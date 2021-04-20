@@ -6,6 +6,7 @@ on:
       - 'environments/**.json'
       - 'terraform/environments/bootstrap-member/**'
       - '.github/workflows/new-environment.yml'
+      - 'scripts/provision-terraform-workspaces.sh'
     branches:
       - main
   pull_request:
