@@ -7,7 +7,7 @@ module "ram-principal-association" {
 
   count = (var.networking[0].set == "") ? 0 : 1
 
-  source = "../../modules/ram-principal-association"
+  source = "github.com/ministryofjustice/modernisation-platform/terraform/modules/ram-principal-association"
 
   providers = {
     aws.share-acm    = aws.core-network-services
@@ -28,7 +28,7 @@ module "ram-ec2-retagging" {
   count = (var.networking[0].set == "") ? 0 : 1
 
 
-  source = "../../modules/ram-ec2-retagging"
+  source = "github.com/ministryofjustice/modernisation-platform/terraform/modules/ram-ec2-retagging"
   providers = {
     aws.share-host   = aws.core-vpc
     aws.share-tenant = aws
