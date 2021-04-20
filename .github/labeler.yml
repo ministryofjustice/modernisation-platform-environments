@@ -1,0 +1,8 @@
+onboarding:
+  - "environments/**"
+
+dependencies:
+  - "terraform/**/*.lock.hcl"
+
+github-workflow:
+  - "github/workflows/**"
