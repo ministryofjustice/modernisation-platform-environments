@@ -4,10 +4,10 @@
 #
 # You need to pass through an argument to this script:
 #
-# bootstrap (`sh scripts/provision-terraform-workspaces.sh bootstrap`)
-# Using the `bootstrap` argument will create Terraform workspaces for all applications and their environments
-# within terraform/environments/bootstrap/* subdirectories.
-# Use case: to create Terraform workspaces for bootstrap steps.
+# bootstrap-member (`sh scripts/provision-terraform-workspaces.sh bootstrap-member`)
+# Using the `bootstrap-member` argument will create Terraform workspaces for all applications and their environments
+# within terraform/environments/bootstrap-member/* subdirectories.
+# Use case: to create Terraform workspaces for bootstrap-member steps.
 #
 # all-environments (`sh scripts/provision-terraform-workspaces.sh all-environments`)
 # Using the `all-environments` argument will create Terraform workspaces for all applications and their environments
@@ -29,7 +29,7 @@ do
 APPLICATION=`basename "${JSON_FILE}" .json`
 
   # Build temporary folder to emulate real folder
-  if  [ "${2}" != "bootstrap" ]
+  if  [ "${2}" != "bootstrap-member" ]
   then
       if [ -d "${git_dir}/tmp" ]
       then
@@ -48,9 +48,9 @@ APPLICATION=`basename "${JSON_FILE}" .json`
   for ENV in `cat "${JSON_FILE}" | jq -r --arg FILENAME "${APPLICATION}" '.environments[].name'`
   do
     # Check if state file exists in S3
-    if [ "${2}" = "bootstrap" ]
+    if [ "${2}" = "bootstrap-member" ]
     then
-      # For Bootstrap files
+      # For bootstrap-member files
       aws s3api head-object --bucket modernisation-platform-terraform-state --key "environments/${1}/${APPLICATION}-${ENV}/terraform.tfstate"  > /dev/null 2>&1
       RETURN_CODE="${?}"
     else
@@ -62,7 +62,7 @@ APPLICATION=`basename "${JSON_FILE}" .json`
   
     if [[ "${RETURN_CODE}" -ne 0 ]]
     then
-      [ "${2}" = "bootstrap" ] && TERRAFORM_PATH="${git_dir}/terraform/environments/${1}" || TERRAFORM_PATH="${git_dir}/tmp"
+      [ "${2}" = "bootstrap-member" ] && TERRAFORM_PATH="${git_dir}/terraform/environments/${1}" || TERRAFORM_PATH="${git_dir}/tmp"
       # move to Terraform environment folder
       echo "terraform working folder:    ${TERRAFORM_PATH}"
       terraform -chdir="${TERRAFORM_PATH}" init > /dev/null
@@ -82,10 +82,10 @@ case "${1}" in
 all-environments)
   iterate_environments "" "${1}" "*"
   ;;
-bootstrap)
-  iterate_environments "bootstrap/delegate-access" "${1}" "*"
-  iterate_environments "bootstrap/secure-baselines" "${1}" "*"
-  iterate_environments "bootstrap/single-sign-on" "${1}" "*"
+bootstrap-member)
+  iterate_environments "bootstrap-member/delegate-access" "${1}" "*"
+  iterate_environments "bootstrap-member/secure-baselines" "${1}" "*"
+  iterate_environments "bootstrap-member/single-sign-on" "${1}" "*"
   ;;
 *)
   # Check if folder exists for application
