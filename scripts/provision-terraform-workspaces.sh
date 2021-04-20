@@ -68,8 +68,6 @@ APPLICATION=`basename "${JSON_FILE}" .json`
       terraform -chdir="${TERRAFORM_PATH}" init > /dev/null
       terraform -chdir="${TERRAFORM_PATH}" workspace new "${APPLICATION}-${ENV}"
     fi
-    echo "loop1"
-    echo "status code $?"
   done
 done
 }
@@ -82,13 +80,11 @@ git_dir="$( git rev-parse --show-toplevel )"
 case "${1}" in
 all-environments)
   iterate_environments "" "${1}" "*"
-  echo "all envs"
   ;;
 bootstrap-member)
   iterate_environments "bootstrap-member/delegate-access" "${1}" "*"
   iterate_environments "bootstrap-member/secure-baselines" "${1}" "*"
   iterate_environments "bootstrap-member/single-sign-on" "${1}" "*"
-  echo "member-env"
   ;;
 *)
   # Check if folder exists for application
