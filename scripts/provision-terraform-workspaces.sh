@@ -54,12 +54,12 @@ APPLICATION=`basename "${JSON_FILE}" .json`
       aws s3api head-object --bucket modernisation-platform-terraform-state --key "environments/${1}/${APPLICATION}-${ENV}/terraform.tfstate"  > /dev/null 2>&1
       RETURN_CODE="${?}"
     else
-      aws s3api head-object --bucket modernisation-platform-terraform-state --key "environments/${APPLICATION}/${APPLICATION}-${ENV}/terraform.tfstate" > /dev/null 2>&1 
+      aws s3api head-object --bucket modernisation-platform-terraform-state --key "environments/${APPLICATION}/${APPLICATION}-${ENV}/terraform.tfstate" > /dev/null 2>&1
       RETURN_CODE="${?}"
     fi
-    
+
     echo "${1}       ${APPLICATION}-${ENV}:-------Return Code: ${RETURN_CODE}"
-  
+
     if [[ "${RETURN_CODE}" -ne 0 ]]
     then
       [ "${2}" = "bootstrap-member" ] && TERRAFORM_PATH="${git_dir}/terraform/environments/${1}" || TERRAFORM_PATH="${git_dir}/tmp"
@@ -68,7 +68,8 @@ APPLICATION=`basename "${JSON_FILE}" .json`
       terraform -chdir="${TERRAFORM_PATH}" init > /dev/null
       terraform -chdir="${TERRAFORM_PATH}" workspace new "${APPLICATION}-${ENV}"
     fi
- 
+    echo "loop1"
+    echo "status code $?"
   done
 done
 }
@@ -81,11 +82,13 @@ git_dir="$( git rev-parse --show-toplevel )"
 case "${1}" in
 all-environments)
   iterate_environments "" "${1}" "*"
+  echo "all envs"
   ;;
 bootstrap-member)
   iterate_environments "bootstrap-member/delegate-access" "${1}" "*"
   iterate_environments "bootstrap-member/secure-baselines" "${1}" "*"
   iterate_environments "bootstrap-member/single-sign-on" "${1}" "*"
+  echo "member-env"
   ;;
 *)
   # Check if folder exists for application
