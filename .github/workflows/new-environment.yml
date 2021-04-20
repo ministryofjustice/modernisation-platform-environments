@@ -4,7 +4,7 @@ on:
   push:
     paths:
       - 'environments/**.json'
-      - 'terraform/environments/bootstrap-member-member/**'
+      - 'terraform/environments/bootstrap-member/**'
       - '.github/workflows/new-environment.yml'
     branches:
       - main
