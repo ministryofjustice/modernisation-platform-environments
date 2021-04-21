@@ -1,8 +1,8 @@
 name: "RAM Share Association"
 
 on:
-  [repository_dispatch]
-  types: [ram-share-assoc-workflow]
+  repository_dispatch:
+    types: ram-share-assoc-workflow
 
 env:
   TF_IN_AUTOMATION: true
