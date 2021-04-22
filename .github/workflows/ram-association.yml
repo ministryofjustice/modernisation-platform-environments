@@ -30,9 +30,8 @@ jobs:
           for i in ${{ steps.new_account.outputs.files }}
           do
           echo "[+] Setting up RAM association for ${i} environment: ${{ github.event.client_payload.environment }}"
-          #bash scripts/member-account-ram-association.sh ${i} ${{ github.event.client_payload.environment }}        
+          bash scripts/member-account-ram-association.sh ${i} ${{ github.event.client_payload.environment }}        
           done
           else
           echo "[+] There were no new AWS member accounts to process"
           fi
-          
