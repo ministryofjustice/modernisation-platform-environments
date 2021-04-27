@@ -1,15 +1,11 @@
-# Ministry of Justice Template Repository
+# Modernisation Platform Environments
 
-Use this template to [create a repository] with the default initial files for a Ministry of Justice Github repository, including:
+## Introduction
 
-* The correct LICENSE
-* Github actions
-* .gitignore file
+This repository contains the Modernisation Platform infrastructure and workflow for user environments (AWS accounts). 
 
-Once you have created your repository, please:
+Here you can add infrastructure to your environment with [Terraform](https://www.terraform.io/). This currently is manually deployed to your environment by a Modernisation Platform engineer, but we plan to introduce Github workflows to automate this.
 
-* Edit the copy of this README.md file to document your project
-* Grant permissions to the appropriate MoJ teams
-* Setup branch protection
+To learn more about how the Modernisation Platform works, please see our main repo [modernisation-platform](https://github.com/ministryofjustice/modernisation-platform), or our [user guidance](https://ministryofjustice.github.io/modernisation-platform)
 
-[create a repository]: https://github.com/ministryofjustice/template-repository/generate
+To request an environment, a new feature, or to report a bug, please [create an issue](https://github.com/ministryofjustice/modernisation-platform/issues/new/choose) on our main repo using the relevant issue template.
