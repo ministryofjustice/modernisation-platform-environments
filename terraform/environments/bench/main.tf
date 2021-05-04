@@ -748,8 +748,8 @@ resource "random_password" "db_master_password" {
 }
 
 resource "random_string" "secret_name_suffix" {
-  length           = 6
-  special          = false
+  length  = 6
+  special = false
 }
 
 resource "aws_secretsmanager_secret" "master_password" {
