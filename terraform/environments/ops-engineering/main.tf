@@ -11,5 +11,5 @@ resource "aws_ecrpublic_repository" "spike" {
 }
 
 output "repository_uri" {
-    value = aws_ecrpublic_repository.spike.repository_uri
+  value = aws_ecrpublic_repository.spike.repository_uri
 }
