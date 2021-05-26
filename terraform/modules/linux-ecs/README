@@ -1,0 +1,3 @@
+efs remove
+Put task def and service in sandbox main.tf
+put secrets in secrets manager
