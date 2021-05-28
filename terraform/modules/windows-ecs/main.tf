@@ -21,9 +21,9 @@ data "aws_subnet_ids" "shared-private" {
 # data "aws_security_group" "loadbalancer" {
 #   name = var.app_name
 # }
-# data "aws_lb_target_group" "target_group" {
-#   name = var.app_name
-# }
+data "aws_lb_target_group" "target_group" {
+  name = var.app_name
+}
 # data "aws_lb" "selected" {
 #   name = var.app_name
 # }
@@ -32,6 +32,11 @@ data "aws_subnet_ids" "shared-private" {
 #   port              = var.server_port
 # }
 #
+
+resource "aws_iam_service_linked_role" "ecs" {
+  aws_service_name = "ecs.amazonaws.com"
+}
+
 resource "aws_autoscaling_group" "cluster-scaling-group" {
   vpc_zone_identifier = sort(data.aws_subnet_ids.shared-private.ids)
   desired_capacity = var.ec2_desired_capacity
@@ -214,9 +219,9 @@ resource "aws_ecs_cluster" "ecs_cluster" {
 }
 
 resource "aws_ecs_task_definition" "ecs_task_definition" {
-  family             = var.app_name
-  execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
-  network_mode       = "bridge"
+  family               = "${var.app_name}-task-definition"
+  execution_role_arn   = aws_iam_role.ecs_task_execution_role.arn
+  network_mode         = "bridge"
   requires_compatibilities = [
     "EC2",
   ]
@@ -249,14 +254,13 @@ resource "aws_ecs_service" "ecs_service" {
     type  = "spread"
   }
 
-  # load_balancer {
-  #   target_group_arn = data.aws_lb_target_group.target_group.id
-  #   container_name   = var.app_name
-  #   container_port   = var.server_port
-  # }
+  load_balancer {
+    target_group_arn = data.aws_lb_target_group.target_group.id
+    container_name   = var.app_name
+    container_port   = var.server_port
+  }
 
   depends_on = [
-    #aws_lb_listener.listener,
     aws_iam_role_policy_attachment.ecs_task_execution_role,
   ]
 

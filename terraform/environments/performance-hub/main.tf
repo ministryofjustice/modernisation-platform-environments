@@ -69,17 +69,16 @@ data "terraform_remote_state" "core_network_services" {
   config = {
     acl     = "bucket-owner-full-control"
     bucket  = "modernisation-platform-terraform-state"
-    key     = "environments/core-network-services/core-network-services-production/terraform.tfstate"
+    key     = "environments/accounts/core-network-services/core-network-services-production/terraform.tfstate"
     region  = "eu-west-2"
     encrypt = "true"
   }
 }
 
 data "template_file" "launch-template" {
-  template = "${file("templates/user-data")}"
+  template = "${file("templates/user-data.txt")}"
   vars = {
     cluster_name = local.application_name
-    #efs_id       = aws_efs_file_system.storage.id
   }
 }
 
@@ -113,7 +112,7 @@ module "windows-ecs" {
   app_name                    = local.application_name
   ami_image_id                = var.ami_image_id
   instance_type               = var.instance_type
-  user_data                   = data.template_file.launch-template.rendered
+  user_data                   = base64encode(data.template_file.launch-template.rendered)
   key_name                    = var.key_name
   task_definition             = data.template_file.task_definition.rendered
   ec2_desired_capacity        = var.ec2_desired_capacity
@@ -121,18 +120,19 @@ module "windows-ecs" {
   ec2_min_size                = var.ec2_min_size
   container_cpu               = var.container_cpu
   container_memory            = var.container_memory
+  server_port                 = var.server_port
   app_count                   = var.app_count
 #   cidr_access                 = var.cidr_access
   tags_common                 = local.tags
 
-  depends_on = [aws_ecr_repository.ecr_repo]
+  depends_on = [aws_ecr_repository.ecr_repo, aws_lb_listener.listener]
 }
 
 resource "aws_route53_record" "external" {
   provider = aws.core-vpc
 
   zone_id = data.aws_route53_zone.external.zone_id
-  name    = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  name    = "${var.networking[0].application}.${var.networking[0].business-unit}-preprod.modernisation-platform.service.justice.gov.uk"
   type    = "A"
 
   alias {
@@ -143,12 +143,12 @@ resource "aws_route53_record" "external" {
 }
 
 resource "aws_acm_certificate" "external" {
-  domain_name       = "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  domain_name       = "${var.networking[0].business-unit}-preprod.modernisation-platform.service.justice.gov.uk"
   validation_method = "DNS"
 
-  subject_alternative_names = ["*.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
+  subject_alternative_names = ["*.${var.networking[0].business-unit}-preprod.modernisation-platform.service.justice.gov.uk"]
   tags = {
-    Environment = "test"
+    Environment = "preprod"
   }
 
   lifecycle {
@@ -244,7 +244,7 @@ resource "aws_lb_listener" "https_listener" {
   load_balancer_arn = aws_lb.external.id
   port              = "443"
   protocol          = "HTTPS"
-  certificate_arn   = aws_acm_certificate.external
+  certificate_arn   = aws_acm_certificate.external.arn
 
   default_action {
     type = "fixed-response"
@@ -312,35 +312,34 @@ resource "aws_acm_certificate" "inner" {
 
 resource "aws_db_instance" "database" {
   identifier                          = local.application_name
-  allocated_storage                   = 20
+  allocated_storage                   = 100
   storage_type                        = "gp2"
-  engine                              = "mysql"
-  engine_version                      = "5.7.26"
-  instance_class                      = "db.t3.large"
-  multi_az                            = var.db_multi_az
-  name                                = "opa18hubdb"
+  engine                              = "sqlserver-se"
+  engine_version                      = "15.00.4073.23.v1"
+  license_model                       = "license-included"
+  instance_class                      = "db.m5.large"
+  multi_az                            = true
+  # name                                = local.application_name
   username                            = var.db_user
   password                            = var.db_password
-  port                                = "3306"
   storage_encrypted                   = false
   iam_database_authentication_enabled = false
   vpc_security_group_ids = [
     aws_security_group.db.id
   ]
-  snapshot_identifier       = var.db_snapshot_identifier
+  # snapshot_identifier       = var.db_snapshot_identifier
   backup_retention_period   = 30
   maintenance_window        = "Mon:00:00-Mon:03:00"
   backup_window             = "03:00-06:00"
-  final_snapshot_identifier = "opahub18-final-snapshot"
+  # final_snapshot_identifier = "opahub18-final-snapshot"
   deletion_protection       = false
   db_subnet_group_name      = aws_db_subnet_group.db.id
-  option_group_name         = aws_db_option_group.db.id
 
-  timeouts {
-    create = "40m"
-    delete = "40m"
-    update = "80m"
-  }
+  # timeouts {
+  #   create = "40m"
+  #   delete = "40m"
+  #   update = "80m"
+  # }
 
   tags = local.tags
 }
@@ -357,8 +356,8 @@ resource "aws_security_group" "db" {
   vpc_id      = data.aws_vpc.shared.id
 
   ingress {
-    from_port = 3306
-    to_port   = 3306
+    from_port = 1433
+    to_port   = 1433
     protocol  = "tcp"
     cidr_blocks = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
   }
@@ -373,8 +372,125 @@ resource "aws_security_group" "db" {
   tags = local.tags
 }
 
-resource "aws_db_option_group" "db" {
-  name                 = local.application_name
-  engine_name          = "mysql"
-  major_engine_version = "5.7"
+#------------------------------------------------------------------------------
+# S3 Bucket for Database backup files
+#------------------------------------------------------------------------------
+
+resource "aws_s3_bucket" "database_files" {
+  bucket_prefix = "performance-hub"
+  acl           = "private"
+
+  lifecycle {
+    prevent_destroy = true
+  }
+
+  dynamic "lifecycle_rule" {
+    for_each = true ? [true] : []
+
+    content {
+      enabled = true
+
+      noncurrent_version_transition {
+        days          = 30
+        storage_class = "STANDARD_IA"
+      }
+
+      transition {
+        days          = 60
+        storage_class = "STANDARD_IA"
+      }
+    }
+  }
+
+  server_side_encryption_configuration {
+    rule {
+      apply_server_side_encryption_by_default {
+        sse_algorithm     = "aws:kms"
+        kms_master_key_id = aws_kms_key.s3.arn
+      }
+    }
+  }
+
+  versioning {
+    enabled = true
+  }
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "performance-hub-s3"
+    },
+  )
+}
+
+#S3 bucket access policy
+data "aws_iam_policy_document" "bucket_access" {
+
+  statement {
+    actions = [
+      "s3:PutObject",
+      "s3:PutObjectAcl",
+      "s3:ListBucket"
+    ]
+
+    resources = [
+      aws_s3_bucket.database_files.arn,
+      "${aws_s3_bucket.database_files.arn}/*"
+    ]
+    principals {
+      identifiers = ["s3.amazonaws.com"]
+      type        = "Service"
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "root" {
+
+  bucket = aws_s3_bucket.database_files.id
+  policy = data.aws_iam_policy_document.bucket_access.json
+}
+
+#------------------------------------------------------------------------------
+# KMS setup for S3
+#------------------------------------------------------------------------------
+
+resource "aws_kms_key" "s3" {
+  description         = "Encryption key for s3"
+  enable_key_rotation = true
+  policy              = data.aws_iam_policy_document.s3-kms.json
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "s3-kms"
+    },
+  )
+}
+
+resource "aws_kms_alias" "kms-alias" {
+  name          = "alias/s3"
+  target_key_id = aws_kms_key.s3.arn
+}
+
+data "aws_iam_policy_document" "s3-kms" {
+  statement {
+    effect    = "Allow"
+    actions   = ["kms:*"]
+    resources = ["*"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["s3.amazonaws.com"]
+    }
+  }
+  statement {
+    effect    = "Allow"
+    actions   = ["kms:*"]
+    resources = ["*"]
+
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
+    }
+  }
 }

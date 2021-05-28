@@ -60,9 +60,17 @@ variable "app_image" {
 
 }
 
-variable "db_snapshot_identifier" {
+variable "db_user" {
 
 }
+
+variable "db_password" {
+
+}
+
+# variable "db_snapshot_identifier" {
+#
+# }
 #
 # variable "health_check_path" {
 #   default = "/opa/opa-hub/manager"

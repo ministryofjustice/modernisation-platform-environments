@@ -1,2 +1,4 @@
+<powershell>
 Import-Module ECSTools
 Initialize-ECSAgent –Cluster ${cluster_name} -EnableIAMTaskRole
+</powershell>
