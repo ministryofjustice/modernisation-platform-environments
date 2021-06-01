@@ -57,6 +57,13 @@ data "aws_route53_zone" "inner" {
   private_zone = true
 }
 
+data "aws_route53_zone" "network-services" {
+  provider = aws.core-network-services
+
+  name         = "modernisation-platform.service.justice.gov.uk."
+  private_zone = false
+}
+
 data "aws_subnet_ids" "shared-public" {
   vpc_id = data.aws_vpc.shared.id
   tags = {
@@ -171,7 +178,7 @@ resource "aws_route53_record" "external_validation" {
   records         = [each.value.record]
   ttl             = 60
   type            = each.value.type
-  zone_id         = data.aws_route53_zone.external.zone_id
+  zone_id         = data.aws_route53_zone.network-services.zone_id
 }
 
 resource "aws_acm_certificate_validation" "external" {
