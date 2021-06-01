@@ -30,7 +30,7 @@ jobs:
       - name: load and configure Terraform for dev
         uses: hashicorp/setup-terraform@v1.3.2
         with:
-          terraform_version: 0.14.4
+          terraform_version: 0.14.6
           terraform_wrapper: false
       - name: dev-deploy-terraform-plan
         run: |
