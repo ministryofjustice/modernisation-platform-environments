@@ -5,6 +5,7 @@ on:
     branches: '*'
     paths:
       - 'terraform/environments/performance-hub/**'
+      - '.github/workflows/performance-hub-cicd.yml'
   pull_request:
     branches:
       - main
@@ -27,17 +28,17 @@ jobs:
       - name: checkout repository to use in dev
         uses: actions/checkout@v2.3.4
       - name: load and configure Terraform for dev
-        uses: hashicorp/setup-terraform@v1.4.0
+        uses: hashicorp/setup-terraform@v1.3.2
         with:
-          terraform_version: 0.15.4
+          terraform_version: 0.14.4
           terraform_wrapper: false
       - name: dev-deploy-terraform-plan
         run: |
           echo "Terraform plan - dev"
           #CONFIGURE TERRAFORM AND WORKSPACE
           bash scripts/terraform-init.sh terraform/environments/performance-hub
-          terraform -chdir="terraform/environments/core-vpc" workspace select "performance-hub-${TF_ENV}"
-          bash scripts/terraform-plan.sh terraform/environments/performance-hub
+          terraform -chdir="terraform/environments/performance-hub" workspace select "performance-hub-${TF_ENV}"
+          bash scripts/terraform-plan.sh terraform/environments/performance-hub -var-file=environments/${TF_ENV}.tfvars
         env:
           TF_ENV: preproduction
 
