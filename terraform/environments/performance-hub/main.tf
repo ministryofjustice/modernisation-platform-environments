@@ -92,9 +92,9 @@ data "template_file" "launch-template" {
 data "template_file" "task_definition" {
   template = "${file("templates/task_definition.json")}"
   vars = {
-    app_name          = local.application_name
+    app_name = local.application_name
     #app_image         = format("%s%s", data.aws_caller_identity.current.account".dkr.ecr."${var.region}".amazonaws.com/"${local.application_name})
-    app_image         = format("%s%s", data.aws_caller_identity.current.account_id,var.app_image)
+    app_image = format("%s%s", data.aws_caller_identity.current.account_id, var.app_image)
     #data.aws_ecr_image.service_image.id
     #".dkr.ecr.eu-west-2.amazonaws.com/ccms-opa18-hub"
     server_port       = var.server_port
@@ -114,23 +114,23 @@ module "windows-ecs" {
 
   source = "../../modules/windows-ecs"
 
-  subnet_set_name             = local.subnet_set_name
-  vpc_all                     = local.vpc_all
-  app_name                    = local.application_name
-  ami_image_id                = var.ami_image_id
-  instance_type               = var.instance_type
-  user_data                   = base64encode(data.template_file.launch-template.rendered)
-  key_name                    = var.key_name
-  task_definition             = data.template_file.task_definition.rendered
-  ec2_desired_capacity        = var.ec2_desired_capacity
-  ec2_max_size                = var.ec2_max_size
-  ec2_min_size                = var.ec2_min_size
-  container_cpu               = var.container_cpu
-  container_memory            = var.container_memory
-  server_port                 = var.server_port
-  app_count                   = var.app_count
-#   cidr_access                 = var.cidr_access
-  tags_common                 = local.tags
+  subnet_set_name      = local.subnet_set_name
+  vpc_all              = local.vpc_all
+  app_name             = local.application_name
+  ami_image_id         = var.ami_image_id
+  instance_type        = var.instance_type
+  user_data            = base64encode(data.template_file.launch-template.rendered)
+  key_name             = var.key_name
+  task_definition      = data.template_file.task_definition.rendered
+  ec2_desired_capacity = var.ec2_desired_capacity
+  ec2_max_size         = var.ec2_max_size
+  ec2_min_size         = var.ec2_min_size
+  container_cpu        = var.container_cpu
+  container_memory     = var.container_memory
+  server_port          = var.server_port
+  app_count            = var.app_count
+  #   cidr_access                 = var.cidr_access
+  tags_common = local.tags
 
   depends_on = [aws_ecr_repository.ecr_repo, aws_lb_listener.listener]
 }
@@ -187,7 +187,7 @@ resource "aws_route53_record" "external_validation_subdomain" {
 
 resource "aws_acm_certificate_validation" "external" {
   certificate_arn         = aws_acm_certificate.external.arn
-  validation_record_fqdns = [ local.domain_name_main[0], local.domain_name_sub[0] ]
+  validation_record_fqdns = [local.domain_name_main[0], local.domain_name_sub[0]]
 }
 
 #------------------------------------------------------------------------------
@@ -197,7 +197,7 @@ resource "aws_acm_certificate_validation" "external" {
 resource "aws_lb" "external" {
   name               = local.application_name
   load_balancer_type = "application"
-  subnets = data.aws_subnet_ids.shared-public.ids
+  subnets            = data.aws_subnet_ids.shared-public.ids
 
   security_groups = [aws_security_group.load_balancer_security_group.id]
 
@@ -252,7 +252,7 @@ resource "aws_lb_listener" "http_listener" {
 }
 
 resource "aws_lb_listener" "https_listener" {
-  depends_on = [ aws_acm_certificate_validation.external ]
+  depends_on = [aws_acm_certificate_validation.external]
 
   load_balancer_arn = aws_lb.external.id
   port              = "443"
@@ -293,9 +293,9 @@ resource "aws_security_group" "load_balancer_security_group" {
   # }
 
   ingress {
-    protocol  = "tcp"
-    from_port = 443
-    to_port   = 443
+    protocol    = "tcp"
+    from_port   = 443
+    to_port     = 443
     cidr_blocks = ["0.0.0.0/0", ]
   }
 
@@ -316,14 +316,14 @@ resource "aws_security_group" "load_balancer_security_group" {
 #------------------------------------------------------------------------------
 
 resource "aws_db_instance" "database" {
-  identifier                          = local.application_name
-  allocated_storage                   = 100
-  storage_type                        = "gp2"
-  engine                              = "sqlserver-se"
-  engine_version                      = "15.00.4073.23.v1"
-  license_model                       = "license-included"
-  instance_class                      = "db.m5.large"
-  multi_az                            = true
+  identifier        = local.application_name
+  allocated_storage = 100
+  storage_type      = "gp2"
+  engine            = "sqlserver-se"
+  engine_version    = "15.00.4073.23.v1"
+  license_model     = "license-included"
+  instance_class    = "db.m5.large"
+  multi_az          = true
   # name                                = local.application_name
   username                            = var.db_user
   password                            = var.db_password
@@ -350,9 +350,9 @@ resource "aws_db_instance" "database" {
 }
 
 resource "aws_db_subnet_group" "db" {
-  name = local.application_name
+  name       = local.application_name
   subnet_ids = sort(data.aws_subnet_ids.shared-data.ids)
-  tags = local.tags
+  tags       = local.tags
 }
 
 resource "aws_security_group" "db" {
@@ -361,9 +361,9 @@ resource "aws_security_group" "db" {
   vpc_id      = data.aws_vpc.shared.id
 
   ingress {
-    from_port = 1433
-    to_port   = 1433
-    protocol  = "tcp"
+    from_port   = 1433
+    to_port     = 1433
+    protocol    = "tcp"
     cidr_blocks = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
   }
 

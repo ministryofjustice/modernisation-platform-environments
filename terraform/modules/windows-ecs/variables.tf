@@ -2,15 +2,15 @@ variable "vpc_all" {
 
 }
 
-variable "subnet_set_name"{
+variable "subnet_set_name" {
 
 }
 
-variable "user_data"{
+variable "user_data" {
 
 }
 #
-variable "task_definition"{
+variable "task_definition" {
 
 }
 
@@ -79,5 +79,5 @@ variable "ec2_min_size" {
 # }
 #
 variable "tags_common" {
-  type        = map(string)
+  type = map(string)
 }
