@@ -163,6 +163,7 @@ resource "aws_acm_certificate" "external" {
   }
 }
 
+# TODO Split out the domain validation options so that we only create one record in the relevant domain
 resource "aws_route53_record" "external_validation" {
   provider = aws.core-network-services
   for_each = {
@@ -181,6 +182,7 @@ resource "aws_route53_record" "external_validation" {
   zone_id         = data.aws_route53_zone.network-services.zone_id
 }
 
+# TODO Split out the domain validation options so that we only create one record in the relevant domain
 resource "aws_route53_record" "external_validation_subdomain" {
   provider = aws.core-vpc
   for_each = {
@@ -196,7 +198,7 @@ resource "aws_route53_record" "external_validation_subdomain" {
   records         = [each.value.record]
   ttl             = 60
   type            = each.value.type
-  zone_id         = data.aws_route53_zone.network-services.zone_id
+  zone_id         = data.aws_route53_zone.external.zone_id
 }
 
 resource "aws_acm_certificate_validation" "external" {
