@@ -16,3 +16,10 @@ if [ -z "$1" ]; then
 else
   terraform -chdir="$1" apply -input=false -no-color -auto-approve | ./scripts/redact-output.sh
 fi
+
+if [ ! -z "$2" ]; then
+  options="$2"
+  terraform -chdir="$1" apply -input=false -no-color -auto-approve $options | ./scripts/redact-output.sh
+else
+  terraform -chdir="$1" apply -input=false -no-color -auto-approve | ./scripts/redact-output.sh
+fi
