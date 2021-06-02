@@ -22,7 +22,7 @@ provider "aws" {
   }
 }
 
-# AWS provider for core-vpc-production, to share VPCs into this account
+# AWS provider for network services to enable dns entries for certificate validation to be created
 provider "aws" {
   alias  = "core-network-services"
   region = "eu-west-2"
