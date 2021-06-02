@@ -1,0 +1,12 @@
+[{
+  "name": "performance-hub",
+  "image": "${app_image}:${container_version}",
+  "portMappings": [
+    {
+      "protocol": "tcp",
+      "containerPort": 7001,
+      "hostPort": 8080
+    }
+  ],
+  "essential": true
+}]
