@@ -5,6 +5,10 @@ resource "aws_ecr_repository" "ecr_repo" {
   image_scanning_configuration {
     scan_on_push = false
   }
+  
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 data "aws_caller_identity" "current" {}
@@ -333,6 +337,7 @@ resource "aws_db_instance" "database" {
   backup_window             = "03:00-06:00"
   # final_snapshot_identifier = "opahub18-final-snapshot"
   deletion_protection       = false
+  option_group_name         = aws_db_option_group.db_option_group.name
   db_subnet_group_name      = aws_db_subnet_group.db.id
 
   # timeouts {
@@ -342,6 +347,22 @@ resource "aws_db_instance" "database" {
   # }
 
   tags = local.tags
+}
+
+resource "aws_db_option_group" "db_option_group" {
+  name                     = "${local.application_name}-option-group"
+  option_group_description = "Terraform Option Group"
+  engine_name              = "sqlserver-ee"
+  major_engine_version     = "15.00"
+
+  option {
+    option_name = "SQLSERVER_BACKUP_RESTORE"
+
+    option_settings {
+      name  = "IAM_ROLE_ARN"
+      value = aws_iam_role.s3_database_files_role.arn
+    }
+  }
 }
 
 resource "aws_db_subnet_group" "db" {
@@ -421,6 +442,40 @@ resource "aws_s3_bucket" "database_files" {
       Name = "performance-hub-s3"
     },
   )
+}
+
+resource "aws_iam_role" "s3_database_files_role" {
+  name = "${local.application_name}-s3-backups-role"
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+  {
+    "Effect": "Allow",
+    "Action": [
+        "s3:ListBucket",
+        "s3:GetBucketLocation"
+    ],
+    "Resource": [
+        "${aws_s3_bucket.database_files.arn}"
+    ]
+  },
+  {
+    "Effect": "Allow",
+    "Action": [
+        "s3:GetObjectMetaData",
+        "s3:GetObject",
+        "s3:PutObject",
+        "s3:ListMultipartUploadParts",
+        "s3:AbortMultipartUpload"
+    ],
+    "Resource": [
+        "${aws_s3_bucket.database_files.arn}/*"
+    ]
+  }
+  ]
+}
+EOF
 }
 
 #S3 bucket access policy
