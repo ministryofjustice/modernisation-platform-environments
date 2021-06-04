@@ -24,6 +24,10 @@ variable "key_name" {
   description = "Key to access EC2s in ECS cluster"
 }
 
+variable "db-mgmt-server-key" {
+  description = "Key to access db management EC2"
+}
+
 variable "container_cpu" {
   description = "Container instance CPU units to provision (1 vCPU = 1024 CPU units)"
   default     = "512"

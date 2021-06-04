@@ -18,9 +18,9 @@ data "aws_subnet_ids" "shared-private" {
 # data "aws_db_instance" "database" {
 #   db_instance_identifier = var.app_name
 # }
-# data "aws_security_group" "loadbalancer" {
-#   name = var.app_name
-# }
+data "aws_security_group" "loadbalancer" {
+  name = var.app_name
+}
 data "aws_lb_target_group" "target_group" {
   name = var.app_name
 }
@@ -66,14 +66,14 @@ resource "aws_security_group" "cluster_ec2" {
   #   )
   # }
 
-  # ingress {
-  #   protocol  = "tcp"
-  #   from_port = 32768
-  #   to_port   = 65535
-  #   security_groups = [
-  #     data.aws_security_group.loadbalancer.id
-  #   ]
-  # }
+  ingress {
+    protocol  = "tcp"
+    from_port = 32768
+    to_port   = 65535
+    security_groups = [
+      data.aws_security_group.loadbalancer.id
+    ]
+  }
 
   egress {
     protocol  = "-1"

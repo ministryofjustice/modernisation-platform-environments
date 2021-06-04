@@ -5,7 +5,7 @@ resource "aws_ecr_repository" "ecr_repo" {
   image_scanning_configuration {
     scan_on_push = false
   }
-  
+
   lifecycle {
     prevent_destroy = true
   }
@@ -357,17 +357,17 @@ resource "aws_db_instance" "database" {
 resource "aws_db_option_group" "db_option_group" {
   name                     = "${local.application_name}-option-group"
   option_group_description = "Terraform Option Group"
-  engine_name              = "sqlserver-ee"
+  engine_name              = "sqlserver-se"
   major_engine_version     = "15.00"
 
-  option {
-    option_name = "SQLSERVER_BACKUP_RESTORE"
-
-    option_settings {
-      name  = "IAM_ROLE_ARN"
-      value = aws_iam_role.s3_database_files_role.arn
-    }
-  }
+  # option {
+  #   option_name = "SQLSERVER_BACKUP_RESTORE"
+  #
+  #   option_settings {
+  #     name  = "IAM_ROLE_ARN"
+  #     value = aws_iam_role.s3_database_backups_role.arn
+  #   }
+  # }
 }
 
 resource "aws_db_subnet_group" "db" {
@@ -401,9 +401,8 @@ resource "aws_security_group" "db" {
 #------------------------------------------------------------------------------
 # S3 Bucket for Database backup files
 #------------------------------------------------------------------------------
-
-resource "aws_s3_bucket" "database_files" {
-  bucket_prefix = "performance-hub"
+resource "aws_s3_bucket" "database_backup_files" {
+  bucket        = "performance-hub-db-backups"
   acl           = "private"
 
   lifecycle {
@@ -444,72 +443,176 @@ resource "aws_s3_bucket" "database_files" {
   tags = merge(
     local.tags,
     {
-      Name = "performance-hub-s3"
+      Name = "performance-hub-db-backups-s3"
     },
   )
 }
 
-resource "aws_iam_role" "s3_database_files_role" {
-  name = "${local.application_name}-s3-backups-role"
-  assume_role_policy = <<EOF
+#S3 bucket access policy
+resource "aws_iam_policy" "s3_database_backups_policy" {
+  name = "${local.application_name}-s3-database_backups-policy"
+  policy = <<EOF
 {
   "Version": "2012-10-17",
   "Statement": [
-  {
-    "Effect": "Allow",
-    "Action": [
+    {
+      "Effect": "Allow",
+      "Action": [
         "s3:ListBucket",
         "s3:GetBucketLocation"
-    ],
-    "Resource": [
-        "${aws_s3_bucket.database_files.arn}"
-    ]
-  },
-  {
-    "Effect": "Allow",
-    "Action": [
+      ],
+      "Resource": [
+          "${aws_s3_bucket.database_backup_files.arn}"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
         "s3:GetObjectMetaData",
         "s3:GetObject",
         "s3:PutObject",
         "s3:ListMultipartUploadParts",
         "s3:AbortMultipartUpload"
-    ],
-    "Resource": [
-        "${aws_s3_bucket.database_files.arn}/*"
-    ]
-  }
+      ],
+      "Resource": [
+        "${aws_s3_bucket.database_backup_files.arn}/*"
+      ]
+    }
   ]
 }
 EOF
 }
 
-#S3 bucket access policy
-data "aws_iam_policy_document" "bucket_access" {
+# data "aws_iam_policy_document" "s3_database_backups_policy" {
+#
+#   statement {
+#     actions = [
+#       "s3:ListBucket",
+#       "s3:GetBucketLocation"
+#     ]
+#
+#     resources = [
+#       aws_s3_bucket.database_backup_files.arn,
+#       "${aws_s3_bucket.database_backup_files.arn}/*"
+#     ]
+#
+#   }
+# }
 
+resource "aws_iam_role" "s3_database_backups_role" {
+  name = "${local.application_name}-s3-database-backups-role"
+  assume_role_policy = data.aws_iam_policy_document.s3-access-policy.json
+}
+
+resource "aws_iam_role_policy_attachment" "s3_database_backups_attachment" {
+  role       = aws_iam_role.s3_database_backups_role.name
+  policy_arn = aws_iam_policy.s3_database_backups_policy.arn
+}
+#------------------------------------------------------------------------------
+# S3 Bucket for Uploads
+#------------------------------------------------------------------------------
+resource "aws_s3_bucket" "upload_files" {
+  bucket        = "performance-hub-uploads"
+  acl           = "private"
+
+  lifecycle {
+    prevent_destroy = true
+  }
+
+  dynamic "lifecycle_rule" {
+    for_each = true ? [true] : []
+
+    content {
+      enabled = true
+
+      noncurrent_version_transition {
+        days          = 30
+        storage_class = "STANDARD_IA"
+      }
+
+      transition {
+        days          = 60
+        storage_class = "STANDARD_IA"
+      }
+    }
+  }
+
+  server_side_encryption_configuration {
+    rule {
+      apply_server_side_encryption_by_default {
+        sse_algorithm     = "aws:kms"
+        kms_master_key_id = aws_kms_key.s3.arn
+      }
+    }
+  }
+
+  versioning {
+    enabled = true
+  }
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "performance-hub-uploads"
+    },
+  )
+}
+
+resource "aws_iam_role" "s3_uploads_role" {
+  name = "${local.application_name}-s3-uploads-role"
+  assume_role_policy = data.aws_iam_policy_document.s3-access-policy.json
+}
+
+data "aws_iam_policy_document" "s3-access-policy" {
+  version = "2012-10-17"
   statement {
+    sid    = ""
+    effect = "Allow"
     actions = [
-      "s3:PutObject",
-      "s3:PutObjectAcl",
-      "s3:ListBucket"
-    ]
-
-    resources = [
-      aws_s3_bucket.database_files.arn,
-      "${aws_s3_bucket.database_files.arn}/*"
+      "sts:AssumeRole",
     ]
     principals {
-      identifiers = ["s3.amazonaws.com"]
-      type        = "Service"
+      type = "Service"
+      identifiers = [
+        "ec2.amazonaws.com",
+      ]
     }
   }
 }
 
-resource "aws_s3_bucket_policy" "root" {
-
-  bucket = aws_s3_bucket.database_files.id
-  policy = data.aws_iam_policy_document.bucket_access.json
+resource "aws_iam_policy" "s3-uploads-policy" {
+  name = "${local.application_name}-s3-uploads-policy"
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+          "s3:*"
+      ],
+      "Resource": [
+          "${aws_s3_bucket.upload_files.arn}"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+          "s3:*"
+      ],
+      "Resource": [
+        "${aws_s3_bucket.upload_files.arn}/*"
+      ]
+    }
+  ]
+}
+EOF
 }
 
+resource "aws_iam_role_policy_attachment" "s3_uploads_attachment" {
+  role       = aws_iam_role.s3_uploads_role.name
+  policy_arn = aws_iam_policy.s3-uploads-policy.arn
+}
 #------------------------------------------------------------------------------
 # KMS setup for S3
 #------------------------------------------------------------------------------

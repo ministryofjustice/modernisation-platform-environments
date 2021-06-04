@@ -5,18 +5,18 @@ resource "aws_instance" "db_mgmt_server" {
   ebs_optimized               = true
   iam_instance_profile        = aws_iam_instance_profile.db_mgmt_profile.name
   instance_type               = "t3.large"
-  key_name                    = var.ec2_key
+  key_name                    = var.db-mgmt-server-key
   monitoring                  = true
-  subnet_id                   = data.aws_cloudformation_stack.landing_zone.outputs["AppPrivateSubnetA"]
+  subnet_id                   = data.aws_subnet.private_subnets_a.id
   user_data                   = data.template_cloudinit_config.cloudinit-db-mgmt.rendered
   vpc_security_group_ids      = [aws_security_group.db_mgmt_server_security_group.id, ]
 
   root_block_device {
     delete_on_termination = true
     encrypted             = true
-    kms_key_id            = data.aws_cloudformation_export.ebscmk.value
+    kms_key_id            = aws_kms_key.ebs.id
     volume_size           = 150
-    volume_type           = "gp2"
+    volume_type           = "gp3"
   }
 
   lifecycle {
@@ -37,7 +37,6 @@ data "template_file" "db_mgmt_server_script" {
 }
 
 data "template_cloudinit_config" "cloudinit-db-mgmt" {
-  count         = 1
   gzip          = false
   base64_encode = false
 
@@ -88,8 +87,8 @@ resource "aws_iam_policy" "db_mgmt_policy" {
             "Effect": "Allow",
             "Action": "s3:*",
             "Resource": [
-                ${"aws_s3_bucket.database_files.arn"},
-                ${"aws_s3_bucket.database_files.arn" ":/*"}
+                "${aws_s3_bucket.database_backup_files.arn}",
+                 "${aws_s3_bucket.database_backup_files.arn}:/*"
             ]
         }
     ]
@@ -101,17 +100,17 @@ EOF
 resource "aws_security_group" "db_mgmt_server_security_group" {
   name_prefix = "${local.application_name}-db-mgmt-server-sg"
   description = "controls access to the db mgmt server"
-  vpc_id      = data.aws_cloudformation_stack.landing_zone.outputs["VpcId"]
+  vpc_id      = data.aws_vpc.shared.id
 
-  ingress {
-    protocol  = "tcp"
-    from_port = 3389
-    to_port   = 3389
-    cidr_blocks = [
-      data.aws_cloudformation_stack.landing_zone.outputs["EnvironmentCIDR"],
-      var.bastion_cidr
-    ]
-  }
+  # ingress {
+  #   protocol  = "tcp"
+  #   from_port = 3389
+  #   to_port   = 3389
+  #   cidr_blocks = [
+  #     data.aws_cloudformation_stack.landing_zone.outputs["EnvironmentCIDR"],
+  #     var.bastion_cidr
+  #   ]
+  # }
 
   egress {
     protocol  = "-1"
@@ -123,4 +122,49 @@ resource "aws_security_group" "db_mgmt_server_security_group" {
   }
 
   tags = local.tags
+}
+
+#------------------------------------------------------------------------------
+# KMS setup for S3
+#------------------------------------------------------------------------------
+
+resource "aws_kms_key" "ebs" {
+  description         = "Encryption key for EBS"
+  enable_key_rotation = true
+  policy              = data.aws_iam_policy_document.ebs-kms.json
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "ebs-kms"
+    },
+  )
+}
+
+resource "aws_kms_alias" "ebs-kms-alias" {
+  name          = "alias/ebs"
+  target_key_id = aws_kms_key.ebs.arn
+}
+
+data "aws_iam_policy_document" "ebs-kms" {
+  statement {
+    effect    = "Allow"
+    actions   = ["kms:*"]
+    resources = ["*"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["ec2.amazonaws.com"]
+    }
+  }
+  statement {
+    effect    = "Allow"
+    actions   = ["kms:*"]
+    resources = ["*"]
+
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
+    }
+  }
 }
