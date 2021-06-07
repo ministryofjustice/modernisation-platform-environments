@@ -2,11 +2,13 @@
 # https://github.com/ministryofjustice/modernisation-platform/blob/main/scripts/provision-member-directories.sh
 
 * @modernisation-platform
+/terraform/environments/bench @modernisation-platform @modernisation-platform
 /terraform/environments/bichard7 @cjse-bichard7-next @modernisation-platform
 /terraform/environments/heater @modernisation-platform @modernisation-platform
 /terraform/environments/ops-engineering @operations-engineering @modernisation-platform
 /terraform/environments/performance-hub @modernisation-platform-engineers @modernisation-platform
 /terraform/environments/remote-supervision @hmpps-remote-supervision @modernisation-platform
+/terraform/environments/sprinkler @modernisation-platform @modernisation-platform
 **/providers.tf @modernisation-platform
 **/backend.tf @modernisation-platform
 **/subnet_share.tf @modernisation-platform
