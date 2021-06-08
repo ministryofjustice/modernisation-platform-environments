@@ -1,7 +1,6 @@
 ami_image_id                  = "ami-03dd3e42b5ea48f45"
 instance_type                 = "t3.small"
 key_name                      = "performance-hub-ec2"
-db-mgmt-server-key            = "performance-hub-db-mgmt-server"
 app_count                     = "1"
 ec2_desired_capacity          = 2
 ec2_max_size                  = 3
