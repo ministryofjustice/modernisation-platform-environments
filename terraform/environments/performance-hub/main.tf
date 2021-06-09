@@ -360,14 +360,14 @@ resource "aws_db_option_group" "db_option_group" {
   engine_name              = "sqlserver-se"
   major_engine_version     = "15.00"
 
-  # option {
-  #   option_name = "SQLSERVER_BACKUP_RESTORE"
-  #
-  #   option_settings {
-  #     name  = "IAM_ROLE_ARN"
-  #     value = aws_iam_role.s3_database_backups_role.arn
-  #   }
-  # }
+  option {
+    option_name = "SQLSERVER_BACKUP_RESTORE"
+  
+    option_settings {
+      name  = "IAM_ROLE_ARN"
+      value = aws_iam_role.s3_database_backups_role.arn
+    }
+  }
 }
 
 resource "aws_db_subnet_group" "db" {
@@ -380,23 +380,26 @@ resource "aws_security_group" "db" {
   name        = local.application_name
   description = "Allow DB inbound traffic"
   vpc_id      = data.aws_vpc.shared.id
-
-  ingress {
-    from_port = 1433
-    to_port   = 1433
-    protocol  = "tcp"
-    cidr_blocks = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
   tags = local.tags
 }
+
+resource "aws_security_group_rule" "db_mgmt_ingress_rule" {
+  type      = "ingress"
+  from_port = 1433
+  to_port   = 1433
+  protocol  = "tcp"
+  security_group_id = aws_security_group.db.id
+  source_security_group_id = aws_security_group.db_mgmt_server_security_group.id
+}
+
+# resource "aws_security_group_rule" "db_ecs_ingress_rule" {
+#   type      = "ingress"
+#   from_port = 1433
+#   to_port   = 1433
+#   protocol  = "tcp"
+#   security_group_id = aws_security_group.db.id
+#   source_security_group_id = aws_security_group.db_mgmt_server_security_group.id 
+# }
 
 #------------------------------------------------------------------------------
 # S3 Bucket for Database backup files
@@ -483,22 +486,6 @@ resource "aws_iam_policy" "s3_database_backups_policy" {
 EOF
 }
 
-# data "aws_iam_policy_document" "s3_database_backups_policy" {
-#
-#   statement {
-#     actions = [
-#       "s3:ListBucket",
-#       "s3:GetBucketLocation"
-#     ]
-#
-#     resources = [
-#       aws_s3_bucket.database_backup_files.arn,
-#       "${aws_s3_bucket.database_backup_files.arn}/*"
-#     ]
-#
-#   }
-# }
-
 resource "aws_iam_role" "s3_database_backups_role" {
   name = "${local.application_name}-s3-database-backups-role"
   assume_role_policy = data.aws_iam_policy_document.s3-access-policy.json
@@ -575,6 +562,7 @@ data "aws_iam_policy_document" "s3-access-policy" {
       type = "Service"
       identifiers = [
         "ec2.amazonaws.com",
+        "rds.amazonaws.com",
       ]
     }
   }

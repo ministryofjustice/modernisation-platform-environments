@@ -1,3 +1,28 @@
 <powershell>
+Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+
+refreshenv
+
 choco install sql-server-management-studio
+choco install winfsp
+choco install rclone
+
+$config=@'
+[remote]
+type = s3
+provider = AWS
+env_auth = true
+region = eu-west-2
+location_constraint = eu-west-2
+acl = private
+server_side_encryption = aws:kms
+storage_class = STANDARD
+'@
+
+$config | Out-File C:\Users\Administrator\.config\rclone\rclone.conf
+
+
+refreshenv
+
+rclone mount remote:performance-hub-db-backups Y:
 </powershell>

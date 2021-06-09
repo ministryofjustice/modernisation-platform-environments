@@ -82,15 +82,35 @@ resource "aws_iam_policy" "db_mgmt_policy" {
 {
     "Version": "2012-10-17",
     "Statement": [
-        {
-            "Sid": "",
-            "Effect": "Allow",
-            "Action": "s3:*",
-            "Resource": [
-                "${aws_s3_bucket.database_backup_files.arn}",
-                 "${aws_s3_bucket.database_backup_files.arn}:/*"
-            ]
-        }
+      {
+        "Effect": "Allow",
+        "Action": "s3:*",
+        "Resource": "*"
+      },
+      {
+        "Effect": "Allow",
+        "Action": [
+          "ssmmessages:CreateControlChannel",
+          "ssmmessages:CreateDataChannel",
+          "ssmmessages:OpenControlChannel",
+          "ssmmessages:OpenDataChannel"
+        ],
+        "Resource": "*"
+      },
+      {
+        "Effect": "Allow",
+        "Action": [
+          "s3:GetEncryptionConfiguration"
+        ],
+        "Resource": "*"
+      },
+      {
+        "Effect": "Allow",
+        "Action": [
+          "kms:Decrypt"
+        ],
+        "Resource": "arn:aws:kms:eu-west-2:322518575883:key/c1b9e987-29e2-458f-b5bd-2e9c2b57f049"
+      }
     ]
 }
 EOF
@@ -102,15 +122,12 @@ resource "aws_security_group" "db_mgmt_server_security_group" {
   description = "controls access to the db mgmt server"
   vpc_id      = data.aws_vpc.shared.id
 
-  # ingress {
-  #   protocol  = "tcp"
-  #   from_port = 3389
-  #   to_port   = 3389
-  #   cidr_blocks = [
-  #     data.aws_cloudformation_stack.landing_zone.outputs["EnvironmentCIDR"],
-  #     var.bastion_cidr
-  #   ]
-  # }
+  ingress {
+    protocol  = "tcp"
+    from_port = 3389
+    to_port   = 3389
+    cidr_blocks = [ "10.236.0.218/32" ]
+  }
 
   egress {
     protocol  = "-1"
