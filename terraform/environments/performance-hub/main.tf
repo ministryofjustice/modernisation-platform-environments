@@ -327,7 +327,7 @@ resource "aws_db_instance" "database" {
   engine_version                      = "15.00.4073.23.v1"
   license_model                       = "license-included"
   instance_class                      = "db.m5.large"
-  multi_az                            = true
+  multi_az                            = false
   # name                                = local.application_name
   username                            = var.db_user
   password                            = var.db_password
@@ -337,7 +337,7 @@ resource "aws_db_instance" "database" {
     aws_security_group.db.id
   ]
   # snapshot_identifier       = var.db_snapshot_identifier
-  backup_retention_period   = 30
+  backup_retention_period   = 0
   maintenance_window        = "Mon:00:00-Mon:03:00"
   backup_window             = "03:00-06:00"
   final_snapshot_identifier = "final-snapshot"
