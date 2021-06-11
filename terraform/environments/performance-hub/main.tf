@@ -83,14 +83,14 @@ data "terraform_remote_state" "core_network_services" {
 }
 
 data "template_file" "launch-template" {
-  template = "${file("templates/user-data.txt")}"
+  template = file("templates/user-data.txt")
   vars = {
     cluster_name = local.application_name
   }
 }
 
 data "template_file" "task_definition" {
-  template = "${file("templates/task_definition.json")}"
+  template = file("templates/task_definition.json")
   vars = {
     app_name = local.application_name
     #app_image         = format("%s%s", data.aws_caller_identity.current.account".dkr.ecr."${var.region}".amazonaws.com/"${local.application_name})
