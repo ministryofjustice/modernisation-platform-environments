@@ -808,15 +808,6 @@ resource "aws_cloudwatch_log_group" "app" {
   )
 }
 
-provider "aws" {
-  alias  = "bad-things"
-  region = "eu-west-2"
-
-  assume_role {
-    role_arn = "arn:aws:iam::${local.environment_management.account_ids["core-network-services-production"]}:role/modify-dns-records"
-  }
-}
-
 # Workflow test
 resource "aws_s3_bucket" "bucket" {
   bucket_prefix = "sprinker-test-bucket"
