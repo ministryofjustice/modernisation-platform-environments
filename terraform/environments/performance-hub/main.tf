@@ -336,7 +336,7 @@ resource "aws_db_instance" "database" {
   vpc_security_group_ids = [
     aws_security_group.db.id
   ]
-  # snapshot_identifier       = var.db_snapshot_identifier
+  snapshot_identifier       = var.db_snapshot_identifier
   backup_retention_period   = 0
   maintenance_window        = "Mon:00:00-Mon:03:00"
   backup_window             = "03:00-06:00"
@@ -545,6 +545,25 @@ resource "aws_s3_bucket" "upload_files" {
   )
 }
 
+resource "aws_s3_bucket_policy" "upload_files_policy" {
+  bucket = aws_s3_bucket.upload_files.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Id      = "upload_bucket_policy"
+    Statement = [
+      {
+        Effect    = "Allow"
+        Principal = "*"
+        Action    = "s3:*"
+        Resource = [
+          aws_s3_bucket.upload_files.arn,
+          "${aws_s3_bucket.upload_files.arn}/*",
+        ]
+      },
+    ]
+  })
+}
+
 resource "aws_iam_role" "s3_uploads_role" {
   name = "${local.application_name}-s3-uploads-role"
   assume_role_policy = data.aws_iam_policy_document.s3-access-policy.json
@@ -590,7 +609,7 @@ resource "aws_iam_policy" "s3-uploads-policy" {
       ],
       "Resource": [
         "${aws_s3_bucket.upload_files.arn}/*"
-      ]
+      ]  
     }
   ]
 }

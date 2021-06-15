@@ -3,13 +3,16 @@ Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManage
 
 refreshenv
 
-choco install sql-server-management-studio
-choco install winfsp
-choco install rclone
+choco install sql-server-management-studio -y
+choco install winfsp -y 
+choco install rclone -y
+
+mkdir C:\Users\Administrator\.config
+mkdir C:\Users\Administrator\.config\rclone
+
+rclone config create remote s3
 
 $config=@'
-[remote]
-type = s3
 provider = AWS
 env_auth = true
 region = eu-west-2
@@ -19,7 +22,7 @@ server_side_encryption = aws:kms
 storage_class = STANDARD
 '@
 
-$config | Out-File C:\Users\Administrator\.config\rclone\rclone.conf
+$config | Add-Content C:\Users\Administrator\.config\rclone\rclone.conf
 
 
 refreshenv

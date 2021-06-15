@@ -31,7 +31,7 @@ variable "container_cpu" {
 
 variable "container_memory" {
   description = "Container instance memory to provision (in MiB)"
-  default     = "1536"
+  default     = "512"
 }
 
 variable "server_port" {
@@ -68,9 +68,10 @@ variable "db_password" {
 
 }
 
-# variable "db_snapshot_identifier" {
-#
-# }
+variable "db_snapshot_identifier" {
+  description = "The default database snapshot to restore from"
+  default     = "performance-hub-initial"
+}
 #
 # variable "health_check_path" {
 #   default = "/opa/opa-hub/manager"
