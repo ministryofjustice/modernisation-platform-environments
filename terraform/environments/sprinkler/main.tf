@@ -808,10 +808,10 @@ resource "aws_cloudwatch_log_group" "app" {
   )
 }
 
-# Workflow test
-resource "aws_s3_bucket" "bucket" {
-  bucket_prefix = "sprinker-test-bucket"
-  acl           = "private"
+# # Workflow test
+# resource "aws_s3_bucket" "bucket" {
+#   bucket_prefix = "sprinker-test-bucket"
+#   acl           = "private"
 
-  tags = local.tags
-}
+#   tags = local.tags
+# }
