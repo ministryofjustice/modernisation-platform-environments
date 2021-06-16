@@ -815,3 +815,13 @@ resource "aws_s3_bucket" "bucket" {
 
   tags = local.tags
 }
+
+provider "aws" {
+  alias  = "bad-things"
+  region = "eu-west-2"
+
+  assume_role {
+    role_arn = "arn:aws:iam::${local.environment_management.account_ids["core-network-services-production"]}:role/modify-dns-records"
+  }
+}
+
