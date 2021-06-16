@@ -1,11 +1,46 @@
 [{
   "name": "performance-hub",
-  "image": "${app_image}:${container_version}",
+  "image": "322518575883.dkr.ecr.eu-west-2.amazonaws.com/performance-hub:latest",
   "portMappings": [
     {
       "protocol": "tcp",
-      "containerPort": 80,
-      "hostPort": 8080
+      "containerPort": 80
+    }
+  ],
+  "mountPoints": [
+    {
+      "sourceVolume": "upload_volume",
+      "containerPath": "/upload_volume"
+    }
+  ],
+  "volumes": [
+    {
+        "name": "upload_volume",
+        "host": "Y:\\upload_data"
+    }
+  ],
+  "environment" : [
+    {
+      "name" : "DB_HOST",
+      "value" : "${aws_db_instance.database.address}"
+    },
+    {
+      "name" : "DB_SCHEMA",
+      "value": "${var.networking[0].application}"
+    },
+    {
+      "name" : "DB_USER",
+      "value" : "admin"
+    },
+    {
+      "name" : "DB_PORT",
+      "value" : "5432"
+    }
+  ],
+  "secrets": [
+    {
+      "name": "DB_PASSWORD",
+      "valueFrom": "${data.aws_secretsmanager_secret_version.database_password.arn}"
     }
   ],
   "essential": true

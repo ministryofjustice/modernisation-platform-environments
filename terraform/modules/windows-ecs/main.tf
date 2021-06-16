@@ -229,7 +229,7 @@ resource "aws_ecs_task_definition" "ecs_task_definition" {
   memory = var.container_memory
 
   volume {
-    name = "app_volume"
+    name = "upload_volume"
     # efs_volume_configuration {
     #   file_system_id = aws_efs_file_system.storage.id
     # }
