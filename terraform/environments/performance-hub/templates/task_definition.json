@@ -22,11 +22,11 @@
   "environment" : [
     {
       "name" : "DB_HOST",
-      "value" : "${aws_db_instance.database.address}"
+      "value" : "${db_host}"
     },
     {
       "name" : "DB_SCHEMA",
-      "value": "${var.networking[0].application}"
+      "value": "${app_name}"
     },
     {
       "name" : "DB_USER",
@@ -40,7 +40,7 @@
   "secrets": [
     {
       "name": "DB_PASSWORD",
-      "valueFrom": "${data.aws_secretsmanager_secret_version.database_password.arn}"
+      "valueFrom": "${db_password}"
     }
   ],
   "essential": true

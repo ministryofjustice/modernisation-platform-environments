@@ -104,9 +104,8 @@ data "template_file" "task_definition" {
     server_port       = var.server_port
     aws_region        = var.region
     container_version = var.container_version
-    db_host           = aws_db_instance.database.endpoint
-    # db_user           = var.db_user
-    # db_password       = var.db_password
+    db_host           = aws_db_instance.database.address
+    db_password       = data.aws_secretsmanager_secret_version.database_password.arn
   }
 }
 
@@ -362,7 +361,7 @@ resource "aws_db_option_group" "db_option_group" {
 
   option {
     option_name = "SQLSERVER_BACKUP_RESTORE"
-  
+
     option_settings {
       name  = "IAM_ROLE_ARN"
       value = aws_iam_role.s3_database_backups_role.arn
@@ -398,7 +397,7 @@ resource "aws_security_group_rule" "db_mgmt_ingress_rule" {
 #   to_port   = 1433
 #   protocol  = "tcp"
 #   security_group_id = aws_security_group.db.id
-#   source_security_group_id = aws_security_group.db_mgmt_server_security_group.id 
+#   source_security_group_id = aws_security_group.db_mgmt_server_security_group.id
 # }
 
 #------------------------------------------------------------------------------
@@ -609,7 +608,7 @@ resource "aws_iam_policy" "s3-uploads-policy" {
       ],
       "Resource": [
         "${aws_s3_bucket.upload_files.arn}/*"
-      ]  
+      ]
     }
   ]
 }
