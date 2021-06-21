@@ -6,9 +6,10 @@ Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManage
 
 refreshenv
 
-choco install sql-server-management-studio -y
 choco install winfsp -y 
 choco install rclone -y
+choco install nssm -y
+choco install carbon -y
 
 mkdir C:\Users\Administrator\.config
 mkdir C:\Users\Administrator\.config\rclone
@@ -29,5 +30,8 @@ $config | Add-Content C:\Users\Administrator\.config\rclone\rclone.conf
 
 refreshenv
 
-rclone mount remote:performance-hub-uploads Y:
+nssm install s3drive "C:\ProgramData\chocolatey\bin\rclone.exe"
+nssm set s3drive AppDirectory "C:\ProgramData\chocolatey\bin"
+nssm set s3drive AppParameters "mount remote:performance-hub-uploads Y:"
+
 </powershell>

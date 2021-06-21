@@ -87,14 +87,14 @@ data "terraform_remote_state" "core_network_services" {
 }
 
 data "template_file" "launch-template" {
-  template = "${file("templates/user-data.txt")}"
+  template = file("templates/user-data.txt")
   vars = {
     cluster_name = local.application_name
   }
 }
 
 data "template_file" "task_definition" {
-  template = "${file("templates/task_definition.json")}"
+  template = file("templates/task_definition.json")
   vars = {
     app_name          = local.application_name
     #app_image         = format("%s%s", data.aws_caller_identity.current.account".dkr.ecr."${var.region}".amazonaws.com/"${local.application_name})
@@ -397,7 +397,16 @@ resource "aws_security_group_rule" "db_mgmt_ingress_rule" {
 #   to_port   = 1433
 #   protocol  = "tcp"
 #   security_group_id = aws_security_group.db.id
-#   source_security_group_id = aws_security_group.db_mgmt_server_security_group.id
+#   source_security_group_id = module.windows-ecs.cluster_ec2_security_group_id 
+# }
+
+# resource "aws_security_group_rule" "db_bastion_ingress_rule" {
+#   type      = "ingress"
+#   from_port = 1433
+#   to_port   = 1433
+#   protocol  = "tcp"
+#   security_group_id = aws_security_group.db.id
+#   cidr_blocks = [ "${module.bastion_linux.bastion_private_ip}/32" ]
 # }
 
 #------------------------------------------------------------------------------
