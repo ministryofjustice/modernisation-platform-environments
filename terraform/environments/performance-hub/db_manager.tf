@@ -116,8 +116,7 @@ resource "aws_security_group" "db_mgmt_server_security_group" {
     protocol  = "tcp"
     from_port = 3389
     to_port   = 3389
-    #cidr_blocks = [ "${module.bastion_linux.bastion_private_ip}/32" ]
-    cidr_blocks = [ "10.236.0.21/32" ]
+    cidr_blocks = [ "${module.bastion_linux.bastion_private_ip}/32" ]
   }
 
   egress {

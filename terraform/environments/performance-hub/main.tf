@@ -391,23 +391,23 @@ resource "aws_security_group_rule" "db_mgmt_ingress_rule" {
   source_security_group_id = aws_security_group.db_mgmt_server_security_group.id
 }
 
-# resource "aws_security_group_rule" "db_ecs_ingress_rule" {
-#   type      = "ingress"
-#   from_port = 1433
-#   to_port   = 1433
-#   protocol  = "tcp"
-#   security_group_id = aws_security_group.db.id
-#   source_security_group_id = module.windows-ecs.cluster_ec2_security_group_id 
-# }
+resource "aws_security_group_rule" "db_ecs_ingress_rule" {
+  type      = "ingress"
+  from_port = 1433
+  to_port   = 1433
+  protocol  = "tcp"
+  security_group_id = aws_security_group.db.id
+  source_security_group_id = module.windows-ecs.cluster_ec2_security_group_id
+}
 
-# resource "aws_security_group_rule" "db_bastion_ingress_rule" {
-#   type      = "ingress"
-#   from_port = 1433
-#   to_port   = 1433
-#   protocol  = "tcp"
-#   security_group_id = aws_security_group.db.id
-#   cidr_blocks = [ "${module.bastion_linux.bastion_private_ip}/32" ]
-# }
+resource "aws_security_group_rule" "db_bastion_ingress_rule" {
+  type      = "ingress"
+  from_port = 1433
+  to_port   = 1433
+  protocol  = "tcp"
+  security_group_id = aws_security_group.db.id
+  cidr_blocks = [ "${module.bastion_linux.bastion_private_ip}/32" ]
+}
 
 #------------------------------------------------------------------------------
 # S3 Bucket for Database backup files
