@@ -2,7 +2,7 @@
 name: performance-hub
 on:
   push:
-    branches: 
+    branches:
       - main
     paths:
       - 'terraform/environments/performance-hub/**'
@@ -24,51 +24,50 @@ defaults:
     shell: bash
 
 jobs:
-  
-  # These jobs run when creating a pull request
-  # plan-development:
-  #   name: Plan Development - performance-hub
-  #   runs-on: ubuntu-latest
-  #   if: github.ref != 'refs/heads/main'
-  #   steps:
-  #     - name: Checkout Repository
-  #       uses: actions/checkout@v2.3.4
-  #     - name: Load and Configure Terraform
-  #       uses: hashicorp/setup-terraform@v1.3.2
-  #       with:
-  #         terraform_version: 0.14.6
-  #         terraform_wrapper: false
-  #     - name: Terraform plan - development
-  #       run: |
-  #         echo "Terraform plan - ${TF_ENV}"
-  #         bash scripts/terraform-init.sh terraform/environments/performance-hub
-  #         terraform -chdir="terraform/environments/performance-hub" workspace select "performance-hub-${TF_ENV}"
-  #         bash scripts/terraform-plan.sh terraform/environments/performance-hub
-  #       env:
-  #         TF_ENV: development
+  #These jobs run when creating a pull request
+  plan-development:
+    name: Plan Development - performance-hub
+    runs-on: ubuntu-latest
+    if: github.ref != 'refs/heads/main'
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2.3.4
+      - name: Load and Configure Terraform
+        uses: hashicorp/setup-terraform@v1.3.2
+        with:
+          terraform_version: 0.14.6
+          terraform_wrapper: false
+      - name: Terraform plan - development
+        run: |
+          echo "Terraform plan - ${TF_ENV}"
+          bash scripts/terraform-init.sh terraform/environments/performance-hub
+          terraform -chdir="terraform/environments/performance-hub" workspace select "performance-hub-${TF_ENV}"
+          bash scripts/terraform-plan.sh terraform/environments/performance-hub
+        env:
+          TF_ENV: development
 
-  # deploy-development:
-  #   name: Deploy Development - performance-hub
-  #   runs-on: ubuntu-latest
-  #   if: github.ref != 'refs/heads/main'
-  #   environment:
-  #     name: performance-hub-development
-  #   steps:
-  #     - name: Checkout Repository
-  #       uses: actions/checkout@v2.3.4
-  #     - name: Load and Configure Terraform
-  #       uses: hashicorp/setup-terraform@v1.3.2
-  #       with:
-  #         terraform_version: 0.14.6
-  #         terraform_wrapper: false
-  #     - name: Terraform apply - development
-  #       run: |
-  #         echo "Terraform apply - ${TF_ENV}"
-  #         bash scripts/terraform-init.sh terraform/environments/performance-hub
-  #         terraform -chdir="terraform/environments/performance-hub" workspace select "performance-hub-${TF_ENV}"
-  #         bash scripts/terraform-apply.sh terraform/environments/performance-hub
-  #       env:
-  #         TF_ENV: development
+  deploy-development:
+    name: Deploy Development - performance-hub
+    runs-on: ubuntu-latest
+    if: github.ref != 'refs/heads/main'
+    environment:
+      name: performance-hub-development
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2.3.4
+      - name: Load and Configure Terraform
+        uses: hashicorp/setup-terraform@v1.3.2
+        with:
+          terraform_version: 0.14.6
+          terraform_wrapper: false
+      - name: Terraform apply - development
+        run: |
+          echo "Terraform apply - ${TF_ENV}"
+          bash scripts/terraform-init.sh terraform/environments/performance-hub
+          terraform -chdir="terraform/environments/performance-hub" workspace select "performance-hub-${TF_ENV}"
+          bash scripts/terraform-apply.sh terraform/environments/performance-hub
+        env:
+          TF_ENV: development
 
   # plan-test:
   #   name: Plan Test - performance-hub
@@ -158,7 +157,7 @@ jobs:
           bash scripts/terraform-apply.sh terraform/environments/performance-hub
         env:
           TF_ENV: preproduction
-  
+
   # plan-production:
   #   name: Plan Production - performance-hub
   #   runs-on: ubuntu-latest
