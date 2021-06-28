@@ -64,10 +64,6 @@ variable "db_user" {
 
 }
 
-variable "db_password" {
-
-}
-
 variable "db_snapshot_identifier" {
   description = "The default database snapshot to restore from"
   default     = "performance-hub-initial"

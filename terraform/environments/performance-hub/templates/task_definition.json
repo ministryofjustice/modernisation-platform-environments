@@ -30,11 +30,19 @@
     },
     {
       "name" : "DB_USER",
-      "value" : "admin"
+      "value" : "${db_user}"
     },
     {
       "name" : "DB_PORT",
       "value" : "5432"
+    },
+    {
+      "name": "MojHub_CnnStr",
+      "value": "Server=${db_host};Database=NomsPMU;User Id=${db_user};Password=${db_password};"
+    },
+    {
+      "name": "MojHub_Membership",
+      "value": "Server=${db_host};Database=Membership;User Id=${db_user};Password=${db_password};"
     }
   ],
   "secrets": [

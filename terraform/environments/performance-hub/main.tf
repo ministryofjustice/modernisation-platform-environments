@@ -105,6 +105,7 @@ data "template_file" "task_definition" {
     aws_region        = var.region
     container_version = var.container_version
     db_host           = aws_db_instance.database.address
+    db_user           = var.db_user 
     db_password       = data.aws_secretsmanager_secret_version.database_password.arn
   }
 }
@@ -329,7 +330,7 @@ resource "aws_db_instance" "database" {
   multi_az                            = false
   # name                                = local.application_name
   username                            = var.db_user
-  password                            = var.db_password
+  password                            = data.aws_secretsmanager_secret_version.database_password.arn
   storage_encrypted                   = false
   iam_database_authentication_enabled = false
   vpc_security_group_ids = [
@@ -413,7 +414,7 @@ resource "aws_security_group_rule" "db_bastion_ingress_rule" {
 # S3 Bucket for Database backup files
 #------------------------------------------------------------------------------
 resource "aws_s3_bucket" "database_backup_files" {
-  bucket        = "performance-hub-db-backups"
+  bucket        = "performance-hub-db-backups-${local.environment}"
   acl           = "private"
 
   lifecycle {
@@ -507,7 +508,7 @@ resource "aws_iam_role_policy_attachment" "s3_database_backups_attachment" {
 # S3 Bucket for Uploads
 #------------------------------------------------------------------------------
 resource "aws_s3_bucket" "upload_files" {
-  bucket        = "performance-hub-uploads"
+  bucket        = "performance-hub-uploads-${local.environment}"
   acl           = "private"
 
   lifecycle {
