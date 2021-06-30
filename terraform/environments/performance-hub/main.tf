@@ -90,6 +90,7 @@ data "template_file" "launch-template" {
   template = file("templates/user-data.txt")
   vars = {
     cluster_name = local.application_name
+    environment = local.environment
   }
 }
 
@@ -97,10 +98,7 @@ data "template_file" "task_definition" {
   template = file("templates/task_definition.json")
   vars = {
     app_name          = local.application_name
-    #app_image         = format("%s%s", data.aws_caller_identity.current.account".dkr.ecr."${var.region}".amazonaws.com/"${local.application_name})
-    app_image         = format("%s%s", data.aws_caller_identity.current.account_id,var.app_image)
-    #data.aws_ecr_image.service_image.id
-    #".dkr.ecr.eu-west-2.amazonaws.com/ccms-opa18-hub"
+    ecr_url           = format("%s%s%s%s%s", data.aws_caller_identity.current.account, ".dkr.ecr.", var.region, ".amazonaws.com/", local.application_name)
     server_port       = var.server_port
     aws_region        = var.region
     container_version = var.container_version

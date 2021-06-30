@@ -12,7 +12,7 @@ data "aws_secretsmanager_secret_version" "environment_management" {
 
 # Get secret by name for database password
 data "aws_secretsmanager_secret" "database_password" {
-  name     = "performance_hub_db"
+  name = "performance_hub_db"
 }
 
 data "aws_secretsmanager_secret_version" "database_password" {

@@ -56,13 +56,14 @@ variable "ec2_min_size" {
   description = "Min Number of EC2s in the cluster"
 }
 
-variable "app_image" {
-
-}
-
 variable "db_user" {
 
 }
+
+variable "ecr_url" {
+
+}
+
 
 variable "db_snapshot_identifier" {
   description = "The default database snapshot to restore from"

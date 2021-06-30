@@ -1,6 +1,6 @@
 <powershell>
 Import-Module ECSTools
-Initialize-ECSAgent –Cluster ${cluster_name} -EnableIAMTaskRole
+Initialize-ECSAgent –Cluster ${cluster_name} -EnableTaskIAMRole
 
 Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
 
@@ -32,6 +32,6 @@ refreshenv
 
 nssm install s3drive "C:\ProgramData\chocolatey\bin\rclone.exe"
 nssm set s3drive AppDirectory "C:\ProgramData\chocolatey\bin"
-nssm set s3drive AppParameters "mount remote:performance-hub-uploads Y:"
+nssm set s3drive AppParameters "mount remote:performance-hub-uploads-${environment} Y:"
 
 </powershell>

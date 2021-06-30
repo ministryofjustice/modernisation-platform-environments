@@ -1,6 +1,6 @@
 [{
   "name": "performance-hub",
-  "image": "322518575883.dkr.ecr.eu-west-2.amazonaws.com/performance-hub:latest",
+  "image": "${ecr_url}:${container_version}",
   "portMappings": [
     {
       "protocol": "tcp",
@@ -38,11 +38,11 @@
     },
     {
       "name": "MojHub_CnnStr",
-      "value": "Server=${db_host};Database=NomsPMU;User Id=${db_user};Password=${db_password};"
+      "value": "Server=${db_host};Database=NomsPMU;User Id=${db_user};Password=;"
     },
     {
       "name": "MojHub_Membership",
-      "value": "Server=${db_host};Database=Membership;User Id=${db_user};Password=${db_password};"
+      "value": "Server=${db_host};Database=Membership;User Id=${db_user};Password=;"
     }
   ],
   "secrets": [
