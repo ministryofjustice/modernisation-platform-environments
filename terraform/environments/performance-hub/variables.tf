@@ -61,7 +61,7 @@ variable "db_user" {
 }
 
 variable "ecr_url" {
-
+  default = ""
 }
 
 

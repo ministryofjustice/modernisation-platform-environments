@@ -16,7 +16,9 @@
   "volumes": [
     {
         "name": "upload_volume",
-        "host": "Y:\\upload_data"
+        "host":  {
+          "sourcePath" : "Y:/upload_data"
+         }
     }
   ],
   "environment" : [

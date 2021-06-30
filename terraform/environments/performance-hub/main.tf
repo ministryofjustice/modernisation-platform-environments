@@ -98,7 +98,7 @@ data "template_file" "task_definition" {
   template = file("templates/task_definition.json")
   vars = {
     app_name          = local.application_name
-    ecr_url           = format("%s%s%s%s%s", data.aws_caller_identity.current.account, ".dkr.ecr.", var.region, ".amazonaws.com/", local.application_name)
+    ecr_url           = format("%s%s%s%s%s", data.aws_caller_identity.current.account_id, ".dkr.ecr.", var.region, ".amazonaws.com/", local.application_name)
     server_port       = var.server_port
     aws_region        = var.region
     container_version = var.container_version
