@@ -1,5 +1,5 @@
 data "aws_vpc" "shared" {
-  tags= {
+  tags = {
     "Name" = var.vpc_all
   }
 }
@@ -39,9 +39,9 @@ resource "aws_iam_service_linked_role" "ecs" {
 
 resource "aws_autoscaling_group" "cluster-scaling-group" {
   vpc_zone_identifier = sort(data.aws_subnet_ids.shared-private.ids)
-  desired_capacity = var.ec2_desired_capacity
-  max_size         = var.ec2_max_size
-  min_size         = var.ec2_min_size
+  desired_capacity    = var.ec2_desired_capacity
+  max_size            = var.ec2_max_size
+  min_size            = var.ec2_min_size
 
   launch_template {
     id      = aws_launch_template.ec2-launch-template.id
@@ -219,9 +219,9 @@ resource "aws_ecs_cluster" "ecs_cluster" {
 }
 
 resource "aws_ecs_task_definition" "ecs_task_definition" {
-  family               = "${var.app_name}-task-definition"
-  execution_role_arn   = aws_iam_role.ecs_task_execution_role.arn
-  network_mode         = "bridge"
+  family             = "${var.app_name}-task-definition"
+  execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
+  network_mode       = "bridge"
   requires_compatibilities = [
     "EC2",
   ]
@@ -307,6 +307,10 @@ resource "aws_iam_role" "ecs_task_execution_role" {
 resource "aws_iam_role_policy_attachment" "ecs_task_execution_role" {
   role       = aws_iam_role.ecs_task_execution_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+}
+resource "aws_iam_role_policy_attachment" "ecs_task_secrets_manager" {
+  role       = aws_iam_role.ecs_task_execution_role.name
+  policy_arn = "arn:aws:iam::aws:policy/SecretsManagerReadWrite"
 }
 
 ##### ECS autoscaling ##########
