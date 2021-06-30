@@ -90,7 +90,7 @@ data "template_file" "launch-template" {
   template = file("templates/user-data.txt")
   vars = {
     cluster_name = local.application_name
-    environment = local.environment
+    environment  = local.environment
   }
 }
 
@@ -103,7 +103,7 @@ data "template_file" "task_definition" {
     aws_region        = var.region
     container_version = var.container_version
     db_host           = aws_db_instance.database.address
-    db_user           = var.db_user 
+    db_user           = var.db_user
     db_password       = data.aws_secretsmanager_secret_version.database_password.arn
   }
 }
@@ -318,14 +318,14 @@ resource "aws_security_group" "load_balancer_security_group" {
 #------------------------------------------------------------------------------
 
 resource "aws_db_instance" "database" {
-  identifier                          = local.application_name
-  allocated_storage                   = 100
-  storage_type                        = "gp2"
-  engine                              = "sqlserver-se"
-  engine_version                      = "15.00.4073.23.v1"
-  license_model                       = "license-included"
-  instance_class                      = "db.m5.large"
-  multi_az                            = false
+  identifier        = local.application_name
+  allocated_storage = 100
+  storage_type      = "gp2"
+  engine            = "sqlserver-se"
+  engine_version    = "15.00.4073.23.v1"
+  license_model     = "license-included"
+  instance_class    = "db.m5.large"
+  multi_az          = false
   # name                                = local.application_name
   username                            = var.db_user
   password                            = data.aws_secretsmanager_secret_version.database_password.arn
@@ -378,42 +378,42 @@ resource "aws_security_group" "db" {
   name        = local.application_name
   description = "Allow DB inbound traffic"
   vpc_id      = data.aws_vpc.shared.id
-  tags = local.tags
+  tags        = local.tags
 }
 
 resource "aws_security_group_rule" "db_mgmt_ingress_rule" {
-  type      = "ingress"
-  from_port = 1433
-  to_port   = 1433
-  protocol  = "tcp"
-  security_group_id = aws_security_group.db.id
+  type                     = "ingress"
+  from_port                = 1433
+  to_port                  = 1433
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.db.id
   source_security_group_id = aws_security_group.db_mgmt_server_security_group.id
 }
 
 resource "aws_security_group_rule" "db_ecs_ingress_rule" {
-  type      = "ingress"
-  from_port = 1433
-  to_port   = 1433
-  protocol  = "tcp"
-  security_group_id = aws_security_group.db.id
+  type                     = "ingress"
+  from_port                = 1433
+  to_port                  = 1433
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.db.id
   source_security_group_id = module.windows-ecs.cluster_ec2_security_group_id
 }
 
 resource "aws_security_group_rule" "db_bastion_ingress_rule" {
-  type      = "ingress"
-  from_port = 1433
-  to_port   = 1433
-  protocol  = "tcp"
+  type              = "ingress"
+  from_port         = 1433
+  to_port           = 1433
+  protocol          = "tcp"
   security_group_id = aws_security_group.db.id
-  cidr_blocks = [ "${module.bastion_linux.bastion_private_ip}/32" ]
+  cidr_blocks       = ["${module.bastion_linux.bastion_private_ip}/32"]
 }
 
 #------------------------------------------------------------------------------
 # S3 Bucket for Database backup files
 #------------------------------------------------------------------------------
 resource "aws_s3_bucket" "database_backup_files" {
-  bucket        = "performance-hub-db-backups-${local.environment}"
-  acl           = "private"
+  bucket = "performance-hub-db-backups-${local.environment}"
+  acl    = "private"
 
   lifecycle {
     prevent_destroy = true
@@ -460,7 +460,7 @@ resource "aws_s3_bucket" "database_backup_files" {
 
 #S3 bucket access policy
 resource "aws_iam_policy" "s3_database_backups_policy" {
-  name = "${local.application_name}-s3-database_backups-policy"
+  name   = "${local.application_name}-s3-database_backups-policy"
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -494,7 +494,7 @@ EOF
 }
 
 resource "aws_iam_role" "s3_database_backups_role" {
-  name = "${local.application_name}-s3-database-backups-role"
+  name               = "${local.application_name}-s3-database-backups-role"
   assume_role_policy = data.aws_iam_policy_document.s3-access-policy.json
 }
 
@@ -506,8 +506,8 @@ resource "aws_iam_role_policy_attachment" "s3_database_backups_attachment" {
 # S3 Bucket for Uploads
 #------------------------------------------------------------------------------
 resource "aws_s3_bucket" "upload_files" {
-  bucket        = "performance-hub-uploads-${local.environment}"
-  acl           = "private"
+  bucket = "performance-hub-uploads-${local.environment}"
+  acl    = "private"
 
   lifecycle {
     prevent_destroy = true
@@ -572,7 +572,7 @@ resource "aws_s3_bucket_policy" "upload_files_policy" {
 }
 
 resource "aws_iam_role" "s3_uploads_role" {
-  name = "${local.application_name}-s3-uploads-role"
+  name               = "${local.application_name}-s3-uploads-role"
   assume_role_policy = data.aws_iam_policy_document.s3-access-policy.json
 }
 
@@ -595,7 +595,7 @@ data "aws_iam_policy_document" "s3-access-policy" {
 }
 
 resource "aws_iam_policy" "s3-uploads-policy" {
-  name = "${local.application_name}-s3-uploads-policy"
+  name   = "${local.application_name}-s3-uploads-policy"
   policy = <<EOF
 {
   "Version": "2012-10-17",
