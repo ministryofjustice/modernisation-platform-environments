@@ -126,21 +126,21 @@ resource "aws_launch_template" "ec2-launch-template" {
 
   tag_specifications {
     resource_type = "instance"
-    tags = merge(map(
-      "Name", "${var.app_name}-ecs-cluster",
-    ), var.tags_common)
+    tags = merge(tomap({
+      "Name" = "${var.app_name}-ecs-cluster"
+    }), var.tags_common)
   }
 
   tag_specifications {
     resource_type = "volume"
-    tags = merge(map(
-      "Name", "${var.app_name}-ecs-cluster",
-    ), var.tags_common)
+    tags = merge(tomap({
+      "Name" = "${var.app_name}-ecs-cluster"
+    }), var.tags_common)
   }
 
-  tags = merge(map(
-    "Name", "${var.app_name}-ecs-cluster-template",
-  ), var.tags_common)
+  tags = merge(tomap({
+    "Name" = "${var.app_name}-ecs-cluster-template"
+  }), var.tags_common)
 }
 
 # IAM Role, policy and instance profile (to attach the role to the EC2)
@@ -221,7 +221,6 @@ resource "aws_ecs_cluster" "ecs_cluster" {
 resource "aws_ecs_task_definition" "ecs_task_definition" {
   family             = "${var.app_name}-task-definition"
   execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
-  network_mode       = "bridge"
   requires_compatibilities = [
     "EC2",
   ]
@@ -485,14 +484,14 @@ resource "aws_appautoscaling_policy" "scaling_policy_down" {
 #
 #   tags = var.tags_common
 # }
-# # Set up CloudWatch group and log stream and retain logs for 30 days
-# resource "aws_cloudwatch_log_group" "hub_log_group" {
-#   name              = "${var.app_name}-ecs"
-#   retention_in_days = 30
-#   tags              = var.tags_common
-# }
-#
-# resource "aws_cloudwatch_log_stream" "hub_log_stream" {
-#   name           = "${var.app_name}-log-stream"
-#   log_group_name = aws_cloudwatch_log_group.hub_log_group.name
-# }
+# Set up CloudWatch group and log stream and retain logs for 30 days
+resource "aws_cloudwatch_log_group" "cloudwatch_group" {
+  name              = "${var.app_name}-ecs"
+  retention_in_days = 30
+  tags              = var.tags_common
+}
+
+resource "aws_cloudwatch_log_stream" "cloudwatch_stream" {
+  name           = "${var.app_name}-log-stream"
+  log_group_name = aws_cloudwatch_log_group.cloudwatch_group.name
+}

@@ -1,12 +1,13 @@
 <powershell>
 Import-Module ECSTools
-Initialize-ECSAgent –Cluster ${cluster_name} -EnableTaskIAMRole
+[Environment]::SetEnvironmentVariable("ECS_ENABLE_AWSLOGS_EXECUTIONROLE_OVERRIDE", "true", "Machine")
+Ic –Cluster ${cluster_name} -EnableTaskIAMRole -LoggingDrivers '["json-file","awslogs"]'
 
 Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
 
 refreshenv
 
-choco install winfsp -y 
+choco install winfsp -y
 choco install rclone -y
 choco install nssm -y
 choco install carbon -y

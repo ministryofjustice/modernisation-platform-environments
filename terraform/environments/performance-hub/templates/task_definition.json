@@ -3,24 +3,17 @@
   "image": "${ecr_url}:${container_version}",
   "portMappings": [
     {
-      "protocol": "tcp",
       "containerPort": 80
     }
   ],
-  "mountPoints": [
-    {
-      "sourceVolume": "upload_volume",
-      "containerPath": "/upload_volume"
-    }
-  ],
-  "volumes": [
-    {
-        "name": "upload_volume",
-        "host":  {
-          "sourcePath" : "Y:/upload_data"
-         }
-    }
-  ],
+"logConfiguration": {
+  "logDriver": "awslogs",
+  "options": {
+      "awslogs-group": "performance-hub-ecs",
+      "awslogs-region": "eu-west-2",
+      "awslogs-stream-prefix": "perf-hub"
+   }
+  },
   "environment" : [
     {
       "name" : "DB_HOST",
