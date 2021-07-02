@@ -30,7 +30,7 @@ jobs:
       - name: load and configure Terraform for dev
         uses: hashicorp/setup-terraform@v1.3.2
         with:
-          terraform_version: 0.14.6
+          terraform_version: 1.0.1
           terraform_wrapper: false
       - name: dev-deploy-terraform-plan
         run: |
@@ -41,7 +41,7 @@ jobs:
           bash scripts/terraform-init.sh terraform/environments/performance-hub
           bash scripts/terraform-plan.sh terraform/environments/performance-hub -var-file=environments/${TF_ENV}.tfvars
         env:
-          TF_ENV: preproduction
+          TF_ENV: development
 
   # PR-deploy-to-development-env:
   #   runs-on: ubuntu-latest
@@ -52,7 +52,7 @@ jobs:
   #     - name: load and configure Terraform for dev
   #       uses: hashicorp/setup-terraform@v1.4.0
   #       with:
-  #         terraform_version: 0.15.4
+  #         terraform_version: 1.0.1
   #         terraform_wrapper: false
   #     - name: dev-deploy-terraform-init
   #       run: echo "Terraform init - "
@@ -72,7 +72,7 @@ jobs:
   #     - name: load and configure Terraform for test
   #       uses: hashicorp/setup-terraform@v1.4.0
   #       with:
-  #         terraform_version: 0.15.4
+  #         terraform_version: 1.0.1
   #         terraform_wrapper: false
   #     - name: test-deploy-terraform-init
   #       run: echo "Terraform init - test"
@@ -89,7 +89,7 @@ jobs:
       - name: load and configure Terraform
         uses: hashicorp/setup-terraform@v1.3.2
         with:
-          terraform_version: 0.14.6
+          terraform_version: 1.0.1
           terraform_wrapper: false
       - name: deploy-terraform-plan-preproduction
         run: |
@@ -112,7 +112,7 @@ jobs:
       - name: load and configure Terraform for preproduction
         uses: hashicorp/setup-terraform@v1.3.2
         with:
-          terraform_version: 0.14.6
+          terraform_version: 1.0.1
           terraform_wrapper: false
       - name: preproduction-deploy-terraform-apply
         run: |
@@ -134,7 +134,7 @@ jobs:
   #     - name: load and configure Terraform for production
   #       uses: hashicorp/setup-terraform@v1.4.0
   #       with:
-  #         terraform_version: 0.15.4
+  #         terraform_version: 1.0.1
   #         terraform_wrapper: false
   #     - name: production-deploy-terraform-init
   #       run: echo "Terraform init - production"
