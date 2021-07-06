@@ -8,6 +8,10 @@ variable "container_version" {
 
 }
 
+variable "db_password_key" {
+
+}
+
 variable "app_count" {
   description = "Number of docker containers to run"
 }

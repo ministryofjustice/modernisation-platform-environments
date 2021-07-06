@@ -1,41 +1,12 @@
 <powershell>
 Import-Module ECSTools
+[Environment]::SetEnvironmentVariable("ECS_CONTAINER_START_TIMEOUT", "15m", [System.EnvironmentVariableTarget]::Machine)
 [Environment]::SetEnvironmentVariable("ECS_ENABLE_AWSLOGS_EXECUTIONROLE_OVERRIDE", "true", "Machine")
-[Environment]::SetEnvironmentVariable("ECS_ENABLE_TASK_IAM_ROLE", "true", "Machine"
+[Environment]::SetEnvironmentVariable("ECS_ENABLE_TASK_IAM_ROLE", "true", "Machine")
 
 Initialize-ECSAgent –Cluster ${cluster_name} -EnableTaskIAMRole -LoggingDrivers '["json-file","awslogs"]'
 
 
 Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
-
-refreshenv
-
-choco install winfsp -y
-choco install rclone -y
-choco install nssm -y
-choco install carbon -y
-
-mkdir C:\Users\Administrator\.config
-mkdir C:\Users\Administrator\.config\rclone
-
-rclone config create remote s3
-
-$config=@'
-provider = AWS
-env_auth = true
-region = eu-west-2
-location_constraint = eu-west-2
-acl = private
-server_side_encryption = aws:kms
-storage_class = STANDARD
-'@
-
-$config | Add-Content C:\Users\Administrator\.config\rclone\rclone.conf
-
-refreshenv
-
-nssm install s3drive "C:\ProgramData\chocolatey\bin\rclone.exe"
-nssm set s3drive AppDirectory "C:\ProgramData\chocolatey\bin"
-nssm set s3drive AppParameters "mount remote:performance-hub-uploads-${environment} Y:"
 
 </powershell>

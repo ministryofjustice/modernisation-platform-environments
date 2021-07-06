@@ -47,6 +47,27 @@ data "aws_subnet" "private_subnets_c" {
   }
 }
 
+data "aws_subnet" "public_az_a" {
+  vpc_id = data.aws_vpc.shared.id
+  tags = {
+    Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public-${var.region}a"
+  }
+}
+
+data "aws_subnet" "public_az_b" {
+  vpc_id = data.aws_vpc.shared.id
+  tags = {
+    Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public-${var.region}b"
+  }
+}
+
+data "aws_subnet" "public_az_c" {
+  vpc_id = data.aws_vpc.shared.id
+  tags = {
+    Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public-${var.region}c"
+  }
+}
+
 data "aws_route53_zone" "external" {
   provider = aws.core-vpc
 
@@ -131,6 +152,8 @@ module "windows-ecs" {
   container_memory     = var.container_memory
   server_port          = var.server_port
   app_count            = var.app_count
+  public_cidrs         = [data.aws_subnet.public_az_a.cidr_block, data.aws_subnet.public_az_b.cidr_block, data.aws_subnet.public_az_c.cidr_block]
+
   #   cidr_access                 = var.cidr_access
   tags_common = local.tags
 
@@ -141,7 +164,7 @@ resource "aws_route53_record" "external" {
   provider = aws.core-vpc
 
   zone_id = data.aws_route53_zone.external.zone_id
-  name    = "${var.networking[0].application}.${var.networking[0].business-unit}-preprod.modernisation-platform.service.justice.gov.uk"
+  name    = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   type    = "A"
 
   alias {
@@ -218,15 +241,15 @@ resource "aws_lb_target_group" "target_group" {
     type = "lb_cookie"
   }
 
-  # health_check {
-  #   path                = var.health_check_path
-  #   healthy_threshold   = "5"
-  #   interval            = "120"
-  #   protocol            = "HTTP"
-  #   unhealthy_threshold = "2"
-  #   matcher             = "200"
-  #   timeout             = "5"
-  # }
+  health_check {
+    # path                = "/"
+    healthy_threshold   = "5"
+    interval            = "120"
+    protocol            = "HTTP"
+    unhealthy_threshold = "2"
+    matcher             = "200"
+    timeout             = "5"
+  }
 
   tags = local.tags
 }
@@ -242,16 +265,16 @@ resource "aws_lb_listener" "listener" {
   }
 }
 
-resource "aws_lb_listener" "http_listener" {
-  load_balancer_arn = aws_lb.external.id
-  port              = "80"
-  protocol          = "HTTP"
-
-  default_action {
-    target_group_arn = aws_lb_target_group.target_group.id
-    type             = "forward"
-  }
-}
+# resource "aws_lb_listener" "http_listener" {
+#   load_balancer_arn = aws_lb.external.id
+#   port              = "80"
+#   protocol          = "HTTP"
+#
+#   default_action {
+#     target_group_arn = aws_lb_target_group.target_group.id
+#     type             = "forward"
+#   }
+# }
 
 resource "aws_lb_listener" "https_listener" {
   depends_on = [aws_acm_certificate_validation.external]
@@ -276,23 +299,12 @@ resource "aws_security_group" "load_balancer_security_group" {
   description = "controls access to lb"
   vpc_id      = data.aws_vpc.shared.id
 
-  # ingress {
-  #   protocol  = "tcp"
-  #   from_port = var.server_port
-  #   to_port   = var.server_port
-  #   cidr_blocks = concat(
-  #     var.cidr_access,
-  #   )
-  # }
-
-  # ingress {
-  #   protocol  = "tcp"
-  #   from_port = 80
-  #   to_port   = 80
-  #   cidr_blocks = concat(
-  #     var.cidr_access,
-  #   )
-  # }
+  ingress {
+    protocol  = "tcp"
+    from_port = var.server_port
+    to_port   = var.server_port
+    cidr_blocks = ["0.0.0.0/0", ]
+  }
 
   ingress {
     protocol    = "tcp"

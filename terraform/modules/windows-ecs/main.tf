@@ -10,7 +10,6 @@ data "aws_subnet_ids" "shared-private" {
     "Name" = "${var.subnet_set_name}-private*"
   }
 }
-
 # # data "aws_ecr_image" "service_image" {
 # #   repository_name = var.app_name
 # #   image_tag       = var.container_version
@@ -24,14 +23,6 @@ data "aws_security_group" "loadbalancer" {
 data "aws_lb_target_group" "target_group" {
   name = var.app_name
 }
-# data "aws_lb" "selected" {
-#   name = var.app_name
-# }
-# data "aws_lb_listener" "listener" {
-#   load_balancer_arn = data.aws_lb.selected.arn
-#   port              = var.server_port
-# }
-#
 
 resource "aws_iam_service_linked_role" "ecs" {
   aws_service_name = "ecs.amazonaws.com"
@@ -57,14 +48,12 @@ resource "aws_security_group" "cluster_ec2" {
   description = "controls access to the cluster ec2 instance"
   vpc_id      = data.aws_vpc.shared.id
 
-  # ingress {
-  #   protocol  = "tcp"
-  #   from_port = 7001
-  #   to_port   = 7001
-  #   cidr_blocks = concat(
-  #     var.cidr_access
-  #   )
-  # }
+  ingress {
+    protocol  = "tcp"
+    from_port = var.server_port
+    to_port   = var.server_port
+    cidr_blocks = var.public_cidrs
+  }
 
   ingress {
     protocol  = "tcp"

@@ -1,5 +1,5 @@
 ami_image_id         = "ami-03dd3e42b5ea48f45"
-instance_type        = "t3.large"
+instance_type        = "m4.xlarge"
 key_name             = "performance-hub-ec2"
 app_count            = "1"
 ec2_desired_capacity = 2
@@ -8,7 +8,7 @@ ec2_min_size         = 2
 # cidr_access                   = []
 server_port       = "80"
 container_version = "latest"
-container_cpu     = "512"
+container_cpu     = "2048"
 container_memory  = "4096"
 # db_instance_class             = ""
 db_user                = "admin"
