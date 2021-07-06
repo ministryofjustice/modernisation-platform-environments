@@ -49,9 +49,9 @@ resource "aws_security_group" "cluster_ec2" {
   vpc_id      = data.aws_vpc.shared.id
 
   ingress {
-    protocol  = "tcp"
-    from_port = var.server_port
-    to_port   = var.server_port
+    protocol    = "tcp"
+    from_port   = var.server_port
+    to_port     = var.server_port
     cidr_blocks = var.public_cidrs
   }
 
