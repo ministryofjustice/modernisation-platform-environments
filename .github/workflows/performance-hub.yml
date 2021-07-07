@@ -28,7 +28,7 @@ jobs:
   plan-development:
     name: Plan Development - performance-hub
     runs-on: ubuntu-latest
-    if: github.ref != 'refs/heads/main'
+    if: github.ref != 'refs/heads/main' || github.event_name == 'workflow_dispatch'
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2.3.4
@@ -42,14 +42,14 @@ jobs:
           echo "Terraform plan - ${TF_ENV}"
           bash scripts/terraform-init.sh terraform/environments/performance-hub
           terraform -chdir="terraform/environments/performance-hub" workspace select "performance-hub-${TF_ENV}"
-          bash scripts/terraform-plan.sh terraform/environments/performance-hub
+          bash scripts/terraform-plan.sh terraform/environments/performance-hub -var-file=environments/${TF_ENV}.tfvars
         env:
           TF_ENV: development
 
   deploy-development:
     name: Deploy Development - performance-hub
     runs-on: ubuntu-latest
-    if: github.ref != 'refs/heads/main'
+    if: github.ref != 'refs/heads/main' || github.event_name == 'workflow_dispatch'
     environment:
       name: performance-hub-development
     steps:
@@ -65,7 +65,7 @@ jobs:
           echo "Terraform apply - ${TF_ENV}"
           bash scripts/terraform-init.sh terraform/environments/performance-hub
           terraform -chdir="terraform/environments/performance-hub" workspace select "performance-hub-${TF_ENV}"
-          bash scripts/terraform-apply.sh terraform/environments/performance-hub
+          bash scripts/terraform-apply.sh terraform/environments/performance-hub -var-file=environments/${TF_ENV}.tfvars
         env:
           TF_ENV: development
 
@@ -131,7 +131,7 @@ jobs:
           echo "Terraform plan - ${TF_ENV}"
           bash scripts/terraform-init.sh terraform/environments/performance-hub
           terraform -chdir="terraform/environments/performance-hub" workspace select "performance-hub-${TF_ENV}"
-          bash scripts/terraform-plan.sh terraform/environments/performance-hub
+          bash scripts/terraform-plan.sh terraform/environments/performance-hub -var-file=environments/${TF_ENV}.tfvars
         env:
           TF_ENV: preproduction
 
@@ -154,7 +154,7 @@ jobs:
           echo "Terraform apply - ${TF_ENV}"
           bash scripts/terraform-init.sh terraform/environments/performance-hub
           terraform -chdir="terraform/environments/performance-hub" workspace select "performance-hub-${TF_ENV}"
-          bash scripts/terraform-apply.sh terraform/environments/performance-hub
+          bash scripts/terraform-apply.sh terraform/environments/performance-hub -var-file=environments/${TF_ENV}.tfvars
         env:
           TF_ENV: preproduction
 
