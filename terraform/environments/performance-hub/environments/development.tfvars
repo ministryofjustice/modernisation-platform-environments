@@ -1,4 +1,4 @@
-ami_image_id         = "ami-03dd3e42b5ea48f45"
+ami_image_id         = "ami-0c84c2544c1c7cba7"
 instance_type        = "m4.xlarge"
 key_name             = "performance-hub-ec2"
 app_count            = "1"

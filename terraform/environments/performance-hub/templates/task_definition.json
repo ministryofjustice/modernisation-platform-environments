@@ -1,19 +1,22 @@
 [{
   "name": "performance-hub",
-  "image": "${ecr_url}:${container_version}",
+  "image": "mcr.microsoft.com/dotnet/framework/samples:aspnetapp",
+  "cpu": 2048,
   "portMappings": [
     {
-      "containerPort": 80
+      "containerPort": 80,
+      "hostPort": 8080
     }
   ],
-"logConfiguration": {
-  "logDriver": "awslogs",
-  "options": {
-      "awslogs-group": "performance-hub-ecs",
-      "awslogs-region": "eu-west-2",
-      "awslogs-stream-prefix": "perf-hub"
-   }
-  },
+  "memory": 4096,
+  "logConfiguration": {
+    "logDriver": "awslogs",
+    "options": {
+        "awslogs-group": "performance-hub-ecs",
+        "awslogs-region": "eu-west-2",
+        "awslogs-stream-prefix": "perf-hub"
+     }
+    },
   "environment" : [
     {
       "name" : "DB_HOST",

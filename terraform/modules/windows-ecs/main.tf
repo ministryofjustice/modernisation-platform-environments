@@ -18,8 +18,12 @@ data "aws_subnet_ids" "shared-private" {
 #   db_instance_identifier = var.app_name
 # }
 data "aws_security_group" "loadbalancer" {
-  name = var.app_name
+  vpc_id = data.aws_vpc.shared.id
+  tags = {
+  "Name" = "${var.app_name}-loadbalancer-security-group"
+ }
 }
+
 data "aws_lb_target_group" "target_group" {
   name = var.app_name
 }
@@ -50,15 +54,8 @@ resource "aws_security_group" "cluster_ec2" {
 
   ingress {
     protocol  = "tcp"
-    from_port = var.server_port
-    to_port   = var.server_port
-    cidr_blocks = var.public_cidrs
-  }
-
-  ingress {
-    protocol  = "tcp"
-    from_port = 32768
-    to_port   = 65535
+    from_port = 8080
+    to_port   = 8080
     security_groups = [
       data.aws_security_group.loadbalancer.id
     ]
@@ -73,7 +70,12 @@ resource "aws_security_group" "cluster_ec2" {
     ]
   }
 
-  tags = var.tags_common
+  tags = merge(
+    var.tags_common,
+    {
+      Name = "${var.app_name}-cluster-ec2-security-group"
+    }
+  )
 }
 
 # EC2 launch template - settings to use for new EC2s added to the group
@@ -213,8 +215,6 @@ resource "aws_ecs_task_definition" "ecs_task_definition" {
   requires_compatibilities = [
     "EC2",
   ]
-  cpu    = var.container_cpu
-  memory = var.container_memory
 
   volume {
     name = "upload_volume"
@@ -225,11 +225,16 @@ resource "aws_ecs_task_definition" "ecs_task_definition" {
 
   container_definitions = var.task_definition
 
-  tags = var.tags_common
+  tags = merge(
+    var.tags_common,
+    {
+      Name = "${var.app_name}-task-definition"
+    }
+  )
 }
 
 resource "aws_ecs_service" "ecs_service" {
-  name            = var.app_name
+  name            = "${var.app_name}-ecs-service"
   cluster         = aws_ecs_cluster.ecs_cluster.id
   task_definition = aws_ecs_task_definition.ecs_task_definition.arn
   desired_count   = var.app_count
@@ -252,17 +257,27 @@ resource "aws_ecs_service" "ecs_service" {
     aws_iam_role_policy_attachment.ecs_task_execution_role,
   ]
 
-  tags = var.tags_common
+  tags = merge(
+    var.tags_common,
+    {
+      Name = "${var.app_name}-ecs-service"
+    }
+  )
 }
 
 resource "aws_ecs_capacity_provider" "capacity_provider" {
-  name = var.app_name
+  name = "${var.app_name}-capacity-provider"
 
   auto_scaling_group_provider {
     auto_scaling_group_arn = aws_autoscaling_group.cluster-scaling-group.arn
   }
 
-  tags = var.tags_common
+  tags = merge(
+    var.tags_common,
+    {
+      Name = "${var.app_name}-capacity-provider"
+    }
+  )
 }
 # ECS task execution role data
 # https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_execution_IAM_role.html

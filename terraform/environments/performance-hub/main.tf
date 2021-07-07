@@ -226,7 +226,12 @@ resource "aws_lb" "external" {
 
   security_groups = [aws_security_group.load_balancer_security_group.id]
 
-  tags = local.tags
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-external-loadbalancer"
+    }
+  )
 }
 
 resource "aws_lb_target_group" "target_group" {
@@ -251,7 +256,12 @@ resource "aws_lb_target_group" "target_group" {
     timeout             = "5"
   }
 
-  tags = local.tags
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-target-group"
+    }
+  )
 }
 
 resource "aws_lb_listener" "listener" {
@@ -295,7 +305,7 @@ resource "aws_lb_listener" "https_listener" {
 }
 
 resource "aws_security_group" "load_balancer_security_group" {
-  name_prefix = local.application_name
+  name_prefix = "${local.application_name}-loadbalancer-security-group"
   description = "controls access to lb"
   vpc_id      = data.aws_vpc.shared.id
 
@@ -322,7 +332,12 @@ resource "aws_security_group" "load_balancer_security_group" {
     ]
   }
 
-  tags = local.tags
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-loadbalancer-security-group"
+    }
+  )
 }
 
 #------------------------------------------------------------------------------
@@ -361,7 +376,12 @@ resource "aws_db_instance" "database" {
   #   update = "80m"
   # }
 
-  tags = local.tags
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-database"
+    }
+  )
 }
 
 resource "aws_db_option_group" "db_option_group" {

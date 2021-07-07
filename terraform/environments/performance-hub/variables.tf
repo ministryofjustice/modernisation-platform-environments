@@ -30,17 +30,14 @@ variable "key_name" {
 
 variable "container_cpu" {
   description = "Container instance CPU units to provision (1 vCPU = 1024 CPU units)"
-  default     = "512"
 }
 
 variable "container_memory" {
   description = "Container instance memory to provision (in MiB)"
-  default     = "512"
 }
 
 variable "server_port" {
   description = "Port exposed by the docker image to redirect traffic to"
-  default     = 7001
 }
 
 # variable "cidr_access" {
