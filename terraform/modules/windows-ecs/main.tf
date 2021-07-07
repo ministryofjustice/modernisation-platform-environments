@@ -20,8 +20,8 @@ data "aws_subnet_ids" "shared-private" {
 data "aws_security_group" "loadbalancer" {
   vpc_id = data.aws_vpc.shared.id
   tags = {
-  "Name" = "${var.app_name}-loadbalancer-security-group"
- }
+    "Name" = "${var.app_name}-loadbalancer-security-group"
+  }
 }
 
 data "aws_lb_target_group" "target_group" {
