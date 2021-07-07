@@ -42,7 +42,7 @@ jobs:
           echo "Terraform plan - ${TF_ENV}"
           bash scripts/terraform-init.sh terraform/environments/performance-hub
           terraform -chdir="terraform/environments/performance-hub" workspace select "performance-hub-${TF_ENV}"
-          bash scripts/terraform-plan.sh terraform/environments/performance-hub
+          bash scripts/terraform-plan.sh terraform/environments/performance-hub -var-file=environments/${TF_ENV}.tfvars
         env:
           TF_ENV: development
 
@@ -65,7 +65,7 @@ jobs:
           echo "Terraform apply - ${TF_ENV}"
           bash scripts/terraform-init.sh terraform/environments/performance-hub
           terraform -chdir="terraform/environments/performance-hub" workspace select "performance-hub-${TF_ENV}"
-          bash scripts/terraform-apply.sh terraform/environments/performance-hub
+          bash scripts/terraform-apply.sh terraform/environments/performance-hub -var-file=environments/${TF_ENV}.tfvars
         env:
           TF_ENV: development
 
@@ -131,7 +131,7 @@ jobs:
           echo "Terraform plan - ${TF_ENV}"
           bash scripts/terraform-init.sh terraform/environments/performance-hub
           terraform -chdir="terraform/environments/performance-hub" workspace select "performance-hub-${TF_ENV}"
-          bash scripts/terraform-plan.sh terraform/environments/performance-hub
+          bash scripts/terraform-plan.sh terraform/environments/performance-hub -var-file=environments/${TF_ENV}.tfvars
         env:
           TF_ENV: preproduction
 
@@ -154,7 +154,7 @@ jobs:
           echo "Terraform apply - ${TF_ENV}"
           bash scripts/terraform-init.sh terraform/environments/performance-hub
           terraform -chdir="terraform/environments/performance-hub" workspace select "performance-hub-${TF_ENV}"
-          bash scripts/terraform-apply.sh terraform/environments/performance-hub
+          bash scripts/terraform-apply.sh terraform/environments/performance-hub -var-file=environments/${TF_ENV}.tfvars
         env:
           TF_ENV: preproduction
 
