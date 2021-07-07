@@ -2,6 +2,10 @@ variable "vpc_all" {
 
 }
 
+variable "public_cidrs" {
+  type = list(string)
+}
+
 variable "subnet_set_name" {
 
 }

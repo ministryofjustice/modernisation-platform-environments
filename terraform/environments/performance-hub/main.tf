@@ -5,6 +5,10 @@ resource "aws_ecr_repository" "ecr_repo" {
   image_scanning_configuration {
     scan_on_push = false
   }
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 data "aws_caller_identity" "current" {}
@@ -40,6 +44,27 @@ data "aws_subnet" "private_subnets_c" {
   vpc_id = data.aws_vpc.shared.id
   tags = {
     "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-private-${var.region}c"
+  }
+}
+
+data "aws_subnet" "public_az_a" {
+  vpc_id = data.aws_vpc.shared.id
+  tags = {
+    Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public-${var.region}a"
+  }
+}
+
+data "aws_subnet" "public_az_b" {
+  vpc_id = data.aws_vpc.shared.id
+  tags = {
+    Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public-${var.region}b"
+  }
+}
+
+data "aws_subnet" "public_az_c" {
+  vpc_id = data.aws_vpc.shared.id
+  tags = {
+    Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public-${var.region}c"
   }
 }
 
@@ -86,23 +111,21 @@ data "template_file" "launch-template" {
   template = file("templates/user-data.txt")
   vars = {
     cluster_name = local.application_name
+    environment  = local.environment
   }
 }
 
 data "template_file" "task_definition" {
   template = file("templates/task_definition.json")
   vars = {
-    app_name = local.application_name
-    #app_image         = format("%s%s", data.aws_caller_identity.current.account".dkr.ecr."${var.region}".amazonaws.com/"${local.application_name})
-    app_image = format("%s%s", data.aws_caller_identity.current.account_id, var.app_image)
-    #data.aws_ecr_image.service_image.id
-    #".dkr.ecr.eu-west-2.amazonaws.com/ccms-opa18-hub"
+    app_name          = local.application_name
+    ecr_url           = format("%s%s%s%s%s", data.aws_caller_identity.current.account_id, ".dkr.ecr.", var.region, ".amazonaws.com/", local.application_name)
     server_port       = var.server_port
     aws_region        = var.region
     container_version = var.container_version
-    db_host           = aws_db_instance.database.endpoint
-    # db_user           = var.db_user
-    # db_password       = var.db_password
+    db_host           = aws_db_instance.database.address
+    db_user           = var.db_user
+    db_password       = data.aws_secretsmanager_secret_version.database_password.arn
   }
 }
 
@@ -129,6 +152,8 @@ module "windows-ecs" {
   container_memory     = var.container_memory
   server_port          = var.server_port
   app_count            = var.app_count
+  public_cidrs         = [data.aws_subnet.public_az_a.cidr_block, data.aws_subnet.public_az_b.cidr_block, data.aws_subnet.public_az_c.cidr_block]
+
   #   cidr_access                 = var.cidr_access
   tags_common = local.tags
 
@@ -139,7 +164,7 @@ resource "aws_route53_record" "external" {
   provider = aws.core-vpc
 
   zone_id = data.aws_route53_zone.external.zone_id
-  name    = "${var.networking[0].application}.${var.networking[0].business-unit}-preprod.modernisation-platform.service.justice.gov.uk"
+  name    = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   type    = "A"
 
   alias {
@@ -201,7 +226,12 @@ resource "aws_lb" "external" {
 
   security_groups = [aws_security_group.load_balancer_security_group.id]
 
-  tags = local.tags
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-external-loadbalancer"
+    }
+  )
 }
 
 resource "aws_lb_target_group" "target_group" {
@@ -216,17 +246,22 @@ resource "aws_lb_target_group" "target_group" {
     type = "lb_cookie"
   }
 
-  # health_check {
-  #   path                = var.health_check_path
-  #   healthy_threshold   = "5"
-  #   interval            = "120"
-  #   protocol            = "HTTP"
-  #   unhealthy_threshold = "2"
-  #   matcher             = "200"
-  #   timeout             = "5"
-  # }
+  health_check {
+    # path                = "/"
+    healthy_threshold   = "5"
+    interval            = "120"
+    protocol            = "HTTP"
+    unhealthy_threshold = "2"
+    matcher             = "200"
+    timeout             = "5"
+  }
 
-  tags = local.tags
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-target-group"
+    }
+  )
 }
 
 resource "aws_lb_listener" "listener" {
@@ -240,16 +275,16 @@ resource "aws_lb_listener" "listener" {
   }
 }
 
-resource "aws_lb_listener" "http_listener" {
-  load_balancer_arn = aws_lb.external.id
-  port              = "80"
-  protocol          = "HTTP"
-
-  default_action {
-    target_group_arn = aws_lb_target_group.target_group.id
-    type             = "forward"
-  }
-}
+# resource "aws_lb_listener" "http_listener" {
+#   load_balancer_arn = aws_lb.external.id
+#   port              = "80"
+#   protocol          = "HTTP"
+#
+#   default_action {
+#     target_group_arn = aws_lb_target_group.target_group.id
+#     type             = "forward"
+#   }
+# }
 
 resource "aws_lb_listener" "https_listener" {
   depends_on = [aws_acm_certificate_validation.external]
@@ -270,27 +305,16 @@ resource "aws_lb_listener" "https_listener" {
 }
 
 resource "aws_security_group" "load_balancer_security_group" {
-  name_prefix = local.application_name
+  name_prefix = "${local.application_name}-loadbalancer-security-group"
   description = "controls access to lb"
   vpc_id      = data.aws_vpc.shared.id
 
-  # ingress {
-  #   protocol  = "tcp"
-  #   from_port = var.server_port
-  #   to_port   = var.server_port
-  #   cidr_blocks = concat(
-  #     var.cidr_access,
-  #   )
-  # }
-
-  # ingress {
-  #   protocol  = "tcp"
-  #   from_port = 80
-  #   to_port   = 80
-  #   cidr_blocks = concat(
-  #     var.cidr_access,
-  #   )
-  # }
+  ingress {
+    protocol    = "tcp"
+    from_port   = var.server_port
+    to_port     = var.server_port
+    cidr_blocks = ["0.0.0.0/0", ]
+  }
 
   ingress {
     protocol    = "tcp"
@@ -308,7 +332,12 @@ resource "aws_security_group" "load_balancer_security_group" {
     ]
   }
 
-  tags = local.tags
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-loadbalancer-security-group"
+    }
+  )
 }
 
 #------------------------------------------------------------------------------
@@ -323,21 +352,22 @@ resource "aws_db_instance" "database" {
   engine_version    = "15.00.4073.23.v1"
   license_model     = "license-included"
   instance_class    = "db.m5.large"
-  multi_az          = true
+  multi_az          = false
   # name                                = local.application_name
   username                            = var.db_user
-  password                            = var.db_password
+  password                            = data.aws_secretsmanager_secret_version.database_password.arn
   storage_encrypted                   = false
   iam_database_authentication_enabled = false
   vpc_security_group_ids = [
     aws_security_group.db.id
   ]
-  # snapshot_identifier       = var.db_snapshot_identifier
-  backup_retention_period   = 30
+  snapshot_identifier       = var.db_snapshot_identifier
+  backup_retention_period   = 0
   maintenance_window        = "Mon:00:00-Mon:03:00"
   backup_window             = "03:00-06:00"
   final_snapshot_identifier = "final-snapshot"
   deletion_protection       = false
+  option_group_name         = aws_db_option_group.db_option_group.name
   db_subnet_group_name      = aws_db_subnet_group.db.id
 
   # timeouts {
@@ -346,7 +376,28 @@ resource "aws_db_instance" "database" {
   #   update = "80m"
   # }
 
-  tags = local.tags
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-database"
+    }
+  )
+}
+
+resource "aws_db_option_group" "db_option_group" {
+  name                     = "${local.application_name}-option-group"
+  option_group_description = "Terraform Option Group"
+  engine_name              = "sqlserver-se"
+  major_engine_version     = "15.00"
+
+  option {
+    option_name = "SQLSERVER_BACKUP_RESTORE"
+
+    option_settings {
+      name  = "IAM_ROLE_ARN"
+      value = aws_iam_role.s3_database_backups_role.arn
+    }
+  }
 }
 
 resource "aws_db_subnet_group" "db" {
@@ -359,31 +410,42 @@ resource "aws_security_group" "db" {
   name        = local.application_name
   description = "Allow DB inbound traffic"
   vpc_id      = data.aws_vpc.shared.id
+  tags        = local.tags
+}
 
-  ingress {
-    from_port   = 1433
-    to_port     = 1433
-    protocol    = "tcp"
-    cidr_blocks = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
-  }
+resource "aws_security_group_rule" "db_mgmt_ingress_rule" {
+  type                     = "ingress"
+  from_port                = 1433
+  to_port                  = 1433
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.db.id
+  source_security_group_id = aws_security_group.db_mgmt_server_security_group.id
+}
 
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+resource "aws_security_group_rule" "db_ecs_ingress_rule" {
+  type                     = "ingress"
+  from_port                = 1433
+  to_port                  = 1433
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.db.id
+  source_security_group_id = module.windows-ecs.cluster_ec2_security_group_id
+}
 
-  tags = local.tags
+resource "aws_security_group_rule" "db_bastion_ingress_rule" {
+  type              = "ingress"
+  from_port         = 1433
+  to_port           = 1433
+  protocol          = "tcp"
+  security_group_id = aws_security_group.db.id
+  cidr_blocks       = ["${module.bastion_linux.bastion_private_ip}/32"]
 }
 
 #------------------------------------------------------------------------------
 # S3 Bucket for Database backup files
 #------------------------------------------------------------------------------
-
-resource "aws_s3_bucket" "database_files" {
-  bucket_prefix = "performance-hub"
-  acl           = "private"
+resource "aws_s3_bucket" "database_backup_files" {
+  bucket = "performance-hub-db-backups-${local.environment}"
+  acl    = "private"
 
   lifecycle {
     prevent_destroy = true
@@ -423,38 +485,180 @@ resource "aws_s3_bucket" "database_files" {
   tags = merge(
     local.tags,
     {
-      Name = "performance-hub-s3"
+      Name = "performance-hub-db-backups-s3"
     },
   )
 }
 
 #S3 bucket access policy
-data "aws_iam_policy_document" "bucket_access" {
+resource "aws_iam_policy" "s3_database_backups_policy" {
+  name   = "${local.application_name}-s3-database_backups-policy"
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:ListBucket",
+        "s3:GetBucketLocation"
+      ],
+      "Resource": [
+          "${aws_s3_bucket.database_backup_files.arn}"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObjectMetaData",
+        "s3:GetObject",
+        "s3:PutObject",
+        "s3:ListMultipartUploadParts",
+        "s3:AbortMultipartUpload"
+      ],
+      "Resource": [
+        "${aws_s3_bucket.database_backup_files.arn}/*"
+      ]
+    }
+  ]
+}
+EOF
+}
 
-  statement {
-    actions = [
-      "s3:PutObject",
-      "s3:PutObjectAcl",
-      "s3:ListBucket"
+resource "aws_iam_role" "s3_database_backups_role" {
+  name               = "${local.application_name}-s3-database-backups-role"
+  assume_role_policy = data.aws_iam_policy_document.s3-access-policy.json
+}
+
+resource "aws_iam_role_policy_attachment" "s3_database_backups_attachment" {
+  role       = aws_iam_role.s3_database_backups_role.name
+  policy_arn = aws_iam_policy.s3_database_backups_policy.arn
+}
+#------------------------------------------------------------------------------
+# S3 Bucket for Uploads
+#------------------------------------------------------------------------------
+resource "aws_s3_bucket" "upload_files" {
+  bucket = "performance-hub-uploads-${local.environment}"
+  acl    = "private"
+
+  lifecycle {
+    prevent_destroy = true
+  }
+
+  dynamic "lifecycle_rule" {
+    for_each = true ? [true] : []
+
+    content {
+      enabled = true
+
+      noncurrent_version_transition {
+        days          = 30
+        storage_class = "STANDARD_IA"
+      }
+
+      transition {
+        days          = 60
+        storage_class = "STANDARD_IA"
+      }
+    }
+  }
+
+  server_side_encryption_configuration {
+    rule {
+      apply_server_side_encryption_by_default {
+        sse_algorithm     = "aws:kms"
+        kms_master_key_id = aws_kms_key.s3.arn
+      }
+    }
+  }
+
+  versioning {
+    enabled = true
+  }
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "performance-hub-uploads"
+    },
+  )
+}
+
+resource "aws_s3_bucket_policy" "upload_files_policy" {
+  bucket = aws_s3_bucket.upload_files.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Id      = "upload_bucket_policy"
+    Statement = [
+      {
+        Effect    = "Allow"
+        Principal = "*"
+        Action    = "s3:*"
+        Resource = [
+          aws_s3_bucket.upload_files.arn,
+          "${aws_s3_bucket.upload_files.arn}/*",
+        ]
+      },
     ]
+  })
+}
 
-    resources = [
-      aws_s3_bucket.database_files.arn,
-      "${aws_s3_bucket.database_files.arn}/*"
+resource "aws_iam_role" "s3_uploads_role" {
+  name               = "${local.application_name}-s3-uploads-role"
+  assume_role_policy = data.aws_iam_policy_document.s3-access-policy.json
+}
+
+data "aws_iam_policy_document" "s3-access-policy" {
+  version = "2012-10-17"
+  statement {
+    sid    = ""
+    effect = "Allow"
+    actions = [
+      "sts:AssumeRole",
     ]
     principals {
-      identifiers = ["s3.amazonaws.com"]
-      type        = "Service"
+      type = "Service"
+      identifiers = [
+        "ec2.amazonaws.com",
+        "rds.amazonaws.com",
+      ]
     }
   }
 }
 
-resource "aws_s3_bucket_policy" "root" {
-
-  bucket = aws_s3_bucket.database_files.id
-  policy = data.aws_iam_policy_document.bucket_access.json
+resource "aws_iam_policy" "s3-uploads-policy" {
+  name   = "${local.application_name}-s3-uploads-policy"
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+          "s3:*"
+      ],
+      "Resource": [
+          "${aws_s3_bucket.upload_files.arn}"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+          "s3:*"
+      ],
+      "Resource": [
+        "${aws_s3_bucket.upload_files.arn}/*"
+      ]
+    }
+  ]
+}
+EOF
 }
 
+resource "aws_iam_role_policy_attachment" "s3_uploads_attachment" {
+  role       = aws_iam_role.s3_uploads_role.name
+  policy_arn = aws_iam_policy.s3-uploads-policy.arn
+}
 #------------------------------------------------------------------------------
 # KMS setup for S3
 #------------------------------------------------------------------------------

@@ -8,6 +8,10 @@ variable "container_version" {
 
 }
 
+variable "db_password_key" {
+
+}
+
 variable "app_count" {
   description = "Number of docker containers to run"
 }
@@ -26,17 +30,14 @@ variable "key_name" {
 
 variable "container_cpu" {
   description = "Container instance CPU units to provision (1 vCPU = 1024 CPU units)"
-  default     = "512"
 }
 
 variable "container_memory" {
   description = "Container instance memory to provision (in MiB)"
-  default     = "1536"
 }
 
 variable "server_port" {
   description = "Port exposed by the docker image to redirect traffic to"
-  default     = 7001
 }
 
 # variable "cidr_access" {
@@ -56,21 +57,19 @@ variable "ec2_min_size" {
   description = "Min Number of EC2s in the cluster"
 }
 
-variable "app_image" {
-
-}
-
 variable "db_user" {
 
 }
 
-variable "db_password" {
-
+variable "ecr_url" {
+  default = ""
 }
 
-# variable "db_snapshot_identifier" {
-#
-# }
+
+variable "db_snapshot_identifier" {
+  description = "The default database snapshot to restore from"
+  default     = "performance-hub-initial"
+}
 #
 # variable "health_check_path" {
 #   default = "/opa/opa-hub/manager"

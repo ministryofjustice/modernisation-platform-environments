@@ -1,11 +1,52 @@
 [{
   "name": "performance-hub",
-  "image": "${app_image}:${container_version}",
+  "image": "mcr.microsoft.com/dotnet/framework/samples:aspnetapp",
+  "cpu": 2048,
   "portMappings": [
     {
-      "protocol": "tcp",
-      "containerPort": 7001,
+      "containerPort": 80,
       "hostPort": 8080
+    }
+  ],
+  "memory": 4096,
+  "logConfiguration": {
+    "logDriver": "awslogs",
+    "options": {
+        "awslogs-group": "performance-hub-ecs",
+        "awslogs-region": "eu-west-2",
+        "awslogs-stream-prefix": "perf-hub"
+     }
+    },
+  "environment" : [
+    {
+      "name" : "DB_HOST",
+      "value" : "${db_host}"
+    },
+    {
+      "name" : "DB_SCHEMA",
+      "value": "${app_name}"
+    },
+    {
+      "name" : "DB_USER",
+      "value" : "${db_user}"
+    },
+    {
+      "name" : "DB_PORT",
+      "value" : "5432"
+    },
+    {
+      "name": "MojHub_CnnStr",
+      "value": "Server=${db_host};Database=NomsPMU;User Id=${db_user};Password=;"
+    },
+    {
+      "name": "MojHub_Membership",
+      "value": "Server=${db_host};Database=Membership;User Id=${db_user};Password=;"
+    }
+  ],
+  "secrets": [
+    {
+      "name": "DB_PASSWORD",
+      "valueFrom": "${db_password}"
     }
   ],
   "essential": true

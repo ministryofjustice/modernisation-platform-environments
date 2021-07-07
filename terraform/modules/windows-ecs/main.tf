@@ -10,7 +10,6 @@ data "aws_subnet_ids" "shared-private" {
     "Name" = "${var.subnet_set_name}-private*"
   }
 }
-
 # # data "aws_ecr_image" "service_image" {
 # #   repository_name = var.app_name
 # #   image_tag       = var.container_version
@@ -18,20 +17,16 @@ data "aws_subnet_ids" "shared-private" {
 # data "aws_db_instance" "database" {
 #   db_instance_identifier = var.app_name
 # }
-# data "aws_security_group" "loadbalancer" {
-#   name = var.app_name
-# }
+data "aws_security_group" "loadbalancer" {
+  vpc_id = data.aws_vpc.shared.id
+  tags = {
+    "Name" = "${var.app_name}-loadbalancer-security-group"
+  }
+}
+
 data "aws_lb_target_group" "target_group" {
   name = var.app_name
 }
-# data "aws_lb" "selected" {
-#   name = var.app_name
-# }
-# data "aws_lb_listener" "listener" {
-#   load_balancer_arn = data.aws_lb.selected.arn
-#   port              = var.server_port
-# }
-#
 
 resource "aws_iam_service_linked_role" "ecs" {
   aws_service_name = "ecs.amazonaws.com"
@@ -57,23 +52,14 @@ resource "aws_security_group" "cluster_ec2" {
   description = "controls access to the cluster ec2 instance"
   vpc_id      = data.aws_vpc.shared.id
 
-  # ingress {
-  #   protocol  = "tcp"
-  #   from_port = 7001
-  #   to_port   = 7001
-  #   cidr_blocks = concat(
-  #     var.cidr_access
-  #   )
-  # }
-
-  # ingress {
-  #   protocol  = "tcp"
-  #   from_port = 32768
-  #   to_port   = 65535
-  #   security_groups = [
-  #     data.aws_security_group.loadbalancer.id
-  #   ]
-  # }
+  ingress {
+    protocol  = "tcp"
+    from_port = 8080
+    to_port   = 8080
+    security_groups = [
+      data.aws_security_group.loadbalancer.id
+    ]
+  }
 
   egress {
     protocol  = "-1"
@@ -84,7 +70,12 @@ resource "aws_security_group" "cluster_ec2" {
     ]
   }
 
-  tags = var.tags_common
+  tags = merge(
+    var.tags_common,
+    {
+      Name = "${var.app_name}-cluster-ec2-security-group"
+    }
+  )
 }
 
 # EC2 launch template - settings to use for new EC2s added to the group
@@ -126,21 +117,21 @@ resource "aws_launch_template" "ec2-launch-template" {
 
   tag_specifications {
     resource_type = "instance"
-    tags = merge(map(
-      "Name", "${var.app_name}-ecs-cluster",
-    ), var.tags_common)
+    tags = merge(tomap({
+      "Name" = "${var.app_name}-ecs-cluster"
+    }), var.tags_common)
   }
 
   tag_specifications {
     resource_type = "volume"
-    tags = merge(map(
-      "Name", "${var.app_name}-ecs-cluster",
-    ), var.tags_common)
+    tags = merge(tomap({
+      "Name" = "${var.app_name}-ecs-cluster"
+    }), var.tags_common)
   }
 
-  tags = merge(map(
-    "Name", "${var.app_name}-ecs-cluster-template",
-  ), var.tags_common)
+  tags = merge(tomap({
+    "Name" = "${var.app_name}-ecs-cluster-template"
+  }), var.tags_common)
 }
 
 # IAM Role, policy and instance profile (to attach the role to the EC2)
@@ -221,15 +212,12 @@ resource "aws_ecs_cluster" "ecs_cluster" {
 resource "aws_ecs_task_definition" "ecs_task_definition" {
   family             = "${var.app_name}-task-definition"
   execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
-  network_mode       = "bridge"
   requires_compatibilities = [
     "EC2",
   ]
-  cpu    = var.container_cpu
-  memory = var.container_memory
 
   volume {
-    name = "app_volume"
+    name = "upload_volume"
     # efs_volume_configuration {
     #   file_system_id = aws_efs_file_system.storage.id
     # }
@@ -237,11 +225,16 @@ resource "aws_ecs_task_definition" "ecs_task_definition" {
 
   container_definitions = var.task_definition
 
-  tags = var.tags_common
+  tags = merge(
+    var.tags_common,
+    {
+      Name = "${var.app_name}-task-definition"
+    }
+  )
 }
 
 resource "aws_ecs_service" "ecs_service" {
-  name            = var.app_name
+  name            = "${var.app_name}-ecs-service"
   cluster         = aws_ecs_cluster.ecs_cluster.id
   task_definition = aws_ecs_task_definition.ecs_task_definition.arn
   desired_count   = var.app_count
@@ -264,17 +257,27 @@ resource "aws_ecs_service" "ecs_service" {
     aws_iam_role_policy_attachment.ecs_task_execution_role,
   ]
 
-  tags = var.tags_common
+  tags = merge(
+    var.tags_common,
+    {
+      Name = "${var.app_name}-ecs-service"
+    }
+  )
 }
 
 resource "aws_ecs_capacity_provider" "capacity_provider" {
-  name = var.app_name
+  name = "${var.app_name}-capacity-provider"
 
   auto_scaling_group_provider {
     auto_scaling_group_arn = aws_autoscaling_group.cluster-scaling-group.arn
   }
 
-  tags = var.tags_common
+  tags = merge(
+    var.tags_common,
+    {
+      Name = "${var.app_name}-capacity-provider"
+    }
+  )
 }
 # ECS task execution role data
 # https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_execution_IAM_role.html
@@ -485,14 +488,14 @@ resource "aws_appautoscaling_policy" "scaling_policy_down" {
 #
 #   tags = var.tags_common
 # }
-# # Set up CloudWatch group and log stream and retain logs for 30 days
-# resource "aws_cloudwatch_log_group" "hub_log_group" {
-#   name              = "${var.app_name}-ecs"
-#   retention_in_days = 30
-#   tags              = var.tags_common
-# }
-#
-# resource "aws_cloudwatch_log_stream" "hub_log_stream" {
-#   name           = "${var.app_name}-log-stream"
-#   log_group_name = aws_cloudwatch_log_group.hub_log_group.name
-# }
+# Set up CloudWatch group and log stream and retain logs for 30 days
+resource "aws_cloudwatch_log_group" "cloudwatch_group" {
+  name              = "${var.app_name}-ecs"
+  retention_in_days = 30
+  tags              = var.tags_common
+}
+
+resource "aws_cloudwatch_log_stream" "cloudwatch_stream" {
+  name           = "${var.app_name}-log-stream"
+  log_group_name = aws_cloudwatch_log_group.cloudwatch_group.name
+}
