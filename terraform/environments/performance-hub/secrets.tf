@@ -18,3 +18,21 @@ data "aws_secretsmanager_secret" "database_password" {
 data "aws_secretsmanager_secret_version" "database_password" {
   secret_id = data.aws_secretsmanager_secret.database_password.arn
 }
+
+# Get secret by name for database connection string
+data "aws_secretsmanager_secret" "mojhub_cnnstr" {
+  name = "mojhub_cnnstr"
+}
+
+data "aws_secretsmanager_secret_version" "mojhub_cnnstr" {
+  secret_id = data.aws_secretsmanager_secret.mojhub_cnnstr.arn
+}
+
+# Get secret by name for membership database connection string
+data "aws_secretsmanager_secret" "mojhub_membership" {
+  name = "mojhub_membership"
+}
+
+data "aws_secretsmanager_secret_version" "mojhub_membership" {
+  secret_id = data.aws_secretsmanager_secret.mojhub_membership.arn
+}

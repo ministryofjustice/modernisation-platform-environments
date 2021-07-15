@@ -2,6 +2,10 @@ variable "vpc_all" {
 
 }
 
+variable "bastion_cidr" {
+
+}
+
 variable "public_cidrs" {
   type = list(string)
 }

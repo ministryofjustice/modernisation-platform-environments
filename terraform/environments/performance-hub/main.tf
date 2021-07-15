@@ -125,7 +125,9 @@ data "template_file" "task_definition" {
     container_version = var.container_version
     db_host           = aws_db_instance.database.address
     db_user           = var.db_user
-    db_password       = data.aws_secretsmanager_secret_version.database_password.arn
+    db_password       = "${data.aws_secretsmanager_secret_version.database_password.arn}:perfhub_db_password::"
+    mojhub_cnnstr     = "${data.aws_secretsmanager_secret_version.mojhub_cnnstr.arn}:mojhub_cnnstr::"
+    mojhub_membership = "${data.aws_secretsmanager_secret_version.mojhub_membership.arn}:mojhub_membership::"
   }
 }
 
@@ -153,8 +155,7 @@ module "windows-ecs" {
   server_port          = var.server_port
   app_count            = var.app_count
   public_cidrs         = [data.aws_subnet.public_az_a.cidr_block, data.aws_subnet.public_az_b.cidr_block, data.aws_subnet.public_az_c.cidr_block]
-
-  #   cidr_access                 = var.cidr_access
+  bastion_cidr         = "${module.bastion_linux.bastion_private_ip}/32"
   tags_common = local.tags
 
   depends_on = [aws_ecr_repository.ecr_repo, aws_lb_listener.listener]
@@ -252,7 +253,7 @@ resource "aws_lb_target_group" "target_group" {
     interval            = "120"
     protocol            = "HTTP"
     unhealthy_threshold = "2"
-    matcher             = "200"
+    matcher             = "200-499"
     timeout             = "5"
   }
 
@@ -341,30 +342,27 @@ resource "aws_security_group" "load_balancer_security_group" {
 #------------------------------------------------------------------------------
 
 resource "aws_db_instance" "database" {
-  identifier        = local.application_name
-  allocated_storage = 100
-  storage_type      = "gp2"
-  engine            = "sqlserver-se"
-  engine_version    = "15.00.4073.23.v1"
-  license_model     = "license-included"
-  instance_class    = "db.m5.large"
-  multi_az          = false
-  # name                                = local.application_name
+  identifier                          = local.application_name
+  allocated_storage                   = 100
+  storage_type                        = "gp2"
+  engine                              = "sqlserver-se"
+  engine_version                      = "15.00.4073.23.v1"
+  license_model                       = "license-included"
+  instance_class                      = var.db_instance_class
+  multi_az                            = false
   username                            = var.db_user
   password                            = data.aws_secretsmanager_secret_version.database_password.arn
   storage_encrypted                   = false
   iam_database_authentication_enabled = false
-  vpc_security_group_ids = [
-    aws_security_group.db.id
-  ]
-  snapshot_identifier       = var.db_snapshot_identifier
-  backup_retention_period   = 0
-  maintenance_window        = "Mon:00:00-Mon:03:00"
-  backup_window             = "03:00-06:00"
-  final_snapshot_identifier = "final-snapshot"
-  deletion_protection       = false
-  option_group_name         = aws_db_option_group.db_option_group.name
-  db_subnet_group_name      = aws_db_subnet_group.db.id
+  vpc_security_group_ids              = [aws_security_group.db.id]
+  snapshot_identifier                 = var.db_snapshot_identifier
+  backup_retention_period             = 0
+  maintenance_window                  = "Mon:00:00-Mon:03:00"
+  backup_window                       = "03:00-06:00"
+  final_snapshot_identifier           = "final-snapshot"
+  deletion_protection                 = false
+  option_group_name                   = aws_db_option_group.db_option_group.name
+  db_subnet_group_name                = aws_db_subnet_group.db.id
 
   # timeouts {
   #   create = "40m"

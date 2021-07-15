@@ -33,20 +33,20 @@
     {
       "name" : "DB_PORT",
       "value" : "5432"
-    },
-    {
-      "name": "MojHub_CnnStr",
-      "value": "Server=${db_host};Database=NomsPMU;User Id=${db_user};Password=;"
-    },
-    {
-      "name": "MojHub_Membership",
-      "value": "Server=${db_host};Database=Membership;User Id=${db_user};Password=;"
     }
   ],
   "secrets": [
     {
       "name": "DB_PASSWORD",
       "valueFrom": "${db_password}"
+    },
+    {
+      "name": "MojHub_CnnStr",
+      "valueFrom": "${mojhub_cnnstr}"
+    },
+    {
+      "name": "MojHub_Membership",
+      "valueFrom": "${mojhub_membership}"
     }
   ],
   "essential": true

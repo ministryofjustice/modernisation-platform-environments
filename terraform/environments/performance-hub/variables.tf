@@ -40,11 +40,6 @@ variable "server_port" {
   description = "Port exposed by the docker image to redirect traffic to"
 }
 
-# variable "cidr_access" {
-#   description = "List of the Cidr block for workspace access"
-#   type        = list(string)
-# }
-
 variable "ec2_desired_capacity" {
   description = "Number of EC2s in the cluster"
 }
@@ -65,12 +60,11 @@ variable "ecr_url" {
   default = ""
 }
 
+variable "db_instance_class" {
+  
+}
 
 variable "db_snapshot_identifier" {
   description = "The default database snapshot to restore from"
-  default     = "performance-hub-initial"
+  default     = ""
 }
-#
-# variable "health_check_path" {
-#   default = "/opa/opa-hub/manager"
-# }
