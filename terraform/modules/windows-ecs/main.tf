@@ -10,13 +10,7 @@ data "aws_subnet_ids" "shared-private" {
     "Name" = "${var.subnet_set_name}-private*"
   }
 }
-# # data "aws_ecr_image" "service_image" {
-# #   repository_name = var.app_name
-# #   image_tag       = var.container_version
-# # }
-# data "aws_db_instance" "database" {
-#   db_instance_identifier = var.app_name
-# }
+
 data "aws_security_group" "loadbalancer" {
   vpc_id = data.aws_vpc.shared.id
   tags = {
@@ -25,7 +19,9 @@ data "aws_security_group" "loadbalancer" {
 }
 
 data "aws_lb_target_group" "target_group" {
-  name = var.app_name
+  tags = {
+    "Name" = "${var.app_name}-tg-${var.environment}"
+  }
 }
 
 resource "aws_iam_service_linked_role" "ecs" {
@@ -92,7 +88,7 @@ resource "aws_security_group" "cluster_ec2" {
 # so that the autoscaling group creates new ones using the new launch template
 
 resource "aws_launch_template" "ec2-launch-template" {
-  name_prefix   = var.app_name
+  name_prefix   = "${var.app_name}-ec2-launch-template"
   image_id      = var.ami_image_id
   instance_type = var.instance_type
   key_name      = var.key_name
@@ -310,9 +306,14 @@ data "aws_iam_policy_document" "ecs_task_execution_role" {
 
 # ECS task execution role
 resource "aws_iam_role" "ecs_task_execution_role" {
-  name               = var.app_name
+  name               = "${var.app_name}-ecs-task-execution-role"
   assume_role_policy = data.aws_iam_policy_document.ecs_task_execution_role.json
-  tags               = var.tags_common
+  tags = merge(
+    var.tags_common,
+    {
+      Name = "${var.app_name}-ecs-task-execution-role"
+    }
+  )
 }
 
 # ECS task execution role policy attachment
@@ -501,7 +502,12 @@ resource "aws_appautoscaling_policy" "scaling_policy_down" {
 resource "aws_cloudwatch_log_group" "cloudwatch_group" {
   name              = "${var.app_name}-ecs"
   retention_in_days = 30
-  tags              = var.tags_common
+  tags = merge(
+    var.tags_common,
+    {
+      Name = "${var.app_name}-ecs-cloudwatch-group"
+    }
+  )
 }
 
 resource "aws_cloudwatch_log_stream" "cloudwatch_stream" {

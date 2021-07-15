@@ -1,0 +1,41 @@
+{
+    "accounts": {
+        "development": {
+          "region": "eu-west-2",
+          "ami_image_id": "ami-0c84c2544c1c7cba7",
+          "instance_type": "m4.xlarge",
+          "key_name": "performance-hub-ec2",
+          "app_count": "1",
+          "ec2_desired_capacity": 2,
+          "ec2_max_size": 3,
+          "ec2_min_size": 2,
+          "server_port": "80",
+          "container_version": "latest",
+          "container_cpu": "2048",
+          "container_memory": "4096",
+          "db_instance_class": "db.m5.large",
+          "db_user": "admin",
+          "db_password_key": "performance_hub_db",
+          "db_snapshot_identifier": "arn:aws:rds:eu-west-2:322518575883:snapshot:performance-hub-initial"
+
+        },
+        "preproduction": {
+          "region": "eu-west-2",
+          "ami_image_id": "ami-0c84c2544c1c7cba7",
+          "instance_type": "m4.xlarge",
+          "key_name": "performance-hub-ec2",
+          "app_count": "1",
+          "ec2_desired_capacity": 2,
+          "ec2_max_size": 3,
+          "ec2_min_size": 2,
+          "server_port": "80",
+          "container_version": "latest",
+          "container_cpu": "2048",
+          "container_memory": "4096",
+          "db_instance_class": "db.m5.large",
+          "db_user": "admin",
+          "db_password_key": "performance_hub_db",
+          "db_snapshot_identifier": "arn:aws:rds:eu-west-2:322518575883:snapshot:performance-hub-initial"
+        }
+    }
+}
