@@ -29,42 +29,42 @@ data "aws_subnet_ids" "shared-data" {
 data "aws_subnet" "private_subnets_a" {
   vpc_id = data.aws_vpc.shared.id
   tags = {
-    "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-private-${var.region}a"
+    "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-private-${local.app_data.accounts[local.environment].region}a"
   }
 }
 
 data "aws_subnet" "private_subnets_b" {
   vpc_id = data.aws_vpc.shared.id
   tags = {
-    "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-private-${var.region}b"
+    "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-private-${local.app_data.accounts[local.environment].region}b"
   }
 }
 
 data "aws_subnet" "private_subnets_c" {
   vpc_id = data.aws_vpc.shared.id
   tags = {
-    "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-private-${var.region}c"
+    "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-private-${local.app_data.accounts[local.environment].region}c"
   }
 }
 
 data "aws_subnet" "public_az_a" {
   vpc_id = data.aws_vpc.shared.id
   tags = {
-    Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public-${var.region}a"
+    Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public-${local.app_data.accounts[local.environment].region}a"
   }
 }
 
 data "aws_subnet" "public_az_b" {
   vpc_id = data.aws_vpc.shared.id
   tags = {
-    Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public-${var.region}b"
+    Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public-${local.app_data.accounts[local.environment].region}b"
   }
 }
 
 data "aws_subnet" "public_az_c" {
   vpc_id = data.aws_vpc.shared.id
   tags = {
-    Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public-${var.region}c"
+    Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public-${local.app_data.accounts[local.environment].region}c"
   }
 }
 
@@ -119,13 +119,15 @@ data "template_file" "task_definition" {
   template = file("templates/task_definition.json")
   vars = {
     app_name          = local.application_name
-    ecr_url           = format("%s%s%s%s%s", data.aws_caller_identity.current.account_id, ".dkr.ecr.", var.region, ".amazonaws.com/", local.application_name)
-    server_port       = var.server_port
-    aws_region        = var.region
-    container_version = var.container_version
+    ecr_url           = format("%s%s%s%s%s", data.aws_caller_identity.current.account_id, ".dkr.ecr.", local.app_data.accounts[local.environment].region, ".amazonaws.com/", local.application_name)
+    server_port       = local.app_data.accounts[local.environment].server_port
+    aws_region        = local.app_data.accounts[local.environment].region
+    container_version = local.app_data.accounts[local.environment].container_version
     db_host           = aws_db_instance.database.address
-    db_user           = var.db_user
-    db_password       = data.aws_secretsmanager_secret_version.database_password.arn
+    db_user           = local.app_data.accounts[local.environment].db_user
+    db_password       = "${data.aws_secretsmanager_secret_version.database_password.arn}:perfhub_db_password::"
+    mojhub_cnnstr     = "${data.aws_secretsmanager_secret_version.mojhub_cnnstr.arn}:mojhub_cnnstr::"
+    mojhub_membership = "${data.aws_secretsmanager_secret_version.mojhub_membership.arn}:mojhub_membership::"
   }
 }
 
@@ -140,22 +142,22 @@ module "windows-ecs" {
   subnet_set_name      = local.subnet_set_name
   vpc_all              = local.vpc_all
   app_name             = local.application_name
-  ami_image_id         = var.ami_image_id
-  instance_type        = var.instance_type
+  environment          = local.environment
+  ami_image_id         = local.app_data.accounts[local.environment].ami_image_id
+  instance_type        = local.app_data.accounts[local.environment].instance_type
   user_data            = base64encode(data.template_file.launch-template.rendered)
-  key_name             = var.key_name
+  key_name             = local.app_data.accounts[local.environment].key_name
   task_definition      = data.template_file.task_definition.rendered
-  ec2_desired_capacity = var.ec2_desired_capacity
-  ec2_max_size         = var.ec2_max_size
-  ec2_min_size         = var.ec2_min_size
-  container_cpu        = var.container_cpu
-  container_memory     = var.container_memory
-  server_port          = var.server_port
-  app_count            = var.app_count
+  ec2_desired_capacity = local.app_data.accounts[local.environment].ec2_desired_capacity
+  ec2_max_size         = local.app_data.accounts[local.environment].ec2_max_size
+  ec2_min_size         = local.app_data.accounts[local.environment].ec2_min_size
+  container_cpu        = local.app_data.accounts[local.environment].container_cpu
+  container_memory     = local.app_data.accounts[local.environment].container_memory
+  server_port          = local.app_data.accounts[local.environment].server_port
+  app_count            = local.app_data.accounts[local.environment].app_count
   public_cidrs         = [data.aws_subnet.public_az_a.cidr_block, data.aws_subnet.public_az_b.cidr_block, data.aws_subnet.public_az_c.cidr_block]
-
-  #   cidr_access                 = var.cidr_access
-  tags_common = local.tags
+  bastion_cidr         = "${module.bastion_linux.bastion_private_ip}/32"
+  tags_common          = local.tags
 
   depends_on = [aws_ecr_repository.ecr_repo, aws_lb_listener.listener]
 }
@@ -220,7 +222,7 @@ resource "aws_acm_certificate_validation" "external" {
 #------------------------------------------------------------------------------
 
 resource "aws_lb" "external" {
-  name               = local.application_name
+  name               = "${local.application_name}-loadbalancer"
   load_balancer_type = "application"
   subnets            = data.aws_subnet_ids.shared-public.ids
 
@@ -235,8 +237,8 @@ resource "aws_lb" "external" {
 }
 
 resource "aws_lb_target_group" "target_group" {
-  name                 = local.application_name
-  port                 = var.server_port
+  name                 = "${local.application_name}-tg-${local.environment}"
+  port                 = local.app_data.accounts[local.environment].server_port
   protocol             = "HTTP"
   vpc_id               = data.aws_vpc.shared.id
   target_type          = "instance"
@@ -252,21 +254,21 @@ resource "aws_lb_target_group" "target_group" {
     interval            = "120"
     protocol            = "HTTP"
     unhealthy_threshold = "2"
-    matcher             = "200"
+    matcher             = "200-499"
     timeout             = "5"
   }
 
   tags = merge(
     local.tags,
     {
-      Name = "${local.application_name}-target-group"
+      Name = "${local.application_name}-tg-${local.environment}"
     }
   )
 }
 
 resource "aws_lb_listener" "listener" {
   load_balancer_arn = aws_lb.external.id
-  port              = var.server_port
+  port              = local.app_data.accounts[local.environment].server_port
   protocol          = "HTTP"
 
   default_action {
@@ -274,17 +276,6 @@ resource "aws_lb_listener" "listener" {
     type             = "forward"
   }
 }
-
-# resource "aws_lb_listener" "http_listener" {
-#   load_balancer_arn = aws_lb.external.id
-#   port              = "80"
-#   protocol          = "HTTP"
-#
-#   default_action {
-#     target_group_arn = aws_lb_target_group.target_group.id
-#     type             = "forward"
-#   }
-# }
 
 resource "aws_lb_listener" "https_listener" {
   depends_on = [aws_acm_certificate_validation.external]
@@ -307,8 +298,8 @@ resource "aws_security_group" "load_balancer_security_group" {
 
   ingress {
     protocol    = "tcp"
-    from_port   = var.server_port
-    to_port     = var.server_port
+    from_port   = local.app_data.accounts[local.environment].server_port
+    to_port     = local.app_data.accounts[local.environment].server_port
     cidr_blocks = ["0.0.0.0/0", ]
   }
 
@@ -341,30 +332,27 @@ resource "aws_security_group" "load_balancer_security_group" {
 #------------------------------------------------------------------------------
 
 resource "aws_db_instance" "database" {
-  identifier        = local.application_name
-  allocated_storage = 100
-  storage_type      = "gp2"
-  engine            = "sqlserver-se"
-  engine_version    = "15.00.4073.23.v1"
-  license_model     = "license-included"
-  instance_class    = "db.m5.large"
-  multi_az          = false
-  # name                                = local.application_name
-  username                            = var.db_user
+  identifier                          = local.application_name
+  allocated_storage                   = 100
+  storage_type                        = "gp2"
+  engine                              = "sqlserver-se"
+  engine_version                      = "15.00.4073.23.v1"
+  license_model                       = "license-included"
+  instance_class                      = local.app_data.accounts[local.environment].db_instance_class
+  multi_az                            = false
+  username                            = local.app_data.accounts[local.environment].db_user
   password                            = data.aws_secretsmanager_secret_version.database_password.arn
   storage_encrypted                   = false
   iam_database_authentication_enabled = false
-  vpc_security_group_ids = [
-    aws_security_group.db.id
-  ]
-  snapshot_identifier       = var.db_snapshot_identifier
-  backup_retention_period   = 0
-  maintenance_window        = "Mon:00:00-Mon:03:00"
-  backup_window             = "03:00-06:00"
-  final_snapshot_identifier = "final-snapshot"
-  deletion_protection       = false
-  option_group_name         = aws_db_option_group.db_option_group.name
-  db_subnet_group_name      = aws_db_subnet_group.db.id
+  vpc_security_group_ids              = [aws_security_group.db.id]
+  snapshot_identifier                 = local.app_data.accounts[local.environment].db_snapshot_identifier
+  backup_retention_period             = 0
+  maintenance_window                  = "Mon:00:00-Mon:03:00"
+  backup_window                       = "03:00-06:00"
+  final_snapshot_identifier           = "final-snapshot"
+  deletion_protection                 = false
+  option_group_name                   = aws_db_option_group.db_option_group.name
+  db_subnet_group_name                = aws_db_subnet_group.db.id
 
   # timeouts {
   #   create = "40m"
@@ -397,16 +385,26 @@ resource "aws_db_option_group" "db_option_group" {
 }
 
 resource "aws_db_subnet_group" "db" {
-  name       = local.application_name
+  name       = "${local.application_name}-db-subnet-group"
   subnet_ids = sort(data.aws_subnet_ids.shared-data.ids)
-  tags       = local.tags
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-db-subnet-group"
+    }
+  )
 }
 
 resource "aws_security_group" "db" {
-  name        = local.application_name
+  name        = "${local.application_name}-db-sg"
   description = "Allow DB inbound traffic"
   vpc_id      = data.aws_vpc.shared.id
-  tags        = local.tags
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-db-sg"
+    }
+  )
 }
 
 resource "aws_security_group_rule" "db_mgmt_ingress_rule" {
@@ -440,7 +438,7 @@ resource "aws_security_group_rule" "db_bastion_ingress_rule" {
 # S3 Bucket for Database backup files
 #------------------------------------------------------------------------------
 resource "aws_s3_bucket" "database_backup_files" {
-  bucket = "performance-hub-db-backups-${local.environment}"
+  bucket = "${local.application_name}-db-backups-${local.environment}"
   acl    = "private"
 
   lifecycle {
@@ -481,8 +479,8 @@ resource "aws_s3_bucket" "database_backup_files" {
   tags = merge(
     local.tags,
     {
-      Name = "performance-hub-db-backups-s3"
-    },
+      Name = "${local.application_name}-db-backups-s3"
+    }
   )
 }
 
@@ -524,6 +522,12 @@ EOF
 resource "aws_iam_role" "s3_database_backups_role" {
   name               = "${local.application_name}-s3-database-backups-role"
   assume_role_policy = data.aws_iam_policy_document.s3-access-policy.json
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-s3-db-backups-role"
+    }
+  )
 }
 
 resource "aws_iam_role_policy_attachment" "s3_database_backups_attachment" {
@@ -534,7 +538,7 @@ resource "aws_iam_role_policy_attachment" "s3_database_backups_attachment" {
 # S3 Bucket for Uploads
 #------------------------------------------------------------------------------
 resource "aws_s3_bucket" "upload_files" {
-  bucket = "performance-hub-uploads-${local.environment}"
+  bucket = "${local.application_name}-uploads-${local.environment}"
   acl    = "private"
 
   lifecycle {
@@ -575,8 +579,8 @@ resource "aws_s3_bucket" "upload_files" {
   tags = merge(
     local.tags,
     {
-      Name = "performance-hub-uploads"
-    },
+      Name = "${local.application_name}-uploads"
+    }
   )
 }
 
@@ -602,6 +606,12 @@ resource "aws_s3_bucket_policy" "upload_files_policy" {
 resource "aws_iam_role" "s3_uploads_role" {
   name               = "${local.application_name}-s3-uploads-role"
   assume_role_policy = data.aws_iam_policy_document.s3-access-policy.json
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-s3-uploads-role"
+    }
+  )
 }
 
 data "aws_iam_policy_document" "s3-access-policy" {
@@ -615,8 +625,8 @@ data "aws_iam_policy_document" "s3-access-policy" {
     principals {
       type = "Service"
       identifiers = [
-        "ec2.amazonaws.com",
         "rds.amazonaws.com",
+        "ec2.amazonaws.com",
       ]
     }
   }
@@ -667,8 +677,8 @@ resource "aws_kms_key" "s3" {
   tags = merge(
     local.tags,
     {
-      Name = "s3-kms"
-    },
+      Name = "${local.application_name}-s3-kms"
+    }
   )
 }
 

@@ -5,7 +5,7 @@ resource "aws_instance" "db_mgmt_server" {
   ebs_optimized               = true
   iam_instance_profile        = aws_iam_instance_profile.db_mgmt_profile.name
   instance_type               = "t3.large"
-  key_name                    = var.key_name
+  key_name                    = local.app_data.accounts[local.environment].key_name
   monitoring                  = true
   subnet_id                   = data.aws_subnet.private_subnets_a.id
   user_data                   = data.template_cloudinit_config.cloudinit-db-mgmt.rendered
@@ -30,6 +30,12 @@ resource "aws_instance" "db_mgmt_server" {
       root_block_device, # Prevent changes to encryption from destroying existing EC2s - can delete once encryption complete
     ]
   }
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-db-mgmt-server"
+    }
+  )
 }
 
 data "template_file" "db_mgmt_server_script" {
@@ -60,7 +66,12 @@ data "aws_iam_policy_document" "db_mgmt_policy" {
 resource "aws_iam_role" "db_mgmt_role" {
   name               = "${local.application_name}-role"
   assume_role_policy = data.aws_iam_policy_document.db_mgmt_policy.json
-  tags               = local.tags
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-db_mgmt_role"
+    }
+  )
 }
 
 resource "aws_iam_role_policy_attachment" "db-mgmt-attach-policy" {
@@ -128,7 +139,12 @@ resource "aws_security_group" "db_mgmt_server_security_group" {
     ]
   }
 
-  tags = local.tags
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-db-mgmt-server-sg"
+    }
+  )
 }
 
 #------------------------------------------------------------------------------
@@ -143,8 +159,8 @@ resource "aws_kms_key" "ebs" {
   tags = merge(
     local.tags,
     {
-      Name = "ebs-kms"
-    },
+      Name = "${local.application_name}-ebs-kms"
+    }
   )
 }
 

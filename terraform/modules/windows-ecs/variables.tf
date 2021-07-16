@@ -2,6 +2,10 @@ variable "vpc_all" {
 
 }
 
+variable "bastion_cidr" {
+
+}
+
 variable "public_cidrs" {
   type = list(string)
 }
@@ -18,9 +22,6 @@ variable "task_definition" {
 
 }
 
-# variable "container_version" {
-# }
-#
 variable "app_count" {
   description = "Number of docker containers to run"
 }
@@ -48,21 +49,11 @@ variable "container_cpu" {
 variable "container_memory" {
   description = "Container instance memory to provision (in MiB)"
 }
-#
-#
+
 variable "server_port" {
 
 }
-#
-# variable "zone_id" {
-#   default = "true"
-# }
-#
-# variable "cidr_access" {
-#   description = "List of the Cidr block for workspace access"
-#   type        = list(string)
-# }
-#
+
 variable "ec2_desired_capacity" {
   description = "Number of EC2s in the cluster"
 }
@@ -74,14 +65,11 @@ variable "ec2_max_size" {
 variable "ec2_min_size" {
   description = "Min Number of EC2s in the cluster"
 }
-#
-# variable "app_image" {
-#   #default = ".dkr.ecr.eu-west-2.amazonaws.com/ccms-opa18-hub"
-# }
-#
-# variable "health_check_path" {
-# }
-#
+
+variable "environment" {
+
+}
+
 variable "tags_common" {
   type = map(string)
 }
