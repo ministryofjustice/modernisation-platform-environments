@@ -1,6 +1,6 @@
 [{
   "name": "performance-hub",
-  "image": "mcr.microsoft.com/dotnet/framework/samples:aspnetapp",
+  "image": "${ecr_url}:${container_version}",
   "cpu": 2048,
   "portMappings": [
     {
