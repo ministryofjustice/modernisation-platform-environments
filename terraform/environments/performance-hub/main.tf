@@ -139,30 +139,30 @@ module "windows-ecs" {
 
   source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs"
 
-  subnet_set_name          = local.subnet_set_name
-  vpc_all                  = local.vpc_all
-  app_name                 = local.application_name
-  container_instance_type  = local.app_data.accounts[local.environment].container_instance_type
-  environment              = local.environment
-  ami_image_id             = local.app_data.accounts[local.environment].ami_image_id
-  instance_type            = local.app_data.accounts[local.environment].instance_type
-  user_data                = base64encode(data.template_file.launch-template.rendered)
-  key_name                 = local.app_data.accounts[local.environment].key_name
-  task_definition          = data.template_file.task_definition.rendered
-  ec2_desired_capacity     = local.app_data.accounts[local.environment].ec2_desired_capacity
-  ec2_max_size             = local.app_data.accounts[local.environment].ec2_max_size
-  ec2_min_size             = local.app_data.accounts[local.environment].ec2_min_size
-  container_cpu            = local.app_data.accounts[local.environment].container_cpu
-  container_memory         = local.app_data.accounts[local.environment].container_memory
-  task_definition_volume   = local.app_data.accounts[local.environment].task_definition_volume
-  network_mode             = local.app_data.accounts[local.environment].network_mode
-  server_port              = local.app_data.accounts[local.environment].server_port
-  app_count                = local.app_data.accounts[local.environment].app_count
-  public_cidrs             = [data.aws_subnet.public_az_a.cidr_block, data.aws_subnet.public_az_b.cidr_block, data.aws_subnet.public_az_c.cidr_block]
-  bastion_cidr             = "${module.bastion_linux.bastion_private_ip}/32"
-  tags_common              = local.tags
+  subnet_set_name         = local.subnet_set_name
+  vpc_all                 = local.vpc_all
+  app_name                = local.application_name
+  container_instance_type = local.app_data.accounts[local.environment].container_instance_type
+  environment             = local.environment
+  ami_image_id            = local.app_data.accounts[local.environment].ami_image_id
+  instance_type           = local.app_data.accounts[local.environment].instance_type
+  user_data               = base64encode(data.template_file.launch-template.rendered)
+  key_name                = local.app_data.accounts[local.environment].key_name
+  task_definition         = data.template_file.task_definition.rendered
+  ec2_desired_capacity    = local.app_data.accounts[local.environment].ec2_desired_capacity
+  ec2_max_size            = local.app_data.accounts[local.environment].ec2_max_size
+  ec2_min_size            = local.app_data.accounts[local.environment].ec2_min_size
+  container_cpu           = local.app_data.accounts[local.environment].container_cpu
+  container_memory        = local.app_data.accounts[local.environment].container_memory
+  task_definition_volume  = local.app_data.accounts[local.environment].task_definition_volume
+  network_mode            = local.app_data.accounts[local.environment].network_mode
+  server_port             = local.app_data.accounts[local.environment].server_port
+  app_count               = local.app_data.accounts[local.environment].app_count
+  public_cidrs            = [data.aws_subnet.public_az_a.cidr_block, data.aws_subnet.public_az_b.cidr_block, data.aws_subnet.public_az_c.cidr_block]
+  bastion_cidr            = "${module.bastion_linux.bastion_private_ip}/32"
+  tags_common             = local.tags
 
-  depends_on               = [aws_ecr_repository.ecr_repo, aws_lb_listener.listener]
+  depends_on = [aws_ecr_repository.ecr_repo, aws_lb_listener.listener]
 }
 
 resource "aws_route53_record" "external" {
