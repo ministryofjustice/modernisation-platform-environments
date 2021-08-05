@@ -52,4 +52,23 @@ locals {
   domain_type_sub    = [for k, v in local.domain_types : v.type if k != "modernisation-platform.service.justice.gov.uk"]
 
   app_data = jsondecode(file("./application_variables.json"))
+
+  ec2_ingress_rules = {
+  "cluster_ec2_lb_ingress" = {
+    description = "Cluster EC2 loadbalancer ingress rule"
+    from_port   = 8080
+    to_port     = 8080
+    protocol    = "tcp"
+    cidr_blocks = []
+    security_groups = [aws_security_group.load_balancer_security_group.id]
+  },
+  "cluster_ec2_bastion_ingress" = {
+    description = "Cluster EC2 bastion ingress rule"
+    from_port   = 3389
+    to_port     = 3389
+    protocol    = "tcp"
+    cidr_blocks = ["${module.bastion_linux.bastion_private_ip}/32"]
+    security_groups = []
+  }
+ }
 }

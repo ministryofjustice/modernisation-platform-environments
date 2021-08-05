@@ -160,6 +160,7 @@ module "windows-ecs" {
   app_count                = local.app_data.accounts[local.environment].app_count
   public_cidrs             = [data.aws_subnet.public_az_a.cidr_block, data.aws_subnet.public_az_b.cidr_block, data.aws_subnet.public_az_c.cidr_block]
   bastion_cidr             = "${module.bastion_linux.bastion_private_ip}/32"
+  ec2_ingress_rules        = local.ec2_ingress_rules
   tags_common              = local.tags
 
   depends_on               = [aws_ecr_repository.ecr_repo, aws_lb_listener.listener]
