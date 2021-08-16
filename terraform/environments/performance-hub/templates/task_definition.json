@@ -47,6 +47,10 @@
     {
       "name": "MojHub_Membership",
       "valueFrom": "${mojhub_membership}"
+    },
+    {
+      "name": "GOVUK_NOTIFY_API_KEY",
+      "valueFrom": "${govuk_notify_api_key}"
     }
   ],
   "essential": true
