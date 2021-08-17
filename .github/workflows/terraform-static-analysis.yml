@@ -26,6 +26,7 @@ jobs:
       with:
         scan_type: changed
         tfsec_exclude: AWS095
+        tflint_exclude: terraform_module_pinned_source
 
   terraform-static-analysis-full-scan:
     name: Terraform Static Analysis - scan all directories
