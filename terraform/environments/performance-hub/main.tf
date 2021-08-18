@@ -118,16 +118,17 @@ data "template_file" "launch-template" {
 data "template_file" "task_definition" {
   template = file("templates/task_definition.json")
   vars = {
-    app_name          = local.application_name
-    ecr_url           = format("%s%s%s%s%s", data.aws_caller_identity.current.account_id, ".dkr.ecr.", local.app_data.accounts[local.environment].region, ".amazonaws.com/", local.application_name)
-    server_port       = local.app_data.accounts[local.environment].server_port
-    aws_region        = local.app_data.accounts[local.environment].region
-    container_version = local.app_data.accounts[local.environment].container_version
-    db_host           = aws_db_instance.database.address
-    db_user           = local.app_data.accounts[local.environment].db_user
-    db_password       = "${data.aws_secretsmanager_secret_version.database_password.arn}:perfhub_db_password::"
-    mojhub_cnnstr     = "${data.aws_secretsmanager_secret_version.mojhub_cnnstr.arn}:mojhub_cnnstr::"
-    mojhub_membership = "${data.aws_secretsmanager_secret_version.mojhub_membership.arn}:mojhub_membership::"
+    app_name             = local.application_name
+    ecr_url              = format("%s%s%s%s%s", data.aws_caller_identity.current.account_id, ".dkr.ecr.", local.app_data.accounts[local.environment].region, ".amazonaws.com/", local.application_name)
+    server_port          = local.app_data.accounts[local.environment].server_port
+    aws_region           = local.app_data.accounts[local.environment].region
+    container_version    = local.app_data.accounts[local.environment].container_version
+    db_host              = aws_db_instance.database.address
+    db_user              = local.app_data.accounts[local.environment].db_user
+    db_password          = "${data.aws_secretsmanager_secret_version.database_password.arn}:perfhub_db_password::"
+    mojhub_cnnstr        = "${data.aws_secretsmanager_secret_version.mojhub_cnnstr.arn}:mojhub_cnnstr::"
+    mojhub_membership    = "${data.aws_secretsmanager_secret_version.mojhub_membership.arn}:mojhub_membership::"
+    govuk_notify_api_key = "${data.aws_secretsmanager_secret_version.govuk_notify_api_key.arn}:govuk_notify_api_key::"
   }
 }
 
