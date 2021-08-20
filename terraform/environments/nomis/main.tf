@@ -41,7 +41,7 @@ resource "aws_security_group" "weblogic_server" {
   vpc_id      = data.aws_vpc.shared_vpc.id
 
   tags = merge(
-    var.tags_common,
+    local.tags,
     {
       Name = "weblogic-server-${local.application_name}"
     }
@@ -91,7 +91,7 @@ resource "aws_instance" "weblogic_server" {
   # user_data = base64encode(data.template_file.user_data.rendered)
 
   tags = merge(
-    var.tags_common,
+    var.tags,
     {
       Name = "weblogic"
     }
