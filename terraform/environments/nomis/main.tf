@@ -91,7 +91,7 @@ resource "aws_instance" "weblogic_server" {
   # user_data = base64encode(data.template_file.user_data.rendered)
 
   tags = merge(
-    var.tags,
+    local.tags,
     {
       Name = "weblogic"
     }
