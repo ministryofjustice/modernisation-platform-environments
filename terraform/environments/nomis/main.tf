@@ -26,13 +26,13 @@ data "aws_subnet" "private_az_a" {
 }
 
 # get bastion_linux security group
-data "aws_security_group" "bastion_linux" {
-  provider = aws.share-host
+# data "aws_security_group" "bastion_linux" {
+#   provider = aws.share-host
 
-  tags = {
-    Name = "bastion-linux-${local.application_name}"
-  }
-}
+#   tags = {
+#     Name = "bastion-linux-${local.application_name}"
+#   }
+# }
 
 # Security Groups
 resource "aws_security_group" "weblogic_server" {
