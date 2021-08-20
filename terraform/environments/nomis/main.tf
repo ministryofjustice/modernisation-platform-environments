@@ -57,8 +57,7 @@ resource "aws_security_group_rule" "weblogic_server_egress_1" {
   from_port   = "22"
   to_port     = "22"
   protocol    = "TCP"
-  # cidr_blocks = ["0.0.0.0/0"]
-  source_security_group_id = data.aws_security_group.bastion_linux.id
+  cidr_blocks = ["${module.bastion_linux.bastion_private_ip}/32"]
 }
 
 ##### EC2 ####
