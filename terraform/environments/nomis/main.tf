@@ -42,7 +42,7 @@ resource "aws_security_group" "weblogic_server" {
   ]
   egress = [
     {
-      description = "allow all"
+      description      = "allow all"
       from_port        = 0
       to_port          = 0
       protocol         = "-1"
@@ -76,7 +76,7 @@ data "aws_ami" "weblogic_image" {
 }
 
 resource "aws_instance" "weblogic_server" {
-  instance_type = "t3.micro"
+  instance_type               = "t3.micro"
   ami                         = data.aws_ami.weblogic_image.id
   associate_public_ip_address = false
   # iam_instance_profile        = aws_iam_instance_profile.bastion_profile.id
@@ -89,7 +89,7 @@ resource "aws_instance" "weblogic_server" {
     http_tokens = "required"
   }
   root_block_device {
-    encrypted     = true
+    encrypted = true
   }
   tags = merge(
     local.tags,
