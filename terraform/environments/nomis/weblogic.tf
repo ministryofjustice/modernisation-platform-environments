@@ -31,25 +31,23 @@ resource "aws_security_group" "weblogic_server" {
   name        = "weblogic-server-${local.application_name}"
   vpc_id      = data.aws_vpc.shared_vpc.id
 
-  ingress = [
-    {
-      description = "SSH from Bastion"
-      from_port   = "22"
-      to_port     = "22"
-      protocol    = "TCP"
-      cidr_blocks = ["${module.bastion_linux.bastion_private_ip}/32"]
-    }
-  ]
-  egress = [
-    {
-      description      = "allow all"
-      from_port        = 0
-      to_port          = 0
-      protocol         = "-1"
-      cidr_blocks      = ["0.0.0.0/0"]
-      ipv6_cidr_blocks = ["::/0"]
-    }
-  ]
+  ingress {
+    description = "SSH from Bastion"
+    from_port   = "22"
+    to_port     = "22"
+    protocol    = "TCP"
+    cidr_blocks = ["${module.bastion_linux.bastion_private_ip}/32"]
+  }
+
+  egress {
+    description      = "allow all"
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+
   tags = merge(
     local.tags,
     {
