@@ -83,7 +83,7 @@ resource "aws_instance" "weblogic_server" {
   monitoring             = false
   vpc_security_group_ids = [aws_security_group.weblogic_server.id]
   subnet_id              = data.aws_subnet.private_az_a.id
-  # user_data = base64encode(data.template_file.user_data.rendered)
+  user_data = base64encode(data.template_cloudinit_config.cloudinit.rendered)
   ebs_optimized = true
   metadata_options {
     http_tokens = "required"
@@ -97,4 +97,18 @@ resource "aws_instance" "weblogic_server" {
       Name = "weblogic"
     }
   )
+}
+
+data "template_file" "cloudinit" {
+  template = file("./templates/cloudinit.txt")
+}
+
+data "template_cloudinit_config" "cloudinit" {
+  gzip          = false
+  base64_encode = false
+
+  part {
+    content_type = "text/cloud-config"
+    content      = data.template_file.cloudinit.rendered
+  }
 }
