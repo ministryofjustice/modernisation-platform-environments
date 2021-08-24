@@ -83,8 +83,8 @@ resource "aws_instance" "weblogic_server" {
   monitoring             = false
   vpc_security_group_ids = [aws_security_group.weblogic_server.id]
   subnet_id              = data.aws_subnet.private_az_a.id
-  user_data = file("./templates/cloudinit.cfg")
-  ebs_optimized = true
+  user_data              = file("./templates/cloudinit.cfg")
+  ebs_optimized          = true
   metadata_options {
     http_tokens = "required"
   }
