@@ -25,7 +25,7 @@ defaults:
     shell: bash
 
 jobs:
-  path-filter:
+  changes:
     name: Filter jobs by path
     runs-on: ubuntu-latest
     outputs:
@@ -36,16 +36,25 @@ jobs:
       uses: dorny/paths-filter@v2.10.2
       id: filter
       with:
-        filters: |
+        filters: | # additional filtering needed to handle multiple images
           packer:
-            - 'terraform/environments/nomis/packer/**'
+            image1: 'terraform/environments/nomis/packer/image1/**'
+            image2: 'terraform/environments/nomis/packer/image2/**'
           terraform:
-            - 'terraform/environments/nomis/**'     
+            - 'terraform/environments/nomis/*'     
 
   # this job runs on PR when packer files changed
+  # matrix job to handle multiple images?
   packer-validate:
     runs-on: ubuntu-latest
-    if: github.ref != 'refs/heads/main' && needs.path-filter.outputs.packer == 'true'
+    if: github.ref != 'refs/heads/main' && needs.changes.outputs.packer == 'true'
+    strategy:
+      matrix:
+        image: ${{ fromJSON(needs.changes.outputs.packer) }}
+    defaults:
+      run:
+        shell: bash
+        working-directory: terraform/environments/nomis/packer/${{ matrix.packer }}
     steps:
     - name: Checkout the code
       uses: actions/checkout@v2.3.4
@@ -71,8 +80,8 @@ jobs:
 
   # this job only runs on repository dispatch from NOMIS app repo
   packer-build:
-    needs: path-filter
-    if: github.ref != 'refs/heads/main' && needs.path-filter.outputs.packer == 'true'
+    needs: changes
+    if: github.ref != 'refs/heads/main' && needs.changes.outputs.packer == 'true'
     name: Build packer image
     runs-on: ubuntu-latest
     # if: github.event_name == 'repository_dispatch'
@@ -97,9 +106,10 @@ jobs:
   
 #   # These jobs run when creating a pull request
 #   plan-development:
+#     needs: changes
 #     name: Plan Development - nomis
 #     runs-on: ubuntu-latest
-#     if: (needs.path-filter.outputs.terraform == 'true' && github.ref != 'refs/heads/main') || github.event_name == 'workflow_dispatch'
+#     if: (needs.changes.outputs.terraform == 'true' && github.ref != 'refs/heads/main') || github.event_name == 'workflow_dispatch'
 #     steps:
 #       - name: Checkout Repository
 #         uses: actions/checkout@v2.3.4
@@ -118,9 +128,10 @@ jobs:
 #           TF_ENV: development
 
 #   deploy-development:
+#     needs: changes
 #     name: Deploy Development - nomis
 #     runs-on: ubuntu-latest
-#     if: (needs.path-filter.outputs.terraform == 'true' && github.ref != 'refs/heads/main') || github.event_name == 'workflow_dispatch'
+#     if: (needs.changes.outputs.terraform == 'true' && github.ref != 'refs/heads/main') || github.event_name == 'workflow_dispatch'
 #     environment:
 #       name: nomis-development
 #     steps:
@@ -141,9 +152,10 @@ jobs:
 #           TF_ENV: development
 
   plan-test:
+    needs: changes
     name: Plan Test - nomis
     runs-on: ubuntu-latest
-    if: (needs.path-filter.outputs.terraform == 'true' && github.ref != 'refs/heads/main') || github.event_name == 'workflow_dispatch'
+    if: (needs.changes.outputs.terraform == 'true' && github.ref != 'refs/heads/main') || github.event_name == 'workflow_dispatch'
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2.3.4
@@ -162,9 +174,10 @@ jobs:
           TF_ENV: test
 
   deploy-test:
+    needs: changes
     name: Deploy Test - nomis
     runs-on: ubuntu-latest
-    if: (needs.path-filter.outputs.terraform == 'true' && github.ref != 'refs/heads/main') || github.event_name == 'workflow_dispatch'
+    if: (needs.changes.outputs.terraform == 'true' && github.ref != 'refs/heads/main') || github.event_name == 'workflow_dispatch'
     environment:
       name: nomis-test
     steps:
