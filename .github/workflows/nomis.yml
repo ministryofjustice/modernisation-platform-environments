@@ -32,6 +32,8 @@ jobs:
       packer: ${{ steps.filter.outputs.packer }}
       terraform: ${{ steps.filter.outputs.terraform }}
     steps:
+    - name: Checkout the code
+      uses: actions/checkout@v2.3.4
     - name: Paths Changes Filter
       uses: dorny/paths-filter@v2.10.2
       id: filter
@@ -41,7 +43,8 @@ jobs:
             image1: 'terraform/environments/nomis/packer/image1/**'
             image2: 'terraform/environments/nomis/packer/image2/**'
           terraform:
-            - 'terraform/environments/nomis/*'     
+            - 'terraform/environments/nomis/*'   
+        base: ${{ github.ref }}  
 
   # this job runs on PR when packer files changed
   # matrix job to handle multiple images?
@@ -56,8 +59,8 @@ jobs:
         shell: bash
         working-directory: terraform/environments/nomis/packer/${{ matrix.packer }}
     steps:
-    - name: Checkout the code
-      uses: actions/checkout@v2.3.4
+    # - name: Checkout the code
+    #   uses: actions/checkout@v2.3.4
 
     - name: Setup Packer
       uses: hashicorp-contrib/setup-packer@v1.0.0
