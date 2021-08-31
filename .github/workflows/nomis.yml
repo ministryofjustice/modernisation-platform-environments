@@ -60,23 +60,41 @@ jobs:
     - name: Checkout the code
       uses: actions/checkout@v2.3.4
 
+    - name: Initialise Packer
+      uses: hashicorp/packer-github-actions@master
+      with:
+        command: init
+        target: terraform/environments/nomis/packer/${{ matrix.image }} 
+
+    - name: Validate Packer template
+      uses: hashicorp/packer-github-actions@master
+      with:
+        command: validate
+        target: terraform/environments/nomis/packer/${{ matrix.image }}
+
+    - name: Inspect Packer template
+      uses: hashicorp/packer-github-actions@master
+      with:
+        command: inspect
+        target: terraform/environments/nomis/packer/${{ matrix.image }} 
+
     # - name: Setup Packer
     #   uses: hashicorp-contrib/setup-packer@v1.0.0
 
-    - name: Initialise Packer
-      run: packer init .
+    # - name: Initialise Packer
+    #   run: packer init .
 
-    - name: Validate Packer template
-      run: packer validate .
+    # - name: Validate Packer template
+    #   run: packer validate .
 
-    - name: Inspect Packer template
-      run: packer inspect . | tee comment.txt
+    # - name: Inspect Packer template
+    #   run: packer inspect . | tee comment.txt
 
-    - name: Post PR comment 
-      uses: marocchino/sticky-pull-request-comment@v2
-      with:
-        # recreate: true # this needs changing
-        path: terraform/environments/nomis/packer/${{ matrix.image }}/comment.txt
+    # - name: Post PR comment 
+    #   uses: marocchino/sticky-pull-request-comment@v2
+    #   with:
+    #     # recreate: true # this needs changing
+    #     path: terraform/environments/nomis/packer/${{ matrix.image }}/comment.txt
 
 
   # this job only runs on repository dispatch from NOMIS app repo
