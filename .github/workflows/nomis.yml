@@ -51,6 +51,7 @@ jobs:
     strategy:
       matrix:
         image: ${{ fromJSON(needs.changes.outputs.images) }}
+      fail-fast: false
     defaults:
       run:
         shell: bash
@@ -74,7 +75,7 @@ jobs:
     - name: Post PR comment 
       uses: marocchino/sticky-pull-request-comment@v2
       with:
-        recreate: true # this needs changing
+        # recreate: true # this needs changing
         path: terraform/environments/nomis/packer/${{ matrix.image }}/out.txt
 
 
@@ -87,6 +88,7 @@ jobs:
     strategy:
       matrix:
         image: ${{ fromJSON(needs.changes.outputs.images) }}
+      fail-fast: false
     # defaults:
     #   run:
     #     shell: bash
@@ -107,7 +109,7 @@ jobs:
         with:
           command: build
           arguments: "-color=false -on-error=abort"
-          target: terraform/environments/nomis/packer/${{ matrix.image }}/main.pkr.hcl
+          target: terraform/environments/nomis/packer/${{ matrix.image }}/.
         env:
           PACKER_LOG: 1
   

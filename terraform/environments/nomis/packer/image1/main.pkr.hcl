@@ -28,9 +28,9 @@ locals {
 }
 
 source "amazon-ebs" "this" {
-  assume_role {
-    role_arn = "arn:aws:iam::612659970365:role/MemberInfrastructureAccess"
-  }
+  # assume_role {
+  #   role_arn = "arn:aws:iam::612659970365:role/MemberInfrastructureAccess"
+  # }
   ami_name      = "${var.app_name}-${formatdate("YYYY-MM-DD'T'hh.mm.ssZ",timestamp())}" # this need to be something easily referenced in ec2 creation terraform, although could use data source for that and filter on owned amis, owners = ["self"]
   instance_type = var.instance_type
   region        = var.region
