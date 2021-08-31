@@ -37,11 +37,10 @@ jobs:
       uses: dorny/paths-filter@v2.10.2
       id: filter
       with:
-        filters: | # additional filtering needed to handle multiple images
+        filters: |
           image1: 'terraform/environments/nomis/packer/image1/**'
           image2: 'terraform/environments/nomis/packer/image2/**' 
-        base: ${{ github.ref }}
-    - run: echo "${{ steps.filter.outputs.changes }}"
+        base: ${{ github.ref }} # this is here for testing locally with act
 
   # this job runs on PR when packer files changed
   packer-validate:
@@ -75,7 +74,7 @@ jobs:
       uses: marocchino/sticky-pull-request-comment@v2
       with:
         recreate: true
-        path: out.txt
+        path: terraform/environments/nomis/packer/${{ matrix.image }}/out.txt
 
 
   # this job only runs on repository dispatch from NOMIS app repo
