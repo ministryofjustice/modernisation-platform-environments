@@ -44,6 +44,7 @@ jobs:
 
   # this job runs on PR when packer files changed
   packer-validate:
+    name: Packer Validate ${{ matrix.image }}
     needs: changes
     runs-on: ubuntu-latest
     if: github.ref != 'refs/heads/main'
@@ -78,30 +79,37 @@ jobs:
 
 
   # this job only runs on repository dispatch from NOMIS app repo
-  # packer-build:
-  #   needs: changes
-  #   if: github.ref == 'refs/heads/main'
-  #   name: Build packer image
-  #   runs-on: ubuntu-latest
+  packer-build:
+    name: Packer Build ${{ matrix.image }}
+    needs: changes
+    runs-on: ubuntu-latest
+    if: github.ref != 'refs/heads/main'
+    strategy:
+      matrix:
+        image: ${{ fromJSON(needs.changes.outputs.images) }}
+    defaults:
+      run:
+        shell: bash
+        working-directory: "terraform/environments/nomis/packer/${{ matrix.image }}"
     # if: github.event_name == 'repository_dispatch'
-    # environment:
-    #   name: nomis-test
-    # steps:
-      # - name: Checkout Repository
-      #   uses: actions/checkout@v2.3.4
-      #   with:
-      #     repository: ministryofjustice/new-repo-name
-      #     token: ${{ secrets.DSO_GITHUB_AUTOMATION_PAT }}
-      #     path: something
+    environment:
+      name: nomis-test
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v2.3.4
+        # with:
+        #   repository: ministryofjustice/new-repo-name
+        #   token: ${{ secrets.DSO_GITHUB_AUTOMATION_PAT }}
+        #   path: something
 
-      # - name: Packer Build
-      #   uses: hashicorp/packer-github-actions@0.2.0
-      #   with:
-      #     command: build
-      #     arguments: "-color=false -on-error=abort"
-      #     target: packer.pkr.hcl
-      #   env:
-      #     PACKER_LOG: 1
+      - name: Packer Build
+        uses: hashicorp/packer-github-actions@0.2.0
+        with:
+          command: build
+          arguments: "-color=false -on-error=abort"
+          target: main.pkr.hcl
+        env:
+          PACKER_LOG: 1
   
 #   # These jobs run when creating a pull request
 #   plan-development:
