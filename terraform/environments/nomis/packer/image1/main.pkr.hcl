@@ -1,5 +1,4 @@
 data "amazon-ami" "this" {
-  # profile       = "612659970365_modernisation-platform-developer"
   filters = {
     virtualization-type = "hvm"
     name                = "${var.source_image_name}*"
@@ -20,6 +19,8 @@ data "amazon-ami" "this" {
 #   }
 # }
 
+# data "sshkey" "akey" {
+# }
 
 locals {
   source_ami_id = data.amazon-ami.this.id
@@ -38,6 +39,7 @@ source "amazon-ebs" "this" {
   subnet_id = "subnet-0b8492e457b5a7297" # hmpps-test-nomis-private-eu-west-2a 
   source_ami = local.source_ami_id
   ssh_username = "ec2-user"
+  # ssh_private_key_file = data.sshkey.akey.private_key_path
   # session_manager =
   skip_create_ami = var.skip_create_ami
   encrypt_boot = true

@@ -1,5 +1,4 @@
 data "amazon-ami" "this" {
-  # profile       = "612659970365_modernisation-platform-developer"
   filters = {
     virtualization-type = "hvm"
     name                = "${var.source_image_name}*"

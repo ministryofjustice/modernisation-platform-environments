@@ -25,37 +25,15 @@ defaults:
     shell: bash
 
 jobs:
-  changes:
-    name: Filter jobs by path
-    runs-on: ubuntu-latest
-    outputs:
-      images: ${{ steps.filter.outputs.changes }}
-    steps:
-    - name: Checkout the code
-      uses: actions/checkout@v2.3.4
-    - name: Paths Changes Filter
-      uses: dorny/paths-filter@v2.10.2
-      id: filter
-      with:
-        filters: |
-          image1: 'terraform/environments/nomis/packer/image1/**'
-          image2: 'terraform/environments/nomis/packer/image2/**' 
-        base: ${{ github.ref }} # this is here for testing locally with act
-
   # this job runs on PR when packer files changed
   packer-validate:
-    name: Packer Validate ${{ matrix.image }}
-    needs: changes
+    name: Packer Validate
     runs-on: ubuntu-latest
     if: github.ref != 'refs/heads/main'
-    strategy:
-      matrix:
-        image: ${{ fromJSON(needs.changes.outputs.images) }}
-      fail-fast: false
     defaults:
       run:
         shell: bash
-        working-directory: "terraform/environments/nomis/packer/${{ matrix.image }}"
+        working-directory: "terraform/environments/nomis/packer/image1"
     steps:     
     - name: Checkout the code
       uses: actions/checkout@v2.3.4
@@ -80,9 +58,6 @@ jobs:
 
     - name: Setup Packer
       uses: hashicorp-contrib/setup-packer@v1.0.0
-      env:
-        AWS_ACCESS_KEY_ID:  ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY:  ${{ secrets.AWS_SECRET_ACCESS_KEY }} 
 
     - name: Initialise Packer
       run: packer init .
@@ -99,222 +74,25 @@ jobs:
         # recreate: true # this needs changing
         path: terraform/environments/nomis/packer/${{ matrix.image }}/comment.txt
 
-
-  # this job only runs on repository dispatch from NOMIS app repo
   packer-build:
     name: Packer Build ${{ matrix.image }}
-    needs: changes
     runs-on: ubuntu-latest
     if: github.ref != 'refs/heads/main'
-    strategy:
-      matrix:
-        image: ${{ fromJSON(needs.changes.outputs.images) }}
-      fail-fast: false
     defaults:
       run:
         shell: bash
-        working-directory: "terraform/environments/nomis/packer/${{ matrix.image }}"
-    # if: github.event_name == 'repository_dispatch'
+        working-directory: "terraform/environments/nomis/packer/image1"
     environment:
       name: nomis-test
     steps:
       - name: Checkout the code
         uses: actions/checkout@v2.3.4
-        # with:
-        #   repository: ministryofjustice/new-repo-name
-        #   token: ${{ secrets.DSO_GITHUB_AUTOMATION_PAT }}
-        #   path: something
 
       - name: Setup Packer
         uses: hashicorp-contrib/setup-packer@v1.0.0
-        env:
-          AWS_ACCESS_KEY_ID:  ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY:  ${{ secrets.AWS_SECRET_ACCESS_KEY }} 
 
       - name: Initialise Packer
         run: packer init .
 
       - name: Build Packer Image
         run: packer build .
-  
-#   # These jobs run when creating a pull request
-#   plan-development:
-#     needs: changes
-#     name: Plan Development - nomis
-#     runs-on: ubuntu-latest
-#     if: github.ref != 'refs/heads/main' || github.event_name == 'workflow_dispatch'
-#     steps:
-#       - name: Checkout Repository
-#         uses: actions/checkout@v2.3.4
-#       - name: Load and Configure Terraform
-#         uses: hashicorp/setup-terraform@v1.3.2
-#         with:
-#           terraform_version: 1.0.1
-#           terraform_wrapper: false
-#       - name: Terraform plan - development
-#         run: |
-#           echo "Terraform plan - ${TF_ENV}"
-#           bash scripts/terraform-init.sh terraform/environments/nomis
-#           terraform -chdir="terraform/environments/nomis" workspace select "nomis-${TF_ENV}"
-#           bash scripts/terraform-plan.sh terraform/environments/nomis
-#         env:
-#           TF_ENV: development
-
-#   deploy-development:
-#     needs: changes
-#     name: Deploy Development - nomis
-#     runs-on: ubuntu-latest
-#     if: github.ref != 'refs/heads/main' || github.event_name == 'workflow_dispatch'
-#     environment:
-#       name: nomis-development
-#     steps:
-#       - name: Checkout Repository
-#         uses: actions/checkout@v2.3.4
-#       - name: Load and Configure Terraform
-#         uses: hashicorp/setup-terraform@v1.3.2
-#         with:
-#           terraform_version: 1.0.1
-#           terraform_wrapper: false
-#       - name: Terraform apply - development
-#         run: |
-#           echo "Terraform apply - ${TF_ENV}"
-#           bash scripts/terraform-init.sh terraform/environments/nomis
-#           terraform -chdir="terraform/environments/nomis" workspace select "nomis-${TF_ENV}"
-#           bash scripts/terraform-apply.sh terraform/environments/nomis
-#         env:
-#           TF_ENV: development
-
-  plan-test:
-    needs: changes
-    name: Plan Test - nomis
-    runs-on: ubuntu-latest
-    if: github.ref != 'refs/heads/main' || github.event_name == 'workflow_dispatch'
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2.3.4
-      - name: Load and Configure Terraform
-        uses: hashicorp/setup-terraform@v1.3.2
-        with:
-          terraform_version: 1.0.1
-          terraform_wrapper: false
-      - name: Terraform plan - test
-        run: |
-          echo "Terraform plan - ${TF_ENV}"
-          bash scripts/terraform-init.sh terraform/environments/nomis
-          terraform -chdir="terraform/environments/nomis" workspace select "nomis-${TF_ENV}"
-          bash scripts/terraform-plan.sh terraform/environments/nomis
-        env:
-          TF_ENV: test
-
-  deploy-test:
-    needs: changes
-    name: Deploy Test - nomis
-    runs-on: ubuntu-latest
-    if: github.ref != 'refs/heads/main' || github.event_name == 'workflow_dispatch'
-    environment:
-      name: nomis-test
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2.3.4
-      - name: Load and Configure Terraform
-        uses: hashicorp/setup-terraform@v1.3.2
-        with:
-          terraform_version: 1.0.1
-          terraform_wrapper: false
-      - name: Terraform apply - test
-        run: |
-          echo "Terraform apply - ${TF_ENV}"
-          bash scripts/terraform-init.sh terraform/environments/nomis
-          terraform -chdir="terraform/environments/nomis" workspace select "nomis-${TF_ENV}"
-          bash scripts/terraform-apply.sh terraform/environments/nomis
-        env:
-          TF_ENV: test
-
-#   # These jobs run after merging to main
-#   plan-preproduction:
-#     name: Plan Preproduction - nomis
-#     runs-on: ubuntu-latest
-#     if: github.ref == 'refs/heads/main'
-#     steps:
-#       - name: Checkout Repository
-#         uses: actions/checkout@v2.3.4
-#       - name: Load and Configure Terraform
-#         uses: hashicorp/setup-terraform@v1.3.2
-#         with:
-#           terraform_version: 1.0.1
-#           terraform_wrapper: false
-#       - name: Terraform plan - preproduction
-#         run: |
-#           echo "Terraform plan - ${TF_ENV}"
-#           bash scripts/terraform-init.sh terraform/environments/nomis
-#           terraform -chdir="terraform/environments/nomis" workspace select "nomis-${TF_ENV}"
-#           bash scripts/terraform-plan.sh terraform/environments/nomis
-#         env:
-#           TF_ENV: preproduction
-
-#   deploy-preproduction:
-#     name: Deploy Preproduction - nomis
-#     runs-on: ubuntu-latest
-#     if: github.ref == 'refs/heads/main'
-#     environment:
-#       name: nomis-preproduction
-#     steps:
-#       - name: Checkout Repository
-#         uses: actions/checkout@v2.3.4
-#       - name: Load and Configure Terraform
-#         uses: hashicorp/setup-terraform@v1.3.2
-#         with:
-#           terraform_version: 1.0.1
-#           terraform_wrapper: false
-#       - name: Terraform apply - preproduction
-#         run: |
-#           echo "Terraform apply - ${TF_ENV}"
-#           bash scripts/terraform-init.sh terraform/environments/nomis
-#           terraform -chdir="terraform/environments/nomis" workspace select "nomis-${TF_ENV}"
-#           bash scripts/terraform-apply.sh terraform/environments/nomis
-#         env:
-#           TF_ENV: preproduction
-  
-#   plan-production:
-#     name: Plan Production - nomis
-#     runs-on: ubuntu-latest
-#     if: github.ref == 'refs/heads/main'
-#     steps:
-#       - name: Checkout Repository
-#         uses: actions/checkout@v2.3.4
-#       - name: Load and Configure Terraform
-#         uses: hashicorp/setup-terraform@v1.3.2
-#         with:
-#           terraform_version: 1.0.1
-#           terraform_wrapper: false
-#       - name: Terraform plan - production
-#         run: |
-#           echo "Terraform plan - ${TF_ENV}"
-#           bash scripts/terraform-init.sh terraform/environments/nomis
-#           terraform -chdir="terraform/environments/nomis" workspace select "nomis-${TF_ENV}"
-#           bash scripts/terraform-plan.sh terraform/environments/nomis
-#         env:
-#           TF_ENV: production
-
-#   deploy-production:
-#     name: Deploy Production - nomis
-#     runs-on: ubuntu-latest
-#     if: github.ref == 'refs/heads/main'
-#     environment:
-#       name: nomis-production
-#     steps:
-#       - name: Checkout Repository
-#         uses: actions/checkout@v2.3.4
-#       - name: Load and Configure Terraform
-#         uses: hashicorp/setup-terraform@v1.3.2
-#         with:
-#           terraform_version: 1.0.1
-#           terraform_wrapper: false
-#       - name: Terraform apply - production
-#         run: |
-#           echo "Terraform apply - ${TF_ENV}"
-#           bash scripts/terraform-init.sh terraform/environments/nomis
-#           terraform -chdir="terraform/environments/nomis" workspace select "nomis-${TF_ENV}"
-#           bash scripts/terraform-apply.sh terraform/environments/nomis
-#         env:
-#           TF_ENV: production

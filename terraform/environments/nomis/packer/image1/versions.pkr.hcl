@@ -1,10 +1,15 @@
 packer {
-  required_version = ">= 1.7.0"
+  required_version = ">= 1.7.4"
 
   required_plugins {
     amazon = {
       version = ">= 1.0.0"
       source  = "github.com/hashicorp/amazon"
+    }
+
+    sshkey = {
+      version = ">= 0.1.0"
+      source = "github.com/ivoronin/sshkey"
     }
   }
 }
