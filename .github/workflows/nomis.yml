@@ -101,8 +101,9 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-access-key-id: ${{ secrets.NOMIS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.NOMIS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.NOMIS_SESSION_TOKEN }}
           aws-region: eu-west-2
 
       - name: Setup Packer
