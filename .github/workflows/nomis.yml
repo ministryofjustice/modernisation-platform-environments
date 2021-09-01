@@ -33,7 +33,7 @@ jobs:
     defaults:
       run:
         shell: bash
-        working-directory: "terraform/environments/nomis/packer/image1"
+        working-directory: "terraform/environments/nomis/packer/image2"
     environment:
       name: packer-build
     steps:     
