@@ -83,10 +83,10 @@ resource "aws_instance" "weblogic_server" {
   subnet_id              = data.aws_subnet.private_az_a.id
   user_data              = file("./templates/cloudinit.cfg")
   ebs_optimized          = true
-  metadata_options {
-    http_tokens = "required"
-  }
 
+  root_block_device {
+    encrypted = true
+  }
   tags = merge(
     local.tags,
     {
