@@ -86,9 +86,7 @@ resource "aws_instance" "weblogic_server" {
   metadata_options {
     http_tokens = "required"
   }
-  root_block_device {
-    encrypted = true
-  }
+
   tags = merge(
     local.tags,
     {
