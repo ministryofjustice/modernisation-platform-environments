@@ -34,7 +34,7 @@ source "amazon-ebs" "this" {
   instance_type = var.instance_type
   region        = var.region
   vpc_id = "vpc-0bc6de192f48dbef9" # hmpps-test
-  subnet_id = "subnet-0b8492e457b5a7297" # hmpps-test-nomis-private-eu-west-2a 
+  subnet_id = "subnet-06312986524fb43c9" # hmpps-test-nomis-public-eu-west-2a
   source_ami = local.source_ami_id
   ssh_username = "ec2-user"
   # session_manager =
