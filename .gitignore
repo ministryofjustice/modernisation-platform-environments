@@ -5,3 +5,13 @@
 tmp/
 .vscode/
 .terraform.lock.hcl
+
+##########################
+## IntelliJ
+##########################
+*.iml
+.idea/
+*.ipr
+*.iws
+out/
+.idea_modules/
