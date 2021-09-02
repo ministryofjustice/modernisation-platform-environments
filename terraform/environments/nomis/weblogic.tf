@@ -74,7 +74,7 @@ data "aws_ami" "weblogic_image" {
 }
 
 resource "aws_instance" "weblogic_server" {
-  instance_type               = "t1.micro"
+  instance_type               = "t2.micro"
   ami                         = data.aws_ami.weblogic_image.id
   associate_public_ip_address = false
   # iam_instance_profile        = aws_iam_instance_profile.bastion_profile.id
