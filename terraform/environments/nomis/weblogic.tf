@@ -84,9 +84,9 @@ resource "aws_instance" "weblogic_server" {
   # user_data              = file("./templates/cloudinit.cfg")
   # ebs_optimized          = true
 
-  root_block_device {
-    encrypted = true
-  }
+  # root_block_device {
+  #   encrypted = true
+  # }
   tags = merge(
     local.tags,
     {
