@@ -97,9 +97,9 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-access-key-id: ${{ secrets.AWS.NOMIS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS.NOMIS_SECRET_ACCESS_KEY }}
-          aws-session-token: ${{ secrets.AWS.NOMIS_SESSION_TOKEN }}
+          aws-access-key-id: ${{ secrets.AWS_NOMIS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_NOMIS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_NOMIS_SESSION_TOKEN }}
           aws-region: eu-west-2
 
       - name: Checkout the code
