@@ -87,7 +87,7 @@ resource "aws_instance" "weblogic_server" {
   root_block_device {
     encrypted = true
   }
-  
+
   tags = merge(
     local.tags,
     {
