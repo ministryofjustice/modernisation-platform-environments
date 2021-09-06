@@ -60,7 +60,7 @@ resource "aws_security_group" "weblogic_server" {
 
 data "aws_ami" "weblogic_image" {
   most_recent = true
-  owners      = ["309956199498"] # Red Hat - this will be a custom image later "self"
+  owners      = ["309956199498"] # Red Hat - this will be a custom image later "self" .
 
   filter {
     name   = "name"
@@ -81,12 +81,13 @@ resource "aws_instance" "weblogic_server" {
   monitoring             = false
   vpc_security_group_ids = [aws_security_group.weblogic_server.id]
   subnet_id              = data.aws_subnet.private_az_a.id
-  # user_data              = file("./templates/cloudinit.cfg")
+  user_data              = file("./templates/cloudinit.cfg")
   # ebs_optimized          = true
 
-  # root_block_device {
-  #   encrypted = true
-  # }
+  root_block_device {
+    encrypted = true
+  }
+
   tags = merge(
     local.tags,
     {
