@@ -60,11 +60,11 @@ resource "aws_security_group" "weblogic_server" {
 
 data "aws_ami" "weblogic_image" {
   most_recent = true
-  owners      = ["309956199498"] # Red Hat - this will be a custom image later "self" .
+  owners      = ["self"] # 309956199498 Red Hat - this will be a custom image later "self" .
 
   filter {
     name   = "name"
-    values = ["RHEL-6.9*"]
+    values = ["nomis_app"]
   }
 
   filter {
