@@ -64,7 +64,7 @@ data "aws_ami" "weblogic_image" {
 
   filter {
     name   = "name"
-    values = ["nomis_app"]
+    values = ["nomis_app-*"]
   }
 
   filter {
