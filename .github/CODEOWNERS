@@ -11,6 +11,7 @@
 /terraform/environments/performance-hub @performance-hub-developers @modernisation-platform
 /terraform/environments/remote-supervision @hmpps-remote-supervision @modernisation-platform
 /terraform/environments/sprinkler @modernisation-platform @modernisation-platform
+/terraform/environments/tariff @cica @modernisation-platform
 /terraform/environments/testing @modernisation-platform @modernisation-platform
 **/providers.tf @modernisation-platform
 **/backend.tf @modernisation-platform
