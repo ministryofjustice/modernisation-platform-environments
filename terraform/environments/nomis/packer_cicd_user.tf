@@ -66,7 +66,7 @@ resource "aws_iam_role" "packer" {
 
 # policy for the packer role, and attach to role
 resource "aws_iam_role_policy" "packer" {
-  name = "modify-dns-records"
+  name = "packer-minimum-permissions"
   role = aws_iam_role.packer.id
 
   policy = jsonencode({
@@ -75,7 +75,6 @@ resource "aws_iam_role_policy" "packer" {
       {
         "Effect" : "Allow",
         "Action" : [
-          "ec2:AttachVolume",
           "ec2:AuthorizeSecurityGroupIngress",
           "ec2:CopyImage",
           "ec2:CreateImage",
@@ -84,11 +83,6 @@ resource "aws_iam_role_policy" "packer" {
           "ec2:CreateSnapshot",
           "ec2:CreateTags",
           "ec2:CreateVolume",
-          "ec2:DeleteKeyPair",
-          "ec2:DeleteSecurityGroup",
-          "ec2:DeleteSnapshot",
-          "ec2:DeleteVolume",
-          "ec2:DeregisterImage",
           "ec2:DescribeImageAttribute",
           "ec2:DescribeImages",
           "ec2:DescribeInstances",
@@ -99,18 +93,35 @@ resource "aws_iam_role_policy" "packer" {
           "ec2:DescribeSubnets",
           "ec2:DescribeTags",
           "ec2:DescribeVolumes",
-          "ec2:DetachVolume",
           "ec2:GetPasswordData",
+          "ec2:RegisterImage",
+          "ec2:RunInstances",
+        ],
+        "Resource" : "*"
+      },
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "ec2:AttachVolume",
+          "ec2:DeleteKeyPair",
+          "ec2:DeleteSecurityGroup",
+          "ec2:DeleteSnapshot",
+          "ec2:DeleteVolume",
+          "ec2:DeregisterImage",
+          "ec2:DetachVolume",
           "ec2:ModifyImageAttribute",
           "ec2:ModifyInstanceAttribute",
           "ec2:ModifySnapshotAttribute",
-          "ec2:RegisterImage",
-          "ec2:RunInstances",
           "ec2:StopInstances",
           "ec2:TerminateInstances"
         ],
-        "Resource" : "*" # limit delete actions to instances with packer tag??
-      },
+        "Resource" : "*",
+        "Condition" : {
+          "StringEquals" : {
+            "ec2:ResourceTag/creator" : "Packer"
+          }
+        }
+      }
     ]
   })
 }
