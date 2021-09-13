@@ -140,8 +140,8 @@ resource "aws_iam_role_policy" "packer" {
 #------------------------------------------------------------------------------
 
 resource "aws_iam_role" "packer_ssm_role" {
-  name = "packer_ssm_role"
-  path = "/"
+  name                 = "packer_ssm_role"
+  path                 = "/"
   max_session_duration = "3600"
   assume_role_policy = jsonencode(
     {
