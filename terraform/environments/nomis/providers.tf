@@ -35,4 +35,7 @@ provider "aws" {
   alias  = "bucket-replication"
   region = "eu-west-1"
 }
-
+# AWS provider for the workspace you're working in (every resource will default to using this, unless otherwise specified)
+provider "aws" {
+  region = "eu-west-2"
+}
