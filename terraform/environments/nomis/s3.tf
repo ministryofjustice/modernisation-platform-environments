@@ -2,15 +2,15 @@ provider "aws" {
   alias  = "bucket-replication"
   region = "eu-west-1"
 }
+
 module "s3-bucket" {
   source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v4.0.0"
 
   providers = {
     aws.bucket-replication = aws.eu-west-2
   }
-  bucket_prefix        = "s3-bucket"
-  replication_role_arn = module.s3-bucket-replication-role.role.arn
-  replication_enabled = true
+  bucket_prefix       = "s3-bucket"
+  replication_enabled = false
 
   lifecycle_rule = [
     {
@@ -53,5 +53,5 @@ module "s3-bucket" {
     }
   ]
 
-  tags                 = local.tags
+  tags = local.tags
 }
