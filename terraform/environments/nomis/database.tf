@@ -20,10 +20,10 @@ resource "aws_security_group" "db_server" {
   }
 
   ingress {
-    description = "DB access from weblogic (private subnet)"
-    from_port   = "1521"
-    to_port     = "1521"
-    protocol    = "TCP"
+    description     = "DB access from weblogic (private subnet)"
+    from_port       = "1521"
+    to_port         = "1521"
+    protocol        = "TCP"
     security_groups = [aws_security_group.weblogic_server.id]
   }
 
