@@ -51,7 +51,7 @@ resource "aws_iam_group_policy" "packer_member_policy" {
   name   = "packer-member-policy"
   policy = data.aws_iam_policy_document.packer_member_policy.json
   # group      = aws_iam_group.packer_member_group.name
-  group = "packer_member_group"
+  group = "packer-member-group"
 }
 
 # Role to provide required packer permissions
@@ -196,7 +196,7 @@ resource "aws_iam_role_policy" "packer" {
 #------------------------------------------------------------------------------
 
 resource "aws_iam_role" "packer_ssm_role" {
-  name                 = "packer_ssm_role"
+  name                 = "packer-ssm-role"
   path                 = "/"
   max_session_duration = "3600"
   assume_role_policy = jsonencode(
@@ -218,13 +218,13 @@ resource "aws_iam_role" "packer_ssm_role" {
   tags = merge(
     local.tags,
     {
-      Name = "packer_ssm_role"
+      Name = "packer-ssm-role"
     },
   )
 }
 
 resource "aws_iam_instance_profile" "packer_ssm_profile" {
-  name = "packer_ssm_profile"
+  name = "packer-ssm-profile"
   role = aws_iam_role.packer_ssm_role.name
   path = "/"
 }
