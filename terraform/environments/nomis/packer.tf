@@ -172,7 +172,7 @@ data "aws_iam_policy_document" "packer_ssm_permissions" {
   statement {
     effect    = "Allow"
     actions   = ["iam:PassRole"]
-    resources = [aws_iam_instance_profile.packer_ssm_role.arn]
+    resources = [aws_iam_role.packer_ssm_role.arn]
   }
 }
 
