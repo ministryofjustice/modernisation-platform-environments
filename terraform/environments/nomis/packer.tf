@@ -40,8 +40,8 @@ data "aws_iam_group" "packer_member_group" {
 # build policy json for packer group member policy
 data "aws_iam_policy_document" "packer_member_policy" {
   statement {
-    effect  = "Allow"
-    actions = ["sts:AssumeRole"]
+    effect    = "Allow"
+    actions   = ["sts:AssumeRole"]
     resources = aws_iam_role.packer.arn
   }
 }
