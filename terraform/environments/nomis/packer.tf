@@ -59,7 +59,11 @@ data "aws_iam_policy_document" "packer_assume_role_policy" {
   statement {
     effect  = "Allow"
     actions = ["sts:AssumeRole"]
-
+    condition {
+      test     = "StringLike"
+      variable = "sts:RoleSessionName"
+      values   = ["&{aws:username}"]      
+    }
     principals {
       type        = "AWS"
       identifiers = [data.aws_iam_user.packer_member_user.arn]
@@ -144,7 +148,7 @@ data "aws_iam_policy_document" "packer_ssm_permissions" {
   statement {
     effect    = "Allow"
     actions   = ["ssm:StartSession"]
-    resources = ["arn:aws:ec2:eu-west-2:612659970365:instance/*"]
+    resources = ["arn:aws:ec2:eu-west-2:${local.environment_management.account_ids[terraform.workspace]}:instance/*"]
     condition {
       test     = "StringEquals"
       variable = "aws:ResourceTag/creator"
@@ -246,4 +250,10 @@ resource "aws_security_group" "packer_security_group" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+  tags = merge(
+    local.tags,
+    {
+      Name = "packer-build-sg"
+    },
+  )
 }
