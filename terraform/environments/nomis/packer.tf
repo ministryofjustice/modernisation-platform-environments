@@ -42,8 +42,7 @@ data "aws_iam_policy_document" "packer_member_policy" {
   statement {
     effect  = "Allow"
     actions = ["sts:AssumeRole"]
-    # resources = aws_iam_role.packer.arn
-    resources = data.aws_iam_role.packer.arn
+    resources = aws_iam_role.packer.arn
   }
 }
 
@@ -124,7 +123,7 @@ data "aws_iam_policy_document" "packer_minimum_permissions" {
     ]
     resources = "*"
     condition {
-      test     = StringEquals
+      test     = "StringEquals"
       variable = "ec2:ResourceTag/creator"
       values   = ["Packer"]
     }
@@ -134,7 +133,7 @@ data "aws_iam_policy_document" "packer_minimum_permissions" {
     actions   = ["ec2:DeleteKeyPair"]
     resources = "*"
     condition {
-      test     = StringLike
+      test     = "StringLike"
       variable = "ec2:KeyPairName"
       values   = ["packer_*"]
     }
@@ -148,7 +147,7 @@ data "aws_iam_policy_document" "packer_ssm_permissions" {
     actions   = ["ssm:StartSession"]
     resources = "arn:aws:ec2:eu-west-2:612659970365:instance/*"
     condition {
-      test     = StringEquals
+      test     = "StringEquals"
       variable = "aws:ResourceTag/creator"
       values   = ["Packer"]
     }
