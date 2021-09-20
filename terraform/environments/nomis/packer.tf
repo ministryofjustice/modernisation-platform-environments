@@ -42,14 +42,13 @@ data "aws_iam_policy_document" "packer_member_policy" {
   statement {
     effect  = "Allow"
     actions = ["sts:AssumeRole"]
-    resources = aws_iam_role.packer.arn
+    resources = [aws_iam_role.packer.arn]
   }
 }
 
 # attach inline policy
 resource "aws_iam_group_policy" "packer_member_policy" {
   name        = "packer-member-policy"
-  description = "IAM Policy for packer member user"
   policy      = data.aws_iam_policy_document.packer_member_policy.json
   # group      = aws_iam_group.packer_member_group.name
   group = "packer_member_group"
@@ -107,7 +106,7 @@ data "aws_iam_policy_document" "packer_minimum_permissions" {
       "ec2:RegisterImage",
       "ec2:RunInstances"
     ]
-    resources = "*"
+    resources = ["*"]
   }
   statement {
     effect = "Allow"
@@ -121,7 +120,7 @@ data "aws_iam_policy_document" "packer_minimum_permissions" {
       "ec2:StopInstances",
       "ec2:TerminateInstances"
     ]
-    resources = "*"
+    resources = ["*"]
     condition {
       test     = "StringEquals"
       variable = "ec2:ResourceTag/creator"
@@ -131,7 +130,7 @@ data "aws_iam_policy_document" "packer_minimum_permissions" {
   statement {
     effect    = "Allow"
     actions   = ["ec2:DeleteKeyPair"]
-    resources = "*"
+    resources = ["*"]
     condition {
       test     = "StringLike"
       variable = "ec2:KeyPairName"
@@ -145,7 +144,7 @@ data "aws_iam_policy_document" "packer_ssm_permissions" {
   statement {
     effect    = "Allow"
     actions   = ["ssm:StartSession"]
-    resources = "arn:aws:ec2:eu-west-2:612659970365:instance/*"
+    resources = ["arn:aws:ec2:eu-west-2:612659970365:instance/*"]
     condition {
       test     = "StringEquals"
       variable = "aws:ResourceTag/creator"
@@ -155,7 +154,7 @@ data "aws_iam_policy_document" "packer_ssm_permissions" {
   statement {
     effect    = "Allow"
     actions   = ["ssm:StartSession"]
-    resources = "arn:aws:ssm:eu-west-2::document/AWS-StartPortForwardingSession"
+    resources = ["arn:aws:ssm:eu-west-2::document/AWS-StartPortForwardingSession"]
   }
   statement {
     effect = "Allow"
@@ -163,17 +162,17 @@ data "aws_iam_policy_document" "packer_ssm_permissions" {
       "ssm:TerminateSession",
       "ssm:ResumeSession"
     ]
-    resources = "arn:aws:ssm:*:*:session/&{aws:username}-*"
+    resources = ["arn:aws:ssm:*:*:session/&{aws:username}-*"]
   }
   statement {
     effect   = "Allow"
     actions  = ["iam:GetInstanceProfile"]
-    resource = aws_iam_instance_profile.packer_ssm_profile.arn
+    resources = [aws_iam_instance_profile.packer_ssm_profile.arn]
   }
   statement {
     effect   = "Allow"
     actions  = ["iam:PassRole"]
-    resource = aws_iam_instance_profile.packer_ssm_role.arn
+    resources = [aws_iam_instance_profile.packer_ssm_role.arn]
   }
 }
 
