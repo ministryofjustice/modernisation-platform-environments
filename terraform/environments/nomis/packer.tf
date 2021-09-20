@@ -24,7 +24,7 @@ data "aws_iam_user" "packer_member_user" {
 # }
 
 data "aws_iam_group" "packer_member_group" {
-  group_name = "packer_member_group"
+  group_name = "packer-member-group"
 }
 
 # resource "aws_iam_group_membership" "packer_member" {
