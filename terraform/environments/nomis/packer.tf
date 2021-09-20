@@ -62,7 +62,7 @@ data "aws_iam_policy_document" "packer_assume_role_policy" {
     condition {
       test     = "StringLike"
       variable = "sts:RoleSessionName"
-      values   = ["&{aws:username}"]      
+      values   = ["&{aws:username}"]
     }
     principals {
       type        = "AWS"
