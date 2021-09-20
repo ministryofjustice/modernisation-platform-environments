@@ -40,16 +40,16 @@ data "aws_iam_group" "packer_member_group" {
 # build policy json for packer group member policy
 data "aws_iam_policy_document" "packer_member_policy" {
   statement {
-    effect  = "Allow"
-    actions = ["sts:AssumeRole"]
+    effect    = "Allow"
+    actions   = ["sts:AssumeRole"]
     resources = [aws_iam_role.packer.arn]
   }
 }
 
 # attach inline policy
 resource "aws_iam_group_policy" "packer_member_policy" {
-  name        = "packer-member-policy"
-  policy      = data.aws_iam_policy_document.packer_member_policy.json
+  name   = "packer-member-policy"
+  policy = data.aws_iam_policy_document.packer_member_policy.json
   # group      = aws_iam_group.packer_member_group.name
   group = "packer_member_group"
 }
@@ -165,13 +165,13 @@ data "aws_iam_policy_document" "packer_ssm_permissions" {
     resources = ["arn:aws:ssm:*:*:session/&{aws:username}-*"]
   }
   statement {
-    effect   = "Allow"
-    actions  = ["iam:GetInstanceProfile"]
+    effect    = "Allow"
+    actions   = ["iam:GetInstanceProfile"]
     resources = [aws_iam_instance_profile.packer_ssm_profile.arn]
   }
   statement {
-    effect   = "Allow"
-    actions  = ["iam:PassRole"]
+    effect    = "Allow"
+    actions   = ["iam:PassRole"]
     resources = [aws_iam_instance_profile.packer_ssm_role.arn]
   }
 }
