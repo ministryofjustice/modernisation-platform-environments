@@ -247,12 +247,12 @@ resource "aws_security_group" "packer_security_group" {
   description = "Security Group for Packer builds"
   name        = "packer-build-${local.application_name}"
   vpc_id      = data.aws_vpc.shared_vpc.id
-  egress { #tfsec:ignore:AWS009
+  egress {
     description = "allow all"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["0.0.0.0/0"] #tfsec:ignore:AWS009
   }
   tags = merge(
     local.tags,
