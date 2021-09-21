@@ -85,6 +85,9 @@ resource "aws_iam_role" "packer" {
 # build policy json for Packer base permissions
 data "aws_iam_policy_document" "packer_minimum_permissions" {
   statement {
+    #checkov:skip=CKV_AWS_111
+    #checkov:skip=CKV_AWS_109
+    #checkov:skip=CKV_AWS_107
     effect = "Allow"
     actions = [
       "ec2:AuthorizeSecurityGroupIngress",
@@ -106,7 +109,6 @@ data "aws_iam_policy_document" "packer_minimum_permissions" {
       "ec2:DescribeSubnets",
       "ec2:DescribeTags",
       "ec2:DescribeVolumes",
-      "ec2:GetPasswordData",
       "ec2:RegisterImage",
       "ec2:RunInstances"
     ]
@@ -121,6 +123,7 @@ data "aws_iam_policy_document" "packer_minimum_permissions" {
       "ec2:ModifyImageAttribute",
       "ec2:ModifyInstanceAttribute",
       "ec2:ModifySnapshotAttribute",
+      "ec2:GetPasswordData",
       "ec2:StopInstances",
       "ec2:TerminateInstances"
     ]
@@ -240,10 +243,11 @@ resource "aws_iam_instance_profile" "packer_ssm_profile" {
 #------------------------------------------------------------------------------
 
 resource "aws_security_group" "packer_security_group" {
+  #checkov:skip=CKV2_AWS_5
   description = "Security Group for Packer builds"
   name        = "packer-build-${local.application_name}"
   vpc_id      = data.aws_vpc.shared_vpc.id
-  egress {
+  egress { #tfsec:ignore:AWS009
     description = "allow all"
     from_port   = 0
     to_port     = 0
