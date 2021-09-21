@@ -129,6 +129,7 @@ data "template_file" "task_definition" {
     mojhub_cnnstr        = "${data.aws_secretsmanager_secret_version.mojhub_cnnstr.arn}:mojhub_cnnstr::"
     mojhub_membership    = "${data.aws_secretsmanager_secret_version.mojhub_membership.arn}:mojhub_membership::"
     govuk_notify_api_key = "${data.aws_secretsmanager_secret_version.govuk_notify_api_key.arn}:govuk_notify_api_key::"
+    os_vts_api_key       = "${data.aws_secretsmanager_secret_version.os_vts_api_key.arn}:os_vts_api_key::"
   }
 }
 
