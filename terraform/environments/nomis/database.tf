@@ -51,7 +51,7 @@ data "aws_ami" "db_image" {
 
   filter {
     name   = "name"
-    values = ["RHEL-7.4_*"]
+    values = ["RHEL-7.*"]
   }
 
   filter {
