@@ -1,5 +1,5 @@
 data "aws_subnet" "data_az_a" {
-  vpc_id = data.aws_vpc.shared_vpc.id
+  vpc_id = local.vpc_id
   tags = {
     Name = "${local.vpc_name}-${local.environment}-${local.subnet_set}-data-${local.region}a"
   }
@@ -9,7 +9,7 @@ data "aws_subnet" "data_az_a" {
 resource "aws_security_group" "db_server" {
   description = "Configure Oracle database access"
   name        = "db-server-${local.application_name}"
-  vpc_id      = data.aws_vpc.shared_vpc.id
+  vpc_id      = local.vpc_id
 
   ingress {
     description = "SSH from Bastion"
