@@ -33,6 +33,14 @@
     {
       "name" : "DB_PORT",
       "value" : "5432"
+    },
+    {
+      "name" : "ENVIRONMENT_NAME",
+      "value" : "${env_name}"
+    },
+    {
+      "name" : "SYSTEM_USER_ACCOUNT_ID",
+      "value" : "${system_account_id}"
     }
   ],
   "secrets": [
@@ -51,6 +59,10 @@
     {
       "name": "GOVUK_NOTIFY_API_KEY",
       "valueFrom": "${govuk_notify_api_key}"
+    },
+    {
+      "name": "OS_VTS_API_KEY",
+      "valueFrom": "${os_vts_api_key}"
     }
   ],
   "essential": true
