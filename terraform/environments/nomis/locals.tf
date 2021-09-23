@@ -38,7 +38,7 @@ locals {
 
   environment = trimprefix(terraform.workspace, "${var.networking[0].application}-")
   vpc_name    = var.networking[0].business-unit
-  vpc_id = data.aws_vpc.shared_vpc.id
+  vpc_id      = data.aws_vpc.shared_vpc.id
   subnet_set  = var.networking[0].set
 
   is_live       = [substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-production" || substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-preproduction" ? "live" : "non-live"]
