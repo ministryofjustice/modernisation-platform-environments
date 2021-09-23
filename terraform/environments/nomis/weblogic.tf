@@ -37,7 +37,7 @@ resource "aws_security_group" "weblogic_server" {
   )
 }
 
-##### EC2 ####
+# EC2 instance
 
 data "aws_ami" "weblogic_image" {
   most_recent = true
