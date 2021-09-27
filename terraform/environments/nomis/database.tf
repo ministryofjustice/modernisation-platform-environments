@@ -71,7 +71,7 @@ resource "aws_instance" "db_server" {
   user_data                   = file("./templates/cloudinit.cfg")
   vpc_security_group_ids      = [aws_security_group.db_server.id]
 
-# block devices defined in custom image
+  # block devices defined in custom image
   # root_block_device {
   #   delete_on_termination = true
   #   encrypted             = true
