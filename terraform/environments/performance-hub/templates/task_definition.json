@@ -41,6 +41,14 @@
     {
       "name" : "SYSTEM_USER_ACCOUNT_ID",
       "value" : "${system_account_id}"
+    },
+    {
+      "name" : "HUB_STORAGE_BUCKET",
+      "value" : "${storage_bucket}"
+    },
+    {
+      "name" : "FRIENDLY_MAME",
+      "value" : "${friendly_name}"
     }
   ],
   "secrets": [

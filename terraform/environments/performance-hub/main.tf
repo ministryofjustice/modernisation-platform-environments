@@ -119,7 +119,7 @@ data "template_file" "task_definition" {
   template = file("templates/task_definition.json")
   vars = {
     app_name             = local.application_name
-    env_name             = local.app_data.accounts[local.environment].env_name
+    env_name             = local.environment
     system_account_id    = local.app_data.accounts[local.environment].system_account_id
     ecr_url              = format("%s%s%s%s%s", data.aws_caller_identity.current.account_id, ".dkr.ecr.", local.app_data.accounts[local.environment].region, ".amazonaws.com/", local.application_name)
     server_port          = local.app_data.accounts[local.environment].server_port
@@ -132,6 +132,8 @@ data "template_file" "task_definition" {
     mojhub_membership    = "${data.aws_secretsmanager_secret_version.mojhub_membership.arn}:mojhub_membership::"
     govuk_notify_api_key = "${data.aws_secretsmanager_secret_version.govuk_notify_api_key.arn}:govuk_notify_api_key::"
     os_vts_api_key       = "${data.aws_secretsmanager_secret_version.os_vts_api_key.arn}:os_vts_api_key::"
+    storage_bucket       = format("performance-hub-uploads-%s", local.environment)
+    friendly_name        = local.app_data.accounts[local.environment].friendly_name
   }
 }
 
