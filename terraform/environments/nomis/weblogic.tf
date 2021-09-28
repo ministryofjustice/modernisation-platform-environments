@@ -45,7 +45,7 @@ data "aws_ami" "weblogic_image" {
 
   filter {
     name   = "name"
-    values = ["nomis_app-2021-09-20*"] # temp. fix this to prevent any moe accidemtal replacements
+    values = ["nomis_app-2021-09-20*"] # temp. fix this to prevent any more accidental replacements
   }
 
   filter {
