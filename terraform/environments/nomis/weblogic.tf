@@ -59,10 +59,10 @@ resource "aws_instance" "weblogic_server" {
   ami                         = data.aws_ami.weblogic_image.id
   associate_public_ip_address = false
   iam_instance_profile        = "ssm-ec2-profile"
-  monitoring             = false
-  vpc_security_group_ids = [aws_security_group.weblogic_server.id]
-  subnet_id              = data.aws_subnet.private_az_a.id
-  user_data              = file("./templates/cloudinit.cfg")
+  monitoring                  = false
+  vpc_security_group_ids      = [aws_security_group.weblogic_server.id]
+  subnet_id                   = data.aws_subnet.private_az_a.id
+  user_data                   = file("./templates/cloudinit.cfg")
   # ebs_optimized          = true
 
   root_block_device {
