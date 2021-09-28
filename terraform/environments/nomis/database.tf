@@ -51,7 +51,7 @@ data "aws_ami" "db_image" {
 
   filter {
     name   = "name"
-    values = ["nomis_db-2021-09-24*"] # pinning image for now
+    values = ["nomis_db-2021-09-27*"] # pinning image for now
   }
 
   filter {
@@ -67,7 +67,7 @@ resource "aws_instance" "db_server" {
   associate_public_ip_address = false
   iam_instance_profile        = "ssm-ec2-profile"
   ebs_optimized               = true
-  subnet_id                   = data.aws_subnet.data_az_a.id
+  subnet_id                   = data.aws_subnet.private_az_a.id # data.aws_subnet.data_az_a.id put here whilst testing install steps
   user_data                   = file("./templates/cloudinit.cfg")
   vpc_security_group_ids      = [aws_security_group.db_server.id]
 
