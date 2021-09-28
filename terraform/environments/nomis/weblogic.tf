@@ -58,7 +58,7 @@ resource "aws_instance" "weblogic_server" {
   instance_type               = "t2.micro"
   ami                         = data.aws_ami.weblogic_image.id
   associate_public_ip_address = false
-  # iam_instance_profile        = aws_iam_instance_profile.bastion_profile.id
+  iam_instance_profile        = "ssm-ec2-profile"
   monitoring             = false
   vpc_security_group_ids = [aws_security_group.weblogic_server.id]
   subnet_id              = data.aws_subnet.private_az_a.id
