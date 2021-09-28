@@ -33,6 +33,6 @@ resource "aws_iam_role" "ssm_ec2_role" {
 
 resource "aws_iam_instance_profile" "ec2_ssm_profile" {
   name = "ssm-ec2-profile"
-  role = aws_iam_role.ec2_ssm_role.name
+  role = aws_iam_role.ssm_ec2_role.name
   path = "/"
 }
