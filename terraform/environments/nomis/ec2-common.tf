@@ -1,5 +1,5 @@
 #------------------------------------------------------------------------------
-# Instance profile to be assumed by Packer build instance
+# Instance profile to be assumed by the ec2 instance
 # This is required to enable SSH via Systems Manager
 #------------------------------------------------------------------------------
 
