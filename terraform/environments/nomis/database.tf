@@ -47,11 +47,11 @@ resource "aws_security_group" "db_server" {
 ##### EC2 ####
 data "aws_ami" "db_image" {
   most_recent = true
-  owners      = ["309956199498"] # TODO: replace with custom AMI once built.
+  owners      = ["self"]
 
   filter {
     name   = "name"
-    values = ["RHEL-7.*"]
+    values = ["nomis_db-2021-09-27*"] # pinning image for now
   }
 
   filter {
@@ -65,23 +65,25 @@ resource "aws_instance" "db_server" {
   ami                         = data.aws_ami.db_image.id
   monitoring                  = true
   associate_public_ip_address = false
+  iam_instance_profile        = "ssm-ec2-profile"
   ebs_optimized               = true
-  subnet_id                   = data.aws_subnet.data_az_a.id
+  subnet_id                   = data.aws_subnet.private_az_a.id # data.aws_subnet.data_az_a.id put here whilst testing install steps
   user_data                   = file("./templates/cloudinit.cfg")
   vpc_security_group_ids      = [aws_security_group.db_server.id]
 
-  root_block_device {
-    delete_on_termination = true
-    encrypted             = true
-    volume_size           = 100
-  }
+  # block devices defined in custom image
+  # root_block_device {
+  #   delete_on_termination = true
+  #   encrypted             = true
+  #   volume_size           = 100
+  # }
 
-  ebs_block_device {
-    device_name           = "/dev/sdb"
-    delete_on_termination = true
-    encrypted             = true
-    volume_size           = 200
-  }
+  # ebs_block_device {
+  #   device_name           = "/dev/sdb"
+  #   delete_on_termination = true
+  #   encrypted             = true
+  #   volume_size           = 200
+  # }
 
   lifecycle {
     ignore_changes = [
