@@ -65,7 +65,7 @@ resource "aws_instance" "db_server" {
   ami                         = data.aws_ami.db_image.id
   monitoring                  = true
   associate_public_ip_address = false
-  iam_instance_profile        = "ssm-ec2-profile"
+  iam_instance_profile        = aws_iam_instance_profile.ec2_ssm_profile.id
   ebs_optimized               = true
   subnet_id                   = data.aws_subnet.private_az_a.id # data.aws_subnet.data_az_a.id put here whilst testing install steps
   user_data                   = file("./templates/cloudinit.cfg")
@@ -78,12 +78,13 @@ resource "aws_instance" "db_server" {
   #   volume_size           = 100
   # }
 
-  # ebs_block_device {
-  #   device_name           = "/dev/sdb"
-  #   delete_on_termination = true
-  #   encrypted             = true
-  #   volume_size           = 200
-  # }
+  ebs_block_device {
+    # ASM disk
+    device_name           = "/dev/sde"
+    delete_on_termination = true
+    encrypted             = true
+    volume_size           = 100
+  }
 
   lifecycle {
     ignore_changes = [
