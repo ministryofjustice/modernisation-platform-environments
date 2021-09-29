@@ -1,22 +1,3 @@
-#### Networking & Security ####
-
-# get shared subnet-set vpc object
-data "aws_vpc" "shared_vpc" {
-  # provider = aws.share-host
-  tags = {
-    Name = "${local.vpc_name}-${local.environment}"
-  }
-}
-
-data "aws_subnet_ids" "local_account" {
-  vpc_id = data.aws_vpc.shared_vpc.id
-}
-
-# data "aws_subnet" "local_account" {
-#   for_each = data.aws_subnet_ids.local_account.ids
-#   id       = each.value
-# }
-
 # get shared subnet-set private (az (a) subnet)
 data "aws_subnet" "private_az_a" {
   # provider = aws.share-host
@@ -29,7 +10,7 @@ data "aws_subnet" "private_az_a" {
 resource "aws_security_group" "weblogic_server" {
   description = "Configure weblogic access - ingress should be only from Bastion"
   name        = "weblogic-server-${local.application_name}"
-  vpc_id      = data.aws_vpc.shared_vpc.id
+  vpc_id      = local.vpc_id
 
   ingress {
     description = "SSH from Bastion"
@@ -56,7 +37,7 @@ resource "aws_security_group" "weblogic_server" {
   )
 }
 
-##### EC2 ####
+# EC2 instance
 
 data "aws_ami" "weblogic_image" {
   most_recent = true
@@ -64,7 +45,7 @@ data "aws_ami" "weblogic_image" {
 
   filter {
     name   = "name"
-    values = ["nomis_app-*"]
+    values = ["nomis_app-2021-09-20*"] # temp. fix this to prevent any more accidental replacements
   }
 
   filter {
@@ -77,11 +58,11 @@ resource "aws_instance" "weblogic_server" {
   instance_type               = "t2.micro"
   ami                         = data.aws_ami.weblogic_image.id
   associate_public_ip_address = false
-  # iam_instance_profile        = aws_iam_instance_profile.bastion_profile.id
-  monitoring             = false
-  vpc_security_group_ids = [aws_security_group.weblogic_server.id]
-  subnet_id              = data.aws_subnet.private_az_a.id
-  user_data              = file("./templates/cloudinit.cfg")
+  iam_instance_profile        = "ssm-ec2-profile"
+  monitoring                  = false
+  vpc_security_group_ids      = [aws_security_group.weblogic_server.id]
+  subnet_id                   = data.aws_subnet.private_az_a.id
+  user_data                   = file("./templates/cloudinit.cfg")
   # ebs_optimized          = true
 
   root_block_device {
