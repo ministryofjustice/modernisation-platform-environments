@@ -78,15 +78,6 @@ resource "aws_instance" "db_server" {
   #   volume_size           = 100
   # }
 
-  dynamic "ebs_block_device" {
-    for_each = data.aws_ami.db_image.block_device_mappings
-    iterator = each
-    content {
-      device_name = each.value.device_name
-      snapshot_id = each.value.ebs.snapshot_id
-    }
-  }
-
   lifecycle {
     ignore_changes = [
       # This prevents clobbering the tags of attached EBS volumes. See
