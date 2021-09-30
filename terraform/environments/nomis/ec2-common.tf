@@ -57,14 +57,14 @@ resource "aws_iam_role" "s3_ec2_role" {
         {
           "Effect" : "Allow",
           "Action" : ["s3:ListBucket"],
-          "Resource" : ["arn:aws:s3:::${local.storage_bucket}"]
+          "Resource" : ["arn:aws:s3:::${module.s3-bucket.bucket}"]
         },
         {
           "Effect" : "Allow",
           "Action" : [
             "s3:GetObject"
           ],
-          "Resource" : ["arn:aws:s3:::s3-bucket*/*"]
+          "Resource" : ["arn:aws:s3:::${module.s3-bucket.bucket}/*"]
         }
       ]
     }
