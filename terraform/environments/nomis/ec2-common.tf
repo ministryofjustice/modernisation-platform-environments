@@ -1,7 +1,3 @@
-locals {
-  storage_bucket = module.s3-bucket.aws_s3_bucket.default.bucket
-}
-
 #------------------------------------------------------------------------------
 # Instance profile to be assumed by the ec2 instance
 # This is required to enable SSH via Systems Manager
