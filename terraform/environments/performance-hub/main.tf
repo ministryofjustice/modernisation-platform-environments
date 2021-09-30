@@ -119,7 +119,7 @@ data "template_file" "task_definition" {
   template = file("templates/task_definition.json")
   vars = {
     app_name             = local.application_name
-    env_name             = local.app_data.accounts[local.environment].env_name
+    env_name             = local.environment
     system_account_id    = local.app_data.accounts[local.environment].system_account_id
     ecr_url              = format("%s%s%s%s%s", data.aws_caller_identity.current.account_id, ".dkr.ecr.", local.app_data.accounts[local.environment].region, ".amazonaws.com/", local.application_name)
     server_port          = local.app_data.accounts[local.environment].server_port
@@ -132,6 +132,9 @@ data "template_file" "task_definition" {
     mojhub_membership    = "${data.aws_secretsmanager_secret_version.mojhub_membership.arn}:mojhub_membership::"
     govuk_notify_api_key = "${data.aws_secretsmanager_secret_version.govuk_notify_api_key.arn}:govuk_notify_api_key::"
     os_vts_api_key       = "${data.aws_secretsmanager_secret_version.os_vts_api_key.arn}:os_vts_api_key::"
+    #storage_bucket       = format("%s-uploads-%s", local.application_name, local.environment)
+    storage_bucket = "${aws_s3_bucket.upload_files.id}"
+    friendly_name  = local.app_data.accounts[local.environment].friendly_name
   }
 }
 
@@ -600,7 +603,7 @@ resource "aws_s3_bucket_policy" "upload_files_policy" {
     Statement = [
       {
         Effect    = "Allow"
-        Principal = "*"
+        Principal = { AWS = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/cicd-member-user"] }
         Action    = "s3:*"
         Resource = [
           aws_s3_bucket.upload_files.arn,
@@ -611,17 +614,17 @@ resource "aws_s3_bucket_policy" "upload_files_policy" {
   })
 }
 
-resource "aws_iam_role" "s3_uploads_role" {
-  name               = "${local.application_name}-s3-uploads-role"
-  assume_role_policy = data.aws_iam_policy_document.s3-access-policy.json
-  tags = merge(
-    local.tags,
-    {
-      Name = "${local.application_name}-s3-uploads-role"
-    }
-  )
-}
-
+# resource "aws_iam_role" "s3_uploads_role" {
+#   name               = "${local.application_name}-s3-uploads-role"
+#   assume_role_policy = data.aws_iam_policy_document.s3-access-policy.json
+#   tags = merge(
+#     local.tags,
+#     {
+#       Name = "${local.application_name}-s3-uploads-role"
+#     }
+#   )
+# }
+#
 data "aws_iam_policy_document" "s3-access-policy" {
   version = "2012-10-17"
   statement {
@@ -639,40 +642,40 @@ data "aws_iam_policy_document" "s3-access-policy" {
     }
   }
 }
-
-resource "aws_iam_policy" "s3-uploads-policy" {
-  name   = "${local.application_name}-s3-uploads-policy"
-  policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": [
-          "s3:*"
-      ],
-      "Resource": [
-          "${aws_s3_bucket.upload_files.arn}"
-      ]
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-          "s3:*"
-      ],
-      "Resource": [
-        "${aws_s3_bucket.upload_files.arn}/*"
-      ]
-    }
-  ]
-}
-EOF
-}
-
-resource "aws_iam_role_policy_attachment" "s3_uploads_attachment" {
-  role       = aws_iam_role.s3_uploads_role.name
-  policy_arn = aws_iam_policy.s3-uploads-policy.arn
-}
+#
+# resource "aws_iam_policy" "s3-uploads-policy" {
+#   name   = "${local.application_name}-s3-uploads-policy"
+#   policy = <<EOF
+# {
+#   "Version": "2012-10-17",
+#   "Statement": [
+#     {
+#       "Effect": "Allow",
+#       "Action": [
+#           "s3:*"
+#       ],
+#       "Resource": [
+#           "${aws_s3_bucket.upload_files.arn}"
+#       ]
+#     },
+#     {
+#       "Effect": "Allow",
+#       "Action": [
+#           "s3:*"
+#       ],
+#       "Resource": [
+#         "${aws_s3_bucket.upload_files.arn}/*"
+#       ]
+#     }
+#   ]
+# }
+# EOF
+# }
+#
+# resource "aws_iam_role_policy_attachment" "s3_uploads_attachment" {
+#   role       = aws_iam_role.s3_uploads_role.name
+#   policy_arn = aws_iam_policy.s3-uploads-policy.arn
+# }
 #------------------------------------------------------------------------------
 # KMS setup for S3
 #------------------------------------------------------------------------------
@@ -696,16 +699,6 @@ resource "aws_kms_alias" "kms-alias" {
 }
 
 data "aws_iam_policy_document" "s3-kms" {
-  statement {
-    effect    = "Allow"
-    actions   = ["kms:*"]
-    resources = ["*"]
-
-    principals {
-      type        = "Service"
-      identifiers = ["s3.amazonaws.com"]
-    }
-  }
   statement {
     effect    = "Allow"
     actions   = ["kms:*"]
