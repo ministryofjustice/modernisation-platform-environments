@@ -23,7 +23,7 @@ module "s3-bucket" {
         {
           days          = 90
           storage_class = "STANDARD_IA"
-          }
+        }
       ]
 
       expiration = {
