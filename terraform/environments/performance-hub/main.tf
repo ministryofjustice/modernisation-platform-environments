@@ -603,12 +603,11 @@ resource "aws_s3_bucket_policy" "upload_files_policy" {
     Statement = [
       {
         Effect    = "Allow"
-        Principal = "*"
+        Principal = "AWS:[arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/cicd-member]"
         Action    = "s3:*"
         Resource = [
           aws_s3_bucket.upload_files.arn,
           "${aws_s3_bucket.upload_files.arn}/*",
-          "arn:aws:s3:::performance-hub-uploads-development/$${aws:cicd-member-user}/*",
         ]
       },
     ]
