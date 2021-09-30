@@ -1,5 +1,5 @@
-locals  {
-  storage_bucket = "${module.s3-bucket.aws_s3_bucket.default.bucket}"
+locals {
+  storage_bucket = module.s3-bucket.aws_s3_bucket.default.bucket
 }
 
 #------------------------------------------------------------------------------
