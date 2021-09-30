@@ -14,14 +14,14 @@ resource "aws_iam_role" "ssm_ec2_role" {
         {
           "Effect" : "Allow",
           "Action" : ["s3:ListBucket"],
-          "Resource" : ["arn:aws:s3:::${module.s3-bucket.default.bucket}"]
+          "Resource" : ["arn:aws:s3:::${module.s3-bucket.aws_s3_bucket.default.bucket}"]
         },
         {
           "Effect" : "Allow",
           "Action" : [
             "s3:GetObject"
           ],
-          "Resource" : ["arn:aws:s3:::${module.s3-bucket.default.bucket}/*"]
+          "Resource" : ["arn:aws:s3:::${module.s3-bucket.aws_s3_bucket.default}/*"]
         }
       ]
     }
