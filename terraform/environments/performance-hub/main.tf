@@ -608,6 +608,7 @@ resource "aws_s3_bucket_policy" "upload_files_policy" {
         Resource = [
           aws_s3_bucket.upload_files.arn,
           "${aws_s3_bucket.upload_files.arn}/*",
+          "arn:aws:s3:::performance-hub-uploads-development/$${aws:cicd-member-user}/*",
         ]
       },
     ]
