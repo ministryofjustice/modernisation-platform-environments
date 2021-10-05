@@ -55,7 +55,7 @@ data "aws_ami" "weblogic_image" {
 }
 
 resource "aws_instance" "weblogic_server" {
-  instance_type               = "t2.micro"
+  instance_type               = "t2.medium"
   ami                         = data.aws_ami.weblogic_image.id
   associate_public_ip_address = false
   iam_instance_profile        = "ssm-ec2-profile"
