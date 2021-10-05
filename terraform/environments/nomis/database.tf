@@ -61,7 +61,7 @@ data "aws_ami" "db_image" {
 }
 
 resource "aws_instance" "db_server" {
-  instance_type               = "t3.micro" # TODO: replace with "d2.xlarge" to match required spec.
+  instance_type               = "t3.medium" # TODO: replace with "d2.xlarge" to match required spec.
   ami                         = data.aws_ami.db_image.id
   monitoring                  = true
   associate_public_ip_address = false
@@ -113,7 +113,7 @@ resource "aws_ebs_volume" "asm_disk" {
 }
 
 resource "aws_volume_attachment" "asm_disk" {
-  device_name = "/dev/sde"
+  device_name = "/dev/asm1"
   volume_id   = aws_ebs_volume.asm_disk.id
   instance_id = aws_instance.db_server.id
 }
