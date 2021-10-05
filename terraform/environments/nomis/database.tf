@@ -61,7 +61,7 @@ data "aws_ami" "db_image" {
 }
 
 resource "aws_instance" "db_server" {
-  instance_type               = "t3.micro" # TODO: replace with "d2.xlarge" to match required spec.
+  instance_type               = "t3.medium" # TODO: replace with "d2.xlarge" to match required spec.
   ami                         = data.aws_ami.db_image.id
   monitoring                  = true
   associate_public_ip_address = false
