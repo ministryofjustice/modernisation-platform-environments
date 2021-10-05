@@ -113,7 +113,7 @@ resource "aws_ebs_volume" "asm_disk" {
 }
 
 resource "aws_volume_attachment" "asm_disk" {
-  device_name = "/dev/asm1"
+  device_name = "/dev/sde"
   volume_id   = aws_ebs_volume.asm_disk.id
   instance_id = aws_instance.db_server.id
 }
