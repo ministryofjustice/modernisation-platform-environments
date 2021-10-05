@@ -144,7 +144,7 @@ data "template_file" "task_definition" {
 
 module "windows-ecs" {
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs?ref=v1.0.1"
+  source = "/Users/zuri/gitWork/mod-platform/modernisation-platform-terraform-ecs"
 
   subnet_set_name         = local.subnet_set_name
   vpc_all                 = local.vpc_all
@@ -720,7 +720,7 @@ data "aws_iam_policy_document" "s3-kms" {
 
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root", "arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/cicd-member-user", "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/performance-hub-ec2-instance-role"]
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root", "arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/cicd-member-user"]
     }
   }
 }
