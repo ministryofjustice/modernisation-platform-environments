@@ -144,7 +144,7 @@ data "template_file" "task_definition" {
 
 module "windows-ecs" {
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs?ref=v1.0.1"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs?ref=v1.0.2"
 
   subnet_set_name         = local.subnet_set_name
   vpc_all                 = local.vpc_all
@@ -614,17 +614,17 @@ resource "aws_s3_bucket_policy" "upload_files_policy" {
   })
 }
 
-# resource "aws_iam_role" "s3_uploads_role" {
-#   name               = "${local.application_name}-s3-uploads-role"
-#   assume_role_policy = data.aws_iam_policy_document.s3-access-policy.json
-#   tags = merge(
-#     local.tags,
-#     {
-#       Name = "${local.application_name}-s3-uploads-role"
-#     }
-#   )
-# }
-#
+resource "aws_iam_role" "s3_uploads_role" {
+  name               = "${local.application_name}-s3-uploads-role"
+  assume_role_policy = data.aws_iam_policy_document.s3-access-policy.json
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-s3-uploads-role"
+    }
+  )
+}
+
 data "aws_iam_policy_document" "s3-access-policy" {
   version = "2012-10-17"
   statement {
@@ -642,40 +642,54 @@ data "aws_iam_policy_document" "s3-access-policy" {
     }
   }
 }
-#
-# resource "aws_iam_policy" "s3-uploads-policy" {
-#   name   = "${local.application_name}-s3-uploads-policy"
-#   policy = <<EOF
-# {
-#   "Version": "2012-10-17",
-#   "Statement": [
-#     {
-#       "Effect": "Allow",
-#       "Action": [
-#           "s3:*"
-#       ],
-#       "Resource": [
-#           "${aws_s3_bucket.upload_files.arn}"
-#       ]
-#     },
-#     {
-#       "Effect": "Allow",
-#       "Action": [
-#           "s3:*"
-#       ],
-#       "Resource": [
-#         "${aws_s3_bucket.upload_files.arn}/*"
-#       ]
-#     }
-#   ]
-# }
-# EOF
-# }
-#
-# resource "aws_iam_role_policy_attachment" "s3_uploads_attachment" {
-#   role       = aws_iam_role.s3_uploads_role.name
-#   policy_arn = aws_iam_policy.s3-uploads-policy.arn
-# }
+
+resource "aws_iam_policy" "s3-uploads-policy" {
+  name   = "${local.application_name}-s3-uploads-policy"
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+          "s3:*"
+      ],
+      "Resource": [
+          "${aws_s3_bucket.upload_files.arn}"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+          "s3:*"
+      ],
+      "Resource": [
+        "${aws_s3_bucket.upload_files.arn}/*"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetEncryptionConfiguration"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+      "kms:Decrypt"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "s3_uploads_attachment" {
+  role       = aws_iam_role.s3_uploads_role.name
+  policy_arn = aws_iam_policy.s3-uploads-policy.arn
+}
 #------------------------------------------------------------------------------
 # KMS setup for S3
 #------------------------------------------------------------------------------
@@ -706,7 +720,7 @@ data "aws_iam_policy_document" "s3-kms" {
 
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root", "arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/cicd-member-user"]
     }
   }
 }
