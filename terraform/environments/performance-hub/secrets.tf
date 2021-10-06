@@ -13,13 +13,13 @@ data "aws_secretsmanager_secret_version" "environment_management" {
 ## == DATABASE CONNECTIONS ==
 
 # Get secret by name for database password
-data "aws_secretsmanager_secret" "database_password" {
-  name = "performance_hub_db"
-}
+# data "aws_secretsmanager_secret" "database_password" {
+#   name = "performance_hub_db"
+# }
 
-data "aws_secretsmanager_secret_version" "database_password" {
-  secret_id = data.aws_secretsmanager_secret.database_password.arn
-}
+# data "aws_secretsmanager_secret_version" "database_password" {
+#   secret_id = data.aws_secretsmanager_secret.database_password.arn
+# }
 
 # Get secret by name for database connection string
 data "aws_secretsmanager_secret" "mojhub_cnnstr" {
