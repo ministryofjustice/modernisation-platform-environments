@@ -62,14 +62,14 @@ data "aws_secretsmanager_secret_version" "os_vts_api_key" {
 
 ## == PERSISTENT STORAGE (S3) ==
 
-# Secret by name for the persistent storage bucket name
-data "aws_secretsmanager_secret" "hub_storage_bucket" {
-  name = "hub_storage_bucket"
-}
+# Secret by name for the persistent storage bucket name (defined as ${aws_s3_bucket.upload_files.id})
+# data "aws_secretsmanager_secret" "hub_storage_bucket" {
+#   name = "hub_storage_bucket"
+# }
 
-data "aws_secretsmanager_secret_version" "hub_storage_bucket" {
-  secret_id = data.aws_secretsmanager_secret.hub_storage_bucket.arn
-}
+# data "aws_secretsmanager_secret_version" "hub_storage_bucket" {
+#   secret_id = data.aws_secretsmanager_secret.hub_storage_bucket.arn
+# }
 
 # Secret by name for the persistent storage bucket access key ID
 data "aws_secretsmanager_secret" "hub_storage_access_key_id" {
@@ -87,4 +87,57 @@ data "aws_secretsmanager_secret" "hub_storage_secret_access_key" {
 
 data "aws_secretsmanager_secret_version" "hub_storage_secret_access_key" {
   secret_id = data.aws_secretsmanager_secret.hub_storage_secret_access_key.arn
+}
+
+## == ANALYTICAL PLATFORM (S3) ==
+
+# Secret by name for AP import bucket credentials
+data "aws_secretsmanager_secret" "ap_import_access_key_id" {
+  name = "ap_import_access_key_id"
+}
+
+data "aws_secretsmanager_secret_version" "ap_import_access_key_id" {
+  secret_id = data.aws_secretsmanager_secret.ap_import_access_key_id.arn
+}
+
+data "aws_secretsmanager_secret" "ap_import_secret_access_key" {
+  name = "ap_import_secret_access_key"
+}
+
+data "aws_secretsmanager_secret_version" "ap_import_secret_access_key" {
+  secret_id = data.aws_secretsmanager_secret.ap_import_secret_access_key.arn
+}
+
+# Secret by name for AP export bucket credentials
+data "aws_secretsmanager_secret" "ap_export_access_key_id" {
+  name = "ap_export_access_key_id"
+}
+
+data "aws_secretsmanager_secret_version" "ap_export_access_key_id" {
+  secret_id = data.aws_secretsmanager_secret.ap_export_access_key_id.arn
+}
+
+data "aws_secretsmanager_secret" "ap_export_secret_access_key" {
+  name = "ap_export_secret_access_key"
+}
+
+data "aws_secretsmanager_secret_version" "ap_export_secret_access_key" {
+  secret_id = data.aws_secretsmanager_secret.ap_export_secret_access_key.arn
+}
+
+## == BOOK A SECURE MOVE ACCESS KEYS (S3) ==
+data "aws_secretsmanager_secret" "pecs_basm_prod_access_key_id" {
+  name = "pecs_basm_prod_access_key_id"
+}
+
+data "aws_secretsmanager_secret_version" "pecs_basm_prod_access_key_id" {
+  secret_id = data.aws_secretsmanager_secret.pecs_basm_prod_access_key_id.arn
+}
+
+data "aws_secretsmanager_secret" "pecs_basm_prod_secret_access_key" {
+  name = "pecs_basm_prod_secret_access_key"
+}
+
+data "aws_secretsmanager_secret_version" "pecs_basm_prod_secret_access_key" {
+  secret_id = data.aws_secretsmanager_secret.pecs_basm_prod_secret_access_key.arn
 }
