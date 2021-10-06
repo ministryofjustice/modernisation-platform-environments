@@ -51,7 +51,7 @@ data "aws_ami" "db_image" {
 
   filter {
     name   = "name"
-    values = ["nomis_db-2021-09-27*"] # pinning image for now
+    values = ["nomis_db-2021-09-24*"] # pinning image for now
   }
 
   filter {
@@ -75,7 +75,7 @@ resource "aws_instance" "db_server" {
   # root_block_device {
   #   delete_on_termination = true
   #   encrypted             = true
-  #   volume_size           = 100
+  #   volume_size           = 30
   # }
 
   lifecycle {
