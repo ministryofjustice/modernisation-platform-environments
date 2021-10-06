@@ -77,14 +77,6 @@
       "valueFrom": "${os_vts_api_key}"
     },
     {
-      "name": "HUB_STORAGE_ACCESS_KEY_ID",
-      "valueFrom": "${hub_storage_access_key_id}"
-    },
-    {
-      "name": "HUB_STORAGE_SECRET_ACCESS_KEY",
-      "valueFrom": "${hub_storage_secret_access_key}"
-    },
-    {
       "name": "PECS_BASM_PROD_ACCESS_KEY_ID",
       "valueFrom": "${pecs_basm_prod_access_key_id}"
     },

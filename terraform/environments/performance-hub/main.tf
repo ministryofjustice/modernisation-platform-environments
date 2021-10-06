@@ -135,8 +135,6 @@ data "template_file" "task_definition" {
     #storage_bucket                   = format("%s-uploads-%s", local.application_name, local.environment)
     storage_bucket                   = "${aws_s3_bucket.upload_files.id}"
     friendly_name                    = local.app_data.accounts[local.environment].friendly_name
-    hub_storage_access_key_id        = aws_secretsmanager_secret_version.hub_storage_access_key_id.arn
-    hub_storage_secret_access_key    = aws_secretsmanager_secret_version.hub_storage_secret_access_key.arn
     pecs_basm_prod_access_key_id     = aws_secretsmanager_secret_version.pecs_basm_prod_access_key_id.arn
     pecs_basm_prod_secret_access_key = aws_secretsmanager_secret_version.pecs_basm_prod_secret_access_key.arn
     ap_import_access_key_id          = aws_secretsmanager_secret_version.ap_import_access_key_id.arn
@@ -152,7 +150,7 @@ data "template_file" "task_definition" {
 
 module "windows-ecs" {
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs?ref=v1.0.2"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs?ref=v1.0.3"
 
   subnet_set_name         = local.subnet_set_name
   vpc_all                 = local.vpc_all
@@ -736,6 +734,12 @@ data "aws_iam_policy_document" "s3-kms" {
 #------------------------------------------------------------------------------
 # Secrets definitions
 #------------------------------------------------------------------------------
+# Create secret
+resource "random_password" "random_password" {
+
+  length  = 32
+  special = false
+}
 
 resource "aws_secretsmanager_secret" "mojhub_cnnstr" {
   name = "mojhub_cnnstr"
@@ -748,7 +752,7 @@ resource "aws_secretsmanager_secret" "mojhub_cnnstr" {
 }
 resource "aws_secretsmanager_secret_version" "mojhub_cnnstr" {
   secret_id     = aws_secretsmanager_secret.mojhub_cnnstr.id
-  secret_string = ""
+  secret_string = random_password.random_password.result
 }
 
 resource "aws_secretsmanager_secret" "mojhub_membership" {
@@ -762,7 +766,7 @@ resource "aws_secretsmanager_secret" "mojhub_membership" {
 }
 resource "aws_secretsmanager_secret_version" "mojhub_membership" {
   secret_id     = aws_secretsmanager_secret.mojhub_membership.id
-  secret_string = ""
+  secret_string = random_password.random_password.result
 }
 
 resource "aws_secretsmanager_secret" "govuk_notify_api_key" {
@@ -776,7 +780,7 @@ resource "aws_secretsmanager_secret" "govuk_notify_api_key" {
 }
 resource "aws_secretsmanager_secret_version" "govuk_notify_api_key" {
   secret_id     = aws_secretsmanager_secret.govuk_notify_api_key.id
-  secret_string = ""
+  secret_string = random_password.random_password.result
 }
 
 resource "aws_secretsmanager_secret" "os_vts_api_key" {
@@ -790,35 +794,7 @@ resource "aws_secretsmanager_secret" "os_vts_api_key" {
 }
 resource "aws_secretsmanager_secret_version" "os_vts_api_key" {
   secret_id     = aws_secretsmanager_secret.os_vts_api_key.id
-  secret_string = ""
-}
-
-resource "aws_secretsmanager_secret" "hub_storage_access_key_id" {
-  name = "hub_storage_access_key_id"
-  tags = merge(
-    local.tags,
-    {
-      Name = "hub_storage_access_key_id"
-    },
-  )
-}
-resource "aws_secretsmanager_secret_version" "hub_storage_access_key_id" {
-  secret_id     = aws_secretsmanager_secret.hub_storage_access_key_id.id
-  secret_string = ""
-}
-
-resource "aws_secretsmanager_secret" "hub_storage_secret_access_key" {
-  name = "hub_storage_secret_access_key"
-  tags = merge(
-    local.tags,
-    {
-      Name = "hub_storage_secret_access_key"
-    },
-  )
-}
-resource "aws_secretsmanager_secret_version" "hub_storage_secret_access_key" {
-  secret_id     = aws_secretsmanager_secret.hub_storage_secret_access_key.id
-  secret_string = ""
+  secret_string = random_password.random_password.result
 }
 
 resource "aws_secretsmanager_secret" "ap_import_access_key_id" {
@@ -832,7 +808,7 @@ resource "aws_secretsmanager_secret" "ap_import_access_key_id" {
 }
 resource "aws_secretsmanager_secret_version" "ap_import_access_key_id" {
   secret_id     = aws_secretsmanager_secret.ap_import_access_key_id.id
-  secret_string = ""
+  secret_string = random_password.random_password.result
 }
 
 resource "aws_secretsmanager_secret" "ap_import_secret_access_key" {
@@ -846,7 +822,7 @@ resource "aws_secretsmanager_secret" "ap_import_secret_access_key" {
 }
 resource "aws_secretsmanager_secret_version" "ap_import_secret_access_key" {
   secret_id     = aws_secretsmanager_secret.ap_import_secret_access_key.id
-  secret_string = ""
+  secret_string = random_password.random_password.result
 }
 
 resource "aws_secretsmanager_secret" "ap_export_access_key_id" {
@@ -860,7 +836,7 @@ resource "aws_secretsmanager_secret" "ap_export_access_key_id" {
 }
 resource "aws_secretsmanager_secret_version" "ap_export_access_key_id" {
   secret_id     = aws_secretsmanager_secret.ap_export_access_key_id.id
-  secret_string = ""
+  secret_string = random_password.random_password.result
 }
 
 resource "aws_secretsmanager_secret" "ap_export_secret_access_key" {
@@ -874,7 +850,7 @@ resource "aws_secretsmanager_secret" "ap_export_secret_access_key" {
 }
 resource "aws_secretsmanager_secret_version" "ap_export_secret_access_key" {
   secret_id     = aws_secretsmanager_secret.ap_export_secret_access_key.id
-  secret_string = ""
+  secret_string = random_password.random_password.result
 }
 
 resource "aws_secretsmanager_secret" "pecs_basm_prod_access_key_id" {
@@ -888,7 +864,7 @@ resource "aws_secretsmanager_secret" "pecs_basm_prod_access_key_id" {
 }
 resource "aws_secretsmanager_secret_version" "pecs_basm_prod_access_key_id" {
   secret_id     = aws_secretsmanager_secret.pecs_basm_prod_access_key_id.id
-  secret_string = ""
+  secret_string = random_password.random_password.result
 }
 
 resource "aws_secretsmanager_secret" "pecs_basm_prod_secret_access_key" {
@@ -902,5 +878,5 @@ resource "aws_secretsmanager_secret" "pecs_basm_prod_secret_access_key" {
 }
 resource "aws_secretsmanager_secret_version" "pecs_basm_prod_secret_access_key" {
   secret_id     = aws_secretsmanager_secret.pecs_basm_prod_secret_access_key.id
-  secret_string = ""
+  secret_string = random_password.random_password.result
 }

@@ -35,5 +35,5 @@ resource "aws_secretsmanager_secret" "database_password" {
 
 resource "aws_secretsmanager_secret_version" "database_password" {
   secret_id     = aws_secretsmanager_secret.database_password.id
-  secret_string = ""
+  secret_string = random_password.random_password.result
 }
