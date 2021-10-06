@@ -13,6 +13,7 @@
 /terraform/environments/sprinkler @modernisation-platform @modernisation-platform
 /terraform/environments/tariff @cica @modernisation-platform
 /terraform/environments/testing @modernisation-platform @modernisation-platform
+/terraform/environments/xhibit-portal @xhibit-portal-dev @modernisation-platform
 **/providers.tf @modernisation-platform
 **/backend.tf @modernisation-platform
 **/subnet_share.tf @modernisation-platform
