@@ -127,22 +127,22 @@ data "template_file" "task_definition" {
     container_version    = local.app_data.accounts[local.environment].container_version
     db_host              = aws_db_instance.database.address
     db_user              = local.app_data.accounts[local.environment].db_user
-    db_password          = "${data.aws_secretsmanager_secret_version.database_password.arn}:perfhub_db_password::"
-    mojhub_cnnstr        = "${data.aws_secretsmanager_secret_version.mojhub_cnnstr.arn}:mojhub_cnnstr::"
-    mojhub_membership    = "${data.aws_secretsmanager_secret_version.mojhub_membership.arn}:mojhub_membership::"
-    govuk_notify_api_key = "${data.aws_secretsmanager_secret_version.govuk_notify_api_key.arn}:govuk_notify_api_key::"
-    os_vts_api_key       = "${data.aws_secretsmanager_secret_version.os_vts_api_key.arn}:os_vts_api_key::"
+    db_password          = aws_secretsmanager_secret_version.database_password.arn
+    mojhub_cnnstr        = aws_secretsmanager_secret_version.mojhub_cnnstr.arn
+    mojhub_membership    = aws_secretsmanager_secret_version.mojhub_membership.arn
+    govuk_notify_api_key = aws_secretsmanager_secret_version.govuk_notify_api_key.arn
+    os_vts_api_key       = aws_secretsmanager_secret_version.os_vts_api_key.arn
     #storage_bucket                   = format("%s-uploads-%s", local.application_name, local.environment)
     storage_bucket                   = "${aws_s3_bucket.upload_files.id}"
     friendly_name                    = local.app_data.accounts[local.environment].friendly_name
-    hub_storage_access_key_id        = "${data.aws_secretsmanager_secret_version.hub_storage_access_key_id.arn}:hub_storage_access_key_id::"
-    hub_storage_secret_access_key    = "${data.aws_secretsmanager_secret_version.hub_storage_secret_access_key.arn}:hub_storage_secret_access_key::"
-    pecs_basm_prod_access_key_id     = "${data.aws_secretsmanager_secret_version.pecs_basm_prod_access_key_id.arn}:pecs_basm_prod_access_key_id::"
-    pecs_basm_prod_secret_access_key = "${data.aws_secretsmanager_secret_version.pecs_basm_prod_secret_access_key.arn}:pecs_basm_prod_secret_access_key::"
-    ap_import_access_key_id          = "${data.aws_secretsmanager_secret_version.ap_import_access_key_id.arn}:ap_import_access_key_id::"
-    ap_import_secret_access_key      = "${data.aws_secretsmanager_secret_version.ap_import_secret_access_key.arn}:ap_import_secret_access_key::"
-    ap_export_access_key_id          = "${data.aws_secretsmanager_secret_version.ap_export_access_key_id.arn}:ap_export_access_key_id::"
-    ap_export_secret_access_key      = "${data.aws_secretsmanager_secret_version.ap_export_secret_access_key.arn}:ap_export_secret_access_key::"
+    hub_storage_access_key_id        = aws_secretsmanager_secret_version.hub_storage_access_key_id.arn
+    hub_storage_secret_access_key    = aws_secretsmanager_secret_version.hub_storage_secret_access_key.arn
+    pecs_basm_prod_access_key_id     = aws_secretsmanager_secret_version.pecs_basm_prod_access_key_id.arn
+    pecs_basm_prod_secret_access_key = aws_secretsmanager_secret_version.pecs_basm_prod_secret_access_key.arn
+    ap_import_access_key_id          = aws_secretsmanager_secret_version.ap_import_access_key_id.arn
+    ap_import_secret_access_key      = aws_secretsmanager_secret_version.ap_import_secret_access_key.arn
+    ap_export_access_key_id          = aws_secretsmanager_secret_version.ap_export_access_key_id.arn
+    ap_export_secret_access_key      = aws_secretsmanager_secret_version.ap_export_secret_access_key.arn
   }
 }
 
@@ -360,7 +360,7 @@ resource "aws_db_instance" "database" {
   instance_class                      = local.app_data.accounts[local.environment].db_instance_class
   multi_az                            = false
   username                            = local.app_data.accounts[local.environment].db_user
-  password                            = data.aws_secretsmanager_secret_version.database_password.arn
+  password                            = aws_secretsmanager_secret_version.database_password.arn
   storage_encrypted                   = false
   iam_database_authentication_enabled = false
   vpc_security_group_ids              = [aws_security_group.db.id]
@@ -900,7 +900,7 @@ resource "aws_secretsmanager_secret" "pecs_basm_prod_secret_access_key" {
     },
   )
 }
-resource "aws_secretsmanager_secret_version" "pecs_bapecs_basm_prod_secret_access_keysm_prod_access_key_id" {
+resource "aws_secretsmanager_secret_version" "pecs_basm_prod_secret_access_key" {
   secret_id     = aws_secretsmanager_secret.pecs_basm_prod_secret_access_key.id
   secret_string = ""
 }
