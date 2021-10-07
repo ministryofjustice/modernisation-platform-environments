@@ -93,6 +93,6 @@ resource "aws_ebs_volume" "extra_disk" {
 
 resource "aws_volume_attachment" "extra_disk" {
   device_name = "/dev/sde"
-  volume_id   = aws_ebs_volume.asm_disk.id
-  instance_id = aws_instance.db_server.id
+  volume_id   = aws_ebs_volume.extra_disk.id
+  instance_id = aws_instance.weblogic_server.id
 }
