@@ -8,6 +8,9 @@
         },
         "production": {
 
+        },
+        "default": {
+
         }
     }
 }

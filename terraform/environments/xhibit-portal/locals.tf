@@ -7,6 +7,13 @@ data "http" "environments_file" {
   url = "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/${local.application_name}.json"
 }
 
+# get shared subnet-set vpc object
+data "aws_vpc" "shared_vpc" {
+  tags = {
+    Name = "${local.vpc_name}-${local.environment}"
+  }
+}
+
 locals {
 
   application_name = "xhibit-portal"
@@ -30,6 +37,8 @@ locals {
 
   environment = trimprefix(terraform.workspace, "${var.networking[0].application}-")
   vpc_name    = var.networking[0].business-unit
+  vpc_id      = data.aws_vpc.shared_vpc.id
+
   subnet_set  = var.networking[0].set
 
   is_live       = [substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-production" || substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-preproduction" ? "live" : "non-live"]
@@ -39,4 +48,6 @@ locals {
   # example usage:  
   # example_data = local.application_data.accounts[local.environment].example_var
   application_data = fileexists("./application_variables.json") ? jsondecode(file("./application_variables.json")) : {}
+
+  region = "eu-west-2" 
 }
