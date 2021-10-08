@@ -39,7 +39,7 @@ locals {
   vpc_name    = var.networking[0].business-unit
   vpc_id      = data.aws_vpc.shared_vpc.id
 
-  subnet_set  = var.networking[0].set
+  subnet_set = var.networking[0].set
 
   is_live       = [substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-production" || substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-preproduction" ? "live" : "non-live"]
   provider_name = "core-vpc-${local.environment}"
@@ -49,5 +49,5 @@ locals {
   # example_data = local.application_data.accounts[local.environment].example_var
   application_data = fileexists("./application_variables.json") ? jsondecode(file("./application_variables.json")) : {}
 
-  region = "eu-west-2" 
+  region = "eu-west-2"
 }
