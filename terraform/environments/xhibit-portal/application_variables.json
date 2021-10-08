@@ -2,7 +2,7 @@
     "accounts": {
         "development": {
           "example_var": "dev-data",
-          "my-new-var" : "testdata2"
+          "my-new-var" : "testdata3"
         },
         "test": {
           "example_var": "test-data"
