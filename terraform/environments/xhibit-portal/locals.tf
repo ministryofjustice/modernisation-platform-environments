@@ -35,7 +35,8 @@ locals {
     { "source-code" = "https://github.com/ministryofjustice/modernisation-platform-environments" }
   )
 
-  environment = trimprefix(terraform.workspace, "${var.networking[0].application}-")
+  environment =  terraform.workspace == "default" ? "development" : trimprefix(terraform.workspace, "${var.networking[0].application}-")
+
   vpc_name    = var.networking[0].business-unit
   vpc_id      = data.aws_vpc.shared_vpc.id
 
