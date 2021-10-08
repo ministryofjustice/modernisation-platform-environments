@@ -40,7 +40,7 @@ resource "aws_instance" "importmachine" {
   ebs_optimized               = true
   metadata_options {
     http_tokens = "required"
-  } 
+  }
 
   root_block_device {
     encrypted = true
