@@ -38,6 +38,9 @@ resource "aws_instance" "importmachine" {
   vpc_security_group_ids      = [aws_security_group.importmachine.id]
   subnet_id                   = data.aws_subnet.private_az_a.id
   ebs_optimized               = true
+  metadata_options {
+    http_tokens = "required"
+  } 
 
   root_block_device {
     encrypted = true
