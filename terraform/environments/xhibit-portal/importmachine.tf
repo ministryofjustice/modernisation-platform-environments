@@ -40,7 +40,7 @@ resource "aws_instance" "importmachine" {
   ebs_optimized               = true
 
   metadata_options {
-    http_tokens = "required"
+    http_tokens   = "required"
     http_endpoint = "enabled"
   }
 
