@@ -117,3 +117,23 @@ resource "aws_volume_attachment" "asm_disk" {
   volume_id   = aws_ebs_volume.asm_disk.id
   instance_id = aws_instance.db_server.id
 }
+
+resource "aws_ebs_volume" "asm_disk_temp" {
+  availability_zone = "${local.region}a"
+  type              = "gp2"
+  encrypted         = true
+  size              = 10
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "db-server-${local.application_name}-asm-disk-temp"
+    }
+  )
+}
+
+resource "aws_volume_attachment" "asm_disk_temp" {
+  device_name = "/dev/sdf"
+  volume_id   = aws_ebs_volume.asm_disk_temp.id
+  instance_id = aws_instance.db_server.id
+}
