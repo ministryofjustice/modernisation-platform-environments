@@ -99,12 +99,12 @@ resource "aws_instance" "db_server" {
 }
 
 
-locals{
+locals {
   asm_disks = ["sde", "sdf"]
 }
 
 resource "aws_ebs_volume" "asm_disk" {
-  for_each = toset(local.asm_disks)
+  for_each          = toset(local.asm_disks)
   availability_zone = "${local.region}a"
   type              = "gp2"
   encrypted         = true
