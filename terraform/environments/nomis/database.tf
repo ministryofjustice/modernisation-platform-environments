@@ -99,12 +99,12 @@ resource "aws_instance" "db_server" {
 }
 
 
-locals{
+locals {
   asm_disks = ["sde", "sdf"]
 }
 
 resource "aws_ebs_volume" "asm_disk" {
-  for_each = toset(local.asm_disks)
+  for_each          = toset(local.asm_disks)
   availability_zone = "${local.region}a"
   type              = "gp2"
   encrypted         = true
@@ -119,7 +119,7 @@ resource "aws_ebs_volume" "asm_disk" {
 }
 
 resource "aws_volume_attachment" "asm_disk" {
-  for_each = aws_ebs_volume.asm_disk
+  for_each    = aws_ebs_volume.asm_disk
   device_name = each.key
   volume_id   = each.value.id
   instance_id = aws_instance.db_server.id
