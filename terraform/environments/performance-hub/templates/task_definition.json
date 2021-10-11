@@ -47,8 +47,12 @@
       "value" : "${storage_bucket}"
     },
     {
-      "name" : "FRIENDLY_MAME",
+      "name" : "FRIENDLY_NAME",
       "value" : "${friendly_name}"
+    },
+    {
+      "name" : "ECR_URL",
+      "value" : "${ecr_url}"
     }
   ],
   "secrets": [
@@ -71,6 +75,30 @@
     {
       "name": "OS_VTS_API_KEY",
       "valueFrom": "${os_vts_api_key}"
+    },
+    {
+      "name": "PECS_BASM_PROD_ACCESS_KEY_ID",
+      "valueFrom": "${pecs_basm_prod_access_key_id}"
+    },
+    {
+      "name": "PECS_BASM_PROD_SECRET_ACCESS_KEY",
+      "valueFrom": "${pecs_basm_prod_secret_access_key}"
+    },
+    {
+      "name": "AP_IMPORT_ACCESS_KEY_ID",
+      "valueFrom": "${ap_import_access_key_id}"
+    },
+    {
+      "name": "AP_IMPORT_SECRET_ACCESS_KEY",
+      "valueFrom": "${ap_import_secret_access_key}"
+    },
+    {
+      "name": "AP_EXPORT_ACCESS_KEY_ID",
+      "valueFrom": "${ap_export_access_key_id}"
+    },
+    {
+      "name": "AP_EXPORT_SECRET_ACCESS_KEY",
+      "valueFrom": "${ap_export_secret_access_key}"
     }
   ],
   "essential": true
