@@ -76,3 +76,23 @@ resource "aws_instance" "weblogic_server" {
     }
   )
 }
+
+resource "aws_ebs_volume" "extra_disk" {
+  availability_zone = "${local.region}a"
+  type              = "gp2"
+  encrypted         = true
+  size              = 50
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "weblogic-${local.application_name}-extra-disk"
+    }
+  )
+}
+
+resource "aws_volume_attachment" "extra_disk" {
+  device_name = "/dev/sde"
+  volume_id   = aws_ebs_volume.extra_disk.id
+  instance_id = aws_instance.weblogic_server.id
+}
