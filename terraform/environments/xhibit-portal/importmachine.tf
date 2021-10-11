@@ -110,10 +110,10 @@ resource "aws_instance" "win2003" {
   }
 
   tags = merge(
-  local.tags,
-  {
-    Name = "win2003-${local.application_name}"
-  }
+    local.tags,
+    {
+      Name = "win2003-${local.application_name}"
+    }
   )
 }
 
@@ -124,10 +124,10 @@ resource "aws_ebs_volume" "disk_xvdf" {
   size              = 400
 
   tags = merge(
-  local.tags,
-  {
-    Name = "win2003-${local.application_name}-disk"
-  }
+    local.tags,
+    {
+      Name = "win2003-${local.application_name}-disk"
+    }
   )
 }
 
