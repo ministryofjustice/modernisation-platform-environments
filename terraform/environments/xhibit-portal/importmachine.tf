@@ -84,7 +84,7 @@ resource "aws_ebs_volume" "disk_xvdf" {
   availability_zone = "${local.region}a"
   type              = "gp2"
   encrypted         = true
-  size              = 400
+  size              = 6000
 
   tags = merge(
     local.tags,
