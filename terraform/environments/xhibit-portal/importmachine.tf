@@ -106,7 +106,7 @@ data "aws_ami" "importmachine" {
 
   filter {
     name   = "name"
-    values = ["Windows_Server-2022-English-Full-Base-*"]
+    values = ["Windows_Server-2019-English-Full-Base-*"]
   }
 
   filter {
@@ -144,6 +144,7 @@ resource "aws_instance" "importmachine" {
   associate_public_ip_address = false
   ebs_optimized               = true
   subnet_id                   = data.aws_subnet.private_az_a.id
+
 
   metadata_options {
     http_tokens   = "required"
