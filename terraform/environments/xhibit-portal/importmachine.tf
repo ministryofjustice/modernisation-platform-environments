@@ -72,6 +72,33 @@ data "aws_subnet" "private_az_a" {
   }
 }
 
+
+# Security Groups
+resource "aws_security_group" "importmachine" {
+  description = "Configure importmachine access - ingress should be only from Bastion"
+  name        = "importmachine-${local.application_name}"
+  vpc_id      = local.vpc_id
+
+  ingress {
+    description = "SSH from Bastion"
+    from_port   = 0
+    to_port     = "3389"
+    protocol    = "TCP"
+    cidr_blocks = ["${module.bastion_linux.bastion_private_ip}/32"]
+  }
+
+  egress {
+    description      = "allow all"
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+
+}
+
+
 ##### EC2 ####
 data "aws_ami" "win2003" {
   most_recent = true
@@ -91,6 +118,7 @@ data "aws_ami" "win2003" {
 resource "aws_instance" "win2003" {
   instance_type               = "t4g.large"
   ami                         = data.aws_ami.win2003.id
+  vpc_security_group_ids      = [aws_security_group.importmachine.id]
   monitoring                  = true
   associate_public_ip_address = false
   ebs_optimized               = true
