@@ -34,13 +34,13 @@ resource "aws_instance" "importmachine" {
   ami                         = "ami-0a0502ffd782e9b12"
   associate_public_ip_address = false
   # iam_instance_profile        = "ssm-ec2-profile"
-  monitoring                  = false
-  vpc_security_group_ids      = [aws_security_group.importmachine.id]
-  subnet_id                   = data.aws_subnet.private_az_a.id
-  ebs_optimized               = true
+  monitoring             = false
+  vpc_security_group_ids = [aws_security_group.importmachine.id]
+  subnet_id              = data.aws_subnet.private_az_a.id
+  ebs_optimized          = true
 
   metadata_options {
-    http_tokens = "required"
+    http_tokens   = "required"
     http_endpoint = "enabled"
   }
 
