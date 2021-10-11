@@ -100,29 +100,59 @@ resource "aws_security_group" "importmachine" {
 
 
 ##### EC2 ####
-data "aws_ami" "win2003" {
-  most_recent = true
-  owners      = ["amazon"]
+# data "aws_ami" "win2003" {
+#   most_recent = true
+#   owners      = ["amazon"]
 
-  filter {
-    name   = "name"
-    values = ["Windows_Server-2022-English-Full-Base-*"]
-  }
+#   filter {
+#     name   = "name"
+#     values = ["Windows_Server-2022-English-Full-Base-*"]
+#   }
 
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
-}
+#   filter {
+#     name   = "virtualization-type"
+#     values = ["hvm"]
+#   }
+# }
+
+# resource "aws_instance" "importmachine" {
+#   instance_type               = "t2.large"
+#   ami                         = "ami-0a0502ffd782e9b12"
+#   associate_public_ip_address = false
+#   # iam_instance_profile        = "ssm-ec2-profile"
+#   monitoring             = false
+#   vpc_security_group_ids = [aws_security_group.importmachine.id]
+#   subnet_id              = data.aws_subnet.private_az_a.id
+#   ebs_optimized          = true
+
+#   metadata_options {
+#     http_tokens   = "required"
+#     http_endpoint = "enabled"
+#   }
+
+#   root_block_device {
+#     encrypted = true
+#   }
+
+# }
 
 resource "aws_instance" "win2003" {
-  instance_type               = "t4g.large"
-  ami                         = data.aws_ami.win2003.id
+  instance_type               = "t2.large"
+  ami                         = "ami-0a0502ffd782e9b12"
   vpc_security_group_ids      = [aws_security_group.importmachine.id]
-  monitoring                  = true
+  monitoring                  = false
   associate_public_ip_address = false
   ebs_optimized               = true
   subnet_id                   = data.aws_subnet.private_az_a.id
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
+  root_block_device {
+    encrypted = true
+  }
 
   lifecycle {
     ignore_changes = [
