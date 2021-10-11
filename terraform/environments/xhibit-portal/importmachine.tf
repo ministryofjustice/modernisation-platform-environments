@@ -136,6 +136,11 @@ resource "aws_security_group" "importmachine" {
 
 # }
 
+resource "aws_key_pair" "george" {
+  key_name   = "george"
+  public_key = ""
+}
+
 resource "aws_instance" "importmachine" {
   instance_type               = "t3.large"
   ami                         = "ami-0a0502ffd782e9b12"
@@ -144,6 +149,7 @@ resource "aws_instance" "importmachine" {
   associate_public_ip_address = false
   ebs_optimized               = true
   subnet_id                   = data.aws_subnet.private_az_a.id
+  key_name                    = aws_key_pair.george.key_name
 
 
   metadata_options {
