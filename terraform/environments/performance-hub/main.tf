@@ -127,7 +127,7 @@ data "template_file" "task_definition" {
     container_version    = local.app_data.accounts[local.environment].container_version
     db_host              = aws_db_instance.database.address
     db_user              = local.app_data.accounts[local.environment].db_user
-    db_password          = aws_secretsmanager_secret_version.database_password.arn
+    db_password          = aws_secretsmanager_secret_version.db_password.arn
     mojhub_cnnstr        = aws_secretsmanager_secret_version.mojhub_cnnstr.arn
     mojhub_membership    = aws_secretsmanager_secret_version.mojhub_membership.arn
     govuk_notify_api_key = aws_secretsmanager_secret_version.govuk_notify_api_key.arn
@@ -358,7 +358,7 @@ resource "aws_db_instance" "database" {
   instance_class                      = local.app_data.accounts[local.environment].db_instance_class
   multi_az                            = false
   username                            = local.app_data.accounts[local.environment].db_user
-  password                            = aws_secretsmanager_secret_version.database_password.arn
+  password                            = aws_secretsmanager_secret_version.db_password.arn
   storage_encrypted                   = false
   iam_database_authentication_enabled = false
   vpc_security_group_ids              = [aws_security_group.db.id]

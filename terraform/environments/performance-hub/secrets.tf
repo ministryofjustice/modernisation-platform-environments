@@ -21,9 +21,9 @@ data "aws_secretsmanager_secret_version" "environment_management" {
 #   secret_id = data.aws_secretsmanager_secret.database_password.arn
 # }
 
-resource "aws_secretsmanager_secret" "database_password" {
+resource "aws_secretsmanager_secret" "db_password" {
 
-  name = "${var.networking[0].application}-db-password"
+  name = "${var.networking[0].application}-database-password"
 
   tags = merge(
     local.tags,
@@ -33,7 +33,7 @@ resource "aws_secretsmanager_secret" "database_password" {
   )
 }
 
-resource "aws_secretsmanager_secret_version" "database_password" {
-  secret_id     = aws_secretsmanager_secret.database_password.id
+resource "aws_secretsmanager_secret_version" "db_password" {
+  secret_id     = aws_secretsmanager_secret.db_password.id
   secret_string = random_password.random_password.result
 }
