@@ -100,20 +100,20 @@ resource "aws_security_group" "importmachine" {
 
 
 ##### EC2 ####
-data "aws_ami" "importmachine" {
-  most_recent = true
-  owners      = ["amazon"]
+# data "aws_ami" "importmachine" {
+#   most_recent = true
+#   owners      = ["amazon"]
 
-  filter {
-    name   = "name"
-    values = ["Windows_Server-2019-English-Full-Base-*"]
-  }
+#   filter {
+#     name   = "name"
+#     values = ["Windows_Server-2019-English-Full-Base-*"]
+#   }
 
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
-}
+#   filter {
+#     name   = "virtualization-type"
+#     values = ["hvm"]
+#   }
+# }
 
 # resource "aws_instance" "importmachine" {
 #   instance_type               = "t2.large"
@@ -137,8 +137,8 @@ data "aws_ami" "importmachine" {
 # }
 
 resource "aws_instance" "importmachine" {
-  instance_type               = "t2.large"
-  ami                         = data.aws_ami.importmachine.id
+  instance_type               = "t3.large"
+  ami                         = "ami-0a0502ffd782e9b12"
   vpc_security_group_ids      = [aws_security_group.importmachine.id]
   monitoring                  = false
   associate_public_ip_address = false
