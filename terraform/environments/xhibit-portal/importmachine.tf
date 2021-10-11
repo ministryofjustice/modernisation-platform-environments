@@ -170,7 +170,7 @@ resource "aws_instance" "importmachine" {
   tags = merge(
     local.tags,
     {
-      Name = "win2003-${local.application_name}"
+      Name = "importmachine-${local.application_name}"
     }
   )
 }
@@ -184,7 +184,7 @@ resource "aws_ebs_volume" "disk_xvdf" {
   tags = merge(
     local.tags,
     {
-      Name = "win2003-${local.application_name}-disk"
+      Name = "importmachine-${local.application_name}-disk"
     }
   )
 }
@@ -192,5 +192,5 @@ resource "aws_ebs_volume" "disk_xvdf" {
 resource "aws_volume_attachment" "disk_xvdf" {
   device_name = "xvdf"
   volume_id   = aws_ebs_volume.disk_xvdf.id
-  instance_id = aws_instance.win2003.id
+  instance_id = aws_instance.importmachine.id
 }
