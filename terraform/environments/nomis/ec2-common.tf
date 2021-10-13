@@ -43,8 +43,8 @@ data "aws_iam_policy_document" "s3_bucket_access" {
       "s3:ListBucket",
       "s3:DeleteObject"
     ]
-    resources = ["arn:aws:s3:::s3-bucket20210929163229537900000001",
-    "arn:aws:s3:::s3-bucket20210929163229537900000001/*"] # todo: reference bucket module output
+    resources = [module.s3-bucket.bucket.arn,
+    "${module.s3-bucket.bucket.arn}/*"] # todo: reference bucket module output
   }
 }
 
