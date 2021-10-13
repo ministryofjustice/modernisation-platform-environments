@@ -36,13 +36,13 @@ resource "aws_iam_role" "ssm_ec2_role" {
 # create policy document for access to s3 bucket
 data "aws_iam_policy_document" "s3_bucket_access" {
   statement {
-    effect    = "Allow"
-    actions   = [
-                  "s3:PutObject",
-                  "s3:GetObject",
-                  "s3:ListBucket",
-                  "s3:DeleteObject"
-                ]
+    effect = "Allow"
+    actions = [
+      "s3:PutObject",
+      "s3:GetObject",
+      "s3:ListBucket",
+      "s3:DeleteObject"
+    ]
     resources = ["arn:aws:s3:::s3-bucket20210929163229537900000001",
     "arn:aws:s3:::s3-bucket20210929163229537900000001/*"] # todo: reference bucket module output
   }
