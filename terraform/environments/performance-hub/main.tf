@@ -127,14 +127,20 @@ data "template_file" "task_definition" {
     container_version    = local.app_data.accounts[local.environment].container_version
     db_host              = aws_db_instance.database.address
     db_user              = local.app_data.accounts[local.environment].db_user
-    db_password          = "${data.aws_secretsmanager_secret_version.database_password.arn}:perfhub_db_password::"
-    mojhub_cnnstr        = "${data.aws_secretsmanager_secret_version.mojhub_cnnstr.arn}:mojhub_cnnstr::"
-    mojhub_membership    = "${data.aws_secretsmanager_secret_version.mojhub_membership.arn}:mojhub_membership::"
-    govuk_notify_api_key = "${data.aws_secretsmanager_secret_version.govuk_notify_api_key.arn}:govuk_notify_api_key::"
-    os_vts_api_key       = "${data.aws_secretsmanager_secret_version.os_vts_api_key.arn}:os_vts_api_key::"
-    #storage_bucket       = format("%s-uploads-%s", local.application_name, local.environment)
-    storage_bucket = "${aws_s3_bucket.upload_files.id}"
-    friendly_name  = local.app_data.accounts[local.environment].friendly_name
+    db_password          = aws_secretsmanager_secret_version.db_password.arn
+    mojhub_cnnstr        = aws_secretsmanager_secret_version.mojhub_cnnstr.arn
+    mojhub_membership    = aws_secretsmanager_secret_version.mojhub_membership.arn
+    govuk_notify_api_key = aws_secretsmanager_secret_version.govuk_notify_api_key.arn
+    os_vts_api_key       = aws_secretsmanager_secret_version.os_vts_api_key.arn
+    #storage_bucket                   = format("%s-uploads-%s", local.application_name, local.environment)
+    storage_bucket                   = "${aws_s3_bucket.upload_files.id}"
+    friendly_name                    = local.app_data.accounts[local.environment].friendly_name
+    pecs_basm_prod_access_key_id     = aws_secretsmanager_secret_version.pecs_basm_prod_access_key_id.arn
+    pecs_basm_prod_secret_access_key = aws_secretsmanager_secret_version.pecs_basm_prod_secret_access_key.arn
+    ap_import_access_key_id          = aws_secretsmanager_secret_version.ap_import_access_key_id.arn
+    ap_import_secret_access_key      = aws_secretsmanager_secret_version.ap_import_secret_access_key.arn
+    ap_export_access_key_id          = aws_secretsmanager_secret_version.ap_export_access_key_id.arn
+    ap_export_secret_access_key      = aws_secretsmanager_secret_version.ap_export_secret_access_key.arn
   }
 }
 
@@ -352,7 +358,7 @@ resource "aws_db_instance" "database" {
   instance_class                      = local.app_data.accounts[local.environment].db_instance_class
   multi_az                            = false
   username                            = local.app_data.accounts[local.environment].db_user
-  password                            = data.aws_secretsmanager_secret_version.database_password.arn
+  password                            = aws_secretsmanager_secret_version.db_password.arn
   storage_encrypted                   = false
   iam_database_authentication_enabled = false
   vpc_security_group_ids              = [aws_security_group.db.id]
@@ -723,4 +729,154 @@ data "aws_iam_policy_document" "s3-kms" {
       identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root", "arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/cicd-member-user"]
     }
   }
+}
+
+#------------------------------------------------------------------------------
+# Secrets definitions
+#------------------------------------------------------------------------------
+# Create secret
+resource "random_password" "random_password" {
+
+  length  = 32
+  special = false
+}
+
+resource "aws_secretsmanager_secret" "mojhub_cnnstr" {
+  name = "mojhub_cnnstr"
+  tags = merge(
+    local.tags,
+    {
+      Name = "mojhub_cnnstr"
+    },
+  )
+}
+resource "aws_secretsmanager_secret_version" "mojhub_cnnstr" {
+  secret_id     = aws_secretsmanager_secret.mojhub_cnnstr.id
+  secret_string = random_password.random_password.result
+}
+
+resource "aws_secretsmanager_secret" "mojhub_membership" {
+  name = "mojhub_membership"
+  tags = merge(
+    local.tags,
+    {
+      Name = "mojhub_membership"
+    },
+  )
+}
+resource "aws_secretsmanager_secret_version" "mojhub_membership" {
+  secret_id     = aws_secretsmanager_secret.mojhub_membership.id
+  secret_string = random_password.random_password.result
+}
+
+resource "aws_secretsmanager_secret" "govuk_notify_api_key" {
+  name = "govuk_notify_api_key"
+  tags = merge(
+    local.tags,
+    {
+      Name = "govuk_notify_api_key"
+    },
+  )
+}
+resource "aws_secretsmanager_secret_version" "govuk_notify_api_key" {
+  secret_id     = aws_secretsmanager_secret.govuk_notify_api_key.id
+  secret_string = random_password.random_password.result
+}
+
+resource "aws_secretsmanager_secret" "os_vts_api_key" {
+  name = "os_vts_api_key"
+  tags = merge(
+    local.tags,
+    {
+      Name = "os_vts_api_key"
+    },
+  )
+}
+resource "aws_secretsmanager_secret_version" "os_vts_api_key" {
+  secret_id     = aws_secretsmanager_secret.os_vts_api_key.id
+  secret_string = random_password.random_password.result
+}
+
+resource "aws_secretsmanager_secret" "ap_import_access_key_id" {
+  name = "ap_import_access_key_id"
+  tags = merge(
+    local.tags,
+    {
+      Name = "ap_import_access_key_id"
+    },
+  )
+}
+resource "aws_secretsmanager_secret_version" "ap_import_access_key_id" {
+  secret_id     = aws_secretsmanager_secret.ap_import_access_key_id.id
+  secret_string = random_password.random_password.result
+}
+
+resource "aws_secretsmanager_secret" "ap_import_secret_access_key" {
+  name = "ap_import_secret_access_key"
+  tags = merge(
+    local.tags,
+    {
+      Name = "ap_import_secret_access_key"
+    },
+  )
+}
+resource "aws_secretsmanager_secret_version" "ap_import_secret_access_key" {
+  secret_id     = aws_secretsmanager_secret.ap_import_secret_access_key.id
+  secret_string = random_password.random_password.result
+}
+
+resource "aws_secretsmanager_secret" "ap_export_access_key_id" {
+  name = "ap_export_access_key_id"
+  tags = merge(
+    local.tags,
+    {
+      Name = "ap_export_access_key_id"
+    },
+  )
+}
+resource "aws_secretsmanager_secret_version" "ap_export_access_key_id" {
+  secret_id     = aws_secretsmanager_secret.ap_export_access_key_id.id
+  secret_string = random_password.random_password.result
+}
+
+resource "aws_secretsmanager_secret" "ap_export_secret_access_key" {
+  name = "ap_export_secret_access_key"
+  tags = merge(
+    local.tags,
+    {
+      Name = "ap_export_secret_access_key"
+    },
+  )
+}
+resource "aws_secretsmanager_secret_version" "ap_export_secret_access_key" {
+  secret_id     = aws_secretsmanager_secret.ap_export_secret_access_key.id
+  secret_string = random_password.random_password.result
+}
+
+resource "aws_secretsmanager_secret" "pecs_basm_prod_access_key_id" {
+  name = "pecs_basm_prod_access_key_id"
+  tags = merge(
+    local.tags,
+    {
+      Name = "pecs_basm_prod_access_key_id"
+    },
+  )
+}
+resource "aws_secretsmanager_secret_version" "pecs_basm_prod_access_key_id" {
+  secret_id     = aws_secretsmanager_secret.pecs_basm_prod_access_key_id.id
+  secret_string = random_password.random_password.result
+}
+
+resource "aws_secretsmanager_secret" "pecs_basm_prod_secret_access_key" {
+  name = "pecs_basm_prod_secret_access_key"
+  tags = merge(
+    local.tags,
+    {
+      Name = "pecs_basm_prod_secret_access_key"
+    },
+  )
+}
+resource "aws_secretsmanager_secret_version" "pecs_basm_prod_secret_access_key" {
+  secret_id     = aws_secretsmanager_secret.pecs_basm_prod_secret_access_key.id
+  secret_string = random_password.random_password.result
 }

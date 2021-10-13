@@ -119,7 +119,7 @@ resource "aws_ebs_volume" "asm_disk" {
 }
 
 resource "aws_volume_attachment" "asm_disk" {
-  for_each = aws_ebs_volume.asm_disk
+  for_each    = aws_ebs_volume.asm_disk
   device_name = "/dev/${each.key}"
   volume_id   = each.value.id
   instance_id = aws_instance.db_server.id
