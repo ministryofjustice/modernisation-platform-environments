@@ -98,7 +98,13 @@ resource "aws_instance" "db_server" {
   )
 }
 
+
+locals {
+  asm_disks = ["sde", "sdf"]
+}
+
 resource "aws_ebs_volume" "asm_disk" {
+  for_each          = toset(local.asm_disks)
   availability_zone = "${local.region}a"
   type              = "gp2"
   encrypted         = true
@@ -107,33 +113,14 @@ resource "aws_ebs_volume" "asm_disk" {
   tags = merge(
     local.tags,
     {
-      Name = "db-server-${local.application_name}-asm-disk"
+      Name = "db-server-${local.application_name}-asm-disk-${each.key}"
     }
   )
 }
 
 resource "aws_volume_attachment" "asm_disk" {
-  device_name = "/dev/sde"
-  volume_id   = aws_ebs_volume.asm_disk.id
-  instance_id = aws_instance.db_server.id
-}
-
-resource "aws_ebs_volume" "asm_disk_temp" {
-  availability_zone = "${local.region}a"
-  type              = "gp2"
-  encrypted         = true
-  size              = 10
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "db-server-${local.application_name}-asm-disk-temp"
-    }
-  )
-}
-
-resource "aws_volume_attachment" "asm_disk_temp" {
-  device_name = "/dev/sdf"
-  volume_id   = aws_ebs_volume.asm_disk_temp.id
+  for_each    = aws_ebs_volume.asm_disk
+  device_name = "/dev/${each.key}"
+  volume_id   = each.value.id
   instance_id = aws_instance.db_server.id
 }

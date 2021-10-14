@@ -1,6 +1,8 @@
 #------------------------------------------------------------------------------
 # Instance profile to be assumed by the ec2 instance
 # This is required to enable SSH via Systems Manager
+# and also to allow access to an S3 bucket in which 
+# Oracle and Weblogic installation files are held
 #------------------------------------------------------------------------------
 
 resource "aws_iam_role" "ssm_ec2_role" {
@@ -29,6 +31,28 @@ resource "aws_iam_role" "ssm_ec2_role" {
       Name = "ssm-ec2-role"
     },
   )
+}
+
+# create policy document for access to s3 bucket
+data "aws_iam_policy_document" "s3_bucket_access" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "s3:PutObject",
+      "s3:GetObject",
+      "s3:ListBucket",
+      "s3:DeleteObject"
+    ]
+    resources = [module.s3-bucket.bucket.arn,
+    "${module.s3-bucket.bucket.arn}/*"] # todo: reference bucket module output
+  }
+}
+
+# attach s3 document as inline policy
+resource "aws_iam_role_policy" "s3_bucket_access" {
+  name   = "nomis-apps-bucket-access"
+  role   = aws_iam_role.ssm_ec2_role.name
+  policy = data.aws_iam_policy_document.s3_bucket_access.json
 }
 
 resource "aws_iam_instance_profile" "ec2_ssm_profile" {
