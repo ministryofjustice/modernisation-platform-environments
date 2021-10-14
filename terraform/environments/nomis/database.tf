@@ -67,7 +67,7 @@ resource "aws_instance" "db_server" {
   associate_public_ip_address = false
   iam_instance_profile        = aws_iam_instance_profile.ec2_ssm_profile.id
   ebs_optimized               = true
-  subnet_id                   = data.aws_subnet.private_az_a.id # data.aws_subnet.data_az_a.id put here whilst testing install steps
+  subnet_id                   = data.aws_subnet.data_az_a.id # data.aws_subnet.data_az_a.id put here whilst testing install steps
   user_data                   = file("./templates/cloudinit.cfg")
   vpc_security_group_ids      = [aws_security_group.db_server.id]
 
