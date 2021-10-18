@@ -2,14 +2,14 @@
 provider "aws" {
   region = "eu-west-2"
 
-  assume_role {
-    role_arn = "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/MemberInfrastructureAccess"
-  }
-  
   # assume_role {
-  #   #role_arn = "arn:aws:iam::276038508461:role/MemberInfrastructureAccess"
-  #   #role_arn = null
+  #   role_arn = "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/MemberInfrastructureAccess"
   # }
+
+  assume_role {
+    role_arn = "arn:aws:iam::276038508461:role/MemberInfrastructureAccess"
+    #role_arn = null
+  }
 }
 
 # AWS provider for the Modernisation Platform, to get things from there if required
