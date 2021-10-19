@@ -51,7 +51,7 @@ data "aws_ami" "db_image" {
 
   filter {
     name   = "name"
-    values = ["nomis_db-2021-09-24*"] # pinning image for now
+    values = ["nomis_db-2021-10-15*"] # pinning image for now
   }
 
   filter {
