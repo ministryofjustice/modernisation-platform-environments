@@ -11,6 +11,10 @@ resource "aws_instance" "db_mgmt_server" {
   user_data                   = data.template_cloudinit_config.cloudinit-db-mgmt.rendered
   vpc_security_group_ids      = [aws_security_group.db_mgmt_server_security_group.id, ]
 
+  metadata_options {
+    http_tokens = "required"
+  }
+
   root_block_device {
     delete_on_termination = true
     encrypted             = true
@@ -85,6 +89,7 @@ resource "aws_iam_instance_profile" "db_mgmt_profile" {
 }
 
 # ebs ec2 policy
+#tfsec:ignore:AWS099
 resource "aws_iam_policy" "db_mgmt_policy" {
   name        = "${local.application_name}-db_mgmt-ec2-policy"
   description = "${local.application_name} ec2-policy"
@@ -125,15 +130,18 @@ resource "aws_security_group" "db_mgmt_server_security_group" {
 
   ingress {
     protocol    = "tcp"
+    description = "Open the RDP port"
     from_port   = 3389
     to_port     = 3389
     cidr_blocks = ["${module.bastion_linux.bastion_private_ip}/32"]
   }
 
   egress {
-    protocol  = "-1"
-    from_port = 0
-    to_port   = 0
+    description = "All outbound ports open"
+    protocol    = "-1"
+    from_port   = 0
+    to_port     = 0
+    #tfsec:ignore:AWS009
     cidr_blocks = [
       "0.0.0.0/0",
     ]
@@ -170,6 +178,8 @@ resource "aws_kms_alias" "ebs-kms-alias" {
 }
 
 data "aws_iam_policy_document" "ebs-kms" {
+  #checkov:skip=CKV_AWS_111
+  #checkov:skip=CKV_AWS_109
   statement {
     effect    = "Allow"
     actions   = ["kms:*"]
