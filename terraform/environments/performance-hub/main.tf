@@ -376,7 +376,7 @@ resource "aws_db_instance" "database" {
   deletion_protection                 = false
   option_group_name                   = aws_db_option_group.db_option_group.name
   db_subnet_group_name                = aws_db_subnet_group.db.id
-  enabled_cloudwatch_logs_exports     = ["general", "error", "slowquery"]
+  enabled_cloudwatch_logs_exports     = ["error"]
 
   # timeouts {
   #   create = "40m"
