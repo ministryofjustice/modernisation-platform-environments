@@ -1,5 +1,5 @@
 resource "aws_instance" "db_mgmt_server" {
-  ami                         = "ami-0a0502ffd782e9b12"
+  ami                         = "ami-0f9853ca76d115e7b"
   associate_public_ip_address = false
   availability_zone           = "eu-west-2a"
   ebs_optimized               = true
@@ -12,6 +12,7 @@ resource "aws_instance" "db_mgmt_server" {
   vpc_security_group_ids      = [aws_security_group.db_mgmt_server_security_group.id, ]
 
   metadata_options {
+    http_endpoint = "enabled"
     http_tokens = "required"
   }
 

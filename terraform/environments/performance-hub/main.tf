@@ -108,7 +108,7 @@ data "template_file" "task_definition" {
     app_name             = local.application_name
     env_name             = local.environment
     system_account_id    = local.app_data.accounts[local.environment].system_account_id
-    ecr_url              = format("%s%s%s%s%s", data.aws_caller_identity.current.account_id, ".dkr.ecr.", local.app_data.accounts[local.environment].region, ".amazonaws.com/", local.application_name)
+    ecr_url              = format("%s%s%s", "374269020027.dkr.ecr.", local.app_data.accounts[local.environment].region, ".amazonaws.com/performance-hub-ecr-repo")
     server_port          = local.app_data.accounts[local.environment].server_port
     aws_region           = local.app_data.accounts[local.environment].region
     container_version    = local.app_data.accounts[local.environment].container_version
@@ -376,7 +376,7 @@ resource "aws_db_instance" "database" {
   deletion_protection                 = false
   option_group_name                   = aws_db_option_group.db_option_group.name
   db_subnet_group_name                = aws_db_subnet_group.db.id
-  enabled_cloudwatch_logs_exports     = ["general", "error", "slowquery"]
+  enabled_cloudwatch_logs_exports     = ["error"]
 
   # timeouts {
   #   create = "40m"
