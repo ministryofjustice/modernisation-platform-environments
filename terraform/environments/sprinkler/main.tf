@@ -176,6 +176,10 @@ resource "aws_security_group_rule" "app_ingress_2" {
 resource "aws_ecs_cluster" "app" {
 
   name = var.networking[0].application
+  setting {
+    name  = "containerInsights"
+    value = "disabled"
+  }
 
   tags = merge(
     local.tags,
@@ -806,12 +810,4 @@ resource "aws_cloudwatch_log_group" "app" {
       Name = var.networking[0].application
     },
   )
-}
-
-# Workflow test
-resource "aws_s3_bucket" "bucket" {
-  bucket_prefix = "sprinker-test-bucket"
-  acl           = "private"
-
-  tags = local.tags
 }
