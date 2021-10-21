@@ -1,6 +1,8 @@
 ######################### Run Terraform via CICD ##################################
 # Get secret by name for environment management
+#tfsec:ignore:AWS095
 data "aws_secretsmanager_secret" "environment_management" {
+  #checkov:skip=CKV_AWS_149
   provider = aws.modernisation-platform
   name     = "environment_management"
 }
@@ -44,7 +46,9 @@ data "aws_secretsmanager_secret_version" "environment_management" {
 #   secret_id = data.aws_secretsmanager_secret.database_password.arn
 # }
 
+#tfsec:ignore:AWS095
 resource "aws_secretsmanager_secret" "db_password" {
+  #checkov:skip=CKV_AWS_149
 
   name = "${var.networking[0].application}-database-password"
 
