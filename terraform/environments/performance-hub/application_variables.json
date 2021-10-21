@@ -21,7 +21,9 @@
           "db_snapshot_identifier": "arn:aws:rds:eu-west-2:322518575883:snapshot:performance-hub-initial",
           "env_name": "development",
           "system_account_id": "C67AF61C-F010-4C37-8912-99308FD03241",
-          "friendly_name": "HMPPS Development Hub"
+          "friendly_name": "HMPPS Development Hub",
+          "app_db_name": "NomsPMU",
+          "memebership_db_name": "Membership"
         },
         "preproduction": {
           "region": "eu-west-2",
@@ -44,7 +46,9 @@
           "db_snapshot_identifier": "arn:aws:rds:eu-west-2:322518575883:snapshot:performance-hub-15102021",
           "env_name": "preproduction",
           "system_account_id": "C67AF61C-F010-4C37-8912-99308FD03241",
-          "friendly_name": "HMPPS Test Hub"
+          "friendly_name": "HMPPS Test Hub",
+          "app_db_name": "NomsPMU_Staging",
+          "memebership_db_name": "Membership_Staging"
         },
         "production": {
           "region": "eu-west-2",
@@ -67,7 +71,9 @@
           "db_snapshot_identifier": "arn:aws:rds:eu-west-2:322518575883:snapshot:performance-hub-initial",
           "env_name": "production",
           "system_account_id": "B554E4A1-3171-43F5-AEC1-B1B4050BF071",
-          "friendly_name": "HMPPS Performance Hub"
+          "friendly_name": "HMPPS Performance Hub",
+          "app_db_name": "NomsPMU_Live",
+          "memebership_db_name": "Membership_Live"
         }
     }
 }
