@@ -2,7 +2,7 @@
     "accounts": {
         "development": {
           "region": "eu-west-2",
-          "ami_image_id": "ami-0c84c2544c1c7cba7",
+          "ami_image_id": "ami-0710a28eb649a761d",
           "instance_type": "t3.large",
           "key_name": "performance-hub-ec2",
           "app_count": "1",
@@ -18,7 +18,7 @@
           "network_mode": "none",
           "db_instance_class": "db.m5.large",
           "db_user": "admin",
-          "db_snapshot_identifier": "arn:aws:rds:eu-west-2:322518575883:snapshot:performance-hub-initial",
+          "db_snapshot_identifier": "arn:aws:rds:eu-west-2:938841708445:snapshot:performance-hub-withencryption-21102021",
           "env_name": "development",
           "system_account_id": "C67AF61C-F010-4C37-8912-99308FD03241",
           "friendly_name": "HMPPS Development Hub",
@@ -27,7 +27,7 @@
         },
         "preproduction": {
           "region": "eu-west-2",
-          "ami_image_id": "ami-0c84c2544c1c7cba7",
+          "ami_image_id": "ami-0710a28eb649a761d",
           "instance_type": "t3.large",
           "key_name": "performance-hub-ec2",
           "app_count": "1",
@@ -43,7 +43,7 @@
           "network_mode": "none",
           "db_instance_class": "db.m5.large",
           "db_user": "admin",
-          "db_snapshot_identifier": "arn:aws:rds:eu-west-2:322518575883:snapshot:performance-hub-15102021",
+          "db_snapshot_identifier": "arn:aws:rds:eu-west-2:322518575883:snapshot:performance-hub-withencryption-21102021",
           "env_name": "preproduction",
           "system_account_id": "C67AF61C-F010-4C37-8912-99308FD03241",
           "friendly_name": "HMPPS Test Hub",
@@ -52,7 +52,7 @@
         },
         "production": {
           "region": "eu-west-2",
-          "ami_image_id": "ami-0c84c2544c1c7cba7",
+          "ami_image_id": "ami-0710a28eb649a761d",
           "instance_type": "t3.large",
           "key_name": "performance-hub-ec2",
           "app_count": "1",
