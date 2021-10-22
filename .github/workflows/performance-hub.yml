@@ -181,6 +181,7 @@ jobs:
 
   deploy-production:
     name: Deploy Production - performance-hub
+    needs: [plan-production]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     environment:
