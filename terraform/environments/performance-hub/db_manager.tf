@@ -13,7 +13,7 @@ resource "aws_instance" "db_mgmt_server" {
 
   metadata_options {
     http_endpoint = "enabled"
-    http_tokens = "required"
+    http_tokens   = "required"
   }
 
   root_block_device {
