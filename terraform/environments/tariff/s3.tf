@@ -10,7 +10,7 @@ module "s3-bucket" {
   providers = {
     aws.bucket-replication = aws.bucket-replication
   }
-  bucket_name       = "tariff-bucket"
+  bucket_name         = "tariff-bucket"
   replication_enabled = false
 
   lifecycle_rule = [
