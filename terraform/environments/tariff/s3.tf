@@ -1,14 +1,9 @@
-
-provider "aws" {
-  alias  = "bucket-replication"
-  region = "eu-west-1"
-}
-
 module "s3-bucket" {
   source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v4.0.0"
 
   providers = {
-    aws.bucket-replication = aws.bucket-replication
+    # Default provider for replication to same region. Contact Mod Platform if replication to different region is required.
+    aws.bucket-replication = aws
   }
   bucket_name       = "tariff-bucket"
   replication_enabled = false
