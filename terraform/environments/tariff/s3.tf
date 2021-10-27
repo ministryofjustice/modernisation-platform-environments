@@ -5,7 +5,7 @@ module "s3-bucket" {
     # Default provider for replication to same region. Contact Mod Platform if replication to different region is required.
     aws.bucket-replication = aws
   }
-  bucket_name       = "tariff-bucket"
+  bucket_name         = "tariff-bucket"
   replication_enabled = false
 
   lifecycle_rule = [
