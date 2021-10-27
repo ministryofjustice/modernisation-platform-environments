@@ -3,7 +3,9 @@ locals {
 }
 
 module "bastion_linux" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=v1.0.3"
+  #source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=v1.0.3"
+  #source = "/Users/george.fountopoulos/c-proper-moj/modernisation-platform-terraform-bastion-linux"
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux.git?ref=autoscale"
 
   providers = {
     aws.share-host   = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
