@@ -24,7 +24,7 @@
           "friendly_name": "HMPPS Development Hub",
           "app_db_name": "NomsPMU",
           "memebership_db_name": "Membership",
-          "hub_wwwroot": "C:\\inetpub\\wwwroot"
+          "hub_wwwroot": "C:\/inetpub\/wwwroot"
         },
         "preproduction": {
           "region": "eu-west-2",
@@ -50,7 +50,7 @@
           "friendly_name": "HMPPS Test Hub",
           "app_db_name": "NomsPMU_Staging",
           "memebership_db_name": "Membership_Staging",
-          "hub_wwwroot": "C:\\inetpub\\wwwroot"
+          "hub_wwwroot": "C:\/inetpub\/wwwroot"
         },
         "production": {
           "region": "eu-west-2",
@@ -76,7 +76,7 @@
           "friendly_name": "HMPPS Performance Hub",
           "app_db_name": "NomsPMU_Live",
           "memebership_db_name": "Membership_Live",
-          "hub_wwwroot": "C:\\inetpub\\wwwroot"
+          "hub_wwwroot": "C:\/inetpub\/wwwroot"
         }
     }
 }
