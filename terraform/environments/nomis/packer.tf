@@ -200,6 +200,7 @@ resource "aws_iam_role_policy" "packer" {
 #------------------------------------------------------------------------------
 # Instance profile to be assumed by Packer build instance
 # This is required to enable SSH via Systems Manager
+# and for access to S3 bucket
 #------------------------------------------------------------------------------
 
 resource "aws_iam_role" "packer_ssm_role" {
@@ -230,6 +231,25 @@ resource "aws_iam_role" "packer_ssm_role" {
   )
 }
 
+# build policy document for access to s3 bucket
+data "aws_iam_policy_document" "s3_bucket_access" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "s3:GetObject"
+    ]
+    resources = ["${module.s3-bucket.bucket.arn}/dbaupload/oracle_11gR2/*"]
+  }
+}
+
+# attach s3 document as inline policy
+resource "aws_iam_role_policy" "s3_bucket_access" {
+  name   = "nomis-apps-bucket-access"
+  role   = aws_iam_role.ssm_ec2_role.name
+  policy = data.aws_iam_policy_document.s3_bucket_access.json
+}
+
+# create instance profile from role
 resource "aws_iam_instance_profile" "packer_ssm_profile" {
   name = "packer-ssm-profile"
   role = aws_iam_role.packer_ssm_role.name
