@@ -232,7 +232,7 @@ resource "aws_iam_role" "packer_ssm_role" {
 }
 
 # build policy document for access to s3 bucket
-data "aws_iam_policy_document" "s3_bucket_access" {
+data "aws_iam_policy_document" "packer_s3_bucket_access" {
   statement {
     effect = "Allow"
     actions = [
@@ -243,10 +243,10 @@ data "aws_iam_policy_document" "s3_bucket_access" {
 }
 
 # attach s3 document as inline policy
-resource "aws_iam_role_policy" "s3_bucket_access" {
+resource "aws_iam_role_policy" "packer_s3_bucket_access" {
   name   = "nomis-apps-bucket-access"
-  role   = aws_iam_role.ssm_ec2_role.name
-  policy = data.aws_iam_policy_document.s3_bucket_access.json
+  role   = aws_iam_role.packer_ssm_role.name
+  policy = data.aws_iam_policy_document.packer_s3_bucket_access.json
 }
 
 # create instance profile from role
