@@ -53,6 +53,10 @@
     {
       "name" : "ECR_URL",
       "value" : "${ecr_url}"
+    },
+    {
+      "name" : "WWW_ROOT",
+      "value" : "${wwwroot}"
     }
   ],
   "secrets": [

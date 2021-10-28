@@ -119,9 +119,9 @@ data "template_file" "task_definition" {
     mojhub_membership    = aws_secretsmanager_secret_version.mojhub_membership.arn
     govuk_notify_api_key = aws_secretsmanager_secret_version.govuk_notify_api_key.arn
     os_vts_api_key       = aws_secretsmanager_secret_version.os_vts_api_key.arn
-    #storage_bucket                   = format("%s-uploads-%s", local.application_name, local.environment)
-    storage_bucket                   = "${aws_s3_bucket.upload_files.id}"
-    friendly_name                    = local.app_data.accounts[local.environment].friendly_name
+    storage_bucket       = "${aws_s3_bucket.upload_files.id}"
+    friendly_name        = local.app_data.accounts[local.environment].friendly_name
+    hub_wwwroot          = local.app_data.accounts[local.environment].hub_wwwroot
     pecs_basm_prod_access_key_id     = aws_secretsmanager_secret_version.pecs_basm_prod_access_key_id.arn
     pecs_basm_prod_secret_access_key = aws_secretsmanager_secret_version.pecs_basm_prod_secret_access_key.arn
     ap_import_access_key_id          = aws_secretsmanager_secret_version.ap_import_access_key_id.arn
