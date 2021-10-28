@@ -23,7 +23,8 @@
           "system_account_id": "C67AF61C-F010-4C37-8912-99308FD03241",
           "friendly_name": "HMPPS Development Hub",
           "app_db_name": "NomsPMU",
-          "memebership_db_name": "Membership"
+          "memebership_db_name": "Membership",
+          "hub_wwwroot": "C:\/inetpub\/wwwroot"
         },
         "preproduction": {
           "region": "eu-west-2",
@@ -48,7 +49,8 @@
           "system_account_id": "C67AF61C-F010-4C37-8912-99308FD03241",
           "friendly_name": "HMPPS Test Hub",
           "app_db_name": "NomsPMU_Staging",
-          "memebership_db_name": "Membership_Staging"
+          "memebership_db_name": "Membership_Staging",
+          "hub_wwwroot": "C:\/inetpub\/wwwroot"
         },
         "production": {
           "region": "eu-west-2",
@@ -73,7 +75,8 @@
           "system_account_id": "B554E4A1-3171-43F5-AEC1-B1B4050BF071",
           "friendly_name": "HMPPS Performance Hub",
           "app_db_name": "NomsPMU_Live",
-          "memebership_db_name": "Membership_Live"
+          "memebership_db_name": "Membership_Live",
+          "hub_wwwroot": "C:\/inetpub\/wwwroot"
         }
     }
 }
