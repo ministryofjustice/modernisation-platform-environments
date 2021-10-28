@@ -55,8 +55,8 @@
       "value" : "${ecr_url}"
     },
     {
-      "name" : "WWW_ROOT",
-      "value" : "${wwwroot}"
+      "name" : "HUB_WWW_ROOT",
+      "value" : "${hub_wwwroot}"
     }
   ],
   "secrets": [
