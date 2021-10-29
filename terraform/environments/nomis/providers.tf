@@ -6,6 +6,13 @@ provider "aws" {
     role_arn = "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/MemberInfrastructureAccess"
   }
 }
+provider "aws" {
+  alias  = "bucket-replication"
+  region = "eu-west-1"
+  assume_role {
+    role_arn = "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/MemberInfrastructureAccess"
+  }
+}
 
 # AWS provider for the Modernisation Platform, to get things from there if required
 provider "aws" {

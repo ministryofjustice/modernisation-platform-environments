@@ -5,8 +5,8 @@
 # Oracle and Weblogic installation files are held
 #------------------------------------------------------------------------------
 
-resource "aws_iam_role" "ssm_ec2_role" {
-  name                 = "ssm-ec2-role"
+resource "aws_iam_role" "ec2_common_role" {
+  name                 = "ec2-common-role"
   path                 = "/"
   max_session_duration = "3600"
   assume_role_policy = jsonencode(
@@ -28,7 +28,7 @@ resource "aws_iam_role" "ssm_ec2_role" {
   tags = merge(
     local.tags,
     {
-      Name = "ssm-ec2-role"
+      Name = "ec2-common-role"
     },
   )
 }
@@ -44,19 +44,19 @@ data "aws_iam_policy_document" "s3_bucket_access" {
       "s3:DeleteObject"
     ]
     resources = [module.s3-bucket.bucket.arn,
-    "${module.s3-bucket.bucket.arn}/*"] # todo: reference bucket module output
+    "${module.s3-bucket.bucket.arn}/*"]
   }
 }
 
 # attach s3 document as inline policy
 resource "aws_iam_role_policy" "s3_bucket_access" {
   name   = "nomis-apps-bucket-access"
-  role   = aws_iam_role.ssm_ec2_role.name
+  role   = aws_iam_role.ec2_common_role.name
   policy = data.aws_iam_policy_document.s3_bucket_access.json
 }
 
-resource "aws_iam_instance_profile" "ec2_ssm_profile" {
-  name = "ssm-ec2-profile"
-  role = aws_iam_role.ssm_ec2_role.name
+resource "aws_iam_instance_profile" "ec2_common_profile" {
+  name = "ec2-common-profile"
+  role = aws_iam_role.ec2_common_role.name
   path = "/"
 }
