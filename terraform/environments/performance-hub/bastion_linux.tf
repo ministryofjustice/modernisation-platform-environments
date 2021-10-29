@@ -3,7 +3,7 @@ locals {
 }
 
 module "bastion_linux" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=v2.0.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=fix-private-ip"
 
   providers = {
     aws.share-host   = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
