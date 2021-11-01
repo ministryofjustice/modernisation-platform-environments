@@ -1,6 +1,8 @@
 {
     "accounts": {
         "development": {
+            "key_name": "sprinkler-ec2",
+            "region": "eu-west-2",
             "ecs_type": "FARGATE",
             "rds_storage": 5,
             "rds_postgresql_version": "12.7",
@@ -8,6 +10,8 @@
 
         },
         "production": {
+            "key_name": "sprinkler-ec2",
+            "region": "eu-west-2",
             "ecs_type": "FARGATE",
             "rds_storage": 5,
             "rds_postgresql_version": "12.7",
