@@ -130,10 +130,10 @@ resource "aws_security_group" "db_mgmt_server_security_group" {
   vpc_id      = data.aws_vpc.shared.id
 
   ingress {
-    protocol    = "tcp"
-    description = "Open the RDP port"
-    from_port   = 3389
-    to_port     = 3389
+    protocol        = "tcp"
+    description     = "Open the RDP port"
+    from_port       = 3389
+    to_port         = 3389
     security_groups = [module.bastion_linux.bastion_security_group]
   }
 
