@@ -53,7 +53,7 @@ resource "aws_instance" "infra1" {
   tags = merge(
     local.tags,
     {
-      Name = "infra2-${local.application_name}"
+      Name = "infra1-${local.application_name}"
     }
   )
 }
