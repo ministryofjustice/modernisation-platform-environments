@@ -458,7 +458,7 @@ resource "aws_security_group_rule" "db_bastion_ingress_rule" {
   to_port           = 1433
   protocol          = "tcp"
   security_group_id = aws_security_group.db.id
-  cidr_blocks       = ["${module.bastion_linux.bastion_private_ip}/32"]
+  security_groups   = [module.bastion_linux.bastion_security_group]
 }
 
 #------------------------------------------------------------------------------
