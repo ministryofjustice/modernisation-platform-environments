@@ -134,7 +134,8 @@ resource "aws_security_group" "db_mgmt_server_security_group" {
     description = "Open the RDP port"
     from_port   = 3389
     to_port     = 3389
-    #    cidr_blocks = ["${module.bastion_linux.bastion_private_ip}/32"]
+    # with bastion <2.0.2 we used cidr_blocks instead of security_groups:
+    # cidr_blocks = ["${module.bastion_linux.bastion_private_ip}/32"]
     security_groups = [module.bastion_linux.bastion_security_group]
   }
 
