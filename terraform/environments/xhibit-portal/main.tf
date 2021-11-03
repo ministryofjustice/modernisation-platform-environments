@@ -1,6 +1,6 @@
 module "vm-import" {
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-aws-vm-import"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-aws-vm-import?ref=initial-commit"
 
   bucket_prefix    = local.application_data.accounts[local.environment].bucket_prefix
   tags             = local.tags
