@@ -53,7 +53,7 @@ resource "aws_instance" "infra1" {
   tags = merge(
     local.tags,
     {
-      Name = "domaincontrollers-${local.application_name}"
+      Name = "infra2-${local.application_name}"
     }
   )
 }
@@ -95,7 +95,7 @@ resource "aws_instance" "infra2" {
   tags = merge(
     local.tags,
     {
-      Name = "importmachine-${local.application_name}"
+      Name = "infra2-${local.application_name}"
     }
   )
 }
