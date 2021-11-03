@@ -1,16 +1,10 @@
 {
     "accounts": {
         "development": {
-          "example_var": "dev-data"
-        },
-        "test": {
-          "example_var": "test-data"
-        },
-        "preproduction": {
-          "example_var": "preproduction-data"
+          "bucket_prefix": "vm-import-s3-bucket"
         },
         "production": {
-          "example_var": "production-data"
+          "bucket_prefix": "vm-import-s3-bucket"
         }
     }
 }
