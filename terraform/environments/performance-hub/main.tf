@@ -295,7 +295,7 @@ resource "aws_lb_listener" "https_listener" {
   load_balancer_arn = aws_lb.external.id
   port              = "443"
   protocol          = "HTTPS"
-  certificate_arn   = aws_acm_certificate.external.arn
+  certificate_arn   = local.app_data.accounts[local.environment].cert_arn
 
   default_action {
     target_group_arn = aws_lb_target_group.target_group.id
@@ -451,9 +451,9 @@ resource "aws_security_group_rule" "db_ecs_ingress_rule" {
 }
 
 resource "aws_security_group_rule" "db_bastion_ingress_rule" {
-  type              = "ingress"
-  description       = "Default SQL Server port 1433"
-  from_port         = 1433
+  type                     = "ingress"
+  description              = "Default SQL Server port 1433"
+  from_port                = 1433
   to_port                  = 1433
   protocol                 = "tcp"
   security_group_id        = aws_security_group.db.id
