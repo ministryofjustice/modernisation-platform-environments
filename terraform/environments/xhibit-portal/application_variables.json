@@ -1,10 +1,12 @@
 {
     "accounts": {
         "development": {
-          "bucket_prefix": "vm-import-s3-bucket"
+          "bucket_prefix":  "vm-import-s3-bucket",
+          "app-ami":        "ami-0a0502ffd782e9b12"
         },
         "production": {
-          "bucket_prefix": "vm-import-s3-bucket"
+          "bucket_prefix":  "vm-import-s3-bucket",
+          "app-ami" :       "ami-02e9a044a859f26b8"
         }
     }
 }
