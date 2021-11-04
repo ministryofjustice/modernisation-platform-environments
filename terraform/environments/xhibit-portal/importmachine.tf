@@ -1,12 +1,4 @@
 
-# get shared subnet-set private (az (a) subnet)
-data "aws_subnet" "private_az_a" {
-  # provider = aws.share-host
-  tags = {
-    Name = "${local.vpc_name}-${local.environment}-${local.subnet_set}-private-${local.region}a"
-  }
-}
-
 
 # Security Groups
 resource "aws_security_group" "importmachine" {
