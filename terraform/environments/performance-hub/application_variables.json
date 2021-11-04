@@ -24,6 +24,7 @@
           "friendly_name": "HMPPS Development Hub",
           "app_db_name": "NomsPMU",
           "memebership_db_name": "Membership",
+          "cert_arn": "arn:aws:acm:eu-west-2:938841708445:certificate/977c968e-1992-46a4-bfe8-e4043ab5a982",
           "hub_wwwroot": "C:\/inetpub\/wwwroot"
         },
         "preproduction": {
@@ -50,6 +51,7 @@
           "friendly_name": "HMPPS Test Hub",
           "app_db_name": "NomsPMU_Staging",
           "memebership_db_name": "Membership_Staging",
+          "cert_arn": "arn:aws:acm:eu-west-2:322518575883:certificate/006c900e-1628-4653-8502-4e2d44bfb606",
           "hub_wwwroot": "C:\/inetpub\/wwwroot"
         },
         "production": {
@@ -70,12 +72,13 @@
           "network_mode": "none",
           "db_instance_class": "db.m5.large",
           "db_user": "admin",
-          "db_snapshot_identifier": "arn:aws:rds:eu-west-2:322518575883:snapshot:performance-hub-initial",
+          "db_snapshot_identifier": "arn:aws:rds:eu-west-2:143664002102:snapshot:performance-hub-2021-10-26-03-16-encryption",
           "env_name": "production",
           "system_account_id": "B554E4A1-3171-43F5-AEC1-B1B4050BF071",
           "friendly_name": "HMPPS Performance Hub",
           "app_db_name": "NomsPMU_Live",
           "memebership_db_name": "Membership_Live",
+          "cert_arn": "arn:aws:acm:eu-west-2:143664002102:certificate/fe04b294-243f-4f83-af86-5d82e65cc553",
           "hub_wwwroot": "C:\/inetpub\/wwwroot"
         }
     }
