@@ -3,7 +3,7 @@
 # Security Groups
 resource "aws_security_group" "app-server" {
   description = "Domain traffic only"
-  name        = "domaincontrollers-${local.application_name}"
+  name        = "app-server-${local.application_name}"
   vpc_id      = local.vpc_id
 
   egress {
