@@ -1,16 +1,12 @@
 {
     "accounts": {
         "development": {
-          "example_var": "dev-data"
-        },
-        "test": {
-          "example_var": "test-data"
-        },
-        "preproduction": {
-          "example_var": "preproduction-data"
+          "bucket_prefix":  "vm-import-s3-bucket",
+          "app-ami":        "ami-0a0502ffd782e9b12"
         },
         "production": {
-          "example_var": "production-data"
+          "bucket_prefix":  "vm-import-s3-bucket",
+          "app-ami" :       "ami-02e9a044a859f26b8"
         }
     }
 }
