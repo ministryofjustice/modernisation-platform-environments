@@ -137,7 +137,7 @@ data "template_file" "task_definition" {
 
 module "windows-ecs" {
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs?ref=v1.0.3"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs?ref=v1.0.4"
 
   subnet_set_name         = local.subnet_set_name
   vpc_all                 = local.vpc_all
@@ -159,7 +159,6 @@ module "windows-ecs" {
   server_port             = local.app_data.accounts[local.environment].server_port
   app_count               = local.app_data.accounts[local.environment].app_count
   public_cidrs            = [data.aws_subnet.public_az_a.cidr_block, data.aws_subnet.public_az_b.cidr_block, data.aws_subnet.public_az_c.cidr_block]
-  bastion_cidr            = "${module.bastion_linux.bastion_private_ip}/32"
   ec2_ingress_rules       = local.ec2_ingress_rules
   tags_common             = local.tags
 
@@ -229,7 +228,7 @@ resource "aws_lb" "external" {
   #checkov:skip=CKV_AWS_91
   #checkov:skip=CKV_AWS_131
   #checkov:skip=CKV2_AWS_20
-  #checkov:skip=CKV2_AWS_28  
+  #checkov:skip=CKV2_AWS_28
   name                       = "${local.application_name}-loadbalancer"
   load_balancer_type         = "application"
   subnets                    = data.aws_subnet_ids.shared-public.ids
@@ -278,7 +277,7 @@ resource "aws_lb_target_group" "target_group" {
 #tfsec:ignore:AWS004
 resource "aws_lb_listener" "listener" {
   #checkov:skip=CKV_AWS_2
-  #checkov:skip=CKV_AWS_103  
+  #checkov:skip=CKV_AWS_103
   load_balancer_arn = aws_lb.external.id
   port              = local.app_data.accounts[local.environment].server_port
   protocol          = "HTTP"
@@ -290,7 +289,7 @@ resource "aws_lb_listener" "listener" {
 }
 
 resource "aws_lb_listener" "https_listener" {
-  #checkov:skip=CKV_AWS_103  
+  #checkov:skip=CKV_AWS_103
   depends_on = [aws_acm_certificate_validation.external]
 
   load_balancer_arn = aws_lb.external.id
@@ -452,13 +451,13 @@ resource "aws_security_group_rule" "db_ecs_ingress_rule" {
 }
 
 resource "aws_security_group_rule" "db_bastion_ingress_rule" {
-  type              = "ingress"
-  description       = "Default SQL Server port 1433"
-  from_port         = 1433
-  to_port           = 1433
-  protocol          = "tcp"
-  security_group_id = aws_security_group.db.id
-  cidr_blocks       = ["${module.bastion_linux.bastion_private_ip}/32"]
+  type                     = "ingress"
+  description              = "Default SQL Server port 1433"
+  from_port                = 1433
+  to_port                  = 1433
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.db.id
+  source_security_group_id = module.bastion_linux.bastion_security_group
 }
 
 #------------------------------------------------------------------------------
@@ -522,7 +521,7 @@ resource "aws_iam_policy" "s3_database_backups_policy" {
 {
   "Version": "2012-10-17",
   "Statement": [
-    { 
+    {
       "Effect": "Allow",
       "Action": [
         "kms:DescribeKey",
@@ -582,7 +581,7 @@ resource "aws_iam_role_policy_attachment" "s3_database_backups_attachment" {
 resource "aws_s3_bucket" "upload_files" {
   #checkov:skip=CKV_AWS_18
   #checkov:skip=CKV_AWS_144
-  #checkov:skip=CKV2_AWS_6  
+  #checkov:skip=CKV2_AWS_6
   bucket = "${local.application_name}-uploads-${local.environment}"
   acl    = "private"
 
@@ -784,7 +783,7 @@ resource "aws_kms_alias" "rds-kms-alias" {
 
 data "aws_iam_policy_document" "rds-kms" {
   #checkov:skip=CKV_AWS_111
-  #checkov:skip=CKV_AWS_109  
+  #checkov:skip=CKV_AWS_109
   statement {
     effect    = "Allow"
     actions   = ["kms:*"]

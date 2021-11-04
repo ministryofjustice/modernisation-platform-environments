@@ -5,11 +5,11 @@ resource "aws_instance" "db_mgmt_server" {
   ebs_optimized               = true
   iam_instance_profile        = aws_iam_instance_profile.db_mgmt_profile.name
   instance_type               = "t3.large"
-  key_name                    = local.app_data.accounts[local.environment].key_name
-  monitoring                  = true
-  subnet_id                   = data.aws_subnet.private_subnets_a.id
-  user_data                   = data.template_cloudinit_config.cloudinit-db-mgmt.rendered
-  vpc_security_group_ids      = [aws_security_group.db_mgmt_server_security_group.id, ]
+  #  key_name                    = local.app_data.accounts[local.environment].key_name
+  monitoring             = true
+  subnet_id              = data.aws_subnet.private_subnets_a.id
+  user_data              = data.template_cloudinit_config.cloudinit-db-mgmt.rendered
+  vpc_security_group_ids = [aws_security_group.db_mgmt_server_security_group.id, ]
 
   metadata_options {
     http_endpoint = "enabled"
@@ -130,10 +130,12 @@ resource "aws_security_group" "db_mgmt_server_security_group" {
   vpc_id      = data.aws_vpc.shared.id
 
   ingress {
-    protocol        = "tcp"
-    description     = "Open the RDP port"
-    from_port       = 3389
-    to_port         = 3389
+    protocol    = "tcp"
+    description = "Open the RDP port"
+    from_port   = 3389
+    to_port     = 3389
+    # with bastion <2.0.2 we used cidr_blocks instead of security_groups:
+    # cidr_blocks = ["${module.bastion_linux.bastion_private_ip}/32"]
     security_groups = [module.bastion_linux.bastion_security_group]
   }
 
