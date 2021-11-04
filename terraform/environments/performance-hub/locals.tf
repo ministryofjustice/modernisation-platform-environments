@@ -67,8 +67,8 @@ locals {
       from_port       = 3389
       to_port         = 3389
       protocol        = "tcp"
-      cidr_blocks     = ["${module.bastion_linux.bastion_private_ip}/32"]
-      security_groups = []
+      cidr_blocks     = []
+      security_groups = [module.bastion_linux.bastion_security_group]
     }
   }
 }
