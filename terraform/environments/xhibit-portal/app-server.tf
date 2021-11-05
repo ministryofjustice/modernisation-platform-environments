@@ -22,8 +22,6 @@ resource "aws_security_group" "app-server" {
     protocol    = "TCP"
     cidr_blocks = ["${module.bastion_linux.bastion_private_ip}/32"]
   }
-
-
 }
 
 
