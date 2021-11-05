@@ -29,7 +29,7 @@ resource "aws_security_group" "app-server" {
 
 resource "aws_instance" "app-server" {
   instance_type               = "t2.medium"
-  ami                         = local.application_data.accounts[local.environment].app-ami
+  ami                         = local.application_data.accounts[local.environment].suprig02-ami
   vpc_security_group_ids      = [aws_security_group.app-server.id]
   monitoring                  = false
   associate_public_ip_address = false

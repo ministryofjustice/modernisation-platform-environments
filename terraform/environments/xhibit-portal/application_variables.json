@@ -1,12 +1,30 @@
 {
-    "accounts": {
-        "development": {
-          "bucket_prefix":  "vm-import-s3-bucket",
-          "app-ami":        "ami-0a0502ffd782e9b12" 
-        },
-        "production": {
-          "bucket_prefix":  "vm-import-s3-bucket",
-          "app-ami" :       "ami-02e9a044a859f26b8"
-        }
+  "accounts": {
+    "development": {  
+      "bucket_prefix":    "vm-import-s3-bucket",
+      "infra1-ami" :      "ami-0a0502ffd782e9b12", 
+      "infra2-ami" :      "ami-0a0502ffd782e9b12", 
+      "infra6-ami" :      "ami-0a0502ffd782e9b12", 
+      "suprig01-ami" :    "ami-0a0502ffd782e9b12", 
+      "suprig01-ami" :    "ami-0a0502ffd782e9b12", 
+      "suprig02-ami" :    "ami-0a0502ffd782e9b12", 
+      "suprig02-ami" :    "ami-0a0502ffd782e9b12", 
+      "suprig03-ami" :    "ami-0a0502ffd782e9b12", 
+      "suprig05-ami" :    "ami-0a0502ffd782e9b12", 
+      "XHBPRESMS01-ami":  "ami-0a0502ffd782e9b12" 
+    },
+    "production": {
+      "bucket_prefix":    "vm-import-s3-bucket",
+      "infra1-ami" :      "ami-0c0151248203d7b48",
+      "infra2-ami" :      "ami-0d3009b2fe8a1bc25",
+      "infra6-ami" :      "ami-0a7d742e0545c8077",
+      "suprig01-ami" :    "ami-006c2806cf7987d30",
+      "suprig01-ami" :    "ami-0a7a63dd625a0e05a",
+      "suprig02-ami" :    "ami-08fb3b3e3d6516df2",
+      "suprig02-ami" :    "ami-09bbf4ce843757779",
+      "suprig03-ami" :    "ami-023cbf3dcecc9e68c",
+      "suprig05-ami" :    "ami-0491073c200a246e1",
+      "XHBPRESMS01-ami":  "ami-0e88b3a7df63e7ebb"                  
     }
+  }
 }

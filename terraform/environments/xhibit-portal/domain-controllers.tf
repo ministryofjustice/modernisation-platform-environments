@@ -28,7 +28,7 @@ resource "aws_security_group" "domain-controllers" {
 
 resource "aws_instance" "infra1" {
   instance_type               = "t3.small"
-  ami                         = "ami-0a0502ffd782e9b12"
+  ami                         = local.application_data.accounts[local.environment].infra1-ami
   vpc_security_group_ids      = [aws_security_group.domain-controllers.id]
   monitoring                  = false
   associate_public_ip_address = false
@@ -91,7 +91,7 @@ resource "aws_volume_attachment" "infra1-disk1" {
 
 resource "aws_instance" "infra2" {
   instance_type               = "t3.small"
-  ami                         = "ami-0a0502ffd782e9b12"
+  ami                         = local.application_data.accounts[local.environment].infra2-ami
   vpc_security_group_ids      = [aws_security_group.domain-controllers.id]
   monitoring                  = false
   associate_public_ip_address = false
