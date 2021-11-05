@@ -1,3 +1,12 @@
+data "aws_caller_identity" "current" {}
+
+data "aws_subnet" "private_subnets_a" {
+  vpc_id = data.aws_vpc.shared.id
+  tags = {
+    "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-private-${local.app_data.accounts[local.environment].region}a"
+  }
+}
+
 variable "region" {
   type        = string
   description = ""
