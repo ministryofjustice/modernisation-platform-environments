@@ -75,7 +75,7 @@
           "db_instance_class": "db.m5.large",
           "db_user": "admin",
           "db_allocated_storage": "400",
-          "db_snapshot_identifier": "arn:aws:rds:eu-west-2:143664002102:snapshot:performance-hub-2021-10-26-03-16-encryption",
+          "db_snapshot_identifier": "arn:aws:rds:eu-west-2:143664002102:snapshot:performance-hub-2021-11-04-14-21-encrypted",
           "env_name": "production",
           "system_account_id": "B554E4A1-3171-43F5-AEC1-B1B4050BF071",
           "friendly_name": "HMPPS Performance Hub",

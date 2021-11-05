@@ -383,6 +383,10 @@ resource "aws_db_instance" "database" {
   #   update = "80m"
   # }
 
+  lifecycle {
+    prevent_destroy = true
+  }
+
   tags = merge(
     local.tags,
     {
