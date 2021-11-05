@@ -72,7 +72,7 @@ resource "aws_ebs_volume" "infra1-disk1" {
   type              = "gp2"
   encrypted         = true
 
-  snapshot_id = local.application_data.accounts[local.environment].suprig02-ami
+  snapshot_id = local.application_data.accounts[local.environment].infra1-disk-1-snapshot
 
   tags = merge(
     local.tags,
