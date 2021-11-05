@@ -67,6 +67,27 @@ resource "aws_instance" "infra1" {
   )
 }
 
+resource "aws_ebs_volume" "infra1-disk1" {
+  availability_zone = "${local.region}a"
+  type              = "gp2"
+  encrypted         = true
+
+  snapshot_id = "snap-08507bf59326a5879"
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "infra1-disk1-${local.application_name}"
+    }
+  )
+}
+
+resource "aws_volume_attachment" "infra1-disk1" {
+  device_name = "infra1-disk1"
+  volume_id   = aws_ebs_volume.infra1-disk1.id
+  instance_id = aws_instance.infra1.id
+}
+
 
 resource "aws_instance" "infra2" {
   instance_type               = "t3.small"
