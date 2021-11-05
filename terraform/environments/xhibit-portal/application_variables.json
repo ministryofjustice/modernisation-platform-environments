@@ -21,7 +21,7 @@
       "suprig01-disk-1-snapshot"      : "snap-08faed719f2040610",  
       "infra1-disk-1-snapshot"        : "snap-08faed719f2040610",  
       "suprig05-disk-1-snapshot"      : "snap-08faed719f2040610",  
-      "suprig01-disk-3-snapshot"      : "snap-08faed719f2040610", 
+      "suprig01-disk-3-snapshot"      : "snap-08faed719f2040610"
 
     },
     "production": {
