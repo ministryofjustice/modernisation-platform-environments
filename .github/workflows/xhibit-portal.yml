@@ -2,8 +2,8 @@
 name: xhibit-portal
 on:
   push:
-    branches: 
-      - main
+    branches:
+      - "*"
     paths:
       - 'terraform/environments/xhibit-portal/**'
       - '.github/workflows/xhibit-portal.yml'
@@ -24,7 +24,7 @@ defaults:
     shell: bash
 
 jobs:
-  
+
   # These jobs run when creating a pull request
   plan-development:
     name: Plan Development - xhibit-portal
@@ -158,7 +158,7 @@ jobs:
   #         bash scripts/terraform-apply.sh terraform/environments/xhibit-portal
   #       env:
   #         TF_ENV: preproduction
-  
+
   plan-production:
     name: Plan Production - xhibit-portal
     runs-on: ubuntu-latest
