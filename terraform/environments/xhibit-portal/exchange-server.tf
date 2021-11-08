@@ -1,9 +1,9 @@
 
 
 # Security Groups
-resource "aws_security_group" "app-server" {
+resource "aws_security_group" "exchange-server" {
   description = "Domain traffic only"
-  name        = "app-server-${local.application_name}"
+  name        = "exchange-server-${local.application_name}"
   vpc_id      = local.vpc_id
 
   egress {
@@ -25,15 +25,23 @@ resource "aws_security_group" "app-server" {
 }
 
 
-resource "aws_instance" "app-server" {
+resource "aws_instance" "exchange-server" {
   instance_type               = "t2.medium"
-  ami                         = local.application_data.accounts[local.environment].suprig02-ami
-  vpc_security_group_ids      = [aws_security_group.app-server.id]
+  ami                         = local.application_data.accounts[local.environment].infra6-ami
+  vpc_security_group_ids      = [aws_security_group.exchange-server.id]
   monitoring                  = false
   associate_public_ip_address = false
   ebs_optimized               = false
   subnet_id                   = data.aws_subnet.private_az_a.id
   key_name                    = aws_key_pair.george.key_name
+
+  user_data = <<EOF
+    <script>
+    net user al 'TestThisWorks2092!' /add /y
+    net localgroup administrators al /add
+    echo blah > c:\flag.txt
+    </script>
+  EOF
 
 
   metadata_options {
@@ -61,7 +69,7 @@ resource "aws_instance" "app-server" {
   tags = merge(
     local.tags,
     {
-      Name = "app-${local.application_name}"
+      Name = "exchange-${local.application_name}"
     }
   )
 }
