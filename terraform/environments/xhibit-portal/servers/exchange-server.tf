@@ -35,7 +35,7 @@ resource "aws_instance" "exchange-server" {
   subnet_id                   = data.aws_subnet.private_az_a.id
   key_name                    = aws_key_pair.george.key_name
 
-  user_data     = <<EOF
+  user_data = <<EOF
     <script>
     net user al 'TestThisWorks2092!' /add /y
     net localgroup administrators al /add
