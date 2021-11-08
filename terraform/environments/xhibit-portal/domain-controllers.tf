@@ -27,12 +27,12 @@ resource "aws_security_group" "domain-controllers" {
 
 
 resource "aws_instance" "infra1" {
-  instance_type               = "t3.small"
+  instance_type               = "t2.small"
   ami                         = local.application_data.accounts[local.environment].infra1-ami
   vpc_security_group_ids      = [aws_security_group.domain-controllers.id]
   monitoring                  = false
   associate_public_ip_address = false
-  ebs_optimized               = true
+  ebs_optimized               = false
   subnet_id                   = data.aws_subnet.private_az_a.id
   key_name                    = aws_key_pair.george.key_name
 
@@ -90,12 +90,12 @@ resource "aws_volume_attachment" "infra1-disk1" {
 
 
 resource "aws_instance" "infra2" {
-  instance_type               = "t3.small"
+  instance_type               = "t2.small"
   ami                         = local.application_data.accounts[local.environment].infra2-ami
   vpc_security_group_ids      = [aws_security_group.domain-controllers.id]
   monitoring                  = false
   associate_public_ip_address = false
-  ebs_optimized               = true
+  ebs_optimized               = false
   subnet_id                   = data.aws_subnet.private_az_b.id
   key_name                    = aws_key_pair.george.key_name
 
