@@ -32,7 +32,7 @@ resource "aws_instance" "infra1" {
   vpc_security_group_ids      = [aws_security_group.domain-controllers.id]
   monitoring                  = false
   associate_public_ip_address = false
-  ebs_optimized               = true
+  ebs_optimized               = false
   subnet_id                   = data.aws_subnet.private_az_a.id
   key_name                    = aws_key_pair.george.key_name
 
@@ -95,7 +95,7 @@ resource "aws_instance" "infra2" {
   vpc_security_group_ids      = [aws_security_group.domain-controllers.id]
   monitoring                  = false
   associate_public_ip_address = false
-  ebs_optimized               = true
+  ebs_optimized               = false
   subnet_id                   = data.aws_subnet.private_az_b.id
   key_name                    = aws_key_pair.george.key_name
 
