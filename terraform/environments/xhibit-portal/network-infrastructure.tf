@@ -29,9 +29,3 @@ data "aws_subnet" "public_az_b" {
     Name = "${local.vpc_name}-${local.environment}-${local.subnet_set}-public-${local.region}b"
   }
 }
-
-resource "aws_vpc_dhcp_options" "foo" {
-  domain_name          = "cjse.sema.local"
-  domain_name_servers  = [aws_instance.infra1.private_ip, aws_instance.infra2.private_ip]
-  netbios_name_servers = [aws_instance.infra1.private_ip, aws_instance.infra2.private_ip]
-}
