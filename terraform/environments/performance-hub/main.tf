@@ -234,7 +234,7 @@ resource "aws_lb" "external" {
   subnets                    = data.aws_subnet_ids.shared-public.ids
   enable_deletion_protection = true
   # allow 60*4 seconds before 504 gateway timeout for long-running DB operations
-  idle_timeout               = 240
+  idle_timeout = 240
 
   security_groups = [aws_security_group.load_balancer_security_group.id]
 
