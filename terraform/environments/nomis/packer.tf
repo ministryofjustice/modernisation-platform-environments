@@ -131,7 +131,7 @@ data "aws_iam_policy_document" "packer_minimum_permissions" {
     condition {
       test     = "StringLike"
       variable = "ec2:ResourceTag/creator"
-      values   = ["Packer","packer","ansible"]
+      values   = ["Packer", "packer", "ansible"]
     }
   }
   statement {
