@@ -190,7 +190,7 @@ data "aws_iam_policy_document" "packer_ansible_permissions" {
     effect = "Allow"
     actions = [
       "ec2:DescribeInstanceAttribute",
-      "DescribeIamInstanceProfileAssociations",
+      "ec2:DescribeIamInstanceProfileAssociations",
     ]
     resources = ["*"]
   }
