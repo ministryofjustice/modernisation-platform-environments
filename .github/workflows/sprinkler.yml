@@ -159,46 +159,46 @@ jobs:
   #       env:
   #         TF_ENV: preproduction
 
-  plan-production:
-    name: Plan Production - sprinkler
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2.3.4
-      - name: Load and Configure Terraform
-        uses: hashicorp/setup-terraform@v1.3.2
-        with:
-          terraform_version: 1.0.1
-          terraform_wrapper: false
-      - name: Terraform plan - production
-        run: |
-          echo "Terraform plan - ${TF_ENV}"
-          bash scripts/terraform-init.sh terraform/environments/sprinkler
-          terraform -chdir="terraform/environments/sprinkler" workspace select "sprinkler-${TF_ENV}"
-          bash scripts/terraform-plan.sh terraform/environments/sprinkler
-        env:
-          TF_ENV: production
+  # plan-production:
+  #   name: Plan Production - sprinkler
+  #   runs-on: ubuntu-latest
+  #   if: github.ref == 'refs/heads/main'
+  #   steps:
+  #     - name: Checkout Repository
+  #       uses: actions/checkout@v2.3.4
+  #     - name: Load and Configure Terraform
+  #       uses: hashicorp/setup-terraform@v1.3.2
+  #       with:
+  #         terraform_version: 1.0.1
+  #         terraform_wrapper: false
+  #     - name: Terraform plan - production
+  #       run: |
+  #         echo "Terraform plan - ${TF_ENV}"
+  #         bash scripts/terraform-init.sh terraform/environments/sprinkler
+  #         terraform -chdir="terraform/environments/sprinkler" workspace select "sprinkler-${TF_ENV}"
+  #         bash scripts/terraform-plan.sh terraform/environments/sprinkler
+  #       env:
+  #         TF_ENV: production
 
-  deploy-production:
-    name: Deploy Production - sprinkler
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    environment:
-      name: sprinkler-production
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2.3.4
-      - name: Load and Configure Terraform
-        uses: hashicorp/setup-terraform@v1.3.2
-        with:
-          terraform_version: 1.0.1
-          terraform_wrapper: false
-      - name: Terraform apply - production
-        run: |
-          echo "Terraform apply - ${TF_ENV}"
-          bash scripts/terraform-init.sh terraform/environments/sprinkler
-          terraform -chdir="terraform/environments/sprinkler" workspace select "sprinkler-${TF_ENV}"
-          bash scripts/terraform-apply.sh terraform/environments/sprinkler
-        env:
-          TF_ENV: production
+  # deploy-production:
+  #   name: Deploy Production - sprinkler
+  #   runs-on: ubuntu-latest
+  #   if: github.ref == 'refs/heads/main'
+  #   environment:
+  #     name: sprinkler-production
+  #   steps:
+  #     - name: Checkout Repository
+  #       uses: actions/checkout@v2.3.4
+  #     - name: Load and Configure Terraform
+  #       uses: hashicorp/setup-terraform@v1.3.2
+  #       with:
+  #         terraform_version: 1.0.1
+  #         terraform_wrapper: false
+  #     - name: Terraform apply - production
+  #       run: |
+  #         echo "Terraform apply - ${TF_ENV}"
+  #         bash scripts/terraform-init.sh terraform/environments/sprinkler
+  #         terraform -chdir="terraform/environments/sprinkler" workspace select "sprinkler-${TF_ENV}"
+  #         bash scripts/terraform-apply.sh terraform/environments/sprinkler
+  #       env:
+  #         TF_ENV: production
