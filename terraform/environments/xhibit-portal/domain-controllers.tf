@@ -163,11 +163,11 @@ resource "aws_route53_resolver_endpoint" "cjse-domain" {
   ]
 
   ip_address {
-    subnet_id = data.aws_subnet.private_az_a 
+    subnet_id = data.aws_subnet.private_az_a.id
   }
 
   ip_address {
-    subnet_id = data.aws_subnet.private_az_b
+    subnet_id = data.aws_subnet.private_az_b.id
   }
 
   tags = {
