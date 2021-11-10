@@ -137,19 +137,19 @@ resource "aws_security_group" "outbound-dns-resolver" {
   vpc_id      = local.vpc_id
 
   egress {
-    description      = "allow DNS"
-    from_port        = 0
-    to_port          = 53
-    protocol         = "TCP"
-    security_groups  = [ aws_security_group.domain-controllers.id ]
+    description     = "allow DNS"
+    from_port       = 0
+    to_port         = 53
+    protocol        = "TCP"
+    security_groups = [aws_security_group.domain-controllers.id]
   }
 
   egress {
-    description      = "allow DNS"
-    from_port        = 0
-    to_port          = 53
-    protocol         = "UDP"
-    security_groups  = [ aws_security_group.domain-controllers.id ]
+    description     = "allow DNS"
+    from_port       = 0
+    to_port         = 53
+    protocol        = "UDP"
+    security_groups = [aws_security_group.domain-controllers.id]
   }
 
 }
@@ -159,7 +159,7 @@ resource "aws_route53_resolver_endpoint" "cjse-domain" {
   direction = "OUTBOUND"
 
   security_group_ids = [
-    aws_security_group.domain-controllers.id 
+    aws_security_group.domain-controllers.id
   ]
 
   ip_address {
