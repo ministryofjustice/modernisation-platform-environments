@@ -101,6 +101,7 @@ data "aws_iam_policy_document" "packer_minimum_permissions" {
       "ec2:DeregisterImage", # unfortunately Packer does not tag intermediate images it creates
       "ec2:DescribeImageAttribute",
       "ec2:DescribeImages",
+      "ec2:DescribeInstanceAttribute",
       "ec2:DescribeInstances",
       "ec2:DescribeInstanceStatus",
       "ec2:DescribeRegions",
