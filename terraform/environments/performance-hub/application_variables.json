@@ -18,6 +18,7 @@
           "network_mode": "none",
           "db_instance_class": "db.m5.large",
           "db_user": "admin",
+          "db_allocated_storage": "100",
           "db_snapshot_identifier": "arn:aws:rds:eu-west-2:938841708445:snapshot:performance-hub-withencryption-21102021",
           "env_name": "development",
           "system_account_id": "C67AF61C-F010-4C37-8912-99308FD03241",
@@ -45,6 +46,7 @@
           "network_mode": "none",
           "db_instance_class": "db.m5.large",
           "db_user": "admin",
+          "db_allocated_storage": "100",
           "db_snapshot_identifier": "arn:aws:rds:eu-west-2:322518575883:snapshot:performance-hub-withencryption-21102021",
           "env_name": "preproduction",
           "system_account_id": "C67AF61C-F010-4C37-8912-99308FD03241",
@@ -72,13 +74,14 @@
           "network_mode": "none",
           "db_instance_class": "db.m5.large",
           "db_user": "admin",
-          "db_snapshot_identifier": "arn:aws:rds:eu-west-2:143664002102:snapshot:performance-hub-2021-10-26-03-16-encryption",
+          "db_allocated_storage": "400",
+          "db_snapshot_identifier": "arn:aws:rds:eu-west-2:143664002102:snapshot:performance-hub-2021-11-04-14-21-encrypted",
           "env_name": "production",
           "system_account_id": "B554E4A1-3171-43F5-AEC1-B1B4050BF071",
           "friendly_name": "HMPPS Performance Hub",
           "app_db_name": "NomsPMU_Live",
           "memebership_db_name": "Membership_Live",
-          "cert_arn": "arn:aws:acm:eu-west-2:143664002102:certificate/fe04b294-243f-4f83-af86-5d82e65cc553",
+          "cert_arn": "arn:aws:acm:eu-west-2:143664002102:certificate/437a7b82-406c-42ef-94da-a5bae3f51bd5",
           "hub_wwwroot": "C:\/inetpub\/wwwroot"
         }
     }
