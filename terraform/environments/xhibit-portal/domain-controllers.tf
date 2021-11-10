@@ -129,3 +129,63 @@ resource "aws_instance" "infra2" {
     }
   )
 }
+
+# Security Groups
+resource "aws_security_group" "outbound-dns-resolver" {
+  description = "DNS traffic only"
+  name        = "outbound-dns-resolver-${local.application_name}"
+  vpc_id      = local.vpc_id
+
+  egress {
+    description      = "allow DNS"
+    from_port        = 0
+    to_port          = 53
+    protocol         = "TCP"
+    security_groups  = [ aws_security_group.domain-controllers.id ]
+  }
+
+  egress {
+    description      = "allow DNS"
+    from_port        = 0
+    to_port          = 53
+    protocol         = "UDP"
+    security_groups  = [ aws_security_group.domain-controllers.id ]
+  }
+
+}
+
+resource "aws_route53_resolver_endpoint" "cjse-domain" {
+  name      = "cjse-sema-local"
+  direction = "OUTBOUND"
+
+  security_group_ids = [
+    aws_security_group.domain-controllers.id 
+  ]
+
+  ip_address {
+    subnet_id = aws_subnet.private_az_a 
+  }
+
+  ip_address {
+    subnet_id = aws_subnet.private_az_b
+  }
+
+  tags = {
+    Name = "cjse-sema-local-${local.application_name}-${local.environment}"
+  }
+}
+
+resource "aws_route53_resolver_rule" "fwd" {
+  domain_name          = "cjse.sema.local"
+  name                 = "cjse-sema-local"
+  rule_type            = "FORWARD"
+  resolver_endpoint_id = aws_route53_resolver_endpoint.cjse-domain.id
+
+  target_ip {
+    ip = aws_instance.infra1.private_ip
+  }
+
+  target_ip {
+    ip = aws_instance.infra2.private_ip
+  }
+}
