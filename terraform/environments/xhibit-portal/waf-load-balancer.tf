@@ -31,7 +31,7 @@ data "aws_subnet_ids" "shared-public" {
 }
 
 resource "aws_lb" "waf_lb" {
-  name                       = "waf_lb-${var.networking[0].application}"
+  name                       = "waf-lb-${var.networking[0].application}"
   internal                   = false
   load_balancer_type         = "application"
   security_groups            = [aws_security_group.waf_lb_sg.id]
@@ -41,13 +41,13 @@ resource "aws_lb" "waf_lb" {
   tags = merge(
     local.tags,
     {
-      Name = "waf_lb-${var.networking[0].application}"
+      Name = "waf-lb-${var.networking[0].application}"
     },
   )
 }
 
 resource "aws_lb_target_group" "waf_lb_tg" {
-  name                 = "waf_lb_tg-${var.networking[0].application}"
+  name                 = "waf-lb-tg-${var.networking[0].application}"
   port                 = 80
   protocol             = "HTTP"
   target_type          = "ip"
@@ -57,7 +57,7 @@ resource "aws_lb_target_group" "waf_lb_tg" {
   tags = merge(
     local.tags,
     {
-      Name = "waf_lb_tg-${var.networking[0].application}"
+      Name = "waf-lb_-g-${var.networking[0].application}"
     },
   )
 }
@@ -138,7 +138,7 @@ resource "aws_acm_certificate_validation" "waf_lb_cert_validation" {
 }
 
 resource "aws_wafv2_web_acl" "waf_acl" {
-  name        = "waf_acl"
+  name        = "waf-acl"
   description = "WAF for Xhibit Portal."
   scope       = "REGIONAL"
 
@@ -185,7 +185,7 @@ resource "aws_wafv2_web_acl" "waf_acl" {
   tags = merge(
     local.tags,
     {
-      Name = "waf_acl-${var.networking[0].application}"
+      Name = "waf-acl-${var.networking[0].application}"
     },
   )
 
