@@ -233,6 +233,8 @@ resource "aws_lb" "external" {
   load_balancer_type         = "application"
   subnets                    = data.aws_subnet_ids.shared-public.ids
   enable_deletion_protection = true
+  # allow 60*4 seconds before 504 gateway timeout for long-running DB operations
+  idle_timeout = 240
 
   security_groups = [aws_security_group.load_balancer_security_group.id]
 
@@ -354,7 +356,7 @@ resource "aws_db_instance" "database" {
   #checkov:skip=CKV_AWS_118
   #checkov:skip=CKV_AWS_157
   identifier                          = local.application_name
-  allocated_storage                   = 100
+  allocated_storage                   = local.app_data.accounts[local.environment].db_allocated_storage
   storage_type                        = "gp2"
   engine                              = "sqlserver-se"
   engine_version                      = "15.00.4073.23.v1"
@@ -382,6 +384,10 @@ resource "aws_db_instance" "database" {
   #   delete = "40m"
   #   update = "80m"
   # }
+
+  lifecycle {
+    prevent_destroy = true
+  }
 
   tags = merge(
     local.tags,
