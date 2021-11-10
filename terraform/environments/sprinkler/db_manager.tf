@@ -38,7 +38,7 @@ resource "aws_instance" "db_mgmt_server" {
   tags = merge(
     local.tags,
     {
-      Name = "${local.application_name}-db-mgmt-server",
+      Name        = "${local.application_name}-db-mgmt-server",
       stop_nights = "ec2"
     }
   )
