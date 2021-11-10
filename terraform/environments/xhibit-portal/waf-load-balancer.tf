@@ -49,7 +49,7 @@ resource "aws_lb" "waf_lb" {
 resource "aws_lb_target_group" "waf_lb_tg" {
   name                 = "waf_lb_tg-${var.networking[0].application}"
   port                 = 80
-  protocol             = "http"
+  protocol             = "HTTP"
   target_type          = "ip"
   deregistration_delay = "30"
   vpc_id               = locals.vpc_id
