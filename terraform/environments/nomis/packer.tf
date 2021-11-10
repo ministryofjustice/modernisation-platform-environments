@@ -101,7 +101,6 @@ data "aws_iam_policy_document" "packer_minimum_permissions" {
       "ec2:DeregisterImage", # unfortunately Packer does not tag intermediate images it creates
       "ec2:DescribeImageAttribute",
       "ec2:DescribeImages",
-      "ec2:DescribeInstanceAttribute",
       "ec2:DescribeInstances",
       "ec2:DescribeInstanceStatus",
       "ec2:DescribeRegions",
@@ -184,11 +183,25 @@ data "aws_iam_policy_document" "packer_ssm_permissions" {
   }
 }
 
+# some extra permissions required for Ansible ec2 module
+# it might be an idea to create another role for Ansible instead
+data "aws_iam_policy_document" "packer_ansible_permissions" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "ec2:DescribeInstanceAttribute",
+      "DescribeIamInstanceProfileAssociations",
+    ]
+    resources = ["*"]
+  }
+}
+
 # combine policy json
 data "aws_iam_policy_document" "packer_combined" {
   source_policy_documents = [
     data.aws_iam_policy_document.packer_minimum_permissions.json,
-    data.aws_iam_policy_document.packer_ssm_permissions.json
+    data.aws_iam_policy_document.packer_ssm_permissions.json,
+    data.aws_iam_policy_document.packer_ansible_permissions.json
   ]
 }
 # attach policy to role inline
