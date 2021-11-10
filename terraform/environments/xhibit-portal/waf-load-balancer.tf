@@ -1,7 +1,7 @@
 resource "aws_security_group" "waf_lb_sg" {
   description = "Security group for app load balancer, simply to implement ACL rules for the WAF"
   name        = "waf-lb-sg-${var.networking[0].application}"
-  vpc_id      = locals.vpc_id
+  vpc_id      = local.vpc_id
 
   ingress {
     description      = "allow all"
@@ -24,7 +24,7 @@ resource "aws_security_group" "waf_lb_sg" {
 }
 
 data "aws_subnet_ids" "shared-public" {
-  vpc_id = locals.vpc_id
+  vpc_id = local.vpc_id
   tags = {
     "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public*"
   }
@@ -52,7 +52,7 @@ resource "aws_lb_target_group" "waf_lb_tg" {
   protocol             = "HTTP"
   target_type          = "ip"
   deregistration_delay = "30"
-  vpc_id               = locals.vpc_id
+  vpc_id               = local.vpc_id
 
   tags = merge(
     local.tags,
