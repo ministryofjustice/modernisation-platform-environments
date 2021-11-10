@@ -129,7 +129,7 @@ data "aws_iam_policy_document" "packer_minimum_permissions" {
     ]
     resources = ["*"]
     condition {
-      test     = "StringEquals"
+      test     = "StringEqualsIgnoreCase"
       variable = "ec2:ResourceTag/creator"
       values   = ["Packer"]
     }
