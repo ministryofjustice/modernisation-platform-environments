@@ -110,7 +110,8 @@ data "aws_iam_policy_document" "packer_minimum_permissions" {
       "ec2:DescribeTags",
       "ec2:DescribeVolumes",
       "ec2:RegisterImage",
-      "ec2:RunInstances"
+      "ec2:RunInstances",
+      "ec2:DeleteSecurityGroup"
     ]
     resources = ["*"]
   }
@@ -138,11 +139,6 @@ data "aws_iam_policy_document" "packer_minimum_permissions" {
     effect    = "Allow"
     actions   = ["ec2:DeleteKeyPair"]
     resources = ["*"]
-    condition {
-      test     = "StringLike"
-      variable = "ec2:KeyPairName"
-      values   = ["packer_*"]
-    }
   }
 }
 
