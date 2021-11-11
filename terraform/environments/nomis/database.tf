@@ -12,10 +12,10 @@ resource "aws_security_group" "db_server" {
   vpc_id      = local.vpc_id
 
   ingress {
-    description = "SSH from Bastion"
-    from_port   = "22"
-    to_port     = "22"
-    protocol    = "TCP"
+    description     = "SSH from Bastion"
+    from_port       = "22"
+    to_port         = "22"
+    protocol        = "TCP"
     security_groups = [module.bastion_linux.bastion_security_group]
   }
 
