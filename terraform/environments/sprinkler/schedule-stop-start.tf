@@ -20,7 +20,7 @@ module "stop_ec2_instance_nights" {
 module "start_ec2_instance_mornings" {
   source                         = "github.com/diodonfrost/terraform-aws-lambda-scheduler-stop-start?ref=3.1.3"
   name                           = "start_ec2_instance_mornings"
-  cloudwatch_schedule_expression = "cron(0/6 * * * ? *)" # "cron(0 8 ? * MON *)" # Every Monday at 8:00 GMT
+  cloudwatch_schedule_expression = "cron(0/3 * * * ? *)" # "cron(0 8 ? * MON *)" # Every Monday at 8:00 GMT
   schedule_action                = "start"
   autoscaling_schedule           = "false"
   ec2_schedule                   = "true"
