@@ -16,7 +16,7 @@ resource "aws_security_group" "db_server" {
     from_port   = "22"
     to_port     = "22"
     protocol    = "TCP"
-    cidr_blocks = ["${module.bastion_linux.bastion_private_ip}/32"]
+    security_groups = [module.bastion_linux.bastion_security_group]
   }
 
   ingress {
