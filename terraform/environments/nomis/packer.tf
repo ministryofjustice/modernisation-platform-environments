@@ -95,7 +95,6 @@ data "aws_iam_policy_document" "packer_minimum_permissions" {
       "ec2:CreateImage",
       "ec2:CreateKeypair",
       "ec2:CreateSnapshot",
-      "ec2:CreateTags",
       "ec2:CreateVolume",
       "ec2:DeleteSnapshot",  # unfortunately Packer does not tag intermediate snapshots it creates
       "ec2:DeregisterImage", # unfortunately Packer does not tag intermediate images it creates
@@ -142,6 +141,17 @@ data "aws_iam_policy_document" "packer_minimum_permissions" {
       test     = "StringLike"
       variable = "ec2:KeyPairName"
       values   = ["packer_*"]
+    }
+  }
+
+  statement {
+    effect    = "Allow"
+    actions   = ["ec2:CreateTags"]
+    resources = ["*"]
+    condition { # only allow tagging of resources on creation
+      test     = "StringLike"
+      variable = "ec2:CreateAction"
+      values   = ["*"]
     }
   }
 }
