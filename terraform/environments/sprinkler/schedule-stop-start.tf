@@ -11,7 +11,6 @@ module "stop_ec2_instance_nights" {
   spot_schedule                  = "terminate"
   ec2_schedule                   = "true"
   rds_schedule                   = "false"
-  cloudwatch_alarm_schedule      = "false"
   event_rule_enabled             = "false"
   scheduler_tag = {
     key   = "stop_nights"
@@ -28,7 +27,6 @@ module "start_ec2_instance_mornings" {
   spot_schedule                  = "false"
   ec2_schedule                   = "true"
   rds_schedule                   = "false"
-  cloudwatch_alarm_schedule      = "false"
   event_rule_enabled             = "false"
   scheduler_tag = {
     key   = "stop_nights"
