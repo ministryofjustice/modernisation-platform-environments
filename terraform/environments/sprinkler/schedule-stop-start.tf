@@ -15,7 +15,7 @@ module "stop_ec2_instance_nights" {
   event_rule_enabled             = "false"
   scheduler_tag                  = {
     key   = "stop_nights"
-    value = "ec2"
+    value = "true"
   }
 }
 
@@ -32,7 +32,7 @@ module "start_ec2_instance_mornings" {
   event_rule_enabled             = "false"
   scheduler_tag                  = {
     key   = "stop_nights"
-    value = "ec2"
+    value = "true"
   }
 }
 

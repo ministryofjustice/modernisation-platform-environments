@@ -39,7 +39,7 @@ resource "aws_instance" "db_mgmt_server" {
     local.tags,
     {
       Name        = "${local.application_name}-db-mgmt-server",
-      stop_nights = "ec2"
+      stop_nights = "true"
     }
   )
 }
