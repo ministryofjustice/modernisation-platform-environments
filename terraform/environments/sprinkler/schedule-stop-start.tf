@@ -39,7 +39,7 @@ module "start_ec2_instance_mornings" {
 resource "aws_kms_grant" "stop_start_scheduler" {
   key_id            = aws_kms_key.ebs.id
   grantee_principal = module.start_ec2_instance_mornings.lambda_iam_role_arn
-  operations        = [
+  operations = [
     "Decrypt",
     "DescribeKey",
     "CreateGrant"
