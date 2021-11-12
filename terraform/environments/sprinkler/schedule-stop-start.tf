@@ -13,16 +13,17 @@ module "stop_ec2_instance_nights" {
   rds_schedule                   = "false"
   event_rule_enabled             = "false"
   environment_name               = terraform.workspace
-  scheduler_tag = {
+  scheduler_tag                  = {
     key   = "stop_nights"
     value = "true"
   }
-  tags = merge(
-    local.tags,
-    {
-      Name = "stop_ec2_instance_nights-${var.networking[0].application}"
-    }
+  tags                           = merge(
+  local.tags,
+  {
+    Name = "stop_ec2_instance_nights-${var.networking[0].application}"
+  }
   )
+  remote_state_bucket_name       = data.terraform_remote_state.core_network_services.id
 }
 
 module "start_ec2_instance_mornings" {
@@ -36,22 +37,23 @@ module "start_ec2_instance_mornings" {
   rds_schedule                   = "false"
   event_rule_enabled             = "false"
   environment_name               = terraform.workspace
-  scheduler_tag = {
+  scheduler_tag                  = {
     key   = "stop_nights"
     value = "true"
   }
-  tags = merge(
-    local.tags,
-    {
-      Name = "start_ec2_instance_mornings-${var.networking[0].application}"
-    }
+  tags                           = merge(
+  local.tags,
+  {
+    Name = "start_ec2_instance_mornings-${var.networking[0].application}"
+  }
   )
+  remote_state_bucket_name       = data.terraform_remote_state.core_network_services.id
 }
 
 resource "aws_kms_grant" "stop_start_scheduler" {
   key_id            = aws_kms_key.ebs.id
   grantee_principal = module.start_ec2_instance_mornings.lambda_iam_role_arn
-  operations = [
+  operations        = [
     "Decrypt",
     "DescribeKey",
     "CreateGrant"
