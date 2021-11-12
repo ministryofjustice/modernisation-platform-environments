@@ -153,12 +153,12 @@ data "aws_iam_policy_document" "packer_minimum_permissions" {
       variable = "ec2:CreateAction"
       values = [
         "RunInstances",
-        "ec2:CopyImage",
-        "ec2:CreateImage",
-        "ec2:CreateKeypair",
-        "ec2:CreateSnapshot",
-        "ec2:CreateVolume",
-        "ec2:RegisterImage"
+        "CopyImage",
+        "CreateImage",
+        "CreateKeypair",
+        "CreateSnapshot",
+        "CreateVolume",
+        "RegisterImage"
       ]
     }
   }
