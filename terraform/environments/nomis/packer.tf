@@ -181,9 +181,9 @@ data "aws_iam_policy_document" "packer_ssm_permissions" {
     ]
     resources = ["*"]
     condition {
-      test = "StringLike"
+      test     = "StringLike"
       variable = "ssm:resourceTag/aws:ssmmessages:session-id"
-      values = ["&{aws:username}"]
+      values   = ["&{aws:username}"]
     }
   }
   statement {
