@@ -17,6 +17,12 @@ module "stop_ec2_instance_nights" {
     key   = "stop_nights"
     value = "true"
   }
+  tags                           = merge(
+  local.tags,
+  {
+    Name = "stop_ec2_instance_nights-${var.networking[0].application}"
+  }
+  )
 }
 
 module "start_ec2_instance_mornings" {
@@ -34,6 +40,12 @@ module "start_ec2_instance_mornings" {
     key   = "stop_nights"
     value = "true"
   }
+  tags                           = merge(
+  local.tags,
+  {
+    Name = "start_ec2_instance_mornings-${var.networking[0].application}"
+  }
+  )
 }
 
 resource "aws_kms_grant" "stop_start_scheduler" {
