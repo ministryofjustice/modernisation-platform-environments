@@ -169,7 +169,12 @@ data "aws_iam_policy_document" "packer_ssm_permissions" {
       "ssm:TerminateSession",
       "ssm:ResumeSession"
     ]
-    resources = ["arn:aws:ssm:*:*:session/&{aws:username}-*"]
+    resources = ["*"]
+    condition {
+      test = "StringLike"
+      variable = "ssm:resourceTag/aws:ssmmessages:session-id"
+      values = ["&{aws:username}"]
+    }
   }
   statement {
     effect    = "Allow"
