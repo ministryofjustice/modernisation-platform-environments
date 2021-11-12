@@ -3,7 +3,7 @@
 #------------------------------------------------------------------------------
 
 module "stop_ec2_instance_nights" {
-  source                         = "github.com/ministryofjustice/hmpps-delius-network-terraform//lambda-scheduler?ref=main"
+  source                         = "github.com/ministryofjustice/hmpps-delius-network-terraform//lambda-scheduler?ref=1.26.0"
   name                           = "stop_ec2_instance_nights"
   cloudwatch_schedule_expression = "cron(0/30 * * * ? *)" # "cron(0 0 ? * FRI *)" # Every Friday at 23:00 GMT
   schedule_action                = "stop"
@@ -26,7 +26,7 @@ module "stop_ec2_instance_nights" {
 }
 
 module "start_ec2_instance_mornings" {
-  source                         = "github.com/ministryofjustice/hmpps-delius-network-terraform//lambda-scheduler?ref=main"
+  source                         = "github.com/ministryofjustice/hmpps-delius-network-terraform//lambda-scheduler?ref=1.26.0"
   name                           = "start_ec2_instance_mornings"
   cloudwatch_schedule_expression = "cron(0/5 * * * ? *)" # "cron(0 8 ? * MON *)" # Every Monday at 8:00 GMT
   schedule_action                = "start"
