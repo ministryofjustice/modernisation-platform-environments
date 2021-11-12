@@ -151,7 +151,15 @@ data "aws_iam_policy_document" "packer_minimum_permissions" {
     condition { # only allow tagging of resources on creation
       test     = "StringLike"
       variable = "ec2:CreateAction"
-      values   = ["*"]
+      values = [
+        "RunInstances",
+        "ec2:CopyImage",
+        "ec2:CreateImage",
+        "ec2:CreateKeypair",
+        "ec2:CreateSnapshot",
+        "ec2:CreateVolume",
+        "ec2:RegisterImage"
+      ]
     }
   }
 }
@@ -181,9 +189,9 @@ data "aws_iam_policy_document" "packer_ssm_permissions" {
     ]
     resources = ["*"]
     condition {
-      test = "StringLike"
+      test     = "StringLike"
       variable = "ssm:resourceTag/aws:ssmmessages:session-id"
-      values = ["&{aws:username}"]
+      values   = ["&{aws:userid}"]
     }
   }
   statement {
