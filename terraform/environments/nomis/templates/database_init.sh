@@ -38,21 +38,6 @@ hugepages() {
     sed -ri '/^\*[^0-9]+/ s/[0-9]+/'"$memlock_limit"'/' /etc/security/limits.d/99-grid-oracle-limits.conf
 }
 
-swap_file() {
-    
-    echo "+++Configuring swap..."
-    local swap_limit_mb=16384 # as recommended in oracle docs
-    local memtotal_mb=$(expr $memtotal_kb / 1024)
-    
-    local swap_mb=$(($memtotal_mb > $swap_limit_mb ? $swap_limit_mb : $memtotal_mb))
-    
-    swapoff /swapfile
-    dd if=/dev/zero of=/swapfile bs=1M count="$swap_mb"
-    mkswap /swapfile
-    swapon /swapfile
-    echo "created $memtotal_mb MB swap space"
-}
-
 swap_disk() {
 
     echo "+++Configuring swap partition..."
@@ -64,10 +49,6 @@ swap_disk() {
 
     swapoff "$swap_disk"
     mkswap "$swap_disk" -L "$swap_label"
-
-    # get swap disk uuid
-    # had some issues with uuid so switched to using label
-    # local swap_uuid_new=$(lsblk "$swap_disk" -no UUID)
 
     # update fstab
     sed -ri "/^UUID=.*swap/ s/^UUID=\S+/LABEL=$swap_label/" /etc/fstab
