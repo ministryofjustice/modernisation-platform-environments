@@ -95,7 +95,6 @@ data "aws_iam_policy_document" "packer_minimum_permissions" {
       "ec2:CreateImage",
       "ec2:CreateKeypair",
       "ec2:CreateSnapshot",
-      "ec2:CreateTags",
       "ec2:CreateVolume",
       "ec2:DeleteSnapshot",  # unfortunately Packer does not tag intermediate snapshots it creates
       "ec2:DeregisterImage", # unfortunately Packer does not tag intermediate images it creates
@@ -129,9 +128,9 @@ data "aws_iam_policy_document" "packer_minimum_permissions" {
     ]
     resources = ["*"]
     condition {
-      test     = "StringEquals"
+      test     = "StringLike"
       variable = "ec2:ResourceTag/creator"
-      values   = ["Packer"]
+      values   = ["Packer", "packer", "ansible"]
     }
   }
   statement {
@@ -142,6 +141,25 @@ data "aws_iam_policy_document" "packer_minimum_permissions" {
       test     = "StringLike"
       variable = "ec2:KeyPairName"
       values   = ["packer_*"]
+    }
+  }
+
+  statement {
+    effect    = "Allow"
+    actions   = ["ec2:CreateTags"]
+    resources = ["*"]
+    condition { # only allow tagging of resources on creation
+      test     = "StringLike"
+      variable = "ec2:CreateAction"
+      values = [
+        "RunInstances",
+        "CopyImage",
+        "CreateImage",
+        "CreateKeypair",
+        "CreateSnapshot",
+        "CreateVolume",
+        "RegisterImage"
+      ]
     }
   }
 }
@@ -169,7 +187,12 @@ data "aws_iam_policy_document" "packer_ssm_permissions" {
       "ssm:TerminateSession",
       "ssm:ResumeSession"
     ]
-    resources = ["arn:aws:ssm:*:*:session/&{aws:username}-*"]
+    resources = ["*"]
+    condition {
+      test     = "StringLike"
+      variable = "ssm:resourceTag/aws:ssmmessages:session-id"
+      values   = ["&{aws:userid}"]
+    }
   }
   statement {
     effect    = "Allow"
@@ -183,11 +206,29 @@ data "aws_iam_policy_document" "packer_ssm_permissions" {
   }
 }
 
+# some extra permissions required for Ansible ec2 module
+# it might be an idea to create another role for Ansible instead
+data "aws_iam_policy_document" "packer_ansible_permissions" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "ec2:DescribeInstanceAttribute",
+      "ec2:DescribeIamInstanceProfileAssociations",
+      "ec2:DescribeInstanceTypes",
+      "ec2:DescribeVpcs",
+      "ec2:DescribeKeyPairs",
+      "sts:DecodeAuthorizationMessage"
+    ]
+    resources = ["*"]
+  }
+}
+
 # combine policy json
 data "aws_iam_policy_document" "packer_combined" {
   source_policy_documents = [
     data.aws_iam_policy_document.packer_minimum_permissions.json,
-    data.aws_iam_policy_document.packer_ssm_permissions.json
+    data.aws_iam_policy_document.packer_ssm_permissions.json,
+    data.aws_iam_policy_document.packer_ansible_permissions.json
   ]
 }
 # attach policy to role inline
