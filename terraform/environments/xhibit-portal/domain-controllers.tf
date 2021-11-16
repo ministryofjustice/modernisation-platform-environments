@@ -166,7 +166,7 @@ resource "aws_route53_resolver_endpoint" "cjse-domain" {
   direction = "OUTBOUND"
 
   security_group_ids = [
-    aws_security_group.domain-controllers.id
+    aws_security_group.outbound-dns-resolver.id
   ]
 
   ip_address {
