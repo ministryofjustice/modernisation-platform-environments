@@ -51,7 +51,7 @@ data "aws_ami" "db_image" {
 
   filter {
     name   = "name"
-    values = ["nomis_db-2021-10-15*"] # pinning image for now
+    values = ["nomis_db-2021-11-08*"] # pinning image for now
   }
 
   filter {
@@ -61,22 +61,43 @@ data "aws_ami" "db_image" {
 }
 
 resource "aws_instance" "db_server" {
-  instance_type               = "t3.medium" # TODO: replace with "d2.xlarge" to match required spec.
+  instance_type               = "r5.xlarge"
   ami                         = data.aws_ami.db_image.id
   monitoring                  = true
   associate_public_ip_address = false
   iam_instance_profile        = aws_iam_instance_profile.ec2_common_profile.id
   ebs_optimized               = true
-  subnet_id                   = data.aws_subnet.private_az_a.id # data.aws_subnet.data_az_a.id put here whilst testing install steps
-  user_data                   = file("./templates/cloudinit.cfg")
+  subnet_id                   = data.aws_subnet.data_az_a.id
+  user_data                   = file("./templates/database_init.sh")
   vpc_security_group_ids      = [aws_security_group.db_server.id]
 
-  # block devices defined in custom image
-  # root_block_device {
-  #   delete_on_termination = true
-  #   encrypted             = true
-  #   volume_size           = 30
-  # }
+  root_block_device {
+    delete_on_termination = true
+    encrypted             = true
+    volume_size           = 30
+  }
+
+  # these ebs devices are part of image, resize them here
+  ebs_block_device { # swap disk, size according to instance RAM and oracle recommendations (max 16GB)
+    device_name           = "/dev/sds"
+    delete_on_termination = true
+    encrypted             = true
+    volume_size           = 16
+  }
+
+  ebs_block_device { # ASM disk 01
+    device_name           = "/dev/sde"
+    delete_on_termination = true
+    encrypted             = true
+    volume_size           = 100
+  }
+
+  ebs_block_device { # ASM disk 02
+    device_name           = "/dev/sdf"
+    delete_on_termination = true
+    encrypted             = true
+    volume_size           = 100
+  }
 
   lifecycle {
     ignore_changes = [
@@ -93,34 +114,10 @@ resource "aws_instance" "db_server" {
   tags = merge(
     local.tags,
     {
-      Name = "db-server-${local.application_name}"
+      Name      = "db-server-${local.application_name}"
+      component = "data"
+      os_type   = "Linux (RHEL 7.9)"
+      always_on = "false"
     }
   )
-}
-
-
-locals {
-  asm_disks = ["sde", "sdf"]
-}
-
-resource "aws_ebs_volume" "asm_disk" {
-  for_each          = toset(local.asm_disks)
-  availability_zone = "${local.region}a"
-  type              = "gp2"
-  encrypted         = true
-  size              = 100
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "db-server-${local.application_name}-asm-disk-${each.key}"
-    }
-  )
-}
-
-resource "aws_volume_attachment" "asm_disk" {
-  for_each    = aws_ebs_volume.asm_disk
-  device_name = "/dev/${each.key}"
-  volume_id   = each.value.id
-  instance_id = aws_instance.db_server.id
 }

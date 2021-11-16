@@ -95,7 +95,6 @@ data "aws_iam_policy_document" "packer_minimum_permissions" {
       "ec2:CreateImage",
       "ec2:CreateKeypair",
       "ec2:CreateSnapshot",
-      "ec2:CreateTags",
       "ec2:CreateVolume",
       "ec2:DeleteSnapshot",  # unfortunately Packer does not tag intermediate snapshots it creates
       "ec2:DeregisterImage", # unfortunately Packer does not tag intermediate images it creates
@@ -144,6 +143,25 @@ data "aws_iam_policy_document" "packer_minimum_permissions" {
       values   = ["packer_*"]
     }
   }
+
+  statement {
+    effect    = "Allow"
+    actions   = ["ec2:CreateTags"]
+    resources = ["*"]
+    condition { # only allow tagging of resources on creation
+      test     = "StringLike"
+      variable = "ec2:CreateAction"
+      values = [
+        "RunInstances",
+        "CopyImage",
+        "CreateImage",
+        "CreateKeypair",
+        "CreateSnapshot",
+        "CreateVolume",
+        "RegisterImage"
+      ]
+    }
+  }
 }
 
 # build policy json for Packer session manager permissions
@@ -169,7 +187,12 @@ data "aws_iam_policy_document" "packer_ssm_permissions" {
       "ssm:TerminateSession",
       "ssm:ResumeSession"
     ]
-    resources = ["arn:aws:ssm:*:*:session/&{aws:username}-*"]
+    resources = ["*"]
+    condition {
+      test     = "StringLike"
+      variable = "ssm:resourceTag/aws:ssmmessages:session-id"
+      values   = ["&{aws:userid}"]
+    }
   }
   statement {
     effect    = "Allow"
