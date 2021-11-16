@@ -135,7 +135,7 @@ resource "aws_instance" "infra2" {
 # Security Groups
 resource "aws_security_group" "outbound-dns-resolver" {
   provider = aws.core-vpc
-  
+
   description = "DNS traffic only"
   name        = "outbound-dns-resolver-${local.application_name}"
   vpc_id      = local.vpc_id
