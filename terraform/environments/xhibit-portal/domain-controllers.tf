@@ -1,7 +1,7 @@
 # Security Groups
 resource "aws_security_group" "domain-controllers" {
   provider = aws.core-vpc
-  
+
   description = "Domain traffic only"
   name        = "domaincontrollers-${local.application_name}"
   vpc_id      = local.vpc_id
