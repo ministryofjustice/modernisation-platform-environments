@@ -1,5 +1,7 @@
 # Security Groups
 resource "aws_security_group" "domain-controllers" {
+  provider = aws.core-vpc
+  
   description = "Domain traffic only"
   name        = "domaincontrollers-${local.application_name}"
   vpc_id      = local.vpc_id
@@ -182,7 +184,7 @@ resource "aws_route53_resolver_endpoint" "cjse-domain" {
 
 resource "aws_route53_resolver_rule" "fwd" {
   provider = aws.core-vpc
-  
+
   domain_name          = "cjse.sema.local"
   name                 = "cjse-sema-local"
   rule_type            = "FORWARD"
