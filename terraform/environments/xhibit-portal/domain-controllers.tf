@@ -132,9 +132,12 @@ resource "aws_instance" "infra2" {
 
 # Security Groups
 resource "aws_security_group" "outbound-dns-resolver" {
+  provider = aws.core-vpc
+  
   description = "DNS traffic only"
   name        = "outbound-dns-resolver-${local.application_name}"
   vpc_id      = local.vpc_id
+
 
   egress {
     description     = "allow DNS"
@@ -155,6 +158,8 @@ resource "aws_security_group" "outbound-dns-resolver" {
 }
 
 resource "aws_route53_resolver_endpoint" "cjse-domain" {
+  provider = aws.core-vpc
+
   name      = "cjse-sema-local"
   direction = "OUTBOUND"
 
@@ -176,6 +181,8 @@ resource "aws_route53_resolver_endpoint" "cjse-domain" {
 }
 
 resource "aws_route53_resolver_rule" "fwd" {
+  provider = aws.core-vpc
+  
   domain_name          = "cjse.sema.local"
   name                 = "cjse-sema-local"
   rule_type            = "FORWARD"
