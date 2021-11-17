@@ -6,55 +6,109 @@ resource "aws_security_group" "domain-controllers" {
   name        = "domaincontrollers-${local.application_name}"
   vpc_id      = local.vpc_id
 
-  egress {
+}
+
+resource "aws_security_group_rule" "dc1" {  
+    security_group  = aws_security_group.domain-controllers.id
+    provider        = local.vpc_id
+    type            = "egress"
     description      = "allow all"
     from_port        = 0
     to_port          = 0
     protocol         = "-1"
     cidr_blocks      = ["0.0.0.0/0"]
     ipv6_cidr_blocks = ["::/0"]
-  }
+}
 
-  ingress {
-    description = "SSH from Bastion"
-    from_port   = 0
-    to_port     = "3389"
-    protocol    = "TCP"
-    cidr_blocks = ["${module.bastion_linux.bastion_private_ip}/32"]
-  }
+resource "aws_security_group_rule" "dc2" {
+    security_group  = aws_security_group.domain-controllers.id
+    provider        = local.vpc_id
+    type            = "ingress"
+    description     = "SSH from Bastion"
+    from_port       = 0
+    to_port         = "3389"
+    protocol        = "TCP"
+    cidr_blocks     = ["${module.bastion_linux.bastion_private_ip}/32"]
+}
 
-  ingress {
+resource "aws_security_group_rule" "dc3" {
+    security_group  = aws_security_group.domain-controllers.id
+    provider        = local.vpc_id
+    type            = "ingress"
     description     = "allow DNS"
     from_port       = 0
     to_port         = 53
     protocol        = "TCP"
-    security_groups = [aws_security_group.outbound-dns-resolver.id]
-  }
+    source_security_group_id = aws_security_group.outbound-dns-resolver.id
+}
 
-  ingress {
+resource "aws_security_group_rule" "dc4" {
+    security_group  = aws_security_group.domain-controllers.id
+    provider        = local.vpc_id
+    type            = "ingress"
     description     = "allow DNS"
     from_port       = 0
     to_port         = 53
     protocol        = "UDP"
-    security_groups = [aws_security_group.outbound-dns-resolver.id]
-  }
+    source_security_group_id = aws_security_group.outbound-dns-resolver.id
+}
 
-  ingress {
+resource "aws_security_group_rule" "dc5" {
+    security_group  = aws_security_group.domain-controllers.id
+    provider        = local.vpc_id
+    type            = "ingress"
     description     = "allow DCs to listen to each other"
     from_port       = 0
     to_port         = 0
     protocol        = "TCP"
     self            = true
-  }
+}
 
-  egress {
+resource "aws_security_group_rule" "dc6" {
+    security_group  = aws_security_group.domain-controllers.id
+    provider        = local.vpc_id
+    type            = "egress"
     description     = "allow DCs to talk to each other"
     from_port       = 0
     to_port         = 0
     protocol        = "TCP"
     self            = true
-  }
+}
 
+
+# Security Groups
+resource "aws_security_group" "outbound-dns-resolver" {
+  provider = aws.core-vpc
+
+  description = "DNS traffic only"
+  name        = "outbound-dns-resolver-${local.application_name}"
+  vpc_id      = local.vpc_id
+
+
+
+
+}
+
+resource "aws_security_group_rule" "res1" {  
+    security_group  = aws_security_group.outbound-dns-resolver.id
+    provider        = local.vpc_id
+    type            = "egress"
+    description     = "allow DNS"
+    from_port       = 0
+    to_port         = 53
+    protocol        = "TCP"
+    source_security_group = aws_security_group.domain-controllers.id
+}
+
+resource "aws_security_group_rule" "res2" {  
+    security_group  = aws_security_group.outbound-dns-resolver.id
+    provider        = local.vpc_id
+    type            = "egress"
+    description     = "allow DNS"
+    from_port       = 0
+    to_port         = 53
+    protocol        = "UDP"
+    source_security_group = aws_security_group.domain-controllers.id
 }
 
 
@@ -163,32 +217,7 @@ resource "aws_instance" "infra2" {
   )
 }
 
-# Security Groups
-resource "aws_security_group" "outbound-dns-resolver" {
-  provider = aws.core-vpc
 
-  description = "DNS traffic only"
-  name        = "outbound-dns-resolver-${local.application_name}"
-  vpc_id      = local.vpc_id
-
-
-  egress {
-    description     = "allow DNS"
-    from_port       = 0
-    to_port         = 53
-    protocol        = "TCP"
-    security_groups = [aws_security_group.domain-controllers.id]
-  }
-
-  egress {
-    description     = "allow DNS"
-    from_port       = 0
-    to_port         = 53
-    protocol        = "UDP"
-    security_groups = [aws_security_group.domain-controllers.id]
-  }
-
-}
 
 resource "aws_route53_resolver_endpoint" "cjse-domain" {
   provider = aws.core-vpc
