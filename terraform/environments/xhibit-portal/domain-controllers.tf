@@ -198,3 +198,8 @@ resource "aws_route53_resolver_rule" "fwd" {
     ip = aws_instance.infra2.private_ip
   }
 }
+
+resource "aws_route53_resolver_rule_association" "cjse-domain" {
+  resolver_rule_id = aws_route53_resolver_rule.fwd.id
+  vpc_id           = local.vpc_id
+}
