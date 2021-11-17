@@ -216,7 +216,7 @@ resource "aws_route53_resolver_rule" "fwd" {
   }
 }
 
-resource "aws_route53_resolver_rule_association" "cjse-domain-assoc" {
-  resolver_rule_id = aws_route53_resolver_rule.sys.id
-  vpc_id           = aws_vpc.foo.id
+resource "aws_route53_resolver_rule_association" "cjse-domain" {
+  resolver_rule_id = aws_route53_resolver_rule.fwd.id
+  vpc_id           = local.vpc_id
 }
