@@ -23,6 +23,23 @@ resource "aws_security_group" "domain-controllers" {
     cidr_blocks = ["${module.bastion_linux.bastion_private_ip}/32"]
   }
 
+  ingress {
+    description     = "allow DNS"
+    from_port       = 0
+    to_port         = 53
+    protocol        = "TCP"
+    security_groups = [aws_security_group.outbound-dns-resolver.id]
+  }
+
+  ingress {
+    description     = "allow DNS"
+    from_port       = 0
+    to_port         = 53
+    protocol        = "UDP"
+    security_groups = [aws_security_group.outbound-dns-resolver.id]
+  }
+
+
 
 }
 
@@ -197,4 +214,9 @@ resource "aws_route53_resolver_rule" "fwd" {
   target_ip {
     ip = aws_instance.infra2.private_ip
   }
+}
+
+resource "aws_route53_resolver_rule_association" "cjse-domain-assoc" {
+  resolver_rule_id = aws_route53_resolver_rule.sys.id
+  vpc_id           = aws_vpc.foo.id
 }
