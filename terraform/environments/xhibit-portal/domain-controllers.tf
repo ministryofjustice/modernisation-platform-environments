@@ -55,7 +55,6 @@ resource "aws_security_group" "domain-controllers" {
     self            = true
   }
 
-
 }
 
 
@@ -232,6 +231,8 @@ resource "aws_route53_resolver_rule" "fwd" {
 }
 
 resource "aws_route53_resolver_rule_association" "cjse-domain" {
+  provider = aws.core-vpc
+
   resolver_rule_id = aws_route53_resolver_rule.fwd.id
   vpc_id           = local.vpc_id
 }
