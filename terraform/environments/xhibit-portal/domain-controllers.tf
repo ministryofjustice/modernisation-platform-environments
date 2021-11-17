@@ -1,6 +1,6 @@
 # Security Groups
 resource "aws_security_group" "domain-controllers" {
-  provider = aws.core-vpc
+  # provider = aws.core-vpc
 
   description = "Domain traffic only"
   name        = "domaincontrollers-${local.application_name}"
@@ -10,7 +10,7 @@ resource "aws_security_group" "domain-controllers" {
 
 resource "aws_security_group_rule" "dc1" {  
     security_group_id  = aws_security_group.domain-controllers.id
-    provider        = aws.core-vpc
+    # provider        = aws.core-vpc
     type            = "egress"
     description      = "allow all"
     from_port        = 0
@@ -33,7 +33,7 @@ resource "aws_security_group_rule" "dc2" {
 
 resource "aws_security_group_rule" "dc3" {
     security_group_id  = aws_security_group.domain-controllers.id
-    provider        = aws.core-vpc
+    # provider        = aws.core-vpc
     type            = "ingress"
     description     = "allow DNS"
     from_port       = 0
@@ -44,7 +44,7 @@ resource "aws_security_group_rule" "dc3" {
 
 resource "aws_security_group_rule" "dc4" {
     security_group_id  = aws_security_group.domain-controllers.id
-    provider        = aws.core-vpc
+    # provider        = aws.core-vpc
     type            = "ingress"
     description     = "allow DNS"
     from_port       = 0
@@ -55,7 +55,7 @@ resource "aws_security_group_rule" "dc4" {
 
 resource "aws_security_group_rule" "dc5" {
     security_group_id  = aws_security_group.domain-controllers.id
-    provider        = aws.core-vpc
+    # provider        = aws.core-vpc
     type            = "ingress"
     description     = "allow DCs to listen to each other"
     from_port       = 0
@@ -66,7 +66,7 @@ resource "aws_security_group_rule" "dc5" {
 
 resource "aws_security_group_rule" "dc6" {
     security_group_id  = aws_security_group.domain-controllers.id
-    provider        = aws.core-vpc
+    # provider        = aws.core-vpc
     type            = "egress"
     description     = "allow DCs to talk to each other"
     from_port       = 0
