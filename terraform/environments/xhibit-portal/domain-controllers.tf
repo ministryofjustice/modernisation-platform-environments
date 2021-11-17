@@ -39,6 +39,21 @@ resource "aws_security_group" "domain-controllers" {
     security_groups = [aws_security_group.outbound-dns-resolver.id]
   }
 
+  ingress {
+    description     = "allow DCs to listen to each other"
+    from_port       = 0
+    to_port         = 0
+    protocol        = "TCP"
+    self            = true
+  }
+
+  egress {
+    description     = "allow DCs to talk to each other"
+    from_port       = 0
+    to_port         = 0
+    protocol        = "TCP"
+    self            = true
+  }
 
 
 }
