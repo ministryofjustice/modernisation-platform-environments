@@ -10,7 +10,7 @@ resource "aws_security_group" "domain-controllers" {
 
 resource "aws_security_group_rule" "dc1" {  
     security_group_id  = aws_security_group.domain-controllers.id
-    # provider        = aws.core-vpc
+    provider        = aws.core-vpc
     type            = "egress"
     description      = "allow all"
     from_port        = 0
