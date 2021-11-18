@@ -60,3 +60,17 @@ resource "aws_iam_instance_profile" "ec2_common_profile" {
   role = aws_iam_role.ec2_common_role.name
   path = "/"
 }
+
+#------------------------------------------------------------------------------
+# Keypair for ec2-user
+#------------------------------------------------------------------------------
+resource "aws_key_pair" "ec2-user" {
+  key_name   = "ec2-user"
+  public_key = local.application_data.accounts[local.environment].public_key
+  tags = merge(
+    local.tags,
+    {
+      Name = "ec2-user"
+    },
+  )
+}
