@@ -60,6 +60,16 @@ data "aws_ami" "db_image" {
   }
 }
 
+locals {
+  volume_size = {
+    "/dev/sdb" = 100,
+    "/dev/sdc" = 100,
+    "/dev/sde" = 100,
+    "/dev/sdf" = 100,
+    "/dev/sds" = 16
+  }
+}
+
 resource "aws_instance" "db_server" {
   instance_type               = "r5.xlarge"
   ami                         = data.aws_ami.db_image.id
@@ -78,40 +88,16 @@ resource "aws_instance" "db_server" {
     volume_size           = 30
   }
 
-  # these ebs devices are part of image, resize them here
-    ebs_block_device { # /u01
-    device_name           = "/dev/sdb"
-    delete_on_termination = true
-    encrypted             = true
-    volume_size           = 100
-  }
-
-    ebs_block_device { # /u02
-    device_name           = "/dev/sdc"
-    delete_on_termination = true
-    encrypted             = true
-    volume_size           = 100
-  }
-  
-  ebs_block_device { # swap disk, size according to instance RAM and oracle recommendations (max 16GB)
-    device_name           = "/dev/sds"
-    delete_on_termination = true
-    encrypted             = true
-    volume_size           = 16
-  }
-
-  ebs_block_device { # ASM disk 01
-    device_name           = "/dev/sde"
-    delete_on_termination = true
-    encrypted             = true
-    volume_size           = 100
-  }
-
-  ebs_block_device { # ASM disk 02
-    device_name           = "/dev/sdf"
-    delete_on_termination = true
-    encrypted             = true
-    volume_size           = 100
+  dynamic "ebs_block_device" {
+    for_each = [for bdm in data.aws_ami.db_image.block_device_mappings : bdm if bdm.device_name !=  data.aws_ami.ami.root_device_name]
+    iterator = device
+    content {
+      device_name = device.value["device_name"]
+      iops        = device.value["ebs"]["iops"]
+      snapshot_id = device.value["ebs"]["snapshot_id"]
+      volume_size = lookup(local.volume_size, device.value["device_name"], device.value["ebs"]["volume_size"])
+      volume_type = device.value["ebs"]["volume_type"]
+    }
   }
 
   lifecycle {
