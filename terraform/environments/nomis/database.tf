@@ -51,12 +51,22 @@ data "aws_ami" "db_image" {
 
   filter {
     name   = "name"
-    values = ["nomis_db-2021-11-08*"] # pinning image for now
+    values = [local.application_data.accounts[local.environment].database_ami_name]
   }
 
   filter {
     name   = "virtualization-type"
     values = ["hvm"]
+  }
+}
+
+locals {
+  volume_size = {
+    "/dev/sdb" = 100,
+    "/dev/sdc" = 100,
+    "/dev/sde" = 100,
+    "/dev/sdf" = 100,
+    "/dev/sds" = 16
   }
 }
 
@@ -70,6 +80,7 @@ resource "aws_instance" "db_server" {
   subnet_id                   = data.aws_subnet.data_az_a.id
   user_data                   = file("./templates/database_init.sh")
   vpc_security_group_ids      = [aws_security_group.db_server.id]
+  # key_name                    = aws_key_pair.ec2-user.key_name add this on next rebuild
 
   root_block_device {
     delete_on_termination = true
@@ -77,26 +88,16 @@ resource "aws_instance" "db_server" {
     volume_size           = 30
   }
 
-  # these ebs devices are part of image, resize them here
-  ebs_block_device { # swap disk, size according to instance RAM and oracle recommendations (max 16GB)
-    device_name           = "/dev/sds"
-    delete_on_termination = true
-    encrypted             = true
-    volume_size           = 16
-  }
-
-  ebs_block_device { # ASM disk 01
-    device_name           = "/dev/sde"
-    delete_on_termination = true
-    encrypted             = true
-    volume_size           = 100
-  }
-
-  ebs_block_device { # ASM disk 02
-    device_name           = "/dev/sdf"
-    delete_on_termination = true
-    encrypted             = true
-    volume_size           = 100
+  dynamic "ebs_block_device" {
+    for_each = [for bdm in data.aws_ami.db_image.block_device_mappings : bdm if bdm.device_name != data.aws_ami.db_image.root_device_name]
+    iterator = device
+    content {
+      device_name = device.value["device_name"]
+      iops        = device.value["ebs"]["iops"]
+      snapshot_id = device.value["ebs"]["snapshot_id"]
+      volume_size = lookup(local.volume_size, device.value["device_name"], device.value["ebs"]["volume_size"])
+      volume_type = device.value["ebs"]["volume_type"]
+    }
   }
 
   lifecycle {
