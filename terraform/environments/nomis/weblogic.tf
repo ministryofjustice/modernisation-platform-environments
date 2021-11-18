@@ -28,6 +28,14 @@ resource "aws_security_group" "weblogic_server" {
     security_groups = ["sg-073bc1ad3ef1d1bb3"]
   }
 
+  ingress {
+    description     = "access from Windows Jumpserver"
+    from_port       = "80"
+    to_port         = "80"
+    protocol        = "TCP"
+    security_groups = ["sg-073bc1ad3ef1d1bb3"]
+  }
+
   egress {
     description      = "allow all"
     from_port        = 0
