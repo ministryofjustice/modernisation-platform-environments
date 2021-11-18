@@ -79,6 +79,20 @@ resource "aws_instance" "db_server" {
   }
 
   # these ebs devices are part of image, resize them here
+    ebs_block_device { # /u01
+    device_name           = "/dev/sdb"
+    delete_on_termination = true
+    encrypted             = true
+    volume_size           = 100
+  }
+
+    ebs_block_device { # /u02
+    device_name           = "/dev/sdc"
+    delete_on_termination = true
+    encrypted             = true
+    volume_size           = 100
+  }
+  
   ebs_block_device { # swap disk, size according to instance RAM and oracle recommendations (max 16GB)
     device_name           = "/dev/sds"
     delete_on_termination = true
