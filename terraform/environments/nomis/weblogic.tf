@@ -21,7 +21,7 @@ resource "aws_security_group" "weblogic_server" {
   }
 
   ingress {
-    description     = "access from Windows Jumpserver"
+    description     = "access from Windows Jumpserver (admin console)"
     from_port       = "7001"
     to_port         = "7001"
     protocol        = "TCP"
@@ -32,6 +32,14 @@ resource "aws_security_group" "weblogic_server" {
     description     = "access from Windows Jumpserver"
     from_port       = "80"
     to_port         = "80"
+    protocol        = "TCP"
+    security_groups = ["sg-073bc1ad3ef1d1bb3"]
+  }
+
+  ingress {
+    description     = "access from Windows Jumpserver (forms/reports)"
+    from_port       = "7777"
+    to_port         = "7777"
     protocol        = "TCP"
     security_groups = ["sg-073bc1ad3ef1d1bb3"]
   }
