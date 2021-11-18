@@ -89,7 +89,7 @@ resource "aws_instance" "db_server" {
   }
 
   dynamic "ebs_block_device" {
-    for_each = [for bdm in data.aws_ami.db_image.block_device_mappings : bdm if bdm.device_name !=  data.aws_ami.ami.root_device_name]
+    for_each = [for bdm in data.aws_ami.db_image.block_device_mappings : bdm if bdm.device_name != data.aws_ami.ami.root_device_name]
     iterator = device
     content {
       device_name = device.value["device_name"]
