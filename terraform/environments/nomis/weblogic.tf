@@ -20,6 +20,14 @@ resource "aws_security_group" "weblogic_server" {
     security_groups = [module.bastion_linux.bastion_security_group]
   }
 
+  ingress {
+    description     = "access from Windows Jumpserver"
+    from_port       = "7001"
+    to_port         = "7001"
+    protocol        = "TCP"
+    security_groups = ["sg-073bc1ad3ef1d1bb3"]
+  }
+
   egress {
     description      = "allow all"
     from_port        = 0
