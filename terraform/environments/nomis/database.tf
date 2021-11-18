@@ -70,7 +70,7 @@ resource "aws_instance" "db_server" {
   subnet_id                   = data.aws_subnet.data_az_a.id
   user_data                   = file("./templates/database_init.sh")
   vpc_security_group_ids      = [aws_security_group.db_server.id]
-  key_name                    = aws_key_pair.ec2-user.key_name
+  # key_name                    = aws_key_pair.ec2-user.key_name add this on next rebuild
 
   root_block_device {
     delete_on_termination = true
