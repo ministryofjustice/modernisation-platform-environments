@@ -217,7 +217,8 @@ data "aws_iam_policy_document" "packer_ansible_permissions" {
       "ec2:DescribeInstanceTypes",
       "ec2:DescribeVpcs",
       "ec2:DescribeKeyPairs",
-      "sts:DecodeAuthorizationMessage"
+      "sts:DecodeAuthorizationMessage",
+      "ssm:DeleteDocument"
     ]
     resources = ["*"]
   }
