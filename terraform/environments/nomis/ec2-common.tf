@@ -126,7 +126,7 @@ resource "aws_kms_key" "session_manager" {
   enable_key_rotation = true
 
   tags = merge(
-    var.tags_common,
+    local.tags,
     {
       Name = "session_manager"
     },
