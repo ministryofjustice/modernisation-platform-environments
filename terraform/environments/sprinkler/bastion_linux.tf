@@ -27,7 +27,7 @@ module "bastion_linux" {
   app_name      = var.networking[0].application
   business_unit = local.vpc_name
   subnet_set    = local.subnet_set
-  environment   = local.environment
+  environment   = "sandbox"
   region        = "eu-west-2"
 
   # Tags
