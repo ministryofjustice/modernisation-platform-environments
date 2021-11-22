@@ -74,3 +74,39 @@ resource "aws_key_pair" "ec2-user" {
     },
   )
 }
+
+#------------------------------------------------------------------------------
+# Session Manager Logging and Preferences
+#------------------------------------------------------------------------------
+
+resource "aws_cloudwatch_log_group" "session_manager" {
+
+  name              = "session-manager-logs"
+  retention_in_days = local.application_data.accounts[local.environment].session_manager_log_retention_days
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "session-manager-logs"
+    },
+  )
+}
+
+
+resource "aws_ssm_document" "session_manager_settings" {
+  name            = "SSM-SessionManagerRunShell"
+  document_type   = "Session"
+  document_format = "JSON"
+
+  content = <<DOC
+  {
+    "schemaVersion": "1.0",
+    "description": "Document to hold regional settings for Session Manager",
+    "sessionType": "Standard_Stream",
+    "inputs": {
+        "cloudWatchLogGroupName": ${aws_cloudwatch_log_group.session_manager},
+        "cloudWatchEncryptionEnabled": "true"
+    }
+  }
+DOC
+}
