@@ -76,7 +76,7 @@ resource "aws_key_pair" "ec2-user" {
 }
 
 #------------------------------------------------------------------------------
-# Session Manager Logging and Preferences
+# Session Manager Logging and Settings
 #------------------------------------------------------------------------------
 
 resource "aws_cloudwatch_log_group" "session_manager" {
@@ -92,7 +92,6 @@ resource "aws_cloudwatch_log_group" "session_manager" {
   )
 }
 
-
 resource "aws_ssm_document" "session_manager_settings" {
   name            = "SSM-SessionManagerRunShell"
   document_type   = "Session"
@@ -100,12 +99,24 @@ resource "aws_ssm_document" "session_manager_settings" {
 
   content = jsonencode(
     {
-      "schemaVersion": "1.0",
-      "description": "Document to hold regional settings for Session Manager",
-      "sessionType": "Standard_Stream",
-      "inputs": {
-          "cloudWatchLogGroupName": "${aws_cloudwatch_log_group.session_manager}",
-          "cloudWatchEncryptionEnabled": "true"
+      schemaVersion = "1.0"
+      description = "Document to hold regional settings for Session Manager"
+      sessionType = "Standard_Stream",
+      inputs = {
+          cloudWatchLogGroupName = aws_cloudwatch_log_group.session_manager.name
+          cloudWatchEncryptionEnabled = true
+          cloudWatchStreamingEnabled = true
+          s3BucketName = ""
+          s3KeyPrefix = ""
+          s3EncryptionEnabled = true
+          idleSessionTimeout = "20"
+          kmsKeyId = ""
+          runAsEnabled = false
+          runAsDefaultUser = ""
+          shellProfile = {
+            windows = ""
+            linux = ""
+          }
       }
     }
   )
