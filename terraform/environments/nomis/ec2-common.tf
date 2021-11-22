@@ -110,7 +110,7 @@ resource "aws_ssm_document" "session_manager_settings" {
           s3KeyPrefix = ""
           s3EncryptionEnabled = true
           idleSessionTimeout = "20"
-          kmsKeyId = ""
+          kmsKeyId = aws_kms_key.session_manager.arn
           runAsEnabled = false
           runAsDefaultUser = ""
           shellProfile = {
@@ -120,4 +120,20 @@ resource "aws_ssm_document" "session_manager_settings" {
       }
     }
   )
+}
+
+resource "aws_kms_key" "session_manager" {
+  enable_key_rotation = true
+
+  tags = merge(
+    var.tags_common,
+    {
+      Name = "session_manager"
+    },
+  )
+}
+
+resource "aws_kms_alias" "session_manager_alias" {
+  name          = "alias/session_manager_key"
+  target_key_id = aws_kms_key.session_manager.arn
 }
