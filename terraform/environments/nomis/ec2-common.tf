@@ -100,12 +100,12 @@ resource "aws_ssm_document" "session_manager_settings" {
 
   content = jsonencode(
     {
-      "schemaVersion": "1.0",
-      "description": "Document to hold regional settings for Session Manager",
-      "sessionType": "Standard_Stream",
-      "inputs": {
-          "cloudWatchLogGroupName": "${aws_cloudwatch_log_group.session_manager}",
-          "cloudWatchEncryptionEnabled": "true"
+      "schemaVersion" : "1.0",
+      "description" : "Document to hold regional settings for Session Manager",
+      "sessionType" : "Standard_Stream",
+      "inputs" : {
+        "cloudWatchLogGroupName" : "${aws_cloudwatch_log_group.session_manager}",
+        "cloudWatchEncryptionEnabled" : "true"
       }
     }
   )
