@@ -100,23 +100,23 @@ resource "aws_ssm_document" "session_manager_settings" {
   content = jsonencode(
     {
       schemaVersion = "1.0"
-      description = "Document to hold regional settings for Session Manager"
-      sessionType = "Standard_Stream",
+      description   = "Document to hold regional settings for Session Manager"
+      sessionType   = "Standard_Stream",
       inputs = {
-          cloudWatchLogGroupName = aws_cloudwatch_log_group.session_manager.name
-          cloudWatchEncryptionEnabled = true
-          cloudWatchStreamingEnabled = true
-          s3BucketName = ""
-          s3KeyPrefix = ""
-          s3EncryptionEnabled = true
-          idleSessionTimeout = "20"
-          kmsKeyId = aws_kms_key.session_manager.arn
-          runAsEnabled = false
-          runAsDefaultUser = ""
-          shellProfile = {
-            windows = ""
-            linux = ""
-          }
+        cloudWatchLogGroupName      = aws_cloudwatch_log_group.session_manager.name
+        cloudWatchEncryptionEnabled = true
+        cloudWatchStreamingEnabled  = true
+        s3BucketName                = ""
+        s3KeyPrefix                 = ""
+        s3EncryptionEnabled         = true
+        idleSessionTimeout          = "20"
+        kmsKeyId                    = aws_kms_key.session_manager.arn
+        runAsEnabled                = false
+        runAsDefaultUser            = ""
+        shellProfile = {
+          windows = ""
+          linux   = ""
+        }
       }
     }
   )
