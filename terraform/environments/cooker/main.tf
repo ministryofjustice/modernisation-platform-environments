@@ -86,42 +86,42 @@ locals {
 
 data "aws_vpc" "shared" {
   tags = {
-    "Name" = "${var.networking[0].business-unit}-${local.environment}"
+    "Name" = "${var.networking[0].business-unit}-sandbox"
   }
 }
 
 data "aws_subnet_ids" "shared-data" {
   vpc_id = data.aws_vpc.shared.id
   tags = {
-    "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-data*"
+    "Name" = "${var.networking[0].business-unit}-sandbox-${var.networking[0].set}-data*"
   }
 }
 
 data "aws_subnet_ids" "shared-private" {
   vpc_id = data.aws_vpc.shared.id
   tags = {
-    "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-private*"
+    "Name" = "${var.networking[0].business-unit}-sandbox-${var.networking[0].set}-private*"
   }
 }
 
 data "aws_subnet_ids" "shared-public" {
   vpc_id = data.aws_vpc.shared.id
   tags = {
-    "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public*"
+    "Name" = "${var.networking[0].business-unit}-sandbox-${var.networking[0].set}-public*"
   }
 }
 
 data "aws_route53_zone" "external" {
   provider = aws.core-vpc
 
-  name         = "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk."
+  name         = "${var.networking[0].business-unit}-sandbox.modernisation-platform.service.justice.gov.uk."
   private_zone = false
 }
 
 data "aws_route53_zone" "inner" {
   provider = aws.core-vpc
 
-  name         = "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.internal."
+  name         = "${var.networking[0].business-unit}-sandbox.modernisation-platform.internal."
   private_zone = true
 }
 
@@ -435,8 +435,7 @@ resource "aws_security_group_rule" "external_lb_ingress_1" {
   to_port           = 80
   protocol          = "tcp"
   cidr_blocks = [
-    "95.144.220.197/32",
-    "46.208.127.9/32"
+    "81.157.202.5/32"
   ]
 }
 
@@ -458,8 +457,7 @@ resource "aws_security_group_rule" "external_lb_ingress_2" {
   to_port           = 443
   protocol          = "tcp"
   cidr_blocks = [
-    "95.144.220.197/32",
-    "46.208.127.9/32"
+    "81.157.202.5/32"
   ]
 }
 
@@ -518,7 +516,7 @@ resource "aws_route53_record" "external" {
   provider = aws.core-vpc
 
   zone_id = data.aws_route53_zone.external.zone_id
-  name    = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  name    = "${var.networking[0].application}.${var.networking[0].business-unit}-sandbox.modernisation-platform.service.justice.gov.uk"
   type    = "A"
 
   alias {
@@ -529,10 +527,10 @@ resource "aws_route53_record" "external" {
 }
 
 resource "aws_acm_certificate" "external" {
-  domain_name       = "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  domain_name       = "${var.networking[0].business-unit}-sandbox.modernisation-platform.service.justice.gov.uk"
   validation_method = "DNS"
 
-  subject_alternative_names = ["*.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
+  subject_alternative_names = ["*.${var.networking[0].business-unit}-sandbox.modernisation-platform.service.justice.gov.uk"]
   tags = {
     Environment = "test"
   }
@@ -658,7 +656,7 @@ resource "aws_route53_record" "inner" {
   provider = aws.core-vpc
 
   zone_id = data.aws_route53_zone.inner.zone_id
-  name    = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.internal"
+  name    = "${var.networking[0].application}.${var.networking[0].business-unit}-sandbox.modernisation-platform.internal"
   type    = "A"
 
   alias {
@@ -680,10 +678,10 @@ data "terraform_remote_state" "core_network_services" {
 }
 
 resource "aws_acm_certificate" "inner" {
-  domain_name               = "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.internal"
+  domain_name               = "${var.networking[0].business-unit}-sandbox.modernisation-platform.internal"
   certificate_authority_arn = local.is_live[0] == "live" ? data.terraform_remote_state.core_network_services.outputs.acmpca_subordinate_live : data.terraform_remote_state.core_network_services.outputs.acmpca_subordinate_non_live
 
-  subject_alternative_names = ["*.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.internal"]
+  subject_alternative_names = ["*.${var.networking[0].business-unit}-sandbox.modernisation-platform.internal"]
   tags = {
     Environment = "test"
   }
