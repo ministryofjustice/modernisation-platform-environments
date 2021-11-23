@@ -29,7 +29,7 @@ resource "aws_instance" "app-server" {
   ami                         = local.application_data.accounts[local.environment].suprig02-ami
   vpc_security_group_ids      = [
                                     aws_security_group.app-server.id,
-                                    aws_security_group.all-member-servers.id
+                                    # aws_security_group.all-member-servers.id
                                 ]
   monitoring                  = false
   associate_public_ip_address = false
