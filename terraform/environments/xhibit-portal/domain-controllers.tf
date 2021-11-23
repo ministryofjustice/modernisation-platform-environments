@@ -80,25 +80,25 @@ resource "aws_security_group_rule" "dc6" {
 # }
 
 
-# resource "aws_security_group_rule" "member-servers-from-dcs" {
-#     security_group_id        = aws_security_group.all-member-servers.id
-#     type                     = "ingress"
-#     description              = "member-servers-from-dcs"
-#     from_port                = 0
-#     to_port                  = 0
-#     protocol                 = "-1"
-#     source_security_group_id = aws_security_group.domain-controllers.id
-# }
+resource "aws_security_group_rule" "member-servers-from-dcs" {
+    security_group_id        = aws_security_group.member-servers.id
+    type                     = "ingress"
+    description              = "member-servers-from-dcs"
+    from_port                = 0
+    to_port                  = 0
+    protocol                 = "-1"
+    source_security_group_id = aws_security_group.domain-controllers.id
+}
 
-# resource "aws_security_group_rule" "member-servers-to-dcs" {
-#     security_group_id        = aws_security_group.all-member-servers.id
-#     type                     = "egress"
-#     description              = "member-servers-to-dcs"
-#     from_port                = 0
-#     to_port                  = 0
-#     protocol                 = "-1"
-#     source_security_group_id = aws_security_group.domain-controllers.id
-# }
+resource "aws_security_group_rule" "member-servers-to-dcs" {
+    security_group_id        = aws_security_group.member-servers.id
+    type                     = "egress"
+    description              = "member-servers-to-dcs"
+    from_port                = 0
+    to_port                  = 0
+    protocol                 = "-1"
+    source_security_group_id = aws_security_group.domain-controllers.id
+}
 
 
 
