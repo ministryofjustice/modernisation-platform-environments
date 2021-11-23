@@ -56,7 +56,7 @@ resource "aws_iam_role_policy" "s3_bucket_access" {
 }
 
 # create policy document to write Session Manager logs to CloudWatch
-data "aws_iam_policy_document" "s3_bucket_access" {
+data "aws_iam_policy_document" "session_manager_logging" {
   statement { # for session and log encryption
     effect = "Allow"
     actions = [
@@ -77,6 +77,12 @@ data "aws_iam_policy_document" "s3_bucket_access" {
   }
 }
 
+# attach session logging document as inline policy
+resource "aws_iam_role_policy" "session_manager_logging" {
+  name   = "session-manager-logging"
+  role   = aws_iam_role.ec2_common_role.name
+  policy = data.aws_iam_policy_document.session_manager_logging.json
+}
 
 resource "aws_iam_instance_profile" "ec2_common_profile" {
   name = "ec2-common-profile"
