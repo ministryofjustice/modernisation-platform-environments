@@ -282,7 +282,7 @@ data "aws_iam_policy_document" "packer_s3_bucket_access" {
     resources = ["${module.s3-bucket.bucket.arn}/*"]
   }
   statement {
-    effect  = "Deny"
+    effect = "Deny"
     actions = [
       "s3:*"
     ]
