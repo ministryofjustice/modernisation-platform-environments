@@ -74,3 +74,66 @@ resource "aws_key_pair" "ec2-user" {
     },
   )
 }
+
+#------------------------------------------------------------------------------
+# Session Manager Logging and Settings
+#------------------------------------------------------------------------------
+
+resource "aws_cloudwatch_log_group" "session_manager" {
+
+  name              = "session-manager-logs"
+  retention_in_days = local.application_data.accounts[local.environment].session_manager_log_retention_days
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "session-manager-logs"
+    },
+  )
+}
+
+resource "aws_ssm_document" "session_manager_settings" {
+  name            = "SSM-SessionManagerRunShell"
+  document_type   = "Session"
+  document_format = "JSON"
+
+  content = jsonencode(
+    {
+      schemaVersion = "1.0"
+      description   = "Document to hold regional settings for Session Manager"
+      sessionType   = "Standard_Stream",
+      inputs = {
+        cloudWatchLogGroupName      = aws_cloudwatch_log_group.session_manager.name
+        cloudWatchEncryptionEnabled = false
+        cloudWatchStreamingEnabled  = true
+        s3BucketName                = ""
+        s3KeyPrefix                 = ""
+        s3EncryptionEnabled         = false
+        idleSessionTimeout          = "20"
+        kmsKeyId                    = "" # aws_kms_key.session_manager.arn
+        runAsEnabled                = false
+        runAsDefaultUser            = ""
+        shellProfile = {
+          windows = ""
+          linux   = ""
+        }
+      }
+    }
+  )
+}
+
+resource "aws_kms_key" "session_manager" {
+  enable_key_rotation = true
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "session_manager"
+    },
+  )
+}
+
+resource "aws_kms_alias" "session_manager_alias" {
+  name          = "alias/session_manager_key"
+  target_key_id = aws_kms_key.session_manager.arn
+}
