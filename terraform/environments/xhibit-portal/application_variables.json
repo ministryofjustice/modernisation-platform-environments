@@ -2,7 +2,7 @@
   "accounts": {
     "development": {  
       "bucket_prefix"                 : "vm-import-s3-bucket",
-      "infra1-ami"                    : "ami-026ff13f8db4d060c", 
+      "infra1-ami"                    : "ami-007236c5007568b5a", 
       "infra1-disk-1-snapshot"        : "snap-04856057b2156f3e9",  
       "infra2-ami"                    : "ami-08ede6a951a525c56", 
       "infra6-ami"                    : "ami-00cacdacb8790178f", 

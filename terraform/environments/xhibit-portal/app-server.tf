@@ -1,34 +1,39 @@
-
-
 # Security Groups
 resource "aws_security_group" "app-server" {
-  description = "Domain traffic only"
+  description = "Bastion traffic"
   name        = "app-server-${local.application_name}"
   vpc_id      = local.vpc_id
+}
 
-  egress {
+
+resource "aws_security_group_rule" "app-outbound-all" {
+    security_group_id  = aws_security_group.app-server.id
+    type            = "egress"
     description      = "allow all"
     from_port        = 0
     to_port          = 0
     protocol         = "-1"
     cidr_blocks      = ["0.0.0.0/0"]
     ipv6_cidr_blocks = ["::/0"]
-  }
-
-  ingress {
-    description = "SSH from Bastion"
-    from_port   = 0
-    to_port     = "3389"
-    protocol    = "TCP"
-    cidr_blocks = ["${module.bastion_linux.bastion_private_ip}/32"]
-  }
 }
 
+resource "aws_security_group_rule" "app-inbound-bastion" {
+    security_group_id  = aws_security_group.app-server.id
+    type            = "ingress"
+    description      = "allow bastion"
+    from_port        = 0
+    to_port          = 3389
+    protocol         = "TCP"
+    cidr_blocks      = ["${module.bastion_linux.bastion_private_ip}/32"]
+}
 
 resource "aws_instance" "app-server" {
   instance_type               = "t2.medium"
   ami                         = local.application_data.accounts[local.environment].suprig02-ami
-  vpc_security_group_ids      = [aws_security_group.app-server.id]
+  vpc_security_group_ids      = [
+                                    aws_security_group.app-server.id,
+                                    aws_security_group.all-member-servers.id
+                                ]
   monitoring                  = false
   associate_public_ip_address = false
   ebs_optimized               = false
