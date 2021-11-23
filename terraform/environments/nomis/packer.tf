@@ -275,7 +275,7 @@ resource "aws_iam_role" "packer_ssm_role" {
 # build policy document for access to s3 bucket
 data "aws_iam_policy_document" "packer_s3_bucket_access" {
   statement {
-    effect  = "Deny"
+    effect = "Deny"
     notactions = [
       "s3:GetObject"
     ]
