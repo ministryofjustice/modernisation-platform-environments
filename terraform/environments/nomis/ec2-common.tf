@@ -55,6 +55,35 @@ resource "aws_iam_role_policy" "s3_bucket_access" {
   policy = data.aws_iam_policy_document.s3_bucket_access.json
 }
 
+# create policy document to write Session Manager logs to CloudWatch
+data "aws_iam_policy_document" "session_manager_logging" {
+  statement { # for session and log encryption
+    effect = "Allow"
+    actions = [
+      "kms:Decrypt",
+      "kms:GenerateDataKey"
+    ]
+    resources = [aws_kms_key.session_manager.arn]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "logs:CreateLogStream",
+      "logs:PutLogEvents",
+      "logs:DescribeLogGroups",
+      "logs:DescribeLogStreams"
+    ]
+    resources = ["*"]
+  }
+}
+
+# attach session logging document as inline policy
+resource "aws_iam_role_policy" "session_manager_logging" {
+  name   = "session-manager-logging"
+  role   = aws_iam_role.ec2_common_role.name
+  policy = data.aws_iam_policy_document.session_manager_logging.json
+}
+
 resource "aws_iam_instance_profile" "ec2_common_profile" {
   name = "ec2-common-profile"
   role = aws_iam_role.ec2_common_role.name
@@ -83,6 +112,7 @@ resource "aws_cloudwatch_log_group" "session_manager" {
 
   name              = "session-manager-logs"
   retention_in_days = local.application_data.accounts[local.environment].session_manager_log_retention_days
+  # kms_key_id = aws_kms_key.session_manager.arn
 
   tags = merge(
     local.tags,
