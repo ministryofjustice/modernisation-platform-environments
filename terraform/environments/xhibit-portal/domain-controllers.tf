@@ -7,98 +7,98 @@ resource "aws_security_group" "domain-controllers" {
 
 }
 
-# resource "aws_security_group_rule" "dc1" {
-#     security_group_id  = aws_security_group.domain-controllers.id
-#     type            = "egress"
-#     description      = "allow all"
-#     from_port        = 0
-#     to_port          = 0
-#     protocol         = "-1"
-#     cidr_blocks      = ["0.0.0.0/0"]
-#     ipv6_cidr_blocks = ["::/0"]
-# }
+resource "aws_security_group_rule" "dc1" {
+    security_group_id  = aws_security_group.domain-controllers.id
+    type            = "egress"
+    description      = "allow all"
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+}
 
-# resource "aws_security_group_rule" "dc2" {
-#     security_group_id  = aws_security_group.domain-controllers.id
-#     type            = "ingress"
-#     description     = "SSH from Bastion"
-#     from_port       = 0
-#     to_port         = "3389"
-#     protocol        = "TCP"
-#     cidr_blocks     = ["${module.bastion_linux.bastion_private_ip}/32"]
-# }
+resource "aws_security_group_rule" "dc2" {
+    security_group_id  = aws_security_group.domain-controllers.id
+    type            = "ingress"
+    description     = "SSH from Bastion"
+    from_port       = 0
+    to_port         = "3389"
+    protocol        = "TCP"
+    cidr_blocks     = ["${module.bastion_linux.bastion_private_ip}/32"]
+}
 
-# resource "aws_security_group_rule" "dc3" {
-#     security_group_id  = aws_security_group.domain-controllers.id
-#     type            = "ingress"
-#     description     = "allow DNS"
-#     from_port       = 0
-#     to_port         = 53
-#     protocol        = "TCP"
-#     source_security_group_id = aws_security_group.outbound-dns-resolver.id
-# }
+resource "aws_security_group_rule" "dc3" {
+    security_group_id  = aws_security_group.domain-controllers.id
+    type            = "ingress"
+    description     = "allow DNS"
+    from_port       = 0
+    to_port         = 53
+    protocol        = "TCP"
+    source_security_group_id = aws_security_group.outbound-dns-resolver.id
+}
 
-# resource "aws_security_group_rule" "dc4" {
-#     security_group_id  = aws_security_group.domain-controllers.id
-#     type            = "ingress"
-#     description     = "allow DNS"
-#     from_port       = 0
-#     to_port         = 53
-#     protocol        = "UDP"
-#     source_security_group_id = aws_security_group.outbound-dns-resolver.id
-# }
+resource "aws_security_group_rule" "dc4" {
+    security_group_id  = aws_security_group.domain-controllers.id
+    type            = "ingress"
+    description     = "allow DNS"
+    from_port       = 0
+    to_port         = 53
+    protocol        = "UDP"
+    source_security_group_id = aws_security_group.outbound-dns-resolver.id
+}
 
-# resource "aws_security_group_rule" "dc5" {
-#     security_group_id  = aws_security_group.domain-controllers.id
-#     type            = "ingress"
-#     description     = "allow DCs to listen to each other"
-#     from_port       = 0
-#     to_port         = 0
-#     protocol        = -1
-#     self            = true
-# }
+resource "aws_security_group_rule" "dc5" {
+    security_group_id  = aws_security_group.domain-controllers.id
+    type            = "ingress"
+    description     = "allow DCs to listen to each other"
+    from_port       = 0
+    to_port         = 0
+    protocol        = -1
+    self            = true
+}
 
-# resource "aws_security_group_rule" "dc6" {
-#     security_group_id  = aws_security_group.domain-controllers.id
-#     type            = "egress"
-#     description     = "allow DCs to talk to each other"
-#     from_port       = 0
-#     to_port         = 0
-#     protocol        = -1
-#     self            = true
-# }
-
-
-# resource "aws_security_group_rule" "dc7" {
-#     security_group_id        = aws_security_group.domain-controllers.id
-#     type                     = "ingress"
-#     description              = "allow DNS"
-#     from_port                = 0
-#     to_port                  = 0
-#     protocol                 = -1
-#     source_security_group_id = aws_security_group.all-member-servers.id
-# }
+resource "aws_security_group_rule" "dc6" {
+    security_group_id  = aws_security_group.domain-controllers.id
+    type            = "egress"
+    description     = "allow DCs to talk to each other"
+    from_port       = 0
+    to_port         = 0
+    protocol        = -1
+    self            = true
+}
 
 
-# resource "aws_security_group_rule" "member-servers-from-dcs" {
-#     security_group_id        = aws_security_group.all-member-servers.id
-#     type                     = "ingress"
-#     description              = "member-servers-from-dcs"
-#     from_port                = 0
-#     to_port                  = 0
-#     protocol                 = "-1"
-#     source_security_group_id = aws_security_group.domain-controllers.id
-# }
+resource "aws_security_group_rule" "dc7" {
+    security_group_id        = aws_security_group.domain-controllers.id
+    type                     = "ingress"
+    description              = "allow DNS"
+    from_port                = 0
+    to_port                  = 0
+    protocol                 = -1
+    source_security_group_id = aws_security_group.all-member-servers.id
+}
 
-# resource "aws_security_group_rule" "member-servers-to-dcs" {
-#     security_group_id        = aws_security_group.all-member-servers.id
-#     type                     = "egress"
-#     description              = "member-servers-to-dcs"
-#     from_port                = 0
-#     to_port                  = 0
-#     protocol                 = "-1"
-#     source_security_group_id = aws_security_group.domain-controllers.id
-# }
+
+resource "aws_security_group_rule" "member-servers-from-dcs" {
+    security_group_id        = aws_security_group.all-member-servers.id
+    type                     = "ingress"
+    description              = "member-servers-from-dcs"
+    from_port                = 0
+    to_port                  = 0
+    protocol                 = "-1"
+    source_security_group_id = aws_security_group.domain-controllers.id
+}
+
+resource "aws_security_group_rule" "member-servers-to-dcs" {
+    security_group_id        = aws_security_group.all-member-servers.id
+    type                     = "egress"
+    description              = "member-servers-to-dcs"
+    from_port                = 0
+    to_port                  = 0
+    protocol                 = "-1"
+    source_security_group_id = aws_security_group.domain-controllers.id
+}
 
 
 
