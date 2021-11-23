@@ -104,7 +104,7 @@ resource "aws_ssm_document" "session_manager_settings" {
       sessionType   = "Standard_Stream",
       inputs = {
         cloudWatchLogGroupName      = aws_cloudwatch_log_group.session_manager.name
-        cloudWatchEncryptionEnabled = true
+        cloudWatchEncryptionEnabled = false
         cloudWatchStreamingEnabled  = true
         s3BucketName                = ""
         s3KeyPrefix                 = ""
