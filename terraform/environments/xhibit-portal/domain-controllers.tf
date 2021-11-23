@@ -120,27 +120,27 @@ resource "aws_security_group" "outbound-dns-resolver" {
   vpc_id      = local.vpc_id
 }
 
-# resource "aws_security_group_rule" "res1" {
-#     security_group_id  = aws_security_group.outbound-dns-resolver.id
-#     provider        = aws.core-vpc
-#     type            = "egress"
-#     description     = "allow DNS"
-#     from_port       = 0
-#     to_port         = 53
-#     protocol        = "TCP"
-#     source_security_group_id = aws_security_group.domain-controllers.id
-# }
+resource "aws_security_group_rule" "res1" {
+    security_group_id  = aws_security_group.outbound-dns-resolver.id
+    provider        = aws.core-vpc
+    type            = "egress"
+    description     = "allow DNS"
+    from_port       = 0
+    to_port         = 53
+    protocol        = "TCP"
+    source_security_group_id = aws_security_group.domain-controllers.id
+}
 
-# resource "aws_security_group_rule" "res2" {
-#     security_group_id  = aws_security_group.outbound-dns-resolver.id
-#     provider        = aws.core-vpc
-#     type            = "egress"
-#     description     = "allow DNS"
-#     from_port       = 0
-#     to_port         = 53
-#     protocol        = "UDP"
-#     source_security_group_id = aws_security_group.domain-controllers.id
-# }
+resource "aws_security_group_rule" "res2" {
+    security_group_id  = aws_security_group.outbound-dns-resolver.id
+    provider        = aws.core-vpc
+    type            = "egress"
+    description     = "allow DNS"
+    from_port       = 0
+    to_port         = 53
+    protocol        = "UDP"
+    source_security_group_id = aws_security_group.domain-controllers.id
+}
 
 
 
