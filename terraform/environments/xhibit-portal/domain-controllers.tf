@@ -54,7 +54,7 @@ resource "aws_security_group_rule" "dc5" {
     description     = "allow DCs to listen to each other"
     from_port       = 0
     to_port         = 0
-    protocol        = "TCP"
+    protocol        = -1
     self            = true
 }
 
@@ -64,7 +64,7 @@ resource "aws_security_group_rule" "dc6" {
     description     = "allow DCs to talk to each other"
     from_port       = 0
     to_port         = 0
-    protocol        = "TCP"
+    protocol        = -1
     self            = true
 }
 
@@ -260,3 +260,9 @@ resource "aws_route53_resolver_rule_association" "cjse-domain" {
   resolver_rule_id = aws_route53_resolver_rule.fwd.id
   vpc_id           = local.vpc_id
 }
+
+
+
+
+
+
