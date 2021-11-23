@@ -80,36 +80,36 @@ resource "aws_security_group_rule" "dc7" {
 }
 
 
-resource "aws_security_group_rule" "member-servers-from-dcs" {
-    security_group_id        = aws_security_group.all-member-servers.id
-    type                     = "ingress"
-    description              = "member-servers-from-dcs"
-    from_port                = 0
-    to_port                  = 0
-    protocol                 = "-1"
-    source_security_group_id = aws_security_group.domain-controllers.id
-}
+# resource "aws_security_group_rule" "member-servers-from-dcs" {
+#     security_group_id        = aws_security_group.all-member-servers.id
+#     type                     = "ingress"
+#     description              = "member-servers-from-dcs"
+#     from_port                = 0
+#     to_port                  = 0
+#     protocol                 = "-1"
+#     source_security_group_id = aws_security_group.domain-controllers.id
+# }
 
-resource "aws_security_group_rule" "member-servers-to-dcs" {
-    security_group_id        = aws_security_group.all-member-servers.id
-    type                     = "egress"
-    description              = "member-servers-to-dcs"
-    from_port                = 0
-    to_port                  = 0
-    protocol                 = "-1"
-    source_security_group_id = aws_security_group.domain-controllers.id
-}
+# resource "aws_security_group_rule" "member-servers-to-dcs" {
+#     security_group_id        = aws_security_group.all-member-servers.id
+#     type                     = "egress"
+#     description              = "member-servers-to-dcs"
+#     from_port                = 0
+#     to_port                  = 0
+#     protocol                 = "-1"
+#     source_security_group_id = aws_security_group.domain-controllers.id
+# }
 
 
 
-# Security Groups
-resource "aws_security_group" "all-member-servers" {
-  provider = aws.core-vpc
+# # Security Groups
+# resource "aws_security_group" "all-member-servers" {
+#   provider = aws.core-vpc
 
-  description = "All domain member servers"
-  name        = "all-domain-member-servers-${local.application_name}"
-  vpc_id      = local.vpc_id
-}
+#   description = "All domain member servers"
+#   name        = "all-domain-member-servers-${local.application_name}"
+#   vpc_id      = local.vpc_id
+# }
 
 
 resource "aws_security_group" "outbound-dns-resolver" {
