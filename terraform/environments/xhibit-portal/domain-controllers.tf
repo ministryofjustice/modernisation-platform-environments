@@ -7,7 +7,8 @@ resource "aws_security_group" "domain-controllers" {
 
 }
 
-resource "aws_security_group_rule" "dc1" {
+# Allow DCs to connect anywhere
+resource "aws_security_group_rule" "dc-all-outbound-traffic" {
     security_group_id  = aws_security_group.domain-controllers.id
     type            = "egress"
     description      = "allow all"
@@ -18,7 +19,7 @@ resource "aws_security_group_rule" "dc1" {
     ipv6_cidr_blocks = ["::/0"]
 }
 
-resource "aws_security_group_rule" "dc2" {
+resource "aws_security_group_rule" "ssh-from-bastion" {
     security_group_id  = aws_security_group.domain-controllers.id
     type            = "ingress"
     description     = "SSH from Bastion"
@@ -28,7 +29,7 @@ resource "aws_security_group_rule" "dc2" {
     cidr_blocks     = ["${module.bastion_linux.bastion_private_ip}/32"]
 }
 
-resource "aws_security_group_rule" "dc3" {
+resource "aws_security_group_rule" "dns-into-dc-tcp" {
     security_group_id  = aws_security_group.domain-controllers.id
     type            = "ingress"
     description     = "allow DNS"
@@ -38,7 +39,7 @@ resource "aws_security_group_rule" "dc3" {
     source_security_group_id = aws_security_group.outbound-dns-resolver.id
 }
 
-resource "aws_security_group_rule" "dc4" {
+resource "aws_security_group_rule" "dns-into-dc-udp" {
     security_group_id  = aws_security_group.domain-controllers.id
     type            = "ingress"
     description     = "allow DNS"
