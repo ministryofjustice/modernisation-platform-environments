@@ -81,6 +81,40 @@ resource "aws_security_group_rule" "dcs-from-app" {
 }
 
 
+resource "aws_security_group_rule" "dcs-from-cjim" {
+    security_group_id        = aws_security_group.domain-controllers.id
+    type                     = "ingress"
+    description              = "allow All"
+    from_port                = 0
+    to_port                  = 0
+    protocol                 = -1
+    source_security_group_id = aws_security_group.cjim-server.id
+}
+
+
+resource "aws_security_group_rule" "dcs-from-cjip" {
+    security_group_id        = aws_security_group.domain-controllers.id
+    type                     = "ingress"
+    description              = "allow All"
+    from_port                = 0
+    to_port                  = 0
+    protocol                 = -1
+    source_security_group_id = aws_security_group.cjip-server.id
+}
+
+
+resource "aws_security_group_rule" "dcs-from-portal" {
+    security_group_id        = aws_security_group.domain-controllers.id
+    type                     = "ingress"
+    description              = "allow All"
+    from_port                = 0
+    to_port                  = 0
+    protocol                 = -1
+    source_security_group_id = aws_security_group.portal-server.id
+}
+
+
+
 resource "aws_security_group" "outbound-dns-resolver" {
   provider = aws.core-vpc
 
