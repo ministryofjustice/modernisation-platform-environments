@@ -69,15 +69,15 @@ resource "aws_security_group_rule" "dc6" {
 }
 
 
-# resource "aws_security_group_rule" "dc7" {
-#     security_group_id        = aws_security_group.domain-controllers.id
-#     type                     = "ingress"
-#     description              = "allow DNS"
-#     from_port                = 0
-#     to_port                  = 0
-#     protocol                 = -1
-#     source_security_group_id = aws_security_group.all-member-servers.id
-# }
+resource "aws_security_group_rule" "dc7" {
+    security_group_id        = aws_security_group.domain-controllers.id
+    type                     = "ingress"
+    description              = "allow DNS"
+    from_port                = 0
+    to_port                  = 0
+    protocol                 = -1
+    source_security_group_id = aws_security_group.member-servers.id
+}
 
 
 resource "aws_security_group_rule" "member-servers-from-dcs" {
