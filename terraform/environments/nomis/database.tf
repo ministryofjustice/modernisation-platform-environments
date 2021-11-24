@@ -51,7 +51,7 @@ data "aws_ami" "db_image" {
 
   filter {
     name   = "name"
-    values = [local.application_data.accounts[local.environment].database_ami_name]
+    values = [local.application_data.accounts[local.environment].ami_name_database]
   }
 
   filter {

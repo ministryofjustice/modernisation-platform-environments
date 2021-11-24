@@ -4,7 +4,7 @@ locals {
 
 module "bastion_linux" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=v2.0.2"
-
+  count = local.application_data.accounts[local.environment].bastion == true ? 1 : 0
   providers = {
     aws.share-host   = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
     aws.share-tenant = aws          # The default provider (unaliased, `aws`) is the tenant
