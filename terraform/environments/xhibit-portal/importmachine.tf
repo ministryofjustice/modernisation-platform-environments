@@ -96,7 +96,7 @@ resource "aws_volume_attachment" "disk_xvdf" {
 
 resource "aws_instance" "domaincheck" {
   instance_type               = "t3.medium"
-  ami                         = "ami-0a0502ffd782e9b12"
+  ami                         = "ami-0b4be016677a77d93"
   vpc_security_group_ids      = [aws_security_group.domain-check.id]
   monitoring                  = false
   associate_public_ip_address = false
