@@ -102,14 +102,14 @@ resource "aws_security_group_rule" "dc6" {
 
 
 
-# Security Groups
-resource "aws_security_group" "member-servers" {
-  provider = aws.core-vpc
+# # Security Groups
+# resource "aws_security_group" "member-servers" {
+#   provider = aws.core-vpc
 
-  description = "Domain member servers"
-  name        = "domain-member-servers-${local.application_name}"
-  vpc_id      = local.vpc_id
-}
+#   description = "Domain member servers"
+#   name        = "domain-member-servers-${local.application_name}"
+#   vpc_id      = local.vpc_id
+# }
 
 
 resource "aws_security_group" "outbound-dns-resolver" {
