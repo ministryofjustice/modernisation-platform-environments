@@ -130,7 +130,7 @@ resource "aws_instance" "domaincheck" {
   tags = merge(
     local.tags,
     {
-      Name = "importmachine-${local.application_name}"
+      Name = "dcheck-${local.application_name}"
     }
   )
 }
@@ -165,7 +165,7 @@ resource "aws_security_group" "domaincheck" {
 # Security Groups
 resource "aws_security_group" "domain-check" {
   description = "Bastion traffic"
-  name        = "app-server-${local.application_name}"
+  name        = "dcheck-${local.application_name}"
   vpc_id      = local.vpc_id
 }
 
