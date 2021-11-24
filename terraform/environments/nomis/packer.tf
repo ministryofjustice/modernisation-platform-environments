@@ -275,6 +275,13 @@ resource "aws_iam_role" "packer_ssm_role" {
 # build policy document for access to s3 bucket
 data "aws_iam_policy_document" "packer_s3_bucket_access" {
   statement {
+    effect = "Allow"
+    actions = [
+      "s3:GetObject"
+    ]
+    resources = ["${module.s3-bucket.bucket.arn}/*"]
+  }
+  statement { # explicitly deny eveything else
     effect = "Deny"
     not_actions = [
       "s3:GetObject"
