@@ -167,4 +167,15 @@ resource "aws_security_group_rule" "dcheck-inbound-bastion" {
     cidr_blocks      = ["${module.bastion_linux.bastion_private_ip}/32"]
 }
 
+resource "aws_security_group_rule" "dcheck-to-dcs" {
+    security_group_id        = aws_security_group.domain-controllers.id
+    type                     = "egress"
+    description              = "allow All"
+    from_port                = 0
+    to_port                  = 0
+    protocol                 = -1
+    self                     = true
+}
+
+
 
