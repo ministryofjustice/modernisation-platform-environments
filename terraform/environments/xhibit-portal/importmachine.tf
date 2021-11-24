@@ -171,7 +171,7 @@ resource "aws_security_group" "domain-check" {
 
 
 resource "aws_security_group_rule" "dcheck-outbound-all" {
-    security_group_id  = aws_security_group.domaincheck.id
+    security_group_id  = aws_security_group.domain-check.id
     type            = "egress"
     description      = "allow all"
     from_port        = 0
@@ -182,7 +182,7 @@ resource "aws_security_group_rule" "dcheck-outbound-all" {
 }
 
 resource "aws_security_group_rule" "dcheck-inbound-bastion" {
-    security_group_id  = aws_security_group.domaincheck.id
+    security_group_id  = aws_security_group.domain-check.id
     type            = "ingress"
     description      = "allow bastion"
     from_port        = 0
