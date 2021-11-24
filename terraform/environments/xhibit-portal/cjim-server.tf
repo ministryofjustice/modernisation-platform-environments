@@ -31,7 +31,7 @@ resource "aws_security_group_rule" "cjim-inbound-bastion" {
 
 resource "aws_instance" "cjim-server" {
   instance_type               = "t2.medium"
-  ami                         = local.application_data.accounts[local.environment].suprig05-ami
+  ami                         = local.application_data.accounts[local.environment].suprig04-ami
   vpc_security_group_ids      = [aws_security_group.cjim-server.id]
   monitoring                  = false
   associate_public_ip_address = false
@@ -76,7 +76,7 @@ resource "aws_ebs_volume" "cjim-disk1" {
   type              = "gp2"
   encrypted         = true
 
-  snapshot_id = local.application_data.accounts[local.environment].suprig05-disk-1-snapshot
+  snapshot_id = local.application_data.accounts[local.environment].suprig04-disk-1-snapshot
 
   tags = merge(
     local.tags,
