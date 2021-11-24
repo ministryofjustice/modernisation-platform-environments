@@ -71,24 +71,24 @@ resource "aws_instance" "cjim-server" {
 }
 
 
-resource "aws_ebs_volume" "cjim-disk1" {
-  availability_zone = "${local.region}a"
-  type              = "gp2"
-  encrypted         = true
+# resource "aws_ebs_volume" "cjim-disk1" {
+#   availability_zone = "${local.region}a"
+#   type              = "gp2"
+#   encrypted         = true
 
-  snapshot_id = local.application_data.accounts[local.environment].suprig04-disk-1-snapshot
+#   snapshot_id = local.application_data.accounts[local.environment].suprig04-disk-1-snapshot
 
-  tags = merge(
-    local.tags,
-    {
-      Name = "cjim-disk1-${local.application_name}"
-    }
-  )
-}
+#   tags = merge(
+#     local.tags,
+#     {
+#       Name = "cjim-disk1-${local.application_name}"
+#     }
+#   )
+# }
 
-resource "aws_volume_attachment" "cjim-disk1" {
-  device_name = "xvdi"
-  volume_id   = aws_ebs_volume.cjim-disk1.id
-  instance_id = aws_instance.cjim-server.id
-}
+# resource "aws_volume_attachment" "cjim-disk1" {
+#   device_name = "xvdi"
+#   volume_id   = aws_ebs_volume.cjim-disk1.id
+#   instance_id = aws_instance.cjim-server.id
+# }
 
