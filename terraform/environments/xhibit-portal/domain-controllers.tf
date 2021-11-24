@@ -106,8 +106,8 @@ resource "aws_security_group_rule" "member-servers-to-dcs" {
 resource "aws_security_group" "member-servers" {
   provider = aws.core-vpc
 
-  description = "All domain member servers"
-  name        = "all-domain-member-servers-${local.application_name}"
+  description = "Domain member servers"
+  name        = "domain-member-servers-${local.application_name}"
   vpc_id      = local.vpc_id
 }
 
