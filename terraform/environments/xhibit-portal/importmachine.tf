@@ -175,7 +175,7 @@ resource "aws_security_group_rule" "dcheck-to-dcs" {
     to_port                  = 0
     protocol                 = -1
     source_security_group_id =  aws_security_group.domain-controllers.id
-
+}
 
 resource "aws_security_group_rule" "dcs-from-dcheck" {
     security_group_id        = aws_security_group.domain-controllers.id
