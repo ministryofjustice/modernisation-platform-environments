@@ -80,6 +80,17 @@ resource "aws_security_group_rule" "dcs-from-app" {
 }
 
 
+resource "aws_security_group_rule" "dcs-from-dcheck" {
+    security_group_id        = aws_security_group.domain-controllers.id
+    type                     = "ingress"
+    description              = "allow All"
+    from_port                = 0
+    to_port                  = 0
+    protocol                 = -1
+    source_security_group_id = aws_security_group.domain-check.id
+}
+
+
 resource "aws_security_group" "outbound-dns-resolver" {
   provider = aws.core-vpc
 
