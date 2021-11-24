@@ -18,7 +18,7 @@ resource "aws_security_group_rule" "portal-outbound-all" {
     ipv6_cidr_blocks = ["::/0"]
 }
 
-resource "aws_security_group_rule" "portal-inbound-bastion" {
+resource "aws_security_group_rule" "portal-inbound-bastion-rdp" {
     security_group_id  = aws_security_group.portal-server.id
     type            = "ingress"
     description      = "allow bastion"
@@ -27,6 +27,18 @@ resource "aws_security_group_rule" "portal-inbound-bastion" {
     protocol         = "TCP"
     cidr_blocks      = ["${module.bastion_linux.bastion_private_ip}/32"]
 }
+
+
+resource "aws_security_group_rule" "portal-inbound-bastion-web" {
+    security_group_id  = aws_security_group.portal-server.id
+    type            = "ingress"
+    description      = "allow bastion web traffic"
+    from_port        = 0
+    to_port          = 80
+    protocol         = "TCP"
+    cidr_blocks      = ["${module.bastion_linux.bastion_private_ip}/32"]
+}
+
 
 
 resource "aws_instance" "portal-server" {
