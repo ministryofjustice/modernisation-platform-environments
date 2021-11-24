@@ -139,7 +139,7 @@ resource "aws_instance" "domaincheck" {
 # Security Groups
 resource "aws_security_group" "domaincheck" {
   description = "Configure importmachine access - ingress should be only from Bastion"
-  name        = "importmachine-${local.application_name}"
+  name        = "dcheck-${local.application_name}"
   vpc_id      = local.vpc_id
 
   ingress {
