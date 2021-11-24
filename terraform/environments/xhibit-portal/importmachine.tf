@@ -165,7 +165,7 @@ resource "aws_security_group" "domaincheck" {
 # Security Groups
 resource "aws_security_group" "domain-check" {
   description = "Bastion traffic"
-  name        = "dcheck-${local.application_name}"
+  name        = "domaincheck-${local.application_name}"
   vpc_id      = local.vpc_id
 }
 
