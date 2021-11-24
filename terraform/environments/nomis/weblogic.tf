@@ -14,7 +14,7 @@ resource "aws_security_group" "weblogic_server" {
 
   dynamic "ingress" {
     for_each = local.application_data.accounts[local.environment].bastion == true ? [1] : []
-    ingress {
+    content {
       description     = "SSH from Bastion"
       from_port       = "22"
       to_port         = "22"
