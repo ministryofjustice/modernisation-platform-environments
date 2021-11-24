@@ -28,6 +28,17 @@ resource "aws_security_group_rule" "cjip-inbound-bastion" {
     cidr_blocks      = ["${module.bastion_linux.bastion_private_ip}/32"]
 }
 
+resource "aws_security_group_rule" "cjip-inbound-bastion" {
+    security_group_id  = aws_security_group.cjip-server.id
+    type            = "ingress"
+    description      = "allow bastion web traffic"
+    from_port        = 0
+    to_port          = 80
+    protocol         = "TCP"
+    cidr_blocks      = ["${module.bastion_linux.bastion_private_ip}/32"]
+}
+
+
 
 resource "aws_instance" "cjip-server" {
   instance_type               = "t2.medium"
