@@ -18,7 +18,7 @@ resource "aws_security_group_rule" "cjip-outbound-all" {
     ipv6_cidr_blocks = ["::/0"]
 }
 
-resource "aws_security_group_rule" "cjip-inbound-bastion" {
+resource "aws_security_group_rule" "cjip-inbound-bastion-rdp" {
     security_group_id  = aws_security_group.cjip-server.id
     type            = "ingress"
     description      = "allow bastion"
@@ -28,7 +28,7 @@ resource "aws_security_group_rule" "cjip-inbound-bastion" {
     cidr_blocks      = ["${module.bastion_linux.bastion_private_ip}/32"]
 }
 
-resource "aws_security_group_rule" "cjip-inbound-bastion" {
+resource "aws_security_group_rule" "cjip-inbound-bastion-web" {
     security_group_id  = aws_security_group.cjip-server.id
     type            = "ingress"
     description      = "allow bastion web traffic"
