@@ -1,14 +1,14 @@
 
 # Security Groups
-resource "aws_security_group" "cjim-server" {
+resource "aws_security_group" "cjip-server" {
   description = "Bastion traffic"
-  name        = "cjim-server-${local.application_name}"
+  name        = "cjip-server-${local.application_name}"
   vpc_id      = local.vpc_id
 }
 
 
-resource "aws_security_group_rule" "cjim-outbound-all" {
-    security_group_id  = aws_security_group.cjim-server.id
+resource "aws_security_group_rule" "cjip-outbound-all" {
+    security_group_id  = aws_security_group.cjip-server.id
     type            = "egress"
     description      = "allow all"
     from_port        = 0
@@ -18,8 +18,8 @@ resource "aws_security_group_rule" "cjim-outbound-all" {
     ipv6_cidr_blocks = ["::/0"]
 }
 
-resource "aws_security_group_rule" "cjim-inbound-bastion" {
-    security_group_id  = aws_security_group.cjim-server.id
+resource "aws_security_group_rule" "cjip-inbound-bastion" {
+    security_group_id  = aws_security_group.cjip-server.id
     type            = "ingress"
     description      = "allow bastion"
     from_port        = 0
@@ -29,10 +29,10 @@ resource "aws_security_group_rule" "cjim-inbound-bastion" {
 }
 
 
-resource "aws_instance" "cjim-server" {
+resource "aws_instance" "cjip-server" {
   instance_type               = "t2.medium"
-  ami                         = local.application_data.accounts[local.environment].suprig04-ami
-  vpc_security_group_ids      = [aws_security_group.cjim-server.id]
+  ami                         = local.application_data.accounts[local.environment].suprig05-ami
+  vpc_security_group_ids      = [aws_security_group.cjip-server.id]
   monitoring                  = false
   associate_public_ip_address = false
   ebs_optimized               = false
@@ -65,30 +65,30 @@ resource "aws_instance" "cjim-server" {
   tags = merge(
     local.tags,
     {
-      Name = "cjim-${local.application_name}"
+      Name = "cjip-${local.application_name}"
     }
   )
 }
 
 
-resource "aws_ebs_volume" "cjim-disk1" {
+resource "aws_ebs_volume" "cjip-disk1" {
   availability_zone = "${local.region}a"
   type              = "gp2"
   encrypted         = true
 
-  snapshot_id = local.application_data.accounts[local.environment].suprig04-disk-1-snapshot
+  snapshot_id = local.application_data.accounts[local.environment].suprig05-disk-1-snapshot
 
   tags = merge(
     local.tags,
     {
-      Name = "cjim-disk1-${local.application_name}"
+      Name = "cjip-disk1-${local.application_name}"
     }
   )
 }
 
-resource "aws_volume_attachment" "cjim-disk1" {
+resource "aws_volume_attachment" "cjip-disk1" {
   device_name = "xvdi"
-  volume_id   = aws_ebs_volume.cjim-disk1.id
-  instance_id = aws_instance.cjim.id
+  volume_id   = aws_ebs_volume.cjip-disk1.id
+  instance_id = aws_instance.cjip.id
 }
 
