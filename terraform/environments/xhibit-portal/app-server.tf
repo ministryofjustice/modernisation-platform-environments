@@ -29,6 +29,20 @@ resource "aws_security_group_rule" "app-inbound-bastion" {
 }
 
 
+
+# resource "aws_security_group_rule" "app-to-dcs" {
+#     security_group_id        = aws_security_group.domain-controllers.id
+#     type                     = "egress"
+#     description              = "allow All"
+#     from_port                = 0
+#     to_port                  = 0
+#     protocol                 = -1
+#     self                     = true
+# }
+
+
+
+
 resource "aws_instance" "app-server" {
   instance_type               = "t2.medium"
   ami                         = local.application_data.accounts[local.environment].suprig02-ami
