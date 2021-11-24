@@ -146,7 +146,7 @@ resource "aws_security_group" "domain-check" {
 }
 
 
-resource "aws_security_group_rule" "dcheck-outbound-all" {
+resource"aws_security_group_rule" "dcheck-outbound-all" {
     security_group_id  = aws_security_group.domain-check.id
     type            = "egress"
     description      = "allow all"
@@ -168,14 +168,13 @@ resource "aws_security_group_rule" "dcheck-inbound-bastion" {
 }
 
 resource "aws_security_group_rule" "dcheck-to-dcs" {
-    security_group_id        = aws_security_group.domain-controllers.id
+    security_group_id        = aws_security_group.domain-check.id
     type                     = "egress"
     description              = "allow All"
     from_port                = 0
     to_port                  = 0
     protocol                 = -1
-    self                     = true
-}
+    source_security_group_id =  aws_security_group.domain-controllers.id
 
 
 
