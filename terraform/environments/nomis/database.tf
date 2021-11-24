@@ -11,12 +11,15 @@ resource "aws_security_group" "db_server" {
   name        = "db-server-${local.application_name}"
   vpc_id      = local.vpc_id
 
-  ingress {
-    description     = "SSH from Bastion"
-    from_port       = "22"
-    to_port         = "22"
-    protocol        = "TCP"
-    security_groups = [module.bastion_linux.bastion_security_group]
+  dynamic "ingress" {
+    for_each = local.application_data.accounts[local.environment].bastion == true ? [1] : []
+    ingress {
+      description     = "SSH from Bastion"
+      from_port       = "22"
+      to_port         = "22"
+      protocol        = "TCP"
+      security_groups = [module.bastion_linux.bastion_security_group]
+    }
   }
 
   ingress {
