@@ -69,9 +69,6 @@ resource "aws_security_group_rule" "dc6" {
 }
 
 
-
-
-
 resource "aws_security_group_rule" "dcs-from-app" {
     security_group_id        = aws_security_group.domain-controllers.id
     type                     = "ingress"
@@ -81,38 +78,6 @@ resource "aws_security_group_rule" "dcs-from-app" {
     protocol                 = -1
     source_security_group_id = aws_security_group.app-server.id
 }
-
-
-# resource "aws_security_group_rule" "member-servers-from-dcs" {
-#     security_group_id        = aws_security_group.member-servers.id
-#     type                     = "ingress"
-#     description              = "member-servers-from-dcs"
-#     from_port                = 0
-#     to_port                  = 0
-#     protocol                 = "-1"
-#     source_security_group_id = aws_security_group.domain-controllers.id
-# }
-
-# resource "aws_security_group_rule" "member-servers-to-dcs" {
-#     security_group_id        = aws_security_group.member-servers.id
-#     type                     = "egress"
-#     description              = "member-servers-to-dcs"
-#     from_port                = 0
-#     to_port                  = 0
-#     protocol                 = "-1"
-#     source_security_group_id = aws_security_group.domain-controllers.id
-# }
-
-
-
-  # # Security Groups
-  # resource "aws_security_group" "member-servers" {
-  #   provider = aws.core-vpc
-
-  #   description = "Domain member servers"
-  #   name        = "domain-member-servers-${local.application_name}"
-  #   vpc_id      = local.vpc_id
-  # }
 
 
 resource "aws_security_group" "outbound-dns-resolver" {
