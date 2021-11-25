@@ -1,25 +1,25 @@
-resource "aws_security_group" "waf_lb_sg" {
-  description = "Security group for app load balancer, simply to implement ACL rules for the WAF"
-  name        = "waf-lb-sg-${var.networking[0].application}"
-  vpc_id      = local.vpc_id
+# resource "aws_security_group" "waf_lb_sg" {
+#   description = "Security group for app load balancer, simply to implement ACL rules for the WAF"
+#   name        = "waf-lb-sg-${var.networking[0].application}"
+#   vpc_id      = local.vpc_id
 
-  ingress {
-    description      = "allow all"
-    from_port        = 0
-    to_port          = 0
-    protocol         = "-1"
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
-  }
+#   ingress {
+#     description      = "allow all"
+#     from_port        = 0
+#     to_port          = 0
+#     protocol         = "-1"
+#     cidr_blocks      = ["0.0.0.0/0"]
+#     ipv6_cidr_blocks = ["::/0"]
+#   }
 
-  egress {
-    description = "Send everything straight to the app server"
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["${module.bastion_linux.bastion_private_ip}/32"]
-  }
-}
+#   egress {
+#     description = "Send everything straight to the app server"
+#     from_port   = 80
+#     to_port     = 80
+#     protocol    = "tcp"
+#     cidr_blocks = ["${module.bastion_linux.bastion_private_ip}/32"]
+#   }
+# }
 
 resource "aws_security_group" "waf_lb" {
   description = "Security group for app load balancer, simply to implement ACL rules for the WAF"
