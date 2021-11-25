@@ -62,11 +62,11 @@ resource "aws_lb_target_group" "waf_lb_tg" {
   )
 }
 
-resource "aws_lb_target_group_attachment" "web-traffic" {
-  target_group_arn = aws_lb_target_group.waf_lb_tg.arn
-  target_id        = aws_instance.portal-server.id
-  port             = 80
-}
+# resource "aws_lb_target_group_attachment" "web-traffic" {
+#   target_group_arn = aws_lb_target_group.waf_lb_tg.arn
+#   target_id        = aws_instance.portal-server.id
+#   port             = 80
+# }
 
 
 resource "aws_lb_listener" "waf_lb_listener" {
