@@ -23,7 +23,7 @@
 
 resource "aws_security_group" "waf_lb" {
   description = "Security group for app load balancer, simply to implement ACL rules for the WAF"
-  name        = "waf-lb-${var.networking[0].application}"
+  name        = "waf-loadbalancer-${var.networking[0].application}"
   vpc_id      = local.vpc_id
 }
 
@@ -76,6 +76,12 @@ resource "aws_lb_target_group" "waf_lb_tg" {
       Name = "waf-lb_-g-${var.networking[0].application}"
     },
   )
+}
+
+resource "aws_lb_target_group_attachment" "portal-server-attachment" {
+  target_group_arn = aws_lb_target_group.waf_lb_tg.arn
+  target_id        = aws_instance.portal-server.id
+  port             = 80
 }
 
 
