@@ -38,6 +38,15 @@ resource "aws_security_group_rule" "cjip-inbound-bastion-web" {
     cidr_blocks      = ["${module.bastion_linux.bastion_private_ip}/32"]
 }
 
+resource "aws_security_group_rule" "cjim-inbound-web" {
+    security_group_id  = aws_security_group.cjip-server.id
+    type            = "ingress"
+    description     = "allow web from cjim"
+    from_port       = 80
+    to_port         = 80
+    protocol        = "TCP"
+    source_security_group_id = aws_security_group.cjim-server.id
+}
 
 
 
