@@ -28,6 +28,15 @@ resource "aws_security_group_rule" "app-inbound-bastion" {
     cidr_blocks      = ["${module.bastion_linux.bastion_private_ip}/32"]
 }
 
+resource "aws_security_group_rule" "portal-to-app" {
+    security_group_id  = aws_security_group.portal-server.id
+    type            = "ingress"
+    description      = "allow bastion web traffic"
+    from_port        = 0
+    to_port          = 80
+    protocol         = "TCP"
+    source_security_group_id = aws_security_group.portal-server.id
+}
 
 resource "aws_instance" "app-server" {
   instance_type               = "t2.medium"
