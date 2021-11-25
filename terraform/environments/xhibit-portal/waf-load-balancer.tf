@@ -62,12 +62,6 @@ resource "aws_lb_target_group" "waf_lb_tg" {
   )
 }
 
-# resource "aws_lb_target_group_attachment" "web-traffic" {
-#   target_group_arn = aws_lb_target_group.waf_lb_tg.arn
-#   target_id        = aws_instance.portal-server.id
-#   port             = 80
-# }
-
 
 resource "aws_lb_listener" "waf_lb_listener" {
   depends_on = [
@@ -85,6 +79,30 @@ resource "aws_lb_listener" "waf_lb_listener" {
     target_group_arn = aws_lb_target_group.waf_lb_tg.arn
   }
 }
+
+resource "aws_alb_listener_rule" "listener_rule" {
+  depends_on   = ["aws_alb_target_group.waf_lb_tg"]  
+  listener_arn = "${aws_alb_listener.waf_lb_listener.arn}"  
+  priority     = "${var.priority}"   
+  action {    
+    type             = "forward"    
+    target_group_arn = "${aws_alb_target_group.waf_lb_tg.id}"  
+  }   
+  condition {    
+    path_pattern {
+      values = ["/"]  
+    }    
+  }
+
+  # condition {    
+  #   host-header {
+  #     values = ["web.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]  
+  #   }    
+  # }
+
+}
+
+
 
 resource "aws_route53_record" "waf_lb_dns" {
   provider = aws.core-vpc
