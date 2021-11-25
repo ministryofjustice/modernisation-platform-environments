@@ -19,12 +19,12 @@ resource "aws_security_group_rule" "dc-all-outbound-traffic" {
     ipv6_cidr_blocks = ["::/0"]
 }
 
-resource "aws_security_group_rule" "ssh-from-bastion" {
+resource "aws_security_group_rule" "rdp-from-bastion" {
     security_group_id  = aws_security_group.domain-controllers.id
     type            = "ingress"
     description     = "SSH from Bastion"
-    from_port       = 0
-    to_port         = "3389"
+    from_port       = 3389
+    to_port         = 3389
     protocol        = "TCP"
     cidr_blocks     = ["${module.bastion_linux.bastion_private_ip}/32"]
 }
@@ -33,7 +33,7 @@ resource "aws_security_group_rule" "dns-into-dc-tcp" {
     security_group_id  = aws_security_group.domain-controllers.id
     type            = "ingress"
     description     = "allow DNS"
-    from_port       = 0
+    from_port       = 53
     to_port         = 53
     protocol        = "TCP"
     source_security_group_id = aws_security_group.outbound-dns-resolver.id
@@ -43,7 +43,7 @@ resource "aws_security_group_rule" "dns-into-dc-udp" {
     security_group_id  = aws_security_group.domain-controllers.id
     type            = "ingress"
     description     = "allow DNS"
-    from_port       = 0
+    from_port       = 53
     to_port         = 53
     protocol        = "UDP"
     source_security_group_id = aws_security_group.outbound-dns-resolver.id
