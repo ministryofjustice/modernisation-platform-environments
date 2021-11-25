@@ -17,11 +17,21 @@ resource "aws_security_group" "waf_lb_sg" {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = [
-      "10.237.32.82/32"
-    ]
+    cidr_blocks = ["${module.bastion_linux.bastion_private_ip}/32"]
   }
 }
+
+
+# resource "aws_security_group_rule" "app-from-portal" {
+#     security_group_id  = aws_security_group.app-server.id
+#     type            = "ingress"
+#     description      = "allow portal web traffic"
+#     from_port        = 80
+#     to_port          = 80
+#     protocol         = "TCP"
+#     source_security_group_id = aws_security_group.portal-server.id
+# }
+
 
 data "aws_subnet_ids" "shared-public" {
   vpc_id = local.vpc_id
@@ -81,12 +91,11 @@ resource "aws_lb_listener" "waf_lb_listener" {
 }
 
 resource "aws_alb_listener_rule" "listener_rule" {
-  depends_on   = ["aws_alb_target_group.waf_lb_tg"]  
-  listener_arn = "${aws_alb_listener.waf_lb_listener.arn}"  
-  priority     = "${var.priority}"   
+  depends_on   = [aws_lb_target_group.waf_lb_tg]  
+  listener_arn = aws_lb_listener.waf_lb_listener.arn     
   action {    
     type             = "forward"    
-    target_group_arn = "${aws_alb_target_group.waf_lb_tg.id}"  
+    target_group_arn = aws_lb_target_group.waf_lb_tg.id  
   }   
   condition {    
     path_pattern {
