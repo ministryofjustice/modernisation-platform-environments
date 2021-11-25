@@ -66,7 +66,6 @@ resource "aws_lb_target_group" "waf_lb_tg" {
   name                 = "waf-lb-tg-${var.networking[0].application}"
   port                 = 80
   protocol             = "HTTP"
-  target_type          = "ip"
   deregistration_delay = "30"
   vpc_id               = local.vpc_id
 
