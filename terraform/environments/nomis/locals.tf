@@ -17,7 +17,7 @@ data "aws_vpc" "shared_vpc" {
 
 locals {
 
-  application_name = "nomis"
+  application_name = var.networking[0].application
 
   environment_management = jsondecode(data.aws_secretsmanager_secret_version.environment_management.secret_string)
 
