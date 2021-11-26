@@ -49,6 +49,14 @@ provider "aws" {
 #   region = "eu-west-2"
 # }
 
+# provider "aws" {
+#   alias  = "bucket-replication"
+#   region = "eu-west-1"
+#   assume_role {
+#     role_arn = "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/MemberInfrastructureAccess"
+#   }
+# }
+
 # # AWS provider for core-vpc-<environment>, to share VPCs into this account
 # provider "aws" {
 #   alias  = "core-vpc"
