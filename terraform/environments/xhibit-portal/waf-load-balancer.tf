@@ -142,7 +142,7 @@ resource "aws_alb_listener_rule" "web_listener_rule" {
   }
 
   condition {    
-    host-header {
+    host_header {
       # web.xhibit-portal.hmcts-development.modernisation-platform.service.justice.gov.uk
       values = ["web.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]  
     }    
