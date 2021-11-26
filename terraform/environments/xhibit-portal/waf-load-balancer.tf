@@ -113,7 +113,9 @@ resource "aws_lb_target_group_attachment" "ingestion-server-attachment" {
 
 resource "aws_lb_listener" "waf_lb_listener" {
   depends_on = [
-    aws_acm_certificate_validation.waf_lb_cert_validation
+    aws_acm_certificate_validation.waf_lb_cert_validation,
+    aws_lb_target_group.waf_lb_web_tg,
+    aws_lb_target_group.waf_lb_ingest_tg
   ]
 
   load_balancer_arn = aws_lb.waf_lb.arn
