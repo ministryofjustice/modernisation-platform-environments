@@ -1,32 +1,19 @@
-# resource "aws_security_group" "waf_lb_sg" {
-#   description = "Security group for app load balancer, simply to implement ACL rules for the WAF"
-#   name        = "waf-lb-sg-${var.networking[0].application}"
-#   vpc_id      = local.vpc_id
-
-#   ingress {
-#     description      = "allow all"
-#     from_port        = 0
-#     to_port          = 0
-#     protocol         = "-1"
-#     cidr_blocks      = ["0.0.0.0/0"]
-#     ipv6_cidr_blocks = ["::/0"]
-#   }
-
-#   egress {
-#     description = "Send everything straight to the app server"
-#     from_port   = 80
-#     to_port     = 80
-#     protocol    = "tcp"
-#     cidr_blocks = ["${module.bastion_linux.bastion_private_ip}/32"]
-#   }
-# }
-
 resource "aws_security_group" "waf_lb" {
   description = "Security group for app load balancer, simply to implement ACL rules for the WAF"
   name        = "waf-loadbalancer-${var.networking[0].application}"
   vpc_id      = local.vpc_id
 }
 
+# resource "aws_security_group_rule" "ingress-to-portal" {
+#     security_group_id  = aws_security_group.waf_lb.id
+#     type            = "ingress"
+#     description      = "allow portal web traffic"
+#     from_port        = 0
+#     to_port          = 0
+#     protocol         = "TCP"
+#     cidr_blocks      = ["0.0.0.0/0"]
+#     source_security_group_id = aws_security_group.portal-server.id
+# }
 
 resource "aws_security_group_rule" "egress-to-portal" {
     security_group_id  = aws_security_group.waf_lb.id
@@ -249,4 +236,9 @@ resource "aws_wafv2_web_acl" "waf_acl" {
     metric_name                = "waf-acl-metric"
     sampled_requests_enabled   = true
   }
+}
+
+resource "aws_wafv2_web_acl_association" "aws_lb_waf_association" {
+  resource_arn = aws_lb.waf_lb.arn
+  web_acl_arn  = aws_wafv2_web_acl.waf_acl.arn
 }
