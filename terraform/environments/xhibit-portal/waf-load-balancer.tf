@@ -49,7 +49,7 @@ resource "aws_lb" "waf_lb" {
 }
 
 resource "aws_lb_target_group" "waf_lb_web_tg" {
-  name                 = "waf-lb-tg-${var.networking[0].application}"
+  name                 = "waf-lb-web-tg-${var.networking[0].application}"
   port                 = 80
   protocol             = "HTTP"
   deregistration_delay = "30"
@@ -74,7 +74,7 @@ resource "aws_lb_target_group" "waf_lb_web_tg" {
 }
 
 resource "aws_lb_target_group" "waf_lb_ingest_tg" {
-  name                 = "waf-lb-tg-${var.networking[0].application}"
+  name                 = "waf-lb-ingest-tg-${var.networking[0].application}"
   port                 = 80
   protocol             = "HTTP"
   deregistration_delay = "30"
