@@ -193,13 +193,13 @@ resource "aws_ebs_volume" "database-disk4" {
   )
 }
 
-resource "aws_volume_attachment" "database-disk5" {
+resource "aws_volume_attachment" "database-disk4" {
   device_name = "xvdi"
   volume_id   = aws_ebs_volume.database-disk4.id
   instance_id = aws_instance.database-server.id
 }
 
-resource "aws_ebs_volume" "database-disk4" {
+resource "aws_ebs_volume" "database-disk5" {
   availability_zone = "${local.region}a"
   type              = "gp2"
   encrypted         = true
