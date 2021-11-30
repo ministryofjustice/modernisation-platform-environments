@@ -279,7 +279,14 @@ data "aws_iam_policy_document" "packer_s3_bucket_access" {
     actions = [
       "s3:GetObject"
     ]
-    resources = ["${module.s3-bucket.bucket.arn}/dbaupload/oracle_11gR2/*"]
+    resources = ["${module.s3-bucket.bucket.arn}/*"]
+  }
+  statement { # explicitly deny eveything else
+    effect = "Deny"
+    not_actions = [
+      "s3:GetObject"
+    ]
+    resources = ["${module.s3-bucket.bucket.arn}/*"]
   }
 }
 

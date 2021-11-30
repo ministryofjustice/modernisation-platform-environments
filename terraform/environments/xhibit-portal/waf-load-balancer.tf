@@ -25,8 +25,6 @@ resource "aws_security_group_rule" "egress-to-ingestion" {
     source_security_group_id = aws_security_group.cjip-server.id
 }
 
-
-
 data "aws_subnet_ids" "shared-public" {
   vpc_id = local.vpc_id
   tags = {
@@ -307,6 +305,7 @@ resource "aws_wafv2_web_acl" "waf_acl" {
     metric_name                = "waf-acl-metric"
     sampled_requests_enabled   = true
   }
+
 }
 
 resource "aws_wafv2_web_acl_association" "aws_lb_waf_association" {
