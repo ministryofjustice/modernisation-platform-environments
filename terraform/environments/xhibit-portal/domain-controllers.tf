@@ -123,6 +123,16 @@ resource "aws_security_group_rule" "dcs-from-exchange" {
   source_security_group_id = aws_security_group.exchange-server.id
 }
 
+resource "aws_security_group_rule" "dcs-from-db" {
+  security_group_id        = aws_security_group.domain-controllers.id
+  type                     = "ingress"
+  description              = "allow All"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = -1
+  source_security_group_id = aws_security_group.database-server.id
+}
+
 
 resource "aws_security_group" "outbound-dns-resolver" {
   provider = aws.core-vpc
