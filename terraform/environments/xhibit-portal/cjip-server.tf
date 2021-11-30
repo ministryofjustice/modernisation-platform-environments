@@ -55,7 +55,7 @@ resource "aws_security_group_rule" "cjim-inbound-web" {
 
 
 resource "aws_instance" "cjip-server" {
-  depends_on   = [aws_security_group.cjip-server,aws_lb_target_group_attachment.ingestion-server-attachment]
+  depends_on   = [aws_security_group.cjip-server]
   instance_type               = "t2.medium"
   ami                         = local.application_data.accounts[local.environment].suprig05-ami
   vpc_security_group_ids      = [aws_security_group.cjip-server.id]
@@ -98,7 +98,6 @@ resource "aws_instance" "cjip-server" {
 
 
 resource "aws_ebs_volume" "cjip-disk1" {
-  depends_on   = [aws_instance.cjip-server]
   availability_zone = "${local.region}a"
   type              = "gp2"
   encrypted         = true

@@ -125,7 +125,6 @@ resource "aws_security_group_rule" "cjip-to-sql" {
 
 
 # resource "aws_ebs_volume" "database-disk1" {
-#   depends_on   = [aws_instance.database-server]
 #   availability_zone = "${local.region}a"
 #   type              = "gp2"
 #   encrypted         = true
@@ -150,7 +149,6 @@ resource "aws_security_group_rule" "cjip-to-sql" {
 
 
 # resource "aws_ebs_volume" "database-disk2" {
-#   depends_on   = [aws_instance.database-server]
 #   availability_zone = "${local.region}a"
 #   type              = "gp2"
 #   encrypted         = true
@@ -173,7 +171,6 @@ resource "aws_security_group_rule" "cjip-to-sql" {
 
 
 # resource "aws_ebs_volume" "database-disk3" {
-#   depends_on   = [aws_instance.database-server]
 #   availability_zone = "${local.region}a"
 #   type              = "gp2"
 #   encrypted         = true

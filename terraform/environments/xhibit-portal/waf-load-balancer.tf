@@ -80,7 +80,7 @@ resource "aws_lb_target_group" "waf_lb_web_tg" {
 }
 
 resource "aws_lb_target_group" "waf_lb_ingest_tg" {
-  depends_on   = [aws_lb.waf_lb] 
+  depends_on   = [aws_lb.waf_lb,aws_lb_target_group_attachment.portal-server-attachment] 
   name                 = "waf-lb-ingest-tg-${var.networking[0].application}"
   port                 = 80
   protocol             = "HTTP"
