@@ -127,7 +127,7 @@ resource "aws_ebs_volume" "database-disk1" {
 }
 
 resource "aws_volume_attachment" "database-disk1" {
-  device_name = "xvdi"
+  device_name = "xvdb"
   volume_id   = aws_ebs_volume.database-disk1.id
   instance_id = aws_instance.database-server.id
 }
@@ -151,7 +151,7 @@ resource "aws_ebs_volume" "database-disk2" {
 }
 
 resource "aws_volume_attachment" "database-disk2" {
-  device_name = "xvdi"
+  device_name = "xvdc"
   volume_id   = aws_ebs_volume.database-disk2.id
   instance_id = aws_instance.database-server.id
 }
@@ -173,7 +173,7 @@ resource "aws_ebs_volume" "database-disk3" {
 }
 
 resource "aws_volume_attachment" "database-disk3" {
-  device_name = "xvdi"
+  device_name = "xvdd"
   volume_id   = aws_ebs_volume.database-disk3.id
   instance_id = aws_instance.database-server.id
 }
@@ -194,7 +194,7 @@ resource "aws_ebs_volume" "database-disk4" {
 }
 
 resource "aws_volume_attachment" "database-disk4" {
-  device_name = "xvdi"
+  device_name = "xvde"
   volume_id   = aws_ebs_volume.database-disk4.id
   instance_id = aws_instance.database-server.id
 }
@@ -215,7 +215,7 @@ resource "aws_ebs_volume" "database-disk5" {
 }
 
 resource "aws_volume_attachment" "database-disk5" {
-  device_name = "xvdi"
+  device_name = "xvdf"
   volume_id   = aws_ebs_volume.database-disk5.id
   instance_id = aws_instance.database-server.id
 }
@@ -237,7 +237,7 @@ resource "aws_ebs_volume" "database-disk6" {
 }
 
 resource "aws_volume_attachment" "database-disk6" {
-  device_name = "xvdi"
+  device_name = "xvdg"
   volume_id   = aws_ebs_volume.database-disk6.id
   instance_id = aws_instance.database-server.id
 }
