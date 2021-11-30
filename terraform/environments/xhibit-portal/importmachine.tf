@@ -147,44 +147,44 @@ resource "aws_security_group" "domain-check" {
 
 
 resource "aws_security_group_rule" "dcheck-outbound-all" {
-    security_group_id  = aws_security_group.domain-check.id
-    type            = "egress"
-    description      = "allow all"
-    from_port        = 0
-    to_port          = 0
-    protocol         = "-1"
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
+  security_group_id = aws_security_group.domain-check.id
+  type              = "egress"
+  description       = "allow all"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  cidr_blocks       = ["0.0.0.0/0"]
+  ipv6_cidr_blocks  = ["::/0"]
 }
 
 resource "aws_security_group_rule" "dcheck-inbound-bastion" {
-    security_group_id  = aws_security_group.domain-check.id
-    type            = "ingress"
-    description      = "allow bastion"
-    from_port        = 0
-    to_port          = 3389
-    protocol         = "TCP"
-    cidr_blocks      = ["${module.bastion_linux.bastion_private_ip}/32"]
+  security_group_id = aws_security_group.domain-check.id
+  type              = "ingress"
+  description       = "allow bastion"
+  from_port         = 0
+  to_port           = 3389
+  protocol          = "TCP"
+  cidr_blocks       = ["${module.bastion_linux.bastion_private_ip}/32"]
 }
 
 resource "aws_security_group_rule" "dcheck-to-dcs" {
-    security_group_id        = aws_security_group.domain-check.id
-    type                     = "egress"
-    description              = "allow All"
-    from_port                = 0
-    to_port                  = 0
-    protocol                 = -1
-    source_security_group_id =  aws_security_group.domain-controllers.id
+  security_group_id        = aws_security_group.domain-check.id
+  type                     = "egress"
+  description              = "allow All"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = -1
+  source_security_group_id = aws_security_group.domain-controllers.id
 }
 
 resource "aws_security_group_rule" "dcs-from-dcheck" {
-    security_group_id        = aws_security_group.domain-controllers.id
-    type                     = "ingress"
-    description              = "allow All"
-    from_port                = 0
-    to_port                  = 0
-    protocol                 = -1
-    source_security_group_id = aws_security_group.domain-check.id
+  security_group_id        = aws_security_group.domain-controllers.id
+  type                     = "ingress"
+  description              = "allow All"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = -1
+  source_security_group_id = aws_security_group.domain-check.id
 }
 
 

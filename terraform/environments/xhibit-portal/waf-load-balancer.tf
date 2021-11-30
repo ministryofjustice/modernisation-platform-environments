@@ -6,23 +6,23 @@ resource "aws_security_group" "waf_lb" {
 
 
 resource "aws_security_group_rule" "egress-to-portal" {
-    security_group_id  = aws_security_group.waf_lb.id
-    type            = "egress"
-    description      = "allow web traffic to get to portal"
-    from_port        = 80
-    to_port          = 80
-    protocol         = "TCP"
-    source_security_group_id = aws_security_group.portal-server.id
+  security_group_id        = aws_security_group.waf_lb.id
+  type                     = "egress"
+  description              = "allow web traffic to get to portal"
+  from_port                = 80
+  to_port                  = 80
+  protocol                 = "TCP"
+  source_security_group_id = aws_security_group.portal-server.id
 }
 
 resource "aws_security_group_rule" "egress-to-ingestion" {
-    security_group_id  = aws_security_group.waf_lb.id
-    type            = "egress"
-    description      = "allow web traffic to get to ingestion server"
-    from_port        = 80
-    to_port          = 80
-    protocol         = "TCP"
-    source_security_group_id = aws_security_group.cjip-server.id
+  security_group_id        = aws_security_group.waf_lb.id
+  type                     = "egress"
+  description              = "allow web traffic to get to ingestion server"
+  from_port                = 80
+  to_port                  = 80
+  protocol                 = "TCP"
+  source_security_group_id = aws_security_group.cjip-server.id
 }
 
 data "aws_subnet_ids" "shared-public" {
@@ -56,13 +56,13 @@ resource "aws_lb_target_group" "waf_lb_web_tg" {
   vpc_id               = local.vpc_id
 
   health_check {
-    path = "/Secure/Default.aspx"
-    port = 80
-    healthy_threshold = 6
+    path                = "/Secure/Default.aspx"
+    port                = 80
+    healthy_threshold   = 6
     unhealthy_threshold = 2
-    timeout = 2
-    interval = 5
-    matcher = "200"  # change this to 200 when the database comes up
+    timeout             = 2
+    interval            = 5
+    matcher             = "200" # change this to 200 when the database comes up
   }
 
   tags = merge(
@@ -81,13 +81,13 @@ resource "aws_lb_target_group" "waf_lb_ingest_tg" {
   vpc_id               = local.vpc_id
 
   health_check {
-    path = "/BITSWebService/BITSWebService.asmx"
-    port = 80
-    healthy_threshold = 6
+    path                = "/BITSWebService/BITSWebService.asmx"
+    port                = 80
+    healthy_threshold   = 6
     unhealthy_threshold = 2
-    timeout = 2
-    interval = 5
-    matcher = "200"  # change this to 200 when the database comes up
+    timeout             = 2
+    interval            = 5
+    matcher             = "200" # change this to 200 when the database comes up
   }
 
   tags = merge(
@@ -131,45 +131,45 @@ resource "aws_lb_listener" "waf_lb_listener" {
 }
 
 resource "aws_alb_listener_rule" "web_listener_rule" {
-  depends_on   = [aws_lb_target_group.waf_lb_web_tg]  
-  listener_arn = aws_lb_listener.waf_lb_listener.arn     
-  action {    
-    type             = "forward"    
-    target_group_arn = aws_lb_target_group.waf_lb_web_tg.id  
-  }   
-  condition {    
+  depends_on   = [aws_lb_target_group.waf_lb_web_tg]
+  listener_arn = aws_lb_listener.waf_lb_listener.arn
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.waf_lb_web_tg.id
+  }
+  condition {
     path_pattern {
-      values = ["/"]  
-    }    
+      values = ["/"]
+    }
   }
 
-  condition {    
+  condition {
     host_header {
       # web.xhibit-portal.hmcts-development.modernisation-platform.service.justice.gov.uk
-      values = ["web.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]  
-    }    
+      values = ["web.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
+    }
   }
 
 }
 
 resource "aws_alb_listener_rule" "ingestion_listener_rule" {
-  depends_on   = [aws_lb_target_group.waf_lb_ingest_tg]  
-  listener_arn = aws_lb_listener.waf_lb_listener.arn     
-  action {    
-    type             = "forward"    
-    target_group_arn = aws_lb_target_group.waf_lb_ingest_tg.id  
-  }   
-  condition {    
+  depends_on   = [aws_lb_target_group.waf_lb_ingest_tg]
+  listener_arn = aws_lb_listener.waf_lb_listener.arn
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.waf_lb_ingest_tg.id
+  }
+  condition {
     path_pattern {
-      values = ["/"]  
-    }    
+      values = ["/"]
+    }
   }
 
-  condition {    
+  condition {
     host_header {
       # web.xhibit-portal.hmcts-development.modernisation-platform.service.justice.gov.uk
-      values = ["ingest.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]  
-    }    
+      values = ["ingest.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
+    }
   }
 
 }
