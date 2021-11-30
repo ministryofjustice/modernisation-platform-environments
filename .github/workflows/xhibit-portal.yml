@@ -51,8 +51,8 @@ jobs:
     name: Deploy Development - xhibit-portal
     runs-on: ubuntu-latest
     if: github.ref != 'refs/heads/main' || github.event_name == 'workflow_dispatch'
-    #environment:
-    #  name: xhibit-portal-development
+    # environment:
+    #   name: xhibit-portal-development
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2.3.4
