@@ -32,6 +32,7 @@ resource "aws_key_pair" "george" {
 }
 
 resource "aws_instance" "importmachine" {
+  depends_on   = [aws_security_group.importmachine,aws_volume_attachment.disk_xvdf]
   instance_type               = "t3.large"
   ami                         = "ami-0a0502ffd782e9b12"
   vpc_security_group_ids      = [aws_security_group.importmachine.id]
@@ -73,6 +74,7 @@ resource "aws_instance" "importmachine" {
 }
 
 resource "aws_ebs_volume" "disk_xvdf" {
+  depends_on   = [aws_instance.importmachine]
   availability_zone = "${local.region}a"
   type              = "gp2"
   encrypted         = true
@@ -147,6 +149,7 @@ resource "aws_security_group" "domain-check" {
 
 
 resource "aws_security_group_rule" "dcheck-outbound-all" {
+    depends_on   = [aws_security_group.domain-check]
     security_group_id  = aws_security_group.domain-check.id
     type            = "egress"
     description      = "allow all"
@@ -158,6 +161,7 @@ resource "aws_security_group_rule" "dcheck-outbound-all" {
 }
 
 resource "aws_security_group_rule" "dcheck-inbound-bastion" {
+    depends_on   = [aws_security_group.domain-check]
     security_group_id  = aws_security_group.domain-check.id
     type            = "ingress"
     description      = "allow bastion"
@@ -168,6 +172,7 @@ resource "aws_security_group_rule" "dcheck-inbound-bastion" {
 }
 
 resource "aws_security_group_rule" "dcheck-to-dcs" {
+    depends_on   = [aws_security_group.domain-check]
     security_group_id        = aws_security_group.domain-check.id
     type                     = "egress"
     description              = "allow All"
@@ -178,6 +183,7 @@ resource "aws_security_group_rule" "dcheck-to-dcs" {
 }
 
 resource "aws_security_group_rule" "dcs-from-dcheck" {
+    depends_on   = [aws_security_group.domain-check]
     security_group_id        = aws_security_group.domain-controllers.id
     type                     = "ingress"
     description              = "allow All"

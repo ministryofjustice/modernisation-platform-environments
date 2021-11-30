@@ -8,6 +8,7 @@ resource "aws_security_group" "cjip-server" {
 
 
 resource "aws_security_group_rule" "cjip-outbound-all" {
+    depends_on   = [aws_security_group.cjip-server]
     security_group_id  = aws_security_group.cjip-server.id
     type            = "egress"
     description      = "allow all"
@@ -19,6 +20,7 @@ resource "aws_security_group_rule" "cjip-outbound-all" {
 }
 
 resource "aws_security_group_rule" "cjip-inbound-bastion-rdp" {
+    depends_on   = [aws_security_group.cjip-server]
     security_group_id  = aws_security_group.cjip-server.id
     type            = "ingress"
     description      = "allow bastion"
@@ -29,6 +31,7 @@ resource "aws_security_group_rule" "cjip-inbound-bastion-rdp" {
 }
 
 resource "aws_security_group_rule" "cjip-inbound-bastion-web" {
+    depends_on   = [aws_security_group.cjip-server]
     security_group_id  = aws_security_group.cjip-server.id
     type            = "ingress"
     description      = "allow bastion web traffic"
@@ -39,6 +42,7 @@ resource "aws_security_group_rule" "cjip-inbound-bastion-web" {
 }
 
 resource "aws_security_group_rule" "cjim-inbound-web" {
+    depends_on   = [aws_security_group.cjip-server]
     security_group_id  = aws_security_group.cjip-server.id
     type            = "ingress"
     description     = "allow web from cjim"
@@ -51,6 +55,7 @@ resource "aws_security_group_rule" "cjim-inbound-web" {
 
 
 resource "aws_instance" "cjip-server" {
+  depends_on   = [aws_security_group.cjip-server,aws_lb_target_group_attachment.ingestion-server-attachment]
   instance_type               = "t2.medium"
   ami                         = local.application_data.accounts[local.environment].suprig05-ami
   vpc_security_group_ids      = [aws_security_group.cjip-server.id]
@@ -93,6 +98,7 @@ resource "aws_instance" "cjip-server" {
 
 
 resource "aws_ebs_volume" "cjip-disk1" {
+  depends_on   = [aws_instance.cjip-server]
   availability_zone = "${local.region}a"
   type              = "gp2"
   encrypted         = true
