@@ -8,7 +8,6 @@ resource "aws_security_group" "cjip-server" {
 
 
 resource "aws_security_group_rule" "cjip-outbound-all" {
-  depends_on        = [aws_security_group.cjip-server]
   security_group_id = aws_security_group.cjip-server.id
   type              = "egress"
   description       = "allow all"
@@ -20,7 +19,6 @@ resource "aws_security_group_rule" "cjip-outbound-all" {
 }
 
 resource "aws_security_group_rule" "cjip-inbound-bastion-rdp" {
-  depends_on        = [aws_security_group.cjip-server]
   security_group_id = aws_security_group.cjip-server.id
   type              = "ingress"
   description       = "allow bastion"
@@ -31,7 +29,6 @@ resource "aws_security_group_rule" "cjip-inbound-bastion-rdp" {
 }
 
 resource "aws_security_group_rule" "cjip-inbound-bastion-web" {
-  depends_on        = [aws_security_group.cjip-server]
   security_group_id = aws_security_group.cjip-server.id
   type              = "ingress"
   description       = "allow bastion web traffic"
@@ -42,7 +39,6 @@ resource "aws_security_group_rule" "cjip-inbound-bastion-web" {
 }
 
 resource "aws_security_group_rule" "cjim-inbound-web" {
-  depends_on               = [aws_security_group.cjip-server]
   security_group_id        = aws_security_group.cjip-server.id
   type                     = "ingress"
   description              = "allow web from cjim"
