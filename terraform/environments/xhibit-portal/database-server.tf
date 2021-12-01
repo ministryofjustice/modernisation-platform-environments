@@ -8,6 +8,7 @@ resource "aws_security_group" "database-server" {
 
 
 resource "aws_security_group_rule" "database-outbound-all" {
+  depends_on        = [aws_security_group.database-server]
   security_group_id = aws_security_group.database-server.id
   type              = "egress"
   description       = "allow all"
@@ -19,6 +20,7 @@ resource "aws_security_group_rule" "database-outbound-all" {
 }
 
 resource "aws_security_group_rule" "database-inbound-bastion" {
+  depends_on        = [aws_security_group.database-server]
   security_group_id = aws_security_group.database-server.id
   type              = "ingress"
   description       = "allow bastion"
@@ -29,6 +31,7 @@ resource "aws_security_group_rule" "database-inbound-bastion" {
 }
 
 resource "aws_security_group_rule" "app-to-sql" {
+  depends_on               = [aws_security_group.database-server]
   security_group_id        = aws_security_group.database-server.id
   type                     = "ingress"
   description              = "allow app to sql traffic"
@@ -39,6 +42,7 @@ resource "aws_security_group_rule" "app-to-sql" {
 }
 
 resource "aws_security_group_rule" "portal-to-sql" {
+  depends_on               = [aws_security_group.database-server]
   security_group_id        = aws_security_group.database-server.id
   type                     = "ingress"
   description              = "allow app to sql traffic"
@@ -49,6 +53,7 @@ resource "aws_security_group_rule" "portal-to-sql" {
 }
 
 resource "aws_security_group_rule" "cjim-to-sql" {
+  depends_on               = [aws_security_group.database-server]
   security_group_id        = aws_security_group.database-server.id
   type                     = "ingress"
   description              = "allow app to sql traffic"
@@ -59,6 +64,7 @@ resource "aws_security_group_rule" "cjim-to-sql" {
 }
 
 resource "aws_security_group_rule" "cjip-to-sql" {
+  depends_on               = [aws_security_group.database-server]
   security_group_id        = aws_security_group.database-server.id
   type                     = "ingress"
   description              = "allow app to sql traffic"
@@ -69,178 +75,136 @@ resource "aws_security_group_rule" "cjip-to-sql" {
 }
 
 
-resource "aws_instance" "database-server" {
-  instance_type               = "t2.medium"
-  ami                         = local.application_data.accounts[local.environment].suprig01-ami
-  vpc_security_group_ids      = [aws_security_group.database-server.id]
-  monitoring                  = false
-  associate_public_ip_address = false
-  ebs_optimized               = false
-  subnet_id                   = data.aws_subnet.private_az_a.id
-  key_name                    = aws_key_pair.george.key_name
+# resource "aws_instance" "database-server" {
+#   depends_on   = [aws_security_group.database-server]
+#   instance_type               = "t2.medium"
+#   ami                         = local.application_data.accounts[local.environment].suprig01-ami
+#   vpc_security_group_ids      = [aws_security_group.database-server.id]
+#   monitoring                  = false
+#   associate_public_ip_address = false
+#   ebs_optimized               = false
+#   subnet_id                   = data.aws_subnet.private_az_a.id
+#   key_name                    = aws_key_pair.george.key_name
 
 
-  metadata_options {
-    http_tokens   = "required"
-    http_endpoint = "enabled"
-  }
+#   metadata_options {
+#     http_tokens   = "required"
+#     http_endpoint = "enabled"
+#   }
 
-  root_block_device {
-    encrypted = true
-  }
+#   root_block_device {
+#     encrypted = true
+#   }
 
-  lifecycle {
-    ignore_changes = [
-      # This prevents clobbering the tags of attached EBS volumes. See
-      # [this bug][1] in the AWS provider upstream.
-      #
-      # [1]: https://github.com/terraform-providers/terraform-provider-aws/issues/770
-      volume_tags,
-      #user_data,         # Prevent changes to user_data from destroying existing EC2s
-      root_block_device,
-      # Prevent changes to encryption from destroying existing EC2s - can delete once encryption complete
-    ]
-  }
+#   lifecycle {
+#     ignore_changes = [
+#       # This prevents clobbering the tags of attached EBS volumes. See
+#       # [this bug][1] in the AWS provider upstream.
+#       #
+#       # [1]: https://github.com/terraform-providers/terraform-provider-aws/issues/770
+#       volume_tags,
+#       #user_data,         # Prevent changes to user_data from destroying existing EC2s
+#       root_block_device,
+#       # Prevent changes to encryption from destroying existing EC2s - can delete once encryption complete
+#     ]
+#   }
 
-  tags = merge(
-    local.tags,
-    {
-      Name = "database-${local.application_name}"
-    }
-  )
-}
-
-
-resource "aws_ebs_volume" "database-disk1" {
-  availability_zone = "${local.region}a"
-  type              = "gp2"
-  encrypted         = true
-
-  snapshot_id = local.application_data.accounts[local.environment].suprig01-disk-1-snapshot
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "database-disk1-${local.application_name}"
-    }
-  )
-}
-
-resource "aws_volume_attachment" "database-disk1" {
-  device_name = "xvdb"
-  volume_id   = aws_ebs_volume.database-disk1.id
-  instance_id = aws_instance.database-server.id
-}
+#   tags = merge(
+#     local.tags,
+#     {
+#       Name = "database-${local.application_name}"
+#     }
+#   )
+# }
 
 
+# resource "aws_ebs_volume" "database-disk1" {
+#   availability_zone = "${local.region}a"
+#   type              = "gp2"
+#   encrypted         = true
+
+#   snapshot_id = local.application_data.accounts[local.environment].suprig01-disk-1-snapshot
+
+#   tags = merge(
+#     local.tags,
+#     {
+#       Name = "database-disk1-${local.application_name}"
+#     }
+#   )
+# }
+
+# resource "aws_volume_attachment" "database-disk1" {
+#   device_name = "xvdi"
+#   volume_id   = aws_ebs_volume.database-disk1.id
+#   instance_id = aws_instance.database-server.id
+# }
 
 
-resource "aws_ebs_volume" "database-disk2" {
-  availability_zone = "${local.region}a"
-  type              = "gp2"
-  encrypted         = true
-
-  snapshot_id = local.application_data.accounts[local.environment].suprig01-disk-2-snapshot
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "database-disk2-${local.application_name}"
-    }
-  )
-}
-
-resource "aws_volume_attachment" "database-disk2" {
-  device_name = "xvdc"
-  volume_id   = aws_ebs_volume.database-disk2.id
-  instance_id = aws_instance.database-server.id
-}
 
 
-resource "aws_ebs_volume" "database-disk3" {
-  availability_zone = "${local.region}a"
-  type              = "gp2"
-  encrypted         = true
+# resource "aws_ebs_volume" "database-disk2" {
+#   availability_zone = "${local.region}a"
+#   type              = "gp2"
+#   encrypted         = true
 
-  snapshot_id = local.application_data.accounts[local.environment].suprig01-disk-3-snapshot
+#   snapshot_id = local.application_data.accounts[local.environment].suprig01-disk-2-snapshot
 
-  tags = merge(
-    local.tags,
-    {
-      Name = "database-disk3-${local.application_name}"
-    }
-  )
-}
+#   tags = merge(
+#     local.tags,
+#     {
+#       Name = "database-disk2-${local.application_name}"
+#     }
+#   )
+# }
 
-resource "aws_volume_attachment" "database-disk3" {
-  device_name = "xvdd"
-  volume_id   = aws_ebs_volume.database-disk3.id
-  instance_id = aws_instance.database-server.id
-}
-
-resource "aws_ebs_volume" "database-disk4" {
-  availability_zone = "${local.region}a"
-  type              = "gp2"
-  encrypted         = true
-
-  snapshot_id = local.application_data.accounts[local.environment].suprig01-disk-4-snapshot
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "database-disk4-${local.application_name}"
-    }
-  )
-}
-
-resource "aws_volume_attachment" "database-disk4" {
-  device_name = "xvde"
-  volume_id   = aws_ebs_volume.database-disk4.id
-  instance_id = aws_instance.database-server.id
-}
-
-resource "aws_ebs_volume" "database-disk5" {
-  availability_zone = "${local.region}a"
-  type              = "gp2"
-  encrypted         = true
-
-  snapshot_id = local.application_data.accounts[local.environment].suprig01-disk-5-snapshot
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "database-disk5-${local.application_name}"
-    }
-  )
-}
-
-resource "aws_volume_attachment" "database-disk5" {
-  device_name = "xvdf"
-  volume_id   = aws_ebs_volume.database-disk5.id
-  instance_id = aws_instance.database-server.id
-}
+# resource "aws_volume_attachment" "database-disk2" {
+#   device_name = "xvdi"
+#   volume_id   = aws_ebs_volume.database-disk2.id
+#   instance_id = aws_instance.database-server.id
+# }
 
 
-resource "aws_ebs_volume" "database-disk6" {
-  availability_zone = "${local.region}a"
-  type              = "gp2"
-  encrypted         = true
+# resource "aws_ebs_volume" "database-disk3" {
+#   availability_zone = "${local.region}a"
+#   type              = "gp2"
+#   encrypted         = true
 
-  snapshot_id = local.application_data.accounts[local.environment].suprig01-disk-6-snapshot
+#   snapshot_id = local.application_data.accounts[local.environment].suprig01-disk-3-snapshot
 
-  tags = merge(
-    local.tags,
-    {
-      Name = "database-disk6-${local.application_name}"
-    }
-  )
-}
+#   tags = merge(
+#     local.tags,
+#     {
+#       Name = "database-disk3-${local.application_name}"
+#     }
+#   )
+# }
 
-resource "aws_volume_attachment" "database-disk6" {
-  device_name = "xvdg"
-  volume_id   = aws_ebs_volume.database-disk6.id
-  instance_id = aws_instance.database-server.id
-}
+# resource "aws_volume_attachment" "database-disk3" {
+#   device_name = "xvdi"
+#   volume_id   = aws_ebs_volume.database-disk3.id
+#   instance_id = aws_instance.database-server.id
+# }
+
+# resource "aws_ebs_volume" "database-disk4" {
+#   availability_zone = "${local.region}a"
+#   type              = "gp2"
+#   encrypted         = true
+
+#   snapshot_id = local.application_data.accounts[local.environment].suprig01-disk-4-snapshot
+
+#   tags = merge(
+#     local.tags,
+#     {
+#       Name = "database-disk4-${local.application_name}"
+#     }
+#   )
+# }
+
+# resource "aws_volume_attachment" "database-disk4" {
+#   device_name = "xvdi"
+#   volume_id   = aws_ebs_volume.database-disk4.id
+#   instance_id = aws_instance.database-server.id
+# }
 
 
 
