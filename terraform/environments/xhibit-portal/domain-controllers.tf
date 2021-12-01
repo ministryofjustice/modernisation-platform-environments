@@ -64,16 +64,16 @@ resource "aws_security_group_rule" "dc5" {
   self              = true
 }
 
-# resource "aws_security_group_rule" "dc6" {
-#   depends_on        = [aws_security_group.domain-controllers]
-#   security_group_id = aws_security_group.domain-controllers.id
-#   type              = "egress"
-#   description       = "allow DCs to talk to each other"
-#   from_port         = 0
-#   to_port           = 0
-#   protocol          = -1
-#   self              = true
-# }
+resource "aws_security_group_rule" "dc6" {
+  depends_on        = [aws_security_group.domain-controllers]
+  security_group_id = aws_security_group.domain-controllers.id
+  type              = "egress"
+  description       = "allow DCs to talk to each other"
+  from_port         = 0
+  to_port           = 0
+  protocol          = -1
+  self              = true
+}
 
 
 resource "aws_security_group_rule" "dcs-from-app" {
