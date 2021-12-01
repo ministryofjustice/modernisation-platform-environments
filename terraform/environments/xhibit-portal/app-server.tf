@@ -8,6 +8,7 @@ resource "aws_security_group" "app-server" {
 
 
 resource "aws_security_group_rule" "app-outbound-all" {
+  depends_on        = [aws_security_group.app-server]
   security_group_id = aws_security_group.app-server.id
   type              = "egress"
   description       = "allow all"
@@ -19,6 +20,7 @@ resource "aws_security_group_rule" "app-outbound-all" {
 }
 
 resource "aws_security_group_rule" "app-inbound-bastion" {
+  depends_on        = [aws_security_group.app-server]
   security_group_id = aws_security_group.app-server.id
   type              = "ingress"
   description       = "allow bastion"
@@ -29,6 +31,7 @@ resource "aws_security_group_rule" "app-inbound-bastion" {
 }
 
 resource "aws_security_group_rule" "app-from-portal" {
+  depends_on               = [aws_security_group.app-server]
   security_group_id        = aws_security_group.app-server.id
   type                     = "ingress"
   description              = "allow portal web traffic"
