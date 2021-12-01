@@ -70,7 +70,6 @@ resource "aws_security_group_rule" "cjip-to-sql" {
 
 
 # resource "aws_instance" "database-server" {
-#   depends_on   = [aws_security_group.database-server]
 #   instance_type               = "t2.medium"
 #   ami                         = local.application_data.accounts[local.environment].suprig01-ami
 #   vpc_security_group_ids      = [aws_security_group.database-server.id]

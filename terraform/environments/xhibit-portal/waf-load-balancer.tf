@@ -33,7 +33,6 @@ data "aws_subnet_ids" "shared-public" {
 }
 
 resource "aws_lb" "waf_lb" {
-  depends_on                 = [aws_security_group.waf_lb]
   name                       = "waf-lb-${var.networking[0].application}"
   internal                   = false
   load_balancer_type         = "application"
@@ -50,7 +49,6 @@ resource "aws_lb" "waf_lb" {
 }
 
 resource "aws_lb_target_group" "waf_lb_web_tg" {
-  depends_on           = [aws_lb.waf_lb]
   name                 = "waf-lb-web-tg-${var.networking[0].application}"
   port                 = 80
   protocol             = "HTTP"
@@ -76,7 +74,6 @@ resource "aws_lb_target_group" "waf_lb_web_tg" {
 }
 
 resource "aws_lb_target_group" "waf_lb_ingest_tg" {
-  depends_on           = [aws_lb.waf_lb, aws_lb_target_group_attachment.portal-server-attachment]
   name                 = "waf-lb-ingest-tg-${var.networking[0].application}"
   port                 = 80
   protocol             = "HTTP"
@@ -115,12 +112,6 @@ resource "aws_lb_target_group_attachment" "ingestion-server-attachment" {
 
 
 resource "aws_lb_listener" "waf_lb_listener" {
-  depends_on = [
-    aws_acm_certificate_validation.waf_lb_cert_validation,
-    aws_lb_target_group.waf_lb_web_tg,
-    aws_lb_target_group.waf_lb_ingest_tg
-  ]
-
   load_balancer_arn = aws_lb.waf_lb.arn
   port              = "443"
   protocol          = "HTTPS"
