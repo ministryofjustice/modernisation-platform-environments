@@ -27,8 +27,6 @@ resource "aws_security_group_rule" "egress-to-ingestion" {
     source_security_group_id = aws_security_group.cjip-server.id
 }
 
-
-
 data "aws_subnet_ids" "shared-public" {
   vpc_id = local.vpc_id
   tags = {
@@ -62,13 +60,13 @@ resource "aws_lb_target_group" "waf_lb_web_tg" {
   vpc_id               = local.vpc_id
 
   health_check {
-    path = "/Secure/Default.aspx"
-    port = 80
-    healthy_threshold = 6
+    path                = "/Secure/Default.aspx"
+    port                = 80
+    healthy_threshold   = 6
     unhealthy_threshold = 2
-    timeout = 2
-    interval = 5
-    matcher = "200"  # change this to 200 when the database comes up
+    timeout             = 2
+    interval            = 5
+    matcher             = "200" # change this to 200 when the database comes up
   }
 
   tags = merge(
@@ -88,13 +86,13 @@ resource "aws_lb_target_group" "waf_lb_ingest_tg" {
   vpc_id               = local.vpc_id
 
   health_check {
-    path = "/BITSWebService/BITSWebService.asmx"
-    port = 80
-    healthy_threshold = 6
+    path                = "/BITSWebService/BITSWebService.asmx"
+    port                = 80
+    healthy_threshold   = 6
     unhealthy_threshold = 2
-    timeout = 2
-    interval = 5
-    matcher = "200"  # change this to 200 when the database comes up
+    timeout             = 2
+    interval            = 5
+    matcher             = "200" # change this to 200 when the database comes up
   }
 
   tags = merge(
@@ -146,15 +144,15 @@ resource "aws_alb_listener_rule" "web_listener_rule" {
   }   
   condition {    
     path_pattern {
-      values = ["/"]  
-    }    
+      values = ["/"]
+    }
   }
 
-  condition {    
+  condition {
     host_header {
       # web.xhibit-portal.hmcts-development.modernisation-platform.service.justice.gov.uk
-      values = ["web.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]  
-    }    
+      values = ["web.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
+    }
   }
 
 }
@@ -168,15 +166,15 @@ resource "aws_alb_listener_rule" "ingestion_listener_rule" {
   }   
   condition {    
     path_pattern {
-      values = ["/"]  
-    }    
+      values = ["/"]
+    }
   }
 
-  condition {    
+  condition {
     host_header {
       # web.xhibit-portal.hmcts-development.modernisation-platform.service.justice.gov.uk
-      values = ["ingest.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]  
-    }    
+      values = ["ingest.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
+    }
   }
 
 }
@@ -312,6 +310,7 @@ resource "aws_wafv2_web_acl" "waf_acl" {
     metric_name                = "waf-acl-metric"
     sampled_requests_enabled   = true
   }
+
 }
 
 resource "aws_wafv2_web_acl_association" "aws_lb_waf_association" {
