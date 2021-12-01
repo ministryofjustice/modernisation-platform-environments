@@ -6,7 +6,6 @@ resource "aws_security_group" "waf_lb" {
 
 
 resource "aws_security_group_rule" "egress-to-portal" {
-  depends_on               = [aws_security_group.waf_lb]
   security_group_id        = aws_security_group.waf_lb.id
   type                     = "egress"
   description              = "allow web traffic to get to portal"
@@ -17,7 +16,6 @@ resource "aws_security_group_rule" "egress-to-portal" {
 }
 
 resource "aws_security_group_rule" "egress-to-ingestion" {
-  depends_on               = [aws_security_group.waf_lb]
   security_group_id        = aws_security_group.waf_lb.id
   type                     = "egress"
   description              = "allow web traffic to get to ingestion server"
@@ -136,7 +134,6 @@ resource "aws_lb_listener" "waf_lb_listener" {
 }
 
 resource "aws_alb_listener_rule" "web_listener_rule" {
-  depends_on   = [aws_lb_listener.waf_lb_listener]
   listener_arn = aws_lb_listener.waf_lb_listener.arn
   action {
     type             = "forward"
@@ -158,7 +155,6 @@ resource "aws_alb_listener_rule" "web_listener_rule" {
 }
 
 resource "aws_alb_listener_rule" "ingestion_listener_rule" {
-  depends_on   = [aws_lb_listener.waf_lb_listener]
   listener_arn = aws_lb_listener.waf_lb_listener.arn
   action {
     type             = "forward"

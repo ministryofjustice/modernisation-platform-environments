@@ -8,7 +8,6 @@ resource "aws_security_group" "database-server" {
 
 
 resource "aws_security_group_rule" "database-outbound-all" {
-  depends_on        = [aws_security_group.database-server]
   security_group_id = aws_security_group.database-server.id
   type              = "egress"
   description       = "allow all"
@@ -20,7 +19,6 @@ resource "aws_security_group_rule" "database-outbound-all" {
 }
 
 resource "aws_security_group_rule" "database-inbound-bastion" {
-  depends_on        = [aws_security_group.database-server]
   security_group_id = aws_security_group.database-server.id
   type              = "ingress"
   description       = "allow bastion"
@@ -31,7 +29,6 @@ resource "aws_security_group_rule" "database-inbound-bastion" {
 }
 
 resource "aws_security_group_rule" "app-to-sql" {
-  depends_on               = [aws_security_group.database-server]
   security_group_id        = aws_security_group.database-server.id
   type                     = "ingress"
   description              = "allow app to sql traffic"
@@ -42,7 +39,6 @@ resource "aws_security_group_rule" "app-to-sql" {
 }
 
 resource "aws_security_group_rule" "portal-to-sql" {
-  depends_on               = [aws_security_group.database-server]
   security_group_id        = aws_security_group.database-server.id
   type                     = "ingress"
   description              = "allow app to sql traffic"
@@ -53,7 +49,6 @@ resource "aws_security_group_rule" "portal-to-sql" {
 }
 
 resource "aws_security_group_rule" "cjim-to-sql" {
-  depends_on               = [aws_security_group.database-server]
   security_group_id        = aws_security_group.database-server.id
   type                     = "ingress"
   description              = "allow app to sql traffic"
@@ -64,7 +59,6 @@ resource "aws_security_group_rule" "cjim-to-sql" {
 }
 
 resource "aws_security_group_rule" "cjip-to-sql" {
-  depends_on               = [aws_security_group.database-server]
   security_group_id        = aws_security_group.database-server.id
   type                     = "ingress"
   description              = "allow app to sql traffic"
