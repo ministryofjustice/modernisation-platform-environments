@@ -54,6 +54,7 @@ resource "aws_security_group_rule" "portal-inbound-from-waf" {
 
 
 resource "aws_instance" "portal-server" {
+  depends_on                  = [aws_security_group.portal-server]
   instance_type               = "t2.medium"
   ami                         = local.application_data.accounts[local.environment].suprig03-ami
   vpc_security_group_ids      = [aws_security_group.portal-server.id]
