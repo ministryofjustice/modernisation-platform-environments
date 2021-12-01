@@ -8,6 +8,7 @@ resource "aws_security_group" "cjim-server" {
 
 
 resource "aws_security_group_rule" "cjim-outbound-all" {
+  name              = "cjim-outbound-all"
   depends_on        = [aws_security_group.cjim-server]
   security_group_id = aws_security_group.cjim-server.id
   type              = "egress"
@@ -20,6 +21,7 @@ resource "aws_security_group_rule" "cjim-outbound-all" {
 }
 
 resource "aws_security_group_rule" "cjim-inbound-bastion" {
+  name              = "cjim-inbound-bastion"
   depends_on        = [aws_security_group.cjim-server]
   security_group_id = aws_security_group.cjim-server.id
   type              = "ingress"
@@ -31,6 +33,7 @@ resource "aws_security_group_rule" "cjim-inbound-bastion" {
 }
 
 resource "aws_security_group_rule" "cjip-inbound-web" {
+  name                     = "cjip-inbound-web"
   depends_on               = [aws_security_group.cjim-server]
   security_group_id        = aws_security_group.cjim-server.id
   type                     = "ingress"
@@ -43,7 +46,6 @@ resource "aws_security_group_rule" "cjip-inbound-web" {
 
 
 resource "aws_instance" "cjim-server" {
-  depends_on                  = [aws_security_group.cjim-server]
   instance_type               = "t2.medium"
   ami                         = local.application_data.accounts[local.environment].suprig04-ami
   vpc_security_group_ids      = [aws_security_group.cjim-server.id]

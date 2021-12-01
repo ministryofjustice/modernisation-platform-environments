@@ -8,6 +8,7 @@ resource "aws_security_group" "database-server" {
 
 
 resource "aws_security_group_rule" "database-outbound-all" {
+  name              = "database-outbound-all"
   security_group_id = aws_security_group.database-server.id
   type              = "egress"
   description       = "allow all"
@@ -19,6 +20,7 @@ resource "aws_security_group_rule" "database-outbound-all" {
 }
 
 resource "aws_security_group_rule" "database-inbound-bastion" {
+  name              = "database-inbound-bastion"
   security_group_id = aws_security_group.database-server.id
   type              = "ingress"
   description       = "allow bastion"
@@ -29,6 +31,7 @@ resource "aws_security_group_rule" "database-inbound-bastion" {
 }
 
 resource "aws_security_group_rule" "app-to-sql" {
+  name                     = "app-to-sql"
   security_group_id        = aws_security_group.database-server.id
   type                     = "ingress"
   description              = "allow app to sql traffic"
@@ -39,6 +42,7 @@ resource "aws_security_group_rule" "app-to-sql" {
 }
 
 resource "aws_security_group_rule" "portal-to-sql" {
+  name                     = "portal-to-sql"
   security_group_id        = aws_security_group.database-server.id
   type                     = "ingress"
   description              = "allow app to sql traffic"
@@ -49,6 +53,7 @@ resource "aws_security_group_rule" "portal-to-sql" {
 }
 
 resource "aws_security_group_rule" "cjim-to-sql" {
+  name                     = "cjim-to-sql"
   security_group_id        = aws_security_group.database-server.id
   type                     = "ingress"
   description              = "allow app to sql traffic"
@@ -59,6 +64,7 @@ resource "aws_security_group_rule" "cjim-to-sql" {
 }
 
 resource "aws_security_group_rule" "cjip-to-sql" {
+  name                     = "cjip-to-sql"
   security_group_id        = aws_security_group.database-server.id
   type                     = "ingress"
   description              = "allow app to sql traffic"

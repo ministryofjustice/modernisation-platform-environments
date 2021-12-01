@@ -9,6 +9,7 @@ resource "aws_security_group" "domain-controllers" {
 
 # Allow DCs to connect anywhere
 resource "aws_security_group_rule" "dc-all-outbound-traffic" {
+  name              = "dc-all-outbound-traffic"
   security_group_id = aws_security_group.domain-controllers.id
   type              = "egress"
   description       = "allow all"
@@ -20,6 +21,7 @@ resource "aws_security_group_rule" "dc-all-outbound-traffic" {
 }
 
 resource "aws_security_group_rule" "rdp-from-bastion" {
+  name              = "rdp-from-bastion"
   security_group_id = aws_security_group.domain-controllers.id
   type              = "ingress"
   description       = "SSH from Bastion"
@@ -30,6 +32,7 @@ resource "aws_security_group_rule" "rdp-from-bastion" {
 }
 
 resource "aws_security_group_rule" "dns-into-dc-tcp" {
+  name                     = "dns-into-dc-tcp"
   security_group_id        = aws_security_group.domain-controllers.id
   type                     = "ingress"
   description              = "allow DNS"
@@ -40,6 +43,7 @@ resource "aws_security_group_rule" "dns-into-dc-tcp" {
 }
 
 resource "aws_security_group_rule" "dns-into-dc-udp" {
+  name                     = "dns-into-dc-udp"
   security_group_id        = aws_security_group.domain-controllers.id
   type                     = "ingress"
   description              = "allow DNS"
@@ -50,6 +54,7 @@ resource "aws_security_group_rule" "dns-into-dc-udp" {
 }
 
 resource "aws_security_group_rule" "dc5" {
+  name              = "dc5"
   security_group_id = aws_security_group.domain-controllers.id
   type              = "ingress"
   description       = "allow DCs to listen to each other"
@@ -71,6 +76,7 @@ resource "aws_security_group_rule" "dc5" {
 
 
 resource "aws_security_group_rule" "dcs-from-app" {
+  name                     = "dcs-from-app"
   security_group_id        = aws_security_group.domain-controllers.id
   type                     = "ingress"
   description              = "allow All"
@@ -82,6 +88,7 @@ resource "aws_security_group_rule" "dcs-from-app" {
 
 
 resource "aws_security_group_rule" "dcs-from-cjim" {
+  name                     = "dcs-from-cjim"
   security_group_id        = aws_security_group.domain-controllers.id
   type                     = "ingress"
   description              = "allow All"
@@ -93,6 +100,7 @@ resource "aws_security_group_rule" "dcs-from-cjim" {
 
 
 resource "aws_security_group_rule" "dcs-from-cjip" {
+  name                     = "dcs-from-cjip"
   security_group_id        = aws_security_group.domain-controllers.id
   type                     = "ingress"
   description              = "allow All"
@@ -104,6 +112,7 @@ resource "aws_security_group_rule" "dcs-from-cjip" {
 
 
 resource "aws_security_group_rule" "dcs-from-portal" {
+  name                     = "dcs-from-portal"
   security_group_id        = aws_security_group.domain-controllers.id
   type                     = "ingress"
   description              = "allow All"
@@ -114,6 +123,7 @@ resource "aws_security_group_rule" "dcs-from-portal" {
 }
 
 resource "aws_security_group_rule" "dcs-from-exchange" {
+  name                     = "dcs-from-exchange"
   security_group_id        = aws_security_group.domain-controllers.id
   type                     = "ingress"
   description              = "allow All"
@@ -124,6 +134,7 @@ resource "aws_security_group_rule" "dcs-from-exchange" {
 }
 
 resource "aws_security_group_rule" "dcs-from-db" {
+  name                     = "dcs-from-db"
   security_group_id        = aws_security_group.domain-controllers.id
   type                     = "ingress"
   description              = "allow All"
@@ -143,6 +154,7 @@ resource "aws_security_group" "outbound-dns-resolver" {
 }
 
 resource "aws_security_group_rule" "res1" {
+  name                     = "res1"
   security_group_id        = aws_security_group.outbound-dns-resolver.id
   provider                 = aws.core-vpc
   type                     = "egress"
@@ -154,6 +166,7 @@ resource "aws_security_group_rule" "res1" {
 }
 
 resource "aws_security_group_rule" "res2" {
+  name                     = "res2"
   security_group_id        = aws_security_group.outbound-dns-resolver.id
   provider                 = aws.core-vpc
   type                     = "egress"
@@ -231,7 +244,6 @@ resource "aws_volume_attachment" "infra1-disk1" {
 
 
 resource "aws_instance" "infra2" {
-  depends_on                  = [aws_security_group.domain-controllers, aws_security_group.outbound-dns-resolver]
   instance_type               = "t2.small"
   ami                         = local.application_data.accounts[local.environment].infra2-ami
   vpc_security_group_ids      = [aws_security_group.domain-controllers.id]
