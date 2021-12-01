@@ -135,7 +135,7 @@ resource "aws_security_group_rule" "dcs-from-exchange" {
 }
 
 resource "aws_security_group_rule" "dcs-from-db" {
-  depends_on        = [aws_security_group.domain-controllers]
+  depends_on               = [aws_security_group.domain-controllers]
   security_group_id        = aws_security_group.domain-controllers.id
   type                     = "ingress"
   description              = "allow All"
