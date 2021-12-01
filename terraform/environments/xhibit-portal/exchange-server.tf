@@ -26,7 +26,7 @@ resource "aws_security_group" "exchange-server" {
 
 
 resource "aws_instance" "exchange-server" {
-  depends_on   = [aws_security_group.exchange-server]
+  depends_on                  = [aws_security_group.exchange-server]
   instance_type               = "t2.medium"
   ami                         = local.application_data.accounts[local.environment].infra6-ami
   vpc_security_group_ids      = [aws_security_group.exchange-server.id]
