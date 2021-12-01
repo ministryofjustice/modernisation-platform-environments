@@ -6,7 +6,6 @@ resource "aws_security_group" "waf_lb" {
 
 
 resource "aws_security_group_rule" "egress-to-portal" {
-  name                     = "egress-to-portal"
   security_group_id        = aws_security_group.waf_lb.id
   type                     = "egress"
   description              = "allow web traffic to get to portal"
@@ -17,7 +16,6 @@ resource "aws_security_group_rule" "egress-to-portal" {
 }
 
 resource "aws_security_group_rule" "egress-to-ingestion" {
-  name                     = "egress-to-ingestion"
   security_group_id        = aws_security_group.waf_lb.id
   type                     = "egress"
   description              = "allow web traffic to get to ingestion server"

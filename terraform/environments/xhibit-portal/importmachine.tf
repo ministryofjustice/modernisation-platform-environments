@@ -32,6 +32,7 @@ resource "aws_key_pair" "george" {
 }
 
 resource "aws_instance" "importmachine" {
+  depends_on                  = [aws_security_group.importmachine]
   instance_type               = "t3.large"
   ami                         = "ami-0a0502ffd782e9b12"
   vpc_security_group_ids      = [aws_security_group.importmachine.id]
@@ -147,7 +148,6 @@ resource "aws_security_group" "domain-check" {
 
 
 resource "aws_security_group_rule" "dcheck-outbound-all" {
-  name              = "dcheck-outbound-all"
   security_group_id = aws_security_group.domain-check.id
   type              = "egress"
   description       = "allow all"
@@ -159,7 +159,6 @@ resource "aws_security_group_rule" "dcheck-outbound-all" {
 }
 
 resource "aws_security_group_rule" "dcheck-inbound-bastion" {
-  name              = "dcheck-inbound-bastion"
   security_group_id = aws_security_group.domain-check.id
   type              = "ingress"
   description       = "allow bastion"
@@ -170,7 +169,6 @@ resource "aws_security_group_rule" "dcheck-inbound-bastion" {
 }
 
 resource "aws_security_group_rule" "dcheck-to-dcs" {
-  name                     = "dcheck-to-dcs"
   security_group_id        = aws_security_group.domain-check.id
   type                     = "egress"
   description              = "allow All"
@@ -181,7 +179,6 @@ resource "aws_security_group_rule" "dcheck-to-dcs" {
 }
 
 resource "aws_security_group_rule" "dcs-from-dcheck" {
-  name                     = "dcs-from-dcheck"
   security_group_id        = aws_security_group.domain-controllers.id
   type                     = "ingress"
   description              = "allow All"

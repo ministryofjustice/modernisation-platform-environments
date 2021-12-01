@@ -8,7 +8,6 @@ resource "aws_security_group" "portal-server" {
 
 
 resource "aws_security_group_rule" "portal-outbound-all" {
-  name              = "portal-outbound-all"
   security_group_id = aws_security_group.portal-server.id
   type              = "egress"
   description       = "allow all"
@@ -20,7 +19,6 @@ resource "aws_security_group_rule" "portal-outbound-all" {
 }
 
 resource "aws_security_group_rule" "portal-inbound-bastion-rdp" {
-  name              = "portal-inbound-bastion-rdp"
   security_group_id = aws_security_group.portal-server.id
   type              = "ingress"
   description       = "allow bastion"
@@ -32,7 +30,6 @@ resource "aws_security_group_rule" "portal-inbound-bastion-rdp" {
 
 
 resource "aws_security_group_rule" "portal-inbound-bastion-web" {
-  name              = "portal-inbound-bastion-web"
   security_group_id = aws_security_group.portal-server.id
   type              = "ingress"
   description       = "allow bastion web traffic"
@@ -44,7 +41,6 @@ resource "aws_security_group_rule" "portal-inbound-bastion-web" {
 
 
 resource "aws_security_group_rule" "portal-inbound-from-waf" {
-  name                     = "portal-inbound-from-waf"
   security_group_id        = aws_security_group.portal-server.id
   type                     = "ingress"
   description              = "allow web traffic"
@@ -58,6 +54,7 @@ resource "aws_security_group_rule" "portal-inbound-from-waf" {
 
 
 resource "aws_instance" "portal-server" {
+  depends_on                  = [aws_security_group.portal-server]
   instance_type               = "t2.medium"
   ami                         = local.application_data.accounts[local.environment].suprig03-ami
   vpc_security_group_ids      = [aws_security_group.portal-server.id]
