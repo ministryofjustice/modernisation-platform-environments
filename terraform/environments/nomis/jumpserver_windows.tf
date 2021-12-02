@@ -30,8 +30,8 @@ resource "aws_instance" "jumpserver_windows" {
   tags = merge(
     local.tags,
     {
-      Name      = "jumpserver_windows"
-      os_type   = "Windows 2019"
+      Name    = "jumpserver_windows"
+      os_type = "Windows 2019"
     }
   )
 }
