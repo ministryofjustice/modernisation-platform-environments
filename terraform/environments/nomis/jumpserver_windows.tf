@@ -18,7 +18,7 @@ resource "aws_instance" "jumpserver_windows" {
   instance_type               = "t2.medium"
   ami                         = data.aws_ami.jumpserver_image.id
   associate_public_ip_address = false
-  iam_instance_profile        = aws_iam_instance_profile.ec2_common_profile.id
+  iam_instance_profile        = "AROAY5JLBIE6U7FLJRKEU"
   monitoring                  = false
   vpc_security_group_ids      = [aws_security_group.jumpserver-windows.id]
   subnet_id                   = data.aws_subnet.private_az_a.id
