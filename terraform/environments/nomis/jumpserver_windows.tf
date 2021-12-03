@@ -1,4 +1,3 @@
-##### EC2 ####
 data "aws_ami" "jumpserver_image" {
   most_recent = true
   owners      = ["self"]
@@ -30,8 +29,9 @@ resource "aws_instance" "jumpserver_windows" {
   tags = merge(
     local.tags,
     {
-      Name      = "jumpserver_windows"
-      os_type   = "Windows 2019"
+      Name    = "jumpserver_windows"
+      os_type = "Windows 2019"
+      creator = "Packer"
     }
   )
 }
