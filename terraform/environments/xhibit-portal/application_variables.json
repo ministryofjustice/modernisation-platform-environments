@@ -10,7 +10,7 @@
       "infra6-disk-2-snapshot"        : "snap-055015576f3a10c50",  
       "suprig01-ami"                  : "ami-0404573c24e8a5c4b", 
       "suprig01-disk-1-snapshot"      : "snap-0cf103268c794d7ea",  
-      "suprig01-disk-2-snapshot"      : "snap-08faed719f2040610",  
+      "suprig01-disk-2-snapshot"      : "snap-030e67d8fc831bfa3",  
       "suprig01-disk-3-snapshot"      : "snap-0bc66688ff5c8f5fe",
       "suprig01-disk-4-snapshot"      : "snap-0b2762962b1bf5a3e",  
       "suprig01-disk-5-snapshot"      : "snap-08faed719f2040610",
@@ -40,10 +40,10 @@
       "suprig01-disk-5-snapshot"      : "snap-05cdcdfd8ca921282",
       "suprig01-disk-6-snapshot"      : "snap-08507bf59326a5879",
       "suprig02-ami"                  : "ami-09bbf4ce843757779",
-      "suprig03-ami"                  : "ami-023cbf3dcecc9e68c",
+      "suprig03-ami"                  : "ami-095918cf2cb1810ec",
       "suprig04-ami"                  : "ami-02a3d0963a3bf8078",
       "suprig04-disk-1-snapshot"      : "snap-0414bfa696a12104e",
-      "suprig05-ami"                  : "ami-0491073c200a246e1",
+      "suprig05-ami"                  : "ami-01e99657fbf6cc85b",
       "suprig05-disk-1-snapshot"      : "snap-08b1c019201557295",
       "XHBPRESMS01-ami"               : "ami-0e88b3a7df63e7ebb"                
     } 
