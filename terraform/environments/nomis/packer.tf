@@ -124,7 +124,8 @@ data "aws_iam_policy_document" "packer_minimum_permissions" {
       "ec2:ModifySnapshotAttribute",
       "ec2:GetPasswordData",
       "ec2:StopInstances",
-      "ec2:TerminateInstances"
+      "ec2:TerminateInstances",
+      "ec2:DeleteSecurityGroup"
     ]
     resources = ["*"]
     condition {
