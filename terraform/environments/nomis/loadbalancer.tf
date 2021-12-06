@@ -9,7 +9,7 @@ data "aws_subnet_ids" "private" {
   }
 }
 
-resource "aws_security_group" "internal_lb" {
+resource "aws_security_group" "internal_elb" {
 
   name        = "internal-lb-${local.application_name}"
   description = "Allow inbound traffic to internal load balancer"
@@ -26,7 +26,7 @@ resource "aws_security_group" "internal_lb" {
 resource "aws_security_group_rule" "internal_lb_ingress_1" {
 
   description       = "https inbound from anywhere (limited by subnet ACL)"
-  security_group_id = aws_security_group.internal_lb.id
+  security_group_id = aws_security_group.internal_elb.id
   type              = "ingress"
   from_port         = 443
   to_port           = 443
@@ -37,7 +37,7 @@ resource "aws_security_group_rule" "internal_lb_ingress_1" {
 resource "aws_security_group_rule" "internal_lb_egress_1" {
 
   description              = "outbound to weblogic targets"
-  security_group_id        = aws_security_group.internal_lb.id
+  security_group_id        = aws_security_group.internal_elb.id
   type                     = "egress"
   from_port                = 7777
   to_port                  = 7777
@@ -50,7 +50,7 @@ resource "aws_lb" "internal" {
   name                       = "lb-internal-${local.application_name}"
   internal                   = true
   load_balancer_type         = "application"
-  security_groups            = [aws_security_group.internal_lb.id]
+  security_groups            = [aws_security_group.internal_elb.id]
   subnets                    = data.aws_subnet_ids.private.ids
   enable_deletion_protection = false
 
