@@ -15,28 +15,34 @@ resource "aws_security_group" "internal_elb" {
   description = "Allow inbound traffic to internal load balancer"
   vpc_id      = local.vpc_id
 
-  ingress {
-    description = "https from anywhere"
-    from_port   = "443"
-    to_port     = "443"
-    protocol    = "TCP"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    description     = "to weblogic"
-    from_port       = "7777"
-    to_port         = "7777"
-    protocol        = "TCP"
-    security_groups = [aws_security_group.weblogic_server.id]
-  }
-
   tags = merge(
     local.tags,
     {
       Name = "internal-lb-${local.application_name}"
     },
   )
+}
+
+resource "aws_security_group_rule" "internal_elb_ingress_1" {
+
+  description       = "all 443 inbound from anywhere (limited by subnet ACL)"
+  security_group_id = aws_security_group.internal_elb.id
+  type              = "ingress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+}
+
+resource "aws_security_group_rule" "internal_elb_egress_1" {
+
+  description              = "all outbound to weblogic targets"
+  security_group_id        = aws_security_group.internal_elb.id
+  type                     = "egress"
+  from_port                = 7777
+  to_port                  = 7777
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.weblogic_server.id
 }
 
 resource "aws_lb" "internal" {
