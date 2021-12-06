@@ -122,7 +122,7 @@ resource "aws_lb_listener" "internal" {
 #------------------------------------------------------------------------------
 # Route 53 record
 #------------------------------------------------------------------------------
-resource "aws_route53_record" "loadbalancer" {
+resource "aws_route53_record" "internal_elb" {
   provider = aws.core-vpc
 
   zone_id = data.aws_route53_zone.external.zone_id
@@ -178,7 +178,7 @@ resource "aws_route53_record" "internal_elb_validation" {
 
 resource "aws_acm_certificate_validation" "internal_elb" {
   certificate_arn         = aws_acm_certificate.internal_elb.arn
-  validation_record_fqdns = [for record in aws_route53_record.external_validation : record.fqdn]
+  validation_record_fqdns = [for record in aws_route53_record.internal_elb_validation : record.fqdn]
 }
 
 #------------------------------------------------------------------------------
