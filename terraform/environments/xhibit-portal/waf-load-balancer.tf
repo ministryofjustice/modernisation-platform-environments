@@ -1,26 +1,30 @@
-resource "aws_security_group" "waf_lb_sg" {
+resource "aws_security_group" "waf_lb" {
   description = "Security group for app load balancer, simply to implement ACL rules for the WAF"
-  name        = "waf-lb-sg-${var.networking[0].application}"
+  name        = "waf-loadbalancer-${var.networking[0].application}"
   vpc_id      = local.vpc_id
+}
 
-  ingress {
-    description      = "allow all"
-    from_port        = 0
-    to_port          = 0
-    protocol         = "-1"
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
-  }
 
-  egress {
-    description = "Send everything straight to the app server"
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = [
-      "10.237.32.82/32"
-    ]
-  }
+resource "aws_security_group_rule" "egress-to-portal" {
+  depends_on               = [aws_security_group.waf_lb]
+  security_group_id        = aws_security_group.waf_lb.id
+  type                     = "egress"
+  description              = "allow web traffic to get to portal"
+  from_port                = 80
+  to_port                  = 80
+  protocol                 = "TCP"
+  source_security_group_id = aws_security_group.portal-server.id
+}
+
+resource "aws_security_group_rule" "egress-to-ingestion" {
+  depends_on               = [aws_security_group.waf_lb]
+  security_group_id        = aws_security_group.waf_lb.id
+  type                     = "egress"
+  description              = "allow web traffic to get to ingestion server"
+  from_port                = 80
+  to_port                  = 80
+  protocol                 = "TCP"
+  source_security_group_id = aws_security_group.cjip-server.id
 }
 
 data "aws_subnet_ids" "shared-public" {
@@ -31,10 +35,11 @@ data "aws_subnet_ids" "shared-public" {
 }
 
 resource "aws_lb" "waf_lb" {
+  depends_on                 = [aws_security_group.waf_lb]
   name                       = "waf-lb-${var.networking[0].application}"
   internal                   = false
   load_balancer_type         = "application"
-  security_groups            = [aws_security_group.waf_lb_sg.id]
+  security_groups            = [aws_security_group.waf_lb.id]
   subnets                    = data.aws_subnet_ids.shared-public.ids
   enable_deletion_protection = false
 
@@ -46,13 +51,23 @@ resource "aws_lb" "waf_lb" {
   )
 }
 
-resource "aws_lb_target_group" "waf_lb_tg" {
-  name                 = "waf-lb-tg-${var.networking[0].application}"
+resource "aws_lb_target_group" "waf_lb_web_tg" {
+  depends_on           = [aws_lb.waf_lb]
+  name                 = "waf-lb-web-tg-${var.networking[0].application}"
   port                 = 80
   protocol             = "HTTP"
-  target_type          = "ip"
   deregistration_delay = "30"
   vpc_id               = local.vpc_id
+
+  health_check {
+    path                = "/Secure/Default.aspx"
+    port                = 80
+    healthy_threshold   = 6
+    unhealthy_threshold = 2
+    timeout             = 2
+    interval            = 5
+    matcher             = "200" # change this to 200 when the database comes up
+  }
 
   tags = merge(
     local.tags,
@@ -62,9 +77,50 @@ resource "aws_lb_target_group" "waf_lb_tg" {
   )
 }
 
+resource "aws_lb_target_group" "waf_lb_ingest_tg" {
+  depends_on           = [aws_lb.waf_lb, aws_lb_target_group_attachment.portal-server-attachment]
+  name                 = "waf-lb-ingest-tg-${var.networking[0].application}"
+  port                 = 80
+  protocol             = "HTTP"
+  deregistration_delay = "30"
+  vpc_id               = local.vpc_id
+
+  health_check {
+    path                = "/BITSWebService/BITSWebService.asmx"
+    port                = 80
+    healthy_threshold   = 6
+    unhealthy_threshold = 2
+    timeout             = 2
+    interval            = 5
+    matcher             = "200" # change this to 200 when the database comes up
+  }
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "waf-lb_-g-${var.networking[0].application}"
+    },
+  )
+}
+
+resource "aws_lb_target_group_attachment" "portal-server-attachment" {
+  target_group_arn = aws_lb_target_group.waf_lb_web_tg.arn
+  target_id        = aws_instance.portal-server.id
+  port             = 80
+}
+
+resource "aws_lb_target_group_attachment" "ingestion-server-attachment" {
+  target_group_arn = aws_lb_target_group.waf_lb_ingest_tg.arn
+  target_id        = aws_instance.cjip-server.id
+  port             = 80
+}
+
+
 resource "aws_lb_listener" "waf_lb_listener" {
   depends_on = [
-    aws_acm_certificate_validation.waf_lb_cert_validation
+    aws_acm_certificate_validation.waf_lb_cert_validation,
+    aws_lb_target_group.waf_lb_web_tg,
+    aws_lb_target_group.waf_lb_ingest_tg
   ]
 
   load_balancer_arn = aws_lb.waf_lb.arn
@@ -75,15 +131,75 @@ resource "aws_lb_listener" "waf_lb_listener" {
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.waf_lb_tg.arn
+    target_group_arn = aws_lb_target_group.waf_lb_web_tg.arn
   }
 }
 
-resource "aws_route53_record" "waf_lb_dns" {
+resource "aws_alb_listener_rule" "web_listener_rule" {
+  depends_on   = [aws_lb_listener.waf_lb_listener]
+  listener_arn = aws_lb_listener.waf_lb_listener.arn
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.waf_lb_web_tg.id
+  }
+  condition {
+    path_pattern {
+      values = ["/"]
+    }
+  }
+
+  condition {
+    host_header {
+      # web.xhibit-portal.hmcts-development.modernisation-platform.service.justice.gov.uk
+      values = ["web.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
+    }
+  }
+
+}
+
+resource "aws_alb_listener_rule" "ingestion_listener_rule" {
+  depends_on   = [aws_lb_listener.waf_lb_listener]
+  listener_arn = aws_lb_listener.waf_lb_listener.arn
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.waf_lb_ingest_tg.id
+  }
+  condition {
+    path_pattern {
+      values = ["/"]
+    }
+  }
+
+  condition {
+    host_header {
+      # web.xhibit-portal.hmcts-development.modernisation-platform.service.justice.gov.uk
+      values = ["ingest.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
+    }
+  }
+
+}
+
+
+
+resource "aws_route53_record" "waf_lb_web_dns" {
   provider = aws.core-vpc
 
   zone_id = data.aws_route53_zone.external_r53_zone.zone_id
-  name    = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  name    = "web.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type    = "A"
+
+  alias {
+    name                   = aws_lb.waf_lb.dns_name
+    zone_id                = aws_lb.waf_lb.zone_id
+    evaluate_target_health = true
+  }
+}
+
+resource "aws_route53_record" "waf_lb_ingest_dns" {
+  provider = aws.core-vpc
+
+  zone_id = data.aws_route53_zone.external_r53_zone.zone_id
+  name    = "ingest.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   type    = "A"
 
   alias {
@@ -194,4 +310,10 @@ resource "aws_wafv2_web_acl" "waf_acl" {
     metric_name                = "waf-acl-metric"
     sampled_requests_enabled   = true
   }
+
+}
+
+resource "aws_wafv2_web_acl_association" "aws_lb_waf_association" {
+  resource_arn = aws_lb.waf_lb.arn
+  web_acl_arn  = aws_wafv2_web_acl.waf_acl.arn
 }

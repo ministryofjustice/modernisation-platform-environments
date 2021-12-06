@@ -25,7 +25,7 @@ resource "aws_security_group" "weblogic_server" {
     from_port       = "7001"
     to_port         = "7001"
     protocol        = "TCP"
-    security_groups = ["sg-073bc1ad3ef1d1bb3"]
+    security_groups = [aws_security_group.jumpserver-windows.id]
   }
 
   ingress {
@@ -33,7 +33,7 @@ resource "aws_security_group" "weblogic_server" {
     from_port       = "80"
     to_port         = "80"
     protocol        = "TCP"
-    security_groups = ["sg-073bc1ad3ef1d1bb3"]
+    security_groups = [aws_security_group.jumpserver-windows.id]
   }
 
   ingress {
@@ -41,7 +41,7 @@ resource "aws_security_group" "weblogic_server" {
     from_port       = "7777"
     to_port         = "7777"
     protocol        = "TCP"
-    security_groups = ["sg-073bc1ad3ef1d1bb3"]
+    security_groups = [aws_security_group.jumpserver-windows.id]
   }
 
   egress {
@@ -88,7 +88,7 @@ resource "aws_instance" "weblogic_server" {
   subnet_id                   = data.aws_subnet.private_az_a.id
   user_data                   = file("./templates/cloudinit.cfg")
   # ebs_optimized          = true
-  # key_name                  = aws_key_pair.ec2-user.key_name add this on next rebuild
+  key_name = aws_key_pair.ec2-user.key_name
 
   root_block_device {
     encrypted = true
