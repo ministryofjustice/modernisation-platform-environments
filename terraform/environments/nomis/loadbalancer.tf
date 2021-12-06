@@ -47,7 +47,7 @@ resource "aws_security_group_rule" "internal_elb_egress_1" {
 
 resource "aws_lb" "internal" {
 
-  name                       = "internal-${local.application_name}"
+  name                       = "elb-internal-${local.application_name}"
   internal                   = true
   load_balancer_type         = "application"
   security_groups            = [aws_security_group.internal_elb.id]
