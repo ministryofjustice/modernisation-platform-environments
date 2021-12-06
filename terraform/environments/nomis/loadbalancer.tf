@@ -9,17 +9,17 @@ data "aws_subnet_ids" "private" {
   }
 }
 
-resource "aws_security_group" "internal_lb" {
+resource "aws_security_group" "internal_elb" {
 
   name        = "internal-lb-${local.application_name}"
   description = "Allow inbound traffic to internal load balancer"
   vpc_id      = local.vpc_id
 
   ingress {
-    description     = "https from anywhere"
-    from_port       = "443"
-    to_port         = "443"
-    protocol        = "TCP"
+    description = "https from anywhere"
+    from_port   = "443"
+    to_port     = "443"
+    protocol    = "TCP"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
@@ -44,7 +44,7 @@ resource "aws_lb" "internal" {
   name                       = "internal-${local.application_name}"
   internal                   = true
   load_balancer_type         = "application"
-  security_groups            = [aws_security_group.internal_lb.id]
+  security_groups            = [aws_security_group.internal_elb.id]
   subnets                    = data.aws_subnet_ids.private.ids
   enable_deletion_protection = false
 
@@ -64,15 +64,15 @@ resource "aws_lb_target_group" "weblogic" {
   target_type          = "ip"
   deregistration_delay = "30"
   vpc_id               = local.vpc_id
-  
+
   health_check {
-    enabled = true
-    interval = "30"
-    healthy_threshold = "3"
-    matcher = "200-399"
-    path = "/keepalive.htm"
-    port = "7777"
-    timeout = "30"
+    enabled            = true
+    interval           = "30"
+    healthy_threshold  = "3"
+    matcher            = "200-399"
+    path               = "/keepalive.htm"
+    port               = "7777"
+    timeout            = "30"
     unhealty_threshold = "5"
   }
 
@@ -98,18 +98,18 @@ resource "aws_lb_target_group_attachment" "weblogic" {
 
 resource "aws_lb_listener" "internal" {
   depends_on = [
-    aws_acm_certificate_validation.external
+    aws_acm_certificate_validation.internal_elb
   ]
 
   load_balancer_arn = aws_lb.internal.arn
   port              = "443"
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = aws_acm_certificate.internal.arn
+  certificate_arn   = aws_acm_certificate.internal_elb.arn
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.internal.arn
+    target_group_arn = aws_lb_target_group.weblogic.arn
   }
 }
 
@@ -139,7 +139,7 @@ resource "aws_acm_certificate" "internal_elb" {
   validation_method = "DNS"
 
   subject_alternative_names = ["*.${local.vpc_name}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
-  
+
   tags = merge(
     local.tags,
     {
@@ -170,7 +170,7 @@ resource "aws_route53_record" "internal_elb_validation" {
   zone_id         = data.aws_route53_zone.external.zone_id
 }
 
-resource "aws_acm_certificate_validation" "internal-elb" {
+resource "aws_acm_certificate_validation" "internal_elb" {
   certificate_arn         = aws_acm_certificate.internal_elb.arn
   validation_record_fqdns = [for record in aws_route53_record.external_validation : record.fqdn]
 }
