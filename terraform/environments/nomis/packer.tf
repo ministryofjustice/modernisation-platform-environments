@@ -219,7 +219,7 @@ data "aws_iam_policy_document" "packer_ansible_permissions" {
       "ec2:DescribeKeyPairs",
       "sts:DecodeAuthorizationMessage",
       "ec2:ModifySecurityGroupRules",
-      "ec2:RevokeSecurityGroupIngress", 
+      "ec2:RevokeSecurityGroupIngress",
     ]
     resources = ["*"]
   }
