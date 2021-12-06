@@ -25,7 +25,7 @@ resource "aws_security_group" "internal_lb" {
 
 resource "aws_security_group_rule" "internal_lb_ingress_1" {
 
-  description       = "https inbound from anywhere (limited by subnet ACL)"
+  description       = "all 443 inbound from anywhere (limited by subnet ACL)"
   security_group_id = aws_security_group.internal_lb.id
   type              = "ingress"
   from_port         = 443
@@ -36,7 +36,7 @@ resource "aws_security_group_rule" "internal_lb_ingress_1" {
 
 resource "aws_security_group_rule" "internal_lb_egress_1" {
 
-  description              = "outbound to weblogic targets"
+  description              = "all outbound to weblogic targets"
   security_group_id        = aws_security_group.internal_lb.id
   type                     = "egress"
   from_port                = 7777
