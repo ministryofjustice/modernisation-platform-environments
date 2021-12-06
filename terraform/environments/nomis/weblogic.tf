@@ -41,7 +41,7 @@ resource "aws_security_group" "weblogic_server" {
     from_port       = "7777"
     to_port         = "7777"
     protocol        = "TCP"
-    security_groups = [aws_security_group.jumpserver-windows.id, aws_security_group.internal_elb.id]
+    security_groups = [aws_security_group.jumpserver-windows.id, aws_security_group.internal_lb.id]
   }
 
   egress {
