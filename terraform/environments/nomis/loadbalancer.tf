@@ -79,7 +79,7 @@ resource "aws_lb_target_group" "weblogic" {
     path               = "/keepalive.htm"
     port               = "7777"
     timeout            = "30"
-    unhealty_threshold = "5"
+    unhealthy_threshold = "5"
   }
 
   # access_logs { maybe we want this?
