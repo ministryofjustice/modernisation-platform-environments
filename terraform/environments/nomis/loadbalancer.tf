@@ -72,13 +72,13 @@ resource "aws_lb_target_group" "weblogic" {
   vpc_id               = local.vpc_id
 
   health_check {
-    enabled            = true
-    interval           = "30"
-    healthy_threshold  = "3"
-    matcher            = "200-399"
-    path               = "/keepalive.htm"
-    port               = "7777"
-    timeout            = "30"
+    enabled             = true
+    interval            = "30"
+    healthy_threshold   = "3"
+    matcher             = "200-399"
+    path                = "/keepalive.htm"
+    port                = "7777"
+    timeout             = "30"
     unhealthy_threshold = "5"
   }
 
