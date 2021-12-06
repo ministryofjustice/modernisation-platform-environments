@@ -1,26 +1,26 @@
 #------------------------------------------------------------------------------
-# Load Balancer - External
+# Load Balancer - Internal
 #------------------------------------------------------------------------------
 
-data "aws_subnet_ids" "public" {
+data "aws_subnet_ids" "private" {
   vpc_id = local.vpc_id
   tags = {
-    Name = "${local.vpc_name}-${local.environment}-${local.subnet_set}-public-${local.region}*"
+    Name = "${local.vpc_name}-${local.environment}-${local.subnet_set}-private-${local.region}*"
   }
 }
 
-resource "aws_security_group" "external_lb" {
+resource "aws_security_group" "internal_lb" {
 
-  name        = "external-lb-${local.application_name}"
-  description = "Allow inbound traffic to external load balancer"
+  name        = "internal-lb-${local.application_name}"
+  description = "Allow inbound traffic to internal load balancer"
   vpc_id      = local.vpc_id
 
   ingress {
-    description     = "https from pttp"
+    description     = "https from anywhere"
     from_port       = "443"
     to_port         = "443"
     protocol        = "TCP"
-    cidr_blocks = ["#pttp presumably"]
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {
@@ -34,31 +34,31 @@ resource "aws_security_group" "external_lb" {
   tags = merge(
     local.tags,
     {
-      Name = "external-lb-${local.application_name}"
+      Name = "internal-lb-${local.application_name}"
     },
   )
 }
 
-resource "aws_lb" "external" {
+resource "aws_lb" "internal" {
 
-  name                       = "external-${local.application_name}"
-  internal                   = false
+  name                       = "internal-${local.application_name}"
+  internal                   = true
   load_balancer_type         = "application"
-  security_groups            = [aws_security_group.external_lb.id]
-  subnets                    = data.aws_subnet_ids.public.ids
+  security_groups            = [aws_security_group.internal_lb.id]
+  subnets                    = data.aws_subnet_ids.private.ids
   enable_deletion_protection = false
 
   tags = merge(
     local.tags,
     {
-      Name = "external-${local.application_name}"
+      Name = "internal-${local.application_name}"
     },
   )
 }
 
-resource "aws_lb_target_group" "external" {
+resource "aws_lb_target_group" "weblogic" {
 
-  name                 = "external-${local.application_name}"
+  name                 = "weblogic-${local.application_name}"
   port                 = "7777" # port on which targets receive traffic
   protocol             = "HTTPS"
   target_type          = "ip"
@@ -85,31 +85,48 @@ resource "aws_lb_target_group" "external" {
   tags = merge(
     local.tags,
     {
-      Name = "external-${local.application_name}"
+      Name = "weblogic-${local.application_name}"
     },
   )
 }
 
 resource "aws_lb_target_group_attachment" "weblogic" {
-  target_group_arn = aws_lb_target_group.test.arn
+  target_group_arn = aws_lb_target_group.weblogic.arn
   target_id        = aws_instance.weblogic_server.private_ip
   port             = "7777"
 }
 
-resource "aws_lb_listener" "external" {
+resource "aws_lb_listener" "internal" {
   depends_on = [
     aws_acm_certificate_validation.external
   ]
 
-  load_balancer_arn = aws_lb.external.arn
+  load_balancer_arn = aws_lb.internal.arn
   port              = "443"
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = aws_acm_certificate.external.arn
+  certificate_arn   = aws_acm_certificate.internal.arn
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.external.arn
+    target_group_arn = aws_lb_target_group.internal.arn
+  }
+}
+
+#------------------------------------------------------------------------------
+# Route 53 record
+#------------------------------------------------------------------------------
+resource "aws_route53_record" "loadbalancer" {
+  provider = aws.core-vpc
+
+  zone_id = data.aws_route53_zone.external.zone_id
+  name    = "${local.application_name}.${local.vpc_name}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type    = "A"
+
+  alias {
+    name                   = aws_lb.internal.dns_name
+    zone_id                = aws_lb.internal.zone_id
+    evaluate_target_health = true
   }
 }
 
@@ -117,7 +134,7 @@ resource "aws_lb_listener" "external" {
 # Certificate
 #------------------------------------------------------------------------------
 
-resource "aws_acm_certificate" "external" {
+resource "aws_acm_certificate" "internal_elb" {
   domain_name       = "${local.vpc_name}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   validation_method = "DNS"
 
@@ -126,7 +143,7 @@ resource "aws_acm_certificate" "external" {
   tags = merge(
     local.tags,
     {
-      Name = "external-${local.application_name}"
+      Name = "internal-elb-${local.application_name}"
     },
   )
 
@@ -135,10 +152,10 @@ resource "aws_acm_certificate" "external" {
   }
 }
 
-resource "aws_route53_record" "external_validation" {
+resource "aws_route53_record" "internal_elb_validation" {
   provider = aws.core-vpc
   for_each = {
-    for dvo in aws_acm_certificate.external.domain_validation_options : dvo.domain_name => {
+    for dvo in aws_acm_certificate.internal_elb.domain_validation_options : dvo.domain_name => {
       name   = dvo.resource_record_name
       record = dvo.resource_record_value
       type   = dvo.resource_record_type
@@ -153,8 +170,8 @@ resource "aws_route53_record" "external_validation" {
   zone_id         = data.aws_route53_zone.external.zone_id
 }
 
-resource "aws_acm_certificate_validation" "external" {
-  certificate_arn         = aws_acm_certificate.external.arn
+resource "aws_acm_certificate_validation" "internal-elb" {
+  certificate_arn         = aws_acm_certificate.internal_elb.arn
   validation_record_fqdns = [for record in aws_route53_record.external_validation : record.fqdn]
 }
 
@@ -162,6 +179,6 @@ resource "aws_acm_certificate_validation" "external" {
 # Web Application Firewall
 #------------------------------------------------------------------------------
 
-resource "aws_wafv2_web_acl" "waf" {
-#TODO https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/wafv2_web_acl
-}
+# resource "aws_wafv2_web_acl" "waf" {
+# #TODO https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/wafv2_web_acl
+# }

@@ -1,4 +1,9 @@
 #------------------------------------------------------------------------------
+# Datasources for Route 53 Zones
+# The actual records are declared with the relevant resources
+#------------------------------------------------------------------------------
+
+#------------------------------------------------------------------------------
 # Internal Zone
 #------------------------------------------------------------------------------
 data "aws_route53_zone" "internal" {
@@ -6,16 +11,6 @@ data "aws_route53_zone" "internal" {
 
   name         = "${local.vpc_name}-${local.environment}.modernisation-platform.internal."
   private_zone = true
-}
-
-resource "aws_route53_record" "database" {
-  provider = aws.core-vpc
-
-  zone_id = data.aws_route53_zone.internal.zone_id
-  name    = "database.${local.application_name}.${local.vpc_name}-${local.environment}.modernisation-platform.internal"
-  type    = "A"
-  ttl     = "60"
-  records = [aws_instance.db_server.private_ip]
 }
 
 #------------------------------------------------------------------------------
@@ -26,18 +21,4 @@ data "aws_route53_zone" "external" {
 
   name         = "${local.vpc_name}-${local.environment}.modernisation-platform.service.justice.gov.uk."
   private_zone = true
-}
-
-resource "aws_route53_record" "loadbalancer" {
-  provider = aws.core-vpc
-
-  zone_id = data.aws_route53_zone.external.zone_id
-  name    = "${local.application_name}.${local.vpc_name}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-  type    = "A"
-
-  alias {
-    name                   = aws_lb.external.dns_name
-    zone_id                = aws_lb.external.zone_id
-    evaluate_target_health = true
-  }
 }
