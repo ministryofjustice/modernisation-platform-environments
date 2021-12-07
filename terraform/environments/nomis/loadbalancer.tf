@@ -102,7 +102,7 @@ resource "aws_lb_target_group" "weblogic" {
 
 resource "aws_lb_target_group_attachment" "weblogic" {
   target_group_arn = aws_lb_target_group.weblogic.arn
-  target_id        = "10.26.8.87"
+  target_id        = "10.26.8.130"
   port             = "7777"
 }
 
