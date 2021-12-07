@@ -74,6 +74,7 @@ resource "aws_instance" "importmachine" {
 }
 
 resource "aws_ebs_volume" "disk_xvdf" {
+  depends_on        = [aws_instance.importmachine]
   availability_zone = "${local.region}a"
   type              = "gp2"
   encrypted         = true
