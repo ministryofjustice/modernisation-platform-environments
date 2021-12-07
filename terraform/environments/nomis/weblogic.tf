@@ -69,7 +69,7 @@ data "aws_ami" "weblogic_image" {
 
   filter {
     name   = "name"
-    values = ["nomis_app-2021-09-20*"] # temp. fix this to prevent any more accidental replacements
+    values = ["weblogic_prior_to_cidr_migration*"] # temp. fix this to prevent any more accidental replacements
   }
 
   filter {
@@ -102,22 +102,22 @@ resource "aws_instance" "weblogic_server" {
   )
 }
 
-resource "aws_ebs_volume" "extra_disk" {
-  availability_zone = "${local.region}a"
-  type              = "gp2"
-  encrypted         = true
-  size              = 50
+# resource "aws_ebs_volume" "extra_disk" {
+#   availability_zone = "${local.region}a"
+#   type              = "gp2"
+#   encrypted         = true
+#   size              = 50
 
-  tags = merge(
-    local.tags,
-    {
-      Name = "weblogic-${local.application_name}-extra-disk"
-    }
-  )
-}
+#   tags = merge(
+#     local.tags,
+#     {
+#       Name = "weblogic-${local.application_name}-extra-disk"
+#     }
+#   )
+# }
 
-resource "aws_volume_attachment" "extra_disk" {
-  device_name = "/dev/sde"
-  volume_id   = aws_ebs_volume.extra_disk.id
-  instance_id = aws_instance.weblogic_server.id
-}
+# resource "aws_volume_attachment" "extra_disk" {
+#   device_name = "/dev/sde"
+#   volume_id   = aws_ebs_volume.extra_disk.id
+#   instance_id = aws_instance.weblogic_server.id
+# }
