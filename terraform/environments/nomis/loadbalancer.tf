@@ -64,12 +64,16 @@ resource "aws_lb" "internal" {
 
 resource "aws_lb_target_group" "weblogic" {
 
-  name                 = "weblogic-${local.application_name}"
+  name_prefix          = "wlogic" 
   port                 = "80" # port on which targets receive traffic
   protocol             = "HTTPS"
   target_type          = "ip"
   deregistration_delay = "30"
   vpc_id               = local.vpc_id
+  
+  lifecycle {
+    create_before_destroy = true
+  }
 
   health_check {
     enabled             = true
