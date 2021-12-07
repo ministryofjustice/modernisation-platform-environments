@@ -98,6 +98,7 @@ resource "aws_instance" "cjip-server" {
 
 
 resource "aws_ebs_volume" "cjip-disk1" {
+  depends_on        = [aws_instance.cjip-server]
   availability_zone = "${local.region}a"
   type              = "gp2"
   encrypted         = true
