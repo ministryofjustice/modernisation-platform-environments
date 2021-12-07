@@ -64,7 +64,7 @@ resource "aws_lb" "internal" {
 
 resource "aws_lb_target_group" "weblogic" {
 
-  name_prefix          = "wlogic" 
+  name_prefix          = "wlogic"
   port                 = "7777" # port on which targets receive traffic
   protocol             = "HTTP"
   target_type          = "ip"
