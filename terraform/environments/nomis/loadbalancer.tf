@@ -70,7 +70,7 @@ resource "aws_lb_target_group" "weblogic" {
   target_type          = "ip"
   deregistration_delay = "30"
   vpc_id               = local.vpc_id
-  
+
   lifecycle {
     create_before_destroy = true
   }
