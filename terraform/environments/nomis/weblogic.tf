@@ -33,7 +33,7 @@ resource "aws_security_group" "weblogic_server" {
     from_port       = "80"
     to_port         = "80"
     protocol        = "TCP"
-    security_groups = [aws_security_group.jumpserver-windows.id]
+    security_groups = [aws_security_group.jumpserver-windows.id, aws_security_group.internal_elb.id]
   }
 
   ingress {
