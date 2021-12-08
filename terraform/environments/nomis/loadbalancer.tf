@@ -87,14 +87,14 @@ resource "aws_lb" "internal" {
   #   prefix  = "test-lb"
   #   enabled = true
   # }
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "weblogic-${local.application_name}"
-    },
-  )
-}
+# 
+#   tags = merge(
+#     local.tags,
+#     {
+#       Name = "weblogic-${local.application_name}"
+#     },
+#   )
+# }
 
 # resource "aws_lb_target_group_attachment" "weblogic" {
 #   target_group_arn = aws_lb_target_group.weblogic.arn
