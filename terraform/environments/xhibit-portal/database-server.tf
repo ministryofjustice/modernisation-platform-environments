@@ -1,4 +1,3 @@
-###testing
 # Security Groups
 resource "aws_security_group" "database-server" {
   description = "Bastion traffic"
