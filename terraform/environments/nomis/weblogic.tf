@@ -69,7 +69,7 @@ data "aws_ami" "weblogic_image" {
 
   filter {
     name   = "name"
-    values = ["weblogic_prior_to_cidr_migration*"] # temp. fix this to prevent any more accidental replacements
+    values = ["nomis_app-2021-09-20*"] # temp. fix this to prevent any more accidental replacements
   }
 
   filter {
