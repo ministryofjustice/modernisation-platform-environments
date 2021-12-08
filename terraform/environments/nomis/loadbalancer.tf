@@ -87,7 +87,7 @@ resource "aws_lb" "internal" {
 #   prefix  = "test-lb"
 #   enabled = true
 # }
-# 
+#
 #   tags = merge(
 #     local.tags,
 #     {
@@ -102,22 +102,22 @@ resource "aws_lb" "internal" {
 #   port             = "7777"
 # }
 
-resource "aws_lb_listener" "internal" {
-  depends_on = [
-    aws_acm_certificate_validation.internal_lb
-  ]
-
-  load_balancer_arn = aws_lb.internal.arn
-  port              = "443"
-  protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = aws_acm_certificate.internal_lb.arn
-
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.weblogic.arn
-  }
-}
+# resource "aws_lb_listener" "internal" {
+#   depends_on = [
+#     aws_acm_certificate_validation.internal_lb
+#   ]
+#
+#   load_balancer_arn = aws_lb.internal.arn
+#   port              = "443"
+#   protocol          = "HTTPS"
+#   ssl_policy        = "ELBSecurityPolicy-2016-08"
+#   certificate_arn   = aws_acm_certificate.internal_lb.arn
+#
+#   default_action {
+#     type             = "forward"
+#     target_group_arn = aws_lb_target_group.weblogic.arn
+#   }
+# }
 
 #------------------------------------------------------------------------------
 # Route 53 record
