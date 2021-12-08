@@ -5,6 +5,7 @@ on:
     branches:
       - xp-dev
       - test-branch3
+      - main
     paths:
       - 'terraform/environments/xhibit-portal/**'
       - '.github/workflows/xhibit-portal.yml'
