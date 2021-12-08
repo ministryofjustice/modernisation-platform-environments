@@ -78,29 +78,29 @@ data "aws_ami" "weblogic_image" {
   }
 }
 
-resource "aws_instance" "weblogic_server" {
-  instance_type               = "t2.medium"
-  ami                         = data.aws_ami.weblogic_image.id
-  associate_public_ip_address = false
-  iam_instance_profile        = aws_iam_instance_profile.ec2_common_profile.id
-  monitoring                  = false
-  vpc_security_group_ids      = [aws_security_group.weblogic_server.id]
-  subnet_id                   = data.aws_subnet.private_az_a.id
-  user_data                   = file("./templates/cloudinit.cfg")
-  # ebs_optimized          = true
-  key_name = aws_key_pair.ec2-user.key_name
-
-  root_block_device {
-    encrypted = true
-  }
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "weblogic"
-    }
-  )
-}
+# resource "aws_instance" "weblogic_server" {
+#   instance_type               = "t2.medium"
+#   ami                         = data.aws_ami.weblogic_image.id
+#   associate_public_ip_address = false
+#   iam_instance_profile        = aws_iam_instance_profile.ec2_common_profile.id
+#   monitoring                  = false
+#   vpc_security_group_ids      = [aws_security_group.weblogic_server.id]
+#   subnet_id                   = data.aws_subnet.private_az_a.id
+#   user_data                   = file("./templates/cloudinit.cfg")
+#   # ebs_optimized          = true
+#   key_name = aws_key_pair.ec2-user.key_name
+#
+#   root_block_device {
+#     encrypted = true
+#   }
+#
+#   tags = merge(
+#     local.tags,
+#     {
+#       Name = "weblogic"
+#     }
+#   )
+# }
 
 resource "aws_ebs_volume" "extra_disk" {
   availability_zone = "${local.region}a"
