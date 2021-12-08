@@ -145,7 +145,7 @@ resource "aws_key_pair" "george" {
 #   description = "Bastion traffic"
 #   name        = "domaincheck-${local.application_name}"
 #   vpc_id      = local.vpc_id
-# }
+# } 
 
 
 # resource "aws_security_group_rule" "dcheck-outbound-all" {
