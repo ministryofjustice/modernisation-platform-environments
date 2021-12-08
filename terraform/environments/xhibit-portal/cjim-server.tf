@@ -86,6 +86,7 @@ resource "aws_instance" "cjim-server" {
 
 
 resource "aws_ebs_volume" "cjim-disk1" {
+  depends_on        = [aws_instance.cjim-server]
   availability_zone = "${local.region}a"
   type              = "gp2"
   encrypted         = true
