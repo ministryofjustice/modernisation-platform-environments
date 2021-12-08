@@ -18,14 +18,14 @@ resource "aws_security_group" "internal_elb" {
   tags = merge(
     local.tags,
     {
-      Name = "internal-lb-${local.application_name}"
+      Name = "internal-loadbalancer-sg"
     },
   )
 }
 
 resource "aws_security_group_rule" "internal_lb_ingress_1" {
 
-  description       = "all 443 inbound from anywhere (limited by subnet ACL)"
+  description       = "allow 443 inbound from anywhere (limited by subnet ACL)"
   security_group_id = aws_security_group.internal_elb.id
   type              = "ingress"
   from_port         = 443
@@ -36,7 +36,7 @@ resource "aws_security_group_rule" "internal_lb_ingress_1" {
 
 resource "aws_security_group_rule" "internal_lb_egress_1" {
 
-  description              = "all outbound to weblogic targets"
+  description              = "allow outbound to weblogic targets"
   security_group_id        = aws_security_group.internal_elb.id
   type                     = "egress"
   from_port                = 7777
@@ -57,19 +57,23 @@ resource "aws_lb" "internal" {
   tags = merge(
     local.tags,
     {
-      Name = "internal-${local.application_name}"
+      Name = "internal-loadbalancer"
     },
   )
 }
 
 resource "aws_lb_target_group" "weblogic" {
 
-  name                 = "weblogic-${local.application_name}"
+  name_prefix          = "wlogic"
   port                 = "7777" # port on which targets receive traffic
-  protocol             = "HTTPS"
+  protocol             = "HTTP"
   target_type          = "ip"
   deregistration_delay = "30"
   vpc_id               = local.vpc_id
+
+  lifecycle {
+    create_before_destroy = true
+  }
 
   health_check {
     enabled             = true
@@ -91,14 +95,14 @@ resource "aws_lb_target_group" "weblogic" {
   tags = merge(
     local.tags,
     {
-      Name = "weblogic-${local.application_name}"
+      Name = "internal-loadbalancer-weblogic-tg"
     },
   )
 }
 
 resource "aws_lb_target_group_attachment" "weblogic" {
   target_group_arn = aws_lb_target_group.weblogic.arn
-  target_id        = aws_instance.weblogic_server.private_ip
+  target_id        = "10.26.8.15"
   port             = "7777"
 }
 
@@ -149,7 +153,7 @@ resource "aws_acm_certificate" "internal_lb" {
   tags = merge(
     local.tags,
     {
-      Name = "internal-lb-${local.application_name}"
+      Name = "internal-lb-cert"
     },
   )
 
