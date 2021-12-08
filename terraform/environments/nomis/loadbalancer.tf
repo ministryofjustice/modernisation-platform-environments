@@ -18,14 +18,14 @@ resource "aws_security_group" "internal_elb" {
   tags = merge(
     local.tags,
     {
-      Name = "internal-lb-${local.application_name}"
+      Name = "internal-loadbalancer-sg"
     },
   )
 }
 
 resource "aws_security_group_rule" "internal_lb_ingress_1" {
 
-  description       = "all 443 inbound from anywhere (limited by subnet ACL)"
+  description       = "allow 443 inbound from anywhere (limited by subnet ACL)"
   security_group_id = aws_security_group.internal_elb.id
   type              = "ingress"
   from_port         = 443
@@ -36,7 +36,7 @@ resource "aws_security_group_rule" "internal_lb_ingress_1" {
 
 resource "aws_security_group_rule" "internal_lb_egress_1" {
 
-  description              = "all outbound to weblogic targets"
+  description              = "allow outbound to weblogic targets"
   security_group_id        = aws_security_group.internal_elb.id
   type                     = "egress"
   from_port                = 7777
@@ -57,30 +57,30 @@ resource "aws_lb" "internal" {
   tags = merge(
     local.tags,
     {
-      Name = "internal-${local.application_name}"
+      Name = "internal-loadbalancer"
     },
   )
 }
 
-resource "aws_lb_target_group" "weblogic" {
-
-  name                 = "weblogic-${local.application_name}"
-  port                 = "7777" # port on which targets receive traffic
-  protocol             = "HTTPS"
-  target_type          = "ip"
-  deregistration_delay = "30"
-  vpc_id               = local.vpc_id
-
-  health_check {
-    enabled             = true
-    interval            = "30"
-    healthy_threshold   = "3"
-    matcher             = "200-399"
-    path                = "/keepalive.htm"
-    port                = "7777"
-    timeout             = "5"
-    unhealthy_threshold = "5"
-  }
+# resource "aws_lb_target_group" "weblogic" {
+#
+#   name                 = "weblogic-${local.application_name}"
+#   port                 = "7777" # port on which targets receive traffic
+#   protocol             = "HTTPS"
+#   target_type          = "ip"
+#   deregistration_delay = "30"
+#   vpc_id               = local.vpc_id
+#
+#   health_check {
+#     enabled             = true
+#     interval            = "30"
+#     healthy_threshold   = "3"
+#     matcher             = "200-399"
+#     path                = "/keepalive.htm"
+#     port                = "7777"
+#     timeout             = "5"
+#     unhealthy_threshold = "5"
+#   }
 
   # access_logs { maybe we want this?
   #   bucket  = aws_s3_bucket.lb_logs.bucket
