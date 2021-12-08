@@ -96,11 +96,11 @@ resource "aws_lb_target_group" "weblogic" {
   )
 }
 
-resource "aws_lb_target_group_attachment" "weblogic" {
-  target_group_arn = aws_lb_target_group.weblogic.arn
-  target_id        = aws_instance.weblogic_server.private_ip
-  port             = "7777"
-}
+# resource "aws_lb_target_group_attachment" "weblogic" {
+#   target_group_arn = aws_lb_target_group.weblogic.arn
+#   target_id        = aws_instance.weblogic_server.private_ip
+#   port             = "7777"
+# }
 
 resource "aws_lb_listener" "internal" {
   depends_on = [
