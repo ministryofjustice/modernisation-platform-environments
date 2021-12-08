@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - xp-dev
-      - test-branch3
       - main
     paths:
       - 'terraform/environments/xhibit-portal/**'
