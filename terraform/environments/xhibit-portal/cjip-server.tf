@@ -118,4 +118,3 @@ resource "aws_volume_attachment" "cjip-disk1" {
   volume_id   = aws_ebs_volume.cjip-disk1.id
   instance_id = aws_instance.cjip-server.id
 }
-

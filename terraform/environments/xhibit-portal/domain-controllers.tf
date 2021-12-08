@@ -227,7 +227,7 @@ resource "aws_ebs_volume" "infra1-disk1" {
 }
 
 resource "aws_volume_attachment" "infra1-disk1" {
-  device_name = "xvdi"
+  device_name = "xvdg"
   volume_id   = aws_ebs_volume.infra1-disk1.id
   instance_id = aws_instance.infra1.id
 }
@@ -323,9 +323,3 @@ resource "aws_route53_resolver_rule_association" "cjse-domain" {
   resolver_rule_id = aws_route53_resolver_rule.fwd.id
   vpc_id           = local.vpc_id
 }
-
-
-
-
-
-
