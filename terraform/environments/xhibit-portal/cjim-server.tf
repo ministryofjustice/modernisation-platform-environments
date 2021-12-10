@@ -103,6 +103,7 @@ resource "aws_ebs_volume" "cjim-disk1" {
 
 resource "aws_volume_attachment" "cjim-disk1" {
   device_name = "xvdi"
+  force_detach = true
   volume_id   = aws_ebs_volume.cjim-disk1.id
   instance_id = aws_instance.cjim-server.id
 }

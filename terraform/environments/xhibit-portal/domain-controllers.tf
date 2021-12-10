@@ -228,6 +228,7 @@ resource "aws_ebs_volume" "infra1-disk1" {
 
 resource "aws_volume_attachment" "infra1-disk1" {
   device_name = "xvdi"
+  force_detach = true
   volume_id   = aws_ebs_volume.infra1-disk1.id
   instance_id = aws_instance.infra1.id
 }
