@@ -41,6 +41,19 @@ resource "aws_security_group_rule" "cjip-inbound-web" {
   source_security_group_id = aws_security_group.cjip-server.id
 }
 
+# TODO - check this next one is ok with adam. 
+resource "aws_security_group_rule" "database-outbound-all" {
+  depends_on               = [aws_security_group.cjim-server]
+  security_group_id        = aws_security_group.cjim-server.id
+  type                     = "ingress"
+  description              = "allow all connections to db"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
+  source_security_group_id = aws_security_group.database-server.id
+}
+
+
 
 resource "aws_instance" "cjim-server" {
   depends_on                  = [aws_security_group.cjim-server]
