@@ -1,4 +1,3 @@
-
 # Security Groups
 resource "aws_security_group" "database-server" {
   description = "Bastion traffic"
@@ -213,7 +212,3 @@ resource "aws_volume_attachment" "database-disk4" {
   volume_id    = aws_ebs_volume.database-disk4.id
   instance_id  = aws_instance.database-server.id
 }
-
-
-
-
