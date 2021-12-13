@@ -51,16 +51,16 @@ resource "aws_security_group_rule" "portal-to-sql" {
   source_security_group_id = aws_security_group.portal-server.id
 }
 
-resource "aws_security_group_rule" "cjim-to-sql" {
-  depends_on               = [aws_security_group.database-server]
-  security_group_id        = aws_security_group.database-server.id
-  type                     = "ingress"
-  description              = "allow app to sql traffic"
-  from_port                = 1433
-  to_port                  = 1433
-  protocol                 = "TCP"
-  source_security_group_id = aws_security_group.cjim-server.id
-}
+# resource "aws_security_group_rule" "cjim-to-sql" {
+#   depends_on               = [aws_security_group.database-server]
+#   security_group_id        = aws_security_group.database-server.id
+#   type                     = "ingress"
+#   description              = "allow app to sql traffic"
+#   from_port                = 1433
+#   to_port                  = 1433
+#   protocol                 = "TCP"
+#   source_security_group_id = aws_security_group.cjim-server.id
+# }
 
 
 # TODO check this with adam - go back over and reduce open ports
