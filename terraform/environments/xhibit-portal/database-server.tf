@@ -63,18 +63,18 @@ resource "aws_security_group_rule" "cjim-to-sql" {
 }
 
 
-# # TODO check this with adam - go back over and reduce open ports
+# TODO check this with adam - go back over and reduce open ports
 
-# resource "aws_security_group_rule" "all-cjim-to-sql" {
-#   depends_on               = [aws_security_group.database-server]
-#   security_group_id        = aws_security_group.database-server.id
-#   type                     = "ingress"
-#   description              = "allow all app to sql traffic"
-#   from_port                = 0
-#   to_port                  = 0
-#   protocol                 = "-1"
-#   source_security_group_id = aws_security_group.cjim-server.id
-# }
+resource "aws_security_group_rule" "all-cjim-to-sql" {
+  depends_on               = [aws_security_group.database-server]
+  security_group_id        = aws_security_group.database-server.id
+  type                     = "ingress"
+  description              = "allow all app to sql traffic"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
+  source_security_group_id = aws_security_group.cjim-server.id
+}
 
 
 
