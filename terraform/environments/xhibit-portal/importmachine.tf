@@ -75,7 +75,7 @@ resource "aws_instance" "importmachine" {
 
 resource "aws_ebs_volume" "disk_xvdf" {
   depends_on        = [aws_instance.importmachine]
-  snapshot_id = local.application_data.accounts[local.environment].importmachine-data-snapshot
+  snapshot_id       = local.application_data.accounts[local.environment].importmachine-data-snapshot
   availability_zone = "${local.region}a"
   type              = "gp2"
   encrypted         = true
