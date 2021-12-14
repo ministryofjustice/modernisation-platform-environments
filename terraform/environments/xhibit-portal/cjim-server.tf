@@ -8,6 +8,7 @@ resource "aws_security_group" "cjim-server" {
 
 
 resource "aws_security_group_rule" "cjim-outbound-all" {
+  depends_on        = [aws_security_group.cjim-server]
   security_group_id = aws_security_group.cjim-server.id
   type              = "egress"
   description       = "allow all"
@@ -19,6 +20,7 @@ resource "aws_security_group_rule" "cjim-outbound-all" {
 }
 
 resource "aws_security_group_rule" "cjim-inbound-bastion" {
+  depends_on        = [aws_security_group.cjim-server]
   security_group_id = aws_security_group.cjim-server.id
   type              = "ingress"
   description       = "allow bastion"
@@ -29,6 +31,7 @@ resource "aws_security_group_rule" "cjim-inbound-bastion" {
 }
 
 resource "aws_security_group_rule" "cjip-inbound-web" {
+  depends_on               = [aws_security_group.cjim-server]
   security_group_id        = aws_security_group.cjim-server.id
   type                     = "ingress"
   description              = "allow web from cjip"
@@ -40,6 +43,7 @@ resource "aws_security_group_rule" "cjip-inbound-web" {
 
 
 resource "aws_instance" "cjim-server" {
+  depends_on                  = [aws_security_group.cjim-server]
   instance_type               = "t2.medium"
   ami                         = local.application_data.accounts[local.environment].suprig04-ami
   vpc_security_group_ids      = [aws_security_group.cjim-server.id]
@@ -82,6 +86,7 @@ resource "aws_instance" "cjim-server" {
 
 
 resource "aws_ebs_volume" "cjim-disk1" {
+  depends_on        = [aws_instance.cjim-server]
   availability_zone = "${local.region}a"
   type              = "gp2"
   encrypted         = true
@@ -97,8 +102,9 @@ resource "aws_ebs_volume" "cjim-disk1" {
 }
 
 resource "aws_volume_attachment" "cjim-disk1" {
-  device_name = "xvdi"
-  volume_id   = aws_ebs_volume.cjim-disk1.id
-  instance_id = aws_instance.cjim-server.id
+  device_name  = "xvdg"
+  force_detach = true
+  volume_id    = aws_ebs_volume.cjim-disk1.id
+  instance_id  = aws_instance.cjim-server.id
 }
 

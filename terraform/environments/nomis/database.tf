@@ -1,3 +1,6 @@
+#------------------------------------------------------------------------------
+# Networking and Security Groups
+#------------------------------------------------------------------------------
 data "aws_subnet" "data_az_a" {
   vpc_id = local.vpc_id
   tags = {
@@ -5,7 +8,6 @@ data "aws_subnet" "data_az_a" {
   }
 }
 
-# Security Groups
 resource "aws_security_group" "db_server" {
   description = "Configure Oracle database access"
   name        = "db-server-${local.application_name}"
@@ -44,7 +46,9 @@ resource "aws_security_group" "db_server" {
   )
 }
 
-##### EC2 ####
+#------------------------------------------------------------------------------
+# AMI and EC2
+#------------------------------------------------------------------------------
 data "aws_ami" "db_image" {
   most_recent = true
   owners      = ["self"]
@@ -80,7 +84,7 @@ resource "aws_instance" "db_server" {
   subnet_id                   = data.aws_subnet.data_az_a.id
   user_data                   = file("./templates/database_init.sh")
   vpc_security_group_ids      = [aws_security_group.db_server.id]
-  # key_name                    = aws_key_pair.ec2-user.key_name add this on next rebuild
+  key_name                    = aws_key_pair.ec2-user.key_name
 
   root_block_device {
     delete_on_termination = true
@@ -121,4 +125,17 @@ resource "aws_instance" "db_server" {
       always_on = "false"
     }
   )
+}
+
+#------------------------------------------------------------------------------
+# Route 53 record
+#------------------------------------------------------------------------------
+resource "aws_route53_record" "database" {
+  provider = aws.core-vpc
+
+  zone_id = data.aws_route53_zone.internal.zone_id
+  name    = "database.${local.application_name}.${local.vpc_name}-${local.environment}.modernisation-platform.internal"
+  type    = "A"
+  ttl     = "60"
+  records = [aws_instance.db_server.private_ip]
 }

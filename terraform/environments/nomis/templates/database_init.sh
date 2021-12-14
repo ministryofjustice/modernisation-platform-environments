@@ -23,14 +23,14 @@ hugepages() {
     # repeat if necessary, wait up to 5 minutes
     local i=0
     if [[ "$pages_created" -lt "$pages" ]]; then
-        sleep 60
-        sysctl -p
-        pages_created=$(awk '/^HugePages_Total/ {print $2}' /proc/meminfo)
-        ((i++))
         if [[ "$i" == '5' ]]; then
             echo "only $pages_created, expected $pages"
             break
         fi
+        sleep 60
+        sysctl -p
+        pages_created=$(awk '/^HugePages_Total/ {print $2}' /proc/meminfo)
+        ((i++))
     fi
     echo "created [$pages_created/$pages] hugepages"
 
@@ -97,7 +97,18 @@ reconfigure_oracle_has() {
         crsctl stop has
         crsctl enable has
         crsctl start has
-        sleep 30
+        sleep 10
+        i=0
+        asm_status=$(srvctl status asm | grep "ASM is running")
+        if [[ -z "$asm_status" ]]; then
+            if [[ "$i" == '10' ]]; then
+                echo "ASM did not start after 5 minutes, resize oracle asm disks manually"
+                break
+            fi
+            sleep 30
+            asm_status=$(srvctl status asm | grep "ASM is running")
+            ((i++))
+        fi
         sqlplus -s / as sysasm <<< "alter diskgroup ORADATA resize all;"
 EOF
 

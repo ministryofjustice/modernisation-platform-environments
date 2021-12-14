@@ -1,4 +1,3 @@
-
 # Security Groups
 resource "aws_security_group" "database-server" {
   description = "Bastion traffic"
@@ -8,6 +7,7 @@ resource "aws_security_group" "database-server" {
 
 
 resource "aws_security_group_rule" "database-outbound-all" {
+  depends_on        = [aws_security_group.database-server]
   security_group_id = aws_security_group.database-server.id
   type              = "egress"
   description       = "allow all"
@@ -19,6 +19,7 @@ resource "aws_security_group_rule" "database-outbound-all" {
 }
 
 resource "aws_security_group_rule" "database-inbound-bastion" {
+  depends_on        = [aws_security_group.database-server]
   security_group_id = aws_security_group.database-server.id
   type              = "ingress"
   description       = "allow bastion"
@@ -28,40 +29,76 @@ resource "aws_security_group_rule" "database-inbound-bastion" {
   cidr_blocks       = ["${module.bastion_linux.bastion_private_ip}/32"]
 }
 
-resource "aws_security_group_rule" "app-to-sql" {
-  security_group_id        = aws_security_group.database-server.id
-  type                     = "ingress"
-  description              = "allow app to sql traffic"
-  from_port                = 1433
-  to_port                  = 1433
-  protocol                 = "TCP"
-  source_security_group_id = aws_security_group.app-server.id
-}
-
 resource "aws_security_group_rule" "portal-to-sql" {
+  depends_on               = [aws_security_group.database-server]
   security_group_id        = aws_security_group.database-server.id
   type                     = "ingress"
-  description              = "allow app to sql traffic"
+  description              = "allow portal to sql traffic"
   from_port                = 1433
   to_port                  = 1433
   protocol                 = "TCP"
   source_security_group_id = aws_security_group.portal-server.id
 }
 
-resource "aws_security_group_rule" "cjim-to-sql" {
+
+# ----------------------------------------------------------
+
+# resource "aws_security_group_rule" "cjim-to-sql" {
+#   depends_on               = [aws_security_group.database-server]
+#   security_group_id        = aws_security_group.database-server.id
+#   type                     = "ingress"
+#   description              = "allow app to sql traffic"
+#   from_port                = 1433
+#   to_port                  = 1433
+#   protocol                 = "TCP"
+#   source_security_group_id = aws_security_group.cjim-server.id
+# }
+
+# TODO check this with adam - go back over and reduce open ports
+
+resource "aws_security_group_rule" "all-cjim-to-sql" {
+  depends_on               = [aws_security_group.database-server]
   security_group_id        = aws_security_group.database-server.id
   type                     = "ingress"
-  description              = "allow app to sql traffic"
-  from_port                = 1433
-  to_port                  = 1433
-  protocol                 = "TCP"
+  description              = "allow all cjim to sql traffic"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
   source_security_group_id = aws_security_group.cjim-server.id
 }
 
-resource "aws_security_group_rule" "cjip-to-sql" {
+# resource "aws_security_group_rule" "app-to-sql" {
+#   depends_on               = [aws_security_group.database-server]
+#   security_group_id        = aws_security_group.database-server.id
+#   type                     = "ingress"
+#   description              = "allow app to sql traffic"
+#   from_port                = 1433
+#   to_port                  = 1433
+#   protocol                 = "TCP"
+#   source_security_group_id = aws_security_group.app-server.id
+# }
+
+resource "aws_security_group_rule" "all-app-to-sql" {
+  depends_on               = [aws_security_group.database-server]
   security_group_id        = aws_security_group.database-server.id
   type                     = "ingress"
-  description              = "allow app to sql traffic"
+  description              = "allow all app to sql traffic"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
+  source_security_group_id = aws_security_group.app-server.id
+}
+
+# ----------------------------------------------------------
+
+
+
+
+resource "aws_security_group_rule" "cjip-to-sql" {
+  depends_on               = [aws_security_group.database-server]
+  security_group_id        = aws_security_group.database-server.id
+  type                     = "ingress"
+  description              = "allow cjip to sql traffic"
   from_port                = 1433
   to_port                  = 1433
   protocol                 = "TCP"
@@ -70,6 +107,7 @@ resource "aws_security_group_rule" "cjip-to-sql" {
 
 
 resource "aws_instance" "database-server" {
+  depends_on                  = [aws_security_group.database-server]
   instance_type               = "t2.medium"
   ami                         = local.application_data.accounts[local.environment].suprig01-ami
   vpc_security_group_ids      = [aws_security_group.database-server.id]
@@ -112,6 +150,7 @@ resource "aws_instance" "database-server" {
 
 
 resource "aws_ebs_volume" "database-disk1" {
+  depends_on        = [aws_instance.database-server]
   availability_zone = "${local.region}a"
   type              = "gp2"
   encrypted         = true
@@ -127,15 +166,17 @@ resource "aws_ebs_volume" "database-disk1" {
 }
 
 resource "aws_volume_attachment" "database-disk1" {
-  device_name = "xvdb"
-  volume_id   = aws_ebs_volume.database-disk1.id
-  instance_id = aws_instance.database-server.id
+  device_name  = "xvdl"
+  force_detach = true
+  volume_id    = aws_ebs_volume.database-disk1.id
+  instance_id  = aws_instance.database-server.id
 }
 
 
 
 
 resource "aws_ebs_volume" "database-disk2" {
+  depends_on        = [aws_instance.database-server]
   availability_zone = "${local.region}a"
   type              = "gp2"
   encrypted         = true
@@ -151,13 +192,15 @@ resource "aws_ebs_volume" "database-disk2" {
 }
 
 resource "aws_volume_attachment" "database-disk2" {
-  device_name = "xvdc"
-  volume_id   = aws_ebs_volume.database-disk2.id
-  instance_id = aws_instance.database-server.id
+  device_name  = "xvdm"
+  force_detach = true
+  volume_id    = aws_ebs_volume.database-disk2.id
+  instance_id  = aws_instance.database-server.id
 }
 
 
 resource "aws_ebs_volume" "database-disk3" {
+  depends_on        = [aws_instance.database-server]
   availability_zone = "${local.region}a"
   type              = "gp2"
   encrypted         = true
@@ -173,12 +216,14 @@ resource "aws_ebs_volume" "database-disk3" {
 }
 
 resource "aws_volume_attachment" "database-disk3" {
-  device_name = "xvdd"
-  volume_id   = aws_ebs_volume.database-disk3.id
-  instance_id = aws_instance.database-server.id
+  device_name  = "xvdn"
+  force_detach = true
+  volume_id    = aws_ebs_volume.database-disk3.id
+  instance_id  = aws_instance.database-server.id
 }
 
 resource "aws_ebs_volume" "database-disk4" {
+  depends_on        = [aws_instance.database-server]
   availability_zone = "${local.region}a"
   type              = "gp2"
   encrypted         = true
@@ -194,54 +239,8 @@ resource "aws_ebs_volume" "database-disk4" {
 }
 
 resource "aws_volume_attachment" "database-disk4" {
-  device_name = "xvde"
-  volume_id   = aws_ebs_volume.database-disk4.id
-  instance_id = aws_instance.database-server.id
+  device_name  = "xvdo"
+  force_detach = true
+  volume_id    = aws_ebs_volume.database-disk4.id
+  instance_id  = aws_instance.database-server.id
 }
-
-resource "aws_ebs_volume" "database-disk5" {
-  availability_zone = "${local.region}a"
-  type              = "gp2"
-  encrypted         = true
-
-  snapshot_id = local.application_data.accounts[local.environment].suprig01-disk-5-snapshot
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "database-disk5-${local.application_name}"
-    }
-  )
-}
-
-resource "aws_volume_attachment" "database-disk5" {
-  device_name = "xvdf"
-  volume_id   = aws_ebs_volume.database-disk5.id
-  instance_id = aws_instance.database-server.id
-}
-
-
-resource "aws_ebs_volume" "database-disk6" {
-  availability_zone = "${local.region}a"
-  type              = "gp2"
-  encrypted         = true
-
-  snapshot_id = local.application_data.accounts[local.environment].suprig01-disk-6-snapshot
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "database-disk6-${local.application_name}"
-    }
-  )
-}
-
-resource "aws_volume_attachment" "database-disk6" {
-  device_name = "xvdg"
-  volume_id   = aws_ebs_volume.database-disk6.id
-  instance_id = aws_instance.database-server.id
-}
-
-
-
-
