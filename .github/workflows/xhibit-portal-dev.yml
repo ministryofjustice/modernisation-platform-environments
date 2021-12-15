@@ -20,6 +20,7 @@ jobs:
   plan-development:
     name: Plan Development - xhibit-portal
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/xp-dev'
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2.3.4
@@ -41,6 +42,7 @@ jobs:
     needs: plan-development 
     name: Deploy Development - xhibit-portal
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/xp-dev'
     # environment:
     #   name: xhibit-portal-development
     steps:
