@@ -41,6 +41,7 @@ jobs:
     needs: plan-production
     name: Deploy Production - xhibit-portal
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
     environment:
       name: xhibit-portal-production
     steps:
