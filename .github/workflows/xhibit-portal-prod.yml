@@ -1,12 +1,12 @@
 ---
-name: xhibit-portal
+name: xhibit-portal-prod
 on:
   push:
     branches:
-      - xp-dev
+      - main
     paths:
       - 'terraform/environments/xhibit-portal/**'
-      - '.github/workflows/xhibit-portal.yml'
+      - '.github/workflows/xhibit-portal-prod.yml'
   workflow_dispatch:
 env:
   AWS_ACCESS_KEY_ID:  ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -17,12 +17,10 @@ defaults:
     shell: bash
 
 jobs: 
-
-  # These jobs run when creating a pull request
-  plan-development:
-    name: Plan Development - xhibit-portal
+  plan-production:
+    name: Plan Production - xhibit-portal
     runs-on: ubuntu-latest
-    if: github.ref != 'refs/heads/main' || github.event_name == 'workflow_dispatch'
+    if: github.ref == 'refs/heads/xp-dev'
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2.3.4
@@ -31,22 +29,22 @@ jobs:
         with:
           terraform_version: 1.0.1
           terraform_wrapper: false
-      - name: Terraform plan - development
+      - name: Terraform plan - production
         run: |
           echo "Terraform plan - ${TF_ENV}"
           bash scripts/terraform-init.sh terraform/environments/xhibit-portal
           terraform -chdir="terraform/environments/xhibit-portal" workspace select "xhibit-portal-${TF_ENV}"
           bash scripts/terraform-plan.sh terraform/environments/xhibit-portal
         env:
-          TF_ENV: development
+          TF_ENV: production
 
-  deploy-development:
-    needs: plan-development 
-    name: Deploy Development - xhibit-portal
+  deploy-production:
+    needs: plan-production
+    name: Deploy Production - xhibit-portal
     runs-on: ubuntu-latest
-    if: github.ref != 'refs/heads/main' || github.event_name == 'workflow_dispatch'
-    # environment:
-    #   name: xhibit-portal-development
+    if: github.ref == 'refs/heads/main'
+    environment:
+      name: xhibit-portal-production
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2.3.4
@@ -55,11 +53,11 @@ jobs:
         with:
           terraform_version: 1.0.1
           terraform_wrapper: false
-      - name: Terraform apply - development
+      - name: Terraform apply - production
         run: |
           echo "Terraform apply - ${TF_ENV}"
           bash scripts/terraform-init.sh terraform/environments/xhibit-portal
           terraform -chdir="terraform/environments/xhibit-portal" workspace select "xhibit-portal-${TF_ENV}"
           bash scripts/terraform-apply.sh terraform/environments/xhibit-portal
         env:
-          TF_ENV: development
+          TF_ENV: production
