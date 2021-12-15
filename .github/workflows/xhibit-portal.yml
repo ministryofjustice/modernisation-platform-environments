@@ -89,8 +89,6 @@ jobs:
     name: Deploy Production - xhibit-portal
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
-    environment:
-      name: xhibit-portal-production
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2.3.4
