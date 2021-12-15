@@ -48,6 +48,7 @@ jobs:
           TF_ENV: development
 
   deploy-development:
+    needs: plan-development 
     name: Deploy Development - xhibit-portal
     runs-on: ubuntu-latest
     if: github.ref != 'refs/heads/main' || github.event_name == 'workflow_dispatch'
