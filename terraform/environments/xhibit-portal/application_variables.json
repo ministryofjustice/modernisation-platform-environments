@@ -22,7 +22,8 @@
       "suprig05-ami"                  : "ami-0910907944e075745", 
       "suprig05-disk-1-snapshot"      : "snap-004daf44c682a43c1",  
       "XHBPRESMS01-ami"               : "ami-0a0502ffd782e9b12",
-      "dummy snapshot id"             : "snap-08faed719f2040610" 
+      "dummy snapshot id"             : "snap-08faed719f2040610",
+      "importmachine-data-snapshot"   : "snap-0688d8b6d3bd6b245"
     },
     "production": {
       "bucket_prefix"                 : "vm-import-s3-bucket",
@@ -45,7 +46,10 @@
       "suprig04-disk-1-snapshot"      : "snap-0414bfa696a12104e",
       "suprig05-ami"                  : "ami-01e99657fbf6cc85b",
       "suprig05-disk-1-snapshot"      : "snap-08b1c019201557295",
-      "XHBPRESMS01-ami"               : "ami-0e88b3a7df63e7ebb"                
+      "XHBPRESMS01-ami"               : "ami-0e88b3a7df63e7ebb",                
+      "importmachine-data-snapshot"   : "snap-09073f656deb1ecb1"
+
     } 
+
   }
 }
