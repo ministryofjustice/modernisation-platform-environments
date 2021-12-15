@@ -248,3 +248,27 @@ resource "aws_volume_attachment" "database-disk4" {
   volume_id    = aws_ebs_volume.database-disk4.id
   instance_id  = aws_instance.database-server.id
 }
+
+resource "aws_ebs_volume" "database-disk5" {
+  depends_on        = [aws_instance.database-server]
+  availability_zone = "${local.region}a"
+  type              = "gp2"
+  encrypted         = true
+
+  snapshot_id = local.application_data.accounts[local.environment].suprig01-disk-5-snapshot
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "database-disk5-${local.application_name}"
+    }
+  )
+}
+
+resource "aws_volume_attachment" "database-disk5" {
+  depends_on   = [aws_instance.database-server]
+  device_name  = "xvdy"
+  force_detach = true
+  volume_id    = aws_ebs_volume.database-disk5.id
+  instance_id  = aws_instance.database-server.id
+}
