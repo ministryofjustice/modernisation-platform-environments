@@ -160,6 +160,7 @@ jobs:
   #         TF_ENV: preproduction
 
   plan-production:
+    needs: deploy-development
     name: Plan Production - xhibit-portal
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/xp-dev'
