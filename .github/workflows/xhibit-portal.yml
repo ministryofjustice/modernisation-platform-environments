@@ -3,8 +3,8 @@ name: xhibit-portal
 on:
   push:
     branches:
-      - main
       - xp-dev
+      - main
     paths:
       - 'terraform/environments/xhibit-portal/**'
       - '.github/workflows/xhibit-portal.yml'

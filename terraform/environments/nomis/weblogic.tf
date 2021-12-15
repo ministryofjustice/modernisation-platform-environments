@@ -20,29 +20,29 @@ resource "aws_security_group" "weblogic_server" {
     security_groups = [module.bastion_linux.bastion_security_group]
   }
 
-  # ingress {
-  #   description     = "access from Windows Jumpserver (admin console)"
-  #   from_port       = "7001"
-  #   to_port         = "7001"
-  #   protocol        = "TCP"
-  #   security_groups = ["sg-073bc1ad3ef1d1bb3"]
-  # }
+  ingress {
+    description     = "access from Windows Jumpserver (admin console)"
+    from_port       = "7001"
+    to_port         = "7001"
+    protocol        = "TCP"
+    security_groups = [aws_security_group.jumpserver-windows.id]
+  }
 
-  # ingress {
-  #   description     = "access from Windows Jumpserver"
-  #   from_port       = "80"
-  #   to_port         = "80"
-  #   protocol        = "TCP"
-  #   security_groups = ["sg-073bc1ad3ef1d1bb3"]
-  # }
+  ingress {
+    description     = "access from Windows Jumpserver"
+    from_port       = "80"
+    to_port         = "80"
+    protocol        = "TCP"
+    security_groups = [aws_security_group.jumpserver-windows.id]
+  }
 
-  # ingress {
-  #   description     = "access from Windows Jumpserver (forms/reports)"
-  #   from_port       = "7777"
-  #   to_port         = "7777"
-  #   protocol        = "TCP"
-  #   security_groups = ["sg-073bc1ad3ef1d1bb3"]
-  # }
+  ingress {
+    description     = "access from Windows Jumpserver (forms/reports)"
+    from_port       = "7777"
+    to_port         = "7777"
+    protocol        = "TCP"
+    security_groups = [aws_security_group.jumpserver-windows.id, aws_security_group.internal_elb.id]
+  }
 
   egress {
     description      = "allow all"
@@ -102,22 +102,22 @@ resource "aws_instance" "weblogic_server" {
   )
 }
 
-resource "aws_ebs_volume" "extra_disk" {
-  availability_zone = "${local.region}a"
-  type              = "gp2"
-  encrypted         = true
-  size              = 50
+# resource "aws_ebs_volume" "extra_disk" {
+#   availability_zone = "${local.region}a"
+#   type              = "gp2"
+#   encrypted         = true
+#   size              = 50
 
-  tags = merge(
-    local.tags,
-    {
-      Name = "weblogic-${local.application_name}-extra-disk"
-    }
-  )
-}
+#   tags = merge(
+#     local.tags,
+#     {
+#       Name = "weblogic-${local.application_name}-extra-disk"
+#     }
+#   )
+# }
 
-resource "aws_volume_attachment" "extra_disk" {
-  device_name = "/dev/sde"
-  volume_id   = aws_ebs_volume.extra_disk.id
-  instance_id = aws_instance.weblogic_server.id
-}
+# resource "aws_volume_attachment" "extra_disk" {
+#   device_name = "/dev/sde"
+#   volume_id   = aws_ebs_volume.extra_disk.id
+#   instance_id = aws_instance.weblogic_server.id
+# }

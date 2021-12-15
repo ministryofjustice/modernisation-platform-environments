@@ -1,16 +1,24 @@
+#------------------------------------------------------------------------------
+# Datasources for Route 53 Zones
+# The actual records are declared with the relevant resources
+#------------------------------------------------------------------------------
+
+#------------------------------------------------------------------------------
+# Internal Zone
+#------------------------------------------------------------------------------
 data "aws_route53_zone" "internal" {
   provider = aws.core-vpc
 
-  name         = "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.internal."
+  name         = "${local.vpc_name}-${local.environment}.modernisation-platform.internal."
   private_zone = true
 }
 
-resource "aws_route53_record" "database" {
+#------------------------------------------------------------------------------
+# External Zone
+#------------------------------------------------------------------------------
+data "aws_route53_zone" "external" {
   provider = aws.core-vpc
 
-  zone_id = data.aws_route53_zone.internal.zone_id
-  name    = "database.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.internal"
-  type    = "A"
-  ttl     = "60"
-  records = [aws_instance.db_server.private_ip]
+  name         = "${local.vpc_name}-${local.environment}.modernisation-platform.service.justice.gov.uk."
+  private_zone = false
 }

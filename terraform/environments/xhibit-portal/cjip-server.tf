@@ -98,6 +98,7 @@ resource "aws_instance" "cjip-server" {
 
 
 resource "aws_ebs_volume" "cjip-disk1" {
+  depends_on        = [aws_instance.cjip-server]
   availability_zone = "${local.region}a"
   type              = "gp2"
   encrypted         = true
@@ -113,8 +114,9 @@ resource "aws_ebs_volume" "cjip-disk1" {
 }
 
 resource "aws_volume_attachment" "cjip-disk1" {
-  device_name = "xvdi"
-  volume_id   = aws_ebs_volume.cjip-disk1.id
-  instance_id = aws_instance.cjip-server.id
+  device_name  = "xvdi"
+  force_detach = true
+  volume_id    = aws_ebs_volume.cjip-disk1.id
+  instance_id  = aws_instance.cjip-server.id
 }
 
