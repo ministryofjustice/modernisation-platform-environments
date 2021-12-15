@@ -71,7 +71,7 @@ jobs:
   plan-production:
     name: Plan Production - xhibit-portal
     runs-on: ubuntu-latest
-    if: ${{ github.ref == 'refs/heads/main' && (github.event_name == 'pull_request' || github.event_name == 'push') }}
+    if: ${{ github.ref == 'refs/heads/main' }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2.3.4
