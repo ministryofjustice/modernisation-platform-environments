@@ -10,7 +10,7 @@ on:
   pull_request:
     branches:
       - main
-    types: [opened, edited, reopened, synchronize]
+    types: [synchronize]
     paths:
       - 'terraform/environments/xhibit-portal/**'
       - '.github/workflows/xhibit-portal.yml'
