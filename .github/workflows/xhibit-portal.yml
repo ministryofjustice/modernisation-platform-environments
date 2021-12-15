@@ -1,5 +1,5 @@
 ---
-name: xhibit-portal-dev
+name: xhibit-portal
 on:
   push:
     branches:
@@ -8,13 +8,6 @@ on:
     paths:
       - 'terraform/environments/xhibit-portal/**'
       - '.github/workflows/xhibit-portal.yml'
-  pull_request:
-    branches:
-      - main
-    types: [opened, edited, reopened]
-    paths:
-      - 'terraform/environments/xhibit-portal/**'
-      - '.github/workflows/xhibit-portal-prod.yml'
   workflow_dispatch:
 env:
   AWS_ACCESS_KEY_ID:  ${{ secrets.AWS_ACCESS_KEY_ID }}
