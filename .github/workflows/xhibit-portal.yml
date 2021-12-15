@@ -3,7 +3,7 @@ name: xhibit-portal
 on:
   push:
     branches:
-      - main
+      - xp-dev
     paths:
       - 'terraform/environments/xhibit-portal/**'
       - '.github/workflows/xhibit-portal.yml'
@@ -162,7 +162,7 @@ jobs:
   plan-production:
     name: Plan Production - xhibit-portal
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/xp-dev'
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2.3.4
