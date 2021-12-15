@@ -1,9 +1,10 @@
 ---
-name: xhibit-portal-prod
+name: xhibit-portal-prod-plan
 on:
-  push:
+  pull_request:
     branches:
       - main
+    types: [opened, edited, reopened]
     paths:
       - 'terraform/environments/xhibit-portal/**'
       - '.github/workflows/xhibit-portal-prod.yml'
@@ -35,29 +36,5 @@ jobs:
           bash scripts/terraform-init.sh terraform/environments/xhibit-portal
           terraform -chdir="terraform/environments/xhibit-portal" workspace select "xhibit-portal-${TF_ENV}"
           bash scripts/terraform-plan.sh terraform/environments/xhibit-portal
-        env:
-          TF_ENV: production
-
-  deploy-production:
-    needs: plan-production
-    name: Deploy Production - xhibit-portal
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    environment:
-      name: xhibit-portal-production
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2.3.4
-      - name: Load and Configure Terraform
-        uses: hashicorp/setup-terraform@v1.3.2
-        with:
-          terraform_version: 1.0.1
-          terraform_wrapper: false
-      - name: Terraform apply - production
-        run: |
-          echo "Terraform apply - ${TF_ENV}"
-          bash scripts/terraform-init.sh terraform/environments/xhibit-portal
-          terraform -chdir="terraform/environments/xhibit-portal" workspace select "xhibit-portal-${TF_ENV}"
-          bash scripts/terraform-apply.sh terraform/environments/xhibit-portal
         env:
           TF_ENV: production
