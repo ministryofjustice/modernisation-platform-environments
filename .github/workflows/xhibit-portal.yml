@@ -23,7 +23,7 @@ defaults:
   run:
     shell: bash
 
-jobs:
+jobs: 
 
   # These jobs run when creating a pull request
   plan-development:
