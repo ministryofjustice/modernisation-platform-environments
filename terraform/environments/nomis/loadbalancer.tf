@@ -25,13 +25,24 @@ resource "aws_security_group" "internal_elb" {
 
 resource "aws_security_group_rule" "internal_lb_ingress_1" {
 
-  description       = "allow 443 inbound from anywhere (limited by subnet ACL)"
+  description       = "allow 443 inbound from PTTP devices"
   security_group_id = aws_security_group.internal_elb.id
   type              = "ingress"
   from_port         = 443
   to_port           = 443
   protocol          = "tcp"
-  cidr_blocks       = ["0.0.0.0/0"] # limit this once working, set to pttp range and jumpserver?
+  cidr_blocks       = ["10.184.0.0/16"] # Global Protect PTTP devices
+}
+
+resource "aws_security_group_rule" "internal_lb_ingress_2" {
+
+  description       = "allow 443 inbound from Jump Server"
+  security_group_id = aws_security_group.internal_elb.id
+  type              = "ingress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  source_security_group_id = aws_security_group.jumpserver-windows.id
 }
 
 resource "aws_security_group_rule" "internal_lb_egress_1" {
