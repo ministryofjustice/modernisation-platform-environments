@@ -168,7 +168,7 @@ data "aws_iam_policy_document" "packer_minimum_permissions" {
       ]
     }
   }
-  
+
   statement { # need this as Packer seems to copy the image and then tag it
     effect    = "Allow"
     actions   = ["ec2:CreateTags"]
