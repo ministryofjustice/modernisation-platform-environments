@@ -56,6 +56,31 @@ resource "aws_security_group_rule" "portal-inbound-from-waf" {
 
 
 
+resource "aws_security_group_rule" "portal-cjip-inbound-all" {
+  depends_on               = [aws_security_group.portal-server]
+  security_group_id        = aws_security_group.portal-server.id
+  type                     = "ingress"
+  description              = "allow all traffic"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
+  source_security_group_id = aws_security_group.cjip-server.id
+}
+
+
+resource "aws_security_group_rule" "portal-cjim-inbound-all" {
+  depends_on               = [aws_security_group.portal-server]
+  security_group_id        = aws_security_group.portal-server.id
+  type                     = "ingress"
+  description              = "allow all traffic"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
+  source_security_group_id = aws_security_group.cjim-server.id
+}
+
+
+
 
 resource "aws_instance" "portal-server" {
   depends_on                  = [aws_security_group.portal-server]

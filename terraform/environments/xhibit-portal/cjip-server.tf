@@ -52,6 +52,18 @@ resource "aws_security_group_rule" "cjim-inbound-web" {
   source_security_group_id = aws_security_group.cjim-server.id
 }
 
+// added for the msdtc thing
+resource "aws_security_group_rule" "cjip-portal-inbound-all" {
+  depends_on               = [aws_security_group.cjip-server]
+  security_group_id        = aws_security_group.cjip-server.id
+  type                     = "ingress"
+  description              = "allow all from portal"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
+  source_security_group_id = aws_security_group.portal-server.id
+}
+
 
 
 resource "aws_instance" "cjip-server" {
@@ -114,8 +126,10 @@ resource "aws_ebs_volume" "cjip-disk1" {
 }
 
 resource "aws_volume_attachment" "cjip-disk1" {
-  device_name = "xvdi"
-  volume_id   = aws_ebs_volume.cjip-disk1.id
-  instance_id = aws_instance.cjip-server.id
+  depends_on   = [aws_instance.cjip-server]
+  device_name  = "xvdk"
+  force_detach = true
+  volume_id    = aws_ebs_volume.cjip-disk1.id
+  instance_id  = aws_instance.cjip-server.id
 }
 
