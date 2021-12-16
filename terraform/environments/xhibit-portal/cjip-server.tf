@@ -53,7 +53,7 @@ resource "aws_security_group_rule" "cjim-inbound-web" {
 }
 
 // added for the msdtc thing
-resource "aws_security_group_rule" "portal-inbound-all" {
+resource "aws_security_group_rule" "cjip-portal-inbound-all" {
   depends_on               = [aws_security_group.cjip-server]
   security_group_id        = aws_security_group.cjip-server.id
   type                     = "ingress"
