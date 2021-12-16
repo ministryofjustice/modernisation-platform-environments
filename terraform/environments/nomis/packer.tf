@@ -172,7 +172,10 @@ data "aws_iam_policy_document" "packer_minimum_permissions" {
   statement { # need this as Packer seems to copy the image and then tag it
     effect    = "Allow"
     actions   = ["ec2:CreateTags"]
-    resources = ["arn:aws:ec2:eu-west-2::image/ami-*"]
+    resources = [
+      "arn:aws:ec2:eu-west-2::image/ami-*",
+      "arn:aws:ec2:eu-west-2::snapshot/snap-*"
+      ]
   }
 }
 
