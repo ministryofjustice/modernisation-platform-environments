@@ -167,3 +167,25 @@ resource "aws_kms_alias" "session_manager_alias" {
   name          = "alias/session_manager_key"
   target_key_id = aws_kms_key.session_manager.arn
 }
+
+#------------------------------------------------------------------------------
+# Cloud Watch Agent
+#------------------------------------------------------------------------------
+
+resource "aws_ssm_association" "example" {
+  name = "AWS-ConfigureAWSPackage"
+  association_name = "install cloud watch agent"
+  parameters {
+    Action = "Install"
+    Name = "AmazonCloudWatchAgent"
+  }
+  targets {
+    key    = "InstanceIds"
+    values = [aws_instance.db_server.id]
+  }
+  output_location {
+    s3_bucket_name = module.s3-bucket.bucket.name
+    s3_key_prefix = "systems-manager/cloud-watch-agent-install"
+    s3_region = local.region
+  }
+}
