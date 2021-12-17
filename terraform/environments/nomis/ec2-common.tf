@@ -173,11 +173,11 @@ resource "aws_kms_alias" "session_manager_alias" {
 #------------------------------------------------------------------------------
 
 resource "aws_ssm_association" "example" {
-  name = "AWS-ConfigureAWSPackage"
+  name             = "AWS-ConfigureAWSPackage"
   association_name = "install cloud watch agent"
   parameters {
     Action = "Install"
-    Name = "AmazonCloudWatchAgent"
+    Name   = "AmazonCloudWatchAgent"
   }
   targets {
     key    = "InstanceIds"
@@ -185,7 +185,7 @@ resource "aws_ssm_association" "example" {
   }
   output_location {
     s3_bucket_name = module.s3-bucket.bucket.name
-    s3_key_prefix = "systems-manager/cloud-watch-agent-install"
-    s3_region = local.region
+    s3_key_prefix  = "systems-manager/cloud-watch-agent-install"
+    s3_region      = local.region
   }
 }
