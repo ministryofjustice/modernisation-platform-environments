@@ -184,7 +184,7 @@ resource "aws_ssm_association" "cloud_watch_agent" {
     values = [aws_instance.db_server.id]
   }
   output_location {
-    s3_bucket_name = module.s3-bucket.bucket.name
+    s3_bucket_name = module.s3-bucket.bucket.id
     s3_key_prefix  = "systems-manager/cloud-watch-agent-install"
     s3_region      = local.region
   }
