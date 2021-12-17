@@ -194,3 +194,39 @@ resource "aws_ssm_association" "cloud_watch_agent" {
   #   s3_region      = local.region
   # }
 }
+
+resource "aws_ssm_association" "manage_cloud_watch_agent_linux" {
+  name             = "AmazonCloudWatch-ManageAgent"
+  association_name = "manage-cloud-watch-agent"
+  parameters = {
+    action = "configure"
+    mode = "ec2"
+    optionalConfigurationSource   = "ssm"
+    optionalConfigurationLocation = aws_ssm_parameter.cloud_watch_config_linux.name
+    optionalRestart = "yes"
+  }
+  targets {
+    key    = "InstanceIds"
+    values = [aws_instance.db_server.id]
+  }
+  apply_only_at_cron_interval = false
+  # schedule_expression = 
+}
+
+resource "aws_ssm_parameter" "cloud_watch_config_linux" {
+  description = "cloud watch agent config for linux"
+  name  = "cloud-watch-config-linux"
+  type  = "String"
+  value = file("./templates/cloud_watch_linux.sh")
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "cloud-watch-config-linux"
+    },
+  )
+}
+
+# do a schedule
+# config for windows
+# add one for ssm-agent updates??
