@@ -173,7 +173,7 @@ resource "aws_kms_alias" "session_manager_alias" {
 #------------------------------------------------------------------------------
 
 resource "aws_ssm_association" "cloud_watch_agent" {
-  name = "AWS-ConfigureAWSPackage"
+  name             = "AWS-ConfigureAWSPackage"
   association_name = "install cloud watch agent"
   parameters = {
     Action = "Install"
