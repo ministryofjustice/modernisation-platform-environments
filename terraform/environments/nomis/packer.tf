@@ -90,7 +90,6 @@ data "aws_iam_policy_document" "packer_minimum_permissions" {
     #checkov:skip=CKV_AWS_107
     effect = "Allow"
     actions = [
-      "ec2:AuthorizeSecurityGroupIngress",
       "ec2:CopyImage",
       "ec2:CreateImage",
       "ec2:CreateKeypair",
@@ -133,6 +132,13 @@ data "aws_iam_policy_document" "packer_minimum_permissions" {
       values   = ["Packer", "packer", "ansible"]
     }
   }
+
+  statement {
+    effect    = "Allow"
+    actions   = ["ec2:AuthorizeSecurityGroupIngress"]
+    resources = [aws_security_group.packer_security_group.arn]
+  }
+
   statement {
     effect    = "Allow"
     actions   = ["ec2:DeleteKeyPair"]
@@ -161,6 +167,15 @@ data "aws_iam_policy_document" "packer_minimum_permissions" {
         "RegisterImage"
       ]
     }
+  }
+
+  statement { # need this as Packer seems to copy the image and then tag it
+    effect  = "Allow"
+    actions = ["ec2:CreateTags"]
+    resources = [
+      "arn:aws:ec2:eu-west-2::image/ami-*",
+      "arn:aws:ec2:eu-west-2::snapshot/snap-*"
+    ]
   }
 }
 
