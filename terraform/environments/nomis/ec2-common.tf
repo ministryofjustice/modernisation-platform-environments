@@ -179,8 +179,8 @@ resource "aws_ssm_association" "cloud_watch_agent" {
   name             = "AWS-ConfigureAWSPackage"
   association_name = "install-cloud-watch-agent"
   parameters = {
-    Action = "Install"
-    Name   = "AmazonCloudWatchAgent"
+    action = "Install"
+    name   = "AmazonCloudWatchAgent"
   }
   targets {
     key    = "InstanceIds"
