@@ -27,7 +27,7 @@ resource "aws_iam_role" "ec2_common_role" {
   managed_policy_arns = [
     "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
     "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
-    ]
+  ]
   tags = merge(
     local.tags,
     {
