@@ -199,11 +199,11 @@ resource "aws_ssm_association" "manage_cloud_watch_agent_linux" {
   name             = "AmazonCloudWatch-ManageAgent"
   association_name = "manage-cloud-watch-agent"
   parameters = {
-    action = "configure"
-    mode = "ec2"
+    action                        = "configure"
+    mode                          = "ec2"
     optionalConfigurationSource   = "ssm"
     optionalConfigurationLocation = aws_ssm_parameter.cloud_watch_config_linux.name
-    optionalRestart = "yes"
+    optionalRestart               = "yes"
   }
   targets {
     key    = "InstanceIds"
@@ -215,9 +215,9 @@ resource "aws_ssm_association" "manage_cloud_watch_agent_linux" {
 
 resource "aws_ssm_parameter" "cloud_watch_config_linux" {
   description = "cloud watch agent config for linux"
-  name  = "cloud-watch-config-linux"
-  type  = "String"
-  value = file("./templates/cloud_watch_linux.sh")
+  name        = "cloud-watch-config-linux"
+  type        = "String"
+  value       = file("./templates/cloud_watch_linux.sh")
 
   tags = merge(
     local.tags,
