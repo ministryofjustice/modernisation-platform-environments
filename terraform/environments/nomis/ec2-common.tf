@@ -24,7 +24,10 @@ resource "aws_iam_role" "ec2_common_role" {
       ]
     }
   )
-  managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"]
+  managed_policy_arns = [
+    "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+    "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+    ]
   tags = merge(
     local.tags,
     {
@@ -174,7 +177,7 @@ resource "aws_kms_alias" "session_manager_alias" {
 
 resource "aws_ssm_association" "cloud_watch_agent" {
   name             = "AWS-ConfigureAWSPackage"
-  association_name = "install cloud watch agent"
+  association_name = "install-cloud-watch-agent"
   parameters = {
     Action = "Install"
     Name   = "AmazonCloudWatchAgent"
