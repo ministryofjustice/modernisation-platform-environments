@@ -183,16 +183,14 @@ resource "aws_ssm_association" "cloud_watch_agent" {
     name   = "AmazonCloudWatchAgent"
   }
   targets {
-    key    = "InstanceIds"
-    values = [aws_instance.db_server.id]
+    key = "InstanceIds"
+    values = [
+      aws_instance.db_server.id,
+      aws_instance.weblogic_server.id
+    ]
   }
   apply_only_at_cron_interval = false
   # schedule_expression = 
-  # output_location {
-  #   s3_bucket_name = module.s3-bucket.bucket.id
-  #   s3_key_prefix  = "systems-manager/cloud-watch-agent-install"
-  #   s3_region      = local.region
-  # }
 }
 
 resource "aws_ssm_association" "manage_cloud_watch_agent_linux" {

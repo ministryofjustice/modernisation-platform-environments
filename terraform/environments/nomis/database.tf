@@ -119,11 +119,11 @@ resource "aws_instance" "db_server" {
   tags = merge(
     local.tags,
     {
-      Name      = "db-server-${local.application_name}"
-      component = "data"
-      os_type   = "Linux"
+      Name       = "db-server-${local.application_name}"
+      component  = "data"
+      os_type    = "Linux"
       os_version = "RHEL 7.9"
-      always_on = "false"
+      always_on  = "false"
     }
   )
 }
