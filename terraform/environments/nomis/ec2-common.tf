@@ -206,8 +206,8 @@ resource "aws_ssm_association" "manage_cloud_watch_agent_linux" {
     optionalRestart               = "yes"
   }
   targets {
-    key    = "InstanceIds"
-    values = [aws_instance.db_server.id]
+    key    = "tag:os_type"
+    values = ["Linux"]
   }
   apply_only_at_cron_interval = false
   # schedule_expression = 
