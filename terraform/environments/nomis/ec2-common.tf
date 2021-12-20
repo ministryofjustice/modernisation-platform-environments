@@ -215,9 +215,9 @@ resource "aws_ssm_association" "manage_cloud_watch_agent_linux" {
 
 resource "aws_ssm_parameter" "cloud_watch_config_linux" {
   description = "cloud watch agent config for linux"
-  name  = "cloud-watch-config-linux"
-  type  = "String"
-  value = file("./templates/cloud_watch_linux.json")
+  name        = "cloud-watch-config-linux"
+  type        = "String"
+  value       = file("./templates/cloud_watch_linux.json")
 
   tags = merge(
     local.tags,
