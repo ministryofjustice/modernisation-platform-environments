@@ -22,6 +22,10 @@ resource "aws_instance" "jumpserver_windows" {
   vpc_security_group_ids      = [aws_security_group.jumpserver-windows.id]
   subnet_id                   = data.aws_subnet.private_az_a.id
   key_name                    = "jumpserver-windows"
+  metadata_options {
+    http_endpoint = "enabled"
+    http_tokens   = "required"
+  }
   root_block_device {
     encrypted = true
   }
@@ -41,10 +45,11 @@ resource "aws_security_group" "jumpserver-windows" {
   name        = "jumpserver-windows-${local.application_name}"
   vpc_id      = local.vpc_id
   egress {
-    from_port        = 0
-    to_port          = 0
-    protocol         = "-1"
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
+    description = "allow all"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    #tfsec:ignore:AWS009
+    cidr_blocks = ["0.0.0.0/0"]
   }
 }

@@ -30,12 +30,12 @@ resource "aws_security_group" "db_server" {
   }
 
   egress {
-    description      = "allow all"
-    from_port        = 0
-    to_port          = 0
-    protocol         = "-1"
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
+    description = "allow all"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    #tfsec:ignore:AWS009
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   tags = merge(
@@ -85,7 +85,10 @@ resource "aws_instance" "db_server" {
   user_data                   = file("./templates/database_init.sh")
   vpc_security_group_ids      = [aws_security_group.db_server.id]
   key_name                    = aws_key_pair.ec2-user.key_name
-
+  metadata_options {
+    http_endpoint = "enabled"
+    http_tokens   = "required"
+  }
   root_block_device {
     delete_on_termination = true
     encrypted             = true

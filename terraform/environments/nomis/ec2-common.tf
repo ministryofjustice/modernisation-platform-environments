@@ -60,14 +60,17 @@ resource "aws_iam_role_policy" "s3_bucket_access" {
 
 # create policy document to write Session Manager logs to CloudWatch
 data "aws_iam_policy_document" "session_manager_logging" {
-  statement { # for session and log encryption
-    effect = "Allow"
-    actions = [
-      "kms:Decrypt",
-      "kms:GenerateDataKey"
-    ]
-    resources = [aws_kms_key.session_manager.arn]
-  }
+  # commented out as not encypting with KMS currently as the the role
+  # assumed by the user connecting also needs the GenerateDataKey permission
+  # see https://mojdt.slack.com/archives/C01A7QK5VM1/p1637603085030600
+  # statement { # for session and log encryption using KMS
+  #   effect = "Allow"
+  #   actions = [
+  #     "kms:Decrypt",
+  #     "kms:GenerateDataKey"
+  #   ]
+  #   resources = [aws_kms_key.session_manager.arn]
+  # }
   statement {
     effect = "Allow"
     actions = [
@@ -76,7 +79,10 @@ data "aws_iam_policy_document" "session_manager_logging" {
       "logs:DescribeLogGroups",
       "logs:DescribeLogStreams"
     ]
-    resources = ["*"]
+    resources = [
+      aws_cloudwatch_log_group.session_manager.arn,
+      "${aws_cloudwatch_log_group.session_manager.arn}:log-stream:*"
+    ]
   }
 }
 
@@ -111,11 +117,13 @@ resource "aws_key_pair" "ec2-user" {
 # Session Manager Logging and Settings
 #------------------------------------------------------------------------------
 
+# Ignore warnings regarding log groups not encrypted using customer-managed
+# KMS keys - note they are still encrypted with default KMS key
+#tfsec:ignore:AWS089
 resource "aws_cloudwatch_log_group" "session_manager" {
 
   name              = "session-manager-logs"
   retention_in_days = local.application_data.accounts[local.environment].session_manager_log_retention_days
-  # kms_key_id = aws_kms_key.session_manager.arn
 
   tags = merge(
     local.tags,
@@ -155,21 +163,22 @@ resource "aws_ssm_document" "session_manager_settings" {
   )
 }
 
-resource "aws_kms_key" "session_manager" {
-  enable_key_rotation = true
+# commented out for now - see https://mojdt.slack.com/archives/C01A7QK5VM1/p1637603085030600
+# resource "aws_kms_key" "session_manager" {
+#   enable_key_rotation = true
 
-  tags = merge(
-    local.tags,
-    {
-      Name = "session_manager"
-    },
-  )
-}
+#   tags = merge(
+#     local.tags,
+#     {
+#       Name = "session_manager"
+#     },
+#   )
+# }
 
-resource "aws_kms_alias" "session_manager_alias" {
-  name          = "alias/session_manager_key"
-  target_key_id = aws_kms_key.session_manager.arn
-}
+# resource "aws_kms_alias" "session_manager_alias" {
+#   name          = "alias/session_manager_key"
+#   target_key_id = aws_kms_key.session_manager.arn
+# }
 
 #------------------------------------------------------------------------------
 # Cloud Watch Agent
