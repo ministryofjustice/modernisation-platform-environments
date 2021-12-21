@@ -1,0 +1,114 @@
+---
+name: xhibit-portal
+on:                                          # Put ALL the triggers for any part of the workflow here.
+  push: # triggers on 'push' or 'merge'      # The whole workflow will run each time these events happen
+    branches:                                # and they're skipped according to the 'if' conditions below
+      - main
+      - xp-dev
+    paths:
+      - 'terraform/environments/xhibit-portal/**'
+      - '.github/workflows/xhibit-portal.yml'
+  pull_request:
+    branches:
+      - main
+    types: [opened, edited, reopened] # triggers when opening, changing or reopening a PR
+    paths:
+      - 'terraform/environments/xhibit-portal/**'
+      - '.github/workflows/xhibit-portal.yml'
+  workflow_dispatch:
+env:
+  AWS_ACCESS_KEY_ID:  ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  TF_IN_AUTOMATION: true
+defaults:
+  run:
+    shell: bash
+
+jobs: 
+  plan-development:
+    name: Plan Development - xhibit-portal
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/xp-dev' # job only runs for pushes to the xp-dev branch
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2.3.4
+      - name: Load and Configure Terraform
+        uses: hashicorp/setup-terraform@v1.3.2
+        with:
+          terraform_version: 1.0.1
+          terraform_wrapper: false
+      - name: Terraform plan - development
+        run: |
+          echo "Terraform plan - ${TF_ENV}"
+          bash scripts/terraform-init.sh terraform/environments/xhibit-portal
+          terraform -chdir="terraform/environments/xhibit-portal" workspace select "xhibit-portal-${TF_ENV}"
+          bash scripts/terraform-plan.sh terraform/environments/xhibit-portal
+        env:
+          TF_ENV: development
+
+  deploy-development:
+    needs: plan-development # job only runs if plan-development runs successfully
+    name: Deploy Development - xhibit-portal
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/xp-dev'
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2.3.4
+      - name: Load and Configure Terraform
+        uses: hashicorp/setup-terraform@v1.3.2
+        with:
+          terraform_version: 1.0.1
+          terraform_wrapper: false
+      - name: Terraform apply - development
+        run: |
+          echo "Terraform apply - ${TF_ENV}"
+          bash scripts/terraform-init.sh terraform/environments/xhibit-portal
+          terraform -chdir="terraform/environments/xhibit-portal" workspace select "xhibit-portal-${TF_ENV}"
+          bash scripts/terraform-apply.sh terraform/environments/xhibit-portal
+        env:
+          TF_ENV: development
+
+  plan-production:
+    name: Plan Production - xhibit-portal
+    runs-on: ubuntu-latest
+    if: ${{ github.ref == 'refs/heads/main' || github.event_name == 'pull_request' }} # job only runs when PR is raised or changed, or for merges to the main branch
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2.3.4
+      - name: Load and Configure Terraform
+        uses: hashicorp/setup-terraform@v1.3.2
+        with:
+          terraform_version: 1.0.1
+          terraform_wrapper: false
+      - name: Terraform plan - production
+        run: |
+          echo "Terraform plan - ${TF_ENV}"
+          bash scripts/terraform-init.sh terraform/environments/xhibit-portal
+          terraform -chdir="terraform/environments/xhibit-portal" workspace select "xhibit-portal-${TF_ENV}"
+          bash scripts/terraform-plan.sh terraform/environments/xhibit-portal
+        env:
+          TF_ENV: production
+
+  deploy-production:
+    needs: plan-production # job only runs if plan-production runs successfully
+    name: Deploy Production - xhibit-portal
+    runs-on: ubuntu-latest
+    if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }} # job only runs for merges to the main branch, which can only be done after PR review approval
+    # environment:
+    #   name: xhibit-portal-production        # put this in if you want to click-to-deploy with a review button in the Github Actions tab
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2.3.4
+      - name: Load and Configure Terraform
+        uses: hashicorp/setup-terraform@v1.3.2
+        with:
+          terraform_version: 1.0.1
+          terraform_wrapper: false
+      - name: Terraform apply - production
+        run: |
+          echo "Terraform apply - ${TF_ENV}"
+          bash scripts/terraform-init.sh terraform/environments/xhibit-portal
+          terraform -chdir="terraform/environments/xhibit-portal" workspace select "xhibit-portal-${TF_ENV}"
+          bash scripts/terraform-apply.sh terraform/environments/xhibit-portal
+        env:
+          TF_ENV: production

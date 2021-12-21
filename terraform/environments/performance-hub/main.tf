@@ -1,16 +1,3 @@
-resource "aws_ecr_repository" "ecr_repo" {
-  name                 = local.application_name
-  image_tag_mutability = "MUTABLE"
-
-  image_scanning_configuration {
-    scan_on_push = false
-  }
-
-  lifecycle {
-    prevent_destroy = true
-  }
-}
-
 data "aws_caller_identity" "current" {}
 
 data "aws_vpc" "shared" {
@@ -118,20 +105,29 @@ data "template_file" "launch-template" {
 data "template_file" "task_definition" {
   template = file("templates/task_definition.json")
   vars = {
-    app_name             = local.application_name
-    env_name             = local.app_data.accounts[local.environment].env_name
-    system_account_id    = local.app_data.accounts[local.environment].system_account_id
-    ecr_url              = format("%s%s%s%s%s", data.aws_caller_identity.current.account_id, ".dkr.ecr.", local.app_data.accounts[local.environment].region, ".amazonaws.com/", local.application_name)
-    server_port          = local.app_data.accounts[local.environment].server_port
-    aws_region           = local.app_data.accounts[local.environment].region
-    container_version    = local.app_data.accounts[local.environment].container_version
-    db_host              = aws_db_instance.database.address
-    db_user              = local.app_data.accounts[local.environment].db_user
-    db_password          = "${data.aws_secretsmanager_secret_version.database_password.arn}:perfhub_db_password::"
-    mojhub_cnnstr        = "${data.aws_secretsmanager_secret_version.mojhub_cnnstr.arn}:mojhub_cnnstr::"
-    mojhub_membership    = "${data.aws_secretsmanager_secret_version.mojhub_membership.arn}:mojhub_membership::"
-    govuk_notify_api_key = "${data.aws_secretsmanager_secret_version.govuk_notify_api_key.arn}:govuk_notify_api_key::"
-    os_vts_api_key       = "${data.aws_secretsmanager_secret_version.os_vts_api_key.arn}:os_vts_api_key::"
+    app_name                         = local.application_name
+    env_name                         = local.environment
+    system_account_id                = local.app_data.accounts[local.environment].system_account_id
+    ecr_url                          = format("%s%s%s", "374269020027.dkr.ecr.", local.app_data.accounts[local.environment].region, ".amazonaws.com/performance-hub-ecr-repo")
+    server_port                      = local.app_data.accounts[local.environment].server_port
+    aws_region                       = local.app_data.accounts[local.environment].region
+    container_version                = local.app_data.accounts[local.environment].container_version
+    db_host                          = aws_db_instance.database.address
+    db_user                          = local.app_data.accounts[local.environment].db_user
+    db_password                      = aws_secretsmanager_secret_version.db_password.arn
+    mojhub_cnnstr                    = aws_secretsmanager_secret_version.mojhub_cnnstr.arn
+    mojhub_membership                = aws_secretsmanager_secret_version.mojhub_membership.arn
+    govuk_notify_api_key             = aws_secretsmanager_secret_version.govuk_notify_api_key.arn
+    os_vts_api_key                   = aws_secretsmanager_secret_version.os_vts_api_key.arn
+    storage_bucket                   = "${aws_s3_bucket.upload_files.id}"
+    friendly_name                    = local.app_data.accounts[local.environment].friendly_name
+    hub_wwwroot                      = local.app_data.accounts[local.environment].hub_wwwroot
+    pecs_basm_prod_access_key_id     = aws_secretsmanager_secret_version.pecs_basm_prod_access_key_id.arn
+    pecs_basm_prod_secret_access_key = aws_secretsmanager_secret_version.pecs_basm_prod_secret_access_key.arn
+    ap_import_access_key_id          = aws_secretsmanager_secret_version.ap_import_access_key_id.arn
+    ap_import_secret_access_key      = aws_secretsmanager_secret_version.ap_import_secret_access_key.arn
+    ap_export_access_key_id          = aws_secretsmanager_secret_version.ap_export_access_key_id.arn
+    ap_export_secret_access_key      = aws_secretsmanager_secret_version.ap_export_secret_access_key.arn
   }
 }
 
@@ -141,7 +137,7 @@ data "template_file" "task_definition" {
 
 module "windows-ecs" {
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs?ref=v1.0.1"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs?ref=v1.0.4"
 
   subnet_set_name         = local.subnet_set_name
   vpc_all                 = local.vpc_all
@@ -163,11 +159,10 @@ module "windows-ecs" {
   server_port             = local.app_data.accounts[local.environment].server_port
   app_count               = local.app_data.accounts[local.environment].app_count
   public_cidrs            = [data.aws_subnet.public_az_a.cidr_block, data.aws_subnet.public_az_b.cidr_block, data.aws_subnet.public_az_c.cidr_block]
-  bastion_cidr            = "${module.bastion_linux.bastion_private_ip}/32"
   ec2_ingress_rules       = local.ec2_ingress_rules
   tags_common             = local.tags
 
-  depends_on = [aws_ecr_repository.ecr_repo, aws_lb_listener.listener]
+  depends_on = [aws_lb_listener.listener]
 }
 
 resource "aws_route53_record" "external" {
@@ -228,11 +223,18 @@ resource "aws_acm_certificate_validation" "external" {
 #------------------------------------------------------------------------------
 # Load Balancer
 #------------------------------------------------------------------------------
-
+#tfsec:ignore:AWS005 tfsec:ignore:AWS083
 resource "aws_lb" "external" {
-  name               = "${local.application_name}-loadbalancer"
-  load_balancer_type = "application"
-  subnets            = data.aws_subnet_ids.shared-public.ids
+  #checkov:skip=CKV_AWS_91
+  #checkov:skip=CKV_AWS_131
+  #checkov:skip=CKV2_AWS_20
+  #checkov:skip=CKV2_AWS_28
+  name                       = "${local.application_name}-loadbalancer"
+  load_balancer_type         = "application"
+  subnets                    = data.aws_subnet_ids.shared-public.ids
+  enable_deletion_protection = true
+  # allow 60*4 seconds before 504 gateway timeout for long-running DB operations
+  idle_timeout = 240
 
   security_groups = [aws_security_group.load_balancer_security_group.id]
 
@@ -274,7 +276,10 @@ resource "aws_lb_target_group" "target_group" {
   )
 }
 
+#tfsec:ignore:AWS004
 resource "aws_lb_listener" "listener" {
+  #checkov:skip=CKV_AWS_2
+  #checkov:skip=CKV_AWS_103
   load_balancer_arn = aws_lb.external.id
   port              = local.app_data.accounts[local.environment].server_port
   protocol          = "HTTP"
@@ -286,12 +291,13 @@ resource "aws_lb_listener" "listener" {
 }
 
 resource "aws_lb_listener" "https_listener" {
+  #checkov:skip=CKV_AWS_103
   depends_on = [aws_acm_certificate_validation.external]
 
   load_balancer_arn = aws_lb.external.id
   port              = "443"
   protocol          = "HTTPS"
-  certificate_arn   = aws_acm_certificate.external.arn
+  certificate_arn   = local.app_data.accounts[local.environment].cert_arn
 
   default_action {
     target_group_arn = aws_lb_target_group.target_group.id
@@ -306,22 +312,28 @@ resource "aws_security_group" "load_balancer_security_group" {
 
   ingress {
     protocol    = "tcp"
+    description = "Open the server port"
     from_port   = local.app_data.accounts[local.environment].server_port
     to_port     = local.app_data.accounts[local.environment].server_port
+    #tfsec:ignore:AWS008
     cidr_blocks = ["0.0.0.0/0", ]
   }
 
   ingress {
     protocol    = "tcp"
+    description = "Open the SSL port"
     from_port   = 443
     to_port     = 443
+    #tfsec:ignore:AWS008
     cidr_blocks = ["0.0.0.0/0", ]
   }
 
   egress {
-    protocol  = "-1"
-    from_port = 0
-    to_port   = 0
+    protocol    = "-1"
+    description = "Open all outbound ports"
+    from_port   = 0
+    to_port     = 0
+    #tfsec:ignore:AWS009
     cidr_blocks = [
       "0.0.0.0/0",
     ]
@@ -340,8 +352,11 @@ resource "aws_security_group" "load_balancer_security_group" {
 #------------------------------------------------------------------------------
 
 resource "aws_db_instance" "database" {
+  #tfsec:ignore:AWS099
+  #checkov:skip=CKV_AWS_118
+  #checkov:skip=CKV_AWS_157
   identifier                          = local.application_name
-  allocated_storage                   = 100
+  allocated_storage                   = local.app_data.accounts[local.environment].db_allocated_storage
   storage_type                        = "gp2"
   engine                              = "sqlserver-se"
   engine_version                      = "15.00.4073.23.v1"
@@ -349,24 +364,30 @@ resource "aws_db_instance" "database" {
   instance_class                      = local.app_data.accounts[local.environment].db_instance_class
   multi_az                            = false
   username                            = local.app_data.accounts[local.environment].db_user
-  password                            = data.aws_secretsmanager_secret_version.database_password.arn
-  storage_encrypted                   = false
+  password                            = aws_secretsmanager_secret_version.db_password.arn
+  storage_encrypted                   = true
   iam_database_authentication_enabled = false
   vpc_security_group_ids              = [aws_security_group.db.id]
   snapshot_identifier                 = local.app_data.accounts[local.environment].db_snapshot_identifier
-  backup_retention_period             = 0
+  backup_retention_period             = 30
   maintenance_window                  = "Mon:00:00-Mon:03:00"
   backup_window                       = "03:00-06:00"
   final_snapshot_identifier           = "final-snapshot"
+  kms_key_id                          = aws_kms_key.rds.arn
   deletion_protection                 = false
   option_group_name                   = aws_db_option_group.db_option_group.name
   db_subnet_group_name                = aws_db_subnet_group.db.id
+  enabled_cloudwatch_logs_exports     = ["error"]
 
   # timeouts {
   #   create = "40m"
   #   delete = "40m"
   #   update = "80m"
   # }
+
+  lifecycle {
+    prevent_destroy = true
+  }
 
   tags = merge(
     local.tags,
@@ -417,6 +438,7 @@ resource "aws_security_group" "db" {
 
 resource "aws_security_group_rule" "db_mgmt_ingress_rule" {
   type                     = "ingress"
+  description              = "Default SQL Server port 1433"
   from_port                = 1433
   to_port                  = 1433
   protocol                 = "tcp"
@@ -426,6 +448,7 @@ resource "aws_security_group_rule" "db_mgmt_ingress_rule" {
 
 resource "aws_security_group_rule" "db_ecs_ingress_rule" {
   type                     = "ingress"
+  description              = "Default SQL Server port 1433"
   from_port                = 1433
   to_port                  = 1433
   protocol                 = "tcp"
@@ -434,18 +457,23 @@ resource "aws_security_group_rule" "db_ecs_ingress_rule" {
 }
 
 resource "aws_security_group_rule" "db_bastion_ingress_rule" {
-  type              = "ingress"
-  from_port         = 1433
-  to_port           = 1433
-  protocol          = "tcp"
-  security_group_id = aws_security_group.db.id
-  cidr_blocks       = ["${module.bastion_linux.bastion_private_ip}/32"]
+  type                     = "ingress"
+  description              = "Default SQL Server port 1433"
+  from_port                = 1433
+  to_port                  = 1433
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.db.id
+  source_security_group_id = module.bastion_linux.bastion_security_group
 }
 
 #------------------------------------------------------------------------------
 # S3 Bucket for Database backup files
 #------------------------------------------------------------------------------
+#tfsec:ignore:AWS002 tfsec:ignore:AWS098
 resource "aws_s3_bucket" "database_backup_files" {
+  #checkov:skip=CKV_AWS_18
+  #checkov:skip=CKV_AWS_144
+  #checkov:skip=CKV2_AWS_6
   bucket = "${local.application_name}-db-backups-${local.environment}"
   acl    = "private"
 
@@ -502,6 +530,16 @@ resource "aws_iam_policy" "s3_database_backups_policy" {
     {
       "Effect": "Allow",
       "Action": [
+        "kms:DescribeKey",
+        "kms:GenerateDataKey",
+        "kms:Encrypt",
+        "kms:Decrypt"
+      ],
+      "Resource": "${aws_kms_key.s3.arn}"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
         "s3:ListBucket",
         "s3:GetBucketLocation"
       ],
@@ -545,7 +583,11 @@ resource "aws_iam_role_policy_attachment" "s3_database_backups_attachment" {
 #------------------------------------------------------------------------------
 # S3 Bucket for Uploads
 #------------------------------------------------------------------------------
+#tfsec:ignore:AWS002 tfsec:ignore:AWS098
 resource "aws_s3_bucket" "upload_files" {
+  #checkov:skip=CKV_AWS_18
+  #checkov:skip=CKV_AWS_144
+  #checkov:skip=CKV2_AWS_6
   bucket = "${local.application_name}-uploads-${local.environment}"
   acl    = "private"
 
@@ -600,7 +642,7 @@ resource "aws_s3_bucket_policy" "upload_files_policy" {
     Statement = [
       {
         Effect    = "Allow"
-        Principal = "*"
+        Principal = { AWS = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/cicd-member-user"] }
         Action    = "s3:*"
         Resource = [
           aws_s3_bucket.upload_files.arn,
@@ -663,6 +705,20 @@ resource "aws_iam_policy" "s3-uploads-policy" {
       "Resource": [
         "${aws_s3_bucket.upload_files.arn}/*"
       ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetEncryptionConfiguration"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+      "kms:Decrypt"
+      ],
+      "Resource": "*"
     }
   ]
 }
@@ -696,16 +752,8 @@ resource "aws_kms_alias" "kms-alias" {
 }
 
 data "aws_iam_policy_document" "s3-kms" {
-  statement {
-    effect    = "Allow"
-    actions   = ["kms:*"]
-    resources = ["*"]
-
-    principals {
-      type        = "Service"
-      identifiers = ["s3.amazonaws.com"]
-    }
-  }
+  #checkov:skip=CKV_AWS_111
+  #checkov:skip=CKV_AWS_109
   statement {
     effect    = "Allow"
     actions   = ["kms:*"]
@@ -713,7 +761,213 @@ data "aws_iam_policy_document" "s3-kms" {
 
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root", "arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/cicd-member-user"]
     }
   }
+}
+#------------------------------------------------------------------------------
+# KMS setup for RDS
+#------------------------------------------------------------------------------
+
+resource "aws_kms_key" "rds" {
+  description         = "Encryption key for rds"
+  enable_key_rotation = true
+  policy              = data.aws_iam_policy_document.rds-kms.json
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-rds-kms"
+    }
+  )
+}
+
+resource "aws_kms_alias" "rds-kms-alias" {
+  name          = "alias/rds"
+  target_key_id = aws_kms_key.rds.arn
+}
+
+data "aws_iam_policy_document" "rds-kms" {
+  #checkov:skip=CKV_AWS_111
+  #checkov:skip=CKV_AWS_109
+  statement {
+    effect    = "Allow"
+    actions   = ["kms:*"]
+    resources = ["*"]
+
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root", "arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/cicd-member-user"]
+    }
+  }
+}
+
+#------------------------------------------------------------------------------
+# Secrets definitions
+#------------------------------------------------------------------------------
+# Create secret
+resource "random_password" "random_password" {
+
+  length  = 32
+  special = false
+}
+
+#tfsec:ignore:AWS095
+resource "aws_secretsmanager_secret" "mojhub_cnnstr" {
+  #checkov:skip=CKV_AWS_149
+  name = "mojhub_cnnstr"
+  tags = merge(
+    local.tags,
+    {
+      Name = "mojhub_cnnstr"
+    },
+  )
+}
+resource "aws_secretsmanager_secret_version" "mojhub_cnnstr" {
+  secret_id     = aws_secretsmanager_secret.mojhub_cnnstr.id
+  secret_string = random_password.random_password.result
+}
+
+#tfsec:ignore:AWS095
+resource "aws_secretsmanager_secret" "mojhub_membership" {
+  #checkov:skip=CKV_AWS_149
+  name = "mojhub_membership"
+  tags = merge(
+    local.tags,
+    {
+      Name = "mojhub_membership"
+    },
+  )
+}
+resource "aws_secretsmanager_secret_version" "mojhub_membership" {
+  secret_id     = aws_secretsmanager_secret.mojhub_membership.id
+  secret_string = random_password.random_password.result
+}
+
+#tfsec:ignore:AWS095
+resource "aws_secretsmanager_secret" "govuk_notify_api_key" {
+  #checkov:skip=CKV_AWS_149
+  name = "govuk_notify_api_key"
+  tags = merge(
+    local.tags,
+    {
+      Name = "govuk_notify_api_key"
+    },
+  )
+}
+resource "aws_secretsmanager_secret_version" "govuk_notify_api_key" {
+  secret_id     = aws_secretsmanager_secret.govuk_notify_api_key.id
+  secret_string = random_password.random_password.result
+}
+
+#tfsec:ignore:AWS095
+resource "aws_secretsmanager_secret" "os_vts_api_key" {
+  #checkov:skip=CKV_AWS_149
+  name = "os_vts_api_key"
+  tags = merge(
+    local.tags,
+    {
+      Name = "os_vts_api_key"
+    },
+  )
+}
+resource "aws_secretsmanager_secret_version" "os_vts_api_key" {
+  secret_id     = aws_secretsmanager_secret.os_vts_api_key.id
+  secret_string = random_password.random_password.result
+}
+
+#tfsec:ignore:AWS095
+resource "aws_secretsmanager_secret" "ap_import_access_key_id" {
+  #checkov:skip=CKV_AWS_149
+  name = "ap_import_access_key_id"
+  tags = merge(
+    local.tags,
+    {
+      Name = "ap_import_access_key_id"
+    },
+  )
+}
+resource "aws_secretsmanager_secret_version" "ap_import_access_key_id" {
+  secret_id     = aws_secretsmanager_secret.ap_import_access_key_id.id
+  secret_string = random_password.random_password.result
+}
+
+#tfsec:ignore:AWS095
+resource "aws_secretsmanager_secret" "ap_import_secret_access_key" {
+  #checkov:skip=CKV_AWS_149
+  name = "ap_import_secret_access_key"
+  tags = merge(
+    local.tags,
+    {
+      Name = "ap_import_secret_access_key"
+    },
+  )
+}
+resource "aws_secretsmanager_secret_version" "ap_import_secret_access_key" {
+  secret_id     = aws_secretsmanager_secret.ap_import_secret_access_key.id
+  secret_string = random_password.random_password.result
+}
+
+#tfsec:ignore:AWS095
+resource "aws_secretsmanager_secret" "ap_export_access_key_id" {
+  #checkov:skip=CKV_AWS_149
+  name = "ap_export_access_key_id"
+  tags = merge(
+    local.tags,
+    {
+      Name = "ap_export_access_key_id"
+    },
+  )
+}
+resource "aws_secretsmanager_secret_version" "ap_export_access_key_id" {
+  secret_id     = aws_secretsmanager_secret.ap_export_access_key_id.id
+  secret_string = random_password.random_password.result
+}
+
+#tfsec:ignore:AWS095
+resource "aws_secretsmanager_secret" "ap_export_secret_access_key" {
+  #checkov:skip=CKV_AWS_149
+  name = "ap_export_secret_access_key"
+  tags = merge(
+    local.tags,
+    {
+      Name = "ap_export_secret_access_key"
+    },
+  )
+}
+resource "aws_secretsmanager_secret_version" "ap_export_secret_access_key" {
+  secret_id     = aws_secretsmanager_secret.ap_export_secret_access_key.id
+  secret_string = random_password.random_password.result
+}
+
+#tfsec:ignore:AWS095
+resource "aws_secretsmanager_secret" "pecs_basm_prod_access_key_id" {
+  #checkov:skip=CKV_AWS_149
+  name = "pecs_basm_prod_access_key_id"
+  tags = merge(
+    local.tags,
+    {
+      Name = "pecs_basm_prod_access_key_id"
+    },
+  )
+}
+resource "aws_secretsmanager_secret_version" "pecs_basm_prod_access_key_id" {
+  secret_id     = aws_secretsmanager_secret.pecs_basm_prod_access_key_id.id
+  secret_string = random_password.random_password.result
+}
+
+#tfsec:ignore:AWS095
+resource "aws_secretsmanager_secret" "pecs_basm_prod_secret_access_key" {
+  #checkov:skip=CKV_AWS_149
+  name = "pecs_basm_prod_secret_access_key"
+  tags = merge(
+    local.tags,
+    {
+      Name = "pecs_basm_prod_secret_access_key"
+    },
+  )
+}
+resource "aws_secretsmanager_secret_version" "pecs_basm_prod_secret_access_key" {
+  secret_id     = aws_secretsmanager_secret.pecs_basm_prod_secret_access_key.id
+  secret_string = random_password.random_password.result
 }

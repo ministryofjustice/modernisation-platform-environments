@@ -13,11 +13,35 @@ resource "aws_security_group" "weblogic_server" {
   vpc_id      = local.vpc_id
 
   ingress {
-    description = "SSH from Bastion"
-    from_port   = "22"
-    to_port     = "22"
-    protocol    = "TCP"
-    cidr_blocks = ["${module.bastion_linux.bastion_private_ip}/32"]
+    description     = "SSH from Bastion"
+    from_port       = "22"
+    to_port         = "22"
+    protocol        = "TCP"
+    security_groups = [module.bastion_linux.bastion_security_group]
+  }
+
+  ingress {
+    description     = "access from Windows Jumpserver (admin console)"
+    from_port       = "7001"
+    to_port         = "7001"
+    protocol        = "TCP"
+    security_groups = [aws_security_group.jumpserver-windows.id]
+  }
+
+  ingress {
+    description     = "access from Windows Jumpserver"
+    from_port       = "80"
+    to_port         = "80"
+    protocol        = "TCP"
+    security_groups = [aws_security_group.jumpserver-windows.id]
+  }
+
+  ingress {
+    description     = "access from Windows Jumpserver (forms/reports)"
+    from_port       = "7777"
+    to_port         = "7777"
+    protocol        = "TCP"
+    security_groups = [aws_security_group.jumpserver-windows.id, aws_security_group.internal_elb.id]
   }
 
   egress {
@@ -55,15 +79,16 @@ data "aws_ami" "weblogic_image" {
 }
 
 resource "aws_instance" "weblogic_server" {
-  instance_type               = "t2.micro"
+  instance_type               = "t2.medium"
   ami                         = data.aws_ami.weblogic_image.id
   associate_public_ip_address = false
-  iam_instance_profile        = "ssm-ec2-profile"
+  iam_instance_profile        = aws_iam_instance_profile.ec2_common_profile.id
   monitoring                  = false
   vpc_security_group_ids      = [aws_security_group.weblogic_server.id]
   subnet_id                   = data.aws_subnet.private_az_a.id
   user_data                   = file("./templates/cloudinit.cfg")
   # ebs_optimized          = true
+  key_name = aws_key_pair.ec2-user.key_name
 
   root_block_device {
     encrypted = true
@@ -76,3 +101,23 @@ resource "aws_instance" "weblogic_server" {
     }
   )
 }
+
+# resource "aws_ebs_volume" "extra_disk" {
+#   availability_zone = "${local.region}a"
+#   type              = "gp2"
+#   encrypted         = true
+#   size              = 50
+
+#   tags = merge(
+#     local.tags,
+#     {
+#       Name = "weblogic-${local.application_name}-extra-disk"
+#     }
+#   )
+# }
+
+# resource "aws_volume_attachment" "extra_disk" {
+#   device_name = "/dev/sde"
+#   volume_id   = aws_ebs_volume.extra_disk.id
+#   instance_id = aws_instance.weblogic_server.id
+# }

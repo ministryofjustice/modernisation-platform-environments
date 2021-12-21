@@ -1,5 +1,8 @@
+######################### Run Terraform via CICD ##################################
 # Get secret by name for environment management
+#tfsec:ignore:AWS095
 data "aws_secretsmanager_secret" "environment_management" {
+  #checkov:skip=CKV_AWS_149
   provider = aws.modernisation-platform
   name     = "environment_management"
 }
@@ -9,82 +12,55 @@ data "aws_secretsmanager_secret_version" "environment_management" {
   provider  = aws.modernisation-platform
   secret_id = data.aws_secretsmanager_secret.environment_management.id
 }
+######################### Run Terraform via CICD ##################################
+
+
+######################### Run Terraform Plan Locally Only ##################################
+# To run a Terraform Plan locally, uncomment this bottom section of code and comment out the top section
+
+# # Get secret by arn for environment management
+# data "aws_ssm_parameter" "environment_management_arn" {
+#   name = "environment_management_arn"
+# }
+
+# data "aws_secretsmanager_secret" "environment_management" {
+#   arn = data.aws_ssm_parameter.environment_management_arn.value
+# }
+
+# # Get latest secret value with ID from above. This secret stores account IDs for the Modernisation Platform sub-accounts
+# data "aws_secretsmanager_secret_version" "environment_management" {
+#   secret_id = data.aws_secretsmanager_secret.environment_management.id
+# }
+
+######################### Run Terraform Plan Locally Only ##################################
+
 
 ## == DATABASE CONNECTIONS ==
 
 # Get secret by name for database password
-data "aws_secretsmanager_secret" "database_password" {
-  name = "performance_hub_db"
+# data "aws_secretsmanager_secret" "database_password" {
+#   name = "performance_hub_db"
+# }
+
+# data "aws_secretsmanager_secret_version" "database_password" {
+#   secret_id = data.aws_secretsmanager_secret.database_password.arn
+# }
+
+#tfsec:ignore:AWS095
+resource "aws_secretsmanager_secret" "db_password" {
+  #checkov:skip=CKV_AWS_149
+
+  name = "${var.networking[0].application}-database-password"
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "${var.networking[0].application}-db-password"
+    },
+  )
 }
 
-data "aws_secretsmanager_secret_version" "database_password" {
-  secret_id = data.aws_secretsmanager_secret.database_password.arn
-}
-
-# Get secret by name for database connection string
-data "aws_secretsmanager_secret" "mojhub_cnnstr" {
-  name = "mojhub_cnnstr"
-}
-
-data "aws_secretsmanager_secret_version" "mojhub_cnnstr" {
-  secret_id = data.aws_secretsmanager_secret.mojhub_cnnstr.arn
-}
-
-# Get secret by name for membership database connection string
-data "aws_secretsmanager_secret" "mojhub_membership" {
-  name = "mojhub_membership"
-}
-
-data "aws_secretsmanager_secret_version" "mojhub_membership" {
-  secret_id = data.aws_secretsmanager_secret.mojhub_membership.arn
-}
-
-## == API KEYS ==
-
-# Secret by name for GOV.UK Notify API key
-data "aws_secretsmanager_secret" "govuk_notify_api_key" {
-  name = "govuk_notify_api_key"
-}
-
-data "aws_secretsmanager_secret_version" "govuk_notify_api_key" {
-  secret_id = data.aws_secretsmanager_secret.govuk_notify_api_key.arn
-}
-
-# Secret by name for OS Vector Tile API key
-data "aws_secretsmanager_secret" "os_vts_api_key" {
-  name = "os_vts_api_key"
-}
-
-data "aws_secretsmanager_secret_version" "os_vts_api_key" {
-  secret_id = data.aws_secretsmanager_secret.os_vts_api_key.arn
-}
-
-
-## == PERSISTENT STORAGE (S3) ==
-
-# Secret by name for the persistent storage bucket name
-data "aws_secretsmanager_secret" "hub_storage_bucket" {
-  name = "hub_storage_bucket"
-}
-
-data "aws_secretsmanager_secret_version" "hub_storage_bucket" {
-  secret_id = data.aws_secretsmanager_secret.hub_storage_bucket.arn
-}
-
-# Secret by name for the persistent storage bucket access key ID
-data "aws_secretsmanager_secret" "hub_storage_access_key_id" {
-  name = "hub_storage_access_key_id"
-}
-
-data "aws_secretsmanager_secret_version" "hub_storage_access_key_id" {
-  secret_id = data.aws_secretsmanager_secret.hub_storage_access_key_id.arn
-}
-
-# Secret by name for the persistent storage bucket secret access key
-data "aws_secretsmanager_secret" "hub_storage_secret_access_key" {
-  name = "hub_storage_secret_access_key"
-}
-
-data "aws_secretsmanager_secret_version" "hub_storage_secret_access_key" {
-  secret_id = data.aws_secretsmanager_secret.hub_storage_secret_access_key.arn
+resource "aws_secretsmanager_secret_version" "db_password" {
+  secret_id     = aws_secretsmanager_secret.db_password.id
+  secret_string = random_password.random_password.result
 }

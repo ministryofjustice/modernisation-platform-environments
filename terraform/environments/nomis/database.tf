@@ -1,3 +1,6 @@
+#------------------------------------------------------------------------------
+# Networking and Security Groups
+#------------------------------------------------------------------------------
 data "aws_subnet" "data_az_a" {
   vpc_id = local.vpc_id
   tags = {
@@ -5,18 +8,17 @@ data "aws_subnet" "data_az_a" {
   }
 }
 
-# Security Groups
 resource "aws_security_group" "db_server" {
   description = "Configure Oracle database access"
   name        = "db-server-${local.application_name}"
   vpc_id      = local.vpc_id
 
   ingress {
-    description = "SSH from Bastion"
-    from_port   = "22"
-    to_port     = "22"
-    protocol    = "TCP"
-    cidr_blocks = ["${module.bastion_linux.bastion_private_ip}/32"]
+    description     = "SSH from Bastion"
+    from_port       = "22"
+    to_port         = "22"
+    protocol        = "TCP"
+    security_groups = [module.bastion_linux.bastion_security_group]
   }
 
   ingress {
@@ -44,14 +46,16 @@ resource "aws_security_group" "db_server" {
   )
 }
 
-##### EC2 ####
+#------------------------------------------------------------------------------
+# AMI and EC2
+#------------------------------------------------------------------------------
 data "aws_ami" "db_image" {
   most_recent = true
   owners      = ["self"]
 
   filter {
     name   = "name"
-    values = ["nomis_db-2021-09-27*"] # pinning image for now
+    values = [local.application_data.accounts[local.environment].database_ami_name]
   }
 
   filter {
@@ -60,23 +64,45 @@ data "aws_ami" "db_image" {
   }
 }
 
+locals {
+  volume_size = {
+    "/dev/sdb" = 100,
+    "/dev/sdc" = 100,
+    "/dev/sde" = 100,
+    "/dev/sdf" = 100,
+    "/dev/sds" = 16
+  }
+}
+
 resource "aws_instance" "db_server" {
-  instance_type               = "t3.micro" # TODO: replace with "d2.xlarge" to match required spec.
+  instance_type               = "r5.xlarge"
   ami                         = data.aws_ami.db_image.id
   monitoring                  = true
   associate_public_ip_address = false
-  iam_instance_profile        = aws_iam_instance_profile.ec2_ssm_profile.id
+  iam_instance_profile        = aws_iam_instance_profile.ec2_common_profile.id
   ebs_optimized               = true
-  subnet_id                   = data.aws_subnet.private_az_a.id # data.aws_subnet.data_az_a.id put here whilst testing install steps
-  user_data                   = file("./templates/cloudinit.cfg")
+  subnet_id                   = data.aws_subnet.data_az_a.id
+  user_data                   = file("./templates/database_init.sh")
   vpc_security_group_ids      = [aws_security_group.db_server.id]
+  key_name                    = aws_key_pair.ec2-user.key_name
 
-  # block devices defined in custom image
-  # root_block_device {
-  #   delete_on_termination = true
-  #   encrypted             = true
-  #   volume_size           = 100
-  # }
+  root_block_device {
+    delete_on_termination = true
+    encrypted             = true
+    volume_size           = 30
+  }
+
+  dynamic "ebs_block_device" {
+    for_each = [for bdm in data.aws_ami.db_image.block_device_mappings : bdm if bdm.device_name != data.aws_ami.db_image.root_device_name]
+    iterator = device
+    content {
+      device_name = device.value["device_name"]
+      iops        = device.value["ebs"]["iops"]
+      snapshot_id = device.value["ebs"]["snapshot_id"]
+      volume_size = lookup(local.volume_size, device.value["device_name"], device.value["ebs"]["volume_size"])
+      volume_type = device.value["ebs"]["volume_type"]
+    }
+  }
 
   lifecycle {
     ignore_changes = [
@@ -93,27 +119,23 @@ resource "aws_instance" "db_server" {
   tags = merge(
     local.tags,
     {
-      Name = "db-server-${local.application_name}"
+      Name      = "db-server-${local.application_name}"
+      component = "data"
+      os_type   = "Linux (RHEL 7.9)"
+      always_on = "false"
     }
   )
 }
 
-resource "aws_ebs_volume" "asm_disk" {
-  availability_zone = "${local.region}a"
-  type              = "gp2"
-  encrypted         = true
-  size              = 100
+#------------------------------------------------------------------------------
+# Route 53 record
+#------------------------------------------------------------------------------
+resource "aws_route53_record" "database" {
+  provider = aws.core-vpc
 
-  tags = merge(
-    local.tags,
-    {
-      Name = "db-server-${local.application_name}-asm-disk"
-    }
-  )
-}
-
-resource "aws_volume_attachment" "asm_disk" {
-  device_name = "/dev/sde"
-  volume_id   = aws_ebs_volume.asm_disk.id
-  instance_id = aws_instance.db_server.id
+  zone_id = data.aws_route53_zone.internal.zone_id
+  name    = "database.${local.application_name}.${local.vpc_name}-${local.environment}.modernisation-platform.internal"
+  type    = "A"
+  ttl     = "60"
+  records = [aws_instance.db_server.private_ip]
 }

@@ -17,7 +17,7 @@ data "aws_vpc" "shared_vpc" {
 
 locals {
 
-  application_name = "nomis"
+  application_name = var.networking[0].application
 
   environment_management = jsondecode(data.aws_secretsmanager_secret_version.environment_management.secret_string)
 
@@ -48,6 +48,7 @@ locals {
   # example usage:  
   # example_data = local.application_data.accounts[local.environment].example_var
   # application_data = jsondecode(file("./application_variables.json"))
+  application_data = fileexists("./application_variables.json") ? jsondecode(file("./application_variables.json")) : {}
 
   region = "eu-west-2"
 }

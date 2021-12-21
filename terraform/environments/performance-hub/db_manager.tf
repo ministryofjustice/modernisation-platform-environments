@@ -1,5 +1,5 @@
 resource "aws_instance" "db_mgmt_server" {
-  ami                         = "ami-09b00616b12b077f8"
+  ami                         = "ami-0f9853ca76d115e7b"
   associate_public_ip_address = false
   availability_zone           = "eu-west-2a"
   ebs_optimized               = true
@@ -10,6 +10,11 @@ resource "aws_instance" "db_mgmt_server" {
   subnet_id                   = data.aws_subnet.private_subnets_a.id
   user_data                   = data.template_cloudinit_config.cloudinit-db-mgmt.rendered
   vpc_security_group_ids      = [aws_security_group.db_mgmt_server_security_group.id, ]
+
+  metadata_options {
+    http_endpoint = "enabled"
+    http_tokens   = "required"
+  }
 
   root_block_device {
     delete_on_termination = true
@@ -85,6 +90,7 @@ resource "aws_iam_instance_profile" "db_mgmt_profile" {
 }
 
 # ebs ec2 policy
+#tfsec:ignore:AWS099
 resource "aws_iam_policy" "db_mgmt_policy" {
   name        = "${local.application_name}-db_mgmt-ec2-policy"
   description = "${local.application_name} ec2-policy"
@@ -124,16 +130,19 @@ resource "aws_security_group" "db_mgmt_server_security_group" {
   vpc_id      = data.aws_vpc.shared.id
 
   ingress {
-    protocol    = "tcp"
-    from_port   = 3389
-    to_port     = 3389
-    cidr_blocks = ["${module.bastion_linux.bastion_private_ip}/32"]
+    protocol        = "tcp"
+    description     = "Open the RDP port"
+    from_port       = 3389
+    to_port         = 3389
+    security_groups = [module.bastion_linux.bastion_security_group]
   }
 
   egress {
-    protocol  = "-1"
-    from_port = 0
-    to_port   = 0
+    description = "All outbound ports open"
+    protocol    = "-1"
+    from_port   = 0
+    to_port     = 0
+    #tfsec:ignore:AWS009
     cidr_blocks = [
       "0.0.0.0/0",
     ]
@@ -170,6 +179,8 @@ resource "aws_kms_alias" "ebs-kms-alias" {
 }
 
 data "aws_iam_policy_document" "ebs-kms" {
+  #checkov:skip=CKV_AWS_111
+  #checkov:skip=CKV_AWS_109
   statement {
     effect    = "Allow"
     actions   = ["kms:*"]

@@ -90,12 +90,10 @@ data "aws_iam_policy_document" "packer_minimum_permissions" {
     #checkov:skip=CKV_AWS_107
     effect = "Allow"
     actions = [
-      "ec2:AuthorizeSecurityGroupIngress",
       "ec2:CopyImage",
       "ec2:CreateImage",
       "ec2:CreateKeypair",
       "ec2:CreateSnapshot",
-      "ec2:CreateTags",
       "ec2:CreateVolume",
       "ec2:DeleteSnapshot",  # unfortunately Packer does not tag intermediate snapshots it creates
       "ec2:DeregisterImage", # unfortunately Packer does not tag intermediate images it creates
@@ -129,11 +127,18 @@ data "aws_iam_policy_document" "packer_minimum_permissions" {
     ]
     resources = ["*"]
     condition {
-      test     = "StringEquals"
+      test     = "StringLike"
       variable = "ec2:ResourceTag/creator"
-      values   = ["Packer"]
+      values   = ["Packer", "packer", "ansible"]
     }
   }
+
+  statement {
+    effect    = "Allow"
+    actions   = ["ec2:AuthorizeSecurityGroupIngress"]
+    resources = [aws_security_group.packer_security_group.arn]
+  }
+
   statement {
     effect    = "Allow"
     actions   = ["ec2:DeleteKeyPair"]
@@ -143,6 +148,34 @@ data "aws_iam_policy_document" "packer_minimum_permissions" {
       variable = "ec2:KeyPairName"
       values   = ["packer_*"]
     }
+  }
+
+  statement {
+    effect    = "Allow"
+    actions   = ["ec2:CreateTags"]
+    resources = ["*"]
+    condition { # only allow tagging of resources on creation
+      test     = "StringLike"
+      variable = "ec2:CreateAction"
+      values = [
+        "RunInstances",
+        "CopyImage",
+        "CreateImage",
+        "CreateKeypair",
+        "CreateSnapshot",
+        "CreateVolume",
+        "RegisterImage"
+      ]
+    }
+  }
+
+  statement { # need this as Packer seems to copy the image and then tag it
+    effect  = "Allow"
+    actions = ["ec2:CreateTags"]
+    resources = [
+      "arn:aws:ec2:eu-west-2::image/ami-*",
+      "arn:aws:ec2:eu-west-2::snapshot/snap-*"
+    ]
   }
 }
 
@@ -169,7 +202,12 @@ data "aws_iam_policy_document" "packer_ssm_permissions" {
       "ssm:TerminateSession",
       "ssm:ResumeSession"
     ]
-    resources = ["arn:aws:ssm:*:*:session/&{aws:username}-*"]
+    resources = ["*"]
+    condition {
+      test     = "StringLike"
+      variable = "ssm:resourceTag/aws:ssmmessages:session-id"
+      values   = ["&{aws:userid}"]
+    }
   }
   statement {
     effect    = "Allow"
@@ -183,11 +221,29 @@ data "aws_iam_policy_document" "packer_ssm_permissions" {
   }
 }
 
+# some extra permissions required for Ansible ec2 module
+# it might be an idea to create another role for Ansible instead
+data "aws_iam_policy_document" "packer_ansible_permissions" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "ec2:DescribeInstanceAttribute",
+      "ec2:DescribeIamInstanceProfileAssociations",
+      "ec2:DescribeInstanceTypes",
+      "ec2:DescribeVpcs",
+      "ec2:DescribeKeyPairs",
+      "sts:DecodeAuthorizationMessage"
+    ]
+    resources = ["*"]
+  }
+}
+
 # combine policy json
 data "aws_iam_policy_document" "packer_combined" {
   source_policy_documents = [
     data.aws_iam_policy_document.packer_minimum_permissions.json,
-    data.aws_iam_policy_document.packer_ssm_permissions.json
+    data.aws_iam_policy_document.packer_ssm_permissions.json,
+    data.aws_iam_policy_document.packer_ansible_permissions.json
   ]
 }
 # attach policy to role inline
@@ -200,6 +256,7 @@ resource "aws_iam_role_policy" "packer" {
 #------------------------------------------------------------------------------
 # Instance profile to be assumed by Packer build instance
 # This is required to enable SSH via Systems Manager
+# and for access to S3 bucket
 #------------------------------------------------------------------------------
 
 resource "aws_iam_role" "packer_ssm_role" {
@@ -230,6 +287,32 @@ resource "aws_iam_role" "packer_ssm_role" {
   )
 }
 
+# build policy document for access to s3 bucket
+data "aws_iam_policy_document" "packer_s3_bucket_access" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "s3:GetObject"
+    ]
+    resources = ["${module.s3-bucket.bucket.arn}/*"]
+  }
+  statement { # explicitly deny eveything else
+    effect = "Deny"
+    not_actions = [
+      "s3:GetObject"
+    ]
+    resources = ["${module.s3-bucket.bucket.arn}/*"]
+  }
+}
+
+# attach s3 document as inline policy
+resource "aws_iam_role_policy" "packer_s3_bucket_access" {
+  name   = "nomis-apps-bucket-access"
+  role   = aws_iam_role.packer_ssm_role.name
+  policy = data.aws_iam_policy_document.packer_s3_bucket_access.json
+}
+
+# create instance profile from role
 resource "aws_iam_instance_profile" "packer_ssm_profile" {
   name = "packer-ssm-profile"
   role = aws_iam_role.packer_ssm_role.name
