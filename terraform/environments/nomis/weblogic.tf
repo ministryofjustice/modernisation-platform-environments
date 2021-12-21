@@ -97,7 +97,11 @@ resource "aws_instance" "weblogic_server" {
   tags = merge(
     local.tags,
     {
-      Name = "weblogic"
+      Name       = "weblogic"
+      component  = "application"
+      os_type    = "Linux"
+      os_version = "RHEL 6.10"
+      always_on  = "false"
     }
   )
 }
