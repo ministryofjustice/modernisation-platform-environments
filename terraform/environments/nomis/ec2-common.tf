@@ -24,7 +24,10 @@ resource "aws_iam_role" "ec2_common_role" {
       ]
     }
   )
-  managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"]
+  managed_policy_arns = [
+    "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+    "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+  ]
   tags = merge(
     local.tags,
     {
@@ -167,3 +170,61 @@ resource "aws_kms_alias" "session_manager_alias" {
   name          = "alias/session_manager_key"
   target_key_id = aws_kms_key.session_manager.arn
 }
+
+#------------------------------------------------------------------------------
+# Cloud Watch Agent
+#------------------------------------------------------------------------------
+
+resource "aws_ssm_association" "cloud_watch_agent" {
+  name             = "AWS-ConfigureAWSPackage"
+  association_name = "install-cloud-watch-agent"
+  parameters = {
+    action = "Install"
+    name   = "AmazonCloudWatchAgent"
+  }
+  targets {
+    key = "InstanceIds"
+    values = [
+      aws_instance.db_server.id,
+      aws_instance.weblogic_server.id
+    ]
+  }
+  apply_only_at_cron_interval = false
+  # schedule_expression = 
+}
+
+resource "aws_ssm_association" "manage_cloud_watch_agent_linux" {
+  name             = "AmazonCloudWatch-ManageAgent"
+  association_name = "manage-cloud-watch-agent"
+  parameters = {
+    action                        = "configure"
+    mode                          = "ec2"
+    optionalConfigurationSource   = "ssm"
+    optionalConfigurationLocation = aws_ssm_parameter.cloud_watch_config_linux.name
+    optionalRestart               = "yes"
+  }
+  targets {
+    key    = "tag:os_type"
+    values = ["Linux"]
+  }
+  apply_only_at_cron_interval = false
+  # schedule_expression = 
+}
+
+resource "aws_ssm_parameter" "cloud_watch_config_linux" {
+  description = "cloud watch agent config for linux"
+  name        = "cloud-watch-config-linux"
+  type        = "String"
+  value       = file("./templates/cloud_watch_linux.json")
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "cloud-watch-config-linux"
+    },
+  )
+}
+
+# do a schedule
+# config for windows
+# add one for ssm-agent updates??
