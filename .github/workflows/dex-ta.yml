@@ -202,3 +202,137 @@ jobs:
   #        bash scripts/terraform-apply.sh terraform/environments/dex-ta
   #      env:
   #        TF_ENV: production
+=======
+#   plan-test:
+#     name: Plan Test - dex-ta
+#     runs-on: ubuntu-latest
+#     if: github.ref != 'refs/heads/main' || github.event_name == 'workflow_dispatch'
+#     steps:
+#       - name: Checkout Repository
+#         uses: actions/checkout@v2.3.4
+#       - name: Load and Configure Terraform
+#         uses: hashicorp/setup-terraform@v1.3.2
+#         with:
+#           terraform_version: 1.0.1
+#           terraform_wrapper: false
+#       - name: Terraform plan - test
+#         run: |
+#           echo "Terraform plan - ${TF_ENV}"
+#           bash scripts/terraform-init.sh terraform/environments/dex-ta
+#           terraform -chdir="terraform/environments/dex-ta" workspace select "dex-ta-${TF_ENV}"
+#           bash scripts/terraform-plan.sh terraform/environments/dex-ta
+#         env:
+#           TF_ENV: test
+
+#   deploy-test:
+#     name: Deploy Test - dex-ta
+#     runs-on: ubuntu-latest
+#     if: github.ref != 'refs/heads/main' || github.event_name == 'workflow_dispatch'
+#     environment:
+#       name: dex-ta-test
+#     steps:
+#       - name: Checkout Repository
+#         uses: actions/checkout@v2.3.4
+#       - name: Load and Configure Terraform
+#         uses: hashicorp/setup-terraform@v1.3.2
+#         with:
+#           terraform_version: 1.0.1
+#           terraform_wrapper: false
+#       - name: Terraform apply - test
+#         run: |
+#           echo "Terraform apply - ${TF_ENV}"
+#           bash scripts/terraform-init.sh terraform/environments/dex-ta
+#           terraform -chdir="terraform/environments/dex-ta" workspace select "dex-ta-${TF_ENV}"
+#           bash scripts/terraform-apply.sh terraform/environments/dex-ta
+#         env:
+#           TF_ENV: test
+
+#   # These jobs run after merging to main
+#   plan-preproduction:
+#     name: Plan Preproduction - dex-ta
+#     runs-on: ubuntu-latest
+#     if: github.ref == 'refs/heads/main'
+#     steps:
+#       - name: Checkout Repository
+#         uses: actions/checkout@v2.3.4
+#       - name: Load and Configure Terraform
+#         uses: hashicorp/setup-terraform@v1.3.2
+#         with:
+#           terraform_version: 1.0.1
+#           terraform_wrapper: false
+#       - name: Terraform plan - preproduction
+#         run: |
+#           echo "Terraform plan - ${TF_ENV}"
+#           bash scripts/terraform-init.sh terraform/environments/dex-ta
+#           terraform -chdir="terraform/environments/dex-ta" workspace select "dex-ta-${TF_ENV}"
+#           bash scripts/terraform-plan.sh terraform/environments/dex-ta
+#         env:
+#           TF_ENV: preproduction
+
+#   deploy-preproduction:
+#     name: Deploy Preproduction - dex-ta
+#     runs-on: ubuntu-latest
+#     if: github.ref == 'refs/heads/main'
+#     environment:
+#       name: dex-ta-preproduction
+#     steps:
+#       - name: Checkout Repository
+#         uses: actions/checkout@v2.3.4
+#       - name: Load and Configure Terraform
+#         uses: hashicorp/setup-terraform@v1.3.2
+#         with:
+#           terraform_version: 1.0.1
+#           terraform_wrapper: false
+#       - name: Terraform apply - preproduction
+#         run: |
+#           echo "Terraform apply - ${TF_ENV}"
+#           bash scripts/terraform-init.sh terraform/environments/dex-ta
+#           terraform -chdir="terraform/environments/dex-ta" workspace select "dex-ta-${TF_ENV}"
+#           bash scripts/terraform-apply.sh terraform/environments/dex-ta
+#         env:
+#           TF_ENV: preproduction
+  
+#   plan-production:
+#     name: Plan Production - dex-ta
+#     runs-on: ubuntu-latest
+#     if: github.ref == 'refs/heads/main'
+#     steps:
+#       - name: Checkout Repository
+#         uses: actions/checkout@v2.3.4
+#       - name: Load and Configure Terraform
+#         uses: hashicorp/setup-terraform@v1.3.2
+#         with:
+#           terraform_version: 1.0.1
+#           terraform_wrapper: false
+#       - name: Terraform plan - production
+#         run: |
+#           echo "Terraform plan - ${TF_ENV}"
+#           bash scripts/terraform-init.sh terraform/environments/dex-ta
+#           terraform -chdir="terraform/environments/dex-ta" workspace select "dex-ta-${TF_ENV}"
+#           bash scripts/terraform-plan.sh terraform/environments/dex-ta
+#         env:
+#           TF_ENV: production
+
+#   deploy-production:
+#     name: Deploy Production - dex-ta
+#     runs-on: ubuntu-latest
+#     if: github.ref == 'refs/heads/main'
+#     environment:
+#       name: dex-ta-production
+#     steps:
+#       - name: Checkout Repository
+#         uses: actions/checkout@v2.3.4
+#       - name: Load and Configure Terraform
+#         uses: hashicorp/setup-terraform@v1.3.2
+#         with:
+#           terraform_version: 1.0.1
+#           terraform_wrapper: false
+#       - name: Terraform apply - production
+#         run: |
+#           echo "Terraform apply - ${TF_ENV}"
+#           bash scripts/terraform-init.sh terraform/environments/dex-ta
+#           terraform -chdir="terraform/environments/dex-ta" workspace select "dex-ta-${TF_ENV}"
+#           bash scripts/terraform-apply.sh terraform/environments/dex-ta
+#         env:
+#           TF_ENV: production
+
