@@ -121,7 +121,7 @@ resource "aws_key_pair" "ec2-user" {
 # KMS keys - note they are still encrypted with default KMS key
 #tfsec:ignore:AWS089
 resource "aws_cloudwatch_log_group" "session_manager" {
-
+  #checkov:skip=CKV_AWS_107:skip KMS CMK encryption check while logging solution is being determined
   name              = "session-manager-logs"
   retention_in_days = local.application_data.accounts[local.environment].session_manager_log_retention_days
 

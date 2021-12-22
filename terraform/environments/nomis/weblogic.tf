@@ -79,6 +79,8 @@ data "aws_ami" "weblogic_image" {
 }
 
 resource "aws_instance" "weblogic_server" {
+  #checkov:skip=CKV_AWS_135:skip "Ensure that EC2 is EBS optimized" as not supported by t2 instances.
+  # t2 was chosen as t3 does not support RHEL 6.10. Review next time instance type is changed.
   instance_type               = "t2.medium"
   ami                         = data.aws_ami.weblogic_image.id
   associate_public_ip_address = false

@@ -14,6 +14,8 @@ data "aws_ami" "jumpserver_image" {
 }
 
 resource "aws_instance" "jumpserver_windows" {
+  #checkov:skip=CKV_AWS_135:skip "Ensure that EC2 is EBS optimized" as not supported by t2 instances.
+  # This can probably be moved to a t3 instance. Review next time instance type is changed.  
   instance_type               = "t2.medium"
   ami                         = data.aws_ami.jumpserver_image.id
   associate_public_ip_address = false

@@ -57,13 +57,13 @@ resource "aws_security_group_rule" "internal_lb_egress_1" {
 }
 
 resource "aws_lb" "internal" {
-
+  #checkov:skip=CKV_AWS_91:skip "Ensure the ELBv2 (Application/Network) has access logging enabled"
   name                       = "lb-internal-${local.application_name}"
   internal                   = true
   load_balancer_type         = "application"
   security_groups            = [aws_security_group.internal_elb.id]
   subnets                    = data.aws_subnet_ids.private.ids
-  enable_deletion_protection = false
+  enable_deletion_protection = true
   drop_invalid_header_fields = true
 
   tags = merge(
