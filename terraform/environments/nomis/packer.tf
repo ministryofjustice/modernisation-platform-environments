@@ -202,7 +202,7 @@ data "aws_iam_policy_document" "packer_ssm_permissions" {
       "ssm:TerminateSession",
       "ssm:ResumeSession"
     ]
-    resources = ["*"]
+    resources = ["*"] #checkov:skip=CKV_AWS_111:scope limited by conditional
     condition {
       test     = "StringLike"
       variable = "ssm:resourceTag/aws:ssmmessages:session-id"

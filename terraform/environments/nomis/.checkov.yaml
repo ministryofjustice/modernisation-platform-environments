@@ -1,0 +1,2 @@
+skip-check:
+  - CKV_AWS_126 # skip "Ensure that detailed monitoring is enabled for EC2 instances", not required for now

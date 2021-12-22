@@ -52,8 +52,8 @@ provider "aws" {
 
 # # AWS provider for core-vpc-<environment>, to share VPCs into this account
 # provider "aws" {
-#   alias  = "core-vpc"
-#   region = "eu-west-2"
+#   alias                  = "core-vpc"
+#   region                 = "eu-west-2"
 #   skip_get_ec2_platforms = true
 
 #   assume_role {
@@ -63,10 +63,9 @@ provider "aws" {
 
 # # AWS provider for network services to enable dns entries for certificate validation to be created
 # provider "aws" {
-#   alias  = "core-network-services"
-#   region = "eu-west-2"
+#   alias                  = "core-network-services"
+#   region                 = "eu-west-2"
 #   skip_get_ec2_platforms = true
-
 #   assume_role {
 #     role_arn = "arn:aws:iam::${local.environment_management.account_ids["core-network-services-production"]}:role/read-dns-records"
 #   }
