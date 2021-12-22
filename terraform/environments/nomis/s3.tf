@@ -23,9 +23,6 @@ module "s3-bucket" {
         {
           days          = 90
           storage_class = "STANDARD_IA"
-          }, {
-          days          = 365
-          storage_class = "GLACIER"
         }
       ]
 
