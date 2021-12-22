@@ -14,6 +14,8 @@ data "aws_ami" "jumpserver_image" {
 }
 
 resource "aws_instance" "jumpserver_windows" {
+  #checkov:skip=CKV_AWS_135:skip "Ensure that EC2 is EBS optimized" as not supported by t2 instances.
+  # This can probably be moved to a t3 instance. Review next time instance type is changed.  
   instance_type               = "t2.medium"
   ami                         = data.aws_ami.jumpserver_image.id
   associate_public_ip_address = false
@@ -22,6 +24,10 @@ resource "aws_instance" "jumpserver_windows" {
   vpc_security_group_ids      = [aws_security_group.jumpserver-windows.id]
   subnet_id                   = data.aws_subnet.private_az_a.id
   key_name                    = "jumpserver-windows"
+  metadata_options {
+    http_endpoint = "enabled"
+    http_tokens   = "required"
+  }
   root_block_device {
     encrypted = true
   }
@@ -41,10 +47,11 @@ resource "aws_security_group" "jumpserver-windows" {
   name        = "jumpserver-windows-${local.application_name}"
   vpc_id      = local.vpc_id
   egress {
-    from_port        = 0
-    to_port          = 0
-    protocol         = "-1"
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
+    description = "allow all"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    #tfsec:ignore:AWS009
+    cidr_blocks = ["0.0.0.0/0"]
   }
 }

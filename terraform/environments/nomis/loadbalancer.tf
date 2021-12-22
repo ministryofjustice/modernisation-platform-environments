@@ -57,13 +57,14 @@ resource "aws_security_group_rule" "internal_lb_egress_1" {
 }
 
 resource "aws_lb" "internal" {
-
+  #checkov:skip=CKV_AWS_91:skip "Ensure the ELBv2 (Application/Network) has access logging enabled"
   name                       = "lb-internal-${local.application_name}"
   internal                   = true
   load_balancer_type         = "application"
   security_groups            = [aws_security_group.internal_elb.id]
   subnets                    = data.aws_subnet_ids.private.ids
-  enable_deletion_protection = false
+  enable_deletion_protection = true
+  drop_invalid_header_fields = true
 
   tags = merge(
     local.tags,
@@ -125,7 +126,7 @@ resource "aws_lb_listener" "internal" {
   load_balancer_arn = aws_lb.internal.arn
   port              = "443"
   protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  ssl_policy        = "ELBSecurityPolicy-TLS-1-2-2017-01"
   certificate_arn   = aws_acm_certificate.internal_lb.arn
 
   default_action {

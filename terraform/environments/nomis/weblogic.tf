@@ -45,12 +45,12 @@ resource "aws_security_group" "weblogic_server" {
   }
 
   egress {
-    description      = "allow all"
-    from_port        = 0
-    to_port          = 0
-    protocol         = "-1"
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
+    description = "allow all"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    #tfsec:ignore:AWS009
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   tags = merge(
@@ -79,6 +79,8 @@ data "aws_ami" "weblogic_image" {
 }
 
 resource "aws_instance" "weblogic_server" {
+  #checkov:skip=CKV_AWS_135:skip "Ensure that EC2 is EBS optimized" as not supported by t2 instances.
+  # t2 was chosen as t3 does not support RHEL 6.10. Review next time instance type is changed.
   instance_type               = "t2.medium"
   ami                         = data.aws_ami.weblogic_image.id
   associate_public_ip_address = false
@@ -89,7 +91,10 @@ resource "aws_instance" "weblogic_server" {
   user_data                   = file("./templates/cloudinit.cfg")
   # ebs_optimized          = true
   key_name = aws_key_pair.ec2-user.key_name
-
+  metadata_options {
+    http_endpoint = "enabled"
+    http_tokens   = "required"
+  }
   root_block_device {
     encrypted = true
   }
@@ -97,7 +102,11 @@ resource "aws_instance" "weblogic_server" {
   tags = merge(
     local.tags,
     {
-      Name = "weblogic"
+      Name       = "weblogic"
+      component  = "application"
+      os_type    = "Linux"
+      os_version = "RHEL 6.10"
+      always_on  = "false"
     }
   )
 }
