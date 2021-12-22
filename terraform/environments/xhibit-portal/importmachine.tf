@@ -14,6 +14,16 @@ resource "aws_security_group" "importmachine" {
     cidr_blocks = ["${module.bastion_linux.bastion_private_ip}/32"]
   }
 
+  ingress {
+    description = "web from all"
+    from_port   = 8000
+    to_port     = 8000
+    protocol    = "TCP"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+
+  }
+
   egress {
     description      = "allow all"
     from_port        = 0
