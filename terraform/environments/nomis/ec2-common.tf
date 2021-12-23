@@ -299,9 +299,9 @@ data "aws_iam_policy_document" "eventbridge_runcommand" {
     effect  = "Allow"
     actions = ["ssm:SendCommand"]
     resources = [
-      "arn:aws:ec2:eu-west-2:${local.environment_management.account_ids[terraform.workspace]}:instance/*",
+      "arn:aws:ec2:${local.region}:${local.environment_management.account_ids[terraform.workspace]}:instance/*",
       # limit to only running the cloud watch config document
-      "arn:aws:ssm:${local.region}::document/AmazonCloudWatch-ManageAgent"
+      "arn:aws:ssm:${local.region}:*:document/AmazonCloudWatch-ManageAgent"
     ]
   }
   statement {
