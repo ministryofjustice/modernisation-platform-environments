@@ -22,7 +22,7 @@
 				"totalcpu": false
 			},
 			"disk": {
-				"drop_device"
+				"drop_device": true,
 				"measurement": [
 					"used_percent",
 					"inodes_free"
