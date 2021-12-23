@@ -273,7 +273,7 @@ resource "aws_cloudwatch_event_target" "cloud_watch_agent_linux" {
       optionalRestart               = "yes"
     }
   )
-  rule     = aws_cloudwatch_event_rule.cloud_watch_agent_linux.name
+  rule = aws_cloudwatch_event_rule.cloud_watch_agent_linux.name
   # role_arn = aws_iam_role.ssm_run_command.arn
 
   run_command_targets {
