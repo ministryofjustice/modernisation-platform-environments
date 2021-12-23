@@ -274,7 +274,7 @@ resource "aws_cloudwatch_event_target" "cloud_watch_agent_linux" {
     }
   )
   rule     = aws_cloudwatch_event_rule.cloud_watch_agent_linux.name
-  # role_arn = aws_iam_role.ssm_run_command.arn
+  role_arn = aws_iam_role.ssm_run_command.arn
 
   run_command_targets {
     key    = "tag:os_type"
@@ -299,7 +299,18 @@ data "aws_iam_policy_document" "eventbridge_runcommand" {
     effect  = "Allow"
     actions = ["ssm:SendCommand"]
     resources = [
-      "arn:aws:ec2:${local.region}:${local.environment_management.account_ids[terraform.workspace]}:instance/*",
+      "arn:aws:ec2:${local.region}:${local.environment_management.account_ids[terraform.workspace]}:instance/*"
+    ]
+    condition {
+      test     = "StringEquals"
+      variable = "ec2:ResourceTag/os_type"
+      values   = ["*"]
+    }
+  }
+  statement {
+    effect  = "Allow"
+    actions = ["ssm:SendCommand"]
+    resources = [
       # limit to only running the cloud watch config document
       "arn:aws:ssm:${local.region}:*:document/AmazonCloudWatch-ManageAgent"
     ]
