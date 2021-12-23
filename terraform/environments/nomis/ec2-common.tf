@@ -274,7 +274,7 @@ resource "aws_cloudwatch_event_target" "cloud_watch_agent_linux" {
     }
   )
   rule     = aws_cloudwatch_event_rule.cloud_watch_agent_linux.name
-  role_arn = aws_iam_role.ssm_run_command.arn
+  # role_arn = aws_iam_role.ssm_run_command.arn
 
   run_command_targets {
     key    = "tag:os_type"
