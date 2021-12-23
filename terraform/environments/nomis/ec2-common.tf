@@ -234,6 +234,135 @@ resource "aws_ssm_parameter" "cloud_watch_config_linux" {
   )
 }
 
-# do a schedule
-# config for windows
-# add one for ssm-agent updates??
+#------------------------------------------------------------------------------
+# EventBridge for CloudWatch Agent Config Changes
+#------------------------------------------------------------------------------
+resource "aws_cloudwatch_event_rule" "cloud_watch_agent_linux" {
+  name        = "update-cloud-watch-agent-linux"
+  description = "Update Cloud Watch Agent on Linux instances when config file is changed"
+  is_enabled  = true
+
+  event_pattern = jsonencode(
+    {
+      detail-type = ["Parameter Store Change"]
+      source      = ["aws.ssm"]
+      resources   = [aws_ssm_parameter.cloud_watch_config_linux.arn]
+      detail = {
+        operation = ["Update"]
+      }
+    }
+  )
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "cloud-watch-config-linux"
+    },
+  )
+}
+
+resource "aws_cloudwatch_event_target" "cloud_watch_agent_linux" {
+  target_id = "update-cloud-watch-agent-linux"
+  arn       = "arn:aws:ssm:${local.region}::document/AmazonCloudWatch-ManageAgent"
+  input = jsonencode(
+    {
+      action                        = "configure"
+      mode                          = "ec2"
+      optionalConfigurationSource   = "ssm"
+      optionalConfigurationLocation = aws_ssm_parameter.cloud_watch_config_linux.name
+      optionalRestart               = "yes"
+    }
+  )
+  rule     = aws_cloudwatch_event_rule.cloud_watch_agent_linux.name
+  role_arn = aws_iam_role.ssm_run_command.arn
+
+  run_command_targets {
+    key    = "tag:os_type"
+    values = ["Linux"]
+  }
+}
+
+# policy and role to allow run command
+data "aws_iam_policy_document" "eventbridge_assume_role" {
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+    principals {
+      type        = "Service"
+      identifiers = ["events.amazonaws.com"]
+    }
+  }
+}
+
+data "aws_iam_policy_document" "eventbridge_runcommand" {
+  statement {
+    effect  = "Allow"
+    actions = ["ssm:SendCommand"]
+    resources = [
+      "arn:aws:ec2:eu-west-2:${local.environment_management.account_ids[terraform.workspace]}:instance/*",
+      # limit to only running the cloud watch config document
+      "arn:aws:ssm:${local.region}::document/AmazonCloudWatch-ManageAgent"
+    ]
+  }
+}
+
+resource "aws_iam_role" "ssm_run_command" {
+  name               = "ssm-run-command"
+  description        = "role for EventBridge to invoke run command on EC2"
+  assume_role_policy = data.aws_iam_policy_document.eventbridge_assume_role.json
+  inline_policy {
+    name   = "EventBridgeRunCommand"
+    policy = data.aws_iam_policy_document.eventbridge_runcommand.json
+  }
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "EventBridgeRunCommand"
+    },
+  )
+}
+
+# module "eventbridge" {
+#   source  = "terraform-aws-modules/eventbridge/aws"
+#   version = "1.13.2"
+
+#   # bus_name = "default"
+#   rules = {
+#     cloud_watch_agent = {
+#       description = "watch for changes to Cloud Watch Agent config"
+#       enabled     = true
+#       event_pattern = jsonencode(
+#         {
+#           "detail-type" : ["Parameter Store Change"],
+#           "source" : ["aws.ssm"],
+#           "resources" : [aws_ssm_parameter.cloud_watch_config_linux.arn],
+#           "detail" : {
+#             "operation" : ["Update"]
+#           }
+#         }
+#       )
+#     }
+#   }
+
+#   targets = {
+#     cloud_watch_agent = [
+#       {
+#         name = "update-cloud-watch-agent-linux"
+#         arn  = "arn:aws:ssm:${local.region}::document/AmazonCloudWatch-ManageAgent"
+#         input = {
+#           action                        = "configure"
+#           mode                          = "ec2"
+#           optionalConfigurationSource   = "ssm"
+#           optionalConfigurationLocation = aws_ssm_parameter.cloud_watch_config_linux.name
+#           optionalRestart               = "yes"
+#         }
+#         run_command_targets = {
+#           key    = "tag:os_type"
+#           values = ["Linux"]
+#         }
+#       }
+#     ]
+#   }
+#   create_bus = false
+# }
