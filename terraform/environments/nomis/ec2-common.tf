@@ -304,6 +304,13 @@ data "aws_iam_policy_document" "eventbridge_runcommand" {
       "arn:aws:ssm:${local.region}::document/AmazonCloudWatch-ManageAgent"
     ]
   }
+  statement {
+    effect  = "Allow"
+    actions = ["ssm:GetParameter"]
+    resources = [
+      aws_ssm_parameter.cloud_watch_config_linux.arn
+    ]
+  }
 }
 
 resource "aws_iam_role" "ssm_run_command" {
