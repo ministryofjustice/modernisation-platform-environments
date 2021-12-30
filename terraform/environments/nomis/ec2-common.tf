@@ -275,7 +275,7 @@ resource "aws_cloudwatch_event_target" "cloud_watch_agent_linux" {
     }
   )
   rule     = aws_cloudwatch_event_rule.cloud_watch_agent_linux.name
-  role_arn = aws_iam_role.ssm_run_command.arn
+  role_arn = aws_iam_role.ssm_run_command.arn # try using ec2-common-role
 
   run_command_targets {
     key    = "tag:os_type"
@@ -333,6 +333,10 @@ resource "aws_iam_role" "ssm_run_command" {
     name   = "EventBridgeRunCommand"
     policy = data.aws_iam_policy_document.eventbridge_runcommand.json
   }
+
+  managed_policy_arns = [
+    "arn:aws:iam::aws:policy/AmazonEventBridgeFullAccess",
+  ]
 
   tags = merge(
     local.tags,
