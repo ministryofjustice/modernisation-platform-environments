@@ -249,7 +249,7 @@ resource "aws_cloudwatch_event_rule" "cloud_watch_agent_linux" {
       resources   = [aws_ssm_parameter.cloud_watch_config_linux.arn]
       detail = {
         operation = ["Update"]
-        name = [aws_ssm_parameter.cloud_watch_config_linux.name]
+        name      = [aws_ssm_parameter.cloud_watch_config_linux.name]
       }
     }
   )
