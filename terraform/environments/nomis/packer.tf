@@ -301,7 +301,7 @@ data "aws_iam_policy_document" "packer_s3_bucket_access" {
     not_actions = [
       "s3:ListObject"
     ]
-    resources = ["${module.s3-bucket.bucket.arn}/DB_BKP/*"]
+    resources = ["${module.s3-bucket.bucket.arn}/DB_BKP/CNOMT*"]
   }
 }
 
