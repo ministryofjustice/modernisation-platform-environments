@@ -298,10 +298,15 @@ data "aws_iam_policy_document" "packer_s3_bucket_access" {
   }
   statement {
     effect = "Allow"
-    not_actions = [
-      "s3:ListObject"
+    actions = [
+      "s3:ListBucket"
     ]
-    resources = ["${module.s3-bucket.bucket.arn}/DB_BKP/CNOMT*"]
+    resources = ["${module.s3-bucket.bucket.arn}"]
+    condition {
+      test     = "StringLike"
+      variable = "s3:prefix"
+      values   = ["DB_BKP/CNOMT_20211214/*"]
+    }
   }
 }
 
