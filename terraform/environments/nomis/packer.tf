@@ -174,7 +174,8 @@ data "aws_iam_policy_document" "packer_minimum_permissions" {
     actions = ["ec2:CreateTags"]
     resources = [
       "arn:aws:ec2:eu-west-2::image/ami-*",
-      "arn:aws:ec2:eu-west-2::snapshot/snap-*"
+      "arn:aws:ec2:eu-west-2::snapshot/snap-*",
+      "arn:aws:ec2:eu-west-2:${local.environment_management.account_ids[terraform.workspace]}:key-pair/packer*"
     ]
   }
 }
@@ -296,12 +297,17 @@ data "aws_iam_policy_document" "packer_s3_bucket_access" {
     ]
     resources = ["${module.s3-bucket.bucket.arn}/*"]
   }
-  statement { # explicitly deny eveything else
-    effect = "Deny"
-    not_actions = [
-      "s3:GetObject"
+  statement {
+    effect = "Allow"
+    actions = [
+      "s3:ListBucket"
     ]
-    resources = ["${module.s3-bucket.bucket.arn}/*"]
+    resources = ["${module.s3-bucket.bucket.arn}"]
+    condition {
+      test     = "StringLike"
+      variable = "s3:prefix"
+      values   = ["DB_BKP/CNOMT_20211214/*"]
+    }
   }
 }
 
