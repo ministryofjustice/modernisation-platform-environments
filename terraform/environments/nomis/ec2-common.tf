@@ -24,7 +24,10 @@ resource "aws_iam_role" "ec2_common_role" {
       ]
     }
   )
-  managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"]
+  managed_policy_arns = [
+    "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+    "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+  ]
   tags = merge(
     local.tags,
     {
@@ -57,14 +60,17 @@ resource "aws_iam_role_policy" "s3_bucket_access" {
 
 # create policy document to write Session Manager logs to CloudWatch
 data "aws_iam_policy_document" "session_manager_logging" {
-  statement { # for session and log encryption
-    effect = "Allow"
-    actions = [
-      "kms:Decrypt",
-      "kms:GenerateDataKey"
-    ]
-    resources = [aws_kms_key.session_manager.arn]
-  }
+  # commented out as not encypting with KMS currently as the the role
+  # assumed by the user connecting also needs the GenerateDataKey permission
+  # see https://mojdt.slack.com/archives/C01A7QK5VM1/p1637603085030600
+  # statement { # for session and log encryption using KMS
+  #   effect = "Allow"
+  #   actions = [
+  #     "kms:Decrypt",
+  #     "kms:GenerateDataKey"
+  #   ]
+  #   resources = [aws_kms_key.session_manager.arn]
+  # }
   statement {
     effect = "Allow"
     actions = [
@@ -73,7 +79,10 @@ data "aws_iam_policy_document" "session_manager_logging" {
       "logs:DescribeLogGroups",
       "logs:DescribeLogStreams"
     ]
-    resources = ["*"]
+    resources = [
+      aws_cloudwatch_log_group.session_manager.arn,
+      "${aws_cloudwatch_log_group.session_manager.arn}:log-stream:*"
+    ]
   }
 }
 
@@ -108,11 +117,13 @@ resource "aws_key_pair" "ec2-user" {
 # Session Manager Logging and Settings
 #------------------------------------------------------------------------------
 
+# Ignore warnings regarding log groups not encrypted using customer-managed
+# KMS keys - note they are still encrypted with default KMS key
+#tfsec:ignore:AWS089
 resource "aws_cloudwatch_log_group" "session_manager" {
-
+  #checkov:skip=CKV_AWS_158:skip KMS CMK encryption check while logging solution is being determined
   name              = "session-manager-logs"
   retention_in_days = local.application_data.accounts[local.environment].session_manager_log_retention_days
-  # kms_key_id = aws_kms_key.session_manager.arn
 
   tags = merge(
     local.tags,
@@ -152,18 +163,77 @@ resource "aws_ssm_document" "session_manager_settings" {
   )
 }
 
-resource "aws_kms_key" "session_manager" {
-  enable_key_rotation = true
+# commented out for now - see https://mojdt.slack.com/archives/C01A7QK5VM1/p1637603085030600
+# resource "aws_kms_key" "session_manager" {
+#   enable_key_rotation = true
+
+#   tags = merge(
+#     local.tags,
+#     {
+#       Name = "session_manager"
+#     },
+#   )
+# }
+
+# resource "aws_kms_alias" "session_manager_alias" {
+#   name          = "alias/session_manager_key"
+#   target_key_id = aws_kms_key.session_manager.arn
+# }
+
+#------------------------------------------------------------------------------
+# Cloud Watch Agent
+#------------------------------------------------------------------------------
+
+resource "aws_ssm_association" "cloud_watch_agent" {
+  name             = "AWS-ConfigureAWSPackage"
+  association_name = "install-cloud-watch-agent"
+  parameters = {
+    action = "Install"
+    name   = "AmazonCloudWatchAgent"
+  }
+  targets {
+    key = "InstanceIds"
+    values = [
+      aws_instance.db_server.id,
+      aws_instance.weblogic_server.id
+    ]
+  }
+  apply_only_at_cron_interval = false
+  # schedule_expression = 
+}
+
+resource "aws_ssm_association" "manage_cloud_watch_agent_linux" {
+  name             = "AmazonCloudWatch-ManageAgent"
+  association_name = "manage-cloud-watch-agent"
+  parameters = {
+    action                        = "configure"
+    mode                          = "ec2"
+    optionalConfigurationSource   = "ssm"
+    optionalConfigurationLocation = aws_ssm_parameter.cloud_watch_config_linux.name
+    optionalRestart               = "yes"
+  }
+  targets {
+    key    = "tag:os_type"
+    values = ["Linux"]
+  }
+  apply_only_at_cron_interval = false
+  # schedule_expression = 
+}
+
+resource "aws_ssm_parameter" "cloud_watch_config_linux" {
+  description = "cloud watch agent config for linux"
+  name        = "cloud-watch-config-linux"
+  type        = "String"
+  value       = file("./templates/cloud_watch_linux.json")
 
   tags = merge(
     local.tags,
     {
-      Name = "session_manager"
+      Name = "cloud-watch-config-linux"
     },
   )
 }
 
-resource "aws_kms_alias" "session_manager_alias" {
-  name          = "alias/session_manager_key"
-  target_key_id = aws_kms_key.session_manager.arn
-}
+# do a schedule
+# config for windows
+# add one for ssm-agent updates??
