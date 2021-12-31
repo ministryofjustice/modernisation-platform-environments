@@ -296,12 +296,12 @@ data "aws_iam_policy_document" "packer_s3_bucket_access" {
     ]
     resources = ["${module.s3-bucket.bucket.arn}/*"]
   }
-  statement { # explicitly deny eveything else
-    effect = "Deny"
+  statement {
+    effect = "Allow"
     not_actions = [
-      "s3:GetObject"
+      "s3:ListObject"
     ]
-    resources = ["${module.s3-bucket.bucket.arn}/*"]
+    resources = ["${module.s3-bucket.bucket.arn}/DB_BKP/*"]
   }
 }
 
