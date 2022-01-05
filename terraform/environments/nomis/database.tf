@@ -93,6 +93,7 @@ resource "aws_instance" "db_server" {
     delete_on_termination = true
     encrypted             = true
     volume_size           = 30
+    volume_type           = "gp3"
   }
 
   dynamic "ebs_block_device" {
