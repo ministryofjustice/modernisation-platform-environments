@@ -75,7 +75,7 @@ locals {
 }
 
 resource "aws_instance" "db_server" {
-  instance_type               = "r5.xlarge"
+  instance_type               = "r6i.xlarge"
   ami                         = data.aws_ami.db_image.id
   monitoring                  = true
   associate_public_ip_address = false
