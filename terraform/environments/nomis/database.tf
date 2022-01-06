@@ -75,7 +75,7 @@ locals {
 }
 
 resource "aws_instance" "db_server" {
-  instance_type               = "r5.xlarge"
+  instance_type               = "r6i.xlarge"
   ami                         = data.aws_ami.db_image.id
   monitoring                  = true
   associate_public_ip_address = false
@@ -93,6 +93,7 @@ resource "aws_instance" "db_server" {
     delete_on_termination = true
     encrypted             = true
     volume_size           = 30
+    volume_type           = "gp3"
   }
 
   dynamic "ebs_block_device" {
