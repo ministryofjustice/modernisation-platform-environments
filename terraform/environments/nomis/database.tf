@@ -30,12 +30,12 @@ resource "aws_security_group" "db_server" {
   }
 
   egress {
-    description      = "allow all"
-    from_port        = 0
-    to_port          = 0
-    protocol         = "-1"
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
+    description = "allow all"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    #tfsec:ignore:AWS009
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   tags = merge(
@@ -75,7 +75,7 @@ locals {
 }
 
 resource "aws_instance" "db_server" {
-  instance_type               = "r5.xlarge"
+  instance_type               = "r6i.xlarge"
   ami                         = data.aws_ami.db_image.id
   monitoring                  = true
   associate_public_ip_address = false
@@ -85,11 +85,15 @@ resource "aws_instance" "db_server" {
   user_data                   = file("./templates/database_init.sh")
   vpc_security_group_ids      = [aws_security_group.db_server.id]
   key_name                    = aws_key_pair.ec2-user.key_name
-
+  metadata_options {
+    http_endpoint = "enabled"
+    http_tokens   = "required"
+  }
   root_block_device {
     delete_on_termination = true
     encrypted             = true
     volume_size           = 30
+    volume_type           = "gp3"
   }
 
   dynamic "ebs_block_device" {
@@ -119,10 +123,11 @@ resource "aws_instance" "db_server" {
   tags = merge(
     local.tags,
     {
-      Name      = "db-server-${local.application_name}"
-      component = "data"
-      os_type   = "Linux (RHEL 7.9)"
-      always_on = "false"
+      Name       = "db-server-${local.application_name}"
+      component  = "data"
+      os_type    = "Linux"
+      os_version = "RHEL 7.9"
+      always_on  = "false"
     }
   )
 }

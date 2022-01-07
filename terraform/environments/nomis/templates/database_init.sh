@@ -110,6 +110,11 @@ reconfigure_oracle_has() {
             ((i++))
         fi
         sqlplus -s / as sysasm <<< "alter diskgroup ORADATA resize all;"
+        if [[ -n "$(grep CNOMT1 /etc/oratab)" ]]; then
+            source oraenv <<< CNOMT1
+            srvctl add database -d CNOMT1 -o $ORACLE_HOME
+            srvctl start database -d CNOMT1
+        fi
 EOF
 
     # run the script as oracle user

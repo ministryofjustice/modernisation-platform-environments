@@ -54,6 +54,31 @@ resource "aws_security_group_rule" "app-inbound-all" {
 # }
 
 
+# resource "aws_security_group_rule" "app-from-database" {
+#   depends_on               = [aws_security_group.app-server]
+#   security_group_id        = aws_security_group.app-server.id
+#   type                     = "ingress"
+#   description              = "allow DTC traffic from DB"
+#   from_port                = 135
+#   to_port                  = 135
+#   protocol                 = "TCP"
+#   source_security_group_id = aws_security_group.database-server.id
+# }
+
+resource "aws_security_group_rule" "app-all-from-database" {
+  depends_on               = [aws_security_group.app-server]
+  security_group_id        = aws_security_group.app-server.id
+  type                     = "ingress"
+  description              = "allow all traffic from DB"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
+  source_security_group_id = aws_security_group.database-server.id
+}
+
+
+
+
 resource "aws_instance" "app-server" {
   depends_on                  = [aws_security_group.app-server]
   instance_type               = "t2.medium"

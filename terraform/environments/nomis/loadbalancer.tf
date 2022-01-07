@@ -25,13 +25,24 @@ resource "aws_security_group" "internal_elb" {
 
 resource "aws_security_group_rule" "internal_lb_ingress_1" {
 
-  description       = "allow 443 inbound from anywhere (limited by subnet ACL)"
+  description       = "allow 443 inbound from PTTP devices"
   security_group_id = aws_security_group.internal_elb.id
   type              = "ingress"
   from_port         = 443
   to_port           = 443
   protocol          = "tcp"
-  cidr_blocks       = ["0.0.0.0/0"]
+  cidr_blocks       = ["10.184.0.0/16"] # Global Protect PTTP devices
+}
+
+resource "aws_security_group_rule" "internal_lb_ingress_2" {
+
+  description              = "allow 443 inbound from Jump Server"
+  security_group_id        = aws_security_group.internal_elb.id
+  type                     = "ingress"
+  from_port                = 443
+  to_port                  = 443
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.jumpserver-windows.id
 }
 
 resource "aws_security_group_rule" "internal_lb_egress_1" {
@@ -46,13 +57,14 @@ resource "aws_security_group_rule" "internal_lb_egress_1" {
 }
 
 resource "aws_lb" "internal" {
-
+  #checkov:skip=CKV_AWS_91:skip "Ensure the ELBv2 (Application/Network) has access logging enabled"
   name                       = "lb-internal-${local.application_name}"
   internal                   = true
   load_balancer_type         = "application"
   security_groups            = [aws_security_group.internal_elb.id]
   subnets                    = data.aws_subnet_ids.private.ids
-  enable_deletion_protection = false
+  enable_deletion_protection = true
+  drop_invalid_header_fields = true
 
   tags = merge(
     local.tags,
@@ -66,7 +78,7 @@ resource "aws_lb_target_group" "weblogic" {
 
   name_prefix          = "wlogic"
   port                 = "7777" # port on which targets receive traffic
-  protocol             = "HTTP"
+  protocol             = "HTTPS"
   target_type          = "ip"
   deregistration_delay = "30"
   vpc_id               = local.vpc_id
@@ -102,7 +114,7 @@ resource "aws_lb_target_group" "weblogic" {
 
 resource "aws_lb_target_group_attachment" "weblogic" {
   target_group_arn = aws_lb_target_group.weblogic.arn
-  target_id        = "10.26.8.15"
+  target_id        = aws_instance.weblogic_server.private_ip
   port             = "7777"
 }
 
@@ -114,7 +126,7 @@ resource "aws_lb_listener" "internal" {
   load_balancer_arn = aws_lb.internal.arn
   port              = "443"
   protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  ssl_policy        = "ELBSecurityPolicy-TLS-1-2-2017-01"
   certificate_arn   = aws_acm_certificate.internal_lb.arn
 
   default_action {
