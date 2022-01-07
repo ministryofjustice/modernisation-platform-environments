@@ -186,7 +186,7 @@ resource "aws_ssm_document" "session_manager_settings" {
 
 resource "aws_ssm_document" "cloud_watch_agent" {
   name            = "InstallAndManageCloudWatchAgent"
-  document_type   = "Automation"
+  document_type   = "Command"
   document_format = "YAML"
   content         = file("./ssm-documents/install-and-manage-cwagent.yaml")
 
