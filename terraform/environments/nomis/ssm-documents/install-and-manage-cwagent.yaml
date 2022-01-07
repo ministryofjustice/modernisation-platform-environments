@@ -1,4 +1,4 @@
-schemaVersion: 2.2
+schemaVersion: "2.2"
 description: A composite document for installing and configuring the CloudWatch Agent.
 parameters:
   optionalConfigurationLocation:
