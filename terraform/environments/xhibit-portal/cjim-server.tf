@@ -19,27 +19,39 @@ resource "aws_security_group_rule" "cjim-outbound-all" {
   ipv6_cidr_blocks  = ["::/0"]
 }
 
-resource "aws_security_group_rule" "cjim-inbound-bastion" {
+resource "aws_security_group_rule" "cjim-inbound-all" {
   depends_on        = [aws_security_group.cjim-server]
   security_group_id = aws_security_group.cjim-server.id
   type              = "ingress"
-  description       = "allow bastion"
+  description       = "allow all"
   from_port         = 0
-  to_port           = 3389
-  protocol          = "TCP"
-  cidr_blocks       = ["${module.bastion_linux.bastion_private_ip}/32"]
+  to_port           = 0
+  protocol          = "-1"
+  cidr_blocks       = ["0.0.0.0/0"]
+  ipv6_cidr_blocks  = ["::/0"]
 }
 
-resource "aws_security_group_rule" "cjip-inbound-web" {
-  depends_on               = [aws_security_group.cjim-server]
-  security_group_id        = aws_security_group.cjim-server.id
-  type                     = "ingress"
-  description              = "allow web from cjip"
-  from_port                = 80
-  to_port                  = 80
-  protocol                 = "TCP"
-  source_security_group_id = aws_security_group.cjip-server.id
-}
+# resource "aws_security_group_rule" "cjim-inbound-bastion" {
+#   depends_on        = [aws_security_group.cjim-server]
+#   security_group_id = aws_security_group.cjim-server.id
+#   type              = "ingress"
+#   description       = "allow bastion"
+#   from_port         = 0
+#   to_port           = 3389
+#   protocol          = "TCP"
+#   cidr_blocks       = ["${module.bastion_linux.bastion_private_ip}/32"]
+# }
+
+# resource "aws_security_group_rule" "cjip-inbound-web" {
+#   depends_on               = [aws_security_group.cjim-server]
+#   security_group_id        = aws_security_group.cjim-server.id
+#   type                     = "ingress"
+#   description              = "allow web from cjip"
+#   from_port                = 80
+#   to_port                  = 80
+#   protocol                 = "TCP"
+#   source_security_group_id = aws_security_group.cjip-server.id
+# }
 
 
 resource "aws_instance" "cjim-server" {
