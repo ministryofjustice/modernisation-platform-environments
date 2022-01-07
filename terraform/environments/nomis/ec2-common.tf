@@ -185,10 +185,10 @@ resource "aws_ssm_document" "session_manager_settings" {
 #------------------------------------------------------------------------------
 
 resource "aws_ssm_document" "cloud_watch_agent" {
-  name          = "InstallAndManageCloudWatchAgent"
-  document_type = "Automation"
+  name            = "InstallAndManageCloudWatchAgent"
+  document_type   = "Automation"
   document_format = "YAML"
-  content = file("./ssm-documents/install-and-manage-cwagent.yaml")
+  content         = file("./ssm-documents/install-and-manage-cwagent.yaml")
 
   tags = merge(
     local.tags,
@@ -196,7 +196,7 @@ resource "aws_ssm_document" "cloud_watch_agent" {
       Name = "install-and-manage-cloud-watch-agent"
     },
   )
-} 
+}
 
 resource "aws_ssm_association" "manage_cloud_watch_agent_linux" {
   name             = aws_ssm_document.cloud_watch_agent.name
