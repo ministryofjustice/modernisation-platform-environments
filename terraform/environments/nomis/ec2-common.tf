@@ -209,7 +209,7 @@ resource "aws_ssm_association" "manage_cloud_watch_agent_linux" {
     values = ["Linux"]
   }
   apply_only_at_cron_interval = false
-  # schedule_expression = 
+  schedule_expression = "cron(0 7 ? * TUE *)"
 }
 
 resource "aws_ssm_parameter" "cloud_watch_config_linux" {
@@ -226,11 +226,10 @@ resource "aws_ssm_parameter" "cloud_watch_config_linux" {
   )
 }
 
-# do a schedule
-# config for windows
+# TODO: config for windows
 
 #------------------------------------------------------------------------------
-# SSM Agent - update System Manager Agent
+# SSM Agent - update Systems Manager Agent
 #------------------------------------------------------------------------------
 
 resource "aws_ssm_association" "update_ssm_agent" {
@@ -245,5 +244,5 @@ resource "aws_ssm_association" "update_ssm_agent" {
     values = ["Linux","Windows"]
   }
   apply_only_at_cron_interval = false
-  # schedule_expression = TODO once we have determined when machines will be on/off
+  schedule_expression = "cron(30 7 ? * TUE *)"
 }
