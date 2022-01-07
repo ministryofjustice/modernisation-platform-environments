@@ -209,7 +209,7 @@ resource "aws_ssm_association" "manage_cloud_watch_agent_linux" {
     values = ["Linux"]
   }
   apply_only_at_cron_interval = false
-  schedule_expression = "cron(0 7 ? * TUE *)"
+  schedule_expression         = "cron(0 7 ? * TUE *)"
 }
 
 resource "aws_ssm_parameter" "cloud_watch_config_linux" {
@@ -244,5 +244,5 @@ resource "aws_ssm_association" "update_ssm_agent" {
     values = ["Linux", "Windows"]
   }
   apply_only_at_cron_interval = false
-  schedule_expression = "cron(30 7 ? * TUE *)"
+  schedule_expression         = "cron(30 7 ? * TUE *)"
 }
