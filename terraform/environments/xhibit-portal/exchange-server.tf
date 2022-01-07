@@ -16,12 +16,21 @@ resource "aws_security_group" "exchange-server" {
   }
 
   ingress {
-    description = "SSH from Bastion"
-    from_port   = 3389
-    to_port     = 3389
-    protocol    = "TCP"
-    cidr_blocks = ["${module.bastion_linux.bastion_private_ip}/32"]
+    description      = "allow all"
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
   }
+
+  # ingress {
+  #   description = "SSH from Bastion"
+  #   from_port   = 3389
+  #   to_port     = 3389
+  #   protocol    = "TCP"
+  #   cidr_blocks = ["${module.bastion_linux.bastion_private_ip}/32"]
+  # }
 }
 
 
