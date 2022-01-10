@@ -18,16 +18,30 @@ resource "aws_security_group_rule" "database-outbound-all" {
   ipv6_cidr_blocks  = ["::/0"]
 }
 
-resource "aws_security_group_rule" "database-inbound-bastion" {
+resource "aws_security_group_rule" "database-inbound-all" {
   depends_on        = [aws_security_group.database-server]
   security_group_id = aws_security_group.database-server.id
   type              = "ingress"
-  description       = "allow bastion"
-  from_port         = 3389
-  to_port           = 3389
-  protocol          = "TCP"
-  cidr_blocks       = ["${module.bastion_linux.bastion_private_ip}/32"]
+  description       = "allow all"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  cidr_blocks       = ["0.0.0.0/0"]
+  ipv6_cidr_blocks  = ["::/0"]
 }
+
+
+# resource "aws_security_group_rule" "database-inbound-bastion" {
+#   depends_on        = [aws_security_group.database-server]
+#   security_group_id = aws_security_group.database-server.id
+#   type              = "ingress"
+#   description       = "allow bastion"
+#   from_port         = 3389
+#   to_port           = 3389
+#   protocol          = "TCP"
+#   cidr_blocks       = ["${module.bastion_linux.bastion_private_ip}/32"]
+# }
+
 
 # resource "aws_security_group_rule" "portal-to-sql" {
 #   depends_on               = [aws_security_group.database-server]
@@ -45,27 +59,27 @@ resource "aws_security_group_rule" "database-inbound-bastion" {
 
 # TODO check this with adam - go back over and reduce open ports
 
-resource "aws_security_group_rule" "all-cjim-to-sql" {
-  depends_on               = [aws_security_group.database-server]
-  security_group_id        = aws_security_group.database-server.id
-  type                     = "ingress"
-  description              = "allow all cjim to sql traffic"
-  from_port                = 0
-  to_port                  = 0
-  protocol                 = "-1"
-  source_security_group_id = aws_security_group.cjim-server.id
-}
+# resource "aws_security_group_rule" "all-cjim-to-sql" {
+#   depends_on               = [aws_security_group.database-server]
+#   security_group_id        = aws_security_group.database-server.id
+#   type                     = "ingress"
+#   description              = "allow all cjim to sql traffic"
+#   from_port                = 0
+#   to_port                  = 0
+#   protocol                 = "-1"
+#   source_security_group_id = aws_security_group.cjim-server.id
+# }
 
-resource "aws_security_group_rule" "all-app-to-sql" {
-  depends_on               = [aws_security_group.database-server]
-  security_group_id        = aws_security_group.database-server.id
-  type                     = "ingress"
-  description              = "allow all app to sql traffic"
-  from_port                = 0
-  to_port                  = 0
-  protocol                 = "-1"
-  source_security_group_id = aws_security_group.app-server.id
-}
+# resource "aws_security_group_rule" "all-app-to-sql" {
+#   depends_on               = [aws_security_group.database-server]
+#   security_group_id        = aws_security_group.database-server.id
+#   type                     = "ingress"
+#   description              = "allow all app to sql traffic"
+#   from_port                = 0
+#   to_port                  = 0
+#   protocol                 = "-1"
+#   source_security_group_id = aws_security_group.app-server.id
+# }
 
 resource "aws_security_group_rule" "all-portal-to-sql" {
   depends_on               = [aws_security_group.database-server]
@@ -78,6 +92,7 @@ resource "aws_security_group_rule" "all-portal-to-sql" {
   source_security_group_id = aws_security_group.portal-server.id
 }
 
+
 resource "aws_security_group_rule" "all-cjip-to-sql" {
   depends_on               = [aws_security_group.database-server]
   security_group_id        = aws_security_group.database-server.id
@@ -88,6 +103,7 @@ resource "aws_security_group_rule" "all-cjip-to-sql" {
   protocol                 = "-1"
   source_security_group_id = aws_security_group.cjip-server.id
 }
+
 
 # ----------------------------------------------------------
 
