@@ -220,6 +220,11 @@ data "aws_iam_policy_document" "packer_ssm_permissions" {
     actions   = ["iam:PassRole"]
     resources = [aws_iam_role.packer_ssm_role.arn]
   }
+  statement {
+    effect    = "Allow"
+    actions   = ["ssm:GetParameters"]
+    resources = ["arn:aws:ssm:eu-west-2::document/AWS-StartPortForwardingSession"]
+  }
 }
 
 # some extra permissions required for Ansible ec2 module
