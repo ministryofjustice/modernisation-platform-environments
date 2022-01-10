@@ -222,8 +222,8 @@ data "aws_iam_policy_document" "packer_ssm_permissions" {
   }
   statement {
     effect    = "Allow"
-    actions   = ["ssm:GetParameters"]
-    resources = ["arn:aws:ssm:eu-west-2::document/AWS-StartPortForwardingSession"]
+    actions   = ["ssm:GetParameter"]
+    resources = ["*"]
   }
 }
 
