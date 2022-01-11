@@ -153,7 +153,7 @@ resource "aws_ebs_volume" "launch_device" {
 # }
 
 resource "aws_volume_attachment" "launch_device" {
-  for_each = aws_ebs_volume.launch_devices
+  for_each = aws_ebs_volume.launch_device
 
   device_name = each.key
   volume_id   = each.value.id
