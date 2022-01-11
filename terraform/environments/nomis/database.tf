@@ -102,7 +102,7 @@ resource "aws_instance" "db_server" {
     iterator = device
     content {
       device_name = device.value.device_name
-      no_device = true
+      no_device   = true
     }
   }
 
@@ -131,14 +131,14 @@ resource "aws_instance" "db_server" {
 }
 
 resource "aws_ebs_volume" "launch_device" {
-  for_each = {for bdm in data.aws_ami.db_image.block_device_mappings : bdm.device_name => bdm if bdm.device_name != data.aws_ami.db_image.root_device_name}
+  for_each = { for bdm in data.aws_ami.db_image.block_device_mappings : bdm.device_name => bdm if bdm.device_name != data.aws_ami.db_image.root_device_name }
 
   availability_zone = "${local.region}a"
   encrypted         = true
-  iops        = each.value["ebs"]["iops"]
-  snapshot_id = each.value["ebs"]["snapshot_id"]
-  size = lookup(local.volume_size, each.value["device_name"], each.value["ebs"]["volume_size"])
-  type = each.value["ebs"]["volume_type"]
+  iops              = each.value["ebs"]["iops"]
+  snapshot_id       = each.value["ebs"]["snapshot_id"]
+  size              = lookup(local.volume_size, each.value["device_name"], each.value["ebs"]["volume_size"])
+  type              = each.value["ebs"]["volume_type"]
 
   tags = merge(
     local.tags,
