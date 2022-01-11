@@ -29,10 +29,10 @@ data "aws_ami" "weblogic_image" {
 resource "aws_instance" "weblogic_server" {
   #checkov:skip=CKV_AWS_135:skip "Ensure that EC2 is EBS optimized" as not supported by t2 instances.
   # t2 was chosen as t3 does not support RHEL 6.10. Review next time instance type is changed.
-  instance_type               = "t2.medium"
+  instance_type               = var.weblogic_instance_type
   ami                         = data.aws_ami.weblogic_image.id
   associate_public_ip_address = false
-  iam_instance_profile        = instance_profile_id
+  iam_instance_profile        = var.instance_profile_id
   monitoring                  = false
   vpc_security_group_ids      = [var.weblogic_common_security_group_id]
   subnet_id                   = data.aws_subnet.private_az_a.id
@@ -54,16 +54,18 @@ resource "aws_instance" "weblogic_server" {
     for_each = [for bdm in data.aws_ami.weblogic_image.block_device_mappings : bdm if bdm.device_name != data.aws_ami.weblogic_image.root_device_name]
     iterator = device
     content {
-      device_name = device.value["device_name"]
-      iops        = device.value["ebs"]["iops"]
-      snapshot_id = device.value["ebs"]["snapshot_id"]
-      volume_size = lookup(var.weblogic_drive_map, device.value["device_name"], device.value["ebs"]["volume_size"])
-      volume_type = device.value["ebs"]["volume_type"]
+      device_name           = device.value["device_name"]
+      delete_on_termination = true
+      encrypted             = true
+      iops                  = device.value["ebs"]["iops"]
+      snapshot_id           = device.value["ebs"]["snapshot_id"]
+      volume_size           = lookup(var.weblogic_drive_map, device.value["device_name"], device.value["ebs"]["volume_size"])
+      volume_type           = device.value["ebs"]["volume_type"]
     }
   }
 
   tags = merge(
-    var.tags_common,
+    var.tags,
     {
       Name       = "weblogic-${var.stack_name}"
       component  = "application"

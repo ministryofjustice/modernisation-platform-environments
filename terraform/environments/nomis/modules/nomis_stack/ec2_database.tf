@@ -12,14 +12,14 @@ resource "aws_security_group" "db_server" {
     from_port       = "22"
     to_port         = "22"
     protocol        = "TCP"
-    security_groups = [module.bastion_linux.bastion_security_group]
+    security_groups = [var.bastion_security_group]
   }
 
   ingress {
-    description     = "DB access from weblogic (private subnet)"
-    from_port       = "1521"
-    to_port         = "1521"
-    protocol        = "TCP"
+    description = "DB access from weblogic (private subnet)"
+    from_port   = "1521"
+    to_port     = "1521"
+    protocol    = "TCP"
     cidr_blocks = ["${aws_instance.weblogic_server.private_ip}/32"]
   }
 
@@ -33,7 +33,7 @@ resource "aws_security_group" "db_server" {
   }
 
   tags = merge(
-    var.tags_common,
+    var.tags,
     {
       Name = "database-${var.stack_name}"
     }
@@ -60,14 +60,14 @@ data "aws_ami" "db_image" {
 
 resource "aws_instance" "db_server" {
   # tflint-ignore: aws_instance_invalid_type
-  instance_type               = "r6i.xlarge"
+  instance_type               = var.database_instance_type
   ami                         = data.aws_ami.db_image.id
   monitoring                  = true
   associate_public_ip_address = false
   iam_instance_profile        = var.instance_profile_id
   ebs_optimized               = true
   subnet_id                   = data.aws_subnet.data_az_a.id
-  user_data                   = file("./user_data/database_init.sh")
+  user_data                   = file("${path.module}/user_data/database_init.sh")
   vpc_security_group_ids      = [aws_security_group.db_server.id]
   key_name                    = var.key_name
   metadata_options {
@@ -85,11 +85,13 @@ resource "aws_instance" "db_server" {
     for_each = [for bdm in data.aws_ami.db_image.block_device_mappings : bdm if bdm.device_name != data.aws_ami.db_image.root_device_name]
     iterator = device
     content {
-      device_name = device.value["device_name"]
-      iops        = device.value["ebs"]["iops"]
-      snapshot_id = device.value["ebs"]["snapshot_id"]
-      volume_size = lookup(var.database_drive_map, device.value["device_name"], device.value["ebs"]["volume_size"])
-      volume_type = device.value["ebs"]["volume_type"]
+      device_name           = device.value["device_name"]
+      delete_on_termination = true
+      encrypted             = true
+      iops                  = device.value["ebs"]["iops"]
+      snapshot_id           = device.value["ebs"]["snapshot_id"]
+      volume_size           = lookup(var.database_drive_map, device.value["device_name"], device.value["ebs"]["volume_size"])
+      volume_type           = device.value["ebs"]["volume_type"]
     }
   }
 
@@ -106,7 +108,7 @@ resource "aws_instance" "db_server" {
   }
 
   tags = merge(
-    var.tags_common,
+    var.tags,
     {
       Name       = "database-${var.stack_name}"
       component  = "data"
@@ -124,7 +126,7 @@ resource "aws_instance" "db_server" {
 resource "aws_route53_record" "database" {
   provider = aws.core-vpc
 
-  zone_id = data.aws_route53_zone.internal.zone_id / this
+  zone_id = data.aws_route53_zone.internal.zone_id
   name    = "database-${var.stack_name}.${var.application_name}.${var.business_unit}-${var.environment}.modernisation-platform.internal"
   type    = "A"
   ttl     = "60"

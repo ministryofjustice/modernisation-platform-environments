@@ -53,7 +53,7 @@ resource "aws_security_group_rule" "internal_lb_egress_1" {
   from_port                = 7777
   to_port                  = 7777
   protocol                 = "tcp"
-  source_security_group_id = aws_security_group.weblogic_server.id
+  source_security_group_id = aws_security_group.weblogic_common.id
 }
 
 resource "aws_lb" "internal" {
@@ -86,7 +86,7 @@ resource "aws_lb_listener" "internal" {
   certificate_arn   = aws_acm_certificate.internal_lb.arn
 
   default_action {
-    type             = "fixed-response"
+    type = "fixed-response"
     fixed_response {
       content_type = "text/plain"
       message_body = "Fixed response content"

@@ -29,7 +29,7 @@ resource "aws_lb_target_group" "weblogic" {
   # }
 
   tags = merge(
-    local.tags,
+    var.tags,
     {
       Name = "weblogic-${var.stack_name}-tg"
     },
@@ -44,21 +44,12 @@ resource "aws_lb_target_group_attachment" "weblogic" {
 
 resource "aws_lb_listener_rule" "weblogic" {
   listener_arn = var.load_balancer_listener_arn
-  priority     = 99
+  priority     = 100
 
   action {
-    type = "forward"
-    forward {
-      target_group {
-        arn    = aws_lb_target_group.weblogic.arn
-      }
-      # stickiness {
-      #   enabled  = true
-      #   duration = 600
-      # }
-    }
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.weblogic.arn
   }
-
   condition {
     host_header {
       values = ["${var.application_name}-${var.stack_name}.${var.business_unit}-${var.environment}.modernisation-platform.service.justice.gov.uk"]

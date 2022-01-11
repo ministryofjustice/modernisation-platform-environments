@@ -10,9 +10,6 @@
                     "weblogic_ami_name": "nomis_app-2021-09-20*",
                     "weblogic_ami_owner": "self"                   
 
-                },
-                "T2":{
-
                 }
             }
         }

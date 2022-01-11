@@ -3,25 +3,32 @@
 #------------------------------------------------------------------------------
 
 module "nomis_stack" {
-  source = "modules/nomis_stack"
+  source = "./modules/nomis_stack"
+
+  providers = {
+    aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
+  }
+
   for_each = local.application_data.accounts[local.environment].stacks
 
-  stack_name = each.key
-  database_ami_name = each.database_ami_name
-  database_ami_owner = each.database_ami_owner
-  weblogic_ami_name = each.weblogic_ami_name
-  weblogic_ami_owner = each.weblogic_ami_owner
+  stack_name                        = each.key
+  database_ami_name                 = each.value.database_ami_name
+  database_ami_owner                = each.value.database_ami_owner
+  weblogic_ami_name                 = each.value.weblogic_ami_name
+  weblogic_ami_owner                = each.value.weblogic_ami_owner
   weblogic_common_security_group_id = aws_security_group.weblogic_common.id
 
-  instance_profile_id = aws_iam_instance_profile.ec2_common_profile.id
-  key_name = aws_key_pair.ec2-user.key_name
+  bastion_security_group     = module.bastion_linux.bastion_security_group
+  instance_profile_id        = aws_iam_instance_profile.ec2_common_profile.id
+  key_name                   = aws_key_pair.ec2-user.key_name
   load_balancer_listener_arn = aws_lb_listener.internal.arn
 
   application_name = local.application_name
-  business_unit = local.vpc_name
-  environment = local.environment
-  region = local.region
-  subnet_set = local.subnet_set 
+  business_unit    = local.vpc_name
+  environment      = local.environment
+  region           = local.region
+  tags             = local.tags
+  subnet_set       = local.subnet_set
 }
 
 #------------------------------------------------------------------------------

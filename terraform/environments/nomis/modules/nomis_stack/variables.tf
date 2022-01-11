@@ -7,6 +7,11 @@ variable "application_name" {
   }
 }
 
+variable "bastion_security_group" {
+  type        = string
+  description = "Security group of Bastion instance that can be used to connect to the database instance"
+}
+
 variable "business_unit" {
   type        = string
   description = "Fixed variable to specify business-unit for RAM shared subnets"
@@ -23,14 +28,8 @@ variable "database_ami_owner" {
 }
 
 variable "database_drive_map" {
-  type = map({
-    "/dev/sdb" = number # /u01
-    "/dev/sdc" = number # /u02
-    "/dev/sde" = number # /ORADATA01
-    "/dev/sdf" = number # /ORADATA02
-    "/dev/sds" = number # /swap
-  })
-  description = "the size of the ebs volumes (GiB) attached to the database instance"
+  type        = map(any)
+  description = "The size of the non-root ebs volumes (GiB) attached to the database instance.  The keys must match the block device names the AMI launches with"
   default = {
     "/dev/sdb" = 100
     "/dev/sdc" = 100
@@ -38,6 +37,12 @@ variable "database_drive_map" {
     "/dev/sdf" = 100
     "/dev/sds" = 16
   }
+}
+
+variable "database_instance_type" {
+  type        = string
+  description = "ec2 instance type to use for the database"
+  default     = "r6i.xlarge"
 }
 
 variable "environment" {
@@ -70,13 +75,18 @@ variable "stack_name" {
   description = "provide a unique name"
   validation {
     condition     = length(var.stack_name) < 6
-    error_message = "The stack_name variable must be 5 characters or fewer"
+    error_message = "The stack_name variable must be 5 characters or fewer."
   }
 }
 
 variable "subnet_set" {
   type        = string
   description = "Fixed variable to specify subnet-set for RAM shared subnets"
+}
+
+variable "tags" {
+  type        = map(any)
+  description = "Default tags to be applied to resources"
 }
 
 variable "weblogic_ami_name" {
@@ -95,11 +105,15 @@ variable "weblogic_common_security_group_id" {
 }
 
 variable "weblogic_drive_map" {
-  type = map({
-    "/dev/sdb" = number
-  })
+  type        = map(any)
   description = "the size of the ebs volumes (GiB) attached to the weblogic instance"
   default = {
     "/dev/sdb" = 200
   }
+}
+
+variable "weblogic_instance_type" {
+  type        = string
+  description = "ec2 instance type to use for the database"
+  default     = "t2.medium"
 }
