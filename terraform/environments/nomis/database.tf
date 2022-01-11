@@ -148,10 +148,6 @@ resource "aws_ebs_volume" "launch_device" {
   )
 }
 
-# locals {
-#   ebs_launch_device_names = 
-# }
-
 resource "aws_volume_attachment" "launch_device" {
   for_each = aws_ebs_volume.launch_device
 
