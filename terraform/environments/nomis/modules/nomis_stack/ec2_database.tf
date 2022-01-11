@@ -1,17 +1,11 @@
 #------------------------------------------------------------------------------
-# Networking and Security Groups
+# Security Group
 #------------------------------------------------------------------------------
-data "aws_subnet" "data_az_a" {
-  vpc_id = local.vpc_id
-  tags = {
-    Name = "${local.vpc_name}-${local.environment}-${local.subnet_set}-data-${local.region}a"
-  }
-}
 
 resource "aws_security_group" "db_server" {
   description = "Configure Oracle database access"
-  name        = "db-server-${local.application_name}"
-  vpc_id      = local.vpc_id
+  name        = "database-${var.stack_name}"
+  vpc_id      = data.aws_vpc.shared_vpc.id
 
   ingress {
     description     = "SSH from Bastion"
@@ -26,7 +20,7 @@ resource "aws_security_group" "db_server" {
     from_port       = "1521"
     to_port         = "1521"
     protocol        = "TCP"
-    security_groups = [aws_security_group.weblogic_server.id]
+    cidr_blocks = ["${aws_instance.weblogic_server.private_ip}/32"]
   }
 
   egress {
@@ -39,9 +33,9 @@ resource "aws_security_group" "db_server" {
   }
 
   tags = merge(
-    local.tags,
+    var.tags_common,
     {
-      Name = "db-server-${local.application_name}"
+      Name = "database-${var.stack_name}"
     }
   )
 }
@@ -51,26 +45,16 @@ resource "aws_security_group" "db_server" {
 #------------------------------------------------------------------------------
 data "aws_ami" "db_image" {
   most_recent = true
-  owners      = ["self"]
+  owners      = [var.database_ami_owner]
 
   filter {
     name   = "name"
-    values = [local.application_data.accounts[local.environment].database_ami_name]
+    values = [var.database_ami_name]
   }
 
   filter {
     name   = "virtualization-type"
     values = ["hvm"]
-  }
-}
-
-locals {
-  volume_size = {
-    "/dev/sdb" = 100,
-    "/dev/sdc" = 100,
-    "/dev/sde" = 100,
-    "/dev/sdf" = 100,
-    "/dev/sds" = 16
   }
 }
 
@@ -80,12 +64,12 @@ resource "aws_instance" "db_server" {
   ami                         = data.aws_ami.db_image.id
   monitoring                  = true
   associate_public_ip_address = false
-  iam_instance_profile        = aws_iam_instance_profile.ec2_common_profile.id
+  iam_instance_profile        = var.instance_profile_id
   ebs_optimized               = true
   subnet_id                   = data.aws_subnet.data_az_a.id
-  user_data                   = file("./templates/database_init.sh")
+  user_data                   = file("./user_data/database_init.sh")
   vpc_security_group_ids      = [aws_security_group.db_server.id]
-  key_name                    = aws_key_pair.ec2-user.key_name
+  key_name                    = var.key_name
   metadata_options {
     http_endpoint = "enabled"
     http_tokens   = "required"
@@ -104,7 +88,7 @@ resource "aws_instance" "db_server" {
       device_name = device.value["device_name"]
       iops        = device.value["ebs"]["iops"]
       snapshot_id = device.value["ebs"]["snapshot_id"]
-      volume_size = lookup(local.volume_size, device.value["device_name"], device.value["ebs"]["volume_size"])
+      volume_size = lookup(var.database_drive_map, device.value["device_name"], device.value["ebs"]["volume_size"])
       volume_type = device.value["ebs"]["volume_type"]
     }
   }
@@ -122,9 +106,9 @@ resource "aws_instance" "db_server" {
   }
 
   tags = merge(
-    local.tags,
+    var.tags_common,
     {
-      Name       = "db-server-${local.application_name}"
+      Name       = "database-${var.stack_name}"
       component  = "data"
       os_type    = "Linux"
       os_version = "RHEL 7.9"
@@ -136,11 +120,12 @@ resource "aws_instance" "db_server" {
 #------------------------------------------------------------------------------
 # Route 53 record
 #------------------------------------------------------------------------------
+
 resource "aws_route53_record" "database" {
   provider = aws.core-vpc
 
-  zone_id = data.aws_route53_zone.internal.zone_id
-  name    = "database.${local.application_name}.${local.vpc_name}-${local.environment}.modernisation-platform.internal"
+  zone_id = data.aws_route53_zone.internal.zone_id / this
+  name    = "database-${var.stack_name}.${var.application_name}.${var.business_unit}-${var.environment}.modernisation-platform.internal"
   type    = "A"
   ttl     = "60"
   records = [aws_instance.db_server.private_ip]
