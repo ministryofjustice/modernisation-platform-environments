@@ -19,17 +19,17 @@ variable "business_unit" {
 
 variable "database_ami_name" {
   type        = string
-  description = "name of AMI to be used to launch the database ec2 instance"
+  description = "Name of AMI to be used to launch the database ec2 instance"
 }
 
 variable "database_ami_owner" {
   type        = string
-  description = "name of AMI to be used to launch the database ec2 instance"
+  description = "Name of AMI to be used to launch the database ec2 instance"
 }
 
 variable "database_drive_map" {
   type        = map(any)
-  description = "The size of the non-root ebs volumes (GiB) attached to the database instance.  The keys must match the block device names the AMI launches with"
+  description = "The size of the non-root ebs volumes (GiB) attached to the database instance.  Note this is only relevant for re-sizing those volumes which form part of the AMI block device mappings.  The keys must match the block device names the AMI launches with"
   default = {
     "/dev/sdb" = 100
     "/dev/sdc" = 100
@@ -37,6 +37,19 @@ variable "database_drive_map" {
     "/dev/sdf" = 100
     "/dev/sds" = 16
   }
+}
+
+variable "database_extra_ingress_rules" {
+  type = list(object({
+    description     = string
+    from_port       = string
+    to_port         = string
+    protocol        = string
+    security_groups = list(string)
+    cidr_blocks     = list(string)
+  }))
+  description = "ec2 instance type to use for the database"
+  default     = []
 }
 
 variable "database_instance_type" {
@@ -47,7 +60,7 @@ variable "database_instance_type" {
 
 variable "environment" {
   type        = string
-  description = "application environment"
+  description = "Application environment - i.e. the terraform workspace"
 }
 
 variable "instance_profile_id" {
@@ -57,7 +70,7 @@ variable "instance_profile_id" {
 
 variable "key_name" {
   type        = string
-  description = "name of ssh key resource for ec2-user"
+  description = "Name of ssh key resource for ec2-user"
 }
 
 variable "load_balancer_listener_arn" {
@@ -67,12 +80,13 @@ variable "load_balancer_listener_arn" {
 
 variable "region" {
   type        = string
-  description = ""
+  description = "The AWS region in which to deploy the resources"
+  default     = "eu-west-2"
 }
 
 variable "stack_name" {
   type        = string
-  description = "provide a unique name"
+  description = "Provide a unique name for the stack"
   validation {
     condition     = length(var.stack_name) < 6
     error_message = "The stack_name variable must be 5 characters or fewer."
@@ -91,25 +105,23 @@ variable "tags" {
 
 variable "weblogic_ami_name" {
   type        = string
-  description = "name of AMI to be used to launch the weblogic ec2 instance"
+  description = "Name of AMI to be used to launch the weblogic ec2 instance"
 }
 
 variable "weblogic_ami_owner" {
   type        = string
-  description = "name of AMI to be used to launch the weblogic ec2 instance"
+  description = "Name of AMI to be used to launch the weblogic ec2 instance"
 }
 
 variable "weblogic_common_security_group_id" {
   type        = string
-  description = "common security group used by all weblogic instances"
+  description = "Common security group used by all weblogic instances"
 }
 
 variable "weblogic_drive_map" {
   type        = map(any)
-  description = "the size of the ebs volumes (GiB) attached to the weblogic instance"
-  default = {
-    "/dev/sdb" = 200
-  }
+  description = "The size of the ebs volumes (GiB) attached to the weblogic instance. Note this is only relevant for re-sizing those volumes which form part of the AMI block device mappings. The keys must match the block device names the AMI launches with"
+  default     = {}
 }
 
 variable "weblogic_instance_type" {

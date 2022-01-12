@@ -2,11 +2,23 @@
 # Security Group
 #------------------------------------------------------------------------------
 
-resource "aws_security_group" "db_server" {
+resource "aws_security_group" "database_server" {
   description = "Configure Oracle database access"
   name        = "database-${var.stack_name}"
   vpc_id      = data.aws_vpc.shared_vpc.id
 
+  dynamic "ingress" { # extra ingress rules that might be specified
+    for_each = var.database_extra_ingress_rules
+    iterator = rule
+    content {
+      description     = rule.value.description
+      from_port       = rule.value.from_port
+      to_port         = rule.value.to_port
+      protocol        = rule.value.protocol
+      security_groups = rule.value.security_groups
+      cidr_blocks     = rule.value.cidr_blocks
+    }
+  }
   ingress {
     description     = "SSH from Bastion"
     from_port       = "22"
@@ -43,7 +55,7 @@ resource "aws_security_group" "db_server" {
 #------------------------------------------------------------------------------
 # AMI and EC2
 #------------------------------------------------------------------------------
-data "aws_ami" "db_image" {
+data "aws_ami" "database_image" {
   most_recent = true
   owners      = [var.database_ami_owner]
 
@@ -58,17 +70,21 @@ data "aws_ami" "db_image" {
   }
 }
 
-resource "aws_instance" "db_server" {
+locals {
+  database_root_device_size = one([for bdm in data.aws_ami.weblogic_image.block_device_mappings : bdm.ebs.volume_size if bdm.device_name == data.aws_ami.database_image.root_device_name])
+}
+
+resource "aws_instance" "database_server" {
   # tflint-ignore: aws_instance_invalid_type
   instance_type               = var.database_instance_type
-  ami                         = data.aws_ami.db_image.id
+  ami                         = data.aws_ami.database_image.id
   monitoring                  = true
   associate_public_ip_address = false
   iam_instance_profile        = var.instance_profile_id
   ebs_optimized               = true
   subnet_id                   = data.aws_subnet.data_az_a.id
   user_data                   = file("${path.module}/user_data/database_init.sh")
-  vpc_security_group_ids      = [aws_security_group.db_server.id]
+  vpc_security_group_ids      = [aws_security_group.database_server.id]
   key_name                    = var.key_name
   metadata_options {
     http_endpoint = "enabled"
@@ -77,21 +93,15 @@ resource "aws_instance" "db_server" {
   root_block_device {
     delete_on_termination = true
     encrypted             = true
-    volume_size           = 30
+    volume_size           = lookup(var.database_drive_map, data.aws_ami.database_image.root_device_name, local.database_root_device_size)
     volume_type           = "gp3"
   }
-
-  dynamic "ebs_block_device" {
-    for_each = [for bdm in data.aws_ami.db_image.block_device_mappings : bdm if bdm.device_name != data.aws_ami.db_image.root_device_name]
+  dynamic "ephemeral_block_device" { # block devices specified inline cannot be resized later so we need to make sure they are not mounted here
+    for_each = [for bdm in data.aws_ami.database_image.block_device_mappings : bdm if bdm.device_name != data.aws_ami.database_image.root_device_name]
     iterator = device
     content {
-      device_name           = device.value["device_name"]
-      delete_on_termination = true
-      encrypted             = true
-      iops                  = device.value["ebs"]["iops"]
-      snapshot_id           = device.value["ebs"]["snapshot_id"]
-      volume_size           = lookup(var.database_drive_map, device.value["device_name"], device.value["ebs"]["volume_size"])
-      volume_type           = device.value["ebs"]["volume_type"]
+      device_name = device.value.device_name
+      no_device   = true
     }
   }
 
@@ -119,6 +129,32 @@ resource "aws_instance" "db_server" {
   )
 }
 
+resource "aws_ebs_volume" "database_server_ami_volume" {
+  for_each = { for bdm in data.aws_ami.database_image.block_device_mappings : bdm.device_name => bdm if bdm.device_name != data.aws_ami.database_image.root_device_name }
+
+  availability_zone = "${var.region}a"
+  encrypted         = true
+  iops              = each.value["ebs"]["iops"]
+  snapshot_id       = each.value["ebs"]["snapshot_id"]
+  size              = lookup(var.database_drive_map, each.value["device_name"], each.value["ebs"]["volume_size"])
+  type              = each.value["ebs"]["volume_type"]
+
+  tags = merge(
+    var.tags,
+    {
+      Name = "database-${var.stack_name}-${each.value.device_name}"
+    }
+  )
+}
+
+resource "aws_volume_attachment" "database_server_ami_volume" {
+  for_each = aws_ebs_volume.database_server_ami_volume
+
+  device_name = each.key
+  volume_id   = each.value.id
+  instance_id = aws_instance.database_server.id
+}
+
 #------------------------------------------------------------------------------
 # Route 53 record
 #------------------------------------------------------------------------------
@@ -130,5 +166,5 @@ resource "aws_route53_record" "database" {
   name    = "database-${var.stack_name}.${var.application_name}.${var.business_unit}-${var.environment}.modernisation-platform.internal"
   type    = "A"
   ttl     = "60"
-  records = [aws_instance.db_server.private_ip]
+  records = [aws_instance.database_server.private_ip]
 }
