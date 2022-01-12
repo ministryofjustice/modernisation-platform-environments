@@ -75,6 +75,7 @@ locals {
 }
 
 resource "aws_instance" "db_server" {
+  # tflint-ignore: aws_instance_invalid_type
   instance_type               = "r6i.xlarge"
   ami                         = data.aws_ami.db_image.id
   monitoring                  = true
