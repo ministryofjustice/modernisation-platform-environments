@@ -184,40 +184,32 @@ resource "aws_ssm_document" "session_manager_settings" {
 # Cloud Watch Agent
 #------------------------------------------------------------------------------
 
-resource "aws_ssm_association" "cloud_watch_agent" {
-  name             = "AWS-ConfigureAWSPackage"
-  association_name = "install-cloud-watch-agent"
-  parameters = {
-    action = "Install"
-    name   = "AmazonCloudWatchAgent"
-  }
-  targets {
-    key = "InstanceIds"
-    values = [
-      aws_instance.db_server.id,
-      aws_instance.weblogic_server.id
-    ]
-  }
-  apply_only_at_cron_interval = false
-  # schedule_expression = 
+resource "aws_ssm_document" "cloud_watch_agent" {
+  name            = "InstallAndManageCloudWatchAgent"
+  document_type   = "Command"
+  document_format = "YAML"
+  content         = file("./ssm-documents/install-and-manage-cwagent.yaml")
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "install-and-manage-cloud-watch-agent"
+    },
+  )
 }
 
 resource "aws_ssm_association" "manage_cloud_watch_agent_linux" {
-  name             = "AmazonCloudWatch-ManageAgent"
+  name             = aws_ssm_document.cloud_watch_agent.name
   association_name = "manage-cloud-watch-agent"
-  parameters = {
-    action                        = "configure"
-    mode                          = "ec2"
-    optionalConfigurationSource   = "ssm"
+  parameters = { # name of ssm parameter containing cloud watch agent config file
     optionalConfigurationLocation = aws_ssm_parameter.cloud_watch_config_linux.name
-    optionalRestart               = "yes"
   }
   targets {
     key    = "tag:os_type"
     values = ["Linux"]
   }
   apply_only_at_cron_interval = false
-  # schedule_expression = 
+  schedule_expression         = "cron(0 7 ? * TUE *)"
 }
 
 resource "aws_ssm_parameter" "cloud_watch_config_linux" {
@@ -234,6 +226,23 @@ resource "aws_ssm_parameter" "cloud_watch_config_linux" {
   )
 }
 
-# do a schedule
-# config for windows
-# add one for ssm-agent updates??
+# TODO: config for windows
+
+#------------------------------------------------------------------------------
+# SSM Agent - update Systems Manager Agent
+#------------------------------------------------------------------------------
+
+resource "aws_ssm_association" "update_ssm_agent" {
+  name             = "AWS-UpdateSSMAgent" # this is an AWS provided document
+  association_name = "update-ssm-agent"
+  parameters = {
+    allowDowngrade = "false"
+  }
+  targets {
+    # we could just target all instances, but this would also include the bastion, which gets rebuilt everyday
+    key    = "tag:os_type"
+    values = ["Linux", "Windows"]
+  }
+  apply_only_at_cron_interval = false
+  schedule_expression         = "cron(30 7 ? * TUE *)"
+}
