@@ -3,9 +3,10 @@
 # Security Group
 #------------------------------------------------------------------------------
 
-# The security group will be common across all weblogic instances.  Since they
-# will be accessed from a single jumpserver.  Also it makes it easier to manage
-# the loadbalancer egress rules if there is a single security group.
+# The security group will be common across all weblogic instances so it is
+# defined outside of this module. (it is envisaged that they will be accessed
+# from a single jumpserver.  Also it makes it easier to manage the loadbalancer
+# egress rules if there is a single security group.)
 
 #------------------------------------------------------------------------------
 # AMI and EC2

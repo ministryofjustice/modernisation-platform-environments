@@ -1,6 +1,7 @@
 variable "application_name" {
   type        = string
-  description = "Name of application"
+  description = "The name of the application.  This will be name of the environment in Modernisation Platform"
+  default = "nomis"
   validation {
     condition     = can(regex("^[A-Za-z0-9][A-Za-z0-9-.]{1,61}[A-Za-z0-9]$", var.application_name))
     error_message = "Invalid name for application supplied in variable app_name."
@@ -14,7 +15,8 @@ variable "bastion_security_group" {
 
 variable "business_unit" {
   type        = string
-  description = "Fixed variable to specify business-unit for RAM shared subnets"
+  description = "This corresponds to the VPC in which the application resides"
+  default = "hmpps"
 }
 
 variable "database_ami_name" {
@@ -49,7 +51,7 @@ variable "database_extra_ingress_rules" {
     security_groups = list(string)
     cidr_blocks     = list(string)
   }))
-  description = "ec2 instance type to use for the database"
+  description = "A list of extra ingress rules to be added to the database security group"
   default     = []
 }
 
