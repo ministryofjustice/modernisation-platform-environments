@@ -21,6 +21,7 @@ hugepages() {
     local pages_created=$(awk '/^HugePages_Total/ {print $2}' /proc/meminfo)
 
     # repeat if necessary, wait up to 5 minutes
+    local i=0
     while [[ "$i" -lt 5 ]]; do
         if [[ "$pages_created" -ge "$pages" ]]; then
             break
@@ -66,6 +67,9 @@ disks() {
         echo "resizing device ${item}"
         parted --script "${item}" resizepart 1 100%
     done
+
+    # rescan oracle asm disks as they don't always appear on first launch of instance
+    oracleasm scandisks
 }
 
 reconfigure_oracle_has() {
@@ -99,6 +103,7 @@ reconfigure_oracle_has() {
         asm_status=$(srvctl status asm | grep "ASM is running")
         while [[ "$i" -le 10 ]]; do
             if [[ -n "$asm_status" ]]; then
+                asmcmd mount ORADATA
                 sqlplus -s / as sysasm <<< "alter diskgroup ORADATA resize all;"
                 if [[ -n "$(grep CNOMT1 /etc/oratab)" ]]; then
                     source oraenv <<< CNOMT1
@@ -114,7 +119,7 @@ reconfigure_oracle_has() {
             sleep 30
             asm_status=$(srvctl status asm | grep "ASM is running")
             ((i++))
-        done   
+        done
 EOF
 
     # run the script as oracle user
