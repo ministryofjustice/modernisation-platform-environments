@@ -6,7 +6,6 @@
             "stacks": {
                 "T1": {
                     "database_ami_name": "nomis_db_CNOMT1*",
-                    "database_ami_owner": "self",
                     "database_extra_ingress_rules": [
                         {
                             "description"     : "a test rule",
@@ -17,8 +16,7 @@
                             "cidr_blocks" : ["192.168.1.1/32","192.168.1.2/32"]
                         }
                     ],
-                    "weblogic_ami_name": "nomis_app-2021-09-20*",
-                    "weblogic_ami_owner": "self"                 
+                    "weblogic_ami_name": "nomis_app-2021-09-20*"          
                 }
             }
         }

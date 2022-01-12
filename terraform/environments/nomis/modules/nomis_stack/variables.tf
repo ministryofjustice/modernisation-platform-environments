@@ -25,6 +25,7 @@ variable "database_ami_name" {
 variable "database_ami_owner" {
   type        = string
   description = "Name of AMI to be used to launch the database ec2 instance"
+  default = "self"
 }
 
 variable "database_drive_map" {
@@ -111,6 +112,7 @@ variable "weblogic_ami_name" {
 variable "weblogic_ami_owner" {
   type        = string
   description = "Name of AMI to be used to launch the weblogic ec2 instance"
+  default = "self"
 }
 
 variable "weblogic_common_security_group_id" {

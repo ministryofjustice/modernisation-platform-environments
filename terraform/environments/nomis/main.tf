@@ -13,10 +13,8 @@ module "nomis_stack" {
 
   stack_name                        = each.key
   database_ami_name                 = each.value.database_ami_name
-  database_ami_owner                = each.value.database_ami_owner
   weblogic_ami_name                 = each.value.weblogic_ami_name
   database_extra_ingress_rules      = each.value.database_extra_ingress_rules
-  weblogic_ami_owner                = each.value.weblogic_ami_owner
   weblogic_common_security_group_id = aws_security_group.weblogic_common.id
 
   bastion_security_group     = module.bastion_linux.bastion_security_group
