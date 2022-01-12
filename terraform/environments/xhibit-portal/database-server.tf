@@ -141,6 +141,7 @@ resource "aws_instance" "database-server" {
 
   root_block_device {
     encrypted = true
+    volume_size = 64
   }
 
   lifecycle {
