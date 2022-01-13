@@ -1,22 +1,17 @@
 variable "application_name" {
   type        = string
   description = "The name of the application.  This will be name of the environment in Modernisation Platform"
-  default = "nomis"
+  default     = "nomis"
   validation {
     condition     = can(regex("^[A-Za-z0-9][A-Za-z0-9-.]{1,61}[A-Za-z0-9]$", var.application_name))
     error_message = "Invalid name for application supplied in variable app_name."
   }
 }
 
-variable "bastion_security_group" {
-  type        = string
-  description = "Security group of Bastion instance that can be used to connect to the database instance"
-}
-
 variable "business_unit" {
   type        = string
   description = "This corresponds to the VPC in which the application resides"
-  default = "hmpps"
+  default     = "hmpps"
 }
 
 variable "database_ami_name" {
@@ -26,8 +21,8 @@ variable "database_ami_name" {
 
 variable "database_ami_owner" {
   type        = string
-  description = "Name of AMI to be used to launch the database ec2 instance"
-  default = "self"
+  description = "Owner of AMI to be used to launch the database ec2 instance"
+  default     = "self"
 }
 
 variable "database_drive_map" {
@@ -59,6 +54,11 @@ variable "database_instance_type" {
   type        = string
   description = "ec2 instance type to use for the database"
   default     = "r6i.xlarge"
+}
+
+variable "database_common_security_group_id" {
+  type        = string
+  description = "Common security group used by all database instances"
 }
 
 variable "environment" {
@@ -113,8 +113,8 @@ variable "weblogic_ami_name" {
 
 variable "weblogic_ami_owner" {
   type        = string
-  description = "Name of AMI to be used to launch the weblogic ec2 instance"
-  default = "self"
+  description = "Owner of AMI to be used to launch the weblogic ec2 instance"
+  default     = "self"
 }
 
 variable "weblogic_common_security_group_id" {
@@ -130,7 +130,7 @@ variable "weblogic_drive_map" {
 
 variable "weblogic_instance_type" {
   type        = string
-  description = "ec2 instance type to use for the database"
+  description = "ec2 instance type to use for the weblogic instance"
   default     = "t2.medium"
 }
 

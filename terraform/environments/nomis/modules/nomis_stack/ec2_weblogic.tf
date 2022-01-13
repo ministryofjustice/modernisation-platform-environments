@@ -34,7 +34,7 @@ locals {
 data "template_file" "weblogic_init" {
   template = "${file("${path.module}/user_data/weblogic_init.sh")}"
   vars = {
-    DB_HOSTNAME       = var.DB_HOSTNAME
+    DB_HOSTNAME       = "database-${var.stack_name}.${var.application_name}.${var.business_unit}-${var.environment}.modernisation-platform.internal"
     DB_NAME           = var.DB_NAME
     DB_PORT           = var.DB_PORT
     # Sensitive values (obtained via user input on "terraform apply")
