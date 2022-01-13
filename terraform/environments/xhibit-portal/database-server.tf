@@ -297,7 +297,9 @@ resource "aws_ebs_volume" "database-disk6" {
   type              = "gp2"
   encrypted         = true
 
-  snapshot_id = local.application_data.accounts[local.environment].suprig01-disk-6-snapshot
+  #snapshot_id = local.application_data.accounts[local.environment].suprig01-disk-6-snapshot
+
+  size = 300
 
   tags = merge(
     local.tags,
