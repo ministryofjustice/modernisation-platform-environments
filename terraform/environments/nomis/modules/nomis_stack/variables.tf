@@ -133,3 +133,28 @@ variable "weblogic_instance_type" {
   description = "ec2 instance type to use for the database"
   default     = "t2.medium"
 }
+
+# Sensitive Values
+variable "DB_USERNAME" {
+  type        = string
+  description = "Username for database"
+  sensitive   = true
+}
+
+variable "DB_PASSWORD" {
+  type        = string
+  description = "Password for database"
+  sensitive   = true
+}
+
+variable "WEBLOGIC_USERNAME" {
+  type        = string
+  description = "Admin username for Weblogic GUI"
+  sensitive   = true
+}
+
+variable "WEBLOGIC_PASSWORD" {
+  type        = string
+  description = "Admin password for Weblogic GUI"
+  sensitive   = true
+}

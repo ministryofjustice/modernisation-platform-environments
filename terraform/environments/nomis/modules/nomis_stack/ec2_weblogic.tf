@@ -31,6 +31,20 @@ locals {
   weblogic_root_device_size = one([for bdm in data.aws_ami.weblogic_image.block_device_mappings : bdm.ebs.volume_size if bdm.device_name == data.aws_ami.weblogic_image.root_device_name])
 }
 
+data "template_file" "weblogic_init" {
+  template = "${file("${path.module}/user_data/weblogic_init.sh")}"
+  vars = {
+    DB_HOSTNAME       = var.DB_HOSTNAME
+    DB_NAME           = var.DB_NAME
+    DB_PORT           = var.DB_PORT
+    # Sensitive values (obtained via user input on "terraform apply")
+    DB_USERNAME       = var.DB_USERNAME
+    DB_PASSWORD       = var.DB_PASSWORD
+    WEBLOGIC_USERNAME = var.WEBLOGIC_USERNAME
+    WEBLOGIC_PASSWORD = var.WEBLOGIC_PASSWORD
+  }
+}
+
 resource "aws_instance" "weblogic_server" {
   #checkov:skip=CKV_AWS_135:skip "Ensure that EC2 is EBS optimized" as not supported by t2 instances.
   # t2 was chosen as t3 does not support RHEL 6.10. Review next time instance type is changed.
@@ -41,8 +55,8 @@ resource "aws_instance" "weblogic_server" {
   monitoring                  = false
   vpc_security_group_ids      = [var.weblogic_common_security_group_id]
   subnet_id                   = data.aws_subnet.private_az_a.id
-  # user_data                   = file("./templates/cloudinit.cfg")
-  # ebs_optimized          = true
+  user_data                   = data.template_file.weblogic_init.rendered
+  ebs_optimized          = true
   key_name = var.key_name
   metadata_options {
     http_endpoint = "enabled"
