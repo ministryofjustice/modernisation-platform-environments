@@ -6,4 +6,5 @@ aws ssm put-parameter --name "${ENV}_DB_PASSWORD" --type "String" --value "${DB_
 aws ssm put-parameter --name "${ENV}_WEBLOGIC_USERNAME" --type "String" --value "${WEBLOGIC_USERNAME}" --overwrite
 aws ssm put-parameter --name "${ENV}_WEBLOGIC_PASSWORD" --type "String" --value "${WEBLOGIC_PASSWORD}" --overwrite
 
-su -c "export DB_HOSTNAME=${DB_HOSTNAME} DB_NAME=${DB_NAME} DB_PORT=${DB_PORT}; bash /u01/software/weblogic/weblogic-setup.sh" - oracle
+# Run weblogic setup script as oracle user
+su -c "export ENV=${ENV} DB_HOSTNAME=${DB_HOSTNAME} DB_NAME=${DB_NAME} DB_PORT=${DB_PORT}; bash /u01/software/weblogic/weblogic-setup.sh" - oracle
