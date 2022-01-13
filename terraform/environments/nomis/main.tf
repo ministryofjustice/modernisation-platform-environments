@@ -36,6 +36,7 @@ module "nomis_stack" {
 #------------------------------------------------------------------------------
 
 resource "aws_security_group" "weblogic_common" {
+  #checkov:skip=CKV2_AWS_5:skip "Ensure that Security Groups are attached to another resource" - attached in nomis-stack module
   description = "Common security group for weblogic instances"
   name        = "weblogic-common"
   vpc_id      = local.vpc_id
@@ -94,6 +95,7 @@ resource "aws_security_group" "weblogic_common" {
 #------------------------------------------------------------------------------
 
 resource "aws_security_group" "database_common" {
+  #checkov:skip=CKV2_AWS_5:skip "Ensure that Security Groups are attached to another resource" - attached in nomis-stack module
   description = "Common security group for database instances"
   name        = "database-common"
   vpc_id      = data.aws_vpc.shared_vpc.id

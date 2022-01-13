@@ -59,12 +59,11 @@ locals {
 }
 
 resource "aws_instance" "database_server" {
-  # tflint-ignore: aws_instance_invalid_type
   ami                         = data.aws_ami.database_image.id
   associate_public_ip_address = false
   ebs_optimized               = true
   iam_instance_profile        = var.instance_profile_id
-  instance_type               = var.database_instance_type
+  instance_type               = var.database_instance_type # tflint-ignore: aws_instance_invalid_type
   key_name                    = var.key_name
   monitoring                  = true
   subnet_id                   = data.aws_subnet.data_az_a.id
