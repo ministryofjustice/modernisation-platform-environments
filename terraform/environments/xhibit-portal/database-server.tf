@@ -140,7 +140,8 @@ resource "aws_instance" "database-server" {
   }
 
   root_block_device {
-    encrypted = true
+    encrypted   = true
+    volume_size = 64
   }
 
   lifecycle {
@@ -295,6 +296,8 @@ resource "aws_ebs_volume" "database-disk6" {
   availability_zone = "${local.region}a"
   type              = "gp2"
   encrypted         = true
+
+  #snapshot_id = local.application_data.accounts[local.environment].suprig01-disk-6-snapshot
 
   size = 300
 
