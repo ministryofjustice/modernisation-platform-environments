@@ -134,6 +134,17 @@ variable "weblogic_instance_type" {
   default     = "t2.medium"
 }
 
+# Variables for weblogic configuration
+variable "DB_NAME" {
+  type        = string
+  description = "Name of Nomis database e.g. CNOMT1"
+}
+
+variable "DB_PORT" {
+  type        = string
+  description = "Nomis database port e.g. 1521"
+}
+
 # Sensitive Values
 variable "DB_USERNAME" {
   type        = string
