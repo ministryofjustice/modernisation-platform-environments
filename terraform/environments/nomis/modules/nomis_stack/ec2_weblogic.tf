@@ -49,16 +49,17 @@ data "template_file" "weblogic_init" {
 resource "aws_instance" "weblogic_server" {
   #checkov:skip=CKV_AWS_135:skip "Ensure that EC2 is EBS optimized" as not supported by t2 instances.
   # t2 was chosen as t3 does not support RHEL 6.10. Review next time instance type is changed.
-  instance_type               = var.weblogic_instance_type
   ami                         = data.aws_ami.weblogic_image.id
   associate_public_ip_address = false
-  iam_instance_profile        = var.instance_profile_id
-  monitoring                  = false
-  vpc_security_group_ids      = [var.weblogic_common_security_group_id]
-  subnet_id                   = data.aws_subnet.private_az_a.id
-  user_data                   = data.template_file.weblogic_init.rendered
-  ebs_optimized          = true
-  key_name = var.key_name
+  # ebs_optimized          = true
+  iam_instance_profile   = var.instance_profile_id
+  instance_type          = var.weblogic_instance_type
+  key_name               = var.key_name
+  monitoring             = false
+  subnet_id              = data.aws_subnet.private_az_a.id
+  user_data              = file("${path.module}/user_data/weblogic_init.sh")
+  vpc_security_group_ids = [var.weblogic_common_security_group_id]
+
   metadata_options {
     http_endpoint = "enabled"
     http_tokens   = "required"
