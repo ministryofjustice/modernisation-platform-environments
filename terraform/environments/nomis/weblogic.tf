@@ -90,7 +90,7 @@ resource "aws_instance" "weblogic_server" {
   iam_instance_profile        = aws_iam_instance_profile.ec2_common_profile.id
   monitoring                  = false
   vpc_security_group_ids      = [aws_security_group.weblogic_server.id]
-  subnet_id                   = data.aws_subnet.data_az_a.id
+  subnet_id                   = data.aws_subnet.private_az_a.id
   user_data                   = file("./templates/weblogic-init.sh")
   # ebs_optimized          = true
   key_name = aws_key_pair.ec2-user.key_name
