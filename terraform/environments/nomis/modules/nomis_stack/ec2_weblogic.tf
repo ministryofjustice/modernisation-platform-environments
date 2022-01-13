@@ -89,6 +89,7 @@ resource "aws_instance" "weblogic_server" {
       always_on  = "false"
     }
   )
+  depends_on = [aws_instance.database_server]
 }
 
 resource "aws_ebs_volume" "weblogic_ami_volume" {
