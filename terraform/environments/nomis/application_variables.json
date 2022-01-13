@@ -5,18 +5,18 @@
             "session_manager_log_retention_days": 90,
             "stacks": {
                 "T1": {
-                    "database_ami_name": "nomis_db_CNOMT1*",
+                    "database_ami_name": "nomis_db_CNOMT1-2022-01-05*",
                     "database_extra_ingress_rules": [
                         {
                             "description"     : "a test rule",
-                            "from_port"       : "80",
-                            "to_port"         : "80",
+                            "from_port"       : "9999",
+                            "to_port"         : "9999",
                             "protocol"        : "TCP",
                             "security_groups" : [],
                             "cidr_blocks" : ["192.168.1.1/32","192.168.1.2/32"]
                         }
                     ],
-                    "weblogic_ami_name": "nomis_app-2021-09-20*"          
+                    "weblogic_ami_name": "weblogic-2022-01-12*"          
                 }
             }
         }
