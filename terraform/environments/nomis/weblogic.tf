@@ -1,10 +1,10 @@
 #------------------------------------------------------------------------------
 # Networking and Security Groups
 #------------------------------------------------------------------------------
-data "aws_subnet" "data_az_a" {
+data "aws_subnet" "private_az_a" {
   vpc_id = local.vpc_id
   tags = {
-    Name = "${local.vpc_name}-${local.environment}-${local.subnet_set}-data-${local.region}a"
+    Name = "${local.vpc_name}-${local.environment}-${local.subnet_set}-private-${local.region}a"
   }
 }
 
