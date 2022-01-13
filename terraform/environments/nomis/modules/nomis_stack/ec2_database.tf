@@ -3,7 +3,7 @@
 #------------------------------------------------------------------------------
 
 resource "aws_security_group" "database_server" {
-  description = "Configure Oracle database access"
+  description = "Stack specific security group rules for database instance"
   name        = "database-${var.stack_name}"
   vpc_id      = data.aws_vpc.shared_vpc.id
 
@@ -19,13 +19,6 @@ resource "aws_security_group" "database_server" {
       cidr_blocks     = rule.value.cidr_blocks
     }
   }
-  ingress {
-    description     = "SSH from Bastion"
-    from_port       = "22"
-    to_port         = "22"
-    protocol        = "TCP"
-    security_groups = [var.bastion_security_group]
-  }
 
   ingress {
     description = "DB access from weblogic (private subnet)"
@@ -33,15 +26,6 @@ resource "aws_security_group" "database_server" {
     to_port     = "1521"
     protocol    = "TCP"
     cidr_blocks = ["${aws_instance.weblogic_server.private_ip}/32"]
-  }
-
-  egress {
-    description = "allow all"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    #tfsec:ignore:AWS009
-    cidr_blocks = ["0.0.0.0/0"]
   }
 
   tags = merge(
@@ -76,16 +60,19 @@ locals {
 
 resource "aws_instance" "database_server" {
   # tflint-ignore: aws_instance_invalid_type
-  instance_type               = var.database_instance_type
   ami                         = data.aws_ami.database_image.id
-  monitoring                  = true
   associate_public_ip_address = false
-  iam_instance_profile        = var.instance_profile_id
   ebs_optimized               = true
+  iam_instance_profile        = var.instance_profile_id
+  instance_type               = var.database_instance_type
+  key_name                    = var.key_name
+  monitoring                  = true
   subnet_id                   = data.aws_subnet.data_az_a.id
   user_data                   = file("${path.module}/user_data/database_init.sh")
-  vpc_security_group_ids      = [aws_security_group.database_server.id]
-  key_name                    = var.key_name
+  vpc_security_group_ids      = [
+    var.database_common_security_group_id,
+    aws_security_group.database_server.id
+    ]
   metadata_options {
     http_endpoint = "enabled"
     http_tokens   = "required"

@@ -1,3 +1,9 @@
+data "aws_subnet" "private_az_a" {
+  tags = {
+    Name = "${local.vpc_name}-${local.environment}-${local.subnet_set}-private-${local.region}a"
+  }
+}
+
 data "aws_ami" "jumpserver_image" {
   most_recent = true
   owners      = ["self"]
@@ -44,7 +50,7 @@ resource "aws_instance" "jumpserver_windows" {
 
 resource "aws_security_group" "jumpserver-windows" {
   description = "Configure Windows jumpserver egress"
-  name        = "jumpserver-windows-${local.application_name}"
+  name        = "jumpserver-windows"
   vpc_id      = local.vpc_id
   egress {
     description = "allow all"
@@ -54,4 +60,11 @@ resource "aws_security_group" "jumpserver-windows" {
     #tfsec:ignore:AWS009
     cidr_blocks = ["0.0.0.0/0"]
   }
+  
+  tags = merge(
+    local.tags,
+    {
+      Name = "jumpserver-windows"
+    }
+  )
 }
