@@ -55,16 +55,15 @@ data "aws_ami" "database_image" {
 }
 
 locals {
-  database_root_device_size = one([for bdm in data.aws_ami.weblogic_image.block_device_mappings : bdm.ebs.volume_size if bdm.device_name == data.aws_ami.database_image.root_device_name])
+  database_root_device_size = one([for bdm in data.aws_ami.database_image.block_device_mappings : bdm.ebs.volume_size if bdm.device_name == data.aws_ami.database_image.root_device_name])
 }
 
 resource "aws_instance" "database_server" {
-  # tflint-ignore: aws_instance_invalid_type
   ami                         = data.aws_ami.database_image.id
   associate_public_ip_address = false
   ebs_optimized               = true
   iam_instance_profile        = var.instance_profile_id
-  instance_type               = var.database_instance_type
+  instance_type               = var.database_instance_type # tflint-ignore: aws_instance_invalid_type
   key_name                    = var.key_name
   monitoring                  = true
   subnet_id                   = data.aws_subnet.data_az_a.id

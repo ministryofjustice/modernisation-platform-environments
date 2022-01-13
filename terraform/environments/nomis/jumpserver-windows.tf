@@ -50,7 +50,7 @@ resource "aws_instance" "jumpserver_windows" {
 
 resource "aws_security_group" "jumpserver-windows" {
   description = "Configure Windows jumpserver egress"
-  name        = "jumpserver-windows"
+  name        = "jumpserver-windows-${local.application_name}"
   vpc_id      = local.vpc_id
   egress {
     description = "allow all"
@@ -60,11 +60,4 @@ resource "aws_security_group" "jumpserver-windows" {
     #tfsec:ignore:AWS009
     cidr_blocks = ["0.0.0.0/0"]
   }
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "jumpserver-windows"
-    }
-  )
 }
