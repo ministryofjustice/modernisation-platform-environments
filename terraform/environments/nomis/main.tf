@@ -11,11 +11,11 @@ module "nomis_stack" {
 
   for_each = local.application_data.accounts[local.environment].stacks
 
-  stack_name                        = each.key
-  database_ami_name                 = each.value.database_ami_name
-  database_extra_ingress_rules      = each.value.database_extra_ingress_rules
-  weblogic_ami_name                 = each.value.weblogic_ami_name
-  
+  stack_name                   = each.key
+  database_ami_name            = each.value.database_ami_name
+  database_extra_ingress_rules = each.value.database_extra_ingress_rules
+  weblogic_ami_name            = each.value.weblogic_ami_name
+
   database_common_security_group_id = aws_security_group.database_common.id
   weblogic_common_security_group_id = aws_security_group.weblogic_common.id
 

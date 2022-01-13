@@ -69,10 +69,10 @@ resource "aws_instance" "database_server" {
   monitoring                  = true
   subnet_id                   = data.aws_subnet.data_az_a.id
   user_data                   = file("${path.module}/user_data/database_init.sh")
-  vpc_security_group_ids      = [
+  vpc_security_group_ids = [
     var.database_common_security_group_id,
     aws_security_group.database_server.id
-    ]
+  ]
   metadata_options {
     http_endpoint = "enabled"
     http_tokens   = "required"

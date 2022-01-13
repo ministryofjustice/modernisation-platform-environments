@@ -37,15 +37,15 @@ resource "aws_instance" "weblogic_server" {
   ami                         = data.aws_ami.weblogic_image.id
   associate_public_ip_address = false
   # ebs_optimized          = true
-  iam_instance_profile        = var.instance_profile_id
-  instance_type               = var.weblogic_instance_type
-  key_name = var.key_name
-  monitoring                  = false
-  subnet_id                   = data.aws_subnet.private_az_a.id
+  iam_instance_profile = var.instance_profile_id
+  instance_type        = var.weblogic_instance_type
+  key_name             = var.key_name
+  monitoring           = false
+  subnet_id            = data.aws_subnet.private_az_a.id
   # user_data                   = file("./templates/cloudinit.cfg")
-  vpc_security_group_ids      = [var.weblogic_common_security_group_id]
-  
-  
+  vpc_security_group_ids = [var.weblogic_common_security_group_id]
+
+
   metadata_options {
     http_endpoint = "enabled"
     http_tokens   = "required"

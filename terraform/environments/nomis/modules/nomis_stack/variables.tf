@@ -1,7 +1,7 @@
 variable "application_name" {
   type        = string
   description = "The name of the application.  This will be name of the environment in Modernisation Platform"
-  default = "nomis"
+  default     = "nomis"
   validation {
     condition     = can(regex("^[A-Za-z0-9][A-Za-z0-9-.]{1,61}[A-Za-z0-9]$", var.application_name))
     error_message = "Invalid name for application supplied in variable app_name."
@@ -11,7 +11,7 @@ variable "application_name" {
 variable "business_unit" {
   type        = string
   description = "This corresponds to the VPC in which the application resides"
-  default = "hmpps"
+  default     = "hmpps"
 }
 
 variable "database_ami_name" {
@@ -22,7 +22,7 @@ variable "database_ami_name" {
 variable "database_ami_owner" {
   type        = string
   description = "Owner of AMI to be used to launch the database ec2 instance"
-  default = "self"
+  default     = "self"
 }
 
 variable "database_drive_map" {
@@ -114,7 +114,7 @@ variable "weblogic_ami_name" {
 variable "weblogic_ami_owner" {
   type        = string
   description = "Owner of AMI to be used to launch the weblogic ec2 instance"
-  default = "self"
+  default     = "self"
 }
 
 variable "weblogic_common_security_group_id" {

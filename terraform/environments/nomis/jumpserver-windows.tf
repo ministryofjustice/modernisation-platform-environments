@@ -60,7 +60,7 @@ resource "aws_security_group" "jumpserver-windows" {
     #tfsec:ignore:AWS009
     cidr_blocks = ["0.0.0.0/0"]
   }
-  
+
   tags = merge(
     local.tags,
     {
