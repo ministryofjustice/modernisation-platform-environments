@@ -55,7 +55,7 @@ data "aws_ami" "database_image" {
 }
 
 locals {
-  database_root_device_size = one([for bdm in data.aws_ami.weblogic_image.block_device_mappings : bdm.ebs.volume_size if bdm.device_name == data.aws_ami.database_image.root_device_name])
+  database_root_device_size = one([for bdm in data.aws_ami.database_image.block_device_mappings : bdm.ebs.volume_size if bdm.device_name == data.aws_ami.database_image.root_device_name])
 }
 
 resource "aws_instance" "database_server" {
