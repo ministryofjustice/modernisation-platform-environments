@@ -1,3 +1,9 @@
+data "aws_subnet" "private_az_a" {
+  tags = {
+    Name = "${local.vpc_name}-${local.environment}-${local.subnet_set}-private-${local.region}a"
+  }
+}
+
 data "aws_ami" "jumpserver_image" {
   most_recent = true
   owners      = ["self"]
