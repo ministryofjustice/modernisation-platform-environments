@@ -1,6 +1,8 @@
 {
   "accounts": {
-    "development": {  
+    "development": {
+      "public_dns_name_web"           : "dev-pportal.cjsonline.gov.uk",
+      "public_dns_name_ingestion"     : "dev-ingest.cjsonline.gov.uk",
       "bucket_prefix"                 : "vm-import-s3-bucket",
       "infra1-ami"                    : "ami-026ff13f8db4d060c", 
       "infra1-disk-1-snapshot"        : "snap-04856057b2156f3e9",  
@@ -26,6 +28,8 @@
       "importmachine-data-snapshot"   : "snap-0688d8b6d3bd6b245"
     },
     "production": {
+      "public_dns_name_web"           : "pportal.cjsonline.gov.uk",
+      "public_dns_name_ingestion"     : "ingest.cjsonline.gov.uk",
       "bucket_prefix"                 : "vm-import-s3-bucket",
       "infra1-ami"                    : "ami-03f009729268d81d9",
       "infra1-disk-1-snapshot"        : "snap-08507bf59326a5879",
