@@ -37,7 +37,7 @@ resource "aws_instance" "weblogic_server" {
   ami                         = data.aws_ami.weblogic_image.id
   associate_public_ip_address = false
   # ebs_optimized          = true
-  iam_instance_profile   = var.instance_profile_id
+  iam_instance_profile   = var.instance_profile_name
   instance_type          = var.weblogic_instance_type
   key_name               = var.key_name
   monitoring             = false

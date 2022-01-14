@@ -62,7 +62,7 @@ resource "aws_instance" "database_server" {
   ami                         = data.aws_ami.database_image.id
   associate_public_ip_address = false
   ebs_optimized               = true
-  iam_instance_profile        = var.instance_profile_id
+  iam_instance_profile        = var.instance_profile_name
   instance_type               = var.database_instance_type # tflint-ignore: aws_instance_invalid_type
   key_name                    = var.key_name
   monitoring                  = true
@@ -153,4 +153,91 @@ resource "aws_route53_record" "database" {
   type    = "A"
   ttl     = "60"
   records = [aws_instance.database_server.private_ip]
+}
+
+#------------------------------------------------------------------------------
+# ASM Passwords
+#------------------------------------------------------------------------------
+
+resource "random_password" "asm_sys" {
+
+  length  = 30
+  special = false
+}
+
+resource "aws_ssm_parameter" "asm_sys" {
+  name        = "database/${var.stack_name}/ASMSYS"
+  description = "${var.stack_name} ASMSYS password"
+  type        = "SecureString"
+  value       = random_password.asm_sys.result
+
+  tags = merge(
+    var.tags,
+    {
+      Name = "database-${var.stack_name}-ASMSYS"
+    }
+  )
+}
+
+resource "random_password" "asm_snmp" {
+
+  length  = 30
+  special = false
+}
+
+resource "aws_ssm_parameter" "asm_ssnmp" {
+  name        = "/database/${var.stack_name}/ASMSNMP"
+  description = "ASMSNMP password ${var.stack_name}"
+  type        = "SecureString"
+  value       = random_password.asm_snmp.result
+
+  tags = merge(
+    var.tags,
+    {
+      Name = "database-${var.stack_name}-ASMSNMP"
+    }
+  )
+}
+
+#------------------------------------------------------------------------------
+# Instance IAM role extra permissions
+# Temporarily allow get parameter when instance first created
+# Attach policy inline on ec2-common-role
+#------------------------------------------------------------------------------
+
+resource "time_offset" "asm_parameter" {
+  # static time resource for controlling access to parameter
+  offset_minutes = 60
+  triggers = {
+    # if the instance is recycled we reset the timestamp to give access again
+    instance_id = aws_instance.database_server.arn
+  }
+}
+
+data "aws_iam_policy_document" "asm_parameter" {
+  statement {
+    effect    = "Allow"
+    actions   = ["ssm:GetParameter"]
+    resources = ["/database/${var.stack_name}/*"]
+    condition {
+      test     = "DateLessThan"
+      variable = "aws:CurrentTime"
+      values   = [time_offset.asm_parameter.rfc3339]
+    }
+    condition {
+      test     = "StringLike"
+      variable = "ec2:SourceInstanceARN"
+      values   = [aws_instance.database_server.arn]
+    }
+  }
+}
+
+data "aws_iam_instance_profile" "ec2_common_profile" {
+  name = var.instance_profile_name
+}
+
+resource "aws_iam_role_policy" "asm_parameter" {
+  name   = "asm-parameter-access-${var.stack_name}"
+  role   = data.aws_iam_instance_profile.ec2_common_profile.role_id
+  policy = data.aws_iam_policy_document.asm_parameter.json
 }
