@@ -226,8 +226,8 @@ resource "time_offset" "asm_parameter" {
 data "aws_iam_policy_document" "asm_parameter" {
   statement {
     effect    = "Allow"
-    actions   = ["ssm:GetParameter"]
-    resources = ["arn:aws:ssm:region:account-id:parameter/database/${var.stack_name}/*"]
+    actions   = ["ssm:GetParameter*"]
+    resources = ["arn:aws:ssm:${var.region}:*:parameter/database/${var.stack_name}/*"]
     condition {
       test     = "DateLessThan"
       variable = "aws:CurrentTime"
