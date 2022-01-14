@@ -56,10 +56,5 @@ data "aws_iam_policy_document" "sprinkler_ebs_encryption_policy_doc" {
       values   = ["${data.aws_organizations_organization.root_account.id}/*/${local.environment_management.modernisation_platform_organisation_unit_id}/*"]
     }
 
-    condition {
-      test     = "Bool"
-      variable = "kms:GrantIsForAWSResource"
-      values   = ["true"]
-    }
   }
 }
