@@ -88,6 +88,8 @@ reconfigure_oracle_has() {
     # script to be run as oracle user
     cat > /tmp/oracle_reconfig.sh << 'EOF'
         #!/bin/bash
+        password_ASMSYS=$(aws ssm get-parameter --with-decryption --name "${parameter_name_ASMSYS}" --output text --query Parameter.Value)
+        password_ASMSNMP=$(aws ssm get-parameter --with-decryption --name "${parameter_name_ASMSNMP}" --output text --query Parameter.Value)
         source oraenv <<< +ASM
         srvctl add listener
         # get spfile for ASM
@@ -105,6 +107,8 @@ reconfigure_oracle_has() {
             if [[ -n "$asm_status" ]]; then
                 asmcmd mount ORADATA
                 sqlplus -s / as sysasm <<< "alter diskgroup ORADATA resize all;"
+                asmcmd orapwusr --modify --password ASMSNMP <<< "$password_ASMSNMP"
+                asmcmd orapwusr --modify --password ASMSYS <<< "$password_SYS"
                 if [[ -n "$(grep CNOMT1 /etc/oratab)" ]]; then
                     source oraenv <<< CNOMT1
                     srvctl add database -d CNOMT1 -o $ORACLE_HOME

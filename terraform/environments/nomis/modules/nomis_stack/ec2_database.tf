@@ -58,6 +58,15 @@ locals {
   database_root_device_size = one([for bdm in data.aws_ami.database_image.block_device_mappings : bdm.ebs.volume_size if bdm.device_name == data.aws_ami.database_image.root_device_name])
 }
 
+# user-data template
+data "template_file" "database_init" {
+  template = file("${path.module}/user_data/database_init.sh")
+  vars = {
+    parameter_name_ASMSYS  = aws_ssm_parameter.asm_sys.name
+    parameter_name_ASMSNMP = aws_ssm_parameter.asm_snmp.name
+  }
+}
+
 resource "aws_instance" "database_server" {
   ami                         = data.aws_ami.database_image.id
   associate_public_ip_address = false
@@ -67,7 +76,7 @@ resource "aws_instance" "database_server" {
   key_name                    = var.key_name
   monitoring                  = true
   subnet_id                   = data.aws_subnet.data_az_a.id
-  user_data                   = file("${path.module}/user_data/database_init.sh")
+  user_data                   = base64encode(data.template_file.database_init.rendered)
   vpc_security_group_ids = [
     var.database_common_security_group_id,
     aws_security_group.database_server.id
@@ -185,7 +194,7 @@ resource "random_password" "asm_snmp" {
   special = false
 }
 
-resource "aws_ssm_parameter" "asm_ssnmp" {
+resource "aws_ssm_parameter" "asm_snmp" {
   name        = "/database/${var.stack_name}/ASMSNMP"
   description = "ASMSNMP password ${var.stack_name}"
   type        = "SecureString"
