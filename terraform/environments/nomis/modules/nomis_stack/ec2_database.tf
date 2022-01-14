@@ -166,7 +166,7 @@ resource "random_password" "asm_sys" {
 }
 
 resource "aws_ssm_parameter" "asm_sys" {
-  name        = "database/${var.stack_name}/ASMSYS"
+  name        = "/database/${var.stack_name}/ASMSYS"
   description = "${var.stack_name} ASMSYS password"
   type        = "SecureString"
   value       = random_password.asm_sys.result
@@ -238,6 +238,6 @@ data "aws_iam_instance_profile" "ec2_common_profile" {
 
 resource "aws_iam_role_policy" "asm_parameter" {
   name   = "asm-parameter-access-${var.stack_name}"
-  role   = data.aws_iam_instance_profile.ec2_common_profile.role_id
+  role   = data.aws_iam_instance_profile.ec2_common_profile.role_name
   policy = data.aws_iam_policy_document.asm_parameter.json
 }
