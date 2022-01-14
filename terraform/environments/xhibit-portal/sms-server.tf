@@ -1,9 +1,9 @@
 
 
 # Security Groups
-resource "aws_security_group" "exchange-server" {
+resource "aws_security_group" "sms-server" {
   description = "Domain traffic only"
-  name        = "exchange-server-${local.application_name}"
+  name        = "sms-server-${local.application_name}"
   vpc_id      = local.vpc_id
 
   egress {
@@ -34,11 +34,11 @@ resource "aws_security_group" "exchange-server" {
 }
 
 
-resource "aws_instance" "exchange-server" {
-  depends_on                  = [aws_security_group.exchange-server]
+resource "aws_instance" "sms-server" {
+  depends_on                  = [aws_security_group.sms-server]
   instance_type               = "t2.medium"
-  ami                         = local.application_data.accounts[local.environment].infra6-ami
-  vpc_security_group_ids      = [aws_security_group.exchange-server.id]
+  ami                         = local.application_data.accounts[local.environment].XHBPRESMS01-ami
+  vpc_security_group_ids      = [aws_security_group.sms-server.id]
   monitoring                  = false
   associate_public_ip_address = false
   ebs_optimized               = false
@@ -79,7 +79,7 @@ resource "aws_instance" "exchange-server" {
   tags = merge(
     local.tags,
     {
-      Name = "exchange-${local.application_name}"
+      Name = "sms-${local.application_name}"
     }
   )
 }
