@@ -63,9 +63,11 @@ disks() {
     local devices=($(lsblk -npf -o FSTYPE,PKNAME | awk '/oracleasm/ {print $2}'))
     unset IFS
 
-    for item in "${devices[@]}"; do
-        echo "resizing device ${item}"
-        parted --script "${item}" resizepart 1 100%
+    # Note use of $${} syntax - this is because this file is being used as a terraform template
+    # so we need the extra $ to prevent terraform trying to interpolate it
+    for item in "$${devices[@]}"; do
+        echo "resizing device $${item}"
+        parted --script "$${item}" resizepart 1 100%
     done
 
     # rescan oracle asm disks as they don't always appear on first launch of instance
