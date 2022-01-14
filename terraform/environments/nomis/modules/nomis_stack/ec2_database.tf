@@ -207,7 +207,7 @@ resource "aws_ssm_parameter" "asm_ssnmp" {
 
 resource "time_offset" "asm_parameter" {
   # static time resource for controlling access to parameter
-  offset_minutes = 60
+  offset_minutes = 30
   triggers = {
     # if the instance is recycled we reset the timestamp to give access again
     instance_id = aws_instance.database_server.arn
@@ -218,7 +218,7 @@ data "aws_iam_policy_document" "asm_parameter" {
   statement {
     effect    = "Allow"
     actions   = ["ssm:GetParameter"]
-    resources = ["/database/${var.stack_name}/*"]
+    resources = ["arn:aws:ssm:region:account-id:parameter/database/${var.stack_name}/*"]
     condition {
       test     = "DateLessThan"
       variable = "aws:CurrentTime"
