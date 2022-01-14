@@ -108,6 +108,14 @@ resource "aws_security_group" "database_common" {
     security_groups = [module.bastion_linux.bastion_security_group]
   }
 
+  ingress {
+    description = "Access to database port from Azure fix n go NOMS-Test"
+    from_port   = "1521"
+    to_port     = "1521"
+    protocol    = "TCP"
+    cidr_blocks = ["10.101.0.0/16"] # NOMS-Test
+  }
+
   egress {
     description = "allow all"
     from_port   = 0
