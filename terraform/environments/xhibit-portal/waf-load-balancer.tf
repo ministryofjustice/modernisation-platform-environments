@@ -216,7 +216,7 @@ resource "aws_acm_certificate" "waf_lb_cert" {
   subject_alternative_names = [
     "*.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk",
     local.application_data.accounts[local.environment].public_dns_name_web,
-    local.application_data.accounts[local.environment].public_dns_name_ingestion, 
+    local.application_data.accounts[local.environment].public_dns_name_ingestion,
   ]
 
   tags = {
