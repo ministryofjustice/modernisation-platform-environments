@@ -109,7 +109,7 @@ resource "aws_security_group" "database_common" {
   }
 
   ingress {
-    description = "Access to database port from Azure fix 'n go NOMS-Test"
+    description = "Access to database port from Azure fix n go NOMS-Test"
     from_port   = "1521"
     to_port     = "1521"
     protocol    = "TCP"
