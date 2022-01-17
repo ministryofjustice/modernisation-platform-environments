@@ -335,7 +335,7 @@ resource "aws_ssm_association" "ec2_scheduled_stop" {
 }
 
 resource "aws_iam_role" "ssm_ec2_start_stop" {
-  name                 = "ssm_ec2_start_stop"
+  name                 = "ssm-ec2-start-stop"
   path                 = "/"
   max_session_duration = "3600"
   assume_role_policy = jsonencode(
