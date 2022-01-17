@@ -258,7 +258,7 @@ resource "aws_ssm_association" "manage_cloud_watch_agent_linux" {
     values = ["Linux"]
   }
   apply_only_at_cron_interval = false
-  schedule_expression         = "cron(0 7 ? * TUE *)"
+  schedule_expression         = "cron(45 7 ? * TUE *)"
 }
 
 resource "aws_ssm_parameter" "cloud_watch_config_linux" {
@@ -294,4 +294,46 @@ resource "aws_ssm_association" "update_ssm_agent" {
   }
   apply_only_at_cron_interval = false
   schedule_expression         = "cron(30 7 ? * TUE *)"
+}
+
+#------------------------------------------------------------------------------
+# Scheduled overnight shutdown
+#------------------------------------------------------------------------------
+
+# Scheduled start
+resource "aws_ssm_association" "ec2_scheduled_start" {
+  name             = "AWS-StartEC2Instance" # this is an AWS provided document
+  association_name = "ec2_scheduled_start"
+  automation_target_parameter_name = "InstanceId"
+  parameters = {
+    AutomationAssumeRole = data.aws_iam_role.ssm_service_role.arn
+  }
+  targets {
+    # currently all instances created through the nomis-stack module are tagged 'false'
+    key    = "tag:always_on"
+    values = ["false"]
+  }
+  apply_only_at_cron_interval = true
+  schedule_expression         = "cron(0 7 ? * MON-FRI *)"
+}
+
+# Scheduled stop
+resource "aws_ssm_association" "ec2_scheduled_stop" {
+  name             = "AWS-StopEC2Instance" # this is an AWS provided document
+  association_name = "ec2_scheduled_start"
+  automation_target_parameter_name = "InstanceId"
+  parameters = {
+    AutomationAssumeRole = data.aws_iam_role.ssm_service_role.arn
+  }
+  targets {
+    # currently all instances created through the nomis-stack module are tagged 'false'
+    key    = "tag:always_on"
+    values = ["false"]
+  }
+  apply_only_at_cron_interval = true
+  schedule_expression         = "cron(0 19 ? * MON-FRI *)"
+}
+
+data "aws_iam_role" "ssm_service_role" {
+  name = "AWSServiceRoleForAmazonSSM"
 }
