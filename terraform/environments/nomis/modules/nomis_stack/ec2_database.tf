@@ -154,11 +154,21 @@ resource "aws_volume_attachment" "database_server_ami_volume" {
 # Route 53 record
 #------------------------------------------------------------------------------
 
-resource "aws_route53_record" "database" {
+resource "aws_route53_record" "database_internal" {
   provider = aws.core-vpc
 
   zone_id = data.aws_route53_zone.internal.zone_id
-  name    = "database-${var.stack_name}.${var.application_name}.${var.business_unit}-${var.environment}.modernisation-platform.internal"
+  name    = "db.${var.stack_name}.${var.application_name}.${data.aws_route53_zone.internal.name}"
+  type    = "A"
+  ttl     = "60"
+  records = [aws_instance.database_server.private_ip]
+}
+
+resource "aws_route53_record" "database_external" {
+  provider = aws.core-vpc
+
+  zone_id = data.aws_route53_zone.external.zone_id
+  name    = "db.${var.stack_name}.${var.application_name}.${data.aws_route53_zone.external.name}"
   type    = "A"
   ttl     = "60"
   records = [aws_instance.database_server.private_ip]
