@@ -311,7 +311,7 @@ resource "aws_ebs_volume" "database-disk6" {
 
 resource "aws_volume_attachment" "database-disk6" {
   depends_on   = [aws_instance.database-server]
-  device_name  = "xvdz"
+  device_name  = "xvdf"
   force_detach = true
   volume_id    = aws_ebs_volume.database-disk6.id
   instance_id  = aws_instance.database-server.id

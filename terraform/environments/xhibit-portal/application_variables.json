@@ -38,7 +38,7 @@
       "infra6-disk-1-snapshot"        : "snap-007cc36aef3020b43",
       "infra6-disk-2-snapshot"        : "snap-055015576f3a10c50",
       "suprig01-ami"                  : "ami-03e2c2db09c43e7f2",
-      "suprig01-disk-1-snapshot"      : "snap-0af3d646324475d25 ",
+      "suprig01-disk-1-snapshot"      : "snap-0af3d646324475d25",
       "suprig01-disk-2-snapshot"      : "snap-03d42b6f06f3b1f6e",
       "suprig01-disk-3-snapshot"      : "snap-02e3bc305763a7aa7",
       "suprig01-disk-4-snapshot"      : "snap-09ee74dd43cb8ffbe",
