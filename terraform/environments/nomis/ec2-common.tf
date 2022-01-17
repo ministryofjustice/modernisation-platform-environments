@@ -354,7 +354,7 @@ resource "aws_iam_role" "ssm_ec2_start_stop" {
     }
   )
   managed_policy_arns = [
-    "arn:aws:iam::aws:policy/AmazonSSMServiceRolePolicy"
+    "arn:aws:iam::aws:policy/service-role/AmazonSSMAutomationRole"
   ]
   tags = merge(
     local.tags,
@@ -362,29 +362,4 @@ resource "aws_iam_role" "ssm_ec2_start_stop" {
       Name = "ssm-ec2-start-stop"
     },
   )
-}
-
-# create policy document for start stop instances
-data "aws_iam_policy_document" "ssm_ec2_start_stop" {
-  statement {
-    effect = "Allow"
-    actions = [
-      "ec2:StartInstances",
-      "ec2:StopInstances"
-    ]
-    resources = ["*"]
-    condition {
-      test     = "StringLike"
-      variable = "ec2:ResourceTag/always_on"
-      values   = ["false"]
-    }
-    # todo: add a time condition
-  }
-}
-
-# attach document as inline policy
-resource "aws_iam_role_policy" "ssm_ec2_start_stop" {
-  name   = "ssm_ec2_start_stop"
-  role   = aws_iam_role.ssm_ec2_start_stop.name
-  policy = data.aws_iam_policy_document.ssm_ec2_start_stop.json
 }
