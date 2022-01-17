@@ -110,7 +110,7 @@ reconfigure_oracle_has() {
                 asmcmd mount ORADATA
                 sqlplus -s / as sysasm <<< "alter diskgroup ORADATA resize all;"
                 asmcmd orapwusr --modify --password ASMSNMP <<< "$password_ASMSNMP"
-                asmcmd orapwusr --modify --password ASMSYS <<< "$password_SYS"
+                asmcmd orapwusr --modify --password ASMSYS <<< "$password_ASMSYS"
                 if [[ -n "$(grep CNOMT1 /etc/oratab)" ]]; then
                     source oraenv <<< CNOMT1
                     srvctl add database -d CNOMT1 -o $ORACLE_HOME
