@@ -120,7 +120,7 @@ resource "aws_acm_certificate" "internal_lb" {
   domain_name       = "${local.application_name}.${data.aws_route53_zone.external.name}"
   validation_method = "DNS"
 
-  subject_alternative_names = ["*.${var.application_name}.${data.aws_route53_zone.external.name}"]
+  subject_alternative_names = ["*.${local.application_name}.${data.aws_route53_zone.external.name}"]
 
   tags = merge(
     local.tags,
