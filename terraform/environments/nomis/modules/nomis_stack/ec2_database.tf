@@ -158,7 +158,7 @@ resource "aws_route53_record" "database_internal" {
   provider = aws.core-vpc
 
   zone_id = data.aws_route53_zone.internal.zone_id
-  name    = "database-${var.stack_name}.${var.application_name}.${data.aws_route53_zone.internal.name}"
+  name    = "db.${var.stack_name}.${var.application_name}.${data.aws_route53_zone.internal.name}"
   type    = "A"
   ttl     = "60"
   records = [aws_instance.database_server.private_ip]
@@ -168,7 +168,7 @@ resource "aws_route53_record" "database_external" {
   provider = aws.core-vpc
 
   zone_id = data.aws_route53_zone.external.zone_id
-  name    = "database-${var.stack_name}.${var.application_name}.${data.aws_route53_zone.external.name}"
+  name    = "db.${var.stack_name}.${var.application_name}.${data.aws_route53_zone.external.name}"
   type    = "A"
   ttl     = "60"
   records = [aws_instance.database_server.private_ip]

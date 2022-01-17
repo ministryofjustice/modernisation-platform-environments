@@ -117,10 +117,10 @@ resource "aws_route53_record" "internal_lb" {
 #------------------------------------------------------------------------------
 
 resource "aws_acm_certificate" "internal_lb" {
-  domain_name       = "${local.vpc_name}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  domain_name       = "${local.application_name}.${data.aws_route53_zone.external.name}"
   validation_method = "DNS"
 
-  subject_alternative_names = ["*.${local.vpc_name}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
+  subject_alternative_names = ["*.${var.application_name}.${data.aws_route53_zone.external.name}"]
 
   tags = merge(
     local.tags,
