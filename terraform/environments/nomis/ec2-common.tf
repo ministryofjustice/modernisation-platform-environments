@@ -320,7 +320,7 @@ resource "aws_ssm_association" "ec2_scheduled_start" {
 # Scheduled stop
 resource "aws_ssm_association" "ec2_scheduled_stop" {
   name                             = "AWS-StopEC2Instance" # this is an AWS provided document
-  association_name                 = "ec2_scheduled_start"
+  association_name                 = "ec2_scheduled_stop"
   automation_target_parameter_name = "InstanceId"
   parameters = {
     AutomationAssumeRole = aws_iam_role.ssm_ec2_start_stop.arn
