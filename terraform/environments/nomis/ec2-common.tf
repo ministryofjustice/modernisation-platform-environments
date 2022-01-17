@@ -302,8 +302,8 @@ resource "aws_ssm_association" "update_ssm_agent" {
 
 # Scheduled start
 resource "aws_ssm_association" "ec2_scheduled_start" {
-  name             = "AWS-StartEC2Instance" # this is an AWS provided document
-  association_name = "ec2_scheduled_start"
+  name                             = "AWS-StartEC2Instance" # this is an AWS provided document
+  association_name                 = "ec2_scheduled_start"
   automation_target_parameter_name = "InstanceId"
   parameters = {
     AutomationAssumeRole = data.aws_iam_role.ssm_service_role.arn
@@ -319,8 +319,8 @@ resource "aws_ssm_association" "ec2_scheduled_start" {
 
 # Scheduled stop
 resource "aws_ssm_association" "ec2_scheduled_stop" {
-  name             = "AWS-StopEC2Instance" # this is an AWS provided document
-  association_name = "ec2_scheduled_start"
+  name                             = "AWS-StopEC2Instance" # this is an AWS provided document
+  association_name                 = "ec2_scheduled_start"
   automation_target_parameter_name = "InstanceId"
   parameters = {
     AutomationAssumeRole = data.aws_iam_role.ssm_service_role.arn
