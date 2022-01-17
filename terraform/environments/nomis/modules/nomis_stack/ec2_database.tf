@@ -58,16 +58,25 @@ locals {
   database_root_device_size = one([for bdm in data.aws_ami.database_image.block_device_mappings : bdm.ebs.volume_size if bdm.device_name == data.aws_ami.database_image.root_device_name])
 }
 
+# user-data template
+data "template_file" "database_init" {
+  template = file("${path.module}/user_data/database_init.sh")
+  vars = {
+    parameter_name_ASMSYS  = aws_ssm_parameter.asm_sys.name
+    parameter_name_ASMSNMP = aws_ssm_parameter.asm_snmp.name
+  }
+}
+
 resource "aws_instance" "database_server" {
   ami                         = data.aws_ami.database_image.id
   associate_public_ip_address = false
   ebs_optimized               = true
-  iam_instance_profile        = var.instance_profile_id
+  iam_instance_profile        = var.instance_profile_name
   instance_type               = var.database_instance_type # tflint-ignore: aws_instance_invalid_type
   key_name                    = var.key_name
   monitoring                  = true
   subnet_id                   = data.aws_subnet.data_az_a.id
-  user_data                   = file("${path.module}/user_data/database_init.sh")
+  user_data                   = base64encode(data.template_file.database_init.rendered)
   vpc_security_group_ids = [
     var.database_common_security_group_id,
     aws_security_group.database_server.id
@@ -153,4 +162,91 @@ resource "aws_route53_record" "database" {
   type    = "A"
   ttl     = "60"
   records = [aws_instance.database_server.private_ip]
+}
+
+#------------------------------------------------------------------------------
+# ASM Passwords
+#------------------------------------------------------------------------------
+
+resource "random_password" "asm_sys" {
+
+  length  = 30
+  special = false
+}
+
+resource "aws_ssm_parameter" "asm_sys" {
+  name        = "/database/${var.stack_name}/ASMSYS"
+  description = "${var.stack_name} ASMSYS password"
+  type        = "SecureString"
+  value       = random_password.asm_sys.result
+
+  tags = merge(
+    var.tags,
+    {
+      Name = "database-${var.stack_name}-ASMSYS"
+    }
+  )
+}
+
+resource "random_password" "asm_snmp" {
+
+  length  = 30
+  special = false
+}
+
+resource "aws_ssm_parameter" "asm_snmp" {
+  name        = "/database/${var.stack_name}/ASMSNMP"
+  description = "ASMSNMP password ${var.stack_name}"
+  type        = "SecureString"
+  value       = random_password.asm_snmp.result
+
+  tags = merge(
+    var.tags,
+    {
+      Name = "database-${var.stack_name}-ASMSNMP"
+    }
+  )
+}
+
+#------------------------------------------------------------------------------
+# Instance IAM role extra permissions
+# Temporarily allow get parameter when instance first created
+# Attach policy inline on ec2-common-role
+#------------------------------------------------------------------------------
+
+resource "time_offset" "asm_parameter" {
+  # static time resource for controlling access to parameter
+  offset_minutes = 30
+  triggers = {
+    # if the instance is recycled we reset the timestamp to give access again
+    instance_id = aws_instance.database_server.arn
+  }
+}
+
+data "aws_iam_policy_document" "asm_parameter" {
+  statement {
+    effect    = "Allow"
+    actions   = ["ssm:GetParameter*"]
+    resources = ["arn:aws:ssm:${var.region}:*:parameter/database/${var.stack_name}/*"]
+    condition {
+      test     = "DateLessThan"
+      variable = "aws:CurrentTime"
+      values   = [time_offset.asm_parameter.rfc3339]
+    }
+    condition {
+      test     = "StringLike"
+      variable = "ec2:SourceInstanceARN"
+      values   = [aws_instance.database_server.arn]
+    }
+  }
+}
+
+data "aws_iam_instance_profile" "ec2_common_profile" {
+  name = var.instance_profile_name
+}
+
+resource "aws_iam_role_policy" "asm_parameter" {
+  name   = "asm-parameter-access-${var.stack_name}"
+  role   = data.aws_iam_instance_profile.ec2_common_profile.role_name
+  policy = data.aws_iam_policy_document.asm_parameter.json
 }
