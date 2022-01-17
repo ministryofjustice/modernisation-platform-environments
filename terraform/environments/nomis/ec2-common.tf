@@ -302,11 +302,11 @@ resource "aws_ssm_association" "update_ssm_agent" {
 
 # Scheduled start
 resource "aws_ssm_association" "ec2_scheduled_start" {
-  name             = "AWS-StartEC2Instance" # this is an AWS provided document
-  association_name = "ec2_scheduled_start"
+  name                             = "AWS-StartEC2Instance" # this is an AWS provided document
+  association_name                 = "ec2_scheduled_start"
   automation_target_parameter_name = "InstanceId"
   parameters = {
-    AutomationAssumeRole = data.aws_iam_role.ssm_service_role.arn
+    AutomationAssumeRole = aws_iam_role.ssm_ec2_start_stop.arn
   }
   targets {
     # currently all instances created through the nomis-stack module are tagged 'false'
@@ -314,16 +314,16 @@ resource "aws_ssm_association" "ec2_scheduled_start" {
     values = ["false"]
   }
   apply_only_at_cron_interval = true
-  schedule_expression         = "cron(0 7 ? * MON-FRI *)"
+  schedule_expression         = "cron(0 7 ? * * *)"
 }
 
 # Scheduled stop
 resource "aws_ssm_association" "ec2_scheduled_stop" {
-  name             = "AWS-StopEC2Instance" # this is an AWS provided document
-  association_name = "ec2_scheduled_start"
+  name                             = "AWS-StopEC2Instance" # this is an AWS provided document
+  association_name                 = "ec2_scheduled_start"
   automation_target_parameter_name = "InstanceId"
   parameters = {
-    AutomationAssumeRole = data.aws_iam_role.ssm_service_role.arn
+    AutomationAssumeRole = aws_iam_role.ssm_ec2_start_stop.arn
   }
   targets {
     # currently all instances created through the nomis-stack module are tagged 'false'
@@ -331,9 +331,60 @@ resource "aws_ssm_association" "ec2_scheduled_stop" {
     values = ["false"]
   }
   apply_only_at_cron_interval = true
-  schedule_expression         = "cron(0 19 ? * MON-FRI *)"
+  schedule_expression         = "cron(0 19 ? * * *)"
 }
 
-data "aws_iam_role" "ssm_service_role" {
-  name = "AWSServiceRoleForAmazonSSM"
+resource "aws_iam_role" "ssm_ec2_start_stop" {
+  name                 = "ssm_ec2_start_stop"
+  path                 = "/"
+  max_session_duration = "3600"
+  assume_role_policy = jsonencode(
+    {
+      "Version" : "2012-10-17",
+      "Statement" : [
+        {
+          "Effect" : "Allow",
+          "Principal" : {
+            "Service" : "ssm.amazonaws.com"
+          }
+          "Action" : "sts:AssumeRole",
+          "Condition" : {}
+        }
+      ]
+    }
+  )
+  managed_policy_arns = [
+    "arn:aws:iam::aws:policy/AmazonSSMServiceRolePolicy"
+  ]
+  tags = merge(
+    local.tags,
+    {
+      Name = "ssm-ec2-start-stop"
+    },
+  )
+}
+
+# create policy document for start stop instances
+data "aws_iam_policy_document" "ssm_ec2_start_stop" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "ec2:StartInstances",
+      "ec2:StopInstances"
+    ]
+    resources = ["*"]
+    condition {
+      test     = "StringLike"
+      variable = "ec2:ResourceTag/always_on"
+      values   = ["false"]
+    }
+    # todo: add a time condition
+  }
+}
+
+# attach document as inline policy
+resource "aws_iam_role_policy" "ssm_ec2_start_stop" {
+  name   = "ssm_ec2_start_stop"
+  role   = aws_iam_role.ssm_ec2_start_stop.name
+  policy = data.aws_iam_policy_document.ssm_ec2_start_stop.json
 }
