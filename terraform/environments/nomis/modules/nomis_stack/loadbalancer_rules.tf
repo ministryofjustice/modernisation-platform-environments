@@ -52,7 +52,7 @@ resource "aws_lb_listener_rule" "weblogic" {
   }
   condition {
     host_header {
-      values = ["${var.application_name}-${var.stack_name}.${var.business_unit}-${var.environment}.modernisation-platform.service.justice.gov.uk"]
+      values = ["${var.stack_name}.${var.application_name}.${data.aws_route53_zone.external.name}"]
     }
   }
 }
