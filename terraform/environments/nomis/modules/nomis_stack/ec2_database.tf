@@ -27,14 +27,14 @@ resource "aws_security_group_rule" "weblogic_server" {
 }
 
 resource "aws_security_group_rule" "extra_rules" { # Extra ingress rules that might be specified
-   for_each           = var.database_extra_ingress_rules
-   type               = "ingress"
-   security_group_id  = aws_security_group.database_server.id
-   description        = each.value.description
-   from_port          = each.value.from_port
-   to_port            = each.value.to_port
-   cidr_blocks        = each.value.cidr_blocks
-   protocol           = each.value.protocol
+  for_each          = var.database_extra_ingress_rules
+  type              = "ingress"
+  security_group_id = aws_security_group.database_server.id
+  description       = each.value.description
+  from_port         = each.value.from_port
+  to_port           = each.value.to_port
+  cidr_blocks       = each.value.cidr_blocks
+  protocol          = each.value.protocol
 }
 
 #------------------------------------------------------------------------------
