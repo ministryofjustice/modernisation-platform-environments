@@ -32,10 +32,10 @@ locals {
 }
 
 data "template_file" "weblogic_init" {
-  template = "${file("${path.module}/user_data/weblogic_init.sh")}"
+  template = file("${path.module}/user_data/weblogic_init.sh")
   vars = {
-    ENV               = var.stack_name
-    DB_HOSTNAME       = "database-${var.stack_name}.${var.application_name}.${var.business_unit}-${var.environment}.modernisation-platform.internal"
+    ENV         = var.stack_name
+    DB_HOSTNAME = "database-${var.stack_name}.${var.application_name}.${var.business_unit}-${var.environment}.modernisation-platform.internal"
   }
 }
 
@@ -45,7 +45,7 @@ resource "aws_instance" "weblogic_server" {
   ami                         = data.aws_ami.weblogic_image.id
   associate_public_ip_address = false
   # ebs_optimized          = true
-  iam_instance_profile   = var.instance_profile_id
+  iam_instance_profile   = var.instance_profile_name
   instance_type          = var.weblogic_instance_type
   key_name               = var.key_name
   monitoring             = false
