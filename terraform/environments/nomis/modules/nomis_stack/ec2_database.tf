@@ -26,7 +26,7 @@ resource "aws_security_group_rule" "weblogic_server" {
   depends_on        = [aws_instance.weblogic_server]
 }
 
-resource "aws_security_group_rule" "extra_rules" { # extra ingress rules that might be specified
+resource "aws_security_group_rule" "extra_rules" { # Extra ingress rules that might be specified
    for_each           = var.database_extra_ingress_rules
    type               = "ingress"
    security_group_id  = aws_security_group.database_server.id
