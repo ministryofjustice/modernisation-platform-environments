@@ -53,7 +53,7 @@ resource "aws_security_group_rule" "internal_lb_egress_1" {
   from_port                = 7777
   to_port                  = 7777
   protocol                 = "tcp"
-  source_security_group_id = aws_security_group.weblogic_server.id
+  source_security_group_id = aws_security_group.weblogic_common.id
 }
 
 resource "aws_lb" "internal" {
@@ -74,50 +74,6 @@ resource "aws_lb" "internal" {
   )
 }
 
-resource "aws_lb_target_group" "weblogic" {
-
-  name_prefix          = "wlogic"
-  port                 = "7777" # port on which targets receive traffic
-  protocol             = "HTTPS"
-  target_type          = "ip"
-  deregistration_delay = "30"
-  vpc_id               = local.vpc_id
-
-  lifecycle {
-    create_before_destroy = true
-  }
-
-  health_check {
-    enabled             = true
-    interval            = "30"
-    healthy_threshold   = "3"
-    matcher             = "200-399"
-    path                = "/keepalive.htm"
-    port                = "7777"
-    timeout             = "5"
-    unhealthy_threshold = "5"
-  }
-
-  # access_logs { maybe we want this?
-  #   bucket  = aws_s3_bucket.lb_logs.bucket
-  #   prefix  = "test-lb"
-  #   enabled = true
-  # }
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "internal-loadbalancer-weblogic-tg"
-    },
-  )
-}
-
-resource "aws_lb_target_group_attachment" "weblogic" {
-  target_group_arn = aws_lb_target_group.weblogic.arn
-  target_id        = aws_instance.weblogic_server.private_ip
-  port             = "7777"
-}
-
 resource "aws_lb_listener" "internal" {
   depends_on = [
     aws_acm_certificate_validation.internal_lb
@@ -130,8 +86,12 @@ resource "aws_lb_listener" "internal" {
   certificate_arn   = aws_acm_certificate.internal_lb.arn
 
   default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.weblogic.arn
+    type = "fixed-response"
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "Fixed response content"
+      status_code  = "503"
+    }
   }
 }
 
@@ -142,7 +102,7 @@ resource "aws_route53_record" "internal_lb" {
   provider = aws.core-vpc
 
   zone_id = data.aws_route53_zone.external.zone_id
-  name    = "${local.application_name}.${local.vpc_name}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  name    = "*.${data.aws_route53_zone.external.name}"
   type    = "A"
 
   alias {
@@ -157,10 +117,10 @@ resource "aws_route53_record" "internal_lb" {
 #------------------------------------------------------------------------------
 
 resource "aws_acm_certificate" "internal_lb" {
-  domain_name       = "${local.vpc_name}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  domain_name       = "${local.application_name}.${data.aws_route53_zone.external.name}"
   validation_method = "DNS"
 
-  subject_alternative_names = ["*.${local.vpc_name}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
+  subject_alternative_names = ["*.${local.application_name}.${data.aws_route53_zone.external.name}"]
 
   tags = merge(
     local.tags,

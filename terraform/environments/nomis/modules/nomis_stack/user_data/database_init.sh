@@ -22,16 +22,14 @@ hugepages() {
 
     # repeat if necessary, wait up to 5 minutes
     local i=0
-    if [[ "$pages_created" -lt "$pages" ]]; then
-        if [[ "$i" == '5' ]]; then
-            echo "only $pages_created, expected $pages"
+    while [[ "$i" -lt 5 ]]; do
+        if [[ "$pages_created" -ge "$pages" ]]; then
             break
         fi
         sleep 60
         sysctl -p
         pages_created=$(awk '/^HugePages_Total/ {print $2}' /proc/meminfo)
-        ((i++))
-    fi
+    done
     echo "created [$pages_created/$pages] hugepages"
 
     # update memory limits
@@ -65,10 +63,15 @@ disks() {
     local devices=($(lsblk -npf -o FSTYPE,PKNAME | awk '/oracleasm/ {print $2}'))
     unset IFS
 
-    for item in "${devices[@]}"; do
-        echo "resizing device ${item}"
-        parted --script "${item}" resizepart 1 100%
+    # Note use of $${} syntax - this is because this file is being used as a terraform template
+    # so we need the extra $ to prevent terraform trying to interpolate it
+    for item in "$${devices[@]}"; do
+        echo "resizing device $${item}"
+        parted --script "$${item}" resizepart 1 100%
     done
+
+    # rescan oracle asm disks as they don't always appear on first launch of instance
+    oracleasm scandisks
 }
 
 reconfigure_oracle_has() {
@@ -87,6 +90,8 @@ reconfigure_oracle_has() {
     # script to be run as oracle user
     cat > /tmp/oracle_reconfig.sh << 'EOF'
         #!/bin/bash
+        password_ASMSYS=$(aws ssm get-parameter --with-decryption --name "${parameter_name_ASMSYS}" --output text --query Parameter.Value)
+        password_ASMSNMP=$(aws ssm get-parameter --with-decryption --name "${parameter_name_ASMSNMP}" --output text --query Parameter.Value)
         source oraenv <<< +ASM
         srvctl add listener
         # get spfile for ASM
@@ -100,21 +105,27 @@ reconfigure_oracle_has() {
         sleep 10
         i=0
         asm_status=$(srvctl status asm | grep "ASM is running")
-        if [[ -z "$asm_status" ]]; then
-            if [[ "$i" == '10' ]]; then
-                echo "ASM did not start after 5 minutes, resize oracle asm disks manually"
+        while [[ "$i" -le 10 ]]; do
+            if [[ -n "$asm_status" ]]; then
+                asmcmd mount ORADATA
+                sqlplus -s / as sysasm <<< "alter diskgroup ORADATA resize all;"
+                asmcmd orapwusr --modify --password ASMSNMP <<< "$password_ASMSNMP"
+                asmcmd orapwusr --modify --password ASMSYS <<< "$password_SYS"
+                if [[ -n "$(grep CNOMT1 /etc/oratab)" ]]; then
+                    source oraenv <<< CNOMT1
+                    srvctl add database -d CNOMT1 -o $ORACLE_HOME
+                    srvctl start database -d CNOMT1
+                fi
+                break
+            fi
+            if [[ "$i" -eq 10 ]]; then
+                echo "The ASM disks could not be re-sized as the ASM service was not ready after 5 minutes"
                 break
             fi
             sleep 30
             asm_status=$(srvctl status asm | grep "ASM is running")
             ((i++))
-        fi
-        sqlplus -s / as sysasm <<< "alter diskgroup ORADATA resize all;"
-        if [[ -n "$(grep CNOMT1 /etc/oratab)" ]]; then
-            source oraenv <<< CNOMT1
-            srvctl add database -d CNOMT1 -o $ORACLE_HOME
-            srvctl start database -d CNOMT1
-        fi
+        done
 EOF
 
     # run the script as oracle user

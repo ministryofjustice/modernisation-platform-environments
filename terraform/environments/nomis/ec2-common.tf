@@ -25,7 +25,6 @@ resource "aws_iam_role" "ec2_common_role" {
     }
   )
   managed_policy_arns = [
-    "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
     "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
   ]
   tags = merge(
@@ -34,6 +33,62 @@ resource "aws_iam_role" "ec2_common_role" {
       Name = "ec2-common-role"
     },
   )
+}
+
+# create instance profile from IAM role
+resource "aws_iam_instance_profile" "ec2_common_profile" {
+  name = "ec2-common-profile"
+  role = aws_iam_role.ec2_common_role.name
+  path = "/"
+}
+
+# custom policy for SSM as managed policy AmazonSSMManagedInstanceCore is too permissive
+data "aws_iam_policy_document" "ssm_custom" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "ssm:DescribeAssociation",
+      "ssm:GetDeployablePatchSnapshotForInstance",
+      "ssm:GetDocument",
+      "ssm:DescribeDocument",
+      "ssm:GetManifest",
+      "ssm:ListAssociations",
+      "ssm:ListInstanceAssociations",
+      "ssm:PutInventory",
+      "ssm:PutComplianceItems",
+      "ssm:PutConfigurePackageResult",
+      "ssm:UpdateAssociationStatus",
+      "ssm:UpdateInstanceAssociationStatus",
+      "ssm:UpdateInstanceInformation",
+      "ssmmessages:CreateControlChannel",
+      "ssmmessages:CreateDataChannel",
+      "ssmmessages:OpenControlChannel",
+      "ssmmessages:OpenDataChannel",
+      "ec2messages:AcknowledgeMessage",
+      "ec2messages:DeleteMessage",
+      "ec2messages:FailMessage",
+      "ec2messages:GetEndpoint",
+      "ec2messages:GetMessages",
+      "ec2messages:SendReply"
+    ]
+    resources = ["*"]
+  }
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "ssm:GetParameter",
+      "ssm:GetParameters"
+    ]
+    resources = [aws_ssm_parameter.cloud_watch_config_linux.arn]
+  }
+}
+
+# attach SSM document as inline policy
+resource "aws_iam_role_policy" "ssm_custom" {
+  name   = "custom-SSM-manged-instance-core"
+  role   = aws_iam_role.ec2_common_role.name
+  policy = data.aws_iam_policy_document.ssm_custom.json
 }
 
 # create policy document for access to s3 bucket
@@ -91,12 +146,6 @@ resource "aws_iam_role_policy" "session_manager_logging" {
   name   = "session-manager-logging"
   role   = aws_iam_role.ec2_common_role.name
   policy = data.aws_iam_policy_document.session_manager_logging.json
-}
-
-resource "aws_iam_instance_profile" "ec2_common_profile" {
-  name = "ec2-common-profile"
-  role = aws_iam_role.ec2_common_role.name
-  path = "/"
 }
 
 #------------------------------------------------------------------------------
@@ -184,40 +233,32 @@ resource "aws_ssm_document" "session_manager_settings" {
 # Cloud Watch Agent
 #------------------------------------------------------------------------------
 
-resource "aws_ssm_association" "cloud_watch_agent" {
-  name             = "AWS-ConfigureAWSPackage"
-  association_name = "install-cloud-watch-agent"
-  parameters = {
-    action = "Install"
-    name   = "AmazonCloudWatchAgent"
-  }
-  targets {
-    key = "InstanceIds"
-    values = [
-      aws_instance.db_server.id,
-      aws_instance.weblogic_server.id
-    ]
-  }
-  apply_only_at_cron_interval = false
-  # schedule_expression = 
+resource "aws_ssm_document" "cloud_watch_agent" {
+  name            = "InstallAndManageCloudWatchAgent"
+  document_type   = "Command"
+  document_format = "YAML"
+  content         = file("./ssm-documents/install-and-manage-cwagent.yaml")
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "install-and-manage-cloud-watch-agent"
+    },
+  )
 }
 
 resource "aws_ssm_association" "manage_cloud_watch_agent_linux" {
-  name             = "AmazonCloudWatch-ManageAgent"
+  name             = aws_ssm_document.cloud_watch_agent.name
   association_name = "manage-cloud-watch-agent"
-  parameters = {
-    action                        = "configure"
-    mode                          = "ec2"
-    optionalConfigurationSource   = "ssm"
+  parameters = { # name of ssm parameter containing cloud watch agent config file
     optionalConfigurationLocation = aws_ssm_parameter.cloud_watch_config_linux.name
-    optionalRestart               = "yes"
   }
   targets {
     key    = "tag:os_type"
     values = ["Linux"]
   }
   apply_only_at_cron_interval = false
-  # schedule_expression = 
+  schedule_expression         = "cron(45 7 ? * TUE *)"
 }
 
 resource "aws_ssm_parameter" "cloud_watch_config_linux" {
@@ -234,6 +275,91 @@ resource "aws_ssm_parameter" "cloud_watch_config_linux" {
   )
 }
 
-# do a schedule
-# config for windows
-# add one for ssm-agent updates??
+# TODO: config for windows
+
+#------------------------------------------------------------------------------
+# SSM Agent - update Systems Manager Agent
+#------------------------------------------------------------------------------
+
+resource "aws_ssm_association" "update_ssm_agent" {
+  name             = "AWS-UpdateSSMAgent" # this is an AWS provided document
+  association_name = "update-ssm-agent"
+  parameters = {
+    allowDowngrade = "false"
+  }
+  targets {
+    # we could just target all instances, but this would also include the bastion, which gets rebuilt everyday
+    key    = "tag:os_type"
+    values = ["Linux", "Windows"]
+  }
+  apply_only_at_cron_interval = false
+  schedule_expression         = "cron(30 7 ? * TUE *)"
+}
+
+#------------------------------------------------------------------------------
+# Scheduled overnight shutdown
+#------------------------------------------------------------------------------
+
+# Scheduled start
+resource "aws_ssm_association" "ec2_scheduled_start" {
+  name                             = "AWS-StartEC2Instance" # this is an AWS provided document
+  association_name                 = "ec2_scheduled_start"
+  automation_target_parameter_name = "InstanceId"
+  parameters = {
+    AutomationAssumeRole = aws_iam_role.ssm_ec2_start_stop.arn
+  }
+  targets {
+    # currently all instances created through the nomis-stack module are tagged 'false'
+    key    = "tag:always_on"
+    values = ["false"]
+  }
+  apply_only_at_cron_interval = true
+  schedule_expression         = "cron(0 7 ? * * *)"
+}
+
+# Scheduled stop
+resource "aws_ssm_association" "ec2_scheduled_stop" {
+  name                             = "AWS-StopEC2Instance" # this is an AWS provided document
+  association_name                 = "ec2_scheduled_stop"
+  automation_target_parameter_name = "InstanceId"
+  parameters = {
+    AutomationAssumeRole = aws_iam_role.ssm_ec2_start_stop.arn
+  }
+  targets {
+    # currently all instances created through the nomis-stack module are tagged 'false'
+    key    = "tag:always_on"
+    values = ["false"]
+  }
+  apply_only_at_cron_interval = true
+  schedule_expression         = "cron(0 19 ? * * *)"
+}
+
+resource "aws_iam_role" "ssm_ec2_start_stop" {
+  name                 = "ssm-ec2-start-stop"
+  path                 = "/"
+  max_session_duration = "3600"
+  assume_role_policy = jsonencode(
+    {
+      "Version" : "2012-10-17",
+      "Statement" : [
+        {
+          "Effect" : "Allow",
+          "Principal" : {
+            "Service" : "ssm.amazonaws.com"
+          }
+          "Action" : "sts:AssumeRole",
+          "Condition" : {}
+        }
+      ]
+    }
+  )
+  managed_policy_arns = [
+    "arn:aws:iam::aws:policy/service-role/AmazonSSMAutomationRole"
+  ]
+  tags = merge(
+    local.tags,
+    {
+      Name = "ssm-ec2-start-stop"
+    },
+  )
+}
