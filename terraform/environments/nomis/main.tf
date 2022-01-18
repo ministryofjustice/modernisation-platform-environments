@@ -19,7 +19,7 @@ module "nomis_stack" {
   database_common_security_group_id = aws_security_group.database_common.id
   weblogic_common_security_group_id = aws_security_group.weblogic_common.id
 
-  instance_profile_id        = aws_iam_instance_profile.ec2_common_profile.id
+  instance_profile_name      = aws_iam_instance_profile.ec2_common_profile.name
   key_name                   = aws_key_pair.ec2-user.key_name
   load_balancer_listener_arn = aws_lb_listener.internal.arn
 
@@ -106,6 +106,14 @@ resource "aws_security_group" "database_common" {
     to_port         = "22"
     protocol        = "TCP"
     security_groups = [module.bastion_linux.bastion_security_group]
+  }
+
+  ingress {
+    description = "Access to database port from Azure fix n go NOMS-Test"
+    from_port   = "1521"
+    to_port     = "1521"
+    protocol    = "TCP"
+    cidr_blocks = ["10.101.0.0/16"] # NOMS-Test
   }
 
   egress {
