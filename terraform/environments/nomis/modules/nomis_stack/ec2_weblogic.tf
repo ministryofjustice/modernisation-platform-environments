@@ -53,6 +53,8 @@ resource "aws_instance" "weblogic_server" {
   user_data              = file("${path.module}/user_data/weblogic_init.sh")
   vpc_security_group_ids = [var.weblogic_common_security_group_id]
 
+  depends_on = [aws_instance.database_server]
+
   metadata_options {
     http_endpoint = "enabled"
     http_tokens   = "required"
@@ -83,7 +85,6 @@ resource "aws_instance" "weblogic_server" {
       always_on  = "false"
     }
   )
-  depends_on = [aws_instance.database_server]
 }
 
 resource "aws_ebs_volume" "weblogic_ami_volume" {
