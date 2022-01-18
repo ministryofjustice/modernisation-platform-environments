@@ -32,10 +32,10 @@ locals {
 }
 
 data "template_file" "weblogic_init" {
-  template = "${file("${path.module}/user_data/weblogic_init.sh")}"
+  template = file("${path.module}/user_data/weblogic_init.sh")
   vars = {
-    ENV               = var.stack_name
-    DB_HOSTNAME       = "database-${var.stack_name}.${var.application_name}.${var.business_unit}-${var.environment}.modernisation-platform.internal"
+    ENV         = var.stack_name
+    DB_HOSTNAME = "database-${var.stack_name}.${var.application_name}.${var.business_unit}-${var.environment}.modernisation-platform.internal"
   }
 }
 
