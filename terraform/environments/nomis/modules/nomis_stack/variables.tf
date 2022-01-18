@@ -43,7 +43,6 @@ variable "database_extra_ingress_rules" {
     from_port       = string
     to_port         = string
     protocol        = string
-    security_groups = list(string)
     cidr_blocks     = list(string)
   }))
   description = "A list of extra ingress rules to be added to the database security group"
