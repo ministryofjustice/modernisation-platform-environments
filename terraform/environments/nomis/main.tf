@@ -15,13 +15,6 @@ module "nomis_stack" {
   database_ami_name            = each.value.database_ami_name
   database_extra_ingress_rules = each.value.database_extra_ingress_rules
   weblogic_ami_name            = each.value.weblogic_ami_name
-  DB_NAME                      = each.value.DB_NAME
-  DB_PORT                      = each.value.DB_PORT
-  # Sensitive Values
-  DB_USERNAME                  = each.value.DB_USERNAME
-  DB_PASSWORD                  = each.value.DB_PASSWORD
-  WEBLOGIC_USERNAME            = each.value.WEBLOGIC_USERNAME
-  WEBLOGIC_PASSWORD            = each.value.WEBLOGIC_PASSWORD
 
   database_common_security_group_id = aws_security_group.database_common.id
   weblogic_common_security_group_id = aws_security_group.weblogic_common.id

@@ -36,13 +36,6 @@ data "template_file" "weblogic_init" {
   vars = {
     ENV               = var.stack_name
     DB_HOSTNAME       = "database-${var.stack_name}.${var.application_name}.${var.business_unit}-${var.environment}.modernisation-platform.internal"
-    DB_NAME           = var.DB_NAME
-    DB_PORT           = var.DB_PORT
-    # Sensitive values (obtained via user input on "terraform apply")
-    DB_USERNAME       = var.DB_USERNAME
-    DB_PASSWORD       = var.DB_PASSWORD
-    WEBLOGIC_USERNAME = var.WEBLOGIC_USERNAME
-    WEBLOGIC_PASSWORD = var.WEBLOGIC_PASSWORD
   }
 }
 
