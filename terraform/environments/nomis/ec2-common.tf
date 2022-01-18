@@ -298,12 +298,22 @@ resource "aws_ssm_association" "update_ssm_agent" {
 
 #------------------------------------------------------------------------------
 # Scheduled overnight shutdown
+# This is a pretty basic implementation until Mod Platform build a platform
+# wide solution.  State Manager does not allow cron expressions like MON-FRI
+# so we need to create a separate association for each day in order to deal with
+# weekends.  Alternatively we could use Eventbridge rules as a trigger, but its 
+# slightly more complex to setup the IAM roles for that.
 #------------------------------------------------------------------------------
+
+locals {
+  weekdays = ["MON", "TUE", "WED", "THU", "FRI"]
+}
 
 # Scheduled start
 resource "aws_ssm_association" "ec2_scheduled_start" {
+  for_each                         = toset(local.weekdays)
   name                             = "AWS-StartEC2Instance" # this is an AWS provided document
-  association_name                 = "ec2_scheduled_start"
+  association_name                 = "ec2_scheduled_start_${each.value}"
   automation_target_parameter_name = "InstanceId"
   parameters = {
     AutomationAssumeRole = aws_iam_role.ssm_ec2_start_stop.arn
@@ -314,13 +324,14 @@ resource "aws_ssm_association" "ec2_scheduled_start" {
     values = ["false"]
   }
   apply_only_at_cron_interval = true
-  schedule_expression         = "cron(0 7 ? * * *)"
+  schedule_expression         = "cron(0 7 ? * ${each.value} *)"
 }
 
 # Scheduled stop
 resource "aws_ssm_association" "ec2_scheduled_stop" {
+  for_each                         = toset(local.weekdays)
   name                             = "AWS-StopEC2Instance" # this is an AWS provided document
-  association_name                 = "ec2_scheduled_stop"
+  association_name                 = "ec2_scheduled_stop_${each.value}"
   automation_target_parameter_name = "InstanceId"
   parameters = {
     AutomationAssumeRole = aws_iam_role.ssm_ec2_start_stop.arn
@@ -331,7 +342,7 @@ resource "aws_ssm_association" "ec2_scheduled_stop" {
     values = ["false"]
   }
   apply_only_at_cron_interval = true
-  schedule_expression         = "cron(0 19 ? * * *)"
+  schedule_expression         = "cron(0 19 ? * ${each.value} *)"
 }
 
 resource "aws_iam_role" "ssm_ec2_start_stop" {
@@ -355,6 +366,7 @@ resource "aws_iam_role" "ssm_ec2_start_stop" {
   )
   managed_policy_arns = [
     "arn:aws:iam::aws:policy/service-role/AmazonSSMAutomationRole"
+    # todo: This policy gives a lot of permissions. We should create a custom policy if we keep the solution long term 
   ]
   tags = merge(
     local.tags,
