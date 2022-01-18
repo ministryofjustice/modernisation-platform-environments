@@ -63,9 +63,11 @@ disks() {
     local devices=($(lsblk -npf -o FSTYPE,PKNAME | awk '/oracleasm/ {print $2}'))
     unset IFS
 
-    for item in "${devices[@]}"; do
-        echo "resizing device ${item}"
-        parted --script "${item}" resizepart 1 100%
+    # Note use of $${} syntax - this is because this file is being used as a terraform template
+    # so we need the extra $ to prevent terraform trying to interpolate it
+    for item in "$${devices[@]}"; do
+        echo "resizing device $${item}"
+        parted --script "$${item}" resizepart 1 100%
     done
 
     # rescan oracle asm disks as they don't always appear on first launch of instance
@@ -88,6 +90,8 @@ reconfigure_oracle_has() {
     # script to be run as oracle user
     cat > /tmp/oracle_reconfig.sh << 'EOF'
         #!/bin/bash
+        password_ASMSYS=$(aws ssm get-parameter --with-decryption --name "${parameter_name_ASMSYS}" --output text --query Parameter.Value)
+        password_ASMSNMP=$(aws ssm get-parameter --with-decryption --name "${parameter_name_ASMSNMP}" --output text --query Parameter.Value)
         source oraenv <<< +ASM
         srvctl add listener
         # get spfile for ASM
@@ -105,6 +109,8 @@ reconfigure_oracle_has() {
             if [[ -n "$asm_status" ]]; then
                 asmcmd mount ORADATA
                 sqlplus -s / as sysasm <<< "alter diskgroup ORADATA resize all;"
+                asmcmd orapwusr --modify --password ASMSNMP <<< "$password_ASMSNMP"
+                asmcmd orapwusr --modify --password ASMSYS <<< "$password_SYS"
                 if [[ -n "$(grep CNOMT1 /etc/oratab)" ]]; then
                     source oraenv <<< CNOMT1
                     srvctl add database -d CNOMT1 -o $ORACLE_HOME
