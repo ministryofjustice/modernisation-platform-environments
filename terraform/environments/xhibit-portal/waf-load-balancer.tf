@@ -79,7 +79,7 @@ resource "aws_lb_target_group" "waf_lb_web_tg" {
     unhealthy_threshold = 2
     timeout             = 2
     interval            = 5
-    matcher             = "200" # change this to 200 when the database comes up
+    matcher             = "302" # change this to 200 when the database comes up
   }
 
   tags = merge(
