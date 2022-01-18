@@ -12,7 +12,6 @@
                             "from_port"       : "9999",
                             "to_port"         : "9999",
                             "protocol"        : "TCP",
-                            "security_groups" : [],
                             "cidr_blocks" : ["192.168.1.1/32","192.168.1.2/32"]
                         }
                     ],

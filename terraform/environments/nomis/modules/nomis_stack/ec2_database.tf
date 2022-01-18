@@ -16,23 +16,24 @@ resource "aws_security_group" "database_server" {
 }
 
 resource "aws_security_group_rule" "weblogic_server" {
-  description       = "Rule"
-  security_group_id = aws_security_group.database_server.id
+  description       = "DB access from weblogic (private subnet)"
   type              = "ingress"
-  from_port         = 443
-  to_port           = 443
-  protocol          = "tcp"
+  security_group_id = aws_security_group.database_server.id
+  from_port         = "1521"
+  to_port           = "1521"
+  protocol          = "TCP"
   cidr_blocks       = ["${aws_instance.weblogic_server.private_ip}/32"]
   depends_on        = [aws_instance.weblogic_server]
 }
 
-resource "aws_security_group_rule" "extra_rules" {
+resource "aws_security_group_rule" "extra_rules" { # extra ingress rules that might be specified
    for_each           = var.database_extra_ingress_rules
    type               = "ingress"
    security_group_id  = aws_security_group.database_server.id
-   from_port          = each.value.port
-   to_port            = each.value.port
-   cidr_blocks        = each.value.cidrs
+   description        = each.value.description
+   from_port          = each.value.from_port
+   to_port            = each.value.to_port
+   cidr_blocks        = each.value.cidr_blocks
    protocol           = each.value.protocol
 }
 
