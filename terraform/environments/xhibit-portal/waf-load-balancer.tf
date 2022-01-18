@@ -27,6 +27,19 @@ resource "aws_security_group_rule" "egress-to-ingestion" {
   source_security_group_id = aws_security_group.cjip-server.id
 }
 
+resource "aws_security_group_rule" "allow_web_users" {
+  depends_on               = [aws_security_group.waf_lb]
+  security_group_id        = aws_security_group.waf_lb.id
+  type                     = "ingress"
+  description              = "allow web traffic to get to ingestion server"
+  from_port                = 443
+  to_port                  = 443
+  protocol                 = "TCP"
+  cidr_blocks       = ["109.152.13.5/32"]
+  # ipv6_cidr_blocks  = ["::/0"]
+}
+
+
 data "aws_subnet_ids" "shared-public" {
   vpc_id = local.vpc_id
   tags = {
