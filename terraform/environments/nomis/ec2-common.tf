@@ -258,7 +258,7 @@ resource "aws_ssm_association" "manage_cloud_watch_agent_linux" {
     values = ["Linux"]
   }
   apply_only_at_cron_interval = false
-  schedule_expression         = "cron(0 7 ? * TUE *)"
+  schedule_expression         = "cron(45 7 ? * TUE *)"
 }
 
 resource "aws_ssm_parameter" "cloud_watch_config_linux" {
@@ -294,4 +294,84 @@ resource "aws_ssm_association" "update_ssm_agent" {
   }
   apply_only_at_cron_interval = false
   schedule_expression         = "cron(30 7 ? * TUE *)"
+}
+
+#------------------------------------------------------------------------------
+# Scheduled overnight shutdown
+# This is a pretty basic implementation until Mod Platform build a platform
+# wide solution.  State Manager does not allow cron expressions like MON-FRI
+# so we need to create a separate association for each day in order to deal with
+# weekends.  Alternatively we could use Eventbridge rules as a trigger, but its 
+# slightly more complex to setup the IAM roles for that.
+#------------------------------------------------------------------------------
+
+locals {
+  weekdays = ["MON", "TUE", "WED", "THU", "FRI"]
+}
+
+# Scheduled start
+resource "aws_ssm_association" "ec2_scheduled_start" {
+  for_each                         = toset(local.weekdays)
+  name                             = "AWS-StartEC2Instance" # this is an AWS provided document
+  association_name                 = "ec2_scheduled_start_${each.value}"
+  automation_target_parameter_name = "InstanceId"
+  parameters = {
+    AutomationAssumeRole = aws_iam_role.ssm_ec2_start_stop.arn
+  }
+  targets {
+    # currently all instances created through the nomis-stack module are tagged 'false'
+    key    = "tag:always_on"
+    values = ["false"]
+  }
+  apply_only_at_cron_interval = true
+  schedule_expression         = "cron(0 7 ? * ${each.value} *)"
+}
+
+# Scheduled stop
+resource "aws_ssm_association" "ec2_scheduled_stop" {
+  for_each                         = toset(local.weekdays)
+  name                             = "AWS-StopEC2Instance" # this is an AWS provided document
+  association_name                 = "ec2_scheduled_stop_${each.value}"
+  automation_target_parameter_name = "InstanceId"
+  parameters = {
+    AutomationAssumeRole = aws_iam_role.ssm_ec2_start_stop.arn
+  }
+  targets {
+    # currently all instances created through the nomis-stack module are tagged 'false'
+    key    = "tag:always_on"
+    values = ["false"]
+  }
+  apply_only_at_cron_interval = true
+  schedule_expression         = "cron(0 19 ? * ${each.value} *)"
+}
+
+resource "aws_iam_role" "ssm_ec2_start_stop" {
+  name                 = "ssm-ec2-start-stop"
+  path                 = "/"
+  max_session_duration = "3600"
+  assume_role_policy = jsonencode(
+    {
+      "Version" : "2012-10-17",
+      "Statement" : [
+        {
+          "Effect" : "Allow",
+          "Principal" : {
+            "Service" : "ssm.amazonaws.com"
+          }
+          "Action" : "sts:AssumeRole",
+          "Condition" : {}
+        }
+      ]
+    }
+  )
+  managed_policy_arns = [
+    "arn:aws:iam::aws:policy/service-role/AmazonSSMAutomationRole"
+    # todo: This policy gives a lot of permissions. We should create a custom policy if we keep the solution long term 
+  ]
+  tags = merge(
+    local.tags,
+    {
+      Name = "ssm-ec2-start-stop"
+    },
+  )
 }
