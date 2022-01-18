@@ -36,7 +36,7 @@ resource "aws_security_group" "sms-server" {
 
 resource "aws_instance" "sms-server" {
   depends_on                  = [aws_security_group.sms-server]
-  instance_type               = "t2.medium"
+  instance_type               = "t3.large"
   ami                         = local.application_data.accounts[local.environment].XHBPRESMS01-ami
   vpc_security_group_ids      = [aws_security_group.sms-server.id]
   monitoring                  = false
