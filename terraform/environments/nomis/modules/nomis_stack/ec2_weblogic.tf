@@ -31,6 +31,14 @@ locals {
   weblogic_root_device_size = one([for bdm in data.aws_ami.weblogic_image.block_device_mappings : bdm.ebs.volume_size if bdm.device_name == data.aws_ami.weblogic_image.root_device_name])
 }
 
+data "template_file" "weblogic_init" {
+  template = file("${path.module}/user_data/weblogic_init.sh")
+  vars = {
+    ENV         = var.stack_name
+    DB_HOSTNAME = "db.${var.stack_name}.${var.application_name}.${data.aws_route53_zone.internal.name}"
+  }
+}
+
 resource "aws_instance" "weblogic_server" {
   #checkov:skip=CKV_AWS_135:skip "Ensure that EC2 is EBS optimized" as not supported by t2 instances.
   # t2 was chosen as t3 does not support RHEL 6.10. Review next time instance type is changed.
@@ -45,6 +53,7 @@ resource "aws_instance" "weblogic_server" {
   user_data              = file("${path.module}/user_data/weblogic_init.sh")
   vpc_security_group_ids = [var.weblogic_common_security_group_id]
 
+  depends_on = [aws_instance.database_server]
 
   metadata_options {
     http_endpoint = "enabled"
