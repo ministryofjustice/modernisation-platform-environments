@@ -12,7 +12,7 @@ resource "aws_security_group_rule" "database-outbound-all" {
   type              = "egress"
   description       = "allow all"
   from_port         = 0
-  to_port           = 0
+  to_port           = 65535
   protocol          = "TCP"
   cidr_blocks       = ["0.0.0.0/0"]
   ipv6_cidr_blocks  = ["::/0"]
@@ -24,7 +24,7 @@ resource "aws_security_group_rule" "database-inbound-all" {
   type              = "ingress"
   description       = "allow all"
   from_port         = 0
-  to_port           = 0
+  to_port           = 65535
   protocol          = "TCP"
   cidr_blocks       = ["0.0.0.0/0"]
   ipv6_cidr_blocks  = ["::/0"]
