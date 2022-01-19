@@ -29,7 +29,7 @@ resource "aws_security_group_rule" "weblogic_server" {
 # locals {database_extra_ingress_rules = jsondecode(var.database_extra_ingress_rules)}
 
 resource "aws_security_group_rule" "extra_rules" { # Extra ingress rules that might be specified
-  for_each          = { for rule in try(var.database_extra_ingress_rules) : "${rule.description}-${rule.to_port}" => rule }
+  for_each          = { for rule in var.database_extra_ingress_rules : "${rule.description}-${rule.to_port}" => rule }
   type              = "ingress"
   security_group_id = aws_security_group.database_server.id
   description       = lookup(each.value, "description")
