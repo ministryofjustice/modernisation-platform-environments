@@ -29,14 +29,14 @@ resource "aws_security_group_rule" "weblogic_server" {
 # locals {database_extra_ingress_rules = jsondecode(var.database_extra_ingress_rules)}
 
 resource "aws_security_group_rule" "extra_rules" { # Extra ingress rules that might be specified
-  for_each          = { for rule in tomap(var.database_extra_ingress_rules) : "${rule.description}-${rule.type}" => rule }
+  for_each          = { for rule in try(var.database_extra_ingress_rules) : "${rule.description}-${rule.type}" => rule }
   type              = "ingress"
   security_group_id = aws_security_group.database_server.id
-  description       = lookup(each.value.description)
-  from_port         = lookup(each.value.from_port)
-  to_port           = lookup(each.value.to_port)
-  cidr_blocks       = lookup(each.value.cidr_blocks)
-  protocol          = lookup(each.value.protocol)
+  description       = lookup(each.value, "description")
+  from_port         = lookup(each.value, "from_port")
+  to_port           = lookup(each.value, "to_port")
+  cidr_blocks       = lookup(each.value, "cidr_blocks")
+  protocol          = lookup(each.value, "protocol")
 }
 
 #------------------------------------------------------------------------------
