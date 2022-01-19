@@ -50,7 +50,7 @@ resource "aws_instance" "weblogic_server" {
   key_name               = var.key_name
   monitoring             = false
   subnet_id              = data.aws_subnet.private_az_a.id
-  user_data              = file("${path.module}/user_data/weblogic_init.sh")
+  user_data              = data.template_file.weblogic_init.rendered
   vpc_security_group_ids = [var.weblogic_common_security_group_id]
 
   depends_on = [aws_instance.database_server]
