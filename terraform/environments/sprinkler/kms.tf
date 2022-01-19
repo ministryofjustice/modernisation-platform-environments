@@ -16,7 +16,7 @@ data "aws_iam_policy_document" "sprinkler_ebs_encryption_policy_doc" {
 
   # Allow root users full management access to key
   statement {
-    effect  = "Allow"
+    effect = "Allow"
     actions = [
       "kms:*"
     ]
@@ -36,7 +36,7 @@ data "aws_iam_policy_document" "sprinkler_ebs_encryption_policy_doc" {
   # Conditions for principals is based on approach taken for S3 example in https://aws.amazon.com/blogs/security/iam-share-aws-resources-groups-aws-accounts-aws-organizations/
   # Conditions for key grants is based on https://docs.aws.amazon.com/kms/latest/developerguide/key-policies.html#key-policy-service-integration
   statement {
-    effect  = "Allow"
+    effect = "Allow"
     actions = [
       "kms:DescribeKey",
       "kms:ReEncrypt*",
@@ -53,7 +53,7 @@ data "aws_iam_policy_document" "sprinkler_ebs_encryption_policy_doc" {
     condition {
       test     = "ForAnyValue:StringLike"
       variable = "aws:PrincipalOrgPaths"
-      values   = [
+      values = [
         "${data.aws_organizations_organization.root_account.id}/*/${local.environment_management.modernisation_platform_organisation_unit_id}/*"
       ]
     }
@@ -62,7 +62,7 @@ data "aws_iam_policy_document" "sprinkler_ebs_encryption_policy_doc" {
 
   # Allow all core-shared-services-production to use this key so that it can create encrypted volumes with EC2 Image Builder
   statement {
-    effect  = "Allow"
+    effect = "Allow"
     actions = [
       "kms:CreateGrant",
       "kms:Encrypt",
