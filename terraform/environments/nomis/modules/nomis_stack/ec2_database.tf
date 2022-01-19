@@ -2,39 +2,39 @@
 # Security Group
 #------------------------------------------------------------------------------
 
-# resource "aws_security_group" "database_server" {
-#   description = "Stack specific security group rules for database instance"
-#   name        = "database-${var.stack_name}"
-#   vpc_id      = data.aws_vpc.shared_vpc.id
-#
-#   dynamic "ingress" { # extra ingress rules that might be specified
-#     for_each = var.database_extra_ingress_rules
-#     iterator = rule
-#     content {
-#       description     = rule.value.description
-#       from_port       = rule.value.from_port
-#       to_port         = rule.value.to_port
-#       protocol        = rule.value.protocol
-#       security_groups = rule.value.security_groups
-#       cidr_blocks     = rule.value.cidr_blocks
-#     }
-#   }
-#   #
-#   # ingress {
-#   #   description = "DB access from weblogic (private subnet)"
-#   #   from_port   = "1521"
-#   #   to_port     = "1521"
-#   #   protocol    = "TCP"
-#   #   cidr_blocks = ["${aws_instance.weblogic_server.private_ip}/32"]
-#   # }
-#
-#   tags = merge(
-#     var.tags,
-#     {
-#       Name = "database-${var.stack_name}"
-#     }
-#   )
-# }
+resource "aws_security_group" "database_server" {
+  description = "Stack specific security group rules for database instance"
+  name        = "database-${var.stack_name}"
+  vpc_id      = data.aws_vpc.shared_vpc.id
+
+  dynamic "ingress" { # extra ingress rules that might be specified
+    for_each = var.database_extra_ingress_rules
+    iterator = rule
+    content {
+      description     = rule.value.description
+      from_port       = rule.value.from_port
+      to_port         = rule.value.to_port
+      protocol        = rule.value.protocol
+      security_groups = rule.value.security_groups
+      cidr_blocks     = rule.value.cidr_blocks
+    }
+  }
+  #
+  # ingress {
+  #   description = "DB access from weblogic (private subnet)"
+  #   from_port   = "1521"
+  #   to_port     = "1521"
+  #   protocol    = "TCP"
+  #   cidr_blocks = ["${aws_instance.weblogic_server.private_ip}/32"]
+  # }
+
+  tags = merge(
+    var.tags,
+    {
+      Name = "database-${var.stack_name}"
+    }
+  )
+}
 
 #------------------------------------------------------------------------------
 # AMI and EC2
