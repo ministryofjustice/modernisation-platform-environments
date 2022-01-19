@@ -23,7 +23,6 @@ resource "aws_security_group_rule" "weblogic_server" {
   to_port           = "1521"
   protocol          = "TCP"
   cidr_blocks       = ["${aws_instance.weblogic_server.private_ip}/32"]
-  depends_on        = [aws_instance.weblogic_server]
 }
 
 resource "aws_security_group_rule" "extra_rules" { # Extra ingress rules that might be specified
