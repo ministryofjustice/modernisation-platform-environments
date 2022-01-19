@@ -155,11 +155,11 @@ resource "aws_alb_listener_rule" "web_listener_rule" {
     type             = "forward"
     target_group_arn = aws_lb_target_group.waf_lb_web_tg.id
   }
-  # condition {
-  #   path_pattern {
-  #     values = ["/"]
-  #   }
-  # }
+  condition {
+    path_pattern {
+      values = ["/*"]
+    }
+  }
 
   condition {
     host_header {
@@ -180,11 +180,11 @@ resource "aws_alb_listener_rule" "ingestion_listener_rule" {
     type             = "forward"
     target_group_arn = aws_lb_target_group.waf_lb_ingest_tg.id
   }
-  # condition {
-  #   path_pattern {
-  #     values = ["/"]
-  #   }
-  # }
+  condition {
+    path_pattern {
+      values = ["/*"]
+    }
+  }
 
   condition {
     host_header {
