@@ -2,7 +2,7 @@
 name: nomis
 on:
   push:
-    branches: 
+    branches:
       - main
     paths:
       - 'terraform/environments/nomis/**'
@@ -24,7 +24,7 @@ defaults:
     shell: bash
 
 jobs:
-  
+
 #   # These jobs run when creating a pull request
 #   plan-development:
 #     name: Plan Development - nomis
@@ -110,7 +110,7 @@ jobs:
           echo "Terraform apply - ${TF_ENV}"
           bash scripts/terraform-init.sh terraform/environments/nomis
           terraform -chdir="terraform/environments/nomis" workspace select "nomis-${TF_ENV}"
-          bash scripts/terraform-apply.sh terraform/environments/nomis
+          terraform destroy -target='module.nomis_stack["T1"].aws_volume_attachment.weblogic_ami_volume["/dev/sdb"]'
         env:
           TF_ENV: test
 
@@ -158,7 +158,7 @@ jobs:
 #           bash scripts/terraform-apply.sh terraform/environments/nomis
 #         env:
 #           TF_ENV: preproduction
-  
+
 #   plan-production:
 #     name: Plan Production - nomis
 #     runs-on: ubuntu-latest
