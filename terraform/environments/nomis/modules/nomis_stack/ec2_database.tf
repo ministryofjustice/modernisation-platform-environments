@@ -27,7 +27,7 @@ resource "aws_security_group_rule" "weblogic_server" {
 }
 
 resource "aws_security_group_rule" "extra_rules" { # Extra ingress rules that might be specified
-  for_each          = tomap(var.database_extra_ingress_rules)
+  for_each          = { for rule in var.database_extra_ingress_rules : "${rule.description}-${rule.type}" => rule }
   type              = "ingress"
   security_group_id = aws_security_group.database_server.id
   description       = each.value.description
