@@ -35,7 +35,7 @@ resource "aws_security_group_rule" "allow_web_users" {
   from_port         = 443
   to_port           = 443
   protocol          = "TCP"
-  cidr_blocks       = ["109.152.13.5/32"]
+  cidr_blocks       = ["109.147.86.54/32"]
   # ipv6_cidr_blocks  = ["::/0"]
 }
 
