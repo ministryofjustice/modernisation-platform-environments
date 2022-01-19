@@ -78,8 +78,8 @@ resource "aws_instance" "database_server" {
   subnet_id                   = data.aws_subnet.data_az_a.id
   user_data                   = base64encode(data.template_file.database_init.rendered)
   vpc_security_group_ids = [
-    var.database_common_security_group_id,
-    aws_security_group.database_server.id
+    var.database_common_security_group_id
+    # aws_security_group.database_server.id
   ]
   metadata_options {
     http_endpoint = "enabled"
