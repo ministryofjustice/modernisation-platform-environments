@@ -7,6 +7,14 @@ resource "aws_security_group" "database_server" {
   name        = "database-${var.stack_name}"
   vpc_id      = data.aws_vpc.shared_vpc.id
 
+  tags = merge(
+    var.tags,
+    {
+      Name = "database-${var.stack_name}"
+    }
+  )
+}
+
 resource "aws_security_group_rule" "weblogic_server" {
   description       = "DB access from weblogic (private subnet)"
   type              = "ingress"
