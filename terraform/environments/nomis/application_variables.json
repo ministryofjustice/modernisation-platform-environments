@@ -8,7 +8,14 @@
                     "database_ami_name": "nomis_db_CNOMT1-2022-01-05*",
                     "database_extra_ingress_rules": [
                         {
-                            "description"     : "a_test_rule",
+                            "description"     : "a_test_rule1",
+                            "from_port"       : "9999",
+                            "to_port"         : "9999",
+                            "protocol"        : "TCP",
+                            "cidr_blocks"     : ["192.168.1.1/32","192.168.1.2/32"]
+                        },
+                        {
+                            "description"     : "a_test_rule2",
                             "from_port"       : "9999",
                             "to_port"         : "9999",
                             "protocol"        : "TCP",
