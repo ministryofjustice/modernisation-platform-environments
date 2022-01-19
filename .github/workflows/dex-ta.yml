@@ -202,7 +202,7 @@ jobs:
   #        bash scripts/terraform-apply.sh terraform/environments/dex-ta
   #      env:
   #        TF_ENV: production
-=======
+# =======
 #   plan-test:
 #     name: Plan Test - dex-ta
 #     runs-on: ubuntu-latest

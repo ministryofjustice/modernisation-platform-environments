@@ -53,8 +53,29 @@ data "aws_iam_policy_document" "sprinkler_ebs_encryption_policy_doc" {
     condition {
       test     = "ForAnyValue:StringLike"
       variable = "aws:PrincipalOrgPaths"
-      values   = ["${data.aws_organizations_organization.root_account.id}/*/${local.environment_management.modernisation_platform_organisation_unit_id}/*"]
+      values = [
+        "${data.aws_organizations_organization.root_account.id}/*/${local.environment_management.modernisation_platform_organisation_unit_id}/*"
+      ]
     }
 
+  }
+
+  # Allow all core-shared-services-production to use this key so that it can create encrypted volumes with EC2 Image Builder
+  statement {
+    effect = "Allow"
+    actions = [
+      "kms:CreateGrant",
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*",
+      "kms:DescribeKey",
+    ]
+
+    resources = ["*"]
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${local.environment_management.account_ids["core-shared-services-production"]}:root"]
+    }
   }
 }
