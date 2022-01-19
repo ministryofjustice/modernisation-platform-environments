@@ -19,14 +19,14 @@ resource "aws_security_group" "database_server" {
       cidr_blocks     = rule.value.cidr_blocks
     }
   }
-
-  ingress {
-    description = "DB access from weblogic (private subnet)"
-    from_port   = "1521"
-    to_port     = "1521"
-    protocol    = "TCP"
-    cidr_blocks = ["${aws_instance.weblogic_server.private_ip}/32"]
-  }
+  # 
+  # ingress {
+  #   description = "DB access from weblogic (private subnet)"
+  #   from_port   = "1521"
+  #   to_port     = "1521"
+  #   protocol    = "TCP"
+  #   cidr_blocks = ["${aws_instance.weblogic_server.private_ip}/32"]
+  # }
 
   tags = merge(
     var.tags,
