@@ -6,17 +6,8 @@
             "stacks": {
                 "T1": {
                     "database_ami_name": "nomis_db_CNOMT1-2022-01-05*",
-                    "database_extra_ingress_rules": [
-                        {
-                            "description"     : "a test rule",
-                            "from_port"       : "9999",
-                            "to_port"         : "9999",
-                            "protocol"        : "TCP",
-                            "security_groups" : [],
-                            "cidr_blocks" : ["192.168.1.1/32","192.168.1.2/32"]
-                        }
-                    ],
-                    "weblogic_ami_name": "weblogic-2022-01-17*"          
+                    "database_extra_ingress_rules": [],
+                    "weblogic_ami_name": "weblogic-2022-01-17*"
                 }
             }
         }
