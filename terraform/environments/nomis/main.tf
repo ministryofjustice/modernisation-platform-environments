@@ -115,7 +115,7 @@ resource "aws_security_group" "database_common" {
     protocol    = "TCP"
     cidr_blocks = [
       for cidr in local.application_data.accounts[local.environment].database_external_access_cidr : cidr
-      ]
+    ]
   }
 
   egress {
