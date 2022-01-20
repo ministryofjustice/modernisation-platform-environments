@@ -108,6 +108,7 @@ data "aws_iam_policy_document" "packer_minimum_permissions" {
       "ec2:DescribeTags",
       "ec2:DescribeVolumes",
       "ec2:RegisterImage",
+      "ec2:RevokeSecurityGroupIngress",
       "ec2:RunInstances"
     ]
     resources = ["*"]
