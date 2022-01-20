@@ -109,11 +109,13 @@ resource "aws_security_group" "database_common" {
   }
 
   ingress {
-    description = "Access to database port from Azure fix n go NOMS-Test"
+    description = "External access to database port"
     from_port   = "1521"
     to_port     = "1521"
     protocol    = "TCP"
-    cidr_blocks = ["10.101.0.0/16"] # NOMS-Test
+    cidr_blocks = [
+      for cidr in local.application_data.accounts[local.environment].database_external_access_cidr : cidr
+      ]
   }
 
   egress {
