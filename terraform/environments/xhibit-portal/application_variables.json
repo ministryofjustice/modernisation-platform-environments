@@ -17,7 +17,7 @@
       "suprig01-disk-4-snapshot"      : "snap-005f4eb70d9d43366",
       "suprig01-disk-5-snapshot"      : "snap-08faed719f2040610",
       "suprig01-disk-6-snapshot"      : "snap-08faed719f2040610",    
-      "suprig02-ami"                  : "ami-02cd7e7f72b73ff2c", 
+      "suprig02-ami"                  : "ami-0eab7e70e4af872b3", 
       "suprig03-ami"                  : "ami-08f58e91429f8b907", 
       "suprig04-ami"                  : "ami-078997970a2e2ade7",
       "suprig04-disk-1-snapshot"      : "snap-0c727246dbdd5f75b",  
