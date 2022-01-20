@@ -48,3 +48,9 @@ data "aws_route53_zone" "external" {
   name         = "${var.business_unit}-${var.environment}.modernisation-platform.service.justice.gov.uk."
   private_zone = false
 }
+
+#------------------------------------------------------------------------------
+# This account id
+#------------------------------------------------------------------------------
+
+data "aws_caller_identity" "current" {}

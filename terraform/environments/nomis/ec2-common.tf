@@ -44,6 +44,8 @@ resource "aws_iam_instance_profile" "ec2_common_profile" {
 
 # custom policy for SSM as managed policy AmazonSSMManagedInstanceCore is too permissive
 data "aws_iam_policy_document" "ssm_custom" {
+  #tfsec:ignore:AWS099:this is derived from AmazonSSMManagedInstanceCore managed policy
+  #checkov:skip=CKV_AWS_111:this is derived from AmazonSSMManagedInstanceCore managed policy
   statement {
     effect = "Allow"
     actions = [
@@ -262,6 +264,7 @@ resource "aws_ssm_association" "manage_cloud_watch_agent_linux" {
 }
 
 resource "aws_ssm_parameter" "cloud_watch_config_linux" {
+  #checkov:skip=CKV2_AWS_34:there should not be anything secret in this config
   description = "cloud watch agent config for linux"
   name        = "cloud-watch-config-linux"
   type        = "String"
