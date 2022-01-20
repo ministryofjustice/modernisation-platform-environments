@@ -107,10 +107,11 @@ reconfigure_oracle_has() {
         asm_status=$(srvctl status asm | grep "ASM is running")
         while [[ "$i" -le 10 ]]; do
             if [[ -n "$asm_status" ]]; then
-                asmcmd mount ORADATA
+                asmcmd mount ORADATA # returns exit code zero even if already mounted
                 sqlplus -s / as sysasm <<< "alter diskgroup ORADATA resize all;"
                 asmcmd orapwusr --modify --password ASMSNMP <<< "$password_ASMSNMP"
-                asmcmd orapwusr --modify --password ASMSYS <<< "$password_SYS"
+                asmcmd orapwusr --modify --password SYS <<< "$password_ASMSYS"
+                # start test database if present in AMI
                 if [[ -n "$(grep CNOMT1 /etc/oratab)" ]]; then
                     source oraenv <<< CNOMT1
                     srvctl add database -d CNOMT1 -o $ORACLE_HOME
