@@ -12,23 +12,23 @@ resource "aws_security_group_rule" "database-outbound-all" {
   type              = "egress"
   description       = "allow all"
   from_port         = 0
-  to_port           = 65535
+  to_port           = 0
   protocol          = "-1"
   cidr_blocks       = ["0.0.0.0/0"]
   ipv6_cidr_blocks  = ["::/0"]
 }
 
-# resource "aws_security_group_rule" "database-inbound-all" {
-#   depends_on        = [aws_security_group.database-server]
-#   security_group_id = aws_security_group.database-server.id
-#   type              = "ingress"
-#   description       = "allow all"
-#   from_port         = 0
-#   to_port           = 65535
-#   protocol          = "TCP"
-#   cidr_blocks       = ["0.0.0.0/0"]
-#   ipv6_cidr_blocks  = ["::/0"]
-# }
+resource "aws_security_group_rule" "database-inbound-all" {
+  depends_on        = [aws_security_group.database-server]
+  security_group_id = aws_security_group.database-server.id
+  type              = "ingress"
+  description       = "allow all"
+  from_port         = 0
+  to_port           = 65535
+  protocol          = "UDP"
+  cidr_blocks       = ["0.0.0.0/0"]
+  ipv6_cidr_blocks  = ["::/0"]
+}
 
 
 # resource "aws_security_group_rule" "database-inbound-bastion" {
@@ -68,16 +68,16 @@ resource "aws_security_group_rule" "dc-to-sql" {
   source_security_group_id = aws_security_group.domain-controllers.id
 }
 
-resource "aws_security_group_rule" "dc-to-sql-2" {
-  depends_on               = [aws_security_group.database-server]
-  security_group_id        = aws_security_group.database-server.id
-  type                     = "ingress"
-  description              = "allow dc to sql traffic"
-  from_port                = 1400
-  to_port                  = 1449
-  protocol                 = "UDP"
-  source_security_group_id = aws_security_group.domain-controllers.id
-} 
+# resource "aws_security_group_rule" "dc-to-sql-2" {
+#   depends_on               = [aws_security_group.database-server]
+#   security_group_id        = aws_security_group.database-server.id
+#   type                     = "ingress"
+#   description              = "allow dc to sql traffic"
+#   from_port                = 1400
+#   to_port                  = 1449
+#   protocol                 = "UDP"
+#   source_security_group_id = aws_security_group.domain-controllers.id
+# } 
 
 resource "aws_security_group_rule" "dc-to-sql-3" {
   depends_on               = [aws_security_group.database-server]
@@ -90,16 +90,16 @@ resource "aws_security_group_rule" "dc-to-sql-3" {
   source_security_group_id = aws_security_group.domain-controllers.id
 }
 
-resource "aws_security_group_rule" "dc-to-sql-4" {
-  depends_on               = [aws_security_group.database-server]
-  security_group_id        = aws_security_group.database-server.id
-  type                     = "ingress"
-  description              = "allow dc to sql traffic"
-  from_port                = 123
-  to_port                  = 123
-  protocol                 = "UDP"
-  source_security_group_id = aws_security_group.domain-controllers.id
-}
+# resource "aws_security_group_rule" "dc-to-sql-4" {
+#   depends_on               = [aws_security_group.database-server]
+#   security_group_id        = aws_security_group.database-server.id
+#   type                     = "ingress"
+#   description              = "allow dc to sql traffic"
+#   from_port                = 123
+#   to_port                  = 123
+#   protocol                 = "UDP"
+#   source_security_group_id = aws_security_group.domain-controllers.id
+# }
 
 resource "aws_security_group_rule" "cjim-to-sql" {
   depends_on               = [aws_security_group.database-server]
