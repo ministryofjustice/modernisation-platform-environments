@@ -264,6 +264,7 @@ resource "aws_ssm_association" "manage_cloud_watch_agent_linux" {
 }
 
 resource "aws_ssm_parameter" "cloud_watch_config_linux" {
+  #checkov:skip=CKV2_AWS_34:there should not be anything secret in this config
   description = "cloud watch agent config for linux"
   name        = "cloud-watch-config-linux"
   type        = "String"
