@@ -27,6 +27,19 @@ resource "aws_security_group_rule" "egress-to-ingestion" {
   source_security_group_id = aws_security_group.cjip-server.id
 }
 
+resource "aws_security_group_rule" "allow_web_users" {
+  depends_on        = [aws_security_group.waf_lb]
+  security_group_id = aws_security_group.waf_lb.id
+  type              = "ingress"
+  description       = "allow web traffic to get to ingestion server"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "TCP"
+  cidr_blocks       = ["109.147.86.54/32"]
+  # ipv6_cidr_blocks  = ["::/0"]
+}
+
+
 data "aws_subnet_ids" "shared-public" {
   vpc_id = local.vpc_id
   tags = {
@@ -66,7 +79,7 @@ resource "aws_lb_target_group" "waf_lb_web_tg" {
     unhealthy_threshold = 2
     timeout             = 2
     interval            = 5
-    matcher             = "200" # change this to 200 when the database comes up
+    matcher             = "302" # change this to 200 when the database comes up
   }
 
   tags = merge(
@@ -213,7 +226,12 @@ resource "aws_acm_certificate" "waf_lb_cert" {
   domain_name       = "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   validation_method = "DNS"
 
-  subject_alternative_names = ["*.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
+  subject_alternative_names = [
+    "*.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk",
+    local.application_data.accounts[local.environment].public_dns_name_web,
+    local.application_data.accounts[local.environment].public_dns_name_ingestion,
+  ]
+
   tags = {
     Environment = "prod"
   }
@@ -249,8 +267,10 @@ resource "aws_route53_record" "waf_lb_r53_record" {
 }
 
 resource "aws_acm_certificate_validation" "waf_lb_cert_validation" {
-  certificate_arn         = aws_acm_certificate.waf_lb_cert.arn
-  validation_record_fqdns = [for record in aws_route53_record.waf_lb_r53_record : record.fqdn]
+  certificate_arn = aws_acm_certificate.waf_lb_cert.arn
+  //validation_record_fqdns = [for record in aws_route53_record.waf_lb_r53_record : record.fqdn]
+  validation_record_fqdns = [for dvo in aws_acm_certificate.waf_lb_cert.domain_validation_options : dvo.resource_record_name]
+
 }
 
 resource "aws_wafv2_web_acl" "waf_acl" {
