@@ -77,7 +77,7 @@ resource "aws_security_group_rule" "dc-to-sql-2" {
   to_port                  = 1449
   protocol                 = "UDP"
   source_security_group_id = aws_security_group.domain-controllers.id
-} 
+}
 
 resource "aws_security_group_rule" "dc-to-sql-3" {
   depends_on               = [aws_security_group.database-server]
