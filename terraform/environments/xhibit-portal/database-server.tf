@@ -198,24 +198,24 @@ resource "aws_security_group_rule" "sql-to-app-tcp3" {
 }
 
 resource "aws_security_group_rule" "sql-out-udp" {
-  depends_on               = [aws_security_group.database-server]
-  security_group_id        = aws_security_group.database-server.id
-  type                     = "egress"
-  description              = "allow app to sql traffic"
-  from_port                = 1400
-  to_port                  = 1449
-  protocol                 = "UDP"
+  depends_on        = [aws_security_group.database-server]
+  security_group_id = aws_security_group.database-server.id
+  type              = "egress"
+  description       = "allow app to sql traffic"
+  from_port         = 1400
+  to_port           = 1449
+  protocol          = "UDP"
   cidr_blocks       = ["10.33.48.0/24"]
 }
 
 resource "aws_security_group_rule" "sql-out-tcp" {
-  depends_on               = [aws_security_group.database-server]
-  security_group_id        = aws_security_group.database-server.id
-  type                     = "egress"
-  description              = "allow app to sql traffic"
-  from_port                = 1000
-  to_port                  = 1200
-  protocol                 = "TCP"
+  depends_on        = [aws_security_group.database-server]
+  security_group_id = aws_security_group.database-server.id
+  type              = "egress"
+  description       = "allow app to sql traffic"
+  from_port         = 1000
+  to_port           = 1200
+  protocol          = "TCP"
   cidr_blocks       = ["192.168.111.0/24"]
 }
 
