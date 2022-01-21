@@ -56,11 +56,11 @@ resource "aws_lb" "waf_lb" {
   subnets                    = data.aws_subnet_ids.shared-public.ids
   enable_deletion_protection = false
 
-  # access_logs {
-  #   bucket  = aws_s3_bucket.loadbalancer_logs.bucket
-  #   prefix  = "http-lb"
-  #   enabled = true
-  # }
+  access_logs {
+    bucket  = "${aws_s3_bucket.loadbalancer_logs.bucket}"
+    prefix  = "http-lb"
+    enabled = true
+  }
 
   tags = merge(
     local.tags,
@@ -174,7 +174,7 @@ resource "aws_alb_listener_rule" "web_listener_rule" {
       values = [
         "web.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk",
         local.application_data.accounts[local.environment].public_dns_name_web
-      ]
+        ]
     }
   }
 
@@ -351,4 +351,66 @@ resource "aws_wafv2_web_acl_association" "aws_lb_waf_association" {
   resource_arn = aws_lb.waf_lb.arn
   web_acl_arn  = aws_wafv2_web_acl.waf_acl.arn
 }
+
+
+
+resource "aws_s3_bucket" "loadbalancer_logs" {
+  bucket        = "ingest.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}-lblogs"
+  acl           = "log-delivery-write"
+  force_destroy = true
+}
+
+resource "aws_s3_bucket_policy" "loadbalancer_logs_policy" {
+  bucket = "aws_s3_bucket.this.id"
+  policy = "${data.aws_iam_policy_document.s3_bucket_lb_write.json}"
+}
+
+
+data "aws_iam_policy_document" "s3_bucket_lb_write" {
+
+  policy_id = "s3_bucket_lb_logs"
+
+  statement {
+    actions = [
+      "s3:PutObject",
+    ]
+    effect = "Allow"
+    resources = [
+      "${aws_s3_bucket.loadbalancer_logs.arn}/*",
+    ]
+
+    principals {
+      identifiers = "delivery.logs.amazonaws.com"
+      type        = "Service"
+    }
+  }
+
+  statement {
+    actions = [
+      "s3:PutObject"
+    ]
+    effect = "Allow"
+    resources = ["${aws_s3_bucket.loadbalancer_logs.arn}/*"]
+    principals {
+      identifiers = ["delivery.logs.amazonaws.com"]
+      type        = "Service"
+    }
+  }
+
+
+  statement {
+    actions = [
+      "s3:GetBucketAcl"
+    ]
+    effect = "Allow"
+    resources = ["${aws_s3_bucket.loadbalancer_logs.arn}"]
+    principals {
+      identifiers = ["delivery.logs.amazonaws.com"]
+      type        = "Service"
+    }
+  }
+}
+
+
+
 
