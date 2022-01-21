@@ -205,7 +205,7 @@ resource "aws_security_group_rule" "sql-out-udp" {
   from_port                = 1400
   to_port                  = 1449
   protocol                 = "UDP"
-  cidr_blocks       = ["10.33.48.0/24"]
+  cidr_blocks              = ["10.33.0.0/16"]
 }
 
 resource "aws_security_group_rule" "sql-out-tcp" {
@@ -216,7 +216,7 @@ resource "aws_security_group_rule" "sql-out-tcp" {
   from_port                = 1000
   to_port                  = 1200
   protocol                 = "TCP"
-  cidr_blocks       = ["192.168.111.0/24"]
+  cidr_blocks              = ["192.168.0.0/16"]
 }
 
 # ----------------------------------------------------------
