@@ -61,7 +61,7 @@ resource "aws_security_group_rule" "sql-to-dc-tcp" {
   description              = "allow sql to dc traffic"
   from_port                = 1400
   to_port                  = 1449
-  protocol                 = "UDP"
+  protocol                 = "TCP"
   source_security_group_id = aws_security_group.domain-controllers.id
 }
 
