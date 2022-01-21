@@ -56,11 +56,11 @@ resource "aws_lb" "waf_lb" {
   subnets                    = data.aws_subnet_ids.shared-public.ids
   enable_deletion_protection = false
 
-  access_logs {
-    bucket  = aws_s3_bucket.loadbalancer_logs.bucket
-    prefix  = "http-lb"
-    enabled = true
-  }
+  # access_logs {
+  #   bucket  = aws_s3_bucket.loadbalancer_logs.bucket
+  #   prefix  = "http-lb"
+  #   enabled = true
+  # }
 
   tags = merge(
     local.tags,
