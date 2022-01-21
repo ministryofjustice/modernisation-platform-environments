@@ -66,38 +66,38 @@ resource "aws_security_group_rule" "dc-to-sql-udp2" {
   source_security_group_id = aws_security_group.domain-controllers.id
 }
 
-resource "aws_security_group_rule" "cjim-to-sql-icmp" {
-  depends_on               = [aws_security_group.database-server]
-  security_group_id        = aws_security_group.database-server.id
-  type                     = "ingress"
-  description              = "allow cjim to sql traffic"
-  from_port                = 0
-  to_port                  = 0
-  protocol                 = "ICMP"
-  source_security_group_id = aws_security_group.cjim-server.id
-}
+# resource "aws_security_group_rule" "cjim-to-sql-icmp" {
+#   depends_on               = [aws_security_group.database-server]
+#   security_group_id        = aws_security_group.database-server.id
+#   type                     = "ingress"
+#   description              = "allow cjim to sql traffic"
+#   from_port                = 0
+#   to_port                  = 0
+#   protocol                 = "ICMP"
+#   source_security_group_id = aws_security_group.cjim-server.id
+# }
 
-resource "aws_security_group_rule" "cjim-to-sql-tcp" {
-  depends_on               = [aws_security_group.database-server]
-  security_group_id        = aws_security_group.database-server.id
-  type                     = "ingress"
-  description              = "allow cjim to sql traffic"
-  from_port                = 0
-  to_port                  = 65535
-  protocol                 = "TCP"
-  source_security_group_id = aws_security_group.cjim-server.id
-}
+# resource "aws_security_group_rule" "cjim-to-sql-tcp" {
+#   depends_on               = [aws_security_group.database-server]
+#   security_group_id        = aws_security_group.database-server.id
+#   type                     = "ingress"
+#   description              = "allow cjim to sql traffic"
+#   from_port                = 0
+#   to_port                  = 65535
+#   protocol                 = "TCP"
+#   source_security_group_id = aws_security_group.cjim-server.id
+# }
 
-resource "aws_security_group_rule" "cjim-to-sql-udp" {
-  depends_on               = [aws_security_group.database-server]
-  security_group_id        = aws_security_group.database-server.id
-  type                     = "ingress"
-  description              = "allow cjim to sql traffic"
-  from_port                = 0
-  to_port                  = 65535
-  protocol                 = "UDP"
-  source_security_group_id = aws_security_group.cjim-server.id
-}
+# resource "aws_security_group_rule" "cjim-to-sql-udp" {
+#   depends_on               = [aws_security_group.database-server]
+#   security_group_id        = aws_security_group.database-server.id
+#   type                     = "ingress"
+#   description              = "allow cjim to sql traffic"
+#   from_port                = 0
+#   to_port                  = 65535
+#   protocol                 = "UDP"
+#   source_security_group_id = aws_security_group.cjim-server.id
+# }
 
 resource "aws_security_group_rule" "app-to-sql-icmp" {
   depends_on               = [aws_security_group.database-server]
@@ -132,16 +132,16 @@ resource "aws_security_group_rule" "app-to-sql-tcp2" {
   source_security_group_id = aws_security_group.app-server.id
 }
 
-resource "aws_security_group_rule" "app-to-sql-udp" {
-  depends_on               = [aws_security_group.database-server]
-  security_group_id        = aws_security_group.database-server.id
-  type                     = "ingress"
-  description              = "allow app to sql traffic"
-  from_port                = 0
-  to_port                  = 65535
-  protocol                 = "UDP"
-  source_security_group_id = aws_security_group.app-server.id
-}
+# resource "aws_security_group_rule" "app-to-sql-udp" {
+#   depends_on               = [aws_security_group.database-server]
+#   security_group_id        = aws_security_group.database-server.id
+#   type                     = "ingress"
+#   description              = "allow app to sql traffic"
+#   from_port                = 0
+#   to_port                  = 65535
+#   protocol                 = "UDP"
+#   source_security_group_id = aws_security_group.app-server.id
+# }
 
 # ----------------------------------------------------------
 
