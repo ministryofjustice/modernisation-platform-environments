@@ -77,7 +77,29 @@ resource "aws_security_group_rule" "dc-to-sql" {
   description              = "allow dc to sql traffic"
   from_port                = 0
   to_port                  = 0
-  protocol                 = "-1"
+  protocol                 = "ICMP"
+  source_security_group_id = aws_security_group.domain-controllers.id
+}
+
+resource "aws_security_group_rule" "dc-to-sql-2" {
+  depends_on               = [aws_security_group.database-server]
+  security_group_id        = aws_security_group.database-server.id
+  type                     = "ingress"
+  description              = "allow dc to sql traffic"
+  from_port                = 0
+  to_port                  = 65535
+  protocol                 = "TCP"
+  source_security_group_id = aws_security_group.domain-controllers.id
+}
+
+resource "aws_security_group_rule" "dc-to-sql-3" {
+  depends_on               = [aws_security_group.database-server]
+  security_group_id        = aws_security_group.database-server.id
+  type                     = "ingress"
+  description              = "allow dc to sql traffic"
+  from_port                = 0
+  to_port                  = 65535
+  protocol                 = "UDP"
   source_security_group_id = aws_security_group.domain-controllers.id
 }
 
@@ -121,7 +143,29 @@ resource "aws_security_group_rule" "cjim-to-sql" {
   description              = "allow cjim to sql traffic"
   from_port                = 0
   to_port                  = 0
-  protocol                 = "-1"
+  protocol                 = "ICMP"
+  source_security_group_id = aws_security_group.cjim-server.id
+}
+
+resource "aws_security_group_rule" "cjim-to-sql-2" {
+  depends_on               = [aws_security_group.database-server]
+  security_group_id        = aws_security_group.database-server.id
+  type                     = "ingress"
+  description              = "allow cjim to sql traffic"
+  from_port                = 0
+  to_port                  = 65535
+  protocol                 = "TCP"
+  source_security_group_id = aws_security_group.cjim-server.id
+}
+
+resource "aws_security_group_rule" "cjim-to-sql-3" {
+  depends_on               = [aws_security_group.database-server]
+  security_group_id        = aws_security_group.database-server.id
+  type                     = "ingress"
+  description              = "allow cjim to sql traffic"
+  from_port                = 0
+  to_port                  = 65535
+  protocol                 = "UDP"
   source_security_group_id = aws_security_group.cjim-server.id
 }
 
@@ -132,7 +176,29 @@ resource "aws_security_group_rule" "app-to-sql" {
   description              = "allow app to sql traffic"
   from_port                = 0
   to_port                  = 0
-  protocol                 = "-1"
+  protocol                 = "ICMP"
+  source_security_group_id = aws_security_group.app-server.id
+}
+
+resource "aws_security_group_rule" "app-to-sql-2" {
+  depends_on               = [aws_security_group.database-server]
+  security_group_id        = aws_security_group.database-server.id
+  type                     = "ingress"
+  description              = "allow app to sql traffic"
+  from_port                = 0
+  to_port                  = 65535
+  protocol                 = "TCP"
+  source_security_group_id = aws_security_group.app-server.id
+}
+
+resource "aws_security_group_rule" "app-to-sql-3" {
+  depends_on               = [aws_security_group.database-server]
+  security_group_id        = aws_security_group.database-server.id
+  type                     = "ingress"
+  description              = "allow app to sql traffic"
+  from_port                = 0
+  to_port                  = 65535
+  protocol                 = "UDP"
   source_security_group_id = aws_security_group.app-server.id
 }
 
@@ -165,10 +231,31 @@ resource "aws_security_group_rule" "all-portal-to-sql" {
   description              = "allow all portal to sql traffic"
   from_port                = 0
   to_port                  = 0
-  protocol                 = "-1"
+  protocol                 = "ICMP"
   source_security_group_id = aws_security_group.portal-server.id
 }
 
+resource "aws_security_group_rule" "all-portal-to-sql-2" {
+  depends_on               = [aws_security_group.database-server]
+  security_group_id        = aws_security_group.database-server.id
+  type                     = "ingress"
+  description              = "allow all portal to sql traffic"
+  from_port                = 0
+  to_port                  = 65535
+  protocol                 = "TCP"
+  source_security_group_id = aws_security_group.portal-server.id
+}
+
+resource "aws_security_group_rule" "all-portal-to-sql-3" {
+  depends_on               = [aws_security_group.database-server]
+  security_group_id        = aws_security_group.database-server.id
+  type                     = "ingress"
+  description              = "allow all portal to sql traffic"
+  from_port                = 0
+  to_port                  = 65535
+  protocol                 = "UDP"
+  source_security_group_id = aws_security_group.portal-server.id
+}
 
 resource "aws_security_group_rule" "all-cjip-to-sql" {
   depends_on               = [aws_security_group.database-server]
@@ -177,7 +264,29 @@ resource "aws_security_group_rule" "all-cjip-to-sql" {
   description              = "allow all cjip to sql traffic"
   from_port                = 0
   to_port                  = 0
-  protocol                 = "-1"
+  protocol                 = "ICMP"
+  source_security_group_id = aws_security_group.cjip-server.id
+}
+
+resource "aws_security_group_rule" "all-cjip-to-sql-2" {
+  depends_on               = [aws_security_group.database-server]
+  security_group_id        = aws_security_group.database-server.id
+  type                     = "ingress"
+  description              = "allow all cjip to sql traffic"
+  from_port                = 0
+  to_port                  = 65535
+  protocol                 = "TCP"
+  source_security_group_id = aws_security_group.cjip-server.id
+}
+
+resource "aws_security_group_rule" "all-cjip-to-sql-3" {
+  depends_on               = [aws_security_group.database-server]
+  security_group_id        = aws_security_group.database-server.id
+  type                     = "ingress"
+  description              = "allow all cjip to sql traffic"
+  from_port                = 0
+  to_port                  = 65535
+  protocol                 = "UDP"
   source_security_group_id = aws_security_group.cjip-server.id
 }
 
