@@ -57,7 +57,7 @@ resource "aws_lb" "waf_lb" {
   enable_deletion_protection = false
 
   access_logs {
-    bucket  = "${aws_s3_bucket.loadbalancer_logs.bucket}"
+    bucket  = aws_s3_bucket.loadbalancer_logs.bucket
     prefix  = "http-lb"
     enabled = true
   }
@@ -362,7 +362,7 @@ resource "aws_s3_bucket" "loadbalancer_logs" {
 
 resource "aws_s3_bucket_policy" "loadbalancer_logs_policy" {
   bucket = "aws_s3_bucket.this.id"
-  policy = "${data.aws_iam_policy_document.s3_bucket_lb_write.json}"
+  policy = data.aws_iam_policy_document.s3_bucket_lb_write.json
 }
 
 
@@ -388,7 +388,7 @@ data "aws_iam_policy_document" "s3_bucket_lb_write" {
     actions = [
       "s3:PutObject"
     ]
-    effect = "Allow"
+    effect    = "Allow"
     resources = ["${aws_s3_bucket.loadbalancer_logs.arn}/*"]
     principals {
       identifiers = ["delivery.logs.amazonaws.com"]
@@ -401,7 +401,7 @@ data "aws_iam_policy_document" "s3_bucket_lb_write" {
     actions = [
       "s3:GetBucketAcl"
     ]
-    effect = "Allow"
+    effect    = "Allow"
     resources = ["${aws_s3_bucket.loadbalancer_logs.arn}"]
     principals {
       identifiers = ["delivery.logs.amazonaws.com"]
