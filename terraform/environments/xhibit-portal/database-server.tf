@@ -130,8 +130,8 @@ resource "aws_security_group_rule" "app-to-sql" {
   security_group_id        = aws_security_group.database-server.id
   type                     = "ingress"
   description              = "allow app to sql traffic"
-  from_port                = 1102
-  to_port                  = 1102
+  from_port                = 1000
+  to_port                  = 1200
   protocol                 = "TCP"
   source_security_group_id = aws_security_group.app-server.id
 }
@@ -141,21 +141,21 @@ resource "aws_security_group_rule" "app-to-sql-2" {
   security_group_id        = aws_security_group.database-server.id
   type                     = "ingress"
   description              = "allow app to sql traffic"
-  from_port                = 2370
-  to_port                  = 2370
+  from_port                = 2000
+  to_port                  = 2399
   protocol                 = "TCP"
   source_security_group_id = aws_security_group.app-server.id
 }
 
-resource "aws_security_group_rule" "app-to-sql-3" {
-  depends_on               = [aws_security_group.database-server]
-  security_group_id        = aws_security_group.database-server.id
-  type                     = "ingress"
-  description              = "allow app to sql traffic"
-  from_port                = 1030
-  to_port                  = 1030
-  protocol                 = "TCP"
-  source_security_group_id = aws_security_group.app-server.id
+# resource "aws_security_group_rule" "app-to-sql-3" {
+#   depends_on               = [aws_security_group.database-server]
+#   security_group_id        = aws_security_group.database-server.id
+#   type                     = "ingress"
+#   description              = "allow app to sql traffic"
+#   from_port                = 1030
+#   to_port                  = 1030
+#   protocol                 = "TCP"
+#   source_security_group_id = aws_security_group.app-server.id
 }
 
 # resource "aws_security_group_rule" "all-portal-to-sql" {
