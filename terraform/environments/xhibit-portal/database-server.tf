@@ -198,14 +198,14 @@ resource "aws_security_group_rule" "sql-to-app-icmp" {
 # }
 
 resource "aws_security_group_rule" "sql-out-udp" {
-  depends_on               = [aws_security_group.database-server]
-  security_group_id        = aws_security_group.database-server.id
-  type                     = "egress"
-  description              = "allow app to sql traffic"
-  from_port                = 1400
-  to_port                  = 1449
-  protocol                 = "UDP"
-  cidr_blocks              = ["10.33.0.0/16"]
+  depends_on        = [aws_security_group.database-server]
+  security_group_id = aws_security_group.database-server.id
+  type              = "egress"
+  description       = "allow app to sql traffic"
+  from_port         = 1400
+  to_port           = 1449
+  protocol          = "UDP"
+  cidr_blocks       = ["10.33.0.0/16"]
 }
 
 # resource "aws_security_group_rule" "sql-out-tcp" {
