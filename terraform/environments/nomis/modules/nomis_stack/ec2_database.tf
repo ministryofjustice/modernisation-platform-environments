@@ -7,27 +7,6 @@ resource "aws_security_group" "database_server" {
   name        = "database-${var.stack_name}"
   vpc_id      = data.aws_vpc.shared_vpc.id
 
-  dynamic "ingress" { # extra ingress rules that might be specified
-    for_each = var.database_extra_ingress_rules
-    iterator = rule
-    content {
-      description     = rule.value.description
-      from_port       = rule.value.from_port
-      to_port         = rule.value.to_port
-      protocol        = rule.value.protocol
-      security_groups = rule.value.security_groups
-      cidr_blocks     = rule.value.cidr_blocks
-    }
-  }
-
-  ingress {
-    description = "DB access from weblogic (private subnet)"
-    from_port   = "1521"
-    to_port     = "1521"
-    protocol    = "TCP"
-    cidr_blocks = ["${aws_instance.weblogic_server.private_ip}/32"]
-  }
-
   tags = merge(
     var.tags,
     {
@@ -36,6 +15,26 @@ resource "aws_security_group" "database_server" {
   )
 }
 
+resource "aws_security_group_rule" "weblogic_server" {
+  description       = "DB access from weblogic (private subnet)"
+  type              = "ingress"
+  security_group_id = aws_security_group.database_server.id
+  from_port         = "1521"
+  to_port           = "1521"
+  protocol          = "TCP"
+  cidr_blocks       = ["${aws_instance.weblogic_server.private_ip}/32"]
+}
+
+resource "aws_security_group_rule" "extra_rules" { # Extra ingress rules that might be specified
+  for_each          = { for rule in var.database_extra_ingress_rules : "${rule.description}-${rule.to_port}" => rule }
+  type              = "ingress"
+  security_group_id = aws_security_group.database_server.id
+  description       = each.value.description
+  from_port         = each.value.from_port
+  to_port           = each.value.to_port
+  cidr_blocks       = each.value.cidr_blocks
+  protocol          = each.value.protocol
+}
 #------------------------------------------------------------------------------
 # AMI and EC2
 #------------------------------------------------------------------------------
@@ -236,8 +235,8 @@ resource "time_offset" "asm_parameter" {
 data "aws_iam_policy_document" "asm_parameter" {
   statement {
     effect    = "Allow"
-    actions   = ["ssm:GetParameter*"]
-    resources = ["arn:aws:ssm:${var.region}:*:parameter/database/${var.stack_name}/*"]
+    actions   = ["ssm:GetParameter"]
+    resources = ["arn:aws:ssm:${var.region}:${data.aws_caller_identity.current.id}:parameter/database/${var.stack_name}/*"]
     condition {
       test     = "DateLessThan"
       variable = "aws:CurrentTime"

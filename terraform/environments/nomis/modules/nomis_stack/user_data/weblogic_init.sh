@@ -1,3 +1,3 @@
 #!/bin/bash
 
-su -c "bash /u01/software/weblogic/weblogic-setup.sh" - oracle
+su -c "export DB_HOSTNAME=${DB_HOSTNAME}; bash /u01/software/weblogic/weblogic-setup.sh" - oracle
