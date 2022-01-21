@@ -217,6 +217,7 @@ resource "aws_security_group_rule" "sql-out-tcp" {
   to_port                  = 1200
   protocol                 = "TCP"
   cidr_blocks              = ["192.168.0.0/16"]
+}
 
 # ----------------------------------------------------------
 
