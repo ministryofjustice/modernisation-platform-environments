@@ -355,7 +355,7 @@ resource "aws_wafv2_web_acl_association" "aws_lb_waf_association" {
 
 
 resource "aws_s3_bucket" "loadbalancer_logs" {
-  bucket        = "ingest.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk-lblogs"
+  bucket        = "ingest.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}-lblogs"
   acl           = "log-delivery-write"
   force_destroy = true
 }
