@@ -50,7 +50,7 @@
       "suprig04-disk-1-snapshot"      : "snap-0414bfa696a12104e",
       "suprig05-ami"                  : "ami-01e99657fbf6cc85b",
       "suprig05-disk-1-snapshot"      : "snap-08b1c019201557295",
-      "XHBPRESMS01-ami"               : "ami-015f21229c257c085",                
+      "XHBPRESMS01-ami"               : "ami-078f8e92d0e00a0ef",                
       "importmachine-data-snapshot"   : "snap-09073f656deb1ecb1"
 
     } 
