@@ -380,7 +380,7 @@ data "aws_iam_policy_document" "s3_bucket_lb_write" {
     ]
 
     principals {
-      identifiers = "delivery.logs.amazonaws.com"
+      identifiers = ["delivery.logs.amazonaws.com"]
       type        = "Service"
     }
   }
