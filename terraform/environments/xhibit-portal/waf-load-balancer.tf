@@ -56,6 +56,12 @@ resource "aws_lb" "waf_lb" {
   subnets                    = data.aws_subnet_ids.shared-public.ids
   enable_deletion_protection = false
 
+  # access_logs {
+  #   bucket  = aws_s3_bucket.loadbalancer_logs.bucket
+  #   prefix  = "http-lb"
+  #   enabled = true
+  # }
+
   tags = merge(
     local.tags,
     {
@@ -155,6 +161,7 @@ resource "aws_alb_listener_rule" "web_listener_rule" {
     type             = "forward"
     target_group_arn = aws_lb_target_group.waf_lb_web_tg.id
   }
+
   condition {
     path_pattern {
       values = ["/*"]
@@ -180,6 +187,7 @@ resource "aws_alb_listener_rule" "ingestion_listener_rule" {
     type             = "forward"
     target_group_arn = aws_lb_target_group.waf_lb_ingest_tg.id
   }
+
   condition {
     path_pattern {
       values = ["/*"]
@@ -343,3 +351,4 @@ resource "aws_wafv2_web_acl_association" "aws_lb_waf_association" {
   resource_arn = aws_lb.waf_lb.arn
   web_acl_arn  = aws_wafv2_web_acl.waf_acl.arn
 }
+
