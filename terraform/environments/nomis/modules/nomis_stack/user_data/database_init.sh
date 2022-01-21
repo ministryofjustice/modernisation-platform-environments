@@ -17,19 +17,19 @@ hugepages() {
     sed -ri 's/^vm.nr_hugepages.*$/vm.nr_hugepages='"$pages"'/' /etc/sysctl.conf
     sysctl -p
 
-    # check pages
-    local pages_created=$(awk '/^HugePages_Total/ {print $2}' /proc/meminfo)
-
-    # repeat if necessary, wait up to 5 minutes
+    # check pages, repeat if necessary, wait up to 5 minutes
+    local pages_created
     local i=0
     while [[ "$i" -lt 5 ]]; do
+        pages_created=$(awk '/^HugePages_Total/ {print $2}' /proc/meminfo)
         if [[ "$pages_created" -ge "$pages" ]]; then
             break
         fi
         sleep 60
         sysctl -p
-        pages_created=$(awk '/^HugePages_Total/ {print $2}' /proc/meminfo)
+        ((i++))
     done
+    
     echo "created [$pages_created/$pages] hugepages"
 
     # update memory limits
@@ -104,13 +104,14 @@ reconfigure_oracle_has() {
         crsctl start has
         sleep 10
         i=0
-        asm_status=$(srvctl status asm | grep "ASM is running")
         while [[ "$i" -le 10 ]]; do
+            asm_status=$(srvctl status asm | grep "ASM is running")
             if [[ -n "$asm_status" ]]; then
-                asmcmd mount ORADATA
+                asmcmd mount ORADATA # returns exit code zero even if already mounted
                 sqlplus -s / as sysasm <<< "alter diskgroup ORADATA resize all;"
                 asmcmd orapwusr --modify --password ASMSNMP <<< "$password_ASMSNMP"
-                asmcmd orapwusr --modify --password ASMSYS <<< "$password_SYS"
+                asmcmd orapwusr --modify --password SYS <<< "$password_ASMSYS"
+                # start test database if present in AMI
                 if [[ -n "$(grep CNOMT1 /etc/oratab)" ]]; then
                     source oraenv <<< CNOMT1
                     srvctl add database -d CNOMT1 -o $ORACLE_HOME
@@ -123,7 +124,6 @@ reconfigure_oracle_has() {
                 break
             fi
             sleep 30
-            asm_status=$(srvctl status asm | grep "ASM is running")
             ((i++))
         done
 EOF
