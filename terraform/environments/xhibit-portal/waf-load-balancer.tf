@@ -369,6 +369,7 @@ resource "aws_s3_bucket_policy" "loadbalancer_logs_policy" {
 data "aws_iam_policy_document" "s3_bucket_lb_write" {
 
   policy_id = "s3_bucket_lb_logs"
+  
 
   statement {
     actions = [
