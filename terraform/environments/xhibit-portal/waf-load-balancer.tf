@@ -51,7 +51,6 @@ resource "aws_lb" "waf_lb" {
 
   depends_on                 = [
       aws_security_group.waf_lb , 
-
   ]
 
   name                       = "waf-lb-${var.networking[0].application}"
@@ -367,14 +366,11 @@ resource "aws_s3_bucket" "loadbalancer_logs" {
 
 resource "aws_s3_bucket_policy" "loadbalancer_logs_policy" {
   bucket = aws_s3_bucket.loadbalancer_logs.bucket
-  policy = "${data.aws_iam_policy_document.s3_bucket_lb_write.json}"
+  policy = data.aws_iam_policy_document.s3_bucket_lb_write.json
 }
 
 
-resource "aws_iam_policy_document" "s3_bucket_lb_write" {
-
-  policy_id = "s3_bucket_lb_logs"
-
+data "aws_iam_policy_document" "s3_bucket_lb_write" {
 
   statement {
     actions = [
@@ -402,7 +398,6 @@ resource "aws_iam_policy_document" "s3_bucket_lb_write" {
       type        = "Service"
     }
   }
-
 
   statement {
     actions = [
