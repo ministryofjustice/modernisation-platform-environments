@@ -48,7 +48,12 @@ data "aws_subnet_ids" "shared-public" {
 }
 
 resource "aws_lb" "waf_lb" {
-  depends_on                 = [aws_security_group.waf_lb]
+
+  depends_on                 = [
+      aws_security_group.waf_lb , 
+
+  ]
+
   name                       = "waf-lb-${var.networking[0].application}"
   internal                   = false
   load_balancer_type         = "application"
@@ -57,7 +62,7 @@ resource "aws_lb" "waf_lb" {
   enable_deletion_protection = false
 
   access_logs {
-    bucket  = "${aws_s3_bucket.loadbalancer_logs.bucket}"
+    bucket  = aws_s3_bucket.loadbalancer_logs.bucket
     prefix  = "http-lb"
     enabled = true
   }
@@ -366,7 +371,7 @@ resource "aws_s3_bucket_policy" "loadbalancer_logs_policy" {
 }
 
 
-data "aws_iam_policy_document" "s3_bucket_lb_write" {
+resource "aws_iam_policy_document" "s3_bucket_lb_write" {
 
   policy_id = "s3_bucket_lb_logs"
 
