@@ -359,7 +359,7 @@ resource "aws_wafv2_web_acl_association" "aws_lb_waf_association" {
 
 
 resource "aws_s3_bucket" "loadbalancer_logs" {
-  bucket        = "ingest.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}-lblogs"
+  bucket        = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}-lblogs"
   acl           = "log-delivery-write"
   force_destroy = true
 }
@@ -382,8 +382,8 @@ data "aws_iam_policy_document" "s3_bucket_lb_write" {
     ]
 
     principals {
-      identifiers = ["delivery.logs.amazonaws.com"]
-      type        = "Service"
+      identifiers = ["arn:aws:iam::652711504416:root"]
+      type        = "AWS"
     }
   }
 
