@@ -35,7 +35,10 @@ resource "aws_security_group_rule" "allow_web_users" {
   from_port         = 443
   to_port           = 443
   protocol          = "TCP"
-  cidr_blocks       = ["109.147.86.54/32"]
+  cidr_blocks       = [
+    "109.147.86.54/32",
+    "81.101.176.47/32"
+  ]
   # ipv6_cidr_blocks  = ["::/0"]
 }
 
@@ -422,7 +425,7 @@ resource "aws_s3_bucket" "waf_logs" {
 
 resource "aws_wafv2_web_acl_logging_configuration" "waf_logs" {
   log_destination_configs = ["${aws_s3_bucket.waf_logs.arn}"]
-  resource_arn            = aws_wafv2_web_acl.waf_acl.id
+  resource_arn            = aws_wafv2_web_acl.waf_acl
 }
 
 
