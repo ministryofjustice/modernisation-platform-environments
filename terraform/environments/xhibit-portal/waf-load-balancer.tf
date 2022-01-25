@@ -163,6 +163,8 @@ resource "aws_lb_listener" "waf_lb_listener" {
 
 
 resource "aws_alb_listener_rule" "root_listener_redirect" {
+  priority     = 1
+  
   depends_on   = [aws_lb_listener.waf_lb_listener]
   listener_arn = aws_lb_listener.waf_lb_listener.arn
 
@@ -195,18 +197,13 @@ resource "aws_alb_listener_rule" "root_listener_redirect" {
 }
 
 resource "aws_alb_listener_rule" "web_listener_rule" {
+  priority     = 2
   depends_on   = [aws_lb_listener.waf_lb_listener]
   listener_arn = aws_lb_listener.waf_lb_listener.arn
   action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.waf_lb_web_tg.id
   }
-
-  # condition {
-  #   path_pattern {
-  #     values = ["/*"]
-  #   }
-  # }
 
   condition {
     host_header {
@@ -221,18 +218,13 @@ resource "aws_alb_listener_rule" "web_listener_rule" {
 }
 
 resource "aws_alb_listener_rule" "ingestion_listener_rule" {
+  priority     = 3
   depends_on   = [aws_lb_listener.waf_lb_listener]
   listener_arn = aws_lb_listener.waf_lb_listener.arn
   action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.waf_lb_ingest_tg.id
   }
-
-  # condition {
-  #   path_pattern {
-  #     values = ["/*"]
-  #   }
-  # }
 
   condition {
     host_header {
