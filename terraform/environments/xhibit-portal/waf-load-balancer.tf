@@ -35,7 +35,7 @@ resource "aws_security_group_rule" "allow_web_users" {
   from_port         = 443
   to_port           = 443
   protocol          = "TCP"
-  cidr_blocks       = [
+  cidr_blocks = [
     "109.147.86.54/32",
     "81.101.176.47/32"
   ]
@@ -52,8 +52,8 @@ data "aws_subnet_ids" "shared-public" {
 
 resource "aws_lb" "waf_lb" {
 
-  depends_on                 = [
-      aws_security_group.waf_lb , 
+  depends_on = [
+    aws_security_group.waf_lb,
   ]
 
   name                       = "waf-lb-${var.networking[0].application}"
@@ -181,7 +181,7 @@ resource "aws_alb_listener_rule" "web_listener_rule" {
       values = [
         "web.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk",
         local.application_data.accounts[local.environment].public_dns_name_web
-        ]
+      ]
     }
   }
 
@@ -394,7 +394,7 @@ data "aws_iam_policy_document" "s3_bucket_lb_write" {
     actions = [
       "s3:PutObject"
     ]
-    effect = "Allow"
+    effect    = "Allow"
     resources = ["${aws_s3_bucket.loadbalancer_logs.arn}/*"]
     principals {
       identifiers = ["delivery.logs.amazonaws.com"]
@@ -406,7 +406,7 @@ data "aws_iam_policy_document" "s3_bucket_lb_write" {
     actions = [
       "s3:GetBucketAcl"
     ]
-    effect = "Allow"
+    effect    = "Allow"
     resources = ["${aws_s3_bucket.loadbalancer_logs.arn}"]
     principals {
       identifiers = ["delivery.logs.amazonaws.com"]
