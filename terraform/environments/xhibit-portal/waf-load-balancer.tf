@@ -87,7 +87,7 @@ resource "aws_lb_target_group" "waf_lb_web_tg" {
     port                = 80
     healthy_threshold   = 6
     unhealthy_threshold = 2
-    timeout             = 10
+    timeout             = 2
     interval            = 5
     matcher             = "302" # change this to 200 when the database comes up
   }
@@ -178,7 +178,7 @@ resource "aws_alb_listener_rule" "web_listener_rule" {
       values = [
         "web.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk",
         local.application_data.accounts[local.environment].public_dns_name_web
-      ]
+        ]
     }
   }
 
