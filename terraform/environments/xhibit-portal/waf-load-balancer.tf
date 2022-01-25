@@ -412,6 +412,19 @@ data "aws_iam_policy_document" "s3_bucket_lb_write" {
   }
 }
 
+resource "aws_s3_bucket" "waf_logs" {
+  bucket        = "aws-waf-logs-${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}"
+  acl           = "log-delivery-write"
+  force_destroy = true
+}
+
+
+
+resource "aws_wafv2_web_acl_logging_configuration" "waf_logs" {
+  log_destination_configs = ["${aws_s3_bucket.waf_logs.arn}"]
+  resource_arn            = aws_wafv2_web_acl.waf_acl.id
+}
+
 
 
 
