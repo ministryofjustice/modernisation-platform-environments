@@ -113,7 +113,7 @@ resource "aws_lb_target_group" "waf_lb_ingest_tg" {
     port                = 80
     healthy_threshold   = 6
     unhealthy_threshold = 2
-    timeout             = 10
+    timeout             = 2
     interval            = 5
     matcher             = "200" # change this to 200 when the database comes up
   }
