@@ -167,8 +167,8 @@ resource "aws_alb_listener_rule" "root_listener_redirect" {
   listener_arn = aws_lb_listener.waf_lb_listener.arn
 
   action {
-    type       = "redirect"
-    
+    type        = "redirect"
+    status_code = "HTTP_301"
     redirect {
       path = "/Secure/Default.aspx"
     }
