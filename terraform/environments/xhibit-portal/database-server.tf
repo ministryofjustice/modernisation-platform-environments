@@ -1,4 +1,4 @@
-# Security Groups
+# Security Groups section
 resource "aws_security_group" "database-server" {
   description = "Bastion traffic"
   name        = "database-server-${local.application_name}"
