@@ -168,8 +168,9 @@ resource "aws_alb_listener_rule" "root_listener_redirect" {
 
   action {
     type        = "redirect"
-    status_code = "HTTP_301"
+
     redirect {
+      status_code = "HTTP_301"
       path = "/Secure/Default.aspx"
     }
 
