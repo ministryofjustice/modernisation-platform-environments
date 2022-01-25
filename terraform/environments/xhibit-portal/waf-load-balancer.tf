@@ -37,7 +37,8 @@ resource "aws_security_group_rule" "allow_web_users" {
   protocol          = "TCP"
   cidr_blocks = [
     "109.147.86.54/32",
-    "81.101.176.47/32"
+    "81.101.176.47/32",
+    "194.33.196.2/32"
   ]
   # ipv6_cidr_blocks  = ["::/0"]
 }
