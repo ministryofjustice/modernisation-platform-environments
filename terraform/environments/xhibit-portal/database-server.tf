@@ -21,14 +21,14 @@ resource "aws_security_group_rule" "database-outbound-all" {
 # ----------------------------------------------------------
 
 resource "aws_security_group_rule" "cjim-inbound-bastion" {
-  depends_on               = [aws_security_group.database-server]
-  security_group_id        = aws_security_group.database-server.id
-  type                     = "ingress"
-  description              = "allow bastion"
-  from_port                = 3389
-  to_port                  = 3389
-  protocol                 = "TCP"
-  cidr_blocks              = ["${module.bastion_linux.bastion_private_ip}/32"]
+  depends_on        = [aws_security_group.database-server]
+  security_group_id = aws_security_group.database-server.id
+  type              = "ingress"
+  description       = "allow bastion"
+  from_port         = 3389
+  to_port           = 3389
+  protocol          = "TCP"
+  cidr_blocks       = ["${module.bastion_linux.bastion_private_ip}/32"]
 }
 
 resource "aws_security_group_rule" "dc-to-sql-icmp" {
