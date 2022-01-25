@@ -164,17 +164,17 @@ resource "aws_lb_listener" "waf_lb_listener" {
 
 
 resource "aws_alb_listener_rule" "root_listener_redirect" {
-  priority     = 1
-  
+  priority = 1
+
   depends_on   = [aws_lb_listener.waf_lb_listener]
   listener_arn = aws_lb_listener.waf_lb_listener.arn
 
   action {
-    type        = "redirect"
+    type = "redirect"
 
     redirect {
       status_code = "HTTP_301"
-      path = "/Secure/Default.aspx"
+      path        = "/Secure/Default.aspx"
     }
 
   }
@@ -212,7 +212,7 @@ resource "aws_alb_listener_rule" "web_listener_rule" {
       values = [
         "web.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk",
         local.application_data.accounts[local.environment].public_dns_name_web
-        ]
+      ]
     }
   }
 
