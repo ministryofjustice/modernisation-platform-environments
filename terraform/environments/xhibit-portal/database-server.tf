@@ -20,6 +20,17 @@ resource "aws_security_group_rule" "database-outbound-all" {
 
 # ----------------------------------------------------------
 
+resource "aws_security_group_rule" "cjim-inbound-bastion" {
+  depends_on        = [aws_security_group.database-server]
+  security_group_id = aws_security_group.database-server.id
+  type              = "ingress"
+  description       = "allow bastion"
+  from_port         = 3389
+  to_port           = 3389
+  protocol          = "TCP"
+  cidr_blocks       = ["${module.bastion_linux.bastion_private_ip}/32"]
+}
+
 resource "aws_security_group_rule" "dc-to-sql-icmp" {
   depends_on               = [aws_security_group.database-server]
   security_group_id        = aws_security_group.database-server.id
@@ -49,7 +60,7 @@ resource "aws_security_group_rule" "dc-to-sql-tcp" {
   type                     = "ingress"
   description              = "allow dc to sql traffic"
   from_port                = 1400
-  to_port                  = 1449
+  to_port                  = 1499
   protocol                 = "TCP"
   source_security_group_id = aws_security_group.domain-controllers.id
 }
@@ -71,7 +82,7 @@ resource "aws_security_group_rule" "dc-to-sql-udp" {
   type                     = "ingress"
   description              = "allow dc to sql traffic"
   from_port                = 1400
-  to_port                  = 1449
+  to_port                  = 1499
   protocol                 = "UDP"
   source_security_group_id = aws_security_group.domain-controllers.id
 }
@@ -126,7 +137,7 @@ resource "aws_security_group_rule" "app-to-sql-tcp" {
   type                     = "ingress"
   description              = "allow app to sql traffic"
   from_port                = 1000
-  to_port                  = 1200
+  to_port                  = 1499
   protocol                 = "TCP"
   source_security_group_id = aws_security_group.app-server.id
 }
@@ -137,7 +148,7 @@ resource "aws_security_group_rule" "app-to-sql-tcp2" {
   type                     = "ingress"
   description              = "allow app to sql traffic"
   from_port                = 2000
-  to_port                  = 2400
+  to_port                  = 2499
   protocol                 = "TCP"
   source_security_group_id = aws_security_group.app-server.id
 }

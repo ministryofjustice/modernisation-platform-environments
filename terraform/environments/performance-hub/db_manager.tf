@@ -134,7 +134,7 @@ resource "aws_security_group" "db_mgmt_server_security_group" {
     description     = "Open the RDP port"
     from_port       = 3389
     to_port         = 3389
-    security_groups = [module.bastion_linux.bastion_security_group]
+    security_groups = [module._linux.bastion_security_group]
   }
 
   egress {
