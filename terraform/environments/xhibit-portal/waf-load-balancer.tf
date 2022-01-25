@@ -425,7 +425,7 @@ resource "aws_s3_bucket" "waf_logs" {
 
 resource "aws_wafv2_web_acl_logging_configuration" "waf_logs" {
   log_destination_configs = ["${aws_s3_bucket.waf_logs.arn}"]
-  resource_arn            = aws_wafv2_web_acl.waf_acl
+  resource_arn            = aws_wafv2_web_acl.waf_acl.arn
 }
 
 
