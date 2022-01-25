@@ -35,7 +35,10 @@ resource "aws_security_group_rule" "allow_web_users" {
   from_port         = 443
   to_port           = 443
   protocol          = "TCP"
-  cidr_blocks       = ["109.147.86.54/32"]
+  cidr_blocks = [
+    "109.147.86.54/32",
+    "81.101.176.47/32"
+  ]
   # ipv6_cidr_blocks  = ["::/0"]
 }
 
@@ -48,7 +51,11 @@ data "aws_subnet_ids" "shared-public" {
 }
 
 resource "aws_lb" "waf_lb" {
-  depends_on                 = [aws_security_group.waf_lb]
+
+  depends_on = [
+    aws_security_group.waf_lb,
+  ]
+
   name                       = "waf-lb-${var.networking[0].application}"
   internal                   = false
   load_balancer_type         = "application"
@@ -56,11 +63,11 @@ resource "aws_lb" "waf_lb" {
   subnets                    = data.aws_subnet_ids.shared-public.ids
   enable_deletion_protection = false
 
-  # access_logs {
-  #   bucket  = "${aws_s3_bucket.loadbalancer_logs.bucket}"
-  #   prefix  = "http-lb"
-  #   enabled = true
-  # }
+  access_logs {
+    bucket  = aws_s3_bucket.loadbalancer_logs.bucket
+    prefix  = "http-lb"
+    enabled = true
+  }
 
   tags = merge(
     local.tags,
@@ -354,62 +361,72 @@ resource "aws_wafv2_web_acl_association" "aws_lb_waf_association" {
 
 
 
-# resource "aws_s3_bucket" "loadbalancer_logs" {
-#   bucket        = "ingest.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}-lblogs"
-#   acl           = "log-delivery-write"
-#   force_destroy = true
-# }
+resource "aws_s3_bucket" "loadbalancer_logs" {
+  bucket        = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}-lblogs"
+  acl           = "log-delivery-write"
+  force_destroy = true
+}
 
-# resource "aws_s3_bucket_policy" "loadbalancer_logs_policy" {
-#   bucket = "aws_s3_bucket.this.id"
-#   policy = "${data.aws_iam_policy_document.s3_bucket_lb_write.json}"
-# }
-
-
-# data "aws_iam_policy_document" "s3_bucket_lb_write" {
-
-#   policy_id = "s3_bucket_lb_logs"
-
-#   statement {
-#     actions = [
-#       "s3:PutObject",
-#     ]
-#     effect = "Allow"
-#     resources = [
-#       "${aws_s3_bucket.loadbalancer_logs.arn}/*",
-#     ]
-
-#     principals {
-#       identifiers = ["delivery.logs.amazonaws.com"]
-#       type        = "Service"
-#     }
-#   }
-
-#   statement {
-#     actions = [
-#       "s3:PutObject"
-#     ]
-#     effect = "Allow"
-#     resources = ["${aws_s3_bucket.loadbalancer_logs.arn}/*"]
-#     principals {
-#       identifiers = ["delivery.logs.amazonaws.com"]
-#       type        = "Service"
-#     }
-#   }
+resource "aws_s3_bucket_policy" "loadbalancer_logs_policy" {
+  bucket = aws_s3_bucket.loadbalancer_logs.bucket
+  policy = data.aws_iam_policy_document.s3_bucket_lb_write.json
+}
 
 
-#   statement {
-#     actions = [
-#       "s3:GetBucketAcl"
-#     ]
-#     effect = "Allow"
-#     resources = ["${aws_s3_bucket.loadbalancer_logs.arn}"]
-#     principals {
-#       identifiers = ["delivery.logs.amazonaws.com"]
-#       type        = "Service"
-#     }
-#   }
-# }
+data "aws_iam_policy_document" "s3_bucket_lb_write" {
+
+  statement {
+    actions = [
+      "s3:PutObject",
+    ]
+    effect = "Allow"
+    resources = [
+      "${aws_s3_bucket.loadbalancer_logs.arn}/*",
+    ]
+
+    principals {
+      identifiers = ["arn:aws:iam::652711504416:root"]
+      type        = "AWS"
+    }
+  }
+
+  statement {
+    actions = [
+      "s3:PutObject"
+    ]
+    effect    = "Allow"
+    resources = ["${aws_s3_bucket.loadbalancer_logs.arn}/*"]
+    principals {
+      identifiers = ["delivery.logs.amazonaws.com"]
+      type        = "Service"
+    }
+  }
+
+  statement {
+    actions = [
+      "s3:GetBucketAcl"
+    ]
+    effect    = "Allow"
+    resources = ["${aws_s3_bucket.loadbalancer_logs.arn}"]
+    principals {
+      identifiers = ["delivery.logs.amazonaws.com"]
+      type        = "Service"
+    }
+  }
+}
+
+resource "aws_s3_bucket" "waf_logs" {
+  bucket        = "aws-waf-logs-${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}"
+  acl           = "log-delivery-write"
+  force_destroy = true
+}
+
+
+
+resource "aws_wafv2_web_acl_logging_configuration" "waf_logs" {
+  log_destination_configs = ["${aws_s3_bucket.waf_logs.arn}"]
+  resource_arn            = aws_wafv2_web_acl.waf_acl.arn
+}
 
 
 
