@@ -517,37 +517,37 @@ resource "aws_security_group_rule" "dc-all-inbound-traffic" {
 #   source_security_group_id = aws_security_group.portal-server.id
 # }
 
-# resource "aws_security_group" "outbound-dns-resolver" {
-#   provider = aws.core-vpc
+resource "aws_security_group" "outbound-dns-resolver" {
+  provider = aws.core-vpc
 
-#   description = "DNS traffic only"
-#   name        = "outbound-dns-resolver-${local.application_name}"
-#   vpc_id      = local.vpc_id
-# }
+  description = "DNS traffic only"
+  name        = "outbound-dns-resolver-${local.application_name}"
+  vpc_id      = local.vpc_id
+}
 
-# resource "aws_security_group_rule" "res1" {
-#   depends_on               = [aws_security_group.outbound-dns-resolver]
-#   security_group_id        = aws_security_group.outbound-dns-resolver.id
-#   provider                 = aws.core-vpc
-#   type                     = "egress"
-#   description              = "allow DNS"
-#   from_port                = 0
-#   to_port                  = 53
-#   protocol                 = "TCP"
-#   source_security_group_id = aws_security_group.domain-controllers.id
-# }
+resource "aws_security_group_rule" "res1" {
+  depends_on               = [aws_security_group.outbound-dns-resolver]
+  security_group_id        = aws_security_group.outbound-dns-resolver.id
+  provider                 = aws.core-vpc
+  type                     = "egress"
+  description              = "allow DNS"
+  from_port                = 0
+  to_port                  = 53
+  protocol                 = "TCP"
+  source_security_group_id = aws_security_group.domain-controllers.id
+}
 
-# resource "aws_security_group_rule" "res2" {
-#   depends_on               = [aws_security_group.outbound-dns-resolver]
-#   security_group_id        = aws_security_group.outbound-dns-resolver.id
-#   provider                 = aws.core-vpc
-#   type                     = "egress"
-#   description              = "allow DNS"
-#   from_port                = 0
-#   to_port                  = 53
-#   protocol                 = "UDP"
-#   source_security_group_id = aws_security_group.domain-controllers.id
-# }
+resource "aws_security_group_rule" "res2" {
+  depends_on               = [aws_security_group.outbound-dns-resolver]
+  security_group_id        = aws_security_group.outbound-dns-resolver.id
+  provider                 = aws.core-vpc
+  type                     = "egress"
+  description              = "allow DNS"
+  from_port                = 0
+  to_port                  = 53
+  protocol                 = "UDP"
+  source_security_group_id = aws_security_group.domain-controllers.id
+}
 
 
 
