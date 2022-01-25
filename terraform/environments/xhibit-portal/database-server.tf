@@ -6,17 +6,17 @@ resource "aws_security_group" "database-server" {
 }
 
 
-# resource "aws_security_group_rule" "database-outbound-all" {
-#   depends_on        = [aws_security_group.database-server]
-#   security_group_id = aws_security_group.database-server.id
-#   type              = "egress"
-#   description       = "allow all"
-#   from_port         = 0
-#   to_port           = 0
-#   protocol          = "-1"
-#   cidr_blocks       = ["0.0.0.0/0"]
-#   ipv6_cidr_blocks  = ["::/0"]
-# }
+resource "aws_security_group_rule" "database-outbound-all" {
+  depends_on        = [aws_security_group.database-server]
+  security_group_id = aws_security_group.database-server.id
+  type              = "egress"
+  description       = "allow all"
+  from_port         = 0
+  to_port           = 65535
+  protocol          = "TCP"
+  cidr_blocks       = ["0.0.0.0/0"]
+  ipv6_cidr_blocks  = ["::/0"]
+}
 
 # ----------------------------------------------------------
 
@@ -54,16 +54,16 @@ resource "aws_security_group_rule" "dc-to-sql-tcp" {
   source_security_group_id = aws_security_group.domain-controllers.id
 }
 
-resource "aws_security_group_rule" "sql-to-dc-tcp" {
-  depends_on               = [aws_security_group.database-server]
-  security_group_id        = aws_security_group.database-server.id
-  type                     = "egress"
-  description              = "allow sql to dc traffic"
-  from_port                = 1400
-  to_port                  = 1449
-  protocol                 = "TCP"
-  source_security_group_id = aws_security_group.domain-controllers.id
-}
+# resource "aws_security_group_rule" "sql-to-dc-tcp" {
+#   depends_on               = [aws_security_group.database-server]
+#   security_group_id        = aws_security_group.database-server.id
+#   type                     = "egress"
+#   description              = "allow sql to dc traffic"
+#   from_port                = 1400
+#   to_port                  = 1449
+#   protocol                 = "TCP"
+#   source_security_group_id = aws_security_group.domain-controllers.id
+# }
 
 resource "aws_security_group_rule" "dc-to-sql-udp" {
   depends_on               = [aws_security_group.database-server]
@@ -153,49 +153,49 @@ resource "aws_security_group_rule" "sql-to-app-icmp" {
   source_security_group_id = aws_security_group.app-server.id
 }
 
-resource "aws_security_group_rule" "sql-to-app-tcp" {
-  depends_on               = [aws_security_group.database-server]
-  security_group_id        = aws_security_group.database-server.id
-  type                     = "egress"
-  description              = "allow app to sql traffic"
-  from_port                = 1000
-  to_port                  = 1200
-  protocol                 = "TCP"
-  source_security_group_id = aws_security_group.app-server.id
-}
+# resource "aws_security_group_rule" "sql-to-app-tcp" {
+#   depends_on               = [aws_security_group.database-server]
+#   security_group_id        = aws_security_group.database-server.id
+#   type                     = "egress"
+#   description              = "allow app to sql traffic"
+#   from_port                = 1000
+#   to_port                  = 1200
+#   protocol                 = "TCP"
+#   source_security_group_id = aws_security_group.app-server.id
+# }
 
-resource "aws_security_group_rule" "sql-to-cjim-tcp" {
-  depends_on               = [aws_security_group.database-server]
-  security_group_id        = aws_security_group.database-server.id
-  type                     = "egress"
-  description              = "allow app to sql traffic"
-  from_port                = 2000
-  to_port                  = 2400
-  protocol                 = "TCP"
-  source_security_group_id = aws_security_group.cjim-server.id
-}
+# resource "aws_security_group_rule" "sql-to-cjim-tcp" {
+#   depends_on               = [aws_security_group.database-server]
+#   security_group_id        = aws_security_group.database-server.id
+#   type                     = "egress"
+#   description              = "allow app to sql traffic"
+#   from_port                = 2000
+#   to_port                  = 2400
+#   protocol                 = "TCP"
+#   source_security_group_id = aws_security_group.cjim-server.id
+# }
 
-resource "aws_security_group_rule" "sql-to-app-tcp2" {
-  depends_on               = [aws_security_group.database-server]
-  security_group_id        = aws_security_group.database-server.id
-  type                     = "egress"
-  description              = "allow app to sql traffic"
-  from_port                = 1400
-  to_port                  = 1449
-  protocol                 = "TCP"
-  source_security_group_id = aws_security_group.app-server.id
-}
+# resource "aws_security_group_rule" "sql-to-app-tcp2" {
+#   depends_on               = [aws_security_group.database-server]
+#   security_group_id        = aws_security_group.database-server.id
+#   type                     = "egress"
+#   description              = "allow app to sql traffic"
+#   from_port                = 1400
+#   to_port                  = 1449
+#   protocol                 = "TCP"
+#   source_security_group_id = aws_security_group.app-server.id
+# }
 
-resource "aws_security_group_rule" "sql-to-app-tcp3" {
-  depends_on               = [aws_security_group.database-server]
-  security_group_id        = aws_security_group.database-server.id
-  type                     = "egress"
-  description              = "allow app to sql traffic"
-  from_port                = 2000
-  to_port                  = 2400
-  protocol                 = "TCP"
-  source_security_group_id = aws_security_group.app-server.id
-}
+# resource "aws_security_group_rule" "sql-to-app-tcp3" {
+#   depends_on               = [aws_security_group.database-server]
+#   security_group_id        = aws_security_group.database-server.id
+#   type                     = "egress"
+#   description              = "allow app to sql traffic"
+#   from_port                = 2000
+#   to_port                  = 2400
+#   protocol                 = "TCP"
+#   source_security_group_id = aws_security_group.app-server.id
+# }
 
 resource "aws_security_group_rule" "sql-out-udp" {
   depends_on        = [aws_security_group.database-server]
@@ -208,16 +208,16 @@ resource "aws_security_group_rule" "sql-out-udp" {
   cidr_blocks       = ["10.33.0.0/16"]
 }
 
-resource "aws_security_group_rule" "sql-out-tcp" {
-  depends_on               = [aws_security_group.database-server]
-  security_group_id        = aws_security_group.database-server.id
-  type                     = "egress"
-  description              = "allow app to sql traffic"
-  from_port                = 1000
-  to_port                  = 1200
-  protocol                 = "TCP"
-  cidr_blocks              = ["192.168.0.0/16"]
-}
+# resource "aws_security_group_rule" "sql-out-tcp" {
+#   depends_on               = [aws_security_group.database-server]
+#   security_group_id        = aws_security_group.database-server.id
+#   type                     = "egress"
+#   description              = "allow app to sql traffic"
+#   from_port                = 1000
+#   to_port                  = 1200
+#   protocol                 = "TCP"
+#   cidr_blocks              = ["192.168.0.0/16"]
+# }
 
 # ----------------------------------------------------------
 
