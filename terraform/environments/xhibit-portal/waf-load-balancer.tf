@@ -35,7 +35,10 @@ resource "aws_security_group_rule" "allow_web_users" {
   from_port         = 443
   to_port           = 443
   protocol          = "TCP"
-  cidr_blocks       = ["109.147.86.54/32"]
+  cidr_blocks = [
+    "109.147.86.54/32",
+    "81.101.176.47/32"
+  ]
   # ipv6_cidr_blocks  = ["::/0"]
 }
 
@@ -49,8 +52,8 @@ data "aws_subnet_ids" "shared-public" {
 
 resource "aws_lb" "waf_lb" {
 
-  depends_on                 = [
-      aws_security_group.waf_lb , 
+  depends_on = [
+    aws_security_group.waf_lb,
   ]
 
   name                       = "waf-lb-${var.networking[0].application}"
@@ -87,7 +90,7 @@ resource "aws_lb_target_group" "waf_lb_web_tg" {
     port                = 80
     healthy_threshold   = 6
     unhealthy_threshold = 2
-    timeout             = 10
+    timeout             = 2
     interval            = 5
     matcher             = "302" # change this to 200 when the database comes up
   }
@@ -113,7 +116,7 @@ resource "aws_lb_target_group" "waf_lb_ingest_tg" {
     port                = 80
     healthy_threshold   = 6
     unhealthy_threshold = 2
-    timeout             = 10
+    timeout             = 2
     interval            = 5
     matcher             = "200" # change this to 200 when the database comes up
   }
@@ -391,7 +394,7 @@ data "aws_iam_policy_document" "s3_bucket_lb_write" {
     actions = [
       "s3:PutObject"
     ]
-    effect = "Allow"
+    effect    = "Allow"
     resources = ["${aws_s3_bucket.loadbalancer_logs.arn}/*"]
     principals {
       identifiers = ["delivery.logs.amazonaws.com"]
@@ -403,13 +406,26 @@ data "aws_iam_policy_document" "s3_bucket_lb_write" {
     actions = [
       "s3:GetBucketAcl"
     ]
-    effect = "Allow"
+    effect    = "Allow"
     resources = ["${aws_s3_bucket.loadbalancer_logs.arn}"]
     principals {
       identifiers = ["delivery.logs.amazonaws.com"]
       type        = "Service"
     }
   }
+}
+
+resource "aws_s3_bucket" "waf_logs" {
+  bucket        = "aws-waf-logs-${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}"
+  acl           = "log-delivery-write"
+  force_destroy = true
+}
+
+
+
+resource "aws_wafv2_web_acl_logging_configuration" "waf_logs" {
+  log_destination_configs = ["${aws_s3_bucket.waf_logs.arn}"]
+  resource_arn            = aws_wafv2_web_acl.waf_acl.arn
 }
 
 
