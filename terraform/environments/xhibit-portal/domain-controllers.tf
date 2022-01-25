@@ -20,132 +20,502 @@ resource "aws_security_group_rule" "dc-all-outbound-traffic" {
   ipv6_cidr_blocks  = ["::/0"]
 }
 
-resource "aws_security_group_rule" "dc-all-inbound-traffic" {
+# resource "aws_security_group_rule" "dc-all-inbound-traffic" {
+#   depends_on        = [aws_security_group.domain-controllers]
+#   security_group_id = aws_security_group.domain-controllers.id
+#   type              = "ingress"
+#   description       = "allow all"
+#   from_port         = 0
+#   to_port           = 0
+#   protocol          = "-1"
+#   cidr_blocks       = ["0.0.0.0/0"]
+#   ipv6_cidr_blocks  = ["::/0"]
+# }
+
+resource "aws_security_group_rule" "dns-into-dc-tcp" {
+  depends_on               = [aws_security_group.domain-controllers]
+  security_group_id        = aws_security_group.domain-controllers.id
+  type                     = "ingress"
+  description              = "allow DNS"
+  from_port                = 53
+  to_port                  = 53
+  protocol                 = "UDP"
+  source_security_group_id = aws_security_group.outbound-dns-resolver.id
+}
+
+resource "aws_security_group_rule" "dc-to-dc-icmp" {
   depends_on        = [aws_security_group.domain-controllers]
   security_group_id = aws_security_group.domain-controllers.id
   type              = "ingress"
-  description       = "allow all"
+  description       = "allow DCs to listen to each other"
   from_port         = 0
   to_port           = 0
-  protocol          = "-1"
-  cidr_blocks       = ["0.0.0.0/0"]
-  ipv6_cidr_blocks  = ["::/0"]
+  protocol          = "ICMP"
+  self              = true
 }
 
-# resource "aws_security_group_rule" "rdp-from-bastion" {
-#   depends_on        = [aws_security_group.domain-controllers]
-#   security_group_id = aws_security_group.domain-controllers.id
-#   type              = "ingress"
-#   description       = "SSH from Bastion"
-#   from_port         = 3389
-#   to_port           = 3389
-#   protocol          = "TCP"
-#   cidr_blocks       = ["${module.bastion_linux.bastion_private_ip}/32"]
-# }
+resource "aws_security_group_rule" "dc-to-dc-tcp" {
+  depends_on        = [aws_security_group.domain-controllers]
+  security_group_id = aws_security_group.domain-controllers.id
+  type              = "ingress"
+  description       = "allow DCs to listen to each other"
+  from_port         = 53
+  to_port           = 53
+  protocol          = "TCP"
+  self              = true
+}
 
-# resource "aws_security_group_rule" "dns-into-dc-tcp" {
-#   depends_on               = [aws_security_group.domain-controllers]
-#   security_group_id        = aws_security_group.domain-controllers.id
-#   type                     = "ingress"
-#   description              = "allow DNS"
-#   from_port                = 53
-#   to_port                  = 53
-#   protocol                 = "TCP"
-#   source_security_group_id = aws_security_group.outbound-dns-resolver.id
-# }
+resource "aws_security_group_rule" "dc-to-dc-tcp2" {
+  depends_on        = [aws_security_group.domain-controllers]
+  security_group_id = aws_security_group.domain-controllers.id
+  type              = "ingress"
+  description       = "allow DCs to listen to each other"
+  from_port         = 1000
+  to_port           = 2000
+  protocol          = "TCP"
+  self              = true
+}
 
-# resource "aws_security_group_rule" "dns-into-dc-udp" {
-#   depends_on               = [aws_security_group.domain-controllers]
-#   security_group_id        = aws_security_group.domain-controllers.id
-#   type                     = "ingress"
-#   description              = "allow DNS"
-#   from_port                = 53
-#   to_port                  = 53
-#   protocol                 = "UDP"
-#   source_security_group_id = aws_security_group.outbound-dns-resolver.id
-# }
+resource "aws_security_group_rule" "dc-to-dc-udp" {
+  depends_on        = [aws_security_group.domain-controllers]
+  security_group_id = aws_security_group.domain-controllers.id
+  type              = "ingress"
+  description       = "allow DCs to listen to each other"
+  from_port         = 53
+  to_port           = 53
+  protocol          = "UDP"
+  self              = true
+}
 
-# resource "aws_security_group_rule" "dc5" {
-#   depends_on        = [aws_security_group.domain-controllers]
-#   security_group_id = aws_security_group.domain-controllers.id
-#   type              = "ingress"
-#   description       = "allow DCs to listen to each other"
-#   from_port         = 0
-#   to_port           = 0
-#   protocol          = -1
-#   self              = true
-# }
+resource "aws_security_group_rule" "dc-to-dc-udp2" {
+  depends_on        = [aws_security_group.domain-controllers]
+  security_group_id = aws_security_group.domain-controllers.id
+  type              = "ingress"
+  description       = "allow DCs to listen to each other"
+  from_port         = 123
+  to_port           = 123
+  protocol          = "UDP"
+  self              = true
+}
 
+resource "aws_security_group_rule" "dc-to-dc-udp3" {
+  depends_on        = [aws_security_group.domain-controllers]
+  security_group_id = aws_security_group.domain-controllers.id
+  type              = "ingress"
+  description       = "allow DCs to listen to each other"
+  from_port         = 50000
+  to_port           = 65535
+  protocol          = "UDP"
+  self              = true
+}
 
-# resource "aws_security_group_rule" "dcs-from-app" {
-#   depends_on               = [aws_security_group.domain-controllers]
-#   security_group_id        = aws_security_group.domain-controllers.id
-#   type                     = "ingress"
-#   description              = "allow All"
-#   from_port                = 0
-#   to_port                  = 0
-#   protocol                 = -1
-#   source_security_group_id = aws_security_group.app-server.id
-# }
+resource "aws_security_group_rule" "app-to-dc-icmp" {
+  depends_on        = [aws_security_group.domain-controllers]
+  security_group_id = aws_security_group.domain-controllers.id
+  type              = "ingress"
+  description       = "allow DCs to listen to each other"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "ICMP"
+  source_security_group_id = aws_security_group.app-server.id
+}
 
-
-# resource "aws_security_group_rule" "dcs-from-cjim" {
-#   depends_on               = [aws_security_group.domain-controllers]
-#   security_group_id        = aws_security_group.domain-controllers.id
-#   type                     = "ingress"
-#   description              = "allow All"
-#   from_port                = 0
-#   to_port                  = 0
-#   protocol                 = -1
-#   source_security_group_id = aws_security_group.cjim-server.id
-# }
-
-
-# resource "aws_security_group_rule" "dcs-from-cjip" {
-#   depends_on               = [aws_security_group.domain-controllers]
-#   security_group_id        = aws_security_group.domain-controllers.id
-#   type                     = "ingress"
-#   description              = "allow All"
-#   from_port                = 0
-#   to_port                  = 0
-#   protocol                 = -1
-#   source_security_group_id = aws_security_group.cjip-server.id
-# }
+resource "aws_security_group_rule" "app-to-dc-tcp" {
+  depends_on               = [aws_security_group.domain-controllers]
+  security_group_id        = aws_security_group.domain-controllers.id
+  type                     = "ingress"
+  description              = "allow All"
+  from_port                = 445
+  to_port                  = 445
+  protocol                 = "TCP"
+  source_security_group_id = aws_security_group.app-server.id
+}
 
 
-# resource "aws_security_group_rule" "dcs-from-portal" {
-#   depends_on               = [aws_security_group.domain-controllers]
-#   security_group_id        = aws_security_group.domain-controllers.id
-#   type                     = "ingress"
-#   description              = "allow All"
-#   from_port                = 0
-#   to_port                  = 0
-#   protocol                 = -1
-#   source_security_group_id = aws_security_group.portal-server.id
-# }
+resource "aws_security_group_rule" "cjim-to-dc-icmp" {
+  depends_on               = [aws_security_group.domain-controllers]
+  security_group_id        = aws_security_group.domain-controllers.id
+  type                     = "ingress"
+  description              = "allow All"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "ICMP"
+  source_security_group_id = aws_security_group.cjim-server.id
+}
 
-# resource "aws_security_group_rule" "dcs-from-exchange" {
-#   depends_on               = [aws_security_group.domain-controllers]
-#   security_group_id        = aws_security_group.domain-controllers.id
-#   type                     = "ingress"
-#   description              = "allow All"
-#   from_port                = 0
-#   to_port                  = 0
-#   protocol                 = -1
-#   source_security_group_id = aws_security_group.exchange-server.id
-# }
+resource "aws_security_group_rule" "cjim-to-dc-tcp" {
+  depends_on               = [aws_security_group.domain-controllers]
+  security_group_id        = aws_security_group.domain-controllers.id
+  type                     = "ingress"
+  description              = "allow All"
+  from_port                = 130
+  to_port                  = 140
+  protocol                 = "TCP"
+  source_security_group_id = aws_security_group.cjim-server.id
+}
 
-# resource "aws_security_group_rule" "dcs-from-db" {
-#   depends_on               = [aws_security_group.domain-controllers]
-#   security_group_id        = aws_security_group.domain-controllers.id
-#   type                     = "ingress"
-#   description              = "allow All"
-#   from_port                = 0
-#   to_port                  = 0
-#   protocol                 = -1
-#   source_security_group_id = aws_security_group.database-server.id
-# }
+resource "aws_security_group_rule" "cjim-to-dc-tcp2" {
+  depends_on               = [aws_security_group.domain-controllers]
+  security_group_id        = aws_security_group.domain-controllers.id
+  type                     = "ingress"
+  description              = "allow All"
+  from_port                = 389
+  to_port                  = 389
+  protocol                 = "TCP"
+  source_security_group_id = aws_security_group.cjim-server.id
+}
 
+resource "aws_security_group_rule" "cjim-to-dc-tcp3" {
+  depends_on               = [aws_security_group.domain-controllers]
+  security_group_id        = aws_security_group.domain-controllers.id
+  type                     = "ingress"
+  description              = "allow All"
+  from_port                = 1026
+  to_port                  = 1026
+  protocol                 = "TCP"
+  source_security_group_id = aws_security_group.cjim-server.id
+}
+
+resource "aws_security_group_rule" "cjim-to-dc-udp" {
+  depends_on               = [aws_security_group.domain-controllers]
+  security_group_id        = aws_security_group.domain-controllers.id
+  type                     = "ingress"
+  description              = "allow All"
+  from_port                = 88
+  to_port                  = 88
+  protocol                 = "UDP"
+  source_security_group_id = aws_security_group.cjim-server.id
+}
+
+resource "aws_security_group_rule" "cjim-to-dc-udp2" {
+  depends_on               = [aws_security_group.domain-controllers]
+  security_group_id        = aws_security_group.domain-controllers.id
+  type                     = "ingress"
+  description              = "allow All"
+  from_port                = 389
+  to_port                  = 389
+  protocol                 = "UDP"
+  source_security_group_id = aws_security_group.cjim-server.id
+}
+
+resource "aws_security_group_rule" "cjip-to-dc-icmp" {
+  depends_on               = [aws_security_group.domain-controllers]
+  security_group_id        = aws_security_group.domain-controllers.id
+  type                     = "ingress"
+  description              = "allow All"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "ICMP"
+  source_security_group_id = aws_security_group.cjip-server.id
+}
+
+resource "aws_security_group_rule" "cjip-to-dc-tcp" {
+  depends_on               = [aws_security_group.domain-controllers]
+  security_group_id        = aws_security_group.domain-controllers.id
+  type                     = "ingress"
+  description              = "allow All"
+  from_port                = 135
+  to_port                  = 135
+  protocol                 = "TCP"
+  source_security_group_id = aws_security_group.cjip-server.id
+}
+
+resource "aws_security_group_rule" "cjip-to-dc-tcp2" {
+  depends_on               = [aws_security_group.domain-controllers]
+  security_group_id        = aws_security_group.domain-controllers.id
+  type                     = "ingress"
+  description              = "allow All"
+  from_port                = 389
+  to_port                  = 389
+  protocol                 = "TCP"
+  source_security_group_id = aws_security_group.cjip-server.id
+}
+
+resource "aws_security_group_rule" "cjip-to-dc-tcp3" {
+  depends_on               = [aws_security_group.domain-controllers]
+  security_group_id        = aws_security_group.domain-controllers.id
+  type                     = "ingress"
+  description              = "allow All"
+  from_port                = 445
+  to_port                  = 445
+  protocol                 = "TCP"
+  source_security_group_id = aws_security_group.cjip-server.id
+}
+
+resource "aws_security_group_rule" "cjip-to-dc-tcp4" {
+  depends_on               = [aws_security_group.domain-controllers]
+  security_group_id        = aws_security_group.domain-controllers.id
+  type                     = "ingress"
+  description              = "allow All"
+  from_port                = 1026
+  to_port                  = 1026
+  protocol                 = "TCP"
+  source_security_group_id = aws_security_group.cjip-server.id
+}
+
+resource "aws_security_group_rule" "cjip-to-dc-udp" {
+  depends_on               = [aws_security_group.domain-controllers]
+  security_group_id        = aws_security_group.domain-controllers.id
+  type                     = "ingress"
+  description              = "allow All"
+  from_port                = 88
+  to_port                  = 88
+  protocol                 = "UDP"
+  source_security_group_id = aws_security_group.cjip-server.id
+}
+
+resource "aws_security_group_rule" "cjip-to-dc-udp2" {
+  depends_on               = [aws_security_group.domain-controllers]
+  security_group_id        = aws_security_group.domain-controllers.id
+  type                     = "ingress"
+  description              = "allow All"
+  from_port                = 130
+  to_port                  = 140
+  protocol                 = "UDP"
+  source_security_group_id = aws_security_group.cjip-server.id
+}
+
+resource "aws_security_group_rule" "cjip-to-dc-udp3" {
+  depends_on               = [aws_security_group.domain-controllers]
+  security_group_id        = aws_security_group.domain-controllers.id
+  type                     = "ingress"
+  description              = "allow All"
+  from_port                = 389
+  to_port                  = 389
+  protocol                 = "UDP"
+  source_security_group_id = aws_security_group.cjip-server.id
+}
+
+resource "aws_security_group_rule" "db-to-dc-icmp" {
+  depends_on               = [aws_security_group.domain-controllers]
+  security_group_id        = aws_security_group.domain-controllers.id
+  type                     = "ingress"
+  description              = "allow All"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "ICMP"
+  source_security_group_id = aws_security_group.database-server.id
+}
+
+resource "aws_security_group_rule" "db-to-dc-tcp" {
+  depends_on               = [aws_security_group.domain-controllers]
+  security_group_id        = aws_security_group.domain-controllers.id
+  type                     = "ingress"
+  description              = "allow All"
+  from_port                = 130
+  to_port                  = 140
+  protocol                 = "TCP"
+  source_security_group_id = aws_security_group.database-server.id
+}
+
+resource "aws_security_group_rule" "db-to-dc-tcp2" {
+  depends_on               = [aws_security_group.domain-controllers]
+  security_group_id        = aws_security_group.domain-controllers.id
+  type                     = "ingress"
+  description              = "allow All"
+  from_port                = 445
+  to_port                  = 445
+  protocol                 = "TCP"
+  source_security_group_id = aws_security_group.database-server.id
+}
+
+resource "aws_security_group_rule" "db-to-dc-tcp3" {
+  depends_on               = [aws_security_group.domain-controllers]
+  security_group_id        = aws_security_group.domain-controllers.id
+  type                     = "ingress"
+  description              = "allow All"
+  from_port                = 1026
+  to_port                  = 1026
+  protocol                 = "TCP"
+  source_security_group_id = aws_security_group.database-server.id
+}
+
+resource "aws_security_group_rule" "db-to-dc-udp" {
+  depends_on               = [aws_security_group.domain-controllers]
+  security_group_id        = aws_security_group.domain-controllers.id
+  type                     = "ingress"
+  description              = "allow All"
+  from_port                = 88
+  to_port                  = 88
+  protocol                 = "UDP"
+  source_security_group_id = aws_security_group.database-server.id
+}
+
+resource "aws_security_group_rule" "db-to-dc-udp2" {
+  depends_on               = [aws_security_group.domain-controllers]
+  security_group_id        = aws_security_group.domain-controllers.id
+  type                     = "ingress"
+  description              = "allow All"
+  from_port                = 123
+  to_port                  = 123
+  protocol                 = "UDP"
+  source_security_group_id = aws_security_group.database-server.id
+}
+
+resource "aws_security_group_rule" "db-to-dc-udp3" {
+  depends_on               = [aws_security_group.domain-controllers]
+  security_group_id        = aws_security_group.domain-controllers.id
+  type                     = "ingress"
+  description              = "allow All"
+  from_port                = 389
+  to_port                  = 389
+  protocol                 = "UDP"
+  source_security_group_id = aws_security_group.database-server.id
+}
+
+resource "aws_security_group_rule" "exchange-to-dc-icmp" {
+  depends_on               = [aws_security_group.domain-controllers]
+  security_group_id        = aws_security_group.domain-controllers.id
+  type                     = "ingress"
+  description              = "allow All"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "ICMP"
+  source_security_group_id = aws_security_group.exchange-server.id
+}
+
+resource "aws_security_group_rule" "exchange-to-dc-tcp2" {
+  depends_on               = [aws_security_group.domain-controllers]
+  security_group_id        = aws_security_group.domain-controllers.id
+  type                     = "ingress"
+  description              = "allow All"
+  from_port                = 88
+  to_port                  = 88
+  protocol                 = "TCP"
+  source_security_group_id = aws_security_group.exchange-server.id
+}
+
+resource "aws_security_group_rule" "exchange-to-dc-tcp3" {
+  depends_on               = [aws_security_group.domain-controllers]
+  security_group_id        = aws_security_group.domain-controllers.id
+  type                     = "ingress"
+  description              = "allow All"
+  from_port                = 130
+  to_port                  = 140
+  protocol                 = "TCP"
+  source_security_group_id = aws_security_group.exchange-server.id
+}
+
+resource "aws_security_group_rule" "exchange-to-dc-tcp4" {
+  depends_on               = [aws_security_group.domain-controllers]
+  security_group_id        = aws_security_group.domain-controllers.id
+  type                     = "ingress"
+  description              = "allow All"
+  from_port                = 389
+  to_port                  = 389
+  protocol                 = "TCP"
+  source_security_group_id = aws_security_group.exchange-server.id
+}
+
+resource "aws_security_group_rule" "exchange-to-dc-tcp5" {
+  depends_on               = [aws_security_group.domain-controllers]
+  security_group_id        = aws_security_group.domain-controllers.id
+  type                     = "ingress"
+  description              = "allow All"
+  from_port                = 445
+  to_port                  = 445
+  protocol                 = "TCP"
+  source_security_group_id = aws_security_group.exchange-server.id
+}
+
+resource "aws_security_group_rule" "exchange-to-dc-tcp6" {
+  depends_on               = [aws_security_group.domain-controllers]
+  security_group_id        = aws_security_group.domain-controllers.id
+  type                     = "ingress"
+  description              = "allow All"
+  from_port                = 1025
+  to_port                  = 1026
+  protocol                 = "TCP"
+  source_security_group_id = aws_security_group.exchange-server.id
+}
+
+resource "aws_security_group_rule" "exchange-to-dc-tcp7" {
+  depends_on               = [aws_security_group.domain-controllers]
+  security_group_id        = aws_security_group.domain-controllers.id
+  type                     = "ingress"
+  description              = "allow All"
+  from_port                = 3268
+  to_port                  = 3268
+  protocol                 = "TCP"
+  source_security_group_id = aws_security_group.exchange-server.id
+}
+
+resource "aws_security_group_rule" "exchange-to-dc-udp" {
+  depends_on               = [aws_security_group.domain-controllers]
+  security_group_id        = aws_security_group.domain-controllers.id
+  type                     = "ingress"
+  description              = "allow All"
+  from_port                = 53
+  to_port                  = 53
+  protocol                 = "UDP"
+  source_security_group_id = aws_security_group.exchange-server.id
+}
+
+resource "aws_security_group_rule" "exchange-to-dc-udp2" {
+  depends_on               = [aws_security_group.domain-controllers]
+  security_group_id        = aws_security_group.domain-controllers.id
+  type                     = "ingress"
+  description              = "allow All"
+  from_port                = 123
+  to_port                  = 123
+  protocol                 = "UDP"
+  source_security_group_id = aws_security_group.exchange-server.id
+}
+
+resource "aws_security_group_rule" "exchange-to-dc-udp3" {
+  depends_on               = [aws_security_group.domain-controllers]
+  security_group_id        = aws_security_group.domain-controllers.id
+  type                     = "ingress"
+  description              = "allow All"
+  from_port                = 130
+  to_port                  = 140
+  protocol                 = "UDP"
+  source_security_group_id = aws_security_group.exchange-server.id
+}
+
+resource "aws_security_group_rule" "exchange-to-dc-udp4" {
+  depends_on               = [aws_security_group.domain-controllers]
+  security_group_id        = aws_security_group.domain-controllers.id
+  type                     = "ingress"
+  description              = "allow All"
+  from_port                = 389
+  to_port                  = 389
+  protocol                 = "UDP"
+  source_security_group_id = aws_security_group.exchange-server.id
+}
+
+resource "aws_security_group_rule" "portal-to-dc-icmp" {
+  depends_on               = [aws_security_group.domain-controllers]
+  security_group_id        = aws_security_group.domain-controllers.id
+  type                     = "ingress"
+  description              = "allow All"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "ICMP"
+  source_security_group_id = aws_security_group.portal-server.id
+}
+
+resource "aws_security_group_rule" "portal-to-dc-udp" {
+  depends_on               = [aws_security_group.domain-controllers]
+  security_group_id        = aws_security_group.domain-controllers.id
+  type                     = "ingress"
+  description              = "allow All"
+  from_port                = 88
+  to_port                  = 88
+  protocol                 = "UDP"
+  source_security_group_id = aws_security_group.portal-server.id
+}
+
+resource "aws_security_group_rule" "portal-to-dc-tcp" {
+  depends_on               = [aws_security_group.domain-controllers]
+  security_group_id        = aws_security_group.domain-controllers.id
+  type                     = "ingress"
+  description              = "allow All"
+  from_port                = 443
+  to_port                  = 443
+  protocol                 = "TCP"
+  source_security_group_id = aws_security_group.portal-server.id
+}
 
 resource "aws_security_group" "outbound-dns-resolver" {
   provider = aws.core-vpc
