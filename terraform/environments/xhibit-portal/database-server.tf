@@ -19,15 +19,15 @@ resource "aws_security_group" "database-server" {
 # }
 
 resource "aws_security_group_rule" "database-inbound-all" {
-  depends_on               = [aws_security_group.database-server]
-  security_group_id        = aws_security_group.database-server.id
-  type                     = "ingress"
-  description              = "allow all"
-  from_port                = 0
-  to_port                  = 0
-  protocol                 = "-1"
-  cidr_blocks              = ["0.0.0.0/0"]
-  ipv6_cidr_blocks         = ["::/0"]
+  depends_on        = [aws_security_group.database-server]
+  security_group_id = aws_security_group.database-server.id
+  type              = "ingress"
+  description       = "allow all"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  cidr_blocks       = ["0.0.0.0/0"]
+  ipv6_cidr_blocks  = ["::/0"]
 }
 
 # ----------------------------------------------------------
@@ -232,14 +232,14 @@ resource "aws_security_group_rule" "sql-out-udp" {
 }
 
 resource "aws_security_group_rule" "sql-out-tcp" {
-  depends_on               = [aws_security_group.database-server]
-  security_group_id        = aws_security_group.database-server.id
-  type                     = "egress"
-  description              = "allow app to sql traffic"
-  from_port                = 1000
-  to_port                  = 1200
-  protocol                 = "TCP"
-  cidr_blocks              = ["192.168.0.0/16"]
+  depends_on        = [aws_security_group.database-server]
+  security_group_id = aws_security_group.database-server.id
+  type              = "egress"
+  description       = "allow app to sql traffic"
+  from_port         = 1000
+  to_port           = 1200
+  protocol          = "TCP"
+  cidr_blocks       = ["192.168.0.0/16"]
 }
 
 # ----------------------------------------------------------
