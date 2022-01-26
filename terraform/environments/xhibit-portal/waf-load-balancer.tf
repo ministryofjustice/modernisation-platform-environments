@@ -37,7 +37,8 @@ resource "aws_security_group_rule" "allow_web_users" {
   protocol          = "TCP"
   cidr_blocks = [
     "109.147.86.54/32",
-    "81.101.176.47/32"
+    "81.101.176.47/32",
+    "194.33.196.2/32"
   ]
   # ipv6_cidr_blocks  = ["::/0"]
 }
@@ -161,17 +162,26 @@ resource "aws_lb_listener" "waf_lb_listener" {
   }
 }
 
-resource "aws_alb_listener_rule" "web_listener_rule" {
+
+resource "aws_alb_listener_rule" "root_listener_redirect" {
+  priority = 1
+
   depends_on   = [aws_lb_listener.waf_lb_listener]
   listener_arn = aws_lb_listener.waf_lb_listener.arn
+
   action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.waf_lb_web_tg.id
+    type = "redirect"
+
+    redirect {
+      status_code = "HTTP_301"
+      path        = "/Secure/Default.aspx"
+    }
+
   }
 
   condition {
     path_pattern {
-      values = ["/*"]
+      values = ["/"]
     }
   }
 
@@ -187,18 +197,34 @@ resource "aws_alb_listener_rule" "web_listener_rule" {
 
 }
 
+resource "aws_alb_listener_rule" "web_listener_rule" {
+  priority     = 2
+  depends_on   = [aws_lb_listener.waf_lb_listener]
+  listener_arn = aws_lb_listener.waf_lb_listener.arn
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.waf_lb_web_tg.id
+  }
+
+  condition {
+    host_header {
+      # web.xhibit-portal.hmcts-development.modernisation-platform.service.justice.gov.uk
+      values = [
+        "web.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk",
+        local.application_data.accounts[local.environment].public_dns_name_web
+      ]
+    }
+  }
+
+}
+
 resource "aws_alb_listener_rule" "ingestion_listener_rule" {
+  priority     = 3
   depends_on   = [aws_lb_listener.waf_lb_listener]
   listener_arn = aws_lb_listener.waf_lb_listener.arn
   action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.waf_lb_ingest_tg.id
-  }
-
-  condition {
-    path_pattern {
-      values = ["/*"]
-    }
   }
 
   condition {
