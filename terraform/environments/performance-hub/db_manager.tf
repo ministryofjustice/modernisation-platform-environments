@@ -1,4 +1,5 @@
 resource "aws_instance" "db_mgmt_server" {
+  count                       = local.is-production ? 1 : 0
   ami                         = "ami-0f9853ca76d115e7b"
   associate_public_ip_address = false
   availability_zone           = "eu-west-2a"
@@ -134,7 +135,7 @@ resource "aws_security_group" "db_mgmt_server_security_group" {
     description     = "Open the RDP port"
     from_port       = 3389
     to_port         = 3389
-    security_groups = [module._linux.bastion_security_group]
+    security_groups = [module.bastion_linux.bastion_security_group]
   }
 
   egress {
