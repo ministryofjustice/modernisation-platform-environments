@@ -1,6 +1,6 @@
 resource "aws_instance" "db_mgmt_server" {
   # only create in production
-  count = local.is-production ? 1 : 0
+  count                       = local.is-production ? 1 : 0
   ami                         = "ami-0f9853ca76d115e7b"
   associate_public_ip_address = false
   availability_zone           = "eu-west-2a"
