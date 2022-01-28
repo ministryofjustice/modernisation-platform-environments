@@ -83,3 +83,58 @@ resource "aws_instance" "exchange-server" {
     }
   )
 }
+
+
+
+
+resource "aws_ebs_volume" "exchange-disk1" {
+  depends_on        = [aws_instance.exchange-server]
+  availability_zone = "${local.region}a"
+  type              = "gp2"
+  encrypted         = true
+
+  snapshot_id = local.application_data.accounts[local.environment].infra6-disk-1-snapshot
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "exchange-disk1-${local.application_name}"
+    }
+  )
+}
+
+resource "aws_volume_attachment" "exchange-disk1" {
+  depends_on   = [aws_instance.exchange-server]
+  device_name  = "xvdl"
+  force_detach = true
+  volume_id    = aws_ebs_volume.exchange-disk1.id
+  instance_id  = aws_instance.exchange-server.id
+}
+
+
+
+
+resource "aws_ebs_volume" "exchange-disk2" {
+  depends_on        = [aws_instance.exchange-server]
+  availability_zone = "${local.region}a"
+  type              = "gp2"
+  encrypted         = true
+
+  snapshot_id = local.application_data.accounts[local.environment].infra6-disk-2-snapshot
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "exchange-disk2-${local.application_name}"
+    }
+  )
+}
+
+resource "aws_volume_attachment" "exchange-disk2" {
+  depends_on   = [aws_instance.exchange-server]
+  device_name  = "xvdm"
+  force_detach = true
+  volume_id    = aws_ebs_volume.exchange-disk2.id
+  instance_id  = aws_instance.exchange-server.id
+}
+
