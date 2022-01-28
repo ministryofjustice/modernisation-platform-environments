@@ -1,7 +1,7 @@
 [{
   "name": "performance-hub",
   "image": "${ecr_url}:${container_version}",
-  "cpu": 2048,
+  "cpu": 1536,
   "portMappings": [
     {
       "containerPort": 80,
