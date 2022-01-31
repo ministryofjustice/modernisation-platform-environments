@@ -76,7 +76,7 @@ resource "aws_instance" "database_server" {
   ami                         = data.aws_ami.database_image.id
   associate_public_ip_address = false
   ebs_optimized               = true
-  iam_instance_profile        = aws_iam_instance_profile.ec2_common_profile
+  iam_instance_profile        = aws_iam_instance_profile.ec2_common_profile.name
   instance_type               = var.database_instance_type # tflint-ignore: aws_instance_invalid_type
   key_name                    = var.key_name
   monitoring                  = true
