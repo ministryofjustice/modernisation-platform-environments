@@ -1,9 +1,9 @@
 module "nomis-db-backup-bucket" {
   source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v4.0.0"
 
-  providers = {
-    aws.bucket-replication = aws
-  }
+  # providers = {
+  #   aws.bucket-replication = aws
+  # }
   bucket_prefix       = "nomis-db-${stack_name}-backup-bucket"
   replication_enabled = false
 
