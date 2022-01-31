@@ -156,10 +156,31 @@ resource "aws_iam_role_policy" "s3_bucket_access" {
 }
 
 # attach s3 document as inline policy ec2_database_role
+
 resource "aws_iam_role_policy" "s3_db_bucket_access" {
   name   = "nomis-apps-bucket-access-for-db"
   role   = aws_iam_role.ec2_database_role.name
   policy = data.aws_iam_policy_document.s3_bucket_access.json
+}
+
+data "aws_iam_policy_document" "s3_db_backup_bucket_access" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "s3:PutObject",
+      "s3:GetObject",
+      "s3:ListBucket",
+      "s3:DeleteObject"
+    ]
+    resources = [module.nomis-db-backup-bucket.bucket.arn,
+    "${module.nomis-db-backup-bucket.bucket.arn}/*"]
+  }
+}
+
+resource "aws_iam_role_policy" "s3_db_backup_bucket_access" {
+  name   = "nomis-apps-bucket-access-for-db-backup"
+  role   = aws_iam_role.ec2_database_role.name
+  policy = data.aws_iam_policy_document.s3_db_backup_bucket_access.json
 }
 
 # create policy document to write Session Manager logs to CloudWatch
