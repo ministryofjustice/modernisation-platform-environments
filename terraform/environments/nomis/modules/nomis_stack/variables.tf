@@ -70,6 +70,11 @@ variable "instance_profile_name" {
   description = "IAM instance profile to be attached to the instances"
 }
 
+variable "instance_profile_role_name" {
+  type        = string
+  description = "IAM instance profile role name to be attached to the instances"
+}
+
 variable "key_name" {
   type        = string
   description = "Name of ssh key resource for ec2-user"
