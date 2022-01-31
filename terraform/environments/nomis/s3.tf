@@ -97,6 +97,6 @@ module "nomis-db-backup-bucket" {
   ]
 
   tags = local.tags
-  
+
 }
 
