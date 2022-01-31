@@ -40,7 +40,7 @@ resource "aws_security_group_rule" "extra_rules" { # Extra ingress rules that mi
 #------------------------------------------------------------------------------
 
 resource "aws_iam_instance_profile" "ec2_db_profile" {
-  name = "ec2-common-profile"
+  name = "ec2-db-profile"
   role = var.instance_profile_role_name
   path = "/"
 }
