@@ -8,6 +8,7 @@
 /terraform/environments/mi-platform @analytical-platform @modernisation-platform
 /terraform/environments/nomis @studio-webops @modernisation-platform
 /terraform/environments/performance-hub @performance-hub-developers @modernisation-platform
+/terraform/environments/ppud @ppud-replacement-devs @modernisation-platform
 /terraform/environments/remote-supervision @hmpps-remote-supervision @modernisation-platform
 /terraform/environments/sprinkler @modernisation-platform @modernisation-platform
 /terraform/environments/tariff @cica @modernisation-platform
