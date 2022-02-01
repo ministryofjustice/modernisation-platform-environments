@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # Instance profile to be assumed by the ec2 instance
 # This is required to enable SSH via Systems Manager
-# and also to allow access to an S3 bucket in which
+# and also to allow access to an S3 bucket in which 
 # Oracle and Weblogic installation files are held
 #------------------------------------------------------------------------------
 
@@ -34,38 +34,6 @@ resource "aws_iam_role" "ec2_common_role" {
     },
   )
 }
-
-resource "aws_iam_role" "ec2_database_role" {
-  name                 = "ec2-database-role"
-  path                 = "/"
-  max_session_duration = "3600"
-  assume_role_policy = jsonencode(
-    {
-      "Version" : "2012-10-17",
-      "Statement" : [
-        {
-          "Effect" : "Allow",
-          "Principal" : {
-            "Service" : "ec2.amazonaws.com"
-          }
-          "Action" : "sts:AssumeRole",
-          "Condition" : {}
-        }
-      ]
-    }
-  )
-  managed_policy_arns = [
-    "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
-  ]
-  tags = merge(
-    local.tags,
-    {
-      Name = "ec2-database-role"
-    },
-  )
-}
-
-
 
 # create instance profile from IAM role
 resource "aws_iam_instance_profile" "ec2_common_profile" {
@@ -117,19 +85,11 @@ data "aws_iam_policy_document" "ssm_custom" {
     resources = [aws_ssm_parameter.cloud_watch_config_linux.arn]
   }
 }
-### TODO: Do these have to be inline if they're reused for multiple roles?
 
-# attach SSM document as inline policy ec2_common_role
+# attach SSM document as inline policy
 resource "aws_iam_role_policy" "ssm_custom" {
   name   = "custom-SSM-manged-instance-core"
   role   = aws_iam_role.ec2_common_role.name
-  policy = data.aws_iam_policy_document.ssm_custom.json
-}
-
-# attach SSM document as inline policy ec2_database_role
-resource "aws_iam_role_policy" "ssm_db_custom" {
-  name   = "custom-SSM-manged-instance-core-for-db"
-  role   = aws_iam_role.ec2_database_role.name
   policy = data.aws_iam_policy_document.ssm_custom.json
 }
 
@@ -153,34 +113,6 @@ resource "aws_iam_role_policy" "s3_bucket_access" {
   name   = "nomis-apps-bucket-access"
   role   = aws_iam_role.ec2_common_role.name
   policy = data.aws_iam_policy_document.s3_bucket_access.json
-}
-
-# attach s3 document as inline policy ec2_database_role
-
-resource "aws_iam_role_policy" "s3_db_bucket_access" {
-  name   = "nomis-apps-bucket-access-for-db"
-  role   = aws_iam_role.ec2_database_role.name
-  policy = data.aws_iam_policy_document.s3_bucket_access.json
-}
-
-data "aws_iam_policy_document" "s3_db_backup_bucket_access" {
-  statement {
-    effect = "Allow"
-    actions = [
-      "s3:PutObject",
-      "s3:GetObject",
-      "s3:ListBucket",
-      "s3:DeleteObject"
-    ]
-    resources = [module.nomis-db-backup-bucket.bucket.arn,
-    "${module.nomis-db-backup-bucket.bucket.arn}/*"]
-  }
-}
-
-resource "aws_iam_role_policy" "s3_db_backup_bucket_access" {
-  name   = "nomis-apps-bucket-access-for-db-backup"
-  role   = aws_iam_role.ec2_database_role.name
-  policy = data.aws_iam_policy_document.s3_db_backup_bucket_access.json
 }
 
 # create policy document to write Session Manager logs to CloudWatch
@@ -217,14 +149,6 @@ resource "aws_iam_role_policy" "session_manager_logging" {
   role   = aws_iam_role.ec2_common_role.name
   policy = data.aws_iam_policy_document.session_manager_logging.json
 }
-
-# attach session logging document as inline policy ec2_database_role
-resource "aws_iam_role_policy" "db_session_manager_logging" {
-  name   = "db_session-manager-logging"
-  role   = aws_iam_role.ec2_database_role.name
-  policy = data.aws_iam_policy_document.session_manager_logging.json
-}
-
 
 #------------------------------------------------------------------------------
 # Keypair for ec2-user
@@ -380,7 +304,7 @@ resource "aws_ssm_association" "update_ssm_agent" {
 # This is a pretty basic implementation until Mod Platform build a platform
 # wide solution.  State Manager does not allow cron expressions like MON-FRI
 # so we need to create a separate association for each day in order to deal with
-# weekends.  Alternatively we could use Eventbridge rules as a trigger, but its
+# weekends.  Alternatively we could use Eventbridge rules as a trigger, but its 
 # slightly more complex to setup the IAM roles for that.
 #------------------------------------------------------------------------------
 
@@ -445,7 +369,7 @@ resource "aws_iam_role" "ssm_ec2_start_stop" {
   )
   managed_policy_arns = [
     "arn:aws:iam::aws:policy/service-role/AmazonSSMAutomationRole"
-    # todo: This policy gives a lot of permissions. We should create a custom policy if we keep the solution long term
+    # todo: This policy gives a lot of permissions. We should create a custom policy if we keep the solution long term 
   ]
   tags = merge(
     local.tags,

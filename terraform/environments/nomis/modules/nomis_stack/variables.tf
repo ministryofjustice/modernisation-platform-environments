@@ -70,9 +70,9 @@ variable "instance_profile_name" {
   description = "IAM instance profile to be attached to the instances"
 }
 
-variable "instance_profile_role_name" {
+variable "instance_profile_db_name" {
   type        = string
-  description = "IAM instance profile role name to be attached to the instances"
+  description = "IAM instance profile name to be attached to the database instances"
 }
 
 variable "key_name" {

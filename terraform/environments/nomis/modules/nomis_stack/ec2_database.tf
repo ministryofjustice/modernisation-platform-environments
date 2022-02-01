@@ -39,11 +39,6 @@ resource "aws_security_group_rule" "extra_rules" { # Extra ingress rules that mi
 # AMI and EC2
 #------------------------------------------------------------------------------
 
-resource "aws_iam_instance_profile" "ec2_db_profile" {
-  name = "ec2-db-profile"
-  role = var.instance_profile_role_name
-  path = "/"
-}
 data "aws_ami" "database_image" {
   most_recent = true
   owners      = [var.database_ami_owner]
@@ -76,7 +71,7 @@ resource "aws_instance" "database_server" {
   ami                         = data.aws_ami.database_image.id
   associate_public_ip_address = false
   ebs_optimized               = true
-  iam_instance_profile        = aws_iam_instance_profile.ec2_db_profile.name
+  iam_instance_profile        = var.instance_profile_db_name
   instance_type               = var.database_instance_type # tflint-ignore: aws_instance_invalid_type
   key_name                    = var.key_name
   monitoring                  = true
