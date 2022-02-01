@@ -1,14 +1,14 @@
 [{
   "name": "performance-hub",
   "image": "${ecr_url}:${container_version}",
-  "cpu": 2048,
+  "cpu": 1536,
   "portMappings": [
     {
       "containerPort": 80,
       "hostPort": 8080
     }
   ],
-  "memory": 4096,
+  "memory": 3072,
   "logConfiguration": {
     "logDriver": "awslogs",
     "options": {
