@@ -40,6 +40,11 @@ resource "aws_iam_role" "ec2_database_role" {
     policy = data.aws_iam_policy_document.s3_db_backup_bucket_access.json
   }
 
+  inline_policy {
+    name   = "session-manager-logging-db"
+    policy = data.aws_iam_policy_document.session_manager_logging.json
+  }
+
   tags = merge(
     local.tags,
     {
