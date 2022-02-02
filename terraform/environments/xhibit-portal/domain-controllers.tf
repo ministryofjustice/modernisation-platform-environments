@@ -1,36 +1,36 @@
 # Security Groups
-resource "aws_security_group" "domain-controllers" {
+# resource "aws_security_group" "domain-controllers" {
 
-  description = "Domain traffic only"
-  name        = "domaincontrollers-${local.application_name}"
-  vpc_id      = local.vpc_id
+#   description = "Domain traffic only"
+#   name        = "domaincontrollers-${local.application_name}"
+#   vpc_id      = local.vpc_id
 
-}
+# }
 
-# Allow DCs to connect anywhere
-resource "aws_security_group_rule" "dc-all-outbound-traffic" {
-  depends_on        = [aws_security_group.domain-controllers]
-  security_group_id = aws_security_group.domain-controllers.id
-  type              = "egress"
-  description       = "allow all"
-  from_port         = 0
-  to_port           = 0
-  protocol          = "-1"
-  cidr_blocks       = ["0.0.0.0/0"]
-  ipv6_cidr_blocks  = ["::/0"]
-}
+# # Allow DCs to connect anywhere
+# resource "aws_security_group_rule" "dc-all-outbound-traffic" {
+#   depends_on        = [aws_security_group.domain-controllers]
+#   security_group_id = aws_security_group.domain-controllers.id
+#   type              = "egress"
+#   description       = "allow all"
+#   from_port         = 0
+#   to_port           = 0
+#   protocol          = "-1"
+#   cidr_blocks       = ["0.0.0.0/0"]
+#   ipv6_cidr_blocks  = ["::/0"]
+# }
 
-resource "aws_security_group_rule" "dc-all-inbound-traffic" {
-  depends_on        = [aws_security_group.domain-controllers]
-  security_group_id = aws_security_group.domain-controllers.id
-  type              = "ingress"
-  description       = "allow all"
-  from_port         = 0
-  to_port           = 0
-  protocol          = "-1"
-  cidr_blocks       = ["0.0.0.0/0"]
-  ipv6_cidr_blocks  = ["::/0"]
-}
+# resource "aws_security_group_rule" "dc-all-inbound-traffic" {
+#   depends_on        = [aws_security_group.domain-controllers]
+#   security_group_id = aws_security_group.domain-controllers.id
+#   type              = "ingress"
+#   description       = "allow all"
+#   from_port         = 0
+#   to_port           = 0
+#   protocol          = "-1"
+#   cidr_blocks       = ["0.0.0.0/0"]
+#   ipv6_cidr_blocks  = ["::/0"]
+# }
 
 # resource "aws_security_group_rule" "dns-into-dc-tcp" {
 #   depends_on               = [aws_security_group.domain-controllers]
@@ -534,7 +534,7 @@ resource "aws_security_group_rule" "res1" {
   from_port                = 0
   to_port                  = 53
   protocol                 = "TCP"
-  source_security_group_id = aws_security_group.domain-controllers.id
+  source_security_group_id = aws_security_group.app-servers.id
 }
 
 resource "aws_security_group_rule" "res2" {
@@ -546,7 +546,7 @@ resource "aws_security_group_rule" "res2" {
   from_port                = 0
   to_port                  = 53
   protocol                 = "UDP"
-  source_security_group_id = aws_security_group.domain-controllers.id
+  source_security_group_id = aws_security_group.app-servers.id
 }
 
 
@@ -555,7 +555,7 @@ resource "aws_security_group_rule" "res2" {
 resource "aws_instance" "infra1" {
   instance_type               = "t2.small"
   ami                         = local.application_data.accounts[local.environment].infra1-ami
-  vpc_security_group_ids      = [aws_security_group.domain-controllers.id]
+  vpc_security_group_ids      = [aws_security_group.app-servers.id]
   monitoring                  = false
   associate_public_ip_address = false
   ebs_optimized               = false
@@ -617,10 +617,10 @@ resource "aws_volume_attachment" "infra1-disk1" {
 
 
 resource "aws_instance" "infra2" {
-  depends_on                  = [aws_security_group.domain-controllers, aws_security_group.outbound-dns-resolver]
+  depends_on                  = [aws_security_group.app-servers, aws_security_group.outbound-dns-resolver]
   instance_type               = "t2.small"
   ami                         = local.application_data.accounts[local.environment].infra2-ami
-  vpc_security_group_ids      = [aws_security_group.domain-controllers.id]
+  vpc_security_group_ids      = [aws_security_group.app-servers.id]
   monitoring                  = false
   associate_public_ip_address = false
   ebs_optimized               = false
