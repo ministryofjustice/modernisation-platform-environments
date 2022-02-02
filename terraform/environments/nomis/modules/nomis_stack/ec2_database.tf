@@ -252,7 +252,7 @@ data "aws_iam_policy_document" "asm_parameter" {
 }
 
 data "aws_iam_instance_profile" "ec2_common_profile" {
-  name = var.instance_profile_name
+  name = aws_instance.database_server.iam_instance_profile
 }
 
 resource "aws_iam_role_policy" "asm_parameter" {
