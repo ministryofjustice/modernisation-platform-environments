@@ -1,6 +1,6 @@
 resource "aws_lb_target_group" "weblogic" {
 
-  name_prefix          = var.stack_name
+  name_prefix          = "${var.stack_name}-"
   port                 = "7777" # port on which targets receive traffic
   protocol             = "HTTPS"
   target_type          = "ip"
