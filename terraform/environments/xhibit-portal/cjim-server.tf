@@ -84,6 +84,12 @@ resource "aws_instance" "cjim-server" {
 
   root_block_device {
     encrypted = true
+    tags = merge(
+      local.tags,
+      {
+        Name = "root-block-device-cjim-${local.application_name}"
+      }
+    )
   }
 
   lifecycle {
@@ -94,7 +100,6 @@ resource "aws_instance" "cjim-server" {
       # [1]: https://github.com/terraform-providers/terraform-provider-aws/issues/770
       volume_tags,
       #user_data,         # Prevent changes to user_data from destroying existing EC2s
-      root_block_device,
       # Prevent changes to encryption from destroying existing EC2s - can delete once encryption complete
     ]
   }
@@ -131,4 +136,3 @@ resource "aws_volume_attachment" "cjim-disk1" {
   volume_id    = aws_ebs_volume.cjim-disk1.id
   instance_id  = aws_instance.cjim-server.id
 }
-
