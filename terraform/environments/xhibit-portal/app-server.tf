@@ -1,10 +1,10 @@
 
 # Security Groups
- resource "aws_security_group" "app-server" {
-   description = "Bastion traffic"
-   name        = "app-server-${local.application_name}"
-   vpc_id      = local.vpc_id
- }
+#  resource "aws_security_group" "app-server" {
+#    description = "Bastion traffic"
+#    name        = "app-server-${local.application_name}"
+#    vpc_id      = local.vpc_id
+#  }
 
 
 # resource "aws_security_group_rule" "app-outbound-all" {

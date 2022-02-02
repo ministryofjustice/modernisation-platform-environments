@@ -163,13 +163,13 @@ resource "aws_security_group_rule" "app-all-to-ingestion" {
   source_security_group_id = aws_security_group.ingestion-servers.id
 }
 
-resource "aws_security_group_rule" "ingestion-to-from-app" {
+resource "aws_security_group_rule" "ingestion-all-to-app" {
   depends_on               = [aws_security_group.app-servers, aws_security_group.ingestion-servers]
-  security_group_id        = aws_security_group.app-server.id
+  security_group_id        = aws_security_group.ingestion-servers.id
   type                     = "egress"
   description              = "allow all traffic from DB"
   from_port                = 0
   to_port                  = 0
   protocol                 = "-1"
-  source_security_group_id = aws_security_group.ingestion-servers.id
+  source_security_group_id = aws_security_group.app-servers.id
 }
