@@ -5,16 +5,16 @@ resource "aws_security_group" "waf_lb" {
 }
 
 
-# resource "aws_security_group_rule" "egress-to-portal" {
-#   depends_on               = [aws_security_group.waf_lb]
-#   security_group_id        = aws_security_group.waf_lb.id
-#   type                     = "egress"
-#   description              = "allow web traffic to get to portal"
-#   from_port                = 80
-#   to_port                  = 80
-#   protocol                 = "TCP"
-#   source_security_group_id = aws_security_group.portal-server.id
-# }
+resource "aws_security_group_rule" "egress-to-portal" {
+  depends_on               = [aws_security_group.waf_lb]
+  security_group_id        = aws_security_group.waf_lb.id
+  type                     = "egress"
+  description              = "allow web traffic to get to portal"
+  from_port                = 80
+  to_port                  = 80
+  protocol                 = "TCP"
+  source_security_group_id = aws_security_group.portal-server.id
+}
 
 resource "aws_security_group_rule" "egress-to-ingestion" {
   depends_on               = [aws_security_group.waf_lb]
@@ -24,7 +24,7 @@ resource "aws_security_group_rule" "egress-to-ingestion" {
   from_port                = 80
   to_port                  = 80
   protocol                 = "TCP"
-  source_security_group_id = aws_security_group.ingestion-servers.id
+  source_security_group_id = aws_security_group.cjip-server.id
 }
 
 resource "aws_security_group_rule" "allow_web_users" {
