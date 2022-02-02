@@ -570,6 +570,12 @@ resource "aws_instance" "infra1" {
 
   root_block_device {
     encrypted = true
+    tags = merge(
+      local.tags,
+      {
+        Name = "root-block-device-infra1-${local.application_name}"
+      }
+    )
   }
 
   lifecycle {
@@ -580,7 +586,6 @@ resource "aws_instance" "infra1" {
       # [1]: https://github.com/terraform-providers/terraform-provider-aws/issues/770
       volume_tags,
       #user_data,         # Prevent changes to user_data from destroying existing EC2s
-      root_block_device,
       # Prevent changes to encryption from destroying existing EC2s - can delete once encryption complete
     ]
   }
@@ -706,9 +711,3 @@ resource "aws_route53_resolver_rule_association" "cjse-domain" {
   resolver_rule_id = aws_route53_resolver_rule.fwd.id
   vpc_id           = local.vpc_id
 }
-
-
-
-
-
-
