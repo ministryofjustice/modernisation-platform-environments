@@ -44,7 +44,6 @@ resource "aws_lb_target_group_attachment" "weblogic" {
 
 resource "aws_lb_listener_rule" "weblogic" {
   listener_arn = var.load_balancer_listener_arn
-  priority     = 100
 
   action {
     type             = "forward"
