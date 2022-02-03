@@ -23,7 +23,7 @@
       "suprig04-disk-1-snapshot"      : "snap-0c727246dbdd5f75b",  
       "suprig05-ami"                  : "ami-0910907944e075745", 
       "suprig05-disk-1-snapshot"      : "snap-004daf44c682a43c1",  
-      "XHBPRESMS01-ami"               : "ami-0a0502ffd782e9b12",
+      "XHBPRESMS01-ami"               : "ami-082ace3b4ab9d3345",
       "dummy snapshot id"             : "snap-08faed719f2040610",
       "importmachine-data-snapshot"   : "snap-0688d8b6d3bd6b245"
     },
