@@ -251,12 +251,12 @@ data "aws_iam_policy_document" "asm_parameter" {
   }
 }
 
-data "aws_iam_instance_profile" "ec2_common_profile" {
+data "aws_iam_instance_profile" "ec2_database_profile" {
   name = var.instance_profile_db_name
 }
 
 resource "aws_iam_role_policy" "asm_parameter" {
   name   = "asm-parameter-access-${var.stack_name}"
-  role   = data.aws_iam_instance_profile.ec2_common_profile.role_name
+  role   = data.aws_iam_instance_profile.ec2_database_profile.role_name
   policy = data.aws_iam_policy_document.asm_parameter.json
 }
