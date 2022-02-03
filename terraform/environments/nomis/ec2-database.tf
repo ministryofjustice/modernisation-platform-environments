@@ -40,7 +40,7 @@ resource "aws_iam_role" "ec2_database_role" {
 # to the role in the nomis_stack module
 resource "aws_iam_role_policy" "s3_db_backup_bucket_access" {
   name   = "nomis-db-backup-bucket-access"
-  role   = aws_iam_role.ec2_common_role.name
+  role   = aws_iam_role.ec2_database_role.name
   policy = data.aws_iam_policy_document.s3_db_backup_bucket_access.json
 }
 

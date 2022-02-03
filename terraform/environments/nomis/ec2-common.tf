@@ -144,7 +144,13 @@ resource "aws_iam_policy" "ec2_common_policy" {
   name        = "ec2-common-policy"
   path        = "/"
   description = "Common policy for all ec2 instances"
-  policy = data.aws_iam_policy_document.ec2_common_combined.json
+  policy      = data.aws_iam_policy_document.ec2_common_combined.json
+  tags = merge(
+    local.tags,
+    {
+      Name = "ec2-common-policy"
+    },
+  )
 }
 
 #------------------------------------------------------------------------------
