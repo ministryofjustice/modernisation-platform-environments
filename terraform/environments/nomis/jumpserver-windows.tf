@@ -41,11 +41,11 @@ resource "aws_instance" "jumpserver_windows" {
   tags = merge(
     local.tags,
     {
-      Name    = "jumpserver_windows"
+      Name       = "jumpserver_windows"
       os_type    = "Windows"
       os_version = "2019"
       always_on  = "false"
-      creator = "Packer" # Temporary Tag: Allows me to delete the instance using the CLI
+      creator    = "Packer" # Temporary Tag: Allows me to delete the instance using the CLI
     }
   )
 }
