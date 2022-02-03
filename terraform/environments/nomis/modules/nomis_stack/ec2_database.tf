@@ -119,7 +119,7 @@ resource "aws_instance" "database_server" {
       component  = "data"
       os_type    = "Linux"
       os_version = "RHEL 7.9"
-      always_on  = "false"
+      always_on  = var.environment == "test" ? "false" : "true"
     }
   )
 }
@@ -252,7 +252,7 @@ data "aws_iam_policy_document" "asm_parameter" {
 }
 
 data "aws_iam_instance_profile" "ec2_common_profile" {
-  name = aws_instance.database_server.iam_instance_profile
+  name = var.instance_profile_db_name
 }
 
 resource "aws_iam_role_policy" "asm_parameter" {

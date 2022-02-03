@@ -25,7 +25,8 @@ resource "aws_iam_role" "ec2_common_role" {
     }
   )
   managed_policy_arns = [
-    "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+    "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy",
+    aws_iam_policy.ec2_common_policy.arn
   ]
   tags = merge(
     local.tags,
@@ -86,13 +87,6 @@ data "aws_iam_policy_document" "ssm_custom" {
   }
 }
 
-# attach SSM document as inline policy
-resource "aws_iam_role_policy" "ssm_custom" {
-  name   = "custom-SSM-manged-instance-core"
-  role   = aws_iam_role.ec2_common_role.name
-  policy = data.aws_iam_policy_document.ssm_custom.json
-}
-
 # create policy document for access to s3 bucket
 data "aws_iam_policy_document" "s3_bucket_access" {
   statement {
@@ -106,13 +100,6 @@ data "aws_iam_policy_document" "s3_bucket_access" {
     resources = [module.s3-bucket.bucket.arn,
     "${module.s3-bucket.bucket.arn}/*"]
   }
-}
-
-# attach s3 document as inline policy
-resource "aws_iam_role_policy" "s3_bucket_access" {
-  name   = "nomis-apps-bucket-access"
-  role   = aws_iam_role.ec2_common_role.name
-  policy = data.aws_iam_policy_document.s3_bucket_access.json
 }
 
 # create policy document to write Session Manager logs to CloudWatch
@@ -143,11 +130,21 @@ data "aws_iam_policy_document" "session_manager_logging" {
   }
 }
 
-# attach session logging document as inline policy
-resource "aws_iam_role_policy" "session_manager_logging" {
-  name   = "session-manager-logging"
-  role   = aws_iam_role.ec2_common_role.name
-  policy = data.aws_iam_policy_document.session_manager_logging.json
+# combine ec2-common policy documents 
+data "aws_iam_policy_document" "ec2_common_combined" {
+  source_policy_documents = [
+    data.aws_iam_policy_document.ssm_custom.json,
+    data.aws_iam_policy_document.s3_bucket_access.json,
+    data.aws_iam_policy_document.session_manager_logging.json
+  ]
+}
+
+# create single managed policy to be attached to ec2-common IAM role
+resource "aws_iam_policy" "ec2_common_policy" {
+  name        = "ec2-common-policy"
+  path        = "/"
+  description = "Common policy for all ec2 instances"
+  policy = data.aws_iam_policy_document.ec2_common_combined.json
 }
 
 #------------------------------------------------------------------------------
