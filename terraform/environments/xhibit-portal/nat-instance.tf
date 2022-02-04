@@ -6,15 +6,28 @@
    vpc_id      = local.vpc_id
  }
 
-resource "aws_security_group_rule" "nat-smtp" {
+resource "aws_security_group_rule" "nat-smtp-from-exchange" {
   depends_on        = [aws_security_group.nat-server]
   security_group_id = aws_security_group.nat-server.id
   type              = "ingress"
-  description       = "allow all"
+  description       = "allow port 25"
   from_port         = 25
   to_port           = 25
   protocol          = "TCP"
   source_security_group_id = aws_security_group.app-server.id
+}
+
+resource "aws_security_group_rule" "nat-smtp-outbound-to-web" {
+  depends_on        = [aws_security_group.nat-server]
+  security_group_id = aws_security_group.nat-server.id
+  type              = "egress"
+  description       = "allow port 25"
+  from_port         = 25
+  to_port           = 25
+  protocol          = "TCP"
+  cidr_blocks       = ["0.0.0.0/0"]
+  ipv6_cidr_blocks  = ["::/0"]
+
 }
 
 
