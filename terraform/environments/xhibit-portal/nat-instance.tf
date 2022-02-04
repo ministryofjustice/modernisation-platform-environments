@@ -23,13 +23,17 @@ resource "aws_eip" "smtp-nat" {
   vpc      = true
 }
 
-
+# resource "aws_route" "exchange-to-nat" {
+#   route_table_id            = 
+#   destination_cidr_block    = 
+#   gateway_id                =
+# }
 
 resource "aws_instance" "nat-server" {
   depends_on                  = [aws_security_group.nat-server]
   instance_type               = "t2.medium"
   ami                         = local.application_data.accounts[local.environment].nat-instance-ami
-  vpc_security_group_ids      = [aws_security_group.nat-servers.id]
+  vpc_security_group_ids      = [aws_security_group.nat-server.id]
   monitoring                  = false
   associate_public_ip_address = false
   ebs_optimized               = false
