@@ -112,3 +112,45 @@ resource "aws_volume_attachment" "weblogic_ami_volume" {
   volume_id   = each.value.id
   instance_id = aws_instance.weblogic_server.id
 }
+#------------------------------------------------------------------------------
+# Instance IAM role extra permissions
+# Temporarily allow get parameter when instance first created
+# Attach policy inline on ec2-common-role
+#------------------------------------------------------------------------------
+
+resource "time_offset" "weblogic_asm_parameter" {
+  # static time resource for controlling access to parameter
+  offset_minutes = 30
+  triggers = {
+    # if the instance is recycled we reset the timestamp to give access again
+    instance_id = aws_instance.database_server.arn
+  }
+}
+
+data "aws_iam_policy_document" "weblogic_asm_parameter" {
+  statement {
+    effect    = "Allow"
+    actions   = ["ssm:GetParameter"]
+    resources = ["arn:aws:ssm:${var.region}:${data.aws_caller_identity.current.id}:parameter/weblogic/default/*","arn:aws:ssm:${var.region}:${data.aws_caller_identity.current.id}:parameter/weblogic/${var.stack_name}/*"]
+    condition {
+      test     = "DateLessThan"
+      variable = "aws:CurrentTime"
+      values   = [time_offset.weblogic_asm_parameter.rfc3339]
+    }
+    condition {
+      test     = "StringLike"
+      variable = "ec2:SourceInstanceARN"
+      values   = [aws_instance.weblogic_server.arn]
+    }
+  }
+}
+
+data "aws_iam_instance_profile" "ec2_common_profile" {
+  name = aws_instance.weblogic_server.iam_instance_profile
+}
+
+resource "aws_iam_role_policy" "weblogic_asm_parameter" {
+  name   = "weblogic-asm-parameter-access-${var.stack_name}"
+  role   = data.aws_iam_instance_profile.ec2_common_profile.role_name
+  policy = data.aws_iam_policy_document.asm_parameter.json
+}
