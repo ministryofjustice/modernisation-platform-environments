@@ -4,6 +4,7 @@ on:                                          # Put ALL the triggers for any part
   push: # triggers on 'push' or 'merge'      # The whole workflow will run each time these events happen
     branches:                                # and they're skipped according to the 'if' conditions below
       - main
+      - xp-pre
       - xp-dev
     paths:
       - 'terraform/environments/xhibit-portal/**'

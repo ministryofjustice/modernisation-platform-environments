@@ -83,14 +83,6 @@ resource "aws_instance" "exchange-server" {
   )
 }
 
-
-resource "aws_eip" "lb" {
-  instance = aws_instance.exchange-server.id
-  vpc      = true
-}
-
-
-
 resource "aws_ebs_volume" "exchange-disk1" {
   depends_on        = [aws_instance.exchange-server]
   availability_zone = "${local.region}a"
