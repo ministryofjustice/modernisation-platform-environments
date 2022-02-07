@@ -355,3 +355,117 @@ resource "aws_security_group" "packer_security_group" {
     },
   )
 }
+
+#------------------------------------------------------------------------------
+# Another role that can be assumed by the default CICD user
+# This one allows access to CloudWatch, for the purpose of monitoring in Grafana
+#------------------------------------------------------------------------------
+
+# get the default cicd user and group details
+data "aws_iam_user" "cicd_member_user" {
+  user_name = "cicd-member-user"
+}
+
+
+# policy to allow assume the grafana role
+data "aws_iam_policy_document" "assume_grafana_role" {
+  statement {
+    effect    = "Allow"
+    actions   = ["sts:AssumeRole"]
+    resources = [aws_iam_role.grafana_cloudwatch_reader.arn]
+  }
+}
+
+# attach assume role policy inline to cicd group
+resource "aws_iam_group_policy" "assume_grafana_role" {
+  name   = "grafana-member-policy"
+  policy = data.aws_iam_policy_document.assume_grafana_role.json
+  group      = "cicd-member-group"
+}
+
+# Policy and IAM Role to provide required permissions for Grafana Cloudwatch plugin
+data "aws_iam_policy_document" "assume_grafana_role_policy" {
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+    condition {
+      test     = "StringLike"
+      variable = "sts:RoleSessionName"
+      values   = ["&{aws:username}"]
+    }
+    principals {
+      type        = "AWS"
+      identifiers = [data.aws_iam_user.cicd_member_user.arn]
+    }
+  }
+}
+
+resource "aws_iam_role" "grafana_cloudwatch_reader" {
+  name               = "grafana-cloudwatch-reader"
+  assume_role_policy = data.aws_iam_policy_document.assume_grafana_role_policy.json
+  tags = merge(
+    local.tags,
+    {
+      Name = "grafana-cloudwatch"
+    },
+  )
+}
+
+# the actual permissions policy, from https://grafana.com/docs/grafana/latest/datasources/aws-cloudwatch/
+data "aws_iam_policy_document" "grafana_cloudwatch_reader" {
+  statement {
+    sid = "AllowReadingMetricsFromCloudWatch"
+    effect = "Allow"
+    actions = [          
+      "cloudwatch:DescribeAlarmsForMetric",
+      "cloudwatch:DescribeAlarmHistory",
+      "cloudwatch:DescribeAlarms",
+      "cloudwatch:ListMetrics",
+      "cloudwatch:GetMetricStatistics",
+      "cloudwatch:GetMetricData",
+      "cloudwatch:GetInsightRuleReport"
+    ]
+    resources = ["*"]
+  }
+
+  statement {
+    sid = "AllowReadingLogsFromCloudWatch"
+    effect = "Allow"
+    actions = [          
+      "logs:DescribeLogGroups",
+      "logs:GetLogGroupFields",
+      "logs:StartQuery",
+      "logs:StopQuery",
+      "logs:GetQueryResults",
+      "logs:GetLogEvents"
+    ]
+    resources = ["*"]
+  }
+
+  statement {
+    sid = "AllowReadingTagsInstancesRegionsFromEC2"
+    effect = "Allow"
+    actions = [          
+      "ec2:DescribeTags",
+      "ec2:DescribeInstances",
+      "ec2:DescribeRegions"
+    ]
+    resources = ["*"]
+  }
+
+  statement {
+    sid = "AllowReadingResourcesForTags"
+    effect = "Allow"
+    actions = [          
+      "tag:GetResources"
+    ]
+    resources = ["*"]
+  }
+}
+
+# attach policy to role inline
+resource "aws_iam_role_policy" "grafana_cloudwatch_reader" {
+  name   = "grafana-cloudwatch-reader"
+  role   = aws_iam_role.grafana_cloudwatch_reader.id
+  policy = data.aws_iam_policy_document.grafana_cloudwatch_reader.json
+}
