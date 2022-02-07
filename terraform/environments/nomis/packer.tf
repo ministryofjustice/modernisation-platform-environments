@@ -380,7 +380,7 @@ data "aws_iam_policy_document" "assume_grafana_role" {
 resource "aws_iam_group_policy" "assume_grafana_role" {
   name   = "grafana-member-policy"
   policy = data.aws_iam_policy_document.assume_grafana_role.json
-  group      = "cicd-member-group"
+  group  = "cicd-member-group"
 }
 
 # Policy and IAM Role to provide required permissions for Grafana Cloudwatch plugin
@@ -414,9 +414,9 @@ resource "aws_iam_role" "grafana_cloudwatch_reader" {
 # the actual permissions policy, from https://grafana.com/docs/grafana/latest/datasources/aws-cloudwatch/
 data "aws_iam_policy_document" "grafana_cloudwatch_reader" {
   statement {
-    sid = "AllowReadingMetricsFromCloudWatch"
+    sid    = "AllowReadingMetricsFromCloudWatch"
     effect = "Allow"
-    actions = [          
+    actions = [
       "cloudwatch:DescribeAlarmsForMetric",
       "cloudwatch:DescribeAlarmHistory",
       "cloudwatch:DescribeAlarms",
@@ -429,9 +429,9 @@ data "aws_iam_policy_document" "grafana_cloudwatch_reader" {
   }
 
   statement {
-    sid = "AllowReadingLogsFromCloudWatch"
+    sid    = "AllowReadingLogsFromCloudWatch"
     effect = "Allow"
-    actions = [          
+    actions = [
       "logs:DescribeLogGroups",
       "logs:GetLogGroupFields",
       "logs:StartQuery",
@@ -443,9 +443,9 @@ data "aws_iam_policy_document" "grafana_cloudwatch_reader" {
   }
 
   statement {
-    sid = "AllowReadingTagsInstancesRegionsFromEC2"
+    sid    = "AllowReadingTagsInstancesRegionsFromEC2"
     effect = "Allow"
-    actions = [          
+    actions = [
       "ec2:DescribeTags",
       "ec2:DescribeInstances",
       "ec2:DescribeRegions"
@@ -454,9 +454,9 @@ data "aws_iam_policy_document" "grafana_cloudwatch_reader" {
   }
 
   statement {
-    sid = "AllowReadingResourcesForTags"
+    sid    = "AllowReadingResourcesForTags"
     effect = "Allow"
-    actions = [          
+    actions = [
       "tag:GetResources"
     ]
     resources = ["*"]
