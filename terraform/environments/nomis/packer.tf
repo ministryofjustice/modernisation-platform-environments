@@ -59,7 +59,7 @@ data "aws_iam_policy_document" "packer_assume_role_policy" {
   statement {
     effect  = "Allow"
     actions = ["sts:AssumeRole"]
-    condition {
+    condition { # require the user to set the role session name to the username, https://aws.amazon.com/blogs/security/easily-control-naming-individual-iam-role-sessions/
       test     = "StringLike"
       variable = "sts:RoleSessionName"
       values   = ["&{aws:username}"]
@@ -388,11 +388,6 @@ data "aws_iam_policy_document" "assume_grafana_role_policy" {
   statement {
     effect  = "Allow"
     actions = ["sts:AssumeRole"]
-    condition {
-      test     = "StringLike"
-      variable = "sts:RoleSessionName"
-      values   = ["&{aws:username}"]
-    }
     principals {
       type        = "AWS"
       identifiers = [data.aws_iam_user.cicd_member_user.arn]
