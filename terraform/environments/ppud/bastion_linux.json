@@ -1,7 +1,7 @@
 {
   "keys": {
     "production": {
-      "doakley": "ecdsa-sha2-nistp521 AAAAE2VjZHNhLXNoYTItbmlzdHA1MjEAAAAIbmlzdHA1MjEAAACFBAFJKECIVWnywx/UQnIOcQ9J77TQC6flqqW7OiTclOBwwbMboPEpkEjMSvRVRs6zP29pFzqlFyil0rTFkYZkrbe5cAFEOr9RJpdW7cpgvNQCAxDbjcFF3xE6oUvxyUL/bC0KfzIw7bEt3dvDYDpzG24P1NFwELS4Yv5mwAiEyn3tJBalfg== darren.oakley@digital.justice.gov.uk"
+      "doakley": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEU5QgCe9tiwCmZxZIx0E6n9It3Xb9oO5bu30rGRv9Vm darren.oakley@digital.justice.gov.uk"
     }
   }
 }
