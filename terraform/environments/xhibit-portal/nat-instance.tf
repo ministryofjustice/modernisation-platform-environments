@@ -1,19 +1,19 @@
 
 # Security Groups
- resource "aws_security_group" "nat-server" {
-   description = "nat traffic"
-   name        = "nat-server-${local.application_name}"
-   vpc_id      = local.vpc_id
- }
+resource "aws_security_group" "nat-server" {
+  description = "nat traffic"
+  name        = "nat-server-${local.application_name}"
+  vpc_id      = local.vpc_id
+}
 
 resource "aws_security_group_rule" "nat-smtp-from-exchange" {
-  depends_on        = [aws_security_group.nat-server]
-  security_group_id = aws_security_group.nat-server.id
-  type              = "ingress"
-  description       = "allow port 25"
-  from_port         = 25
-  to_port           = 25
-  protocol          = "TCP"
+  depends_on               = [aws_security_group.nat-server]
+  security_group_id        = aws_security_group.nat-server.id
+  type                     = "ingress"
+  description              = "allow port 25"
+  from_port                = 25
+  to_port                  = 25
+  protocol                 = "TCP"
   source_security_group_id = aws_security_group.app-server.id
 }
 

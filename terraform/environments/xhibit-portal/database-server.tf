@@ -19,15 +19,15 @@ resource "aws_security_group_rule" "database-outbound-all" {
 }
 
 resource "aws_security_group_rule" "database-inbound-all" {
-  depends_on               = [aws_security_group.database-server]
-  security_group_id        = aws_security_group.database-server.id
-  type                     = "ingress"
-  description              = "allow all"
-  from_port                = 0
-  to_port                  = 0
-  protocol                 = "-1"
-  cidr_blocks              = ["0.0.0.0/0"]
-  ipv6_cidr_blocks         = ["::/0"]
+  depends_on        = [aws_security_group.database-server]
+  security_group_id = aws_security_group.database-server.id
+  type              = "ingress"
+  description       = "allow all"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  cidr_blocks       = ["0.0.0.0/0"]
+  ipv6_cidr_blocks  = ["::/0"]
 }
 
 # ----------------------------------------------------------
@@ -264,6 +264,12 @@ resource "aws_instance" "database-server" {
   root_block_device {
     encrypted   = true
     volume_size = 64
+    tags = merge(
+      local.tags,
+      {
+        Name = "root-block-device-database-${local.application_name}"
+      }
+    )
   }
 
   lifecycle {
@@ -274,7 +280,6 @@ resource "aws_instance" "database-server" {
       # [1]: https://github.com/terraform-providers/terraform-provider-aws/issues/770
       volume_tags,
       #user_data,         # Prevent changes to user_data from destroying existing EC2s
-      root_block_device,
       # Prevent changes to encryption from destroying existing EC2s - can delete once encryption complete
     ]
   }
