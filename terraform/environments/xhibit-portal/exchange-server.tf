@@ -83,6 +83,47 @@ resource "aws_instance" "exchange-server" {
   )
 }
 
+resource "aws_network_interface" "email" {
+  subnet_id       = data.aws_subnet.private_az_a.id
+  security_groups = [aws_security_group.exchange-server-email.id]
+
+  attachment {
+    instance     = aws_instance.exchange-server.id
+    device_index = 2
+  }
+}
+
+resource "aws_security_group" "exchange-server-email" {
+  description = "Domain traffic only"
+  name        = "exchange-server-${local.application_name}"
+  vpc_id      = local.vpc_id
+}
+
+resource "aws_security_group_rule" "email-outbound-all" {
+  depends_on        = [aws_security_group.exchange-server-email]
+  security_group_id = aws_security_group.exchange-server-email.id
+  type              = "egress"
+  description       = "allow all"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  cidr_blocks       = ["0.0.0.0/0"]
+  ipv6_cidr_blocks  = ["::/0"]
+}
+
+resource "aws_security_group_rule" "email-inbound-all" {
+  depends_on        = [aws_security_group.exchange-server-email]
+  security_group_id = aws_security_group.exchange-server-email.id
+  type              = "ingress"
+  description       = "allow all"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  cidr_blocks       = ["0.0.0.0/0"]
+  ipv6_cidr_blocks  = ["::/0"]
+}
+
+
 
 resource "aws_ebs_volume" "exchange-disk1" {
   depends_on        = [aws_instance.exchange-server]
