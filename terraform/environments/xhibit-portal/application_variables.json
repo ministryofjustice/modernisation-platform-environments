@@ -29,8 +29,8 @@
       "nat-instance-ami"              : "ami-087e7082959f51a02"
     },
     "preproduction": {
-      "public_dns_name_web"           : "prepportal.cjsonline.gov.uk",
-      "public_dns_name_ingestion"     : "preingest.cjsonline.gov.uk",
+      "public_dns_name_web"           : "pportal.cjsonline.gov.uk",
+      "public_dns_name_ingestion"     : "ingest.cjsonline.gov.uk",
       "bucket_prefix"                 : "vm-import-s3-bucket",
       "infra1-ami"                    : "ami-09d9fc0360099ebd2",
       "infra1-disk-1-snapshot"        : "snap-078d43138754490c0",
