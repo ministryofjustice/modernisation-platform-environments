@@ -34,8 +34,9 @@ locals {
 data "template_file" "weblogic_init" {
   template = file("${path.module}/user_data/weblogic_init.sh")
   vars = {
-    ENV         = var.stack_name
-    DB_HOSTNAME = "db.${var.stack_name}.${var.application_name}.${data.aws_route53_zone.internal.name}"
+    ENV               = var.stack_name
+    DB_HOSTNAME       = "db.${var.stack_name}.${var.application_name}.${data.aws_route53_zone.internal.name}"
+    USE_DEFAULT_CREDS = var.use_default_creds
   }
 }
 
@@ -112,6 +113,21 @@ resource "aws_volume_attachment" "weblogic_ami_volume" {
   volume_id   = each.value.id
   instance_id = aws_instance.weblogic_server.id
 }
+
+#------------------------------------------------------------------------------
+# Route 53 record
+#------------------------------------------------------------------------------
+
+resource "aws_route53_record" "weblogic_internal" {
+  provider = aws.core-vpc
+
+  zone_id = data.aws_route53_zone.internal.zone_id
+  name    = "weblogic.${var.stack_name}.${var.application_name}.${data.aws_route53_zone.internal.name}"
+  type    = "A"
+  ttl     = "60"
+  records = [aws_instance.weblogic_server.private_ip]
+}
+
 #------------------------------------------------------------------------------
 # Instance IAM role extra permissions
 # Temporarily allow get parameter when instance first created

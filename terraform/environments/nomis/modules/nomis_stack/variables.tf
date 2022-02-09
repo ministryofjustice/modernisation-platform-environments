@@ -137,3 +137,9 @@ variable "weblogic_instance_type" {
   description = "ec2 instance type to use for the weblogic instance"
   default     = "t2.medium"
 }
+
+varaible "use_default_creds" {
+  type        = string
+  description = "Use the default weblogic admin username/password & T1 Nomis db username/password (Parameter Store Variables)"
+  default     = "true"
+}
