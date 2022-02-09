@@ -87,9 +87,7 @@ jobs:
     needs: plan-preproduction # job only runs if plan-production runs successfully
     name: Deploy Pre-Production - xhibit-portal
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/xp-pre' # job only runs for merges to the main branch, which can only be done after PR review approval
-    # environment:
-    #   name: xhibit-portal-production        # put this in if you want to click-to-deploy with a review button in the Github Actions tab
+    if: github.ref == 'refs/heads/xp-preprod'    
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2.3.4
