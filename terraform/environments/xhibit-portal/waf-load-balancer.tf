@@ -270,7 +270,7 @@ resource "aws_route53_record" "waf_lb_ingest_dns" {
 }
 
 resource "aws_acm_certificate" "waf_lb_cert" {
-  domain_name       = "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  domain_name       = "modernisation-platform.service.justice.gov.uk"
   validation_method = "DNS"
 
   subject_alternative_names = [
@@ -280,7 +280,7 @@ resource "aws_acm_certificate" "waf_lb_cert" {
   ]
 
   tags = {
-    Environment = "prod"
+    Environment = local.environment
   }
 
   lifecycle {
@@ -453,7 +453,3 @@ resource "aws_wafv2_web_acl_logging_configuration" "waf_logs" {
   log_destination_configs = ["${aws_s3_bucket.waf_logs.arn}"]
   resource_arn            = aws_wafv2_web_acl.waf_acl.arn
 }
-
-
-
-
