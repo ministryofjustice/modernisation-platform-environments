@@ -5,6 +5,7 @@ on:                                          # Put ALL the triggers for any part
     branches:                                # and they're skipped according to the 'if' conditions below
       - main
       - xp-pre
+      - xp-preprod
       - xp-dev
     paths:
       - 'terraform/environments/xhibit-portal/**'
