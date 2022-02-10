@@ -18,16 +18,16 @@ resource "aws_security_group" "nat-server" {
 # }
 
 resource "aws_security_group_rule" "nat-smtp-from-exchange" {
-  depends_on               = [aws_security_group.nat-server]
-  security_group_id        = aws_security_group.nat-server.id
-  type                     = "ingress"
-  description              = "allow port 25"
-  from_port                = 0
-  to_port                  = 65000
-  protocol                 = "TCP"
-  cidr_blocks              = ["0.0.0.0/0"]
-  ipv6_cidr_blocks         = ["::/0"]
-}       
+  depends_on        = [aws_security_group.nat-server]
+  security_group_id = aws_security_group.nat-server.id
+  type              = "ingress"
+  description       = "allow port 25"
+  from_port         = 0
+  to_port           = 65000
+  protocol          = "TCP"
+  cidr_blocks       = ["0.0.0.0/0"]
+  ipv6_cidr_blocks  = ["::/0"]
+}
 
 
 resource "aws_security_group_rule" "nat-smtp-outbound-to-web" {
