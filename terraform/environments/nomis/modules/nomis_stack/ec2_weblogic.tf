@@ -136,7 +136,7 @@ resource "aws_route53_record" "weblogic_internal" {
 
 resource "time_offset" "weblogic_asm_parameter" {
   # static time resource for controlling access to parameter
-  offset_minutes = 30
+  offset_minutes = 60
   triggers = {
     # if the instance is recycled we reset the timestamp to give access again
     instance_id = aws_instance.weblogic_server.arn
