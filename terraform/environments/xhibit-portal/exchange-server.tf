@@ -22,25 +22,26 @@ resource "aws_security_group_rule" "web-outbound-all" {
 
 
 resource "aws_security_group_rule" "infra-inbound-all" {
-  depends_on        = [aws_security_group.exchange-server]
-  security_group_id = aws_security_group.exchange-server.id
-  type              = "ingress"
-  description       = "allow all"
-  from_port         = 0
-  to_port           = 0
-  protocol          = "-1"
+  depends_on               = [aws_security_group.exchange-server]
+  security_group_id        = aws_security_group.exchange-server.id
+  type                     = "ingress"
+  description              = "allow all"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
   source_security_group_id = aws_security_group.app-server
 }
 
 
+
 resource "aws_security_group_rule" "infra-outbound-all" {
-  depends_on        = [aws_security_group.exchange-server]
-  security_group_id = aws_security_group.exchange-server.id
-  type              = "egress"
-  description       = "allow all"
-  from_port         = 0
-  to_port           = 0
-  protocol          = "-1"
+  depends_on               = [aws_security_group.exchange-server]
+  security_group_id        = aws_security_group.exchange-server.id
+  type                     = "egress"
+  description              = "allow all"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
   source_security_group_id = aws_security_group.app-server
 }
 
