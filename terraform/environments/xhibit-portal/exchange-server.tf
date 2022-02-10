@@ -96,16 +96,6 @@ resource "aws_instance" "exchange-server" {
   )
 }
 
-resource "aws_network_interface" "email" {
-  subnet_id       = data.aws_subnet.private_az_a.id
-  security_groups = [aws_security_group.exchange-server-email.id]
-
-  attachment {
-    instance     = aws_instance.exchange-server.id
-    device_index = 2
-  }
-}
-
 resource "aws_ebs_volume" "exchange-disk1" {
   depends_on        = [aws_instance.exchange-server]
   availability_zone = "${local.region}a"
