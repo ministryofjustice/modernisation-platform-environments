@@ -46,7 +46,7 @@ resource "aws_instance" "weblogic_server" {
   ami                         = data.aws_ami.weblogic_image.id
   associate_public_ip_address = false
   # ebs_optimized          = true
-  iam_instance_profile   = var.instance_profile_name
+  iam_instance_profile   = var.instance_profile_weblogic_name
   instance_type          = var.weblogic_instance_type
   key_name               = var.key_name
   monitoring             = false
@@ -136,7 +136,7 @@ resource "aws_route53_record" "weblogic_internal" {
 
 resource "time_offset" "weblogic_asm_parameter" {
   # static time resource for controlling access to parameter
-  offset_minutes = 60
+  offset_minutes = 30
   triggers = {
     # if the instance is recycled we reset the timestamp to give access again
     instance_id = aws_instance.weblogic_server.arn
@@ -161,8 +161,8 @@ data "aws_iam_policy_document" "weblogic_asm_parameter" {
   }
 }
 
-data "aws_iam_instance_profile" "ec2_common_profile" {
-  name = aws_instance.weblogic_server.iam_instance_profile
+data "aws_iam_instance_profile" "ec2_weblogic_profile" {
+  name = var.instance_profile_weblogic_name
 }
 
 resource "aws_iam_role_policy" "weblogic_asm_parameter" {
