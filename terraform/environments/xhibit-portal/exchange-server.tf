@@ -45,6 +45,18 @@ resource "aws_security_group_rule" "infra-outbound-all" {
   source_security_group_id = aws_security_group.app-server.id
 }
 
+ resource "aws_security_group_rule" "app-inbound-bastion" {
+   depends_on        = [aws_security_group.exchange-server]
+   security_group_id = aws_security_group.exchange-server.id
+   type              = "ingress"
+   description       = "allow bastion"
+   from_port         = 3389
+   to_port           = 3389
+   protocol          = "TCP"
+   cidr_blocks       = ["${module.bastion_linux.bastion_private_ip}/32"]
+ }
+
+
 
 resource "aws_instance" "exchange-server" {
   depends_on                  = [aws_security_group.exchange-server]
