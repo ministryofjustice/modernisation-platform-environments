@@ -11,6 +11,10 @@
                 "T2": {
                     "database_ami_name": "nomis_db_CNOMT1-2022-01-05*",
                     "weblogic_ami_name": "weblogic-2022-01-17*"
+                },
+                "T1": {
+                    "database_ami_name": "nomis_db_CNOMT1-2022-01-05*",
+                    "weblogic_ami_name": "weblogic-2022-02-09*"
                 }
             }
         }
