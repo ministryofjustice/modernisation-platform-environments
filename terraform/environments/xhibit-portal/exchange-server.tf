@@ -33,10 +33,10 @@ resource "aws_security_group_rule" "infra-inbound-all" {
 }
 
 
-resource "aws_security_group_rule" "infra-inbound-all" {
+resource "aws_security_group_rule" "infra-outbound-all" {
   depends_on        = [aws_security_group.exchange-server]
   security_group_id = aws_security_group.exchange-server.id
-  type              = "ingress"
+  type              = "egress"
   description       = "allow all"
   from_port         = 0
   to_port           = 0
@@ -46,14 +46,14 @@ resource "aws_security_group_rule" "infra-inbound-all" {
 
 
 resource "aws_instance" "exchange-server" {
-  depends_on                  = [aws_security_group.app-server]
+  depends_on                  = [aws_security_group.exchange-server]
   instance_type               = "t2.medium"
   ami                         = local.application_data.accounts[local.environment].infra6-ami
-  vpc_security_group_ids      = [aws_security_group.app-server.id]
+  vpc_security_group_ids      = [aws_security_group.exchange-server.id]
   monitoring                  = false
   associate_public_ip_address = false
   ebs_optimized               = false
-  subnet_id                   = data.aws_subnet.private_az_a.id
+  subnet_id                   = data.aws_subnet.public_az_a.id
   key_name                    = aws_key_pair.george.key_name
 
   user_data = <<EOF
