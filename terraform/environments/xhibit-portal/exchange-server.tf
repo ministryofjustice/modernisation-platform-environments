@@ -2,7 +2,7 @@
 
 resource "aws_security_group" "exchange-server" {
   description = "Domain traffic only"
-  name        = "Exchange-server-${local.application_name}"
+  name        = "exchange-server-${local.application_name}"
   vpc_id      = local.vpc_id
 }
 
