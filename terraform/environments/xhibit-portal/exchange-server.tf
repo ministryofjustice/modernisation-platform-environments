@@ -1,36 +1,48 @@
 
 
-# Security Groups
-# resource "aws_security_group" "exchange-server" {
-#   description = "Domain traffic only"
-#   name        = "exchange-server-${local.application_name}"
-#   vpc_id      = local.vpc_id
-# }
+resource "aws_security_group" "exchange-server" {
+  description = "Domain traffic only"
+  name        = "exchange-server-${local.application_name}"
+  vpc_id      = local.vpc_id
+}
 
 
-# resource "aws_security_group_rule" "exchange-outbound-all" {
-#   depends_on        = [aws_security_group.exchange-server]
-#   security_group_id = aws_security_group.exchange-server.id
-#   type              = "egress"
-#   description       = "allow all"
-#   from_port         = 0
-#   to_port           = 0
-#   protocol          = "-1"
-#   cidr_blocks       = ["0.0.0.0/0"]
-#   ipv6_cidr_blocks  = ["::/0"]
-# }
+resource "aws_security_group_rule" "web-outbound-all" {
+  depends_on        = [aws_security_group.exchange-server]
+  security_group_id = aws_security_group.exchange-server.id
+  type              = "egress"
+  description       = "allow all"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  cidr_blocks       = ["0.0.0.0/0"]
+  ipv6_cidr_blocks  = ["::/0"]
 
-# resource "aws_security_group_rule" "exchange-inbound-all" {
-#   depends_on        = [aws_security_group.exchange-server]
-#   security_group_id = aws_security_group.exchange-server.id
-#   type              = "ingress"
-#   description       = "allow all"
-#   from_port         = 0
-#   to_port           = 0
-#   protocol          = "-1"
-#   cidr_blocks       = ["0.0.0.0/0"]
-#   ipv6_cidr_blocks  = ["::/0"]
-# }
+}
+
+
+resource "aws_security_group_rule" "infra-inbound-all" {
+  depends_on        = [aws_security_group.exchange-server]
+  security_group_id = aws_security_group.exchange-server.id
+  type              = "ingress"
+  description       = "allow all"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  source_security_group_id = aws_security_group.app-server
+}
+
+
+resource "aws_security_group_rule" "infra-inbound-all" {
+  depends_on        = [aws_security_group.exchange-server]
+  security_group_id = aws_security_group.exchange-server.id
+  type              = "ingress"
+  description       = "allow all"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  source_security_group_id = aws_security_group.app-server
+}
 
 
 resource "aws_instance" "exchange-server" {
