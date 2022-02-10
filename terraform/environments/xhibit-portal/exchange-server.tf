@@ -6,7 +6,6 @@ resource "aws_security_group" "exchange-server" {
   vpc_id      = local.vpc_id
 }
 
-
 resource "aws_security_group_rule" "web-outbound-all" {
   depends_on        = [aws_security_group.exchange-server]
   security_group_id = aws_security_group.exchange-server.id
@@ -17,9 +16,7 @@ resource "aws_security_group_rule" "web-outbound-all" {
   protocol          = "-1"
   cidr_blocks       = ["0.0.0.0/0"]
   ipv6_cidr_blocks  = ["::/0"]
-
 }
-
 
 resource "aws_security_group_rule" "infra-inbound-all" {
   depends_on               = [aws_security_group.exchange-server]
@@ -31,8 +28,6 @@ resource "aws_security_group_rule" "infra-inbound-all" {
   protocol                 = "-1"
   source_security_group_id = aws_security_group.app-server.id
 }
-
-
 
 resource "aws_security_group_rule" "infra-outbound-all" {
   depends_on               = [aws_security_group.exchange-server]
@@ -56,7 +51,10 @@ resource "aws_security_group_rule" "app-inbound-bastion" {
   cidr_blocks       = ["${module.bastion_linux.bastion_private_ip}/32"]
 }
 
-
+resource "aws_eip" "exchange" {
+  instance = aws_instance.exchange-server.id
+  vpc      = true
+}
 
 resource "aws_instance" "exchange-server" {
   depends_on                  = [aws_security_group.exchange-server]
