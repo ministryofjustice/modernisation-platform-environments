@@ -29,7 +29,7 @@ resource "aws_security_group_rule" "infra-inbound-all" {
   from_port                = 0
   to_port                  = 0
   protocol                 = "-1"
-  source_security_group_id = aws_security_group.app-server
+  source_security_group_id = aws_security_group.app-server.id
 }
 
 
@@ -42,7 +42,7 @@ resource "aws_security_group_rule" "infra-outbound-all" {
   from_port                = 0
   to_port                  = 0
   protocol                 = "-1"
-  source_security_group_id = aws_security_group.app-server
+  source_security_group_id = aws_security_group.app-server.id
 }
 
 
