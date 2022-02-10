@@ -139,7 +139,7 @@ resource "time_offset" "weblogic_asm_parameter" {
   offset_minutes = 30
   triggers = {
     # if the instance is recycled we reset the timestamp to give access again
-    instance_id = aws_instance.database_server.arn
+    instance_id = aws_instance.weblogic_server.arn
   }
 }
 
