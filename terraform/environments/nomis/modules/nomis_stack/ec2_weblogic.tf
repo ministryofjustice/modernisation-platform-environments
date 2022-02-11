@@ -168,5 +168,5 @@ data "aws_iam_instance_profile" "ec2_weblogic_profile" {
 resource "aws_iam_role_policy" "weblogic_asm_parameter" {
   name   = "weblogic-asm-parameter-access-${var.stack_name}"
   role   = data.aws_iam_instance_profile.ec2_weblogic_profile.role_name
-  policy = data.aws_iam_policy_document.asm_parameter.json
+  policy = data.aws_iam_policy_document.weblogic_asm_parameter.json
 }
