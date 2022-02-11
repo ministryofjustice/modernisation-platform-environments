@@ -134,25 +134,25 @@ resource "aws_route53_record" "weblogic_internal" {
 # Attach policy inline on ec2-common-role
 #------------------------------------------------------------------------------
 
-// resource "time_offset" "weblogic_asm_parameter" {
-//   # static time resource for controlling access to parameter
-//   offset_minutes = 30
-//   triggers = {
-//     # if the instance is recycled we reset the timestamp to give access again
-//     instance_id = aws_instance.weblogic_server.arn
-//   }
-// }
+resource "time_offset" "weblogic_asm_parameter" {
+  # static time resource for controlling access to parameter
+  offset_minutes = 30
+  triggers = {
+    # if the instance is recycled we reset the timestamp to give access again
+    instance_id = aws_instance.weblogic_server.arn
+  }
+}
 
 data "aws_iam_policy_document" "weblogic_asm_parameter" {
   statement {
     effect    = "Allow"
     actions   = ["ssm:GetParameter"]
     resources = ["arn:aws:ssm:${var.region}:${data.aws_caller_identity.current.id}:parameter/weblogic/default/*", "arn:aws:ssm:${var.region}:${data.aws_caller_identity.current.id}:parameter/weblogic/${var.stack_name}/*"]
-    // condition {
-    //   test     = "DateLessThan"
-    //   variable = "aws:CurrentTime"
-    //   values   = [time_offset.weblogic_asm_parameter.rfc3339]
-    // }
+    condition {
+      test     = "DateLessThan"
+      variable = "aws:CurrentTime"
+      values   = [time_offset.weblogic_asm_parameter.rfc3339]
+    }
     condition {
       test     = "StringLike"
       variable = "ec2:SourceInstanceARN"
