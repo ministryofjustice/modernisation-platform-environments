@@ -1,47 +1,70 @@
 
 
-# Security Groups
-# resource "aws_security_group" "exchange-server" {
-#   description = "Domain traffic only"
-#   name        = "exchange-server-${local.application_name}"
-#   vpc_id      = local.vpc_id
-# }
+resource "aws_security_group" "exchange-server" {
+  description = "Domain traffic only"
+  name        = "exchange-server-${local.application_name}"
+  vpc_id      = local.vpc_id
+}
 
+resource "aws_security_group_rule" "web-outbound-all" {
+  depends_on        = [aws_security_group.exchange-server]
+  security_group_id = aws_security_group.exchange-server.id
+  type              = "egress"
+  description       = "allow all"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  cidr_blocks       = ["0.0.0.0/0"]
+  ipv6_cidr_blocks  = ["::/0"]
+}
 
-# resource "aws_security_group_rule" "exchange-outbound-all" {
-#   depends_on        = [aws_security_group.exchange-server]
-#   security_group_id = aws_security_group.exchange-server.id
-#   type              = "egress"
-#   description       = "allow all"
-#   from_port         = 0
-#   to_port           = 0
-#   protocol          = "-1"
-#   cidr_blocks       = ["0.0.0.0/0"]
-#   ipv6_cidr_blocks  = ["::/0"]
-# }
+resource "aws_security_group_rule" "infra-inbound-all" {
+  depends_on               = [aws_security_group.exchange-server]
+  security_group_id        = aws_security_group.exchange-server.id
+  type                     = "ingress"
+  description              = "allow all"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
+  source_security_group_id = aws_security_group.app-server.id
+}
 
-# resource "aws_security_group_rule" "exchange-inbound-all" {
-#   depends_on        = [aws_security_group.exchange-server]
-#   security_group_id = aws_security_group.exchange-server.id
-#   type              = "ingress"
-#   description       = "allow all"
-#   from_port         = 0
-#   to_port           = 0
-#   protocol          = "-1"
-#   cidr_blocks       = ["0.0.0.0/0"]
-#   ipv6_cidr_blocks  = ["::/0"]
-# }
+resource "aws_security_group_rule" "infra-outbound-all" {
+  depends_on               = [aws_security_group.exchange-server]
+  security_group_id        = aws_security_group.exchange-server.id
+  type                     = "egress"
+  description              = "allow all"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
+  source_security_group_id = aws_security_group.app-server.id
+}
 
+resource "aws_security_group_rule" "app-inbound-bastion" {
+  depends_on        = [aws_security_group.exchange-server]
+  security_group_id = aws_security_group.exchange-server.id
+  type              = "ingress"
+  description       = "allow bastion"
+  from_port         = 3389
+  to_port           = 3389
+  protocol          = "TCP"
+  cidr_blocks       = ["${module.bastion_linux.bastion_private_ip}/32"]
+}
+
+resource "aws_eip" "exchange" {
+  instance = aws_instance.exchange-server.id
+  vpc      = true
+}
 
 resource "aws_instance" "exchange-server" {
-  depends_on                  = [aws_security_group.app-server]
+  depends_on                  = [aws_security_group.exchange-server]
   instance_type               = "t2.medium"
   ami                         = local.application_data.accounts[local.environment].infra6-ami
-  vpc_security_group_ids      = [aws_security_group.app-server.id]
+  vpc_security_group_ids      = [aws_security_group.exchange-server.id]
   monitoring                  = false
   associate_public_ip_address = false
   ebs_optimized               = false
-  subnet_id                   = data.aws_subnet.private_az_a.id
+  subnet_id                   = data.aws_subnet.public_az_a.id
   key_name                    = aws_key_pair.george.key_name
 
   user_data = <<EOF
@@ -82,7 +105,6 @@ resource "aws_instance" "exchange-server" {
     }
   )
 }
-
 
 resource "aws_ebs_volume" "exchange-disk1" {
   depends_on        = [aws_instance.exchange-server]
