@@ -46,7 +46,7 @@ jobs:
     needs: plan-development # job only runs if plan-development runs successfully
     name: Deploy Development - xhibit-portal
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/xp-dev'
+    if: github.ref == 'xp/fix-aws-provider-issue'
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2.3.4
