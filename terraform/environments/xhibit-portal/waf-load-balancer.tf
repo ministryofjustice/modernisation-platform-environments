@@ -38,7 +38,8 @@ resource "aws_security_group_rule" "allow_web_users" {
   cidr_blocks = [
     "109.147.86.54/32",
     "81.101.176.47/32",
-    "194.33.196.2/32"
+    "194.33.196.2/32",
+    "109.152.65.209/32"
   ]
   # ipv6_cidr_blocks  = ["::/0"]
 }
@@ -385,12 +386,14 @@ resource "aws_wafv2_web_acl_association" "aws_lb_waf_association" {
   web_acl_arn  = aws_wafv2_web_acl.waf_acl.arn
 }
 
-
-
 resource "aws_s3_bucket" "loadbalancer_logs" {
   bucket        = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}-lblogs"
-  acl           = "log-delivery-write"
   force_destroy = true
+}
+
+resource "aws_s3_bucket_acl" "loadbalancer_logs" {
+  bucket = aws_s3_bucket.loadbalancer_logs.id
+  acl    = "log-delivery-write"
 }
 
 resource "aws_s3_bucket_policy" "loadbalancer_logs_policy" {
@@ -443,11 +446,13 @@ data "aws_iam_policy_document" "s3_bucket_lb_write" {
 
 resource "aws_s3_bucket" "waf_logs" {
   bucket        = "aws-waf-logs-${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}"
-  acl           = "log-delivery-write"
   force_destroy = true
 }
 
-
+resource "aws_s3_bucket_acl" "waf_logs" {
+  bucket = aws_s3_bucket.waf_logs.id
+  acl    = "log-delivery-write"
+}
 
 resource "aws_wafv2_web_acl_logging_configuration" "waf_logs" {
   log_destination_configs = ["${aws_s3_bucket.waf_logs.arn}"]
