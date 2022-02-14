@@ -38,16 +38,23 @@
 ######################### Run Terraform Plan Locally Only ##################################
 # To run a Terraform Plan locally, uncomment this bottom section of code and comment out the top section
 
+
+terraform {
+  required_providers {
+    aws = {
+      version = "< 4.0.0"
+  }
+}
+
+
 provider "aws" {
   region = "eu-west-2"
-  version = "v3.74.2"
 }
 
 # AWS provider for core-vpc-<environment>, to share VPCs into this account
 provider "aws" {
   alias  = "core-vpc"
   region = "eu-west-2"
-  version = "v3.74.2"
 
   assume_role {
     role_arn = "arn:aws:iam::${local.environment_management.account_ids[local.provider_name]}:role/member-delegation-read-only"
@@ -58,7 +65,6 @@ provider "aws" {
 provider "aws" {
   alias  = "core-network-services"
   region = "eu-west-2"
-  version = "v3.74.2"
 
   assume_role {
     role_arn = "arn:aws:iam::${local.environment_management.account_ids["core-network-services-production"]}:role/read-dns-records"
