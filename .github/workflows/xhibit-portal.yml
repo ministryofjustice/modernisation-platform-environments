@@ -7,6 +7,7 @@ on:                                          # Put ALL the triggers for any part
       - xp-pre
       - xp-preprod
       - xp-dev
+      - xp/fix-aws-provider-issue
     paths:
       - 'terraform/environments/xhibit-portal/**'
       - '.github/workflows/xhibit-portal.yml'
@@ -19,11 +20,11 @@ defaults:
   run:
     shell: bash
 
-jobs: 
+jobs:
   plan-development:
     name: Plan Development - xhibit-portal
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/xp-dev' # job only runs for pushes to the xp-dev branch
+    if: github.ref == 'xp/fix-aws-provider-issue' # job only runs for pushes to the xp-dev branch
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2.3.4
@@ -66,7 +67,7 @@ jobs:
   plan-preproduction:
     name: Plan Pre-Production - xhibit-portal
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/xp-preprod' 
+    if: github.ref == 'refs/heads/xp-preprod'
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2.3.4
@@ -88,7 +89,7 @@ jobs:
     needs: plan-preproduction # job only runs if plan-production runs successfully
     name: Deploy Pre-Production - xhibit-portal
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/xp-preprod'    
+    if: github.ref == 'refs/heads/xp-preprod'
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2.3.4
