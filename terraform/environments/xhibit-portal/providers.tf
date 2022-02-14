@@ -39,13 +39,7 @@
 # To run a Terraform Plan locally, uncomment this bottom section of code and comment out the top section
 
 
-terraform {
-  required_providers {
-    aws = {
-      version = "< 4.0.0"
-    }
-  }
-}
+
 
 
 provider "aws" {
