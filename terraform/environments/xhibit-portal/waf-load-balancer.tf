@@ -225,9 +225,7 @@ resource "aws_alb_listener_rule" "ingestion_listener_rule" {
 
   condition {
     host_header {
-      # web.xhibit-portal.hmcts-development.modernisation-platform.service.justice.gov.uk
       values = [
-        "ingest.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk",
         local.application_data.accounts[local.environment].public_dns_name_ingestion
       ]
     }
