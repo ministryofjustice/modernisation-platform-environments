@@ -36,6 +36,7 @@ jobs:
         run: |
           echo "Terraform plan - ${TF_ENV}"
           bash scripts/terraform-init.sh terraform/environments/xhibit-portal
+          terraform -chdir="terraform/environments/xhibit-portal" workspace list
           terraform -chdir="terraform/environments/xhibit-portal" workspace select "xhibit-portal-${TF_ENV}"
           bash scripts/terraform-plan.sh terraform/environments/xhibit-portal
         env:
