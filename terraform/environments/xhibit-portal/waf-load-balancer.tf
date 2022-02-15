@@ -389,7 +389,7 @@ resource "aws_wafv2_web_acl_association" "aws_lb_waf_association" {
 
 resource "aws_s3_bucket" "loadbalancer_logs" {
   bucket        = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}-lblogs"
-  acl    = "log-delivery-write"
+  acl           = "log-delivery-write"
   force_destroy = true
 }
 
@@ -448,7 +448,7 @@ data "aws_iam_policy_document" "s3_bucket_lb_write" {
 
 resource "aws_s3_bucket" "waf_logs" {
   bucket        = "aws-waf-logs-${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}"
-  acl    = "log-delivery-write"
+  acl           = "log-delivery-write"
   force_destroy = true
 }
 
