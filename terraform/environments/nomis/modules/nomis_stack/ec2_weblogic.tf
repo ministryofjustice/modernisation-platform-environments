@@ -109,9 +109,10 @@ resource "aws_ebs_volume" "weblogic_ami_volume" {
 resource "aws_volume_attachment" "weblogic_ami_volume" {
   for_each = aws_ebs_volume.weblogic_ami_volume
 
-  device_name = each.key
-  volume_id   = each.value.id
-  instance_id = aws_instance.weblogic_server.id
+  device_name  = each.key
+  volume_id    = each.value.id
+  instance_id  = aws_instance.weblogic_server.id
+  force_detach = true
 }
 
 #------------------------------------------------------------------------------
