@@ -1,3 +1,4 @@
+#comment test
 resource "aws_security_group" "waf_lb" {
   description = "Security group for app load balancer, simply to implement ACL rules for the WAF"
   name        = "waf-loadbalancer-${var.networking[0].application}"
@@ -388,13 +389,14 @@ resource "aws_wafv2_web_acl_association" "aws_lb_waf_association" {
 
 resource "aws_s3_bucket" "loadbalancer_logs" {
   bucket        = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}-lblogs"
+  acl    = "log-delivery-write"
   force_destroy = true
 }
 
-resource "aws_s3_bucket_acl" "loadbalancer_logs" {
-  bucket = aws_s3_bucket.loadbalancer_logs.id
-  acl    = "log-delivery-write"
-}
+# resource "aws_s3_bucket_acl" "loadbalancer_logs" {
+#   bucket = aws_s3_bucket.loadbalancer_logs.id
+#   acl    = "log-delivery-write"
+# }
 
 resource "aws_s3_bucket_policy" "loadbalancer_logs_policy" {
   bucket = aws_s3_bucket.loadbalancer_logs.bucket
@@ -446,13 +448,14 @@ data "aws_iam_policy_document" "s3_bucket_lb_write" {
 
 resource "aws_s3_bucket" "waf_logs" {
   bucket        = "aws-waf-logs-${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}"
+  acl    = "log-delivery-write"
   force_destroy = true
 }
 
-resource "aws_s3_bucket_acl" "waf_logs" {
-  bucket = aws_s3_bucket.waf_logs.id
-  acl    = "log-delivery-write"
-}
+# resource "aws_s3_bucket_acl" "waf_logs" {
+#   bucket = aws_s3_bucket.waf_logs.id
+#   acl    = "log-delivery-write"
+# }
 
 resource "aws_wafv2_web_acl_logging_configuration" "waf_logs" {
   log_destination_configs = ["${aws_s3_bucket.waf_logs.arn}"]
