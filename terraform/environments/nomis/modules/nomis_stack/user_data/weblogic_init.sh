@@ -1,8 +1,20 @@
 #!/bin/bash
 
-# su -c "export USE_DEFAULT_CREDS=${USE_DEFAULT_CREDS} DB_HOSTNAME=${DB_HOSTNAME} ENV=${ENV}; bash /u01/software/weblogic/weblogic-setup.sh" - oracle
-su -c "export USE_DEFAULT_CREDS='true' DB_HOSTNAME=db.t1.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk ENV=T1; bash /u01/software/weblogic/weblogic-setup.sh" - oracle
+hostname ${WEBLOGIC_HOSTNAME}
 
 # Create nomis_weblogic service
 chkconfig --add nomis_weblogic
 chkconfig --level 3 nomis_weblogic on
+
+# Check variables are set and run weblogic setup script
+# USAGE
+# [-d] Use default credentials for database and Weblogic admin console
+# [-e <ENV> e.g. T1]
+# [-h <DB_HOSTNAME>]
+if [[ -n ${ENV} ]] && [[ -n ${DB_HOSTNAME} ]] && [[ ${USE_DEFAULT_CREDS} = "false" ]]; then
+  su -c "bash /u01/software/weblogic/weblogic-setup.sh -d -e ${ENV} -h ${DB_HOSTNAME}" - oracle
+elif [[ -n ${DB_HOSTNAME} ]] && [[ ${USE_DEFAULT_CREDS} = "true" ]]; then
+  su -c "bash /u01/software/weblogic/weblogic-setup.sh -d -h ${DB_HOSTNAME}" - oracle
+else
+ exit 1
+fi
