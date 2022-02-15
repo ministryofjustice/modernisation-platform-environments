@@ -187,9 +187,7 @@ resource "aws_alb_listener_rule" "root_listener_redirect" {
 
   condition {
     host_header {
-      # web.xhibit-portal.hmcts-development.modernisation-platform.service.justice.gov.uk
       values = [
-        "web.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk",
         local.application_data.accounts[local.environment].public_dns_name_web
       ]
     }
@@ -208,9 +206,7 @@ resource "aws_alb_listener_rule" "web_listener_rule" {
 
   condition {
     host_header {
-      # web.xhibit-portal.hmcts-development.modernisation-platform.service.justice.gov.uk
       values = [
-        "web.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk",
         local.application_data.accounts[local.environment].public_dns_name_web
       ]
     }
@@ -229,9 +225,7 @@ resource "aws_alb_listener_rule" "ingestion_listener_rule" {
 
   condition {
     host_header {
-      # web.xhibit-portal.hmcts-development.modernisation-platform.service.justice.gov.uk
       values = [
-        "ingest.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk",
         local.application_data.accounts[local.environment].public_dns_name_ingestion
       ]
     }
@@ -239,42 +233,11 @@ resource "aws_alb_listener_rule" "ingestion_listener_rule" {
 
 }
 
-
-
-resource "aws_route53_record" "waf_lb_web_dns" {
-  provider = aws.core-vpc
-
-  zone_id = data.aws_route53_zone.external_r53_zone.zone_id
-  name    = "web.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-  type    = "A"
-
-  alias {
-    name                   = aws_lb.waf_lb.dns_name
-    zone_id                = aws_lb.waf_lb.zone_id
-    evaluate_target_health = true
-  }
-}
-
-resource "aws_route53_record" "waf_lb_ingest_dns" {
-  provider = aws.core-vpc
-
-  zone_id = data.aws_route53_zone.external_r53_zone.zone_id
-  name    = "ingest.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-  type    = "A"
-
-  alias {
-    name                   = aws_lb.waf_lb.dns_name
-    zone_id                = aws_lb.waf_lb.zone_id
-    evaluate_target_health = true
-  }
-}
-
 resource "aws_acm_certificate" "waf_lb_cert" {
-  domain_name       = "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  domain_name       = local.application_data.accounts[local.environment].public_dns_name_web
   validation_method = "DNS"
 
   subject_alternative_names = [
-    local.application_data.accounts[local.environment].public_dns_name_web,
     local.application_data.accounts[local.environment].public_dns_name_ingestion,
   ]
 
@@ -285,13 +248,6 @@ resource "aws_acm_certificate" "waf_lb_cert" {
   lifecycle {
     create_before_destroy = true
   }
-}
-
-data "aws_route53_zone" "external_r53_zone" {
-  provider = aws.core-vpc
-
-  name         = "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk."
-  private_zone = false
 }
 
 resource "aws_route53_record" "waf_lb_r53_record" {
