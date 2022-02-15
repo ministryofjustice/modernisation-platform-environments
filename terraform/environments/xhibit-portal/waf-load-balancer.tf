@@ -187,7 +187,9 @@ resource "aws_alb_listener_rule" "root_listener_redirect" {
 
   condition {
     host_header {
+      # web.xhibit-portal.hmcts-development.modernisation-platform.service.justice.gov.uk
       values = [
+        "web.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk",
         local.application_data.accounts[local.environment].public_dns_name_web
       ]
     }
@@ -206,7 +208,9 @@ resource "aws_alb_listener_rule" "web_listener_rule" {
 
   condition {
     host_header {
+      # web.xhibit-portal.hmcts-development.modernisation-platform.service.justice.gov.uk
       values = [
+        "web.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk",
         local.application_data.accounts[local.environment].public_dns_name_web
       ]
     }
@@ -225,7 +229,9 @@ resource "aws_alb_listener_rule" "ingestion_listener_rule" {
 
   condition {
     host_header {
+      # web.xhibit-portal.hmcts-development.modernisation-platform.service.justice.gov.uk
       values = [
+        "ingest.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk",
         local.application_data.accounts[local.environment].public_dns_name_ingestion
       ]
     }
@@ -264,7 +270,7 @@ resource "aws_route53_record" "waf_lb_ingest_dns" {
 }
 
 resource "aws_acm_certificate" "waf_lb_cert" {
-  domain_name       = "modernisation-platform.service.justice.gov.uk"
+  domain_name       = "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   validation_method = "DNS"
 
   subject_alternative_names = [
