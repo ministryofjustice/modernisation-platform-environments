@@ -36,9 +36,9 @@ resource "aws_security_group_rule" "allow_web_users" {
   to_port           = 443
   protocol          = "TCP"
   cidr_blocks = [
-    "109.147.86.54/32",
-    "81.101.176.47/32",
-    "194.33.196.2/32"
+    "109.152.65.209/32", # George
+    "81.101.176.47/32", # Aman
+    "194.33.196.2/32"   # Gary
   ]
   # ipv6_cidr_blocks  = ["::/0"]
 }
@@ -187,9 +187,7 @@ resource "aws_alb_listener_rule" "root_listener_redirect" {
 
   condition {
     host_header {
-      # web.xhibit-portal.hmcts-development.modernisation-platform.service.justice.gov.uk
       values = [
-        "web.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk",
         local.application_data.accounts[local.environment].public_dns_name_web
       ]
     }
@@ -208,9 +206,7 @@ resource "aws_alb_listener_rule" "web_listener_rule" {
 
   condition {
     host_header {
-      # web.xhibit-portal.hmcts-development.modernisation-platform.service.justice.gov.uk
       values = [
-        "web.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk",
         local.application_data.accounts[local.environment].public_dns_name_web
       ]
     }
@@ -274,7 +270,6 @@ resource "aws_acm_certificate" "waf_lb_cert" {
   validation_method = "DNS"
 
   subject_alternative_names = [
-    "*.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk",
     local.application_data.accounts[local.environment].public_dns_name_web,
     local.application_data.accounts[local.environment].public_dns_name_ingestion,
   ]
