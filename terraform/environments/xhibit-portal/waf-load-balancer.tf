@@ -1,5 +1,3 @@
-#comment to trigger workflow
-
 resource "aws_security_group" "waf_lb" {
   description = "Security group for app load balancer, simply to implement ACL rules for the WAF"
   name        = "waf-loadbalancer-${var.networking[0].application}"
