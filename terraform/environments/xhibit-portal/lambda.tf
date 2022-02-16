@@ -67,8 +67,8 @@ resource "aws_lambda_function" "root_snapshot_to_ami" {
 
 resource "aws_cloudwatch_event_rule" "every_day" {
   name                = "run-daily"
-  description         = "Runs daily at 7:15pm"
-  schedule_expression = "cron(15 19 * * ? *)"
+  description         = "Runs daily at 8pm"
+  schedule_expression = "cron(0 20 * * ? *)"
 }
 
 resource "aws_cloudwatch_event_target" "trigger_lambda_every_day" {
