@@ -44,7 +44,7 @@ resource "aws_key_pair" "george" {
 resource "aws_instance" "importmachine" {
   depends_on                  = [aws_security_group.importmachine]
   instance_type               = "t3.large"
-  ami                         = "ami-0a0502ffd782e9b12"
+  ami                         = local.application_data.accounts[local.environment].importmachine-ami
   vpc_security_group_ids      = [aws_security_group.importmachine.id]
   monitoring                  = false
   associate_public_ip_address = false
