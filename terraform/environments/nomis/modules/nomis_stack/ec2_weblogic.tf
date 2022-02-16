@@ -95,7 +95,7 @@ resource "aws_ebs_volume" "weblogic_ami_volume" {
   iops              = each.value["ebs"]["iops"]
   snapshot_id       = each.value["ebs"]["snapshot_id"]
   size              = lookup(var.weblogic_drive_map, each.value["device_name"], each.value["ebs"]["volume_size"])
-  type              = each.value["ebs"]["volume_type"]
+  type              = each.value["ebs"]["volume_type"] == "gp2" ? "gp3" : each.value["ebs"]["volume_type"]
 
   tags = merge(
     var.tags,
