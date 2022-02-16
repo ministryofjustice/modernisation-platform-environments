@@ -16,5 +16,6 @@ if [[ -n ${ENV} ]] && [[ -n ${DB_HOSTNAME} ]] && [[ ${USE_DEFAULT_CREDS} = "fals
 elif [[ -n ${DB_HOSTNAME} ]] && [[ ${USE_DEFAULT_CREDS} = "true" ]]; then
   su -c "bash /u01/software/weblogic/weblogic-setup.sh -d -h ${DB_HOSTNAME}" - oracle
 else
- exit 1
+  echo "Error: Environment variables undefined"
+  exit 1
 fi
