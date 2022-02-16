@@ -25,7 +25,7 @@
       "suprig05-disk-1-snapshot"      : "snap-004daf44c682a43c1",
       "XHBPRESMS01-ami"               : "ami-082ace3b4ab9d3345",
       "dummy snapshot id"             : "snap-08faed719f2040610",
-      "importmachine-ami"             : "ami-0a0502ffd782e9b12",
+      "importmachine-ami"             : "ami-0f90e80b299573521",
       "importmachine-data-snapshot"   : "snap-0688d8b6d3bd6b245",
       "nat-instance-ami"              : "ami-087e7082959f51a02"
     },
@@ -55,7 +55,7 @@
       "suprig05-ami"                  : "ami-0e52c25843d72f2a5",
       "suprig05-disk-1-snapshot"      : "snap-0b6d529f807eb9a6a",
       "XHBPRESMS01-ami"               : "ami-08f52dea252c952c1",
-      "importmachine-ami"             : "ami-0a0502ffd782e9b12",
+      "importmachine-ami"             : "ami-0f90e80b299573521",
       "importmachine-data-snapshot"   : "snap-0281146c5951823fa",
       "nat-instance-ami"              : "ami-087e7082959f51a02"
     } ,
