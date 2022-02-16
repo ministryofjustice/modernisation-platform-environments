@@ -5,6 +5,7 @@ on:                                          # Put ALL the triggers for any part
     branches:                                # and they're skipped according to the 'if' conditions below
       - main
       - xp-pre
+      - xp-preprod
       - xp-dev
     paths:
       - 'terraform/environments/xhibit-portal/**'
@@ -18,11 +19,11 @@ defaults:
   run:
     shell: bash
 
-jobs: 
+jobs:
   plan-development:
     name: Plan Development - xhibit-portal
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/xp-dev' # job only runs for pushes to the xp-dev branch
+    if: github.ref == 'refs/heads/xp-pre' # job only runs for pushes to the xp-dev branch
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2.3.4
@@ -35,6 +36,7 @@ jobs:
         run: |
           echo "Terraform plan - ${TF_ENV}"
           bash scripts/terraform-init.sh terraform/environments/xhibit-portal
+          terraform -chdir="terraform/environments/xhibit-portal" workspace list
           terraform -chdir="terraform/environments/xhibit-portal" workspace select "xhibit-portal-${TF_ENV}"
           bash scripts/terraform-plan.sh terraform/environments/xhibit-portal
         env:
@@ -44,7 +46,7 @@ jobs:
     needs: plan-development # job only runs if plan-development runs successfully
     name: Deploy Development - xhibit-portal
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/xp-dev'
+    if: github.ref == 'refs/heads/xp-pre'
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2.3.4
@@ -65,7 +67,7 @@ jobs:
   plan-preproduction:
     name: Plan Pre-Production - xhibit-portal
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/xp-preprod' 
+    if: github.ref == 'refs/heads/xp-preprod'
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2.3.4
@@ -87,7 +89,7 @@ jobs:
     needs: plan-preproduction # job only runs if plan-production runs successfully
     name: Deploy Pre-Production - xhibit-portal
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/xp-preprod'    
+    if: github.ref == 'refs/heads/xp-preprod'
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2.3.4
