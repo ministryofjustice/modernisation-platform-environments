@@ -25,6 +25,7 @@
       "suprig05-disk-1-snapshot"      : "snap-004daf44c682a43c1",  
       "XHBPRESMS01-ami"               : "ami-082ace3b4ab9d3345",
       "dummy snapshot id"             : "snap-08faed719f2040610",
+      "importmachine-ami"             : "ami-0f90e80b299573521",
       "importmachine-data-snapshot"   : "snap-0688d8b6d3bd6b245",
       "nat-instance-ami"              : "ami-087e7082959f51a02"
     },
@@ -51,7 +52,8 @@
       "suprig04-disk-1-snapshot"      : "snap-02f6069537faf46dd",
       "suprig05-ami"                  : "ami-06508dcea0a1ecb82",
       "suprig05-disk-1-snapshot"      : "snap-0b6d529f807eb9a6a",
-      "XHBPRESMS01-ami"               : "ami-0bbced760c465506e",                
+      "XHBPRESMS01-ami"               : "ami-0bbced760c465506e", 
+      "importmachine-ami"             : "ami-0a0502ffd782e9b12",
       "importmachine-data-snapshot"   : "snap-09073f656deb1ecb1",
       "nat-instance-ami"              : "ami-087e7082959f51a02"
     } ,
@@ -78,7 +80,8 @@
       "suprig04-disk-1-snapshot"      : "snap-0414bfa696a12104e",
       "suprig05-ami"                  : "ami-00a8f2138f939e815",
       "suprig05-disk-1-snapshot"      : "snap-08b1c019201557295",
-      "XHBPRESMS01-ami"               : "ami-0e9fa072635068743",                
+      "XHBPRESMS01-ami"               : "ami-0e9fa072635068743", 
+      "importmachine-ami"             : "REPLACE HERE FROM ZURI",
       "importmachine-data-snapshot"   : "snap-09073f656deb1ecb1",
       "nat-instance-ami"              : "ami-087e7082959f51a02"
 
