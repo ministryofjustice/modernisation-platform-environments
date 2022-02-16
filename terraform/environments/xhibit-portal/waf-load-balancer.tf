@@ -36,10 +36,9 @@ resource "aws_security_group_rule" "allow_web_users" {
   to_port           = 443
   protocol          = "TCP"
   cidr_blocks = [
-    "109.147.86.54/32",
-    "81.101.176.47/32",
-    "194.33.196.2/32",
-    "109.152.65.209/32"
+    "109.152.65.209/32", # George
+    "81.101.176.47/32",  # Aman
+    "194.33.196.2/32"    # Gary
   ]
   # ipv6_cidr_blocks  = ["::/0"]
 }
@@ -188,9 +187,7 @@ resource "aws_alb_listener_rule" "root_listener_redirect" {
 
   condition {
     host_header {
-      # web.xhibit-portal.hmcts-development.modernisation-platform.service.justice.gov.uk
       values = [
-        "web.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk",
         local.application_data.accounts[local.environment].public_dns_name_web
       ]
     }
@@ -209,9 +206,7 @@ resource "aws_alb_listener_rule" "web_listener_rule" {
 
   condition {
     host_header {
-      # web.xhibit-portal.hmcts-development.modernisation-platform.service.justice.gov.uk
       values = [
-        "web.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk",
         local.application_data.accounts[local.environment].public_dns_name_web
       ]
     }
@@ -230,9 +225,7 @@ resource "aws_alb_listener_rule" "ingestion_listener_rule" {
 
   condition {
     host_header {
-      # web.xhibit-portal.hmcts-development.modernisation-platform.service.justice.gov.uk
       values = [
-        "ingest.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk",
         local.application_data.accounts[local.environment].public_dns_name_ingestion
       ]
     }
@@ -240,78 +233,21 @@ resource "aws_alb_listener_rule" "ingestion_listener_rule" {
 
 }
 
-
-
-resource "aws_route53_record" "waf_lb_web_dns" {
-  provider = aws.core-vpc
-
-  zone_id = data.aws_route53_zone.external_r53_zone.zone_id
-  name    = "web.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-  type    = "A"
-
-  alias {
-    name                   = aws_lb.waf_lb.dns_name
-    zone_id                = aws_lb.waf_lb.zone_id
-    evaluate_target_health = true
-  }
-}
-
-resource "aws_route53_record" "waf_lb_ingest_dns" {
-  provider = aws.core-vpc
-
-  zone_id = data.aws_route53_zone.external_r53_zone.zone_id
-  name    = "ingest.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-  type    = "A"
-
-  alias {
-    name                   = aws_lb.waf_lb.dns_name
-    zone_id                = aws_lb.waf_lb.zone_id
-    evaluate_target_health = true
-  }
-}
-
 resource "aws_acm_certificate" "waf_lb_cert" {
-  domain_name       = "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  domain_name       = local.application_data.accounts[local.environment].public_dns_name_web
   validation_method = "DNS"
 
   subject_alternative_names = [
-    "*.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk",
-    local.application_data.accounts[local.environment].public_dns_name_web,
     local.application_data.accounts[local.environment].public_dns_name_ingestion,
   ]
 
   tags = {
-    Environment = "prod"
+    Environment = local.environment
   }
 
   lifecycle {
     create_before_destroy = true
   }
-}
-
-data "aws_route53_zone" "external_r53_zone" {
-  provider = aws.core-vpc
-
-  name         = "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk."
-  private_zone = false
-}
-
-resource "aws_route53_record" "waf_lb_r53_record" {
-  provider = aws.core-vpc
-  for_each = {
-    for dvo in aws_acm_certificate.waf_lb_cert.domain_validation_options : dvo.domain_name => {
-      name   = dvo.resource_record_name
-      record = dvo.resource_record_value
-      type   = dvo.resource_record_type
-    }
-  }
-
-  allow_overwrite = true
-  name            = each.value.name
-  records         = [each.value.record]
-  ttl             = 60
-  type            = each.value.type
-  zone_id         = data.aws_route53_zone.external_r53_zone.zone_id
 }
 
 resource "aws_acm_certificate_validation" "waf_lb_cert_validation" {
@@ -454,7 +390,3 @@ resource "aws_wafv2_web_acl_logging_configuration" "waf_logs" {
   log_destination_configs = ["${aws_s3_bucket.waf_logs.arn}"]
   resource_arn            = aws_wafv2_web_acl.waf_acl.arn
 }
-
-
-
-
