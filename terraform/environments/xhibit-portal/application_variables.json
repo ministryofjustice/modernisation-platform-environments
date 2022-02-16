@@ -25,7 +25,7 @@
       "suprig05-disk-1-snapshot"      : "snap-004daf44c682a43c1",
       "XHBPRESMS01-ami"               : "ami-082ace3b4ab9d3345",
       "dummy snapshot id"             : "snap-08faed719f2040610",
-      "importmachine-ami"             : "ami-0f90e80b299573521",
+      "importmachine-ami"             : "ami-0a0502ffd782e9b12",
       "importmachine-data-snapshot"   : "snap-0688d8b6d3bd6b245",
       "nat-instance-ami"              : "ami-087e7082959f51a02"
     },
