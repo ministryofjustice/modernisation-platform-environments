@@ -47,13 +47,13 @@ resource "aws_instance" "weblogic_server" {
   ami                         = data.aws_ami.weblogic_image.id
   associate_public_ip_address = false
   # ebs_optimized               = true
-  iam_instance_profile        = var.instance_profile_weblogic_name
-  instance_type               = var.weblogic_instance_type
-  key_name                    = var.key_name
-  monitoring                  = false
-  subnet_id                   = data.aws_subnet.private_az_a.id
-  user_data                   = data.template_file.weblogic_init.rendered
-  vpc_security_group_ids      = [var.weblogic_common_security_group_id]
+  iam_instance_profile   = var.instance_profile_weblogic_name
+  instance_type          = var.weblogic_instance_type
+  key_name               = var.key_name
+  monitoring             = false
+  subnet_id              = data.aws_subnet.private_az_a.id
+  user_data              = data.template_file.weblogic_init.rendered
+  vpc_security_group_ids = [var.weblogic_common_security_group_id]
 
   depends_on = [aws_instance.database_server]
 
