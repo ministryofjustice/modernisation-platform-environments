@@ -57,11 +57,11 @@ resource "aws_instance" "weblogic_server" {
 
   depends_on = [aws_instance.database_server]
 
-  metadata_options {
-    http_endpoint               = "enabled"
-    http_tokens                 = "required"
-    http_put_response_hop_limit = 4
-  }
+  # metadata_options {
+  #   http_endpoint               = "enabled"
+  #   http_tokens                 = "required"
+  #   http_put_response_hop_limit = 4
+  # }
 
   root_block_device {
     delete_on_termination = true
