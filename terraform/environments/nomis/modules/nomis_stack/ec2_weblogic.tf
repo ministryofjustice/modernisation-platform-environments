@@ -35,7 +35,6 @@ data "template_file" "weblogic_init" {
   template = file("${path.module}/user_data/weblogic_init.sh")
   vars = {
     ENV               = var.stack_name
-    WEBLOGIC_HOSTNAME = "weblogic.${var.stack_name}.${var.application_name}.${data.aws_route53_zone.internal.name}"
     DB_HOSTNAME       = "db.${var.stack_name}.${var.application_name}.${data.aws_route53_zone.internal.name}"
     USE_DEFAULT_CREDS = var.use_default_creds
   }
