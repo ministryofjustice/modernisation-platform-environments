@@ -47,7 +47,7 @@ resource "aws_instance" "weblogic_server" {
   ami                         = data.aws_ami.weblogic_image.id
   associate_public_ip_address = false
   iam_instance_profile        = var.instance_profile_weblogic_name
-  instance_type               =  var.weblogic_instance_type
+  instance_type               = var.weblogic_instance_type
   key_name                    = var.key_name
   monitoring                  = false
   subnet_id                   = data.aws_subnet.private_az_a.id
