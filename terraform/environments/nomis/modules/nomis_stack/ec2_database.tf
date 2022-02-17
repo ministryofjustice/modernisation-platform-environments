@@ -82,8 +82,9 @@ resource "aws_instance" "database_server" {
     aws_security_group.database_server.id
   ]
   metadata_options {
-    http_endpoint = "enabled"
-    http_tokens   = "required"
+    http_endpoint               = "enabled"
+    http_tokens                 = "required"
+    http_put_response_hop_limit = 2
   }
   root_block_device {
     delete_on_termination = true
