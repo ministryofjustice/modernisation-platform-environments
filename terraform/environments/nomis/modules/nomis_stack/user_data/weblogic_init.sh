@@ -1,6 +1,7 @@
 #!/bin/bash
 
-hostname ${WEBLOGIC_HOSTNAME}
+# Make sure /dev/xvdb is mounted to /u01 (fstab working intermittently)
+mount -a
 
 # Create nomis_weblogic service
 chkconfig --add nomis_weblogic

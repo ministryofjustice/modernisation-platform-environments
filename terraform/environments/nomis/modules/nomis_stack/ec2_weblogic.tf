@@ -46,22 +46,15 @@ resource "aws_instance" "weblogic_server" {
   # t2 was chosen as t3 does not support RHEL 6.10. Review next time instance type is changed.
   ami                         = data.aws_ami.weblogic_image.id
   associate_public_ip_address = false
-  # ebs_optimized               = true
-  iam_instance_profile   = var.instance_profile_weblogic_name
-  instance_type          = var.weblogic_instance_type
-  key_name               = var.key_name
-  monitoring             = false
-  subnet_id              = data.aws_subnet.private_az_a.id
-  user_data              = data.template_file.weblogic_init.rendered
-  vpc_security_group_ids = [var.weblogic_common_security_group_id]
+  iam_instance_profile        = var.instance_profile_weblogic_name
+  instance_type               =  var.weblogic_instance_type
+  key_name                    = var.key_name
+  monitoring                  = false
+  subnet_id                   = data.aws_subnet.private_az_a.id
+  user_data                   = data.template_file.weblogic_init.rendered
+  vpc_security_group_ids      = [var.weblogic_common_security_group_id]
 
   depends_on = [aws_instance.database_server]
-
-  # metadata_options {
-  #   http_endpoint               = "enabled"
-  #   http_tokens                 = "required"
-  #   http_put_response_hop_limit = 4
-  # }
 
   root_block_device {
     delete_on_termination = true
