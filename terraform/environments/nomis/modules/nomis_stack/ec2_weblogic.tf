@@ -46,7 +46,7 @@ resource "aws_instance" "weblogic_server" {
   # t2 was chosen as t3 does not support RHEL 6.10. Review next time instance type is changed.
   ami                         = data.aws_ami.weblogic_image.id
   associate_public_ip_address = false
-  ebs_optimized               = true
+  # ebs_optimized               = true
   iam_instance_profile        = var.instance_profile_weblogic_name
   instance_type               = var.weblogic_instance_type
   key_name                    = var.key_name
