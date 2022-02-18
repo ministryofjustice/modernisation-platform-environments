@@ -54,8 +54,8 @@ resource "aws_instance" "weblogic_server" {
   vpc_security_group_ids      = [var.weblogic_common_security_group_id]
 
   # metadata_options {
-    # http_endpoint = "enabled"   # http_endpoint/http_tokens force instance to use IMDSv2 which is incompatible with Weblogic
-    # http_tokens   = "required"
+  # http_endpoint = "enabled"   # http_endpoint/http_tokens force instance to use IMDSv2 which is incompatible with Weblogic
+  # http_tokens   = "required"
   # }
 
   depends_on = [aws_instance.database_server]
