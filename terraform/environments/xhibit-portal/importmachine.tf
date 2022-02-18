@@ -51,7 +51,7 @@ resource "aws_instance" "importmachine" {
   ebs_optimized               = true
   subnet_id                   = data.aws_subnet.private_az_a.id
   key_name                    = aws_key_pair.george.key_name
-  iam_instance_profile        = "arn:aws:iam::276038508461:role/CloudwachAgentServerRole"
+  aws_iam_instance_profile    { name = aws_iam_instance_profile.CloudwachAgentServerRole }
 
 
   metadata_options {
