@@ -98,9 +98,9 @@ resource "aws_instance" "app-server" {
   root_block_device {
     encrypted = true
     tags = {
-        Name = "root-block-device-app-${local.application_name}"
-      }
+      Name = "root-block-device-app-${local.application_name}"
     }
+  }
 
   lifecycle {
     ignore_changes = [
