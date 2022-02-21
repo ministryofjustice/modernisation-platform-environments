@@ -43,7 +43,7 @@ resource "aws_security_group_rule" "allow_web_users" {
     "20.49.163.191/32", # Azure function proxy
     "20.49.163.194/32", # Azure function proxy
     "20.49.163.244/32", # Azure function proxy
-    "10.182.60.51/32"   # NLE CGI proxy 
+    "10.182.60.51/32",   # NLE CGI proxy 
     "213.205.240.103/32" # George temporary ip
   ]
   # ipv6_cidr_blocks  = ["::/0"]
