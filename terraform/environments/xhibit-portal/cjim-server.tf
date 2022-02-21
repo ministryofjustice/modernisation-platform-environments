@@ -84,13 +84,10 @@ resource "aws_instance" "cjim-server" {
 
   root_block_device {
     encrypted = true
-    tags = merge(
-      local.tags,
-      {
+    tags = {
         Name = "root-block-device-cjim-${local.application_name}"
       }
-    )
-  }
+    }
 
   lifecycle {
     ignore_changes = [

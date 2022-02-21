@@ -570,13 +570,10 @@ resource "aws_instance" "infra1" {
 
   root_block_device {
     encrypted = true
-    tags = merge(
-      local.tags,
-      {
+    tags = {
         Name = "root-block-device-infra1-${local.application_name}"
       }
-    )
-  }
+    }
 
   lifecycle {
     ignore_changes = [
