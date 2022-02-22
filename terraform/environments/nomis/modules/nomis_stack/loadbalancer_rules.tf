@@ -2,7 +2,7 @@ resource "aws_lb_target_group" "weblogic" {
 
   name_prefix          = "${var.stack_name}-"
   port                 = "7777" # port on which targets receive traffic
-  protocol             = "HTTPS"
+  protocol             = "HTTP"
   target_type          = "ip"
   deregistration_delay = "30"
   vpc_id               = data.aws_vpc.shared_vpc.id
@@ -21,12 +21,6 @@ resource "aws_lb_target_group" "weblogic" {
     timeout             = "5"
     unhealthy_threshold = "5"
   }
-
-  # access_logs { maybe we want this?
-  #   bucket  = aws_s3_bucket.lb_logs.bucket
-  #   prefix  = "test-lb"
-  #   enabled = true
-  # }
 
   tags = merge(
     var.tags,
