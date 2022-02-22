@@ -22,12 +22,6 @@ resource "aws_lb_target_group" "weblogic" {
     unhealthy_threshold = "5"
   }
 
-  # access_logs { maybe we want this?
-  #   bucket  = aws_s3_bucket.lb_logs.bucket
-  #   prefix  = "test-lb"
-  #   enabled = true
-  # }
-
   tags = merge(
     var.tags,
     {

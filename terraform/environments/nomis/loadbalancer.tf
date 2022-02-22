@@ -66,6 +66,12 @@ resource "aws_lb" "internal" {
   enable_deletion_protection = true
   # drop_invalid_header_fields = true
 
+  access_logs {
+    bucket  = module.s3-bucket.bucket.arn
+    prefix  = "loadbalancer-logs"
+    enabled = true
+  }
+
   tags = merge(
     local.tags,
     {
