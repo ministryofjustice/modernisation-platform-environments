@@ -49,44 +49,44 @@ module "s3-bucket" {
   tags = local.tags
 }
 
-resource "aws_s3_bucket_policy" "loadbalancer_logs" {
-  bucket = module.s3-bucket.bucket.id
-  policy = jsonencode( # policy from: https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-access-logs.html#access-logging-bucket-permissions
-    {
-      "Version": "2012-10-17",
-      "Statement": [
-        {
-          "Effect": "Allow",
-          "Principal": {
-            "AWS": "arn:aws:iam::652711504416:root"
-          },
-          "Action": "s3:PutObject",
-          "Resource": "${module.s3-bucket.bucket.arn}/loadbalancer-logs/AWSLogs/${local.environment_management.account_ids[terraform.workspace]}/*"
-        },
-        {
-          "Effect": "Allow",
-          "Principal": {
-            "Service": "delivery.logs.amazonaws.com"
-          },
-          "Action": "s3:PutObject",
-          "Resource": "${module.s3-bucket.bucket.arn}/loadbalancer-logs/AWSLogs/${local.environment_management.account_ids[terraform.workspace]}/*",
-          "Condition": {
-            "StringEquals": {
-              "s3:x-amz-acl": "bucket-owner-full-control"
-            }
-          }
-        },
-        {
-          "Effect": "Allow",
-          "Principal": {
-            "Service": "delivery.logs.amazonaws.com"
-          },
-          "Action": "s3:GetBucketAcl",
-          "Resource": "${module.s3-bucket.bucket.arn}"
-        }
-      ]
+data "aws_iam_policy_document" "loadbalancer_logs" {
+  source_policy_documents = [module.s3-bucket.bucket.policy]
+
+# policy from: https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-access-logs.html#access-logging-bucket-permissions
+  statement {
+    effect = "Allow"
+    actions = ["s3:PutObject"]
+    resources = ["${module.s3-bucket.bucket.arn}/loadbalancer-logs/AWSLogs/${local.environment_management.account_ids[terraform.workspace]}/*"]
+    principals {
+      identifiers = ["arn:aws:iam::652711504416:root"]
+      type = "AWS"
     }
-  )
+  }
+
+  statement {
+    effect = "Allow"
+    actions = ["s3:PutObject"]
+    resources = ["${module.s3-bucket.bucket.arn}/loadbalancer-logs/AWSLogs/${local.environment_management.account_ids[terraform.workspace]}/*"]
+    principals {
+      identifiers = ["delivery.logs.amazonaws.com"]
+      type = "Service"
+    }
+    condition {
+      test     = "StringEquals"
+      variable = "s3:x-amz-acl"
+      values   = ["bucket-owner-full-control"]
+    }
+  }
+
+  statement {
+    effect = "Allow"
+    actions = ["s3:GetBucketAcl"]
+    resources = ["${module.s3-bucket.bucket.arn}"]
+    principals {
+      identifiers = ["delivery.logs.amazonaws.com"]
+      type = "Service"
+    }
+  }
 }
 
 module "nomis-db-backup-bucket" {
