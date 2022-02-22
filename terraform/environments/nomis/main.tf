@@ -76,10 +76,10 @@ resource "aws_security_group" "weblogic_common" {
   }
 
   ingress {
-    description     = "temp access from PTTP - delete once access through loadbalancer working"
-    from_port       = "7777"
-    to_port         = "7777"
-    protocol        = "TCP"
+    description = "temp access from PTTP - delete once access through loadbalancer working"
+    from_port   = "7777"
+    to_port     = "7777"
+    protocol    = "TCP"
     cidr_blocks = ["10.184.0.0/16"]
   }
   egress {
