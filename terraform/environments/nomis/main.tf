@@ -75,13 +75,6 @@ resource "aws_security_group" "weblogic_common" {
     security_groups = [aws_security_group.jumpserver-windows.id, aws_security_group.internal_elb.id]
   }
 
-  ingress {
-    description = "temp access from PTTP - delete once access through loadbalancer working"
-    from_port   = "7777"
-    to_port     = "7777"
-    protocol    = "TCP"
-    cidr_blocks = ["10.184.0.0/16"]
-  }
   egress {
     description = "allow all"
     from_port   = 0
