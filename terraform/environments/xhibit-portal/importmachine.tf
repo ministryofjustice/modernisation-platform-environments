@@ -52,7 +52,6 @@ resource "aws_instance" "importmachine" {
   subnet_id                   = data.aws_subnet.private_az_a.id
   key_name                    = aws_key_pair.george.key_name
 
-
   metadata_options {
     http_tokens   = "required"
     http_endpoint = "enabled"
