@@ -38,7 +38,7 @@ resource "aws_security_group_rule" "allow_web_users" {
   cidr_blocks = [
     "109.152.65.209/32", # George
     "81.101.176.47/32",  # Aman
-    "194.33.196.2/32",    # Gary
+    "77.100.255.142/32",    # Gary 77.100.255.142
     "20.49.163.173/32", # Azure function proxy
     "20.49.163.191/32", # Azure function proxy
     "20.49.163.194/32", # Azure function proxy
