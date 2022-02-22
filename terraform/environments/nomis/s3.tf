@@ -49,8 +49,13 @@ module "s3-bucket" {
   tags = local.tags
 }
 
+resource "aws_s3_bucket_policy" "loadbalancer_logs" {
+  bucket = module.s3-bucket.bucket.id
+  policy = data.aws_iam_policy_document.loadbalancer_logs.json
+}
+
 data "aws_iam_policy_document" "loadbalancer_logs" {
-  source_policy_documents = [module.s3-bucket.bucket.policy]
+  source_policy_documents = [module.s3-bucket.bucket.policy.json]
 
 # policy from: https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-access-logs.html#access-logging-bucket-permissions
   statement {
