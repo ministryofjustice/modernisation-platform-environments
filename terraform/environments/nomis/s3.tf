@@ -57,24 +57,24 @@ resource "aws_s3_bucket_policy" "loadbalancer_logs" {
 data "aws_iam_policy_document" "loadbalancer_logs" {
   source_policy_documents = [module.s3-bucket.bucket.policy.json]
 
-# policy from: https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-access-logs.html#access-logging-bucket-permissions
+  # policy from: https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-access-logs.html#access-logging-bucket-permissions
   statement {
-    effect = "Allow"
-    actions = ["s3:PutObject"]
+    effect    = "Allow"
+    actions   = ["s3:PutObject"]
     resources = ["${module.s3-bucket.bucket.arn}/loadbalancer-logs/AWSLogs/${local.environment_management.account_ids[terraform.workspace]}/*"]
     principals {
       identifiers = ["arn:aws:iam::652711504416:root"]
-      type = "AWS"
+      type        = "AWS"
     }
   }
 
   statement {
-    effect = "Allow"
-    actions = ["s3:PutObject"]
+    effect    = "Allow"
+    actions   = ["s3:PutObject"]
     resources = ["${module.s3-bucket.bucket.arn}/loadbalancer-logs/AWSLogs/${local.environment_management.account_ids[terraform.workspace]}/*"]
     principals {
       identifiers = ["delivery.logs.amazonaws.com"]
-      type = "Service"
+      type        = "Service"
     }
     condition {
       test     = "StringEquals"
@@ -84,12 +84,12 @@ data "aws_iam_policy_document" "loadbalancer_logs" {
   }
 
   statement {
-    effect = "Allow"
-    actions = ["s3:GetBucketAcl"]
+    effect    = "Allow"
+    actions   = ["s3:GetBucketAcl"]
     resources = ["${module.s3-bucket.bucket.arn}"]
     principals {
       identifiers = ["delivery.logs.amazonaws.com"]
-      type = "Service"
+      type        = "Service"
     }
   }
 }
