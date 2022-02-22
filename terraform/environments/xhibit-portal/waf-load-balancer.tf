@@ -43,6 +43,7 @@ resource "aws_security_group_rule" "allow_web_users" {
     "20.49.163.191/32", # Azure function proxy
     "20.49.163.194/32", # Azure function proxy
     "20.49.163.244/32", # Azure function proxy
+    "82.44.118.20/32", # Nick
     "10.182.60.51/32",   # NLE CGI proxy 
     "109.249.181.8/32" # George temporary ip
   ]
