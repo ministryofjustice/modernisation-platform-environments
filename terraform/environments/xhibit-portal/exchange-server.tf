@@ -83,6 +83,9 @@ resource "aws_instance" "exchange-server" {
 
   root_block_device {
     encrypted = true
+    tags = {
+      Name = "root-block-device-exchange-server-${local.application_name}"
+    }
   }
 
   lifecycle {
@@ -93,7 +96,7 @@ resource "aws_instance" "exchange-server" {
       # [1]: https://github.com/terraform-providers/terraform-provider-aws/issues/770
       volume_tags,
       #user_data,         # Prevent changes to user_data from destroying existing EC2s
-      root_block_device,
+      #root_block_device,
       # Prevent changes to encryption from destroying existing EC2s - can delete once encryption complete
     ]
   }
@@ -156,4 +159,3 @@ resource "aws_volume_attachment" "exchange-disk2" {
   volume_id    = aws_ebs_volume.exchange-disk2.id
   instance_id  = aws_instance.exchange-server.id
 }
-
