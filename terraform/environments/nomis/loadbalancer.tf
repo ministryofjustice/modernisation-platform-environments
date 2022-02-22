@@ -64,7 +64,7 @@ resource "aws_lb" "internal" {
   security_groups            = [aws_security_group.internal_elb.id]
   subnets                    = data.aws_subnet_ids.private.ids
   enable_deletion_protection = true
-  # drop_invalid_header_fields = true
+  drop_invalid_header_fields = true
 
   tags = merge(
     local.tags,
