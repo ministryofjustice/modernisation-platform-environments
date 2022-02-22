@@ -64,7 +64,7 @@ resource "aws_lb" "internal" {
   security_groups            = [aws_security_group.internal_elb.id]
   subnets                    = data.aws_subnet_ids.private.ids
   enable_deletion_protection = true
-  drop_invalid_header_fields = true
+  # drop_invalid_header_fields = true
 
   tags = merge(
     local.tags,
@@ -82,7 +82,7 @@ resource "aws_lb_listener" "internal" {
   load_balancer_arn = aws_lb.internal.arn
   port              = "443"
   protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-TLS-1-2-2017-01"
+  ssl_policy        = "ELBSecurityPolicy-2016-08"
   certificate_arn   = aws_acm_certificate.internal_lb.arn
 
   default_action {
