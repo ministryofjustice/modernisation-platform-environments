@@ -265,9 +265,9 @@ resource "aws_instance" "database-server" {
     encrypted   = true
     volume_size = 64
     tags = {
-        Name = "root-block-device-database-${local.application_name}"
-      }
+      Name = "root-block-device-database-${local.application_name}"
     }
+  }
 
   lifecycle {
     ignore_changes = [
