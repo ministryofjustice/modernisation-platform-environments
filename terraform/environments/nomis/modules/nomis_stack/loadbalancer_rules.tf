@@ -2,7 +2,7 @@ resource "aws_lb_target_group" "weblogic" {
 
   name_prefix          = "${var.stack_name}-"
   port                 = "7777" # port on which targets receive traffic
-  protocol             = "HTTPS"
+  protocol             = "HTTP"
   target_type          = "ip"
   deregistration_delay = "30"
   vpc_id               = data.aws_vpc.shared_vpc.id
