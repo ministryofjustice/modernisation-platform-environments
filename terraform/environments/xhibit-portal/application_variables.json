@@ -72,7 +72,7 @@
       "nat-instance-ami"              : "ami-087e7082959f51a02",
       "public_dns_name_ingestion"     : "ingest.cjsonline.gov.uk",
       "public_dns_name_web"           : "pportal.cjsonline.gov.uk",
-      "suprig01-ami"                  : "ami-06739ae96f8b80f1a",
+      "suprig01-ami"                  : "ami-069a5ee8439907210",
       "suprig01-disk-1-snapshot"      : "snap-0a608f776dd13e2e3",
       "suprig01-disk-2-snapshot"      : "snap-0fcbdf3554417cea0",
       "suprig01-disk-3-snapshot"      : "snap-0b1dcdb9003ad49b3",
