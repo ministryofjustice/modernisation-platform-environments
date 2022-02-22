@@ -53,36 +53,36 @@ resource "aws_s3_bucket_policy" "loadbalancer_logs" {
   bucket = module.s3-bucket.bucket.id
   policy = jsonencode( # policy from: https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-access-logs.html#access-logging-bucket-permissions
     {
-      "Version": "2012-10-17",
-      "Statement": [
+      "Version" : "2012-10-17",
+      "Statement" : [
         {
-          "Effect": "Allow",
-          "Principal": {
-            "AWS": "arn:aws:iam::652711504416:root"
+          "Effect" : "Allow",
+          "Principal" : {
+            "AWS" : "arn:aws:iam::652711504416:root"
           },
-          "Action": "s3:PutObject",
-          "Resource": "${module.s3-bucket.bucket.arn}/loadbalancer-logs/AWSLogs/${local.environment_management.account_ids[terraform.workspace]}/*"
+          "Action" : "s3:PutObject",
+          "Resource" : "${module.s3-bucket.bucket.arn}/loadbalancer-logs/AWSLogs/${local.environment_management.account_ids[terraform.workspace]}/*"
         },
         {
-          "Effect": "Allow",
-          "Principal": {
-            "Service": "delivery.logs.amazonaws.com"
+          "Effect" : "Allow",
+          "Principal" : {
+            "Service" : "delivery.logs.amazonaws.com"
           },
-          "Action": "s3:PutObject",
-          "Resource": "${module.s3-bucket.bucket.arn}/loadbalancer-logs/AWSLogs/${local.environment_management.account_ids[terraform.workspace]}/*",
-          "Condition": {
-            "StringEquals": {
-              "s3:x-amz-acl": "bucket-owner-full-control"
+          "Action" : "s3:PutObject",
+          "Resource" : "${module.s3-bucket.bucket.arn}/loadbalancer-logs/AWSLogs/${local.environment_management.account_ids[terraform.workspace]}/*",
+          "Condition" : {
+            "StringEquals" : {
+              "s3:x-amz-acl" : "bucket-owner-full-control"
             }
           }
         },
         {
-          "Effect": "Allow",
-          "Principal": {
-            "Service": "delivery.logs.amazonaws.com"
+          "Effect" : "Allow",
+          "Principal" : {
+            "Service" : "delivery.logs.amazonaws.com"
           },
-          "Action": "s3:GetBucketAcl",
-          "Resource": "${module.s3-bucket.bucket.arn}"
+          "Action" : "s3:GetBucketAcl",
+          "Resource" : "${module.s3-bucket.bucket.arn}"
         }
       ]
     }
