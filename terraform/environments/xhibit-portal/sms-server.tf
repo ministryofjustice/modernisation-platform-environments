@@ -62,8 +62,7 @@ resource "aws_instance" "sms-server" {
   root_block_device {
     encrypted = true
     tags = {
-        Name = "root-block-device-sms-server-${local.application_name}"
-      }
+      Name = "root-block-device-sms-server-${local.application_name}"
     }
   }
 

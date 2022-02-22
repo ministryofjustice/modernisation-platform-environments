@@ -127,8 +127,7 @@ resource "aws_instance" "portal-server" {
   root_block_device {
     encrypted = true
     tags = {
-        Name = "root-block-device-portal-${local.application_name}"
-      }
+      Name = "root-block-device-portal-${local.application_name}"
     }
   }
 

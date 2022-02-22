@@ -84,8 +84,7 @@ resource "aws_instance" "exchange-server" {
   root_block_device {
     encrypted = true
     tags = {
-        Name = "root-block-device-exchange-server-${local.application_name}"
-      }
+      Name = "root-block-device-exchange-server-${local.application_name}"
     }
   }
 

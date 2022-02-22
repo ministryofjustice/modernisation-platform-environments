@@ -638,8 +638,7 @@ resource "aws_instance" "infra2" {
   root_block_device {
     encrypted = true
     tags = {
-        Name = "root-block-infra2-${local.application_name}"
-      }
+      Name = "root-block-device-infra2-${local.application_name}"
     }
   }
 
