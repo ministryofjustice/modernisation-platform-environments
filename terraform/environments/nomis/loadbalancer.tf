@@ -67,7 +67,7 @@ resource "aws_lb" "internal" {
   # drop_invalid_header_fields = true
 
   access_logs {
-    bucket  = module.s3-bucket.bucket.arn
+    bucket  = module.s3-bucket.bucket.id
     prefix  = "loadbalancer-logs"
     enabled = true
   }
