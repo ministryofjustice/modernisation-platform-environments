@@ -571,9 +571,9 @@ resource "aws_instance" "infra1" {
   root_block_device {
     encrypted = true
     tags = {
-        Name = "root-block-device-infra1-${local.application_name}"
-      }
+      Name = "root-block-device-infra1-${local.application_name}"
     }
+  }
 
   lifecycle {
     ignore_changes = [
