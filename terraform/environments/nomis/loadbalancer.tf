@@ -45,6 +45,17 @@ resource "aws_security_group_rule" "internal_lb_ingress_2" {
   source_security_group_id = aws_security_group.jumpserver-windows.id
 }
 
+resource "aws_security_group_rule" "internal_lb_ingress_3" {
+
+  description       = "allow 80 inbound from PTTP devices"
+  security_group_id = aws_security_group.internal_elb.id
+  type              = "ingress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  cidr_blocks       = ["10.184.0.0/16"] # Global Protect PTTP devices
+}
+
 resource "aws_security_group_rule" "internal_lb_egress_1" {
 
   description              = "allow outbound to weblogic targets"
@@ -91,6 +102,25 @@ resource "aws_lb_listener" "internal" {
       content_type = "text/plain"
       message_body = "Fixed response content"
       status_code  = "503"
+    }
+  }
+}
+
+resource "aws_lb_listener" "internal_http" {
+  depends_on = [
+    aws_acm_certificate_validation.internal_lb
+  ]
+
+  load_balancer_arn = aws_lb.internal.arn
+  port              = "80"
+  protocol          = "HTTP"
+
+  default_action {
+    type = "redirect"
+    redirect {
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
     }
   }
 }
