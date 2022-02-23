@@ -38,7 +38,15 @@ resource "aws_security_group_rule" "allow_web_users" {
   cidr_blocks = [
     "109.152.65.209/32", # George
     "81.101.176.47/32",  # Aman
-    "194.33.196.2/32"    # Gary
+    "77.100.255.142/32", # Gary 77.100.255.142
+    "20.49.163.173/32", # Azure function proxy
+    "20.49.163.191/32", # Azure function proxy
+    "20.49.163.194/32", # Azure function proxy
+    "20.49.163.244/32", # Azure function proxy
+    "82.44.118.20/32",  # Nick
+    "10.175.22.201/32", # Fletcher Anthony
+    "10.182.60.51/32",  # NLE CGI proxy 
+    "109.249.181.8/32"  # George temporary ip
   ]
   # ipv6_cidr_blocks  = ["::/0"]
 }
