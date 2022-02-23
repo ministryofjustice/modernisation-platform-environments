@@ -120,7 +120,6 @@ resource "aws_lb_listener" "internal_http" {
     redirect {
       port        = "443"
       protocol    = "HTTPS"
-      status_code = "HTTP_301"
     }
   }
 }
