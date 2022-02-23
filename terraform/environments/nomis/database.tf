@@ -37,12 +37,12 @@ resource "aws_instance" "database_server" {
     volume_type           = "gp3"
   }
 
-  ephemeral_block_device { 
+  ephemeral_block_device {
     device_name = "/dev/sde"
     no_device   = true
   }
 
-  ephemeral_block_device { 
+  ephemeral_block_device {
     device_name = "/dev/sdf"
     no_device   = true
   }
