@@ -65,7 +65,7 @@ disks() {
     
     # get the name corrsponding to the volume id of the device
     local i=1
-    for item in "$${asm_disk_array[@]}"
+    for item in "$${asm_disk_array[@]}"; do
         echo "$item"
         local device_name=$(lsblk -ndp -o NAME,SERIAL | awk '$item {print $1}')
         parted --script "$device_name" mkpart primary 1 100%
