@@ -10,6 +10,7 @@ data "aws_iam_policy_document" "lambda_assume_role_policy" {
 }
 
 resource "aws_iam_role" "snapshot_lambda" {
+  count = "${local.is-production ? 1 : 0}"
 
   name = "snapshot_lambda"
 
@@ -54,12 +55,13 @@ data "archive_file" "lambda_zip" {
 
 # tfsec:ignore:aws-lambda-enable-tracing
 resource "aws_lambda_function" "root_snapshot_to_ami" {
+  count = "${local.is-production ? 1 : 0}"
   # checkov:skip=CKV_AWS_50: "X-ray tracing is not required"
   # checkov:skip=CKV_AWS_117: "Lambda is not environment specific"
   # checkov:skip=CKV_AWS_116: "DLQ not required"
   filename                       = "lambda/lambda_function.zip"
   function_name                  = "root_snapshot_to_ami"
-  role                           = aws_iam_role.snapshot_lambda.arn
+  role                           = aws_iam_role.snapshot_lambda[count.index].arn
   handler                        = "index.lambda_handler"
   source_code_hash               = data.archive_file.lambda_zip.output_path
   runtime                        = "python3.8"
@@ -67,21 +69,24 @@ resource "aws_lambda_function" "root_snapshot_to_ami" {
 }
 
 resource "aws_cloudwatch_event_rule" "every_day" {
+  count = "${local.is-production ? 1 : 0}"
   name                = "run-daily"
   description         = "Runs daily at 1:30am"
   schedule_expression = "cron(30 1 * * ? *)"
 }
 
 resource "aws_cloudwatch_event_target" "trigger_lambda_every_day" {
-  rule      = aws_cloudwatch_event_rule.every_day.name
+  count = "${local.is-production ? 1 : 0}"
+  rule      = aws_cloudwatch_event_rule.every_day[count.index].name
   target_id = "root_snapshot_to_ami"
-  arn       = aws_lambda_function.root_snapshot_to_ami.arn
+  arn       = aws_lambda_function.root_snapshot_to_ami[count.index].arn
 }
 
 resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda" {
+  count = "${local.is-production ? 1 : 0}"
   statement_id  = "AllowExecutionFromCloudWatch"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.root_snapshot_to_ami.function_name
+  function_name = aws_lambda_function.root_snapshot_to_ami[count.index].function_name
   principal     = "events.amazonaws.com"
-  source_arn    = aws_cloudwatch_event_rule.every_day.arn
+  source_arn    = aws_cloudwatch_event_rule.every_day[count.index].arn
 }

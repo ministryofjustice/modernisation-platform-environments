@@ -5,7 +5,7 @@ def lambda_handler(event, context):
     today = datetime.datetime.now()
     date_time = today.date()
     format_time = today.strftime("%m/%d/%Y")
-    root_snapshots = ["root-block-device-exchange-server-xhibit-portal","root-block-device-cjim-xhibit-portal","root-block-device-infra1-xhibit-portal","root-block-device-cjip-xhibit-portal","root-block-device-cjim-xhibit-portal","root-block-device-exchange-server-xhibit-portal"]
+    root_snapshots = ["root-block-device-database-xhibit-portal","root-block-device-cjim-xhibit-portal","root-block-device-infra1-xhibit-portal","root-block-device-exchange-server-xhibit-portal","root-block-device-cjip-xhibit-portal"]
     print("Connecting to EC2")
     client = boto3.client('ec2')
 
