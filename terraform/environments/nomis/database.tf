@@ -8,7 +8,7 @@ data "aws_caller_identity" "current" {}
 data "template_file" "database_init" {
   template = file("${path.module}/templates/database_init.sh")
   vars = {
-    asm_disks = join("\n", local.asm_disks)
+    asm_disks = join("|", local.asm_disks)
     parameter_name_ASMSYS  = aws_ssm_parameter.asm_sys.name
     parameter_name_ASMSNMP = aws_ssm_parameter.asm_snmp.name
   }

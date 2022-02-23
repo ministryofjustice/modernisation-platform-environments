@@ -58,9 +58,15 @@ swap_disk() {
 disks() {
     # create the Oracle ASM disks
     # note use of $${} syntax - this is because this file is being used as a terraform template
+    # var is passed from terraform as a single string of pipe separted values.  Read into an array
+    IFS='|'
+    read -a asm_disk_array <<< "${asm_disks}"
+    unset IFS
+    
     # get the name corrsponding to the volume id of the device
     local i=1
-    for item in ${asm_disks[@]} # var pased by terraform
+    for item in "$${asm_disk_array[@]}"
+        echo "$item"
         local device_name=$(lsblk -ndp -o NAME,SERIAL | awk '$item {print $1}')
         parted --script "$device_name" mkpart primary 1 100%
         oracleasm createdisk "ORADATA0$${i}" "$${device_name}p1"
