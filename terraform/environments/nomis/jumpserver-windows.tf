@@ -35,7 +35,9 @@ resource "aws_instance" "jumpserver_windows" {
     http_tokens   = "required"
   }
   root_block_device {
-    encrypted = true
+    delete_on_termination = true
+    encrypted             = true
+    volume_type           = "gp3"
   }
 
   tags = merge(
