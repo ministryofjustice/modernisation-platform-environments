@@ -118,8 +118,8 @@ resource "aws_lb_listener" "internal_http" {
   default_action {
     type = "redirect"
     redirect {
-      port        = "443"
-      protocol    = "HTTPS"
+      port     = "443"
+      protocol = "HTTPS"
     }
   }
 }
