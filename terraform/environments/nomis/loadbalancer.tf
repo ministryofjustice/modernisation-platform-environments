@@ -97,6 +97,8 @@ resource "aws_lb" "internal" {
 }
 
 resource "aws_lb_listener" "internal" {
+  #tfsec:ignore:aws-elb-use-secure-tls-policy:the application does not support tls 1.2
+  #checkov:skip=CKV_AWS_103:the application does not support tls 1.2
   depends_on = [
     aws_acm_certificate_validation.internal_lb
   ]
