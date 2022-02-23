@@ -22,10 +22,10 @@ resource "aws_instance" "database_server" {
   instance_type               = "t3.medium" # tflint-ignore: aws_instance_invalid_type
   key_name                    = aws_key_pair.ec2-user.key_name
   monitoring                  = true
-  subnet_id                   = data.aws_subnet.private_az_a.id 
+  subnet_id                   = data.aws_subnet.private_az_a.id
   user_data                   = base64encode(data.template_file.database_init.rendered)
-  vpc_security_group_ids = [aws_security_group.database_common.id]
- 
+  vpc_security_group_ids      = [aws_security_group.database_common.id]
+
   metadata_options {
     http_endpoint = "enabled"
     http_tokens   = "required"
@@ -62,17 +62,17 @@ resource "aws_instance" "database_server" {
 }
 
 # Attach any asm ebs volumes, not in the AMI block device map, but specified in var.database_drive_map
-locals{
+locals {
   database_asm_disks = [
     {
       device_name = "/dev/sde"
-      size = 100
-      type = "gp3"
+      size        = 100
+      type        = "gp3"
     },
     {
       device_name = "/dev/sdf"
-      size = 100
-      type = "gp3"
+      size        = 100
+      type        = "gp3"
     }
   ]
 }
@@ -104,7 +104,7 @@ resource "aws_volume_attachment" "database_server_asm_volume" {
 locals {
   # create pipe separated values for passing to bash script.  Also trim the volume id prefix as it is formated slightly different on the VM
   # asm_disks = [ for k, v in aws_ebs_volume.database_server_asm_volume : join("|", [v.label, trimprefix(v.id, "vol-")]) ]
-  asm_disks = [ for k, v in aws_ebs_volume.database_server_asm_volume : trimprefix(v.id, "vol-") ]
+  asm_disks = [for k, v in aws_ebs_volume.database_server_asm_volume : trimprefix(v.id, "vol-")]
 }
 
 
