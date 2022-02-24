@@ -66,6 +66,7 @@ resource "aws_lambda_function" "root_snapshot_to_ami" {
   source_code_hash               = data.archive_file.lambda_zip.output_path
   runtime                        = "python3.8"
   reserved_concurrent_executions = 1
+  timeout                        = "120"
 }
 
 resource "aws_cloudwatch_event_rule" "every_day" {
