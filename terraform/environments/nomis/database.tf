@@ -37,15 +37,15 @@ resource "aws_instance" "database_server" {
     volume_type           = "gp3"
   }
 
-  ephemeral_block_device {
-    device_name = "/dev/sde"
-    no_device   = true
-  }
+  # ephemeral_block_device {
+  #   device_name = "/dev/sde"
+  #   no_device   = true
+  # }
 
-  ephemeral_block_device {
-    device_name = "/dev/sdf"
-    no_device   = true
-  }
+  # ephemeral_block_device {
+  #   device_name = "/dev/sdf"
+  #   no_device   = true
+  # }
 
   lifecycle {
     ignore_changes = [
@@ -75,12 +75,12 @@ resource "aws_instance" "database_server" {
 locals {
   database_asm_disks = [
     {
-      device_name = "/dev/sde"
+      device_name = "/dev/sdg"
       size        = 100
       type        = "gp3"
     },
     {
-      device_name = "/dev/sdf"
+      device_name = "/dev/sdh"
       size        = 100
       type        = "gp3"
     }

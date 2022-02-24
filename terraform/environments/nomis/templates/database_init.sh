@@ -56,24 +56,36 @@ swap_disk() {
 }
 
 disks() {
-    # create the Oracle ASM disks
-    # note use of $${} syntax - this is because this file is being used as a terraform template
-    # var is passed from terraform as a single string of pipe separted values.  Read into an array
+    
+    echo "+++Resizing ASM disks..."
+    # find the oracleasm partitions
+    IFS=$'\n'
+    local devices=($(lsblk -npf -o FSTYPE,PKNAME | awk '/oracleasm/ {print $2}'))
+    unset IFS
+
+    # Note use of $${} syntax - this is because this file is being used as a terraform template
+    # so we need the extra $ to prevent terraform trying to interpolate it
+    for item in "$${devices[@]}"; do
+        echo "resizing device $${item}"
+        parted --script "$${item}" resizepart 1 100%
+    done
+    
+    # create any additional Oracle ASM disks not included in AMI
+    # var is passed from terraform as a single string of pipe separated values.  Read into an array
     IFS='|'
     read -a asm_disk_array <<< "${asm_disks}"
     unset IFS
     
-    # get the name corrsponding to the volume id of the device
-    local i=1
+    # get the name corrsponding to the volume id of the device, partition and create asm disk
+    local i=3 # TODO: add code to check next available ORADATA0* (01 and 02 included in AMI)
     for item in "$${asm_disk_array[@]}"; do
-        echo "$item"
-        local device_name=$(lsblk -ndp -o NAME,SERIAL | awk '$item {print $1}')
-        parted --script "$device_name" mkpart primary 1 100%
+        local device_name=$(lsblk -ndp -o NAME,SERIAL | awk -v pattern="$item" '$0 ~ pattern {print $1}')
+        parted --script "$device_name" mklabel gpt mkpart primary 1 100%
         oracleasm createdisk "ORADATA0$${i}" "$${device_name}p1"
         ((i++))
     done
 
-    oracleasm scandisks
+    echo $(oracleasm scandisks)
 }
 
 reconfigure_oracle_has() {
@@ -84,7 +96,7 @@ reconfigure_oracle_has() {
     fuser -k -n tcp 1521 || true
 
     # update hostname in listener file
-    sed -ri "s/(HOST = )([^\)]*)/\1$HOSTNAME/" /u01/app/oracle/product/11.2.0.4/gridhome_1/network/admin/listener.ora
+    sed -ri "s/(HOST = )([^\)]*)/\1$HOSTNAME/" $ORACLE_HOME/network/admin/listener.ora
 
     echo "+++reconfigure grid"
     $ORACLE_HOME/perl/bin/perl -I $ORACLE_HOME/perl/lib -I $ORACLE_HOME/crs/install $ORACLE_HOME/crs/install/roothas.pl
