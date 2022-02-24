@@ -80,7 +80,7 @@ resource "aws_security_group" "weblogic_common" {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    #tfsec:ignore:AWS009
+    #tfsec:ignore:aws-vpc-no-public-egress-sgr
     cidr_blocks = ["0.0.0.0/0"]
   }
 
@@ -125,7 +125,7 @@ resource "aws_security_group" "database_common" {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    #tfsec:ignore:AWS009
+    #tfsec:ignore:aws-vpc-no-public-egress-sgr
     cidr_blocks = ["0.0.0.0/0"]
   }
 
