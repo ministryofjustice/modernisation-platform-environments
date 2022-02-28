@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+# Note use of $${} syntax in paces - this is because this file is being used as a terraform template so need to escape variable substitution
+
 # some vars
 ORACLE_HOME=/u01/app/oracle/product/11.2.0.4/gridhome_1
 memtotal_kb=$(awk '/^MemTotal/ {print $2}' /proc/meminfo)
@@ -63,7 +65,6 @@ disks() {
     local devices=($(lsblk -npf -o FSTYPE,PKNAME | awk '/oracleasm/ {print $2}'))
     unset IFS
 
-    # Note use of $${} syntax - this is because this file is being used as a terraform template
     # so we need the extra $ to prevent terraform trying to interpolate it
     for item in "$${devices[@]}"; do
         echo "resizing device $${item}"
@@ -132,7 +133,7 @@ reconfigure_oracle_has() {
                 disk_group_disks=$(asmcmd lsdsk -G ORADATA --suppressheader | awk -F ':' '{print $2}') # disks already memebers of disk group
                 unique=($(echo "$disk_group_disks" "$oracleasm_disks" | tr ' ' '\n' | sort | uniq -u)) # disks not in disk group, kind of
                 for j in "$${unique[@]}"; do
-                    sqlplus -s / as sysasm <<< "alter diskgroup ORADATA add disk 'ORCL:${j}';"
+                    sqlplus -s / as sysasm <<< "alter diskgroup ORADATA add disk 'ORCL:$${j}';"
                 done
                 # resize disks
                 sqlplus -s / as sysasm <<< "alter diskgroup ORADATA resize all;"
