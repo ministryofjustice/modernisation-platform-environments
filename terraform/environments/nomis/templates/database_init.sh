@@ -75,9 +75,6 @@ disks() {
     IFS='|'
     read -a asm_disk_array <<< "${asm_disks}"
     unset IFS
-    
-    # rediscover oracleasm disk before proceeding
-    oracleasm scandisks
 
     # get the name corrsponding to the volume id of the device, partition and create asm disk
     local i=3 # TODO: add code to check next available ORADATA0* (01 and 02 included in AMI)
@@ -92,6 +89,7 @@ disks() {
         ((i++))
     done
 
+    # rediscover oracleasm disk before proceeding
     oracleasm scandisks
 }
 
@@ -134,18 +132,22 @@ reconfigure_oracle_has() {
             asm_status=$(srvctl status asm | grep "ASM is running")
             if [[ -n "$asm_status" ]]; then
                 asmcmd mount ORADATA # returns exit code zero even if already mounted
+                
                 # add any new ASM disks
                 oracleasm_disks=$(oracleasm listdisks) # all available asm disks
-                disk_group_disks=$(asmcmd lsdsk -G ORADATA --suppressheader | awk -F ':' '{print $2}') # disks already memebers of disk group
+                disk_group_disks=$(asmcmd lsdsk -G ORADATA --suppressheader | awk -F ':' '{print $2}') # disks already members of disk group
                 unique=($(echo "$disk_group_disks" "$oracleasm_disks" | tr ' ' '\n' | sort | uniq -u)) # disks not in disk group, kind of
                 for j in "$${unique[@]}"; do
                     sqlplus -s / as sysasm <<< "alter diskgroup ORADATA add disk 'ORCL:$${j}';"
                 done
+                
                 # resize disks
                 sqlplus -s / as sysasm <<< "alter diskgroup ORADATA resize all;"
+                
                 # set asm passwords
                 asmcmd orapwusr --modify --password ASMSNMP <<< "$password_ASMSNMP"
                 asmcmd orapwusr --modify --password SYS <<< "$password_ASMSYS"
+                
                 # start test database if present in AMI
                 if [[ -n "$(grep CNOMT1 /etc/oratab)" ]]; then
                     source oraenv <<< CNOMT1
