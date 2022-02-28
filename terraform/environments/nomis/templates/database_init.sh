@@ -65,7 +65,6 @@ disks() {
     local devices=($(lsblk -npf -o FSTYPE,PKNAME | awk '/oracleasm/ {print $2}'))
     unset IFS
 
-    # so we need the extra $ to prevent terraform trying to interpolate it
     for item in "$${devices[@]}"; do
         echo "resizing device $${item}"
         parted --script "$${item}" resizepart 1 100%
@@ -77,12 +76,19 @@ disks() {
     read -a asm_disk_array <<< "${asm_disks}"
     unset IFS
     
+    # rediscover oracleasm disk before proceeding
+    oracleasm scandisks
+
     # get the name corrsponding to the volume id of the device, partition and create asm disk
     local i=3 # TODO: add code to check next available ORADATA0* (01 and 02 included in AMI)
     for item in "$${asm_disk_array[@]}"; do
         local device_name=$(lsblk -ndp -o NAME,SERIAL | awk -v pattern="$item" '$0 ~ pattern {print $1}')
-        parted --script "$device_name" mklabel gpt mkpart primary 1 100%
-        oracleasm createdisk "ORADATA0$${i}" "$${device_name}p1"
+        # catch error that can occur if the disk is already an ASM disk (can occur when updating an AMI whilst keeping existing ASM disks)
+        is_asm_disk=$(oracleasm querydisk "$${device_name}p1" | grep "is not marked as an ASM disk")
+        if [[ -n "$is_asm_disk" ]]; then
+            parted --script "$device_name" mklabel gpt mkpart primary 1 100%
+            oracleasm createdisk "ORADATA0$${i}" "$${device_name}p1"
+        fi
         ((i++))
     done
 
