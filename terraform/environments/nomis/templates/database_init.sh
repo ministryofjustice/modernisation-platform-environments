@@ -85,7 +85,7 @@ disks() {
         ((i++))
     done
 
-    echo $(oracleasm scandisks)
+    oracleasm scandisks
 }
 
 reconfigure_oracle_has() {
@@ -104,12 +104,15 @@ reconfigure_oracle_has() {
     # script to be run as oracle user
     cat > /tmp/oracle_reconfig.sh << 'EOF'
         #!/bin/bash
+
+        # retrieve password from parameter store
         password_ASMSYS=$(aws ssm get-parameter --with-decryption --name "${parameter_name_ASMSYS}" --output text --query Parameter.Value)
         password_ASMSNMP=$(aws ssm get-parameter --with-decryption --name "${parameter_name_ASMSNMP}" --output text --query Parameter.Value)
+        
+        # reconfigure Oracle HAS
         source oraenv <<< +ASM
         srvctl add listener
-        # get spfile for ASM
-        spfile=$(adrci exec="set home +asm ; show alert -tail 1000" | grep -oE -m 1 '\+ORADATA.*')
+        spfile=$(adrci exec="set home +asm ; show alert -tail 1000" | grep -oE -m 1 '\+ORADATA.*') # get spfile for ASM
         srvctl add asm -l LISTENER -p "$spfile" -d "ORCL:ORA*"
         crsctl modify resource "ora.asm" -attr "AUTO_START=1"
         crsctl modify resource "ora.cssd" -attr "AUTO_START=1"
@@ -117,12 +120,23 @@ reconfigure_oracle_has() {
         crsctl enable has
         crsctl start has
         sleep 10
+        
+        # wait for HAS to come up, particuarly ASM
         i=0
         while [[ "$i" -le 10 ]]; do
             asm_status=$(srvctl status asm | grep "ASM is running")
             if [[ -n "$asm_status" ]]; then
                 asmcmd mount ORADATA # returns exit code zero even if already mounted
+                # add any new ASM disks
+                oracleasm_disks=$(oracleasm listdisks) # all available asm disks
+                disk_group_disks=$(asmcmd lsdsk -G ORADATA --suppressheader | awk -F ':' '{print $2}') # disks already memebers of disk group
+                unique=($(echo "$disk_group_disks" "$oracleasm_disks" | tr ' ' '\n' | sort | uniq -u)) # disks not in disk group, kind of
+                for j in "$${unique[@]}"; do
+                    sqlplus -s / as sysasm <<< "alter diskgroup ORADATA add disk 'ORCL:${j}';"
+                done
+                # resize disks
                 sqlplus -s / as sysasm <<< "alter diskgroup ORADATA resize all;"
+                # set asm passwords
                 asmcmd orapwusr --modify --password ASMSNMP <<< "$password_ASMSNMP"
                 asmcmd orapwusr --modify --password SYS <<< "$password_ASMSYS"
                 # start test database if present in AMI
