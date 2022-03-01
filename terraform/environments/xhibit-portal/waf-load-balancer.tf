@@ -36,7 +36,7 @@ resource "aws_security_group_rule" "allow_web_users" {
   to_port           = 443
   protocol          = "TCP"
   cidr_blocks = [
-    "109.152.65.209/32", # George
+    "109.152.47.104/32", # George
     "81.101.176.47/32",  # Aman
     "77.100.255.142/32", # Gary 77.100.255.142
     "20.49.163.173/32",  # Azure function proxy
@@ -46,7 +46,6 @@ resource "aws_security_group_rule" "allow_web_users" {
     "82.44.118.20/32",   # Nick
     "10.175.22.201/32",  # Fletcher Anthony
     "10.182.60.51/32",   # NLE CGI proxy 
-    "109.249.181.8/32"   # George temporary ip
   ]
   # ipv6_cidr_blocks  = ["::/0"]
 }
