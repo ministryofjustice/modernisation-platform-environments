@@ -16,7 +16,7 @@ data "aws_secretsmanager_secret_version" "environment_management" {
 ######################### Run Terraform Plan Locally Only ##################################
 # To run a Terraform Plan locally, uncomment this bottom section of code and comment out the top section
 
-# # Get secret by arn for environment management
+# Get secret by arn for environment management
 # data "aws_ssm_parameter" "environment_management_arn" {
 #   name = "environment_management_arn"
 # }

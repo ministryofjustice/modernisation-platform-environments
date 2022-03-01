@@ -24,16 +24,17 @@ resource "aws_iam_role" "snapshot_lambda" {
         {
           Action = [
             "ec2:DescribeImageAttribute",
+            "ec2:RegisterImage",
             "ec2:DescribeImages",
             "ec2:DescribeSnapshotAttribute",
             "ec2:DescribeSnapshots",
-            "ec2:DescribeVolumeAttribute",
-            "ec2:DescribeVolume",
             "ec2:DescribeTags",
             "ec2:CreateTags",
             "ec2:DeleteTags",
             "ec2:CreateImage",
-            "ec2:CreateVolume",
+            "logs:CreateLogGroup",
+            "logs:CreateLogStream",
+            "logs:PutLogEvents"
           ]
           Effect   = "Allow"
           Resource = "*"
@@ -67,8 +68,8 @@ resource "aws_lambda_function" "root_snapshot_to_ami" {
 
 resource "aws_cloudwatch_event_rule" "every_day" {
   name                = "run-daily"
-  description         = "Runs daily at 8pm"
-  schedule_expression = "cron(0 20 * * ? *)"
+  description         = "Runs daily at 1:30am"
+  schedule_expression = "cron(30 1 * * ? *)"
 }
 
 resource "aws_cloudwatch_event_target" "trigger_lambda_every_day" {
