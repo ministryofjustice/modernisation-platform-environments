@@ -50,7 +50,8 @@ resource "aws_instance" "importmachine" {
   associate_public_ip_address = false
   ebs_optimized               = true
   subnet_id                   = data.aws_subnet.private_az_a.id
-  key_name                    = aws_key_pair.george.key_name
+#  key_name                    = aws_key_pair.george.key_name
+  key_name                    = "gary"
 
   metadata_options {
     http_tokens   = "required"
