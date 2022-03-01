@@ -121,13 +121,13 @@ resource "aws_lb_target_group" "waf_lb_ingest_tg" {
   vpc_id               = local.vpc_id
 
   health_check {
-    path                = "/BITSWebService/BITSWebService.asmx"
+    path                = "/"
     port                = 80
     healthy_threshold   = 6
     unhealthy_threshold = 2
     timeout             = 2
     interval            = 5
-    matcher             = "500" # TODO this is really bad practice - someone needs to implement a proper health check, either in the code itself, or by using an external checker like https://aws.amazon.com/blogs/networking-and-content-delivery/identifying-unhealthy-targets-of-elastic-load-balancer/
+    matcher             = "304" # TODO this is really bad practice - someone needs to implement a proper health check, either in the code itself, or by using an external checker like https://aws.amazon.com/blogs/networking-and-content-delivery/identifying-unhealthy-targets-of-elastic-load-balancer/
   }
 
   tags = merge(
