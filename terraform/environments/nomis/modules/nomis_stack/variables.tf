@@ -75,6 +75,11 @@ variable "instance_profile_db_name" {
   description = "IAM instance profile name to be attached to the database instances"
 }
 
+variable "instance_profile_weblogic_name" {
+  type        = string
+  description = "IAM instance profile name to be attached to the weblogic instances"
+}
+
 variable "key_name" {
   type        = string
   description = "Name of ssh key resource for ec2-user"
@@ -136,4 +141,10 @@ variable "weblogic_instance_type" {
   type        = string
   description = "ec2 instance type to use for the weblogic instance"
   default     = "t2.medium"
+}
+
+variable "use_default_creds" {
+  type        = string
+  description = "Use the default weblogic admin username/password & T1 Nomis db username/password (Parameter Store Variables)"
+  default     = "true"
 }
