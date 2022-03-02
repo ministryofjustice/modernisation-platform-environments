@@ -8,8 +8,8 @@ data "aws_caller_identity" "current" {}
 data "template_file" "database_init" {
   template = file("${path.module}/templates/database_init.sh")
   vars = {
-    ASM_DATA_DISKS  = join("|", local.data_disks)
-    ASM_FLASH_DISKS = join("|", local.flash_disks)
+    ASM_DATA_DISKS        = join("|", local.data_disks)
+    ASM_FLASH_DISKS       = join("|", local.flash_disks)
     SSM_PARAMETER_ASMSYS  = aws_ssm_parameter.asm_sys.name
     SSM_PARAMETER_ASMSNMP = aws_ssm_parameter.asm_snmp.name
   }
@@ -141,7 +141,7 @@ resource "aws_volume_attachment" "asm_flash_volume" {
 locals {
   # create pipe separated values for passing to bash script.  Also trim the volume id prefix as it is formated slightly different on the VM
   # asm_disks = [ for k, v in aws_ebs_volume.database_server_asm_volume : join("|", [v.label, trimprefix(v.id, "vol-")]) ]
-  data_disks = [for k, v in aws_ebs_volume.asm_data_volume : trimprefix(v.id, "vol-")]
+  data_disks  = [for k, v in aws_ebs_volume.asm_data_volume : trimprefix(v.id, "vol-")]
   flash_disks = [for k, v in aws_ebs_volume.asm_flash_volume : trimprefix(v.id, "vol-")]
 }
 
