@@ -8,9 +8,10 @@ data "aws_caller_identity" "current" {}
 data "template_file" "database_init" {
   template = file("${path.module}/templates/database_init.sh")
   vars = {
-    asm_disks              = join("|", local.asm_disks)
-    parameter_name_ASMSYS  = aws_ssm_parameter.asm_sys.name
-    parameter_name_ASMSNMP = aws_ssm_parameter.asm_snmp.name
+    ASM_DATA_DISKS  = try(join("|", local.asm_data_disks), "")
+    ASM_FLASH_DISKS = try(join("|", local.asm_flash_disks), "")
+    SSM_PARAMETER_ASMSYS  = aws_ssm_parameter.asm_sys.name
+    SSM_PARAMETER_ASMSNMP = aws_ssm_parameter.asm_snmp.name
   }
 }
 
@@ -19,7 +20,7 @@ resource "aws_instance" "database_server" {
   associate_public_ip_address = false
   ebs_optimized               = true
   iam_instance_profile        = aws_iam_instance_profile.ec2_database_profile.name
-  instance_type               = "t3.medium" # tflint-ignore: aws_instance_invalid_type
+  instance_type               = "t3.medium"
   key_name                    = aws_key_pair.ec2-user.key_name
   monitoring                  = true
   subnet_id                   = data.aws_subnet.private_az_a.id
@@ -114,7 +115,7 @@ resource "aws_volume_attachment" "database_server_asm_volume" {
 locals {
   # create pipe separated values for passing to bash script.  Also trim the volume id prefix as it is formated slightly different on the VM
   # asm_disks = [ for k, v in aws_ebs_volume.database_server_asm_volume : join("|", [v.label, trimprefix(v.id, "vol-")]) ]
-  asm_disks = [for k, v in aws_ebs_volume.database_server_asm_volume : trimprefix(v.id, "vol-")]
+  asm_data_disks = [for k, v in aws_ebs_volume.database_server_asm_volume : trimprefix(v.id, "vol-")]
 }
 
 
