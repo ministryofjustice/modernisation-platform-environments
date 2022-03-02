@@ -48,7 +48,7 @@ resource "aws_security_group_rule" "allow_web_users" {
     "10.182.60.51/32",   # NLE CGI proxy 
   ]
   ipv6_cidr_blocks  = [
-    "2a00:23c7:2416:3d01:495a:c973:f084:34f2/128"
+    "2a00:23c7:2416:3d01:c98d:4432:3c83:d937/128"
   ]
 }
 
