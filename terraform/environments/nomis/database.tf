@@ -8,8 +8,8 @@ data "aws_caller_identity" "current" {}
 data "template_file" "database_init" {
   template = file("${path.module}/templates/database_init.sh")
   vars = {
-    ASM_DATA_DISKS  = try(join("|", local.asm_data_disks), "")
-    ASM_FLASH_DISKS = try(join("|", local.asm_flash_disks), "")
+    ASM_DATA_DISKS  = join("|", local.data_disks)
+    ASM_FLASH_DISKS = join("|", local.flash_disks)
     SSM_PARAMETER_ASMSYS  = aws_ssm_parameter.asm_sys.name
     SSM_PARAMETER_ASMSNMP = aws_ssm_parameter.asm_snmp.name
   }
@@ -74,12 +74,14 @@ resource "aws_instance" "database_server" {
 
 # Attach any asm ebs volumes, not in the AMI block device map, but specified in var.database_drive_map
 locals {
-  database_asm_disks = [
+  asm_data_disks = [
     {
       device_name = "/dev/sdg"
       size        = 100
       type        = "gp3"
-    },
+    }
+  ]
+  asm_flash_disks = [
     {
       device_name = "/dev/sdh"
       size        = 100
@@ -88,8 +90,8 @@ locals {
   ]
 }
 
-resource "aws_ebs_volume" "database_server_asm_volume" {
-  for_each = { for disk in local.database_asm_disks : disk.device_name => disk }
+resource "aws_ebs_volume" "asm_data_volume" {
+  for_each = { for disk in local.asm_data_disks : disk.device_name => disk }
 
   availability_zone = "${local.region}a"
   encrypted         = true
@@ -104,8 +106,32 @@ resource "aws_ebs_volume" "database_server_asm_volume" {
   )
 }
 
-resource "aws_volume_attachment" "database_server_asm_volume" {
-  for_each = aws_ebs_volume.database_server_asm_volume
+resource "aws_volume_attachment" "asm_data_volume" {
+  for_each = aws_ebs_volume.asm_data_volume
+
+  device_name = each.key
+  volume_id   = each.value.id
+  instance_id = aws_instance.database_server.id
+}
+
+resource "aws_ebs_volume" "asm_flash_volume" {
+  for_each = { for disk in local.asm_flash_disks : disk.device_name => disk }
+
+  availability_zone = "${local.region}a"
+  encrypted         = true
+  size              = each.value.size
+  type              = each.value.type
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "database-test-${each.value.device_name}"
+    }
+  )
+}
+
+resource "aws_volume_attachment" "asm_flash_volume" {
+  for_each = aws_ebs_volume.asm_flash_volume
 
   device_name = each.key
   volume_id   = each.value.id
@@ -115,7 +141,8 @@ resource "aws_volume_attachment" "database_server_asm_volume" {
 locals {
   # create pipe separated values for passing to bash script.  Also trim the volume id prefix as it is formated slightly different on the VM
   # asm_disks = [ for k, v in aws_ebs_volume.database_server_asm_volume : join("|", [v.label, trimprefix(v.id, "vol-")]) ]
-  asm_data_disks = [for k, v in aws_ebs_volume.database_server_asm_volume : trimprefix(v.id, "vol-")]
+  data_disks = [for k, v in aws_ebs_volume.asm_data_volume : trimprefix(v.id, "vol-")]
+  flash_disks = [for k, v in aws_ebs_volume.asm_flash_volume : trimprefix(v.id, "vol-")]
 }
 
 
