@@ -36,17 +36,20 @@ resource "aws_security_group_rule" "allow_web_users" {
   to_port           = 443
   protocol          = "TCP"
   cidr_blocks = [
-    "109.152.65.209/32", # George
+    "109.152.47.104/32", # George
     "81.101.176.47/32",  # Aman
     "77.100.255.142/32", # Gary 77.100.255.142
     "20.49.163.173/32",  # Azure function proxy
     "20.49.163.191/32",  # Azure function proxy
     "20.49.163.194/32",  # Azure function proxy
     "20.49.163.244/32",  # Azure function proxy
+    "82.44.118.20/32",   # Nick
+    "10.175.22.201/32",  # Fletcher Anthony
     "10.182.60.51/32",   # NLE CGI proxy 
-    "109.249.181.8/32"   # George temporary ip
   ]
-  # ipv6_cidr_blocks  = ["::/0"]
+  ipv6_cidr_blocks = [
+    "2a00:23c7:2416:3d01:495a:c973:f084:34f2/128"
+  ]
 }
 
 
@@ -119,13 +122,13 @@ resource "aws_lb_target_group" "waf_lb_ingest_tg" {
   vpc_id               = local.vpc_id
 
   health_check {
-    path                = "/BITSWebService/BITSWebService.asmx"
+    path                = "/"
     port                = 80
     healthy_threshold   = 6
     unhealthy_threshold = 2
     timeout             = 2
     interval            = 5
-    matcher             = "200" # change this to 200 when the database comes up
+    matcher             = "304,200" # TODO this is really bad practice - someone needs to implement a proper health check, either in the code itself, or by using an external checker like https://aws.amazon.com/blogs/networking-and-content-delivery/identifying-unhealthy-targets-of-elastic-load-balancer/
   }
 
   tags = merge(

@@ -6,7 +6,6 @@
       "bucket_prefix"                       :  "vm-import-s3-bucket",
       "importmachine-ami"                   :  "ami-0b33dfec9e4072ca1",
       "importmachine-data-snapshot"         :  "snap-0281146c5951823fa",
-      "importmachine-data-snapshot"         :  "snap-0281146c5951823fa",
       "infra1-ami"                          :  "ami-0636a37a2432d047d",
       "infra1-disk-1-snapshot"              :  "snap-078d43138754490c0",
       "infra2-ami"                          :  "ami-061cdd849f697c23c",
@@ -34,14 +33,14 @@
       "public_dns_name_ingestion"     : "preingest.cjsonline.gov.uk",
       "bucket_prefix"                 : "vm-import-s3-bucket",
       "importmachine-data-snapshot"   : "snap-0281146c5951823fa",
-      "infra1-ami"                    : "ami-05093014538674242" ,
+      "infra1-ami"                    : "ami-0aa0659ae213d1be0",
       "infra1-disk-1-snapshot"        : "snap-078d43138754490c0",
       "infra2-ami"                    : "ami-0e19a61f250d3514a",
-      "infra6-ami"                    : "ami-0dc414e1e33288945",
+      "infra6-ami"                    : "ami-009cc3b4ddf98fcac",
       "infra6-disk-1-snapshot"        : "snap-066a78a64ced07b37",
       "infra6-disk-2-snapshot"        : "snap-0a28e6b8cc9c3a090",
       "nat-instance-ami"              : "ami-087e7082959f51a02",
-      "suprig01-ami"                  : "ami-089ab71e11a1e0c00",
+      "suprig01-ami"                  : "ami-0465870d8d43ee95b",
       "suprig01-disk-1-snapshot"      : "snap-0ecd328cd041b81ec",
       "suprig01-disk-2-snapshot"      : "snap-00e1b7ce54810c10b",
       "suprig01-disk-3-snapshot"      : "snap-0afabe110ce7bbcb3",
@@ -50,13 +49,12 @@
       "suprig01-disk-6-snapshot"      : "snap-0dcf311fdde368c3a",
       "suprig02-ami"                  : "ami-071d5e047e9e02736",
       "suprig03-ami"                  : "ami-031adf4f7846c107f",
-      "suprig04-ami"                  : "ami-0537457452aade55e",
+      "suprig04-ami"                  : "ami-0309d11990a8e1938",
       "suprig04-disk-1-snapshot"      : "snap-02f6069537faf46dd",
-      "suprig05-ami"                  : "ami-0776aeeea16d8bfa6",
+      "suprig05-ami"                  : "ami-05254896def06c89a",
       "suprig05-disk-1-snapshot"      : "snap-0b6d529f807eb9a6a",
       "XHBPRESMS01-ami"               : "ami-001caddd4fc94fc39",
-      "importmachine-ami"             : "ami-0b33dfec9e4072ca1",
-      "importmachine-data-snapshot"   : "snap-0281146c5951823fa"
+      "importmachine-ami"             : "ami-0b33dfec9e4072ca1"
     } ,
     "production": {
       "public_dns_name_web"           : "pportal.cjsonline.gov.uk",
@@ -70,8 +68,6 @@
       "infra6-disk-1-snapshot"        : "snap-055ec51e02377d753",
       "infra6-disk-2-snapshot"        : "snap-0328eed1c5b5abf5c",
       "nat-instance-ami"              : "ami-087e7082959f51a02",
-      "public_dns_name_ingestion"     : "ingest.cjsonline.gov.uk",
-      "public_dns_name_web"           : "pportal.cjsonline.gov.uk",
       "suprig01-ami"                  : "ami-069a5ee8439907210",
       "suprig01-disk-1-snapshot"      : "snap-0a608f776dd13e2e3",
       "suprig01-disk-2-snapshot"      : "snap-0fcbdf3554417cea0",
@@ -86,8 +82,8 @@
       "suprig05-ami"                  : "ami-0e52c25843d72f2a5",
       "suprig05-disk-1-snapshot"      : "snap-08b1c019201557295",
       "XHBPRESMS01-ami"               : "ami-08f52dea252c952c1",
-      "importmachine-ami"             : "ami-0f90e80b299573521",
-      "importmachine-data-snapshot"   : "snap-09073f656deb1ecb1"
+      "importmachine-ami"             : "ami-0f90e80b299573521"
+
     }
 
   }
