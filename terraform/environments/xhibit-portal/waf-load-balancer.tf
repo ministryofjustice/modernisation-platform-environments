@@ -46,6 +46,9 @@ resource "aws_security_group_rule" "allow_web_users" {
     "82.44.118.20/32",   # Nick
     "10.175.22.201/32",  # Fletcher Anthony
     "10.182.60.51/32",   # NLE CGI proxy 
+    "5.148.32.215",      # NCC Group proxy ITHC
+    "195.95.131.110",    # NCC Group proxy ITHC
+    "195.95.131.112",    # NCC Group proxy ITHC
   ]
   ipv6_cidr_blocks  = [
     "2a00:23c7:2416:3d01:c98d:4432:3c83:d937/128"
