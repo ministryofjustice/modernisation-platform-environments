@@ -26,7 +26,9 @@
       "suprig04-disk-1-snapshot"            :  "snap-02f6069537faf46dd",
       "suprig05-ami"                        :  "ami-023807cc724df2fd5",
       "suprig05-disk-1-snapshot"            :  "snap-0b6d529f807eb9a6a",
-      "XHBPRESMS01-ami"                     :  "ami-0d97cd2809f84fedb"
+      "XHBPRESMS01-ami"                     :  "ami-0d97cd2809f84fedb",
+      "buildserver-ami"                     :  "ami-023807cc724df2fd5",
+      "buildserver-disk-1-snapshot"         :  "snap-0b6d529f807eb9a6a"
     },
     "preproduction": {
       "public_dns_name_web"           : "prepportal.cjsonline.gov.uk",
@@ -53,7 +55,9 @@
       "suprig05-ami"                  : "ami-0da5babad86576eb8",
       "suprig05-disk-1-snapshot"      : "snap-0b6d529f807eb9a6a",
       "XHBPRESMS01-ami"               : "ami-001caddd4fc94fc39",
-      "importmachine-ami"             : "ami-0b33dfec9e4072ca1"
+      "importmachine-ami"             : "ami-0b33dfec9e4072ca1",
+      "buildserver-ami"               : "ami-05254896def06c89a",
+      "buildserver-disk-1-snapshot"   : "snap-0b6d529f807eb9a6a"
     } ,
     "production": {
       "public_dns_name_web"           : "pportal.cjsonline.gov.uk",
@@ -80,8 +84,9 @@
       "suprig05-ami"                  : "ami-0e52c25843d72f2a5",
       "suprig05-disk-1-snapshot"      : "snap-08b1c019201557295",
       "XHBPRESMS01-ami"               : "ami-08f52dea252c952c1",
-      "importmachine-ami"             : "ami-0f90e80b299573521"
-
+      "importmachine-ami"             : "ami-0f90e80b299573521",
+      "buildserver-ami"               : "ami-0e52c25843d72f2a5",
+      "buildserver-disk-1-snapshot"   : "snap-08b1c019201557295"
     }
 
   }

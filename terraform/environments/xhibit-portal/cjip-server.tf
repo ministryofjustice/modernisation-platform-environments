@@ -97,12 +97,9 @@ resource "aws_instance" "cjip-server" {
 
   root_block_device {
     encrypted = true
-    tags = merge(
-      local.tags,
-      {
-        Name = "root-block-device-cjip-${local.application_name}"
-      }
-    )
+    tags = {
+      Name = "root-block-device-cjip-${local.application_name}"
+    }
   }
 
   lifecycle {

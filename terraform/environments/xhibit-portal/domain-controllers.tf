@@ -570,12 +570,9 @@ resource "aws_instance" "infra1" {
 
   root_block_device {
     encrypted = true
-    tags = merge(
-      local.tags,
-      {
-        Name = "root-block-device-infra1-${local.application_name}"
-      }
-    )
+    tags = {
+      Name = "root-block-device-infra1-${local.application_name}"
+    }
   }
 
   lifecycle {
@@ -584,7 +581,7 @@ resource "aws_instance" "infra1" {
       # [this bug][1] in the AWS provider upstream.
       #
       # [1]: https://github.com/terraform-providers/terraform-provider-aws/issues/770
-      volume_tags,
+      #volume_tags,
       #user_data,         # Prevent changes to user_data from destroying existing EC2s
       # Prevent changes to encryption from destroying existing EC2s - can delete once encryption complete
     ]
@@ -640,6 +637,9 @@ resource "aws_instance" "infra2" {
 
   root_block_device {
     encrypted = true
+    tags = {
+      Name = "root-block-device-infra2-${local.application_name}"
+    }
   }
 
   lifecycle {
@@ -650,7 +650,7 @@ resource "aws_instance" "infra2" {
       # [1]: https://github.com/terraform-providers/terraform-provider-aws/issues/770
       volume_tags,
       #user_data,         # Prevent changes to user_data from destroying existing EC2s
-      root_block_device,
+      #root_block_device,
       # Prevent changes to encryption from destroying existing EC2s - can delete once encryption complete
     ]
   }

@@ -36,19 +36,25 @@ resource "aws_security_group_rule" "allow_web_users" {
   to_port           = 443
   protocol          = "TCP"
   cidr_blocks = [
-    "109.152.65.209/32", # George
+    "109.152.47.104/32", # George
     "81.101.176.47/32",  # Aman
     "77.100.255.142/32", # Gary 77.100.255.142
-    "20.49.163.173/32", # Azure function proxy
-    "20.49.163.191/32", # Azure function proxy
-    "20.49.163.194/32", # Azure function proxy
-    "20.49.163.244/32", # Azure function proxy
-    "82.44.118.20/32",  # Nick
-    "10.175.22.201/32", # Fletcher Anthony
-    "10.182.60.51/32",  # NLE CGI proxy 
-    "109.249.181.8/32"  # George temporary ip
+    "20.49.163.173/32",  # Azure function proxy
+    "20.49.163.191/32",  # Azure function proxy
+    "20.49.163.194/32",  # Azure function proxy
+    "20.49.163.244/32",  # Azure function proxy
+    "82.44.118.20/32",   # Nick
+    "10.175.22.201/32",  # Anthony Fletcher
+    "10.182.60.51/32",   # NLE CGI proxy 
+    "10.175.165.159/32", # Helen Dawes
+    "10.175.72.157/32",  # Alan Brightmore
+    "5.148.32.215/32",   # NCC Group proxy ITHC
+    "195.95.131.110/32", # NCC Group proxy ITHC
+    "195.95.131.112/32", # NCC Group proxy ITHC
   ]
-  # ipv6_cidr_blocks  = ["::/0"]
+  ipv6_cidr_blocks = [
+    "2a00:23c7:2416:3d01:c98d:4432:3c83:d937/128"
+  ]
 }
 
 
@@ -121,13 +127,13 @@ resource "aws_lb_target_group" "waf_lb_ingest_tg" {
   vpc_id               = local.vpc_id
 
   health_check {
-    path                = "/BITSWebService/BITSWebService.asmx"
+    path                = "/"
     port                = 80
     healthy_threshold   = 6
     unhealthy_threshold = 2
     timeout             = 2
     interval            = 5
-    matcher             = "200" # change this to 200 when the database comes up
+    matcher             = "304,200" # TODO this is really bad practice - someone needs to implement a proper health check, either in the code itself, or by using an external checker like https://aws.amazon.com/blogs/networking-and-content-delivery/identifying-unhealthy-targets-of-elastic-load-balancer/
   }
 
   tags = merge(
@@ -161,7 +167,7 @@ resource "aws_lb_listener" "waf_lb_listener" {
   load_balancer_arn = aws_lb.waf_lb.arn
   port              = "443"
   protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  ssl_policy        = "ELBSecurityPolicy-2014-10"
   certificate_arn   = aws_acm_certificate.waf_lb_cert.arn
 
   default_action {
