@@ -1,39 +1,39 @@
 
 
-# # Security Groups
-# resource "aws_security_group" "importmachine" {
-#   description = "Configure importmachine access - ingress should be only from Bastion"
-#   name        = "importmachine-${local.application_name}"
-#   vpc_id      = local.vpc_id
+# Security Groups
+resource "aws_security_group" "importmachine" {
+  description = "Configure importmachine access - ingress should be only from Bastion"
+  name        = "importmachine-${local.application_name}"
+  vpc_id      = local.vpc_id
 
-#   ingress {
-#     description = "SSH from Bastion"
-#     from_port   = 0
-#     to_port     = "3389"
-#     protocol    = "TCP"
-#     cidr_blocks = ["${module.bastion_linux.bastion_private_ip}/32"]
-#   }
+  ingress {
+    description = "SSH from Bastion"
+    from_port   = 0
+    to_port     = "3389"
+    protocol    = "TCP"
+    cidr_blocks = ["${module.bastion_linux.bastion_private_ip}/32"]
+  }
 
-#   ingress {
-#     description      = "web from all"
-#     from_port        = 8000
-#     to_port          = 8000
-#     protocol         = "TCP"
-#     cidr_blocks      = ["0.0.0.0/0"]
-#     ipv6_cidr_blocks = ["::/0"]
+  ingress {
+    description      = "web from all"
+    from_port        = 8000
+    to_port          = 8000
+    protocol         = "TCP"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
 
-#   }
+  }
 
-#   egress {
-#     description      = "allow all"
-#     from_port        = 0
-#     to_port          = 0
-#     protocol         = "-1"
-#     cidr_blocks      = ["0.0.0.0/0"]
-#     ipv6_cidr_blocks = ["::/0"]
-#   }
+  egress {
+    description      = "allow all"
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
 
-# }
+}
 
 
 resource "aws_key_pair" "george" {
