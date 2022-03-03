@@ -47,11 +47,9 @@ resource "aws_instance" "importmachine" {
   ami                         = local.application_data.accounts[local.environment].importmachine-ami
   vpc_security_group_ids      = [aws_security_group.importmachine.id]
   monitoring                  = false
-  associate_public_ip_address = true
   ebs_optimized               = true
   subnet_id                   = data.aws_subnet.private_az_a.id
-  #  key_name                    = aws_key_pair.george.key_name
-  key_name = "george"
+  key_name                    = aws_key_pair.george.key_name
 
   metadata_options {
     http_tokens   = "required"
