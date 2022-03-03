@@ -50,7 +50,7 @@ resource "aws_security_group_rule" "allow_web_users" {
     "195.95.131.110",    # NCC Group proxy ITHC
     "195.95.131.112",    # NCC Group proxy ITHC
   ]
-  ipv6_cidr_blocks  = [
+  ipv6_cidr_blocks = [
     "2a00:23c7:2416:3d01:c98d:4432:3c83:d937/128"
   ]
 }
