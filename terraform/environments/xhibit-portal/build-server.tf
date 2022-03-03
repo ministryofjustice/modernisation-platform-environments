@@ -20,7 +20,7 @@ resource "aws_security_group_rule" "build-inbound-bastion" {
 resource "aws_security_group_rule" "build-outbound-bastion" {
   depends_on        = [aws_security_group.build-server]
   security_group_id = aws_security_group.build-server.id
-  type              = "ingress"
+  type              = "egress"
   description       = "allow all to bastion"
   from_port         = 0
   to_port           = 0
