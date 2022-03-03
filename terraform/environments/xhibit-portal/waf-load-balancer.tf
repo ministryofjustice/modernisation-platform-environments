@@ -48,9 +48,9 @@ resource "aws_security_group_rule" "allow_web_users" {
     "10.182.60.51/32",   # NLE CGI proxy 
     "10.175.165.159/32", # Helen Dawes
     "10.175.72.157/32",  # Alan Brightmore
-    "5.148.32.215/32",      # NCC Group proxy ITHC
-    "195.95.131.110/32",    # NCC Group proxy ITHC
-    "195.95.131.112/32",    # NCC Group proxy ITHC
+    "5.148.32.215/32",   # NCC Group proxy ITHC
+    "195.95.131.110/32", # NCC Group proxy ITHC
+    "195.95.131.112/32", # NCC Group proxy ITHC
   ]
   ipv6_cidr_blocks = [
     "2a00:23c7:2416:3d01:c98d:4432:3c83:d937/128"
@@ -167,7 +167,7 @@ resource "aws_lb_listener" "waf_lb_listener" {
   load_balancer_arn = aws_lb.waf_lb.arn
   port              = "443"
   protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  ssl_policy        = "ELBSecurityPolicy-2014-10"
   certificate_arn   = aws_acm_certificate.waf_lb_cert.arn
 
   default_action {
