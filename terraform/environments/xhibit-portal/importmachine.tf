@@ -60,18 +60,18 @@ resource "aws_instance" "importmachine" {
     encrypted = true
   }
 
-  lifecycle {
-    ignore_changes = [
-      # This prevents clobbering the tags of attached EBS volumes. See
-      # [this bug][1] in the AWS provider upstream.
-      #
-      # [1]: https://github.com/terraform-providers/terraform-provider-aws/issues/770
-      volume_tags,
-      #user_data,         # Prevent changes to user_data from destroying existing EC2s
-      root_block_device,
-      # Prevent changes to encryption from destroying existing EC2s - can delete once encryption complete
-    ]
-  }
+  # lifecycle {
+  #   ignore_changes = [
+  #     # This prevents clobbering the tags of attached EBS volumes. See
+  #     # [this bug][1] in the AWS provider upstream.
+  #     #
+  #     # [1]: https://github.com/terraform-providers/terraform-provider-aws/issues/770
+  #     volume_tags,
+  #     #user_data,         # Prevent changes to user_data from destroying existing EC2s
+  #     root_block_device,
+  #     # Prevent changes to encryption from destroying existing EC2s - can delete once encryption complete
+  #   ]
+  # }
 
   tags = merge(
     local.tags,
