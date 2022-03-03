@@ -85,6 +85,7 @@
       "suprig05-disk-1-snapshot"      : "snap-08b1c019201557295",
       "XHBPRESMS01-ami"               : "ami-08f52dea252c952c1",
       "importmachine-ami"             : "ami-0f90e80b299573521",
+      "importmachine-data-snapshot"   : "snap-0281146c5951823fa",
       "buildserver-ami"               : "ami-0e52c25843d72f2a5",
       "buildserver-disk-1-snapshot"   : "snap-08b1c019201557295"
     }
