@@ -27,8 +27,8 @@
       "suprig05-ami"                        :  "ami-023807cc724df2fd5",
       "suprig05-disk-1-snapshot"            :  "snap-0b6d529f807eb9a6a",
       "XHBPRESMS01-ami"                     :  "ami-0d97cd2809f84fedb",
-      "buildserver-ami"                     :  "ami-023807cc724df2fd5",
-      "buildserver-disk-1-snapshot"         :  "snap-0b6d529f807eb9a6a"
+      "buildserver-ami"                     :  "ami-0ab0d0d090270671f",
+      "buildserver-disk-1-snapshot"         :  "snap-0626f8276cc1afc2f"
     },
     "preproduction": {
       "public_dns_name_web"           : "prepportal.cjsonline.gov.uk",
