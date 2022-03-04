@@ -428,6 +428,10 @@ resource "aws_cloudfront_distribution" "distribution" {
     }
   }
 
+  viewer_certificate {
+    acm_certificate_arn = aws_acm_certificate.waf_lb_cert.arn
+  }
+
   enabled = true
   aliases   = ["yoursite.example.com"]
 
