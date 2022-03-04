@@ -430,6 +430,7 @@ resource "aws_cloudfront_distribution" "distribution" {
 
   viewer_certificate {
     acm_certificate_arn = aws_acm_certificate.waf_lb_cert.arn
+    ssl_support_method = "sni-only"
   }
 
   enabled = true
