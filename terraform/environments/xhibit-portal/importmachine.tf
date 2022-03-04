@@ -79,7 +79,7 @@ resource "aws_instance" "importmachine" {
 #       Name = "importmachine-${local.application_name}"
 #     }
 #   )
-# }
+ }
 
 # resource "aws_ebs_volume" "disk_xvdf" {
 #   depends_on        = [aws_instance.importmachine]
