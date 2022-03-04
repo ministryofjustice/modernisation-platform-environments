@@ -419,7 +419,13 @@ resource "aws_cloudfront_distribution" "distribution" {
       name = "X-Origin-Token"
       value = random_string.origin_token.result
     }
+
+    custom_origin_config {
+      origin_ssl_protocols  = ["SSLv3","TLSv1","TLSv1.1", "TLSv1.2"]
+    }
   }
+
+
 
   restrictions {
     geo_restriction {
