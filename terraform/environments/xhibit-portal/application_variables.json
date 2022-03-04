@@ -4,7 +4,7 @@
       "public_dns_name_ingestion"           :  "dev-ingest.cjsonline.gov.uk",
       "public_dns_name_web"                 :  "dev-pportal.cjsonline.gov.uk",
       "bucket_prefix"                       :  "vm-import-s3-bucket",
-      "importmachine-ami"                   :  "ami-0b33dfec9e4072ca1",
+      "importmachine-ami"                   :  "ami-03778fe8eef3985a7",
       "importmachine-data-snapshot"         :  "snap-0281146c5951823fa",
       "infra1-ami"                          :  "ami-0636a37a2432d047d",
       "infra1-disk-1-snapshot"              :  "snap-078d43138754490c0",

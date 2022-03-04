@@ -99,8 +99,8 @@ resource "aws_ebs_volume" "disk_xvdf" {
   )
 }
 
-# resource "aws_volume_attachment" "disk_xvdf" {
-#   device_name = "xvdf"
-#   volume_id   = aws_ebs_volume.disk_xvdf.id
-#   instance_id = aws_instance.importmachine.id
-# }
+ resource "aws_volume_attachment" "disk_xvdf" {
+  device_name = "xvdf"
+  volume_id   = aws_ebs_volume.disk_xvdf.id
+  instance_id = aws_instance.importmachine.id
+}
