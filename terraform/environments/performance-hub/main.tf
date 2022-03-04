@@ -372,6 +372,7 @@ resource "aws_db_instance" "database" {
   backup_retention_period             = 30
   maintenance_window                  = "Mon:00:00-Mon:03:00"
   backup_window                       = "03:00-06:00"
+  final_snapshot_identifier           = "final-snapshot"
   kms_key_id                          = aws_kms_key.rds.arn
   deletion_protection                 = false
   option_group_name                   = aws_db_option_group.db_option_group.name
