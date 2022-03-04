@@ -73,12 +73,12 @@ resource "aws_instance" "importmachine" {
 #   #   ]
 #   # }
 
-#   tags = merge(
-#     local.tags,
-#     {
-#       Name = "importmachine-${local.application_name}"
-#     }
-#   )
+  tags = merge(
+    local.tags,
+    {
+      Name = "importmachine-${local.application_name}"
+    }
+  )
  }
 
 # resource "aws_ebs_volume" "disk_xvdf" {
