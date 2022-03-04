@@ -422,6 +422,7 @@ resource "aws_cloudfront_distribution" "distribution" {
 
     custom_origin_config {
       origin_ssl_protocols  = ["SSLv3","TLSv1","TLSv1.1", "TLSv1.2"]
+      http_port = 80
     }
   }
 
