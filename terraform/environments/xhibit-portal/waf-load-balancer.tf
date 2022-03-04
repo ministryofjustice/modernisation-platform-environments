@@ -44,7 +44,7 @@ resource "aws_security_group_rule" "allow_web_users" {
     "20.49.163.194/32",  # Azure function proxy
     "20.49.163.244/32",  # Azure function proxy
     "82.44.118.20/32",   # Nick
-    "10.175.52.4/32",    # Anthony Fletcher
+    "194.33.192.4/32",   # Anthony Fletcher
     "10.182.60.51/32",   # NLE CGI proxy 
     "10.175.165.159/32", # Helen Dawes
     "10.175.72.157/32",  # Alan Brightmore
