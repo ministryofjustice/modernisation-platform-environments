@@ -406,44 +406,65 @@ resource "aws_wafv2_web_acl_logging_configuration" "waf_logs" {
 }
 
 
-resource "random_string" "origin_token" {
-  length = 30
-  special = false
-}
+# resource "random_string" "origin_token" {
+#   length = 30
+#   special = false
+# }
 
-resource "aws_cloudfront_distribution" "distribution" {
-  origin {
-    domain_name   = aws_lb.waf_lb.arn
-    origin_id            = "xp-ingestion"
-    custom_header {
-      name = "X-Origin-Token"
-      value = random_string.origin_token.result
-    }
-  }
+# resource "aws_cloudfront_distribution" "distribution" {
+#   origin {
+#     domain_name   = aws_lb.waf_lb.arn
+#     origin_id            = "xp-ingestion"
+#     custom_header {
+#       name = "X-Origin-Token"
+#       value = random_string.origin_token.result
+#     }
 
-  enabled = true
-  aliases   = ["yoursite.example.com"]
+#     custom_origin_config {
+#       origin_ssl_protocols  = ["SSLv3","TLSv1","TLSv1.1", "TLSv1.2"]
+#       http_port              = 80
+#       https_port             = 443
+#       origin_protocol_policy = "http-only"
+#     }
+#   }
 
-  default_cache_behavior {
-    allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
-    cached_methods   = []
-    target_origin_id     = "xp-ingestion"
 
-    forwarded_values {
-      query_string = true
-      headers        = ["X-Origin-Token"]
 
-      cookies {
-        forward = "all"
-      }
-    }
+#   restrictions {
+#     geo_restriction {
+#       restriction_type = "whitelist"
+#       locations        = [ "GB"]
+#     }
+#   }
 
-    viewer_protocol_policy = "redirect-to-https"
-    min_ttl                = 0
-    default_ttl            = 3600
-    max_ttl                = 86400
-  }
-}
+#   viewer_certificate {
+#     acm_certificate_arn = aws_acm_certificate.waf_lb_cert.arn
+#     ssl_support_method = "sni-only"
+#   }
+
+#   enabled = true
+#   aliases   = ["yoursite.example.com"]
+
+#   default_cache_behavior {
+#     allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
+#     cached_methods   = []
+#     target_origin_id     = "xp-ingestion"
+
+#     forwarded_values {
+#       query_string = true
+#       headers        = ["X-Origin-Token"]
+
+#       cookies {
+#         forward = "all"
+#       }
+#     }
+
+#     viewer_protocol_policy = "redirect-to-https"
+#     min_ttl                = 0
+#     default_ttl            = 3600
+#     max_ttl                = 86400
+#   }
+# }
 
 
 
