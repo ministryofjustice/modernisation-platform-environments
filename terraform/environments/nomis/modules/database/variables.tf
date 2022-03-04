@@ -9,9 +9,9 @@ variable "application_name" {
 }
 
 variable "asm_data_capacity" {
-  type = number
+  type        = number
   description = "Total capcity of the DATA disk group in GiB"
-  default = 200
+  default     = 200
   validation {
     condition     = var.asm_data_capacity >= 5
     error_message = "The minimum capacity that can be specified for the DATA diskgroup is 5 GiB."
@@ -19,21 +19,21 @@ variable "asm_data_capacity" {
 }
 
 variable "asm_data_iops" {
-  type = number
+  type        = number
   description = "Iops of the DATA disks"
-  default = 3000
+  default     = 3000
 }
 
 variable "asm_data_throughput" {
-  type = number
+  type        = number
   description = "Throughout of the DATA disks in MiB/s"
-  default = 125
+  default     = 125
 }
 
 variable "asm_flash_capacity" {
-  type = number
+  type        = number
   description = "Total capcity of the FLASH disk group in GiB"
-  default = 100
+  default     = 100
   validation {
     condition     = var.asm_flash_capacity >= 2
     error_message = "The minimum capacity that can be specified for the FLASH diskgroup is 2 GiB."
@@ -41,15 +41,15 @@ variable "asm_flash_capacity" {
 }
 
 variable "asm_flash_iops" {
-  type = number
+  type        = number
   description = "Iops of the FLASH disks"
-  default = 3000
+  default     = 3000
 }
 
 variable "asm_flash_throughput" {
-  type = number
+  type        = number
   description = "Throughout of the FLASH disks in MB/s"
-  default = 125
+  default     = 125
 }
 
 variable "business_unit" {

@@ -3,27 +3,27 @@
 #------------------------------------------------------------------------------
 
 locals {
- oracle_app_disks = [ # match structure of AMI block device mappings
-   "/dev/sdb",
-   "/dev/sdc"
- ]
- asm_data_disks = [ # match structure of AMI block device mappings
-   "/dev/sde", # DATA01
-   "/dev/sdf", # DATA02
-   "/dev/sdg", # DATA03
-   "/dev/sdh", # DATA04
-   "/dev/sdi", # DATA05
-   ]
+  oracle_app_disks = [ # match structure of AMI block device mappings
+    "/dev/sdb",
+    "/dev/sdc"
+  ]
+  asm_data_disks = [ # match structure of AMI block device mappings
+    "/dev/sde",      # DATA01
+    "/dev/sdf",      # DATA02
+    "/dev/sdg",      # DATA03
+    "/dev/sdh",      # DATA04
+    "/dev/sdi",      # DATA05
+  ]
   asm_flash_disks = [ # match structure of AMI block device mappings
-   "/dev/sdj", # FLASH01
-   "/dev/sdk"  # FLASH02
-   ]
+    "/dev/sdj",       # FLASH01
+    "/dev/sdk"        # FLASH02
+  ]
   swap_disk = "/dev/sds" # match structure of AMI block device mappings
 
-  asm_data_disk_size = floor(var.asm_data_capacity / length(local.asm_data_disks))
+  asm_data_disk_size  = floor(var.asm_data_capacity / length(local.asm_data_disks))
   asm_flash_disk_size = floor(var.asm_flash_capacity / length(local.asm_flash_disks))
-  block_device_map = { for bdm in data.aws_ami.database.block_device_mappings : bdm.device_name => bdm }
-  root_device_size = one([for bdm in data.aws_ami.database.block_device_mappings : bdm.ebs.volume_size if bdm.device_name == data.aws_ami.database.root_device_name])
+  block_device_map    = { for bdm in data.aws_ami.database.block_device_mappings : bdm.device_name => bdm }
+  root_device_size    = one([for bdm in data.aws_ami.database.block_device_mappings : bdm.ebs.volume_size if bdm.device_name == data.aws_ami.database.root_device_name])
 }
 
 #------------------------------------------------------------------------------
@@ -123,7 +123,7 @@ resource "aws_instance" "database" {
     delete_on_termination = true
     encrypted             = true
     # volume_size           = lookup(var.drive_map, data.aws_ami.database.root_device_name, local.root_device_size)
-    volume_type           = "gp3"
+    volume_type = "gp3"
   }
   dynamic "ephemeral_block_device" { # block devices specified inline cannot be resized later so we need to make sure they are not mounted here
     for_each = [for bdm in data.aws_ami.database.block_device_mappings : bdm if bdm.device_name != data.aws_ami.database.root_device_name]
@@ -164,10 +164,10 @@ resource "aws_ebs_volume" "oracle_app" {
   availability_zone = "${var.region}a"
   encrypted         = true
   # iops              = var.oracle_app_iops
-  snapshot_id       = local.block_device_map[each.key].ebs.snapshot_id
+  snapshot_id = local.block_device_map[each.key].ebs.snapshot_id
   # size              = local.oracle_app_disk_size
   # throughput = var.oracle_app_throughput
-  type              = "gp3"
+  type = "gp3"
 
   tags = merge(
     var.tags,
@@ -193,7 +193,7 @@ resource "aws_ebs_volume" "asm_data" {
   iops              = var.asm_data_iops
   snapshot_id       = local.block_device_map[each.key].ebs.snapshot_id
   size              = local.asm_data_disk_size
-  throughput = var.asm_data_throughput
+  throughput        = var.asm_data_throughput
   type              = "gp3"
 
   tags = merge(
@@ -220,7 +220,7 @@ resource "aws_ebs_volume" "asm_flash" {
   iops              = var.asm_flash_iops
   snapshot_id       = local.block_device_map[each.key].ebs.snapshot_id
   size              = local.asm_flash_disk_size
-  throughput = var.asm_flash_throughput
+  throughput        = var.asm_flash_throughput
   type              = "gp3"
 
   tags = merge(
