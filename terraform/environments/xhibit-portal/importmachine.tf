@@ -37,9 +37,9 @@ resource "aws_security_group" "importmachine" {
 
 
 resource "aws_key_pair" "george" {
-  key_name   = "george"
-  public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCt2geFOwgsihu1oAG3RghCqercNTMv1QUgVnJvyllJGllRDbD5cfit5u3yKPB50W5IOgm9p+21epSRYSEL9TwkSNuveI1LK4CFDOurT5QiOSXL/0pFScwhSFbYud3IzbMJ8dEj/hyRm+gnqHbO86CJRBvSvL6j1Wn9S1rTPbfa0VmMehTsD2Wk181TlddIUBMnG+Dd4eeIoi5ivEzfM8jX4NJXzadXG/wTIrsx471tBF7g8TzCcYDMgTQw9oEdR3wugFjfuUDSK/SYXFTUpDOufZefpENcSW9SPDVfzCeM6ludNKxZFqVGAKwc7BFMygAucZjwVgiKxWBDVRcqTmtuM+ujoBh+d/o4RVGTs9V0MSE8YSIqk91U+/PRlL1nXBk0KaLqzB6/EdZZWxkxfhzv+iDrPnvqQd+ayzV0KcbzIP6iCxFn4YDM9jPWBDjIksKhi3TB4XyW446v6ttord0eB6glWFytA1LJ7Y7aiKaOnWa5oW7IbCZtE7PFxp+dmTk= george.cairns@MJ001152"
-}
+   key_name   = "george"
+   public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCt2geFOwgsihu1oAG3RghCqercNTMv1QUgVnJvyllJGllRDbD5cfit5u3yKPB50W5IOgm9p+21epSRYSEL9TwkSNuveI1LK4CFDOurT5QiOSXL/0pFScwhSFbYud3IzbMJ8dEj/hyRm+gnqHbO86CJRBvSvL6j1Wn9S1rTPbfa0VmMehTsD2Wk181TlddIUBMnG+Dd4eeIoi5ivEzfM8jX4NJXzadXG/wTIrsx471tBF7g8TzCcYDMgTQw9oEdR3wugFjfuUDSK/SYXFTUpDOufZefpENcSW9SPDVfzCeM6ludNKxZFqVGAKwc7BFMygAucZjwVgiKxWBDVRcqTmtuM+ujoBh+d/o4RVGTs9V0MSE8YSIqk91U+/PRlL1nXBk0KaLqzB6/EdZZWxkxfhzv+iDrPnvqQd+ayzV0KcbzIP6iCxFn4YDM9jPWBDjIksKhi3TB4XyW446v6ttord0eB6glWFytA1LJ7Y7aiKaOnWa5oW7IbCZtE7PFxp+dmTk= george.cairns@MJ001152"
+ }
 
 resource "aws_instance" "importmachine" {
   depends_on                  = [aws_security_group.importmachine]
@@ -60,18 +60,18 @@ resource "aws_instance" "importmachine" {
     encrypted = true
   }
 
-  lifecycle {
-    ignore_changes = [
-      # This prevents clobbering the tags of attached EBS volumes. See
-      # [this bug][1] in the AWS provider upstream.
-      #
-      # [1]: https://github.com/terraform-providers/terraform-provider-aws/issues/770
-      volume_tags,
-      #user_data,         # Prevent changes to user_data from destroying existing EC2s
-      root_block_device,
-      # Prevent changes to encryption from destroying existing EC2s - can delete once encryption complete
-    ]
-  }
+  # lifecycle {
+  #   ignore_changes = [
+  #     # This prevents clobbering the tags of attached EBS volumes. See
+  #     # [this bug][1] in the AWS provider upstream.
+  #     #
+  #     # [1]: https://github.com/terraform-providers/terraform-provider-aws/issues/770
+  #     volume_tags,
+  #     #user_data,         # Prevent changes to user_data from destroying existing EC2s
+  #     root_block_device,
+  #     # Prevent changes to encryption from destroying existing EC2s - can delete once encryption complete
+  #   ]
+  # }
 
   tags = merge(
     local.tags,
