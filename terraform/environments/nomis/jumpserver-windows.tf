@@ -35,15 +35,19 @@ resource "aws_instance" "jumpserver_windows" {
     http_tokens   = "required"
   }
   root_block_device {
-    encrypted = true
+    delete_on_termination = true
+    encrypted             = true
+    volume_type           = "gp3"
   }
 
   tags = merge(
     local.tags,
     {
-      Name    = "jumpserver_windows"
-      os_type = "Windows 2019"
-      creator = "Packer" # Temporary Tag: Allows me to delete the instance using the CLI
+      Name       = "jumpserver_windows"
+      os_type    = "Windows"
+      os_version = "2019"
+      always_on  = "false"
+      creator    = "Packer" # Temporary Tag: Allows me to delete the instance using the CLI
     }
   )
 }
@@ -57,7 +61,7 @@ resource "aws_security_group" "jumpserver-windows" {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    #tfsec:ignore:AWS009
+    #tfsec:ignore:aws-vpc-no-public-egress-sgr
     cidr_blocks = ["0.0.0.0/0"]
   }
 }

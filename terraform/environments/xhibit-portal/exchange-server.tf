@@ -1,14 +1,12 @@
 
 
-# Security Groups
 resource "aws_security_group" "exchange-server" {
   description = "Domain traffic only"
   name        = "exchange-server-${local.application_name}"
   vpc_id      = local.vpc_id
 }
 
-
-resource "aws_security_group_rule" "exchange-outbound-all" {
+resource "aws_security_group_rule" "web-outbound-all" {
   depends_on        = [aws_security_group.exchange-server]
   security_group_id = aws_security_group.exchange-server.id
   type              = "egress"
@@ -20,18 +18,43 @@ resource "aws_security_group_rule" "exchange-outbound-all" {
   ipv6_cidr_blocks  = ["::/0"]
 }
 
-resource "aws_security_group_rule" "exchange-inbound-all" {
+resource "aws_security_group_rule" "infra-inbound-all" {
+  depends_on               = [aws_security_group.exchange-server]
+  security_group_id        = aws_security_group.exchange-server.id
+  type                     = "ingress"
+  description              = "allow all"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
+  source_security_group_id = aws_security_group.app-server.id
+}
+
+resource "aws_security_group_rule" "infra-outbound-all" {
+  depends_on               = [aws_security_group.exchange-server]
+  security_group_id        = aws_security_group.exchange-server.id
+  type                     = "egress"
+  description              = "allow all"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
+  source_security_group_id = aws_security_group.app-server.id
+}
+
+resource "aws_security_group_rule" "app-inbound-bastion" {
   depends_on        = [aws_security_group.exchange-server]
   security_group_id = aws_security_group.exchange-server.id
   type              = "ingress"
-  description       = "allow all"
-  from_port         = 0
-  to_port           = 0
-  protocol          = "-1"
-  cidr_blocks       = ["0.0.0.0/0"]
-  ipv6_cidr_blocks  = ["::/0"]
+  description       = "allow bastion"
+  from_port         = 3389
+  to_port           = 3389
+  protocol          = "TCP"
+  cidr_blocks       = ["${module.bastion_linux.bastion_private_ip}/32"]
 }
 
+resource "aws_eip" "exchange" {
+  instance = aws_instance.exchange-server.id
+  vpc      = true
+}
 
 resource "aws_instance" "exchange-server" {
   depends_on                  = [aws_security_group.exchange-server]
@@ -41,7 +64,7 @@ resource "aws_instance" "exchange-server" {
   monitoring                  = false
   associate_public_ip_address = false
   ebs_optimized               = false
-  subnet_id                   = data.aws_subnet.private_az_a.id
+  subnet_id                   = data.aws_subnet.public_az_a.id
   key_name                    = aws_key_pair.george.key_name
 
   user_data = <<EOF
@@ -60,6 +83,9 @@ resource "aws_instance" "exchange-server" {
 
   root_block_device {
     encrypted = true
+    tags = {
+      Name = "root-block-device-exchange-server-${local.application_name}"
+    }
   }
 
   lifecycle {
@@ -70,7 +96,7 @@ resource "aws_instance" "exchange-server" {
       # [1]: https://github.com/terraform-providers/terraform-provider-aws/issues/770
       volume_tags,
       #user_data,         # Prevent changes to user_data from destroying existing EC2s
-      root_block_device,
+      #root_block_device,
       # Prevent changes to encryption from destroying existing EC2s - can delete once encryption complete
     ]
   }
@@ -82,14 +108,6 @@ resource "aws_instance" "exchange-server" {
     }
   )
 }
-
-
-resource "aws_eip" "lb" {
-  instance = aws_instance.exchange-server.id
-  vpc      = true
-}
-
-
 
 resource "aws_ebs_volume" "exchange-disk1" {
   depends_on        = [aws_instance.exchange-server]
@@ -141,4 +159,3 @@ resource "aws_volume_attachment" "exchange-disk2" {
   volume_id    = aws_ebs_volume.exchange-disk2.id
   instance_id  = aws_instance.exchange-server.id
 }
-

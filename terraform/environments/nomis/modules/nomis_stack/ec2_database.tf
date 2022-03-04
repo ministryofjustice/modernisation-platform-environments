@@ -119,7 +119,7 @@ resource "aws_instance" "database_server" {
       component  = "data"
       os_type    = "Linux"
       os_version = "RHEL 7.9"
-      always_on  = "false"
+      always_on  = var.environment == "test" ? "false" : "true"
     }
   )
 }
@@ -132,7 +132,7 @@ resource "aws_ebs_volume" "database_server_ami_volume" {
   iops              = each.value["ebs"]["iops"]
   snapshot_id       = each.value["ebs"]["snapshot_id"]
   size              = lookup(var.database_drive_map, each.value["device_name"], each.value["ebs"]["volume_size"])
-  type              = each.value["ebs"]["volume_type"]
+  type              = each.value["ebs"]["volume_type"] == "gp2" ? "gp3" : each.value["ebs"]["volume_type"]
 
   tags = merge(
     var.tags,
@@ -251,12 +251,12 @@ data "aws_iam_policy_document" "asm_parameter" {
   }
 }
 
-data "aws_iam_instance_profile" "ec2_common_profile" {
-  name = aws_instance.database_server.iam_instance_profile
+data "aws_iam_instance_profile" "ec2_database_profile" {
+  name = var.instance_profile_db_name
 }
 
 resource "aws_iam_role_policy" "asm_parameter" {
   name   = "asm-parameter-access-${var.stack_name}"
-  role   = data.aws_iam_instance_profile.ec2_common_profile.role_name
+  role   = data.aws_iam_instance_profile.ec2_database_profile.role_name
   policy = data.aws_iam_policy_document.asm_parameter.json
 }

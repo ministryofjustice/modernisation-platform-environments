@@ -264,12 +264,9 @@ resource "aws_instance" "database-server" {
   root_block_device {
     encrypted   = true
     volume_size = 64
-    tags = merge(
-      local.tags,
-      {
-        Name = "root-block-device-database-${local.application_name}"
-      }
-    )
+    tags = {
+      Name = "root-block-device-database-${local.application_name}"
+    }
   }
 
   lifecycle {

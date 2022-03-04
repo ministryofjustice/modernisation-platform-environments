@@ -36,11 +36,25 @@ resource "aws_security_group_rule" "allow_web_users" {
   to_port           = 443
   protocol          = "TCP"
   cidr_blocks = [
-    "109.147.86.54/32",
-    "81.101.176.47/32",
-    "194.33.196.2/32"
+    "109.152.47.104/32", # George
+    "81.101.176.47/32",  # Aman
+    "77.100.255.142/32", # Gary 77.100.255.142
+    "20.49.163.173/32",  # Azure function proxy
+    "20.49.163.191/32",  # Azure function proxy
+    "20.49.163.194/32",  # Azure function proxy
+    "20.49.163.244/32",  # Azure function proxy
+    "82.44.118.20/32",   # Nick
+    "10.175.22.201/32",  # Anthony Fletcher
+    "10.182.60.51/32",   # NLE CGI proxy 
+    "10.175.165.159/32", # Helen Dawes
+    "10.175.72.157/32",  # Alan Brightmore
+    "5.148.32.215/32",   # NCC Group proxy ITHC
+    "195.95.131.110/32", # NCC Group proxy ITHC
+    "195.95.131.112/32", # NCC Group proxy ITHC
   ]
-  # ipv6_cidr_blocks  = ["::/0"]
+  ipv6_cidr_blocks = [
+    "2a00:23c7:2416:3d01:c98d:4432:3c83:d937/128"
+  ]
 }
 
 
@@ -113,13 +127,13 @@ resource "aws_lb_target_group" "waf_lb_ingest_tg" {
   vpc_id               = local.vpc_id
 
   health_check {
-    path                = "/BITSWebService/BITSWebService.asmx"
+    path                = "/"
     port                = 80
     healthy_threshold   = 6
     unhealthy_threshold = 2
     timeout             = 2
     interval            = 5
-    matcher             = "200" # change this to 200 when the database comes up
+    matcher             = "304,200" # TODO this is really bad practice - someone needs to implement a proper health check, either in the code itself, or by using an external checker like https://aws.amazon.com/blogs/networking-and-content-delivery/identifying-unhealthy-targets-of-elastic-load-balancer/
   }
 
   tags = merge(
@@ -187,9 +201,7 @@ resource "aws_alb_listener_rule" "root_listener_redirect" {
 
   condition {
     host_header {
-      # web.xhibit-portal.hmcts-development.modernisation-platform.service.justice.gov.uk
       values = [
-        "web.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk",
         local.application_data.accounts[local.environment].public_dns_name_web
       ]
     }
@@ -208,9 +220,7 @@ resource "aws_alb_listener_rule" "web_listener_rule" {
 
   condition {
     host_header {
-      # web.xhibit-portal.hmcts-development.modernisation-platform.service.justice.gov.uk
       values = [
-        "web.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk",
         local.application_data.accounts[local.environment].public_dns_name_web
       ]
     }
@@ -229,9 +239,7 @@ resource "aws_alb_listener_rule" "ingestion_listener_rule" {
 
   condition {
     host_header {
-      # web.xhibit-portal.hmcts-development.modernisation-platform.service.justice.gov.uk
       values = [
-        "ingest.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk",
         local.application_data.accounts[local.environment].public_dns_name_ingestion
       ]
     }
@@ -239,78 +247,21 @@ resource "aws_alb_listener_rule" "ingestion_listener_rule" {
 
 }
 
-
-
-resource "aws_route53_record" "waf_lb_web_dns" {
-  provider = aws.core-vpc
-
-  zone_id = data.aws_route53_zone.external_r53_zone.zone_id
-  name    = "web.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-  type    = "A"
-
-  alias {
-    name                   = aws_lb.waf_lb.dns_name
-    zone_id                = aws_lb.waf_lb.zone_id
-    evaluate_target_health = true
-  }
-}
-
-resource "aws_route53_record" "waf_lb_ingest_dns" {
-  provider = aws.core-vpc
-
-  zone_id = data.aws_route53_zone.external_r53_zone.zone_id
-  name    = "ingest.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-  type    = "A"
-
-  alias {
-    name                   = aws_lb.waf_lb.dns_name
-    zone_id                = aws_lb.waf_lb.zone_id
-    evaluate_target_health = true
-  }
-}
-
 resource "aws_acm_certificate" "waf_lb_cert" {
-  domain_name       = "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  domain_name       = local.application_data.accounts[local.environment].public_dns_name_web
   validation_method = "DNS"
 
   subject_alternative_names = [
-    "*.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk",
-    local.application_data.accounts[local.environment].public_dns_name_web,
     local.application_data.accounts[local.environment].public_dns_name_ingestion,
   ]
 
   tags = {
-    Environment = "prod"
+    Environment = local.environment
   }
 
   lifecycle {
     create_before_destroy = true
   }
-}
-
-data "aws_route53_zone" "external_r53_zone" {
-  provider = aws.core-vpc
-
-  name         = "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk."
-  private_zone = false
-}
-
-resource "aws_route53_record" "waf_lb_r53_record" {
-  provider = aws.core-vpc
-  for_each = {
-    for dvo in aws_acm_certificate.waf_lb_cert.domain_validation_options : dvo.domain_name => {
-      name   = dvo.resource_record_name
-      record = dvo.resource_record_value
-      type   = dvo.resource_record_type
-    }
-  }
-
-  allow_overwrite = true
-  name            = each.value.name
-  records         = [each.value.record]
-  ttl             = 60
-  type            = each.value.type
-  zone_id         = data.aws_route53_zone.external_r53_zone.zone_id
 }
 
 resource "aws_acm_certificate_validation" "waf_lb_cert_validation" {
@@ -453,7 +404,3 @@ resource "aws_wafv2_web_acl_logging_configuration" "waf_logs" {
   log_destination_configs = ["${aws_s3_bucket.waf_logs.arn}"]
   resource_arn            = aws_wafv2_web_acl.waf_acl.arn
 }
-
-
-
-

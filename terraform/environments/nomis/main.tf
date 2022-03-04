@@ -19,10 +19,11 @@ module "nomis_stack" {
   database_common_security_group_id = aws_security_group.database_common.id
   weblogic_common_security_group_id = aws_security_group.weblogic_common.id
 
-  instance_profile_name      = aws_iam_instance_profile.ec2_common_profile.name
-  instance_profile_db_name   = aws_iam_instance_profile.ec2_database_profile.name
-  key_name                   = aws_key_pair.ec2-user.key_name
-  load_balancer_listener_arn = aws_lb_listener.internal.arn
+  instance_profile_name          = aws_iam_instance_profile.ec2_common_profile.name
+  instance_profile_db_name       = aws_iam_instance_profile.ec2_database_profile.name
+  instance_profile_weblogic_name = aws_iam_instance_profile.ec2_weblogic_profile.name
+  key_name                       = aws_key_pair.ec2-user.key_name
+  load_balancer_listener_arn     = aws_lb_listener.internal.arn
 
   application_name = local.application_name
   business_unit    = local.vpc_name
@@ -79,7 +80,7 @@ resource "aws_security_group" "weblogic_common" {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    #tfsec:ignore:AWS009
+    #tfsec:ignore:aws-vpc-no-public-egress-sgr
     cidr_blocks = ["0.0.0.0/0"]
   }
 
@@ -124,7 +125,7 @@ resource "aws_security_group" "database_common" {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    #tfsec:ignore:AWS009
+    #tfsec:ignore:aws-vpc-no-public-egress-sgr
     cidr_blocks = ["0.0.0.0/0"]
   }
 

@@ -4,6 +4,7 @@ on:                                          # Put ALL the triggers for any part
   push: # triggers on 'push' or 'merge'      # The whole workflow will run each time these events happen
     branches:                                # and they're skipped according to the 'if' conditions below
       - main
+      - xp-preprod
       - xp-dev
     paths:
       - 'terraform/environments/xhibit-portal/**'
@@ -17,7 +18,7 @@ defaults:
   run:
     shell: bash
 
-jobs: 
+jobs:
   plan-development:
     name: Plan Development - xhibit-portal
     runs-on: ubuntu-latest
@@ -34,6 +35,7 @@ jobs:
         run: |
           echo "Terraform plan - ${TF_ENV}"
           bash scripts/terraform-init.sh terraform/environments/xhibit-portal
+          terraform -chdir="terraform/environments/xhibit-portal" workspace list
           terraform -chdir="terraform/environments/xhibit-portal" workspace select "xhibit-portal-${TF_ENV}"
           bash scripts/terraform-plan.sh terraform/environments/xhibit-portal
         env:
@@ -60,6 +62,49 @@ jobs:
           bash scripts/terraform-apply.sh terraform/environments/xhibit-portal
         env:
           TF_ENV: development
+
+  plan-preproduction:
+    name: Plan Pre-Production - xhibit-portal
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/xp-preprod' # job only runs for pushes to the xp-preprod branch
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2.3.4
+      - name: Load and Configure Terraform
+        uses: hashicorp/setup-terraform@v1.3.2
+        with:
+          terraform_version: 1.0.1
+          terraform_wrapper: false
+      - name: Terraform plan - preproduction
+        run: |
+          echo "Terraform plan - ${TF_ENV}"
+          bash scripts/terraform-init.sh terraform/environments/xhibit-portal
+          terraform -chdir="terraform/environments/xhibit-portal" workspace select "xhibit-portal-${TF_ENV}"
+          bash scripts/terraform-plan.sh terraform/environments/xhibit-portal
+        env:
+          TF_ENV: preproduction
+
+  deploy-preproduction:
+    needs: plan-preproduction # job only runs if plan-production runs successfully
+    name: Deploy Pre-Production - xhibit-portal
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/xp-preprod'
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2.3.4
+      - name: Load and Configure Terraform
+        uses: hashicorp/setup-terraform@v1.3.2
+        with:
+          terraform_version: 1.0.1
+          terraform_wrapper: false
+      - name: Terraform apply - preproduction
+        run: |
+          echo "Terraform apply - ${TF_ENV}"
+          bash scripts/terraform-init.sh terraform/environments/xhibit-portal
+          terraform -chdir="terraform/environments/xhibit-portal" workspace select "xhibit-portal-${TF_ENV}"
+          bash scripts/terraform-apply.sh terraform/environments/xhibit-portal
+        env:
+          TF_ENV: preproduction
 
   plan-production:
     name: Plan Production - xhibit-portal
