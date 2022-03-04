@@ -417,7 +417,7 @@ resource "aws_cloudfront_distribution" "distribution" {
     origin_id            = "xp-ingestion"
     custom_header {
       name = "X-Origin-Token"
-      value = random_string.origin_token.results
+      value = random_string.origin_token.result
     }
   }
 
