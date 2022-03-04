@@ -53,14 +53,14 @@ resource "aws_instance" "importmachine" {
   subnet_id                   = data.aws_subnet.private_az_a.id
   key_name                    = aws_key_pair.george.key_name
 
-#   metadata_options {
-#     http_tokens   = "required"
-#     http_endpoint = "enabled"
-#   }
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
 
-#   root_block_device {
-#     encrypted = true
-#   }
+  root_block_device {
+    encrypted = true
+  }
 
 #   # lifecycle {
 #   #   ignore_changes = [
@@ -83,21 +83,21 @@ resource "aws_instance" "importmachine" {
   )
  }
 
-# resource "aws_ebs_volume" "disk_xvdf" {
-#   depends_on        = [aws_instance.importmachine]
-#   snapshot_id       = local.application_data.accounts[local.environment].importmachine-data-snapshot
-#   availability_zone = "${local.region}a"
-#   type              = "gp2"
-#   encrypted         = true
-#   size              = 6000
+resource "aws_ebs_volume" "disk_xvdf" {
+  depends_on        = [aws_instance.importmachine]
+  snapshot_id       = local.application_data.accounts[local.environment].importmachine-data-snapshot
+  availability_zone = "${local.region}a"
+  type              = "gp2"
+  encrypted         = true
+  size              = 6000
 
-#   tags = merge(
-#     local.tags,
-#     {
-#       Name = "importmachine-${local.application_name}-disk"
-#     }
-#   )
-# }
+  tags = merge(
+    local.tags,
+    {
+      Name = "importmachine-${local.application_name}-disk"
+    }
+  )
+}
 
 # resource "aws_volume_attachment" "disk_xvdf" {
 #   device_name = "xvdf"
