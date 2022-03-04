@@ -421,6 +421,13 @@ resource "aws_cloudfront_distribution" "distribution" {
     }
   }
 
+  restrictions {
+    geo_restriction {
+      restriction_type = "whitelist"
+      locations        = [ "GB"]
+    }
+  }
+
   enabled = true
   aliases   = ["yoursite.example.com"]
 
