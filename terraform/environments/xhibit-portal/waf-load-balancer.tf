@@ -404,3 +404,46 @@ resource "aws_wafv2_web_acl_logging_configuration" "waf_logs" {
   log_destination_configs = ["${aws_s3_bucket.waf_logs.arn}"]
   resource_arn            = aws_wafv2_web_acl.waf_acl.arn
 }
+
+
+resource "random_string" "origin_token" {
+  length = 30
+  special = false
+}
+
+resource "aws_cloudfront_distribution" "distribution" {
+  origin {
+    domain_name   = aws_lb.waf_lb.arn
+    origin_id            = "xp-ingestion"
+    custom_header {
+      name = "X-Origin-Token"
+      value = random_string.origin_token.result
+    }
+  }
+
+  enabled = true
+  aliases   = ["yoursite.example.com"]
+
+  default_cache_behavior {
+    allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
+    cached_methods   = []
+    target_origin_id     = "xp-ingestion"
+
+    forwarded_values {
+      query_string = true
+      headers        = ["X-Origin-Token"]
+
+      cookies {
+        forward = "all"
+      }
+    }
+
+    viewer_protocol_policy = "redirect-to-https"
+    min_ttl                = 0
+    default_ttl            = 3600
+    max_ttl                = 86400
+  }
+}
+
+
+
