@@ -42,9 +42,8 @@ resource "aws_security_group" "importmachine" {
  
  resource "aws_key_pair" "gary" {
     key_name   = "gary"
-    public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCt2geFOwgsihu1oAG3RghCqercNTMv1QUgVnJvyllJGllRDbD5cfit5u3yKPB50W5IOgm9p+21epSRYSEL9TwkSNuveI1LK4CFDOurT5QiOSXL/0pFScwhSFbYud3IzbMJ8dEj/hyRm+gnqHbO86CJRBvSvL6j1Wn9S1rTPbfa0VmMehTsD2Wk181TlddIUBMnG+Dd4eeIoi5ivEzfM8jX4NJXzadXG/wTIrsx471tBF7g8TzCcYDMgTQw9oEdR3wugFjfuUDSK/SYXFTUpDOufZefpENcSW9SPDVfzCeM6ludNKxZFqVGAKwc7BFMygAucZjwVgiKxWBDVRcqTmtuM+ujoBh+d/o4RVGTs9V0MSE8YSIqk91U+/PRlL1nXBk0KaLqzB6/EdZZWxkxfhzv+iDrPnvqQd+ayzV0KcbzIP6iCxFn4YDM9jPWBDjIksKhi3TB4XyW446v6ttord0eB6glWFytA1LJ7Y7aiKaOnWa5oW7IbCZtE7PFxp+dmTk= george.cairns@MJ001152"      
+    public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCzHlo7RjnSIv6PNFR/6zndLt4M/fSWUQpVon5jMQge4K+uMfaAbWIOtgVYm4+Z0gtNkDRPEJb8WaJTFFQUbmShR8k3gBDw3nnpXANbVcs/qvOtxatb2eFmgzjfxdWYxZQpagwwn2W/STw1Nslfpe9CpZJo5p4lqd1nmxmf48UamN56ulNR3iyaigNM4FIvpQdBfwLdqnEf1u5beXs0dui2QphGOsh4eta9cUX3wZYnxM7h8YZ1anfjy+/wuQRmJhf1FzU0aDV/BpafK6QhV7sNqqYgWoMHzfl01XC/abFopUGILzyHTDgXdiJlFMjooz6X8sJYGaOfIBcgoocFFF0lAMWbT4l8bAzTI1swvdVOwtreGZ++9BPqUn5effAgXSDBUG14Yk3PyplObrNwmm7dfdWyKP9mW4ucA/1cMPV8MmtLlq2j/lhdzD0fvjjS3IaYcoN1QlR07TwBr+wA2be3CuhON766Gzg5SGpjhhMw09bgyAxX5MX6x7Nc1xctWjc= gary.grant@L0852"
    }
-
 
 resource "aws_instance" "importmachine" {
 
@@ -52,7 +51,7 @@ resource "aws_instance" "importmachine" {
   instance_type               = "t3a.large"
   ami                         = local.application_data.accounts[local.environment].importmachine-ami
   vpc_security_group_ids      = [aws_security_group.importmachine.id]
-  monitoring                  = true
+  monitoring                  = false
   ebs_optimized               = true
   subnet_id                   = data.aws_subnet.private_az_a.id
   key_name                    = aws_key_pair.gary.key_name
