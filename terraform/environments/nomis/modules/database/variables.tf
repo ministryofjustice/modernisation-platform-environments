@@ -7,14 +7,14 @@ variable "ami_owner" {
   type        = string
   description = "Owner of AMI to be used to launch the database ec2 instance"
   default     = "self"
-  nullable = false
+  nullable    = false
 }
 
 variable "application_name" {
   type        = string
   description = "The name of the application.  This will be name of the environment in Modernisation Platform"
   default     = "nomis"
-  nullable = false
+  nullable    = false
   validation {
     condition     = can(regex("^[A-Za-z0-9][A-Za-z0-9-.]{1,61}[A-Za-z0-9]$", var.application_name))
     error_message = "Invalid name for application supplied in variable app_name."
@@ -24,8 +24,8 @@ variable "application_name" {
 variable "asm_data_capacity" {
   type        = number
   description = "Total capacity of the DATA disk group in GiB"
-  default = 5
-  nullable = false
+  default     = 5
+  nullable    = false
   validation {
     condition     = var.asm_data_capacity >= 5
     error_message = "The minimum capacity that can be specified for the DATA diskgroup is 5 GiB."
@@ -36,21 +36,21 @@ variable "asm_data_iops" {
   type        = number
   description = "Iops of the DATA disks"
   default     = 3000
-  nullable = false
+  nullable    = false
 }
 
 variable "asm_data_throughput" {
   type        = number
   description = "Throughput of the DATA disks in MiB/s"
   default     = 125
-  nullable = false
+  nullable    = false
 }
 
 variable "asm_flash_capacity" {
   type        = number
   description = "Total capacity of the FLASH disk group in GiB"
-  default = 2
-  nullable = false
+  default     = 2
+  nullable    = false
   validation {
     condition     = var.asm_flash_capacity >= 2
     error_message = "The minimum capacity that can be specified for the FLASH diskgroup is 2 GiB."
@@ -61,28 +61,28 @@ variable "asm_flash_iops" {
   type        = number
   description = "Iops of the FLASH disks"
   default     = 3000
-  nullable = false
+  nullable    = false
 }
 
 variable "asm_flash_throughput" {
   type        = number
   description = "Throughput of the FLASH disks in MB/s"
   default     = 125
-  nullable = false
+  nullable    = false
 }
 
 variable "availability_zone" {
   type        = string
   description = "The availability zone in which to deploy the infrastructure"
-  default = "eu-west-2a"
-  nullable = false
+  default     = "eu-west-2a"
+  nullable    = false
 }
 
 variable "business_unit" {
   type        = string
   description = "This corresponds to the VPC in which the application resides"
   default     = "hmpps"
-  nullable = false
+  nullable    = false
 }
 
 variable "extra_ingress_rules" {
@@ -95,14 +95,14 @@ variable "extra_ingress_rules" {
   }))
   description = "A list of extra ingress rules to be added to the database security group"
   default     = []
-  nullable = false
+  nullable    = false
 }
 
 variable "instance_type" {
   type        = string
   description = "ec2 instance type to use for the database"
   default     = "r6i.xlarge"
-  nullable = false
+  nullable    = false
 }
 
 variable "common_security_group_id" {
