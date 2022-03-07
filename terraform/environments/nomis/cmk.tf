@@ -26,26 +26,26 @@ data "aws_iam_policy_document" "shared_image_builder_cmk_policy" {
       "arn:aws:iam::${local.environment_management.account_ids["core-shared-services-production"]}:root"]
     }
   }
-  statement {
-    effect = "Allow"
-    actions = [
-      "kms:Create*",
-      "kms:Describe*",
-      "kms:Enable*",
-      "kms:List*",
-      "kms:Put*",
-      "kms:Update*",
-      "kms:Revoke*",
-      "kms:Disable*",
-      "kms:Get*",
-      "kms:Delete*",
-      "kms:ScheduleKeyDeletion",
-      "kms:CancelKeyDeletion"
-    ]
-    resources = ["*"]
-    principals {
-      type        = "AWS"
-      identifiers = ["arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:root"]
-    }
+}
+statement {
+  effect = "Allow"
+  actions = [
+    "kms:Create*",
+    "kms:Describe*",
+    "kms:Enable*",
+    "kms:List*",
+    "kms:Put*",
+    "kms:Update*",
+    "kms:Revoke*",
+    "kms:Disable*",
+    "kms:Get*",
+    "kms:Delete*",
+    "kms:ScheduleKeyDeletion",
+    "kms:CancelKeyDeletion"
+  ]
+  resources = ["*"]
+  principals {
+    type        = "AWS"
+    identifiers = ["arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:root"]
   }
 }
