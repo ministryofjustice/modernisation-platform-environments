@@ -239,7 +239,6 @@ data "aws_iam_policy_document" "packer_ansible_permissions" {
       "ec2:DescribeVpcs",
       "ec2:DescribeKeyPairs",
       "sts:DecodeAuthorizationMessage",
-      "kms:CreateKey",
       "kms:ReEncrypt*"
     ]
     resources = ["*"]
