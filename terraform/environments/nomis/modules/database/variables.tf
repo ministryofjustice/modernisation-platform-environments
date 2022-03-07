@@ -119,7 +119,7 @@ variable "name" {
 }
 
 variable "oracle_app_disk_size" {
-  type = map(any)
+  type        = map(any)
   description = "Capcity of each Oracle application disk, /u01 and /u02"
   default = {
     "/dev/sdb" = 100
