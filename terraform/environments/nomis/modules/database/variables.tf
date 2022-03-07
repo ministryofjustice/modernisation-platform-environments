@@ -72,7 +72,7 @@ variable "asm_flash_throughput" {
 }
 
 variable "availability_zone" {
-  type = string
+  type        = string
   description = "The availability zone in which to deploy the infrastructure"
   default = "eu-west-2a"
   nullable = false
