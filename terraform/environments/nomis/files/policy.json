@@ -2,6 +2,25 @@
     "Version": "2012-10-17",
     "Statement": [
 {
+    "Sid": "Allow administration of the key",
+                  "Effect": "Allow",
+                  "Principal": { "AWS": "arn:aws:iam::612659970365:root" },
+                  "Action": [
+                      "kms:Create*",
+                      "kms:Describe*",
+                      "kms:Enable*",
+                      "kms:List*",
+                      "kms:Put*",
+                      "kms:Update*",
+                      "kms:Revoke*",
+                      "kms:Disable*",
+                      "kms:Get*",
+                      "kms:Delete*",
+                      "kms:ScheduleKeyDeletion",
+                      "kms:CancelKeyDeletion"
+                  ],
+                  "Resource": "*"
+},{
     "Sid": "Allow external account 374269020027 use of the CMK",
     "Effect": "Allow",
     "Principal": {
