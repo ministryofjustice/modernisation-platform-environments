@@ -15,6 +15,11 @@
                     "asm_data_throughout": 125,
                     "asm_flash_capacity": 100,
                     "availability_zone": "eu-west-2a"
+                },
+                "CNNOMT1": {
+                    "ami_name": "nomis_db_CNOMT1-2022-03-04*",
+                    "asm_data_capacity": 200,
+                    "availability_zone": "eu-west-2a"
                 }
             },
             "stacks": {
