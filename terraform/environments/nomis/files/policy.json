@@ -1,0 +1,34 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+{
+    "Sid": "Allow external account 374269020027 use of the CMK",
+    "Effect": "Allow",
+    "Principal": {
+        "AWS": [
+            "arn:aws:iam::374269020027:root"
+        ]
+    },
+    "Action": [
+        "kms:Encrypt",
+        "kms:Decrypt",
+        "kms:ReEncrypt*",
+        "kms:GenerateDataKey*",
+        "kms:DescribeKey"
+    ],
+    "Resource": "*"
+},{
+    "Sid": "Allow attachment of persistent resources in external account 374269020027",
+    "Effect": "Allow",
+    "Principal": {
+        "AWS": [
+            "arn:aws:iam::374269020027:root"
+        ]
+    },
+    "Action": [
+        "kms:CreateGrant"
+    ],
+    "Resource": "*"
+ }
+]
+}
