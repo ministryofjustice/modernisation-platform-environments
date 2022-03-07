@@ -50,7 +50,26 @@ resource "aws_security_group_rule" "allow_web_users" {
     "10.175.72.157/32",  # Alan Brightmore
     "5.148.32.215/32",   # NCC Group proxy ITHC
     "195.95.131.110/32", # NCC Group proxy ITHC
-    "195.95.131.112/32", # NCC Group proxy ITHC
+    "195.95.131.112/32", # NCC Group proxy ITHC,
+    "194.33.196.1/32",   # ATOS PROXY IPS
+    "194.33.196.2/32",   # ATOS PROXY IPS
+    "194.33.196.3/32",   # ATOS PROXY IPS
+    "194.33.196.4/32",   # ATOS PROXY IPS
+    "194.33.196.5/32",   # ATOS PROXY IPS
+    "194.33.196.6/32",   # ATOS PROXY IPS
+    "194.33.196.46/32",  # ATOS PROXY IPS
+    "194.33.196.47/32",  # ATOS PROXY IPS
+    "194.33.196.48/32",  # ATOS PROXY IPS
+    "194.33.192.1/32",   # ATOS PROXY IPS
+    "194.33.192.2/32",   # ATOS PROXY IPS
+    "194.33.192.3/32",   # ATOS PROXY IPS
+    "194.33.192.4/32",   # ATOS PROXY IPS
+    "194.33.192.5/32",   # ATOS PROXY IPS
+    "194.33.192.6/32",   # ATOS PROXY IPS
+    "194.33.192.46/32",  # ATOS PROXY IPS
+    "194.33.192.47/32",  # ATOS PROXY IPS
+    "194.33.192.48/32",  # ATOS PROXY IPS
+
   ]
   ipv6_cidr_blocks = [
     "2a00:23c7:2416:3d01:c98d:4432:3c83:d937/128"
