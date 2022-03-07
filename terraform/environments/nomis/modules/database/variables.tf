@@ -21,7 +21,7 @@ variable "application_name" {
 
 variable "asm_data_capacity" {
   type        = number
-  description = "Total capcity of the DATA disk group in GiB"
+  description = "Total capacity of the DATA disk group in GiB"
   default = 5
   validation {
     condition     = var.asm_data_capacity >= 5
@@ -37,13 +37,13 @@ variable "asm_data_iops" {
 
 variable "asm_data_throughput" {
   type        = number
-  description = "Throughout of the DATA disks in MiB/s"
+  description = "Throughput of the DATA disks in MiB/s"
   default     = 125
 }
 
 variable "asm_flash_capacity" {
   type        = number
-  description = "Total capcity of the FLASH disk group in GiB"
+  description = "Total capacity of the FLASH disk group in GiB"
   default = 2
   validation {
     condition     = var.asm_flash_capacity >= 2
@@ -59,13 +59,13 @@ variable "asm_flash_iops" {
 
 variable "asm_flash_throughput" {
   type        = number
-  description = "Throughout of the FLASH disks in MB/s"
+  description = "Throughput of the FLASH disks in MB/s"
   default     = 125
 }
 
 variable "availability_zone" {
   type = string
-  description = "The availability zone in which to deploy the infrastructure, a, b or c"
+  description = "The availability zone in which to deploy the infrastructure"
   default = "eu-west-2a"
 }
 
@@ -105,7 +105,7 @@ variable "environment" {
 
 variable "instance_profile_name" {
   type        = string
-  description = "IAM instance profile to be attached to the instances"
+  description = "IAM instance profile to be attached to the instance"
 }
 
 variable "key_name" {
@@ -115,7 +115,7 @@ variable "key_name" {
 
 variable "name" {
   type        = string
-  description = "Provide a unique name for the stack"
+  description = "Provide a unique name for the instance"
 }
 
 variable "oracle_app_disk_size" {
