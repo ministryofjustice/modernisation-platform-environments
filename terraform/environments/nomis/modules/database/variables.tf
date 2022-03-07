@@ -22,7 +22,7 @@ variable "application_name" {
 variable "asm_data_capacity" {
   type        = number
   description = "Total capacity of the DATA disk group in GiB"
-  default = 5
+  default     = 5
   validation {
     condition     = var.asm_data_capacity >= 5
     error_message = "The minimum capacity that can be specified for the DATA diskgroup is 5 GiB."
@@ -44,7 +44,7 @@ variable "asm_data_throughput" {
 variable "asm_flash_capacity" {
   type        = number
   description = "Total capacity of the FLASH disk group in GiB"
-  default = 2
+  default     = 2
   validation {
     condition     = var.asm_flash_capacity >= 2
     error_message = "The minimum capacity that can be specified for the FLASH diskgroup is 2 GiB."
@@ -64,9 +64,9 @@ variable "asm_flash_throughput" {
 }
 
 variable "availability_zone" {
-  type = string
+  type        = string
   description = "The availability zone in which to deploy the infrastructure"
-  default = "eu-west-2a"
+  default     = "eu-west-2a"
 }
 
 variable "business_unit" {
