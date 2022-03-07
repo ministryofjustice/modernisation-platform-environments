@@ -1,7 +1,7 @@
 resource "aws_kms_key" "nomis-cmk" {
   description             = "Nomis Managed Key for AMI Sharing"
   deletion_window_in_days = 10
-  policy                  = data.aws_iam_policy_document.shared_image_builder_cmk_policy
+  policy                  = data.aws_iam_policy_document.shared_image_builder_cmk_policy.json
 }
 
 resource "aws_kms_alias" "nomis-key" {
@@ -9,7 +9,7 @@ resource "aws_kms_alias" "nomis-key" {
   target_key_id = aws_kms_key.nomis-cmk.key_id
 }
 
-data "aws_iam_policy_document" "shared_image_builder_cmk_policy" { 
+data "aws_iam_policy_document" "shared_image_builder_cmk_policy" {
     statement {
         effect = "Allow"
         actions =  ["kms:Encrypt",
