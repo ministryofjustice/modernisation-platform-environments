@@ -54,7 +54,7 @@ resource "aws_security_group_rule" "allow_web_users" {
     "195.95.131.110/32", # NCC Group proxy ITHC
     "195.95.131.112/32", # NCC Group proxy ITHC
     "81.152.37.83/32",   # Anand
-    "77.108.144.130/32"  # AL Office
+    "77.108.144.130/32",  # AL Office
     "194.33.196.1/32",   # ATOS PROXY IPS
     "194.33.196.2/32",   # ATOS PROXY IPS
     "194.33.196.3/32",   # ATOS PROXY IPS
