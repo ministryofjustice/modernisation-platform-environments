@@ -50,8 +50,6 @@ data "aws_iam_policy_document" "shared_image_builder_cmk_policy" {
     }
   }
 
-}
-
 # {
 #     "Version": "2012-10-17",
 #     "Statement": [
