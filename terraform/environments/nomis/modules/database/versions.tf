@@ -6,4 +6,5 @@ terraform {
       configuration_aliases = [aws.core-vpc]
     }
   }
+  required_version = ">= 1.1.0"
 }

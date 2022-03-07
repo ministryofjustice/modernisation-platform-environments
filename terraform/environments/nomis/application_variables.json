@@ -19,6 +19,7 @@
                 "CNNOMT1": {
                     "ami_name": "nomis_db_CNOMT1-2022-03-04*",
                     "asm_data_capacity": 200,
+                    "asm_flash_capacity": 2,
                     "availability_zone": "eu-west-2a"
                 }
             },
