@@ -415,10 +415,10 @@ resource "aws_cloudfront_distribution" "distribution" {
   origin {
     domain_name   = aws_lb.waf_lb.dns_name
     origin_id            = "xp-ingestion"
-    custom_header {
-      name = "X-Origin-Token"
-      value = random_string.origin_token.result
-    }
+    # custom_header {
+    #   name = "X-Origin-Token"
+    #   value = random_string.origin_token.result
+    # }
 
     custom_origin_config {
       origin_ssl_protocols  = ["SSLv3","TLSv1","TLSv1.1", "TLSv1.2"]
@@ -450,7 +450,7 @@ resource "aws_cloudfront_distribution" "distribution" {
 
     forwarded_values {
       query_string = true
-      headers        = ["X-Origin-Token"]
+      # headers        = ["X-Origin-Token"]
 
       cookies {
         forward = "all"
