@@ -9,7 +9,7 @@ resource "aws_kms_alias" "nomis-key" {
   target_key_id = aws_kms_key.nomis-cmk.key_id
 }
 
-data "aws_iam_policy_document" "shared_image_builder_cmk_policy" {
+data "aws_iam_policy_document" "shared_image_builder_cmk_policy" { 
     statement {
         effect = "Allow"
         actions =  ["kms:Encrypt",
@@ -48,6 +48,7 @@ data "aws_iam_policy_document" "shared_image_builder_cmk_policy" {
             identifiers = ["arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:root"]
         }
     }
+
 }
 
 # {
