@@ -4,7 +4,7 @@
       "public_dns_name_ingestion"           :  "dev-ingest.cjsonline.gov.uk",
       "public_dns_name_web"                 :  "dev-pportal.cjsonline.gov.uk",
       "bucket_prefix"                       :  "vm-import-s3-bucket",
-      "importmachine-ami"                   :  "ami-0b33dfec9e4072ca1",
+      "importmachine-ami"                   :  "ami-03778fe8eef3985a7",
       "importmachine-data-snapshot"         :  "snap-0281146c5951823fa",
       "infra1-ami"                          :  "ami-0636a37a2432d047d",
       "infra1-disk-1-snapshot"              :  "snap-078d43138754490c0",
@@ -27,8 +27,8 @@
       "suprig05-ami"                        :  "ami-023807cc724df2fd5",
       "suprig05-disk-1-snapshot"            :  "snap-0b6d529f807eb9a6a",
       "XHBPRESMS01-ami"                     :  "ami-0d97cd2809f84fedb",
-      "buildserver-ami"                     :  "ami-023807cc724df2fd5",
-      "buildserver-disk-1-snapshot"         :  "snap-0b6d529f807eb9a6a"
+      "buildserver-ami"                     :  "ami-0ab0d0d090270671f",
+      "buildserver-disk-1-snapshot"         :  "snap-0626f8276cc1afc2f"
     },
     "preproduction": {
       "public_dns_name_web"           : "prepportal.cjsonline.gov.uk",
@@ -56,7 +56,7 @@
       "suprig05-disk-1-snapshot"      : "snap-0b6d529f807eb9a6a",
       "XHBPRESMS01-ami"               : "ami-001caddd4fc94fc39",
       "importmachine-ami"             : "ami-0b33dfec9e4072ca1",
-      "buildserver-ami"               : "ami-05254896def06c89a",
+      "buildserver-ami"               : "ami-0da5babad86576eb8",
       "buildserver-disk-1-snapshot"   : "snap-0b6d529f807eb9a6a"
     } ,
     "production": {
@@ -85,6 +85,7 @@
       "suprig05-disk-1-snapshot"      : "snap-08b1c019201557295",
       "XHBPRESMS01-ami"               : "ami-08f52dea252c952c1",
       "importmachine-ami"             : "ami-0f90e80b299573521",
+      "importmachine-data-snapshot"   : "snap-0281146c5951823fa",
       "buildserver-ami"               : "ami-0e52c25843d72f2a5",
       "buildserver-disk-1-snapshot"   : "snap-08b1c019201557295"
     }
