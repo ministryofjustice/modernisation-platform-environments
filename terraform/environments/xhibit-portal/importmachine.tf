@@ -41,6 +41,7 @@ resource "aws_security_group" "importmachine" {
    }
  
 
+
 resource "aws_instance" "importmachine" {
 
   depends_on                  = [aws_security_group.importmachine]
