@@ -57,6 +57,12 @@ resource "aws_eip" "exchange" {
 }
 
 resource "aws_instance" "exchange-server" {
+
+  lifecycle {
+    # Every commit is making the exchange server recreate itself. This next line is an attempt to work around this. 
+    ignore_changes = ["associate_public_ip_address"]
+  }
+
   depends_on                  = [aws_security_group.exchange-server]
   instance_type               = "t2.medium"
   ami                         = local.application_data.accounts[local.environment].infra6-ami
