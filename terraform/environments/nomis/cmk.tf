@@ -20,8 +20,11 @@ data "aws_iam_policy_document" "shared_image_builder_cmk_policy" {
                     "kms:DescribeKey",
                     "kms:CreateGrant"]
         resources = ["*"]
-        principals = ["arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:root",
-                      "arn:aws:iam::${local.environment_management.account_ids["core-shared-services-production"]}:root"]
+        principals {
+            type = "AWS"
+            identifiers = ["arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:root",
+                           "arn:aws:iam::${local.environment_management.account_ids["core-shared-services-production"]}:root"]
+        }
     }
     statement {
         effect = "Allow"
@@ -40,8 +43,10 @@ data "aws_iam_policy_document" "shared_image_builder_cmk_policy" {
                     "kms:CancelKeyDeletion"
                 ]
         resources = ["*"]
-        principals = ["arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:root"]
-
+        principals {
+            type = "AWS"
+            identifiers = ["arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:root"]
+        }
     }
 }
 
