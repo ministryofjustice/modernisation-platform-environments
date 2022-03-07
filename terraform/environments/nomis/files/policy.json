@@ -33,6 +33,7 @@
         "kms:Encrypt",
         "kms:Decrypt",
         "kms:ReEncrypt*",
+        "kms:ReEncryptFrom",
         "kms:GenerateDataKey*",
         "kms:DescribeKey"
     ],
