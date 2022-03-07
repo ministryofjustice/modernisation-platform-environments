@@ -75,7 +75,7 @@ resource "aws_instance" "database" {
     delete_on_termination = true
     encrypted             = true
     # volume_size           = lookup(var.drive_map, data.aws_ami.database.root_device_name, local.root_device_size)
-    volume_type           = "gp3"
+    volume_type = "gp3"
   }
   dynamic "ephemeral_block_device" { # block devices specified inline cannot be resized later so we need to make sure they are not mounted here
     for_each = [for bdm in data.aws_ami.database.block_device_mappings : bdm if bdm.device_name != data.aws_ami.database.root_device_name]
@@ -143,7 +143,7 @@ resource "aws_ebs_volume" "asm_data" {
   iops              = var.asm_data_iops
   snapshot_id       = local.block_device_map[each.key].ebs.snapshot_id
   size              = local.asm_data_disk_size
-  throughput = var.asm_data_throughput
+  throughput        = var.asm_data_throughput
   type              = "gp3"
 
   tags = merge(
@@ -170,7 +170,7 @@ resource "aws_ebs_volume" "asm_flash" {
   iops              = var.asm_flash_iops
   snapshot_id       = local.block_device_map[each.key].ebs.snapshot_id
   size              = local.asm_flash_disk_size
-  throughput = var.asm_flash_throughput
+  throughput        = var.asm_flash_throughput
   type              = "gp3"
 
   tags = merge(
