@@ -13,7 +13,8 @@
                     "asm_data_capacity": 750,
                     "asm_data_iops": 3000,
                     "asm_data_throughout": 125,
-                    "asm_flash_capacity": 100
+                    "asm_flash_capacity": 100,
+                    "availability_zone": "eu-west-2a"
                 }
             },
             "stacks": {

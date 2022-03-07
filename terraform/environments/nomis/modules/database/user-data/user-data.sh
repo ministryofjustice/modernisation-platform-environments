@@ -1,5 +1,5 @@
 #!/bin/bash
-# Note use of $${} syntax in paces - this is because this file is being used as a terraform template so need to escape variable substitution
+# Note use of $${} syntax in places - this is because this file is being used as a terraform template so need to escape variable substitution
 set -e
 
 # some vars
@@ -58,6 +58,10 @@ swap_disk() {
 
 disks() {
     
+    echo "+++Resizing Oracle application disks"
+    xfs_growfs -d /u01
+    xfs_growfs -d /u02
+    
     echo "+++Resizing ASM disks..."
     # find the oracleasm partitions
     IFS=$'\n'
@@ -113,7 +117,8 @@ reconfigure_oracle_has() {
         while [[ "$i" -le 10 ]]; do
             asm_status=$(srvctl status asm | grep "ASM is running")
             if [[ -n "$asm_status" ]]; then
-                asmcmd mount -a # returns exit code zero even if already mounted
+                asmcmd mount DATA # returns exit code zero even if already mounted
+                asmcmd mount FLASH
 
                 # resize disks
                 sqlplus -s / as sysasm <<< "alter diskgroup DATA resize all;"
