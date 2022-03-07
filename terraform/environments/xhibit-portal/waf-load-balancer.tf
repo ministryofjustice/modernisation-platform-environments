@@ -445,7 +445,7 @@ resource "aws_cloudfront_distribution" "distribution" {
 
   default_cache_behavior {
     allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
-    cached_methods   = ["GET"]
+    cached_methods   = ["HEAD", "GET"]
     target_origin_id     = "xp-ingestion"
 
     forwarded_values {
