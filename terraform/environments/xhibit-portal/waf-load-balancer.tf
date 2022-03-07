@@ -55,6 +55,25 @@ resource "aws_security_group_rule" "allow_web_users" {
     "195.95.131.112/32", # NCC Group proxy ITHC
     "81.152.37.83/32",   # Anand
     "77.108.144.130/32"  # AL Office
+    "194.33.196.1/32",   # ATOS PROXY IPS
+    "194.33.196.2/32",   # ATOS PROXY IPS
+    "194.33.196.3/32",   # ATOS PROXY IPS
+    "194.33.196.4/32",   # ATOS PROXY IPS
+    "194.33.196.5/32",   # ATOS PROXY IPS
+    "194.33.196.6/32",   # ATOS PROXY IPS
+    "194.33.196.46/32",  # ATOS PROXY IPS
+    "194.33.196.47/32",  # ATOS PROXY IPS
+    "194.33.196.48/32",  # ATOS PROXY IPS
+    "194.33.192.1/32",   # ATOS PROXY IPS
+    "194.33.192.2/32",   # ATOS PROXY IPS
+    "194.33.192.3/32",   # ATOS PROXY IPS
+    "194.33.192.4/32",   # ATOS PROXY IPS
+    "194.33.192.5/32",   # ATOS PROXY IPS
+    "194.33.192.6/32",   # ATOS PROXY IPS
+    "194.33.192.46/32",  # ATOS PROXY IPS
+    "194.33.192.47/32",  # ATOS PROXY IPS
+    "194.33.192.48/32",  # ATOS PROXY IPS
+
   ]
   ipv6_cidr_blocks = [
     "2a00:23c7:2416:3d01:c98d:4432:3c83:d937/128"
@@ -408,3 +427,65 @@ resource "aws_wafv2_web_acl_logging_configuration" "waf_logs" {
   log_destination_configs = ["${aws_s3_bucket.waf_logs.arn}"]
   resource_arn            = aws_wafv2_web_acl.waf_acl.arn
 }
+
+
+# resource "random_string" "origin_token" {
+#   length = 30
+#   special = false
+# }
+
+# resource "aws_cloudfront_distribution" "distribution" {
+#   origin {
+#     domain_name   = aws_lb.waf_lb.dns_name
+#     origin_id            = "xp-ingestion"
+#     # custom_header {
+#     #   name = "X-Origin-Token"
+#     #   value = random_string.origin_token.result
+#     # }
+
+#     custom_origin_config {
+#       origin_ssl_protocols  = ["SSLv3","TLSv1","TLSv1.1", "TLSv1.2"]
+#       http_port              = 80
+#       https_port             = 443
+#       origin_protocol_policy = "http-only"
+#     }
+#   }
+
+#   restrictions {
+#     geo_restriction {
+#       restriction_type = "whitelist"
+#       locations        = [ "GB"]
+#     }
+#   }
+
+#   viewer_certificate {
+#     acm_certificate_arn = aws_acm_certificate.waf_lb_cert.arn
+#     ssl_support_method = "sni-only"
+#   }
+
+#   enabled = true
+#   # aliases   = ["yoursite.example.com"]
+
+#   default_cache_behavior {
+#     allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
+#     cached_methods   = ["HEAD", "GET"]
+#     target_origin_id     = "xp-ingestion"
+
+#     forwarded_values {
+#       query_string = true
+#       # headers        = ["X-Origin-Token"]
+
+#       cookies {
+#         forward = "all"
+#       }
+#     }
+
+#     viewer_protocol_policy = "redirect-to-https"
+#     min_ttl                = 0
+#     default_ttl            = 3600
+#     max_ttl                = 86400
+#   }
+# }
+
+
+
