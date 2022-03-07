@@ -47,7 +47,7 @@
           "db_instance_class": "db.m5.large",
           "db_user": "admin",
           "db_allocated_storage": "100",
-          "db_snapshot_identifier": "arn:aws:rds:eu-west-2:322518575883:snapshot:performance-hub-final-snapshot-02032022",
+          "db_snapshot_identifier": "arn:aws:rds:eu-west-2:322518575883:snapshot:performance-hub-final-snapshot-new-kms-key-07032022",
           "env_name": "preproduction",
           "system_account_id": "C67AF61C-F010-4C37-8912-99308FD03241",
           "friendly_name": "HMPPS Test Hub",
