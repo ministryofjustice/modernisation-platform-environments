@@ -4,7 +4,6 @@
 * @modernisation-platform
 /terraform/environments/analytical-platform-data @analytical-platform @modernisation-platform
 /terraform/environments/bichard7 @cjse-bichard7-next @modernisation-platform
-/terraform/environments/dex-ta @dex-ta @modernisation-platform
 /terraform/environments/mi-platform @analytical-platform @modernisation-platform
 /terraform/environments/nomis @studio-webops @modernisation-platform
 /terraform/environments/performance-hub @performance-hub-developers @modernisation-platform

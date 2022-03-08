@@ -140,7 +140,7 @@ variable "weblogic_drive_map" {
 variable "weblogic_instance_type" {
   type        = string
   description = "ec2 instance type to use for the weblogic instance"
-  default     = "t2.medium"
+  default     = "t2.large"
 }
 
 variable "use_default_creds" {
