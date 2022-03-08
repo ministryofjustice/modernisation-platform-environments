@@ -71,7 +71,6 @@ resource "aws_security_group_rule" "allow_web_users" {
     "194.33.192.46/32",  # ATOS PROXY IPS
     "194.33.192.47/32",  # ATOS PROXY IPS
     "194.33.192.48/32",  # ATOS PROXY IPS
-
   ]
   ipv6_cidr_blocks = [
     "2a00:23c7:2416:3d01:c98d:4432:3c83:d937/128"
@@ -265,6 +264,17 @@ resource "aws_alb_listener_rule" "ingestion_listener_rule" {
       ]
     }
   }
+
+  # condition {
+  #   source_ip {
+  #     values = [ # Maximum 5 values
+  #       "194.33.196.0/29",   # ATOS PROXY IPS
+  #       "194.33.196.32/27",  # ATOS PROXY IPS
+  #       "194.33.192.0/29",   # ATOS PROXY IPS
+  #       "194.33.192.32/27",  # ATOS PROXY IPS
+  #     ]
+  #   }
+  # }
 
 }
 
