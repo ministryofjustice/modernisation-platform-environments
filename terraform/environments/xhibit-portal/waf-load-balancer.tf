@@ -50,7 +50,27 @@ resource "aws_security_group_rule" "allow_web_users" {
     "10.175.72.157/32",  # Alan Brightmore
     "5.148.32.215/32",   # NCC Group proxy ITHC
     "195.95.131.110/32", # NCC Group proxy ITHC
-    "195.95.131.112/32", # NCC Group proxy ITHC
+    "195.95.131.112/32", # NCC Group proxy ITHC,
+    "194.33.196.1/32",   # ATOS PROXY IPS
+    "194.33.196.2/32",   # ATOS PROXY IPS
+    "194.33.196.3/32",   # ATOS PROXY IPS
+    "194.33.196.4/32",   # ATOS PROXY IPS
+    "194.33.196.5/32",   # ATOS PROXY IPS
+    "194.33.196.6/32",   # ATOS PROXY IPS
+    "194.33.196.46/32",  # ATOS PROXY IPS
+    "194.33.196.47/32",  # ATOS PROXY IPS
+    "194.33.196.48/32",  # ATOS PROXY IPS
+    "194.33.192.1/32",   # ATOS PROXY IPS
+    "194.33.192.2/32",   # ATOS PROXY IPS
+    "194.33.192.3/32",   # ATOS PROXY IPS
+    "194.33.192.4/32",   # ATOS PROXY IPS
+    "194.33.192.5/32",   # ATOS PROXY IPS
+    "194.33.192.6/32",   # ATOS PROXY IPS
+    "194.33.192.46/32",  # ATOS PROXY IPS
+    "194.33.192.47/32",  # ATOS PROXY IPS
+    "194.33.192.48/32",  # ATOS PROXY IPS
+    "195.59.75.151/32",  # New proxy IPs from Prashanth for testing ingestion
+    "195.59.75.152/32",  # New proxy IPs from Prashanth for testing ingestion
   ]
   ipv6_cidr_blocks = [
     "2a00:23c7:2416:3d01:c98d:4432:3c83:d937/128"
@@ -245,6 +265,17 @@ resource "aws_alb_listener_rule" "ingestion_listener_rule" {
     }
   }
 
+  # condition {
+  #   source_ip {
+  #     values = [ # Maximum 5 values
+  #       "194.33.196.0/29",   # ATOS PROXY IPS
+  #       "194.33.196.32/27",  # ATOS PROXY IPS
+  #       "194.33.192.0/29",   # ATOS PROXY IPS
+  #       "194.33.192.32/27",  # ATOS PROXY IPS
+  #     ]
+  #   }
+  # }
+
 }
 
 resource "aws_acm_certificate" "waf_lb_cert" {
@@ -413,12 +444,12 @@ resource "aws_wafv2_web_acl_logging_configuration" "waf_logs" {
 
 # resource "aws_cloudfront_distribution" "distribution" {
 #   origin {
-#     domain_name   = aws_lb.waf_lb.arn
+#     domain_name   = aws_lb.waf_lb.dns_name
 #     origin_id            = "xp-ingestion"
-#     custom_header {
-#       name = "X-Origin-Token"
-#       value = random_string.origin_token.result
-#     }
+#     # custom_header {
+#     #   name = "X-Origin-Token"
+#     #   value = random_string.origin_token.result
+#     # }
 
 #     custom_origin_config {
 #       origin_ssl_protocols  = ["SSLv3","TLSv1","TLSv1.1", "TLSv1.2"]
@@ -427,8 +458,6 @@ resource "aws_wafv2_web_acl_logging_configuration" "waf_logs" {
 #       origin_protocol_policy = "http-only"
 #     }
 #   }
-
-
 
 #   restrictions {
 #     geo_restriction {
@@ -443,16 +472,16 @@ resource "aws_wafv2_web_acl_logging_configuration" "waf_logs" {
 #   }
 
 #   enabled = true
-#   aliases   = ["yoursite.example.com"]
+#   # aliases   = ["yoursite.example.com"]
 
 #   default_cache_behavior {
 #     allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
-#     cached_methods   = []
+#     cached_methods   = ["HEAD", "GET"]
 #     target_origin_id     = "xp-ingestion"
 
 #     forwarded_values {
 #       query_string = true
-#       headers        = ["X-Origin-Token"]
+#       # headers        = ["X-Origin-Token"]
 
 #       cookies {
 #         forward = "all"
