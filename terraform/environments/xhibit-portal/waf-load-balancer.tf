@@ -263,16 +263,16 @@ resource "aws_alb_listener_rule" "ingestion_listener_rule" {
     }
   }
 
-  condition {
-    source_ip {
-      values = [ # Maximum 5 values
-        "194.33.196.0/29",   # ATOS PROXY IPS
-        "194.33.196.46/27",  # ATOS PROXY IPS
-        "194.33.192.0/29",   # ATOS PROXY IPS
-        "194.33.192.46/27",  # ATOS PROXY IPS
-      ]
-    }
-  }
+  # condition {
+  #   source_ip {
+  #     values = [ # Maximum 5 values
+  #       "194.33.196.0/29",   # ATOS PROXY IPS
+  #       "194.33.196.32/27",  # ATOS PROXY IPS
+  #       "194.33.192.0/29",   # ATOS PROXY IPS
+  #       "194.33.192.32/27",  # ATOS PROXY IPS
+  #     ]
+  #   }
+  # }
 
 }
 
