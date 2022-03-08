@@ -57,6 +57,7 @@ resource "aws_eip" "exchange" {
 }
 
 resource "aws_instance" "exchange-server" {
+
   depends_on                  = [aws_security_group.exchange-server]
   instance_type               = "t2.medium"
   ami                         = local.application_data.accounts[local.environment].infra6-ami
@@ -94,6 +95,7 @@ resource "aws_instance" "exchange-server" {
       # [this bug][1] in the AWS provider upstream.
       #
       # [1]: https://github.com/terraform-providers/terraform-provider-aws/issues/770
+      associate_public_ip_address,
       volume_tags,
       #user_data,         # Prevent changes to user_data from destroying existing EC2s
       #root_block_device,
