@@ -177,7 +177,7 @@ resource "aws_lb_target_group_attachment" "ingestion-server-attachment" {
 }
 
 data "aws_acm_certificate" "ingestion_cert" {
-  domain   = local.application_data.accounts[local.environment].public_dns_name_web
+  domain   = local.application_data.accounts[local.environment].public_dns_name_ingestion
   statuses = ["ISSUED"]
 }
 
