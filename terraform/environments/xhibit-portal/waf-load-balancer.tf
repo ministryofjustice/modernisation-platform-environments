@@ -303,7 +303,7 @@ resource "aws_route53_record" "waf_lb_cname" {
 
 resource "aws_acm_certificate" "waf_lb_cert" {
 
-  domain_name       =  local.application_data.accounts[local.environment].public_dns_name_web,
+  domain_name       =  local.application_data.accounts[local.environment].public_dns_name_web
   validation_method = "DNS"
 
   tags = {
