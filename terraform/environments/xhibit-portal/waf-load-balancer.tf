@@ -290,7 +290,7 @@ resource "aws_route53_record" "waf_lb_cname" {
   provider = aws.core-vpc
 
   zone_id = data.aws_route53_zone.external_r53_zone.zone_id
-  name    = local.application_data.accounts[local.environment].loadbalancer_cname_target + ".${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk."
+  name    = "${local.application_data.accounts[local.environment].loadbalancer_cname_target}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk."
   type    = "CNAME"
 
   alias {
