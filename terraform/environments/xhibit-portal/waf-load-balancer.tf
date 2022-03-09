@@ -176,6 +176,10 @@ resource "aws_lb_target_group_attachment" "ingestion-server-attachment" {
   port             = 80
 }
 
+data "aws_acm_certificate" "ingestion_cert" {
+  domain   = local.application_data.accounts[local.environment].public_dns_name_web
+  statuses = ["ISSUED"]
+}
 
 resource "aws_lb_listener" "waf_lb_listener" {
   depends_on = [
@@ -188,12 +192,17 @@ resource "aws_lb_listener" "waf_lb_listener" {
   port              = "443"
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = aws_acm_certificate.waf_lb_cert.arn
+  certificate_arn   = aws_acm_certificate.ingestion_cert.arn
 
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.waf_lb_web_tg.arn
   }
+}
+
+resource "aws_lb_listener_certificate" "main_portal_cert" {
+  listener_arn    = aws_lb_listener.waf_lb_listener.arn
+  certificate_arn = aws_acm_certificate.waf_lb_cert.arn
 }
 
 
@@ -287,6 +296,8 @@ data "aws_route53_zone" "external_r53_zone" {
 }
 
 resource "aws_route53_record" "waf_lb_cname" {
+  # ingest.cjsonline.gov.uk points at this name. We can then point this name at whatever we like.
+
   provider = aws.core-vpc
 
   zone_id = data.aws_route53_zone.external_r53_zone.zone_id
