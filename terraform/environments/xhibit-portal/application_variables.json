@@ -3,7 +3,7 @@
     "development": {
       "public_dns_name_ingestion"           :  "dev-ingest.cjsonline.gov.uk",
       "public_dns_name_web"                 :  "dev-pportal.cjsonline.gov.uk",
-      "loadbalancer_cname_target"           :  "devxplb.modernisation-platform.service.justice.gov.uk",
+      "loadbalancer_cname_target"           :  "devxplb",
       "bucket_prefix"                       :  "vm-import-s3-bucket",
       "importmachine-ami"                   :  "ami-03778fe8eef3985a7",
       "importmachine-data-snapshot"         :  "snap-0281146c5951823fa",
@@ -34,7 +34,7 @@
     "preproduction": {
       "public_dns_name_web"           : "prepportal.cjsonline.gov.uk",
       "public_dns_name_ingestion"     : "preingest.cjsonline.gov.uk",
-      "loadbalancer_cname_target"     : "prexplb.modernisation-platform.service.justice.gov.uk",
+      "loadbalancer_cname_target"     : "prexplb",
       "bucket_prefix"                 : "vm-import-s3-bucket",
       "importmachine-data-snapshot"   : "snap-0281146c5951823fa",
       "infra1-ami"                    : "ami-0bb169e178f3b3da8",
@@ -64,7 +64,7 @@
     "production": {
       "public_dns_name_web"           : "pportal.cjsonline.gov.uk",
       "bucket_prefix"                 : "vm-import-s3-bucket",
-      "loadbalancer_cname_target"     : "prodxplb.modernisation-platform.service.justice.gov.uk",
+      "loadbalancer_cname_target"     : "prodxplb",
       "infra1-ami"                    : "ami-0a571433a4c7fd6c9" ,
       "infra1-disk-1-snapshot"        : "snap-08507bf59326a5879",
       "infra2-ami"                    : "ami-08d70a362694282b8",

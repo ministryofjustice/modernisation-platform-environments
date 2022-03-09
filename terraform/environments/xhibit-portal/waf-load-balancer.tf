@@ -279,11 +279,18 @@ resource "aws_alb_listener_rule" "ingestion_listener_rule" {
 }
 
 
+data "aws_route53_zone" "external_r53_zone" {
+  provider = aws.core-vpc
+
+  name         = "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk."
+  private_zone = false
+}
+
 resource "aws_route53_record" "waf_lb_cname" {
   provider = aws.core-vpc
 
   zone_id = data.aws_route53_zone.external_r53_zone.zone_id
-  name    = local.application_data.accounts[local.environment].loadbalancer_cname_target
+  name    = local.application_data.accounts[local.environment].loadbalancer_cname_target + ".${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk."
   type    = "CNAME"
 
   alias {
@@ -294,15 +301,10 @@ resource "aws_route53_record" "waf_lb_cname" {
 }
 
 
-
 resource "aws_acm_certificate" "waf_lb_cert" {
 
-  domain_name       = local.application_data.accounts[local.environment].loadbalancer_cname_target
+  domain_name       =  local.application_data.accounts[local.environment].public_dns_name_web,
   validation_method = "DNS"
-
-  subject_alternative_names = [
-    local.application_data.accounts[local.environment].public_dns_name_web,
-  ]
 
   tags = {
     Environment = local.environment
