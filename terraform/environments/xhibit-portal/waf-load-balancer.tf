@@ -278,13 +278,31 @@ resource "aws_alb_listener_rule" "ingestion_listener_rule" {
 
 }
 
+
+resource "aws_route53_record" "waf_lb_cname" {
+  provider = aws.core-vpc
+
+  zone_id = data.aws_route53_zone.external_r53_zone.zone_id
+  name    = local.application_data.accounts[local.environment].loadbalancer_cname_target
+  type    = "CNAME"
+
+  alias {
+    name                   = aws_lb.waf_lb.dns_name
+    zone_id                = aws_lb.waf_lb.zone_id
+    evaluate_target_health = true
+  }
+}
+
+
+
 resource "aws_acm_certificate" "waf_lb_cert" {
-  domain_name       = local.application_data.accounts[local.environment].public_dns_name_web
+
+  domain_name       = local.application_data.accounts[local.environment].loadbalancer_cname_target,
   validation_method = "DNS"
 
-  # subject_alternative_names = [
-  #   local.application_data.accounts[local.environment].public_dns_name_ingestion,
-  # ]
+  subject_alternative_names = [
+    local.application_data.accounts[local.environment].public_dns_name_web,
+  ]
 
   tags = {
     Environment = local.environment
