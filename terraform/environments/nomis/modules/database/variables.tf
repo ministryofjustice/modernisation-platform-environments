@@ -149,3 +149,9 @@ variable "tags" {
   type        = map(any)
   description = "Default tags to be applied to resources"
 }
+
+variable "termination_protection" {
+  type = bool
+  default = false
+  nullable = false
+}

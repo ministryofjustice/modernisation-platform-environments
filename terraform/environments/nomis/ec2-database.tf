@@ -23,6 +23,7 @@ module "database" {
   asm_flash_throughput = try(each.value.asm_data_throughput, null)
   oracle_app_disk_size = try(each.value.oracle_app_disk_size, null)
   extra_ingress_rules  = try(each.value.extra_ingress_rules, null)
+  termination_protection = try(each.termination_protection, null)
 
   common_security_group_id = aws_security_group.database_common.id
   instance_profile_name    = aws_iam_instance_profile.ec2_database_profile.name

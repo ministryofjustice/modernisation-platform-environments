@@ -56,13 +56,14 @@ data "aws_subnet" "data" {
 resource "aws_instance" "database" {
   ami                         = data.aws_ami.database.id
   associate_public_ip_address = false
+  disable_api_termination     = var.termination_protection
   ebs_optimized               = true
   iam_instance_profile        = var.instance_profile_name
   instance_type               = var.instance_type # tflint-ignore: aws_instance_invalid_type
   key_name                    = var.key_name
   monitoring                  = true
   subnet_id                   = data.aws_subnet.data.id
-  user_data                   = base64encode(data.template_file.user_data.rendered)
+  user_data                   = data.template_file.user_data.rendered
   vpc_security_group_ids = [
     var.common_security_group_id,
     aws_security_group.database.id
@@ -76,6 +77,13 @@ resource "aws_instance" "database" {
     encrypted             = true
     # volume_size           = lookup(var.drive_map, data.aws_ami.database.root_device_name, local.root_device_size)
     volume_type = "gp3"
+
+    tags = merge(
+      var.tags,
+      {
+        Name       = "database-${var.name}-root-${data.aws_ami.database.root_device_name}"
+      }
+    )
   }
   dynamic "ephemeral_block_device" { # block devices specified inline cannot be resized later so we need to make sure they are not mounted here
     for_each = [for bdm in data.aws_ami.database.block_device_mappings : bdm if bdm.device_name != data.aws_ami.database.root_device_name]
@@ -88,20 +96,14 @@ resource "aws_instance" "database" {
 
   lifecycle {
     ignore_changes = [
-      # This prevents clobbering the tags of attached EBS volumes. See
-      # [this bug][1] in the AWS provider upstream.
-      #
-      # [1]: https://github.com/terraform-providers/terraform-provider-aws/issues/770
-      volume_tags,
-      #user_data,         # Prevent changes to user_data from destroying existing EC2s
-      root_block_device, # Prevent changes to encryption from destroying existing EC2s - can delete once encryption complete
+      user_data,         # Prevent changes to user_data from destroying existing EC2s
     ]
   }
 
   tags = merge(
     var.tags,
     {
-      Name       = "database-${var.name}"
+      Name       = "database-${var.name}-"
       component  = "data"
       os_type    = "Linux"
       os_version = "RHEL 7.9"
