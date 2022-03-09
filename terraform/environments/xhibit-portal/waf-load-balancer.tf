@@ -282,9 +282,9 @@ resource "aws_acm_certificate" "waf_lb_cert" {
   domain_name       = local.application_data.accounts[local.environment].public_dns_name_web
   validation_method = "DNS"
 
-  subject_alternative_names = [
-    local.application_data.accounts[local.environment].public_dns_name_ingestion,
-  ]
+  # subject_alternative_names = [
+  #   local.application_data.accounts[local.environment].public_dns_name_ingestion,
+  # ]
 
   tags = {
     Environment = local.environment
