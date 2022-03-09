@@ -44,7 +44,7 @@ resource "aws_security_group_rule" "allow_web_users" {
     "20.49.163.194/32",  # Azure function proxy
     "20.49.163.244/32",  # Azure function proxy
     "82.44.118.20/32",   # Nick
-    "10.175.52.4/32",   # Anthony Fletcher
+    "10.175.52.4/32",    # Anthony Fletcher
     "10.182.60.51/32",   # NLE CGI proxy 
     "10.175.165.159/32", # Helen Dawes
     "10.175.72.157/32",  # Alan Brightmore
@@ -52,7 +52,7 @@ resource "aws_security_group_rule" "allow_web_users" {
     "195.95.131.110/32", # NCC Group proxy ITHC
     "195.95.131.112/32", # NCC Group proxy ITHC
     "81.152.37.83/32",   # Anand
-    "77.108.144.130/32",  # AL Office
+    "77.108.144.130/32", # AL Office
     "194.33.196.1/32",   # ATOS PROXY IPS
     "194.33.196.2/32",   # ATOS PROXY IPS
     "194.33.196.3/32",   # ATOS PROXY IPS
@@ -71,6 +71,9 @@ resource "aws_security_group_rule" "allow_web_users" {
     "194.33.192.46/32",  # ATOS PROXY IPS
     "194.33.192.47/32",  # ATOS PROXY IPS
     "194.33.192.48/32",  # ATOS PROXY IPS
+    "195.59.75.151/32",  # New proxy IPs from Prashanth for testing ingestion
+    "195.59.75.152/32",  # New proxy IPs from Prashanth for testing ingestion
+    "109.146.174.114",   # Prashanth
   ]
   ipv6_cidr_blocks = [
     "2a00:23c7:2416:3d01:c98d:4432:3c83:d937/128"
@@ -272,6 +275,7 @@ resource "aws_alb_listener_rule" "ingestion_listener_rule" {
   #       "194.33.196.32/27",  # ATOS PROXY IPS
   #       "194.33.192.0/29",   # ATOS PROXY IPS
   #       "194.33.192.32/27",  # ATOS PROXY IPS
+  #       "195.59.75.144/28",  # New ATOS PROXY IPS
   #     ]
   #   }
   # }
