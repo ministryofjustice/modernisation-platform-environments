@@ -73,7 +73,7 @@ resource "aws_security_group_rule" "allow_web_users" {
     "194.33.192.48/32",  # ATOS PROXY IPS
     "195.59.75.151/32",  # New proxy IPs from Prashanth for testing ingestion
     "195.59.75.152/32",  # New proxy IPs from Prashanth for testing ingestion
-    "109.146.174.114",   # Prashanth
+    "109.146.174.114/32",   # Prashanth
   ]
   ipv6_cidr_blocks = [
     "2a00:23c7:2416:3d01:c98d:4432:3c83:d937/128"
