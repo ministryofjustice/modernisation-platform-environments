@@ -297,7 +297,7 @@ resource "aws_route53_record" "waf_lb_cname" {
 
 resource "aws_acm_certificate" "waf_lb_cert" {
 
-  domain_name       = local.application_data.accounts[local.environment].loadbalancer_cname_target,
+  domain_name       = local.application_data.accounts[local.environment].loadbalancer_cname_target
   validation_method = "DNS"
 
   subject_alternative_names = [
