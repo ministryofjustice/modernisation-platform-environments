@@ -28,7 +28,7 @@ data "template_file" "user_data" {
   template = file("${path.module}/user-data/user-data.sh")
   vars = {
     ENV               = var.name
-    DB_HOSTNAME       = "db.${var.name}.${var.application_name}.${data.aws_route53_zone.internal.name}"
+    DB_HOSTNAME       = "db.T2.${var.application_name}.${data.aws_route53_zone.internal.name}"
     USE_DEFAULT_CREDS = var.use_default_creds
   }
 }
