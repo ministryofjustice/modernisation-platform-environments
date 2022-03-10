@@ -205,9 +205,29 @@ resource "aws_lb_listener_certificate" "main_portal_cert" {
   certificate_arn = aws_acm_certificate.waf_lb_cert.arn
 }
 
+resource "aws_alb_listener_rule" "web_listener_rule" {
+  priority     = 1
+  depends_on   = [aws_lb_listener.waf_lb_listener]
+  listener_arn = aws_lb_listener.waf_lb_listener.arn
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.waf_lb_ingest_tg.id
+  }
+
+  condition {
+    host_header {
+      values = [
+        "d1sy110qgkuge3.cloudfront.net"
+      ]
+    }
+  }
+
+}
+
 
 resource "aws_alb_listener_rule" "root_listener_redirect" {
-  priority = 1
+  priority = 2
 
   depends_on   = [aws_lb_listener.waf_lb_listener]
   listener_arn = aws_lb_listener.waf_lb_listener.arn
@@ -239,7 +259,7 @@ resource "aws_alb_listener_rule" "root_listener_redirect" {
 }
 
 resource "aws_alb_listener_rule" "web_listener_rule" {
-  priority     = 2
+  priority     = 3
   depends_on   = [aws_lb_listener.waf_lb_listener]
   listener_arn = aws_lb_listener.waf_lb_listener.arn
   action {
@@ -258,7 +278,7 @@ resource "aws_alb_listener_rule" "web_listener_rule" {
 }
 
 resource "aws_alb_listener_rule" "ingestion_listener_rule" {
-  priority     = 3
+  priority     = 4
   depends_on   = [aws_lb_listener.waf_lb_listener]
   listener_arn = aws_lb_listener.waf_lb_listener.arn
   action {
