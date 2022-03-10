@@ -12,7 +12,7 @@
 #------------------------------------------------------------------------------
 
 # placement group to distribute instances
-# resource "aws_placement_group" "this" {
+# resource "aws_placement_group" "weblogic" {
 #   name     = "weblogic-placement-group"
 #   strategy = "spread"
 #   tags = merge(
@@ -46,11 +46,11 @@ data "aws_subnet_ids" "private" {
   }
 }
 
-resource "aws_launch_template" "this" {
+resource "aws_launch_template" "weblogic" {
   name = var.name
   
   dynamic "block_device_mappings" {
-    for_each = data.aws_ami.this.block_device_mappings
+    for_each = data.aws_ami.weblogic.block_device_mappings
     iterator = device
     content {
       device_name = device.value.device_name
@@ -69,7 +69,7 @@ resource "aws_launch_template" "this" {
     name =var.instance_profile_name
   }
 
-  image_id = data.aws_ami.this.id
+  image_id = data.aws_ami.weblogic.id
   instance_initiated_shutdown_behavior = "terminate"
   instance_type               = var.instance_type
   key_name                    = var.key_name
@@ -122,10 +122,10 @@ resource "aws_launch_template" "this" {
 
 }
 
-resource "aws_autoscaling_group" "this" {
+resource "aws_autoscaling_group" "weblogic" {
   launch_template {
-    id      = aws_launch_template.this.id
-    version = aws_launch_template.this.latest_version
+    id      = aws_launch_template.weblogic.id
+    version = aws_launch_template.weblogic.latest_version
   }
 
   instance_refresh {
@@ -212,8 +212,8 @@ resource "aws_lb_listener_rule" "weblogic" {
   }
 }
 
-# resource "aws_instance" "this" {
-#   ami                         = data.aws_ami.this.id
+# resource "aws_instance" "weblogic" {
+#   ami                         = data.aws_ami.weblogic.id
 #   associate_public_ip_address = false
 #   disable_api_termination     = var.termination_protection
 #   ebs_optimized               = local.ebs_optimized
@@ -221,7 +221,7 @@ resource "aws_lb_listener_rule" "weblogic" {
 #   instance_type               = var.instance_type # tflint-ignore: aws_instance_invalid_type
 #   key_name                    = var.key_name
 #   monitoring                  = true
-#   placement_group = aws_placement_group.this.id
+#   placement_group = aws_placement_group.weblogic.id
 #   subnet_id                   = data.aws_subnet.private.id
 #   user_data                   = data.template_file.user_data.rendered
 #   vpc_security_group_ids = [var.common_security_group_id]
@@ -234,19 +234,19 @@ resource "aws_lb_listener_rule" "weblogic" {
 #   root_block_device {
 #     delete_on_termination = true
 #     encrypted             = true
-#     # volume_size           = lookup(var.drive_map, data.aws_ami.this.root_device_name, local.root_device_size)
+#     # volume_size           = lookup(var.drive_map, data.aws_ami.weblogic.root_device_name, local.root_device_size)
 #     volume_type = "gp3"
 
 #     tags = merge(
 #       var.tags,
 #       {
-#         Name       = "weblogic-${var.name}-root-${data.aws_ami.this.root_device_name}"
+#         Name       = "weblogic-${var.name}-root-${data.aws_ami.weblogic.root_device_name}"
 #       }
 #     )
 #   }
 
 #   dynamic "ephemeral_block_device" { # block devices specified inline cannot be resized later so we need to make sure they are not mounted here
-#     for_each = [for bdm in data.aws_ami.this.block_device_mappings : bdm if bdm.device_name != data.aws_ami.this.root_device_name]
+#     for_each = [for bdm in data.aws_ami.weblogic.block_device_mappings : bdm if bdm.device_name != data.aws_ami.weblogic.root_device_name]
 #     iterator = device
 #     content {
 #       device_name = device.value.device_name
@@ -272,8 +272,8 @@ resource "aws_lb_listener_rule" "weblogic" {
 #   )
 # }
 
-# resource "aws_ebs_volume" "this" {
-#   for_each = { for bdm in data.aws_ami.this.block_device_mappings : bdm.device_name => bdm if bdm.device_name != data.aws_ami.this.root_device_name }
+# resource "aws_ebs_volume" "weblogic" {
+#   for_each = { for bdm in data.aws_ami.weblogic.block_device_mappings : bdm.device_name => bdm if bdm.device_name != data.aws_ami.weblogic.root_device_name }
 
 #   availability_zone = var.availability_zone
 #   encrypted         = true
@@ -290,12 +290,12 @@ resource "aws_lb_listener_rule" "weblogic" {
 #   )
 # }
 
-# resource "aws_volume_attachment" "this" {
-#   for_each = aws_ebs_volume.this
+# resource "aws_volume_attachment" "weblogic" {
+#   for_each = aws_ebs_volume.weblogic
 
 #   device_name  = each.key
 #   volume_id    = each.value.id
-#   instance_id  = aws_instance.this.id
+#   instance_id  = aws_instance.weblogic.id
 #   force_detach = true
 # }
 
@@ -324,7 +324,7 @@ data "aws_route53_zone" "external" {
 #   name    = "weblogic.${var.name}.${var.application_name}.${data.aws_route53_zone.internal.name}"
 #   type    = "A"
 #   ttl     = "60"
-#   records = [aws_instance.this.private_ip]
+#   records = [aws_instance.weblogic.private_ip]
 # }
 
 #------------------------------------------------------------------------------
@@ -333,16 +333,16 @@ data "aws_route53_zone" "external" {
 # Attach policy inline on ec2-common-role
 #------------------------------------------------------------------------------
 
-# resource "time_offset" "this" {
+# resource "time_offset" "weblogic" {
 #   # static time resource for controlling access to parameter
 #   offset_minutes = 30
 #   triggers = {
 #     # if the instance is recycled we reset the timestamp to give access again
-#     instance_id = aws_instance.this.arn
+#     instance_id = aws_instance.weblogic.arn
 #   }
 # }
 
-data "aws_iam_policy_document" "this" {
+data "aws_iam_policy_document" "weblogic" {
   statement {
     effect    = "Allow"
     actions   = ["ssm:GetParameter"]
@@ -353,12 +353,12 @@ data "aws_iam_policy_document" "this" {
     # condition {
     #   test     = "DateLessThan"
     #   variable = "aws:CurrentTime"
-    #   values   = [time_offset.this.rfc3339]
+    #   values   = [time_offset.weblogic.rfc3339]
     # }
     # condition {
     #   test     = "StringLike"
     #   variable = "ec2:SourceInstanceARN"
-    #   values   = [aws_instance.this.arn]
+    #   values   = [aws_instance.weblogic.arn]
     # }
     condition {
       test     = "StringLike"
@@ -368,12 +368,12 @@ data "aws_iam_policy_document" "this" {
   }
 }
 
-data "aws_iam_instance_profile" "this" {
+data "aws_iam_instance_profile" "weblogic" {
   name = var.instance_profile_name
 }
 
-resource "aws_iam_role_policy" "this" {
+resource "aws_iam_role_policy" "weblogic" {
   name   = "asm-parameter-access-${var.name}"
-  role   = data.aws_iam_instance_profile.this.role_name
-  policy = data.aws_iam_policy_document.this.json
+  role   = data.aws_iam_instance_profile.weblogic.role_name
+  policy = data.aws_iam_policy_document.weblogic.json
 }
