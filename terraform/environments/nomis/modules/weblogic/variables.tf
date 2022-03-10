@@ -21,62 +21,12 @@ variable "application_name" {
   }
 }
 
-variable "asm_data_capacity" {
-  type        = number
-  description = "Total capacity of the DATA disk group in GiB"
-  default     = 5
-  nullable    = false
-  validation {
-    condition     = var.asm_data_capacity >= 5
-    error_message = "The minimum capacity that can be specified for the DATA diskgroup is 5 GiB."
-  }
-}
-
-variable "asm_data_iops" {
-  type        = number
-  description = "Iops of the DATA disks"
-  default     = 3000
-  nullable    = false
-}
-
-variable "asm_data_throughput" {
-  type        = number
-  description = "Throughput of the DATA disks in MiB/s"
-  default     = 125
-  nullable    = false
-}
-
-variable "asm_flash_capacity" {
-  type        = number
-  description = "Total capacity of the FLASH disk group in GiB"
-  default     = 2
-  nullable    = false
-  validation {
-    condition     = var.asm_flash_capacity >= 2
-    error_message = "The minimum capacity that can be specified for the FLASH diskgroup is 2 GiB."
-  }
-}
-
-variable "asm_flash_iops" {
-  type        = number
-  description = "Iops of the FLASH disks"
-  default     = 3000
-  nullable    = false
-}
-
-variable "asm_flash_throughput" {
-  type        = number
-  description = "Throughput of the FLASH disks in MB/s"
-  default     = 125
-  nullable    = false
-}
-
-variable "availability_zone" {
-  type        = string
-  description = "The availability zone in which to deploy the infrastructure"
-  default     = "eu-west-2a"
-  nullable    = false
-}
+# variable "availability_zone" {
+#   type        = string
+#   description = "The availability zone in which to deploy the infrastructure"
+#   default     = "eu-west-2a"
+#   nullable    = false
+# }
 
 variable "business_unit" {
   type        = string
@@ -101,7 +51,7 @@ variable "extra_ingress_rules" {
 variable "instance_type" {
   type        = string
   description = "ec2 instance type to use for the database"
-  default     = "r6i.xlarge"
+  default     = "t2.large"
   nullable    = false
 }
 
@@ -125,6 +75,11 @@ variable "key_name" {
   description = "Name of ssh key resource for ec2-user"
 }
 
+variable "load_balancer_listener_arn" {
+  type        = string
+  description = "arn for loadbalancer fronting weblogics"
+}
+
 variable "name" {
   type        = string
   description = "Provide a unique name for the instance"
@@ -135,9 +90,15 @@ variable "oracle_app_disk_size" {
   description = "Capcity of each Oracle application disk, /u01 and /u02"
   default = {
     # "/dev/sdb" = 100
-    # "/dev/sdc" = 100
   }
   nullable = false
+}
+
+variable "region" {
+  type        = string
+  description = "The region in which to deploy the instances"
+  default     = "eu-west-2a"
+  nullable    = false
 }
 
 variable "subnet_set" {
@@ -154,4 +115,10 @@ variable "termination_protection" {
   type = bool
   default = false
   nullable = false
+}
+
+variable "use_default_creds" {
+  type        = bool
+  description = "Use the default weblogic admin username/password & T1 Nomis db username/password (Parameter Store Variables)"
+  default     = true
 }

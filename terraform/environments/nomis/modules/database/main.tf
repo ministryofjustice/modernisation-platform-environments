@@ -68,10 +68,12 @@ resource "aws_instance" "database" {
     var.common_security_group_id,
     aws_security_group.database.id
   ]
+  
   metadata_options {
     http_endpoint = "enabled"
     http_tokens   = "required"
   }
+  
   root_block_device {
     delete_on_termination = true
     encrypted             = true
@@ -85,6 +87,7 @@ resource "aws_instance" "database" {
       }
     )
   }
+  
   dynamic "ephemeral_block_device" { # block devices specified inline cannot be resized later so we need to make sure they are not mounted here
     for_each = [for bdm in data.aws_ami.database.block_device_mappings : bdm if bdm.device_name != data.aws_ami.database.root_device_name]
     iterator = device
@@ -103,7 +106,7 @@ resource "aws_instance" "database" {
   tags = merge(
     var.tags,
     {
-      Name       = "database-${var.name}-"
+      Name       = "database-${var.name}"
       component  = "data"
       os_type    = "Linux"
       os_version = "RHEL 7.9"
@@ -118,7 +121,7 @@ resource "aws_ebs_volume" "oracle_app" {
   availability_zone = var.availability_zone
   encrypted         = true
   snapshot_id       = local.block_device_map[each.key].ebs.snapshot_id
-  size              = lookup(var.oracle_app_disk_size, each.key, 100)
+  size              = lookup(var.oracle_app_disk_size, each.key, local.block_device_map[each.key].ebs.volume_size)
   type              = "gp3"
 
   tags = merge(
