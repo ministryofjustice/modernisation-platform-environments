@@ -304,11 +304,16 @@ resource "aws_route53_record" "waf_lb_cname" {
   name    = "lb.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk."
   type    = "CNAME"
 
-  alias {
-    name                   = aws_lb.waf_lb.dns_name
-    zone_id                = aws_lb.waf_lb.zone_id
-    evaluate_target_health = true
-  }
+  # alias {
+  #   name                   = aws_lb.waf_lb.dns_name
+  #   zone_id                = aws_lb.waf_lb.zone_id
+  #   evaluate_target_health = true
+  # }
+
+  records        = ["d1sy110qgkuge3.cloudfront.net"]
+
+
+  
 }
 
 
