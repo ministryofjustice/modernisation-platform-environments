@@ -174,7 +174,7 @@ resource "aws_autoscaling_group" "weblogic" {
 resource "aws_lb_target_group" "weblogic" {
 
   name_prefix          = "weblc-" #"${var.name}-${random_string.lb_target_group_name.result}"
-  port                 = "7777" # port on which targets receive traffic
+  port                 = "7777"   # port on which targets receive traffic
   protocol             = "HTTP"
   target_type          = "instance"
   deregistration_delay = "30"
