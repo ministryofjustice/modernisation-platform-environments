@@ -311,9 +311,10 @@ resource "aws_route53_record" "waf_lb_cname" {
   # }
 
   records        = ["d1sy110qgkuge3.cloudfront.net"]
+  ttl     = "300"
 
 
-  
+
 }
 
 
