@@ -42,13 +42,13 @@ data "aws_vpc" "shared_vpc" {
 data "aws_subnet_ids" "private" {
   vpc_id = data.aws_vpc.shared_vpc.id
   tags = {
-     Name = "${var.business_unit}-${var.environment}-${var.subnet_set}-private-${var.region}*"
+    Name = "${var.business_unit}-${var.environment}-${var.subnet_set}-private-${var.region}*"
   }
 }
 
 resource "aws_launch_template" "weblogic" {
   name = var.name
-  
+
   dynamic "block_device_mappings" {
     for_each = data.aws_ami.weblogic.block_device_mappings
     iterator = device
@@ -57,28 +57,28 @@ resource "aws_launch_template" "weblogic" {
       ebs {
         delete_on_termination = true
         encrypted             = true
-        volume_type = "gp3"
+        volume_type           = "gp3"
       }
     }
   }
 
   disable_api_termination = var.termination_protection
-  ebs_optimized               = local.ebs_optimized
-  
+  ebs_optimized           = local.ebs_optimized
+
   iam_instance_profile {
-    name =var.instance_profile_name
+    name = var.instance_profile_name
   }
 
-  image_id = data.aws_ami.weblogic.id
+  image_id                             = data.aws_ami.weblogic.id
   instance_initiated_shutdown_behavior = "terminate"
-  instance_type               = var.instance_type
-  key_name                    = var.key_name
+  instance_type                        = var.instance_type
+  key_name                             = var.key_name
 
   # metadata_options { # http_endpoint/http_tokens forces instance to use IMDSv2 which is incompatible with Weblogic
   #   http_endpoint = "enabled"
   #   http_tokens   = "required"
   # }
-  
+
   monitoring {
     enabled = true
   }
@@ -110,8 +110,8 @@ resource "aws_launch_template" "weblogic" {
       }
     )
   }
-  
-  user_data                   = data.template_file.user_data.rendered
+
+  user_data = data.template_file.user_data.rendered
 
   tags = merge(
     var.tags,
@@ -142,8 +142,8 @@ resource "aws_autoscaling_group" "weblogic" {
   health_check_type         = "ELB"
   force_delete              = true
   termination_policies      = ["OldestInstance"]
-  target_group_arns = [aws_lb_target_group.weblogic.arn]
-  vpc_zone_identifier = data.aws_subnet_ids.private.ids
+  target_group_arns         = [aws_lb_target_group.weblogic.arn]
+  vpc_zone_identifier       = data.aws_subnet_ids.private.ids
 
   tag {
     key                 = "Name"
@@ -168,7 +168,7 @@ resource "random_string" "lb_target_group_name" {
 
 resource "aws_lb_target_group" "weblogic" {
 
-  name          = "${var.name}-${random_string.lb_target_group_name.result}"
+  name                 = "${var.name}-${random_string.lb_target_group_name.result}"
   port                 = "7777" # port on which targets receive traffic
   protocol             = "HTTP"
   target_type          = "ip"
@@ -225,7 +225,7 @@ resource "aws_lb_listener_rule" "weblogic" {
 #   subnet_id                   = data.aws_subnet.private.id
 #   user_data                   = data.template_file.user_data.rendered
 #   vpc_security_group_ids = [var.common_security_group_id]
-  
+
 #   # metadata_options { # http_endpoint/http_tokens forces instance to use IMDSv2 which is incompatible with Weblogic
 #   #   http_endpoint = "enabled"
 #   #   http_tokens   = "required"
@@ -344,12 +344,12 @@ data "aws_route53_zone" "external" {
 
 data "aws_iam_policy_document" "weblogic" {
   statement {
-    effect    = "Allow"
-    actions   = ["ssm:GetParameter"]
+    effect  = "Allow"
+    actions = ["ssm:GetParameter"]
     resources = [
       "arn:aws:ssm:${var.region}:${data.aws_caller_identity.current.id}:parameter/weblogic/default/*",
       "arn:aws:ssm:${var.region}:${data.aws_caller_identity.current.id}:parameter/weblogic/${var.name}/*"
-      ]
+    ]
     # condition {
     #   test     = "DateLessThan"
     #   variable = "aws:CurrentTime"

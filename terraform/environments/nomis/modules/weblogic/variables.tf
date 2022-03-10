@@ -112,8 +112,8 @@ variable "tags" {
 }
 
 variable "termination_protection" {
-  type = bool
-  default = false
+  type     = bool
+  default  = false
   nullable = false
 }
 

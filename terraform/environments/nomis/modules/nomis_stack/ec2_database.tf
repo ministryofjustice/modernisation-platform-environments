@@ -86,14 +86,14 @@ resource "aws_instance" "database_server" {
     http_endpoint = "enabled"
     http_tokens   = "required"
   }
-  
+
   root_block_device {
     delete_on_termination = true
     encrypted             = true
     volume_size           = lookup(var.database_drive_map, data.aws_ami.database_image.root_device_name, local.database_root_device_size)
     volume_type           = "gp3"
   }
-  
+
   dynamic "ephemeral_block_device" { # block devices specified inline cannot be resized later so we need to make sure they are not mounted here
     for_each = [for bdm in data.aws_ami.database_image.block_device_mappings : bdm if bdm.device_name != data.aws_ami.database_image.root_device_name]
     iterator = device

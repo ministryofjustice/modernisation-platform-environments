@@ -68,12 +68,12 @@ resource "aws_instance" "database" {
     var.common_security_group_id,
     aws_security_group.database.id
   ]
-  
+
   metadata_options {
     http_endpoint = "enabled"
     http_tokens   = "required"
   }
-  
+
   root_block_device {
     delete_on_termination = true
     encrypted             = true
@@ -83,11 +83,11 @@ resource "aws_instance" "database" {
     tags = merge(
       var.tags,
       {
-        Name       = "database-${var.name}-root-${data.aws_ami.database.root_device_name}"
+        Name = "database-${var.name}-root-${data.aws_ami.database.root_device_name}"
       }
     )
   }
-  
+
   dynamic "ephemeral_block_device" { # block devices specified inline cannot be resized later so we need to make sure they are not mounted here
     for_each = [for bdm in data.aws_ami.database.block_device_mappings : bdm if bdm.device_name != data.aws_ami.database.root_device_name]
     iterator = device
@@ -99,7 +99,7 @@ resource "aws_instance" "database" {
 
   lifecycle {
     ignore_changes = [
-      user_data,         # Prevent changes to user_data from destroying existing EC2s
+      user_data, # Prevent changes to user_data from destroying existing EC2s
     ]
   }
 
