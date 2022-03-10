@@ -1,11 +1,11 @@
 variable "ami_name" {
   type        = string
-  description = "Name of AMI to be used to launch the database ec2 instance"
+  description = "Name of AMI to be used to launch the ec2 instance"
 }
 
 variable "ami_owner" {
   type        = string
-  description = "Owner of AMI to be used to launch the database ec2 instance"
+  description = "Owner of AMI to be used to launch the ec2 instance"
   default     = "self"
   nullable    = false
 }
@@ -43,21 +43,21 @@ variable "extra_ingress_rules" {
     protocol    = string
     cidr_blocks = list(string)
   }))
-  description = "A list of extra ingress rules to be added to the database security group"
+  description = "A list of extra ingress rules to be added to the instance security group"
   default     = []
   nullable    = false
 }
 
 variable "instance_type" {
   type        = string
-  description = "ec2 instance type to use for the database"
+  description = "ec2 instance type to use for the instances"
   default     = "t2.large"
   nullable    = false
 }
 
 variable "common_security_group_id" {
   type        = string
-  description = "Common security group used by all database instances"
+  description = "Common security group used by all instances"
 }
 
 variable "environment" {
