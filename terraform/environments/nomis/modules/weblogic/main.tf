@@ -111,7 +111,7 @@ resource "aws_launch_template" "weblogic" {
     )
   }
 
-  user_data = data.template_file.user_data.rendered
+  user_data = base64encode(data.template_file.user_data.rendered)
 
   tags = merge(
     var.tags,
@@ -164,6 +164,7 @@ resource "aws_autoscaling_group" "weblogic" {
 
 resource "random_string" "lb_target_group_name" {
   length = 16
+  special = false
 }
 
 resource "aws_lb_target_group" "weblogic" {
