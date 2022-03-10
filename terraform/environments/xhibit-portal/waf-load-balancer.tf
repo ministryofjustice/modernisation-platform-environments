@@ -77,7 +77,7 @@ resource "aws_security_group_rule" "allow_web_users" {
   ]
 }
 
-data "aws_prefix_list" "cf" {
+data "aws_ec2_managed_prefix_list" "cf" {
   name = "com.amazonaws.global.cloudfront.origin-facing"
 }
 
