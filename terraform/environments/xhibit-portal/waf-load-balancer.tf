@@ -205,7 +205,7 @@ resource "aws_lb_listener_certificate" "main_portal_cert" {
   certificate_arn = aws_acm_certificate.waf_lb_cert.arn
 }
 
-resource "aws_alb_listener_rule" "web_listener_rule" {
+resource "aws_alb_listener_rule" "cf_listener_rule" {
   priority     = 1
   depends_on   = [aws_lb_listener.waf_lb_listener]
   listener_arn = aws_lb_listener.waf_lb_listener.arn
