@@ -318,6 +318,8 @@ data "aws_route53_zone" "external_r53_zone" {
 }
 
 resource "aws_route53_record" "waf_lb_cname" {
+  # ingest.cjsonline.gov.uk points at this name. We can then point this name at whatever we like.
+
   provider = aws.core-vpc
 
   zone_id = data.aws_route53_zone.external_r53_zone.zone_id
@@ -327,6 +329,7 @@ resource "aws_route53_record" "waf_lb_cname" {
   alias {
     name                   = aws_lb.waf_lb.dns_name
     zone_id                = aws_lb.waf_lb.zone_id
+    evaluate_target_health = true
   }
 
 }
