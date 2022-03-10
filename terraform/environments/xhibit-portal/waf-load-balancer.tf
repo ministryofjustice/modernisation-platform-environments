@@ -90,7 +90,7 @@ resource "aws_security_group_rule" "allow_cloudfront_ips" {
   from_port         = 443
   to_port           = 443
   protocol          = "TCP"
-  prefix_list_ids   = [data.aws_prefix_list.cf.id]
+  prefix_list_ids   = [data.aws_ec2_managed_prefix_list.cf.id]
 
 }
 
