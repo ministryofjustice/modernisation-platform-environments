@@ -154,6 +154,10 @@ resource "aws_ebs_volume" "asm_data" {
       Name = "database-${var.name}-DATA-${each.key}"
     }
   )
+
+  lifecycle {
+    ignore_changes = [snapshot_id] # retain data if AMI is updated. If you want to start from fresh, destroy it
+  }
 }
 
 resource "aws_volume_attachment" "asm_data" {
@@ -181,6 +185,10 @@ resource "aws_ebs_volume" "asm_flash" {
       Name = "database-${var.name}-FLASH-${each.key}"
     }
   )
+
+  lifecycle {
+    ignore_changes = [snapshot_id] # retain data if AMI is updated. If you want to start from fresh, destroy it
+  }
 }
 
 resource "aws_volume_attachment" "asm_flash" {
