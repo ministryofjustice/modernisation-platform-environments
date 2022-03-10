@@ -166,6 +166,9 @@ resource "aws_autoscaling_group" "weblogic" {
 resource "random_string" "lb_target_group_name" {
   length  = 16
   special = false
+  keepers = {
+    target_group = aws_lb_target_group.weblogic.arn
+  }
 }
 
 resource "aws_lb_target_group" "weblogic" {
