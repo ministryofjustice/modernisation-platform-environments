@@ -195,11 +195,6 @@ resource "aws_lb_target_group_attachment" "ingestion-server-attachment" {
   port             = 80
 }
 
-# data "aws_acm_certificate" "ingestion_cert" {
-#   domain   = local.application_data.accounts[local.environment].public_dns_name_ingestion
-#   statuses = ["ISSUED"]
-# }
-
 resource "aws_lb_listener" "waf_lb_listener" {
   depends_on = [
     aws_acm_certificate_validation.waf_lb_cert_validation,
@@ -329,7 +324,7 @@ resource "aws_route53_record" "waf_lb_cname" {
   alias {
     name                   = aws_lb.waf_lb.dns_name
     zone_id                = aws_lb.waf_lb.zone_id
-    evaluate_target_health = true
+    evaluate_target_health = false
   }
 
 }
@@ -509,6 +504,13 @@ resource "aws_wafv2_web_acl_logging_configuration" "waf_logs" {
   log_destination_configs = ["${aws_s3_bucket.waf_logs.arn}"]
   resource_arn            = aws_wafv2_web_acl.waf_acl.arn
 }
+
+
+
+# data "aws_acm_certificate" "ingestion_cert" {
+#   domain   = local.application_data.accounts[local.environment].public_dns_name_ingestion
+#   statuses = ["ISSUED"]
+# }
 
 
 # resource "random_string" "origin_token" {
