@@ -57,7 +57,7 @@ resource "aws_launch_template" "weblogic" {
       ebs {
         delete_on_termination = true
         encrypted             = true
-        volume_size = device.value.ebs.volume_size
+        volume_size           = device.value.ebs.volume_size
         volume_type           = "gp3"
       }
     }
@@ -164,7 +164,7 @@ resource "aws_autoscaling_group" "weblogic" {
 }
 
 resource "random_string" "lb_target_group_name" {
-  length = 16
+  length  = 16
   special = false
 }
 
