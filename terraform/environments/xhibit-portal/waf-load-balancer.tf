@@ -195,10 +195,10 @@ resource "aws_lb_target_group_attachment" "ingestion-server-attachment" {
   port             = 80
 }
 
-data "aws_acm_certificate" "ingestion_cert" {
-  domain   = local.application_data.accounts[local.environment].public_dns_name_ingestion
-  statuses = ["ISSUED"]
-}
+# data "aws_acm_certificate" "ingestion_cert" {
+#   domain   = local.application_data.accounts[local.environment].public_dns_name_ingestion
+#   statuses = ["ISSUED"]
+# }
 
 resource "aws_lb_listener" "waf_lb_listener" {
   depends_on = [
@@ -211,7 +211,8 @@ resource "aws_lb_listener" "waf_lb_listener" {
   port              = "443"
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = data.aws_acm_certificate.ingestion_cert.arn
+  certificate_arn   = aws_acm_certificate.waf_lb_cert.arn
+  # certificate_arn   = data.aws_acm_certificate.ingestion_cert.arn 
 
   default_action {
     type             = "forward"
@@ -219,34 +220,14 @@ resource "aws_lb_listener" "waf_lb_listener" {
   }
 }
 
-resource "aws_lb_listener_certificate" "main_portal_cert" {
-  listener_arn    = aws_lb_listener.waf_lb_listener.arn
-  certificate_arn = aws_acm_certificate.waf_lb_cert.arn
-}
-
-resource "aws_alb_listener_rule" "cf_listener_rule" {
-  priority     = 1
-  depends_on   = [aws_lb_listener.waf_lb_listener]
-  listener_arn = aws_lb_listener.waf_lb_listener.arn
-
-  action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.waf_lb_ingest_tg.id
-  }
-
-  condition {
-    host_header {
-      values = [
-        "d1sy110qgkuge3.cloudfront.net"
-      ]
-    }
-  }
-
-}
+# resource "aws_lb_listener_certificate" "main_portal_cert" {
+#   listener_arn    = aws_lb_listener.waf_lb_listener.arn
+#   certificate_arn = aws_acm_certificate.waf_lb_cert.arn
+# }
 
 
 resource "aws_alb_listener_rule" "root_listener_redirect" {
-  priority = 2
+  priority = 1
 
   depends_on   = [aws_lb_listener.waf_lb_listener]
   listener_arn = aws_lb_listener.waf_lb_listener.arn
@@ -276,6 +257,7 @@ resource "aws_alb_listener_rule" "root_listener_redirect" {
   }
 
 }
+
 
 resource "aws_alb_listener_rule" "web_listener_rule" {
   priority     = 3
@@ -308,7 +290,8 @@ resource "aws_alb_listener_rule" "ingestion_listener_rule" {
   condition {
     host_header {
       values = [
-        local.application_data.accounts[local.environment].public_dns_name_ingestion
+        local.application_data.accounts[local.environment].public_dns_name_ingestion,
+        "d1sy110qgkuge3.cloudfront.net"
       ]
     }
   }
@@ -343,27 +326,26 @@ resource "aws_route53_record" "waf_lb_cname" {
   name    = "lb.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk."
   type    = "CNAME"
 
-  # alias {
-  #   name                   = aws_lb.waf_lb.dns_name
-  #   zone_id                = aws_lb.waf_lb.zone_id
-  #   evaluate_target_health = true
-  # }
-
-  records        = ["d1sy110qgkuge3.cloudfront.net"]
-  ttl     = "300"
-
-
+  alias {
+    name                   = aws_lb.waf_lb.dns_name
+    zone_id                = aws_lb.waf_lb.zone_id
+    evaluate_target_health = true
+  }
 
 }
 
-
 resource "aws_acm_certificate" "waf_lb_cert" {
-
-  domain_name       =  local.application_data.accounts[local.environment].public_dns_name_web
+  domain_name       = "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   validation_method = "DNS"
 
+  subject_alternative_names = [
+    "*.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk",
+    local.application_data.accounts[local.environment].public_dns_name_web,
+    # local.application_data.accounts[local.environment].public_dns_name_ingestion,
+  ]
+
   tags = {
-    Environment = local.environment
+    Environment = "prod"
   }
 
   lifecycle {
@@ -371,9 +353,10 @@ resource "aws_acm_certificate" "waf_lb_cert" {
   }
 }
 
+
+
 resource "aws_acm_certificate_validation" "waf_lb_cert_validation" {
   certificate_arn = aws_acm_certificate.waf_lb_cert.arn
-  //validation_record_fqdns = [for record in aws_route53_record.waf_lb_r53_record : record.fqdn]
   validation_record_fqdns = [for dvo in aws_acm_certificate.waf_lb_cert.domain_validation_options : dvo.resource_record_name]
 
 }
