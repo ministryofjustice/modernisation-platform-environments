@@ -77,6 +77,25 @@ resource "aws_security_group_rule" "allow_web_users" {
   ]
 }
 
+data "aws_prefix_list" "cf" {
+  name = "com.amazonaws.global.cloudfront.origin-facing"
+}
+
+
+resource "aws_security_group_rule" "allow_cloudfront_ips" {
+  depends_on        = [aws_security_group.waf_lb]
+  security_group_id = aws_security_group.waf_lb.id
+  type              = "ingress"
+  description       = "allow web traffic to get to ingestion server"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "TCP"
+  prefix_list_ids   = [data.aws_prefix_list.cf.id]
+
+}
+
+
+
 
 data "aws_subnet_ids" "shared-public" {
   vpc_id = local.vpc_id
