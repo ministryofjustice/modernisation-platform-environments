@@ -354,12 +354,32 @@ resource "aws_acm_certificate" "waf_lb_cert" {
 }
 
 
-
 resource "aws_acm_certificate_validation" "waf_lb_cert_validation" {
   certificate_arn = aws_acm_certificate.waf_lb_cert.arn
   validation_record_fqdns = [for dvo in aws_acm_certificate.waf_lb_cert.domain_validation_options : dvo.resource_record_name]
 
 }
+
+
+resource "aws_route53_record" "waf_lb_r53_record" {
+  provider = aws.core-vpc
+  for_each = {
+    for dvo in aws_acm_certificate.waf_lb_cert.domain_validation_options : dvo.domain_name => {
+      name   = dvo.resource_record_name
+      record = dvo.resource_record_value
+      type   = dvo.resource_record_type
+    }
+  }
+
+  allow_overwrite = true
+  name            = each.value.name
+  records         = [each.value.record]
+  ttl             = 60
+  type            = each.value.type
+  zone_id         = data.aws_route53_zone.external_r53_zone.zone_id
+}
+
+
 
 resource "aws_wafv2_web_acl" "waf_acl" {
   name        = "waf-acl"
