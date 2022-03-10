@@ -319,13 +319,16 @@ resource "aws_route53_record" "waf_lb_cname" {
 
   zone_id = data.aws_route53_zone.external_r53_zone.zone_id
   name    = "lb.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk."
-  type    = "A"
+  type    = "CNAME"
+  ttl     = 300
+  records = [aws_lb.waf_lb.dns_name]
 
-  alias {
-    name                   = aws_lb.waf_lb.dns_name
-    zone_id                = aws_lb.waf_lb.zone_id
-    evaluate_target_health = false
-  }
+
+  # alias {
+  #   name                   = aws_lb.waf_lb.dns_name
+  #   zone_id                = aws_lb.waf_lb.zone_id
+  #   evaluate_target_health = false
+  # }
 
 }
 
