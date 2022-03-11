@@ -39,8 +39,11 @@ data "aws_vpc" "shared_vpc" {
   }
 }
 
-data "aws_subnet_ids" "private" {
-  vpc_id = data.aws_vpc.shared_vpc.id
+data "aws_subnets" "private" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.shared_vpc.id]
+  }
   tags = {
     Name = "${var.business_unit}-${var.environment}-${var.subnet_set}-private-${var.region}*"
   }
@@ -144,7 +147,7 @@ resource "aws_autoscaling_group" "weblogic" {
   force_delete              = true
   termination_policies      = ["OldestInstance"]
   target_group_arns         = [aws_lb_target_group.weblogic.arn]
-  vpc_zone_identifier       = data.aws_subnet_ids.private.ids
+  vpc_zone_identifier       = data.aws_subnets.private.ids
 
   tag {
     key                 = "Name"
