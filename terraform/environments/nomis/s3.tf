@@ -1,6 +1,6 @@
 
 module "s3-bucket" {
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v4.0.0"
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.0.2"
 
   providers = {
     aws.bucket-replication = aws
@@ -11,7 +11,7 @@ module "s3-bucket" {
   lifecycle_rule = [
     {
       id      = "main"
-      enabled = true
+      enabled = "Enabled"
       prefix  = ""
 
       tags = {
@@ -50,7 +50,7 @@ module "s3-bucket" {
 }
 
 module "nomis-db-backup-bucket" {
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v4.0.0"
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.0.2"
 
   providers = {
     aws.bucket-replication = aws
@@ -61,12 +61,12 @@ module "nomis-db-backup-bucket" {
   lifecycle_rule = [
     {
       id      = "main"
-      enabled = true
+      enabled = "Enabled"
       prefix  = ""
 
       tags = {
         rule      = "log"
-        autoclean = "true"
+        autoclean = "Enabled"
       }
 
       transition = [
