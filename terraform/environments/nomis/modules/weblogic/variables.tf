@@ -97,7 +97,7 @@ variable "oracle_app_disk_size" {
 variable "region" {
   type        = string
   description = "The region in which to deploy the instances"
-  default     = "eu-west-2a"
+  default     = "eu-west-2"
   nullable    = false
 }
 
