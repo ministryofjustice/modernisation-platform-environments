@@ -110,7 +110,7 @@ data "aws_iam_policy_document" "cross-account-s3" {
     ]
 
     resources = ["${module.nomis-image-builder-bucket.s3_bucket_arn}/*",
-                  module.nomis-image-builder-bucket.s3_bucket_arn,]
+    module.nomis-image-builder-bucket.s3_bucket_arn, ]
     principals {
       type = "AWS"
       identifiers = ["arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:root",
