@@ -106,7 +106,7 @@ data "aws_iam_policy_document" "cross-account-s3" {
     actions = [
       "s3:GetObject",
       "s3:PutObject",
-      "s3:PutObjectAcl"]
+    "s3:PutObjectAcl"]
     resources = ["arn:aws:s3:::ec2-image-builder-nomis*/*", ]
     principals {
       type = "AWS"
