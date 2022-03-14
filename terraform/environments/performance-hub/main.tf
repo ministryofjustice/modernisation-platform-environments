@@ -6,10 +6,13 @@ data "aws_vpc" "shared" {
   }
 }
 
-data "aws_subnet_ids" "shared-data" {
-  vpc_id = data.aws_vpc.shared.id
+data "aws_subnets" "shared-data" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.shared.id]
+  }
   tags = {
-    "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-data*"
+    Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-data*"
   }
 }
 
@@ -76,10 +79,13 @@ data "aws_route53_zone" "network-services" {
   private_zone = false
 }
 
-data "aws_subnet_ids" "shared-public" {
-  vpc_id = data.aws_vpc.shared.id
+data "aws_subnets" "shared-public" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.shared.id]
+  }
   tags = {
-    "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public*"
+    Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public*"
   }
 }
 
@@ -137,7 +143,8 @@ data "template_file" "task_definition" {
 
 module "windows-ecs" {
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs?ref=v1.0.4"
+  #source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs?ref=v1.0.4"
+  source = "../../../../modernisation-platform-terraform-ecs"
 
   subnet_set_name         = local.subnet_set_name
   vpc_all                 = local.vpc_all
@@ -231,7 +238,7 @@ resource "aws_lb" "external" {
   #checkov:skip=CKV2_AWS_28
   name                       = "${local.application_name}-loadbalancer"
   load_balancer_type         = "application"
-  subnets                    = data.aws_subnet_ids.shared-public.ids
+  subnets                    = data.aws_subnets.shared-public.ids
   enable_deletion_protection = true
   # allow 60*4 seconds before 504 gateway timeout for long-running DB operations
   idle_timeout = 240
@@ -415,7 +422,7 @@ resource "aws_db_option_group" "db_option_group" {
 
 resource "aws_db_subnet_group" "db" {
   name       = "${local.application_name}-db-subnet-group"
-  subnet_ids = sort(data.aws_subnet_ids.shared-data.ids)
+  subnet_ids = sort(data.aws_subnets.shared-data.ids)
   tags = merge(
     local.tags,
     {
