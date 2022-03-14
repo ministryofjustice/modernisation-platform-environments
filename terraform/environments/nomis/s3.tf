@@ -105,11 +105,12 @@ data "aws_iam_policy_document" "cross-account-s3" {
     sid = "cross-account-s3-access-for-image-builder"
     actions = [
       "s3:GetObject",
-      "s3:PutObject"
+      "s3:PutObject",
+      "s3:PutObjectAcl"
     ]
-    
-    resources = ["arn:aws:s3:::ec2-image-builder-nomis*/*",
-                  "arn:aws:s3:::ec2-image-builder-nomis20220314103938567000000001",]
+
+    resources = ["${module.nomis-image-builder-bucket.s3_bucket_arn}/*",
+                  module.nomis-image-builder-bucket.s3_bucket_arn,]
     principals {
       type = "AWS"
       identifiers = ["arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:root",
