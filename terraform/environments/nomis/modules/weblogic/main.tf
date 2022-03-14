@@ -27,9 +27,12 @@
 data "template_file" "user_data" {
   template = file("${path.module}/user-data/user-data.sh")
   vars = {
-    ENV               = var.name
-    DB_HOSTNAME       = "db.T2.${var.application_name}.${data.aws_route53_zone.internal.name}"
-    USE_DEFAULT_CREDS = var.use_default_creds
+    ENV                     = var.name
+    DB_HOSTNAME             = "db.T2.${var.application_name}.${data.aws_route53_zone.internal.name}"
+    USE_DEFAULT_CREDS       = var.use_default_creds
+    AUTO_SCALING_GROUP_NAME = local.auto_scaling_group_name
+    LIFECYCLE_HOOK_NAME     = local.initial_lifecycle_hook_name
+    REGION                  = var.region
   }
 }
 
@@ -132,6 +135,13 @@ resource "aws_autoscaling_group" "weblogic" {
     version = aws_launch_template.weblogic.latest_version
   }
 
+  initial_lifecycle_hook {
+    name                 = local.initial_lifecycle_hook_name
+    default_result       = "ABANDON"
+    heartbeat_timeout    = 3600
+    lifecycle_transition = "autoscaling:EC2_INSTANCE_LAUNCHING"
+  }
+
   instance_refresh {
     strategy = "Rolling"
     preferences {
@@ -139,15 +149,21 @@ resource "aws_autoscaling_group" "weblogic" {
     }
   }
 
-  name                      = "weblogic-${var.name}"
-  max_size                  = 8
-  min_size                  = 2
+  name                      = local.auto_scaling_group_name
+  max_size                  = 2
+  min_size                  = 1
   health_check_grace_period = 300
   health_check_type         = "ELB"
   force_delete              = true
   termination_policies      = ["OldestInstance"]
   target_group_arns         = [aws_lb_target_group.weblogic.arn]
   vpc_zone_identifier       = data.aws_subnets.private.ids
+
+  warm_pool {
+    pool_state                  = "Stopped"
+    min_size                    = 1
+    max_group_prepared_capacity = 2
+  }
 
   tag {
     key                 = "Name"
@@ -166,17 +182,9 @@ resource "aws_autoscaling_group" "weblogic" {
   }
 }
 
-# resource "random_string" "lb_target_group_name" {
-#   length  = 16
-#   special = false
-#   keepers = {
-#     target_group = aws_lb_target_group.weblogic.arn
-#   }
-# }
-
 resource "aws_lb_target_group" "weblogic" {
 
-  name_prefix          = "weblc-" #"${var.name}-${random_string.lb_target_group_name.result}"
+  name_prefix          = "weblc-"
   port                 = "7777" # port on which targets receive traffic
   protocol             = "HTTP"
   target_type          = "instance"

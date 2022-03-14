@@ -7,6 +7,9 @@ mount -a
 chkconfig --add nomis_weblogic
 chkconfig --level 3 nomis_weblogic on
 
+# Get instance-id for autoscaling lifecycle hook
+INSTANCE_ID=$(curl http://instance-data/latest/meta-data/instance-id)
+
 # Check variables are set and run weblogic setup script
 # USAGE
 # [-d] Use default credentials for database and Weblogic admin console
@@ -18,5 +21,10 @@ elif [[ -n ${DB_HOSTNAME} ]] && [[ ${USE_DEFAULT_CREDS} = "true" ]]; then
   su -c "bash /u01/software/weblogic/weblogic-setup.sh -d -h ${DB_HOSTNAME}" - oracle
 else
   echo "Error: Environment variables undefined"
+  # Send lifecycle failure notification - instance cannot enter warm pool or ASG
+  aws autoscaling complete-lifecycle-action --lifecycle-action-result ABANDON --instance-id $INSTANCE_ID --lifecycle-hook-name ${LIFECYCLE_HOOK_NAME} --auto-scaling-group-name ${AUTO_SCALING_GROUP_NAME} --region ${REGION}
   exit 1
 fi
+
+# Send lifecycle success notification to indicate instance is ready to transition to "Warmed:stopped" state and enter warm pool, or directly to ASG
+aws autoscaling complete-lifecycle-action --lifecycle-action-result CONTINUE --instance-id $INSTANCE_ID --lifecycle-hook-name ${LIFECYCLE_HOOK_NAME} --auto-scaling-group-name ${AUTO_SCALING_GROUP_NAME} --region ${REGION}
