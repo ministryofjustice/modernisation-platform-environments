@@ -361,7 +361,7 @@ data "aws_route53_zone" "external" {
 
 data "aws_iam_policy_document" "weblogic" {
   statement {
-    sid = "parameter-access-for-weblogic-setup"
+    sid     = "parameter-access-for-weblogic-setup"
     effect  = "Allow"
     actions = ["ssm:GetParameter"]
     resources = [
@@ -386,7 +386,7 @@ data "aws_iam_policy_document" "weblogic" {
   }
 
   statement {
-    sid = "trigger-instance-lifecycle-hooks"
+    sid     = "trigger-instance-lifecycle-hooks"
     effect  = "Allow"
     actions = ["autoscaling:CompleteLifecycleAction"]
     resources = [
