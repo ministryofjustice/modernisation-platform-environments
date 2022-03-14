@@ -136,6 +136,7 @@ resource "aws_autoscaling_group" "weblogic" {
   }
 
   initial_lifecycle_hook {
+    # this hook is triggered in the user-data script once weblogic script has completed
     name                 = local.initial_lifecycle_hook_name
     default_result       = "ABANDON"
     heartbeat_timeout    = 3600
@@ -360,6 +361,7 @@ data "aws_route53_zone" "external" {
 
 data "aws_iam_policy_document" "weblogic" {
   statement {
+    sid = "parameter-access-for-weblogic-setup"
     effect  = "Allow"
     actions = ["ssm:GetParameter"]
     resources = [
@@ -378,8 +380,22 @@ data "aws_iam_policy_document" "weblogic" {
     # }
     condition {
       test     = "StringLike"
-      variable = "autoscaling:TargetGroupARNs"
-      values   = [aws_lb_target_group.weblogic.arn]
+      variable = "aws:ResourceTag/aws:ec2launchtemplate:id"
+      values   = [aws_launch_template.weblogic.id]
+    }
+  }
+
+  statement {
+    sid = "trigger-instance-lifecycle-hooks"
+    effect  = "Allow"
+    actions = ["autoscaling:CompleteLifecycleAction"]
+    resources = [
+      aws_autoscaling_group.weblogic.arn
+    ]
+    condition {
+      test     = "StringLike"
+      variable = "aws:ResourceTag/aws:ec2launchtemplate:id"
+      values   = [aws_launch_template.weblogic.id]
     }
   }
 }
