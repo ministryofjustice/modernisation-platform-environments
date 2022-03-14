@@ -181,6 +181,12 @@ resource "aws_autoscaling_group" "weblogic" {
       propagate_at_launch = true
     }
   }
+
+  depends_on = [
+    # the instance profile must be updated before the ASG is created as otherwise
+    # instances get created before they have the necessary permissions
+    aws_iam_role_policy.weblogic
+  ]
 }
 
 resource "aws_lb_target_group" "weblogic" {
@@ -390,7 +396,8 @@ data "aws_iam_policy_document" "weblogic" {
     effect  = "Allow"
     actions = ["autoscaling:CompleteLifecycleAction"]
     resources = [
-      aws_autoscaling_group.weblogic.arn
+      # this is deliberatly not scoped to the specific ASG as this resource must be created before the ASG
+      "arn:aws:autoscaling:${var.region}:${data.aws_caller_identity.current.id}:autoscalinggroup:*"
     ]
     condition {
       test     = "StringLike"
