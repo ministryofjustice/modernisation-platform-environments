@@ -106,7 +106,9 @@ data "aws_iam_policy_document" "cross-account-s3" {
     actions = [
       "s3:GetObject",
       "s3:PutObject",
-      "s3:PutObjectAcl"
+      "s3:PutObjectAcl",
+      "s3:ListBucket"
+
     ]
 
     resources = ["${module.nomis-image-builder-bucket.bucket.arn}/*",
