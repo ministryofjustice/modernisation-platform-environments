@@ -9,12 +9,15 @@ data "aws_vpc" "shared_vpc" {
   }
 }
 
-data "aws_subnet_ids" "local_account" {
-  vpc_id = data.aws_vpc.shared_vpc.id
+data "aws_subnets" "local_account" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.shared_vpc.id]
+  }
 }
 
 data "aws_subnet" "local_account" {
-  for_each = data.aws_subnet_ids.local_account.ids
+  for_each = toset(data.aws_subnets.local_account.ids)
   id       = each.value
 }
 
