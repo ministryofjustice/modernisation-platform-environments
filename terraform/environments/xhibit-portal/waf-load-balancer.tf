@@ -16,17 +16,6 @@ resource "aws_security_group_rule" "egress-to-portal" {
   source_security_group_id = aws_security_group.portal-server.id
 }
 
-resource "aws_security_group_rule" "egress-to-ingestion" {
-  depends_on               = [aws_security_group.waf_lb]
-  security_group_id        = aws_security_group.waf_lb.id
-  type                     = "egress"
-  description              = "allow web traffic to get to ingestion server"
-  from_port                = 80
-  to_port                  = 80
-  protocol                 = "TCP"
-  source_security_group_id = aws_security_group.cjip-server.id
-}
-
 resource "aws_security_group_rule" "allow_web_users" {
   depends_on        = [aws_security_group.waf_lb]
   security_group_id = aws_security_group.waf_lb.id
@@ -256,7 +245,7 @@ resource "aws_acm_certificate" "waf_lb_cert" {
   validation_method = "DNS"
 
   subject_alternative_names = [
-    local.application_data.accounts[local.environment].public_dns_name_ingestion,
+    local.application_data.accounts[local.environment].public_dns_name_web,
   ]
 
   tags = {
