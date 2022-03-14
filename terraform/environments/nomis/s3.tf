@@ -108,7 +108,7 @@ data "aws_iam_policy_document" "cross-account-s3" {
       "s3:PutObject"
     ]
     resources = ["arn:aws:s3:::ec2-image-builder-nomis20220314103938567000000001/*",
-                  "arn:aws:s3:::ec2-image-builder-nomis20220314103938567000000001",]
+    "arn:aws:s3:::ec2-image-builder-nomis20220314103938567000000001", ]
     principals {
       type = "AWS"
       identifiers = ["arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:root",
