@@ -1,24 +1,12 @@
-resource "aws_security_group" "waf_lb" {
-  description = "Security group for app load balancer, simply to implement ACL rules for the WAF"
-  name        = "waf-loadbalancer-${var.networking[0].application}"
+resource "aws_security_group" "ingestion_lb" {
+  description = "Security group for ingestion load balancer, to do server certificate auth with Xhibit"
+  name        = "ingestion-loadbalancer-${var.networking[0].application}"
   vpc_id      = local.vpc_id
 }
 
-
-resource "aws_security_group_rule" "egress-to-portal" {
-  depends_on               = [aws_security_group.waf_lb]
-  security_group_id        = aws_security_group.waf_lb.id
-  type                     = "egress"
-  description              = "allow web traffic to get to portal"
-  from_port                = 80
-  to_port                  = 80
-  protocol                 = "TCP"
-  source_security_group_id = aws_security_group.portal-server.id
-}
-
 resource "aws_security_group_rule" "egress-to-ingestion" {
-  depends_on               = [aws_security_group.waf_lb]
-  security_group_id        = aws_security_group.waf_lb.id
+  depends_on               = [aws_security_group.ingestion_lb]
+  security_group_id        = aws_security_group.ingestion_lb.id
   type                     = "egress"
   description              = "allow web traffic to get to ingestion server"
   from_port                = 80
@@ -88,15 +76,14 @@ data "aws_subnet_ids" "shared-public" {
   }
 }
 
-resource "aws_lb" "waf_lb" {
+resource "aws_elb" "ingestion_lb" {
 
   depends_on = [
-    aws_security_group.waf_lb,
+    aws_security_group.ingestion_lb,
   ]
 
-  name                       = "waf-lb-${var.networking[0].application}"
+  name                       = "ingestion-lb-${var.networking[0].application}"
   internal                   = false
-  load_balancer_type         = "application"
   security_groups            = [aws_security_group.waf_lb.id]
   subnets                    = data.aws_subnet_ids.shared-public.ids
   enable_deletion_protection = false
@@ -115,22 +102,22 @@ resource "aws_lb" "waf_lb" {
   )
 }
 
-resource "aws_lb_target_group" "waf_lb_web_tg" {
-  depends_on           = [aws_lb.waf_lb]
-  name                 = "waf-lb-web-tg-${var.networking[0].application}"
+resource "aws_lb_target_group" "lb_ingest_tg" {
+  depends_on           = [aws_lb.waf_lb, aws_lb_target_group_attachment.portal-server-attachment]
+  name                 = "waf-lb-ingest-tg-${var.networking[0].application}"
   port                 = 80
   protocol             = "HTTP"
   deregistration_delay = "30"
   vpc_id               = local.vpc_id
 
   health_check {
-    path                = "/Secure/Default.aspx"
+    path                = "/"
     port                = 80
     healthy_threshold   = 6
     unhealthy_threshold = 2
     timeout             = 2
     interval            = 5
-    matcher             = "302" # change this to 200 when the database comes up
+    matcher             = "304,200" # TODO this is really bad practice - someone needs to implement a proper health check, either in the code itself, or by using an external checker like https://aws.amazon.com/blogs/networking-and-content-delivery/identifying-unhealthy-targets-of-elastic-load-balancer/
   }
 
   tags = merge(
@@ -141,118 +128,65 @@ resource "aws_lb_target_group" "waf_lb_web_tg" {
   )
 }
 
-resource "aws_lb_target_group" "waf_lb_ingest_tg" {
-#   depends_on           = [aws_lb.waf_lb, aws_lb_target_group_attachment.portal-server-attachment]
-#   name                 = "waf-lb-ingest-tg-${var.networking[0].application}"
-#   port                 = 80
-#   protocol             = "HTTP"
-#   deregistration_delay = "30"
-#   vpc_id               = local.vpc_id
-
-#   health_check {
-#     path                = "/"
-#     port                = 80
-#     healthy_threshold   = 6
-#     unhealthy_threshold = 2
-#     timeout             = 2
-#     interval            = 5
-#     matcher             = "304,200" # TODO this is really bad practice - someone needs to implement a proper health check, either in the code itself, or by using an external checker like https://aws.amazon.com/blogs/networking-and-content-delivery/identifying-unhealthy-targets-of-elastic-load-balancer/
-#   }
-
-#   tags = merge(
-#     local.tags,
-#     {
-#       Name = "waf-lb_-g-${var.networking[0].application}"
-#     },
-#   )
-# }
-
-resource "aws_lb_target_group_attachment" "portal-server-attachment" {
-  target_group_arn = aws_lb_target_group.waf_lb_web_tg.arn
-  target_id        = aws_instance.portal-server.id
+resource "aws_lb_target_group_attachment" "ingestion-server-attachment" {
+  target_group_arn = aws_lb_target_group.lb_ingest_tg.arn
+  target_id        = aws_instance.cjip-server.id
   port             = 80
 }
 
-# resource "aws_lb_target_group_attachment" "ingestion-server-attachment" {
-#   target_group_arn = aws_lb_target_group.waf_lb_ingest_tg.arn
-#   target_id        = aws_instance.cjip-server.id
-#   port             = 80
-# }
 
-
-resource "aws_lb_listener" "waf_lb_listener" {
+resource "aws_lb_listener" "ingestion_lb_listener" {
   depends_on = [
-    aws_acm_certificate_validation.waf_lb_cert_validation,
-    aws_lb_target_group.waf_lb_web_tg,
-    # aws_lb_target_group.waf_lb_ingest_tg
+    aws_acm_certificate_validation.ingestion_lb_cert_validation,
+    aws_lb_target_group.lb_ingest_tg
   ]
 
-  load_balancer_arn = aws_lb.waf_lb.arn
+  load_balancer_arn = aws_elb.ingestion_lb.arn
   port              = "443"
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = aws_acm_certificate.waf_lb_cert.arn
+  certificate_arn   = aws_acm_certificate.ingestion_lb_cert.arn
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.waf_lb_web_tg.arn
+    target_group_arn = aws_lb_target_group.ingestion_lb_web_tg.arn
   }
 }
 
 
-resource "aws_alb_listener_rule" "root_listener_redirect" {
-  priority = 1
-
-  depends_on   = [aws_lb_listener.waf_lb_listener]
-  listener_arn = aws_lb_listener.waf_lb_listener.arn
-
-  action {
-    type = "redirect"
-
-    redirect {
-      status_code = "HTTP_301"
-      path        = "/Secure/Default.aspx"
-    }
-
-  }
-
-  condition {
-    path_pattern {
-      values = ["/"]
-    }
-  }
-
-  condition {
-    host_header {
-      values = [
-        local.application_data.accounts[local.environment].public_dns_name_web
-      ]
-    }
-  }
-
-}
-
-resource "aws_alb_listener_rule" "web_listener_rule" {
-  priority     = 2
-  depends_on   = [aws_lb_listener.waf_lb_listener]
-  listener_arn = aws_lb_listener.waf_lb_listener.arn
+resource "aws_alb_listener_rule" "ingestion_listener_rule" {
+  priority     = 3
+  depends_on   = [aws_lb_listener.ingestion_lb_listener]
+  listener_arn = aws_lb_listener.ingestion_lb_listener.arn
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.waf_lb_web_tg.id
+    target_group_arn = aws_lb_target_group.waf_lb_ingest_tg.id
   }
 
   condition {
     host_header {
       values = [
-        local.application_data.accounts[local.environment].public_dns_name_web
+        local.application_data.accounts[local.environment].public_dns_name_ingestion
       ]
     }
   }
 
+  # condition {
+  #   source_ip {
+  #     values = [ # Maximum 5 values
+  #       "194.33.196.0/29",   # ATOS PROXY IPS
+  #       "194.33.196.32/27",  # ATOS PROXY IPS
+  #       "194.33.192.0/29",   # ATOS PROXY IPS
+  #       "194.33.192.32/27",  # ATOS PROXY IPS
+  #       "195.59.75.144/28",  # New ATOS PROXY IPS
+  #     ]
+  #   }
+  # }
+
 }
 
-resource "aws_acm_certificate" "waf_lb_cert" {
-  domain_name       = local.application_data.accounts[local.environment].public_dns_name_web
+resource "aws_acm_certificate" "ingestion_lb_cert" {
+  domain_name       = local.application_data.accounts[local.environment].public_dns_name_ingestion
   validation_method = "DNS"
 
   subject_alternative_names = [
@@ -268,10 +202,10 @@ resource "aws_acm_certificate" "waf_lb_cert" {
   }
 }
 
-resource "aws_acm_certificate_validation" "waf_lb_cert_validation" {
-  certificate_arn = aws_acm_certificate.waf_lb_cert.arn
+resource "aws_acm_certificate_validation" "ingestion_lb_cert_validation" {
+  certificate_arn = aws_acm_certificate.ingestion_lb_cert.arn
   //validation_record_fqdns = [for record in aws_route53_record.waf_lb_r53_record : record.fqdn]
-  validation_record_fqdns = [for dvo in aws_acm_certificate.waf_lb_cert.domain_validation_options : dvo.resource_record_name]
+  validation_record_fqdns = [for dvo in aws_acm_certificate.ingestion_lb_cert.domain_validation_options : dvo.resource_record_name]
 
 }
 
@@ -335,24 +269,26 @@ resource "aws_wafv2_web_acl" "waf_acl" {
 
 }
 
-resource "aws_wafv2_web_acl_association" "aws_lb_waf_association" {
-  resource_arn = aws_lb.waf_lb.arn
-  web_acl_arn  = aws_wafv2_web_acl.waf_acl.arn
+resource "aws_wafv2_web_acl_association" "aws_lb_ingestion_association" {
+  resource_arn = aws_lb.ingestion_lb.arn
+  ingestion_acl_arn  = aws_wafv2_web_acl.ingestion_acl.arn
 }
 
-resource "aws_s3_bucket" "loadbalancer_logs" {
+
+
+resource "aws_s3_bucket" "ingestion_loadbalancer_logs" {
   bucket        = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}-lblogs"
   acl           = "log-delivery-write"
   force_destroy = true
 }
 
-resource "aws_s3_bucket_policy" "loadbalancer_logs_policy" {
+resource "aws_s3_bucket_policy" "ingestion_loadbalancer_logs_policy" {
   bucket = aws_s3_bucket.loadbalancer_logs.bucket
   policy = data.aws_iam_policy_document.s3_bucket_lb_write.json
 }
 
 
-data "aws_iam_policy_document" "s3_bucket_lb_write" {
+data "aws_iam_policy_document" "s3_bucket_ingestion_lb_write" {
 
   statement {
     actions = [
@@ -394,13 +330,15 @@ data "aws_iam_policy_document" "s3_bucket_lb_write" {
   }
 }
 
-resource "aws_s3_bucket" "waf_logs" {
+resource "aws_s3_bucket" "ingestion_logs" {
   bucket        = "aws-waf-logs-${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}"
   acl           = "log-delivery-write"
   force_destroy = true
 }
 
-resource "aws_wafv2_web_acl_logging_configuration" "waf_logs" {
+
+
+resource "aws_wafv2_web_acl_logging_configuration" "ingestion_logs" {
   log_destination_configs = ["${aws_s3_bucket.waf_logs.arn}"]
   resource_arn            = aws_wafv2_web_acl.waf_acl.arn
 }
