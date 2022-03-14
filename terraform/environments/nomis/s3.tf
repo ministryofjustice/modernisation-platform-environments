@@ -108,7 +108,7 @@ data "aws_iam_policy_document" "cross-account-s3" {
       "s3:PutObject",
       "s3:PutObjectAcl"
     ]
-    resources = ["*"]
+    resources = ["arn:aws:s3:::ec2-image-builder-nomis*/*", "arn:aws:s3:::ec2-image-builder-nomis*"]
     principals {
       type = "AWS"
       identifiers = ["arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:root",
@@ -126,7 +126,7 @@ module "nomis-image-builder-bucket" {
   bucket_prefix       = "ec2-image-builder-nomis"
   replication_enabled = false
 
-  # bucket_policy = [data.aws_iam_policy_document.cross-account-s3.json]
+  bucket_policy = [data.aws_iam_policy_document.cross-account-s3.json]
 
   lifecycle_rule = [
     {
