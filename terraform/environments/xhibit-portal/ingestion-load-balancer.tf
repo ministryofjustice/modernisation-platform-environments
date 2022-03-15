@@ -68,7 +68,6 @@ resource "aws_security_group_rule" "ingestion_lb_allow_web_users" {
   ]
 }
 
-
 data "aws_subnet_ids" "ingestion-shared-public" {
   vpc_id = local.vpc_id
   tags = {
@@ -86,7 +85,6 @@ resource "aws_elb" "ingestion_lb" {
   internal                   = false
   security_groups            = [aws_security_group.ingestion_lb.id]
   subnets                    = data.aws_subnet_ids.ingestion-shared-public.ids
-  enable_deletion_protection = false
 
   access_logs {
     bucket  = aws_s3_bucket.loadbalancer_logs.bucket
@@ -94,95 +92,34 @@ resource "aws_elb" "ingestion_lb" {
     enabled = true
   }
 
+  listener {
+    instance_port      = 80
+    instance_protocol  = "http"
+    lb_port            = 443
+    lb_protocol        = "https"
+    ssl_certificate_id = aws_acm_certificate.ingestion_lb_cert.arn
+  }
+
+  health_check {
+    healthy_threshold   = 6
+    unhealthy_threshold = 2
+    timeout             = 2
+    target              = "HTTP:80/"
+    interval            = 5
+  }
+
+  instances                   = [aws_instance.cjip-server.id]
+  cross_zone_load_balancing   = true
+  idle_timeout                = 400
+  connection_draining         = true
+  connection_draining_timeout = 400
+
   tags = merge(
     local.tags,
     {
       Name = "ingestion-lb-${var.networking[0].application}"
     },
   )
-}
-
-resource "aws_lb_target_group" "lb_ingest_tg" {
-  depends_on           = [aws_lb.ingestion_lb, aws_lb_target_group_attachment.portal-server-attachment]
-  name                 = "ingestion-lb-ingest-tg-${var.networking[0].application}"
-  port                 = 80
-  protocol             = "HTTP"
-  deregistration_delay = "30"
-  vpc_id               = local.vpc_id
-
-  health_check {
-    path                = "/"
-    port                = 80
-    healthy_threshold   = 6
-    unhealthy_threshold = 2
-    timeout             = 2
-    interval            = 5
-    matcher             = "304,200" # TODO this is really bad practice - someone needs to implement a proper health check, either in the code itself, or by using an external checker like https://aws.amazon.com/blogs/networking-and-content-delivery/identifying-unhealthy-targets-of-elastic-load-balancer/
-  }
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "ingestion-lb_-g-${var.networking[0].application}"
-    },
-  )
-}
-
-resource "aws_lb_target_group_attachment" "ingestion-server-attachment" {
-  target_group_arn = aws_lb_target_group.lb_ingest_tg.arn
-  target_id        = aws_instance.cjip-server.id
-  port             = 80
-}
-
-
-resource "aws_lb_listener" "ingestion_lb_listener" {
-  depends_on = [
-    aws_acm_certificate_validation.ingestion_lb_cert_validation,
-    aws_lb_target_group.lb_ingest_tg
-  ]
-
-  load_balancer_arn = aws_elb.ingestion_lb.arn
-  port              = "443"
-  protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = aws_acm_certificate.ingestion_lb_cert.arn
-
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.ingestion_lb_web_tg.arn
-  }
-}
-
-
-resource "aws_alb_listener_rule" "ingestion_listener_rule" {
-  priority     = 3
-  depends_on   = [aws_lb_listener.ingestion_lb_listener]
-  listener_arn = aws_lb_listener.ingestion_lb_listener.arn
-  action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.ingestion_lb_ingest_tg.id
-  }
-
-  condition {
-    host_header {
-      values = [
-        local.application_data.accounts[local.environment].public_dns_name_ingestion
-      ]
-    }
-  }
-
-  # condition {
-  #   source_ip {
-  #     values = [ # Maximum 5 values
-  #       "194.33.196.0/29",   # ATOS PROXY IPS
-  #       "194.33.196.32/27",  # ATOS PROXY IPS
-  #       "194.33.192.0/29",   # ATOS PROXY IPS
-  #       "194.33.192.32/27",  # ATOS PROXY IPS
-  #       "195.59.75.144/28",  # New ATOS PROXY IPS
-  #     ]
-  #   }
-  # }
-
 }
 
 resource "aws_acm_certificate" "ingestion_lb_cert" {
