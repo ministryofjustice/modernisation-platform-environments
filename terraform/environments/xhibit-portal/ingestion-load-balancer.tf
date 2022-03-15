@@ -16,8 +16,8 @@ resource "aws_security_group_rule" "egress-to-ingestion" {
 }
 
 resource "aws_security_group_rule" "allow_web_users" {
-  depends_on        = [aws_security_group.waf_lb]
-  security_group_id = aws_security_group.waf_lb.id
+  depends_on        = [aws_security_group.ingestion_lb]
+  security_group_id = aws_security_group.ingestion_lb.id
   type              = "ingress"
   description       = "allow web traffic to get to ingestion server"
   from_port         = 443
