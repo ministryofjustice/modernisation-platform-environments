@@ -13,9 +13,10 @@ module "weblogic" {
 
   name = each.key
 
-  ami_name = each.value.ami_name
+  ami_name             = each.value.ami_name
+  asg_max_size         = each.value.asg_max_size
+  asg_desired_capacity = each.value.asg_desired_capacity
 
-  oracle_app_disk_size   = try(each.value.oracle_app_disk_size, null)
   termination_protection = try(each.value.termination_protection, null)
 
   common_security_group_id    = aws_security_group.weblogic_common.id
@@ -31,9 +32,69 @@ module "weblogic" {
 }
 
 #------------------------------------------------------------------------------
+# Common Security Group for Weblogic Instances
+#------------------------------------------------------------------------------
+
+resource "aws_security_group" "weblogic_common" {
+  #checkov:skip=CKV2_AWS_5:skip "Ensure that Security Groups are attached to another resource" - attached in nomis-stack module
+  description = "Common security group for weblogic instances"
+  name        = "weblogic-common"
+  vpc_id      = local.vpc_id
+
+  ingress {
+    description     = "SSH from Bastion"
+    from_port       = "22"
+    to_port         = "22"
+    protocol        = "TCP"
+    security_groups = [module.bastion_linux.bastion_security_group]
+  }
+
+  ingress {
+    description     = "access from Windows Jumpserver (admin console)"
+    from_port       = "7001"
+    to_port         = "7001"
+    protocol        = "TCP"
+    security_groups = [aws_security_group.jumpserver-windows.id]
+  }
+
+  ingress {
+    description     = "access from Windows Jumpserver"
+    from_port       = "80"
+    to_port         = "80"
+    protocol        = "TCP"
+    security_groups = [aws_security_group.jumpserver-windows.id]
+  }
+
+  ingress {
+    description     = "access from Windows Jumpserver (forms/reports)"
+    from_port       = "7777"
+    to_port         = "7777"
+    protocol        = "TCP"
+    security_groups = [aws_security_group.jumpserver-windows.id, aws_security_group.internal_elb.id]
+  }
+
+  egress {
+    description = "allow all"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    #tfsec:ignore:aws-vpc-no-public-egress-sgr
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "weblogic-commmon"
+    }
+  )
+}
+
+#------------------------------------------------------------------------------
 # Instance profile to be assumed by the ec2 weblogic instances
 # This is based on the ec2-common-profile but additional permissions may be
 # granted as needed
+# TODO: delete this once nomis_stack module gone
 #------------------------------------------------------------------------------
 resource "aws_iam_role" "ec2_weblogic_role" {
   name                 = "ec2-weblogic-role"

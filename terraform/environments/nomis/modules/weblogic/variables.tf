@@ -21,6 +21,34 @@ variable "application_name" {
   }
 }
 
+variable "asg_max_size" {
+  type        = number
+  description = "The maximum size of the auto scaling group"
+  default     = 1
+  nullable    = false
+}
+
+variable "asg_min_size" {
+  type        = number
+  description = "The minimum size of the auto scaling group"
+  default     = 1
+  nullable    = false
+}
+
+variable "asg_desired_capacity" {
+  type        = number
+  description = "The desired number of instances.  Use for manually scaling, or up the asg_min_size var.  Must be >= asg_min_size and =< asg_max_size."
+  default     = null
+  nullable    = true
+}
+
+variable "asg_warm_pool_min_size" {
+  type        = number
+  description = "The minimum number of instances that should always be available in the auto scaling group warm pool"
+  default     = 0
+  nullable    = false
+}
+
 # variable "availability_zone" {
 #   type        = string
 #   description = "The availability zone in which to deploy the infrastructure"

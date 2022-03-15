@@ -37,9 +37,63 @@ module "database" {
 }
 
 #------------------------------------------------------------------------------
+# Common Security Group for Database Instances
+#------------------------------------------------------------------------------
+
+resource "aws_security_group" "database_common" {
+  #checkov:skip=CKV2_AWS_5:skip "Ensure that Security Groups are attached to another resource" - attached in nomis-stack module
+  description = "Common security group for database instances"
+  name        = "database-common"
+  vpc_id      = data.aws_vpc.shared_vpc.id
+
+  ingress {
+    description     = "DB access from weblogic instances"
+    from_port       = "1521"
+    to_port         = "1521"
+    protocol        = "TCP"
+    security_groups = [aws_security_group.weblogic_common.id]
+  }
+
+  ingress {
+    description     = "SSH from Bastion"
+    from_port       = "22"
+    to_port         = "22"
+    protocol        = "TCP"
+    security_groups = [module.bastion_linux.bastion_security_group]
+  }
+
+  ingress {
+    description = "External access to database port"
+    from_port   = "1521"
+    to_port     = "1521"
+    protocol    = "TCP"
+    cidr_blocks = [
+      for cidr in local.application_data.accounts[local.environment].database_external_access_cidr : cidr
+    ]
+  }
+
+  egress {
+    description = "allow all"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    #tfsec:ignore:aws-vpc-no-public-egress-sgr
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "database-common"
+    }
+  )
+}
+
+#------------------------------------------------------------------------------
 # Instance profile to be assumed by the ec2 database instances
 # This is based on the ec2-common-profile but also gives access to an S3 bucket
 # in which database backups are stored
+# TODO: maybe do same as weblogic and move this into the database module
 #------------------------------------------------------------------------------
 resource "aws_iam_role" "ec2_database_role" {
   name                 = "ec2-database-role"

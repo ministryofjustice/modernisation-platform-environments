@@ -11,24 +11,12 @@
 # EC2
 #------------------------------------------------------------------------------
 
-# placement group to distribute instances
-# resource "aws_placement_group" "weblogic" {
-#   name     = "weblogic-placement-group"
-#   strategy = "spread"
-#   tags = merge(
-#     var.tags,
-#     {
-#       Name       = "${var.name}-weblogic-placement-group"
-#     }
-#   )
-# }
-
 # user-data template
 data "template_file" "user_data" {
   template = file("${path.module}/user-data/user-data.sh")
   vars = {
     ENV                     = var.name
-    DB_HOSTNAME             = "db.T2.${var.application_name}.${data.aws_route53_zone.internal.name}"
+    DB_HOSTNAME             = "db.${var.name}.${var.application_name}.${data.aws_route53_zone.internal.name}"
     USE_DEFAULT_CREDS       = var.use_default_creds
     AUTO_SCALING_GROUP_NAME = local.auto_scaling_group_name
     LIFECYCLE_HOOK_NAME     = local.initial_lifecycle_hook_name
@@ -150,9 +138,10 @@ resource "aws_autoscaling_group" "weblogic" {
     }
   }
 
+  desired_capacity          = var.asg_desired_capacity
   name                      = local.auto_scaling_group_name
-  max_size                  = 2
-  min_size                  = 1
+  max_size                  = var.asg_max_size
+  min_size                  = var.asg_min_size
   health_check_grace_period = 300
   health_check_type         = "ELB"
   force_delete              = true
@@ -163,8 +152,8 @@ resource "aws_autoscaling_group" "weblogic" {
 
   warm_pool {
     pool_state                  = "Stopped"
-    min_size                    = 1
-    max_group_prepared_capacity = 2
+    min_size                    = var.asg_warm_pool_min_size
+    max_group_prepared_capacity = var.asg_max_size
   }
 
   tag {
@@ -184,6 +173,9 @@ resource "aws_autoscaling_group" "weblogic" {
   }
 }
 
+#------------------------------------------------------------------------------
+# Loadbalancer rules
+#------------------------------------------------------------------------------
 resource "aws_lb_target_group" "weblogic" {
 
   name_prefix          = "weblc-"
@@ -230,121 +222,6 @@ resource "aws_lb_listener_rule" "weblogic" {
   }
 }
 
-# resource "aws_instance" "weblogic" {
-#   ami                         = data.aws_ami.weblogic.id
-#   associate_public_ip_address = false
-#   disable_api_termination     = var.termination_protection
-#   ebs_optimized               = local.ebs_optimized
-#   iam_instance_profile        = var.instance_profile_name
-#   instance_type               = var.instance_type # tflint-ignore: aws_instance_invalid_type
-#   key_name                    = var.key_name
-#   monitoring                  = true
-#   placement_group = aws_placement_group.weblogic.id
-#   subnet_id                   = data.aws_subnet.private.id
-#   user_data                   = data.template_file.user_data.rendered
-#   vpc_security_group_ids = [var.common_security_group_id]
-
-#   # metadata_options { # http_endpoint/http_tokens forces instance to use IMDSv2 which is incompatible with Weblogic
-#   #   http_endpoint = "enabled"
-#   #   http_tokens   = "required"
-#   # }
-
-#   root_block_device {
-#     delete_on_termination = true
-#     encrypted             = true
-#     # volume_size           = lookup(var.drive_map, data.aws_ami.weblogic.root_device_name, local.root_device_size)
-#     volume_type = "gp3"
-
-#     tags = merge(
-#       var.tags,
-#       {
-#         Name       = "weblogic-${var.name}-root-${data.aws_ami.weblogic.root_device_name}"
-#       }
-#     )
-#   }
-
-#   dynamic "ephemeral_block_device" { # block devices specified inline cannot be resized later so we need to make sure they are not mounted here
-#     for_each = [for bdm in data.aws_ami.weblogic.block_device_mappings : bdm if bdm.device_name != data.aws_ami.weblogic.root_device_name]
-#     iterator = device
-#     content {
-#       device_name = device.value.device_name
-#       no_device   = true
-#     }
-#   }
-
-#   lifecycle {
-#     ignore_changes = [
-#       user_data,         # Prevent changes to user_data from destroying existing EC2s
-#     ]
-#   }
-
-#   tags = merge(
-#     var.tags,
-#     {
-#       Name       = "weblogic-${var.name}"
-#       component  = "data"
-#       os_type    = "Linux"
-#       os_version = "RHEL 6.10" # todo: we should add this as a tag in the AMI and then get it from a datasource
-#       always_on  = var.environment == "production" ? "true" : "false"
-#     }
-#   )
-# }
-
-# resource "aws_ebs_volume" "weblogic" {
-#   for_each = { for bdm in data.aws_ami.weblogic.block_device_mappings : bdm.device_name => bdm if bdm.device_name != data.aws_ami.weblogic.root_device_name }
-
-#   availability_zone = var.availability_zone
-#   encrypted         = true
-#   iops              = each.value["ebs"]["iops"]
-#   snapshot_id       = each.value["ebs"]["snapshot_id"]
-#   size              = lookup(var.oracle_app_disk_size, each.value["device_name"], each.value["ebs"]["volume_size"])
-#   type              = each.value["ebs"]["volume_type"] == "gp2" ? "gp3" : each.value["ebs"]["volume_type"]
-
-#   tags = merge(
-#     var.tags,
-#     {
-#       Name = "weblogic-${var.name}-${each.value.device_name}"
-#     }
-#   )
-# }
-
-# resource "aws_volume_attachment" "weblogic" {
-#   for_each = aws_ebs_volume.weblogic
-
-#   device_name  = each.key
-#   volume_id    = each.value.id
-#   instance_id  = aws_instance.weblogic.id
-#   force_detach = true
-# }
-
-#------------------------------------------------------------------------------
-# Route 53 record
-#------------------------------------------------------------------------------
-
-data "aws_route53_zone" "internal" {
-  provider = aws.core-vpc
-
-  name         = "${var.business_unit}-${var.environment}.modernisation-platform.internal."
-  private_zone = true
-}
-
-data "aws_route53_zone" "external" {
-  provider = aws.core-vpc
-
-  name         = "${var.business_unit}-${var.environment}.modernisation-platform.service.justice.gov.uk."
-  private_zone = false
-}
-
-# resource "aws_route53_record" "internal" {
-#   provider = aws.core-vpc
-
-#   zone_id = data.aws_route53_zone.internal.zone_id
-#   name    = "weblogic.${var.name}.${var.application_name}.${data.aws_route53_zone.internal.name}"
-#   type    = "A"
-#   ttl     = "60"
-#   records = [aws_instance.weblogic.private_ip]
-# }
-
 #------------------------------------------------------------------------------
 # Instance profile to be assumed by the ec2 instances
 #------------------------------------------------------------------------------
@@ -369,7 +246,7 @@ resource "aws_iam_role" "weblogic" {
   )
 
   inline_policy {
-    name = "weblogic-policy"
+    name   = "weblogic-policy"
     policy = data.aws_iam_policy_document.weblogic.json
   }
 
