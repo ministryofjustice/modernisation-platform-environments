@@ -84,7 +84,7 @@ resource "aws_elb" "ingestion_lb" {
 
   name                       = "ingestion-lb-${var.networking[0].application}"
   internal                   = false
-  security_groups            = [aws_security_group.waf_lb.id]
+  security_groups            = [aws_security_group.ingestion_lb.id]
   subnets                    = data.aws_subnet_ids.ingestion-shared-public.ids
   enable_deletion_protection = false
 
@@ -97,14 +97,14 @@ resource "aws_elb" "ingestion_lb" {
   tags = merge(
     local.tags,
     {
-      Name = "waf-lb-${var.networking[0].application}"
+      Name = "ingestion-lb-${var.networking[0].application}"
     },
   )
 }
 
 resource "aws_lb_target_group" "lb_ingest_tg" {
-  depends_on           = [aws_lb.waf_lb, aws_lb_target_group_attachment.portal-server-attachment]
-  name                 = "waf-lb-ingest-tg-${var.networking[0].application}"
+  depends_on           = [aws_lb.ingestion_lb, aws_lb_target_group_attachment.portal-server-attachment]
+  name                 = "ingestion-lb-ingest-tg-${var.networking[0].application}"
   port                 = 80
   protocol             = "HTTP"
   deregistration_delay = "30"
@@ -123,7 +123,7 @@ resource "aws_lb_target_group" "lb_ingest_tg" {
   tags = merge(
     local.tags,
     {
-      Name = "waf-lb_-g-${var.networking[0].application}"
+      Name = "ingestion-lb_-g-${var.networking[0].application}"
     },
   )
 }
@@ -160,7 +160,7 @@ resource "aws_alb_listener_rule" "ingestion_listener_rule" {
   listener_arn = aws_lb_listener.ingestion_lb_listener.arn
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.waf_lb_ingest_tg.id
+    target_group_arn = aws_lb_target_group.ingestion_lb_ingest_tg.id
   }
 
   condition {
@@ -204,74 +204,9 @@ resource "aws_acm_certificate" "ingestion_lb_cert" {
 
 resource "aws_acm_certificate_validation" "ingestion_lb_cert_validation" {
   certificate_arn = aws_acm_certificate.ingestion_lb_cert.arn
-  //validation_record_fqdns = [for record in aws_route53_record.waf_lb_r53_record : record.fqdn]
+  //validation_record_fqdns = [for record in aws_route53_record.ingestion_lb_r53_record : record.fqdn]
   validation_record_fqdns = [for dvo in aws_acm_certificate.ingestion_lb_cert.domain_validation_options : dvo.resource_record_name]
 
-}
-
-resource "aws_wafv2_web_acl" "waf_acl" {
-  name        = "waf-acl"
-  description = "WAF for Xhibit Portal."
-  scope       = "REGIONAL"
-
-  default_action {
-    allow {}
-  }
-
-  rule {
-    name     = "rule-1"
-    priority = 1
-
-    override_action {
-      count {}
-    }
-
-    statement {
-      managed_rule_group_statement {
-        name        = "AWSManagedRulesCommonRuleSet"
-        vendor_name = "AWS"
-
-        excluded_rule {
-          name = "SizeRestrictions_QUERYSTRING"
-        }
-
-        excluded_rule {
-          name = "NoUserAgent_HEADER"
-        }
-
-        scope_down_statement {
-          geo_match_statement {
-            country_codes = ["GB"]
-          }
-        }
-      }
-    }
-
-    visibility_config {
-      cloudwatch_metrics_enabled = true
-      metric_name                = "waf-acl-rule-1-metric"
-      sampled_requests_enabled   = true
-    }
-  }
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "waf-acl-${var.networking[0].application}"
-    },
-  )
-
-  visibility_config {
-    cloudwatch_metrics_enabled = true
-    metric_name                = "waf-acl-metric"
-    sampled_requests_enabled   = true
-  }
-
-}
-
-resource "aws_wafv2_web_acl_association" "aws_lb_ingestion_association" {
-  resource_arn = aws_lb.ingestion_lb.arn
-  ingestion_acl_arn  = aws_wafv2_web_acl.ingestion_acl.arn
 }
 
 
@@ -331,14 +266,7 @@ data "aws_iam_policy_document" "s3_bucket_ingestion_lb_write" {
 }
 
 resource "aws_s3_bucket" "ingestion_logs" {
-  bucket        = "aws-waf-logs-${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}"
+  bucket        = "aws-ingestion-logs-${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}"
   acl           = "log-delivery-write"
   force_destroy = true
-}
-
-
-
-resource "aws_wafv2_web_acl_logging_configuration" "ingestion_logs" {
-  log_destination_configs = ["${aws_s3_bucket.waf_logs.arn}"]
-  resource_arn            = aws_wafv2_web_acl.waf_acl.arn
 }
