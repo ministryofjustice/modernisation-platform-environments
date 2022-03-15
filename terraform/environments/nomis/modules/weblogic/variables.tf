@@ -93,11 +93,6 @@ variable "environment" {
   description = "Application environment - i.e. the terraform workspace"
 }
 
-# variable "instance_profile_name" {
-#   type        = string
-#   description = "IAM instance profile to be attached to the instance"
-# }
-
 variable "instance_profile_policy_arn" {
   type        = string
   description = "An IAM policy document to be attached to the weblogic instance profile"
@@ -115,7 +110,7 @@ variable "load_balancer_listener_arn" {
 
 variable "name" {
   type        = string
-  description = "Provide a unique name for the instance"
+  description = "This must be the same as the name variable used when setting up the database instance to which the weblogics will connect, e.g. CNOMT1, CNOMT2 etc"
 }
 
 variable "oracle_app_disk_size" {

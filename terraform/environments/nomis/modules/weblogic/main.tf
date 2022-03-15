@@ -90,7 +90,10 @@ resource "aws_launch_template" "weblogic" {
     tags = merge(
       var.tags,
       {
-        Name = "weblogic-${var.name}"
+        Name       = "weblogic-${var.name}"
+        component  = "application"
+        os_type    = "Linux"
+        os_version = "RHEL 6.10"
       }
     )
   }
@@ -117,6 +120,9 @@ resource "aws_launch_template" "weblogic" {
 
 }
 
+#------------------------------------------------------------------------------
+# Auto Scaling Group
+#------------------------------------------------------------------------------
 resource "aws_autoscaling_group" "weblogic" {
   launch_template {
     id      = aws_launch_template.weblogic.id
@@ -127,7 +133,7 @@ resource "aws_autoscaling_group" "weblogic" {
     # this hook is triggered in the user-data script once weblogic script has completed
     name                 = local.initial_lifecycle_hook_name
     default_result       = "ABANDON"
-    heartbeat_timeout    = 3600
+    heartbeat_timeout    = 3000 # inital weblogic setup takes about 45 mins!
     lifecycle_transition = "autoscaling:EC2_INSTANCE_LAUNCHING"
   }
 
@@ -171,6 +177,24 @@ resource "aws_autoscaling_group" "weblogic" {
       propagate_at_launch = true
     }
   }
+}
+
+resource "aws_autoscaling_schedule" "scale_down" {
+  scheduled_action_name  = "weblogic_scale_down"
+  min_size               = 0
+  max_size               = -1
+  desired_capacity       = 0
+  recurrence             = "0 19 * * *"
+  autoscaling_group_name = aws_autoscaling_group.weblogic.name
+}
+
+resource "aws_autoscaling_schedule" "scale_up" {
+  scheduled_action_name  = "weblogic_scale_up"
+  min_size               = var.asg_min_size
+  max_size               = -1
+  desired_capacity       = var.asg_desired_capacity
+  recurrence             = "0 7 * * *"
+  autoscaling_group_name = aws_autoscaling_group.weblogic.name
 }
 
 #------------------------------------------------------------------------------
