@@ -12,18 +12,18 @@ let suffix = "" + Date.now()
 
 let dvladoc = getDvlaDoc(
 	{
-		correlationId : 		 "" + suffix,
-		documentId : 			 "GC BITS TEST " + suffix,
-		description  :           "GC BITS TEST " + suffix,
-		name : 					 "GC BITS TEST " + suffix,
-		dvlaDocIdName: 			 "GC BITS TEST " + suffix,
-		dvlaDocIdUniqueId:       "CSDD" + suffix,
+		correlationId : 		"" + suffix,
+		documentId : 			  "GC BITS TEST " + suffix,
+		description  :      "GC BITS TEST " + suffix,
+		name : 					    "GC BITS TEST " + suffix,
+		dvlaDocIdName: 			"GC BITS TEST " + suffix,
+		dvlaDocIdUniqueId:  "CSDD" + suffix,
 
 	}
 )
 
 
-let result = await sendRequest(dvladoc, 'https://ingest.cjsonline.gov.uk/BITSWebService/BITSWebservice.asmx' )
+let result = await sendRequest(dvladoc, 'https://preingest.cjsonline.gov.uk/BITSWebService/BITSWebservice.asmx' )
 
 
 console.log(result)
@@ -44,7 +44,7 @@ async function sendRequest (body, url) {
 
   return data
 
-} 
+}  
 
 
 
