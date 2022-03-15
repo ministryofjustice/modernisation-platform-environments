@@ -369,7 +369,7 @@ resource "aws_iam_role" "weblogic" {
   )
 
   inline_policy {
-    name = "weblogic-policy"
+    name   = "weblogic-policy"
     policy = data.aws_iam_policy_document.weblogic
   }
 
