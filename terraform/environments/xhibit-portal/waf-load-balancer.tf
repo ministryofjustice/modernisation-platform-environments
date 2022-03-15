@@ -242,7 +242,7 @@ resource "aws_acm_certificate" "waf_lb_cert" {
 
 
 resource "aws_acm_certificate_validation" "waf_lb_cert_validation" {
-  certificate_arn = aws_acm_certificate.waf_lb_cert.arn
+  certificate_arn         = aws_acm_certificate.waf_lb_cert.arn
   validation_record_fqdns = [for dvo in aws_acm_certificate.waf_lb_cert.domain_validation_options : dvo.resource_record_name]
 }
 
