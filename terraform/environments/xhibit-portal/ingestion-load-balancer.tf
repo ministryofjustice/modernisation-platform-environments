@@ -122,7 +122,7 @@ resource "aws_elb" "ingestion_lb" {
   )
 }
 
-data "aws_acm_certificate" "ingestion_cert" {
+data "aws_acm_certificate" "ingestion_lb_cert" {
   domain   = local.application_data.accounts[local.environment].public_dns_name_ingestion
   statuses = ["ISSUED"]
 }
