@@ -16,7 +16,7 @@ resource "aws_security_group_rule" "egress-to-portal" {
   source_security_group_id = aws_security_group.portal-server.id
 }
 
-resource "aws_security_group_rule" "allow_web_users" {
+resource "aws_security_group_rule" "waf_lb_allow_web_users" {
   depends_on        = [aws_security_group.waf_lb]
   security_group_id = aws_security_group.waf_lb.id
   type              = "ingress"
