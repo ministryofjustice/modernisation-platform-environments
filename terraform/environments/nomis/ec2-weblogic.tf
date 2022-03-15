@@ -18,7 +18,7 @@ module "weblogic" {
   oracle_app_disk_size   = try(each.value.oracle_app_disk_size, null)
   termination_protection = try(each.value.termination_protection, null)
 
-  common_security_group_id    = aws_security_group.database_common.id
+  common_security_group_id    = aws_security_group.weblogic_common.id
   instance_profile_policy_arn = aws_iam_policy.ec2_common_policy.arn
   key_name                    = aws_key_pair.ec2-user.key_name
   load_balancer_listener_arn  = aws_lb_listener.internal.arn

@@ -73,7 +73,7 @@ resource "aws_launch_template" "weblogic" {
   ebs_optimized           = local.ebs_optimized
 
   iam_instance_profile {
-    name = aws_iam_instance_profile.weblogic.name
+    arn = aws_iam_instance_profile.weblogic.arn
   }
 
   image_id                             = data.aws_ami.weblogic.id
