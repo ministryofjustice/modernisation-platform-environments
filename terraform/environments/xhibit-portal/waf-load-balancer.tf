@@ -28,10 +28,6 @@ resource "aws_security_group_rule" "waf_lb_allow_web_users" {
     "109.152.47.104/32", # George
     "81.101.176.47/32",  # Aman
     "77.100.255.142/32", # Gary 77.100.255.142
-    "20.49.163.173/32",  # Azure function proxy
-    "20.49.163.191/32",  # Azure function proxy
-    "20.49.163.194/32",  # Azure function proxy
-    "20.49.163.244/32",  # Azure function proxy
     "82.44.118.20/32",   # Nick
     "10.175.52.4/32",    # Anthony Fletcher
     "10.182.60.51/32",   # NLE CGI proxy 
@@ -60,8 +56,6 @@ resource "aws_security_group_rule" "waf_lb_allow_web_users" {
     "194.33.192.46/32",  # ATOS PROXY IPS
     "194.33.192.47/32",  # ATOS PROXY IPS
     "194.33.192.48/32",  # ATOS PROXY IPS
-    "195.59.75.151/32",  # New proxy IPs from Prashanth for testing ingestion
-    "195.59.75.152/32",  # New proxy IPs from Prashanth for testing ingestion
     "35.176.93.186/32" , # David Sibley 1
     "94.175.30.86/32" ,  # David Sibley 1
     "109.146.174.114/32",# Prashanth
