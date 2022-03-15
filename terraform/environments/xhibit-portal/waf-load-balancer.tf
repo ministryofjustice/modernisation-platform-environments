@@ -56,8 +56,6 @@ resource "aws_security_group_rule" "waf_lb_allow_web_users" {
     "194.33.192.46/32",  # ATOS PROXY IPS
     "194.33.192.47/32",  # ATOS PROXY IPS
     "194.33.192.48/32",  # ATOS PROXY IPS
-    "35.176.93.186/32" , # David Sibley 1
-    "94.175.30.86/32" ,  # David Sibley 1
     "109.146.174.114/32",# Prashanth
   ]
   ipv6_cidr_blocks = [
