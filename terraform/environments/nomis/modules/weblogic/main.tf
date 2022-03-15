@@ -160,7 +160,7 @@ resource "aws_autoscaling_group" "weblogic" {
   target_group_arns         = [aws_lb_target_group.weblogic.arn]
   vpc_zone_identifier       = data.aws_subnets.private.ids
   wait_for_capacity_timeout = 0
-  
+
   warm_pool {
     pool_state                  = "Stopped"
     min_size                    = 1
