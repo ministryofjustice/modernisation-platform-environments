@@ -25,40 +25,40 @@ resource "aws_security_group_rule" "waf_lb_allow_web_users" {
   to_port           = 443
   protocol          = "TCP"
   cidr_blocks = [
-    "109.152.47.104/32", # George
-    "81.101.176.47/32",  # Aman
-    "77.100.255.142/32", # Gary 77.100.255.142
-    "82.44.118.20/32",   # Nick
-    "10.175.52.4/32",    # Anthony Fletcher
-    "10.182.60.51/32",   # NLE CGI proxy 
-    "10.175.165.159/32", # Helen Dawes
-    "10.175.72.157/32",  # Alan Brightmore
-    "5.148.32.215/32",   # NCC Group proxy ITHC
-    "195.95.131.110/32", # NCC Group proxy ITHC
-    "195.95.131.112/32", # NCC Group proxy ITHC
-    "81.152.37.83/32",   # Anand
-    "77.108.144.130/32", # AL Office
-    "194.33.196.1/32",   # ATOS PROXY IPS
-    "194.33.196.2/32",   # ATOS PROXY IPS
-    "194.33.196.3/32",   # ATOS PROXY IPS
-    "194.33.196.4/32",   # ATOS PROXY IPS
-    "194.33.196.5/32",   # ATOS PROXY IPS
-    "194.33.196.6/32",   # ATOS PROXY IPS
-    "194.33.196.46/32",  # ATOS PROXY IPS
-    "194.33.196.47/32",  # ATOS PROXY IPS
-    "194.33.196.48/32",  # ATOS PROXY IPS
-    "194.33.192.1/32",   # ATOS PROXY IPS
-    "194.33.192.2/32",   # ATOS PROXY IPS
-    "194.33.192.3/32",   # ATOS PROXY IPS
-    "194.33.192.4/32",   # ATOS PROXY IPS
-    "194.33.192.5/32",   # ATOS PROXY IPS
-    "194.33.192.6/32",   # ATOS PROXY IPS
-    "194.33.192.46/32",  # ATOS PROXY IPS
-    "194.33.192.47/32",  # ATOS PROXY IPS
-    "194.33.192.48/32",  # ATOS PROXY IPS
-    "35.176.93.186/32" , # David Sibley 1
-    "94.175.30.86/32" ,  # David Sibley 1
-    "109.146.174.114/32",# Prashanth
+    "109.152.47.104/32",  # George
+    "81.101.176.47/32",   # Aman
+    "77.100.255.142/32",  # Gary 77.100.255.142
+    "82.44.118.20/32",    # Nick
+    "10.175.52.4/32",     # Anthony Fletcher
+    "10.182.60.51/32",    # NLE CGI proxy 
+    "10.175.165.159/32",  # Helen Dawes
+    "10.175.72.157/32",   # Alan Brightmore
+    "5.148.32.215/32",    # NCC Group proxy ITHC
+    "195.95.131.110/32",  # NCC Group proxy ITHC
+    "195.95.131.112/32",  # NCC Group proxy ITHC
+    "81.152.37.83/32",    # Anand
+    "77.108.144.130/32",  # AL Office
+    "194.33.196.1/32",    # ATOS PROXY IPS
+    "194.33.196.2/32",    # ATOS PROXY IPS
+    "194.33.196.3/32",    # ATOS PROXY IPS
+    "194.33.196.4/32",    # ATOS PROXY IPS
+    "194.33.196.5/32",    # ATOS PROXY IPS
+    "194.33.196.6/32",    # ATOS PROXY IPS
+    "194.33.196.46/32",   # ATOS PROXY IPS
+    "194.33.196.47/32",   # ATOS PROXY IPS
+    "194.33.196.48/32",   # ATOS PROXY IPS
+    "194.33.192.1/32",    # ATOS PROXY IPS
+    "194.33.192.2/32",    # ATOS PROXY IPS
+    "194.33.192.3/32",    # ATOS PROXY IPS
+    "194.33.192.4/32",    # ATOS PROXY IPS
+    "194.33.192.5/32",    # ATOS PROXY IPS
+    "194.33.192.6/32",    # ATOS PROXY IPS
+    "194.33.192.46/32",   # ATOS PROXY IPS
+    "194.33.192.47/32",   # ATOS PROXY IPS
+    "194.33.192.48/32",   # ATOS PROXY IPS
+    "35.176.93.186/32",   # David Sibley 1
+    "94.175.30.86/32",    # David Sibley 1
+    "109.146.174.114/32", # Prashanth
   ]
   ipv6_cidr_blocks = [
     "2a00:23c7:2416:3d01:9103:2cbb:5bd3:6106/128"
@@ -244,7 +244,7 @@ resource "aws_acm_certificate" "waf_lb_cert" {
 
 
 resource "aws_acm_certificate_validation" "waf_lb_cert_validation" {
-  certificate_arn = aws_acm_certificate.waf_lb_cert.arn
+  certificate_arn         = aws_acm_certificate.waf_lb_cert.arn
   validation_record_fqdns = [for dvo in aws_acm_certificate.waf_lb_cert.domain_validation_options : dvo.resource_record_name]
 }
 
