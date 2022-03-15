@@ -88,7 +88,7 @@ resource "aws_elb" "ingestion_lb" {
 
   access_logs {
     bucket  = aws_s3_bucket.loadbalancer_logs.bucket
-    prefix  = "http-lb"
+    bucket_prefix  = "http-lb"
     enabled = true
   }
 
