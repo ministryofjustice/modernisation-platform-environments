@@ -143,8 +143,7 @@ data "template_file" "task_definition" {
 
 module "windows-ecs" {
 
-  #source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs?ref=v1.0.4"
-  source = "../../../../modernisation-platform-terraform-ecs"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs?ref=v2.0.0"
 
   subnet_set_name         = local.subnet_set_name
   vpc_all                 = local.vpc_all
