@@ -122,31 +122,16 @@ resource "aws_elb" "ingestion_lb" {
   )
 }
 
-resource "aws_acm_certificate" "ingestion_lb_cert" {
-  domain_name       = local.application_data.accounts[local.environment].public_dns_name_ingestion
-  validation_method = "DNS"
-
-  subject_alternative_names = [
-    local.application_data.accounts[local.environment].public_dns_name_ingestion,
-  ]
-
-  tags = {
-    Environment = local.environment
-  }
-
-  lifecycle {
-    create_before_destroy = true
-  }
+data "aws_acm_certificate" "ingestion_cert" {
+  domain   = local.application_data.accounts[local.environment].public_dns_name_ingestion
+  statuses = ["ISSUED"]
 }
 
 resource "aws_acm_certificate_validation" "ingestion_lb_cert_validation" {
   certificate_arn = aws_acm_certificate.ingestion_lb_cert.arn
   //validation_record_fqdns = [for record in aws_route53_record.ingestion_lb_r53_record : record.fqdn]
   validation_record_fqdns = [for dvo in aws_acm_certificate.ingestion_lb_cert.domain_validation_options : dvo.resource_record_name]
-
 }
-
-
 
 resource "aws_s3_bucket" "ingestion_loadbalancer_logs" {
   bucket        = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}-ingestion-lblogs"
@@ -168,7 +153,7 @@ data "aws_iam_policy_document" "s3_bucket_ingestion_lb_write" {
     ]
     effect = "Allow"
     resources = [
-      "${aws_s3_bucket.loadbalancer_logs.arn}/*",
+      "${aws_s3_bucket.ingestion_loadbalancer_logs.arn}/*",
     ]
 
     principals {
@@ -182,7 +167,7 @@ data "aws_iam_policy_document" "s3_bucket_ingestion_lb_write" {
       "s3:PutObject"
     ]
     effect    = "Allow"
-    resources = ["${aws_s3_bucket.loadbalancer_logs.arn}/*"]
+    resources = ["${aws_s3_bucket.ingestion_loadbalancer_logs.arn}/*"]
     principals {
       identifiers = ["delivery.logs.amazonaws.com"]
       type        = "Service"
@@ -194,7 +179,7 @@ data "aws_iam_policy_document" "s3_bucket_ingestion_lb_write" {
       "s3:GetBucketAcl"
     ]
     effect    = "Allow"
-    resources = ["${aws_s3_bucket.loadbalancer_logs.arn}"]
+    resources = ["${aws_s3_bucket.ingestion_loadbalancer_logs.arn}"]
     principals {
       identifiers = ["delivery.logs.amazonaws.com"]
       type        = "Service"
