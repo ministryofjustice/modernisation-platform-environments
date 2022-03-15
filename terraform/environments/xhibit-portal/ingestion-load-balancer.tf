@@ -127,12 +127,6 @@ data "aws_acm_certificate" "ingestion_lb_cert" {
   statuses = ["ISSUED"]
 }
 
-resource "aws_acm_certificate_validation" "ingestion_lb_cert_validation" {
-  certificate_arn = data.aws_acm_certificate.ingestion_lb_cert.arn
-  //validation_record_fqdns = [for record in aws_route53_record.ingestion_lb_r53_record : record.fqdn]
-  validation_record_fqdns = [for dvo in data.aws_acm_certificate.ingestion_lb_cert.domain_validation_options : dvo.resource_record_name]
-}
-
 resource "aws_s3_bucket" "ingestion_loadbalancer_logs" {
   bucket        = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}-ingestion-lblogs"
   acl           = "log-delivery-write"
