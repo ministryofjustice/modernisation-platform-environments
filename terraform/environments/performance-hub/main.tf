@@ -482,41 +482,9 @@ resource "aws_s3_bucket" "database_backup_files" {
   #checkov:skip=CKV_AWS_144
   #checkov:skip=CKV2_AWS_6
   bucket = "${local.application_name}-db-backups-${local.environment}"
-  acl    = "private"
 
   lifecycle {
     prevent_destroy = true
-  }
-
-  dynamic "lifecycle_rule" {
-    for_each = true ? [true] : []
-
-    content {
-      enabled = true
-
-      noncurrent_version_transition {
-        days          = 30
-        storage_class = "STANDARD_IA"
-      }
-
-      transition {
-        days          = 60
-        storage_class = "STANDARD_IA"
-      }
-    }
-  }
-
-  server_side_encryption_configuration {
-    rule {
-      apply_server_side_encryption_by_default {
-        sse_algorithm     = "aws:kms"
-        kms_master_key_id = aws_kms_key.s3.arn
-      }
-    }
-  }
-
-  versioning {
-    enabled = true
   }
 
   tags = merge(
@@ -525,6 +493,45 @@ resource "aws_s3_bucket" "database_backup_files" {
       Name = "${local.application_name}-db-backups-s3"
     }
   )
+}
+
+resource "aws_s3_bucket_acl" "database_backup_files" {
+  bucket = aws_s3_bucket.database_backup_files.id
+  acl    = "private"
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "database_backup_files" {
+  bucket = aws_s3_bucket.database_backup_files.id
+  rule {
+    id     = "tf-s3-lifecycle"
+    status = "Enabled"
+    noncurrent_version_transition {
+      noncurrent_days = 30
+      storage_class   = "STANDARD_IA"
+    }
+
+    transition {
+      days          = 60
+      storage_class = "STANDARD_IA"
+    }
+  }
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "database_backup_files" {
+  bucket = aws_s3_bucket.database_backup_files.id
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm     = "aws:kms"
+      kms_master_key_id = aws_kms_key.s3.arn
+    }
+  }
+}
+
+resource "aws_s3_bucket_versioning" "database_backup_files" {
+  bucket = aws_s3_bucket.database_backup_files.id
+  versioning_configuration {
+    status = "Enabled"
+  }
 }
 
 #S3 bucket access policy
@@ -596,41 +603,9 @@ resource "aws_s3_bucket" "upload_files" {
   #checkov:skip=CKV_AWS_144
   #checkov:skip=CKV2_AWS_6
   bucket = "${local.application_name}-uploads-${local.environment}"
-  acl    = "private"
 
   lifecycle {
     prevent_destroy = true
-  }
-
-  dynamic "lifecycle_rule" {
-    for_each = true ? [true] : []
-
-    content {
-      enabled = true
-
-      noncurrent_version_transition {
-        days          = 30
-        storage_class = "STANDARD_IA"
-      }
-
-      transition {
-        days          = 60
-        storage_class = "STANDARD_IA"
-      }
-    }
-  }
-
-  server_side_encryption_configuration {
-    rule {
-      apply_server_side_encryption_by_default {
-        sse_algorithm     = "aws:kms"
-        kms_master_key_id = aws_kms_key.s3.arn
-      }
-    }
-  }
-
-  versioning {
-    enabled = true
   }
 
   tags = merge(
@@ -639,6 +614,45 @@ resource "aws_s3_bucket" "upload_files" {
       Name = "${local.application_name}-uploads"
     }
   )
+}
+
+resource "aws_s3_bucket_acl" "upload_files" {
+  bucket = aws_s3_bucket.upload_files.id
+  acl    = "private"
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "upload_files" {
+  bucket = aws_s3_bucket.upload_files.id
+  rule {
+    id     = "tf-s3-lifecycle"
+    status = "Enabled"
+    noncurrent_version_transition {
+      noncurrent_days = 30
+      storage_class   = "STANDARD_IA"
+    }
+
+    transition {
+      days          = 60
+      storage_class = "STANDARD_IA"
+    }
+  }
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "upload_files" {
+  bucket = aws_s3_bucket.upload_files.id
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm     = "aws:kms"
+      kms_master_key_id = aws_kms_key.s3.arn
+    }
+  }
+}
+
+resource "aws_s3_bucket_versioning" "upload_files" {
+  bucket = aws_s3_bucket.upload_files.id
+  versioning_configuration {
+    status = "Enabled"
+  }
 }
 
 resource "aws_s3_bucket_policy" "upload_files_policy" {
