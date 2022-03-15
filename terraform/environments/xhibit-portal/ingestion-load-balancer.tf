@@ -15,7 +15,7 @@ resource "aws_security_group_rule" "egress-to-ingestion" {
   source_security_group_id = aws_security_group.cjip-server.id
 }
 
-resource "aws_security_group_rule" "allow_web_users" {
+resource "aws_security_group_rule" "ingestion_lb_allow_web_users" {
   depends_on        = [aws_security_group.ingestion_lb]
   security_group_id = aws_security_group.ingestion_lb.id
   type              = "ingress"
@@ -69,7 +69,7 @@ resource "aws_security_group_rule" "allow_web_users" {
 }
 
 
-data "aws_subnet_ids" "shared-public" {
+data "aws_subnet_ids" "ingestion-shared-public" {
   vpc_id = local.vpc_id
   tags = {
     "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public*"
@@ -85,7 +85,7 @@ resource "aws_elb" "ingestion_lb" {
   name                       = "ingestion-lb-${var.networking[0].application}"
   internal                   = false
   security_groups            = [aws_security_group.waf_lb.id]
-  subnets                    = data.aws_subnet_ids.shared-public.ids
+  subnets                    = data.aws_subnet_ids.ingestion-shared-public.ids
   enable_deletion_protection = false
 
   access_logs {
