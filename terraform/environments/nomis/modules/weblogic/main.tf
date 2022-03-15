@@ -73,7 +73,7 @@ resource "aws_launch_template" "weblogic" {
   ebs_optimized           = local.ebs_optimized
 
   iam_instance_profile {
-    name = var.instance_profile_name
+    name = aws_iam_instance_profile.weblogic.name
   }
 
   image_id                             = data.aws_ami.weblogic.id
@@ -160,7 +160,7 @@ resource "aws_autoscaling_group" "weblogic" {
   target_group_arns         = [aws_lb_target_group.weblogic.arn]
   vpc_zone_identifier       = data.aws_subnets.private.ids
   wait_for_capacity_timeout = 0
-  
+
   warm_pool {
     pool_state                  = "Stopped"
     min_size                    = 1
@@ -182,12 +182,6 @@ resource "aws_autoscaling_group" "weblogic" {
       propagate_at_launch = true
     }
   }
-
-  depends_on = [
-    # the instance profile must be updated before the ASG is created as otherwise
-    # instances get created before they have the necessary permissions
-    aws_iam_role_policy.weblogic
-  ]
 }
 
 resource "aws_lb_target_group" "weblogic" {
@@ -352,19 +346,45 @@ data "aws_route53_zone" "external" {
 # }
 
 #------------------------------------------------------------------------------
-# Instance IAM role extra permissions
-# Temporarily allow get parameter when instance first created
-# Attach policy inline on ec2-common-role
+# Instance profile to be assumed by the ec2 instances
 #------------------------------------------------------------------------------
+resource "aws_iam_role" "weblogic" {
+  name                 = "ec2-weblogic-role-${var.name}"
+  path                 = "/"
+  max_session_duration = "3600"
+  assume_role_policy = jsonencode(
+    {
+      "Version" : "2012-10-17",
+      "Statement" : [
+        {
+          "Effect" : "Allow",
+          "Principal" : {
+            "Service" : "ec2.amazonaws.com"
+          }
+          "Action" : "sts:AssumeRole",
+          "Condition" : {}
+        }
+      ]
+    }
+  )
+  managed_policy_arns = [
+    "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy",
+    var.instance_profile_policy_arn
+  ]
 
-# resource "time_offset" "weblogic" {
-#   # static time resource for controlling access to parameter
-#   offset_minutes = 30
-#   triggers = {
-#     # if the instance is recycled we reset the timestamp to give access again
-#     instance_id = aws_instance.weblogic.arn
-#   }
-# }
+  tags = merge(
+    var.tags,
+    {
+      Name = "ec2-weblogic-role-${var.name}"
+    },
+  )
+}
+
+resource "aws_iam_instance_profile" "weblogic" {
+  name = "ec2-weblogic-profile-${var.name}"
+  role = aws_iam_role.weblogic.name
+  path = "/"
+}
 
 data "aws_iam_policy_document" "weblogic" {
   statement {
@@ -375,21 +395,6 @@ data "aws_iam_policy_document" "weblogic" {
       "arn:aws:ssm:${var.region}:${data.aws_caller_identity.current.id}:parameter/weblogic/default/*",
       "arn:aws:ssm:${var.region}:${data.aws_caller_identity.current.id}:parameter/weblogic/${var.name}/*"
     ]
-    # condition {
-    #   test     = "DateLessThan"
-    #   variable = "aws:CurrentTime"
-    #   values   = [time_offset.weblogic.rfc3339]
-    # }
-    # condition {
-    #   test     = "StringLike"
-    #   variable = "ec2:SourceInstanceARN"
-    #   values   = [aws_instance.weblogic.arn]
-    # }
-    condition {
-      test     = "StringLike"
-      variable = "ec2:ResourceTag/aws:ec2launchtemplate:id"
-      values   = [aws_launch_template.weblogic.id]
-    }
   }
 
   statement {
@@ -397,28 +402,7 @@ data "aws_iam_policy_document" "weblogic" {
     effect  = "Allow"
     actions = ["autoscaling:CompleteLifecycleAction"]
     resources = [
-      # this is deliberatly not scoped to the specific ASG as this resource must be created before the ASG
-      "arn:aws:autoscaling:${var.region}:${data.aws_caller_identity.current.id}:autoScalingGroup:*:autoScalingGroupName/*"
+      "arn:aws:autoscaling:${var.region}:${data.aws_caller_identity.current.id}:autoScalingGroup:*:autoScalingGroupName/${local.auto_scaling_group_name}"
     ]
-    # condition {
-    #   test     = "StringLike"
-    #   variable = "ec2:ResourceTag/aws:ec2launchtemplate:id"
-    #   values   = [aws_launch_template.weblogic.id]
-    # }
-    condition {
-      test     = "StringLike"
-      variable = "autoscaling:ResourceTag/aws:ec2launchtemplate:id"
-      values   = [aws_launch_template.weblogic.id]
-    }
   }
-}
-
-data "aws_iam_instance_profile" "weblogic" {
-  name = var.instance_profile_name
-}
-
-resource "aws_iam_role_policy" "weblogic" {
-  name   = "asm-parameter-access-${var.name}"
-  role   = data.aws_iam_instance_profile.weblogic.role_name
-  policy = data.aws_iam_policy_document.weblogic.json
 }

@@ -65,9 +65,14 @@ variable "environment" {
   description = "Application environment - i.e. the terraform workspace"
 }
 
-variable "instance_profile_name" {
+# variable "instance_profile_name" {
+#   type        = string
+#   description = "IAM instance profile to be attached to the instance"
+# }
+
+variable "instance_profile_policy_arn" {
   type        = string
-  description = "IAM instance profile to be attached to the instance"
+  description = "An IAM policy document to be attached to the weblogic instance profile"
 }
 
 variable "key_name" {

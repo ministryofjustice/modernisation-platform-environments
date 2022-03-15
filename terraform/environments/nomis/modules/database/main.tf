@@ -330,7 +330,7 @@ data "aws_iam_policy_document" "asm_parameter" {
       variable = "aws:CurrentTime"
       values   = [time_offset.asm_parameter.rfc3339]
     }
-    condition {
+    condition { #todo: this needs rethinking as it doesn't do anything
       test     = "StringLike"
       variable = "ec2:SourceInstanceARN"
       values   = [aws_instance.database.arn]
