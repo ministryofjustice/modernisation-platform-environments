@@ -240,7 +240,6 @@ resource "aws_acm_certificate" "waf_lb_cert" {
   validation_method = "DNS"
 
   subject_alternative_names = [
-    "*.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk",
     local.application_data.accounts[local.environment].public_dns_name_web,
   ]
 
@@ -253,9 +252,14 @@ resource "aws_acm_certificate" "waf_lb_cert" {
 resource "aws_acm_certificate_validation" "waf_lb_cert_validation" {
   certificate_arn = aws_acm_certificate.waf_lb_cert.arn
   validation_record_fqdns = [for dvo in aws_acm_certificate.waf_lb_cert.domain_validation_options : dvo.resource_record_name]
-
 }
 
+data "aws_route53_zone" "external_r53_zone" {
+  provider = aws.core-vpc
+
+  name         = "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk."
+  private_zone = false
+}
 
 resource "aws_route53_record" "waf_lb_r53_record" {
   provider = aws.core-vpc
