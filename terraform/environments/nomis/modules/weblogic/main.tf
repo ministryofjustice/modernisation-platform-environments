@@ -159,7 +159,8 @@ resource "aws_autoscaling_group" "weblogic" {
   termination_policies      = ["OldestInstance"]
   target_group_arns         = [aws_lb_target_group.weblogic.arn]
   vpc_zone_identifier       = data.aws_subnets.private.ids
-
+  wait_for_capacity_timeout = 0
+  
   warm_pool {
     pool_state                  = "Stopped"
     min_size                    = 1
@@ -386,7 +387,7 @@ data "aws_iam_policy_document" "weblogic" {
     # }
     condition {
       test     = "StringLike"
-      variable = "aws:ResourceTag/aws:ec2launchtemplate:id"
+      variable = "ec2:ResourceTag/aws:ec2launchtemplate:id"
       values   = [aws_launch_template.weblogic.id]
     }
   }
@@ -397,11 +398,16 @@ data "aws_iam_policy_document" "weblogic" {
     actions = ["autoscaling:CompleteLifecycleAction"]
     resources = [
       # this is deliberatly not scoped to the specific ASG as this resource must be created before the ASG
-      "arn:aws:autoscaling:${var.region}:${data.aws_caller_identity.current.id}:autoscalinggroup:*"
+      "arn:aws:autoscaling:${var.region}:${data.aws_caller_identity.current.id}:autoScalingGroup:*:autoScalingGroupName/*"
     ]
+    # condition {
+    #   test     = "StringLike"
+    #   variable = "ec2:ResourceTag/aws:ec2launchtemplate:id"
+    #   values   = [aws_launch_template.weblogic.id]
+    # }
     condition {
       test     = "StringLike"
-      variable = "aws:ResourceTag/aws:ec2launchtemplate:id"
+      variable = "autoscaling:ResourceTag/aws:ec2launchtemplate:id"
       values   = [aws_launch_template.weblogic.id]
     }
   }
