@@ -97,7 +97,7 @@ resource "aws_elb" "ingestion_lb" {
     instance_protocol  = "http"
     lb_port            = 443
     lb_protocol        = "https"
-    ssl_certificate_id = aws_acm_certificate.ingestion_lb_cert.arn
+    ssl_certificate_id = data.aws_acm_certificate.ingestion_lb_cert.arn
   }
 
   health_check {
@@ -128,9 +128,9 @@ data "aws_acm_certificate" "ingestion_lb_cert" {
 }
 
 resource "aws_acm_certificate_validation" "ingestion_lb_cert_validation" {
-  certificate_arn = aws_acm_certificate.ingestion_lb_cert.arn
+  certificate_arn = data.aws_acm_certificate.ingestion_lb_cert.arn
   //validation_record_fqdns = [for record in aws_route53_record.ingestion_lb_r53_record : record.fqdn]
-  validation_record_fqdns = [for dvo in aws_acm_certificate.ingestion_lb_cert.domain_validation_options : dvo.resource_record_name]
+  validation_record_fqdns = [for dvo in data.aws_acm_certificate.ingestion_lb_cert.domain_validation_options : dvo.resource_record_name]
 }
 
 resource "aws_s3_bucket" "ingestion_loadbalancer_logs" {
