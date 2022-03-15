@@ -4,7 +4,7 @@ Terraform module for creating Weblogic instances in a multi-AZ autoscaling group
 
 ## Usage 
 
-Pay particular attention to the `name` variable. This needs to be the same as the name used in the target databases internal Route 53 record, e.g. `db.<var.name>.remainder-of-uri`.
+Pay particular attention to the `name` variable. This needs to be the same as the name used in the target databases internal Route 53 record, e.g. `db.<var.name>.xxxxxxxx.gov.uk`.
 
 Many variables have the `nullable` property set to false, this allows the variable default to be used if a `null` value is passed.  Handy if using the module in a `for_each` and not all values are set (see `termination_protection` in below example).
 
@@ -102,11 +102,11 @@ No modules.
 | <a name="input_key_name"></a> [key\_name](#input\_key\_name) | Name of ssh key resource for ec2-user | `string` | n/a | yes |
 | <a name="input_load_balancer_listener_arn"></a> [load\_balancer\_listener\_arn](#input\_load\_balancer\_listener\_arn) | arn for loadbalancer fronting weblogics | `string` | n/a | yes |
 | <a name="input_name"></a> [name](#input\_name) | This must be the same as the name variable used when setting up the database instance to which the weblogics will connect, e.g. CNOMT1, CNOMT2 etc | `string` | n/a | yes |
-| <a name="input_oracle_app_disk_size"></a> [oracle\_app\_disk\_size](#input\_oracle\_app\_disk\_size) | Capcity of each Oracle application disk, /u01 and /u02 | `map(any)` | `{}` | no |
+| <a name="input_oracle_app_disk_size"></a> [oracle\_app\_disk\_size](#input\_oracle\_app\_disk\_size) | Capcity of each Oracle application disk, /u01 and /u02. If not specified, the default values from the AMI block device mappings will be used. | `map(any)` | `{}` | no |
 | <a name="input_region"></a> [region](#input\_region) | The region in which to deploy the instances | `string` | `"eu-west-2"` | no |
 | <a name="input_subnet_set"></a> [subnet\_set](#input\_subnet\_set) | Fixed variable to specify subnet-set for RAM shared subnets | `string` | n/a | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | Default tags to be applied to resources | `map(any)` | n/a | yes |
-| <a name="input_termination_protection"></a> [termination\_protection](#input\_termination\_protection) | n/a | `bool` | `false` | no |
+| <a name="input_termination_protection"></a> [termination\_protection](#input\_termination\_protection) | Set to true to prevent accidental deletion of instances | `bool` | `false` | no |
 | <a name="input_use_default_creds"></a> [use\_default\_creds](#input\_use\_default\_creds) | Use the default weblogic admin username/password & T1 Nomis db username/password (Parameter Store Variables) | `bool` | `true` | no |
 
 ## Outputs

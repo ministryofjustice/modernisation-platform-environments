@@ -49,13 +49,6 @@ variable "asg_warm_pool_min_size" {
   nullable    = false
 }
 
-# variable "availability_zone" {
-#   type        = string
-#   description = "The availability zone in which to deploy the infrastructure"
-#   default     = "eu-west-2a"
-#   nullable    = false
-# }
-
 variable "business_unit" {
   type        = string
   description = "This corresponds to the VPC in which the application resides"
@@ -115,7 +108,7 @@ variable "name" {
 
 variable "oracle_app_disk_size" {
   type        = map(any)
-  description = "Capcity of each Oracle application disk, /u01 and /u02"
+  description = "Capcity of each Oracle application disk, /u01 and /u02. If not specified, the default values from the AMI block device mappings will be used."
   default = {
     # "/dev/sdb" = 100
   }
@@ -140,9 +133,10 @@ variable "tags" {
 }
 
 variable "termination_protection" {
-  type     = bool
-  default  = false
-  nullable = false
+  type        = bool
+  description = "Set to true to prevent accidental deletion of instances"
+  default     = false
+  nullable    = false
 }
 
 variable "use_default_creds" {
