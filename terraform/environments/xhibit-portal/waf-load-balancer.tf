@@ -130,50 +130,17 @@ resource "aws_lb_target_group" "waf_lb_web_tg" {
   )
 }
 
-resource "aws_lb_target_group" "waf_lb_ingest_tg" {
-#   depends_on           = [aws_lb.waf_lb, aws_lb_target_group_attachment.portal-server-attachment]
-#   name                 = "waf-lb-ingest-tg-${var.networking[0].application}"
-#   port                 = 80
-#   protocol             = "HTTP"
-#   deregistration_delay = "30"
-#   vpc_id               = local.vpc_id
-
-#   health_check {
-#     path                = "/"
-#     port                = 80
-#     healthy_threshold   = 6
-#     unhealthy_threshold = 2
-#     timeout             = 2
-#     interval            = 5
-#     matcher             = "304,200" # TODO this is really bad practice - someone needs to implement a proper health check, either in the code itself, or by using an external checker like https://aws.amazon.com/blogs/networking-and-content-delivery/identifying-unhealthy-targets-of-elastic-load-balancer/
-#   }
-
-#   tags = merge(
-#     local.tags,
-#     {
-#       Name = "waf-lb_-g-${var.networking[0].application}"
-#     },
-#   )
-# }
-
 resource "aws_lb_target_group_attachment" "portal-server-attachment" {
   target_group_arn = aws_lb_target_group.waf_lb_web_tg.arn
   target_id        = aws_instance.portal-server.id
   port             = 80
 }
 
-# resource "aws_lb_target_group_attachment" "ingestion-server-attachment" {
-#   target_group_arn = aws_lb_target_group.waf_lb_ingest_tg.arn
-#   target_id        = aws_instance.cjip-server.id
-#   port             = 80
-# }
-
 
 resource "aws_lb_listener" "waf_lb_listener" {
   depends_on = [
     aws_acm_certificate_validation.waf_lb_cert_validation,
-    aws_lb_target_group.waf_lb_web_tg,
-    # aws_lb_target_group.waf_lb_ingest_tg
+    aws_lb_target_group.waf_lb_web_tg
   ]
 
   load_balancer_arn = aws_lb.waf_lb.arn
