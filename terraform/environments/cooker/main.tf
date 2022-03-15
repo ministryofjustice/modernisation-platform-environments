@@ -68,18 +68,6 @@ variable "region" {
 #   path = "/"
 # }
 
-
-
-
-
-
-
-
-
-
-
-
-
 locals {
   app_data = jsondecode(file("./app_variables.json"))
 }
@@ -90,24 +78,33 @@ data "aws_vpc" "shared" {
   }
 }
 
-data "aws_subnet_ids" "shared-data" {
-  vpc_id = data.aws_vpc.shared.id
+data "aws_subnets" "shared-data" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.shared.id]
+  }
   tags = {
-    "Name" = "${var.networking[0].business-unit}-sandbox-${var.networking[0].set}-data*"
+    Name = "${var.networking[0].business-unit}-sandbox-${var.networking[0].set}-data*"
   }
 }
 
-data "aws_subnet_ids" "shared-private" {
-  vpc_id = data.aws_vpc.shared.id
+data "aws_subnets" "shared-private" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.shared.id]
+  }
   tags = {
-    "Name" = "${var.networking[0].business-unit}-sandbox-${var.networking[0].set}-private*"
+    Name = "${var.networking[0].business-unit}-sandbox-${var.networking[0].set}-private*"
   }
 }
 
-data "aws_subnet_ids" "shared-public" {
-  vpc_id = data.aws_vpc.shared.id
+data "aws_subnets" "shared-public" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.shared.id]
+  }
   tags = {
-    "Name" = "${var.networking[0].business-unit}-sandbox-${var.networking[0].set}-public*"
+    Name = "${var.networking[0].business-unit}-sandbox-${var.networking[0].set}-public*"
   }
 }
 
@@ -204,7 +201,7 @@ resource "aws_ecs_service" "app" {
   desired_count                     = "1"
   health_check_grace_period_seconds = "120"
   network_configuration {
-    subnets          = data.aws_subnet_ids.shared-private.ids
+    subnets          = data.aws_subnets.shared-private.ids
     security_groups  = [aws_security_group.app.id]
     assign_public_ip = false
   }
@@ -467,7 +464,7 @@ resource "aws_lb" "external" {
   internal                   = false
   load_balancer_type         = "application"
   security_groups            = [aws_security_group.external_lb.id]
-  subnets                    = data.aws_subnet_ids.shared-public.ids
+  subnets                    = data.aws_subnets.shared-public.ids
   enable_deletion_protection = false
 
   tags = merge(
@@ -607,7 +604,7 @@ resource "aws_lb" "inner" {
   internal                   = true
   load_balancer_type         = "application"
   security_groups            = [aws_security_group.inner_lb.id]
-  subnets                    = data.aws_subnet_ids.shared-private.ids
+  subnets                    = data.aws_subnets.shared-private.ids
   enable_deletion_protection = false
 
   tags = merge(
@@ -728,7 +725,7 @@ resource "aws_db_subnet_group" "app" {
 
   name        = var.networking[0].application
   description = "Data subnets group"
-  subnet_ids  = data.aws_subnet_ids.shared-data.ids
+  subnet_ids  = data.aws_subnets.shared-data.ids
 
   tags = merge(
     local.tags,
@@ -774,7 +771,7 @@ resource "aws_db_instance" "app" {
   engine                 = "postgres"
   engine_version         = local.app_data.accounts[local.environment].rds_postgresql_version
   instance_class         = local.app_data.accounts[local.environment].rds_instance_class
-  name                   = var.networking[0].application
+  db_name                = var.networking[0].application
   username               = "dbmain"
   password               = random_password.db_master_password.result
   vpc_security_group_ids = [aws_security_group.rds.id]
