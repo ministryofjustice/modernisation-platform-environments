@@ -16,18 +16,7 @@ resource "aws_security_group_rule" "egress-to-portal" {
   source_security_group_id = aws_security_group.portal-server.id
 }
 
-resource "aws_security_group_rule" "egress-to-ingestion" {
-  depends_on               = [aws_security_group.waf_lb]
-  security_group_id        = aws_security_group.waf_lb.id
-  type                     = "egress"
-  description              = "allow web traffic to get to ingestion server"
-  from_port                = 80
-  to_port                  = 80
-  protocol                 = "TCP"
-  source_security_group_id = aws_security_group.cjip-server.id
-}
-
-resource "aws_security_group_rule" "allow_web_users" {
+resource "aws_security_group_rule" "waf_lb_allow_web_users" {
   depends_on        = [aws_security_group.waf_lb]
   security_group_id = aws_security_group.waf_lb.id
   type              = "ingress"
@@ -36,49 +25,65 @@ resource "aws_security_group_rule" "allow_web_users" {
   to_port           = 443
   protocol          = "TCP"
   cidr_blocks = [
-    "109.152.47.104/32", # George
-    "81.101.176.47/32",  # Aman
-    "77.100.255.142/32", # Gary 77.100.255.142
-    "20.49.163.173/32",  # Azure function proxy
-    "20.49.163.191/32",  # Azure function proxy
-    "20.49.163.194/32",  # Azure function proxy
-    "20.49.163.244/32",  # Azure function proxy
-    "82.44.118.20/32",   # Nick
-    "10.175.22.201/32",  # Anthony Fletcher
-    "10.182.60.51/32",   # NLE CGI proxy 
-    "10.175.165.159/32", # Helen Dawes
-    "10.175.72.157/32",  # Alan Brightmore
-    "5.148.32.215/32",   # NCC Group proxy ITHC
-    "195.95.131.110/32", # NCC Group proxy ITHC
-    "195.95.131.112/32", # NCC Group proxy ITHC,
-    "194.33.196.1/32",   # ATOS PROXY IPS
-    "194.33.196.2/32",   # ATOS PROXY IPS
-    "194.33.196.3/32",   # ATOS PROXY IPS
-    "194.33.196.4/32",   # ATOS PROXY IPS
-    "194.33.196.5/32",   # ATOS PROXY IPS
-    "194.33.196.6/32",   # ATOS PROXY IPS
-    "194.33.196.46/32",  # ATOS PROXY IPS
-    "194.33.196.47/32",  # ATOS PROXY IPS
-    "194.33.196.48/32",  # ATOS PROXY IPS
-    "194.33.192.1/32",   # ATOS PROXY IPS
-    "194.33.192.2/32",   # ATOS PROXY IPS
-    "194.33.192.3/32",   # ATOS PROXY IPS
-    "194.33.192.4/32",   # ATOS PROXY IPS
-    "194.33.192.5/32",   # ATOS PROXY IPS
-    "194.33.192.6/32",   # ATOS PROXY IPS
-    "194.33.192.46/32",  # ATOS PROXY IPS
-    "194.33.192.47/32",  # ATOS PROXY IPS
-    "194.33.192.48/32",  # ATOS PROXY IPS
-
-
+    "109.152.47.104/32",  # George
+    "81.101.176.47/32",   # Aman
+    "77.100.255.142/32",  # Gary 77.100.255.142
+    "82.44.118.20/32",    # Nick
+    "10.175.52.4/32",     # Anthony Fletcher
+    "10.182.60.51/32",    # NLE CGI proxy 
+    "10.175.165.159/32",  # Helen Dawes
+    "10.175.72.157/32",   # Alan Brightmore
+    "5.148.32.215/32",    # NCC Group proxy ITHC
+    "195.95.131.110/32",  # NCC Group proxy ITHC
+    "195.95.131.112/32",  # NCC Group proxy ITHC
+    "81.152.37.83/32",    # Anand
+    "77.108.144.130/32",  # AL Office
+    "194.33.196.1/32",    # ATOS PROXY IPS
+    "194.33.196.2/32",    # ATOS PROXY IPS
+    "194.33.196.3/32",    # ATOS PROXY IPS
+    "194.33.196.4/32",    # ATOS PROXY IPS
+    "194.33.196.5/32",    # ATOS PROXY IPS
+    "194.33.196.6/32",    # ATOS PROXY IPS
+    "194.33.196.46/32",   # ATOS PROXY IPS
+    "194.33.196.47/32",   # ATOS PROXY IPS
+    "194.33.196.48/32",   # ATOS PROXY IPS
+    "194.33.192.1/32",    # ATOS PROXY IPS
+    "194.33.192.2/32",    # ATOS PROXY IPS
+    "194.33.192.3/32",    # ATOS PROXY IPS
+    "194.33.192.4/32",    # ATOS PROXY IPS
+    "194.33.192.5/32",    # ATOS PROXY IPS
+    "194.33.192.6/32",    # ATOS PROXY IPS
+    "194.33.192.46/32",   # ATOS PROXY IPS
+    "194.33.192.47/32",   # ATOS PROXY IPS
+    "194.33.192.48/32",   # ATOS PROXY IPS
+    "109.146.174.114/32", # Prashanth
   ]
   ipv6_cidr_blocks = [
-    "2a00:23c7:2416:3d01:c98d:4432:3c83:d937/128"
+    "2a00:23c7:2416:3d01:9103:2cbb:5bd3:6106/128"
   ]
 }
 
+data "aws_ec2_managed_prefix_list" "cf" {
+  name = "com.amazonaws.global.cloudfront.origin-facing"
+}
 
-data "aws_subnet_ids" "shared-public" {
+
+resource "aws_security_group_rule" "allow_cloudfront_ips" {
+  depends_on        = [aws_security_group.waf_lb]
+  security_group_id = aws_security_group.waf_lb.id
+  type              = "ingress"
+  description       = "allow web traffic to get to ingestion server"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "TCP"
+  prefix_list_ids   = [data.aws_ec2_managed_prefix_list.cf.id]
+
+}
+
+
+
+
+data "aws_subnet_ids" "waf-shared-public" {
   vpc_id = local.vpc_id
   tags = {
     "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public*"
@@ -95,7 +100,7 @@ resource "aws_lb" "waf_lb" {
   internal                   = false
   load_balancer_type         = "application"
   security_groups            = [aws_security_group.waf_lb.id]
-  subnets                    = data.aws_subnet_ids.shared-public.ids
+  subnets                    = data.aws_subnet_ids.waf-shared-public.ids
   enable_deletion_protection = false
 
   access_logs {
@@ -138,41 +143,9 @@ resource "aws_lb_target_group" "waf_lb_web_tg" {
   )
 }
 
-resource "aws_lb_target_group" "waf_lb_ingest_tg" {
-  depends_on           = [aws_lb.waf_lb, aws_lb_target_group_attachment.portal-server-attachment]
-  name                 = "waf-lb-ingest-tg-${var.networking[0].application}"
-  port                 = 80
-  protocol             = "HTTP"
-  deregistration_delay = "30"
-  vpc_id               = local.vpc_id
-
-  health_check {
-    path                = "/"
-    port                = 80
-    healthy_threshold   = 6
-    unhealthy_threshold = 2
-    timeout             = 2
-    interval            = 5
-    matcher             = "304,200" # TODO this is really bad practice - someone needs to implement a proper health check, either in the code itself, or by using an external checker like https://aws.amazon.com/blogs/networking-and-content-delivery/identifying-unhealthy-targets-of-elastic-load-balancer/
-  }
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "waf-lb_-g-${var.networking[0].application}"
-    },
-  )
-}
-
 resource "aws_lb_target_group_attachment" "portal-server-attachment" {
   target_group_arn = aws_lb_target_group.waf_lb_web_tg.arn
   target_id        = aws_instance.portal-server.id
-  port             = 80
-}
-
-resource "aws_lb_target_group_attachment" "ingestion-server-attachment" {
-  target_group_arn = aws_lb_target_group.waf_lb_ingest_tg.arn
-  target_id        = aws_instance.cjip-server.id
   port             = 80
 }
 
@@ -180,8 +153,7 @@ resource "aws_lb_target_group_attachment" "ingestion-server-attachment" {
 resource "aws_lb_listener" "waf_lb_listener" {
   depends_on = [
     aws_acm_certificate_validation.waf_lb_cert_validation,
-    aws_lb_target_group.waf_lb_web_tg,
-    aws_lb_target_group.waf_lb_ingest_tg
+    aws_lb_target_group.waf_lb_web_tg
   ]
 
   load_balancer_arn = aws_lb.waf_lb.arn
@@ -189,12 +161,18 @@ resource "aws_lb_listener" "waf_lb_listener" {
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
   certificate_arn   = aws_acm_certificate.waf_lb_cert.arn
+  # certificate_arn   = data.aws_acm_certificate.ingestion_cert.arn 
 
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.waf_lb_web_tg.arn
   }
 }
+
+# resource "aws_lb_listener_certificate" "main_portal_cert" {
+#   listener_arn    = aws_lb_listener.waf_lb_listener.arn
+#   certificate_arn = aws_acm_certificate.waf_lb_cert.arn
+# }
 
 
 resource "aws_alb_listener_rule" "root_listener_redirect" {
@@ -229,8 +207,9 @@ resource "aws_alb_listener_rule" "root_listener_redirect" {
 
 }
 
+
 resource "aws_alb_listener_rule" "web_listener_rule" {
-  priority     = 2
+  priority     = 3
   depends_on   = [aws_lb_listener.waf_lb_listener]
   listener_arn = aws_lb_listener.waf_lb_listener.arn
   action {
@@ -248,48 +227,50 @@ resource "aws_alb_listener_rule" "web_listener_rule" {
 
 }
 
-resource "aws_alb_listener_rule" "ingestion_listener_rule" {
-  priority     = 3
-  depends_on   = [aws_lb_listener.waf_lb_listener]
-  listener_arn = aws_lb_listener.waf_lb_listener.arn
-  action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.waf_lb_ingest_tg.id
-  }
-
-  condition {
-    host_header {
-      values = [
-        local.application_data.accounts[local.environment].public_dns_name_ingestion
-      ]
-    }
-  }
-
-}
-
 resource "aws_acm_certificate" "waf_lb_cert" {
-  domain_name       = local.application_data.accounts[local.environment].public_dns_name_web
+  domain_name       = "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   validation_method = "DNS"
 
   subject_alternative_names = [
-    local.application_data.accounts[local.environment].public_dns_name_ingestion,
+    local.application_data.accounts[local.environment].public_dns_name_web,
   ]
-
-  tags = {
-    Environment = local.environment
-  }
 
   lifecycle {
     create_before_destroy = true
   }
 }
 
-resource "aws_acm_certificate_validation" "waf_lb_cert_validation" {
-  certificate_arn = aws_acm_certificate.waf_lb_cert.arn
-  //validation_record_fqdns = [for record in aws_route53_record.waf_lb_r53_record : record.fqdn]
-  validation_record_fqdns = [for dvo in aws_acm_certificate.waf_lb_cert.domain_validation_options : dvo.resource_record_name]
 
+resource "aws_acm_certificate_validation" "waf_lb_cert_validation" {
+  certificate_arn         = aws_acm_certificate.waf_lb_cert.arn
+  validation_record_fqdns = [for dvo in aws_acm_certificate.waf_lb_cert.domain_validation_options : dvo.resource_record_name]
 }
+
+data "aws_route53_zone" "external_r53_zone" {
+  provider = aws.core-vpc
+
+  name         = "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk."
+  private_zone = false
+}
+
+resource "aws_route53_record" "waf_lb_r53_record" {
+  provider = aws.core-vpc
+  for_each = {
+    for dvo in aws_acm_certificate.waf_lb_cert.domain_validation_options : dvo.domain_name => {
+      name   = dvo.resource_record_name
+      record = dvo.resource_record_value
+      type   = dvo.resource_record_type
+    }
+  }
+
+  allow_overwrite = true
+  name            = each.value.name
+  records         = [each.value.record]
+  ttl             = 60
+  type            = each.value.type
+  zone_id         = data.aws_route53_zone.external_r53_zone.zone_id
+}
+
 
 resource "aws_wafv2_web_acl" "waf_acl" {
   name        = "waf-acl"
@@ -356,8 +337,6 @@ resource "aws_wafv2_web_acl_association" "aws_lb_waf_association" {
   web_acl_arn  = aws_wafv2_web_acl.waf_acl.arn
 }
 
-
-
 resource "aws_s3_bucket" "loadbalancer_logs" {
   bucket        = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}-lblogs"
   acl           = "log-delivery-write"
@@ -418,71 +397,7 @@ resource "aws_s3_bucket" "waf_logs" {
   force_destroy = true
 }
 
-
-
 resource "aws_wafv2_web_acl_logging_configuration" "waf_logs" {
   log_destination_configs = ["${aws_s3_bucket.waf_logs.arn}"]
   resource_arn            = aws_wafv2_web_acl.waf_acl.arn
 }
-
-
-# resource "random_string" "origin_token" {
-#   length = 30
-#   special = false
-# }
-
-# resource "aws_cloudfront_distribution" "distribution" {
-#   origin {
-#     domain_name   = aws_lb.waf_lb.dns_name
-#     origin_id            = "xp-ingestion"
-#     # custom_header {
-#     #   name = "X-Origin-Token"
-#     #   value = random_string.origin_token.result
-#     # }
-
-#     custom_origin_config {
-#       origin_ssl_protocols  = ["SSLv3","TLSv1","TLSv1.1", "TLSv1.2"]
-#       http_port              = 80
-#       https_port             = 443
-#       origin_protocol_policy = "http-only"
-#     }
-#   }
-
-#   restrictions {
-#     geo_restriction {
-#       restriction_type = "whitelist"
-#       locations        = [ "GB"]
-#     }
-#   }
-
-#   viewer_certificate {
-#     acm_certificate_arn = aws_acm_certificate.waf_lb_cert.arn
-#     ssl_support_method = "sni-only"
-#   }
-
-#   enabled = true
-#   # aliases   = ["yoursite.example.com"]
-
-#   default_cache_behavior {
-#     allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
-#     cached_methods   = ["HEAD", "GET"]
-#     target_origin_id     = "xp-ingestion"
-
-#     forwarded_values {
-#       query_string = true
-#       # headers        = ["X-Origin-Token"]
-
-#       cookies {
-#         forward = "all"
-#       }
-#     }
-
-#     viewer_protocol_policy = "redirect-to-https"
-#     min_ttl                = 0
-#     default_ttl            = 3600
-#     max_ttl                = 86400
-#   }
-# }
-
-
-
