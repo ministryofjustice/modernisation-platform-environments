@@ -149,13 +149,13 @@ resource "aws_acm_certificate_validation" "ingestion_lb_cert_validation" {
 
 
 resource "aws_s3_bucket" "ingestion_loadbalancer_logs" {
-  bucket        = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}-lblogs"
+  bucket        = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}-ingestion-lblogs"
   acl           = "log-delivery-write"
   force_destroy = true
 }
 
 resource "aws_s3_bucket_policy" "ingestion_loadbalancer_logs_policy" {
-  bucket = aws_s3_bucket.loadbalancer_logs.bucket
+  bucket = aws_s3_bucket.ingestion_loadbalancer_logs.bucket
   policy = data.aws_iam_policy_document.s3_bucket_lb_write.json
 }
 
@@ -200,10 +200,4 @@ data "aws_iam_policy_document" "s3_bucket_ingestion_lb_write" {
       type        = "Service"
     }
   }
-}
-
-resource "aws_s3_bucket" "ingestion_logs" {
-  bucket        = "aws-ingestion-logs-${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}"
-  acl           = "log-delivery-write"
-  force_destroy = true
 }
