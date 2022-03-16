@@ -343,7 +343,7 @@ resource "aws_s3_bucket" "loadbalancer_logs" {
 
 resource "aws_s3_bucket_acl" "loadbalancer_logs" {
   bucket = aws_s3_bucket.loadbalancer_logs.id
-  acl = "log-delivery-write"
+  acl    = "log-delivery-write"
 }
 
 resource "aws_s3_bucket_policy" "loadbalancer_logs_policy" {
@@ -401,7 +401,7 @@ resource "aws_s3_bucket" "waf_logs" {
 
 resource "aws_s3_bucket_acl" "waf_logs" {
   bucket = aws_s3_bucket.waf_logs.id
-  acl = "log-delivery-write"
+  acl    = "log-delivery-write"
 }
 
 resource "aws_wafv2_web_acl_logging_configuration" "waf_logs" {
