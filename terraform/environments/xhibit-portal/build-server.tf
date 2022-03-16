@@ -7,25 +7,25 @@ resource "aws_security_group" "build-server" {
 }
 
 resource "aws_security_group_rule" "build-inbound-bastion" {
-  depends_on        = [aws_security_group.build-server]
-  security_group_id = aws_security_group.build-server.id
-  type              = "ingress"
-  description       = "allow all from bastion"
-  from_port         = 0
-  to_port           = 0
-  protocol          = "-1"
-  cidr_blocks       = ["${module.bastion_linux.bastion_private_ip}/32"]
+  depends_on               = [aws_security_group.build-server]
+  security_group_id        = aws_security_group.build-server.id
+  type                     = "ingress"
+  description              = "allow all from bastion"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
+  source_security_group_id = module.bastion_linux.bastion_security_group
 }
 
 resource "aws_security_group_rule" "build-outbound-bastion" {
-  depends_on        = [aws_security_group.build-server]
-  security_group_id = aws_security_group.build-server.id
-  type              = "egress"
-  description       = "allow all to bastion"
-  from_port         = 0
-  to_port           = 0
-  protocol          = "-1"
-  cidr_blocks       = ["${module.bastion_linux.bastion_private_ip}/32"]
+  depends_on               = [aws_security_group.build-server]
+  security_group_id        = aws_security_group.build-server.id
+  type                     = "egress"
+  description              = "allow all to bastion"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
+  source_security_group_id = module.bastion_linux.bastion_security_group
 }
 
 resource "aws_instance" "build-server" {
