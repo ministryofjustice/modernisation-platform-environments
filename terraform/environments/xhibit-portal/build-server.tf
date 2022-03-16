@@ -1,14 +1,14 @@
 
 # Security Groups
-resource "aws_security_group" "build-server" {
+resource "aws_security_group" "build_server" {
   description = "Bastion traffic"
   name        = "build-server-${local.application_name}"
   vpc_id      = local.vpc_id
 }
 
 resource "aws_security_group_rule" "build-inbound-bastion" {
-  depends_on        = [aws_security_group.build-server]
-  security_group_id = aws_security_group.build-server.id
+  depends_on        = [aws_security_group.build_server]
+  security_group_id = aws_security_group.build_server.id
   type              = "ingress"
   description       = "allow all from bastion"
   from_port         = 0
@@ -18,8 +18,8 @@ resource "aws_security_group_rule" "build-inbound-bastion" {
 }
 
 resource "aws_security_group_rule" "build-outbound-bastion" {
-  depends_on        = [aws_security_group.build-server]
-  security_group_id = aws_security_group.build-server.id
+  depends_on        = [aws_security_group.build_server]
+  security_group_id = aws_security_group.build_server.id
   type              = "egress"
   description       = "allow all to bastion"
   from_port         = 0
@@ -29,10 +29,10 @@ resource "aws_security_group_rule" "build-outbound-bastion" {
 }
 
 resource "aws_instance" "build-server" {
-  depends_on                  = [aws_security_group.build-server]
+  depends_on                  = [aws_security_group.build_server]
   instance_type               = "t2.medium"
   ami                         = local.application_data.accounts[local.environment].buildserver-ami
-  vpc_security_group_ids      = [aws_security_group.build-server.id]
+  vpc_security_group_ids      = [aws_security_group.build_server.id]
   monitoring                  = false
   associate_public_ip_address = false
   ebs_optimized               = false

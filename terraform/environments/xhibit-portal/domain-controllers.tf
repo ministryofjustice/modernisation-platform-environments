@@ -517,7 +517,7 @@
 #   source_security_group_id = aws_security_group.portal-server.id
 # }
 
-resource "aws_security_group" "outbound-dns-resolver" {
+resource "aws_security_group" "outbound_dns_resolver" {
   provider = aws.core-vpc
 
   description = "DNS traffic only"
@@ -526,27 +526,27 @@ resource "aws_security_group" "outbound-dns-resolver" {
 }
 
 resource "aws_security_group_rule" "res1" {
-  depends_on               = [aws_security_group.outbound-dns-resolver]
-  security_group_id        = aws_security_group.outbound-dns-resolver.id
+  depends_on               = [aws_security_group.outbound_dns_resolver]
+  security_group_id        = aws_security_group.outbound_dns_resolver.id
   provider                 = aws.core-vpc
   type                     = "egress"
   description              = "allow DNS"
   from_port                = 0
   to_port                  = 53
   protocol                 = "TCP"
-  source_security_group_id = aws_security_group.app-servers.id
+  source_security_group_id = aws_security_group.app_servers.id
 }
 
 resource "aws_security_group_rule" "res2" {
-  depends_on               = [aws_security_group.outbound-dns-resolver]
-  security_group_id        = aws_security_group.outbound-dns-resolver.id
+  depends_on               = [aws_security_group.outbound_dns_resolver]
+  security_group_id        = aws_security_group.outbound_dns_resolver.id
   provider                 = aws.core-vpc
   type                     = "egress"
   description              = "allow DNS"
   from_port                = 0
   to_port                  = 53
   protocol                 = "UDP"
-  source_security_group_id = aws_security_group.app-servers.id
+  source_security_group_id = aws_security_group.app_servers.id
 }
 
 
@@ -555,7 +555,7 @@ resource "aws_security_group_rule" "res2" {
 resource "aws_instance" "infra1" {
   instance_type               = "t2.small"
   ami                         = local.application_data.accounts[local.environment].infra1-ami
-  vpc_security_group_ids      = [aws_security_group.app-servers.id]
+  vpc_security_group_ids      = [aws_security_group.app_servers.id]
   monitoring                  = false
   associate_public_ip_address = false
   ebs_optimized               = false
@@ -619,10 +619,10 @@ resource "aws_volume_attachment" "infra1-disk1" {
 
 
 resource "aws_instance" "infra2" {
-  depends_on                  = [aws_security_group.app-servers, aws_security_group.outbound-dns-resolver]
+  depends_on                  = [aws_security_group.app_servers, aws_security_group.outbound_dns_resolver]
   instance_type               = "t2.small"
   ami                         = local.application_data.accounts[local.environment].infra2-ami
-  vpc_security_group_ids      = [aws_security_group.app-servers.id]
+  vpc_security_group_ids      = [aws_security_group.app_servers.id]
   monitoring                  = false
   associate_public_ip_address = false
   ebs_optimized               = false

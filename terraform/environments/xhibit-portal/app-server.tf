@@ -80,10 +80,10 @@
 
 
 resource "aws_instance" "app-server" {
-  depends_on                  = [aws_security_group.app-servers]
+  depends_on                  = [aws_security_group.app_servers]
   instance_type               = "t2.medium"
   ami                         = local.application_data.accounts[local.environment].suprig02-ami
-  vpc_security_group_ids      = [aws_security_group.app-servers.id]
+  vpc_security_group_ids      = [aws_security_group.app_servers.id]
   monitoring                  = false
   associate_public_ip_address = false
   ebs_optimized               = false

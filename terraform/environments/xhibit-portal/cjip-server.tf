@@ -79,10 +79,10 @@
 
 
 resource "aws_instance" "cjip-server" {
-  depends_on                  = [aws_security_group.ingestion-servers]
+  depends_on                  = [aws_security_group.ingestion_server]
   instance_type               = "t2.medium"
   ami                         = local.application_data.accounts[local.environment].suprig05-ami
-  vpc_security_group_ids      = [aws_security_group.ingestion-servers.id]
+  vpc_security_group_ids      = [aws_security_group.ingestion_server.id]
   monitoring                  = false
   associate_public_ip_address = false
   ebs_optimized               = false

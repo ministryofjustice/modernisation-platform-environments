@@ -108,10 +108,10 @@
 
 
 resource "aws_instance" "portal-server" {
-  depends_on                  = [aws_security_group.ingestion-servers]
+  depends_on                  = [aws_security_group.portal_server]
   instance_type               = "t2.medium"
   ami                         = local.application_data.accounts[local.environment].suprig03-ami
-  vpc_security_group_ids      = [aws_security_group.ingestion-servers.id]
+  vpc_security_group_ids      = [aws_security_group.portal_server.id]
   monitoring                  = false
   associate_public_ip_address = false
   ebs_optimized               = false
