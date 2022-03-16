@@ -28,3 +28,19 @@ fi
 
 # Send lifecycle success notification to indicate instance is ready to transition to "Warmed:stopped" state and enter warm pool, or directly to ASG
 aws autoscaling complete-lifecycle-action --lifecycle-action-result CONTINUE --instance-id $INSTANCE_ID --lifecycle-hook-name ${LIFECYCLE_HOOK_NAME} --auto-scaling-group-name ${AUTO_SCALING_GROUP_NAME} --region ${REGION}
+
+# Add script that triggers lifecycle hook when instance is restarted (i.e. when exiting the warm pool)
+# Always trigger CONTINUE, loadbalancer health checks will determine if service up
+cat > /usr/local/bin/autoscaling-lifecycle-hook.sh << 'EOF'
+#!/bin/bash
+# Added by cloud-init user-data script
+# Triggers an AWS auto-scaling group lifecycle hook to indicate that the instance is in a ready state
+INSTANCE_ID=$(curl http://instance-data/latest/meta-data/instance-id)
+aws autoscaling complete-lifecycle-action --lifecycle-action-result CONTINUE --instance-id $INSTANCE_ID --lifecycle-hook-name ${LIFECYCLE_HOOK_NAME} --auto-scaling-group-name ${AUTO_SCALING_GROUP_NAME} --region ${REGION}
+EOF
+
+chmod u+x /usr/local/bin/autoscaling-lifecycle-hook.sh
+
+# Add to cron.d to run at boot and make sure crond is enabled
+echo "@reboot root /usr/local/bin/autoscaling-lifecycle-hook.sh" > /etc/cron.d/autoscaling-lifecycle-hook
+chkconfig crond on
