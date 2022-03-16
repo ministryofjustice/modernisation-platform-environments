@@ -22,7 +22,7 @@ resource "aws_security_group" "sms-server" {
   }
 }
 
-resource "aws_security_group_rule" "exchange-inbound-all" {
+resource "aws_security_group_rule" "sms-inbound-all" {
   depends_on        = [aws_security_group.exchange_server]
   security_group_id = aws_security_group.exchange_server.id
   type              = "ingress"
