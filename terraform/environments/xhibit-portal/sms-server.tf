@@ -14,14 +14,6 @@ resource "aws_security_group" "sms-server" {
   }
 
   ingress {
-    description      = "allow all"
-    from_port        = 0
-    to_port          = 0
-    protocol         = "-1"
-    source_security_group_id = aws_security_group.app_servers.id
-  }
-
-  ingress {
     description = "SSH from Bastion"
     from_port   = 3389
     to_port     = 3389
@@ -30,12 +22,22 @@ resource "aws_security_group" "sms-server" {
   }
 }
 
+resource "aws_security_group_rule" "exchange-inbound-all" {
+  depends_on        = [aws_security_group.exchange_server]
+  security_group_id = aws_security_group.exchange_server.id
+  type              = "ingress"
+  description       = "allow all"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  source_security_group_id = aws_security_group.app_servers.id
+}
 
 resource "aws_instance" "sms-server" {
-  depends_on                  = [aws_security_group.app-servers]
+  depends_on                  = [aws_security_group.app_servers]
   instance_type               = "t3.large"
   ami                         = local.application_data.accounts[local.environment].XHBPRESMS01-ami
-  vpc_security_group_ids      = [aws_security_group.app-servers.id]
+  vpc_security_group_ids      = [aws_security_group.app_servers.id]
   monitoring                  = false
   associate_public_ip_address = false
   ebs_optimized               = false

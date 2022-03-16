@@ -214,7 +214,7 @@ resource "aws_security_group_rule" "app-all-from-ingestion" {
 }
 
 resource "aws_security_group_rule" "ingestion-all-from-app" {
-  depends_on               = [aws_security_group.app-servers, aws_security_group.ingestion_server]
+  depends_on               = [aws_security_group.app_servers, aws_security_group.ingestion_server]
   security_group_id        = aws_security_group.ingestion_server.id
   type                     = "ingress"
   description              = "allow all traffic from DB"
@@ -258,7 +258,7 @@ resource "aws_security_group_rule" "app-all-from-portal" {
 }
 
 resource "aws_security_group_rule" "portal-all-from-app" {
-  depends_on               = [aws_security_group.app-servers, aws_security_group.portal_server]
+  depends_on               = [aws_security_group.app_servers, aws_security_group.portal_server]
   security_group_id        = aws_security_group.portal_server.id
   type                     = "ingress"
   description              = "allow all traffic from DB"
