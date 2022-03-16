@@ -1,6 +1,6 @@
 # Database Server
 
-Terraform module for creating database instances in a multi-AZ autoscaling group.  
+Terraform module for creating database instances from the custom NOMIS Oracle 11g AMI; see [this confluence page](https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/3897262258/Oracle+11gR2+AMI+Build+for+NOMIS+Databases)  
 
 ## Usage 
 
