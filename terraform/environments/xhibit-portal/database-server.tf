@@ -1,34 +1,34 @@
 # Security Groups
-resource "aws_security_group" "database-server" {
-  description = "Bastion traffic"
-  name        = "database-server-${local.application_name}"
-  vpc_id      = local.vpc_id
-}
+# resource "aws_security_group" "database-server" {
+#   description = "Bastion traffic"
+#   name        = "database-server-${local.application_name}"
+#   vpc_id      = local.vpc_id
+# }
 
 
-resource "aws_security_group_rule" "database-outbound-all" {
-  depends_on        = [aws_security_group.database-server]
-  security_group_id = aws_security_group.database-server.id
-  type              = "egress"
-  description       = "allow all"
-  from_port         = 0
-  to_port           = 0
-  protocol          = "-1"
-  cidr_blocks       = ["0.0.0.0/0"]
-  ipv6_cidr_blocks  = ["::/0"]
-}
+# resource "aws_security_group_rule" "database-outbound-all" {
+#   depends_on        = [aws_security_group.database-server]
+#   security_group_id = aws_security_group.database-server.id
+#   type              = "egress"
+#   description       = "allow all"
+#   from_port         = 0
+#   to_port           = 0
+#   protocol          = "-1"
+#   cidr_blocks       = ["0.0.0.0/0"]
+#   ipv6_cidr_blocks  = ["::/0"]
+# }
 
-resource "aws_security_group_rule" "database-inbound-all" {
-  depends_on        = [aws_security_group.database-server]
-  security_group_id = aws_security_group.database-server.id
-  type              = "ingress"
-  description       = "allow all"
-  from_port         = 0
-  to_port           = 0
-  protocol          = "-1"
-  cidr_blocks       = ["0.0.0.0/0"]
-  ipv6_cidr_blocks  = ["::/0"]
-}
+# resource "aws_security_group_rule" "database-inbound-all" {
+#   depends_on               = [aws_security_group.database-server]
+#   security_group_id        = aws_security_group.database-server.id
+#   type                     = "ingress"
+#   description              = "allow all"
+#   from_port                = 0
+#   to_port                  = 0
+#   protocol                 = "-1"
+#   cidr_blocks              = ["0.0.0.0/0"]
+#   ipv6_cidr_blocks         = ["::/0"]
+# }
 
 # ----------------------------------------------------------
 
@@ -245,10 +245,10 @@ resource "aws_security_group_rule" "database-inbound-all" {
 # ----------------------------------------------------------
 
 resource "aws_instance" "database-server" {
-  depends_on                  = [aws_security_group.database-server]
+  depends_on                  = [aws_security_group.app-servers]
   instance_type               = "t2.medium"
   ami                         = local.application_data.accounts[local.environment].suprig01-ami
-  vpc_security_group_ids      = [aws_security_group.database-server.id]
+  vpc_security_group_ids      = [aws_security_group.app-servers.id]
   monitoring                  = false
   associate_public_ip_address = false
   ebs_optimized               = false
