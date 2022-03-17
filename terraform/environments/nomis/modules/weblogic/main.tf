@@ -140,7 +140,7 @@ resource "aws_autoscaling_group" "weblogic" {
   instance_refresh {
     strategy = "Rolling"
     preferences {
-      min_healthy_percentage = 50
+      min_healthy_percentage = 90 # seems that instances in the warm pool are included in the % health count so this needs to be set fairly high
       instance_warmup = 3000
     }
   }
@@ -183,7 +183,7 @@ resource "aws_autoscaling_group" "weblogic" {
 resource "aws_autoscaling_schedule" "scale_down" {
   scheduled_action_name  = "weblogic_scale_down"
   min_size               = 0
-  max_size               = -1
+  max_size               = var.asg_max_size # this should make sure instances move to warm pool rather than being deleted
   desired_capacity       = 0
   recurrence             = "0 19 * * *"
   autoscaling_group_name = aws_autoscaling_group.weblogic.name
@@ -192,7 +192,7 @@ resource "aws_autoscaling_schedule" "scale_down" {
 resource "aws_autoscaling_schedule" "scale_up" {
   scheduled_action_name  = "weblogic_scale_up"
   min_size               = var.asg_min_size
-  max_size               = -1
+  max_size               = var.asg_max_size
   desired_capacity       = var.asg_desired_capacity
   recurrence             = "0 7 * * *"
   autoscaling_group_name = aws_autoscaling_group.weblogic.name

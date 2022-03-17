@@ -18,13 +18,14 @@
                 "CNOMT1": {
                     "ami_name": "weblogic-2022-03-01*",
                     "asg_max_size": 2,
-                    "asg_desired_capacity": 1
+                    "asg_desired_capacity": 2
                 }
             },
             "stacks": {
               "T2": {
                   "database_ami_name": "nomis_db_CNOMT1-2022-01-05*",
-                  "weblogic_ami_name": "weblogic-2022-03-01*"
+                  "weblogic_ami_name": "nomis_RHEL6_10_2022-03-17T07-46-50.061Z",
+                  "weblogic_ami_owner": "374269020027"
               }
             }
         }

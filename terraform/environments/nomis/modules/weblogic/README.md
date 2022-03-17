@@ -2,6 +2,16 @@
 
 Terraform module for creating Weblogic instances in a multi-AZ autoscaling group.  
 
+### Warm pools
+
+Since the Weblogic instances have a very long initial start-up time, the module makes use of warm pools and lifecycle hooks.  Lifecycle hooks allow the instance to indicate to the auto-scaling group that it is ready to enter service.  This occurs once the Weblogic installation and setup script have completed (see user-data script).  At this point the instance may be either put into active service as part of the load balancer target group or moved to the warm pool, where it enters a stopped state until it is required for service by an auto-scaling event.  On exit from the warm pool the instance is started and another lifecycle hook is fired to indicate that it is in the ready state.  This lifecycle hook is activated via a cron job that runs on boot.  It does not check the state of the Weblogic service before firing, for this we instead rely on the load balancer health checks.
+
+The number of instances in the warm pool will be equal to the max size of the auto-scaling group minus the number of active instances in the ASG.  This can be changed if desired by exposing some additional variables in the module.
+
+ ### Scaling
+
+ Currently there is only schedule based scaling in place, which scales the number of active instances to zero after 7pm and scales out again at 7am.  We do not scale down the maximum number of instances, this has the affect of stopping the instances and moving them to the warm pool rather than deleting them.  Obviously this will need to be revisited once we move to production and scaling policies are determined.
+
 ## Usage 
 
 Pay particular attention to the `name` variable. This needs to be the same as the name used in the target databases internal Route 53 record, e.g. `db.<var.name>.xxxxxxxx.gov.uk`.
