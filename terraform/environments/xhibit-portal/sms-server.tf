@@ -1,5 +1,5 @@
 # Security Groups
-resource "aws_security_group" "sms-server" {
+resource "aws_security_group" "sms_server" {
   description = "Domain traffic only"
   name        = "sms-server-${local.application_name}"
   vpc_id      = local.vpc_id
@@ -23,8 +23,8 @@ resource "aws_security_group" "sms-server" {
 }
 
 resource "aws_security_group_rule" "sms-inbound-all" {
-  depends_on        = [aws_security_group.exchange_server]
-  security_group_id = aws_security_group.exchange_server.id
+  depends_on        = [aws_security_group.sms_server]
+  security_group_id = aws_security_group.sms_server.id
   type              = "ingress"
   description       = "allow all"
   from_port         = 0
@@ -33,11 +33,23 @@ resource "aws_security_group_rule" "sms-inbound-all" {
   source_security_group_id = aws_security_group.app_servers.id
 }
 
+resource "aws_security_group_rule" "sms-outbound-all" {
+  depends_on        = [aws_security_group.sms_server]
+  security_group_id = aws_security_group.sms_server.id
+  type              = "egress"
+  description       = "allow all"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  cidr_blocks       = ["0.0.0.0/0"]
+  ipv6_cidr_blocks  = ["::/0"]
+}
+
 resource "aws_instance" "sms-server" {
-  depends_on                  = [aws_security_group.app_servers]
+  depends_on                  = [aws_security_group.sms-server]
   instance_type               = "t3.large"
   ami                         = local.application_data.accounts[local.environment].XHBPRESMS01-ami
-  vpc_security_group_ids      = [aws_security_group.app_servers.id]
+  vpc_security_group_ids      = [aws_security_group.sms-server.id]
   monitoring                  = false
   associate_public_ip_address = false
   ebs_optimized               = false
