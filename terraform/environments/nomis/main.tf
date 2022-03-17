@@ -15,7 +15,7 @@ module "nomis_stack" {
   database_ami_name            = each.value.database_ami_name
   database_extra_ingress_rules = try(each.value.database_extra_ingress_rules, [])
   weblogic_ami_name            = each.value.weblogic_ami_name
-  weblogic_ami_owner = each.value.weblogic_ami_owner
+  weblogic_ami_owner           = each.value.weblogic_ami_owner
 
   database_common_security_group_id = aws_security_group.database_common.id
   weblogic_common_security_group_id = aws_security_group.weblogic_common.id

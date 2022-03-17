@@ -141,7 +141,7 @@ resource "aws_autoscaling_group" "weblogic" {
     strategy = "Rolling"
     preferences {
       min_healthy_percentage = 90 # seems that instances in the warm pool are included in the % health count so this needs to be set fairly high
-      instance_warmup = 3000
+      instance_warmup        = 3000
     }
   }
 
