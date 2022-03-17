@@ -24,7 +24,7 @@
             "stacks": {
               "T2": {
                   "database_ami_name": "nomis_db_CNOMT1-2022-01-05*",
-                  "weblogic_ami_name": "nomis_RHEL6_10_2022-03-17T07-46-50.061Z",
+                  "weblogic_ami_name": "nomis_RHEL6_10*",
                   "weblogic_ami_owner": "374269020027"
               }
             }
