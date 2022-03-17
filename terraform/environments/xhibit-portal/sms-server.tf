@@ -46,10 +46,10 @@ resource "aws_security_group_rule" "sms-outbound-all" {
 }
 
 resource "aws_instance" "sms-server" {
-  depends_on                  = [aws_security_group.sms-server]
+  depends_on                  = [aws_security_group.sms_server]
   instance_type               = "t3.large"
   ami                         = local.application_data.accounts[local.environment].XHBPRESMS01-ami
-  vpc_security_group_ids      = [aws_security_group.sms-server.id]
+  vpc_security_group_ids      = [aws_security_group.sms_server.id]
   monitoring                  = false
   associate_public_ip_address = false
   ebs_optimized               = false
