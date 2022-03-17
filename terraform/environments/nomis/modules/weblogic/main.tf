@@ -227,7 +227,7 @@ resource "aws_lb_target_group" "weblogic" {
 
   stickiness {
     enabled = true
-    type = "lb_cookie"
+    type    = "lb_cookie"
   }
 
   tags = merge(
