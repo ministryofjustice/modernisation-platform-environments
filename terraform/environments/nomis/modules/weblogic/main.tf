@@ -225,6 +225,11 @@ resource "aws_lb_target_group" "weblogic" {
     unhealthy_threshold = "5"
   }
 
+  stickiness {
+    enabled = true
+    type = "lb_cookie"
+  }
+
   tags = merge(
     var.tags,
     {
