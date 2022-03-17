@@ -5,6 +5,8 @@
 # Oracle and Weblogic installation files are held
 #------------------------------------------------------------------------------
 
+#TODO this is role and profile are only used by Jumpserver, so group it with that and reanme it
+# can leave the policy docs here though
 resource "aws_iam_role" "ec2_common_role" {
   name                 = "ec2-common-role"
   path                 = "/"
