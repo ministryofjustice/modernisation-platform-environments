@@ -63,15 +63,15 @@ resource "aws_elb" "ingestion_lb" {
     aws_security_group.ingestion_lb,
   ]
 
-  name                       = "ingestion-lb-${var.networking[0].application}"
-  internal                   = false
-  security_groups            = [aws_security_group.ingestion_lb.id]
-  subnets                    = data.aws_subnet_ids.ingestion-shared-public.ids
+  name            = "ingestion-lb-${var.networking[0].application}"
+  internal        = false
+  security_groups = [aws_security_group.ingestion_lb.id]
+  subnets         = data.aws_subnet_ids.ingestion-shared-public.ids
 
   access_logs {
-    bucket  = aws_s3_bucket.loadbalancer_logs.bucket
-    bucket_prefix  = "http-lb"
-    enabled = true
+    bucket        = aws_s3_bucket.loadbalancer_logs.bucket
+    bucket_prefix = "http-lb"
+    enabled       = true
   }
 
   listener {

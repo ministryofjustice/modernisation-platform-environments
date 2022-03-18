@@ -1,4 +1,41 @@
 #------------------------------------------------------------------------------
+# Database
+#------------------------------------------------------------------------------
+
+module "database" {
+  source = "./modules/database"
+
+  providers = {
+    aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
+  }
+
+  for_each = local.application_data.accounts[local.environment].databases
+
+  name = each.key
+
+  ami_name           = each.value.ami_name
+  asm_data_capacity  = each.value.asm_data_capacity
+  asm_flash_capacity = each.value.asm_flash_capacity
+
+  asm_data_iops        = try(each.value.asm_data_iops, null)
+  asm_data_throughput  = try(each.value.asm_data_throughput, null)
+  asm_flash_iops       = try(each.value.asm_flash_iops, null)
+  asm_flash_throughput = try(each.value.asm_data_throughput, null)
+  oracle_app_disk_size = try(each.value.oracle_app_disk_size, null)
+  extra_ingress_rules  = try(each.value.extra_ingress_rules, null)
+
+  common_security_group_id = aws_security_group.database_common.id
+  instance_profile_name    = aws_iam_instance_profile.ec2_database_profile.name
+  key_name                 = aws_key_pair.ec2-user.key_name
+
+  application_name = local.application_name
+  business_unit    = local.vpc_name
+  environment      = local.environment
+  tags             = local.tags
+  subnet_set       = local.subnet_set
+}
+
+#------------------------------------------------------------------------------
 # Instance profile to be assumed by the ec2 database instances
 # This is based on the ec2-common-profile but also gives access to an S3 bucket
 # in which database backups are stored

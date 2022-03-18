@@ -1,6 +1,6 @@
 
 module "s3-bucket" {
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v4.0.0"
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.0.3"
 
   providers = {
     aws.bucket-replication = aws
@@ -11,7 +11,7 @@ module "s3-bucket" {
   lifecycle_rule = [
     {
       id      = "main"
-      enabled = true
+      enabled = "Enabled"
       prefix  = ""
 
       tags = {
@@ -50,7 +50,7 @@ module "s3-bucket" {
 }
 
 module "nomis-db-backup-bucket" {
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v4.0.0"
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.0.3"
 
   providers = {
     aws.bucket-replication = aws
@@ -61,12 +61,12 @@ module "nomis-db-backup-bucket" {
   lifecycle_rule = [
     {
       id      = "main"
-      enabled = true
+      enabled = "Enabled"
       prefix  = ""
 
       tags = {
         rule      = "log"
-        autoclean = "true"
+        autoclean = "Enabled"
       }
 
       transition = [
@@ -100,3 +100,76 @@ module "nomis-db-backup-bucket" {
 
 }
 
+data "aws_iam_policy_document" "cross-account-s3" {
+  statement {
+    sid = "cross-account-s3-access-for-image-builder"
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:PutObjectAcl",
+      "s3:ListBucket"
+
+    ]
+
+    resources = ["${module.nomis-image-builder-bucket.bucket.arn}/*",
+    module.nomis-image-builder-bucket.bucket.arn, ]
+    principals {
+      type = "AWS"
+      identifiers = ["arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:root",
+      "arn:aws:iam::${local.environment_management.account_ids["core-shared-services-production"]}:root"]
+    }
+  }
+}
+
+module "nomis-image-builder-bucket" {
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.0.3"
+
+  providers = {
+    aws.bucket-replication = aws
+  }
+  bucket_prefix       = "ec2-image-builder-nomis"
+  replication_enabled = false
+
+  bucket_policy = [data.aws_iam_policy_document.cross-account-s3.json]
+
+  lifecycle_rule = [
+    {
+      id      = "main"
+      enabled = "Enabled"
+      prefix  = ""
+
+      tags = {
+        rule      = "log"
+        autoclean = "Enabled"
+      }
+
+      transition = [
+        {
+          days          = 90
+          storage_class = "STANDARD_IA"
+        }
+      ]
+
+      expiration = {
+        days = 730
+      }
+
+      noncurrent_version_transition = [
+        {
+          days          = 90
+          storage_class = "STANDARD_IA"
+          }, {
+          days          = 365
+          storage_class = "GLACIER"
+        }
+      ]
+
+      noncurrent_version_expiration = {
+        days = 730
+      }
+    }
+  ]
+
+  tags = local.tags
+
+}
