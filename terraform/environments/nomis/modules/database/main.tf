@@ -56,6 +56,7 @@ data "aws_subnet" "data" {
 resource "aws_instance" "database" {
   ami                         = data.aws_ami.database.id
   associate_public_ip_address = false
+  disable_api_termination     = var.termination_protection
   ebs_optimized               = true
   iam_instance_profile        = var.instance_profile_name
   instance_type               = var.instance_type # tflint-ignore: aws_instance_invalid_type
@@ -67,16 +68,26 @@ resource "aws_instance" "database" {
     var.common_security_group_id,
     aws_security_group.database.id
   ]
+
   metadata_options {
     http_endpoint = "enabled"
     http_tokens   = "required"
   }
+
   root_block_device {
     delete_on_termination = true
     encrypted             = true
     # volume_size           = lookup(var.drive_map, data.aws_ami.database.root_device_name, local.root_device_size)
     volume_type = "gp3"
+
+    tags = merge(
+      var.tags,
+      {
+        Name = "database-${var.name}-root-${data.aws_ami.database.root_device_name}"
+      }
+    )
   }
+
   dynamic "ephemeral_block_device" { # block devices specified inline cannot be resized later so we need to make sure they are not mounted here
     for_each = [for bdm in data.aws_ami.database.block_device_mappings : bdm if bdm.device_name != data.aws_ami.database.root_device_name]
     iterator = device
@@ -88,13 +99,7 @@ resource "aws_instance" "database" {
 
   lifecycle {
     ignore_changes = [
-      # This prevents clobbering the tags of attached EBS volumes. See
-      # [this bug][1] in the AWS provider upstream.
-      #
-      # [1]: https://github.com/terraform-providers/terraform-provider-aws/issues/770
-      volume_tags,
-      #user_data,         # Prevent changes to user_data from destroying existing EC2s
-      root_block_device, # Prevent changes to encryption from destroying existing EC2s - can delete once encryption complete
+      user_data, # Prevent changes to user_data from destroying existing EC2s
     ]
   }
 
@@ -116,7 +121,7 @@ resource "aws_ebs_volume" "oracle_app" {
   availability_zone = var.availability_zone
   encrypted         = true
   snapshot_id       = local.block_device_map[each.key].ebs.snapshot_id
-  size              = lookup(var.oracle_app_disk_size, each.key, 100)
+  size              = lookup(var.oracle_app_disk_size, each.key, local.block_device_map[each.key].ebs.volume_size)
   type              = "gp3"
 
   tags = merge(
@@ -152,6 +157,10 @@ resource "aws_ebs_volume" "asm_data" {
       Name = "database-${var.name}-DATA-${each.key}"
     }
   )
+
+  lifecycle {
+    ignore_changes = [snapshot_id] # retain data if AMI is updated. If you want to start from fresh, destroy it
+  }
 }
 
 resource "aws_volume_attachment" "asm_data" {
@@ -179,6 +188,10 @@ resource "aws_ebs_volume" "asm_flash" {
       Name = "database-${var.name}-FLASH-${each.key}"
     }
   )
+
+  lifecycle {
+    ignore_changes = [snapshot_id] # retain data if AMI is updated. If you want to start from fresh, destroy it
+  }
 }
 
 resource "aws_volume_attachment" "asm_flash" {
@@ -317,7 +330,7 @@ data "aws_iam_policy_document" "asm_parameter" {
       variable = "aws:CurrentTime"
       values   = [time_offset.asm_parameter.rfc3339]
     }
-    condition {
+    condition { #todo: this needs rethinking as it doesn't do anything
       test     = "StringLike"
       variable = "ec2:SourceInstanceARN"
       values   = [aws_instance.database.arn]
