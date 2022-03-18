@@ -8,13 +8,17 @@ Since the Weblogic instances have a very long initial start-up time, the module 
 
 The number of instances in the warm pool will be equal to the max size of the auto-scaling group minus the number of active instances in the ASG.  This can be changed if desired by exposing some additional variables in the module.
 
+As the module is currently setup, any scale down events cause active instances to be terminated.  It should be possible to instead return them to the warm pool however the Terraform AWS provider does not currently support this feature.  This behavior may be worth considering when it becomes available.  See this [issue](https://github.com/hashicorp/terraform-provider-aws/issues/23735).
+
  ### Scaling
 
- Currently there is only schedule based scaling in place, which scales the number of active instances to zero after 7pm and scales out again at 7am.  We do not scale down the maximum number of instances, this has the affect of stopping the instances and moving them to the warm pool rather than deleting them.  Obviously this will need to be revisited once we move to production and scaling policies are determined.
+ Currently there is only schedule based scaling in place, which scales the number of active instances to zero after 7pm and scales out again at 7am.  We do not scale down the maximum number of instances.  This has the affect of replacing the scaled down instances with new instances in the warm pool, thus we do not need to wait for new instances to be created at the next scale out event. 
+ 
+ The scaling policy will need to be revisited once we move to production and scaling requirements are determined.
 
 ## Usage 
 
-Pay particular attention to the `name` variable. This needs to be the same as the name used in the target databases internal Route 53 record, e.g. `db.<var.name>.xxxxxxxx.gov.uk`.
+Pay particular attention to the `name` variable. This needs to be the same as the name used in the target databases internal Route 53 record, e.g. `db.<var.name>.xxxxxxxx.gov.uk`.  Alternatively we could just add a separate variable for the database name if this proves problematic.
 
 Many variables have the `nullable` property set to false, this allows the variable default to be used if a `null` value is passed.  Handy if using the module in a `for_each` and not all values are set (see `termination_protection` in below example).
 
@@ -33,7 +37,7 @@ module "weblogic" {
 
   ami_name             = each.value.ami_name
   asg_max_size         = each.value.asg_max_size
-  asg_desired_capacity = each.value.asg_desired_capacity
+  asg_desired_capacity = each.value.asg_desired_capacity # you may prefer to just set the minimum capacity instead
 
   termination_protection = try(each.value.termination_protection, null)
 

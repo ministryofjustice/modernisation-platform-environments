@@ -14,8 +14,9 @@ module "weblogic" {
   name = each.key
 
   ami_name             = each.value.ami_name
-  asg_max_size         = each.value.asg_max_size
-  asg_desired_capacity = each.value.asg_desired_capacity
+  asg_max_size         = try(each.value.asg_max_size, null)
+  asg_min_size         = try(each.value.asg_min_size, null)
+  asg_desired_capacity = try(each.value.asg_desired_capacity, null)
 
   termination_protection = try(each.value.termination_protection, null)
 
@@ -88,49 +89,4 @@ resource "aws_security_group" "weblogic_common" {
       Name = "weblogic-commmon"
     }
   )
-}
-
-#------------------------------------------------------------------------------
-# Instance profile to be assumed by the ec2 weblogic instances
-# This is based on the ec2-common-profile but additional permissions may be
-# granted as needed
-# TODO: delete this once nomis_stack module gone
-#------------------------------------------------------------------------------
-resource "aws_iam_role" "ec2_weblogic_role" {
-  name                 = "ec2-weblogic-role"
-  path                 = "/"
-  max_session_duration = "3600"
-  assume_role_policy = jsonencode(
-    {
-      "Version" : "2012-10-17",
-      "Statement" : [
-        {
-          "Effect" : "Allow",
-          "Principal" : {
-            "Service" : "ec2.amazonaws.com"
-          }
-          "Action" : "sts:AssumeRole",
-          "Condition" : {}
-        }
-      ]
-    }
-  )
-  managed_policy_arns = [
-    "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy",
-    aws_iam_policy.ec2_common_policy.arn
-  ]
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "ec2-weblogic-role"
-    },
-  )
-}
-
-# create instance profile from IAM role
-resource "aws_iam_instance_profile" "ec2_weblogic_profile" {
-  name = "ec2-weblogic-profile"
-  role = aws_iam_role.ec2_weblogic_role.name
-  path = "/"
 }
