@@ -76,17 +76,22 @@ async function main() {
       i.serverName = serverTypeToName[i.serverType]
       return i
     })
+    .sort(function compare(a, b) {
+      var dateA = new Date(a.CreationDate);
+      var dateB = new Date(b.CreationDate);
+      return dateA - dateB;
+    });
 
     console.error("Found amis:-")
 
     c2.table(images.map(i => {return  {
-      serverName: i.serverName ,  
-      serverType: i.serverType , 
-      id : i.ImageId   
+      CreationDate : i.CreationDate,
+      serverName   : i.serverName ,  
+      serverType   : i.serverType , 
+      id           : i.ImageId   
     }}  ))
 
     images = images
-
     .filter(i => {
         return Object.keys(serverTypeToName).includes(i.serverType)
     })

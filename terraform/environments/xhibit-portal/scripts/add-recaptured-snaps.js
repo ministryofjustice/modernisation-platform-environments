@@ -32,30 +32,12 @@ serverTypeToName = {
 
 
 let nameFilter = 'SharedToProd'
-let previousHoursToQuery = 72
+let previousHoursToQuery = 3.02
 
 
 // get the current snapshots
 const params = {
-  OwnerIds: ["276038508461"]
-  // Filters: [
-
-
-
-
-    // {
-    //   Name: 'name',
-    //   Values: [
-    //     nameFilter
-    //   ]
-    // },
-    // {
-    //   Name: 'state',
-    //   Values: [
-    //     'available'
-    //   ]
-    // }
-  // ] 
+  OwnerIds: ["self"]
  };
 
 
@@ -77,18 +59,38 @@ async function main() {
         return (differenceInHours(new Date() , i.StartTime ) < previousHoursToQuery ) 
     })
     .map(i=>{
-      i.serverType = i.Description.split("-")[0]
+
+      i.descriptionString = i.Description.match(/(\[.+?\] )*(.+)/)[2]
+
+      i.serverType = i.descriptionString.split("-")[0]
+      i.serverType = i.descriptionString.split("-")[0]
       i.serverName = serverTypeToName[i.serverType]
-      i.diskNumber = i.Description.match(/disk([0-9]+)/)[1]
+      i.diskNumber = i.descriptionString.match(/disk([0-9]+)/)[1]
       return i
     })
+    .sort(function compare(a, b) {
+      var dateA = new Date(a.StartTime);
+      var dateB = new Date(b.StartTime);
+      return dateA - dateB;
+    });
+    // .sort(( a, b ) => {
+    //     if ( a.serverType < b.serverType ){
+    //       return -1;
+    //     }
+    //     if ( a.serverType > b.serverType ){
+    //       return 1;
+    //     }
+    //     return 0;
+    //   }
+    //)
 
     console.error("Found snapshots:-")
 
     c2.table(snapshots.map(i => {return  {
+      StartTime   : i.StartTime, 
       Description : i.Description,
-      serverName: i.serverName ,  
-      serverType: i.serverType , 
+      serverName  : i.serverName ,  
+      serverType  : i.serverType , 
       id : i.SnapshotId   
     }}  ))
 
