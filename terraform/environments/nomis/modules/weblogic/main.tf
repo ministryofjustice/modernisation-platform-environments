@@ -69,6 +69,7 @@ resource "aws_launch_template" "weblogic" {
   instance_type                        = var.instance_type
   key_name                             = var.key_name
 
+  #tfsec:ignore:aws-autoscaling-enforce-http-token-imds
   # metadata_options { # http_endpoint/http_tokens forces instance to use IMDSv2 which is incompatible with Weblogic
   #   http_endpoint = "enabled"
   #   http_tokens   = "required"
@@ -311,6 +312,7 @@ data "aws_iam_policy_document" "weblogic" {
   }
 
   statement {
+    #tfsec:ignore:aws-iam-no-policy-wildcards:this needs to be created before the autoscaling group, therefore the ASG ID needs to be wildcarded
     sid     = "TriggerInstanceLifecycleHooks"
     effect  = "Allow"
     actions = ["autoscaling:CompleteLifecycleAction"]
