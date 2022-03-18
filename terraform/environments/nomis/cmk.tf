@@ -2,6 +2,7 @@ resource "aws_kms_key" "nomis-cmk" {
   description             = "Nomis Managed Key for AMI Sharing"
   deletion_window_in_days = 10
   policy                  = data.aws_iam_policy_document.shared_image_builder_cmk_policy.json
+  enable_key_rotation     = true
 }
 
 resource "aws_kms_alias" "nomis-key" {
