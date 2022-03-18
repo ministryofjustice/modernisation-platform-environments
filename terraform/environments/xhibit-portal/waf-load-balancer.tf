@@ -80,9 +80,6 @@ resource "aws_security_group_rule" "allow_cloudfront_ips" {
 
 }
 
-
-
-
 data "aws_subnet_ids" "waf-shared-public" {
   vpc_id = local.vpc_id
   tags = {
@@ -227,6 +224,7 @@ resource "aws_alb_listener_rule" "web_listener_rule" {
 
 }
 
+/*
 resource "aws_acm_certificate" "waf_lb_cert" {
   domain_name       = "xp-${local.environment}.modernisation-platform.service.justice.gov.uk"
   validation_method = "DNS"
@@ -241,17 +239,9 @@ resource "aws_acm_certificate" "waf_lb_cert" {
   }
 }
 
-
 resource "aws_acm_certificate_validation" "waf_lb_cert_validation" {
   certificate_arn         = aws_acm_certificate.waf_lb_cert.arn
   validation_record_fqdns = [for dvo in aws_acm_certificate.waf_lb_cert.domain_validation_options : dvo.resource_record_name]
-}
-
-data "aws_route53_zone" "external_r53_zone" {
-  provider = aws.core-vpc
-
-  name         = "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk."
-  private_zone = false
 }
 
 resource "aws_route53_record" "waf_lb_r53_record" {
@@ -271,7 +261,80 @@ resource "aws_route53_record" "waf_lb_r53_record" {
   type            = each.value.type
   zone_id         = data.aws_route53_zone.external_r53_zone.zone_id
 }
+*/
 
+data "aws_route53_zone" "external_r53_zone" {
+  provider = aws.core-vpc
+
+  name         = "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk."
+  private_zone = false
+}
+
+data "aws_route53_zone" "network-services" {
+  provider = aws.core-network-services
+
+  name         = "modernisation-platform.service.justice.gov.uk."
+  private_zone = false
+}
+
+resource "aws_route53_record" "external" {
+  provider = aws.core-vpc
+
+  zone_id = data.aws_route53_zone.external_r53_zone.zone_id
+  name    = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type    = "A"
+
+  alias {
+    name                   = aws_lb.waf_lb.dns_name
+    zone_id                = aws_lb.waf_lb.zone_id
+    evaluate_target_health = true
+  }
+}
+
+resource "aws_acm_certificate" "waf_lb_cert" {
+  domain_name       = "modernisation-platform.service.justice.gov.uk"
+  validation_method = "DNS"
+
+  subject_alternative_names = [
+    "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk",
+    "${local.application_data.accounts[local.environment].public_dns_name_web}",
+  ]
+
+  tags = {
+    Environment = local.environment
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_route53_record" "external_validation" {
+  provider = aws.core-network-services
+
+  allow_overwrite = true
+  name            = local.domain_name_main[0]
+  records         = local.domain_record_main
+  ttl             = 60
+  type            = local.domain_type_main[0]
+  zone_id         = data.aws_route53_zone.network-services.zone_id
+}
+
+resource "aws_route53_record" "external_validation_subdomain" {
+  provider = aws.core-vpc
+
+  allow_overwrite = true
+  name            = local.domain_name_sub[0]
+  records         = local.domain_record_sub
+  ttl             = 60
+  type            = local.domain_type_sub[0]
+  zone_id         = data.aws_route53_zone.external_r53_zone.zone_id
+}
+
+resource "aws_acm_certificate_validation" "waf_lb_cert_validation" {
+  certificate_arn         = aws_acm_certificate.waf_lb_cert.arn
+  validation_record_fqdns = [local.domain_name_main[0], local.domain_name_sub[0]]
+}
 
 resource "aws_wafv2_web_acl" "waf_acl" {
   name        = "waf-acl"
