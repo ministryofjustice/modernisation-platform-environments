@@ -292,11 +292,10 @@ resource "aws_route53_record" "external" {
 }
 
 resource "aws_acm_certificate" "waf_lb_cert" {
-  domain_name       = "modernisation-platform.service.justice.gov.uk"
+  domain_name       = "${var.networking[0].business-unit}-${local.cert_env}.modernisation-platform.service.justice.gov.uk"
   validation_method = "DNS"
 
   subject_alternative_names = [
-    "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk",
     "${local.application_data.accounts[local.environment].public_dns_name_web}",
   ]
 
