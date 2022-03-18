@@ -224,44 +224,6 @@ resource "aws_alb_listener_rule" "web_listener_rule" {
 
 }
 
-/*
-resource "aws_acm_certificate" "waf_lb_cert" {
-  domain_name       = "xp-${local.environment}.modernisation-platform.service.justice.gov.uk"
-  validation_method = "DNS"
-
-  subject_alternative_names = [
-    "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk",
-    local.application_data.accounts[local.environment].public_dns_name_web,
-  ]
-
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
-resource "aws_acm_certificate_validation" "waf_lb_cert_validation" {
-  certificate_arn         = aws_acm_certificate.waf_lb_cert.arn
-  validation_record_fqdns = [for dvo in aws_acm_certificate.waf_lb_cert.domain_validation_options : dvo.resource_record_name]
-}
-
-resource "aws_route53_record" "waf_lb_r53_record" {
-  provider = aws.core-vpc
-  for_each = {
-    for dvo in aws_acm_certificate.waf_lb_cert.domain_validation_options : dvo.domain_name => {
-      name   = dvo.resource_record_name
-      record = dvo.resource_record_value
-      type   = dvo.resource_record_type
-    }
-  }
-
-  allow_overwrite = true
-  name            = each.value.name
-  records         = [each.value.record]
-  ttl             = 60
-  type            = each.value.type
-  zone_id         = data.aws_route53_zone.external_r53_zone.zone_id
-}
-*/
 
 data "aws_route53_zone" "external_r53_zone" {
   provider = aws.core-vpc
@@ -292,10 +254,11 @@ resource "aws_route53_record" "external" {
 }
 
 resource "aws_acm_certificate" "waf_lb_cert" {
-  domain_name       = "${var.networking[0].business-unit}-${local.cert_env}.modernisation-platform.service.justice.gov.uk"
+  domain_name       = "modernisation-platform.service.justice.gov.uk"
   validation_method = "DNS"
 
   subject_alternative_names = [
+    "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk",
     "${local.application_data.accounts[local.environment].public_dns_name_web}",
   ]
 
@@ -320,13 +283,14 @@ resource "aws_route53_record" "external_validation" {
 }
 
 resource "aws_route53_record" "external_validation_subdomain" {
+  count = length(local.domain_name_sub)
   provider = aws.core-vpc
 
   allow_overwrite = true
-  name            = local.domain_name_sub[0]
-  records         = local.domain_record_sub
+  name            = local.domain_name_sub[count.index]
+  records         = [local.domain_record_sub[count.index]]
   ttl             = 60
-  type            = local.domain_type_sub[0]
+  type            = local.domain_type_sub[count.index]
   zone_id         = data.aws_route53_zone.external_r53_zone.zone_id
 }
 
