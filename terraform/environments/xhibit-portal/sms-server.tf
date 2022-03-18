@@ -11,7 +11,7 @@ resource "aws_security_group_rule" "sms-inbound-bastion" {
   security_group_id = aws_security_group.sms_server.id
   to_port           = 3389
   type              = "ingress"
-  cidr_blocks       = module.bastion_linux.bastion_private_ip
+  cidr_blocks       = [module.bastion_linux.bastion_private_ip]
 }
 
 resource "aws_security_group_rule" "sms-inbound-all" {
