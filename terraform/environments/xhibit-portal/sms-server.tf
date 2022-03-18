@@ -25,15 +25,25 @@ resource "aws_security_group_rule" "sms-inbound-all" {
   source_security_group_id = aws_security_group.app_servers.id
 }
 
-resource "aws_security_group_rule" "sms-outbound-all" {
+resource "aws_security_group_rule" "sms-outbound-all-ipv4" {
   depends_on        = [aws_security_group.sms_server]
   security_group_id = aws_security_group.sms_server.id
   type              = "egress"
-  description       = "allow all"
+  description       = "allow all ipv4"
   from_port         = 0
   to_port           = 0
   protocol          = "-1"
   cidr_blocks       = ["0.0.0.0/0"]
+}
+
+resource "aws_security_group_rule" "sms-outbound-all-ipv6" {
+  depends_on        = [aws_security_group.sms_server]
+  security_group_id = aws_security_group.sms_server.id
+  type              = "egress"
+  description       = "allow all ipv6"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
   ipv6_cidr_blocks  = ["::/0"]
 }
 
