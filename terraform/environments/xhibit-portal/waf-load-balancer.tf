@@ -296,7 +296,7 @@ resource "aws_route53_record" "external_validation_subdomain" {
 
 resource "aws_acm_certificate_validation" "waf_lb_cert_validation" {
   certificate_arn         = aws_acm_certificate.waf_lb_cert.arn
-  validation_record_fqdns = [local.domain_name_main[0], local.domain_name_sub[0]]
+  validation_record_fqdns = [for record in local.domain_types : record.name]
 }
 
 resource "aws_wafv2_web_acl" "waf_acl" {
