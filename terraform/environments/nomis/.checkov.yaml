@@ -2,3 +2,5 @@ skip-check:
   - CKV_AWS_126 # skip "Ensure that detailed monitoring is enabled for EC2 instances", not required for now
   - CKV_AWS_189 # skip "Ensure EBS Volume is encrypted by KMS using a customer managed Key (CMK)"
   - CKV_AWS_108 # skip "Ensure IAM policies does not allow data exfiltration" while using the packer role which requires broad range of permissions
+  - CKV_AWS_135 # skip "Ensure that EC2 is EBS optimized" as not supported by t2 instances. t2 was chosen as t3 does not support RHEL 6.10. Review next time instance type is changed.
+  - CKV_AWS_79 # skip "Ensure Instance Metadata Service Version 1 is not enabled" incompatible with Weblogic
