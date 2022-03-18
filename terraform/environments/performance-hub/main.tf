@@ -6,10 +6,13 @@ data "aws_vpc" "shared" {
   }
 }
 
-data "aws_subnet_ids" "shared-data" {
-  vpc_id = data.aws_vpc.shared.id
+data "aws_subnets" "shared-data" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.shared.id]
+  }
   tags = {
-    "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-data*"
+    Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-data*"
   }
 }
 
@@ -76,10 +79,13 @@ data "aws_route53_zone" "network-services" {
   private_zone = false
 }
 
-data "aws_subnet_ids" "shared-public" {
-  vpc_id = data.aws_vpc.shared.id
+data "aws_subnets" "shared-public" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.shared.id]
+  }
   tags = {
-    "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public*"
+    Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public*"
   }
 }
 
@@ -137,7 +143,7 @@ data "template_file" "task_definition" {
 
 module "windows-ecs" {
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs?ref=v1.0.4"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs?ref=v2.0.0"
 
   subnet_set_name         = local.subnet_set_name
   vpc_all                 = local.vpc_all
@@ -231,7 +237,7 @@ resource "aws_lb" "external" {
   #checkov:skip=CKV2_AWS_28
   name                       = "${local.application_name}-loadbalancer"
   load_balancer_type         = "application"
-  subnets                    = data.aws_subnet_ids.shared-public.ids
+  subnets                    = data.aws_subnets.shared-public.ids
   enable_deletion_protection = true
   # allow 60*4 seconds before 504 gateway timeout for long-running DB operations
   idle_timeout = 240
@@ -415,7 +421,7 @@ resource "aws_db_option_group" "db_option_group" {
 
 resource "aws_db_subnet_group" "db" {
   name       = "${local.application_name}-db-subnet-group"
-  subnet_ids = sort(data.aws_subnet_ids.shared-data.ids)
+  subnet_ids = sort(data.aws_subnets.shared-data.ids)
   tags = merge(
     local.tags,
     {
@@ -475,41 +481,9 @@ resource "aws_s3_bucket" "database_backup_files" {
   #checkov:skip=CKV_AWS_144
   #checkov:skip=CKV2_AWS_6
   bucket = "${local.application_name}-db-backups-${local.environment}"
-  acl    = "private"
 
   lifecycle {
     prevent_destroy = true
-  }
-
-  dynamic "lifecycle_rule" {
-    for_each = true ? [true] : []
-
-    content {
-      enabled = true
-
-      noncurrent_version_transition {
-        days          = 30
-        storage_class = "STANDARD_IA"
-      }
-
-      transition {
-        days          = 60
-        storage_class = "STANDARD_IA"
-      }
-    }
-  }
-
-  server_side_encryption_configuration {
-    rule {
-      apply_server_side_encryption_by_default {
-        sse_algorithm     = "aws:kms"
-        kms_master_key_id = aws_kms_key.s3.arn
-      }
-    }
-  }
-
-  versioning {
-    enabled = true
   }
 
   tags = merge(
@@ -518,6 +492,45 @@ resource "aws_s3_bucket" "database_backup_files" {
       Name = "${local.application_name}-db-backups-s3"
     }
   )
+}
+
+resource "aws_s3_bucket_acl" "database_backup_files" {
+  bucket = aws_s3_bucket.database_backup_files.id
+  acl    = "private"
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "database_backup_files" {
+  bucket = aws_s3_bucket.database_backup_files.id
+  rule {
+    id     = "tf-s3-lifecycle"
+    status = "Enabled"
+    noncurrent_version_transition {
+      noncurrent_days = 30
+      storage_class   = "STANDARD_IA"
+    }
+
+    transition {
+      days          = 60
+      storage_class = "STANDARD_IA"
+    }
+  }
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "database_backup_files" {
+  bucket = aws_s3_bucket.database_backup_files.id
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm     = "aws:kms"
+      kms_master_key_id = aws_kms_key.s3.arn
+    }
+  }
+}
+
+resource "aws_s3_bucket_versioning" "database_backup_files" {
+  bucket = aws_s3_bucket.database_backup_files.id
+  versioning_configuration {
+    status = "Enabled"
+  }
 }
 
 #S3 bucket access policy
@@ -589,41 +602,9 @@ resource "aws_s3_bucket" "upload_files" {
   #checkov:skip=CKV_AWS_144
   #checkov:skip=CKV2_AWS_6
   bucket = "${local.application_name}-uploads-${local.environment}"
-  acl    = "private"
 
   lifecycle {
     prevent_destroy = true
-  }
-
-  dynamic "lifecycle_rule" {
-    for_each = true ? [true] : []
-
-    content {
-      enabled = true
-
-      noncurrent_version_transition {
-        days          = 30
-        storage_class = "STANDARD_IA"
-      }
-
-      transition {
-        days          = 60
-        storage_class = "STANDARD_IA"
-      }
-    }
-  }
-
-  server_side_encryption_configuration {
-    rule {
-      apply_server_side_encryption_by_default {
-        sse_algorithm     = "aws:kms"
-        kms_master_key_id = aws_kms_key.s3.arn
-      }
-    }
-  }
-
-  versioning {
-    enabled = true
   }
 
   tags = merge(
@@ -632,6 +613,45 @@ resource "aws_s3_bucket" "upload_files" {
       Name = "${local.application_name}-uploads"
     }
   )
+}
+
+resource "aws_s3_bucket_acl" "upload_files" {
+  bucket = aws_s3_bucket.upload_files.id
+  acl    = "private"
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "upload_files" {
+  bucket = aws_s3_bucket.upload_files.id
+  rule {
+    id     = "tf-s3-lifecycle"
+    status = "Enabled"
+    noncurrent_version_transition {
+      noncurrent_days = 30
+      storage_class   = "STANDARD_IA"
+    }
+
+    transition {
+      days          = 60
+      storage_class = "STANDARD_IA"
+    }
+  }
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "upload_files" {
+  bucket = aws_s3_bucket.upload_files.id
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm     = "aws:kms"
+      kms_master_key_id = aws_kms_key.s3.arn
+    }
+  }
+}
+
+resource "aws_s3_bucket_versioning" "upload_files" {
+  bucket = aws_s3_bucket.upload_files.id
+  versioning_configuration {
+    status = "Enabled"
+  }
 }
 
 resource "aws_s3_bucket_policy" "upload_files_policy" {

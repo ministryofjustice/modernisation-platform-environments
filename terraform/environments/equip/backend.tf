@@ -8,6 +8,6 @@ terraform {
     encrypt              = true
     key                  = "terraform.tfstate"
     region               = "eu-west-2"
-    workspace_key_prefix = "environments/members/remote-supervision" # This will store the object as environments/members/remote-supervision/${workspace}/terraform.tfstate
+    workspace_key_prefix = "environments/members/equip" # This will store the object as environments/members/equip/${workspace}/terraform.tfstate
   }
 }
