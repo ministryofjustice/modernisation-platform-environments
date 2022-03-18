@@ -1,3 +1,6 @@
+const { Console } = require("console");
+const c2 = new Console(process.stderr);
+
 var differenceInHours = require('date-fns/differenceInHours')
 
 var chalk = require("chalk")
@@ -73,18 +76,25 @@ async function main() {
     .filter(i => {
         return (differenceInHours(new Date() , i.StartTime ) < previousHoursToQuery ) 
     })
-
-
-
-    console.error("Found snapshots:-\n\n" + snapshots.map(i => `${i.Description} - ${i.SnapshotId}`).join("\n")  + "\n" )
-
-    snapshots = snapshots
     .map(i=>{
       i.serverType = i.Description.split("-")[0]
       i.serverName = serverTypeToName[i.serverType]
       i.diskNumber = i.Description.match(/disk([0-9]+)/)[1]
       return i
     })
+
+    console.error("Found snapshots:-")
+
+    c2.table(snapshots.map(i => {return  {
+      Description : i.Description,
+      serverName: i.serverName ,  
+      serverType: i.serverType , 
+      id : i.SnapshotId   
+    }}  ))
+
+    // console.error("Found snapshots:-\n\n" + snapshots.map(i => `${i.Description} - ${i.SnapshotId}`).join("\n")  + "\n" )
+
+    snapshots = snapshots
     .filter(i => {
         return Object.keys(serverTypeToName).includes(i.serverType)
     })

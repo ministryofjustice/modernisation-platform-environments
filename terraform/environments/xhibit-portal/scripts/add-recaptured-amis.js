@@ -1,3 +1,6 @@
+const { Console } = require("console");
+const c2 = new Console(process.stderr);
+
 var differenceInHours = require('date-fns/differenceInHours')
 
 var chalk = require("chalk")
@@ -12,7 +15,6 @@ fs = require('fs');
 const appvar = JSON.parse(fs.readFileSync("../application_variables.json"))
 
 let envString = process.argv[2]
-
 
 
 serverTypeToName = {
@@ -69,15 +71,22 @@ async function main() {
     .filter(i => {
        return i.Name.toLowerCase().includes(nameFilter.toLowerCase())
     })
-
-    console.error("Found amis:-\n\n" + images.map(i => i.Name).join("\n")  + "\n" )
-
-    images = images
     .map(i=>{
       i.serverType = i.Name.split("-")[0]
       i.serverName = serverTypeToName[i.serverType]
       return i
     })
+
+    console.error("Found amis:-")
+
+    c2.table(images.map(i => {return  {
+      serverName: i.serverName ,  
+      serverType: i.serverType , 
+      id : i.ImageId   
+    }}  ))
+
+    images = images
+
     .filter(i => {
         return Object.keys(serverTypeToName).includes(i.serverType)
     })
@@ -102,3 +111,9 @@ async function main() {
 
 
 main()
+
+
+
+
+
+
