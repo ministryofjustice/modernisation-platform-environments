@@ -131,12 +131,12 @@ resource "aws_instance" "test" {
   monitoring        = true
   ebs_optimized     = true
   root_block_device {
-      encrypted   = true
-      volume_type = "gp3"
-      throughput  = 200
-      volume_size = 30
-      kms_key_id  = aws_kms_key.this.arn
-    }
+    encrypted   = true
+    volume_type = "gp3"
+    throughput  = 200
+    volume_size = 30
+    kms_key_id  = aws_kms_key.this.arn
+  }
   metadata_options {
     http_endpoint = "enabled"
     http_tokens   = "required"
