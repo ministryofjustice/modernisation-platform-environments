@@ -73,7 +73,7 @@
       "infra6-disk-2-snapshot"        : "snap-05b0d77cc6ac378cf",
       "nat-instance-ami"              : "ami-087e7082959f51a02",
       "public_dns_name_ingestion"     : "ingest.cjsonline.gov.uk",
-      "suprig01-ami"                  : "ami-08660d4fd1b98f863",
+      "suprig01-ami"                  : "ami-04d4906b22a324e22",
       "suprig01-disk-1-snapshot"      : "snap-01ae3ad7666908c89",
       "suprig01-disk-2-snapshot"      : "snap-0789febb6b4d65b64",
       "suprig01-disk-3-snapshot"      : "snap-00ca4088084563457",
