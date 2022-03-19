@@ -104,10 +104,10 @@ resource "aws_elb" "ingestion_lb" {
   )
 }
 
-# data "aws_acm_certificate" "ingestion_lb_cert" {
-#   domain   = local.application_data.accounts[local.environment].public_dns_name_ingestion
-#   statuses = ["ISSUED"]
-# }
+data "aws_acm_certificate" "ingestion_lb_cert" {
+  domain   = local.application_data.accounts[local.environment].public_dns_name_ingestion
+  statuses = ["ISSUED"]
+}
 
 # resource "aws_s3_bucket" "ingestion_loadbalancer_logs" {
 #   bucket        = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}-ingestion-lblogs"
