@@ -37,8 +37,6 @@ locals {
 
   environment = terraform.workspace == "default" ? "development" : trimprefix(terraform.workspace, "${var.networking[0].application}-")
 
-  cert_env = local.environment == "preproduction" ? "pre" : local.environment
-
   vpc_name = var.networking[0].business-unit
   vpc_id   = data.aws_vpc.shared_vpc.id
 
