@@ -406,23 +406,8 @@ resource "aws_iam_role" "ssm_ec2_start_stop" {
   )
 
   inline_policy {
-    name = "modify-autoscaling-group-processes"
-
-    policy = jsonencode({
-      Version = "2012-10-17"
-      Sid     = "modify-autoscaling-group-processes"
-      Statement = [
-        {
-          Action = [
-            "autoscaling:DescribeAutoScalingGroups",
-            "autoscaling:SuspendProcesses",
-            "autoscaling:ResumeProcesses"
-          ]
-          Effect   = "Allow"
-          Resource = "*"
-        },
-      ]
-    })
+    name   = "modify-autoscaling-group-processes"
+    policy = data.aws_iam_policy_document.auto_scaling_group_processes.json
   }
 
   managed_policy_arns = [
@@ -435,4 +420,17 @@ resource "aws_iam_role" "ssm_ec2_start_stop" {
       Name = "ssm-ec2-start-stop"
     },
   )
+}
+
+data "aws_iam_policy_document" "auto_scaling_group_processes" {
+  statement {
+    sid    = "modify-autoscaling-group-processes"
+    effect = "Allow"
+    actions = [
+      "autoscaling:DescribeAutoScalingGroups",
+      "autoscaling:SuspendProcesses",
+      "autoscaling:ResumeProcesses"
+    ]
+    resources = ["*"]
+  }
 }
