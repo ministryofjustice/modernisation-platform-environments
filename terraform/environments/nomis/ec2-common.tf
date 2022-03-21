@@ -398,7 +398,7 @@ resource "aws_iam_role" "ssm_ec2_start_stop" {
           Principal = {
             Service = "ssm.amazonaws.com"
           }
-          Action = "sts:AssumeRole"
+          Action    = "sts:AssumeRole"
           Condition = {}
         }
       ]
@@ -410,10 +410,10 @@ resource "aws_iam_role" "ssm_ec2_start_stop" {
 
     policy = jsonencode({
       Version = "2012-10-17"
-      Sid = "modify-autoscaling-group-processes"
+      Sid     = "modify-autoscaling-group-processes"
       Statement = [
         {
-          Action   = [
+          Action = [
             "autoscaling:DescribeAutoScalingGroups",
             "autoscaling:SuspendProcesses",
             "autoscaling:ResumeProcesses"
