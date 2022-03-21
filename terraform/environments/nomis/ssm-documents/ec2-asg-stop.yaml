@@ -22,5 +22,4 @@ mainSteps:
       documentType: SSMDocument
       documentPath: AWS-StopEC2Instance
       documentParameters:
-        InstanceId: "{{ InstanceId }}"
         AutomationAssumeRole: "{{ AutomationAssumeRole }}"

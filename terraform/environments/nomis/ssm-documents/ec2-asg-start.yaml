@@ -14,7 +14,6 @@ mainSteps:
       documentType: SSMDocument
       documentPath: AWS-StartEC2Instance
       documentParameters:
-        InstanceId: "{{ InstanceId }}"
         AutomationAssumeRole: "{{ AutomationAssumeRole }}"
   - name: ResumeAsgHealthChecks
     action: aws:executeAwsApi
