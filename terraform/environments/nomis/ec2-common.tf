@@ -311,7 +311,37 @@ resource "aws_ssm_association" "update_ssm_agent" {
 # so we need to create a separate association for each day in order to deal with
 # weekends.  Alternatively we could use Eventbridge rules as a trigger, but its 
 # slightly more complex to setup the IAM roles for that.
+# Have added a custom ssm document that also suspends health checks on auto
+# scaling groups to prevent member instances from being recreated when powered off
 #------------------------------------------------------------------------------
+
+resource "aws_ssm_document" "ec2_asg_start" {
+  name            = "ec2AsgStart"
+  document_type   = "Command"
+  document_format = "YAML"
+  content         = file("./ssm-documents/ec2-asg-start.yaml")
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "ec2-asg-start"
+    },
+  )
+}
+
+resource "aws_ssm_document" "ec2_asg_stop" {
+  name            = "ec2AsgStop"
+  document_type   = "Command"
+  document_format = "YAML"
+  content         = file("./ssm-documents/ec2-asg-stop.yaml")
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "ec2-asg-stop"
+    },
+  )
+}
 
 locals {
   weekdays = ["MON", "TUE", "WED", "THU", "FRI"]
@@ -320,14 +350,15 @@ locals {
 # Scheduled start
 resource "aws_ssm_association" "ec2_scheduled_start" {
   for_each                         = toset(local.weekdays)
-  name                             = "AWS-StartEC2Instance" # this is an AWS provided document
+  name                             = aws_ssm_document.ec2_asg_start.name
   association_name                 = "ec2_scheduled_start_${each.value}"
   automation_target_parameter_name = "InstanceId"
   parameters = {
     AutomationAssumeRole = aws_iam_role.ssm_ec2_start_stop.arn
+    AutoScalingGroupName = "weblogic-CNOMT1"
   }
   targets {
-    # currently all instances created through the nomis-stack module are tagged 'false'
+    # currently anything non-prod is in scope
     key    = "tag:always_on"
     values = ["false"]
   }
@@ -338,14 +369,15 @@ resource "aws_ssm_association" "ec2_scheduled_start" {
 # Scheduled stop
 resource "aws_ssm_association" "ec2_scheduled_stop" {
   for_each                         = toset(local.weekdays)
-  name                             = "AWS-StopEC2Instance" # this is an AWS provided document
+  name                             = aws_ssm_document.ec2_asg_stop.name
   association_name                 = "ec2_scheduled_stop_${each.value}"
   automation_target_parameter_name = "InstanceId"
   parameters = {
     AutomationAssumeRole = aws_iam_role.ssm_ec2_start_stop.arn
+    AutoScalingGroupName = "weblogic-CNOMT1"
   }
   targets {
-    # currently all instances created through the nomis-stack module are tagged 'false'
+    # currently anything non-prod is in scope
     key    = "tag:always_on"
     values = ["false"]
   }
@@ -359,19 +391,40 @@ resource "aws_iam_role" "ssm_ec2_start_stop" {
   max_session_duration = "3600"
   assume_role_policy = jsonencode(
     {
-      "Version" : "2012-10-17",
-      "Statement" : [
+      Version = "2012-10-17"
+      Statement = [
         {
-          "Effect" : "Allow",
-          "Principal" : {
-            "Service" : "ssm.amazonaws.com"
+          Effect = "Allow"
+          Principal = {
+            Service = "ssm.amazonaws.com"
           }
-          "Action" : "sts:AssumeRole",
-          "Condition" : {}
+          Action = "sts:AssumeRole"
+          Condition = {}
         }
       ]
     }
   )
+
+  inline_policy {
+    name = "modify-autoscaling-group-processes"
+
+    policy = jsonencode({
+      Version = "2012-10-17"
+      Sid = "modify-autoscaling-group-processes"
+      Statement = [
+        {
+          Action   = [
+            "autoscaling:DescribeAutoScalingGroups",
+            "autoscaling:SuspendProcesses",
+            "autoscaling:ResumeProcesses"
+          ]
+          Effect   = "Allow"
+          Resource = "*"
+        },
+      ]
+    })
+  }
+
   managed_policy_arns = [
     "arn:aws:iam::aws:policy/service-role/AmazonSSMAutomationRole"
     # todo: This policy gives a lot of permissions. We should create a custom policy if we keep the solution long term 

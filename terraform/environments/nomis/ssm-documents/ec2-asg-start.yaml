@@ -1,0 +1,26 @@
+schemaVersion: "2.2"
+description: A composite document for starting instances and enabling auto-scaling group health checks.
+parameters:
+  AutomationAssumeRole:
+    description: (Required) The ARN of the role that allows Automation to perform the actions on your behalf.
+    type: String
+  AutoScalingGroupName:
+    description: Name of autoscaling group for which HealthCheck scaling process should be resumed
+    type: String
+mainSteps:
+  - name: StartEC2Instance
+    action: aws:runDocument
+    inputs:
+      documentType: SSMDocument
+      documentPath: AWS-StartEC2Instance
+      documentParameters:
+        InstanceId: "{{ InstanceId }}"
+        AutomationAssumeRole: "{{ AutomationAssumeRole }}"
+  - name: ResumeAsgHealthChecks
+    action: aws:executeAwsApi
+    inputs:
+      service: autoscaling
+      Api: resume_processes
+      AutoScalingGroupName: "{{ AutoScalingGroupName }}"
+      scalingProcesses:
+        - HealthCheck 

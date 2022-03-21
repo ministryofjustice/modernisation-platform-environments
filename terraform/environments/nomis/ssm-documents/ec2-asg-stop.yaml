@@ -1,0 +1,26 @@
+schemaVersion: "2.2"
+description: A composite document for disabling auto-scaling group health checks and stopping instances.
+parameters:
+  AutomationAssumeRole:
+    description: (Required) The ARN of the role that allows Automation to perform the actions on your behalf.
+    type: String
+  AutoScalingGroupName:
+    description: Name of autoscaling group for which HealthCheck scaling process should be suspended
+    type: String
+mainSteps:
+  - name: SuspendAsgHealthChecks
+    action: aws:executeAwsApi
+    inputs:
+      service: autoscaling
+      Api: suspend_processes
+      AutoScalingGroupName: "{{ AutoScalingGroupName }}"
+      scalingProcesses:
+        - HealthCheck 
+  - name: StopEC2Instance
+    action: aws:runDocument
+    inputs:
+      documentType: SSMDocument
+      documentPath: AWS-StopEC2Instance
+      documentParameters:
+        InstanceId: "{{ InstanceId }}"
+        AutomationAssumeRole: "{{ AutomationAssumeRole }}"
