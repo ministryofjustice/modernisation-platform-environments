@@ -186,7 +186,7 @@ resource "aws_autoscaling_schedule" "scale_down" {
   min_size               = 0
   max_size               = var.asg_max_size # this should make sure instances move to warm pool rather than being deleted
   desired_capacity       = 0
-  recurrence             = "0 19 * * *"
+  recurrence             = "0 19 * * Mon-Fri"
   autoscaling_group_name = aws_autoscaling_group.weblogic.name
 }
 
@@ -195,7 +195,7 @@ resource "aws_autoscaling_schedule" "scale_up" {
   min_size               = var.asg_min_size
   max_size               = var.asg_max_size
   desired_capacity       = var.asg_desired_capacity
-  recurrence             = "0 7 * * *"
+  recurrence             = "0 7 * * Mon-Fri"
   autoscaling_group_name = aws_autoscaling_group.weblogic.name
 }
 
