@@ -50,7 +50,7 @@ locals {
       instance_type     = "t2.micro"
       availability_zone = "${local.region}a"
       subnet_id         = data.aws_subnet.public_az_a.id
-      security_groups   = [aws_security_group.aws_sec.id]
+      security_groups   = [aws_security_group.ec2_security_dc.id]
       root_block_device = [
         {
           encrypted   = true
@@ -82,7 +82,7 @@ locals {
       availability_zone = "${local.region}b"
       subnet_id         = data.aws_subnet.private_subnets_a
       #    vpc_security_group_ids = [aws_security_group.aws_sec.id]
-      security_groups = [aws_security_group.aws_sec.id]
+      security_groups = [aws_security_group.ec2_security_dc.id]
       root_block_device = [
         {
           encrypted   = true
@@ -127,7 +127,7 @@ resource "aws_instance" "test" {
   instance_type     = "t3.small"
   availability_zone = "${local.region}a"
   subnet_id         = data.aws_subnet.public_az_a.id
-  security_groups   = [aws_security_group.aws_sec.id]
+  security_groups   = [aws_security_group.ec2_security_dc.id, aws_security_group.ec2_security_citrix.id, aws_security_group.ec2_security_sf.id, aws_security_group.ec2_security_rdp.id, aws_security_group.ec2_security_adc.id, aws_security_group.ec2_security_samba.id]
   monitoring        = true
   ebs_optimized     = true
   root_block_device {
