@@ -424,7 +424,7 @@ resource "aws_iam_role" "ssm_ec2_start_stop" {
 
 data "aws_iam_policy_document" "auto_scaling_group_processes" {
   statement {
-    sid    = "modify-autoscaling-group-processes"
+    sid    = "modifyAautoscalingGroupProcesses"
     effect = "Allow"
     actions = [
       "autoscaling:DescribeAutoScalingGroups",

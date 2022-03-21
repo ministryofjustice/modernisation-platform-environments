@@ -1,4 +1,4 @@
-schemaVersion: "2.2"
+schemaVersion: "0.3"
 description: A composite document for disabling auto-scaling group health checks and stopping instances.
 parameters:
   AutomationAssumeRole:
