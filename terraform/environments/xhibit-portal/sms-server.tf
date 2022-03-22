@@ -45,14 +45,6 @@ resource "aws_instance" "sms-server" {
   subnet_id                   = data.aws_subnet.private_az_a.id
   key_name                    = aws_key_pair.george.key_name
 
-  user_data = <<EOF
-    <script>
-    net user al 'TestThisWorks2092!' /add /y
-    net localgroup administrators al /add
-    echo blah > c:\flag.txt
-    </script>
-  EOF
-
 
   metadata_options {
     http_tokens   = "required"
