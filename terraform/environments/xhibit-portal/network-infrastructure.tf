@@ -202,7 +202,7 @@ resource "aws_security_group_rule" "ingestion-lb-http-to-ingestion-server" {
   source_security_group_id = aws_security_group.ingestion_server.id
 }
 
-resource "aws_security_group_rule" "app-all-from-ingestion" {
+resource "aws_security_group_rule" "app-all-from-self" {
   depends_on               = [aws_security_group.app_servers]
   security_group_id        = aws_security_group.app_servers.id
   type                     = "ingress"
