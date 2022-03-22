@@ -213,6 +213,17 @@ resource "aws_security_group_rule" "app-all-from-self" {
   self                     = true
 }
 
+resource "aws_security_group_rule" "app-all-from-self" {
+  depends_on               = [aws_security_group.app_servers]
+  security_group_id        = aws_security_group.app_servers.id
+  type                     = "egress"
+  description              = "allow all traffic from DB"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
+  self                     = true
+}
+
 resource "aws_security_group_rule" "app-all-from-ingestion" {
   depends_on               = [aws_security_group.app_servers, aws_security_group.ingestion_server]
   security_group_id        = aws_security_group.app_servers.id
