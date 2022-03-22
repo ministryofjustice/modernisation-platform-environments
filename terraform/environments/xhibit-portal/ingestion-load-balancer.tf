@@ -117,7 +117,7 @@ data "aws_acm_certificate" "ingestion_lb_cert" {
 
 # resource "aws_s3_bucket_policy" "ingestion_loadbalancer_logs_policy" {
 #   bucket = aws_s3_bucket.ingestion_loadbalancer_logs.bucket
-#   policy = data.aws_iam_policy_document.s3_bucket_lb_write.json
+#   policy = data.aws_iam_policy_document.s3_bucket_ingestion_lb_write.json
 # }
 
 
