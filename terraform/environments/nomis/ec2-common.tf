@@ -311,6 +311,13 @@ resource "aws_ssm_association" "update_ssm_agent" {
 # so we need to create a separate association for each day in order to deal with
 # weekends.  Alternatively we could use Eventbridge rules as a trigger, but its 
 # slightly more complex to setup the IAM roles for that.
+#
+# This needs a bit more thought, as database needs to be up when Weblogics are
+# created by autoscaling events. As we can't currently return weblogic instances
+# to the warm pool, new ones end up being created during the scheduled scale down
+# event at the end of the day, so database needs to be up for about 1hr longer.
+# Should not be a be a concern once this is released:
+# https://github.com/hashicorp/terraform-provider-aws/pull/23769
 #------------------------------------------------------------------------------
 
 locals {
@@ -327,7 +334,8 @@ resource "aws_ssm_association" "ec2_scheduled_start" {
     AutomationAssumeRole = aws_iam_role.ssm_ec2_start_stop.arn
   }
   targets {
-    # currently all instances created through the nomis-stack module are tagged 'false'
+    # currently all instances created through the database module are tagged 'false'
+    # weblogics are not in scope as they are managed by an autoscaling group, and therefore are not tagged
     key    = "tag:always_on"
     values = ["false"]
   }
@@ -350,7 +358,7 @@ resource "aws_ssm_association" "ec2_scheduled_stop" {
     values = ["false"]
   }
   apply_only_at_cron_interval = true
-  schedule_expression         = "cron(0 19 ? * ${each.value} *)"
+  schedule_expression         = "cron(0 20 ? * ${each.value} *)"
 }
 
 resource "aws_iam_role" "ssm_ec2_start_stop" {
