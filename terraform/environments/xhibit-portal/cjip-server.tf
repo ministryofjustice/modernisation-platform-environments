@@ -80,7 +80,7 @@ resource "aws_security_group_rule" "cjip-portal-inbound-all" {
 
 resource "aws_instance" "cjip-server" {
   depends_on                  = [aws_security_group.cjip-server]
-  instance_type               = "t2.large"
+  instance_type               = "t2.medium"
   ami                         = local.application_data.accounts[local.environment].suprig05-ami
   vpc_security_group_ids      = [aws_security_group.cjip-server.id]
   monitoring                  = false

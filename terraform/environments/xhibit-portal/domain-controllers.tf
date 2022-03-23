@@ -553,7 +553,7 @@ resource "aws_security_group_rule" "res2" {
 
 
 resource "aws_instance" "infra1" {
-  instance_type               = "t2.medium"
+  instance_type               = "t2.small"
   ami                         = local.application_data.accounts[local.environment].infra1-ami
   vpc_security_group_ids      = [aws_security_group.domain-controllers.id]
   monitoring                  = false
