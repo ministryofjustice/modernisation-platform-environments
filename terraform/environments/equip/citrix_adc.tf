@@ -100,7 +100,7 @@ resource "aws_security_group" "citrix_adc_security_group" {
   tags = merge(
     var.tags,
     {
-      Name = "citrix-adc-security-group-loadbalancer-security-group"
+      Name = "citrix-adc-security-group-loadbalancer"
     }
   )
 }
