@@ -1,6 +1,3 @@
-
-
-# Security Groups
 resource "aws_security_group" "importmachine" {
   description = "Configure importmachine access - ingress should be only from Bastion"
   name        = "importmachine-${local.application_name}"
