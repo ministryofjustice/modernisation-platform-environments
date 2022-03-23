@@ -5,6 +5,8 @@
 tmp/
 .vscode/
 .terraform.lock.hcl
+**/node_modules
+**/package-lock.json
 
 ##########################
 ## IntelliJ

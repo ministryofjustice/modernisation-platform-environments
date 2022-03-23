@@ -1,9 +1,11 @@
 #------------------------------------------------------------------------------
 # Load Balancer - Internal
 #------------------------------------------------------------------------------
-
-data "aws_subnet_ids" "private" {
-  vpc_id = local.vpc_id
+data "aws_subnets" "private" {
+  filter {
+    name   = "vpc-id"
+    values = [local.vpc_id]
+  }
   tags = {
     Name = "${local.vpc_name}-${local.environment}-${local.subnet_set}-private-${local.region}*"
   }
@@ -84,7 +86,7 @@ resource "aws_lb" "internal" {
   internal                   = true
   load_balancer_type         = "application"
   security_groups            = [aws_security_group.internal_elb.id]
-  subnets                    = data.aws_subnet_ids.private.ids
+  subnets                    = data.aws_subnets.private.ids
   enable_deletion_protection = true
   drop_invalid_header_fields = true
 
@@ -145,7 +147,7 @@ resource "aws_route53_record" "internal_lb" {
   provider = aws.core-vpc
 
   zone_id = data.aws_route53_zone.external.zone_id
-  name    = "*.${data.aws_route53_zone.external.name}"
+  name    = "*.${local.application_name}.${data.aws_route53_zone.external.name}"
   type    = "A"
 
   alias {
