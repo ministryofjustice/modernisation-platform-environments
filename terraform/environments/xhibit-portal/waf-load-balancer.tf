@@ -370,7 +370,7 @@ resource "aws_s3_bucket" "loadbalancer_logs" {
   force_destroy = true
 }
 
-resource "aws_s3_bucket_server_side_encryption_configuration" "default_encryption" {
+resource "aws_s3_bucket_server_side_encryption_configuration" "default_encryption_loadbalancer_logs" {
   bucket = aws_s3_bucket.loadbalancer_logs.bucket
 
   rule {
@@ -432,6 +432,16 @@ resource "aws_s3_bucket" "waf_logs" {
   bucket        = "aws-waf-logs-${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}"
   acl           = "log-delivery-write"
   force_destroy = true
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "default_encryption_waf_logs" {
+  bucket = aws_s3_bucket.waf_logs.bucket
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm     = "AES256"
+    }
+  }
 }
 
 resource "aws_wafv2_web_acl_logging_configuration" "waf_logs" {
