@@ -9,11 +9,15 @@ const httpsAgent = new https.Agent({
 
 let suffix = "" + Date.now()
 
+// let endpoint = 'ingest' 
+let endpoint = 'dev-ingest' 
+// let endpoint = 'preingest' 
+
 
 let dvladoc = getObligatoryDisqualificationDoc(
 	{
 		correlationId : 		 "" + suffix,
-		messageText : 			 "GC CJIP TEST " + suffix,
+		messageText : 			 endpoint + "CJIP TEST " + suffix,
 		// description  :    "GC BITS TEST " + suffix,
 		// name : 					 "GC BITS TEST " + suffix,
 
@@ -21,7 +25,7 @@ let dvladoc = getObligatoryDisqualificationDoc(
 )
 
 
-let result = await sendRequest(dvladoc, 'https://ingest.cjsonline.gov.uk/CJIPWebService/CJIPWebservice.asmx' )
+let result = await sendRequest(dvladoc, 'https://'  + endpoint + '.cjsonline.gov.uk/CJIPWebService/CJIPWebservice.asmx' )
 
 
 console.log(result)
