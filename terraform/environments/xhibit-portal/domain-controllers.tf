@@ -576,7 +576,6 @@ resource "aws_security_group_rule" "res2_ingress" {
 resource "aws_security_group_rule" "res1_from_app" {
   depends_on               = [aws_security_group.outbound_dns_resolver]
   security_group_id        = aws_security_group.app_servers.id
-  provider                 = local.vpc_id
   type                     = "egress"
   description              = "allow DNS"
   from_port                = 0
@@ -588,7 +587,6 @@ resource "aws_security_group_rule" "res1_from_app" {
 resource "aws_security_group_rule" "res2_from_app" {
   depends_on               = [aws_security_group.outbound_dns_resolver]
   security_group_id        = aws_security_group.app_servers.id
-  provider                 = local.vpc_id
   type                     = "egress"
   description              = "allow DNS"
   from_port                = 0
@@ -600,7 +598,6 @@ resource "aws_security_group_rule" "res2_from_app" {
 resource "aws_security_group_rule" "res1_to_app" {
   depends_on               = [aws_security_group.outbound_dns_resolver]
   security_group_id        = aws_security_group.app_servers.id
-  provider                 = local.vpc_id
   type                     = "ingress"
   description              = "allow DNS"
   from_port                = 0
@@ -612,7 +609,6 @@ resource "aws_security_group_rule" "res1_to_app" {
 resource "aws_security_group_rule" "res2_to_app" {
   depends_on               = [aws_security_group.outbound_dns_resolver]
   security_group_id        = aws_security_group.app_servers.id
-  provider                 = local.vpc_id
   type                     = "ingress"
   description              = "allow DNS"
   from_port                = 0
