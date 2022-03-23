@@ -147,7 +147,7 @@ resource "aws_route53_record" "internal_lb" {
   provider = aws.core-vpc
 
   zone_id = data.aws_route53_zone.external.zone_id
-  name    = "*.${data.aws_route53_zone.external.name}"
+  name    = "*.${local.application_name}.${data.aws_route53_zone.external.name}"
   type    = "A"
 
   alias {

@@ -1,11 +1,11 @@
 variable "ami_name" {
   type        = string
-  description = "Name of AMI to be used to launch the database ec2 instance"
+  description = "Name of AMI to be used to launch the ec2 instance"
 }
 
 variable "ami_owner" {
   type        = string
-  description = "Owner of AMI to be used to launch the database ec2 instance"
+  description = "Owner of AMI to be used to launch the ec2 instance"
   default     = "self"
   nullable    = false
 }
@@ -21,60 +21,31 @@ variable "application_name" {
   }
 }
 
-variable "asm_data_capacity" {
+variable "asg_max_size" {
   type        = number
-  description = "Total capacity of the DATA disk group in GiB"
-  default     = 5
-  nullable    = false
-  validation {
-    condition     = var.asm_data_capacity >= 5
-    error_message = "The minimum capacity that can be specified for the DATA diskgroup is 5 GiB."
-  }
-}
-
-variable "asm_data_iops" {
-  type        = number
-  description = "Iops of the DATA disks"
-  default     = 3000
+  description = "The maximum size of the auto scaling group"
+  default     = 1
   nullable    = false
 }
 
-variable "asm_data_throughput" {
+variable "asg_min_size" {
   type        = number
-  description = "Throughput of the DATA disks in MiB/s"
-  default     = 125
+  description = "The minimum size of the auto scaling group"
+  default     = 1
   nullable    = false
 }
 
-variable "asm_flash_capacity" {
+variable "asg_desired_capacity" {
   type        = number
-  description = "Total capacity of the FLASH disk group in GiB"
-  default     = 2
-  nullable    = false
-  validation {
-    condition     = var.asm_flash_capacity >= 2
-    error_message = "The minimum capacity that can be specified for the FLASH diskgroup is 2 GiB."
-  }
+  description = "The desired number of instances.  Use for manually scaling, or up the asg_min_size var.  Must be >= asg_min_size and =< asg_max_size."
+  default     = null
+  nullable    = true
 }
 
-variable "asm_flash_iops" {
+variable "asg_warm_pool_min_size" {
   type        = number
-  description = "Iops of the FLASH disks"
-  default     = 3000
-  nullable    = false
-}
-
-variable "asm_flash_throughput" {
-  type        = number
-  description = "Throughput of the FLASH disks in MB/s"
-  default     = 125
-  nullable    = false
-}
-
-variable "availability_zone" {
-  type        = string
-  description = "The availability zone in which to deploy the infrastructure"
-  default     = "eu-west-2a"
+  description = "The minimum number of instances that should always be available in the auto scaling group warm pool"
+  default     = 0
   nullable    = false
 }
 
@@ -93,21 +64,21 @@ variable "extra_ingress_rules" {
     protocol    = string
     cidr_blocks = list(string)
   }))
-  description = "A list of extra ingress rules to be added to the database security group"
+  description = "A list of extra ingress rules to be added to the instance security group"
   default     = []
   nullable    = false
 }
 
 variable "instance_type" {
   type        = string
-  description = "ec2 instance type to use for the database"
-  default     = "r6i.xlarge"
+  description = "ec2 instance type to use for the instances"
+  default     = "t2.large"
   nullable    = false
 }
 
 variable "common_security_group_id" {
   type        = string
-  description = "Common security group used by all database instances"
+  description = "Common security group used by all instances"
 }
 
 variable "environment" {
@@ -115,9 +86,9 @@ variable "environment" {
   description = "Application environment - i.e. the terraform workspace"
 }
 
-variable "instance_profile_name" {
+variable "instance_profile_policy_arn" {
   type        = string
-  description = "IAM instance profile to be attached to the instance"
+  description = "An IAM policy document to be attached to the weblogic instance profile"
 }
 
 variable "key_name" {
@@ -125,19 +96,30 @@ variable "key_name" {
   description = "Name of ssh key resource for ec2-user"
 }
 
+variable "load_balancer_listener_arn" {
+  type        = string
+  description = "arn for loadbalancer fronting weblogics"
+}
+
 variable "name" {
   type        = string
-  description = "Provide a unique name for the instance"
+  description = "This must be the same as the name variable used when setting up the database instance to which the weblogics will connect, e.g. CNOMT1, CNOMT2 etc"
 }
 
 variable "oracle_app_disk_size" {
   type        = map(any)
-  description = "Capcity of each Oracle application disk, /u01 and /u02.  If not specified, the default values from the AMI block device mappings will be used."
+  description = "Capcity of each Oracle application disk, /u01 and /u02. If not specified, the default values from the AMI block device mappings will be used."
   default = {
     # "/dev/sdb" = 100
-    # "/dev/sdc" = 100
   }
   nullable = false
+}
+
+variable "region" {
+  type        = string
+  description = "The region in which to deploy the instances"
+  default     = "eu-west-2"
+  nullable    = false
 }
 
 variable "subnet_set" {
@@ -155,4 +137,10 @@ variable "termination_protection" {
   description = "Set to true to prevent accidental deletion of instances"
   default     = false
   nullable    = false
+}
+
+variable "use_default_creds" {
+  type        = bool
+  description = "Use the default weblogic admin username/password & T1 Nomis db username/password (Parameter Store Variables)"
+  default     = true
 }
