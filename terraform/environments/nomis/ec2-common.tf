@@ -1,55 +1,13 @@
 #------------------------------------------------------------------------------
-# Instance profile to be assumed by the ec2 instance
-# This is required to enable SSH via Systems Manager
-# and also to allow access to an S3 bucket in which 
-# Oracle and Weblogic installation files are held
+# Common IAM policies for all ec2 instance profiles
 #------------------------------------------------------------------------------
-
-#TODO this is role and profile are only used by Jumpserver, so group it with that and reanme it
-# can leave the policy docs here though
-resource "aws_iam_role" "ec2_common_role" {
-  name                 = "ec2-common-role"
-  path                 = "/"
-  max_session_duration = "3600"
-  assume_role_policy = jsonencode(
-    {
-      "Version" : "2012-10-17",
-      "Statement" : [
-        {
-          "Effect" : "Allow",
-          "Principal" : {
-            "Service" : "ec2.amazonaws.com"
-          }
-          "Action" : "sts:AssumeRole",
-          "Condition" : {}
-        }
-      ]
-    }
-  )
-  managed_policy_arns = [
-    "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy",
-    aws_iam_policy.ec2_common_policy.arn
-  ]
-  tags = merge(
-    local.tags,
-    {
-      Name = "ec2-common-role"
-    },
-  )
-}
-
-# create instance profile from IAM role
-resource "aws_iam_instance_profile" "ec2_common_profile" {
-  name = "ec2-common-profile"
-  role = aws_iam_role.ec2_common_role.name
-  path = "/"
-}
 
 # custom policy for SSM as managed policy AmazonSSMManagedInstanceCore is too permissive
 data "aws_iam_policy_document" "ssm_custom" {
   #tfsec:ignore:AWS099:this is derived from AmazonSSMManagedInstanceCore managed policy
   #checkov:skip=CKV_AWS_111:this is derived from AmazonSSMManagedInstanceCore managed policy
   statement {
+    sid    = "CustomSsmPolicy"
     effect = "Allow"
     actions = [
       "ssm:DescribeAssociation",
@@ -80,6 +38,7 @@ data "aws_iam_policy_document" "ssm_custom" {
   }
 
   statement {
+    sid    = "AccessCloudWatchConfigParameter"
     effect = "Allow"
     actions = [
       "ssm:GetParameter",
@@ -89,9 +48,10 @@ data "aws_iam_policy_document" "ssm_custom" {
   }
 }
 
-# create policy document for access to s3 bucket
+# create policy document for access to s3 artefact bucket
 data "aws_iam_policy_document" "s3_bucket_access" {
   statement {
+    sid = "AccessToInstallationArtefactBucket"
     effect = "Allow"
     actions = [
       "s3:PutObject",
@@ -118,6 +78,7 @@ data "aws_iam_policy_document" "session_manager_logging" {
   #   resources = [aws_kms_key.session_manager.arn]
   # }
   statement {
+    sid    = "WriteSessionManagerLogs"
     effect = "Allow"
     actions = [
       "logs:CreateLogStream",
@@ -141,7 +102,7 @@ data "aws_iam_policy_document" "ec2_common_combined" {
   ]
 }
 
-# create single managed policy to be attached to ec2-common IAM role
+# create single managed policy
 resource "aws_iam_policy" "ec2_common_policy" {
   name        = "ec2-common-policy"
   path        = "/"
@@ -153,6 +114,14 @@ resource "aws_iam_policy" "ec2_common_policy" {
       Name = "ec2-common-policy"
     },
   )
+}
+
+# create list of common managed policies that can be attached to ec2 instance profiles
+locals {
+  ec2_common_managed_policies = [
+    "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy",
+    aws_iam_policy.ec2_common_policy.arn
+  ]
 }
 
 #------------------------------------------------------------------------------
