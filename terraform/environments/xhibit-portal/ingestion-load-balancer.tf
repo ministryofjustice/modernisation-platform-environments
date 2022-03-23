@@ -4,16 +4,16 @@ resource "aws_security_group" "ingestion_lb" {
   vpc_id      = local.vpc_id
 }
 
-resource "aws_security_group_rule" "egress-to-ingestion" {
-  depends_on               = [aws_security_group.ingestion_lb]
-  security_group_id        = aws_security_group.ingestion_lb.id
-  type                     = "egress"
-  description              = "allow web traffic to get to ingestion server"
-  from_port                = 80
-  to_port                  = 80
-  protocol                 = "TCP"
-  source_security_group_id = aws_security_group.ingestion_server.id
-}
+# resource "aws_security_group_rule" "egress-to-ingestion" {
+#   depends_on               = [aws_security_group.ingestion_lb]
+#   security_group_id        = aws_security_group.ingestion_lb.id
+#   type                     = "egress"
+#   description              = "allow web traffic to get to ingestion server"
+#   from_port                = 80
+#   to_port                  = 80
+#   protocol                 = "TCP"
+#   source_security_group_id = aws_security_group.ingestion_server.id
+# }
 
 resource "aws_security_group_rule" "ingestion_lb_allow_web_users" {
   depends_on        = [aws_security_group.ingestion_lb]
