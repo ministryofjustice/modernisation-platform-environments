@@ -51,7 +51,7 @@ data "aws_iam_policy_document" "ssm_custom" {
 # create policy document for access to s3 artefact bucket
 data "aws_iam_policy_document" "s3_bucket_access" {
   statement {
-    sid = "AccessToInstallationArtefactBucket"
+    sid    = "AccessToInstallationArtefactBucket"
     effect = "Allow"
     actions = [
       "s3:PutObject",
