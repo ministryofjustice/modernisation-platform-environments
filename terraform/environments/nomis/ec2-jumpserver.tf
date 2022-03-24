@@ -97,7 +97,7 @@ resource "aws_iam_role" "ec2_jumpserver_role" {
 }
 
 resource "aws_iam_instance_profile" "ec2_jumpserver_profile" {
-  name = "ec2-common-profile"
+  name = "ec2-jumpserver-profile"
   role = aws_iam_role.ec2_jumpserver_role.name
   path = "/"
 }
