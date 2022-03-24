@@ -1,6 +1,6 @@
 resource "aws_instance" "build-server" {
   depends_on                  = [aws_security_group.build_server]
-  instance_type               = "t2.medium"
+  instance_type               = "t3.large"
   ami                         = local.application_data.accounts[local.environment].buildserver-ami
   vpc_security_group_ids      = [aws_security_group.build_server.id]
   monitoring                  = false
