@@ -148,4 +148,8 @@ resource "aws_ssm_association" "jumpserver_ec2_rescue" {
     key    = "InstanceIds"
     values = [aws_instance.jumpserver_windows.id]
   }
+  depends_on = [
+    aws_iam_role_policy.jumpserver_put_parameter,
+    aws_ssm_parameter.jumpserver_ec2_rescue
+  ]
 }
