@@ -105,7 +105,7 @@ data "aws_iam_policy_document" "s3_db_backup_bucket_access" {
 }
 
 resource "aws_iam_policy" "s3_db_backup_bucket_access" {
-  name        = "ec2-common-policy"
+  name        = "s3-db-backup-bucket-access"
   path        = "/"
   description = "Policy for access to database backup bucket"
   policy      = data.aws_iam_policy_document.s3_db_backup_bucket_access.json
