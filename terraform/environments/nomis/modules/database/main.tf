@@ -58,7 +58,7 @@ resource "aws_instance" "database" {
   associate_public_ip_address = false
   disable_api_termination     = var.termination_protection
   ebs_optimized               = true
-  iam_instance_profile        = var.instance_profile_name
+  iam_instance_profile        = aws_iam_instance_profile.database.name
   instance_type               = var.instance_type # tflint-ignore: aws_instance_invalid_type
   key_name                    = var.key_name
   monitoring                  = true
@@ -330,20 +330,46 @@ data "aws_iam_policy_document" "asm_parameter" {
       variable = "aws:CurrentTime"
       values   = [time_offset.asm_parameter.rfc3339]
     }
-    condition { #todo: this needs rethinking as it doesn't do anything
-      test     = "StringLike"
-      variable = "ec2:SourceInstanceARN"
-      values   = [aws_instance.database.arn]
-    }
   }
 }
+resource "aws_iam_role" "database" {
+  name                 = "ec2-database-role-${var.name}"
+  path                 = "/"
+  max_session_duration = "3600"
+  assume_role_policy = jsonencode(
+    {
+      "Version" : "2012-10-17",
+      "Statement" : [
+        {
+          "Effect" : "Allow",
+          "Principal" : {
+            "Service" : "ec2.amazonaws.com"
+          }
+          "Action" : "sts:AssumeRole",
+          "Condition" : {}
+        }
+      ]
+    }
+  )
 
-data "aws_iam_instance_profile" "database" {
-  name = var.instance_profile_name
+  managed_policy_arns = var.instance_profile_policies
+
+  tags = merge(
+    var.tags,
+    {
+      Name = "ec2-database-role-${var.name}"
+    },
+  )
 }
 
 resource "aws_iam_role_policy" "asm_parameter" {
   name   = "asm-parameter-access-${var.name}"
-  role   = data.aws_iam_instance_profile.database.role_name
+  role   = aws_iam_role.database.id
   policy = data.aws_iam_policy_document.asm_parameter.json
+}
+
+resource "aws_iam_instance_profile" "database" {
+  name = "ec2-database-profile-${var.name}"
+  role = aws_iam_role.database.name
+  path = "/"
 }

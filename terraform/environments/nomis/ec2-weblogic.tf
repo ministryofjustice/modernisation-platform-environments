@@ -20,10 +20,10 @@ module "weblogic" {
 
   termination_protection = try(each.value.termination_protection, null)
 
-  common_security_group_id    = aws_security_group.weblogic_common.id
-  instance_profile_policy_arn = aws_iam_policy.ec2_common_policy.arn
-  key_name                    = aws_key_pair.ec2-user.key_name
-  load_balancer_listener_arn  = aws_lb_listener.internal.arn
+  common_security_group_id   = aws_security_group.weblogic_common.id
+  instance_profile_policies  = local.ec2_common_managed_policies
+  key_name                   = aws_key_pair.ec2-user.key_name
+  load_balancer_listener_arn = aws_lb_listener.internal.arn
 
   application_name = local.application_name
   business_unit    = local.vpc_name
@@ -67,11 +67,14 @@ resource "aws_security_group" "weblogic_common" {
   }
 
   ingress {
-    description     = "access from Windows Jumpserver (forms/reports)"
-    from_port       = "7777"
-    to_port         = "7777"
-    protocol        = "TCP"
-    security_groups = [aws_security_group.jumpserver-windows.id, aws_security_group.internal_elb.id]
+    description = "access from Windows Jumpserver and loadbalancer (forms/reports)"
+    from_port   = "7777"
+    to_port     = "7777"
+    protocol    = "TCP"
+    security_groups = [
+      aws_security_group.jumpserver-windows.id,
+      aws_security_group.internal_elb.id
+    ]
   }
 
   egress {

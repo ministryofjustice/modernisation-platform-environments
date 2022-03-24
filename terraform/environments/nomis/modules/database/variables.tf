@@ -115,9 +115,9 @@ variable "environment" {
   description = "Application environment - i.e. the terraform workspace"
 }
 
-variable "instance_profile_name" {
-  type        = string
-  description = "IAM instance profile to be attached to the instance"
+variable "instance_profile_policies" {
+  type        = list(string)
+  description = "A list of managed IAM policy document ARNs to be attached to thhe database instance profile"
 }
 
 variable "key_name" {

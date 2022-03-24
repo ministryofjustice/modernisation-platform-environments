@@ -52,3 +52,23 @@ locals {
 
   region = "eu-west-2"
 }
+
+# This account id
+data "aws_caller_identity" "current" {}
+
+#------------------------------------------------------------------------------
+# Route 53 Zones
+#------------------------------------------------------------------------------
+data "aws_route53_zone" "internal" {
+  provider = aws.core-vpc
+
+  name         = "${local.vpc_name}-${local.environment}.modernisation-platform.internal."
+  private_zone = true
+}
+
+data "aws_route53_zone" "external" {
+  provider = aws.core-vpc
+
+  name         = "${local.vpc_name}-${local.environment}.modernisation-platform.service.justice.gov.uk."
+  private_zone = false
+}
