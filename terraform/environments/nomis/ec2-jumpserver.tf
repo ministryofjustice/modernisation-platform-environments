@@ -120,8 +120,11 @@ resource "aws_ssm_parameter" "jumpserver_ec2_rescue" {
     }
   )
   lifecycle {
-    # ignore changes to value as will get updated by Systems Manager automation
-    ignore_changes = [value]
+    # ignore changes to value and description as will get updated by Systems Manager automation
+    ignore_changes = [
+      value,
+      description
+    ]
   }
 }
 
