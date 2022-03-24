@@ -101,7 +101,7 @@ resource "aws_security_group_rule" "res2_to_app" {
 
 
 resource "aws_instance" "infra1" {
-  instance_type               = "t2.small"
+  instance_type               = "c3.large"
   ami                         = local.application_data.accounts[local.environment].infra1-ami
   vpc_security_group_ids      = [aws_security_group.app_servers.id]
   monitoring                  = false
@@ -168,7 +168,7 @@ resource "aws_volume_attachment" "infra1-disk1" {
 
 resource "aws_instance" "infra2" {
   depends_on                  = [aws_security_group.app_servers, aws_security_group.outbound_dns_resolver]
-  instance_type               = "t2.small"
+  instance_type               = "c3.large"
   ami                         = local.application_data.accounts[local.environment].infra2-ami
   vpc_security_group_ids      = [aws_security_group.app_servers.id]
   monitoring                  = false

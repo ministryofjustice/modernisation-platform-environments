@@ -50,7 +50,7 @@ locals {
   # application_data = jsondecode(file("./application_variables.json"))
   application_data = fileexists("./application_variables.json") ? jsondecode(file("./application_variables.json")) : {}
 
-  region = "eu-west-2"
+  region = "eu-west-1"
 }
 
 # This account id
