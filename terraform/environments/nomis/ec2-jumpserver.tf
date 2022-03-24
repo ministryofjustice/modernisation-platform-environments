@@ -111,7 +111,7 @@ resource "aws_ssm_parameter" "jumpserver_ec2_rescue" {
   name        = "EC2Rescue/Passwords/${aws_instance.jumpserver_windows.id}"
   description = "Jumpserver local admin password"
   type        = "SecureString"
-  value       = ""
+  value       = "default"
 
   tags = merge(
     local.tags,
