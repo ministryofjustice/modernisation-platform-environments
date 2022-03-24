@@ -67,11 +67,14 @@ resource "aws_security_group" "weblogic_common" {
   }
 
   ingress {
-    description     = "access from Windows Jumpserver (forms/reports)"
-    from_port       = "7777"
-    to_port         = "7777"
-    protocol        = "TCP"
-    security_groups = [aws_security_group.jumpserver-windows.id, aws_security_group.internal_elb.id]
+    description = "access from Windows Jumpserver and loadbalancer (forms/reports)"
+    from_port   = "7777"
+    to_port     = "7777"
+    protocol    = "TCP"
+    security_groups = [
+      aws_security_group.jumpserver-windows.id,
+      aws_security_group.internal_elb.id
+    ]
   }
 
   egress {
