@@ -139,13 +139,12 @@ resource "aws_iam_role_policy" "jumpserver_put_parameter" {
 
 # Automation to recover password to parameter store on instance creation
 resource "aws_ssm_association" "jumpserver_ec2_rescue" {
-  name             = "AWSSupport-RunEC2RescueForWindowsTool" # this is an AWS provided document
+  name             = "AWSSupport-RunEC2RescueForWindowsTool"
   association_name = "jumpserver-ec2-rescue"
   parameters = {
     Command = "ResetAccess"
   }
   targets {
-    # we could just target all instances, but this would also include the bastion, which gets rebuilt everyday
     key    = "InstanceIds"
     values = [aws_instance.jumpserver_windows.id]
   }
