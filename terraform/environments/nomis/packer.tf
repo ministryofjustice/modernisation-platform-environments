@@ -175,7 +175,7 @@ data "aws_iam_policy_document" "packer_minimum_permissions" {
     resources = [
       "arn:aws:ec2:eu-west-2::image/ami-*",
       "arn:aws:ec2:eu-west-2::snapshot/snap-*",
-      "arn:aws:ec2:eu-west-2:${local.environment_management.account_ids[terraform.workspace]}:key-pair/packer*"
+      "arn:aws:ec2:eu-west-2:${data.aws_caller_identity.current.id}:key-pair/packer*"
     ]
   }
 }
@@ -185,7 +185,7 @@ data "aws_iam_policy_document" "packer_ssm_permissions" {
   statement {
     effect    = "Allow"
     actions   = ["ssm:StartSession"]
-    resources = ["arn:aws:ec2:eu-west-2:${local.environment_management.account_ids[terraform.workspace]}:instance/*"]
+    resources = ["arn:aws:ec2:eu-west-2:${data.aws_caller_identity.current.id}:instance/*"]
     condition {
       test     = "StringEquals"
       variable = "aws:ResourceTag/creator"
