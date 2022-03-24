@@ -194,7 +194,7 @@ resource "aws_autoscaling_schedule" "scale_up" {
   scheduled_action_name  = "weblogic_scale_up"
   min_size               = var.asg_min_size
   max_size               = var.asg_max_size
-  desired_capacity       = var.asg_desired_capacity
+  desired_capacity       = coalesce(var.asg_desired_capacity, var.asg_min_size)
   recurrence             = "0 7 * * Mon-Fri"
   autoscaling_group_name = aws_autoscaling_group.weblogic.name
 }
@@ -281,10 +281,7 @@ resource "aws_iam_role" "weblogic" {
     policy = data.aws_iam_policy_document.weblogic.json
   }
 
-  managed_policy_arns = [
-    "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy",
-    var.instance_profile_policy_arn
-  ]
+  managed_policy_arns = var.instance_profile_policies
 
   tags = merge(
     var.tags,
