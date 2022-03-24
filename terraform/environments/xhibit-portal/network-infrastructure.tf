@@ -102,7 +102,7 @@ resource "aws_security_group_rule" "exchange-inbound-importmachine" {
   from_port         = 0
   to_port           = 0
   protocol          = "-1"
-  source_security_group_id = aws_security_group.importmachine-xhibit-portal.id
+  source_security_group_id = aws_security_group.importmachine.id
 }
 
 resource "aws_security_group_rule" "exchange-outbound-importmachine" {
@@ -113,7 +113,7 @@ resource "aws_security_group_rule" "exchange-outbound-importmachine" {
   from_port         = 0
   to_port           = 0
   protocol          = "-1"
-  source_security_group_id = aws_security_group.importmachine-xhibit-portal.id
+  source_security_group_id = aws_security_group.importmachine.id
 }
 
 resource "aws_security_group_rule" "exchange-outbound-all" {
@@ -167,7 +167,7 @@ resource "aws_security_group_rule" "sms-inbound-importmachine" {
   from_port         = 0
   to_port           = 0
   protocol          = "-1"
-  source_security_group_id = aws_security_group.importmachine-xhibit-portal.id
+  source_security_group_id = aws_security_group.importmachine.id
 }
 
 resource "aws_security_group_rule" "sms-outbound-importmachine" {
@@ -178,7 +178,7 @@ resource "aws_security_group_rule" "sms-outbound-importmachine" {
   from_port         = 0
   to_port           = 0
   protocol          = "-1"
-  source_security_group_id = aws_security_group.importmachine-xhibit-portal.id
+  source_security_group_id = aws_security_group.importmachine.id
 }
 
 resource "aws_security_group_rule" "sms-inbound-all" {
@@ -222,7 +222,7 @@ resource "aws_security_group_rule" "waf_lb-inbound-importmachine" {
   from_port         = 0
   to_port           = 0
   protocol          = "-1"
-  source_security_group_id = aws_security_group.importmachine-xhibit-portal.id
+  source_security_group_id = aws_security_group.importmachine.id
 }
 
 resource "aws_security_group_rule" "waf_lb-outbound-importmachine" {
@@ -233,7 +233,7 @@ resource "aws_security_group_rule" "waf_lb-outbound-importmachine" {
   from_port         = 0
   to_port           = 0
   protocol          = "-1"
-  source_security_group_id = aws_security_group.importmachine-xhibit-portal.id
+  source_security_group_id = aws_security_group.importmachine.id
 }
 
 resource "aws_security_group_rule" "egress-to-portal" {
@@ -324,7 +324,7 @@ resource "aws_security_group_rule" "ingestion_server-inbound-importmachine" {
   from_port         = 0
   to_port           = 0
   protocol          = "-1"
-  source_security_group_id = aws_security_group.importmachine-xhibit-portal.id
+  source_security_group_id = aws_security_group.importmachine.id
 }
 
 resource "aws_security_group_rule" "ingestion_server-outbound-importmachine" {
@@ -335,7 +335,7 @@ resource "aws_security_group_rule" "ingestion_server-outbound-importmachine" {
   from_port         = 0
   to_port           = 0
   protocol          = "-1"
-  source_security_group_id = aws_security_group.importmachine-xhibit-portal.id
+  source_security_group_id = aws_security_group.importmachine.id
 }
 
 resource "aws_security_group_rule" "portal_server-inbound-bastion" {
@@ -368,7 +368,7 @@ resource "aws_security_group_rule" "app_servers-inbound-importmachine" {
   from_port         = 0
   to_port           = 0
   protocol          = "-1"
-  source_security_group_id = aws_security_group.importmachine-xhibit-portal.id
+  source_security_group_id = aws_security_group.importmachine.id
 }
 
 resource "aws_security_group_rule" "app_servers-outbound-importmachine" {
@@ -379,7 +379,7 @@ resource "aws_security_group_rule" "app_servers-outbound-importmachine" {
   from_port         = 0
   to_port           = 0
   protocol          = "-1"
-  source_security_group_id = aws_security_group.importmachine-xhibit-portal.id
+  source_security_group_id = aws_security_group.importmachine.id
 }
 
 resource "aws_security_group_rule" "app_servers-inbound-bastion" {
@@ -412,7 +412,7 @@ resource "aws_security_group_rule" "portal-inbound-importmachine" {
   from_port         = 0
   to_port           = 0
   protocol          = "-1"
-  source_security_group_id = aws_security_group.importmachine-xhibit-portal.id
+  source_security_group_id = aws_security_group.importmachine.id
 }
 
 resource "aws_security_group_rule" "portal-outbound-importmachine" {
@@ -423,7 +423,7 @@ resource "aws_security_group_rule" "portal-outbound-importmachine" {
   from_port         = 0
   to_port           = 0
   protocol          = "-1"
-  source_security_group_id = aws_security_group.importmachine-xhibit-portal.id
+  source_security_group_id = aws_security_group.importmachine.id
 }
 
 resource "aws_security_group_rule" "portal-http-from-waf-lb" {
@@ -456,7 +456,7 @@ resource "aws_security_group_rule" "ingestion-lb-inbound-importmachine" {
   from_port         = 0
   to_port           = 0
   protocol          = "-1"
-  source_security_group_id = aws_security_group.importmachine-xhibit-portal.id
+  source_security_group_id = aws_security_group.importmachine.id
 }
 
 resource "aws_security_group_rule" "ingestion-lb-outbound-importmachine" {
@@ -467,7 +467,7 @@ resource "aws_security_group_rule" "ingestion-lb-outbound-importmachine" {
   from_port         = 0
   to_port           = 0
   protocol          = "-1"
-  source_security_group_id = aws_security_group.importmachine-xhibit-portal.id
+  source_security_group_id = aws_security_group.importmachine.id
 }
 
 resource "aws_security_group_rule" "ingestion-lb-http-from-ingestion-server" {
