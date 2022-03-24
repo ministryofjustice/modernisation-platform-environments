@@ -117,7 +117,7 @@ variable "environment" {
 
 variable "instance_profile_policies" {
   type        = list(string)
-  description = "A list of managed IAM policy document ARNs to be attached to the weblogic instance profile"
+  description = "A list of managed IAM policy document ARNs to be attached to thhe database instance profile"
 }
 
 variable "key_name" {
