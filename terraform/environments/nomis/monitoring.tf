@@ -13,7 +13,8 @@ resource "aws_iam_access_key" "prometheus_cp_user_key" {
 }
 
 output "secret_key" {
-  value = aws_iam_access_key.prometheus_cp_user_key.secret
+  value     = aws_iam_access_key.prometheus_cp_user_key.secret
+  sensitive = true
 }
 
 output "access_key" {
