@@ -94,6 +94,27 @@ resource "aws_security_group_rule" "build-outbound-bastion" {
   cidr_blocks       = ["${module.bastion_linux.bastion_private_ip}/32"]
 }
 
+resource "aws_security_group_rule" "exchange-inbound-importmachine" {
+  depends_on        = [aws_security_group.exchange_server]
+  security_group_id = aws_security_group.exchange_server.id
+  type              = "ingress"
+  description       = "allow all from bastion"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  source_security_group_id = aws_security_group.importmachine-xhibit-portal.id
+}
+
+resource "aws_security_group_rule" "exchange-outbound-importmachine" {
+  depends_on        = [aws_security_group.exchange_server]
+  security_group_id = aws_security_group.exchange_server.id
+  type              = "egress"
+  description       = "allow all to bastion"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  source_security_group_id = aws_security_group.importmachine-xhibit-portal.id
+}
 
 resource "aws_security_group_rule" "exchange-outbound-all" {
   depends_on        = [aws_security_group.exchange_server]
@@ -138,6 +159,28 @@ resource "aws_security_group_rule" "sms-inbound-bastion" {
   cidr_blocks       = ["${module.bastion_linux.bastion_private_ip}/32"]
 }
 
+resource "aws_security_group_rule" "sms-inbound-importmachine" {
+  depends_on        = [aws_security_group.sms_server]
+  security_group_id = aws_security_group.sms_server.id
+  type              = "ingress"
+  description       = "allow all from bastion"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  source_security_group_id = aws_security_group.importmachine-xhibit-portal.id
+}
+
+resource "aws_security_group_rule" "sms-outbound-importmachine" {
+  depends_on        = [aws_security_group.sms_server]
+  security_group_id = aws_security_group.sms_server.id
+  type              = "egress"
+  description       = "allow all to bastion"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  source_security_group_id = aws_security_group.importmachine-xhibit-portal.id
+}
+
 resource "aws_security_group_rule" "sms-inbound-all" {
   depends_on        = [aws_security_group.sms_server]
   security_group_id = aws_security_group.sms_server.id
@@ -169,6 +212,28 @@ resource "aws_security_group_rule" "sms-outbound-all-ipv6" {
   to_port           = 0
   protocol          = "-1"
   ipv6_cidr_blocks  = ["::/0"]
+}
+
+resource "aws_security_group_rule" "waf_lb-inbound-importmachine" {
+  depends_on        = [aws_security_group.waf_lb]
+  security_group_id = aws_security_group.waf_lb.id
+  type              = "ingress"
+  description       = "allow all from bastion"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  source_security_group_id = aws_security_group.importmachine-xhibit-portal.id
+}
+
+resource "aws_security_group_rule" "waf_lb-outbound-importmachine" {
+  depends_on        = [aws_security_group.waf_lb]
+  security_group_id = aws_security_group.waf_lb.id
+  type              = "egress"
+  description       = "allow all to bastion"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  source_security_group_id = aws_security_group.importmachine-xhibit-portal.id
 }
 
 resource "aws_security_group_rule" "egress-to-portal" {
@@ -251,6 +316,28 @@ resource "aws_security_group_rule" "ingestion_server-outbound-bastion" {
   cidr_blocks       = ["${module.bastion_linux.bastion_private_ip}/32"]
 }
 
+resource "aws_security_group_rule" "ingestion_server-inbound-importmachine" {
+  depends_on        = [aws_security_group.ingestion_server]
+  security_group_id = aws_security_group.ingestion_server.id
+  type              = "ingress"
+  description       = "allow all from bastion"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  source_security_group_id = aws_security_group.importmachine-xhibit-portal.id
+}
+
+resource "aws_security_group_rule" "ingestion_server-outbound-importmachine" {
+  depends_on        = [aws_security_group.ingestion_server]
+  security_group_id = aws_security_group.ingestion_server.id
+  type              = "egress"
+  description       = "allow all to bastion"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  source_security_group_id = aws_security_group.importmachine-xhibit-portal.id
+}
+
 resource "aws_security_group_rule" "portal_server-inbound-bastion" {
   depends_on        = [aws_security_group.portal_server]
   security_group_id = aws_security_group.portal_server.id
@@ -271,6 +358,28 @@ resource "aws_security_group_rule" "portal_server-outbound-bastion" {
   to_port           = 0
   protocol          = "-1"
   cidr_blocks       = ["${module.bastion_linux.bastion_private_ip}/32"]
+}
+
+resource "aws_security_group_rule" "app_servers-inbound-importmachine" {
+  depends_on        = [aws_security_group.app_servers]
+  security_group_id = aws_security_group.app_servers.id
+  type              = "ingress"
+  description       = "allow all from bastion"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  source_security_group_id = aws_security_group.importmachine-xhibit-portal.id
+}
+
+resource "aws_security_group_rule" "app_servers-outbound-importmachine" {
+  depends_on        = [aws_security_group.app_servers]
+  security_group_id = aws_security_group.app_servers.id
+  type              = "egress"
+  description       = "allow all to bastion"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  source_security_group_id = aws_security_group.importmachine-xhibit-portal.id
 }
 
 resource "aws_security_group_rule" "app_servers-inbound-bastion" {
@@ -295,6 +404,28 @@ resource "aws_security_group_rule" "app_servers-outbound-bastion" {
   cidr_blocks       = ["${module.bastion_linux.bastion_private_ip}/32"]
 }
 
+resource "aws_security_group_rule" "portal-inbound-importmachine" {
+  depends_on        = [aws_security_group.portal_server]
+  security_group_id = aws_security_group.portal_server.id
+  type              = "ingress"
+  description       = "allow all from bastion"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  source_security_group_id = aws_security_group.importmachine-xhibit-portal.id
+}
+
+resource "aws_security_group_rule" "portal-outbound-importmachine" {
+  depends_on        = [aws_security_group.portal_server]
+  security_group_id = aws_security_group.portal_server.id
+  type              = "egress"
+  description       = "allow all to bastion"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  source_security_group_id = aws_security_group.importmachine-xhibit-portal.id
+}
+
 resource "aws_security_group_rule" "portal-http-from-waf-lb" {
   depends_on               = [aws_security_group.waf_lb, aws_security_group.portal_server]
   security_group_id        = aws_security_group.portal_server.id
@@ -315,6 +446,28 @@ resource "aws_security_group_rule" "portal-http-to-waf-lb" {
   to_port                  = 80
   protocol                 = "TCP"
   source_security_group_id = aws_security_group.waf_lb.id
+}
+
+resource "aws_security_group_rule" "ingestion-lb-inbound-importmachine" {
+  depends_on        = [aws_security_group.ingestion_lb]
+  security_group_id = aws_security_group.ingestion_lb.id
+  type              = "ingress"
+  description       = "allow all from bastion"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  source_security_group_id = aws_security_group.importmachine-xhibit-portal.id
+}
+
+resource "aws_security_group_rule" "ingestion-lb-outbound-importmachine" {
+  depends_on        = [aws_security_group.ingestion_lb]
+  security_group_id = aws_security_group.ingestion_lb.id
+  type              = "egress"
+  description       = "allow all to bastion"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  source_security_group_id = aws_security_group.importmachine-xhibit-portal.id
 }
 
 resource "aws_security_group_rule" "ingestion-lb-http-from-ingestion-server" {
