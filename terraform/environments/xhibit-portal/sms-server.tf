@@ -1,6 +1,6 @@
 resource "aws_instance" "sms-server" {
   depends_on                  = [aws_security_group.sms_server]
-  instance_type               = "c3.large"
+  instance_type               = "t3.large"
   ami                         = local.application_data.accounts[local.environment].XHBPRESMS01-ami
   vpc_security_group_ids      = [aws_security_group.sms_server.id]
   monitoring                  = false
