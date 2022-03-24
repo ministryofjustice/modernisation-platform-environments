@@ -119,6 +119,10 @@ resource "aws_ssm_parameter" "jumpserver_ec2_rescue" {
       Name = "jumpserver-admin-password"
     }
   )
+  lifecycle {
+    # ignore changes to value as will get updated by Systems Manager automation
+    ignore_changes = [value]
+  }
 }
 
 data "aws_iam_policy_document" "jumpserver_put_parameter" {
