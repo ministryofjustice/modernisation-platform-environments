@@ -217,7 +217,7 @@ resource "aws_route53_record" "external_validation" {
 }
 
 resource "aws_route53_record" "external_validation_subdomain" {
-  count = length(local.domain_name_sub)
+  count    = length(local.domain_name_sub)
   provider = aws.core-vpc
 
   allow_overwrite = true
@@ -309,7 +309,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "default_encryptio
 
   rule {
     apply_server_side_encryption_by_default {
-      sse_algorithm     = "AES256"
+      sse_algorithm = "AES256"
     }
   }
 }
@@ -373,7 +373,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "default_encryptio
 
   rule {
     apply_server_side_encryption_by_default {
-      sse_algorithm     = "AES256"
+      sse_algorithm = "AES256"
     }
   }
 }
