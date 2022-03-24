@@ -53,7 +53,7 @@
           "friendly_name": "HMPPS Test Hub",
           "app_db_name": "NomsPMU_Staging",
           "memebership_db_name": "Membership_Staging",
-          "cert_arn": "arn:aws:acm:eu-west-2:322518575883:certificate/006c900e-1628-4653-8502-4e2d44bfb606",
+          "cert_arn": "arn:aws:acm:eu-west-2:322518575883:certificate/28a9aefd-4f6c-4850-afdb-ea2910614f74",
           "hub_wwwroot": "C:\/inetpub\/wwwroot"
         },
         "production": {
