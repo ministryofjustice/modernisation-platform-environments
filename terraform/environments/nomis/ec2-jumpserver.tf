@@ -108,7 +108,7 @@ resource "aws_iam_instance_profile" "ec2_jumpserver_profile" {
 # Pre-creating it so it gets deleted with the instance
 
 resource "aws_ssm_parameter" "jumpserver_ec2_rescue" {
-  name        = "EC2Rescue/Passwords/${aws_instance.jumpserver_windows.id}"
+  name        = "/EC2Rescue/Passwords/${aws_instance.jumpserver_windows.id}"
   description = "Jumpserver local admin password"
   type        = "SecureString"
   value       = "default"
