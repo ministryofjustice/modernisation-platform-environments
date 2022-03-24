@@ -80,8 +80,8 @@ resource "aws_security_group_rule" "app-all-from-database" {
 
 
 resource "aws_instance" "app-server" {
-  depends_on                  = [aws_security_group.app-server]
-  instance_type               = "t2.medium"
+  depends_on                  = [aws_security_group.app_servers]
+  instance_type               = "t2.large"
   ami                         = local.application_data.accounts[local.environment].suprig02-ami
   vpc_security_group_ids      = [aws_security_group.app-server.id]
   monitoring                  = false
