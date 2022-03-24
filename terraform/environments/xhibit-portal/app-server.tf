@@ -81,7 +81,7 @@
 
 resource "aws_instance" "app-server" {
   depends_on                  = [aws_security_group.app_servers]
-  instance_type               = "t2.medium"
+  instance_type               = "c3.large"
   ami                         = local.application_data.accounts[local.environment].suprig02-ami
   vpc_security_group_ids      = [aws_security_group.app_servers.id]
   monitoring                  = false
