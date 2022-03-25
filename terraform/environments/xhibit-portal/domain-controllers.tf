@@ -124,7 +124,6 @@ resource "aws_instance" "infra1" {
   }
 
   lifecycle {
-    prevent_destroy = local.is-production
     ignore_changes = [
       # This prevents clobbering the tags of attached EBS volumes. See
       # [this bug][1] in the AWS provider upstream.
@@ -134,7 +133,6 @@ resource "aws_instance" "infra1" {
       #user_data,         # Prevent changes to user_data from destroying existing EC2s
       # Prevent changes to encryption from destroying existing EC2s - can delete once encryption complete
     ]
-
   }
 
   tags = merge(
