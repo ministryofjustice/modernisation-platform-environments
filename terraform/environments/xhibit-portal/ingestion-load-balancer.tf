@@ -25,7 +25,7 @@ resource "aws_security_group_rule" "ingestion_lb_allow_web_users" {
   protocol          = "TCP"
   cidr_blocks = [
     "109.152.47.104/32",  # George,
-    "45.150.229.31/32",   # George temporary,
+    "81.134.93.187/32",   # George temporary,
     "81.101.176.47/32",   # Aman
     "77.100.255.142/32",  # Gary
     "82.44.118.20/32",    # Nick
