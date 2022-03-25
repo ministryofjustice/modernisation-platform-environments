@@ -15,7 +15,7 @@ resource "aws_iam_access_key" "prometheus_cp_user_key" {
 resource "aws_iam_user_policy" "policy" {
   name        = "EC2-Read-Only"
   user        = aws_iam_user.prometheus_cp_user.name
-  description = "AmazonEC2ReadOnlyAccess for Prometheus user"
+  # AmazonEC2ReadOnlyAccess Policy
   policy      = <<EOT
 {
     "Version": "2012-10-17",
