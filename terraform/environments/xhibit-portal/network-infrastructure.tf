@@ -581,10 +581,32 @@ resource "aws_security_group_rule" "exchange-all-from-app" {
   source_security_group_id = aws_security_group.exchange_server.id
 }
 
+resource "aws_security_group_rule" "exchange-all-to-app" {
+  depends_on               = [aws_security_group.app_servers, aws_security_group.portal_server]
+  security_group_id        = aws_security_group.app_servers.id
+  type                     = "ingress"
+  description              = "allow all traffic from DB"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
+  source_security_group_id = aws_security_group.exchange_server.id
+}
+
 resource "aws_security_group_rule" "sms-all-from-app" {
   depends_on               = [aws_security_group.app_servers, aws_security_group.portal_server]
   security_group_id        = aws_security_group.app_servers.id
   type                     = "egress"
+  description              = "allow all traffic from DB"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
+  source_security_group_id = aws_security_group.sms_server.id
+}
+
+resource "aws_security_group_rule" "sms-all-to-app" {
+  depends_on               = [aws_security_group.app_servers, aws_security_group.portal_server]
+  security_group_id        = aws_security_group.app_servers.id
+  type                     = "ingress"
   description              = "allow all traffic from DB"
   from_port                = 0
   to_port                  = 0
