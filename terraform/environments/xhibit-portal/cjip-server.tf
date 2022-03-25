@@ -23,6 +23,7 @@ resource "aws_instance" "cjip-server" {
   }
 
   lifecycle {
+    prevent_destroy = local.is-production
     ignore_changes = [
       # This prevents clobbering the tags of attached EBS volumes. See
       # [this bug][1] in the AWS provider upstream.
