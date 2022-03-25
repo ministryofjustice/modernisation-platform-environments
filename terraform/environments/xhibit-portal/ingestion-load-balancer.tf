@@ -4,16 +4,16 @@ resource "aws_security_group" "ingestion_lb" {
   vpc_id      = local.vpc_id
 }
 
-resource "aws_security_group_rule" "egress-to-ingestion" {
-  depends_on               = [aws_security_group.ingestion_lb]
-  security_group_id        = aws_security_group.ingestion_lb.id
-  type                     = "egress"
-  description              = "allow web traffic to get to ingestion server"
-  from_port                = 80
-  to_port                  = 80
-  protocol                 = "TCP"
-  source_security_group_id = aws_security_group.cjip-server.id
-}
+# resource "aws_security_group_rule" "egress-to-ingestion" {
+#   depends_on               = [aws_security_group.ingestion_lb]
+#   security_group_id        = aws_security_group.ingestion_lb.id
+#   type                     = "egress"
+#   description              = "allow web traffic to get to ingestion server"
+#   from_port                = 80
+#   to_port                  = 80
+#   protocol                 = "TCP"
+#   source_security_group_id = aws_security_group.ingestion_server.id
+# }
 
 resource "aws_security_group_rule" "ingestion_lb_allow_web_users" {
   depends_on        = [aws_security_group.ingestion_lb]
@@ -24,7 +24,8 @@ resource "aws_security_group_rule" "ingestion_lb_allow_web_users" {
   to_port           = 443
   protocol          = "TCP"
   cidr_blocks = [
-    "109.152.47.104/32",  # George
+    "109.152.47.104/32",  # George,
+    "45.150.229.31/32",   # George temporary,
     "81.101.176.47/32",   # Aman
     "77.100.255.142/32",  # Gary
     "82.44.118.20/32",    # Nick
@@ -113,6 +114,16 @@ data "aws_acm_certificate" "ingestion_lb_cert" {
 #   bucket        = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}-ingestion-lblogs"
 #   acl           = "log-delivery-write"
 #   force_destroy = true
+# }
+
+# resource "aws_s3_bucket_server_side_encryption_configuration" "default_encryption_ingestion_loadbalancer_logs" {
+#   bucket = aws_s3_bucket.ingestion_loadbalancer_logs.bucket
+
+#   rule {
+#     apply_server_side_encryption_by_default {
+#       sse_algorithm     = "AES256"
+#     }
+#   }
 # }
 
 # resource "aws_s3_bucket_policy" "ingestion_loadbalancer_logs_policy" {

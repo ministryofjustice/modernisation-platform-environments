@@ -1,75 +1,8 @@
-
-# Security Groups
-resource "aws_security_group" "cjim-server" {
-  description = "Bastion traffic"
-  name        = "cjim-server-${local.application_name}"
-  vpc_id      = local.vpc_id
-}
-
-
-resource "aws_security_group_rule" "cjim-outbound-all" {
-  depends_on        = [aws_security_group.cjim-server]
-  security_group_id = aws_security_group.cjim-server.id
-  type              = "egress"
-  description       = "allow all"
-  from_port         = 0
-  to_port           = 0
-  protocol          = "-1"
-  cidr_blocks       = ["0.0.0.0/0"]
-  ipv6_cidr_blocks  = ["::/0"]
-}
-
-resource "aws_security_group_rule" "cjim-inbound-all" {
-  depends_on        = [aws_security_group.cjim-server]
-  security_group_id = aws_security_group.cjim-server.id
-  type              = "ingress"
-  description       = "allow all"
-  from_port         = 0
-  to_port           = 0
-  protocol          = "-1"
-  cidr_blocks       = ["0.0.0.0/0"]
-  ipv6_cidr_blocks  = ["::/0"]
-}
-
-# resource "aws_security_group_rule" "cjim-inbound-bastion" {
-#   depends_on        = [aws_security_group.cjim-server]
-#   security_group_id = aws_security_group.cjim-server.id
-#   type              = "ingress"
-#   description       = "allow bastion"
-#   from_port         = 0
-#   to_port           = 3389
-#   protocol          = "TCP"
-#   cidr_blocks       = ["${module.bastion_linux.bastion_private_ip}/32"]
-# }
-
-# resource "aws_security_group_rule" "cjip-inbound-web" {
-#   depends_on               = [aws_security_group.cjim-server]
-#   security_group_id        = aws_security_group.cjim-server.id
-#   type                     = "ingress"
-#   description              = "allow web from cjip"
-#   from_port                = 80
-#   to_port                  = 80
-#   protocol                 = "TCP"
-#   source_security_group_id = aws_security_group.cjip-server.id
-# }
-
-// added for the msdtc thing
-resource "aws_security_group_rule" "cjim-portal-inbound-all" {
-  depends_on               = [aws_security_group.cjim-server]
-  security_group_id        = aws_security_group.cjim-server.id
-  type                     = "ingress"
-  description              = "allow all from portal"
-  from_port                = 0
-  to_port                  = 0
-  protocol                 = "-1"
-  source_security_group_id = aws_security_group.portal-server.id
-}
-
 resource "aws_instance" "cjim-server" {
-  depends_on                  = [aws_security_group.cjim-server]
+  depends_on                  = [aws_security_group.app_servers]
   instance_type               = "t2.medium"
   ami                         = local.application_data.accounts[local.environment].suprig04-ami
-  vpc_security_group_ids      = [aws_security_group.cjim-server.id]
+  vpc_security_group_ids      = [aws_security_group.app_servers.id]
   monitoring                  = false
   associate_public_ip_address = false
   ebs_optimized               = false

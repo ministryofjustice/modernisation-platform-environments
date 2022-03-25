@@ -86,9 +86,9 @@ variable "environment" {
   description = "Application environment - i.e. the terraform workspace"
 }
 
-variable "instance_profile_policy_arn" {
-  type        = string
-  description = "An IAM policy document to be attached to the weblogic instance profile"
+variable "instance_profile_policies" {
+  type        = list(string)
+  description = "A list of managed IAM policy document ARNs to be attached to the weblogic instance profile"
 }
 
 variable "key_name" {

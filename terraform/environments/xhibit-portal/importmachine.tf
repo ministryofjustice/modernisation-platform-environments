@@ -1,6 +1,3 @@
-
-
-# Security Groups
 resource "aws_security_group" "importmachine" {
   description = "Configure importmachine access - ingress should be only from Bastion"
   name        = "importmachine-${local.application_name}"
@@ -15,10 +12,10 @@ resource "aws_security_group" "importmachine" {
   }
 
   ingress {
-    description      = "web from all"
-    from_port        = 8000
-    to_port          = 8000
-    protocol         = "TCP"
+    description      = "from all"
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
     cidr_blocks      = ["0.0.0.0/0"]
     ipv6_cidr_blocks = ["::/0"]
 
