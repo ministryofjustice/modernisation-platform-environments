@@ -9,8 +9,8 @@ const httpsAgent = new https.Agent({
 
 let suffix = "" + Date.now()
 
-// let endpoint = 'ingest' 
-let endpoint = 'dev-ingest' 
+let endpoint = 'ingest' 
+// let endpoint = 'dev-ingest' 
 // let endpoint = 'preingest' 
 
 
