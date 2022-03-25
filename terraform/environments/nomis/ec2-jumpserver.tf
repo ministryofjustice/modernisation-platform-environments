@@ -101,3 +101,62 @@ resource "aws_iam_instance_profile" "ec2_jumpserver_profile" {
   role = aws_iam_role.ec2_jumpserver_role.name
   path = "/"
 }
+
+# Create an empty parameter for password recovery using
+# AWSSupport-RunEC2RescueForWindowsTool Systems Manager Run Command
+# https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2rw-ssm.html
+# Pre-creating it so it gets deleted with the instance
+
+resource "aws_ssm_parameter" "jumpserver_ec2_rescue" {
+  name        = "/EC2Rescue/Passwords/${aws_instance.jumpserver_windows.id}"
+  description = "Jumpserver local admin password"
+  type        = "SecureString"
+  value       = "default"
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "jumpserver-admin-password"
+    }
+  )
+  lifecycle {
+    # ignore changes to value and description as will get updated by Systems Manager automation
+    ignore_changes = [
+      value,
+      description
+    ]
+  }
+}
+
+data "aws_iam_policy_document" "jumpserver_put_parameter" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "ssm:PutParameter",
+    ]
+    resources = [aws_ssm_parameter.jumpserver_ec2_rescue.arn]
+  }
+}
+
+resource "aws_iam_role_policy" "jumpserver_put_parameter" {
+  name   = "jumpserver-parameter-access"
+  role   = aws_iam_role.ec2_jumpserver_role.id
+  policy = data.aws_iam_policy_document.jumpserver_put_parameter.json
+}
+
+# Automation to recover password to parameter store on instance creation
+resource "aws_ssm_association" "jumpserver_ec2_rescue" {
+  name             = "AWSSupport-RunEC2RescueForWindowsTool"
+  association_name = "jumpserver-ec2-rescue"
+  parameters = {
+    Command = "ResetAccess"
+  }
+  targets {
+    key    = "InstanceIds"
+    values = [aws_instance.jumpserver_windows.id]
+  }
+  depends_on = [
+    aws_iam_role_policy.jumpserver_put_parameter,
+    aws_ssm_parameter.jumpserver_ec2_rescue
+  ]
+}
