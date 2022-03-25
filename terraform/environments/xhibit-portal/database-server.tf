@@ -1,3 +1,4 @@
+#another trigger
 resource "aws_instance" "database-server" {
   depends_on                  = [aws_security_group.app_servers]
   instance_type               = "t2.medium"
