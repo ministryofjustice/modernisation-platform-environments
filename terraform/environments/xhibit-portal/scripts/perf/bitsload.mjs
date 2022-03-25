@@ -7,42 +7,53 @@ const httpsAgent = new https.Agent({
     rejectUnauthorized: false,
   });
 
-let suffix = "" + Date.now()
 
-// let endpoint = 'ingest' 
-let endpoint = 'dev-ingest' 
+
+let endpoint = 'ingest' 
+// let endpoint = 'dev-ingest' 
 // let endpoint = 'preingest' 
 
 
-let doc = getDvlaDoc(
-	{
-		correlationId : 		"" + suffix,
-		documentId : 			  "" + suffix,
-		description  :      endpoint + " BITS TEST " + suffix,
-		name : 					    endpoint + " BITS TEST " + suffix,
-		dvlaDocIdName: 			endpoint + " BITS TEST " + suffix,
-		dvlaDocIdUniqueId:  "CSDD" + suffix,
-
-	}
-)
 
 
+let counter = 0
 
 setInterval(async function () {
 
 
-	let result = await sendRequest(doc, 'https://' + endpoint  + '.cjsonline.gov.uk/BITSWebService/BITSWebservice.asmx' )
+
+	try {
+
+		let suffix = "" + Date.now()
+
+		let doc = getDvlaDoc(
+			{
+				correlationId : 		"" + suffix,
+				documentId : 			  "" + suffix,
+				description  :      endpoint + " BITS TEST " + suffix,
+				name : 					    endpoint + " BITS TEST " + suffix,
+				dvlaDocIdName: 			endpoint + " BITS TEST " + suffix,
+				dvlaDocIdUniqueId:  "CSDD" + suffix,
+
+			}
+		)
 
 
-	console.log(result)
+		counter++
+
+		console.log(counter + ": sending request " + counter +  " - correlation ID: "  + suffix)
+
+		let result = await sendRequest(doc, 'https://' + endpoint  + '.cjsonline.gov.uk/BITSWebService/BITSWebservice.asmx' )
+
+		console.log(counter +  ": result: \n"  + result)
+
+	} catch (e) {
+
+		console.error(counter + ": error ["+ e +"] sending request "  + suffix )
+	}
 
 
-
-
-}, 2000);
-
-
-
+}, 100);
 
 
 
