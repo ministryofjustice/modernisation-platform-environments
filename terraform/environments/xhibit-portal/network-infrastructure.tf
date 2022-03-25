@@ -465,9 +465,9 @@ resource "aws_security_group_rule" "ingestion-lb-http-from-ingestion-server" {
   security_group_id        = aws_security_group.ingestion_lb.id
   type                     = "ingress"
   description              = "allow all traffic from DB"
-  from_port                = 80
-  to_port                  = 80
-  protocol                 = "TCP"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
   source_security_group_id = aws_security_group.ingestion_server.id
 }
 
@@ -476,9 +476,9 @@ resource "aws_security_group_rule" "ingestion-lb-http-to-ingestion-server" {
   security_group_id        = aws_security_group.ingestion_lb.id
   type                     = "egress"
   description              = "allow all traffic from DB"
-  from_port                = 80
-  to_port                  = 80
-  protocol                 = "TCP"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
   source_security_group_id = aws_security_group.ingestion_server.id
 }
 
@@ -487,9 +487,9 @@ resource "aws_security_group_rule" "ingestion-server-http-from-ingestion-lb" {
   security_group_id        = aws_security_group.ingestion_server.id
   type                     = "ingress"
   description              = "allow all traffic from DB"
-  from_port                = 80
-  to_port                  = 80
-  protocol                 = "TCP"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
   source_security_group_id = aws_security_group.ingestion_lb.id
 }
 
@@ -498,9 +498,9 @@ resource "aws_security_group_rule" "ingestion-server-http-to-ingestion-lb" {
   security_group_id        = aws_security_group.ingestion_server.id
   type                     = "egress"
   description              = "allow all traffic from DB"
-  from_port                = 80
-  to_port                  = 80
-  protocol                 = "TCP"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
   source_security_group_id = aws_security_group.ingestion_lb.id
 }
 
