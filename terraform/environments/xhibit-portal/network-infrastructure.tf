@@ -329,9 +329,6 @@ resource "aws_security_group_rule" "ingestion_server-outbound-importmachine" {
   source_security_group_id = aws_security_group.importmachine.id
 }
 
-
-
-
 resource "aws_security_group_rule" "ingestion_server-inbound-testmachine" {
   depends_on               = [aws_security_group.ingestion_server]
   security_group_id        = aws_security_group.ingestion_server.id
