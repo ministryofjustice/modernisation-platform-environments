@@ -27,6 +27,6 @@ jobs:
           echo "Terraform plan - ${TF_ENV}"
           bash scripts/terraform-init.sh terraform/environments/nomis
           terraform -chdir="terraform/environments/nomis" workspace select "nomis-${TF_ENV}"
-          terraform state replace-provider registry.terraform.io/hashicorp/github registry.terraform.io/integrations/github -auto-approve
+          terraform state replace-provider registry.terraform.io/hashicorp/github registry.terraform.io/integrations/github -auto-approve -chdir="terraform/environments/nomis"
         env:
           TF_ENV: test
