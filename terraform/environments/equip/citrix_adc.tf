@@ -5,12 +5,11 @@ variable "additional_tags" {
 }
 
 resource "aws_instance" "citrix_adc_instance" {
-  #  ami           = "ami-0dd0aa051b3fc4e4b"
-  ami           = "ami-06e679d48e5405214"
-  instance_type = "m5.large"
+  ami           = "ami-0dd0aa051b3fc4e4b"
+  instance_type = "m5.xlarge"
   key_name      = aws_key_pair.windowskey.key_name
-  monitoring    = true
-  ebs_optimized = true
+  monitoring                  = true
+  ebs_optimized               = true
 
   root_block_device {
     encrypted   = true

@@ -235,7 +235,7 @@ locals {
 }
 
 module "win2016_multiple" {
-  source = "git::https://github.com/rvadisala/ec2-instance?ref=tags/v1.0"
+  source = "git::https://github.com/rvadisala/ec2-instance?ref=tags/v2.0"
 
 
   for_each = local.win2016_instances
@@ -378,7 +378,7 @@ locals {
 }
 
 module "win2012_SQL_multiple" {
-  source = "git::https://github.com/rvadisala/ec2-instance?ref=tags/v1.0"
+  source = "git::https://github.com/rvadisala/ec2-instance?ref=tags/v2.0"
 
 
   for_each = local.win2012_SQL_instances
@@ -564,7 +564,7 @@ locals {
 
 
 module "win2012_STD_multiple" {
-  source = "git::https://github.com/rvadisala/ec2-instance?ref=tags/v1.0"
+  source = "git::https://github.com/rvadisala/ec2-instance?ref=tags/v2.0"
 
 
   for_each = local.win2012_STD_instances
@@ -587,5 +587,5 @@ module "win2012_STD_multiple" {
     Environment       = "development"
     terraform_managed = "true"
   })
-
 }
+

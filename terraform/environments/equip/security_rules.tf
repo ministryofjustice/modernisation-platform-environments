@@ -52,7 +52,7 @@ resource "aws_security_group_rule" "ingress_rules_adc" {
   from_port         = var.security_group_inbound_ports_adc[count.index]
   to_port           = var.security_group_inbound_ports_adc[count.index]
   protocol          = var.security_group_rule_protocol_adc[count.index]
-  cidr_blocks       = ["${aws_instance.citrix_adc_instance.public_ip}/32"]
+  cidr_blocks       = ["${aws_eip.citrix_eip_pub.public_ip}/32"]
   description       = var.security_group_rule_description_adc[count.index]
   security_group_id = aws_security_group.ec2_security_adc.id
 }
