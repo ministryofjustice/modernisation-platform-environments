@@ -342,7 +342,7 @@ resource "aws_security_group_rule" "ingestion_server-inbound-testmachine" {
   source_security_group_id = aws_security_group.testmachine.id
 }
 
-resource "aws_security_group_rule" "testmachine-outbound-ingestionserver" {
+resource "aws_security_group_rule" "testmachine-outbound" {
   depends_on               = [aws_security_group.testmachine]
   security_group_id        = aws_security_group.testmachine.id
   type                     = "egress"
@@ -364,6 +364,8 @@ resource "aws_security_group_rule" "testmachine_server-inbound-bastion" {
   protocol                 = "-1"
   cidr_blocks              = ["${module.bastion_linux.bastion_private_ip}/32"]
 }
+
+
 
 
 
@@ -402,6 +404,20 @@ resource "aws_security_group_rule" "app_servers-inbound-importmachine" {
   protocol                 = "-1"
   source_security_group_id = aws_security_group.importmachine.id
 }
+
+resource "aws_security_group_rule" "app_servers-inbound-testmachine" {
+  depends_on               = [aws_security_group.app_servers]
+  security_group_id        = aws_security_group.app_servers.id
+  type                     = "ingress"
+  description              = "allow all from bastion"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
+  source_security_group_id = aws_security_group.testmachine.id
+}
+
+
+
 
 resource "aws_security_group_rule" "app_servers-outbound-importmachine" {
   depends_on               = [aws_security_group.app_servers]
