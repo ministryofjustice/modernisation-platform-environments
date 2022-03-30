@@ -4,14 +4,14 @@ data "aws_caller_identity" "current" {}
 
 #tfsec:ignore:aws-s3-enable-bucket-encryption tfsec:ignore:aws-s3-enable-bucket-logging tfsec:ignore:aws-s3-enable-versioning tfsec:ignore:aws-s3-block-public-acls  tfsec:ignore:aws-s3-block-public-policy  tfsec:ignore:aws-s3-ignore-public-acls  tfsec:ignore:aws-s3-no-public-buckets  tfsec:ignore:aws-s3-specify-public-access-block
 resource "aws_s3_bucket" "this" {
-#checkov:skip=CKV_AWS_19
-#checkov:skip=CKV_AWS_18
-#checkov:skip=CKV_AWS_144
-#checkov:skip=CKV_AWS_145
-#checkov:skip=CKV_AWS_21
-#checkov:skip=CKV2_AWS_6
-#checkov:skip=CKV2_AWS_41
-#checkov:skip=CKV2_AWS_37
+  #checkov:skip=CKV_AWS_19
+  #checkov:skip=CKV_AWS_18
+  #checkov:skip=CKV_AWS_144
+  #checkov:skip=CKV_AWS_145
+  #checkov:skip=CKV_AWS_21
+  #checkov:skip=CKV2_AWS_6
+  #checkov:skip=CKV2_AWS_41
+  #checkov:skip=CKV2_AWS_37
   bucket = "moj-alb-citrix-access-logs-bucket"
 
   tags = {
