@@ -94,8 +94,6 @@ variable "load_balancer_delete_timeout" {
   default     = "10m"
 }
 
-
-
 variable "load_balancer_update_timeout" {
   description = "Timeout value when updating the ALB."
   type        = string
@@ -118,4 +116,40 @@ variable "lb_tags" {
   description = "A map of tags to add to load balancer"
   type        = map(string)
   default     = {}
+}
+
+variable "lb_tgt_port" {
+  description = "The port that the downstream server exposes over HTTP/Https"
+  type        = number
+  default     = 80
+}
+
+variable "lb_tgt_health_check_path" {
+  description = "The path to bind for health checks"
+  type        = string
+  default     = "/"
+}
+
+variable "lb_tgt_matcher" {
+  description = "The response codes expected for health checks"
+  default     = "200-399"
+  type        = string
+}
+
+variable "lb_tgt_protocol_version" {
+  description = "Send request to target using HTTP/1.1, HTTP/2, gRPC"
+  type        = string
+  default     = "HTTP1"
+}
+
+variable "lb_tgt_protocol" {
+  description = "Routing Traffic to the Targets"
+  type        = string
+  default     = "HTTP"
+}
+
+variable "lb_tgt_target_type" {
+  description = "Type of target that you must specify when registering targets with this target group"
+  type        = string
+  default     = "instance"
 }

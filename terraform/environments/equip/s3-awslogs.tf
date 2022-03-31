@@ -41,38 +41,48 @@ resource "aws_s3_bucket_policy" "this" {
   bucket = aws_s3_bucket.this.id
   policy = <<EOF
 {
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Principal": {
-                "AWS": "arn:aws:iam::652711504416:root"
-            },
-            "Action": "s3:PutObject",
-            "Resource": "arn:aws:s3:::moj-citrix-alb-access-logs-bucket/AWSLogs/608897814635/*"
-        },
-        {
-            "Effect": "Allow",
-            "Principal": {
-                "Service": "delivery.logs.amazonaws.com"
-            },
-            "Action": "s3:PutObject",
-            "Resource": "arn:aws:s3:::moj-citrix-alb-access-logs-bucket/AWSLogs/608897814635/*",
-            "Condition": {
-                "StringEquals": {
-                    "s3:x-amz-acl": "bucket-owner-full-control"
-                }
-            }
-        },
-        {
-            "Effect": "Allow",
-            "Principal": {
-                "Service": "delivery.logs.amazonaws.com"
-            },
-            "Action": "s3:GetBucketAcl",
-            "Resource": "arn:aws:s3:::moj-citrix-alb-access-logs-bucket"
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "${data.aws_elb_service_account.main.arn}"
+      },
+      "Action": "s3:PutObject",
+      "Resource": "arn:aws:s3:::${aws_s3_bucket.this.id}/AWSLogs/${data.aws_caller_identity.current.account_id}/*"
+    },
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "delivery.logs.amazonaws.com"
+      },
+      "Action": "s3:PutObject",
+      "Resource": "arn:aws:s3:::${aws_s3_bucket.this.id}/AWSLogs/${data.aws_caller_identity.current.account_id}/*",
+      "Condition": {
+        "StringEquals": {
+          "s3:x-amz-acl": "bucket-owner-full-control"
         }
-    ]
+      }
+    },
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "delivery.logs.amazonaws.com"
+      },
+      "Action": "s3:GetBucketAcl",
+      "Resource": "arn:aws:s3:::${aws_s3_bucket.this.id}"
+    },
+    {
+
+       "Sid": "S3PolicyStmt-DO-NOT-MODIFY-1648624790828",
+       "Effect": "Allow",
+       "Principal": {
+           "Service": "logging.s3.amazonaws.com"
+       },
+       "Action": "s3:PutObject",
+       "Resource": "arn:aws:s3:::${aws_s3_bucket.this.id}/*"
+     }
+  ]
 }
 EOF
 }

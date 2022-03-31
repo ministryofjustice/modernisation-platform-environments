@@ -45,6 +45,7 @@ resource "aws_security_group" "alb" {
 resource "aws_lb" "citrix_alb" {
 
   #checkov:skip=CKV2_AWS_28:
+  #checkov:skip=CKV2_AWS_20
 
   name        = format("%s-alb", var.name)
   name_prefix = var.name_prefix
@@ -73,8 +74,8 @@ resource "aws_lb" "citrix_alb" {
   )
 
   access_logs {
-    bucket  = aws_s3_bucket.this.id
-    prefix  = "access-logs-alb"
+    bucket = aws_s3_bucket.this.id
+    #    prefix  = "access-logs-alb"
     enabled = "true"
   }
 
@@ -85,4 +86,54 @@ resource "aws_lb" "citrix_alb" {
     update = var.load_balancer_update_timeout
     delete = var.load_balancer_delete_timeout
   }
+}
+
+resource "aws_lb_target_group" "lb_tg_http" {
+  name             = "citrix-alb-tgt"
+  target_type      = var.lb_tgt_target_type
+  protocol         = var.lb_tgt_protocol
+  protocol_version = var.lb_tgt_protocol_version
+  vpc_id           = data.aws_vpc.shared.id
+  port             = var.lb_tgt_port
+
+  health_check {
+    enabled             = true
+    path                = var.lb_tgt_health_check_path
+    interval            = 30
+    protocol            = "HTTP"
+    port                = 80
+    timeout             = 5
+    healthy_threshold   = 5
+    unhealthy_threshold = 2
+    matcher             = var.lb_tgt_matcher
+  }
+
+  tags = local.tags
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+
+#tfsec:ignore:aws-elb-http-not-used
+resource "aws_lb_listener" "lb_listener_http" {
+  load_balancer_arn = aws_lb.citrix_alb.arn
+  port              = "80"
+  protocol          = "HTTP"
+
+  default_action {
+    target_group_arn = aws_lb_target_group.lb_tg_http.id
+    type             = "forward"
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_lb_target_group_attachment" "citrix_instance" {
+  target_group_arn = aws_lb_target_group.lb_tg_http.arn
+  target_id        = aws_instance.citrix_adc_instance.id
+  port             = 80
 }
