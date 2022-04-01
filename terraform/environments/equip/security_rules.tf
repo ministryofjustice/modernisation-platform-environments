@@ -28,7 +28,7 @@ resource "aws_security_group_rule" "ingress_rules" {
 }
 
 ##############################################################################################
-
+/*
 variable "security_group_inbound_ports_adc" {
   type        = list(number)
   description = "list of ADC ports"
@@ -56,6 +56,7 @@ resource "aws_security_group_rule" "ingress_rules_adc" {
   description       = var.security_group_rule_description_adc[count.index]
   security_group_id = aws_security_group.ec2_security_adc.id
 }
+*/
 
 
 

@@ -323,6 +323,7 @@ resource "aws_instance" "SOC" {
     Name = "NPS-COR-A-SOC01"
     ROLE = "Security Operation Center Gateway"
   }
+
 }
 
 ################################################################################

@@ -44,9 +44,26 @@ resource "aws_network_interface" "public_interface" {
   }
 }
 
+resource "null_resource" "previous" {}
+
+resource "time_sleep" "wait_period" {
+  depends_on = [
+    aws_instance.citrix_adc_instance,
+    aws_network_interface.public_interface,
+    null_resource.previous
+  ]
+
+  create_duration = "300s"
+}
+
 resource "aws_network_interface" "private_interface" {
   subnet_id       = data.aws_subnet.private_subnets_a.id
   security_groups = [aws_security_group.citrix_adc_security_group.id]
+
+  depends_on = [
+    aws_network_interface.public_interface,
+    time_sleep.wait_period
+  ]
 
   attachment {
     instance     = aws_instance.citrix_adc_instance.id
@@ -56,33 +73,6 @@ resource "aws_network_interface" "private_interface" {
   tags = {
     Name        = "Private Network Internal Interface"
     Description = "Private Interface for Citrix ADC"
-  }
-}
-
-resource "aws_network_interface" "data_interface" {
-  subnet_id       = data.aws_subnet.data_subnets_a.id
-  security_groups = [aws_security_group.citrix_adc_security_group.id]
-
-  attachment {
-    instance     = aws_instance.citrix_adc_instance.id
-    device_index = 2
-  }
-
-  tags = {
-    Name        = "Data Network Internal Interface"
-    Description = "Data Network Interface for Citrix ADC"
-  }
-}
-
-
-
-resource "aws_eip" "citrix_eip_pub" {
-  vpc               = true
-  network_interface = aws_network_interface.public_interface.id
-  depends_on        = [aws_instance.citrix_adc_instance]
-
-  tags = {
-    Name = "Elastic IpAddress for Citrix"
   }
 }
 
@@ -120,3 +110,4 @@ resource "aws_security_group" "citrix_adc_security_group" {
     }
   )
 }
+
