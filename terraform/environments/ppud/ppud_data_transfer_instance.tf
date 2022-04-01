@@ -49,6 +49,11 @@ resource "aws_security_group_rule" "ppud_data_transfer_https_egress" {
   cidr_blocks = ["0.0.0.0/0"]
 }
 
+resource "aws_key_pair" "doakley" {
+  key_name   = "doakley"
+  public_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEU5QgCe9tiwCmZxZIx0E6n9It3Xb9oO5bu30rGRv9Vm darren.oakley@digital.justice.gov.uk"
+}
+
 resource "aws_instance" "ppud_data_transfer" {
   instance_type               = "t3.micro"
   ami                         = data.aws_ami.ubuntu.id
@@ -57,6 +62,7 @@ resource "aws_instance" "ppud_data_transfer" {
   associate_public_ip_address = false
   ebs_optimized               = true
   subnet_id                   = data.aws_subnet.private_az_a.id
+  key_name                    = aws_key_pair.doakley.key_name
 
   metadata_options {
     http_tokens   = "required"
