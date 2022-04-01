@@ -26,6 +26,16 @@ resource "aws_security_group" "ppud_data_transfer" {
   vpc_id      = local.vpc_id
 }
 
+resource "aws_security_group_rule" "ppud_data_transfer_ssh_ingress" {
+  security_group_id = aws_security_group.ppud_data_transfer.id
+
+  description = "ppud_data_transfer_ssh_ingress"
+  type        = "ingress"
+  from_port   = "22"
+  to_port     = "22"
+  protocol    = "TCP"
+  cidr_blocks = ["0.0.0.0/0"]
+}
 
 resource "aws_security_group_rule" "ppud_data_transfer_http_egress" {
   security_group_id = aws_security_group.ppud_data_transfer.id
