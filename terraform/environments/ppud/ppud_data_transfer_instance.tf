@@ -50,7 +50,6 @@ resource "aws_security_group_rule" "ppud_data_transfer_https_egress" {
 }
 
 resource "aws_instance" "ppud_data_transfer" {
-  depends_on                  = [aws_security_group.ppud_data_transfer]
   instance_type               = "t3.micro"
   ami                         = data.aws_ami.ubuntu.id
   vpc_security_group_ids      = [aws_security_group.ppud_data_transfer.id]
