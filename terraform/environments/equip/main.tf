@@ -579,7 +579,7 @@ module "win2012_STD_multiple" {
   ebs_optimized          = true
   key_name               = aws_key_pair.windowskey.key_name
   user_data              = data.template_file.windows-userdata.rendered
-  iam_instance_profile = aws_iam_instance_profile.instance-profile-moj.name
+  iam_instance_profile   = aws_iam_instance_profile.instance-profile-moj.name
 
 
 
