@@ -226,10 +226,10 @@ resource "aws_volume_attachment" "swap" {
 
 locals {
   volume_ids = concat(
-    [for item in aws_ebs_volume.asm_data : item.id],
-    [for item in aws_ebs_volume.asm_flash : item.id],
-    [for item in aws_ebs_volume.oracle_app : item.id],
-    [for item in aws_ebs_volume.swap : item.id]
+    [for k, v in aws_ebs_volume.asm_data : v.id],
+    [for k, v in aws_ebs_volume.asm_flash : v.id],
+    [for k, v in aws_ebs_volume.oracle_app : v.id],
+    [aws_ebs_volume.swap.id]
   )
 }
 
