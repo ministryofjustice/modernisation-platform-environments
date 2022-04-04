@@ -19,7 +19,7 @@
                     "ami_name": "nomis_db-2022-03-03*",
                     "asm_data_capacity": 200,
                     "asm_flash_capacity": 2,
-                    "termination_protection": true
+                    "termination_protection": false
                 }
             },
             "weblogics": {
