@@ -1,18 +1,19 @@
 #!/bin/bash
 # Note use of $${} syntax in places - this is because this file is being used as a terraform template so need to escape variable substitution
-set -e
-
-# some vars
-ORACLE_HOME=/u01/app/oracle/product/11.2.0.4/gridhome_1
-memtotal_kb=$(awk '/^MemTotal/ {print $2}' /proc/meminfo)
+set -euo pipefail
 
 hugepages() {
     
     echo "+++Configuring hugepages..."
     
+    local memtotal_kb=$(awk '/^MemTotal/ {print $2}' /proc/meminfo)
+    
     local page_size_kb=2048
     local pages=$(expr $memtotal_kb / 2 / $page_size_kb)
-    local memlock_limit=$(expr $pages \* $page_size_kb)
+    
+    local memlock=$(expr 9 \* $memtotal_kb / 10)
+    local memlock_max=134217728 # 128GB
+    local memlock_limit=$(( $memlock > $memlock_max ? $memlock_max : $memlock ))
 
     # configure huge pages
     sed -ri 's/^vm.nr_hugepages.*$/vm.nr_hugepages='"$pages"'/' /etc/sysctl.conf
@@ -33,8 +34,8 @@ hugepages() {
     
     echo "created [$pages_created/$pages] hugepages"
 
-    # update memory limits
-    sed -ri '/^\*[^0-9]+/ s/[0-9]+/'"$memlock_limit"'/' /etc/security/limits.d/99-grid-oracle-limits.conf
+    # update memlock limits
+    sed -ri '/^oracle.+memlock[^0-9]+/ s/[0-9]+/'"$memlock_limit"'/' /etc/security/limits.conf
 }
 
 swap_disk() {
@@ -78,6 +79,8 @@ disks() {
 }
 
 reconfigure_oracle_has() {
+
+    local ORACLE_HOME=/u01/app/oracle/product/11.2.0.4/gridhome_1
     
     echo "+++Reconfiguring Oracle HAS..."
 
@@ -85,7 +88,7 @@ reconfigure_oracle_has() {
     fuser -k -n tcp 1521 || true
 
     # update hostname in listener file
-    sed -ri "s/(HOST = )([^\)]*)/\1$HOSTNAME/" /u01/app/oracle/product/11.2.0.4/gridhome_1/network/admin/listener.ora
+    sed -ri "s/(HOST = )([^\)]*)/\1$HOSTNAME/" $ORACLE_HOME/network/admin/listener.ora
 
     echo "+++reconfigure grid"
     $ORACLE_HOME/perl/bin/perl -I $ORACLE_HOME/perl/lib -I $ORACLE_HOME/crs/install $ORACLE_HOME/crs/install/roothas.pl
