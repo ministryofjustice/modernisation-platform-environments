@@ -40,6 +40,9 @@ hugepages() {
 
 swap_disk() {
 
+    echo "+++Waiting for volumes to be attached to instance"
+    aws ec2 wait volume-in-use --volume-ids ${volume_ids}
+
     echo "+++Configuring swap partition..."
     # get current swap partition
     local swap_disk=$(awk '/partition/ {print $1}' /proc/swaps)
@@ -58,9 +61,6 @@ swap_disk() {
 }
 
 disks() {
-
-    echo "+++Waiting for volumes to be attached to instance"
-    aws ec2 wait volume-in-use --volume-ids ${volume_ids}
     
     echo "+++Resizing Oracle application disks"
     xfs_growfs -d /u01
