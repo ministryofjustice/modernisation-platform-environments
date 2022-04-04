@@ -110,7 +110,7 @@ resource "aws_instance" "database" {
       component  = "data"
       os_type    = "Linux"
       os_version = "RHEL 7.9"
-      always_on  = var.environment == "production" ? "true" : "false"
+      always_on  = var.always_on
     }
   )
 }
