@@ -58,6 +58,9 @@ swap_disk() {
 }
 
 disks() {
+
+    echo "+++Waiting for volumes to be attached to instance"
+    aws ec2 wait volume-in-use --volume-ids ${volume_ids}
     
     echo "+++Resizing Oracle application disks"
     xfs_growfs -d /u01

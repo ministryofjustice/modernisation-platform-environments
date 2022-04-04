@@ -43,6 +43,7 @@ data "template_file" "user_data" {
   vars = {
     parameter_name_ASMSYS  = aws_ssm_parameter.asm_sys.name
     parameter_name_ASMSNMP = aws_ssm_parameter.asm_snmp.name
+    volume_ids             = join(" ", local.volume_ids)
   }
 }
 
@@ -221,6 +222,15 @@ resource "aws_volume_attachment" "swap" {
   device_name = local.swap_disk
   volume_id   = aws_ebs_volume.swap.id
   instance_id = aws_instance.database.id
+}
+
+locals {
+  volume_ids = concat(
+    aws_ebs_volume.asm_data[*].volume_id,
+    aws_ebs_volume.asm_flash[*].volume_id,
+    aws_ebs_volume.oracle_app[*].volume_id,
+    aws_ebs_volume.swap[*].volume_id
+  )
 }
 
 #------------------------------------------------------------------------------

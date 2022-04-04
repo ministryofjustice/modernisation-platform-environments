@@ -13,13 +13,6 @@
                     "ami_name": "nomis_db_CNOMT1-2022-03-04*",
                     "asm_data_capacity": 100,
                     "asm_flash_capacity": 2
-                },
-                "CNAUDT1": {
-                    "always_on": true,
-                    "ami_name": "nomis_db-2022-03-03*",
-                    "asm_data_capacity": 200,
-                    "asm_flash_capacity": 2,
-                    "termination_protection": false
                 }
             },
             "weblogics": {
