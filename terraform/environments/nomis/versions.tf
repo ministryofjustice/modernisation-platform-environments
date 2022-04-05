@@ -4,14 +4,6 @@ terraform {
       version = "~> 4.0"
       source  = "hashicorp/aws"
     }
-    github = {
-      version = "4.9.4"
-      source  = "integrations/github"
-    }
   }
   required_version = ">= 1.1.7"
-}
-
-provider "github" {
-  owner = "ministryofjustice"
 }
