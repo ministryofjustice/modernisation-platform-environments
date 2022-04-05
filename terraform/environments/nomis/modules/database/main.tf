@@ -43,6 +43,7 @@ data "template_file" "user_data" {
   vars = {
     parameter_name_ASMSYS  = aws_ssm_parameter.asm_sys.name
     parameter_name_ASMSNMP = aws_ssm_parameter.asm_snmp.name
+    volume_ids             = join(" ", local.volume_ids)
   }
 }
 
@@ -110,7 +111,7 @@ resource "aws_instance" "database" {
       component  = "data"
       os_type    = "Linux"
       os_version = "RHEL 7.9"
-      always_on  = var.environment == "production" ? "true" : "false"
+      always_on  = var.always_on
     }
   )
 }
@@ -221,6 +222,15 @@ resource "aws_volume_attachment" "swap" {
   device_name = local.swap_disk
   volume_id   = aws_ebs_volume.swap.id
   instance_id = aws_instance.database.id
+}
+
+locals {
+  volume_ids = concat(
+    [for k, v in aws_ebs_volume.asm_data : v.id],
+    [for k, v in aws_ebs_volume.asm_flash : v.id],
+    [for k, v in aws_ebs_volume.oracle_app : v.id],
+    [aws_ebs_volume.swap.id]
+  )
 }
 
 #------------------------------------------------------------------------------

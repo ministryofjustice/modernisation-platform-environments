@@ -13,6 +13,7 @@ module "database" {
 
   name = each.key
 
+  always_on          = each.value.always_on
   ami_name           = each.value.ami_name
   asm_data_capacity  = each.value.asm_data_capacity
   asm_flash_capacity = each.value.asm_flash_capacity
