@@ -20,7 +20,7 @@ provider "aws" {
   region                 = "eu-west-2"
   skip_get_ec2_platforms = true
   assume_role {
-    role_arn = "arn:aws:iam::${local.environment_management.account_ids[local.provider_name]}:role/member-delegation-${local.vpc_name}-${local.environment == "development"? "sandbox" : local.environment}"
+    role_arn = "arn:aws:iam::${local.environment_management.account_ids[local.provider_name]}:role/member-delegation-${local.vpc_name}-${local.environment == "development" ? "sandbox" : local.environment}"
   }
 }
 
