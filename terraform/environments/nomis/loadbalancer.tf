@@ -216,25 +216,25 @@ resource "aws_acm_certificate_validation" "internal_lb" {
 #------------------------------------------------------------------------------
 
 resource "aws_route53_zone" "az" {
-  name = "modernisation-platform.az.justice.gov.uk"
+  name = "modernisation-platform.nomis.az.justice.gov.uk"
   tags = merge(
     local.tags,
     {
-      Name = "modernisation-platform.az.justice.gov.uk"
+      Name = "modernisation-platform.nomis.az.justice.gov.uk"
     }
   )
 }
 
 resource "aws_ssm_parameter" "az_ns" {
-  name        = "/nameservers/modernisation-platform.az.justice.gov.uk"
-  description = "Nameservers for modernisation-platform.az.justice.gov.uk"
+  name        = "/nameservers/${aws_route53_zone.az.name}"
+  description = "Nameservers for ${aws_route53_zone.az.name}"
   type        = "String"
   value       = join(", ", aws_route53_zone.az.name_servers)
 
   tags = merge(
     local.tags,
     {
-      Name = "NS records modernisation-platform.az.justice.gov.uk"
+      Name = "NS records ${aws_route53_zone.az.name}"
     }
   )
 }
@@ -243,7 +243,7 @@ resource "aws_route53_record" "internal_lb_az" {
   provider = aws.core-vpc
 
   zone_id = aws_route53_zone.az.zone_id
-  name    = "*.${local.application_name}.${aws_route53_zone.az.name}"
+  name    = "*.${aws_route53_zone.az.name}"
   type    = "A"
 
   alias {
@@ -254,10 +254,10 @@ resource "aws_route53_record" "internal_lb_az" {
 }
 
 # resource "aws_acm_certificate" "internal_lb_az" {
-#   domain_name       = "${local.application_name}.${aws_route53_zone.az.name}"
+#   domain_name       = aws_route53_zone.az.name
 #   validation_method = "DNS"
 
-#   subject_alternative_names = ["*.${local.application_name}.${aws_route53_zone.az.name}"]
+#   subject_alternative_names = ["*.${aws_route53_zone.az.name}"]
 
 #   tags = merge(
 #     local.tags,
