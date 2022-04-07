@@ -4,19 +4,45 @@ data "aws_caller_identity" "current" {}
 
 #tfsec:ignore:aws-s3-enable-bucket-encryption tfsec:ignore:aws-s3-enable-bucket-logging tfsec:ignore:aws-s3-enable-versioning tfsec:ignore:aws-s3-block-public-acls  tfsec:ignore:aws-s3-block-public-policy  tfsec:ignore:aws-s3-ignore-public-acls  tfsec:ignore:aws-s3-no-public-buckets  tfsec:ignore:aws-s3-specify-public-access-block
 resource "aws_s3_bucket" "this" {
-  #checkov:skip=CKV_AWS_19
-  #checkov:skip=CKV_AWS_18
-  #checkov:skip=CKV_AWS_144
-  #checkov:skip=CKV_AWS_145
-  #checkov:skip=CKV_AWS_21
-  #checkov:skip=CKV2_AWS_6
-  #checkov:skip=CKV2_AWS_41
-  #checkov:skip=CKV2_AWS_37
   bucket = "moj-alb-citrix-access-logs-bucket"
 
   tags = {
     Environment = "Development"
     Name        = "S3 Access Logs for ALB"
+  }
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "bucket-config" {
+  bucket = aws_s3_bucket.this.bucket
+
+  rule {
+    id = "log_deletion"
+
+    expiration {
+      days = 90
+    }
+
+    filter {
+      and {
+        prefix = "AWSLogs/${data.aws_caller_identity.current.account_id}/"
+
+        tags = {
+          rule      = "log-deletion"
+          autoclean = "true"
+        }
+      }
+    }
+    status = "Enabled"
+
+    transition {
+      days          = 30
+      storage_class = "STANDARD_IA"
+    }
+
+    transition {
+      days          = 60
+      storage_class = "GLACIER"
+    }
   }
 }
 

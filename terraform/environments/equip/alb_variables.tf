@@ -109,7 +109,7 @@ variable "access_logs" {
 variable "tags" {
   description = "A map of tags to add to all resources"
   type        = map(string)
-  default     = {}
+  default     = { terraform_managed = "true" }
 }
 
 variable "lb_tags" {
