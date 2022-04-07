@@ -209,3 +209,87 @@ resource "aws_acm_certificate_validation" "internal_lb" {
 # resource "aws_wafv2_web_acl" "waf" {
 # #TODO https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/wafv2_web_acl
 # }
+
+
+#------------------------------------------------------------------------------
+# Temporaray resources to support access from PTTP
+#------------------------------------------------------------------------------
+
+resource "aws_route53_zone" "az" {
+  name = "modernisation-platform.az.justice.gov.uk"
+  tags = merge(
+    local.tags,
+    {
+      Name = "modernisation-platform.az.justice.gov.uk"
+    }
+  )
+}
+
+resource "aws_ssm_parameter" "az_ns" {
+  name        = "/nameservers/modernisation-platform.az.justice.gov.uk"
+  description = "Nameservers for modernisation-platform.az.justice.gov.uk"
+  type        = "String"
+  value       = join(", ", aws_route53_zone.az.name_servers)
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "NS records modernisation-platform.az.justice.gov.uk"
+    }
+  )
+}
+
+resource "aws_route53_record" "internal_lb_az" {
+  provider = aws.core-vpc
+
+  zone_id = aws_route53_zone.az.zone_id
+  name    = "*.${local.application_name}.${aws_route53_zone.az.name}"
+  type    = "A"
+
+  alias {
+    name                   = aws_lb.internal.dns_name
+    zone_id                = aws_lb.internal.zone_id
+    evaluate_target_health = true
+  }
+}
+
+# resource "aws_acm_certificate" "internal_lb_az" {
+#   domain_name       = "${local.application_name}.${aws_route53_zone.az.name}"
+#   validation_method = "DNS"
+
+#   subject_alternative_names = ["*.${local.application_name}.${aws_route53_zone.az.name}"]
+
+#   tags = merge(
+#     local.tags,
+#     {
+#       Name = "internal-lb-cert-az"
+#     },
+#   )
+
+#   lifecycle {
+#     create_before_destroy = true
+#   }
+# }
+
+# resource "aws_route53_record" "internal_lb_validation_az" {
+#   provider = aws.core-vpc
+#   for_each = {
+#     for dvo in aws_acm_certificate.internal_lb_az.domain_validation_options : dvo.domain_name => {
+#       name   = dvo.resource_record_name
+#       record = dvo.resource_record_value
+#       type   = dvo.resource_record_type
+#     }
+#   }
+
+#   allow_overwrite = true
+#   name            = each.value.name
+#   records         = [each.value.record]
+#   ttl             = 60
+#   type            = each.value.type
+#   zone_id         = aws_route53_zone.az.zone_id
+# }
+
+# resource "aws_acm_certificate_validation" "internal_lb_az" {
+#   certificate_arn         = aws_acm_certificate.internal_lb_az.arn
+#   validation_record_fqdns = [for record in aws_route53_record.internal_lb_validation_az : record.fqdn]
+# }
