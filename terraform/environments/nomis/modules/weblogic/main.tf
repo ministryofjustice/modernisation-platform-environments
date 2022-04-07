@@ -248,7 +248,9 @@ resource "aws_lb_listener_rule" "weblogic" {
   }
   condition {
     host_header {
-      values = ["${var.name}.${var.application_name}.${data.aws_route53_zone.external.name}"]
+      # this is a temporary change to support using the az.justice.gov.uk domain
+      # values = ["${var.name}.${var.application_name}.${data.aws_route53_zone.external.name}"]
+      values = ["${var.name}.${data.aws_route53_zone.external.name}"]
     }
   }
 }

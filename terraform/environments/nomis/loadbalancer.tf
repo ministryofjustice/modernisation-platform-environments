@@ -215,8 +215,10 @@ resource "aws_acm_certificate_validation" "internal_lb" {
 
 #------------------------------------------------------------------------------
 # Temporaray resources to support access from PTTP
-# Note will also need to revert the external zone datasource in the weblogic
-# module when this is binned and revert the loadbalancer certificate
+# Note will also need to revert the following when this is retired:
+# 1. route 53 external zone datasource in the weblogic module
+# 2. Loadbalancer listener rule host header in weblogic module
+# 3. Loadbalancer certificate in this file
 #------------------------------------------------------------------------------
 
 resource "aws_route53_zone" "az" {
