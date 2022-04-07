@@ -1,6 +1,6 @@
 resource "aws_instance" "build-server" {
   depends_on                  = [aws_security_group.build_server]
-  instance_type               = "t2.medium"
+  instance_type               = "c3.large"
   ami                         = local.application_data.accounts[local.environment].buildserver-ami
   vpc_security_group_ids      = [aws_security_group.build_server.id]
   monitoring                  = false
@@ -32,6 +32,7 @@ resource "aws_instance" "build-server" {
       #user_data,         # Prevent changes to user_data from destroying existing EC2s
       # Prevent changes to encryption from destroying existing EC2s - can delete once encryption complete
     ]
+    prevent_destroy = true
   }
 
   tags = merge(
