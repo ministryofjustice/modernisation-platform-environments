@@ -1,53 +1,13 @@
 #------------------------------------------------------------------------------
-# Instance profile to be assumed by the ec2 instance
-# This is required to enable SSH via Systems Manager
-# and also to allow access to an S3 bucket in which 
-# Oracle and Weblogic installation files are held
+# Common IAM policies for all ec2 instance profiles
 #------------------------------------------------------------------------------
-
-resource "aws_iam_role" "ec2_common_role" {
-  name                 = "ec2-common-role"
-  path                 = "/"
-  max_session_duration = "3600"
-  assume_role_policy = jsonencode(
-    {
-      "Version" : "2012-10-17",
-      "Statement" : [
-        {
-          "Effect" : "Allow",
-          "Principal" : {
-            "Service" : "ec2.amazonaws.com"
-          }
-          "Action" : "sts:AssumeRole",
-          "Condition" : {}
-        }
-      ]
-    }
-  )
-  managed_policy_arns = [
-    "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy",
-    aws_iam_policy.ec2_common_policy.arn
-  ]
-  tags = merge(
-    local.tags,
-    {
-      Name = "ec2-common-role"
-    },
-  )
-}
-
-# create instance profile from IAM role
-resource "aws_iam_instance_profile" "ec2_common_profile" {
-  name = "ec2-common-profile"
-  role = aws_iam_role.ec2_common_role.name
-  path = "/"
-}
 
 # custom policy for SSM as managed policy AmazonSSMManagedInstanceCore is too permissive
 data "aws_iam_policy_document" "ssm_custom" {
   #tfsec:ignore:AWS099:this is derived from AmazonSSMManagedInstanceCore managed policy
   #checkov:skip=CKV_AWS_111:this is derived from AmazonSSMManagedInstanceCore managed policy
   statement {
+    sid    = "CustomSsmPolicy"
     effect = "Allow"
     actions = [
       "ssm:DescribeAssociation",
@@ -78,6 +38,7 @@ data "aws_iam_policy_document" "ssm_custom" {
   }
 
   statement {
+    sid    = "AccessCloudWatchConfigParameter"
     effect = "Allow"
     actions = [
       "ssm:GetParameter",
@@ -87,9 +48,10 @@ data "aws_iam_policy_document" "ssm_custom" {
   }
 }
 
-# create policy document for access to s3 bucket
+# create policy document for access to s3 artefact bucket
 data "aws_iam_policy_document" "s3_bucket_access" {
   statement {
+    sid    = "AccessToInstallationArtefactBucket"
     effect = "Allow"
     actions = [
       "s3:PutObject",
@@ -116,6 +78,7 @@ data "aws_iam_policy_document" "session_manager_logging" {
   #   resources = [aws_kms_key.session_manager.arn]
   # }
   statement {
+    sid    = "WriteSessionManagerLogs"
     effect = "Allow"
     actions = [
       "logs:CreateLogStream",
@@ -139,7 +102,7 @@ data "aws_iam_policy_document" "ec2_common_combined" {
   ]
 }
 
-# create single managed policy to be attached to ec2-common IAM role
+# create single managed policy
 resource "aws_iam_policy" "ec2_common_policy" {
   name        = "ec2-common-policy"
   path        = "/"
@@ -151,6 +114,14 @@ resource "aws_iam_policy" "ec2_common_policy" {
       Name = "ec2-common-policy"
     },
   )
+}
+
+# create list of common managed policies that can be attached to ec2 instance profiles
+locals {
+  ec2_common_managed_policies = [
+    "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy",
+    aws_iam_policy.ec2_common_policy.arn
+  ]
 }
 
 #------------------------------------------------------------------------------
@@ -309,6 +280,13 @@ resource "aws_ssm_association" "update_ssm_agent" {
 # so we need to create a separate association for each day in order to deal with
 # weekends.  Alternatively we could use Eventbridge rules as a trigger, but its 
 # slightly more complex to setup the IAM roles for that.
+#
+# This needs a bit more thought, as database needs to be up when Weblogics are
+# created by autoscaling events. As we can't currently return weblogic instances
+# to the warm pool, new ones end up being created during the scheduled scale down
+# event at the end of the day, so database needs to be up for about 1hr longer.
+# Should not be a be a concern once this is released:
+# https://github.com/hashicorp/terraform-provider-aws/pull/23769
 #------------------------------------------------------------------------------
 
 locals {
@@ -325,7 +303,8 @@ resource "aws_ssm_association" "ec2_scheduled_start" {
     AutomationAssumeRole = aws_iam_role.ssm_ec2_start_stop.arn
   }
   targets {
-    # currently all instances created through the nomis-stack module are tagged 'false'
+    # currently all instances created through the database module are tagged 'false'
+    # weblogics are not in scope as they are managed by an autoscaling group, and therefore are not tagged
     key    = "tag:always_on"
     values = ["false"]
   }
@@ -348,7 +327,7 @@ resource "aws_ssm_association" "ec2_scheduled_stop" {
     values = ["false"]
   }
   apply_only_at_cron_interval = true
-  schedule_expression         = "cron(0 19 ? * ${each.value} *)"
+  schedule_expression         = "cron(0 20 ? * ${each.value} *)"
 }
 
 resource "aws_iam_role" "ssm_ec2_start_stop" {

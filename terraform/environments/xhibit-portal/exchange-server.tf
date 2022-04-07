@@ -15,15 +15,6 @@ resource "aws_instance" "exchange-server" {
   subnet_id                   = data.aws_subnet.public_az_a.id
   key_name                    = aws_key_pair.george.key_name
 
-  user_data = <<EOF
-    <script>
-    net user al 'TestThisWorks2092!' /add /y
-    net localgroup administrators al /add
-    echo blah > c:\flag.txt
-    </script>
-  EOF
-
-
   metadata_options {
     http_tokens   = "required"
     http_endpoint = "enabled"

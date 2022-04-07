@@ -24,7 +24,9 @@ resource "aws_security_group_rule" "ingestion_lb_allow_web_users" {
   to_port           = 443
   protocol          = "TCP"
   cidr_blocks = [
-    "109.152.47.104/32",  # George
+    "109.152.47.104/32",  # George,
+    "81.134.93.187/32",   # George temporary,
+    "18.133.150.172/32",   # Dev testmachine
     "81.101.176.47/32",   # Aman
     "77.100.255.142/32",  # Gary
     "82.44.118.20/32",    # Nick
@@ -37,8 +39,12 @@ resource "aws_security_group_rule" "ingestion_lb_allow_web_users" {
     "195.95.131.112/32",  # NCC Group proxy ITHC
     "81.152.37.83/32",    # Anand
     "77.108.144.130/32",  # AL Office
-    "195.59.75.151/32",   # New proxy IPs from Prashanth for testing ingestion
-    "195.59.75.152/32",   # New proxy IPs from Prashanth for testing ingestion
+    "195.59.75.151/32",   # New proxy IPs from Prashanth for testing ingestion NLE DEV
+    "195.59.75.152/32",   # New proxy IPs from Prashanth for testing ingestion NLE DEV
+    "194.33.192.0/24",    # New proxy IPs from Prashanth for testing ingestion LE PROD
+    "194.33.196.0/24",    # New proxy IPs from Prashanth for testing ingestion LE PROD
+    "194.33.248.0/24",    # New proxy IPs from Prashanth for testing ingestion LE PROD
+    "194.33.249.0/24",    # New proxy IPs from Prashanth for testing ingestion LE PROD
     "109.146.174.114/32", # Prashanth
   ]
   ipv6_cidr_blocks = [
@@ -123,7 +129,7 @@ data "aws_acm_certificate" "ingestion_lb_cert" {
 
 # resource "aws_s3_bucket_policy" "ingestion_loadbalancer_logs_policy" {
 #   bucket = aws_s3_bucket.ingestion_loadbalancer_logs.bucket
-#   policy = data.aws_iam_policy_document.s3_bucket_lb_write.json
+#   policy = data.aws_iam_policy_document.s3_bucket_ingestion_lb_write.json
 # }
 
 
