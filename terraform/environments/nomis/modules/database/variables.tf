@@ -1,3 +1,10 @@
+variable "always_on" {
+  type        = bool
+  description = "Set to false if the instance should be shutdown at evenings and weekends"
+  default     = true
+  nullable    = false
+}
+
 variable "ami_name" {
   type        = string
   description = "Name of AMI to be used to launch the database ec2 instance"
