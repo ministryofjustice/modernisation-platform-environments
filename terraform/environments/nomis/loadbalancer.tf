@@ -244,8 +244,6 @@ resource "aws_ssm_parameter" "az_ns" {
 }
 
 resource "aws_route53_record" "internal_lb_az" {
-  # provider = aws.core-vpc
-
   zone_id = aws_route53_zone.az.zone_id
   name    = "*.${aws_route53_zone.az.name}"
   type    = "A"
@@ -276,7 +274,6 @@ resource "aws_acm_certificate" "internal_lb_az" {
 }
 
 resource "aws_route53_record" "internal_lb_validation_az" {
-  provider = aws.core-vpc
   for_each = {
     for dvo in aws_acm_certificate.internal_lb_az.domain_validation_options : dvo.domain_name => {
       name   = dvo.resource_record_name
