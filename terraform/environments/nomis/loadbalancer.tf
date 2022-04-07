@@ -100,8 +100,8 @@ resource "aws_lb" "internal" {
 
 resource "aws_lb_listener" "internal" {
   depends_on = [
-    aws_acm_certificate_validation.internal_lb
-    # aws_acm_certificate_validation.internal_lb_az
+    # aws_acm_certificate_validation.internal_lb
+    aws_acm_certificate_validation.internal_lb_az
   ]
 
   load_balancer_arn = aws_lb.internal.arn
@@ -110,8 +110,8 @@ resource "aws_lb_listener" "internal" {
   #checkov:skip=CKV_AWS_103:the application does not support tls 1.2
   #tfsec:ignore:aws-elb-use-secure-tls-policy:the application does not support tls 1.2
   ssl_policy      = "ELBSecurityPolicy-2016-08"
-  certificate_arn = aws_acm_certificate.internal_lb.arn # this is what we'll use once we go back to modplatform dns
-  # certificate_arn = aws_acm_certificate.internal_lb_az.arn
+  # certificate_arn = aws_acm_certificate.internal_lb.arn # this is what we'll use once we go back to modplatform dns
+  certificate_arn = aws_acm_certificate.internal_lb_az.arn
 
   default_action {
     type = "fixed-response"
@@ -215,6 +215,8 @@ resource "aws_acm_certificate_validation" "internal_lb" {
 
 #------------------------------------------------------------------------------
 # Temporaray resources to support access from PTTP
+# Note will also need to revert the external zone datasource in the weblogic
+# module when this is binned and revert the loadbalancer certificate
 #------------------------------------------------------------------------------
 
 resource "aws_route53_zone" "az" {
@@ -255,43 +257,43 @@ resource "aws_route53_record" "internal_lb_az" {
   }
 }
 
-# resource "aws_acm_certificate" "internal_lb_az" {
-#   domain_name       = aws_route53_zone.az.name
-#   validation_method = "DNS"
+resource "aws_acm_certificate" "internal_lb_az" {
+  domain_name       = aws_route53_zone.az.name
+  validation_method = "DNS"
 
-#   subject_alternative_names = ["*.${aws_route53_zone.az.name}"]
+  subject_alternative_names = ["*.${aws_route53_zone.az.name}"]
 
-#   tags = merge(
-#     local.tags,
-#     {
-#       Name = "internal-lb-cert-az"
-#     },
-#   )
+  tags = merge(
+    local.tags,
+    {
+      Name = "internal-lb-cert-az"
+    },
+  )
 
-#   lifecycle {
-#     create_before_destroy = true
-#   }
-# }
+  lifecycle {
+    create_before_destroy = true
+  }
+}
 
-# resource "aws_route53_record" "internal_lb_validation_az" {
-#   provider = aws.core-vpc
-#   for_each = {
-#     for dvo in aws_acm_certificate.internal_lb_az.domain_validation_options : dvo.domain_name => {
-#       name   = dvo.resource_record_name
-#       record = dvo.resource_record_value
-#       type   = dvo.resource_record_type
-#     }
-#   }
+resource "aws_route53_record" "internal_lb_validation_az" {
+  provider = aws.core-vpc
+  for_each = {
+    for dvo in aws_acm_certificate.internal_lb_az.domain_validation_options : dvo.domain_name => {
+      name   = dvo.resource_record_name
+      record = dvo.resource_record_value
+      type   = dvo.resource_record_type
+    }
+  }
 
-#   allow_overwrite = true
-#   name            = each.value.name
-#   records         = [each.value.record]
-#   ttl             = 60
-#   type            = each.value.type
-#   zone_id         = aws_route53_zone.az.zone_id
-# }
+  allow_overwrite = true
+  name            = each.value.name
+  records         = [each.value.record]
+  ttl             = 60
+  type            = each.value.type
+  zone_id         = aws_route53_zone.az.zone_id
+}
 
-# resource "aws_acm_certificate_validation" "internal_lb_az" {
-#   certificate_arn         = aws_acm_certificate.internal_lb_az.arn
-#   validation_record_fqdns = [for record in aws_route53_record.internal_lb_validation_az : record.fqdn]
-# }
+resource "aws_acm_certificate_validation" "internal_lb_az" {
+  certificate_arn         = aws_acm_certificate.internal_lb_az.arn
+  validation_record_fqdns = [for record in aws_route53_record.internal_lb_validation_az : record.fqdn]
+}
