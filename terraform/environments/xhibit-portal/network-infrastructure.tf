@@ -117,7 +117,7 @@ resource "aws_security_group_rule" "exchange-outbound-all" {
   ipv6_cidr_blocks  = ["::/0"]
 }
 
-resource "aws_security_group_rule" "exchange-inbound-all" {
+resource "aws_security_group_rule" "exchange-inbound-app" {
   depends_on        = [aws_security_group.exchange_server]
   security_group_id = aws_security_group.exchange_server.id
   type              = "ingress"
@@ -125,8 +125,7 @@ resource "aws_security_group_rule" "exchange-inbound-all" {
   from_port         = 0
   to_port           = 0
   protocol          = "-1"
-  cidr_blocks       = ["0.0.0.0/0"]
-  ipv6_cidr_blocks  = ["::/0"]
+  source_security_group_id = aws_security_group.app_servers.id
 }
 
 resource "aws_security_group_rule" "exchange-inbound-bastion" {
@@ -328,13 +327,6 @@ resource "aws_security_group_rule" "testmachine_server-inbound-bastion" {
   cidr_blocks       = ["${module.bastion_linux.bastion_private_ip}/32"]
 }
 
-
-
-
-
-
-
-
 resource "aws_security_group_rule" "portal_server-inbound-bastion" {
   depends_on        = [aws_security_group.portal_server]
   security_group_id = aws_security_group.portal_server.id
@@ -378,10 +370,6 @@ resource "aws_security_group_rule" "app_servers-inbound-testmachine" {
   protocol                 = "-1"
   source_security_group_id = aws_security_group.testmachine.id
 }
-
-
-
-
 
 resource "aws_security_group_rule" "app_servers-outbound-importmachine" {
   depends_on               = [aws_security_group.app_servers]
