@@ -231,6 +231,20 @@ resource "aws_route53_zone" "az" {
   )
 }
 
+resource "aws_ssm_parameter" "az_ns" {
+  name        = "/nameservers/${aws_route53_zone.az.name}"
+  description = "Nameservers for ${aws_route53_zone.az.name}"
+  type        = "String"
+  value       = join(", ", aws_route53_zone.az.name_servers)
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "NS records ${aws_route53_zone.az.name}"
+    }
+  )
+}
+
 resource "aws_route53_record" "internal_lb_az" {
   zone_id = aws_route53_zone.az.zone_id
   name    = "*.${aws_route53_zone.az.name}"
