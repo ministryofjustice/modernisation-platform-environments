@@ -56,7 +56,7 @@
       "suprig04-disk-1-snapshot"      : "snap-02f6069537faf46dd",
       "suprig05-ami"                  : "ami-062d75b8c2ca6f00b",
       "suprig05-disk-1-snapshot"      : "snap-0b6d529f807eb9a6a",
-      "XHBPRESMS01-ami"               : "ami-08b7bbbccd608eb23",
+      "XHBPRESMS01-ami"               : "ami-0ff6a6bdd455e373d",
       "importmachine-ami"             : "ami-0b33dfec9e4072ca1",
       "buildserver-ami"               : "ami-0da5babad86576eb8",
       "buildserver-disk-1-snapshot"   : "snap-0b6d529f807eb9a6a"
