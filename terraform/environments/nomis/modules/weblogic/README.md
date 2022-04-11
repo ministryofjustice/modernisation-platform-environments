@@ -1,6 +1,6 @@
 # Weblogic Server
 
-Terraform module for creating Weblogic instances in a multi-AZ autoscaling group.  
+Terraform module for creating Weblogic instances in a multi-AZ auto-scaling group (ASG).  
 
 ### Warm pools
 
@@ -8,11 +8,11 @@ Since the Weblogic instances have a very long initial start-up time, the module 
 
 The number of instances in the warm pool will be equal to the max size of the auto-scaling group minus the number of active instances in the ASG.  This can be changed if desired by exposing some additional variables in the module.
 
-As the module is currently setup, any scale down events cause active instances to be terminated.  It should be possible to instead return them to the warm pool however the Terraform AWS provider does not currently support this feature.  This behavior may be worth considering when it becomes available.  See this [issue](https://github.com/hashicorp/terraform-provider-aws/issues/23735).
+The warm pool instance reuse policy has been set to 'reuse on scale in', thus during scale in events excess instances are powered off and returned to the warm pool.
 
  ### Scaling
 
- Currently there is only schedule based scaling in place, which scales the number of active instances to zero after 7pm and scales out again at 7am.  We do not scale down the maximum number of instances.  This has the affect of replacing the scaled down instances with new instances in the warm pool, thus we do not need to wait for new instances to be created at the next scale out event. 
+ Currently there is only schedule based scaling in place, which scales the number of active instances to zero after 7pm and scales out again at 7am.  We do not scale down the maximum number of instances.  This has the affect of returning the scaled down instances to the warm pool, thus we do not need to wait for new instances to be created at the next scale out event. 
  
  The scaling policy will need to be revisited once we move to production and scaling requirements are determined.
 

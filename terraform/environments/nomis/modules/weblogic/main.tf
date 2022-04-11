@@ -162,6 +162,10 @@ resource "aws_autoscaling_group" "weblogic" {
     pool_state                  = "Stopped"
     min_size                    = var.asg_warm_pool_min_size
     max_group_prepared_capacity = var.asg_max_size
+
+    instance_reuse_policy {
+      reuse_on_scale_in = true
+    }
   }
 
   tag {
