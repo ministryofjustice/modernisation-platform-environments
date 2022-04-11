@@ -26,7 +26,6 @@ resource "aws_security_group" "ppud_data_transfer" {
   vpc_id      = local.vpc_id
 }
 
-
 resource "aws_security_group_rule" "ppud_data_transfer_http_egress" {
   security_group_id = aws_security_group.ppud_data_transfer.id
 
@@ -47,6 +46,69 @@ resource "aws_security_group_rule" "ppud_data_transfer_https_egress" {
   to_port     = "443"
   protocol    = "TCP"
   cidr_blocks = ["0.0.0.0/0"]
+}
+
+data "aws_iam_policy_document" "ppud_data_transfer_assume_policy_document" {
+  statement {
+    actions = [
+      "sts:AssumeRole",
+    ]
+    principals {
+      type        = "Service"
+      identifiers = ["ec2.amazonaws.com"]
+    }
+  }
+}
+
+resource "aws_iam_role" "ppud_data_transfer_role" {
+  name               = "data-transfer-${local.application_name}"
+  path               = "/"
+  assume_role_policy = data.aws_iam_policy_document.ppud_data_transfer_assume_policy_document.json
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "data-transfer-${local.application_name}"
+    }
+  )
+}
+
+#wildcards permissible read access to specific buckets
+#tfsec:ignore:aws-iam-no-policy-wildcards
+data "aws_iam_policy_document" "ppud_data_transfer_ssm_s3_policy_document" {
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "s3:GetObject"
+    ]
+    resources = [
+      "arn:aws:s3:::aws-ssm-${local.region}/*",
+      "arn:aws:s3:::aws-windows-downloads-${local.region}/*",
+      "arn:aws:s3:::amazon-ssm-${local.region}/*",
+      "arn:aws:s3:::amazon-ssm-packages-${local.region}/*",
+      "arn:aws:s3:::${local.region}-birdwatcher-prod/*",
+      "arn:aws:s3:::aws-ssm-distributor-file-${local.region}/*",
+      "arn:aws:s3:::aws-ssm-document-attachments-${local.region}/*",
+      "arn:aws:s3:::patch-baseline-snapshot-${local.region}/*"
+    ]
+  }
+}
+
+resource "aws_iam_policy" "ppud_data_transfer_ssm_s3_policy" {
+  name   = "ppud_data_transfer_ssm_s3"
+  policy = data.aws_iam_policy_document.ppud_data_transfer_ssm_s3_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "ppud_data_transfer_host_ssm_s3" {
+  policy_arn = aws_iam_policy.ppud_data_transfer_ssm_s3_policy.arn
+  role       = aws_iam_role.ppud_data_transfer_role.name
+}
+
+resource "aws_iam_instance_profile" "ppud_data_transfer_profile" {
+  name = "data-transfer-${local.application_name}-ec2-profile"
+  role = aws_iam_role.ppud_data_transfer_role.name
+  path = "/"
 }
 
 resource "aws_key_pair" "doakley" {
