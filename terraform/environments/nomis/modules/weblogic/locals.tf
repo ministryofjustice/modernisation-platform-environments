@@ -26,10 +26,16 @@ data "aws_route53_zone" "internal" {
   private_zone = true
 }
 
-data "aws_route53_zone" "external" {
-  provider = aws.core-vpc
+# data "aws_route53_zone" "external" {
+#   provider = aws.core-vpc
 
-  name         = "${var.business_unit}-${var.environment}.modernisation-platform.service.justice.gov.uk."
+#   name         = "${var.business_unit}-${var.environment}.modernisation-platform.service.justice.gov.uk."
+#   private_zone = false
+# }
+
+# temporarily using az.justice.gov.uk
+data "aws_route53_zone" "external" {
+  name         = "modernisation-platform.nomis.az.justice.gov.uk."
   private_zone = false
 }
 
