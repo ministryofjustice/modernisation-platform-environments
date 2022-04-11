@@ -118,13 +118,13 @@ resource "aws_security_group_rule" "exchange-outbound-all" {
 }
 
 resource "aws_security_group_rule" "exchange-inbound-app" {
-  depends_on        = [aws_security_group.exchange_server]
-  security_group_id = aws_security_group.exchange_server.id
-  type              = "ingress"
-  description       = "allow all"
-  from_port         = 0
-  to_port           = 0
-  protocol          = "-1"
+  depends_on               = [aws_security_group.exchange_server]
+  security_group_id        = aws_security_group.exchange_server.id
+  type                     = "ingress"
+  description              = "allow all"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
   source_security_group_id = aws_security_group.app_servers.id
 }
 
