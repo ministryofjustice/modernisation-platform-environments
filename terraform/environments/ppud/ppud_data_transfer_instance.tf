@@ -130,6 +130,7 @@ resource "aws_instance" "ppud_data_transfer" {
   ebs_optimized               = true
   subnet_id                   = data.aws_subnet.private_az_a.id
   key_name                    = aws_key_pair.doakley.key_name
+  iam_instance_profile        = aws_iam_instance_profile.ppud_data_transfer_profile.id
 
   metadata_options {
     http_tokens   = "required"
