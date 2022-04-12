@@ -1,0 +1,10 @@
+#!/bin/bash
+
+set -euo pipefail
+
+./generate-nuke-config.sh
+
+TF_ENV='development'
+bash scripts/terraform-init.sh terraform/environments/sprinkler
+terraform -chdir="terraform/environments/sprinkler" workspace select "sprinkler-${TF_ENV}"
+aws-nuke --access-key-id "$AWS_ACCESS_KEY_ID" --secret-access-key "$AWS_SECRET_ACCESS_KEY" nuke-config.yml
