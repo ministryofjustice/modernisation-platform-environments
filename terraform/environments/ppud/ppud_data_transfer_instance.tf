@@ -73,6 +73,11 @@ resource "aws_iam_role" "ppud_data_transfer_role" {
   )
 }
 
+resource "aws_iam_role_policy_attachment" "ppud_data_transfer_managed" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+  role       = aws_iam_role.ppud_data_transfer_role.name
+}
+
 #wildcards permissible read access to specific buckets
 #tfsec:ignore:aws-iam-no-policy-wildcards
 data "aws_iam_policy_document" "ppud_data_transfer_ssm_s3_policy_document" {
