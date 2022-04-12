@@ -80,7 +80,7 @@ resource "aws_security_group" "database_common" {
     protocol    = "TCP"
     cidr_blocks = ["172.20.0.0/16"]
   }
-  
+
   egress {
     description = "allow all"
     from_port   = 0
