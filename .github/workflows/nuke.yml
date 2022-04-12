@@ -5,6 +5,13 @@ on:
     # * is a special character in YAML so you have to quote this string
     # trigger every sunday at 10:00am
     - cron: '0 10 * * 0'
+  pull_request:
+    branches:
+      - main
+    types: [ opened, edited, reopened, synchronize ]
+    paths:
+      - 'scripts/**'
+      - '.github/workflows/nuke.yml'
   workflow_dispatch:
 env:
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
