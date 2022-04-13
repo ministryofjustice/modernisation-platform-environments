@@ -49,6 +49,9 @@ resource-types:
     - IAMUserPolicyAttachment
     - IAMUserSSHPublicKey
     - IAMVirtualMFADevice
+    - S3AccessPoint
+    - S3Bucket
+    - S3MultipartUpload
     - S3Object
     - SecurityHub
     - WAFv2WebACL
