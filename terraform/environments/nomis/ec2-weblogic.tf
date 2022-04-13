@@ -79,8 +79,8 @@ resource "aws_security_group" "weblogic_common" {
 
   ingress {
     description = "access from Cloud Platform Prometheus server"
-    from_port   = "9090"
-    to_port     = "9090"
+    from_port   = "9100"
+    to_port     = "9100"
     protocol    = "TCP"
     cidr_blocks = ["172.20.0.0/16"]
   }
