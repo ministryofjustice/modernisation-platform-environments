@@ -11,6 +11,7 @@ cat ./scripts/nuke-config-template.txt | envsubst >nuke-config.yml
 
 aws sts assume-role \
   --role-arn "arn:aws:iam::${SPRINKLER_DEVELOPMENT_ACCID}:role/MemberInfrastructureAccess" \
-  --role-session-name SPRINKLER_DEVELOPMENT_ACCID
+  --role-session-name SPRINKLER_DEVELOPMENT_ACCID \
+  --region eu-west-2
 
 $HOME/bin/aws-nuke --access-key-id "$AWS_ACCESS_KEY_ID" --secret-access-key "$AWS_SECRET_ACCESS_KEY" --config nuke-config.yml
