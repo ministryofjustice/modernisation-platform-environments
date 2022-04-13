@@ -10,8 +10,8 @@ eval "$(jq -r '.NUKE_ACCOUNT_IDS | to_entries | .[] |"export " + .key + "=" + (.
 cat ./scripts/nuke-config-template.txt | envsubst >nuke-config.yml
 
 export AWS_REGION=eu-west-2
-unset AWS_SESSION_TOKEN # unset the environment variable
 
-eval $(aws sts assume-role --role-arn "arn:aws:iam::${SPRINKLER_DEVELOPMENT_ACCID}:role/MemberInfrastructureAccess" --role-session-name "SPRINKLER_DEVELOPMENT_ACCID_SESSION" | jq -r '.Credentials | "export AWS_ACCESS_KEY_ID=\(.AccessKeyId)\nexport AWS_SECRET_ACCESS_KEY=\(.SecretAccessKey)\nexport AWS_SESSION_TOKEN=\(.SessionToken)\n"')
+aws sts assume-role --role-arn "arn:aws:iam::${SPRINKLER_DEVELOPMENT_ACCID}:role/MemberInfrastructureAccess" \
+  --role-session-name "SPRINKLER_DEVELOPMENT_ACCID_SESSION"
 
-$HOME/bin/aws-nuke --access-key-id "$AWS_ACCESS_KEY_ID" --secret-access-key "$AWS_SECRET_ACCESS_KEY" --config nuke-config.yml
+#$HOME/bin/aws-nuke --access-key-id "$AWS_ACCESS_KEY_ID" --secret-access-key "$AWS_SECRET_ACCESS_KEY" --config nuke-config.yml
