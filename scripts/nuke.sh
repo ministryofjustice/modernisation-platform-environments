@@ -17,4 +17,7 @@ echo "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID"
 echo "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY"
 echo "AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN"
 
-$HOME/bin/aws-nuke --access-key-id "$AWS_ACCESS_KEY_ID" --secret-access-key "$AWS_SECRET_ACCESS_KEY" --config nuke-config.yml
+$HOME/bin/aws-nuke --access-key-id "$AWS_ACCESS_KEY_ID" \
+  --secret-access-key "$AWS_SECRET_ACCESS_KEY" \
+  --session-token "$AWS_SESSION_TOKEN" \
+  --config nuke-config.yml
