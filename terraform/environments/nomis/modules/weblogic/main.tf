@@ -162,6 +162,10 @@ resource "aws_autoscaling_group" "weblogic" {
     pool_state                  = "Stopped"
     min_size                    = var.asg_warm_pool_min_size
     max_group_prepared_capacity = var.asg_max_size
+
+    instance_reuse_policy {
+      reuse_on_scale_in = true
+    }
   }
 
   tag {
@@ -248,7 +252,9 @@ resource "aws_lb_listener_rule" "weblogic" {
   }
   condition {
     host_header {
-      values = ["${var.name}.${var.application_name}.${data.aws_route53_zone.external.name}"]
+      # this is a temporary change to support using the az.justice.gov.uk domain
+      # values = ["${var.name}.${var.application_name}.${data.aws_route53_zone.external.name}"]
+      values = ["${var.name}.${data.aws_route53_zone.external.name}"]
     }
   }
 }
