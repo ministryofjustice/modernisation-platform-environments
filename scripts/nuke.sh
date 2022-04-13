@@ -16,4 +16,5 @@ eval $(aws sts assume-role --role-arn "arn:aws:iam::${SPRINKLER_DEVELOPMENT_ACCI
 $HOME/bin/aws-nuke --access-key-id "$AWS_ACCESS_KEY_ID" \
   --secret-access-key "$AWS_SECRET_ACCESS_KEY" \
   --session-token "$AWS_SESSION_TOKEN" \
-  --config nuke-config.yml
+  --config nuke-config.yml \
+  --force
