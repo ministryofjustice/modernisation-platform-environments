@@ -111,7 +111,7 @@ resource "aws_lb_listener" "internal" {
   #tfsec:ignore:aws-elb-use-secure-tls-policy:the application does not support tls 1.2
   ssl_policy = "ELBSecurityPolicy-2016-08"
   # certificate_arn = aws_acm_certificate.internal_lb.arn # this is what we'll use once we go back to modplatform dns
-  certificate_arn = aws_acm_certificate.internal_lb_az.arn
+  certificate_arn = local.environment == "test" ? aws_acm_certificate.internal_lb_az[0].arn : aws_acm_certificate.internal_lb.arn
 
   default_action {
     type = "fixed-response"
@@ -218,10 +218,13 @@ resource "aws_acm_certificate_validation" "internal_lb" {
 # Note will also need to revert the following when this is retired:
 # 1. route 53 external zone datasource in the weblogic module
 # 2. Loadbalancer listener rule host header in weblogic module
-# 3. Loadbalancer certificate in this file
+# 3. aws_lb_listener.internal.certificate_arn in this file
+# Hopefully this will be gone by the time we need to create weblogics in prod
+# if not then additional work will be required in the weblogic module
 #------------------------------------------------------------------------------
 
 resource "aws_route53_zone" "az" {
+  count = local.environment == "test" ? 1: 0
   name = "modernisation-platform.nomis.az.justice.gov.uk"
   tags = merge(
     local.tags,
@@ -231,23 +234,10 @@ resource "aws_route53_zone" "az" {
   )
 }
 
-resource "aws_ssm_parameter" "az_ns" {
-  name        = "/nameservers/${aws_route53_zone.az.name}"
-  description = "Nameservers for ${aws_route53_zone.az.name}"
-  type        = "String"
-  value       = join(", ", aws_route53_zone.az.name_servers)
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "NS records ${aws_route53_zone.az.name}"
-    }
-  )
-}
-
 resource "aws_route53_record" "internal_lb_az" {
-  zone_id = aws_route53_zone.az.zone_id
-  name    = "*.${aws_route53_zone.az.name}"
+  count = local.environment == "test" ? 1: 0
+  zone_id = aws_route53_zone.az[0].zone_id
+  name    = "*.${aws_route53_zone.az[0].name}"
   type    = "A"
 
   alias {
@@ -258,10 +248,11 @@ resource "aws_route53_record" "internal_lb_az" {
 }
 
 resource "aws_acm_certificate" "internal_lb_az" {
-  domain_name       = aws_route53_zone.az.name
+  count = local.environment == "test" ? 1: 0
+  domain_name       = aws_route53_zone.az[0].name
   validation_method = "DNS"
 
-  subject_alternative_names = ["*.${aws_route53_zone.az.name}"]
+  subject_alternative_names = ["*.${aws_route53_zone.az[0].name}"]
 
   tags = merge(
     local.tags,
@@ -277,7 +268,7 @@ resource "aws_acm_certificate" "internal_lb_az" {
 
 resource "aws_route53_record" "internal_lb_validation_az" {
   for_each = {
-    for dvo in aws_acm_certificate.internal_lb_az.domain_validation_options : dvo.domain_name => {
+    for dvo in aws_acm_certificate.internal_lb_az[0].domain_validation_options : dvo.domain_name => {
       name   = dvo.resource_record_name
       record = dvo.resource_record_value
       type   = dvo.resource_record_type
@@ -289,10 +280,11 @@ resource "aws_route53_record" "internal_lb_validation_az" {
   records         = [each.value.record]
   ttl             = 60
   type            = each.value.type
-  zone_id         = aws_route53_zone.az.zone_id
+  zone_id         = aws_route53_zone.az[0].zone_id
 }
 
 resource "aws_acm_certificate_validation" "internal_lb_az" {
-  certificate_arn         = aws_acm_certificate.internal_lb_az.arn
+  count = local.environment == "test" ? 1: 0
+  certificate_arn         = aws_acm_certificate.internal_lb_az[0].arn
   validation_record_fqdns = [for record in aws_route53_record.internal_lb_validation_az : record.fqdn]
 }
