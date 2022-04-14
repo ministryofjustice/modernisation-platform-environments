@@ -39,7 +39,7 @@ resource "aws_instance" "exchange-server" {
       #root_block_device,
       # Prevent changes to encryption from destroying existing EC2s - can delete once encryption complete
     ]
-    prevent_destroy = local.environment == "production" ? true : false
+    prevent_destroy = "${local.environment == "production" ? true : false}"
   }
 
   tags = merge(

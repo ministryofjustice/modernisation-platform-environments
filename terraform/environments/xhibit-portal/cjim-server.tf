@@ -33,7 +33,7 @@ resource "aws_instance" "cjim-server" {
       # Prevent changes to encryption from destroying existing EC2s - can delete once encryption complete
     ]
     
-    prevent_destroy = local.environment == "production" ? true : false
+    prevent_destroy = ${local.environment == "production" ? true : false}
   }
 
   tags = merge(
