@@ -35,7 +35,7 @@ resource "aws_instance" "database-server" {
       # Prevent changes to encryption from destroying existing EC2s - can delete once encryption complete
     ]
     
-    prevent_destroy = "${local.is-production}"
+    prevent_destroy = true
   }
 
   tags = merge(
