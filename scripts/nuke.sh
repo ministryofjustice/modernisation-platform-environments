@@ -22,7 +22,8 @@ export AWS_REGION=eu-west-2
 for d in terraform/environments/*; do
   dir_name=$(basename "$d")
   dir_name_upper_case=${dir_name^^}
-  bash scripts/terraform-init.sh terraform/environments/sprinkler
+  echo "Search for development workspace to nuke in $d"
+  bash scripts/terraform-init.sh "$d"
   tf_workspaces=$(terraform -chdir="$d" workspace list)
   if [[ "$tf_workspaces" == *"${dir_name}-development"* ]]; then
     if [[ "$NUKE_SKIP_ENVIRONMENTS" != *"${dir_name}-development"* ]]; then
@@ -39,5 +40,7 @@ for d in terraform/environments/*; do
     else
       echo "Skipped nuking ${dir_name}-development because of the env variable NUKE_SKIP_ENVIRONMENTS=${NUKE_SKIP_ENVIRONMENTS}"
     fi
+  else
+    echo "No development workspace was found to nuke in $d"
   fi
 done
