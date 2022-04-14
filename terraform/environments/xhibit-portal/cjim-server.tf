@@ -32,6 +32,8 @@ resource "aws_instance" "cjim-server" {
       #user_data,         # Prevent changes to user_data from destroying existing EC2s
       # Prevent changes to encryption from destroying existing EC2s - can delete once encryption complete
     ]
+    
+    prevent_destroy = true
   }
 
   tags = merge(
