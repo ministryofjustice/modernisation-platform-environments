@@ -70,7 +70,7 @@ resource "aws_instance" "importmachine" {
       root_block_device,
       # Prevent changes to encryption from destroying existing EC2s - can delete once encryption complete
     ]
-    prevent_destroy = "${local.environment == "production" ? true : false}"
+    prevent_destroy = local.is-production
   }
 
   tags = merge(

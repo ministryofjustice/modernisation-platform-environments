@@ -202,7 +202,7 @@ resource "aws_instance" "infra2" {
       # Prevent changes to encryption from destroying existing EC2s - can delete once encryption complete
     ]
 
-    prevent_destroy = "${local.environment == "production" ? true : false}"
+    prevent_destroy = local.is-production
   }
 
   tags = merge(
