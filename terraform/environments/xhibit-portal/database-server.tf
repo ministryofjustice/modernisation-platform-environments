@@ -197,3 +197,27 @@ resource "aws_volume_attachment" "database-disk6" {
   volume_id    = aws_ebs_volume.database-disk6.id
   instance_id  = aws_instance.database-server.id
 }
+
+resource "aws_ebs_volume" "database-disk7" {
+  depends_on        = [aws_instance.database-server]
+  availability_zone = "${local.region}a"
+  type              = "gp2"
+  encrypted         = true
+
+  size = 300
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "database-disk7-${local.application_name}"
+    }
+  )
+}
+
+resource "aws_volume_attachment" "database-disk7" {
+  depends_on   = [aws_instance.database-server]
+  device_name  = "xvdp"
+  force_detach = true
+  volume_id    = aws_ebs_volume.database-disk7.id
+  instance_id  = aws_instance.database-server.id
+}
