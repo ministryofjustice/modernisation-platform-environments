@@ -33,7 +33,7 @@ resource "aws_instance" "cjip-server" {
       # Prevent changes to encryption from destroying existing EC2s - can delete once encryption complete
     ]
    
-    prevent_destroy = local.is-production
+    prevent_destroy = ${local.is-production}
   }
 
   tags = merge(
