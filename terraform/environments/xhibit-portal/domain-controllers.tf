@@ -201,7 +201,8 @@ resource "aws_instance" "infra2" {
       #root_block_device,
       # Prevent changes to encryption from destroying existing EC2s - can delete once encryption complete
     ]
-    #prevent_destroy = true
+
+    prevent_destroy = environment == "production" ? true : false
   }
 
   tags = merge(
