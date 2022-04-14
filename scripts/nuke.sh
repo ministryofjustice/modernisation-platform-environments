@@ -28,14 +28,17 @@ for d in terraform/environments/*; do
   if [[ "$tf_workspaces" == *"${dir_name}-development"* ]]; then
     if [[ "$NUKE_SKIP_ENVIRONMENTS" != *"${dir_name}-development"* ]]; then
       echo "BEGIN: nuke ${dir_name}-development"
-      eval $(aws sts assume-role --role-arn "arn:aws:iam::${"$dir_name_upper_case"_DEVELOPMENT_ACCID}:role/MemberInfrastructureAccess" --role-session-name "${dir_name_upper_case}_DEVELOPMENT_ACCID_SESSION" | jq -r '.Credentials | "export AWS_ACCESS_KEY_ID=\(.AccessKeyId)\nexport AWS_SECRET_ACCESS_KEY=\(.SecretAccessKey)\nexport AWS_SESSION_TOKEN=\(.SessionToken)\n"')
+      acc_id_var_name="${dir_name_upper_case}_DEVELOPMENT_ACCID"
+      acc_id=${!acc_id_var_name}
+      echo "acc_id = $acc_id"
+      eval $(aws sts assume-role --role-arn "arn:aws:iam::${acc_id}:role/MemberInfrastructureAccess" --role-session-name "${dir_name_upper_case}_DEVELOPMENT_ACCID_SESSION" | jq -r '.Credentials | "export AWS_ACCESS_KEY_ID=\(.AccessKeyId)\nexport AWS_SECRET_ACCESS_KEY=\(.SecretAccessKey)\nexport AWS_SESSION_TOKEN=\(.SessionToken)\n"')
 
       $HOME/bin/aws-nuke --access-key-id "$AWS_ACCESS_KEY_ID" \
         --secret-access-key "$AWS_SECRET_ACCESS_KEY" \
         --session-token "$AWS_SESSION_TOKEN" \
         --config nuke-config.yml \
         --force
-#        --no-dry-run
+      #        --no-dry-run
       echo "END: nuke ${dir_name}-development"
     else
       echo "Skipped nuking ${dir_name}-development because of the env variable NUKE_SKIP_ENVIRONMENTS=${NUKE_SKIP_ENVIRONMENTS}"
