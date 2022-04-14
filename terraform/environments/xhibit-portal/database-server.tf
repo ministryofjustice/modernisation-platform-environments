@@ -34,7 +34,8 @@ resource "aws_instance" "database-server" {
       #user_data,         # Prevent changes to user_data from destroying existing EC2s
       # Prevent changes to encryption from destroying existing EC2s - can delete once encryption complete
     ]
-    #prevent_destroy = true
+    
+    prevent_destroy = true
   }
 
   tags = merge(
@@ -194,5 +195,29 @@ resource "aws_volume_attachment" "database-disk6" {
   device_name  = "xvdf"
   force_detach = true
   volume_id    = aws_ebs_volume.database-disk6.id
+  instance_id  = aws_instance.database-server.id
+}
+
+resource "aws_ebs_volume" "database-disk7" {
+  depends_on        = [aws_instance.database-server]
+  availability_zone = "${local.region}a"
+  type              = "gp2"
+  encrypted         = true
+
+  size = 300
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "database-disk7-${local.application_name}"
+    }
+  )
+}
+
+resource "aws_volume_attachment" "database-disk7" {
+  depends_on   = [aws_instance.database-server]
+  device_name  = "xvdp"
+  force_detach = true
+  volume_id    = aws_ebs_volume.database-disk7.id
   instance_id  = aws_instance.database-server.id
 }
