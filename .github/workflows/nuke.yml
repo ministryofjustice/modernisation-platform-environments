@@ -25,7 +25,7 @@ defaults:
 jobs:
 
   nuke:
-    name: Nuke
+    name: Nuke and redeploy after nuke
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -50,19 +50,11 @@ jobs:
           echo "BEGIN: Nuke"
           bash scripts/nuke.sh
           echo "END: Nuke"
-
-  redeploy:
-    name: Redeploy after nuke
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2.3.4
-      - name: Load and Configure Terraform
-        uses: hashicorp/setup-terraform@v1.3.2
+      - name: Sleep for 30 seconds to allow terraform noticing the nuke
+        uses: jakejarvis/wait-action@master
         with:
-          terraform_version: 1.0.1
-          terraform_wrapper: false
-      - name: Terraform apply - development
+          time: '30s'
+      - name: Terraform apply - after nuke
         run: |
           echo "BEGIN: Redeploy after nuke"
           bash scripts/terraform-apply-after-nuke.sh
