@@ -7,6 +7,10 @@ mount -a
 chkconfig --add nomis_weblogic
 chkconfig --level 3 nomis_weblogic on
 
+# Create node_exporter service
+chkconfig --add node_exporter
+chkconfig --level 3 node_exporter on
+
 # Get instance-id for autoscaling lifecycle hook
 INSTANCE_ID=$(curl http://instance-data/latest/meta-data/instance-id)
 
