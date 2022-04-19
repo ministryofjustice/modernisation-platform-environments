@@ -3,8 +3,8 @@ name: nuke
 on:
   schedule:
     # * is a special character in YAML so you have to quote this string
-    # trigger every sunday at 10:00am
-    - cron: '0 10 * * 0'
+    # trigger every sunday at 12:00am
+    - cron: '0 12 * * 0'
   pull_request:
     branches:
       - main
@@ -16,7 +16,6 @@ on:
 env:
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  NUKE_ACCOUNT_IDS: ${{ secrets.NUKE_ACCOUNT_IDS }}
   NUKE_SKIP_ENVIRONMENTS: ${{ secrets.NUKE_SKIP_ENVIRONMENTS }}
   TF_IN_AUTOMATION: true
 defaults:
@@ -26,7 +25,7 @@ defaults:
 jobs:
 
   nuke:
-    name: Nuke
+    name: Redeploy after nuke
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -36,18 +35,8 @@ jobs:
         with:
           terraform_version: 1.0.1
           terraform_wrapper: false
-      - name: Install AWS Nuke
+      - name: Terraform apply - after nuke
         run: |
-          echo "BEGIN: Install AWS Nuke"
-          mkdir -p $HOME/bin
-          wget -c "https://github.com/rebuy-de/aws-nuke/releases/download/${AWS_NUKE_VERSION}/aws-nuke-${AWS_NUKE_VERSION}-linux-amd64.tar.gz" -O - | tar -xz -C $HOME/bin
-          mv "$HOME/bin/aws-nuke-${AWS_NUKE_VERSION}-linux-amd64" $HOME/bin/aws-nuke
-          chmod +x $HOME/bin/aws-nuke
-          echo "END: Install AWS Nuke"
-        env:
-          AWS_NUKE_VERSION: v2.16.0
-      - name: Nuke
-        run: |
-          echo "BEGIN: Nuke"
-          bash scripts/nuke.sh
-          echo "END: Nuke"
+          echo "BEGIN: Redeploy after nuke"
+          bash scripts/terraform-apply-after-nuke.sh
+          echo "END: Redeploy after nuke"
