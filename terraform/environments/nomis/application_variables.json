@@ -24,10 +24,6 @@
             },
             "weblogics": {
                 "CNOMT1": {
-                    "ami_name": "weblogic-2022-03-01*",
-                    "asg_max_size": 1
-                },
-                "Test": {
                     "ami_name": "weblogic-2022-04-19*",
                     "asg_max_size": 1
                 }
