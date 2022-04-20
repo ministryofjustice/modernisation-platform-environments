@@ -20,10 +20,21 @@
                     "asm_data_capacity": 200,
                     "asm_flash_capacity": 2,
                     "termination_protection": true
+                },
+                "Test": {
+                    "always_on": true,
+                    "ami_name": "nomis_db-2022-03-03*",
+                    "asm_data_capacity": 200,
+                    "asm_flash_capacity": 2,
+                    "termination_protection": true
                 }
             },
             "weblogics": {
                 "CNOMT1": {
+                    "ami_name": "weblogic-2022-03-01*",
+                    "asg_max_size": 1
+                },
+                "Test": {
                     "ami_name": "weblogic-2022-03-01*",
                     "asg_max_size": 1
                 }
