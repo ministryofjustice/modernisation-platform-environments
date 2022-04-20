@@ -20,7 +20,7 @@
           "chkconfig --add node_exporter",
           "chkconfig --level 3 node_exporter on",
           "echo 'Start Node Exporter'",
-          "service node_exporter start",
+          "service node_exporter start"
         ]
       }
     }
