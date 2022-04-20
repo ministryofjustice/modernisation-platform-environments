@@ -27,7 +27,7 @@
                     "ami_name": "weblogic-2022-04-19*",
                     "asg_max_size": 1
                 },
-                "Test": {
+                "Test2": {
                     "ami_name": "weblogic-2022-03-01*",
                     "asg_max_size": 1
                 }
