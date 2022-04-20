@@ -86,7 +86,7 @@ resource "aws_lb_listener" "listener_https" {
   port              = "443"
   protocol          = "HTTPS"
   ssl_policy      = "ELBSecurityPolicy-TLS-1-2-2017-01"
-  certificate_arn = data.aws_acm_certificate.equip_cert.arn
+  certificate_arn = aws_acm_certificate.lb_cert.arn
 
   default_action {
     target_group_arn = aws_lb_target_group.lb_tg_http.arn
