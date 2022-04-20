@@ -1,5 +1,5 @@
 resource "aws_instance" "db_mgmt_server" {
-  ami                         = "ami-0f9853ca76d115e7b"
+  ami                         = "ami-03e88be9ecff64781"
   associate_public_ip_address = false
   availability_zone           = "eu-west-2a"
   ebs_optimized               = true
