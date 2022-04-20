@@ -8,7 +8,7 @@
       "inputs": {
         "runCommand": [
           "echo 'Downloading Node Exporter tar from S3 bucket'",
-          "aws s3api get-object --bucket s3-bucket20210929163229537900000001 --key node-exporter/node_exporter-1.3.1.linux-amd64.tar.gz /tmp",
+          "aws s3api get-object --bucket s3-bucket20210929163229537900000001 --key node-exporter/node_exporter-1.3.1.linux-amd64.tar.gz /tmp/",
           "tar xf /tmp/node_exporter-1.3.1.linux-amd64.tar.gz",
           "yes | rm /tmp/node_exporter-1.3.1.linux-amd64.tar.gz",
           "cp /tmp/node_exporter-1.3.1.linux-amd64/node_exporter /usr/bin/",
