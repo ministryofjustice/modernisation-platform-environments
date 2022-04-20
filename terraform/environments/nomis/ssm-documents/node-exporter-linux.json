@@ -1,7 +1,6 @@
 {
   "schemaVersion": "2.2",
   "description": "Installs node exporter on Linux instances",
-  },
   "mainSteps": [
     {
       "action": "aws:runShellScript",
