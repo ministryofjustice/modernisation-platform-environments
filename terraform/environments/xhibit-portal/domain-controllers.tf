@@ -278,6 +278,6 @@ resource "aws_route53_resolver_rule" "app-to-sms" {
 resource "aws_route53_resolver_rule_association" "app-to-sms" {
   provider = aws.core-vpc
 
-  resolver_rule_id = aws_route53_resolver_rule.fwd.id
+  resolver_rule_id = aws_route53_resolver_rule.app-to-sms.id
   vpc_id           = local.vpc_id
 }
