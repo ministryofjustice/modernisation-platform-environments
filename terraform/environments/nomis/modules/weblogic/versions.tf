@@ -1,7 +1,7 @@
 terraform {
   required_providers {
     aws = {
-      version               = "~> 4.0"
+      version               = "~> 4.9"
       source                = "hashicorp/aws"
       configuration_aliases = [aws.core-vpc]
     }

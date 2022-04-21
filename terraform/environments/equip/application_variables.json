@@ -1,7 +1,8 @@
 {
     "accounts": {
         "development": {
-          "example_var": "dev-data"
+          "example_var": "dev-data",
+          "public_dns_name_web": "equip.hmpps-development.modernisation-platform.service.justice.gov.uk"
         },
         "test": {
           "example_var": "test-data"

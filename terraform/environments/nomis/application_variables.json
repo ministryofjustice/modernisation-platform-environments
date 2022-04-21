@@ -18,7 +18,8 @@
                     "always_on": true,
                     "ami_name": "nomis_db-2022-03-03*",
                     "asm_data_capacity": 200,
-                    "asm_flash_capacity": 2
+                    "asm_flash_capacity": 2,
+                    "termination_protection": true
                 }
             },
             "weblogics": {
@@ -27,6 +28,16 @@
                     "asg_max_size": 1
                 }
             }
+        },
+        "production": {
+            "database_external_access_cidr" : {
+                "azure_noms_live": "10.40.0.0/18",
+                "cloud_platform": "172.20.0.0/16"
+            },
+            "public_key": "",
+            "session_manager_log_retention_days": 395,
+            "databases": {},
+            "weblogics": {}     
         }
     }
 }
