@@ -1052,7 +1052,6 @@ resource "aws_security_group_rule" "aws_domain_security_group_ingress_21" {
   from_port                = 42
   to_port                  = 42
   source_security_group_id = aws_security_group.all_internal_groups.id
-
   security_group_id = aws_security_group.aws_domain_security_group.id
 }
 
@@ -1068,9 +1067,9 @@ resource "aws_security_group_rule" "aws_domain_security_group_ingress_22" {
 }
 
 resource "aws_security_group_rule" "aws_domain_security_group_ingress_23" {
+  description              = "Allow resolver endpoint to receive DNS requests"
   type                     = "ingress"
   protocol                 = "udp"
-  description              = "DNS UDP Traffic"
   from_port                = 53
   to_port                  = 53
   source_security_group_id = aws_security_group.aws_dns_resolver.id
@@ -1078,9 +1077,9 @@ resource "aws_security_group_rule" "aws_domain_security_group_ingress_23" {
 }
 
 resource "aws_security_group_rule" "aws_domain_security_group_ingress_24" {
+  description              = "Allow resolver endpoint to receive DNS requests"
   type                     = "ingress"
   protocol                 = "tcp"
-  description              = "DNS TCP Traffic"
   from_port                = 53
   to_port                  = 53
   source_security_group_id = aws_security_group.aws_dns_resolver.id
@@ -1357,6 +1356,7 @@ resource "aws_security_group" "aws_dns_resolver" {
 }
 
 resource "aws_security_group_rule" "allow_tcp_53_in" {
+  description       = "Allow resolver endpoint to receive DNS requests"
   from_port         = 53
   protocol          = "TCP"
   security_group_id = aws_security_group.aws_dns_resolver.id
@@ -1366,6 +1366,7 @@ resource "aws_security_group_rule" "allow_tcp_53_in" {
 }
 
 resource "aws_security_group_rule" "allow_udp_53_in" {
+  description       = "Allow resolver endpoint to receive DNS requests"
   from_port         = 53
   protocol          = "UDP"
   security_group_id = aws_security_group.aws_dns_resolver.id
@@ -1375,6 +1376,7 @@ resource "aws_security_group_rule" "allow_udp_53_in" {
 }
 
 resource "aws_security_group_rule" "allow_tcp_53_out" {
+  description              = "Allow resolver endpoint to forward DNS requests"
   from_port                = 53
   protocol                 = "TCP"
   security_group_id        = aws_security_group.aws_dns_resolver.id
@@ -1384,6 +1386,7 @@ resource "aws_security_group_rule" "allow_tcp_53_out" {
 }
 
 resource "aws_security_group_rule" "allow_udp_53_out" {
+  description              = "Allow resolver endpoint to forward DNS requests"
   from_port                = 53
   protocol                 = "UDP"
   security_group_id        = aws_security_group.aws_dns_resolver.id
