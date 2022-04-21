@@ -4,7 +4,6 @@ failed_envs=()
 for d in terraform/environments/*; do
   exit_code=0
   dir_name=$(basename "$d")
-  dir_name_upper_case=${dir_name^^}
   echo "Search for development workspace to perform terraform apply in $d"
   bash scripts/terraform-init.sh "$d" || exit_code=$?
   tf_workspaces=$(terraform -chdir="$d" workspace list) || exit_code=$?
