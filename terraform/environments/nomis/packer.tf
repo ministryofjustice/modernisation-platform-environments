@@ -269,21 +269,15 @@ data "aws_iam_policy_document" "packer_s3_bucket_access" {
   statement {
     effect = "Allow"
     actions = [
-      "s3:GetObject"
-    ]
-    resources = ["${module.s3-bucket.bucket.arn}/*"]
-  }
-  statement {
-    effect = "Allow"
-    actions = [
+      "s3:GetObject",
       "s3:ListBucket"
     ]
-    resources = ["${module.s3-bucket.bucket.arn}"]
-    condition {
-      test     = "StringLike"
-      variable = "s3:prefix"
-      values   = ["DB_BKP/CNOMT_20211214/*"]
-    }
+    resources = [
+      module.s3-bucket.bucket.arn,
+      module.nomis-db-backup-bucket.arn,
+      "${module.s3-bucket.bucket.arn}/*",
+      "${module.nomis-db-backup-bucket.arn}/*"
+    ]
   }
 }
 
