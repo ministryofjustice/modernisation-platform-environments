@@ -1072,7 +1072,7 @@ resource "aws_security_group_rule" "aws_domain_security_group_ingress_23" {
   protocol                 = "udp"
   from_port                = 53
   to_port                  = 53
-  source_security_group_id = aws_security_group.aws_dns_resolver.id
+  cidr_blocks              = [data.aws_vpc.shared.cidr_block]
   security_group_id        = aws_security_group.aws_domain_security_group.id
 }
 
@@ -1082,7 +1082,7 @@ resource "aws_security_group_rule" "aws_domain_security_group_ingress_24" {
   protocol                 = "tcp"
   from_port                = 53
   to_port                  = 53
-  source_security_group_id = aws_security_group.aws_dns_resolver.id
+  cidr_blocks              = [data.aws_vpc.shared.cidr_block]
   security_group_id        = aws_security_group.aws_domain_security_group.id
 }
 
@@ -1347,6 +1347,7 @@ resource "aws_security_group_rule" "all_internal_groups_egress" {
 }
 
 resource "aws_security_group" "aws_dns_resolver" {
+  provider = aws.core-vpc
   name        = "dns_resolver"
   description = "Security Group for DNS resolver request"
   vpc_id      = data.aws_vpc.shared.id
@@ -1382,7 +1383,7 @@ resource "aws_security_group_rule" "allow_tcp_53_out" {
   security_group_id        = aws_security_group.aws_dns_resolver.id
   to_port                  = 53
   type                     = "egress"
-  source_security_group_id = aws_security_group.aws_domain_security_group.id
+  cidr_blocks              = [data.aws_vpc.shared.cidr_block]
 }
 
 resource "aws_security_group_rule" "allow_udp_53_out" {
@@ -1392,5 +1393,5 @@ resource "aws_security_group_rule" "allow_udp_53_out" {
   security_group_id        = aws_security_group.aws_dns_resolver.id
   to_port                  = 53
   type                     = "egress"
-  source_security_group_id = aws_security_group.aws_domain_security_group.id
+  cidr_blocks              = [data.aws_vpc.shared.cidr_block]
 }
