@@ -1099,6 +1099,166 @@ resource "aws_security_group_rule" "aws_domain_security_group_egress_1" {
   security_group_id = aws_security_group.aws_domain_security_group.id
 }
 
+resource "aws_security_group_rule" "egress_tcp_88" {
+  description       = "Allow internal Kerberos key distribution center traffic"
+  from_port         = 88
+  protocol          = "TCP"
+  security_group_id = aws_security_group.aws_domain_security_group.id
+  source_security_group_id = aws_security_group.aws_domain_security_group.id
+  to_port           = 88
+  type              = "egress"
+}
+
+resource "aws_security_group_rule" "ingress_tcp_88" {
+  description       = "Allow internal Kerberos key distribution center traffic"
+  from_port         = 88
+  protocol          = "TCP"
+  security_group_id = aws_security_group.aws_domain_security_group.id
+  source_security_group_id = aws_security_group.aws_domain_security_group.id
+  to_port           = 88
+  type              = "ingress"
+}
+
+resource "aws_security_group_rule" "egress_tcp_135" {
+  description       = "Allow internal RPC traffic"
+  from_port         = 135
+  protocol          = "TCP"
+  security_group_id = aws_security_group.aws_domain_security_group.id
+  source_security_group_id = aws_security_group.aws_domain_security_group.id
+  to_port           = 135
+  type              = "egress"
+}
+
+resource "aws_security_group_rule" "ingress_tcp_135" {
+  description       = "Allow internal RPC traffic"
+  from_port         = 135
+  protocol          = "TCP"
+  security_group_id = aws_security_group.aws_domain_security_group.id
+  source_security_group_id = aws_security_group.aws_domain_security_group.id
+  to_port           = 135
+  type              = "ingress"
+}
+
+resource "aws_security_group_rule" "egress_tcp_139" {
+  description       = "Allow internal NetBIOS traffic"
+  from_port         = 139
+  protocol          = "TCP"
+  security_group_id = aws_security_group.aws_domain_security_group.id
+  source_security_group_id = aws_security_group.aws_domain_security_group.id
+  to_port           = 139
+  type              = "egress"
+}
+
+resource "aws_security_group_rule" "ingress_tcp_139" {
+  description       = "Allow internal NetBIOS traffic"
+  from_port         = 139
+  protocol          = "TCP"
+  security_group_id = aws_security_group.aws_domain_security_group.id
+  source_security_group_id = aws_security_group.aws_domain_security_group.id
+  to_port           = 139
+  type              = "ingress"
+}
+
+resource "aws_security_group_rule" "egress_tcp_389" {
+  description       = "Allow internal LDAP traffic"
+  from_port         = 389
+  protocol          = "TCP"
+  security_group_id = aws_security_group.aws_domain_security_group.id
+  source_security_group_id = aws_security_group.aws_domain_security_group.id
+  to_port           = 389
+  type              = "egress"
+}
+
+resource "aws_security_group_rule" "ingress_tcp_389" {
+  description       = "Allow internal LDAP traffic"
+  from_port         = 389
+  protocol          = "TCP"
+  security_group_id = aws_security_group.aws_domain_security_group.id
+  source_security_group_id = aws_security_group.aws_domain_security_group.id
+  to_port           = 389
+  type              = "ingress"
+}
+
+resource "aws_security_group_rule" "egress_tcp_445" {
+  description       = "Allow internal SMB traffic"
+  from_port         = 445
+  protocol          = "TCP"
+  security_group_id = aws_security_group.aws_domain_security_group.id
+  source_security_group_id = aws_security_group.aws_domain_security_group.id
+  to_port           = 445
+  type              = "egress"
+}
+
+resource "aws_security_group_rule" "ingress_tcp_445" {
+  description       = "Allow internal SMB traffic"
+  from_port         = 445
+  protocol          = "TCP"
+  security_group_id = aws_security_group.aws_domain_security_group.id
+  source_security_group_id = aws_security_group.aws_domain_security_group.id
+  to_port           = 445
+  type              = "ingress"
+}
+
+resource "aws_security_group_rule" "egress_udp_53" {
+  description       = "Allow internal DNS traffic"
+  from_port         = 53
+  protocol          = "UDP"
+  security_group_id = aws_security_group.aws_domain_security_group.id
+  source_security_group_id = aws_security_group.aws_domain_security_group.id
+  to_port           = 53
+  type              = "egress"
+}
+
+resource "aws_security_group_rule" "ingress_udp_53" {
+  description       = "Allow internal DNS traffic"
+  from_port         = 53
+  protocol          = "TCP"
+  security_group_id = aws_security_group.aws_domain_security_group.id
+  source_security_group_id = aws_security_group.aws_domain_security_group.id
+  to_port           = 53
+  type              = "ingress"
+}
+
+resource "aws_security_group_rule" "egress_udp_389" {
+  description       = "Allow internal LDAP traffic"
+  from_port         = 389
+  protocol          = "UDP"
+  security_group_id = aws_security_group.aws_domain_security_group.id
+  source_security_group_id = aws_security_group.aws_domain_security_group.id
+  to_port           = 389
+  type              = "egress"
+}
+
+resource "aws_security_group_rule" "ingress_udp_389" {
+  description       = "Allow internal DNS traffic"
+  from_port         = 389
+  protocol          = "TCP"
+  security_group_id = aws_security_group.aws_domain_security_group.id
+  source_security_group_id = aws_security_group.aws_domain_security_group.id
+  to_port           = 389
+  type              = "ingress"
+}
+
+resource "aws_security_group_rule" "egress_tcp_49152-65535" {
+  description       = "Allow internal DNS traffic"
+  from_port         = 49512
+  protocol          = "UDP"
+  security_group_id = aws_security_group.aws_domain_security_group.id
+  source_security_group_id = aws_security_group.aws_domain_security_group.id
+  to_port           = 65535
+  type              = "egress"
+}
+
+resource "aws_security_group_rule" "ingress_tcp_49152-65535" {
+  description       = "Allow internal DNS traffic"
+  from_port         = 49512
+  protocol          = "TCP"
+  security_group_id = aws_security_group.aws_domain_security_group.id
+  source_security_group_id = aws_security_group.aws_domain_security_group.id
+  to_port           = 65535
+  type              = "ingress"
+}
+
 #############################################################
 
 #All Internal Security Group
