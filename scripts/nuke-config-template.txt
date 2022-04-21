@@ -63,6 +63,9 @@ accounts:
   "$SPRINKLER_DEVELOPMENT_ACCID": # SPRINKLER_DEVELOPMENT_ACCID
     presets:
       - "common"
+  "$PERFORMANCE_HUB_DEVELOPMENT_ACCID": # PERFORMANCE_HUB_DEVELOPMENT_ACCID
+    presets:
+      - "common"
 
 presets:
   common:
