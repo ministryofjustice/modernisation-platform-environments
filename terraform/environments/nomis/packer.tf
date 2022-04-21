@@ -18,10 +18,10 @@ data "aws_iam_policy_document" "packer_member_policy" {
 
 # attach inline policy
 resource "aws_iam_group_policy" "packer_member_policy" {
-  count = local.environment == "test" ? 1: 0
+  count  = local.environment == "test" ? 1 : 0
   name   = "packer-member-policy"
   policy = data.aws_iam_policy_document.packer_member_policy.json
-  group = "packer-member-group"
+  group  = "packer-member-group"
 }
 
 # Role to provide required packer permissions

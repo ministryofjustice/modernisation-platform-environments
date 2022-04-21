@@ -224,8 +224,8 @@ resource "aws_acm_certificate_validation" "internal_lb" {
 #------------------------------------------------------------------------------
 
 resource "aws_route53_zone" "az" {
-  count = local.environment == "test" ? 1: 0
-  name = "modernisation-platform.nomis.az.justice.gov.uk"
+  count = local.environment == "test" ? 1 : 0
+  name  = "modernisation-platform.nomis.az.justice.gov.uk"
   tags = merge(
     local.tags,
     {
@@ -235,7 +235,7 @@ resource "aws_route53_zone" "az" {
 }
 
 resource "aws_route53_record" "internal_lb_az" {
-  count = local.environment == "test" ? 1: 0
+  count   = local.environment == "test" ? 1 : 0
   zone_id = aws_route53_zone.az[0].zone_id
   name    = "*.${aws_route53_zone.az[0].name}"
   type    = "A"
@@ -248,7 +248,7 @@ resource "aws_route53_record" "internal_lb_az" {
 }
 
 resource "aws_acm_certificate" "internal_lb_az" {
-  count = local.environment == "test" ? 1: 0
+  count             = local.environment == "test" ? 1 : 0
   domain_name       = aws_route53_zone.az[0].name
   validation_method = "DNS"
 
@@ -284,7 +284,7 @@ resource "aws_route53_record" "internal_lb_validation_az" {
 }
 
 resource "aws_acm_certificate_validation" "internal_lb_az" {
-  count = local.environment == "test" ? 1: 0
+  count                   = local.environment == "test" ? 1 : 0
   certificate_arn         = aws_acm_certificate.internal_lb_az[0].arn
   validation_record_fqdns = [for record in aws_route53_record.internal_lb_validation_az : record.fqdn]
 }
