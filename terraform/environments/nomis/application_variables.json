@@ -20,7 +20,13 @@
                     "asm_data_capacity": 200,
                     "asm_flash_capacity": 2,
                     "termination_protection": true
-                }
+                },
+                "TEST-STIG": {
+                    "always_on": false,
+                    "ami_name": "nomis_db_CNOMT1-2022-03-04*",
+                    "asm_data_capacity": 100,
+                    "asm_flash_capacity": 2
+                },
             },
             "weblogics": {
                 "CNOMT1": {
