@@ -93,7 +93,7 @@ data "aws_iam_policy_document" "session_manager_logging" {
   }
 }
 
-# combine ec2-common policy documents 
+# combine ec2-common policy documents
 data "aws_iam_policy_document" "ec2_common_combined" {
   source_policy_documents = [
     data.aws_iam_policy_document.ssm_custom.json,
@@ -274,13 +274,40 @@ resource "aws_ssm_association" "update_ssm_agent" {
 }
 
 #------------------------------------------------------------------------------
+# Node Exporter - Install/Start Node Exporter Service
+#------------------------------------------------------------------------------
+
+resource "aws_ssm_document" "node_exporter_linux" {
+  name            = "InstallNodeExporterLinux"
+  document_type   = "Command"
+  document_format = "JSON"
+  content         = file("./ssm-documents/node-exporter-linux.json")
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "install-node-exporter-linux"
+    },
+  )
+}
+
+resource "aws_ssm_association" "node_exporter_linux" {
+  name             = aws_ssm_document.node_exporter_linux.name
+  association_name = "node-exporter-linux"
+  targets {
+    key    = "tag:os_type"
+    values = ["Linux"]
+  }
+}
+
+#------------------------------------------------------------------------------
 # Scheduled overnight shutdown
 # This is a pretty basic implementation until Mod Platform build a platform
 # wide solution.  State Manager does not allow cron expressions like MON-FRI
 # so we need to create a separate association for each day in order to deal with
-# weekends.  Alternatively we could use Eventbridge rules as a trigger, but its 
+# weekends.  Alternatively we could use Eventbridge rules as a trigger, but its
 # slightly more complex to setup the IAM roles for that.
-# 
+#
 # Note that instances created throught the Weblogic module are not in scope as
 # they are managed by an autoscaling group, and therefore are not tagged as targets
 #------------------------------------------------------------------------------
@@ -344,7 +371,7 @@ resource "aws_iam_role" "ssm_ec2_start_stop" {
   )
   managed_policy_arns = [
     "arn:aws:iam::aws:policy/service-role/AmazonSSMAutomationRole"
-    # todo: This policy gives a lot of permissions. We should create a custom policy if we keep the solution long term 
+    # todo: This policy gives a lot of permissions. We should create a custom policy if we keep the solution long term
   ]
   tags = merge(
     local.tags,
