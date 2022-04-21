@@ -1351,9 +1351,6 @@ resource "aws_security_group" "aws_dns_resolver" {
   name        = "dns_resolver"
   description = "Security Group for DNS resolver request"
   vpc_id      = data.aws_vpc.shared.id
-
-  tags = { Name = "dns_resolver"
-  }
 }
 
 resource "aws_security_group_rule" "allow_tcp_53_in" {
