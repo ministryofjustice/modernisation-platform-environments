@@ -17,6 +17,8 @@ cat ./scripts/nuke-config-template.txt | envsubst >nuke-config.yml
 
 export AWS_REGION=eu-west-2
 
+nuked_envs=()
+skipped_envs=()
 failed_envs=()
 for d in terraform/environments/*; do
   dir_name=$(basename "$d")
@@ -45,10 +47,13 @@ for d in terraform/environments/*; do
 
           if [ $exit_code -ne 0 ]; then
             failed_envs+=("${dir_name}-development")
+          else
+            nuked_envs+=("${dir_name}-development")
           fi
           echo "END: nuke ${dir_name}-development"
         else
           echo "Skipped nuking ${dir_name}-development because of the env variable NUKE_SKIP_ENVIRONMENTS=${NUKE_SKIP_ENVIRONMENTS}"
+          skipped_envs+=("${dir_name}-development")
         fi
       else
         echo "No development workspace was found to nuke in $d"
@@ -56,8 +61,19 @@ for d in terraform/environments/*; do
     fi
   else
     echo "Skipped nuking ${dir_name} because of the env variable NUKE_SKIP_ENVIRONMENTS=${NUKE_SKIP_ENVIRONMENTS}"
+    skipped_envs+=("${dir_name}")
   fi
 done
+
+echo "Nuke complete: ${#nuked_envs[@]} nuked, ${#skipped_envs[@]} skipped, ${#failed_envs[@]} failed."
+
+if [ ${#nuked_envs[@]} -ne 0 ]; then
+  echo "Nuked environments: ${nuked_envs[@]}"
+fi
+
+if [ ${#skipped_envs[@]} -ne 0 ]; then
+  echo "Skipped environments: ${skipped_envs[@]}"
+fi
 
 if [ ${#failed_envs[@]} -ne 0 ]; then
   echo "ERROR: could not nuke environments: ${failed_envs[@]}"
