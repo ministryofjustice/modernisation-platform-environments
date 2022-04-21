@@ -20,12 +20,6 @@
                     "asm_data_capacity": 200,
                     "asm_flash_capacity": 2,
                     "termination_protection": true
-                },
-                "TEST-STIG": {
-                    "always_on": false,
-                    "ami_name": "nomis_db_STIG-2022-04-20*",
-                    "asm_data_capacity": 100,
-                    "asm_flash_capacity": 2
                 }
             },
             "weblogics": {
