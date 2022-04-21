@@ -13,13 +13,17 @@ for d in terraform/environments/*; do
   else
     if [[ "$tf_workspaces" == *"${dir_name}-development"* ]]; then
       if [[ "$NUKE_SKIP_ENVIRONMENTS" != *"${dir_name}-development"* ]]; then
-        echo "BEGIN: terraform apply ${dir_name}-development"
-        terraform -chdir="$d" workspace select "${dir_name}-development" || EXIT_CODE=$?
-        bash scripts/terraform-apply.sh "$d" || EXIT_CODE=$?
-        if [ $EXIT_CODE -ne 0 ]; then
-          FAILED_ENVS+=("${dir_name}-development")
+        if [[ "$NUKE_DO_NOT_RECREATE_ENVIRONMENTS" != *"${dir_name}-development"* ]]; then
+          echo "BEGIN: terraform apply ${dir_name}-development"
+          terraform -chdir="$d" workspace select "${dir_name}-development" || EXIT_CODE=$?
+          bash scripts/terraform-apply.sh "$d" || EXIT_CODE=$?
+          if [ $EXIT_CODE -ne 0 ]; then
+            FAILED_ENVS+=("${dir_name}-development")
+          fi
+          echo "END: terraform apply ${dir_name}-development"
+        else
+          echo "Skipped terraform apply for ${dir_name}-development because of the env variable NUKE_DO_NOT_RECREATE_ENVIRONMENTS=${NUKE_DO_NOT_RECREATE_ENVIRONMENTS}"
         fi
-        echo "END: terraform apply ${dir_name}-development"
       else
         echo "Skipped terraform apply for ${dir_name}-development because of the env variable NUKE_SKIP_ENVIRONMENTS=${NUKE_SKIP_ENVIRONMENTS}"
       fi
