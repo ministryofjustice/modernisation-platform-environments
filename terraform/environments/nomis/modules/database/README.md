@@ -45,6 +45,9 @@ module "database" {
 }
 ```
 
+## Upgrading the AMI
+If you upgrade the AMI used by the instance, the instance will be destroyed, however as the ebs volumes are managed as separate resources it is possible to retain the ebs snapshots.  Currently the ebs volumes associated with the database DATA and FLASH disk groups have a lifecycle argument to ignore changes to the snapshot id, thus upgrading the AMI will not destroy the data stored on these volumes.  It should then be possible to do an in place upgrade of the AMI without losing the database data.  This has been tested with the `CNOMT1` AMI.  For other AMIs additional steps will be required to add and open the retained database.
+
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 
