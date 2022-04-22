@@ -58,6 +58,15 @@ resource "aws_security_group" "jumpserver-windows" {
   description = "Configure Windows jumpserver egress"
   name        = "jumpserver-windows-${local.application_name}"
   vpc_id      = local.vpc_id
+
+  ingress {
+    description = "access from Cloud Platform Prometheus server"
+    from_port   = "9182"
+    to_port     = "9182"
+    protocol    = "TCP"
+    cidr_blocks = ["172.20.0.0/16"]
+  }
+
   egress {
     description = "allow all"
     from_port   = 0
