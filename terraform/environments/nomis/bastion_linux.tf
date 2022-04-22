@@ -31,6 +31,11 @@ module "bastion_linux" {
   region        = "eu-west-2"
 
   # Tags
-  tags_common = local.tags
+  tags_common = merge(
+    local.tags,
+    {
+      os_type = "Linux"
+    }
+  )
   tags_prefix = terraform.workspace
 }

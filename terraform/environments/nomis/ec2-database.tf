@@ -73,6 +73,14 @@ resource "aws_security_group" "database_common" {
     ]
   }
 
+  ingress {
+    description = "access from Cloud Platform Prometheus server"
+    from_port   = "9100"
+    to_port     = "9100"
+    protocol    = "TCP"
+    cidr_blocks = [local.application_data.accounts[local.environment].database_external_access_cidr.cloud_platform]
+  }
+
   egress {
     description = "allow all"
     from_port   = 0
