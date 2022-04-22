@@ -64,7 +64,7 @@ resource "aws_security_group" "jumpserver-windows" {
     from_port   = "9182"
     to_port     = "9182"
     protocol    = "TCP"
-    cidr_blocks = ["172.20.0.0/16"]
+    cidr_blocks = [local.application_data.accounts[local.environment].database_external_access_cidr.cloud_platform]
   }
 
   egress {
