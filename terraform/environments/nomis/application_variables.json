@@ -10,7 +10,7 @@
             "databases": {
                 "CNOMT1": {
                     "always_on": false,
-                    "ami_name": "nomis_db_CNOMT1-2022-03-04*",
+                    "ami_name": "nomis_db_STIG_CNOMT1-2022-04-21*",
                     "asm_data_capacity": 100,
                     "asm_flash_capacity": 2
                 },
