@@ -1,41 +1,11 @@
 #------------------------------------------------------------------------------
 # Resources required for Packer
+# Packer CICD user & group created manually as pipeline does not have
+# required permissions.
+# Packer user is only available in the Test account.  To avoid excessive use
+# of count, roles and policies are created in all accounts but not attached
+# to an IAM user (through use of count)
 #------------------------------------------------------------------------------
-
-
-#------------------------------------------------------------------------------
-# Packer CICD User - user & group created manually as pipeline does not have
-# required permissions
-#------------------------------------------------------------------------------
-
-# resource "aws_iam_user" "packer_member_user" {
-#   name = "packer-member-user"
-# }
-
-data "aws_iam_user" "packer_member_user" {
-  user_name = "packer-member-user"
-}
-
-# resource "aws_iam_access_key" "packer_member_user_key" {
-#   user = aws_iam_user.packer_member_user.name
-# }
-# resource "aws_iam_group" "packer_member_group" {
-#   name = "packer-member-group"
-# }
-
-data "aws_iam_group" "packer_member_group" {
-  group_name = "packer-member-group"
-}
-
-# resource "aws_iam_group_membership" "packer_member" {
-#   name = "packer-member-group-membership"
-
-#   users = [
-#     aws_iam_user.packer_member_user.name
-#   ]
-
-#   group = aws_iam_group.packer_member_group.name
-# }
 
 # build policy json for packer group member policy
 data "aws_iam_policy_document" "packer_member_policy" {
@@ -48,10 +18,10 @@ data "aws_iam_policy_document" "packer_member_policy" {
 
 # attach inline policy
 resource "aws_iam_group_policy" "packer_member_policy" {
+  count  = local.environment == "test" ? 1 : 0
   name   = "packer-member-policy"
   policy = data.aws_iam_policy_document.packer_member_policy.json
-  # group      = aws_iam_group.packer_member_group.name
-  group = "packer-member-group"
+  group  = "packer-member-group"
 }
 
 # Role to provide required packer permissions
@@ -66,7 +36,7 @@ data "aws_iam_policy_document" "packer_assume_role_policy" {
     }
     principals {
       type        = "AWS"
-      identifiers = [data.aws_iam_user.packer_member_user.arn]
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.id}:user/packer-member-user"]
     }
   }
 }
@@ -299,21 +269,15 @@ data "aws_iam_policy_document" "packer_s3_bucket_access" {
   statement {
     effect = "Allow"
     actions = [
-      "s3:GetObject"
-    ]
-    resources = ["${module.s3-bucket.bucket.arn}/*"]
-  }
-  statement {
-    effect = "Allow"
-    actions = [
+      "s3:GetObject",
       "s3:ListBucket"
     ]
-    resources = ["${module.s3-bucket.bucket.arn}"]
-    condition {
-      test     = "StringLike"
-      variable = "s3:prefix"
-      values   = ["DB_BKP/CNOMT_20211214/*"]
-    }
+    resources = [
+      module.s3-bucket.bucket.arn,
+      module.nomis-db-backup-bucket.bucket.arn,
+      "${module.s3-bucket.bucket.arn}/*",
+      "${module.nomis-db-backup-bucket.bucket.arn}/*"
+    ]
   }
 }
 

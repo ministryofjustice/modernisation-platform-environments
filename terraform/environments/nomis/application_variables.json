@@ -10,7 +10,7 @@
             "databases": {
                 "CNOMT1": {
                     "always_on": false,
-                    "ami_name": "nomis_db_CNOMT1-2022-03-04*",
+                    "ami_name": "nomis_db_STIG_CNOMT1-2022-04-21*",
                     "asm_data_capacity": 100,
                     "asm_flash_capacity": 2
                 },
@@ -24,10 +24,20 @@
             },
             "weblogics": {
                 "CNOMT1": {
-                    "ami_name": "weblogic-2022-04-19*",
+                    "ami_name": "weblogic-2022-03-01*",
                     "asg_max_size": 1
                 }
             }
+        },
+        "production": {
+            "database_external_access_cidr" : {
+                "azure_noms_live": "10.40.0.0/18",
+                "cloud_platform": "172.20.0.0/16"
+            },
+            "public_key": "",
+            "session_manager_log_retention_days": 395,
+            "databases": {},
+            "weblogics": {}     
         }
     }
 }
