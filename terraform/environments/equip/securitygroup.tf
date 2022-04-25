@@ -178,6 +178,28 @@ resource "aws_security_group_rule" "aws_citrix_security_group_egress_1" {
   security_group_id = aws_security_group.aws_citrix_security_group.id
 }
 
+resource "aws_security_group_rule" "ingress_ctx_host_internal_traffic" {
+  for_each                 = local.application_data.ctx_internal_rules
+  description              = format("CTX host internal traffic for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.citrix_adc.id
+  to_port                  = each.value.to_port
+  type                     = "ingress"
+  source_security_group_id = aws_security_group.citrix_adc.id
+}
+
+resource "aws_security_group_rule" "egress_ctx_host_internal_traffic" {
+  for_each                 = local.application_data.ctx_internal_rules
+  description              = format("CTX host internal traffic for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.citrix_adc.id
+  to_port                  = each.value.to_port
+  type                     = "egress"
+  source_security_group_id = aws_security_group.citrix_adc.id
+}
+
 ############################################################################
 
 #AWS Equip Security Group
