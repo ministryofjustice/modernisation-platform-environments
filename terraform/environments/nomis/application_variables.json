@@ -35,7 +35,7 @@
                 "cloud_platform": "172.20.0.0/16"
             },
             "public_key": "",
-            "session_manager_log_retention_days": 395,
+            "session_manager_log_retention_days": 400,
             "databases": {},
             "weblogics": {}     
         }
