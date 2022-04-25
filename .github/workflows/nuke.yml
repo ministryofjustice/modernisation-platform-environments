@@ -10,7 +10,7 @@ env:
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   NUKE_ACCOUNT_IDS: ${{ secrets.NUKE_ACCOUNT_IDS }}
-  NUKE_SKIP_ENVIRONMENTS: ${{ secrets.NUKE_SKIP_ENVIRONMENTS }}
+  NUKE_SKIP_ENVIRONMENTS: nomis,xhibit-portal-development,equip-development,tariff-development,
   TF_IN_AUTOMATION: true
 defaults:
   run:
