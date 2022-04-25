@@ -77,6 +77,8 @@ data "aws_iam_policy_document" "packer_minimum_permissions" {
       "ec2:DescribeSubnets",
       "ec2:DescribeTags",
       "ec2:DescribeVolumes",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*",
       "ec2:ModifyImageAttribute",
       "ec2:ModifySnapshotAttribute",
       "ec2:RegisterImage",
