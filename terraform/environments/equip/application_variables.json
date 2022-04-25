@@ -77,8 +77,8 @@
       "protocol": "TCP"
     },
     "UDP_16500-16509": {
-      "from_port": 443,
-      "to_port": 443,
+      "from_port": 16500,
+      "to_port": 16509,
       "protocol": "UDP"
     }
   }
