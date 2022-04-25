@@ -100,7 +100,7 @@ resource "aws_s3_bucket_policy" "this" {
     },
     {
 
-       "Sid": "S3PolicyStmt-DO-NOT-MODIFY-1648624790828",
+       "Sid": "S3PolicyStmt",
        "Effect": "Allow",
        "Principal": {
            "Service": "logging.s3.amazonaws.com"
