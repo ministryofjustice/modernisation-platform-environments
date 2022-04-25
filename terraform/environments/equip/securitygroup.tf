@@ -180,6 +180,7 @@ resource "aws_security_group_rule" "aws_citrix_security_group_egress_1" {
 
 resource "aws_security_group_rule" "ingress_ctx_host_internal_traffic" {
   for_each                 = local.application_data.ctx_internal_rules
+  description              = "CTX host internal traffic"
   from_port                = each.value.from_port
   protocol                 = each.value.protocol
   security_group_id        = aws_security_group.citrix_adc.id
@@ -190,6 +191,7 @@ resource "aws_security_group_rule" "ingress_ctx_host_internal_traffic" {
 
 resource "aws_security_group_rule" "egress_ctx_host_internal_traffic" {
   for_each                 = local.application_data.ctx_internal_rules
+  description              = "CTX host internal traffic"
   from_port                = each.value.from_port
   protocol                 = each.value.protocol
   security_group_id        = aws_security_group.citrix_adc.id
