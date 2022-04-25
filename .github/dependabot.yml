@@ -20,6 +20,14 @@ updates:
   schedule:
     interval: "daily"
 - package-ecosystem: "terraform"
+  directory: "/terraform/environments/equip/acm-dns"
+  schedule:
+    interval: "daily"
+- package-ecosystem: "terraform"
+  directory: "/terraform/environments/equip/ec2-instance-module"
+  schedule:
+    interval: "daily"
+- package-ecosystem: "terraform"
   directory: "/terraform/environments/nomis"
   schedule:
     interval: "daily"
