@@ -18,6 +18,7 @@ module "database" {
   asm_data_capacity  = each.value.asm_data_capacity
   asm_flash_capacity = each.value.asm_flash_capacity
 
+  ami_owner              = try(each.value.ami_owner, null)
   asm_data_iops          = try(each.value.asm_data_iops, null)
   asm_data_throughput    = try(each.value.asm_data_throughput, null)
   asm_flash_iops         = try(each.value.asm_flash_iops, null)

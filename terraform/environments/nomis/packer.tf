@@ -150,7 +150,7 @@ data "aws_iam_policy_document" "packer_minimum_permissions" {
   }
 
   statement { # need so Packer can use CMK to encrypt snapshots so can be shared with other accounts
-    effect  = "Allow"
+    effect = "Allow"
     actions = [
       "kms:Encrypt",
       "kms:Decrypt",
@@ -159,7 +159,7 @@ data "aws_iam_policy_document" "packer_minimum_permissions" {
       "kms:GenerateDataKey*",
       "kms:DescribeKey",
       "kms:CreateGrant"
-      ]
+    ]
     resources = [try(aws_kms_key.nomis-cmk[0].arn, "*")] # this is like this because CMK does not exist in prod
   }
 }
