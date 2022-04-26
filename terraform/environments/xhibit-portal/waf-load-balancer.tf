@@ -246,6 +246,10 @@ resource "aws_wafv2_web_acl" "waf_acl" {
     name     = "block-non-gb"
     priority = 0
 
+    action {
+      allow {}
+    }
+
     statement {
       geo_match_statement {
         country_codes = ["GB"]
