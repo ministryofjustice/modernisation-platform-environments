@@ -854,7 +854,7 @@ resource "aws_security_group_rule" "ingress_hosts_to_domain_contoller_traffic" {
   security_group_id        = aws_security_group.aws_domain_security_group.id
   to_port                  = each.value.to_port
   type                     = "ingress"
-  source_security_group_id = aws_security_group.aws_domain_security_group.id
+  source_security_group_id = aws_security_group.all_internal_groups.id
 }
 
 resource "aws_security_group_rule" "aws_domain_security_group_ingress_udp_53" {
