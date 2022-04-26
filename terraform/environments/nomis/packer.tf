@@ -187,7 +187,7 @@ data "aws_iam_policy_document" "packer_ssm_permissions" {
       "ssm:TerminateSession",
       "ssm:ResumeSession"
     ]
-    resources = ["arn:aws:ssm:eu-west-2:${data.aws_caller_identity.current.id}:session/&{aws:username}-*"]
+    resources = ["arn:aws:ssm:eu-west-2:${data.aws_caller_identity.current.id}:session/packer-member-user-*"]
   }
   statement {
     effect    = "Allow"
