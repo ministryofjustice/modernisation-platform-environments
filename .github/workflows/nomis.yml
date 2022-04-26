@@ -71,6 +71,7 @@ jobs:
 #           TF_ENV: development
 
   plan-all-environments:
+    name: Plan nomis
     strategy: 
       matrix:
         tf-env: [test, production]

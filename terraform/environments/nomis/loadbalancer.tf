@@ -267,7 +267,7 @@ resource "aws_acm_certificate" "internal_lb_az" {
 }
 
 locals {
-  domain_validation_options = length(aws_acm_certificate.internal_lb_az) > 0 ? aws_acm_certificate.internal_lb_az[0].domain_validation_options : []
+  domain_validation_options = try(aws_acm_certificate.internal_lb_az[0].domain_validation_options, [])
 }
 
 resource "aws_route53_record" "internal_lb_validation_az" { 

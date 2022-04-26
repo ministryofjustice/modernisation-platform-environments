@@ -160,7 +160,7 @@ data "aws_iam_policy_document" "packer_minimum_permissions" {
       "kms:DescribeKey",
       "kms:CreateGrant"
       ]
-    resources = [aws_kms_key.nomis-cmk[0].arn]
+    resources = [try(aws_kms_key.nomis-cmk[0].arn, "*")] # this is like this because CMK does not exist in prod
   }
 }
 
