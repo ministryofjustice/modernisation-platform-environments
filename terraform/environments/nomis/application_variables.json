@@ -40,6 +40,7 @@
                 "TEST": {
                     "always_on": true,
                     "ami_name": "nomis_db_STIG-2022-04-26*",
+                    "ami_owner": "${local.environment_management.account_ids['nomis-test']}",
                     "asm_data_capacity": 200,
                     "asm_flash_capacity": 2,
                     "termination_protection": false

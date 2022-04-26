@@ -1,5 +1,6 @@
 #------------------------------------------------------------------------------
 # Windows Jumpserver
+# TODO: once we have an AMI in prod remove all the count stuff
 #------------------------------------------------------------------------------
 
 data "aws_subnet" "private_az_a" {
@@ -10,7 +11,7 @@ data "aws_subnet" "private_az_a" {
 
 data "aws_ami" "jumpserver_image" {
   most_recent = true
-  owners      = ["self"]
+  owners      = ["${local.environment_management.account_ids["nomis-test"]}"]
 
   filter {
     name   = "name"
@@ -24,6 +25,7 @@ data "aws_ami" "jumpserver_image" {
 }
 
 resource "aws_instance" "jumpserver_windows" {
+  count = local.environment == "test" ? 1 : 0
   instance_type               = "t3.medium"
   ami                         = data.aws_ami.jumpserver_image.id
   associate_public_ip_address = false
@@ -117,6 +119,7 @@ resource "aws_iam_instance_profile" "ec2_jumpserver_profile" {
 # Pre-creating it so it gets deleted with the instance
 
 resource "aws_ssm_parameter" "jumpserver_ec2_rescue" {
+  count = local.environment == "test" ? 1 : 0
   name        = "/EC2Rescue/Passwords/${aws_instance.jumpserver_windows.id}"
   description = "Jumpserver local admin password"
   type        = "SecureString"
@@ -138,6 +141,7 @@ resource "aws_ssm_parameter" "jumpserver_ec2_rescue" {
 }
 
 data "aws_iam_policy_document" "jumpserver_put_parameter" {
+  count = local.environment == "test" ? 1 : 0
   statement {
     effect = "Allow"
     actions = [
@@ -148,6 +152,7 @@ data "aws_iam_policy_document" "jumpserver_put_parameter" {
 }
 
 resource "aws_iam_role_policy" "jumpserver_put_parameter" {
+  count = local.environment == "test" ? 1 : 0
   name   = "jumpserver-parameter-access"
   role   = aws_iam_role.ec2_jumpserver_role.id
   policy = data.aws_iam_policy_document.jumpserver_put_parameter.json
@@ -155,6 +160,7 @@ resource "aws_iam_role_policy" "jumpserver_put_parameter" {
 
 # Automation to recover password to parameter store on instance creation
 resource "aws_ssm_association" "jumpserver_ec2_rescue" {
+  count = local.environment == "test" ? 1 : 0
   name             = "AWSSupport-RunEC2RescueForWindowsTool"
   association_name = "jumpserver-ec2-rescue"
   parameters = {
