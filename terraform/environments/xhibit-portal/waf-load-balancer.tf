@@ -233,14 +233,11 @@ resource "aws_acm_certificate_validation" "waf_lb_cert_validation" {
   validation_record_fqdns = [for record in local.domain_types : record.name]
 }
 
-resource "aws_wafv2_web_acl" "waf_acl" {
-  name        = "waf-acl"
-  description = "WAF for Xhibit Portal."
+resource "aws_wafv2_rule_group" "waf_acl" {
+  capacity    = 701
+  name        = "waf-acl-rule-group"
+  description = "WAF rule group for Xhibit Portal."
   scope       = "REGIONAL"
-
-  default_action {
-    block {}
-  }
 
   rule {
     name     = "block-non-gb"
@@ -277,6 +274,47 @@ resource "aws_wafv2_web_acl" "waf_acl" {
     visibility_config {
       cloudwatch_metrics_enabled = true
       metric_name                = "waf-acl-common-rules-metric"
+      sampled_requests_enabled   = true
+    }
+  }
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "waf-acl-${var.networking[0].application}"
+    },
+  )
+
+  visibility_config {
+    cloudwatch_metrics_enabled = true
+    metric_name                = "waf-rule-group-metric"
+    sampled_requests_enabled   = true
+  }
+
+}
+
+resource "aws_wafv2_web_acl" "waf_acl" {
+  name        = "waf-acl"
+  description = "WAF ACL for Xhibit Portal."
+  scope       = "REGIONAL"
+
+  default_action {
+    block {}
+  }
+
+  rule {
+    name     = "rules"
+    priority = 0
+
+    statement {
+      rule_group_reference_statement {
+        arn = aws_wafv2_rule_group.waf_acl.arn
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "waf-acl-block-non-gb-rule-metric"
       sampled_requests_enabled   = true
     }
   }
