@@ -77,8 +77,6 @@ data "aws_iam_policy_document" "packer_minimum_permissions" {
       "ec2:DescribeSubnets",
       "ec2:DescribeTags",
       "ec2:DescribeVolumes",
-      "kms:ReEncrypt*",
-      "kms:GenerateDataKey*",
       "ec2:ModifyImageAttribute",
       "ec2:ModifySnapshotAttribute",
       "ec2:RegisterImage",
@@ -150,6 +148,20 @@ data "aws_iam_policy_document" "packer_minimum_permissions" {
       "arn:aws:ec2:eu-west-2:${data.aws_caller_identity.current.id}:key-pair/packer*"
     ]
   }
+
+  statement { # need so Packer can use CMK to encrypt snapshots so can be shared with other accounts
+    effect  = "Allow"
+    actions = [
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:ReEncrypt*",
+      "kms:ReEncryptFrom",
+      "kms:GenerateDataKey*",
+      "kms:DescribeKey",
+      "kms:CreateGrant"
+      ]
+    resources = [aws_kms_key.nomis-cmk[0].arn]
+  }
 }
 
 # build policy json for Packer session manager permissions
@@ -175,12 +187,7 @@ data "aws_iam_policy_document" "packer_ssm_permissions" {
       "ssm:TerminateSession",
       "ssm:ResumeSession"
     ]
-    resources = ["*"] #checkov:skip=CKV_AWS_111:scope limited by conditional
-    condition {
-      test     = "StringLike"
-      variable = "ssm:resourceTag/aws:ssmmessages:session-id"
-      values   = ["&{aws:userid}"]
-    }
+    resources = ["arn:aws:ssm:eu-west-2:${data.aws_caller_identity.current.id}:session/&{aws:username}-*"]
   }
   statement {
     effect    = "Allow"
