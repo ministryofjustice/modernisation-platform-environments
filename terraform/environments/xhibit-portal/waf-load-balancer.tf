@@ -239,11 +239,28 @@ resource "aws_wafv2_web_acl" "waf_acl" {
   scope       = "REGIONAL"
 
   default_action {
-    allow {}
+    block {}
   }
 
   rule {
-    name     = "rule-1"
+    name     = "block-non-gb"
+    priority = 0
+
+    statement {
+      geo_match_statement {
+        country_codes = ["GB"]
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "waf-acl-block-non-gb-rule-metric"
+      sampled_requests_enabled   = true
+    }
+  }
+
+  rule {
+    name     = "aws-waf-common-rules"
     priority = 1
 
     override_action {
@@ -254,26 +271,12 @@ resource "aws_wafv2_web_acl" "waf_acl" {
       managed_rule_group_statement {
         name        = "AWSManagedRulesCommonRuleSet"
         vendor_name = "AWS"
-
-        excluded_rule {
-          name = "SizeRestrictions_QUERYSTRING"
-        }
-
-        excluded_rule {
-          name = "NoUserAgent_HEADER"
-        }
-
-        scope_down_statement {
-          geo_match_statement {
-            country_codes = ["GB"]
-          }
-        }
       }
     }
 
     visibility_config {
       cloudwatch_metrics_enabled = true
-      metric_name                = "waf-acl-rule-1-metric"
+      metric_name                = "waf-acl-common-rules-metric"
       sampled_requests_enabled   = true
     }
   }
