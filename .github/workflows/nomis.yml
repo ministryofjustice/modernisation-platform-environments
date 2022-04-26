@@ -70,16 +70,11 @@ jobs:
 #         env:
 #           TF_ENV: development
 
-<<<<<<< HEAD
   plan-all-environments:
     strategy: 
       matrix:
         tf-env: [test, production]
       fail-fast: false
-=======
-  plan-test:
-    name: Plan Test - nomis
->>>>>>> main
     runs-on: ubuntu-latest
     if: github.ref != 'refs/heads/main' || github.event_name == 'workflow_dispatch'
     steps:
@@ -90,7 +85,6 @@ jobs:
         with:
           terraform_version: 1.1.7
           terraform_wrapper: false
-<<<<<<< HEAD
       - name: Terraform plan - ${{ matrix.tf-env }}
         run: |
           echo "Terraform plan - ${{ matrix.tf-env }}"
@@ -118,16 +112,6 @@ jobs:
   #         bash scripts/terraform-plan.sh terraform/environments/nomis
   #       env:
   #         TF_ENV: test
-=======
-      - name: Terraform plan - test
-        run: |
-          echo "Terraform plan - ${TF_ENV}"
-          bash scripts/terraform-init.sh terraform/environments/nomis
-          terraform -chdir="terraform/environments/nomis" workspace select "nomis-${TF_ENV}"
-          bash scripts/terraform-plan.sh terraform/environments/nomis
-        env:
-          TF_ENV: test
->>>>>>> main
 
   deploy-test:
     name: Deploy Test - nomis
