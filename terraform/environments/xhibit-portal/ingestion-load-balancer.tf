@@ -49,7 +49,7 @@ resource "aws_elb" "ingestion_lb" {
   subnets         = data.aws_subnet_ids.ingestion-shared-public.ids
 
   access_logs {
-    bucket        = aws_s3_bucket.loadbalancer_logs.bucket
+    bucket        = aws_s3_bucket.ingestion_loadbalancer_logs.bucket
     bucket_prefix = "http-lb"
     enabled       = true
   }
