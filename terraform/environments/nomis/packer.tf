@@ -237,7 +237,6 @@ resource "aws_iam_role_policy" "packer" {
   name   = "packer-minimum-permissions"
   role   = aws_iam_role.packer.id
   policy = data.aws_iam_policy_document.packer_combined.json
-  max_session_duration = 7200 # builds can take up to 1hr 45mins
 }
 
 #------------------------------------------------------------------------------
@@ -249,7 +248,7 @@ resource "aws_iam_role_policy" "packer" {
 resource "aws_iam_role" "packer_ssm_role" {
   name                 = "packer-ssm-role"
   path                 = "/"
-  max_session_duration = "3600"
+  max_session_duration = "7200" # builds can take up to 1hr 45mins
   assume_role_policy = jsonencode(
     {
       "Version" : "2012-10-17",
