@@ -15,6 +15,30 @@
       "public_dns_name_web": "equip.hmpps-development.modernisation-platform.service.justice.gov.uk"
     }
   },
+  "internet_to_alb_rules": {
+    "TCP_80": {
+      "from_port": 80,
+      "to_port": 80,
+      "protocol": "TCP"
+    },
+    "TCP_443": {
+      "from_port": 443,
+      "to_port": 443,
+      "protocol": "TCP"
+    }
+  },
+  "alb_to_citrix-adc_rules": {
+    "TCP_80": {
+      "from_port": 80,
+      "to_port": 80,
+      "protocol": "TCP"
+    },
+    "TCP_443": {
+      "from_port": 443,
+      "to_port": 443,
+      "protocol": "TCP"
+    }
+  },
   "ctx_internal_rules": {
     "TCP_80": {
       "from_port": 80,

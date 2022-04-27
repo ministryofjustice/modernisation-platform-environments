@@ -8,37 +8,26 @@ resource "aws_security_group" "alb_sg" {
     Name = "alb_sg"
   }
 }
-
-resource "aws_security_group_rule" "alb_sg_ingress_1" {
-  type        = "ingress"
-  protocol    = "tcp"
-  description = "Web Traffic"
-  from_port   = 80
-  to_port     = 80
-  #tfsec:ignore:AWS008
-  cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = aws_security_group.alb_sg.id
-}
-
-resource "aws_security_group_rule" "alb_sg_ingress_2" {
-  type        = "ingress"
-  protocol    = "tcp"
-  description = "Web SSL Traffic"
-  from_port   = 443
-  to_port     = 443
-  #tfsec:ignore:AWS008
-  cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = aws_security_group.alb_sg.id
-}
-
-resource "aws_security_group_rule" "alb_sg_egress" {
-  type                     = "egress"
-  protocol                 = "all"
-  description              = "Egress Rule for alb_sg"
-  from_port                = 0
-  to_port                  = 0
-  source_security_group_id = aws_security_group.citrix_adc.id
+resource "aws_security_group_rule" "ingress_internet_to_alb_traffic" {
+  for_each                 = local.application_data.internet_to_alb_rules
+  description              = format("Internet to ALB traffic for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
   security_group_id        = aws_security_group.alb_sg.id
+  to_port                  = each.value.to_port
+  type                     = "ingress"
+  cidr_blocks              = ["0.0.0.0/0"]
+}
+
+resource "aws_security_group_rule" "egress_alb_to_citrix-adc_traffic" {
+  for_each                 = local.application_data.alb_to_citrix-adc_rules
+  description              = format("ALB to Citrix ADC traffic for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.alb_sg.id
+  to_port                  = each.value.to_port
+  type                     = "egress"
+  source_security_group_id = aws_security_group.citrix_adc.id
 }
 
 ############################################################################
