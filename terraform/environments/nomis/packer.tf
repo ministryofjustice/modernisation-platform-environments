@@ -9,10 +9,11 @@
 
 # build policy json for packer group member policy
 data "aws_iam_policy_document" "packer_member_policy" {
+  count = local.environment == "test" ? 1 : 0
   statement {
     effect    = "Allow"
     actions   = ["sts:AssumeRole"]
-    resources = [aws_iam_role.packer.arn]
+    resources = [aws_iam_role.packer[0].arn]
   }
 }
 
@@ -20,12 +21,13 @@ data "aws_iam_policy_document" "packer_member_policy" {
 resource "aws_iam_group_policy" "packer_member_policy" {
   count  = local.environment == "test" ? 1 : 0
   name   = "packer-member-policy"
-  policy = data.aws_iam_policy_document.packer_member_policy.json
+  policy = data.aws_iam_policy_document.packer_member_policy[0].json
   group  = "packer-member-group"
 }
 
 # Role to provide required packer permissions
 data "aws_iam_policy_document" "packer_assume_role_policy" {
+  count = local.environment == "test" ? 1 : 0
   statement {
     effect  = "Allow"
     actions = ["sts:AssumeRole"]
@@ -42,8 +44,9 @@ data "aws_iam_policy_document" "packer_assume_role_policy" {
 }
 
 resource "aws_iam_role" "packer" {
+  count              = local.environment == "test" ? 1 : 0
   name               = "packer-build"
-  assume_role_policy = data.aws_iam_policy_document.packer_assume_role_policy.json
+  assume_role_policy = data.aws_iam_policy_document.packer_assume_role_policy[0].json
   tags = merge(
     local.tags,
     {
@@ -54,6 +57,7 @@ resource "aws_iam_role" "packer" {
 
 # build policy json for Packer base permissions
 data "aws_iam_policy_document" "packer_minimum_permissions" {
+  count = local.environment == "test" ? 1 : 0
   statement {
     #checkov:skip=CKV_AWS_111
     #checkov:skip=CKV_AWS_109
@@ -106,7 +110,7 @@ data "aws_iam_policy_document" "packer_minimum_permissions" {
   statement {
     effect    = "Allow"
     actions   = ["ec2:AuthorizeSecurityGroupIngress"]
-    resources = [aws_security_group.packer_security_group.arn]
+    resources = [aws_security_group.packer_security_group[0].arn]
   }
 
   statement {
@@ -160,12 +164,13 @@ data "aws_iam_policy_document" "packer_minimum_permissions" {
       "kms:DescribeKey",
       "kms:CreateGrant"
     ]
-    resources = [try(aws_kms_key.nomis-cmk[0].arn, "*")] # this is like this because CMK does not exist in prod
+    resources = [aws_kms_key.nomis-cmk[0].arn]
   }
 }
 
 # build policy json for Packer session manager permissions
 data "aws_iam_policy_document" "packer_ssm_permissions" {
+  count = local.environment == "test" ? 1 : 0
   statement {
     effect    = "Allow"
     actions   = ["ssm:StartSession"]
@@ -192,12 +197,12 @@ data "aws_iam_policy_document" "packer_ssm_permissions" {
   statement {
     effect    = "Allow"
     actions   = ["iam:GetInstanceProfile"]
-    resources = [aws_iam_instance_profile.packer_ssm_profile.arn]
+    resources = [aws_iam_instance_profile.packer_ssm_profile[0].arn]
   }
   statement {
     effect    = "Allow"
     actions   = ["iam:PassRole"]
-    resources = [aws_iam_role.packer_ssm_role.arn]
+    resources = [aws_iam_role.packer_ssm_role[0].arn]
   }
   statement {
     effect    = "Allow"
@@ -209,6 +214,7 @@ data "aws_iam_policy_document" "packer_ssm_permissions" {
 # some extra permissions required for Ansible ec2 module
 # it might be an idea to create another role for Ansible instead
 data "aws_iam_policy_document" "packer_ansible_permissions" {
+  count = local.environment == "test" ? 1 : 0
   statement {
     effect = "Allow"
     actions = [
@@ -226,17 +232,19 @@ data "aws_iam_policy_document" "packer_ansible_permissions" {
 
 # combine policy json
 data "aws_iam_policy_document" "packer_combined" {
+  count = local.environment == "test" ? 1 : 0
   source_policy_documents = [
-    data.aws_iam_policy_document.packer_minimum_permissions.json,
-    data.aws_iam_policy_document.packer_ssm_permissions.json,
-    data.aws_iam_policy_document.packer_ansible_permissions.json
+    data.aws_iam_policy_document.packer_minimum_permissions[0].json,
+    data.aws_iam_policy_document.packer_ssm_permissions[0].json,
+    data.aws_iam_policy_document.packer_ansible_permissions[0].json
   ]
 }
 # attach policy to role inline
 resource "aws_iam_role_policy" "packer" {
+  count  = local.environment == "test" ? 1 : 0
   name   = "packer-minimum-permissions"
-  role   = aws_iam_role.packer.id
-  policy = data.aws_iam_policy_document.packer_combined.json
+  role   = aws_iam_role.packer[0].id
+  policy = data.aws_iam_policy_document.packer_combined[0].json
 }
 
 #------------------------------------------------------------------------------
@@ -246,6 +254,7 @@ resource "aws_iam_role_policy" "packer" {
 #------------------------------------------------------------------------------
 
 resource "aws_iam_role" "packer_ssm_role" {
+  count                = local.environment == "test" ? 1 : 0
   name                 = "packer-ssm-role"
   path                 = "/"
   max_session_duration = "7200" # builds can take up to 1hr 45mins
@@ -275,6 +284,7 @@ resource "aws_iam_role" "packer_ssm_role" {
 
 # build policy document for access to s3 bucket
 data "aws_iam_policy_document" "packer_s3_bucket_access" {
+  count = local.environment == "test" ? 1 : 0
   statement {
     effect = "Allow"
     actions = [
@@ -292,16 +302,18 @@ data "aws_iam_policy_document" "packer_s3_bucket_access" {
 
 # attach s3 document as inline policy
 resource "aws_iam_role_policy" "packer_s3_bucket_access" {
+  count  = local.environment == "test" ? 1 : 0
   name   = "nomis-apps-bucket-access"
-  role   = aws_iam_role.packer_ssm_role.name
-  policy = data.aws_iam_policy_document.packer_s3_bucket_access.json
+  role   = aws_iam_role.packer_ssm_role[0].name
+  policy = data.aws_iam_policy_document.packer_s3_bucket_access[0].json
 }
 
 # create instance profile from role
 resource "aws_iam_instance_profile" "packer_ssm_profile" {
-  name = "packer-ssm-profile"
-  role = aws_iam_role.packer_ssm_role.name
-  path = "/"
+  count = local.environment == "test" ? 1 : 0
+  name  = "packer-ssm-profile"
+  role  = aws_iam_role.packer_ssm_role[0].name
+  path  = "/"
 }
 
 #------------------------------------------------------------------------------
@@ -311,6 +323,7 @@ resource "aws_iam_instance_profile" "packer_ssm_profile" {
 #------------------------------------------------------------------------------
 
 resource "aws_security_group" "packer_security_group" {
+  count = local.environment == "test" ? 1 : 0
   #checkov:skip=CKV2_AWS_5
   description = "Security Group for Packer builds"
   name        = "packer-build-${local.application_name}"
