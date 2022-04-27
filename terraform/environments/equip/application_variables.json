@@ -158,5 +158,127 @@
       "to_port": -1,
       "protocol": "ICMP"
     }
+  },
+  "host_to_domain_controller_rules": {
+    "TCP_25": {
+      "from_port": 25,
+      "to_port": 25,
+      "protocol": "TCP"
+    },
+    "TCP_53": {
+      "from_port": 53,
+      "to_port": 53,
+      "protocol": "TCP"
+    },
+    "UDP_53": {
+      "from_port": 53,
+      "to_port": 53,
+      "protocol": "UDP"
+    },
+    "UDP_67": {
+      "from_port": 67,
+      "to_port": 67,
+      "protocol": "UDP"
+    },
+    "TCP_88": {
+      "from_port": 88,
+      "to_port": 88,
+      "protocol": "TCP"
+    },
+    "UDP_88": {
+      "from_port": 88,
+      "to_port": 88,
+      "protocol": "UDP"
+    },
+    "UDP_123": {
+      "from_port": 123,
+      "to_port": 123,
+      "protocol": "UDP"
+    },
+    "TCP_135": {
+      "from_port": 135,
+      "to_port": 135,
+      "protocol": "TCP"
+    },
+    "UDP_137-138": {
+      "from_port": 137,
+      "to_port": 138,
+      "protocol": "UDP"
+    },
+    "TCP_139": {
+      "from_port": 139,
+      "to_port": 139,
+      "protocol": "TCP"
+    },
+    "TCP_389": {
+      "from_port": 389,
+      "to_port": 389,
+      "protocol": "TCP"
+    },
+    "UDP_389": {
+      "from_port": 389,
+      "to_port": 389,
+      "protocol": "UDP"
+    },
+    "TCP_445": {
+      "from_port": 445,
+      "to_port": 445,
+      "protocol": "TCP"
+    },
+    "UDP_445": {
+      "from_port": 445,
+      "to_port": 445,
+      "protocol": "UDP"
+    },
+    "TCP_464": {
+      "from_port": 464,
+      "to_port": 464,
+      "protocol": "TCP"
+    },
+    "UDP_464": {
+      "from_port": 464,
+      "to_port": 464,
+      "protocol": "UDP"
+    },
+    "TCP_636": {
+      "from_port": 636,
+      "to_port": 636,
+      "protocol": "TCP"
+    },
+    "TCP_1025-5000": {
+      "from_port": 1025,
+      "to_port": 5000,
+      "protocol": "TCP"
+    },
+    "UDP_2535": {
+      "from_port": 2535,
+      "to_port": 2535,
+      "protocol": "UDP"
+    },
+    "TCP_3268-3269": {
+      "from_port": 3268,
+      "to_port": 3269,
+      "protocol": "TCP"
+    },
+    "TCP_5722": {
+      "from_port": 5722,
+      "to_port": 5722,
+      "protocol": "TCP"
+    },
+    "TCP_9389": {
+      "from_port": 9389,
+      "to_port": 9389,
+      "protocol": "TCP"
+    },
+    "TCP_49152-65535": {
+      "from_port": 49152,
+      "to_port": 65535,
+      "protocol": "TCP"
+    },
+    "ICMP_ALL": {
+      "from_port": -1,
+      "to_port": -1,
+      "protocol": "ICMP"
+    }
   }
 }
