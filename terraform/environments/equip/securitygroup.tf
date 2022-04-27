@@ -272,7 +272,7 @@ resource "aws_security_group" "aws_domain_security_group" {
 
 resource "aws_security_group_rule" "ingress_hosts_to_domain_contoller_traffic" {
   for_each                 = local.application_data.host_to_domain_controller_rules
-  description              = format("Windows host to Domain Controller traffic for %s %d", each.value.protocol, each.value.from_port)
+  description              = format("All hosts to Domain Controller traffic for %s %d", each.value.protocol, each.value.from_port)
   from_port                = each.value.from_port
   protocol                 = each.value.protocol
   security_group_id        = aws_security_group.aws_domain_security_group.id
@@ -365,7 +365,7 @@ resource "aws_security_group" "aws_dns_resolver" {
 
 resource "aws_security_group_rule" "ingress_dns_endpoint_traffic" {
   for_each          = local.application_data.dns_endpoint_rules
-  description       = format("Domain Controller internal traffic for %s %d", each.value.protocol, each.value.from_port)
+  description       = format("VPC to DNS Endpoint traffic for %s %d", each.value.protocol, each.value.from_port)
   from_port         = each.value.from_port
   protocol          = each.value.protocol
   security_group_id = aws_security_group.aws_dns_resolver.id
@@ -376,7 +376,7 @@ resource "aws_security_group_rule" "ingress_dns_endpoint_traffic" {
 
 resource "aws_security_group_rule" "egress_dns_endpoint_traffic" {
   for_each          = local.application_data.dns_endpoint_rules
-  description       = format("Domain Controller internal traffic for %s %d", each.value.protocol, each.value.from_port)
+  description       = format("DNS Endpoint to Domain Controller traffic for %s %d", each.value.protocol, each.value.from_port)
   from_port         = each.value.from_port
   protocol          = each.value.protocol
   security_group_id = aws_security_group.aws_dns_resolver.id
