@@ -41,7 +41,7 @@ module "bastion_linux" {
 }
 
 resource "aws_security_group_rule" "CP_monitoring_ingress" {
-  desciption        = "Allows access from Cloud Platform Monitoring"
+  description       = "Allows access from Cloud Platform Monitoring"
   type              = "ingress"
   from_port         = 9100
   to_port           = 9100
@@ -51,7 +51,7 @@ resource "aws_security_group_rule" "CP_monitoring_ingress" {
 }
 
 resource "aws_security_group_rule" "CP_monitoring_egress" {
-  desciption        = "Allows access from Cloud Platform Monitoring"
+  description       = "Allows access from Cloud Platform Monitoring"
   type              = "egress"
   from_port         = 9100
   to_port           = 9100
