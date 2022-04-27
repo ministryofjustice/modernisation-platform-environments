@@ -55,6 +55,17 @@ resource "aws_security_group_rule" "ingress_alb_to_citrix-adc_traffic" {
   source_security_group_id = aws_security_group.alb_sg.id
 }
 
+resource "aws_security_group_rule" "ingress_ctx_host_to_citrix-adc" {
+  for_each                 = local.application_data.ctx_to_adc_rules
+  description              = format("CTX host to Citrix ADC traffic for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.citrix_adc.id
+  to_port                  = each.value.to_port
+  type                     = "ingress"
+  source_security_group_id = aws_security_group.aws_citrix_security_group.id
+}
+
 resource "aws_security_group_rule" "citrix_adc_egress_1" {
   type        = "egress"
   protocol    = "-1"
@@ -110,6 +121,17 @@ resource "aws_security_group_rule" "egress_ctx_host_internal_traffic" {
   to_port                  = each.value.to_port
   type                     = "egress"
   source_security_group_id = aws_security_group.aws_citrix_security_group.id
+}
+
+resource "aws_security_group_rule" "egress_ctx_host_to_citrix-adc" {
+  for_each                 = local.application_data.ctx_to_adc_rules
+  description              = format("CTX host to Citrix ADC traffic for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.aws_citrix_security_group.id
+  to_port                  = each.value.to_port
+  type                     = "egress"
+  source_security_group_id = aws_security_group.citrix_adc.id
 }
 
 resource "aws_security_group_rule" "aws_citrix_security_group_egress_1" {
@@ -351,9 +373,6 @@ resource "aws_security_group" "aws_dns_resolver" {
   name        = "dns_resolver"
   description = "Security Group for DNS resolver request"
   vpc_id      = data.aws_vpc.shared.id
-  tags = merge(local.tags,
-    { Name = lower(format("sg-%s-%s-equip-dns", local.application_name, local.environment)) }
-  )
 }
 
 resource "aws_security_group_rule" "ingress_dns_endpoint_traffic" {

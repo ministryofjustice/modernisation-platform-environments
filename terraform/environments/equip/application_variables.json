@@ -71,6 +71,23 @@
       "protocol": "UDP"
     }
   },
+  "ctx_to_adc_rules": {
+    "TCP_22": {
+      "from_port": 22,
+      "to_port": 22,
+      "protocol": "TCP"
+    },
+    "TCP_80": {
+      "from_port": 80,
+      "to_port": 80,
+      "protocol": "TCP"
+    },
+    "TCP_443": {
+      "from_port": 443,
+      "to_port": 443,
+      "protocol": "TCP"
+    }
+  },
   "ctx_to_spotfire_rules": {
     "TCP_9": {
       "from_port": 9,
