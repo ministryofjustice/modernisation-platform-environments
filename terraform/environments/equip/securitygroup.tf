@@ -17,6 +17,7 @@ resource "aws_security_group_rule" "ingress_internet_to_alb_traffic" {
   security_group_id = aws_security_group.alb_sg.id
   to_port           = each.value.to_port
   type              = "ingress"
+  #tfsec:ignore:AWS009
   cidr_blocks       = ["0.0.0.0/0"]
 }
 
@@ -39,8 +40,6 @@ resource "aws_security_group" "citrix_adc" {
   name        = "citrix_adc"
   description = "Security Group for citrix_adc"
   vpc_id      = data.aws_vpc.shared.id
-
-  depends_on = [aws_security_group.alb_sg]
   tags = {
     Name = "citrix_adc"
   }
@@ -64,12 +63,9 @@ resource "aws_security_group_rule" "citrix_adc_egress_1" {
   from_port   = 0
   to_port     = 0
   #tfsec:ignore:AWS009
-  cidr_blocks = [
-    "0.0.0.0/0",
-  ]
+  cidr_blocks = ["0.0.0.0/0"]
   security_group_id = aws_security_group.citrix_adc.id
 }
-
 
 ############################################################################
 
@@ -97,19 +93,6 @@ resource "aws_security_group_rule" "ingress_citrix-adc_to_ctx-host_traffic" {
   source_security_group_id = aws_security_group.citrix_adc.id
 }
 
-resource "aws_security_group_rule" "aws_citrix_security_group_egress_1" {
-  type        = "egress"
-  protocol    = "-1"
-  description = "Open all outbound ports"
-  from_port   = 0
-  to_port     = 0
-  #tfsec:ignore:AWS009
-  cidr_blocks = [
-    "0.0.0.0/0",
-  ]
-  security_group_id = aws_security_group.aws_citrix_security_group.id
-}
-
 resource "aws_security_group_rule" "ingress_ctx_host_internal_traffic" {
   for_each                 = local.application_data.ctx_internal_rules
   description              = format("CTX host internal traffic for %s %d", each.value.protocol, each.value.from_port)
@@ -130,6 +113,17 @@ resource "aws_security_group_rule" "egress_ctx_host_internal_traffic" {
   to_port                  = each.value.to_port
   type                     = "egress"
   source_security_group_id = aws_security_group.aws_citrix_security_group.id
+}
+
+resource "aws_security_group_rule" "aws_citrix_security_group_egress_1" {
+  type        = "egress"
+  protocol    = "-1"
+  description = "Open all outbound ports"
+  from_port   = 0
+  to_port     = 0
+  #tfsec:ignore:AWS009
+  cidr_blocks = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.aws_citrix_security_group.id
 }
 
 ############################################################################
@@ -220,9 +214,7 @@ resource "aws_security_group_rule" "aws_spotfire_security_group_egress_1" {
   from_port   = 0
   to_port     = 0
   #tfsec:ignore:AWS009
-  cidr_blocks = [
-    "0.0.0.0/0",
-  ]
+  cidr_blocks = ["0.0.0.0/0"]
   security_group_id = aws_security_group.aws_spotfire_security_group.id
 }
 
@@ -307,9 +299,7 @@ resource "aws_security_group_rule" "aws_domain_security_group_egress_1" {
   from_port   = 0
   to_port     = 0
   #tfsec:ignore:AWS009
-  cidr_blocks = [
-    "0.0.0.0/0",
-  ]
+  cidr_blocks = ["0.0.0.0/0",]
   security_group_id = aws_security_group.aws_domain_security_group.id
 }
 
@@ -350,67 +340,6 @@ resource "aws_security_group" "all_internal_groups" {
   tags = {
     Name = "all_internal_groups"
   }
-}
-
-resource "aws_security_group_rule" "all_internal_groups_ingress_8" {
-  type                     = "ingress"
-  protocol                 = "tcp"
-  description              = "Wins TCP Traffic"
-  from_port                = 1512
-  to_port                  = 1512
-  source_security_group_id = aws_security_group.aws_domain_security_group.id
-  security_group_id        = aws_security_group.all_internal_groups.id
-}
-
-resource "aws_security_group_rule" "all_internal_groups_ingress_9" {
-  type                     = "ingress"
-  protocol                 = "tcp"
-  description              = "Nameserver TCP Traffic"
-  from_port                = 42
-  to_port                  = 42
-  source_security_group_id = aws_security_group.aws_domain_security_group.id
-  security_group_id        = aws_security_group.all_internal_groups.id
-}
-
-resource "aws_security_group_rule" "all_internal_groups_ingress_10" {
-  type                     = "ingress"
-  protocol                 = "tcp"
-  description              = "RDP TCP Traffic"
-  from_port                = 3389
-  to_port                  = 3389
-  source_security_group_id = aws_security_group.aws_domain_security_group.id
-  security_group_id        = aws_security_group.all_internal_groups.id
-}
-
-
-resource "aws_security_group_rule" "all_internal_groups_ingress_19" {
-  type                     = "ingress"
-  protocol                 = "udp"
-  description              = "Wins UDP Traffic"
-  from_port                = 1512
-  to_port                  = 1512
-  source_security_group_id = aws_security_group.aws_domain_security_group.id
-  security_group_id        = aws_security_group.all_internal_groups.id
-}
-
-resource "aws_security_group_rule" "all_internal_groups_ingress_20" {
-  type                     = "ingress"
-  protocol                 = "udp"
-  description              = "Nameserver UDP Traffic"
-  from_port                = 42
-  to_port                  = 42
-  source_security_group_id = aws_security_group.aws_domain_security_group.id
-  security_group_id        = aws_security_group.all_internal_groups.id
-}
-
-resource "aws_security_group_rule" "all_internal_groups_ingress_21" {
-  type                     = "ingress"
-  protocol                 = "udp"
-  description              = "RDP UDP Traffic"
-  from_port                = 3389
-  to_port                  = 3389
-  source_security_group_id = aws_security_group.aws_domain_security_group.id
-  security_group_id        = aws_security_group.all_internal_groups.id
 }
 
 resource "aws_security_group_rule" "all_internal_groups_egress" {
