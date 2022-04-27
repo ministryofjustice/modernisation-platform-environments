@@ -305,6 +305,28 @@
       "protocol": "ICMP"
     }
   },
+  "host_to_proxy_rules": {
+    "TCP_80": {
+      "from_port": 80,
+      "to_port": 80,
+      "protocol": "TCP"
+    },
+    "TCP_443": {
+      "from_port": 443,
+      "to_port": 443,
+      "protocol": "TCP"
+    },
+    "TCP_4952-65535": {
+      "from_port": 4952,
+      "to_port": 65535,
+      "protocol": "TCP"
+    },
+    "UDP_4952-65535": {
+      "from_port": 4952,
+      "to_port": 65535,
+      "protocol": "UDP"
+    }
+  },
   "citrix_to_spotfire_rules": {
     "TCP_9": {
       "from_port": 9,
@@ -422,7 +444,16 @@
       "protocol": "UDP"
     }
   },
-  "host_to_proxy_rules": {
-
+  "dns_endpoint_rules": {
+    "TCP_53": {
+      "from_port": 53,
+      "to_port": 53,
+      "protocol": "TCP"
+    },
+    "UDP_53": {
+      "from_port": 53,
+      "to_port": 53,
+      "protocol": "UDP"
+    }
   }
 }

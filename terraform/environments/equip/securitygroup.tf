@@ -9,14 +9,14 @@ resource "aws_security_group" "alb_sg" {
   }
 }
 resource "aws_security_group_rule" "ingress_internet_to_alb_traffic" {
-  for_each                 = local.application_data.internet_to_alb_rules
-  description              = format("Internet to ALB traffic for %s %d", each.value.protocol, each.value.from_port)
-  from_port                = each.value.from_port
-  protocol                 = each.value.protocol
-  security_group_id        = aws_security_group.alb_sg.id
-  to_port                  = each.value.to_port
-  type                     = "ingress"
-  cidr_blocks              = ["0.0.0.0/0"]
+  for_each          = local.application_data.internet_to_alb_rules
+  description       = format("Internet to ALB traffic for %s %d", each.value.protocol, each.value.from_port)
+  from_port         = each.value.from_port
+  protocol          = each.value.protocol
+  security_group_id = aws_security_group.alb_sg.id
+  to_port           = each.value.to_port
+  type              = "ingress"
+  cidr_blocks       = ["0.0.0.0/0"]
 }
 
 resource "aws_security_group_rule" "egress_alb_to_citrix-adc_traffic" {
@@ -532,48 +532,16 @@ resource "aws_security_group" "aws_proxy_security_group" {
   }
 }
 
-resource "aws_security_group_rule" "aws_proxy_security_group_ingress_1" {
-  type                     = "ingress"
-  protocol                 = "tcp"
-  description              = "Web TCP Traffic"
-  from_port                = 80
-  to_port                  = 80
-  depends_on               = [aws_security_group.all_internal_groups]
-  source_security_group_id = aws_security_group.all_internal_groups.id
+resource "aws_security_group_rule" "ingress_hosts_to_proxies_traffic" {
+  for_each                 = local.application_data.host_to_proxy_rules
+  description              = format("All hosts to proxy server traffic for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
   security_group_id        = aws_security_group.aws_proxy_security_group.id
-
-}
-
-resource "aws_security_group_rule" "aws_proxy_security_group_ingress_2" {
+  to_port                  = each.value.to_port
   type                     = "ingress"
-  protocol                 = "tcp"
-  description              = "SSL TCP Traffic"
-  from_port                = 443
-  to_port                  = 443
   source_security_group_id = aws_security_group.all_internal_groups.id
-  security_group_id        = aws_security_group.aws_proxy_security_group.id
 }
-
-resource "aws_security_group_rule" "aws_proxy_security_group_ingress_3" {
-  type                     = "ingress"
-  protocol                 = "tcp"
-  description              = "SAG TCP Traffic"
-  from_port                = 4952
-  to_port                  = 65535
-  source_security_group_id = aws_security_group.all_internal_groups.id
-  security_group_id        = aws_security_group.aws_proxy_security_group.id
-}
-
-resource "aws_security_group_rule" "aws_proxy_security_group_ingress_4" {
-  type                     = "ingress"
-  protocol                 = "udp"
-  description              = "SAG UDP Traffic"
-  from_port                = 4952
-  to_port                  = 65535
-  source_security_group_id = aws_security_group.all_internal_groups.id
-  security_group_id        = aws_security_group.aws_proxy_security_group.id
-}
-
 
 resource "aws_security_group_rule" "aws_proxy_security_group_egress_1" {
   type        = "egress"
@@ -582,9 +550,7 @@ resource "aws_security_group_rule" "aws_proxy_security_group_egress_1" {
   from_port   = 0
   to_port     = 0
   #tfsec:ignore:AWS009
-  cidr_blocks = [
-    "0.0.0.0/0",
-  ]
+  cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.aws_proxy_security_group.id
 }
 
@@ -768,46 +734,24 @@ resource "aws_security_group" "aws_dns_resolver" {
   vpc_id      = data.aws_vpc.shared.id
 }
 
-resource "aws_security_group_rule" "allow_tcp_53_in" {
-  provider          = aws.core-vpc
-  description       = "Allow resolver endpoint to receive DNS requests"
-  from_port         = 53
-  protocol          = "TCP"
+resource "aws_security_group_rule" "ingress_dns_endpoint_traffic" {
+  for_each          = local.application_data.dns_endpoint_rules
+  description       = format("Domain Controller internal traffic for %s %d", each.value.protocol, each.value.from_port)
+  from_port         = each.value.from_port
+  protocol          = each.value.protocol
   security_group_id = aws_security_group.aws_dns_resolver.id
-  to_port           = 53
+  to_port           = each.value.to_port
   type              = "ingress"
   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
 }
 
-resource "aws_security_group_rule" "allow_udp_53_in" {
-  provider          = aws.core-vpc
-  description       = "Allow resolver endpoint to receive DNS requests"
-  from_port         = 53
-  protocol          = "UDP"
+resource "aws_security_group_rule" "egress_dns_endpoint_traffic" {
+  for_each          = local.application_data.dns_endpoint_rules
+  description       = format("Domain Controller internal traffic for %s %d", each.value.protocol, each.value.from_port)
+  from_port         = each.value.from_port
+  protocol          = each.value.protocol
   security_group_id = aws_security_group.aws_dns_resolver.id
-  to_port           = 53
-  type              = "ingress"
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-}
-
-resource "aws_security_group_rule" "allow_tcp_53_out" {
-  provider          = aws.core-vpc
-  description       = "Allow resolver endpoint to forward DNS requests"
-  from_port         = 53
-  protocol          = "TCP"
-  security_group_id = aws_security_group.aws_dns_resolver.id
-  to_port           = 53
-  type              = "egress"
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-}
-
-resource "aws_security_group_rule" "allow_udp_53_out" {
-  provider          = aws.core-vpc
-  description       = "Allow resolver endpoint to forward DNS requests"
-  from_port         = 53
-  protocol          = "UDP"
-  security_group_id = aws_security_group.aws_dns_resolver.id
-  to_port           = 53
+  to_port           = each.value.to_port
   type              = "egress"
   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
 }
