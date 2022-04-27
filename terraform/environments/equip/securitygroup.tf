@@ -86,64 +86,15 @@ resource "aws_security_group" "aws_citrix_security_group" {
   }
 }
 
-resource "aws_security_group_rule" "aws_citrix_security_group_ingress_1" {
-  type                     = "ingress"
-  protocol                 = "tcp"
-  description              = "Web Traffic"
-  from_port                = 80
-  to_port                  = 80
+resource "aws_security_group_rule" "ingress_citrix-adc_to_ctx-host_traffic" {
+  for_each          = local.application_data.adc_to_ctx_rules
+  description       = format("Citrix ADC to Citrix host traffic for %s %d", each.value.protocol, each.value.from_port)
+  from_port         = each.value.from_port
+  protocol          = each.value.protocol
+  security_group_id = aws_security_group.aws_citrix_security_group.id
+  to_port           = each.value.to_port
+  type              = "ingress"
   source_security_group_id = aws_security_group.citrix_adc.id
-  security_group_id        = aws_security_group.aws_citrix_security_group.id
-}
-
-resource "aws_security_group_rule" "aws_citrix_security_group_ingress_2" {
-  type                     = "ingress"
-  protocol                 = "tcp"
-  description              = "Web SSL Traffic"
-  from_port                = 443
-  to_port                  = 443
-  source_security_group_id = aws_security_group.citrix_adc.id
-  security_group_id        = aws_security_group.aws_citrix_security_group.id
-}
-
-resource "aws_security_group_rule" "aws_citrix_security_group_ingress_3" {
-  type                     = "ingress"
-  protocol                 = "tcp"
-  description              = "ICA TCP  Traffic"
-  from_port                = 1494
-  to_port                  = 1494
-  source_security_group_id = aws_security_group.citrix_adc.id
-  security_group_id        = aws_security_group.aws_citrix_security_group.id
-}
-
-resource "aws_security_group_rule" "aws_citrix_security_group_ingress_4" {
-  type                     = "ingress"
-  protocol                 = "udp"
-  description              = "ICA UDP Traffic"
-  from_port                = 1494
-  to_port                  = 1494
-  source_security_group_id = aws_security_group.citrix_adc.id
-  security_group_id        = aws_security_group.aws_citrix_security_group.id
-}
-
-resource "aws_security_group_rule" "aws_citrix_security_group_ingress_5" {
-  type                     = "ingress"
-  protocol                 = "tcp"
-  description              = "Citrixmaclient TCP Traffic"
-  from_port                = 2598
-  to_port                  = 2598
-  source_security_group_id = aws_security_group.citrix_adc.id
-  security_group_id        = aws_security_group.aws_citrix_security_group.id
-}
-
-resource "aws_security_group_rule" "aws_citrix_security_group_ingress_6" {
-  type                     = "ingress"
-  protocol                 = "udp"
-  description              = "Citrixmaclient UDP Traffic"
-  from_port                = 2598
-  to_port                  = 2598
-  source_security_group_id = aws_security_group.citrix_adc.id
-  security_group_id        = aws_security_group.aws_citrix_security_group.id
 }
 
 resource "aws_security_group_rule" "aws_citrix_security_group_egress_1" {
@@ -338,24 +289,15 @@ resource "aws_security_group_rule" "ingress_hosts_to_domain_contoller_traffic" {
   source_security_group_id = aws_security_group.all_internal_groups.id
 }
 
-resource "aws_security_group_rule" "aws_domain_security_group_ingress_udp_53" {
-  description       = "Allow resolver endpoint to send DNS requests to DC"
-  type              = "ingress"
-  protocol          = "udp"
-  from_port         = 53
-  to_port           = 53
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-  security_group_id = aws_security_group.aws_domain_security_group.id
-}
-
-resource "aws_security_group_rule" "aws_domain_security_group_ingress_tcp_53" {
-  description       = "Allow resolver endpoint to send DNS requests to DC"
-  type              = "ingress"
-  protocol          = "tcp"
-  from_port         = 53
-  to_port           = 53
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-  security_group_id = aws_security_group.aws_domain_security_group.id
+resource "aws_security_group_rule" "ingress_dns_endpoints_to_domain_contoller_traffic" {
+  for_each                 = local.application_data.dns_endpoint_rules
+  description              = format("DNS Endpoint to Domain Controller traffic for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.aws_domain_security_group.id
+  to_port                  = each.value.to_port
+  type                     = "ingress"
+  source_security_group_id = aws_security_group.aws_dns_resolver.id
 }
 
 resource "aws_security_group_rule" "aws_domain_security_group_egress_1" {
