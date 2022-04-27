@@ -150,7 +150,7 @@ data "aws_iam_policy_document" "packer_minimum_permissions" {
   }
 
   statement { # need so Packer can use CMK to encrypt snapshots so can be shared with other accounts
-    effect  = "Allow"
+    effect = "Allow"
     actions = [
       "kms:Encrypt",
       "kms:Decrypt",
@@ -159,8 +159,8 @@ data "aws_iam_policy_document" "packer_minimum_permissions" {
       "kms:GenerateDataKey*",
       "kms:DescribeKey",
       "kms:CreateGrant"
-      ]
-    resources = [aws_kms_key.nomis-cmk[0].arn]
+    ]
+    resources = [try(aws_kms_key.nomis-cmk[0].arn, "*")] # this is like this because CMK does not exist in prod
   }
 }
 
@@ -248,7 +248,7 @@ resource "aws_iam_role_policy" "packer" {
 resource "aws_iam_role" "packer_ssm_role" {
   name                 = "packer-ssm-role"
   path                 = "/"
-  max_session_duration = "3600"
+  max_session_duration = "7200" # builds can take up to 1hr 45mins
   assume_role_policy = jsonencode(
     {
       "Version" : "2012-10-17",
