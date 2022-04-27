@@ -266,9 +266,13 @@ resource "aws_acm_certificate" "internal_lb_az" {
   }
 }
 
+locals {
+  domain_validation_options = coalesce(aws_acm_certificate.internal_lb_az[0].domain_validation_options, [])
+}
+
 resource "aws_route53_record" "internal_lb_validation_az" {
   for_each = {
-    for dvo in aws_acm_certificate.internal_lb_az[0].domain_validation_options : dvo.domain_name => {
+    for dvo in local.domain_validation_options : dvo.domain_name => {
       name   = dvo.resource_record_name
       record = dvo.resource_record_value
       type   = dvo.resource_record_type
