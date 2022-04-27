@@ -18,7 +18,7 @@ resource "aws_security_group_rule" "ingress_internet_to_alb_traffic" {
   to_port           = each.value.to_port
   type              = "ingress"
   #tfsec:ignore:AWS009
-  cidr_blocks       = ["0.0.0.0/0"]
+  cidr_blocks = ["0.0.0.0/0"]
 }
 
 resource "aws_security_group_rule" "egress_alb_to_citrix-adc_traffic" {
@@ -46,13 +46,13 @@ resource "aws_security_group" "citrix_adc" {
 }
 
 resource "aws_security_group_rule" "ingress_alb_to_citrix-adc_traffic" {
-  for_each          = local.application_data.alb_to_citrix-adc_rules
-  description       = format("ALB to Citrix ADC traffic for %s %d", each.value.protocol, each.value.from_port)
-  from_port         = each.value.from_port
-  protocol          = each.value.protocol
-  security_group_id = aws_security_group.citrix_adc.id
-  to_port           = each.value.to_port
-  type              = "ingress"
+  for_each                 = local.application_data.alb_to_citrix-adc_rules
+  description              = format("ALB to Citrix ADC traffic for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.citrix_adc.id
+  to_port                  = each.value.to_port
+  type                     = "ingress"
   source_security_group_id = aws_security_group.alb_sg.id
 }
 
@@ -63,7 +63,7 @@ resource "aws_security_group_rule" "citrix_adc_egress_1" {
   from_port   = 0
   to_port     = 0
   #tfsec:ignore:AWS009
-  cidr_blocks = ["0.0.0.0/0"]
+  cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.citrix_adc.id
 }
 
@@ -83,13 +83,13 @@ resource "aws_security_group" "aws_citrix_security_group" {
 }
 
 resource "aws_security_group_rule" "ingress_citrix-adc_to_ctx-host_traffic" {
-  for_each          = local.application_data.adc_to_ctx_rules
-  description       = format("Citrix ADC to Citrix host traffic for %s %d", each.value.protocol, each.value.from_port)
-  from_port         = each.value.from_port
-  protocol          = each.value.protocol
-  security_group_id = aws_security_group.aws_citrix_security_group.id
-  to_port           = each.value.to_port
-  type              = "ingress"
+  for_each                 = local.application_data.adc_to_ctx_rules
+  description              = format("Citrix ADC to Citrix host traffic for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.aws_citrix_security_group.id
+  to_port                  = each.value.to_port
+  type                     = "ingress"
   source_security_group_id = aws_security_group.citrix_adc.id
 }
 
@@ -122,7 +122,7 @@ resource "aws_security_group_rule" "aws_citrix_security_group_egress_1" {
   from_port   = 0
   to_port     = 0
   #tfsec:ignore:AWS009
-  cidr_blocks = ["0.0.0.0/0"]
+  cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.aws_citrix_security_group.id
 }
 
@@ -214,7 +214,7 @@ resource "aws_security_group_rule" "aws_spotfire_security_group_egress_1" {
   from_port   = 0
   to_port     = 0
   #tfsec:ignore:AWS009
-  cidr_blocks = ["0.0.0.0/0"]
+  cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.aws_spotfire_security_group.id
 }
 
@@ -271,25 +271,25 @@ resource "aws_security_group" "aws_domain_security_group" {
 }
 
 resource "aws_security_group_rule" "ingress_hosts_to_domain_contoller_traffic" {
-  for_each                 = local.application_data.host_to_domain_controller_rules
-  description              = format("All hosts to Domain Controller traffic for %s %d", each.value.protocol, each.value.from_port)
-  from_port                = each.value.from_port
-  protocol                 = each.value.protocol
-  security_group_id        = aws_security_group.aws_domain_security_group.id
-  to_port                  = each.value.to_port
-  type                     = "ingress"
-  source_security_group_id = aws_security_group.all_internal_groups.id
+  for_each          = local.application_data.host_to_domain_controller_rules
+  description       = format("All hosts to Domain Controller traffic for %s %d", each.value.protocol, each.value.from_port)
+  from_port         = each.value.from_port
+  protocol          = each.value.protocol
+  security_group_id = aws_security_group.aws_domain_security_group.id
+  to_port           = each.value.to_port
+  type              = "ingress"
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
 }
 
 resource "aws_security_group_rule" "ingress_dns_endpoints_to_domain_contoller_traffic" {
-  for_each                 = local.application_data.dns_endpoint_rules
-  description              = format("DNS Endpoint to Domain Controller traffic for %s %d", each.value.protocol, each.value.from_port)
-  from_port                = each.value.from_port
-  protocol                 = each.value.protocol
-  security_group_id        = aws_security_group.aws_domain_security_group.id
-  to_port                  = each.value.to_port
-  type                     = "ingress"
-  source_security_group_id = aws_security_group.aws_dns_resolver.id
+  for_each          = local.application_data.dns_endpoint_rules
+  description       = format("DNS Endpoint to Domain Controller traffic for %s %d", each.value.protocol, each.value.from_port)
+  from_port         = each.value.from_port
+  protocol          = each.value.protocol
+  security_group_id = aws_security_group.aws_domain_security_group.id
+  to_port           = each.value.to_port
+  type              = "ingress"
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
 }
 
 resource "aws_security_group_rule" "aws_domain_security_group_egress_1" {
@@ -299,7 +299,7 @@ resource "aws_security_group_rule" "aws_domain_security_group_egress_1" {
   from_port   = 0
   to_port     = 0
   #tfsec:ignore:AWS009
-  cidr_blocks = ["0.0.0.0/0",]
+  cidr_blocks       = ["0.0.0.0/0", ]
   security_group_id = aws_security_group.aws_domain_security_group.id
 }
 
@@ -364,6 +364,7 @@ resource "aws_security_group" "aws_dns_resolver" {
 }
 
 resource "aws_security_group_rule" "ingress_dns_endpoint_traffic" {
+  provider          = aws.core-vpc
   for_each          = local.application_data.dns_endpoint_rules
   description       = format("VPC to DNS Endpoint traffic for %s %d", each.value.protocol, each.value.from_port)
   from_port         = each.value.from_port
@@ -375,6 +376,7 @@ resource "aws_security_group_rule" "ingress_dns_endpoint_traffic" {
 }
 
 resource "aws_security_group_rule" "egress_dns_endpoint_traffic" {
+  provider          = aws.core-vpc
   for_each          = local.application_data.dns_endpoint_rules
   description       = format("DNS Endpoint to Domain Controller traffic for %s %d", each.value.protocol, each.value.from_port)
   from_port         = each.value.from_port
