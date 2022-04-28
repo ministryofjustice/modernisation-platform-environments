@@ -23,4 +23,4 @@ mainSteps:
         mode: ec2
         optionalConfigurationSource: ssm
         optionalConfigurationLocation: "{{ optionalConfigurationLocation }}"
-        optionalRestart: yes
+        optionalRestart: "yes"
