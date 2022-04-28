@@ -71,6 +71,20 @@
       "protocol": "UDP"
     }
   },
+  "adc_to_equip_rules": {
+    "TCP_443": {
+      "from_port": 443,
+      "to_port": 443,
+      "protocol": "TCP"
+    }
+  },
+  "adc_to_spotfire_rules": {
+    "TCP_443": {
+      "from_port": 443,
+      "to_port": 443,
+      "protocol": "TCP"
+    }
+  },
   "ctx_to_adc_rules": {
     "TCP_22": {
       "from_port": 22,
@@ -464,6 +478,103 @@
       "from_port": -1,
       "to_port": -1,
       "protocol": "ICMP"
+    }
+  },
+  "domain_controller_to_host_rules": {
+    "TCP_42": {
+      "from_port": 42,
+      "to_port": 42,
+      "protocol": "TCP"
+    },
+    "UDP_42": {
+      "from_port": 42,
+      "to_port": 42,
+      "protocol": "UDP"
+    },
+    "UDP_53": {
+      "from_port": 53,
+      "to_port": 53,
+      "protocol": "UDP"
+    },
+    "TCP_88": {
+      "from_port": 88,
+      "to_port": 88,
+      "protocol": "TCP"
+    },
+    "UDP_88": {
+      "from_port": 88,
+      "to_port": 88,
+      "protocol": "UDP"
+    },
+    "TCP_135": {
+      "from_port": 135,
+      "to_port": 135,
+      "protocol": "TCP"
+    },
+    "UDP_135": {
+      "from_port": 135,
+      "to_port": 135,
+      "protocol": "UDP"
+    },
+    "TCP_137-139": {
+      "from_port": 137,
+      "to_port": 139,
+      "protocol": "TCP"
+    },
+    "UDP_137-139": {
+      "from_port": 137,
+      "to_port": 139,
+      "protocol": "UDP"
+    },
+    "TCP_389": {
+      "from_port": 389,
+      "to_port": 389,
+      "protocol": "TCP"
+    },
+    "UDP_389": {
+      "from_port": 389,
+      "to_port": 389,
+      "protocol": "UDP"
+    },
+    "TCP_445": {
+      "from_port": 445,
+      "to_port": 445,
+      "protocol": "TCP"
+    },
+    "UDP_445": {
+      "from_port": 445,
+      "to_port": 445,
+      "protocol": "UDP"
+    },
+    "TCP_636": {
+      "from_port": 636,
+      "to_port": 636,
+      "protocol": "TCP"
+    },
+    "UDP_636": {
+      "from_port": 636,
+      "to_port": 636,
+      "protocol": "UDP"
+    },
+    "TCP_1512": {
+      "from_port": 1512,
+      "to_port": 1512,
+      "protocol": "TCP"
+    },
+    "UDP_1512": {
+      "from_port": 1512,
+      "to_port": 1512,
+      "protocol": "UDP"
+    },
+    "TCP_3268-3269": {
+      "from_port": 3268,
+      "to_port": 3269,
+      "protocol": "TCP"
+    },
+    "TCP_3389": {
+      "from_port": 3389,
+      "to_port": 3389,
+      "protocol": "TCP"
     }
   },
   "host_to_domain_controller_rules": {
