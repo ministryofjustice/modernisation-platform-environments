@@ -340,7 +340,7 @@ resource "aws_security_group" "aws_domain_security_group" {
   )
 }
 
-resource "aws_security_group_rule" "ingress_hosts_to_domain_contoller_traffic" {
+resource "aws_security_group_rule" "ingress_hosts_to_domain_controller_traffic" {
   for_each                 = local.application_data.host_to_domain_controller_rules
   description              = format("All hosts to Domain Controller traffic for %s %d", each.value.protocol, each.value.from_port)
   from_port                = each.value.from_port
@@ -351,7 +351,7 @@ resource "aws_security_group_rule" "ingress_hosts_to_domain_contoller_traffic" {
   source_security_group_id = aws_security_group.all_internal_groups.id
 }
 
-resource "aws_security_group_rule" "ingress_dns_endpoints_to_domain_contoller_traffic" {
+resource "aws_security_group_rule" "ingress_dns_endpoints_to_domain_controller_traffic" {
   for_each          = local.application_data.dns_endpoint_rules
   description       = format("DNS Endpoint to Domain Controller traffic for %s %d", each.value.protocol, each.value.from_port)
   from_port         = each.value.from_port
@@ -433,6 +433,7 @@ resource "aws_security_group_rule" "ingress_domain_controller_to_all_hosts_traff
   source_security_group_id = aws_security_group.aws_domain_security_group.id
 }
 
+# cidr_blocks should be replaced with source_security_group_id, but open until confirmed with configuration team
 resource "aws_security_group_rule" "egress_all_hosts_to_proxies" {
   for_each          = local.application_data.host_to_proxy_rules
   description       = format("All hosts to internet for %s %d", each.value.protocol, each.value.from_port)
