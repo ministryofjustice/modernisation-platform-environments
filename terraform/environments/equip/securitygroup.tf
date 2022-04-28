@@ -354,17 +354,15 @@ resource "aws_security_group" "all_internal_groups" {
   )
 }
 
-resource "aws_security_group_rule" "all_internal_groups_egress" {
-  type        = "egress"
-  protocol    = "-1"
-  description = "Open all outbound ports"
-  from_port   = 0
-  to_port     = 0
-  #tfsec:ignore:AWS009
-  cidr_blocks = [
-    "0.0.0.0/0",
-  ]
-  security_group_id = aws_security_group.all_internal_groups.id
+resource "aws_security_group_rule" "egress_all_hosts_to_proxies" {
+  for_each                 = local.application_data.host_to_proxy_rules
+  description              = format("All hosts to proxies traffic for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.all_internal_groups.id
+  to_port                  = each.value.to_port
+  type                     = "egress"
+  source_security_group_id = aws_security_group.aws_proxy_security_group.id
 }
 
 ## AWS Resolver Endpoint security group
