@@ -1,8 +1,13 @@
 #!/bin/bash
 
-# Parse the env variable NUKE_ACCOUNT_IDS which holds a JSON string of account IDs. Example value held in
-# NUKE_ACCOUNT_IDS is as follows
-#    NUKE_ACCOUNT_IDS='
+export AWS_REGION=eu-west-2
+
+nuke_account_ids=$(aws secretsmanager get-secret-value --secret-id nuke_account_ids --query 'SecretString')
+echo "nuke_account_ids=${nuke_account_ids}"
+
+# Parse the variable nuke_account_ids which holds a JSON string of account IDs. Example value held in
+# nuke_account_ids is as follows
+#    nuke_account_ids='
 #    {
 #      "NUKE_ACCOUNT_IDS": {
 #        "SPRINKLER_DEVELOPMENT_ACCID": "111111111111",
@@ -10,12 +15,14 @@
 #      }
 #    }'
 # Export the account IDs to env variables, for example: export SPRINKLER_DEVELOPMENT_ACCID=111111111111
-eval "$(jq -r '.NUKE_ACCOUNT_IDS | to_entries | .[] |"export " + .key + "=" + (.value | @sh)' <<<"$NUKE_ACCOUNT_IDS")"
+eval "$(jq -r '.nuke_account_ids | to_entries | .[] |"export " + .key + "=" + (.value | @sh)' <<<"$nuke_account_ids")"
+
+echo "SPRINKLER_DEVELOPMENT_ACCID=$SPRINKLER_DEVELOPMENT_ACCID"
+exit 1
+
 
 # Generate nuke-config.yml interpolating env variables with account IDs.
 cat ./scripts/nuke-config-template.txt | envsubst >nuke-config.yml
-
-export AWS_REGION=eu-west-2
 
 nuked_envs=()
 skipped_envs=()
