@@ -2,11 +2,7 @@
 
 export AWS_REGION=eu-west-2
 
-echo "jq --version"
-jq --version
-
 nuke_account_ids=$(aws secretsmanager get-secret-value --secret-id nuke_account_ids --query 'SecretString' --output text --no-cli-pager)
-echo "nuke_account_ids=${nuke_account_ids}"
 
 # Parse the variable nuke_account_ids which holds a JSON string of account IDs. Example value held in
 # nuke_account_ids is as follows
@@ -19,10 +15,6 @@ echo "nuke_account_ids=${nuke_account_ids}"
 #    }'
 # Export the account IDs to env variables, for example: export SPRINKLER_DEVELOPMENT_ACCID=111111111111
 eval "$(jq -r '.NUKE_ACCOUNT_IDS | to_entries | .[] |"export " + .key + "=" + (.value | @sh)' <<<"$nuke_account_ids")"
-
-echo "SPRINKLER_DEVELOPMENT_ACCID=$SPRINKLER_DEVELOPMENT_ACCID"
-exit 1
-
 
 # Generate nuke-config.yml interpolating env variables with account IDs.
 cat ./scripts/nuke-config-template.txt | envsubst >nuke-config.yml
