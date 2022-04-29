@@ -5,7 +5,7 @@ export AWS_REGION=eu-west-2
 echo "jq --version"
 jq --version
 
-nuke_account_ids=$(aws secretsmanager get-secret-value --secret-id nuke_account_ids --query 'SecretString')
+nuke_account_ids=$(aws secretsmanager get-secret-value --secret-id nuke_account_ids --query 'SecretString' --output text --no-cli-pager)
 echo "nuke_account_ids=${nuke_account_ids}"
 
 # Parse the variable nuke_account_ids which holds a JSON string of account IDs. Example value held in
