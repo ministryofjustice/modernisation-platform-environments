@@ -15,7 +15,7 @@ echo "nuke_account_ids=${nuke_account_ids}"
 #      }
 #    }'
 # Export the account IDs to env variables, for example: export SPRINKLER_DEVELOPMENT_ACCID=111111111111
-eval "$(jq -r '.nuke_account_ids | to_entries | .[] |"export " + .key + "=" + (.value | @sh)' <<<"$nuke_account_ids")"
+eval "$(jq -r '.NUKE_ACCOUNT_IDS | to_entries | .[] |"export " + .key + "=" + (.value | @sh)' <<<"$nuke_account_ids")"
 
 echo "SPRINKLER_DEVELOPMENT_ACCID=$SPRINKLER_DEVELOPMENT_ACCID"
 exit 1
