@@ -403,3 +403,136 @@ resource "aws_iam_role" "ssm_ec2_start_stop" {
     },
   )
 }
+
+#------------------------------------------------------------------------------
+# Patch Manager
+#------------------------------------------------------------------------------
+
+# Define a Maintenance Window, Thursday 2am, 180 minutes
+resource "aws_ssm_maintenance_window" "maintenance" {
+  name                       = "weekly-patching"
+  description                = "Maintenance window for applying OS patches"
+  schedule                   = "cron(0 2 ? * THU *)"
+  duration                   = 3
+  cutoff                     = 1
+  enabled                    = true
+  allow_unassociated_targets = true
+}
+
+# Maintenance window task to start instances in scope of scheduled shutdown
+# How's this gonna work with the weblogics in warm pool?
+# Might need a different solution for ASG - scheduled refresh of AMI?
+resource "aws_ssm_maintenance_window_task" "start_instances" {
+  name        = "Start-Instances"
+  description = "Starts instances that are in scope of scheduled shut-down"
+  # max_concurrency = 2
+  # max_errors      = 1
+  cutoff_behavior = "CANCEL_TASK"
+  priority        = 1
+  task_arn        = "AWS-StartEC2Instance"
+  task_type       = "AUTOMATION"
+  window_id       = aws_ssm_maintenance_window.maintenance.id
+
+  targets {
+    key    = "tag:always_on"
+    values = ["false"]
+  }
+
+  task_invocation_parameters {
+    automation_parameters {
+      document_version = "$LATEST"
+      parameter {
+        name   = "AutomationAssumeRole"
+        values = [aws_iam_role.ssm_ec2_start_stop.arn]
+      }
+    }
+  }
+}
+
+# Maintenance window task to apply RHEL patches
+resource "aws_ssm_maintenance_window_task" "rhel_patching" {
+  name        = "RHEL-security-patching"
+  description = "Applies AWS default patch baseline for RHEL instances"
+  # max_concurrency = 2
+  # max_errors      = 1
+  cutoff_behavior = "CANCEL_TASK"
+  priority        = 2
+  task_arn        = "AWS-RunPatchBaseline"
+  task_type       = "RUN_COMMAND"
+  window_id       = aws_ssm_maintenance_window.maintenance.id
+
+  targets {
+    key    = "tag:Patch Group"
+    values = ["${aws_ssm_patch_group.rhel.patch_group}"]
+  }
+
+  task_invocation_parameters {
+    run_command_parameters {
+      parameter {
+        name   = "Operation"
+        values = ["Scan"]
+      }
+      parameter {
+        name   = "RebootOption"
+        values = ["NoReboot"]
+      }
+    }
+  }
+}
+
+# Maintenance window task to apply Windows patches
+resource "aws_ssm_maintenance_window_task" "windows_patching" {
+  name        = "Windows-security-patching"
+  description = "Applies AWS default patch baseline for Windows instances"
+  # max_concurrency = 2
+  # max_errors      = 1
+  cutoff_behavior = "CANCEL_TASK"
+  priority        = 2
+  task_arn        = "AWS-RunPatchBaseline"
+  task_type       = "RUN_COMMAND"
+  window_id       = aws_ssm_maintenance_window.maintenance.id
+
+  targets {
+    key    = "tag:Patch Group"
+    values = ["${aws_ssm_patch_group.windows.patch_group}"]
+  }
+
+  task_invocation_parameters {
+    run_command_parameters {
+      parameter {
+        name   = "Operation"
+        values = ["Scan"]
+      }
+      parameter {
+        name   = "RebootOption"
+        values = ["RebootIfNeeded"]
+      }
+    }
+  }
+}
+
+# Patch Baselines
+data "aws_ssm_patch_baseline" "rhel" {
+  owner            = "AWS"
+  name_prefix      = "AWS-"
+  operating_system = "REDHAT_ENTERPRISE_LINUX"
+  default_baseline = true
+}
+
+data "aws_ssm_patch_baseline" "windows" {
+  owner            = "AWS"
+  name_prefix      = "AWS-"
+  operating_system = "WINDOWS"
+  default_baseline = true
+}
+
+# Patch Groups
+resource "aws_ssm_patch_group" "rhel" {
+  baseline_id = data.aws_ssm_patch_baseline.rhel.id
+  patch_group = "RHEL"
+}
+
+resource "aws_ssm_patch_group" "windows" {
+  baseline_id = data.aws_ssm_patch_baseline.windows.id
+  patch_group = "Windows"
+}
