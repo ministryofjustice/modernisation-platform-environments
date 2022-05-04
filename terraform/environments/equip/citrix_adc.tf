@@ -26,9 +26,46 @@ resource "aws_instance" "citrix_adc_instance" {
     http_tokens = "optional"
   }
 
-  tags = {
-    Name = "NPS-COR-A-ADC01"
-    ROLE = "Citrix Netscaler ADC VPX"
-  }
+  tags = merge(local.tags,
+    { Name = "NPS-COR-A-ADC01"
+      ROLE = "Citrix Netscaler ADC VPX"
+    }
+  )
+
 }
 
+resource "aws_network_interface" "adc_vip_interface" {
+  security_groups   = [aws_security_group.citrix_adc.id]
+  source_dest_check = false
+  subnet_id         = data.aws_subnet.public_az_a.id
+
+  attachment {
+    device_index = 1
+    instance     = aws_instance.citrix_adc_instance.id
+  }
+
+  tags = merge(local.tags,
+    { Name = "ENI-NPS-COR-A-ADC01_VIP"
+      ROLE = "Citrix Netscaler ADC VPX VIP Interface"
+    }
+  )
+
+}
+
+resource "aws_network_interface" "adc_snip_interface" {
+  security_groups   = [aws_security_group.citrix_adc.id]
+  source_dest_check = false
+  subnet_id         = data.aws_subnet.private_subnets_a.id
+
+  attachment {
+    device_index = 2
+    instance     = aws_instance.citrix_adc_instance.id
+  }
+
+  tags = merge(local.tags,
+    { Name = "ENI-NPS-COR-A-ADC01_SNIP"
+      ROLE = "Citrix Netscaler ADC VPX SNIP Interface"
+    }
+  )
+
+}
