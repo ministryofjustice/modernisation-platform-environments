@@ -28,7 +28,7 @@ resource "aws_instance" "citrix_adc_instance" {
 
   tags = merge(local.tags,
     { Name = "NPS-COR-A-ADC01"
-      ROLE = "Citrix Netscaler ADC VPX"
+      Role = "Citrix Netscaler ADC VPX"
     }
   )
 
