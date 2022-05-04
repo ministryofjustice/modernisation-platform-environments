@@ -495,7 +495,7 @@ resource "aws_ssm_maintenance_window_task" "rhel_patching" {
     run_command_parameters {
       parameter {
         name   = "Operation"
-        values = ["Scan"]
+        values = ["Install"]
       }
       parameter {
         name   = "RebootOption"
@@ -538,7 +538,7 @@ resource "aws_ssm_maintenance_window_task" "windows_patching" {
     run_command_parameters {
       parameter {
         name   = "Operation"
-        values = ["Scan"]
+        values = ["Install"]
       }
       parameter {
         name   = "RebootOption"
