@@ -32,3 +32,24 @@ resource "aws_instance" "citrix_adc_instance" {
   }
 }
 
+resource "aws_network_interface" "adc_vip_interface" {
+  security_groups   = [aws_security_group.citrix_adc.id]
+  source_dest_check = false
+  subnet_id         = aws_instance.citrix_adc_instance.subnet_id
+
+  attachment {
+    device_index = 1
+    instance     = aws_instance.citrix_adc_instance.id
+  }
+}
+
+resource "aws_network_interface" "adc_snip_interface" {
+  security_groups   = [aws_security_group.citrix_adc.id]
+  source_dest_check = false
+  subnet_id         = aws_instance.citrix_adc_instance.subnet_id
+
+  attachment {
+    device_index = 2
+    instance     = aws_instance.citrix_adc_instance.id
+  }
+}
