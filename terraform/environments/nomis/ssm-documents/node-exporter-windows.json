@@ -7,8 +7,8 @@
       "name": "InstallNodeExporter",
       "inputs": {
         "runCommand": [
-          "Copy-S3Object -BucketName s3-bucket20210929163229537900000001 -Key node-exporter/wmi_exporter-0.8.3-amd64.msi -LocalFile 'C:\Program Files (x86)\wmi_exporter\wmi_exporter.exe'",
-          "msiexec /i 'C:\Program Files (x86)\wmi_exporter\wmi_exporter.exe' LISTEN_PORT=9182"
+          "Copy-S3Object -BucketName s3-bucket20210929163229537900000001 -Key node-exporter/wmi_exporter-0.8.3-amd64.msi -LocalFile 'C:\\Program Files (x86)\\wmi_exporter\\wmi_exporter.exe'",
+          "msiexec /i 'C:\\Program Files (x86)\\wmi_exporter\\wmi_exporter.exe' LISTEN_PORT=9182"
         ]
       }
     }
