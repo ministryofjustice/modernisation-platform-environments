@@ -73,7 +73,7 @@ resource "aws_security_group_rule" "egress_citrix-adc_to_ctx-host" {
   protocol                 = each.value.protocol
   security_group_id        = aws_security_group.citrix_adc.id
   to_port                  = each.value.to_port
-  type                     = "ingress"
+  type                     = "egress"
   source_security_group_id = aws_security_group.aws_citrix_security_group.id
 }
 
@@ -84,7 +84,7 @@ resource "aws_security_group_rule" "egress_citrix-adc_to_equip" {
   protocol                 = each.value.protocol
   security_group_id        = aws_security_group.citrix_adc.id
   to_port                  = each.value.to_port
-  type                     = "ingress"
+  type                     = "egress"
   source_security_group_id = aws_security_group.aws_equip_security_group.id
 }
 
@@ -95,7 +95,7 @@ resource "aws_security_group_rule" "egress_citrix-adc_to_spotfire" {
   protocol                 = each.value.protocol
   security_group_id        = aws_security_group.citrix_adc.id
   to_port                  = each.value.to_port
-  type                     = "ingress"
+  type                     = "egress"
   source_security_group_id = aws_security_group.aws_spotfire_security_group.id
 }
 
