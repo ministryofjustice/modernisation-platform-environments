@@ -422,11 +422,24 @@ resource "aws_ssm_maintenance_window" "maintenance" {
 # Maintenance window task to start instances in scope of scheduled shutdown
 # How's this gonna work with the weblogics in warm pool?
 # Might need a different solution for ASG - scheduled refresh of AMI?
+
+resource "aws_ssm_maintenance_window_target" "start_instances" {
+  window_id     = aws_ssm_maintenance_window.maintenance.id
+  name          = "start-instances"
+  description   = "Target group for instances in scope of scheduled shutdown"
+  resource_type = "INSTANCE"
+
+  targets {
+    key    = "tag:always_on"
+    values = ["false"]
+  }
+}
+
 resource "aws_ssm_maintenance_window_task" "start_instances" {
-  name        = "Start-Instances"
-  description = "Starts instances that are in scope of scheduled shut-down"
-  # max_concurrency = 2
-  # max_errors      = 1
+  name            = "Start-Instances"
+  description     = "Starts instances that are in scope of scheduled shutdown"
+  max_concurrency = "100%"
+  max_errors      = "100%"
   cutoff_behavior = "CANCEL_TASK"
   priority        = 1
   task_arn        = "AWS-StartEC2Instance"
@@ -434,8 +447,8 @@ resource "aws_ssm_maintenance_window_task" "start_instances" {
   window_id       = aws_ssm_maintenance_window.maintenance.id
 
   targets {
-    key    = "tag:always_on"
-    values = ["false"]
+    key    = "WindowTargetIds"
+    values = [aws_ssm_maintenance_window_target.start_instances.id]
   }
 
   task_invocation_parameters {
@@ -450,11 +463,23 @@ resource "aws_ssm_maintenance_window_task" "start_instances" {
 }
 
 # Maintenance window task to apply RHEL patches
+resource "aws_ssm_maintenance_window_target" "rhel_patching" {
+  window_id     = aws_ssm_maintenance_window.maintenance.id
+  name          = "rhel-patching"
+  description   = "Target group for RHEL patching"
+  resource_type = "INSTANCE"
+
+  targets {
+    key    = "tag:Patch Group"
+    values = [aws_ssm_patch_group.rhel.patch_group]
+  }
+}
+
 resource "aws_ssm_maintenance_window_task" "rhel_patching" {
-  name        = "RHEL-security-patching"
-  description = "Applies AWS default patch baseline for RHEL instances"
-  # max_concurrency = 2
-  # max_errors      = 1
+  name            = "RHEL-security-patching"
+  description     = "Applies AWS default patch baseline for RHEL instances"
+  max_concurrency = "100%"
+  max_errors      = "50%"
   cutoff_behavior = "CANCEL_TASK"
   priority        = 2
   task_arn        = "AWS-RunPatchBaseline"
@@ -462,8 +487,8 @@ resource "aws_ssm_maintenance_window_task" "rhel_patching" {
   window_id       = aws_ssm_maintenance_window.maintenance.id
 
   targets {
-    key    = "tag:Patch Group"
-    values = ["${aws_ssm_patch_group.rhel.patch_group}"]
+    key    = "WindowTargetIds"
+    values = [aws_ssm_maintenance_window_target.rhel_patching.id]
   }
 
   task_invocation_parameters {
@@ -481,11 +506,23 @@ resource "aws_ssm_maintenance_window_task" "rhel_patching" {
 }
 
 # Maintenance window task to apply Windows patches
+resource "aws_ssm_maintenance_window_target" "windows_patching" {
+  window_id     = aws_ssm_maintenance_window.maintenance.id
+  name          = "windows-patching"
+  description   = "Target group for Windows patching"
+  resource_type = "INSTANCE"
+
+  targets {
+    key    = "tag:Patch Group"
+    values = [aws_ssm_patch_group.windows.patch_group]
+  }
+}
+
 resource "aws_ssm_maintenance_window_task" "windows_patching" {
-  name        = "Windows-security-patching"
-  description = "Applies AWS default patch baseline for Windows instances"
-  # max_concurrency = 2
-  # max_errors      = 1
+  name            = "Windows-security-patching"
+  description     = "Applies AWS default patch baseline for Windows instances"
+  max_concurrency = "100%"
+  max_errors      = "50%"
   cutoff_behavior = "CANCEL_TASK"
   priority        = 2
   task_arn        = "AWS-RunPatchBaseline"
@@ -493,8 +530,8 @@ resource "aws_ssm_maintenance_window_task" "windows_patching" {
   window_id       = aws_ssm_maintenance_window.maintenance.id
 
   targets {
-    key    = "tag:Patch Group"
-    values = ["${aws_ssm_patch_group.windows.patch_group}"]
+    key    = "WindowTargetIds"
+    values = [aws_ssm_maintenance_window_target.windows_patching.id]
   }
 
   task_invocation_parameters {
