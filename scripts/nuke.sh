@@ -39,6 +39,10 @@ done
 export account_blocklist_str
 export accounts_str
 cat ./scripts/nuke-config-template.txt | envsubst >nuke-config.yml
+echo 'nuke-config.yml:'
+echo '----------------'
+cat nuke-config.yml
+echo '----------------'
 
 nuked_envs=()
 failed_envs=()
