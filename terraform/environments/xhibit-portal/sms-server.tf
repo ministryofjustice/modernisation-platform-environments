@@ -7,7 +7,8 @@ resource "aws_instance" "sms-server" {
   associate_public_ip_address = false
   ebs_optimized               = false
   subnet_id                   = data.aws_subnet.private_az_a.id
-  key_name                    = aws_key_pair.george.key_name
+  key_name                    = aws_key_pair.gary.key_name
+  #key_name                    = aws_key_pair.george.key_name
 
 
   metadata_options {
