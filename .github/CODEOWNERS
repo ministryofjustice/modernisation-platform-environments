@@ -3,6 +3,7 @@
 
 * @modernisation-platform
 /terraform/environments/equip @modernisation-platform-engineers @modernisation-platform
+/terraform/environments/example @modernisation-platform @modernisation-platform
 /terraform/environments/nomis @studio-webops @modernisation-platform
 /terraform/environments/performance-hub @performance-hub-developers @modernisation-platform
 /terraform/environments/ppud @ppud-replacement-devs @modernisation-platform
