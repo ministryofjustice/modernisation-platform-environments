@@ -35,7 +35,7 @@ resource "aws_instance" "sms-server" {
       # Prevent changes to encryption from destroying existing EC2s - can delete once encryption complete
     ]
     
-    prevent_destroy = true
+    prevent_destroy = false
   }
 
   tags = merge(
