@@ -458,6 +458,10 @@ resource "aws_ssm_maintenance_window_task" "start_instances" {
         name   = "AutomationAssumeRole"
         values = [aws_iam_role.ssm_ec2_start_stop.arn]
       }
+      parameter {
+        name   = "InstanceId"
+        values = ["*"]
+      }
     }
   }
 }
