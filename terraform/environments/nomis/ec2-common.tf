@@ -420,9 +420,6 @@ resource "aws_ssm_maintenance_window" "maintenance" {
 }
 
 # Maintenance window task to start instances in scope of scheduled shutdown
-# How's this gonna work with the weblogics in warm pool?
-# Might need a different solution for ASG - scheduled refresh of AMI?
-
 resource "aws_ssm_maintenance_window_target" "start_instances" {
   window_id     = aws_ssm_maintenance_window.maintenance.id
   name          = "start-instances"
