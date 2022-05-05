@@ -617,7 +617,7 @@ resource "aws_ssm_patch_baseline" "windows" {
         values = ["CriticalUpdates", "SecurityUpdates"]
       }
     patch_filter {
-        key    = "SEVERITY"
+        key    = "MSRC_SEVERITY"
         values = ["Critical"]
       }
   }
@@ -630,7 +630,7 @@ resource "aws_ssm_patch_baseline" "windows" {
         values = ["CriticalUpdates", "SecurityUpdates"]
       }
     patch_filter {
-        key    = "SEVERITY"
+        key    = "MSRC_SEVERITY"
         values = ["Important"]
       }
   }
