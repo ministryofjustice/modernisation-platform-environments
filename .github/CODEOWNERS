@@ -3,6 +3,7 @@
 
 * @ministryofjustice/modernisation-platform
 /terraform/environments/equip @ministryofjustice/modernisation-platform-engineers @ministryofjustice/modernisation-platform
+/terraform/environments/example @ministryofjustice/modernisation-platform @ministryofjustice/modernisation-platform
 /terraform/environments/nomis @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
 /terraform/environments/performance-hub @ministryofjustice/performance-hub-developers @ministryofjustice/modernisation-platform
 /terraform/environments/ppud @ministryofjustice/ppud-replacement-devs @ministryofjustice/modernisation-platform
