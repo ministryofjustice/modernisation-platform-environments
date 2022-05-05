@@ -10,6 +10,8 @@ data "aws_acm_certificate" "production_cert" {
   statuses = ["ISSUED"]
 }
 
+#Load balancer needs to be publically accessible
+#tfsec:ignore:aws-elb-alb-not-public
 resource "aws_lb" "citrix_alb" {
 
   name        = format("alb-%s-%s-citrix", local.application_name, local.environment)
