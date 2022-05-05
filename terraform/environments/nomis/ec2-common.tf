@@ -413,7 +413,7 @@ resource "aws_iam_role" "ssm_ec2_start_stop" {
 resource "aws_ssm_maintenance_window" "maintenance" {
   name                       = "weekly-patching"
   description                = "Maintenance window for applying OS patches"
-  schedule                   = replace("cron(0 2 ? * DAY *)", "DAY",  local.application_data.accounts[local.environment].patch_day)
+  schedule                   = "cron(0 2 ? * ${local.application_data.accounts[local.environment].patch_day} *)"
   duration                   = 3
   cutoff                     = 1
   enabled                    = true
