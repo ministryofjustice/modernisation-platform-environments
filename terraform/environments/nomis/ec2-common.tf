@@ -282,6 +282,7 @@ resource "aws_ssm_document" "node_exporter_linux" {
   document_type   = "Command"
   document_format = "JSON"
   content         = file("./ssm-documents/node-exporter-linux.json")
+  target_type      = "/AWS::EC2::Instance"
 
   tags = merge(
     local.tags,
