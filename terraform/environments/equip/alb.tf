@@ -94,6 +94,7 @@ resource "aws_lb_target_group_attachment" "lb_tga_443" {
 }
 
 resource "aws_lb_listener" "lb_listener_https" {
+  #checkov:skip=CKV_AWS_103
   load_balancer_arn = aws_lb.citrix_alb.arn
   port              = "443"
   protocol          = "HTTPS"
