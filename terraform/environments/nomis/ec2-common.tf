@@ -409,15 +409,21 @@ resource "aws_iam_role" "ssm_ec2_start_stop" {
 # Patch Manager
 #------------------------------------------------------------------------------
 
-# Define a Maintenance Window, Thursday 2am, 180 minutes
+# Define a Maintenance Window, 2am on patch_day, 180 minutes
 resource "aws_ssm_maintenance_window" "maintenance" {
   name                       = "weekly-patching"
   description                = "Maintenance window for applying OS patches"
-  schedule                   = "cron(0 2 ? * THU *)"
+  schedule                   = replace("cron(0 2 ? * DAY *)", "DAY",  local.application_data.accounts[local.environment].patch_day)
   duration                   = 3
   cutoff                     = 1
   enabled                    = true
   allow_unassociated_targets = true
+  tags = merge(
+    local.tags,
+    {
+      Name = "weekly-patching"
+    },
+  )
 }
 
 # Maintenance window task to start instances in scope of scheduled shutdown
@@ -551,27 +557,99 @@ resource "aws_ssm_maintenance_window_task" "windows_patching" {
 }
 
 # Patch Baselines
-data "aws_ssm_patch_baseline" "rhel" {
-  owner            = "AWS"
-  name_prefix      = "AWS-"
+resource "aws_ssm_patch_baseline" "rhel" {
+  name = "USER-RedHatPatchBaseline"
+  description = "Approves all RHEL operating system patches that are classified as Security and Bugfix and that have a severity of Critical or Important."
   operating_system = "REDHAT_ENTERPRISE_LINUX"
-  default_baseline = true
+
+  approval_rule {
+    approve_after_days =  local.application_data.accounts[local.environment].patch_approval_delay_days
+    compliance_level = "CRITICAL"
+    patch_filter {
+        key    = "CLASSIFICATION"
+        values = ["Security"]
+      }
+    patch_filter {
+        key    = "SEVERITY"
+        values = ["Critical"]
+      }
+  }
+  
+  approval_rule {
+    approve_after_days = local.application_data.accounts[local.environment].patch_approval_delay_days
+    compliance_level = "HIGH"
+    patch_filter {
+        key    = "CLASSIFICATION"
+        values = ["Security"]
+      }
+    patch_filter {
+        key    = "SEVERITY"
+        values = ["Important"]
+      }
+  }
+
+  approval_rule {
+    approve_after_days = local.application_data.accounts[local.environment].patch_approval_delay_days
+    compliance_level = "MEDIUM"
+    patch_filter {
+        key    = "CLASSIFICATION"
+        values = ["Bugfix"]
+      }
+  }
+  tags = merge(
+    local.tags,
+    {
+      Name = "rhel-patch-baseline"
+    },
+  )
 }
 
-data "aws_ssm_patch_baseline" "windows" {
-  owner            = "AWS"
-  name_prefix      = "AWS-"
+resource "aws_ssm_patch_baseline" "windows" {
+  name = "USER-WindowsPatchBaseline-OS"
+  description = "Approves all Windows Server operating system patches that are classified as CriticalUpdates or SecurityUpdates and that have an MSRC severity of Critical or Important."
   operating_system = "WINDOWS"
-  default_baseline = true
+
+  approval_rule {
+    approve_after_days = local.application_data.accounts[local.environment].patch_approval_delay_days
+    compliance_level = "CRITICAL"
+    patch_filter {
+        key    = "CLASSIFICATION"
+        values = ["CriticalUpdates", "SecurityUpdates"]
+      }
+    patch_filter {
+        key    = "SEVERITY"
+        values = ["Critical"]
+      }
+  }
+  
+  approval_rule {
+    approve_after_days = local.application_data.accounts[local.environment].patch_approval_delay_days
+    compliance_level = "HIGH"
+    patch_filter {
+        key    = "CLASSIFICATION"
+        values = ["CriticalUpdates", "SecurityUpdates"]
+      }
+    patch_filter {
+        key    = "SEVERITY"
+        values = ["Important"]
+      }
+  }
+  
+  tags = merge(
+    local.tags,
+    {
+      Name = "windows-patch-baseline"
+    },
+  )
 }
 
 # Patch Groups
 resource "aws_ssm_patch_group" "rhel" {
-  baseline_id = data.aws_ssm_patch_baseline.rhel.id
+  baseline_id = aws_ssm_patch_baseline.rhel.id
   patch_group = "RHEL"
 }
 
 resource "aws_ssm_patch_group" "windows" {
-  baseline_id = data.aws_ssm_patch_baseline.windows.id
+  baseline_id = aws_ssm_patch_baseline.windows.id
   patch_group = "Windows"
 }
