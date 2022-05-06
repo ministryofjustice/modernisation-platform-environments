@@ -21,6 +21,7 @@ for key in "${!account_ids[@]}"; do
   to_dir_name "$key"
   if [[ "$NUKE_DO_NOT_RECREATE_ENVIRONMENTS" != *"${dir_name}-development,"* ]]; then
     echo "BEGIN: terraform apply ${dir_name}-development"
+    bash scripts/terraform-init.sh "terraform/environments/${dir_name}" || exit_code=$?
     terraform -chdir="terraform/environments/${dir_name}" workspace select "${dir_name}-development" || exit_code=$?
     bash scripts/terraform-apply.sh "terraform/environments/${dir_name}" || exit_code=$?
     if [ $exit_code -ne 0 ]; then
