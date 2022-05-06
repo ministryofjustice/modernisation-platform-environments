@@ -24,7 +24,7 @@ for key in "${!account_ids[@]}"; do
     bash scripts/terraform-init.sh "terraform/environments/${dir_name}" || exit_code=$?
     terraform -chdir="terraform/environments/${dir_name}" workspace select "${dir_name}-development" || exit_code=$?
     bash scripts/terraform-apply.sh "terraform/environments/${dir_name}" || exit_code=$?
-    if [ $exit_code -ne 0 ]; then
+    if [[ $exit_code -ne 0 ]]; then
       failed_envs+=("${dir_name}-development")
     else
       redeployed_envs+=("${dir_name}-development")
