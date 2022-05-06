@@ -282,6 +282,7 @@ resource "aws_ssm_document" "node_exporter_linux" {
   document_type   = "Command"
   document_format = "JSON"
   content         = file("./ssm-documents/node-exporter-linux.json")
+  target_type      = "/AWS::EC2::Instance"
 
   tags = merge(
     local.tags,
@@ -402,4 +403,175 @@ resource "aws_iam_role" "ssm_ec2_start_stop" {
       Name = "ssm-ec2-start-stop"
     },
   )
+}
+
+#------------------------------------------------------------------------------
+# Patch Manager
+#------------------------------------------------------------------------------
+
+# Define a Maintenance Window, Thursday 2am, 180 minutes
+resource "aws_ssm_maintenance_window" "maintenance" {
+  name                       = "weekly-patching"
+  description                = "Maintenance window for applying OS patches"
+  schedule                   = "cron(0 2 ? * THU *)"
+  duration                   = 3
+  cutoff                     = 1
+  enabled                    = true
+  allow_unassociated_targets = true
+}
+
+# Maintenance window task to start instances in scope of scheduled shutdown
+resource "aws_ssm_maintenance_window_target" "start_instances" {
+  window_id     = aws_ssm_maintenance_window.maintenance.id
+  name          = "start-instances"
+  description   = "Target group for instances in scope of scheduled shutdown"
+  resource_type = "INSTANCE"
+
+  targets {
+    key    = "tag:always_on"
+    values = ["false"]
+  }
+}
+
+resource "aws_ssm_maintenance_window_task" "start_instances" {
+  name            = "Start-Instances"
+  description     = "Starts instances that are in scope of scheduled shutdown"
+  max_concurrency = "100%"
+  max_errors      = "100%"
+  cutoff_behavior = "CANCEL_TASK"
+  priority        = 1
+  task_arn        = "AWS-StartEC2Instance"
+  task_type       = "AUTOMATION"
+  window_id       = aws_ssm_maintenance_window.maintenance.id
+
+  targets {
+    key    = "WindowTargetIds"
+    values = [aws_ssm_maintenance_window_target.start_instances.id]
+  }
+
+  task_invocation_parameters {
+    automation_parameters {
+      document_version = "$LATEST"
+      parameter {
+        name   = "AutomationAssumeRole"
+        values = [aws_iam_role.ssm_ec2_start_stop.arn]
+      }
+      parameter {
+        name   = "InstanceId"
+        values = ["*"]
+      }
+    }
+  }
+}
+
+# Maintenance window task to apply RHEL patches
+resource "aws_ssm_maintenance_window_target" "rhel_patching" {
+  window_id     = aws_ssm_maintenance_window.maintenance.id
+  name          = "rhel-patching"
+  description   = "Target group for RHEL patching"
+  resource_type = "INSTANCE"
+
+  targets {
+    key    = "tag:Patch Group"
+    values = [aws_ssm_patch_group.rhel.patch_group]
+  }
+}
+
+resource "aws_ssm_maintenance_window_task" "rhel_patching" {
+  name            = "RHEL-security-patching"
+  description     = "Applies AWS default patch baseline for RHEL instances"
+  max_concurrency = "100%"
+  max_errors      = "50%"
+  cutoff_behavior = "CANCEL_TASK"
+  priority        = 2
+  task_arn        = "AWS-RunPatchBaseline"
+  task_type       = "RUN_COMMAND"
+  window_id       = aws_ssm_maintenance_window.maintenance.id
+
+  targets {
+    key    = "WindowTargetIds"
+    values = [aws_ssm_maintenance_window_target.rhel_patching.id]
+  }
+
+  task_invocation_parameters {
+    run_command_parameters {
+      parameter {
+        name   = "Operation"
+        values = ["Install"]
+      }
+      parameter {
+        name   = "RebootOption"
+        values = ["NoReboot"]
+      }
+    }
+  }
+}
+
+# Maintenance window task to apply Windows patches
+resource "aws_ssm_maintenance_window_target" "windows_patching" {
+  window_id     = aws_ssm_maintenance_window.maintenance.id
+  name          = "windows-patching"
+  description   = "Target group for Windows patching"
+  resource_type = "INSTANCE"
+
+  targets {
+    key    = "tag:Patch Group"
+    values = [aws_ssm_patch_group.windows.patch_group]
+  }
+}
+
+resource "aws_ssm_maintenance_window_task" "windows_patching" {
+  name            = "Windows-security-patching"
+  description     = "Applies AWS default patch baseline for Windows instances"
+  max_concurrency = "100%"
+  max_errors      = "50%"
+  cutoff_behavior = "CANCEL_TASK"
+  priority        = 2
+  task_arn        = "AWS-RunPatchBaseline"
+  task_type       = "RUN_COMMAND"
+  window_id       = aws_ssm_maintenance_window.maintenance.id
+
+  targets {
+    key    = "WindowTargetIds"
+    values = [aws_ssm_maintenance_window_target.windows_patching.id]
+  }
+
+  task_invocation_parameters {
+    run_command_parameters {
+      parameter {
+        name   = "Operation"
+        values = ["Install"]
+      }
+      parameter {
+        name   = "RebootOption"
+        values = ["RebootIfNeeded"]
+      }
+    }
+  }
+}
+
+# Patch Baselines
+data "aws_ssm_patch_baseline" "rhel" {
+  owner            = "AWS"
+  name_prefix      = "AWS-"
+  operating_system = "REDHAT_ENTERPRISE_LINUX"
+  default_baseline = true
+}
+
+data "aws_ssm_patch_baseline" "windows" {
+  owner            = "AWS"
+  name_prefix      = "AWS-"
+  operating_system = "WINDOWS"
+  default_baseline = true
+}
+
+# Patch Groups
+resource "aws_ssm_patch_group" "rhel" {
+  baseline_id = data.aws_ssm_patch_baseline.rhel.id
+  patch_group = "RHEL"
+}
+
+resource "aws_ssm_patch_group" "windows" {
+  baseline_id = data.aws_ssm_patch_baseline.windows.id
+  patch_group = "Windows"
 }

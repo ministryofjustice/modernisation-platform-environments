@@ -107,11 +107,12 @@ resource "aws_instance" "database" {
   tags = merge(
     var.tags,
     {
-      Name       = "database-${var.name}"
-      component  = "data"
-      os_type    = "Linux"
-      os_version = "RHEL 7.9"
-      always_on  = var.always_on
+      Name          = "database-${var.name}"
+      component     = "data"
+      os_type       = "Linux"
+      os_version    = "RHEL 7.9"
+      always_on     = var.always_on
+      "Patch Group" = "RHEL"
     }
   )
 }

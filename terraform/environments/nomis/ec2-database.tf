@@ -34,8 +34,8 @@ module "database" {
   application_name = local.application_name
   business_unit    = local.vpc_name
   environment      = local.environment
-  tags             = local.tags
   subnet_set       = local.subnet_set
+  tags             = local.tags
 }
 
 #------------------------------------------------------------------------------
