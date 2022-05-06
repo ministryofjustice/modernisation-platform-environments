@@ -4,7 +4,7 @@ resource "aws_security_group" "alb_sg" {
   description = "Security Group for Application LoadBalancer"
   vpc_id      = data.aws_vpc.shared.id
   tags = merge(local.tags,
-    { Name = lower(format("sg-%s-%s-alb", local.application_name, local.environment)) }
+    { Name = lower(format("secg-%s-%s-alb", local.application_name, local.environment)) }
   )
 }
 
@@ -36,11 +36,11 @@ resource "aws_security_group_rule" "egress_alb_to_citrix-adc_traffic" {
 #Citrix ADC Security Group
 
 resource "aws_security_group" "citrix_adc_mgmt" {
-  name        = lower(format("sg-%s-%s-citrix-adc_mgmt", local.application_name, local.environment))
+  name        = lower(format("secg-%s-%s-citrix-adc_mgmt", local.application_name, local.environment))
   description = "Security Group for Citrix ADC Management interface"
   vpc_id      = data.aws_vpc.shared.id
   tags = merge(local.tags,
-    { Name = lower(format("sg-%s-%s-citrix-adc_mgmt", local.application_name, local.environment)) }
+    { Name = lower(format("secg-%s-%s-citrix-adc_mgmt", local.application_name, local.environment)) }
   )
 }
 
@@ -56,11 +56,11 @@ resource "aws_security_group_rule" "ingress_ctx_host_to_citrix-adc" {
 }
 
 resource "aws_security_group" "citrix_adc_vip" {
-  name        = lower(format("sg-%s-%s-citrix-adc_vip", local.application_name, local.environment))
+  name        = lower(format("secg-%s-%s-citrix-adc_vip", local.application_name, local.environment))
   description = "Security Group for Citrix ADC VIP interface"
   vpc_id      = data.aws_vpc.shared.id
   tags = merge(local.tags,
-    { Name = lower(format("sg-%s-%s-citrix-adc_vip", local.application_name, local.environment)) }
+    { Name = lower(format("secg-%s-%s-citrix-adc_vip", local.application_name, local.environment)) }
   )
 }
 
@@ -76,11 +76,11 @@ resource "aws_security_group_rule" "ingress_alb_to_citrix-adc_traffic" {
 }
 
 resource "aws_security_group" "citrix_adc_snip" {
-  name        = lower(format("sg-%s-%s-citrix-adc_snip", local.application_name, local.environment))
+  name        = lower(format("secg-%s-%s-citrix-adc_snip", local.application_name, local.environment))
   description = "Security Group for Citrix ADC SNIP interface"
   vpc_id      = data.aws_vpc.shared.id
   tags = merge(local.tags,
-    { Name = lower(format("sg-%s-%s-citrix-adc_snip", local.application_name, local.environment)) }
+    { Name = lower(format("secg-%s-%s-citrix-adc_snip", local.application_name, local.environment)) }
   )
 }
 
@@ -126,7 +126,7 @@ resource "aws_security_group" "aws_citrix_security_group" {
   description = "Security Group for AWS_Citrix "
   vpc_id      = data.aws_vpc.shared.id
   tags = merge(local.tags,
-    { Name = lower(format("sg-%s-%s-citrix-host", local.application_name, local.environment)) }
+    { Name = lower(format("secg-%s-%s-citrix-host", local.application_name, local.environment)) }
   )
 }
 
@@ -216,7 +216,7 @@ resource "aws_security_group" "aws_equip_security_group" {
   description = "Security Group for AWS_Equip"
   vpc_id      = data.aws_vpc.shared.id
   tags = merge(local.tags,
-    { Name = lower(format("sg-%s-%s-equip", local.application_name, local.environment)) }
+    { Name = lower(format("secg-%s-%s-equip", local.application_name, local.environment)) }
   )
 }
 
@@ -263,7 +263,7 @@ resource "aws_security_group" "aws_spotfire_security_group" {
   description = "Security Group for AWS_SpotFire"
   vpc_id      = data.aws_vpc.shared.id
   tags = merge(local.tags,
-    { Name = lower(format("sg-%s-%s-spotfire", local.application_name, local.environment)) }
+    { Name = lower(format("secg-%s-%s-spotfire", local.application_name, local.environment)) }
   )
 }
 
@@ -308,7 +308,7 @@ resource "aws_security_group" "aws_proxy_security_group" {
   description = "Security Group for AWS_Proxy"
   vpc_id      = data.aws_vpc.shared.id
   tags = merge(local.tags,
-    { Name = lower(format("sg-%s-%s-proxy", local.application_name, local.environment)) }
+    { Name = lower(format("secg-%s-%s-proxy", local.application_name, local.environment)) }
   )
 }
 
@@ -343,7 +343,7 @@ resource "aws_security_group" "aws_domain_security_group" {
   description = "Security Group for AWS_Domain"
   vpc_id      = data.aws_vpc.shared.id
   tags = merge(local.tags,
-    { Name = lower(format("sg-%s-%s-domain-controller", local.application_name, local.environment)) }
+    { Name = lower(format("secg-%s-%s-domain-controller", local.application_name, local.environment)) }
   )
 }
 
@@ -425,7 +425,7 @@ resource "aws_security_group" "all_internal_groups" {
   description = "Security Group for all_internal_groups"
   vpc_id      = data.aws_vpc.shared.id
   tags = merge(local.tags,
-    { Name = lower(format("sg-%s-%s-all-hosts", local.application_name, local.environment)) }
+    { Name = lower(format("secg-%s-%s-all-hosts", local.application_name, local.environment)) }
   )
 }
 
