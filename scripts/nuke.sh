@@ -39,10 +39,6 @@ done
 export account_blocklist_str
 export accounts_str
 cat ./scripts/nuke-config-template.txt | envsubst >nuke-config.yml
-echo 'nuke-config.yml:'
-echo '----------------'
-cat nuke-config.yml
-echo '----------------'
 
 nuked_envs=()
 failed_envs=()
@@ -57,7 +53,7 @@ for key in "${!account_ids[@]}"; do
     --force \
     --no-dry-run || exit_code=$?
 
-  if [ $exit_code -ne 0 ]; then
+  if [[ $exit_code -ne 0 ]]; then
     failed_envs+=("${key}")
   else
     nuked_envs+=("${key}")
@@ -67,11 +63,11 @@ done
 
 echo "Nuke complete: ${#nuked_envs[@]} nuked, ${#failed_envs[@]} failed."
 
-if [ ${#nuked_envs[@]} -ne 0 ]; then
+if [[ ${#nuked_envs[@]} -ne 0 ]]; then
   echo "Nuked environments: ${nuked_envs[@]}"
 fi
 
-if [ ${#failed_envs[@]} -ne 0 ]; then
+if [[ ${#failed_envs[@]} -ne 0 ]]; then
   echo "ERROR: could not nuke environments: ${failed_envs[@]}"
   echo "Refer to previous errors for details."
   exit 1

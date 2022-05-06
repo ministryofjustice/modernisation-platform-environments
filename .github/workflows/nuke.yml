@@ -37,7 +37,7 @@ jobs:
           chmod +x $HOME/bin/aws-nuke
           echo "END: Install AWS Nuke"
         env:
-          AWS_NUKE_VERSION: v2.16.0
+          AWS_NUKE_VERSION: v2.18.1
       - name: Nuke
         run: |
           echo "BEGIN: Nuke"

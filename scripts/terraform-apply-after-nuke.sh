@@ -35,15 +35,15 @@ done
 
 echo "Terraform apply complete: ${#redeployed_envs[@]} redeployed, ${#skipped_envs[@]} skipped, ${#failed_envs[@]} failed."
 
-if [ ${#redeployed_envs[@]} -ne 0 ]; then
+if [[ ${#redeployed_envs[@]} -ne 0 ]]; then
   echo "Redeployed environments: ${redeployed_envs[@]}"
 fi
 
-if [ ${#skipped_envs[@]} -ne 0 ]; then
+if [[ ${#skipped_envs[@]} -ne 0 ]]; then
   echo "Skipped environments: ${skipped_envs[@]}"
 fi
 
-if [ ${#failed_envs[@]} -ne 0 ]; then
+if [[ ${#failed_envs[@]} -ne 0 ]]; then
   echo "ERROR: could not perform terraform apply for environments: ${failed_envs[@]}"
   echo "Refer to previous errors for details."
   exit 1
