@@ -29,9 +29,9 @@ accounts_str=''
 for key in "${!account_ids[@]}"; do
   accounts_str+="  \"${account_ids[$key]}\" # ${key}"
   accounts_str+=$'\n'
-  accounts_str+="      presets:"
+  accounts_str+="    presets:"
   accounts_str+=$'\n'
-  accounts_str+="        - \"common\""
+  accounts_str+="      - \"common\""
   accounts_str+=$'\n'
 done
 
