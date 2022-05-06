@@ -9,7 +9,7 @@ resource "aws_instance" "sms-server" {
   subnet_id                   = data.aws_subnet.private_az_a.id
   key_name                    = aws_key_pair.gary.key_name
   #key_name                    = aws_key_pair.george.key_name
-  iam_instance_profile        = aws_iam_instance_profile.ec2_xp_profile
+  iam_instance_profile        = "${aws_iam_instance_profile.ec2_xp_profile.id}"
 
   metadata_options {
     http_tokens   = "required"
