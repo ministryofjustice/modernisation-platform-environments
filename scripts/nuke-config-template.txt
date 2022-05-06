@@ -11,6 +11,7 @@ regions:
 
 account-blocklist:
 $account_blocklist_str
+
 resource-types:
   # don't nuke IAM users
   excludes:
@@ -54,6 +55,7 @@ resource-types:
 
 accounts:
 $accounts_str
+
 presets:
   common:
     filters:
