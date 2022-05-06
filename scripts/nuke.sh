@@ -27,7 +27,7 @@ eval "$(jq -r '.NUKE_ACCOUNT_IDS | to_entries | .[] |"account_ids[" + (.key | @s
 # Generate the accounts section to be added to nuke-config.yml. These are the accounts that will be nuked.
 accounts_str=''
 for key in "${!account_ids[@]}"; do
-  accounts_str+="  \"${account_ids[$key]}\" # ${key}"
+  accounts_str+="  \"${account_ids[$key]}\": # ${key}"
   accounts_str+=$'\n'
   accounts_str+="    presets:"
   accounts_str+=$'\n'
