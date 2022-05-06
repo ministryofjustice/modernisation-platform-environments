@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export AWS_REGION=eu-west-2
+
 # for example PERFORMANCE_HUB_DEVELOPMENT_ACCID will be converted to the directory name 'performance-hub'
 to_dir_name() {
   dir_name=$(echo ${1%%_DEVELOPMENT_ACCID} | tr '[:upper:]' '[:lower:]' | tr '_' '-')
