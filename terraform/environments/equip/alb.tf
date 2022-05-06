@@ -4,88 +4,101 @@
 # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-access-logs.html
 ##############################################################
 
-data "aws_acm_certificate" "equip_cert" {
+data "aws_acm_certificate" "production_cert" {
+  count = local.environment == "production" ? 1 : 0
   domain   = "equip.service.justice.gov.uk"
   statuses = ["ISSUED"]
 }
 
+#Load balancer needs to be publically accessible
+#tfsec:ignore:aws-elb-alb-not-public
 resource "aws_lb" "citrix_alb" {
 
-  name        = format("%s-alb", var.name)
-  name_prefix = var.name_prefix
-
-  load_balancer_type = var.load_balancer_type
-  #tfsec:ignore:aws-elb-alb-not-public
-  internal        = var.internal
+  name        = format("alb-%s-%s-citrix", local.application_name, local.environment)
+  load_balancer_type = "application"
   security_groups = [aws_security_group.alb_sg.id]
   subnets         = [data.aws_subnet.public_az_a.id, data.aws_subnet.public_az_b.id]
 
-  enable_deletion_protection       = var.enable_deletion_protection
-  idle_timeout                     = var.idle_timeout
-  enable_http2                     = var.enable_http2
-  desync_mitigation_mode           = var.desync_mitigation_mode
-  drop_invalid_header_fields       = var.drop_invalid_header_fields
-  enable_waf_fail_open             = var.enable_waf_fail_open
-  enable_cross_zone_load_balancing = var.enable_cross_zone_load_balancing
-  ip_address_type                  = var.ip_address_type
+  enable_deletion_protection       = true
+  drop_invalid_header_fields       = true
+  enable_waf_fail_open             = true
+  ip_address_type                  = "ipv4"
 
-  tags = merge(
-    var.tags,
-    var.lb_tags,
-    {
-      Name = var.name != null ? var.name : var.name_prefix
-    },
+    tags = merge(local.tags,
+    { Name = format("alb-%s-%s-citrix", local.application_name, local.environment)
+      Role = "Equip public load balancer"
+    }
   )
 
   access_logs {
     bucket = aws_s3_bucket.this.id
-    #    prefix  = "access-logs-alb"
     enabled = "true"
   }
 
-  depends_on = [aws_s3_bucket.this]
-
-  timeouts {
-    create = var.load_balancer_create_timeout
-    update = var.load_balancer_update_timeout
-    delete = var.load_balancer_delete_timeout
-  }
 }
 
 resource "aws_lb_target_group" "lb_tg_http" {
-  name             = "citrix-alb-tgt"
-  target_type      = var.lb_tgt_target_type
-  protocol         = var.lb_tgt_protocol
-  protocol_version = var.lb_tgt_protocol_version
+  name             = format("tg-%s-%s-80", local.application_name, local.environment)
+  target_type      = "ip"
+  protocol         = "HTTP"
   vpc_id           = data.aws_vpc.shared.id
-  port             = var.lb_tgt_port
+  port             = "80"
 
   health_check {
     enabled             = true
-    path                = var.lb_tgt_health_check_path
+    path                = "/"
     interval            = 30
     protocol            = "HTTP"
     port                = 80
-    timeout             = 5
+    timeout             = 10
     healthy_threshold   = 5
     unhealthy_threshold = 2
-    matcher             = var.lb_tgt_matcher
+    matcher             = "200"
   }
 
   tags = local.tags
 }
 
-resource "aws_lb_target_group_attachment" "citrix_instance" {
+resource "aws_lb_target_group" "lb_tg_https" {
+  name             = format("tg-%s-%s-443", local.application_name, local.environment)
+  target_type      = "ip"
+  protocol         = "HTTPS"
+  vpc_id           = data.aws_vpc.shared.id
+  port             = "443"
+
+  health_check {
+    enabled             = true
+    path                = "/"
+    interval            = 30
+    protocol            = "HTTPS"
+    port                = 80
+    timeout             = 10
+    healthy_threshold   = 5
+    unhealthy_threshold = 2
+    matcher             = "200"
+  }
+
+  tags = local.tags
+}
+
+resource "aws_lb_target_group_attachment" "lb_tga_80" {
   target_group_arn = aws_lb_target_group.lb_tg_http.arn
-  target_id        = aws_instance.citrix_adc_instance.id
+  target_id        = aws_network_interface.adc_vip_interface.private_ip
   port             = 80
 }
 
-resource "aws_lb_listener" "listener_https" {
+resource "aws_lb_target_group_attachment" "lb_tga_443" {
+  target_group_arn = aws_lb_target_group.lb_tg_http.arn
+  target_id        = aws_network_interface.adc_vip_interface.private_ip
+  port             = 443
+}
+
+resource "aws_lb_listener" "lb_listener_https" {
+  #checkov:skip=CKV_AWS_103
   load_balancer_arn = aws_lb.citrix_alb.arn
   port              = "443"
   protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-TLS-1-2-2017-01"
+  ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
   certificate_arn   = aws_acm_certificate.lb_cert.arn
 
   default_action {
@@ -94,7 +107,7 @@ resource "aws_lb_listener" "listener_https" {
   }
 }
 
-resource "aws_lb_listener" "redirect_http_to_https" {
+resource "aws_lb_listener" "lb_listener_http" {
   load_balancer_arn = aws_lb.citrix_alb.arn
   port              = "80"
   protocol          = "HTTP"

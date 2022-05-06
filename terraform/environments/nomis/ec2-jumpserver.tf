@@ -52,6 +52,7 @@
 #       os_type    = "Windows"
 #       os_version = "2019"
 #       always_on  = "false"
+#       "Patch Group" = "${aws_ssm_patch_group.windows.patch_group}" 
 #     }
 #   )
 # }

@@ -1,16 +1,17 @@
 # This file is auto-generated here, do not manually amend. 
 # https://github.com/ministryofjustice/modernisation-platform/blob/main/scripts/provision-member-directories.sh
 
-* @modernisation-platform
-/terraform/environments/equip @modernisation-platform-engineers @modernisation-platform
-/terraform/environments/nomis @studio-webops @modernisation-platform
-/terraform/environments/performance-hub @performance-hub-developers @modernisation-platform
-/terraform/environments/ppud @ppud-replacement-devs @modernisation-platform
-/terraform/environments/sprinkler @modernisation-platform @modernisation-platform
-/terraform/environments/tariff @cica @modernisation-platform
-/terraform/environments/testing @modernisation-platform @modernisation-platform
-/terraform/environments/xhibit-portal @xhibit-portal-dev @modernisation-platform
-**/providers.tf @modernisation-platform
-**/backend.tf @modernisation-platform
-**/subnet_share.tf @modernisation-platform
-**/networking.auto.tfvars.json @modernisation-platform
+* @ministryofjustice/modernisation-platform
+/terraform/environments/equip @ministryofjustice/modernisation-platform-engineers @ministryofjustice/modernisation-platform
+/terraform/environments/example @ministryofjustice/modernisation-platform @ministryofjustice/modernisation-platform
+/terraform/environments/nomis @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
+/terraform/environments/performance-hub @ministryofjustice/performance-hub-developers @ministryofjustice/modernisation-platform
+/terraform/environments/ppud @ministryofjustice/ppud-replacement-devs @ministryofjustice/modernisation-platform
+/terraform/environments/sprinkler @ministryofjustice/modernisation-platform @ministryofjustice/modernisation-platform
+/terraform/environments/tariff @ministryofjustice/cica @ministryofjustice/modernisation-platform
+/terraform/environments/testing @ministryofjustice/modernisation-platform @ministryofjustice/modernisation-platform
+/terraform/environments/xhibit-portal @ministryofjustice/xhibit-portal-dev @ministryofjustice/modernisation-platform
+**/providers.tf @ministryofjustice/modernisation-platform
+**/backend.tf @ministryofjustice/modernisation-platform
+**/subnet_share.tf @ministryofjustice/modernisation-platform
+**/networking.auto.tfvars.json @ministryofjustice/modernisation-platform
