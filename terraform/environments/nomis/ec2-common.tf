@@ -32,7 +32,7 @@ data "aws_iam_policy_document" "ssm_custom" {
       "ec2messages:FailMessage",
       "ec2messages:GetEndpoint",
       "ec2messages:GetMessages",
-      "ec2messages:SendReply"
+      "ec2messages:SendReply",
     ]
     resources = ["*"]
   }
@@ -45,6 +45,15 @@ data "aws_iam_policy_document" "ssm_custom" {
       "ssm:GetParameters"
     ]
     resources = [aws_ssm_parameter.cloud_watch_config_linux.arn]
+  }
+
+  statement {
+    sid    = "AccessCloudWatchConfigParameter"
+    effect = "Allow"
+    actions = [
+      "logs:PutRetentionPolicy"
+    ]
+    resources = ["arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.id}:log-group:cwagent-*:log-stream:"]
   }
 }
 
