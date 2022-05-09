@@ -27,7 +27,7 @@
       "suprig04-disk-1-snapshot": "snap-02f6069537faf46dd",
       "suprig05-ami": "ami-062d75b8c2ca6f00b",
       "suprig05-disk-1-snapshot": "snap-0b6d529f807eb9a6a",
-      "XHBPRESMS01-ami": "ami-04348c5dcf59a6f3e",
+      "XHBPRESMS01-ami": "ami-0c68fadfe3d88eba8",
       "buildserver-ami": "ami-096d0bf0a5fc0fadb",
       "buildserver-disk-1-snapshot": "snap-04ecdbc7c6e980243",
       "sms-recovery-ami": "ami-0a244485e2e4ffd03"
