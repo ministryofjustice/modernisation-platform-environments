@@ -75,13 +75,6 @@
 						"log_group_name": "cwagent-nomis-autologoff",
 						"log_stream_name": "{instance_id}",
 						"retention_in_days": 400
-					},
-					{
-						"file_path": "/u01/app/oracle/diag/rdbms/*/*/trace/alert*.log",
-						"log_group_name": "cwagent-rdbms-alert-log",
-						"log_stream_name": "{instance_id}",
-						"multi_line_start_pattern": "%a %b %d %H:%M:%S %Y",
-						"retention_in_days": 30
 					}
 				]
 			}
