@@ -7,8 +7,9 @@ resource "aws_instance" "sms-server" {
   associate_public_ip_address = false
   ebs_optimized               = false
   subnet_id                   = data.aws_subnet.private_az_a.id
-  key_name                    = aws_key_pair.george.key_name
-
+  key_name                    = aws_key_pair.gary.key_name
+  #key_name                    = aws_key_pair.george.key_name
+  iam_instance_profile        = "${aws_iam_instance_profile.ec2_xp_profile.id}"
 
   metadata_options {
     http_tokens   = "required"
@@ -34,7 +35,7 @@ resource "aws_instance" "sms-server" {
       # Prevent changes to encryption from destroying existing EC2s - can delete once encryption complete
     ]
     
-    prevent_destroy = true
+    prevent_destroy = false
   }
 
   tags = merge(
