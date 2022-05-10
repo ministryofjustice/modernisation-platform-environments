@@ -26,7 +26,7 @@ resource "aws_iam_role" "image-builder-distro-role" {
 }
 
 
-resource "aws_role_policy_attachment" "image-builder-distro-policy-attach" {
+resource "aws_iam_role_policy_attachment" "image-builder-distro-policy-attach" {
   policy_arn = "arn:aws:iam::aws:policy/Ec2ImageBuilderCrossAccountDistributionAccess"
   role       = aws_iam_role.image-builder-distro-role
 }
