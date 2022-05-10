@@ -3,7 +3,7 @@ locals {
 }
 
 module "bastion_linux" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=v3.0.2"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=v3.0.3"
 
   providers = {
     aws.share-host   = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
@@ -31,6 +31,31 @@ module "bastion_linux" {
   region        = "eu-west-2"
 
   # Tags
-  tags_common = local.tags
+  tags_common = merge(
+    local.tags,
+    {
+      os_type = "Linux"
+    }
+  )
   tags_prefix = terraform.workspace
+}
+
+resource "aws_security_group_rule" "CP_monitoring_ingress" {
+  description       = "Allows access from Cloud Platform Monitoring"
+  type              = "ingress"
+  from_port         = 9100
+  to_port           = 9100
+  protocol          = "tcp"
+  cidr_blocks       = [local.application_data.accounts[local.environment].database_external_access_cidr.cloud_platform]
+  security_group_id = module.bastion_linux.bastion_security_group
+}
+
+resource "aws_security_group_rule" "CP_monitoring_egress" {
+  description       = "Allows access from Cloud Platform Monitoring"
+  type              = "egress"
+  from_port         = 9100
+  to_port           = 9100
+  protocol          = "tcp"
+  cidr_blocks       = [local.application_data.accounts[local.environment].database_external_access_cidr.cloud_platform]
+  security_group_id = module.bastion_linux.bastion_security_group
 }

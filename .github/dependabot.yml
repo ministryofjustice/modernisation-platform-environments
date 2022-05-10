@@ -11,47 +11,59 @@ updates:
   # Dependabot doesn't currently support wildcard or multiple directory declarations within
   # a dependabot configuration, so we need to add all directories individually
   # See: github.com/dependabot/dependabot-core/issues/2178
-- package-ecosystem: "terraform"
-  directory: "/terraform/environments/cooker"
-  schedule:
-    interval: "daily"
-- package-ecosystem: "terraform"
-  directory: "/terraform/environments/equip"
-  schedule:
-    interval: "daily"
-- package-ecosystem: "terraform"
-  directory: "/terraform/environments/nomis"
-  schedule:
-    interval: "daily"
-- package-ecosystem: "terraform"
-  directory: "/terraform/environments/nomis/modules/database"
-  schedule:
-    interval: "daily"
-- package-ecosystem: "terraform"
-  directory: "/terraform/environments/nomis/modules/weblogic"
-  schedule:
-    interval: "daily"
-- package-ecosystem: "terraform"
-  directory: "/terraform/environments/performance-hub"
-  schedule:
-    interval: "daily"
-- package-ecosystem: "terraform"
-  directory: "/terraform/environments/ppud"
-  schedule:
-    interval: "daily"
-- package-ecosystem: "terraform"
-  directory: "/terraform/environments/sprinkler"
-  schedule:
-    interval: "daily"
-- package-ecosystem: "terraform"
-  directory: "/terraform/environments/tariff"
-  schedule:
-    interval: "daily"
-- package-ecosystem: "terraform"
-  directory: "/terraform/environments/testing"
-  schedule:
-    interval: "daily"
-- package-ecosystem: "terraform"
-  directory: "/terraform/environments/xhibit-portal"
-  schedule:
-    interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/cooker"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/equip"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/equip/acm-dns"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/equip/ec2-instance-module"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/example"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/nomis"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/nomis/modules/database"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/nomis/modules/weblogic"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/performance-hub"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/ppud"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/sprinkler"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/tariff"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/testing"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/xhibit-portal"
+    schedule:
+      interval: "daily"

@@ -18,6 +18,7 @@ module "weblogic" {
   asg_min_size         = try(each.value.asg_min_size, null)
   asg_desired_capacity = try(each.value.asg_desired_capacity, null)
 
+  ami_owner              = try(each.value.ami_owner, "${local.environment_management.account_ids["nomis-test"]}")
   termination_protection = try(each.value.termination_protection, null)
 
   common_security_group_id   = aws_security_group.weblogic_common.id
@@ -78,12 +79,12 @@ resource "aws_security_group" "weblogic_common" {
   }
 
   ingress {
-  description = "access from Cloud Platform Prometheus server"
-  from_port   = "9100"
-  to_port     = "9100"
-  protocol    = "TCP"
-  cidr_blocks = ["172.20.0.0/16"]
-}
+    description = "access from Cloud Platform Prometheus server"
+    from_port   = "9100"
+    to_port     = "9100"
+    protocol    = "TCP"
+    cidr_blocks = [local.application_data.accounts[local.environment].database_external_access_cidr.cloud_platform]
+  }
 
   egress {
     description = "allow all"

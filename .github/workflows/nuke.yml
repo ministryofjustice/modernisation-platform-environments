@@ -1,0 +1,44 @@
+---
+name: Nuke
+on:
+  schedule:
+    # * is a special character in YAML so you have to quote this string
+    # trigger every sunday at 10:00am
+    - cron: '0 10 * * 0'
+  workflow_dispatch:
+env:
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  TF_IN_AUTOMATION: true
+defaults:
+  run:
+    shell: bash
+
+jobs:
+
+  nuke:
+    name: Nuke
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3.0.2
+      - name: Load and Configure Terraform
+        uses: hashicorp/setup-terraform@v2.0.0
+        with:
+          terraform_version: 1.0.1
+          terraform_wrapper: false
+      - name: Install AWS Nuke
+        run: |
+          echo "BEGIN: Install AWS Nuke"
+          mkdir -p $HOME/bin
+          wget -c "https://github.com/rebuy-de/aws-nuke/releases/download/${AWS_NUKE_VERSION}/aws-nuke-${AWS_NUKE_VERSION}-linux-amd64.tar.gz" -O - | tar -xz -C $HOME/bin
+          mv "$HOME/bin/aws-nuke-${AWS_NUKE_VERSION}-linux-amd64" $HOME/bin/aws-nuke
+          chmod +x $HOME/bin/aws-nuke
+          echo "END: Install AWS Nuke"
+        env:
+          AWS_NUKE_VERSION: v2.18.1
+      - name: Nuke
+        run: |
+          echo "BEGIN: Nuke"
+          bash scripts/nuke.sh
+          echo "END: Nuke"

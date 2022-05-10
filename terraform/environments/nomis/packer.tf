@@ -1,61 +1,33 @@
 #------------------------------------------------------------------------------
 # Resources required for Packer
+# Packer CICD user & group created manually as pipeline does not have
+# required permissions.
+# Packer user is only available in the Test account.  To avoid excessive use
+# of count, roles and policies are created in all accounts but not attached
+# to an IAM user (through use of count)
 #------------------------------------------------------------------------------
-
-
-#------------------------------------------------------------------------------
-# Packer CICD User - user & group created manually as pipeline does not have
-# required permissions
-#------------------------------------------------------------------------------
-
-# resource "aws_iam_user" "packer_member_user" {
-#   name = "packer-member-user"
-# }
-
-data "aws_iam_user" "packer_member_user" {
-  user_name = "packer-member-user"
-}
-
-# resource "aws_iam_access_key" "packer_member_user_key" {
-#   user = aws_iam_user.packer_member_user.name
-# }
-# resource "aws_iam_group" "packer_member_group" {
-#   name = "packer-member-group"
-# }
-
-data "aws_iam_group" "packer_member_group" {
-  group_name = "packer-member-group"
-}
-
-# resource "aws_iam_group_membership" "packer_member" {
-#   name = "packer-member-group-membership"
-
-#   users = [
-#     aws_iam_user.packer_member_user.name
-#   ]
-
-#   group = aws_iam_group.packer_member_group.name
-# }
 
 # build policy json for packer group member policy
 data "aws_iam_policy_document" "packer_member_policy" {
+  count = local.environment == "test" ? 1 : 0
   statement {
     effect    = "Allow"
     actions   = ["sts:AssumeRole"]
-    resources = [aws_iam_role.packer.arn]
+    resources = [aws_iam_role.packer[0].arn]
   }
 }
 
 # attach inline policy
 resource "aws_iam_group_policy" "packer_member_policy" {
+  count  = local.environment == "test" ? 1 : 0
   name   = "packer-member-policy"
-  policy = data.aws_iam_policy_document.packer_member_policy.json
-  # group      = aws_iam_group.packer_member_group.name
-  group = "packer-member-group"
+  policy = data.aws_iam_policy_document.packer_member_policy[0].json
+  group  = "packer-member-group"
 }
 
 # Role to provide required packer permissions
 data "aws_iam_policy_document" "packer_assume_role_policy" {
+  count = local.environment == "test" ? 1 : 0
   statement {
     effect  = "Allow"
     actions = ["sts:AssumeRole"]
@@ -66,14 +38,15 @@ data "aws_iam_policy_document" "packer_assume_role_policy" {
     }
     principals {
       type        = "AWS"
-      identifiers = [data.aws_iam_user.packer_member_user.arn]
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.id}:user/packer-member-user"]
     }
   }
 }
 
 resource "aws_iam_role" "packer" {
+  count              = local.environment == "test" ? 1 : 0
   name               = "packer-build"
-  assume_role_policy = data.aws_iam_policy_document.packer_assume_role_policy.json
+  assume_role_policy = data.aws_iam_policy_document.packer_assume_role_policy[0].json
   tags = merge(
     local.tags,
     {
@@ -84,6 +57,7 @@ resource "aws_iam_role" "packer" {
 
 # build policy json for Packer base permissions
 data "aws_iam_policy_document" "packer_minimum_permissions" {
+  count = local.environment == "test" ? 1 : 0
   statement {
     #checkov:skip=CKV_AWS_111
     #checkov:skip=CKV_AWS_109
@@ -107,6 +81,8 @@ data "aws_iam_policy_document" "packer_minimum_permissions" {
       "ec2:DescribeSubnets",
       "ec2:DescribeTags",
       "ec2:DescribeVolumes",
+      "ec2:ModifyImageAttribute",
+      "ec2:ModifySnapshotAttribute",
       "ec2:RegisterImage",
       "ec2:RunInstances"
     ]
@@ -118,9 +94,7 @@ data "aws_iam_policy_document" "packer_minimum_permissions" {
       "ec2:AttachVolume",
       "ec2:DeleteVolume",
       "ec2:DetachVolume",
-      "ec2:ModifyImageAttribute",
       "ec2:ModifyInstanceAttribute",
-      "ec2:ModifySnapshotAttribute",
       "ec2:GetPasswordData",
       "ec2:StopInstances",
       "ec2:TerminateInstances"
@@ -136,7 +110,7 @@ data "aws_iam_policy_document" "packer_minimum_permissions" {
   statement {
     effect    = "Allow"
     actions   = ["ec2:AuthorizeSecurityGroupIngress"]
-    resources = [aws_security_group.packer_security_group.arn]
+    resources = [aws_security_group.packer_security_group[0].arn]
   }
 
   statement {
@@ -178,10 +152,25 @@ data "aws_iam_policy_document" "packer_minimum_permissions" {
       "arn:aws:ec2:eu-west-2:${data.aws_caller_identity.current.id}:key-pair/packer*"
     ]
   }
+
+  statement { # need so Packer can use CMK to encrypt snapshots so can be shared with other accounts
+    effect = "Allow"
+    actions = [
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:ReEncrypt*",
+      "kms:ReEncryptFrom",
+      "kms:GenerateDataKey*",
+      "kms:DescribeKey",
+      "kms:CreateGrant"
+    ]
+    resources = [aws_kms_key.nomis-cmk[0].arn]
+  }
 }
 
 # build policy json for Packer session manager permissions
 data "aws_iam_policy_document" "packer_ssm_permissions" {
+  count = local.environment == "test" ? 1 : 0
   statement {
     effect    = "Allow"
     actions   = ["ssm:StartSession"]
@@ -203,22 +192,17 @@ data "aws_iam_policy_document" "packer_ssm_permissions" {
       "ssm:TerminateSession",
       "ssm:ResumeSession"
     ]
-    resources = ["*"] #checkov:skip=CKV_AWS_111:scope limited by conditional
-    condition {
-      test     = "StringLike"
-      variable = "ssm:resourceTag/aws:ssmmessages:session-id"
-      values   = ["&{aws:userid}"]
-    }
+    resources = ["arn:aws:ssm:eu-west-2:${data.aws_caller_identity.current.id}:session/packer-member-user-*"]
   }
   statement {
     effect    = "Allow"
     actions   = ["iam:GetInstanceProfile"]
-    resources = [aws_iam_instance_profile.packer_ssm_profile.arn]
+    resources = [aws_iam_instance_profile.packer_ssm_profile[0].arn]
   }
   statement {
     effect    = "Allow"
     actions   = ["iam:PassRole"]
-    resources = [aws_iam_role.packer_ssm_role.arn]
+    resources = [aws_iam_role.packer_ssm_role[0].arn]
   }
   statement {
     effect    = "Allow"
@@ -230,6 +214,7 @@ data "aws_iam_policy_document" "packer_ssm_permissions" {
 # some extra permissions required for Ansible ec2 module
 # it might be an idea to create another role for Ansible instead
 data "aws_iam_policy_document" "packer_ansible_permissions" {
+  count = local.environment == "test" ? 1 : 0
   statement {
     effect = "Allow"
     actions = [
@@ -247,17 +232,19 @@ data "aws_iam_policy_document" "packer_ansible_permissions" {
 
 # combine policy json
 data "aws_iam_policy_document" "packer_combined" {
+  count = local.environment == "test" ? 1 : 0
   source_policy_documents = [
-    data.aws_iam_policy_document.packer_minimum_permissions.json,
-    data.aws_iam_policy_document.packer_ssm_permissions.json,
-    data.aws_iam_policy_document.packer_ansible_permissions.json
+    data.aws_iam_policy_document.packer_minimum_permissions[0].json,
+    data.aws_iam_policy_document.packer_ssm_permissions[0].json,
+    data.aws_iam_policy_document.packer_ansible_permissions[0].json
   ]
 }
 # attach policy to role inline
 resource "aws_iam_role_policy" "packer" {
+  count  = local.environment == "test" ? 1 : 0
   name   = "packer-minimum-permissions"
-  role   = aws_iam_role.packer.id
-  policy = data.aws_iam_policy_document.packer_combined.json
+  role   = aws_iam_role.packer[0].id
+  policy = data.aws_iam_policy_document.packer_combined[0].json
 }
 
 #------------------------------------------------------------------------------
@@ -267,9 +254,10 @@ resource "aws_iam_role_policy" "packer" {
 #------------------------------------------------------------------------------
 
 resource "aws_iam_role" "packer_ssm_role" {
+  count                = local.environment == "test" ? 1 : 0
   name                 = "packer-ssm-role"
   path                 = "/"
-  max_session_duration = "3600"
+  max_session_duration = "7200" # builds can take up to 1hr 45mins
   assume_role_policy = jsonencode(
     {
       "Version" : "2012-10-17",
@@ -296,39 +284,36 @@ resource "aws_iam_role" "packer_ssm_role" {
 
 # build policy document for access to s3 bucket
 data "aws_iam_policy_document" "packer_s3_bucket_access" {
+  count = local.environment == "test" ? 1 : 0
   statement {
     effect = "Allow"
     actions = [
-      "s3:GetObject"
-    ]
-    resources = ["${module.s3-bucket.bucket.arn}/*"]
-  }
-  statement {
-    effect = "Allow"
-    actions = [
+      "s3:GetObject",
       "s3:ListBucket"
     ]
-    resources = ["${module.s3-bucket.bucket.arn}"]
-    condition {
-      test     = "StringLike"
-      variable = "s3:prefix"
-      values   = ["DB_BKP/CNOMT_20211214/*"]
-    }
+    resources = [
+      module.s3-bucket.bucket.arn,
+      module.nomis-db-backup-bucket.bucket.arn,
+      "${module.s3-bucket.bucket.arn}/*",
+      "${module.nomis-db-backup-bucket.bucket.arn}/*"
+    ]
   }
 }
 
 # attach s3 document as inline policy
 resource "aws_iam_role_policy" "packer_s3_bucket_access" {
+  count  = local.environment == "test" ? 1 : 0
   name   = "nomis-apps-bucket-access"
-  role   = aws_iam_role.packer_ssm_role.name
-  policy = data.aws_iam_policy_document.packer_s3_bucket_access.json
+  role   = aws_iam_role.packer_ssm_role[0].name
+  policy = data.aws_iam_policy_document.packer_s3_bucket_access[0].json
 }
 
 # create instance profile from role
 resource "aws_iam_instance_profile" "packer_ssm_profile" {
-  name = "packer-ssm-profile"
-  role = aws_iam_role.packer_ssm_role.name
-  path = "/"
+  count = local.environment == "test" ? 1 : 0
+  name  = "packer-ssm-profile"
+  role  = aws_iam_role.packer_ssm_role[0].name
+  path  = "/"
 }
 
 #------------------------------------------------------------------------------
@@ -338,6 +323,7 @@ resource "aws_iam_instance_profile" "packer_ssm_profile" {
 #------------------------------------------------------------------------------
 
 resource "aws_security_group" "packer_security_group" {
+  count = local.environment == "test" ? 1 : 0
   #checkov:skip=CKV2_AWS_5
   description = "Security Group for Packer builds"
   name        = "packer-build-${local.application_name}"

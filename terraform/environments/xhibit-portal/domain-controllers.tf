@@ -261,23 +261,3 @@ resource "aws_route53_resolver_rule_association" "cjse-domain" {
   resolver_rule_id = aws_route53_resolver_rule.fwd.id
   vpc_id           = local.vpc_id
 }
-
-resource "aws_route53_resolver_rule" "app-to-sms" {
-  provider = aws.core-vpc
-
-  domain_name          = "xhbpresms01"
-  name                 = "sms-server"
-  rule_type            = "FORWARD"
-  resolver_endpoint_id = aws_route53_resolver_endpoint.cjse-domain.id
-
-  target_ip {
-    ip = aws_instance.sms-server.private_ip
-  }
-}
-
-resource "aws_route53_resolver_rule_association" "app-to-sms" {
-  provider = aws.core-vpc
-
-  resolver_rule_id = aws_route53_resolver_rule.app-to-sms.id
-  vpc_id           = local.vpc_id
-}

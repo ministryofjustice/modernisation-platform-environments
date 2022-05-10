@@ -18,6 +18,7 @@ module "database" {
   asm_data_capacity  = each.value.asm_data_capacity
   asm_flash_capacity = each.value.asm_flash_capacity
 
+  ami_owner              = try(each.value.ami_owner, "${local.environment_management.account_ids["nomis-test"]}")
   asm_data_iops          = try(each.value.asm_data_iops, null)
   asm_data_throughput    = try(each.value.asm_data_throughput, null)
   asm_flash_iops         = try(each.value.asm_flash_iops, null)
@@ -33,8 +34,8 @@ module "database" {
   application_name = local.application_name
   business_unit    = local.vpc_name
   environment      = local.environment
-  tags             = local.tags
   subnet_set       = local.subnet_set
+  tags             = local.tags
 }
 
 #------------------------------------------------------------------------------
@@ -71,6 +72,14 @@ resource "aws_security_group" "database_common" {
     cidr_blocks = [
       for cidr in local.application_data.accounts[local.environment].database_external_access_cidr : cidr
     ]
+  }
+
+  ingress {
+    description = "access from Cloud Platform Prometheus server"
+    from_port   = "9100"
+    to_port     = "9100"
+    protocol    = "TCP"
+    cidr_blocks = [local.application_data.accounts[local.environment].database_external_access_cidr.cloud_platform]
   }
 
   egress {

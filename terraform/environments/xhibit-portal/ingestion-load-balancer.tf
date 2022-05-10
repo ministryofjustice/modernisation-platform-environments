@@ -4,6 +4,17 @@ resource "aws_security_group" "ingestion_lb" {
   vpc_id      = local.vpc_id
 }
 
+# resource "aws_security_group_rule" "egress-to-ingestion" {
+#   depends_on               = [aws_security_group.ingestion_lb]
+#   security_group_id        = aws_security_group.ingestion_lb.id
+#   type                     = "egress"
+#   description              = "allow web traffic to get to ingestion server"
+#   from_port                = 80
+#   to_port                  = 80
+#   protocol                 = "TCP"
+#   source_security_group_id = aws_security_group.ingestion_server.id
+# }
+
 resource "aws_security_group_rule" "ingestion_lb_allow_web_users" {
   depends_on        = [aws_security_group.ingestion_lb]
   security_group_id = aws_security_group.ingestion_lb.id
@@ -49,7 +60,7 @@ resource "aws_elb" "ingestion_lb" {
   subnets         = data.aws_subnet_ids.ingestion-shared-public.ids
 
   access_logs {
-    bucket        = aws_s3_bucket.ingestion_loadbalancer_logs.bucket
+    bucket        = aws_s3_bucket.loadbalancer_logs.bucket
     bucket_prefix = "http-lb"
     enabled       = true
   }
@@ -89,66 +100,66 @@ data "aws_acm_certificate" "ingestion_lb_cert" {
   statuses = ["ISSUED"]
 }
 
-resource "aws_s3_bucket" "ingestion_loadbalancer_logs" {
-  bucket        = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}-ingestion-lblogs"
-  acl           = "log-delivery-write"
-  force_destroy = true
-}
+# resource "aws_s3_bucket" "ingestion_loadbalancer_logs" {
+#   bucket        = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}-ingestion-lblogs"
+#   acl           = "log-delivery-write"
+#   force_destroy = true
+# }
 
-resource "aws_s3_bucket_server_side_encryption_configuration" "default_encryption_ingestion_loadbalancer_logs" {
-  bucket = aws_s3_bucket.ingestion_loadbalancer_logs.bucket
+# resource "aws_s3_bucket_server_side_encryption_configuration" "default_encryption_ingestion_loadbalancer_logs" {
+#   bucket = aws_s3_bucket.ingestion_loadbalancer_logs.bucket
 
-  rule {
-    apply_server_side_encryption_by_default {
-      sse_algorithm     = "AES256"
-    }
-  }
-}
+#   rule {
+#     apply_server_side_encryption_by_default {
+#       sse_algorithm     = "AES256"
+#     }
+#   }
+# }
 
-resource "aws_s3_bucket_policy" "ingestion_loadbalancer_logs_policy" {
-  bucket = aws_s3_bucket.ingestion_loadbalancer_logs.bucket
-  policy = data.aws_iam_policy_document.s3_bucket_ingestion_lb_write.json
-}
+# resource "aws_s3_bucket_policy" "ingestion_loadbalancer_logs_policy" {
+#   bucket = aws_s3_bucket.ingestion_loadbalancer_logs.bucket
+#   policy = data.aws_iam_policy_document.s3_bucket_ingestion_lb_write.json
+# }
 
 
-data "aws_iam_policy_document" "s3_bucket_ingestion_lb_write" {
+# data "aws_iam_policy_document" "s3_bucket_ingestion_lb_write" {
 
-  statement {
-    actions = [
-      "s3:PutObject",
-    ]
-    effect = "Allow"
-    resources = [
-      "${aws_s3_bucket.ingestion_loadbalancer_logs.arn}/*",
-    ]
+#   statement {
+#     actions = [
+#       "s3:PutObject",
+#     ]
+#     effect = "Allow"
+#     resources = [
+#       "${aws_s3_bucket.ingestion_loadbalancer_logs.arn}/*",
+#     ]
 
-    principals {
-      identifiers = ["arn:aws:iam::652711504416:root"]
-      type        = "AWS"
-    }
-  }
+#     principals {
+#       identifiers = ["arn:aws:iam::652711504416:root"]
+#       type        = "AWS"
+#     }
+#   }
 
-  statement {
-    actions = [
-      "s3:PutObject"
-    ]
-    effect    = "Allow"
-    resources = ["${aws_s3_bucket.ingestion_loadbalancer_logs.arn}/*"]
-    principals {
-      identifiers = ["delivery.logs.amazonaws.com"]
-      type        = "Service"
-    }
-  }
+#   statement {
+#     actions = [
+#       "s3:PutObject"
+#     ]
+#     effect    = "Allow"
+#     resources = ["${aws_s3_bucket.ingestion_loadbalancer_logs.arn}/*"]
+#     principals {
+#       identifiers = ["delivery.logs.amazonaws.com"]
+#       type        = "Service"
+#     }
+#   }
 
-  statement {
-    actions = [
-      "s3:GetBucketAcl"
-    ]
-    effect    = "Allow"
-    resources = ["${aws_s3_bucket.ingestion_loadbalancer_logs.arn}"]
-    principals {
-      identifiers = ["delivery.logs.amazonaws.com"]
-      type        = "Service"
-    }
-  }
-}
+#   statement {
+#     actions = [
+#       "s3:GetBucketAcl"
+#     ]
+#     effect    = "Allow"
+#     resources = ["${aws_s3_bucket.ingestion_loadbalancer_logs.arn}"]
+#     principals {
+#       identifiers = ["delivery.logs.amazonaws.com"]
+#       type        = "Service"
+#     }
+#   }
+# }

@@ -1,63 +1,75 @@
 #------------------------------------------------------------------------------
 # Windows Jumpserver
+# TODO: once we have an AMI in prod everything can be uncommented.  I've not
+# uncommented the security group as its references elsewhere
 #------------------------------------------------------------------------------
 
-data "aws_subnet" "private_az_a" {
-  tags = {
-    Name = "${local.vpc_name}-${local.environment}-${local.subnet_set}-private-${local.region}a"
-  }
-}
+# data "aws_subnet" "private_az_a" {
+#   tags = {
+#     Name = "${local.vpc_name}-${local.environment}-${local.subnet_set}-private-${local.region}a"
+#   }
+# }
 
-data "aws_ami" "jumpserver_image" {
-  most_recent = true
-  owners      = ["self"]
+# data "aws_ami" "jumpserver_image" {
+#   most_recent = true
+#   owners      = ["${local.environment_management.account_ids["nomis-test"]}"]
 
-  filter {
-    name   = "name"
-    values = ["jumpserver-windows"]
-  }
+#   filter {
+#     name   = "name"
+#     values = ["jumpserver-windows"]
+#   }
 
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
-}
+#   filter {
+#     name   = "virtualization-type"
+#     values = ["hvm"]
+#   }
+# }
 
-resource "aws_instance" "jumpserver_windows" {
-  instance_type               = "t3.medium"
-  ami                         = data.aws_ami.jumpserver_image.id
-  associate_public_ip_address = false
-  iam_instance_profile        = aws_iam_instance_profile.ec2_jumpserver_profile.id
-  ebs_optimized               = true
-  monitoring                  = false
-  vpc_security_group_ids      = [aws_security_group.jumpserver-windows.id]
-  subnet_id                   = data.aws_subnet.private_az_a.id
-  key_name                    = aws_key_pair.ec2-user.key_name
-  metadata_options {
-    http_endpoint = "enabled"
-    http_tokens   = "required"
-  }
-  root_block_device {
-    delete_on_termination = true
-    encrypted             = true
-    volume_type           = "gp3"
-  }
+# resource "aws_instance" "jumpserver_windows" {
+#   instance_type               = "t3.medium"
+#   ami                         = data.aws_ami.jumpserver_image.id
+#   associate_public_ip_address = false
+#   iam_instance_profile        = aws_iam_instance_profile.ec2_jumpserver_profile.id
+#   ebs_optimized               = true
+#   monitoring                  = false
+#   vpc_security_group_ids      = [aws_security_group.jumpserver-windows.id]
+#   subnet_id                   = data.aws_subnet.private_az_a.id
+#   key_name                    = aws_key_pair.ec2-user.key_name
+#   metadata_options {
+#     http_endpoint = "enabled"
+#     http_tokens   = "required"
+#   }
+#   root_block_device {
+#     delete_on_termination = true
+#     encrypted             = true
+#     volume_type           = "gp3"
+#   }
 
-  tags = merge(
-    local.tags,
-    {
-      Name       = "jumpserver_windows"
-      os_type    = "Windows"
-      os_version = "2019"
-      always_on  = "false"
-    }
-  )
-}
+#   tags = merge(
+#     local.tags,
+#     {
+#       Name       = "jumpserver_windows"
+#       os_type    = "Windows"
+#       os_version = "2019"
+#       always_on  = "false"
+#       "Patch Group" = "${aws_ssm_patch_group.windows.patch_group}" 
+#     }
+#   )
+# }
 
 resource "aws_security_group" "jumpserver-windows" {
   description = "Configure Windows jumpserver egress"
   name        = "jumpserver-windows-${local.application_name}"
   vpc_id      = local.vpc_id
+
+  ingress {
+    description = "access from Cloud Platform Prometheus server"
+    from_port   = "9182"
+    to_port     = "9182"
+    protocol    = "TCP"
+    cidr_blocks = [local.application_data.accounts[local.environment].database_external_access_cidr.cloud_platform]
+  }
+
   egress {
     description = "allow all"
     from_port   = 0
@@ -68,95 +80,95 @@ resource "aws_security_group" "jumpserver-windows" {
   }
 }
 
-resource "aws_iam_role" "ec2_jumpserver_role" {
-  name                 = "ec2-jumpserver-role"
-  path                 = "/"
-  max_session_duration = "3600"
-  assume_role_policy = jsonencode(
-    {
-      "Version" : "2012-10-17",
-      "Statement" : [
-        {
-          "Effect" : "Allow",
-          "Principal" : {
-            "Service" : "ec2.amazonaws.com"
-          }
-          "Action" : "sts:AssumeRole",
-          "Condition" : {}
-        }
-      ]
-    }
-  )
-  managed_policy_arns = local.ec2_common_managed_policies
-  tags = merge(
-    local.tags,
-    {
-      Name = "ec2-jumpserver-role"
-    },
-  )
-}
+# resource "aws_iam_role" "ec2_jumpserver_role" {
+#   name                 = "ec2-jumpserver-role"
+#   path                 = "/"
+#   max_session_duration = "3600"
+#   assume_role_policy = jsonencode(
+#     {
+#       "Version" : "2012-10-17",
+#       "Statement" : [
+#         {
+#           "Effect" : "Allow",
+#           "Principal" : {
+#             "Service" : "ec2.amazonaws.com"
+#           }
+#           "Action" : "sts:AssumeRole",
+#           "Condition" : {}
+#         }
+#       ]
+#     }
+#   )
+#   managed_policy_arns = local.ec2_common_managed_policies
+#   tags = merge(
+#     local.tags,
+#     {
+#       Name = "ec2-jumpserver-role"
+#     },
+#   )
+# }
 
-resource "aws_iam_instance_profile" "ec2_jumpserver_profile" {
-  name = "ec2-jumpserver-profile"
-  role = aws_iam_role.ec2_jumpserver_role.name
-  path = "/"
-}
+# resource "aws_iam_instance_profile" "ec2_jumpserver_profile" {
+#   name = "ec2-jumpserver-profile"
+#   role = aws_iam_role.ec2_jumpserver_role.name
+#   path = "/"
+# }
 
-# Create an empty parameter for password recovery using
-# AWSSupport-RunEC2RescueForWindowsTool Systems Manager Run Command
-# https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2rw-ssm.html
-# Pre-creating it so it gets deleted with the instance
+# # Create an empty parameter for password recovery using
+# # AWSSupport-RunEC2RescueForWindowsTool Systems Manager Run Command
+# # https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2rw-ssm.html
+# # Pre-creating it so it gets deleted with the instance
 
-resource "aws_ssm_parameter" "jumpserver_ec2_rescue" {
-  name        = "/EC2Rescue/Passwords/${aws_instance.jumpserver_windows.id}"
-  description = "Jumpserver local admin password"
-  type        = "SecureString"
-  value       = "default"
+# resource "aws_ssm_parameter" "jumpserver_ec2_rescue" {
+#   name        = "/EC2Rescue/Passwords/${aws_instance.jumpserver_windows.id}"
+#   description = "Jumpserver local admin password"
+#   type        = "SecureString"
+#   value       = "default"
 
-  tags = merge(
-    local.tags,
-    {
-      Name = "jumpserver-admin-password"
-    }
-  )
-  lifecycle {
-    # ignore changes to value and description as will get updated by Systems Manager automation
-    ignore_changes = [
-      value,
-      description
-    ]
-  }
-}
+#   tags = merge(
+#     local.tags,
+#     {
+#       Name = "jumpserver-admin-password"
+#     }
+#   )
+#   lifecycle {
+#     # ignore changes to value and description as will get updated by Systems Manager automation
+#     ignore_changes = [
+#       value,
+#       description
+#     ]
+#   }
+# }
 
-data "aws_iam_policy_document" "jumpserver_put_parameter" {
-  statement {
-    effect = "Allow"
-    actions = [
-      "ssm:PutParameter",
-    ]
-    resources = [aws_ssm_parameter.jumpserver_ec2_rescue.arn]
-  }
-}
+# data "aws_iam_policy_document" "jumpserver_put_parameter" {
+#   statement {
+#     effect = "Allow"
+#     actions = [
+#       "ssm:PutParameter",
+#     ]
+#     resources = [aws_ssm_parameter.jumpserver_ec2_rescue.arn]
+#   }
+# }
 
-resource "aws_iam_role_policy" "jumpserver_put_parameter" {
-  name   = "jumpserver-parameter-access"
-  role   = aws_iam_role.ec2_jumpserver_role.id
-  policy = data.aws_iam_policy_document.jumpserver_put_parameter.json
-}
+# resource "aws_iam_role_policy" "jumpserver_put_parameter" {
+#   name   = "jumpserver-parameter-access"
+#   role   = aws_iam_role.ec2_jumpserver_role.id
+#   policy = data.aws_iam_policy_document.jumpserver_put_parameter.json
+# }
 
-# Automation to recover password to parameter store on instance creation
-resource "aws_ssm_association" "jumpserver_ec2_rescue" {
-  name             = "AWSSupport-RunEC2RescueForWindowsTool"
-  association_name = "jumpserver-ec2-rescue"
-  parameters = {
-    Command = "ResetAccess"
-  }
-  targets {
-    key    = "InstanceIds"
-    values = [aws_instance.jumpserver_windows.id]
-  }
-  depends_on = [
-    aws_iam_role_policy.jumpserver_put_parameter,
-    aws_ssm_parameter.jumpserver_ec2_rescue
-  ]
-}
+# # Automation to recover password to parameter store on instance creation
+# resource "aws_ssm_association" "jumpserver_ec2_rescue" {
+#   name             = "AWSSupport-RunEC2RescueForWindowsTool"
+#   association_name = "jumpserver-ec2-rescue"
+#   parameters = {
+#     Command = "ResetAccess"
+#   }
+#   targets {
+#     key    = "InstanceIds"
+#     values = [aws_instance.jumpserver_windows.id]
+#   }
+#   depends_on = [
+#     aws_iam_role_policy.jumpserver_put_parameter,
+#     aws_ssm_parameter.jumpserver_ec2_rescue
+#   ]
+# }

@@ -1,0 +1,35 @@
+---
+name: Redeploy after nuke
+on:
+  schedule:
+    # * is a special character in YAML so you have to quote this string
+    # trigger every sunday at 12:00am
+    - cron: '0 12 * * 0'
+  workflow_dispatch:
+env:
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  NUKE_DO_NOT_RECREATE_ENVIRONMENTS: performance-hub-development,example-development,sample-development,
+  TF_IN_AUTOMATION: true
+defaults:
+  run:
+    shell: bash
+
+jobs:
+
+  redeploy-after-nuke:
+    name: Redeploy after nuke
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3.0.2
+      - name: Load and Configure Terraform
+        uses: hashicorp/setup-terraform@v2.0.0
+        with:
+          terraform_version: 1.0.1
+          terraform_wrapper: false
+      - name: Terraform apply - after nuke
+        run: |
+          echo "BEGIN: Redeploy after nuke"
+          bash scripts/terraform-apply-after-nuke.sh
+          echo "END: Redeploy after nuke"
