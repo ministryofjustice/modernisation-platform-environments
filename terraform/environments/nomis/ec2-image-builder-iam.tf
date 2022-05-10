@@ -90,9 +90,20 @@ resource "aws_iam_role_policy_attachment" "image-builder-launch-tempplate-attach
 
 # role for a provider to lookup launch templates from the core-shared-services account to avoid hard-coding
 
+data "aws_iam_policy_document" "mod-platform-assume-role" {
+  statement {
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${local.environment_management.account_ids["modernisation-platform"]}:root"]
+    }
+  }
+}
+
 resource "aws_iam_role" "core-services-launch-template-reader" {
   name               = "NomisLaunchTemplateReaderRole"
-  assume_role_policy = data.aws_iam_policy_document.image-builder-distro-assume-role.json
+  assume_role_policy = data.aws_iam_policy_document.mod-platform-assume-role.json
   tags = merge(
     local.tags,
     {
