@@ -9,7 +9,6 @@ on:
 env:
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  NUKE_ACCOUNT_IDS: ${{ secrets.NUKE_ACCOUNT_IDS }}
   NUKE_DO_NOT_RECREATE_ENVIRONMENTS: performance-hub-development,example-development,sample-development,
   TF_IN_AUTOMATION: true
 defaults:
