@@ -87,3 +87,46 @@ resource "aws_iam_role_policy_attachment" "image-builder-launch-tempplate-attach
   role       = aws_iam_role.image-builder-distro-role.name
 
 }
+
+# role for a provider to lookup launch templates from the core-shared-services account to avoid hard-coding
+
+resource "aws_iam_role" "core-services-launch-template-reader" {
+  name               = "NomisLaunchTemplateReaderRole"
+  assume_role_policy = data.aws_iam_policy_document.image-builder-distro-assume-role.json
+  tags = merge(
+    local.tags,
+    {
+      Name = "core-services-launch-template-reader"
+    },
+  )
+
+}
+
+data "aws_iam_policy_document" "launch-template-reader-policy-doc" {
+  statement {
+    effect = "Allow"
+    actions = [
+        "ec2:DescribeLaunchTemplates"
+    ]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_policy" "launch-template-reader-policy" {
+  name        = "launch-template-reader-policy"
+  path        = "/"
+  description = "Policy to Allow Core Shared Services Account to Look up Launch Templates"
+  policy      = data.aws_iam_policy_document.launch-template-reader-policy-doc.json
+  tags = merge(
+    local.tags,
+    {
+      Name = "launch-template-reader-policy"
+    },
+  )
+}
+
+resource "aws_iam_role_policy_attachment" "launch-template-reader-policy-attach" {
+  policy_arn = aws_iam_policy.launch-template-reader-policy.arn
+  role       = aws_iam_role.core-services-launch-template-reader.name
+
+}
