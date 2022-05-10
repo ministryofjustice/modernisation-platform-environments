@@ -1,7 +1,9 @@
 # Required permissions for Image Builder AMI distribution
 # https://docs.aws.amazon.com/imagebuilder/latest/userguide/cross-account-dist.html
 # These permissions are needed in all ami destination accounts
-
+data "aws_caller_identity" "mod-platform" {
+    provider = aws.modernisation-platform
+}
 data "aws_iam_policy_document" "image-builder-distro-assume-role" {
   statement {
     actions = ["sts:AssumeRole"]
@@ -96,7 +98,7 @@ data "aws_iam_policy_document" "mod-platform-assume-role" {
 
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::${local.environment_management.account_ids["modernisation-platform"]}:root"]
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.mod-platform.account_id}:root"]
     }
   }
 }
