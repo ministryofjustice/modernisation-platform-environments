@@ -53,3 +53,23 @@ module "s3-bucket-ukcloud-replica" {
 
   tags = local.tags
 }
+
+data "aws_iam_policy_document" "bucket_policy" {
+  count = local.is-development ? 1 : 0
+  statement {
+    effect    = "Allow"
+    actions   = [
+      "s3:Get*",
+    ]
+    resources = [
+      module.s3-bucket-ukcloud-replica[0].bucket.id,
+      "${module.s3-bucket-ukcloud-replica[0].bucket.id}/*"
+    ]
+    principals {
+      type        = "AWS"
+      identifiers = [
+        "arn:aws:iam::${local.environment_management.account_ids["equip-production"]}:*"
+      ]
+    }
+  }
+}
