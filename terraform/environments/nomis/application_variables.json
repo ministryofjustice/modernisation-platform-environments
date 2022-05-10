@@ -10,7 +10,7 @@
                     "retention_days": 90
                 },
                 "cwagent-var-log-messages": {
-                    "retention_days": 90
+                    "retention_days": 30
                 },
                 "cwagent-var-log-secure": {
                     "retention_days": 90
