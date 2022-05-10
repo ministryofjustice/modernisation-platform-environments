@@ -119,6 +119,14 @@ resource "aws_launch_template" "weblogic" {
     }
   )
 
+  update_default_version = true # needed to allow correct management via Image Builder Distribution
+
+  lifecycle {
+    ignore_changes = [
+      tags, description, image_id, latest_version
+    ]
+  }
+
 }
 
 #------------------------------------------------------------------------------
