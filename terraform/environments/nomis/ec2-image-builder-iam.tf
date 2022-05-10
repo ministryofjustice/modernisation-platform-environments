@@ -28,7 +28,7 @@ resource "aws_iam_role" "image-builder-distro-role" {
 
 resource "aws_iam_role_policy_attachment" "image-builder-distro-policy-attach" {
   policy_arn = "arn:aws:iam::aws:policy/Ec2ImageBuilderCrossAccountDistributionAccess"
-  role       = aws_iam_role.image-builder-distro-role
+  role       = aws_iam_role.image-builder-distro-role.name
 }
 
 
@@ -90,6 +90,6 @@ resource "aws_iam_policy" "image-builder-combined-policy" {
 
 resource "aws_iam_role_policy_attachment" "image-builder-launch-tempplate-attach" {
   policy_arn = aws_iam_policy.image-builder-combined-policy.arn
-  role       = aws_iam_role.image-builder-distro-role
+  role       = aws_iam_role.image-builder-distro-role.name
 
 }
