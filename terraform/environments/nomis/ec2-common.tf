@@ -282,7 +282,7 @@ resource "aws_ssm_document" "node_exporter_linux" {
   document_type   = "Command"
   document_format = "JSON"
   content         = file("./ssm-documents/node-exporter-linux.json")
-  target_type      = "/AWS::EC2::Instance"
+  target_type     = "/AWS::EC2::Instance"
 
   tags = merge(
     local.tags,
@@ -558,43 +558,43 @@ resource "aws_ssm_maintenance_window_task" "windows_patching" {
 
 # Patch Baselines
 resource "aws_ssm_patch_baseline" "rhel" {
-  name = "USER-RedHatPatchBaseline"
-  description = "Approves all RHEL operating system patches that are classified as Security and Bugfix and that have a severity of Critical or Important."
+  name             = "USER-RedHatPatchBaseline"
+  description      = "Approves all RHEL operating system patches that are classified as Security and Bugfix and that have a severity of Critical or Important."
   operating_system = "REDHAT_ENTERPRISE_LINUX"
 
   approval_rule {
-    approve_after_days =  local.application_data.accounts[local.environment].patch_approval_delay_days
-    compliance_level = "CRITICAL"
-    patch_filter {
-        key    = "CLASSIFICATION"
-        values = ["Security"]
-      }
-    patch_filter {
-        key    = "SEVERITY"
-        values = ["Critical"]
-      }
-  }
-  
-  approval_rule {
     approve_after_days = local.application_data.accounts[local.environment].patch_approval_delay_days
-    compliance_level = "HIGH"
+    compliance_level   = "CRITICAL"
     patch_filter {
-        key    = "CLASSIFICATION"
-        values = ["Security"]
-      }
+      key    = "CLASSIFICATION"
+      values = ["Security"]
+    }
     patch_filter {
-        key    = "SEVERITY"
-        values = ["Important"]
-      }
+      key    = "SEVERITY"
+      values = ["Critical"]
+    }
   }
 
   approval_rule {
     approve_after_days = local.application_data.accounts[local.environment].patch_approval_delay_days
-    compliance_level = "MEDIUM"
+    compliance_level   = "HIGH"
     patch_filter {
-        key    = "CLASSIFICATION"
-        values = ["Bugfix"]
-      }
+      key    = "CLASSIFICATION"
+      values = ["Security"]
+    }
+    patch_filter {
+      key    = "SEVERITY"
+      values = ["Important"]
+    }
+  }
+
+  approval_rule {
+    approve_after_days = local.application_data.accounts[local.environment].patch_approval_delay_days
+    compliance_level   = "MEDIUM"
+    patch_filter {
+      key    = "CLASSIFICATION"
+      values = ["Bugfix"]
+    }
   }
   tags = merge(
     local.tags,
@@ -605,36 +605,36 @@ resource "aws_ssm_patch_baseline" "rhel" {
 }
 
 resource "aws_ssm_patch_baseline" "windows" {
-  name = "USER-WindowsPatchBaseline-OS"
-  description = "Approves all Windows Server operating system patches that are classified as CriticalUpdates or SecurityUpdates and that have an MSRC severity of Critical or Important."
+  name             = "USER-WindowsPatchBaseline-OS"
+  description      = "Approves all Windows Server operating system patches that are classified as CriticalUpdates or SecurityUpdates and that have an MSRC severity of Critical or Important."
   operating_system = "WINDOWS"
 
   approval_rule {
     approve_after_days = local.application_data.accounts[local.environment].patch_approval_delay_days
-    compliance_level = "CRITICAL"
+    compliance_level   = "CRITICAL"
     patch_filter {
-        key    = "CLASSIFICATION"
-        values = ["CriticalUpdates", "SecurityUpdates"]
-      }
+      key    = "CLASSIFICATION"
+      values = ["CriticalUpdates", "SecurityUpdates"]
+    }
     patch_filter {
-        key    = "MSRC_SEVERITY"
-        values = ["Critical"]
-      }
+      key    = "MSRC_SEVERITY"
+      values = ["Critical"]
+    }
   }
-  
+
   approval_rule {
     approve_after_days = local.application_data.accounts[local.environment].patch_approval_delay_days
-    compliance_level = "HIGH"
+    compliance_level   = "HIGH"
     patch_filter {
-        key    = "CLASSIFICATION"
-        values = ["CriticalUpdates", "SecurityUpdates"]
-      }
+      key    = "CLASSIFICATION"
+      values = ["CriticalUpdates", "SecurityUpdates"]
+    }
     patch_filter {
-        key    = "MSRC_SEVERITY"
-        values = ["Important"]
-      }
+      key    = "MSRC_SEVERITY"
+      values = ["Important"]
+    }
   }
-  
+
   tags = merge(
     local.tags,
     {
