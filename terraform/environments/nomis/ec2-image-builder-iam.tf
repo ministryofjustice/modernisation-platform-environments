@@ -44,7 +44,7 @@ data "aws_iam_policy_document" "image-builder-launch-template-policy" {
   }
 }
 
-ata "aws_iam_policy_document" "image-builder-distro-kms-policy" {
+data "aws_iam_policy_document" "image-builder-distro-kms-policy" {
   statement {
     effect = "Allow"
     actions = [
