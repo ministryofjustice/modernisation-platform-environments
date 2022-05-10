@@ -18,7 +18,7 @@ module "weblogic" {
   asg_min_size         = try(each.value.asg_min_size, null)
   asg_desired_capacity = try(each.value.asg_desired_capacity, null)
 
-  ami_owner              = try(each.value.ami_owner, "${local.environment_management.account_ids["core-shared-services"]}")
+  ami_owner              = try(each.value.ami_owner, "${local.environment_management.account_ids["core-shared-services-production"]}")
   termination_protection = try(each.value.termination_protection, null)
 
   common_security_group_id   = aws_security_group.weblogic_common.id
