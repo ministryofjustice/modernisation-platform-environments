@@ -15,7 +15,7 @@ data "aws_iam_policy_document" "image-builder-distro-assume-role" {
 
 resource "aws_iam_role" "image-builder-distro-role" {
   name               = "EC2ImageBuilderDistributionCrossAccountRole"
-  assume_role_policy = data.aws_iam_policy_document.image-builder-distro-assume-role
+  assume_role_policy = data.aws_iam_policy_document.image-builder-distro-assume-role.json
   tags = merge(
     local.tags,
     {
