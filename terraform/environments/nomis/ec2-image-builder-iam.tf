@@ -59,12 +59,6 @@ data "aws_iam_policy_document" "image-builder-distro-kms-policy" {
         "kms:RevokeGrant"
     ]
     resources = ["*"]
-    principals {
-      type = "AWS"
-      identifiers = [
-        "arn:aws:iam::${local.environment_management.account_ids["core-shared-services-production"]}:root"
-      ]
-    }
   }
 }
 
