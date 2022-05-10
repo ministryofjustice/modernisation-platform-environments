@@ -32,11 +32,29 @@ data "aws_iam_policy_document" "ssm_custom" {
       "ec2messages:FailMessage",
       "ec2messages:GetEndpoint",
       "ec2messages:GetMessages",
-      "ec2messages:SendReply"
+      "ec2messages:SendReply",
     ]
     resources = ["*"]
   }
+}
 
+# custom policy document for cloudwatch agent, based on CloudWatchAgentServerPolicy
+data "aws_iam_policy_document" "cloud_watch_custom" {
+  statement {
+    sid    = "CloudWatchAgentServerPolicy"
+    effect = "Allow"
+    actions = [
+      "cloudwatch:PutMetricData",
+      "ec2:DescribeVolumes",
+      "ec2:DescribeTags",
+      "logs:PutLogEvents",
+      "logs:DescribeLogStreams",
+      "logs:DescribeLogGroups",
+      "logs:CreateLogStream",
+      "logs:CreateLogGroup"
+    ]
+    resources = ["*"]
+  }
   statement {
     sid    = "AccessCloudWatchConfigParameter"
     effect = "Allow"
@@ -45,6 +63,15 @@ data "aws_iam_policy_document" "ssm_custom" {
       "ssm:GetParameters"
     ]
     resources = [aws_ssm_parameter.cloud_watch_config_linux.arn]
+  }
+
+  statement {
+    sid    = "SetCloudWatchLogRetention"
+    effect = "Allow"
+    actions = [
+      "logs:PutRetentionPolicy"
+    ]
+    resources = ["arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.id}:log-group:cwagent-*:log-stream:"]
   }
 }
 
@@ -98,7 +125,8 @@ data "aws_iam_policy_document" "ec2_common_combined" {
   source_policy_documents = [
     data.aws_iam_policy_document.ssm_custom.json,
     data.aws_iam_policy_document.s3_bucket_access.json,
-    data.aws_iam_policy_document.session_manager_logging.json
+    data.aws_iam_policy_document.session_manager_logging.json,
+    data.aws_iam_policy_document.cloud_watch_custom.json
   ]
 }
 
@@ -119,7 +147,6 @@ resource "aws_iam_policy" "ec2_common_policy" {
 # create list of common managed policies that can be attached to ec2 instance profiles
 locals {
   ec2_common_managed_policies = [
-    "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy",
     aws_iam_policy.ec2_common_policy.arn
   ]
 }
