@@ -119,7 +119,8 @@ data "aws_iam_policy_document" "launch-template-reader-policy-doc" {
   statement {
     effect = "Allow"
     actions = [
-        "ec2:DescribeLaunchTemplates"
+        "ec2:DescribeLaunchTemplates",
+        "ec2:DescribeLaunchTemplateVersions"
     ]
     resources = ["*"]
   }
