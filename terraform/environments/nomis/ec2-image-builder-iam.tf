@@ -4,6 +4,30 @@
 data "aws_caller_identity" "mod-platform" {
     provider = aws.modernisation-platform
 }
+
+data "aws_ami" "weblogic" {
+  most_recent = true
+  owners      = ["arn:aws:iam::${local.environment_management.account_ids["core-shared-services-production"]}:root"]
+
+  filter {
+    name   = "name"
+    values = ["nomis_Weblogic_*"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+}
+
+resource "aws_snapshot_create_volume_permission" "volume-laucnh-permissions" {
+    provider = aws.core-shared-services
+
+    for_each = data.aws_ami.weblogic.block_device_mappings
+    iterator = device
+    account_id = local.environment_management.account_ids[terraform.workspace]
+    snapshot_id = device.value.ebs.snapshot_id
+}
 data "aws_iam_policy_document" "image-builder-distro-assume-role" {
   statement {
     actions = ["sts:AssumeRole"]
