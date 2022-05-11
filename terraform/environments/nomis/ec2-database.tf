@@ -137,7 +137,7 @@ data "aws_subnet" "private_az_a" {
 
 data "aws_ami" "image" {
   most_recent = true
-  owners      = ["374269020027"]
+  owners      = ["${local.environment_management.account_ids["nomis-test"]}"]
 
   filter {
     name   = "name"
@@ -201,4 +201,72 @@ resource "aws_volume_attachment" "disk" {
   device_name = each.key
   volume_id   = each.value.id
   instance_id = aws_instance.test.id
+}
+
+data "aws_ami" "mp_image" {
+  most_recent = true
+  owners      = ["374269020027"]
+
+  filter {
+    name   = "name"
+    values = ["nomis_RHEL7_9_2022-05-11T12-46-53*"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+}
+
+resource "aws_instance" "mp_test" {
+  instance_type               = "t3.medium"
+  ami                         = data.aws_ami.mp_image.id
+  associate_public_ip_address = false
+  ebs_optimized               = true
+  monitoring                  = false
+  subnet_id                   = data.aws_subnet.private_az_a.id
+  key_name                    = aws_key_pair.ec2-user.key_name
+  vpc_security_group_ids = [aws_security_group.database_common.id]
+  metadata_options {
+    http_endpoint = "enabled"
+    http_tokens   = "required"
+  }
+  root_block_device {
+    delete_on_termination = true
+    encrypted             = true
+    volume_type           = "gp3"
+  }
+  dynamic "ephemeral_block_device" { # block devices specified inline cannot be resized later so we need to make sure they are not mounted here
+    for_each = [for bdm in data.aws_ami.mp_image.block_device_mappings : bdm if bdm.device_name != data.aws_ami.mp_image.root_device_name]
+    iterator = device
+    content {
+      device_name = device.value.device_name
+      no_device   = true
+    }
+  }
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "test-rhe7"
+
+    }
+  )
+}
+
+resource "aws_ebs_volume" "mp_disk" {
+  for_each = { for bdm in data.aws_ami.mp_image.block_device_mappings : bdm.device_name => bdm if bdm.device_name != data.aws_ami.mp_image.root_device_name }
+
+  availability_zone = "eu-west-2a"
+  encrypted         = true
+  snapshot_id       = each.value.ebs.snapshot_id
+  type              = "gp3"
+}
+
+resource "aws_volume_attachment" "mp_disk" {
+  for_each = aws_ebs_volume.mp_disk
+
+  device_name = each.key
+  volume_id   = each.value.id
+  instance_id = aws_instance.mp_test.id
 }
