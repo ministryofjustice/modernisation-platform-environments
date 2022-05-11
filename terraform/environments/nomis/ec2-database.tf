@@ -137,7 +137,7 @@ data "aws_subnet" "private_az_a" {
 
 data "aws_ami" "image" {
   most_recent = true
-  owners      = ["${local.environment_management.account_ids["nomis-test"]}"]
+  owners      = ["374269020027"]
 
   filter {
     name   = "name"
