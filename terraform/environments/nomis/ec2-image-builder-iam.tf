@@ -24,9 +24,8 @@ resource "aws_snapshot_create_volume_permission" "volume-laucnh-permissions" {
     provider = aws.core-shared-services
 
     for_each = data.aws_ami.weblogic.block_device_mappings
-    iterator = device
     account_id = local.environment_management.account_ids[terraform.workspace]
-    snapshot_id = device.value.ebs.snapshot_id
+    snapshot_id = each.value.ebs.snapshot_id
 }
 data "aws_iam_policy_document" "image-builder-distro-assume-role" {
   statement {
