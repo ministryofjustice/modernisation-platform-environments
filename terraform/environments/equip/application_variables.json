@@ -103,6 +103,16 @@
     }
   },
   "ctx_to_spotfire_rules": {
+    "ICMP_ALL": {
+      "from_port": -1,
+      "to_port": -1,
+      "protocol": "ICMP"
+    },
+    "TCP_445": {
+      "from_port": 445,
+      "to_port": 445,
+      "protocol": "TCP"
+    },
     "TCP_9": {
       "from_port": 9,
       "to_port": 9,
@@ -220,6 +230,16 @@
     }
   },
   "ctx_to_equip_rules": {
+    "ICMP_ALL": {
+      "from_port": -1,
+      "to_port": -1,
+      "protocol": "ICMP"
+    },
+    "TCP_445": {
+      "from_port": 445,
+      "to_port": 445,
+      "protocol": "TCP"
+    },
     "TCP_9": {
       "from_port": 9,
       "to_port": 9,
