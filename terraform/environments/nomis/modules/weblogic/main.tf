@@ -43,19 +43,19 @@ data "aws_subnets" "private" {
 resource "aws_launch_template" "weblogic" {
   name = var.name
 
-  dynamic "block_device_mappings" {
-    for_each = data.aws_ami.weblogic.block_device_mappings
-    iterator = device
-    content {
-      device_name = device.value.device_name
-      ebs {
-        delete_on_termination = true
-        encrypted             = true
-        volume_size           = device.value.ebs.volume_size
-        volume_type           = "gp3"
-      }
-    }
-  }
+  # dynamic "block_device_mappings" {
+  #   for_each = data.aws_ami.weblogic.block_device_mappings
+  #   iterator = device
+  #   content {
+  #     device_name = device.value.device_name
+  #     ebs {
+  #       delete_on_termination = true
+  #       encrypted             = true
+  #       volume_size           = device.value.ebs.volume_size
+  #       volume_type           = "gp3"
+  #     }
+  #   }
+  # }
 
   disable_api_termination = var.termination_protection
   ebs_optimized           = local.ebs_optimized
