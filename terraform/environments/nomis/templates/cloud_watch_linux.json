@@ -61,27 +61,17 @@
 					{
 						"file_path": "/var/log/messages",
 						"log_group_name": "cwagent-var-log-messages",
-						"log_stream_name": "{instance_id}",
-						"retention_in_days": 30
+						"log_stream_name": "{instance_id}"
 					},
 					{
 						"file_path": "/var/log/secure",
 						"log_group_name": "cwagent-var-log-secure",
-						"log_stream_name": "{instance_id}",
-						"retention_in_days": 400
+						"log_stream_name": "{instance_id}"
 					},
 					{
 						"file_path": "/u01/tag/autologoff/autologoff.log",
 						"log_group_name": "cwagent-nomis-autologoff",
-						"log_stream_name": "{instance_id}",
-						"retention_in_days": 400
-					},
-					{
-						"file_path": "/u01/app/oracle/diag/rdbms/*/*/trace/alert*.log",
-						"log_group_name": "cwagent-rdbms-alert-log",
-						"log_stream_name": "{instance_id}",
-						"multi_line_start_pattern": "%a %b %d %H:%M:%S %Y",
-						"retention_in_days": 30
+						"log_stream_name": "{instance_id}"
 					}
 				]
 			}

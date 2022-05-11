@@ -32,13 +32,13 @@ data "aws_iam_policy_document" "ssm_custom" {
       "ec2messages:FailMessage",
       "ec2messages:GetEndpoint",
       "ec2messages:GetMessages",
-      "ec2messages:SendReply",
+      "ec2messages:SendReply"
     ]
     resources = ["*"]
   }
 }
 
-# custom policy document for cloudwatch agent, based on CloudWatchAgentServerPolicy
+# custom policy document for cloudwatch agent, based on CloudWatchAgentServerPolicy but removed CreateLogGroup permission to enforce all log groups in code
 data "aws_iam_policy_document" "cloud_watch_custom" {
   statement {
     sid    = "CloudWatchAgentServerPolicy"
@@ -50,8 +50,7 @@ data "aws_iam_policy_document" "cloud_watch_custom" {
       "logs:PutLogEvents",
       "logs:DescribeLogStreams",
       "logs:DescribeLogGroups",
-      "logs:CreateLogStream",
-      "logs:CreateLogGroup"
+      "logs:CreateLogStream"
     ]
     resources = ["*"]
   }
@@ -63,15 +62,6 @@ data "aws_iam_policy_document" "cloud_watch_custom" {
       "ssm:GetParameters"
     ]
     resources = [aws_ssm_parameter.cloud_watch_config_linux.arn]
-  }
-
-  statement {
-    sid    = "SetCloudWatchLogRetention"
-    effect = "Allow"
-    actions = [
-      "logs:PutRetentionPolicy"
-    ]
-    resources = ["arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.id}:log-group:cwagent-*:log-stream:"]
   }
 }
 
@@ -91,41 +81,11 @@ data "aws_iam_policy_document" "s3_bucket_access" {
   }
 }
 
-# create policy document to write Session Manager logs to CloudWatch
-data "aws_iam_policy_document" "session_manager_logging" {
-  # commented out as not encypting with KMS currently as the the role
-  # assumed by the user connecting also needs the GenerateDataKey permission
-  # see https://mojdt.slack.com/archives/C01A7QK5VM1/p1637603085030600
-  # statement { # for session and log encryption using KMS
-  #   effect = "Allow"
-  #   actions = [
-  #     "kms:Decrypt",
-  #     "kms:GenerateDataKey"
-  #   ]
-  #   resources = [aws_kms_key.session_manager.arn]
-  # }
-  statement {
-    sid    = "WriteSessionManagerLogs"
-    effect = "Allow"
-    actions = [
-      "logs:CreateLogStream",
-      "logs:PutLogEvents",
-      "logs:DescribeLogGroups",
-      "logs:DescribeLogStreams"
-    ]
-    resources = [
-      aws_cloudwatch_log_group.session_manager.arn,
-      "${aws_cloudwatch_log_group.session_manager.arn}:log-stream:*"
-    ]
-  }
-}
-
 # combine ec2-common policy documents
 data "aws_iam_policy_document" "ec2_common_combined" {
   source_policy_documents = [
     data.aws_iam_policy_document.ssm_custom.json,
     data.aws_iam_policy_document.s3_bucket_access.json,
-    data.aws_iam_policy_document.session_manager_logging.json,
     data.aws_iam_policy_document.cloud_watch_custom.json
   ]
 }
@@ -169,22 +129,6 @@ resource "aws_key_pair" "ec2-user" {
 # Session Manager Logging and Settings
 #------------------------------------------------------------------------------
 
-# Ignore warnings regarding log groups not encrypted using customer-managed
-# KMS keys - note they are still encrypted with default KMS key
-#tfsec:ignore:AWS089
-resource "aws_cloudwatch_log_group" "session_manager" {
-  #checkov:skip=CKV_AWS_158:skip KMS CMK encryption check while logging solution is being determined
-  name              = "session-manager-logs"
-  retention_in_days = local.application_data.accounts[local.environment].session_manager_log_retention_days
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "session-manager-logs"
-    },
-  )
-}
-
 resource "aws_ssm_document" "session_manager_settings" {
   name            = "SSM-SessionManagerRunShell"
   document_type   = "Session"
@@ -196,7 +140,7 @@ resource "aws_ssm_document" "session_manager_settings" {
       description   = "Document to hold regional settings for Session Manager"
       sessionType   = "Standard_Stream",
       inputs = {
-        cloudWatchLogGroupName      = aws_cloudwatch_log_group.session_manager.name
+        cloudWatchLogGroupName      = "session-manager-logs"
         cloudWatchEncryptionEnabled = false
         cloudWatchStreamingEnabled  = true
         s3BucketName                = ""
@@ -231,6 +175,27 @@ resource "aws_ssm_document" "session_manager_settings" {
 #   name          = "alias/session_manager_key"
 #   target_key_id = aws_kms_key.session_manager.arn
 # }
+
+#------------------------------------------------------------------------------
+# Cloud Watch Log Groups
+#------------------------------------------------------------------------------
+
+# Ignore warnings regarding log groups not encrypted using customer-managed
+# KMS keys - note they are still encrypted with default KMS key
+#tfsec:ignore:AWS089
+resource "aws_cloudwatch_log_group" "groups" {
+  #checkov:skip=CKV_AWS_158:skip KMS CMK encryption check while logging solution is being determined
+  for_each = local.application_data.accounts[local.environment].log_groups
+  name              = each.key
+  retention_in_days = each.value.retention_days
+
+  tags = merge(
+    local.tags,
+    {
+      Name = each.key
+    },
+  )
+}
 
 #------------------------------------------------------------------------------
 # Cloud Watch Agent
