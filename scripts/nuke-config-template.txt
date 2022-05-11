@@ -46,6 +46,8 @@ resource-types:
     - IAMUserPolicyAttachment
     - IAMUserSSHPublicKey
     - IAMVirtualMFADevice
+    - KMSAlias
+    - KMSKey
     - S3AccessPoint
     - S3Bucket
     - S3MultipartUpload
