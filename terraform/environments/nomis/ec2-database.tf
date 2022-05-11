@@ -158,6 +158,7 @@ resource "aws_instance" "test" {
   monitoring                  = false
   subnet_id                   = data.aws_subnet.private_az_a.id
   key_name                    = aws_key_pair.ec2-user.key_name
+  vpc_security_group_ids = [aws_security_group.database_common.id]
   metadata_options {
     http_endpoint = "enabled"
     http_tokens   = "required"
