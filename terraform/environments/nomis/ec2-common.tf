@@ -183,19 +183,19 @@ resource "aws_ssm_document" "session_manager_settings" {
 # Ignore warnings regarding log groups not encrypted using customer-managed
 # KMS keys - note they are still encrypted with default KMS key
 #tfsec:ignore:AWS089
-resource "aws_cloudwatch_log_group" "groups" {
-  #checkov:skip=CKV_AWS_158:skip KMS CMK encryption check while logging solution is being determined
-  for_each = local.application_data.accounts[local.environment].log_groups
-  name              = each.key
-  retention_in_days = each.value.retention_days
+# resource "aws_cloudwatch_log_group" "groups" {
+#   #checkov:skip=CKV_AWS_158:skip KMS CMK encryption check while logging solution is being determined
+#   for_each = local.application_data.accounts[local.environment].log_groups
+#   name              = each.key
+#   retention_in_days = each.value.retention_days
 
-  tags = merge(
-    local.tags,
-    {
-      Name = each.key
-    },
-  )
-}
+#   tags = merge(
+#     local.tags,
+#     {
+#       Name = each.key
+#     },
+#   )
+# }
 
 #------------------------------------------------------------------------------
 # Cloud Watch Agent
