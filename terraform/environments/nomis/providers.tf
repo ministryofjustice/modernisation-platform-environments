@@ -40,16 +40,6 @@ provider "aws" {
     role_arn = "arn:aws:iam::${local.environment_management.account_ids["core-network-services-production"]}:role/modify-dns-records"
   }
 }
-
-provider "aws" {
-  alias                 = "core-shared-services"
-  region = "eu-west-2"
-  skip_get_ec2_platforms = true
-
-  assume_role {
-    role_arn = "arn:aws:iam::${local.environment_management.account_ids["core-shared-services-production"]}:role/ModernisationPlatformAccess"
-  }
-}
 ######################### Run Terraform via CICD ##################################
 
 
