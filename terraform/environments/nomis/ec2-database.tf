@@ -190,7 +190,7 @@ resource "aws_ebs_volume" "disk" {
 
   availability_zone = "eu-west-2a"
   encrypted         = true
-  snapshot_id       = each.value.snapshot_id
+  snapshot_id       = each.value.ebs.snapshot_id
   type              = "gp3"
 }
 
