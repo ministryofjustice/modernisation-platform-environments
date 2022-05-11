@@ -439,11 +439,23 @@ locals {
         {
           device_name = "/dev/sdg"
           volume_type = "gp3"
-          volume_size = 400
+          volume_size = 200
           encrypted   = true
           kms_key_id  = aws_kms_key.this.arn
           tags = {
             Name = "${local.name}-COR-A-EQP01-ebs-block-2"
+          }
+        }
+      ]
+      ebs_block_device = [
+        {
+          device_name = "/dev/sdh"
+          volume_type = "gp3"
+          volume_size = 400
+          encrypted   = true
+          kms_key_id  = aws_kms_key.this.arn
+          tags = {
+            Name = "${local.name}-COR-A-EQP01-ebs-block-3"
           }
         }
       ]
@@ -575,4 +587,3 @@ module "win2012_STD_multiple" {
     terraform_managed = "true"
   })
 }
-
