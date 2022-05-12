@@ -264,6 +264,28 @@ resource "aws_security_group_rule" "egress_equip_to_spotfire_traffic" {
   source_security_group_id = aws_security_group.aws_spotfire_security_group.id
 }
 
+resource "aws_security_group_rule" "ingress_spotfire_internal_traffic" {
+  for_each                 = local.application_data.spotfire_internal_rules
+  description              = format("Spotfire internal traffic for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.aws_spotfire_security_group.id
+  to_port                  = each.value.to_port
+  type                     = "ingress"
+  source_security_group_id = aws_security_group.aws_spotfire_security_group.id
+}
+
+resource "aws_security_group_rule" "ingress_equip_internal_traffic" {
+  for_each                 = local.application_data.equip_internal_rules
+  description              = format("Equip host internal traffic for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.aws_equip_security_group.id
+  to_port                  = each.value.to_port
+  type                     = "ingress"
+  source_security_group_id = aws_security_group.aws_equip_security_group.id
+}
+
 resource "aws_security_group_rule" "aws_equip_security_group_egress_1" {
   type        = "egress"
   protocol    = "-1"
