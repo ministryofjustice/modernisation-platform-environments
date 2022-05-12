@@ -193,7 +193,7 @@ resource "aws_autoscaling_group" "weblogic" {
   }
   lifecycle {
     ignore_changes = [
-      launch_template.version
+      launch_template.*.version
     ]
   }
 }
