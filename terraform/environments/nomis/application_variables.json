@@ -39,7 +39,7 @@
             },
             "weblogics": {
                 "CNOMT1": {
-                    "ami_name": "nomis_Weblogic_2022-05-10T12*",
+                    "ami_name": "nomis_Weblogic_2022*",
                     "asg_max_size": 1
                 }
             }
