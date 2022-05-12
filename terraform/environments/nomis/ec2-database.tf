@@ -209,7 +209,7 @@ data "aws_ami" "mp_image" {
 
   filter {
     name   = "name"
-    values = ["nomis_RHEL7_9_2022-05-11T12-46-53*"]
+    values = ["nomis_RHEL7_9_2022-05-11*"]
   }
 
   filter {
