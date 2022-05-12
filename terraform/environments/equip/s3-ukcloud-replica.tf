@@ -55,7 +55,7 @@ module "s3-bucket-ukcloud-replica" {
 
 resource "aws_s3_bucket_policy" "allow_access_from_another_account" {
   count  = local.is-development ? 1 : 0
-  bucket = module.s3-bucket-ukcloud-replica[0].bucket.arn
+  bucket = module.s3-bucket-ukcloud-replica[0].bucket.id
   policy = data.aws_iam_policy_document.allow_access_from_another_account[0].json
 }
 
