@@ -37,7 +37,8 @@
       "from_port": 445,
       "to_port": 445,
       "protocol": "TCP"
-    },
+    }
+  },
   "equip_internal_rules": {
     "ICMP_ALL": {
       "from_port": -1,
@@ -48,7 +49,8 @@
       "from_port": 445,
       "to_port": 445,
       "protocol": "TCP"
-    },
+    }
+  },
   "alb_to_citrix-adc_rules": {
     "TCP_80": {
       "from_port": 80,
