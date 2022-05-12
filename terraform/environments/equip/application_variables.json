@@ -27,6 +27,28 @@
       "protocol": "TCP"
     }
   },
+  "spotfire_internal_rules": {
+    "ICMP_ALL": {
+      "from_port": -1,
+      "to_port": -1,
+      "protocol": "ICMP"
+    },
+    "TCP_445": {
+      "from_port": 445,
+      "to_port": 445,
+      "protocol": "TCP"
+    },
+  "equip_internal_rules": {
+    "ICMP_ALL": {
+      "from_port": -1,
+      "to_port": -1,
+      "protocol": "ICMP"
+    },
+    "TCP_445": {
+      "from_port": 445,
+      "to_port": 445,
+      "protocol": "TCP"
+    },
   "alb_to_citrix-adc_rules": {
     "TCP_80": {
       "from_port": 80,
