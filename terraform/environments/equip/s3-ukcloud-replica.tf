@@ -1,6 +1,5 @@
 module "s3-bucket-ukcloud-replica" {
-  count = local.is-development ? 1 : 0
-
+  count               = local.is-development ? 1 : 0
   source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.0.5"
   bucket_prefix       = "s3-bucket-ukcloud-replica"
   versioning_enabled  = false
@@ -54,12 +53,19 @@ module "s3-bucket-ukcloud-replica" {
   tags = local.tags
 }
 
-data "aws_iam_policy_document" "bucket_policy" {
+resource "aws_s3_bucket_policy" "allow_access_from_another_account" {
+  count  = local.is-development ? 1 : 0
+  bucket = module.s3-bucket-ukcloud-replica[0].bucket.id
+  policy = data.aws_iam_policy_document.allow_access_from_another_account[0].json
+}
+
+data "aws_iam_policy_document" "allow_access_from_another_account" {
   count = local.is-development ? 1 : 0
   statement {
     effect    = "Allow"
     actions   = [
       "s3:Get*",
+      "s3:List*"
     ]
     resources = [
       module.s3-bucket-ukcloud-replica[0].bucket.id,
@@ -72,4 +78,31 @@ data "aws_iam_policy_document" "bucket_policy" {
       ]
     }
   }
+}
+
+resource "aws_iam_policy" "read_list_s3_access_policy" {
+  count  = local.is-development ? 1 : 0
+  name   = "read_list_s3_access_policy"
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Sid" : "AllowUserToSeeBucketListInTheConsole",
+        "Action" : ["s3:ListAllMyBuckets", "s3:GetBucketLocation"],
+        "Effect" : "Allow",
+        "Resource" : ["arn:aws:s3:::*"]
+      },
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "s3:Get*",
+          "s3:List*"
+        ],
+        "Resource" : [
+          module.s3-bucket-ukcloud-replica[0].bucket.id,
+          "${module.s3-bucket-ukcloud-replica[0].bucket.id}/*"
+        ]
+      }
+    ]
+  })
 }
