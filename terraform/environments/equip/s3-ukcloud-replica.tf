@@ -74,7 +74,7 @@ data "aws_iam_policy_document" "allow_access_from_another_account" {
     principals {
       type        = "AWS"
       identifiers = [
-        "arn:aws:iam::${local.environment_management.account_ids["equip-production"]}:*"
+        "arn:aws:iam::${local.environment_management.account_ids["equip-production"]}:root"
       ]
     }
   }
