@@ -25,17 +25,20 @@ data "aws_iam_policy_document" "shared_image_builder_cmk_policy" {
     effect = "Allow"
     actions = ["kms:Encrypt",
       "kms:Decrypt",
+      "kms:Encrypt",
       "kms:ReEncrypt*",
       "kms:ReEncryptFrom",
       "kms:GenerateDataKey*",
       "kms:DescribeKey",
-    "kms:CreateGrant"]
+      "kms:CreateGrant"
+    ]
     resources = ["*"]
     principals {
       type = "AWS"
       identifiers = ["arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:root",
         "arn:aws:iam::${local.environment_management.account_ids["core-shared-services-production"]}:root",
-        "arn:aws:iam::${local.environment_management.account_ids["nomis-production"]}:root"
+        "arn:aws:iam::${local.environment_management.account_ids["nomis-production"]}:root",
+        "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling"
       ]
     }
   }

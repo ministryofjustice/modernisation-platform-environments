@@ -119,6 +119,14 @@ resource "aws_launch_template" "weblogic" {
     }
   )
 
+  update_default_version = true # needed to allow correct management via Image Builder Distribution
+
+  lifecycle {
+    ignore_changes = [
+      tags, description, image_id, latest_version
+    ]
+  }
+
 }
 
 #------------------------------------------------------------------------------
@@ -182,6 +190,11 @@ resource "aws_autoscaling_group" "weblogic" {
       value               = tag.value
       propagate_at_launch = true
     }
+  }
+  lifecycle {
+    ignore_changes = [
+      launch_template[0].version
+    ]
   }
 }
 
