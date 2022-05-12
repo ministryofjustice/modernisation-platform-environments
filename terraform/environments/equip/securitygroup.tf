@@ -212,7 +212,7 @@ resource "aws_security_group_rule" "aws_citrix_security_group_egress_1" {
 #AWS Equip Security Group
 
 resource "aws_security_group" "aws_equip_security_group" {
-  name        = "aws_equip_security_group"
+  name        = lower(format("secg-%s-%s-equip", local.application_name, local.environment))
   description = "Security Group for AWS_Equip"
   vpc_id      = data.aws_vpc.shared.id
   tags = merge(local.tags,
@@ -240,6 +240,28 @@ resource "aws_security_group_rule" "ingress_ctx_hosts_to_equip_traffic" {
   to_port                  = each.value.to_port
   type                     = "ingress"
   source_security_group_id = aws_security_group.aws_citrix_security_group.id
+}
+
+resource "aws_security_group_rule" "ingress_spotfire_to_equip_traffic" {
+  for_each                 = local.application_data.spotfire_to_equip_rules
+  description              = format("Spotfire host to Equip traffic for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.aws_equip_security_group.id
+  to_port                  = each.value.to_port
+  type                     = "ingress"
+  source_security_group_id = aws_security_group.aws_spotfire_security_group.id
+}
+
+resource "aws_security_group_rule" "egress_equip_to_spotfire_traffic" {
+  for_each                 = local.application_data.equip_to_spotfire_rules
+  description              = format("Equip host to Spotfire traffic for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.aws_equip_security_group.id
+  to_port                  = each.value.to_port
+  type                     = "egress"
+  source_security_group_id = aws_security_group.aws_spotfire_security_group.id
 }
 
 resource "aws_security_group_rule" "aws_equip_security_group_egress_1" {
@@ -287,6 +309,28 @@ resource "aws_security_group_rule" "ingress_ctx_hosts_to_spotfire_traffic" {
   to_port                  = each.value.to_port
   type                     = "ingress"
   source_security_group_id = aws_security_group.aws_citrix_security_group.id
+}
+
+resource "aws_security_group_rule" "ingress_equip_to_spotfire_traffic" {
+  for_each                 = local.application_data.equip_to_spotfire_rules
+  description              = format("Equip host to Spotfire traffic for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.aws_spotfire_security_group.id
+  to_port                  = each.value.to_port
+  type                     = "ingress"
+  source_security_group_id = aws_security_group.aws_equip_security_group.id
+}
+
+resource "aws_security_group_rule" "egress_spotfire_to_equip_traffic" {
+  for_each                 = local.application_data.spotfire_to_equip_rules
+  description              = format("Spotfire host to Equip traffic for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.aws_spotfire_security_group.id
+  to_port                  = each.value.to_port
+  type                     = "egress"
+  source_security_group_id = aws_security_group.aws_equip_security_group.id
 }
 
 resource "aws_security_group_rule" "aws_spotfire_security_group_egress_1" {
