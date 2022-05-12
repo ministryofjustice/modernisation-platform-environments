@@ -68,13 +68,13 @@ data "aws_iam_policy_document" "allow_access_from_another_account" {
       "s3:List*"
     ]
     resources = [
-      module.s3-bucket-ukcloud-replica[0].bucket.id,
-      "${module.s3-bucket-ukcloud-replica[0].bucket.id}/*"
+      module.s3-bucket-ukcloud-replica[0].bucket.arn,
+      "${module.s3-bucket-ukcloud-replica[0].bucket.arn}/*"
     ]
     principals {
       type        = "AWS"
       identifiers = [
-        "arn:aws:iam::${local.environment_management.account_ids["equip-production"]}:*"
+        "arn:aws:iam::${local.environment_management.account_ids["equip-production"]}:root"
       ]
     }
   }
@@ -99,8 +99,8 @@ resource "aws_iam_policy" "read_list_s3_access_policy" {
           "s3:List*"
         ],
         "Resource" : [
-          module.s3-bucket-ukcloud-replica[0].bucket.id,
-          "${module.s3-bucket-ukcloud-replica[0].bucket.id}/*"
+          module.s3-bucket-ukcloud-replica[0].bucket.arn,
+          "${module.s3-bucket-ukcloud-replica[0].bucket.arn}/*"
         ]
       }
     ]
