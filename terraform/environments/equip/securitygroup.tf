@@ -179,7 +179,7 @@ resource "aws_security_group_rule" "egress_equip_to_citrix_adc_vip" {
   description              = format("Equip to Citrix ADC VIP for %s %d", each.value.protocol, each.value.from_port)
   from_port                = each.value.from_port
   protocol                 = each.value.protocol
-  security_group_id        =
+  security_group_id        = aws_security_group.aws_equip_security_group.id
   to_port                  = each.value.to_port
   type                     = "egress"
   source_security_group_id = aws_security_group.citrix_adc_vip.id
