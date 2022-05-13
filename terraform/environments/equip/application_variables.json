@@ -27,6 +27,13 @@
       "protocol": "TCP"
     }
   },
+  "port_80_rules": {
+    "TCP_80": {
+      "from_port": 80,
+      "to_port": 80,
+      "protocol": "TCP"
+    }
+  },
   "spotfire_internal_rules": {
     "ICMP_ALL": {
       "from_port": -1,
@@ -622,6 +629,11 @@
     }
   },
   "equip_to_spotfire_rules": {
+    "TCP_80": {
+      "from_port": 80,
+      "to_port": 80,
+      "protocol": "TCP"
+    },
     "TCP_445": {
       "from_port": 445,
       "to_port": 445,
@@ -639,6 +651,11 @@
     }
   },
   "spotfire_to_equip_rules": {
+    "TCP_80": {
+      "from_port": 80,
+      "to_port": 80,
+      "protocol": "TCP"
+    },
     "TCP_445": {
       "from_port": 445,
       "to_port": 445,
