@@ -1,10 +1,10 @@
 data "aws_region" "current" {}
 
 data "aws_vpc" "shared" {
-  tags = {
+   tags = {
     "Name" = "${var.networking[0].business-unit}-${local.environment}"
-  }
-}
+   }
+ }
 
 data "aws_subnets" "shared-data" {
   filter {
