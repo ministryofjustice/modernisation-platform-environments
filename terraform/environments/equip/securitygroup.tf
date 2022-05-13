@@ -130,8 +130,6 @@ resource "aws_security_group_rule" "ingress_citrix_adc_vip_to_citrix_host" {
   source_security_group_id = aws_security_group.aws_citrix_security_group.id
 }
 
-#first lot
-
 resource "aws_security_group_rule" "egress_sf_to_citrix_adc_vip" {
   for_each                 = local.application_data.port_80_rules
   description              = format("Spotfire to Citrix ADC VIP traffic for %s %d", each.value.protocol, each.value.from_port)
@@ -219,8 +217,6 @@ resource "aws_security_group_rule" "ingress_equip_to_citrix_host" {
   type                     = "ingress"
   source_security_group_id = aws_security_group.aws_citrix_security_group.id
 }
-
-# third lot
 
 resource "aws_security_group_rule" "egress_citrix_host_to_citrix_adc_vip" {
   for_each                 = local.application_data.port_80_rules
