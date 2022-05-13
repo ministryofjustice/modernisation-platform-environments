@@ -64,6 +64,186 @@ resource "aws_security_group" "citrix_adc_vip" {
   )
 }
 
+resource "aws_security_group_rule" "egress_citrix_adc_vip_to_sf" {
+  for_each                 = local.application_data.port_80_rules
+  description              = format("Citrix ADC VIP traffic to Spotfire for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.citrix_adc_vip.id
+  to_port                  = each.value.to_port
+  type                     = "egress"
+  source_security_group_id = aws_security_group.aws_spotfire_security_group.id
+}
+
+resource "aws_security_group_rule" "egress_citrix_adc_vip_to_equip" {
+  for_each                 = local.application_data.port_80_rules
+  description              = format("Citrix ADC VIP traffic to Equip for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.citrix_adc_vip.id
+  to_port                  = each.value.to_port
+  type                     = "egress"
+  source_security_group_id = aws_security_group.aws_equip_security_group.id
+}
+
+resource "aws_security_group_rule" "egress_citrix_adc_vip_to_citrix_host" {
+  for_each                 = local.application_data.port_80_rules
+  description              = format("Citrix ADC VIP traffic to Citrix Host for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.citrix_adc_vip.id
+  to_port                  = each.value.to_port
+  type                     = "egress"
+  source_security_group_id = aws_security_group.aws_citrix_security_group.id
+}
+
+resource "aws_security_group_rule" "ingress_citrix_adc_vip_to_sf" {
+  for_each                 = local.application_data.port_80_rules
+  description              = format("Citrix ADC VIP traffic to Spotfire for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.citrix_adc_vip.id
+  to_port                  = each.value.to_port
+  type                     = "ingress"
+  source_security_group_id = aws_security_group.aws_spotfire_security_group.id
+}
+
+resource "aws_security_group_rule" "ingress_citrix_adc_vip_to_equip" {
+  for_each                 = local.application_data.port_80_rules
+  description              = format("Citrix ADC VIP traffic to Equip for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.citrix_adc_vip.id
+  to_port                  = each.value.to_port
+  type                     = "ingress"
+  source_security_group_id = aws_security_group.aws_equip_security_group.id
+}
+
+resource "aws_security_group_rule" "ingress_citrix_adc_vip_to_citrix_host" {
+  for_each                 = local.application_data.port_80_rules
+  description              = format("Citrix ADC VIP traffic to Citrix Host for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.citrix_adc_vip.id
+  to_port                  = each.value.to_port
+  type                     = "ingress"
+  source_security_group_id = aws_security_group.aws_citrix_security_group.id
+}
+
+#first lot
+
+resource "aws_security_group_rule" "egress_sf_to_citrix_adc_vip" {
+  for_each                 = local.application_data.port_80_rules
+  description              = format("Spotfire to Citrix ADC VIP traffic for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.aws_spotfire_security_group.id
+  to_port                  = each.value.to_port
+  type                     = "egress"
+  source_security_group_id = aws_security_group.citrix_adc_vip.id
+}
+
+resource "aws_security_group_rule" "egress_sf_to_citrix_host" {
+  for_each                 = local.application_data.port_80_rules
+  description              = format("Spotfire traffic to Citrix Host for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.aws_spotfire_security_group.id
+  to_port                  = each.value.to_port
+  type                     = "egress"
+  source_security_group_id = aws_security_group.aws_citrix_security_group.id
+}
+
+resource "aws_security_group_rule" "ingress_sf_to_citrix_adc_vip" {
+  for_each                 = local.application_data.port_80_rules
+  description              = format("Spotfire to Citrix ADC VIP traffic for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.aws_spotfire_security_group.id
+  to_port                  = each.value.to_port
+  type                     = "ingress"
+  source_security_group_id = aws_security_group.citrix_adc_vip.id
+}
+
+resource "aws_security_group_rule" "ingress_sf_citrix_host" {
+  for_each                 = local.application_data.port_80_rules
+  description              = format("Spotfire to Citrix Host for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.aws_spotfire_security_group.id
+  to_port                  = each.value.to_port
+  type                     = "ingress"
+  source_security_group_id = aws_security_group.aws_citrix_security_group.id
+}
+
+resource "aws_security_group_rule" "egress_equip_to_citrix_adc_vip" {
+  for_each                 = local.application_data.port_80_rules
+  description              = format("Equip to Citrix ADC VIP for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        =
+  to_port                  = each.value.to_port
+  type                     = "egress"
+  source_security_group_id = aws_security_group.citrix_adc_vip.id
+}
+
+resource "aws_security_group_rule" "egress_equip_to_citrix_host" {
+  for_each                 = local.application_data.port_80_rules
+  description              = format("Equip to Citrix Host for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.aws_equip_security_group.id
+  to_port                  = each.value.to_port
+  type                     = "egress"
+  source_security_group_id = aws_security_group.aws_citrix_security_group.id
+}
+
+resource "aws_security_group_rule" "ingress_equip_to_citrix_adc_vip" {
+  for_each                 = local.application_data.port_80_rules
+  description              = format("Equip to Citrix ADC VIP traffic for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.aws_equip_security_group.id
+  to_port                  = each.value.to_port
+  type                     = "ingress"
+  source_security_group_id = aws_security_group.citrix_adc_vip.id
+}
+
+resource "aws_security_group_rule" "ingress_equip_to_citrix_host" {
+  for_each                 = local.application_data.port_80_rules
+  description              = format("Equip to Citrix Host for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.aws_equip_security_group.id
+  to_port                  = each.value.to_port
+  type                     = "ingress"
+  source_security_group_id = aws_security_group.aws_citrix_security_group.id
+}
+
+# third lot
+
+resource "aws_security_group_rule" "egress_citrix_host_to_citrix_adc_vip" {
+  for_each                 = local.application_data.port_80_rules
+  description              = format("Citrix ADC VIP traffic to Spotfire for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.aws_citrix_security_group.id
+  to_port                  = each.value.to_port
+  type                     = "egress"
+  source_security_group_id = aws_security_group.citrix_adc_vip.id
+}
+
+resource "aws_security_group_rule" "ingress_citrix_host_to_citrix_adc_vip" {
+  for_each                 = local.application_data.port_80_rules
+  description              = format("Citrix host to Citrix ADC VIP traffic for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.aws_citrix_security_group.id
+  to_port                  = each.value.to_port
+  type                     = "ingress"
+  source_security_group_id = aws_security_group.citrix_adc_vip.id
+}
+
 resource "aws_security_group_rule" "ingress_alb_to_citrix-adc_traffic" {
   for_each                 = local.application_data.alb_to_citrix-adc_rules
   description              = format("ALB to Citrix ADC traffic for %s %d", each.value.protocol, each.value.from_port)
