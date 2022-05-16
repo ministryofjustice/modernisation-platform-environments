@@ -218,7 +218,7 @@ module "win2016_multiple" {
   for_each = local.win2016_instances
 
   name                   = "${local.name}-${each.key}"
-  ami                    = data.aws_ami.windows_2016_ami.id
+  ami                    = "ami-0eb1bbd88dd77f1b7"
   instance_type          = each.value.instance_type
   vpc_security_group_ids = each.value.vpc_security_group_ids
   subnet_id              = each.value.subnet_id
@@ -255,7 +255,7 @@ data "aws_ami" "windows_2016_std_SQL17_ami" {
 }
 
 resource "aws_instance" "SOC" {
-  ami = data.aws_ami.windows_2016_std_SQL17_ami.id
+  ami = "ami-0781096210795e2d3"
 
   instance_type          = "t3a.xlarge"
   availability_zone      = "${local.region}a"
@@ -367,7 +367,7 @@ module "win2012_SQL_multiple" {
   for_each = local.win2012_SQL_instances
 
   name                   = "${local.name}-${each.key}"
-  ami                    = data.aws_ami.windows_2012_std_SQL16_ami.id
+  ami                    = "ami-074c86bb2f72d9966"
   instance_type          = each.value.instance_type
   vpc_security_group_ids = each.value.vpc_security_group_ids
   subnet_id              = each.value.subnet_id
@@ -568,7 +568,7 @@ module "win2012_STD_multiple" {
   for_each = local.win2012_STD_instances
 
   name                   = "${local.name}-${each.key}"
-  ami                    = data.aws_ami.windows_2012_std_ami.id
+  ami                    = "ami-04208d5dbf1d2dd44"
   instance_type          = each.value.instance_type
   vpc_security_group_ids = each.value.vpc_security_group_ids
   subnet_id              = each.value.subnet_id
