@@ -43,7 +43,7 @@ resource "aws_iam_policy_attachment" "citrix_adc_instance_attachment" {
 }
 
 resource "aws_iam_policy_attachment" "read_list_s3_access_attachment" {
-  count  = local.is-development ? 1 : 0
+  count      = local.is-development ? 1 : 0
   name       = "read_list_s3_access_attachment"
   roles      = [aws_iam_role.ssm-instance-role-moj.name]
   policy_arn = aws_iam_policy.read_list_s3_access_policy[0].arn
