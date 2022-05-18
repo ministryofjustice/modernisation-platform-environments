@@ -40,7 +40,7 @@ resource "aws_iam_role" "dlm_lifecycle_role" {
 
 
 resource "aws_iam_role_policy_attachment" "dlm_lifecycle_policy" {
-  name   = lower(format("dlm-lifecycle-policy-%s-%s", var.service, var.environment))
-  role   = aws_iam_role.dlm_lifecycle_role.id
-  policy_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/AWSDataLifecycleManagerServiceRole"
+  name       = lower(format("dlm-lifecycle-policy-%s-%s", var.service, var.environment))
+  role       = [aws_iam_role.dlm_lifecycle_role.id]
+  policy_arn = "arn:aws:iam::aws:policy/AWSDataLifecycleManagerServiceRole"
 }
