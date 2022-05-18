@@ -5,7 +5,7 @@
 ##############################################################
 
 data "aws_acm_certificate" "production_cert" {
-  count = local.environment == "production" ? 1 : 0
+  count    = local.environment == "production" ? 1 : 0
   domain   = "equip.service.justice.gov.uk"
   statuses = ["ISSUED"]
 }
@@ -14,35 +14,35 @@ data "aws_acm_certificate" "production_cert" {
 #tfsec:ignore:aws-elb-alb-not-public
 resource "aws_lb" "citrix_alb" {
 
-  name        = format("alb-%s-%s-citrix", local.application_name, local.environment)
+  name               = format("alb-%s-%s-citrix", local.application_name, local.environment)
   load_balancer_type = "application"
-  security_groups = [aws_security_group.alb_sg.id]
-  subnets         = [data.aws_subnet.public_az_a.id, data.aws_subnet.public_az_b.id]
+  security_groups    = [aws_security_group.alb_sg.id]
+  subnets            = [data.aws_subnet.public_az_a.id, data.aws_subnet.public_az_b.id]
 
-  enable_deletion_protection       = true
-  drop_invalid_header_fields       = true
-  enable_waf_fail_open             = true
-  ip_address_type                  = "ipv4"
+  enable_deletion_protection = true
+  drop_invalid_header_fields = true
+  enable_waf_fail_open       = true
+  ip_address_type            = "ipv4"
 
-    tags = merge(local.tags,
+  tags = merge(local.tags,
     { Name = format("alb-%s-%s-citrix", local.application_name, local.environment)
       Role = "Equip public load balancer"
     }
   )
 
   access_logs {
-    bucket = aws_s3_bucket.this.id
+    bucket  = aws_s3_bucket.this.id
     enabled = "true"
   }
 
 }
 
 resource "aws_lb_target_group" "lb_tg_http" {
-  name             = format("tg-%s-%s-80", local.application_name, local.environment)
-  target_type      = "ip"
-  protocol         = "HTTP"
-  vpc_id           = data.aws_vpc.shared.id
-  port             = "80"
+  name        = format("tg-%s-%s-80", local.application_name, local.environment)
+  target_type = "ip"
+  protocol    = "HTTP"
+  vpc_id      = data.aws_vpc.shared.id
+  port        = "80"
 
   health_check {
     enabled             = true
@@ -60,11 +60,11 @@ resource "aws_lb_target_group" "lb_tg_http" {
 }
 
 resource "aws_lb_target_group" "lb_tg_https" {
-  name             = format("tg-%s-%s-443", local.application_name, local.environment)
-  target_type      = "ip"
-  protocol         = "HTTPS"
-  vpc_id           = data.aws_vpc.shared.id
-  port             = "443"
+  name        = format("tg-%s-%s-443", local.application_name, local.environment)
+  target_type = "ip"
+  protocol    = "HTTPS"
+  vpc_id      = data.aws_vpc.shared.id
+  port        = "443"
 
   health_check {
     enabled             = true

@@ -5,7 +5,7 @@ module "s3-bucket-ukcloud-replica" {
   versioning_enabled  = false
   replication_enabled = false
   # The following providers configuration will not be used because 'replication_enabled' is false
-  providers           = {
+  providers = {
     aws.bucket-replication = aws
   }
 
@@ -24,7 +24,7 @@ module "s3-bucket-ukcloud-replica" {
         {
           days          = 90
           storage_class = "STANDARD_IA"
-        }, {
+          }, {
           days          = 365
           storage_class = "GLACIER"
         }
@@ -38,7 +38,7 @@ module "s3-bucket-ukcloud-replica" {
         {
           days          = 90
           storage_class = "STANDARD_IA"
-        }, {
+          }, {
           days          = 365
           storage_class = "GLACIER"
         }
@@ -62,8 +62,8 @@ resource "aws_s3_bucket_policy" "allow_access_from_another_account" {
 data "aws_iam_policy_document" "allow_access_from_another_account" {
   count = local.is-development ? 1 : 0
   statement {
-    effect    = "Allow"
-    actions   = [
+    effect = "Allow"
+    actions = [
       "s3:Get*",
       "s3:List*"
     ]
@@ -72,7 +72,7 @@ data "aws_iam_policy_document" "allow_access_from_another_account" {
       "${module.s3-bucket-ukcloud-replica[0].bucket.arn}/*"
     ]
     principals {
-      type        = "AWS"
+      type = "AWS"
       identifiers = [
         "arn:aws:iam::${local.environment_management.account_ids["equip-production"]}:root"
       ]
@@ -81,8 +81,8 @@ data "aws_iam_policy_document" "allow_access_from_another_account" {
 }
 
 resource "aws_iam_policy" "read_list_s3_access_policy" {
-  count  = local.is-development ? 1 : 0
-  name   = "read_list_s3_access_policy"
+  count = local.is-development ? 1 : 0
+  name  = "read_list_s3_access_policy"
   policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [
