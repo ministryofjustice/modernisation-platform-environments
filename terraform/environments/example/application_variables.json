@@ -16,13 +16,13 @@
           "container_memory": "3072",
           "task_definition_volume": "upload_volume",
           "network_mode": "none",
-          "db_instance_class": "db.m5.large",
+          "db_instance_class": "db.t3.micro",
           "db_user": "admin",
-          "db_allocated_storage": "100",
+          "db_allocated_storage": "50",
+          "db_max_allocated_storage": "100",
           "db_snapshot_identifier": "arn:aws:rds:eu-west-2:083957762049:snapshot:example-development-db-snapshot",
           "env_name": "development",
           "friendly_name": "Example Development Hub",
-          "app_db_name": "Exmaple-dev",
           "cert_arn": "arn:aws:acm:eu-west-2:938841708445:certificate/977c968e-1992-46a4-bfe8-e4043ab5a982"
           },
  
