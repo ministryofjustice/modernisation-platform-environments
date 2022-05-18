@@ -8,7 +8,7 @@ resource "aws_dlm_lifecycle_policy" "dlm_daily_snapshots" {
     resource_types = ["VOLUME"]
 
     schedule {
-      name = "Daily snapshot at 3:00AM"
+      name = format("%s-%s-schedule", var.service, var.environment)
 
       create_rule {
         interval      = 24
