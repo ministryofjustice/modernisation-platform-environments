@@ -52,15 +52,15 @@ locals {
           volume_type = "gp3"
           volume_size = 60
           kms_key_id  = aws_kms_key.this.arn
-          tags = {
-            Name = "${local.name}-COR-A-DC01-root-block"
-          }
+          tags = merge(local.tags,
+            { Name = "${local.name}-COR-A-DC01-root-block" }
+          )
         }
       ]
-      tags = {
-        Name = "${local.name}-COR-A-DC01"
-        Role = "Domain Controller"
-      }
+      tags = merge(local.tags,
+        { Name = "${local.name}-COR-A-DC01"
+        Role = "Domain Controller" }
+      )
     }
     COR-A-DC02 = {
       instance_type          = "t3a.large"
@@ -72,16 +72,16 @@ locals {
           volume_type = "gp3"
           volume_size = 60
           kms_key_id  = aws_kms_key.this.arn
-          tags = {
-            Name = "${local.name}-COR-A-DC02-root-block"
-            Role = "Domain Controller"
-          }
+          tags = merge(local.tags,
+            { Name = "${local.name}-COR-A-DC02-root-block"
+            Role = "Domain Controller" }
+          )
         }
       ]
-      tags = {
-        Name = "${local.name}-COR-A-DC02"
-        Role = "Domain Controller"
-      }
+      tags = merge(local.tags,
+        { Name = "${local.name}-COR-A-DC02"
+        Role = "Domain Controller" }
+      )
     }
     COR-A-CTX01 = {
       instance_type          = "t3a.large"
@@ -93,9 +93,9 @@ locals {
           volume_type = "gp3"
           volume_size = 100
           kms_key_id  = aws_kms_key.this.arn
-          tags = {
-            Name = "${local.name}-COR-A-CTX01-root-block"
-          }
+          tags = merge(local.tags,
+            { Name = "${local.name}-COR-A-CTX01-root-block" }
+          )
         }
       ]
       ebs_block_device = [
@@ -105,15 +105,15 @@ locals {
           volume_size = 100
           encrypted   = true
           kms_key_id  = aws_kms_key.this.arn
-          tags = {
-            Name = "${local.name}-COR-A-CTX01-ebs-block"
-          }
+          tags = merge(local.tags,
+            { Name = "${local.name}-COR-A-CTX01-ebs-block" }
+          )
         }
       ]
-      tags = {
-        Name = "${local.name}-COR-A-CTX01"
-        Role = "Citrix Infrastructure"
-      }
+      tags = merge(local.tags,
+        { Name = "${local.name}-COR-A-CTX01"
+        Role = "Citrix Infrastructure" }
+      )
     }
     COR-A-CTX02 = {
       instance_type          = "t3a.large"
@@ -125,15 +125,15 @@ locals {
           volume_type = "gp3"
           volume_size = 100
           kms_key_id  = aws_kms_key.this.arn
-          tags = {
-            Name = "${local.name}-COR-A-CTX02-root-block"
-          }
+          tags = merge(local.tags,
+            { Name = "${local.name}-COR-A-CTX02-root-block" }
+          )
         }
       ]
-      tags = {
-        Name = "${local.name}-COR-A-CTX02"
-        Role = "Citrix Session Host"
-      }
+      tags = merge(local.tags,
+        { Name = "${local.name}-COR-A-CTX02"
+        Role = "Citrix Session Host" }
+      )
     }
     COR-A-CTX03 = {
       instance_type          = "t3a.large"
@@ -145,15 +145,15 @@ locals {
           volume_type = "gp3"
           volume_size = 100
           kms_key_id  = aws_kms_key.this.arn
-          tags = {
-            Name = "${local.name}-COR-A-CTX03-root-block"
-          }
+          tags = merge(local.tags,
+            { Name = "${local.name}-COR-A-CTX03-root-block" }
+          )
         }
       ]
-      tags = {
-        Name = "${local.name}-COR-A-CTX03"
-        Role = "Citrix Session Host"
-      }
+      tags = merge(local.tags,
+        { Name = "${local.name}-COR-A-CTX03"
+        Role = "Citrix Session Host" }
+      )
     }
     COR-A-PXY01 = {
       instance_type          = "t3a.large"
@@ -165,9 +165,9 @@ locals {
           volume_type = "gp3"
           volume_size = 70
           kms_key_id  = aws_kms_key.this.arn
-          tags = {
-            Name = "${local.name}-COR-A-PXY01-root-block"
-          }
+          tags = merge(local.tags,
+            { Name = "${local.name}-COR-A-PXY01-root-block" }
+          )
         }
       ]
       ebs_block_device = [
@@ -177,15 +177,15 @@ locals {
           volume_size = 500
           encrypted   = true
           kms_key_id  = aws_kms_key.this.arn
-          tags = {
-            Name = "${local.name}-COR-A-PXY01-ebs-block"
-          }
+          tags = merge(local.tags,
+            { Name = "${local.name}-COR-A-PXY01-ebs-block" }
+          )
         }
       ]
-      tags = {
-        Name = "${local.name}-COR-A-PXY01"
-        Role = "Proxy Services"
-      }
+      tags = merge(local.tags,
+        { Name = "${local.name}-COR-A-PXY01"
+        Role = "Proxy Services" }
+      )
     }
     COR-A-TST01 = {
       instance_type          = "t3a.large"
@@ -197,15 +197,15 @@ locals {
           volume_type = "gp3"
           volume_size = 60
           kms_key_id  = aws_kms_key.this.arn
-          tags = {
-            Name = "${local.name}-COR-A-TST01-root-block"
-          }
+          tags = merge(local.tags,
+            { Name = "${local.name}-COR-A-TST01-root-block" }
+          )
         }
       ]
-      tags = {
-        Name = "${local.name}-COR-A-TST01"
-        Role = "Test Server"
-      }
+      tags = merge(local.tags,
+        { Name = "${local.name}-COR-A-TST01"
+        Role = "Test Server" }
+      )
     }
   }
 }
@@ -232,10 +232,10 @@ module "win2016_multiple" {
   root_block_device  = lookup(each.value, "root_block_device", [])
   ebs_block_device   = lookup(each.value, "ebs_block_device", [])
 
-  tags = merge(each.value.tags, {
-    Environment       = "development"
-    terraform_managed = "true"
-  })
+  tags = merge(each.value.tags, local.tags,
+    { Environment = "development"
+    terraform_managed = "true" }
+  )
 }
 
 
@@ -272,9 +272,9 @@ resource "aws_instance" "SOC" {
     volume_type = "gp3"
     volume_size = 70
     kms_key_id  = aws_kms_key.this.arn
-    tags = {
-      Name = "NPS-COR-A-SOC01-root-block"
-    }
+    tags = merge(local.tags,
+      { Name = "NPS-COR-A-SOC01-root-block" }
+    )
   }
   ebs_block_device {
     device_name = "/dev/sdf"
@@ -282,9 +282,9 @@ resource "aws_instance" "SOC" {
     volume_size = 100
     encrypted   = true
     kms_key_id  = aws_kms_key.this.arn
-    tags = {
-      Name = "NPS-COR-A-SOC01-ebs-block1"
-    }
+    tags = merge(local.tags,
+      { Name = "NPS-COR-A-SOC01-ebs-block1" }
+    )
   }
   ebs_block_device {
     device_name = "/dev/sdg"
@@ -292,19 +292,19 @@ resource "aws_instance" "SOC" {
     volume_size = 300
     encrypted   = true
     kms_key_id  = aws_kms_key.this.arn
-    tags = {
-      Name = "NPS-COR-A-SOC01-ebs-block2"
-    }
+    tags = merge(local.tags,
+      { Name = "NPS-COR-A-SOC01-ebs-block2" }
+    )
   }
   metadata_options {
     http_endpoint = "enabled"
     http_tokens   = "required"
   }
 
-  tags = {
-    Name = "NPS-COR-A-SOC01"
-    ROLE = "Security Operation Center Gateway"
-  }
+  tags = merge(local.tags,
+    { Name = "NPS-COR-A-SOC01"
+    ROLE = "Security Operation Center Gateway" }
+  )
 
 }
 
@@ -335,9 +335,9 @@ locals {
           volume_type = "gp3"
           volume_size = 70
           kms_key_id  = aws_kms_key.this.arn
-          tags = {
-            Name = "${local.name}-COR-A-SF02-root-block"
-          }
+          tags = merge(local.tags,
+            { Name = "${local.name}-COR-A-SF02-root-block" }
+          )
         }
       ]
       ebs_block_device = [
@@ -347,15 +347,15 @@ locals {
           volume_size = 125
           encrypted   = true
           kms_key_id  = aws_kms_key.this.arn
-          tags = {
-            Name = "${local.name}-COR-A-SF02-ebs-block"
-          }
+          tags = merge(local.tags,
+            { Name = "${local.name}-COR-A-SF02-ebs-block" }
+          )
         }
       ]
-      tags = {
-        Name = "${local.name}-COR-A-SF02"
-        Role = "Spotfire Database Server"
-      }
+      tags = merge(local.tags,
+        { Name = "${local.name}-COR-A-SF02"
+        Role = "Spotfire Database Server" }
+      )
     }
   }
 }
@@ -382,7 +382,7 @@ module "win2012_SQL_multiple" {
   root_block_device  = lookup(each.value, "root_block_device", [])
   ebs_block_device   = lookup(each.value, "ebs_block_device", [])
 
-  tags = merge(each.value.tags, {
+  tags = merge(each.value.tags, local.tags, {
     Environment       = "development"
     terraform_managed = "true"
   })
@@ -418,9 +418,9 @@ locals {
           volume_type = "gp3"
           volume_size = 90
           kms_key_id  = aws_kms_key.this.arn
-          tags = {
-            Name = "${local.name}-COR-A-EQP01-root-block"
-          }
+          tags = merge(local.tags,
+            { Name = "${local.name}-COR-A-EQP01-root-block" }
+          )
         }
       ]
       ebs_block_device = [
@@ -430,9 +430,9 @@ locals {
           volume_size = 100
           encrypted   = true
           kms_key_id  = aws_kms_key.this.arn
-          tags = {
-            Name = "${local.name}-COR-A-EQP01-ebs-block-1"
-          }
+          tags = merge(local.tags,
+            { Name = "${local.name}-COR-A-EQP01-ebs-block-1" }
+          )
         }
       ]
       ebs_block_device = [
@@ -442,9 +442,9 @@ locals {
           volume_size = 200
           encrypted   = true
           kms_key_id  = aws_kms_key.this.arn
-          tags = {
-            Name = "${local.name}-COR-A-EQP01-ebs-block-2"
-          }
+          tags = merge(local.tags,
+            { Name = "${local.name}-COR-A-EQP01-ebs-block-2" }
+          )
         }
       ]
       ebs_block_device = [
@@ -454,15 +454,15 @@ locals {
           volume_size = 400
           encrypted   = true
           kms_key_id  = aws_kms_key.this.arn
-          tags = {
-            Name = "${local.name}-COR-A-EQP01-ebs-block-3"
-          }
+          tags = merge(local.tags,
+            { Name = "${local.name}-COR-A-EQP01-ebs-block-3" }
+          )
         }
       ]
-      tags = {
-        Name = "${local.name}-COR-A-EQP01"
-        Role = "Nimbus Application Services"
-      }
+      tags = merge(local.tags,
+        { Name = "${local.name}-COR-A-EQP01"
+        Role = "Nimbus Application Services" }
+      )
     }
     COR-A-EQP02 = {
       instance_type          = "t3a.xlarge"
@@ -474,9 +474,9 @@ locals {
           volume_type = "gp3"
           volume_size = 80
           kms_key_id  = aws_kms_key.this.arn
-          tags = {
-            Name = "${local.name}-COR-A-EQP02-root-block"
-          }
+          tags = merge(local.tags,
+            { Name = "${local.name}-COR-A-EQP02-root-block" }
+          )
         }
       ]
       ebs_block_device = [
@@ -486,15 +486,15 @@ locals {
           volume_size = 100
           encrypted   = true
           kms_key_id  = aws_kms_key.this.arn
-          tags = {
-            Name = "${local.name}-COR-A-EQP02-ebs-block-1"
-          }
+          tags = merge(local.tags,
+            { Name = "${local.name}-COR-A-EQP02-ebs-block-1" }
+          )
         }
       ]
-      tags = {
-        Name = "${local.name}-COR-A-EQP02"
-        Role = "Nimbus Application Services"
-      }
+      tags = merge(local.tags,
+        { Name = "${local.name}-COR-A-EQP02"
+        Role = "Nimbus Application Services" }
+      )
     }
     COR-A-EQP03 = {
       instance_type          = "t3a.xlarge"
@@ -506,15 +506,15 @@ locals {
           volume_type = "gp3"
           volume_size = 60
           kms_key_id  = aws_kms_key.this.arn
-          tags = {
-            Name = "${local.name}-COR-A-EQP03-root-block"
-          }
+          tags = merge(local.tags,
+            { Name = "${local.name}-COR-A-EQP03-root-block" }
+          )
         }
       ]
-      tags = {
-        Name = "${local.name}-COR-A-EQP03"
-        Role = "Nimbus Application Services"
-      }
+      tags = merge(local.tags,
+        { Name = "${local.name}-COR-A-EQP03"
+        Role = "Nimbus Application Services" }
+      )
     }
     COR-A-SF01 = {
       instance_type          = "t3a.large"
@@ -526,15 +526,15 @@ locals {
           volume_type = "gp3"
           volume_size = 60
           kms_key_id  = aws_kms_key.this.arn
-          tags = {
-            Name = "${local.name}-COR-A-SF01-root-block"
-          }
+          tags = merge(local.tags,
+            { Name = "${local.name}-COR-A-SF01-root-block" }
+          )
         }
       ]
-      tags = {
-        Name = "${local.name}-COR-A-SF01"
-        Role = "Spot Fire Server"
-      }
+      tags = merge(local.tags,
+        { Name = "${local.name}-COR-A-SF01"
+        Role = "Spot Fire Server" }
+      )
     }
     COR-A-SF03 = {
       instance_type          = "t3a.large"
@@ -546,16 +546,16 @@ locals {
           volume_type = "gp3"
           volume_size = 60
           kms_key_id  = aws_kms_key.this.arn
-          tags = {
-            Name = "${local.name}-COR-A-SF03-root-block"
-          }
+          tags = merge(local.tags,
+            { Name = "${local.name}-COR-A-SF03-root-block" }
+          )
         }
       ]
 
-      tags = {
-        Name = "${local.name}-COR-A-SF03"
-        Role = "Spot Fire WebPlayer Server"
-      }
+      tags = merge(local.tags,
+        { Name = "${local.name}-COR-A-SF03"
+        Role = "Spot Fire WebPlayer Server" }
+      )
     }
   }
 }
@@ -582,7 +582,7 @@ module "win2012_STD_multiple" {
   root_block_device  = lookup(each.value, "root_block_device", [])
   ebs_block_device   = lookup(each.value, "ebs_block_device", [])
 
-  tags = merge(each.value.tags, {
+  tags = merge(each.value.tags, local.tags, {
     Environment       = "development"
     terraform_managed = "true"
   })
