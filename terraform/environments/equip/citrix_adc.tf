@@ -15,9 +15,9 @@ resource "aws_instance" "citrix_adc_instance" {
     volume_size = 20
     kms_key_id  = aws_kms_key.this.arn
 
-    tags = {
-      Name = "Citrix_ADC_VPX_ROOT_VOLUME"
-    }
+    tags = merge(local.tags,
+          { Name = "Citrix_ADC_VPX_ROOT_VOLUME" }
+      )
   }
 
   metadata_options {
