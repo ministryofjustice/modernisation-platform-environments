@@ -7,9 +7,10 @@ resource "aws_security_group" "example-ec2-sg" {
   tags = merge(local.tags,
     { Name = lower(format("sg-%s-%s-example", local.application_name, local.environment)) }
   )
+  # Need ingress and egress in here
   }
   
-#  module "example-ec2" 
+#  Build EC2 "example-ec2" 
 resource "aws_instance" "develop" {
   # Specify the instance type and ami to be used (this is the Amazon free tier option)
   instance_type          = local.app_variables.accounts[local.environment].instance_type
@@ -22,18 +23,12 @@ resource "aws_instance" "develop" {
      volume_size          = 20
    }
  
-  tags = {
-    Name = "First terraform EC2 build"
+  tags = merge(local.tags,
+  {   Name = "First terraform EC2 build"
     }
+  )
     depends_on = [aws_security_group.example-ec2-sg]
 } 
- 
-#  resource "aws_volume_attachment" "mountvolumetoec2" {
-#   device_name = "/dev/sdb"
-#   instance_id = "i-083aad7eac1faa3c5"
-#   volume_id = "vol-0e32e4534b355c092"
-
-# #  #Then the EC2
 
 # module "ec2_instance" {
 #   source  = "terraform-aws-modules/ec2-instance/aws"
