@@ -15,9 +15,7 @@ resource "aws_security_group_rule" "ingestion_lb_allow_web_users" {
   cidr_blocks = [
     "18.133.150.172/32", # Dev testmachine
     "10.182.60.51/32",   # NLE CGI proxy 
-    "5.148.32.215/32",   # NCC Group proxy ITHC
-    "195.95.131.110/32", # NCC Group proxy ITHC
-    "195.95.131.112/32", # NCC Group proxy ITHC
+    "109.158.54.93",     # Ben test ip
     "195.59.75.151/32",  # New proxy IPs from Prashanth for testing ingestion NLE DEV
     "195.59.75.152/32",  # New proxy IPs from Prashanth for testing ingestion NLE DEV
     "194.33.192.0/24",   # New proxy IPs from Prashanth for testing ingestion LE PROD
