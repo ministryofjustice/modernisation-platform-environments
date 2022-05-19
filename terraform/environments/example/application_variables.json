@@ -2,8 +2,8 @@
     "accounts": {
         "development": {
           "region": "eu-west-2",
-          "ami_image_id": "ami-0b0af3577fe5e3532",
-          "instance_type": "t3.medium",
+          "ami_image_id": "ami-0d729d2846a86a9e7",
+          "instance_type": "t2.micro",
           "key_name": "example-development-ec2",
           "app_count": "1",
           "ec2_desired_capacity": 2,

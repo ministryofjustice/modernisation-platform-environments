@@ -12,54 +12,21 @@ resource "aws_security_group" "example-ec2-sg" {
 #  module "example-ec2" 
 resource "aws_instance" "develop" {
   # Specify the instance type and ami to be used (this is the Amazon free tier option)
-  instance_type          = "t2.micro"
-  ami                    = "ami-0d729d2846a86a9e7"
+  instance_type          = local.app_variables.accounts[local.environment].instance_type
+  ami                    = local.app_variables.accounts[local.environment].ami_image_id
   vpc_security_group_ids = [aws_security_group.example-ec2-sg.id]
   subnet_id              = data.aws_subnet.private_subnets_a.id
   # Increase the volume size of the root volume
-  ebs_block_device {
+  root_block_device {
      volume_type          = "gp3"
-     device_name          = "/dev/xvda"
      volume_size          = 20
    }
-  # Add another volume to the EC2 - repeat as needed if more volumes are required.
-  ebs_block_device {
-     device_name          = "/dev/sdf"
-     volume_type          = "gp3"
-     volume_size          = 150
-     throughput           = 200
-     encrypted            = true
-  }
-
+ 
   tags = {
     Name = "First terraform EC2 build"
     }
     depends_on = [aws_security_group.example-ec2-sg]
 } 
-# Create volumes
-# resource "aws_ebs_volume" root_volume" {
-#               encrypted   = true
-#               volume_type = "gp3"
-#               throughput  = 200
-#               volume_size = 50
-#               tags = {
-#                 Name = "root-volume"
-#               }
-# }
-                  
-#  resource "aws_ebs_volume" "ebs_volume" {
-#             {
-#               device_name = "/dev/sdf"
-#               volume_type = "gp3"
-#               volume_size = 150
-#               throughput  = 200
-#               encrypted   = true
-#               # kms_key_id  = aws_kms_key.this.arn
-#               tags = {
-#                 Name = "ebs_volume"
-#               }
-#             }
-#  }
  
 #  resource "aws_volume_attachment" "mountvolumetoec2" {
 #   device_name = "/dev/sdb"
@@ -103,4 +70,8 @@ resource "aws_instance" "develop" {
 # aws_security_group.example-ec2-sg
 #  ]
 #  }
- 
+#  resource "aws_volume_attachment" "mountvolumetoec2" {
+#   # device_name = "/dev/sdb"
+#   instance_id = aws_instance.develop.id
+#   volume_id = aws_ebs_volume.mountvolumetoec2.id
+#  }

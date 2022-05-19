@@ -1,10 +1,10 @@
 ######################### Run Terraform via CICD ##################################
 # Get secret by name for environment management
-# resource "random_password" "random_password" {
+resource "random_password" "random_password" {
 
-#   length  = 32
-#   special = false
-# }
+  length  = 32
+  special = false
+}
 
 data "aws_secretsmanager_secret" "environment_management" {
   provider = aws.modernisation-platform
