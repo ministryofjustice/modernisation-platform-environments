@@ -44,19 +44,28 @@ nuked_envs=()
 failed_envs=()
 for key in "${!account_ids[@]}"; do
   echo "BEGIN: nuke ${key}"
-  eval $(aws sts assume-role --role-arn "arn:aws:iam::${account_ids[$key]}:role/MemberInfrastructureAccess" --role-session-name "${key}_SESSION" | jq -r '.Credentials | "export AWS_ACCESS_KEY_ID=\(.AccessKeyId)\nexport AWS_SECRET_ACCESS_KEY=\(.SecretAccessKey)\nexport AWS_SESSION_TOKEN=\(.SessionToken)\n"')
-
-  $HOME/bin/aws-nuke --access-key-id "$AWS_ACCESS_KEY_ID" \
-    --secret-access-key "$AWS_SECRET_ACCESS_KEY" \
-    --session-token "$AWS_SESSION_TOKEN" \
-    --config nuke-config.yml \
-    --force \
-    --no-dry-run || exit_code=$?
-
-  if [[ $exit_code -ne 0 ]]; then
+  assume_role_json=$(aws sts assume-role --role-arn "arn:aws:iam::${account_ids[$key]}:role/MemberInfrastructureAccess" --role-session-name "${key}_SESSION" 2>&1)
+  if [[ "$assume_role_json" != *"Credentials"* ]]; then
+    echo "Error while trying to assume-role: $assume_role_json"
+    echo "Executing the command: aws sts assume-role --role-arn \"arn:aws:iam::${account_ids[$key]}:role/MemberInfrastructureAccess\" --role-session-name \"${key}_SESSION\""
+    echo "Account alias: $key"
+    echo "Account id: ${account_ids[$key]}"
     failed_envs+=("${key}")
   else
-    nuked_envs+=("${key}")
+    aws_env_vars_export=$(echo "$assume_role_json" | jq -r '.Credentials | "export AWS_ACCESS_KEY_ID=\(.AccessKeyId)\nexport AWS_SECRET_ACCESS_KEY=\(.SecretAccessKey)\nexport AWS_SESSION_TOKEN=\(.SessionToken)\n"')
+    eval "$aws_env_vars_export" || exit_code=$?
+    $HOME/bin/aws-nuke --access-key-id "$AWS_ACCESS_KEY_ID" \
+      --secret-access-key "$AWS_SECRET_ACCESS_KEY" \
+      --session-token "$AWS_SESSION_TOKEN" \
+      --config nuke-config.yml \
+      --force \
+      --no-dry-run || exit_code=$?
+
+    if [[ $exit_code -ne 0 ]]; then
+      failed_envs+=("${key}")
+    else
+      nuked_envs+=("${key}")
+    fi
   fi
   echo "END: nuke ${key}"
 done
