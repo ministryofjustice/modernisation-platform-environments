@@ -14,8 +14,11 @@ resource "aws_security_group_rule" "allow_cloudfront_ips" {
 
 }
 
-data "aws_subnet_ids" "waf-shared-public" {
-  vpc_id = local.vpc_id
+data "aws_subnets" "waf-shared-public" {
+  filter {
+    name   = "vpc-id"
+    values = [local.vpc_id]
+  }
   tags = {
     "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public*"
   }
@@ -31,7 +34,7 @@ resource "aws_lb" "waf_lb" {
   internal                   = false
   load_balancer_type         = "application"
   security_groups            = [aws_security_group.waf_lb.id]
-  subnets                    = data.aws_subnet_ids.waf-shared-public.ids
+  subnets                    = data.aws_subnets.waf-shared-public.ids
   enable_deletion_protection = false
 
   access_logs {
