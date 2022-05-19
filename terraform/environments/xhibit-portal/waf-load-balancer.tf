@@ -14,8 +14,11 @@ resource "aws_security_group_rule" "allow_cloudfront_ips" {
 
 }
 
-data "aws_subnet_ids" "waf-shared-public" {
-  vpc_id = local.vpc_id
+data "aws_subnets" "waf-shared-public" {
+  filter {
+    name   = "vpc-id"
+    values = [local.vpc_id]
+  }
   tags = {
     "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public*"
   }
@@ -31,7 +34,7 @@ resource "aws_lb" "waf_lb" {
   internal                   = false
   load_balancer_type         = "application"
   security_groups            = [aws_security_group.waf_lb.id]
-  subnets                    = data.aws_subnet_ids.waf-shared-public.ids
+  subnets                    = data.aws_subnets.waf-shared-public.ids
   enable_deletion_protection = false
 
   access_logs {
@@ -307,8 +310,12 @@ resource "aws_wafv2_web_acl_association" "aws_lb_waf_association" {
 
 resource "aws_s3_bucket" "loadbalancer_logs" {
   bucket        = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}-lblogs"
-  acl           = "log-delivery-write"
   force_destroy = true
+}
+
+resource "aws_s3_bucket_acl" "loadbalancer_logs" {
+  bucket = aws_s3_bucket.loadbalancer_logs.id
+  acl    = "log-delivery-write"
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "default_encryption_loadbalancer_logs" {
@@ -371,8 +378,12 @@ data "aws_iam_policy_document" "s3_bucket_lb_write" {
 
 resource "aws_s3_bucket" "waf_logs" {
   bucket        = "aws-waf-logs-${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}"
-  acl           = "log-delivery-write"
   force_destroy = true
+}
+
+resource "aws_s3_bucket_acl" "waf_logs" {
+  bucket = aws_s3_bucket.waf_logs.id
+  acl    = "log-delivery-write"
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "default_encryption_waf_logs" {
