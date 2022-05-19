@@ -73,24 +73,24 @@ resource "aws_security_group" "build_server" {
 }
 
 resource "aws_security_group_rule" "build-inbound-bastion" {
-  depends_on        = [aws_security_group.build_server]
-  security_group_id = aws_security_group.build_server.id
-  type              = "ingress"
-  description       = "allow all from bastion"
-  from_port         = 0
-  to_port           = 0
-  protocol          = "-1"
+  depends_on               = [aws_security_group.build_server]
+  security_group_id        = aws_security_group.build_server.id
+  type                     = "ingress"
+  description              = "allow all from bastion"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
   source_security_group_id = module.bastion_linux.bastion_security_group
 }
 
 resource "aws_security_group_rule" "build-outbound-bastion" {
-  depends_on        = [aws_security_group.build_server]
-  security_group_id = aws_security_group.build_server.id
-  type              = "egress"
-  description       = "allow all to bastion"
-  from_port         = 0
-  to_port           = 0
-  protocol          = "-1"
+  depends_on               = [aws_security_group.build_server]
+  security_group_id        = aws_security_group.build_server.id
+  type                     = "egress"
+  description              = "allow all to bastion"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
   source_security_group_id = module.bastion_linux.bastion_security_group
 }
 
@@ -129,22 +129,22 @@ resource "aws_security_group_rule" "exchange-inbound-app" {
 }
 
 resource "aws_security_group_rule" "exchange-inbound-bastion" {
-  depends_on        = [aws_security_group.exchange_server]
-  security_group_id = aws_security_group.exchange_server.id
-  type              = "ingress"
-  description       = "allow all from bastion"
-  from_port         = 0
-  to_port           = 0
-  protocol          = "-1"
+  depends_on               = [aws_security_group.exchange_server]
+  security_group_id        = aws_security_group.exchange_server.id
+  type                     = "ingress"
+  description              = "allow all from bastion"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
   source_security_group_id = module.bastion_linux.bastion_security_group
 }
 
 resource "aws_security_group_rule" "sms-inbound-bastion" {
-  from_port         = 3389
-  protocol          = "TCP"
-  security_group_id = aws_security_group.sms_server.id
-  to_port           = 3389
-  type              = "ingress"
+  from_port                = 3389
+  protocol                 = "TCP"
+  security_group_id        = aws_security_group.sms_server.id
+  to_port                  = 3389
+  type                     = "ingress"
   source_security_group_id = module.bastion_linux.bastion_security_group
 }
 
@@ -250,24 +250,24 @@ resource "aws_security_group_rule" "waf_lb_allow_web_users" {
 }
 
 resource "aws_security_group_rule" "ingestion_server-inbound-bastion" {
-  depends_on        = [aws_security_group.ingestion_server]
-  security_group_id = aws_security_group.ingestion_server.id
-  type              = "ingress"
-  description       = "allow all from bastion"
-  from_port         = 0
-  to_port           = 0
-  protocol          = "-1"
+  depends_on               = [aws_security_group.ingestion_server]
+  security_group_id        = aws_security_group.ingestion_server.id
+  type                     = "ingress"
+  description              = "allow all from bastion"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
   source_security_group_id = module.bastion_linux.bastion_security_group
 }
 
 resource "aws_security_group_rule" "ingestion_server-outbound-bastion" {
-  depends_on        = [aws_security_group.ingestion_server]
-  security_group_id = aws_security_group.ingestion_server.id
-  type              = "egress"
-  description       = "allow all to bastion"
-  from_port         = 0
-  to_port           = 0
-  protocol          = "-1"
+  depends_on               = [aws_security_group.ingestion_server]
+  security_group_id        = aws_security_group.ingestion_server.id
+  type                     = "egress"
+  description              = "allow all to bastion"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
   source_security_group_id = module.bastion_linux.bastion_security_group
 }
 
@@ -317,35 +317,35 @@ resource "aws_security_group_rule" "testmachine-outbound-ingestionserver" {
 }
 
 resource "aws_security_group_rule" "testmachine_server-inbound-bastion" {
-  depends_on        = [aws_security_group.testmachine]
-  security_group_id = aws_security_group.testmachine.id
-  type              = "ingress"
-  description       = "allow all from bastion"
-  from_port         = 0
-  to_port           = 0
-  protocol          = "-1"
+  depends_on               = [aws_security_group.testmachine]
+  security_group_id        = aws_security_group.testmachine.id
+  type                     = "ingress"
+  description              = "allow all from bastion"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
   source_security_group_id = module.bastion_linux.bastion_security_group
 }
 
 resource "aws_security_group_rule" "portal_server-inbound-bastion" {
-  depends_on        = [aws_security_group.portal_server]
-  security_group_id = aws_security_group.portal_server.id
-  type              = "ingress"
-  description       = "allow all from bastion"
-  from_port         = 0
-  to_port           = 0
-  protocol          = "-1"
+  depends_on               = [aws_security_group.portal_server]
+  security_group_id        = aws_security_group.portal_server.id
+  type                     = "ingress"
+  description              = "allow all from bastion"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
   source_security_group_id = module.bastion_linux.bastion_security_group
 }
 
 resource "aws_security_group_rule" "portal_server-outbound-bastion" {
-  depends_on        = [aws_security_group.portal_server]
-  security_group_id = aws_security_group.portal_server.id
-  type              = "egress"
-  description       = "allow all to bastion"
-  from_port         = 0
-  to_port           = 0
-  protocol          = "-1"
+  depends_on               = [aws_security_group.portal_server]
+  security_group_id        = aws_security_group.portal_server.id
+  type                     = "egress"
+  description              = "allow all to bastion"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
   source_security_group_id = module.bastion_linux.bastion_security_group
 }
 
@@ -383,24 +383,24 @@ resource "aws_security_group_rule" "app_servers-outbound-importmachine" {
 }
 
 resource "aws_security_group_rule" "app_servers-inbound-bastion" {
-  depends_on        = [aws_security_group.app_servers]
-  security_group_id = aws_security_group.app_servers.id
-  type              = "ingress"
-  description       = "allow all from bastion"
-  from_port         = 0
-  to_port           = 0
-  protocol          = "-1"
+  depends_on               = [aws_security_group.app_servers]
+  security_group_id        = aws_security_group.app_servers.id
+  type                     = "ingress"
+  description              = "allow all from bastion"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
   source_security_group_id = module.bastion_linux.bastion_security_group
 }
 
 resource "aws_security_group_rule" "app_servers-outbound-bastion" {
-  depends_on        = [aws_security_group.app_servers]
-  security_group_id = aws_security_group.app_servers.id
-  type              = "egress"
-  description       = "allow all to bastion"
-  from_port         = 0
-  to_port           = 0
-  protocol          = "-1"
+  depends_on               = [aws_security_group.app_servers]
+  security_group_id        = aws_security_group.app_servers.id
+  type                     = "egress"
+  description              = "allow all to bastion"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
   source_security_group_id = module.bastion_linux.bastion_security_group
 }
 

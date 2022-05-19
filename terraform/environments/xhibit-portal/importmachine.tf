@@ -4,10 +4,10 @@ resource "aws_security_group" "importmachine" {
   vpc_id      = local.vpc_id
 
   ingress {
-    description = "SSH from Bastion"
-    from_port   = 0
-    to_port     = "3389"
-    protocol    = "TCP"
+    description     = "SSH from Bastion"
+    from_port       = 0
+    to_port         = "3389"
+    protocol        = "TCP"
     security_groups = [module.bastion_linux.bastion_security_group]
   }
 
