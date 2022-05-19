@@ -80,7 +80,7 @@ resource "aws_security_group_rule" "build-inbound-bastion" {
   from_port         = 0
   to_port           = 0
   protocol          = "-1"
-  cidr_blocks       = ["${module.bastion_linux.bastion_private_ip}/32"]
+  source_security_group_id = module.bastion_linux.bastion_security_group
 }
 
 resource "aws_security_group_rule" "build-outbound-bastion" {
@@ -91,7 +91,7 @@ resource "aws_security_group_rule" "build-outbound-bastion" {
   from_port         = 0
   to_port           = 0
   protocol          = "-1"
-  cidr_blocks       = ["${module.bastion_linux.bastion_private_ip}/32"]
+  source_security_group_id = module.bastion_linux.bastion_security_group
 }
 
 resource "aws_security_group_rule" "exchange-inbound-importmachine" {
@@ -136,7 +136,7 @@ resource "aws_security_group_rule" "exchange-inbound-bastion" {
   from_port         = 0
   to_port           = 0
   protocol          = "-1"
-  cidr_blocks       = ["${module.bastion_linux.bastion_private_ip}/32"]
+  source_security_group_id = module.bastion_linux.bastion_security_group
 }
 
 resource "aws_security_group_rule" "sms-inbound-bastion" {
@@ -145,7 +145,7 @@ resource "aws_security_group_rule" "sms-inbound-bastion" {
   security_group_id = aws_security_group.sms_server.id
   to_port           = 3389
   type              = "ingress"
-  cidr_blocks       = ["${module.bastion_linux.bastion_private_ip}/32"]
+  source_security_group_id = module.bastion_linux.bastion_security_group
 }
 
 resource "aws_security_group_rule" "sms-inbound-importmachine" {
@@ -257,7 +257,7 @@ resource "aws_security_group_rule" "ingestion_server-inbound-bastion" {
   from_port         = 0
   to_port           = 0
   protocol          = "-1"
-  cidr_blocks       = ["${module.bastion_linux.bastion_private_ip}/32"]
+  source_security_group_id = module.bastion_linux.bastion_security_group
 }
 
 resource "aws_security_group_rule" "ingestion_server-outbound-bastion" {
@@ -268,7 +268,7 @@ resource "aws_security_group_rule" "ingestion_server-outbound-bastion" {
   from_port         = 0
   to_port           = 0
   protocol          = "-1"
-  cidr_blocks       = ["${module.bastion_linux.bastion_private_ip}/32"]
+  source_security_group_id = module.bastion_linux.bastion_security_group
 }
 
 resource "aws_security_group_rule" "ingestion_server-inbound-importmachine" {
@@ -324,7 +324,7 @@ resource "aws_security_group_rule" "testmachine_server-inbound-bastion" {
   from_port         = 0
   to_port           = 0
   protocol          = "-1"
-  cidr_blocks       = ["${module.bastion_linux.bastion_private_ip}/32"]
+  source_security_group_id = module.bastion_linux.bastion_security_group
 }
 
 resource "aws_security_group_rule" "portal_server-inbound-bastion" {
@@ -335,7 +335,7 @@ resource "aws_security_group_rule" "portal_server-inbound-bastion" {
   from_port         = 0
   to_port           = 0
   protocol          = "-1"
-  cidr_blocks       = ["${module.bastion_linux.bastion_private_ip}/32"]
+  source_security_group_id = module.bastion_linux.bastion_security_group
 }
 
 resource "aws_security_group_rule" "portal_server-outbound-bastion" {
@@ -346,7 +346,7 @@ resource "aws_security_group_rule" "portal_server-outbound-bastion" {
   from_port         = 0
   to_port           = 0
   protocol          = "-1"
-  cidr_blocks       = ["${module.bastion_linux.bastion_private_ip}/32"]
+  source_security_group_id = module.bastion_linux.bastion_security_group
 }
 
 resource "aws_security_group_rule" "app_servers-inbound-importmachine" {
@@ -390,7 +390,7 @@ resource "aws_security_group_rule" "app_servers-inbound-bastion" {
   from_port         = 0
   to_port           = 0
   protocol          = "-1"
-  cidr_blocks       = ["${module.bastion_linux.bastion_private_ip}/32"]
+  source_security_group_id = module.bastion_linux.bastion_security_group
 }
 
 resource "aws_security_group_rule" "app_servers-outbound-bastion" {
@@ -401,7 +401,7 @@ resource "aws_security_group_rule" "app_servers-outbound-bastion" {
   from_port         = 0
   to_port           = 0
   protocol          = "-1"
-  cidr_blocks       = ["${module.bastion_linux.bastion_private_ip}/32"]
+  source_security_group_id = module.bastion_linux.bastion_security_group
 }
 
 resource "aws_security_group_rule" "portal-inbound-importmachine" {
