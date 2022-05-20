@@ -16,7 +16,7 @@ resource "aws_security_group_rule" "ingress_traffic" {
   security_group_id = aws_security_group.example-ec2-sg.id
   to_port           = each.value.to_port
   type              = "ingress"
-  cidr_blocks       = ["0.0.0.0/0"]
+  cidr_blocks       = local.cidr_blocks
 }
 resource "aws_security_group_rule" "egress_traffic" {
   for_each          = local.app_variables.example_ec2_sg_rules

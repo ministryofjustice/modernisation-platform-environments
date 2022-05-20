@@ -42,4 +42,6 @@ locals {
   # example_data = local.application_data.accounts[local.environment].example_var
   # app_variables = fileexists("./application_variables.json") ? jsondecode(file("./application_variables.json")) : {}
   app_variables = jsondecode(file("./application_variables.json"))
+
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
 }
