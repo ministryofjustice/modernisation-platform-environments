@@ -6,8 +6,28 @@ resource "aws_security_group" "example-load-balancer-sg" {
   tags = merge(local.tags,
     { Name = lower(format("sg-%s-%s-example", local.application_name, local.environment)) }
   )
-  # Need ingress and egress in here
+ 
   }
+  resource "aws_security_group_rule" "ingress_traffic_lb" {
+  for_each          = local.app_variables.example_ec2_sg_rules
+  description       = format("Traffic for %s %d", each.value.protocol, each.value.from_port)
+  from_port         = each.value.from_port
+  protocol          = each.value.protocol
+  security_group_id = aws_security_group.example-load-balancer-sg.id
+  to_port           = each.value.to_port
+  type              = "ingress"
+  cidr_blocks       = ["0.0.0.0/0"]
+}
+resource "aws_security_group_rule" "egress_traffic_lb" {
+  for_each          = local.app_variables.example_ec2_sg_rules
+  description       = format("Outbound traffic for %s %d", each.value.protocol, each.value.from_port)
+  from_port         = each.value.from_port
+  protocol          = each.value.protocol
+  security_group_id = aws_security_group.example-load-balancer-sg.id
+  to_port           = each.value.to_port
+  type              = "egress"
+  source_security_group_id = aws_security_group.example-load-balancer-sg.id
+}
 
 # Build loadbalancer
 

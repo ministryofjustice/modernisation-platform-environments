@@ -4,29 +4,32 @@ resource "aws_security_group" "example-ec2-sg" {
   name        = "example-EC2-sg"
   description = "controls access to EC2"
   vpc_id      = data.aws_vpc.shared.id
-
-ingress {
+  tags = merge(local.tags,
+    { Name = lower(format("sg-%s-%s-example", local.application_name, local.environment)) }
+  )
+  }
+resource "aws_security_group_rule" "ingress_traffic" {
   for_each          = local.app_variables.example_ec2_sg_rules
   description       = format("Traffic for %s %d", each.value.protocol, each.value.from_port)
   from_port         = each.value.from_port
   protocol          = each.value.protocol
   security_group_id = aws_security_group.example-ec2-sg.id
   to_port           = each.value.to_port
+  type              = "ingress"
+  cidr_blocks       = ["0.0.0.0/0"]
 }
-egress {
+resource "aws_security_group_rule" "egress_traffic" {
   for_each          = local.app_variables.example_ec2_sg_rules
   description       = format("Outbound traffic for %s %d", each.value.protocol, each.value.from_port)
   from_port         = each.value.from_port
   protocol          = each.value.protocol
   security_group_id = aws_security_group.example-ec2-sg.id
   to_port           = each.value.to_port
+  type              = "egress"
+  source_security_group_id = aws_security_group.example-ec2-sg.id
 }
 
-  tags = merge(local.tags,
-    { Name = lower(format("sg-%s-%s-example", local.application_name, local.environment)) }
-  )
-  # Need ingress and egress in here
-  }
+
   
 #  Build EC2 "example-ec2" 
 resource "aws_instance" "develop" {
