@@ -4,6 +4,24 @@ resource "aws_security_group" "example-ec2-sg" {
   name        = "example-EC2-sg"
   description = "controls access to EC2"
   vpc_id      = data.aws_vpc.shared.id
+
+ingress {
+    description      = "TLS from VPC"
+    from_port        = 80
+    to_port          = 80
+    protocol         = "tcp"
+    # Need to amend this to a suitable value
+    cidr_blocks      = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    # Need to amend this to a suitable value
+    cidr_blocks      = ["0.0.0.0/0"]
+  }
+
   tags = merge(local.tags,
     { Name = lower(format("sg-%s-%s-example", local.application_name, local.environment)) }
   )
@@ -22,7 +40,7 @@ resource "aws_instance" "develop" {
      volume_type          = "gp3"
      volume_size          = 20
    }
- 
+
   tags = merge(local.tags,
   {   Name = "First terraform EC2 build"
     }
