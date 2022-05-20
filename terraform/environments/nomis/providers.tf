@@ -50,6 +50,13 @@ provider "aws" {
 #   region = "eu-west-2"
 # }
 
+# # AWS provider for the Modernisation Platform, to get things from there if required
+# provider "aws" {
+#   alias                  = "modernisation-platform"
+#   region                 = "eu-west-2"
+#   skip_get_ec2_platforms = true
+# }
+
 # # AWS provider for core-vpc-<environment>, to share VPCs into this account
 # provider "aws" {
 #   alias                  = "core-vpc"
