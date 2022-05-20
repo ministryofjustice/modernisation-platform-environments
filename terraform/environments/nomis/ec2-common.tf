@@ -733,7 +733,7 @@ resource "aws_iam_policy" "cloudwatch_datasource_policy" {
   name        = "cloudwatch-datasource-policy"
   path        = "/"
   description = "Policy for the Monitoring Cloudwatch Datasource"
-  policy      = data.aws_iam_policy_document.cloudwatch_datasourc.json
+  policy      = data.aws_iam_policy_document.cloudwatch_datasource.json
   tags = merge(
     local.tags,
     {
