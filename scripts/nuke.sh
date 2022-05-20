@@ -50,12 +50,11 @@ ROOT_AWS_SESSION_TOKEN="${AWS_SESSION_TOKEN}"
 
 for key in "${!account_ids[@]}"; do
   echo "BEGIN: nuke ${key}"
-  assume_role_command="aws sts assume-role --role-arn \"arn:aws:iam::${account_ids[$key]}:role/MemberInfrastructureAccess\" --role-session-name \"${key}_SESSION\""
-  assume_role_json=$("${assume_role_command}" 2>&1)
+  assume_role_json=$(aws sts assume-role --role-arn "arn:aws:iam::${account_ids[$key]}:role/MemberInfrastructureAccess" --role-session-name "${key}_SESSION" 2>&1)
   if [[ "$assume_role_json" != *"Credentials"* ]]; then
-    echo "ERROR: while trying to assume-role: $assume_role_json"
-    echo "ERROR: Executing the command: ${assume_role_command}"
-    echo "ERROR: Account alias: $key"
+    echo "ERROR: while trying to assume-role: ${assume_role_json}"
+    echo "ERROR: Executing the command: aws sts assume-role --role-arn \"arn:aws:iam::${account_ids[$key]}:role/MemberInfrastructureAccess\" --role-session-name \"${key}_SESSION\""
+    echo "ERROR: Account alias: ${key}"
     echo "ERROR: Account id: ${account_ids[$key]}"
     failed_envs+=("${key}")
   else
