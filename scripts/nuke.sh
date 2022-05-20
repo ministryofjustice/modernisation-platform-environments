@@ -72,23 +72,22 @@ for key in "${!account_ids[@]}"; do
     else
       nuked_envs+=("${key}")
     fi
-
-    # Revert back to the initial root user's credentials so that the following assume-role succeeds
-    AWS_ACCESS_KEY_ID="${ROOT_AWS_ACCESS_KEY_ID}"
-    AWS_SECRET_ACCESS_KEY="${ROOT_AWS_SECRET_ACCESS_KEY}"
-    AWS_SESSION_TOKEN="${ROOT_AWS_SESSION_TOKEN}"
   fi
+  # Revert back to the initial root user's credentials so that the following assume-role succeeds
+  AWS_ACCESS_KEY_ID="${ROOT_AWS_ACCESS_KEY_ID}"
+  AWS_SECRET_ACCESS_KEY="${ROOT_AWS_SECRET_ACCESS_KEY}"
+  AWS_SESSION_TOKEN="${ROOT_AWS_SESSION_TOKEN}"
   echo "END: nuke ${key}"
 done
 
-echo "Nuke complete: ${#nuked_envs[@]} nuked, ${#failed_envs[@]} failed."
+echo "Auto-nuke complete: ${#nuked_envs[@]} nuked, ${#failed_envs[@]} failed."
 
 if [[ ${#nuked_envs[@]} -ne 0 ]]; then
-  echo "Nuked environments: ${nuked_envs[@]}"
+  echo "Auto-nuked environments: ${nuked_envs[@]}"
 fi
 
 if [[ ${#failed_envs[@]} -ne 0 ]]; then
-  echo "ERROR: could not nuke environments: ${failed_envs[@]}"
+  echo "ERROR: could not auto-nuke environments: ${failed_envs[@]}"
   echo "Refer to previous errors for details."
   exit 1
 fi
