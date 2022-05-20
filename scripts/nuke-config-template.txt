@@ -16,6 +16,12 @@ resource-types:
   # don't nuke IAM users
   excludes:
     - ACMCertificate
+    - CloudTrailTrail
+    - CloudWatchAlarm
+    - CloudWatchLogsLogGroup
+    - ConfigServiceConfigRule
+    - ConfigServiceConfigurationRecorder
+    - ConfigServiceDeliveryChannel
     - EC2DHCPOption
     - EC2InternetGateway
     - EC2InternetGatewayAttachment
@@ -52,6 +58,7 @@ resource-types:
     - S3Bucket
     - S3MultipartUpload
     - S3Object
+    - SecretsManagerSecret
     - SecurityHub
     - WAFv2WebACL
 

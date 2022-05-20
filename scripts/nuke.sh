@@ -42,14 +42,21 @@ cat ./scripts/nuke-config-template.txt | envsubst >nuke-config.yml
 
 nuked_envs=()
 failed_envs=()
+
+# Copy the initial root user's credentials
+ROOT_AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID}"
+ROOT_AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY}"
+ROOT_AWS_SESSION_TOKEN="${AWS_SESSION_TOKEN}"
+
 for key in "${!account_ids[@]}"; do
   echo "BEGIN: nuke ${key}"
-  assume_role_json=$(aws sts assume-role --role-arn "arn:aws:iam::${account_ids[$key]}:role/MemberInfrastructureAccess" --role-session-name "${key}_SESSION" 2>&1)
+  assume_role_command="aws sts assume-role --role-arn \"arn:aws:iam::${account_ids[$key]}:role/MemberInfrastructureAccess\" --role-session-name \"${key}_SESSION\""
+  assume_role_json=$("${assume_role_command}" 2>&1)
   if [[ "$assume_role_json" != *"Credentials"* ]]; then
-    echo "Error while trying to assume-role: $assume_role_json"
-    echo "Executing the command: aws sts assume-role --role-arn \"arn:aws:iam::${account_ids[$key]}:role/MemberInfrastructureAccess\" --role-session-name \"${key}_SESSION\""
-    echo "Account alias: $key"
-    echo "Account id: ${account_ids[$key]}"
+    echo "ERROR: while trying to assume-role: $assume_role_json"
+    echo "ERROR: Executing the command: ${assume_role_command}"
+    echo "ERROR: Account alias: $key"
+    echo "ERROR: Account id: ${account_ids[$key]}"
     failed_envs+=("${key}")
   else
     aws_env_vars_export=$(echo "$assume_role_json" | jq -r '.Credentials | "export AWS_ACCESS_KEY_ID=\(.AccessKeyId)\nexport AWS_SECRET_ACCESS_KEY=\(.SecretAccessKey)\nexport AWS_SESSION_TOKEN=\(.SessionToken)\n"')
@@ -66,6 +73,11 @@ for key in "${!account_ids[@]}"; do
     else
       nuked_envs+=("${key}")
     fi
+
+    # Revert back to the initial root user's credentials so that the following assume-role succeeds
+    AWS_ACCESS_KEY_ID="${ROOT_AWS_ACCESS_KEY_ID}"
+    AWS_SECRET_ACCESS_KEY="${ROOT_AWS_SECRET_ACCESS_KEY}"
+    AWS_SESSION_TOKEN="${ROOT_AWS_SESSION_TOKEN}"
   fi
   echo "END: nuke ${key}"
 done
