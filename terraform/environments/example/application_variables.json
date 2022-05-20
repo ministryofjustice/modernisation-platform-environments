@@ -25,7 +25,7 @@
           "friendly_name": "Example Development Hub",
           "cert_arn": "arn:aws:acm:eu-west-2:938841708445:certificate/977c968e-1992-46a4-bfe8-e4043ab5a982"
           },
- 
+           
         "test": {
           "example_var": "test-data"
         },
@@ -35,5 +35,17 @@
         "production": {
           "example_var": "production-data"
         }
+    },
+    "example_ec2_sg_rules": {
+      "TCP_80": {
+        "from_port": 80,
+        "to_port": 80,
+        "protocol": "TCP"
+      },
+      "TCP_443": {
+        "from_port": 443,
+        "to_port": 443,
+        "protocol": "TCP"
+      }
     }
 }

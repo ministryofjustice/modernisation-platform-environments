@@ -6,21 +6,21 @@ resource "aws_security_group" "example-ec2-sg" {
   vpc_id      = data.aws_vpc.shared.id
 
 ingress {
-    description      = "TLS from VPC"
-    from_port        = 80
-    to_port          = 80
-    protocol         = "tcp"
-    # Need to amend this to a suitable value
-    cidr_blocks      = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port        = 0
-    to_port          = 0
-    protocol         = "-1"
-    # Need to amend this to a suitable value
-    cidr_blocks      = ["0.0.0.0/0"]
-  }
+  for_each          = local.app_variables.example_ec2_sg_rules
+  description       = format("Traffic for %s %d", each.value.protocol, each.value.from_port)
+  from_port         = each.value.from_port
+  protocol          = each.value.protocol
+  security_group_id = aws_security_group.example-ec2-sg.id
+  to_port           = each.value.to_port
+}
+egress {
+  for_each          = local.app_variables.example_ec2_sg_rules
+  description       = format("Outbound traffic for %s %d", each.value.protocol, each.value.from_port)
+  from_port         = each.value.from_port
+  protocol          = each.value.protocol
+  security_group_id = aws_security_group.example-ec2-sg.id
+  to_port           = each.value.to_port
+}
 
   tags = merge(local.tags,
     { Name = lower(format("sg-%s-%s-example", local.application_name, local.environment)) }
