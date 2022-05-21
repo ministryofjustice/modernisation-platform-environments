@@ -24,6 +24,10 @@ updates:
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
+    directory: "/terraform/environments/equip/dlm-snapshot"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
     directory: "/terraform/environments/equip/ec2-instance-module"
     schedule:
       interval: "daily"
