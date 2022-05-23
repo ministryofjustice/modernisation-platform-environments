@@ -9,7 +9,7 @@ module "weblogic" {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
   }
 
-  for_each = local.application_data.accounts[local.environment].weblogics
+  for_each = local.accounts[local.environment].weblogics
 
   name = each.key
 
@@ -83,7 +83,7 @@ resource "aws_security_group" "weblogic_common" {
     from_port   = "9100"
     to_port     = "9100"
     protocol    = "TCP"
-    cidr_blocks = [local.application_data.accounts[local.environment].database_external_access_cidr.cloud_platform]
+    cidr_blocks = [local.accounts[local.environment].database_external_access_cidr.cloud_platform]
   }
 
   egress {
