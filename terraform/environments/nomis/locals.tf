@@ -46,9 +46,9 @@ locals {
 
   # environment specfic variables
   # example usage:  
-  # example_data = local.application_data.accounts[local.environment].example_var
+  # example_data = local.accounts[local.environment].example_var
   # application_data = jsondecode(file("./application_variables.json"))
-  application_data = fileexists("./application_variables.json") ? jsondecode(file("./application_variables.json")) : {}
+  # application_data = fileexists("./application_variables.json") ? jsondecode(file("./application_variables.json")) : {}
 
   region = "eu-west-2"
 }

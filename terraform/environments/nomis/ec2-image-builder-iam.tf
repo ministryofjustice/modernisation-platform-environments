@@ -2,7 +2,7 @@
 # https://docs.aws.amazon.com/imagebuilder/latest/userguide/cross-account-dist.html
 # These permissions are needed in all ami destination accounts
 data "aws_caller_identity" "mod-platform" {
-    provider = aws.modernisation-platform
+  provider = aws.modernisation-platform
 }
 
 data "aws_iam_policy_document" "image-builder-distro-assume-role" {
@@ -51,15 +51,15 @@ data "aws_iam_policy_document" "image-builder-distro-kms-policy" {
   statement {
     effect = "Allow"
     actions = [
-        "kms:Encrypt",
-        "kms:Decrypt",
-        "kms:ReEncrypt*",
-        "kms:ReEncryptFrom",
-        "kms:GenerateDataKey*",
-        "kms:DescribeKey",
-        "kms:CreateGrant",
-        "kms:ListGrant",
-        "kms:RevokeGrant"
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:ReEncrypt*",
+      "kms:ReEncryptFrom",
+      "kms:GenerateDataKey*",
+      "kms:DescribeKey",
+      "kms:CreateGrant",
+      "kms:ListGrant",
+      "kms:RevokeGrant"
     ]
     resources = ["*"]
   }
@@ -120,8 +120,8 @@ data "aws_iam_policy_document" "launch-template-reader-policy-doc" {
   statement {
     effect = "Allow"
     actions = [
-        "ec2:DescribeLaunchTemplates",
-        "ec2:DescribeLaunchTemplateVersions"
+      "ec2:DescribeLaunchTemplates",
+      "ec2:DescribeLaunchTemplateVersions"
     ]
     resources = ["*"]
   }

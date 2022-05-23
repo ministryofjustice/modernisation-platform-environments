@@ -126,7 +126,7 @@ locals {
 #------------------------------------------------------------------------------
 resource "aws_key_pair" "ec2-user" {
   key_name   = "ec2-user"
-  public_key = local.application_data.accounts[local.environment].public_key
+  public_key = local.accounts[local.environment].ec2_common.public_key
   tags = merge(
     local.tags,
     {
@@ -195,7 +195,7 @@ resource "aws_ssm_document" "session_manager_settings" {
 #tfsec:ignore:AWS089
 resource "aws_cloudwatch_log_group" "groups" {
   #checkov:skip=CKV_AWS_158:skip KMS CMK encryption check while logging solution is being determined
-  for_each          = local.application_data.accounts[local.environment].log_groups
+  for_each          = local.accounts[local.environment].log_groups
   name              = each.key
   retention_in_days = each.value.retention_days
 
@@ -415,7 +415,7 @@ resource "aws_iam_role" "ssm_ec2_start_stop" {
 resource "aws_ssm_maintenance_window" "maintenance" {
   name                       = "weekly-patching"
   description                = "Maintenance window for applying OS patches"
-  schedule                   = "cron(0 2 ? * ${local.application_data.accounts[local.environment].patch_day} *)"
+  schedule                   = "cron(0 2 ? * ${local.accounts[local.environment].ec2_common.patch_day} *)"
   duration                   = 3
   cutoff                     = 1
   enabled                    = true
@@ -565,7 +565,7 @@ resource "aws_ssm_patch_baseline" "rhel" {
   operating_system = "REDHAT_ENTERPRISE_LINUX"
 
   approval_rule {
-    approve_after_days = local.application_data.accounts[local.environment].patch_approval_delay_days
+    approve_after_days = local.accounts[local.environment].ec2_common.patch_approval_delay_days
     compliance_level   = "CRITICAL"
     patch_filter {
       key    = "CLASSIFICATION"
@@ -578,7 +578,7 @@ resource "aws_ssm_patch_baseline" "rhel" {
   }
 
   approval_rule {
-    approve_after_days = local.application_data.accounts[local.environment].patch_approval_delay_days
+    approve_after_days = local.accounts[local.environment].ec2_common.patch_approval_delay_days
     compliance_level   = "HIGH"
     patch_filter {
       key    = "CLASSIFICATION"
@@ -591,7 +591,7 @@ resource "aws_ssm_patch_baseline" "rhel" {
   }
 
   approval_rule {
-    approve_after_days = local.application_data.accounts[local.environment].patch_approval_delay_days
+    approve_after_days = local.accounts[local.environment].ec2_common.patch_approval_delay_days
     compliance_level   = "MEDIUM"
     patch_filter {
       key    = "CLASSIFICATION"
@@ -612,7 +612,7 @@ resource "aws_ssm_patch_baseline" "windows" {
   operating_system = "WINDOWS"
 
   approval_rule {
-    approve_after_days = local.application_data.accounts[local.environment].patch_approval_delay_days
+    approve_after_days = local.accounts[local.environment].ec2_common.patch_approval_delay_days
     compliance_level   = "CRITICAL"
     patch_filter {
       key    = "CLASSIFICATION"
@@ -625,7 +625,7 @@ resource "aws_ssm_patch_baseline" "windows" {
   }
 
   approval_rule {
-    approve_after_days = local.application_data.accounts[local.environment].patch_approval_delay_days
+    approve_after_days = local.accounts[local.environment].ec2_common.patch_approval_delay_days
     compliance_level   = "HIGH"
     patch_filter {
       key    = "CLASSIFICATION"

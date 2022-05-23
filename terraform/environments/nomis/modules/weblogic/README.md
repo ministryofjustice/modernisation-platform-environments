@@ -31,7 +31,7 @@ module "weblogic" {
     aws.core-vpc = aws.core-vpc
   }
 
-  for_each = local.application_data.accounts[local.environment].weblogics
+  for_each = local.accounts[local.environment].weblogics
 
   name = each.key
 
