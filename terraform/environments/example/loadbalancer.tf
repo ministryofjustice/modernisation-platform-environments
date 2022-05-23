@@ -7,6 +7,7 @@ resource "aws_security_group" "example-load-balancer-sg" {
     { Name = lower(format("sg-%s-%s-example", local.application_name, local.environment)) }
   )
  
+ # Set up the ingress and egress parts of the security group
   }
   resource "aws_security_group_rule" "ingress_traffic_lb" {
   for_each          = local.app_variables.example_ec2_sg_rules
@@ -50,6 +51,7 @@ resource "aws_lb" "external" {
 
    depends_on = [aws_security_group.example-ec2-sg]
 }
+# Create the target group 
 resource "aws_lb_target_group" "target_group" {
   name                 = "${local.application_name}-tg-${local.environment}"
   port                 = local.app_variables.accounts[local.environment].server_port
@@ -80,79 +82,9 @@ resource "aws_lb_target_group" "target_group" {
   )
 }
 
+# Link target group to the EC2 instance on port 80
 resource "aws_lb_target_group_attachment" "develop" {
   target_group_arn = aws_lb_target_group.target_group.arn
   target_id        = aws_instance.develop.id
   port             = 80
 }
-
-#tfsec:ignore:AWS004
-# resource "aws_lb_listener" "listener" {
-#   #checkov:skip=CKV_AWS_2
-#   #checkov:skip=CKV_AWS_103
-#   load_balancer_arn = aws_lb.external.id
-#   port              = local.app_variables.accounts[local.environment].server_port
-#   protocol          = "HTTP"
-
-#   default_action {
-#     target_group_arn = aws_lb_target_group.target_group.id
-#     type             = "forward"
-#   }
-# }
-
-# resource "aws_lb_listener" "https_listener" {
-#   #checkov:skip=CKV_AWS_103
-# #  depends_on = [aws_acm_certificate_validation.external]
-
-#   load_balancer_arn = aws_lb.external.id
-#   port              = "443"
-#   protocol          = "HTTPS"
-#  # certificate_arn   = local.app_variables.accounts[local.environment].cert_arn
-
-#   default_action {
-#     target_group_arn = aws_lb_target_group.target_group.id
-#     type             = "forward"
-#   }
-# }
-
-# resource "aws_security_group" "load_balancer_security_group" {
-#   name_prefix = "${local.application_name}-loadbalancer-security-group"
-#   description = "controls access to lb"
-#   vpc_id      = data.aws_vpc.shared.id
-
-#   ingress {
-#     protocol    = "tcp"
-#     description = "Open the server port"
-#     from_port   = local.app_variables.accounts[local.environment].server_port
-#     to_port     = local.app_variables.accounts[local.environment].server_port
-#     #tfsec:ignore:AWS008
-#     cidr_blocks = ["0.0.0.0/0", ]
-#   }
-
-#   ingress {
-#     protocol    = "tcp"
-#     description = "Open the SSL port"
-#     from_port   = 443
-#     to_port     = 443
-#     #tfsec:ignore:AWS008
-#     cidr_blocks = ["0.0.0.0/0", ]
-#   }
-
-#   egress {
-#     protocol    = "-1"
-#     description = "Open all outbound ports"
-#     from_port   = 0
-#     to_port     = 0
-#     #tfsec:ignore:AWS009
-#     cidr_blocks = [
-#       "0.0.0.0/0",
-#     ]
-#   }
-
-#   tags = merge(
-#     local.tags,
-#     {
-#       Name = "${local.application_name}-loadbalancer-security-group"
-#     }
-#   )
-# }
