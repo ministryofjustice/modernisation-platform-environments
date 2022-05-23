@@ -27,6 +27,13 @@
       "protocol": "TCP"
     }
   },
+  "port_80_rules": {
+    "TCP_80": {
+      "from_port": 80,
+      "to_port": 80,
+      "protocol": "TCP"
+    }
+  },
   "alb_to_citrix-adc_rules": {
     "TCP_80": {
       "from_port": 80,
@@ -103,6 +110,16 @@
     }
   },
   "ctx_to_spotfire_rules": {
+    "ICMP_ALL": {
+      "from_port": -1,
+      "to_port": -1,
+      "protocol": "ICMP"
+    },
+    "TCP_445": {
+      "from_port": 445,
+      "to_port": 445,
+      "protocol": "TCP"
+    },
     "TCP_9": {
       "from_port": 9,
       "to_port": 9,
@@ -220,6 +237,16 @@
     }
   },
   "ctx_to_equip_rules": {
+    "ICMP_ALL": {
+      "from_port": -1,
+      "to_port": -1,
+      "protocol": "ICMP"
+    },
+    "TCP_445": {
+      "from_port": 445,
+      "to_port": 445,
+      "protocol": "TCP"
+    },
     "TCP_9": {
       "from_port": 9,
       "to_port": 9,
@@ -575,6 +602,74 @@
       "from_port": 3389,
       "to_port": 3389,
       "protocol": "TCP"
+    }
+  },
+  "equip_internal_rules": {
+    "ICMP_ALL": {
+      "from_port": -1,
+      "to_port": -1,
+      "protocol": "ICMP"
+    },
+    "TCP_445": {
+      "from_port": 445,
+      "to_port": 445,
+      "protocol": "TCP"
+    }
+  },
+  "equip_to_spotfire_rules": {
+    "TCP_80": {
+      "from_port": 80,
+      "to_port": 80,
+      "protocol": "TCP"
+    },
+    "TCP_445": {
+      "from_port": 445,
+      "to_port": 445,
+      "protocol": "TCP"
+    },
+    "UDP_445": {
+      "from_port": 445,
+      "to_port": 445,
+      "protocol": "UDP"
+    },
+    "ICMP_ALL": {
+      "from_port": -1,
+      "to_port": -1,
+      "protocol": "ICMP"
+    }
+  },
+  "spotfire_internal_rules": {
+    "ICMP_ALL": {
+      "from_port": -1,
+      "to_port": -1,
+      "protocol": "ICMP"
+    },
+    "TCP_445": {
+      "from_port": 445,
+      "to_port": 445,
+      "protocol": "TCP"
+    }
+  },
+  "spotfire_to_equip_rules": {
+    "TCP_80": {
+      "from_port": 80,
+      "to_port": 80,
+      "protocol": "TCP"
+    },
+    "TCP_445": {
+      "from_port": 445,
+      "to_port": 445,
+      "protocol": "TCP"
+    },
+    "UDP_445": {
+      "from_port": 445,
+      "to_port": 445,
+      "protocol": "UDP"
+    },
+    "ICMP_ALL": {
+      "from_port": -1,
+      "to_port": -1,
+      "protocol": "ICMP"
     }
   },
   "host_to_domain_controller_rules": {

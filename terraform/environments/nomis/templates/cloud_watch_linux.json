@@ -1,7 +1,7 @@
 {
 	"agent": {
 		"metrics_collection_interval": 60,
-		"run_as_user": "cwagent"
+		"run_as_user": "root"
 	},
 	"metrics": {
 		"append_dimensions": {
@@ -51,6 +51,29 @@
 					"swap_used_percent"
 				],
 				"metrics_collection_interval": 60
+			}
+		}
+	},
+	"logs": {
+		"logs_collected": {
+			"files": {
+				"collect_list": [
+					{
+						"file_path": "/var/log/messages",
+						"log_group_name": "cwagent-var-log-messages",
+						"log_stream_name": "{instance_id}"
+					},
+					{
+						"file_path": "/var/log/secure",
+						"log_group_name": "cwagent-var-log-secure",
+						"log_stream_name": "{instance_id}"
+					},
+					{
+						"file_path": "/u01/tag/autologoff/autologoff.log",
+						"log_group_name": "cwagent-nomis-autologoff",
+						"log_stream_name": "{instance_id}"
+					}
+				]
 			}
 		}
 	}

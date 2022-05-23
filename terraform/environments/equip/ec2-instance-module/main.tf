@@ -42,7 +42,7 @@ resource "aws_instance" "this" {
       }
     }
   }
-  
+
   dynamic "root_block_device" {
     for_each = var.root_block_device
     content {

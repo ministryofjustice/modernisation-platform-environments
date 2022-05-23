@@ -10,15 +10,18 @@ regions:
   - "eu-west-2"
 
 account-blocklist:
-  - "$PERFORMANCE_HUB_PREPRODUCTION_ACCID" # PERFORMANCE_HUB_PREPRODUCTION_ACCID
-  - "$PERFORMANCE_HUB_PRODUCTION_ACCID" # PERFORMANCE_HUB_PRODUCTION_ACCID
-  - "$XHIBIT_PORTAL_PREPRODUCTION_ACCID" # XHIBIT_PORTAL_PREPRODUCTION_ACCID
-  - "$XHIBIT_PORTAL_PRODUCTION_ACCID" # XHIBIT_PORTAL_PRODUCTION_ACCID
+$account_blocklist_str
 
 resource-types:
   # don't nuke IAM users
   excludes:
     - ACMCertificate
+    - CloudTrailTrail
+    - CloudWatchAlarm
+    - CloudWatchLogsLogGroup
+    - ConfigServiceConfigRule
+    - ConfigServiceConfigurationRecorder
+    - ConfigServiceDeliveryChannel
     - EC2DHCPOption
     - EC2InternetGateway
     - EC2InternetGatewayAttachment
@@ -49,23 +52,18 @@ resource-types:
     - IAMUserPolicyAttachment
     - IAMUserSSHPublicKey
     - IAMVirtualMFADevice
+    - KMSAlias
+    - KMSKey
     - S3AccessPoint
     - S3Bucket
     - S3MultipartUpload
     - S3Object
+    - SecretsManagerSecret
     - SecurityHub
     - WAFv2WebACL
 
 accounts:
-  "$COOKER_DEVELOPMENT_ACCID": # COOKER_DEVELOPMENT_ACCID
-    presets:
-      - "common"
-  "$SPRINKLER_DEVELOPMENT_ACCID": # SPRINKLER_DEVELOPMENT_ACCID
-    presets:
-      - "common"
-  "$PERFORMANCE_HUB_DEVELOPMENT_ACCID": # PERFORMANCE_HUB_DEVELOPMENT_ACCID
-    presets:
-      - "common"
+$accounts_str
 
 presets:
   common:

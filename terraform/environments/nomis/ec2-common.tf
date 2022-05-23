@@ -36,7 +36,34 @@ data "aws_iam_policy_document" "ssm_custom" {
     ]
     resources = ["*"]
   }
+}
 
+# custom policy document for cloudwatch agent, based on CloudWatchAgentServerPolicy but removed CreateLogGroup permission to enforce all log groups in code
+data "aws_iam_policy_document" "cloud_watch_custom" {
+  statement {
+    sid    = "CloudWatchAgentServerPolicy"
+    effect = "Allow"
+    actions = [
+      "cloudwatch:PutMetricData",
+      "ec2:DescribeVolumes",
+      "ec2:DescribeTags",
+      "logs:PutLogEvents",
+      "logs:DescribeLogStreams",
+      "logs:DescribeLogGroups",
+      "logs:CreateLogStream"
+    ]
+    resources = ["*"]
+  }
+
+  statement {
+    sid    = "DenyCreateLogGroups"
+    effect = "Deny"
+    actions = [
+      # Letting instances create log groups makes it difficult to delete them later
+      "logs:CreateLogGroup"
+    ]
+    resources = ["*"]
+  }
   statement {
     sid    = "AccessCloudWatchConfigParameter"
     effect = "Allow"
@@ -64,41 +91,12 @@ data "aws_iam_policy_document" "s3_bucket_access" {
   }
 }
 
-# create policy document to write Session Manager logs to CloudWatch
-data "aws_iam_policy_document" "session_manager_logging" {
-  # commented out as not encypting with KMS currently as the the role
-  # assumed by the user connecting also needs the GenerateDataKey permission
-  # see https://mojdt.slack.com/archives/C01A7QK5VM1/p1637603085030600
-  # statement { # for session and log encryption using KMS
-  #   effect = "Allow"
-  #   actions = [
-  #     "kms:Decrypt",
-  #     "kms:GenerateDataKey"
-  #   ]
-  #   resources = [aws_kms_key.session_manager.arn]
-  # }
-  statement {
-    sid    = "WriteSessionManagerLogs"
-    effect = "Allow"
-    actions = [
-      "logs:CreateLogStream",
-      "logs:PutLogEvents",
-      "logs:DescribeLogGroups",
-      "logs:DescribeLogStreams"
-    ]
-    resources = [
-      aws_cloudwatch_log_group.session_manager.arn,
-      "${aws_cloudwatch_log_group.session_manager.arn}:log-stream:*"
-    ]
-  }
-}
-
 # combine ec2-common policy documents
 data "aws_iam_policy_document" "ec2_common_combined" {
   source_policy_documents = [
     data.aws_iam_policy_document.ssm_custom.json,
     data.aws_iam_policy_document.s3_bucket_access.json,
-    data.aws_iam_policy_document.session_manager_logging.json
+    data.aws_iam_policy_document.cloud_watch_custom.json
   ]
 }
 
@@ -119,7 +117,6 @@ resource "aws_iam_policy" "ec2_common_policy" {
 # create list of common managed policies that can be attached to ec2 instance profiles
 locals {
   ec2_common_managed_policies = [
-    "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy",
     aws_iam_policy.ec2_common_policy.arn
   ]
 }
@@ -142,22 +139,6 @@ resource "aws_key_pair" "ec2-user" {
 # Session Manager Logging and Settings
 #------------------------------------------------------------------------------
 
-# Ignore warnings regarding log groups not encrypted using customer-managed
-# KMS keys - note they are still encrypted with default KMS key
-#tfsec:ignore:AWS089
-resource "aws_cloudwatch_log_group" "session_manager" {
-  #checkov:skip=CKV_AWS_158:skip KMS CMK encryption check while logging solution is being determined
-  name              = "session-manager-logs"
-  retention_in_days = local.application_data.accounts[local.environment].session_manager_log_retention_days
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "session-manager-logs"
-    },
-  )
-}
-
 resource "aws_ssm_document" "session_manager_settings" {
   name            = "SSM-SessionManagerRunShell"
   document_type   = "Session"
@@ -169,7 +150,7 @@ resource "aws_ssm_document" "session_manager_settings" {
       description   = "Document to hold regional settings for Session Manager"
       sessionType   = "Standard_Stream",
       inputs = {
-        cloudWatchLogGroupName      = aws_cloudwatch_log_group.session_manager.name
+        cloudWatchLogGroupName      = "session-manager-logs"
         cloudWatchEncryptionEnabled = false
         cloudWatchStreamingEnabled  = true
         s3BucketName                = ""
@@ -204,6 +185,27 @@ resource "aws_ssm_document" "session_manager_settings" {
 #   name          = "alias/session_manager_key"
 #   target_key_id = aws_kms_key.session_manager.arn
 # }
+
+#------------------------------------------------------------------------------
+# Cloud Watch Log Groups
+#------------------------------------------------------------------------------
+
+# Ignore warnings regarding log groups not encrypted using customer-managed
+# KMS keys - note they are still encrypted with default KMS key
+#tfsec:ignore:AWS089
+resource "aws_cloudwatch_log_group" "groups" {
+  #checkov:skip=CKV_AWS_158:skip KMS CMK encryption check while logging solution is being determined
+  for_each          = local.application_data.accounts[local.environment].log_groups
+  name              = each.key
+  retention_in_days = each.value.retention_days
+
+  tags = merge(
+    local.tags,
+    {
+      Name = each.key
+    },
+  )
+}
 
 #------------------------------------------------------------------------------
 # Cloud Watch Agent
@@ -282,7 +284,7 @@ resource "aws_ssm_document" "node_exporter_linux" {
   document_type   = "Command"
   document_format = "JSON"
   content         = file("./ssm-documents/node-exporter-linux.json")
-  target_type      = "/AWS::EC2::Instance"
+  target_type     = "/AWS::EC2::Instance"
 
   tags = merge(
     local.tags,
@@ -558,43 +560,43 @@ resource "aws_ssm_maintenance_window_task" "windows_patching" {
 
 # Patch Baselines
 resource "aws_ssm_patch_baseline" "rhel" {
-  name = "USER-RedHatPatchBaseline"
-  description = "Approves all RHEL operating system patches that are classified as Security and Bugfix and that have a severity of Critical or Important."
+  name             = "USER-RedHatPatchBaseline"
+  description      = "Approves all RHEL operating system patches that are classified as Security and Bugfix and that have a severity of Critical or Important."
   operating_system = "REDHAT_ENTERPRISE_LINUX"
 
   approval_rule {
-    approve_after_days =  local.application_data.accounts[local.environment].patch_approval_delay_days
-    compliance_level = "CRITICAL"
-    patch_filter {
-        key    = "CLASSIFICATION"
-        values = ["Security"]
-      }
-    patch_filter {
-        key    = "SEVERITY"
-        values = ["Critical"]
-      }
-  }
-  
-  approval_rule {
     approve_after_days = local.application_data.accounts[local.environment].patch_approval_delay_days
-    compliance_level = "HIGH"
+    compliance_level   = "CRITICAL"
     patch_filter {
-        key    = "CLASSIFICATION"
-        values = ["Security"]
-      }
+      key    = "CLASSIFICATION"
+      values = ["Security"]
+    }
     patch_filter {
-        key    = "SEVERITY"
-        values = ["Important"]
-      }
+      key    = "SEVERITY"
+      values = ["Critical"]
+    }
   }
 
   approval_rule {
     approve_after_days = local.application_data.accounts[local.environment].patch_approval_delay_days
-    compliance_level = "MEDIUM"
+    compliance_level   = "HIGH"
     patch_filter {
-        key    = "CLASSIFICATION"
-        values = ["Bugfix"]
-      }
+      key    = "CLASSIFICATION"
+      values = ["Security"]
+    }
+    patch_filter {
+      key    = "SEVERITY"
+      values = ["Important"]
+    }
+  }
+
+  approval_rule {
+    approve_after_days = local.application_data.accounts[local.environment].patch_approval_delay_days
+    compliance_level   = "MEDIUM"
+    patch_filter {
+      key    = "CLASSIFICATION"
+      values = ["Bugfix"]
+    }
   }
   tags = merge(
     local.tags,
@@ -605,36 +607,36 @@ resource "aws_ssm_patch_baseline" "rhel" {
 }
 
 resource "aws_ssm_patch_baseline" "windows" {
-  name = "USER-WindowsPatchBaseline-OS"
-  description = "Approves all Windows Server operating system patches that are classified as CriticalUpdates or SecurityUpdates and that have an MSRC severity of Critical or Important."
+  name             = "USER-WindowsPatchBaseline-OS"
+  description      = "Approves all Windows Server operating system patches that are classified as CriticalUpdates or SecurityUpdates and that have an MSRC severity of Critical or Important."
   operating_system = "WINDOWS"
 
   approval_rule {
     approve_after_days = local.application_data.accounts[local.environment].patch_approval_delay_days
-    compliance_level = "CRITICAL"
+    compliance_level   = "CRITICAL"
     patch_filter {
-        key    = "CLASSIFICATION"
-        values = ["CriticalUpdates", "SecurityUpdates"]
-      }
+      key    = "CLASSIFICATION"
+      values = ["CriticalUpdates", "SecurityUpdates"]
+    }
     patch_filter {
-        key    = "MSRC_SEVERITY"
-        values = ["Critical"]
-      }
+      key    = "MSRC_SEVERITY"
+      values = ["Critical"]
+    }
   }
-  
+
   approval_rule {
     approve_after_days = local.application_data.accounts[local.environment].patch_approval_delay_days
-    compliance_level = "HIGH"
+    compliance_level   = "HIGH"
     patch_filter {
-        key    = "CLASSIFICATION"
-        values = ["CriticalUpdates", "SecurityUpdates"]
-      }
+      key    = "CLASSIFICATION"
+      values = ["CriticalUpdates", "SecurityUpdates"]
+    }
     patch_filter {
-        key    = "MSRC_SEVERITY"
-        values = ["Important"]
-      }
+      key    = "MSRC_SEVERITY"
+      values = ["Important"]
+    }
   }
-  
+
   tags = merge(
     local.tags,
     {
