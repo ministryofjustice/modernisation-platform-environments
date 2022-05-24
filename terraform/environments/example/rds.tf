@@ -4,17 +4,32 @@
 # Set these up in there and make sure the local points to that location
 
 resource "aws_db_instance" "Example-RDS" {
-  engine                 = "mysql"
-  engine_version        = "5.7"
-  instance_class         = local.app_variables.accounts[local.environment].db_instance_class
-  db_name               = "${local.application_name}${local.environment}database"
-  identifier            = "${local.application_name}-${local.environment}-database" 
-  username              = local.app_variables.accounts[local.environment].db_user
-  password              = aws_secretsmanager_secret_version.db_password.secret_string
-  parameter_group_name  = "default.mysql5.7"
-  skip_final_snapshot   = true
-  allocated_storage     = local.app_variables.accounts[local.environment].db_allocated_storage
-  max_allocated_storage = local.app_variables.accounts[local.environment].db_max_allocated_storage
-  maintenance_window    = "Sun:00:00-Sun:03:00"
-  allow_major_version_upgrade = false
+  engine                      = "mysql"
+  engine_version              = "5.7"
+  instance_class              = local.app_variables.accounts[local.environment].db_instance_class
+  db_name                     = "${local.application_name}${local.environment}database"
+  identifier                  = "${local.application_name}-${local.environment}-database" 
+  username                    = local.app_variables.accounts[local.environment].db_user
+  password                    = aws_secretsmanager_secret_version.db_password.secret_string
+  parameter_group_name        = "default.mysql5.7"
+  skip_final_snapshot         = local.app_variables.accounts[local.environment].skip_final_snapshot
+  allocated_storage           = local.app_variables.accounts[local.environment].db_allocated_storage
+  max_allocated_storage       = local.app_variables.accounts[local.environment].db_max_allocated_storage
+  maintenance_window          = local.app_variables.accounts[local.environment].maintenance_window
+  allow_major_version_upgrade = local.app_variables.accounts[local.environment].allow_major_version_upgrade
+  backup_window               = local.app_variables.accounts[local.environment].backup_window
+  backup_retention_period     = local.app_variables.accounts[local.environment].retention_period
+  tags = merge(local.tags,
+    { Name = lower(format("%s-%s-example", local.application_name, local.environment)) }
+  )
   }
+
+#   resource "aws_db_instance_automated_backups_replication" "Example-RDS" {
+#   source_db_instance_arn = local.app_variables.accounts[local.environment].source_database
+#   retention_period       = 14
+# }
+
+# data "aws_db_snapshot" "snapshot" {
+#   db_instance_identifier = aws_db_instance.Example-RDS.id
+#   #source_db_instance_arn = local.app_variables.accounts[local.environment].db_snapshot_identifier
+# }

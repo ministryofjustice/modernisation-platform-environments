@@ -4,7 +4,7 @@ resource "aws_security_group" "example-load-balancer-sg" {
   description = "controls access to load balancer"
   vpc_id      = data.aws_vpc.shared.id
   tags = merge(local.tags,
-    { Name = lower(format("sg-%s-%s-example", local.application_name, local.environment)) }
+    { Name = lower(format("lb-sg-%s-%s-example", local.application_name, local.environment)) }
   )
  
  # Set up the ingress and egress parts of the security group
@@ -88,3 +88,16 @@ resource "aws_lb_target_group_attachment" "develop" {
   target_id        = aws_instance.develop.id
   port             = 80
 }
+
+# Load blancer listener
+resource "aws_lb_listener" "external" {
+  load_balancer_arn = aws_lb.external.arn
+  port              = local.app_variables.accounts[local.environment].server_port
+  protocol          = local.app_variables.accounts[local.environment].lb_listener_protocol
+
+  default_action {
+    type = "forward"
+    target_group_arn = aws_lb_target_group.target_group.arn
+  }
+}
+
