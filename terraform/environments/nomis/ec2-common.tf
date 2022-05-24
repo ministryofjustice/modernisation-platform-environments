@@ -4,7 +4,7 @@
 
 # custom policy for SSM as managed policy AmazonSSMManagedInstanceCore is too permissive
 data "aws_iam_policy_document" "ssm_custom" {
-  #tfsec:ignore:AWS099:this is derived from AmazonSSMManagedInstanceCore managed policy
+  #tfsec:ignore:aws-iam-no-policy-wildcards:this is derived from AmazonSSMManagedInstanceCore managed policy
   #checkov:skip=CKV_AWS_111:this is derived from AmazonSSMManagedInstanceCore managed policy
   statement {
     sid    = "CustomSsmPolicy"
@@ -40,6 +40,7 @@ data "aws_iam_policy_document" "ssm_custom" {
 
 # custom policy document for cloudwatch agent, based on CloudWatchAgentServerPolicy but removed CreateLogGroup permission to enforce all log groups in code
 data "aws_iam_policy_document" "cloud_watch_custom" {
+  #checkov:skip=CKV_AWS_111:this is derived from AWS provided CloudWatchAgentServerPolicy managed policy
   statement {
     sid    = "CloudWatchAgentServerPolicy"
     effect = "Allow"

@@ -3,6 +3,7 @@ locals {
 }
 
 module "bastion_linux" {
+  #tfsec:ignore:aws-s3-enable-bucket-logging:this exclusion is set in the module but for some reason its not propogated
   source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=v3.0.3"
 
   providers = {

@@ -38,7 +38,8 @@ resource "aws_iam_role_policy_attachment" "image-builder-distro-policy-attach" {
 data "aws_iam_policy_document" "image-builder-launch-template-policy" {
   statement {
     effect = "Allow"
-    actions = ["ec2:CreateLaunchTemplateVersion",
+    actions = [
+      "ec2:CreateLaunchTemplateVersion",
       "ec2:ModifyLaunchTemplate",
       "ec2:DescribeLaunchTemplates",
       "ec2:CreateTags"
@@ -58,10 +59,10 @@ data "aws_iam_policy_document" "image-builder-distro-kms-policy" {
       "kms:GenerateDataKey*",
       "kms:DescribeKey",
       "kms:CreateGrant",
-      "kms:ListGrant",
+      "kms:ListGrants",
       "kms:RevokeGrant"
     ]
-    resources = ["*"]
+    resources = [aws_kms_key.nomis-cmk[0].arn]
   }
 }
 
