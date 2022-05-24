@@ -46,7 +46,7 @@ resource "aws_security_group_rule" "CP_monitoring_ingress" {
   from_port         = 9100
   to_port           = 9100
   protocol          = "tcp"
-  cidr_blocks       = [local.application_data.accounts[local.environment].database_external_access_cidr.cloud_platform]
+  cidr_blocks       = [local.accounts[local.environment].database_external_access_cidr.cloud_platform]
   security_group_id = module.bastion_linux.bastion_security_group
 }
 
@@ -56,6 +56,6 @@ resource "aws_security_group_rule" "CP_monitoring_egress" {
   from_port         = 9100
   to_port           = 9100
   protocol          = "tcp"
-  cidr_blocks       = [local.application_data.accounts[local.environment].database_external_access_cidr.cloud_platform]
+  cidr_blocks       = [local.accounts[local.environment].database_external_access_cidr.cloud_platform]
   security_group_id = module.bastion_linux.bastion_security_group
 }

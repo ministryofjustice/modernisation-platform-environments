@@ -9,7 +9,7 @@ module "database" {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
   }
 
-  for_each = local.application_data.accounts[local.environment].databases
+  for_each = local.accounts[local.environment].databases
 
   name = each.key
 
@@ -70,7 +70,7 @@ resource "aws_security_group" "database_common" {
     to_port     = "1521"
     protocol    = "TCP"
     cidr_blocks = [
-      for cidr in local.application_data.accounts[local.environment].database_external_access_cidr : cidr
+      for cidr in local.accounts[local.environment].database_external_access_cidr : cidr
     ]
   }
 
@@ -79,7 +79,7 @@ resource "aws_security_group" "database_common" {
     from_port   = "9100"
     to_port     = "9100"
     protocol    = "TCP"
-    cidr_blocks = [local.application_data.accounts[local.environment].database_external_access_cidr.cloud_platform]
+    cidr_blocks = [local.accounts[local.environment].database_external_access_cidr.cloud_platform]
   }
 
   egress {
