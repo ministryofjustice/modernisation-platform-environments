@@ -12,6 +12,7 @@
 		},
 		"metrics_collected": {
 			"cpu": {
+				"resources": "*",
 				"measurement": [
 					"cpu_usage_idle",
 					"cpu_usage_iowait",
