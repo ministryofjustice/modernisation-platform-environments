@@ -118,6 +118,7 @@ resource "aws_iam_role" "core-services-launch-template-reader" {
 }
 
 data "aws_iam_policy_document" "launch-template-reader-policy-doc" {
+  #tfsec:ignore:aws-iam-no-policy-wildcards: describe permissions only.  Could potentially output launch template arn from weblogic module and pass here
   statement {
     effect = "Allow"
     actions = [
