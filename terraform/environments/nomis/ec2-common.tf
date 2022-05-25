@@ -33,9 +33,9 @@ data "aws_iam_policy_document" "ssm_custom" {
       "ec2messages:SendReply"
     ]
     # skiping these as policy is a scoped down version of Amazon provided AmazonSSMManagedInstanceCore managed policy.  Permissions required for SSM function
-    #tfsec:ignore:aws-iam-no-policy-wildcards
+    
     #checkov:skip=CKV_AWS_111: "Ensure IAM policies does not allow write access without constraints"
-    resources = ["*"]
+    resources = ["*"] #tfsec:ignore:aws-iam-no-policy-wildcards
   }
 }
 
@@ -54,9 +54,8 @@ data "aws_iam_policy_document" "cloud_watch_custom" {
       "logs:CreateLogStream"
     ]
     # skiping these as policy is a scoped down version of Amazon provided CloudWatchAgentServerPolicy managed policy
-    #tfsec:ignore:aws-iam-no-policy-wildcards
     #checkov:skip=CKV_AWS_111: "Ensure IAM policies does not allow write access without constraints"
-    resources = ["*"]
+    resources = ["*"] #tfsec:ignore:aws-iam-no-policy-wildcards
   }
 
   statement {
@@ -97,7 +96,6 @@ data "aws_iam_policy_document" "s3_bucket_access" {
 
 # combine ec2-common policy documents
 data "aws_iam_policy_document" "ec2_common_combined" {
-  #tfsec:ignore:aws-iam-no-policy-wildcards:exp:2022-08-25
   source_policy_documents = [
     data.aws_iam_policy_document.ssm_custom.json,
     data.aws_iam_policy_document.s3_bucket_access.json,

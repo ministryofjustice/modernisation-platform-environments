@@ -60,7 +60,7 @@ resource "aws_instance" "database" {
   disable_api_termination     = var.termination_protection
   ebs_optimized               = true
   iam_instance_profile        = aws_iam_instance_profile.database.name
-  instance_type               = var.instance_type # tflint-ignore: aws_instance_invalid_type
+  instance_type               = var.instance_type
   key_name                    = var.key_name
   monitoring                  = true
   subnet_id                   = data.aws_subnet.data.id
@@ -116,10 +116,10 @@ resource "aws_instance" "database" {
     }
   )
 }
-
+ #tfsec:ignore:aws-ebs-encryption-customer-key:exp:2022-08-31: I don't think we need the fine grained control CMK would provide
 resource "aws_ebs_volume" "oracle_app" {
   for_each = toset(local.oracle_app_disks)
-
+  
   availability_zone = var.availability_zone
   encrypted         = true
   snapshot_id       = local.block_device_map[each.key].ebs.snapshot_id
@@ -136,12 +136,13 @@ resource "aws_ebs_volume" "oracle_app" {
 
 resource "aws_volume_attachment" "oracle_app" {
   for_each = aws_ebs_volume.oracle_app
-
+  
   device_name = each.key
   volume_id   = each.value.id
   instance_id = aws_instance.database.id
 }
 
+ #tfsec:ignore:aws-ebs-encryption-customer-key:exp:2022-08-31: I don't think we need the fine grained control CMK would provide
 resource "aws_ebs_volume" "asm_data" {
   for_each = toset(local.asm_data_disks)
 
@@ -173,6 +174,7 @@ resource "aws_volume_attachment" "asm_data" {
   instance_id = aws_instance.database.id
 }
 
+ #tfsec:ignore:aws-ebs-encryption-customer-key:exp:2022-08-31: I don't think we need the fine grained control CMK would provide
 resource "aws_ebs_volume" "asm_flash" {
   for_each = toset(local.asm_flash_disks)
 
@@ -204,6 +206,7 @@ resource "aws_volume_attachment" "asm_flash" {
   instance_id = aws_instance.database.id
 }
 
+ #tfsec:ignore:aws-ebs-encryption-customer-key:exp:2022-08-31: I don't think we need the fine grained control CMK would provide
 resource "aws_ebs_volume" "swap" {
   availability_zone = var.availability_zone
   encrypted         = true
@@ -335,6 +338,7 @@ data "aws_iam_policy_document" "asm_parameter" {
   statement {
     effect    = "Allow"
     actions   = ["ssm:GetParameter"]
+    #tfsec:ignore:aws-iam-no-policy-wildcards: acccess scoped to parameter path, plus time conditional restricts access to short duration after launch
     resources = ["arn:aws:ssm:${local.region}:${data.aws_caller_identity.current.id}:parameter/database/${var.name}/*"]
     condition {
       test     = "DateLessThan"

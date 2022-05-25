@@ -170,6 +170,7 @@ data "aws_iam_policy_document" "packer_minimum_permissions" {
 
 # build policy json for Packer session manager permissions
 data "aws_iam_policy_document" "packer_ssm_permissions" {
+  #checkov:skip=CKV_AWS_108 # skip "Ensure IAM policies does not allow data exfiltration" while using the packer role which requires broad range of permissions
   count = local.environment == "test" ? 1 : 0
   statement {
     effect    = "Allow"
