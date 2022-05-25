@@ -1,5 +1,7 @@
 data "aws_region" "current" {}
 
+data "aws_caller_identity" "current" {}
+
 data "aws_vpc" "shared" {
    tags = {
     "Name" = "${var.networking[0].business-unit}-${local.environment}"
@@ -118,5 +120,23 @@ data "terraform_remote_state" "core_network_services" {
     key     = "environments/accounts/core-network-services/core-network-services-production/terraform.tfstate"
     region  = "eu-west-2"
     encrypt = "true"
+  }
+}
+
+data "aws_iam_policy_document" "s3-access-policy" {
+  version = "2012-10-17"
+  statement {
+    sid    = ""
+    effect = "Allow"
+    actions = [
+      "sts:AssumeRole",
+    ]
+    principals {
+      type = "Service"
+      identifiers = [
+        "rds.amazonaws.com",
+        "ec2.amazonaws.com",
+      ]
+    }
   }
 }

@@ -20,8 +20,7 @@
           "lb_listener_protocol":"HTTP",
           "backup_window":"16:00-17:00",
           "maintenance_window":"Sun:00:00-Sun:03:00"
-          },
-           
+          },           
         "test": {
           "example_var": "test-data"
         },
