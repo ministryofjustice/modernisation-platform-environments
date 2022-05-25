@@ -44,7 +44,7 @@ data "aws_iam_policy_document" "image-builder-launch-template-policy" {
       "ec2:DescribeLaunchTemplates",
       "ec2:CreateTags"
     ]
-    resources = ["*"]
+    resources = [for item in module.weblogic : item.launch_template_arn]
   }
 }
 
@@ -67,6 +67,7 @@ data "aws_iam_policy_document" "image-builder-distro-kms-policy" {
 }
 
 data "aws_iam_policy_document" "image-builder-combined" {
+  #tfsec:ignore:aws-iam-no-policy-wildcards:exp:2022-08-25
   source_policy_documents = [
     data.aws_iam_policy_document.image-builder-distro-kms-policy.json,
     data.aws_iam_policy_document.image-builder-launch-template-policy.json
@@ -118,14 +119,13 @@ resource "aws_iam_role" "core-services-launch-template-reader" {
 }
 
 data "aws_iam_policy_document" "launch-template-reader-policy-doc" {
-  #tfsec:ignore:aws-iam-no-policy-wildcards: describe permissions only.  Could potentially output launch template arn from weblogic module and pass here
   statement {
     effect = "Allow"
     actions = [
       "ec2:DescribeLaunchTemplates",
       "ec2:DescribeLaunchTemplateVersions"
     ]
-    resources = ["*"]
+    resources = [for item in module.weblogic : item.launch_template_arn]
   }
 }
 

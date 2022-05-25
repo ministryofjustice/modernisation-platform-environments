@@ -97,6 +97,7 @@ data "aws_iam_policy_document" "s3_bucket_access" {
 
 # combine ec2-common policy documents
 data "aws_iam_policy_document" "ec2_common_combined" {
+  #tfsec:ignore:aws-iam-no-policy-wildcards:exp:2022-08-25
   source_policy_documents = [
     data.aws_iam_policy_document.ssm_custom.json,
     data.aws_iam_policy_document.s3_bucket_access.json,
