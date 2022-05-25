@@ -51,6 +51,7 @@ data "aws_iam_policy_document" "image-builder-launch-template-policy" {
 data "aws_iam_policy_document" "image-builder-distro-kms-policy" {
   statement {
     effect = "Allow"
+    #tfsec:ignore:aws-iam-no-policy-wildcards:exp:2022-08-25
     actions = [
       "kms:Encrypt",
       "kms:Decrypt",
@@ -62,12 +63,11 @@ data "aws_iam_policy_document" "image-builder-distro-kms-policy" {
       "kms:ListGrants",
       "kms:RevokeGrant"
     ]
-    resources = [aws_kms_key.nomis-cmk[0].arn]
+    resources = try([aws_kms_key.nomis-cmk[0].arn],[])
   }
 }
 
 data "aws_iam_policy_document" "image-builder-combined" {
-  #tfsec:ignore:aws-iam-no-policy-wildcards:exp:2022-08-25
   source_policy_documents = [
     data.aws_iam_policy_document.image-builder-distro-kms-policy.json,
     data.aws_iam_policy_document.image-builder-launch-template-policy.json
