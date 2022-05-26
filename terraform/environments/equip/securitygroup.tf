@@ -271,6 +271,17 @@ resource "aws_security_group_rule" "egress_citrix-adc_to_spotfire" {
   source_security_group_id = aws_security_group.aws_spotfire_security_group.id
 }
 
+resource "aws_security_group_rule" "egress_citrix-adc_to_domain_controllers" {
+  for_each                 = local.application_data.adc_to_domain_controller_rules
+  description              = format("Citrix ADC to Domain controller traffic for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.citrix_adc_snip.id
+  to_port                  = each.value.to_port
+  type                     = "egress"
+  source_security_group_id = aws_security_group.aws_domain_security_group.id
+}
+
 ############################################################################
 
 #AWS Citrix Security Group
