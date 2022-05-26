@@ -92,6 +92,34 @@
       "protocol": "TCP"
     }
   },
+  "adc-mgmt_to_ctx_rules": {
+    "TCP_443": {
+      "from_port": 443,
+      "to_port": 443,
+      "protocol": "TCP"
+    }
+  },
+  "adc-mgmt_to_domain_controller_rules": {
+    "TCP_443": {
+      "from_port": 443,
+      "to_port": 443,
+      "protocol": "TCP"
+    }
+  },
+  "adc-mgmt_to_equip_rules": {
+    "TCP_443": {
+      "from_port": 443,
+      "to_port": 443,
+      "protocol": "TCP"
+    }
+  },
+  "adc-mgmt_to_spotfire_rules": {
+    "TCP_443": {
+      "from_port": 443,
+      "to_port": 443,
+      "protocol": "TCP"
+    }
+  },
   "ctx_to_adc-mgmt_rules": {
     "TCP_22": {
       "from_port": 22,
