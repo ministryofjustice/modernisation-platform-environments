@@ -599,6 +599,16 @@ resource "aws_security_group_rule" "ingress_dns_endpoints_to_domain_controller_t
   type              = "ingress"
   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
 }
+resource "aws_security_group_rule" "ingress_citrix-adc_to_domain_controller_traffic" {
+  for_each          = local.application_data.adc_to_domain_controller_rules
+  description       = format("Citrix Netscaler SNIP to Domain Controller traffic for %s %d", each.value.protocol, each.value.from_port)
+  from_port         = each.value.from_port
+  protocol          = each.value.protocol
+  security_group_id = aws_security_group.aws_domain_security_group.id
+  to_port           = each.value.to_port
+  type              = "ingress"
+  source_security_group_id = aws_security_group.citrix_adc_snip.id
+}
 
 resource "aws_security_group_rule" "egress_domain_controller_to_all_hosts_traffic" {
   for_each                 = local.application_data.domain_controller_to_host_rules
