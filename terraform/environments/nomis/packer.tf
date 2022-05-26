@@ -290,13 +290,16 @@ data "aws_iam_policy_document" "packer_s3_bucket_access" {
     effect = "Allow"
     actions = [
       "s3:GetObject",
-      "s3:ListBucket"
+      "s3:ListBucket",
+      "s3:*" // TODO: REMOVE
     ]
     resources = [
       module.s3-bucket.bucket.arn,
       module.nomis-db-backup-bucket.bucket.arn,
       "${module.s3-bucket.bucket.arn}/*",
-      "${module.nomis-db-backup-bucket.bucket.arn}/*"
+      "${module.nomis-db-backup-bucket.bucket.arn}/*",
+      module.nomis-image-builder-bucket.bucket.arn, // TODO: REMOVE
+      "${module.nomis-image-builder-bucket.bucket.arn}/*" // TODO: REMOVE
     ]
   }
 }
