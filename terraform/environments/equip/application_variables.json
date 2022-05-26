@@ -46,6 +46,13 @@
       "protocol": "TCP"
     }
   },
+  "adc_to_domain_controller_rules": {
+    "ICMP_ALL": {
+      "from_port": -1,
+      "to_port": -1,
+      "protocol": "ICMP"
+    }
+  },
   "adc_to_ctx_rules": {
     "TCP_80": {
       "from_port": 80,
@@ -76,6 +83,11 @@
       "from_port": 2598,
       "to_port": 2598,
       "protocol": "UDP"
+    },
+    "ICMP_ALL": {
+      "from_port": -1,
+      "to_port": -1,
+      "protocol": "ICMP"
     }
   },
   "adc_to_equip_rules": {
@@ -83,6 +95,11 @@
       "from_port": 443,
       "to_port": 443,
       "protocol": "TCP"
+    },
+    "ICMP_ALL": {
+      "from_port": -1,
+      "to_port": -1,
+      "protocol": "ICMP"
     }
   },
   "adc_to_spotfire_rules": {
@@ -90,6 +107,11 @@
       "from_port": 443,
       "to_port": 443,
       "protocol": "TCP"
+    },
+    "ICMP_ALL": {
+      "from_port": -1,
+      "to_port": -1,
+      "protocol": "ICMP"
     }
   },
   "ctx_to_adc_rules": {
