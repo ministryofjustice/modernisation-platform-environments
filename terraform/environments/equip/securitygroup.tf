@@ -572,6 +572,17 @@ resource "aws_security_group_rule" "ingress_spotfire_internal_traffic" {
   source_security_group_id = aws_security_group.aws_spotfire_security_group.id
 }
 
+resource "aws_security_group_rule" "egress_spotfire_internal_traffic" {
+  for_each                 = local.application_data.spotfire_internal_rules
+  description              = format("Spotfire internal traffic for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.aws_spotfire_security_group.id
+  to_port                  = each.value.to_port
+  type                     = "egress"
+  source_security_group_id = aws_security_group.aws_spotfire_security_group.id
+}
+
 resource "aws_security_group_rule" "egress_spotfire_to_citrix-adc-vip_traffic" {
   for_each                 = local.application_data.port_80_rules
   description              = format("Spotfire to Citrix ADC VIP traffic for %s %d", each.value.protocol, each.value.from_port)
