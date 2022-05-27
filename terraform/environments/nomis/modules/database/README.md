@@ -17,7 +17,7 @@ module "database" {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
   }
 
-  for_each = local.application_data.accounts[local.environment].databases
+  for_each = local.accounts[local.environment].databases
 
   name = each.key
 
