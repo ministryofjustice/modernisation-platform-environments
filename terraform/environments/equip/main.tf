@@ -451,7 +451,7 @@ locals {
         {
           device_name = "/dev/sdh"
           volume_type = "gp3"
-          volume_size = 400
+          volume_size = 1000
           encrypted   = true
           kms_key_id  = aws_kms_key.this.arn
           tags = merge(local.tags,
