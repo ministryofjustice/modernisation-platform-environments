@@ -4,7 +4,7 @@
 module "s3-bucket" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.0.5"
 
-  bucket_prefix                            = "s3-bucket"
+  bucket_prefix                            = "s3-bucket-example"
   versioning_enabled                       = false
   
   # Refer to the below section "Replication" before enabling replication
@@ -23,7 +23,7 @@ module "s3-bucket" {
   lifecycle_rule = [
     {
       id      = "main"
-      enabled = true
+      enabled = "Enabled"
       prefix  = ""
 
       tags = {
@@ -60,6 +60,7 @@ module "s3-bucket" {
       }
     }
   ]
+  
 
   tags = merge(local.tags,
     { Name = lower(format("s3-bucket-%s-%s-example", local.application_name, local.environment)) }
