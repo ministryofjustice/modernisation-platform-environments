@@ -310,12 +310,12 @@ resource "aws_instance" "SOC" {
 
 ################################################################################
 
-data "aws_ami" "windows_2012_std_SQL16_ami" {
+data "aws_ami" "windows_2019_std_SQL17_ami" {
   owners      = ["amazon"]
   most_recent = true
   filter {
     name   = "name"
-    values = ["Windows_Server-2012-R2_RTM-English-64Bit-SQL_2016_SP3_Standard*"]
+    values = ["Windows_Server-2019-English-Full-SQL_2017_Standard*"]
   }
   filter {
     name   = "virtualization-type"
@@ -324,7 +324,7 @@ data "aws_ami" "windows_2012_std_SQL16_ami" {
 }
 
 locals {
-  win2012_SQL_instances = {
+  win2019_SQL_instances = {
     COR-A-SF02 = {
       instance_type          = "t3a.xlarge"
       subnet_id              = data.aws_subnet.private_subnets_a.id
@@ -360,14 +360,14 @@ locals {
   }
 }
 
-module "win2012_SQL_multiple" {
+module "win2019_SQL_multiple" {
   source = "./ec2-instance-module"
 
 
-  for_each = local.win2012_SQL_instances
+  for_each = local.win2019_SQL_instances
 
   name                   = "${local.name}-${each.key}"
-  ami                    = "ami-074c86bb2f72d9966"
+  ami                    = "ami-0d6ed9f188054719d"
   instance_type          = each.value.instance_type
   vpc_security_group_ids = each.value.vpc_security_group_ids
   subnet_id              = each.value.subnet_id

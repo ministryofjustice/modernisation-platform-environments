@@ -1,0 +1,96 @@
+# This file is for vars that vary between accounts.  Locals.tf conatins common vars.
+locals {
+  accounts = {
+    test = {
+      # ip ranges for external access to database instances
+      database_external_access_cidr = {
+        azure_noms_test = "10.101.0.0/16"
+        cloud_platform  = "172.20.0.0/16"
+      },
+      # vars common across ec2 instances
+      ec2_common = {
+        public_key                = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCv/RZr7NQwO1Ovjbaxs5X9jR1L4QU/WSOIH3qhCriTlzbdnPI5mA79ZWBZ25h5tA2eIu5FbX+DBwYgwARCnS6VL4KiLKq9j7Ys/gx2FE6rWlXEibpK/9dGLu35znDUyO0xiLIu/EPZFpWhn/2L1z82GiEjDaiY00NmxkHHKMaRCDrgCJ4tEhGPWGcPYoNAYmCkncQJjYojSJ0uaP6e85yx2nmE85YDE+QcDoN5HtHex84CCibh98nD2tMhEQ2Ss+g7/nSXw+/Z2RadDznpz0h/8CcgAGpTHJ35+aeWINquw0lWSJldCLfn3PXldcDzFleqoop9jRGn2hB9eOUz2iEC7MXoLPFcen/lzQD+xfwvaq1+4YU7BbiyTtY/lcw0xcE01QBA+nUiHPJMBewr2TmZRHNy1fvg8ZRKLrOcEMz8iPKVtquftl1DZZCO8Xccr3BVpfoXIl5LuEWPqnMABAvgtkHMaIkTqKMgaKVEC9/KTqRn/K2zzGljUJkzcgO95bNksjDRXtbfQ0AD7CLa47xPOLPh4dC2WDindKh3YALa74EBOyEtJWvLt6fRLPhWmOaZkCrjC3TI+onKiPo0nXrN7Uyg2Q6Atiauw6fqz63cRXkzU/e7LVoxT42qaaaGMytgZJXF3Wk4hp88IqqnDXFavLUElsJEgOTWiNTk2N92/w=="
+        patch_approval_delay_days = 3
+        patch_day                 = "TUE"
+      },
+      # cloud watch log groups
+      log_groups = {
+        session-manager-logs = {
+          retention_days = 90
+        },
+        cwagent-var-log-messages = {
+          retention_days = 30
+        },
+        cwagent-var-log-secure = {
+          retention_days = 90
+        },
+        cwagent-nomis-autologoff = {
+          retention_days = 90
+        }
+      },
+      # Add database instances here.  They will be created using the database module
+      databases = {
+        CNOMT1 = {
+          always_on          = false
+          ami_name           = "nomis_db_STIG_CNOMT1-2022-04-21*"
+          asm_data_capacity  = 100
+          asm_flash_capacity = 2
+        },
+        CNAUDT1 = {
+          always_on              = true
+          ami_name               = "nomis_db-2022-03-03*"
+          asm_data_capacity      = 200
+          asm_flash_capacity     = 2
+          termination_protection = true
+        }
+      },
+      # Add weblogic instances here.  They will be created using the weblogic module
+      weblogics = {
+        CNOMT1 = {
+          ami_name     = "nomis_Weblogic_2022*"
+          asg_max_size = 1
+        }
+      }
+    },
+    production = {
+      # ip ranges for external access to database instances
+      database_external_access_cidr = {
+        azure_noms_live = "10.40.0.0/18"
+        cloud_platform  = "172.20.0.0/16"
+      },
+      # vars common across ec2 instances
+      ec2_common = {
+        public_key                = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDdCvr+81dRu1qxFi1LSWEybb/ztbzlbfjd3Hj1EOHcEQt6lo9Cr94SUXjjUvD6krNzm9QWs8TdVRNfDCjaZRmO6KFX8UUUwE0UB0p6LZPy2I8cYirGN8f2fwCrh8dZg6x8sxa7fXW5gMZal6Z0O10u0XM5ajXkQz2f4T4zCxff7MDEuqZV0OWhaiTWPT9eph4UZH5FWA8Lxzml6qIAwyHa6O5j7hQpvX4kiMjvg9F9C5Fxo6EBpCAjdRcXgsMmDHQjqLJO3b2wWPlm45yES7NaAwZCb6Yq0BRmDPv2/ZokVNE8tudtf+cNa2+aLB9WiBVnFXggIuFeelArNi5X9U4nLzvaDX3y7+TnY+QY5FcDugJDwHKcb/ah64WMpSiWjrFiyg6fF04jFfV6YKdsH//7E/DSZAkVsj+XKHt23SyWS6RKXag+IW3UIp3pttELNHbIO+7vUGZT8btqIBtN5iM6PLiYzfDFHDRmd/aO0a844ZFioFzabGo7MuyAU+NkfLHIBXazrrxd2s+HXnBtL80iur4Jm7Vut1QoPJmknCq9iBv+itE8RYM8oN74g5BVTPAsw5vr2c5fvXwVdu0XhwRnkSsfCppdntf2ObX51PxjxXcq63jCEYRdq0bBPyGWa8hKiMcwx4TIz3IW2xGmLK6PO+2LLpVg89Q7EicMAFHC3w=="
+        patch_approval_delay_days = 7
+        patch_day                 = "THU"
+      },
+      # cloud watch log groups
+      log_groups = {
+        session-manager-logs = {
+          retention_days = 400
+        },
+        cwagent-var-log-messages = {
+          retention_days = 90
+        },
+        cwagent-var-log-secure = {
+          retention_days = 400
+        },
+        cwagent-nomis-autologoff = {
+          retention_days = 400
+        }
+      },
+      # Add database instances here.  They will be created using the database module
+      databases = {
+        TEST = {
+          always_on              = true
+          ami_name               = "nomis_db_STIG-2022-04-26*"
+          asm_data_capacity      = 200
+          asm_flash_capacity     = 2
+          termination_protection = false
+        }
+      },
+      # Add weblogic instances here.  They will be created using the weblogic module
+      weblogics = {}
+    }
+  }
+}
