@@ -324,7 +324,7 @@ data "aws_ami" "windows_2019_std_SQL17_ami" {
 }
 
 locals {
-  win2012_SQL_instances = {
+  win2019_SQL_instances = {
     COR-A-SF02 = {
       instance_type          = "t3a.xlarge"
       subnet_id              = data.aws_subnet.private_subnets_a.id
@@ -360,11 +360,11 @@ locals {
   }
 }
 
-module "win2012_SQL_multiple" {
+module "win2019_SQL_multiple" {
   source = "./ec2-instance-module"
 
 
-  for_each = local.win2012_SQL_instances
+  for_each = local.win2019_SQL_instances
 
   name                   = "${local.name}-${each.key}"
   ami                    = "ami-0d6ed9f188054719d"
