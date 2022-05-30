@@ -8,6 +8,28 @@ resource "aws_security_group" "alb_sg" {
   )
 }
 
+resource "aws_security_group_rule" "egress_equip_to_proxy_4" {
+  for_each                 = local.application_data.equip_proxy_rules
+  description              = format("Equip egress traffic to proxy for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.alb_sg.id
+  to_port                  = each.value.to_port
+  type                     = "egress"
+  source_security_group_id = aws_security_group.aws_proxy_security_group.id
+}
+
+resource "aws_security_group_rule" "ingress_equip_from_proxy_4" {
+  for_each                 = local.application_data.equip_proxy_rules
+  description              = format("Equip ingress traffic from proxy for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.alb_sg.id
+  to_port                  = each.value.to_port
+  type                     = "ingress"
+  source_security_group_id = aws_security_group.aws_proxy_security_group.id
+}
+
 resource "aws_security_group_rule" "ingress_internet_to_alb_traffic" {
   for_each          = local.application_data.internet_to_alb_rules
   description       = format("Internet to ALB traffic for %s %d", each.value.protocol, each.value.from_port)
@@ -42,6 +64,28 @@ resource "aws_security_group" "citrix_adc_mgmt" {
   tags = merge(local.tags,
     { Name = lower(format("secg-%s-%s-citrix-adc_mgmt", local.application_name, local.environment)) }
   )
+}
+
+resource "aws_security_group_rule" "egress_equip_to_proxy_6" {
+  for_each                 = local.application_data.equip_proxy_rules
+  description              = format("Equip egress traffic to proxy for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.citrix_adc_mgmt.id
+  to_port                  = each.value.to_port
+  type                     = "egress"
+  source_security_group_id = aws_security_group.aws_proxy_security_group.id
+}
+
+resource "aws_security_group_rule" "ingress_equip_from_proxy_6" {
+  for_each                 = local.application_data.equip_proxy_rules
+  description              = format("Equip ingress traffic from proxy for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.citrix_adc_mgmt.id
+  to_port                  = each.value.to_port
+  type                     = "ingress"
+  source_security_group_id = aws_security_group.aws_proxy_security_group.id
 }
 
 resource "aws_security_group_rule" "ingress_ctx_host_to_citrix-adc-mgmt" {
@@ -123,6 +167,28 @@ resource "aws_security_group" "citrix_adc_vip" {
   )
 }
 
+resource "aws_security_group_rule" "egress_equip_to_proxy_8" {
+  for_each                 = local.application_data.equip_proxy_rules
+  description              = format("Equip egress traffic to proxy for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.citrix_adc_vip.id
+  to_port                  = each.value.to_port
+  type                     = "egress"
+  source_security_group_id = aws_security_group.aws_proxy_security_group.id
+}
+
+resource "aws_security_group_rule" "ingress_equip_from_proxy_8" {
+  for_each                 = local.application_data.equip_proxy_rules
+  description              = format("Equip ingress traffic from proxy for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.citrix_adc_vip.id
+  to_port                  = each.value.to_port
+  type                     = "ingress"
+  source_security_group_id = aws_security_group.aws_proxy_security_group.id
+}
+
 resource "aws_security_group_rule" "ingress_alb_to_citrix-adc-vip_traffic" {
   for_each                 = local.application_data.alb_to_citrix-adc-vip_rules
   description              = format("ALB to Citrix ADC VIP traffic for %s %d", each.value.protocol, each.value.from_port)
@@ -202,6 +268,28 @@ resource "aws_security_group" "citrix_adc_snip" {
   )
 }
 
+resource "aws_security_group_rule" "egress_equip_to_proxy_2" {
+  for_each                 = local.application_data.equip_proxy_rules
+  description              = format("Equip egress traffic to proxy for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.citrix_adc_snip.id
+  to_port                  = each.value.to_port
+  type                     = "egress"
+  source_security_group_id = aws_security_group.aws_proxy_security_group.id
+}
+
+resource "aws_security_group_rule" "ingress_equip_from_proxy_2" {
+  for_each                 = local.application_data.equip_proxy_rules
+  description              = format("Equip ingress traffic from proxy for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.citrix_adc_snip.id
+  to_port                  = each.value.to_port
+  type                     = "ingress"
+  source_security_group_id = aws_security_group.aws_proxy_security_group.id
+}
+
 resource "aws_security_group_rule" "egress_citrix-adc-snip_to_ctx-host" {
   for_each                 = local.application_data.adc-snip_to_ctx_rules
   description              = format("Citrix ADC SNIP to Citrix host traffic for %s %d", each.value.protocol, each.value.from_port)
@@ -246,6 +334,28 @@ resource "aws_security_group" "aws_citrix_security_group" {
   tags = merge(local.tags,
     { Name = lower(format("secg-%s-%s-citrix-host", local.application_name, local.environment)) }
   )
+}
+
+resource "aws_security_group_rule" "egress_equip_to_proxy_7" {
+  for_each                 = local.application_data.equip_proxy_rules
+  description              = format("Equip egress traffic to proxy for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.aws_citrix_security_group.id
+  to_port                  = each.value.to_port
+  type                     = "egress"
+  source_security_group_id = aws_security_group.aws_proxy_security_group.id
+}
+
+resource "aws_security_group_rule" "ingress_equip_from_proxy_7" {
+  for_each                 = local.application_data.equip_proxy_rules
+  description              = format("Equip ingress traffic from proxy for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.aws_citrix_security_group.id
+  to_port                  = each.value.to_port
+  type                     = "ingress"
+  source_security_group_id = aws_security_group.aws_proxy_security_group.id
 }
 
 resource "aws_security_group_rule" "ingress_citrix-adc-mgmt_to_ctx-host_traffic" {
@@ -459,6 +569,28 @@ resource "aws_security_group_rule" "egress_equip_to_spotfire_traffic" {
   source_security_group_id = aws_security_group.aws_spotfire_security_group.id
 }
 
+resource "aws_security_group_rule" "egress_equip_to_proxy" {
+  for_each                 = local.application_data.equip_proxy_rules
+  description              = format("Equip egress traffic to proxy for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.aws_equip_security_group.id
+  to_port                  = each.value.to_port
+  type                     = "egress"
+  source_security_group_id = aws_security_group.aws_proxy_security_group.id
+}
+
+resource "aws_security_group_rule" "ingress_equip_from_proxy" {
+  for_each                 = local.application_data.equip_proxy_rules
+  description              = format("Equip ingress traffic from proxy for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.aws_equip_security_group.id
+  to_port                  = each.value.to_port
+  type                     = "ingress"
+  source_security_group_id = aws_security_group.aws_proxy_security_group.id
+}
+
 resource "aws_security_group_rule" "ingress_equip_internal_traffic" {
   for_each                 = local.application_data.equip_internal_rules
   description              = format("Equip host internal traffic for %s %d", each.value.protocol, each.value.from_port)
@@ -493,6 +625,28 @@ resource "aws_security_group" "aws_spotfire_security_group" {
   tags = merge(local.tags,
     { Name = lower(format("secg-%s-%s-spotfire", local.application_name, local.environment)) }
   )
+}
+
+resource "aws_security_group_rule" "egress_equip_to_proxy_5" {
+  for_each                 = local.application_data.equip_proxy_rules
+  description              = format("Equip egress traffic to proxy for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.aws_spotfire_security_group.id
+  to_port                  = each.value.to_port
+  type                     = "egress"
+  source_security_group_id = aws_security_group.aws_proxy_security_group.id
+}
+
+resource "aws_security_group_rule" "ingress_equip_from_proxy_5" {
+  for_each                 = local.application_data.equip_proxy_rules
+  description              = format("Equip ingress traffic from proxy for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.aws_spotfire_security_group.id
+  to_port                  = each.value.to_port
+  type                     = "ingress"
+  source_security_group_id = aws_security_group.aws_proxy_security_group.id
 }
 
 resource "aws_security_group_rule" "ingress_citrix-adc-vip_to_sf" {
@@ -639,6 +793,28 @@ resource "aws_security_group" "aws_proxy_security_group" {
   )
 }
 
+resource "aws_security_group_rule" "egress_equip_to_proxy_9" {
+  for_each                 = local.application_data.equip_proxy_rules
+  description              = format("Equip egress traffic to proxy for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.aws_proxy_security_group.id
+  to_port                  = each.value.to_port
+  type                     = "egress"
+  source_security_group_id = aws_security_group.aws_proxy_security_group.id
+}
+
+resource "aws_security_group_rule" "ingress_equip_from_proxy_9" {
+  for_each                 = local.application_data.equip_proxy_rules
+  description              = format("Equip ingress traffic from proxy for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.aws_proxy_security_group.id
+  to_port                  = each.value.to_port
+  type                     = "ingress"
+  source_security_group_id = aws_security_group.aws_proxy_security_group.id
+}
+
 resource "aws_security_group_rule" "ingress_hosts_to_proxies_traffic" {
   for_each                 = local.application_data.host_to_proxy_rules
   description              = format("All hosts to proxy server traffic for %s %d", each.value.protocol, each.value.from_port)
@@ -683,6 +859,28 @@ resource "aws_security_group" "aws_domain_security_group" {
   tags = merge(local.tags,
     { Name = lower(format("secg-%s-%s-domain-controller", local.application_name, local.environment)) }
   )
+}
+
+resource "aws_security_group_rule" "egress_equip_to_proxy_3" {
+  for_each                 = local.application_data.equip_proxy_rules
+  description              = format("Equip egress traffic to proxy for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.aws_domain_security_group.id
+  to_port                  = each.value.to_port
+  type                     = "egress"
+  source_security_group_id = aws_security_group.aws_proxy_security_group.id
+}
+
+resource "aws_security_group_rule" "ingress_equip_from_proxy_3" {
+  for_each                 = local.application_data.equip_proxy_rules
+  description              = format("Equip ingress traffic from proxy for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.aws_domain_security_group.id
+  to_port                  = each.value.to_port
+  type                     = "ingress"
+  source_security_group_id = aws_security_group.aws_proxy_security_group.id
 }
 
 resource "aws_security_group_rule" "ingress_citrix-adc-mgmt_to_domain_controller_traffic" {
@@ -776,6 +974,28 @@ resource "aws_security_group" "all_internal_groups" {
   tags = merge(local.tags,
     { Name = lower(format("secg-%s-%s-all-hosts", local.application_name, local.environment)) }
   )
+}
+
+resource "aws_security_group_rule" "egress_equip_to_proxy_1" {
+  for_each                 = local.application_data.equip_proxy_rules
+  description              = format("Equip egress traffic to proxy for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.all_internal_groups.id
+  to_port                  = each.value.to_port
+  type                     = "egress"
+  source_security_group_id = aws_security_group.aws_proxy_security_group.id
+}
+
+resource "aws_security_group_rule" "ingress_equip_from_proxy_1" {
+  for_each                 = local.application_data.equip_proxy_rules
+  description              = format("Equip ingress traffic from proxy for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.all_internal_groups.id
+  to_port                  = each.value.to_port
+  type                     = "ingress"
+  source_security_group_id = aws_security_group.aws_proxy_security_group.id
 }
 
 resource "aws_security_group_rule" "ingress_domain_controller_to_all_hosts_traffic" {

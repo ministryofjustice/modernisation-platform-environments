@@ -664,6 +664,13 @@
       "protocol": "TCP"
     }
   },
+  "equip_proxy_rules": {
+    "TCP_4119": {
+      "from_port": 4119,
+      "to_port": 4119,
+      "protocol": "TCP"
+    }
+  },
   "equip_to_spotfire_rules": {
     "TCP_80": {
       "from_port": 80,
