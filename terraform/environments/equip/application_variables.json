@@ -728,6 +728,11 @@
       "from_port": 9443,
       "to_port": 9443,
       "protocol": "TCP"
+    },
+    "TCP_9501": {
+      "from_port": 9501,
+      "to_port": 9501,
+      "protocol": "TCP"
     }
   },
   "spotfire_to_equip_rules": {
