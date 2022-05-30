@@ -731,6 +731,11 @@
       "to_port": 9080,
       "protocol": "TCP"
     },
+    "TCP_9501": {
+      "from_port": 9501,
+      "to_port": 9501,
+      "protocol": "TCP"
+    },
     "TCP_9443": {
       "from_port": 9443,
       "to_port": 9443,
