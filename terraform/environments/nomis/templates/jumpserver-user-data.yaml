@@ -1,0 +1,52 @@
+# This is an EC2Launch V2 type user-data script
+# https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2launch-v2.html
+version: 1.0
+tasks:
+- task: executeScript
+  inputs:
+  - frequency: once
+    type: powershell
+    runAs: localSystem
+    content: |
+      # Download/Install Java
+      Read-S3Object -BucketName s3-bucket20210929163229537900000001 -Key jumpserver-software/jre-6u33-windows-i586.exe -File C:\jumpserver-software\jre-6u33-windows-i586.exe
+      Start-Process -Wait -FilePath "C:\jumpserver-software\jre-6u33-windows-i586.exe" -ArgumentList "/qn", "/s", "/v" -PassThru
+
+      # Add Nomis sites to trusted sites
+       $sites = @(
+          "*.nomis.hmpps-test.modernisation-platform.internal"
+          "*.nomis.hmpps-test.modernisation-platform.justice.gov.uk"
+          "*.nomis.hmpps-production.modernisation-platform.internal"
+          "*.nomis.hmpps-production.modernisation-platform.justice.gov.uk"
+          "*.modernisation-platform.nomis.az.justice.gov.uk"
+      )
+
+      $paths = @(
+          "HKLM:\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Domains"
+          "HKLM:\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\EscDomains"
+      )
+
+      foreach($path in $paths){
+        $sites | ForEach-Object {
+            New-Item -Path $path\$_ -Force
+            New-ItemProperty -Path $path\$_ -Name http -Value 2 -PropertyType DWORD -Force
+            New-ItemProperty -Path $path\$_ -Name https -Value 2 -PropertyType DWORD -Force
+        }
+      }
+
+      # Use Local Machine settings for Internet Security Settings
+      $reg_path = "HKLM:\Software\Policies\Microsoft\Windows\CurrentVersion\Internet Settings"
+      New-Item -Path $reg_path -Force
+      New-ItemProperty -Path $reg_path -Name Security_HKLM_only -Value 1 -PropertyType DWORD -Force 
+
+      # Configure Java
+      Read-S3Object -BucketName s3-bucket20210929163229537900000001 -Key jumpserver-software/deployment.config -File C:\Windows\Sun\Java\Deployment\deployment.config
+      Read-S3Object -BucketName s3-bucket20210929163229537900000001 -Key jumpserver-software/deployment.properties -File C:\Windows\Sun\Java\Deployment\deployment.properties
+
+      # Add a user
+      $password = ConvertTo-SecureString $(Get-SSMParameter -Name "/jumpserver/WebOps" -WithDecryption 1 -Select Parameter.Value) -AsPlainText -Force 
+      New-LocalUser "WebOps" -Password $password -FullName "WebOps"
+      Add-LocalGroupMember -Group "Remote Desktop Users" -Member "WebOps"
+
+      # Disable Administrator
+      Disable-LocalUser -Name "Administrator"
