@@ -650,6 +650,17 @@ resource "aws_security_group_rule" "ingress_hosts_to_proxies_traffic" {
   source_security_group_id = aws_security_group.all_internal_groups.id
 }
 
+resource "aws_security_group_rule" "ingress_domain_controllers_to_proxies_traffic" {
+  for_each                 = local.application_data.domain_controller_to_proxy_rules
+  description              = format("Domain Controller to proxy server traffic for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.aws_proxy_security_group.id
+  to_port                  = each.value.to_port
+  type                     = "ingress"
+  source_security_group_id = aws_security_group.aws_domain_security_group.id
+}
+
 resource "aws_security_group_rule" "egress_proxy_host_to_citrix-adc-mgmt" {
   for_each                 = local.application_data.proxy_to_adc-mgmt_rules
   description              = format("Proxy host to Citrix ADC Management traffic for %s %d", each.value.protocol, each.value.from_port)
@@ -727,6 +738,17 @@ resource "aws_security_group_rule" "egress_domain_controller_to_all_hosts_traffi
   to_port                  = each.value.to_port
   type                     = "egress"
   source_security_group_id = aws_security_group.all_internal_groups.id
+}
+
+resource "aws_security_group_rule" "egress_domain_controller_to_proxies" {
+  for_each                 = local.application_data.domain_controller_to_proxy_rules
+  description              = format("Domain Controller to Proxy traffic for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.aws_domain_security_group.id
+  to_port                  = each.value.to_port
+  type                     = "egress"
+  source_security_group_id = aws_security_group.aws_proxy_security_group.id
 }
 
 resource "aws_security_group_rule" "aws_domain_security_group_egress_1" {
