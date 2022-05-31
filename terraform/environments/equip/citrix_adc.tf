@@ -2,7 +2,7 @@ resource "aws_instance" "citrix_adc_instance" {
   ami                    = "ami-0dd0aa051b3fc4e4b"
   instance_type          = "m5.xlarge"
   key_name               = aws_key_pair.windowskey.key_name
-  subnet_id              = data.aws_subnet.private_subnets_a.id
+  subnet_id              = data.aws_subnet.private_subnet_a.id
   vpc_security_group_ids = [aws_security_group.citrix_adc_mgmt.id]
   iam_instance_profile   = aws_iam_instance_profile.instance-profile-moj.name
   monitoring             = true
@@ -37,7 +37,7 @@ resource "aws_instance" "citrix_adc_instance" {
 resource "aws_network_interface" "adc_vip_interface" {
   security_groups   = [aws_security_group.citrix_adc_vip.id]
   source_dest_check = false
-  subnet_id         = data.aws_subnet.public_az_a.id
+  subnet_id         = data.aws_subnet.public_subnet_a.id
 
   attachment {
     device_index = 1
@@ -55,7 +55,7 @@ resource "aws_network_interface" "adc_vip_interface" {
 resource "aws_network_interface" "adc_snip_interface" {
   security_groups   = [aws_security_group.citrix_adc_snip.id]
   source_dest_check = false
-  subnet_id         = data.aws_subnet.private_subnets_a.id
+  subnet_id         = data.aws_subnet.private_subnet_a.id
 
   attachment {
     device_index = 2
