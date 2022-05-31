@@ -35,7 +35,7 @@ resource "aws_instance" "jumpserver_windows" {
   vpc_security_group_ids      = [aws_security_group.jumpserver-windows.id]
   subnet_id                   = data.aws_subnet.private_az_a.id
   key_name                    = aws_key_pair.ec2-user.key_name
-  user_data = file("./templates/jumpserver-user-data.yaml")
+  user_data                   = file("./templates/jumpserver-user-data.yaml")
   metadata_options {
     http_endpoint = "enabled"
     http_tokens   = "required"
@@ -49,11 +49,11 @@ resource "aws_instance" "jumpserver_windows" {
   tags = merge(
     local.tags,
     {
-      Name       = "jumpserver_windows"
-      os_type    = "Windows"
-      os_version = "2019"
-      always_on  = "false"
-      "Patch Group" = "${aws_ssm_patch_group.windows.patch_group}" 
+      Name          = "jumpserver_windows"
+      os_type       = "Windows"
+      os_version    = "2019"
+      always_on     = "false"
+      "Patch Group" = "${aws_ssm_patch_group.windows.patch_group}"
     }
   )
 }
