@@ -2,7 +2,7 @@ locals {
   public_key_data = jsondecode(file("./bastion_linux.json"))
 }
 
- #tfsec:ignore:aws-s3-encryption-customer-key:exp:2022-08-31 tfsec:ignore:aws-s3-enable-bucket-logging:exp:2022-08-31 these checks are ignored in the bastion module but don't proagate through
+#tfsec:ignore:aws-s3-encryption-customer-key:exp:2022-08-31 tfsec:ignore:aws-s3-enable-bucket-logging:exp:2022-08-31 these checks are ignored in the bastion module but don't proagate through
 module "bastion_linux" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=v3.0.3"
 

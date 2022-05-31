@@ -33,7 +33,7 @@ data "aws_iam_policy_document" "ssm_custom" {
       "ec2messages:SendReply"
     ]
     # skiping these as policy is a scoped down version of Amazon provided AmazonSSMManagedInstanceCore managed policy.  Permissions required for SSM function
-    
+
     #checkov:skip=CKV_AWS_111: "Ensure IAM policies does not allow write access without constraints"
     resources = ["*"] #tfsec:ignore:aws-iam-no-policy-wildcards
   }

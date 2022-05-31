@@ -63,7 +63,7 @@ data "aws_iam_policy_document" "image-builder-distro-kms-policy" {
       "kms:ListGrants",
       "kms:RevokeGrant"
     ]
-    resources = try([aws_kms_key.nomis-cmk[0].arn],[])
+    resources = try([aws_kms_key.nomis-cmk[0].arn], [])
   }
 }
 
