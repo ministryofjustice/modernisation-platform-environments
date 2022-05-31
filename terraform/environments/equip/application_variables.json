@@ -652,6 +652,13 @@
       "protocol": "TCP"
     }
   },
+  "domain_controller_to_proxy_rules": {
+    "TCP_4119": {
+      "from_port": 4119,
+      "to_port": 4119,
+      "protocol": "TCP"
+    }
+  },
   "equip_internal_rules": {
     "ICMP_ALL": {
       "from_port": -1,
