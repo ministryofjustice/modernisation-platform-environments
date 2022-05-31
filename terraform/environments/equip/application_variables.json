@@ -664,13 +664,6 @@
       "protocol": "TCP"
     }
   },
-  "equip_proxy_rules": {
-    "TCP_4119": {
-      "from_port": 4119,
-      "to_port": 4119,
-      "protocol": "TCP"
-    }
-  },
   "equip_to_spotfire_rules": {
     "TCP_80": {
       "from_port": 80,
@@ -686,6 +679,11 @@
       "from_port": 445,
       "to_port": 445,
       "protocol": "UDP"
+    },
+    "TCP_1433": {
+      "from_port": 1433,
+      "to_port": 1433,
+      "protocol": "TCP"
     },
     "ICMP_ALL": {
       "from_port": -1,
@@ -895,6 +893,11 @@
     "TCP_443": {
       "from_port": 443,
       "to_port": 443,
+      "protocol": "TCP"
+    },
+    "TCP_4119": {
+      "from_port": 4119,
+      "to_port": 4119,
       "protocol": "TCP"
     },
     "TCP_4952-65535": {
