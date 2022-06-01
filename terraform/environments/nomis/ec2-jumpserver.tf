@@ -12,11 +12,11 @@ data "aws_subnet" "private_az_a" {
 
 data "aws_ami" "jumpserver_image" {
   most_recent = true
-  owners      = ["${local.environment_management.account_ids["core-shared-services-production"]}"]
+  owners      = ["801119661308"] # Microsoft
 
   filter {
     name   = "name"
-    values = ["mp_WindowsServer2022_2022-05-01*"]
+    values = ["Windows_Server-2022-English-Full-Base-*"]
   }
 
   filter {
