@@ -1,3 +1,17 @@
+resource "aws_ec2_subnet_cidr_reservation" "vip-reservation" {
+  provider         = aws.core-vpc
+  cidr_block       = cidrsubnet(data.aws_subnet.public_subnet_a.cidr_block, 5, 30)
+  reservation_type = "prefix"
+  subnet_id        = data.aws_subnet.public_subnet_a.id
+}
+
+resource "aws_ec2_subnet_cidr_reservation" "snip-reservation" {
+  provider         = aws.core-vpc
+  cidr_block       = cidrsubnet(data.aws_subnet.private_subnet_a.cidr_block, 6, 62)
+  reservation_type = "prefix"
+  subnet_id        = data.aws_subnet.private_subnet_a.id
+}
+
 resource "aws_instance" "citrix_adc_instance" {
   depends_on           = [aws_network_interface.adc_mgmt_interface]
   ami                  = "ami-0dd0aa051b3fc4e4b"
