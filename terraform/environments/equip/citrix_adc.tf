@@ -64,12 +64,12 @@ resource "aws_network_interface" "adc_mgmt_interface" {
 }
 
 resource "aws_network_interface" "adc_vip_interface" {
-  depends_on = [aws_ec2_subnet_cidr_reservation.vip-reservation]
+  depends_on              = [aws_ec2_subnet_cidr_reservation.vip-reservation]
   private_ip_list_enabled = true
   private_ip_list = [
     cidrhost(aws_ec2_subnet_cidr_reservation.vip-reservation.cidr_block, 0),
     cidrhost(aws_ec2_subnet_cidr_reservation.vip-reservation.cidr_block, 1),
-]
+  ]
   security_groups   = [aws_security_group.citrix_adc_vip.id]
   source_dest_check = false
   subnet_id         = data.aws_subnet.public_subnet_a.id
@@ -87,14 +87,14 @@ resource "aws_network_interface" "adc_vip_interface" {
 }
 
 resource "aws_network_interface" "adc_snip_interface" {
-  depends_on = [aws_ec2_subnet_cidr_reservation.snip-reservation]
+  depends_on              = [aws_ec2_subnet_cidr_reservation.snip-reservation]
   private_ip_list_enabled = true
   private_ip_list = [
     cidrhost(aws_ec2_subnet_cidr_reservation.snip-reservation.cidr_block, 0),
     cidrhost(aws_ec2_subnet_cidr_reservation.snip-reservation.cidr_block, 1),
     cidrhost(aws_ec2_subnet_cidr_reservation.snip-reservation.cidr_block, 2),
     cidrhost(aws_ec2_subnet_cidr_reservation.snip-reservation.cidr_block, 3),
-]
+  ]
   security_groups   = [aws_security_group.citrix_adc_snip.id]
   source_dest_check = false
   subnet_id         = data.aws_subnet.private_subnet_a.id
