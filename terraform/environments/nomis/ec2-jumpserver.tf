@@ -45,6 +45,7 @@ resource "aws_instance" "jumpserver_windows" {
   subnet_id                   = data.aws_subnet.private_az_a.id
   key_name                    = aws_key_pair.ec2-user.key_name
   user_data                   = data.template_file.user_data.rendered
+  user_data_replace_on_change = true
   metadata_options {
     http_endpoint = "enabled"
     http_tokens   = "required"
@@ -145,12 +146,46 @@ resource "aws_ssm_parameter" "webops" {
   )
 }
 
+# put in secret manager
+resource "aws_secretsmanager_secret" "webops" {
+  name = "/Jumpserver/Users/WebOps"
+  policy = data.aws_iam_policy_document.webops_secret.json
+  tags = merge(
+    local.tags,
+    {
+      Name = "jumpserver-webops-password"
+    },
+  )
+}
+
+data "aws_iam_policy_document" "webops_secret" {
+  statement {
+    effect    = "Allow"
+    actions   = ["secretsmanager:GetSecretValue"]
+    resources = ["*"]
+    principals {
+      type = "AWS"
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.id}:role/${aws_iam_role.ec2_jumpserver_role.name}"]
+    }
+  }
+}
+
+resource "aws_secretsmanager_secret_version" "webops" {
+  secret_id     = aws_secretsmanager_secret.webops.id
+  secret_string = random_password.webops.result
+}
+
 # permissions to retrieve it
 data "aws_iam_policy_document" "webops" {
   statement {
     effect    = "Allow"
     actions   = ["ssm:GetParameter"]
     resources = ["arn:aws:ssm:${local.region}:${data.aws_caller_identity.current.id}:parameter${aws_ssm_parameter.webops.name}"]
+  }
+  statement {
+    effect    = "Allow"
+    actions   = ["secretsmanager:GetSecretValue"]
+    resources = ["arn:aws:secretsmanager:${local.region}:${data.aws_caller_identity.current.id}:secret:${aws_secretsmanager_secret.webops.name}"]
   }
 }
 
