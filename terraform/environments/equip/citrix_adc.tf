@@ -39,7 +39,7 @@ resource "aws_instance" "citrix_adc_instance" {
 
 resource "aws_network_interface" "adc_mgmt_interface" {
   security_groups   = [aws_security_group.citrix_adc_mgmt.id]
-  source_dest_check = true
+  source_dest_check = false
   subnet_id         = data.aws_subnet.data_subnet_a.id
 
   tags = merge(local.tags,
