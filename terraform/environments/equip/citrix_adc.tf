@@ -1,10 +1,15 @@
 resource "aws_instance" "citrix_adc_instance" {
-  ami                    = "ami-0dd0aa051b3fc4e4b"
-  instance_type          = "m5.xlarge"
-  key_name               = aws_key_pair.windowskey.key_name
-  iam_instance_profile   = aws_iam_instance_profile.instance-profile-moj.name
-  monitoring             = true
-  ebs_optimized          = true
+  ami                  = "ami-0dd0aa051b3fc4e4b"
+  instance_type        = "m5.xlarge"
+  key_name             = aws_key_pair.windowskey.key_name
+  iam_instance_profile = aws_iam_instance_profile.instance-profile-moj.name
+  monitoring           = true
+  ebs_optimized        = true
+
+  network_interface {
+    network_interface_id = aws_network_interface.adc_mgmt_interface.id
+    device_index         = 0
+  }
 
 
   root_block_device {
@@ -36,11 +41,6 @@ resource "aws_network_interface" "adc_mgmt_interface" {
   security_groups   = [aws_security_group.citrix_adc_mgmt.id]
   source_dest_check = false
   subnet_id         = data.aws_subnet.data_subnet_a.id
-
-  attachment {
-    device_index = 0
-    instance     = aws_instance.citrix_adc_instance.id
-  }
 
   tags = merge(local.tags,
     { Name = "ENI-NPS-COR-A-ADC01_MGMT"
