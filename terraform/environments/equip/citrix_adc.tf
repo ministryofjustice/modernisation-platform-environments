@@ -1,5 +1,6 @@
 resource "aws_instance" "citrix_adc_instance" {
   ami                  = "ami-0dd0aa051b3fc4e4b"
+  availability_zone    = format("%sa", local.region)
   instance_type        = "m5.xlarge"
   key_name             = aws_key_pair.windowskey.key_name
   iam_instance_profile = aws_iam_instance_profile.instance-profile-moj.name
@@ -10,7 +11,6 @@ resource "aws_instance" "citrix_adc_instance" {
     network_interface_id = aws_network_interface.adc_mgmt_interface.id
     device_index         = 0
   }
-
 
   root_block_device {
     encrypted   = true
