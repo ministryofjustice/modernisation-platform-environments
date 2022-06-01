@@ -29,8 +29,8 @@ data "aws_ami" "jumpserver_image" {
 data "template_file" "user_data" {
   template = file("./templates/jumpserver-user-data.yaml")
   vars = {
-    WEBOPS_PASSWORD  = aws_ssm_parameter.webops.name
-    S3_BUCKET = module.s3-bucket.bucket.id
+    WEBOPS_PASSWORD = aws_ssm_parameter.webops.name
+    S3_BUCKET       = module.s3-bucket.bucket.id
   }
 }
 
@@ -148,7 +148,7 @@ resource "aws_ssm_parameter" "webops" {
 
 # put in secret manager
 resource "aws_secretsmanager_secret" "webops" {
-  name = "/Jumpserver/Users/WebOps"
+  name   = "/Jumpserver/Users/WebOps"
   policy = data.aws_iam_policy_document.webops_secret.json
   tags = merge(
     local.tags,
@@ -164,7 +164,7 @@ data "aws_iam_policy_document" "webops_secret" {
     actions   = ["secretsmanager:GetSecretValue"]
     resources = ["*"]
     not_principals {
-      type = "AWS"
+      type        = "AWS"
       identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.id}:role/${aws_iam_role.ec2_jumpserver_role.name}"]
     }
   }
