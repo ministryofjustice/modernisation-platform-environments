@@ -29,8 +29,8 @@ data "aws_ami" "jumpserver_image" {
 data "template_file" "user_data" {
   template = file("./templates/jumpserver-user-data.yaml")
   vars = {
-    WEBOPS_PASSWORD  = aws_ssm_parameter.webops.name
-    S3_BUCKET = module.s3-bucket.bucket.id
+    WEBOPS_PASSWORD = aws_ssm_parameter.webops.name
+    S3_BUCKET       = module.s3-bucket.bucket.id
   }
 }
 
