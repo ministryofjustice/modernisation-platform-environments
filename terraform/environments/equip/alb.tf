@@ -17,7 +17,7 @@ resource "aws_lb" "citrix_alb" {
   name               = format("alb-%s-%s-citrix", local.application_name, local.environment)
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb_sg.id]
-  subnets            = [data.aws_subnet.public_az_a.id, data.aws_subnet.public_az_b.id]
+  subnets            = [data.aws_subnet.public_subnet_a.id, data.aws_subnet.public_subnet_b.id]
 
   enable_deletion_protection = true
   drop_invalid_header_fields = true
