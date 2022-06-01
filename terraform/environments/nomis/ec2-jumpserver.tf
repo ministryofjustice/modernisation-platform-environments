@@ -133,7 +133,7 @@ resource "random_password" "webops" {
 
 # put in parameter store
 resource "aws_ssm_parameter" "webops" {
-  name        = "/jumpserver/WebOps"
+  name        = "/Jumpserver/Users/WebOps"
   description = "Jumpserver password for WebOps user"
   type        = "SecureString"
   value       = random_password.webops.result
@@ -164,8 +164,11 @@ data "aws_iam_policy_document" "webops_secret" {
     actions   = ["secretsmanager:GetSecretValue"]
     resources = ["*"]
     not_principals {
-      type        = "AWS"
-      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.id}:role/${aws_iam_role.ec2_jumpserver_role.name}"]
+      type = "AWS"
+      identifiers = [
+        "arn:aws:sts::${data.aws_caller_identity.current.id}:assumed-role/${aws_iam_role.ec2_jumpserver_role.name}/${aws_instance.jumpserver_windows.id}",
+        "arn:aws:sts::${data.aws_caller_identity.current.id}:assumed-role/AWSReservedSSO_modernisation-platform-developer*"
+      ]
     }
   }
 }
