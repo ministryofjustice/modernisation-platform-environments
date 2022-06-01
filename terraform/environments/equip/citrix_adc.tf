@@ -1,11 +1,12 @@
 resource "aws_instance" "citrix_adc_instance" {
-  ami                  = "ami-0dd0aa051b3fc4e4b"
-  availability_zone    = format("%sa", local.region)
-  instance_type        = "m5.xlarge"
-  key_name             = aws_key_pair.windowskey.key_name
-  iam_instance_profile = aws_iam_instance_profile.instance-profile-moj.name
-  monitoring           = true
-  ebs_optimized        = true
+  depends_on                  = [aws_network_interface.adc_mgmt_interface]
+  ami                         = "ami-0dd0aa051b3fc4e4b"
+  availability_zone           = format("%sa", local.region)
+  instance_type               = "m5.xlarge"
+  key_name                    = aws_key_pair.windowskey.key_name
+  iam_instance_profile        = aws_iam_instance_profile.instance-profile-moj.name
+  monitoring                  = true
+  ebs_optimized               = true
 
   network_interface {
     network_interface_id = aws_network_interface.adc_mgmt_interface.id
@@ -34,12 +35,11 @@ resource "aws_instance" "citrix_adc_instance" {
       Role = "Citrix Netscaler ADC VPX"
     }
   )
-
 }
 
 resource "aws_network_interface" "adc_mgmt_interface" {
   security_groups   = [aws_security_group.citrix_adc_mgmt.id]
-  source_dest_check = false
+  source_dest_check = true
   subnet_id         = data.aws_subnet.data_subnet_a.id
 
   tags = merge(local.tags,
@@ -47,7 +47,6 @@ resource "aws_network_interface" "adc_mgmt_interface" {
       ROLE = "Citrix Netscaler ADC VPX MGMT Interface"
     }
   )
-
 }
 
 resource "aws_network_interface" "adc_vip_interface" {
@@ -65,7 +64,6 @@ resource "aws_network_interface" "adc_vip_interface" {
       ROLE = "Citrix Netscaler ADC VPX VIP Interface"
     }
   )
-
 }
 
 resource "aws_network_interface" "adc_snip_interface" {
@@ -83,5 +81,4 @@ resource "aws_network_interface" "adc_snip_interface" {
       ROLE = "Citrix Netscaler ADC VPX SNIP Interface"
     }
   )
-
 }
