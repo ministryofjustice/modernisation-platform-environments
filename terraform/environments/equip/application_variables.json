@@ -171,8 +171,8 @@
       "protocol": "TCP"
     },
     "TCP_2598": {
-      "from_port": 80,
-      "to_port": 80,
+      "from_port": 2598,
+      "to_port": 2598,
       "protocol": "TCP"
     }
   },
@@ -193,8 +193,8 @@
       "protocol": "TCP"
     },
     "TCP_2598": {
-      "from_port": 80,
-      "to_port": 80,
+      "from_port": 2598,
+      "to_port": 2598,
       "protocol": "TCP"
     }},
   "ctx_to_spotfire_rules": {
