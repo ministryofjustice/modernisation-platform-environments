@@ -160,10 +160,10 @@ resource "aws_secretsmanager_secret" "webops" {
 
 data "aws_iam_policy_document" "webops_secret" {
   statement {
-    effect    = "Allow"
+    effect    = "Deny"
     actions   = ["secretsmanager:GetSecretValue"]
     resources = ["*"]
-    principals {
+    not_principals {
       type = "AWS"
       identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.id}:role/${aws_iam_role.ec2_jumpserver_role.name}"]
     }
