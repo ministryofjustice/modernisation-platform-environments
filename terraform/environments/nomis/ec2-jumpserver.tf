@@ -126,7 +126,7 @@ resource "aws_iam_instance_profile" "ec2_jumpserver_profile" {
 }
 
 locals {
-  jumpserver_users = [
+  jumpserver_users = [ # must be github username
     "rwhittlemoj",
     "julialawrence",
     "ewastempel"
