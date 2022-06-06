@@ -30,7 +30,7 @@ data "template_file" "user_data" {
   template = file("./templates/jumpserver-user-data.yaml")
   vars = {
     # WEBOPS_PASSWORD = aws_ssm_parameter.webops.name
-    S3_BUCKET       = module.s3-bucket.bucket.id
+    S3_BUCKET = module.s3-bucket.bucket.id
   }
 }
 
@@ -136,8 +136,8 @@ locals {
 # Create password for each user
 resource "random_password" "jumpserver_users" {
   for_each = toset(local.jumpserver_users)
-  length  = 32
-  special = true
+  length   = 32
+  special  = true
 }
 
 # put in parameter store
@@ -158,7 +158,7 @@ resource "random_password" "jumpserver_users" {
 # put in secret manager
 resource "aws_secretsmanager_secret" "jumpserver_users" {
   for_each = toset(local.jumpserver_users)
-  name   = "/Jumpserver/Users/${each.value}"
+  name     = "/Jumpserver/Users/${each.value}"
   # policy = data.aws_iam_policy_document.jumpserver_users.json
   tags = merge(
     local.tags,
@@ -185,7 +185,7 @@ data "aws_iam_policy_document" "jumpserver_secrets" {
 }
 
 resource "aws_secretsmanager_secret_version" "jumpserver_users" {
-  for_each = toset(local.jumpserver_users)
+  for_each      = toset(local.jumpserver_users)
   secret_id     = aws_secretsmanager_secret.jumpserver_users[each.value].id
   secret_string = random_password.jumpserver_users[each.value].result
 }
