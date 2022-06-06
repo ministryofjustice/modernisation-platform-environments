@@ -48,9 +48,9 @@ tasks:
       Set-WinSystemLocale "en-GB"
       
       # Add a user
-      $password = ConvertTo-SecureString $(Get-SSMParameter -Name "${WEBOPS_PASSWORD}" -WithDecryption 1 -Select Parameter.Value) -AsPlainText -Force 
-      New-LocalUser "WebOps" -Password $password -FullName "WebOps"
-      Add-LocalGroupMember -Group "Remote Desktop Users" -Member "WebOps"
+      # $password = ConvertTo-SecureString $(Get-SSMParameter -Name "WEBOPS_PASSWORD" -WithDecryption 1 -Select Parameter.Value) -AsPlainText -Force 
+      # New-LocalUser "WebOps" -Password $password -FullName "WebOps"
+      # Add-LocalGroupMember -Group "Remote Desktop Users" -Member "WebOps"
 
-      # Disable Administrator
-      Disable-LocalUser -Name "Administrator"
+      # # Disable Administrator
+      # Disable-LocalUser -Name "Administrator"
