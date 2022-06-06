@@ -29,14 +29,14 @@ data "aws_ami" "jumpserver_image" {
 data "template_file" "user_data" {
   template = file("./templates/jumpserver-user-data.yaml")
   vars = {
-    WEBOPS_PASSWORD = aws_ssm_parameter.webops.name
+    # WEBOPS_PASSWORD = aws_ssm_parameter.webops.name
     S3_BUCKET       = module.s3-bucket.bucket.id
   }
 }
 
 resource "aws_instance" "jumpserver_windows" {
   instance_type               = "t3.medium"
-  ami                         = data.aws_ami.jumpserver_image.id
+  ami                         = "ami-0e5bdd429f857895a" #data.aws_ami.jumpserver_image.id
   associate_public_ip_address = false
   iam_instance_profile        = aws_iam_instance_profile.ec2_jumpserver_profile.id
   ebs_optimized               = true
@@ -45,7 +45,7 @@ resource "aws_instance" "jumpserver_windows" {
   subnet_id                   = data.aws_subnet.private_az_a.id
   key_name                    = aws_key_pair.ec2-user.key_name
   user_data                   = data.template_file.user_data.rendered
-  user_data_replace_on_change = true
+  user_data_replace_on_change = false
   metadata_options {
     http_endpoint = "enabled"
     http_tokens   = "required"
@@ -125,78 +125,96 @@ resource "aws_iam_instance_profile" "ec2_jumpserver_profile" {
   path = "/"
 }
 
-# Create password for WebOps user
-resource "random_password" "webops" {
+locals {
+  jumpserver_users = [
+    "rwhittlemoj",
+    "julialawrence",
+    "ewastempel"
+  ]
+}
+
+# Create password for each user
+resource "random_password" "jumpserver_users" {
+  for_each = toset(local.jumpserver_users)
   length  = 32
   special = true
 }
 
 # put in parameter store
-resource "aws_ssm_parameter" "webops" {
-  name        = "/Jumpserver/Users/WebOps"
-  description = "Jumpserver password for WebOps user"
-  type        = "SecureString"
-  value       = random_password.webops.result
+# resource "aws_ssm_parameter" "webops" {
+#   name        = "/Jumpserver/Users/WebOps"
+#   description = "Jumpserver password for WebOps user"
+#   type        = "SecureString"
+#   value       = random_password.webops.result
 
-  tags = merge(
-    local.tags,
-    {
-      Name = "jumpserver-webops-password"
-    }
-  )
-}
+#   tags = merge(
+#     local.tags,
+#     {
+#       Name = "jumpserver-webops-password"
+#     }
+#   )
+# }
 
 # put in secret manager
-resource "aws_secretsmanager_secret" "webops" {
-  name   = "/Jumpserver/Users/WebOps"
-  policy = data.aws_iam_policy_document.webops_secret.json
+resource "aws_secretsmanager_secret" "jumpserver_users" {
+  for_each = toset(local.jumpserver_users)
+  name   = "/Jumpserver/Users/${each.value}"
+  # policy = data.aws_iam_policy_document.jumpserver_users[each.value].json
   tags = merge(
     local.tags,
     {
-      Name = "jumpserver-webops-password"
+      Name = "jumpserver-user-${each.value}"
     },
   )
 }
 
-data "aws_iam_policy_document" "webops_secret" {
+data "aws_iam_policy_document" "jumpserver_secrets" {
+  for_each = toset(local.jumpserver_users)
   statement {
     effect    = "Deny"
-    actions   = ["secretsmanager:GetSecretValue"]
+    actions   = ["secretsmanager:*"]
     resources = ["*"]
     not_principals {
       type = "AWS"
       identifiers = [
         "arn:aws:sts::${data.aws_caller_identity.current.id}:assumed-role/${aws_iam_role.ec2_jumpserver_role.name}/${aws_instance.jumpserver_windows.id}",
-        "arn:aws:sts::${data.aws_caller_identity.current.id}:assumed-role/AWSReservedSSO_modernisation-platform-developer*"
+        "arn:aws:sts::${data.aws_caller_identity.current.id}:assumed-role/AWSReservedSSO_modernisation-platform-developer_*/${each.value}*",
+        "arn:aws:sts::${data.aws_caller_identity.current.id}:assumed-role/MemberInfrastructureAccess/*" # so terraform can wrangle it
       ]
     }
   }
 }
 
-resource "aws_secretsmanager_secret_version" "webops" {
-  secret_id     = aws_secretsmanager_secret.webops.id
-  secret_string = random_password.webops.result
+resource "aws_secretsmanager_secret_version" "jumpserver_users" {
+  for_each = toset(local.jumpserver_users)
+  secret_id     = aws_secretsmanager_secret.jumpserver_users[each.value].id
+  secret_string = random_password.jumpserver_users[each.value].result
 }
 
 # permissions to retrieve it
-data "aws_iam_policy_document" "webops" {
-  statement {
-    effect    = "Allow"
-    actions   = ["ssm:GetParameter"]
-    resources = ["arn:aws:ssm:${local.region}:${data.aws_caller_identity.current.id}:parameter${aws_ssm_parameter.webops.name}"]
-  }
+data "aws_iam_policy_document" "jumpserver_users" {
+  # statement {
+  #   effect    = "Allow"
+  #   actions   = ["ssm:GetParameter"]
+  #   resources = ["arn:aws:ssm:${local.region}:${data.aws_caller_identity.current.id}:parameter${aws_ssm_parameter.jumpserver_users.name}"]
+  # }
   statement {
     effect    = "Allow"
     actions   = ["secretsmanager:GetSecretValue"]
-    resources = ["arn:aws:secretsmanager:${local.region}:${data.aws_caller_identity.current.id}:secret:${aws_secretsmanager_secret.webops.name}"]
+    resources = ["arn:aws:secretsmanager:${local.region}:${data.aws_caller_identity.current.id}:secret:/Jumpserver/Users/*"]
+  }
+  statement {
+    effect    = "Allow"
+    actions   = ["secretsmanager:ListSecrets"]
+    resources = ["arn:aws:secretsmanager:${local.region}:${data.aws_caller_identity.current.id}:secret:/Jumpserver/Users/*"]
   }
 }
 
 # Add policy to role
-resource "aws_iam_role_policy" "webops" {
-  name   = "asm-parameter-access-webops"
+resource "aws_iam_role_policy" "jumpserver_users" {
+  name   = "asm-parameter-access-jumpserver-users"
   role   = aws_iam_role.ec2_jumpserver_role.id
-  policy = data.aws_iam_policy_document.webops.json
+  policy = data.aws_iam_policy_document.jumpserver_users.json
 }
 
 
