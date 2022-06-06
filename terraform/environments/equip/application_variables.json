@@ -80,8 +80,8 @@
   },
   "adc-snip_to_equip_rules": {
     "TCP_80": {
-      "from_port": 443,
-      "to_port": 443,
+      "from_port": 80,
+      "to_port": 80,
       "protocol": "TCP"
     },
     "TCP_443": {
