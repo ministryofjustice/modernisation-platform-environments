@@ -29,14 +29,14 @@ data "aws_ami" "jumpserver_image" {
 data "template_file" "user_data" {
   template = file("./templates/jumpserver-user-data.yaml")
   vars = {
-    # WEBOPS_PASSWORD = aws_ssm_parameter.webops.name
-    S3_BUCKET = module.s3-bucket.bucket.id
+    SECRET_PREFIX = local.secret_prefix
+    S3_BUCKET     = module.s3-bucket.bucket.id
   }
 }
 
 resource "aws_instance" "jumpserver_windows" {
   instance_type               = "t3.medium"
-  ami                         = "ami-0e5bdd429f857895a" #data.aws_ami.jumpserver_image.id
+  ami                         = data.aws_ami.jumpserver_image.id
   associate_public_ip_address = false
   iam_instance_profile        = aws_iam_instance_profile.ec2_jumpserver_profile.id
   ebs_optimized               = true
@@ -45,7 +45,7 @@ resource "aws_instance" "jumpserver_windows" {
   subnet_id                   = data.aws_subnet.private_az_a.id
   key_name                    = aws_key_pair.ec2-user.key_name
   user_data                   = data.template_file.user_data.rendered
-  user_data_replace_on_change = false
+  user_data_replace_on_change = true
   metadata_options {
     http_endpoint = "enabled"
     http_tokens   = "required"
@@ -131,6 +131,7 @@ locals {
     "julialawrence",
     "ewastempel"
   ]
+  secret_prefix = "/Jumpserver/Users"
 }
 
 # Create password for each user
@@ -158,7 +159,7 @@ resource "random_password" "jumpserver_users" {
 # put in secret manager
 resource "aws_secretsmanager_secret" "jumpserver_users" {
   for_each = toset(local.jumpserver_users)
-  name     = "/Jumpserver/Users/${each.value}"
+  name     = "${local.secret_prefix}/${each.value}"
   # policy = data.aws_iam_policy_document.jumpserver_users[each.value].json
   tags = merge(
     local.tags,
@@ -201,7 +202,7 @@ data "aws_iam_policy_document" "jumpserver_users" {
   statement {
     effect    = "Allow"
     actions   = ["secretsmanager:GetSecretValue"]
-    resources = ["arn:aws:secretsmanager:${local.region}:${data.aws_caller_identity.current.id}:secret:/Jumpserver/Users/*"]
+    resources = ["arn:aws:secretsmanager:${local.region}:${data.aws_caller_identity.current.id}:secret:${local.secret_prefix}/*"]
   }
   statement {
     effect    = "Allow"
