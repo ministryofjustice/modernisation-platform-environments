@@ -88,12 +88,22 @@
       "from_port": 443,
       "to_port": 443,
       "protocol": "TCP"
+    },
+    "TCP_8080": {
+      "from_port": 8080,
+      "to_port": 8080,
+      "protocol": "TCP"
     }
   },
   "adc-snip_to_spotfire_rules": {
     "TCP_443": {
       "from_port": 443,
       "to_port": 443,
+      "protocol": "TCP"
+    },
+    "TCP_8080": {
+      "from_port": 8080,
+      "to_port": 8080,
       "protocol": "TCP"
     }
   },
