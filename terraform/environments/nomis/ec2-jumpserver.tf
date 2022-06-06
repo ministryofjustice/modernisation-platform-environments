@@ -1,8 +1,15 @@
 #------------------------------------------------------------------------------
 # Windows Jumpserver
-# TODO: once we have an AMI in prod everything can be uncommented.  I've not
-# uncommented the security group as its references elsewhere
 #------------------------------------------------------------------------------
+
+locals {
+  jumpserver_users = [ # must be github username
+    "rwhittlemoj",
+    "julialawrence",
+    "ewastempel"
+  ]
+  secret_prefix = "/Jumpserver/Users"
+}
 
 data "aws_subnet" "private_az_a" {
   tags = {
@@ -123,15 +130,6 @@ resource "aws_iam_instance_profile" "ec2_jumpserver_profile" {
   name = "ec2-jumpserver-profile"
   role = aws_iam_role.ec2_jumpserver_role.name
   path = "/"
-}
-
-locals {
-  jumpserver_users = [ # must be github username
-    "rwhittlemoj",
-    "julialawrence",
-    "ewastempel"
-  ]
-  secret_prefix = "/Jumpserver/Users"
 }
 
 # Create password for each user

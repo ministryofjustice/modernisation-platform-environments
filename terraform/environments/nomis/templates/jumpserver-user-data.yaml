@@ -7,7 +7,7 @@ tasks:
   inputs:
   - frequency: once
     type: powershell
-    runAs: localSystem
+    runAs: admin
     content: |
       # Download/Install Java
       Read-S3Object -BucketName ${S3_BUCKET} -Key jumpserver-software/jre-6u33-windows-i586.exe -File C:\jumpserver-software\jre-6u33-windows-i586.exe
@@ -47,13 +47,7 @@ tasks:
       # Set timezone
       Set-TimeZone "GMT Standard Time"
       Set-WinSystemLocale "en-GB"
-
-- task: executeScript
-  inputs:  
-  - frequency: once
-    type: powershell
-    runAs: admin
-    content: |      
+   
       # Scheduled job to add new users - jobs can be found under Task Scheduler -> Powershell -> ScheduledJobs
       $add_users = '
       $secret_prefix = "${SECRET_PREFIX}/"
