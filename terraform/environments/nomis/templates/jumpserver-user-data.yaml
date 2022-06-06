@@ -1,5 +1,6 @@
 # This is an EC2Launch V2 type user-data script
-# https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2launch-v2.html
+# https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2launch-v2-settings.html#ec2launch-v2-task-configuration
+# See C:\ProgramData\Amazon\EC2Launch\log for logs
 version: 1.0
 tasks:
 - task: executeScript
@@ -46,10 +47,12 @@ tasks:
       # Set timezone
       Set-TimeZone "GMT Standard Time"
       Set-WinSystemLocale "en-GB"
-      
-      # Scheduled job to add new users
-      Import-Module PSScheduledJob
-
+  
+  - frequency: once
+    type: powershell
+    runAs: Administrator
+    content: |      
+      # Scheduled job to add new users - jobs can be found under Task Scheduler -> Powershell -> ScheduledJobs
       $add_users = '
       $secret_prefix = "${SECRET_PREFIX}"
 
@@ -58,8 +61,13 @@ tasks:
       foreach($secret in $secrets){
           $username = $secret.Name.SubString($secret_prefix.Length)
           $password = ConvertTo-SecureString $(Get-SECSecretValue -SecretId $secret.ARN -Select SecretString) -AsPlainText -Force
-          New-LocalUser $username -Password $password -FullName $username
-          Add-LocalGroupMember -Group "Remote Desktop Users" -Member $username
+          
+          $user_exists = Get-LocalUser $username -ErrorAction SilentlyContinue
+
+          if ($user_exists -eq $null) {
+              New-LocalUser $username -Password $password -FullName $username
+              Add-LocalGroupMember -Group "Remote Desktop Users" -Member $username
+          }
       }
       '
 
