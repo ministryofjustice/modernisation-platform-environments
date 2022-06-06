@@ -120,6 +120,23 @@
       "protocol": "TCP"
     }
   },
+  "adc-vip_to_domain_controller_rules": {
+    "TCP_389": {
+      "from_port": 389,
+      "to_port": 389,
+      "protocol": "TCP"
+    },
+    "UDP_389": {
+      "from_port": 389,
+      "to_port": 389,
+      "protocol": "UDP"
+    },
+    "TCP_636": {
+      "from_port": 636,
+      "to_port": 636,
+      "protocol": "TCP"
+    }
+  },
   "ctx_to_adc-mgmt_rules": {
     "TCP_22": {
       "from_port": 22,
@@ -137,6 +154,49 @@
       "protocol": "TCP"
     }
   },
+  "ctx_to_adc-snip_rules": {
+    "TCP_80": {
+      "from_port": 80,
+      "to_port": 80,
+      "protocol": "TCP"
+    },
+    "TCP_443": {
+      "from_port": 443,
+      "to_port": 443,
+      "protocol": "TCP"
+    },
+    "TCP_1494": {
+      "from_port": 1494,
+      "to_port": 1494,
+      "protocol": "TCP"
+    },
+    "TCP_2598": {
+      "from_port": 2598,
+      "to_port": 2598,
+      "protocol": "TCP"
+    }
+  },
+  "ctx_to_adc-vip_rules": {
+    "TCP_80": {
+      "from_port": 80,
+      "to_port": 80,
+      "protocol": "TCP"
+    },
+    "TCP_443": {
+      "from_port": 443,
+      "to_port": 443,
+      "protocol": "TCP"
+    },
+    "TCP_1494": {
+      "from_port": 1494,
+      "to_port": 1494,
+      "protocol": "TCP"
+    },
+    "TCP_2598": {
+      "from_port": 2598,
+      "to_port": 2598,
+      "protocol": "TCP"
+    }},
   "ctx_to_spotfire_rules": {
     "ICMP_ALL": {
       "from_port": -1,
