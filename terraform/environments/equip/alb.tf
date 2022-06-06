@@ -83,13 +83,13 @@ resource "aws_lb_target_group" "lb_tg_https" {
 
 resource "aws_lb_target_group_attachment" "lb_tga_80" {
   target_group_arn = aws_lb_target_group.lb_tg_http.arn
-  target_id        = aws_network_interface.adc_vip_interface.private_ip
+  target_id        = aws_network_interface.adc_vip_interface.private_ip_list[0]
   port             = 80
 }
 
 resource "aws_lb_target_group_attachment" "lb_tga_443" {
   target_group_arn = aws_lb_target_group.lb_tg_http.arn
-  target_id        = aws_network_interface.adc_vip_interface.private_ip
+  target_id        = aws_network_interface.adc_vip_interface.private_ip_list[0]
   port             = 443
 }
 
