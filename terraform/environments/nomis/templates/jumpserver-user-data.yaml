@@ -17,8 +17,11 @@ tasks:
       Read-S3Object -BucketName ${S3_BUCKET} -Key jumpserver-software/deployment.config -File C:\Windows\Sun\Java\Deployment\deployment.config
       Read-S3Object -BucketName ${S3_BUCKET} -Key jumpserver-software/deployment.properties -File C:\Windows\Sun\Java\Deployment\deployment.properties
       
+      # Prevent Java update notifications
+      Remove-ItemProperty -Path "HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Run" -Name SunJavaUpdateSched -Force 
+ 
       # Add Nomis sites to trusted sites
-       $sites = @(
+      $sites = @(
           "*.nomis.hmpps-test.modernisation-platform.internal"
           "*.nomis.hmpps-test.modernisation-platform.justice.gov.uk"
           "*.nomis.hmpps-production.modernisation-platform.internal"
@@ -44,39 +47,40 @@ tasks:
       New-Item -Path $reg_path -Force
       New-ItemProperty -Path $reg_path -Name Security_HKLM_only -Value 1 -PropertyType DWORD -Force 
 
-      # Set timezone
+      # Set timezone and locale
       Set-TimeZone "GMT Standard Time"
       Set-WinSystemLocale "en-GB"
    
       # Scheduled job to add new users - jobs can be found under Task Scheduler -> Powershell -> ScheduledJobs
       $add_users = '      
-        Add-Type -AssemblyName 'System.Web' # used for generating random password
+        Add-Type -AssemblyName "System.Web" # used for generating random password
 
-        $secret_prefix = "${SECRET_PREFIX}/"
+        $secret_prefix = "${SECRET_PREFIX}/" # from Terraform templating
 
         $secrets = Get-SECSecretList -Filter @{Key="name";Values=$secret_prefix} 
 
         foreach($secret in $secrets){
-            $username = $secret.Name.SubString($secret_prefix.Length)          
+            $username = $secret.Name.SubString($secret_prefix.Length) # secrets are stored like /Jumpserver/Users/JoeBloggs, so trim prefix       
             $user_exists = Get-LocalUser $username -ErrorAction SilentlyContinue
 
             if ($user_exists -eq $null) {
                 # $password = ConvertTo-SecureString $(Get-SECSecretValue -SecretId $secret.ARN -Select SecretString) -AsPlainText -Force
                 
                 # create password and add to secret manager
-                $password = ConvertTo-SecureString -String $([System.Web.Security.Membership]::GeneratePassword(32,5)) -AsPlainText -Force 
+                $password = [System.Web.Security.Membership]::GeneratePassword(32,5) 
                 Write-SECSecretValue -SecretId $secret.ARN -SecretString $password
 
                 # Create user and add to RD group
-                New-LocalUser $username -Password $password -FullName $username
+                $secure_string = ConvertTo-SecureString -String $password -AsPlainText -Force
+                New-LocalUser $username -Password $secure_string -FullName $username
                 Add-LocalGroupMember -Group "Remote Desktop Users" -Member $username
             }
         }
       '
 
+      # add_user script is written to file and added as a recurring job
       $path = "C:\jumpserver-software\add_users.ps1"
-      $add_users > $path
-
+      $add_users > $path      
       Register-ScheduledJob -Name "add_users" -FilePath $path -RunEvery $(New-TimeSpan -Minutes 15) -RunNow 
 
       # # Disable Administrator
