@@ -143,7 +143,7 @@ resource "random_password" "jumpserver_users" {
 resource "aws_secretsmanager_secret" "jumpserver_users" {
   for_each = toset(local.jumpserver_users)
   name     = "${local.secret_prefix}/${each.value}"
-  policy   = data.aws_iam_policy_document.jumpserver_users[each.value].json
+  policy   = data.aws_iam_policy_document.jumpserver_secrets[each.value].json
   tags = merge(
     local.tags,
     {
