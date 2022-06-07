@@ -16,9 +16,6 @@ tasks:
       # Configure Java
       Read-S3Object -BucketName ${S3_BUCKET} -Key jumpserver-software/deployment.config -File C:\Windows\Sun\Java\Deployment\deployment.config
       Read-S3Object -BucketName ${S3_BUCKET} -Key jumpserver-software/deployment.properties -File C:\Windows\Sun\Java\Deployment\deployment.properties
-      
-      # Prevent Java update notifications
-      Remove-ItemProperty -Path "HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Run" -Name SunJavaUpdateSched -Force 
  
       # Add Nomis sites to trusted sites
       $sites = @(
