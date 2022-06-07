@@ -161,27 +161,21 @@ resource "aws_secretsmanager_secret_version" "jumpserver_users" {
 # resource policy to restrict access
 data "aws_iam_policy_document" "jumpserver_secrets" {
   for_each = toset(local.jumpserver_users)
-  # statement {
-  #   effect    = "Deny"
-  #   actions   = ["secretsmanager:*"]
-  #   resources = ["*"]
-  #   not_principals {
-  #     type = "AWS"
-  #     identifiers = [
-  #       "arn:aws:sts::${data.aws_caller_identity.current.id}:assumed-role/${aws_iam_role.ec2_jumpserver_role.name}/${aws_instance.jumpserver_windows.id}",
-  #       "arn:aws:sts::${data.aws_caller_identity.current.id}:assumed-role/AWSReservedSSO_modernisation-platform-developer_*/${each.value}*", # specific user
-  #       "arn:aws:sts::${data.aws_caller_identity.current.id}:assumed-role/MemberInfrastructureAccess/*"                                      # so terraform can wrangle it
-  #     ]
-  #   }
-  # }
   statement {
     effect    = "Allow"
     actions   = ["secretsmanager:*"]
     resources = ["*"]
-    not_principals {
-      type = "AWS"
-      identifiers = [
-        "arn:aws:sts::${data.aws_caller_identity.current.id}:assumed-role/AWSReservedSSO_modernisation-platform-developer_*/${each.value}*", # specific user
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+    condition {
+      test     = "StringNotLike"
+      variable = "aws:userid"
+      values = [
+        aws_iam_role.ec2_jumpserver_role.id,
+        "${each.value}@digital.justice.gov.uk", # specific user
+        # data.aws_iam_role.member_infrastructure_access.id # terraform CICD user
       ]
     }
   }
