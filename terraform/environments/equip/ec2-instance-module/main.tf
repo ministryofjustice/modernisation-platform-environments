@@ -4,6 +4,7 @@ locals {
 }
 #tfsec:ignore:aws-ec2-enable-at-rest-encryption
 resource "aws_instance" "this" {
+  lifecycle { ignore_changes = [ebs_block_device] }
 
   ami                  = var.ami
   instance_type        = var.instance_type
