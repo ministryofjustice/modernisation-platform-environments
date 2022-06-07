@@ -162,8 +162,8 @@ resource "aws_secretsmanager_secret_version" "jumpserver_users" {
 data "aws_iam_policy_document" "jumpserver_secrets" {
   for_each = toset(local.jumpserver_users)
   statement {
-    effect    = "Allow"
-    actions   = ["secretsmanager:*"]
+    effect    = "Deny"
+    actions   = ["secretsmanager:GetSecretValue"]
     resources = ["*"]
     principals {
       type        = "*"
@@ -173,9 +173,9 @@ data "aws_iam_policy_document" "jumpserver_secrets" {
       test     = "StringNotLike"
       variable = "aws:userid"
       values = [
-        aws_iam_role.ec2_jumpserver_role.id,
-        "${each.value}@digital.justice.gov.uk", # specific user
-        # data.aws_iam_role.member_infrastructure_access.id # terraform CICD user
+        "${aws_iam_role.ec2_jumpserver_role.id}:*",
+        "*:${each.value}@digital.justice.gov.uk",                # specific user
+        "${data.aws_iam_role.member_infrastructure_access.id}:*" # terraform CICD role
       ]
     }
   }
