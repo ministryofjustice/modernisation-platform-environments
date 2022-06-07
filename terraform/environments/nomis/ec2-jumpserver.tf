@@ -143,7 +143,7 @@ resource "random_password" "jumpserver_users" {
 resource "aws_secretsmanager_secret" "jumpserver_users" {
   for_each = toset(local.jumpserver_users)
   name     = "${local.secret_prefix}/${each.value}"
-  # policy = data.aws_iam_policy_document.jumpserver_users[each.value].json
+  policy   = data.aws_iam_policy_document.jumpserver_users[each.value].json
   tags = merge(
     local.tags,
     {
@@ -161,16 +161,27 @@ resource "aws_secretsmanager_secret_version" "jumpserver_users" {
 # resource policy to restrict access
 data "aws_iam_policy_document" "jumpserver_secrets" {
   for_each = toset(local.jumpserver_users)
+  # statement {
+  #   effect    = "Deny"
+  #   actions   = ["secretsmanager:*"]
+  #   resources = ["*"]
+  #   not_principals {
+  #     type = "AWS"
+  #     identifiers = [
+  #       "arn:aws:sts::${data.aws_caller_identity.current.id}:assumed-role/${aws_iam_role.ec2_jumpserver_role.name}/${aws_instance.jumpserver_windows.id}",
+  #       "arn:aws:sts::${data.aws_caller_identity.current.id}:assumed-role/AWSReservedSSO_modernisation-platform-developer_*/${each.value}*", # specific user
+  #       "arn:aws:sts::${data.aws_caller_identity.current.id}:assumed-role/MemberInfrastructureAccess/*"                                      # so terraform can wrangle it
+  #     ]
+  #   }
+  # }
   statement {
-    effect    = "Deny"
+    effect    = "Allow"
     actions   = ["secretsmanager:*"]
     resources = ["*"]
     not_principals {
       type = "AWS"
       identifiers = [
-        "arn:aws:sts::${data.aws_caller_identity.current.id}:assumed-role/${aws_iam_role.ec2_jumpserver_role.name}/${aws_instance.jumpserver_windows.id}",
         "arn:aws:sts::${data.aws_caller_identity.current.id}:assumed-role/AWSReservedSSO_modernisation-platform-developer_*/${each.value}*", # specific user
-        "arn:aws:sts::${data.aws_caller_identity.current.id}:assumed-role/MemberInfrastructureAccess/*"                                      # so terraform can wrangle it
       ]
     }
   }

@@ -11,12 +11,13 @@ tasks:
     content: |
       # Download/Install Java
       Read-S3Object -BucketName ${S3_BUCKET} -Key jumpserver-software/jre-6u33-windows-i586.exe -File C:\jumpserver-software\jre-6u33-windows-i586.exe
-      Start-Process -Wait -FilePath "C:\jumpserver-software\jre-6u33-windows-i586.exe" -ArgumentList "/qn", "/s", "/v" -PassThru
+      Start-Process -Wait -FilePath "C:\jumpserver-software\jre-6u33-windows-i586.exe" -ArgumentList "/qn", "/s", "/v" -PassThru -RedirectStandardOutput "C:\jumpserver-software\jre-install.log"
 
       # Configure Java
       Read-S3Object -BucketName ${S3_BUCKET} -Key jumpserver-software/deployment.config -File C:\Windows\Sun\Java\Deployment\deployment.config
       Read-S3Object -BucketName ${S3_BUCKET} -Key jumpserver-software/deployment.properties -File C:\Windows\Sun\Java\Deployment\deployment.properties
- 
+      Read-S3Object -BucketName ${S3_BUCKET} -Key jumpserver-software/trusted.certs -File C:\Windows\Sun\Java\Deployment\trusted.certs 
+   
       # Add Nomis sites to trusted sites
       $sites = @(
           "*.nomis.hmpps-test.modernisation-platform.internal"
@@ -47,6 +48,9 @@ tasks:
       # Set timezone and locale
       Set-TimeZone "GMT Standard Time"
       Set-WinSystemLocale "en-GB"
+
+      # Prevent Java update check
+      Remove-ItemProperty -Path "HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Run" -Name SunJavaUpdateSched -Force 
    
       # Scheduled job to add new users - jobs can be found under Task Scheduler -> Powershell -> ScheduledJobs
       $add_users = '      
