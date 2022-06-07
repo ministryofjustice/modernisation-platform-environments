@@ -23,7 +23,7 @@ data "aws_ami" "jumpserver_image" {
 
   filter {
     name   = "name"
-    values = ["Windows_Server-2022-English-Full-Base-*"]
+    values = ["Windows_Server-2019-English-Full-Base-2022.05.25"]
   }
 
   filter {
