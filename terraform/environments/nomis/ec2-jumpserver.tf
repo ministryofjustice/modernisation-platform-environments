@@ -170,7 +170,7 @@ data "aws_iam_policy_document" "jumpserver_secrets" {
       identifiers = [
         "arn:aws:sts::${data.aws_caller_identity.current.id}:assumed-role/${aws_iam_role.ec2_jumpserver_role.name}/${aws_instance.jumpserver_windows.id}",
         "arn:aws:sts::${data.aws_caller_identity.current.id}:assumed-role/AWSReservedSSO_modernisation-platform-developer_*/${each.value}*", # specific user
-        "arn:aws:sts::${data.aws_caller_identity.current.id}:assumed-role/MemberInfrastructureAccess/*" # so terraform can wrangle it
+        "arn:aws:sts::${data.aws_caller_identity.current.id}:assumed-role/MemberInfrastructureAccess/*"                                      # so terraform can wrangle it
       ]
     }
   }
