@@ -139,22 +139,7 @@ resource "random_password" "jumpserver_users" {
   special  = true
 }
 
-# put in parameter store
-# resource "aws_ssm_parameter" "webops" {
-#   name        = "/Jumpserver/Users/WebOps"
-#   description = "Jumpserver password for WebOps user"
-#   type        = "SecureString"
-#   value       = random_password.webops.result
-
-#   tags = merge(
-#     local.tags,
-#     {
-#       Name = "jumpserver-webops-password"
-#     }
-#   )
-# }
-
-# put in secret manager
+# create secret in secret manager
 resource "aws_secretsmanager_secret" "jumpserver_users" {
   for_each = toset(local.jumpserver_users)
   name     = "${local.secret_prefix}/${each.value}"
@@ -167,6 +152,13 @@ resource "aws_secretsmanager_secret" "jumpserver_users" {
   )
 }
 
+resource "aws_secretsmanager_secret_version" "jumpserver_users" {
+  for_each      = toset(local.jumpserver_users)
+  secret_id     = aws_secretsmanager_secret.jumpserver_users[each.value].id
+  secret_string = random_password.jumpserver_users[each.value].result
+}
+
+# resource policy to restrict access
 data "aws_iam_policy_document" "jumpserver_secrets" {
   for_each = toset(local.jumpserver_users)
   statement {
@@ -177,29 +169,18 @@ data "aws_iam_policy_document" "jumpserver_secrets" {
       type = "AWS"
       identifiers = [
         "arn:aws:sts::${data.aws_caller_identity.current.id}:assumed-role/${aws_iam_role.ec2_jumpserver_role.name}/${aws_instance.jumpserver_windows.id}",
-        "arn:aws:sts::${data.aws_caller_identity.current.id}:assumed-role/AWSReservedSSO_modernisation-platform-developer_*/${each.value}*",
+        "arn:aws:sts::${data.aws_caller_identity.current.id}:assumed-role/AWSReservedSSO_modernisation-platform-developer_*/${each.value}*", # specific user
         "arn:aws:sts::${data.aws_caller_identity.current.id}:assumed-role/MemberInfrastructureAccess/*" # so terraform can wrangle it
       ]
     }
   }
 }
 
-resource "aws_secretsmanager_secret_version" "jumpserver_users" {
-  for_each      = toset(local.jumpserver_users)
-  secret_id     = aws_secretsmanager_secret.jumpserver_users[each.value].id
-  secret_string = random_password.jumpserver_users[each.value].result
-}
-
-# permissions to retrieve it
+# permissions to allow ec2 access
 data "aws_iam_policy_document" "jumpserver_users" {
-  # statement {
-  #   effect    = "Allow"
-  #   actions   = ["ssm:GetParameter"]
-  #   resources = ["arn:aws:ssm:${local.region}:${data.aws_caller_identity.current.id}:parameter${aws_ssm_parameter.jumpserver_users.name}"]
-  # }
   statement {
     effect    = "Allow"
-    actions   = ["secretsmanager:GetSecretValue"]
+    actions   = ["secretsmanager:PutSecretValue"]
     resources = ["arn:aws:secretsmanager:${local.region}:${data.aws_caller_identity.current.id}:secret:${local.secret_prefix}/*"]
   }
   statement {

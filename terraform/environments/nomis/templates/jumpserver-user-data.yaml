@@ -49,22 +49,29 @@ tasks:
       Set-WinSystemLocale "en-GB"
    
       # Scheduled job to add new users - jobs can be found under Task Scheduler -> Powershell -> ScheduledJobs
-      $add_users = '
-      $secret_prefix = "${SECRET_PREFIX}/"
+      $add_users = '      
+        Add-Type -AssemblyName 'System.Web' # used for generating random password
 
-      $secrets = Get-SECSecretList -Filter @{Key="name";Values=$secret_prefix} 
+        $secret_prefix = "${SECRET_PREFIX}/"
 
-      foreach($secret in $secrets){
-          $username = $secret.Name.SubString($secret_prefix.Length)
-          $password = ConvertTo-SecureString $(Get-SECSecretValue -SecretId $secret.ARN -Select SecretString) -AsPlainText -Force
-          
-          $user_exists = Get-LocalUser $username -ErrorAction SilentlyContinue
+        $secrets = Get-SECSecretList -Filter @{Key="name";Values=$secret_prefix} 
 
-          if ($user_exists -eq $null) {
-              New-LocalUser $username -Password $password -FullName $username
-              Add-LocalGroupMember -Group "Remote Desktop Users" -Member $username
-          }
-      }
+        foreach($secret in $secrets){
+            $username = $secret.Name.SubString($secret_prefix.Length)          
+            $user_exists = Get-LocalUser $username -ErrorAction SilentlyContinue
+
+            if ($user_exists -eq $null) {
+                # $password = ConvertTo-SecureString $(Get-SECSecretValue -SecretId $secret.ARN -Select SecretString) -AsPlainText -Force
+                
+                # create password and add to secret manager
+                $password = ConvertTo-SecureString -String $([System.Web.Security.Membership]::GeneratePassword(32,5)) -AsPlainText -Force 
+                Write-SECSecretValue -SecretId $secret.ARN -SecretString $password
+
+                # Create user and add to RD group
+                New-LocalUser $username -Password $password -FullName $username
+                Add-LocalGroupMember -Group "Remote Desktop Users" -Member $username
+            }
+        }
       '
 
       $path = "C:\jumpserver-software\add_users.ps1"
