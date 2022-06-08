@@ -7,7 +7,7 @@ locals {
     "rwhittlemoj",
     "julialawrence",
     "ewastempel",
-    # "jnq-moj"
+    "jnq-moj"
   ]
   secret_prefix = "/Jumpserver/Users"
 }
