@@ -7,7 +7,7 @@ locals {
     "rwhittlemoj",
     "julialawrence",
     "ewastempel",
-    # "jnq-moj"
+    "jnq"
   ]
   secret_prefix = "/Jumpserver/Users"
 }
@@ -134,13 +134,13 @@ resource "aws_iam_instance_profile" "ec2_jumpserver_profile" {
 }
 
 # Create password for each user
-resource "random_password" "jumpserver_users" {
-  for_each = toset(local.jumpserver_users)
-  length   = 32
-  special  = true
-}
+# resource "random_password" "jumpserver_users" {
+#   for_each = toset(local.jumpserver_users)
+#   length   = 32
+#   special  = true
+# }
 
-# create secret in secret manager
+# create empty secret in secret manager
 resource "aws_secretsmanager_secret" "jumpserver_users" {
   for_each = toset(local.jumpserver_users)
   name     = "${local.secret_prefix}/${each.value}"
@@ -153,11 +153,11 @@ resource "aws_secretsmanager_secret" "jumpserver_users" {
   )
 }
 
-resource "aws_secretsmanager_secret_version" "jumpserver_users" {
-  for_each      = toset(local.jumpserver_users)
-  secret_id     = aws_secretsmanager_secret.jumpserver_users[each.value].id
-  secret_string = random_password.jumpserver_users[each.value].result
-}
+# resource "aws_secretsmanager_secret_version" "jumpserver_users" {
+#   for_each      = toset(local.jumpserver_users)
+#   secret_id     = aws_secretsmanager_secret.jumpserver_users[each.value].id
+#   secret_string = random_password.jumpserver_users[each.value].result
+# }
 
 # resource policy to restrict access
 data "aws_iam_policy_document" "jumpserver_secrets" {
