@@ -191,6 +191,17 @@ resource "aws_security_group_rule" "egress_citrix-adc-snip_to_ctx-host" {
   source_security_group_id = aws_security_group.aws_citrix_security_group.id
 }
 
+resource "aws_security_group_rule" "egress_citrix-adc-snip_to_domain_controller_traffic" {
+  for_each                 = local.application_data.adc-snip_to_domain_controller_rules
+  description              = format("Citrix ADC SNIP traffic to Domain Controllers for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.citrix_adc_snip.id
+  to_port                  = each.value.to_port
+  type                     = "egress"
+  source_security_group_id = aws_security_group.aws_domain_security_group.id
+}
+
 resource "aws_security_group_rule" "egress_citrix-adc-snip_to_equip" {
   for_each                 = local.application_data.adc-snip_to_equip_rules
   description              = format("Citrix ADC to Equip host traffic for %s %d", each.value.protocol, each.value.from_port)
@@ -606,6 +617,17 @@ resource "aws_security_group_rule" "ingress_citrix-adc-mgmt_to_domain_controller
   to_port                  = each.value.to_port
   type                     = "ingress"
   source_security_group_id = aws_security_group.citrix_adc_mgmt.id
+}
+
+resource "aws_security_group_rule" "ingress_citrix-adc-snip_to_domain_controller_traffic" {
+  for_each                 = local.application_data.adc-snip_to_domain_controller_rules
+  description              = format("Citrix ADC SNIP traffic to Domain Controllers for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.aws_domain_security_group.id
+  to_port                  = each.value.to_port
+  type                     = "ingress"
+  source_security_group_id = aws_security_group.citrix_adc_snip.id
 }
 
 resource "aws_security_group_rule" "ingress_citrix-adc-vip_to_domain_controller_traffic" {
