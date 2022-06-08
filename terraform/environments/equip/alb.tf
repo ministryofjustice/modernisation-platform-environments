@@ -261,10 +261,9 @@ resource "aws_wafv2_web_acl_association" "aws_lb_waf_association" {
   web_acl_arn  = aws_wafv2_web_acl.wafv2_web_acl.arn
 }
 
-
 #tfsec:ignore:aws-s3-enable-bucket-encryption tfsec:ignore:aws-s3-enable-bucket-logging tfsec:ignore:aws-s3-enable-versioning tfsec:ignore:aws-s3-block-public-acls tfsec:ignore:aws-s3-block-public-policy tfsec:ignore:aws-s3-ignore-public-acls tfsec:ignore:aws-s3-no-public-buckets tfsec:ignore:aws-s3-specify-public-access-block
 resource "aws_s3_bucket" "wafv2_webacl_logs" {
-  bucket        = "aws-waf-logs-citrix-moj"
+  bucket        = format("aws-waf-logs-citrix-moj-%s", data.aws_caller_identity.current.account_id)
   force_destroy = true
 }
 

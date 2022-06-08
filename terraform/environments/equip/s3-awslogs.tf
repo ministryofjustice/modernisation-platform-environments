@@ -4,7 +4,7 @@ data "aws_caller_identity" "current" {}
 
 #tfsec:ignore:aws-s3-enable-bucket-encryption tfsec:ignore:aws-s3-enable-bucket-logging tfsec:ignore:aws-s3-enable-versioning tfsec:ignore:aws-s3-block-public-acls  tfsec:ignore:aws-s3-block-public-policy  tfsec:ignore:aws-s3-ignore-public-acls  tfsec:ignore:aws-s3-no-public-buckets  tfsec:ignore:aws-s3-specify-public-access-block
 resource "aws_s3_bucket" "this" {
-  bucket = "moj-alb-citrix-access-logs-bucket"
+  bucket = format("moj-alb-citrix-access-logs-bucket-%s", data.aws_caller_identity.current.account_id)
 
   tags = {
     Environment = "Development"
