@@ -36,28 +36,6 @@ resource "aws_lb" "citrix_alb" {
 
 }
 
-resource "aws_lb_target_group" "lb_tg_http" {
-  name        = format("tg-%s-%s-80", local.application_name, local.environment)
-  target_type = "ip"
-  protocol    = "HTTP"
-  vpc_id      = data.aws_vpc.shared.id
-  port        = "80"
-
-  health_check {
-    enabled             = true
-    path                = "/"
-    interval            = 30
-    protocol            = "HTTP"
-    port                = 80
-    timeout             = 10
-    healthy_threshold   = 5
-    unhealthy_threshold = 2
-    matcher             = "200"
-  }
-
-  tags = local.tags
-}
-
 resource "aws_lb_target_group" "lb_tg_https" {
   name        = format("tg-%s-%s-443", local.application_name, local.environment)
   target_type = "ip"
@@ -80,14 +58,8 @@ resource "aws_lb_target_group" "lb_tg_https" {
   tags = local.tags
 }
 
-resource "aws_lb_target_group_attachment" "lb_tga_80" {
-  target_group_arn = aws_lb_target_group.lb_tg_http.arn
-  target_id        = aws_network_interface.adc_vip_interface.private_ip_list[0]
-  port             = 80
-}
-
 resource "aws_lb_target_group_attachment" "lb_tga_443" {
-  target_group_arn = aws_lb_target_group.lb_tg_http.arn
+  target_group_arn = aws_lb_target_group.lb_tg_https.arn
   target_id        = aws_network_interface.adc_vip_interface.private_ip_list[0]
   port             = 443
 }
@@ -101,7 +73,7 @@ resource "aws_lb_listener" "lb_listener_https" {
   certificate_arn   = data.aws_acm_certificate.equip_cert.arn
 
   default_action {
-    target_group_arn = aws_lb_target_group.lb_tg_http.arn
+    target_group_arn = aws_lb_target_group.lb_tg_https.arn
     type             = "forward"
   }
 }
@@ -289,10 +261,9 @@ resource "aws_wafv2_web_acl_association" "aws_lb_waf_association" {
   web_acl_arn  = aws_wafv2_web_acl.wafv2_web_acl.arn
 }
 
-
 #tfsec:ignore:aws-s3-enable-bucket-encryption tfsec:ignore:aws-s3-enable-bucket-logging tfsec:ignore:aws-s3-enable-versioning tfsec:ignore:aws-s3-block-public-acls tfsec:ignore:aws-s3-block-public-policy tfsec:ignore:aws-s3-ignore-public-acls tfsec:ignore:aws-s3-no-public-buckets tfsec:ignore:aws-s3-specify-public-access-block
 resource "aws_s3_bucket" "wafv2_webacl_logs" {
-  bucket        = "aws-waf-logs-citrix-moj"
+  bucket_prefix = "aws-waf-logs-citrix-moj"
   force_destroy = true
 }
 

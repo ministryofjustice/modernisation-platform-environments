@@ -35,11 +35,6 @@
     }
   },
   "alb_to_citrix-adc-vip_rules": {
-    "TCP_80": {
-      "from_port": 80,
-      "to_port": 80,
-      "protocol": "TCP"
-    },
     "TCP_443": {
       "from_port": 443,
       "to_port": 443,
