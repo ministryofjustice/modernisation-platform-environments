@@ -73,6 +73,23 @@
       "protocol": "UDP"
     }
   },
+  "adc-snip_to_domain_controller_rules": {
+    "TCP_389": {
+      "from_port": 389,
+      "to_port": 389,
+      "protocol": "TCP"
+    },
+    "UDP_389": {
+      "from_port": 389,
+      "to_port": 389,
+      "protocol": "UDP"
+    },
+    "TCP_636": {
+      "from_port": 636,
+      "to_port": 636,
+      "protocol": "TCP"
+    }
+  },
   "adc-snip_to_equip_rules": {
     "TCP_80": {
       "from_port": 80,
@@ -110,9 +127,24 @@
     }
   },
   "adc-mgmt_to_domain_controller_rules": {
+    "TCP_389": {
+      "from_port": 389,
+      "to_port": 389,
+      "protocol": "TCP"
+    },
+    "UDP_389": {
+      "from_port": 389,
+      "to_port": 389,
+      "protocol": "UDP"
+    },
     "TCP_443": {
       "from_port": 443,
       "to_port": 443,
+      "protocol": "TCP"
+    },
+    "TCP_636": {
+      "from_port": 636,
+      "to_port": 636,
       "protocol": "TCP"
     }
   },
