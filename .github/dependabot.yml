@@ -64,10 +64,6 @@ updates:
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
-    directory: "/terraform/environments/testing"
-    schedule:
-      interval: "daily"
-  - package-ecosystem: "terraform"
     directory: "/terraform/environments/threat-and-vulnerability-mgmt"
     schedule:
       interval: "daily"
