@@ -6,7 +6,8 @@ locals {
   jumpserver_users = [ # must be github username
     "rwhittlemoj",
     "julialawrence",
-    "ewastempel"
+    "ewastempel",
+    # "jnq-moj"
   ]
   secret_prefix = "/Jumpserver/Users"
 }
@@ -42,7 +43,7 @@ data "template_file" "user_data" {
 }
 
 resource "aws_instance" "jumpserver_windows" {
-  instance_type               = "t3.medium"
+  instance_type               = "t3.large"
   ami                         = data.aws_ami.jumpserver_image.id
   associate_public_ip_address = false
   iam_instance_profile        = aws_iam_instance_profile.ec2_jumpserver_profile.id

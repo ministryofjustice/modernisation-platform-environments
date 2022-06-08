@@ -85,4 +85,4 @@ tasks:
       Register-ScheduledJob -Name "add_users" -FilePath $path -RunEvery $(New-TimeSpan -Minutes 15) -RunNow 
 
       # Disable Administrator
-      Disable-LocalUser -Name "Administrator"
+      # Disable-LocalUser -Name "Administrator"
