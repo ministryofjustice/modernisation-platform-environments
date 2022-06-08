@@ -2,9 +2,14 @@ data "aws_elb_service_account" "main" {}
 
 data "aws_caller_identity" "current" {}
 
+resource "random_string" "bucket_suffix" {
+  length  = 6
+  special = false
+}
+
 #tfsec:ignore:aws-s3-enable-bucket-encryption tfsec:ignore:aws-s3-enable-bucket-logging tfsec:ignore:aws-s3-enable-versioning tfsec:ignore:aws-s3-block-public-acls  tfsec:ignore:aws-s3-block-public-policy  tfsec:ignore:aws-s3-ignore-public-acls  tfsec:ignore:aws-s3-no-public-buckets  tfsec:ignore:aws-s3-specify-public-access-block
 resource "aws_s3_bucket" "this" {
-  bucket = format("moj-alb-citrix-access-logs-bucket-%s", data.aws_caller_identity.current.account_id)
+  bucket = format("moj-alb-citrix-access-logs-bucket-%s", random_string.bucket_suffix.result)
 
   tags = {
     Environment = "Development"
