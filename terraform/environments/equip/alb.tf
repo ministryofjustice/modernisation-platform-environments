@@ -136,7 +136,7 @@ resource "aws_lb_target_group_attachment" "lb_tga_443_equip-portal" {
 
 resource "aws_lb_target_group_attachment" "lb_tga_443_portal" {
   target_group_arn = aws_lb_target_group.lb_tg_https_portal.arn
-  target_id        = join("", module.win2012_STD_multiple["COR-A-EQP02"].private_ip)
+  target_id        = join("", module.win2012_STD_multiple["COR-A-EQP01"].private_ip)
 }
 
 resource "aws_lb_target_group_attachment" "lb_tga_443_analytics" {
