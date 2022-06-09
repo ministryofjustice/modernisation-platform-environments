@@ -44,7 +44,8 @@ data "aws_iam_policy_document" "image-builder-launch-template-policy" {
       "ec2:DescribeLaunchTemplates",
       "ec2:CreateTags"
     ]
-    resources = [for item in module.weblogic : item.launch_template_arn]
+    #tfsec:ignore:aws-iam-no-policy-wildcards:exp:2022-08-25
+    resources = ["*"]
   }
 }
 
