@@ -658,3 +658,94 @@ resource "aws_ssm_patch_group" "windows" {
   baseline_id = aws_ssm_patch_baseline.windows.id
   patch_group = "Windows"
 }
+# CloudWatch Monitoring Role and Policies
+
+data "aws_iam_policy_document" "cloudwatch-datasource-assume-role" {
+  statement {
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::754256621582:root"]
+    }
+  }
+}
+
+resource "aws_iam_role" "cloudwatch-datasource-role" {
+  name               = "CloudwatchDatasourceRole"
+  assume_role_policy = data.aws_iam_policy_document.cloudwatch-datasource-assume-role.json
+  tags = merge(
+    local.tags,
+    {
+      Name = "cloudwatch-datasource-role"
+    },
+  )
+
+}
+
+data "aws_iam_policy_document" "cloudwatch_datasource" {
+  statement {
+    sid    = "AllowReadingMetricsFromCloudWatch"
+    effect = "Allow"
+    actions = [
+      "cloudwatch:DescribeAlarmsForMetric",
+      "cloudwatch:DescribeAlarmHistory",
+      "cloudwatch:DescribeAlarms",
+      "cloudwatch:ListMetrics",
+      "cloudwatch:GetMetricData",
+      "cloudwatch:GetInsightRuleReport"
+    ]
+    resources = ["*"]
+  }
+  statement {
+    sid    = "AllowReadingLogsFromCloudWatch"
+    effect = "Allow"
+    actions = [
+      "logs:DescribeLogGroups",
+      "logs:GetLogGroupFields",
+      "logs:StartQuery",
+      "logs:StopQuery",
+      "logs:GetQueryResults",
+      "logs:GetLogEvents"
+    ]
+    resources = ["*"]
+  }
+  statement {
+    sid    = "AllowReadingTagsInstancesRegionsFromEC2"
+    effect = "Allow"
+    actions = [
+      "ec2:DescribeTags",
+      "ec2:DescribeInstances",
+      "ec2:DescribeRegions"
+    ]
+    resources = ["*"]
+  }
+  statement {
+    sid    = "AllowReadingResourcesForTags"
+    effect = "Allow"
+    actions = [
+      "tag:GetResources"
+    ]
+    resources = ["*"]
+  }
+
+}
+
+resource "aws_iam_policy" "cloudwatch_datasource_policy" {
+  name        = "cloudwatch-datasource-policy"
+  path        = "/"
+  description = "Policy for the Monitoring Cloudwatch Datasource"
+  policy      = data.aws_iam_policy_document.cloudwatch_datasource.json
+  tags = merge(
+    local.tags,
+    {
+      Name = "cloudwatch-datasource-policy"
+    },
+  )
+}
+
+resource "aws_iam_role_policy_attachment" "cloudwatch_datasource_policy_attach" {
+  policy_arn = aws_iam_policy.cloudwatch_datasource_policy.arn
+  role       = aws_iam_role.cloudwatch-datasource-role.name
+
+}
