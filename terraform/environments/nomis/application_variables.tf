@@ -35,12 +35,14 @@ locals {
           ami_name           = "nomis_db_STIG_CNOMT1-2022-04-21*"
           asm_data_capacity  = 100
           asm_flash_capacity = 2
+          description        = "Test NOMIS T1 database with a dataset of T1PDL0009 (note: only NOMIS db, NDH db is not included."
         },
         CNAUDT1 = {
           always_on              = true
           ami_name               = "nomis_db-2022-03-03*"
           asm_data_capacity      = 200
           asm_flash_capacity     = 2
+          description            = "Copy of Test NOMIS Audit database in Azure T1PDL0010, replicating with T1PDL0010."
           termination_protection = true
         }
       },
@@ -81,12 +83,14 @@ locals {
       },
       # Add database instances here.  They will be created using the database module
       databases = {
-        TEST = {
+        AUDIT = {
           always_on              = true
           ami_name               = "nomis_db_STIG-2022-04-26*"
-          asm_data_capacity      = 200
-          asm_flash_capacity     = 2
-          termination_protection = false
+          instance_type          = "r6i.2xlarge"
+          asm_data_capacity      = 4000
+          asm_flash_capacity     = 1000
+          description            = "Copy of Production NOMIS Audit database in Azure PDPDL00038, replacting with PDPDL00038, a replacement for PDPDL00037."
+          termination_protection = true
         }
       },
       # Add weblogic instances here.  They will be created using the weblogic module
