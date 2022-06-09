@@ -81,13 +81,13 @@ locals {
       },
       # Add database instances here.  They will be created using the database module
       databases = {
-        TEST = {
-          always_on              = true
-          ami_name               = "nomis_db_STIG-2022-04-26*"
-          asm_data_capacity      = 200
-          asm_flash_capacity     = 2
-          termination_protection = false
-        }
+        # TEST = {
+        #   always_on              = true
+        #   ami_name               = "nomis_db_STIG-2022-04-26*"
+        #   asm_data_capacity      = 200
+        #   asm_flash_capacity     = 2
+        #   termination_protection = false
+        # }
       },
       # Add weblogic instances here.  They will be created using the weblogic module
       weblogics = {}

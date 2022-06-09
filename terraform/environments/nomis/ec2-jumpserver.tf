@@ -1,5 +1,8 @@
 #------------------------------------------------------------------------------
 # Windows Jumpserver
+# To add a new local user account, add a github username to `jumpserver_users`
+# local variable.  Scheduled job running on instance will create user and push 
+# password to Secrets Manager, which only said user can access.
 #------------------------------------------------------------------------------
 
 locals {
@@ -43,7 +46,7 @@ data "template_file" "user_data" {
 }
 
 resource "aws_instance" "jumpserver_windows" {
-  instance_type               = "t3.large"
+  instance_type               = "t3.medium"
   ami                         = data.aws_ami.jumpserver_image.id
   associate_public_ip_address = false
   iam_instance_profile        = aws_iam_instance_profile.ec2_jumpserver_profile.id
@@ -133,13 +136,6 @@ resource "aws_iam_instance_profile" "ec2_jumpserver_profile" {
   path = "/"
 }
 
-# Create password for each user
-# resource "random_password" "jumpserver_users" {
-#   for_each = toset(local.jumpserver_users)
-#   length   = 32
-#   special  = true
-# }
-
 # create empty secret in secret manager
 resource "aws_secretsmanager_secret" "jumpserver_users" {
   for_each = toset(local.jumpserver_users)
@@ -153,13 +149,7 @@ resource "aws_secretsmanager_secret" "jumpserver_users" {
   )
 }
 
-# resource "aws_secretsmanager_secret_version" "jumpserver_users" {
-#   for_each      = toset(local.jumpserver_users)
-#   secret_id     = aws_secretsmanager_secret.jumpserver_users[each.value].id
-#   secret_string = random_password.jumpserver_users[each.value].result
-# }
-
-# resource policy to restrict access
+# resource policy to restrict access to secret value to specific user and the CICD role used to deploy terraform
 data "aws_iam_policy_document" "jumpserver_secrets" {
   for_each = toset(local.jumpserver_users)
   statement {
@@ -181,7 +171,7 @@ data "aws_iam_policy_document" "jumpserver_secrets" {
   }
 }
 
-# permissions to allow ec2 access
+# IAM policy permissions to enable jumpserver to list secrets and put user passwords into secret manager
 data "aws_iam_policy_document" "jumpserver_users" {
   statement {
     effect    = "Allow"

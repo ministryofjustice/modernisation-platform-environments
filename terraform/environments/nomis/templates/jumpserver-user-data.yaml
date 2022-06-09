@@ -65,8 +65,6 @@ tasks:
             $user_exists = Get-LocalUser $username -ErrorAction SilentlyContinue
 
             if ($user_exists -eq $null) {
-                # $password = ConvertTo-SecureString $(Get-SECSecretValue -SecretId $secret.ARN -Select SecretString) -AsPlainText -Force
-                
                 # create password and add to secret manager
                 $password = [System.Web.Security.Membership]::GeneratePassword(32,5) 
                 Write-SECSecretValue -SecretId $secret.ARN -SecretString $password
