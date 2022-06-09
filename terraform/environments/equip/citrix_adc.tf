@@ -1,13 +1,31 @@
-resource "aws_instance" "citrix_adc_instance" {
-  ami                    = "ami-0dd0aa051b3fc4e4b"
-  instance_type          = "m5.xlarge"
-  key_name               = aws_key_pair.windowskey.key_name
-  subnet_id              = data.aws_subnet.private_subnets_a.id
-  vpc_security_group_ids = [aws_security_group.citrix_adc_mgmt.id]
-  iam_instance_profile   = aws_iam_instance_profile.instance-profile-moj.name
-  monitoring             = true
-  ebs_optimized          = true
+resource "aws_ec2_subnet_cidr_reservation" "vip-reservation" {
+  provider         = aws.core-vpc
+  cidr_block       = cidrsubnet(data.aws_subnet.public_subnet_a.cidr_block, 5, 30)
+  reservation_type = "explicit"
+  subnet_id        = data.aws_subnet.public_subnet_a.id
+}
 
+resource "aws_ec2_subnet_cidr_reservation" "snip-reservation" {
+  provider         = aws.core-vpc
+  cidr_block       = cidrsubnet(data.aws_subnet.private_subnet_a.cidr_block, 6, 62)
+  reservation_type = "explicit"
+  subnet_id        = data.aws_subnet.private_subnet_a.id
+}
+
+resource "aws_instance" "citrix_adc_instance" {
+  depends_on           = [aws_network_interface.adc_mgmt_interface]
+  ami                  = "ami-0dd0aa051b3fc4e4b"
+  availability_zone    = format("%sa", local.region)
+  instance_type        = "m5.xlarge"
+  key_name             = aws_key_pair.windowskey.key_name
+  iam_instance_profile = aws_iam_instance_profile.instance-profile-moj.name
+  monitoring           = true
+  ebs_optimized        = true
+
+  network_interface {
+    network_interface_id = aws_network_interface.adc_mgmt_interface.id
+    device_index         = 0
+  }
 
   root_block_device {
     encrypted   = true
@@ -16,8 +34,8 @@ resource "aws_instance" "citrix_adc_instance" {
     kms_key_id  = aws_kms_key.this.arn
 
     tags = merge(local.tags,
-          { Name = "Citrix_ADC_VPX_ROOT_VOLUME" }
-      )
+      { Name = "Citrix_ADC_VPX_ROOT_VOLUME" }
+    )
   }
 
   metadata_options {
@@ -31,13 +49,30 @@ resource "aws_instance" "citrix_adc_instance" {
       Role = "Citrix Netscaler ADC VPX"
     }
   )
+}
 
+resource "aws_network_interface" "adc_mgmt_interface" {
+  security_groups   = [aws_security_group.citrix_adc_mgmt.id]
+  source_dest_check = false
+  subnet_id         = data.aws_subnet.data_subnet_a.id
+
+  tags = merge(local.tags,
+    { Name = "ENI-NPS-COR-A-ADC01_MGMT"
+      ROLE = "Citrix Netscaler ADC VPX MGMT Interface"
+    }
+  )
 }
 
 resource "aws_network_interface" "adc_vip_interface" {
+  depends_on              = [aws_ec2_subnet_cidr_reservation.vip-reservation]
+  private_ip_list_enabled = true
+  private_ip_list = [
+    cidrhost(aws_ec2_subnet_cidr_reservation.vip-reservation.cidr_block, 0),
+    cidrhost(aws_ec2_subnet_cidr_reservation.vip-reservation.cidr_block, 1),
+  ]
   security_groups   = [aws_security_group.citrix_adc_vip.id]
   source_dest_check = false
-  subnet_id         = data.aws_subnet.public_az_a.id
+  subnet_id         = data.aws_subnet.public_subnet_a.id
 
   attachment {
     device_index = 1
@@ -49,13 +84,20 @@ resource "aws_network_interface" "adc_vip_interface" {
       ROLE = "Citrix Netscaler ADC VPX VIP Interface"
     }
   )
-
 }
 
 resource "aws_network_interface" "adc_snip_interface" {
+  depends_on              = [aws_ec2_subnet_cidr_reservation.snip-reservation]
+  private_ip_list_enabled = true
+  private_ip_list = [
+    cidrhost(aws_ec2_subnet_cidr_reservation.snip-reservation.cidr_block, 0),
+    cidrhost(aws_ec2_subnet_cidr_reservation.snip-reservation.cidr_block, 1),
+    cidrhost(aws_ec2_subnet_cidr_reservation.snip-reservation.cidr_block, 2),
+    cidrhost(aws_ec2_subnet_cidr_reservation.snip-reservation.cidr_block, 3),
+  ]
   security_groups   = [aws_security_group.citrix_adc_snip.id]
   source_dest_check = false
-  subnet_id         = data.aws_subnet.private_subnets_a.id
+  subnet_id         = data.aws_subnet.private_subnet_a.id
 
   attachment {
     device_index = 2
@@ -67,5 +109,4 @@ resource "aws_network_interface" "adc_snip_interface" {
       ROLE = "Citrix Netscaler ADC VPX SNIP Interface"
     }
   )
-
 }
