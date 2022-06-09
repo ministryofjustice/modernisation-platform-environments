@@ -108,6 +108,7 @@ resource "aws_instance" "database" {
     var.tags,
     {
       Name          = "database-${var.name}"
+      description   = var.description
       component     = "data"
       os_type       = "Linux"
       os_version    = "RHEL 7.9"
