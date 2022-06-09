@@ -12,11 +12,53 @@ resource "aws_route53_record" "external" {
   }
 }
 
-resource "aws_route53_record" "external" {
+resource "aws_route53_record" "analytics" {
   provider = aws.core-vpc
 
-  zone_id = data.aws_route53_zone.external.zone_id
-  name    = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  zone_id = data.aws_route53_zone.application-zone.zone_id
+  name    = "analytics"
+  type    = "A"
+
+  alias {
+    name                   = aws_lb.citrix_alb.dns_name
+    zone_id                = aws_lb.citrix_alb.zone_id
+    evaluate_target_health = true
+  }
+}
+
+resource "aws_route53_record" "equip-portal" {
+  provider = aws.core-vpc
+
+  zone_id = data.aws_route53_zone.application-zone.zone_id
+  name    = "equip-portal"
+  type    = "A"
+
+  alias {
+    name                   = aws_lb.citrix_alb.dns_name
+    zone_id                = aws_lb.citrix_alb.zone_id
+    evaluate_target_health = true
+  }
+}
+
+resource "aws_route53_record" "gateway" {
+  provider = aws.core-vpc
+
+  zone_id = data.aws_route53_zone.application-zone.zone_id
+  name    = "gateway"
+  type    = "A"
+
+  alias {
+    name                   = aws_lb.citrix_alb.dns_name
+    zone_id                = aws_lb.citrix_alb.zone_id
+    evaluate_target_health = true
+  }
+}
+
+resource "aws_route53_record" "portal" {
+  provider = aws.core-vpc
+
+  zone_id = data.aws_route53_zone.application-zone.zone_id
+  name    = "portal"
   type    = "A"
 
   alias {
