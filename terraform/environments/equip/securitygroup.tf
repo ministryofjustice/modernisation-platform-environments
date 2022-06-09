@@ -31,6 +31,17 @@ resource "aws_security_group_rule" "egress_alb_to_citrix-adc-vip_traffic" {
   source_security_group_id = aws_security_group.citrix_adc_vip.id
 }
 
+resource "aws_security_group_rule" "egress_alb_to_citrix-adc-snip_traffic" {
+  for_each                 = local.application_data.alb_to_citrix-adc-snip_rules
+  description              = format("ALB to Citrix ADC SNIP traffic for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.alb_sg.id
+  to_port                  = each.value.to_port
+  type                     = "egress"
+  source_security_group_id = aws_security_group.citrix_adc_snip.id
+}
+
 ############################################################################
 
 #Citrix ADC MGMT Security Group
@@ -167,6 +178,17 @@ resource "aws_security_group" "citrix_adc_snip" {
   tags = merge(local.tags,
     { Name = lower(format("secg-%s-%s-citrix-adc_snip", local.application_name, local.environment)) }
   )
+}
+
+resource "aws_security_group_rule" "ingress_alb_to_citrix-adc-snip_traffic" {
+  for_each                 = local.application_data.alb_to_citrix-adc-snip_rules
+  description              = format("ALB to Citrix ADC SNIP traffic for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.citrix_adc_snip.id
+  to_port                  = each.value.to_port
+  type                     = "ingress"
+  source_security_group_id = aws_security_group.alb_sg.id
 }
 
 resource "aws_security_group_rule" "ingress_ctx-host_to_citrix-adc-snip_traffic" {
