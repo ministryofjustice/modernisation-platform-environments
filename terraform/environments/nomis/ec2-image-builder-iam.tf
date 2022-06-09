@@ -39,14 +39,21 @@ data "aws_iam_policy_document" "image-builder-launch-template-policy" {
   statement {
     effect = "Allow"
     actions = [
+      "ec2:DescribeLaunchTemplates"
+    ]
+
+    resources = ["*"]
+  }
+
+  statement {
+    effect = "Allow"
+    actions = [
       "ec2:CreateLaunchTemplateVersion",
       "ec2:ModifyLaunchTemplate",
-      "ec2:DescribeLaunchTemplates",
       "ec2:CreateTags"
     ]
-    #checkov:skip=CKV_AWS_111: "Ensure IAM policies does not allow write access without constraints"
-    #tfsec:ignore:aws-iam-no-policy-wildcards:exp:2022-08-25
-    resources = ["*"]
+
+    resources = [for item in module.weblogic : item.launch_template_arn]
   }
 }
 
@@ -127,7 +134,7 @@ data "aws_iam_policy_document" "launch-template-reader-policy-doc" {
       "ec2:DescribeLaunchTemplates",
       "ec2:DescribeLaunchTemplateVersions"
     ]
-    resources = [for item in module.weblogic : item.launch_template_arn]
+    resources = ["*"]
   }
 }
 
