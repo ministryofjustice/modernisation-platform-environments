@@ -34,6 +34,13 @@
       "protocol": "TCP"
     }
   },
+  "alb_to_citrix-adc-snip_rules": {
+    "TCP_443": {
+      "from_port": 443,
+      "to_port": 443,
+      "protocol": "TCP"
+    }
+  },
   "alb_to_citrix-adc-vip_rules": {
     "TCP_443": {
       "from_port": 443,
