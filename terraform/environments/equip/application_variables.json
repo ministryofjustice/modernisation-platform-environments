@@ -48,6 +48,20 @@
       "protocol": "TCP"
     }
   },
+  "alb_to_equip_rules": {
+    "TCP_8080": {
+      "from_port": 8080,
+      "to_port": 8080,
+      "protocol": "TCP"
+    }
+  },
+  "alb_to_spotfire_rules": {
+    "TCP_80": {
+      "from_port": 80,
+      "to_port": 80,
+      "protocol": "TCP"
+    }
+  },
   "adc-snip_to_ctx_rules": {
     "TCP_80": {
       "from_port": 80,
