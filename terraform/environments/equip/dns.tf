@@ -13,7 +13,7 @@ resource "aws_route53_record" "external" {
 }
 
 resource "aws_route53_record" "analytics" {
-  provider = aws.network-services
+  provider = aws.core-network-services
 
   zone_id = data.aws_route53_zone.application-zone.zone_id
   name    = "analytics"
@@ -27,7 +27,7 @@ resource "aws_route53_record" "analytics" {
 }
 
 resource "aws_route53_record" "equip-portal" {
-  provider = aws.network-services
+  provider = aws.core-network-services
 
   zone_id = data.aws_route53_zone.application-zone.zone_id
   name    = "equip-portal"
@@ -41,7 +41,7 @@ resource "aws_route53_record" "equip-portal" {
 }
 
 resource "aws_route53_record" "gateway" {
-  provider = aws.network-services
+  provider = aws.core-network-services
 
   zone_id = data.aws_route53_zone.application-zone.zone_id
   name    = "gateway"
@@ -55,7 +55,7 @@ resource "aws_route53_record" "gateway" {
 }
 
 resource "aws_route53_record" "portal" {
-  provider = aws.network-services
+  provider = aws.core-network-services
 
   zone_id = data.aws_route53_zone.application-zone.zone_id
   name    = "portal"
