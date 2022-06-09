@@ -101,7 +101,7 @@ data "aws_route53_zone" "network-services" {
 }
 
 data "aws_route53_zone" "application-zone" {
-    provider = aws.core-network-services
+  provider = aws.core-network-services
 
   name         = "equip.service.justice.gov.uk."
   private_zone = false
