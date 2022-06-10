@@ -811,6 +811,17 @@ resource "aws_security_group_rule" "ingress_domain_controller_to_all_hosts_traff
   source_security_group_id = aws_security_group.aws_domain_security_group.id
 }
 
+resource "aws_security_group_rule" "egress_all_hosts_to_domain_controller_traffic" {
+  for_each                 = local.application_data.host_to_domain_controller_rules
+  description              = format("Host traffic to Domain Controllers for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.all_internal_groups.id
+  to_port                  = each.value.to_port
+  type                     = "egress"
+  source_security_group_id = aws_security_group.aws_domain_security_group.id
+}
+
 # cidr_blocks should be replaced with source_security_group_id, but open until confirmed with configuration team
 resource "aws_security_group_rule" "egress_all_hosts_to_proxies" {
   for_each          = local.application_data.host_to_proxy_rules
