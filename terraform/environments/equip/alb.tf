@@ -125,22 +125,22 @@ resource "aws_lb_target_group" "lb_tg_analytics" {
 }
 
 resource "aws_lb_target_group_attachment" "lb_tga_gateway" {
-  target_group_arn = aws_lb_target_group.lb_tg_https_gateway.arn
+  target_group_arn = aws_lb_target_group.lb_tg_gateway.arn
   target_id        = aws_network_interface.adc_vip_interface.private_ip_list[0]
 }
 
 resource "aws_lb_target_group_attachment" "lb_tga_equip-portal" {
-  target_group_arn = aws_lb_target_group.lb_tg_https_equip-portal.arn
+  target_group_arn = aws_lb_target_group.lb_tg_equip-portal.arn
   target_id        = join("", module.win2012_STD_multiple["COR-A-EQP01"].private_ip)
 }
 
 resource "aws_lb_target_group_attachment" "lb_tga_portal" {
-  target_group_arn = aws_lb_target_group.lb_tg_https_portal.arn
+  target_group_arn = aws_lb_target_group.lb_tg_portal.arn
   target_id        = join("", module.win2012_STD_multiple["COR-A-EQP01"].private_ip)
 }
 
 resource "aws_lb_target_group_attachment" "lb_tga_analytics" {
-  target_group_arn = aws_lb_target_group.lb_tg_https_analytics.arn
+  target_group_arn = aws_lb_target_group.lb_tg_analytics.arn
   target_id        = join("", module.win2012_STD_multiple["COR-A-SF01"].private_ip)
 }
 
