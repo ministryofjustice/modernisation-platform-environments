@@ -61,16 +61,16 @@ resource "aws_lb_target_group" "lb_tg_https_gateway" {
 resource "aws_lb_target_group" "lb_tg_https_equip-portal" {
   name        = "tg-equip-portal"
   target_type = "ip"
-  protocol    = "HTTPS"
+  protocol    = "HTTP"
   vpc_id      = data.aws_vpc.shared.id
-  port        = "443"
+  port        = "80"
 
   health_check {
     enabled             = true
     path                = "/"
     interval            = 30
-    protocol            = "HTTPS"
-    port                = 443
+    protocol            = "HTTP"
+    port                = 80
     timeout             = 5
     healthy_threshold   = 5
     unhealthy_threshold = 2
@@ -124,22 +124,22 @@ resource "aws_lb_target_group" "lb_tg_https_analytics" {
   tags = local.tags
 }
 
-resource "aws_lb_target_group_attachment" "lb_tga_443_gateway" {
+resource "aws_lb_target_group_attachment" "lb_tga_gateway" {
   target_group_arn = aws_lb_target_group.lb_tg_https_gateway.arn
   target_id        = aws_network_interface.adc_vip_interface.private_ip_list[0]
 }
 
-resource "aws_lb_target_group_attachment" "lb_tga_443_equip-portal" {
+resource "aws_lb_target_group_attachment" "lb_tga_equip-portal" {
   target_group_arn = aws_lb_target_group.lb_tg_https_equip-portal.arn
-  target_id        = aws_network_interface.adc_snip_interface.private_ip_list[1]
+  target_id        = join("", module.win2012_STD_multiple["COR-A-EQP01"].private_ip)
 }
 
-resource "aws_lb_target_group_attachment" "lb_tga_443_portal" {
+resource "aws_lb_target_group_attachment" "lb_tga_portal" {
   target_group_arn = aws_lb_target_group.lb_tg_https_portal.arn
   target_id        = join("", module.win2012_STD_multiple["COR-A-EQP01"].private_ip)
 }
 
-resource "aws_lb_target_group_attachment" "lb_tga_443_analytics" {
+resource "aws_lb_target_group_attachment" "lb_tga_analytics" {
   target_group_arn = aws_lb_target_group.lb_tg_https_analytics.arn
   target_id        = join("", module.win2012_STD_multiple["COR-A-SF01"].private_ip)
 }
