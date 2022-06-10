@@ -111,7 +111,7 @@ resource "aws_lb_target_group" "lb_tg_analytics" {
 
   health_check {
     enabled             = true
-    path                = "/"
+    path                = "/spotfire/login.html"
     interval            = 30
     protocol            = "HTTP"
     port                = 8080
@@ -153,7 +153,7 @@ resource "aws_lb_listener" "lb_listener_https" {
   certificate_arn   = data.aws_acm_certificate.equip_cert.arn
 
   default_action {
-    target_group_arn = aws_lb_target_group.lb_tg_https_gateway.arn
+    target_group_arn = aws_lb_target_group.lb_tg_gateway.arn
     type             = "forward"
   }
 }
@@ -178,7 +178,7 @@ resource "aws_lb_listener_rule" "gateway-equip-service-justice-gov-uk" {
   listener_arn = aws_lb_listener.lb_listener_https.arn
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.lb_tg_https_gateway.arn
+    target_group_arn = aws_lb_target_group.lb_tg_gateway.arn
   }
   condition {
     host_header {
@@ -191,7 +191,7 @@ resource "aws_lb_listener_rule" "equip-portal-equip-service-justice-gov-uk" {
   listener_arn = aws_lb_listener.lb_listener_https.arn
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.lb_tg_https_equip-portal.arn
+    target_group_arn = aws_lb_target_group.lb_tg_equip-portal.arn
   }
   condition {
     host_header {
@@ -204,7 +204,7 @@ resource "aws_lb_listener_rule" "portal-equip-service-justice-gov-uk" {
   listener_arn = aws_lb_listener.lb_listener_https.arn
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.lb_tg_https_portal.arn
+    target_group_arn = aws_lb_target_group.lb_tg_portal.arn
   }
   condition {
     host_header {
@@ -217,7 +217,7 @@ resource "aws_lb_listener_rule" "analytics-equip-service-justice-gov-uk" {
   listener_arn = aws_lb_listener.lb_listener_https.arn
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.lb_tg_https_analytics.arn
+    target_group_arn = aws_lb_target_group.lb_tg_analytics.arn
   }
   condition {
     host_header {
