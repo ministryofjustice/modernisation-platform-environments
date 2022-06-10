@@ -36,7 +36,7 @@ resource "aws_lb" "citrix_alb" {
 
 }
 
-resource "aws_lb_target_group" "lb_tg_https_gateway" {
+resource "aws_lb_target_group" "lb_tg_gateway" {
   name        = "tg-gateway"
   target_type = "ip"
   protocol    = "HTTPS"
@@ -58,7 +58,7 @@ resource "aws_lb_target_group" "lb_tg_https_gateway" {
   tags = local.tags
 }
 
-resource "aws_lb_target_group" "lb_tg_https_equip-portal" {
+resource "aws_lb_target_group" "lb_tg_equip-portal" {
   name        = "tg-equip-portal"
   target_type = "ip"
   protocol    = "HTTP"
@@ -80,7 +80,7 @@ resource "aws_lb_target_group" "lb_tg_https_equip-portal" {
   tags = local.tags
 }
 
-resource "aws_lb_target_group" "lb_tg_https_portal" {
+resource "aws_lb_target_group" "lb_tg_portal" {
   name        = "tg-portal"
   target_type = "ip"
   protocol    = "HTTP"
@@ -102,7 +102,7 @@ resource "aws_lb_target_group" "lb_tg_https_portal" {
   tags = local.tags
 }
 
-resource "aws_lb_target_group" "lb_tg_https_analytics" {
+resource "aws_lb_target_group" "lb_tg_analytics" {
   name        = "tg-analytics"
   target_type = "ip"
   protocol    = "HTTP"
