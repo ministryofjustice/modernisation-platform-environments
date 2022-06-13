@@ -126,7 +126,7 @@ resource "aws_lb_target_group" "lb_tg_analytics" {
 
 resource "aws_lb_target_group_attachment" "lb_tga_gateway" {
   target_group_arn = aws_lb_target_group.lb_tg_gateway.arn
-  target_id        = aws_network_interface.adc_vip_interface.private_ip_list[0]
+  target_id        = join("", module.win2016_multiple["COR-A-CTX01"].private_ip)
 }
 
 resource "aws_lb_target_group_attachment" "lb_tga_equip-portal" {
