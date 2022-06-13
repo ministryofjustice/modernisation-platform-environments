@@ -39,16 +39,16 @@ resource "aws_lb" "citrix_alb" {
 resource "aws_lb_target_group" "lb_tg_gateway" {
   name        = "tg-gateway"
   target_type = "ip"
-  protocol    = "HTTPS"
+  protocol    = "HTTP"
   vpc_id      = data.aws_vpc.shared.id
-  port        = "443"
+  port        = "80"
 
   health_check {
     enabled             = true
-    path                = "/"
+    path                = "/Citrix/EquipStoreFrontWeb"
     interval            = 30
-    protocol            = "HTTPS"
-    port                = 443
+    protocol            = "HTTP"
+    port                = 80
     timeout             = 5
     healthy_threshold   = 5
     unhealthy_threshold = 2
@@ -174,7 +174,20 @@ resource "aws_lb_listener" "lb_listener_http" {
   }
 }
 
-resource "aws_lb_listener_rule" "gateway-equip-service-justice-gov-uk" {
+resource "aws_lb_listener_rule" "equip-portal-equip-service-justice-gov-uk" {
+  listener_arn = aws_lb_listener.lb_listener_https.arn
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.lb_tg_equip-portal.arn
+  }
+  condition {
+    host_header {
+      values = ["equip-portal.equip.service.justice.gov.uk"]
+    }
+  }
+}
+
+resource "aws_lb_listener_rule" "fwd-gateway-equip-service-justice-gov-uk" {
   listener_arn = aws_lb_listener.lb_listener_https.arn
   action {
     type             = "forward"
@@ -185,17 +198,25 @@ resource "aws_lb_listener_rule" "gateway-equip-service-justice-gov-uk" {
       values = ["gateway.equip.service.justice.gov.uk"]
     }
   }
+  condition {
+    path_pattern {
+      values = ["/Citrix/EquipStoreFrontWeb"]
+    }
+  }
 }
 
-resource "aws_lb_listener_rule" "equip-portal-equip-service-justice-gov-uk" {
+resource "aws_lb_listener_rule" "redir-gateway-equip-service-justice-gov-uk" {
   listener_arn = aws_lb_listener.lb_listener_https.arn
   action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.lb_tg_equip-portal.arn
+    type = "redirect"
+    redirect {
+      path        = "/Citrix/EquipStoreFrontWeb"
+      status_code = "HTTP_301"
+    }
   }
   condition {
     host_header {
-      values = ["equip-portal.equip.service.justice.gov.uk"]
+      values = ["gateway.equip.service.justice.gov.uk"]
     }
   }
 }
