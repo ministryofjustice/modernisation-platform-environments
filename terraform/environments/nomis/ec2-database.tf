@@ -106,6 +106,7 @@ resource "aws_security_group" "database_common" {
 #------------------------------------------------------------------------------
 
 data "aws_iam_policy_document" "s3_db_backup_bucket_access" {
+  #tfsec:ignore:aws-iam-no-policy-wildcards:need to be able to write database backups to specific bucket
   statement {
     effect = "Allow"
     actions = [
