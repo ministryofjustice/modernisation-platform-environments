@@ -32,6 +32,10 @@ data "aws_iam_policy_document" "shared_image_builder_cmk_policy" {
       "kms:DescribeKey",
       "kms:CreateGrant"
     ]
+    # these can be ignored as this policy is being applied to a specific key resource. ["*"] in this case refers to this key
+    #tfsec:ignore:aws-iam-no-policy-wildcards
+    #checkov:skip=CKV_AWS_111: "Ensure IAM policies does not allow write access without constraints"
+    #checkov:skip=CKV_AWS_109: "Ensure IAM policies does not allow permissions management / resource exposure without constraints"
     resources = ["*"]
     principals {
       type = "AWS"
@@ -58,6 +62,10 @@ data "aws_iam_policy_document" "shared_image_builder_cmk_policy" {
       "kms:ScheduleKeyDeletion",
       "kms:CancelKeyDeletion"
     ]
+    # these can be ignored as this policy is being applied to a specific key resource. ["*"] in this case refers to this key
+    #tfsec:ignore:aws-iam-no-policy-wildcards
+    #checkov:skip=CKV_AWS_111: "Ensure IAM policies does not allow write access without constraints"
+    #checkov:skip=CKV_AWS_109: "Ensure IAM policies does not allow permissions management / resource exposure without constraints"
     resources = ["*"]
     principals {
       type        = "AWS"

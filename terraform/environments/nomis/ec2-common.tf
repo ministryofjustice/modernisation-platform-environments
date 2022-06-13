@@ -4,8 +4,6 @@
 
 # custom policy for SSM as managed policy AmazonSSMManagedInstanceCore is too permissive
 data "aws_iam_policy_document" "ssm_custom" {
-  #tfsec:ignore:AWS099:this is derived from AmazonSSMManagedInstanceCore managed policy
-  #checkov:skip=CKV_AWS_111:this is derived from AmazonSSMManagedInstanceCore managed policy
   statement {
     sid    = "CustomSsmPolicy"
     effect = "Allow"
@@ -34,7 +32,10 @@ data "aws_iam_policy_document" "ssm_custom" {
       "ec2messages:GetMessages",
       "ec2messages:SendReply"
     ]
-    resources = ["*"]
+    # skiping these as policy is a scoped down version of Amazon provided AmazonSSMManagedInstanceCore managed policy.  Permissions required for SSM function
+
+    #checkov:skip=CKV_AWS_111: "Ensure IAM policies does not allow write access without constraints"
+    resources = ["*"] #tfsec:ignore:aws-iam-no-policy-wildcards
   }
 }
 
@@ -52,7 +53,9 @@ data "aws_iam_policy_document" "cloud_watch_custom" {
       "logs:DescribeLogGroups",
       "logs:CreateLogStream"
     ]
-    resources = ["*"]
+    # skiping these as policy is a scoped down version of Amazon provided CloudWatchAgentServerPolicy managed policy
+    #checkov:skip=CKV_AWS_111: "Ensure IAM policies does not allow write access without constraints"
+    resources = ["*"] #tfsec:ignore:aws-iam-no-policy-wildcards
   }
 
   statement {
@@ -692,6 +695,7 @@ data "aws_iam_policy_document" "cloudwatch_datasource" {
       "cloudwatch:GetMetricData",
       "cloudwatch:GetInsightRuleReport"
     ]
+    #tfsec:ignore:aws-iam-no-policy-wildcards:exp:2022-08-25
     resources = ["*"]
   }
   statement {
@@ -705,6 +709,7 @@ data "aws_iam_policy_document" "cloudwatch_datasource" {
       "logs:GetQueryResults",
       "logs:GetLogEvents"
     ]
+    #tfsec:ignore:aws-iam-no-policy-wildcards:exp:2022-08-25
     resources = ["*"]
   }
   statement {
