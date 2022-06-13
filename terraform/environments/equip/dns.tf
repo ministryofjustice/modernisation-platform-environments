@@ -12,6 +12,66 @@ resource "aws_route53_record" "external" {
   }
 }
 
+resource "aws_route53_record" "analytics" {
+  count    = local.is-development ? 1 : 0
+  provider = aws.core-network-services
+
+  zone_id = data.aws_route53_zone.application-zone.zone_id
+  name    = "analytics"
+  type    = "A"
+
+  alias {
+    name                   = aws_lb.citrix_alb.dns_name
+    zone_id                = aws_lb.citrix_alb.zone_id
+    evaluate_target_health = true
+  }
+}
+
+resource "aws_route53_record" "equip-portal" {
+  count    = local.is-development ? 1 : 0
+  provider = aws.core-network-services
+
+  zone_id = data.aws_route53_zone.application-zone.zone_id
+  name    = "equip-portal"
+  type    = "A"
+
+  alias {
+    name                   = aws_lb.citrix_alb.dns_name
+    zone_id                = aws_lb.citrix_alb.zone_id
+    evaluate_target_health = true
+  }
+}
+
+resource "aws_route53_record" "gateway" {
+  count    = local.is-development ? 1 : 0
+  provider = aws.core-network-services
+
+  zone_id = data.aws_route53_zone.application-zone.zone_id
+  name    = "gateway"
+  type    = "A"
+
+  alias {
+    name                   = aws_lb.citrix_alb.dns_name
+    zone_id                = aws_lb.citrix_alb.zone_id
+    evaluate_target_health = true
+  }
+}
+
+resource "aws_route53_record" "portal" {
+  count    = local.is-development ? 1 : 0
+  provider = aws.core-network-services
+
+  zone_id = data.aws_route53_zone.application-zone.zone_id
+  name    = "portal"
+  type    = "A"
+
+  alias {
+    name                   = aws_lb.citrix_alb.dns_name
+    zone_id                = aws_lb.citrix_alb.zone_id
+    evaluate_target_health = true
+  }
+}
+
 resource "aws_route53_resolver_endpoint" "equip-domain" {
   provider = aws.core-vpc
 

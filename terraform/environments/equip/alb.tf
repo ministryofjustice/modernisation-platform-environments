@@ -36,7 +36,7 @@ resource "aws_lb" "citrix_alb" {
 
 }
 
-resource "aws_lb_target_group" "lb_tg_https_gateway" {
+resource "aws_lb_target_group" "lb_tg_gateway" {
   name        = "tg-gateway"
   target_type = "ip"
   protocol    = "HTTPS"
@@ -58,19 +58,19 @@ resource "aws_lb_target_group" "lb_tg_https_gateway" {
   tags = local.tags
 }
 
-resource "aws_lb_target_group" "lb_tg_https_equip-portal" {
+resource "aws_lb_target_group" "lb_tg_equip-portal" {
   name        = "tg-equip-portal"
   target_type = "ip"
-  protocol    = "HTTPS"
+  protocol    = "HTTP"
   vpc_id      = data.aws_vpc.shared.id
-  port        = "443"
+  port        = "80"
 
   health_check {
     enabled             = true
     path                = "/"
     interval            = 30
-    protocol            = "HTTPS"
-    port                = 443
+    protocol            = "HTTP"
+    port                = 80
     timeout             = 5
     healthy_threshold   = 5
     unhealthy_threshold = 2
@@ -80,19 +80,19 @@ resource "aws_lb_target_group" "lb_tg_https_equip-portal" {
   tags = local.tags
 }
 
-resource "aws_lb_target_group" "lb_tg_https_portal" {
+resource "aws_lb_target_group" "lb_tg_portal" {
   name        = "tg-portal"
   target_type = "ip"
-  protocol    = "HTTPS"
+  protocol    = "HTTP"
   vpc_id      = data.aws_vpc.shared.id
-  port        = "443"
+  port        = "80"
 
   health_check {
     enabled             = true
     path                = "/"
     interval            = 30
-    protocol            = "HTTPS"
-    port                = 443
+    protocol            = "HTTP"
+    port                = 80
     timeout             = 5
     healthy_threshold   = 5
     unhealthy_threshold = 2
@@ -102,19 +102,19 @@ resource "aws_lb_target_group" "lb_tg_https_portal" {
   tags = local.tags
 }
 
-resource "aws_lb_target_group" "lb_tg_https_analytics" {
+resource "aws_lb_target_group" "lb_tg_analytics" {
   name        = "tg-analytics"
   target_type = "ip"
-  protocol    = "HTTPS"
+  protocol    = "HTTP"
   vpc_id      = data.aws_vpc.shared.id
-  port        = "443"
+  port        = "8080"
 
   health_check {
     enabled             = true
-    path                = "/"
+    path                = "/spotfire/login.html"
     interval            = 30
-    protocol            = "HTTPS"
-    port                = 443
+    protocol            = "HTTP"
+    port                = 8080
     timeout             = 5
     healthy_threshold   = 5
     unhealthy_threshold = 2
@@ -124,28 +124,24 @@ resource "aws_lb_target_group" "lb_tg_https_analytics" {
   tags = local.tags
 }
 
-resource "aws_lb_target_group_attachment" "lb_tga_443_gateway" {
-  target_group_arn = aws_lb_target_group.lb_tg_https_gateway.arn
+resource "aws_lb_target_group_attachment" "lb_tga_gateway" {
+  target_group_arn = aws_lb_target_group.lb_tg_gateway.arn
   target_id        = aws_network_interface.adc_vip_interface.private_ip_list[0]
-  port             = 443
 }
 
-resource "aws_lb_target_group_attachment" "lb_tga_443_equip-portal" {
-  target_group_arn = aws_lb_target_group.lb_tg_https_equip-portal.arn
-  target_id        = aws_network_interface.adc_snip_interface.private_ip_list[1]
-  port             = 443
+resource "aws_lb_target_group_attachment" "lb_tga_equip-portal" {
+  target_group_arn = aws_lb_target_group.lb_tg_equip-portal.arn
+  target_id        = join("", module.win2012_STD_multiple["COR-A-EQP01"].private_ip)
 }
 
-resource "aws_lb_target_group_attachment" "lb_tga_443_portal" {
-  target_group_arn = aws_lb_target_group.lb_tg_https_portal.arn
-  target_id        = aws_network_interface.adc_snip_interface.private_ip_list[2]
-  port             = 443
+resource "aws_lb_target_group_attachment" "lb_tga_portal" {
+  target_group_arn = aws_lb_target_group.lb_tg_portal.arn
+  target_id        = join("", module.win2012_STD_multiple["COR-A-EQP01"].private_ip)
 }
 
-resource "aws_lb_target_group_attachment" "lb_tga_443_analytics" {
-  target_group_arn = aws_lb_target_group.lb_tg_https_analytics.arn
-  target_id        = aws_network_interface.adc_snip_interface.private_ip_list[3]
-  port             = 443
+resource "aws_lb_target_group_attachment" "lb_tga_analytics" {
+  target_group_arn = aws_lb_target_group.lb_tg_analytics.arn
+  target_id        = join("", module.win2012_STD_multiple["COR-A-SF01"].private_ip)
 }
 
 resource "aws_lb_listener" "lb_listener_https" {
@@ -157,7 +153,7 @@ resource "aws_lb_listener" "lb_listener_https" {
   certificate_arn   = data.aws_acm_certificate.equip_cert.arn
 
   default_action {
-    target_group_arn = aws_lb_target_group.lb_tg_https_gateway.arn
+    target_group_arn = aws_lb_target_group.lb_tg_gateway.arn
     type             = "forward"
   }
 }
@@ -182,7 +178,7 @@ resource "aws_lb_listener_rule" "gateway-equip-service-justice-gov-uk" {
   listener_arn = aws_lb_listener.lb_listener_https.arn
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.lb_tg_https_gateway.arn
+    target_group_arn = aws_lb_target_group.lb_tg_gateway.arn
   }
   condition {
     host_header {
@@ -195,7 +191,7 @@ resource "aws_lb_listener_rule" "equip-portal-equip-service-justice-gov-uk" {
   listener_arn = aws_lb_listener.lb_listener_https.arn
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.lb_tg_https_equip-portal.arn
+    target_group_arn = aws_lb_target_group.lb_tg_equip-portal.arn
   }
   condition {
     host_header {
@@ -208,7 +204,7 @@ resource "aws_lb_listener_rule" "portal-equip-service-justice-gov-uk" {
   listener_arn = aws_lb_listener.lb_listener_https.arn
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.lb_tg_https_portal.arn
+    target_group_arn = aws_lb_target_group.lb_tg_portal.arn
   }
   condition {
     host_header {
@@ -221,7 +217,7 @@ resource "aws_lb_listener_rule" "analytics-equip-service-justice-gov-uk" {
   listener_arn = aws_lb_listener.lb_listener_https.arn
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.lb_tg_https_analytics.arn
+    target_group_arn = aws_lb_target_group.lb_tg_analytics.arn
   }
   condition {
     host_header {

@@ -42,6 +42,28 @@ resource "aws_security_group_rule" "egress_alb_to_citrix-adc-snip_traffic" {
   source_security_group_id = aws_security_group.citrix_adc_snip.id
 }
 
+resource "aws_security_group_rule" "egress_alb_to_equip_host_traffic" {
+  for_each                 = local.application_data.alb_to_equip_rules
+  description              = format("ALB to Equip traffic for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.alb_sg.id
+  to_port                  = each.value.to_port
+  type                     = "egress"
+  source_security_group_id = aws_security_group.aws_equip_security_group.id
+}
+
+resource "aws_security_group_rule" "egress_alb_to_spotfire_host_traffic" {
+  for_each                 = local.application_data.alb_to_spotfire_rules
+  description              = format("ALB to Spotfire traffic for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.alb_sg.id
+  to_port                  = each.value.to_port
+  type                     = "egress"
+  source_security_group_id = aws_security_group.aws_spotfire_security_group.id
+}
+
 ############################################################################
 
 #Citrix ADC MGMT Security Group
@@ -371,6 +393,17 @@ resource "aws_security_group" "aws_equip_security_group" {
   )
 }
 
+resource "aws_security_group_rule" "ingress_alb_to_equip_traffic" {
+  for_each                 = local.application_data.alb_to_equip_rules
+  description              = format("ALB to Equip traffic for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.aws_equip_security_group.id
+  to_port                  = each.value.to_port
+  type                     = "ingress"
+  source_security_group_id = aws_security_group.alb_sg.id
+}
+
 resource "aws_security_group_rule" "ingress_citrix-adc-mgmt_to_equip_traffic" {
   for_each                 = local.application_data.adc-mgmt_to_equip_rules
   description              = format("ADC MGMT to Equip traffic for %s %d", each.value.protocol, each.value.from_port)
@@ -471,6 +504,17 @@ resource "aws_security_group" "aws_spotfire_security_group" {
   tags = merge(local.tags,
     { Name = lower(format("secg-%s-%s-spotfire", local.application_name, local.environment)) }
   )
+}
+
+resource "aws_security_group_rule" "ingress_alb_to_spotfire_traffic" {
+  for_each                 = local.application_data.alb_to_spotfire_rules
+  description              = format("ALB to Spotfire traffic for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.aws_spotfire_security_group.id
+  to_port                  = each.value.to_port
+  type                     = "ingress"
+  source_security_group_id = aws_security_group.alb_sg.id
 }
 
 resource "aws_security_group_rule" "ingress_citrix-adc-mgmt_to_spotfire_traffic" {
@@ -764,6 +808,17 @@ resource "aws_security_group_rule" "ingress_domain_controller_to_all_hosts_traff
   security_group_id        = aws_security_group.all_internal_groups.id
   to_port                  = each.value.to_port
   type                     = "ingress"
+  source_security_group_id = aws_security_group.aws_domain_security_group.id
+}
+
+resource "aws_security_group_rule" "egress_all_hosts_to_domain_controller_traffic" {
+  for_each                 = local.application_data.host_to_domain_controller_rules
+  description              = format("Host traffic to Domain Controllers for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.all_internal_groups.id
+  to_port                  = each.value.to_port
+  type                     = "egress"
   source_security_group_id = aws_security_group.aws_domain_security_group.id
 }
 
