@@ -660,7 +660,7 @@ resource "aws_ssm_patch_group" "windows" {
 }
 # CloudWatch Monitoring Role and Policies
 
-data "aws_iam_policy_document" "cloudwatch-datasource-assume-role" {
+data "aws_iam_policy_document" "cloud-platform-monitoring-assume-role" {
   statement {
     actions = ["sts:AssumeRole"]
 
@@ -673,7 +673,7 @@ data "aws_iam_policy_document" "cloudwatch-datasource-assume-role" {
 
 resource "aws_iam_role" "cloudwatch-datasource-role" {
   name               = "CloudwatchDatasourceRole"
-  assume_role_policy = data.aws_iam_policy_document.cloudwatch-datasource-assume-role.json
+  assume_role_policy = data.aws_iam_policy_document.cloud-platform-monitoring-assume-role.json
   tags = merge(
     local.tags,
     {
@@ -749,5 +749,22 @@ resource "aws_iam_policy" "cloudwatch_datasource_policy" {
 resource "aws_iam_role_policy_attachment" "cloudwatch_datasource_policy_attach" {
   policy_arn = aws_iam_policy.cloudwatch_datasource_policy.arn
   role       = aws_iam_role.cloudwatch-datasource-role.name
+
+}
+
+resource "aws_iam_role" "prometheus-ec2-discovery-role" {
+  name               = "PrometheusEC2DiscoveryRole"
+  assume_role_policy = data.aws_iam_policy_document.cloud-platform-monitoring-assume-role.json
+  tags = merge(
+    local.tags,
+    {
+      Name = "prometheus-ec2-discovery-role"
+    },
+  )
+}
+
+resource "aws_iam_role_policy_attachment" "prometheus_ec2_discovery_policy_attach" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess"
+  role       = aws_iam_role.prometheus-ec2-discovery-role.name
 
 }
