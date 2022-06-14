@@ -12,50 +12,64 @@ resource "aws_route53_record" "external" {
   }
 }
 
-resource "aws_acm_certificate" "lb_cert" {
-  domain_name       = "modernisation-platform.service.justice.gov.uk"
-  validation_method = "DNS"
-
-  subject_alternative_names = [
-    "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk",
-    "${local.application_data.accounts[local.environment].public_dns_name_web}",
-  ]
-
-  tags = {
-    Environment = local.environment
-  }
-
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
-resource "aws_acm_certificate_validation" "waf_lb_cert_validation" {
-  certificate_arn         = aws_acm_certificate.lb_cert.arn
-  validation_record_fqdns = [for record in local.domain_types : record.name]
-}
-
-resource "aws_route53_record" "external_validation" {
+resource "aws_route53_record" "analytics" {
+  count    = local.is-development ? 1 : 0
   provider = aws.core-network-services
 
-  allow_overwrite = true
-  name            = local.domain_name_main[0]
-  records         = local.domain_record_main
-  ttl             = 60
-  type            = local.domain_type_main[0]
-  zone_id         = data.aws_route53_zone.network-services.zone_id
+  zone_id = data.aws_route53_zone.application-zone.zone_id
+  name    = "analytics"
+  type    = "A"
+
+  alias {
+    name                   = aws_lb.citrix_alb.dns_name
+    zone_id                = aws_lb.citrix_alb.zone_id
+    evaluate_target_health = true
+  }
 }
 
-resource "aws_route53_record" "external_validation_subdomain" {
-  count    = length(local.domain_name_sub)
-  provider = aws.core-vpc
+resource "aws_route53_record" "equip-portal" {
+  count    = local.is-development ? 1 : 0
+  provider = aws.core-network-services
 
-  allow_overwrite = true
-  name            = local.domain_name_sub[count.index]
-  records         = [local.domain_record_sub[count.index]]
-  ttl             = 60
-  type            = local.domain_type_sub[count.index]
-  zone_id         = data.aws_route53_zone.external.zone_id
+  zone_id = data.aws_route53_zone.application-zone.zone_id
+  name    = "equip-portal"
+  type    = "A"
+
+  alias {
+    name                   = aws_lb.citrix_alb.dns_name
+    zone_id                = aws_lb.citrix_alb.zone_id
+    evaluate_target_health = true
+  }
+}
+
+resource "aws_route53_record" "gateway" {
+  count    = local.is-development ? 1 : 0
+  provider = aws.core-network-services
+
+  zone_id = data.aws_route53_zone.application-zone.zone_id
+  name    = "gateway"
+  type    = "A"
+
+  alias {
+    name                   = aws_lb.citrix_alb.dns_name
+    zone_id                = aws_lb.citrix_alb.zone_id
+    evaluate_target_health = true
+  }
+}
+
+resource "aws_route53_record" "portal" {
+  count    = local.is-development ? 1 : 0
+  provider = aws.core-network-services
+
+  zone_id = data.aws_route53_zone.application-zone.zone_id
+  name    = "portal"
+  type    = "A"
+
+  alias {
+    name                   = aws_lb.citrix_alb.dns_name
+    zone_id                = aws_lb.citrix_alb.zone_id
+    evaluate_target_health = true
+  }
 }
 
 resource "aws_route53_resolver_endpoint" "equip-domain" {
@@ -69,15 +83,15 @@ resource "aws_route53_resolver_endpoint" "equip-domain" {
   ]
 
   ip_address {
-    subnet_id = data.aws_subnet.private_subnets_a.id
+    subnet_id = data.aws_subnet.private_subnet_a.id
   }
 
   ip_address {
-    subnet_id = data.aws_subnet.private_subnets_b.id
+    subnet_id = data.aws_subnet.private_subnet_b.id
   }
 
   ip_address {
-    subnet_id = data.aws_subnet.private_subnets_c.id
+    subnet_id = data.aws_subnet.private_subnet_c.id
   }
 
   tags = {

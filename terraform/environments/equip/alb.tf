@@ -4,8 +4,7 @@
 # https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-access-logs.html
 ##############################################################
 
-data "aws_acm_certificate" "production_cert" {
-  count    = local.environment == "production" ? 1 : 0
+data "aws_acm_certificate" "equip_cert" {
   domain   = "equip.service.justice.gov.uk"
   statuses = ["ISSUED"]
 }
@@ -17,7 +16,7 @@ resource "aws_lb" "citrix_alb" {
   name               = format("alb-%s-%s-citrix", local.application_name, local.environment)
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb_sg.id]
-  subnets            = [data.aws_subnet.public_az_a.id, data.aws_subnet.public_az_b.id]
+  subnets            = [data.aws_subnet.public_subnet_a.id, data.aws_subnet.public_subnet_b.id]
 
   enable_deletion_protection = true
   drop_invalid_header_fields = true
@@ -37,8 +36,30 @@ resource "aws_lb" "citrix_alb" {
 
 }
 
-resource "aws_lb_target_group" "lb_tg_http" {
-  name        = format("tg-%s-%s-80", local.application_name, local.environment)
+resource "aws_lb_target_group" "lb_tg_gateway" {
+  name        = "tg-gateway"
+  target_type = "ip"
+  protocol    = "HTTPS"
+  vpc_id      = data.aws_vpc.shared.id
+  port        = "443"
+
+  health_check {
+    enabled             = true
+    path                = "/"
+    interval            = 30
+    protocol            = "HTTPS"
+    port                = 443
+    timeout             = 5
+    healthy_threshold   = 5
+    unhealthy_threshold = 2
+    matcher             = "200"
+  }
+
+  tags = local.tags
+}
+
+resource "aws_lb_target_group" "lb_tg_equip-portal" {
+  name        = "tg-equip-portal"
   target_type = "ip"
   protocol    = "HTTP"
   vpc_id      = data.aws_vpc.shared.id
@@ -50,7 +71,7 @@ resource "aws_lb_target_group" "lb_tg_http" {
     interval            = 30
     protocol            = "HTTP"
     port                = 80
-    timeout             = 10
+    timeout             = 5
     healthy_threshold   = 5
     unhealthy_threshold = 2
     matcher             = "200"
@@ -59,20 +80,20 @@ resource "aws_lb_target_group" "lb_tg_http" {
   tags = local.tags
 }
 
-resource "aws_lb_target_group" "lb_tg_https" {
-  name        = format("tg-%s-%s-443", local.application_name, local.environment)
+resource "aws_lb_target_group" "lb_tg_portal" {
+  name        = "tg-portal"
   target_type = "ip"
-  protocol    = "HTTPS"
+  protocol    = "HTTP"
   vpc_id      = data.aws_vpc.shared.id
-  port        = "443"
+  port        = "80"
 
   health_check {
     enabled             = true
     path                = "/"
     interval            = 30
-    protocol            = "HTTPS"
+    protocol            = "HTTP"
     port                = 80
-    timeout             = 10
+    timeout             = 5
     healthy_threshold   = 5
     unhealthy_threshold = 2
     matcher             = "200"
@@ -81,16 +102,46 @@ resource "aws_lb_target_group" "lb_tg_https" {
   tags = local.tags
 }
 
-resource "aws_lb_target_group_attachment" "lb_tga_80" {
-  target_group_arn = aws_lb_target_group.lb_tg_http.arn
-  target_id        = aws_network_interface.adc_vip_interface.private_ip
-  port             = 80
+resource "aws_lb_target_group" "lb_tg_analytics" {
+  name        = "tg-analytics"
+  target_type = "ip"
+  protocol    = "HTTP"
+  vpc_id      = data.aws_vpc.shared.id
+  port        = "8080"
+
+  health_check {
+    enabled             = true
+    path                = "/spotfire/login.html"
+    interval            = 30
+    protocol            = "HTTP"
+    port                = 8080
+    timeout             = 5
+    healthy_threshold   = 5
+    unhealthy_threshold = 2
+    matcher             = "200"
+  }
+
+  tags = local.tags
 }
 
-resource "aws_lb_target_group_attachment" "lb_tga_443" {
-  target_group_arn = aws_lb_target_group.lb_tg_http.arn
-  target_id        = aws_network_interface.adc_vip_interface.private_ip
-  port             = 443
+resource "aws_lb_target_group_attachment" "lb_tga_gateway" {
+  target_group_arn = aws_lb_target_group.lb_tg_gateway.arn
+  target_id        = aws_network_interface.adc_vip_interface.private_ip_list[0]
+}
+
+resource "aws_lb_target_group_attachment" "lb_tga_equip-portal" {
+  target_group_arn = aws_lb_target_group.lb_tg_equip-portal.arn
+  target_id        = join("", module.win2012_STD_multiple["COR-A-EQP01"].private_ip)
+}
+
+resource "aws_lb_target_group_attachment" "lb_tga_portal" {
+  target_group_arn = aws_lb_target_group.lb_tg_portal.arn
+  target_id        = join("", module.win2012_STD_multiple["COR-A-EQP01"].private_ip)
+}
+
+resource "aws_lb_target_group_attachment" "lb_tga_analytics" {
+  target_group_arn = aws_lb_target_group.lb_tg_analytics.arn
+  target_id        = join("", module.win2012_STD_multiple["COR-A-SF01"].private_ip)
 }
 
 resource "aws_lb_listener" "lb_listener_https" {
@@ -99,10 +150,10 @@ resource "aws_lb_listener" "lb_listener_https" {
   port              = "443"
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-TLS-1-2-2017-01"
-  certificate_arn   = aws_acm_certificate.lb_cert.arn
+  certificate_arn   = data.aws_acm_certificate.equip_cert.arn
 
   default_action {
-    target_group_arn = aws_lb_target_group.lb_tg_http.arn
+    target_group_arn = aws_lb_target_group.lb_tg_gateway.arn
     type             = "forward"
   }
 }
@@ -123,226 +174,54 @@ resource "aws_lb_listener" "lb_listener_http" {
   }
 }
 
-
-#########################################################################
-# WAF Rules for Application Load balancer
-#########################################################################
-
-resource "aws_wafv2_web_acl" "wafv2_web_acl" {
-  name        = "aws_wafv2_webacl"
-  description = "Web ACL for ALB"
-  scope       = "REGIONAL"
-
-  default_action {
-    allow {
-    }
+resource "aws_lb_listener_rule" "gateway-equip-service-justice-gov-uk" {
+  listener_arn = aws_lb_listener.lb_listener_https.arn
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.lb_tg_gateway.arn
   }
-
-  visibility_config {
-    cloudwatch_metrics_enabled = true
-    metric_name                = "aws_wafv2_webacl"
-    sampled_requests_enabled   = true
-  }
-  rule {
-    name     = "WAF_Known_bad"
-    priority = 1
-    override_action {
-      none {
-      }
-    }
-    statement {
-      managed_rule_group_statement {
-        name        = "AWSManagedRulesKnownBadInputsRuleSet"
-        vendor_name = "AWS"
-      }
-    }
-    visibility_config {
-      cloudwatch_metrics_enabled = true
-      metric_name                = "WAF_Known_bad"
-      sampled_requests_enabled   = true
-    }
-  }
-  rule {
-    name     = "WAF_AmazonIP_reputation"
-    priority = 2
-    override_action {
-      count {
-      }
-    }
-    statement {
-      managed_rule_group_statement {
-        name        = "AWSManagedRulesAmazonIpReputationList"
-        vendor_name = "AWS"
-      }
-    }
-    visibility_config {
-      cloudwatch_metrics_enabled = true
-      metric_name                = "WAF_AmazonIP_reputation"
-      sampled_requests_enabled   = true
-    }
-  }
-  rule {
-    name     = "WAF_Core_rule"
-    priority = 3
-    override_action {
-      count {
-      }
-    }
-    statement {
-      managed_rule_group_statement {
-        name        = "AWSManagedRulesCommonRuleSet"
-        vendor_name = "AWS"
-
-        excluded_rule {
-          name = "SizeRestrictions_QUERYSTRING"
-        }
-
-        excluded_rule {
-          name = "SizeRestrictions_BODY"
-        }
-
-        excluded_rule {
-          name = "GenericRFI_QUERYARGUMENTS"
-        }
-
-        excluded_rule {
-          name = "NoUserAgent_HEADER"
-        }
-
-        scope_down_statement {
-          geo_match_statement {
-            country_codes = ["GB", "IN"]
-          }
-        }
-      }
-    }
-    visibility_config {
-      cloudwatch_metrics_enabled = true
-      metric_name                = "WAF_Core_rule"
-      sampled_requests_enabled   = true
-    }
-  }
-  rule {
-    name     = "WAF_AnonymousIP"
-    priority = 4
-    override_action {
-      count {
-      }
-    }
-    statement {
-      managed_rule_group_statement {
-        name        = "AWSManagedRulesAnonymousIpList"
-        vendor_name = "AWS"
-      }
-    }
-    visibility_config {
-      cloudwatch_metrics_enabled = true
-      metric_name                = "WAF_AnonymousIP"
-      sampled_requests_enabled   = true
-    }
-  }
-  rule {
-    name     = "WAF_SQLdatabase"
-    priority = 5
-    override_action {
-      count {
-      }
-    }
-    statement {
-      managed_rule_group_statement {
-        name        = "AWSManagedRulesSQLiRuleSet"
-        vendor_name = "AWS"
-      }
-    }
-    visibility_config {
-      cloudwatch_metrics_enabled = true
-      metric_name                = "WAF_SQLdatabase"
-      sampled_requests_enabled   = true
-    }
-  }
-  rule {
-    name     = "WAF_Windows_OS"
-    priority = 6
-    override_action {
-      count {
-      }
-    }
-    statement {
-      managed_rule_group_statement {
-        name        = "AWSManagedRulesWindowsRuleSet"
-        vendor_name = "AWS"
-      }
-    }
-    visibility_config {
-      cloudwatch_metrics_enabled = true
-      metric_name                = "WAF_Windows_OS"
-      sampled_requests_enabled   = true
-    }
-  }
-  tags = {
-    Name = "aws_wafv2_webacl citrix"
-  }
-}
-
-
-resource "aws_wafv2_web_acl_association" "aws_lb_waf_association" {
-  resource_arn = aws_lb.citrix_alb.arn
-  web_acl_arn  = aws_wafv2_web_acl.wafv2_web_acl.arn
-}
-
-
-#tfsec:ignore:aws-s3-enable-bucket-encryption tfsec:ignore:aws-s3-enable-bucket-logging tfsec:ignore:aws-s3-enable-versioning tfsec:ignore:aws-s3-block-public-acls tfsec:ignore:aws-s3-block-public-policy tfsec:ignore:aws-s3-ignore-public-acls tfsec:ignore:aws-s3-no-public-buckets tfsec:ignore:aws-s3-specify-public-access-block
-resource "aws_s3_bucket" "wafv2_webacl_logs" {
-  bucket        = "aws-waf-logs-citrix-moj"
-  force_destroy = true
-}
-
-resource "aws_s3_bucket_lifecycle_configuration" "bucket-config-waf" {
-  bucket = aws_s3_bucket.wafv2_webacl_logs.bucket
-
-  rule {
-    id = "log_deletion"
-
-    expiration {
-      days = 90
-    }
-
-    filter {
-      and {
-        prefix = ""
-
-        tags = {
-          rule      = "waf-log-deletion"
-          autoclean = "true"
-        }
-      }
-    }
-    status = "Enabled"
-
-    transition {
-      days          = 30
-      storage_class = "STANDARD_IA"
-    }
-
-    transition {
-      days          = 60
-      storage_class = "GLACIER"
+  condition {
+    host_header {
+      values = ["gateway.equip.service.justice.gov.uk"]
     }
   }
 }
 
-#tfsec:ignore:aws-s3-encryption-customer-key
-resource "aws_s3_bucket_server_side_encryption_configuration" "default_encryption_waf_logs" {
-  bucket = aws_s3_bucket.wafv2_webacl_logs.id
-
-  rule {
-    apply_server_side_encryption_by_default {
-      sse_algorithm = "AES256"
+resource "aws_lb_listener_rule" "equip-portal-equip-service-justice-gov-uk" {
+  listener_arn = aws_lb_listener.lb_listener_https.arn
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.lb_tg_equip-portal.arn
+  }
+  condition {
+    host_header {
+      values = ["equip-portal.equip.service.justice.gov.uk"]
     }
   }
 }
 
-resource "aws_wafv2_web_acl_logging_configuration" "wafv2_webacl_logs" {
-  log_destination_configs = ["${aws_s3_bucket.wafv2_webacl_logs.arn}"]
-  resource_arn            = aws_wafv2_web_acl.wafv2_web_acl.arn
+resource "aws_lb_listener_rule" "portal-equip-service-justice-gov-uk" {
+  listener_arn = aws_lb_listener.lb_listener_https.arn
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.lb_tg_portal.arn
+  }
+  condition {
+    host_header {
+      values = ["portal.equip.service.justice.gov.uk"]
+    }
+  }
+}
+
+resource "aws_lb_listener_rule" "analytics-equip-service-justice-gov-uk" {
+  listener_arn = aws_lb_listener.lb_listener_https.arn
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.lb_tg_analytics.arn
+  }
+  condition {
+    host_header {
+      values = ["analytics.equip.service.justice.gov.uk"]
+    }
+  }
 }

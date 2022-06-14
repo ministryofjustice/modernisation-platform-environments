@@ -80,6 +80,9 @@ resource "aws_instance" "jumpserver_windows" {
 }
 
 resource "aws_security_group" "jumpserver-windows" {
+  # this skip check can be removed once the jumpserver is reinstated
+  # reluctant to delete the SG as its referenced in various places
+  #checkov:skip=CKV2_AWS_5: "Ensure that Security Groups are attached to another resource"
   description = "Configure Windows jumpserver egress"
   name        = "jumpserver-windows-${local.application_name}"
   vpc_id      = local.vpc_id

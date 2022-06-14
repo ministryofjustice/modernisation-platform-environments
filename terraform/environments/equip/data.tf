@@ -16,45 +16,66 @@ data "aws_subnets" "shared-data" {
   }
 }
 
-data "aws_subnet" "private_subnets_a" {
+data "aws_subnet" "private_subnet_a" {
   vpc_id = data.aws_vpc.shared.id
   tags = {
     "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-private-${data.aws_region.current.name}a"
   }
 }
 
-data "aws_subnet" "private_subnets_b" {
+data "aws_subnet" "private_subnet_b" {
   vpc_id = data.aws_vpc.shared.id
   tags = {
     "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-private-${data.aws_region.current.name}b"
   }
 }
 
-data "aws_subnet" "private_subnets_c" {
+data "aws_subnet" "private_subnet_c" {
   vpc_id = data.aws_vpc.shared.id
   tags = {
     "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-private-${data.aws_region.current.name}c"
   }
 }
 
-data "aws_subnet" "public_az_a" {
+data "aws_subnet" "public_subnet_a" {
   vpc_id = data.aws_vpc.shared.id
   tags = {
     Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public-${data.aws_region.current.name}a"
   }
 }
 
-data "aws_subnet" "public_az_b" {
+data "aws_subnet" "public_subnet_b" {
   vpc_id = data.aws_vpc.shared.id
   tags = {
     Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public-${data.aws_region.current.name}b"
   }
 }
 
-data "aws_subnet" "public_az_c" {
+data "aws_subnet" "public_subnet_c" {
   vpc_id = data.aws_vpc.shared.id
   tags = {
     Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public-${data.aws_region.current.name}c"
+  }
+}
+
+data "aws_subnet" "data_subnet_a" {
+  vpc_id = data.aws_vpc.shared.id
+  tags = {
+    Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-data-${data.aws_region.current.name}a"
+  }
+}
+
+data "aws_subnet" "data_subnet_b" {
+  vpc_id = data.aws_vpc.shared.id
+  tags = {
+    Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-data-${data.aws_region.current.name}b"
+  }
+}
+
+data "aws_subnet" "data_subnet_c" {
+  vpc_id = data.aws_vpc.shared.id
+  tags = {
+    Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-data-${data.aws_region.current.name}c"
   }
 }
 
@@ -76,6 +97,13 @@ data "aws_route53_zone" "network-services" {
   provider = aws.core-network-services
 
   name         = "modernisation-platform.service.justice.gov.uk."
+  private_zone = false
+}
+
+data "aws_route53_zone" "application-zone" {
+  provider = aws.core-network-services
+
+  name         = "equip.service.justice.gov.uk."
   private_zone = false
 }
 
