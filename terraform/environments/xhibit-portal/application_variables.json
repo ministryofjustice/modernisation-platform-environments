@@ -29,7 +29,8 @@
       "suprig05-disk-1-snapshot": "snap-0b6d529f807eb9a6a",
       "XHBPRESMS01-ami": "ami-03ad19f47c6725480",
       "buildserver-ami": "ami-096d0bf0a5fc0fadb",
-      "buildserver-disk-1-snapshot": "snap-04ecdbc7c6e980243"
+      "buildserver-disk-1-snapshot": "snap-04ecdbc7c6e980243",
+      "suprig01-baremetal-ami": "ami-00774479ee85c5c3a"
     },
     "preproduction": {
       "public_dns_name_web": "prepportal.cjsonline.gov.uk",
@@ -59,7 +60,8 @@
       "XHBPRESMS01-ami": "ami-03ad19f47c6725480",
       "importmachine-ami": "ami-0b33dfec9e4072ca1",
       "buildserver-ami": "ami-0da5babad86576eb8",
-      "buildserver-disk-1-snapshot": "snap-0b6d529f807eb9a6a"
+      "buildserver-disk-1-snapshot": "snap-0b6d529f807eb9a6a",
+      "suprig01-baremetal-ami": "ami-00774479ee85c5c3a"
     },
     "production": {
       "public_dns_name_web": "pportal.cjsonline.gov.uk",
