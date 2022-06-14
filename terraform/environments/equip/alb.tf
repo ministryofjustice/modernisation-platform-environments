@@ -39,16 +39,16 @@ resource "aws_lb" "citrix_alb" {
 resource "aws_lb_target_group" "lb_tg_gateway" {
   name        = "tg-gateway"
   target_type = "ip"
-  protocol    = "HTTP"
+  protocol    = "HTTPS"
   vpc_id      = data.aws_vpc.shared.id
-  port        = "80"
+  port        = "443"
 
   health_check {
     enabled             = true
     path                = "/"
     interval            = 30
-    protocol            = "HTTP"
-    port                = 80
+    protocol            = "HTTPS"
+    port                = 443
     timeout             = 5
     healthy_threshold   = 5
     unhealthy_threshold = 2
