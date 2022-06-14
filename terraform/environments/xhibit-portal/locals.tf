@@ -66,4 +66,12 @@ locals {
   domain_type_main   = [for k, v in local.domain_types : v.type if k == "modernisation-platform.service.justice.gov.uk"]
   domain_type_sub    = [for k, v in local.domain_types : v.type if k != "modernisation-platform.service.justice.gov.uk"]
 
+  # This is used to prevent our bare metal server from deploying in environments other than production
+  only_in_production_mapping = {
+    development   = 0
+    preproduction = 0
+    production    = 1
+  }
+  only_in_production = local.only_in_production_mapping[terraform.workspace]
+
 }
