@@ -92,6 +92,13 @@ variable "business_unit" {
   nullable    = false
 }
 
+variable "description" {
+  type        = string
+  description = "VM description, should include information such as what is running on it, etc."
+  default     = ""
+  nullable    = false
+}
+
 variable "extra_ingress_rules" {
   type = list(object({
     description = string

@@ -69,11 +69,11 @@ resource "aws_launch_template" "weblogic" {
   instance_type                        = var.instance_type
   key_name                             = var.key_name
 
-  #tfsec:ignore:aws-autoscaling-enforce-http-token-imds
-  # metadata_options { # http_endpoint/http_tokens forces instance to use IMDSv2 which is incompatible with Weblogic
-  #   http_endpoint = "enabled"
-  #   http_tokens   = "required"
-  # }
+  #checkov:skip=CKV_AWS_79 # skip "Ensure Instance Metadata Service Version 1 is not enabled" incompatible with Weblogic
+  metadata_options {
+    http_endpoint = "enabled"
+    http_tokens   = "optional" #tfsec:ignore:aws-autoscaling-enforce-http-token-imds: http_tokens forces instance to use IMDSv2 which is incompatible with Weblogic
+  }
 
   monitoring {
     enabled = true
@@ -321,6 +321,7 @@ data "aws_iam_policy_document" "weblogic" {
     sid     = "ParameterAccessForWeblogicSetup"
     effect  = "Allow"
     actions = ["ssm:GetParameter"]
+    #tfsec:ignore:aws-iam-no-policy-wildcards: access scoped to parameter path
     resources = [
       "arn:aws:ssm:${var.region}:${data.aws_caller_identity.current.id}:parameter/weblogic/default/*",
       "arn:aws:ssm:${var.region}:${data.aws_caller_identity.current.id}:parameter/weblogic/${var.name}/*"
@@ -328,10 +329,10 @@ data "aws_iam_policy_document" "weblogic" {
   }
 
   statement {
-    #tfsec:ignore:aws-iam-no-policy-wildcards:this needs to be created before the autoscaling group, therefore the ASG ID needs to be wildcarded
     sid     = "TriggerInstanceLifecycleHooks"
     effect  = "Allow"
     actions = ["autoscaling:CompleteLifecycleAction"]
+    #tfsec:ignore:aws-iam-no-policy-wildcards: this needs to be created before the autoscaling group, therefore the ASG ID needs to be wildcarded
     resources = [
       "arn:aws:autoscaling:${var.region}:${data.aws_caller_identity.current.id}:autoScalingGroup:*:autoScalingGroupName/${local.auto_scaling_group_name}"
     ]

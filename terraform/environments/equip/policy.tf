@@ -20,6 +20,7 @@ resource "aws_iam_policy" "policy-ssm" {
   })
 }
 
+#tfsec:ignore:aws-iam-no-policy-wildcards
 resource "aws_iam_policy" "citrix_adc_instance_policy" {
   name        = "citrix_adc_instance_policy"
   path        = "/"

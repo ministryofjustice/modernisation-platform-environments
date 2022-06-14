@@ -44,7 +44,7 @@ locals {
   win2016_instances = {
     COR-A-DC01 = {
       instance_type          = "t3a.large"
-      subnet_id              = data.aws_subnet.private_subnets_a.id
+      subnet_id              = data.aws_subnet.private_subnet_a.id
       vpc_security_group_ids = [aws_security_group.aws_domain_security_group.id]
       root_block_device = [
         {
@@ -64,7 +64,7 @@ locals {
     }
     COR-A-DC02 = {
       instance_type          = "t3a.large"
-      subnet_id              = data.aws_subnet.private_subnets_b.id
+      subnet_id              = data.aws_subnet.private_subnet_b.id
       vpc_security_group_ids = [aws_security_group.aws_domain_security_group.id]
       root_block_device = [
         {
@@ -85,7 +85,7 @@ locals {
     }
     COR-A-CTX01 = {
       instance_type          = "t3a.large"
-      subnet_id              = data.aws_subnet.private_subnets_a.id
+      subnet_id              = data.aws_subnet.private_subnet_a.id
       vpc_security_group_ids = [aws_security_group.aws_citrix_security_group.id, aws_security_group.all_internal_groups.id]
       root_block_device = [
         {
@@ -117,7 +117,7 @@ locals {
     }
     COR-A-CTX02 = {
       instance_type          = "t3a.large"
-      subnet_id              = data.aws_subnet.private_subnets_a.id
+      subnet_id              = data.aws_subnet.private_subnet_a.id
       vpc_security_group_ids = [aws_security_group.aws_citrix_security_group.id, aws_security_group.all_internal_groups.id]
       root_block_device = [
         {
@@ -137,7 +137,7 @@ locals {
     }
     COR-A-CTX03 = {
       instance_type          = "t3a.large"
-      subnet_id              = data.aws_subnet.private_subnets_b.id
+      subnet_id              = data.aws_subnet.private_subnet_a.id
       vpc_security_group_ids = [aws_security_group.aws_citrix_security_group.id, aws_security_group.all_internal_groups.id]
       root_block_device = [
         {
@@ -157,7 +157,7 @@ locals {
     }
     COR-A-PXY01 = {
       instance_type          = "t3a.large"
-      subnet_id              = data.aws_subnet.private_subnets_a.id
+      subnet_id              = data.aws_subnet.private_subnet_a.id
       vpc_security_group_ids = [aws_security_group.aws_proxy_security_group.id, aws_security_group.all_internal_groups.id]
       root_block_device = [
         {
@@ -189,7 +189,7 @@ locals {
     }
     COR-A-TST01 = {
       instance_type          = "t3a.large"
-      subnet_id              = data.aws_subnet.private_subnets_a.id
+      subnet_id              = data.aws_subnet.private_subnet_a.id
       vpc_security_group_ids = [aws_security_group.aws_equip_security_group.id, aws_security_group.all_internal_groups.id]
       root_block_device = [
         {
@@ -259,7 +259,7 @@ resource "aws_instance" "SOC" {
 
   instance_type          = "t3a.xlarge"
   availability_zone      = "${local.region}a"
-  subnet_id              = data.aws_subnet.private_subnets_a.id
+  subnet_id              = data.aws_subnet.private_subnet_a.id
   vpc_security_group_ids = [aws_security_group.aws_proxy_security_group.id, aws_security_group.all_internal_groups.id]
   monitoring             = true
   ebs_optimized          = true
@@ -310,12 +310,12 @@ resource "aws_instance" "SOC" {
 
 ################################################################################
 
-data "aws_ami" "windows_2012_std_SQL16_ami" {
+data "aws_ami" "windows_2019_std_SQL17_ami" {
   owners      = ["amazon"]
   most_recent = true
   filter {
     name   = "name"
-    values = ["Windows_Server-2012-R2_RTM-English-64Bit-SQL_2016_SP3_Standard*"]
+    values = ["Windows_Server-2019-English-Full-SQL_2017_Standard*"]
   }
   filter {
     name   = "virtualization-type"
@@ -324,10 +324,10 @@ data "aws_ami" "windows_2012_std_SQL16_ami" {
 }
 
 locals {
-  win2012_SQL_instances = {
+  win2019_SQL_instances = {
     COR-A-SF02 = {
       instance_type          = "t3a.xlarge"
-      subnet_id              = data.aws_subnet.private_subnets_a.id
+      subnet_id              = data.aws_subnet.private_subnet_a.id
       vpc_security_group_ids = [aws_security_group.aws_spotfire_security_group.id, aws_security_group.all_internal_groups.id]
       root_block_device = [
         {
@@ -360,14 +360,14 @@ locals {
   }
 }
 
-module "win2012_SQL_multiple" {
+module "win2019_SQL_multiple" {
   source = "./ec2-instance-module"
 
 
-  for_each = local.win2012_SQL_instances
+  for_each = local.win2019_SQL_instances
 
   name                   = "${local.name}-${each.key}"
-  ami                    = "ami-074c86bb2f72d9966"
+  ami                    = "ami-0d6ed9f188054719d"
   instance_type          = each.value.instance_type
   vpc_security_group_ids = each.value.vpc_security_group_ids
   subnet_id              = each.value.subnet_id
@@ -410,7 +410,7 @@ locals {
   win2012_STD_instances = {
     COR-A-EQP01 = {
       instance_type          = "t3a.xlarge"
-      subnet_id              = data.aws_subnet.private_subnets_a.id
+      subnet_id              = data.aws_subnet.private_subnet_a.id
       vpc_security_group_ids = [aws_security_group.aws_equip_security_group.id, aws_security_group.all_internal_groups.id]
       root_block_device = [
         {
@@ -451,7 +451,7 @@ locals {
         {
           device_name = "/dev/sdh"
           volume_type = "gp3"
-          volume_size = 400
+          volume_size = 1000
           encrypted   = true
           kms_key_id  = aws_kms_key.this.arn
           tags = merge(local.tags,
@@ -466,7 +466,7 @@ locals {
     }
     COR-A-EQP02 = {
       instance_type          = "t3a.xlarge"
-      subnet_id              = data.aws_subnet.private_subnets_b.id
+      subnet_id              = data.aws_subnet.private_subnet_a.id
       vpc_security_group_ids = [aws_security_group.aws_equip_security_group.id, aws_security_group.all_internal_groups.id]
       root_block_device = [
         {
@@ -498,7 +498,7 @@ locals {
     }
     COR-A-EQP03 = {
       instance_type          = "t3a.xlarge"
-      subnet_id              = data.aws_subnet.private_subnets_c.id
+      subnet_id              = data.aws_subnet.private_subnet_c.id
       vpc_security_group_ids = [aws_security_group.aws_equip_security_group.id, aws_security_group.all_internal_groups.id]
       root_block_device = [
         {
@@ -518,7 +518,7 @@ locals {
     }
     COR-A-SF01 = {
       instance_type          = "t3a.large"
-      subnet_id              = data.aws_subnet.private_subnets_a.id
+      subnet_id              = data.aws_subnet.private_subnet_a.id
       vpc_security_group_ids = [aws_security_group.aws_spotfire_security_group.id, aws_security_group.all_internal_groups.id]
       root_block_device = [
         {
@@ -538,7 +538,7 @@ locals {
     }
     COR-A-SF03 = {
       instance_type          = "t3a.large"
-      subnet_id              = data.aws_subnet.private_subnets_a.id
+      subnet_id              = data.aws_subnet.private_subnet_a.id
       vpc_security_group_ids = [aws_security_group.aws_spotfire_security_group.id, aws_security_group.all_internal_groups.id]
       root_block_device = [
         {
