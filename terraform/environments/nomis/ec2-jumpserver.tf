@@ -51,7 +51,7 @@ resource "aws_instance" "jumpserver_windows" {
   associate_public_ip_address = false
   iam_instance_profile        = aws_iam_instance_profile.ec2_jumpserver_profile.id
   ebs_optimized               = true
- #checkov:skip=CKV_AWS_126: "Ensure that detailed monitoring is enabled for EC2 instances" don't think we need such fine resolution for JS
+  #checkov:skip=CKV_AWS_126: "Ensure that detailed monitoring is enabled for EC2 instances" don't think we need such fine resolution for JS
   monitoring                  = false
   vpc_security_group_ids      = [aws_security_group.jumpserver-windows.id]
   subnet_id                   = data.aws_subnet.private_az_a.id
