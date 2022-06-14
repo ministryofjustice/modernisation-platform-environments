@@ -1,7 +1,7 @@
 #another trigger
 resource "aws_instance" "database-server-baremetal" {
   # Used to prevent this server deploying in production
-  count                       = [local.only_in_production]
+  count                       = local.only_in_production
   depends_on                  = [aws_security_group.sms_server]
   instance_type               = "c5d.metal"
   ami                         = local.application_data.accounts[local.environment].suprig01-baremetal-ami
