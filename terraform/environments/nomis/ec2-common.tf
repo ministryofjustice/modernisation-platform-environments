@@ -753,7 +753,7 @@ resource "aws_iam_role_policy_attachment" "cloudwatch_datasource_policy_attach" 
 }
 
 resource "aws_iam_role" "prometheus-ec2-discovery-role" {
-  name               = "PrometheusEC2DiscoveryRole"
+  name               = "PrometheusEC2DiscoveryeRole"
   assume_role_policy = data.aws_iam_policy_document.cloud-platform-monitoring-assume-role.json
   tags = merge(
     local.tags,
