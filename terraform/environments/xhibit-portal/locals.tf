@@ -72,6 +72,6 @@ locals {
     preproduction = 0
     production    = 1
   }
-  only_in_production = local.only_in_production_mapping[terraform.workspace]
+  only_in_production = local.only_in_production_mapping[local.environment]
 
 }
