@@ -45,7 +45,7 @@ resource "aws_lb_target_group" "lb_tg_gateway" {
 
   health_check {
     enabled             = true
-    path                = "/Citrix/EquipStoreFrontWeb"
+    path                = "/"
     interval            = 30
     protocol            = "HTTP"
     port                = 80
@@ -192,27 +192,6 @@ resource "aws_lb_listener_rule" "fwd-gateway-equip-service-justice-gov-uk" {
   action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.lb_tg_gateway.arn
-  }
-  condition {
-    host_header {
-      values = ["gateway.equip.service.justice.gov.uk"]
-    }
-  }
-  condition {
-    path_pattern {
-      values = ["/Citrix/EquipStoreFrontWeb"]
-    }
-  }
-}
-
-resource "aws_lb_listener_rule" "redir-gateway-equip-service-justice-gov-uk" {
-  listener_arn = aws_lb_listener.lb_listener_https.arn
-  action {
-    type = "redirect"
-    redirect {
-      path        = "/Citrix/EquipStoreFrontWeb"
-      status_code = "HTTP_301"
-    }
   }
   condition {
     host_header {
