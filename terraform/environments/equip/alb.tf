@@ -174,19 +174,6 @@ resource "aws_lb_listener" "lb_listener_http" {
   }
 }
 
-resource "aws_lb_listener_rule" "gateway-equip-service-justice-gov-uk" {
-  listener_arn = aws_lb_listener.lb_listener_https.arn
-  action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.lb_tg_gateway.arn
-  }
-  condition {
-    host_header {
-      values = ["gateway.equip.service.justice.gov.uk"]
-    }
-  }
-}
-
 resource "aws_lb_listener_rule" "equip-portal-equip-service-justice-gov-uk" {
   listener_arn = aws_lb_listener.lb_listener_https.arn
   action {
@@ -196,6 +183,19 @@ resource "aws_lb_listener_rule" "equip-portal-equip-service-justice-gov-uk" {
   condition {
     host_header {
       values = ["equip-portal.equip.service.justice.gov.uk"]
+    }
+  }
+}
+
+resource "aws_lb_listener_rule" "gateway-equip-service-justice-gov-uk" {
+  listener_arn = aws_lb_listener.lb_listener_https.arn
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.lb_tg_gateway.arn
+  }
+  condition {
+    host_header {
+      values = ["gateway.equip.service.justice.gov.uk"]
     }
   }
 }
