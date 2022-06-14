@@ -225,7 +225,7 @@ data "aws_iam_policy_document" "packer_ansible_permissions" {
       "ec2:DescribeVpcs",
       "ec2:DescribeKeyPairs",
       "sts:DecodeAuthorizationMessage",
-      # "kms:ReEncrypt*", # for building from cmk-encrypted AMIs - don't think this is required here
+      "secretsmanager:*" # need this temp. to cleanup jumpserver secrets
     ]
     resources = ["*"]
   }

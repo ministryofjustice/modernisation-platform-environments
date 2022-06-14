@@ -5,6 +5,11 @@ data "aws_caller_identity" "mod-platform" {
   provider = aws.modernisation-platform
 }
 
+data "aws_kms_key" "nomis_key" {
+  # Look up the CMK used to create AMIs, which is in the test account (maybe it should be in prod?)
+  key_id = "arn:aws:kms:${local.region}:${local.environment_management.account_ids["nomis-test"]}:alias/nomis-image-builder"
+}
+
 data "aws_iam_policy_document" "image-builder-distro-assume-role" {
   statement {
     actions = ["sts:AssumeRole"]
@@ -72,7 +77,8 @@ data "aws_iam_policy_document" "image-builder-distro-kms-policy" {
       "kms:ListGrants",
       "kms:RevokeGrant"
     ]
-    resources = try([aws_kms_key.nomis-cmk[0].arn], [])
+    # we use the same AMIs in test and production, which are encrypted with a single key that only exists in test, hence the below
+    resources = [local.environment == "test" ? aws_kms_key.nomis-cmk[0].arn : data.aws_kms_key.nomis_key.arn]
   }
 }
 
