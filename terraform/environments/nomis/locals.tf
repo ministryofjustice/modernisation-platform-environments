@@ -56,6 +56,11 @@ locals {
 # This account id
 data "aws_caller_identity" "current" {}
 
+# Infrastructure CICD role
+data "aws_iam_role" "member_infrastructure_access" {
+  name = "MemberInfrastructureAccess"
+}
+
 #------------------------------------------------------------------------------
 # Route 53 Zones
 #------------------------------------------------------------------------------
