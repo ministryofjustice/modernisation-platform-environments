@@ -42,6 +42,17 @@ resource "aws_security_group_rule" "egress_alb_to_citrix-adc-snip_traffic" {
   source_security_group_id = aws_security_group.citrix_adc_snip.id
 }
 
+resource "aws_security_group_rule" "egress_alb_to_ctx_host_traffic" {
+  for_each                 = local.application_data.alb_to_ctx_rules
+  description              = format("ALB to CTX traffic for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.alb_sg.id
+  to_port                  = each.value.to_port
+  type                     = "egress"
+  source_security_group_id = aws_security_group.aws_citrix_security_group.id
+}
+
 resource "aws_security_group_rule" "egress_alb_to_equip_host_traffic" {
   for_each                 = local.application_data.alb_to_equip_rules
   description              = format("ALB to Equip traffic for %s %d", each.value.protocol, each.value.from_port)
@@ -301,6 +312,17 @@ resource "aws_security_group_rule" "ingress_citrix-adc-snip_to_ctx-host_traffic"
   to_port                  = each.value.to_port
   type                     = "ingress"
   source_security_group_id = aws_security_group.citrix_adc_snip.id
+}
+
+resource "aws_security_group_rule" "ingress_alb_to_ctx-host_traffic" {
+  for_each                 = local.application_data.alb_to_ctx_rules
+  description              = format("ALB to Citrix host traffic for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.aws_citrix_security_group.id
+  to_port                  = each.value.to_port
+  type                     = "ingress"
+  source_security_group_id = aws_security_group.alb_sg.id
 }
 
 resource "aws_security_group_rule" "ingress_ctx_host_internal_traffic" {

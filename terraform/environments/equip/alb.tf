@@ -39,16 +39,16 @@ resource "aws_lb" "citrix_alb" {
 resource "aws_lb_target_group" "lb_tg_gateway" {
   name        = "tg-gateway"
   target_type = "ip"
-  protocol    = "HTTPS"
+  protocol    = "HTTP"
   vpc_id      = data.aws_vpc.shared.id
-  port        = "443"
+  port        = "80"
 
   health_check {
     enabled             = true
     path                = "/"
     interval            = 30
-    protocol            = "HTTPS"
-    port                = 443
+    protocol            = "HTTP"
+    port                = 80
     timeout             = 5
     healthy_threshold   = 5
     unhealthy_threshold = 2
@@ -126,7 +126,7 @@ resource "aws_lb_target_group" "lb_tg_analytics" {
 
 resource "aws_lb_target_group_attachment" "lb_tga_gateway" {
   target_group_arn = aws_lb_target_group.lb_tg_gateway.arn
-  target_id        = aws_network_interface.adc_vip_interface.private_ip_list[0]
+  target_id        = join("", module.win2016_multiple["COR-A-CTX01"].private_ip)
 }
 
 resource "aws_lb_target_group_attachment" "lb_tga_equip-portal" {
@@ -174,19 +174,6 @@ resource "aws_lb_listener" "lb_listener_http" {
   }
 }
 
-resource "aws_lb_listener_rule" "gateway-equip-service-justice-gov-uk" {
-  listener_arn = aws_lb_listener.lb_listener_https.arn
-  action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.lb_tg_gateway.arn
-  }
-  condition {
-    host_header {
-      values = ["gateway.equip.service.justice.gov.uk"]
-    }
-  }
-}
-
 resource "aws_lb_listener_rule" "equip-portal-equip-service-justice-gov-uk" {
   listener_arn = aws_lb_listener.lb_listener_https.arn
   action {
@@ -196,6 +183,19 @@ resource "aws_lb_listener_rule" "equip-portal-equip-service-justice-gov-uk" {
   condition {
     host_header {
       values = ["equip-portal.equip.service.justice.gov.uk"]
+    }
+  }
+}
+
+resource "aws_lb_listener_rule" "fwd-gateway-equip-service-justice-gov-uk" {
+  listener_arn = aws_lb_listener.lb_listener_https.arn
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.lb_tg_gateway.arn
+  }
+  condition {
+    host_header {
+      values = ["gateway.equip.service.justice.gov.uk"]
     }
   }
 }
