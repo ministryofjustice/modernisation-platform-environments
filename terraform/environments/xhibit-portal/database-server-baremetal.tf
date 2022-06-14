@@ -73,7 +73,7 @@ resource "aws_network_interface" "baremetal-database-network-access" {
   security_groups = [aws_security_group.app_servers]
 
   attachment {
-    instance     = [aws_instance.database-server-baremetal]
+    instance     = aws_instance.database-server-baremetal
     device_index = 1
   }
 }
