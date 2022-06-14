@@ -83,15 +83,6 @@ locals {
       },
       # Add database instances here.  They will be created using the database module
       databases = {
-<<<<<<< HEAD
-        # TEST = {
-        #   always_on              = true
-        #   ami_name               = "nomis_db_STIG-2022-04-26*"
-        #   asm_data_capacity      = 200
-        #   asm_flash_capacity     = 2
-        #   termination_protection = false
-        # }
-=======
         AUDIT = {
           always_on              = true
           ami_name               = "nomis_db_STIG-2022-04-26*"
@@ -101,7 +92,6 @@ locals {
           description            = "Copy of Production NOMIS Audit database in Azure PDPDL00038, replacting with PDPDL00038, a replacement for PDPDL00037."
           termination_protection = true
         }
->>>>>>> 79d599d8580e3bcdce57bf7f18ab426f70321dd3
       },
       # Add weblogic instances here.  They will be created using the weblogic module
       weblogics = {}
