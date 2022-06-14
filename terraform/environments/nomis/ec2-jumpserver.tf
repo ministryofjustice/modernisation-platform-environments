@@ -141,6 +141,7 @@ resource "aws_secretsmanager_secret" "jumpserver_users" {
   for_each = toset(local.jumpserver_users)
   name     = "${local.secret_prefix}/${each.value}"
   policy   = data.aws_iam_policy_document.jumpserver_secrets[each.value].json
+  recovery_window_in_days = 0
   tags = merge(
     local.tags,
     {

@@ -225,8 +225,6 @@ data "aws_iam_policy_document" "packer_ansible_permissions" {
       "ec2:DescribeKeyPairs",
       "sts:DecodeAuthorizationMessage",
       "kms:ReEncrypt*", # for building from cmk-encrypted AMIs
-      "logs:DeleteLogGroup",
-      "secretsmanager:DeleteResourcePolicy"
     ]
     resources = ["*"]
   }
