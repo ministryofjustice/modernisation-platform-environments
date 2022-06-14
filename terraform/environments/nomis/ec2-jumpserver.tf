@@ -81,9 +81,6 @@ resource "aws_instance" "jumpserver_windows" {
 }
 
 resource "aws_security_group" "jumpserver-windows" {
-  # this skip check can be removed once the jumpserver is reinstated
-  # reluctant to delete the SG as its referenced in various places
-  #checkov:skip=CKV2_AWS_5: "Ensure that Security Groups are attached to another resource"
   description = "Configure Windows jumpserver egress"
   name        = "jumpserver-windows-${local.application_name}"
   vpc_id      = local.vpc_id
@@ -198,64 +195,3 @@ resource "aws_iam_role_policy" "jumpserver_users" {
   role   = aws_iam_role.ec2_jumpserver_role.id
   policy = data.aws_iam_policy_document.jumpserver_users.json
 }
-
-
-
-# Create an empty parameter for Adminstrator password recovery using
-# AWSSupport-RunEC2RescueForWindowsTool Systems Manager Run Command
-# https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2rw-ssm.html
-# Pre-creating it so it gets deleted with the instance
-
-# resource "aws_ssm_parameter" "jumpserver_ec2_rescue" {
-#   name        = "/EC2Rescue/Passwords/${aws_instance.jumpserver_windows.id}"
-#   description = "Jumpserver local admin password"
-#   type        = "SecureString"
-#   value       = "default"
-
-#   tags = merge(
-#     local.tags,
-#     {
-#       Name = "jumpserver-admin-password"
-#     }
-#   )
-#   lifecycle {
-#     # ignore changes to value and description as will get updated by Systems Manager automation
-#     ignore_changes = [
-#       value,
-#       description
-#     ]
-#   }
-# }
-
-# data "aws_iam_policy_document" "jumpserver_put_parameter" {
-#   statement {
-#     effect = "Allow"
-#     actions = [
-#       "ssm:PutParameter",
-#     ]
-#     resources = [aws_ssm_parameter.jumpserver_ec2_rescue.arn]
-#   }
-# }
-
-# resource "aws_iam_role_policy" "jumpserver_put_parameter" {
-#   name   = "jumpserver-parameter-access"
-#   role   = aws_iam_role.ec2_jumpserver_role.id
-#   policy = data.aws_iam_policy_document.jumpserver_put_parameter.json
-# }
-
-# # Automation to recover password to parameter store on instance creation
-# resource "aws_ssm_association" "jumpserver_ec2_rescue" {
-#   name             = "AWSSupport-RunEC2RescueForWindowsTool"
-#   association_name = "jumpserver-ec2-rescue"
-#   parameters = {
-#     Command = "ResetAccess"
-#   }
-#   targets {
-#     key    = "InstanceIds"
-#     values = [aws_instance.jumpserver_windows.id]
-#   }
-#   depends_on = [
-#     aws_iam_role_policy.jumpserver_put_parameter,
-#     aws_ssm_parameter.jumpserver_ec2_rescue
-#   ]
-# }
