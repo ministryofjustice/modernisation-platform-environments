@@ -1,7 +1,7 @@
 #another trigger
 resource "aws_instance" "database-server-baremetal" {
   # Used to prevent this server deploying in production
-  count                       = local.only_in_production
+  # count                       = local.only_in_production
   depends_on                  = [aws_security_group.sms_server]
   instance_type               = "c5d.metal"
   ami                         = local.application_data.accounts[local.environment].suprig01-baremetal-ami
@@ -50,7 +50,7 @@ resource "aws_instance" "database-server-baremetal" {
 
 
 resource "aws_ebs_volume" "database-baremetal-disk1" {
-  count             = local.only_in_production
+  # count             = local.only_in_production
   depends_on        = [aws_instance.database-server-baremetal]
   availability_zone = "${local.region}a"
   type              = "gp2"
@@ -67,7 +67,7 @@ resource "aws_ebs_volume" "database-baremetal-disk1" {
 
 
 resource "aws_network_interface" "baremetal-database-network-access" {
-  count           = local.only_in_production
+  # count           = local.only_in_production
   depends_on      = [aws_instance.database-server-baremetal]
   subnet_id       = data.aws_subnet.private_az_a.id
   security_groups = [aws_security_group.app_servers]
