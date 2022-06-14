@@ -48,6 +48,13 @@
       "protocol": "TCP"
     }
   },
+  "alb_to_ctx_rules": {
+    "TCP_80": {
+      "from_port": 80,
+      "to_port": 80,
+      "protocol": "TCP"
+    }
+  },
   "alb_to_equip_rules": {
     "TCP_80": {
       "from_port": 80,
