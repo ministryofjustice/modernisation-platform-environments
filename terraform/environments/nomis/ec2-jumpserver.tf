@@ -51,6 +51,7 @@ resource "aws_instance" "jumpserver_windows" {
   associate_public_ip_address = false
   iam_instance_profile        = aws_iam_instance_profile.ec2_jumpserver_profile.id
   ebs_optimized               = true
+ #checkov:skip=CKV_AWS_126: "Ensure that detailed monitoring is enabled for EC2 instances" don't think we need such fine resolution for JS
   monitoring                  = false
   vpc_security_group_ids      = [aws_security_group.jumpserver-windows.id]
   subnet_id                   = data.aws_subnet.private_az_a.id
@@ -140,7 +141,9 @@ resource "aws_iam_instance_profile" "ec2_jumpserver_profile" {
 }
 
 # create empty secret in secret manager
+#tfsec:ignore:aws-ssm-secret-use-customer-key
 resource "aws_secretsmanager_secret" "jumpserver_users" {
+  #checkov:skip=CKV_AWS_149: "Ensure that Secrets Manager secret is encrypted using KMS CMK"
   for_each                = toset(local.jumpserver_users)
   name                    = "${local.secret_prefix}/${each.value}"
   policy                  = data.aws_iam_policy_document.jumpserver_secrets[each.value].json
