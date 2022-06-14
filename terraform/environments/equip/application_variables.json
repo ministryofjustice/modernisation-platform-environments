@@ -102,6 +102,11 @@
     }
   },
   "adc-snip_to_domain_controller_rules": {
+    "TCP_53": {
+      "from_port": 53,
+      "to_port": 53,
+      "protocol": "TCP"
+    },
     "TCP_389": {
       "from_port": 389,
       "to_port": 389,
