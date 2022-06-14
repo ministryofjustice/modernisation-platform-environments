@@ -1,6 +1,6 @@
 #another trigger
 resource "aws_instance" "database-server-baremetal" {
-  # Used to prevent this server deploying in production
+  # Used to only deploy in production
   count                       = local.only_in_production
   depends_on                  = [aws_security_group.sms_server]
   instance_type               = "c5d.metal"
