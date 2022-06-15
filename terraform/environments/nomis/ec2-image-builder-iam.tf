@@ -57,8 +57,8 @@ data "aws_iam_policy_document" "image-builder-launch-template-policy" {
       "ec2:ModifyLaunchTemplate",
       "ec2:CreateTags"
     ]
-
-    resources = [for item in module.weblogic : item.launch_template_arn]
+    # coalescelist as there are no weblogics in prod at the moment and empty resource is not acceptable
+    resources = coalescelist([for item in module.weblogic : item.launch_template_arn], ["arn:aws:ec2:${local.region}:${data.aws_caller_identity.current.id}:launch-template/dummy"])
   }
 }
 
