@@ -199,5 +199,6 @@ data "aws_iam_policy_document" "kms_policy" {
       values   = ["true"]
       variable = "kms:GrantIsForAWSResource"
     }
+    resources = ["*"]
   }
 }
