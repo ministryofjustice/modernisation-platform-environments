@@ -8,6 +8,7 @@ locals {
 
 resource "aws_kms_key" "this" {
   enable_key_rotation = true
+  policy              = local.is-development ? data.aws_iam_policy_document.kms_policy[0].json : ""
 }
 
 resource "aws_kms_alias" "this" {
