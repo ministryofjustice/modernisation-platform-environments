@@ -50,7 +50,6 @@ resource "aws_instance" "database-server-baremetal" {
 
 
 resource "aws_ebs_volume" "database-baremetal-disk1" {
-  count             = local.only_in_production
   depends_on        = [aws_instance.database-server-baremetal]
   availability_zone = "${local.region}a"
   type              = "gp2"
