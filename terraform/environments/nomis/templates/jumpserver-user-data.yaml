@@ -9,6 +9,9 @@ tasks:
     type: powershell
     runAs: admin
     content: |
+      Set-TimeZone "GMT Standard Time"
+      Set-WinSystemLocale "en-GB"
+      
       # Scheduled job to add new users - jobs can be found under Task Scheduler -> Powershell -> ScheduledJobs
       $add_users = '      
         Add-Type -AssemblyName "System.Web" # used for generating random password
@@ -35,8 +38,8 @@ tasks:
       '
 
       # add_user script is written to file and added as a recurring job
-      $path = "C:\jumpserver-software\add_users.ps1"
-      $add_users > $path      
+      $path = "C:\Users\Administrator\Documents\add_users.ps1"
+      Out-File -FilePath $path -InputObject $add_users   
       Register-ScheduledJob -Name "add_users" -FilePath $path -RunEvery $(New-TimeSpan -Minutes 15) -RunNow 
 
       # Disable Administrator
