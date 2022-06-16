@@ -23,11 +23,11 @@ data "aws_subnet" "private_az_a" {
 
 data "aws_ami" "jumpserver_image" {
   most_recent = true
-  owners      = ["801119661308"] # Microsoft
+  owners      = [local.environment_management.account_ids["core-shared-services-production"]] #["801119661308"] # Microsoft
 
   filter {
     name   = "name"
-    values = ["Windows_Server-2022-English-Full-Base-2022.05.25"]
+    values = ["nomis_jumpserver_2022-06-15*"]
   }
 
   filter {
