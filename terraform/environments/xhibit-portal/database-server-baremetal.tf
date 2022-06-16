@@ -65,6 +65,14 @@ resource "aws_ebs_volume" "database-baremetal-disk1" {
   )
 }
 
+resource "aws_volume_attachment" "database-baremetal-disk1" {
+  depends_on   = [aws_instance.database-server]
+  device_name  = "xvdl"
+  force_detach = true
+  volume_id    = aws_ebs_volume.database-baremetal-disk1.id
+  instance_id  = aws_instance.database-server-baremetal.id
+}
+
 
 resource "aws_network_interface" "baremetal-database-network-access" {
   count           = local.only_in_production
