@@ -67,7 +67,6 @@ resource "aws_ebs_volume" "database-baremetal-disk1" {
 
 
 resource "aws_network_interface" "baremetal-database-network-access" {
-  count           = local.only_in_production
   depends_on      = [aws_instance.database-server-baremetal]
   subnet_id       = data.aws_subnet.private_az_a.id
   security_groups = [aws_security_group.app_servers.id]
