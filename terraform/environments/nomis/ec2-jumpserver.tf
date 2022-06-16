@@ -27,7 +27,7 @@ data "aws_ami" "jumpserver_image" {
 
   filter {
     name   = "name"
-    values = ["nomis_jumpserver_2022-06-15*"]
+    values = ["nomis_jumpserver_2022-06-16*"]
   }
 
   filter {
@@ -72,7 +72,7 @@ resource "aws_instance" "jumpserver_windows" {
     local.tags,
     {
       Name          = "jumpserver_windows"
-      os_type       = "Windoze" # keep out of scope of wmi association for testing choco install
+      os_type       = "Windows"
       os_version    = "2022"
       always_on     = "false"
       "Patch Group" = "${aws_ssm_patch_group.windows.patch_group}"

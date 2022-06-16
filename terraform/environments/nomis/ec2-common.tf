@@ -320,14 +320,15 @@ resource "aws_ssm_document" "node_exporter_windows" {
   )
 }
 
-resource "aws_ssm_association" "node_exporter_windows" {
-  name             = aws_ssm_document.node_exporter_windows.name
-  association_name = "node-exporter-windows"
-  targets {
-    key    = "tag:os_type"
-    values = ["Windows"]
-  }
-}
+# Commented out as this gets a really old version from s3 bucket and jumpserver AMI has latest version already installed
+# resource "aws_ssm_association" "node_exporter_windows" {
+#   name             = aws_ssm_document.node_exporter_windows.name
+#   association_name = "node-exporter-windows"
+#   targets {
+#     key    = "tag:os_type"
+#     values = ["Windows"]
+#   }
+# }
 
 #------------------------------------------------------------------------------
 # Scheduled overnight shutdown
