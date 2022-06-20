@@ -1,5 +1,5 @@
 output "sns_topic_policy" {
-    value = aws_iam_policy.policy
+  value = aws_iam_policy.policy
 }
 
 output "topic_name" {

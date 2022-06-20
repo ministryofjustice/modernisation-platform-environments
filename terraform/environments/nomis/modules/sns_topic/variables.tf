@@ -11,13 +11,13 @@ variable "aws_region" {
 }
 
 variable "application" {
-    description = "Application name using the topic"
-    default = "nomis"
-    type = string
+  description = "Application name using the topic"
+  default     = "nomis"
+  type        = string
 }
 
 variable "env" {
-    description = "Target environment (test/prod)"
-    default = "test"
-    type = string
+  description = "Target environment (test/prod)"
+  default     = "test"
+  type        = string
 }
