@@ -22,5 +22,5 @@ resource "aws_ses_domain_identity_verification" "external" {
 }
 
 data "aws_iam_user" "email" {
-  user_name = ""
+  user_name = format("%s-%s-email_policy", local.application_name, local.environment)
 }
