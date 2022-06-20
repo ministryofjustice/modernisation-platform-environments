@@ -2,7 +2,7 @@ module "monitoring-sns-topic" {
   source             = "./modules/sns_topic"
   application        = "nomis-monitoring"
   env                = local.environment
-  topic_display_name = "${application} ${env} SNS topic"
+  topic_display_name = "Nomis monitoring ${local.environment} SNS topic"
 
 }
 
@@ -19,6 +19,6 @@ resource "aws_iam_role" "alertmanager-sns-role" {
 
 resource "aws_iam_role_policy_attachment" "alertmanager_sns_topic_distro_policy_attach" {
   policy_arn = module.monitoring-sns-topic.sns_topic_policy
-  role       = aws_iam_role.palertmanager-sns-role.name
+  role       = aws_iam_role.alertmanager-sns-role.name
 
 }
