@@ -1,5 +1,5 @@
 module "monitoring-sns-topic" {
-    source = "./modiles/sns_topic"
+    source = "./modules/sns_topic"
     application = "nomis-monitoring"
     env = local.environment
 }
