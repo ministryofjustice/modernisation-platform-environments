@@ -1,8 +1,8 @@
 data "aws_caller_identity" "current" {}
 
 resource "aws_sns_topic" "sns_topic" {
-  name         = "mod-platform-${var.application}-${var.env}"
-  display_name = "SNS Topic for ${var.application}-${var.env}"
+  name              = "mod-platform-${var.application}-${var.env}"
+  display_name      = "SNS Topic for ${var.application}-${var.env}"
   kms_master_key_id = ""
 }
 

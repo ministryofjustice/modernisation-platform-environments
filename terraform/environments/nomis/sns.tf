@@ -1,7 +1,7 @@
 module "monitoring-sns-topic" {
-    source = "./modiles/sns_topic"
-    application = "nomis-monitoring"
-    env = local.environment
+  source      = "./modiles/sns_topic"
+  application = "nomis-monitoring"
+  env         = local.environment
 }
 
 resource "aws_iam_role" "alertmanager-sns-role" {
