@@ -1,7 +1,8 @@
 module "monitoring-sns-topic" {
-  source      = "./modules/sns_topic"
-  application = "nomis-monitoring"
-  env         = local.environment
+  source       = "./modules/sns_topic"
+  application  = "nomis-monitoring"
+  env          = local.environment
+  display_name = "${application} ${env} SNS topic"
 
 }
 
