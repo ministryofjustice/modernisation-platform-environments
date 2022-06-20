@@ -18,7 +18,7 @@ resource "aws_iam_role" "alertmanager-sns-role" {
 }
 
 resource "aws_iam_role_policy_attachment" "alertmanager_sns_topic_distro_policy_attach" {
-  policy_arn = module.monitoring-sns-topic.sns_topic_policy
+  policy_arn = module.monitoring-sns-topic.sns_topic_policy.arn
   role       = aws_iam_role.alertmanager-sns-role.name
 
 }
