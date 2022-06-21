@@ -20,7 +20,3 @@ resource "aws_ses_domain_identity_verification" "external" {
 
   depends_on = [aws_route53_record.external_amazonses_verification_record]
 }
-
-data "aws_iam_user" "email" {
-  user_name = format("%s-%s-email_policy", local.application_name, local.environment)
-}
