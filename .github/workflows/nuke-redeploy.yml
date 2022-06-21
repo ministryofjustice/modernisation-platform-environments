@@ -9,7 +9,7 @@ on:
 env:
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  NUKE_DO_NOT_RECREATE_ENVIRONMENTS: performance-hub-development,example-development,sample-development,
+  NUKE_DO_NOT_RECREATE_ENVIRONMENTS: performance-hub-development,example-development,testing-test-development,
   TF_IN_AUTOMATION: true
 defaults:
   run:

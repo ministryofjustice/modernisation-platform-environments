@@ -256,6 +256,7 @@ data "aws_ami" "windows_2016_std_SQL17_ami" {
 }
 
 resource "aws_instance" "SOC" {
+  lifecycle { ignore_changes = [ebs_block_device] }
   ami = "ami-0781096210795e2d3"
 
   instance_type          = "t3a.xlarge"
