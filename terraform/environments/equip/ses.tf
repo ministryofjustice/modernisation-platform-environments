@@ -1,5 +1,4 @@
 resource "aws_ses_domain_identity" "external" {
-  provider = aws.core-network-services
   domain   = data.aws_route53_zone.application-zone.name
 }
 
@@ -15,7 +14,6 @@ resource "aws_route53_record" "external_amazonses_verification_record" {
 }
 
 resource "aws_ses_domain_identity_verification" "external" {
-  provider = aws.core-network-services
   domain   = aws_ses_domain_identity.external.id
 
   depends_on = [aws_route53_record.external_amazonses_verification_record]
