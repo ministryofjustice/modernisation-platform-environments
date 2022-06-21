@@ -283,7 +283,7 @@ resource "aws_ssm_association" "update_ssm_agent" {
 #------------------------------------------------------------------------------
 
 data "template_file" "node_exporter_install_template" {
-  template = "${file("${path.module}/ssm-documents/templates/node-exporter-linux.json.tmpl")}"
+  template = file("${path.module}/ssm-documents/templates/node-exporter-linux.json.tmpl")
   var = {
     bucket_name = module.s3-bucket.bucket.id
   }
