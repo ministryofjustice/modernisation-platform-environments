@@ -493,14 +493,14 @@ resource "aws_security_group_rule" "egress_equip_internal_traffic" {
 }
 
 resource "aws_security_group_rule" "egress_equip_to_SES_traffic" {
-  for_each                 = local.application_data.equip_to_aws_ses_rules
-  description              = format("Equip host to SES traffic for %s %d", each.value.protocol, each.value.from_port)
-  from_port                = each.value.from_port
-  protocol                 = each.value.protocol
-  security_group_id        = aws_security_group.aws_equip_security_group.id
-  to_port                  = each.value.to_port
-  type                     = "egress"
-  cidr_blocks              = ["0.0.0.0/0"]
+  for_each          = local.application_data.equip_to_aws_ses_rules
+  description       = format("Equip host to SES traffic for %s %d", each.value.protocol, each.value.from_port)
+  from_port         = each.value.from_port
+  protocol          = each.value.protocol
+  security_group_id = aws_security_group.aws_equip_security_group.id
+  to_port           = each.value.to_port
+  type              = "egress"
+  cidr_blocks       = ["0.0.0.0/0"]
 }
 
 resource "aws_security_group_rule" "egress_equip_to_spotfire_traffic" {
