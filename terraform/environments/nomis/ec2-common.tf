@@ -312,11 +312,18 @@ resource "aws_ssm_association" "node_exporter_linux" {
   }
 }
 
+data "template_file" "node_exporter_windows_install_template" {
+  template = file("${path.module}/ssm-documents/templates/node-exporter-windows.json.tmpl")
+  vars = {
+    bucket_name = module.s3-bucket.bucket.id
+  }
+}
+
 resource "aws_ssm_document" "node_exporter_windows" {
   name            = "InstallNodeExporterWindows"
   document_type   = "Command"
   document_format = "JSON"
-  content         = file("./ssm-documents/node-exporter-windows.json")
+  content         = data.template_file.node_exporter_windows_install_template.rendered
 
   tags = merge(
     local.tags,
