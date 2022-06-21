@@ -19,6 +19,7 @@
           "aws s3api get-object --bucket ${bucket_name} --key node-exporter/node_exporter_opts /tmp/node_exporter",
           "mv -f /tmp/node_exporter /etc/default/",
           "chmod 755 /etc/init.d/node_exporter",
+          "killall node_exporter",
           "echo 'Create Node Exporter Service'",
           "chkconfig --add node_exporter",
           "chkconfig --level 3 node_exporter on",
