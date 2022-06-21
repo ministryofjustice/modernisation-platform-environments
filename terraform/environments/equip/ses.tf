@@ -1,5 +1,5 @@
 resource "aws_ses_domain_identity" "external" {
-  domain   = data.aws_route53_zone.application-zone.name
+  domain = data.aws_route53_zone.application-zone.name
 }
 
 # `allow_overwrite` is used here as this is a verification record
@@ -14,7 +14,7 @@ resource "aws_route53_record" "external_amazonses_verification_record" {
 }
 
 resource "aws_ses_domain_identity_verification" "external" {
-  domain   = aws_ses_domain_identity.external.id
+  domain = aws_ses_domain_identity.external.id
 
   depends_on = [aws_route53_record.external_amazonses_verification_record]
 }
