@@ -17,7 +17,7 @@
           "echo 'Downloading node_exporter service script'",
           "aws s3api get-object --bucket ${bucket_name} --key node-exporter/node_exporter_service_linux.sh /etc/init.d/node_exporter",
           "aws s3api get-object --bucket ${bucket_name} --key node-exporter/node_exporter_opts /tmp/node_exporter",
-          "mv -f /tmp/node_exporter /etc/default/"
+          "mv -f /tmp/node_exporter /etc/default/",
           "chmod 755 /etc/init.d/node_exporter",
           "echo 'Create Node Exporter Service'",
           "chkconfig --add node_exporter",
