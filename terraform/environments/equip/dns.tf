@@ -13,7 +13,7 @@ resource "aws_route53_record" "external" {
 }
 
 resource "aws_route53_record" "analytics" {
-  count    = local.is-development ? 1 : 0
+  count    = local.is-production ? 1 : 0
   provider = aws.core-network-services
 
   zone_id = data.aws_route53_zone.application-zone.zone_id
@@ -28,7 +28,7 @@ resource "aws_route53_record" "analytics" {
 }
 
 resource "aws_route53_record" "equip-portal" {
-  count    = local.is-development ? 1 : 0
+  count    = local.is-production ? 1 : 0
   provider = aws.core-network-services
 
   zone_id = data.aws_route53_zone.application-zone.zone_id
@@ -58,7 +58,7 @@ resource "aws_route53_record" "gateway" {
 }
 
 resource "aws_route53_record" "portal" {
-  count    = local.is-development ? 1 : 0
+  count    = local.is-production ? 1 : 0
   provider = aws.core-network-services
 
   zone_id = data.aws_route53_zone.application-zone.zone_id

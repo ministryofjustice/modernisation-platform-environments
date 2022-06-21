@@ -23,7 +23,7 @@ data "aws_subnet" "private_az_a" {
 
 data "aws_ami" "jumpserver_image" {
   most_recent = true
-  owners      = [local.environment_management.account_ids["core-shared-services-production"]] #["801119661308"] # Microsoft
+  owners      = [local.environment_management.account_ids["core-shared-services-production"]]
 
   filter {
     name   = "name"

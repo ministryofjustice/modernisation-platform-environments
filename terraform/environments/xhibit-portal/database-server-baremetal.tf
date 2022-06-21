@@ -1,6 +1,6 @@
 #another trigger
 resource "aws_instance" "database-server-baremetal" {
-  # Used to only deploy in production
+  # Used to only allow the bare metal server to deploy in prod
   count                       = local.only_in_production
   depends_on                  = [aws_security_group.sms_server]
   instance_type               = "c5d.metal"
@@ -65,15 +65,24 @@ resource "aws_ebs_volume" "database-baremetal-disk1" {
   )
 }
 
+resource "aws_volume_attachment" "database-baremetal-disk1" {
+  count        = local.only_in_production
+  depends_on   = [aws_instance.database-server]
+  device_name  = "xvdl"
+  force_detach = true
+  volume_id    = aws_ebs_volume.database-baremetal-disk1[count.index].id
+  instance_id  = aws_instance.database-server-baremetal[count.index].id
+}
+
 
 resource "aws_network_interface" "baremetal-database-network-access" {
   count           = local.only_in_production
   depends_on      = [aws_instance.database-server-baremetal]
   subnet_id       = data.aws_subnet.private_az_a.id
-  security_groups = [aws_security_group.app_servers]
+  security_groups = [aws_security_group.app_servers.id]
 
   attachment {
-    instance     = aws_instance.database-server-baremetal
+    instance     = aws_instance.database-server-baremetal[count.index].id
     device_index = 1
   }
 }
