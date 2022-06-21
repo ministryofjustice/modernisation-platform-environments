@@ -50,7 +50,7 @@ module "s3-bucket" {
 }
 
 module "nomis-db-backup-bucket" {
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.0.5"
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.1.1"
 
   providers = {
     aws.bucket-replication = aws
@@ -122,7 +122,7 @@ data "aws_iam_policy_document" "cross-account-s3" {
 }
 
 module "nomis-image-builder-bucket" {
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.0.5"
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.1.1"
 
   providers = {
     aws.bucket-replication = aws
