@@ -282,11 +282,17 @@ resource "aws_ssm_association" "update_ssm_agent" {
 # Node Exporter - Install/Start Node Exporter Service
 #------------------------------------------------------------------------------
 
+data "template_file" "node_exporter_install_template" {
+  template = "${file("${path.module}/ssm-documents/templates/node-exporter-linux.json.tmpl")}"
+  var = {
+    bucket_name = module.s3-bucket.bucket.id
+  }
+}
 resource "aws_ssm_document" "node_exporter_linux" {
   name            = "InstallNodeExporterLinux"
   document_type   = "Command"
   document_format = "JSON"
-  content         = file("./ssm-documents/node-exporter-linux.json")
+  content         = data.template_file.node_exporter_install_template.rendered
   target_type     = "/AWS::EC2::Instance"
 
   tags = merge(
