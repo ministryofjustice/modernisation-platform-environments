@@ -29,7 +29,7 @@ resource "aws_iam_policy" "ec2_bastion_policy" {
 
 resource "aws_iam_role_policy_attachment" "ec2_nomis_bastion_policy_attach" {
   policy_arn = aws_iam_policy.ec2_bastion_policy.arn
-  role       = data.aws_iam_instance_profile.bastion_instance_profile.role_arn
+  role       = data.aws_iam_instance_profile.bastion_instance_profile.role_name
 }
 
 
