@@ -9,49 +9,9 @@ tasks:
     type: powershell
     runAs: admin
     content: |
-      # Download/Install Java
-      Read-S3Object -BucketName ${S3_BUCKET} -Key jumpserver-software/jre-6u33-windows-i586.exe -File C:\jumpserver-software\jre-6u33-windows-i586.exe
-      Start-Process -Wait -FilePath "C:\jumpserver-software\jre-6u33-windows-i586.exe" -ArgumentList "/qn", "/s", "/v" -PassThru -RedirectStandardOutput "C:\jumpserver-software\jre-install.log"
-
-      # Configure Java
-      Read-S3Object -BucketName ${S3_BUCKET} -Key jumpserver-software/deployment.config -File C:\Windows\Sun\Java\Deployment\deployment.config
-      Read-S3Object -BucketName ${S3_BUCKET} -Key jumpserver-software/deployment.properties -File C:\Windows\Sun\Java\Deployment\deployment.properties
-      Read-S3Object -BucketName ${S3_BUCKET} -Key jumpserver-software/trusted.certs -File C:\Windows\Sun\Java\Deployment\trusted.certs 
-   
-      # Add Nomis sites to trusted sites
-      $sites = @(
-          "*.nomis.hmpps-test.modernisation-platform.internal"
-          "*.nomis.hmpps-test.modernisation-platform.justice.gov.uk"
-          "*.nomis.hmpps-production.modernisation-platform.internal"
-          "*.nomis.hmpps-production.modernisation-platform.justice.gov.uk"
-          "*.modernisation-platform.nomis.az.justice.gov.uk"
-      )
-
-      $paths = @(
-          "HKLM:\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\Domains"
-          "HKLM:\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap\EscDomains"
-      )
-
-      foreach($path in $paths){
-        $sites | ForEach-Object {
-            New-Item -Path $path\$_ -Force
-            New-ItemProperty -Path $path\$_ -Name http -Value 2 -PropertyType DWORD -Force
-            New-ItemProperty -Path $path\$_ -Name https -Value 2 -PropertyType DWORD -Force
-        }
-      }
-
-      # Use Local Machine settings for Internet Security Settings
-      $reg_path = "HKLM:\Software\Policies\Microsoft\Windows\CurrentVersion\Internet Settings"
-      New-Item -Path $reg_path -Force
-      New-ItemProperty -Path $reg_path -Name Security_HKLM_only -Value 1 -PropertyType DWORD -Force 
-
-      # Set timezone and locale
       Set-TimeZone "GMT Standard Time"
       Set-WinSystemLocale "en-GB"
-
-      # Prevent Java update check
-      Remove-ItemProperty -Path "HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Run" -Name SunJavaUpdateSched -Force 
-   
+      
       # Scheduled job to add new users - jobs can be found under Task Scheduler -> Powershell -> ScheduledJobs
       $add_users = '      
         Add-Type -AssemblyName "System.Web" # used for generating random password
@@ -78,8 +38,8 @@ tasks:
       '
 
       # add_user script is written to file and added as a recurring job
-      $path = "C:\jumpserver-software\add_users.ps1"
-      $add_users > $path      
+      $path = "C:\Users\Administrator\Documents\add_users.ps1"
+      Out-File -FilePath $path -InputObject $add_users   
       Register-ScheduledJob -Name "add_users" -FilePath $path -RunEvery $(New-TimeSpan -Minutes 15) -RunNow 
 
       # Disable Administrator
