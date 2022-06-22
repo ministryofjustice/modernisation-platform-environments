@@ -5,7 +5,7 @@ resource "aws_ses_domain_identity" "external" {
 # `allow_overwrite` is used here as this is a verification record
 resource "aws_route53_record" "external_amazonses_verification_record" {
   provider        = aws.core-network-services
-  zone_id         = data.aws_route53_zone.external.id
+  zone_id         = data.aws_route53_zone.application-zone.id
   allow_overwrite = true
   name            = format("_amazonses.%s", data.aws_route53_zone.application-zone.name)
   type            = "TXT"
