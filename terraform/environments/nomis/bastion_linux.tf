@@ -2,6 +2,37 @@ locals {
   public_key_data = jsondecode(file("./bastion_linux.json"))
 }
 
+data "aws_iam_instance_profile" "bastion_instance_profile" {
+  name = "bastion-ec2-profile"
+}
+
+data "aws_iam_policy_document" "ec2_bastion_combined" {
+  source_policy_documents = [
+    data.aws_iam_policy_document.s3_bucket_access.json,
+    data.aws_iam_policy_document.cloud_watch_custom.json
+  ]
+}
+
+# create single managed policy
+resource "aws_iam_policy" "ec2_bastion_policy" {
+  name        = "ec2-nomis-bastion-policy"
+  path        = "/"
+  description = "Additional permissions for MP Bastion"
+  policy      = data.aws_iam_policy_document.ec2_bastion_combined.json
+  tags = merge(
+    local.tags,
+    {
+      Name = "ec2-nomis-bastion-policy"
+    },
+  )
+}
+
+resource "aws_iam_role_policy_attachment" "ec2_nomis_bastion_policy_attach" {
+  policy_arn = aws_iam_policy.ec2_bastion_policy.arn
+  role       = data.aws_iam_instance_profile.bastion_instance_profile.role_arn
+}
+
+
 #tfsec:ignore:aws-s3-encryption-customer-key:exp:2022-08-31 tfsec:ignore:aws-s3-enable-bucket-logging:exp:2022-08-31 these checks are ignored in the bastion module but don't proagate through
 module "bastion_linux" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=v3.0.3"
