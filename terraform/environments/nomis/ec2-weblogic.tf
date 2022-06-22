@@ -86,6 +86,14 @@ resource "aws_security_group" "weblogic_common" {
     cidr_blocks = [local.accounts[local.environment].database_external_access_cidr.cloud_platform]
   }
 
+  ingress {
+    description = "access from Cloud Platform Prometheus script exporter collector"
+    from_port   = "9172"
+    to_port     = "9172"
+    protocol    = "TCP"
+    cidr_blocks = [local.accounts[local.environment].database_external_access_cidr.cloud_platform]
+  }
+
   egress {
     description = "allow all"
     from_port   = 0
