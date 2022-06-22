@@ -1,5 +1,5 @@
 module "s3-bucket" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.0.5"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.1.1"
 
   providers = {
     # Default provider for replication to same region. Contact Mod Platform if replication to different region is required.
