@@ -17,4 +17,7 @@ resource "aws_ses_domain_identity_verification" "external" {
   domain = aws_ses_domain_identity.external.id
 
   depends_on = [aws_route53_record.external_amazonses_verification_record]
+  timeouts {
+    create = "5m"
+  }
 }
