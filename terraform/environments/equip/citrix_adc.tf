@@ -18,8 +18,9 @@ resource "aws_eip" "public-vip" {
 }
 
 resource "aws_eip_association" "public-vip" {
-  allocation_id      = aws_eip.public-vip.id
-  private_ip_address = aws_network_interface.adc_vip_interface.private_ip
+  allocation_id        = aws_eip.public-vip.id
+  network_interface_id = aws_network_interface.adc_vip_interface.id
+  private_ip_address   = aws_network_interface.adc_vip_interface.private_ip
 }
 
 resource "aws_instance" "citrix_adc_instance" {

@@ -48,6 +48,7 @@ resource "aws_route53_record" "gateway" {
 
   zone_id = data.aws_route53_zone.application-zone.zone_id
   name    = "gateway"
+  ttl     = "300"
   type    = "CNAME"
   records = [aws_eip.public-vip.public_ip]
 }
