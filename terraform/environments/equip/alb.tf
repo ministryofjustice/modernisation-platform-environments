@@ -225,3 +225,51 @@ resource "aws_lb_listener_rule" "analytics-equip-service-justice-gov-uk" {
     }
   }
 }
+
+resource "aws_lb_listener_rule" "equip-analytics-rocstac-com" {
+  listener_arn = aws_lb_listener.lb_listener_https.arn
+  action {
+    type = "redirect"
+    redirect {
+      host        = "analytics.equip.service.justice.gov.uk"
+      status_code = "HTTP_301"
+    }
+  }
+  condition {
+    host_header {
+      values = ["equip-analytics.rocstac.com"]
+    }
+  }
+}
+
+resource "aws_lb_listener_rule" "equip-gateway-rocstac-com" {
+  listener_arn = aws_lb_listener.lb_listener_https.arn
+  action {
+    type = "redirect"
+    redirect {
+      host        = "gateway.equip.service.justice.gov.uk"
+      status_code = "HTTP_301"
+    }
+  }
+  condition {
+    host_header {
+      values = ["equip-gateway.rocstac.com"]
+    }
+  }
+}
+
+resource "aws_lb_listener_rule" "equip-portal-rocstac-com" {
+  listener_arn = aws_lb_listener.lb_listener_https.arn
+  action {
+    type = "redirect"
+    redirect {
+      host        = "portal.equip.service.justice.gov.uk"
+      status_code = "HTTP_301"
+    }
+  }
+  condition {
+    host_header {
+      values = ["equip-portal.rocstac.com"]
+    }
+  }
+}

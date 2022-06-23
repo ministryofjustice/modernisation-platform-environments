@@ -27,6 +27,13 @@
       "protocol": "TCP"
     }
   },
+  "internet_to_adc-vip_rules": {
+    "TCP_443": {
+      "from_port": 443,
+      "to_port": 443,
+      "protocol": "TCP"
+    }
+  },
   "port_80_rules": {
     "TCP_80": {
       "from_port": 80,
@@ -648,6 +655,18 @@
     "TCP_445": {
       "from_port": 445,
       "to_port": 445,
+      "protocol": "TCP"
+    }
+  },
+  "equip_to_aws_ses_rules": {
+    "TCP_25": {
+      "from_port": 25,
+      "to_port": 25,
+      "protocol": "TCP"
+    },
+    "TCP_587": {
+      "from_port": 587,
+      "to_port": 587,
       "protocol": "TCP"
     }
   },
