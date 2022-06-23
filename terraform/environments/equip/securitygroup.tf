@@ -179,7 +179,7 @@ resource "aws_security_group_rule" "ingress_alb_to_citrix-adc-vip_traffic" {
 }
 
 resource "aws_security_group_rule" "ingress_internet_to_citrix-adc-vip_traffic" {
-  for_each          = local.application_data.internet_to_citrix-adc-vip_rules
+  for_each          = local.application_data.internet_to_adc-vip_rules
   description       = format("Internet to Citrix ADC VIP traffic for %s %d", each.value.protocol, each.value.from_port)
   from_port         = each.value.from_port
   protocol          = each.value.protocol
