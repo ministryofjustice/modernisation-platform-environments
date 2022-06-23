@@ -43,7 +43,7 @@ resource "aws_route53_record" "equip-portal" {
 }
 
 resource "aws_route53_record" "gateway" {
-  count    = local.is-development ? 1 : 0
+  count    = local.is-production ? 1 : 0
   provider = aws.core-network-services
 
   zone_id = data.aws_route53_zone.application-zone.zone_id
