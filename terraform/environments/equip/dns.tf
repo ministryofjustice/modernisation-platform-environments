@@ -50,7 +50,7 @@ resource "aws_route53_record" "gateway" {
   name    = "gateway"
   ttl     = "300"
   type    = "CNAME"
-  records = [aws_eip.public-vip.public_ip]
+  records = [aws_eip.public-vip.public_dns]
 }
 
 resource "aws_route53_record" "portal" {
