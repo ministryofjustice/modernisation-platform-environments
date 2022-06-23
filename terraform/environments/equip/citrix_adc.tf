@@ -13,7 +13,7 @@ resource "aws_ec2_subnet_cidr_reservation" "snip-reservation" {
 }
 
 resource "aws_eip" "public-vip" {
-  #checkov:ignore:CKV2_AWS_19: "EIP attachment is handled through separate resource"
+  #checkov:skip=CKV2_AWS_19: "EIP attachment is handled through separate resource"
   tags = merge(local.tags,
   { Name = "EIP-ADC-Public" })
 }
