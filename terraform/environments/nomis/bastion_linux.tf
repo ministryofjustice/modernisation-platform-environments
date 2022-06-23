@@ -35,7 +35,7 @@ resource "aws_iam_role_policy_attachment" "ec2_nomis_bastion_policy_attach" {
 
 #tfsec:ignore:aws-s3-encryption-customer-key:exp:2022-08-31 tfsec:ignore:aws-s3-enable-bucket-logging:exp:2022-08-31 these checks are ignored in the bastion module but don't proagate through
 module "bastion_linux" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=v3.0.3"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=v3.0.4"
 
   providers = {
     aws.share-host   = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
