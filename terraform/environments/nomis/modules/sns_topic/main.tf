@@ -1,11 +1,11 @@
 data "aws_caller_identity" "current" {}
 
 data "aws_ssm_parameter" "subscriptions" {
-  name = "/monitoring/subs"
+  name = "/monitoring/subscription"
 }
 
 locals {
-  subscriptions_data = jsondecode(data.aws_ssm_parameter.subscriptions.value)
+  subscriptions_data = sensitive(jsondecode(data.aws_ssm_parameter.subscriptions.value))
 }
 
 resource "aws_sns_topic" "sns_topic" {
@@ -15,7 +15,7 @@ resource "aws_sns_topic" "sns_topic" {
 }
 
 resource "aws_sns_topic_subscription" "monitoring_subscriptions" {
-  count     = length(local.subscriptions_data.emails)
+  count         = length(local.subscriptions_data.emails)
   topic_arn     = aws_sns_topic.sns_topic.arn
   protocol      = "email"
   endpoint      = local.subscriptions_data.emails[count.index].email
