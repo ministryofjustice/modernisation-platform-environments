@@ -12,6 +12,16 @@ resource "aws_ec2_subnet_cidr_reservation" "snip-reservation" {
   subnet_id        = data.aws_subnet.private_subnet_a.id
 }
 
+resource "aws_eip" "public-vip" {
+  tags = merge(local.tags,
+  { Name = "EIP-ADC-Public" })
+}
+
+resource "aws_eip_association" "public-vip" {
+  allocation_id      = aws_eip.public-vip.id
+  private_ip_address = aws_network_interface.adc_vip_interface.private_ip
+}
+
 resource "aws_instance" "citrix_adc_instance" {
   depends_on           = [aws_network_interface.adc_mgmt_interface]
   ami                  = "ami-0dd0aa051b3fc4e4b"
