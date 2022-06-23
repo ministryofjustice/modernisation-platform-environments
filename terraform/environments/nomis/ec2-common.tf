@@ -282,11 +282,17 @@ resource "aws_ssm_association" "update_ssm_agent" {
 # Node Exporter - Install/Start Node Exporter Service
 #------------------------------------------------------------------------------
 
+data "template_file" "node_exporter_install_template" {
+  template = file("${path.module}/ssm-documents/templates/node-exporter-linux.json.tmpl")
+  vars = {
+    bucket_name = module.s3-bucket.bucket.id
+  }
+}
 resource "aws_ssm_document" "node_exporter_linux" {
   name            = "InstallNodeExporterLinux"
   document_type   = "Command"
   document_format = "JSON"
-  content         = file("./ssm-documents/node-exporter-linux.json")
+  content         = data.template_file.node_exporter_install_template.rendered
   target_type     = "/AWS::EC2::Instance"
 
   tags = merge(
@@ -306,11 +312,18 @@ resource "aws_ssm_association" "node_exporter_linux" {
   }
 }
 
+data "template_file" "node_exporter_windows_install_template" {
+  template = file("${path.module}/ssm-documents/templates/node-exporter-windows.json.tmpl")
+  vars = {
+    bucket_name = module.s3-bucket.bucket.id
+  }
+}
+
 resource "aws_ssm_document" "node_exporter_windows" {
   name            = "InstallNodeExporterWindows"
   document_type   = "Command"
   document_format = "JSON"
-  content         = file("./ssm-documents/node-exporter-windows.json")
+  content         = data.template_file.node_exporter_windows_install_template.rendered
 
   tags = merge(
     local.tags,
@@ -320,14 +333,15 @@ resource "aws_ssm_document" "node_exporter_windows" {
   )
 }
 
-resource "aws_ssm_association" "node_exporter_windows" {
-  name             = aws_ssm_document.node_exporter_windows.name
-  association_name = "node-exporter-windows"
-  targets {
-    key    = "tag:os_type"
-    values = ["Windows"]
-  }
-}
+# Commented out as this gets a really old version from s3 bucket and jumpserver AMI has latest version already installed
+# resource "aws_ssm_association" "node_exporter_windows" {
+#   name             = aws_ssm_document.node_exporter_windows.name
+#   association_name = "node-exporter-windows"
+#   targets {
+#     key    = "tag:os_type"
+#     values = ["Windows"]
+#   }
+# }
 
 #------------------------------------------------------------------------------
 # Scheduled overnight shutdown

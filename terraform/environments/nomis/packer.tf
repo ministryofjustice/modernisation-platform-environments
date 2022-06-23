@@ -84,7 +84,8 @@ data "aws_iam_policy_document" "packer_minimum_permissions" {
       "ec2:ModifyImageAttribute",
       "ec2:ModifySnapshotAttribute",
       "ec2:RegisterImage",
-      "ec2:RunInstances"
+      "ec2:RunInstances",
+      "sns:*" # just temporary to test subscriptions
     ]
     resources = ["*"]
   }
