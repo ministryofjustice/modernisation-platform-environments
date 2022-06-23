@@ -5,7 +5,7 @@ data "aws_ssm_parameter" "subscriptions" {
 }
 
 locals {
-  subscrptions_data = jsondecode(data.aws_ssm_parameter.subscriptions.value)
+  subscriptions_data = jsondecode(data.aws_ssm_parameter.subscriptions.value)
 }
 
 resource "aws_sns_topic" "sns_topic" {
