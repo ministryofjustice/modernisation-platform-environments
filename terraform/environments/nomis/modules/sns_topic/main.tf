@@ -1,9 +1,26 @@
 data "aws_caller_identity" "current" {}
 
+data "aws_ssm_parameter" "subscriptions" {
+    name = "/monitoring/subscriptions"
+}
+
+locals {
+    subscrptions_data = jsondecode(data.aws_ssm_parameter.subscriptions.value)
+}
+
 resource "aws_sns_topic" "sns_topic" {
   name              = "mod-platform-${var.application}-${var.env}"
   display_name      = "SNS Topic for ${var.application}-${var.env}"
   kms_master_key_id = ""
+}
+
+resource "aws_sns_topic_subscription" "monitoring_subscriptions" {
+    for_each = local.subscriptions_data.emails
+    topic_arn = aws_sns_topic.sns_topic.arn
+    protocol  = "email"
+    endpoint  = each.value.email
+    filter_policy = jsonencode(each.value.filter)
+
 }
 
 data "aws_iam_policy_document" "policy" {
