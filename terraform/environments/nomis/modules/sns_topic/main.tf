@@ -15,11 +15,11 @@ resource "aws_sns_topic" "sns_topic" {
 }
 
 resource "aws_sns_topic_subscription" "monitoring_subscriptions" {
-  for_each      = local.subscriptions_data.emails
+  count     = length(local.subscriptions_data.emails)
   topic_arn     = aws_sns_topic.sns_topic.arn
   protocol      = "email"
-  endpoint      = each.value.email
-  filter_policy = jsonencode(each.value.filter)
+  endpoint      = local.subscriptions_data.emails[count.index].email
+  filter_policy = jsonencode(local.subscriptions_data.emails[count.index].filter)
 
 }
 
