@@ -48,13 +48,9 @@ resource "aws_route53_record" "gateway" {
 
   zone_id = data.aws_route53_zone.application-zone.zone_id
   name    = "gateway"
-  type    = "A"
-
-  alias {
-    name                   = aws_lb.citrix_alb.dns_name
-    zone_id                = aws_lb.citrix_alb.zone_id
-    evaluate_target_health = true
-  }
+  ttl     = "300"
+  type    = "CNAME"
+  records = [aws_eip.public-vip.public_dns]
 }
 
 resource "aws_route53_record" "portal" {

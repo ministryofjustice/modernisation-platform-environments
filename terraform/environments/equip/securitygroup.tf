@@ -178,6 +178,17 @@ resource "aws_security_group_rule" "ingress_alb_to_citrix-adc-vip_traffic" {
   source_security_group_id = aws_security_group.alb_sg.id
 }
 
+resource "aws_security_group_rule" "ingress_internet_to_citrix-adc-vip_traffic" {
+  for_each          = local.application_data.internet_to_adc-vip_rules
+  description       = format("Internet to Citrix ADC VIP traffic for %s %d", each.value.protocol, each.value.from_port)
+  from_port         = each.value.from_port
+  protocol          = each.value.protocol
+  security_group_id = aws_security_group.citrix_adc_vip.id
+  to_port           = each.value.to_port
+  type              = "ingress"
+  cidr_blocks       = ["0.0.0.0/0"]
+}
+
 resource "aws_security_group_rule" "ingress_ctx-host_to_citrix-adc-vip_traffic" {
   for_each                 = local.application_data.ctx_to_adc-vip_rules
   description              = format("Citrix Host traffic to ADC VIP for %s %d", each.value.protocol, each.value.from_port)

@@ -27,6 +27,13 @@
       "protocol": "TCP"
     }
   },
+  "internet_to_adc-vip_rules": {
+    "TCP_443": {
+      "from_port": 443,
+      "to_port": 443,
+      "protocol": "TCP"
+    }
+  },
   "port_80_rules": {
     "TCP_80": {
       "from_port": 80,
