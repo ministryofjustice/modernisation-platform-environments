@@ -1,7 +1,7 @@
 data "aws_caller_identity" "current" {}
 
 data "aws_ssm_parameter" "subscriptions" {
-  name = "/monitoring/subscriptions"
+  name = "/monitoring/subs"
 }
 
 locals {
