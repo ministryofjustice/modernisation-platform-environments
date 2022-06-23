@@ -11,7 +11,7 @@ locals {
 resource "aws_sns_topic" "sns_topic" {
   name              = "mod-platform-${var.application}-${var.env}"
   display_name      = "SNS Topic for ${var.application}-${var.env}"
-  kms_master_key_id = ""
+  kms_master_key_id = "alias/aws/sns"
 }
 
 resource "aws_sns_topic_subscription" "monitoring_subscriptions" {
