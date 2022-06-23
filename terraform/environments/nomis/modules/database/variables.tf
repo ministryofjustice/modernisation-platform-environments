@@ -148,8 +148,8 @@ variable "oracle_app_disk_size" {
   type        = map(any)
   description = "Capcity of each Oracle application disk, /u01 and /u02.  If not specified, the default values from the AMI block device mappings will be used."
   default = {
-    # "/dev/sdb" = 100
-    # "/dev/sdc" = 100
+    # "/dev/sdb" = 100 # /u01
+    # "/dev/sdc" = 100 # /u02
   }
   nullable = false
 }

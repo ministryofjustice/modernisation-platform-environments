@@ -24,8 +24,8 @@ locals {
 
 
   oracle_app_disks = [ # match structure of AMI block device mappings
-    "/dev/sdb",
-    "/dev/sdc"
+    "/dev/sdb",        # /u01
+    "/dev/sdc"         # /u02
   ]
   asm_data_disks = [ # match structure of AMI block device mappings
     "/dev/sde",      # DATA01

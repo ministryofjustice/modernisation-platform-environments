@@ -131,6 +131,10 @@ data "terraform_remote_state" "core_network_services" {
 }
 
 data "aws_iam_policy_document" "kms_policy" {
+
+  # checkov:skip=CKV_AWS_109: "Key policy requires asterisk resource"
+  # checkov:skip=CKV_AWS_111: "Key policy requires asterisk resource"
+
   count = local.is-development ? 1 : 0
   statement {
     sid     = "Enable IAM User Permissions"

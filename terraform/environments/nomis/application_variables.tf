@@ -91,6 +91,10 @@ locals {
           asm_flash_capacity     = 1000
           description            = "Copy of Production NOMIS Audit database in Azure PDPDL00038, replacting with PDPDL00038, a replacement for PDPDL00037."
           termination_protection = true
+          oracle_app_disk_size = {
+            "/dev/sdb" = 100 # /u01
+            "/dev/sdc" = 800 # /u02
+          }
         }
       },
       # Add weblogic instances here.  They will be created using the weblogic module
