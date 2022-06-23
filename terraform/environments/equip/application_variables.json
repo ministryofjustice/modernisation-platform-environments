@@ -651,6 +651,18 @@
       "protocol": "TCP"
     }
   },
+  "equip_to_aws_ses_rules": {
+    "TCP_25": {
+      "from_port": 25,
+      "to_port": 25,
+      "protocol": "TCP"
+    },
+    "TCP_587": {
+      "from_port": 587,
+      "to_port": 587,
+      "protocol": "TCP"
+    }
+  },
   "equip_to_spotfire_rules": {
     "TCP_80": {
       "from_port": 80,
