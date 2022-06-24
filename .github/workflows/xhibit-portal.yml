@@ -71,7 +71,7 @@ jobs:
   plan-preproduction:
     name: Plan Pre-Production - xhibit-portal
     runs-on: ubuntu-latest
-    if: if: github.ref == 'refs/heads/main' # job only runs for merges in the main branch
+    if: github.ref == 'refs/heads/main' # job only runs for merges in the main branch
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3.0.2
