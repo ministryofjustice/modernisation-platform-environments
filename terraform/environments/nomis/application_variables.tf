@@ -93,7 +93,7 @@ locals {
           termination_protection = true
           oracle_app_disk_size = {
             "/dev/sdb" = 100 # /u01
-            "/dev/sdc" = 800 # /u02
+            "/dev/sdc" = 5120 # /u02
           }
         }
       },
