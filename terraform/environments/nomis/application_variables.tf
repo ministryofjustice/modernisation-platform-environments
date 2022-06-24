@@ -92,7 +92,7 @@ locals {
           description            = "Copy of Production NOMIS Audit database in Azure PDPDL00038, replacting with PDPDL00038, a replacement for PDPDL00037."
           termination_protection = true
           oracle_app_disk_size = {
-            "/dev/sdb" = 100 # /u01
+            "/dev/sdb" = 100  # /u01
             "/dev/sdc" = 5120 # /u02
           }
         }
