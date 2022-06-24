@@ -4,8 +4,13 @@ on:                                          # Put ALL the triggers for any part
   push: # triggers on 'push' or 'merge'      # The whole workflow will run each time these events happen
     branches:                                # and they're skipped according to the 'if' conditions below
       - main
-      - xp-preprod
-      - xp-dev
+    paths:
+      - 'terraform/environments/xhibit-portal/**'
+      - '.github/workflows/xhibit-portal.yml'
+  pull_request:
+    branches:
+      - main
+    types: [opened, edited, reopened, synchronize]
     paths:
       - 'terraform/environments/xhibit-portal/**'
       - '.github/workflows/xhibit-portal.yml'
@@ -22,7 +27,7 @@ jobs:
   plan-development:
     name: Plan Development - xhibit-portal
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/xp-dev' # job only runs for pushes to the xp-dev branch
+    if: github.ref != 'refs/heads/main' || github.event_name == 'workflow_dispatch' # job only runs for pull requests
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3.0.2
@@ -45,7 +50,7 @@ jobs:
     needs: plan-development # job only runs if plan-development runs successfully
     name: Deploy Development - xhibit-portal
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/xp-dev'
+    if: github.ref != 'refs/heads/main' || github.event_name == 'workflow_dispatch'
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3.0.2
@@ -66,7 +71,7 @@ jobs:
   plan-preproduction:
     name: Plan Pre-Production - xhibit-portal
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/xp-preprod' # job only runs for pushes to the xp-preprod branch
+    if: if: github.ref == 'refs/heads/main' # job only runs for merges in the main branch
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3.0.2
@@ -88,7 +93,7 @@ jobs:
     needs: plan-preproduction # job only runs if plan-production runs successfully
     name: Deploy Pre-Production - xhibit-portal
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/xp-preprod'
+    if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3.0.2
@@ -109,7 +114,7 @@ jobs:
   plan-production:
     name: Plan Production - xhibit-portal
     runs-on: ubuntu-latest
-    if: ${{ github.ref == 'refs/heads/main' }} # job only runs for merges to the main branch
+    if: github.ref == 'refs/heads/main' # job only runs for merges to the main branch
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3.0.2
@@ -131,9 +136,9 @@ jobs:
     needs: plan-production # job only runs if plan-production runs successfully
     name: Deploy Production - xhibit-portal
     runs-on: ubuntu-latest
-    if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }} # job only runs for merges to the main branch, which can only be done after PR review approval
-    # environment:
-    #   name: xhibit-portal-production        # put this in if you want to click-to-deploy with a review button in the Github Actions tab
+    if: github.ref == 'refs/heads/main' # job only runs for merges to the main branch, which can only be done after PR review approval
+    environment:
+      name: xhibit-portal-production        # put this in if you want to click-to-deploy with a review button in the Github Actions tab
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3.0.2
