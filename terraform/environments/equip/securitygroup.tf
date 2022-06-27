@@ -926,7 +926,7 @@ resource "aws_security_group_rule" "egress_dns_endpoint_traffic" {
 #AWS SOC Security Group
 
 resource "aws_security_group" "aws_soc_security_group" {
-  name        = "soc_security_groups"
+  name        = "soc_security_group"
   description = "Security Group for SOC instances"
   vpc_id      = data.aws_vpc.shared.id
   tags = merge(local.tags,
