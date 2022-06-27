@@ -714,6 +714,13 @@
       "protocol": "TCP"
     }
   },
+  "soc_to_equip_rules": {
+    "TCP_25": {
+      "from_port": 25,
+      "to_port": 25,
+      "protocol": "TCP"
+    }
+  },
   "spotfire_internal_rules": {
     "ICMP_ALL": {
       "from_port": -1,
