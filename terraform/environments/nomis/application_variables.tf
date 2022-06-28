@@ -45,7 +45,7 @@ locals {
           description            = "Copy of Test NOMIS Audit database in Azure T1PDL0010, replicating with T1PDL0010."
           termination_protection = true
         },
-        CNAUDT1c = {
+        CNAUDT1d = {
           always_on              = false
           ami_name               = "nomis_db-2022-03-03*"
           asm_data_capacity      = 200

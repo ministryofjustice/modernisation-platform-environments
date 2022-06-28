@@ -406,6 +406,7 @@ resource "aws_iam_instance_profile" "database" {
 
 data "cloudinit_config" "oracle_monitoring_and_userdata" {
   part {
+    order = 1
     content_type = "text/x-shellscript"
     content      = data.template_file.user_data.rendered
   }
@@ -413,6 +414,7 @@ data "cloudinit_config" "oracle_monitoring_and_userdata" {
     for_each = var.oracle_sids[*]
     content {
       content_type = "text/cloud-config"
+      merge_type = "list(append)+dict(recurse_list)+str(append)"
       content = yamlencode({
         write_files = [
           {
@@ -428,23 +430,24 @@ data "cloudinit_config" "oracle_monitoring_and_userdata" {
     }
   }
 
-  # dynamic "part" {
-  #   for_each = try(slice(var.oracle_sids, 0, 1), [])
-  #   content {
-  #     content_type = "text/cloud-config"
-  #     content = yamlencode({
-  #       write_files = [
-  #         {
-  #           encoding    = "b64"
-  #           content     = base64encode(templatefile("${path.module}/templates/config.yml.tftpl", { oracle_sids = var.oracle_sids }))
-  #           path        = "/home/oracle/config.yml"
-  #           owner       = "root:root"
-  #           permissions = "0755"
-  #         },
-  #       ]
-  #     })
+  dynamic "part" {
+    for_each = try(slice(var.oracle_sids, 0, 1), [])
+    content {
+      content_type = "text/cloud-config"
+      merge_type = "list(append)+dict(recurse_list)+str(append)"
+      content = yamlencode({
+        write_files = [
+          {
+            encoding    = "b64"
+            content     = base64encode(templatefile("${path.module}/templates/config.yml.tftpl", { oracle_sids = var.oracle_sids }))
+            path        = "/home/oracle/config.yml"
+            owner       = "root:root"
+            permissions = "0755"
+          },
+        ]
+      })
 
-  #   }
-  # }
+    }
+  }
 
 }
