@@ -429,7 +429,7 @@ data "cloudinit_config" "oracle_monitoring_and_userdata" {
   }
 
   dynamic "part" {
-    for_each = try(var.oracle_sids[0], null)
+    for_each = try(toset(var.oracle_sids[0]), null)
     content {
       content_type = "text/cloud-config"
       content = yamlencode({
