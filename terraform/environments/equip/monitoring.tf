@@ -19,6 +19,7 @@ resource "aws_cloudwatch_metric_alarm" "ddos_attack_external" {
 
 # SNS topic for monitoring to send alarms to
 resource "aws_sns_topic" "high_priority" {
+  #tfsec:ignore:aws-sns-topic-encryption-use-cmk
   name              = format("%s_high_priority", local.application_name)
   kms_master_key_id = "alias/aws/sns"
 }
