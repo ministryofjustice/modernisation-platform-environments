@@ -406,7 +406,6 @@ resource "aws_iam_instance_profile" "database" {
 
 data "cloudinit_config" "oracle_monitoring_and_userdata" {
   part {
-    order = 1
     content_type = "text/x-shellscript"
     content      = data.template_file.user_data.rendered
   }
