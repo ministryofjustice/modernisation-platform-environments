@@ -406,7 +406,7 @@ resource "aws_iam_instance_profile" "database" {
 
 data "cloudinit_config" "oracle_monitoring_and_userdata" {
   part {
-    order = 1
+    order        = 1
     content_type = "text/x-shellscript"
     content      = data.template_file.user_data.rendered
   }
@@ -414,7 +414,7 @@ data "cloudinit_config" "oracle_monitoring_and_userdata" {
     for_each = var.oracle_sids[*]
     content {
       content_type = "text/cloud-config"
-      merge_type = "list(append)+dict(recurse_list)+str(append)"
+      merge_type   = "list(append)+dict(recurse_list)+str(append)"
       content = yamlencode({
         write_files = [
           {
@@ -434,7 +434,7 @@ data "cloudinit_config" "oracle_monitoring_and_userdata" {
     for_each = try(slice(var.oracle_sids, 0, 1), [])
     content {
       content_type = "text/cloud-config"
-      merge_type = "list(append)+dict(recurse_list)+str(append)"
+      merge_type   = "list(append)+dict(recurse_list)+str(append)"
       content = yamlencode({
         write_files = [
           {
