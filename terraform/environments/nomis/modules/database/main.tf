@@ -407,7 +407,7 @@ resource "aws_iam_instance_profile" "database" {
 data "cloudinit_config" "oracle_monitoring_and_userdata" {
   part {
     content_type = "text/x-shellscript"
-    content      = base64encode(data.template_file.user_data.rendered)
+    content      = data.template_file.user_data.rendered
   }
   dynamic "part" {
     for_each = var.oracle_sids[*]
