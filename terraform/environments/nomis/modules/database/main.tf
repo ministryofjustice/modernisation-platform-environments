@@ -413,7 +413,7 @@ data "cloudinit_config" "oracle_monitoring_and_userdata" {
     for_each = var.oracle_sids[*]
     content {
       content_type = "text/cloud-config"
-      merge_type = "list(append)+dict(recurse_list)+str(append)"
+      merge_type   = "list(append)+dict(recurse_list)+str(append)"
       content = yamlencode({
         write_files = [
           {
@@ -433,7 +433,7 @@ data "cloudinit_config" "oracle_monitoring_and_userdata" {
     for_each = try(slice(var.oracle_sids, 0, 1), [])
     content {
       content_type = "text/cloud-config"
-      merge_type = "list(append)+dict(recurse_list)+str(append)"
+      merge_type   = "list(append)+dict(recurse_list)+str(append)"
       content = yamlencode({
         write_files = [
           {
