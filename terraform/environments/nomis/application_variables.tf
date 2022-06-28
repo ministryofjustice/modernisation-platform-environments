@@ -44,6 +44,14 @@ locals {
           asm_flash_capacity     = 2
           description            = "Copy of Test NOMIS Audit database in Azure T1PDL0010, replicating with T1PDL0010."
           termination_protection = true
+        },
+        CNAUDT1a = {
+          always_on              = false
+          ami_name               = "nomis_db-2022-03-03*"
+          asm_data_capacity      = 200
+          asm_flash_capacity     = 2
+          description            = "Copy of Test NOMIS Audit database in Azure T1PDL0010, Test Monitoring Instance"
+          termination_protection = true
         }
       },
       # Add weblogic instances here.  They will be created using the weblogic module
@@ -89,7 +97,7 @@ locals {
           instance_type          = "r6i.2xlarge"
           asm_data_capacity      = 4000
           asm_flash_capacity     = 1000
-          description            = "Copy of Production NOMIS Audit database in Azure PDPDL00038, replacting with PDPDL00038, a replacement for PDPDL00037."
+          description            = "Copy of Production NOMIS Audit database in Azure PDPDL00038, replicating with PDPDL00038, a replacement for PDPDL00037."
           termination_protection = true
           oracle_app_disk_size = {
             "/dev/sdb" = 100  # /u01

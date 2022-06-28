@@ -64,7 +64,7 @@ resource "aws_instance" "database" {
   key_name                    = var.key_name
   monitoring                  = true
   subnet_id                   = data.aws_subnet.data.id
-  user_data                   = base64encode(data.template_file.user_data.rendered)
+  user_data                   = length(var.oracle_sids) == 0 ? base64encode(data.template_file.user_data.rendered) : data.cloudinit_config.oracle_monitoring_and_userdata.rendered
   vpc_security_group_ids = [
     var.common_security_group_id,
     aws_security_group.database.id
@@ -388,4 +388,63 @@ resource "aws_iam_instance_profile" "database" {
   name = "ec2-database-profile-${var.name}"
   role = aws_iam_role.database.name
   path = "/"
+}
+
+# Resources for Oracle DB monitoring
+
+# resource "local_file" "script_exporter_config_file" {
+#   count = length(var.oracle_sids) > 1 ? 1 : 0
+#   content = templatefile("${path.module}/templates/config.yml.tftpl", {oracle_sids = var.oracle_sids})
+#   filename = "${path.module}/output/config.yml"
+# }
+
+# resource "local_file" "script_exporter_config_scripts" {
+#   count = length(var.oracle_sids)
+#   content = templatefile("${path.module}/templates/oracle-health.sh.tftpl", {oracle_sid = var.oracle_sids[count.index]})
+#   filename = "${path.module}/output/oracle-health-${var.oracle_sids[count.index]}.sh"
+# }
+
+data "cloudinit_config" "oracle_monitoring_and_userdata" {
+  part {
+    content_type = "text/x-shellscript"
+    content      = base64encode(data.template_file.user_data.rendered)
+  }
+  dynamic "part" {
+    for_each = toset(var.oracle_sids)
+    content {
+      content_type = "text/cloud-config"
+      content = yamlencode({
+        write_files = [
+          {
+            encoding    = "b64"
+            content     = base64encode(templatefile("${path.module}/templates/oracle-health.sh.tftpl", { oracle_sid = part.value }))
+            path        = "/home/oracle/oracle-health-${part.value}.sh"
+            owner       = "oracle:oinstall"
+            permissions = "0500"
+          },
+        ]
+      })
+
+    }
+  }
+
+  dynamic "part" {
+    for_each = var.oracle_sids[*]
+    content {
+      content_type = "text/cloud-config"
+      content = yamlencode({
+        write_files = [
+          {
+            encoding    = "b64"
+            content     = base64encode(templatefile("${path.module}/templates/config.yml.tftpl", { oracle_sids = var.oracle_sids }))
+            path        = "/home/oracle/config.yml"
+            owner       = "root:root"
+            permissions = "0755"
+          },
+        ]
+      })
+
+    }
+  }
+
 }
