@@ -410,7 +410,7 @@ data "cloudinit_config" "oracle_monitoring_and_userdata" {
     content      = base64encode(data.template_file.user_data.rendered)
   }
   dynamic "part" {
-    for_each = toset(var.oracle_sids)
+    for_each = var.oracle_sids[*]
     content {
       content_type = "text/cloud-config"
       content = yamlencode({
@@ -429,7 +429,7 @@ data "cloudinit_config" "oracle_monitoring_and_userdata" {
   }
 
   dynamic "part" {
-    for_each = var.oracle_sids[*]
+    for_each = try(var.oracle_sids[0], null)
     content {
       content_type = "text/cloud-config"
       content = yamlencode({
