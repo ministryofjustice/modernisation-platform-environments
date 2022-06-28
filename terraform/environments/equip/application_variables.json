@@ -409,6 +409,16 @@
       "to_port": 89,
       "protocol": "TCP"
     },
+    "TCP_135": {
+      "from_port": 135,
+      "to_port": 135,
+      "protocol": "TCP"
+    },
+    "UDP_135": {
+      "from_port": 135,
+      "to_port": 135,
+      "protocol": "UDP"
+    },
     "TCP_443": {
       "from_port": 443,
       "to_port": 443,
@@ -418,6 +428,16 @@
       "from_port": 443,
       "to_port": 443,
       "protocol": "UDP"
+    },
+    "TCP_445": {
+      "from_port": 445,
+      "to_port": 445,
+      "protocol": "TCP"
+    },
+    "TCP_593": {
+      "from_port": 593,
+      "to_port": 593,
+      "protocol": "TCP"
     },
     "TCP_1494": {
       "from_port": 1494,
@@ -462,6 +482,16 @@
     "UDP_16500-16509": {
       "from_port": 16500,
       "to_port": 16509,
+      "protocol": "UDP"
+    },
+    "TCP_49152-65535": {
+      "from_port": 49152,
+      "to_port": 65535,
+      "protocol": "TCP"
+    },
+    "UDP_49152-65535": {
+      "from_port": 49152,
+      "to_port": 65535,
       "protocol": "UDP"
     }
   },

@@ -40,6 +40,10 @@ updates:
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
+    directory: "/terraform/environments/nomis/modules/sns_topic"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
     directory: "/terraform/environments/nomis/modules/weblogic"
     schedule:
       interval: "daily"
