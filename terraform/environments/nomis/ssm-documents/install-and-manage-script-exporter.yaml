@@ -7,9 +7,9 @@ mainSteps:
   inputs:
     sourceType: GitHub
     destinationPath: "/etc/systemd/system/"
-    sourceInfo: "{\"owner\":\"ministryofjustice\", \"repository\":\"modernisation-platform-environments\",\"getOptions\" : \"branch:nomis/dso-1548-oracle-monitoring\",\"path\" :\"terraform/environments/nomis/ssm-documents/files/script-exporter-service\"}"
+    sourceInfo: "{\"owner\":\"ministryofjustice\", \"repository\":\"modernisation-platform-environments\",\"getOptions\" : \"branch:main\",\"path\" :\"terraform/environments/nomis/ssm-documents/files/script-exporter-service\"}"
 - action: "aws:runShellScript"
-  name: "InstallNodeExporter"
+  name: "InstallScriptExporter"
   inputs:
     runCommand:
     - "wget https://github.com/adhocteam/script_exporter/releases/download/v1.2.0/script_exporter-1.2.0.linux-amd64.tar.gz -P /tmp"
