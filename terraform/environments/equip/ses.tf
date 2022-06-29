@@ -21,7 +21,7 @@ resource "aws_route53_record" "external_amazonses_verification_record" {
 
 resource "aws_route53_record" "external_amazonses_dkim_record" {
   provider        = aws.core-network-services
-  count           = 3
+  count           = local.is-production ? 3 : 0
   zone_id         = data.aws_route53_zone.application-zone.id
   allow_overwrite = true
   name            = "${element(aws_ses_domain_dkim.external[0].dkim_tokens, count.index)}._domainkey"
