@@ -46,7 +46,7 @@ locals {
           termination_protection = true
           oracle_sids            = ["MIST1", "CNMAUDT1"]
         },
-        CNAUDT1d = {
+        CNAUDT1e = {
           always_on              = false
           ami_name               = "nomis_db-2022-03-03*"
           asm_data_capacity      = 200
