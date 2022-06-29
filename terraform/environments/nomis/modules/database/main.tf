@@ -19,7 +19,7 @@ resource "aws_security_group" "database" {
     {
       Name = "database-${var.name}",
     },
-    [length(var.oracle_sids) > 0 ? { oracle_sids = try(join(",", var.oracle_sids), "") } : null]...)
+  [length(var.oracle_sids) > 0 ? { oracle_sids = try(join(",", var.oracle_sids), "") } : null]...)
 }
 
 resource "aws_security_group_rule" "extra_rules" { # Extra ingress rules that might be specified
