@@ -2,12 +2,12 @@
 schemaVersion: "2.2"
 description: "Installs script exporter on Linux instances"
 mainSteps:
-- action: aws:downloadContent
-  name: DownloadScriptExporter
-  inputs:
-    sourceType: HTTP
-    sourceInfo: "{\"url\":\"https://github.com/adhocteam/script_exporter/releases/download/v1.2.0/script_exporter-1.2.0.linux-amd64.tar.gz\"}"
-    destinationPath: "/tmp"
+# - action: aws:downloadContent
+#   name: DownloadScriptExporter
+#   inputs:
+#     sourceType: HTTP
+#     sourceInfo: "{\"url\":\"https://github.com/adhocteam/script_exporter/releases/download/v1.2.0/script_exporter-1.2.0.linux-amd64.tar.gz\"}"
+#     destinationPath: "/tmp"
 - action: aws:downloadContent
   name: DownloadScriptExporterServiceFile
   inputs:
@@ -19,6 +19,7 @@ mainSteps:
   inputs:
     runCommand:
     - "PATH=$PATH:/usr/local/bin # aws binary is sometimes in /usr/local/bin"
+    - "wget https://github.com/adhocteam/script_exporter/releases/download/v1.2.0/script_exporter-1.2.0.linux-amd64.tar.gz -P /tmp"
     - "tar xf /tmp/script_exporter-1.2.0.linux-amd64.tar.gz"
     - "rm /tmp/script_exporter-1.2.0.linux-amd64.tar.gz"
     - "mv /tmp/script_exporter-1.2.0.linux-amd64/script_exporter /usr/bin/script-exporter"
