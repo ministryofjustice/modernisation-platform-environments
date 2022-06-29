@@ -362,7 +362,8 @@ resource "aws_ssm_association" "script-exporter" {
   name             = aws_ssm_document.script_exporter.name
   association_name = "install-and-manage-script-exporter"
   targets {
-    key = "tag:oracle_sids"
+    key    = "tag:oracle_sids"
+    values = []
   }
 }
 
