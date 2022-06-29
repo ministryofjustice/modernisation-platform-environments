@@ -78,6 +78,16 @@ resource "aws_security_group" "database_common" {
   }
 
   ingress {
+    description = "External access to SSH port for agent management"
+    from_port   = "22"
+    to_port     = "22"
+    protocol    = "TCP"
+    cidr_blocks = [
+      for cidr in local.accounts[local.environment].database_external_access_cidr : cidr
+    ]
+  }
+
+  ingress {
     description = "access from Cloud Platform Prometheus server"
     from_port   = "9100"
     to_port     = "9100"
