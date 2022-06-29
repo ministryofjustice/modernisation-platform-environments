@@ -28,6 +28,7 @@ module "database" {
   extra_ingress_rules    = try(each.value.extra_ingress_rules, null)
   termination_protection = try(each.value.termination_protection, null)
   instance_type          = try(each.value.instance_type, null)
+  oracle_sids            = try(each.value.oracle_sids, null)
 
   common_security_group_id  = aws_security_group.database_common.id
   instance_profile_policies = concat(local.ec2_common_managed_policies, [aws_iam_policy.s3_db_backup_bucket_access.arn])

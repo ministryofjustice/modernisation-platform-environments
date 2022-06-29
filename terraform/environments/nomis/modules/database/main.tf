@@ -17,8 +17,9 @@ resource "aws_security_group" "database" {
   tags = merge(
     var.tags,
     {
-      Name = "database-${var.name}"
-    }
+      Name = "database-${var.name}",
+    },
+    [length(var.oracle_sids) > 0 ? {oracle_sids = try(join(",", var.oracle_sids), "")}: null ]
   )
 }
 

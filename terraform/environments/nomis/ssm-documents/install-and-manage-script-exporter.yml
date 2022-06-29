@@ -1,0 +1,34 @@
+---
+schemaVersion: "2.2"
+description: "Installs node exporter on Linux instances"
+mainSteps:
+- action: aws:DownloadContent
+  name: DownloadScriptExporter
+  inputs:
+    sourceType: HTTP
+    sourceInfo: "{\"url\":\"https://github.com/adhocteam/script_exporter/releases/download/v1.2.0/script_exporter-1.2.0.linux-amd64.tar.gz\"}"
+    destinationPath: "/tmp"
+- action: aws:DownloadContent
+  name: DownloadScriptExporterServiceFile
+  inputs:
+    sourceType: GitHub
+    destinationPath: "/etc/systemd/system/"
+    sourceInfo: "{\"owner\":\"ministryofjustice\", \"repository\":\"modernisation-platform-environments\",\"getOptions\" : \"branch:nomis/dso-1548-oracle-monitoring\",\"path\" :\"terraform/environments/nomis/ssm-documents/files/script-exporter-service\"}"
+- action: "aws:runShellScript"
+  name: "InstallNodeExporter"
+  inputs:
+    runCommand:
+    - "PATH=$PATH:/usr/local/bin # aws binary is sometimes in /usr/local/bin"
+    - "tar xf /tmp/script_exporter-1.2.0.linux-amd64.tar.gz"
+    - "rm /tmp/script_exporter-1.2.0.linux-amd64.tar.gz"
+    - "cp /tmp/script_exporter-1.2.0.linux-amd64.tar.gz/script_exporter /usr/bin/script-exporter"
+    - "chmod +x /usr/bin/script-exporter"
+    - "rm -rf /tmp/script_exporter-1.2.0.linux-amd64.tar.gz"
+    - "touch /home/oracle/script-exporter.env"
+    - "chown oracle:oinstall /home/oracle/script-exporter.env"
+    - "killall script-exporter"
+    - "echo 'Create Script Exporter Service'"
+    - "systemctl enable script-exporter"
+    - "systemctl daemon-reload"
+    - "echo 'Start Script Exporter'"
+    - "systemctl start script-exporter"
