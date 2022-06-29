@@ -98,7 +98,7 @@ locals {
             "/dev/sdc" = 5120 # /u02
           }
         },
-        AUDITa = {
+        AUDIT_REPLICA = {
           always_on              = false
           ami_name               = "nomis_db_STIG-2022-04-26*"
           instance_type          = "r6i.2xlarge"
