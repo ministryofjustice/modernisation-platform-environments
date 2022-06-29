@@ -391,18 +391,6 @@ resource "aws_iam_instance_profile" "database" {
 
 # Resources for Oracle DB monitoring
 
-# resource "local_file" "script_exporter_config_file" {
-#   count = length(var.oracle_sids) > 1 ? 1 : 0
-#   content = templatefile("${path.module}/templates/config.yml.tftpl", {oracle_sids = var.oracle_sids})
-#   filename = "${path.module}/output/config.yml"
-# }
-
-# resource "local_file" "script_exporter_config_scripts" {
-#   count = length(var.oracle_sids)
-#   content = templatefile("${path.module}/templates/oracle-health.sh.tftpl", {oracle_sid = var.oracle_sids[count.index]})
-#   filename = "${path.module}/output/oracle-health-${var.oracle_sids[count.index]}.sh"
-# }
-
 data "cloudinit_config" "oracle_monitoring_and_userdata" {
   part {
     content_type = "text/x-shellscript"
