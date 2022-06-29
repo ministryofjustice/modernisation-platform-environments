@@ -2,13 +2,13 @@
 schemaVersion: "2.2"
 description: "Installs node exporter on Linux instances"
 mainSteps:
-- action: aws:DownloadContent
+- action: aws:downloadContent
   name: DownloadScriptExporter
   inputs:
     sourceType: HTTP
     sourceInfo: "{\"url\":\"https://github.com/adhocteam/script_exporter/releases/download/v1.2.0/script_exporter-1.2.0.linux-amd64.tar.gz\"}"
     destinationPath: "/tmp"
-- action: aws:DownloadContent
+- action: aws:downloadContent
   name: DownloadScriptExporterServiceFile
   inputs:
     sourceType: GitHub
