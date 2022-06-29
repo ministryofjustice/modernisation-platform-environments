@@ -9,7 +9,7 @@
         "runCommand": [
           "echo 'Downloading Node Exporter tar from S3 bucket'",
           "PATH=$PATH:/usr/local/bin # aws binary is sometimes in /usr/local/bin",
-          "wget https://github.com/prometheus/node_exporter/releases/download/v1.3.1/node_exporter-1.3.1.linux-amd64.tar.gz",
+          "aws s3api get-object --bucket ${bucket_name} --key node-exporter/node_exporter-1.3.1.linux-amd64.tar.gz node_exporter-1.3.1.linux-amd64.tar.gz",
           "tar xf node_exporter-1.3.1.linux-amd64.tar.gz",
           "rm node_exporter-1.3.1.linux-amd64.tar.gz",
           "cp node_exporter-1.3.1.linux-amd64/node_exporter /usr/bin/",
