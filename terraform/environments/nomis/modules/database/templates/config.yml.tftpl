@@ -1,0 +1,6 @@
+scripts:
+%{ for sid in oracle_sids ~}
+#${length(sid)} / ${sid} / ${length(sid)-2}
+  - name: oracle_health_check_${sid}
+    script: sudo -i -u oracle /home/oracle/oracle-health-${sid}.sh
+%{ endfor ~}

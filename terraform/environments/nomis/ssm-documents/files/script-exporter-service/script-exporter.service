@@ -1,0 +1,11 @@
+[Unit]
+Description=Script exporter service
+
+[Service]
+User=root
+ExecStart=/usr/bin/script-exporter -web.listen-address=:9172 -config.file=/home/oracle/config.yml
+EnvironmentFile=/home/oracle/script-exporter.env
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

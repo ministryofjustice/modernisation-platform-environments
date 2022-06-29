@@ -170,3 +170,10 @@ variable "termination_protection" {
   default     = false
   nullable    = false
 }
+
+variable "oracle_sids" {
+  type        = list(string)
+  description = "List of databases hosted on the server"
+  default     = []
+  nullable    = false
+}

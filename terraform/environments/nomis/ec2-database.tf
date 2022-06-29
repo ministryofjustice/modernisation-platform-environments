@@ -28,6 +28,7 @@ module "database" {
   extra_ingress_rules    = try(each.value.extra_ingress_rules, null)
   termination_protection = try(each.value.termination_protection, null)
   instance_type          = try(each.value.instance_type, null)
+  oracle_sids            = try(each.value.oracle_sids, null)
 
   common_security_group_id  = aws_security_group.database_common.id
   instance_profile_policies = concat(local.ec2_common_managed_policies, [aws_iam_policy.s3_db_backup_bucket_access.arn])
@@ -70,6 +71,26 @@ resource "aws_security_group" "database_common" {
     description = "External access to database port"
     from_port   = "1521"
     to_port     = "1521"
+    protocol    = "TCP"
+    cidr_blocks = [
+      for cidr in local.accounts[local.environment].database_external_access_cidr : cidr
+    ]
+  }
+
+  ingress {
+    description = "External access to SSH port for agent management"
+    from_port   = "22"
+    to_port     = "22"
+    protocol    = "TCP"
+    cidr_blocks = [
+      for cidr in local.accounts[local.environment].database_external_access_cidr : cidr
+    ]
+  }
+
+  ingress {
+    description = "External access to OEM Agent port for metrics collection"
+    from_port   = "3872"
+    to_port     = "3872"
     protocol    = "TCP"
     cidr_blocks = [
       for cidr in local.accounts[local.environment].database_external_access_cidr : cidr
