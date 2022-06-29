@@ -18,8 +18,7 @@ resource "aws_security_group" "database" {
     var.tags,
     {
       Name = "database-${var.name}",
-    },
-  [length(var.oracle_sids) > 0 ? { oracle_sids = try(join(",", var.oracle_sids), "") } : null]...)
+  })
 }
 
 resource "aws_security_group_rule" "extra_rules" { # Extra ingress rules that might be specified
@@ -114,8 +113,8 @@ resource "aws_instance" "database" {
       os_version    = "RHEL 7.9"
       always_on     = var.always_on
       "Patch Group" = "RHEL"
-    }
-  )
+    },
+  [length(var.oracle_sids) > 0 ? { oracle_sids = try(join(",", var.oracle_sids), "") } : null]...)
 }
 #tfsec:ignore:aws-ebs-encryption-customer-key:exp:2022-08-31: I don't think we need the fine grained control CMK would provide
 resource "aws_ebs_volume" "oracle_app" {
