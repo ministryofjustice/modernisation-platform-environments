@@ -492,6 +492,17 @@ resource "aws_security_group_rule" "ingress_equip_internal_traffic" {
   source_security_group_id = aws_security_group.aws_equip_security_group.id
 }
 
+resource "aws_security_group_rule" "ingress_soc_to_equip_traffic" {
+  for_each                 = local.application_data.soc_to_equip_rules
+  description              = format("SOC traffic to Equip Hosts for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.aws_equip_security_group.id
+  to_port                  = each.value.to_port
+  type                     = "ingress"
+  source_security_group_id = aws_security_group.aws_soc_security_group.id
+}
+
 resource "aws_security_group_rule" "egress_equip_internal_traffic" {
   for_each                 = local.application_data.equip_internal_rules
   description              = format("Equip host internal traffic for %s %d", each.value.protocol, each.value.from_port)
@@ -908,4 +919,28 @@ resource "aws_security_group_rule" "egress_dns_endpoint_traffic" {
   to_port           = each.value.to_port
   type              = "egress"
   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+}
+
+############################################################
+
+#AWS SOC Security Group
+
+resource "aws_security_group" "aws_soc_security_group" {
+  name        = "soc_security_group"
+  description = "Security Group for SOC instances"
+  vpc_id      = data.aws_vpc.shared.id
+  tags = merge(local.tags,
+    { Name = lower(format("secg-%s-%s-soc", local.application_name, local.environment)) }
+  )
+}
+
+resource "aws_security_group_rule" "egress_soc_to_equip_traffic" {
+  for_each                 = local.application_data.soc_to_equip_rules
+  description              = format("SOC traffic to Equip Hosts for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.aws_soc_security_group.id
+  to_port                  = each.value.to_port
+  type                     = "egress"
+  source_security_group_id = aws_security_group.aws_equip_security_group.id
 }
