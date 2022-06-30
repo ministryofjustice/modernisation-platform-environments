@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"os"
 	"strings"
 	"testing"
 
@@ -19,6 +20,10 @@ import (
 )
 
 /**
+ENV variable NUKE_SKIP_SANDBOX_ACCOUNTS: A comma-separated list of account names to be skipped from the test. For example:
+"bichard7-sandbox-shared, core-vpc-sandbox,".
+As can be observed in the example, every account name needs a leading comma, hence the last comma in the list.
+
 CLI examples:
 aws secretsmanager get-secret-value --secret-id environment_management --profile mod --region eu-west-2
 aws secretsmanager get-secret-value --secret-id nuke_account_ids --profile mod --region eu-west-2 --query 'SecretString' --output text --no-cli-pager
@@ -105,11 +110,11 @@ func isSandboxAccount(cfg aws.Config, accountId string) bool {
 	return false
 }
 
-func getSandboxAccounts(cfg aws.Config) map[string]string {
+func getSandboxAccounts(cfg aws.Config, skipAccountNames string) map[string]string {
 	accounts := make(map[string]string)
 	nonProdAccounts := getNonProdAccounts(cfg)
 	for accName, accId := range nonProdAccounts {
-		if isSandboxAccount(cfg, accId) {
+		if !strings.Contains(skipAccountNames, accName) && isSandboxAccount(cfg, accId) {
 			accounts[accName] = accId
 		}
 	}
@@ -126,12 +131,12 @@ func TestSandboxAccountsAreAutoNuked(t *testing.T) {
 	}
 
 	autoNukedAccountIds := getAutoNukedAccountIds(cfg)
-	sandboxAccounts := getSandboxAccounts(cfg)
+	sandboxAccounts := getSandboxAccounts(cfg, os.Getenv("NUKE_SKIP_SANDBOX_ACCOUNTS"))
 	sandboxNonAutoNukedAccounts := make(map[string]string)
 	for accName, accId := range sandboxAccounts {
 		if !slices.Contains(autoNukedAccountIds, accId) {
 			sandboxNonAutoNukedAccounts[accName] = accId
 		}
 	}
-	assert.Empty(t, sandboxNonAutoNukedAccounts, "Sandbox accounts were found that need to be added to the auto-nuke list (nuke_account_ids secret): https://user-guide.modernisation-platform.service.justice.gov.uk/concepts/environments/auto-nuke.html")
+	assert.Empty(t, sandboxNonAutoNukedAccounts, "Sandbox accounts were found that need to be added to the auto-nuke list. Refer to the nuke_account_ids secret from https://user-guide.modernisation-platform.service.justice.gov.uk/concepts/environments/auto-nuke.html. Alternatively, use the env variable NUKE_SKIP_SANDBOX_ACCOUNTS to skip these accounts from the test.")
 }
