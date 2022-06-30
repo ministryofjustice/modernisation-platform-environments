@@ -92,24 +92,10 @@ locals {
           asm_flash_capacity     = 1000
           description            = "Copy of Production NOMIS Audit database in Azure PDPDL00038, replicating with PDPDL00038, a replacement for PDPDL00037."
           termination_protection = true
-          oracle_sids            = ["CNMAUDPD"]
+          oracle_sids            = ["PCNMAUD"]
           oracle_app_disk_size = {
             "/dev/sdb" = 100  # /u01
             "/dev/sdc" = 5120 # /u02
-          }
-        },
-        AUDIT_REPLICA = {
-          always_on              = false
-          ami_name               = "nomis_db_STIG-2022-04-26*"
-          instance_type          = "r6i.2xlarge"
-          asm_data_capacity      = 4000
-          asm_flash_capacity     = 1000
-          description            = "Copy of Production NOMIS Audit database in Azure PDPDL00038, replicating with PDPDL00038, a replacement for PDPDL00037. Monitoring Test"
-          termination_protection = true
-          oracle_sids            = ["CNMAUDPD"]
-          oracle_app_disk_size = {
-            "/dev/sdb" = 100 # /u01
-            "/dev/sdc" = 200 # /u02
           }
         }
       },
