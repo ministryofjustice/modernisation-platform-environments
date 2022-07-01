@@ -125,7 +125,7 @@ func TestSandboxAccountsAreAutoNuked(t *testing.T) {
 	t.Parallel()
 
 	// Load the Shared AWS Configuration (~/.aws/config)
-	cfg, err := config.LoadDefaultConfig(context.TODO())
+	cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithRegion("eu-west-2"))
 	if err != nil {
 		log.Fatal(err)
 	}
