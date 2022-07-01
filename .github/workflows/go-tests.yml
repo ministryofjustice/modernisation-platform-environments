@@ -1,6 +1,8 @@
 ---
-name: Nuke
+name: Go tests
 on:
+  pull_request:
+    types: [ opened, edited, reopened, synchronize ]
   schedule:
     # * is a special character in YAML so you have to quote this string
     # trigger every sunday at 10:00am
