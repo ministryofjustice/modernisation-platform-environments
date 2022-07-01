@@ -84,7 +84,7 @@ Check whether the given account has a sandbox role associated to it.
 From command line, you would use `aws iam list-roles`.
 */
 func isSandboxAccount(cfg aws.Config, accountId string) bool {
-	roleARN := fmt.Sprintf("arn:aws:iam::%v:role/ModernisationPlatformAccess", accountId)
+	roleARN := fmt.Sprintf("arn:aws:iam::%v:role/MemberInfrastructureAccess", accountId)
 	stsClient := sts.NewFromConfig(cfg)
 	provider := stscreds.NewAssumeRoleProvider(stsClient, roleARN)
 	cfg.Credentials = aws.NewCredentialsCache(provider)
