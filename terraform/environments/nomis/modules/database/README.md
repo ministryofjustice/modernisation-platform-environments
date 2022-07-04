@@ -1,8 +1,8 @@
 # Database Server
 
-Terraform module for creating database instances from the custom NOMIS Oracle 11g AMI; see [this confluence page](https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/3897262258/Oracle+11gR2+AMI+Build+for+NOMIS+Databases)  
+Terraform module for creating database instances from the custom NOMIS Oracle 11g AMI; see [this confluence page](https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/3897262258/Oracle+11gR2+AMI+Build+for+NOMIS+Databases)
 
-## Usage 
+## Usage
 
 Pay particular attention to the `name` variable. This is used to create private and public Route 53 records for the database instance, e.g. `db.<var.name>.xxxxxxxx.gov.uk`.
 
@@ -54,14 +54,16 @@ If you upgrade the AMI used by the instance, the instance will be destroyed, how
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.1.7 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 4.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 4.9 |
+| <a name="requirement_cloudinit"></a> [cloudinit](#requirement\_cloudinit) | ~> 2.2 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | ~> 4.0 |
-| <a name="provider_aws.core-vpc"></a> [aws.core-vpc](#provider\_aws.core-vpc) | ~> 4.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | ~> 4.9 |
+| <a name="provider_aws.core-vpc"></a> [aws.core-vpc](#provider\_aws.core-vpc) | ~> 4.9 |
+| <a name="provider_cloudinit"></a> [cloudinit](#provider\_cloudinit) | ~> 2.2 |
 | <a name="provider_random"></a> [random](#provider\_random) | n/a |
 | <a name="provider_template"></a> [template](#provider\_template) | n/a |
 | <a name="provider_time"></a> [time](#provider\_time) | n/a |
@@ -78,6 +80,8 @@ No modules.
 | [aws_ebs_volume.asm_flash](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ebs_volume) | resource |
 | [aws_ebs_volume.oracle_app](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ebs_volume) | resource |
 | [aws_ebs_volume.swap](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ebs_volume) | resource |
+| [aws_iam_instance_profile.database](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_instance_profile) | resource |
+| [aws_iam_role.database](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
 | [aws_iam_role_policy.asm_parameter](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy) | resource |
 | [aws_instance.database](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/instance) | resource |
 | [aws_route53_record.external](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_record) | resource |
@@ -96,18 +100,19 @@ No modules.
 | [aws_ami.database](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ami) | data source |
 | [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
 | [aws_ec2_instance_type.database](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ec2_instance_type) | data source |
-| [aws_iam_instance_profile.database](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_instance_profile) | data source |
 | [aws_iam_policy_document.asm_parameter](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_route53_zone.external](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/route53_zone) | data source |
 | [aws_route53_zone.internal](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/route53_zone) | data source |
 | [aws_subnet.data](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/subnet) | data source |
 | [aws_vpc.shared_vpc](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/vpc) | data source |
+| [cloudinit_config.oracle_monitoring_and_userdata](https://registry.terraform.io/providers/hashicorp/cloudinit/latest/docs/data-sources/config) | data source |
 | [template_file.user_data](https://registry.terraform.io/providers/hashicorp/template/latest/docs/data-sources/file) | data source |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| <a name="input_always_on"></a> [always\_on](#input\_always\_on) | Set to false if the instance should be shutdown at evenings and weekends | `bool` | `true` | no |
 | <a name="input_ami_name"></a> [ami\_name](#input\_ami\_name) | Name of AMI to be used to launch the database ec2 instance | `string` | n/a | yes |
 | <a name="input_ami_owner"></a> [ami\_owner](#input\_ami\_owner) | Owner of AMI to be used to launch the database ec2 instance | `string` | `"self"` | no |
 | <a name="input_application_name"></a> [application\_name](#input\_application\_name) | The name of the application.  This will be name of the environment in Modernisation Platform | `string` | `"nomis"` | no |
@@ -120,13 +125,15 @@ No modules.
 | <a name="input_availability_zone"></a> [availability\_zone](#input\_availability\_zone) | The availability zone in which to deploy the infrastructure | `string` | `"eu-west-2a"` | no |
 | <a name="input_business_unit"></a> [business\_unit](#input\_business\_unit) | This corresponds to the VPC in which the application resides | `string` | `"hmpps"` | no |
 | <a name="input_common_security_group_id"></a> [common\_security\_group\_id](#input\_common\_security\_group\_id) | Common security group used by all database instances | `string` | n/a | yes |
+| <a name="input_description"></a> [description](#input\_description) | VM description, should include information such as what is running on it, etc. | `string` | `""` | no |
 | <a name="input_environment"></a> [environment](#input\_environment) | Application environment - i.e. the terraform workspace | `string` | n/a | yes |
 | <a name="input_extra_ingress_rules"></a> [extra\_ingress\_rules](#input\_extra\_ingress\_rules) | A list of extra ingress rules to be added to the database security group | <pre>list(object({<br>    description = string<br>    from_port   = string<br>    to_port     = string<br>    protocol    = string<br>    cidr_blocks = list(string)<br>  }))</pre> | `[]` | no |
-| <a name="input_instance_profile_name"></a> [instance\_profile\_name](#input\_instance\_profile\_name) | IAM instance profile to be attached to the instance | `string` | n/a | yes |
+| <a name="input_instance_profile_policies"></a> [instance\_profile\_policies](#input\_instance\_profile\_policies) | A list of managed IAM policy document ARNs to be attached to thhe database instance profile | `list(string)` | n/a | yes |
 | <a name="input_instance_type"></a> [instance\_type](#input\_instance\_type) | ec2 instance type to use for the database | `string` | `"r6i.xlarge"` | no |
 | <a name="input_key_name"></a> [key\_name](#input\_key\_name) | Name of ssh key resource for ec2-user | `string` | n/a | yes |
 | <a name="input_name"></a> [name](#input\_name) | Provide a unique name for the instance | `string` | n/a | yes |
 | <a name="input_oracle_app_disk_size"></a> [oracle\_app\_disk\_size](#input\_oracle\_app\_disk\_size) | Capcity of each Oracle application disk, /u01 and /u02.  If not specified, the default values from the AMI block device mappings will be used. | `map(any)` | `{}` | no |
+| <a name="input_oracle_sids"></a> [oracle\_sids](#input\_oracle\_sids) | List of databases hosted on the server | `list(string)` | `[]` | no |
 | <a name="input_subnet_set"></a> [subnet\_set](#input\_subnet\_set) | Fixed variable to specify subnet-set for RAM shared subnets | `string` | n/a | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | Default tags to be applied to resources | `map(any)` | n/a | yes |
 | <a name="input_termination_protection"></a> [termination\_protection](#input\_termination\_protection) | Set to true to prevent accidental deletion of instances | `bool` | `false` | no |

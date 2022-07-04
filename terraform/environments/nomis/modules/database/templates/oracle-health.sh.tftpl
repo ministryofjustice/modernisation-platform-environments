@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+if [[ "$(whoami)" != "oracle" ]]
+then
+  echo "This script is expected to be run as the Oracle user" 1>&2
+  exit 1
+fi
+
+# We need to make sure this is in the path
+export PATH=$${PATH}:/usr/local/bin
+
+CRSCTL="$(dbhome +ASM)/bin/crsctl"
+
+if [[ -x "$${CRSCTL}" ]]
+then
+  # Clustered Oracle
+  ORACLE_SID="+ASM"
+  ORAENV_ASK="NO"
+  . oraenv > /dev/null
+
+  # DB resources names are usually 'ora.$${DB}.db' but some have a suffix after $${DB}
+  DB="$(crsctl status resource | grep -m1 -i ora\.${oracle_sid}.*\.db | cut -f2 -d=)"
+
+  # Worth noting here that crsctl exits with code 0 even if you try and find details of a database that doesn't exist
+  STATUS="$(crsctl status resource $${DB} -v | grep STATE_DETAILS | cut -f2 -d= | cut -f1 -d,)"
+
+  case $${STATUS} in
+    "Open")
+      exit 0
+      ;;
+    "Open,Readonly")
+      exit 0
+      ;;
+    "Mounted (Closed)")
+      exit 0
+      ;;
+    *)
+      echo "Failed to find a valid state for $${DB}" 1>&2
+      exit 1
+      ;;
+  esac
+else
+  # Not clustered so we use the sysdate query
+  ORACLE_SID="${oracle_sid}"
+  ORAENV_ASK="NO"
+  . oraenv > /dev/null
+
+  $${ORACLE_HOME}/bin/sqlplus / as sysdba <<-EOF > /dev/null
+  set heading off
+  WHENEVER SQLERROR EXIT SQL.SQLCODE
+  select sysdate from dual;
+EOF
+
+  exit "$${?}"
+fi

@@ -262,7 +262,7 @@ resource "aws_instance" "SOC" {
   instance_type          = "t3a.xlarge"
   availability_zone      = "${local.region}a"
   subnet_id              = data.aws_subnet.private_subnet_a.id
-  vpc_security_group_ids = [aws_security_group.aws_proxy_security_group.id, aws_security_group.all_internal_groups.id]
+  vpc_security_group_ids = [aws_security_group.aws_proxy_security_group.id, aws_security_group.all_internal_groups.id, aws_security_group.aws_soc_security_group.id]
   monitoring             = true
   ebs_optimized          = true
   user_data              = data.template_file.windows-userdata.rendered
