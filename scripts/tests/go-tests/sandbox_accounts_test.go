@@ -36,7 +36,8 @@ func getSecret(cfg aws.Config, secretName string) string {
 	}
 	result, err := client.GetSecretValue(context.TODO(), input)
 	if err != nil {
-		log.Println(err.Error())
+		log.Fatal(err)
+		os.Exit(1)
 	}
 	return *result.SecretString
 }
@@ -83,7 +84,7 @@ func getAutoNukedAccountIds(cfg aws.Config) []string {
 Check whether the given account has a sandbox role associated to it.
 From command line, you would use `aws iam list-roles`.
 */
-func isSandboxAccount(cfg aws.Config, accountId string) bool {
+func isSandboxAccount(cfg aws.Config, accountName string, accountId string) bool {
 	roleARN := fmt.Sprintf("arn:aws:iam::%v:role/MemberInfrastructureAccess", accountId)
 	stsClient := sts.NewFromConfig(cfg)
 	provider := stscreds.NewAssumeRoleProvider(stsClient, roleARN)
@@ -94,17 +95,23 @@ func isSandboxAccount(cfg aws.Config, accountId string) bool {
 		PathPrefix: aws.String("/")})
 
 	if err != nil {
-		fmt.Println("Error", err)
-		return false
+		if strings.Contains(err.Error(), "is not authorized to perform: sts:AssumeRole on resource") {
+			log.Printf("WARN: account %v (%v) is ignored because it does not have the role MemberInfrastructureAccess, therefore is not a member account and cannot have the sandbox SSO role\n", accountName, accountId)
+		} else {
+			log.Fatal(err)
+			os.Exit(1)
+		}
 	}
 
-	// For simplicity and less dereferencing: more execution speed
-	rolesList := outRoles.Roles
+	if outRoles != nil {
+		// For simplicity and less dereferencing: more execution speed
+		rolesList := outRoles.Roles
 
-	for i := range rolesList {
-		roleName := *rolesList[i].RoleName
-		if strings.Contains(roleName, "sandbox") {
-			return true
+		for i := range rolesList {
+			roleName := *rolesList[i].RoleName
+			if strings.Contains(roleName, "sandbox") {
+				return true
+			}
 		}
 	}
 	return false
@@ -113,9 +120,9 @@ func isSandboxAccount(cfg aws.Config, accountId string) bool {
 func getSandboxAccounts(cfg aws.Config, skipAccountNames string) map[string]string {
 	accounts := make(map[string]string)
 	nonProdAccounts := getNonProdAccounts(cfg)
-	for accName, accId := range nonProdAccounts {
-		if !strings.Contains(skipAccountNames, accName) && isSandboxAccount(cfg, accId) {
-			accounts[accName] = accId
+	for accountName, accountId := range nonProdAccounts {
+		if (len(skipAccountNames) < 1 || !strings.Contains(skipAccountNames, accountName)) && isSandboxAccount(cfg, accountName, accountId) {
+			accounts[accountName] = accountId
 		}
 	}
 	return accounts
@@ -128,10 +135,13 @@ func TestSandboxAccountsAreAutoNuked(t *testing.T) {
 	cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithRegion("eu-west-2"))
 	if err != nil {
 		log.Fatal(err)
+		os.Exit(1)
 	}
 
 	autoNukedAccountIds := getAutoNukedAccountIds(cfg)
+	assert.NotEmpty(t, autoNukedAccountIds, "No accounts were found in the auto-nuke list. Refer to the nuke_account_ids secret from https://user-guide.modernisation-platform.service.justice.gov.uk/concepts/environments/auto-nuke.html")
 	sandboxAccounts := getSandboxAccounts(cfg, os.Getenv("NUKE_SKIP_SANDBOX_ACCOUNTS"))
+	assert.NotEmpty(t, sandboxAccounts, "No member development accounts with the sandbox role were found")
 	sandboxNonAutoNukedAccounts := make(map[string]string)
 	for accName, accId := range sandboxAccounts {
 		if !slices.Contains(autoNukedAccountIds, accId) {
