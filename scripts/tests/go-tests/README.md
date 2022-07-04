@@ -9,11 +9,9 @@ aws-vault exec mod -- go test -v
 Upon successful run, you should see an output similar to the below
 
 ```
-TestS3Creation 2022-06-08T14:29:22+01:00 logger.go:66: Destroy complete! Resources: 3 destroyed.
-TestS3Creation 2022-06-08T14:29:22+01:00 logger.go:66: 
---- PASS: TestS3Creation (20.60s)
+--- PASS: TestSandboxAccountsAreAutoNuked (7.44s)
 PASS
-ok      github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux        20.897s
+ok      github.com/ministryofjustice/modernisation-platform-environments        7.677s
 ```
 
 ## Module initialisation
