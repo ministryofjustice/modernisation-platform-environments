@@ -1,8 +1,6 @@
 ---
 name: Go tests
 on:
-  pull_request:
-    types: [ opened, edited, reopened, synchronize ]
   schedule:
     # * is a special character in YAML so you have to quote this string
     # trigger every sunday at 10:00am
@@ -12,7 +10,10 @@ env:
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   TF_IN_AUTOMATION: true
-  # NUKE_SKIP_SANDBOX_ACCOUNTS: bichard7-sandbox-shared, core-vpc-sandbox,
+  # NUKE_SKIP_SANDBOX_ACCOUNTS is a comma-separated list of account names to be skipped from the
+  # sandbox_accounts_test.go test. For example: "xhibit-portal-development,another-development,".
+  # As can be observed in the example above, every account name needs a leading comma, hence the last comma in the list.
+  NUKE_SKIP_SANDBOX_ACCOUNTS: xhibit-portal-development,
 jobs:
   go-tests:
     name: Run Go Unit Tests

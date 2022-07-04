@@ -21,8 +21,8 @@ import (
 
 /**
 ENV variable NUKE_SKIP_SANDBOX_ACCOUNTS: A comma-separated list of account names to be skipped from the test. For example:
-"bichard7-sandbox-shared, core-vpc-sandbox,".
-As can be observed in the example, every account name needs a leading comma, hence the last comma in the list.
+"xhibit-portal-development,another-development,".
+As can be observed in the example above, every account name needs a leading comma, hence the last comma in the list.
 
 CLI examples:
 aws secretsmanager get-secret-value --secret-id environment_management --profile mod --region eu-west-2
