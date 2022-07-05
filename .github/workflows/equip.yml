@@ -36,10 +36,11 @@ jobs:
       - name: Load and Configure Terraform
         uses: hashicorp/setup-terraform@v2.0.0
         with:
-          terraform_version: 1.0.1
+          terraform_version: "~1"
           terraform_wrapper: false
       - name: Terraform plan - development
         run: |
+          terraform --version
           echo "Terraform plan - ${TF_ENV}"
           bash scripts/terraform-init.sh terraform/environments/equip
           terraform -chdir="terraform/environments/equip" workspace select "equip-${TF_ENV}"
@@ -59,10 +60,11 @@ jobs:
       - name: Load and Configure Terraform
         uses: hashicorp/setup-terraform@v2.0.0
         with:
-          terraform_version: 1.0.1
+          terraform_version: "~1"
           terraform_wrapper: false
       - name: Terraform apply - development
         run: |
+          terraform --version
           echo "Terraform apply - ${TF_ENV}"
           bash scripts/terraform-init.sh terraform/environments/equip
           terraform -chdir="terraform/environments/equip" workspace select "equip-${TF_ENV}"
@@ -80,10 +82,11 @@ jobs:
       - name: Load and Configure Terraform
         uses: hashicorp/setup-terraform@v2.0.0
         with:
-          terraform_version: 1.0.1
+          terraform_version: "~1"
           terraform_wrapper: false
       - name: Terraform plan - production
         run: |
+          terraform --version
           echo "Terraform plan - ${TF_ENV}"
           bash scripts/terraform-init.sh terraform/environments/equip
           terraform -chdir="terraform/environments/equip" workspace select "equip-${TF_ENV}"
@@ -103,10 +106,11 @@ jobs:
       - name: Load and Configure Terraform
         uses: hashicorp/setup-terraform@v2.0.0
         with:
-          terraform_version: 1.0.1
+          terraform_version: "~1"
           terraform_wrapper: false
       - name: Terraform apply - production
         run: |
+          terraform --version
           echo "Terraform apply - ${TF_ENV}"
           bash scripts/terraform-init.sh terraform/environments/equip
           terraform -chdir="terraform/environments/equip" workspace select "equip-${TF_ENV}"
