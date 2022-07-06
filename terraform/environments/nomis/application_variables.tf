@@ -4,9 +4,11 @@ locals {
     test = {
       # ip ranges for external access to database instances
       database_external_access_cidr = {
-        azure_noms_test = "10.101.0.0/16"
-        cloud_platform  = "172.20.0.0/16"
+        azure_noms_test      = "10.101.0.0/16"
+        azure_noms_mgmt_test = "10.102.0.0/16"
+        cloud_platform       = "172.20.0.0/16"
       },
+
       # vars common across ec2 instances
       ec2_common = {
         public_key                = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCv/RZr7NQwO1Ovjbaxs5X9jR1L4QU/WSOIH3qhCriTlzbdnPI5mA79ZWBZ25h5tA2eIu5FbX+DBwYgwARCnS6VL4KiLKq9j7Ys/gx2FE6rWlXEibpK/9dGLu35znDUyO0xiLIu/EPZFpWhn/2L1z82GiEjDaiY00NmxkHHKMaRCDrgCJ4tEhGPWGcPYoNAYmCkncQJjYojSJ0uaP6e85yx2nmE85YDE+QcDoN5HtHex84CCibh98nD2tMhEQ2Ss+g7/nSXw+/Z2RadDznpz0h/8CcgAGpTHJ35+aeWINquw0lWSJldCLfn3PXldcDzFleqoop9jRGn2hB9eOUz2iEC7MXoLPFcen/lzQD+xfwvaq1+4YU7BbiyTtY/lcw0xcE01QBA+nUiHPJMBewr2TmZRHNy1fvg8ZRKLrOcEMz8iPKVtquftl1DZZCO8Xccr3BVpfoXIl5LuEWPqnMABAvgtkHMaIkTqKMgaKVEC9/KTqRn/K2zzGljUJkzcgO95bNksjDRXtbfQ0AD7CLa47xPOLPh4dC2WDindKh3YALa74EBOyEtJWvLt6fRLPhWmOaZkCrjC3TI+onKiPo0nXrN7Uyg2Q6Atiauw6fqz63cRXkzU/e7LVoxT42qaaaGMytgZJXF3Wk4hp88IqqnDXFavLUElsJEgOTWiNTk2N92/w=="
@@ -58,8 +60,9 @@ locals {
     production = {
       # ip ranges for external access to database instances
       database_external_access_cidr = {
-        azure_noms_live = "10.40.0.0/18"
-        cloud_platform  = "172.20.0.0/16"
+        azure_noms_live      = "10.40.0.0/18"
+        cloud_platform       = "172.20.0.0/16"
+        azure_noms_mgmt_live = "10.40.128.0/20"
       },
       # vars common across ec2 instances
       ec2_common = {

@@ -108,6 +108,7 @@ resource "aws_instance" "database" {
     {
       Name          = "database-${var.name}"
       description   = var.description
+      servername    = var.name
       component     = "data"
       os_type       = "Linux"
       os_version    = "RHEL 7.9"
