@@ -83,7 +83,7 @@ data "aws_iam_policy_document" "sns_topic_key_policy" {
     ]
     effect = "Allow"
     principals {
-      type = "AWS"
+      type        = "AWS"
       identifiers = ["arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:root"]
     }
     # these can be ignored as this policy is being applied to a specific key resource. ["*"] in this case refers to this key
