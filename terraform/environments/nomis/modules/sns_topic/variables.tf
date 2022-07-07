@@ -21,3 +21,13 @@ variable "env" {
   default     = "test"
   type        = string
 }
+
+variable "kms_master_key_id" {
+  description = "Id of the customer managed key used to encrypt this topic"
+  type        = string
+}
+
+variable "kms_master_key_arn" {
+  description = "ARN of the customer managed key used to encrypt this topic"
+  type        = string
+}

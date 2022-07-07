@@ -11,7 +11,7 @@ locals {
 resource "aws_sns_topic" "sns_topic" {
   name              = "mod-platform-${var.application}-${var.env}"
   display_name      = "SNS Topic for ${var.application}-${var.env}"
-  kms_master_key_id = "alias/aws/sns"
+  kms_master_key_id = var.kms_master_key_id
 }
 
 resource "aws_sns_topic_subscription" "monitoring_subscriptions" {
@@ -56,6 +56,15 @@ data "aws_iam_policy_document" "policy" {
 
     resources = [
       aws_sns_topic.sns_topic.arn,
+    ]
+  }
+  statement {
+    actions = [
+      "kms:GenerateDataKey",
+      "kms:Decrypt"
+    ]
+    resources = [
+      var.kms_master_key_arn
     ]
   }
 }
