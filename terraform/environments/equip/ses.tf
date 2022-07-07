@@ -1,4 +1,5 @@
 resource "aws_ses_domain_identity" "external" {
+  count  = local.is-production ? 1 : 0
   domain = data.aws_route53_zone.application-zone.name
 }
 
@@ -11,6 +12,7 @@ resource "aws_ses_domain_dkim" "external" {
 # `allow_overwrite` is used here as this is a verification record
 resource "aws_route53_record" "external_amazonses_verification_record" {
   provider        = aws.core-network-services
+  count           = local.is-production ? 1 : 0
   zone_id         = data.aws_route53_zone.application-zone.id
   allow_overwrite = true
   name            = format("_amazonses.%s", data.aws_route53_zone.application-zone.name)
@@ -32,6 +34,7 @@ resource "aws_route53_record" "external_amazonses_dkim_record" {
 }
 
 resource "aws_ses_domain_identity_verification" "external" {
+  count  = local.is-production ? 1 : 0
   domain = aws_ses_domain_identity.external.id
 
   depends_on = [aws_route53_record.external_amazonses_verification_record]
