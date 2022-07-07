@@ -1,6 +1,6 @@
 resource "aws_route53_record" "oracle-manager" {
   provider = aws.core-vpc
-  count = can(local.accounts[local.environment].database_oracle_manager) ? 1 : 0
+  count    = can(local.accounts[local.environment].database_oracle_manager) ? 1 : 0
 
 
   zone_id = data.aws_route53_zone.internal.zone_id
