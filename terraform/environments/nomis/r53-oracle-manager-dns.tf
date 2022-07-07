@@ -1,10 +1,10 @@
 resource "aws_route53_record" "oracle-manager" {
   provider = aws.core-vpc
-  for_each = local.accounts[local.environment].database_oracle_manager
+  count = try(local.accounts[local.environment].database_oracle_manager, false) ? 1 : 0
 
   zone_id = data.aws_route53_zone.internal.zone_id
-  name    = "${each.value.oms_hostname}.${local.application_name}.${data.aws_route53_zone.internal.name}"
+  name    = "${local.accounts[local.environment].database_oracle_manager.oms_hostname}.${local.application_name}.${data.aws_route53_zone.internal.name}"
   type    = "A"
   ttl     = "60"
-  records = [each.value.oms_ip_address]
+  records = [local.accounts[local.environment].database_oracle_manager.oms_ip_address]
 }
