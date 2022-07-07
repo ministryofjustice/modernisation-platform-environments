@@ -123,7 +123,7 @@ resource "aws_launch_template" "weblogic" {
 
   lifecycle {
     ignore_changes = [
-      tags, description, image_id, latest_version
+      tags, description, image_id
     ]
   }
 
