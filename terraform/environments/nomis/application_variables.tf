@@ -68,7 +68,7 @@ locals {
       # Details of OMS Manager in FixNGo (only needs defining if databases in the environment are managed)
       database_oracle_manager = {
         oms_ip_address = "10.40.0.136"
-        oms_hostname   = "oms"
+        oms_hostname   = "oem"
       }
       # vars common across ec2 instances
       ec2_common = {
