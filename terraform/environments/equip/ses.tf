@@ -1,22 +1,24 @@
 resource "aws_ses_domain_identity" "external" {
+  count  = local.is-production ? 1 : 0
   domain = data.aws_route53_zone.application-zone.name
 }
 
 resource "aws_ses_domain_dkim" "external" {
   count      = local.is-production ? 1 : 0
-  domain     = aws_ses_domain_identity.external.domain
+  domain     = aws_ses_domain_identity.external[0].domain
   depends_on = [aws_ses_domain_identity_verification.external]
 }
 
 # `allow_overwrite` is used here as this is a verification record
 resource "aws_route53_record" "external_amazonses_verification_record" {
   provider        = aws.core-network-services
+  count           = local.is-production ? 1 : 0
   zone_id         = data.aws_route53_zone.application-zone.id
   allow_overwrite = true
   name            = format("_amazonses.%s", data.aws_route53_zone.application-zone.name)
   type            = "TXT"
   ttl             = "300"
-  records         = [aws_ses_domain_identity.external.verification_token]
+  records         = [aws_ses_domain_identity.external[0].verification_token]
 }
 
 resource "aws_route53_record" "external_amazonses_dkim_record" {
@@ -32,7 +34,8 @@ resource "aws_route53_record" "external_amazonses_dkim_record" {
 }
 
 resource "aws_ses_domain_identity_verification" "external" {
-  domain = aws_ses_domain_identity.external.id
+  count  = local.is-production ? 1 : 0
+  domain = aws_ses_domain_identity.external[0].id
 
   depends_on = [aws_route53_record.external_amazonses_verification_record]
   timeouts {
