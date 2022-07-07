@@ -1,10 +1,3 @@
-data "aws_route53_zone" "internal" {
-  provider = aws.core-vpc
-
-  name         = "${local.business_unit}-${local.environment}.modernisation-platform.internal."
-  private_zone = true
-}
-
 resource "aws_route53_record" "oracle-manager" {
   provider = aws.core-vpc
   for_each = local.accounts[local.environment].database_oracle_manager
