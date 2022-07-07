@@ -5,7 +5,7 @@ resource "aws_ses_domain_identity" "external" {
 
 resource "aws_ses_domain_dkim" "external" {
   count      = local.is-production ? 1 : 0
-  domain     = aws_ses_domain_identity.external.domain
+  domain     = aws_ses_domain_identity.external[0].domain
   depends_on = [aws_ses_domain_identity_verification.external]
 }
 
@@ -18,7 +18,7 @@ resource "aws_route53_record" "external_amazonses_verification_record" {
   name            = format("_amazonses.%s", data.aws_route53_zone.application-zone.name)
   type            = "TXT"
   ttl             = "300"
-  records         = [aws_ses_domain_identity.external.verification_token]
+  records         = [aws_ses_domain_identity.external[0].verification_token]
 }
 
 resource "aws_route53_record" "external_amazonses_dkim_record" {
@@ -35,7 +35,7 @@ resource "aws_route53_record" "external_amazonses_dkim_record" {
 
 resource "aws_ses_domain_identity_verification" "external" {
   count  = local.is-production ? 1 : 0
-  domain = aws_ses_domain_identity.external.id
+  domain = aws_ses_domain_identity.external[0].id
 
   depends_on = [aws_route53_record.external_amazonses_verification_record]
   timeouts {
