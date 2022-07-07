@@ -3,8 +3,8 @@ module "monitoring-sns-topic" {
   application        = "nomis-monitoring"
   env                = local.environment
   topic_display_name = "Nomis monitoring ${local.environment} SNS topic"
-  kms_master_key_arn = aws.aws_kms_key.sns.arn
-  kms_master_key_id  = aws.aws_kms_key.sns.key_id
+  kms_master_key_arn = aws_kms_key.sns.arn
+  kms_master_key_id  = aws_kms_key.sns.key_id
 
 }
 
