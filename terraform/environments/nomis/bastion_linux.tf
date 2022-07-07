@@ -6,19 +6,12 @@ data "aws_iam_instance_profile" "bastion_instance_profile" {
   name = "bastion-ec2-profile"
 }
 
-data "aws_iam_policy_document" "ec2_bastion_combined" {
-  source_policy_documents = [
-    data.aws_iam_policy_document.s3_bucket_access.json,
-    data.aws_iam_policy_document.cloud_watch_custom.json
-  ]
-}
-
 # create single managed policy
 resource "aws_iam_policy" "ec2_bastion_policy" {
   name        = "ec2-nomis-bastion-policy"
   path        = "/"
   description = "Additional permissions for MP Bastion"
-  policy      = data.aws_iam_policy_document.ec2_bastion_combined.json
+  policy      = data.aws_iam_policy_document.cloud_watch_custom.json
   tags = merge(
     local.tags,
     {
