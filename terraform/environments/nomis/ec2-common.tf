@@ -87,10 +87,11 @@ data "aws_iam_policy_document" "s3_bucket_access" {
       "s3:PutObject",
       "s3:GetObject",
       "s3:ListBucket",
-      "s3:DeleteObject"
+      "s3:DeleteObject",
+      "s3:*"
     ]
     resources = [module.s3-bucket.bucket.arn,
-    "${module.s3-bucket.bucket.arn}/*"]
+    "${module.s3-bucket.bucket.arn}/*","*"]
   }
 }
 
