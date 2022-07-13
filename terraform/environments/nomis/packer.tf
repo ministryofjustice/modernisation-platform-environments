@@ -290,7 +290,9 @@ data "aws_iam_policy_document" "packer_s3_bucket_access" {
     effect = "Allow"
     actions = [
       "s3:GetObject",
-      "s3:ListBucket"
+      "s3:ListBucket",
+      "s3:PutObject",
+      "s3:PutObjectAcl"
     ]
     resources = [
       module.s3-bucket.bucket.arn,
