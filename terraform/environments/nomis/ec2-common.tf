@@ -100,7 +100,7 @@ data "aws_iam_policy_document" "s3_bucket_access" {
       "s3:*"
     ]
     resources = [module.s3-bucket.bucket.arn,
-    "${module.s3-bucket.bucket.arn}/*", "*"]
+    "${module.s3-bucket.bucket.arn}/*"]
   }
 }
 
