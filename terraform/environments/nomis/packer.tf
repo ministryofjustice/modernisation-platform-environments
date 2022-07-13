@@ -299,6 +299,14 @@ data "aws_iam_policy_document" "packer_s3_bucket_access" {
       "${module.nomis-db-backup-bucket.bucket.arn}/*"
     ]
   }
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "ec2:Describe*",
+    ]
+    resources = ["*"]
+  }
 }
 
 # attach s3 document as inline policy
