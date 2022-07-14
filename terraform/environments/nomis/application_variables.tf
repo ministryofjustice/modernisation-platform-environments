@@ -104,7 +104,7 @@ locals {
           oracle_sids            = ["PCNMAUD"]
           oracle_app_disk_size = {
             "/dev/sdb" = 100  # /u01
-            "/dev/sdc" = 5120 # /u02
+            "/dev/sdc" = 2048 # /u02
           }
         },
         NOMIS = {
@@ -113,12 +113,12 @@ locals {
           instance_type          = "r6i.4xlarge"
           asm_data_capacity      = 4000
           asm_flash_capacity     = 1000
-          description            = "Copy of Production NOMIS database in Azure PDPDL00035, replicating with PDPDL00035, a replacement for PDPDL10036."
+          description            = "Copy of Production NOMIS CNOM database in Azure PDPDL00035, replicating with PDPDL00035, a replacement for PDPDL10036."
           termination_protection = true
           oracle_sids            = ["MISPD,CNOMP"]
           oracle_app_disk_size = {
             "/dev/sdb" = 100  # /u01
-            "/dev/sdc" = 5120 # /u02
+            "/dev/sdc" = 512 # /u02
           }
         }
       },
