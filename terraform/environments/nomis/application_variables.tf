@@ -104,7 +104,7 @@ locals {
           oracle_sids            = ["PCNMAUD"]
           oracle_app_disk_size = {
             "/dev/sdb" = 100  # /u01
-            "/dev/sdc" = 2048 # /u02
+            "/dev/sdc" = 5120 # /u02
           }
         },
         NOMIS = {
