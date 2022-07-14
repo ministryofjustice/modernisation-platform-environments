@@ -106,6 +106,20 @@ locals {
             "/dev/sdb" = 100  # /u01
             "/dev/sdc" = 5120 # /u02
           }
+        },
+        NOMIS = {
+          always_on              = true
+          ami_name               = "nomis_db_STIG-2022-04-26*"
+          instance_type          = "r6i.4xlarge"
+          asm_data_capacity      = 4000
+          asm_flash_capacity     = 1000
+          description            = "Copy of Production NOMIS database in Azure, a replacement for PDPDL00035."
+          termination_protection = true
+          oracle_sids            = ["MISPD,CNOMP"]
+          oracle_app_disk_size = {
+            "/dev/sdb" = 100  # /u01
+            "/dev/sdc" = 5120 # /u02
+          }
         }
       },
       # Add weblogic instances here.  They will be created using the weblogic module
