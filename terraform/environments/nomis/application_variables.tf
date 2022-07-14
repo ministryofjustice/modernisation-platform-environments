@@ -113,7 +113,7 @@ locals {
           instance_type          = "r6i.4xlarge"
           asm_data_capacity      = 4000
           asm_flash_capacity     = 1000
-          description            = "Copy of Production NOMIS database in Azure, a replacement for PDPDL00035."
+          description            = "Copy of Production NOMIS database in Azure PDPDL00035, replicating with PDPDL00035, a replacement for PDPDL10036."
           termination_protection = true
           oracle_sids            = ["MISPD,CNOMP"]
           oracle_app_disk_size = {
