@@ -117,7 +117,7 @@ locals {
           termination_protection = true
           oracle_sids            = ["MISPD,CNOMP"]
           oracle_app_disk_size = {
-            "/dev/sdb" = 100  # /u01
+            "/dev/sdb" = 100 # /u01
             "/dev/sdc" = 512 # /u02
           }
         }
