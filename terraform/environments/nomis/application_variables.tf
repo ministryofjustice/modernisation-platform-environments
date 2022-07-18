@@ -106,6 +106,9 @@ locals {
             "/dev/sdb" = 100  # /u01
             "/dev/sdc" = 5120 # /u02
           }
+          tags = {
+            monitored = true
+          }
         },
         NOMIS = {
           always_on              = true
@@ -115,10 +118,13 @@ locals {
           asm_flash_capacity     = 1000
           description            = "Copy of Production NOMIS CNOM database in Azure PDPDL00035, replicating with PDPDL00035, a replacement for PDPDL10036."
           termination_protection = true
-          oracle_sids            = ["PCNOM,PMISS1"]
+          oracle_sids            = ["PCNOM", "PMISS1"]
           oracle_app_disk_size = {
             "/dev/sdb" = 100 # /u01
             "/dev/sdc" = 512 # /u02
+          }
+          tags = {
+            monitored = false //not yet live
           }
         }
       },
