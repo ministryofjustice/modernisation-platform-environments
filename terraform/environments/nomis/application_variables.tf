@@ -38,6 +38,9 @@ locals {
           asm_data_capacity  = 100
           asm_flash_capacity = 2
           description        = "Test NOMIS T1 database with a dataset of T1PDL0009 (note: only NOMIS db, NDH db is not included."
+          tags = {
+            monitored = false
+          }
         },
         CNAUDT1 = {
           always_on              = true
@@ -47,6 +50,9 @@ locals {
           description            = "Copy of Test NOMIS Audit database in Azure T1PDL0010, replicating with T1PDL0010."
           termination_protection = true
           oracle_sids            = ["MIST1", "CNMAUDT1"]
+          tags = {
+            monitored = false
+          }
         }
       },
       # Add weblogic instances here.  They will be created using the weblogic module
