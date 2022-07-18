@@ -110,7 +110,7 @@ locals {
             monitored = true
           }
         },
-        NOMIS = {
+        CNOM = {
           always_on              = true
           ami_name               = "nomis_db_STIG-2022-04-26*"
           instance_type          = "r6i.4xlarge"
