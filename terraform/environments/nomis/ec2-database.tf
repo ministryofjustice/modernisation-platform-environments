@@ -38,7 +38,7 @@ module "database" {
   business_unit    = local.vpc_name
   environment      = local.environment
   subnet_set       = local.subnet_set
-  tags             = local.tags
+  tags             = merge(local.tags, try(each.value.tags, {}))
 }
 
 #------------------------------------------------------------------------------
