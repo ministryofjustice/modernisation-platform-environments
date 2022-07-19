@@ -12,6 +12,9 @@ provider "aws" {
   alias                  = "modernisation-platform"
   region                 = "eu-west-2"
   skip_get_ec2_platforms = true
+  assume_role {
+    role_arn = "arn:aws:iam::946070829339:role/readonly"
+  }
 }
 
 # AWS provider for core-vpc-<environment>, to share VPCs into this account
