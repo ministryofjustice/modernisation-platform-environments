@@ -56,6 +56,8 @@ data "aws_iam_policy_document" "extra_permissions" {
       "identitystore:ListGroups",
       "secretsmanager:GetSecretValue",
       "sts:AssumeRole",
+      "s3:*",
+      "kms:*",
     ]
 
     resources = ["*"]
