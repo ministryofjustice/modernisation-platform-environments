@@ -24,11 +24,6 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
         env:
           ACCOUNT_ID: 348456244381 # sprinkler-development
-
-
-
-
-
       # Upload a file to AWS s3
       - name: Copy LICENSE to s3
         run: |
