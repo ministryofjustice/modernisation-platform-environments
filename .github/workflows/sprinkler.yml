@@ -16,8 +16,9 @@ on:
      - '.github/workflows/sprinkler.yml'
  workflow_dispatch:
 env:
- AWS_ACCESS_KEY_ID:  ${{ secrets.AWS_ACCESS_KEY_ID }}
- AWS_SECRET_ACCESS_KEY:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+# AWS_ACCESS_KEY_ID:  ${{ secrets.AWS_ACCESS_KEY_ID }}
+# AWS_SECRET_ACCESS_KEY:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+ AWS_REGION: "eu-west-2"
  TF_IN_AUTOMATION: true
 defaults:
  run:
@@ -33,6 +34,14 @@ jobs:
    steps:
      - name: Checkout Repository
        uses: actions/checkout@v3.0.2
+     - name: configure aws credentials
+       uses: aws-actions/configure-aws-credentials@v1
+       with:
+         role-to-assume: arn:aws:iam::${{ env.ACCOUNT_ID }}:role/github-action
+         role-session-name: samplerolesession
+         aws-region: ${{ env.AWS_REGION }}
+       env:
+         ACCOUNT_ID: 348456244381 # sprinkler-development
      - name: Load and Configure Terraform
        uses: hashicorp/setup-terraform@v2.0.0
        with:
