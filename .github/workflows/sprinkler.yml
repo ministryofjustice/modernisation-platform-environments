@@ -20,6 +20,10 @@ env:
 # AWS_SECRET_ACCESS_KEY:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
  AWS_REGION: "eu-west-2"
  TF_IN_AUTOMATION: true
+# permission can be added at job level or workflow level
+permissions:
+  id-token: write
+  contents: read    # This is required for actions/checkout
 defaults:
  run:
    shell: bash
