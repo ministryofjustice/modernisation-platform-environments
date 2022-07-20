@@ -53,17 +53,6 @@ locals {
           tags = {
             monitored = false
           }
-        },
-        TEST = {
-          always_on          = false
-          ami_name           = "nomis_database_2022-07-19*"
-          ami_owner          = local.environment_management.account_ids["core-shared-services-production"]
-          asm_data_capacity  = 100
-          asm_flash_capacity = 2
-          description        = "Test database AMI created with AMS Imagebuilder"
-          tags = {
-            monitored = false
-          }
         }
       },
       # Add weblogic instances here.  They will be created using the weblogic module
