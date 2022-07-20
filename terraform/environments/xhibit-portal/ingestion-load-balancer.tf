@@ -180,7 +180,7 @@ data "aws_iam_policy_document" "s3_bucket_ingestion_lb_write" {
     resources = ["${aws_s3_bucket.ingestion_loadbalancer_logs.arn}"]
 
     condition {
-      name     = "Bool"
+      test     = "Bool"
       variable = "aws:SecureTransport"
       values = [
         "true"
