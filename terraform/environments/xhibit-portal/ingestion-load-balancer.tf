@@ -137,6 +137,14 @@ data "aws_iam_policy_document" "s3_bucket_ingestion_lb_write" {
       "${aws_s3_bucket.ingestion_loadbalancer_logs.arn}/*",
     ]
 
+    condition {
+      name = "Bool"
+      variable = "aws:SecureTransport"
+      values = [
+        "true"
+      ]
+    }
+
     principals {
       identifiers = ["arn:aws:iam::652711504416:root"]
       type        = "AWS"
@@ -149,6 +157,15 @@ data "aws_iam_policy_document" "s3_bucket_ingestion_lb_write" {
     ]
     effect    = "Allow"
     resources = ["${aws_s3_bucket.ingestion_loadbalancer_logs.arn}/*"]
+    
+    condition {
+      name = "Bool"
+      variable = "aws:SecureTransport"
+      values = [
+        "true"
+      ]
+    }
+    
     principals {
       identifiers = ["delivery.logs.amazonaws.com"]
       type        = "Service"
@@ -161,6 +178,15 @@ data "aws_iam_policy_document" "s3_bucket_ingestion_lb_write" {
     ]
     effect    = "Allow"
     resources = ["${aws_s3_bucket.ingestion_loadbalancer_logs.arn}"]
+
+    condition {
+      name = "Bool"
+      variable = "aws:SecureTransport"
+      values = [
+        "true"
+      ]
+    }    
+    
     principals {
       identifiers = ["delivery.logs.amazonaws.com"]
       type        = "Service"
