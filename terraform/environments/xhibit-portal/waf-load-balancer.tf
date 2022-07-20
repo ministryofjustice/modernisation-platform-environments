@@ -425,3 +425,83 @@ resource "aws_wafv2_web_acl_logging_configuration" "waf_logs" {
   log_destination_configs = ["${aws_s3_bucket.waf_logs.arn}"]
   resource_arn            = aws_wafv2_web_acl.waf_acl.arn
 }
+
+resource "aws_s3_bucket_policy" "waf_logs_policy" {
+  bucket = aws_s3_bucket.waf_logs.bucket
+  policy = data.aws_iam_policy_document.s3_bucket_waf_logs_policy.json
+}
+
+data "aws_iam_policy_document" "s3_bucket_waf_logs_policy" {
+
+  statement {
+    sid = "AWSLogDeliveryWrite"
+    actions = [
+      "s3:PutObject",
+    ]
+    effect = "Allow"
+    resources = [
+      "${aws_s3_bucket.waf_logs.arn}/AWSLogs/FIND_ACCOUNT_ID_VARIABLE/*"
+    ]
+
+    condition {
+      test     = "StringEquals"
+      variable = "s3:x-amz-acl"
+      values = [
+        "bucket-owner-full-control"
+      ]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceAccount"
+      values = [
+        "FIND_ACCOUNT_ID_VARIABLE"
+      ]
+    }
+
+    condition {
+      test     = "ArnLike"
+      variable = "aws:SourceArn"
+      values = [
+        "arn:aws:logs:eu-west-2:FIND_ACCOUNT_ID_VARIABLE:*"
+      ]
+    }
+
+    principals {
+      identifiers = ["delivery.logs.amazonaws.com"]
+      type        = "Service"
+    }
+  }
+
+  statement {
+    sid = "AWSLogDeliveryAclCheck"
+    actions = [
+      "s3:GetBucketAcl"
+    ]
+    effect    = "Allow"
+    resources = [
+      "${aws_s3_bucket.waf_logs.arn}"
+    ]
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceAccount"
+      values = [
+        "FIND_ACCOUNT_ID_VARIABLE"
+      ]
+    }
+
+    condition {
+      test     = "ArnLike"
+      variable = "aws:SourceArn"
+      values = [
+        "arn:aws:logs:eu-west-2:FIND_ACCOUNT_ID_VARIABLE:*"
+      ]
+    }
+
+    principals {
+      identifiers = ["delivery.logs.amazonaws.com"]
+      type        = "Service"
+    }
+  }
+}
