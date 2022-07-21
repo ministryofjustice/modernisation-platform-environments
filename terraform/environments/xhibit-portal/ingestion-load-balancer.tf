@@ -146,6 +146,11 @@ data "aws_iam_policy_document" "s3_bucket_ingestion_lb_write" {
         "false"
       ]
     }
+
+    principals {
+      identifiers = ["*"]
+      type        = "AWS"
+    }
   }
 
   statement {
