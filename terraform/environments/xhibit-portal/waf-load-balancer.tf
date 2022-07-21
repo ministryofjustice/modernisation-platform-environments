@@ -437,6 +437,26 @@ resource "aws_s3_bucket_policy" "waf_logs_policy" {
 data "aws_iam_policy_document" "s3_bucket_waf_logs_policy" {
 
   statement {
+    sid = "AllowSSLRequestsOnly"
+    actions = [
+      "s3:*",
+    ]
+    effect = "Deny"
+    resources = [
+      "${aws_s3_bucket.waf_logs.arn}/*",
+      "${aws_s3_bucket.waf_logs.arn}"
+    ]
+
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values = [
+        "false"
+      ]
+    }
+  }
+  
+  statement {
     sid = "AWSLogDeliveryWrite"
     actions = [
       "s3:PutObject",
@@ -470,14 +490,6 @@ data "aws_iam_policy_document" "s3_bucket_waf_logs_policy" {
       ]
     }
 
-    condition {
-      test     = "Bool"
-      variable = "aws:SecureTransport"
-      values = [
-        "true"
-      ]
-    }
-
     principals {
       identifiers = ["delivery.logs.amazonaws.com"]
       type        = "Service"
@@ -507,14 +519,6 @@ data "aws_iam_policy_document" "s3_bucket_waf_logs_policy" {
       variable = "aws:SourceArn"
       values = [
         "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.account_id}:*"
-      ]
-    }
-
-    condition {
-      test     = "Bool"
-      variable = "aws:SecureTransport"
-      values = [
-        "true"
       ]
     }
 
