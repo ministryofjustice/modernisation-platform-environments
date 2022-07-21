@@ -65,7 +65,7 @@ resource "aws_instance" "importmachine" {
 
   root_block_device {
     encrypted   = true
-    volume_size = 60
+    volume_size = 70
   }
 
   lifecycle {
@@ -76,7 +76,6 @@ resource "aws_instance" "importmachine" {
       # [1]: https://github.com/terraform-providers/terraform-provider-aws/issues/770
       volume_tags,
       #user_data,         # Prevent changes to user_data from destroying existing EC2s
-      root_block_device,
       # Prevent changes to encryption from destroying existing EC2s - can delete once encryption complete
     ]
     prevent_destroy = true
