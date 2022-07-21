@@ -67,7 +67,7 @@ locals {
         },
         TEST = {
           always_on          = false
-          ami_name           = "nomis_database_2022-07-20*"
+          ami_name           = "nomis_database_2022-07-21*"
           ami_owner          = "self"
           asm_data_capacity  = 100
           asm_flash_capacity = 2
