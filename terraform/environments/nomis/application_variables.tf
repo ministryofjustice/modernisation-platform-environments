@@ -67,8 +67,8 @@ locals {
         },
         TEST = {
           always_on          = false
-          ami_name           = "nomis_database_2022-07-19*"
-          ami_owner          = local.environment_management.account_ids["core-shared-services-production"]
+          ami_name           = "nomis_database_2022-07-20*"
+          ami_owner          = "self"
           asm_data_capacity  = 100
           asm_flash_capacity = 2
           description        = "Testing AMI generated through imagebuilder."
