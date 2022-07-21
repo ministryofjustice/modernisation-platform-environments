@@ -65,7 +65,7 @@ resource "aws_instance" "importmachine" {
 
   root_block_device {
     encrypted   = true
-    volume_size = 70
+    volume_size = 60
   }
 
   lifecycle {
