@@ -11,7 +11,7 @@ data "aws_kms_key" "nomis_key" {
 }
 
 data "aws_kms_key" "hmpps_key" {
-  # Look up the CMK used to create AMIs, which is in the test account (maybe it should be in prod?)
+  # Look up the shared CMK used to create AMIs in the MP shared services account
   key_id = "arn:aws:kms:${local.region}:${local.environment_management.account_ids["core-shared-services-production"]}:alias/ebs-hmpps"
 }
 
