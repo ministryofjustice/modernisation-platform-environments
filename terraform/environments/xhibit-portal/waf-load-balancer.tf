@@ -2,6 +2,9 @@ data "aws_ec2_managed_prefix_list" "cf" {
   name = "com.amazonaws.global.cloudfront.origin-facing"
 }
 
+# to get account id
+data "aws_caller_identity" "current" {}
+
 resource "aws_security_group_rule" "allow_cloudfront_ips" {
   depends_on        = [aws_security_group.waf_lb]
   security_group_id = aws_security_group.waf_lb.id
@@ -345,6 +348,14 @@ data "aws_iam_policy_document" "s3_bucket_lb_write" {
       "${aws_s3_bucket.loadbalancer_logs.arn}/*",
     ]
 
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values = [
+        "true"
+      ]
+    }
+
     principals {
       identifiers = ["arn:aws:iam::652711504416:root"]
       type        = "AWS"
@@ -357,6 +368,14 @@ data "aws_iam_policy_document" "s3_bucket_lb_write" {
     ]
     effect    = "Allow"
     resources = ["${aws_s3_bucket.loadbalancer_logs.arn}/*"]
+
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values = [
+        "true"
+      ]
+    }
     principals {
       identifiers = ["delivery.logs.amazonaws.com"]
       type        = "Service"
@@ -369,6 +388,15 @@ data "aws_iam_policy_document" "s3_bucket_lb_write" {
     ]
     effect    = "Allow"
     resources = ["${aws_s3_bucket.loadbalancer_logs.arn}"]
+
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values = [
+        "true"
+      ]
+    }
+
     principals {
       identifiers = ["delivery.logs.amazonaws.com"]
       type        = "Service"
@@ -399,4 +427,109 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "default_encryptio
 resource "aws_wafv2_web_acl_logging_configuration" "waf_logs" {
   log_destination_configs = ["${aws_s3_bucket.waf_logs.arn}"]
   resource_arn            = aws_wafv2_web_acl.waf_acl.arn
+}
+
+resource "aws_s3_bucket_policy" "waf_logs_policy" {
+  bucket = aws_s3_bucket.waf_logs.bucket
+  policy = data.aws_iam_policy_document.s3_bucket_waf_logs_policy.json
+}
+
+data "aws_iam_policy_document" "s3_bucket_waf_logs_policy" {
+
+  statement {
+    sid = "AllowSSLRequestsOnly"
+    actions = [
+      "s3:*",
+    ]
+    effect = "Deny"
+    resources = [
+      "${aws_s3_bucket.waf_logs.arn}/*",
+      "${aws_s3_bucket.waf_logs.arn}"
+    ]
+
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values = [
+        "false"
+      ]
+    }
+
+    principals {
+      identifiers = ["*"]
+      type        = "AWS"
+    }
+  }
+
+  statement {
+    sid = "AWSLogDeliveryWrite"
+    actions = [
+      "s3:PutObject",
+    ]
+    effect = "Allow"
+    resources = [
+      "${aws_s3_bucket.waf_logs.arn}/AWSLogs/*"
+    ]
+
+    condition {
+      test     = "StringEquals"
+      variable = "s3:x-amz-acl"
+      values = [
+        "bucket-owner-full-control"
+      ]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceAccount"
+      values = [
+        "${data.aws_caller_identity.current.account_id}"
+      ]
+    }
+
+    condition {
+      test     = "ArnLike"
+      variable = "aws:SourceArn"
+      values = [
+        "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.account_id}:*"
+      ]
+    }
+
+    principals {
+      identifiers = ["delivery.logs.amazonaws.com"]
+      type        = "Service"
+    }
+  }
+
+  statement {
+    sid = "AWSLogDeliveryAclCheck"
+    actions = [
+      "s3:GetBucketAcl"
+    ]
+    effect = "Allow"
+    resources = [
+      "${aws_s3_bucket.waf_logs.arn}"
+    ]
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceAccount"
+      values = [
+        "${data.aws_caller_identity.current.account_id}"
+      ]
+    }
+
+    condition {
+      test     = "ArnLike"
+      variable = "aws:SourceArn"
+      values = [
+        "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.account_id}:*"
+      ]
+    }
+
+    principals {
+      identifiers = ["delivery.logs.amazonaws.com"]
+      type        = "Service"
+    }
+  }
 }
