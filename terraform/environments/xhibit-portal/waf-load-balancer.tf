@@ -2,6 +2,9 @@ data "aws_ec2_managed_prefix_list" "cf" {
   name = "com.amazonaws.global.cloudfront.origin-facing"
 }
 
+# to get account id
+data "aws_caller_identity" "current" {}
+
 resource "aws_security_group_rule" "allow_cloudfront_ips" {
   depends_on        = [aws_security_group.waf_lb]
   security_group_id = aws_security_group.waf_lb.id
@@ -440,7 +443,7 @@ data "aws_iam_policy_document" "s3_bucket_waf_logs_policy" {
     ]
     effect = "Allow"
     resources = [
-      "${aws_s3_bucket.waf_logs.arn}/AWSLogs/FIND_ACCOUNT_ID_VARIABLE/*"
+      "${aws_s3_bucket.waf_logs.arn}/AWSLogs/*"
     ]
 
     condition {
@@ -455,7 +458,7 @@ data "aws_iam_policy_document" "s3_bucket_waf_logs_policy" {
       test     = "StringEquals"
       variable = "aws:SourceAccount"
       values = [
-        "FIND_ACCOUNT_ID_VARIABLE"
+        "${data.aws_caller_identity.current.account_id}"
       ]
     }
 
@@ -463,7 +466,7 @@ data "aws_iam_policy_document" "s3_bucket_waf_logs_policy" {
       test     = "ArnLike"
       variable = "aws:SourceArn"
       values = [
-        "arn:aws:logs:eu-west-2:FIND_ACCOUNT_ID_VARIABLE:*"
+        "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.account_id}:*"
       ]
     }
 
@@ -487,7 +490,7 @@ data "aws_iam_policy_document" "s3_bucket_waf_logs_policy" {
       test     = "StringEquals"
       variable = "aws:SourceAccount"
       values = [
-        "FIND_ACCOUNT_ID_VARIABLE"
+        "${data.aws_caller_identity.current.account_id}"
       ]
     }
 
@@ -495,7 +498,7 @@ data "aws_iam_policy_document" "s3_bucket_waf_logs_policy" {
       test     = "ArnLike"
       variable = "aws:SourceArn"
       values = [
-        "arn:aws:logs:eu-west-2:FIND_ACCOUNT_ID_VARIABLE:*"
+        "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.account_id}:*"
       ]
     }
 
