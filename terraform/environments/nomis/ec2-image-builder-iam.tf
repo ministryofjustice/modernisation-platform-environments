@@ -10,6 +10,11 @@ data "aws_kms_key" "nomis_key" {
   key_id = "arn:aws:kms:${local.region}:${local.environment_management.account_ids["nomis-test"]}:alias/nomis-image-builder"
 }
 
+data "aws_kms_key" "hmpps_key" {
+  # Look up the shared CMK used to create AMIs in the MP shared services account
+  key_id = "arn:aws:kms:${local.region}:${local.environment_management.account_ids["core-shared-services-production"]}:alias/ebs-hmpps"
+}
+
 data "aws_iam_policy_document" "image-builder-distro-assume-role" {
   statement {
     actions = ["sts:AssumeRole"]
@@ -78,7 +83,7 @@ data "aws_iam_policy_document" "image-builder-distro-kms-policy" {
       "kms:RevokeGrant"
     ]
     # we use the same AMIs in test and production, which are encrypted with a single key that only exists in test, hence the below
-    resources = [local.environment == "test" ? aws_kms_key.nomis-cmk[0].arn : data.aws_kms_key.nomis_key.arn]
+    resources = [local.environment == "test" ? aws_kms_key.nomis-cmk[0].arn : data.aws_kms_key.nomis_key.arn, data.aws_kms_key.hmpps_key.arn]
   }
 }
 

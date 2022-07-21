@@ -60,6 +60,14 @@ resource "aws_security_group" "database_common" {
   }
 
   ingress {
+    description = "DB access other DB instances for replication"
+    from_port   = "1521"
+    to_port     = "1521"
+    protocol    = "TCP"
+    self        = true
+  }
+
+  ingress {
     description     = "SSH from Bastion"
     from_port       = "22"
     to_port         = "22"

@@ -71,7 +71,7 @@ resource "aws_instance" "database" {
 
   metadata_options {
     http_endpoint = "enabled"
-    http_tokens   = "required"
+    http_tokens   = "optional"
   }
 
   root_block_device {

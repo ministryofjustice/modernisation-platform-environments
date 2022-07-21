@@ -1,4 +1,5 @@
-#another trigger
+# While this is called database-server-baremetal, this actually holds the database and the app server.
+# We need permissions to run terraform mv to eventually update the naming.
 resource "aws_instance" "database-server-baremetal" {
   # Used to only allow the bare metal server to deploy in prod
   count                       = local.only_in_production
@@ -22,7 +23,7 @@ resource "aws_instance" "database-server-baremetal" {
     encrypted   = true
     volume_size = 300
     tags = {
-      Name = "root-block-device-database-baremetal-${local.application_name}"
+      Name = "root-block-device-baremetal-${local.application_name}"
     }
   }
 
@@ -43,12 +44,12 @@ resource "aws_instance" "database-server-baremetal" {
   tags = merge(
     local.tags,
     {
-      Name = "database-baremetal-${local.application_name}"
+      Name = "baremetal-${local.application_name}"
     }
   )
 }
 
-
+# Database disk and network
 resource "aws_ebs_volume" "database-baremetal-disk1" {
   count             = local.only_in_production
   depends_on        = [aws_instance.database-server-baremetal]
@@ -67,7 +68,7 @@ resource "aws_ebs_volume" "database-baremetal-disk1" {
 
 resource "aws_volume_attachment" "database-baremetal-disk1" {
   count        = local.only_in_production
-  depends_on   = [aws_instance.database-server]
+  depends_on   = [aws_instance.database-server-baremetal]
   device_name  = "xvdl"
   force_detach = true
   volume_id    = aws_ebs_volume.database-baremetal-disk1[count.index].id
@@ -80,9 +81,62 @@ resource "aws_network_interface" "baremetal-database-network-access" {
   depends_on      = [aws_instance.database-server-baremetal]
   subnet_id       = data.aws_subnet.private_az_a.id
   security_groups = [aws_security_group.app_servers.id]
+  tags = merge(
+    local.tags,
+    {
+      Name = "database-baremetal-eni-${local.application_name}"
+    }
+  )
 
   attachment {
     instance     = aws_instance.database-server-baremetal[count.index].id
     device_index = 1
   }
 }
+
+# App disk and network
+resource "aws_ebs_volume" "app-baremetal-disk2" {
+  count             = local.only_in_production
+  depends_on        = [aws_instance.database-server-baremetal]
+  availability_zone = "${local.region}a"
+  type              = "gp2"
+  encrypted         = true
+  size              = 2000
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "app-baremetal-disk2-${local.application_name}"
+    }
+  )
+}
+
+resource "aws_volume_attachment" "app-baremetal-disk2" {
+  count        = local.only_in_production
+  depends_on   = [aws_instance.database-server-baremetal]
+  device_name  = "xvdm"
+  force_detach = true
+  volume_id    = aws_ebs_volume.app-baremetal-disk2[count.index].id
+  instance_id  = aws_instance.database-server-baremetal[count.index].id
+}
+
+
+resource "aws_network_interface" "baremetal-app-network-access" {
+  count           = local.only_in_production
+  depends_on      = [aws_instance.database-server-baremetal]
+  subnet_id       = data.aws_subnet.private_az_a.id
+  security_groups = [aws_security_group.app_servers.id]
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "app-baremetal-eni-${local.application_name}"
+    }
+  )
+
+  attachment {
+    instance     = aws_instance.database-server-baremetal[count.index].id
+    device_index = 2
+  }
+}
+
