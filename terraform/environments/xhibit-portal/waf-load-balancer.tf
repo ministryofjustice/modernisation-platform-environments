@@ -470,6 +470,14 @@ data "aws_iam_policy_document" "s3_bucket_waf_logs_policy" {
       ]
     }
 
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values = [
+        "true"
+      ]
+    }
+
     principals {
       identifiers = ["delivery.logs.amazonaws.com"]
       type        = "Service"
@@ -499,6 +507,14 @@ data "aws_iam_policy_document" "s3_bucket_waf_logs_policy" {
       variable = "aws:SourceArn"
       values = [
         "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.account_id}:*"
+      ]
+    }
+
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values = [
+        "true"
       ]
     }
 
