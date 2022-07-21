@@ -147,7 +147,7 @@ data "aws_iam_policy_document" "s3_bucket_ingestion_lb_write" {
       ]
     }
   }
-  
+
   statement {
     actions = [
       "s3:PutObject",
