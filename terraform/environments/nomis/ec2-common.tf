@@ -81,6 +81,15 @@ data "aws_iam_policy_document" "cloud_watch_custom" {
 # create policy document for access to s3 artefact bucket
 data "aws_iam_policy_document" "s3_bucket_access" {
   statement {
+    sid    = "AllowOracleSecureWebListBucketandGetLocation"
+    effect = "Allow"
+    actions = [
+      "s3:ListAllMyBuckets",
+      "s3:GetBucketLocation"
+    ]
+    resources = ["arn:aws:s3:::*"]
+  }
+  statement {
     sid    = "AccessToInstallationArtefactBucket"
     effect = "Allow"
     actions = [

@@ -42,6 +42,17 @@ locals {
             monitored = false
           }
         },
+        CNOMT1_COPY = {
+          always_on          = false
+          ami_name           = "nomis_db_STIG_CNOMT1-2022-04-21*"
+          asm_data_capacity  = 100
+          asm_flash_capacity = 2
+          description        = "Test NOMIS T1 database with a dataset of T1PDL0009 (note: only NOMIS db, NDH db is not included. Used for oracle secure web install testing."
+          oracle_sids        = ["CNOMT1"]
+          tags = {
+            monitored = true
+          }
+        },
         CNAUDT1 = {
           always_on              = true
           ami_name               = "nomis_db-2022-03-03*"
