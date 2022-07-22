@@ -340,6 +340,31 @@ resource "aws_s3_bucket_policy" "loadbalancer_logs_policy" {
 data "aws_iam_policy_document" "s3_bucket_lb_write" {
 
   statement {
+    sid = "AllowSSLRequestsOnly"
+    actions = [
+      "s3:*",
+    ]
+    effect = "Deny"
+    resources = [
+      "${aws_s3_bucket.loadbalancer_logs.arn}/*",
+      "${aws_s3_bucket.loadbalancer_logs.arn}"
+    ]
+
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values = [
+        "false"
+      ]
+    }
+
+    principals {
+      identifiers = ["*"]
+      type        = "AWS"
+    }
+  }
+
+  statement {
     actions = [
       "s3:PutObject",
     ]
@@ -347,14 +372,6 @@ data "aws_iam_policy_document" "s3_bucket_lb_write" {
     resources = [
       "${aws_s3_bucket.loadbalancer_logs.arn}/*",
     ]
-
-    condition {
-      test     = "Bool"
-      variable = "aws:SecureTransport"
-      values = [
-        "true"
-      ]
-    }
 
     principals {
       identifiers = ["arn:aws:iam::652711504416:root"]
@@ -369,13 +386,6 @@ data "aws_iam_policy_document" "s3_bucket_lb_write" {
     effect    = "Allow"
     resources = ["${aws_s3_bucket.loadbalancer_logs.arn}/*"]
 
-    condition {
-      test     = "Bool"
-      variable = "aws:SecureTransport"
-      values = [
-        "true"
-      ]
-    }
     principals {
       identifiers = ["delivery.logs.amazonaws.com"]
       type        = "Service"
@@ -388,14 +398,6 @@ data "aws_iam_policy_document" "s3_bucket_lb_write" {
     ]
     effect    = "Allow"
     resources = ["${aws_s3_bucket.loadbalancer_logs.arn}"]
-
-    condition {
-      test     = "Bool"
-      variable = "aws:SecureTransport"
-      values = [
-        "true"
-      ]
-    }
 
     principals {
       identifiers = ["delivery.logs.amazonaws.com"]
