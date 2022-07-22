@@ -76,7 +76,6 @@ resource "aws_instance" "importmachine" {
       # [1]: https://github.com/terraform-providers/terraform-provider-aws/issues/770
       volume_tags,
       #user_data,         # Prevent changes to user_data from destroying existing EC2s
-      # Prevent changes to encryption from destroying existing EC2s - can delete once encryption complete
     ]
     prevent_destroy = true
   }
