@@ -377,6 +377,40 @@ resource "aws_ssm_association" "script-exporter" {
 }
 
 #------------------------------------------------------------------------------
+# Oracle Secure Web - Install Oracle Secure Web s3 Backup Module
+#------------------------------------------------------------------------------
+
+data "template_file" "oracle_secure_web_install_template" {
+  template = file("${path.module}/ssm-documents/templates/oracle-secure-web-install.json.tmpl")
+  vars = {
+    bucket_name = module.s3-bucket.bucket.id
+  }
+}
+resource "aws_ssm_document" "oracle_secure_web" {
+  name            = "InstallOracleSecureWeb"
+  document_type   = "Command"
+  document_format = "JSON"
+  content         = data.template_file.oracle_secure_web_install_template.rendered
+  target_type     = "/AWS::EC2::Instance"
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "install-and-test-oracle-secure-web-backup"
+    },
+  )
+}
+
+resource "aws_ssm_association" "oracle_secure_web" {
+  name             = aws_ssm_document.oracle_secure_web.name
+  association_name = "install-and-test-oracle-secure-web-backup"
+  targets {
+    key    = "tag-key"
+    values = ["oracle_sids"]
+  }
+}
+
+#------------------------------------------------------------------------------
 # Scheduled overnight shutdown
 # This is a pretty basic implementation until Mod Platform build a platform
 # wide solution.  State Manager does not allow cron expressions like MON-FRI
