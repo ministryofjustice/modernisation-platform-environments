@@ -7,6 +7,7 @@
       "name": "InstallOracleSecureWeb",
       "inputs": {
         "runCommand": [
+          "set -e",
           "echo 'Downloading Oracle Secure Web & Java JDK from S3 bucket'",
           "sudo su - oracle",
           "PATH=$PATH:/usr/local/bin # aws binary is sometimes in /usr/local/bin",
