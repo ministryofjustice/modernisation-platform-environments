@@ -8,7 +8,7 @@ resource "aws_backup_plan" "backup-plan" {
     for_each = var.rules
     content {
       rule_name                = lookup(rule.value, "name", null)
-      target_vault_name        = aws_backup_vault.backup-vault.name
+      target_vault_name        = data.aws_backup_vault.backup-vault.name
       schedule                 = lookup(rule.value, "schedule", null)
       start_window             = lookup(rule.value, "start_window", null)
       completion_window        = lookup(rule.value, "completion_window", null)
