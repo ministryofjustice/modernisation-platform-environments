@@ -1,5 +1,5 @@
 data "aws_backup_vault" "backup-vault" {
-  name        = "everything"
+  name = "everything"
 }
 
 resource "aws_backup_plan" "backup-plan" {
