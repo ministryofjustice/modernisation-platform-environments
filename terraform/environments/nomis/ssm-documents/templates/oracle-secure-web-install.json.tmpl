@@ -24,7 +24,7 @@
           "echo \"-configFile $ORACLE_HOME/dbs/osbws.ora\" >> $INSTALL_DIR/osbws_argfile",
           "cat $INSTALL_DIR/osbws_argfile",
           "export PATH=$PATH:$INSTALL_DIR/jdk1.7.0_80/bin",
-          "java -verbose -jar $INSTALL_DIR/osbws_install.jar -ARGFILE $INSTALL_DIR/osbws_argfile -IAMRole $IAM_ROLE_NAME",
+          "java -jar $INSTALL_DIR/osbws_install.jar -ARGFILE $INSTALL_DIR/osbws_argfile -IAMRole $IAM_ROLE_NAME",
           "export OSB_WS_PFILE=$ORACLE_HOME/dbs/osbws.ora",
           "echo \"OSB_WS_BUCKET=${bucket_name}\" >> $ORACLE_HOME/dbs/osbws.ora",
           "sed -i 's/http:\\/\\//https:\\/\\//g' $ORACLE_HOME/dbs/osbws.ora",
