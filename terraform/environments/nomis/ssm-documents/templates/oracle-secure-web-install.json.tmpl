@@ -17,7 +17,7 @@
           "IAM_ROLE_NAME=$(curl http://169.254.169.254/latest/meta-data/iam/security-credentials/)",
           "tar -zxvf $INSTALL_DIR/jdk-7u80-linux-x64.tar.gz -C $INSTALL_DIR",
           "unzip -o $INSTALL_DIR/osbws_installer.zip -d $INSTALL_DIR",
-          "echo \"-walletDir $ORACLE_HOME/dbs/osbws_wallet\" >> $INSTALL_DIR/osbws_argfile",
+          "echo \"-walletDir $ORACLE_HOME/dbs/osbws_wallet\" > $INSTALL_DIR/osbws_argfile",
           "echo \"-libDir $ORACLE_HOME/lib\" >> $INSTALL_DIR/osbws_argfile",
           "echo \"-location eu-west-2\" >> $INSTALL_DIR/osbws_argfile",
           "echo \"-awsEndPoint s3-eu-west-2.amazonaws.com\" >> $INSTALL_DIR/osbws_argfile",
