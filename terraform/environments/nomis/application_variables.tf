@@ -78,7 +78,7 @@ locals {
         value = true
         rules = [{
           name                     = "daily_snapshot"
-          schedule                 = "cron(40 6 ? * MON-SAT *)"
+          schedule                 = "cron(10 10 ? * MON-SAT *)"
           start_window             = 60
           completion_window        = 180
           delete_after             = 7
@@ -86,7 +86,7 @@ locals {
           },
           {
             name                     = "weekly_snapshot"
-            schedule                 = "cron(40 16 ? * 1 *)"
+            schedule                 = "cron(40 19 ? * 1 *)"
             start_window             = 60
             completion_window        = 180
             delete_after             = 30
