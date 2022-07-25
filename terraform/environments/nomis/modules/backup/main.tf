@@ -5,7 +5,7 @@ resource "aws_kms_key" "aws_backup_key" {
 }
 
 resource "aws_backup_vault" "backup-vault" {
-  name        = "${var.application_name}-${var.environment}-backup-vault"
+  name        = "${var.application_name}-${var.environment}_backup_vault"
   kms_key_arn = aws_kms_key.aws_backup_key.arn
   tags = merge({
     role = "backup-vault"
@@ -13,7 +13,7 @@ resource "aws_backup_vault" "backup-vault" {
 }
 
 resource "aws_backup_plan" "backup-plan" {
-  name = "${var.backup_vault_name}_plan"
+  name = "${var.application_name}-${var.environment}_plan"
   dynamic "rule" {
     for_each = var.rules
     content {
