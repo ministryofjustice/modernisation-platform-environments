@@ -8,7 +8,7 @@
       "inputs": {
         "runCommand": [
           "echo 'Downloading Oracle Secure Web & Java JDK from S3 bucket'",
-          "sudo su - oracle"
+          "sudo su - oracle",
           "PATH=$PATH:/usr/local/bin # aws binary is sometimes in /usr/local/bin",
           "aws s3 cp s3://${bucket_name}/oracle-secure-web/ /u02/stage/osbws --recursive",
           "ORACLE_HOME=/u01/app/oracle/product/11.2.0.4/db_1",
