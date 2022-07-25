@@ -1,15 +1,5 @@
-resource "aws_kms_key" "aws_backup_key" {
-  description             = "AWS Backup KMS key"
-  deletion_window_in_days = 30
-  enable_key_rotation     = true
-}
-
-resource "aws_backup_vault" "backup-vault" {
-  name        = "${var.application_name}-${var.environment}_backup_vault"
-  kms_key_arn = aws_kms_key.aws_backup_key.arn
-  tags = merge({
-    role = "backup-vault"
-  }, var.tags)
+data "aws_backup_vault" "backup-vault" {
+  name        = "everything"
 }
 
 resource "aws_backup_plan" "backup-plan" {
