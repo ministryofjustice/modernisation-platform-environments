@@ -1,5 +1,5 @@
 module "backup" {
-  for_each    = try(local.accounts[local.environment].backup, false) ? [1] : []
+  for_each    = local.accounts[local.environment].backup == null ? [] : [1]
   source      = "./modules/backup"
   key         = local.accounts[local.environment].backup.key
   value       = local.accounts[local.environment].backup.value
