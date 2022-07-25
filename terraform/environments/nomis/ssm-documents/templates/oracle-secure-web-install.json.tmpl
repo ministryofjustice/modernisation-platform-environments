@@ -27,7 +27,7 @@
           "java -verbose -jar $INSTALL_DIR/osbws_install.jar -ARGFILE $INSTALL_DIR/osbws_argfile -IAMRole $IAM_ROLE_NAME",
           "export OSB_WS_PFILE=$ORACLE_HOME/dbs/osbws.ora",
           "echo \"OSB_WS_BUCKET=${bucket_name}\" >> $ORACLE_HOME/dbs/osbws.ora",
-          "sed -i 's/http:\/\//https:\/\//g' $ORACLE_HOME/dbs/osbws.ora",
+          "sed -i 's/http:\\/\\//https:\\/\\//g' $ORACLE_HOME/dbs/osbws.ora",
           "$ORACLE_HOME/bin/sbttest /tmp/foo -libname $ORACLE_HOME/lib/libosbws.so"
         ]
       }
