@@ -11,7 +11,7 @@ locals {
 
       # vars common across ec2 instances
       ec2_common = {
-        public_key                = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCv/RZr7NQwO1Ovjbaxs5X9jR1L4QU/WSOIH3qhCriTlzbdnPI5mA79ZWBZ25h5tA2eIu5FbX+DBwYgwARCnS6VL4KiLKq9j7Ys/gx2FE6rWlXEibpK/9dGLu35znDUyO0xiLIu/EPZFpWhn/2L1z82GiEjDaiY00NmxkHHKMaRCDrgCJ4tEhGPWGcPYoNAYmCkncQJjYojSJ0uaP6e85yx2nmE85YDE+QcDoN5HtHex84CCibh98nD2tMhEQ2Ss+g7/nSXw+/Z2RadDznpz0h/8CcgAGpTHJ35+aeWINquw0lWSJldCLfn3PXldcDzFleqoop9jRGn2hB9eOUz2iEC7MXoLPFcen/lzQD+xfwvaq1+4YU7BbiyTtY/lcw0xcE01QBA+nUiHPJMBewr2TmZRHNy1fvg8ZRKLrOcEMz8iPKVtquftl1DZZCO8Xccr3BVpfoXIl5LuEWPqnMABAvgtkHMaIkTqKMgaKVEC9/KTqRn/K2zzGljUJkzcgO95bNksjDRXtbfQ0AD7CLa47xPOLPh4dC2WDindKh3YALa74EBOyEtJWvLt6fRLPhWmOaZkCrjC3TI+onKiPo0nXrN7Uyg2Q6Atiauw6fqz63cRXkzU/e7LVoxT42qaaaGMytgZJXF3Wk4hp88IqqnDXFavLUElsJEgOTWiNTk2N92/w=="
+        public_key                = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDXIAx15y74zJvbaBpAb46vEMF324OKiJ0yyUN6zdjgbvVyTtTJELRmwAvNFuKrccdAuwtLeOjU7a8dORoaK34h0D3+Y8/x/hjdFfZX0XtyQYguG8Z/cuhvTydDfF12rZ8jo0TfCiLafSCDezxxC2BXRFT4qFORKeD5+ZjbC1d520k/gDvh7vdfXBCUINnFeqOA/AJ0Jy9WAMCA2M9oJc4buD3bSx3OF99m9f3ygYvaqsemnvJHAovHchOgaFNZTY3sOLZcrhW6/Cp+W+xxiu+udNrdh/FYX2awYa+MFdi5ooZHTqvla+bVNXHMJ/rKL1VIXGYr5D/RASAcOt3tF40sAdeOa1JhjFvSFpltbAwWHXo9wNl/Mb1F3hF2ZT/4eMKAg7/ruWPuigw78aLLzHFx1v43WNNrEEX6JUJtYgzJXl8ZucrY3d9mI53KbMfPd3EnMpSwa/hHBJksUidP34AR+DQQhYkZI1n+zrJ4pTSoTtLKJD0NTkfTCs0FXgos/5zyS/u7/vCsRXlUcoA8u2zefAadQfLaUXwPbW9RjqDvrfVOwIvmtMVC+BSTQUByVBT2OxS+F5LqllqFJJ1fCQteAH3y5dLs986Tv4kNq0Vz/bDa9vf1wPBq/yY+MeujD7gMIl2038uBfT2CKW5mk9Iis1IYEFw9aIMpDVXmYDHN/Q== dso-pub-key"
         patch_approval_delay_days = 3
         patch_day                 = "TUE"
       },
@@ -73,6 +73,35 @@ locals {
           asg_max_size = 1
         }
       }
+      backup = {
+        key   = "backup"
+        value = true
+        rules = [{
+          name                     = "daily_snapshot"
+          schedule                 = "cron(40 6 ? * MON-SAT *)"
+          start_window             = 60
+          completion_window        = 180
+          delete_after             = 7
+          enable_continuous_backup = true
+          },
+          {
+            name                     = "weekly_snapshot"
+            schedule                 = "cron(40 16 ? * 1 *)"
+            start_window             = 60
+            completion_window        = 180
+            delete_after             = 30
+            enable_continuous_backup = false
+          },
+          {
+            name                     = "monthly_snapshot"
+            schedule                 = "cron(0 5 1 * ? *)"
+            start_window             = 60
+            completion_window        = 180
+            delete_after             = 60
+            enable_continuous_backup = false
+          }
+        ]
+      }
     },
     production = {
       # ip ranges for external access to database instances
@@ -125,6 +154,7 @@ locals {
           }
           tags = {
             monitored = true
+            backup    = true
           }
         },
         NOMIS = {
@@ -142,6 +172,7 @@ locals {
           }
           tags = {
             monitored = false //not yet live
+            backup    = false
           }
         }
       },

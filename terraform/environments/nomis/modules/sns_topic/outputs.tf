@@ -3,7 +3,7 @@ output "sns_topic_policy" {
 }
 
 output "topic_name" {
-  description = "Namefor the topic"
+  description = "Name for the topic"
   value       = aws_sns_topic.sns_topic.name
 }
 
