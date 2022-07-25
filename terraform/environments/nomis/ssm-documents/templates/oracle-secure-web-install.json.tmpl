@@ -15,7 +15,7 @@
           "ORACLE_HOME=/u01/app/oracle/product/11.2.0.4/db_1",
           "INSTALL_DIR=/u02/stage/osbws",
           "IAM_ROLE_NAME=$(curl http://169.254.169.254/latest/meta-data/iam/security-credentials/)",
-          "tar -zxvf $INSTALL_DIR/jdk-7u80-linux-x64.tar.gz -C $INSTALL_DIR",
+          "tar -zxf $INSTALL_DIR/jdk-7u80-linux-x64.tar.gz -C $INSTALL_DIR",
           "unzip -o $INSTALL_DIR/osbws_installer.zip -d $INSTALL_DIR",
           "echo \"-walletDir $ORACLE_HOME/dbs/osbws_wallet\" > $INSTALL_DIR/osbws_argfile",
           "echo \"-libDir $ORACLE_HOME/lib\" >> $INSTALL_DIR/osbws_argfile",
