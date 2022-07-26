@@ -54,6 +54,12 @@ resource "aws_security_group" "waf_lb" {
   vpc_id      = local.vpc_id
 }
 
+resource "aws_security_group" "prtg_lb" {
+  description = "Security group for app load balancer, simply to implement ACL rules for the PRTG"
+  name        = "prtg-loadbalancer-${var.networking[0].application}"
+  vpc_id      = local.vpc_id
+}
+
 resource "aws_security_group" "sms_server" {
   description = "Domain traffic only"
   name        = "sms-server-${local.application_name}"
@@ -226,6 +232,27 @@ resource "aws_security_group_rule" "waf_lb-outbound-importmachine" {
   source_security_group_id = aws_security_group.importmachine.id
 }
 
+resource "aws_security_group_rule" "prtg_lb-inbound-importmachine" {
+  depends_on               = [aws_security_group.prtg_lb]
+  security_group_id        = aws_security_group.prtg_lb.id
+  type                     = "ingress"
+  description              = "allow all from bastion"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
+  source_security_group_id = aws_security_group.importmachine.id
+}
+
+resource "aws_security_group_rule" "prtg_lb-outbound-importmachine" {
+  depends_on               = [aws_security_group.prtg_lb]
+  security_group_id        = aws_security_group.prtg_lb.id
+  type                     = "egress"
+  description              = "allow all to bastion"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
+  source_security_group_id = aws_security_group.importmachine.id
+}
 resource "aws_security_group_rule" "egress-to-portal" {
   depends_on               = [aws_security_group.waf_lb]
   security_group_id        = aws_security_group.waf_lb.id
@@ -248,6 +275,30 @@ resource "aws_security_group_rule" "waf_lb_allow_web_users" {
   cidr_blocks       = ["0.0.0.0/0"]
   ipv6_cidr_blocks  = ["::/0"]
 }
+
+resource "aws_security_group_rule" "egress-to-prtg" {
+  depends_on               = [aws_security_group.prtg_lb]
+  security_group_id        = aws_security_group.prtg_lb.id
+  type                     = "egress"
+  description              = "allow web traffic to get to portal"
+  from_port                = 80
+  to_port                  = 80
+  protocol                 = "TCP"
+  source_security_group_id = aws_security_group.portal_server.id
+}
+
+resource "aws_security_group_rule" "prtg_lb_allow_web_users" {
+  depends_on        = [aws_security_group.prtg_lb]
+  security_group_id = aws_security_group.prtg_lb.id
+  type              = "ingress"
+  description       = "allow web traffic to get to ingestion server"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "TCP"
+  cidr_blocks       = ["0.0.0.0/0"]
+  ipv6_cidr_blocks  = ["::/0"]
+}
+
 
 resource "aws_security_group_rule" "ingestion_server-inbound-bastion" {
   depends_on               = [aws_security_group.ingestion_server]
@@ -448,6 +499,27 @@ resource "aws_security_group_rule" "portal-http-to-waf-lb" {
   source_security_group_id = aws_security_group.waf_lb.id
 }
 
+resource "aws_security_group_rule" "portal-http-from-prtg-lb" {
+  depends_on               = [aws_security_group.prtg_lb, aws_security_group.portal_server]
+  security_group_id        = aws_security_group.portal_server.id
+  type                     = "ingress"
+  description              = "allow all traffic from DB"
+  from_port                = 80
+  to_port                  = 80
+  protocol                 = "TCP"
+  source_security_group_id = aws_security_group.prtg_lb.id
+}
+
+resource "aws_security_group_rule" "portal-http-to-prtg-lb" {
+  depends_on               = [aws_security_group.prtg_lb, aws_security_group.portal_server]
+  security_group_id        = aws_security_group.portal_server.id
+  type                     = "egress"
+  description              = "allow all traffic from DB"
+  from_port                = 80
+  to_port                  = 80
+  protocol                 = "TCP"
+  source_security_group_id = aws_security_group.prtg_lb.id
+}
 resource "aws_security_group_rule" "ingestion-lb-inbound-importmachine" {
   depends_on               = [aws_security_group.ingestion_lb]
   security_group_id        = aws_security_group.ingestion_lb.id
