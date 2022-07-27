@@ -65,7 +65,7 @@ resource "aws_lb_target_group" "prtg_lb_web_tg" {
   health_check {
     path                = "/index.htm"
     port                = 443
-    protocol             = "HTTPS"
+    protocol            = "HTTPS"
     healthy_threshold   = 6
     unhealthy_threshold = 2
     timeout             = 2
