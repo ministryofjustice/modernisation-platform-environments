@@ -57,19 +57,19 @@ resource "aws_lb" "prtg_lb" {
 resource "aws_lb_target_group" "prtg_lb_web_tg" {
   depends_on           = [aws_lb.prtg_lb]
   name                 = "prtg-lb-web-tg-${var.networking[0].application}"
-  port                 = 80
-  protocol             = "HTTP"
+  port                 = 443
+  protocol             = "HTTPS"
   deregistration_delay = "30"
   vpc_id               = local.vpc_id
 
    health_check {
-  #     path                = "/Secure/Default.aspx"
-      port                = 80
-  #     healthy_threshold   = 6
-  #     unhealthy_threshold = 2
+      path                = "/"
+      port                = 443
+      healthy_threshold   = 6
+      unhealthy_threshold = 2
       timeout             = 2
       interval            = 5
-  #     matcher             = "302" # change this to 200 when the database comes up
+      matcher             = "200" # change this to 200 when the database comes up
     }
 
   tags = merge(
@@ -83,7 +83,7 @@ resource "aws_lb_target_group" "prtg_lb_web_tg" {
 resource "aws_lb_target_group_attachment" "prtg-server-attachment" {
   target_group_arn = aws_lb_target_group.prtg_lb_web_tg.arn
   target_id        = aws_instance.importmachine.id
-  port             = 80
+  port             = 443
 }
 
 
