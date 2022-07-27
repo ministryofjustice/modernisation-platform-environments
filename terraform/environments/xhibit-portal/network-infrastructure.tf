@@ -280,9 +280,9 @@ resource "aws_security_group_rule" "egress-to-prtg" {
   depends_on               = [aws_security_group.prtg_lb]
   security_group_id        = aws_security_group.prtg_lb.id
   type                     = "egress"
-  description              = "allow web traffic to get to portal"
-  from_port                = 80
-  to_port                  = 80
+  description              = "allow web traffic to get to prtg"
+  from_port                = 443
+  to_port                  = 443
   protocol                 = "TCP"
   source_security_group_id = aws_security_group.portal_server.id
 }
@@ -504,8 +504,8 @@ resource "aws_security_group_rule" "portal-http-from-prtg-lb" {
   security_group_id        = aws_security_group.portal_server.id
   type                     = "ingress"
   description              = "allow all traffic from DB"
-  from_port                = 80
-  to_port                  = 80
+  from_port                = 443
+  to_port                  = 443
   protocol                 = "TCP"
   source_security_group_id = aws_security_group.prtg_lb.id
 }
@@ -515,8 +515,8 @@ resource "aws_security_group_rule" "portal-http-to-prtg-lb" {
   security_group_id        = aws_security_group.portal_server.id
   type                     = "egress"
   description              = "allow all traffic from DB"
-  from_port                = 80
-  to_port                  = 80
+  from_port                = 443
+  to_port                  = 443
   protocol                 = "TCP"
   source_security_group_id = aws_security_group.prtg_lb.id
 }
