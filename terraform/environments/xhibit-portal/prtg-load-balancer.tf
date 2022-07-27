@@ -54,13 +54,13 @@ resource "aws_lb" "prtg_lb" {
   )
 }
 
-# resource "aws_lb_target_group" "prtg_lb_web_tg" {
-#   depends_on           = [aws_lb.prtg_lb]
-#   name                 = "prtg-lb-web-tg-${var.networking[0].application}"
-#   port                 = 80
-#   protocol             = "HTTP"
-#   deregistration_delay = "30"
-#   vpc_id               = local.vpc_id
+resource "aws_lb_target_group" "prtg_lb_web_tg" {
+  depends_on           = [aws_lb.prtg_lb]
+  name                 = "prtg-lb-web-tg-${var.networking[0].application}"
+  port                 = 80
+  protocol             = "HTTP"
+  deregistration_delay = "30"
+  vpc_id               = local.vpc_id
 
 #   health_check {
 #     path                = "/Secure/Default.aspx"
@@ -72,13 +72,13 @@ resource "aws_lb" "prtg_lb" {
 #     matcher             = "302" # change this to 200 when the database comes up
 #   }
 
-#   tags = merge(
-#     local.tags,
-#     {
-#       Name = "prtg-lb_-g-${var.networking[0].application}"
-#     },
-#   )
-# }
+  tags = merge(
+    local.tags,
+    {
+      Name = "prtg-lb_-g-${var.networking[0].application}"
+    },
+  )
+}
 
 resource "aws_lb_target_group_attachment" "prtg-server-attachment" {
   target_group_arn = aws_lb_target_group.prtg_lb_web_tg.arn
