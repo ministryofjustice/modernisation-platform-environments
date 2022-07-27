@@ -63,7 +63,7 @@ resource "aws_lb_target_group" "prtg_lb_web_tg" {
   vpc_id               = local.vpc_id
 
   health_check {
-    path                = "/"
+    path                = "/index.htm"
     port                = 443
     healthy_threshold   = 6
     unhealthy_threshold = 2
