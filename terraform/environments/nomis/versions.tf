@@ -7,7 +7,7 @@ terraform {
 
     http = {
       version = "~> 3.0"
-      source = "hashicorp/http"
+      source  = "hashicorp/http"
     }
   }
   required_version = "~> 1.0"
