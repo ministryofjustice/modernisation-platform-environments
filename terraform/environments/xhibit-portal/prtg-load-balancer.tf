@@ -62,15 +62,15 @@ resource "aws_lb_target_group" "prtg_lb_web_tg" {
   deregistration_delay = "30"
   vpc_id               = local.vpc_id
 
-  #   health_check {
+   health_check {
   #     path                = "/Secure/Default.aspx"
-  #     port                = 80
+      port                = 80
   #     healthy_threshold   = 6
   #     unhealthy_threshold = 2
-  #     timeout             = 2
-  #     interval            = 5
+      timeout             = 2
+      interval            = 5
   #     matcher             = "302" # change this to 200 when the database comes up
-  #   }
+    }
 
   tags = merge(
     local.tags,
