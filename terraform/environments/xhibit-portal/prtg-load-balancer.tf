@@ -241,9 +241,9 @@ resource "aws_wafv2_web_acl" "prtg_acl" {
       allow {}
     }
 
-   statement {
-     geo_match_statement {
-       country_codes = ["GB"]
+    statement {
+      geo_match_statement {
+        country_codes = ["GB"]
       }
     }
 
