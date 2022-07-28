@@ -293,13 +293,47 @@ resource "aws_security_group_rule" "ingestion_server-outbound-importmachine" {
   source_security_group_id = aws_security_group.importmachine.id
 }
 
+resource "aws_security_group_rule" "ingestion_server-inbound-testmachine" {
+  depends_on               = [aws_security_group.ingestion_server]
+  security_group_id        = aws_security_group.ingestion_server.id
+  type                     = "ingress"
+  description              = "allow all from bastion"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
+  source_security_group_id = aws_security_group.testmachine.id
+}
+
+resource "aws_security_group_rule" "testmachine-outbound-ingestionserver" {
+  depends_on        = [aws_security_group.testmachine]
+  security_group_id = aws_security_group.testmachine.id
+  type              = "egress"
+  description       = "allow all"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  cidr_blocks       = ["0.0.0.0/0"]
+  ipv6_cidr_blocks  = ["::/0"]
+}
+
+resource "aws_security_group_rule" "testmachine_server-inbound-bastion" {
+  depends_on               = [aws_security_group.testmachine]
+  security_group_id        = aws_security_group.testmachine.id
+  type                     = "ingress"
+  description              = "allow all from bastion"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
+  source_security_group_id = module.bastion_linux.bastion_security_group
+}
+
 resource "aws_security_group_rule" "portal_server-inbound-bastion" {
   depends_on               = [aws_security_group.portal_server]
   security_group_id        = aws_security_group.portal_server.id
   type                     = "ingress"
   description              = "allow all from bastion"
-  to_port                  = 0
   from_port                = 0
+  to_port                  = 0
   protocol                 = "-1"
   source_security_group_id = module.bastion_linux.bastion_security_group
 }
@@ -324,6 +358,17 @@ resource "aws_security_group_rule" "app_servers-inbound-importmachine" {
   to_port                  = 0
   protocol                 = "-1"
   source_security_group_id = aws_security_group.importmachine.id
+}
+
+resource "aws_security_group_rule" "app_servers-inbound-testmachine" {
+  depends_on               = [aws_security_group.app_servers]
+  security_group_id        = aws_security_group.app_servers.id
+  type                     = "ingress"
+  description              = "allow all from bastion"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
+  source_security_group_id = aws_security_group.testmachine.id
 }
 
 resource "aws_security_group_rule" "app_servers-outbound-importmachine" {
