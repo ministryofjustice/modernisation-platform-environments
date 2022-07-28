@@ -236,7 +236,7 @@ resource "aws_security_group_rule" "prtg_lb-inbound-importmachine" {
   depends_on               = [aws_security_group.prtg_lb]
   security_group_id        = aws_security_group.prtg_lb.id
   type                     = "ingress"
-  description              = "allow all from prtg-lb to importmachine"
+  description              = "allow all from importmachine to prtg-lb"
   from_port                = 0
   to_port                  = 0
   protocol                 = "-1"
@@ -247,7 +247,7 @@ resource "aws_security_group_rule" "prtg_lb-outbound-importmachine" {
   depends_on               = [aws_security_group.prtg_lb]
   security_group_id        = aws_security_group.prtg_lb.id
   type                     = "egress"
-  description              = "allow all to importmachine to prtg-lb"
+  description              = "allow all to prtg-lb to importmachine"
   from_port                = 0
   to_port                  = 0
   protocol                 = "-1"
