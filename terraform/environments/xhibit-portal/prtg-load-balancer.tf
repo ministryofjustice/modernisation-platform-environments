@@ -412,8 +412,8 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "default_encryptio
 }
 
 resource "aws_wafv2_web_acl_logging_configuration" "prtg_logs" {
-  # log_destination_configs = ["${aws_s3_bucket.prtg_logs.arn}"]
-  log_destination_configs = aws_s3_bucket.prtg_logs.arn
+  log_destination_configs = ["${aws_s3_bucket.prtg_logs.arn}"]
+  # log_destination_configs = aws_s3_bucket.prtg_logs.arn
   resource_arn            = aws_wafv2_web_acl.prtg_acl.arn
 }
 
