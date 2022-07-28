@@ -55,7 +55,7 @@ resource "aws_security_group" "waf_lb" {
 }
 
 resource "aws_security_group" "prtg_lb" {
-  description = "Security group for app load balancer, simply to implement ACL rules for the PRTG"
+  description = "Security group for prtg LoadBalancer, simply to implement ACL rules for the prtg-lb"
   name        = "prtg-loadbalancer-${var.networking[0].application}"
   vpc_id      = local.vpc_id
 }
@@ -236,7 +236,7 @@ resource "aws_security_group_rule" "prtg_lb-inbound-importmachine" {
   depends_on               = [aws_security_group.prtg_lb]
   security_group_id        = aws_security_group.prtg_lb.id
   type                     = "ingress"
-  description              = "allow all from bastion"
+  description              = "allow all from prtg-lb to importmachine"
   from_port                = 0
   to_port                  = 0
   protocol                 = "-1"
@@ -247,7 +247,7 @@ resource "aws_security_group_rule" "prtg_lb-outbound-importmachine" {
   depends_on               = [aws_security_group.prtg_lb]
   security_group_id        = aws_security_group.prtg_lb.id
   type                     = "egress"
-  description              = "allow all to bastion"
+  description              = "allow all to importmachine to prtg-lb"
   from_port                = 0
   to_port                  = 0
   protocol                 = "-1"
@@ -280,7 +280,7 @@ resource "aws_security_group_rule" "egress-to-prtg" {
   depends_on               = [aws_security_group.prtg_lb]
   security_group_id        = aws_security_group.prtg_lb.id
   type                     = "egress"
-  description              = "allow web traffic to get to prtg"
+  description              = "allow portal server access from import server"
   from_port                = 443
   to_port                  = 443
   protocol                 = "TCP"
@@ -291,7 +291,7 @@ resource "aws_security_group_rule" "prtg_lb_allow_web_users" {
   depends_on        = [aws_security_group.prtg_lb]
   security_group_id = aws_security_group.prtg_lb.id
   type              = "ingress"
-  description       = "allow web traffic to get to ingestion server"
+  description       = "allow web traffic to get to prtg Load Balancer over SSL "
   from_port         = 443
   to_port           = 443
   protocol          = "TCP"
@@ -503,7 +503,7 @@ resource "aws_security_group_rule" "portal-http-from-prtg-lb" {
   depends_on               = [aws_security_group.prtg_lb, aws_security_group.portal_server]
   security_group_id        = aws_security_group.portal_server.id
   type                     = "ingress"
-  description              = "allow all traffic from DB"
+  description              = "allow access to prtg Load Balancer from portal server"
   from_port                = 443
   to_port                  = 443
   protocol                 = "TCP"
@@ -514,7 +514,7 @@ resource "aws_security_group_rule" "portal-http-to-prtg-lb" {
   depends_on               = [aws_security_group.prtg_lb, aws_security_group.portal_server]
   security_group_id        = aws_security_group.portal_server.id
   type                     = "egress"
-  description              = "allow all traffic from DB"
+  description              = "allow all to portal server from prtg Load Balancer"
   from_port                = 443
   to_port                  = 443
   protocol                 = "TCP"
