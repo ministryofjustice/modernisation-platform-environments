@@ -225,7 +225,7 @@ resource "aws_acm_certificate_validation" "prtg_lb_cert_validation" {
 }
 
 resource "aws_wafv2_web_acl" "prtg_acl" {
-  name        = "prtg-acl"
+  name        = "WAFprtg-acl"
   description = "WAF ACL rules for prtg Looad Balancer."
   scope       = "REGIONAL"
 
