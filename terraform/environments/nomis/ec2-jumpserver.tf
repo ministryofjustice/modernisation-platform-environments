@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # Windows Jumpserver
 # To add a new local user account, add a github username to `jumpserver_users`
-# local variable.  Scheduled job running on instance will create user and push 
+# local variable.  Scheduled job running on instance will create user and push
 # password to Secrets Manager, which only said user can access.
 #------------------------------------------------------------------------------
 
@@ -87,8 +87,8 @@ resource "aws_security_group" "jumpserver-windows" {
 
   ingress {
     description = "access from Cloud Platform Prometheus server"
-    from_port   = "9182"
-    to_port     = "9182"
+    from_port   = "9100"
+    to_port     = "9100"
     protocol    = "TCP"
     cidr_blocks = [local.accounts[local.environment].database_external_access_cidr.cloud_platform]
   }
