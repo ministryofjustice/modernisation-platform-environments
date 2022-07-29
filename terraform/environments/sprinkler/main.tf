@@ -558,7 +558,7 @@ resource "aws_lb_listener" "external" {
   load_balancer_arn = aws_lb.external.arn
   port              = "443"
   protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
+  ssl_policy        = "ELBSecurityPolicy-TLS-1-2-2017-01"
   certificate_arn   = aws_acm_certificate.external.arn
 
   default_action {
@@ -715,7 +715,7 @@ resource "aws_lb_listener" "inner" {
   load_balancer_arn = aws_lb.inner.arn
   port              = "443"
   protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
+  ssl_policy        = "ELBSecurityPolicy-TLS-1-2-2017-01"
   certificate_arn   = aws_acm_certificate.inner.arn
 
   default_action {
@@ -862,10 +862,11 @@ resource "aws_db_parameter_group" "app" {
 
 # tfsec:ignore:aws-rds-specify-backup-retention
 resource "aws_db_instance" "app" {
-  # checkov:skip=CKV_AWS_226: "auto_upgrade_minor_version true by default"
+  # checkov:skip=CKV_AWS_118: "sprinkler does not need enhanced monitoring"
   # checkov:skip=CKV_AWS_129: "export to cloudwatch for logs is unneeded here"
   # checkov:skip=CKV_AWS_157: "multi-AZ deployment excessive for sprinkler"
   # checkov:skip=CKV_AWS_161: "IAM authentication excessive for sprinkler"
+  # checkov:skip=CKV_AWS_226: "auto_upgrade_minor_version true by default"
   identifier                      = var.networking[0].application
   allocated_storage               = local.app_data.accounts[local.environment].rds_storage
   engine                          = "postgres"
@@ -873,7 +874,6 @@ resource "aws_db_instance" "app" {
   instance_class                  = local.app_data.accounts[local.environment].rds_instance_class
   db_name                         = var.networking[0].application
   username                        = "dbmain"
-  monitoring_interval             = 60
   parameter_group_name            = aws_db_parameter_group.app.name
   password                        = random_password.db_master_password.result
   performance_insights_enabled    = true
