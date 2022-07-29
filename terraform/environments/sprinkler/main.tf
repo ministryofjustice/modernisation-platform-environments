@@ -205,11 +205,11 @@ resource "aws_security_group_rule" "app_ingress_2" {
   source_security_group_id = aws_security_group.inner_lb.id
 }
 
+# tfsec:ignore:aws-ecs-enable-container-insight
 resource "aws_ecs_cluster" "app" {
-
+# checkov:skip=CKV_AWS_65
   name = var.networking[0].application
-  #tfsec:ignore:aws-ecs-enable-container-insight
-  setting {
+setting {
     name  = "containerInsights"
     value = "disabled"
   }
@@ -501,8 +501,11 @@ resource "aws_security_group_rule" "external_lb_ingress_2" {
   ]
 }
 
-#tfsec:ignore:aws-elb-alb-not-public
+# tfsec:ignore:aws-elb-alb-not-public
 resource "aws_lb" "external" {
+  # checkov:skip=CKV_AWS_91: "Sprinkler is minimally exposed to the internet so no real requirement for access logs"
+  # checkov:skip=CKV_AWS_150: "Deletion protection not required for sprinkler"
+  # checkov:skip=CKV2_AWS_28: "AWS Shield provides WAF by default"
   name                       = "external-${var.networking[0].application}"
   drop_invalid_header_fields = true
   internal                   = false
@@ -520,13 +523,23 @@ resource "aws_lb" "external" {
 }
 
 resource "aws_lb_target_group" "external" {
-
+# checkov:skip=CKV_AWS_261 "Health check clearly defined"
   name                 = "external-${var.networking[0].application}"
   port                 = "3000"
   protocol             = "HTTP"
   target_type          = "ip"
   deregistration_delay = "30"
   vpc_id               = data.aws_vpc.shared.id
+
+  health_check {
+    enabled = true
+    healthy_threshold = "5"
+    interval = "30"
+    port = "3000"
+    protocol = "HTTP"
+    timeout = "5"
+    unhealthy_threshold = "2"
+  }
 
   tags = merge(
     local.tags,
@@ -537,6 +550,7 @@ resource "aws_lb_target_group" "external" {
 }
 
 resource "aws_lb_listener" "external" {
+# checkov:skip=CKV_AWS_103: "LB using higher version of TLS"
   depends_on = [
     aws_acm_certificate_validation.external
   ]
@@ -645,6 +659,9 @@ resource "aws_security_group_rule" "inner_lb_egress_1" {
 }
 
 resource "aws_lb" "inner" {
+  # checkov:skip=CKV_AWS_91: "Sprinkler is minimally exposed to the internet so no real requirement for access logs"
+  # checkov:skip=CKV_AWS_150: "Deletion protection not required for sprinkler"
+  # checkov:skip=CKV2_AWS_28: "AWS Shield provides WAF by default"
 
   name                       = "inner-${var.networking[0].application}"
   drop_invalid_header_fields = true
@@ -663,13 +680,23 @@ resource "aws_lb" "inner" {
 }
 
 resource "aws_lb_target_group" "inner" {
-
+# checkov:skip=CKV_AWS_261 "Health check clearly defined"
   name                 = "inner-${var.networking[0].application}"
   port                 = "3000"
   protocol             = "HTTP"
   target_type          = "ip"
   deregistration_delay = "30"
   vpc_id               = data.aws_vpc.shared.id
+
+  health_check {
+    enabled = true
+    healthy_threshold = "5"
+    interval = "30"
+    port = "3000"
+    protocol = "HTTP"
+    timeout = "5"
+    unhealthy_threshold = "2"
+  }
 
   tags = merge(
     local.tags,
@@ -680,6 +707,7 @@ resource "aws_lb_target_group" "inner" {
 }
 
 resource "aws_lb_listener" "inner" {
+# checkov:skip=CKV_AWS_103: "LB using higher version of TLS"
   depends_on = [
     aws_acm_certificate.inner
   ]
@@ -728,6 +756,9 @@ resource "aws_acm_certificate" "inner" {
   subject_alternative_names = ["*.${var.networking[0].business-unit}-sandbox.modernisation-platform.internal"]
   tags = {
     Environment = "test"
+  }
+  lifecycle {
+    create_before_destroy = true
   }
 }
 
@@ -799,7 +830,7 @@ resource "random_string" "secret_name_suffix" {
 # Account-local key fine for development account
 # tfsec:ignore:aws-ssm-secret-use-customer-key
 resource "aws_secretsmanager_secret" "master_password" {
-
+# checkov:skip=CKV_AWS_149
   name = "${var.networking[0].application}-db-master-${random_string.secret_name_suffix.result}"
 
   tags = merge(
@@ -815,9 +846,26 @@ resource "aws_secretsmanager_secret_version" "master_password" {
   secret_string = random_password.db_master_password.result
 }
 
+resource "aws_db_parameter_group" "app" {
+  name   = "sprinkler-pg"
+  family = "postgres12"
+  parameter {
+    name="log_statement"
+    value="ddl"
+  }
+
+  parameter {
+    name="log_min_duration_statement"
+    value="1"
+  }
+}
+
 # tfsec:ignore:aws-rds-specify-backup-retention
 resource "aws_db_instance" "app" {
-
+# checkov:skip=CKV_AWS_226: "auto_upgrade_minor_version true by default"
+# checkov:skip=CKV_AWS_129: "export to cloudwatch for logs is unneeded here"
+# checkov:skip=CKV_AWS_157: "multi-AZ deployment excessive for sprinkler"
+# checkov:skip=CKV_AWS_161: "IAM authentication excessive for sprinkler"
   identifier             = var.networking[0].application
   allocated_storage      = local.app_data.accounts[local.environment].rds_storage
   engine                 = "postgres"
@@ -825,9 +873,11 @@ resource "aws_db_instance" "app" {
   instance_class         = local.app_data.accounts[local.environment].rds_instance_class
   db_name                = var.networking[0].application
   username               = "dbmain"
+  monitoring_interval    = 60
+  parameter_group_name   = aws_db_parameter_group.app.name
   password               = random_password.db_master_password.result
   performance_insights_enabled = true
-  performance_insights_kms_key_id = data.aws_kms_key.rds.id
+  performance_insights_kms_key_id = data.aws_kms_key.rds.arn
   vpc_security_group_ids = [aws_security_group.rds.id]
   db_subnet_group_name   = aws_db_subnet_group.app.id
   skip_final_snapshot    = true
@@ -846,7 +896,7 @@ resource "aws_db_instance" "app" {
 #------------------------------------------------------------------------------
 #tfsec:ignore:aws-cloudwatch-log-group-customer-key
 resource "aws_cloudwatch_log_group" "app" {
-
+#checkov:skip=CKV_AWS_158
   name              = var.networking[0].application
   retention_in_days = 90
 
