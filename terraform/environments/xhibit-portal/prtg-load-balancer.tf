@@ -54,7 +54,7 @@ resource "aws_lb_target_group" "prtg_lb_web_tg" {
     unhealthy_threshold = 2
     timeout             = 2
     interval            = 5
-    matcher             = "200" # change this to 200 when the database comes up
+    matcher             = "200" # Success code of response from target /index.htm
   }
 
   tags = merge(
