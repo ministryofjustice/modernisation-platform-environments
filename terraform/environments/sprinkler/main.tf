@@ -171,9 +171,11 @@ resource "aws_security_group" "app" {
   )
 }
 
+#tfsec:ignore:aws-vpc-no-public-egress-sgr
 resource "aws_security_group_rule" "app_egress_1" {
 
   security_group_id = aws_security_group.app.id
+  description       = "Allow app servers unrestricted internet access"
   type              = "egress"
   from_port         = 0
   to_port           = 0
@@ -184,6 +186,7 @@ resource "aws_security_group_rule" "app_egress_1" {
 resource "aws_security_group_rule" "app_ingress_1" {
 
   security_group_id        = aws_security_group.app.id
+  description              = "Allow external lb to send traffic in to application sg"
   type                     = "ingress"
   from_port                = 3000
   to_port                  = 3000
@@ -194,6 +197,7 @@ resource "aws_security_group_rule" "app_ingress_1" {
 resource "aws_security_group_rule" "app_ingress_2" {
 
   security_group_id        = aws_security_group.app.id
+  description              = "Allow internal lb to send traffic in to application sg"
   type                     = "ingress"
   from_port                = 3000
   to_port                  = 3000
@@ -204,6 +208,7 @@ resource "aws_security_group_rule" "app_ingress_2" {
 resource "aws_ecs_cluster" "app" {
 
   name = var.networking[0].application
+  #tfsec:ignore:aws-ecs-enable-container-insight
   setting {
     name  = "containerInsights"
     value = "disabled"
@@ -462,6 +467,7 @@ resource "aws_security_group" "external_lb" {
 resource "aws_security_group_rule" "external_lb_ingress_1" {
 
   security_group_id = aws_security_group.external_lb.id
+  description       = "Allow HTTP traffic in from internet endpoint"
   type              = "ingress"
   from_port         = 80
   to_port           = 80
@@ -474,6 +480,7 @@ resource "aws_security_group_rule" "external_lb_ingress_1" {
 resource "aws_security_group_rule" "external_lb_egress_1" {
 
   security_group_id        = aws_security_group.external_lb.id
+  description              = "Allow external lb to send traffic to application"
   type                     = "egress"
   from_port                = 3000
   to_port                  = 3000
@@ -484,18 +491,20 @@ resource "aws_security_group_rule" "external_lb_egress_1" {
 resource "aws_security_group_rule" "external_lb_ingress_2" {
 
   security_group_id = aws_security_group.external_lb.id
+  description       = "Allow https traffic from internet"
   type              = "ingress"
   from_port         = 443
   to_port           = 443
   protocol          = "tcp"
   cidr_blocks = [
-    "81.157.202.5/32"
+    "35.176.93.186/32"
   ]
 }
 
+#tfsec:ignore:aws-elb-alb-not-public
 resource "aws_lb" "external" {
-
   name                       = "external-${var.networking[0].application}"
+  drop_invalid_header_fields = true
   internal                   = false
   load_balancer_type         = "application"
   security_groups            = [aws_security_group.external_lb.id]
@@ -535,7 +544,7 @@ resource "aws_lb_listener" "external" {
   load_balancer_arn = aws_lb.external.arn
   port              = "443"
   protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
   certificate_arn   = aws_acm_certificate.external.arn
 
   default_action {
@@ -616,6 +625,7 @@ resource "aws_security_group" "inner_lb" {
 resource "aws_security_group_rule" "inner_lb_ingress_1" {
 
   security_group_id        = aws_security_group.inner_lb.id
+  description              = "Allow inner lb to receive https traffic"
   type                     = "ingress"
   from_port                = 443
   to_port                  = 443
@@ -626,6 +636,7 @@ resource "aws_security_group_rule" "inner_lb_ingress_1" {
 resource "aws_security_group_rule" "inner_lb_egress_1" {
 
   security_group_id        = aws_security_group.inner_lb.id
+  description              = "Allow inner lb to forward traffic to app sg on port tcp/3000"
   type                     = "egress"
   from_port                = 3000
   to_port                  = 3000
@@ -636,6 +647,7 @@ resource "aws_security_group_rule" "inner_lb_egress_1" {
 resource "aws_lb" "inner" {
 
   name                       = "inner-${var.networking[0].application}"
+  drop_invalid_header_fields = true
   internal                   = true
   load_balancer_type         = "application"
   security_groups            = [aws_security_group.inner_lb.id]
@@ -675,7 +687,7 @@ resource "aws_lb_listener" "inner" {
   load_balancer_arn = aws_lb.inner.arn
   port              = "443"
   protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
   certificate_arn   = aws_acm_certificate.inner.arn
 
   default_action {
@@ -725,7 +737,7 @@ resource "aws_acm_certificate" "inner" {
 resource "aws_security_group" "rds" {
 
   name        = "db-${var.networking[0].application}"
-  description = "Allow inbound traffic from application"
+  description = "RDS security group"
   vpc_id      = data.aws_vpc.shared.id
 
   tags = merge(
@@ -739,6 +751,7 @@ resource "aws_security_group" "rds" {
 resource "aws_security_group_rule" "rds_ingress_1" {
 
   security_group_id        = aws_security_group.rds.id
+  description              = "Allow traffic in from application security group for postgres"
   type                     = "ingress"
   from_port                = 5432
   to_port                  = 5432
@@ -749,11 +762,12 @@ resource "aws_security_group_rule" "rds_ingress_1" {
 resource "aws_security_group_rule" "rds_egress_1" {
 
   security_group_id = aws_security_group.rds.id
+  description       = "Allow RDS out to MP Dev & Test"
   type              = "egress"
   from_port         = 0
   to_port           = 0
   protocol          = -1
-  cidr_blocks       = ["0.0.0.0/0"]
+  cidr_blocks       = ["10.26.0.0/16"]
 }
 
 resource "aws_db_subnet_group" "app" {
@@ -782,6 +796,8 @@ resource "random_string" "secret_name_suffix" {
   special = false
 }
 
+# Account-local key fine for development account
+# tfsec:ignore:aws-ssm-secret-use-customer-key
 resource "aws_secretsmanager_secret" "master_password" {
 
   name = "${var.networking[0].application}-db-master-${random_string.secret_name_suffix.result}"
@@ -799,6 +815,7 @@ resource "aws_secretsmanager_secret_version" "master_password" {
   secret_string = random_password.db_master_password.result
 }
 
+# tfsec:ignore:aws-rds-specify-backup-retention
 resource "aws_db_instance" "app" {
 
   identifier             = var.networking[0].application
@@ -809,9 +826,12 @@ resource "aws_db_instance" "app" {
   db_name                = var.networking[0].application
   username               = "dbmain"
   password               = random_password.db_master_password.result
+  performance_insights_enabled = true
+  performance_insights_kms_key_id = data.aws_kms_key.rds.id
   vpc_security_group_ids = [aws_security_group.rds.id]
   db_subnet_group_name   = aws_db_subnet_group.app.id
   skip_final_snapshot    = true
+  storage_encrypted      = true
 
   tags = merge(
     local.tags,
@@ -824,7 +844,7 @@ resource "aws_db_instance" "app" {
 #------------------------------------------------------------------------------
 # Logging
 #------------------------------------------------------------------------------
-
+#tfsec:ignore:aws-cloudwatch-log-group-customer-key
 resource "aws_cloudwatch_log_group" "app" {
 
   name              = var.networking[0].application

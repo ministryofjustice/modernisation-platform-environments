@@ -1,3 +1,20 @@
+# AWS Managed KMS keys
+data "aws_kms_alias" "rds" {
+  name = "alias/aws/rds"
+}
+
+data "aws_kms_key" "rds" {
+  key_id = "alias/aws/rds"
+}
+
+data "aws_kms_alias" "sns" {
+  name = "alias/aws/sns"
+}
+
+data "aws_kms_key" "sns" {
+  key_id = "alias/aws/sns"
+}
+
 # Customer-managed CMK (with associated alias and key policy) used for encryption of EBS volumes and snapshots backing AMIs generated from image builder
 resource "aws_kms_key" "sprinkler_ebs_encryption_cmk" {
   enable_key_rotation = true
