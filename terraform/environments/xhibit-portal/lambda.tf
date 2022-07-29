@@ -88,11 +88,6 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda" {
 }
 
 
-
-
-
-
-
 # Delete AMI Lambda
 data "aws_iam_policy_document" "lambda_delete_assume_role_policy" {
   statement {
@@ -175,7 +170,7 @@ resource "aws_cloudwatch_event_target" "trigger_lambda_every_day_0230" {
   arn       = aws_lambda_function.delete_old_ami.arn
 }
 
-resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda" {
+resource "aws_lambda_permission" "allow_cloudwatch_to_call_delete_ami_lambda" {
   statement_id  = "AllowExecutionFromCloudWatch"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.delete_old_ami.function_name
