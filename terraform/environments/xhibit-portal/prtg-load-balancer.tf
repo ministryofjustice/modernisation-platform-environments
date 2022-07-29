@@ -294,7 +294,7 @@ resource "aws_wafv2_web_acl" "prtg_acl" {
 resource "aws_wafv2_web_acl_association" "aws_prtg-lb_waf_association" {
   resource_arn = aws_lb.prtg_lb.arn
   web_acl_arn  = aws_wafv2_web_acl.prtg_acl.arn
-} 
+}
 resource "aws_s3_bucket" "loadbalancer_logs" {
   bucket        = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}-lblogs"
   force_destroy = true
