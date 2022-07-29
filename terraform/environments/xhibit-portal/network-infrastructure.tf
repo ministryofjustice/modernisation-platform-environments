@@ -511,16 +511,16 @@ resource "aws_security_group_rule" "portal-http-to-waf-lb" {
 #   source_security_group_id = aws_security_group.prtg_lb.id
 # }
 
-# resource "aws_security_group_rule" "portal-http-to-prtg-lb" {
-#   depends_on               = [aws_security_group.prtg_lb, aws_security_group.portal_server]
-#   security_group_id        = aws_security_group.portal_server.id
-#   type                     = "egress"
-#   description              = "allow all to portal server from prtg Load Balancer"
-#   from_port                = 443
-#   to_port                  = 443
-#   protocol                 = "TCP"
-#   source_security_group_id = aws_security_group.prtg_lb.id
-# }
+resource "aws_security_group_rule" "portal-http-to-prtg-lb" {
+  depends_on               = [aws_security_group.prtg_lb, aws_security_group.portal_server]
+  security_group_id        = aws_security_group.portal_server.id
+  type                     = "egress"
+  description              = "allow all to portal server from prtg Load Balancer"
+  from_port                = 443
+  to_port                  = 443
+  protocol                 = "TCP"
+  source_security_group_id = aws_security_group.prtg_lb.id
+}
 resource "aws_security_group_rule" "ingestion-lb-inbound-importmachine" {
   depends_on               = [aws_security_group.ingestion_lb]
   security_group_id        = aws_security_group.ingestion_lb.id
