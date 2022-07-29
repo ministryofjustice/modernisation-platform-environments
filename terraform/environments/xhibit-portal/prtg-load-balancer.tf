@@ -294,102 +294,100 @@ resource "aws_wafv2_web_acl" "prtg_acl" {
 resource "aws_wafv2_web_acl_association" "aws_prtg-lb_waf_association" {
   resource_arn = aws_lb.prtg_lb.arn
   web_acl_arn  = aws_wafv2_web_acl.prtg_acl.arn
+} 
+resource "aws_s3_bucket" "loadbalancer_logs" {
+  bucket        = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}-lblogs"
+  force_destroy = true
 }
 
-# resource "aws_s3_bucket" "loadbalancer_logs" {
-#   bucket        = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}-lblogs"
-#   force_destroy = true
-# }
+resource "aws_s3_bucket_acl" "loadbalancer_logs" {
+  bucket = aws_s3_bucket.loadbalancer_logs.id
+  acl    = "log-delivery-write"
+}
 
-# resource "aws_s3_bucket_acl" "loadbalancer_logs" {
-#   bucket = aws_s3_bucket.loadbalancer_logs.id
-#   acl    = "log-delivery-write"
-# }
+resource "aws_s3_bucket_server_side_encryption_configuration" "default_encryption_loadbalancer_logs" {
+  bucket = aws_s3_bucket.loadbalancer_logs.bucket
 
-# resource "aws_s3_bucket_server_side_encryption_configuration" "default_encryption_loadbalancer_logs" {
-#   bucket = aws_s3_bucket.loadbalancer_logs.bucket
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
 
-#   rule {
-#     apply_server_side_encryption_by_default {
-#       sse_algorithm = "AES256"
-#     }
-#   }
-# }
+resource "aws_s3_bucket_policy" "loadbalancer_logs_policy" {
+  bucket = aws_s3_bucket.loadbalancer_logs.bucket
+  policy = data.aws_iam_policy_document.s3_bucket_lb_write.json
+}
 
-# resource "aws_s3_bucket_policy" "loadbalancer_logs_policy" {
-#   bucket = aws_s3_bucket.loadbalancer_logs.bucket
-#   policy = data.aws_iam_policy_document.s3_bucket_lb_write.json
-# }
+data "aws_iam_policy_document" "s3_bucket_lb_write" {
 
+  statement {
+    sid = "AllowSSLRequestsOnly"
+    actions = [
+      "s3:*",
+    ]
+    effect = "Deny"
+    resources = [
+      "${aws_s3_bucket.loadbalancer_logs.arn}/*",
+      "${aws_s3_bucket.loadbalancer_logs.arn}"
+    ]
 
-# data "aws_iam_policy_document" "s3_bucket_lb_write" {
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values = [
+        "false"
+      ]
+    }
 
-#   statement {
-#     sid = "AllowSSLRequestsOnly"
-#     actions = [
-#       "s3:*",
-#     ]
-#     effect = "Deny"
-#     resources = [
-#       "${aws_s3_bucket.loadbalancer_logs.arn}/*",
-#       "${aws_s3_bucket.loadbalancer_logs.arn}"
-#     ]
+    principals {
+      identifiers = ["*"]
+      type        = "AWS"
+    }
+  }
 
-#     condition {
-#       test     = "Bool"
-#       variable = "aws:SecureTransport"
-#       values = [
-#         "false"
-#       ]
-#     }
+  statement {
+    actions = [
+      "s3:PutObject",
+    ]
+    effect = "Allow"
+    resources = [
+      "${aws_s3_bucket.loadbalancer_logs.arn}/*",
+    ]
 
-#     principals {
-#       identifiers = ["*"]
-#       type        = "AWS"
-#     }
-#   }
+    principals {
+      identifiers = ["arn:aws:iam::652711504416:root"]
+      type        = "AWS"
+    }
+  }
 
-#   statement {
-#     actions = [
-#       "s3:PutObject",
-#     ]
-#     effect = "Allow"
-#     resources = [
-#       "${aws_s3_bucket.loadbalancer_logs.arn}/*",
-#     ]
+  statement {
+    actions = [
+      "s3:PutObject"
+    ]
+    effect    = "Allow"
+    resources = ["${aws_s3_bucket.loadbalancer_logs.arn}/*"]
 
-#     principals {
-#       identifiers = ["arn:aws:iam::652711504416:root"]
-#       type        = "AWS"
-#     }
-#   }
+    principals {
+      identifiers = ["delivery.logs.amazonaws.com"]
+      type        = "Service"
+    }
+  }
 
-#   statement {
-#     actions = [
-#       "s3:PutObject"
-#     ]
-#     effect    = "Allow"
-#     resources = ["${aws_s3_bucket.loadbalancer_logs.arn}/*"]
+  statement {
+    actions = [
+      "s3:GetBucketAcl"
+    ]
+    effect    = "Allow"
+    resources = ["${aws_s3_bucket.loadbalancer_logs.arn}"]
 
-#     principals {
-#       identifiers = ["delivery.logs.amazonaws.com"]
-#       type        = "Service"
-#     }
-#   }
-
-#   statement {
-#     actions = [
-#       "s3:GetBucketAcl"
-#     ]
-#     effect    = "Allow"
-#     resources = ["${aws_s3_bucket.loadbalancer_logs.arn}"]
-
-#     principals {
-#       identifiers = ["delivery.logs.amazonaws.com"]
-#       type        = "Service"
-#     }
-#   }
-# }
+    principals {
+      identifiers = ["delivery.logs.amazonaws.com"]
+      type        = "Service"
+    }
+  }
+}
 
 resource "aws_s3_bucket" "prtg_logs" {
   bucket        = "aws-waf-logs-prtg-${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}"
