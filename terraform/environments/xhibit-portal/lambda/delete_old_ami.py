@@ -27,7 +27,8 @@ def lambda_handler(event, context):
                     ):
                         try:
                             snap_id = bdm.get("Ebs").get("SnapshotId")
-                            client.delete_snapshot(SnapshotId=snap_id, dry_run=True)
+                            client.delete_snapshot(
+                                SnapshotId=snap_id, dry_run=True)
                         except Exception as e:
                             if "InvalidSnapshot.InUse" in e.message:
                                 print(f"Snapshot {id} in use")
