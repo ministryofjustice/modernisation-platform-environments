@@ -123,7 +123,7 @@ locals {
           asm_data_capacity  = 4000
           asm_flash_capacity = 1000
           description        = "Copy of Production NOMIS CNOM database in Azure PDPDL00035, replicating with PDPDL00035, a replacement for PDPDL10036."
-          # termination_protection = true
+          # termination_protection = true // needed to recreate the db
           oracle_sids = ["PCNOM", "PMISS1"]
           oracle_app_disk_size = {
             "/dev/sdb" = 100 # /u01
