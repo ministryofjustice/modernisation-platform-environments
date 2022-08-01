@@ -121,7 +121,7 @@ locals {
           retention_days = 400
         }
       },
-      # Add database instances here.  They will be created using the database module
+      # Add database instances here. They will be created using the database module
       databases = {
         AUDIT = {
           always_on              = true
