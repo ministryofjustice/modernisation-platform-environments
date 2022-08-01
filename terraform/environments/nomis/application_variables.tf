@@ -140,23 +140,23 @@ locals {
             monitored = true
           }
         },
-        NOMIS = {
-          always_on          = true
-          ami_name           = "nomis_db_STIG-2022-04-26*"
-          instance_type      = "r6i.4xlarge"
-          asm_data_capacity  = 4000
-          asm_flash_capacity = 1000
-          description        = "Copy of Production NOMIS CNOM database in Azure PDPDL00035, replicating with PDPDL00035, a replacement for PDPDL10036."
-          # termination_protection = true // needed to recreate the db
-          oracle_sids = ["PCNOM", "PMISS1"]
-          oracle_app_disk_size = {
-            "/dev/sdb" = 100 # /u01
-            "/dev/sdc" = 512 # /u02
-          }
-          tags = {
-            monitored = false //not yet live
-          }
-        }
+        # NOMIS = {
+        #   always_on          = true
+        #   ami_name           = "nomis_db_STIG-2022-04-26*"
+        #   instance_type      = "r6i.4xlarge"
+        #   asm_data_capacity  = 4000
+        #   asm_flash_capacity = 1000
+        #   description        = "Copy of Production NOMIS CNOM database in Azure PDPDL00035, replicating with PDPDL00035, a replacement for PDPDL10036."
+        #   # termination_protection = true // needed to recreate the db
+        #   oracle_sids = ["PCNOM", "PMISS1"]
+        #   oracle_app_disk_size = {
+        #     "/dev/sdb" = 100 # /u01
+        #     "/dev/sdc" = 512 # /u02
+        #   }
+        #   tags = {
+        #     monitored = false //not yet live
+        #   }
+        # }
       },
       # Add weblogic instances here.  They will be created using the weblogic module
       weblogics = {}
