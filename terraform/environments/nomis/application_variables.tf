@@ -69,15 +69,15 @@ locals {
           }
         },
         ORACLEDR = {
-        always_on          = false
-        ami_name           = data.aws_ami.database.name
-        asm_data_capacity  = 100
-        asm_flash_capacity = 2
-        description        = "Test Oracle DR database."
-        tags = {
-          monitored = false
-        }
-      },
+          always_on          = false
+          ami_name           = data.aws_ami.database.name
+          asm_data_capacity  = 100
+          asm_flash_capacity = 2
+          description        = "Test Oracle DR database."
+          tags = {
+            monitored = false
+          }
+        },
       },
       # Add weblogic instances here.  They will be created using the weblogic module
       weblogics = {
