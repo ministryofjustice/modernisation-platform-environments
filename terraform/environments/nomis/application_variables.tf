@@ -68,12 +68,12 @@ locals {
             monitored = false
           }
         },
-        ORACLEDR = {
+        CNAUDT1DR = {
           always_on          = false
           ami_name           = data.aws_ami.database.name
-          asm_data_capacity  = 100
+          asm_data_capacity  = 200
           asm_flash_capacity = 2
-          description        = "Test Oracle DR database."
+          description        = "Test Oracle DR database with CNAUDT1 spec."
           tags = {
             monitored = false
           }
