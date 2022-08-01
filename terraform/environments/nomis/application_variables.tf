@@ -67,9 +67,8 @@ locals {
           tags = {
             monitored = false
           }
-        }
-      },
-      ORACLEDR = {
+        },
+        ORACLEDR = {
         always_on          = false
         ami_name           = data.aws_ami.database.name
         asm_data_capacity  = 100
@@ -78,6 +77,7 @@ locals {
         tags = {
           monitored = false
         }
+      },
       },
       # Add weblogic instances here.  They will be created using the weblogic module
       weblogics = {
