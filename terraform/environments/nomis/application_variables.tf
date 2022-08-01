@@ -118,8 +118,8 @@ locals {
         },
         NOMIS = {
           always_on          = true
-          ami_name           = "nomis_db_STIG-2022-04-26*"
-          instance_type      = "nomis_database_2022-07-21T11-43-27.346Z"
+          ami_name           = "nomis_database_2022-07-21T11-43-27.346Z"
+          instance_type      = "r6i.4xlarge"
           asm_data_capacity  = 4000
           asm_flash_capacity = 1000
           description        = "Copy of Production NOMIS CNOM database in Azure PDPDL00035, replicating with PDPDL00035, a replacement for PDPDL10036."
