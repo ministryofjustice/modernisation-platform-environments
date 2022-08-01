@@ -1,16 +1,16 @@
 # This file is for vars that vary between accounts.  Locals.tf conatins common vars.
 data "aws_ami" "database" {
-  most_recent      = true
-  owners           = ["self"]
+  most_recent = true
+  owners      = ["self"]
 
-    filter {
-     name   = "name"
-     values = ["nomis_database_*"]
-    }
-    filter {
-      name   = "virtualization-type"
-      values = ["hvm"]
-    }
+  filter {
+    name   = "name"
+    values = ["nomis_database_*"]
+  }
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
 }
 
 locals {
@@ -70,15 +70,15 @@ locals {
         }
       },
       ORACLEDR = {
-          always_on          = false
-          ami_name           = data.aws_ami.database.name
-          asm_data_capacity  = 100
-          asm_flash_capacity = 2
-          description        = "Test Oracle DR database."
-          tags = {
-            monitored = false
-          }
-       },
+        always_on          = false
+        ami_name           = data.aws_ami.database.name
+        asm_data_capacity  = 100
+        asm_flash_capacity = 2
+        description        = "Test Oracle DR database."
+        tags = {
+          monitored = false
+        }
+      },
       # Add weblogic instances here.  They will be created using the weblogic module
       weblogics = {
         CNOMT1 = {
