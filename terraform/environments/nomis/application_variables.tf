@@ -63,9 +63,9 @@ locals {
           asm_flash_capacity     = 2
           description            = "Copy of Test NOMIS Audit database in Azure T1PDL0010, replicating with T1PDL0010."
           termination_protection = true
-          oracle_sids            = ["MIST1", "CNMAUDT1"]
+          oracle_sids        = ["T1CNMAUD"]
           tags = {
-            monitored = false
+            monitored = true
           }
         },
       },
