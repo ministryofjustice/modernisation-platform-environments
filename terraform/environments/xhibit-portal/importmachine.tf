@@ -77,7 +77,7 @@ resource "aws_instance" "importmachine" {
       volume_tags,
       #user_data,         # Prevent changes to user_data from destroying existing EC2s
     ]
-    prevent_destroy = false
+    prevent_destroy = true
   }
 
   tags = merge(
