@@ -1,6 +1,4 @@
-# data "aws_ec2_managed_prefix_list" "cf" {
-#   name = "com.amazonaws.global.cloudfront.origin-facing"
-# }
+
 data "aws_subnets" "prtg-shared-public" {
   filter {
     name   = "vpc-id"
@@ -91,93 +89,6 @@ resource "aws_lb_listener" "prtg_lb_listener" {
   }
 }
 
-# resource "aws_lb_listener_certificate" "main_portal_cert" {
-#   listener_arn    = aws_lb_listener.prtg_lb_listener.arn
-#   certificate_arn = aws_acm_certificate.prtg_lb_cert.arn
-# }
-
-
-# resource "aws_alb_listener_rule" "root_listener_redirect" {
-#   priority = 1
-
-#   depends_on   = [aws_lb_listener.prtg_lb_listener]
-#   listener_arn = aws_lb_listener.prtg_lb_listener.arn
-
-#   action {
-#     type = "redirect"
-
-#     redirect {
-#       status_code = "HTTP_301"
-#       path        = "/Secure/Default.aspx"
-#     }
-
-#   }
-
-#   condition {
-#     path_pattern {
-#       values = ["/"]
-#     }
-#   }
-
-#   condition {
-#     host_header {
-#       values = [
-#         local.application_data.accounts[local.environment].public_dns_name_web
-#       ]
-#     }
-#   }
-
-# }
-
-
-# resource "aws_alb_listener_rule" "web_listener_rule" {
-#   priority     = 3
-#   depends_on   = [aws_lb_listener.prtg_lb_listener]
-#   listener_arn = aws_lb_listener.prtg_lb_listener.arn
-#   action {
-#     type             = "forward"
-#     target_group_arn = aws_lb_target_group.prtg_lb_web_tg.id
-#   }
-
-#   condition {
-#     host_header {
-#       values = [
-#         local.application_data.accounts[local.environment].public_dns_name_web
-#       ]
-#     }
-#   }
-
-# }
-
-
-# data "aws_route53_zone" "external_r53_zone" {
-#   provider = aws.core-vpc
-
-#   name         = "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk."
-#   private_zone = false
-# }
-
-# data "aws_route53_zone" "network-services" {
-#   provider = aws.core-network-services
-
-#   name         = "modernisation-platform.service.justice.gov.uk."
-#   private_zone = false
-# }
-
-# resource "aws_route53_record" "external" {
-#   provider = aws.core-vpc
-
-#   zone_id = data.aws_route53_zone.external_r53_zone.zone_id
-#   name    = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-#   type    = "A"
-
-#   alias {
-#     name                   = aws_lb.prtg_lb.dns_name
-#     zone_id                = aws_lb.prtg_lb.zone_id
-#     evaluate_target_health = true
-#   }
-# }
-
 resource "aws_acm_certificate" "prtg_lb_cert" {
   domain_name       = "modernisation-platform.service.justice.gov.uk"
   validation_method = "DNS"
@@ -196,6 +107,7 @@ resource "aws_acm_certificate" "prtg_lb_cert" {
   }
 }
 
+# Leave in the route 53 record comments until we are ready to request DNS from Platform Guys/Girls
 # resource "aws_route53_record" "external_validation" {
 #   provider = aws.core-network-services
 
@@ -295,99 +207,6 @@ resource "aws_wafv2_web_acl_association" "aws_prtg-lb_waf_association" {
   resource_arn = aws_lb.prtg_lb.arn
   web_acl_arn  = aws_wafv2_web_acl.prtg_acl.arn
 }
-# resource "aws_s3_bucket" "loadbalancer_logs" {
-#   bucket        = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}-lblogs"
-#   force_destroy = true
-# }
-
-# resource "aws_s3_bucket_acl" "loadbalancer_logs" {
-#   bucket = aws_s3_bucket.loadbalancer_logs.id
-#   acl    = "log-delivery-write"
-# }
-
-# resource "aws_s3_bucket_server_side_encryption_configuration" "default_encryption_loadbalancer_logs" {
-#   bucket = aws_s3_bucket.loadbalancer_logs.bucket
-
-#   rule {
-#     apply_server_side_encryption_by_default {
-#       sse_algorithm = "AES256"
-#     }
-#   }
-# }
-
-# resource "aws_s3_bucket_policy" "loadbalancer_logs_policy" {
-#   bucket = aws_s3_bucket.loadbalancer_logs.bucket
-#   policy = data.aws_iam_policy_document.s3_bucket_lb_write.json
-# }
-
-# data "aws_iam_policy_document" "s3_bucket_lb_write" {
-
-#   statement {
-#     sid = "AllowSSLRequestsOnly"
-#     actions = [
-#       "s3:*",
-#     ]
-#     effect = "Deny"
-#     resources = [
-#       "${aws_s3_bucket.loadbalancer_logs.arn}/*",
-#       "${aws_s3_bucket.loadbalancer_logs.arn}"
-#     ]
-
-#     condition {
-#       test     = "Bool"
-#       variable = "aws:SecureTransport"
-#       values = [
-#         "false"
-#       ]
-#     }
-
-#     principals {
-#       identifiers = ["*"]
-#       type        = "AWS"
-#     }
-#   }
-
-#   statement {
-#     actions = [
-#       "s3:PutObject",
-#     ]
-#     effect = "Allow"
-#     resources = [
-#       "${aws_s3_bucket.loadbalancer_logs.arn}/*",
-#     ]
-
-#     principals {
-#       identifiers = ["arn:aws:iam::652711504416:root"]
-#       type        = "AWS"
-#     }
-#   }
-
-#   statement {
-#     actions = [
-#       "s3:PutObject"
-#     ]
-#     effect    = "Allow"
-#     resources = ["${aws_s3_bucket.loadbalancer_logs.arn}/*"]
-
-#     principals {
-#       identifiers = ["delivery.logs.amazonaws.com"]
-#       type        = "Service"
-#     }
-#   }
-
-#   statement {
-#     actions = [
-#       "s3:GetBucketAcl"
-#     ]
-#     effect    = "Allow"
-#     resources = ["${aws_s3_bucket.loadbalancer_logs.arn}"]
-
-#     principals {
-#       identifiers = ["delivery.logs.amazonaws.com"]
-#       type        = "Service"
-#     }
-#   }
-# }
 
 resource "aws_s3_bucket" "prtg_logs" {
   bucket        = "aws-waf-logs-prtg-${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}"
