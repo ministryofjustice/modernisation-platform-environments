@@ -68,27 +68,6 @@ locals {
             monitored = false
           }
         },
-        CNAUDT1DR = {
-          always_on          = false
-          ami_name           = data.aws_ami.database.name
-          asm_data_capacity  = 200
-          asm_flash_capacity = 2
-          description        = "Test Oracle DR database with CNAUDT1 spec."
-          tags = {
-            monitored = false
-          }
-        },
-        CNAUDT1RESTORE = {
-          always_on          = false
-          ami_name           = "database-CNAUDT1-snapshot"
-          asm_data_capacity  = 200
-          asm_flash_capacity = 2
-          description        = "Restoring CNAUDT1 from VM backup."
-          oracle_sids        = ["T1CNMAUD"]
-          tags = {
-            monitored = true
-          }
-        },
       },
       # Add weblogic instances here.  They will be created using the weblogic module
       weblogics = {
