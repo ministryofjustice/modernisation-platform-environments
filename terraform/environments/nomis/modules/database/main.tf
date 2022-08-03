@@ -68,7 +68,7 @@ resource "aws_instance" "database" {
     var.common_security_group_id,
     aws_security_group.database.id
   ]
-
+  #checkov:skip=CKV_AWS_79:We are tied to v1 metadata service
   metadata_options {
     http_endpoint = "enabled"
     http_tokens   = "optional"
