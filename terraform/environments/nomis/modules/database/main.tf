@@ -71,6 +71,7 @@ resource "aws_instance" "database" {
   #checkov:skip=CKV_AWS_79:We are tied to v1 metadata service
   metadata_options {
     http_endpoint = "enabled"
+    #tfsec:ignore:aws-ec2-enforce-http-token-imds:the Oracle installer cannott accommodate a token
     http_tokens   = "optional"
   }
 
