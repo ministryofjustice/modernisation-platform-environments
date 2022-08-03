@@ -63,19 +63,9 @@ locals {
           asm_flash_capacity     = 2
           description            = "Copy of Test NOMIS Audit database in Azure T1PDL0010, replicating with T1PDL0010."
           termination_protection = true
-          oracle_sids            = ["MIST1", "CNMAUDT1"]
+          oracle_sids            = ["T1CNMAUD"]
           tags = {
-            monitored = false
-          }
-        },
-        ORACLEDR = {
-          always_on          = false
-          ami_name           = data.aws_ami.database.name
-          asm_data_capacity  = 100
-          asm_flash_capacity = 2
-          description        = "Test Oracle DR database."
-          tags = {
-            monitored = false
+            monitored = true
           }
         },
       },
@@ -138,6 +128,23 @@ locals {
           }
           tags = {
             monitored = true
+          }
+        },
+        AUDITDR = {
+          always_on              = true
+          ami_name               = "nomis_database_2022-07-21T11-43-27.346Z"
+          ami_owner              = local.environment_management.account_ids[terraform.workspace]
+          instance_type          = "r6i.2xlarge"
+          asm_data_capacity      = 4000
+          asm_flash_capacity     = 1000
+          description            = "DR instance of Oracle DB to perform backup/restore testing."
+          termination_protection = false # temporary VM, will be destroyed
+          oracle_app_disk_size = {
+            "/dev/sdb" = 100  # /u01
+            "/dev/sdc" = 5120 # /u02
+          }
+          tags = {
+            monitored = false
           }
         },
         NOMIS = {
