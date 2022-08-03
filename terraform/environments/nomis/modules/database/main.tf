@@ -72,7 +72,7 @@ resource "aws_instance" "database" {
   metadata_options {
     http_endpoint = "enabled"
     #tfsec:ignore:aws-ec2-enforce-http-token-imds:the Oracle installer cannott accommodate a token
-    http_tokens   = "optional"
+    http_tokens = "optional"
   }
 
   root_block_device {
