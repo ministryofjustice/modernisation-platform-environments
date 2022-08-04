@@ -68,18 +68,19 @@ locals {
             monitored = false // TODO: while the testing is going on to avoid alert spam
           }
         },
-        # CNAUDT1DR = {
-        #   always_on              = true
-        #   ami_name               = "database-CNAUDT1-snapshot-20220803"
-        #   asm_data_capacity      = 200
-        #   asm_flash_capacity     = 2
-        #   description            = "Copy of Test NOMIS Audit database in Azure T1PDL0010, Restored from snapshot."
-        #   termination_protection = true
-        #   oracle_sids            = ["T1CNMAUD"]
-        #   tags = {
-        #     monitored = true
-        #   }
-        # },
+        CNAUDT1DR = {
+          always_on               = true
+          restoring_from_snapshot = true
+          ami_name                = "database-CNAUDT1-snapshot-20220803"
+          asm_data_capacity       = 200
+          asm_flash_capacity      = 2
+          description             = "Copy of Test NOMIS Audit database in Azure T1PDL0010, Restored from snapshot."
+          termination_protection  = true
+          oracle_sids             = ["T1CNMAUD"]
+          tags = {
+            monitored = true
+          }
+        },
       },
       # Add weblogic instances here.  They will be created using the weblogic module
       weblogics = {
