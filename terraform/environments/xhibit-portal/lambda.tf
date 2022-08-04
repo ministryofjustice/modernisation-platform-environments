@@ -47,9 +47,10 @@ resource "aws_iam_role" "snapshot_lambda" {
 #Create ZIP archive and lambda
 data "archive_file" "lambda_zip" {
 
-  type        = "zip"
-  source_file = "lambda/index.py"
-  output_path = "lambda/lambda_function.zip"
+  type             = "zip"
+  source_file      = "lambda/index.py"
+  output_file_mode = "0666"
+  output_path      = "lambda/lambda_function.zip"
 }
 
 # tfsec:ignore:aws-lambda-enable-tracing
@@ -61,7 +62,7 @@ resource "aws_lambda_function" "root_snapshot_to_ami" {
   function_name                  = "root_snapshot_to_ami"
   role                           = aws_iam_role.snapshot_lambda.arn
   handler                        = "index.lambda_handler"
-  source_code_hash               = data.archive_file.lambda_zip.output_path
+  source_code_hash               = data.archive_file.lambda_zip.output_base64sha256
   runtime                        = "python3.8"
   timeout                        = "120"
   reserved_concurrent_executions = 1
@@ -138,9 +139,10 @@ resource "aws_iam_role" "delete_snapshot_lambda" {
 #Create ZIP archive and lambda
 data "archive_file" "delete_lambda_zip" {
 
-  type        = "zip"
-  source_file = "lambda/delete_old_ami.py"
-  output_path = "lambda/delete_old_ami.zip"
+  type             = "zip"
+  source_file      = "lambda/delete_old_ami.py"
+  output_file_mode = "0666"
+  output_path      = "lambda/delete_old_ami.zip"
 }
 
 # tfsec:ignore:aws-lambda-enable-tracing
@@ -152,7 +154,7 @@ resource "aws_lambda_function" "delete_old_ami" {
   function_name                  = "delete_old_ami"
   role                           = aws_iam_role.delete_snapshot_lambda.arn
   handler                        = "index.lambda_handler"
-  source_code_hash               = data.archive_file.delete_lambda_zip.output_path
+  source_code_hash               = data.archive_file.delete_lambda_zip.output_base64sha256
   runtime                        = "python3.8"
   timeout                        = "120"
   reserved_concurrent_executions = 1
