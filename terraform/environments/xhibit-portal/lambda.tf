@@ -69,7 +69,7 @@ resource "aws_lambda_function" "root_snapshot_to_ami" {
 }
 
 resource "aws_cloudwatch_event_rule" "every_day" {
-  name                = "run-daily"
+  name                = "run-daily_01_30"
   description         = "Runs daily at 1:30am"
   schedule_expression = "cron(30 1 * * ? *)"
 }
@@ -161,7 +161,7 @@ resource "aws_lambda_function" "delete_old_ami" {
 }
 
 resource "aws_cloudwatch_event_rule" "every_day_0230" {
-  name                = "run-daily"
+  name                = "run-daily_0230"
   description         = "Runs daily at 2:30am"
   schedule_expression = "cron(30 2 * * ? *)"
 }
