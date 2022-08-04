@@ -114,7 +114,7 @@ reconfigure_oracle_has() {
         # retrieve password from parameter store
         password_ASMSYS=$(aws ssm get-parameter --with-decryption --name "${parameter_name_ASMSYS}" --output text --query Parameter.Value)
         password_ASMSNMP=$(aws ssm get-parameter --with-decryption --name "${parameter_name_ASMSNMP}" --output text --query Parameter.Value)
-        unset
+
         # reconfigure Oracle HAS
         source oraenv <<< +ASM
         srvctl add listener
