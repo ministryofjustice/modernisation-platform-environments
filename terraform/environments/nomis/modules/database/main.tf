@@ -43,6 +43,7 @@ data "template_file" "user_data" {
     parameter_name_ASMSYS  = aws_ssm_parameter.asm_sys.name
     parameter_name_ASMSNMP = aws_ssm_parameter.asm_snmp.name
     volume_ids             = join(" ", local.volume_ids)
+    restored_from_snapshot = var.restored_from_snapshot
   }
 }
 

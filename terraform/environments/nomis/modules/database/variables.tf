@@ -154,6 +154,20 @@ variable "oracle_app_disk_size" {
   nullable = false
 }
 
+variable "oracle_sids" {
+  type        = list(string)
+  description = "List of databases hosted on the server"
+  default     = []
+  nullable    = false
+}
+
+variable "restored_from_snapshot" {
+  type        = bool
+  description = "Instance is being restored from an existing Oracle database EC2 snapshot"
+  default     = false
+  nullable    = false
+}
+
 variable "subnet_set" {
   type        = string
   description = "Fixed variable to specify subnet-set for RAM shared subnets"
@@ -168,12 +182,5 @@ variable "termination_protection" {
   type        = bool
   description = "Set to true to prevent accidental deletion of instances"
   default     = false
-  nullable    = false
-}
-
-variable "oracle_sids" {
-  type        = list(string)
-  description = "List of databases hosted on the server"
-  default     = []
   nullable    = false
 }
