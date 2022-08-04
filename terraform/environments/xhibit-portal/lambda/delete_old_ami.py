@@ -5,7 +5,7 @@ from dateutil import parser
 
 
 def lambda_handler(event, context):
-    today = datetime.datetime.now()
+    today = datetime.now()
     date_time = today.date()
     deletion_time = date_time - timedelta(days=122)
     client = boto3.client("ec2")
@@ -27,8 +27,7 @@ def lambda_handler(event, context):
                     ):
                         try:
                             snap_id = bdm.get("Ebs").get("SnapshotId")
-                            client.delete_snapshot(
-                                SnapshotId=snap_id, dry_run=True)
+                            client.delete_snapshot(SnapshotId=snap_id, dry_run=True)
                         except Exception as e:
                             if "InvalidSnapshot.InUse" in e.message:
                                 print(f"Snapshot {id} in use")

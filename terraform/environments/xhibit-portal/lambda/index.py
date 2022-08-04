@@ -3,7 +3,7 @@ from datetime import datetime
 
 
 def lambda_handler(event, context):
-    today = datetime.datetime.now()
+    today = datetime.now()
     date_time = today.date()
 
     format_time = today.strftime("%m/%d/%Y")
@@ -22,10 +22,7 @@ def lambda_handler(event, context):
     ]
     print("Connecting to EC2")
     client = boto3.client("ec2")
-    print(
-        "Root block snapshot to ami process started at %s...\n"
-        % datetime.datetime.now()
-    )
+    print("Root block snapshot to ami process started at %s...\n" % datetime.now())
     for element in root_snapshots:
         print(element)
         response = client.describe_snapshots(
