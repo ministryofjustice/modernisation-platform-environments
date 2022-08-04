@@ -40,7 +40,7 @@ hugepages() {
 
 swap_disk() {
     echo "+++Updating PATH with /usr/local/bin for aws-cli"
-    export PATH=$PATH:/usr/local/bin
+    local PATH=$PATH:/usr/local/bin
 
     echo "+++Waiting for volumes to be attached to instance"
     aws ec2 wait volume-in-use --volume-ids ${volume_ids}
@@ -94,9 +94,12 @@ reconfigure_oracle_has() {
 
     # update hostname in listener file
     sed -ri "s/(HOST = )([^\)]*)/\1$HOSTNAME/" $ORACLE_HOME/network/admin/listener.ora
+    %{ if ${restoring_from_snapshot} } # if restoring from existing oracle database snapshot
 
     echo "+++deconfigure existing grid infrastructure"
     $ORACLE_HOME/perl/bin/perl -I $ORACLE_HOME/perl/lib -I $ORACLE_HOME/crs/install $ORACLE_HOME/crs/install/roothas.pl -deconfig -force
+
+    %{ endif }
 
     echo "+++reconfigure grid"
     $ORACLE_HOME/perl/bin/perl -I $ORACLE_HOME/perl/lib -I $ORACLE_HOME/crs/install $ORACLE_HOME/crs/install/roothas.pl
