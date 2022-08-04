@@ -153,7 +153,7 @@ resource "aws_lambda_function" "delete_old_ami" {
   filename                       = "lambda/delete_old_ami.zip"
   function_name                  = "delete_old_ami"
   role                           = aws_iam_role.delete_snapshot_lambda.arn
-  handler                        = "index.lambda_handler"
+  handler                        = "delete_old_ami.lambda_handler"
   source_code_hash               = data.archive_file.delete_lambda_zip.output_base64sha256
   runtime                        = "python3.8"
   timeout                        = "120"
