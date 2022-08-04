@@ -94,7 +94,7 @@ reconfigure_oracle_has() {
 
     # update hostname in listener file
     sed -ri "s/(HOST = )([^\)]*)/\1$HOSTNAME/" $ORACLE_HOME/network/admin/listener.ora
-    %{ if ${restoring_from_snapshot} } # if restoring from existing oracle database snapshot
+    %{ if restoring_from_snapshot } # if restoring from existing oracle database snapshot
 
     echo "+++deconfigure existing grid infrastructure"
     $ORACLE_HOME/perl/bin/perl -I $ORACLE_HOME/perl/lib -I $ORACLE_HOME/crs/install $ORACLE_HOME/crs/install/roothas.pl -deconfig -force
