@@ -143,25 +143,25 @@ locals {
             monitored = true
           }
         },
-        # PCNMAUD = {
-        #   always_on              = true
-        #   restored_from_snapshot = true
-        #   ami_name               = "AwsBackup_i-00861f43dc59ce8ce_1B74E1A2-8F97-BC94-9FDD-6D6936275F6B"
-        #   ami_owner              = local.environment_management.account_ids[terraform.workspace]
-        #   instance_type          = "r6i.2xlarge"
-        #   asm_data_capacity      = 4000
-        #   asm_flash_capacity     = 1000
-        #   description            = "Production NOMIS Audit database, replicating with PDPDL00038 and PDPDL00037, a replacement for PDPDL00037."
-        #   termination_protection = false
-        #   oracle_sids            = ["PCNMAUD"]
-        #   oracle_app_disk_size = {
-        #     "/dev/sdb" = 100  # /u01
-        #     "/dev/sdc" = 5120 # /u02
-        #   }
-        #   tags = {
-        #     monitored = true
-        #   }
-        # },
+        PCNMAUD = {
+          always_on              = true
+          restored_from_snapshot = true
+          ami_name               = "AwsBackup_i-00861f43dc59ce8ce_1B74E1A2-8F97-BC94-9FDD-6D6936275F6B"
+          ami_owner              = local.environment_management.account_ids[terraform.workspace]
+          instance_type          = "r6i.2xlarge"
+          asm_data_capacity      = 4000
+          asm_flash_capacity     = 1000
+          description            = "Production NOMIS Audit database, replicating with PDPDL00038 and PDPDL00037, a replacement for PDPDL00037."
+          termination_protection = false
+          oracle_sids            = ["PCNMAUD"]
+          oracle_app_disk_size = {
+            "/dev/sdb" = 100  # /u01
+            "/dev/sdc" = 5120 # /u02
+          }
+          tags = {
+            monitored = true
+          }
+        },
         AUDITDR = {
           always_on              = true
           ami_name               = "nomis_database_2022-07-21T11-43-27.346Z"
