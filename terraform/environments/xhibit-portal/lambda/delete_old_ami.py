@@ -27,6 +27,7 @@ def lambda_handler(event, context):
                     ):
                         try:
                             snap_id = bdm.get("Ebs").get("SnapshotId")
+                            print(f"Deleting Snapshot {snap_id}")
                             client.delete_snapshot(SnapshotId=snap_id, dry_run=True)
                         except Exception as e:
                             if "InvalidSnapshot.InUse" in e.message:
@@ -34,6 +35,7 @@ def lambda_handler(event, context):
                                 continue
                 try:
                     image_id = image["ImageId"]
+                    print(f"Deleting Image {image_id}")
                     client.deregister_image(ImageId=image_id, dry_run=True)
                 except Exception as e:
                     print(f"Error deleting image: {e.message}")
