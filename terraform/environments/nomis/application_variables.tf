@@ -69,14 +69,14 @@ locals {
           }
         },
         CNAUDT1DR = {
-          always_on               = true
-          restoring_from_snapshot = true
-          ami_name                = "database-CNAUDT1-snapshot-20220803"
-          asm_data_capacity       = 200
-          asm_flash_capacity      = 2
-          description             = "Copy of Test NOMIS Audit database in Azure T1PDL0010, Restored from snapshot."
-          termination_protection  = true
-          oracle_sids             = ["T1CNMAUD"]
+          always_on              = true
+          restored_from_snapshot = true
+          ami_name               = "database-CNAUDT1-snapshot-20220803"
+          asm_data_capacity      = 200
+          asm_flash_capacity     = 2
+          description            = "Copy of Test NOMIS Audit database in Azure T1PDL0010, Restored from snapshot."
+          termination_protection = true
+          oracle_sids            = ["T1CNMAUD"]
           tags = {
             monitored = true
           }
@@ -133,6 +133,25 @@ locals {
           asm_data_capacity      = 4000
           asm_flash_capacity     = 1000
           description            = "Copy of Production NOMIS Audit database in Azure PDPDL00038, replicating with PDPDL00038, a replacement for PDPDL00037."
+          termination_protection = true
+          oracle_sids            = ["PCNMAUD"]
+          oracle_app_disk_size = {
+            "/dev/sdb" = 100  # /u01
+            "/dev/sdc" = 5120 # /u02
+          }
+          tags = {
+            monitored = true
+          }
+        },
+        PCNMAUD = {
+          always_on              = true
+          restored_from_snapshot = true
+          ami_name               = "AwsBackup_i-00861f43dc59ce8ce_1B74E1A2-8F97-BC94-9FDD-6D6936275F6B"
+          ami_owner              = local.environment_management.account_ids[terraform.workspace]
+          instance_type          = "r6i.2xlarge"
+          asm_data_capacity      = 4000
+          asm_flash_capacity     = 1000
+          description            = "Production NOMIS Audit database, replicating with PDPDL00038 and PDPDL00037, a replacement for PDPDL00037."
           termination_protection = true
           oracle_sids            = ["PCNMAUD"]
           oracle_app_disk_size = {

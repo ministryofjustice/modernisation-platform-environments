@@ -161,9 +161,9 @@ variable "oracle_sids" {
   nullable    = false
 }
 
-variable "restoring_from_snapshot" {
+variable "restored_from_snapshot" {
   type        = bool
-  description = "Instance is being restored from an existing Oracle database snapshot"
+  description = "Instance is being restored from an existing Oracle database EC2 snapshot"
   default     = false
   nullable    = false
 }

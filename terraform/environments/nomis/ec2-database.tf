@@ -19,17 +19,17 @@ module "database" {
   asm_flash_capacity = each.value.asm_flash_capacity
   description        = each.value.description
 
-  ami_owner               = try(each.value.ami_owner, local.environment_management.account_ids["nomis-test"])
-  asm_data_iops           = try(each.value.asm_data_iops, null)
-  asm_data_throughput     = try(each.value.asm_data_throughput, null)
-  asm_flash_iops          = try(each.value.asm_flash_iops, null)
-  asm_flash_throughput    = try(each.value.asm_data_throughput, null)
-  oracle_app_disk_size    = try(each.value.oracle_app_disk_size, null)
-  extra_ingress_rules     = try(each.value.extra_ingress_rules, null)
-  termination_protection  = try(each.value.termination_protection, null)
-  instance_type           = try(each.value.instance_type, null)
-  oracle_sids             = try(each.value.oracle_sids, null)
-  restoring_from_snapshot = try(each.value.restoring_from_snapshot, false)
+  ami_owner              = try(each.value.ami_owner, local.environment_management.account_ids["nomis-test"])
+  asm_data_iops          = try(each.value.asm_data_iops, null)
+  asm_data_throughput    = try(each.value.asm_data_throughput, null)
+  asm_flash_iops         = try(each.value.asm_flash_iops, null)
+  asm_flash_throughput   = try(each.value.asm_data_throughput, null)
+  oracle_app_disk_size   = try(each.value.oracle_app_disk_size, null)
+  extra_ingress_rules    = try(each.value.extra_ingress_rules, null)
+  termination_protection = try(each.value.termination_protection, null)
+  instance_type          = try(each.value.instance_type, null)
+  oracle_sids            = try(each.value.oracle_sids, null)
+  restored_from_snapshot = try(each.value.restored_from_snapshot, false)
 
   common_security_group_id  = aws_security_group.database_common.id
   instance_profile_policies = concat(local.ec2_common_managed_policies, [aws_iam_policy.s3_db_backup_bucket_access.arn])
