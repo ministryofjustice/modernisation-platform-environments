@@ -152,7 +152,7 @@ locals {
           asm_data_capacity      = 4000
           asm_flash_capacity     = 1000
           description            = "Production NOMIS Audit database, replicating with PDPDL00038 and PDPDL00037, a replacement for PDPDL00037."
-          termination_protection = true
+          termination_protection = false
           oracle_sids            = ["PCNMAUD"]
           oracle_app_disk_size = {
             "/dev/sdb" = 100  # /u01
