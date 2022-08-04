@@ -40,9 +40,10 @@ resource "aws_security_group_rule" "extra_rules" { # Extra ingress rules that mi
 data "template_file" "user_data" {
   template = file("${path.module}/user-data/user-data.sh")
   vars = {
-    parameter_name_ASMSYS  = aws_ssm_parameter.asm_sys.name
-    parameter_name_ASMSNMP = aws_ssm_parameter.asm_snmp.name
-    volume_ids             = join(" ", local.volume_ids)
+    parameter_name_ASMSYS   = aws_ssm_parameter.asm_sys.name
+    parameter_name_ASMSNMP  = aws_ssm_parameter.asm_snmp.name
+    volume_ids              = join(" ", local.volume_ids)
+    restoring_from_snapshot = var.restoring_from_snapshot
   }
 }
 
