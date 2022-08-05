@@ -345,7 +345,7 @@ resource "aws_alb_listener_rule" "prtg_root_listener_redirect" {
   depends_on   = [aws_lb_listener.prtg_lb_listener]
   listener_arn = aws_lb_listener.prtg_lb_listener.arn
 
-  default_action {
+  action {
     type = "redirect"
 
     redirect {
