@@ -83,11 +83,11 @@ resource "aws_lb_target_group_attachment" "prtg-server-attachment" {
 #   certificate_arn   = aws_acm_certificate.prtg_lb_cert.arn
 #   # certificate_arn   = data.aws_acm_certificate.ingestion_cert.arn 
 
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.prtg_lb_web_tg.arn
-  }
-}
+#   default_action {
+#     type             = "forward"
+#     target_group_arn = aws_lb_target_group.prtg_lb_web_tg.arn
+#   }
+# }
 
 resource "aws_acm_certificate" "prtg_lb_cert" {
   domain_name       = "modernisation-platform.service.justice.gov.uk"
