@@ -70,18 +70,18 @@ resource "aws_lb_target_group_attachment" "prtg-server-attachment" {
 }
 
 
-resource "aws_lb_listener" "prtg_lb_listener" {
-  depends_on = [
-    aws_acm_certificate_validation.prtg_lb_cert_validation,
-    aws_lb_target_group.prtg_lb_web_tg
-  ]
+# resource "aws_lb_listener" "prtg_lb_listener" {
+#   depends_on = [
+#     aws_acm_certificate_validation.prtg_lb_cert_validation,
+#     aws_lb_target_group.prtg_lb_web_tg
+#   ]
 
-  load_balancer_arn = aws_lb.prtg_lb.arn
-  port              = "443"
-  protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = aws_acm_certificate.prtg_lb_cert.arn
-  # certificate_arn   = data.aws_acm_certificate.ingestion_cert.arn 
+#   load_balancer_arn = aws_lb.prtg_lb.arn
+#   port              = "443"
+#   protocol          = "HTTPS"
+#   ssl_policy        = "ELBSecurityPolicy-2016-08"
+#   certificate_arn   = aws_acm_certificate.prtg_lb_cert.arn
+#   # certificate_arn   = data.aws_acm_certificate.ingestion_cert.arn 
 
   default_action {
     type             = "forward"
@@ -356,24 +356,24 @@ resource "aws_lb_listener" "prtg_lb_listener" {
   }
 }
 
-resource "aws_alb_listener_rule" "root_listener_redirect" {
-  priority     = 1
-  port         = 80
-  protocol     = "HTTP"
-  depends_on   = [aws_lb_listener.prtg_lb_listener]
-  listener_arn = aws_lb_listener.prtg_lb_listener.arn
+# resource "aws_alb_listener_rule" "root_listener_redirect" {
+#   priority     = 1
+#   port         = 80
+#   protocol     = "HTTP"
+#   depends_on   = [aws_lb_listener.prtg_lb_listener]
+#   listener_arn = aws_lb_listener.prtg_lb_listener.arn
 
-  default_action {
-    type = "redirect"
+#   default_action {
+#     type = "redirect"
 
-    redirect {
-      status_code = "HTTP_301"
-      port        = 443
-      protocol    = "HTTPS"
-      # path       = "monitoring.pportal.cjsonline.gov.uk/public/mapshow.htm?id=2270&mapid=EE1CB6BA-590C-4D06-BB63-F6FDB8E09C06"
-    }
+#     redirect {
+#       status_code = "HTTP_301"
+#       port        = 443
+#       protocol    = "HTTPS"
+#       # path       = "monitoring.pportal.cjsonline.gov.uk/public/mapshow.htm?id=2270&mapid=EE1CB6BA-590C-4D06-BB63-F6FDB8E09C06"
+#     }
 
-  }
+#   }
 
   # condition {
   #   path_pattern {
