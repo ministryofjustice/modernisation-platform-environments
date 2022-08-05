@@ -3,14 +3,14 @@
 set -euo pipefail
 
 hugepages() {
-    
+
     echo "+++Configuring hugepages..."
-    
+
     local memtotal_kb=$(awk '/^MemTotal/ {print $2}' /proc/meminfo)
-    
+
     local page_size_kb=2048
     local pages=$(expr $memtotal_kb / 2 / $page_size_kb)
-    
+
     local memlock=$(expr 9 \* $memtotal_kb / 10)
     local memlock_max=134217728 # 128GB
     local memlock_limit=$(( $memlock > $memlock_max ? $memlock_max : $memlock ))
@@ -31,7 +31,7 @@ hugepages() {
         sysctl -p
         ((i++))
     done
-    
+
     echo "created [$pages_created/$pages] hugepages"
 
     # update memlock limits
@@ -39,6 +39,8 @@ hugepages() {
 }
 
 swap_disk() {
+    echo "+++Updating PATH with /usr/local/bin for aws-cli"
+    local PATH=$PATH:/usr/local/bin
 
     echo "+++Waiting for volumes to be attached to instance"
     aws ec2 wait volume-in-use --volume-ids ${volume_ids}
@@ -46,7 +48,7 @@ swap_disk() {
     echo "+++Configuring swap partition..."
     # get current swap partition
     local swap_disk=$(awk '/partition/ {print $1}' /proc/swaps)
-    
+
     # set a label for swap partition
     local swap_label="swap"
 
@@ -61,17 +63,17 @@ swap_disk() {
 }
 
 disks() {
-    
+
     echo "+++Resizing Oracle application disks"
     xfs_growfs -d /u01
     xfs_growfs -d /u02
-    
+
     echo "+++Resizing ASM disks..."
     # find the oracleasm partitions
     IFS=$'\n'
     local devices=($(lsblk -npf -o FSTYPE,PKNAME | awk '/oracleasm/ {print $2}'))
     unset IFS
- 
+
     for item in "$${devices[@]}"; do
         echo "resizing device $${item}"
         parted --script "$${item}" resizepart 1 100%
@@ -84,7 +86,7 @@ disks() {
 reconfigure_oracle_has() {
 
     local ORACLE_HOME=/u01/app/oracle/product/11.2.0.4/gridhome_1
-    
+
     echo "+++Reconfiguring Oracle HAS..."
 
     # kill anything on port 1521
@@ -92,6 +94,12 @@ reconfigure_oracle_has() {
 
     # update hostname in listener file
     sed -ri "s/(HOST = )([^\)]*)/\1$HOSTNAME/" $ORACLE_HOME/network/admin/listener.ora
+    %{ if restored_from_snapshot } # if restoring from existing oracle database snapshot
+
+    echo "+++deconfigure existing grid infrastructure"
+    $ORACLE_HOME/perl/bin/perl -I $ORACLE_HOME/perl/lib -I $ORACLE_HOME/crs/install $ORACLE_HOME/crs/install/roothas.pl -deconfig -force
+
+    %{ endif }
 
     echo "+++reconfigure grid"
     $ORACLE_HOME/perl/bin/perl -I $ORACLE_HOME/perl/lib -I $ORACLE_HOME/crs/install $ORACLE_HOME/crs/install/roothas.pl
@@ -100,11 +108,13 @@ reconfigure_oracle_has() {
     cat > /tmp/oracle_reconfig.sh << 'EOF'
         #!/bin/bash
         echo "+++Setting up Oracle HAS as Oracle user"
-        
+
+        unset ORAENV_ASK
+
         # retrieve password from parameter store
         password_ASMSYS=$(aws ssm get-parameter --with-decryption --name "${parameter_name_ASMSYS}" --output text --query Parameter.Value)
         password_ASMSNMP=$(aws ssm get-parameter --with-decryption --name "${parameter_name_ASMSNMP}" --output text --query Parameter.Value)
-        
+
         # reconfigure Oracle HAS
         source oraenv <<< +ASM
         srvctl add listener
@@ -129,11 +139,11 @@ reconfigure_oracle_has() {
                 # resize disks
                 sqlplus -s / as sysasm <<< "alter diskgroup DATA resize all;"
                 sqlplus -s / as sysasm <<< "alter diskgroup FLASH resize all;"
-                
+
                 # set asm passwords
                 asmcmd orapwusr --modify --password ASMSNMP <<< "$password_ASMSNMP"
                 asmcmd orapwusr --modify --password SYS <<< "$password_ASMSYS"
-                
+
                 # start test database if present in AMI
                 if [[ -n "$(grep CNOMT1 /etc/oratab)" ]]; then
                     source oraenv <<< CNOMT1

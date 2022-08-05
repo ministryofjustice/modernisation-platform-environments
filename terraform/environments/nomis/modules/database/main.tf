@@ -43,6 +43,7 @@ data "template_file" "user_data" {
     parameter_name_ASMSYS  = aws_ssm_parameter.asm_sys.name
     parameter_name_ASMSNMP = aws_ssm_parameter.asm_snmp.name
     volume_ids             = join(" ", local.volume_ids)
+    restored_from_snapshot = var.restored_from_snapshot
   }
 }
 
@@ -68,10 +69,11 @@ resource "aws_instance" "database" {
     var.common_security_group_id,
     aws_security_group.database.id
   ]
-
+  #checkov:skip=CKV_AWS_79:We are tied to v1 metadata service
   metadata_options {
     http_endpoint = "enabled"
-    http_tokens   = "optional"
+    #tfsec:ignore:aws-ec2-enforce-http-token-imds:the Oracle installer cannott accommodate a token
+    http_tokens = "optional"
   }
 
   root_block_device {

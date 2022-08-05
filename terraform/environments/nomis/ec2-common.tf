@@ -401,14 +401,16 @@ resource "aws_ssm_document" "oracle_secure_web" {
   )
 }
 
-resource "aws_ssm_association" "oracle_secure_web" {
-  name             = aws_ssm_document.oracle_secure_web.name
-  association_name = "install-and-test-oracle-secure-web-backup"
-  targets {
-    key    = "tag-key"
-    values = ["oracle_sids"]
-  }
-}
+# resource "aws_ssm_association" "oracle_secure_web" {
+#   name             = aws_ssm_document.oracle_secure_web.name
+#   association_name = "install-and-test-oracle-secure-web-backup"
+#   targets {
+#     key    = "tag-key"
+#     values = ["oracle_sids"]
+#   }
+# }
+
+# TODO: Temporarily disable automatic provisioning while performing DR tests.
 
 #------------------------------------------------------------------------------
 # Scheduled overnight shutdown

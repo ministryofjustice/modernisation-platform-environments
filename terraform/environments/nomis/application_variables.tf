@@ -63,19 +63,22 @@ locals {
           asm_flash_capacity     = 2
           description            = "Copy of Test NOMIS Audit database in Azure T1PDL0010, replicating with T1PDL0010."
           termination_protection = true
-          oracle_sids            = ["MIST1", "CNMAUDT1"]
+          oracle_sids            = ["T1CNMAUD"]
           tags = {
-            monitored = false
+            monitored = false // TODO: while the testing is going on to avoid alert spam
           }
         },
-        ORACLEDR = {
-          always_on          = false
-          ami_name           = data.aws_ami.database.name
-          asm_data_capacity  = 100
-          asm_flash_capacity = 2
-          description        = "Test Oracle DR database."
+        CNAUDT1DR = {
+          always_on              = true
+          restored_from_snapshot = true
+          ami_name               = "database-CNAUDT1-snapshot-20220803"
+          asm_data_capacity      = 200
+          asm_flash_capacity     = 2
+          description            = "Copy of Test NOMIS Audit database in Azure T1PDL0010, Restored from snapshot."
+          termination_protection = true
+          oracle_sids            = ["T1CNMAUD"]
           tags = {
-            monitored = false
+            monitored = true
           }
         },
       },
