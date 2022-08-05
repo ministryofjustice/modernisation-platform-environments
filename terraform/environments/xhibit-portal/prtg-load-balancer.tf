@@ -230,7 +230,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "default_encryptio
 
 resource "aws_wafv2_web_acl_logging_configuration" "prtg_logs" {
   log_destination_configs = ["${aws_s3_bucket.prtg_logs.arn}"]
-  resource_arn = aws_wafv2_web_acl.prtg_acl.arn
+  resource_arn            = aws_wafv2_web_acl.prtg_acl.arn
 }
 
 resource "aws_s3_bucket_policy" "prtg_logs_policy" {
@@ -357,9 +357,9 @@ resource "aws_lb_listener" "prtg_lb_listener" {
 }
 
 resource "aws_alb_listener_rule" "root_listener_redirect" {
-  priority = 1
-  port     = 80
-  protocol = "HTTP"
+  priority     = 1
+  port         = 80
+  protocol     = "HTTP"
   depends_on   = [aws_lb_listener.prtg_lb_listener]
   listener_arn = aws_lb_listener.prtg_lb_listener.arn
 
