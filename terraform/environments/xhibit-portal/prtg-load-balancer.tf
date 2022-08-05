@@ -356,4 +356,18 @@ resource "aws_alb_listener_rule" "prtg_root_listener_redirect" {
     }
 
   }
+
+  condition {
+    path_pattern {
+      values = ["/"]
+    }
+  }
+
+  condition {
+    host_header {
+      values = [
+        local.application_data.accounts[local.environment].public_dns_name_prtg
+      ]
+    }
+  }
 }
