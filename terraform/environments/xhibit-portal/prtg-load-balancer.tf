@@ -343,22 +343,18 @@ resource "aws_alb_listener_rule" "prtg_http_to_https_redirect" {
   listener_arn = aws_lb_listener.prtg_lb_listener.arn
   port         = "80"
   protocol     = "HTTP"
-
   action {
     type = "redirect"
-
     redirect {
       status_code = "HTTP_301"
       port        = "443"
       protocol    = "HTTPS"
       # path       = "monitoring.pportal.cjsonline.gov.uk/public/mapshow.htm?id=2270&mapid=EE1CB6BA-590C-4D06-BB63-F6FDB8E09C06"
     }
-
   }
-
   condition {
     path_pattern {
-      values = ["/"]
+      values = ["/*"]
     }
   }
 
