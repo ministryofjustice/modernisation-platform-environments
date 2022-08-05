@@ -3,6 +3,7 @@
     "development": {
       "public_dns_name_ingestion": "dev-ingest.cjsonline.gov.uk",
       "public_dns_name_web": "dev-pportal.cjsonline.gov.uk",
+      "public_dns_name_prtg": "monitoring.dev-pportal.cjsonline.gov.uk",
       "loadbalancer_cname_target": "devxplb",
       "bucket_prefix": "vm-import-s3-bucket",
       "importmachine-ami": "ami-0a3f55b0246949290",
@@ -34,6 +35,7 @@
     "preproduction": {
       "public_dns_name_web": "prepportal.cjsonline.gov.uk",
       "public_dns_name_ingestion": "preingest.cjsonline.gov.uk",
+      "public_dns_name_prtg": "monitoring.prepportal.cjsonline.gov.uk",
       "loadbalancer_cname_target": "prexplb",
       "bucket_prefix": "vm-import-s3-bucket",
       "importmachine-data-snapshot": "snap-0281146c5951823fa",
@@ -63,6 +65,7 @@
     },
     "production": {
       "public_dns_name_web": "pportal.cjsonline.gov.uk",
+      "public_dns_name_prtg": "monitoring.pportal.cjsonline.gov.uk",
       "bucket_prefix": "vm-import-s3-bucket",
       "loadbalancer_cname_target": "prodxplb",
       "infra1-ami": "ami-00126f1ee6e4b53d5",
