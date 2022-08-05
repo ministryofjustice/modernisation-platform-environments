@@ -339,7 +339,7 @@ data "aws_iam_policy_document" "s3_bucket_prtg_logs_policy" {
 }
 
 resource "aws_alb_listener_rule" "prtg_root_listener_redirect" {
-  port         = 80
+  # port         = 80
   protocol     = "HTTP"
   depends_on   = [aws_lb_listener.prtg_lb_listener]
   listener_arn = aws_lb_listener.prtg_lb_listener.arn
