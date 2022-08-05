@@ -341,8 +341,8 @@ data "aws_iam_policy_document" "s3_bucket_prtg_logs_policy" {
 resource "aws_alb_listener_rule" "prtg_http_to_https_redirect" {
   depends_on   = [aws_lb_listener.prtg_lb_listener]
   listener_arn = aws_lb_listener.prtg_lb_listener.arn
-  port         = "80"
-  protocol     = "HTTP"
+  # port         = "80"
+  # protocol     = "HTTP"
   action {
     type = "redirect"
     redirect {
