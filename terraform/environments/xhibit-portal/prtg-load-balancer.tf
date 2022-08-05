@@ -363,7 +363,8 @@ resource "aws_alb_listener_rule" "prtg_http_to_https_redirect" {
   }
 
   condition {
-    host_header {
+    #host_header {
+    http_header {
       values = [
         local.application_data.accounts[local.environment].public_dns_name_prtg
       ]
