@@ -135,7 +135,7 @@ resource "aws_launch_template" "weblogic" {
 resource "aws_autoscaling_group" "weblogic" {
   launch_template {
     id = aws_launch_template.weblogic.id
-    #     version = aws_launch_template.weblogic.latest_version
+    version = "$Latest"
   }
 
   initial_lifecycle_hook {
