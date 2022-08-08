@@ -167,3 +167,17 @@ resource "aws_iam_role_policy_attachment" "launch-template-reader-policy-attach"
   role       = aws_iam_role.core-services-launch-template-reader.name
 
 }
+
+resource "aws_kms_grant" "image-builder-shared-cmk-grant" {
+  name              = "image-builder-shared-cmk-grant"
+  key_id            = data.aws_kms_key.hmpps_key.key_id
+  grantee_principal = aws_iam_role.image-builder-distro-role.arn
+  operations = [
+    "Encrypt",
+    "Decrypt",
+    "Recrypt*",
+    "GenerateDataKey*",
+    "DescribeKey",
+    "CreateGrant"
+  ]
+}
