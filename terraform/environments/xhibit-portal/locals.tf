@@ -74,12 +74,12 @@ locals {
     }
   }
 
-  prtg_domain_name_main   = [for k, v in local.domain_types : v.name if k == "modernisation-platform.service.justice.gov.uk"]
-  prtg_domain_name_sub    = [for k, v in local.domain_types : v.name if k != "modernisation-platform.service.justice.gov.uk"]
-  prtg_domain_record_main = [for k, v in local.domain_types : v.record if k == "modernisation-platform.service.justice.gov.uk"]
-  prtg_domain_record_sub  = [for k, v in local.domain_types : v.record if k != "modernisation-platform.service.justice.gov.uk"]
-  prtg_domain_type_main   = [for k, v in local.domain_types : v.type if k == "modernisation-platform.service.justice.gov.uk"]
-  prtg_domain_type_sub    = [for k, v in local.domain_types : v.type if k != "modernisation-platform.service.justice.gov.uk"]
+  prtg_domain_name_main   = [for k, v in local.prtg_domain_types : v.name if k == "modernisation-platform.service.justice.gov.uk"]
+  prtg_domain_name_sub    = [for k, v in local.prtg_domain_types : v.name if k != "modernisation-platform.service.justice.gov.uk"]
+  prtg_domain_record_main = [for k, v in local.prtg_domain_types : v.record if k == "modernisation-platform.service.justice.gov.uk"]
+  prtg_domain_record_sub  = [for k, v in local.prtg_domain_types : v.record if k != "modernisation-platform.service.justice.gov.uk"]
+  prtg_domain_type_main   = [for k, v in local.prtg_domain_types : v.type if k == "modernisation-platform.service.justice.gov.uk"]
+  prtg_domain_type_sub    = [for k, v in local.prtg_domain_types : v.type if k != "modernisation-platform.service.justice.gov.uk"]
 
   
   
