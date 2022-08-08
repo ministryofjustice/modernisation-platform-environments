@@ -65,20 +65,18 @@ locals {
           termination_protection = true
           oracle_sids            = ["T1CNMAUD"]
           tags = {
-            monitored = false // TODO: while the testing is going on to avoid alert spam
+            monitored = true
           }
         },
-        CNAUDT1DR = {
-          always_on              = true
-          restored_from_snapshot = true
-          ami_name               = "database-CNAUDT1-snapshot-20220803"
-          asm_data_capacity      = 200
-          asm_flash_capacity     = 2
-          description            = "Copy of Test NOMIS Audit database in Azure T1PDL0010, Restored from snapshot."
-          termination_protection = true
-          oracle_sids            = ["T1CNMAUD"]
+        CNOMT1TEST = {
+          always_on          = false
+          ami_name           = "nomis_db_STIG_CNOMT1-2022-04-21T11.33.39Z"
+          asm_data_capacity  = 100
+          asm_flash_capacity = 2
+          description        = "Test NOMIS T1 database with a dataset of T1PDL0009 (note: only NOMIS db, NDH db is not included."
+          oracle_sids        = ["CNOMT1"]
           tags = {
-            monitored = true
+            monitored = false
           }
         },
       },
