@@ -30,7 +30,7 @@ resource "aws_security_group_rule" "egress_traffic_lb" {
   source_security_group_id = aws_security_group.example_load_balancer_sg.id
 }
 
-# Build loadbalancer
+# Build loadbalancer #tfsec:ignore:aws-elb-alb-not-public as the external lb needs to be public.
 resource "aws_lb" "external" {
   name                       = "${local.application_name}-loadbalancer"
   load_balancer_type         = "application"
