@@ -177,7 +177,7 @@ resource "aws_kms_grant" "image-builder-shared-cmk-grant" {
     "Decrypt",
     "ReEncryptFrom",
     "GenerateDataKey",
-    "GenereateDataKeyWithoutPlaintext",
+    "GenerateDataKeyWithoutPlaintext",
     "DescribeKey",
     "CreateGrant"
   ]
