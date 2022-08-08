@@ -118,17 +118,17 @@ resource "aws_route53_record" "external_validation" {
   zone_id         = data.aws_route53_zone.network-services.zone_id
 }
 
-resource "aws_route53_record" "external_validation_subdomain" {
-  count    = length(local.domain_name_sub)
-  provider = aws.core-vpc
+# resource "aws_route53_record" "external_validation_subdomain" {
+#   count    = length(local.domain_name_sub)
+#   provider = aws.core-vpc
 
-  allow_overwrite = true
-  name            = local.domain_name_sub[count.index]
-  records         = [local.domain_record_sub[count.index]]
-  ttl             = 60
-  type            = local.domain_type_sub[count.index]
-  zone_id         = data.aws_route53_zone.external_r53_zone.zone_id
-}
+#   allow_overwrite = true
+#   name            = local.domain_name_sub[count.index]
+#   records         = [local.domain_record_sub[count.index]]
+#   ttl             = 60
+#   type            = local.domain_type_sub[count.index]
+#   zone_id         = data.aws_route53_zone.external_r53_zone.zone_id
+# }
 
 resource "aws_acm_certificate_validation" "prtg_lb_cert_validation" {
   certificate_arn         = aws_acm_certificate.prtg_lb_cert.arn
