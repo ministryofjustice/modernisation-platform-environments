@@ -38,8 +38,8 @@ resource "aws_instance" "develop" {
   ami                    = local.application_data.accounts[local.environment].ami_image_id
   vpc_security_group_ids = [aws_security_group.example_ec2_sg.id]
   subnet_id              = data.aws_subnet.private_subnets_a.id
-  monitoring = true
-  ebs_optimized = true
+  monitoring             = true
+  ebs_optimized          = true
 
   metadata_options {
     http_endpoint = "enabled"

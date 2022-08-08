@@ -32,12 +32,12 @@ resource "aws_security_group_rule" "egress_traffic_lb" {
 
 # Build loadbalancer
 resource "aws_lb" "external" {
-  name               = "${local.application_name}-loadbalancer"
-  load_balancer_type = "application"
-  subnets            = data.aws_subnets.shared-public.ids
+  name                       = "${local.application_name}-loadbalancer"
+  load_balancer_type         = "application"
+  subnets                    = data.aws_subnets.shared-public.ids
   enable_deletion_protection = true
   # allow 60*4 seconds before 504 gateway timeout for long-running DB operations
-  idle_timeout = 240
+  idle_timeout               = 240
   drop_invalid_header_fields = true
 
   security_groups = [aws_security_group.example_load_balancer_sg.id]
