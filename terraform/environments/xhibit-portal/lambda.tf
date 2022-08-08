@@ -118,6 +118,7 @@ resource "aws_iam_role" "delete_snapshot_lambda" {
             "ec2:DescribeImageAttribute",
             "ec2:DeregisterImage",
             "ec2:DescribeImages",
+            "ec2:DescribeInstaces",
             "ec2:DescribeSnapshotAttribute",
             "ec2:DescribeSnapshots",
             "ec2:DescribeTags",
