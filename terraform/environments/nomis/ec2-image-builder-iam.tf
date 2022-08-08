@@ -170,7 +170,7 @@ resource "aws_iam_role_policy_attachment" "launch-template-reader-policy-attach"
 
 resource "aws_kms_grant" "image-builder-shared-cmk-grant" {
   name              = "image-builder-shared-cmk-grant"
-  key_id            = data.aws_kms_key.hmpps_key.key_id
+  key_id            = data.aws_kms_key.hmpps_key.arn
   grantee_principal = "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling"
   operations = [
     "Encrypt",
