@@ -35,7 +35,7 @@ resource "aws_lb" "external" {
   name               = "${local.application_name}-loadbalancer"
   load_balancer_type = "application"
   subnets            = data.aws_subnets.shared-public.ids
-  # enable_deletion_protection = true
+  enable_deletion_protection = true
   # allow 60*4 seconds before 504 gateway timeout for long-running DB operations
   idle_timeout = 240
   drop_invalid_header_fields = true
@@ -93,6 +93,7 @@ resource "aws_lb_listener" "external" {
   load_balancer_arn = aws_lb.external.arn
   port              = local.application_data.accounts[local.environment].server_port
   protocol          = local.application_data.accounts[local.environment].lb_listener_protocol
+  ssl_policy        = "ELBSecurityPolicy-TLS-1-2-2017-01"
 
   default_action {
     type             = "forward"

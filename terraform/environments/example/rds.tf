@@ -6,6 +6,7 @@
 resource "aws_db_instance" "Example-RDS" {
   engine                      = "mysql"
   engine_version              = "5.7"
+  auto_minor_version_upgrade  = true
   instance_class              = local.application_data.accounts[local.environment].db_instance_class
   db_name                     = "${local.application_name}${local.environment}database"
   identifier                  = "${local.application_name}-${local.environment}-database"
@@ -19,6 +20,11 @@ resource "aws_db_instance" "Example-RDS" {
   allow_major_version_upgrade = local.application_data.accounts[local.environment].allow_major_version_upgrade
   backup_window               = local.application_data.accounts[local.environment].backup_window
   backup_retention_period     = local.application_data.accounts[local.environment].retention_period
+  iam_database_authentication_enabled = true
+  multi_az                    = true
+  monitoring_interval         = 5
+  storage_encrypted           = true
+  enabled_cloudwatch_logs_exports = ["general", "error", "slowquery"]
   tags = merge(local.tags,
     { Name = lower(format("%s-%s-example", local.application_name, local.environment)) }
   )
