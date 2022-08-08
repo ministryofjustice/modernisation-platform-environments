@@ -38,6 +38,7 @@ resource "aws_lb" "external" {
   # enable_deletion_protection = true
   # allow 60*4 seconds before 504 gateway timeout for long-running DB operations
   idle_timeout = 240
+  drop_invalid_header_fields = true
 
   security_groups = [aws_security_group.example_load_balancer_sg.id]
 
