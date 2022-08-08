@@ -175,8 +175,9 @@ resource "aws_kms_grant" "image-builder-shared-cmk-grant" {
   operations = [
     "Encrypt",
     "Decrypt",
-    "ReEncrypt*",
-    "GenerateDataKey*",
+    "ReEncryptFrom",
+    "GenerateDataKey",
+    "GenereateDataKeyWithoutPlaintext",
     "DescribeKey",
     "CreateGrant"
   ]
