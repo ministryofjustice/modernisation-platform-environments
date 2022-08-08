@@ -107,16 +107,16 @@ resource "aws_acm_certificate" "prtg_lb_cert" {
   }
 }
 
-# resource "aws_route53_record" "external_validation_prtg" {
-#   provider = aws.core-network-services
+resource "aws_route53_record" "external_validation_prtg" {
+  provider = aws.core-network-services
 
-#   allow_overwrite = true
-#   name            = local.domain_name_main[0]
-#   records         = local.domain_record_main
-#   ttl             = 60
-#   type            = local.domain_type_main[0]
-#   zone_id         = data.aws_route53_zone.network-services.zone_id
-# }
+  allow_overwrite = true
+  name            = local.domain_name_main[0]
+  records         = local.domain_record_main
+  ttl             = 60
+  type            = local.domain_type_main[0]
+  zone_id         = data.aws_route53_zone.network-services.zone_id
+}
 
 resource "aws_route53_record" "external_validation_subdomain_prtg" {
   count    = length(local.domain_name_sub)
