@@ -81,7 +81,7 @@ locals {
             monitored = true
           }
         },
-        CNOMT1 = {
+        CNOMT1TEST = {
           always_on          = false
           ami_name           = "nomis_db_CNOMT1-2022-03-04T14.55.18Z"
           asm_data_capacity  = 100
@@ -170,7 +170,7 @@ locals {
           tags = {
             monitored = false //not yet live
           }
-        },
+        }
       },
       # Add weblogic instances here.  They will be created using the weblogic module
       weblogics = {}
