@@ -20,11 +20,11 @@ resource "aws_db_instance" "Example-RDS" {
   allow_major_version_upgrade = local.application_data.accounts[local.environment].allow_major_version_upgrade
   backup_window               = local.application_data.accounts[local.environment].backup_window
   backup_retention_period     = local.application_data.accounts[local.environment].retention_period
-  iam_database_authentication_enabled = true
-  multi_az                    = true
-  monitoring_interval         = 5
+  iam_database_authentication_enabled = local.application_data.accounts[local.environment].db_iam_database_authentication_enabled
+  multi_az                    = local.application_data.accounts[local.environment].db_multi_az
+  monitoring_interval         = local.application_data.accounts[local.environment].db_monitoring_interval
   storage_encrypted           = true
-  enabled_cloudwatch_logs_exports = ["general", "error", "slowquery"]
+  enabled_cloudwatch_logs_exports = local.application_data.accounts[local.environment].db_enabled_cloudwatch_logs_exports
   tags = merge(local.tags,
     { Name = lower(format("%s-%s-example", local.application_name, local.environment)) }
   )

@@ -15,8 +15,12 @@
           "allow_major_version_upgrade":"false",
           "lb_listener_protocol":"HTTP",
           "backup_window":"16:00-17:00",
-          "maintenance_window":"Sun:00:00-Sun:03:00"
-          },           
+          "maintenance_window":"Sun:00:00-Sun:03:00",
+          "db_multi_az": "false",
+          "db_iam_database_authentication_enabled": "true",
+          "db_monitoring_interval": "5",
+          "db_enabled_cloudwatch_logs_exports": ["audit", "error", "general", "slowquery"]
+          },
         "test": {
           "example_var": "test-data"
         },

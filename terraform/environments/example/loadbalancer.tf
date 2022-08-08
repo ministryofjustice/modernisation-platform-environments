@@ -93,7 +93,7 @@ resource "aws_lb_listener" "external" {
   load_balancer_arn = aws_lb.external.arn
   port              = local.application_data.accounts[local.environment].server_port
   protocol          = local.application_data.accounts[local.environment].lb_listener_protocol
-  ssl_policy        = "ELBSecurityPolicy-TLS-1-2-2017-01"
+  ssl_policy        = local.application_data.accounts[local.environment].lb_ssl_policy
 
   default_action {
     type             = "forward"
