@@ -107,7 +107,7 @@ resource "aws_acm_certificate" "prtg_lb_cert" {
   }
 }
 
-# resource "aws_route53_record" "external_validation" {
+# resource "aws_route53_record" "external_validation_prtg" {
 #   provider = aws.core-network-services
 
 #   allow_overwrite = true
@@ -118,7 +118,7 @@ resource "aws_acm_certificate" "prtg_lb_cert" {
 #   zone_id         = data.aws_route53_zone.network-services.zone_id
 # }
 
-resource "aws_route53_record" "external_validation_subdomain" {
+resource "aws_route53_record" "external_validation_subdomain_prtg" {
   count    = length(local.domain_name_sub)
   provider = aws.core-vpc
 
