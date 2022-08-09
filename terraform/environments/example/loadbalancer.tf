@@ -42,6 +42,12 @@ resource "aws_lb" "external" {
 
   security_groups = [aws_security_group.example_load_balancer_sg.id]
 
+  access_logs {
+    bucket  = aws_s3_bucket.lb_logs.bucket
+    prefix  = "test-lb"
+    enabled = true
+  }
+
   tags = merge(
     local.tags,
     {
@@ -63,7 +69,7 @@ resource "aws_lb_target_group" "target_group" {
   stickiness {
     type = "lb_cookie"
   }
-
+  #checkov:skip=CKV_AWS_261: "health_check defined below, but not picked up"
   health_check {
     healthy_threshold   = "5"
     interval            = "120"
@@ -92,8 +98,10 @@ resource "aws_lb_target_group_attachment" "develop" {
 resource "aws_lb_listener" "external" {
   load_balancer_arn = aws_lb.external.arn
   port              = local.application_data.accounts[local.environment].server_port
-  protocol          = local.application_data.accounts[local.environment].lb_listener_protocol   #checkov:skip=CKV_AWS_2: "protocol for lb set in application_variables"
-  ssl_policy        = local.application_data.accounts[local.environment].lb_ssl_policy #checkov:skip=CKV_AWS_103: "ssl_policy for lb set in application_variables"
+  protocol          = local.application_data.accounts[local.environment].lb_listener_protocol
+  #checkov:skip=CKV_AWS_2: "protocol for lb set in application_variables"
+  ssl_policy        = local.application_data.accounts[local.environment].lb_ssl_policy
+  #checkov:skip=CKV_AWS_103: "ssl_policy for lb set in application_variables"
 
   default_action {
     type             = "forward"

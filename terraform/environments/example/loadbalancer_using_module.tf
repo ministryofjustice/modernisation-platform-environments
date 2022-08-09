@@ -60,4 +60,13 @@ resource "aws_lb_target_group" "target_group_module" {
   stickiness {
     type = "lb_cookie"
   }
+  #checkov:skip=CKV_AWS_261: "health_check defined below, but not picked up"
+  health_check {
+    healthy_threshold   = "5"
+    interval            = "120"
+    protocol            = "HTTP"
+    unhealthy_threshold = "2"
+    matcher             = "200-499"
+    timeout             = "5"
+  }
 }

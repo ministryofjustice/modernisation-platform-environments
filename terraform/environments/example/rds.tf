@@ -20,11 +20,17 @@ resource "aws_db_instance" "Example-RDS" {
   maintenance_window          = local.application_data.accounts[local.environment].maintenance_window
   allow_major_version_upgrade = local.application_data.accounts[local.environment].allow_major_version_upgrade
   backup_window               = local.application_data.accounts[local.environment].backup_window
-  backup_retention_period     = local.application_data.accounts[local.environment].retention_period #checkov:skip=CKV_AWS_133: "backup_retention enabled, can be edited it application_variables.json"
-  iam_database_authentication_enabled = local.application_data.accounts[local.environment].db_iam_database_authentication_enabled  #checkov:skip=CKV_AWS_161: "iam auth enabled, but optional"
-  multi_az                    = local.application_data.accounts[local.environment].db_multi_az  #checkov:skip=CKV_AWS_157: "multi-az enabled, but optional"
-  monitoring_interval         = local.application_data.accounts[local.environment].db_monitoring_interval #checkov:skip=CKV_AWS_118: "enhanced monitoring is enabled, but optional"
+  backup_retention_period     = local.application_data.accounts[local.environment].retention_period
+  #checkov:skip=CKV_AWS_133: "backup_retention enabled, can be edited it application_variables.json"
+  iam_database_authentication_enabled = local.application_data.accounts[local.environment].db_iam_database_authentication_enabled
+  #checkov:skip=CKV_AWS_161: "iam auth enabled, but optional"
+  multi_az                    = local.application_data.accounts[local.environment].db_multi_az
+  #checkov:skip=CKV_AWS_157: "multi-az enabled, but optional"
+  monitoring_interval         = local.application_data.accounts[local.environment].db_monitoring_interval
+  #checkov:skip=CKV_AWS_118: "enhanced monitoring is enabled, but optional"
   storage_encrypted           = true
+  performance_insights_enabled = true
+  performance_insights_kms_key_id = "arn:aws:kms:us-west-2:111122223333:key/1234abcd-12ab-34cd-56ef-1234567890ab"
   enabled_cloudwatch_logs_exports = local.application_data.accounts[local.environment].db_enabled_cloudwatch_logs_exports
   tags = merge(local.tags,
     { Name = lower(format("%s-%s-example", local.application_name, local.environment)) }
