@@ -1,5 +1,6 @@
 # We want to delete old ami/snapshots created by the index.py lambda function
 import boto3
+import botocore
 from datetime import datetime, timedelta
 from dateutil import parser
 
@@ -30,14 +31,16 @@ def lambda_handler(event, context):
                             print(f"Deleting Snapshot {snap_id}")
                             client.delete_snapshot(
                                 SnapshotId=snap_id, dry_run=True)
-                        except Exception as e:
-                            if "InvalidSnapshot.InUse" in e.message:
-                                print(f"Snapshot {id} in use")
-                                continue
+                        except botocore.exceptions.ClientError as e:
+                            print(
+                                f"Error deleting Snapshot {e.response['Error']['Message']}"
+                            )
+                            continue
                 try:
                     image_id = image["ImageId"]
                     print(f"Deleting Image {image_id}")
                     client.deregister_image(ImageId=image_id, dry_run=True)
-                except Exception as e:
-                    print(f"Error deleting image: {e.message}")
+                except botocore.exceptions.ClientError as e:
+                    print(
+                        f"Error deleting AMI {e.response['Error']['Message']}")
                     continue
