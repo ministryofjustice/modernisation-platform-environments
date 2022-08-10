@@ -1,26 +1,26 @@
 {
   "accounts": {
     "development": {
-      "region": "eu-west-2",
+      "allow_major_version_upgrade": "false",
       "ami_image_id": "ami-0d729d2846a86a9e7",
-      "instance_type": "t2.micro",
-      "key_name": "example-development-ec2",
+      "backup_window": "16:00-17:00",
       "db_instance_class": "db.t3.micro",
-      "server_port": "80",
       "db_user": "admin",
       "db_allocated_storage": "50",
       "db_max_allocated_storage": "100",
-      "retention_period": "14",
-      "skip_final_snapshot": "true",
-      "allow_major_version_upgrade": "false",
-      "lb_listener_protocol": "HTTP",
-      "backup_window": "16:00-17:00",
-      "maintenance_window": "Sun:00:00-Sun:03:00",
       "db_multi_az": "false",
       "db_iam_database_authentication_enabled": "true",
       "db_monitoring_interval": "5",
       "db_enabled_cloudwatch_logs_exports": ["audit", "error", "general", "slowquery"],
-      "db_performance_insights_enabled": "false"
+      "db_performance_insights_enabled": "false",
+      "instance_type": "t2.micro",
+      "key_name": "example-development-ec2",
+      "lb_listener_protocol": "HTTP",
+      "maintenance_window": "Sun:00:00-Sun:03:00",
+      "region": "eu-west-2",
+      "retention_period": "14",
+      "server_port": "80",
+      "skip_final_snapshot": "true"
     },
     "test": {
       "example_var": "test-data"
