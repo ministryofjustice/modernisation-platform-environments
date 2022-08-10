@@ -6,8 +6,8 @@
 #------------------------------------------------------------------------------
 
 locals {
-  jumpserver_users = [ # must be github username
-    "rwhittlemoj",
+  # This must be a valid github username
+  jumpserver_users = [
     "julialawrence",
     "ewastempel",
     "jnq"
