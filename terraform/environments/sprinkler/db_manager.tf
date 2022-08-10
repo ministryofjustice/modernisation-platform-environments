@@ -124,31 +124,11 @@ EOF
 }
 
 # EC2 Security Group
+#tfsec:ignore:AWS009 #tfsec:ignore:no-public-egress-sgr
 resource "aws_security_group" "db_mgmt_server_security_group" {
   name_prefix = "${local.application_name}-db-mgmt-server-sg"
   description = "controls access to the db mgmt server"
   vpc_id      = data.aws_vpc.shared.id
-
-  ingress {
-    protocol    = "tcp"
-    description = "Open the RDP port"
-    from_port   = 3389
-    to_port     = 3389
-    # with bastion <2.0.2 we used cidr_blocks instead of security_groups:
-    # cidr_blocks = ["${module.bastion_linux.bastion_private_ip}/32"]
-    security_groups = [module.bastion_linux.bastion_security_group]
-  }
-
-  egress {
-    description = "All outbound ports open"
-    protocol    = "-1"
-    from_port   = 0
-    to_port     = 0
-    #tfsec:ignore:AWS009
-    cidr_blocks = [
-      "0.0.0.0/0",
-    ]
-  }
 
   tags = merge(
     local.tags,
@@ -156,6 +136,27 @@ resource "aws_security_group" "db_mgmt_server_security_group" {
       Name = "${local.application_name}-db-mgmt-server-sg"
     }
   )
+}
+
+resource "aws_security_group_rule" "db_ingress_tcp_3389" {
+  protocol              = "tcp"
+  security_group_id     = aws_security_group.db_mgmt_server_security_group.id
+  description           = "Open the RDP port"
+  from_port             = 3389
+  to_port               = 3389
+  source_security_group = [module.bastion_linux.bastion_security_group]
+  type                  = "ingress"
+}
+
+#tfsec:ignore:aws-ec2-no-public-egress-sgr
+resource "aws_security_group_rule" "db_egress_any" {
+  protocol          = -1
+  security_group_id = aws_security_group.db_mgmt_server_security_group.id
+  description       = "All outbound ports open"
+  from_port         = -1
+  to_port           = -1
+  cidr_blocks       = ["0.0.0.0/0"]
+  type              = "egress"
 }
 
 #------------------------------------------------------------------------------
