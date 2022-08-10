@@ -135,7 +135,7 @@ resource "aws_launch_template" "weblogic" {
 resource "aws_autoscaling_group" "weblogic" {
   launch_template {
     id      = aws_launch_template.weblogic.id
-    version = aws_launch_template.weblogic.latest_version
+    version = "$Default"
   }
 
   initial_lifecycle_hook {
@@ -191,11 +191,11 @@ resource "aws_autoscaling_group" "weblogic" {
       propagate_at_launch = true
     }
   }
-  lifecycle {
-    ignore_changes = [
-      launch_template[0].version
-    ]
-  }
+  #   lifecycle {
+  #     ignore_changes = [
+  #       launch_template[0].version
+  #     ]
+  #   }
 }
 
 resource "aws_autoscaling_schedule" "scale_down" {
