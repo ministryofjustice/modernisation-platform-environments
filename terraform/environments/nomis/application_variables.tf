@@ -68,17 +68,18 @@ locals {
             monitored = true
           }
         },
-        # CNOMT1TEST = {
-        #   always_on          = false
-        #   ami_name           = "nomis_db_STIG_CNOMT1-2022-04-21T11.33.39Z"
-        #   asm_data_capacity  = 100
-        #   asm_flash_capacity = 2
-        #   description        = "Test NOMIS T1 database with a dataset of T1PDL0009 (note: only NOMIS db, NDH db is not included."
-        #   oracle_sids        = ["CNOMT1"]
-        #   tags = {
-        #     monitored = false
-        #   }
-        # },
+        CNOMT1TEST = {
+          always_on              = false
+          ami_name               = "nomis_db_CNOMT1-2022-03-04T14.55.18Z"
+          asm_data_capacity      = 100
+          asm_flash_capacity     = 2
+          description            = "Test NOMIS T1 database with a dataset of T1PDL0009 (note: only NOMIS db, NDH db is not included."
+          oracle_sids            = ["CNOMT1"]
+          restored_from_snapshot = true
+          tags = {
+            monitored = false
+          }
+        },
       },
       # Add weblogic instances here.  They will be created using the weblogic module
       weblogics = {
