@@ -12,5 +12,6 @@ data "aws_iam_policy_document" "oidc_assume_role" {
       variable = "aws:PrincipalOrgID"
       values   = [data.aws_organizations_organization.root_account.id]
     }
+    actions = ["sts:AssumeRole"]
   }
 }
