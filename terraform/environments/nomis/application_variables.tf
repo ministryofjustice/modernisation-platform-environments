@@ -162,6 +162,7 @@ locals {
         NDH = {
           always_on              = false
           ami_name               = "nomis_database_2022-08-09T15:04:29.500Z"
+          ami_owner              = local.environment_management.account_ids[terraform.workspace]
           instance_type          = "r6i.xlarge"
           asm_data_capacity      = 4000
           asm_flash_capacity     = 1000
