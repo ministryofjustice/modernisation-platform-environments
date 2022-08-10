@@ -65,20 +65,18 @@ locals {
           termination_protection = true
           oracle_sids            = ["T1CNMAUD"]
           tags = {
-            monitored = false // TODO: while the testing is going on to avoid alert spam
+            monitored = true
           }
         },
-        CNAUDT1DR = {
-          always_on              = true
-          restored_from_snapshot = true
-          ami_name               = "database-CNAUDT1-snapshot-20220803"
-          asm_data_capacity      = 200
-          asm_flash_capacity     = 2
-          description            = "Copy of Test NOMIS Audit database in Azure T1PDL0010, Restored from snapshot."
-          termination_protection = true
-          oracle_sids            = ["T1CNMAUD"]
+        CNOMT1TEST = {
+          always_on          = false
+          ami_name           = "nomis_db_STIG_CNOMT1-2022-04-21T11.33.39Z"
+          asm_data_capacity  = 100
+          asm_flash_capacity = 2
+          description        = "Test NOMIS T1 database with a dataset of T1PDL0009 (note: only NOMIS db, NDH db is not included."
+          oracle_sids        = ["CNOMT1"]
           tags = {
-            monitored = true
+            monitored = false
           }
         },
       },
@@ -143,42 +141,6 @@ locals {
             monitored = true
           }
         },
-        PCNMAUD = {
-          always_on              = true
-          restored_from_snapshot = true
-          ami_name               = "AwsBackup_i-00861f43dc59ce8ce_1B74E1A2-8F97-BC94-9FDD-6D6936275F6B"
-          ami_owner              = local.environment_management.account_ids[terraform.workspace]
-          instance_type          = "r6i.2xlarge"
-          asm_data_capacity      = 4000
-          asm_flash_capacity     = 1000
-          description            = "Production NOMIS Audit database, replicating with PDPDL00038 and PDPDL00037, a replacement for PDPDL00037."
-          termination_protection = false
-          oracle_sids            = ["PCNMAUD"]
-          oracle_app_disk_size = {
-            "/dev/sdb" = 100  # /u01
-            "/dev/sdc" = 5120 # /u02
-          }
-          tags = {
-            monitored = true
-          }
-        },
-        AUDITDR = {
-          always_on              = true
-          ami_name               = "nomis_database_2022-07-21T11-43-27.346Z"
-          ami_owner              = local.environment_management.account_ids[terraform.workspace]
-          instance_type          = "r6i.2xlarge"
-          asm_data_capacity      = 4000
-          asm_flash_capacity     = 1000
-          description            = "DR instance of Oracle DB to perform backup/restore testing."
-          termination_protection = false # temporary VM, will be destroyed
-          oracle_app_disk_size = {
-            "/dev/sdb" = 100  # /u01
-            "/dev/sdc" = 5120 # /u02
-          }
-          tags = {
-            monitored = false
-          }
-        },
         NOMIS = {
           always_on              = true
           ami_name               = "nomis_database_2022-07-21T11-43-27.346Z"
@@ -195,6 +157,24 @@ locals {
           }
           tags = {
             monitored = false //not yet live
+          }
+        },
+        NDH = {
+          always_on              = false
+          ami_name               = "nomis_database_2022-08-09T15-04-29.500Z"
+          ami_owner              = local.environment_management.account_ids[terraform.workspace]
+          instance_type          = "r6i.xlarge"
+          asm_data_capacity      = 4000
+          asm_flash_capacity     = 1000
+          description            = "NDH & TRDATA standby databases in Azure PDPDL00038, replicating with PDPDL00037, a replacement for PDPDL00038."
+          termination_protection = true
+          oracle_sids            = ["PNDH", "PTRDAT"]
+          oracle_app_disk_size = {
+            "/dev/sdb" = 100 # /u01
+            "/dev/sdc" = 512 # /u02
+          }
+          tags = {
+            monitored = false # not yet live
           }
         }
       },

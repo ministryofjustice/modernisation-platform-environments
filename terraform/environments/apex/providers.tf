@@ -20,7 +20,7 @@ provider "aws" {
   region                 = "eu-west-2"
   skip_get_ec2_platforms = true
   assume_role {
-    role_arn = "arn:aws:iam::${local.environment_management.account_ids[local.provider_name]}:role/member-delegation-${local.vpc_name}-sandbox"
+    role_arn = "arn:aws:iam::${local.environment_management.account_ids[local.provider_name]}:role/member-delegation-${local.vpc_name}-${local.environment}"
   }
 }
 
@@ -33,7 +33,6 @@ provider "aws" {
     role_arn = "arn:aws:iam::${local.environment_management.account_ids["core-network-services-production"]}:role/modify-dns-records"
   }
 }
-
 ######################### Run Terraform via CICD ##################################
 
 
