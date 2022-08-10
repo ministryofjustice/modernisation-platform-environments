@@ -95,8 +95,7 @@ resource "aws_acm_certificate" "prtg_lb_cert" {
 
   subject_alternative_names = [
     "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk",
-    "${local.application_data.accounts[local.environment].public_dns_name_prtg}",
-    "monitoring.dev-pportal.cjsonline.gov.uk"
+    "${local.application_data.accounts[local.environment].public_dns_name_prtg}"
   ]
 
   tags = {
@@ -354,7 +353,8 @@ resource "aws_alb_listener_rule" "prtg_http_to_https_redirect" {
   }
   condition {
     path_pattern {
-      values = ["/*"]
+  #    values = ["/*"]
+      values = ["/"]
     }
   }
 
