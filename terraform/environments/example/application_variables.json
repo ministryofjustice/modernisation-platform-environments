@@ -19,7 +19,8 @@
       "db_multi_az": "false",
       "db_iam_database_authentication_enabled": "true",
       "db_monitoring_interval": "5",
-      "db_enabled_cloudwatch_logs_exports": ["audit", "error", "general", "slowquery"]
+      "db_enabled_cloudwatch_logs_exports": ["audit", "error", "general", "slowquery"],
+      "db_performance_insights_enabled": "false"
     },
     "test": {
       "example_var": "test-data"

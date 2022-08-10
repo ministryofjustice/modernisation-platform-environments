@@ -29,8 +29,8 @@ resource "aws_db_instance" "Example-RDS" {
   monitoring_interval         = local.application_data.accounts[local.environment].db_monitoring_interval
   #checkov:skip=CKV_AWS_118: "enhanced monitoring is enabled, but optional"
   storage_encrypted           = true
-  performance_insights_enabled = true
-  performance_insights_kms_key_id = "arn:aws:kms:us-west-2:111122223333:key/1234abcd-12ab-34cd-56ef-1234567890ab"
+  performance_insights_enabled = local.application_data.accounts[local.environment].db_performance_insights_enabled
+  performance_insights_kms_key_id = "" #tfsec:ignore:aws-rds-enable-performance-insights-encryption Left empty so that it will run, however should be populated with real key in scenario.
   enabled_cloudwatch_logs_exports = local.application_data.accounts[local.environment].db_enabled_cloudwatch_logs_exports
   tags = merge(local.tags,
     { Name = lower(format("%s-%s-example", local.application_name, local.environment)) }

@@ -109,3 +109,62 @@ resource "aws_lb_listener" "external" {
   }
 }
 
+# Creation of a WAFv2
+
+resource "aws_wafv2_web_acl" "external" {
+  #checkov:skip=CKV2_AWS_31:Logging example commented out below, example is sound but no logging configuration for it to build.
+  name  = "example-web-acl"
+  scope = "REGIONAL"
+
+  default_action {
+    allow {}
+  }
+
+  rule {
+    name     = "AWS-AWSManagedRulesKnownBadInputsRuleSet"
+    priority = 1
+
+    override_action {
+      none {}
+    }
+
+    statement {
+      managed_rule_group_statement {
+        name        = "AWSManagedRulesKnownBadInputsRuleSet"
+        vendor_name = "AWS"
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = false
+      metric_name                = "friendly-rule-metric-name"
+      sampled_requests_enabled   = false
+    }
+  }
+
+  visibility_config {
+    cloudwatch_metrics_enabled = false
+    metric_name                = "my-web-acl"
+    sampled_requests_enabled   = false
+  }
+}
+
+# Association code for WAFv2 to the LB
+
+resource "aws_wafv2_web_acl_association" "web_acl_association_my_lb" {
+  resource_arn = aws_lb.external.arn
+  web_acl_arn  = aws_wafv2_web_acl.external.arn
+}
+
+# Logging for WAF, it's commented out because it wouldn't build, however it's a basic example.
+
+#resource "aws_wafv2_web_acl_logging_configuration" "external" {
+#  log_destination_configs = [aws_kinesis_firehose_delivery_stream.example.arn]
+#  resource_arn            = aws_wafv2_web_acl.external.arn
+#  redacted_fields {
+#    single_header {
+#      name = "user-agent"
+#    }
+#  }
+#}
+
