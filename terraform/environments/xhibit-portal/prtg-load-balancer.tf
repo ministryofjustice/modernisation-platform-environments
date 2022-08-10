@@ -339,7 +339,7 @@ data "aws_iam_policy_document" "s3_bucket_prtg_logs_policy" {
 
 resource "aws_alb_listener_rule" "prtg_http_to_https_redirect" {
   priority = 1
-  
+
   depends_on   = [aws_lb_listener.prtg_lb_listener]
   listener_arn = aws_lb_listener.prtg_lb_listener.arn
   
@@ -350,7 +350,8 @@ resource "aws_alb_listener_rule" "prtg_http_to_https_redirect" {
     redirect {
       status_code = "HTTP_301"
       port        = "443"
-      protocol    = "HTTPS"
+#      protocol    = "HTTPS"
+      path        = "/index.htm"
       # path       = "monitoring.pportal.cjsonline.gov.uk/public/mapshow.htm?id=2270&mapid=EE1CB6BA-590C-4D06-BB63-F6FDB8E09C06"
     }
   }
