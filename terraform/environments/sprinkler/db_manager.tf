@@ -139,13 +139,13 @@ resource "aws_security_group" "db_mgmt_server_security_group" {
 }
 
 resource "aws_security_group_rule" "db_ingress_tcp_3389" {
-  protocol              = "tcp"
-  security_group_id     = aws_security_group.db_mgmt_server_security_group.id
-  description           = "Open the RDP port"
-  from_port             = 3389
-  to_port               = 3389
-  source_security_group = [module.bastion_linux.bastion_security_group]
-  type                  = "ingress"
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.db_mgmt_server_security_group.id
+  description              = "Open the RDP port"
+  from_port                = 3389
+  to_port                  = 3389
+  source_security_group_id = module.bastion_linux.bastion_security_group
+  type                     = "ingress"
 }
 
 #tfsec:ignore:aws-ec2-no-public-egress-sgr
