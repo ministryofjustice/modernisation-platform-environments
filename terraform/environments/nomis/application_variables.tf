@@ -169,7 +169,7 @@ locals {
           termination_protection = true
           oracle_sids            = ["PNDH", "PTRDAT"]
           oracle_app_disk_size = {
-            "/dev/sdb" = 100  # /u01
+            "/dev/sdb" = 100 # /u01
             "/dev/sdc" = 512 # /u02
           }
           tags = {
