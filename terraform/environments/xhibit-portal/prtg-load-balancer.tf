@@ -353,7 +353,7 @@ resource "aws_alb_listener_rule" "prtg_http_to_https_redirect" {
   }
   condition {
     path_pattern {
-  #    values = ["/*"]
+      #    values = ["/*"]
       values = ["/"]
     }
   }
