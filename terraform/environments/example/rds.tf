@@ -24,12 +24,12 @@ resource "aws_db_instance" "Example-RDS" {
   #checkov:skip=CKV_AWS_133: "backup_retention enabled, can be edited it application_variables.json"
   iam_database_authentication_enabled = local.application_data.accounts[local.environment].db_iam_database_authentication_enabled
   #checkov:skip=CKV_AWS_161: "iam auth enabled, but optional"
-  multi_az                    = local.application_data.accounts[local.environment].db_multi_az
+  multi_az = local.application_data.accounts[local.environment].db_multi_az
   #checkov:skip=CKV_AWS_157: "multi-az enabled, but optional"
-  monitoring_interval         = local.application_data.accounts[local.environment].db_monitoring_interval
+  monitoring_interval = local.application_data.accounts[local.environment].db_monitoring_interval
   #checkov:skip=CKV_AWS_118: "enhanced monitoring is enabled, but optional"
-  storage_encrypted           = true
-  performance_insights_enabled = local.application_data.accounts[local.environment].db_performance_insights_enabled
+  storage_encrypted               = true
+  performance_insights_enabled    = local.application_data.accounts[local.environment].db_performance_insights_enabled
   performance_insights_kms_key_id = "" #tfsec:ignore:aws-rds-enable-performance-insights-encryption Left empty so that it will run, however should be populated with real key in scenario.
   enabled_cloudwatch_logs_exports = local.application_data.accounts[local.environment].db_enabled_cloudwatch_logs_exports
   tags = merge(local.tags,
