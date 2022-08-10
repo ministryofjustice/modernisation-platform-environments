@@ -95,7 +95,7 @@ resource "aws_acm_certificate" "prtg_lb_cert" {
 
   subject_alternative_names = [
     "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk",
-    "${local.application_data.accounts[local.environment].public_dns_name_web}",
+    "${local.application_data.accounts[local.environment].public_dns_name_prtg}"
   ]
 
   tags = {
@@ -107,33 +107,32 @@ resource "aws_acm_certificate" "prtg_lb_cert" {
   }
 }
 
-# Leave in the route 53 record comments until we are ready to request DNS from Platform Guys/Girls
-# resource "aws_route53_record" "external_validation" {
-#   provider = aws.core-network-services
+resource "aws_route53_record" "external_validation_prtg" {
+  provider = aws.core-network-services
 
-#   allow_overwrite = true
-#   name            = local.domain_name_main[0]
-#   records         = local.domain_record_main
-#   ttl             = 60
-#   type            = local.domain_type_main[0]
-#   zone_id         = data.aws_route53_zone.network-services.zone_id
-# }
+  allow_overwrite = true
+  name            = local.prtg_domain_name_main[0]
+  records         = local.prtg_domain_record_main
+  ttl             = 60
+  type            = local.prtg_domain_type_main[0]
+  zone_id         = data.aws_route53_zone.network-services.zone_id
+}
 
-# resource "aws_route53_record" "external_validation_subdomain" {
-#   count    = length(local.domain_name_sub)
-#   provider = aws.core-vpc
+resource "aws_route53_record" "external_validation_subdomain_prtg" {
+  count    = length(local.prtg_domain_name_sub)
+  provider = aws.core-vpc
 
-#   allow_overwrite = true
-#   name            = local.domain_name_sub[count.index]
-#   records         = [local.domain_record_sub[count.index]]
-#   ttl             = 60
-#   type            = local.domain_type_sub[count.index]
-#   zone_id         = data.aws_route53_zone.external_r53_zone.zone_id
-# }
+  allow_overwrite = true
+  name            = local.prtg_domain_name_sub[count.index]
+  records         = [local.prtg_domain_record_sub[count.index]]
+  ttl             = 60
+  type            = local.prtg_domain_type_sub[count.index]
+  zone_id         = data.aws_route53_zone.external_r53_zone.zone_id
+}
 
 resource "aws_acm_certificate_validation" "prtg_lb_cert_validation" {
   certificate_arn         = aws_acm_certificate.prtg_lb_cert.arn
-  validation_record_fqdns = [for record in local.domain_types : record.name]
+  validation_record_fqdns = [for record in local.prtg_domain_types : record.name]
 }
 
 resource "aws_wafv2_web_acl" "prtg_acl" {
@@ -334,6 +333,41 @@ data "aws_iam_policy_document" "s3_bucket_prtg_logs_policy" {
     principals {
       identifiers = ["delivery.logs.amazonaws.com"]
       type        = "Service"
+    }
+  }
+}
+
+resource "aws_alb_listener_rule" "prtg_http_to_https_redirect" {
+  priority = 1
+
+  depends_on   = [aws_lb_listener.prtg_lb_listener]
+  listener_arn = aws_lb_listener.prtg_lb_listener.arn
+
+  # port         = "80"
+  # protocol     = "HTTP"
+  action {
+    type = "redirect"
+    redirect {
+      status_code = "HTTP_301"
+      #      port        = "443"
+      #      protocol    = "HTTPS"
+      path = "/index.htm"
+      # path       = "monitoring.pportal.cjsonline.gov.uk/public/mapshow.htm?id=2270&mapid=EE1CB6BA-590C-4D06-BB63-F6FDB8E09C06"
+    }
+  }
+  condition {
+    path_pattern {
+      #    values = ["/*"]
+      values = ["/"]
+    }
+  }
+
+  condition {
+    host_header {
+
+      values = [
+        local.application_data.accounts[local.environment].public_dns_name_prtg
+      ]
     }
   }
 }
