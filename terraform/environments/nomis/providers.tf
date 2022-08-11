@@ -78,3 +78,7 @@ provider "aws" {
 #   }
 # }
 ######################### Run Terraform Plan Locally Only ##################################
+
+provider "github" {
+  owner = "ministryofjustice"
+}
