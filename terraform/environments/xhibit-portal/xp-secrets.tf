@@ -1,3 +1,6 @@
+# Get account id
+data "aws_caller_identity" "current" {}
+
 # JSON Policy for accessing created secrets
 
 resource "aws_secretsmanager_secret_policy" "test-policy" {
@@ -10,7 +13,7 @@ resource "aws_secretsmanager_secret_policy" "test-policy" {
     "Sid" : "AdministratorFullAccess",
     "Effect" : "Allow",
     "Principal" : {
-      "AWS" : "arn:aws:iam::276038508461:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_AdministratorAccess_1c8be6e1a517e14c"
+      "AWS" : "arn:aws:iam::"${data.aws_caller_identity.current.account_id}":role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_AdministratorAccess_1c8be6e1a517e14c"
     },
     "Action" : "secretsmanager:*",
     "Resource" : "*"
@@ -27,7 +30,15 @@ resource "random_password" "random_password" {
   special = false
 }
 
-# Secret names to create and updated manually in console
+# placeholder plainttext data
+
+data "aws_secretsmanager_secrets" "plainttext" {
+  text = "<<EOF
+  ----start----
+  gdfgdfgdfgdfg
+  ----end----
+  EOF"
+}
 
 resource "aws_secretsmanager_secret" "test" {
   name        = "test"
@@ -36,31 +47,30 @@ resource "aws_secretsmanager_secret" "test" {
 
 resource "aws_secretsmanager_secret_version" "test" {
   secret_id     = aws_secretsmanager_secret.test.id
-  secret_string = <<EOF
-  ----start----
-  gdfgdfgdfgdfg
-  dfgdfgdffgdfg
-  dfgdfgdfgdfgd
-  ----end----
-  EOF
+  secret_string = data.aws_secretsmanager_secrets.plainttext.text
 }
 
 #resource "aws_secretsmanager_secret" "prtgadmin" {
 #  name = "prtgadmin"
-#  description = ""
+#  description = "Root admin account used for the PRTG system on the import machine"
 #}
 #
 #resource "aws_secretsmanager_secret" "george" {
 #  name = "george.pem"
-#  description = ""
+#  description = "Private key for keypair george"
 #}
 #
 #resource "aws_secretsmanager_secret" "aladmin" {
 #  name = "aladmin"
-#  description = ""
+#  description = "The local admin password for the user 'aladmin' on our domain joined EC2 instances"
 #}
 #
-#resource "aws_secretsmanager_secret" "example" {
-#  name = "example"
-#  description = ""
+#resource "aws_secretsmanager_secret" "domainadmin-aladmin" {
+#  name = "aladmin@cjse.sema.local"
+#  description = "Domain admin account"
+#}
+#
+#resource "aws_secretsmanager_secret" "zgit" {
+#  name = "zgit.pem"
+#  description = "key pair used for the zgit-server-xhibit-portal"
 #}
