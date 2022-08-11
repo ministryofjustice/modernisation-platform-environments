@@ -19,7 +19,7 @@ resource "aws_secretsmanager_secret_policy" "test-policy" {
 POLICY
 }
 
-# random placeholder secret
+# random placeholder secret to create the secret name
 
 resource "random_password" "random_password" {
 
@@ -29,27 +29,38 @@ resource "random_password" "random_password" {
 
 # Secret names to create and updated manually in console
 
-resource "aws_secretsmanager_secret" "test-secret" {
-  name = "test-secret"
+resource "aws_secretsmanager_secret" "test" {
+  name = "test"
+  description = "testing plain text creation"
 }
 
 resource "aws_secretsmanager_secret_version" "test-secret" {
   secret_id     = aws_secretsmanager_secret.test-secret.id
-  secret_string = random_password.random_password.result
+  secret_string = <<EOF
+  ----start----
+  gdfgdfgdfgdfg
+  dfgdfgdffgdfg
+  dfgdfgdfgdfgd
+  ----end----
+  EOF
 }
 
 #resource "aws_secretsmanager_secret" "prtgadmin" {
 #  name = "prtgadmin"
+#  description = ""
 #}
 #
 #resource "aws_secretsmanager_secret" "george" {
 #  name = "george.pem"
+#  description = ""
 #}
 #
 #resource "aws_secretsmanager_secret" "aladmin" {
 #  name = "aladmin"
+#  description = ""
 #}
 #
 #resource "aws_secretsmanager_secret" "example" {
 #  name = "example"
+#  description = ""
 #}
