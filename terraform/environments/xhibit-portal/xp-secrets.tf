@@ -1,6 +1,3 @@
-# Get account id
-data "aws_caller_identity" "current" {}
-
 # JSON Policy for accessing created secrets
 
 resource "aws_secretsmanager_secret_policy" "test-policy" {
