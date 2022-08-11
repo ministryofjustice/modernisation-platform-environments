@@ -30,7 +30,7 @@ resource "random_password" "random_password" {
 # Secret names to create and updated manually in console
 
 resource "aws_secretsmanager_secret" "test" {
-  name = "test"
+  name        = "test"
   description = "testing plain text creation"
 }
 
