@@ -20,6 +20,7 @@ env:
   AWS_SECRET_ACCESS_KEY:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   TF_IN_AUTOMATION: true
   GITHUB_TOKEN: ${{ secrets.DSO_GITHUB_AUTOMATION_PAT }}
+  GITHUB_OWNER: ministryofjustice
 defaults:
   run:
     shell: bash
