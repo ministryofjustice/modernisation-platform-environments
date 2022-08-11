@@ -18,6 +18,8 @@ on:
 env:
   AWS_ACCESS_KEY_ID:  ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  GITHUB_TOKEN: ${{ secrets.DSO_GITHUB_AUTOMATION_PAT }}
+  GITHUB_USERNAME: hmpps-dso-automation
   TF_IN_AUTOMATION: true
 defaults:
   run:
@@ -88,6 +90,10 @@ jobs:
         with:
           terraform_version: "~1"
           terraform_wrapper: false
+      - name: Setup GitHub credential helper for terraform
+        uses: fusion-engineering/setup-git-credentials@v2
+        with:
+          credentials: https://${{ env.GITHUB_USERNAME }}:${{ env.GITHUB_TOKEN }}@github.com
       - name: Terraform plan - ${{ matrix.tf-env }}
         run: |
           terraform --version
@@ -95,8 +101,6 @@ jobs:
           bash scripts/terraform-init.sh terraform/environments/nomis
           terraform -chdir="terraform/environments/nomis" workspace select "nomis-${{ matrix.tf-env }}"
           bash scripts/terraform-plan.sh terraform/environments/nomis
-        env:
-          GITHUB_TOKEN: ${{ secrets.DSO_GITHUB_AUTOMATION_PAT }}
 
   # plan-test:
   #   name: Plan Test - nomis
@@ -134,6 +138,10 @@ jobs:
         with:
           terraform_version: "~1"
           terraform_wrapper: false
+      - name: Setup GitHub credential helper for terraform
+        uses: fusion-engineering/setup-git-credentials@v2
+        with:
+          credentials: https://${{ env.GITHUB_USERNAME }}:${{ env.GITHUB_TOKEN }}@github.com
       - name: Terraform apply - test
         run: |
           terraform --version
@@ -143,7 +151,6 @@ jobs:
           bash scripts/terraform-apply.sh terraform/environments/nomis
         env:
           TF_ENV: test
-          GITHUB_TOKEN: ${{ secrets.DSO_GITHUB_AUTOMATION_PAT }}
 
 #   # These jobs run after merging to main
 #   plan-preproduction:
@@ -204,6 +211,10 @@ jobs:
         with:
           terraform_version: "~1"
           terraform_wrapper: false
+      - name: Setup GitHub credential helper for terraform
+        uses: fusion-engineering/setup-git-credentials@v2
+        with:
+          credentials: https://${{ env.GITHUB_USERNAME }}:${{ env.GITHUB_TOKEN }}@github.com
       - name: Terraform plan - production
         run: |
           terraform --version
@@ -213,7 +224,6 @@ jobs:
           bash scripts/terraform-plan.sh terraform/environments/nomis
         env:
           TF_ENV: production
-          GITHUB_TOKEN: ${{ secrets.DSO_GITHUB_AUTOMATION_PAT }}
 
   deploy-production:
     name: Deploy Production - nomis
@@ -229,6 +239,10 @@ jobs:
         with:
           terraform_version: "~1"
           terraform_wrapper: false
+      - name: Setup GitHub credential helper for terraform
+        uses: fusion-engineering/setup-git-credentials@v2
+        with:
+          credentials: https://${{ env.GITHUB_USERNAME }}:${{ env.GITHUB_TOKEN }}@github.com
       - name: Terraform apply - production
         run: |
           terraform --version
@@ -238,4 +252,3 @@ jobs:
           bash scripts/terraform-apply.sh terraform/environments/nomis
         env:
           TF_ENV: production
-          GITHUB_TOKEN: ${{ secrets.DSO_GITHUB_AUTOMATION_PAT }}
