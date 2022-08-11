@@ -20,7 +20,6 @@ env:
   AWS_SECRET_ACCESS_KEY:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   TF_IN_AUTOMATION: true
   GITHUB_TOKEN: ${{ secrets.DSO_GITHUB_AUTOMATION_PAT }}
-  GITHUB_OWNER: ministryofjustice
 defaults:
   run:
     shell: bash
@@ -76,7 +75,7 @@ jobs:
 
   plan-all-environments:
     name: Plan nomis
-    strategy: 
+    strategy:
       matrix:
         tf-env: [test, production]
       fail-fast: false
@@ -190,7 +189,7 @@ jobs:
 #           bash scripts/terraform-apply.sh terraform/environments/nomis
 #         env:
 #           TF_ENV: preproduction
-  
+
   plan-production:
     name: Plan Production - nomis
     runs-on: ubuntu-latest
