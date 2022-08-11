@@ -33,11 +33,11 @@ resource "random_password" "random_password" {
 # placeholder plainttext data
 
 data "aws_secretsmanager_secrets" "plainttext" {
-  text = "<<EOF
-  ----start----
-  gdfgdfgdfgdfg
-  ----end----
-  EOF"
+  text = <<EOT
+----start----
+gdfgdfgdfgdfg
+----end----
+EOT
 }
 
 resource "aws_secretsmanager_secret" "test" {
