@@ -29,12 +29,15 @@ resource "random_password" "random_password" {
 
 # placeholder plainttext data
 
-data "aws_secretsmanager_secrets" "plainttext" {
-  text = <<EOT
+data "aws_secretsmanager_secrets" "ssh" {
+  filter {
+    name   = "plaintext"
+    values = ["<<EOT
 ----start----
 gdfgdfgdfgdfg
 ----end----
-EOT
+EOT"]
+  }
 }
 
 resource "aws_secretsmanager_secret" "test" {
@@ -44,7 +47,7 @@ resource "aws_secretsmanager_secret" "test" {
 
 resource "aws_secretsmanager_secret_version" "test" {
   secret_id     = aws_secretsmanager_secret.test.id
-  secret_string = data.aws_secretsmanager_secrets.plainttext.text
+  secret_string = data.aws_secretsmanager_secrets.ssh.plaintext
 }
 
 #resource "aws_secretsmanager_secret" "prtgadmin" {
