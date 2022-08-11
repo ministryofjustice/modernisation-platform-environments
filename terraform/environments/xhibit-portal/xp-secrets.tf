@@ -32,11 +32,12 @@ resource "random_password" "random_password" {
 data "aws_secretsmanager_secrets" "ssh" {
   filter {
     name   = "plaintext"
-    values = ["<<EOT
+    values = [<<EOT
 ----start----
 gdfgdfgdfgdfg
 ----end----
-EOT"]
+EOT
+]
   }
 }
 
