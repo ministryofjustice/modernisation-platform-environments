@@ -1,7 +1,7 @@
 # JSON Policy for accessing created secrets
 
 resource "aws_secretsmanager_secret_policy" "test-policy" {
-  secret_arn = aws_secretsmanager_secret.test-secret.arn
+  secret_arn = aws_secretsmanager_secret.test.arn
 
   policy = <<POLICY
 {
@@ -34,8 +34,8 @@ resource "aws_secretsmanager_secret" "test" {
   description = "testing plain text creation"
 }
 
-resource "aws_secretsmanager_secret_version" "test-secret" {
-  secret_id     = aws_secretsmanager_secret.test-secret.id
+resource "aws_secretsmanager_secret_version" "test" {
+  secret_id     = aws_secretsmanager_secret.test.id
   secret_string = <<EOF
   ----start----
   gdfgdfgdfgdfg
