@@ -43,7 +43,6 @@ POLICY
   tags = local.tags
 }
 
-
 resource "aws_secretsmanager_secret" "zgit" {
   name                    = "${local.environment}/zgit.pem"
   description             = "key pair used for the zgit-server-xhibit-portal"
