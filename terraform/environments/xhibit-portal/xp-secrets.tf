@@ -41,10 +41,10 @@ resource "random_password" "random_password" {
 # placeholder plainttext data
 
 resource "aws_secretsmanager_secret" "test" {
-  name        = "test"
-  description = "testing plain text creation"
+  name                    = "test"
+  description             = "testing plain text creation"
   recovery_window_in_days = 0
-  policy = <<POLICY
+  policy                  = <<POLICY
 {
   "Version" : "2012-10-17",
   "Statement" : [ {
