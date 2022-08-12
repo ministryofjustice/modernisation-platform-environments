@@ -116,7 +116,7 @@ resource "aws_autoscaling_schedule" "scale_up" {
   max_size               = 1
   desired_capacity       = 1
   recurrence             = "0 7 * * Mon-Fri"
-  autoscaling_group_name = aws_autoscaling_group.this
+  autoscaling_group_name = aws_autoscaling_group.this.name
 }
 
 resource "aws_autoscaling_schedule" "scale_down" {
@@ -125,7 +125,7 @@ resource "aws_autoscaling_schedule" "scale_down" {
   max_size               = 0
   desired_capacity       = 0
   recurrence             = "0 19 * * Mon-Fri"
-  autoscaling_group_name = aws_autoscaling_group.this
+  autoscaling_group_name = aws_autoscaling_group.this.name
 }
 resource "aws_security_group" "jumpserver-windows" {
   description = "Configure Windows jumpserver egress"
