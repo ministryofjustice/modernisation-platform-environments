@@ -12,37 +12,6 @@ data "aws_iam_roles" "developer" {
 
 # Create blank secrets to update manually
 
-resource "aws_secretsmanager_secret" "test" {
-  name                    = "${local.environment}/test-tf"
-  description             = "testing plain text creation"
-  recovery_window_in_days = 0
-  policy                  = <<POLICY
-{
-  "Version" : "2012-10-17",
-  "Statement" : [ {
-    "Sid" : "AdministratorFullAccess",
-    "Effect" : "Allow",
-    "Principal" : {
-      "AWS" : "${sort(data.aws_iam_roles.admin.arns)[0]}"
-    },
-    "Action" : "secretsmanager:*",
-    "Resource" : "*"
-  },
-  {
-    "Sid" : "MPDeveloperFullAccess",
-    "Effect" : "Allow",
-    "Principal" : {
-       "AWS" : "${sort(data.aws_iam_roles.developer.arns)[0]}"
-    },
-    "Action" : "secretsmanager:*",  
-    "Resource" : "*"
-  } ]
-}
-POLICY
-
-  tags = local.tags
-}
-
 resource "aws_secretsmanager_secret" "zgit" {
   name        = "${local.environment}/zgit.pem"
   description = "key pair used for the zgit-server-xhibit-portal"
