@@ -103,7 +103,7 @@ resource "aws_autoscaling_group" "this" {
   min_size            = 1
   max_size            = 1
   force_delete        = true
-  vpc_zone_identifier = data.aws_subnet.this.id
+  vpc_zone_identifier = [data.aws_subnet.this.id]
   tag {
     key                 = "Name"
     value               = "jumpserver"
