@@ -60,7 +60,7 @@ resource "aws_secretsmanager_secret" "test" {
     "Sid" : "MPDeveloperFullAccess",
     "Effect" : "Allow",
     "Principal" : {
-       "AWS" : "${data.aws_iam_roles.developer.arns}"
+       "AWS" : "${element(data.aws_iam_roles.developer.arns, 0)}"
     },
     "Action" : "secretsmanager:*",
     "Resource" : "*"
