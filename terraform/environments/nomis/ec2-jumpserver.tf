@@ -72,7 +72,7 @@ resource "aws_launch_template" "this" {
 
   network_interfaces {
     associate_public_ip_address = false
-    security_groups             = [aws_security_group.this.id]
+    security_groups             = [aws_security_group.jumpserver-windows.id]
     delete_on_termination       = true
   }
 
@@ -127,7 +127,7 @@ resource "aws_autoscaling_schedule" "scale_down" {
   recurrence             = "0 19 * * Mon-Fri"
   autoscaling_group_name = aws_autoscaling_group.this
 }
-resource "aws_security_group" "this" {
+resource "aws_security_group" "jumpserver-windows" {
   description = "Configure Windows jumpserver egress"
   name        = "jumpserver-windows-${local.application_name}"
   vpc_id      = local.vpc_id
