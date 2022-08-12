@@ -51,7 +51,7 @@ resource "aws_secretsmanager_secret" "test" {
     "Sid" : "AdministratorFullAccess",
     "Effect" : "Allow",
     "Principal" : {
-      "AWS" : "${data.aws_iam_roles.admin.arns}"
+      "AWS" : "${element(data.aws_iam_roles.admin.arns, 0)}"
     },
     "Action" : "secretsmanager:*",
     "Resource" : "*"
