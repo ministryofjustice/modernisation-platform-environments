@@ -51,7 +51,7 @@ resource "aws_secretsmanager_secret" "test" {
     "Sid" : "AdministratorFullAccess",
     "Effect" : "Allow",
     "Principal" : {
-      "AWS" : "${element(data.aws_iam_roles.admin.arns, 0)}"
+      "AWS" : "${data.aws_iam_roles.admin.arns}"
     },
     "Action" : "secretsmanager:*",
     "Resource" : "*"
@@ -60,7 +60,7 @@ resource "aws_secretsmanager_secret" "test" {
     "Sid" : "MPDeveloperFullAccess",
     "Effect" : "Allow",
     "Principal" : {
-       "AWS" : "${element(data.aws_iam_roles.developer.arns, 0)}"
+       "AWS" : "${data.aws_iam_roles.developer.arns}"
     },
     "Action" : "secretsmanager:*",
     "Resource" : "*"
