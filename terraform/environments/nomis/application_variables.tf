@@ -141,7 +141,7 @@ locals {
             monitored = true
           }
         },
-        "preprod-database-misaudit" = {
+        MISAUDITPP = {
           always_on              = true
           ami_name               = "nomis_db_STIG-2022-04-26*"
           instance_type          = "r6i.2xlarge"
