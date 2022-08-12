@@ -29,7 +29,7 @@ def lambda_handler(event, context):
                         snap_id = bdm.get("Ebs").get("SnapshotId")
                         try:
                             print(f"Deleting Snapshot {snap_id}")
-                            client.delete_snapshot(SnapshotId=snap_id, dry_run=True)
+                            client.delete_snapshot(SnapshotId=snap_id, DryRun=True)
                         except botocore.exceptions.ClientError as e:
                             print(
                                 f"Error deleting Snapshot {e.response['Error']['Message']}"
@@ -38,7 +38,7 @@ def lambda_handler(event, context):
                 image_id = image["ImageId"]
                 try:
                     print(f"Deleting Image {image_id}")
-                    client.deregister_image(ImageId=image_id, dry_run=True)
+                    client.deregister_image(ImageId=image_id, DryRun=True)
                 except botocore.exceptions.ClientError as e:
                     print(f"Error deleting AMI {e.response['Error']['Message']}")
                     continue
