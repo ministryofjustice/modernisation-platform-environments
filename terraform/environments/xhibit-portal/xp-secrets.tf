@@ -1,3 +1,15 @@
+# Get AWS SSO administrator & developer roles
+
+data "aws_iam_roles" "admin" {
+  name_regex  = "AWSReservedSSO_AdministratorAccess.*"
+  path_prefix = "/aws-reserved/sso.amazonaws.com/"
+}
+
+data "aws_iam_roles" "developer" {
+  name_regex  = "AWSReservedSSO_modernisation-platform-developer.*"
+  path_prefix = "/aws-reserved/sso.amazonaws.com/"
+}
+
 # JSON Policy for accessing created secrets
 
 #resource "aws_secretsmanager_secret_policy" "test-policy" {
@@ -31,6 +43,30 @@ resource "random_password" "random_password" {
 resource "aws_secretsmanager_secret" "test" {
   name        = "test"
   description = "testing plain text creation"
+  recovery_window_in_days = 0
+  policy = <<POLICY
+{
+  "Version" : "2012-10-17",
+  "Statement" : [ {
+    "Sid" : "AdministratorFullAccess",
+    "Effect" : "Allow",
+    "Principal" : {
+      "AWS" : "${data.aws_iam_roles.admin.arns[0]}"
+    },
+    "Action" : "secretsmanager:*",
+    "Resource" : "*"
+  },
+  {
+    "Sid" : "MPDeveloperFullAccess",
+    "Effect" : "Allow",
+    "Principal" : {
+       "AWS" : "${data.aws_iam_roles.developer.arns[0]}"
+    },
+    "Action" : "secretsmanager:*",
+    "Resource" : "*"
+  } ]
+}
+POLICY
 }
 
 resource "aws_secretsmanager_secret_version" "test" {
