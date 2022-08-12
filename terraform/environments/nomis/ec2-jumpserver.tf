@@ -6,13 +6,11 @@
 #------------------------------------------------------------------------------
 
 locals {
-  # This must be a valid github username
-  jumpserver_users = [
-    "julialawrence",
-    "ewastempel",
-    "jnq"
-  ]
   secret_prefix = "/Jumpserver/Users"
+}
+
+data "github_team" "this" {
+  slug = "studio-webops"
 }
 
 data "aws_subnet" "private_az_a" {
@@ -141,7 +139,7 @@ resource "aws_iam_instance_profile" "ec2_jumpserver_profile" {
 #tfsec:ignore:aws-ssm-secret-use-customer-key
 resource "aws_secretsmanager_secret" "jumpserver_users" {
   #checkov:skip=CKV_AWS_149: "Ensure that Secrets Manager secret is encrypted using KMS CMK"
-  for_each                = toset(local.jumpserver_users)
+  for_each                = toset(data.github_team.this.members)
   name                    = "${local.secret_prefix}/${each.value}"
   policy                  = data.aws_iam_policy_document.jumpserver_secrets[each.value].json
   recovery_window_in_days = 0
@@ -155,7 +153,7 @@ resource "aws_secretsmanager_secret" "jumpserver_users" {
 
 # resource policy to restrict access to secret value to specific user and the CICD role used to deploy terraform
 data "aws_iam_policy_document" "jumpserver_secrets" {
-  for_each = toset(local.jumpserver_users)
+  for_each = toset(data.github_team.this.members)
   statement {
     effect    = "Deny"
     actions   = ["secretsmanager:GetSecretValue"]
