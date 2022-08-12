@@ -27,20 +27,18 @@ def lambda_handler(event, context):
                         and bdm.get("Ebs").get("SnapshotId") is not None
                     ):
                         print(f"Deleting Snapshot {snap_id}")
+                        snap_id = bdm.get("Ebs").get("SnapshotId")
                         try:
-                            snap_id = bdm.get("Ebs").get("SnapshotId")
-                            client.delete_snapshot(
-                                SnapshotId=snap_id, DryRun=True)
+                            client.delete_snapshot(SnapshotId=snap_id, DryRun=True)
                         except botocore.exceptions.ClientError as e:
                             print(
                                 f"Error deleting Snapshot {e.response['Error']['Message']}"
                             )
                             continue
                 print(f"Deleting Image {image_id}")
+                image_id = image["ImageId"]
                 try:
-                    image_id = image["ImageId"]
                     client.deregister_image(ImageId=image_id, DryRun=True)
                 except botocore.exceptions.ClientError as e:
-                    print(
-                        f"Error deleting AMI {e.response['Error']['Message']}")
+                    print(f"Error deleting AMI {e.response['Error']['Message']}")
                     continue
