@@ -173,3 +173,81 @@ module "nomis-image-builder-bucket" {
   tags = local.tags
 
 }
+
+#  Audit Archive dumps bucket
+
+data "aws_iam_policy_document" "nomis-all-environments-access" {
+  statement {
+    sid = "all-nomis-environments-access-for-archiving"
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:PutObjectAcl",
+      "s3:ListBucket"
+
+    ]
+
+    resources = ["${module.nomis-audit-archives.bucket.arn}/*",
+    module.nomis-audit-archives.bucket.arn, ]
+    principals {
+      type = "AWS"
+      identifiers = [
+        "arn:aws:iam::${local.environment_management.account_ids["nomis-test"]}:root",
+        "arn:aws:iam::${local.environment_management.account_ids["nomis-production"]}:root"
+      ]
+    }
+  }
+}
+
+module "nomis-audit-archives" {
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.1.1"
+
+  providers = {
+    aws.bucket-replication = aws
+  }
+  bucket_prefix       = "nomis-audit-archives"
+  replication_enabled = false
+
+  bucket_policy = [data.aws_iam_policy_document.nomis-all-environments-access.json]
+
+  lifecycle_rule = [
+    {
+      id      = "main"
+      enabled = "Enabled"
+      prefix  = ""
+
+      tags = {
+        rule      = "log"
+        autoclean = "Enabled"
+      }
+
+      transition = [
+        {
+          days          = 90
+          storage_class = "STANDARD_IA"
+        }
+      ]
+
+      expiration = {
+        days = 730
+      }
+
+      noncurrent_version_transition = [
+        {
+          days          = 90
+          storage_class = "STANDARD_IA"
+          }, {
+          days          = 365
+          storage_class = "GLACIER"
+        }
+      ]
+
+      noncurrent_version_expiration = {
+        days = 730
+      }
+    }
+  ]
+
+  tags = local.tags
+
+}
