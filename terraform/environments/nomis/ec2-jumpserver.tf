@@ -61,15 +61,6 @@ resource "aws_launch_template" "jumpserver" {
   iam_instance_profile {
     arn = aws_iam_instance_profile.jumpserver.arn
   }
-  block_device_mappings {
-    device_name = "jumpserver-root"
-    ebs {
-      delete_on_termination = true
-      encrypted             = true
-      volume_type           = "gp3"
-      volume_size           = 40
-    }
-  }
   metadata_options {
     http_endpoint = "enabled"
     http_tokens   = "required"
