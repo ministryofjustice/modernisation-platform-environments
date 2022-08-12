@@ -48,19 +48,10 @@ resource "aws_secretsmanager_secret" "test" {
 {
   "Version" : "2012-10-17",
   "Statement" : [ {
-    "Sid" : "AdministratorFullAccess",
+    "Sid" : "FullAccess",
     "Effect" : "Allow",
     "Principal" : {
-      "AWS" : "${data.aws_iam_roles.admin.arns}"
-    },
-    "Action" : "secretsmanager:*",
-    "Resource" : "*"
-  },
-  {
-    "Sid" : "MPDeveloperFullAccess",
-    "Effect" : "Allow",
-    "Principal" : {
-       "AWS" : "${data.aws_iam_roles.developer.arns}"
+      "AWS" : "${sort(data.aws_iam_roles.admin.arns)[0]}", "${sort(data.aws_iam_roles.developer.arns)[0]}"
     },
     "Action" : "secretsmanager:*",
     "Resource" : "*"
