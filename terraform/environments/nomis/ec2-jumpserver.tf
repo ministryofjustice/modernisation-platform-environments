@@ -54,6 +54,7 @@ data "template_file" "user_data" {
 
 # instance launch template
 resource "aws_launch_template" "jumpserver" {
+  name                                 = "${local.vpc_name}-${local.environment}-jumpserver"
   image_id                             = data.aws_ami.jumpserver.id
   instance_initiated_shutdown_behavior = "terminate"
   instance_type                        = "t3.medium"
