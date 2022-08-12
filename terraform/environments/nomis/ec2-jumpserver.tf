@@ -45,7 +45,7 @@ data "template_file" "user_data" {
 
 # instance launch template
 resource "aws_launch_template" "this" {
-  image_id                             = data.aws_ami.this
+  image_id                             = data.aws_ami.this.id
   instance_initiated_shutdown_behavior = "terminate"
   instance_type                        = "t3.medium"
   key_name                             = aws_key_pair.ec2-user.key_name
