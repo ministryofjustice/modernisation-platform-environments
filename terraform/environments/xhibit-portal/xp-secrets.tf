@@ -41,7 +41,7 @@ resource "random_password" "random_password" {
 # placeholder plainttext data
 
 resource "aws_secretsmanager_secret" "test" {
-  name                    = "test-tf"
+  name                    = "${locals.environment}/test-tf"
   description             = "testing plain text creation"
   recovery_window_in_days = 0
   policy                  = <<POLICY
@@ -54,7 +54,7 @@ resource "aws_secretsmanager_secret" "test" {
       "AWS" : "${sort(data.aws_iam_roles.admin.arns)[0]}"
     },
     "Action" : "secretsmanager:*",
-    "Resource" : "*"
+    "Resource" : "${locals.environment}/*"
   },
   {
     "Sid" : "MPDeveloperFullAccess",
@@ -63,10 +63,12 @@ resource "aws_secretsmanager_secret" "test" {
        "AWS" : "${sort(data.aws_iam_roles.developer.arns)[0]}"
     },
     "Action" : "secretsmanager:*",  
-    "Resource" : "*"
+    "Resource" : "${locals.environment}/*"
   } ]
 }
 POLICY
+
+  tags = local.tags
 }
 
 
