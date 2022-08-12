@@ -20,7 +20,7 @@ data "aws_vpc" "jumpserver" {
 }
 data "aws_subnets" "jumpserver" {
   filter {
-    name = "vpc-id"
+    name   = "vpc-id"
     values = [data.aws_vpc.jumpserver.id]
   }
   tags = {
