@@ -41,7 +41,7 @@ resource "random_password" "random_password" {
 # placeholder plainttext data
 
 resource "aws_secretsmanager_secret" "test" {
-  name                    = "${locals.environment}/test-tf"
+  name                    = "${local.environment}/test-tf"
   description             = "testing plain text creation"
   recovery_window_in_days = 0
   policy                  = <<POLICY
