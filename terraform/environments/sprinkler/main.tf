@@ -158,7 +158,7 @@ data "aws_route53_zone" "inner" {
 #------------------------------------------------------------------------------
 
 module "github-oidc" {
-  source                 = "github.com/ministryofjustice/modernisation-platform-github-oidc-provider?ref=v1.0.0"
+  source                 = "github.com/ministryofjustice/modernisation-platform-github-oidc-provider?ref=v1.0.1"
   additional_permissions = data.aws_iam_policy_document.oidc_assume_role.json
   github_repository      = "ministryofjustice/modernisation-platform-environments:*"
   tags_common = merge(
