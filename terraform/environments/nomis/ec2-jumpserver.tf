@@ -9,17 +9,26 @@ locals {
   secret_prefix = "/Jumpserver/Users"
 }
 
-data "github_team" "this" {
+data "github_team" "jumpserver" {
   slug = "studio-webops"
 }
 
-data "aws_subnet" "this" {
+data "aws_vpc" "jumpserver" {
   tags = {
-    Name = "${local.vpc_name}-${local.environment}-${local.subnet_set}-private-${local.region}a"
+    Name = "${local.vpc_name}-${local.environment}"
+  }
+}
+data "aws_subnets" "jumpserver" {
+  filter {
+    name = "vpc-id"
+    values = [data.aws_vpc.jumpserver.id]
+  }
+  tags = {
+    Name = "${local.vpc_name}-${local.environment}-${local.subnet_set}-private-${local.region}*"
   }
 }
 
-data "aws_ami" "this" {
+data "aws_ami" "jumpserver" {
   most_recent = true
   owners      = [local.environment_management.account_ids["core-shared-services-production"]]
 
@@ -44,13 +53,13 @@ data "template_file" "user_data" {
 }
 
 # instance launch template
-resource "aws_launch_template" "this" {
-  image_id                             = data.aws_ami.this.id
+resource "aws_launch_template" "jumpserver" {
+  image_id                             = data.aws_ami.jumpserver.id
   instance_initiated_shutdown_behavior = "terminate"
   instance_type                        = "t3.medium"
   key_name                             = aws_key_pair.ec2-user.key_name
   iam_instance_profile {
-    arn = aws_iam_instance_profile.this.arn
+    arn = aws_iam_instance_profile.jumpserver.arn
   }
   block_device_mappings {
     device_name = "jumpserver-root"
@@ -93,9 +102,9 @@ resource "aws_launch_template" "this" {
 }
 
 # autoscaling
-resource "aws_autoscaling_group" "this" {
+resource "aws_autoscaling_group" "jumpserver" {
   launch_template {
-    id      = aws_launch_template.this.id
+    id      = aws_launch_template.jumpserver.id
     version = "$Default"
   }
   desired_capacity    = 1
@@ -103,7 +112,7 @@ resource "aws_autoscaling_group" "this" {
   min_size            = 1
   max_size            = 1
   force_delete        = true
-  vpc_zone_identifier = [data.aws_subnet.this.id]
+  vpc_zone_identifier = data.aws_subnet.jumpserver.ids
   tag {
     key                 = "Name"
     value               = "jumpserver"
@@ -116,7 +125,7 @@ resource "aws_autoscaling_schedule" "scale_up" {
   max_size               = 1
   desired_capacity       = 1
   recurrence             = "0 7 * * Mon-Fri"
-  autoscaling_group_name = aws_autoscaling_group.this.name
+  autoscaling_group_name = aws_autoscaling_group.jumpserver.name
 }
 
 resource "aws_autoscaling_schedule" "scale_down" {
@@ -125,7 +134,7 @@ resource "aws_autoscaling_schedule" "scale_down" {
   max_size               = 0
   desired_capacity       = 0
   recurrence             = "0 19 * * Mon-Fri"
-  autoscaling_group_name = aws_autoscaling_group.this.name
+  autoscaling_group_name = aws_autoscaling_group.jumpserver.name
 }
 resource "aws_security_group" "jumpserver-windows" {
   description = "Configure Windows jumpserver egress"
@@ -150,7 +159,7 @@ resource "aws_security_group" "jumpserver-windows" {
   }
 }
 
-resource "aws_iam_role" "this" {
+resource "aws_iam_role" "jumpserver" {
   name                 = "ec2-jumpserver-role"
   path                 = "/"
   max_session_duration = "3600"
@@ -178,17 +187,17 @@ resource "aws_iam_role" "this" {
   )
 }
 
-resource "aws_iam_instance_profile" "this" {
+resource "aws_iam_instance_profile" "jumpserver" {
   name = "ec2-jumpserver-profile"
-  role = aws_iam_role.this.name
+  role = aws_iam_role.jumpserver.name
   path = "/"
 }
 
 # create empty secret in secret manager
 #tfsec:ignore:aws-ssm-secret-use-customer-key
-resource "aws_secretsmanager_secret" "this" {
+resource "aws_secretsmanager_secret" "jumpserver" {
   #checkov:skip=CKV_AWS_149: "Ensure that Secrets Manager secret is encrypted using KMS CMK"
-  for_each                = toset(data.github_team.this.members)
+  for_each                = toset(data.github_team.jumpserver.members)
   name                    = "${local.secret_prefix}/${each.value}"
   policy                  = data.aws_iam_policy_document.jumpserver_secrets[each.value].json
   recovery_window_in_days = 0
@@ -202,7 +211,7 @@ resource "aws_secretsmanager_secret" "this" {
 
 # resource policy to restrict access to secret value to specific user and the CICD role used to deploy terraform
 data "aws_iam_policy_document" "jumpserver_secrets" {
-  for_each = toset(data.github_team.this.members)
+  for_each = toset(data.github_team.jumpserver.members)
   statement {
     effect    = "Deny"
     actions   = ["secretsmanager:GetSecretValue"]
@@ -239,6 +248,6 @@ data "aws_iam_policy_document" "jumpserver_users" {
 # Add policy to role
 resource "aws_iam_role_policy" "jumpserver_users" {
   name   = "secrets-access-jumpserver-users"
-  role   = aws_iam_role.this.id
+  role   = aws_iam_role.jumpserver.id
   policy = data.aws_iam_policy_document.jumpserver_users.json
 }
