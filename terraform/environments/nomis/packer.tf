@@ -58,6 +58,22 @@ resource "aws_iam_role" "packer" {
 # build policy json for Packer base permissions
 data "aws_iam_policy_document" "packer_minimum_permissions" {
   count = local.environment == "test" ? 1 : 0
+  statement { // TODO: remove this!
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:ListBucket",
+      "s3:PutObject*"
+    ]
+    resources = [
+      module.s3-bucket.bucket.arn,
+      module.nomis-db-backup-bucket.bucket.arn,
+      "arn:aws:s3:::nomis-audit-archives*",
+      "arn:aws:s3:::nomis-audit-archives*/*",
+      "${module.s3-bucket.bucket.arn}/*",
+      "${module.nomis-db-backup-bucket.bucket.arn}/*"
+    ]
+  }
   statement {
     #checkov:skip=CKV_AWS_111
     #checkov:skip=CKV_AWS_109
