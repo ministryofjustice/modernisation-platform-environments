@@ -110,6 +110,9 @@ resource "aws_autoscaling_group" "jumpserver" {
     value               = "jumpserver"
     propagate_at_launch = true
   }
+  depends_on = [
+    aws_launch_template.jumpserver
+  ]
 }
 resource "aws_autoscaling_schedule" "scale_up" {
   scheduled_action_name  = "jumpserver_scale_up"
@@ -149,9 +152,6 @@ resource "aws_security_group" "jumpserver-windows" {
     #tfsec:ignore:aws-vpc-no-public-egress-sgr
     cidr_blocks = ["0.0.0.0/0"]
   }
-  depends_on = [
-    aws_launch_template.jumpserver
-  ]
 }
 
 resource "aws_iam_role" "jumpserver" {
