@@ -48,17 +48,27 @@ resource "aws_secretsmanager_secret" "test" {
 {
   "Version" : "2012-10-17",
   "Statement" : [ {
-    "Sid" : "FullAccess",
+    "Sid" : "AdministratorFullAccess",
     "Effect" : "Allow",
     "Principal" : {
-      "AWS" : "${sort(data.aws_iam_roles.admin.arns)[0]}", "${sort(data.aws_iam_roles.developer.arns)[0]}"
+      "AWS" : "${sort(data.aws_iam_roles.admin.arns)[0]}"
     },
     "Action" : "secretsmanager:*",
+    "Resource" : "*"
+  },
+  {
+    "Sid" : "MPDeveloperFullAccess",
+    "Effect" : "Allow",
+    "Principal" : {
+       "AWS" : "${sort(data.aws_iam_roles.developer.arns)[0]}"
+    },
+    "Action" : "secretsmanager:*",  
     "Resource" : "*"
   } ]
 }
 POLICY
 }
+
 
 resource "aws_secretsmanager_secret_version" "test" {
   secret_id     = aws_secretsmanager_secret.test.id
