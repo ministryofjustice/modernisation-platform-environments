@@ -290,11 +290,14 @@ data "aws_iam_policy_document" "packer_s3_bucket_access" {
     effect = "Allow"
     actions = [
       "s3:GetObject",
-      "s3:ListBucket"
+      "s3:ListBucket",
+      "s3:PutObject*"
     ]
     resources = [
       module.s3-bucket.bucket.arn,
       module.nomis-db-backup-bucket.bucket.arn,
+      "arn:aws:s3:::nomis-audit-archives*",
+      "arn:aws:s3:::nomis-audit-archives*/*",
       "${module.s3-bucket.bucket.arn}/*",
       "${module.nomis-db-backup-bucket.bucket.arn}/*"
     ]
