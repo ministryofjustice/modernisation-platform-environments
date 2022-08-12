@@ -54,7 +54,7 @@ resource "aws_secretsmanager_secret" "test" {
       "AWS" : "${sort(data.aws_iam_roles.admin.arns)[0]}"
     },
     "Action" : "secretsmanager:*",
-    "Resource" : "${locals.environment}/*"
+    "Resource" : "${local.environment}/*"
   },
   {
     "Sid" : "MPDeveloperFullAccess",
@@ -63,7 +63,7 @@ resource "aws_secretsmanager_secret" "test" {
        "AWS" : "${sort(data.aws_iam_roles.developer.arns)[0]}"
     },
     "Action" : "secretsmanager:*",  
-    "Resource" : "${locals.environment}/*"
+    "Resource" : "${local.environment}/*"
   } ]
 }
 POLICY
