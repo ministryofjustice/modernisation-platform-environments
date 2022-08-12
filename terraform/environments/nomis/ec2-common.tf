@@ -112,8 +112,8 @@ data "aws_iam_policy_document" "s3_bucket_access" {
       "s3:ListBucket"
     ]
     resources = [
-      module.nomis-audit-archives.arn,
-      "${module.nomis-audit-archives.arn}/*"
+      module.nomis-audit-archives.bucket.arn,
+      "${module.nomis-audit-archives.bucket.arn}/*"
     ]
   }
 }
