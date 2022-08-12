@@ -1,4 +1,7 @@
 ######################### Run Terraform via CICD ##################################
+provider "github" {
+  owner = "ministryofjustice"
+}
 # AWS provider for the workspace you're working in (every resource will default to using this, unless otherwise specified)
 provider "aws" {
   region = "eu-west-2"
@@ -46,6 +49,9 @@ provider "aws" {
 ######################### Run Terraform Plan Locally Only ##################################
 # To run a Terraform Plan locally, uncomment this bottom section of code and comment out the top section
 
+#provider "github" {
+#  owner = "ministryofjustice"
+#}
 # provider "aws" {
 #   region = "eu-west-2"
 # }
