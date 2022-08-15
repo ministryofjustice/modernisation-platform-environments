@@ -40,5 +40,6 @@ def lambda_handler(event, context):
                     print(f"Deleting Image {image_id}")
                     client.deregister_image(ImageId=image_id)
                 except botocore.exceptions.ClientError as e:
-                    print(f"Error deleting AMI {e.response['Error']['Message']}")
+                    print(
+                        f"Error deleting AMI {e.response['Error']['Message']}")
                     continue
