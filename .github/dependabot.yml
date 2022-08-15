@@ -12,7 +12,15 @@ updates:
   # a dependabot configuration, so we need to add all directories individually
   # See: github.com/dependabot/dependabot-core/issues/2178
   - package-ecosystem: "terraform"
+    directory: "/terraform/environments/apex"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
     directory: "/terraform/environments/cooker"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/data-and-insights-wepi"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
