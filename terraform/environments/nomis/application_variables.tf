@@ -68,6 +68,18 @@ locals {
             monitored = true
           }
         },
+        NDHT2 = {
+          always_on              = false
+          ami_name               = "nomis_db-2022-03-03*"
+          asm_data_capacity      = 200
+          asm_flash_capacity     = 2
+          description            = "Test NDH & TRDATA databases with a dataset of T1PDL0009 (note:NOMIS db not included), replicating with T2PDL0012."
+          termination_protection = true
+          oracle_sids            = ["T2NDH", "T2TRDAT"]
+          tags = {
+            monitored = false
+          }
+        },
         CNOMT1TEST = {
           always_on          = false
           ami_name           = "nomis_db_STIG_CNOMT1-2022-04-21T11.33.39Z"
