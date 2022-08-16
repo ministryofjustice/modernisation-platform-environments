@@ -6,11 +6,9 @@
 #------------------------------------------------------------------------------
 
 resource "aws_kms_key" "xhibit-cmk" {
-  count                   = local.environment == "development" ? 1 : 0
-  description             = "Xhibit Managed Key for AMI Sharing"
-  deletion_window_in_days = 10
-  policy                  = data.aws_iam_policy_document.shared_cmk_policy[0].json
-  enable_key_rotation     = true
+  description         = "Xhibit Managed Key for AMI Sharing"
+  policy              = local.is-development ? data.aws_iam_policy_document.kms_policy[0].json : ""
+  enable_key_rotation = true
 }
 
 resource "aws_kms_alias" "xhibit-cmk-alias" {
@@ -20,33 +18,23 @@ resource "aws_kms_alias" "xhibit-cmk-alias" {
 }
 
 data "aws_iam_policy_document" "shared_cmk_policy" {
-  count = local.environment == "development" ? 1 : 0
+
+  # checkov:skip=CKV_AWS_109: "Key policy requires asterisk resource"
+  # checkov:skip=CKV_AWS_111: "Key policy requires asterisk resource"
+
+  count = local.is-development ? 1 : 0
   statement {
-    effect = "Allow"
-    actions = ["kms:Encrypt",
-      "kms:Decrypt",
-      "kms:Encrypt",
-      "kms:ReEncrypt*",
-      "kms:ReEncryptFrom",
-      "kms:GenerateDataKey*",
-      "kms:DescribeKey",
-      "kms:CreateGrant"
-    ]
-    # these can be ignored as this policy is being applied to a specific key resource. ["*"] in this case refers to this key
-    #tfsec:ignore:aws-iam-no-policy-wildcards
-    #checkov:skip=CKV_AWS_111: "Ensure IAM policies does not allow write access without constraints"
-    #checkov:skip=CKV_AWS_109: "Ensure IAM policies does not allow permissions management / resource exposure without constraints"
-    resources = ["*"]
+    sid     = "Enable IAM User Permissions"
+    actions = ["kms:*"]
     principals {
-      type = "AWS"
-      identifiers = ["arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:root",
-        "arn:aws:iam::${local.environment_management.account_ids["xhibit-portal-production"]}:root",
-        "arn:aws:iam::${local.environment_management.account_ids["xhibit-portal-preproduction"]}:root",
-      ]
+      identifiers = [format("arn:aws:iam::%s:root", data.aws_caller_identity.current.id)]
+      type        = "AWS"
     }
+    resources = ["*"]
   }
+
   statement {
-    effect = "Allow"
+    sid = "Allow access from remote account"
     actions = [
       "kms:Create*",
       "kms:Describe*",
@@ -58,18 +46,50 @@ data "aws_iam_policy_document" "shared_cmk_policy" {
       "kms:Disable*",
       "kms:Get*",
       "kms:Delete*",
+      "kms:TagResource",
+      "kms:UntagResource",
       "kms:ScheduleKeyDeletion",
       "kms:CancelKeyDeletion"
     ]
-    # these can be ignored as this policy is being applied to a specific key resource. ["*"] in this case refers to this key
-    #tfsec:ignore:aws-iam-no-policy-wildcards
-    #checkov:skip=CKV_AWS_111: "Ensure IAM policies does not allow write access without constraints"
-    #checkov:skip=CKV_AWS_109: "Ensure IAM policies does not allow permissions management / resource exposure without constraints"
-    resources = ["*"]
     principals {
+      identifiers = [format("arn:aws:iam::%s:role/ModernisationPlatformAccess", local.environment_management.account_ids["equip-production"])]
       type        = "AWS"
-      identifiers = ["arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:root"]
     }
+    resources = ["*"]
+  }
+
+  statement {
+    sid = "Allow use of the key"
+    actions = [
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*",
+      "kms:DescribeKey"
+    ]
+    principals {
+      identifiers = [format("arn:aws:iam::%s:root", local.environment_management.account_ids[format("%s-production", local.application_name)])]
+      type        = "AWS"
+    }
+    resources = ["*"]
+  }
+
+  statement {
+    sid = "Allow attachment of persistent resources"
+    actions = [
+      "kms:CreateGrant",
+      "kms:ListGrants",
+      "kms:RevokeGrant"
+    ]
+    principals {
+      identifiers = [format("arn:aws:iam::%s:root", local.environment_management.account_ids[format("%s-production", local.application_name)])]
+      type        = "AWS"
+    }
+    condition {
+      test     = "Bool"
+      values   = ["true"]
+      variable = "kms:GrantIsForAWSResource"
+    }
+    resources = ["*"]
   }
 }
-
