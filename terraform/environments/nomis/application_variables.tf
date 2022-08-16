@@ -142,6 +142,23 @@ locals {
             monitored = true
           }
         },
+        MISAUDITPP = {
+          always_on              = true
+          ami_name               = "nomis_db_STIG-2022-04-26*"
+          instance_type          = "r6i.2xlarge"
+          asm_data_capacity      = 4000
+          asm_flash_capacity     = 1000
+          description            = "PreProduction NOMIS MIS and Audit database to replace Azure PPPDL00017"
+          termination_protection = true
+          oracle_sids            = ["PPMIS", "PPCNMAUD"]
+          oracle_app_disk_size = {
+            "/dev/sdb" = 100  # /u01
+            "/dev/sdc" = 5120 # /u02
+          }
+          tags = {
+            monitored = false # not yet live
+          }
+        },
         NOMIS = {
           always_on              = true
           ami_name               = "nomis_database_2022-07-21T11-43-27.346Z"
@@ -158,6 +175,24 @@ locals {
           }
           tags = {
             monitored = false //not yet live
+          }
+        },
+        NDH = {
+          always_on              = false
+          ami_name               = "nomis_database_2022-08-09T15-04-29.500Z"
+          ami_owner              = local.environment_management.account_ids[terraform.workspace]
+          instance_type          = "r6i.xlarge"
+          asm_data_capacity      = 4000
+          asm_flash_capacity     = 1000
+          description            = "NDH & TRDATA standby databases in Azure PDPDL00038, replicating with PDPDL00037, a replacement for PDPDL00038."
+          termination_protection = true
+          oracle_sids            = ["PNDH", "PTRDAT"]
+          oracle_app_disk_size = {
+            "/dev/sdb" = 100 # /u01
+            "/dev/sdc" = 512 # /u02
+          }
+          tags = {
+            monitored = false # not yet live
           }
         }
       },

@@ -2,7 +2,7 @@
 name: nomis
 on:
   push:
-    branches: 
+    branches:
       - main
     paths:
       - 'terraform/environments/nomis/**'
@@ -18,13 +18,14 @@ on:
 env:
   AWS_ACCESS_KEY_ID:  ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  GITHUB_TOKEN: ${{ secrets.DSO_GITHUB_AUTOMATION_PAT }}
   TF_IN_AUTOMATION: true
 defaults:
   run:
     shell: bash
 
 jobs:
-  
+
 #   # These jobs run when creating a pull request
 #   plan-development:
 #     name: Plan Development - nomis
@@ -74,7 +75,7 @@ jobs:
 
   plan-all-environments:
     name: Plan nomis
-    strategy: 
+    strategy:
       matrix:
         tf-env: [test, production]
       fail-fast: false
@@ -188,7 +189,7 @@ jobs:
 #           bash scripts/terraform-apply.sh terraform/environments/nomis
 #         env:
 #           TF_ENV: preproduction
-  
+
   plan-production:
     name: Plan Production - nomis
     runs-on: ubuntu-latest
