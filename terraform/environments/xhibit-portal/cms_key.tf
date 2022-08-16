@@ -1,13 +1,10 @@
 #------------------------------------------------------------------------------
 # Customer Managed Key for AMI sharing
-# Only created in Test account currently as AMIs encrypted using this key
-# should be shared with Production account, hence Prod account requires permissions
-# to use this key
 #------------------------------------------------------------------------------
 
 resource "aws_kms_key" "xhibit-cmk" {
   description         = "Xhibit Managed Key for AMI Sharing"
-  policy              = local.is-development ? data.aws_iam_policy_document.kms_policy[0].json : ""
+  policy              = local.is-development ? data.aws_iam_policy_document.shared_cmk_policy[0].json : ""
   enable_key_rotation = true
 }
 
