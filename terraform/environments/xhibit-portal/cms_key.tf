@@ -9,7 +9,6 @@ resource "aws_kms_key" "xhibit-cmk" {
 }
 
 resource "aws_kms_alias" "xhibit-cmk-alias" {
-  count         = local.environment == "development" ? 1 : 0
   name          = "alias/xhibit-shared-key"
   target_key_id = aws_kms_key.xhibit-cmk[0].key_id
 }
@@ -49,7 +48,7 @@ data "aws_iam_policy_document" "shared_cmk_policy" {
       "kms:CancelKeyDeletion"
     ]
     principals {
-      identifiers = [format("arn:aws:iam::%s:role/ModernisationPlatformAccess", local.environment_management.account_ids["equip-production"])]
+      identifiers = [format("arn:aws:iam::%s:role/ModernisationPlatformAccess", local.environment_management.account_ids["xhibit-portal-production"])]
       type        = "AWS"
     }
     resources = ["*"]
