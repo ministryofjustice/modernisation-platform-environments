@@ -93,30 +93,3 @@ data "aws_iam_policy_document" "shared_cmk_policy" {
   }
 }
 
-data "aws_iam_policy_document" "kms_use" {
-  statement {
-    sid    = "Allow KMS Use"
-    effect = "Allow"
-    actions = [
-      "kms:Encrypt",
-      "kms:Decrypt",
-      "kms:ReEncrypt*",
-      "kms:GenerateDataKey*",
-      "kms:DescribeKey",
-    ]
-    resources = [
-      "${aws_kms_key.xhibit-cmk.arn}"
-    ]
-  }
-}
-
-resource "aws_iam_policy" "kms_use" {
-  name        = "kmsuse"
-  description = "Policy to allow use of KMS Key"
-  policy      = data.aws_iam_policy_document.kms_use.json
-}
-
-resource "aws_iam_role_policy_attachment" "kms_developer" {
-  role       = aws_iam_role.developer.name
-  policy_arn = sort(data.aws_iam_roles.developer.arns)[0]
-}
