@@ -29,7 +29,7 @@ def lambda_handler(event, context):
                     continue
     # Seperate the AMi deletion and Snapshot deletion as it may take a few mins for the AMI to be deleted, and allow the snapshot to be deleted
     snapshot_response = client.describe_snapshots(OwnerIds=["self"])
-    for snapshot in snapshot_response["snapshots"]:
+    for snapshot in snapshot_response["Snapshots"]:
         if parser.parse(snapshot.get("StartTime")).date() < deletion_time:
             snap_id = snapshot.get("SnapshotId")
             try:
