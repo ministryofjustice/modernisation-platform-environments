@@ -10,7 +10,7 @@ resource "aws_kms_key" "xhibit-cmk" {
 
 resource "aws_kms_alias" "xhibit-cmk-alias" {
   name          = "alias/xhibit-shared-key"
-  target_key_id = aws_kms_key.xhibit-cmk[0].key_id
+  target_key_id = aws_kms_key.xhibit-cmk.key_id
 }
 
 data "aws_iam_policy_document" "shared_cmk_policy" {
