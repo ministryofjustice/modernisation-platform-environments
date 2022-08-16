@@ -48,7 +48,7 @@ data "aws_iam_policy_document" "shared_cmk_policy" {
       "kms:CancelKeyDeletion"
     ]
     principals {
-      identifiers = [format("arn:aws:iam::%s:role/ModernisationPlatformAccess", local.environment_management.account_ids["xhibit-portal-production"]), format("arn:aws:iam::%s:role/ModernisationPlatformAccess", local.environment_management.account_ids["xhibit-portal-preproduction"])]
+      identifiers = [format("arn:aws:iam::%s:role/modernisation-platform-developer", local.environment_management.account_ids["xhibit-portal-production"]), format("arn:aws:iam::%s:role/modernisation-platform-developer", local.environment_management.account_ids["xhibit-portal-preproduction"])]
       type        = "AWS"
     }
     resources = ["*"]
