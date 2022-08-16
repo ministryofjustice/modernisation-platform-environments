@@ -48,7 +48,7 @@ data "aws_iam_policy_document" "shared_cmk_policy" {
       "kms:CancelKeyDeletion"
     ]
     principals {
-      identifiers = [format("arn:aws:iam::%s:role/ModernisationPlatformAccess", local.environment_management.account_ids["xhibit-portal-production"])]
+      identifiers = [format("arn:aws:iam::%s:role/ModernisationPlatformAccess", local.environment_management.account_ids["xhibit-portal-production"]), format("arn:aws:iam::%s:role/ModernisationPlatformAccess", local.environment_management.account_ids["xhibit-portal-preproduction"])]
       type        = "AWS"
     }
     resources = ["*"]
@@ -64,7 +64,7 @@ data "aws_iam_policy_document" "shared_cmk_policy" {
       "kms:DescribeKey"
     ]
     principals {
-      identifiers = [format("arn:aws:iam::%s:root", local.environment_management.account_ids[format("%s-production", local.application_name)])]
+      identifiers = [format("arn:aws:iam::%s:root", local.environment_management.account_ids[format("%s-production", local.application_name)]), format("arn:aws:iam::%s:root", local.environment_management.account_ids[format("%s-preproduction", local.application_name)])]
       type        = "AWS"
     }
     resources = ["*"]
@@ -78,7 +78,7 @@ data "aws_iam_policy_document" "shared_cmk_policy" {
       "kms:RevokeGrant"
     ]
     principals {
-      identifiers = [format("arn:aws:iam::%s:root", local.environment_management.account_ids[format("%s-production", local.application_name)])]
+      identifiers = [format("arn:aws:iam::%s:root", local.environment_management.account_ids[format("%s-production", local.application_name)]), format("arn:aws:iam::%s:root", local.environment_management.account_ids[format("%s-preproduction", local.application_name)])]
       type        = "AWS"
     }
     condition {
