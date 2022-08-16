@@ -27,19 +27,15 @@ def lambda_handler(event, context):
                 except botocore.exceptions.ClientError as e:
                     print(f"Error deleting AMI {e.response['Error']['Message']}")
                     continue
-
-                for bdm in image["BlockDeviceMappings"]:
-                    # Ignore ephemeral bdm
-                    if (
-                        bdm.get("Ebs") is not None
-                        and bdm.get("Ebs").get("SnapshotId") is not None
-                    ):
-                        snap_id = bdm.get("Ebs").get("SnapshotId")
-                        try:
-                            print(f"Deleting Snapshot {snap_id}")
-                            client.delete_snapshot(SnapshotId=snap_id)
-                        except botocore.exceptions.ClientError as e:
-                            print(
-                                f"Error deleting Snapshot {e.response['Error']['Message']}"
-                            )
-                            continue
+    # Seperate the AMi deletion and Snapshot deletion as it may take a few mins for the AMI to be deleted, and allow the snapshot to be deleted
+    snapshot_response = client.describe_snapshots(OwnerIds=["self"])
+    for snapshot in snapshot_response["snapshots"]:
+        # Ignore ephemeral bdm
+        if snapshot.get("StartTime") < deletion_time:
+            snap_id = snapshot.get("SnapshotId")
+            try:
+                print(f"Deleting Snapshot {snap_id}")
+                client.delete_snapshot(SnapshotId=snap_id)
+            except botocore.exceptions.ClientError as e:
+                print(f"Error deleting Snapshot {e.response['Error']['Message']}")
+                continue
