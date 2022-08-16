@@ -45,7 +45,10 @@ data "aws_iam_policy_document" "shared_cmk_policy" {
       "kms:TagResource",
       "kms:UntagResource",
       "kms:ScheduleKeyDeletion",
-      "kms:CancelKeyDeletion"
+      "kms:CancelKeyDeletion",
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:ReEncrypt*"
     ]
     principals {
       identifiers = [format("arn:aws:iam::%s:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-developer_9a5e04597105d217", local.environment_management.account_ids["xhibit-portal-preproduction"]), format("arn:aws:iam::%s:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-developer_570eb7336a1416a0", local.environment_management.account_ids["xhibit-portal-production"])]
