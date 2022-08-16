@@ -118,5 +118,5 @@ resource "aws_iam_policy" "kms_use" {
 
 resource "aws_iam_role_policy_attachment" "kms_developer" {
   role       = aws_iam_role.developer.name
-  policy_arn = data.aws_iam_roles.developer.arn
+  policy_arn = sort(data.aws_iam_roles.developer.arns)[0]
 }
