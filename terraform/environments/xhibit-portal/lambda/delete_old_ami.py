@@ -20,6 +20,14 @@ def lambda_handler(event, context):
                 Filters=[{"Name": "image-id", "Values": [image["ImageId"]]}]
             )
             if len(instance_response["Reservations"]) == 0:
+                image_id = image["ImageId"]
+                try:
+                    print(f"Deleting Image {image_id}")
+                    client.deregister_image(ImageId=image_id)
+                except botocore.exceptions.ClientError as e:
+                    print(f"Error deleting AMI {e.response['Error']['Message']}")
+                    continue
+
                 for bdm in image["BlockDeviceMappings"]:
                     # Ignore ephemeral bdm
                     if (
@@ -35,11 +43,3 @@ def lambda_handler(event, context):
                                 f"Error deleting Snapshot {e.response['Error']['Message']}"
                             )
                             continue
-                image_id = image["ImageId"]
-                try:
-                    print(f"Deleting Image {image_id}")
-                    client.deregister_image(ImageId=image_id)
-                except botocore.exceptions.ClientError as e:
-                    print(
-                        f"Error deleting AMI {e.response['Error']['Message']}")
-                    continue
