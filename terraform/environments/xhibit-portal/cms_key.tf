@@ -16,11 +16,11 @@ resource "aws_kms_key" "xhibit-cmk" {
 resource "aws_kms_alias" "xhibit-cmk-alias" {
   count         = local.environment == "development" ? 1 : 0
   name          = "alias/xhibit-shared-key"
-  target_key_id = aws_kms_key.nomis-cmk[0].key_id
+  target_key_id = aws_kms_key.xhibit-cmk[0].key_id
 }
 
 data "aws_iam_policy_document" "shared_cmk_policy" {
-  count = local.environment == "test" ? 1 : 0
+  count = local.environment == "development" ? 1 : 0
   statement {
     effect = "Allow"
     actions = ["kms:Encrypt",
