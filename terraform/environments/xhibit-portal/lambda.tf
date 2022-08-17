@@ -157,7 +157,7 @@ resource "aws_lambda_function" "delete_old_ami" {
   handler                        = "delete_old_ami.lambda_handler"
   source_code_hash               = data.archive_file.delete_lambda_zip.output_base64sha256
   runtime                        = "python3.8"
-  timeout                        = "120"
+  timeout                        = "240"
   reserved_concurrent_executions = 1
 }
 
