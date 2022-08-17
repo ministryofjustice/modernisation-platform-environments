@@ -69,7 +69,7 @@ locals {
           }
         },
         CNOMT1TEST = {
-          always_on          = false
+          always_on          = true
           ami_name           = "nomis_db_STIG_CNOMT1-2022-04-21T11.33.39Z"
           asm_data_capacity  = 100
           asm_flash_capacity = 2
