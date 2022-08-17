@@ -200,7 +200,7 @@ data "aws_iam_policy_document" "nomis-all-environments-access" {
 }
 
 module "nomis-audit-archives" {
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.1.1"
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.2.0"
 
   providers = {
     aws.bucket-replication = aws
