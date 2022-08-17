@@ -26,12 +26,13 @@ def lambda_handler(event, context):
                     print(f"Deleting Image {image_id}")
                     client.deregister_image(ImageId=image_id)
                 except botocore.exceptions.ClientError as e:
-                    print(
-                        f"Error deleting AMI {e.response['Error']['Message']}")
+                    print(f"Error deleting AMI {e.response['Error']['Message']}")
                     continue
     # Seperate the AMi deletion and Snapshot deletion as it may take a few mins for the AMI to be deleted, and allow the snapshot to be deleted
     print("Checking Snapshots")
-    snapshot_paginator = client.get_paginator("describe_snapshots").paginate()
+    snapshot_paginator = client.get_paginator("describe_snapshots").paginate(
+        OwnerId="self"
+    )
     for page in snapshot_paginator:
         for snapshot in page["Snapshots"]:
             if snapshot.get("StartTime").date() < deletion_date:
@@ -40,6 +41,5 @@ def lambda_handler(event, context):
                     print(f"Deleting Snapshot {snap_id}")
                     client.delete_snapshot(SnapshotId=snap_id)
                 except botocore.exceptions.ClientError as e:
-                    print(
-                        f"Error deleting Snapshot {e.response['Error']['Message']}")
+                    print(f"Error deleting Snapshot {e.response['Error']['Message']}")
                     continue
