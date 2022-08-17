@@ -1,6 +1,6 @@
 
 module "s3-bucket" {
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.1.1"
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.2.0"
 
   providers = {
     aws.bucket-replication = aws
@@ -50,7 +50,7 @@ module "s3-bucket" {
 }
 
 module "nomis-db-backup-bucket" {
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.1.1"
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.2.0"
 
   providers = {
     aws.bucket-replication = aws
