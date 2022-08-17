@@ -75,7 +75,7 @@ locals {
           asm_flash_capacity     = 2
           description            = "Test NOMIS T1 database with a dataset of T1PDL0009 (note: only NOMIS db, NDH db is not included."
           oracle_sids            = ["CNOMT1"]
-          restored_from_snapshot = true
+          # restored_from_snapshot = true
           tags = {
             monitored = false
           }
