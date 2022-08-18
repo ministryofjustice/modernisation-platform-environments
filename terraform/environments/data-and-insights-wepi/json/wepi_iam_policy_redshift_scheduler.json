@@ -1,0 +1,15 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+      {
+          "Sid": "",
+          "Effect": "Allow",
+          "Action": [
+              "redshift:PauseCluster",
+              "redshift:ResumeCluster",
+              "redshift:ResizeCluster"
+          ],
+          "Resource": "${redshift_cluster}"
+      }
+  ]
+}
