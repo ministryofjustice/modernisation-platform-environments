@@ -8,8 +8,8 @@
       "redshift_param_group_family": "redshift-1.0",
       "redshift_snapshot_cron": "cron(0 */4 * * *)",
       "redshift_pause_cluster_enabled": true,
-      "redshift_pause_cluster_cron": "0 20 * * 1-5",
-      "redshift_resume_cluster_cron": "0 6 * * 1-5"
+      "redshift_pause_cluster_cron": "cron(0 20 * * 1-5)",
+      "redshift_resume_cluster_cron": "cron(0 6 * * 1-5)"
     },
     "test": {
       "redshift_node_type": "ds2.xlarge",
@@ -19,8 +19,8 @@
       "redshift_param_group_family": "redshift-1.0",
       "redshift_snapshot_cron": "cron(0 */4 * * *)",
       "redshift_pause_cluster_enabled": true,
-      "redshift_pause_cluster_cron": "0 20 * * 1-5",
-      "redshift_resume_cluster_cron": "0 6 * * 1-5"
+      "redshift_pause_cluster_cron": "cron(0 20 * * 1-5)",
+      "redshift_resume_cluster_cron": "cron(0 6 * * 1-5)"
     },
     "production": {
       "redshift_node_type": "ra3.xlplus",
