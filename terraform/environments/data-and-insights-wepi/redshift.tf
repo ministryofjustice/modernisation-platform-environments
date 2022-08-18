@@ -12,7 +12,7 @@ resource "aws_redshift_subnet_group" "wepi_redhsift_subnet_group" {
 }
 
 # Redshift parameter group
-resource "aws_redshift_parameter_group" "wepi_redshift_prama_group" {
+resource "aws_redshift_parameter_group" "wepi_redshift_param_group" {
   name   = "wepi-redshift-${local.environment}-param-group"
   family = local.app_data.accounts[local.environment].redshift_param_group_family
 
@@ -41,7 +41,7 @@ resource "aws_redshift_cluster" "wepi_redshift_cluster" {
   vpc_security_group_ids    = "TO-DO"
   cluster_subnet_group_name = aws_redshift_subnet_group.wepi_redhsift_subnet_group.name
 
-  cluster_parameter_group_name = "TO-DO"
+  cluster_parameter_group_name = aws_redshift_parameter_group.wepi_redshift_param_group.name
 
   aqua_configuration_status = "enabled"
 
