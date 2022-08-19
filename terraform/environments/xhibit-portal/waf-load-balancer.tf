@@ -452,8 +452,8 @@ data "aws_iam_policy_document" "s3_bucket_waf_logs_policy" {
     ]
     effect = "Deny"
     resources = [
-      "${aws_s3_bucket.waf_logs.arn}/*",
-      "${aws_s3_bucket.waf_logs.arn}"
+      "${aws_s3_bucket.waf_logs[0].arn}/*",
+      "${aws_s3_bucket.waf_logs[0].arn}"
     ]
 
     condition {
@@ -477,7 +477,7 @@ data "aws_iam_policy_document" "s3_bucket_waf_logs_policy" {
     ]
     effect = "Allow"
     resources = [
-      "${aws_s3_bucket.waf_logs.arn}/AWSLogs/*"
+      "${aws_s3_bucket.waf_logs[0].arn}/AWSLogs/*"
     ]
 
     condition {
@@ -517,7 +517,7 @@ data "aws_iam_policy_document" "s3_bucket_waf_logs_policy" {
     ]
     effect = "Allow"
     resources = [
-      "${aws_s3_bucket.waf_logs.arn}"
+      "${aws_s3_bucket.waf_logs[0].arn}"
     ]
 
     condition {

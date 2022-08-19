@@ -210,17 +210,19 @@ resource "aws_wafv2_web_acl_association" "aws_prtg-lb_waf_association" {
 }
 
 resource "aws_s3_bucket" "prtg_logs" {
+  count         = local.is-production ? 0 : 1
   bucket        = "aws-waf-logs-prtg-${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}"
   force_destroy = true
 }
 
 resource "aws_s3_bucket_acl" "prtg_logs" {
-  bucket = aws_s3_bucket.prtg_logs.id
+  count  = local.is-production ? 0 : 1
+  bucket = aws_s3_bucket.prtg_logs[0].id
   acl    = "log-delivery-write"
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "default_encryption_prtg_logs" {
-  bucket = aws_s3_bucket.prtg_logs.bucket
+  bucket = aws_s3_bucket.prtg_logs[0].bucket
 
   rule {
     apply_server_side_encryption_by_default {
@@ -237,7 +239,7 @@ resource "aws_wafv2_web_acl_logging_configuration" "prtg_logs" {
 
 resource "aws_s3_bucket_policy" "prtg_logs_policy" {
   count  = local.is-production ? 0 : 1
-  bucket = aws_s3_bucket.prtg_logs[0].bucket
+  bucket = aws_s3_bucket.prtg_logs.bucket
   policy = data.aws_iam_policy_document.s3_bucket_prtg_logs_policy.json
 }
 
@@ -250,8 +252,8 @@ data "aws_iam_policy_document" "s3_bucket_prtg_logs_policy" {
     ]
     effect = "Deny"
     resources = [
-      "${aws_s3_bucket.prtg_logs.arn}/*",
-      "${aws_s3_bucket.prtg_logs.arn}"
+      "${aws_s3_bucket.prtg_logs[0].arn}/*",
+      "${aws_s3_bucket.prtg_logs[0].arn}"
     ]
 
     condition {
@@ -275,7 +277,7 @@ data "aws_iam_policy_document" "s3_bucket_prtg_logs_policy" {
     ]
     effect = "Allow"
     resources = [
-      "${aws_s3_bucket.prtg_logs.arn}/AWSLogs/*"
+      "${aws_s3_bucket.prtg_logs[0].arn}/AWSLogs/*"
     ]
 
     condition {
@@ -315,7 +317,7 @@ data "aws_iam_policy_document" "s3_bucket_prtg_logs_policy" {
     ]
     effect = "Allow"
     resources = [
-      "${aws_s3_bucket.prtg_logs.arn}"
+      "${aws_s3_bucket.prtg_logs[0].arn}"
     ]
 
     condition {
