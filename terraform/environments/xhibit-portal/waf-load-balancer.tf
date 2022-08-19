@@ -440,11 +440,11 @@ resource "aws_wafv2_web_acl_logging_configuration" "waf_logs" {
 resource "aws_s3_bucket_policy" "waf_logs_policy" {
   count  = local.is-production ? 0 : 1
   bucket = aws_s3_bucket.waf_logs[0].bucket
-  policy = data.aws_iam_policy_document.s3_bucket_waf_logs_policy.json
+  policy = data.aws_iam_policy_document.s3_bucket_waf_logs_policy[0].json
 }
 
 data "aws_iam_policy_document" "s3_bucket_waf_logs_policy" {
-
+  count = local.is-production ? 0 : 1
   statement {
     sid = "AllowSSLRequestsOnly"
     actions = [
