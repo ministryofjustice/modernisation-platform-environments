@@ -239,6 +239,77 @@ resource "aws_acm_certificate_validation" "waf_lb_cert_validation" {
   validation_record_fqdns = [for record in local.domain_types : record.name]
 }
 
+resource "aws_wafv2_web_acl" "waf_acl" {
+  name        = "waf-acl"
+  description = "WAF for Xhibit Portal."
+  scope       = "REGIONAL"
+
+  default_action {
+    block {}
+  }
+
+  rule {
+    name     = "block-non-gb"
+    priority = 0
+
+    action {
+      allow {}
+    }
+
+    statement {
+      geo_match_statement {
+        country_codes = ["GB"]
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "waf-acl-block-non-gb-rule-metric"
+      sampled_requests_enabled   = true
+    }
+  }
+
+  rule {
+    name     = "aws-waf-common-rules"
+    priority = 1
+
+    override_action {
+      count {}
+    }
+
+    statement {
+      managed_rule_group_statement {
+        name        = "AWSManagedRulesCommonRuleSet"
+        vendor_name = "AWS"
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "waf-acl-common-rules-metric"
+      sampled_requests_enabled   = true
+    }
+  }
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "waf-acl-${var.networking[0].application}"
+    },
+  )
+
+  visibility_config {
+    cloudwatch_metrics_enabled = true
+    metric_name                = "waf-acl-metric"
+    sampled_requests_enabled   = true
+  }
+
+}
+
+resource "aws_wafv2_web_acl_association" "aws_lb_waf_association" {
+  resource_arn = aws_lb.waf_lb.arn
+  web_acl_arn  = aws_wafv2_web_acl.waf_acl.arn
+}
 
 resource "aws_s3_bucket" "loadbalancer_logs" {
   bucket        = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}-lblogs"
@@ -327,6 +398,136 @@ data "aws_iam_policy_document" "s3_bucket_lb_write" {
     ]
     effect    = "Allow"
     resources = ["${aws_s3_bucket.loadbalancer_logs.arn}"]
+
+    principals {
+      identifiers = ["delivery.logs.amazonaws.com"]
+      type        = "Service"
+    }
+  }
+}
+
+resource "aws_s3_bucket" "waf_logs" {
+  bucket        = "aws-waf-logs-${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}"
+  force_destroy = true
+}
+
+resource "aws_s3_bucket_acl" "waf_logs" {
+  bucket = aws_s3_bucket.waf_logs.id
+  acl    = "log-delivery-write"
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "default_encryption_waf_logs" {
+  bucket = aws_s3_bucket.waf_logs.bucket
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+
+resource "aws_wafv2_web_acl_logging_configuration" "waf_logs" {
+  log_destination_configs = ["${aws_s3_bucket.waf_logs.arn}"]
+  resource_arn            = aws_wafv2_web_acl.waf_acl.arn
+}
+
+resource "aws_s3_bucket_policy" "waf_logs_policy" {
+  bucket = aws_s3_bucket.waf_logs.bucket
+  policy = data.aws_iam_policy_document.s3_bucket_waf_logs_policy.json
+}
+
+data "aws_iam_policy_document" "s3_bucket_waf_logs_policy" {
+
+  statement {
+    sid = "AllowSSLRequestsOnly"
+    actions = [
+      "s3:*",
+    ]
+    effect = "Deny"
+    resources = [
+      "${aws_s3_bucket.waf_logs.arn}/*",
+      "${aws_s3_bucket.waf_logs.arn}"
+    ]
+
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values = [
+        "false"
+      ]
+    }
+
+    principals {
+      identifiers = ["*"]
+      type        = "AWS"
+    }
+  }
+
+  statement {
+    sid = "AWSLogDeliveryWrite"
+    actions = [
+      "s3:PutObject",
+    ]
+    effect = "Allow"
+    resources = [
+      "${aws_s3_bucket.waf_logs.arn}/AWSLogs/*"
+    ]
+
+    condition {
+      test     = "StringEquals"
+      variable = "s3:x-amz-acl"
+      values = [
+        "bucket-owner-full-control"
+      ]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceAccount"
+      values = [
+        "${data.aws_caller_identity.current.account_id}"
+      ]
+    }
+
+    condition {
+      test     = "ArnLike"
+      variable = "aws:SourceArn"
+      values = [
+        "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.account_id}:*"
+      ]
+    }
+
+    principals {
+      identifiers = ["delivery.logs.amazonaws.com"]
+      type        = "Service"
+    }
+  }
+
+  statement {
+    sid = "AWSLogDeliveryAclCheck"
+    actions = [
+      "s3:GetBucketAcl"
+    ]
+    effect = "Allow"
+    resources = [
+      "${aws_s3_bucket.waf_logs.arn}"
+    ]
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceAccount"
+      values = [
+        "${data.aws_caller_identity.current.account_id}"
+      ]
+    }
+
+    condition {
+      test     = "ArnLike"
+      variable = "aws:SourceArn"
+      values = [
+        "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.account_id}:*"
+      ]
+    }
 
     principals {
       identifiers = ["delivery.logs.amazonaws.com"]

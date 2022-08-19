@@ -135,6 +135,78 @@ resource "aws_acm_certificate_validation" "prtg_lb_cert_validation" {
   validation_record_fqdns = [for record in local.prtg_domain_types : record.name]
 }
 
+resource "aws_wafv2_web_acl" "prtg_acl" {
+  name        = "WAFprtg-acl"
+  description = "WAF ACL rules for prtg Looad Balancer."
+  scope       = "REGIONAL"
+
+  default_action {
+    block {}
+  }
+
+  rule {
+    name     = "block-non-gb"
+    priority = 0
+
+    action {
+      allow {}
+    }
+
+    statement {
+      geo_match_statement {
+        country_codes = ["GB"]
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "prtg-acl-block-non-gb-rule-metric"
+      sampled_requests_enabled   = true
+    }
+  }
+
+  rule {
+    name     = "aws-prtg-common-rules"
+    priority = 1
+
+    override_action {
+      count {}
+    }
+
+    statement {
+      managed_rule_group_statement {
+        name        = "AWSManagedRulesCommonRuleSet"
+        vendor_name = "AWS"
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "prtg-acl-common-rules-metric"
+      sampled_requests_enabled   = true
+    }
+  }
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "prtg-acl-${var.networking[0].application}"
+    },
+  )
+
+  visibility_config {
+    cloudwatch_metrics_enabled = true
+    metric_name                = "prtg-acl-metric"
+    sampled_requests_enabled   = true
+  }
+
+}
+
+resource "aws_wafv2_web_acl_association" "aws_prtg-lb_waf_association" {
+  resource_arn = aws_lb.prtg_lb.arn
+  web_acl_arn  = aws_wafv2_web_acl.prtg_acl.arn
+}
+
 resource "aws_s3_bucket" "prtg_logs" {
   bucket        = "aws-waf-logs-prtg-${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}"
   force_destroy = true
@@ -153,6 +225,11 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "default_encryptio
       sse_algorithm = "AES256"
     }
   }
+}
+
+resource "aws_wafv2_web_acl_logging_configuration" "prtg_logs" {
+  log_destination_configs = ["${aws_s3_bucket.prtg_logs.arn}"]
+  resource_arn            = aws_wafv2_web_acl.prtg_acl.arn
 }
 
 resource "aws_s3_bucket_policy" "prtg_logs_policy" {
