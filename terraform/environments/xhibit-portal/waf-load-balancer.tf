@@ -310,7 +310,7 @@ resource "aws_wafv2_web_acl" "waf_acl" {
 resource "aws_wafv2_web_acl_association" "aws_lb_waf_association" {
   resource_arn = aws_lb.waf_lb.arn
   count        = local.is-production ? 0 : 1
-  web_acl_arn  = aws_wafv2_web_acl.waf_acl.arn
+  web_acl_arn  = aws_wafv2_web_acl.waf_acl[0].arn
 }
 
 resource "aws_s3_bucket" "loadbalancer_logs" {
@@ -416,13 +416,13 @@ resource "aws_s3_bucket" "waf_logs" {
 
 resource "aws_s3_bucket_acl" "waf_logs" {
   count  = local.is-production ? 0 : 1
-  bucket = aws_s3_bucket.waf_logs.id
+  bucket = aws_s3_bucket.waf_logs[0].id
   acl    = "log-delivery-write"
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "default_encryption_waf_logs" {
   count  = local.is-production ? 0 : 1
-  bucket = aws_s3_bucket.waf_logs.bucket
+  bucket = aws_s3_bucket.waf_logs[0].bucket
 
   rule {
     apply_server_side_encryption_by_default {
@@ -433,13 +433,13 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "default_encryptio
 
 resource "aws_wafv2_web_acl_logging_configuration" "waf_logs" {
   count                   = local.is-production ? 0 : 1
-  log_destination_configs = ["${aws_s3_bucket.waf_logs.arn}"]
-  resource_arn            = aws_wafv2_web_acl.waf_acl.arn
+  log_destination_configs = ["${aws_s3_bucket.waf_logs[0].arn}"]
+  resource_arn            = aws_wafv2_web_acl.waf_acl[0].arn
 }
 
 resource "aws_s3_bucket_policy" "waf_logs_policy" {
   count  = local.is-production ? 0 : 1
-  bucket = aws_s3_bucket.waf_logs.bucket
+  bucket = aws_s3_bucket.waf_logs[0].bucket
   policy = data.aws_iam_policy_document.s3_bucket_waf_logs_policy.json
 }
 

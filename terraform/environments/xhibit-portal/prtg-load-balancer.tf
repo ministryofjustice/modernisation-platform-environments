@@ -206,7 +206,7 @@ resource "aws_wafv2_web_acl" "prtg_acl" {
 resource "aws_wafv2_web_acl_association" "aws_prtg-lb_waf_association" {
   count        = local.is-production ? 0 : 1
   resource_arn = aws_lb.prtg_lb.arn
-  web_acl_arn  = aws_wafv2_web_acl.prtg_acl.arn
+  web_acl_arn  = aws_wafv2_web_acl.prtg_acl[0].arn
 }
 
 resource "aws_s3_bucket" "prtg_logs" {
@@ -231,13 +231,13 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "default_encryptio
 
 resource "aws_wafv2_web_acl_logging_configuration" "prtg_logs" {
   count                   = local.is-production ? 0 : 1
-  log_destination_configs = ["${aws_s3_bucket.prtg_logs.arn}"]
-  resource_arn            = aws_wafv2_web_acl.prtg_acl.arn
+  log_destination_configs = ["${aws_s3_bucket.prtg_logs[0].arn}"]
+  resource_arn            = aws_wafv2_web_acl.prtg_acl[0].arn
 }
 
 resource "aws_s3_bucket_policy" "prtg_logs_policy" {
   count  = local.is-production ? 0 : 1
-  bucket = aws_s3_bucket.prtg_logs.bucket
+  bucket = aws_s3_bucket.prtg_logs[0].bucket
   policy = data.aws_iam_policy_document.s3_bucket_prtg_logs_policy.json
 }
 
