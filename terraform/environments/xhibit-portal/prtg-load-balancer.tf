@@ -136,6 +136,7 @@ resource "aws_acm_certificate_validation" "prtg_lb_cert_validation" {
 }
 
 resource "aws_wafv2_web_acl" "prtg_acl" {
+  count       = local.is-production ? 0 : 1
   name        = "WAFprtg-acl"
   description = "WAF ACL rules for prtg Looad Balancer."
   scope       = "REGIONAL"
@@ -203,22 +204,25 @@ resource "aws_wafv2_web_acl" "prtg_acl" {
 }
 
 resource "aws_wafv2_web_acl_association" "aws_prtg-lb_waf_association" {
+  count        = local.is-production ? 0 : 1
   resource_arn = aws_lb.prtg_lb.arn
-  web_acl_arn  = aws_wafv2_web_acl.prtg_acl.arn
+  web_acl_arn  = aws_wafv2_web_acl.prtg_acl[0].arn
 }
 
 resource "aws_s3_bucket" "prtg_logs" {
+  count         = local.is-production ? 0 : 1
   bucket        = "aws-waf-logs-prtg-${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}"
   force_destroy = true
 }
 
 resource "aws_s3_bucket_acl" "prtg_logs" {
-  bucket = aws_s3_bucket.prtg_logs.id
+  count  = local.is-production ? 0 : 1
+  bucket = aws_s3_bucket.prtg_logs[0].id
   acl    = "log-delivery-write"
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "default_encryption_prtg_logs" {
-  bucket = aws_s3_bucket.prtg_logs.bucket
+  bucket = aws_s3_bucket.prtg_logs[0].bucket
 
   rule {
     apply_server_side_encryption_by_default {
@@ -228,12 +232,14 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "default_encryptio
 }
 
 resource "aws_wafv2_web_acl_logging_configuration" "prtg_logs" {
-  log_destination_configs = ["${aws_s3_bucket.prtg_logs.arn}"]
-  resource_arn            = aws_wafv2_web_acl.prtg_acl.arn
+  count                   = local.is-production ? 0 : 1
+  log_destination_configs = ["${aws_s3_bucket.prtg_logs[0].arn}"]
+  resource_arn            = aws_wafv2_web_acl.prtg_acl[0].arn
 }
 
 resource "aws_s3_bucket_policy" "prtg_logs_policy" {
-  bucket = aws_s3_bucket.prtg_logs.bucket
+  count  = local.is-production ? 0 : 1
+  bucket = aws_s3_bucket.prtg_logs[0].bucket
   policy = data.aws_iam_policy_document.s3_bucket_prtg_logs_policy.json
 }
 
@@ -246,8 +252,8 @@ data "aws_iam_policy_document" "s3_bucket_prtg_logs_policy" {
     ]
     effect = "Deny"
     resources = [
-      "${aws_s3_bucket.prtg_logs.arn}/*",
-      "${aws_s3_bucket.prtg_logs.arn}"
+      "${aws_s3_bucket.prtg_logs[0].arn}/*",
+      "${aws_s3_bucket.prtg_logs[0].arn}"
     ]
 
     condition {
@@ -271,7 +277,7 @@ data "aws_iam_policy_document" "s3_bucket_prtg_logs_policy" {
     ]
     effect = "Allow"
     resources = [
-      "${aws_s3_bucket.prtg_logs.arn}/AWSLogs/*"
+      "${aws_s3_bucket.prtg_logs[0].arn}/AWSLogs/*"
     ]
 
     condition {
@@ -311,7 +317,7 @@ data "aws_iam_policy_document" "s3_bucket_prtg_logs_policy" {
     ]
     effect = "Allow"
     resources = [
-      "${aws_s3_bucket.prtg_logs.arn}"
+      "${aws_s3_bucket.prtg_logs[0].arn}"
     ]
 
     condition {
