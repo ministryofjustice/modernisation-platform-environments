@@ -76,7 +76,7 @@ resource "aws_instance" "importmachine" {
       # [1]: https://github.com/terraform-providers/terraform-provider-aws/issues/770
       volume_tags,
     ]
-    prevent_destroy = false
+    prevent_destroy = true
   }
 
   tags = merge(
