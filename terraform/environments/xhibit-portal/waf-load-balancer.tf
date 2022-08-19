@@ -241,6 +241,7 @@ resource "aws_acm_certificate_validation" "waf_lb_cert_validation" {
 
 resource "aws_wafv2_web_acl" "waf_acl" {
   name        = "waf-acl"
+  count       = local.is-production ? 0 : 1
   description = "WAF for Xhibit Portal."
   scope       = "REGIONAL"
 
@@ -308,6 +309,7 @@ resource "aws_wafv2_web_acl" "waf_acl" {
 
 resource "aws_wafv2_web_acl_association" "aws_lb_waf_association" {
   resource_arn = aws_lb.waf_lb.arn
+  count        = local.is-production ? 0 : 1
   web_acl_arn  = aws_wafv2_web_acl.waf_acl.arn
 }
 
@@ -407,16 +409,19 @@ data "aws_iam_policy_document" "s3_bucket_lb_write" {
 }
 
 resource "aws_s3_bucket" "waf_logs" {
+  count         = local.is-production ? 0 : 1
   bucket        = "aws-waf-logs-${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}"
   force_destroy = true
 }
 
 resource "aws_s3_bucket_acl" "waf_logs" {
+  count  = local.is-production ? 0 : 1
   bucket = aws_s3_bucket.waf_logs.id
   acl    = "log-delivery-write"
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "default_encryption_waf_logs" {
+  count  = local.is-production ? 0 : 1
   bucket = aws_s3_bucket.waf_logs.bucket
 
   rule {
@@ -427,11 +432,13 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "default_encryptio
 }
 
 resource "aws_wafv2_web_acl_logging_configuration" "waf_logs" {
+  count                   = local.is-production ? 0 : 1
   log_destination_configs = ["${aws_s3_bucket.waf_logs.arn}"]
   resource_arn            = aws_wafv2_web_acl.waf_acl.arn
 }
 
 resource "aws_s3_bucket_policy" "waf_logs_policy" {
+  count  = local.is-production ? 0 : 1
   bucket = aws_s3_bucket.waf_logs.bucket
   policy = data.aws_iam_policy_document.s3_bucket_waf_logs_policy.json
 }
