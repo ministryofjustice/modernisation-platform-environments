@@ -222,6 +222,7 @@ resource "aws_s3_bucket_acl" "prtg_logs" {
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "default_encryption_prtg_logs" {
+  count  = local.is-production ? 0 : 1
   bucket = aws_s3_bucket.prtg_logs[0].bucket
 
   rule {
@@ -240,11 +241,11 @@ resource "aws_wafv2_web_acl_logging_configuration" "prtg_logs" {
 resource "aws_s3_bucket_policy" "prtg_logs_policy" {
   count  = local.is-production ? 0 : 1
   bucket = aws_s3_bucket.prtg_logs[0].bucket
-  policy = data.aws_iam_policy_document.s3_bucket_prtg_logs_policy.json
+  policy = data.aws_iam_policy_document.s3_bucket_prtg_logs_policy[0].json
 }
 
 data "aws_iam_policy_document" "s3_bucket_prtg_logs_policy" {
-
+  count = local.is-production ? 0 : 1
   statement {
     sid = "AllowSSLRequestsOnly"
     actions = [
