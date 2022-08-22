@@ -34,9 +34,10 @@ resource "aws_redshift_cluster" "wepi_redshift_cluster" {
   cluster_type    = local.app_data.accounts[local.environment].redshift_cluster_node_count > 1 ? "multi-node" : "single-node"
   number_of_nodes = local.app_data.accounts[local.environment].redshift_cluster_node_count
 
-  encrypted   = true
-  kms_key_arn = aws_kms_key.wepi_kms_cmk.arn
+  encrypted  = true
+  kms_key_id = aws_kms_key.wepi_kms_cmk.arn
 
+  publicly_accessible       = "false"
   enhanced_vpc_routing      = true
   vpc_security_group_ids    = "TO-DO"
   cluster_subnet_group_name = aws_redshift_subnet_group.wepi_redhsift_subnet_group.name
@@ -47,6 +48,13 @@ resource "aws_redshift_cluster" "wepi_redshift_cluster" {
 
   automated_snapshot_retention_period = local.app_data.accounts[local.environment].redshift_auto_snapshot_retention
   manual_snapshot_retention_period    = local.app_data.accounts[local.environment].redshift_manual_snapshot_retention
+  
+  logging {
+    enable               = true
+    bucket_name          = module.wepi_s3_logging.bucket.name
+    s3_key_prefix        = "wepi-redshift-logs"
+    log_destination_type = "s3"
+  }
 
   tags = merge(
     local.tags,
