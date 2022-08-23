@@ -68,17 +68,6 @@ locals {
             monitored = true
           }
         },
-        CNOMT1TEST = {
-          always_on          = false
-          ami_name           = "nomis_db_STIG_CNOMT1-2022-04-21T11.33.39Z"
-          asm_data_capacity  = 100
-          asm_flash_capacity = 2
-          description        = "Test NOMIS T1 database with a dataset of T1PDL0009 (note: only NOMIS db, NDH db is not included."
-          oracle_sids        = ["CNOMT1"]
-          tags = {
-            monitored = false
-          }
-        },
       },
       # Add weblogic instances here.  They will be created using the weblogic module
       weblogics = {
@@ -139,6 +128,23 @@ locals {
           }
           tags = {
             monitored = true
+          }
+        },
+        MISAUDITPP = {
+          always_on              = true
+          ami_name               = "nomis_db_STIG-2022-04-26*"
+          instance_type          = "r6i.2xlarge"
+          asm_data_capacity      = 4000
+          asm_flash_capacity     = 1000
+          description            = "PreProduction NOMIS MIS and Audit database to replace Azure PPPDL00017"
+          termination_protection = true
+          oracle_sids            = ["PPMIS", "PPCNMAUD"]
+          oracle_app_disk_size = {
+            "/dev/sdb" = 100  # /u01
+            "/dev/sdc" = 5120 # /u02
+          }
+          tags = {
+            monitored = false # not yet live
           }
         },
         NOMIS = {

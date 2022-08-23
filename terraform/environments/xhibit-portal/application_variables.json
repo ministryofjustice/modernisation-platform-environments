@@ -59,7 +59,7 @@
       "suprig05-ami": "ami-062d75b8c2ca6f00b",
       "suprig05-disk-1-snapshot": "snap-0b6d529f807eb9a6a",
       "XHBPRESMS01-ami": "ami-03ad19f47c6725480",
-      "importmachine-ami": "ami-0b33dfec9e4072ca1",
+      "importmachine-ami": "ami-024c501c76c2cada6",
       "buildserver-ami": "ami-0da5babad86576eb8",
       "buildserver-disk-1-snapshot": "snap-0b6d529f807eb9a6a"
     },

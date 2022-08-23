@@ -320,12 +320,35 @@ data "aws_iam_policy_document" "packer_s3_bucket_access" {
   }
 }
 
+# build policy document for listing/describing EC2 instances
+data "aws_iam_policy_document" "packer_ec2_instance_access" {
+  count = local.environment == "test" ? 1 : 0
+  statement {
+    effect = "Allow"
+    actions = [
+      "ec2:DescribeInstances",
+      "ec2:DescribeImages",
+      "ec2:DescribeTags",
+      "ec2:DescribeSnapshots"
+    ]
+    resources = ["*"]
+  }
+}
+
 # attach s3 document as inline policy
 resource "aws_iam_role_policy" "packer_s3_bucket_access" {
   count  = local.environment == "test" ? 1 : 0
   name   = "nomis-apps-bucket-access"
   role   = aws_iam_role.packer_ssm_role[0].name
   policy = data.aws_iam_policy_document.packer_s3_bucket_access[0].json
+}
+
+# attach ec2 document as inline policy
+resource "aws_iam_role_policy" "packer_ec2_instance_access" {
+  count  = local.environment == "test" ? 1 : 0
+  name   = "nomis-describe-instance-access"
+  role   = aws_iam_role.packer_ssm_role[0].name
+  policy = data.aws_iam_policy_document.packer_ec2_instance_access[0].json
 }
 
 # create instance profile from role
