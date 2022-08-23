@@ -5,7 +5,7 @@ resource "aws_iam_role" "wepi_iam_role_redshift_scheduler" {
 }
 
 resource "aws_iam_policy" "wepi_iam_policy_redshift_scheduler" {
-  name   = "wepi-iam-policy-${local.environment}-redshift-scheduler"
+  name = "wepi-iam-policy-${local.environment}-redshift-scheduler"
   policy = templatefile("${path.module}/json/wepi_iam_policy_redshift_scheduler.json",
     {
       redshift_cluster = aws_redshift_cluster.wepi_redshift_cluster.arn

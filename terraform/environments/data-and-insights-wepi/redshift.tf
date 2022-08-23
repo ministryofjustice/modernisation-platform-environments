@@ -48,7 +48,7 @@ resource "aws_redshift_cluster" "wepi_redshift_cluster" {
 
   automated_snapshot_retention_period = local.app_data.accounts[local.environment].redshift_auto_snapshot_retention
   manual_snapshot_retention_period    = local.app_data.accounts[local.environment].redshift_manual_snapshot_retention
-  
+
   logging {
     enable               = true
     bucket_name          = module.wepi_s3_logging.bucket.name
@@ -98,7 +98,7 @@ resource "aws_redshift_scheduled_action" "wepi_redshift_pause_schedule" {
       cluster_identifier = aws_redshift_cluster.wepi_redshift_cluster.cluster_identifier
     }
   }
-} 
+}
 
 resource "aws_redshift_scheduled_action" "wepi_redshift_resume_schedule" {
   count = local.app_data.accounts[local.environment].redshift_pause_cluster_enabled ? 1 : 0

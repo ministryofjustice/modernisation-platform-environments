@@ -11,9 +11,9 @@ resource "aws_secretsmanager_secret" "wepi_redshift_admin_secret" {
 }
 
 resource "random_password" "wepi_redshift_admin_pw" {
-  length           = 32
-  special          = true
-  
+  length  = 32
+  special = true
+
   override_special = "!#$%&*()-_=+[]{}<>:?"
   min_lower        = 1
   min_upper        = 1
