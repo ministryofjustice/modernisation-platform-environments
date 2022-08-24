@@ -1,7 +1,7 @@
 # Redshift subnet group configuration
 resource "aws_redshift_subnet_group" "wepi_redhsift_subnet_group" {
   name       = "wepi-redshift-${local.environment}-subnet-group"
-  subnet_ids = data.aws_subnets.wepi_vpc_subnets_data_all.id
+  subnet_ids = data.aws_subnets.wepi_vpc_subnets_data_all.ids
 
   tags = merge(
     local.tags,
@@ -37,9 +37,11 @@ resource "aws_redshift_cluster" "wepi_redshift_cluster" {
   encrypted  = true
   kms_key_id = aws_kms_key.wepi_kms_cmk.arn
 
-  publicly_accessible       = false
-  enhanced_vpc_routing      = true
-  vpc_security_group_ids    = aws_security_group.wepi_sg_allow_redshift.id
+  publicly_accessible  = false
+  enhanced_vpc_routing = true
+  vpc_security_group_ids = [
+    aws_security_group.wepi_sg_allow_redshift.id
+  ]
   cluster_subnet_group_name = aws_redshift_subnet_group.wepi_redhsift_subnet_group.name
 
   cluster_parameter_group_name = aws_redshift_parameter_group.wepi_redshift_param_group.name
@@ -51,7 +53,7 @@ resource "aws_redshift_cluster" "wepi_redshift_cluster" {
 
   logging {
     enable               = true
-    bucket_name          = module.wepi_s3_logging.bucket.name
+    bucket_name          = module.wepi_s3_logging.bucket.id
     s3_key_prefix        = "wepi-redshift-logs"
     log_destination_type = "s3"
   }
