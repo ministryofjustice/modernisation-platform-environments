@@ -1,6 +1,7 @@
 # Redshift admin password secret
 resource "aws_secretsmanager_secret" "wepi_redshift_admin_secret" {
-  name = "redshift-wepi-${local.environment}-admin-secret"
+  name       = "redshift-wepi-${local.environment}-admin-secret"
+  kms_key_id = aws_kms_key.wepi_kms_cmk.id
 
   tags = merge(
     local.tags,
