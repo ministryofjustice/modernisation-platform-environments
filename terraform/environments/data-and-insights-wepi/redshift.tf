@@ -37,9 +37,9 @@ resource "aws_redshift_cluster" "wepi_redshift_cluster" {
   encrypted  = true
   kms_key_id = aws_kms_key.wepi_kms_cmk.arn
 
-  publicly_accessible       = "false"
+  publicly_accessible       = false
   enhanced_vpc_routing      = true
-  vpc_security_group_ids    = "TO-DO"
+  vpc_security_group_ids    = aws_security_group.wepi_sg_allow_redshift.id
   cluster_subnet_group_name = aws_redshift_subnet_group.wepi_redhsift_subnet_group.name
 
   cluster_parameter_group_name = aws_redshift_parameter_group.wepi_redshift_param_group.name
@@ -70,7 +70,7 @@ resource "aws_redshift_cluster" "wepi_redshift_cluster" {
   }
 }
 
-# Redshift snapshot schedule and assoication
+# Redshift snapshot schedule and association
 resource "aws_redshift_snapshot_schedule" "wepi_redshift_snapshot_sched" {
   identifier = "wepi-redshift-${local.environment}-snapshot-sched"
   definitions = [
