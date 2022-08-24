@@ -135,6 +135,10 @@ resource "aws_ebs_volume" "oracle_app" {
       Name = "database-${var.name}-app-${each.key}"
     }
   )
+
+  lifecycle {
+    ignore_changes = [snapshot_id] # retain data if AMI is updated. If you want to start from fresh, destroy it
+  }
 }
 
 resource "aws_volume_attachment" "oracle_app" {
