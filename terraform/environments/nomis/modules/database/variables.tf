@@ -177,6 +177,7 @@ variable "subnet_type" {
   type        = string
   description = "Subnet type to use for the database"
   default     = "data"
+  nullable    = false
 }
 
 variable "tags" {
