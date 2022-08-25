@@ -77,6 +77,28 @@ locals {
             monitored = false
           }
         },
+        CNOMT104 = {
+          always_on          = false
+          ami_name           = "nomis_db_STIG_CNOMT1-2022-04-21*"
+          asm_data_capacity  = 100
+          asm_flash_capacity = 2
+          description        = "TEST VM"
+          subnet_type        = "private"
+          tags = {
+            monitored = false
+          }
+        },
+        CNOMT105 = {
+          always_on          = false
+          ami_name           = "nomis_db_STIG_CNOMT1-2022-04-21*"
+          asm_data_capacity  = 100
+          asm_flash_capacity = 2
+          description        = "TEST VM"
+          subnet_type        = "private"
+          tags = {
+            monitored = false
+          }
+        },
         CNAUDT1 = {
           always_on              = true
           ami_name               = "nomis_db-2022-03-03*"
