@@ -173,6 +173,12 @@ variable "subnet_set" {
   description = "Fixed variable to specify subnet-set for RAM shared subnets"
 }
 
+variable "subnet_type" {
+  type        = string
+  description = "Subnet type to use for the database"
+  default     = "data"
+}
+
 variable "tags" {
   type        = map(any)
   description = "Default tags to be applied to resources"

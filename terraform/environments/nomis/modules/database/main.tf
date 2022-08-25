@@ -50,7 +50,13 @@ data "template_file" "user_data" {
 # get data subnet for the AZ
 data "aws_subnet" "data" {
   tags = {
-    Name = "${var.business_unit}-${var.environment}-${var.subnet_set}-data-${var.availability_zone}"
+    Name = "${var.business_unit}-${var.environment}-${var.subnet_set}-${var.subnet_type}-${var.availability_zone}"
+  }
+}
+
+data "aws_subnet" "private" {
+  tags = {
+    Name = "${var.business_unit}-${var.environment}-${var.subnet_set}-private-${var.availability_zone}"
   }
 }
 
