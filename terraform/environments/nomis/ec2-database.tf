@@ -30,6 +30,7 @@ module "database" {
   instance_type          = try(each.value.instance_type, null)
   oracle_sids            = try(each.value.oracle_sids, null)
   restored_from_snapshot = try(each.value.restored_from_snapshot, false)
+  subnet_type            = try(each.value.subnet_type, null)
 
   common_security_group_id  = aws_security_group.database_common.id
   instance_profile_policies = concat(local.ec2_common_managed_policies, [aws_iam_policy.s3_db_backup_bucket_access.arn])
