@@ -1,19 +1,18 @@
-module "equip-s3-bucket" {
-  count               = local.is-production ? 1 : 0
-  source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.2.0"
-  bucket_prefix       = format("%s-%s", local.application_name, local.environment)
-  versioning_enabled  = false
-  replication_enabled = false
+
+module "wepi_s3_logging" {
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.2.0"
 
   providers = {
     aws.bucket-replication = aws
   }
+  bucket_prefix       = "wepi-logging"
+  replication_enabled = false
 
   lifecycle_rule = [
     {
-      id      = "tmp"
+      id      = "main"
       enabled = "Enabled"
-      prefix  = "/tmp"
+      prefix  = ""
 
       tags = {
         rule      = "log"
@@ -24,9 +23,6 @@ module "equip-s3-bucket" {
         {
           days          = 90
           storage_class = "STANDARD_IA"
-          }, {
-          days          = 365
-          storage_class = "GLACIER"
         }
       ]
 
