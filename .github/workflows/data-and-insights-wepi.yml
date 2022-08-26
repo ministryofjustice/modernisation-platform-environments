@@ -3,7 +3,7 @@ name: data-and-insights-wepi
 on:
   push:
     branches: 
-      - main
+      - dih/develop
     paths:
       - 'terraform/environments/data-and-insights-wepi/**'
       - '.github/workflows/data-and-insights-wepi.yml'
