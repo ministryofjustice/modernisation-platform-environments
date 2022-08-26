@@ -1,18 +1,18 @@
 {
   "accounts": {
     "development": {
-      "redshift_node_type": "dc2.xlarge",
+      "redshift_node_type": "ra3.xlplus",
       "redshift_cluster_node_count": 1,
       "redshift_auto_snapshot_retention": 7,
       "redshift_manual_snapshot_retention": 7,
       "redshift_param_group_family": "redshift-1.0",
-      "redshift_snapshot_cron": "cron(0 0/4 ?)",
+      "redshift_snapshot_cron": "cron(0 4 *)",
       "redshift_pause_cluster_enabled": true,
       "redshift_pause_cluster_cron": "cron(0 20 * * 1-5)",
       "redshift_resume_cluster_cron": "cron(0 6 * * 1-5)"
     },
     "test": {
-      "redshift_node_type": "dc2.xlarge",
+      "redshift_node_type": "ra3.xlplus",
       "redshift_cluster_node_count": 1,
       "redshift_auto_snapshot_retention": 7,
       "redshift_manual_snapshot_retention": 7,
@@ -28,7 +28,7 @@
       "redshift_auto_snapshot_retention": 35,
       "redshift_manual_snapshot_retention": -1,
       "redshift_param_group_family": "redshift-1.0",
-      "redshift_snapshot_cron": "cron(0 0/4 ?)",
+      "redshift_snapshot_cron": "cron(0 4 *)",
       "redshift_pause_cluster_enabled": false
     }
   }
