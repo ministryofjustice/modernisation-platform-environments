@@ -25,9 +25,9 @@ defaults:
 
 jobs:
   
-  # Temp job to untaint Redshift cluster
-  untaint-redshift-dev:
-    name: Untaint Redshift cluster
+  # These jobs run when creating a pull request
+  plan-development:
+    name: Plan Development - data-and-insights-wepi
     runs-on: ubuntu-latest
     if: github.ref != 'refs/heads/main' || github.event_name == 'workflow_dispatch'
     steps:
@@ -38,60 +38,38 @@ jobs:
         with:
           terraform_version: "~1"
           terraform_wrapper: false
-      - name: Terraform untaint - development
+      - name: Terraform plan - development
         run: |
           echo "Terraform plan - ${TF_ENV}"
           bash scripts/terraform-init.sh terraform/environments/data-and-insights-wepi
           terraform -chdir="terraform/environments/data-and-insights-wepi" workspace select "data-and-insights-wepi-${TF_ENV}"
-          terraform -chdir="terraform/environments/data-and-insights-wepi" untaint aws_redshift_cluster.wepi_redshift_cluster
+          bash scripts/terraform-plan.sh terraform/environments/data-and-insights-wepi
         env:
           TF_ENV: development
-  
-#  # These jobs run when creating a pull request
-#  plan-development:
-#    name: Plan Development - data-and-insights-wepi
-#    runs-on: ubuntu-latest
-#    if: github.ref != 'refs/heads/main' || github.event_name == 'workflow_dispatch'
-#    steps:
-#      - name: Checkout Repository
-#        uses: actions/checkout@v2.3.4
-#      - name: Load and Configure Terraform
-#        uses: hashicorp/setup-terraform@v1.3.2
-#        with:
-#          terraform_version: "~1"
-#          terraform_wrapper: false
-#      - name: Terraform plan - development
-#        run: |
-#          echo "Terraform plan - ${TF_ENV}"
-#          bash scripts/terraform-init.sh terraform/environments/data-and-insights-wepi
-#          terraform -chdir="terraform/environments/data-and-insights-wepi" workspace select "data-and-insights-wepi-${TF_ENV}"
-#          bash scripts/terraform-plan.sh terraform/environments/data-and-insights-wepi
-#        env:
-#          TF_ENV: development
-#
-#  deploy-development:
-#    name: Deploy Development - data-and-insights-wepi
-#    runs-on: ubuntu-latest
-#    if: github.ref != 'refs/heads/main' || github.event_name == 'workflow_dispatch'
-#    environment:
-#      name: data-and-insights-wepi-development
-#    steps:
-#      - name: Checkout Repository
-#        uses: actions/checkout@v2.3.4
-#      - name: Load and Configure Terraform
-#        uses: hashicorp/setup-terraform@v1.3.2
-#        with:
-#          terraform_version: "~1"
-#          terraform_wrapper: false
-#      - name: Terraform apply - development
-#        run: |
-#          echo "Terraform apply - ${TF_ENV}"
-#          bash scripts/terraform-init.sh terraform/environments/data-and-insights-wepi
-#          terraform -chdir="terraform/environments/data-and-insights-wepi" workspace select "data-and-insights-wepi-${TF_ENV}"
-#          bash scripts/terraform-apply.sh terraform/environments/data-and-insights-wepi
-#        env:
-#          TF_ENV: development
-#
+
+  deploy-development:
+    name: Deploy Development - data-and-insights-wepi
+    runs-on: ubuntu-latest
+    if: github.ref != 'refs/heads/main' || github.event_name == 'workflow_dispatch'
+    environment:
+      name: data-and-insights-wepi-development
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2.3.4
+      - name: Load and Configure Terraform
+        uses: hashicorp/setup-terraform@v1.3.2
+        with:
+          terraform_version: "~1"
+          terraform_wrapper: false
+      - name: Terraform apply - development
+        run: |
+          echo "Terraform apply - ${TF_ENV}"
+          bash scripts/terraform-init.sh terraform/environments/data-and-insights-wepi
+          terraform -chdir="terraform/environments/data-and-insights-wepi" workspace select "data-and-insights-wepi-${TF_ENV}"
+          bash scripts/terraform-apply.sh terraform/environments/data-and-insights-wepi
+        env:
+          TF_ENV: development
+
 #   plan-test:
 #     name: Plan Test - data-and-insights-wepi
 #     runs-on: ubuntu-latest
