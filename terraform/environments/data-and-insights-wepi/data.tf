@@ -119,7 +119,7 @@ data "aws_iam_policy_document" "s3_redshift" {
   statement {
     sid       = "RedshiftAcl"
     actions   = ["s3:GetBucketAcl"]
-    resources = [aws_s3_bucket.wepi_redshift_logging_bucket.id]
+    resources = [aws_s3_bucket.wepi_redshift_logging_bucket.arn]
 
     principals {
       type        = "AWS"
@@ -130,7 +130,7 @@ data "aws_iam_policy_document" "s3_redshift" {
   statement {
     sid       = "RedshiftWrite"
     actions   = ["s3:PutObject"]
-    resources = ["${aws_s3_bucket.wepi_redshift_logging_bucket.id}/*"]
+    resources = ["${aws_s3_bucket.wepi_redshift_logging_bucket.arn}/*"]
     condition {
       test     = "StringEquals"
       values   = ["bucket-owner-full-control"]
