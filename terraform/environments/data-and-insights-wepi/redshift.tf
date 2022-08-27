@@ -29,6 +29,7 @@ resource "aws_redshift_parameter_group" "wepi_redshift_param_group" {
 
 # Main Redshift cluster configuration
 resource "aws_redshift_cluster" "wepi_redshift_cluster" {
+  #checkov:skip=CKV_AWS_71: "Cluster logging temporarily disabled whilst issue is raised to AWS."
   cluster_identifier = "wepi-redshift-${local.environment}-cluster"
   database_name      = "wepi${local.environment}db"
 
@@ -57,13 +58,13 @@ resource "aws_redshift_cluster" "wepi_redshift_cluster" {
   manual_snapshot_retention_period    = local.app_data.accounts[local.environment].redshift_manual_snapshot_retention
   skip_final_snapshot                 = true
 
-  logging {
+  /* logging {
     enable               = true
     bucket_name          = aws_s3_bucket.wepi_redshift_logging_bucket.id
     s3_key_prefix        = "wepi-redshift-logs"
     log_destination_type = "s3"
   }
-
+ */
   tags = merge(
     local.tags,
     {
