@@ -48,3 +48,12 @@ module "wepi_s3_logging" {
 
   tags = local.tags
 }
+
+resource "aws_s3_bucket_policy" "wepi_s3_logging_bucket_policy" {
+  bucket = module.wepi_s3_logging.bucket.id
+  policy = templatefile("${path.module}/json/wepi_s3_redshift_bucket_policy.json",
+    {
+      logging_bucket = module.wepi_s3_logging.bucket.arn
+    }
+  )
+}
