@@ -105,7 +105,7 @@ data "aws_subnet" "wepi_vpc_subnets_public_c" {
 
 data "aws_vpc_endpoint" "s3" {
   vpc_id       = data.aws_vpc.wepi_vpc.id
-  service_name = "com.amazonaws.${var.region}.s3"
+  service_name = "com.amazonaws.${data.aws_region.current.name}.s3"
   tags = {
     Name = "${var.networking[0].business-unit}-${local.environment}-com.amazonaws.${data.aws_region.current.name}.s3"
   }
