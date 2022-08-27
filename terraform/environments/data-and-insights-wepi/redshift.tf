@@ -116,3 +116,9 @@ resource "aws_redshift_scheduled_action" "wepi_redshift_resume_schedule" {
     }
   }
 }
+
+# Redshift cluster IAM roles
+resource "aws_redshift_cluster_iam_roles" "wepi_redshift_iam_roles" {
+  cluster_identifier   = aws_redshift_cluster.wepi_redshift_cluster.cluster_identifier
+  default_iam_role_arn = aws_iam_role.wepi_iam_role_redshift_default.arn
+}
