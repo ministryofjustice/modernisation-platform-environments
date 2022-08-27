@@ -8,6 +8,28 @@ module "wepi_s3_logging" {
   bucket_prefix       = "wepi-logging"
   replication_enabled = false
 
+  bucket_policy = <<EOF
+    {
+      "Version": "2012-10-17",
+      "Statement": [
+        {
+          "Effect": "Allow",
+          "Principal": {
+            "Service": "redshift.amazonaws.com"
+          },
+          "Action": [
+            "s3:PutObject",
+            "s3:GetBucketAcl"
+          ],
+          "Resource": [
+            "$${bucket_arn}",
+            "$${bucket_arn}/*"
+          ]
+        }
+      ]
+    }
+  EOF
+
   lifecycle_rule = [
     {
       id      = "main"
@@ -47,13 +69,4 @@ module "wepi_s3_logging" {
   ]
 
   tags = local.tags
-}
-
-resource "aws_s3_bucket_policy" "wepi_s3_logging_bucket_policy" {
-  bucket = module.wepi_s3_logging.bucket.id
-  policy = templatefile("${path.module}/json/wepi_s3_redshift_bucket_policy.json",
-    {
-      logging_bucket = module.wepi_s3_logging.bucket.arn
-    }
-  )
 }
