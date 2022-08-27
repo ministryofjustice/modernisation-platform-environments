@@ -51,14 +51,14 @@ resource "aws_redshift_cluster" "wepi_redshift_cluster" {
   automated_snapshot_retention_period = local.app_data.accounts[local.environment].redshift_auto_snapshot_retention
   manual_snapshot_retention_period    = local.app_data.accounts[local.environment].redshift_manual_snapshot_retention
   skip_final_snapshot = true
-
+/* 
   logging {
     enable               = true
     bucket_name          = module.wepi_s3_logging.bucket.id
     s3_key_prefix        = "wepi-redshift-logs"
     log_destination_type = "s3"
   }
-
+ */
   tags = merge(
     local.tags,
     {
