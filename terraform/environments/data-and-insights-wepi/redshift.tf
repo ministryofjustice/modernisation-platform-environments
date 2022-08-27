@@ -20,6 +20,11 @@ resource "aws_redshift_parameter_group" "wepi_redshift_param_group" {
     name  = "require_ssl"
     value = "true"
   }
+
+  parameter {
+    name  = "enable_user_activity_logging"
+    value = "true"
+  }
 }
 
 # Main Redshift cluster configuration

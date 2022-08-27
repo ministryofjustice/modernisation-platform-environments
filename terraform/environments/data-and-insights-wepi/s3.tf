@@ -48,9 +48,5 @@ resource "aws_s3_bucket_policy" "wepi_redshift_logging_bucket_policy" {
     aws_s3_bucket_public_access_block.wepi_redshift_logging_bucket_public_access_block
   ]
   bucket = aws_s3_bucket.wepi_redshift_logging_bucket.id
-  policy = templatefile("${path.module}/json/wepi_s3_policy_redshift_logging.json",
-    {
-      bucket_arn = aws_s3_bucket.wepi_redshift_logging_bucket.arn
-    }
-  )
+  policy = data.aws_iam_policy_document.s3_redshift.json
 }
