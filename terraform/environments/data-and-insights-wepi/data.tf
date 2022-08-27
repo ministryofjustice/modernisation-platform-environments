@@ -104,7 +104,7 @@ data "aws_subnet" "wepi_vpc_subnets_public_c" {
 }
 
 data "aws_vpc_endpoint" "s3" {
-  provider     = "core-vpc"
+  provider     = aws.core-vpc
   vpc_id       = data.aws_vpc.wepi_vpc.id
   service_name = "com.amazonaws.${data.aws_region.current.name}.s3"
   tags = {
