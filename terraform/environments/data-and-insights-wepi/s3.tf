@@ -45,7 +45,7 @@ resource "aws_s3_bucket_public_access_block" "wepi_redshift_logging_bucket_publi
 
 resource "aws_s3_bucket_policy" "wepi_redshift_logging_bucket_policy" {
   depends_on = [
-    aws_s3_bucket_public_access_block.wepi_redshift_logging_bucket_ec2_public_access_block
+    aws_s3_bucket_public_access_block.wepi_redshift_logging_bucket_public_access_block
   ]
   bucket = aws_s3_bucket.wepi_redshift_logging_bucket.id
   policy = templatefile("${path.module}/json/wepi_s3_policy_redshift_logging.json",
