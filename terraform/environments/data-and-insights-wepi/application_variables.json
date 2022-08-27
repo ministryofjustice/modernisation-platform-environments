@@ -8,8 +8,8 @@
       "redshift_param_group_family": "redshift-1.0",
       "redshift_snapshot_cron": "cron(0 4 *)",
       "redshift_pause_cluster_enabled": true,
-      "redshift_pause_cluster_cron": "cron(0 20 * * 1-5)",
-      "redshift_resume_cluster_cron": "cron(0 6 * * 1-5)",
+      "redshift_pause_cluster_cron": "cron(0 20 ? * MON-FRI *)",
+      "redshift_resume_cluster_cron": "cron(0 6 ? * MON-FRI *)",
       "redshift_log_retention": 90
     },
     "test": {
@@ -20,8 +20,8 @@
       "redshift_param_group_family": "redshift-1.0",
       "redshift_snapshot_cron": "cron(0 0/4 ?)",
       "redshift_pause_cluster_enabled": true,
-      "redshift_pause_cluster_cron": "cron(0 20 * * 1-5)",
-      "redshift_resume_cluster_cron": "cron(0 6 * * 1-5)",
+      "redshift_pause_cluster_cron": "cron(0 20 ? * MON-FRI *)",
+      "redshift_resume_cluster_cron": "cron(0 6 ? * MON-FRI *)",
       "redshift_log_retention": 90
     },
     "production": {
