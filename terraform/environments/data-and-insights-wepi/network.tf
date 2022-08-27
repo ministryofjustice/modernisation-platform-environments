@@ -6,12 +6,22 @@ resource "aws_security_group" "wepi_sg_allow_redshift" {
   vpc_id      = data.aws_vpc.wepi_vpc.id
 
   ingress {
-    description = "Redshift from bastion"
+    description = "Redshift ingress from bastion"
     from_port   = 5439
     to_port     = 5439
     protocol    = "tcp"
     security_groups = [
       module.wepi_bastion.bastion_security_group
+    ]
+  }
+
+  egress {
+    description     = "Redshift egress to S3 endpoint"
+    from_port       = 443
+    to_port         = 443
+    protocol        = "tcp"
+    prefix_list_ids = [
+      data.aws_vpc_endpoint.s3.prefix_list_id
     ]
   }
 
