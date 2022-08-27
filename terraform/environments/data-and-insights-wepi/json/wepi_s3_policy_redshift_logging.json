@@ -5,10 +5,11 @@
           "Sid": "Put bucket policy needed for audit logging",
           "Effect": "Allow",
           "Principal": {
-              "Service": "redshift.amazonaws.com"
+              "AWS": "arn:aws:iam::885798887673:user/logs"
           },
           "Action": [
-              "*"
+            "s3:GetBucketAcl",
+            "s3:PutObject"
           ],
           "Resource": [
               "${bucket_arn}",
