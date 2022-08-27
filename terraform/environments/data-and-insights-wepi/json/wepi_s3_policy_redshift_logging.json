@@ -8,8 +8,7 @@
               "Service": "redshift.amazonaws.com"
           },
           "Action": [
-              "s3:PutObject",
-              "s3:GetBucketAcl"
+              "*"
           ],
           "Resource": [
               "${bucket_arn}",
