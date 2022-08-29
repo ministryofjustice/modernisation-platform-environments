@@ -112,34 +112,3 @@ data "aws_vpc_endpoint" "s3" {
   }
 
 }
-
-data "aws_redshift_service_account" "this" {}
-
-data "aws_iam_policy_document" "s3_redshift" {
-  statement {
-    sid       = "RedshiftAcl"
-    actions   = ["s3:GetBucketAcl"]
-    resources = [aws_s3_bucket.wepi_redshift_logging_bucket.arn]
-
-    principals {
-      type        = "AWS"
-      identifiers = [data.aws_redshift_service_account.this.arn]
-    }
-  }
-
-  statement {
-    sid       = "RedshiftWrite"
-    actions   = ["s3:PutObject"]
-    resources = ["${aws_s3_bucket.wepi_redshift_logging_bucket.arn}/*"]
-    condition {
-      test     = "StringEquals"
-      values   = ["bucket-owner-full-control"]
-      variable = "s3:x-amz-acl"
-    }
-
-    principals {
-      type        = "AWS"
-      identifiers = [data.aws_redshift_service_account.this.arn]
-    }
-  }
-}
