@@ -11,5 +11,7 @@ resource "aws_glue_connection" "wepi_glue_conn_redshift" {
     USERNAME            = aws_redshift_cluster.wepi_redshift_cluster.master_username
   }
 
-  name = "wepi_redshift-${local.environment}-conn"
+  name = "wepi-redshift-${local.environment}-conn"
+
+  tags = local.tags
 }
