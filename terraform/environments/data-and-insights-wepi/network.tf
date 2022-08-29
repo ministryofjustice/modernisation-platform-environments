@@ -16,10 +16,10 @@ resource "aws_security_group" "wepi_sg_allow_redshift" {
   }
 
   egress {
-    description     = "Redshift egress to S3 endpoint"
-    from_port       = 443
-    to_port         = 443
-    protocol        = "tcp"
+    description = "Redshift egress to S3 endpoint"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
     prefix_list_ids = [
       data.aws_vpc_endpoint.s3.prefix_list_id
     ]

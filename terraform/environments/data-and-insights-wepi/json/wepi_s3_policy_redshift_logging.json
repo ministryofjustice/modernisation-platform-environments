@@ -1,15 +1,16 @@
 {
-  "Version": "2012-10-17",
+  "Version": "2008-10-17",
   "Statement": [
       {
           "Sid": "Put bucket policy needed for audit logging",
           "Effect": "Allow",
           "Principal": {
-              "AWS": "arn:aws:iam::307160386991:user/logs"
+            "Service": "redshift.amazonaws.com"
           },
           "Action": [
             "s3:GetBucketAcl",
-            "s3:PutObject"
+            "s3:PutObject",
+            "kms:GenerateDataKey"
           ],
           "Resource": [
               "${bucket_arn}",
