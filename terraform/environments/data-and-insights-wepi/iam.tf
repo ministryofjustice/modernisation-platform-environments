@@ -47,5 +47,5 @@ resource "aws_iam_role" "wepi_iam_role_glue" {
 resource "aws_iam_role_policy_attachment" "wepi_iam_attach_glue" {
   for_each   = data.aws_iam_policy.wepi_iam_glue_policy_list
   policy_arn = each.value.arn
-  role       = aws_iam_role.wepi_iam_role_glue.arn
+  role       = aws_iam_role.wepi_iam_role_glue.name
 }
