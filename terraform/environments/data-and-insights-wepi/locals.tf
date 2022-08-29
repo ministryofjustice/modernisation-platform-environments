@@ -40,4 +40,12 @@ locals {
   # example usage:
   # example_data = local.app_data.accounts[local.environment].example_var
   app_data = fileexists("./application_variables.json") ? jsondecode(file("./application_variables.json")) : {}
+
+  # List of AWS-managed IAM policies required by Glue
+  glue_iam_policy_list = [
+    "AmazonS3FullAccess",
+    "AWSGlueServiceRole",
+    "AmazonRedshiftFullAccess",
+    "AWSGlueSchemaRegistryFullAccess"
+  ]
 }

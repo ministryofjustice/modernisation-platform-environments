@@ -112,3 +112,8 @@ data "aws_vpc_endpoint" "s3" {
   }
 
 }
+
+data "aws_iam_policy" "wepi_iam_glue_policy_list" {
+  for_each = toset(local.glue_iam_policy_list)
+  name     = each.value
+}

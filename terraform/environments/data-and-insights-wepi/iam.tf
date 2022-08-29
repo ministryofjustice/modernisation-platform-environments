@@ -37,3 +37,15 @@ resource "aws_iam_role_policy_attachment" "wepi_iam_attach_redshift_default" {
   policy_arn = aws_iam_policy.wepi_iam_policy_redshift_default.arn
   role       = aws_iam_role.wepi_iam_role_redshift_default.name
 }
+
+# Glue IAM role
+resource "aws_iam_role" "wepi_iam_role_glue" {
+  name               = "wepi-iam-role-${local.environment}-glue"
+  assume_role_policy = file("${path.module}/json/wepi_iam_role_glue.json")
+}
+
+resource "aws_iam_role_policy_attachment" "wepi_iam_attach_glue" {
+  for_each   = data.aws_iam_policy.wepi_iam_glue_policy_list
+  policy_arn = each.value.arn
+  role       = aws_iam_role.wepi_iam_role_glue.arn
+}
