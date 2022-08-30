@@ -1,7 +1,8 @@
 {
   "keys": {
       "development": {
-        "agardner" : "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHjMJncQIh8N9h63AZcAbisFjt9BaqajRdjqWvprgpCb andrew.gardner1@justice.gov.uk"
+        "agardner" : "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHjMJncQIh8N9h63AZcAbisFjt9BaqajRdjqWvprgpCb andrew.gardner1@justice.gov.uk",
+        "simonytta" : "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKeBrsu9K2qVs2r/fueve0V+5WBY/ZZTNq1UJYhuXIZp simona.treivase@justice.gov.uk"
           },
       "test": {
        },
