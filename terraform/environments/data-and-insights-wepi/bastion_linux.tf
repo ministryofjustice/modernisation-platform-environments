@@ -23,7 +23,7 @@ module "wepi_bastion" {
   log_glacier_days     = 60  # days before moving to Glacier
   log_expiry_days      = 180 # days before log expiration
   # bastion
-  allow_ssh_commands = false
+  allow_ssh_commands = true
 
   app_name      = var.networking[0].application
   business_unit = local.vpc_name
