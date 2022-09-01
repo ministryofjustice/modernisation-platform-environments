@@ -10,6 +10,7 @@
 /terraform/environments/performance-hub @ministryofjustice/performance-hub-developers @ministryofjustice/modernisation-platform
 /terraform/environments/ppud @ministryofjustice/modernisation-platform @ministryofjustice/modernisation-platform
 /terraform/environments/ppud @ministryofjustice/ppud-replacement-devs @ministryofjustice/modernisation-platform
+/terraform/environments/refer-and-monitor @ministryofjustice/hmpps-interventions-dev @ministryofjustice/modernisation-platform
 /terraform/environments/refer-monitor @ministryofjustice/hmpps-interventions-dev @ministryofjustice/modernisation-platform
 /terraform/environments/sprinkler @ministryofjustice/modernisation-platform @ministryofjustice/modernisation-platform
 /terraform/environments/tariff @ministryofjustice/cica @ministryofjustice/modernisation-platform
