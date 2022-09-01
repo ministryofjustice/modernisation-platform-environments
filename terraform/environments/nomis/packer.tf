@@ -165,7 +165,7 @@ data "aws_iam_policy_document" "packer_minimum_permissions" {
       "kms:DescribeKey",
       "kms:CreateGrant"
     ]
-    resources = [aws_kms_key.nomis-cmk[0].arn,data.aws_kms_key.hmpps_key.arn]
+    resources = [aws_kms_key.nomis-cmk[0].arn, data.aws_kms_key.hmpps_key.arn]
   }
 }
 
