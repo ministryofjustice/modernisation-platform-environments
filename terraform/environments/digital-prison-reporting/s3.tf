@@ -16,8 +16,6 @@ resource "aws_kms_key" "s3" {
 }
 
 data "aws_iam_policy_document" "s3-kms" {
-  #checkov:skip=CKV_AWS_111
-  #checkov:skip=CKV_AWS_109
   statement {
     effect    = "Allow"
     actions   = ["kms:*"]
