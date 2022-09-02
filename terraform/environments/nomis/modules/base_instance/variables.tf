@@ -65,7 +65,7 @@ variable "extra_ingress_rules" {
 variable "instance_type" {
   type        = string
   description = "ec2 instance type to use for the instances"
-  default     = "t2.large"
+  default     = "r6i.xlarge"
   nullable    = false
 }
 
