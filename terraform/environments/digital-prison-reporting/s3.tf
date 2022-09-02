@@ -42,7 +42,7 @@ module "s3-bucket" {
   }
   bucket_prefix       = "dpr-demo-bucket"
   replication_enabled = false
-  custom_kms_key = aws_kms_key.s3.arn
+  custom_kms_key      = aws_kms_key.s3.arn
   lifecycle_rule = [
     {
       id      = "main"
