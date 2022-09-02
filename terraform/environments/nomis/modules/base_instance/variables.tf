@@ -28,6 +28,13 @@ variable "application_name" {
   }
 }
 
+variable "availability_zone" {
+  type        = string
+  description = "The availability zone in which to deploy the infrastructure"
+  default     = "eu-west-2a"
+  nullable    = false
+}
+
 variable "business_unit" {
   type        = string
   description = "This corresponds to the VPC in which the application resides"
@@ -85,13 +92,6 @@ variable "key_name" {
 variable "name" {
   type        = string
   description = "Provide a unique name for the instance"
-}
-
-variable "region" {
-  type        = string
-  description = "The region in which to deploy the instances"
-  default     = "eu-west-2"
-  nullable    = false
 }
 
 variable "subnet_set" {
