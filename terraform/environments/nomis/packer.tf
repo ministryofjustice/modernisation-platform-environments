@@ -154,7 +154,7 @@ data "aws_iam_policy_document" "packer_minimum_permissions" {
     ]
   }
 
-  statement { # need so Packer can use CMK to encrypt snapshots so can be shared with other accounts
+  statement { # need this so Packer can use CMK to encrypt snapshots so can be shared with other accounts
     effect = "Allow"
     actions = [
       "kms:Encrypt",
