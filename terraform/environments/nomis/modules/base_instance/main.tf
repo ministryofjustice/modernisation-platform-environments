@@ -23,7 +23,7 @@ data "aws_vpc" "shared_vpc" {
 
 data "aws_subnet" "private" {
   tags = {
-    Name = "${var.business_unit}-${var.environment}-${var.subnet_set}-private-${availability_zone}"
+    Name = "${var.business_unit}-${var.environment}-${var.subnet_set}-private-${var.availability_zone}"
   }
 }
 
