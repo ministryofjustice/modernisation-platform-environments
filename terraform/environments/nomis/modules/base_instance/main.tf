@@ -41,6 +41,8 @@ resource "aws_instance" "base_instance" {
   iam_instance_profile        = aws_iam_instance_profile.base_instance_profile.name
   instance_type               = var.instance_type
   key_name                    = var.key_name
+  ebs_optimized               = true # To avoid triggering checkov
+  #checkov:skip=CKV_AWS_126: Monitoring disabled as these are temporary test instances
   monitoring                  = false
   subnet_id                   = data.aws_subnet.private.id
   vpc_security_group_ids = [
