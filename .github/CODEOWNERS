@@ -4,6 +4,7 @@
 * @ministryofjustice/modernisation-platform
 /terraform/environments/apex @ministryofjustice/laa-aws-infrastructure @ministryofjustice/modernisation-platform
 /terraform/environments/data-and-insights-wepi @ministryofjustice/data-and-insights-hub @ministryofjustice/modernisation-platform
+/terraform/environments/digital-prison-reporting @ministryofjustice/hmpps-digital-prison-reporting @ministryofjustice/modernisation-platform
 /terraform/environments/equip @ministryofjustice/modernisation-platform-engineers @ministryofjustice/modernisation-platform
 /terraform/environments/example @ministryofjustice/modernisation-platform @ministryofjustice/modernisation-platform
 /terraform/environments/nomis @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
