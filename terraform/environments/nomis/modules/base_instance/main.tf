@@ -50,13 +50,13 @@ resource "aws_instance" "base_instance" {
   #checkov:skip=CKV_AWS_79: We are tied to v1 metadata service
   metadata_options {
     http_endpoint = "enabled"
-    http_tokens = "required"
+    http_tokens   = "required"
   }
 
   root_block_device {
     delete_on_termination = true
     encrypted             = true
-    volume_type = "gp3"
+    volume_type           = "gp3"
 
     tags = merge(
       var.tags,
@@ -69,12 +69,12 @@ resource "aws_instance" "base_instance" {
   tags = merge(
     var.tags,
     {
-      Name          = "base_instance-${var.name}"
-      description   = var.description
-      os_type       = "Linux"
-      os_version    = data.aws_ami.base_ami.tags["os-version"]
-      always_on     = var.always_on
-    })
+      Name        = "base_instance-${var.name}"
+      description = var.description
+      os_type     = "Linux"
+      os_version  = data.aws_ami.base_ami.tags["os-version"]
+      always_on   = var.always_on
+  })
 }
 
 #------------------------------------------------------------------------------

@@ -79,9 +79,9 @@ locals {
       # Add base instances here. They will be created using the base_instance module
       base_instances = {
         RHEL7TEST = {
-          always_on              = false
-          ami_name               = "nomis_RHEL7-9_BaseImage*"
-          description            = "Test instance for the new nomis_RHEL7-9_BaseImage AMI"
+          always_on   = false
+          ami_name    = "nomis_RHEL7-9_BaseImage*"
+          description = "Test instance for the new nomis_RHEL7-9_BaseImage AMI"
           tags = {
             monitored = false
           }

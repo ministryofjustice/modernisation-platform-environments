@@ -13,13 +13,13 @@ module "base_instance" {
 
   name = each.key
 
-  always_on          = each.value.always_on
-  ami_name           = each.value.ami_name
-  description        = each.value.description
+  always_on   = each.value.always_on
+  ami_name    = each.value.ami_name
+  description = each.value.description
 
-  ami_owner              = try(each.value.ami_owner, local.environment_management.account_ids["nomis-test"])
-  extra_ingress_rules    = try(each.value.extra_ingress_rules, null)
-  instance_type          = try(each.value.instance_type, null)
+  ami_owner           = try(each.value.ami_owner, local.environment_management.account_ids["nomis-test"])
+  extra_ingress_rules = try(each.value.extra_ingress_rules, null)
+  instance_type       = try(each.value.instance_type, null)
 
   common_security_group_id  = aws_security_group.base_instance_common.id
   instance_profile_policies = local.ec2_common_managed_policies
