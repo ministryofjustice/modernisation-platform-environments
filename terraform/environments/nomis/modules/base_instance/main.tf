@@ -43,7 +43,7 @@ resource "aws_instance" "base_instance" {
   subnet_id  = data.aws_subnet.private.id
   vpc_security_group_ids = [
     var.common_security_group_id,
-    aws_security_group.base_instance
+    aws_security_group.base_instance.id
   ]
   #checkov:skip=CKV_AWS_79: We are tied to v1 metadata service
   metadata_options {
