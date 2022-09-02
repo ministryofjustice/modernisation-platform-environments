@@ -43,8 +43,8 @@ resource "aws_instance" "base_instance" {
   key_name                    = var.key_name
   ebs_optimized               = true # To avoid triggering checkov
   #checkov:skip=CKV_AWS_126: Monitoring disabled as these are temporary test instances
-  monitoring                  = false
-  subnet_id                   = data.aws_subnet.private.id
+  monitoring = false
+  subnet_id  = data.aws_subnet.private.id
   vpc_security_group_ids = [
     var.common_security_group_id,
     aws_security_group.base_instance
