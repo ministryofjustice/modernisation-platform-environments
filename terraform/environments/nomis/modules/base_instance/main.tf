@@ -70,7 +70,7 @@ resource "aws_instance" "base_instance" {
       Name        = "base_instance-${var.name}"
       description = var.description
       os_type     = "Linux"
-      os_version  = lookup(data.aws_ami.base_ami.*.tags, "os-version", null)
+      os_version  = lookup(data.aws_ami.base_ami.tags.*, "os-version", null)
       always_on   = var.always_on
   })
 }
