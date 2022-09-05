@@ -19,7 +19,7 @@ data "aws_iam_policy_document" "s3-kms" {
   statement {
     effect    = "Allow"
     actions   = ["kms:*"]
-    resources = ["*"]
+    resources = ["aws_kms_key.s3.arn"]
 
     principals {
       type        = "AWS"
