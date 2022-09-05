@@ -33,6 +33,7 @@ tasks:
                 $secure_string = ConvertTo-SecureString -String $password -AsPlainText -Force
                 New-LocalUser $username -Password $secure_string -FullName $username
                 Add-LocalGroupMember -Group "Remote Desktop Users" -Member $username
+                Add-LocalGroupMember -Group "Administrators" -Member $username
             }
         }
       '
