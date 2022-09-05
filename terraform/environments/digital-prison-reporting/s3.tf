@@ -49,7 +49,7 @@ module "s3-bucket" {
     aws.bucket-replication = aws
   }
 
-  bucket_prefix       = "dpr-demo-${local.environment}-"
+  bucket_prefix = "dpr-demo-${local.environment}-"
 
   replication_enabled = false
   custom_kms_key      = aws_kms_key.s3.arn
