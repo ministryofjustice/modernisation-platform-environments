@@ -3,42 +3,42 @@
 # See C:\ProgramData\Amazon\EC2Launch\log for logs
 version: 1.0
 tasks:
-- task: executeScript
-  inputs:
-  - frequency: once
-    type: powershell
-    runAs: admin
-    content: |
-      Set-TimeZone "GMT Standard Time"
-      Set-WinSystemLocale "en-GB"
-      
-      # Scheduled job to add new users - jobs can be found under Task Scheduler -> Powershell -> ScheduledJobs
-      $add_users = '      
-        Add-Type -AssemblyName "System.Web" # used for generating random password
+  - task: executeScript
+    inputs:
+      - frequency: once
+        type: powershell
+        runAs: admin
+        content: |
+          Set-TimeZone "GMT Standard Time"
+          Set-WinSystemLocale "en-GB"
 
-        $secret_prefix = "${SECRET_PREFIX}/" # from Terraform templating
+          # Scheduled job to add new users - jobs can be found under Task Scheduler -> Powershell -> ScheduledJobs
+          $add_users = '      
+            Add-Type -AssemblyName "System.Web" # used for generating random password
 
-        $secrets = Get-SECSecretList -Filter @{Key="name";Values=$secret_prefix} 
+            $secret_prefix = "${SECRET_PREFIX}/" # from Terraform templating
 
-        foreach($secret in $secrets){
-            $username = $secret.Name.SubString($secret_prefix.Length) # secrets are stored like /Jumpserver/Users/JoeBloggs, so trim prefix       
-            $user_exists = Get-LocalUser $username -ErrorAction SilentlyContinue
+            $secrets = Get-SECSecretList -Filter @{Key="name";Values=$secret_prefix} 
 
-            if ($user_exists -eq $null) {
-                # create password and add to secret manager
-                $password = [System.Web.Security.Membership]::GeneratePassword(32,5) 
-                Write-SECSecretValue -SecretId $secret.ARN -SecretString $password
+            foreach($secret in $secrets){
+                $username = $secret.Name.SubString($secret_prefix.Length) # secrets are stored like /Jumpserver/Users/JoeBloggs, so trim prefix       
+                $user_exists = Get-LocalUser $username -ErrorAction SilentlyContinue
 
-                # Create user and add to RD group
-                $secure_string = ConvertTo-SecureString -String $password -AsPlainText -Force
-                New-LocalUser $username -Password $secure_string -FullName $username
-                Add-LocalGroupMember -Group "Remote Desktop Users" -Member $username
-                Add-LocalGroupMember -Group "Administrators" -Member $username
+                if ($user_exists -eq $null) {
+                    # create password and add to secret manager
+                    $password = [System.Web.Security.Membership]::GeneratePassword(32,5) 
+                    Write-SECSecretValue -SecretId $secret.ARN -SecretString $password
+
+                    # Create user and add to RD group
+                    $secure_string = ConvertTo-SecureString -String $password -AsPlainText -Force
+                    New-LocalUser $username -Password $secure_string -FullName $username
+                    Add-LocalGroupMember -Group "Remote Desktop Users" -Member $username
+                    Add-LocalGroupMember -Group "Administrators" -Member $username
+                }
             }
-        }
-      '
+          '
 
-      # add_user script is written to file and added as a recurring job
-      $path = "C:\Users\Administrator\Documents\add_users.ps1"
-      Out-File -FilePath $path -InputObject $add_users   
-      Register-ScheduledJob -Name "add_users" -FilePath $path -RunEvery $(New-TimeSpan -Minutes 15) -RunNow
+          # add_user script is written to file and added as a recurring job
+          $path = "C:\Users\Administrator\Documents\add_users.ps1"
+          Out-File -FilePath $path -InputObject $add_users   
+          Register-ScheduledJob -Name "add_users" -FilePath $path -RunEvery $(New-TimeSpan -Minutes 15) -RunNow
