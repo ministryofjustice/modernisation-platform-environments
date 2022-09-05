@@ -8,10 +8,14 @@
 /terraform/environments/equip @ministryofjustice/modernisation-platform-engineers @ministryofjustice/modernisation-platform
 /terraform/environments/example @ministryofjustice/modernisation-platform @ministryofjustice/modernisation-platform
 /terraform/environments/nomis @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
+/terraform/environments/oasys @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
 /terraform/environments/performance-hub @ministryofjustice/performance-hub-developers @ministryofjustice/modernisation-platform
 /terraform/environments/ppud @ministryofjustice/modernisation-platform @ministryofjustice/modernisation-platform
 /terraform/environments/ppud @ministryofjustice/ppud-replacement-devs @ministryofjustice/modernisation-platform
-/terraform/environments/refer-monitor @ministryofjustice/hmpps-interventions-dev @ministryofjustice/modernisation-platform
+/terraform/environments/refer-monitor @ministryofjustice/[ @ministryofjustice/modernisation-platform
+/terraform/environments/refer-monitor @ministryofjustice/"hmpps-interventions-dev", @ministryofjustice/modernisation-platform
+/terraform/environments/refer-monitor @ministryofjustice/"interventions-reporting-discovery" @ministryofjustice/modernisation-platform
+/terraform/environments/refer-monitor @ministryofjustice/] @ministryofjustice/modernisation-platform
 /terraform/environments/sprinkler @ministryofjustice/modernisation-platform @ministryofjustice/modernisation-platform
 /terraform/environments/tariff @ministryofjustice/cica @ministryofjustice/modernisation-platform
 /terraform/environments/testing @ministryofjustice/modernisation-platform @ministryofjustice/modernisation-platform
