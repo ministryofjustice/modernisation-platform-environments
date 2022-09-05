@@ -12,7 +12,7 @@ And supporting infrastructure:
 
 The following environments are supported:
 
-- development (e.g. syscon environment + infrastructure dev)
+- development (e.g. syscon + infrastructure dev)
 - test (main test environment + temporary environments as needed)
 - preproduction (single environment for learning and preprod)
 - production
