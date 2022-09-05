@@ -508,7 +508,7 @@ resource "aws_iam_role" "ssm_ec2_start_stop" {
   )
 }
 
-resource "aws_kms_grant" "image-builder-shared-cmk-grant" {
+resource "aws_kms_grant" "ssm-start-stop-shared-cmk-grant" {
   name              = "image-builder-shared-cmk-grant"
   key_id            = data.aws_kms_key.hmpps_key.arn
   grantee_principal = aws_iam_role.ssm_ec2_start_stop.arn
