@@ -34,13 +34,18 @@ resource "aws_kms_alias" "kms-alias" {
 }
 
 ### S3 Bucket
+resource "random_id" "id" {
+    byte_length = 2
+}
+
 module "s3-bucket" {
   source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.2.0"
 
   providers = {
     aws.bucket-replication = aws
   }
-  bucket_prefix       = "dpr-demo-bucket"
+  bucket_prefix       = format("%s-%s-%s-%s","dpr","demo","${random_id.id.result}",local.environment)
+
   replication_enabled = false
   custom_kms_key      = aws_kms_key.s3.arn
   lifecycle_rule = [
