@@ -2,7 +2,7 @@
 # Common IAM policies for all ec2 instance profiles
 #------------------------------------------------------------------------------
 resource "aws_kms_grant" "ssm-start-stop-shared-cmk-grant" {
-  name              = "ssm-start-stop-shared-cmk-grant"
+  name              = "image-builder-shared-cmk-grant"
   key_id            = data.aws_kms_key.hmpps_key.arn
   grantee_principal = "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:assumed-role/*"
   operations = [
