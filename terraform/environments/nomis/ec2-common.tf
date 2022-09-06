@@ -1,7 +1,20 @@
 #------------------------------------------------------------------------------
 # Common IAM policies for all ec2 instance profiles
 #------------------------------------------------------------------------------
-
+resource "aws_kms_grant" "ssm-start-stop-shared-cmk-grant" {
+  name              = "image-builder-shared-cmk-grant"
+  key_id            = data.aws_kms_key.hmpps_key.arn
+  grantee_principal = aws_iam_role.ssm_ec2_start_stop.arn
+  operations = [
+    "Encrypt",
+    "Decrypt",
+    "ReEncryptFrom",
+    "GenerateDataKey",
+    "GenerateDataKeyWithoutPlaintext",
+    "DescribeKey",
+    "CreateGrant"
+  ]
+}
 # custom policy for SSM as managed policy AmazonSSMManagedInstanceCore is too permissive
 data "aws_iam_policy_document" "ssm_custom" {
   statement {
@@ -507,6 +520,7 @@ resource "aws_iam_role" "ssm_ec2_start_stop" {
     },
   )
 }
+
 
 #------------------------------------------------------------------------------
 # Patch Manager
