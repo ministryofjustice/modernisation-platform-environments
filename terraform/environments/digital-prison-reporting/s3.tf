@@ -35,13 +35,6 @@ resource "aws_kms_alias" "kms-alias" {
   target_key_id = aws_kms_key.s3.arn
 }
 
-### S3 Bucket
-#resource "random_uuid" "s3_uuid" { }
-
-#resource "random_id" "s3_id" {
-#	  byte_length = 3
-#}
-
 module "s3-bucket" {
   source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.2.0"
 
