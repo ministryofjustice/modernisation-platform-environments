@@ -1,5 +1,5 @@
 ### S3 KMS
-resource "random_uuid" "s3_uuid" {}
+#resource "random_uuid" "s3_uuid" {}
 
 resource "aws_kms_key" "s3" {
   description         = "Encryption key for s3"
