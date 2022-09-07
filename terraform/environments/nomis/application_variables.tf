@@ -88,7 +88,7 @@ locals {
             from_port   = "9100"
             to_port     = "9100"
             protocol    = "TCP"
-            cidr_blocks = [local.accounts[local.environment].database_external_access_cidr.cloud_platform]
+            cidr_blocks = ["172.20.0.0/16"]
           }]
           tags = {
             monitored = true
