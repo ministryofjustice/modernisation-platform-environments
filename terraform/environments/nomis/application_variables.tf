@@ -83,6 +83,13 @@ locals {
           always_on   = false
           ami_name    = "nomis_rhel_7_9_baseimage*"
           description = "Test instance for the new nomis_RHEL7-9_BaseImage AMI"
+          extra_ingress_rules = [{
+            description = "access from Cloud Platform Prometheus server"
+            from_port   = "9100"
+            to_port     = "9100"
+            protocol    = "TCP"
+            cidr_blocks = [local.accounts[local.environment].database_external_access_cidr.cloud_platform]
+          }]
           tags = {
             monitored = true
           }
