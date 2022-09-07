@@ -17,9 +17,11 @@ resource "aws_kms_key" "s3" {
 
 data "aws_iam_policy_document" "s3-kms" {
   statement {
+    #checkov:skip=CKV_AWS_111
+    #checkov:skip=CKV_AWS_109       
     effect    = "Allow"
     actions   = ["kms:*"]
-    resources = ["aws_kms_key.s3.arn"]
+    resources = ["*"]
 
     principals {
       type        = "AWS"
@@ -33,16 +35,14 @@ resource "aws_kms_alias" "kms-alias" {
   target_key_id = aws_kms_key.s3.arn
 }
 
-### S3 Bucket
-resource "random_uuid" "s3_uuid" {}
-
 module "s3-bucket" {
   source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.2.0"
 
   providers = {
     aws.bucket-replication = aws
   }
-  bucket_prefix = "dpr-demo-${random_uuid.s3_uuid.result}-local.environment}"
+
+  bucket_prefix = "dpr-demo-${local.environment}-"
 
   replication_enabled = false
   custom_kms_key      = aws_kms_key.s3.arn
