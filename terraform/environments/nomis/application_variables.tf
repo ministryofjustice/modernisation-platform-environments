@@ -44,6 +44,7 @@ locals {
           retention_days = 90
         }
       },
+
       # Add database instances here.  They will be created using the database module
       databases = {
         CNOMT1 = {
@@ -79,6 +80,14 @@ locals {
       # Add base instances here. They will be created using the base_instance module
       base_instances = {
         RHEL7TEST = {
+          always_on   = false
+          ami_name    = "nomis_rhel_7_9_baseimage*"
+          description = "Test instance for the new nomis_RHEL7-9_BaseImage AMI"
+          tags = {
+            monitored = false
+          }
+        },
+        RHEL7ANSIBLE = {
           always_on   = false
           ami_name    = "nomis_rhel_7_9_baseimage*"
           description = "Test instance for the new nomis_RHEL7-9_BaseImage AMI"
