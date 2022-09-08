@@ -109,6 +109,15 @@ locals {
           tags = {
             monitored = false
           }
+          extra_ingress_rules = [
+            {
+              description = "access from Cloud Platform Prometheus server"
+              from_port   = "9100"
+              to_port     = "9100"
+              protocol    = "TCP"
+              cidr_blocks = [local.accounts[local.environment].database_external_access_cidr.cloud_platform]
+          }]
+
         }
       }
     },
