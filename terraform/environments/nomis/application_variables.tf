@@ -115,7 +115,7 @@ locals {
               from_port   = "9100"
               to_port     = "9100"
               protocol    = "TCP"
-              cidr_blocks = "172.20.0.0/16"
+              cidr_blocks = ["172.20.0.0/16"]
           }]
 
         }
