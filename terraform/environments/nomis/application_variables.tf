@@ -69,6 +69,21 @@ locals {
             monitored = true
           }
         },
+        TEST_DB = {
+          always_on              = false
+          ami_name               = "nomis_database_2022-08-25T08-18-55.566Z*"
+          asm_data_capacity      = 50
+          asm_flash_capacity     = 10
+          description            = "Blank db install for Sandhya, to be removed EOD Monday"
+          termination_protection = false
+          oracle_app_disk_size = {
+            "/dev/sdb" = 100 # /u01
+            "/dev/sdc" = 100 # /u02
+          }
+          tags = {
+            monitored = false
+          }
+        },
       },
       # Add weblogic instances here.  They will be created using the weblogic module
       weblogics = {
