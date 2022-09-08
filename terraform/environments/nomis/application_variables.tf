@@ -111,7 +111,7 @@ locals {
           }
           extra_ingress_rules = [
             {
-              description = "access from Cloud Platform Prometheus server-9100"
+              description = "access from Cloud Platform Prometheus server"
               from_port   = "9100"
               to_port     = "9100"
               protocol    = "TCP"
