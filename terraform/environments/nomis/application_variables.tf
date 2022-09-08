@@ -44,6 +44,7 @@ locals {
           retention_days = 90
         }
       },
+
       # Add database instances here.  They will be created using the database module
       databases = {
         CNOMT1 = {
@@ -68,6 +69,21 @@ locals {
             monitored = true
           }
         },
+        TEST_DB = {
+          always_on              = false
+          ami_name               = "nomis_database_2022-08-25T08-18-55.566Z*"
+          asm_data_capacity      = 50
+          asm_flash_capacity     = 10
+          description            = "Blank db install for Sandhya, to be removed EOD Monday"
+          termination_protection = false
+          oracle_app_disk_size = {
+            "/dev/sdb" = 100 # /u01
+            "/dev/sdc" = 100 # /u02
+          }
+          tags = {
+            monitored = false
+          }
+        },
       },
       # Add weblogic instances here.  They will be created using the weblogic module
       weblogics = {
@@ -80,11 +96,28 @@ locals {
       base_instances = {
         RHEL7TEST = {
           always_on   = false
-          ami_name    = "nomis_RHEL7-9_BaseImage*"
+          ami_name    = "nomis_rhel_7_9_baseimage*"
           description = "Test instance for the new nomis_RHEL7-9_BaseImage AMI"
           tags = {
             monitored = false
           }
+        },
+        RHEL7ANSIBLE = {
+          always_on   = false
+          ami_name    = "nomis_rhel_7_9_baseimage*"
+          description = "Test instance for the new nomis_RHEL7-9_BaseImage AMI"
+          tags = {
+            monitored = false
+          }
+          extra_ingress_rules = [
+            {
+              description = "access from Cloud Platform Prometheus server"
+              from_port   = "9100"
+              to_port     = "9100"
+              protocol    = "TCP"
+              cidr_blocks = ["172.20.0.0/16"]
+          }]
+
         }
       }
     },
