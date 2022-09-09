@@ -1,6 +1,8 @@
 data "aws_caller_identity" "current" {}
 data "aws_ebs_default_kms_key" "current" {}
-
+data "aws_kms_key" "by_alias" {
+  key_id = data.aws_ebs_default_kms_key.current.key_arn
+}
 data "aws_ami" "this" {
   most_recent = true
   owners      = [var.ami_owner]
@@ -110,7 +112,7 @@ resource "aws_launch_template" "this" {
       delete_on_termination = true
       encrypted             = true
       volume_type           = "gp3"
-      kms_key_id            = data.aws_ebs_default_kms_key.current.key_arn
+      kms_key_id            = data.aws_kms_key.by_alias.arn
     }
   }
   iam_instance_profile {
