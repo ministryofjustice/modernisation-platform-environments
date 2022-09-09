@@ -27,56 +27,8 @@ data "aws_subnets" "this" {
     values = [data.aws_vpc.this.id]
   }
   tags = {
-    Name = "${var.business_unit}-${var.environment}-${var.subnet_set}-${subnet_type}-${local.region}*"
+    Name = "${var.business_unit}-${var.environment}-${var.subnet_set}-${var.subnet_type}-${var.region}*"
   }
-}
-
-#------------------------------------------------------------------------------
-# EC2
-#------------------------------------------------------------------------------
-
-resource "aws_instance" "base_instance" {
-  ami                         = data.aws_ami.this.id
-  associate_public_ip_address = false
-  iam_instance_profile        = aws_iam_instance_profile.this.name
-  instance_type               = var.instance_type
-  key_name                    = var.key_name
-  ebs_optimized               = true # To avoid triggering checkov
-  #checkov:skip=CKV_AWS_126: Monitoring disabled as these are temporary test instances
-  monitoring = false
-  subnet_id  = data.aws_subnet.private.id
-  vpc_security_group_ids = [
-    var.common_security_group_id,
-    aws_security_group.this.id
-  ]
-  #checkov:skip=CKV_AWS_79: We are tied to v1 metadata service
-  metadata_options {
-    http_endpoint = "enabled"
-    http_tokens   = "required"
-  }
-
-  root_block_device {
-    delete_on_termination = true
-    encrypted             = true
-    volume_type           = "gp3"
-
-    tags = merge(
-      var.tags,
-      {
-        Name = "base_instance-${var.name}-root-${data.aws_ami.this.root_device_name}"
-      }
-    )
-  }
-
-  tags = merge(
-    var.tags,
-    {
-      Name        = "base_instance-${var.name}"
-      description = var.description
-      os_type     = "Linux"
-      os_version  = lookup(data.aws_ami.this.tags, "os-version", null)
-      always_on   = var.always_on
-  })
 }
 
 #------------------------------------------------------------------------------
@@ -110,7 +62,7 @@ resource "aws_security_group_rule" "extra_rules" { # Extra ingress rules that mi
 # Instance profile to be assumed by the ec2 instances
 #------------------------------------------------------------------------------
 
-resource "aws_iam_role" "base_instance_role" {
+resource "aws_iam_role" "this" {
   name                 = "ec2-base_instance-role-${var.name}"
   path                 = "/"
   max_session_duration = "3600"
@@ -142,7 +94,7 @@ resource "aws_iam_role" "base_instance_role" {
 
 resource "aws_iam_instance_profile" "this" {
   name = "ec2-base_instance-profile-${var.name}"
-  role = aws_iam_role.base_instance_role.name
+  role = aws_iam_role.this.name
 }
 
 resource "aws_launch_template" "this" {
@@ -160,12 +112,6 @@ resource "aws_launch_template" "this" {
       encrypted             = true
       volume_type           = "gp3"
     }
-    tags = merge(
-      var.tags,
-      {
-        Name = "base_instance-${var.name}-root-${data.aws_ami.this.root_device_name}"
-      }
-    )
   }
   iam_instance_profile {
     arn = aws_iam_instance_profile.this.arn
@@ -197,6 +143,17 @@ resource "aws_launch_template" "this" {
       always_on   = var.always_on
   })
   }
+
+  tag_specifications {
+    resource_type = "volume"
+    tags = merge(
+      var.tags,
+      {
+        Name = "base_instance-${var.name}-root-${data.aws_ami.this.root_device_name}"
+      }
+    )
+  }
+
 }
 
 # autoscaling
@@ -220,7 +177,7 @@ resource "aws_autoscaling_group" "this" {
   ]
 }
 resource "aws_autoscaling_schedule" "scale_up" {
-  scheduled_action_name  = "base_instance-${name}_scale_up"
+  scheduled_action_name  = "base_instance-${var.name}_scale_up"
   min_size               = 0
   max_size               = 1
   desired_capacity       = 1
@@ -229,7 +186,7 @@ resource "aws_autoscaling_schedule" "scale_up" {
 }
 
 resource "aws_autoscaling_schedule" "scale_down" {
-  scheduled_action_name  = "base_instance-${name}_scale_down"
+  scheduled_action_name  = "base_instance-${var.name}_scale_down"
   min_size               = 0
   max_size               = 0
   desired_capacity       = 0

@@ -94,6 +94,12 @@ variable "name" {
   description = "Provide a unique name for the instance"
 }
 
+variable "region" {
+  type = string
+  description = "Destination AWS Region for the infrastructure"
+  default = "eu-west-2"
+}
+
 variable "subnet_set" {
   type        = string
   description = "Fixed variable to specify subnet-set for RAM shared subnets"
