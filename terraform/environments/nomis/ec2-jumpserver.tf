@@ -91,12 +91,17 @@ resource "aws_launch_template" "jumpserver" {
       }
     )
   }
+
+  lifecycle {
+    ignore_changes = [image_id, user_data]
+  }
 }
 
 # autoscaling
 resource "aws_autoscaling_group" "jumpserver" {
   launch_template {
-    id = aws_launch_template.jumpserver.id
+    id      = aws_launch_template.jumpserver.id
+    version = "$Default"
   }
   desired_capacity    = 1
   name                = "jumpserver-autoscaling-group"
