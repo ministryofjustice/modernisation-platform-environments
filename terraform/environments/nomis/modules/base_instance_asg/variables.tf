@@ -89,6 +89,13 @@ variable "key_name" {
   description = "Name of ssh key resource for ec2-user"
 }
 
+variable "kms_key_arn" {
+  type        = string
+  description = "ARN of a KMS key to be used to encrypting EBS volumes"
+  nullable    = true
+}
+
+
 variable "name" {
   type        = string
   description = "Provide a unique name for the instance"

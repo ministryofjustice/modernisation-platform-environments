@@ -1,7 +1,6 @@
 data "aws_caller_identity" "current" {}
-data "aws_ebs_default_kms_key" "current" {}
 data "aws_kms_key" "by_alias" {
-  key_id = data.aws_ebs_default_kms_key.current.key_arn
+  key_id = "alias/aws/ebs"
 }
 data "aws_ami" "this" {
   most_recent = true
@@ -105,14 +104,14 @@ resource "aws_launch_template" "this" {
   instance_initiated_shutdown_behavior = "terminate"
   instance_type                        = var.instance_type
   key_name                             = var.key_name
-
+  update_default_version               = true
   block_device_mappings {
     device_name = data.aws_ami.this.root_device_name
     ebs {
       delete_on_termination = true
       encrypted             = true
       volume_type           = "gp3"
-      kms_key_id            = data.aws_kms_key.by_alias.arn
+      kms_key_id            = coalesce(var.kms_key_arn, data.aws_kms_key.by_alias.arn)
     }
   }
   iam_instance_profile {
