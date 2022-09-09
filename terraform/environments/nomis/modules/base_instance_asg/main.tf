@@ -1,4 +1,5 @@
 data "aws_caller_identity" "current" {}
+data "aws_ebs_default_kms_key" "current" {}
 
 data "aws_ami" "this" {
   most_recent = true
@@ -30,7 +31,6 @@ data "aws_subnets" "this" {
     Name = "${var.business_unit}-${var.environment}-${var.subnet_set}-${var.subnet_type}-${var.region}*"
   }
 }
-
 #------------------------------------------------------------------------------
 # Security Group
 #------------------------------------------------------------------------------
@@ -110,7 +110,7 @@ resource "aws_launch_template" "this" {
       delete_on_termination = true
       encrypted             = true
       volume_type           = "gp3"
-      kms_key_id            = "arn:aws:kms:eu-west-2:612659970365:key/49444d95-0b94-4582-ae68-1db7128647c3"
+      kms_key_id            = data.aws_ebs_default_kms_key.current.key_arn
     }
   }
   iam_instance_profile {
