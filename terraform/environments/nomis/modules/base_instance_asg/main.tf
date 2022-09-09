@@ -103,7 +103,6 @@ resource "aws_launch_template" "this" {
   instance_initiated_shutdown_behavior = "terminate"
   instance_type                        = var.instance_type
   key_name                             = var.key_name
-  ebs_optimized                        = true
 
   # block_device_mappings {
   #   device_name = data.aws_ami.this.root_device_name
