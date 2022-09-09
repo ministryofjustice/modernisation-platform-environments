@@ -37,7 +37,7 @@ data "aws_subnets" "this" {
 
 resource "aws_security_group" "this" {
   description = "Security group rules specific to this base instance"
-  name        = "base_instance-${var.name}"
+  name        = "base_instance_asg-${var.name}"
   vpc_id      = data.aws_vpc.this.id
 
   tags = merge(
@@ -63,7 +63,7 @@ resource "aws_security_group_rule" "extra_rules" { # Extra ingress rules that mi
 #------------------------------------------------------------------------------
 
 resource "aws_iam_role" "this" {
-  name                 = "ec2-base_instance-role-${var.name}"
+  name                 = "ec2-base_instance-asg-role-${var.name}"
   path                 = "/"
   max_session_duration = "3600"
   assume_role_policy = jsonencode(
@@ -87,7 +87,7 @@ resource "aws_iam_role" "this" {
   tags = merge(
     var.tags,
     {
-      Name = "ec2-base_instance-role-${var.name}"
+      Name = "ec2-base_instance-asg-role-asg-${var.name}"
     }
   )
 }
