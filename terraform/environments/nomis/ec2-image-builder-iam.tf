@@ -38,13 +38,13 @@ resource "aws_iam_role" "image-builder-distro-role" {
 
 }
 
-
+#tfsec:ignore:aws-iam-no-policy-wildcards AWS Managed Policy
 resource "aws_iam_role_policy_attachment" "image-builder-distro-policy-attach" {
   policy_arn = "arn:aws:iam::aws:policy/Ec2ImageBuilderCrossAccountDistributionAccess"
   role       = aws_iam_role.image-builder-distro-role.name
 }
 
-
+#tfsec:ignore:aws-iam-no-policy-wildcards needed to look up launch template ids from another account
 data "aws_iam_policy_document" "image-builder-launch-template-policy" {
   statement {
     effect = "Allow"
@@ -71,7 +71,7 @@ data "aws_iam_policy_document" "image-builder-launch-template-policy" {
 data "aws_iam_policy_document" "image-builder-distro-kms-policy" {
   statement {
     effect = "Allow"
-    #tfsec:ignore:aws-iam-no-policy-wildcards:exp:2022-08-25
+    #tfsec:ignore:aws-iam-no-policy-wildcards
     actions = [
       "kms:Encrypt",
       "kms:Decrypt",
