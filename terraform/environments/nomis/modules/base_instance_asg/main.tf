@@ -104,15 +104,15 @@ resource "aws_launch_template" "this" {
   instance_type                        = var.instance_type
   key_name                             = var.key_name
 
-  # block_device_mappings {
-  #   device_name = data.aws_ami.this.root_device_name
-  #   ebs {
-  #     delete_on_termination = true
-  #     encrypted             = true
-  #     volume_type           = "gp3"
-  #     kms_key_id            = "arn:aws:kms:eu-west-2:612659970365:key/49444d95-0b94-4582-ae68-1db7128647c3"
-  #   }
-  # }
+  block_device_mappings {
+    device_name = data.aws_ami.this.root_device_name
+    ebs {
+      delete_on_termination = true
+      encrypted             = true
+      volume_type           = "gp3"
+      kms_key_id            = "arn:aws:kms:eu-west-2:612659970365:key/49444d95-0b94-4582-ae68-1db7128647c3"
+    }
+  }
   iam_instance_profile {
     arn = aws_iam_instance_profile.this.arn
   }
