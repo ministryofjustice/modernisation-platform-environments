@@ -93,6 +93,7 @@ variable "kms_key_arn" {
   type        = string
   description = "ARN of a KMS key to be used to encrypting EBS volumes"
   nullable    = true
+  default     = null
 }
 
 
