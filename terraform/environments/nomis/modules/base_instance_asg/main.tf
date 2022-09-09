@@ -161,7 +161,7 @@ resource "aws_launch_template" "this" {
 resource "aws_autoscaling_group" "this" {
   launch_template {
     id      = aws_launch_template.this.id
-    version = "$Latest"
+    version = "$Default"
   }
   desired_capacity    = 1
   name                = "base_instance-${var.name}-${var.application_name}-${var.environment}"
