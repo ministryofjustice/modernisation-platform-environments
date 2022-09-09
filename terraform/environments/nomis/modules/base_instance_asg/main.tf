@@ -103,7 +103,7 @@ resource "aws_launch_template" "this" {
   instance_initiated_shutdown_behavior = "terminate"
   instance_type                        = var.instance_type
   key_name                             = var.key_name
-  ebs_optimized = true
+  ebs_optimized                        = true
 
   block_device_mappings {
     device_name = data.aws_ami.this.root_device_name
@@ -134,14 +134,14 @@ resource "aws_launch_template" "this" {
   tag_specifications {
     resource_type = "instance"
     tags = merge(
-    var.tags,
-    {
-      Name        = "base_instance-${var.name}"
-      description = var.description
-      os_type     = "Linux"
-      os_version  = lookup(data.aws_ami.this.tags, "os-version", null)
-      always_on   = var.always_on
-  })
+      var.tags,
+      {
+        Name        = "base_instance-${var.name}"
+        description = var.description
+        os_type     = "Linux"
+        os_version  = lookup(data.aws_ami.this.tags, "os-version", null)
+        always_on   = var.always_on
+    })
   }
 
   tag_specifications {
@@ -159,7 +159,7 @@ resource "aws_launch_template" "this" {
 # autoscaling
 resource "aws_autoscaling_group" "this" {
   launch_template {
-    id      = aws_launch_template.this.id
+    id = aws_launch_template.this.id
   }
   desired_capacity    = 1
   name                = "base_instance-${var.name}-${var.application_name}-${var.environment}"

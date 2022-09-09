@@ -95,9 +95,9 @@ variable "name" {
 }
 
 variable "region" {
-  type = string
+  type        = string
   description = "Destination AWS Region for the infrastructure"
-  default = "eu-west-2"
+  default     = "eu-west-2"
 }
 
 variable "subnet_set" {
@@ -108,7 +108,7 @@ variable "subnet_set" {
 variable "subnet_type" {
   type        = string
   description = "Fixed variable to specify subnet type for RAM shared subnets (data, private or public)"
-  default = "data"
+  default     = "data"
 }
 
 variable "tags" {

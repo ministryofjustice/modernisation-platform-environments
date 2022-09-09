@@ -79,7 +79,7 @@ resource "aws_security_group" "base_instance_common" {
     security_groups = [module.bastion_linux.bastion_security_group]
   }
 
-   ingress {
+  ingress {
     description = "access from Cloud Platform Prometheus server"
     from_port   = "9100"
     to_port     = "9100"
