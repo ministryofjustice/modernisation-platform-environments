@@ -159,7 +159,7 @@ resource "aws_launch_template" "this" {
 # autoscaling
 resource "aws_autoscaling_group" "this" {
   launch_template {
-    id = aws_launch_template.this.id
+    id      = aws_launch_template.this.id
     version = "$Latest"
   }
   desired_capacity    = 1
