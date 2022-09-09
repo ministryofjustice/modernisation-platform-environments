@@ -155,6 +155,10 @@ resource "aws_launch_template" "this" {
     )
   }
 
+  lifecycle {
+    ignore_changes = ["image_id"]
+  }
+
 }
 
 # autoscaling
