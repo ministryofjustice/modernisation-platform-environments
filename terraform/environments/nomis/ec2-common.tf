@@ -807,7 +807,7 @@ data "aws_iam_policy_document" "cloudwatch_datasource" {
       "cloudwatch:GetMetricData",
       "cloudwatch:GetInsightRuleReport"
     ]
-    #tfsec:ignore:aws-iam-no-policy-wildcards:exp:2022-08-25
+    #tfsec:ignore:aws-iam-no-policy-wildcards
     resources = ["*"]
   }
   statement {
@@ -821,7 +821,7 @@ data "aws_iam_policy_document" "cloudwatch_datasource" {
       "logs:GetQueryResults",
       "logs:GetLogEvents"
     ]
-    #tfsec:ignore:aws-iam-no-policy-wildcards:exp:2022-08-25
+    #tfsec:ignore:aws-iam-no-policy-wildcards
     resources = ["*"]
   }
   statement {
