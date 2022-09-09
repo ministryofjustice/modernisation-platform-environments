@@ -8,7 +8,7 @@ module "base_instance_asg" {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
   }
 
-  for_each = local.accounts[local.environment].base_instances
+  for_each = local.accounts[local.environment].base_instances_asg
 
   name = each.key
 
