@@ -93,7 +93,7 @@ resource "aws_iam_role" "this" {
 }
 
 resource "aws_iam_instance_profile" "this" {
-  name = "ec2-base_instance-profile-${var.name}"
+  name = "ec2-base_instance-asg-profile-${var.name}"
   role = aws_iam_role.this.name
 }
 
@@ -159,7 +159,8 @@ resource "aws_launch_template" "this" {
 # autoscaling
 resource "aws_autoscaling_group" "this" {
   launch_template {
-    id = aws_launch_template.this.id
+    id      = aws_launch_template.this.id
+    version = "$$Default"
   }
   desired_capacity    = 1
   name                = "base_instance-${var.name}-${var.application_name}-${var.environment}"

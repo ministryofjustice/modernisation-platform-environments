@@ -97,7 +97,7 @@ resource "aws_launch_template" "jumpserver" {
 resource "aws_autoscaling_group" "jumpserver" {
   launch_template {
     id      = aws_launch_template.jumpserver.id
-    version = "$Default"
+    version = "$$Default"
   }
   desired_capacity    = 1
   name                = "jumpserver-autoscaling-group"
