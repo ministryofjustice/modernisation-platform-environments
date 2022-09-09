@@ -50,6 +50,22 @@ resource "aws_security_group" "base_instance_common" {
     security_groups = [module.bastion_linux.bastion_security_group]
   }
 
+   ingress {
+    description = "access from Cloud Platform Prometheus server"
+    from_port   = "9100"
+    to_port     = "9100"
+    protocol    = "TCP"
+    cidr_blocks = [local.accounts[local.environment].database_external_access_cidr.cloud_platform]
+  }
+
+  ingress {
+    description = "access from Cloud Platform Prometheus script exporter collector"
+    from_port   = "9172"
+    to_port     = "9172"
+    protocol    = "TCP"
+    cidr_blocks = [local.accounts[local.environment].database_external_access_cidr.cloud_platform]
+  }
+
   egress {
     description = "allow all"
     from_port   = 0
