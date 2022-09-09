@@ -93,7 +93,7 @@ locals {
         }
       },
       # Add base instances here. They will be created using the base_instance module
-      base_instances = {
+      base_instances_asg = {
         RHEL7TEST = {
           always_on   = false
           ami_name    = "nomis_rhel_7_9_baseimage*"
@@ -102,23 +102,6 @@ locals {
             monitored = false
           }
         },
-        RHEL7ANSIBLE = {
-          always_on   = false
-          ami_name    = "nomis_rhel_7_9_baseimage*"
-          description = "Test instance for the new nomis_RHEL7-9_BaseImage AMI"
-          tags = {
-            monitored = false
-          }
-          extra_ingress_rules = [
-            {
-              description = "access from Cloud Platform Prometheus server"
-              from_port   = "9100"
-              to_port     = "9100"
-              protocol    = "TCP"
-              cidr_blocks = ["172.20.0.0/16"]
-          }]
-
-        }
       }
     },
     production = {
@@ -231,7 +214,7 @@ locals {
       # Add weblogic instances here.  They will be created using the weblogic module
       weblogics = {},
       # Add base instances here. They will be created using the base_instance module
-      base_instances = {}
+      base_instances_asg = {}
     }
   }
 }
