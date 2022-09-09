@@ -1,7 +1,7 @@
 module "lb-access-logs-enabled" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer"
 
-  vpc_all = local.vpc_all
+  vpc_all                    = local.vpc_all
   application_name           = local.application_name
   public_subnets             = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id, data.aws_subnet.private_subnets_c.id]
   loadbalancer_ingress_rules = local.loadbalancer_ingress_rules
