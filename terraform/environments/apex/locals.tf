@@ -31,5 +31,35 @@ locals {
   # environment specfic variables
   # example usage:
   # example_data = local.application_data.accounts[local.environment].example_var
-  application_data = fileexists("./application_variables.json") ? jsondecode(file("./application_variables.json")) : {}
+  app_data = fileexists("./application_variables.json") ? jsondecode(file("./application_variables.json")) : {}
+
+  loadbalancer_ingress_rules = {
+    "cluster_ec2_lb_ingress" = {
+      description     = "Cluster EC2 loadbalancer ingress rule"
+      from_port       = 8080
+      to_port         = 8080
+      protocol        = "tcp"
+      cidr_blocks     = []
+      security_groups = []
+    },
+    "cluster_ec2_bastion_ingress" = {
+      description     = "Cluster EC2 bastion ingress rule"
+      from_port       = 3389
+      to_port         = 3389
+      protocol        = "tcp"
+      cidr_blocks     = []
+      security_groups = []
+    }
+  }
+
+  loadbalancer_egress_rules = {
+    "cluster_ec2_lb_egress" = {
+      description     = "Cluster EC2 loadbalancer egress rule"
+      from_port       = 443
+      to_port         = 443
+      protocol        = "tcp"
+      cidr_blocks     = ["0.0.0.0/0"]
+      security_groups = []
+    }
+  }
 }
