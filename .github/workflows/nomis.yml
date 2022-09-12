@@ -31,7 +31,7 @@ jobs:
         include:
           - environment: test
           - environment: development
-    name: Plan ${{ matrix.environment }} - nomis
+    name: Terraform plan - nomis - ${{ matrix.environment }}
     runs-on: ubuntu-latest
     if: github.ref != 'refs/heads/main'
     environment: nomis-${{ matrix.environment }}
@@ -54,7 +54,7 @@ jobs:
           TF_ENV: ${{ matrix.environment }}
   deploy-dev-test:
     if: github.ref != 'refs/heads/main'
-    name: Terraform apply - ${{ matrix.environment }}
+    name: Terraform apply - nomis - ${{ matrix.environment }}
     environment: nomis-${{ matrix.environment }}
     run: |
       terraform --version
@@ -72,7 +72,7 @@ jobs:
         include:
           - environment: preproduction
           - environment: production
-    name: Plan ${{ matrix.environment }} - nomis
+    name: Terraform plan - nomis - ${{ matrix.environment }}
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     environment: nomis-${{ matrix.environment }}
@@ -95,7 +95,7 @@ jobs:
           TF_ENV: ${{ matrix.environment }}
   deploy-preprod-prod:
     if: github.ref == 'refs/heads/main'
-    name: Terraform apply - ${{ matrix.environment }}
+    name: Terraform apply - nomis - ${{ matrix.environment }}
     environment: nomis-${{ matrix.environment }}
     run: |
       terraform --version
