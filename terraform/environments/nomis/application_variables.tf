@@ -44,8 +44,8 @@ locals {
           retention_days = 90
         }
       },
-      databases = {},
-      weblogics = {},
+      databases          = {},
+      weblogics          = {},
       base_instances_asg = {}
     },
     test = {
@@ -167,8 +167,8 @@ locals {
           retention_days = 90
         }
       },
-      databases = {},
-      weblogics = {},
+      databases          = {},
+      weblogics          = {},
       base_instances_asg = {}
     },
     production = {
