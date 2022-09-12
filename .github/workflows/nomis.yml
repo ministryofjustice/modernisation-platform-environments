@@ -61,6 +61,7 @@ jobs:
           - environment: development
     if: github.ref != 'refs/heads/main'
     name: Terraform apply - nomis - ${{ matrix.environment }}
+    runs-on: ubuntu-latest
     environment:
       name: nomis-${{ matrix.environment }}
     steps:
@@ -111,6 +112,7 @@ jobs:
           - environment: production
     if: github.ref == 'refs/heads/main'
     name: Terraform apply - nomis - ${{ matrix.environment }}
+    runs-on: ubuntu-latest
     environment:
       name: nomis-${{ matrix.environment }}
     steps:
