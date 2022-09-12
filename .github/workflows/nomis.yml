@@ -54,6 +54,11 @@ jobs:
         env:
           TF_ENV: ${{ matrix.environment }}
   deploy-dev-test:
+    strategy:
+      matrix:
+        include:
+          - environment: test
+          - environment: development
     if: github.ref != 'refs/heads/main'
     name: Terraform apply - nomis - ${{ matrix.environment }}
     environment:
@@ -98,6 +103,11 @@ jobs:
         env:
           TF_ENV: ${{ matrix.environment }}
   deploy-preprod-prod:
+    strategy:
+      matrix:
+        include:
+          - environment: preproduction
+          - environment: production
     if: github.ref == 'refs/heads/main'
     name: Terraform apply - nomis - ${{ matrix.environment }}
     environment:
