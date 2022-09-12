@@ -54,6 +54,7 @@ jobs:
         env:
           TF_ENV: ${{ matrix.environment }}
   deploy-dev-test:
+    needs: plan-dev-test
     strategy:
       matrix:
         include:
@@ -105,6 +106,7 @@ jobs:
         env:
           TF_ENV: ${{ matrix.environment }}
   deploy-preprod-prod:
+    needs: plan-preprod-prod
     strategy:
       matrix:
         include:
