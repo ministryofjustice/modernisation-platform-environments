@@ -26,6 +26,7 @@ defaults:
 jobs:
   # Plan + deploy for development and test enironments, never from main
   plan-dev-test:
+    if: github.ref != 'refs/heads/main'
     strategy:
       matrix:
         include:
@@ -33,7 +34,6 @@ jobs:
           - environment: development
     name: Terraform plan - nomis - ${{ matrix.environment }}
     runs-on: ubuntu-latest
-    if: github.ref != 'refs/heads/main'
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3.0.2
@@ -52,13 +52,13 @@ jobs:
         env:
           TF_ENV: ${{ matrix.environment }}
   deploy-dev-test:
+    if: github.ref != 'refs/heads/main'
     needs: plan-dev-test
     strategy:
       matrix:
         include:
           - environment: test
           - environment: development
-    if: github.ref != 'refs/heads/main'
     name: Terraform apply - nomis - ${{ matrix.environment }}
     runs-on: ubuntu-latest
     environment:
@@ -76,6 +76,7 @@ jobs:
 
   # Plan + deploy for pre-production and production enironments, only from main
   plan-preprod-prod:
+    if: github.ref == 'refs/heads/main'
     strategy:
       matrix:
         include:
@@ -83,7 +84,6 @@ jobs:
           - environment: production
     name: Terraform plan - nomis - ${{ matrix.environment }}
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3.0.2
@@ -102,6 +102,7 @@ jobs:
         env:
           TF_ENV: ${{ matrix.environment }}
   deploy-preprod-prod:
+    if: github.ref == 'refs/heads/main'
     needs: plan-preprod-prod
     strategy:
       matrix:
@@ -112,7 +113,6 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: nomis-${{ matrix.environment }}
-    if: github.ref == 'refs/heads/main'
     steps:
       - name: Run Terrform Apply
         run: |
