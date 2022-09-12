@@ -34,7 +34,8 @@ jobs:
     name: Terraform plan - nomis - ${{ matrix.environment }}
     runs-on: ubuntu-latest
     if: github.ref != 'refs/heads/main'
-    environment: nomis-${{ matrix.environment }}
+    environment:
+      name: nomis-${{ matrix.environment }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3.0.2
@@ -55,15 +56,17 @@ jobs:
   deploy-dev-test:
     if: github.ref != 'refs/heads/main'
     name: Terraform apply - nomis - ${{ matrix.environment }}
-    environment: nomis-${{ matrix.environment }}
-    run: |
-      terraform --version
-      echo "Terraform apply - ${TF_ENV}"
-      bash scripts/terraform-init.sh terraform/environments/nomis
-      terraform -chdir="terraform/environments/nomis" workspace select "nomis-${TF_ENV}"
-      bash scripts/terraform-apply.sh terraform/environments/nomis
-    env:
-        TF_ENV: ${{ matrix.environment }}
+    environment:
+      name: nomis-${{ matrix.environment }}
+    - name: Run Terrform Apply
+      run: |
+        terraform --version
+        echo "Terraform apply - ${TF_ENV}"
+        bash scripts/terraform-init.sh terraform/environments/nomis
+        terraform -chdir="terraform/environments/nomis" workspace select "nomis-${TF_ENV}"
+        bash scripts/terraform-apply.sh terraform/environments/nomis
+      env:
+          TF_ENV: ${{ matrix.environment }}
 
   # Plan + deploy for pre-production and production enironments, only from main
   plan-preprod-prod:
@@ -75,7 +78,8 @@ jobs:
     name: Terraform plan - nomis - ${{ matrix.environment }}
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
-    environment: nomis-${{ matrix.environment }}
+    environment:
+      name: nomis-${{ matrix.environment }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3.0.2
@@ -96,12 +100,15 @@ jobs:
   deploy-preprod-prod:
     if: github.ref == 'refs/heads/main'
     name: Terraform apply - nomis - ${{ matrix.environment }}
-    environment: nomis-${{ matrix.environment }}
-    run: |
-      terraform --version
-      echo "Terraform apply - ${TF_ENV}"
-      bash scripts/terraform-init.sh terraform/environments/nomis
-      terraform -chdir="terraform/environments/nomis" workspace select "nomis-${TF_ENV}"
-      bash scripts/terraform-apply.sh terraform/environments/nomis
-    env:
-        TF_ENV: ${{ matrix.environment }}
+    environment:
+      name: nomis-${{ matrix.environment }}
+    steps:
+      - name: Run Terrform Apply
+        run: |
+          terraform --version
+          echo "Terraform apply - ${TF_ENV}"
+          bash scripts/terraform-init.sh terraform/environments/nomis
+          terraform -chdir="terraform/environments/nomis" workspace select "nomis-${TF_ENV}"
+          bash scripts/terraform-apply.sh terraform/environments/nomis
+        env:
+            TF_ENV: ${{ matrix.environment }}
