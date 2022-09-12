@@ -15,6 +15,7 @@ data "aws_ami" "database" {
 
 locals {
   accounts = {
+    development = {}
     test = {
       # ip ranges for external access to database instances
       database_external_access_cidr = {
@@ -104,6 +105,7 @@ locals {
         },
       }
     },
+    preproduction = {}
     production = {
       # ip ranges for external access to database instances
       database_external_access_cidr = {
