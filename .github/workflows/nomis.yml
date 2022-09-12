@@ -34,8 +34,6 @@ jobs:
     name: Terraform plan - nomis - ${{ matrix.environment }}
     runs-on: ubuntu-latest
     if: github.ref != 'refs/heads/main'
-    environment:
-      name: nomis-${{ matrix.environment }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3.0.2
@@ -86,8 +84,6 @@ jobs:
     name: Terraform plan - nomis - ${{ matrix.environment }}
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
-    environment:
-      name: nomis-${{ matrix.environment }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3.0.2
@@ -112,11 +108,11 @@ jobs:
         include:
           - environment: preproduction
           - environment: production
-    if: github.ref == 'refs/heads/main'
     name: Terraform apply - nomis - ${{ matrix.environment }}
     runs-on: ubuntu-latest
     environment:
       name: nomis-${{ matrix.environment }}
+    if: github.ref == 'refs/heads/main'
     steps:
       - name: Run Terrform Apply
         run: |
