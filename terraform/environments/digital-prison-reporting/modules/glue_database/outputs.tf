@@ -1,3 +1,3 @@
 output "name" {
-  value = "${join(",", aws_glue_catalog_database.glue_database.*.name)}"
+  value = join(",", aws_glue_catalog_database.glue_database.*.name)
 }

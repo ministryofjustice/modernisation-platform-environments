@@ -8,5 +8,5 @@ module "glue_database" {
 
   name = local.application_data.accounts[local.environment].glue_db_name
 
-  description  = local.application_data.accounts[local.environment].db_description
+  description = local.application_data.accounts[local.environment].db_description
 }

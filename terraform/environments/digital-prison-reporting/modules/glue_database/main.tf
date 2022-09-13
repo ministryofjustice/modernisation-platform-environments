@@ -1,17 +1,17 @@
 resource "aws_glue_catalog_database" "glue_database" {
-  count = "${var.create ? 1 : 0}"
+  count = var.create ? 1 : 0
 
-  name = "${var.name}"
+  name = var.name
 
-  description  = "${var.description}"
-  catalog_id   = "${var.catalog}"
-  location_uri = "${var.location_uri}"
-  parameters   = "${var.params}"
+  description  = var.description
+  catalog_id   = var.catalog
+  location_uri = var.location_uri
+  parameters   = var.params
 
   lifecycle {
     create_before_destroy = true
     ignore_changes        = []
   }
 
-  depends_on = [] 
+  depends_on = []
 }
