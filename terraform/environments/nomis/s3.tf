@@ -194,7 +194,7 @@ data "aws_iam_policy_document" "nomis-all-environments-access" {
       identifiers = [
         "arn:aws:iam::${local.environment_management.account_ids["nomis-development"]}:root",
         "arn:aws:iam::${local.environment_management.account_ids["nomis-test"]}:root",
-        "arn:aws:iam::${local.environment_management.account_ids["nomis-preproduction"]}:root"
+        "arn:aws:iam::${local.environment_management.account_ids["nomis-preproduction"]}:root",
         "arn:aws:iam::${local.environment_management.account_ids["nomis-production"]}:root"
       ]
     }
