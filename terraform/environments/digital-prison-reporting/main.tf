@@ -4,9 +4,9 @@
 module "glue_database" {
   source = "./modules/glue_database"
 
-  create = "${var.create_database}"
+  create = local.application_data.accounts[local.environment].create_database
 
-  name = "${var.glue_db_name}"
+  name = local.application_data.accounts[local.environment].glue_db_name
 
-  description  = "${var.db_description}"
+  description  = local.application_data.accounts[local.environment].db_description
 }

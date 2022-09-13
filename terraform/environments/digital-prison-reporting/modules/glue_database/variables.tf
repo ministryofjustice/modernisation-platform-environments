@@ -17,6 +17,6 @@ variable "location_uri" {
 }
 
 variable "params" {
-  type    = "map"
-  default = {}
+  description = "(Optional) A list of key-value pairs that define parameters and properties of the database."
+  default     = null
 }
