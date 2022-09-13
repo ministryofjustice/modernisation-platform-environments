@@ -46,7 +46,16 @@ locals {
       },
       databases          = {},
       weblogics          = {},
-      base_instances_asg = {}
+      base_instances_asg = {
+        RHEL64TEST = {
+          always_on   = false
+          ami_name    = "nomis_rhel_6_4_baseimage*"
+          description = "Test instance for the new nomis_RHEL_6_4_BaseImage AMI"
+          tags = {
+            monitored = false
+          }
+        },
+      }
     },
     test = {
       # ip ranges for external access to database instances
