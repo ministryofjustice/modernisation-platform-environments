@@ -223,7 +223,10 @@ resource "aws_acm_certificate_validation" "internal_lb" {
 # if not then additional work will be required in the weblogic module
 #------------------------------------------------------------------------------
 
+
 resource "aws_route53_zone" "az" {
+  #checkov:skip=CKV2_AWS_38
+  #checkov:skip=CKV2_AWS_39
   count = local.environment == "test" ? 1 : 0
   name  = "modernisation-platform.nomis.az.justice.gov.uk"
   tags = merge(
