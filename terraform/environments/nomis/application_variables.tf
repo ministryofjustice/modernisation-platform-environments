@@ -44,8 +44,8 @@ locals {
           retention_days = 90
         }
       },
-      databases          = {},
-      weblogics          = {},
+      databases = {},
+      weblogics = {},
       base_instances_asg = {
         RHEL64TEST = {
           always_on   = false
