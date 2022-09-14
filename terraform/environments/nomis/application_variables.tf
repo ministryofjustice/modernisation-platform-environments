@@ -94,14 +94,6 @@ locals {
       },
       # Add base instances here. They will be created using the base_instance module
       base_instances_asg = {
-        RHEL7TEST = {
-          always_on   = false
-          ami_name    = "nomis_rhel_7_9_baseimage*"
-          description = "Test instance for the new nomis_RHEL7-9_BaseImage AMI"
-          tags = {
-            monitored = false
-          }
-        },
         TESTWL2 = {
           always_on     = false
           ami_name      = "nomis_rhel_6_10_weblogic_appserver_10_3*"
