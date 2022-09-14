@@ -111,7 +111,7 @@ resource "aws_launch_template" "this" {
       delete_on_termination = true
       encrypted             = true
       volume_type           = "gp3"
-      kms_key_id            = coalesce(var.kms_key_arn, data.aws_kms_key.by_alias.arn)
+      kms_key_id            = "arn:aws:kms:eu-west-2:374269020027:key/12984197-3371-4c21-8e43-a88a1581e691"
     }
   }
   iam_instance_profile {
@@ -128,7 +128,10 @@ resource "aws_launch_template" "this" {
 
   network_interfaces {
     associate_public_ip_address = false
-    security_groups             = [var.common_security_group_id, aws_security_group.this.id]
+    security_groups             = [
+      var.common_security_group_id, 
+      aws_security_group.this.id
+    ]
     delete_on_termination       = true
   }
 
