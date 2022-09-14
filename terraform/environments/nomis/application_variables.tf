@@ -1,18 +1,4 @@
 # This file is for vars that vary between accounts.  Locals.tf conatins common vars.
-data "aws_ami" "database" {
-  most_recent = true
-  owners      = ["self"]
-
-  filter {
-    name   = "name"
-    values = ["nomis_database_*"]
-  }
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
-}
-
 locals {
   accounts = {
     development = {
