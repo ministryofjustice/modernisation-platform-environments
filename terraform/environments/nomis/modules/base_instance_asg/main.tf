@@ -128,11 +128,11 @@ resource "aws_launch_template" "this" {
 
   network_interfaces {
     associate_public_ip_address = false
-    security_groups             = [
-      var.common_security_group_id, 
+    security_groups = [
+      var.common_security_group_id,
       aws_security_group.this.id
     ]
-    delete_on_termination       = true
+    delete_on_termination = true
   }
 
   tag_specifications {
