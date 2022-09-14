@@ -33,7 +33,6 @@ locals {
         databases          = {},
         weblogics          = {},
         base_instances_asg = {},
-      }
     },
     test = {
       # ip ranges for external access to database instances
