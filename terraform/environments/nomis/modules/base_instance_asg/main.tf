@@ -111,7 +111,7 @@ resource "aws_launch_template" "this" {
       delete_on_termination = true
       encrypted             = true
       volume_type           = "gp3"
-      kms_key_id            = "arn:aws:kms:eu-west-2:374269020027:key/12984197-3371-4c21-8e43-a88a1581e691"
+      kms_key_id            = data.aws_kms_key.hmpps_key.arn
     }
   }
   iam_instance_profile {

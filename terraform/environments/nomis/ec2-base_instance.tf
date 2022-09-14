@@ -19,6 +19,7 @@ module "base_instance_asg" {
   ami_owner           = try(each.value.ami_owner, local.environment_management.account_ids["nomis-test"])
   extra_ingress_rules = try(each.value.extra_ingress_rules, null)
   instance_type       = try(each.value.instance_type, null)
+  kms_key_arn         = try(each.value.kms_key_arn, null)
 
   common_security_group_id  = aws_security_group.base_instance_common.id
   instance_profile_policies = local.ec2_common_managed_policies
