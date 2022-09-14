@@ -94,7 +94,6 @@ locals {
         TESTWL = {
           ami_name     = "nomis_rhel_6_10_weblogic_appserver_10_3*"
           asg_max_size = 1
-          ami_owner    = "612659970365"
         }
       },
       # Add base instances here. They will be created using the base_instance module
