@@ -90,10 +90,6 @@ locals {
         CNOMT1 = {
           ami_name     = "nomis_Weblogic_2022*"
           asg_max_size = 1
-        },
-        TESTWL = {
-          ami_name     = "nomis_rhel_6_10_weblogic_appserver_10_3*"
-          asg_max_size = 1
         }
       },
       # Add base instances here. They will be created using the base_instance module
@@ -106,6 +102,14 @@ locals {
             monitored = false
           }
         },
+        TESTWL2 = {
+          always_on   = false
+          ami_name    = "nomis_rhel_6_10_weblogic_appserver_10_3*"
+          description = "Test instance for the weblogic base ami"
+          tags = {
+            monitored = false
+          }
+        }
       }
     },
     production = {
