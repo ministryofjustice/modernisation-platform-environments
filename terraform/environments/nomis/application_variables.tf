@@ -29,10 +29,10 @@ locals {
         cwagent-nomis-autologoff = {
           retention_days = 90
         }
-        },
-        databases          = {},
-        weblogics          = {},
-        base_instances_asg = {},
+      },
+      databases          = {},
+      weblogics          = {},
+      base_instances_asg = {},
     },
     test = {
       # ip ranges for external access to database instances
