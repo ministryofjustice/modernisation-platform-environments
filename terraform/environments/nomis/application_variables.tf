@@ -103,9 +103,10 @@ locals {
           }
         },
         TESTWL2 = {
-          always_on   = false
-          ami_name    = "nomis_rhel_6_10_weblogic_appserver_10_3*"
-          description = "Test instance for the weblogic base ami"
+          always_on     = false
+          ami_name      = "nomis_rhel_6_10_weblogic_appserver_10_3*"
+          description   = "Test instance for the weblogic base ami"
+          instance_type = "t2.medium"
           tags = {
             monitored = false
           }
