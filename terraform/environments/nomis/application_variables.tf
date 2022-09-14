@@ -99,6 +99,7 @@ locals {
           ami_name      = "nomis_rhel_6_10_weblogic_appserver_10_3*"
           description   = "Test instance for the weblogic base ami"
           instance_type = "t2.medium"
+          kms_key_arn   = data.aws_kms_key.hmpps_key.arn
           tags = {
             monitored = false
           }
