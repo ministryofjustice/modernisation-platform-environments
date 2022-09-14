@@ -43,18 +43,18 @@ locals {
         cwagent-nomis-autologoff = {
           retention_days = 90
         }
-      },
-      databases = {},
-      weblogics = {},
-      base_instances_asg = {
-        RHEL64TEST = {
-          always_on   = false
-          ami_name    = "nomis_rhel_6_4_baseimage*"
-          description = "Test instance for the new nomis_RHEL_6_4_BaseImage AMI"
-          tags = {
-            monitored = false
-          }
-        },
+      # },
+      # databases          = {},
+      # weblogics          = {},
+      # base_instances_asg = {
+      #   RHEL64TEST = {
+      #     always_on   = false
+      #     ami_name    = "nomis_rhel_6_4_baseimage*"
+      #     description = "Test instance for the new nomis_RHEL_6_4_BaseImage AMI"
+      #     tags = {
+      #       monitored = false
+      #     }
+      #   },
       }
     },
     test = {
