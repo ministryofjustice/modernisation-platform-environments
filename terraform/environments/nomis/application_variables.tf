@@ -216,7 +216,7 @@ locals {
       # Add weblogic instances here.  They will be created using the weblogic module
       weblogics = {},
       # Add base instances here. They will be created using the base_instance module
-      base_instances_asg = {}
+      test_instances_asg = {}
     }
   }
 }
