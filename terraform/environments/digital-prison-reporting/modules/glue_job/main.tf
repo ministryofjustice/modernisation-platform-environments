@@ -7,6 +7,8 @@ locals {
     "--enable-continuous-cloudwatch-log"  = "true"
     "--enable-continuous-log-filter"      = "true"
     "--continuous-log-logStreamPrefix"    = var.continuous_log_stream_prefix
+    "--extra-py-files"                    = length(var.extra_py_files) > 0 ? join(",", var.extra_py_files) : null
+    "--enable-continuous-log-filter"      = var.enable_continuous_log_filter
   }
 
   tags = merge(

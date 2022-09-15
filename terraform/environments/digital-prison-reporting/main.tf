@@ -33,4 +33,6 @@ module "glue_job" {
   description                   = "${local.description}"
   create_security_configuration = "${local.create_sec_conf}"
   tags                          = local.all_tags
+  script_location               = "s3://${var.bucket}/${var.environment}/driver.py"
+  enable_continuous_log_filter  = false
 }
