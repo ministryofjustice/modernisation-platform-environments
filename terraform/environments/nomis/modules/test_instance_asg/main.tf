@@ -37,14 +37,14 @@ data "aws_subnets" "this" {
 #------------------------------------------------------------------------------
 
 resource "aws_security_group" "this" {
-  description = "Security group rules specific to this base instance"
-  name        = "base_instance_asg-${var.name}"
+  description = "Security group rules specific to this test instance"
+  name        = "test_instance_asg-${var.name}"
   vpc_id      = data.aws_vpc.this.id
 
   tags = merge(
     var.tags,
     {
-      Name = "base_instance-${var.name}",
+      Name = "test_instance-${var.name}",
   })
 }
 
@@ -64,7 +64,7 @@ resource "aws_security_group_rule" "extra_rules" { # Extra ingress rules that mi
 #------------------------------------------------------------------------------
 
 resource "aws_iam_role" "this" {
-  name                 = "ec2-base_instance-asg-role-${var.name}"
+  name                 = "ec2-test_instance-asg-role-${var.name}"
   path                 = "/"
   max_session_duration = "3600"
   assume_role_policy = jsonencode(
@@ -88,13 +88,13 @@ resource "aws_iam_role" "this" {
   tags = merge(
     var.tags,
     {
-      Name = "ec2-base_instance-asg-role-asg-${var.name}"
+      Name = "ec2-test_instance-asg-role-asg-${var.name}"
     }
   )
 }
 
 resource "aws_iam_instance_profile" "this" {
-  name = "ec2-base_instance-asg-profile-${var.name}"
+  name = "ec2-test_instance-asg-profile-${var.name}"
   role = aws_iam_role.this.name
 }
 
@@ -105,15 +105,21 @@ resource "aws_launch_template" "this" {
   instance_type                        = var.instance_type
   key_name                             = var.key_name
   update_default_version               = true
-  block_device_mappings {
-    device_name = data.aws_ami.this.root_device_name
-    ebs {
-      delete_on_termination = true
-      encrypted             = true
-      volume_type           = "gp3"
-      kms_key_id            = coalesce(var.kms_key_arn, data.aws_kms_key.by_alias.arn)
+
+  dynamic "block_device_mappings" {
+    for_each = data.aws_ami.this.block_device_mappings
+    iterator = device
+    content {
+      device_name = device.value.device_name
+      ebs {
+        delete_on_termination = true
+        encrypted             = true
+        volume_type           = "gp3"
+        kms_key_id            = coalesce(var.kms_key_arn, data.aws_kms_key.by_alias.arn)
+      }
     }
   }
+
   iam_instance_profile {
     arn = aws_iam_instance_profile.this.arn
   }
@@ -137,7 +143,7 @@ resource "aws_launch_template" "this" {
     tags = merge(
       var.tags,
       {
-        Name        = "base_instance-${var.name}"
+        Name        = "test_instance-${var.name}"
         description = var.description
         os_type     = "Linux"
         os_version  = lookup(data.aws_ami.this.tags, "os-version", null)
@@ -150,7 +156,7 @@ resource "aws_launch_template" "this" {
     tags = merge(
       var.tags,
       {
-        Name = "base_instance-${var.name}-root-${data.aws_ami.this.root_device_name}"
+        Name = "test_instance-${var.name}-root-${data.aws_ami.this.root_device_name}"
       }
     )
   }
@@ -168,14 +174,14 @@ resource "aws_autoscaling_group" "this" {
     version = "$Default"
   }
   desired_capacity    = 1
-  name                = "base_instance-${var.name}-${var.application_name}-${var.environment}"
+  name                = "test_instance-${var.name}-${var.application_name}-${var.environment}"
   min_size            = 1
   max_size            = 1
   force_delete        = true
   vpc_zone_identifier = data.aws_subnets.this.ids
   tag {
     key                 = "Name"
-    value               = "base_instance-${var.name}-${var.application_name}-${var.environment}"
+    value               = "test_instance-${var.name}-${var.application_name}-${var.environment}"
     propagate_at_launch = true
   }
   depends_on = [
@@ -183,7 +189,7 @@ resource "aws_autoscaling_group" "this" {
   ]
 }
 resource "aws_autoscaling_schedule" "scale_up" {
-  scheduled_action_name  = "base_instance-${var.name}_scale_up"
+  scheduled_action_name  = "test_instance-${var.name}_scale_up"
   min_size               = 0
   max_size               = 1
   desired_capacity       = 1
@@ -192,7 +198,7 @@ resource "aws_autoscaling_schedule" "scale_up" {
 }
 
 resource "aws_autoscaling_schedule" "scale_down" {
-  scheduled_action_name  = "base_instance-${var.name}_scale_down"
+  scheduled_action_name  = "test_instance-${var.name}_scale_down"
   min_size               = 0
   max_size               = 0
   desired_capacity       = 0

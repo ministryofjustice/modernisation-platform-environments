@@ -93,7 +93,18 @@ locals {
         }
       },
       # Add base instances here. They will be created using the base_instance module
-      base_instances_asg = {}
+      test_instances_asg = {
+        TESTWL2 = {
+          always_on     = false
+          ami_name      = "nomis_rhel_6_10_weblogic_appserver_10_3*"
+          description   = "Test instance for the weblogic base ami"
+          instance_type = "t2.medium"
+          kms_key_arn   = data.aws_kms_key.hmpps_key.arn
+          tags = {
+            monitored = false
+          }
+        }
+      }
     },
     production = {
       # ip ranges for external access to database instances
@@ -205,7 +216,7 @@ locals {
       # Add weblogic instances here.  They will be created using the weblogic module
       weblogics = {},
       # Add base instances here. They will be created using the base_instance module
-      base_instances_asg = {}
+      test_instances_asg = {}
     }
   }
 }
