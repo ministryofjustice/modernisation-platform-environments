@@ -1,4 +1,4 @@
-variable "create" {
+variable "create_db" {
   default = true
 }
 

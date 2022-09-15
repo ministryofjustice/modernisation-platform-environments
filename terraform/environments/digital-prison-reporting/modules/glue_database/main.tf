@@ -2,7 +2,7 @@ locals {
 }
 
 resource "aws_glue_catalog_database" "glue_database" {
-  count = var.create ? 1 : 0
+  count = var.create_db ? 1 : 0
 
   name = var.name
 

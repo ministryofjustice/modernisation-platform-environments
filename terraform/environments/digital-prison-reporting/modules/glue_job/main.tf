@@ -1,9 +1,9 @@
 locals {
   default_arguments = {
-    "--job-language"                      = "${var.language}"
+    "--job-language"                      = "${var.job_language}"
     "--job-bookmark-option"               = "${lookup(var.bookmark_options, var.bookmark)}"
     "--TempDir"                           = "${var.temp_dir}"
-    "--continuous-log-logGroup"           = aws_cloudwatch_log_group.example.name
+    "--continuous-log-logGroup"           = aws_cloudwatch_log_group.log_group.name
     "--enable-continuous-cloudwatch-log"  = "true"
     "--enable-continuous-log-filter"      = "true"
     "--continuous-log-logStreamPrefix"    = var.continuous_log_stream_prefix
@@ -14,7 +14,7 @@ locals {
   tags = merge(
     var.tags,
     {
-      Name = "${local.application_name}-s3-kms"
+      Name = "${var.name}-s3-kms"
       Resource_Type = "Glue Job"
     }
   )
@@ -23,10 +23,10 @@ locals {
 resource "aws_glue_job" "glue_job" {
   count = "${var.create_job ? 1 : 0}"
 
-  name                   = "${var.name}"
+  name                   = var.name
   role_arn               = var.create_role ? join("", aws_iam_role.role.*.arn) : var.role_arn
-  connections            = ["${var.connections}"]
-  allocated_capacity     = "${var.dpu}"
+  connections            = var.connections
+  max_capacity           = var.dpu
   description            = var.description
   glue_version           = var.glue_version
   max_retries            = var.max_retries
@@ -43,10 +43,6 @@ resource "aws_glue_job" "glue_job" {
   # https://docs.aws.amazon.com/glue/latest/dg/aws-glue-programming-etl-glue-arguments.html
   default_arguments = "${merge(local.default_arguments, var.arguments)}"
 
-  description = "${var.description}"
-  max_retries = "${var.max_retries}"
-  timeout     = "${var.timeout}"
-
   execution_property {
     max_concurrent_runs = "${var.max_concurrent}"
   }
@@ -61,8 +57,8 @@ resource "aws_glue_job" "glue_job" {
 }
 
 resource "aws_iam_role" "role" {
-  count = var.create_role ? 1 : 0
-  name  = "${local.full_name}-role"
+  count = var.create_role && var.create_job ? 1 : 0
+  name  = "${var.name}-role"
   tags  = local.tags
 
   assume_role_policy = jsonencode({
@@ -86,14 +82,14 @@ resource "aws_iam_role" "role" {
 }
 
 resource "aws_cloudwatch_log_group" "log_group" {
-  name              = "/aws-glue/jobs/${local.full_name}"
+  name              = "/aws-glue/jobs/${var.name}"
   retention_in_days = var.log_group_retention_in_days
   tags              = var.tags
 }
 
 resource "aws_glue_security_configuration" "sec_cfg" {
-  count = var.create_security_configuration ? 1 : 0
-  name  = "${local.full_name}-sec-config"
+  count = var.create_security_configuration && var.create_job ? 1 : 0
+  name  = "${var.name}-sec-config"
 
   encryption_configuration {
     cloudwatch_encryption {
@@ -105,9 +101,8 @@ resource "aws_glue_security_configuration" "sec_cfg" {
     }
 
     s3_encryption {
-      kms_key_arn        = data.aws_kms_key.example.arn
+      kms_key_arn        = var.aws_kms_key
       s3_encryption_mode = "SSE-KMS"
     }
-  }
   }
 }

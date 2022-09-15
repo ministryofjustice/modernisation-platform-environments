@@ -1,28 +1,26 @@
-variable "create" {
-  default = true
+variable "create_job" {
+  type        = bool
+  default     = false
+  description = "(Optional) Create AWS IAM role associated with the job."
 }
 
-variable "name" {}
+variable "arguments" {
+  type    = map
+  default = {}
+}
 
-variable "role_arn" {}
-
-variable "connections" {
-  type    = "list"
-  default = []
+variable "max_concurrent" {
+  default = 1
 }
 
 variable "dpu" {
-  default = 2
+  default = 1
 }
 
-variable "script_location" {}
-
-variable "command_name" {
-  default = ""
-}
-
-variable "language" {
-  default = "python"
+variable "temp_dir" {
+  type        = string
+  default     = null
+  description = "(Optional) Specifies an Amazon S3 path to a bucket that can be used as a temporary directory for the job."
 }
 
 variable "bookmark" {
@@ -31,43 +29,13 @@ variable "bookmark" {
 }
 
 variable "bookmark_options" {
-  type = "map"
+  type = map
 
   default = {
     enabled  = "job-bookmark-enable"
     disabled = "job-bookmark-disable"
     paused   = "job-bookmark-pause"
   }
-}
-
-variable "temp_dir" {}
-
-variable "description" {
-  default = ""
-}
-
-variable "max_retries" {
-  default = 0
-}
-
-variable "timeout" {
-  default = 2880
-}
-
-variable "max_concurrent" {
-  default = 1
-}
-
-variable "arguments" {
-  type    = "map"
-  default = {}
-}
-
-# Additionals
-
-variable "environment" {
-  type        = string
-  description = "(Required) Environment name."
 }
 
 variable "name" {
@@ -140,9 +108,15 @@ variable "role_arn" {
   description = "(Optional) The ARN of the IAM role associated with this job."
 }
 
+variable "aws_kms_key" {
+  type        = string
+  default     = ""
+  description = "(Optional) The ARN of the kMS Key associated to S3"
+}
+
 variable "create_role" {
   type        = bool
-  default     = false
+  default     = true
   description = "(Optional) Create AWS IAM role associated with the job."
 }
 
@@ -178,7 +152,7 @@ variable "security_configuration" {
 
 variable "create_security_configuration" {
   type        = bool
-  default     = false
+  default     = true
   description = "(Optional) Create AWS Glue Security Configuration associated with the job."
 }
 
@@ -283,7 +257,6 @@ variable "job_bookmark_option" {
     error_message = "Accepts a value of 'job-bookmark-enable', 'job-bookmark-disable' or 'job-bookmark-pause'."
   }
 }
-
 
 variable "enable_metrics" {
   type        = bool
