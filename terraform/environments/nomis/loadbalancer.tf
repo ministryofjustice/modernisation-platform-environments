@@ -36,16 +36,16 @@ resource "aws_security_group_rule" "internal_lb_ingress_1" {
   cidr_blocks       = ["10.184.0.0/16"] # Global Protect PTTP devices
 }
 
-resource "aws_security_group_rule" "internal_lb_ingress_2" {
+# resource "aws_security_group_rule" "internal_lb_ingress_2" {
 
-  description              = "allow 443 inbound from Jump Server"
-  security_group_id        = aws_security_group.internal_elb.id
-  type                     = "ingress"
-  from_port                = 443
-  to_port                  = 443
-  protocol                 = "tcp"
-  source_security_group_id = aws_security_group.jumpserver-windows.id
-}
+#   description              = "allow 443 inbound from Jump Server"
+#   security_group_id        = aws_security_group.internal_elb.id
+#   type                     = "ingress"
+#   from_port                = 443
+#   to_port                  = 443
+#   protocol                 = "tcp"
+#   source_security_group_id = aws_security_group.jumpserver-windows.id
+# }
 
 resource "aws_security_group_rule" "internal_lb_ingress_3" {
 
@@ -58,16 +58,16 @@ resource "aws_security_group_rule" "internal_lb_ingress_3" {
   cidr_blocks       = ["10.184.0.0/16"] # Global Protect PTTP devices
 }
 
-resource "aws_security_group_rule" "internal_lb_ingress_4" {
+# resource "aws_security_group_rule" "internal_lb_ingress_4" {
 
-  description              = "allow 80 inbound from Jump Server"
-  security_group_id        = aws_security_group.internal_elb.id
-  type                     = "ingress"
-  from_port                = 80
-  to_port                  = 80
-  protocol                 = "tcp"
-  source_security_group_id = aws_security_group.jumpserver-windows.id
-}
+#   description              = "allow 80 inbound from Jump Server"
+#   security_group_id        = aws_security_group.internal_elb.id
+#   type                     = "ingress"
+#   from_port                = 80
+#   to_port                  = 80
+#   protocol                 = "tcp"
+#   source_security_group_id = aws_security_group.jumpserver-windows.id
+# }
 
 resource "aws_security_group_rule" "internal_lb_egress_1" {
 

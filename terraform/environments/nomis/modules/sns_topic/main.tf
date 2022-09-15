@@ -1,8 +1,9 @@
 data "aws_caller_identity" "current" {}
 
 resource "aws_ssm_parameter" "subscriptions" {
-  name = "/monitoring/subscriptions"
-  type = "SecureString"
+  name  = "/monitoring/subscriptions"
+  type  = "SecureString"
+  value = ""
   lifecycle {
     ignore_changes = [
       value,
