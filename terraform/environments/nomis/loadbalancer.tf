@@ -232,6 +232,8 @@ resource "aws_route53_zone" "az" {
       Name = "modernisation-platform.nomis.az.justice.gov.uk"
     }
   )
+  #Raised DSOS-1495 to investigate
+  #checkov:skip=CKV2_AWS_38: "Ensure Domain Name System Security Extensions (DNSSEC) signing is enabled for Amazon Route 53 public hosted zones"
 }
 
 resource "aws_route53_record" "internal_lb_az" {

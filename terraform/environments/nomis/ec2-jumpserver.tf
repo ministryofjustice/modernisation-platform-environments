@@ -50,6 +50,8 @@ data "template_file" "user_data" {
     SECRET_PREFIX = local.secret_prefix
     S3_BUCKET     = module.s3-bucket.bucket.id
   }
+  #not actually a secret
+  #checkov:skip=CKV_SECRET_6: "Base64 High Entropy String"
 }
 
 # instance launch template
