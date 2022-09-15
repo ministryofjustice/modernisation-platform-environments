@@ -2,7 +2,7 @@
 # Common IAM policies for all ec2 instance profiles
 #------------------------------------------------------------------------------
 resource "aws_kms_grant" "ssm-start-stop-shared-cmk-grant" {
-  count                   = local.environment == "test" ? 1 : 0
+  count             = local.environment == "test" ? 1 : 0
   name              = "image-builder-shared-cmk-grant"
   key_id            = data.aws_kms_key.hmpps_key.arn
   grantee_principal = aws_iam_role.ssm_ec2_start_stop.arn
