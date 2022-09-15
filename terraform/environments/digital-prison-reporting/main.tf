@@ -1,3 +1,7 @@
+locals {
+    project = local.application_data.accounts[local.environment].project_short_id
+}
+
 #######################
 # Glue Database Catalog
 #######################

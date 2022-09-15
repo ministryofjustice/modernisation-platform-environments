@@ -1,6 +1,7 @@
 {
   "accounts": {
     "development": {
+      "project_short_id": "dpr",
       "create_database": true,
       "db_description": "DPR Data Catalog",
       "glue_db_name": "dpr-glue-catalog-development"
