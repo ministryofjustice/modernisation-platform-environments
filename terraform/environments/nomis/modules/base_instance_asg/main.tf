@@ -156,7 +156,7 @@ resource "aws_launch_template" "this" {
   }
 
   lifecycle {
-    ignore_changes = ["image_id"]
+    ignore_changes = [image_id, description, tags, tags_all, latest_version]
   }
 
 }
