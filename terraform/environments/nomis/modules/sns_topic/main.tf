@@ -25,6 +25,9 @@ resource "aws_sns_topic_subscription" "monitoring_subscriptions" {
   protocol      = "email"
   endpoint      = local.subscriptions_data.emails[count.index].email
   filter_policy = jsonencode(local.subscriptions_data.emails[count.index].filter)
+  depends_on    = [
+    resource.aws_ssm_parameter.subscriptions
+  ]
 
 }
 
