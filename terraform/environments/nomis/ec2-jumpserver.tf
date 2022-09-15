@@ -50,6 +50,8 @@ data "template_file" "user_data" {
     SECRET_PREFIX = local.secret_prefix
     S3_BUCKET     = module.s3-bucket.bucket.id
   }
+  #not actually a secret
+  #checkov:skip=CKV_SECRET_6: "Base64 High Entropy String"
 }
 
 # instance launch template
@@ -91,12 +93,17 @@ resource "aws_launch_template" "jumpserver" {
       }
     )
   }
+
+  lifecycle {
+    ignore_changes = [image_id, description, tags, tags_all]
+  }
 }
 
 # autoscaling
 resource "aws_autoscaling_group" "jumpserver" {
   launch_template {
-    id = aws_launch_template.jumpserver.id
+    id      = aws_launch_template.jumpserver.id
+    version = "$Default"
   }
   desired_capacity    = 1
   name                = "jumpserver-autoscaling-group"
