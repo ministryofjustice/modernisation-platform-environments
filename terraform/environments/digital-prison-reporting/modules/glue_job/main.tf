@@ -11,7 +11,7 @@ locals {
 }
 
 resource "aws_glue_job" "glue_job" {
-  count = "${var.create ? 1 : 0}"
+  count = "${var.create_job ? 1 : 0}"
 
   name                   = "${var.name}"
   role_arn               = var.create_role ? join("", aws_iam_role.role.*.arn) : var.role_arn
