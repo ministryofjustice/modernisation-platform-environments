@@ -4,7 +4,10 @@
       "project_short_id": "dpr",
       "create_database": true,
       "db_description": "DPR Data Catalog",
-      "glue_db_name": "glue-catalog-development"
+      "glue_db_name": "glue-catalog-development",
+      "create_job": false,
+      "glue_job_name": "glue-job-ingester",
+      "create_security_conf": true
     },
     "test": {
       "example_var": "test-data"

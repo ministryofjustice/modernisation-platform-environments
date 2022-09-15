@@ -8,6 +8,14 @@ locals {
     "--enable-continuous-log-filter"      = "true"
     "--continuous-log-logStreamPrefix"    = var.continuous_log_stream_prefix
   }
+
+  tags = merge(
+    var.tags,
+    {
+      Name = "${local.application_name}-s3-kms"
+      Resource_Type = "Glue Job"
+    }
+  )
 }
 
 resource "aws_glue_job" "glue_job" {
