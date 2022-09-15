@@ -20,7 +20,7 @@ resource "aws_sns_topic" "sns_topic" {
 }
 
 resource "aws_sns_topic_subscription" "monitoring_subscriptions" {
-  count         = length(local.subscriptions_data.emails)
+  count         = local.subscriptions_data.emails != "" ? length(local.subscriptions_data.emails) : 0
   topic_arn     = aws_sns_topic.sns_topic.arn
   protocol      = "email"
   endpoint      = local.subscriptions_data.emails[count.index].email

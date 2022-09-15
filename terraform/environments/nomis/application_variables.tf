@@ -33,6 +33,7 @@ locals {
       databases          = {},
       weblogics          = {},
       base_instances_asg = {},
+      test_instances_asg = {}
     },
     test = {
       # ip ranges for external access to database instances
@@ -157,7 +158,8 @@ locals {
       },
       databases          = {},
       weblogics          = {},
-      base_instances_asg = {}
+      base_instances_asg = {},
+      test_instances_asg = {}
     },
     production = {
       # ip ranges for external access to database instances
