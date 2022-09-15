@@ -521,10 +521,7 @@ data "aws_iam_policy_document" "ssm_ec2_start_stop_kms" {
       "autoscaling:DescribeAutoScalingGroups",
     ]
     #this role manages all the autoscaling groups in an account
-    #tfsec:ignore:aws-iam-no-policy-wildcards
-    #checkov:skip=CKV_AWS_111: "Ensure IAM policies does not allow write access without constraints"
-    #checkov:skip=CKV_AWS_109: "Ensure IAM policies does not allow permissions management / resource exposure without constraints"
-    resources = ["*"]
+    resources = ["*"] #tfsec:ignore:aws-iam-no-policy-wildcards
   }
 }
 
