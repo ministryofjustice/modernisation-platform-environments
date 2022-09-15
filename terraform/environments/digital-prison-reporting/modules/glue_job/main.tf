@@ -1,27 +1,27 @@
 locals {
   default_arguments = {
-    "--job-language"                      = "${var.job_language}"
-    "--job-bookmark-option"               = "${lookup(var.bookmark_options, var.bookmark)}"
-    "--TempDir"                           = "${var.temp_dir}"
-    "--continuous-log-logGroup"           = aws_cloudwatch_log_group.log_group.name
-    "--enable-continuous-cloudwatch-log"  = "true"
-    "--enable-continuous-log-filter"      = "true"
-    "--continuous-log-logStreamPrefix"    = var.continuous_log_stream_prefix
-    "--extra-py-files"                    = length(var.extra_py_files) > 0 ? join(",", var.extra_py_files) : null
-    "--enable-continuous-log-filter"      = var.enable_continuous_log_filter
+    "--job-language"                     = "${var.job_language}"
+    "--job-bookmark-option"              = "${lookup(var.bookmark_options, var.bookmark)}"
+    "--TempDir"                          = "${var.temp_dir}"
+    "--continuous-log-logGroup"          = aws_cloudwatch_log_group.log_group.name
+    "--enable-continuous-cloudwatch-log" = "true"
+    "--enable-continuous-log-filter"     = "true"
+    "--continuous-log-logStreamPrefix"   = var.continuous_log_stream_prefix
+    "--extra-py-files"                   = length(var.extra_py_files) > 0 ? join(",", var.extra_py_files) : null
+    "--enable-continuous-log-filter"     = var.enable_continuous_log_filter
   }
 
   tags = merge(
     var.tags,
     {
-      Name = "${var.name}-s3-kms"
+      Name          = "${var.name}-s3-kms"
       Resource_Type = "Glue Job"
     }
   )
 }
 
 resource "aws_glue_job" "glue_job" {
-  count = "${var.create_job ? 1 : 0}"
+  count = var.create_job ? 1 : 0
 
   name                   = var.name
   role_arn               = var.create_role ? join("", aws_iam_role.role.*.arn) : var.role_arn
@@ -37,17 +37,17 @@ resource "aws_glue_job" "glue_job" {
   tags                   = local.tags
 
   command {
-    script_location = "${var.script_location}"
+    script_location = var.script_location
   }
 
   # https://docs.aws.amazon.com/glue/latest/dg/aws-glue-programming-etl-glue-arguments.html
-  default_arguments = "${merge(local.default_arguments, var.arguments)}"
+  default_arguments = merge(local.default_arguments, var.arguments)
 
   execution_property {
-    max_concurrent_runs = "${var.max_concurrent}"
+    max_concurrent_runs = var.max_concurrent
   }
 
-    dynamic "notification_property" { ##minutes
+  dynamic "notification_property" { ##minutes
     for_each = var.notify_delay_after == null ? [] : [1]
 
     content {
@@ -62,11 +62,11 @@ resource "aws_iam_role" "role" {
   tags  = local.tags
 
   assume_role_policy = jsonencode({
-    Version   = "2012-10-17"
+    Version = "2012-10-17"
     Statement = [
       {
-        Effect    = "Allow"
-        Action    = [
+        Effect = "Allow"
+        Action = [
           "sts:AssumeRole"
         ]
         Principal = {

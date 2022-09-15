@@ -5,7 +5,7 @@ variable "create_job" {
 }
 
 variable "arguments" {
-  type    = map
+  type    = map(any)
   default = {}
 }
 
@@ -29,7 +29,7 @@ variable "bookmark" {
 }
 
 variable "bookmark_options" {
-  type = map
+  type = map(any)
 
   default = {
     enabled  = "job-bookmark-enable"
@@ -157,11 +157,11 @@ variable "create_security_configuration" {
 }
 
 variable "security_configuration_cloudwatch_encryption" {
-  type        = object({
+  type = object({
     cloudwatch_encryption_mode = string
     kms_key_arn                = string
   })
-  default     = {
+  default = {
     cloudwatch_encryption_mode = "DISABLED"
     kms_key_arn                = null
   }
@@ -169,11 +169,11 @@ variable "security_configuration_cloudwatch_encryption" {
 }
 
 variable "security_configuration_job_bookmarks_encryption" {
-  type        = object({
+  type = object({
     job_bookmarks_encryption_mode = string
     kms_key_arn                   = string
   })
-  default     = {
+  default = {
     job_bookmarks_encryption_mode = "DISABLED"
     kms_key_arn                   = null
   }
@@ -181,11 +181,11 @@ variable "security_configuration_job_bookmarks_encryption" {
 }
 
 variable "security_configuration_s3_encryption" {
-  type        = object({
+  type = object({
     s3_encryption_mode = string
     kms_key_arn        = string
   })
-  default     = {
+  default = {
     s3_encryption_mode = "DISABLED"
     kms_key_arn        = null
   }
