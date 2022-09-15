@@ -93,7 +93,7 @@ resource "aws_launch_template" "jumpserver" {
   }
 
   lifecycle {
-    ignore_changes = [image_id, description, tags, tags_all, latest_version]
+    ignore_changes = [image_id, description, tags, tags_all]
   }
 }
 
