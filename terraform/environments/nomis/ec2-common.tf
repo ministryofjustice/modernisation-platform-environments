@@ -493,6 +493,7 @@ resource "aws_ssm_association" "ec2_scheduled_stop" {
 
 data "aws_iam_policy_document" "ssm_ec2_start_stop_kms" {
   statement {
+    sid = "manageSharedAMIsEncryptedEBSVolumes"
     effect = "Allow"
     #tfsec:ignore:aws-iam-no-policy-wildcards
     actions = [
@@ -509,6 +510,22 @@ data "aws_iam_policy_document" "ssm_ec2_start_stop_kms" {
     # we have a legacy CMK that's used in production that will be retired but in the meantime requires permissions
     resources = [local.environment == "test" ? aws_kms_key.nomis-cmk[0].arn : data.aws_kms_key.nomis_key.arn, data.aws_kms_key.hmpps_key.arn]
   }
+
+  statement {
+    sid = "modifyAautoscalingGroupProcesses"
+    effect = "Allow"
+
+    action = [
+      "autoscaling:SuspendProcesses",
+      "autoscaling:ResumeProcesses",
+      "autoscaling:DescribeAutoScalingGroups",
+    ]
+    resources = ["*"]
+  }
+    # this role manages all the autoscaling groups in an account
+    #tfsec:ignore:aws-iam-no-policy-wildcards
+    #checkov:skip=CKV_AWS_111: "Ensure IAM policies does not allow write access without constraints"
+    #checkov:skip=CKV_AWS_109: "Ensure IAM policies does not allow permissions management / resource exposure without constraints"
 }
 
 resource "aws_iam_role" "ssm_ec2_start_stop" {
