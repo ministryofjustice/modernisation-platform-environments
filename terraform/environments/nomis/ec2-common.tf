@@ -515,7 +515,7 @@ data "aws_iam_policy_document" "ssm_ec2_start_stop_kms" {
     sid    = "modifyAautoscalingGroupProcesses"
     effect = "Allow"
 
-    action = [
+    actions = [
       "autoscaling:SuspendProcesses",
       "autoscaling:ResumeProcesses",
       "autoscaling:DescribeAutoScalingGroups",
