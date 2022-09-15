@@ -1,8 +1,6 @@
 # This is an EC2Launch V2 type user-data script
 # https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2launch-v2-settings.html#ec2launch-v2-task-configuration
 # See C:\ProgramData\Amazon\EC2Launch\log for logs
-#not actually a secret
-#checkov:skip=CKV_SECRET_6: "Base64 High Entropy String"
 version: 1.0
 tasks:
   - task: executeScript
@@ -10,6 +8,8 @@ tasks:
       - frequency: once
         type: powershell
         runAs: admin
+        #not actually a secret
+        #checkov:skip=CKV_SECRET_6: "Base64 High Entropy String"
         content: |
           Set-TimeZone "GMT Standard Time"
           Set-WinSystemLocale "en-GB"
@@ -44,5 +44,3 @@ tasks:
           $path = "C:\Users\Administrator\Documents\add_users.ps1"
           Out-File -FilePath $path -InputObject $add_users
           Register-ScheduledJob -Name "add_users" -FilePath $path -RunEvery $(New-TimeSpan -Minutes 15) -RunNow
-        #not actually a secret
-        #checkov:skip=CKV_SECRET_6: "Base64 High Entropy String"
