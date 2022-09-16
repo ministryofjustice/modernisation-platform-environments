@@ -1,12 +1,20 @@
 data "aws_caller_identity" "current" {}
 
-data "aws_ssm_parameter" "subscriptions" {
-  name = var.ssm_parameter_name
+esource "aws_ssm_parameter" "subscriptions" {
+  name  = "/monitoring/subscriptions"
+  type  = "SecureString"
+  value = jsonencode({ "emails" = [] })
+  lifecycle {
+    ignore_changes = [
+      value,
+    ]
+  }
 }
 
 locals {
-  subscriptions_data = sensitive(jsondecode(data.aws_ssm_parameter.subscriptions.value))
+  subscriptions_data = sensitive(jsondecode(aws_ssm_parameter.subscriptions.value))
 }
+
 resource "aws_sns_topic" "sns_topic" {
   name              = "mod-platform-${var.application}-${var.env}"
   display_name      = "SNS Topic for ${var.application}-${var.env}"
