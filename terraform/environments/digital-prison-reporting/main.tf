@@ -41,10 +41,10 @@ module "glue_job" {
 
 # S3 Demo
 module "s3_demo_bucket" {
-    source          = "./modules/s3_bucket"
-    create_bucket   = true
-    tags            = local.all_tags
-    name            = "${local.project}-demo-${local.env}-"
-    aws_kms_arn     = local.s3_kms_arn
+  source        = "./modules/s3_bucket"
+  create_bucket = true
+  tags          = local.all_tags
+  name          = "${local.project}-demo-${local.env}-"
+  aws_kms_arn   = local.s3_kms_arn
 }
 

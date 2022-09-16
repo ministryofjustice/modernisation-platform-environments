@@ -1,8 +1,8 @@
 locals {
-    tags = merge(
+  tags = merge(
     var.tags,
     {
-      Name = "${var.name}s3-bucket"
+      Name          = "${var.name}s3-bucket"
       Resource_Type = "S3 Bucket"
     }
   )
@@ -13,7 +13,7 @@ provider "aws" {
 }
 
 module "s3-bucket" {
-  count = "${var.create_bucket ? 1 : 0}"
+  count  = var.create_bucket ? 1 : 0
   source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.2.0"
 
   providers = {
