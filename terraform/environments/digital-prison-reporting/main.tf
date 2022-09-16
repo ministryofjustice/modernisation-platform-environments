@@ -35,7 +35,7 @@ module "glue_job" {
   description                   = local.description
   create_security_configuration = local.create_sec_conf
   tags                          = local.all_tags
-  script_location               = "s3://${local.env}/driver.py"
+  script_location               = "s3://${local.env}/injector.py"
   enable_continuous_log_filter  = false
   project_id                    = local.project
   aws_kms_key                   = local.s3_kms_arn
@@ -56,10 +56,11 @@ module "s3_demo_bucket" {
 
   replication_enabled = false
   custom_kms_key      = local.s3_kms_arn
+ 
   lifecycle_rule = [
     {
       id      = "main"
-      enabled = "Enabled"
+      enabled = "Disabled"
       prefix  = ""
 
       tags = {
@@ -73,6 +74,9 @@ module "s3_demo_bucket" {
           storage_class = "STANDARD_IA"
         }
       ]
+
+      prevent_destroy = false
+
 
       expiration = {
         days = 730
