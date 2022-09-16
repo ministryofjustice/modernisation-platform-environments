@@ -52,6 +52,10 @@ updates:
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
+    directory: "/terraform/environments/nomis/modules/base_instance_asg"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
     directory: "/terraform/environments/nomis/modules/database"
     schedule:
       interval: "daily"
@@ -61,6 +65,10 @@ updates:
       interval: "daily"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/nomis/modules/weblogic"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/oasys"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
