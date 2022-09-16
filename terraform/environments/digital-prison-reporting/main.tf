@@ -19,7 +19,7 @@ locals {
   )
 }
 
-# Glue Database Catalog
+# Glue Database Catalog 
 module "glue_database" {
   source      = "./modules/glue_database"
   create_db   = local.create_db
