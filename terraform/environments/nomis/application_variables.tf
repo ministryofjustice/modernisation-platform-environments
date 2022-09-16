@@ -93,15 +93,17 @@ locals {
         }
       },
       # Add base instances here. They will be created using the base_instance module
-      base_instances_asg = {
-        RHEL7TEST = {
-          always_on   = false
-          ami_name    = "nomis_rhel_7_9_baseimage*"
-          description = "Test instance for the new nomis_RHEL7-9_BaseImage AMI"
+      test_instances_asg = {
+        TESTWL2 = {
+          always_on     = false
+          ami_name      = "nomis_rhel_6_10_weblogic_appserver_10_3*"
+          description   = "Test instance for the weblogic base ami"
+          instance_type = "t2.medium"
+          kms_key_arn   = data.aws_kms_key.hmpps_key.arn
           tags = {
             monitored = false
           }
-        },
+        }
       }
     },
     production = {
@@ -214,7 +216,7 @@ locals {
       # Add weblogic instances here.  They will be created using the weblogic module
       weblogics = {},
       # Add base instances here. They will be created using the base_instance module
-      base_instances_asg = {}
+      test_instances_asg = {}
     }
   }
 }
