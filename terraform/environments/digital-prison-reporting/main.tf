@@ -35,7 +35,7 @@ module "glue_job" {
   description                   = local.description
   create_security_configuration = local.create_sec_conf
   tags                          = local.all_tags
-  script_location               = "s3://${local.env}/injector.py"
+  script_location               = "s3://dpr-glue-jobs-development-20220916083016134900000005/scripts/injector.py"
   enable_continuous_log_filter  = false
   project_id                    = local.project
   aws_kms_key                   = local.s3_kms_arn

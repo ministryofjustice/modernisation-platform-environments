@@ -5,7 +5,7 @@
       "create_database": true,
       "db_description": "DPR Data Catalog",
       "glue_db_name": "glue-catalog-development",
-      "create_job": false,
+      "create_job": true,
       "glue_job_name": "glue-job-ingester",
       "create_security_conf": true,
       "setup_buckets": true
