@@ -45,7 +45,7 @@ module "s3_demo_bucket" {
   source        = "./modules/s3_bucket"
   create_bucket = true
   tags          = local.all_tags
-  name          = "${local.project}-demo-${local.env}-"
+  name_prefix   = "${local.project}-demo-${local.env}-"
   aws_kms_arn   = local.s3_kms_arn
 }
 
