@@ -81,6 +81,54 @@ resource "aws_iam_role" "role" {
   ]
 }
 
+data "aws_iam_policy_document" "extra-policy-document" {
+  statement {
+    actions = [
+      "s3:GetBucketLocation", 
+      "s3:ListBucket", 
+      "s3:ListAllMyBuckets", 
+      "s3:GetBucketAcl", 
+      "s3:GetObject"
+    ]
+    resources = [
+      "arn:aws:s3:::${var.project_id}-*"
+    ]
+  }
+  statement {
+    actions = [
+      "logs:CreateLogGroup",
+      "logs:CreateLogStream",
+      "logs:PutLogEvents",
+      "logs:AssociateKmsKey"       
+    ]
+    resources = [
+      "arn:aws:logs:*:*:/aws-glue/*"
+    ]
+  }
+  statement {
+    actions = [
+      "glue:*",
+      "s3:GetBucketLocation",
+      "s3:ListBucket",
+      "s3:ListAllMyBuckets",
+      "s3:GetBucketAcl",
+      "iam:ListRolePolicies",
+      "iam:GetRole",
+      "iam:GetRolePolicy",
+      "cloudwatch:PutMetricData"      
+    ]
+    resources = [
+      "*"
+    ]
+  }   
+}
+
+resource "aws_iam_policy" "additional-policy" {
+  name        = "${var.name}-policy"
+  description = "Extra Policy for AWS Glue Job"
+  policy      = data.aws_iam_policy_document.extra-policy-document.json
+}
+
 resource "aws_cloudwatch_log_group" "log_group" {
   name              = "/aws-glue/jobs/${var.name}"
   retention_in_days = var.log_group_retention_in_days

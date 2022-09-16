@@ -43,6 +43,11 @@ variable "name" {
   description = "(Required) Name that will be used for identify resources."
 }
 
+variable "project_id" {
+  type        = string
+  description = "(Required) Project Short ID that will be used for resources."  
+}
+
 variable "tags" {
   type        = map(string)
   default     = {}
