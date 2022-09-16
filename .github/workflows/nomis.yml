@@ -64,6 +64,13 @@ jobs:
     environment:
       name: nomis-${{ matrix.environment }}
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3.0.2
+      - name: Load and Configure Terraform
+        uses: hashicorp/setup-terraform@v2.0.0
+        with:
+          terraform_version: "~1"
+          terraform_wrapper: false
       - name: Run Terrform Apply
         run: |
           terraform --version
@@ -114,6 +121,13 @@ jobs:
     environment:
       name: nomis-${{ matrix.environment }}
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3.0.2
+      - name: Load and Configure Terraform
+        uses: hashicorp/setup-terraform@v2.0.0
+        with:
+          terraform_version: "~1"
+          terraform_wrapper: false
       - name: Run Terrform Apply
         run: |
           terraform --version
