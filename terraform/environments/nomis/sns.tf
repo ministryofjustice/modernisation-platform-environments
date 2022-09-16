@@ -5,7 +5,6 @@ module "monitoring-sns-topic" {
   topic_display_name = "Nomis monitoring ${local.environment} SNS topic"
   kms_master_key_arn = aws_kms_key.sns.arn
   kms_master_key_id  = aws_kms_key.sns.key_id
-  ssm_parameter_name = aws_ssm_parameter.subscriptions.name
 
   depends_on = [
     aws_ssm_parameter.subscriptions
