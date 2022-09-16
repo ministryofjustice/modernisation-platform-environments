@@ -56,7 +56,7 @@ module "s3_demo_bucket" {
 
   replication_enabled = false
   custom_kms_key      = local.s3_kms_arn
- 
+
   lifecycle_rule = [
     {
       id      = "main"
