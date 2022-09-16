@@ -7,7 +7,8 @@
       "glue_db_name": "glue-catalog-development",
       "create_job": false,
       "glue_job_name": "glue-job-ingester",
-      "create_security_conf": true
+      "create_security_conf": true,
+      "setup_buckets": true
     },
     "test": {
       "example_var": "test-data"

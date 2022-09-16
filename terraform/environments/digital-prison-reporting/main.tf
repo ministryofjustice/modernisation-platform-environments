@@ -8,6 +8,7 @@ locals {
   create_sec_conf = local.application_data.accounts[local.environment].create_security_conf
   env             = local.environment
   s3_kms_arn      = aws_kms_key.s3.arn
+  create_bucket   = local.application_data.accounts[local.environment].setup_buckets
 
 
   all_tags = merge(
@@ -42,54 +43,367 @@ module "glue_job" {
 
 # S3 Demo
 module "s3_demo_bucket" {
-  source        = "./modules/s3_bucket"
-  create_bucket = true
-  tags          = local.all_tags
-  name_prefix   = "${local.project}-demo-${local.env}-"
-  aws_kms_arn   = local.s3_kms_arn
+  count  = local.create_bucket ? 1 : 0
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.2.0"
+
+  providers = {
+    aws.bucket-replication = aws
+  }
+
+  bucket_prefix = "${local.project}-demo-${local.env}-"
+
+  replication_enabled = false
+  custom_kms_key      = local.s3_kms_arn
+  lifecycle_rule = [
+    {
+      id      = "main"
+      enabled = "Enabled"
+      prefix  = ""
+
+      tags = {
+        rule      = "log"
+        autoclean = "true"
+      }
+
+      transition = [
+        {
+          days          = 90
+          storage_class = "STANDARD_IA"
+        }
+      ]
+
+      expiration = {
+        days = 730
+      }
+
+      noncurrent_version_transition = [
+        {
+          days          = 90
+          storage_class = "STANDARD_IA"
+          }, {
+          days          = 365
+          storage_class = "GLACIER"
+        }
+      ]
+
+      noncurrent_version_expiration = {
+        days = 730
+      }
+    }
+  ]
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-demo-${local.env}-s3"
+      Resource_Type = "S3 Bucket"
+    }
+  )
+
 }
+
+
 
 # S3 Glue Jobs
 module "s3_glue_jobs_bucket" {
-  source        = "./modules/s3_bucket"
-  create_bucket = true
-  tags          = local.all_tags
-  name_prefix   = "${local.project}-glue-jobs-${local.env}-"
-  aws_kms_arn   = local.s3_kms_arn
+  count  = local.create_bucket ? 1 : 0
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.2.0"
+
+  providers = {
+    aws.bucket-replication = aws
+  }
+
+  bucket_prefix = "${local.project}-glue-jobs-${local.env}-"
+
+  replication_enabled = false
+  custom_kms_key      = local.s3_kms_arn
+  lifecycle_rule = [
+    {
+      id      = "main"
+      enabled = "Enabled"
+      prefix  = ""
+
+      tags = {
+        rule      = "log"
+        autoclean = "true"
+      }
+
+      transition = [
+        {
+          days          = 90
+          storage_class = "STANDARD_IA"
+        }
+      ]
+
+      expiration = {
+        days = 730
+      }
+
+      noncurrent_version_transition = [
+        {
+          days          = 90
+          storage_class = "STANDARD_IA"
+          }, {
+          days          = 365
+          storage_class = "GLACIER"
+        }
+      ]
+
+      noncurrent_version_expiration = {
+        days = 730
+      }
+    }
+  ]
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-glue-jobs-${local.env}-s3"
+      Resource_Type = "S3 Bucket"
+    }
+  )
+
 }
 
 # S3 Landing
 module "s3_landing_bucket" {
-  source        = "./modules/s3_bucket"
-  create_bucket = true
-  tags          = local.all_tags
-  name_prefix   = "${local.project}-landing-${local.env}-"
-  aws_kms_arn   = local.s3_kms_arn
+  count  = local.create_bucket ? 1 : 0
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.2.0"
+
+  providers = {
+    aws.bucket-replication = aws
+  }
+
+  bucket_prefix = "${local.project}-landing-${local.env}-"
+
+  replication_enabled = false
+  custom_kms_key      = local.s3_kms_arn
+  lifecycle_rule = [
+    {
+      id      = "main"
+      enabled = "Enabled"
+      prefix  = ""
+
+      tags = {
+        rule      = "log"
+        autoclean = "true"
+      }
+
+      transition = [
+        {
+          days          = 90
+          storage_class = "STANDARD_IA"
+        }
+      ]
+
+      expiration = {
+        days = 730
+      }
+
+      noncurrent_version_transition = [
+        {
+          days          = 90
+          storage_class = "STANDARD_IA"
+          }, {
+          days          = 365
+          storage_class = "GLACIER"
+        }
+      ]
+
+      noncurrent_version_expiration = {
+        days = 730
+      }
+    }
+  ]
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-landing-${local.env}-s3"
+      Resource_Type = "S3 Bucket"
+    }
+  )
+
 }
 
 # S3 RAW
 module "s3_raw_bucket" {
-  source        = "./modules/s3_bucket"
-  create_bucket = true
-  tags          = local.all_tags
-  name_prefix   = "${local.project}-raw-${local.env}-"
-  aws_kms_arn   = local.s3_kms_arn
+  count  = local.create_bucket ? 1 : 0
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.2.0"
+
+  providers = {
+    aws.bucket-replication = aws
+  }
+
+  bucket_prefix = "${local.project}-raw-${local.env}-"
+
+  replication_enabled = false
+  custom_kms_key      = local.s3_kms_arn
+  lifecycle_rule = [
+    {
+      id      = "main"
+      enabled = "Enabled"
+      prefix  = ""
+
+      tags = {
+        rule      = "log"
+        autoclean = "true"
+      }
+
+      transition = [
+        {
+          days          = 90
+          storage_class = "STANDARD_IA"
+        }
+      ]
+
+      expiration = {
+        days = 730
+      }
+
+      noncurrent_version_transition = [
+        {
+          days          = 90
+          storage_class = "STANDARD_IA"
+          }, {
+          days          = 365
+          storage_class = "GLACIER"
+        }
+      ]
+
+      noncurrent_version_expiration = {
+        days = 730
+      }
+    }
+  ]
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-raw-${local.env}-s3"
+      Resource_Type = "S3 Bucket"
+    }
+  )
+
 }
 
 # S3 Structured
 module "s3_structured_bucket" {
-  source        = "./modules/s3_bucket"
-  create_bucket = true
-  tags          = local.all_tags
-  name_prefix   = "${local.project}-structured-${local.env}-"
-  aws_kms_arn   = local.s3_kms_arn
+  count  = local.create_bucket ? 1 : 0
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.2.0"
+
+  providers = {
+    aws.bucket-replication = aws
+  }
+
+  bucket_prefix = "${local.project}-structured-${local.env}-"
+
+  replication_enabled = false
+  custom_kms_key      = local.s3_kms_arn
+  lifecycle_rule = [
+    {
+      id      = "main"
+      enabled = "Enabled"
+      prefix  = ""
+
+      tags = {
+        rule      = "log"
+        autoclean = "true"
+      }
+
+      transition = [
+        {
+          days          = 90
+          storage_class = "STANDARD_IA"
+        }
+      ]
+
+      expiration = {
+        days = 730
+      }
+
+      noncurrent_version_transition = [
+        {
+          days          = 90
+          storage_class = "STANDARD_IA"
+          }, {
+          days          = 365
+          storage_class = "GLACIER"
+        }
+      ]
+
+      noncurrent_version_expiration = {
+        days = 730
+      }
+    }
+  ]
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-structured-${local.env}-s3"
+      Resource_Type = "S3 Bucket"
+    }
+  )
+
 }
 
 # S3 Curated
 module "s3_curated_bucket" {
-  source        = "./modules/s3_bucket"
-  create_bucket = true
-  tags          = local.all_tags
-  name_prefix   = "${local.project}-curated-${local.env}-"
-  aws_kms_arn   = local.s3_kms_arn
+  count  = local.create_bucket ? 1 : 0
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.2.0"
+
+  providers = {
+    aws.bucket-replication = aws
+  }
+
+  bucket_prefix = "${local.project}-curated-${local.env}-"
+
+  replication_enabled = false
+  custom_kms_key      = local.s3_kms_arn
+  lifecycle_rule = [
+    {
+      id      = "main"
+      enabled = "Enabled"
+      prefix  = ""
+
+      tags = {
+        rule      = "log"
+        autoclean = "true"
+      }
+
+      transition = [
+        {
+          days          = 90
+          storage_class = "STANDARD_IA"
+        }
+      ]
+
+      expiration = {
+        days = 730
+      }
+
+      noncurrent_version_transition = [
+        {
+          days          = 90
+          storage_class = "STANDARD_IA"
+          }, {
+          days          = 365
+          storage_class = "GLACIER"
+        }
+      ]
+
+      noncurrent_version_expiration = {
+        days = 730
+      }
+    }
+  ]
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-curated-${local.env}-s3"
+      Resource_Type = "S3 Bucket"
+    }
+  )
 }
