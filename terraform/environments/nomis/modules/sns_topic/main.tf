@@ -1,6 +1,6 @@
 data "aws_caller_identity" "current" {}
 
-esource "aws_ssm_parameter" "subscriptions" {
+resource "aws_ssm_parameter" "subscriptions" {
   name  = "/monitoring/subscriptions"
   type  = "SecureString"
   value = jsonencode({ "emails" = [] })
