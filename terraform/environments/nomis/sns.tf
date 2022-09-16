@@ -8,7 +8,7 @@ module "monitoring-sns-topic" {
   ssm_parameter_name = aws_ssm_parameter.subscriptions.name
 
 }
-  
+
 resource "aws_ssm_parameter" "subscriptions" {
   name  = "/monitoring/subscriptions"
   type  = "SecureString"
