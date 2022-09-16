@@ -1,17 +1,11 @@
 data "aws_caller_identity" "current" {}
 
-resource "aws_ssm_parameter" "subscriptions" {
-  name  = "/monitoring/subscriptions"
-  type  = "SecureString"
-  value = ""
-  lifecycle {
-    ignore_changes = [
-      value,
-    ]
-  }
+data "aws_ssm_parameter" "subscriptions" {
+  name = var.ssm_parameter_name
 }
+
 locals {
-  subscriptions_data = sensitive(jsondecode(resource.aws_ssm_parameter.subscriptions.value))
+  subscriptions_data = sensitive(jsondecode(data.aws_ssm_parameter.subscriptions.value))
 }
 resource "aws_sns_topic" "sns_topic" {
   name              = "mod-platform-${var.application}-${var.env}"
@@ -20,7 +14,7 @@ resource "aws_sns_topic" "sns_topic" {
 }
 
 resource "aws_sns_topic_subscription" "monitoring_subscriptions" {
-  count         = local.subscriptions_data.emails != "" ? length(local.subscriptions_data.emails) : 0
+  count         = length(local.subscriptions_data.emails)
   topic_arn     = aws_sns_topic.sns_topic.arn
   protocol      = "email"
   endpoint      = local.subscriptions_data.emails[count.index].email
