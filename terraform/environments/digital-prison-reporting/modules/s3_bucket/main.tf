@@ -2,7 +2,7 @@ locals {
   tags = merge(
     var.tags,
     {
-      Name          = "${var.name}s3-bucket"
+      Name = "${var.name_prefix}s3"
       Resource_Type = "S3 Bucket"
     }
   )
@@ -20,7 +20,7 @@ module "s3-bucket" {
     aws.bucket-replication = aws
   }
 
-  bucket_prefix = var.name
+  bucket_prefix = var.name_prefix
 
   replication_enabled = false
   custom_kms_key      = var.aws_kms_arn

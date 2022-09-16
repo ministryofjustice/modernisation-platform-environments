@@ -1,4 +1,4 @@
-variable "name" {
+variable "name_prefix" {
   type        = string
   description = "(Required) Name that will be used for identify resources."
 }

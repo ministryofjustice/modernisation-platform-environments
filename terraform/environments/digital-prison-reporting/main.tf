@@ -48,3 +48,47 @@ module "s3_demo_bucket" {
   aws_kms_arn   = local.s3_kms_arn
 }
 
+# S3 Glue Jobs
+module "s3_glue_jobs_bucket" {
+    source          = "./modules/s3_bucket"
+    create_bucket   = true
+    tags            = local.all_tags
+    name_prefix     = "${local.project}-glue-jobs-${local.env}-"
+    aws_kms_arn     = local.s3_kms_arn
+}
+
+# S3 Landing
+module "s3_landing_bucket" {
+    source          = "./modules/s3_bucket"
+    create_bucket   = true
+    tags            = local.all_tags
+    name_prefix     = "${local.project}-landing-${local.env}-"
+    aws_kms_arn     = local.s3_kms_arn
+}
+
+# S3 RAW
+module "s3_raw_bucket" {
+    source          = "./modules/s3_bucket"
+    create_bucket   = true
+    tags            = local.all_tags
+    name_prefix     = "${local.project}-raw-${local.env}-"
+    aws_kms_arn     = local.s3_kms_arn
+}
+
+# S3 Structured
+module "s3_structured_bucket" {
+    source          = "./modules/s3_bucket"
+    create_bucket   = true
+    tags            = local.all_tags
+    name_prefix     = "${local.project}-structured-${local.env}-"
+    aws_kms_arn     = local.s3_kms_arn
+}
+
+# S3 Curated
+module "s3_curated_bucket" {
+    source          = "./modules/s3_bucket"
+    create_bucket   = true
+    tags            = local.all_tags
+    name_prefix     = "${local.project}-curated-${local.env}-"
+    aws_kms_arn     = local.s3_kms_arn
+}
