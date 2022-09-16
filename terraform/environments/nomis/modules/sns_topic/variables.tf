@@ -35,5 +35,4 @@ variable "kms_master_key_arn" {
 variable "ssm_parameter_name" {
   description = "Name of the paramater where email subscription data is stored."
   type        = string
-  default     = "/monitoring/subscriptions"
 }
