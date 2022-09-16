@@ -46,6 +46,8 @@ module "s3_demo_bucket" {
   count  = local.create_bucket ? 1 : 0
   source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.2.0"
 
+  force_destroy = true
+
   providers = {
     aws.bucket-replication = aws
   }
