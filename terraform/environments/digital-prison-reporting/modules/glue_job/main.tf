@@ -84,10 +84,10 @@ resource "aws_iam_role" "role" {
 data "aws_iam_policy_document" "extra-policy-document" {
   statement {
     actions = [
-      "s3:GetBucketLocation", 
-      "s3:ListBucket", 
-      "s3:ListAllMyBuckets", 
-      "s3:GetBucketAcl", 
+      "s3:GetBucketLocation",
+      "s3:ListBucket",
+      "s3:ListAllMyBuckets",
+      "s3:GetBucketAcl",
       "s3:GetObject"
     ]
     resources = [
@@ -99,7 +99,7 @@ data "aws_iam_policy_document" "extra-policy-document" {
       "logs:CreateLogGroup",
       "logs:CreateLogStream",
       "logs:PutLogEvents",
-      "logs:AssociateKmsKey"       
+      "logs:AssociateKmsKey"
     ]
     resources = [
       "arn:aws:logs:*:*:/aws-glue/*"
@@ -115,12 +115,12 @@ data "aws_iam_policy_document" "extra-policy-document" {
       "iam:ListRolePolicies",
       "iam:GetRole",
       "iam:GetRolePolicy",
-      "cloudwatch:PutMetricData"      
+      "cloudwatch:PutMetricData"
     ]
     resources = [
       "*"
     ]
-  }   
+  }
 }
 
 resource "aws_iam_policy" "additional-policy" {

@@ -36,7 +36,7 @@ module "glue_job" {
   tags                          = local.all_tags
   script_location               = "s3://${local.env}/driver.py"
   enable_continuous_log_filter  = false
-  project_id                    = local.project 
+  project_id                    = local.project
   aws_kms_key                   = local.s3_kms_arn
 }
 

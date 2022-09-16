@@ -45,7 +45,7 @@ variable "name" {
 
 variable "project_id" {
   type        = string
-  description = "(Required) Project Short ID that will be used for resources."  
+  description = "(Required) Project Short ID that will be used for resources."
 }
 
 variable "tags" {
