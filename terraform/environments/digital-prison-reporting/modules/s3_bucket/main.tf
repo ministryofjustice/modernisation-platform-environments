@@ -2,7 +2,7 @@ locals {
   tags = merge(
     var.tags,
     {
-      Name = "${var.name_prefix}s3"
+      Name          = "${var.name_prefix}s3"
       Resource_Type = "S3 Bucket"
     }
   )
