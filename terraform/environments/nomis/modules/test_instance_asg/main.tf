@@ -37,7 +37,7 @@ locals {
   ansible_script_args = {
     branch = var.branch == "" ? "main" : var.branch
   }
-  ansible_script = templatefile("${path.module}/user_data/ansible.sh", local.ansible_script_args)
+  ansible_script = templatefile("${path.module}/user_data/ansible.sh.tftpl", local.ansible_script_args)
 }
 
 #------------------------------------------------------------------------------
