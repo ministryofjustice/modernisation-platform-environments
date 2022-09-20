@@ -131,7 +131,7 @@ resource "aws_iam_policy" "additional-policy" {
 
 resource "aws_iam_role_policy_attachment" "additional_policies" {
   count = var.create_kinesis_ingester ? 1 : 0
-  
+
   role       = var.create_role ? join("", aws_iam_role.role.*.arn) : var.role_arn
   policy_arn = var.additional_policies
 }
