@@ -452,6 +452,46 @@ resource "aws_security_group_rule" "db_mgmt_ingress_rule" {
   source_security_group_id = aws_security_group.db_mgmt_server_security_group.id
 }
 
+resource "aws_security_group_rule" "db_windows_server_failover_tcp_ingress_rule" {
+  type                     = "ingress"
+  description              = "Default SQL Server port 1433"
+  from_port                = 3343
+  to_port                  = 3343
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.db.id
+  source_security_group_id = aws_security_group.db_mgmt_server_security_group.id
+}
+
+resource "aws_security_group_rule" "db_windows_server_failover_tcp_egress_rule" {
+  type                     = "egress"
+  description              = "Default SQL Server port 1433"
+  from_port                = 3343
+  to_port                  = 3343
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.db.id
+  source_security_group_id = aws_security_group.db_mgmt_server_security_group.id
+}
+
+resource "aws_security_group_rule" "db_windows_server_failover_udp_ingress_rule" {
+  type                     = "ingress"
+  description              = "Default SQL Server port 1433"
+  from_port                = 3343
+  to_port                  = 3343
+  protocol                 = "udp"
+  security_group_id        = aws_security_group.db.id
+  source_security_group_id = aws_security_group.db_mgmt_server_security_group.id
+}
+
+resource "aws_security_group_rule" "db_windows_server_failover_udp_egress_rule" {
+  type                     = "egress"
+  description              = "Default SQL Server port 1433"
+  from_port                = 3343
+  to_port                  = 3343
+  protocol                 = "udp"
+  security_group_id        = aws_security_group.db.id
+  source_security_group_id = aws_security_group.db_mgmt_server_security_group.id
+}
+
 resource "aws_security_group_rule" "db_ecs_ingress_rule" {
   type                     = "ingress"
   description              = "Default SQL Server port 1433"
