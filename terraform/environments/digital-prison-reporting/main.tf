@@ -27,19 +27,19 @@ locals {
 
 # Terraform AWS Glue Database
 module "glue_demo_table" {
-  source      = "./modules/glue_table"
-  name        = "${local.project}-glue-demo-table-${local.env}"
+  source = "./modules/glue_table"
+  name   = "${local.project}-glue-demo-table-${local.env}"
 
   # AWS Glue catalog DB
   enable_glue_catalog_database     = false
   glue_catalog_database_name       = module.glue_database.db_name
   glue_catalog_database_parameters = null
-  
+
   # AWS Glue catalog table
-  enable_glue_catalog_table       = true
-  glue_catalog_table_description  = "Demo Table resource managed by Terraform."
-  glue_catalog_table_table_type   = "EXTERNAL_TABLE"
-  glue_catalog_table_parameters   = {
+  enable_glue_catalog_table      = true
+  glue_catalog_table_description = "Demo Table resource managed by Terraform."
+  glue_catalog_table_table_type  = "EXTERNAL_TABLE"
+  glue_catalog_table_parameters = {
     EXTERNAL              = "TRUE"
     "parquet.compression" = "SNAPPY"
     "classification"      = "parquet"
@@ -83,7 +83,7 @@ module "glue_demo_table" {
     sort_columns = []
   }
   glue_table_depends_on = [module.glue_database.db_name]
-}   
+}
 
 # kinesis Data Stream
 module "kinesis_stream_ingestor" {
