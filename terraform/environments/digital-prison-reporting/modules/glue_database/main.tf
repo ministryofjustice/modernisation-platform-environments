@@ -18,3 +18,20 @@ resource "aws_glue_catalog_database" "glue_database" {
 
   depends_on = []
 }
+
+resource "aws_glue_resource_policy" "example" {
+  policy = data.aws_iam_policy_document.glue-example-policy.json
+}
+
+data "aws_iam_policy_document" "glue-example-policy" {
+  statement {
+    actions = [
+      "glue:CreateTable",
+    ]
+    resources = ["arn:aws:glue:${var.aws_region}:${var.aws_account_id}:*"]
+    principals {
+      identifiers = ["*"]
+      type        = "AWS"
+    }
+  }
+}

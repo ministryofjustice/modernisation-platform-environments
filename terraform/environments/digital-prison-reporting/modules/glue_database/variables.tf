@@ -12,6 +12,10 @@ variable "catalog" {
   default = ""
 }
 
+variable "aws_account_id" {}
+
+variable "aws_region" {}
+
 variable "location_uri" {
   default = ""
 }

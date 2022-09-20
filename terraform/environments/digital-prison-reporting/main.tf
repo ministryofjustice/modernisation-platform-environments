@@ -11,6 +11,9 @@ locals {
   kinesis_kms_arn = aws_kms_key.kinesis-kms-key.arn
   kinesis_kms_id  = data.aws_kms_key.kinesis_kms_key.key_id
   create_bucket   = local.application_data.accounts[local.environment].setup_buckets
+  account_id      = data.aws_caller_identity.current.account_id
+  account_region  = data.aws_region.current.name
+  create_kinesis  = local.application_data.accounts[local.environment].create_kinesis_streams
 
 
   all_tags = merge(
@@ -24,6 +27,7 @@ locals {
 # kinesis Data Stream
 module "kinesis_stream_ingestor" {
   source                    = "./modules/kinesis_stream"
+  create_kinesis_stream     = local.create_kinesis
   name                      = "${local.project}-kinesis-ingestor-${local.env}"
   shard_count               = 1
   retention_period          = 24
@@ -44,10 +48,12 @@ module "kinesis_stream_ingestor" {
 
 # Glue Database Catalog 
 module "glue_database" {
-  source      = "./modules/glue_database"
-  create_db   = local.create_db
-  name        = "${local.project}-${local.glue_db}-${local.env}"
-  description = local.description
+  source          = "./modules/glue_database"
+  create_db       = local.create_db
+  name            = "${local.project}-${local.glue_db}-${local.env}"
+  description     = local.description
+  aws_account_id  = local.account_id
+  aws_region      = local.account_region
 }
 
 # Glue JOB

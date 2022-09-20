@@ -1,4 +1,5 @@
 resource "aws_kinesis_stream" "this" {
+  count = var.create_kinesis_stream ? 1 : 0
 
   name                      = var.name
   shard_count               = var.shard_count
