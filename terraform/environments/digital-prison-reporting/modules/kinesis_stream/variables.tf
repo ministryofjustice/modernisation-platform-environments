@@ -56,11 +56,11 @@ variable "create_policy_write_only" {
   description = "Whether to create IAM Policy (ARN) write only of the Stream"
 }
 
-variable "create_policy_admin" {
-  type        = bool
-  default     = true
-  description = "Whether to create IAM Policy (ARN) admin of the Stream"
-}
+#variable "create_policy_admin" {
+#  type        = bool
+#  default     = true
+#  description = "Whether to create IAM Policy (ARN) admin of the Stream"
+#}
 
 variable "project_id" {
   type        = string
