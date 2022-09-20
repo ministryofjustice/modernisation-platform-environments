@@ -25,7 +25,7 @@ locals {
 module "kinesis_stream_ingestor" {
 
   source                    = "./modules/kinesis_stream"
-  name                      = "{local.project}-kinesis-ingestor-${local.env}"
+  name                      = "${local.project}-kinesis-ingestor-${local.env}"
   shard_count               = 1
   retention_period          = 24
   shard_level_metrics       = ["IncomingBytes", "OutgoingBytes"]
@@ -37,7 +37,7 @@ module "kinesis_stream_ingestor" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "{local.project}-kinesis-ingestor-${local.env}"
+      Name          = "${local.project}-kinesis-ingestor-${local.env}"
       Resource_Type = "Kinesis Data Stream"
     }
   )
