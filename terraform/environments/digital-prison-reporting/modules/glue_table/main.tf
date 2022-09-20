@@ -5,7 +5,7 @@ resource "aws_glue_catalog_table" "glue_catalog_table" {
   count = var.enable_glue_catalog_table ? 1 : 0
 
   name          = var.name
-  database_name = var.glue_catalog_table_database_name
+  database_name = var.glue_catalog_database_name
 
   description        = var.glue_catalog_table_description
   catalog_id         = var.glue_catalog_table_catalog_id
