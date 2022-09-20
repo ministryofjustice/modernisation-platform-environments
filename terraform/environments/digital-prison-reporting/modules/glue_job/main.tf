@@ -123,7 +123,7 @@ data "aws_iam_policy_document" "extra-policy-document" {
   }
 }
 
-resource "aws_iam_policy" "extra-local-policy" {
+resource "aws_iam_policy" "additional-policy" {
   name        = "${var.name}-policy"
   description = "Extra Policy for AWS Glue Job"
   policy      = data.aws_iam_policy_document.extra-policy-document.json
