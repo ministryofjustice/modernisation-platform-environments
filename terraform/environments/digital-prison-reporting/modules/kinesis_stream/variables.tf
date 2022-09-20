@@ -41,7 +41,7 @@ variable "kms_key_id" {
 
 variable "tags" {
   description = "A mapping of tags to assign to the resource."
-  type        = map
+  type        = map(any)
 }
 
 variable "create_policy_read_only" {
