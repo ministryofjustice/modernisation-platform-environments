@@ -127,7 +127,7 @@ variable "tags" {
 variable "ansible_repo" {
   type        = string
   description = "Optionally provision the server using this ansible_repo"
-  default     = ""
+  default     = null
 }
 
 variable "branch" {
