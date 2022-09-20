@@ -25,6 +25,66 @@ locals {
   )
 }
 
+# Terraform AWS Glue Database
+module "glue_demo_table" {
+  source      = "./modules/glue_table"
+  name        = "${local.project}-glue-demo-table-${local.env}"
+
+  # AWS Glue catalog DB
+  enable_glue_catalog_database     = false
+  glue_catalog_database_name       = module.glue_database.db_name
+  glue_catalog_database_parameters = null
+  
+  # AWS Glue catalog table
+  enable_glue_catalog_table       = true
+  glue_catalog_table_description  = "Demo Table resource managed by Terraform."
+  glue_catalog_table_table_type   = "EXTERNAL_TABLE"
+  glue_catalog_table_parameters   = {
+    EXTERNAL              = "TRUE"
+    "parquet.compression" = "SNAPPY"
+    "classification"      = "parquet"
+  }
+  glue_catalog_table_storage_descriptor = {
+    location      = "s3://${module.s3_demo_bucket[0].bucket.id}/demo_table_data"
+    input_format  = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat"
+    output_format = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat"
+
+    columns = [
+      {
+        columns_name    = "col1"
+        columns_type    = "string"
+        columns_comment = "col1"
+      },
+      {
+        columns_name    = "col2"
+        columns_type    = "double"
+        columns_comment = "col2"
+      },
+      {
+        columns_name    = "col3"
+        columns_type    = "date"
+        columns_comment = ""
+      },
+    ]
+
+    ser_de_info = [
+      {
+        name                  = "demo-stream"
+        serialization_library = "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe"
+
+        parameters = {
+          "serialization.format" = 1
+        }
+      }
+    ]
+
+    skewed_info = []
+
+    sort_columns = []
+  }
+  glue_table_depends_on = [module.glue_database.db_name]
+}   
+
 # kinesis Data Stream
 module "kinesis_stream_ingestor" {
   source                    = "./modules/kinesis_stream"

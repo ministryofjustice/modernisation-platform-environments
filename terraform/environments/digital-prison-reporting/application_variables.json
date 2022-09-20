@@ -10,7 +10,7 @@
       "create_security_conf": true,
       "setup_buckets": true,
       "create_kinesis_streams": true,
-      "create_glue_registries": true
+      "create_glue_registries": false
     },
     "test": {
       "example_var": "test-data"

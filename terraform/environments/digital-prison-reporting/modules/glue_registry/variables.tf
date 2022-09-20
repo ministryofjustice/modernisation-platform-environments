@@ -10,6 +10,7 @@ variable "tags" {
 
 variable "description" {
   description = "Resource Description"
+  default     = "Glue Registry Resource"
 }
 
 variable "enable_glue_registry" {
