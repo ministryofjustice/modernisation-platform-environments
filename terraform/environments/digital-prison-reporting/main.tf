@@ -68,6 +68,7 @@ module "glue_job" {
   enable_continuous_log_filter  = false
   project_id                    = local.project
   aws_kms_key                   = local.s3_kms_arn
+  create_kinesis_ingester       = local.create_kinesis
   additional_policies           = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_read_only_arn
 }
 
