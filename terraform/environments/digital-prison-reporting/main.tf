@@ -23,7 +23,6 @@ locals {
 
 # kinesis Data Stream
 module "kinesis_stream_ingestor" {
-
   source                    = "./modules/kinesis_stream"
   name                      = "${local.project}-kinesis-ingestor-${local.env}"
   shard_count               = 1
@@ -63,6 +62,7 @@ module "glue_job" {
   enable_continuous_log_filter  = false
   project_id                    = local.project
   aws_kms_key                   = local.s3_kms_arn
+  additional_policies           = ["${module.kinesis_stream_ingestor.kinesis_stream_iam_policy_read_only_arn}"]
 }
 
 # S3 Demo

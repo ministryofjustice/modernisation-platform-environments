@@ -123,10 +123,17 @@ data "aws_iam_policy_document" "extra-policy-document" {
   }
 }
 
-resource "aws_iam_policy" "additional-policy" {
+resource "aws_iam_policy" "extra-local-policy" {
   name        = "${var.name}-policy"
   description = "Extra Policy for AWS Glue Job"
   policy      = data.aws_iam_policy_document.extra-policy-document.json
+}
+
+resource "aws_iam_role_policy_attachment" "additional_policies" {
+  for_each = toset(var.roles)
+
+  role        = aws_iam_role.role
+  policy_arn  = each.value
 }
 
 resource "aws_cloudwatch_log_group" "log_group" {
