@@ -8,6 +8,8 @@ locals {
   create_sec_conf = local.application_data.accounts[local.environment].create_security_conf
   env             = local.environment
   s3_kms_arn      = aws_kms_key.s3.arn
+  kinesis_kms_arn = aws_kms_key.kinesis-kms-key.arn
+  kinesis_kms_id  = data.aws_kms_key.kinesis_kms_key.key_id
   create_bucket   = local.application_data.accounts[local.environment].setup_buckets
 
 
@@ -15,6 +17,26 @@ locals {
     local.tags,
     {
       Name = "${local.application_name}"
+    }
+  )
+}
+
+# kinesis Data Stream
+module "kinesis_stream_ingestor" {
+
+  source                    = "./modules/kinesis_stream"
+  name                      = "{local.project}-kinesis-ingestor-${local.env}"
+  shard_count               = 1
+  retention_period          = 24
+  shard_level_metrics       = ["IncomingBytes", "OutgoingBytes"]
+  enforce_consumer_deletion = false
+  encryption_type           = "KMS"
+  kms_key_id                = local.kinesis_kms_id
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "{local.project}-kinesis-ingestor-${local.env}"
+      Resource_Type = "Kinesis Data Stream"
     }
   )
 }

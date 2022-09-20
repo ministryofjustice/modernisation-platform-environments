@@ -23,10 +23,10 @@ locals {
 resource "aws_glue_job" "glue_job" {
   count = var.create_job ? 1 : 0
 
-  name        = var.name
-  role_arn    = var.create_role ? join("", aws_iam_role.role.*.arn) : var.role_arn
-  connections = var.connections
-  # max_capacity           = var.dpu
+  name                   = var.name
+  role_arn               = var.create_role ? join("", aws_iam_role.role.*.arn) : var.role_arn
+  connections            = var.connections
+  # max_capacity         = var.dpu
   description            = var.description
   glue_version           = var.glue_version
   max_retries            = var.max_retries
