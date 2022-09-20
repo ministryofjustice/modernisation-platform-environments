@@ -130,7 +130,7 @@ resource "aws_iam_policy" "extra-local-policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "additional_policies" {
-  for_each = toset(var.roles)
+  for_each = toset(var.additional_policies)
 
   role       = aws_iam_role.role
   policy_arn = each.value
