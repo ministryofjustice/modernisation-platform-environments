@@ -11,6 +11,8 @@ locals {
     "--enable-continuous-log-filter"     = var.enable_continuous_log_filter
   }
 
+  all_policies = ["${aws_iam_policy.additional-policy.arn}", "${var.additional_policies}"]
+
   tags = merge(
     var.tags,
     {
@@ -129,11 +131,13 @@ resource "aws_iam_policy" "additional-policy" {
   policy      = data.aws_iam_policy_document.extra-policy-document.json
 }
 
-resource "aws_iam_role_policy_attachment" "additional_policies" {
+resource "aws_iam_role_policy_attachment" "all_policies" {
   count = var.create_kinesis_ingester ? 1 : 0
 
+  for_each = local.all_policies
+
   role       = var.create_role ? join("", aws_iam_role.role.*.name) : var.role_name
-  policy_arn = var.additional_policies
+  policy_arn = each.value
 }
 
 resource "aws_cloudwatch_log_group" "log_group" {
