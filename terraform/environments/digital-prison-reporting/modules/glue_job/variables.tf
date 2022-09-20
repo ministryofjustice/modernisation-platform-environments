@@ -292,3 +292,9 @@ variable "continuous_log_stream_prefix" {
   default     = null
   description = "(Optional) Specifies a custom CloudWatch log stream prefix for a job enabled for continuous logging."
 }
+
+variable "create_kinesis_ingester" {
+  type        = bool
+  default     = false
+  description = "Whether to create Kinesis Stream"
+}
