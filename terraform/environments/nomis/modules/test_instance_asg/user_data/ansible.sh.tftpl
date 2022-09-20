@@ -2,7 +2,6 @@
 set -euo pipefail
 
 export PATH=/usr/local/bin:$PATH
-repo="modernisation-platform-ami-builds"
 venv=ansible-6.0.0
 
 echo "# Retrieving API Token"
@@ -14,16 +13,16 @@ instance_id=$(curl -sS -H "X-aws-ec2-metadata-token: $token" -v http://169.254.1
 echo "# Retrieving tag server-type value using aws cli"
 server_type=$(aws ec2 describe-tags --filters "Name=resource-id,Values=$instance_id" "Name=key,Values=server-type" --output=text | cut -f5)
 
-if [[ -z $server_type ]]; then
-  echo "server-type not defined, not installing any ansible" >&2
+if [[ -z $server_type || -z ${ansible_repo} ]]; then
+  echo "server-type or ansible_repo not defined, not installing any ansible" >&2
   exit 0
 fi
 
 # clone ansible roles and playbook
 ansible_dir=$(mktemp -d)
-echo "Cloning $repo into $ansible_dir using branch=${branch} if it exists"
+echo "Cloning ${ansible_repo} into $ansible_dir using branch=${branch} if it exists"
 cd $ansible_dir
-git clone -b ${branch} "https://github.com/ministryofjustice/$repo.git" || git clone "https://github.com/ministryofjustice/$repo.git"
+git clone -b ${branch} "https://github.com/ministryofjustice/${ansible_repo}.git" || git clone "https://github.com/ministryofjustice/${ansible_repo}.git"
 
 # activate virtual environment
 if [[ ! -d /var/lib/venv/$venv ]]; then
@@ -35,7 +34,7 @@ cd /var/lib/venv
 source $venv/bin/activate
 
 echo "# Installing ansible requirements"
-cd $ansible_dir/$repo/ansible
+cd $ansible_dir/${ansible_repo}/ansible
 python3.9 -m pip install -r requirements.txt
 ansible-galaxy role install -r requirements.yml
 ansible-galaxy collection install -r requirements.yml
@@ -53,5 +52,5 @@ rm -rf /tmp/python-venv
 rm -rf /tmp/ansible-init
 
 echo "Cleaning up $ansible_dir"
-rm -rf $ansible_dir/$repo
+rm -rf $ansible_dir/${ansible_repo}
 rmdir $ansible_dir
