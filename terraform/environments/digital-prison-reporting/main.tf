@@ -14,6 +14,7 @@ locals {
   account_id      = data.aws_caller_identity.current.account_id
   account_region  = data.aws_region.current.name
   create_kinesis  = local.application_data.accounts[local.environment].create_kinesis_streams
+  enable_glue_registry  = local.application_data.accounts[local.environment].create_glue_registries
 
 
   all_tags = merge(
@@ -42,6 +43,20 @@ module "kinesis_stream_ingestor" {
     {
       Name          = "${local.project}-kinesis-ingestor-${local.env}"
       Resource_Type = "Kinesis Data Stream"
+    }
+  )
+}
+
+# Glue Registry
+module "glue_registry_avro" {
+  source                = "./modules/glue_registry"
+  enable_glue_registry  = true
+  name                  = "${local.project}-glue-registry-avro-${local.env}"
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-glue-registry-avro-${local.env}"
+      Resource_Type = "Glue Registry"
     }
   )
 }
