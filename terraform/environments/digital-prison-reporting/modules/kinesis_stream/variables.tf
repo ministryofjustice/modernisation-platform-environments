@@ -56,6 +56,13 @@ variable "create_policy_write_only" {
   description = "Whether to create IAM Policy (ARN) write only of the Stream"
 }
 
+
+variable "create_kinesis_stream" {
+  type        = bool
+  default     = false
+  description = "Whether to create Kinesis Stream"
+}
+
 #variable "create_policy_admin" {
 #  type        = bool
 #  default     = true
