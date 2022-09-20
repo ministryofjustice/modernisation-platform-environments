@@ -9,7 +9,7 @@
       "glue_job_name": "glue-job-ingester",
       "create_security_conf": true,
       "setup_buckets": true,
-      "create_kinesis_streams": false
+      "create_kinesis_streams": true
     },
     "test": {
       "example_var": "test-data"
