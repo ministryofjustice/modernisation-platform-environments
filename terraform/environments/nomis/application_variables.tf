@@ -118,6 +118,15 @@ locals {
           tags = {
             monitored = false
           }
+        },
+        AUDITUPLOADTEST = {
+          always_on     = false
+          ami_name      = "nomis_db_STIG_CNOMT1-2022-04-21T11.33.39Z*"
+          description   = "Test instance for audit upload script"
+          instance_type = "r6i.xlarge"
+          tags = {
+            monitored = false
+          }
         }
       }
     },
