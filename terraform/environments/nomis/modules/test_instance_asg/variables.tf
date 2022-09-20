@@ -123,3 +123,9 @@ variable "tags" {
   type        = map(any)
   description = "Default tags to be applied to resources"
 }
+
+variable "branch" {
+  type        = string
+  description = "Git hub branch code is being run from.  For cloning ansible repo"
+  default     = ""
+}

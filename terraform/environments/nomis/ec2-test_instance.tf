@@ -29,6 +29,7 @@ module "test_instance_asg" {
   environment      = local.environment
   subnet_set       = local.subnet_set
   tags             = merge(local.tags, try(each.value.tags, {}))
+  branch           = var.BRANCH_NAME
 }
 #------------------------------------------------------------------------------
 # Security Group for Test Instances
