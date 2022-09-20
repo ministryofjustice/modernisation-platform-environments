@@ -61,3 +61,8 @@ variable "create_policy_admin" {
   default     = true
   description = "Whether to create IAM Policy (ARN) admin of the Stream"
 }
+
+variable "project_id" {
+  type        = string
+  description = "(Required) Project Short ID that will be used for resources."
+}

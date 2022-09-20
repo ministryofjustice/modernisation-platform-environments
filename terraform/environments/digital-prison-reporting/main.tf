@@ -32,6 +32,8 @@ module "kinesis_stream_ingestor" {
   enforce_consumer_deletion = false
   encryption_type           = "KMS"
   kms_key_id                = local.kinesis_kms_id
+  project_id                = local.project
+
   tags = merge(
     local.all_tags,
     {
