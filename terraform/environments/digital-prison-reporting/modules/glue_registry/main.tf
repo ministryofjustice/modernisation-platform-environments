@@ -6,9 +6,9 @@ resource "aws_glue_registry" "glue_registry" {
 
   registry_name = var.name
 
-  description   = var.description
+  description = var.description
 
-  tags          = var.tags
+  tags = var.tags
 
 
   lifecycle {
