@@ -119,7 +119,7 @@ locals {
           description   = "Test instance for audit upload script"
           instance_type = "t2.medium"
           tags = {
-            server-type = base
+            server-type = "base"
             monitored   = false
           }
         }
