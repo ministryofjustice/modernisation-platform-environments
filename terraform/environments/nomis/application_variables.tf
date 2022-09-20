@@ -113,6 +113,16 @@ locals {
             monitored = false
           }
         }
+        ANSIBLETEST = {
+          always_on     = false
+          ami_name      = "nomis_rhel_7_9_baseimage_2022-09-20T09-50-42.631Z*"
+          description   = "Test instance for audit upload script"
+          instance_type = "t2.medium"
+          tags = {
+            server-type = base
+            monitored   = false
+          }
+        }
       }
     },
     production = {
