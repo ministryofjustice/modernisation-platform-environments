@@ -119,6 +119,12 @@ variable "role_arn" {
   description = "(Optional) The ARN of the IAM role associated with this job."
 }
 
+variable "role_name" {
+  type        = string
+  default     = ""
+  description = "(Optional) The Name of the IAM role associated with this job."
+}
+
 variable "aws_kms_key" {
   type        = string
   default     = ""
