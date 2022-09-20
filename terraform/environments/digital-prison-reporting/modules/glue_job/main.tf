@@ -130,7 +130,7 @@ resource "aws_iam_policy" "extra-local-policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "additional_policies" {
-  role       = aws_iam_role.role
+  role       = aws_iam_role.role.arn
   policy_arn = var.additional_policies
 }
 
