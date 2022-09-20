@@ -48,12 +48,12 @@ module "kinesis_stream_ingestor" {
 
 # Glue Database Catalog 
 module "glue_database" {
-  source          = "./modules/glue_database"
-  create_db       = local.create_db
-  name            = "${local.project}-${local.glue_db}-${local.env}"
-  description     = local.description
-  aws_account_id  = local.account_id
-  aws_region      = local.account_region
+  source         = "./modules/glue_database"
+  create_db      = local.create_db
+  name           = "${local.project}-${local.glue_db}-${local.env}"
+  description    = local.description
+  aws_account_id = local.account_id
+  aws_region     = local.account_region
 }
 
 # Glue JOB
