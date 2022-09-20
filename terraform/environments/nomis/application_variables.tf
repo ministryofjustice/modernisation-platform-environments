@@ -113,17 +113,6 @@ locals {
             monitored = false
           }
         }
-        ANSIBLETEST = {
-          always_on     = false
-          ansible_repo  = "modernisation-platform-ami-builds"
-          ami_name      = "nomis_rhel_7_9_baseimage_2022-09-20T09-50-42.631Z*"
-          description   = "Test instance for ansible"
-          instance_type = "t2.medium"
-          tags = {
-            server-type = "base"
-            monitored   = false
-          }
-        }
       }
     },
     production = {
