@@ -37,7 +37,7 @@ resource "aws_iam_policy" "read-only" {
           "kinesis:ListShards"
         ]
         Resource = [
-          aws_kinesis_stream.this.arn
+          aws_kinesis_stream.this[count.index].arn
         ]
       }
     ])
@@ -63,7 +63,7 @@ resource "aws_iam_policy" "write-only" {
           "kinesis:PutRecords",
         ]
         Resource = [
-          aws_kinesis_stream.this.arn
+          aws_kinesis_stream.this[count.index].arn
         ]
       }
     ])

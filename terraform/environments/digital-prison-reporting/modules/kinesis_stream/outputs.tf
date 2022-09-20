@@ -1,16 +1,16 @@
 output "kinesis_stream_name" {
   description = "The unique Kinesis stream name"
-  value       = aws_kinesis_stream.this.name
+  value       = aws_kinesis_stream.this[count.index].name
 }
 
 output "kinesis_stream_shard_count" {
   description = "The count of shards for this Kinesis stream"
-  value       = aws_kinesis_stream.this.shard_count
+  value       = aws_kinesis_stream.this[count.index].shard_count
 }
 
 output "kinesis_stream_arn" {
   description = "The Amazon Resource Name (ARN) specifying the Stream"
-  value       = aws_kinesis_stream.this.arn
+  value       = aws_kinesis_stream.this[count.index].arn
 }
 
 output "kinesis_stream_iam_policy_read_only_arn" {
