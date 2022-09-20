@@ -77,9 +77,9 @@ variable "connections" {
   description = "(Optional) The list of connections used for this job."
 }
 
-variable "additional_policies" {
-  type        = list(string)
-  default     = []
+variable "additional_policies"{
+  type        = string
+  default     = ""
   description = "(Optional) The list of Policies used for this job."
 }
 

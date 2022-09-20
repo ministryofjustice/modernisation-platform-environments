@@ -130,10 +130,8 @@ resource "aws_iam_policy" "extra-local-policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "additional_policies" {
-  for_each = toset(var.additional_policies)
-
   role       = aws_iam_role.role
-  policy_arn = each.value
+  policy_arn = var.additional_policies
 }
 
 resource "aws_cloudwatch_log_group" "log_group" {
