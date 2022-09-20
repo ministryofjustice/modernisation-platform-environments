@@ -130,7 +130,7 @@ resource "aws_iam_policy" "extra-local-policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "additional_policies" {
-  role       = aws_iam_role.role.arn
+  role       = var.create_role ? join("", aws_iam_role.role.*.arn) : var.role_arn
   policy_arn = var.additional_policies
 }
 
