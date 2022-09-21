@@ -440,6 +440,7 @@ resource "aws_ssm_document" "oracle_secure_web" {
 #   }
 # }
 
+
 # TODO: Temporarily disable automatic provisioning while performing DR tests.
 
 #------------------------------------------------------------------------------
