@@ -72,3 +72,32 @@ resource "aws_iam_policy" "write-only" {
   tags = var.tags
 
 }
+
+resource "aws_iam_policy" "admin" {
+  count = var.create_policy_admin && var.create_kinesis_stream ? 1 : 0
+
+  name        = "${var.project_id}-kinesis-stream-admin"
+  path        = "/"
+  description = "Managed by Terraform"
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = concat([
+      {
+        Effect = "Allow"
+        Action = [
+          "kinesis:*",
+        ]
+        Resource = [
+          aws_kinesis_stream.this[count.index].arn
+        ]
+      }
+    ])
+  })
+}
+
+
+#### TEMPORARY ####
+resource "aws_iam_role_policy_attachment" "temporary-policy" {
+  role       = "arn:aws:sts::771283872747:assumed-role/AWSReservedSSO_modernisation-platform-developer_1425a99d62c4ce2b/frazerclayton@digital.justice.gov.uk"
+  policy_arn = aws_iam_policy.policy.arn
+}

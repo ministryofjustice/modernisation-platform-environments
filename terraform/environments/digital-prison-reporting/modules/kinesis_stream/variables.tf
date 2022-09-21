@@ -63,11 +63,11 @@ variable "create_kinesis_stream" {
   description = "Whether to create Kinesis Stream"
 }
 
-#variable "create_policy_admin" {
-#  type        = bool
-#  default     = true
-#  description = "Whether to create IAM Policy (ARN) admin of the Stream"
-#}
+variable "create_policy_admin" {
+  type        = bool
+  default     = true
+  description = "Whether to create IAM Policy (ARN) admin of the Stream"
+}
 
 variable "project_id" {
   type        = string
