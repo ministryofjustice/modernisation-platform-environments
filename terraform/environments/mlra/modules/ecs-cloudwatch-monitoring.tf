@@ -1,5 +1,5 @@
 resource "aws_cloudwatch_dashboard" "mlra" {
-  dashboard_name = local.application_name
+  dashboard_name = var.application_name
 
   dashboard_body = <<EOF
 {
@@ -13,17 +13,17 @@ resource "aws_cloudwatch_dashboard" "mlra" {
       "properties": {
         "metrics": [
           [
-            dashboard_arn =
+          
             "AWS/EC2",
             "CPUUtilization",
             "InstanceId",
             "i-012345"
           ]
         ],
-        "period": 300,
+        "period": 60,
         "stat": "Average",
-        "region": "us-east-1",
-        "title": "EC2 Instance CPU"
+        "region": "${var.aws_region}",
+        "title": "Application ELB 5xx Error"
       }
     },
     {
