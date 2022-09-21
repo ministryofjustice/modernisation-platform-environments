@@ -472,6 +472,46 @@ resource "aws_security_group_rule" "db_bastion_ingress_rule" {
   source_security_group_id = module.bastion_linux.bastion_security_group
 }
 
+resource "aws_security_group_rule" "db_windows_server_failover_tcp_ingress_rule" {
+  type                     = "ingress"
+  description              = "Windows Server Failover Cluster port TCP Ingress"
+  from_port                = 3343
+  to_port                  = 3343
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.db.id
+  source_security_group_id = aws_security_group.db_mgmt_server_security_group.id
+}
+
+resource "aws_security_group_rule" "db_windows_server_failover_tcp_egress_rule" {
+  type                     = "egress"
+  description              = "Windows Server Failover Cluster port TCP Egress"
+  from_port                = 3343
+  to_port                  = 3343
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.db.id
+  source_security_group_id = aws_security_group.db_mgmt_server_security_group.id
+}
+
+resource "aws_security_group_rule" "db_windows_server_failover_udp_ingress_rule" {
+  type                     = "ingress"
+  description              = "Windows Server Failover Cluster port UDP Ingress"
+  from_port                = 3343
+  to_port                  = 3343
+  protocol                 = "udp"
+  security_group_id        = aws_security_group.db.id
+  source_security_group_id = aws_security_group.db_mgmt_server_security_group.id
+}
+
+resource "aws_security_group_rule" "db_windows_server_failover_udp_egress_rule" {
+  type                     = "egress"
+  description              = "Windows Server Failover Cluster port UDP Egress"
+  from_port                = 3343
+  to_port                  = 3343
+  protocol                 = "udp"
+  security_group_id        = aws_security_group.db.id
+  source_security_group_id = aws_security_group.db_mgmt_server_security_group.id
+}
+
 #------------------------------------------------------------------------------
 # S3 Bucket for Database backup files
 #------------------------------------------------------------------------------
