@@ -23,7 +23,7 @@ output "kinesis_stream_iam_policy_write_only_arn" {
   value       = concat(aws_iam_policy.write-only.*.arn, [""])[0]
 }
 
-#output "kinesis_stream_iam_policy_admin_arn" {
-#  description = "The IAM Policy (ARN) admin of the Stream"
-#  value       = concat(aws_iam_policy.admin.*.arn, [""])[0]
-#}
+output "kinesis_stream_iam_policy_admin_arn" {
+  description = "The IAM Policy (ARN) admin of the Stream"
+  value       = concat(aws_iam_policy.admin.*.arn, [""])[0]
+}
