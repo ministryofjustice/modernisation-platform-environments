@@ -12,11 +12,6 @@
     "production": {
       "example_var": "production-data"
     }
-  },
-  "variable": {
-    "app-name": {
-      "default": "MLRA"
-    }
 
-  }
+}
 }

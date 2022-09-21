@@ -36,7 +36,7 @@ provider "aws" {
 ######################### Run Terraform via CICD ##################################
 
 
-######################### Run Terraform Plan Locally Only ##################################
+# ######################## Run Terraform Plan Locally Only ##################################
 # To run a Terraform Plan locally, uncomment this bottom section of code and comment out the top section
 
 # provider "aws" {
@@ -64,4 +64,4 @@ provider "aws" {
 #     role_arn = "arn:aws:iam::${local.environment_management.account_ids["core-network-services-production"]}:role/read-dns-records"
 #   }
 # }
-######################### Run Terraform Plan Locally Only ##################################
+# ######################## Run Terraform Plan Locally Only ##################################
