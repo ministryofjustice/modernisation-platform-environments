@@ -41,6 +41,7 @@ provider "aws" {
 
 # provider "aws" {
 #   region = "eu-west-2"
+#  
 # }
 
 # # AWS provider for core-vpc-<environment>, to share VPCs into this account
