@@ -32,6 +32,15 @@ data "aws_subnets" "this" {
     Name = "${var.business_unit}-${var.environment}-${var.subnet_set}-${var.subnet_type}-${var.region}*"
   }
 }
+
+locals {
+  ansible_script_args = {
+    branch       = var.branch == "" ? "main" : var.branch
+    ansible_repo = var.ansible_repo == null ? "" : var.ansible_repo
+  }
+  ansible_script = templatefile("${path.module}/user_data/ansible.sh.tftpl", local.ansible_script_args)
+}
+
 #------------------------------------------------------------------------------
 # Security Group
 #------------------------------------------------------------------------------
@@ -137,6 +146,8 @@ resource "aws_launch_template" "this" {
     security_groups             = [var.common_security_group_id, aws_security_group.this.id]
     delete_on_termination       = true
   }
+
+  user_data = base64encode(local.ansible_script)
 
   tag_specifications {
     resource_type = "instance"
