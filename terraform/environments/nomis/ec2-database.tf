@@ -175,7 +175,7 @@ resource "aws_iam_policy" "s3_db_backup_bucket_access" {
 data "template_file" "audit_s3_upload_template" {
   template = file("${path.module}/ssm-documents/templates/s3auditupload.yaml.tftmpl")
   vars = {
-    bucket = module.nomis-db-backup-bucket.bucket.id
+    bucket = module.nomis-audit-archives.bucket.id
     branch = "main"
   }
 }
