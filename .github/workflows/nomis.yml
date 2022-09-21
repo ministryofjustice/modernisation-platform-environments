@@ -85,7 +85,6 @@ jobs:
 
   # Plan + deploy for pre-production and production enironments, only from main
   plan-preprod-prod:
-    if: github.ref == 'refs/heads/main'
     strategy:
       matrix:
         include:
@@ -93,6 +92,7 @@ jobs:
           - environment: production
     name: Terraform plan - nomis - ${{ matrix.environment }}
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3.0.2
@@ -111,7 +111,6 @@ jobs:
         env:
           TF_ENV: ${{ matrix.environment }}
   deploy-preprod-prod:
-    if: github.ref == 'refs/heads/main'
     needs: plan-preprod-prod
     strategy:
       matrix:
@@ -119,6 +118,7 @@ jobs:
           - environment: preproduction
           - environment: production
     name: Terraform apply - nomis - ${{ matrix.environment }}
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment:
       name: nomis-${{ matrix.environment }}
