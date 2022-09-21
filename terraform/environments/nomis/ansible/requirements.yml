@@ -1,0 +1,13 @@
+# from Galaxy
+roles:
+
+collections:
+  - name: community.general
+    source: https://galaxy.ansible.com
+    version: 5.6.0
+  - name: amazon.aws
+    source: https://galaxy.ansible.com
+    version: 3.2.0
+  - name: community.aws
+    source: https://galaxy.ansible.com
+    version: 3.2.1
