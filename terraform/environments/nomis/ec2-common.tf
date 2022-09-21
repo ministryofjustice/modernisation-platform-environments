@@ -405,6 +405,7 @@ resource "aws_ssm_association" "script-exporter" {
   }
 }
 
+
 #------------------------------------------------------------------------------
 # Oracle Secure Web - Install Oracle Secure Web s3 Backup Module
 #------------------------------------------------------------------------------
@@ -438,6 +439,7 @@ resource "aws_ssm_document" "oracle_secure_web" {
 #     values = ["oracle_sids"]
 #   }
 # }
+
 
 # TODO: Temporarily disable automatic provisioning while performing DR tests.
 

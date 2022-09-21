@@ -167,3 +167,29 @@ resource "aws_iam_policy" "s3_db_backup_bucket_access" {
     },
   )
 }
+
+#------------------------------------------------------------------------------
+# Upload audit archive dumps to s3
+#------------------------------------------------------------------------------
+
+data "template_file" "audit_s3_upload_template" {
+  template = file("${path.module}/ssm-documents/templates/s3auditupload.yaml.tftmpl")
+  vars = {
+    bucket = module.nomis-audit-archives.bucket.id
+    branch = "main"
+  }
+}
+resource "aws_ssm_document" "audit_s3_upload" {
+  name            = "UploadAuditArchivesToS3"
+  document_type   = "Command"
+  document_format = "YAML"
+  content         = data.template_file.audit_s3_upload_template.rendered
+  target_type     = "/AWS::EC2::Instance"
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "Upload Audit Archives to S3"
+    },
+  )
+}

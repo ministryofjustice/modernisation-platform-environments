@@ -19,6 +19,8 @@ env:
   AWS_SECRET_ACCESS_KEY:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   GITHUB_TOKEN: ${{ secrets.DSO_GITHUB_AUTOMATION_PAT }}
   TF_IN_AUTOMATION: true
+  TF_VAR_BRANCH_NAME: ${{ github.event_name == 'pull_request' && 'main' || (github.head_ref || github.ref_name) }}
+  TF_VAR_GH_ACTOR_NAME: ${{ github.actor}}
 defaults:
   run:
     shell: bash

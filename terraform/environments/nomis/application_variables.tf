@@ -104,6 +104,22 @@ locals {
             monitored = false
           }
         },
+        TEST_DB_SZYMON = {
+          always_on              = false
+          ami_name               = "nomis_rhel_7_9_oracledb_11_2*"
+          asm_data_capacity      = 50
+          asm_flash_capacity     = 10
+          description            = "Test instance for the database ami"
+          termination_protection = false
+          oracle_sids            = ["T1CNMAUD"]
+          oracle_app_disk_size = {
+            "/dev/sdb" = 100 # /u01
+            "/dev/sdc" = 100 # /u02
+          }
+          tags = {
+            monitored = false
+          }
+        },
       },
       # Add weblogic instances here.  They will be created using the weblogic module
       weblogics = {
@@ -114,12 +130,11 @@ locals {
       },
       # Add base instances here. They will be created using the base_instance module
       test_instances_asg = {
-        TESTWL2 = {
+        AUDITUPLOADTEST = {
           always_on     = false
-          ami_name      = "nomis_rhel_6_10_weblogic_appserver_10_3*"
-          description   = "Test instance for the weblogic base ami"
-          instance_type = "t2.medium"
-          kms_key_arn   = data.aws_kms_key.hmpps_key.arn
+          ami_name      = "nomis_db_STIG_CNOMT1-2022-04-21T11.33.39Z*"
+          description   = "Test instance for audit upload script"
+          instance_type = "r6i.xlarge"
           tags = {
             monitored = false
           }
