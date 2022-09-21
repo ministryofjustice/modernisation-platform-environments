@@ -396,14 +396,14 @@ resource "aws_ssm_document" "script_exporter" {
   )
 }
 
-resource "aws_ssm_association" "script-exporter" {
-  name             = aws_ssm_document.script_exporter.name
-  association_name = "install-and-manage-script-exporter"
-  targets {
-    key    = "tag-key"
-    values = ["oracle_sids"]
-  }
-}
+# resource "aws_ssm_association" "script-exporter" {
+#   name             = aws_ssm_document.script_exporter.name
+#   association_name = "install-and-manage-script-exporter"
+#   targets {
+#     key    = "tag-key"
+#     values = ["oracle_sids"]
+#   }
+# }
 
 
 #------------------------------------------------------------------------------
