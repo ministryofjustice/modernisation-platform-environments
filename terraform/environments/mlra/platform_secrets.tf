@@ -13,7 +13,7 @@ data "aws_secretsmanager_secret_version" "environment_management" {
 ######################### Run Terraform via CICD ##################################
 
 
-######################### Run Terraform Plan Locally Only ##################################
+# ######################## Run Terraform Plan Locally Only ##################################
 # To run a Terraform Plan locally, uncomment this bottom section of code and comment out the top section
 
 # # Get secret by arn for environment management
@@ -30,4 +30,4 @@ data "aws_secretsmanager_secret_version" "environment_management" {
 #   secret_id = data.aws_secretsmanager_secret.environment_management.id
 # }
 
-######################### Run Terraform Plan Locally Only ##################################
+# ######################## Run Terraform Plan Locally Only ##################################
