@@ -31,3 +31,7 @@ variable "kms_master_key_arn" {
   description = "ARN of the customer managed key used to encrypt this topic"
   type        = string
 }
+
+variable "ssm_parameter" {
+  type = string
+}
