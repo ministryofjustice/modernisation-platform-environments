@@ -1,5 +1,5 @@
 resource "aws_cloudwatch_dashboard" "mlra" {
-  dashboard_name = "${var.app_name}_dashboard"
+  dashboard_name = local.application_name
 
   dashboard_body = <<EOF
 {
