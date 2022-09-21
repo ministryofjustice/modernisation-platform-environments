@@ -7,7 +7,7 @@ mainSteps:
   inputs:
     runCommand:
     - |
-      sudo yum install gcc openssl-devel bzip2-devel libffi-devel zlib-devel wget unzip screen -y
+      sudo yum install gcc openssl-devel bzip2-devel libffi-devel zlib-devel wget unzip screen git -y
 - name: InstallPython39
   action: "aws:runShellScript"
   inputs:
