@@ -1,7 +1,8 @@
 {
   "accounts": {
     "development": {
-      "example_var": "dev-data"
+      "example_var": "dev-data",
+      "region": "eu-west-2"
     },
     "test": {
       "example_var": "test-data"
