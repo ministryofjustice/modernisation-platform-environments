@@ -1,5 +1,5 @@
 - name: upload_audit_data_dumps
   # gather_facts: no
-  hosts: audit
+  hosts: locahost
   roles:
     - archiveupload
