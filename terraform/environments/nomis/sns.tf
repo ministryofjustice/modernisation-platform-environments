@@ -15,7 +15,7 @@ module "monitoring-sns-topic" {
 resource "aws_ssm_parameter" "subscriptions" {
   name  = "/monitoring/subscriptions"
   type  = "SecureString"
-  value     = jsonencode({ "emails" = [{ "email" : "", "filter" : { "distribution" : [] } }] })
+  value = jsonencode({ "emails" = [{ "email" : "", "filter" : { "distribution" : [] } }] })
   lifecycle {
     ignore_changes = [
       value,
