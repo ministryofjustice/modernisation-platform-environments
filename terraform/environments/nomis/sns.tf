@@ -12,16 +12,16 @@ module "monitoring-sns-topic" {
 
 }
 
-resource "aws_ssm_parameter" "subscriptions" {
-  name  = "/monitoring/subscriptions"
-  type  = "SecureString"
-  value = jsonencode({ "emails" = [] })
-  lifecycle {
-    ignore_changes = [
-      value,
-    ]
-  }
-}
+# resource "aws_ssm_parameter" "subscriptions" {
+#   name  = "/monitoring/subscriptions"
+#   type  = "SecureString"
+#   value = jsonencode({ "emails" = [] })
+#   lifecycle {
+#     ignore_changes = [
+#       value,
+#     ]
+#   }
+# }
 
 resource "aws_iam_role" "alertmanager-sns-role" {
   name               = "AlertmanagerSNSTopicRole"
