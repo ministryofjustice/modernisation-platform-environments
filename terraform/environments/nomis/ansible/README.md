@@ -16,8 +16,8 @@ for an example user data script for provisioning ansible.
 
 ## Running ansible against an EC2 instance post build
 
-A generic [site.yml](/ansible/site.yml) is provided with a dynamic inventory
-[inventory_aws_ec2.yml](/ansible/inventory_aws_ec2.yml). This creates groups
+A generic [site.yml](/terraform/environments/nomis/ansible/site.yml) is provided with a dynamic inventory
+[inventory_aws_ec2.yml](/terraform/environments/nomis/ansible/inventory_aws_ec2.yml). This creates groups
 based of the following tags
 
 - business-unit
@@ -28,7 +28,7 @@ based of the following tags
 
 Ansible tasks are executed on ec2 instances via AWS Session Manager, so you must have [awscli](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2-mac.html#cliv2-mac-install-cmd) installed in addition to the Session Manager [plugin](https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager-working-with-install-plugin.html#install-plugin-macos-signed). The target ec2 instance must also have [ssm-agent](https://docs.aws.amazon.com/systems-manager/latest/userguide/ssm-agent.html) installed. You do not need to have an account on the remote ec2 instance in order to connect.
 
-The `ansible_connection` variable is set to use the `community.aws.aws_ssm` plugin in [group_vars/aws_ec2.yml](/ansible/group_vars/aws_ec2.yml). The `aws_ec2` group is the default group for all instances that are obtained from dynamic inventory.
+The `ansible_connection` variable is set to use the `community.aws.aws_ssm` plugin in [group_vars/aws_ec2.yml](/terraform/environments/nomis/ansible/group_vars/aws_ec2.yml). The `aws_ec2` group is the default group for all instances that are obtained from dynamic inventory.
 
 Ensure you have set your AWS credentials as environment variables or setup your `~/.aws/credentials` accordingly before attempting to run ansible. Note that at the time of writing, it does not seem possible to run Ansible with credentials obtained from `aws sso login`. Temporary credentials can be obtained from https://moj.awsapps.com/start#/
 
