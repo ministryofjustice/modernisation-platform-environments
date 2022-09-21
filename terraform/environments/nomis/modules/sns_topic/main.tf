@@ -1,21 +1,5 @@
 data "aws_caller_identity" "current" {}
 
-# data "aws_ssm_parameter" "subscriptions" {
-#   name = "/monitoring/subscriptions"
-# }
-
-# resource "aws_ssm_parameter" "subscriptions" {
-#   name      = "/monitoring/subscriptions"
-#   type      = "SecureString"
-#   value     = jsonencode({ "emails" = [{ "email" : "", "filter" : { "distribution" : [] } }] })
-#   overwrite = true
-#   lifecycle {
-#     ignore_changes = [
-#       value,
-#     ]
-#   }
-# }
-
 locals {
   subscriptions_data = sensitive(jsondecode(var.ssm_parameter))
 }

@@ -33,5 +33,6 @@ variable "kms_master_key_arn" {
 }
 
 variable "ssm_parameter" {
-  type = string
+  description = "SSM value containining emails and filters to apply to the SNS topic"
+  type        = string
 }
