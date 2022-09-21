@@ -1,5 +1,5 @@
-resource "aws_cloudwatch_dashboard" "MLRADashboard" {
-  dashboard_name = "mlra-dashboard"
+resource "aws_cloudwatch_dashboard" "mlra" {
+  dashboard_name = "${var.app_name}_dashboard"
 
   dashboard_body = <<EOF
 {
@@ -8,11 +8,12 @@ resource "aws_cloudwatch_dashboard" "MLRADashboard" {
       "type": "metric",
       "x": 0,
       "y": 0,
-      "width": 12,
+      "width": 8,
       "height": 6,
       "properties": {
         "metrics": [
           [
+            dashboard_arn =
             "AWS/EC2",
             "CPUUtilization",
             "InstanceId",
