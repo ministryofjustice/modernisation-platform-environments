@@ -1,4 +1,3 @@
-
 # ansible_ssh_common_args: -J {{ hostvars['bastion_linux'].instance_id }} # commented out as connecting direct to each VM via instance-id
 # ansible_ssh_common_args: -o StrictHostKeyChecking=no -o ProxyCommand="sh -c \"aws ssm start-session --target %h --document-name AWS-StartSSHSession --parameters 'portNumber=%p'\""
 ansible_connection: community.aws.aws_ssm
