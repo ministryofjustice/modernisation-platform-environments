@@ -406,6 +406,31 @@ resource "aws_ssm_association" "script-exporter" {
 }
 
 #------------------------------------------------------------------------------
+# Upload audit archive dumps to s3
+#------------------------------------------------------------------------------
+
+data "template_file" "oracle_secure_web_install_template" {
+  template = file("${path.module}/ssm-documents/templates/s3auditupload.yaml.tftmpl")
+  vars = {
+    bucket_name = module.s3-bucket.bucket.id
+  }
+}
+resource "aws_ssm_document" "oracle_secure_web" {
+  name            = "InstallOracleSecureWeb"
+  document_type   = "Command"
+  document_format = "JSON"
+  content         = data.template_file.oracle_secure_web_install_template.rendered
+  target_type     = "/AWS::EC2::Instance"
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "install-and-test-oracle-secure-web-backup"
+    },
+  )
+}
+
+#------------------------------------------------------------------------------
 # Oracle Secure Web - Install Oracle Secure Web s3 Backup Module
 #------------------------------------------------------------------------------
 
