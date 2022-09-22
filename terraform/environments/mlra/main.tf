@@ -4,7 +4,7 @@ module "lb-access-logs-enabled" {
     aws.bucket-replication = aws.bucket-replication
   }
 
-  vpc_all = local.vpc_name
+  vpc_all = local.vpc_all
   #existing_bucket_name               = "my-bucket-name"
   application_name           = local.application_name
   public_subnets             = [data.aws_subnet.public_subnets_a.id, data.aws_subnet.public_subnets_b.id, data.aws_subnet.public_subnets_c.id]
