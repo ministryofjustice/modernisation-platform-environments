@@ -33,6 +33,15 @@ provider "aws" {
     role_arn = "arn:aws:iam::${local.environment_management.account_ids["core-network-services-production"]}:role/modify-dns-records"
   }
 }
+
+provider "aws" {
+  alias  = "bucket-replication"
+  region = "eu-west-1"
+  assume_role {
+    role_arn = "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/MemberInfrastructureAccess"
+  }
+}
+
 ######################### Run Terraform via CICD ##################################
 
 
