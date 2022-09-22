@@ -36,9 +36,9 @@ locals {
   loadbalancer_egress_rules = {
     "cluster_ec2_lb_egress" = {
       description     = "Cluster EC2 loadbalancer egress rule"
-      from_port       = 443
-      to_port         = 443
-      protocol        = "tcp"
+      from_port       = 0
+      to_port         = 0
+      protocol        = "-1"
       cidr_blocks     = ["0.0.0.0/0"]
       security_groups = []
     }
