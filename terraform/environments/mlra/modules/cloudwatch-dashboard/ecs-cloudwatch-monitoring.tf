@@ -33,7 +33,7 @@ resource "aws_cloudwatch_dashboard" "mlra" {
       "properties": {
         "period": 60,
         "stat": "Average",
-        "region": "${var.aws_region}",
+        "region": "${local.application_data.accounts[local.environment].region}",
         "view": "timeSeries"
         "stacked": false
         "title": "Application ELB 4xx Error"
@@ -48,7 +48,7 @@ resource "aws_cloudwatch_dashboard" "mlra" {
       "properties": {
         "period": 300,
         "stat": "Average",
-        "region": "${var.aws_region}",
+        "region": "${local.application_data.accounts[local.environment].region}",
         "view": "timeSeries"
         "stacked": false
         "title": "Application ELB Target Response Time"
@@ -62,7 +62,7 @@ resource "aws_cloudwatch_dashboard" "mlra" {
       "properties": {
         "period": 300,
         "stat": "Average",
-        "region": "${var.aws_region}",
+        "region": "${local.application_data.accounts[local.environment].region}}",
         "view": "timeSeries"
         "stacked": false
         "title": "EC2 CPU"
@@ -80,7 +80,7 @@ resource "aws_cloudwatch_dashboard" "mlra" {
         ],
         "period": 300,
         "stat": "Average",
-        "region": "${var.aws_region}",
+        "region": "${local.application_data.accounts[local.environment].region}",
         "view": "timeSeries"
         "stacked": false
         "title": "ECS Memory"
