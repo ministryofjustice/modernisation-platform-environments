@@ -1,5 +1,8 @@
 module "lb-access-logs-enabled" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer"
+  providers = {
+    aws = aws
+  }
 
   vpc_all = local.vpc_name
   #existing_bucket_name               = "my-bucket-name"
