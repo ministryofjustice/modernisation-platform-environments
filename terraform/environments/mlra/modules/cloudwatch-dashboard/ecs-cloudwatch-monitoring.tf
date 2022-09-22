@@ -1,5 +1,5 @@
 resource "aws_cloudwatch_dashboard" "mlra" {
-  dashboard_name = var.application_name
+  dashboard_name = local.application_name
 
   dashboard_body = <<EOF
 {
@@ -11,18 +11,9 @@ resource "aws_cloudwatch_dashboard" "mlra" {
       "width": 8,
       "height": 6,
       "properties": {
-        "metrics": [
-          [
-          
-            "AWS/EC2",
-            "CPUUtilization",
-            "InstanceId",
-            "i-012345"
-          ]
-        ],
         "period": 60,
         "stat": "Average",
-        "region": "${var.aws_region}"
+        "region": "${local.application_data.accounts[local.environment].region}"
         "annotations": {
           "alarms": ["arn:aws:cloudwatch:${AWS::Region}:${AWS::AccountId}:alarm:${ApplicationELB5xxError}"]
         } 
@@ -40,15 +31,6 @@ resource "aws_cloudwatch_dashboard" "mlra" {
       "width": 8,
       "height": 6,
       "properties": {
-        "metrics": [
-          [
-          
-            "AWS/EC2",
-            "CPUUtilization",
-            "InstanceId",
-            "i-012345"
-          ]
-        ],
         "period": 60,
         "stat": "Average",
         "region": "${var.aws_region}",
@@ -64,14 +46,6 @@ resource "aws_cloudwatch_dashboard" "mlra" {
       "width": 12,
       "height": 6,
       "properties": {
-        "metrics": [
-          [
-            "AWS/EC2",
-            "CPUUtilization",
-            "InstanceId",
-            "i-012345"
-          ]
-        ],
         "period": 300,
         "stat": "Average",
         "region": "${var.aws_region}",
@@ -86,14 +60,6 @@ resource "aws_cloudwatch_dashboard" "mlra" {
       "width": 12,
       "height": 6,
       "properties": {
-        "metrics": [
-          [
-            "AWS/EC2",
-            "CPUUtilization",
-            "InstanceId",
-            "i-012345"
-          ]
-        ],
         "period": 300,
         "stat": "Average",
         "region": "${var.aws_region}",
@@ -110,12 +76,7 @@ resource "aws_cloudwatch_dashboard" "mlra" {
       "height": 6,
       "properties": {
         "metrics": [
-          [
-            "AWS/EC2",
-            "CPUUtilization",
-            "InstanceId",
-            "i-012345"
-          ]
+  
         ],
         "period": 300,
         "stat": "Average",
