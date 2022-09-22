@@ -16,9 +16,9 @@ resource "aws_cloudwatch_dashboard" "mlra" {
         "region": "${local.application_data.accounts[local.environment].region}"
         "annotations": {
           "alarms": #[module.<marks_module>.<output_name]
-        } 
+        }, 
         "view": "timeSeries"
-        "stacked": false
+        "stacked": "false",
         "title": "Application ELB 5xx Error"
       }
     },
@@ -35,10 +35,10 @@ resource "aws_cloudwatch_dashboard" "mlra" {
         "stat": "Average",
         "annotations": {
           "alarms": #[module.<marks_module>.<output_name]
-        } 
+        }, 
         "region": "${local.application_data.accounts[local.environment].region}",
-        "view": "timeSeries"
-        "stacked": false
+        "view": "timeSeries",
+        "stacked": "false",
         "title": "Application ELB 4xx Error"
       }
     },
@@ -72,8 +72,8 @@ resource "aws_cloudwatch_dashboard" "mlra" {
           "alarms": #[module.<marks_module>.<output_name]
         }, 
         "region": "${local.application_data.accounts[local.environment].region}}",
-        "view": "timeSeries"
-        "stacked": false
+        "view": "timeSeries",
+        "stacked": "false",
         "title": "EC2 CPU"
       }
     },
@@ -93,8 +93,8 @@ resource "aws_cloudwatch_dashboard" "mlra" {
           "alarms": #[module.<marks_module>.<output_name]
         } ,
         "region": "${local.application_data.accounts[local.environment].region}",
-        "view": "timeSeries"
-        "stacked": false
+        "view": "timeSeries",
+        "stacked": "false",
         "title": "ECS Memory"
       }
     }
