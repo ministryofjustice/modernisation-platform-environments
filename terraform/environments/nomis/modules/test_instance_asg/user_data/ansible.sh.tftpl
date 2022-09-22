@@ -34,7 +34,7 @@ cd /var/lib/venv
 source $venv/bin/activate
 
 echo "# Installing ansible requirements"
-cd $ansible_dir/${ansible_repo}/ansible
+cd $ansible_dir/${ansible_repo}/${ansible_repo_basedir}
 python3.9 -m pip install -r requirements.txt
 ansible-galaxy role install -r requirements.yml
 ansible-galaxy collection install -r requirements.yml

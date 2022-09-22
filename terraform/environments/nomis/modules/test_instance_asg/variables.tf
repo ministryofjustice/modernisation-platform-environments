@@ -130,6 +130,12 @@ variable "ansible_repo" {
   default     = null
 }
 
+variable "ansible_repo_basedir" {
+  type        = string
+  description = "Base directory within ansible_repo where ansible code is located"
+  default     = null
+}
+
 variable "branch" {
   type        = string
   description = "Git hub branch code is being run from.  For cloning ansible repo"

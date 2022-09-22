@@ -24,13 +24,14 @@ module "test_instance_asg" {
   instance_profile_policies = local.ec2_common_managed_policies
   key_name                  = aws_key_pair.ec2-user.key_name
 
-  application_name = local.application_name
-  business_unit    = local.vpc_name
-  environment      = local.environment
-  subnet_set       = local.subnet_set
-  tags             = merge(local.tags, try(each.value.tags, {}))
-  branch           = var.BRANCH_NAME
-  ansible_repo     = try(each.value.ansible_repo, null)
+  application_name     = local.application_name
+  business_unit        = local.vpc_name
+  environment          = local.environment
+  subnet_set           = local.subnet_set
+  tags                 = merge(local.tags, try(each.value.tags, {}))
+  branch               = var.BRANCH_NAME
+  ansible_repo         = lookup(each.value, "ansible_repo", "modernisation-platform-environments")
+  ansible_repo_basedir = lookup(each.value, "ansible_repo_basedir", "terraform/environments/nomis/ansible")
 }
 #------------------------------------------------------------------------------
 # Security Group for Test Instances
