@@ -15,7 +15,7 @@ resource "aws_cloudwatch_dashboard" "mlra" {
         "stat": "Average",
         "region": "${local.application_data.accounts[local.environment].region}"
         "annotations": {
-          "alarms": ["arn:aws:cloudwatch:${AWS::Region}:${AWS::AccountId}:alarm:${ApplicationELB5xxError}"]
+          "alarms": #[module.<marks_module>.<output_name]
         } 
         "view": "timeSeries"
         "stacked": false
@@ -33,6 +33,9 @@ resource "aws_cloudwatch_dashboard" "mlra" {
       "properties": {
         "period": 60,
         "stat": "Average",
+        "annotations": {
+          "alarms": #[module.<marks_module>.<output_name]
+        } 
         "region": "${local.application_data.accounts[local.environment].region}",
         "view": "timeSeries"
         "stacked": false
@@ -48,9 +51,12 @@ resource "aws_cloudwatch_dashboard" "mlra" {
       "properties": {
         "period": 300,
         "stat": "Average",
+        "annotations": {
+          "alarms": #[module.<marks_module>.<output_name]
+        }, 
         "region": "${local.application_data.accounts[local.environment].region}",
-        "view": "timeSeries"
-        "stacked": false
+        "view": "timeSeries",
+        "stacked": "false",
         "title": "Application ELB Target Response Time"
       },
       {
@@ -62,6 +68,9 @@ resource "aws_cloudwatch_dashboard" "mlra" {
       "properties": {
         "period": 300,
         "stat": "Average",
+        "annotations": {
+          "alarms": #[module.<marks_module>.<output_name]
+        }, 
         "region": "${local.application_data.accounts[local.environment].region}}",
         "view": "timeSeries"
         "stacked": false
@@ -80,6 +89,9 @@ resource "aws_cloudwatch_dashboard" "mlra" {
         ],
         "period": 300,
         "stat": "Average",
+        "annotations": {
+          "alarms": #[module.<marks_module>.<output_name]
+        } ,
         "region": "${local.application_data.accounts[local.environment].region}",
         "view": "timeSeries"
         "stacked": false
@@ -90,4 +102,5 @@ resource "aws_cloudwatch_dashboard" "mlra" {
   ]
 }
 EOF
-}
+}  
+
