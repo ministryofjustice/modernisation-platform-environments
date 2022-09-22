@@ -43,7 +43,7 @@ resource "aws_lb" "external" {
   security_groups = [aws_security_group.example_load_balancer_sg.id]
 
   access_logs {
-    bucket  = aws_s3_bucket.lb_logs.bucket
+    bucket  = "example-bucket"
     prefix  = "test-lb"
     enabled = true
   }
@@ -100,7 +100,7 @@ resource "aws_lb_listener" "external" {
   port              = local.application_data.accounts[local.environment].server_port
   protocol          = local.application_data.accounts[local.environment].lb_listener_protocol
   #checkov:skip=CKV_AWS_2: "protocol for lb set in application_variables"
-  ssl_policy = local.application_data.accounts[local.environment].lb_ssl_policy
+  ssl_policy = "ELBSecurityPolicy-2016-08"
   #checkov:skip=CKV_AWS_103: "ssl_policy for lb set in application_variables"
 
   default_action {
