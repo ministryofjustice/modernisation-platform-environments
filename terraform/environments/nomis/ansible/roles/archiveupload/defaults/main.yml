@@ -1,0 +1,4 @@
+---
+# defaults file for archiveupload
+audit_host_source_dir: /u02/audit_db/datapump
+audit_upload_bucket_prefix: audit_backups
