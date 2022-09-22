@@ -34,14 +34,6 @@ provider "aws" {
   }
 }
 
-provider "aws" {
-  alias  = "bucket-replication"
-  region = "eu-west-1"
-  assume_role {
-    role_arn = "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/MemberInfrastructureAccess"
-  }
-}
-
 ######################### Run Terraform via CICD ##################################
 
 
