@@ -1,7 +1,7 @@
 module "lb-access-logs-enabled" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer"
   providers = {
-    aws.bucket-replication = aws.bucket-replication
+    aws.bucket-replication = aws
   }
 
   vpc_all = local.vpc_all
