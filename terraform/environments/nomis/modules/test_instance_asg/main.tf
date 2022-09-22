@@ -35,8 +35,9 @@ data "aws_subnets" "this" {
 
 locals {
   ansible_script_args = {
-    branch       = var.branch == "" ? "main" : var.branch
-    ansible_repo = var.ansible_repo == null ? "" : var.ansible_repo
+    branch               = var.branch == "" ? "main" : var.branch
+    ansible_repo         = var.ansible_repo == null ? "" : var.ansible_repo
+    ansible_repo_basedir = var.ansible_repo_basedir == null ? "" : var.ansible_repo_basedir
   }
   ansible_script = templatefile("${path.module}/user_data/ansible.sh.tftpl", local.ansible_script_args)
 }

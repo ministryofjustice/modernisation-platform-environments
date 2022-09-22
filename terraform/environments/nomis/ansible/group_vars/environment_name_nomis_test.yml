@@ -1,0 +1,2 @@
+---
+ansible_aws_ssm_bucket_name: s3-bucket20210929163229537900000001 # for some reason you need to specify a bucket

@@ -1,0 +1,57 @@
+---
+# Generic site.yml that deploys the appropriate set of roles for each
+# host.
+#
+# Define a "roles_list" variable for each host containing the roles
+# to run against that host.  Since the same roles typically
+# run on the same component, and we are using dynamic inventory with
+# tagging, define the "roles_list" variable in group_vars.
+#
+# For example, for a NOMIS database, define a roles_list variable in
+#
+# group_vars/server_type_db_nomis.yml
+# ---
+# roles_list:
+#  - time
+#  - hugepages
+#  - oracle
+#
+# Example usage:
+#
+#   # Run all relevant roles against all hosts in check mode
+#   ansible-playbook site.yml --check
+#
+#   # Run a subset of roles
+#   ansible-playbook site.yml -e role=time,hugepages
+#
+#   # Limit the hosts (2 ways of doing this)
+#   ansible-playbook site.yml --limit db-nomis
+#   ansible-playbook site.yml -e target=localhost
+
+- hosts: "{{ target | default('all') }}"
+  tasks:
+    - name: Set roles_defined fact
+      set_fact:
+        # These are roles_list defined in inventory. Default is empty list.
+        roles_defined: "{{ roles_list | default([]) }}"
+
+    # The actual roles to run is intersection of requested role arg and roles_defined.
+    # Special value "all" in role parameter means to run all defined roles.
+    - name: Set roles_to_run fact
+      set_fact:
+        roles_to_run: |
+          {% if role is not defined or role == "all" %}
+          {# all defined roles #}
+          {{ roles_defined }}
+          {% elif role is defined and not role == "" %}
+          {{ role.split(",") | map("trim") | intersect(roles_defined) }}
+          {% else %}
+          []
+          {% endif %}
+
+    - name: Execute roles
+      include_role:
+        name: "{{ role_to_run }}"
+      with_items: "{{ roles_to_run }}"
+      loop_control:
+        loop_var: role_to_run

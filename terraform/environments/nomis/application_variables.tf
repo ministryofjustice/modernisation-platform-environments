@@ -119,6 +119,16 @@ locals {
             monitored = false
           }
         }
+        RHEL79BASE = {
+          always_on     = false
+          ami_name      = "nomis_rhel_7_9_baseimage*"
+          description   = "Test instance for RHEL7.9 base image"
+          instance_type = "t2.medium"
+          tags = {
+            monitored   = false
+            server-type = "base"
+          }
+        }
       }
     },
     production = {
