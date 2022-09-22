@@ -214,8 +214,6 @@ module "s3_demo_bucket" {
 
 }
 
-
-
 # S3 Glue Jobs
 module "s3_glue_jobs_bucket" {
   count  = local.create_bucket ? 1 : 0

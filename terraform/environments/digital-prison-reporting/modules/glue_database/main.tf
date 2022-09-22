@@ -30,6 +30,7 @@ data "aws_iam_policy_document" "glue-example-policy" {
       "glue:DeleteTable",
       "glue:CreateSchema",
       "glue:DeleteSchema",
+      "glue:UpdateTable",      
     ]
     resources = ["arn:aws:glue:${var.aws_region}:${var.aws_account_id}:*"]
     principals {
