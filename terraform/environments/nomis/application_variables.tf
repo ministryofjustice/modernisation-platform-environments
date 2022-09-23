@@ -84,22 +84,22 @@ locals {
             monitored = false
           }
         },
-        # TEST_DB_SZYMON = {
-        #   always_on              = false
-        #   ami_name               = "nomis_rhel_7_9_oracledb_11_2*"
-        #   asm_data_capacity      = 50
-        #   asm_flash_capacity     = 10
-        #   description            = "Test instance for the database ami"
-        #   termination_protection = false
-        #   oracle_sids            = ["T1CNMAUD"]
-        #   oracle_app_disk_size = {
-        #     "/dev/sdb" = 100 # /u01
-        #     "/dev/sdc" = 100 # /u02
-        #   }
-        #   tags = {
-        #     monitored = false
-        #   }
-        # },
+        TEST_DB_SZYMON = {
+          always_on              = false
+          ami_name               = "nomis_rhel_7_9_oracledb_11_2*"
+          asm_data_capacity      = 50
+          asm_flash_capacity     = 10
+          description            = "Test instance for the database ami"
+          termination_protection = false
+          #oracle_sids            = ["T1CNMAUD"]
+          oracle_app_disk_size = {
+            "/dev/sdb" = 100 # /u01
+            "/dev/sdc" = 100 # /u02
+          }
+          tags = {
+            monitored = false
+          }
+        },
       },
       # Add weblogic instances here.  They will be created using the weblogic module
       weblogics = {
