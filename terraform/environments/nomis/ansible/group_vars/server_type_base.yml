@@ -1,0 +1,4 @@
+---
+ansible_python_interpreter: /usr/local/bin/python3.9
+roles_list:
+  - get-ec2-facts
