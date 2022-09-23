@@ -97,7 +97,7 @@ locals {
             "/dev/sdc" = 100 # /u02
           }
           tags = {
-            monitored = false
+            monitored = true
           }
         },
       },
