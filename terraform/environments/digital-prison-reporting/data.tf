@@ -136,3 +136,8 @@ data "terraform_remote_state" "core_network_services" {
     encrypt = "true"
   }
 }
+
+# KMS Key ID for Kinesis Stream
+data "aws_kms_key" "kinesis_kms_key" {
+  key_id = aws_kms_key.kinesis-kms-key.arn
+}
