@@ -1,0 +1,4 @@
+ansible_connection: community.aws.aws_ssm
+ssm_timeout: 2000
+ansible_aws_ssm_region: eu-west-2
+instance_id: "{{ hostvars[inventory_hostname].instance_id }}" # for scenarios where {{ ansible_host }} is set to the ip address rather than instance_id

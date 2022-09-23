@@ -1,14 +1,14 @@
 #------------------------------------------------------------------------------
-# Base Instance
+# test Instance
 #------------------------------------------------------------------------------
-module "base_instance_asg" {
-  source = "./modules/base_instance_asg"
+module "test_instance_asg" {
+  source = "./modules/test_instance_asg"
 
   providers = {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
   }
 
-  for_each = local.accounts[local.environment].base_instances_asg
+  for_each = local.accounts[local.environment].test_instances_asg
 
   name = each.key
 
@@ -20,24 +20,27 @@ module "base_instance_asg" {
   extra_ingress_rules = try(each.value.extra_ingress_rules, null)
   instance_type       = try(each.value.instance_type, null)
 
-  common_security_group_id  = aws_security_group.base_instance_common.id
+  common_security_group_id  = aws_security_group.test_instance_common.id
   instance_profile_policies = local.ec2_common_managed_policies
   key_name                  = aws_key_pair.ec2-user.key_name
 
-  application_name = local.application_name
-  business_unit    = local.vpc_name
-  environment      = local.environment
-  subnet_set       = local.subnet_set
-  tags             = merge(local.tags, try(each.value.tags, {}))
+  application_name     = local.application_name
+  business_unit        = local.vpc_name
+  environment          = local.environment
+  subnet_set           = local.subnet_set
+  tags                 = merge(local.tags, try(each.value.tags, {}))
+  branch               = var.BRANCH_NAME
+  ansible_repo         = lookup(each.value, "ansible_repo", "modernisation-platform-environments")
+  ansible_repo_basedir = lookup(each.value, "ansible_repo_basedir", "terraform/environments/nomis/ansible")
 }
 #------------------------------------------------------------------------------
-# Security Group for Base Instances
+# Security Group for Test Instances
 #------------------------------------------------------------------------------
 
-resource "aws_security_group" "base_instance_common" {
+resource "aws_security_group" "test_instance_common" {
   #checkov:skip=CKV2_AWS_5:skip "Ensure that Security Groups are attached to another resource" - attached in nomis-stack module
-  description = "Security group for base instances"
-  name        = "base_instance-common"
+  description = "Security group for test instances"
+  name        = "test_instance-common"
   vpc_id      = data.aws_vpc.shared_vpc.id
 
   ingress {
@@ -76,7 +79,7 @@ resource "aws_security_group" "base_instance_common" {
   tags = merge(
     local.tags,
     {
-      Name = "base_instance-common"
+      Name = "test_instance-common"
     }
   )
 }

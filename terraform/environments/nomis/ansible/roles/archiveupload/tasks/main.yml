@@ -1,0 +1,44 @@
+---
+# tasks file for archiveupload
+- name: Run auditupload.yml
+  block:
+    - name: Check Variables
+      fail:
+        msg: "Variable {{item}} not defined"
+      when: item is not defined
+      with_items:
+        - audit_upload_bucket
+        - audit_upload_bucket_prefix
+        - audit_host_source_dir
+
+- name: Check aws cli is installed
+  shell: aws --version 2>/dev/null || echo 'false'
+  args:
+    warn: false
+  register: aws_installed
+  check_mode: no
+  changed_when: no
+  tags:
+    - check-aws-cli
+
+- name: Fail when aws cli is not installed
+  fail:
+    msg: "AWS CLI is not installed or is not in found in path"
+  when: aws_installed.stdout is search('false')
+
+- name: Create audit dump host directory
+  file:
+    path: "{{ audit_host_source_dir }}"
+    state: directory
+    owner: oracle
+    group: oinstall
+    mode: "0755"
+
+- name: Sync directory contents to S3
+  community.aws.s3_sync:
+    bucket: "{{ audit_upload_bucket }}"
+    file_root: "{{ audit_host_source_dir }}"
+    key_prefix: "{{ audit_upload_bucket_prefix }}"
+    file_change_strategy: date_size
+    permission: bucket-owner-full-control
+    include: "*"

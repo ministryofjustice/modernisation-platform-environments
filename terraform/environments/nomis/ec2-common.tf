@@ -2,6 +2,7 @@
 # Common IAM policies for all ec2 instance profiles
 #------------------------------------------------------------------------------
 resource "aws_kms_grant" "ssm-start-stop-shared-cmk-grant" {
+  count             = local.environment == "test" ? 1 : 0
   name              = "image-builder-shared-cmk-grant"
   key_id            = data.aws_kms_key.hmpps_key.arn
   grantee_principal = aws_iam_role.ssm_ec2_start_stop.arn
@@ -404,6 +405,7 @@ resource "aws_ssm_association" "script-exporter" {
   }
 }
 
+
 #------------------------------------------------------------------------------
 # Oracle Secure Web - Install Oracle Secure Web s3 Backup Module
 #------------------------------------------------------------------------------
@@ -437,6 +439,7 @@ resource "aws_ssm_document" "oracle_secure_web" {
 #     values = ["oracle_sids"]
 #   }
 # }
+
 
 # TODO: Temporarily disable automatic provisioning while performing DR tests.
 
@@ -490,6 +493,42 @@ resource "aws_ssm_association" "ec2_scheduled_stop" {
   schedule_expression         = "cron(0 19 ? * ${each.value} *)"
 }
 
+data "aws_iam_policy_document" "ssm_ec2_start_stop_kms" {
+  statement {
+    sid    = "manageSharedAMIsEncryptedEBSVolumes"
+    effect = "Allow"
+    #tfsec:ignore:aws-iam-no-policy-wildcards
+    actions = [
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:ReEncrypt*",
+      "kms:ReEncryptFrom",
+      "kms:GenerateDataKey*",
+      "kms:DescribeKey",
+      "kms:CreateGrant",
+      "kms:ListGrants",
+      "kms:RevokeGrant"
+    ]
+    # we have a legacy CMK that's used in production that will be retired but in the meantime requires permissions
+    resources = [local.environment == "test" ? aws_kms_key.nomis-cmk[0].arn : data.aws_kms_key.nomis_key.arn, data.aws_kms_key.hmpps_key.arn]
+  }
+
+  statement {
+    sid    = "modifyAautoscalingGroupProcesses"
+    effect = "Allow"
+
+    actions = [
+      "autoscaling:SuspendProcesses",
+      "autoscaling:ResumeProcesses",
+      "autoscaling:DescribeAutoScalingGroups",
+    ]
+    #this role manages all the autoscaling groups in an account
+    #checkov:skip=CKV_AWS_111: "Ensure IAM policies does not allow write access without constraints"
+    #checkov:skip=CKV_AWS_109: "Ensure IAM policies does not allow permissions management / resource exposure without constraints"
+    resources = ["*"] #tfsec:ignore:aws-iam-no-policy-wildcards
+  }
+}
+
 resource "aws_iam_role" "ssm_ec2_start_stop" {
   name                 = "ssm-ec2-start-stop"
   path                 = "/"
@@ -513,6 +552,13 @@ resource "aws_iam_role" "ssm_ec2_start_stop" {
     "arn:aws:iam::aws:policy/service-role/AmazonSSMAutomationRole"
     # todo: This policy gives a lot of permissions. We should create a custom policy if we keep the solution long term
   ]
+  inline_policy {
+
+    name   = "ssm-ec2-start-stop-kms"
+    policy = data.aws_iam_policy_document.ssm_ec2_start_stop_kms.json
+
+  }
+
   tags = merge(
     local.tags,
     {
