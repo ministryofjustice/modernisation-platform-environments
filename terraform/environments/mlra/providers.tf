@@ -40,11 +40,11 @@ provider "aws" {
 ######################### Run Terraform Plan Locally Only ##################################
 # To run a Terraform Plan locally, uncomment this bottom section of code and comment out the top section
 
-provider "aws" {
-  region = "eu-west-2"
-}
+# provider "aws" {
+#   region = "eu-west-2"
+# }
 
-# AWS provider for core-vpc-<environment>, to share VPCs into this account
+## AWS provider for core-vpc-<environment>, to share VPCs into this account
 # provider "aws" {
 #   alias  = "core-vpc"
 #   region = "eu-west-2"
