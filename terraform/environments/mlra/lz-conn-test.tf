@@ -11,7 +11,7 @@ module "ec2_instance" {
   source  = "terraform-aws-modules/ec2-instance/aws"
   version = "~> 4.1.4"
 
-  name = "instance-${each.key}"
+  name = "mikereidhttptest"
 
   ami                    = "ami-06672d07f62285d1d"
   instance_type          = "t2.micro"
@@ -28,6 +28,7 @@ module "ec2_instance" {
 
 module "mikereidhttptest_sg" {
   source = "terraform-aws-modules/security-group/aws"
+  version = "~> 4.1.4"
 
   name        = "mikereidhttptest-sg"
   description = "Security group for TG connectivity testing between LAA LZ & MP"
