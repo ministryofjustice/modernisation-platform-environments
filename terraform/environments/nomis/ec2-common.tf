@@ -341,14 +341,14 @@ resource "aws_ssm_document" "node_exporter_linux" {
   )
 }
 
-# resource "aws_ssm_association" "node_exporter_linux" {
-#   name             = aws_ssm_document.node_exporter_linux.name
-#   association_name = "node-exporter-linux"
-#   targets {
-#     key    = "tag:os_type"
-#     values = ["Linux"]
-#   }
-# }
+resource "aws_ssm_association" "node_exporter_linux" {
+  name             = aws_ssm_document.node_exporter_linux.name
+  association_name = "node-exporter-linux"
+  targets {
+    key    = "tag:os_type"
+    values = ["Linux"]
+  }
+}
 
 data "template_file" "node_exporter_windows_install_template" {
   template = file("${path.module}/ssm-documents/templates/node-exporter-windows.json.tmpl")
@@ -396,14 +396,14 @@ resource "aws_ssm_document" "script_exporter" {
   )
 }
 
-# resource "aws_ssm_association" "script-exporter" {
-#   name             = aws_ssm_document.script_exporter.name
-#   association_name = "install-and-manage-script-exporter"
-#   targets {
-#     key    = "tag-key"
-#     values = ["oracle_sids"]
-#   }
-# }
+resource "aws_ssm_association" "script-exporter" {
+  name             = aws_ssm_document.script_exporter.name
+  association_name = "install-and-manage-script-exporter"
+  targets {
+    key    = "tag-key"
+    values = ["oracle_sids"]
+  }
+}
 
 
 #------------------------------------------------------------------------------
