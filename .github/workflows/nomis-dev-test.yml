@@ -8,6 +8,7 @@ on:
     paths:
       - 'terraform/environments/nomis/**'
       - '.github/workflows/nomis-dev-test.yml'
+    workflow_dispatch:
 
 env:
   AWS_ACCESS_KEY_ID:  ${{ secrets.AWS_ACCESS_KEY_ID }}
