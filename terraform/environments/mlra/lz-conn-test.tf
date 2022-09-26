@@ -27,7 +27,7 @@ module "ec2_instance" {
 
 
 module "mikereidhttptest_sg" {
-  source = "terraform-aws-modules/security-group/aws"
+  source  = "terraform-aws-modules/security-group/aws"
   version = "~> 4.1.4"
 
   name        = "mikereidhttptest-sg"
