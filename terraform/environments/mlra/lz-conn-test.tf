@@ -15,7 +15,7 @@ module "ec2_instance" {
 
   ami                   = "ami-06672d07f62285d1d"
   instance_type         = "t2.micro"
-  vpc_security_group_ids = [mikereidhttptest_sg.security_group_id]
+  vpc_security_group_ids = [module.mikereidhttptest_sg.security_group_id]
   subnet_id             = "subnet-06594eda5221bd3c9"
   user_data_base64      = base64encode(local.instance-userdata)
 
@@ -40,7 +40,7 @@ module "mikereidhttptest_sg" {
       to_port     = 80
       protocol    = "tcp"
       description = "HTTP"
-      cidr_blocks = "10.200.0.0/16"
+      cidr_blocks = "10.200.0.0/20"
     }
   ]
 }
