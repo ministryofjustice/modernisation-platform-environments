@@ -33,7 +33,6 @@ provider "aws" {
     role_arn = "arn:aws:iam::${local.environment_management.account_ids["core-network-services-production"]}:role/modify-dns-records"
   }
 }
-
 ######################### Run Terraform via CICD ##################################
 
 
@@ -44,7 +43,7 @@ provider "aws" {
 #   region = "eu-west-2"
 # }
 
-## AWS provider for core-vpc-<environment>, to share VPCs into this account
+# # AWS provider for core-vpc-<environment>, to share VPCs into this account
 # provider "aws" {
 #   alias  = "core-vpc"
 #   region = "eu-west-2"
