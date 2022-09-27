@@ -37,7 +37,15 @@ module "mikereidhttptest_sg" {
   vpc_id      = "vpc-06febffe7b87ab37f"
 
 
-  egress_cidr_blocks = ["0.0.0.0/0"]
+  egress_with_cidr_blocks = [
+    {
+      from_port   = 0
+      to_port     = 65535
+      protocol    = "tcp"
+      description = "Outgoing"
+      cidr_blocks = "0.0.0.0/0"
+    }
+  ]
 
   ingress_with_cidr_blocks = [
     {
