@@ -132,7 +132,7 @@ resource "random_password" "this" {
 resource "aws_ssm_parameter" "this" {
   for_each = var.ssm_parameters
 
-  name        = "/${var.ssm_parameters_prefix}${var.name}/each.key"
+  name        = "/${var.ssm_parameters_prefix}${var.name}/${each.key}"
   description = each.value.description
   type        = "SecureString"
   value       = random_password.this[each.key].result
