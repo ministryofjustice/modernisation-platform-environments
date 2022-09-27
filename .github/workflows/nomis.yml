@@ -1,5 +1,5 @@
 ---
-name: nomis-dev-test
+name: nomis
 on:
   push:
     branches:
