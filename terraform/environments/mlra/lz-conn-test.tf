@@ -36,8 +36,8 @@ module "mikereidhttptest_sg" {
 
   ingress_rules = [
     {
-      from_port   = 80
-      to_port     = 80
+      from_port   = "80"
+      to_port     = "80"
       protocol    = "tcp"
       description = "HTTP"
       cidr_blocks = "10.200.0.0/20"
