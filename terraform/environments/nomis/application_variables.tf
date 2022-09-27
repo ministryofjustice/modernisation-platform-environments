@@ -108,26 +108,26 @@ locals {
       },
 
       databases = {
-        #        t1-db-audit = {
-        #          tags = {
-        #            description = "Test NOMIS Audit database replicating with T1PDL0010"
-        #            oracle-sids = "T1CNMAUD"
-        #            monitored   = false
-        #            always-on   = true
-        #          }
-        #          ami_name = "nomis_rhel_7_9_oracledb_11_2*"
-        #          instance = {
-        #            disable_api_termination = true
-        #          }
-        #          ebs_volume_config = {
-        #            data = {
-        #              total_size = 200
-        #            }
-        #            flash = {
-        #              total_size = 2
-        #            }
-        #          }
-        #        }
+        t1-db-audit = {
+          tags = {
+            description = "Test NOMIS Audit database replicating with T1PDL0010"
+            oracle-sids = "T1CNMAUD"
+            monitored   = false
+            always-on   = true
+          }
+          ami_name = "nomis_rhel_7_9_oracledb_11_2*"
+          instance = {
+            disable_api_termination = true
+          }
+          ebs_volume_config = {
+            data = {
+              total_size = 200
+            }
+            flash = {
+              total_size = 2
+            }
+          }
+        }
       }
 
       # Add weblogic instances here.  They will be created using the weblogic module
