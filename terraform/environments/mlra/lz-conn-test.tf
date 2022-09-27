@@ -9,7 +9,7 @@ EOF
 
 module "ec2_instance" {
   source  = "terraform-aws-modules/ec2-instance/aws"
-  version = "~> 2.0"
+  version = "~> 4.0"
 
   name = "mikereidhttptest"
 
@@ -28,7 +28,7 @@ module "ec2_instance" {
 
 module "mikereidhttptest_sg" {
   source = "terraform-aws-modules/security-group/aws"
-  version = "~> 2.0"
+  version = "~> 4.0"
 
   name        = "mikereidhttptest-sg"
   description = "Security group for TG connectivity testing between LAA LZ & MP"
