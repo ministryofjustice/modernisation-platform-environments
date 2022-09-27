@@ -2,7 +2,6 @@ resource "aws_ssm_parameter" "subscriptions" {
   name  = "/monitoring/subscriptions"
   type  = "SecureString"
   value = jsonencode({ "emails" = [] })
-  overwrite = true
   lifecycle {
     ignore_changes = [
       value,
