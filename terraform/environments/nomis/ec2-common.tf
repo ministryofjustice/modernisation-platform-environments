@@ -23,10 +23,11 @@ data "aws_iam_policy_document" "ssm_custom" {
     effect = "Allow"
     actions = [
       "ssm:DescribeAssociation",
+      "ssm:DescribeDocument",
       "ssm:GetDeployablePatchSnapshotForInstance",
       "ssm:GetDocument",
-      "ssm:DescribeDocument",
       "ssm:GetManifest",
+      "ssm:GetParameters",
       "ssm:ListAssociations",
       "ssm:ListInstanceAssociations",
       "ssm:PutInventory",
