@@ -46,8 +46,15 @@ provider "aws" {
 
 
 ######################### Run Terraform Plan Locally Only ##################################
-# To run a Terraform Plan locally, uncomment this bottom section of code and comment out the top section
 
+# # To run a Terraform Plan locally, uncomment this bottom section of code and comment out the top section
+
+# # AWS provider for the workspace you're working in (every resource will default to using this, unless otherwise specified)
+
+# provider "aws" {
+#   alias  = "oidc-session"
+#   region = "eu-west-2"
+# }
 # provider "aws" {
 #   region = "eu-west-2"
 # }
@@ -71,6 +78,16 @@ provider "aws" {
 
 #   assume_role {
 #     role_arn = "arn:aws:iam::${local.environment_management.account_ids["core-network-services-production"]}:role/read-dns-records"
+#   }
+# }
+
+# # # AWS provider for the Modernisation Platform, to get things from there if required
+# provider "aws" {
+#   alias                  = "modernisation-platform"
+#   region                 = "eu-west-2"
+#   skip_get_ec2_platforms = true
+#   assume_role {
+#     role_arn = "arn:aws:iam::${local.modernisation_platform_account_id}:role/githubReadOnly"
 #   }
 # }
 ######################### Run Terraform Plan Locally Only ##################################
