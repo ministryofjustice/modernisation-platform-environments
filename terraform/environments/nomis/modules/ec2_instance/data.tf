@@ -56,3 +56,10 @@ data "template_file" "user_data" {
     ansible_repo_basedir = var.ansible_repo_basedir == null ? "" : var.ansible_repo_basedir
   }
 }
+
+data "cloudinit_config" "this" {
+  part {
+    content_type = "text/x-shellscript"
+    content      = data.template_file.user_data.rendered
+  }
+}
