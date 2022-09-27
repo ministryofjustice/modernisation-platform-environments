@@ -18,7 +18,7 @@ provider "aws" {
   region                 = "eu-west-2"
   skip_get_ec2_platforms = true
   assume_role {
-    role_arn = "arn:aws:iam::${local.modernisation_platform_account_id}:role/githubReadOnly"
+    role_arn = "arn:aws:iam::${local.modernisation_platform_account_id}:role/modernisation-account-limited-read-member-access"
   }
 }
 
@@ -62,7 +62,7 @@ provider "aws" {
 #   region                 = "eu-west-2"
 #   skip_get_ec2_platforms = true
 #   assume_role {
-#     role_arn = "arn:aws:iam::${local.modernisation_platform_account_id}:role/githubReadOnly"
+#     role_arn = "arn:aws:iam::${local.modernisation_platform_account_id}:role/modernisation-account-limited-read-member-access"
 #   }
 # }
 
