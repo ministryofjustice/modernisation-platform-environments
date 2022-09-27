@@ -110,7 +110,7 @@ locals {
       databases = {
         t1-db-audit = {
           tags = {
-            description = "Copy of Test NOMIS Audit database in Azure T1PDL0010, replicating with T1PDL0010."
+            description = "Test NOMIS Audit database replicating with T1PDL0010"
             oracle-sids = "T1CNMAUD"
             monitored   = false
             always-on   = true
