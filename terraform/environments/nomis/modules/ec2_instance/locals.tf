@@ -21,7 +21,7 @@ locals {
     key => value if key != data.aws_ami.this.root_device_name
   }
 
-  ebs_volume_labels = distinct([ for key, value in var.ebs_volumes : value.label ])
+  ebs_volume_labels = distinct([for key, value in var.ebs_volumes : value.label])
 
   ebs_volume_count = {
     for label in local.ebs_volume_labels :

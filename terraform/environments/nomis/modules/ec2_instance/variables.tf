@@ -110,7 +110,7 @@ variable "ebs_volume_config" {
 
 variable "ebs_volumes" {
   description = "EC2 volumes, see aws_ebs_volume for documentation.  key=volume name, value=ebs_volume_config key"
-  type        = map(object({
+  type = map(object({
     label = optional(string)
   }))
 }
@@ -129,9 +129,9 @@ variable "instance_profile_policies" {
 }
 
 variable "ssm_parameters_prefix" {
-  type = string
+  type        = string
   description = "Optionally prefix ssm parameters with this prefix.  Add a trailing /"
-  default = ""
+  default     = ""
 }
 
 variable "ssm_parameters" {
