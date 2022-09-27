@@ -15,6 +15,7 @@ module "lb-access-logs-enabled" {
   region                     = local.application_data.accounts[local.environment].region
   enable_deletion_protection = false
   idle_timeout               = 60
+  force_destroy_bucket       = true
 }
 
 locals {
@@ -52,6 +53,7 @@ resource "aws_lb_listener" "alb_listener" {
   load_balancer_arn = module.lb-access-logs-enabled.load_balancer.arn
   port              = "443"
   protocol          = "HTTP"
+  #TODO_CHANGE_TO_HTTPS
   #ssl_policy        = "ELBSecurityPolicy-2016-08"
   #certificate_arn   = "arn:aws:iam::187416307283:server-certificate/test_cert_rab3wuqwgja25ct3n4jdj2tzu4"
 
@@ -62,7 +64,7 @@ resource "aws_lb_listener" "alb_listener" {
 }
 
 resource "aws_lb_target_group" "alb_target_group" {
-  name = "mlra-arget-group"
+  name = "mlra-target-group"
   #target_type = "alb"
   port     = 80
   protocol = "HTTP"
