@@ -40,7 +40,7 @@ module "mikereidhttptest_sg" {
       to_port     = 80
       protocol    = "tcp"
       description = "HTTP"
-      cidr_blocks = "10.200.0.0/16"
+      cidr_blocks = "10.202.0.0/16"
     }
   ]
 }
