@@ -36,6 +36,9 @@ module "mikereidhttptest_sg" {
   description = "Security group for TG connectivity testing between LAA LZ & MP"
   vpc_id      = "vpc-06febffe7b87ab37f"
 
+
+  egress_cidr_blocks = ["0.0.0.0/0"]
+
   ingress_with_cidr_blocks = [
     {
       from_port   = 80
