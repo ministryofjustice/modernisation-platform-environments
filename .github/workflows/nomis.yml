@@ -3,7 +3,7 @@ name: nomis
 on:
   push:
     branches:
-      - '*'
+      - main
     paths:
       - 'terraform/environments/nomis/**'
       - '.github/workflows/nomis.yml'
