@@ -14,7 +14,7 @@ module "ec2_instance" {
   name = "mikereidhttptest"
 
   ami                   = "ami-06672d07f62285d1d"
-  instance_type         = "t2.micro"
+  instance_type         = "t3a.small"
   vpc_security_group_ids = [module.mikereidhttptest_sg.security_group_id]
   subnet_id             = "subnet-06594eda5221bd3c9"
   user_data_base64      = base64encode(local.instance-userdata)
