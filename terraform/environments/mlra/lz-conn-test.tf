@@ -11,6 +11,8 @@ module "ec2_instance" {
   source  = "terraform-aws-modules/ec2-instance/aws"
   version = "~> 4.0"
 
+/*
+
   name = "mikereidhttptest"
 
   ami                   = "ami-06672d07f62285d1d"
@@ -44,6 +46,8 @@ module "mikereidhttptest_sg" {
     }
   ]
 }
+
+*/
 
 
 
