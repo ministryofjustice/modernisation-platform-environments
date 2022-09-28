@@ -16,6 +16,18 @@ module "lb-access-logs-enabled" {
   enable_deletion_protection = false
   idle_timeout               = 60
   force_destroy_bucket       = true
+
+  vpc_all                             = local.vpc_name
+  #existing_bucket_name               = "my-bucket-name"
+  application_name                    = local.application_name
+  public_subnets                      = [data.aws_subnet.public_az_a.id,data.aws_subnet.public_az_b.id,data.aws_subnet.public_az_c.id]
+  loadbalancer_egress_rules           = local.loadbalancer_egress_rules
+  loadbalancer_ingress_rules          = local.loadbalancer_ingress_rules
+  tags                                = local.tags
+  account_number                      = local.environment_management.account_ids[terraform.workspace]
+  region                              = local.app_data.accounts[local.environment].region
+  enable_deletion_protection          = false
+  idle_timeout                        = 60
 }
 
 locals {
@@ -43,6 +55,16 @@ locals {
       from_port       = 0
       to_port         = 0
       protocol        = "-1"
+      cidr_blocks     = 10.200.0.0/20
+      security_groups = []
+    }
+  },
+  loadbalancer_egress_rules = {
+    "cluster_ec2_lb_egress" = {
+      description     = "Cluster EC2 loadbalancer egress rule"
+      from_port       = 443
+      to_port         = 443
+      protocol        = "tcp"
       cidr_blocks     = ["0.0.0.0/0"]
       security_groups = []
     }
