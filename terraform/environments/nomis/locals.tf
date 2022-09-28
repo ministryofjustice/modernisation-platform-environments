@@ -29,6 +29,7 @@ locals {
   is-development   = substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-development"
 
   # Merge tags from the environment json file with additional ones
+  # The environment file contains application, business-unit, infrastructure-support and owner tags
   tags = merge(
     jsondecode(data.http.environments_file.response_body).tags,
     { "is-production" = local.is-production },
@@ -50,7 +51,8 @@ locals {
   # application_data = jsondecode(file("./application_variables.json"))
   # application_data = fileexists("./application_variables.json") ? jsondecode(file("./application_variables.json")) : {}
 
-  region = "eu-west-2"
+  region            = "eu-west-2"
+  availability_zone = "eu-west-2a"
 }
 
 # This account id
