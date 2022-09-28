@@ -34,7 +34,7 @@ data "aws_ami" "jumpserver" {
 
   filter {
     name   = "name"
-    values = ["nomis_jumpserver_2022-06-21*"]
+    values = ["nomis_windows_server_2022_jumpserver*"]
   }
 
   filter {
