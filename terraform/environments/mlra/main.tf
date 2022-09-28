@@ -5,7 +5,6 @@ module "lb-access-logs-enabled" {
   }
 
   vpc_all = local.vpc_all
-  #existing_bucket_name               = "my-bucket-name"
   application_name           = local.application_name
   public_subnets             = [data.aws_subnet.public_subnets_a.id, data.aws_subnet.public_subnets_b.id, data.aws_subnet.public_subnets_c.id]
   loadbalancer_egress_rules  = local.loadbalancer_egress_rules
@@ -22,18 +21,10 @@ locals {
   loadbalancer_ingress_rules = {
     "cluster_ec2_lb_ingress" = {
       description     = "Cluster EC2 loadbalancer ingress rule"
-      from_port       = 32768
-      to_port         = 61000
+      from_port       = 443
+      to_port         = 443
       protocol        = "tcp"
-      cidr_blocks     = []
-      security_groups = []
-    },
-    "cluster_c2_bastion_ingress" = {
-      description     = "Cluster EC2 bastion ingress rule"
-      from_port       = 22
-      to_port         = 22
-      protocol        = "tcp"
-      cidr_blocks     = ["10.200.0.0/20"]
+      cidr_blocks     = [data.aws_vpc.shared.cidr_block]
       security_groups = []
     }
   }
@@ -53,9 +44,7 @@ resource "aws_lb_listener" "alb_listener" {
   load_balancer_arn = module.lb-access-logs-enabled.load_balancer.arn
   port              = "443"
   protocol          = "HTTP"
-  #TODO_CHANGE_TO_HTTPS
-  #ssl_policy        = "ELBSecurityPolicy-2016-08"
-  #certificate_arn   = "arn:aws:iam::187416307283:server-certificate/test_cert_rab3wuqwgja25ct3n4jdj2tzu4"
+  #TODO_CHANGE_TO_HTTPS_AND_CERTIFICATE_ARN_TOBE_ADDED
 
   default_action {
     type             = "forward"
@@ -64,8 +53,7 @@ resource "aws_lb_listener" "alb_listener" {
 }
 
 resource "aws_lb_target_group" "alb_target_group" {
-  name = "mlra-target-group"
-  #target_type = "alb"
+  name = "${local.application_name}-target-group"
   port     = 80
   protocol = "HTTP"
   vpc_id   = data.aws_vpc.shared.id
