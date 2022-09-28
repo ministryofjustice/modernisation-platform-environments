@@ -30,6 +30,7 @@ locals {
           retention_days = 90
         }
       },
+      databases_legacy   = {},
       databases          = {},
       weblogics          = {},
       base_instances_asg = {},
@@ -66,7 +67,7 @@ locals {
       },
 
       # Add database instances here.  They will be created using the database module
-      databases = {
+      databases_legacy = {
         CNOMT1 = {
           always_on          = false
           ami_name           = "nomis_db_STIG_CNOMT1-2022-04-21*"
@@ -105,6 +106,30 @@ locals {
           }
         },
       },
+
+      databases = {
+        # t1-db-audit = {
+        #   tags = {
+        #     description = "Test NOMIS Audit database replicating with T1PDL0010"
+        #     oracle-sids = "T1CNMAUD"
+        #     monitored   = false
+        #     always-on   = true
+        #   }
+        #   ami_name = "nomis_rhel_7_9_oracledb_11_2*"
+        #   instance = {
+        #     disable_api_termination = true
+        #   }
+        #   ebs_volume_config = {
+        #     data = {
+        #       total_size = 200
+        #     }
+        #     flash = {
+        #       total_size = 2
+        #     }
+        #   }
+        # }
+      }
+
       # Add weblogic instances here.  They will be created using the weblogic module
       weblogics = {
         CNOMT1 = {
@@ -165,6 +190,7 @@ locals {
           retention_days = 90
         }
       },
+      databases_legacy   = {},
       databases          = {},
       weblogics          = {},
       base_instances_asg = {},
@@ -205,7 +231,7 @@ locals {
         }
       },
       # Add database instances here. They will be created using the database module
-      databases = {
+      databases_legacy = {
         AUDIT = {
           always_on              = true
           ami_name               = "nomis_db_STIG-2022-04-26*"
@@ -277,6 +303,7 @@ locals {
           }
         }
       },
+      databases = {},
       # Add weblogic instances here.  They will be created using the weblogic module
       weblogics = {},
       # Add base instances here. They will be created using the base_instance module

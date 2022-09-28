@@ -1,0 +1,217 @@
+#------------------------------------------------------------------------------
+# EC2
+#------------------------------------------------------------------------------
+
+resource "aws_instance" "this" {
+  ami                         = data.aws_ami.this.id
+  associate_public_ip_address = false
+  disable_api_termination     = var.instance.disable_api_termination
+  ebs_optimized               = true
+  iam_instance_profile        = aws_iam_instance_profile.this.name
+  instance_type               = var.instance.instance_type
+  key_name                    = var.instance.key_name
+  monitoring                  = true
+  subnet_id                   = data.aws_subnet.this.id
+  user_data                   = var.instance.user_data != null ? var.instance.user_data : data.cloudinit_config.this.rendered
+  vpc_security_group_ids      = var.instance.vpc_security_group_ids
+
+  #checkov:skip=CKV_AWS_79:We are tied to v1 metadata service
+  metadata_options {
+    http_endpoint = "enabled"
+    #tfsec:ignore:aws-ec2-enforce-http-token-imds:the Oracle installer cannot accommodate a token
+    http_tokens = "optional"
+  }
+
+  root_block_device {
+    delete_on_termination = true
+    encrypted             = true
+    volume_size           = try(var.instance.root_block_device.volume_size, local.ami_block_device_mappings_root.ebs.volume_size)
+    volume_type           = local.ami_block_device_mappings_root.ebs.volume_type
+
+    tags = merge(local.tags, {
+      Name = join("-", [var.name, "root", local.ami_block_device_mappings_root.device_name])
+    })
+  }
+
+  # block devices specified inline cannot be resized later so remove them here
+  # and define as ebs_volumes later
+  dynamic "ephemeral_block_device" {
+    for_each = local.ami_block_device_mappings_nonroot
+    content {
+      device_name = ephemeral_block_device.value.device_name
+      no_device   = true
+    }
+  }
+
+  lifecycle {
+    ignore_changes = [
+      user_data, # Prevent changes to user_data from destroying existing EC2s
+    ]
+  }
+
+  tags = merge(local.tags, {
+    Name = var.name
+  })
+}
+
+#------------------------------------------------------------------------------
+# DISKS
+#------------------------------------------------------------------------------
+
+#tfsec:ignore:aws-ebs-encryption-customer-key:exp:2022-10-31: I don't think we need the fine grained control CMK would provide
+resource "aws_ebs_volume" "this" {
+  for_each = local.ebs_volumes
+
+  # Note that block devices must be also present in the AMI.  AMI values are used
+  # if they are not otherwise defined  
+  availability_zone = var.availability_zone
+  encrypted         = true
+  snapshot_id       = each.value.snapshot_id
+  iops              = each.value.iops
+  throughput        = each.value.throughput
+  size              = each.value.size
+  type              = each.value.type
+
+  tags = merge(
+    local.tags,
+    {
+      Name = join("-", [var.name, each.value.label, each.key])
+    }
+  )
+
+  lifecycle {
+    ignore_changes = [snapshot_id] # retain data if AMI is updated. If you want to start from fresh, destroy it
+  }
+}
+
+resource "aws_volume_attachment" "this" {
+  for_each = aws_ebs_volume.this
+
+  device_name = each.key
+  volume_id   = each.value.id
+  instance_id = aws_instance.this.id
+}
+
+#------------------------------------------------------------------------------
+# Route 53 record
+#------------------------------------------------------------------------------
+
+resource "aws_route53_record" "internal" {
+  count    = var.route53_records.create_internal_record ? 1 : 0
+  provider = aws.core-vpc
+
+  zone_id = data.aws_route53_zone.internal.zone_id
+  name    = "${var.name}.${var.application_name}.${data.aws_route53_zone.internal.name}"
+  type    = "A"
+  ttl     = 60
+  records = [aws_instance.this.private_ip]
+}
+
+resource "aws_route53_record" "external" {
+  count    = var.route53_records.create_external_record ? 1 : 0
+  provider = aws.core-vpc
+
+  zone_id = data.aws_route53_zone.external.zone_id
+  name    = "${var.name}.${var.application_name}.${data.aws_route53_zone.external.name}"
+  type    = "A"
+  ttl     = 60
+  records = [aws_instance.this.private_ip]
+}
+
+#------------------------------------------------------------------------------
+# ASM Passwords
+#------------------------------------------------------------------------------
+
+resource "random_password" "this" {
+  for_each = var.ssm_parameters
+
+  length  = each.value.random.length
+  special = lookup(each.value.random, "special", null)
+}
+
+resource "aws_ssm_parameter" "this" {
+  for_each = var.ssm_parameters
+
+  name        = "/${var.ssm_parameters_prefix}${var.name}/${each.key}"
+  description = each.value.description
+  type        = "SecureString"
+  value       = random_password.this[each.key].result
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "${var.name}-${each.key}"
+    }
+  )
+}
+
+#------------------------------------------------------------------------------
+# Instance IAM role extra permissions
+# Temporarily allow get parameter when instance first created
+# Attach policy inline on ec2-common-role
+#------------------------------------------------------------------------------
+
+resource "time_offset" "asm_parameter" {
+  # static time resource for controlling access to parameter
+  offset_minutes = 30
+  triggers = {
+    # if the instance is recycled we reset the timestamp to give access again
+    instance_id = aws_instance.this.arn
+  }
+}
+
+data "aws_iam_policy_document" "asm_parameter" {
+  statement {
+    effect  = "Allow"
+    actions = ["ssm:GetParameter"]
+    #tfsec:ignore:aws-iam-no-policy-wildcards: acccess scoped to parameter path, plus time conditional restricts access to short duration after launch
+    resources = ["arn:aws:ssm:${var.region}:${data.aws_caller_identity.current.id}:parameter/${var.ssm_parameters_prefix}${var.name}/*"]
+    condition {
+      test     = "DateLessThan"
+      variable = "aws:CurrentTime"
+      values   = [time_offset.asm_parameter.rfc3339]
+    }
+  }
+}
+
+resource "aws_iam_role" "this" {
+  name                 = "ec2-database-role-${var.name}"
+  path                 = "/"
+  max_session_duration = "3600"
+  assume_role_policy = jsonencode(
+    {
+      "Version" : "2012-10-17",
+      "Statement" : [
+        {
+          "Effect" : "Allow",
+          "Principal" : {
+            "Service" : "ec2.amazonaws.com"
+          }
+          "Action" : "sts:AssumeRole",
+          "Condition" : {}
+        }
+      ]
+    }
+  )
+
+  managed_policy_arns = var.instance_profile_policies
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "ec2-database-role-${var.name}"
+    },
+  )
+}
+
+resource "aws_iam_role_policy" "asm_parameter" {
+  name   = "asm-parameter-access-${var.name}"
+  role   = aws_iam_role.this.id
+  policy = data.aws_iam_policy_document.asm_parameter.json
+}
+
+resource "aws_iam_instance_profile" "this" {
+  name = "ec2-database-profile-${var.name}"
+  role = aws_iam_role.this.name
+  path = "/"
+}
