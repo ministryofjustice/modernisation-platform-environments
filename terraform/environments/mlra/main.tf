@@ -4,7 +4,7 @@ module "lb-access-logs-enabled" {
     aws.bucket-replication = aws
   }
 
-  vpc_all = local.vpc_all
+  vpc_all                    = local.vpc_all
   application_name           = local.application_name
   public_subnets             = [data.aws_subnet.public_subnets_a.id, data.aws_subnet.public_subnets_b.id, data.aws_subnet.public_subnets_c.id]
   loadbalancer_egress_rules  = local.loadbalancer_egress_rules
@@ -53,7 +53,7 @@ resource "aws_lb_listener" "alb_listener" {
 }
 
 resource "aws_lb_target_group" "alb_target_group" {
-  name = "${local.application_name}-target-group"
+  name     = "${local.application_name}-target-group"
   port     = 80
   protocol = "HTTP"
   vpc_id   = data.aws_vpc.shared.id
