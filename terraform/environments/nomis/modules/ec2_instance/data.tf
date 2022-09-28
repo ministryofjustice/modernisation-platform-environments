@@ -48,18 +48,23 @@ data "aws_ec2_instance_type" "database" {
   instance_type = var.instance.instance_type
 }
 
-data "template_file" "user_data" {
-  template = file("${path.module}/user_data/ansible.sh.tftpl")
-  vars = {
-    branch               = var.branch == "" ? "main" : var.branch
-    ansible_repo         = var.ansible_repo == null ? "" : var.ansible_repo
-    ansible_repo_basedir = var.ansible_repo_basedir == null ? "" : var.ansible_repo_basedir
-  }
-}
-
 data "cloudinit_config" "this" {
-  part {
-    content_type = "text/x-shellscript"
-    content      = data.template_file.user_data.rendered
+  dynamic "part" {
+    for_each = try(var.user_data.templates, {})
+    content {
+      content_type = "text/cloud-config"
+      merge_type   = "list(append)+dict(recurse_list)+str(append)"
+      content = yamlencode({
+        write_files = [
+          {
+            encoding    = "b64"
+            content     = base64encode(templatefile("templates/${part.key}", merge(local.user_data_args, try(part.value.args, {}))))
+            path        = part.value.path
+            owner       = part.value.owner
+            permissions = part.value.permissions
+          }
+        ]
+      })
+    }
   }
 }

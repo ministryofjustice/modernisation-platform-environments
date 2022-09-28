@@ -98,6 +98,19 @@ variable "instance" {
   })
 }
 
+variable "user_data" {
+  description = "Map of cloud-init config write_file sections for user data"
+  type = object({
+    templates = optional(map(object({
+      path        = string
+      owner       = string
+      permissions = string
+      args        = optional(map(string))
+    })))
+  })
+  default = {}
+}
+
 variable "ebs_volume_config" {
   description = "EC2 volume configurations, where key is a label, e.g. flash, which is assigned to the disk in ebs_volumes.  All disks with same label have the same configuration.  If not specified, use values from the AMI.  If total_size specified, the volume size is this divided by the number of drives with the given label"
   type = map(object({
