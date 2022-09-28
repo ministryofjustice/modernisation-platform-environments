@@ -42,6 +42,7 @@ provider "aws" {
 
 # provider "aws" {
 #   region = "eu-west-2"
+ 
 # }
 
 
@@ -68,3 +69,4 @@ provider "aws" {
 #   }
 # }
 # ######################## Run Terraform Plan Locally Only ##################################
+
