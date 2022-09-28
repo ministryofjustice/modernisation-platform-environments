@@ -5,80 +5,80 @@ resource "aws_cloudwatch_dashboard" "mlra" {
 {
   "widgets": [
     {
-      "type": "metric",
+      "type": "${var.cloudwatch_type}",
       "x": 0,
       "y": 0,
       "width": 8,
       "height": 6,
       "properties": {
         "period": 60,
-        "stat": "${var.stat}",
+        "stat": "${var.cloudwatch_stat}",
         "region": "${local.application_data.accounts[local.environment].region}"
         "annotations": {
           "alarms": #[module.<marks_module>.<output_name]
         }, 
-        "view": "timeSeries"
-        "stacked": "false",
-        "title": "Application ELB 5xx Error"
+        "view": "${var.cloudwatch_view}"
+        "stacked": "${var.cloudwatch_stacked}",
+        "title": "${var.cloudwatch_dashboard_title}"
       }
     },
   ]
 },
 {
-      "type": "metric",
+      "type": "${var.cloudwatch_type}",
       "x": 8,
       "y": 0,
       "width": 8,
       "height": 6,
       "properties": {
         "period": 60,
-        "stat": "${var.stat}",
+        "stat": "${var.cloudwatch_stat}",
         "annotations": {
           "alarms": #[module.<marks_module>.<output_name]
         }, 
         "region": "${local.application_data.accounts[local.environment].region}",
-        "view": "timeSeries",
-        "stacked": "false",
-        "title": "Application ELB 4xx Error"
+        "view": "${var.cloudwatch_view}",
+        "stacked": "${var.cloudwatch_stacked}",
+        "title": "${var.cloudwatch_dashboard_title}"
       }
     },
     {
-      "type": "metric",
+      "type": "${var.cloudwatch_type}",
       "x": 0,
       "y": 0,
       "width": 12,
       "height": 6,
       "properties": {
         "period": 300,
-        "stat": "${var.stat}",
+        "stat": "${var.cloudwatch_stat}",
         "annotations": {
           "alarms": #[module.<marks_module>.<output_name]
         }, 
         "region": "${local.application_data.accounts[local.environment].region}",
-        "view": "timeSeries",
-        "stacked": "false",
-        "title": "Application ELB Target Response Time"
+        "view": "${var.cloudwatch_view}",
+        "stacked": "${var.cloudwatch_stacked}",
+        "title": "${var.cloudwatch_dashboard_title}"
       },
       {
-      "type": "metric",
+      "type": "${var.cloudwatch_type}",
       "x": 0,
       "y": 0,
       "width": 12,
       "height": 6,
       "properties": {
         "period": 300,
-        "stat": "${var.stat}",
+        "stat": "${var.cloudwatch_stat}",
         "annotations": {
           "alarms": #[module.<marks_module>.<output_name]
         }, 
         "region": "${local.application_data.accounts[local.environment].region}}",
-        "view": "timeSeries",
-        "stacked": "false",
-        "title": "EC2 CPU"
+        "view": "${var.cloudwatch_view}",
+        "stacked": "${var.cloudwatch_stacked}",
+        "title": "${var.cloudwatch_dashboard_title}"
       }
     },
     {
-      "type": "metric",
+      "type": "${var.cloudwatch_type}",
       "x": 0,
       "y": 0,
       "width": 12,
@@ -88,14 +88,14 @@ resource "aws_cloudwatch_dashboard" "mlra" {
   
         ],
         "period": 300,
-        "stat": "${var.stat}",
+        "stat": "${var.cloudwatch_stat}",
         "annotations": {
           "alarms": #[module.<marks_module>.<output_name]
         } ,
         "region": "${local.application_data.accounts[local.environment].region}",
-        "view": "timeSeries",
-        "stacked": "false",
-        "title": "ECS Memory"
+        "view": "${var.cloudwatch_view}",
+        "stacked": "${var.cloudwatch_stacked}",
+        "title": "${var.cloudwatch_dashboard_title}"
       }
     }
     

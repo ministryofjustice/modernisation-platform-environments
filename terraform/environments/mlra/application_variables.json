@@ -3,7 +3,11 @@
     "development": {
       "example_var": "dev-data",
       "region": "eu-west-2",
-      "stat": "Average"
+      "cloudwatch_stat": "Average",
+      "cloudwatch_view": "timeSeries",
+      "cloudwatch_stacked": "false",
+      "cloudwatch_type": "metric",
+      "cloudwatch_dashboard_title": ""
     },
     "test": {
       "example_var": "test-data"
