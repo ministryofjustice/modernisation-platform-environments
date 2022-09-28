@@ -12,7 +12,7 @@ resource "aws_cloudwatch_dashboard" "mlra" {
       "height": 6,
       "properties": {
         "period": 60,
-        "stat": "Average",
+        "stat": "${var.stat}",
         "region": "${local.application_data.accounts[local.environment].region}"
         "annotations": {
           "alarms": #[module.<marks_module>.<output_name]
@@ -32,7 +32,7 @@ resource "aws_cloudwatch_dashboard" "mlra" {
       "height": 6,
       "properties": {
         "period": 60,
-        "stat": "Average",
+        "stat": "${var.stat}",
         "annotations": {
           "alarms": #[module.<marks_module>.<output_name]
         }, 
@@ -50,7 +50,7 @@ resource "aws_cloudwatch_dashboard" "mlra" {
       "height": 6,
       "properties": {
         "period": 300,
-        "stat": "Average",
+        "stat": "${var.stat}",
         "annotations": {
           "alarms": #[module.<marks_module>.<output_name]
         }, 
@@ -67,7 +67,7 @@ resource "aws_cloudwatch_dashboard" "mlra" {
       "height": 6,
       "properties": {
         "period": 300,
-        "stat": "Average",
+        "stat": "${var.stat}",
         "annotations": {
           "alarms": #[module.<marks_module>.<output_name]
         }, 
@@ -88,7 +88,7 @@ resource "aws_cloudwatch_dashboard" "mlra" {
   
         ],
         "period": 300,
-        "stat": "Average",
+        "stat": "${var.stat}",
         "annotations": {
           "alarms": #[module.<marks_module>.<output_name]
         } ,
