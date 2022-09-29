@@ -109,7 +109,6 @@ No modules.
 | [aws_subnet.data](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/subnet)                                       | data source |
 | [aws_vpc.shared_vpc](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/vpc)                                       | data source |
 | [cloudinit_config.oracle_monitoring_and_userdata](https://registry.terraform.io/providers/hashicorp/cloudinit/latest/docs/data-sources/config) | data source |
-| [template_file.user_data](https://registry.terraform.io/providers/hashicorp/template/latest/docs/data-sources/file)                            | data source |
 
 ## Inputs
 

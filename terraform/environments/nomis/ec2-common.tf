@@ -320,17 +320,11 @@ resource "aws_ssm_association" "update_ssm_agent" {
 # Node Exporter - Install/Start Node Exporter Service
 #------------------------------------------------------------------------------
 
-data "template_file" "node_exporter_install_template" {
-  template = file("${path.module}/ssm-documents/templates/node-exporter-linux.json.tmpl")
-  vars = {
-    bucket_name = module.s3-bucket.bucket.id
-  }
-}
 resource "aws_ssm_document" "node_exporter_linux" {
   name            = "InstallNodeExporterLinux"
   document_type   = "Command"
   document_format = "JSON"
-  content         = data.template_file.node_exporter_install_template.rendered
+  content         = templatefile("${path.module}/ssm-documents/templates/node-exporter-linux.json.tmpl", { bucket_name = module.s3-bucket.bucket.id })
   target_type     = "/AWS::EC2::Instance"
 
   tags = merge(
@@ -350,19 +344,11 @@ resource "aws_ssm_association" "node_exporter_linux" {
   }
 }
 
-data "template_file" "node_exporter_windows_install_template" {
-  template = file("${path.module}/ssm-documents/templates/node-exporter-windows.json.tmpl")
-  vars = {
-    bucket_name = module.s3-bucket.bucket.id
-  }
-}
-
 resource "aws_ssm_document" "node_exporter_windows" {
   name            = "InstallNodeExporterWindows"
   document_type   = "Command"
   document_format = "JSON"
-  content         = data.template_file.node_exporter_windows_install_template.rendered
-
+  content         = templatefile("${path.module}/ssm-documents/templates/node-exporter-windows.json.tmpl", { bucket_name = module.s3-bucket.bucket.id })
   tags = merge(
     local.tags,
     {
@@ -410,17 +396,11 @@ resource "aws_ssm_association" "script-exporter" {
 # Oracle Secure Web - Install Oracle Secure Web s3 Backup Module
 #------------------------------------------------------------------------------
 
-data "template_file" "oracle_secure_web_install_template" {
-  template = file("${path.module}/ssm-documents/templates/oracle-secure-web-install.json.tmpl")
-  vars = {
-    bucket_name = module.s3-bucket.bucket.id
-  }
-}
 resource "aws_ssm_document" "oracle_secure_web" {
   name            = "InstallOracleSecureWeb"
   document_type   = "Command"
   document_format = "JSON"
-  content         = data.template_file.oracle_secure_web_install_template.rendered
+  content         = templatefile("${path.module}/ssm-documents/templates/oracle-secure-web-install.json.tmpl", { bucket_name = module.s3-bucket.bucket.id })
   target_type     = "/AWS::EC2::Instance"
 
   tags = merge(

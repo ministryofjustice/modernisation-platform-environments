@@ -36,17 +36,6 @@ resource "aws_security_group_rule" "extra_rules" { # Extra ingress rules that mi
 # EC2
 #------------------------------------------------------------------------------
 
-# user-data template
-data "template_file" "user_data" {
-  template = file("${path.module}/templates/user-data.sh.tftmpl")
-  vars = {
-    parameter_name_ASMSYS  = aws_ssm_parameter.asm_sys.name
-    parameter_name_ASMSNMP = aws_ssm_parameter.asm_snmp.name
-    volume_ids             = join(" ", local.volume_ids)
-    restored_from_snapshot = var.restored_from_snapshot
-  }
-}
-
 # get data subnet for the AZ
 data "aws_subnet" "data" {
   tags = {
