@@ -27,11 +27,23 @@ data "aws_subnets" "private" {
   }
 }
 
+resource "aws_security_group" "weblogic" {
+  description = "Security group rules specific to this weblogic instance"
+  name        = "weblogic-${var.name}"
+  vpc_id      = data.aws_vpc.shared_vpc.id
+
+  tags = merge(
+    var.tags,
+    {
+      Name = "weblogic-${var.name}",
+  })
+}
+
 # Extra ingress rules that might be specified
 resource "aws_security_group_rule" "extra_rules" {
   for_each          = { for rule in var.extra_ingress_rules : "${rule.description}-${rule.to_port}" => rule }
   type              = "ingress"
-  security_group_id = aws_security_group.database.id
+  security_group_id = aws_security_group.weblogic.id
   description       = each.value.description
   from_port         = each.value.from_port
   to_port           = each.value.to_port
