@@ -40,7 +40,7 @@ resource "aws_s3_bucket_acl" "application_tf_state" {
 #}
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "application_tf_state" {
-  bucket = aws_s3_bucket.application_tf_statecount[0].id
+  bucket = aws_s3_bucket.application_tf_state[0].id
   rule {
     apply_server_side_encryption_by_default {
       sse_algorithm     = "aws:kms"
