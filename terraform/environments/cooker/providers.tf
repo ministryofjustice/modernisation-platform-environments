@@ -33,6 +33,17 @@ provider "aws" {
     role_arn = "arn:aws:iam::${local.environment_management.account_ids["core-network-services-production"]}:role/modify-dns-records"
   }
 }
+
+provider "aws" {
+  alias                  = "tags"
+  default_tags {
+     tags = {
+      generated-in  = "Terraform"
+      is-production = local.is-production 
+      source-code = "https://github.com/ministryofjustice/modernisation-platform-environments" 
+     }
+  }
+}
 ######################### Run Terraform via CICD ##################################
 
 
