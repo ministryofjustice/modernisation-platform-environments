@@ -9,10 +9,13 @@ terraform {
       version = "~> 2.2"
       source  = "hashicorp/cloudinit"
     }
-
     random = {
       version = "= 3.4.1"
       source  = "hashicorp/random"
+    }
+    time = {
+      version = "~> 0.8.0"
+      source = "hashicorp/time"
     }
   }
   required_version = ">= 1.1.7"
