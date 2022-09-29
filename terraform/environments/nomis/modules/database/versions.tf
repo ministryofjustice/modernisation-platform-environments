@@ -15,7 +15,7 @@ terraform {
     }
     time = {
       version = "~> 0.8.0"
-      source = "hashicorp/time"
+      source  = "hashicorp/time"
     }
   }
   required_version = ">= 1.1.7"
