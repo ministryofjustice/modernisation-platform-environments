@@ -75,7 +75,7 @@ resource "aws_instance" "database" {
   root_block_device {
     delete_on_termination = true
     encrypted             = true
-    volume_type = "gp3"
+    volume_type           = "gp3"
 
     tags = merge(
       var.tags,
