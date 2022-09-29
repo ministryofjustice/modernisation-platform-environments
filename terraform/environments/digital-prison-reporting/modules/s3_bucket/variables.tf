@@ -13,3 +13,9 @@ variable "create_s3" {
   description = "Setup S3 Buckets"
   default     = false
 }
+
+variable "custom_kms_key" {
+  type        = string
+  description = "KMS key ARN to use"
+  default     = ""
+}
