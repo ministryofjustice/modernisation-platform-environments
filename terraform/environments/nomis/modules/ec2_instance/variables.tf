@@ -91,11 +91,24 @@ variable "instance" {
     instance_type           = string
     key_name                = string
     vpc_security_group_ids  = list(string)
-    user_data               = optional(string)
     root_block_device = optional(object({
       volume_size = number
     }))
   })
+}
+
+variable "user_data" {
+  description = "Map of cloud-init config write_file sections for user data"
+  type = object({
+    args    = optional(map(string))
+    scripts = list(string)
+    write_files = optional(map(object({
+      path        = string
+      owner       = string
+      permissions = string
+    })))
+  })
+  default = null
 }
 
 variable "ebs_volume_config" {
