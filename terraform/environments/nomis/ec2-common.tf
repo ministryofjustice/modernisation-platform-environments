@@ -344,29 +344,6 @@ resource "aws_ssm_association" "node_exporter_linux" {
   }
 }
 
-resource "aws_ssm_document" "node_exporter_windows" {
-  name            = "InstallNodeExporterWindows"
-  document_type   = "Command"
-  document_format = "JSON"
-  content         = templatefile("${path.module}/ssm-documents/templates/node-exporter-windows.json.tmpl", { bucket_name = module.s3-bucket.bucket.id })
-  tags = merge(
-    local.tags,
-    {
-      Name = "install-node-exporter-windows"
-    },
-  )
-}
-
-# Commented out as this gets a really old version from s3 bucket and jumpserver AMI has latest version already installed
-# resource "aws_ssm_association" "node_exporter_windows" {
-#   name             = aws_ssm_document.node_exporter_windows.name
-#   association_name = "node-exporter-windows"
-#   targets {
-#     key    = "tag:os_type"
-#     values = ["Windows"]
-#   }
-# }
-
 resource "aws_ssm_document" "script_exporter" {
   name            = "InstallScriptExporterLinux"
   document_type   = "Command"
