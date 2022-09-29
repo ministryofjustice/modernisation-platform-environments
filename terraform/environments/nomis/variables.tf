@@ -4,7 +4,8 @@ variable "BRANCH_NAME" {
   description = "Github actions running branch"
 }
 
- # tflint-ignore: terraform_unused_declarations
+# tflint-ignore: terraform_unused_declarations
+variable "GH_ACTOR_NAME" {
   type        = string
   default     = ""
   description = "GH username triggering Github action"
