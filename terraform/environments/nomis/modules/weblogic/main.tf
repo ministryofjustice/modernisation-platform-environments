@@ -92,8 +92,11 @@ resource "aws_launch_template" "weblogic" {
 
   network_interfaces {
     associate_public_ip_address = false
-    security_groups             = [var.common_security_group_id]
-    delete_on_termination       = true
+    security_groups = [
+      var.common_security_group_id,
+      aws_security_group.weblogic.id
+    ]
+    delete_on_termination = true
   }
 
   tag_specifications {
