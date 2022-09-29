@@ -70,5 +70,15 @@ locals {
       cidr_blocks     = []
       security_groups = [module.bastion_linux.bastion_security_group]
     }
+
+  }
+  ec2_egress_rules = {
+    "cluster_ec2_lb_ingress" = {
+      description     = "Cluster EC2 loadbalancer ingress rule"
+      from_port       = 0
+      to_port         = 0
+      protocol        = "-1"
+      cidr_blocks     = ["0.0.0.0/0"]
+    }
   }
 }
