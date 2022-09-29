@@ -11,7 +11,7 @@
       "setup_buckets": true,
       "create_kinesis_streams": true,
       "create_glue_registries": false,
-      "setup_s3_buckets": true      
+      "setup_s3_buckets": true
     },
     "test": {
       "example_var": "test-data"

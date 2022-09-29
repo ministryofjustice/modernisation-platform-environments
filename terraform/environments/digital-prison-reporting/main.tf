@@ -521,9 +521,9 @@ module "s3_curated_bucket" {
 
 # S3 Bucket (Terraform State for Application IAAC)
 module "s3_application_tf_state" {
-  source      = "./modules/s3_bucket"
-  create_s3   = local.setup_buckets
-  name        = "${local.project}-terraform-state-${local.environment}"
+  source    = "./modules/s3_bucket"
+  create_s3 = local.setup_buckets
+  name      = "${local.project}-terraform-state-${local.environment}"
 
   tags = merge(
     local.all_tags,
