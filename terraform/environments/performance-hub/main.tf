@@ -164,7 +164,7 @@ module "windows-ecs" {
   network_mode            = local.app_data.accounts[local.environment].network_mode
   server_port             = local.app_data.accounts[local.environment].server_port
   app_count               = local.app_data.accounts[local.environment].app_count
-  public_cidrs            = [data.aws_subnet.public_az_a.cidr_block, data.aws_subnet.public_az_b.cidr_block, data.aws_subnet.public_az_c.cidr_block]
+#  public_cidrs            = [data.aws_subnet.public_az_a.cidr_block, data.aws_subnet.public_az_b.cidr_block, data.aws_subnet.public_az_c.cidr_block]
   ec2_ingress_rules       = local.ec2_ingress_rules
   ec2_egress_rules        = local.ec2_egress_rules
   tags_common             = local.tags
