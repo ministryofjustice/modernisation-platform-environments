@@ -108,7 +108,7 @@ locals {
       },
 
       databases = {
-        t1b-db-audit = {
+        t1-db-audit = {
           tags = {
             description = "Test NOMIS Audit database replicating with T1PDL0010"
             oracle-sids = "T1CNMAUD"
