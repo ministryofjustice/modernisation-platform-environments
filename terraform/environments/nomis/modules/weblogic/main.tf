@@ -27,6 +27,18 @@ data "aws_subnets" "private" {
   }
 }
 
+# Extra ingress rules that might be specified
+resource "aws_security_group_rule" "extra_rules" {
+  for_each          = { for rule in var.extra_ingress_rules : "${rule.description}-${rule.to_port}" => rule }
+  type              = "ingress"
+  security_group_id = aws_security_group.database.id
+  description       = each.value.description
+  from_port         = each.value.from_port
+  to_port           = each.value.to_port
+  cidr_blocks       = each.value.cidr_blocks
+  protocol          = each.value.protocol
+}
+
 resource "aws_launch_template" "weblogic" {
   name = var.name
 
