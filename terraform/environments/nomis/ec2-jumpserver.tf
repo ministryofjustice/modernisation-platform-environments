@@ -43,17 +43,6 @@ data "aws_ami" "jumpserver" {
   }
 }
 
-# user-data template
-data "template_file" "user_data" {
-  template = file("./templates/jumpserver-user-data.yaml")
-  vars = {
-    SECRET_PREFIX = local.secret_prefix
-    S3_BUCKET     = module.s3-bucket.bucket.id
-  }
-  #not actually a secret
-  #checkov:skip=CKV_SECRET_6: "Base64 High Entropy String"
-}
-
 # instance launch template
 resource "aws_launch_template" "jumpserver" {
   name                                 = "${local.vpc_name}-${local.environment}-jumpserver"
@@ -79,7 +68,9 @@ resource "aws_launch_template" "jumpserver" {
     delete_on_termination       = true
   }
 
-  user_data = base64encode(data.template_file.user_data.rendered)
+  #checkov:skip=CKV_SECRET_6: "Base64 High Entropy String"
+  user_data = base64encode(templatefile("./templates/jumpserver-user-data.yaml", { SECRET_PREFIX = local.secret_prefix, S3_BUCKET = module.s3-bucket.bucket.id }))
+
   tag_specifications {
     resource_type = "instance"
     tags = merge(
