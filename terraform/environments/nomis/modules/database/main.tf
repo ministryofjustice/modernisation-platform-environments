@@ -75,7 +75,6 @@ resource "aws_instance" "database" {
   root_block_device {
     delete_on_termination = true
     encrypted             = true
-    # volume_size           = lookup(var.drive_map, data.aws_ami.database.root_device_name, local.root_device_size)
     volume_type = "gp3"
 
     tags = merge(
