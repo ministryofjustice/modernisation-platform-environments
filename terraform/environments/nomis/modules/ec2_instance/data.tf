@@ -61,7 +61,7 @@ data "cloudinit_config" "this" {
     for_each = try(var.user_data.scripts, {})
     content {
       content_type = "text/x-shellscript"
-      content      = base64encode(templatefile("templates/${part.value}", local.user_data_args))
+      content      = templatefile("templates/${part.value}", local.user_data_args)
     }
   }
   dynamic "part" {
