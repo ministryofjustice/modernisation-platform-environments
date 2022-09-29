@@ -11,19 +11,6 @@
 # EC2
 #------------------------------------------------------------------------------
 
-# user-data template
-data "template_file" "user_data" {
-  template = file("${path.module}/user-data/user-data.sh")
-  vars = {
-    ENV                     = var.name
-    DB_HOSTNAME             = "db.${var.name}.${var.application_name}.${data.aws_route53_zone.internal.name}"
-    USE_DEFAULT_CREDS       = var.use_default_creds
-    AUTO_SCALING_GROUP_NAME = local.auto_scaling_group_name
-    LIFECYCLE_HOOK_NAME     = local.initial_lifecycle_hook_name
-    REGION                  = var.region
-  }
-}
-
 data "aws_vpc" "shared_vpc" {
   tags = {
     Name = "${var.business_unit}-${var.environment}"
@@ -110,7 +97,18 @@ resource "aws_launch_template" "weblogic" {
     )
   }
 
-  user_data = base64encode(data.template_file.user_data.rendered)
+  user_data = base64encode(templatefile(
+    "${path.module}/templates/user-data.sh.tftmpl",
+    {
+      ENV                     = var.name
+      DB_HOSTNAME             = "db.${var.name}.${var.application_name}.${data.aws_route53_zone.internal.name}"
+      USE_DEFAULT_CREDS       = var.use_default_creds
+      AUTO_SCALING_GROUP_NAME = local.auto_scaling_group_name
+      LIFECYCLE_HOOK_NAME     = local.initial_lifecycle_hook_name
+      REGION                  = var.region
+    }
+    )
+  )
 
   tags = merge(
     var.tags,
