@@ -54,12 +54,14 @@ locals {
 
   database = {
 
+    # server-type and nomis-environment auto set by module
     tags = {
       component            = "data"
       os-type              = "Linux"
       os-major-version     = 7
       os-version           = "RHEL 7.9"
       licence-requirements = "Oracle Database"
+      ami                  = "nomis_rhel_7_9_oracledb_11_2"
       "Patch Group"        = "RHEL"
     }
 
@@ -76,7 +78,7 @@ locals {
       }
       scripts = [
         "oracle_init.sh.tftpl",
-        # "ansible.sh.tftpl"
+        "ansible.sh.tftpl"
       ]
       write_files = {}
     }
