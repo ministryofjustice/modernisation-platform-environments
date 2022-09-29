@@ -91,7 +91,6 @@ variable "instance" {
     instance_type           = string
     key_name                = string
     vpc_security_group_ids  = list(string)
-    user_data               = optional(string)
     root_block_device = optional(object({
       volume_size = number
     }))
@@ -108,7 +107,7 @@ variable "user_data" {
       args        = optional(map(string))
     })))
   })
-  default = {}
+  default = null
 }
 
 variable "ebs_volume_config" {

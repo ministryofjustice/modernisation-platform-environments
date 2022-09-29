@@ -49,6 +49,7 @@ data "aws_ec2_instance_type" "database" {
 }
 
 data "cloudinit_config" "this" {
+  count = length(try(var.user_data.templates, {})) > 0 ? 1 : 0
   dynamic "part" {
     for_each = try(var.user_data.templates, {})
     content {
