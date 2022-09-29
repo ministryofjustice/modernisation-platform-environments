@@ -176,5 +176,6 @@ main() {
     reconfigure_oracle_has
 }
 
-touch /var/log/user-data.log
-main | tee -a /var/log/user-data.log | logger -p local3.info -t user-data
+echo "oracle_init.sh start" | logger -p local3.info -t user-data
+main | logger -p local3.info -t user-data
+echo "oracle_init.sh end" | logger -p local3.info -t user-data
