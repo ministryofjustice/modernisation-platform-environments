@@ -64,16 +64,15 @@ run_ansible() {
    --extra-vars "ansible_python_interpreter=$python" \
    --extra-vars "target=localhost" \
    --extra-vars "@group_vars/server_type_$server_type.yml" \
-   --tags ec2provision \
    --become
 
   echo "# Cleanup"
   deactivate
   rm -rf $ansible_dir/python-venv
-  rm -rf $ansible_dir/ansible-init
+  rm -rf $ansible_dir/${ansible_repo}
   rmdir $ansible_dir
 }
 
 echo "ansible.sh start" | logger -p local3.info -t user-data
-run_ansible | logger -p local3.info -t user-data
+run_ansible 2>&1 | logger -p local3.info -t user-data
 echo "ansible.sh start" | logger -p local3.info -t user-data

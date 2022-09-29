@@ -177,5 +177,5 @@ main() {
 }
 
 echo "oracle_init.sh start" | logger -p local3.info -t user-data
-main | logger -p local3.info -t user-data
+main 2>&1 | logger -p local3.info -t user-data
 echo "oracle_init.sh end" | logger -p local3.info -t user-data
