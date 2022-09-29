@@ -54,12 +54,14 @@ locals {
 
   database = {
 
+    # server-type and nomis-environment auto set by module
     tags = {
       component            = "data"
       os-type              = "Linux"
       os-major-version     = 7
       os-version           = "RHEL 7.9"
       licence-requirements = "Oracle Database"
+      ami                  = "nomis_rhel_7_9_oracledb_11_2"
       "Patch Group"        = "RHEL"
     }
 
@@ -68,6 +70,17 @@ locals {
       instance_type           = "r6i.xlarge"
       key_name                = aws_key_pair.ec2-user.key_name
       vpc_security_group_ids  = [aws_security_group.database_common.id]
+    }
+
+    user_data = {
+      args = {
+        restored_from_snapshot = false
+      }
+      scripts = [
+        "oracle_init.sh.tftpl",
+        "ansible.sh.tftpl"
+      ]
+      write_files = {}
     }
 
     ebs_volumes = {
@@ -132,6 +145,7 @@ module "db_ec2_instance" {
   ami_name              = each.value.ami_name
   ami_owner             = local.environment_management.account_ids[terraform.workspace]
   instance              = merge(local.database.instance, lookup(each.value, "instance", {}))
+  user_data             = merge(local.database.user_data, lookup(each.value, "user_data", {}))
   ebs_volume_config     = merge(local.database.ebs_volume_config, lookup(each.value, "ebs_volume_config", {}))
   ebs_volumes           = merge(local.database.ebs_volumes, lookup(each.value, "ebs_volumes", {}))
   ssm_parameters_prefix = "database/"

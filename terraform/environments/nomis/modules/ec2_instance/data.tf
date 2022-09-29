@@ -48,18 +48,38 @@ data "aws_ec2_instance_type" "database" {
   instance_type = var.instance.instance_type
 }
 
-data "template_file" "user_data" {
-  template = file("${path.module}/user_data/ansible.sh.tftpl")
-  vars = {
-    branch               = var.branch == "" ? "main" : var.branch
-    ansible_repo         = var.ansible_repo == null ? "" : var.ansible_repo
-    ansible_repo_basedir = var.ansible_repo_basedir == null ? "" : var.ansible_repo_basedir
-  }
+locals {
+  user_data_part_count = [
+    try(length(var.user_data.scripts), 0),
+    try(length(var.user_data.write_files), 0)
+  ]
 }
 
 data "cloudinit_config" "this" {
-  part {
-    content_type = "text/x-shellscript"
-    content      = data.template_file.user_data.rendered
+  count = sum(local.user_data_part_count) > 0 ? 1 : 0
+  dynamic "part" {
+    for_each = try(var.user_data.scripts, {})
+    content {
+      content_type = "text/x-shellscript"
+      content      = templatefile("templates/${part.value}", local.user_data_args)
+    }
+  }
+  dynamic "part" {
+    for_each = try(var.user_data.write_files, {})
+    content {
+      content_type = "text/cloud-config"
+      merge_type   = "list(append)+dict(recurse_list)+str(append)"
+      content = yamlencode({
+        write_files = [
+          {
+            encoding    = "b64"
+            content     = base64encode(templatefile("templates/${part.key}", local.user_data_args))
+            path        = part.value.path
+            owner       = part.value.owner
+            permissions = part.value.permissions
+          }
+        ]
+      })
+    }
   }
 }
