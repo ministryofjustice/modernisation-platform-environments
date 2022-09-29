@@ -100,11 +100,12 @@ variable "instance" {
 variable "user_data" {
   description = "Map of cloud-init config write_file sections for user data"
   type = object({
-    templates = optional(map(object({
+    args    = optional(map(string))
+    scripts = list(string)
+    write_files = optional(map(object({
       path        = string
       owner       = string
       permissions = string
-      args        = optional(map(string))
     })))
   })
   default = null

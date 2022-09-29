@@ -48,10 +48,24 @@ data "aws_ec2_instance_type" "database" {
   instance_type = var.instance.instance_type
 }
 
+locals {
+  user_data_part_count = [
+    try(length(var.user_data.scripts), 0),
+    try(length(var.user_data.write_files), 0)
+  ]
+}
+
 data "cloudinit_config" "this" {
-  count = length(try(var.user_data.templates, {})) > 0 ? 1 : 0
+  count = sum(local.user_data_part_count) > 0 ? 1 : 0
   dynamic "part" {
-    for_each = try(var.user_data.templates, {})
+    for_each = try(var.user_data.scripts, {})
+    content {
+      content_type = "text/x-shellscript"
+      content      = base64encode(templatefile("templates/${part.value}", local.user_data_args))
+    }
+  }
+  dynamic "part" {
+    for_each = try(var.user_data.write_files, {})
     content {
       content_type = "text/cloud-config"
       merge_type   = "list(append)+dict(recurse_list)+str(append)"
@@ -59,7 +73,7 @@ data "cloudinit_config" "this" {
         write_files = [
           {
             encoding    = "b64"
-            content     = base64encode(templatefile("templates/${part.key}", merge(local.user_data_args, try(part.value.args, {}))))
+            content     = base64encode(templatefile("templates/${part.key}", local.user_data_args))
             path        = part.value.path
             owner       = part.value.owner
             permissions = part.value.permissions

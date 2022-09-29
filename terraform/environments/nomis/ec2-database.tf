@@ -71,21 +71,14 @@ locals {
     }
 
     user_data = {
-      templates = {
-        "oracle_init.sh.tftpl" = {
-          path        = "/root/oracle_init.sh"
-          owner       = "root:root"
-          permissions = "0500"
-          args = {
-            restored_from_snapshot = false
-          }
-        }
-        "ansible.sh.tftpl" = {
-          path        = "/root/ansible.sh"
-          owner       = "root:root"
-          permissions = "0500"
-        }
+      args = {
+        restored_from_snapshot = false
       }
+      scripts = [
+        "oracle_init.sh.tftpl",
+        "ansible.sh.tftpl"
+      ]
+      write_files = {}
     }
 
     ebs_volumes = {
@@ -147,10 +140,10 @@ module "db_ec2_instance" {
 
   name = each.key
 
-  ami_name  = each.value.ami_name
-  ami_owner = local.environment_management.account_ids[terraform.workspace]
-  instance  = merge(local.database.instance, lookup(each.value, "instance", {}))
-  # user_data             = merge(local.database.user_data, lookup(each.value, "user_data", {}))
+  ami_name              = each.value.ami_name
+  ami_owner             = local.environment_management.account_ids[terraform.workspace]
+  instance              = merge(local.database.instance, lookup(each.value, "instance", {}))
+  user_data             = merge(local.database.user_data, lookup(each.value, "user_data", {}))
   ebs_volume_config     = merge(local.database.ebs_volume_config, lookup(each.value, "ebs_volume_config", {}))
   ebs_volumes           = merge(local.database.ebs_volumes, lookup(each.value, "ebs_volumes", {}))
   ssm_parameters_prefix = "database/"
