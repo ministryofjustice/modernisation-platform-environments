@@ -176,4 +176,5 @@ main() {
     reconfigure_oracle_has
 }
 
-main
+touch /var/log/user-data.log
+main | tee -a /var/log/user-data.log | logger -p local3.info -t user-data

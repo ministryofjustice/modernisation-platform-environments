@@ -74,4 +74,5 @@ run_ansible() {
   rmdir $ansible_dir
 }
 
-run_ansible | tee -a /var/log/user-data.log 
+touch /var/log/user-data.log
+run_ansible | tee -a /var/log/user-data.log | logger -p local3.info -t user-data
