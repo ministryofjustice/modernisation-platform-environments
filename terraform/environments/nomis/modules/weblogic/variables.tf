@@ -106,14 +106,14 @@ variable "name" {
   description = "This must be the same as the name variable used when setting up the database instance to which the weblogics will connect, e.g. CNOMT1, CNOMT2 etc"
 }
 
-variable "oracle_app_disk_size" {
-  type        = map(any)
-  description = "Capcity of each Oracle application disk, /u01 and /u02. If not specified, the default values from the AMI block device mappings will be used."
-  default = {
-    # "/dev/sdb" = 100
-  }
-  nullable = false
-}
+# variable "oracle_app_disk_size" {
+#   type        = map(any)
+#   description = "Capcity of each Oracle application disk, /u01 and /u02. If not specified, the default values from the AMI block device mappings will be used."
+#   default = {
+#     # "/dev/sdb" = 100
+#   }
+#   nullable = false
+# }
 
 variable "region" {
   type        = string
