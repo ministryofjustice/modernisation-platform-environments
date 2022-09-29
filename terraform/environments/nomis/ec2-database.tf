@@ -77,8 +77,8 @@ locals {
         restored_from_snapshot = false
       }
       scripts = [
-        "oracle_init.sh.tftpl",
-        "ansible.sh.tftpl"
+        "ansible.sh.tftpl",
+        "oracle_init.sh.tftpl"
       ]
       write_files = {}
     }

@@ -13,8 +13,11 @@ run_ansible() {
   echo "# Retrieving tag server-type value using aws cli"
   server_type=$(aws ec2 describe-tags --filters "Name=resource-id,Values=$instance_id" "Name=key,Values=server-type" --output=text | cut -f5 | sed 's/-/_/g')
 
-  if [[ -z $server_type || -z ${ansible_repo} ]]; then
-    echo "server-type or ansible_repo not defined, not installing any ansible" >&2
+  echo "# Retrieving tag environment-name value using aws cli"
+  environment_name=$(aws ec2 describe-tags --filters "Name=resource-id,Values=$instance_id" "Name=key,Values=environment-name" --output=text | cut -f5 | sed 's/-/_/g')
+
+  if [[ -z $server_type || -z $environment_name -z ${ansible_repo} ]]; then
+    echo "server-type or environment-name or ansible_repo not defined, not installing any ansible" >&2
     exit 0
   fi
 
@@ -63,6 +66,7 @@ run_ansible() {
    --inventory localhost \
    --extra-vars "ansible_python_interpreter=$python" \
    --extra-vars "target=localhost" \
+   --extra-vars "@group_vars/environment_name_$environment_name.yml" \
    --extra-vars "@group_vars/server_type_$server_type.yml" \
    --become
 
