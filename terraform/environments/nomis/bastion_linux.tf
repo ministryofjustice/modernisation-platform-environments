@@ -2,10 +2,6 @@ locals {
   public_key_data = jsondecode(file("./bastion_linux.json"))
 }
 
-data "aws_iam_instance_profile" "bastion_instance_profile" {
-  name = "bastion-ec2-profile"
-}
-
 # create single managed policy
 resource "aws_iam_policy" "ec2_bastion_policy" {
   name        = "ec2-nomis-bastion-policy"
@@ -19,12 +15,6 @@ resource "aws_iam_policy" "ec2_bastion_policy" {
     },
   )
 }
-
-resource "aws_iam_role_policy_attachment" "ec2_nomis_bastion_policy_attach" {
-  policy_arn = aws_iam_policy.ec2_bastion_policy.arn
-  role       = data.aws_iam_instance_profile.bastion_instance_profile.role_name
-}
-
 
 # tfsec:ignore:aws-s3-enable-bucket-encryption tfsec:ignore:aws-s3-encryption-customer-key tfsec:ignore:aws-s3-enable-bucket-logging tfsec:ignore:aws-s3-enable-versioning
 module "bastion_linux" {
