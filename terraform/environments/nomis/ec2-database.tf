@@ -76,7 +76,7 @@ locals {
       }
       scripts = [
         "oracle_init.sh.tftpl",
-        "ansible.sh.tftpl"
+        # "ansible.sh.tftpl"
       ]
       write_files = {}
     }
