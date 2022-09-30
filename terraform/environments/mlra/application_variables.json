@@ -5,9 +5,9 @@
       "region": "eu-west-2",
       "cloudwatch_stat": "Average",
       "cloudwatch_view": "timeSeries",
-      "cloudwatch_stacked": "false",
       "cloudwatch_type": "metric",
-      "cloudwatch_dashboard_title": ""
+      "cloudwatch_dashboard_title": "",
+      "cloudwatch_dashboard_period": ""
     },
     "test": {
       "example_var": "test-data"
