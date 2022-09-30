@@ -45,12 +45,12 @@ module "bastion_linux" {
   environment   = local.environment
   region        = local.region
 
-  extra_user_data_content = templatefile("templates/bastion-user-data.sh.tftpl", {
-    region           = local.region
-    vpc_name         = local.vpc_name
-    application_name = local.application_name
-    environment      = local.environment
-  })
+  #  extra_user_data_content = templatefile("templates/bastion-user-data.sh.tftpl", {
+  #    region           = local.region
+  #    vpc_name         = local.vpc_name
+  #    application_name = local.application_name
+  #    environment      = local.environment
+  #  })
 
   # Tags
   tags_common = merge(
