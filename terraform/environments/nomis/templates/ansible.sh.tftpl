@@ -4,17 +4,29 @@ set -euo pipefail
 run_ansible() {
   export PATH=/usr/local/bin:$PATH
 
+  echo "ansible_repo:         ${ansible_repo}"
+  echo "ansible_repo_basedir: ${ansible_repo_basedir}"
+  echo "ansible_args:         ${ansible_args}"
+  echo "branch:               ${branch}"
+
+  if [[ ${branch} != "main" ]]; then
+    set -x
+  fi
+
   echo "# Retrieving API Token"
   token=$(curl -sS -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
 
-  echo "# Retrieving Instance ID"
+  echo "# Retrieving Instance ID"
   instance_id=$(curl -sS -H "X-aws-ec2-metadata-token: $token" -v http://169.254.169.254/latest/meta-data/instance-id)
 
-  echo "# Retrieving tag server-type value using aws cli"
+  echo "# Retrieving tag server-type value using aws cli"
   server_type=$(aws ec2 describe-tags --filters "Name=resource-id,Values=$instance_id" "Name=key,Values=server-type" --output=text | cut -f5 | sed 's/-/_/g')
 
-  if [[ -z $server_type || -z ${ansible_repo} ]]; then
-    echo "server-type or ansible_repo not defined, not installing any ansible" >&2
+  echo "# Retrieving tag environment-name value using aws cli"
+  environment_name=$(aws ec2 describe-tags --filters "Name=resource-id,Values=$instance_id" "Name=key,Values=environment-name" --output=text | cut -f5 | sed 's/-/_/g')
+
+  if [[ -z $server_type || -z $environment_name || -z ${ansible_repo} ]]; then
+    echo "server-type or environment-name or ansible_repo not defined, not installing any ansible" >&2
     exit 0
   fi
 
@@ -63,16 +75,17 @@ run_ansible() {
    --inventory localhost \
    --extra-vars "ansible_python_interpreter=$python" \
    --extra-vars "target=localhost" \
+   --extra-vars "@group_vars/environment_name_$environment_name.yml" \
    --extra-vars "@group_vars/server_type_$server_type.yml" \
-   --tags ec2provision \
-   --become
+   --become ${ansible_args}
 
   echo "# Cleanup"
   deactivate
   rm -rf $ansible_dir/python-venv
-  rm -rf $ansible_dir/ansible-init
+  rm -rf $ansible_dir/${ansible_repo}
   rmdir $ansible_dir
 }
 
-touch /var/log/user-data.log
-run_ansible | tee -a /var/log/user-data.log | logger -p local3.info -t user-data
+echo "ansible.sh start" | logger -p local3.info -t user-data
+run_ansible 2>&1 | logger -p local3.info -t user-data
+echo "ansible.sh end" | logger -p local3.info -t user-data
