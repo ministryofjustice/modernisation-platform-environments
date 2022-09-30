@@ -43,7 +43,13 @@ module "bastion_linux" {
   business_unit = local.vpc_name
   subnet_set    = local.subnet_set
   environment   = local.environment
-  region        = "eu-west-2"
+  region        = local.region
+
+  extra_user_data_content = templatefile("templates/bastion-user-data.sh.tftpl", {
+    region           = local.region
+    application_name = local.application_name
+    environment      = local.environment
+  })
 
   # Tags
   tags_common = merge(
