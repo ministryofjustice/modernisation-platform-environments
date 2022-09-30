@@ -47,6 +47,7 @@ module "bastion_linux" {
 
   extra_user_data_content = templatefile("templates/bastion-user-data.sh.tftpl", {
     region           = local.region
+    vpc_name         = local.vpc_name
     application_name = local.application_name
     environment      = local.environment
   })
