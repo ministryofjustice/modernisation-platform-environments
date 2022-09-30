@@ -16,7 +16,7 @@ run_ansible() {
   echo "# Retrieving tag environment-name value using aws cli"
   environment_name=$(aws ec2 describe-tags --filters "Name=resource-id,Values=$instance_id" "Name=key,Values=environment-name" --output=text | cut -f5 | sed 's/-/_/g')
 
-  if [[ -z $server_type || -z $environment_name -z ${ansible_repo} ]]; then
+  if [[ -z $server_type || -z $environment_name || -z ${ansible_repo} ]]; then
     echo "server-type or environment-name or ansible_repo not defined, not installing any ansible" >&2
     exit 0
   fi
