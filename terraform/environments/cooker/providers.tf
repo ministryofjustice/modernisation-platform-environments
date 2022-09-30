@@ -7,13 +7,8 @@ provider "aws" {
     role_arn = "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/MemberInfrastructureAccess"
   }
   default_tags {
-     tags = merge(
-    local.tags,
-    {
-    generated-in  = "Terraform"
-       }
-     )
-   }
+    tags = local.tags
+  }
 }
 
 # AWS provider for the Modernisation Platform, to get things from there if required
