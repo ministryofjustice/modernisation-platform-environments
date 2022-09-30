@@ -1,9 +1,15 @@
 ######################### Run Terraform via CICD ##################################
 # AWS provider for the workspace you're working in (every resource will default to using this, unless otherwise specified)
+# Also include the default_tags we want to use on systems
 provider "aws" {
   region = "eu-west-2"
   assume_role {
     role_arn = "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/MemberInfrastructureAccess"
+  }
+  default_tags {
+     tags = {
+      generated-in  = "Terraform"
+   }
   }
 }
 
@@ -34,16 +40,6 @@ provider "aws" {
   }
 }
 
-provider "aws" {
-  alias                  = "tags"
-  default_tags {
-     tags = {
-      generated-in  = "Terraform"
-      is-production = local.is-production 
-      source-code = "https://github.com/ministryofjustice/modernisation-platform-environments" 
-     }
-  }
-}
 ######################### Run Terraform via CICD ##################################
 
 
