@@ -71,6 +71,7 @@ locals {
     branch               = var.branch == "" ? "main" : var.branch
     ansible_repo         = var.ansible_repo == null ? "" : var.ansible_repo
     ansible_repo_basedir = var.ansible_repo_basedir == null ? "" : var.ansible_repo_basedir
+    ansible_args         = "--tags ec2provision"
     volume_ids           = join(" ", [for key, value in aws_ebs_volume.this : value.id])
   }
 

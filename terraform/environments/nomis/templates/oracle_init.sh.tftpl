@@ -105,9 +105,13 @@ reconfigure_oracle_has() {
     $ORACLE_HOME/perl/bin/perl -I $ORACLE_HOME/perl/lib -I $ORACLE_HOME/crs/install $ORACLE_HOME/crs/install/roothas.pl
 
     # script to be run as oracle user
-    cat > /tmp/oracle_reconfig.sh << 'EOF'
+    cat > /home/oracle/oracle_reconfig.sh << 'EOF'
         #!/bin/bash
         echo "+++Setting up Oracle HAS as Oracle user"
+
+        if [[ ${branch} != "main" ]]; then
+          set -x
+        fi
 
         unset ORAENV_ASK
 
@@ -131,25 +135,22 @@ reconfigure_oracle_has() {
         # wait for HAS to come up, particuarly ASM
         i=0
         while [[ "$i" -le 10 ]]; do
+            echo "+++Wait for ASM service #$((i + 1))"
             asm_status=$(srvctl status asm | grep "ASM is running")
             if [[ -n "$asm_status" ]]; then
+                echo "+++Mount disks"
                 asmcmd mount DATA # returns exit code zero even if already mounted
                 asmcmd mount FLASH
 
                 # resize disks
+                echo "+++Resize disks"
                 sqlplus -s / as sysasm <<< "alter diskgroup DATA resize all;"
                 sqlplus -s / as sysasm <<< "alter diskgroup FLASH resize all;"
 
                 # set asm passwords
+                echo "+++Set ASM Passwords"
                 asmcmd orapwusr --modify --password ASMSNMP <<< "$password_ASMSNMP"
                 asmcmd orapwusr --modify --password SYS <<< "$password_ASMSYS"
-
-                # start test database if present in AMI
-                if [[ -n "$(grep CNOMT1 /etc/oratab)" ]]; then
-                    source oraenv <<< CNOMT1
-                    srvctl add database -d CNOMT1 -o $ORACLE_HOME
-                    srvctl start database -d CNOMT1
-                fi
                 break
             fi
             if [[ "$i" -eq 10 ]]; then
@@ -162,14 +163,23 @@ reconfigure_oracle_has() {
 EOF
 
     # run the script as oracle user
-    chown oracle:oinstall /tmp/oracle_reconfig.sh
-    chmod u+x /tmp/oracle_reconfig.sh
+    chown oracle:oinstall /home/oracle/oracle_reconfig.sh
+    chmod u+x /home/oracle/oracle_reconfig.sh
     echo "+++running reconfiguration script as oracle user"
-    su - oracle -c /tmp/oracle_reconfig.sh
+    su - oracle -c /home/oracle/oracle_reconfig.sh
 
 }
 
 main() {
+    echo "volume_ids:            ${volume_ids}"
+    echo "ssm_parameter_ASMSYS:  ${ssm_parameter_ASMSYS}"
+    echo "ssm_parameter_ASMSNMP: ${ssm_parameter_ASMSNMP}"
+    echo "branch:                ${branch}"
+
+    if [[ ${branch} != "main" ]]; then
+      set -x
+    fi
+
     hugepages
     swap_disk
     disks
@@ -177,5 +187,5 @@ main() {
 }
 
 echo "oracle_init.sh start" | logger -p local3.info -t user-data
-main | logger -p local3.info -t user-data
+main 2>&1 | logger -p local3.info -t user-data
 echo "oracle_init.sh end" | logger -p local3.info -t user-data
