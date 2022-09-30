@@ -7,9 +7,9 @@ provider "aws" {
     role_arn = "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/MemberInfrastructureAccess"
   }
   default_tags {
-     tags = {
-      generated-in  = "Terraform"
-   }
+    tags = {
+      generated-in = "Terraform"
+    }
   }
 }
 
