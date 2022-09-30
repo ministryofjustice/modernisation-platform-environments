@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 # Note use of $${} syntax in places - this is because this file is being used as a terraform template so need to escape variable substitution
 set -euo pipefail
 
@@ -106,7 +106,7 @@ reconfigure_oracle_has() {
 
     # script to be run as oracle user
     cat > /tmp/oracle_reconfig.sh << 'EOF'
-        #!/bin/bash
+        #!/bin/bash -x
         echo "+++Setting up Oracle HAS as Oracle user"
 
         unset ORAENV_ASK
@@ -114,6 +114,10 @@ reconfigure_oracle_has() {
         # retrieve password from parameter store
         password_ASMSYS=$(aws ssm get-parameter --with-decryption --name "${ssm_parameter_ASMSYS}" --output text --query Parameter.Value)
         password_ASMSNMP=$(aws ssm get-parameter --with-decryption --name "${ssm_parameter_ASMSNMP}" --output text --query Parameter.Value)
+
+        # TMP
+        echo "Passwords: $password_ASMSYS"
+        echo "Passwords: $password_ASMSNMP"
 
         # reconfigure Oracle HAS
         source oraenv <<< +ASM
