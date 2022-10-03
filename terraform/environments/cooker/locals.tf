@@ -23,10 +23,16 @@ locals {
   # Merge tags from the environment json file with additional ones
   tags = merge(
     jsondecode(data.http.environments_file.response_body).tags,
+<<<<<<< HEAD
     { "is-production"    = local.is-production },
     { "environment-name" = terraform.workspace } ,
     { "source-code"      = "https://github.com/ministryofjustice/modernisation-platform" } ,
     {created-via         = "Terraform"}
+=======
+    { "is-production" = local.is-production },
+    { "environment-name" = terraform.workspace },
+    { "source-code" = "https://github.com/ministryofjustice/modernisation-platform" }
+>>>>>>> 247550fc5f9542169915af6f8268e35e23e4bcca
   )
 
   environment = trimprefix(terraform.workspace, "${var.networking[0].application}-")
