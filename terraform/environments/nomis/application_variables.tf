@@ -304,7 +304,35 @@ locals {
           }
         }
       },
-      databases = {},
+      databases = {
+        preprod-nomis-db-2 = {
+          tags = {
+            server-type = "nomis-db"
+            description = "PreProduction NOMIS MIS and Audit database to replace Azure PPPDL00017"
+            oracle-sids = "PPMIS, PPCNMAUD"
+            monitored   = false
+            always-on   = true
+          }
+          ami_name = "nomis_rhel_7_9_oracledb_11_2*"
+          instance = {
+            instance_type           = "r6i.2xlarge"
+            disable_api_termination = true
+          }
+          ebs_volumes = {
+            "/dev/sdb" = { size = 100 }  # /u01
+            "/dev/sdc" = { size = 5120 } # /u02
+          }
+          ebs_volume_config = {
+            data = {
+              total_size = 4000
+            }
+            flash = {
+              total_size = 1000
+            }
+          }
+        }
+      }
+
       # Add weblogic instances here.  They will be created using the weblogic module
       weblogics = {},
       # Add base instances here. They will be created using the base_instance module
