@@ -133,7 +133,7 @@ resource "aws_security_group" "app" {
   vpc_id      = data.aws_vpc.shared.id
 
   tags = merge(
-   # local.tags,
+    # local.tags,
     {
       Name = "app-${var.networking[0].application}"
     },
