@@ -22,7 +22,7 @@ locals {
 
   # Merge tags from the environment json file with additional ones
   tags = merge(
-    jsondecode(data.http.environments_file.body).tags,
+    jsondecode(data.http.environments_file.response_body).tags,
     { "is-production" = local.is-production },
     { "environment-name" = terraform.workspace },
     { "source-code" = "https://github.com/ministryofjustice/modernisation-platform" }
@@ -69,6 +69,17 @@ locals {
       protocol        = "tcp"
       cidr_blocks     = []
       security_groups = [module.bastion_linux.bastion_security_group]
+    }
+
+  }
+  ec2_egress_rules = {
+    "cluster_ec2_lb_egress" = {
+      description     = "Cluster EC2 loadbalancer egress rule"
+      from_port       = 0
+      to_port         = 0
+      protocol        = "-1"
+      cidr_blocks     = ["0.0.0.0/0"]
+      security_groups = [aws_security_group.load_balancer_security_group.id]
     }
   }
 }

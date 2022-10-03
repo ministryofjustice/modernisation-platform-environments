@@ -11,7 +11,6 @@ module "cwalarm_1" {
     thresh     = "10"
     alarmdesc  = "This alarm will trigger if we receive 4 4XX elb alerts in a 5 minute period."
 
-  
 }
 module "cwalarm_2" {
     source = "./modules/cloudwatch-alarms"
@@ -26,5 +25,4 @@ module "cwalarm_2" {
     thresh     = "10"
     alarmdesc  = "This alarm will trigger if we receive 4 4XX elb alerts in a 5 minute period."
 
-  
 }
