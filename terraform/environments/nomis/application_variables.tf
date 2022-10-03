@@ -108,9 +108,10 @@ locals {
       },
 
       databases = {
-        t1-db-audit = {
+        t1-nomis-db-2 = {
           tags = {
-            description = "Test NOMIS Audit database replicating with T1PDL0010"
+            server-type = "nomis-db"
+            description = "T1 NOMIS Audit database to replace Azure T1PDL0010"
             oracle-sids = "T1CNMAUD"
             monitored   = false
             always-on   = true
