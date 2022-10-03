@@ -182,7 +182,7 @@ resource "aws_acm_certificate" "internal_lb" {
 }
 
 resource "aws_route53_record" "internal_lb_validation" {
-  provider = aws.core-network-services
+  provider = aws.core-vpc
   for_each = {
     for dvo in aws_acm_certificate.internal_lb.domain_validation_options : dvo.domain_name => {
       name   = dvo.resource_record_name
@@ -196,7 +196,7 @@ resource "aws_route53_record" "internal_lb_validation" {
   records         = [each.value.record]
   ttl             = 60
   type            = each.value.type
-  zone_id         = data.aws_route53_zone.external.zone_id
+  zone_id         = data.aws_route53_zone.external-environment.zone_id
 }
 
 resource "aws_acm_certificate_validation" "internal_lb" {
