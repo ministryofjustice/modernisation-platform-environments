@@ -305,6 +305,7 @@ locals {
         }
       },
       databases = {
+        # NOTE: this is temporarily under prod account while we wait for network connectivity
         preprod-nomis-db-2 = {
           tags = {
             server-type = "nomis-db"
