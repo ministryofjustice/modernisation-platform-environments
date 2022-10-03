@@ -149,7 +149,7 @@ resource "aws_route53_record" "internal_lb" {
   provider = aws.core-vpc
 
   zone_id = data.aws_route53_zone.external.zone_id
-  name    = "*.${local.application_name}.${data.aws_route53_zone.external.name}"
+  name    = "*.${local.application_name}.${local.vpc_name}-${local.environment}.${data.aws_route53_zone.external.name}"
   type    = "A"
 
   alias {
@@ -167,7 +167,7 @@ resource "aws_acm_certificate" "internal_lb" {
   domain_name       = data.aws_route53_zone.external.name
   validation_method = "DNS"
 
-  subject_alternative_names = ["*.${local.application_name}.${data.aws_route53_zone.external.name}"]
+  subject_alternative_names = ["*.${local.application_name}.${local.vpc_name}-${local.environment}.${data.aws_route53_zone.external.name}"]
 
   tags = merge(
     local.tags,
@@ -182,7 +182,7 @@ resource "aws_acm_certificate" "internal_lb" {
 }
 
 resource "aws_route53_record" "internal_lb_validation" {
-  provider = aws.core-vpc
+  provider = aws.core-network-services
   for_each = {
     for dvo in aws_acm_certificate.internal_lb.domain_validation_options : dvo.domain_name => {
       name   = dvo.resource_record_name
