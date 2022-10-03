@@ -147,7 +147,7 @@ module "db_ec2_instance" {
   instance              = merge(local.database.instance, lookup(each.value, "instance", {}))
   user_data             = merge(local.database.user_data, lookup(each.value, "user_data", {}))
   ebs_volume_config     = merge(local.database.ebs_volume_config, lookup(each.value, "ebs_volume_config", {}))
-  ebs_volumes           = merge(local.database.ebs_volumes, lookup(each.value, "ebs_volumes", {}))
+  ebs_volumes           = { for k, v in local.database.ebs_volumes : k => merge(v, try(each.value.ebs_volumes[k], {})) }
   ssm_parameters_prefix = "database/"
   ssm_parameters        = merge(local.database.ssm_parameters, lookup(each.value, "ssm_parameters", {}))
   route53_records       = merge(local.database.route53_records, lookup(each.value, "route53_records", {}))
