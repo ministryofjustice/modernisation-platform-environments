@@ -108,14 +108,15 @@ locals {
       },
 
       databases = {
-        t1-db-audit = {
+        t1-nomis-db-2 = {
           tags = {
-            description = "Test NOMIS Audit database replicating with T1PDL0010"
+            server-type = "nomis-db"
+            description = "T1 NOMIS Audit database to replace Azure T1PDL0010"
             oracle-sids = "T1CNMAUD"
             monitored   = false
             always-on   = true
           }
-          ami_name = "nomis_rhel_7_9_oracledb_11_2*"
+          ami_name = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-03T12-51-25.032Z"
           instance = {
             disable_api_termination = true
           }
@@ -249,23 +250,6 @@ locals {
             monitored = true
           }
         },
-        MISAUDITPP = {
-          always_on              = true
-          ami_name               = "nomis_db_STIG-2022-04-26*"
-          instance_type          = "r6i.2xlarge"
-          asm_data_capacity      = 4000
-          asm_flash_capacity     = 1000
-          description            = "PreProduction NOMIS MIS and Audit database to replace Azure PPPDL00017"
-          termination_protection = true
-          oracle_sids            = ["PPMIS", "PPCNMAUD"]
-          oracle_app_disk_size = {
-            "/dev/sdb" = 100  # /u01
-            "/dev/sdc" = 5120 # /u02
-          }
-          tags = {
-            monitored = false # not yet live
-          }
-        },
         NOMIS = {
           always_on              = true
           ami_name               = "nomis_database_2022-07-21T11-43-27.346Z"
@@ -303,7 +287,37 @@ locals {
           }
         }
       },
-      databases = {},
+      databases = {
+
+        # NOTE: this is temporarily under prod account while we wait for network connectivity
+        preprod-nomis-db-2 = {
+          tags = {
+            server-type = "nomis-db"
+            description = "PreProduction NOMIS MIS and Audit database to replace Azure PPPDL00017"
+            oracle-sids = "PPMIS, PPCNMAUD"
+            monitored   = false
+            always-on   = true
+          }
+          ami_name = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-03T12-51-25.032Z"
+          instance = {
+            instance_type           = "r6i.2xlarge"
+            disable_api_termination = true
+          }
+          ebs_volumes = {
+            "/dev/sdb" = { size = 100 }  # /u01
+            "/dev/sdc" = { size = 5120 } # /u02
+          }
+          ebs_volume_config = {
+            data = {
+              total_size = 4000
+            }
+            flash = {
+              total_size = 1000
+            }
+          }
+        }
+      }
+
       # Add weblogic instances here.  They will be created using the weblogic module
       weblogics = {},
       # Add base instances here. They will be created using the base_instance module
