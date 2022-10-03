@@ -23,9 +23,9 @@ data "aws_iam_policy_document" "ssm_custom" {
     effect = "Allow"
     actions = [
       "ssm:DescribeAssociation",
+      "ssm:DescribeDocument",
       "ssm:GetDeployablePatchSnapshotForInstance",
       "ssm:GetDocument",
-      "ssm:DescribeDocument",
       "ssm:GetManifest",
       "ssm:ListAssociations",
       "ssm:ListInstanceAssociations",
@@ -320,17 +320,11 @@ resource "aws_ssm_association" "update_ssm_agent" {
 # Node Exporter - Install/Start Node Exporter Service
 #------------------------------------------------------------------------------
 
-data "template_file" "node_exporter_install_template" {
-  template = file("${path.module}/ssm-documents/templates/node-exporter-linux.json.tmpl")
-  vars = {
-    bucket_name = module.s3-bucket.bucket.id
-  }
-}
 resource "aws_ssm_document" "node_exporter_linux" {
   name            = "InstallNodeExporterLinux"
   document_type   = "Command"
   document_format = "JSON"
-  content         = data.template_file.node_exporter_install_template.rendered
+  content         = templatefile("${path.module}/ssm-documents/templates/node-exporter-linux.json.tmpl", { bucket_name = module.s3-bucket.bucket.id })
   target_type     = "/AWS::EC2::Instance"
 
   tags = merge(
@@ -349,37 +343,6 @@ resource "aws_ssm_association" "node_exporter_linux" {
     values = ["Linux"]
   }
 }
-
-data "template_file" "node_exporter_windows_install_template" {
-  template = file("${path.module}/ssm-documents/templates/node-exporter-windows.json.tmpl")
-  vars = {
-    bucket_name = module.s3-bucket.bucket.id
-  }
-}
-
-resource "aws_ssm_document" "node_exporter_windows" {
-  name            = "InstallNodeExporterWindows"
-  document_type   = "Command"
-  document_format = "JSON"
-  content         = data.template_file.node_exporter_windows_install_template.rendered
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "install-node-exporter-windows"
-    },
-  )
-}
-
-# Commented out as this gets a really old version from s3 bucket and jumpserver AMI has latest version already installed
-# resource "aws_ssm_association" "node_exporter_windows" {
-#   name             = aws_ssm_document.node_exporter_windows.name
-#   association_name = "node-exporter-windows"
-#   targets {
-#     key    = "tag:os_type"
-#     values = ["Windows"]
-#   }
-# }
 
 resource "aws_ssm_document" "script_exporter" {
   name            = "InstallScriptExporterLinux"
@@ -410,17 +373,11 @@ resource "aws_ssm_association" "script-exporter" {
 # Oracle Secure Web - Install Oracle Secure Web s3 Backup Module
 #------------------------------------------------------------------------------
 
-data "template_file" "oracle_secure_web_install_template" {
-  template = file("${path.module}/ssm-documents/templates/oracle-secure-web-install.json.tmpl")
-  vars = {
-    bucket_name = module.s3-bucket.bucket.id
-  }
-}
 resource "aws_ssm_document" "oracle_secure_web" {
   name            = "InstallOracleSecureWeb"
   document_type   = "Command"
   document_format = "JSON"
-  content         = data.template_file.oracle_secure_web_install_template.rendered
+  content         = templatefile("${path.module}/ssm-documents/templates/oracle-secure-web-install.json.tmpl", { bucket_name = module.s3-bucket.bucket.id })
   target_type     = "/AWS::EC2::Instance"
 
   tags = merge(

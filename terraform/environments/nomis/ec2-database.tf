@@ -1,6 +1,8 @@
 #------------------------------------------------------------------------------
 # Database
 #------------------------------------------------------------------------------
+# OLD NAMING - DEPRECATE
+#------------------------------------------------------------------------------
 
 module "database" {
   source = "./modules/database"
@@ -9,7 +11,7 @@ module "database" {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
   }
 
-  for_each = local.accounts[local.environment].databases
+  for_each = local.accounts[local.environment].databases_legacy
 
   name = each.key
 
@@ -40,6 +42,130 @@ module "database" {
   environment      = local.environment
   subnet_set       = local.subnet_set
   tags             = merge(local.tags, try(each.value.tags, {}))
+}
+
+#------------------------------------------------------------------------------
+# EC2 Instances following naming convention
+#------------------------------------------------------------------------------
+# NEW NAMING
+
+# SET TAGS
+locals {
+
+  database = {
+
+    # server-type and nomis-environment auto set by module
+    tags = {
+      component            = "data"
+      os-type              = "Linux"
+      os-major-version     = 7
+      os-version           = "RHEL 7.9"
+      licence-requirements = "Oracle Database"
+      ami                  = "nomis_rhel_7_9_oracledb_11_2"
+      "Patch Group"        = "RHEL"
+    }
+
+    instance = {
+      disable_api_termination = false
+      instance_type           = "r6i.xlarge"
+      key_name                = aws_key_pair.ec2-user.key_name
+      vpc_security_group_ids  = [aws_security_group.database_common.id]
+    }
+
+    user_data = {
+      args = {
+        restored_from_snapshot = false
+      }
+      scripts = [
+        "ansible.sh.tftpl",
+        "oracle_init.sh.tftpl"
+      ]
+      write_files = {}
+    }
+
+    ebs_volumes = {
+      "/dev/sdb" = { label = "app" }   # /u01
+      "/dev/sdc" = { label = "app" }   # /u02
+      "/dev/sde" = { label = "data" }  # DATA01
+      "/dev/sdf" = { label = "data" }  # DATA02
+      "/dev/sdg" = { label = "data" }  # DATA03
+      "/dev/sdh" = { label = "data" }  # DATA04
+      "/dev/sdi" = { label = "data" }  # DATA05
+      "/dev/sdj" = { label = "flash" } # FLASH01
+      "/dev/sdk" = { label = "flash" } # FLASH02
+      "/dev/sds" = { label = "swap" }
+    }
+
+    ebs_volume_config = {
+      data = {
+        iops       = 3000
+        throughput = 125
+      }
+      flash = {
+        iops       = 3000
+        throughput = 125
+      }
+    }
+
+    route53_records = {
+      create_internal_record = true
+      create_external_record = true
+    }
+
+    ssm_parameters = {
+      ASMSYS = {
+        random = {
+          length  = 30
+          special = false
+        }
+        description = "ASMSYS password"
+      }
+      ASMSNMP = {
+        random = {
+          length  = 30
+          special = false
+        }
+        description = "ASMSNMP password"
+      }
+    }
+  }
+}
+
+module "db_ec2_instance" {
+  source = "./modules/ec2_instance"
+
+  providers = {
+    aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
+  }
+
+  for_each = local.accounts[local.environment].databases
+
+  name = each.key
+
+  ami_name              = each.value.ami_name
+  ami_owner             = local.environment_management.account_ids[terraform.workspace]
+  instance              = merge(local.database.instance, lookup(each.value, "instance", {}))
+  user_data             = merge(local.database.user_data, lookup(each.value, "user_data", {}))
+  ebs_volume_config     = merge(local.database.ebs_volume_config, lookup(each.value, "ebs_volume_config", {}))
+  ebs_volumes           = merge(local.database.ebs_volumes, lookup(each.value, "ebs_volumes", {}))
+  ssm_parameters_prefix = "database/"
+  ssm_parameters        = merge(local.database.ssm_parameters, lookup(each.value, "ssm_parameters", {}))
+  route53_records       = merge(local.database.route53_records, lookup(each.value, "route53_records", {}))
+
+  instance_profile_policies = concat(local.ec2_common_managed_policies, [aws_iam_policy.s3_db_backup_bucket_access.arn])
+
+  business_unit     = local.vpc_name
+  application_name  = local.application_name
+  environment       = local.environment
+  region            = local.region
+  availability_zone = local.availability_zone
+  subnet_set        = local.subnet_set
+  subnet_name       = "data"
+  tags              = merge(local.tags, local.database.tags, try(each.value.tags, {}))
+
+  ansible_repo         = "modernisation-platform-configuration-management"
+  ansible_repo_basedir = "ansible"
+  branch               = var.BRANCH_NAME
 }
 
 #------------------------------------------------------------------------------
@@ -172,18 +298,11 @@ resource "aws_iam_policy" "s3_db_backup_bucket_access" {
 # Upload audit archive dumps to s3
 #------------------------------------------------------------------------------
 
-data "template_file" "audit_s3_upload_template" {
-  template = file("${path.module}/ssm-documents/templates/s3auditupload.yaml.tftmpl")
-  vars = {
-    bucket = module.nomis-audit-archives.bucket.id
-    branch = "main"
-  }
-}
 resource "aws_ssm_document" "audit_s3_upload" {
   name            = "UploadAuditArchivesToS3"
   document_type   = "Command"
   document_format = "YAML"
-  content         = data.template_file.audit_s3_upload_template.rendered
+  content         = templatefile("${path.module}/ssm-documents/templates/s3auditupload.yaml.tftmpl", { bucket = module.nomis-audit-archives.bucket.id, branch = "main" })
   target_type     = "/AWS::EC2::Instance"
 
   tags = merge(

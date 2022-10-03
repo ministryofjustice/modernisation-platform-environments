@@ -143,7 +143,7 @@ data "template_file" "task_definition" {
 
 module "windows-ecs" {
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs?ref=v2.0.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs?ref=v2.0.1"
 
   subnet_set_name         = local.subnet_set_name
   vpc_all                 = local.vpc_all
@@ -164,8 +164,8 @@ module "windows-ecs" {
   network_mode            = local.app_data.accounts[local.environment].network_mode
   server_port             = local.app_data.accounts[local.environment].server_port
   app_count               = local.app_data.accounts[local.environment].app_count
-  public_cidrs            = [data.aws_subnet.public_az_a.cidr_block, data.aws_subnet.public_az_b.cidr_block, data.aws_subnet.public_az_c.cidr_block]
   ec2_ingress_rules       = local.ec2_ingress_rules
+  ec2_egress_rules        = local.ec2_egress_rules
   tags_common             = local.tags
 
   depends_on = [aws_lb_listener.listener]

@@ -96,7 +96,10 @@ No modules.
 | [aws_route53_zone.internal](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/route53_zone)                | data source |
 | [aws_subnets.private](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/subnets)                           | data source |
 | [aws_vpc.shared_vpc](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/vpc)                                | data source |
+<<<<<<< HEAD
 | [template_file.user_data](https://registry.terraform.io/providers/hashicorp/template/latest/docs/data-sources/file)                     | data source |
+=======
+>>>>>>> 9adcb48359b10f15e0a53323d97c1d3cd1faa432
 
 ## Inputs
 
