@@ -133,7 +133,7 @@ resource "aws_security_group" "app" {
   vpc_id      = data.aws_vpc.shared.id
 
   tags = merge(
-    local.tags,
+   # local.tags,
     {
       Name = "app-${var.networking[0].application}"
     },
@@ -175,7 +175,7 @@ resource "aws_ecs_cluster" "app" {
   name = var.networking[0].application
 
   tags = merge(
-    local.tags,
+    # local.tags,
     {
       Name = var.networking[0].application
     },
@@ -218,7 +218,7 @@ resource "aws_ecs_service" "app" {
   }
 
   tags = merge(
-    local.tags,
+    # local.tags,
     {
       Name = var.networking[0].application
     },
@@ -284,7 +284,7 @@ resource "aws_ecs_task_definition" "app" {
   TASK_DEFINITION
 
   tags = merge(
-    local.tags,
+    # local.tags,
     {
       Name = var.networking[0].application
     },
@@ -311,7 +311,7 @@ resource "aws_iam_role" "app_execution" {
 EOF
 
   tags = merge(
-    local.tags,
+    # local.tags,
     {
       Name = "execution-${var.networking[0].application}"
     },
@@ -376,7 +376,7 @@ resource "aws_iam_role" "app_task" {
 EOF
 
   tags = merge(
-    local.tags,
+    # local.tags,
     {
       Name = "task-${var.networking[0].application}"
     },
@@ -417,7 +417,7 @@ resource "aws_security_group" "external_lb" {
   vpc_id      = data.aws_vpc.shared.id
 
   tags = merge(
-    local.tags,
+    # local.tags,
     {
       Name = "external-lb-${var.networking[0].application}"
     },
@@ -468,7 +468,7 @@ resource "aws_lb" "external" {
   enable_deletion_protection = false
 
   tags = merge(
-    local.tags,
+    # local.tags,
     {
       Name = "external-${var.networking[0].application}"
     },
@@ -485,7 +485,7 @@ resource "aws_lb_target_group" "external" {
   vpc_id               = data.aws_vpc.shared.id
 
   tags = merge(
-    local.tags,
+    # local.tags,
     {
       Name = "external-${var.networking[0].application}"
     },
@@ -571,7 +571,7 @@ resource "aws_security_group" "inner_lb" {
   vpc_id      = data.aws_vpc.shared.id
 
   tags = merge(
-    local.tags,
+    # local.tags,
     {
       Name = "inner-lb-${var.networking[0].application}"
     },
@@ -608,7 +608,7 @@ resource "aws_lb" "inner" {
   enable_deletion_protection = false
 
   tags = merge(
-    local.tags,
+    # local.tags,
     {
       Name = "inner-${var.networking[0].application}"
     },
@@ -625,7 +625,7 @@ resource "aws_lb_target_group" "inner" {
   vpc_id               = data.aws_vpc.shared.id
 
   tags = merge(
-    local.tags,
+    # local.tags,
     {
       Name = "inner-${var.networking[0].application}"
     },
@@ -694,7 +694,7 @@ resource "aws_security_group" "rds" {
   vpc_id      = data.aws_vpc.shared.id
 
   tags = merge(
-    local.tags,
+    # local.tags,
     {
       Name = "db-${var.networking[0].application}"
     },
@@ -728,7 +728,7 @@ resource "aws_db_subnet_group" "app" {
   subnet_ids  = data.aws_subnets.shared-data.ids
 
   tags = merge(
-    local.tags,
+    # local.tags,
     {
       Name = var.networking[0].application
     },
@@ -752,7 +752,7 @@ resource "aws_secretsmanager_secret" "master_password" {
   name = "${var.networking[0].application}-db-master-${random_string.secret_name_suffix.result}"
 
   tags = merge(
-    local.tags,
+    # local.tags,
     {
       Name = "${var.networking[0].application}-db-master-${random_string.secret_name_suffix.result}"
     },
@@ -779,7 +779,7 @@ resource "aws_db_instance" "app" {
   skip_final_snapshot    = true
 
   tags = merge(
-    local.tags,
+    # local.tags,
     {
       Name = var.networking[0].application
     }
@@ -796,7 +796,7 @@ resource "aws_cloudwatch_log_group" "app" {
   retention_in_days = 90
 
   tags = merge(
-    local.tags,
+    # local.tags,
     {
       Name = var.networking[0].application
     },
