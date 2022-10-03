@@ -123,15 +123,15 @@ variable "ebs_volume_config" {
 
 variable "ebs_volumes" {
   description = "EC2 volumes, see aws_ebs_volume for documentation.  key=volume name, value=ebs_volume_config key.  label is used as part of the Name tag"
-# Commenting below out as it has unexpected results when used with merge()
-#  type = map(object({
-#    label       = string
-#    snapshot_id = optional(string)
-#    iops        = optional(number)
-#    throughput  = optional(number)
-#    size        = optional(number)
-#    type        = optional(string)
-#  }))
+  # Commenting below out as it has unexpected results when used with merge()
+  #  type = map(object({
+  #    label       = string
+  #    snapshot_id = optional(string)
+  #    iops        = optional(number)
+  #    throughput  = optional(number)
+  #    size        = optional(number)
+  #    type        = optional(string)
+  #  }))
 }
 
 variable "route53_records" {
