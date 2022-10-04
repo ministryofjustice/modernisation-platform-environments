@@ -33,7 +33,7 @@ jobs:
       matrix:
         include:
           - environment: development
-    name: Terraform plan - ${{ github.workspace }} - ${{  matrix.environment }}
+    name: Terraform plan - ${{ github.workflow }} - ${{  matrix.environment }}
     runs-on: ubuntu-latest
     if: github.ref != 'refs/heads/main' || github.event_name == 'workflow_dispatch'
     env:
@@ -70,10 +70,12 @@ jobs:
       matrix:
         include:
           - environment: development
-    name: Terraform apply - ${{ github.workspace }} - ${{  matrix.environment }}
+    name: Terraform apply - ${{ github.workflow }} - ${{  matrix.environment }}
     runs-on: ubuntu-latest
     env:
       TF_ENV: ${{ matrix.environment }}
+    environment:
+      name: ${{ github.workflow }}-${{ matrix.environment }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3.0.2
