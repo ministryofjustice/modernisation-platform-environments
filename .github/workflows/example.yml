@@ -5,15 +5,15 @@ on:
     branches:
       - main
     paths:
-      - 'terraform/environments/"${{ github.workflow }}"/**'
+      - 'terraform/environments/example/**'
       - '.github/workflows/example.yml'
   pull_request:
     branches:
       - main
     types: [opened, edited, reopened, synchronize]
     paths:
-      - 'terraform/environments/${{ github.workflow }}/**'
-      - '.github/workflows/${{ github.workflow }}.yml'
+      - 'terraform/environments/example/**'
+      - '.github/workflows/example.yml'
   workflow_dispatch:
 env:
   TF_IN_AUTOMATION: true
