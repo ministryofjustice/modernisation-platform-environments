@@ -7,6 +7,14 @@ data "http" "environments_file" {
   url = "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/${local.application_name}.json"
 }
 
+data "aws_caller_identity" "oidc_session" {
+  provider = aws.oidc-session
+}
+
+data "aws_caller_identity" "modernisation_platform" {
+  provider = aws.modernisation-platform
+}
+
 locals {
 
   application_name = "data-and-insights-wepi"
