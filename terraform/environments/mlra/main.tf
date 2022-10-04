@@ -49,6 +49,7 @@ resource "aws_lb_listener" "alb_listener" {
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.alb_target_group.arn
+  #TODO cloudfront rule may still need to be applied. pending cutover strategy decisions
   }
 }
 
@@ -57,8 +58,10 @@ resource "aws_lb_target_group" "alb_target_group" {
   port     = 80
   protocol = "HTTP"
   vpc_id   = data.aws_vpc.shared.id
+  health_check {
   interval = 15
   path = "/mlra/"
+  protocol = "HTTP"
   timeout = 5
   healthy_threshold = 2
   unhealthy_threshold = 3
@@ -66,6 +69,7 @@ resource "aws_lb_target_group" "alb_target_group" {
   type = lb_cookie
   cookie_duration = 10800
   deregistration_delay = 30
+  }
 }
 
 
