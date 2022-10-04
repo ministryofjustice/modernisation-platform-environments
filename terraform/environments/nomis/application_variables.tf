@@ -294,7 +294,7 @@ locals {
           tags = {
             server-type = "nomis-db"
             description = "PreProduction NOMIS MIS and Audit database to replace Azure PPPDL00017"
-            oracle-sids = "PPMIS, PPCNMAUD"
+            oracle-sids = "PPMIS PPCNMAUD"
             monitored   = false
             always-on   = true
           }
