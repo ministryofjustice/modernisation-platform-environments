@@ -28,13 +28,12 @@ defaults:
 
 jobs:
 
-  plan-dev-test:
-    strategy:
-      matrix:
-        include:
-          - environment: development
-    name: Terraform plan - ${{ github.workflow }} - ${{ matrix.environment }}
+  plan-development:
+    name: Plan Development - example
     runs-on: ubuntu-latest
+    if: github.ref != 'refs/heads/main' || github.event_name == 'workflow_dispatch'
+    env:
+      TF_ENV: development
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3.0.2
@@ -51,15 +50,14 @@ jobs:
         with:
           terraform_version: "~1"
           terraform_wrapper: false
-      - name: Terraform plan - ${{ matrix.environment }}
+      - name: Terraform plan - development
         run: |
           terraform --version
           echo "Terraform plan - ${TF_ENV}"
-          bash scripts/terraform-init.sh terraform/environments/$GITHUB_WORKFLOW
-          terraform -chdir="terraform/environments/${GITHUB_WORKFLOW}" workspace select "${GITHUB_WORKFLOW}-${TF_ENV}"
-          bash scripts/terraform-plan.sh terraform/environments/$GITHUB_WORKFLOW
-        env:
-          TF_ENV: ${{ matrix.environment }}
+          bash scripts/terraform-init.sh terraform/environments/example
+          terraform -chdir="terraform/environments/example" workspace select "example-${TF_ENV}"
+          bash scripts/terraform-plan.sh terraform/environments/example
+
   # These jobs run when creating a pull request
   deploy-development:
     name: Deploy Development - example
