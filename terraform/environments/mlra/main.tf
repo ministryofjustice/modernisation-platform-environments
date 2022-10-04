@@ -57,29 +57,15 @@ resource "aws_lb_target_group" "alb_target_group" {
   port     = 80
   protocol = "HTTP"
   vpc_id   = data.aws_vpc.shared.id
-}
-
-resource "aws_lb_listener_rule" "static" {
-  listener_arn = aws_lb_listener.front_end.arn
-  priority     = 1
-
-  action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.static.arn
-  }
-
-  # condition {
-  #   path_pattern {
-  #     values = ["/static/*"]
-  #   }
-  # }
-
-  condition {
-    http_header {
-      http_header_name = "X-Custom-Header-LAA-MLRA"
-      values           = ["192.168.1.*"]
-    }
-  }
+  interval = 15
+  path = "/mlra/"
+  timeout = 5
+  healthy_threshold = 2
+  unhealthy_threshold = 3
+  enabled = true
+  type = lb_cookie
+  cookie_duration = 10800
+  deregistration_delay = 30
 }
 
 
