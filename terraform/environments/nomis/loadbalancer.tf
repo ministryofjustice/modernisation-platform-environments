@@ -125,7 +125,8 @@ resource "aws_lb_listener" "internal" {
 
 resource "aws_lb_listener" "internal_http" {
   depends_on = [
-    aws_acm_certificate_validation.internal_lb
+    aws_acm_certificate_validation.internal_lb_sub,
+    aws_acm_certificate_validation.internal_lb_tld
   ]
 
   load_balancer_arn = aws_lb.internal.arn
