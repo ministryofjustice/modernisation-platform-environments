@@ -2,18 +2,18 @@
 name: example
 on:
   push:
-    branches: 
+    branches:
       - main
     paths:
-      - 'terraform/environments/example/**'
-      - '.github/workflows/example.yml'
+      - 'terraform/environments/${{ github.workflow }}/**'
+      - '.github/workflows/${{ github.workflow }}.yml'
   pull_request:
     branches:
       - main
     types: [opened, edited, reopened, synchronize]
     paths:
-      - 'terraform/environments/example/**'
-      - '.github/workflows/example.yml'
+      - 'terraform/environments/${{ github.workflow }}/**'
+      - '.github/workflows/${{ github.workflow }}.yml'
   workflow_dispatch:
 env:
   TF_IN_AUTOMATION: true
@@ -27,10 +27,10 @@ defaults:
     shell: bash
 
 jobs:
-  
+
   # These jobs run when creating a pull request
   plan-development:
-    name: Plan Development - example
+    name: Plan Development - ${{ github.workflow }}
     runs-on: ubuntu-latest
     if: github.ref != 'refs/heads/main' || github.event_name == 'workflow_dispatch'
     env:
