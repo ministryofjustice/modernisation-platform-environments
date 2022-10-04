@@ -132,9 +132,9 @@ resource "aws_security_group" "app" {
   description = "Allow traffic from load balancer(s)"
   vpc_id      = data.aws_vpc.shared.id
 
-  tags = { 
-    Name = "app-${var.networking[0].application}" 
-    }
+  tags = {
+    Name = "app-${var.networking[0].application}"
+  }
 }
 
 resource "aws_security_group_rule" "app_egress_1" {
@@ -172,8 +172,8 @@ resource "aws_ecs_cluster" "app" {
   name = var.networking[0].application
 
   tags = {
-      Name = var.networking[0].application
-    }
+    Name = var.networking[0].application
+  }
 }
 
 resource "aws_ecs_service" "app" {
@@ -212,8 +212,8 @@ resource "aws_ecs_service" "app" {
   }
 
   tags = {
-      Name = var.networking[0].application
-    }
+    Name = var.networking[0].application
+  }
 }
 
 resource "aws_ecs_task_definition" "app" {
@@ -275,8 +275,8 @@ resource "aws_ecs_task_definition" "app" {
   TASK_DEFINITION
 
   tags = {
-      Name = var.networking[0].application
-    }
+    Name = var.networking[0].application
+  }
 }
 
 resource "aws_iam_role" "app_execution" {
@@ -299,8 +299,8 @@ resource "aws_iam_role" "app_execution" {
 EOF
 
   tags = {
-      Name = "execution-${var.networking[0].application}"
-    }
+    Name = "execution-${var.networking[0].application}"
+  }
 }
 
 resource "aws_iam_role_policy" "app_execution" {
@@ -361,8 +361,8 @@ resource "aws_iam_role" "app_task" {
 EOF
 
   tags = {
-      Name = "task-${var.networking[0].application}"
-    }
+    Name = "task-${var.networking[0].application}"
+  }
 }
 
 resource "aws_iam_role_policy" "app_task" {
@@ -399,8 +399,8 @@ resource "aws_security_group" "external_lb" {
   vpc_id      = data.aws_vpc.shared.id
 
   tags = {
-      Name = "external-lb-${var.networking[0].application}"
-    }
+    Name = "external-lb-${var.networking[0].application}"
+  }
 }
 
 resource "aws_security_group_rule" "external_lb_ingress_1" {
@@ -447,8 +447,8 @@ resource "aws_lb" "external" {
   enable_deletion_protection = false
 
   tags = {
-      Name = "external-${var.networking[0].application}"
-    }
+    Name = "external-${var.networking[0].application}"
+  }
 }
 
 resource "aws_lb_target_group" "external" {
@@ -461,8 +461,8 @@ resource "aws_lb_target_group" "external" {
   vpc_id               = data.aws_vpc.shared.id
 
   tags = {
-      Name = "external-${var.networking[0].application}"
-    }
+    Name = "external-${var.networking[0].application}"
+  }
 }
 
 resource "aws_lb_listener" "external" {
@@ -544,8 +544,8 @@ resource "aws_security_group" "inner_lb" {
   vpc_id      = data.aws_vpc.shared.id
 
   tags = {
-      Name = "inner-lb-${var.networking[0].application}"
-    }
+    Name = "inner-lb-${var.networking[0].application}"
+  }
 }
 
 resource "aws_security_group_rule" "inner_lb_ingress_1" {
@@ -578,8 +578,8 @@ resource "aws_lb" "inner" {
   enable_deletion_protection = false
 
   tags = {
-      Name = "inner-${var.networking[0].application}"
-    }
+    Name = "inner-${var.networking[0].application}"
+  }
 }
 
 resource "aws_lb_target_group" "inner" {
@@ -592,8 +592,8 @@ resource "aws_lb_target_group" "inner" {
   vpc_id               = data.aws_vpc.shared.id
 
   tags = {
-      Name = "inner-${var.networking[0].application}"
-    }
+    Name = "inner-${var.networking[0].application}"
+  }
 }
 
 resource "aws_lb_listener" "inner" {
@@ -658,8 +658,8 @@ resource "aws_security_group" "rds" {
   vpc_id      = data.aws_vpc.shared.id
 
   tags = {
-      Name = "db-${var.networking[0].application}"
-    }
+    Name = "db-${var.networking[0].application}"
+  }
 }
 
 resource "aws_security_group_rule" "rds_ingress_1" {
@@ -689,8 +689,8 @@ resource "aws_db_subnet_group" "app" {
   subnet_ids  = data.aws_subnets.shared-data.ids
 
   tags = {
-      Name = var.networking[0].application
-    }
+    Name = var.networking[0].application
+  }
 }
 
 # Create and store database secret
@@ -710,8 +710,8 @@ resource "aws_secretsmanager_secret" "master_password" {
   name = "${var.networking[0].application}-db-master-${random_string.secret_name_suffix.result}"
 
   tags = {
-      Name = "${var.networking[0].application}-db-master-${random_string.secret_name_suffix.result}"
-    }
+    Name = "${var.networking[0].application}-db-master-${random_string.secret_name_suffix.result}"
+  }
 }
 
 resource "aws_secretsmanager_secret_version" "master_password" {
@@ -734,8 +734,8 @@ resource "aws_db_instance" "app" {
   skip_final_snapshot    = true
 
   tags = {
-      Name = var.networking[0].application
-    }
+    Name = var.networking[0].application
+  }
 }
 
 #------------------------------------------------------------------------------
@@ -748,7 +748,7 @@ resource "aws_cloudwatch_log_group" "app" {
   retention_in_days = 90
 
   tags = {
-      Name = var.networking[0].application
-    }
+    Name = var.networking[0].application
+  }
 
 }
