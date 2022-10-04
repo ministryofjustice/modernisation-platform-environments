@@ -49,7 +49,7 @@ resource "aws_lb_listener" "alb_listener" {
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.alb_target_group.arn
-  #TODO cloudfront rule may still need to be applied. pending cutover strategy decisions
+    #TODO cloudfront rule may still need to be applied. pending cutover strategy decisions
   }
 }
 
