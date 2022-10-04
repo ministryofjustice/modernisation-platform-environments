@@ -199,7 +199,13 @@ resource "aws_route53_record" "internal_lb_validation_sub" {
   type            = each.value.type
   zone_id         = data.aws_route53_zone.external-environment.zone_id
 }
-
+resource "aws_acm_certificate_validation" "internal_lb_sub" {
+  certificate_arn         = aws_acm_certificate.internal_lb.arn
+  validation_record_fqdns = [for record in aws_route53_record.internal_lb_validation_sub : record.fqdn]
+  depends_on = [
+    aws_route53_record.internal_lb_validation_sub
+  ]
+}
 resource "aws_route53_record" "internal_lb_validation_tld" {
   provider = aws.core-network-services
   for_each = {
@@ -217,15 +223,12 @@ resource "aws_route53_record" "internal_lb_validation_tld" {
   type            = each.value.type
   zone_id         = data.aws_route53_zone.external.zone_id
 }
-
-resource "aws_acm_certificate_validation" "internal_lb_sub" {
-  certificate_arn         = aws_acm_certificate.internal_lb.arn
-  validation_record_fqdns = [for record in aws_route53_record.internal_lb_validation_sub : record.fqdn]
-}
-
 resource "aws_acm_certificate_validation" "internal_lb_tld" {
   certificate_arn         = aws_acm_certificate.internal_lb.arn
   validation_record_fqdns = [for record in aws_route53_record.internal_lb_validation_tld : record.fqdn]
+  depends_on = [
+    aws_route53_record.internal_lb_validation_tld
+  ]
 }
 
 #------------------------------------------------------------------------------
