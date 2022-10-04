@@ -7,6 +7,12 @@ data "http" "environments_file" {
   url = "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/${local.application_name}.json"
 }
 
+# Get session information from OIDC provider
+
+data "aws_caller_identity" "oidc_session" {
+  provider = aws.oidc-session
+}
+
 # get shared subnet-set vpc object
 data "aws_vpc" "shared_vpc" {
   # provider = aws.share-host
