@@ -58,18 +58,20 @@ resource "aws_lb_target_group" "alb_target_group" {
   port     = 80
   protocol = "HTTP"
   vpc_id   = data.aws_vpc.shared.id
-  health_check {
+  deregistration_delay = 30
+health_check {
   interval = 15
   path = "/mlra/"
   protocol = "HTTP"
   timeout = 5
   healthy_threshold = 2
   unhealthy_threshold = 3
+}
+stickiness {
   enabled = true
-  type = lb_cookie
+  type    = "lb_cookie"
   cookie_duration = 10800
-  deregistration_delay = 30
-  }
+}
 }
 
 
