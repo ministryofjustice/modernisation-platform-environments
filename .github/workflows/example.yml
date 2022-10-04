@@ -6,7 +6,7 @@ on:
       - main
     paths:
       - 'terraform/environments/example/**'
-      - .github/workflows/${{ github.workflow }}.yml
+      - '.github/workflows/example.yml'
   pull_request:
     branches:
       - main
@@ -28,18 +28,18 @@ defaults:
 
 jobs:
 
-  # These jobs run when creating a pull request
-  plan-development:
-    name: Plan Development - ${{ github.workflow }}
+  plan-dev-test:
+    strategy:
+      matrix:
+        include:
+          - environment: development
+    name: Terraform plan - ${{ github.workflow }} - ${{ matrix.environment }}
     runs-on: ubuntu-latest
-    if: github.ref != 'refs/heads/main' || github.event_name == 'workflow_dispatch'
-    env:
-      TF_ENV: development
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3.0.2
       - name: Set Account Number
-        run: echo "ACCOUNT_NUMBER=$(jq -r -e --arg account_name "example-${TF_ENV}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)" >> $GITHUB_ENV
+        run: echo "ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${GITHUB_WORKFLOW}-${TF_ENV}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)" >> $GITHUB_ENV
       - name: configure aws credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -51,14 +51,16 @@ jobs:
         with:
           terraform_version: "~1"
           terraform_wrapper: false
-      - name: Terraform plan - development
+      - name: Terraform plan - ${{ matrix.environment }}
         run: |
           terraform --version
           echo "Terraform plan - ${TF_ENV}"
-          bash scripts/terraform-init.sh terraform/environments/example
-          terraform -chdir="terraform/environments/example" workspace select "example-${TF_ENV}"
-          bash scripts/terraform-plan.sh terraform/environments/example
-
+          bash scripts/terraform-init.sh terraform/environments/$GITHUB_WORKFLOW
+          terraform -chdir="terraform/environments/${GITHUB_WORKFLOW}" workspace select "${GITHUB_WORKFLOW}-${TF_ENV}"
+          bash scripts/terraform-plan.sh terraform/environments/$GITHUB_WORKFLOW
+        env:
+          TF_ENV: ${{ matrix.environment }}
+  # These jobs run when creating a pull request
   deploy-development:
     name: Deploy Development - example
     runs-on: ubuntu-latest
