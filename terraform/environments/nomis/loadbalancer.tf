@@ -185,11 +185,11 @@ resource "aws_acm_certificate" "internal_lb" {
 resource "aws_route53_record" "internal_lb_validation_sub" {
   provider = aws.core-vpc
   for_each = {
-    for domain, dvo in aws_acm_certificate.internal_lb.domain_validation_options : dvo.domain_name => {
+    for dvo in aws_acm_certificate.internal_lb.domain_validation_options : dvo.domain_name => {
       name   = dvo.resource_record_name
       record = dvo.resource_record_value
       type   = dvo.resource_record_type
-    } if domain != "modernisation-platform.service.justice.gov.uk"
+    } if dvo.domain_name != "modernisation-platform.service.justice.gov.uk"
   }
 
   allow_overwrite = true
@@ -203,11 +203,11 @@ resource "aws_route53_record" "internal_lb_validation_sub" {
 resource "aws_route53_record" "internal_lb_validation_tld" {
   provider = aws.core-network-services
   for_each = {
-    for domain, dvo in aws_acm_certificate.internal_lb.domain_validation_options : dvo.domain_name => {
+    for dvo in aws_acm_certificate.internal_lb.domain_validation_options : dvo.domain_name => {
       name   = dvo.resource_record_name
       record = dvo.resource_record_value
       type   = dvo.resource_record_type
-    } if domain == "modernisation-platform.service.justice.gov.uk"
+    } if dvo.domain_name == "modernisation-platform.service.justice.gov.uk"
   }
 
   allow_overwrite = true
