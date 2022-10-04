@@ -43,6 +43,25 @@ variable "alarmdesc" {
     default = ""
   
 }
+variable "pClusterName" {
+    type = string
+    default = "" 
+}
+variable "pAutoscalingGroupName" {
+    type = string
+    default = ""
+  
+}
+variable "pLoadBalancerName" {
+    type = string
+    default = ""
+  
+}
+variable "pTargetGroupName" {
+    type = string
+    default = ""
+  
+}
 variable "pECSCPUAlarmThreshold" {
     description = "ECS CPU Alarm Threshold"
     type = number

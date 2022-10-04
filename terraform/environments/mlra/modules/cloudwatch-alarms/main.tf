@@ -12,7 +12,7 @@
 #}
 
 
-resource "aws_cloudwatch_metric_alram" "esccpuoverthreshold" {
+resource "aws_cloudwatch_metric_alarm" "esccpuoverthreshold" {
     alarm_name = "ECS-CPU-high-threshold-alarm"
     alarm_description = "If the CPU exceeds the predefined threshold, this alarm will trigger. \n Please investigate."
     namespace = "AWS/ECS"
@@ -28,7 +28,7 @@ resource "aws_cloudwatch_metric_alram" "esccpuoverthreshold" {
     comparison_operator = "GreaterThanthreshold"
 }
 
-resource "aws_cloudwatch_metric_alram" "ecsmemoryoverthreshold" { 
+resource "aws_cloudwatch_metric_alarm" "ecsmemoryoverthreshold" { 
       alarm_description = " If the memory util exceeds the predefined threshold, this alarm will trigger.\n Please investigate."
       namespace = " AWS/ECS"
       metric_name = " MemoryUtilization"
@@ -42,7 +42,7 @@ resource "aws_cloudwatch_metric_alram" "ecsmemoryoverthreshold" {
       }
       comparison_operator = " GreaterThanthreshold"
 }
-resource "aws_cloudwatch_metric_alram" "cpuoverthreshold" { 
+resource "aws_cloudwatch_metric_alarm" "cpuoverthreshold" { 
   
       alarm_name = "CPU-high-threshold-alarm"
       alarm_description = "If the CPU exceeds the predefined threshold, this alarm will trigger. \n Please investigate."
@@ -58,7 +58,7 @@ resource "aws_cloudwatch_metric_alram" "cpuoverthreshold" {
       }
       comparison_operator = " GreaterThanthreshold"
 }
-  resource "aws_cloudwatch_metric_alram" "StatusCheckFailure" {
+  resource "aws_cloudwatch_metric_alarm" "statuscheckfailure" {
       alarm_name = "status-check-failure-alarm"
       alarm_description = "If a status check failure occurs on an instance, please investigate. http = "//docs.aws.amazon.com/AWSEC2/latest/UserGuide/monitoring-system-instance-status-check.html""
       namespace = " AWS/EC2"
@@ -74,7 +74,7 @@ resource "aws_cloudwatch_metric_alram" "cpuoverthreshold" {
       comparison_operator = " GreaterThanthreshold"
 }
 # Application Load Balancer Alerting
-resource "aws_cloudwatch_metric_alram" "TargetResponseTime" {
+resource "aws_cloudwatch_metric_alarm" "targetresponsetime" {
       alarm_name = "alb-target-response-time-alarm"
       alarm_description = "The time elapsed, in seconds, after the request leaves the load balancer until a response from the target is received"
       namespace = " AWS/ApplicationELB"
@@ -89,7 +89,7 @@ resource "aws_cloudwatch_metric_alram" "TargetResponseTime" {
       }
       comparison_operator = " GreaterThanthreshold"
 }
-resource "aws_cloudwatch_metric_alram" "TargetResponseTimeMaximum" {
+resource "aws_cloudwatch_metric_alarm" "targetResponsetimemaximum" {
       alarm_name = "alb-target-response-time-alarm-maximum"
       alarm_description = "The time elapsed, in seconds, after the request leaves the load balancer until a response from the target is received. Triggered if response is longer than 60s."
       namespace = " AWS/ApplicationELB"
@@ -104,7 +104,7 @@ resource "aws_cloudwatch_metric_alram" "TargetResponseTimeMaximum" {
       }
       comparison_operator = " GreaterThanthreshold"
 }
-resource "aws_cloudwatch_metric_alram" "UnHealthyHosts" {
+resource "aws_cloudwatch_metric_alarm" "unhealthyhosts" {
       alarm_name = "unhealthy-hosts-alarm"
       alarm_description = "The unhealthy hosts alarm triggers if your load balancer recognises there is an unhealthy host and has been there for over 15 minutes."
       namespace = " AWS/ApplicationELB"
@@ -120,7 +120,7 @@ resource "aws_cloudwatch_metric_alram" "UnHealthyHosts" {
       }
       comparison_operator = "GreaterThanthreshold"
 }      
-resource "aws_cloudwatch_metric_alram" "RejectedConnectionCount" {
+resource "aws_cloudwatch_metric_alarm" "rejectedconnectioncount" {
       alarm_name = "RejectedConnectionCount-alarm"
       alarm_description = "There is no surge queue on ALB's. Alert triggers in ALB rejects too many requests, usually due to backend being busy."
       namespace = " AWS/ApplicationELB"
@@ -135,7 +135,7 @@ resource "aws_cloudwatch_metric_alram" "RejectedConnectionCount" {
       }
       comparison_operator = " GreaterThanthreshold"
 }
-resource "aws_cloudwatch_metric_alram" "http5xxError" {
+resource "aws_cloudwatch_metric_alarm" "http5xxerror" {
       alarm_name = "http-5xx-error-alarm"
       alarm_description = "This alarm will trigger if we receive 4 5XX http alerts in a 5 minute period."
       namespace = " AWS/ApplicationELB"
@@ -150,7 +150,7 @@ resource "aws_cloudwatch_metric_alram" "http5xxError" {
       }
       comparison_operator = " GreaterThanthreshold"
 }
-resource "aws_cloudwatch_metric_alram" "ApplicationELB5xxError" {
+resource "aws_cloudwatch_metric_alarm" "applicationelb5xxerror" {
       alarm_name = "elb-5xx-error-alarm"
       alarm_description = "This alarm will trigger if we receive 4 5XX elb alerts in a 5 minute period."
       namespace = " AWS/ApplicationELB"
@@ -165,7 +165,7 @@ resource "aws_cloudwatch_metric_alram" "ApplicationELB5xxError" {
       }          
       comparison_operator = " GreaterThanthreshold"
 }
-resource "aws_cloudwatch_metric_alram" "http4xxError" {
+resource "aws_cloudwatch_metric_alarm" "http4xxerror" {
       alarm_name = "http-4xx-error-alarm"
       alarm_description = "This alarm will trigger if we receive 4 4XX http alerts in a 5 minute period."
       namespace = " AWS/ApplicationELB"
@@ -180,7 +180,7 @@ resource "aws_cloudwatch_metric_alram" "http4xxError" {
       }
       comparison_operator = " GreaterThanthreshold"
 }
-resource "aws_cloudwatch_metric_alram" "ApplicationELB4xxError" {
+resource "aws_cloudwatch_metric_alarm" "applicationelb4xxerror" {
       alarm_name = "elb-4xx-error-alarm"
       alarm_description = "This alarm will trigger if we receive 4 4XX elb alerts in a 5 minute period."
       namespace = " AWS/ApplicationELB"

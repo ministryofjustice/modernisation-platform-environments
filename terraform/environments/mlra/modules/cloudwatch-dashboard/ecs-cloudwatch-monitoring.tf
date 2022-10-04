@@ -15,7 +15,7 @@ resource "aws_cloudwatch_dashboard" "mlra" {
         "stat": "${var.cloudwatch_stat}",
         "region": "${local.application_data.accounts[local.environment].region}"
         "annotations": {
-          "alarms": #[module.<marks_module>.<output_name]
+          "alarms": module.cloudwatch-alarm.applicationelb5xxerror.value
         }, 
         "view": "${var.cloudwatch_view}"
         "stacked": "${var.cloudwatch_stacked}",
@@ -34,7 +34,7 @@ resource "aws_cloudwatch_dashboard" "mlra" {
         "period": "${var.cloudwatch_dashboard_period}",
         "stat": "${var.cloudwatch_stat}",
         "annotations": {
-          "alarms": #[module.<marks_module>.<output_name]
+          "alarms": module.cloudwatch-alarm.applicationelb4xxerror.value
         }, 
         "region": "${local.application_data.accounts[local.environment].region}",
         "view": "${var.cloudwatch_view}",
@@ -52,7 +52,7 @@ resource "aws_cloudwatch_dashboard" "mlra" {
         "period": "${var.cloudwatch_dashboard_period}",
         "stat": "${var.cloudwatch_stat}",
         "annotations": {
-          "alarms": #[module.<marks_module>.<output_name]
+          "alarms": module.cloudwatch-alarm.targetresponsetime.value
         }, 
         "region": "${local.application_data.accounts[local.environment].region}",
         "view": "${var.cloudwatch_view}",
@@ -69,7 +69,7 @@ resource "aws_cloudwatch_dashboard" "mlra" {
         "period": "${var.cloudwatch_dashboard_period}",
         "stat": "${var.cloudwatch_stat}",
         "annotations": {
-          "alarms": #[module.<marks_module>.<output_name]
+          "alarms": module.cloudwatch-alarm.esccpuoverthreshold.value
         }, 
         "region": "${local.application_data.accounts[local.environment].region}}",
         "view": "${var.cloudwatch_view}",
@@ -90,7 +90,7 @@ resource "aws_cloudwatch_dashboard" "mlra" {
         "period": "${var.cloudwatch_dashboard_period}",
         "stat": "${var.cloudwatch_stat}",
         "annotations": {
-          "alarms": #[module.<marks_module>.<output_name]
+          "alarms": module.cloudwatch-alarm.ecsmemoryoverthreshold.value
         } ,
         "region": "${local.application_data.accounts[local.environment].region}",
         "view": "${var.cloudwatch_view}",
