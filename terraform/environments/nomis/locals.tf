@@ -23,6 +23,10 @@ data "aws_vpc" "shared_vpc" {
 
 locals {
 
+  # Stores modernisation platform account id for setting up the modernisation-platform provider
+
+  modernisation_platform_account_id = data.aws_ssm_parameter.modernisation_platform_account_id.value
+
   application_name = var.networking[0].application
 
   environment_management = jsondecode(data.aws_secretsmanager_secret_version.environment_management.secret_string)
