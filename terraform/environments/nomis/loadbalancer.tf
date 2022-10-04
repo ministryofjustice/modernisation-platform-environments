@@ -215,7 +215,7 @@ resource "aws_route53_record" "internal_lb_validation_tld" {
   records         = [each.value.record]
   ttl             = 60
   type            = each.value.type
-  zone_id         = data.aws_route53_zone.external-environment.zone_id
+  zone_id         = data.aws_route53_zone.external.zone_id
 }
 
 resource "aws_acm_certificate_validation" "internal_lb_sub" {
