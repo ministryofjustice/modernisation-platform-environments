@@ -6,7 +6,7 @@ on:
       - main
     paths:
       - 'terraform/environments/example/**'
-      - '.github/workflows/example.yml'
+      - .github/workflows/${{ github.workflow }}.yml
   pull_request:
     branches:
       - main
