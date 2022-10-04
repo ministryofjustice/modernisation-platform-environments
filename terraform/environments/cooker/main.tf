@@ -132,12 +132,9 @@ resource "aws_security_group" "app" {
   description = "Allow traffic from load balancer(s)"
   vpc_id      = data.aws_vpc.shared.id
 
-  tags = merge(
-    # local.tags,
-    {
-      Name = "app-${var.networking[0].application}"
-    },
-  )
+  tags = { 
+    Name = "app-${var.networking[0].application}" 
+    }
 }
 
 resource "aws_security_group_rule" "app_egress_1" {
@@ -174,12 +171,9 @@ resource "aws_ecs_cluster" "app" {
 
   name = var.networking[0].application
 
-  tags = merge(
-    # local.tags,
-    {
+  tags = {
       Name = var.networking[0].application
-    },
-  )
+    }
 }
 
 resource "aws_ecs_service" "app" {
@@ -217,12 +211,9 @@ resource "aws_ecs_service" "app" {
     container_port   = 3000
   }
 
-  tags = merge(
-    # local.tags,
-    {
+  tags = {
       Name = var.networking[0].application
-    },
-  )
+    }
 }
 
 resource "aws_ecs_task_definition" "app" {
@@ -283,12 +274,9 @@ resource "aws_ecs_task_definition" "app" {
   ]
   TASK_DEFINITION
 
-  tags = merge(
-    # local.tags,
-    {
+  tags = {
       Name = var.networking[0].application
-    },
-  )
+    }
 }
 
 resource "aws_iam_role" "app_execution" {
@@ -310,12 +298,9 @@ resource "aws_iam_role" "app_execution" {
 }
 EOF
 
-  tags = merge(
-    # local.tags,
-    {
+  tags = {
       Name = "execution-${var.networking[0].application}"
-    },
-  )
+    }
 }
 
 resource "aws_iam_role_policy" "app_execution" {
@@ -375,12 +360,9 @@ resource "aws_iam_role" "app_task" {
 }
 EOF
 
-  tags = merge(
-    # local.tags,
-    {
+  tags = {
       Name = "task-${var.networking[0].application}"
-    },
-  )
+    }
 }
 
 resource "aws_iam_role_policy" "app_task" {
@@ -416,12 +398,9 @@ resource "aws_security_group" "external_lb" {
   description = "Allow inbound traffic to external load balancer"
   vpc_id      = data.aws_vpc.shared.id
 
-  tags = merge(
-    # local.tags,
-    {
+  tags = {
       Name = "external-lb-${var.networking[0].application}"
-    },
-  )
+    }
 }
 
 resource "aws_security_group_rule" "external_lb_ingress_1" {
@@ -467,12 +446,9 @@ resource "aws_lb" "external" {
   subnets                    = data.aws_subnets.shared-public.ids
   enable_deletion_protection = false
 
-  tags = merge(
-    # local.tags,
-    {
+  tags = {
       Name = "external-${var.networking[0].application}"
-    },
-  )
+    }
 }
 
 resource "aws_lb_target_group" "external" {
@@ -484,12 +460,9 @@ resource "aws_lb_target_group" "external" {
   deregistration_delay = "30"
   vpc_id               = data.aws_vpc.shared.id
 
-  tags = merge(
-    # local.tags,
-    {
+  tags = {
       Name = "external-${var.networking[0].application}"
-    },
-  )
+    }
 }
 
 resource "aws_lb_listener" "external" {
@@ -570,12 +543,9 @@ resource "aws_security_group" "inner_lb" {
   description = "Allow inbound traffic to inner load balancer"
   vpc_id      = data.aws_vpc.shared.id
 
-  tags = merge(
-    # local.tags,
-    {
+  tags = {
       Name = "inner-lb-${var.networking[0].application}"
-    },
-  )
+    }
 }
 
 resource "aws_security_group_rule" "inner_lb_ingress_1" {
@@ -607,12 +577,9 @@ resource "aws_lb" "inner" {
   subnets                    = data.aws_subnets.shared-private.ids
   enable_deletion_protection = false
 
-  tags = merge(
-    # local.tags,
-    {
+  tags = {
       Name = "inner-${var.networking[0].application}"
-    },
-  )
+    }
 }
 
 resource "aws_lb_target_group" "inner" {
@@ -624,12 +591,9 @@ resource "aws_lb_target_group" "inner" {
   deregistration_delay = "30"
   vpc_id               = data.aws_vpc.shared.id
 
-  tags = merge(
-    # local.tags,
-    {
+  tags = {
       Name = "inner-${var.networking[0].application}"
-    },
-  )
+    }
 }
 
 resource "aws_lb_listener" "inner" {
@@ -693,12 +657,9 @@ resource "aws_security_group" "rds" {
   description = "Allow inbound traffic from application"
   vpc_id      = data.aws_vpc.shared.id
 
-  tags = merge(
-    # local.tags,
-    {
+  tags = {
       Name = "db-${var.networking[0].application}"
-    },
-  )
+    }
 }
 
 resource "aws_security_group_rule" "rds_ingress_1" {
@@ -727,12 +688,9 @@ resource "aws_db_subnet_group" "app" {
   description = "Data subnets group"
   subnet_ids  = data.aws_subnets.shared-data.ids
 
-  tags = merge(
-    # local.tags,
-    {
+  tags = {
       Name = var.networking[0].application
-    },
-  )
+    }
 }
 
 # Create and store database secret
@@ -751,12 +709,9 @@ resource "aws_secretsmanager_secret" "master_password" {
 
   name = "${var.networking[0].application}-db-master-${random_string.secret_name_suffix.result}"
 
-  tags = merge(
-    # local.tags,
-    {
+  tags = {
       Name = "${var.networking[0].application}-db-master-${random_string.secret_name_suffix.result}"
-    },
-  )
+    }
 }
 
 resource "aws_secretsmanager_secret_version" "master_password" {
@@ -778,12 +733,9 @@ resource "aws_db_instance" "app" {
   db_subnet_group_name   = aws_db_subnet_group.app.id
   skip_final_snapshot    = true
 
-  tags = merge(
-    # local.tags,
-    {
+  tags = {
       Name = var.networking[0].application
     }
-  )
 }
 
 #------------------------------------------------------------------------------
@@ -795,10 +747,8 @@ resource "aws_cloudwatch_log_group" "app" {
   name              = var.networking[0].application
   retention_in_days = 90
 
-  tags = merge(
-    # local.tags,
-    {
+  tags = {
       Name = var.networking[0].application
-    },
-  )
+    }
+
 }
