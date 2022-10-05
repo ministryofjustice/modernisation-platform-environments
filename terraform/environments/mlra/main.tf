@@ -48,7 +48,6 @@ resource "aws_lb_listener" "alb_listener" {
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.alb_target_group.arn
     #TODO default action type fixed-response has not been added
     #as this depends on cloudfront which is is not currently configured
     #therefore this will need to be added pending cutover strategy decisions
@@ -58,6 +57,7 @@ resource "aws_lb_listener" "alb_listener" {
     #     ContentType: text/plain
     #     MessageBody: Access Denied - must access via CloudFront
     #     StatusCode: '403'
+    target_group_arn = aws_lb_target_group.alb_target_group.arn
   }
 }
 
