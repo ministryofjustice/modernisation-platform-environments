@@ -19,7 +19,7 @@ jobs:
   create-and-commit-dependabot-file:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3.0.2
+      - uses: actions/checkout@v3.1.0
       - name: Generate file
         run: bash ./scripts/generate-dependabot-file.sh
       - name: Commit changes to GitHub
