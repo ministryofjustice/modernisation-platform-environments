@@ -1,6 +1,7 @@
 locals {
   project              = local.application_data.accounts[local.environment].project_short_id
   glue_db              = local.application_data.accounts[local.environment].glue_db_name
+  glue_db_data_domain  = local.application_data.accounts[local.environment].glue_db_data_domain
   description          = local.application_data.accounts[local.environment].db_description
   create_db            = local.application_data.accounts[local.environment].create_database
   glue_job             = local.application_data.accounts[local.environment].glue_job_name
@@ -24,6 +25,10 @@ locals {
     }
   )
 }
+
+############################
+# Federated Cloud Platform # 
+############################
 
 # Terraform AWS Glue Database
 module "glue_demo_table" {
@@ -85,7 +90,7 @@ module "glue_demo_table" {
   glue_table_depends_on = [module.glue_database.db_name]
 }
 
-# kinesis Data Stream
+# kinesis Data Stream Ingestor
 module "kinesis_stream_ingestor" {
   source                    = "./modules/kinesis_stream"
   create_kinesis_stream     = local.create_kinesis
@@ -103,6 +108,29 @@ module "kinesis_stream_ingestor" {
     {
       Name          = "${local.project}-kinesis-ingestor-${local.env}"
       Resource_Type = "Kinesis Data Stream"
+    }
+  )
+}
+
+# kinesis Domain Data Stream
+module "kinesis_stream_domain_data" {
+  source                    = "./modules/kinesis_stream"
+  create_kinesis_stream     = local.create_kinesis
+  name                      = "${local.project}-kinesis-domain-data-${local.env}"
+  shard_count               = 1
+  retention_period          = 24
+  shard_level_metrics       = ["IncomingBytes", "OutgoingBytes"]
+  enforce_consumer_deletion = false
+  encryption_type           = "KMS"
+  kms_key_id                = local.kinesis_kms_id
+  project_id                = local.project
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-kinesis-domain-data-${local.env}"
+      Resource_Type = "Kinesis Data Stream"
+      Component     = "Domain Data"
     }
   )
 }
@@ -514,6 +542,143 @@ module "s3_curated_bucket" {
     {
       Name          = "${local.project}-curated-${local.env}-s3"
       Resource_Type = "S3 Bucket"
+    }
+  )
+}
+
+
+##########################
+# Data Domain Components # 
+##########################
+
+# Glue Database Catalog for Data Domain
+module "glue_database" {
+  source         = "./modules/glue_database"
+  create_db      = local.create_db
+  name           = "${local.project}-${local.glue_db_data_domain}-${local.env}"
+  description    = "Glue Data Catalog for Data Domain Platform"
+  aws_account_id = local.account_id
+  aws_region     = local.account_region
+}
+
+# Data Domain Bucket
+module "s3_domain_bucket" {
+  count  = local.create_bucket ? 1 : 0
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.2.0"
+
+  providers = {
+    aws.bucket-replication = aws
+  }
+
+  bucket_prefix = "${local.project}-domain-${local.env}-"
+
+  replication_enabled = false
+  custom_kms_key      = local.s3_kms_arn
+  lifecycle_rule = [
+    {
+      id      = "main"
+      enabled = "Enabled"
+      prefix  = ""
+
+      tags = {
+        rule      = "log"
+        autoclean = "true"
+      }
+
+      transition = [
+        {
+          days          = 90
+          storage_class = "STANDARD_IA"
+        }
+      ]
+
+      expiration = {
+        days = 730
+      }
+
+      noncurrent_version_transition = [
+        {
+          days          = 90
+          storage_class = "STANDARD_IA"
+          }, {
+          days          = 365
+          storage_class = "GLACIER"
+        }
+      ]
+
+      noncurrent_version_expiration = {
+        days = 730
+      }
+    }
+  ]
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-domain-${local.env}-s3"
+      Resource_Type = "S3 Bucket"
+      Component     = "Data Domain"
+    }
+  )
+}
+
+# Data Domain Configuration Bucket
+module "s3_domain_config_bucket" {
+  count  = local.create_bucket ? 1 : 0
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.2.0"
+
+  providers = {
+    aws.bucket-replication = aws
+  }
+
+  bucket_prefix = "${local.project}-domain-config-${local.env}-"
+
+  replication_enabled = false
+  custom_kms_key      = local.s3_kms_arn
+  lifecycle_rule = [
+    {
+      id      = "main"
+      enabled = "Enabled"
+      prefix  = ""
+
+      tags = {
+        rule      = "log"
+        autoclean = "true"
+      }
+
+      transition = [
+        {
+          days          = 90
+          storage_class = "STANDARD_IA"
+        }
+      ]
+
+      expiration = {
+        days = 730
+      }
+
+      noncurrent_version_transition = [
+        {
+          days          = 90
+          storage_class = "STANDARD_IA"
+          }, {
+          days          = 365
+          storage_class = "GLACIER"
+        }
+      ]
+
+      noncurrent_version_expiration = {
+        days = 730
+      }
+    }
+  ]
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-domain-config-${local.env}-s3"
+      Resource_Type = "S3 Bucket"
+      Component     = "Data Domain"
     }
   )
 }
