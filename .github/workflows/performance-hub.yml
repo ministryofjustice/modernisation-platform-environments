@@ -31,7 +31,7 @@ jobs:
   #    if: github.ref != 'refs/heads/main' || github.event_name == 'workflow_dispatch'
   #    steps:
   #      - name: Checkout Repository
-  #        uses: actions/checkout@v3.0.2
+  #        uses: actions/checkout@v3.1.0
   #      - name: Load and Configure Terraform
   #        uses: hashicorp/setup-terraform@v2.0.0
   #        with:
@@ -55,7 +55,7 @@ jobs:
   #      name: performance-hub-development
   #    steps:
   #      - name: Checkout Repository
-  #        uses: actions/checkout@v3.0.2
+  #        uses: actions/checkout@v3.1.0
   #      - name: Load and Configure Terraform
   #        uses: hashicorp/setup-terraform@v2.0.0
   #        with:
@@ -77,7 +77,7 @@ jobs:
   #   if: github.ref != 'refs/heads/main'
   #   steps:
   #     - name: Checkout Repository
-  #       uses: actions/checkout@v3.0.2
+  #       uses: actions/checkout@v3.1.0
   #     - name: Load and Configure Terraform
   #       uses: hashicorp/setup-terraform@v2.0.0
   #       with:
@@ -101,7 +101,7 @@ jobs:
   #     name: performance-hub-test
   #   steps:
   #     - name: Checkout Repository
-  #       uses: actions/checkout@v3.0.2
+  #       uses: actions/checkout@v3.1.0
   #     - name: Load and Configure Terraform
   #       uses: hashicorp/setup-terraform@v2.0.0
   #       with:
@@ -124,7 +124,7 @@ jobs:
     if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3.0.2
+        uses: actions/checkout@v3.1.0
       - name: Load and Configure Terraform
         uses: hashicorp/setup-terraform@v2.0.0
         with:
@@ -148,7 +148,7 @@ jobs:
       name: performance-hub-preproduction
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3.0.2
+        uses: actions/checkout@v3.1.0
       - name: Load and Configure Terraform
         uses: hashicorp/setup-terraform@v2.0.0
         with:
@@ -170,7 +170,7 @@ jobs:
     if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3.0.2
+        uses: actions/checkout@v3.1.0
       - name: Load and Configure Terraform
         uses: hashicorp/setup-terraform@v2.0.0
         with:
@@ -194,7 +194,7 @@ jobs:
       name: performance-hub-production
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3.0.2
+        uses: actions/checkout@v3.1.0
       - name: Load and Configure Terraform
         uses: hashicorp/setup-terraform@v2.0.0
         with:
