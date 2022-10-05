@@ -2,16 +2,12 @@
   "accounts": {
     "development": {
       "example_var": "dev-data",
-<<<<<<< HEAD
       "region": "eu-west-2",
       "cloudwatch_stat": "Average",
       "cloudwatch_view": "timeSeries",
       "cloudwatch_type": "metric",
       "cloudwatch_dashboard_title": "",
       "cloudwatch_dashboard_period": ""
-=======
-      "region": "eu-west-2"
->>>>>>> 9adcb48359b10f15e0a53323d97c1d3cd1faa432
     },
     "test": {
       "example_var": "test-data"
