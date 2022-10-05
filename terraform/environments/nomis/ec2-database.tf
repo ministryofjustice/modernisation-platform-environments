@@ -1,314 +1,314 @@
-#------------------------------------------------------------------------------
-# Database
-#------------------------------------------------------------------------------
-# OLD NAMING - DEPRECATE
-#------------------------------------------------------------------------------
+# #------------------------------------------------------------------------------
+# # Database
+# #------------------------------------------------------------------------------
+# # OLD NAMING - DEPRECATE
+# #------------------------------------------------------------------------------
 
-module "database" {
-  source = "./modules/database"
+# module "database" {
+#   source = "./modules/database"
 
-  providers = {
-    aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
-  }
+#   providers = {
+#     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
+#   }
 
-  for_each = local.accounts[local.environment].databases_legacy
+#   for_each = local.accounts[local.environment].databases_legacy
 
-  name = each.key
+#   name = each.key
 
-  always_on          = each.value.always_on
-  ami_name           = each.value.ami_name
-  asm_data_capacity  = each.value.asm_data_capacity
-  asm_flash_capacity = each.value.asm_flash_capacity
-  description        = each.value.description
+#   always_on          = each.value.always_on
+#   ami_name           = each.value.ami_name
+#   asm_data_capacity  = each.value.asm_data_capacity
+#   asm_flash_capacity = each.value.asm_flash_capacity
+#   description        = each.value.description
 
-  ami_owner              = try(each.value.ami_owner, local.environment_management.account_ids["nomis-test"])
-  asm_data_iops          = try(each.value.asm_data_iops, null)
-  asm_data_throughput    = try(each.value.asm_data_throughput, null)
-  asm_flash_iops         = try(each.value.asm_flash_iops, null)
-  asm_flash_throughput   = try(each.value.asm_data_throughput, null)
-  oracle_app_disk_size   = try(each.value.oracle_app_disk_size, null)
-  extra_ingress_rules    = try(each.value.extra_ingress_rules, null)
-  termination_protection = try(each.value.termination_protection, null)
-  instance_type          = try(each.value.instance_type, null)
-  oracle_sids            = try(each.value.oracle_sids, null)
-  restored_from_snapshot = try(each.value.restored_from_snapshot, false)
+#   ami_owner              = try(each.value.ami_owner, local.environment_management.account_ids["nomis-test"])
+#   asm_data_iops          = try(each.value.asm_data_iops, null)
+#   asm_data_throughput    = try(each.value.asm_data_throughput, null)
+#   asm_flash_iops         = try(each.value.asm_flash_iops, null)
+#   asm_flash_throughput   = try(each.value.asm_data_throughput, null)
+#   oracle_app_disk_size   = try(each.value.oracle_app_disk_size, null)
+#   extra_ingress_rules    = try(each.value.extra_ingress_rules, null)
+#   termination_protection = try(each.value.termination_protection, null)
+#   instance_type          = try(each.value.instance_type, null)
+#   oracle_sids            = try(each.value.oracle_sids, null)
+#   restored_from_snapshot = try(each.value.restored_from_snapshot, false)
 
-  common_security_group_id  = aws_security_group.database_common.id
-  instance_profile_policies = concat(local.ec2_common_managed_policies, [aws_iam_policy.s3_db_backup_bucket_access.arn])
-  key_name                  = aws_key_pair.ec2-user.key_name
+#   common_security_group_id  = aws_security_group.database_common.id
+#   instance_profile_policies = concat(local.ec2_common_managed_policies, [aws_iam_policy.s3_db_backup_bucket_access.arn])
+#   key_name                  = aws_key_pair.ec2-user.key_name
 
-  application_name = local.application_name
-  business_unit    = local.vpc_name
-  environment      = local.environment
-  subnet_set       = local.subnet_set
-  tags             = merge(local.tags, try(each.value.tags, {}))
-}
+#   application_name = local.application_name
+#   business_unit    = local.vpc_name
+#   environment      = local.environment
+#   subnet_set       = local.subnet_set
+#   tags             = merge(local.tags, try(each.value.tags, {}))
+# }
 
-#------------------------------------------------------------------------------
-# EC2 Instances following naming convention
-#------------------------------------------------------------------------------
-# NEW NAMING
+# #------------------------------------------------------------------------------
+# # EC2 Instances following naming convention
+# #------------------------------------------------------------------------------
+# # NEW NAMING
 
-# SET TAGS
-locals {
+# # SET TAGS
+# locals {
 
-  database = {
+#   database = {
 
-    # server-type and nomis-environment auto set by module
-    tags = {
-      component            = "data"
-      os-type              = "Linux"
-      os-major-version     = 7
-      os-version           = "RHEL 7.9"
-      licence-requirements = "Oracle Database"
-      ami                  = "nomis_rhel_7_9_oracledb_11_2"
-      "Patch Group"        = "RHEL"
-    }
+#     # server-type and nomis-environment auto set by module
+#     tags = {
+#       component            = "data"
+#       os-type              = "Linux"
+#       os-major-version     = 7
+#       os-version           = "RHEL 7.9"
+#       licence-requirements = "Oracle Database"
+#       ami                  = "nomis_rhel_7_9_oracledb_11_2"
+#       "Patch Group"        = "RHEL"
+#     }
 
-    instance = {
-      disable_api_termination = false
-      instance_type           = "r6i.xlarge"
-      key_name                = aws_key_pair.ec2-user.key_name
-      vpc_security_group_ids  = [aws_security_group.database_common.id]
-    }
+#     instance = {
+#       disable_api_termination = false
+#       instance_type           = "r6i.xlarge"
+#       key_name                = aws_key_pair.ec2-user.key_name
+#       vpc_security_group_ids  = [aws_security_group.database_common.id]
+#     }
 
-    user_data = {
-      args = {
-        restored_from_snapshot = false
-      }
-      scripts = [
-        "ansible.sh.tftpl",
-        "oracle_init.sh.tftpl"
-      ]
-      write_files = {}
-    }
+#     user_data = {
+#       args = {
+#         restored_from_snapshot = false
+#       }
+#       scripts = [
+#         "ansible.sh.tftpl",
+#         "oracle_init.sh.tftpl"
+#       ]
+#       write_files = {}
+#     }
 
-    ebs_volumes = {
-      "/dev/sdb" = { label = "app" }   # /u01
-      "/dev/sdc" = { label = "app" }   # /u02
-      "/dev/sde" = { label = "data" }  # DATA01
-      "/dev/sdf" = { label = "data" }  # DATA02
-      "/dev/sdg" = { label = "data" }  # DATA03
-      "/dev/sdh" = { label = "data" }  # DATA04
-      "/dev/sdi" = { label = "data" }  # DATA05
-      "/dev/sdj" = { label = "flash" } # FLASH01
-      "/dev/sdk" = { label = "flash" } # FLASH02
-      "/dev/sds" = { label = "swap" }
-    }
+#     ebs_volumes = {
+#       "/dev/sdb" = { label = "app" }   # /u01
+#       "/dev/sdc" = { label = "app" }   # /u02
+#       "/dev/sde" = { label = "data" }  # DATA01
+#       "/dev/sdf" = { label = "data" }  # DATA02
+#       "/dev/sdg" = { label = "data" }  # DATA03
+#       "/dev/sdh" = { label = "data" }  # DATA04
+#       "/dev/sdi" = { label = "data" }  # DATA05
+#       "/dev/sdj" = { label = "flash" } # FLASH01
+#       "/dev/sdk" = { label = "flash" } # FLASH02
+#       "/dev/sds" = { label = "swap" }
+#     }
 
-    ebs_volume_config = {
-      data = {
-        iops       = 3000
-        throughput = 125
-      }
-      flash = {
-        iops       = 3000
-        throughput = 125
-      }
-    }
+#     ebs_volume_config = {
+#       data = {
+#         iops       = 3000
+#         throughput = 125
+#       }
+#       flash = {
+#         iops       = 3000
+#         throughput = 125
+#       }
+#     }
 
-    route53_records = {
-      create_internal_record = true
-      create_external_record = true
-    }
+#     route53_records = {
+#       create_internal_record = true
+#       create_external_record = true
+#     }
 
-    ssm_parameters = {
-      ASMSYS = {
-        random = {
-          length  = 30
-          special = false
-        }
-        description = "ASMSYS password"
-      }
-      ASMSNMP = {
-        random = {
-          length  = 30
-          special = false
-        }
-        description = "ASMSNMP password"
-      }
-    }
-  }
-}
+#     ssm_parameters = {
+#       ASMSYS = {
+#         random = {
+#           length  = 30
+#           special = false
+#         }
+#         description = "ASMSYS password"
+#       }
+#       ASMSNMP = {
+#         random = {
+#           length  = 30
+#           special = false
+#         }
+#         description = "ASMSNMP password"
+#       }
+#     }
+#   }
+# }
 
-module "db_ec2_instance" {
-  source = "./modules/ec2_instance"
+# module "db_ec2_instance" {
+#   source = "./modules/ec2_instance"
 
-  providers = {
-    aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
-  }
+#   providers = {
+#     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
+#   }
 
-  for_each = local.accounts[local.environment].databases
+#   for_each = local.accounts[local.environment].databases
 
-  name = each.key
+#   name = each.key
 
-  ami_name              = each.value.ami_name
-  ami_owner             = local.environment_management.account_ids[terraform.workspace]
-  instance              = merge(local.database.instance, lookup(each.value, "instance", {}))
-  user_data             = merge(local.database.user_data, lookup(each.value, "user_data", {}))
-  ebs_volume_config     = merge(local.database.ebs_volume_config, lookup(each.value, "ebs_volume_config", {}))
-  ebs_volumes           = merge(local.database.ebs_volumes, lookup(each.value, "ebs_volumes", {}))
-  ssm_parameters_prefix = "database/"
-  ssm_parameters        = merge(local.database.ssm_parameters, lookup(each.value, "ssm_parameters", {}))
-  route53_records       = merge(local.database.route53_records, lookup(each.value, "route53_records", {}))
+#   ami_name              = each.value.ami_name
+#   ami_owner             = local.environment_management.account_ids[terraform.workspace]
+#   instance              = merge(local.database.instance, lookup(each.value, "instance", {}))
+#   user_data             = merge(local.database.user_data, lookup(each.value, "user_data", {}))
+#   ebs_volume_config     = merge(local.database.ebs_volume_config, lookup(each.value, "ebs_volume_config", {}))
+#   ebs_volumes           = merge(local.database.ebs_volumes, lookup(each.value, "ebs_volumes", {}))
+#   ssm_parameters_prefix = "database/"
+#   ssm_parameters        = merge(local.database.ssm_parameters, lookup(each.value, "ssm_parameters", {}))
+#   route53_records       = merge(local.database.route53_records, lookup(each.value, "route53_records", {}))
 
-  instance_profile_policies = concat(local.ec2_common_managed_policies, [aws_iam_policy.s3_db_backup_bucket_access.arn])
+#   instance_profile_policies = concat(local.ec2_common_managed_policies, [aws_iam_policy.s3_db_backup_bucket_access.arn])
 
-  business_unit     = local.vpc_name
-  application_name  = local.application_name
-  environment       = local.environment
-  region            = local.region
-  availability_zone = local.availability_zone
-  subnet_set        = local.subnet_set
-  subnet_name       = "data"
-  tags              = merge(local.tags, local.database.tags, try(each.value.tags, {}))
+#   business_unit     = local.vpc_name
+#   application_name  = local.application_name
+#   environment       = local.environment
+#   region            = local.region
+#   availability_zone = local.availability_zone
+#   subnet_set        = local.subnet_set
+#   subnet_name       = "data"
+#   tags              = merge(local.tags, local.database.tags, try(each.value.tags, {}))
 
-  ansible_repo         = "modernisation-platform-configuration-management"
-  ansible_repo_basedir = "ansible"
-  branch               = var.BRANCH_NAME
-}
+#   ansible_repo         = "modernisation-platform-configuration-management"
+#   ansible_repo_basedir = "ansible"
+#   branch               = var.BRANCH_NAME
+# }
 
-#------------------------------------------------------------------------------
-# Common Security Group for Database Instances
-#------------------------------------------------------------------------------
+# #------------------------------------------------------------------------------
+# # Common Security Group for Database Instances
+# #------------------------------------------------------------------------------
 
-resource "aws_security_group" "database_common" {
-  #checkov:skip=CKV2_AWS_5:skip "Ensure that Security Groups are attached to another resource" - attached in nomis-stack module
-  description = "Common security group for database instances"
-  name        = "database-common"
-  vpc_id      = data.aws_vpc.shared_vpc.id
+# resource "aws_security_group" "database_common" {
+#   #checkov:skip=CKV2_AWS_5:skip "Ensure that Security Groups are attached to another resource" - attached in nomis-stack module
+#   description = "Common security group for database instances"
+#   name        = "database-common"
+#   vpc_id      = data.aws_vpc.shared_vpc.id
 
-  ingress {
-    description     = "DB access from weblogic instances"
-    from_port       = "1521"
-    to_port         = "1521"
-    protocol        = "TCP"
-    security_groups = [aws_security_group.weblogic_common.id]
-  }
+#   ingress {
+#     description     = "DB access from weblogic instances"
+#     from_port       = "1521"
+#     to_port         = "1521"
+#     protocol        = "TCP"
+#     security_groups = [aws_security_group.weblogic_common.id]
+#   }
 
-  ingress {
-    description = "DB access other DB instances for replication"
-    from_port   = "1521"
-    to_port     = "1521"
-    protocol    = "TCP"
-    self        = true
-  }
+#   ingress {
+#     description = "DB access other DB instances for replication"
+#     from_port   = "1521"
+#     to_port     = "1521"
+#     protocol    = "TCP"
+#     self        = true
+#   }
 
-  ingress {
-    description     = "SSH from Bastion"
-    from_port       = "22"
-    to_port         = "22"
-    protocol        = "TCP"
-    security_groups = [module.bastion_linux.bastion_security_group]
-  }
+#   ingress {
+#     description     = "SSH from Bastion"
+#     from_port       = "22"
+#     to_port         = "22"
+#     protocol        = "TCP"
+#     security_groups = [module.bastion_linux.bastion_security_group]
+#   }
 
-  ingress {
-    description = "External access to database port"
-    from_port   = "1521"
-    to_port     = "1521"
-    protocol    = "TCP"
-    cidr_blocks = [
-      for cidr in local.accounts[local.environment].database_external_access_cidr : cidr
-    ]
-  }
+#   ingress {
+#     description = "External access to database port"
+#     from_port   = "1521"
+#     to_port     = "1521"
+#     protocol    = "TCP"
+#     cidr_blocks = [
+#       for cidr in local.accounts[local.environment].database_external_access_cidr : cidr
+#     ]
+#   }
 
-  ingress {
-    description = "External access to SSH port for agent management"
-    from_port   = "22"
-    to_port     = "22"
-    protocol    = "TCP"
-    cidr_blocks = [
-      for cidr in local.accounts[local.environment].database_external_access_cidr : cidr
-    ]
-  }
+#   ingress {
+#     description = "External access to SSH port for agent management"
+#     from_port   = "22"
+#     to_port     = "22"
+#     protocol    = "TCP"
+#     cidr_blocks = [
+#       for cidr in local.accounts[local.environment].database_external_access_cidr : cidr
+#     ]
+#   }
 
-  ingress {
-    description = "External access to OEM Agent port for metrics collection"
-    from_port   = "3872"
-    to_port     = "3872"
-    protocol    = "TCP"
-    cidr_blocks = [
-      for cidr in local.accounts[local.environment].database_external_access_cidr : cidr
-    ]
-  }
+#   ingress {
+#     description = "External access to OEM Agent port for metrics collection"
+#     from_port   = "3872"
+#     to_port     = "3872"
+#     protocol    = "TCP"
+#     cidr_blocks = [
+#       for cidr in local.accounts[local.environment].database_external_access_cidr : cidr
+#     ]
+#   }
 
-  ingress {
-    description = "access from Cloud Platform Prometheus server"
-    from_port   = "9100"
-    to_port     = "9100"
-    protocol    = "TCP"
-    cidr_blocks = [local.accounts[local.environment].database_external_access_cidr.cloud_platform]
-  }
+#   ingress {
+#     description = "access from Cloud Platform Prometheus server"
+#     from_port   = "9100"
+#     to_port     = "9100"
+#     protocol    = "TCP"
+#     cidr_blocks = [local.accounts[local.environment].database_external_access_cidr.cloud_platform]
+#   }
 
-  ingress {
-    description = "access from Cloud Platform Prometheus script exporter collector"
-    from_port   = "9172"
-    to_port     = "9172"
-    protocol    = "TCP"
-    cidr_blocks = [local.accounts[local.environment].database_external_access_cidr.cloud_platform]
-  }
+#   ingress {
+#     description = "access from Cloud Platform Prometheus script exporter collector"
+#     from_port   = "9172"
+#     to_port     = "9172"
+#     protocol    = "TCP"
+#     cidr_blocks = [local.accounts[local.environment].database_external_access_cidr.cloud_platform]
+#   }
 
-  egress {
-    description = "allow all"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    #tfsec:ignore:aws-vpc-no-public-egress-sgr
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+#   egress {
+#     description = "allow all"
+#     from_port   = 0
+#     to_port     = 0
+#     protocol    = "-1"
+#     #tfsec:ignore:aws-vpc-no-public-egress-sgr
+#     cidr_blocks = ["0.0.0.0/0"]
+#   }
 
-  tags = merge(
-    local.tags,
-    {
-      Name = "database-common"
-    }
-  )
-}
+#   tags = merge(
+#     local.tags,
+#     {
+#       Name = "database-common"
+#     }
+#   )
+# }
 
-#------------------------------------------------------------------------------
-# Policy for PUT access to database backups
-#------------------------------------------------------------------------------
+# #------------------------------------------------------------------------------
+# # Policy for PUT access to database backups
+# #------------------------------------------------------------------------------
 
-data "aws_iam_policy_document" "s3_db_backup_bucket_access" {
-  #tfsec:ignore:aws-iam-no-policy-wildcards:need to be able to write database backups to specific bucket
-  statement {
-    effect = "Allow"
-    actions = [
-      "s3:PutObject",
-    ]
-    resources = [module.nomis-db-backup-bucket.bucket.arn,
-    "${module.nomis-db-backup-bucket.bucket.arn}/*"]
-  }
-}
+# data "aws_iam_policy_document" "s3_db_backup_bucket_access" {
+#   #tfsec:ignore:aws-iam-no-policy-wildcards:need to be able to write database backups to specific bucket
+#   statement {
+#     effect = "Allow"
+#     actions = [
+#       "s3:PutObject",
+#     ]
+#     resources = [module.nomis-db-backup-bucket.bucket.arn,
+#     "${module.nomis-db-backup-bucket.bucket.arn}/*"]
+#   }
+# }
 
-resource "aws_iam_policy" "s3_db_backup_bucket_access" {
-  name        = "s3-db-backup-bucket-access"
-  path        = "/"
-  description = "Policy for access to database backup bucket"
-  policy      = data.aws_iam_policy_document.s3_db_backup_bucket_access.json
-  tags = merge(
-    local.tags,
-    {
-      Name = "s3-db-backup-bucket-access"
-    },
-  )
-}
+# resource "aws_iam_policy" "s3_db_backup_bucket_access" {
+#   name        = "s3-db-backup-bucket-access"
+#   path        = "/"
+#   description = "Policy for access to database backup bucket"
+#   policy      = data.aws_iam_policy_document.s3_db_backup_bucket_access.json
+#   tags = merge(
+#     local.tags,
+#     {
+#       Name = "s3-db-backup-bucket-access"
+#     },
+#   )
+# }
 
-#------------------------------------------------------------------------------
-# Upload audit archive dumps to s3
-#------------------------------------------------------------------------------
+# #------------------------------------------------------------------------------
+# # Upload audit archive dumps to s3
+# #------------------------------------------------------------------------------
 
-resource "aws_ssm_document" "audit_s3_upload" {
-  name            = "UploadAuditArchivesToS3"
-  document_type   = "Command"
-  document_format = "YAML"
-  content         = templatefile("${path.module}/ssm-documents/templates/s3auditupload.yaml.tftmpl", { bucket = module.nomis-audit-archives.bucket.id, branch = "main" })
-  target_type     = "/AWS::EC2::Instance"
+# resource "aws_ssm_document" "audit_s3_upload" {
+#   name            = "UploadAuditArchivesToS3"
+#   document_type   = "Command"
+#   document_format = "YAML"
+#   content         = templatefile("${path.module}/ssm-documents/templates/s3auditupload.yaml.tftmpl", { bucket = module.nomis-audit-archives.bucket.id, branch = "main" })
+#   target_type     = "/AWS::EC2::Instance"
 
-  tags = merge(
-    local.tags,
-    {
-      Name = "Upload Audit Archives to S3"
-    },
-  )
-}
+#   tags = merge(
+#     local.tags,
+#     {
+#       Name = "Upload Audit Archives to S3"
+#     },
+#   )
+# }
