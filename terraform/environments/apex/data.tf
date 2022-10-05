@@ -12,6 +12,14 @@ data "aws_region" "current" {}
 
 data "aws_caller_identity" "current" {}
 
+data "aws_caller_identity" "oidc_session" {
+  provider = aws.oidc-session
+}
+
+data "aws_caller_identity" "modernisation_platform" {
+  provider = aws.modernisation-platform
+}
+
 # VPC and subnet data
 data "aws_vpc" "shared" {
   tags = {
