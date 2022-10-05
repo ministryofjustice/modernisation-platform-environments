@@ -44,7 +44,7 @@ resource "aws_lb_listener" "alb_listener" {
   load_balancer_arn = module.lb-access-logs-enabled.load_balancer.arn
   port              = "443"
   protocol          = "HTTP"
-  #TODO_CHANGE_TO_HTTPS_AND_CERTIFICATE_ARN_TOBE_ADDED
+  #TODO CHANGE_TO_HTTPS_AND_CERTIFICATE_ARN_TOBE_ADDED
 
   default_action {
     type             = "forward"
@@ -52,6 +52,12 @@ resource "aws_lb_listener" "alb_listener" {
     #TODO default action type fixed-response has not been added
     #as this depends on cloudfront which is is not currently configured
     #therefore this will need to be added pending cutover strategy decisions
+    #
+    # - Type: fixed-response
+    #   FixedResponseConfig:
+    #     ContentType: text/plain
+    #     MessageBody: Access Denied - must access via CloudFront
+    #     StatusCode: '403'
   }
 }
 
