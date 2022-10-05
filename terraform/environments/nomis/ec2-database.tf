@@ -178,13 +178,13 @@ resource "aws_security_group" "database_common" {
   name        = "database-common"
   vpc_id      = data.aws_vpc.shared_vpc.id
 
-  ingress {
-    description     = "DB access from weblogic instances"
-    from_port       = "1521"
-    to_port         = "1521"
-    protocol        = "TCP"
-    security_groups = [aws_security_group.weblogic_common.id]
-  }
+  # ingress {
+  #   description     = "DB access from weblogic instances"
+  #   from_port       = "1521"
+  #   to_port         = "1521"
+  #   protocol        = "TCP"
+  #   security_groups = [aws_security_group.weblogic_common.id]
+  # }
 
   ingress {
     description = "DB access other DB instances for replication"
