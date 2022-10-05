@@ -34,7 +34,7 @@ jobs:
         include:
           - environment: development
           # - environment: test
-    name: Plan - ${{ github.workflow }} - ${{  matrix.environment }}
+    name: Plan - ${{  matrix.environment }}
     runs-on: ubuntu-latest
     if: github.ref != 'refs/heads/main' || github.event_name == 'workflow_dispatch'
     env:
@@ -72,7 +72,7 @@ jobs:
         include:
           - environment: development
           # - environment: test
-    name: Apply - ${{ github.workflow }} - ${{  matrix.environment }}
+    name: Apply - ${{  matrix.environment }}
     runs-on: ubuntu-latest
     env:
       TF_ENV: ${{ matrix.environment }}
@@ -109,7 +109,7 @@ jobs:
         include:
           # - environment: preproduction
           - environment: production
-    name: Plan - ${{ github.workflow }} - ${{  matrix.environment }}
+    name: Plan - ${{  matrix.environment }}
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     env:
@@ -146,7 +146,7 @@ jobs:
         include:
           # - environment: preproduction
           - environment: production
-    name: Apply - ${{ github.workflow }} - ${{  matrix.environment }}
+    name: Apply - ${{  matrix.environment }}
     runs-on: ubuntu-latest
     env:
       TF_ENV: ${{ matrix.environment }}
