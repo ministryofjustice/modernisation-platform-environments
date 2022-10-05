@@ -154,6 +154,7 @@ jobs:
     environment:
       name: nomis-${{ matrix.environment }}
     steps:
+      - name: Checkout Repository
         uses: actions/checkout@v3.1.0
       - name: Set Account Number
         run: echo "ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${GITHUB_WORKFLOW}-${TF_ENV}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)" >> $GITHUB_ENV
