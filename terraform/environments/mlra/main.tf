@@ -47,7 +47,7 @@ resource "aws_lb_listener" "alb_listener" {
   #TODO CHANGE_TO_HTTPS_AND_CERTIFICATE_ARN_TOBE_ADDED
 
   default_action {
-    type             = "forward"
+    type = "forward"
     #TODO default action type fixed-response has not been added
     #as this depends on cloudfront which is is not currently configured
     #therefore this will need to be added pending cutover strategy decisions
