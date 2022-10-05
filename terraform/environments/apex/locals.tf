@@ -4,7 +4,7 @@ locals {
 
   environment_management = jsondecode(data.aws_secretsmanager_secret_version.environment_management.secret_string)
 
-    # Stores modernisation platform account id for setting up the modernisation-platform provider
+  # Stores modernisation platform account id for setting up the modernisation-platform provider
 
   modernisation_platform_account_id = data.aws_ssm_parameter.modernisation_platform_account_id.value
 
