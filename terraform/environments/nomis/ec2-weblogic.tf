@@ -21,9 +21,9 @@ module "weblogic" {
   ami_owner              = try(each.value.ami_owner, local.environment_management.account_ids["core-shared-services-production"])
   termination_protection = try(each.value.termination_protection, null)
 
-  common_security_group_id   = aws_security_group.weblogic_common.id
-  instance_profile_policies  = local.ec2_common_managed_policies
-  key_name                   = aws_key_pair.ec2-user.key_name
+  common_security_group_id  = aws_security_group.weblogic_common.id
+  instance_profile_policies = local.ec2_common_managed_policies
+  key_name                  = aws_key_pair.ec2-user.key_name
   # load_balancer_listener_arn = aws_lb_listener.internal.arn
   load_balancer_listener_arn = "nil"
 
