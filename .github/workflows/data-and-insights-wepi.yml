@@ -55,7 +55,7 @@ jobs:
         with:
           terraform_version: "~1"
           terraform_wrapper: false
-      - name: Terraform plan - ${{ github.workflow }} - ${{ matrix.environment }}
+      - name: Plan - ${{ matrix.environment }}
         run: |
           terraform --version
           echo "Terraform plan - ${TF_ENV}"
@@ -94,7 +94,7 @@ jobs:
         with:
           terraform_version: "~1"
           terraform_wrapper: false
-      - name: Terraform apply - ${{ github.workflow }} - ${{ matrix.environment }}
+      - name: Apply - ${{ matrix.environment }}
         run: |
           terraform --version
           echo "Terraform apply - ${TF_ENV}"
@@ -130,7 +130,7 @@ jobs:
 #         with:
 #           terraform_version: "~1"
 #           terraform_wrapper: false
-#       - name: Terraform plan - ${{ github.workflow }} - ${{ matrix.environment }}
+#       - name: Plan - ${{ matrix.environment }}
 #         run: |
 #           terraform --version
 #           echo "Terraform plan - ${TF_ENV}"
@@ -168,7 +168,7 @@ jobs:
 #         with:
 #           terraform_version: "~1"
 #           terraform_wrapper: false
-#       - name: Terraform apply - ${{ github.workflow }} - ${{ matrix.environment }}
+#       - name: Apply - ${{ matrix.environment }}
 #         run: |
 #           terraform --version
 #           echo "Terraform apply - ${TF_ENV}"
