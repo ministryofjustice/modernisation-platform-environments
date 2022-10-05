@@ -552,7 +552,7 @@ module "s3_curated_bucket" {
 ##########################
 
 # Glue Database Catalog for Data Domain
-module "glue_database" {
+module "glue_data_domain_database" {
   source         = "./modules/glue_database"
   create_db      = local.create_db
   name           = "${local.project}-${local.glue_db_data_domain}-${local.env}"
