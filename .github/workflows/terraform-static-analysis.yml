@@ -1,5 +1,5 @@
 name: Terraform Static Code Analysis
-
+# Runs changed scan on pull request, full scan on workflow_dispatch and scheduled.
 on:
   schedule:
     # * is a special character in YAML so you have to quote this string
