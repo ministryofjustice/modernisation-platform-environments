@@ -109,7 +109,7 @@ jobs:
         include:
           # - environment: preproduction
           - environment: production
-    name: Terraform plan - ${{ github.workflow }} - ${{  matrix.environment }}
+    name: Plan - ${{ github.workflow }} - ${{  matrix.environment }}
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     env:
@@ -130,7 +130,7 @@ jobs:
         with:
           terraform_version: "~1"
           terraform_wrapper: false
-      - name: Terraform plan - ${{ github.workflow }} - ${{ matrix.environment }}
+      - name: Plan - ${{ github.workflow }} - ${{ matrix.environment }}
         run: |
           terraform --version
           echo "Terraform plan - ${TF_ENV}"
@@ -146,7 +146,7 @@ jobs:
         include:
           # - environment: preproduction
           - environment: production
-    name: Terraform apply - ${{ github.workflow }} - ${{  matrix.environment }}
+    name: Apply - ${{ github.workflow }} - ${{  matrix.environment }}
     runs-on: ubuntu-latest
     env:
       TF_ENV: ${{ matrix.environment }}
@@ -168,7 +168,7 @@ jobs:
         with:
           terraform_version: "~1"
           terraform_wrapper: false
-      - name: Terraform apply - ${{ github.workflow }} - ${{ matrix.environment }}
+      - name: Apply - ${{ github.workflow }} - ${{ matrix.environment }}
         run: |
           terraform --version
           echo "Terraform apply - ${TF_ENV}"
