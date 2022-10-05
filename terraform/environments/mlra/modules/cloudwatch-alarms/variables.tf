@@ -1,124 +1,124 @@
 variable "alarmname" {
-    type = string
-    default = ""
+  type    = string
+  default = ""
 }
 
 variable "oper" {
-    type = string
-    default = ""
+  type    = string
+  default = ""
 }
 
 variable "eval" {
-    type = string
-    default = ""
-  
+  type    = string
+  default = ""
+
 }
 variable "metricname" {
-    type = string
-    default = ""
-  
+  type    = string
+  default = ""
+
 }
 variable "namespace" {
-    type = string
-    default = ""
-  
+  type    = string
+  default = ""
+
 }
 variable "period" {
-    type = string
-    default = ""
-  
+  type    = string
+  default = ""
+
 }
 variable "stat" {
-    type = string
-    default = ""
-  
+  type    = string
+  default = ""
+
 }
 variable "thresh" {
-    type = string
-    default = ""
-  
+  type    = string
+  default = ""
+
 }
 variable "alarmdesc" {
-    type = string
-    default = ""
-  
+  type    = string
+  default = ""
+
 }
 variable "pClusterName" {
-    type = string
-    default = "" 
+  type    = string
+  default = ""
 }
 variable "pAutoscalingGroupName" {
-    type = string
-    default = ""
-  
+  type    = string
+  default = ""
+
 }
 variable "pLoadBalancerName" {
-    type = string
-    default = ""
-  
+  type    = string
+  default = ""
+
 }
 variable "pTargetGroupName" {
-    type = string
-    default = ""
-  
+  type    = string
+  default = ""
+
 }
 variable "pECSCPUAlarmThreshold" {
-    description = "ECS CPU Alarm Threshold"
-    type = number
-    default = "75"
+  description = "ECS CPU Alarm Threshold"
+  type        = number
+  default     = "75"
 }
 variable "pECSMemoryAlarmThreshold" {
-    description =  "ECS Meomry Alarm Threshold"
-    type =  number
-    default =  "75"
+  description = "ECS Meomry Alarm Threshold"
+  type        = number
+  default     = "75"
 }
 variable "pASGCPUAlarmThreshold" {
-    description =  "ASG CPU Alarm Threshold"
-    type =  number
-    default =  "85"
+  description = "ASG CPU Alarm Threshold"
+  type        = number
+  default     = "85"
 }
 variable "pASGStatusFailureAlarmThreshold" {
-    description =  "ASG Status Check Failures Alarm Threshold"
-    type =  number
-    default =  "1"
+  description = "ASG Status Check Failures Alarm Threshold"
+  type        = number
+  default     = "1"
 }
 variable "pALBUnhealthyAlarmThreshold" {
-    description =  "ALB Unhealthy Hosts Alarm Threshold"
-    type =  number
-    default =  "0"
+  description = "ALB Unhealthy Hosts Alarm Threshold"
+  type        = number
+  default     = "0"
 }
 variable "pALBRejectedAlarmThreshold" {
-    description =  "ALB Rejected Requests Alarm Threshold"
-    type =  number
-    default =  "10"
+  description = "ALB Rejected Requests Alarm Threshold"
+  type        = number
+  default     = "10"
 }
 variable "pALB5xxAlarmThreshold" {
-    description =  "ALB Originiating 5xx Alarm Threshold"
-    type =  number
-    default =  "10"
+  description = "ALB Originiating 5xx Alarm Threshold"
+  type        = number
+  default     = "10"
 }
 variable "pALBTarget5xxAlarmThreshold" {
-    description =  "ALB Target Originiating 5xx Alarm Threshold"
-    type =  number
-    default =  "10"
+  description = "ALB Target Originiating 5xx Alarm Threshold"
+  type        = number
+  default     = "10"
 }
 variable "pALB4xxAlarmThreshold" {
-    description =  "ALB Originiating 4xx Alarm Threshold"
-    type =  number
-    default =  "10"
+  description = "ALB Originiating 4xx Alarm Threshold"
+  type        = number
+  default     = "10"
 }
 variable "pALBTarget4xxAlarmThreshold" {
-    description =  "ALB Target Originiating 4xx Alarm Threshold"
-    type =  number
-    default =  "10"
+  description = "ALB Target Originiating 4xx Alarm Threshold"
+  type        = number
+  default     = "10"
 }
 variable "pALBTargetResponseTimeThreshold" {
-    description =  "ALB Target Response Time Alarm Threshold"
-    type =  number
-    default =  "10"
+  description = "ALB Target Response Time Alarm Threshold"
+  type        = number
+  default     = "10"
 }
 variable "pALBTargetResponseTimeThresholdMaximum" {
-    description =  "ALB Target Response Time Alarm Threshold Maximum"
-    type =  number
-    default =  "60"
+  description = "ALB Target Response Time Alarm Threshold Maximum"
+  type        = number
+  default     = "60"
 }

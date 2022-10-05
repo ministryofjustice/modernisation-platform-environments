@@ -102,5 +102,5 @@ resource "aws_cloudwatch_dashboard" "mlra" {
   ]
 }
 EOF
-}  
+}
 
