@@ -137,7 +137,6 @@ jobs:
 #           bash scripts/terraform-init.sh terraform/environments/$GITHUB_WORKFLOW
 #           terraform -chdir="terraform/environments/${GITHUB_WORKFLOW}" workspace select "${GITHUB_WORKFLOW}-${TF_ENV}"
 #           bash scripts/terraform-plan.sh terraform/environments/$GITHUB_WORKFLOW
-
 #   # These jobs run when creating a pull request
 #   deploy-preprod-prod:
 #     needs: plan-preprod-prod
