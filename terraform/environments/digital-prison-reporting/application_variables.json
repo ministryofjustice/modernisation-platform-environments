@@ -11,7 +11,9 @@
       "create_security_conf": true,
       "setup_buckets": true,
       "create_kinesis_streams": true,
-      "create_glue_registries": false
+      "create_glue_registries": false,
+      "setup_s3_buckets": true,
+      "create_glue_connections": false
     },
     "test": {
       "example_var": "test-data"
