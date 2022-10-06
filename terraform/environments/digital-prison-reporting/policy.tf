@@ -1,6 +1,6 @@
 locals {
-      account_id             = data.aws_caller_identity.current.account_id
-      account_region         = data.aws_region.current.name
+      current_account_id             = data.aws_caller_identity.current.account_id
+      current_account_region         = data.aws_region.current.name
 }
 
 
@@ -18,7 +18,7 @@ data "aws_iam_policy_document" "glue-policy-data" {
       "glue:DeleteSchema",
       "glue:UpdateTable",
     ]
-    resources = ["arn:aws:glue:${local.aws_region}:${local.aws_account_id}:*"]
+    resources = ["arn:aws:glue:${local.current_account_region}:${local.current_account_id}:*"]
     principals {
       identifiers = ["*"]
       type        = "AWS"
