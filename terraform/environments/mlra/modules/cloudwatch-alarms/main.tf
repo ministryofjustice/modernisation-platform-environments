@@ -183,7 +183,7 @@ resource "aws_cloudwatch_metric_alarm" "applicationelb4xxerror" {
   comparison_operator = "GreaterThanThreshold"
 }
 resource "aws_cloudwatch_dashboard" "mlradash" {
-  dashboard_name = local.application_name
+  dashboard_name = "MLRA"
   depends_on = [
     aws_cloudwatch_metric_alarm.applicationelb4xxerror,
     aws_cloudwatch_metric_alarm.applicationelb5xxerror,
