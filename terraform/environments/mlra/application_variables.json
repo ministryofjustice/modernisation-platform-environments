@@ -3,11 +3,8 @@
     "development": {
       "example_var": "dev-data",
       "region": "eu-west-2",
-      "cloudwatch_stat": "Average",
-      "cloudwatch_view": "timeSeries",
-      "cloudwatch_type": "metric",
-      "cloudwatch_dashboard_title": "",
-      "cloudwatch_dashboard_period": ""
+      "alb_target_group_path": "/mlra/"
+
     },
     "test": {
       "example_var": "test-data"
