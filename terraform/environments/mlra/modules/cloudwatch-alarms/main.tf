@@ -6,10 +6,10 @@ resource "aws_cloudwatch_metric_alarm" "esccpuoverthreshold" {
   statistic          = "Average"
   period             = "60"
   evaluation_periods = "5"
-  threshold          = var.pECSCPUAlarmThreshold.value
+  threshold          = var.pECSCPUAlarmThreshold
   treat_missing_data = "breaching"
   Dimensions = {
-    ClusterName = var.pClusterName.value
+    ClusterName = var.pClusterName
   }
   comparison_operator = "GreaterThanThreshold"
 }
@@ -21,10 +21,10 @@ resource "aws_cloudwatch_metric_alarm" "ecsmemoryoverthreshold" {
   statistic          = "Average"
   period             = "60"
   evaluation_periods = "5"
-  threshold          = var.pECSMemoryAlarmThreshold.value
+  threshold          = var.pECSMemoryAlarmThreshold
   treat_missing_data = "breaching"
   Dimensions = {
-    ClusterName = var.pClusterName.value
+    ClusterName = var.pClusterName
   }
   comparison_operator = "GreaterThanThreshold"
 }
@@ -37,10 +37,10 @@ resource "aws_cloudwatch_metric_alarm" "cpuoverthreshold" {
   statistic          = "Average"
   period             = "60"
   evaluation_periods = "5"
-  threshold          = var.pASGCPUAlarmThreshold.value
+  threshold          = var.pASGCPUAlarmThreshold
   treat_missing_data = "breaching"
   Dimensions = {
-    AutoScalingGroupName = var.pAutoscalingGroupName.value
+    AutoScalingGroupName = var.pAutoscalingGroupName
   }
   comparison_operator = "GreaterThanThreshold"
 }
@@ -52,10 +52,10 @@ resource "aws_cloudwatch_metric_alarm" "statuscheckfailure" {
   statistic          = "Average"
   period             = "60"
   evaluation_periods = "5"
-  threshold          = var.pASGStatusFailureAlarmThreshold.value
+  threshold          = var.pASGStatusFailureAlarmThreshold
   treat_missing_data = "breaching"
   Dimensions = {
-    AutoScalingGroupName = var.pAutoscalingGroupName.value
+    AutoScalingGroupName = var.pAutoscalingGroupName
   }
   comparison_operator = "GreaterThanThreshold"
 }
@@ -68,10 +68,10 @@ resource "aws_cloudwatch_metric_alarm" "targetresponsetime" {
   extended_statistic = "p99"
   period             = "60"
   evaluation_periods = "5"
-  threshold          = var.pALBTargetResponseTimeThreshold.value
+  threshold          = var.pALBTargetResponseTimeThreshold
   treat_missing_data = "notBreaching"
   Dimensions = {
-    LoadBalancer = var.pLoadBalancerName.value
+    LoadBalancer = var.pLoadBalancerName
   }
   comparison_operator = "GreaterThanThreshold"
 }
@@ -83,10 +83,10 @@ resource "aws_cloudwatch_metric_alarm" "targetResponsetimemaximum" {
   statistic          = "Maximum"
   period             = "60"
   evaluation_periods = "1"
-  threshold          = var.pALBTargetResponseTimeThresholdMaximum.value
+  threshold          = var.pALBTargetResponseTimeThresholdMaximum
   treat_missing_data = "notBreaching"
   Dimensions = {
-    LoadBalancer = var.pLoadBalancerName.value
+    LoadBalancer = var.pLoadBalancerName
   }
   comparison_operator = "GreaterThanThreshold"
 }
@@ -98,11 +98,11 @@ resource "aws_cloudwatch_metric_alarm" "unhealthyhosts" {
   statistic          = "Average"
   period             = "60"
   evaluation_periods = "5"
-  threshold          = var.pALBUnhealthyAlarmThreshold.value
+  threshold          = var.pALBUnhealthyAlarmThreshold
   treat_missing_data = "notBreaching"
   Dimensions = {
-    LoadBalancer = var.pLoadBalancerName.value
-    TargetGroup  = var.pTargetGroupName.value
+    LoadBalancer = var.pLoadBalancerName
+    TargetGroup  = var.pTargetGroupName
   }
   comparison_operator = "GreaterThanThreshold"
 }
@@ -114,10 +114,10 @@ resource "aws_cloudwatch_metric_alarm" "rejectedconnectioncount" {
   statistic          = "Sum"
   period             = "60"
   evaluation_periods = "5"
-  threshold          = var.pALBRejectedAlarmThreshold.value
+  threshold          = var.pALBRejectedAlarmThreshold
   treat_missing_data = "notBreaching"
   Dimensions = {
-    LoadBalancer = var.pLoadBalancerName.value
+    LoadBalancer = var.pLoadBalancerName
   }
   comparison_operator = "GreaterThanThreshold"
 }
@@ -129,10 +129,10 @@ resource "aws_cloudwatch_metric_alarm" "http5xxerror" {
   statistic          = "Sum"
   period             = "60"
   evaluation_periods = "5"
-  threshold          = var.pALBTarget5xxAlarmThreshold.value
+  threshold          = var.pALBTarget5xxAlarmThreshold
   treat_missing_data = "notBreaching"
   Dimensions = {
-    LoadBalancer = var.pLoadBalancerName.value
+    LoadBalancer = var.pLoadBalancerName
   }
   comparison_operator = "GreaterThanThreshold"
 }
@@ -144,10 +144,10 @@ resource "aws_cloudwatch_metric_alarm" "applicationelb5xxerror" {
   statistic          = "Sum"
   period             = "60"
   evaluation_periods = "5"
-  threshold          = var.pALB5xxAlarmThreshold.value
+  threshold          = var.pALB5xxAlarmThreshold
   treat_missing_data = "notBreaching"
   Dimensions = {
-    LoadBalancer = var.pLoadBalancerName.value
+    LoadBalancer = var.pLoadBalancerName
   }
   comparison_operator = "GreaterThanThreshold"
 }
@@ -159,10 +159,10 @@ resource "aws_cloudwatch_metric_alarm" "http4xxerror" {
   statistic          = "Sum"
   period             = "60"
   evaluation_periods = "5"
-  threshold          = var.pALBTarget4xxAlarmThreshold.value
+  threshold          = var.pALBTarget4xxAlarmThreshold
   treat_missing_data = "notBreaching"
   Dimensions = {
-    LoadBalancer = var.pLoadBalancerName.value
+    LoadBalancer = var.pLoadBalancerName
   }
   comparison_operator = "GreaterThanThreshold"
 }
@@ -174,10 +174,10 @@ resource "aws_cloudwatch_metric_alarm" "applicationelb4xxerror" {
   statistic          = "Sum"
   period             = "60"
   evaluation_periods = "5"
-  threshold          = var.pALB4xxAlarmThreshold.Value
+  threshold          = var.pALB4xxAlarmThreshold
   treat_missing_data = "notBreaching"
   Dimensions = {
-    LoadBalancer = var.pLoadBalancerName.Value
+    LoadBalancer = var.pLoadBalancerName
   }
   comparison_operator = "GreaterThanThreshold"
 }
@@ -207,7 +207,7 @@ resource "aws_cloudwatch_dashboard" "mlradash" {
             ]
           },
           "view": "timeSeries",
-          "region": "${var.region.value}",
+          "region": "${var.region}",
           "stacked": false
       }
     },
@@ -225,7 +225,7 @@ resource "aws_cloudwatch_dashboard" "mlradash" {
             ]
           },
           "view": "timeSeries",
-          "region": "${var.region.value}",
+          "region": "${var.region}",
           "stacked": false
       }
     },
@@ -243,7 +243,7 @@ resource "aws_cloudwatch_dashboard" "mlradash" {
             ]
           },
           "view": "timeSeries",
-          "region": "${var.region.value}",
+          "region": "${var.region}",
           "stacked": false
       }
     },
@@ -261,7 +261,7 @@ resource "aws_cloudwatch_dashboard" "mlradash" {
             ]
           },
           "view": "timeSeries",
-          "region": "${var.region.value}",
+          "region": "${var.region}",
           "stacked": false
       }
     },
@@ -279,7 +279,7 @@ resource "aws_cloudwatch_dashboard" "mlradash" {
             ]
           },
           "view": "timeSeries",
-          "region": "${var.region.value}",
+          "region": "${var.region}",
           "stacked": false
       }
     }
