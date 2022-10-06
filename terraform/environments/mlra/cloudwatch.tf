@@ -1,8 +1,8 @@
 module "cwalarm_1" {
   source = "./modules/cloudwatch-alarms"
 
-  pClusterName = " "
+  pClusterName          = " "
   pAutoscalingGroupName = " "
-  pLoadBalancerName = " "
-  pTargetGroupName = " " 
+  pLoadBalancerName     = " "
+  pTargetGroupName      = " "
 }
