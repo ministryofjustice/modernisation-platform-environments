@@ -1,47 +1,47 @@
 variable "alarmname" {
-    type = string
-    default = ""
+  type    = string
+  default = ""
 }
 
 variable "oper" {
-    type = string
-    default = ""
+  type    = string
+  default = ""
 }
 
 variable "eval" {
-    type = string
-    default = ""
-  
+  type    = string
+  default = ""
+
 }
 variable "metricname" {
-    type = string
-    default = ""
-  
+  type    = string
+  default = ""
+
 }
 variable "namespace" {
-    type = string
-    default = ""
-  
+  type    = string
+  default = ""
+
 }
 variable "period" {
-    type = string
-    default = ""
-  
+  type    = string
+  default = ""
+
 }
 variable "stat" {
-    type = string
-    default = ""
-  
+  type    = string
+  default = ""
+
 }
 variable "thresh" {
-    type = string
-    default = ""
-  
+  type    = string
+  default = ""
+
 }
 variable "alarmdesc" {
-    type = string
-    default = ""
-  
+  type    = string
+  default = ""
+
 }
 variable "pClusterName" {
   type    = string
