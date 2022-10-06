@@ -679,7 +679,7 @@ module "s3_domain_config_bucket" {
     {
       Name          = "${local.project}-domain-config-${local.env}-s3"
       Resource_Type = "S3 Bucket"
-      Component     = "Data Domain" 
+      Component     = "Data Domain"
     }
   )
 }

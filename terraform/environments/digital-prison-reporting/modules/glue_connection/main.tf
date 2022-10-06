@@ -7,14 +7,14 @@ resource "aws_glue_connection" "data_domain_redshift" {
     USERNAME            = var.username
   }
 
-  name = var.name
+  name        = var.name
   description = var.description
-  
-# Optional
+
+  # Optional
 
   physical_connection_requirements {
     security_group_id_list = var.security_groups
     subnet_id              = var.subnet
-	availability_zone      = var.availability_zone
+    availability_zone      = var.availability_zone
   }
 }

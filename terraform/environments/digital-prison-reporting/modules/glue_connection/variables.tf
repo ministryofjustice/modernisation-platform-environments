@@ -16,7 +16,7 @@ variable "username" {
 
 variable "security_groups" {
   description = "The list of security groups."
-  type = "list"
+  type        = list(string)
 }
 
 variable "subnet" {
