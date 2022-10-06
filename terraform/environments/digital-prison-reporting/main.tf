@@ -15,6 +15,7 @@ locals {
   account_region       = data.aws_region.current.name
   create_kinesis       = local.application_data.accounts[local.environment].create_kinesis_streams
   enable_glue_registry = local.application_data.accounts[local.environment].create_glue_registries
+  setup_buckets        = local.application_data.accounts[local.environment].setup_s3_buckets
 
 
   all_tags = merge(
@@ -513,6 +514,22 @@ module "s3_curated_bucket" {
     local.all_tags,
     {
       Name          = "${local.project}-curated-${local.env}-s3"
+      Resource_Type = "S3 Bucket"
+    }
+  )
+}
+
+# S3 Bucket (Terraform State for Application IAAC)
+module "s3_application_tf_state" {
+  source         = "./modules/s3_bucket"
+  create_s3      = local.setup_buckets
+  name           = "${local.project}-terraform-state-${local.environment}"
+  custom_kms_key = local.s3_kms_arn
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-terraform-state-${local.environment}"
       Resource_Type = "S3 Bucket"
     }
   )
