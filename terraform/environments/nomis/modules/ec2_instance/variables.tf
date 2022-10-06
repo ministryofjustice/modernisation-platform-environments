@@ -91,11 +91,24 @@ variable "instance" {
     instance_type           = string
     key_name                = string
     vpc_security_group_ids  = list(string)
-    user_data               = optional(string)
     root_block_device = optional(object({
       volume_size = number
     }))
   })
+}
+
+variable "user_data" {
+  description = "Map of cloud-init config write_file sections for user data"
+  type = object({
+    args    = optional(map(string))
+    scripts = list(string)
+    write_files = optional(map(object({
+      path        = string
+      owner       = string
+      permissions = string
+    })))
+  })
+  default = null
 }
 
 variable "ebs_volume_config" {
@@ -109,10 +122,16 @@ variable "ebs_volume_config" {
 }
 
 variable "ebs_volumes" {
-  description = "EC2 volumes, see aws_ebs_volume for documentation.  key=volume name, value=ebs_volume_config key"
-  type = map(object({
-    label = optional(string)
-  }))
+  description = "EC2 volumes, see aws_ebs_volume for documentation.  key=volume name, value=ebs_volume_config key.  label is used as part of the Name tag"
+  # Commenting below out as it has unexpected results when used with merge()
+  #  type = map(object({
+  #    label       = string
+  #    snapshot_id = optional(string)
+  #    iops        = optional(number)
+  #    throughput  = optional(number)
+  #    size        = optional(number)
+  #    type        = optional(string)
+  #  }))
 }
 
 variable "route53_records" {

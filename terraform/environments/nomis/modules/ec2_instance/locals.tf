@@ -61,4 +61,19 @@ locals {
     for key, value in var.ebs_volumes :
     key => merge(local.ebs_volumes_from_ami[key], local.ebs_volumes_from_config[key], value)
   }
+
+  user_data_args_ssm_params = {
+    for key, value in var.ssm_parameters :
+    "ssm_parameter_${key}" => aws_ssm_parameter.this[key].name
+  }
+
+  user_data_args_common = {
+    branch               = var.branch == "" ? "main" : var.branch
+    ansible_repo         = var.ansible_repo == null ? "" : var.ansible_repo
+    ansible_repo_basedir = var.ansible_repo_basedir == null ? "" : var.ansible_repo_basedir
+    ansible_args         = "--tags ec2provision"
+    volume_ids           = join(" ", [for key, value in aws_ebs_volume.this : value.id])
+  }
+
+  user_data_args = merge(local.user_data_args_common, local.user_data_args_ssm_params, try(var.user_data.args, {}))
 }

@@ -1,6 +1,6 @@
 # This data sources allows us to get the Modernisation Platform account information for use elsewhere
 # (when we want to assume a role in the MP, for instance)
-data "aws_organizations_organization" "root_account" {}
+# data "aws_organizations_organization" "root_account" {}
 
 # Get the environments file from the main repository
 data "http" "environments_file" {
@@ -23,10 +23,14 @@ locals {
 
   # This takes the name of the Terraform workspace (e.g. core-vpc-production), strips out the application name (e.g. core-vpc), and checks if
   # the string leftover is `-production`, if it isn't (e.g. core-vpc-non-production => -non-production) then it sets the var to false.
-  is-production    = substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-production"
+  # tflint-ignore: terraform_unused_declarations
+  is-production = substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-production"
+  # tflint-ignore: terraform_unused_declarations
   is-preproduction = substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-preproduction"
-  is-test          = substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-test"
-  is-development   = substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-development"
+  # tflint-ignore: terraform_unused_declarations
+  is-test = substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-test"
+  # tflint-ignore: terraform_unused_declarations
+  is-development = substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-development"
 
   # Merge tags from the environment json file with additional ones
   # The environment file contains application, business-unit, infrastructure-support and owner tags
@@ -42,6 +46,7 @@ locals {
   vpc_id      = data.aws_vpc.shared_vpc.id
   subnet_set  = var.networking[0].set
 
+  # tflint-ignore: terraform_unused_declarations
   is_live       = [substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-production" || substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-preproduction" ? "live" : "non-live"]
   provider_name = "core-vpc-${local.environment}"
 

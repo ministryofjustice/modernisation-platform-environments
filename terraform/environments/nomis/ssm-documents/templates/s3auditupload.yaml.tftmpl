@@ -28,6 +28,7 @@ mainSteps:
 - name: InstallAndRunAnsible
   action: "aws:runShellScript"
   inputs:
+    timeoutSeconds: "14400"
     runCommand:
       - |
         cd /tmp
