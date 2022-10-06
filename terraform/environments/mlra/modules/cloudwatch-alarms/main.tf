@@ -181,3 +181,109 @@ resource "aws_cloudwatch_metric_alarm" "applicationelb4xxerror" {
   }
   comparison_operator = "GreaterThanthreshold"
 }
+resource "aws_cloudwatch_dashboard" "mlradash" {
+  dashboard_name = local.application_name
+  depends_on = [
+    aws_cloudwatch_metric_alarm.applicationelb4xxerror,
+    aws_cloudwatch_metric_alarm.applicationelb5xxerror,
+    aws_cloudwatch_metric_alarm.targetresponsetime,
+    aws_cloudwatch_metric_alarm.esccpuoverthreshold,
+    aws_cloudwatch_metric_alarm.ecsmemoryoverthreshold
+  ]
+  dashboard_body = <<EOF
+{
+  "widgets" : [
+    {
+      "type" : "metric",
+      "x" : 0,
+      "y" : 0,
+      "width" : 8,
+      "height" : 6,
+      "properties" : {
+          "title" : "Application ELB 5xx Error",
+          "annotations": {
+            "alarms": [
+              "${aws_cloudwatch_metric_alarm.applicationelb5xxerror.alarm_arn}"
+            ]
+          },
+          "view": "timeSeries",
+          "region": "${var.region.value}",
+          "stacked": false
+      }
+    },
+    {
+      "type" : "metric",
+      "x" : 8,
+      "y" : 0,
+      "width" : 8,
+      "height" : 6,
+      "properties" : {
+          "title" : "Application ELB 4xx Error",
+          "annotations": {
+            "alarms": [
+              "${aws_cloudwatch_metric_alarm.applicationelb4xxerror.alarm_arn}"
+            ]
+          },
+          "view": "timeSeries",
+          "region": "${var.region.value}",
+          "stacked": false
+      }
+    },
+    {
+      "type" : "metric",
+      "x" : 16,
+      "y" : 0,
+      "width" : 8,
+      "height" : 6,
+      "properties" : {
+          "title" : "Application ELB Target Response Time",
+          "annotations": {
+            "alarms": [
+              "${aws_cloudwatch_metric_alarm.targetresponsetime.alarm_arn}"
+            ]
+          },
+          "view": "timeSeries",
+          "region": "${var.region.value}",
+          "stacked": false
+      }
+    },
+    {
+      "type" : "metric",
+      "x" : 0,
+      "y" : 12,
+      "width" : 12,
+      "height" : 6,
+      "properties" : {
+          "title" : "ECS CPU",
+          "annotations": {
+            "alarms": [
+              "${aws_cloudwatch_metric_alarm.esccpuoverthreshold.alarm_arn}"
+            ]
+          },
+          "view": "timeSeries",
+          "region": "${var.region.value}",
+          "stacked": false
+      }
+    },
+    {
+      "type" : "metric",
+      "x" : 12,
+      "y" : 12,
+      "width" : 12,
+      "height" : 6,
+      "properties" : {
+          "title" : "ECS Memory",
+          "annotations": {
+            "alarms": [
+              "${aws_cloudwatch_metric_alarm.ecsmemoryoverthreshold.alarm_arn}"
+            ]
+          },
+          "view": "timeSeries",
+          "region": "${var.region.value}",
+          "stacked": false
+      }
+    }
+  ]
+}
+EOF
+}
