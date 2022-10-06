@@ -8,13 +8,14 @@ resource "aws_cloudwatch_metric_alarm" "esccpuoverthreshold" {
   evaluation_periods = "5"
   threshold          = var.pECSCPUAlarmThreshold
   treat_missing_data = "breaching"
-  Dimensions = {
+  dimensions = {
     ClusterName = var.pClusterName
   }
   comparison_operator = "GreaterThanThreshold"
 }
 
 resource "aws_cloudwatch_metric_alarm" "ecsmemoryoverthreshold" {
+  alarm_name         = "ECS-Memory-Over-Threshold"
   alarm_description  = "If the memory util exceeds the predefined threshold, this alarm will trigger.\n Please investigate."
   namespace          = "AWS/ECS"
   metric_name        = "MemoryUtilization"
@@ -23,7 +24,7 @@ resource "aws_cloudwatch_metric_alarm" "ecsmemoryoverthreshold" {
   evaluation_periods = "5"
   threshold          = var.pECSMemoryAlarmThreshold
   treat_missing_data = "breaching"
-  Dimensions = {
+  dimensions = {
     ClusterName = var.pClusterName
   }
   comparison_operator = "GreaterThanThreshold"
@@ -39,7 +40,7 @@ resource "aws_cloudwatch_metric_alarm" "cpuoverthreshold" {
   evaluation_periods = "5"
   threshold          = var.pASGCPUAlarmThreshold
   treat_missing_data = "breaching"
-  Dimensions = {
+  dimensions = {
     AutoScalingGroupName = var.pAutoscalingGroupName
   }
   comparison_operator = "GreaterThanThreshold"
@@ -54,7 +55,7 @@ resource "aws_cloudwatch_metric_alarm" "statuscheckfailure" {
   evaluation_periods = "5"
   threshold          = var.pASGStatusFailureAlarmThreshold
   treat_missing_data = "breaching"
-  Dimensions = {
+  dimensions = {
     AutoScalingGroupName = var.pAutoscalingGroupName
   }
   comparison_operator = "GreaterThanThreshold"
@@ -70,7 +71,7 @@ resource "aws_cloudwatch_metric_alarm" "targetresponsetime" {
   evaluation_periods = "5"
   threshold          = var.pALBTargetResponseTimeThreshold
   treat_missing_data = "notBreaching"
-  Dimensions = {
+  dimensions = {
     LoadBalancer = var.pLoadBalancerName
   }
   comparison_operator = "GreaterThanThreshold"
@@ -85,7 +86,7 @@ resource "aws_cloudwatch_metric_alarm" "targetResponsetimemaximum" {
   evaluation_periods = "1"
   threshold          = var.pALBTargetResponseTimeThresholdMaximum
   treat_missing_data = "notBreaching"
-  Dimensions = {
+  dimensions = {
     LoadBalancer = var.pLoadBalancerName
   }
   comparison_operator = "GreaterThanThreshold"
@@ -100,7 +101,7 @@ resource "aws_cloudwatch_metric_alarm" "unhealthyhosts" {
   evaluation_periods = "5"
   threshold          = var.pALBUnhealthyAlarmThreshold
   treat_missing_data = "notBreaching"
-  Dimensions = {
+  dimensions = {
     LoadBalancer = var.pLoadBalancerName
     TargetGroup  = var.pTargetGroupName
   }
@@ -116,7 +117,7 @@ resource "aws_cloudwatch_metric_alarm" "rejectedconnectioncount" {
   evaluation_periods = "5"
   threshold          = var.pALBRejectedAlarmThreshold
   treat_missing_data = "notBreaching"
-  Dimensions = {
+  dimensions = {
     LoadBalancer = var.pLoadBalancerName
   }
   comparison_operator = "GreaterThanThreshold"
@@ -131,7 +132,7 @@ resource "aws_cloudwatch_metric_alarm" "http5xxerror" {
   evaluation_periods = "5"
   threshold          = var.pALBTarget5xxAlarmThreshold
   treat_missing_data = "notBreaching"
-  Dimensions = {
+  dimensions = {
     LoadBalancer = var.pLoadBalancerName
   }
   comparison_operator = "GreaterThanThreshold"
@@ -146,7 +147,7 @@ resource "aws_cloudwatch_metric_alarm" "applicationelb5xxerror" {
   evaluation_periods = "5"
   threshold          = var.pALB5xxAlarmThreshold
   treat_missing_data = "notBreaching"
-  Dimensions = {
+  dimensions = {
     LoadBalancer = var.pLoadBalancerName
   }
   comparison_operator = "GreaterThanThreshold"
@@ -161,7 +162,7 @@ resource "aws_cloudwatch_metric_alarm" "http4xxerror" {
   evaluation_periods = "5"
   threshold          = var.pALBTarget4xxAlarmThreshold
   treat_missing_data = "notBreaching"
-  Dimensions = {
+  dimensions = {
     LoadBalancer = var.pLoadBalancerName
   }
   comparison_operator = "GreaterThanThreshold"
@@ -176,7 +177,7 @@ resource "aws_cloudwatch_metric_alarm" "applicationelb4xxerror" {
   evaluation_periods = "5"
   threshold          = var.pALB4xxAlarmThreshold
   treat_missing_data = "notBreaching"
-  Dimensions = {
+  dimensions = {
     LoadBalancer = var.pLoadBalancerName
   }
   comparison_operator = "GreaterThanThreshold"
