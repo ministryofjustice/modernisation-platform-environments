@@ -6,12 +6,12 @@ resource "aws_cloudwatch_metric_alarm" "esccpuoverthreshold" {
   statistic          = "Average"
   period             = "60"
   evaluation_periods = "5"
-  threshold          = var.pECSCPUAlarmthreshold.value
+  threshold          = var.pECSCPUAlarmThreshold.value
   treat_missing_data = "breaching"
   Dimensions = {
     ClusterName = var.pClusterName.value
   }
-  comparison_operator = "GreaterThanthreshold"
+  comparison_operator = "GreaterThanThreshold"
 }
 
 resource "aws_cloudwatch_metric_alarm" "ecsmemoryoverthreshold" {
@@ -21,12 +21,12 @@ resource "aws_cloudwatch_metric_alarm" "ecsmemoryoverthreshold" {
   statistic          = "Average"
   period             = "60"
   evaluation_periods = "5"
-  threshold          = var.pECSMemoryAlarmthreshold.value
+  threshold          = var.pECSMemoryAlarmThreshold.value
   treat_missing_data = "breaching"
   Dimensions = {
     ClusterName = var.pClusterName.value
   }
-  comparison_operator = "GreaterThanthreshold"
+  comparison_operator = "GreaterThanThreshold"
 }
 resource "aws_cloudwatch_metric_alarm" "cpuoverthreshold" {
 
@@ -37,12 +37,12 @@ resource "aws_cloudwatch_metric_alarm" "cpuoverthreshold" {
   statistic          = "Average"
   period             = "60"
   evaluation_periods = "5"
-  threshold          = var.pASGCPUAlarmthreshold.value
+  threshold          = var.pASGCPUAlarmThreshold.value
   treat_missing_data = "breaching"
   Dimensions = {
     AutoScalingGroupName = var.pAutoscalingGroupName.value
   }
-  comparison_operator = "GreaterThanthreshold"
+  comparison_operator = "GreaterThanThreshold"
 }
 resource "aws_cloudwatch_metric_alarm" "statuscheckfailure" {
   alarm_name         = "status-check-failure-alarm"
@@ -52,12 +52,12 @@ resource "aws_cloudwatch_metric_alarm" "statuscheckfailure" {
   statistic          = "Average"
   period             = "60"
   evaluation_periods = "5"
-  threshold          = var.pASGStatusFailureAlarmthreshold.value
+  threshold          = var.pASGStatusFailureAlarmThreshold.value
   treat_missing_data = "breaching"
   Dimensions = {
     AutoScalingGroupName = var.pAutoscalingGroupName.value
   }
-  comparison_operator = "GreaterThanthreshold"
+  comparison_operator = "GreaterThanThreshold"
 }
 # Application Load Balancer Alerting
 resource "aws_cloudwatch_metric_alarm" "targetresponsetime" {
@@ -68,12 +68,12 @@ resource "aws_cloudwatch_metric_alarm" "targetresponsetime" {
   extended_statistic = "p99"
   period             = "60"
   evaluation_periods = "5"
-  threshold          = var.pALBTargetResponseTimethreshold.value
+  threshold          = var.pALBTargetResponseTimeThreshold.value
   treat_missing_data = "notBreaching"
   Dimensions = {
     LoadBalancer = var.pLoadBalancerName.value
   }
-  comparison_operator = "GreaterThanthreshold"
+  comparison_operator = "GreaterThanThreshold"
 }
 resource "aws_cloudwatch_metric_alarm" "targetResponsetimemaximum" {
   alarm_name         = "alb-target-response-time-alarm-maximum"
@@ -83,12 +83,12 @@ resource "aws_cloudwatch_metric_alarm" "targetResponsetimemaximum" {
   statistic          = "Maximum"
   period             = "60"
   evaluation_periods = "1"
-  threshold          = var.pALBTargetResponseTimethresholdMaximum.value
+  threshold          = var.pALBTargetResponseTimeThresholdMaximum.value
   treat_missing_data = "notBreaching"
   Dimensions = {
     LoadBalancer = var.pLoadBalancerName.value
   }
-  comparison_operator = "GreaterThanthreshold"
+  comparison_operator = "GreaterThanThreshold"
 }
 resource "aws_cloudwatch_metric_alarm" "unhealthyhosts" {
   alarm_name         = "unhealthy-hosts-alarm"
@@ -98,13 +98,13 @@ resource "aws_cloudwatch_metric_alarm" "unhealthyhosts" {
   statistic          = "Average"
   period             = "60"
   evaluation_periods = "5"
-  threshold          = var.pALBUnhealthyAlarmthreshold.value
+  threshold          = var.pALBUnhealthyAlarmThreshold.value
   treat_missing_data = "notBreaching"
   Dimensions = {
     LoadBalancer = var.pLoadBalancerName.value
     TargetGroup  = var.pTargetGroupName.value
   }
-  comparison_operator = "GreaterThanthreshold"
+  comparison_operator = "GreaterThanThreshold"
 }
 resource "aws_cloudwatch_metric_alarm" "rejectedconnectioncount" {
   alarm_name         = "RejectedConnectionCount-alarm"
@@ -114,12 +114,12 @@ resource "aws_cloudwatch_metric_alarm" "rejectedconnectioncount" {
   statistic          = "Sum"
   period             = "60"
   evaluation_periods = "5"
-  threshold          = var.pALBRejectedAlarmthreshold.value
+  threshold          = var.pALBRejectedAlarmThreshold.value
   treat_missing_data = "notBreaching"
   Dimensions = {
     LoadBalancer = var.pLoadBalancerName.value
   }
-  comparison_operator = "GreaterThanthreshold"
+  comparison_operator = "GreaterThanThreshold"
 }
 resource "aws_cloudwatch_metric_alarm" "http5xxerror" {
   alarm_name         = "http-5xx-error-alarm"
@@ -129,12 +129,12 @@ resource "aws_cloudwatch_metric_alarm" "http5xxerror" {
   statistic          = "Sum"
   period             = "60"
   evaluation_periods = "5"
-  threshold          = var.pALBTarget5xxAlarmthreshold.value
+  threshold          = var.pALBTarget5xxAlarmThreshold.value
   treat_missing_data = "notBreaching"
   Dimensions = {
     LoadBalancer = var.pLoadBalancerName.value
   }
-  comparison_operator = "GreaterThanthreshold"
+  comparison_operator = "GreaterThanThreshold"
 }
 resource "aws_cloudwatch_metric_alarm" "applicationelb5xxerror" {
   alarm_name         = "elb-5xx-error-alarm"
@@ -144,12 +144,12 @@ resource "aws_cloudwatch_metric_alarm" "applicationelb5xxerror" {
   statistic          = "Sum"
   period             = "60"
   evaluation_periods = "5"
-  threshold          = var.pALB5xxAlarmthreshold.value
+  threshold          = var.pALB5xxAlarmThreshold.value
   treat_missing_data = "notBreaching"
   Dimensions = {
     LoadBalancer = var.pLoadBalancerName.value
   }
-  comparison_operator = "GreaterThanthreshold"
+  comparison_operator = "GreaterThanThreshold"
 }
 resource "aws_cloudwatch_metric_alarm" "http4xxerror" {
   alarm_name         = "http-4xx-error-alarm"
@@ -159,12 +159,12 @@ resource "aws_cloudwatch_metric_alarm" "http4xxerror" {
   statistic          = "Sum"
   period             = "60"
   evaluation_periods = "5"
-  threshold          = var.pALBTarget4xxAlarmthreshold.value
+  threshold          = var.pALBTarget4xxAlarmThreshold.value
   treat_missing_data = "notBreaching"
   Dimensions = {
     LoadBalancer = var.pLoadBalancerName.value
   }
-  comparison_operator = "GreaterThanthreshold"
+  comparison_operator = "GreaterThanThreshold"
 }
 resource "aws_cloudwatch_metric_alarm" "applicationelb4xxerror" {
   alarm_name         = "elb-4xx-error-alarm"
@@ -174,12 +174,12 @@ resource "aws_cloudwatch_metric_alarm" "applicationelb4xxerror" {
   statistic          = "Sum"
   period             = "60"
   evaluation_periods = "5"
-  threshold          = var.pALB4xxAlarmthreshold.Value
+  threshold          = var.pALB4xxAlarmThreshold.Value
   treat_missing_data = "notBreaching"
   Dimensions = {
     LoadBalancer = var.pLoadBalancerName.Value
   }
-  comparison_operator = "GreaterThanthreshold"
+  comparison_operator = "GreaterThanThreshold"
 }
 resource "aws_cloudwatch_dashboard" "mlradash" {
   dashboard_name = local.application_name
