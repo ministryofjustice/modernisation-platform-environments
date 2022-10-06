@@ -685,7 +685,7 @@ module "s3_domain_config_bucket" {
 }
 
 # Data Domain Glue Connection (RedShift)
-module "glue_data_domain_database" {
+module "glue_connection_redshift" {
   source            = "./modules/glue_connection"
   create_connection = local.create_glue_connection
   name              = "${local.project}-glue-connect-redshift-${local.env}"
