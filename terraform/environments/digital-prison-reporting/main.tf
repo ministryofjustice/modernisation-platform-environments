@@ -17,7 +17,7 @@ locals {
   create_kinesis       = local.application_data.accounts[local.environment].create_kinesis_streams
   enable_glue_registry = local.application_data.accounts[local.environment].create_glue_registries
   setup_buckets        = local.application_data.accounts[local.environment].setup_s3_buckets
-  create_connection    = local.application_data.accounts[local.environment].create_database.create_glue_connections
+  create_glue_connection= local.application_data.accounts[local.environment].create_database.create_glue_connections
 
 
   all_tags = merge(
