@@ -204,7 +204,7 @@ resource "aws_cloudwatch_dashboard" "mlradash" {
           "title" : "Application ELB 5xx Error",
           "annotations": {
             "alarms": [
-              "${aws_cloudwatch_metric_alarm.applicationelb5xxerror.alarm_arn}"
+              "${aws_cloudwatch_metric_alarm.applicationelb5xxerror.arn}"
             ]
           },
           "view": "timeSeries",
@@ -222,7 +222,7 @@ resource "aws_cloudwatch_dashboard" "mlradash" {
           "title" : "Application ELB 4xx Error",
           "annotations": {
             "alarms": [
-              "${aws_cloudwatch_metric_alarm.applicationelb4xxerror.alarm_arn}"
+              "${aws_cloudwatch_metric_alarm.applicationelb4xxerror.arn}"
             ]
           },
           "view": "timeSeries",
@@ -240,7 +240,7 @@ resource "aws_cloudwatch_dashboard" "mlradash" {
           "title" : "Application ELB Target Response Time",
           "annotations": {
             "alarms": [
-              "${aws_cloudwatch_metric_alarm.targetresponsetime.alarm_arn}"
+              "${aws_cloudwatch_metric_alarm.targetresponsetime.arn}"
             ]
           },
           "view": "timeSeries",
@@ -258,7 +258,7 @@ resource "aws_cloudwatch_dashboard" "mlradash" {
           "title" : "ECS CPU",
           "annotations": {
             "alarms": [
-              "${aws_cloudwatch_metric_alarm.esccpuoverthreshold.alarm_arn}"
+              "${aws_cloudwatch_metric_alarm.esccpuoverthreshold.arn}"
             ]
           },
           "view": "timeSeries",
@@ -276,7 +276,7 @@ resource "aws_cloudwatch_dashboard" "mlradash" {
           "title" : "ECS Memory",
           "annotations": {
             "alarms": [
-              "${aws_cloudwatch_metric_alarm.ecsmemoryoverthreshold.alarm_arn}"
+              "${aws_cloudwatch_metric_alarm.ecsmemoryoverthreshold.arn}"
             ]
           },
           "view": "timeSeries",
