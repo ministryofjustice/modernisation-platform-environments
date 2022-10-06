@@ -118,7 +118,7 @@ module "kinesis_stream_ingestor" {
 module "kinesis_stream_domain_data" {
   source                    = "./modules/kinesis_stream"
   create_kinesis_stream     = local.create_kinesis
-  name                      = "${local.project}-kinesis-domain-data-${local.env}"
+  name                      = "${local.project}-kinesis-data-domain-${local.env}"
   shard_count               = 1
   retention_period          = 24
   shard_level_metrics       = ["IncomingBytes", "OutgoingBytes"]
