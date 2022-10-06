@@ -1,17 +1,3 @@
-#resource "aws_cloudwatch_metric_alarm" "cwalarms" {
-#  alarm_name                = var.alarm_name.value
-#  comparison_operator       = var.oper.value
-#  evaluation_periods        = var.eval.value
-#  metric_name               = var.metric_name.value
-#  namespace                 = var.namespace.value
-#  period                    = var.period.value
-#  statistic                 = var.stat.value
-#  threshold                 = var.thresh.value
-#  alarm_description         = var.alarmdesc.value
-#  insufficient_data_actions = []
-#}
-
-
 resource "aws_cloudwatch_metric_alarm" "esccpuoverthreshold" {
     alarm_name = "ECS-CPU-high-threshold-alarm"
     alarm_description = "If the CPU exceeds the predefined threshold, this alarm will trigger. \n Please investigate."
