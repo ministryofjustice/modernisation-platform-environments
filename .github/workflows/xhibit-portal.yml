@@ -55,8 +55,8 @@ jobs:
           terraform -chdir="terraform/environments/xhibit-portal" workspace list
           terraform -chdir="terraform/environments/xhibit-portal" workspace select "xhibit-portal-${TF_ENV}"
           bash scripts/terraform-plan.sh terraform/environments/xhibit-portal
-        env:
-          TF_ENV: development
+    env:
+      TF_ENV: development
 
   deploy-development:
     needs: plan-development # job only runs if plan-development runs successfully
