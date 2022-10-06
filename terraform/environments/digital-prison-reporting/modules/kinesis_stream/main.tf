@@ -20,7 +20,7 @@ resource "aws_kinesis_stream" "this" {
 resource "aws_iam_policy" "read-only" {
   count = var.create_policy_read_only && var.create_kinesis_stream ? 1 : 0
 
-  name        = "${var.project_id}-kinesis-stream-read-only"
+  name        = "${var.name}-read"
   path        = "/"
   description = "Managed by Terraform"
   policy = jsonencode({
@@ -49,7 +49,7 @@ resource "aws_iam_policy" "read-only" {
 resource "aws_iam_policy" "write-only" {
   count = var.create_policy_write_only && var.create_kinesis_stream ? 1 : 0
 
-  name        = "${var.project_id}-kinesis-stream-write-only"
+  name        = "${var.name}-write"
   path        = "/"
   description = "Managed by Terraform"
   policy = jsonencode({
@@ -76,7 +76,7 @@ resource "aws_iam_policy" "write-only" {
 resource "aws_iam_policy" "admin" {
   count = var.create_policy_admin && var.create_kinesis_stream ? 1 : 0
 
-  name        = "${var.project_id}-kinesis-stream-admin"
+  name        = "${var.name}-admin"
   path        = "/"
   description = "Managed by Terraform"
   policy = jsonencode({

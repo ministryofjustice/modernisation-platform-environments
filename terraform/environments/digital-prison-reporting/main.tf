@@ -1,21 +1,23 @@
 locals {
-  project              = local.application_data.accounts[local.environment].project_short_id
-  glue_db              = local.application_data.accounts[local.environment].glue_db_name
-  description          = local.application_data.accounts[local.environment].db_description
-  create_db            = local.application_data.accounts[local.environment].create_database
-  glue_job             = local.application_data.accounts[local.environment].glue_job_name
-  create_job           = local.application_data.accounts[local.environment].create_job
-  create_sec_conf      = local.application_data.accounts[local.environment].create_security_conf
-  env                  = local.environment
-  s3_kms_arn           = aws_kms_key.s3.arn
-  kinesis_kms_arn      = aws_kms_key.kinesis-kms-key.arn
-  kinesis_kms_id       = data.aws_kms_key.kinesis_kms_key.key_id
-  create_bucket        = local.application_data.accounts[local.environment].setup_buckets
-  account_id           = data.aws_caller_identity.current.account_id
-  account_region       = data.aws_region.current.name
-  create_kinesis       = local.application_data.accounts[local.environment].create_kinesis_streams
-  enable_glue_registry = local.application_data.accounts[local.environment].create_glue_registries
-  setup_buckets        = local.application_data.accounts[local.environment].setup_s3_buckets
+  project                = local.application_data.accounts[local.environment].project_short_id
+  glue_db                = local.application_data.accounts[local.environment].glue_db_name
+  glue_db_data_domain    = local.application_data.accounts[local.environment].glue_db_data_domain
+  description            = local.application_data.accounts[local.environment].db_description
+  create_db              = local.application_data.accounts[local.environment].create_database
+  glue_job               = local.application_data.accounts[local.environment].glue_job_name
+  create_job             = local.application_data.accounts[local.environment].create_job
+  create_sec_conf        = local.application_data.accounts[local.environment].create_security_conf
+  env                    = local.environment
+  s3_kms_arn             = aws_kms_key.s3.arn
+  kinesis_kms_arn        = aws_kms_key.kinesis-kms-key.arn
+  kinesis_kms_id         = data.aws_kms_key.kinesis_kms_key.key_id
+  create_bucket          = local.application_data.accounts[local.environment].setup_buckets
+  account_id             = data.aws_caller_identity.current.account_id
+  account_region         = data.aws_region.current.name
+  create_kinesis         = local.application_data.accounts[local.environment].create_kinesis_streams
+  enable_glue_registry   = local.application_data.accounts[local.environment].create_glue_registries
+  setup_buckets          = local.application_data.accounts[local.environment].setup_s3_buckets
+  create_glue_connection = local.application_data.accounts[local.environment].create_glue_connections
 
 
   all_tags = merge(
@@ -25,6 +27,10 @@ locals {
     }
   )
 }
+
+############################
+# Federated Cloud Platform # 
+############################
 
 # Terraform AWS Glue Database
 module "glue_demo_table" {
@@ -86,7 +92,7 @@ module "glue_demo_table" {
   glue_table_depends_on = [module.glue_database.db_name]
 }
 
-# kinesis Data Stream
+# kinesis Data Stream Ingestor
 module "kinesis_stream_ingestor" {
   source                    = "./modules/kinesis_stream"
   create_kinesis_stream     = local.create_kinesis
@@ -104,6 +110,29 @@ module "kinesis_stream_ingestor" {
     {
       Name          = "${local.project}-kinesis-ingestor-${local.env}"
       Resource_Type = "Kinesis Data Stream"
+    }
+  )
+}
+
+# kinesis Domain Data Stream
+module "kinesis_stream_domain_data" {
+  source                    = "./modules/kinesis_stream"
+  create_kinesis_stream     = local.create_kinesis
+  name                      = "${local.project}-kinesis-data-domain-${local.env}"
+  shard_count               = 1
+  retention_period          = 24
+  shard_level_metrics       = ["IncomingBytes", "OutgoingBytes"]
+  enforce_consumer_deletion = false
+  encryption_type           = "KMS"
+  kms_key_id                = local.kinesis_kms_id
+  project_id                = local.project
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-kinesis-domain-data-${local.env}"
+      Resource_Type = "Kinesis Data Stream"
+      Component     = "Domain Data"
     }
   )
 }
@@ -518,6 +547,160 @@ module "s3_curated_bucket" {
     }
   )
 }
+
+##########################
+# Data Domain Components # 
+##########################
+
+# Glue Database Catalog for Data Domain
+module "glue_data_domain_database" {
+  source         = "./modules/glue_database"
+  create_db      = local.create_db
+  name           = "${local.project}-${local.glue_db_data_domain}-${local.env}"
+  description    = "Glue Data Catalog for Data Domain Platform"
+  aws_account_id = local.account_id
+  aws_region     = local.account_region
+}
+
+# Data Domain Bucket
+module "s3_domain_bucket" {
+  count  = local.create_bucket ? 1 : 0
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.2.0"
+
+  providers = {
+    aws.bucket-replication = aws
+  }
+
+  bucket_prefix = "${local.project}-domain-${local.env}-"
+
+  replication_enabled = false
+  custom_kms_key      = local.s3_kms_arn
+  lifecycle_rule = [
+    {
+      id      = "main"
+      enabled = "Enabled"
+      prefix  = ""
+
+      tags = {
+        rule      = "log"
+        autoclean = "true"
+      }
+
+      transition = [
+        {
+          days          = 90
+          storage_class = "STANDARD_IA"
+        }
+      ]
+
+      expiration = {
+        days = 730
+      }
+
+      noncurrent_version_transition = [
+        {
+          days          = 90
+          storage_class = "STANDARD_IA"
+          }, {
+          days          = 365
+          storage_class = "GLACIER"
+        }
+      ]
+
+      noncurrent_version_expiration = {
+        days = 730
+      }
+    }
+  ]
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-domain-${local.env}-s3"
+      Resource_Type = "S3 Bucket"
+      Component     = "Data Domain"
+    }
+  )
+}
+
+# Data Domain Configuration Bucket
+module "s3_domain_config_bucket" {
+  count  = local.create_bucket ? 1 : 0
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.2.0"
+
+  providers = {
+    aws.bucket-replication = aws
+  }
+
+  bucket_prefix = "${local.project}-domain-config-${local.env}-"
+
+  replication_enabled = false
+  custom_kms_key      = local.s3_kms_arn
+  lifecycle_rule = [
+    {
+      id      = "main"
+      enabled = "Enabled"
+      prefix  = ""
+
+      tags = {
+        rule      = "log"
+        autoclean = "true"
+      }
+
+      transition = [
+        {
+          days          = 90
+          storage_class = "STANDARD_IA"
+        }
+      ]
+
+      expiration = {
+        days = 730
+      }
+
+      noncurrent_version_transition = [
+        {
+          days          = 90
+          storage_class = "STANDARD_IA"
+          }, {
+          days          = 365
+          storage_class = "GLACIER"
+        }
+      ]
+
+      noncurrent_version_expiration = {
+        days = 730
+      }
+    }
+  ]
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-domain-config-${local.env}-s3"
+      Resource_Type = "S3 Bucket"
+      Component     = "Data Domain"
+    }
+  )
+}
+
+# Data Domain Glue Connection (RedShift)
+module "glue_connection_redshift" {
+  source            = "./modules/glue_connection"
+  create_connection = local.create_glue_connection
+  name              = "${local.project}-glue-connect-redshift-${local.env}"
+  connection_url    = ""
+  description       = "Data Domain, Glue Connection to Redshift"
+  security_groups   = []
+  availability_zone = ""
+  subnet            = ""
+  password          = ""
+  username          = ""
+}
+
+##########################
+# Application Backend TF # 
+##########################
 
 # S3 Bucket (Terraform State for Application IAAC)
 module "s3_application_tf_state" {
