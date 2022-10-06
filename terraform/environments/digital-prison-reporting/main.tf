@@ -698,7 +698,6 @@ module "glue_connection_redshift" {
   username          = ""
 }
 
-
 ##########################
 # Application Backend TF # 
 ##########################
