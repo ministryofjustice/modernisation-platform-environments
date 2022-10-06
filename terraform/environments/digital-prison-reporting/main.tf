@@ -693,7 +693,7 @@ module "glue_connection_redshift" {
   description       = "Data Domain, Glue Connection to Redshift"
   security_groups   = []
   availability_zone = ""
-  subnet_id         = ""
+  subnet            = ""
   password          = ""
   username          = ""
 }
