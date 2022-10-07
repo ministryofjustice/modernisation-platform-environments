@@ -30,8 +30,13 @@ locals {
           retention_days = 90
         }
       },
-      databases_legacy   = {},
-      databases          = {},
+      databases_legacy = {},
+      databases = {
+        # Naming
+        # *-nomis-db-1: NOMIS, NDH, TRDATA
+        # *-nomis-db-2: MIS, AUDIT
+        # *-nomis-db-3: HA
+      },
       weblogics          = {},
       base_instances_asg = {},
       test_instances_asg = {}
@@ -108,6 +113,11 @@ locals {
       },
 
       databases = {
+        # Naming
+        # *-nomis-db-1: NOMIS, NDH, TRDATA
+        # *-nomis-db-2: MIS, AUDIT
+        # *-nomis-db-3: HA
+
         t1-nomis-db-2 = {
           tags = {
             server-type = "nomis-db"
@@ -121,12 +131,8 @@ locals {
             disable_api_termination = true
           }
           ebs_volume_config = {
-            data = {
-              total_size = 200
-            }
-            flash = {
-              total_size = 2
-            }
+            data  = { total_size = 200 }
+            flash = { total_size = 2 }
           }
         }
       }
@@ -191,8 +197,13 @@ locals {
           retention_days = 90
         }
       },
-      databases_legacy   = {},
-      databases          = {},
+      databases_legacy = {},
+      databases = {
+        # Naming
+        # *-nomis-db-1: NOMIS, NDH, TRDATA
+        # *-nomis-db-2: MIS, AUDIT
+        # *-nomis-db-3: HA
+      },
       weblogics          = {},
       base_instances_asg = {},
       test_instances_asg = {}
@@ -288,6 +299,10 @@ locals {
         }
       },
       databases = {
+        # Naming
+        # *-nomis-db-1: NOMIS, NDH, TRDATA
+        # *-nomis-db-2: MIS, AUDIT
+        # *-nomis-db-3: HA
 
         # NOTE: this is temporarily under prod account while we wait for network connectivity
         preprod-nomis-db-2 = {
@@ -305,15 +320,34 @@ locals {
           }
           ebs_volumes = {
             "/dev/sdb" = { size = 100 }  # /u01
-            "/dev/sdc" = { size = 5120 } # /u02
+            "/dev/sdc" = { size = 5120 } # /u02 - reduce this to 1000 when we move into preprod subscription
           }
           ebs_volume_config = {
-            data = {
-              total_size = 4000
-            }
-            flash = {
-              total_size = 1000
-            }
+            data  = { total_size = 4000 }
+            flash = { total_size = 1000 }
+          }
+        }
+
+        prod-nomis-db-2 = {
+          tags = {
+            server-type = "nomis-db"
+            description = "Production NOMIS MIS and Audit database to replace Azure PDPDL00036 and PDPDL00038"
+            oracle-sids = "PCNMAUD"
+            monitored   = false
+            always-on   = true
+          }
+          ami_name = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-03T12-51-25.032Z"
+          instance = {
+            instance_type           = "r6i.2xlarge"
+            disable_api_termination = true
+          }
+          ebs_volumes = {
+            "/dev/sdb" = { size = 100 }  # /u01
+            "/dev/sdc" = { size = 1000 } # /u02
+          }
+          ebs_volume_config = {
+            data  = { total_size = 4000 }
+            flash = { total_size = 1000 }
           }
         }
       }
