@@ -105,7 +105,7 @@ resource "aws_lb_listener" "internal" {
   #checkov:skip=CKV_AWS_103:the application does not support tls 1.2
   #tfsec:ignore:aws-elb-use-secure-tls-policy:the application does not support tls 1.2
   ssl_policy      = "ELBSecurityPolicy-2016-08"
-  certificate_arn = aws_acm_certificate.internal_lb.arn 
+  certificate_arn = aws_acm_certificate.internal_lb.arn
 
   default_action {
     type = "fixed-response"
