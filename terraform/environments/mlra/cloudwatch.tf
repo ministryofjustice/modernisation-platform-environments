@@ -1,9 +1,9 @@
 module "cwalarm_1" {
   source = "./modules/cloudwatch-alarms"
 
-  pClusterName = " "
+  pClusterName          = " "
   pAutoscalingGroupName = " "
-  pLoadBalancerName = " "
-  pTargetGroupName = " " 
-  appnameenv = "${local.application_name}-${local.environment}"
+  pLoadBalancerName     = " "
+  pTargetGroupName      = " "
+  appnameenv            = "${local.application_name}-${local.environment}"
 }

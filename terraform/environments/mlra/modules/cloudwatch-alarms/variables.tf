@@ -1,6 +1,6 @@
 variable "region" {
-    default = "eu-west-2"
-  
+  default = "eu-west-2"
+
 }
 variable "pClusterName" {
   type    = string
@@ -23,7 +23,7 @@ variable "pTargetGroupName" {
 }
 variable "appnameenv" {
   default = ""
-  
+
 }
 variable "pECSCPUAlarmThreshold" {
   description = "ECS CPU Alarm Threshold"
