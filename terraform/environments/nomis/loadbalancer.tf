@@ -105,7 +105,7 @@ resource "aws_lb_listener" "internal" {
   #checkov:skip=CKV_AWS_103:the application does not support tls 1.2
   #tfsec:ignore:aws-elb-use-secure-tls-policy:the application does not support tls 1.2
   ssl_policy      = "ELBSecurityPolicy-2016-08"
-  certificate_arn = aws_acm_certificate.internal_lb.arn # this is what we'll use once we go back to modplatform dns
+  certificate_arn = aws_acm_certificate.internal_lb.arn 
 
   default_action {
     type = "fixed-response"
@@ -115,11 +115,6 @@ resource "aws_lb_listener" "internal" {
       status_code  = "503"
     }
   }
-}
-
-resource "aws_lb_listener_certificate" "certificate_mp" {
-  listener_arn    = aws_lb_listener.internal.arn
-  certificate_arn = aws_acm_certificate.internal_lb.arn
 }
 
 resource "aws_lb_listener_certificate" "certificate_az" {
