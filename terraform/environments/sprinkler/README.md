@@ -13,7 +13,7 @@ last_reviewed_on: 2022-10-07
 
 ### **Description:**
 
-Sprinkler only has one account, development. It is like a member account but uses core-vpc-sandbox networking, and is used to create and test infrastructure. Github action in the environments repository. 
+Sprinkler only has one account, development. It is like a member account but uses core-vpc-sandbox networking, and is used to create and test infrastructure. Github action in the environments repository.
 
 ### **Service URLs:**
 
@@ -21,7 +21,7 @@ No production environment.
 
 ### **Incident response hours:**
 
-N/A this is a development account with no incident repsonse hours. 
+N/A this is a development account with no incident repsonse hours.
 
 ### **Incident contact details:**
 

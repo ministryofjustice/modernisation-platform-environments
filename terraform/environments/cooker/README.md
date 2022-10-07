@@ -21,7 +21,7 @@ No production environment.
 
 ### **Incident response hours:**
 
-N/A this is a development account with no incident repsonse hours. 
+N/A this is a development account with no incident repsonse hours.
 
 ### **Incident contact details:**
 
@@ -34,4 +34,3 @@ Please post in #ask-modernisation-platform
 ### **Hosting environment:**
 
 Modernisation Platform
-
