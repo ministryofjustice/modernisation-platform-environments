@@ -5,4 +5,5 @@ module "cwalarm_1" {
   pAutoscalingGroupName = " "
   pLoadBalancerName = " "
   pTargetGroupName = " " 
+  appnameenv = "${local.application_name}-${local.environment}"
 }

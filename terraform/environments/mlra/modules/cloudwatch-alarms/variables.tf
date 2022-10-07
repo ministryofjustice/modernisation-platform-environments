@@ -21,6 +21,10 @@ variable "pTargetGroupName" {
   default = ""
 
 }
+variable "appnameenv" {
+  default = ""
+  
+}
 variable "pECSCPUAlarmThreshold" {
   description = "ECS CPU Alarm Threshold"
   type        = number

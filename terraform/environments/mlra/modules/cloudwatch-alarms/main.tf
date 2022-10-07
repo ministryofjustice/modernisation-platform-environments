@@ -15,7 +15,7 @@ resource "aws_cloudwatch_metric_alarm" "esccpuoverthreshold" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "ecsmemoryoverthreshold" {
-  alarm_name         = "ECS-Memory-Over-Threshold"
+  alarm_name         = "${var.appnameenv}-ECS-Memory-Over-Threshold"
   alarm_description  = "If the memory util exceeds the predefined threshold, this alarm will trigger.\n Please investigate."
   namespace          = "AWS/ECS"
   metric_name        = "MemoryUtilization"
