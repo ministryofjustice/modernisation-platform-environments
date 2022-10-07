@@ -336,7 +336,7 @@ locals {
             monitored   = false
             always-on   = true
           }
-          ami_name = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-03T12-51-25.032Z"
+          ami_name = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-07T12-48-08.562Z"
           instance = {
             instance_type           = "r6i.2xlarge"
             disable_api_termination = true
