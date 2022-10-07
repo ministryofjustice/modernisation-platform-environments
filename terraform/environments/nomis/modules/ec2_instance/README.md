@@ -17,8 +17,8 @@ ebs_volumes = {
 }
 ```
 
-The label will then be included in the device name. You can also override the
-default AMI settings. If all the volumes with the same label have hte same
+The label will then be included in the tag:Name. You can also override the
+default AMI settings. If all the volumes with the same label have the same
 settings, set like this:
 
 ```
@@ -37,7 +37,7 @@ Alternatively, override settings directly within the `ebs_volumes` variable.
 
 ```
 ebs_volumes = {
-  "/dev/sde" = { size = 100 }  # DATA01
-  "/dev/sdf" = { size = 150 }  # DATA02
+  "/dev/sde" = { size = 100 }
+  "/dev/sdf" = { size = 150 }
 }
 ```
