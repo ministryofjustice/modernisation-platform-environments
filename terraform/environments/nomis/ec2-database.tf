@@ -147,11 +147,12 @@ module "db_ec2_instance" {
   instance              = merge(local.database.instance, lookup(each.value, "instance", {}))
   user_data             = merge(local.database.user_data, lookup(each.value, "user_data", {}))
   ebs_volume_config     = merge(local.database.ebs_volume_config, lookup(each.value, "ebs_volume_config", {}))
-  ebs_volumes           = merge(local.database.ebs_volumes, lookup(each.value, "ebs_volumes", {}))
+  ebs_volumes           = { for k, v in local.database.ebs_volumes : k => merge(v, try(each.value.ebs_volumes[k], {})) }
   ssm_parameters_prefix = "database/"
   ssm_parameters        = merge(local.database.ssm_parameters, lookup(each.value, "ssm_parameters", {}))
   route53_records       = merge(local.database.route53_records, lookup(each.value, "route53_records", {}))
 
+  iam_resource_names_prefix = "ec2-database"
   instance_profile_policies = concat(local.ec2_common_managed_policies, [aws_iam_policy.s3_db_backup_bucket_access.arn])
 
   business_unit     = local.vpc_name
@@ -165,7 +166,7 @@ module "db_ec2_instance" {
 
   ansible_repo         = "modernisation-platform-configuration-management"
   ansible_repo_basedir = "ansible"
-  branch               = var.BRANCH_NAME
+  branch               = try(each.value.branch, "main")
 }
 
 #------------------------------------------------------------------------------

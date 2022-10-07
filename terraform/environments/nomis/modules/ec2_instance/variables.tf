@@ -122,10 +122,16 @@ variable "ebs_volume_config" {
 }
 
 variable "ebs_volumes" {
-  description = "EC2 volumes, see aws_ebs_volume for documentation.  key=volume name, value=ebs_volume_config key"
-  type = map(object({
-    label = optional(string)
-  }))
+  description = "EC2 volumes, see aws_ebs_volume for documentation.  key=volume name, value=ebs_volume_config key.  label is used as part of the Name tag"
+  # Commenting below out as it has unexpected results when used with merge()
+  #  type = map(object({
+  #    label       = string
+  #    snapshot_id = optional(string)
+  #    iops        = optional(number)
+  #    throughput  = optional(number)
+  #    size        = optional(number)
+  #    type        = optional(string)
+  #  }))
 }
 
 variable "route53_records" {
@@ -134,6 +140,12 @@ variable "route53_records" {
     create_internal_record = bool
     create_external_record = bool
   })
+}
+
+variable "iam_resource_names_prefix" {
+  type        = string
+  description = "Prefix IAM resources with this prefix, e.g. ec2-database"
+  default     = "ec2"
 }
 
 variable "instance_profile_policies" {
