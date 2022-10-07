@@ -74,7 +74,7 @@ resource "aws_security_group" "weblogic_common" {
     protocol    = "TCP"
     security_groups = [
       aws_security_group.jumpserver-windows.id,
-      # aws_security_group.internal_elb.id
+      aws_security_group.internal_elb.id
     ]
   }
 
