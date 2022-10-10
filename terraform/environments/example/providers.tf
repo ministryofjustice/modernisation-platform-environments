@@ -8,7 +8,7 @@ provider "aws" {
 provider "aws" {
   region = "eu-west-2"
   assume_role {
-    role_arn = "arn:aws:iam::${data.aws_caller_identity.oidc_session.id}:role/MemberInfrastructureAccess"
+    role_arn = "arn:aws:iam::${data.aws_caller_identity.oidc_session.id}:role/ModernisationPlatformAccess"
   }
 }
 
