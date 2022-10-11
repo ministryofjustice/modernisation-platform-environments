@@ -87,10 +87,12 @@ variable "name" {
 variable "instance" {
   description = "EC2 instance settings, see aws_instance documentation"
   type = object({
-    disable_api_termination = bool
-    instance_type           = string
-    key_name                = string
-    vpc_security_group_ids  = list(string)
+    disable_api_termination      = bool
+    instance_type                = string
+    key_name                     = string
+    metadata_options_http_tokens = optional(string)
+    monitoring                   = optional(bool)
+    vpc_security_group_ids       = list(string)
     root_block_device = optional(object({
       volume_size = number
     }))

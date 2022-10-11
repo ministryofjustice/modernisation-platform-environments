@@ -66,10 +66,12 @@ locals {
     }
 
     instance = {
-      disable_api_termination = false
-      instance_type           = "r6i.xlarge"
-      key_name                = aws_key_pair.ec2-user.key_name
-      vpc_security_group_ids  = [aws_security_group.database_common.id]
+      disable_api_termination      = false
+      instance_type                = "r6i.xlarge"
+      key_name                     = aws_key_pair.ec2-user.key_name
+      metadata_options_http_tokens = "optional" # the Oracle installer cannot accommodate a token
+      monitoring                   = true
+      vpc_security_group_ids       = [aws_security_group.database_common.id]
     }
 
     user_data = {
