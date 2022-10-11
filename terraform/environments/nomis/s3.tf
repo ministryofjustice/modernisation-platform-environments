@@ -115,7 +115,7 @@ data "aws_iam_policy_document" "cross-account-s3" {
     module.nomis-image-builder-bucket.bucket.arn, ]
     principals {
       type = "AWS"
-      identifiers = ["arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:root",
+      identifiers = ["arn:aws:iam::${local.account_id}:root",
       "arn:aws:iam::${local.environment_management.account_ids["core-shared-services-production"]}:root"]
     }
   }

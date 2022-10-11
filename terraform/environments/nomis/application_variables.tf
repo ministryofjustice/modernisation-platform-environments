@@ -6,4 +6,7 @@ locals {
     preproduction = local.nomis_preproduction
     production    = local.nomis_production
   }
+
+  account_id         = local.environment_management.account_ids[terraform.workspace]
+  environment_config = local.accounts[local.environment]
 }

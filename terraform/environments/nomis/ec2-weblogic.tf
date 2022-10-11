@@ -9,7 +9,7 @@ module "weblogic" {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
   }
 
-  for_each = local.accounts[local.environment].weblogics
+  for_each = local.environment_config.weblogics
 
   name = each.key
 

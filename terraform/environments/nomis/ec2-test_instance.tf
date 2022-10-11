@@ -8,7 +8,7 @@ module "test_instance_asg" {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
   }
 
-  for_each = local.accounts[local.environment].test_instances_asg
+  for_each = local.environment_config.test_instances_asg
 
   name = each.key
 
