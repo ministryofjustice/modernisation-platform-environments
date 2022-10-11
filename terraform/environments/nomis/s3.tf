@@ -115,8 +115,10 @@ data "aws_iam_policy_document" "cross-account-s3" {
     module.nomis-image-builder-bucket.bucket.arn, ]
     principals {
       type = "AWS"
-      identifiers = ["arn:aws:iam::${local.account_id}:root",
-      "arn:aws:iam::${local.environment_management.account_ids["core-shared-services-production"]}:root"]
+      identifiers = sort([ # sort to avoid plan changes
+        "arn:aws:iam::${local.account_id}:root",
+        "arn:aws:iam::${local.environment_management.account_ids["core-shared-services-production"]}:root"
+      ])
     }
   }
 }
@@ -191,10 +193,10 @@ data "aws_iam_policy_document" "nomis-all-environments-access" {
     module.nomis-audit-archives.bucket.arn, ]
     principals {
       type = "AWS"
-      identifiers = [
+      identifiers = sort([ # sort to avoid plan changes
         "arn:aws:iam::${local.environment_management.account_ids["nomis-test"]}:root",
         "arn:aws:iam::${local.environment_management.account_ids["nomis-production"]}:root"
-      ]
+      ])
     }
   }
 }
