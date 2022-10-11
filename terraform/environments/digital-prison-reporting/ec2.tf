@@ -1,7 +1,7 @@
 locals {
-  project                = local.application_data.accounts[local.environment].project_short_id
-  env                    = local.environment  
-}  
+  project = local.application_data.accounts[local.environment].project_short_id
+  env     = local.environment
+}
 
 
 
