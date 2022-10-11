@@ -13,7 +13,26 @@
       "create_kinesis_streams": true,
       "create_glue_registries": false,
       "setup_s3_buckets": true,
-      "create_glue_connections": false
+      "create_glue_connections": false,
+      "instance_type": "t2.micro",
+      "ami_image_id": "ami-0d729d2846a86a9e7",
+      "dpr_ec2_kinesis_rules": {
+        "TCP_80": {
+          "from_port": 80,
+          "to_port": 80,
+          "protocol": "TCP"
+        },
+        "TCP_443": {
+          "from_port": 443,
+          "to_port": 443,
+          "protocol": "TCP"
+        },
+        "TCP_22": {
+          "from_port": 22,
+          "to_port": 22,
+          "protocol": "TCP"
+        }
+      }
     },
     "test": {
       "example_var": "test-data"
