@@ -142,6 +142,12 @@ variable "route53_records" {
   })
 }
 
+variable "iam_resource_names_prefix" {
+  type        = string
+  description = "Prefix IAM resources with this prefix, e.g. ec2-database"
+  default     = "ec2"
+}
+
 variable "instance_profile_policies" {
   type        = list(string)
   description = "A list of managed IAM policy document ARNs to be attached to the database instance profile"
