@@ -147,10 +147,14 @@ variable "instance_profile_policies" {
 variable "autoscaling_group" {
   description = "See aws_autoscaling_group documentation"
   type = object({
-    desired_capacity  = number
-    max_size          = number
-    min_size          = number
-    target_group_args = optional(list(string))
+    desired_capacity          = number
+    max_size                  = number
+    min_size                  = number
+    health_check_grace_period = optional(number)
+    health_check_type         = optional(string)
+    termination_policies      = optional(list(string))
+    target_group_arns         = optional(list(string))
+    wait_for_capacity_timeout = optional(number)
     instance_refresh = optional(object({
       strategy               = string
       min_healthy_percentage = number

@@ -66,12 +66,12 @@ resource "aws_autoscaling_group" "this" {
   desired_capacity          = var.autoscaling_group.desired_capacity
   max_size                  = var.autoscaling_group.max_size
   min_size                  = var.autoscaling_group.min_size
-  health_check_grace_period = 300
-  health_check_type         = "ELB"
-  termination_policies      = ["OldestInstance"]
-  target_group_arns         = try(var.autoscaling_group.target_group_arns, null)
+  health_check_grace_period = var.autoscaling_group.health_check_grace_period
+  health_check_type         = var.autoscaling_group.health_check_type
+  termination_policies      = var.autoscaling_group.termination_policies
+  target_group_arns         = var.autoscaling_group.target_group_arns
   vpc_zone_identifier       = [data.aws_subnet.this.id]
-  wait_for_capacity_timeout = 0
+  wait_for_capacity_timeout = var.autoscaling_group.wait_for_capacity_timeout
 
   launch_template {
     id      = aws_launch_template.this.id
@@ -115,6 +115,10 @@ resource "aws_autoscaling_group" "this" {
       propagate_at_launch = true
     }
   }
+
+  depends_on = [
+    aws_launch_template.this
+  ]
 }
 
 resource "aws_autoscaling_lifecycle_hook" "this" {
