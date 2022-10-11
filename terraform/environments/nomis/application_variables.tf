@@ -3,11 +3,11 @@ locals {
   accounts = {
     development = {
       # ip ranges for external access to database instances
-      database_external_access_cidr = {
-        azure_noms_test      = "10.101.0.0/16"
-        azure_noms_mgmt_test = "10.102.0.0/16"
-        cloud_platform       = "172.20.0.0/16"
-      },
+      database_external_access_cidr = [
+        local.cidrs.noms_test,
+        local.cidrs.noms_mgmt,
+        local.cidrs.cloud_platform
+      ]
 
       # vars common across ec2 instances
       ec2_common = {
@@ -43,11 +43,11 @@ locals {
     },
     test = {
       # ip ranges for external access to database instances
-      database_external_access_cidr = {
-        azure_noms_test      = "10.101.0.0/16"
-        azure_noms_mgmt_test = "10.102.0.0/16"
-        cloud_platform       = "172.20.0.0/16"
-      },
+      database_external_access_cidr = [
+        local.cidrs.noms_test,
+        local.cidrs.noms_mgmt,
+        local.cidrs.cloud_platform
+      ]
 
       # vars common across ec2 instances
       ec2_common = {
@@ -169,12 +169,11 @@ locals {
     },
     preproduction = {
       # ip ranges for external access to database instances
-      database_external_access_cidr = {
-        azure_noms_live      = "10.40.0.0/18"
-        cloud_platform       = "172.20.0.0/16"
-        azure_noms_mgmt_live = "10.40.128.0/20"
-
-      },
+      database_external_access_cidr = [
+        local.cidrs.noms_live,
+        local.cidrs.noms_mgmt_live,
+        local.cidrs.cloud_platform
+      ]
 
       # vars common across ec2 instances
       ec2_common = {
@@ -210,11 +209,11 @@ locals {
     },
     production = {
       # ip ranges for external access to database instances
-      database_external_access_cidr = {
-        azure_noms_live      = "10.40.0.0/18"
-        cloud_platform       = "172.20.0.0/16"
-        azure_noms_mgmt_live = "10.40.128.0/20"
-      },
+      database_external_access_cidr = [
+        local.cidrs.noms_live,
+        local.cidrs.noms_mgmt_live,
+        local.cidrs.cloud_platform
+      ]
 
       # Details of OMS Manager in FixNGo (only needs defining if databases in the environment are managed)
       database_oracle_manager = {

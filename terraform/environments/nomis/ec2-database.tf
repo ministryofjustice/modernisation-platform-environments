@@ -208,9 +208,7 @@ resource "aws_security_group" "database_common" {
     from_port   = "1521"
     to_port     = "1521"
     protocol    = "TCP"
-    cidr_blocks = [
-      for cidr in local.accounts[local.environment].database_external_access_cidr : cidr
-    ]
+    cidr_blocks = local.accounts[local.environment].database_external_access_cidr
   }
 
   ingress {
@@ -218,9 +216,7 @@ resource "aws_security_group" "database_common" {
     from_port   = "22"
     to_port     = "22"
     protocol    = "TCP"
-    cidr_blocks = [
-      for cidr in local.accounts[local.environment].database_external_access_cidr : cidr
-    ]
+    cidr_blocks = local.accounts[local.environment].database_external_access_cidr
   }
 
   ingress {
@@ -228,9 +224,7 @@ resource "aws_security_group" "database_common" {
     from_port   = "3872"
     to_port     = "3872"
     protocol    = "TCP"
-    cidr_blocks = [
-      for cidr in local.accounts[local.environment].database_external_access_cidr : cidr
-    ]
+    cidr_blocks = local.accounts[local.environment].database_external_access_cidr
   }
 
   ingress {
@@ -238,7 +232,7 @@ resource "aws_security_group" "database_common" {
     from_port   = "9100"
     to_port     = "9100"
     protocol    = "TCP"
-    cidr_blocks = [local.accounts[local.environment].database_external_access_cidr.cloud_platform]
+    cidr_blocks = [local.cidrs.cloud_platform]
   }
 
   ingress {
@@ -246,7 +240,7 @@ resource "aws_security_group" "database_common" {
     from_port   = "9172"
     to_port     = "9172"
     protocol    = "TCP"
-    cidr_blocks = [local.accounts[local.environment].database_external_access_cidr.cloud_platform]
+    cidr_blocks = [local.cidrs.cloud_platform]
   }
 
   egress {
