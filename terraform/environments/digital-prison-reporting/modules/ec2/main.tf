@@ -34,7 +34,7 @@ resource "aws_instance" "develop" {
   instance_type          = var.ec2_instance_type
   ami                    = var.ami_image_id
   vpc_security_group_ids = [aws_security_group.ec2_kinesis_agent.id]
-  subnet_id              = data.aws_subnet.private_subnets_a.id
+  subnet_id              = var.subnet_ids
   monitoring             = true
   ebs_optimized          = true
 
