@@ -75,7 +75,10 @@ resource "aws_ebs_volume" "this" {
   tags = merge(
     local.tags,
     {
-      Name = join("-", [var.name, each.value.label, each.key])
+      Name = try(
+        join("-", [var.name, each.value.label, each.key]),
+        join("-", [var.name, each.key])
+      )
     }
   )
 
@@ -175,7 +178,7 @@ data "aws_iam_policy_document" "asm_parameter" {
 }
 
 resource "aws_iam_role" "this" {
-  name                 = "ec2-database-role-${var.name}"
+  name                 = "${var.iam_resource_names_prefix}-role-${var.name}"
   path                 = "/"
   max_session_duration = "3600"
   assume_role_policy = jsonencode(
@@ -199,7 +202,7 @@ resource "aws_iam_role" "this" {
   tags = merge(
     local.tags,
     {
-      Name = "ec2-database-role-${var.name}"
+      Name = "${var.iam_resource_names_prefix}-role-${var.name}"
     },
   )
 }
@@ -211,7 +214,7 @@ resource "aws_iam_role_policy" "asm_parameter" {
 }
 
 resource "aws_iam_instance_profile" "this" {
-  name = "ec2-database-profile-${var.name}"
+  name = "${var.iam_resource_names_prefix}-profile-${var.name}"
   role = aws_iam_role.this.name
   path = "/"
 }

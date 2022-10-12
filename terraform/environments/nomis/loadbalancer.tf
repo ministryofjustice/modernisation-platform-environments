@@ -99,19 +99,13 @@ resource "aws_lb" "internal" {
 }
 
 resource "aws_lb_listener" "internal" {
-  depends_on = [
-    # aws_acm_certificate_validation.internal_lb
-    aws_acm_certificate_validation.internal_lb_az
-  ]
-
   load_balancer_arn = aws_lb.internal.arn
   port              = "443"
   protocol          = "HTTPS"
   #checkov:skip=CKV_AWS_103:the application does not support tls 1.2
   #tfsec:ignore:aws-elb-use-secure-tls-policy:the application does not support tls 1.2
-  ssl_policy = "ELBSecurityPolicy-2016-08"
-  # certificate_arn = aws_acm_certificate.internal_lb.arn # this is what we'll use once we go back to modplatform dns
-  certificate_arn = local.environment == "test" ? aws_acm_certificate.internal_lb_az[0].arn : aws_acm_certificate.internal_lb.arn
+  ssl_policy      = "ELBSecurityPolicy-2016-08"
+  certificate_arn = aws_acm_certificate.internal_lb.arn
 
   default_action {
     type = "fixed-response"
@@ -123,6 +117,11 @@ resource "aws_lb_listener" "internal" {
   }
 }
 
+resource "aws_lb_listener_certificate" "certificate_az" {
+  count           = local.environment == "test" ? 1 : 0
+  listener_arn    = aws_lb_listener.internal.arn
+  certificate_arn = aws_acm_certificate.internal_lb_az[0].arn
+}
 resource "aws_lb_listener" "internal_http" {
   depends_on = [
     aws_acm_certificate_validation.internal_lb
@@ -148,8 +147,8 @@ resource "aws_lb_listener" "internal_http" {
 resource "aws_route53_record" "internal_lb" {
   provider = aws.core-vpc
 
-  zone_id = data.aws_route53_zone.external.zone_id
-  name    = "*.${local.application_name}.${data.aws_route53_zone.external.name}"
+  zone_id = data.aws_route53_zone.external-environment.zone_id
+  name    = "*.${local.application_name}.${data.aws_route53_zone.external-environment.name}"
   type    = "A"
 
   alias {
@@ -167,7 +166,7 @@ resource "aws_acm_certificate" "internal_lb" {
   domain_name       = data.aws_route53_zone.external.name
   validation_method = "DNS"
 
-  subject_alternative_names = ["*.${local.application_name}.${data.aws_route53_zone.external.name}"]
+  subject_alternative_names = ["*.${local.application_name}.${local.vpc_name}-${local.environment}.${data.aws_route53_zone.external.name}"]
 
   tags = merge(
     local.tags,
@@ -181,14 +180,32 @@ resource "aws_acm_certificate" "internal_lb" {
   }
 }
 
-resource "aws_route53_record" "internal_lb_validation" {
+resource "aws_route53_record" "internal_lb_validation_sub" {
   provider = aws.core-vpc
   for_each = {
     for dvo in aws_acm_certificate.internal_lb.domain_validation_options : dvo.domain_name => {
       name   = dvo.resource_record_name
       record = dvo.resource_record_value
       type   = dvo.resource_record_type
-    }
+    } if dvo.domain_name != "modernisation-platform.service.justice.gov.uk"
+  }
+
+  allow_overwrite = true
+  name            = each.value.name
+  records         = [each.value.record]
+  ttl             = 60
+  type            = each.value.type
+  zone_id         = data.aws_route53_zone.external-environment.zone_id
+}
+
+resource "aws_route53_record" "internal_lb_validation_tld" {
+  provider = aws.core-network-services
+  for_each = {
+    for dvo in aws_acm_certificate.internal_lb.domain_validation_options : dvo.domain_name => {
+      name   = dvo.resource_record_name
+      record = dvo.resource_record_value
+      type   = dvo.resource_record_type
+    } if dvo.domain_name == "modernisation-platform.service.justice.gov.uk"
   }
 
   allow_overwrite = true
@@ -198,10 +215,13 @@ resource "aws_route53_record" "internal_lb_validation" {
   type            = each.value.type
   zone_id         = data.aws_route53_zone.external.zone_id
 }
-
 resource "aws_acm_certificate_validation" "internal_lb" {
   certificate_arn         = aws_acm_certificate.internal_lb.arn
-  validation_record_fqdns = [for record in aws_route53_record.internal_lb_validation : record.fqdn]
+  validation_record_fqdns = [for record in merge(aws_route53_record.internal_lb_validation_tld, aws_route53_record.internal_lb_validation_sub) : record.fqdn]
+  depends_on = [
+    aws_route53_record.internal_lb_validation_tld,
+    aws_route53_record.internal_lb_validation_sub
+  ]
 }
 
 #------------------------------------------------------------------------------

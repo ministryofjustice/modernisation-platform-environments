@@ -39,12 +39,12 @@ data "aws_iam_policy_document" "shared_image_builder_cmk_policy" {
     resources = ["*"]
     principals {
       type = "AWS"
-      identifiers = ["arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:root",
+      identifiers = ["arn:aws:iam::${local.account_id}:root",
         "arn:aws:iam::${local.environment_management.account_ids["core-shared-services-production"]}:root",
         "arn:aws:iam::${local.environment_management.account_ids["nomis-development"]}:root",
         "arn:aws:iam::${local.environment_management.account_ids["nomis-preproduction"]}:root",
         "arn:aws:iam::${local.environment_management.account_ids["nomis-production"]}:root",
-        "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling"
+        "arn:aws:iam::${local.account_id}:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling"
       ]
     }
   }
@@ -71,7 +71,7 @@ data "aws_iam_policy_document" "shared_image_builder_cmk_policy" {
     resources = ["*"]
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:root"]
+      identifiers = ["arn:aws:iam::${local.account_id}:root"]
     }
   }
 }
@@ -86,7 +86,7 @@ data "aws_iam_policy_document" "sns_topic_key_policy" {
     effect = "Allow"
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:root"]
+      identifiers = ["arn:aws:iam::${local.account_id}:root"]
     }
     # these can be ignored as this policy is being applied to a specific key resource. ["*"] in this case refers to this key
     #tfsec:ignore:aws-iam-no-policy-wildcards
