@@ -733,7 +733,6 @@ module "ec2_kinesis_agent" {
   associate_public_ip_address = false
   ebs_optimized               = true
   monitoring                  = true
-  iam_instance_profile        = 
   ebs_size                    = 20
   ebs_encrypted               = true
   ebs_delete_on_termination   = true
