@@ -80,6 +80,7 @@ locals {
           data  = { total_size = 200 }
           flash = { total_size = 2 }
         }
+        branch = "nomis/DSOS-1426/load-CNOMT1-data-role"
       }
     }
 
