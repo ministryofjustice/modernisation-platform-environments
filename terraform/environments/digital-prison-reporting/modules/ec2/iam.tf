@@ -68,5 +68,5 @@ resource "aws_iam_policy_attachment" "this" {
 resource "aws_iam_policy_attachment" "read_list_s3_access_attachment" {
   name       = "read_list_s3_access_attachment"
   roles      = [aws_iam_role.kinesis-agent-instance-role.name]
-  policy_arn = aws_iam_policy.read_list_s3_access_policy[0].arn
+  policy_arn = var.s3_policy_arn
 }

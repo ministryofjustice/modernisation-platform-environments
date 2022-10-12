@@ -736,7 +736,7 @@ module "ec2_kinesis_agent" {
   ebs_size                    = 20
   ebs_encrypted               = true
   ebs_delete_on_termination   = true
-
+  s3_policy_arn               = aws_iam_policy.read_s3_read_access_policy.arn
 
   tags = merge(
     local.all_tags,

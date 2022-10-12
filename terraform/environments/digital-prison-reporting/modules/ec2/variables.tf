@@ -91,3 +91,7 @@ variable "ebs_delete_on_termination" {
   type        = bool
   default     = true
 }
+
+variable "s3_policy_arn" {
+  description = "S3 policy ARN, to be attached to Ec2 Instance Profile"
+}
