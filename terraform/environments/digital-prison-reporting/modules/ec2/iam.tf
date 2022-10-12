@@ -65,7 +65,7 @@ resource "aws_iam_policy_attachment" "this" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
-resource "aws_iam_policy_attachment" "this" {
+resource "aws_iam_policy_attachment" "ec2-role-for-ssm" {
   name       = "ssm_managed_instance_ec2_role"
   roles      = [aws_iam_role.kinesis-agent-instance-role.name]
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM"
