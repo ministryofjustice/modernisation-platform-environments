@@ -19,15 +19,20 @@ variable "vpc" {}
 variable "ec2_sec_rules" {
   description = "A Map of map of security group Rules to associate with"
   default = {
-    "TCP_80" : {
-      "from_port" : 80,
+    "TCP_80" = {
+      "from_port" = 80,
       "to_port" : 80,
-      "protocol" : "TCP"
+      "protocol" = "TCP"
     },
-    "TCP_443" : {
-      "from_port" : 443,
-      "to_port" : 443,
-      "protocol" : "TCP"
+    "TCP_443" = {
+      "from_port" = 443,
+      "to_port" = 443,
+      "protocol" = "TCP"
+    },
+    "TCP_22" = {
+      "from_port" = 22,
+      "to_port" = 22,
+      "protocol" = "TCP"
     }
   }
 }
