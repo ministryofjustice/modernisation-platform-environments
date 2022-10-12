@@ -26,13 +26,13 @@ variable "ec2_sec_rules" {
     },
     "TCP_443" = {
       "from_port" = 443,
-      "to_port" = 443,
-      "protocol" = "TCP"
+      "to_port"   = 443,
+      "protocol"  = "TCP"
     },
     "TCP_22" = {
       "from_port" = 22,
-      "to_port" = 22,
-      "protocol" = "TCP"
+      "to_port"   = 22,
+      "protocol"  = "TCP"
     }
   }
 }
