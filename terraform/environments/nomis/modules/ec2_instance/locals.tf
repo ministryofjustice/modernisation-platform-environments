@@ -6,7 +6,6 @@ locals {
     nomis-environment = local.name_split[0]
     always_on         = lookup(var.tags, "always-on", true) # backward compat.
     server-name       = var.name
-    component         = "data"
   }
   tags = merge(local.default_tags, var.tags)
 
@@ -21,19 +20,6 @@ locals {
     key => value if key != data.aws_ami.this.root_device_name
   }
 
-  ebs_volume_labels = distinct([for key, value in var.ebs_volumes : value.label])
-
-  ebs_volume_count = {
-    for label in local.ebs_volume_labels :
-    label => length([for key, value in var.ebs_volumes : key if value.label == label])
-  }
-
-  ebs_volumes_swap = {
-    swap = {
-      size = data.aws_ec2_instance_type.database.memory_size >= 16384 ? 16 : (data.aws_ec2_instance_type.database.memory_size / 1024)
-    }
-  }
-
   ebs_volumes_from_ami = {
     for key, value in local.ami_block_device_mappings :
     key => {
@@ -45,21 +31,35 @@ locals {
     }
   }
 
+  # See README, allow volumes to be grouped by labels, e.g. "data", "app" and so on.
+  ebs_volume_labels = distinct(flatten([for key, value in var.ebs_volumes : lookup(value, "label", [])]))
+  ebs_volume_count = {
+    for label in local.ebs_volume_labels :
+    label => length([for key, value in var.ebs_volumes : key if try(value.label == label, false)])
+  }
+  ebs_volumes_swap_size = data.aws_ec2_instance_type.this.memory_size >= 16384 ? 16 : (data.aws_ec2_instance_type.this.memory_size / 1024)
   ebs_volumes_from_config = {
     for key, value in var.ebs_volumes :
     key => {
       iops       = try(var.ebs_volume_config[value.label].iops, null)
       throughput = try(var.ebs_volume_config[value.label].throughput, null)
       type       = try(var.ebs_volume_config[value.label].type, null)
-      size       = try(floor(var.ebs_volume_config[value.label].total_size / local.ebs_volume_count[value.label]), null)
+      size = try(
+        floor(var.ebs_volume_config[value.label].total_size / local.ebs_volume_count[value.label]),
+        try(value.label == "swap", false) ? local.ebs_volumes_swap_size : null
+      )
     }
   }
 
-  # take settings directly from var.ebs_volumes,
-  # failing that the ebs_volumes_from_config, failing that the AMI settings
+  # merge AMI and var.ebs_volume values, e.g. allow AMI settings to be overridden
+  ebs_volume_names = keys(merge(var.ebs_volumes, local.ami_block_device_mappings_nonroot))
   ebs_volumes = {
-    for key, value in var.ebs_volumes :
-    key => merge(local.ebs_volumes_from_ami[key], local.ebs_volumes_from_config[key], value)
+    for key in local.ebs_volume_names :
+    key => merge(
+      try(local.ebs_volumes_from_ami[key], {}),
+      try(local.ebs_volumes_from_config[key], {}),
+      try(var.ebs_volumes[key], {})
+    )
   }
 
   user_data_args_ssm_params = {
