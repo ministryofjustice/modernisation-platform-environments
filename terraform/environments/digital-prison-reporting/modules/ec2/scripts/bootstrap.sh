@@ -18,6 +18,10 @@ yum -y update
 # Setup YUM install Kinesis Agent
 sudo yum install –y aws-kinesis-agent
 
+# Install SSM Agent
+cd /tmp
+sudo yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
+
 # Configure and Enable Kinesis Agent
 # /tmp/random.log*
 # Additional Configuration here, https://docs.aws.amazon.com/streams/latest/dev/writing-with-agents.html
@@ -44,3 +48,5 @@ EOF
 
 # Start Stream at Start of the EC2
 sudo chkconfig aws-kinesis-agent on
+sudo systemctl enable amazon-ssm-agent
+sudo systemctl start amazon-ssm-agent

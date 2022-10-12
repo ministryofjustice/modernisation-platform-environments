@@ -1,3 +1,21 @@
+locals {
+  public_key_data = jsondecode(file("./bastion_linux.json"))
+}
+
+#------------------------------------------------------------------------------
+# Keypair for ec2-user
+#------------------------------------------------------------------------------
+resource "aws_key_pair" "ec2-user" {
+  key_name   = "${var.name}-keypair"
+  public_key = local.accounts[local.environment].ec2_common.public_key
+  tags = merge(
+    local.tags,
+    {
+      Name = "ec2-user"
+    },
+  )
+}
+
 # Build the security group for the EC2
 resource "aws_security_group" "ec2_kinesis_agent" {
   name        = var.name
@@ -37,6 +55,14 @@ resource "aws_instance" "develop" {
   subnet_id                   = var.subnet_ids
   monitoring                  = var.monitoring
   ebs_optimized               = var.ebs_optimized
+  # public keys
+  public_key_data             = local.public_key_data.keys[local.environment]
+  # logs
+  log_auto_clean              = "Enabled"
+  log_standard_ia_days        = 30  # days before moving to IA storage
+  log_glacier_days            = 60  # days before moving to Glacier
+  log_expiry_days             = 180 # days before log expiration
+
   associate_public_ip_address = var.associate_public_ip_address
 
   lifecycle { ignore_changes = [ebs_block_device] }
