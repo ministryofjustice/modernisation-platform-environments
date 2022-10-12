@@ -26,22 +26,5 @@
     "production": {
       "example_var": "production-data"
     }
-  },
-  "dpr_ec2_kinesis_rules": {
-    "TCP_80": {
-      "from_port": 80,
-      "to_port": 80,
-      "protocol": "TCP"
-    },
-    "TCP_443": {
-      "from_port": 443,
-      "to_port": 443,
-      "protocol": "TCP"
-    },
-    "TCP_22": {
-      "from_port": 22,
-      "to_port": 22,
-      "protocol": "TCP"
-    }
   }
 }
