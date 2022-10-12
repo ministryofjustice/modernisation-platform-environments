@@ -13,11 +13,22 @@ data "aws_vpc" "shared_vpc" {
   }
 }
 
+data "aws_caller_identity" "oidc_session" {
+  provider = aws.oidc-session
+}
+
+data "aws_caller_identity" "modernisation_platform" {
+  provider = aws.modernisation-platform
+}
+
 locals {
 
   application_name = "ppud"
 
   environment_management = jsondecode(data.aws_secretsmanager_secret_version.environment_management.secret_string)
+
+  # Stores modernisation platform account id for setting up the modernisation-platform provider
+  modernisation_platform_account_id = data.aws_ssm_parameter.modernisation_platform_account_id.value
 
   # This takes the name of the Terraform workspace (e.g. core-vpc-production), strips out the application name (e.g. core-vpc), and checks if
   # the string leftover is `-production`, if it isn't (e.g. core-vpc-non-production => -non-production) then it sets the var to false.

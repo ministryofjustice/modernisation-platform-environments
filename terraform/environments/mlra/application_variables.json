@@ -2,7 +2,8 @@
   "accounts": {
     "development": {
       "example_var": "dev-data",
-      "region": "eu-west-2"
+      "region": "eu-west-2",
+      "alb_target_group_path": "/mlra/"
     },
     "test": {
       "example_var": "test-data"

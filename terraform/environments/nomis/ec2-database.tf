@@ -11,7 +11,7 @@ module "database" {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
   }
 
-  for_each = local.accounts[local.environment].databases_legacy
+  for_each = local.environment_config.databases_legacy
 
   name = each.key
 
@@ -138,12 +138,12 @@ module "db_ec2_instance" {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
   }
 
-  for_each = local.accounts[local.environment].databases
+  for_each = local.environment_config.databases
 
   name = each.key
 
   ami_name              = each.value.ami_name
-  ami_owner             = local.environment_management.account_ids[terraform.workspace]
+  ami_owner             = local.account_id
   instance              = merge(local.database.instance, lookup(each.value, "instance", {}))
   user_data             = merge(local.database.user_data, lookup(each.value, "user_data", {}))
   ebs_volume_config     = merge(local.database.ebs_volume_config, lookup(each.value, "ebs_volume_config", {}))
@@ -152,6 +152,7 @@ module "db_ec2_instance" {
   ssm_parameters        = merge(local.database.ssm_parameters, lookup(each.value, "ssm_parameters", {}))
   route53_records       = merge(local.database.route53_records, lookup(each.value, "route53_records", {}))
 
+  iam_resource_names_prefix = "ec2-database"
   instance_profile_policies = concat(local.ec2_common_managed_policies, [aws_iam_policy.s3_db_backup_bucket_access.arn])
 
   business_unit     = local.vpc_name
@@ -165,7 +166,7 @@ module "db_ec2_instance" {
 
   ansible_repo         = "modernisation-platform-configuration-management"
   ansible_repo_basedir = "ansible"
-  branch               = var.BRANCH_NAME
+  branch               = try(each.value.branch, "main")
 }
 
 #------------------------------------------------------------------------------
@@ -207,9 +208,7 @@ resource "aws_security_group" "database_common" {
     from_port   = "1521"
     to_port     = "1521"
     protocol    = "TCP"
-    cidr_blocks = [
-      for cidr in local.accounts[local.environment].database_external_access_cidr : cidr
-    ]
+    cidr_blocks = local.environment_config.database_external_access_cidr
   }
 
   ingress {
@@ -217,9 +216,7 @@ resource "aws_security_group" "database_common" {
     from_port   = "22"
     to_port     = "22"
     protocol    = "TCP"
-    cidr_blocks = [
-      for cidr in local.accounts[local.environment].database_external_access_cidr : cidr
-    ]
+    cidr_blocks = local.environment_config.database_external_access_cidr
   }
 
   ingress {
@@ -227,9 +224,7 @@ resource "aws_security_group" "database_common" {
     from_port   = "3872"
     to_port     = "3872"
     protocol    = "TCP"
-    cidr_blocks = [
-      for cidr in local.accounts[local.environment].database_external_access_cidr : cidr
-    ]
+    cidr_blocks = local.environment_config.database_external_access_cidr
   }
 
   ingress {
@@ -237,7 +232,7 @@ resource "aws_security_group" "database_common" {
     from_port   = "9100"
     to_port     = "9100"
     protocol    = "TCP"
-    cidr_blocks = [local.accounts[local.environment].database_external_access_cidr.cloud_platform]
+    cidr_blocks = [local.cidrs.cloud_platform]
   }
 
   ingress {
@@ -245,7 +240,7 @@ resource "aws_security_group" "database_common" {
     from_port   = "9172"
     to_port     = "9172"
     protocol    = "TCP"
-    cidr_blocks = [local.accounts[local.environment].database_external_access_cidr.cloud_platform]
+    cidr_blocks = [local.cidrs.cloud_platform]
   }
 
   egress {
