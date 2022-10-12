@@ -146,6 +146,28 @@ locals {
           flash = { total_size = 1000 }
         }
       }
+
+      prod-nomis-db-3 = {
+        tags = {
+          server-type = "nomis-db"
+          description = "Production NOMIS HA database to replace Azure PDPDL00062"
+          monitored   = false
+          always-on   = true
+        }
+        ami_name = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-07T12-48-08.562Z"
+        instance = {
+          instance_type           = "r6i.2xlarge"
+          disable_api_termination = true
+        }
+        ebs_volumes = {
+          "/dev/sdb" = { size = 100 }  # /u01
+          "/dev/sdc" = { size = 1000 } # /u02
+        }
+        ebs_volume_config = {
+          data  = { total_size = 3000 }
+          flash = { total_size = 500 }
+        }
+      }
     }
 
     # Add weblogic instances here.  They will be created using the weblogic module
