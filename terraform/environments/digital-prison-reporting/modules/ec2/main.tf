@@ -2,19 +2,12 @@ locals {
   public_key_data = jsondecode(file("./bastion_linux.json"))
 }
 
-#------------------------------------------------------------------------------
 # Keypair for ec2-user
-#------------------------------------------------------------------------------
-resource "aws_key_pair" "ec2-user" {
-  key_name   = "${var.name}-keypair"
-  public_key = local.accounts[local.environment].ec2_common.public_key
-  tags = merge(
-    local.tags,
-    {
-      Name = "ec2-user"
-    },
-  )
-}
+#resource "aws_key_pair" "ec2-user" {
+#  key_name   = "${var.name}-keypair"
+#  public_key = var.public_key
+#  tags = var.tags
+#}
 
 # Build the security group for the EC2
 resource "aws_security_group" "ec2_kinesis_agent" {
