@@ -7,6 +7,12 @@ data "http" "environments_file" {
   url = "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/${local.application_name}.json"
 }
 
+# Get session information from OIDC provider
+
+data "aws_caller_identity" "oidc_session" {
+  provider = aws.oidc-session
+}
+
 # get shared subnet-set vpc object
 data "aws_vpc" "shared_vpc" {
   # provider = aws.share-host
@@ -16,6 +22,10 @@ data "aws_vpc" "shared_vpc" {
 }
 
 locals {
+
+  # Stores modernisation platform account id for setting up the modernisation-platform provider
+
+  modernisation_platform_account_id = data.aws_ssm_parameter.modernisation_platform_account_id.value
 
   application_name = var.networking[0].application
 
@@ -79,8 +89,16 @@ data "aws_route53_zone" "internal" {
 }
 
 data "aws_route53_zone" "external" {
+  provider = aws.core-network-services
+
+  name         = "modernisation-platform.service.justice.gov.uk."
+  private_zone = false
+}
+
+data "aws_route53_zone" "external-environment" {
   provider = aws.core-vpc
 
   name         = "${local.vpc_name}-${local.environment}.modernisation-platform.service.justice.gov.uk."
   private_zone = false
 }
+

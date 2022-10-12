@@ -7,7 +7,7 @@ on:
     paths:
       - 'terraform/environments/nomis/**'
       - '.github/workflows/nomis.yml'
-    workflow_dispatch:
+
   pull_request:
     branches:
       - main
@@ -18,12 +18,15 @@ on:
   workflow_dispatch:
 
 env:
-  AWS_ACCESS_KEY_ID:  ${{ secrets.AWS_ACCESS_KEY_ID }}
-  AWS_SECRET_ACCESS_KEY:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   GITHUB_TOKEN: ${{ secrets.DSO_GITHUB_AUTOMATION_PAT }}
   TF_IN_AUTOMATION: true
   TF_VAR_BRANCH_NAME: ${{ github.event_name == 'pull_request' && 'main' || (github.head_ref || github.ref_name) }}
   TF_VAR_GH_ACTOR_NAME: ${{ github.actor}}
+  AWS_REGION: "eu-west-2"
+  ENVIRONMENT_MANAGEMENT: ${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}
+permissions:
+  id-token: write # This is required for requesting the JWT
+  contents: read # This is required for actions/checkout
 defaults:
   run:
     shell: bash
@@ -41,6 +44,14 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3.1.0
+      - name: Set Account Number
+        run: echo "ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${GITHUB_WORKFLOW}-${TF_ENV}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)" >> $GITHUB_ENV
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
+          role-session-name: githubactionsrolesession
+          aws-region: ${{ env.AWS_REGION }}
       - name: Load and Configure Terraform
         uses: hashicorp/setup-terraform@v2.0.0
         with:
@@ -53,8 +64,8 @@ jobs:
           bash scripts/terraform-init.sh terraform/environments/nomis
           terraform -chdir="terraform/environments/nomis" workspace select "nomis-${TF_ENV}"
           bash scripts/terraform-plan.sh terraform/environments/nomis
-        env:
-          TF_ENV: ${{ matrix.environment }}
+    env:
+      TF_ENV: ${{ matrix.environment }}
 
   deploy-dev-test:
     needs: plan-dev-test
@@ -71,6 +82,14 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3.1.0
+      - name: Set Account Number
+        run: echo "ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${GITHUB_WORKFLOW}-${TF_ENV}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)" >> $GITHUB_ENV
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
+          role-session-name: githubactionsrolesession
+          aws-region: ${{ env.AWS_REGION }}
       - name: Load and Configure Terraform
         uses: hashicorp/setup-terraform@v2.0.0
         with:
@@ -83,8 +102,8 @@ jobs:
           bash scripts/terraform-init.sh terraform/environments/nomis
           terraform -chdir="terraform/environments/nomis" workspace select "nomis-${TF_ENV}"
           bash scripts/terraform-apply.sh terraform/environments/nomis
-        env:
-            TF_ENV: ${{ matrix.environment }}
+    env:
+        TF_ENV: ${{ matrix.environment }}
 
   # Plan + deploy for pre-production and production enironments, only from main
   plan-preprod-prod:
@@ -99,6 +118,14 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3.1.0
+      - name: Set Account Number
+        run: echo "ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${GITHUB_WORKFLOW}-${TF_ENV}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)" >> $GITHUB_ENV
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
+          role-session-name: githubactionsrolesession
+          aws-region: ${{ env.AWS_REGION }}
       - name: Load and Configure Terraform
         uses: hashicorp/setup-terraform@v2.0.0
         with:
@@ -111,8 +138,9 @@ jobs:
           bash scripts/terraform-init.sh terraform/environments/nomis
           terraform -chdir="terraform/environments/nomis" workspace select "nomis-${TF_ENV}"
           bash scripts/terraform-plan.sh terraform/environments/nomis
-        env:
-          TF_ENV: ${{ matrix.environment }}
+    env:
+      TF_ENV: ${{ matrix.environment }}
+
   deploy-preprod-prod:
     needs: plan-preprod-prod
     if: success() && github.ref == 'refs/heads/main'
@@ -128,6 +156,14 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3.1.0
+      - name: Set Account Number
+        run: echo "ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${GITHUB_WORKFLOW}-${TF_ENV}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)" >> $GITHUB_ENV
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
+          role-session-name: githubactionsrolesession
+          aws-region: ${{ env.AWS_REGION }}
       - name: Load and Configure Terraform
         uses: hashicorp/setup-terraform@v2.0.0
         with:
@@ -140,6 +176,6 @@ jobs:
           bash scripts/terraform-init.sh terraform/environments/nomis
           terraform -chdir="terraform/environments/nomis" workspace select "nomis-${TF_ENV}"
           bash scripts/terraform-apply.sh terraform/environments/nomis
-        env:
-            TF_ENV: ${{ matrix.environment }}
+    env:
+        TF_ENV: ${{ matrix.environment }}
 
