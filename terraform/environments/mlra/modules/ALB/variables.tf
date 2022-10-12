@@ -106,6 +106,10 @@ variable "stickiness.cookie_duration" {
   type        = string
   description = "The cookie duration in seconds for the stickiness"
 }
+variable "ingress_cidr_block" {
+  type        = string
+  description = "The cidr block for the lb ingress rules"
+}
 
 
 
