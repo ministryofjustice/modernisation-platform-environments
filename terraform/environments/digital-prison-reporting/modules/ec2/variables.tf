@@ -32,7 +32,6 @@ variable "ec2_instance_type" {}
 variable "ami_image_id" {}
 
 variable "subnet_ids" {
-  description = "A list of security subnet IDs to associate with"
-  type        = list(string)
+  description = "subnet IDs to associate with"
   default     = null
 }

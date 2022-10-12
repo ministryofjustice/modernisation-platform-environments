@@ -38,7 +38,7 @@ resource "aws_instance" "develop" {
   monitoring             = true
   ebs_optimized          = true
 
-  user_data = file("./scripts/startup.sh")
+  user_data = file("${path.module}/scripts/startup.sh")
 
   metadata_options {
     http_endpoint = "enabled"
