@@ -55,13 +55,6 @@ resource "aws_instance" "develop" {
   subnet_id              = var.subnet_ids
   monitoring             = var.monitoring
   ebs_optimized          = var.ebs_optimized
-  # public keys
-  public_key_data = local.public_key_data.keys[local.environment]
-  # logs
-  log_auto_clean       = "Enabled"
-  log_standard_ia_days = 30  # days before moving to IA storage
-  log_glacier_days     = 60  # days before moving to Glacier
-  log_expiry_days      = 180 # days before log expiration
 
   associate_public_ip_address = var.associate_public_ip_address
 
