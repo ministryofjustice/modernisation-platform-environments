@@ -77,8 +77,9 @@ locals {
         restored_from_snapshot = false
       }
       scripts = [
-        "ansible.sh.tftpl",
-        "oracle_init.sh.tftpl"
+        "ansible-ec2provision.sh.tftpl",
+        "oracle_init.sh.tftpl",
+        "ansible-ec2provisiondata.sh.tftpl"
       ]
       write_files = {}
     }
