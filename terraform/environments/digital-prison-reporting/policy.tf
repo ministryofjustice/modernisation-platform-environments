@@ -28,7 +28,7 @@ data "aws_iam_policy_document" "glue-policy-data" {
 
 # S3 Read Only Policy
 resource "aws_iam_policy" "read_s3_read_access_policy" {
-  name  = "dpr_s3_read_policy"
+  name = "dpr_s3_read_policy"
   policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [
