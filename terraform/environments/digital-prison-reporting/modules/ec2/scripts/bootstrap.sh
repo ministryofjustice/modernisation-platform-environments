@@ -22,6 +22,11 @@ sudo yum install –y aws-kinesis-agent
 cd /tmp
 sudo yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
 
+# Install AWS CLI
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+sudo ./aws/install
+
 # Configure and Enable Kinesis Agent
 # /tmp/random.log*
 # Additional Configuration here, https://docs.aws.amazon.com/streams/latest/dev/writing-with-agents.html
