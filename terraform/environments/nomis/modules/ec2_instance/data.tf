@@ -44,7 +44,7 @@ data "aws_route53_zone" "external" {
   private_zone = false
 }
 
-data "aws_ec2_instance_type" "database" {
+data "aws_ec2_instance_type" "this" {
   instance_type = var.instance.instance_type
 }
 

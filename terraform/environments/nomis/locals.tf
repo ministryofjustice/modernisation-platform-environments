@@ -89,8 +89,16 @@ data "aws_route53_zone" "internal" {
 }
 
 data "aws_route53_zone" "external" {
+  provider = aws.core-network-services
+
+  name         = "modernisation-platform.service.justice.gov.uk."
+  private_zone = false
+}
+
+data "aws_route53_zone" "external-environment" {
   provider = aws.core-vpc
 
   name         = "${local.vpc_name}-${local.environment}.modernisation-platform.service.justice.gov.uk."
   private_zone = false
 }
+
