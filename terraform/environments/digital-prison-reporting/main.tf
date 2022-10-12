@@ -723,7 +723,6 @@ module "s3_application_tf_state" {
 # Ec2
 module "ec2_kinesis_agent" {
   source              = "./modules/ec2"
-  create_ec2          = local.setup_ec2_kinesis_agent
   name                = "${local.project}-ec2-kinesis-agent-${local.env}"
   description         = "EC2 instance for kinesis agent"
   vpc                 = data.aws_vpc.shared.id
