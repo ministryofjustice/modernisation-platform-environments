@@ -27,3 +27,6 @@ variable "cidr" {
   type        = list(string)
   default     = null
 }
+
+variable "ec2_instance_type" {}
+variable "ami_image_id" {}
