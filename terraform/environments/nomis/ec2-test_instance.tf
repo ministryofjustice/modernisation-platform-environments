@@ -8,7 +8,7 @@ module "test_instance_asg" {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
   }
 
-  for_each = local.accounts[local.environment].test_instances_asg
+  for_each = local.environment_config.test_instances_asg
 
   name = each.key
 
@@ -56,7 +56,7 @@ resource "aws_security_group" "test_instance_common" {
     from_port   = "9100"
     to_port     = "9100"
     protocol    = "TCP"
-    cidr_blocks = [local.accounts[local.environment].database_external_access_cidr.cloud_platform]
+    cidr_blocks = [local.cidrs.cloud_platform]
   }
 
   ingress {
@@ -64,7 +64,7 @@ resource "aws_security_group" "test_instance_common" {
     from_port   = "9172"
     to_port     = "9172"
     protocol    = "TCP"
-    cidr_blocks = [local.accounts[local.environment].database_external_access_cidr.cloud_platform]
+    cidr_blocks = [local.cidrs.cloud_platform]
   }
 
   egress {
