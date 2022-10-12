@@ -53,5 +53,5 @@ EOF
 
 # Start Stream at Start of the EC2
 sudo chkconfig aws-kinesis-agent on
-sudo systemctl enable amazon-ssm-agent
 sudo systemctl start amazon-ssm-agent
+sudo systemctl enable amazon-ssm-agent

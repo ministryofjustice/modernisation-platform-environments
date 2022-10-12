@@ -56,6 +56,11 @@ resource "aws_instance" "develop" {
   iam_instance_profile = "${var.name}-profile"
 
   user_data = file("${path.module}/scripts/bootstrap.sh")
+  
+  metadata_options {
+    http_endpoint = "enabled"
+    http_tokens   = "required"
+  }
 
   # Increase the volume size of the root volume
   root_block_device {
