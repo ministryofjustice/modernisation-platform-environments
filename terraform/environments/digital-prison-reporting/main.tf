@@ -18,6 +18,8 @@ locals {
   enable_glue_registry   = local.application_data.accounts[local.environment].create_glue_registries
   setup_buckets          = local.application_data.accounts[local.environment].setup_s3_buckets
   create_glue_connection = local.application_data.accounts[local.environment].create_glue_connections
+  image_id               = local.application_data.accounts[local.environment].ami_image_id
+  instance_type          = local.application_data.accounts[local.environment].ec2_instance_type
 
 
   all_tags = merge(
@@ -714,6 +716,28 @@ module "s3_application_tf_state" {
     {
       Name          = "${local.project}-terraform-state-${local.environment}"
       Resource_Type = "S3 Bucket"
+    }
+  )
+}
+
+# Ec2
+module "ec2_kinesis_agent" {
+  source              = "./modules/ec2"
+  create_ec2          = local.setup_ec2_kinesis_agent
+  name                = "${local.project}-ec2-kinesis-agent-${local.env}"
+  description         = "EC2 instance for kinesis agent"
+  vpc                 = data.aws_vpc.shared.id
+  ec2_sec_rules       = local.application_data.dpr_ec2_kinesis_rules
+  cidr                = [data.aws_vpc.shared.cidr_block]
+  ec2_instance_type   = local.application_data.accounts[local.environment].instance_type
+  ami_image_id        = local.application_data.accounts[local.environment].image_id
+
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-ec2-kinesis-agent-${local.env}"
+      Resource_Type = "EC2 Instance"
     }
   )
 }
