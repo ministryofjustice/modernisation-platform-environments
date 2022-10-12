@@ -60,9 +60,15 @@ resource "aws_iam_role_policy_attachment" "this" {
 }
 
 resource "aws_iam_policy_attachment" "this" {
-  name       = "policy_attachment"
+  name       = "ssm_managed_instance_core"
   roles      = [aws_iam_role.kinesis-agent-instance-role.name]
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
+resource "aws_iam_policy_attachment" "this" {
+  name       = "ssm_managed_instance_ec2_role"
+  roles      = [aws_iam_role.kinesis-agent-instance-role.name]
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM"
 }
 
 resource "aws_iam_policy_attachment" "read_list_s3_access_attachment" {
