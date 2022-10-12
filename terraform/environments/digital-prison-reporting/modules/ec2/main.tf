@@ -49,19 +49,19 @@ resource "aws_security_group_rule" "egress_traffic" {
 #  Build EC2 
 resource "aws_instance" "develop" {
   # Specify the instance type and ami to be used (this is the Amazon free tier option)
-  instance_type               = var.ec2_instance_type
-  ami                         = var.ami_image_id
-  vpc_security_group_ids      = [aws_security_group.ec2_kinesis_agent.id]
-  subnet_id                   = var.subnet_ids
-  monitoring                  = var.monitoring
-  ebs_optimized               = var.ebs_optimized
+  instance_type          = var.ec2_instance_type
+  ami                    = var.ami_image_id
+  vpc_security_group_ids = [aws_security_group.ec2_kinesis_agent.id]
+  subnet_id              = var.subnet_ids
+  monitoring             = var.monitoring
+  ebs_optimized          = var.ebs_optimized
   # public keys
-  public_key_data             = local.public_key_data.keys[local.environment]
+  public_key_data = local.public_key_data.keys[local.environment]
   # logs
-  log_auto_clean              = "Enabled"
-  log_standard_ia_days        = 30  # days before moving to IA storage
-  log_glacier_days            = 60  # days before moving to Glacier
-  log_expiry_days             = 180 # days before log expiration
+  log_auto_clean       = "Enabled"
+  log_standard_ia_days = 30  # days before moving to IA storage
+  log_glacier_days     = 60  # days before moving to Glacier
+  log_expiry_days      = 180 # days before log expiration
 
   associate_public_ip_address = var.associate_public_ip_address
 
