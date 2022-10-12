@@ -40,11 +40,11 @@ data "aws_iam_policy_document" "kinesis-data-stream" {
       "kinesis:ListShards",
       "kinesis:ListStreamConsumers",
       "kinesis:ListStreams",
-      "kinesis:GetRecords",      
+      "kinesis:GetRecords",
     ]
     resources = [
-        "arn:aws:kinesis:eu-west-2:771283872747:stream/dpr-kinesis-data-domain-development",
-        "arn:aws:kinesis:eu-west-2:771283872747:stream/dpr-kinesis-ingestor-development"
+      "arn:aws:kinesis:eu-west-2:771283872747:stream/dpr-kinesis-data-domain-development",
+      "arn:aws:kinesis:eu-west-2:771283872747:stream/dpr-kinesis-ingestor-development"
     ]
   }
 }

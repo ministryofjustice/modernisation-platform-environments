@@ -39,9 +39,9 @@ resource "aws_instance" "develop" {
   ebs_optimized               = var.ebs_optimized
   associate_public_ip_address = var.associate_public_ip_address
 
-  lifecycle { ignore_changes  = [ebs_block_device] }
+  lifecycle { ignore_changes = [ebs_block_device] }
 
-  iam_instance_profile        = "${var.name}-profile"
+  iam_instance_profile = "${var.name}-profile"
 
   user_data = file("${path.module}/scripts/bootstrap.sh")
 
