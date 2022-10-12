@@ -40,7 +40,14 @@ locals {
   }
 }
 
-resource "aws_lb_listener" "alb_listener" {
+
+module "aws_lb_listener" {
+  source = "modules/ALB/main.tf"
+  # providers = {
+  #   aws.bucket-replication = aws
+  # }
+
+# resource "aws_lb_listener" "alb_listener" {
   load_balancer_arn = module.lb-access-logs-enabled.load_balancer.arn
   port              = "443"
   protocol          = "HTTP"
@@ -65,6 +72,9 @@ resource "aws_lb_listener" "alb_listener" {
 #as this depends on cloudfront which is is not currently configured
 #therefore this will need to be added pending cutover strategy decisions
 
+module "aws_lb_target_group" {
+  source = "modules/ALB/main.tf"
+
 resource "aws_lb_target_group" "alb_target_group" {
   name                 = "${local.application_name}-target-group"
   port                 = 80
@@ -84,6 +94,7 @@ resource "aws_lb_target_group" "alb_target_group" {
     type            = "lb_cookie"
     cookie_duration = 10800
   }
+}
 }
 
 

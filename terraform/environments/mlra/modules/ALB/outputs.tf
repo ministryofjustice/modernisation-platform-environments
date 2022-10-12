@@ -10,3 +10,12 @@ output "load_balancer" {
   value = aws_lb.loadbalancer
 }
 
+output "aws_lb_listener" {
+  value = aws_lb.loadbalancer
+}
+
+output "aws_lb_target_group" {
+  value = aws_lb.loadbalancer
+}
+
+
