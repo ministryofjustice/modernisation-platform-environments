@@ -22,7 +22,7 @@ variable "ec2_sec_rules" {
   default     = null
 }
 
-variable "ec2_sec_rules" {
+variable "cidr" {
   description = "A list of security group IDs to associate with"
   type        = list(string)
   default     = null
