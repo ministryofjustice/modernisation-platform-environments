@@ -18,7 +18,7 @@ resource "aws_security_group_rule" "ingress_traffic" {
 }
 
 resource "aws_security_group_rule" "egress_traffic" {
-  for_each                 = var.ec2_sec_rules
+  for_each                 = [var.ec2_sec_rules]
   description              = format("Outbound traffic for %s %d", each.value.protocol, each.value.from_port)
   from_port                = each.value.from_port
   protocol                 = each.value.protocol
