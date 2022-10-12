@@ -34,5 +34,5 @@ variable "ami_image_id" {}
 variable "subnet_ids" {
   description = "A list of security subnet IDs to associate with"
   type        = list(string)
-  default     = null    
+  default     = null
 }
