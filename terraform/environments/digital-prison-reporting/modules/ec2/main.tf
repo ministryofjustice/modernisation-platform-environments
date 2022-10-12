@@ -31,24 +31,27 @@ resource "aws_security_group_rule" "egress_traffic" {
 #  Build EC2 
 resource "aws_instance" "develop" {
   # Specify the instance type and ami to be used (this is the Amazon free tier option)
-  instance_type          = var.ec2_instance_type
-  ami                    = var.ami_image_id
-  vpc_security_group_ids = [aws_security_group.ec2_kinesis_agent.id]
-  subnet_id              = var.subnet_ids
-  monitoring             = true
-  ebs_optimized          = true
+  instance_type               = var.ec2_instance_type
+  ami                         = var.ami_image_id
+  vpc_security_group_ids      = [aws_security_group.ec2_kinesis_agent.id]
+  subnet_id                   = var.subnet_ids
+  monitoring                  = var.monitoring
+  ebs_optimized               = var.ebs_optimized
+  associate_public_ip_address = var.associate_public_ip_address
 
-  user_data = file("${path.module}/scripts/startup.sh")
+  lifecycle { ignore_changes  = [ebs_block_device] }
 
-  metadata_options {
-    http_endpoint = "enabled"
-    http_tokens   = "required"
-  }
+  iam_instance_profile        = "${var.name}-profile"
+
+  user_data = file("${path.module}/scripts/bootstrap.sh")
+
   # Increase the volume size of the root volume
   root_block_device {
-    volume_type = "gp3"
-    volume_size = 20
-    encrypted   = true
+    volume_type           = "gp3"
+    volume_size           = var.ebs_size
+    encrypted             = var.ebs_encrypted
+    delete_on_termination = var.ebs_delete_on_termination
+    tags                  = var.tags
   }
   tags       = var.tags
   depends_on = [aws_security_group.ec2_kinesis_agent]
