@@ -728,7 +728,7 @@ module "ec2_kinesis_agent" {
   vpc               = data.aws_vpc.shared.id
   ec2_sec_rules     = local.application_data.dpr_ec2_kinesis_rules
   cidr              = [data.aws_vpc.shared.cidr_block]
-  subnet_ids        = data.aws_subnet.private_subnets_a.id
+  subnet_ids        = ["data.aws_subnet.private_subnets_a.id"]
   ec2_instance_type = local.instance_type
   ami_image_id      = local.image_id
 
