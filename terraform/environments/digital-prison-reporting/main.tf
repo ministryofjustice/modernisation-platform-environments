@@ -722,14 +722,14 @@ module "s3_application_tf_state" {
 
 # Ec2
 module "ec2_kinesis_agent" {
-  source              = "./modules/ec2"
-  name                = "${local.project}-ec2-kinesis-agent-${local.env}"
-  description         = "EC2 instance for kinesis agent"
-  vpc                 = data.aws_vpc.shared.id
-  ec2_sec_rules       = local.application_data.dpr_ec2_kinesis_rules
-  cidr                = [data.aws_vpc.shared.cidr_block]
-  ec2_instance_type   = local.application_data.accounts[local.environment].instance_type
-  ami_image_id        = local.application_data.accounts[local.environment].image_id
+  source            = "./modules/ec2"
+  name              = "${local.project}-ec2-kinesis-agent-${local.env}"
+  description       = "EC2 instance for kinesis agent"
+  vpc               = data.aws_vpc.shared.id
+  ec2_sec_rules     = local.application_data.dpr_ec2_kinesis_rules
+  cidr              = [data.aws_vpc.shared.cidr_block]
+  ec2_instance_type = local.application_data.accounts[local.environment].instance_type
+  ami_image_id      = local.application_data.accounts[local.environment].image_id
 
 
   tags = merge(
