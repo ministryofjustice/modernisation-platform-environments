@@ -40,7 +40,7 @@ locals {
 
     }
     weblogics = {}
-    ec2_test = {
+    ec2_test_instances = {
       "dev-base-rhel79-1" = {
         tags = {
           server-type = "base-rhel79"
@@ -52,7 +52,7 @@ locals {
         branch   = var.BRANCH_NAME
       }
     }
-    ec2_test_asg = {
+    ec2_test_asgs = {
       dev-base-rhel79 = {
         tags = {
           server-type = "base-rhel79"

@@ -69,7 +69,7 @@ module "ec2_test_instance" {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
   }
 
-  for_each = try(local.environment_config.ec2_test_instance, {})
+  for_each = try(local.environment_config.ec2_test_instances, {})
 
   name = each.key
 
@@ -107,7 +107,7 @@ module "ec2_test_asg" {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
   }
 
-  for_each = try(local.environment_config.ec2_test_asg, {})
+  for_each = try(local.environment_config.ec2_test_asgs, {})
 
   name = each.key
 
