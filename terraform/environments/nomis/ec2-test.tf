@@ -20,7 +20,7 @@ locals {
 
     instance = {
       disable_api_termination      = false
-      instance_type                = "t2.medium"
+      instance_type                = "t3.medium"
       key_name                     = aws_key_pair.ec2-user.key_name
       monitoring                   = false
       metadata_options_http_tokens = "required"
