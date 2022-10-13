@@ -12,6 +12,8 @@ module "lb-access-logs-enabled" {
   enable_deletion_protection = var.enable_deletion_protection
   idle_timeout               = var.idle_timeout
   force_destroy_bucket       = var.force_destroy_bucket
+  tags                       = var.tags
+  account_number             = var.account_number
 }
 
 locals {
