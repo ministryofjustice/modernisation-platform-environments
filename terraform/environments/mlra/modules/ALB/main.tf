@@ -74,16 +74,16 @@ resource "aws_lb_target_group" "alb_target_group" {
   vpc_id               = var.vpc_id
   deregistration_delay = 30
   health_check {
-    interval            = 15
+    interval            = var.healthcheck_interval
     path                = local.application_data.accounts[local.environment].alb_target_group_path
     protocol            = "HTTP"
-    timeout             = 5
-    healthy_threshold   = 2
-    unhealthy_threshold = 3
+    timeout             = var.healthcheck_timeout
+    healthy_threshold   = var.healthcheck_healthy_threshold
+    unhealthy_threshold = var.healthcheck_unhealthy_threshold
   }
   stickiness {
-    enabled         = true
-    type            = "lb_cookie"
-    cookie_duration = 10800
+    enabled         = var.stickiness_enabled
+    type            = var.stickiness_type
+    cookie_duration = var.stickiness_cookie_duration
   }
 }

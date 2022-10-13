@@ -74,31 +74,31 @@ variable "deregistration_delay" {
   type        = string
   description = "The time in seconds for the deregistration delay"
 }
-variable "interval" {
+variable "healthcheck_interval" {
   type        = string
   description = "The time in seconds for the health check interval"
 }
-variable "timeout" {
+variable "healthcheck_timeout" {
   type        = string
   description = "The tiomeout in seconds for the health check"
 }
-variable "healthy_threshold" {
+variable "healthcheck_healthy_threshold" {
   type        = string
   description = "The healthy threshold in seconds for the health check"
 }
-variable "unhealthy_threshold" {
+variable "healthcheck_unhealthy_threshold" {
   type        = string
   description = "The unhealthy threshold in seconds for the health check"
 }
-variable "enabled" {
+variable "stickiness_enabled" {
   type        = bool
   description = "The enabled setting for the stickiness"
 }
-variable "type" {
+variable "stickiness_type" {
   type        = string
   description = "The type setting for the stickiness"
 }
-variable "cookie_duration" {
+variable "stickiness_cookie_duration" {
   type        = string
   description = "The cookie duration in seconds for the stickiness"
 }

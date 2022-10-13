@@ -17,6 +17,14 @@ module "alb" {
   idle_timeout               = 60
   force_destroy_bucket       = true
   ingress_cidr_block         = data.aws_vpc.shared.cidr_block
+  deregistration_delay       = 30
+  healthcheck_interval       = 15
+  healthcheck_timeout        = 5
+  healthcheck_healthy_threshold = 2
+  healthcheck_unhealthy_threshold = 3
+  stickiness_enabled         = true
+  stickiness_type            = lb_cookie
+  stickiness_cookie_duration = 10800
 }
 
 
