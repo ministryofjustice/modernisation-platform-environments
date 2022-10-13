@@ -41,7 +41,7 @@ locals {
     }
     weblogics = {}
     ec2_test_instances = {
-      "dev-base-rhel79-2" = {
+      "dev-base-rhel79-3" = {
         tags = {
           server-type = "base-rhel79"
           description = "Standalone EC2 for testing RHEL7.9 base image"
@@ -51,7 +51,7 @@ locals {
         ami_name = "nomis_rhel_7_9_baseimage*"
         branch   = var.BRANCH_NAME
         instance = {
-          instance_type = "t3.medium"
+          instance_type = "t2.medium"
         }
       }
     }
