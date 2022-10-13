@@ -139,6 +139,29 @@ module "kinesis_stream_domain_data" {
   )
 }
 
+# kinesis DEMO Data Stream
+module "kinesis_stream_domain_data" {
+  source                    = "./modules/kinesis_stream"
+  create_kinesis_stream     = local.create_kinesis
+  name                      = "${local.project}-kinesis-data-demo-${local.env}"
+  shard_count               = 1
+  retention_period          = 24
+  shard_level_metrics       = ["IncomingBytes", "OutgoingBytes"]
+  enforce_consumer_deletion = false
+  encryption_type           = "KMS"
+  kms_key_id                = local.kinesis_kms_id
+  project_id                = local.project
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-kinesis-data-demo-${local.env}"
+      Resource_Type = "Kinesis Data Stream"
+      Component     = "Demo"
+    }
+  )
+}
+
 # Glue Registry
 module "glue_registry_avro" {
   source               = "./modules/glue_registry"

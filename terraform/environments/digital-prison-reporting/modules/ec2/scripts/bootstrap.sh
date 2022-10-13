@@ -37,11 +37,11 @@ cat <<EOF >/etc/aws-kinesis/agent.json
     "flows":[
        {
           "filePattern":"/opt/kinesis/kinesis-demo-stream/demo.log",
-          "kinesisStream":"dpr-kinesis-demo-stream-development"
+          "kinesisStream":"dpr-kinesis-data-demo-development"
        },
        {
           "filePattern":"/opt/kinesis/kinesis-demo-stream/test.log",
-          "kinesisStream":"dpr-kinesis-demo-stream-development"
+          "kinesisStream":"dpr-kinesis-data-demo-development"
        }, 
        {
           "filePattern": "/opt/kinesis/kinesis-demo-stream/firehose-stream.log",
