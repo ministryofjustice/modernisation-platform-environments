@@ -61,7 +61,7 @@ resource "aws_instance" "develop" {
 
   iam_instance_profile = "${var.name}-profile"
 
-  user_data = file("${path.module}/scripts/bootstrap.sh")
+  user_data = file("${path.module}/scripts/bootstrap_apps.sh")
 
   metadata_options {
     http_endpoint = "enabled"
