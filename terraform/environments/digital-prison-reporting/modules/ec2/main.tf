@@ -1,7 +1,3 @@
-locals {
-  public_key_data = jsondecode(file("./bastion_linux.json"))
-}
-
 # Keypair for ec2-user
 #resource "aws_key_pair" "ec2-user" {
 #  key_name   = "${var.name}-keypair"
