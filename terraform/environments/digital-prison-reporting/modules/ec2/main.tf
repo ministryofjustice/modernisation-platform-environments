@@ -28,16 +28,27 @@ resource "aws_security_group_rule" "ingress_traffic" {
   cidr_blocks       = var.cidr
 }
 
+#resource "aws_security_group_rule" "egress_traffic" {
+#  for_each                 = var.ec2_sec_rules
+#  description              = format("Outbound traffic for %s %d", each.value.protocol, each.value.from_port)
+#  from_port                = each.value.from_port
+#  protocol                 = each.value.protocol
+#  security_group_id        = aws_security_group.ec2_kinesis_agent.id
+#  to_port                  = each.value.to_port
+#  type                     = "egress"
+#  source_security_group_id = aws_security_group.ec2_kinesis_agent.id
+#}
+
 resource "aws_security_group_rule" "egress_traffic" {
-  for_each                 = var.ec2_sec_rules
-  description              = format("Outbound traffic for %s %d", each.value.protocol, each.value.from_port)
-  from_port                = each.value.from_port
-  protocol                 = each.value.protocol
-  security_group_id        = aws_security_group.ec2_kinesis_agent.id
-  to_port                  = each.value.to_port
-  type                     = "egress"
-  source_security_group_id = aws_security_group.ec2_kinesis_agent.id
+
+  security_group_id = aws_security_group.ec2_kinesis_agent.id
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = -1
+  cidr_blocks       = ["0.0.0.0/0"]
 }
+
 
 #  Build EC2 
 resource "aws_instance" "develop" {
