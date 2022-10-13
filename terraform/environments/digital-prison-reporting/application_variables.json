@@ -14,8 +14,8 @@
       "create_glue_registries": false,
       "setup_s3_buckets": true,
       "create_glue_connections": false,
-      "ec2_instance_type": "t3.medium",
-      "ami_image_id": "ami-f976839e"
+      "ec2_instance_type": "t3.small",
+      "ami_image_id": "ami-00cc4c3fee6bb6c22"
     },
     "test": {
       "example_var": "test-data"
