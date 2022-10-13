@@ -10,10 +10,12 @@ mkdir -p /opt/kinesis/scripts
 
 # Add Kinesis Stream Directory where logs are delivered
 mkdir -p /opt/kinesis/kinesis-demo-stream
-chown -R 775 /opt/kinesis/kinesis-demo-stream
+chown -R ssm-user:ssm-user /opt/kinesis/kinesis-demo-stream
+chown -R ssm-user:ssm-user /opt/kinesis
+chmod -R 775 /opt/kinesis/kinesis-demo-stream
 
 # Update all packages
-yum -y update
+sudo yum -y update
 
 # Setup YUM install Kinesis Agent
 sudo yum install –y aws-kinesis-agent
@@ -53,5 +55,4 @@ EOF
 
 # Start Stream at Start of the EC2
 sudo chkconfig aws-kinesis-agent on
-sudo systemctl enable amazon-ssm-agent
-sudo systemctl start amazon-ssm-agent
+sudo service aws-kinesis-agent start

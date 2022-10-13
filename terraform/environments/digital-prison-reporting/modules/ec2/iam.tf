@@ -50,6 +50,18 @@ data "aws_iam_policy_document" "kinesis-data-stream" {
   }
 }
 
+data "aws_iam_policy_document" "kinesis-cloudwatch-kms" {
+  statement {
+    actions = [
+      "cloudwatch:PutMetricData",
+      "kms:*",
+    ]
+    resources = [
+      "*"
+    ]
+  }
+}
+
 resource "aws_iam_instance_profile" "kinesis-agent-instance-profile" {
   name = "${var.name}-profile"
   role = aws_iam_role.kinesis-agent-instance-role.name
@@ -58,6 +70,11 @@ resource "aws_iam_instance_profile" "kinesis-agent-instance-profile" {
 resource "aws_iam_role_policy_attachment" "this" {
   role       = aws_iam_role.kinesis-agent-instance-role.name
   policy_arn = aws_iam_policy.kinesis-data-stream-developer.arn
+}
+
+resource "aws_iam_role_policy_attachment" "cloudwatch-kms" {
+  role       = aws_iam_role.kinesis-agent-instance-role.name
+  policy_arn = aws_iam_policy.kinesis-cloudwatch-kms.arn
 }
 
 resource "aws_iam_policy_attachment" "this" {
