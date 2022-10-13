@@ -53,8 +53,8 @@ resource "aws_security_group_rule" "egress_traffic" {
 #  Build EC2 
 resource "aws_instance" "develop" {
   # Specify the instance type and ami to be used (this is the Amazon free tier option)
-  instance_type          = var.ec2_instance_type
-# ami                    = var.ami_image_id
+  instance_type = var.ec2_instance_type
+  # ami                    = var.ami_image_id
   vpc_security_group_ids = [aws_security_group.ec2_kinesis_agent.id]
   subnet_id              = var.subnet_ids
   monitoring             = var.monitoring
