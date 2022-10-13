@@ -40,8 +40,6 @@ locals {
 
     }
     weblogics          = {}
-    base_instances_asg = {}
-    test_instances_asg = {}
   }
 }
 

@@ -1,10 +1,10 @@
-# nomis-preproduction environment settings
+# nomis-development environment settings
 locals {
-  nomis_preproduction = {
+  nomis_development = {
     # ip ranges for external access to database instances
     database_external_access_cidr = [
-      local.cidrs.noms_live,
-      local.cidrs.noms_mgmt_live,
+      local.cidrs.noms_test,
+      local.cidrs.noms_mgmt,
       local.cidrs.cloud_platform
     ]
 
@@ -39,5 +39,29 @@ locals {
       # *-nomis-db-3: HA
     }
     weblogics          = {}
+    ec2_test = {
+      "dev-base-rhel79-1" = {
+        tags = {
+          server-type = "base-rhel79"
+          description = "Standalone EC2 for testing RHEL7.9 base image"
+          monitored   = false
+          always-on   = false
+        }
+        ami_name = "nomis_rhel_7_9_baseimage*"
+      }
+    }
+    ec2_test_asg = {
+      dev-base-rhel79 = {
+        tags = {
+          server-type = "nomis-db"
+          description = "T1 NOMIS Audit database to replace Azure T1PDL0010"
+          oracle-sids = "T1CNMAUD"
+          monitored   = false
+          always-on   = true
+        }
+        ami_name = "nomis_rhel_7_9_baseimage*"
+      }
+    }
   }
 }
+

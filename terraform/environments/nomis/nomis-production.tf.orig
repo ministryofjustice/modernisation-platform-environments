@@ -55,6 +55,50 @@ locals {
           monitored = true
         }
       }
+      NOMIS = {
+        always_on              = true
+        ami_name               = "nomis_database_2022-07-21T11-43-27.346Z"
+<<<<<<< HEAD
+        ami_owner              = local.account_id
+=======
+        ami_owner              = local.environment_management.account_ids[terraform.workspace]
+>>>>>>> 54b698fa (nomis: DSOS-1497: split out application_variables)
+        instance_type          = "r6i.4xlarge"
+        asm_data_capacity      = 4000
+        asm_flash_capacity     = 1000
+        description            = "Copy of Production NOMIS CNOM database in Azure PDPDL00035, replicating with PDPDL00035, a replacement for PDPDL10036."
+        termination_protection = true
+        oracle_sids            = ["PCNOM", "PMISS1"]
+        oracle_app_disk_size = {
+          "/dev/sdb" = 100 # /u01
+          "/dev/sdc" = 512 # /u02
+        }
+        tags = {
+          monitored = false //not yet live
+        }
+      }
+      NDH = {
+        always_on              = false
+        ami_name               = "nomis_database_2022-08-09T15-04-29.500Z"
+<<<<<<< HEAD
+        ami_owner              = local.account_id
+=======
+        ami_owner              = local.environment_management.account_ids[terraform.workspace]
+>>>>>>> 54b698fa (nomis: DSOS-1497: split out application_variables)
+        instance_type          = "r6i.xlarge"
+        asm_data_capacity      = 4000
+        asm_flash_capacity     = 1000
+        description            = "NDH & TRDATA standby databases in Azure PDPDL00038, replicating with PDPDL00037, a replacement for PDPDL00038."
+        termination_protection = true
+        oracle_sids            = ["PNDH", "PTRDAT"]
+        oracle_app_disk_size = {
+          "/dev/sdb" = 100 # /u01
+          "/dev/sdc" = 512 # /u02
+        }
+        tags = {
+          monitored = false # not yet live
+        }
+      }
     }
 
     # Add database instances here. They will be created using ec2-database.tf
@@ -110,31 +154,11 @@ locals {
           flash = { total_size = 1000 }
         }
       }
-
-      prod-nomis-db-3 = {
-        tags = {
-          server-type = "nomis-db"
-          description = "Production NOMIS HA database to replace Azure PDPDL00062"
-          monitored   = false
-          always-on   = true
-        }
-        ami_name = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-07T12-48-08.562Z"
-        instance = {
-          instance_type           = "r6i.2xlarge"
-          disable_api_termination = true
-        }
-        ebs_volumes = {
-          "/dev/sdb" = { size = 100 }  # /u01
-          "/dev/sdc" = { size = 1000 } # /u02
-        }
-        ebs_volume_config = {
-          data  = { total_size = 3000 }
-          flash = { total_size = 500 }
-        }
-      }
     }
 
     # Add weblogic instances here.  They will be created using the weblogic module
     weblogics = {}
+    # Add base instances here. They will be created using the base_instance module
+    test_instances_asg = {}
   }
 }
