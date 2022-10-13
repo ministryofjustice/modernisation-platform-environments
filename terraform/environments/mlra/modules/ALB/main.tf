@@ -14,6 +14,8 @@ module "lb-access-logs-enabled" {
   force_destroy_bucket       = var.force_destroy_bucket
   tags                       = var.tags
   account_number             = var.account_number
+  loadbalancer_ingress_rules = local.loadbalancer_ingress_rules
+  loadbalancer_egress_rules  = local.loadbalancer_egress_rules
 }
 
 locals {
