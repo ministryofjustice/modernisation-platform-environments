@@ -42,6 +42,15 @@ resource "aws_instance" "this" {
     }
   }
 
+  dynamic "private_dns_name_options" {
+    for_each = var.instance.private_dns_name_options != null ? [var.instance.private_dns_name_options] : []
+    content {
+      enable_resource_name_dns_aaaa_record = private_dns_name_options.value.enable_resource_name_dns_aaaa_record
+      enable_resource_name_dns_a_record    = private_dns_name_options.value.enable_resource_name_dns_a_record
+      hostname_type                        = private_dns_name_options.value.hostname_type
+    }
+  }
+
   lifecycle {
     ignore_changes = [
       user_data, # Prevent changes to user_data from destroying existing EC2s

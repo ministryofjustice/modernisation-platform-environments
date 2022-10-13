@@ -41,6 +41,15 @@ resource "aws_launch_template" "this" {
     delete_on_termination       = true
   }
 
+  dynamic "private_dns_name_options" {
+    for_each = var.instance.private_dns_name_options != null ? [var.instance.private_dns_name_options] : []
+    content {
+      enable_resource_name_dns_aaaa_record = private_dns_name_options.value.enable_resource_name_dns_aaaa_record
+      enable_resource_name_dns_a_record    = private_dns_name_options.value.enable_resource_name_dns_a_record
+      hostname_type                        = private_dns_name_options.value.hostname_type
+    }
+  }
+
   user_data = length(data.cloudinit_config.this) == 0 ? null : data.cloudinit_config.this[0].rendered
 
   tag_specifications {

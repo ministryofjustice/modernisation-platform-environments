@@ -25,6 +25,9 @@ locals {
       monitoring                   = false
       metadata_options_http_tokens = "required"
       vpc_security_group_ids       = [aws_security_group.ec2_test.id]
+      private_dns_name_options = {
+        hostname_type = "resource-name"
+      }
     }
 
     ebs_volume_config = {}

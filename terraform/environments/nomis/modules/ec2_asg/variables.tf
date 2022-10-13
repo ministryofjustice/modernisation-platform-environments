@@ -93,6 +93,11 @@ variable "instance" {
     monitoring                   = optional(bool)
     metadata_options_http_tokens = optional(string)
     vpc_security_group_ids       = list(string)
+    private_dns_name_options = optional(object({
+      enable_resource_name_dns_aaaa_record = optional(bool)
+      enable_resource_name_dns_a_record    = optional(bool)
+      hostname_type                        = string
+    }))
   })
 }
 

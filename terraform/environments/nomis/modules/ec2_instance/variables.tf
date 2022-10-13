@@ -96,6 +96,11 @@ variable "instance" {
     root_block_device = optional(object({
       volume_size = number
     }))
+    private_dns_name_options = optional(object({
+      enable_resource_name_dns_aaaa_record = optional(bool)
+      enable_resource_name_dns_a_record    = optional(bool)
+      hostname_type                        = string
+    }))
   })
 }
 
