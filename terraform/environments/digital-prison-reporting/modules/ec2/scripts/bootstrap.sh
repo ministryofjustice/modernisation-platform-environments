@@ -14,25 +14,27 @@ chown -R ssm-user:ssm-user /opt/kinesis/kinesis-demo-stream
 chown -R ssm-user:ssm-user /opt/kinesis
 chmod -R 775 /opt/kinesis/kinesis-demo-stream
 
+echo "assumeyes=1" >> /etc/yum.conf
+
 # Update all packages
 sudo yum -y update
 
 # Setup YUM install Kinesis Agent
-sudo yum install –y aws-kinesis-agent
+sudo yum -y install aws-kinesis-agent
 
 # Install SSM Agent
 #cd /tmp
 #sudo yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
 
 # Install AWS CLI
-sudo curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-sudo unzip awscliv2.zip
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
 sudo ./aws/install
 
 # Configure and Enable Kinesis Agent
 # /tmp/random.log*
 # Additional Configuration here, https://docs.aws.amazon.com/streams/latest/dev/writing-with-agents.html
-sudo cat <<EOF >/etc/aws-kinesis/agent.json
+cat <<EOF >/etc/aws-kinesis/agent.json
 {
     "cloudwatch.emitMetrics":true,
     "kinesis.endpoint":"https://kinesis.eu-west-2.amazonaws.com",
