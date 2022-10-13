@@ -14,6 +14,7 @@ _If you have any questions surrounding this page please post in the `#ask-digita
 ### **Description:**
 
 The only NOMIS component currently in production is the audit database. This receives transactional audit data from the main NOMIS database in Azure, and is queried by adhoc SQL sessions and Business Objects reports.
+
 <!-- A short (less than 50 word) description of what your service does, and who it’s for.-->
 
 ### **Service URLs:**
@@ -23,6 +24,7 @@ The only NOMIS component currently in production is the audit database. This rec
 ### **Incident response hours:**
 
 24/7/365 cover is provided by the DBAs
+
 <!-- When your service receives support for urgent issues. This should be written in a clear, unambiguous way. For example: 24/7/365, Office hours, usually 9am-6pm on working days, or 7am-10pm, 365 days a year. -->
 
 ### **Incident contact details:**
@@ -34,6 +36,7 @@ The only NOMIS component currently in production is the audit database. This rec
 #ask-digital-studio-ops
 
 digital-studio-operations-team@digital.justice.gov.uk
+
 <!-- How people with non-urgent issues or questions can get in touch with your team. As with incident contact details, this must not be the email address or phone number of an individual on the team, it should be a shared email address or a ticket tracking system.-->
 
 ### **Hosting environment:**
