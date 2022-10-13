@@ -1,5 +1,5 @@
 ---
-name: Redeploy after nuke v2
+name: Redeploy after nuke
 on:
   schedule:
     # * is a special character in YAML so you have to quote this string
@@ -24,7 +24,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        nuke_accts: [sprinkler]
+        # current content of nuke list: {"COOKER_DEVELOPMENT_ACCID","SPRINKLER_DEVELOPMENT_ACCID","EXAMPLE_DEVELOPMENT_ACCID","TESTING_TEST_DEVELOPMENT_ACCID,"DELIUS_IAPS_DEVELOPMENT_ACCID"}
+        # matrix values are contents of that list minus accounts in the exclusion list defined in NUKE_DO_NOT_RECREATE_ENVIRONMENTS.
+        nuke_accts: [sprinkler, delius-iaps]
     name: Redeploy after nuke
     runs-on: ubuntu-latest
     steps:
