@@ -78,10 +78,10 @@ locals {
         ebs_volume_config = {
           data  = { total_size = 200 }
           flash = { total_size = 2 }
-        } */
+        }
         # branch            = "nomis/DSOS-1426/load-CNOMT1-data-role"
         # s3-db-restore-dir = "CNOMT1_20211214"
-      }
+      }*/
 
       t1-nomis-db-2 = {
         tags = {
