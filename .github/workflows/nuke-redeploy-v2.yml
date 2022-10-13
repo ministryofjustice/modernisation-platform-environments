@@ -5,6 +5,12 @@ on:
   #   # * is a special character in YAML so you have to quote this string
   #   # trigger every sunday at 12:00am
   #   - cron: '0 12 * * 0'
+  pull_request:
+    branches:
+      - main
+    types: [opened, edited, reopened, synchronize]
+    paths:
+      - '.github/workflows/nuke-redeploy-*.yml'
   workflow_dispatch:
 env:
   AWS_REGION: "eu-west-2"
@@ -48,6 +54,6 @@ jobs:
           echo "Terraform apply - ${ACCOUNT_NAME}"
           bash scripts/terraform-init.sh terraform/environments/$ACCOUNT_NAME
           terraform -chdir="terraform/environments/nomis" workspace select "${ACCOUNT_NAME}-development"
-          bash scripts/terraform-apply.sh terraform/environments/$ACCOUNT_NAME
+          bash scripts/terraform-plan.sh terraform/environments/$ACCOUNT_NAME
     env:
       ACCOUNT_NAME: ${{ matrix.nuke_accts }}
