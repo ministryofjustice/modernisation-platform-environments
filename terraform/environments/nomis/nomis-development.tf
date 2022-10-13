@@ -39,7 +39,31 @@ locals {
       # *-nomis-db-3: HA
 
     }
-    weblogics          = {}
+    weblogics = {}
+    ec2_test = {
+      "dev-base-rhel79-1" = {
+        tags = {
+          server-type = "base-rhel79"
+          description = "Standalone EC2 for testing RHEL7.9 base image"
+          monitored   = false
+          always-on   = false
+        }
+        ami_name = "nomis_rhel_7_9_baseimage*"
+        branch   = var.BRANCH_NAME
+      }
+    }
+    ec2_test_asg = {
+      dev-base-rhel79 = {
+        tags = {
+          server-type = "base-rhel79"
+          description = "Standalone EC2 for testing RHEL7.9 base image"
+          monitored   = false
+          always-on   = false
+        }
+        ami_name = "nomis_rhel_7_9_baseimage*"
+        branch   = var.BRANCH_NAME
+      }
+    }
   }
 }
 
