@@ -50,6 +50,11 @@ locals {
         }
         ami_name = "nomis_rhel_7_9_baseimage*"
         branch   = var.BRANCH_NAME
+        instance = {
+          private_dns_name_options = {
+            hostname_type = "ip-name"
+          }
+        }
       }
     }
     ec2_test_asgs = {
