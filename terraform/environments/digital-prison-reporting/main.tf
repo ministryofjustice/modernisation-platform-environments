@@ -140,7 +140,7 @@ module "kinesis_stream_domain_data" {
 }
 
 # kinesis DEMO Data Stream
-module "kinesis_stream_domain_data" {
+module "kinesis_stream_demo_data" {
   source                    = "./modules/kinesis_stream"
   create_kinesis_stream     = local.create_kinesis
   name                      = "${local.project}-kinesis-data-demo-${local.env}"
