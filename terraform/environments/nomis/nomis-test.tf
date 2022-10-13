@@ -55,21 +55,6 @@ locals {
           monitored = true
         }
       }
-      TEST_DB = {
-        always_on              = false
-        ami_name               = "nomis_database_2022-08-25T08-18-55.566Z*"
-        asm_data_capacity      = 50
-        asm_flash_capacity     = 10
-        description            = "Blank db install for Sandhya, to be removed EOD Monday"
-        termination_protection = false
-        oracle_app_disk_size = {
-          "/dev/sdb" = 100 # /u01
-          "/dev/sdc" = 100 # /u02
-        }
-        tags = {
-          monitored = false
-        }
-      }
     }
 
     # Add database instances here. They will be created using ec2-database.tf
@@ -87,7 +72,7 @@ locals {
           monitored   = false
           always-on   = true
         }
-        ami_name = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-03T12-51-25.032Z"
+        ami_name = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-07T12-48-08.562Z"
         instance = {
           disable_api_termination = true
         }
@@ -106,26 +91,6 @@ locals {
       }
     }
     # Add base instances here. They will be created using the base_instance module
-    test_instances_asg = {
-      AUDITUPLOADTEST = {
-        always_on     = false
-        ami_name      = "nomis_db_STIG_CNOMT1-2022-04-21T11.33.39Z*"
-        description   = "Test instance for audit upload script"
-        instance_type = "r6i.xlarge"
-        tags = {
-          monitored = false
-        }
-      }
-      RHEL79BASE = {
-        always_on     = false
-        ami_name      = "nomis_rhel_7_9_baseimage*"
-        description   = "Test instance for RHEL7.9 base image"
-        instance_type = "t2.medium"
-        tags = {
-          monitored   = false
-          server-type = "base"
-        }
-      }
-    }
+    test_instances_asg = {}
   }
 }
