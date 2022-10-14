@@ -43,7 +43,7 @@ resource "aws_lb" "external" {
   security_groups = [aws_security_group.example_load_balancer_sg.id]
 
   access_logs {
-    bucket  = "example-bucket"
+    bucket  = module.s3-bucket.bucket.id
     prefix  = "test-lb"
     enabled = true
   }
@@ -57,7 +57,7 @@ resource "aws_lb" "external" {
 
   depends_on = [aws_security_group.example_ec2_sg]
 }
-# Create the target group 
+# Create the target group
 resource "aws_lb_target_group" "target_group" {
   name                 = "${local.application_name}-tg-${local.environment}"
   port                 = local.application_data.accounts[local.environment].server_port
