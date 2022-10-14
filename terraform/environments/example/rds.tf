@@ -5,14 +5,14 @@
 
 
 resource "aws_db_instance" "Example-RDS" {
-  engine                      = "mysql"
-  engine_version              = "5.7"
-  auto_minor_version_upgrade  = true
-  instance_class              = local.application_data.accounts[local.environment].db_instance_class
-  db_name                     = "${local.application_name}${local.environment}database"
-  identifier                  = "${local.application_name}-${local.environment}-database"
-  username                    = local.application_data.accounts[local.environment].db_user
-  password                    = aws_secretsmanager_secret_version.db_password.secret_string
+  engine                     = "mysql"
+  engine_version             = "5.7"
+  auto_minor_version_upgrade = true
+  instance_class             = local.application_data.accounts[local.environment].db_instance_class
+  db_name                    = "${local.application_name}${local.environment}database"
+  identifier                 = "${local.application_name}-${local.environment}-database"
+  username                   = local.application_data.accounts[local.environment].db_user
+  password                   = aws_secretsmanager_secret_version.db_password.secret_string
   # tflint-ignore: aws_db_instance_default_parameter_group
   parameter_group_name        = "default.mysql5.7"
   skip_final_snapshot         = local.application_data.accounts[local.environment].skip_final_snapshot
