@@ -63,13 +63,14 @@ locals {
       # *-nomis-db-1: NOMIS, NDH, TRDATA
       # *-nomis-db-2: MIS, AUDIT
       # *-nomis-db-3: HA
-      t1-nomis-db-1 = {
+      /* t1-nomis-db-1 = {
         tags = {
           server-type = "nomis-db"
           description = "T1 NOMIS test database to replace Azure T1PDL0009"
           oracle-sids = "CNOMT1"
           monitored   = false
           always-on   = true
+          s3-db-restore-dir = "CNOMT1_20211214"
         }
         ami_name = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-07T12-48-08.562Z"
         instance = {
@@ -80,8 +81,7 @@ locals {
           flash = { total_size = 2 }
         }
         branch            = "nomis/DSOS-1426/load-CNOMT1-data-role"
-        s3-db-restore-dir = "CNOMT1_20211214"
-      }
+      } */
 
       t1-nomis-db-2 = {
         tags = {
