@@ -37,7 +37,7 @@ locals {
     ssm_parameters    = {}
 
     user_data = {
-      scripts     = ["ansible.sh.tftpl"]
+      scripts     = ["ansible-ec2provision.sh.tftpl"]
       write_files = {}
     }
 
