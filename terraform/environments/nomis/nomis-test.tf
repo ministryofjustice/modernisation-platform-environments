@@ -72,7 +72,8 @@ locals {
           monitored   = false
           always-on   = true
         }
-        ami_name = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-07T12-48-08.562Z"
+        ami_name  = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-07T12-48-08.562Z"
+        ami_owner = "self" # remove this line next time AMI is updated so core-shared-services-production used instead
         instance = {
           disable_api_termination = true
         }

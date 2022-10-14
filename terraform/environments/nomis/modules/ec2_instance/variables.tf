@@ -49,6 +49,11 @@ variable "tags" {
   description = "Default tags to be applied to resources"
 }
 
+variable "account_ids_lookup" {
+  description = "A map of account names to account ids that can be used for AMI owner"
+  default     = {}
+}
+
 variable "ansible_repo" {
   type        = string
   description = "Optionally provision the server using this ansible_repo"

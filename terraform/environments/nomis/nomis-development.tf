@@ -39,11 +39,11 @@ locals {
       # *-nomis-db-3: HA
 
     }
-    weblogics = {}
+    weblogics          = {}
+    ec2_test_instances = {}
     ec2_test_autoscaling_groups = {
       dev-base-rhel79 = {
         tags = {
-          server-type = "base-rhel79"
           description = "Standalone EC2 for testing RHEL7.9 base image"
           monitored   = false
         }

@@ -62,12 +62,18 @@ resource "aws_launch_template" "this" {
   # all volumes will get tagged with the same name
   tag_specifications {
     resource_type = "volume"
-    tags = merge(
-      var.tags,
-      {
-        Name = "${var.name}-volume"
-      }
-    )
+    tags = merge(local.tags, {
+      Name = "${var.name}-volume"
+    })
+  }
+
+  lifecycle {
+    # description and tags will be updated by Image Builder
+    ignore_changes = [
+      description,
+      tags["CreatedBy"],
+      tags_all["CreatedBy"],
+    ]
   }
 }
 
