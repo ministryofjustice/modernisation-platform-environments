@@ -73,7 +73,7 @@ data "aws_iam_policy_document" "bucket_policy" {
     actions = [
       "s3:PutObject"
     ]
-    resources = ["${module.s3-bucket[0].bucket.arn}/test-lb/AWSLogs/*"]
+    resources = ["${module.s3-bucket.bucket.arn}/test-lb/AWSLogs/*"]
     principals {
       type        = "AWS"
       identifiers = [data.aws_elb_service_account.default.arn]
@@ -91,7 +91,7 @@ data "aws_iam_policy_document" "bucket_policy" {
       "s3:PutObject"
     ]
 
-    resources = ["${module.s3-bucket[0].bucket.arn}/test-lb/AWSLogs/*"]
+    resources = ["${module.s3-bucket.bucket.arn}/test-lb/AWSLogs/*"]
 
     condition {
       test     = "StringEquals"
@@ -116,7 +116,7 @@ data "aws_iam_policy_document" "bucket_policy" {
     ]
 
     resources = [
-      module.s3-bucket[0].bucket.arn
+      module.s3-bucket.bucket.arn
     ]
   }
 }
