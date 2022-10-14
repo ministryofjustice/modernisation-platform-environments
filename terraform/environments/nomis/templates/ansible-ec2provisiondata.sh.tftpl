@@ -71,7 +71,7 @@ run_ansible() {
   echo "# Execute ansible"
   ansible-playbook site.yml \
    --connection=local \
-   --inventory localhost \
+   --inventory localhost, \
    --extra-vars "ansible_python_interpreter=$python" \
    --extra-vars "target=localhost" \
    --extra-vars "@group_vars/environment_name_$environment_name.yml" \
