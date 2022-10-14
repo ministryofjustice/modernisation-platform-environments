@@ -41,3 +41,34 @@ ebs_volumes = {
   "/dev/sdf" = { size = 150 }
 }
 ```
+## Restoring a database backup from an s3 bucket to a database instance
+
+Using ec2-database.tf (which uses the ec2-instance module) you can restore a database backup from an s3 bucket to a database instance.
+
+To create an EC2 instance with the CNOMT1_20211214 backup you need to include a tag 's3-db-restore-dir' with the value `<db_name>_YYYYMMDD` in the relevant environment (locals{} in nomis-*.tf). This will run the db_restore role in [modernisation-platforms-configuration-management](https://github.com/ministryofjustice/modernisation-platform-configuration-management) assuming the backup exist in `nomis-db-backup-bucket20220131102905687200000001` s3 bucket.
+
+### Example db EC2 instance with s3-db-restore-dir tag
+
+e.g. nomis-test.tf
+```
+      t1-nomis-db-1 = {
+        tags = {
+          server-type = "nomis-db"
+          description = "T1 NOMIS test database to replace Azure T1PDL0009"
+          oracle-sids = "CNOMT1"
+          monitored   = false
+          always-on   = true
+          s3-db-restore-dir = "CNOMT1_20211214"
+        }
+        ami_name = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-07T12-48-08.562Z"
+        instance = {
+          disable_api_termination = true
+        }
+        ebs_volume_config = {
+          data  = { total_size = 200 }
+          flash = { total_size = 2 }
+        }
+      }
+```
+NOTE: oracle-sids is used earlier in the setup and there may be more then one in some cases. 
+
