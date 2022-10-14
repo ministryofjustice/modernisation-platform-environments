@@ -261,7 +261,7 @@ resource "aws_security_group" "database_common" {
 }
 
 #------------------------------------------------------------------------------
-# Policy for PUT access to database backups
+# Policy for PUT, GET, LIST access to database backups
 #------------------------------------------------------------------------------
 
 data "aws_iam_policy_document" "s3_db_backup_bucket_access" {
@@ -270,6 +270,8 @@ data "aws_iam_policy_document" "s3_db_backup_bucket_access" {
     effect = "Allow"
     actions = [
       "s3:PutObject",
+      "s3:ListBucket",
+      "s3:GetObject"
     ]
     resources = [module.nomis-db-backup-bucket.bucket.arn,
     "${module.nomis-db-backup-bucket.bucket.arn}/*"]
