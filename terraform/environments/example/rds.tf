@@ -13,6 +13,7 @@ resource "aws_db_instance" "Example-RDS" {
   identifier                  = "${local.application_name}-${local.environment}-database"
   username                    = local.application_data.accounts[local.environment].db_user
   password                    = aws_secretsmanager_secret_version.db_password.secret_string
+  # tflint-ignore: aws_db_instance_default_parameter_group
   parameter_group_name        = "default.mysql5.7"
   skip_final_snapshot         = local.application_data.accounts[local.environment].skip_final_snapshot
   allocated_storage           = local.application_data.accounts[local.environment].db_allocated_storage

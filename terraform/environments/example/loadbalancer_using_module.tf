@@ -33,7 +33,7 @@ locals {
 
 # Load balancer build using the module
 module "lb_access_logs_enabled" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer?ref=v2.0.0"
   providers = {
     # Here we use the default provider for the S3 bucket module, buck replication is disabled but we still
     # Need to pass the provider to the S3 bucket module
@@ -52,7 +52,7 @@ module "lb_access_logs_enabled" {
   idle_timeout               = 60
 }
 
-# Create the target group 
+# Create the target group
 resource "aws_lb_target_group" "target_group_module" {
   name                 = "${local.application_name}-tg-mlb-${local.environment}"
   port                 = local.application_data.accounts[local.environment].server_port
