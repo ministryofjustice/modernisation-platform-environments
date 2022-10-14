@@ -40,28 +40,15 @@ locals {
 
     }
     weblogics = {}
-    ec2_test_instances = {
-      "dev-base-rhel79-1" = {
-        tags = {
-          server-type = "base-rhel79"
-          description = "Standalone EC2 for testing RHEL7.9 base image"
-          monitored   = false
-          always-on   = false
-        }
-        ami_name = "nomis_rhel_7_9_baseimage*"
-        branch   = var.BRANCH_NAME
-      }
-    }
-    ec2_test_asgs = {
+    ec2_test_autoscaling_groups = {
       dev-base-rhel79 = {
         tags = {
           server-type = "base-rhel79"
           description = "Standalone EC2 for testing RHEL7.9 base image"
           monitored   = false
-          always-on   = false
         }
         ami_name = "nomis_rhel_7_9_baseimage*"
-        branch   = var.BRANCH_NAME
+        # branch   = var.BRANCH_NAME # comment in if testing ansible
       }
     }
   }

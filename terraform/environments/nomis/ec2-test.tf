@@ -5,9 +5,11 @@
 # SET TAGS
 locals {
 
+  # user can manually increase the desired capacity to 1 via CLI/console 
+  # to create an instance
   ec2_test_autoscaling_group = {
-    desired_capacity = 1
-    max_size         = 1
+    desired_capacity = 0
+    max_size         = 2
     min_size         = 0
   }
 
@@ -49,9 +51,10 @@ locals {
     autoscaling_lifecycle_hooks = {}
 
     autoscaling_schedules = {
-      "scale_up" = merge(local.ec2_test_autoscaling_group, {
+      # if sizes not set, use the values defined in autoscaling_group
+      "scale_up" = {
         recurrence = "0 7 * * Mon-Fri"
-      })
+      }
       "scale_down" = {
         min_size         = 0
         max_size         = 0
@@ -100,14 +103,14 @@ module "ec2_test_instance" {
   branch               = try(each.value.branch, "main")
 }
 
-module "ec2_test_asg" {
-  source = "./modules/ec2_asg"
+module "ec2_test_autoscaling_group" {
+  source = "./modules/ec2_autoscaling_group"
 
   providers = {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
   }
 
-  for_each = try(local.environment_config.ec2_test_asgs, {})
+  for_each = try(local.environment_config.ec2_test_autoscaling_groups, {})
 
   name = each.key
 
@@ -119,7 +122,7 @@ module "ec2_test_asg" {
   ebs_volumes                 = { for k, v in local.ec2_test.ebs_volumes : k => merge(v, try(each.value.ebs_volumes[k], {})) }
   autoscaling_group           = merge(local.ec2_test.autoscaling_group, lookup(each.value, "autoscaling_group", {}))
   autoscaling_lifecycle_hooks = merge(local.ec2_test.autoscaling_lifecycle_hooks, lookup(each.value, "autoscaling_lifecycle_hooks", {}))
-  autoscaling_schedules       = merge(local.ec2_test.autoscaling_schedules, lookup(each.value, "autoscaling_schedules", {}))
+  autoscaling_schedules       = coalesce(lookup(each.value, "autoscaling_schedules", null), local.ec2_test.autoscaling_schedules)
 
   iam_resource_names_prefix = "ec2-test-asg"
   instance_profile_policies = local.ec2_common_managed_policies
