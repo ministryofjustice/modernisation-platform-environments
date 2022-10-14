@@ -46,7 +46,7 @@ ebs_volumes = {
 
 Using ec2-database.tf (which uses the ec2-instance module) you can restore a database backup from an s3 bucket to a database instance.
 
-To create an EC2 instance with the CNOMT1_20211214 backup you need to include a tag 's3-db-restore-dir' with the value `<db_name>_YYYYMMDD` in the relevant environment (locals{} in nomis-\*.tf). This will run the db_restore role in [modernisation-platforms-configuration-management](https://github.com/ministryofjustice/modernisation-platform-configuration-management) assuming the backup exist in `nomis-db-backup-bucket20220131102905687200000001` s3 bucket.
+To create an EC2 instance where you are restoring backup files from a directory (e.g. CNOMT1_20211214) you need to include a tag 's3-db-restore-dir' with the value `<db_name>_YYYYMMDD` in the relevant environment (locals{} in nomis-\*.tf). This will run the db_restore role in [modernisation-platforms-configuration-management](https://github.com/ministryofjustice/modernisation-platform-configuration-management) assuming the backup exist in `nomis-db-backup-bucket20220131102905687200000001` s3 bucket.
 
 ### Example db EC2 instance with s3-db-restore-dir tag
 
