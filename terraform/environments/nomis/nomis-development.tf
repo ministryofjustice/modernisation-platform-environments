@@ -40,8 +40,17 @@ locals {
 
     }
     weblogics          = {}
-    base_instances_asg = {}
-    test_instances_asg = {}
+    ec2_test_instances = {}
+    ec2_test_autoscaling_groups = {
+      dev-base-rhel79 = {
+        tags = {
+          description = "Standalone EC2 for testing RHEL7.9 base image"
+          monitored   = false
+        }
+        ami_name = "nomis_rhel_7_9_baseimage*"
+        # branch   = var.BRANCH_NAME # comment in if testing ansible
+      }
+    }
   }
 }
 

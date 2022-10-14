@@ -86,7 +86,7 @@ variable "ami_owner" {
 
 variable "name" {
   type        = string
-  description = "Provide a unique name for the instance"
+  description = "Provide a unique name for the auto scale group"
 }
 
 variable "instance" {
@@ -95,12 +95,9 @@ variable "instance" {
     disable_api_termination      = bool
     instance_type                = string
     key_name                     = string
-    metadata_options_http_tokens = optional(string)
     monitoring                   = optional(bool)
+    metadata_options_http_tokens = optional(string)
     vpc_security_group_ids       = list(string)
-    root_block_device = optional(object({
-      volume_size = number
-    }))
     private_dns_name_options = optional(object({
       enable_resource_name_dns_aaaa_record = optional(bool)
       enable_resource_name_dns_a_record    = optional(bool)
@@ -146,14 +143,6 @@ variable "ebs_volumes" {
   #  }))
 }
 
-variable "route53_records" {
-  description = "Optionally create internal and external DNS records"
-  type = object({
-    create_internal_record = bool
-    create_external_record = bool
-  })
-}
-
 variable "iam_resource_names_prefix" {
   type        = string
   description = "Prefix IAM resources with this prefix, e.g. ec2-database"
@@ -165,18 +154,46 @@ variable "instance_profile_policies" {
   description = "A list of managed IAM policy document ARNs to be attached to the database instance profile"
 }
 
-variable "ssm_parameters_prefix" {
-  type        = string
-  description = "Optionally prefix ssm parameters with this prefix.  Add a trailing /"
-  default     = ""
+variable "autoscaling_group" {
+  description = "See aws_autoscaling_group documentation"
+  type = object({
+    desired_capacity          = number
+    max_size                  = number
+    min_size                  = number
+    health_check_grace_period = optional(number)
+    health_check_type         = optional(string)
+    termination_policies      = optional(list(string))
+    target_group_arns         = optional(list(string))
+    wait_for_capacity_timeout = optional(number)
+    instance_refresh = optional(object({
+      strategy               = string
+      min_healthy_percentage = number
+      instance_warmup        = number
+    }))
+    warm_pool = optional(object({
+      pool_state                  = string
+      min_size                    = number
+      max_group_prepared_capacity = number
+      reuse_on_scale_in           = bool
+    }))
+  })
 }
 
-variable "ssm_parameters" {
+variable "autoscaling_lifecycle_hooks" {
+  description = "See aws_autoscaling_lifecycle_hook documentation.  Key=name"
   type = map(object({
-    random = object({
-      length  = number
-      special = bool
-    })
-    description = string
+    default_result       = string
+    heartbeat_timeout    = number
+    lifecycle_transition = string
+  }))
+}
+
+variable "autoscaling_schedules" {
+  description = "See aws_autoscaling_schedule documentation.  Key=name.  Values are taken from equivalent autoscaling_group value if null"
+  type = map(object({
+    min_size         = optional(number)
+    max_size         = optional(number)
+    desired_capacity = optional(number)
+    recurrence       = string
   }))
 }

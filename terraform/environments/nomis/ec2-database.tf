@@ -66,10 +66,12 @@ locals {
     }
 
     instance = {
-      disable_api_termination = false
-      instance_type           = "r6i.xlarge"
-      key_name                = aws_key_pair.ec2-user.key_name
-      vpc_security_group_ids  = [aws_security_group.database_common.id]
+      disable_api_termination      = false
+      instance_type                = "r6i.xlarge"
+      key_name                     = aws_key_pair.ec2-user.key_name
+      metadata_options_http_tokens = "optional" # the Oracle installer cannot accommodate a token
+      monitoring                   = true
+      vpc_security_group_ids       = [aws_security_group.database_common.id]
     }
 
     user_data = {
@@ -144,7 +146,7 @@ module "db_ec2_instance" {
   name = each.key
 
   ami_name              = each.value.ami_name
-  ami_owner             = local.account_id
+  ami_owner             = try(each.value.ami_owner, "core-shared-services-production")
   instance              = merge(local.database.instance, lookup(each.value, "instance", {}))
   user_data             = merge(local.database.user_data, lookup(each.value, "user_data", {}))
   ebs_volume_config     = merge(local.database.ebs_volume_config, lookup(each.value, "ebs_volume_config", {}))
@@ -156,14 +158,15 @@ module "db_ec2_instance" {
   iam_resource_names_prefix = "ec2-database"
   instance_profile_policies = concat(local.ec2_common_managed_policies, [aws_iam_policy.s3_db_backup_bucket_access.arn])
 
-  business_unit     = local.vpc_name
-  application_name  = local.application_name
-  environment       = local.environment
-  region            = local.region
-  availability_zone = local.availability_zone
-  subnet_set        = local.subnet_set
-  subnet_name       = "data"
-  tags              = merge(local.tags, local.database.tags, try(each.value.tags, {}))
+  business_unit      = local.vpc_name
+  application_name   = local.application_name
+  environment        = local.environment
+  region             = local.region
+  availability_zone  = local.availability_zone
+  subnet_set         = local.subnet_set
+  subnet_name        = "data"
+  tags               = merge(local.tags, local.database.tags, try(each.value.tags, {}))
+  account_ids_lookup = local.environment_management.account_ids
 
   ansible_repo         = "modernisation-platform-configuration-management"
   ansible_repo_basedir = "ansible"

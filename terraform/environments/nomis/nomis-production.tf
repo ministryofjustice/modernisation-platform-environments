@@ -73,7 +73,8 @@ locals {
           monitored   = false
           always-on   = true
         }
-        ami_name = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-03T12-51-25.032Z"
+        ami_name  = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-03T12-51-25.032Z"
+        ami_owner = "self" # remove this line next time AMI is updated so core-shared-services-production used instead
         instance = {
           instance_type           = "r6i.2xlarge"
           disable_api_termination = true
@@ -96,7 +97,8 @@ locals {
           monitored   = false
           always-on   = true
         }
-        ami_name = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-07T12-48-08.562Z"
+        ami_name  = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-07T12-48-08.562Z"
+        ami_owner = "self" # remove this line next time AMI is updated so core-shared-services-production used instead
         instance = {
           instance_type           = "r6i.2xlarge"
           disable_api_termination = true
@@ -118,7 +120,8 @@ locals {
           monitored   = false
           always-on   = true
         }
-        ami_name = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-07T12-48-08.562Z"
+        ami_name  = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-07T12-48-08.562Z"
+        ami_owner = "self" # remove this line next time AMI is updated so core-shared-services-production used instead
         instance = {
           instance_type           = "r6i.2xlarge"
           disable_api_termination = true
@@ -136,7 +139,5 @@ locals {
 
     # Add weblogic instances here.  They will be created using the weblogic module
     weblogics = {}
-    # Add base instances here. They will be created using the base_instance module
-    test_instances_asg = {}
   }
 }

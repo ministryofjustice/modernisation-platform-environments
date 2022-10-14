@@ -30,18 +30,8 @@ data "aws_ami" "this" {
   }
 }
 
-data "aws_route53_zone" "internal" {
-  provider = aws.core-vpc
-
-  name         = "${var.business_unit}-${var.environment}.modernisation-platform.internal."
-  private_zone = true
-}
-
-data "aws_route53_zone" "external" {
-  provider = aws.core-vpc
-
-  name         = "${var.business_unit}-${var.environment}.modernisation-platform.service.justice.gov.uk."
-  private_zone = false
+data "aws_kms_key" "by_alias" {
+  key_id = "alias/aws/ebs"
 }
 
 data "aws_ec2_instance_type" "this" {

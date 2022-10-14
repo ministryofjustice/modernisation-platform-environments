@@ -38,8 +38,6 @@ locals {
       # *-nomis-db-2: MIS, AUDIT
       # *-nomis-db-3: HA
     }
-    weblogics          = {}
-    base_instances_asg = {}
-    test_instances_asg = {}
+    weblogics = {}
   }
 }
