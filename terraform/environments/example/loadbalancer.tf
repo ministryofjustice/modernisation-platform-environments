@@ -1,4 +1,6 @@
 # Build loadbalancer security group
+
+data "aws_elb_service_account" "default" {}
 resource "aws_security_group" "example_load_balancer_sg" {
   name        = "example-lb-sg"
   description = "controls access to load balancer"

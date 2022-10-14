@@ -39,7 +39,7 @@ resource "aws_db_instance" "Example-RDS" {
 }
 
 resource "aws_iam_role" "rds_enhanced_monitoring" {
-  assume_role_policy = "${data.aws_iam_policy_document.rds_enhanced_monitoring[0].json}"
+  assume_role_policy = data.aws_iam_policy_document.rds_enhanced_monitoring[0].json
   count              = local.application_data.accounts[local.environment].db_monitoring_interval == 0 ? 0 : 1
   name_prefix        = "rds-enhanced-monitoring"
 }
@@ -47,7 +47,7 @@ resource "aws_iam_role" "rds_enhanced_monitoring" {
 resource "aws_iam_role_policy_attachment" "rds_enhanced_monitoring" {
   count      = local.application_data.accounts[local.environment].db_monitoring_interval == 0 ? 0 : 1
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonRDSEnhancedMonitoringRole"
-  role       = "${aws_iam_role.rds_enhanced_monitoring[0].name}"
+  role       = aws_iam_role.rds_enhanced_monitoring[0].name
 }
 
 data "aws_iam_policy_document" "rds_enhanced_monitoring" {
