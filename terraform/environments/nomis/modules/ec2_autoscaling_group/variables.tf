@@ -184,11 +184,11 @@ variable "autoscaling_lifecycle_hooks" {
 }
 
 variable "autoscaling_schedules" {
-  description = "See aws_autoscaling_schedule documentation.  Key=name"
+  description = "See aws_autoscaling_schedule documentation.  Key=name.  Values are taken from equivalent autoscaling_group value if null"
   type = map(object({
-    min_size         = number
-    max_size         = number
-    desired_capacity = number
+    min_size         = optional(number)
+    max_size         = optional(number)
+    desired_capacity = optional(number)
     recurrence       = string
   }))
 }

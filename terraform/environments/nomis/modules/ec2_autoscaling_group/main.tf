@@ -145,9 +145,9 @@ resource "aws_autoscaling_schedule" "this" {
   for_each = var.autoscaling_schedules
 
   scheduled_action_name  = "${var.name}-${each.key}"
-  min_size               = each.value.min_size
-  max_size               = each.value.max_size
-  desired_capacity       = each.value.desired_capacity
+  min_size               = coalesce(each.value.min_size, var.autoscaling_group.min_size)
+  max_size               = coalesce(each.value.max_size, var.autoscaling_group.max_size)
+  desired_capacity       = coalesce(each.value.desired_capacity, var.autoscaling_group.desired_capacity)
   recurrence             = each.value.recurrence
   autoscaling_group_name = aws_autoscaling_group.this.name
 }
