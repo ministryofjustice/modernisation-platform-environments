@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # S3 Bucket
 #------------------------------------------------------------------------------
-  #tfsec:ignore:aws-s3-enable-versioning
+#tfsec:ignore:aws-s3-enable-versioning
 module "s3-bucket" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.2.0"
 

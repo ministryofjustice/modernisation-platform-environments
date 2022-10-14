@@ -32,7 +32,7 @@ locals {
 }
 
 # Load balancer build using the module
-  #tfsec:ignore:aws-vpc-no-public-ingress-sgr
+#tfsec:ignore:aws-vpc-no-public-ingress-sgr
 module "lb_access_logs_enabled" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer?ref=v2.0.0"
   providers = {
