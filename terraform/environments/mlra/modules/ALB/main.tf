@@ -6,7 +6,6 @@ module "lb-access-logs-enabled" {
 
   vpc_all                    = var.vpc_all
   application_name           = var.application_name
-  # public_subnets             = [data.aws_subnet.public_subnets_a.id, data.aws_subnet.public_subnets_b.id, data.aws_subnet.public_subnets_c.id]
   public_subnets             = var.public_subnets
   region                     = var.region
   enable_deletion_protection = var.enable_deletion_protection
@@ -43,7 +42,7 @@ locals {
 
 resource "aws_lb_listener" "alb_listener" {
   load_balancer_arn = module.lb-access-logs-enabled.load_balancer.arn
-  port              = "443"
+  port              = var.listener_port
   protocol          = "HTTP"
   #TODO CHANGE_TO_HTTPS_AND_CERTIFICATE_ARN_TOBE_ADDED
 
@@ -69,14 +68,14 @@ resource "aws_lb_listener" "alb_listener" {
 resource "aws_lb_target_group" "alb_target_group" {
   # name                 = "${local.application_name}-target-group"
   name                 = "${var.application_name}-target-group"
-  port                 = 80
-  protocol             = "HTTP"
+  port                 = var.target_group_port
+  protocol             = var.protocol
   vpc_id               = var.vpc_id
-  deregistration_delay = 30
+  deregistration_delay = var.deregistration_delay
   health_check {
     interval            = var.healthcheck_interval
     path                = local.application_data.accounts[local.environment].alb_target_group_path
-    protocol            = "HTTP"
+    protocol            = var.protocol
     timeout             = var.healthcheck_timeout
     healthy_threshold   = var.healthcheck_healthy_threshold
     unhealthy_threshold = var.healthcheck_unhealthy_threshold

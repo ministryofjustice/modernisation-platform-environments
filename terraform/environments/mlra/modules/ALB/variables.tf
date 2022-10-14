@@ -14,29 +14,29 @@ variable "public_subnets" {
   type        = list(string)
   description = "Public subnets"
 }
-variable "loadbalancer_ingress_rules" {
-  description = "Security group ingress rules for the loadbalancer"
-  type = map(object({
-    description     = string
-    from_port       = number
-    to_port         = number
-    protocol        = string
-    security_groups = list(string)
-    cidr_blocks     = list(string)
-  }))
-}
+# variable "loadbalancer_ingress_rules" {
+#   description = "Security group ingress rules for the loadbalancer"
+#   type = map(object({
+#     description     = string
+#     from_port       = number
+#     to_port         = number
+#     protocol        = string
+#     security_groups = list(string)
+#     cidr_blocks     = list(string)
+#   }))
+# }
 
-variable "loadbalancer_egress_rules" {
-  description = "Security group egress rules for the loadbalancer"
-  type = map(object({
-    description     = string
-    from_port       = number
-    to_port         = number
-    protocol        = string
-    security_groups = list(string)
-    cidr_blocks     = list(string)
-  }))
-}
+# variable "loadbalancer_egress_rules" {
+#   description = "Security group egress rules for the loadbalancer"
+#   type = map(object({
+#     description     = string
+#     from_port       = number
+#     to_port         = number
+#     protocol        = string
+#     security_groups = list(string)
+#     cidr_blocks     = list(string)
+#   }))
+# }
 variable "vpc_all" {
   type        = string
   description = "The full name of the VPC (including environment) used to create resources"
@@ -58,9 +58,13 @@ variable "force_destroy_bucket" {
   description = "A boolean that indicates all objects (including any locked objects) should be deleted from the bucket so that the bucket can be destroyed without error. These objects are not recoverable."
   default     = false
 }
-variable "port" {
+variable "listener_port" {
   type        = string
   description = "The port number for the ALB Listener"
+}
+variable "target_group_port" {
+  type        = string
+  description = "The port number for the ALB Target Group"
 }
 variable "protocol" {
   type        = string
@@ -106,6 +110,11 @@ variable "ingress_cidr_block" {
   type        = string
   description = "The cidr block for the lb ingress rules"
 }
+# variable "egress_cidr_block" {
+#   type        = string
+#   description = "The cidr block for the lb ingress rules"
+# }
+
 
 
 
