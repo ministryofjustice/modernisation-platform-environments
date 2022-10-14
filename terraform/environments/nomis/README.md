@@ -19,6 +19,8 @@ The only NOMIS component currently in production is the audit database. This rec
 
 ### **Service URLs:**
 
+ - db.audit.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk:1521
+ _The endpoint is publically resolvable but is connectable only from within its own environment, the bastion or FixNGo._
 <!--  The URL(s) of the service’s production environment, and test environments if possible-->
 
 ### **Incident response hours:**
