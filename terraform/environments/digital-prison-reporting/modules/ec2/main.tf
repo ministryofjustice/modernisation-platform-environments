@@ -15,7 +15,7 @@ data "template_file" "user_data" {
 
 # Build the security group for the EC2
 resource "aws_security_group" "ec2_sec_group" {
-  name        = var.name
+  name        = "${var.name}-sgroup"
   description = var.description
   vpc_id      = var.vpc
   tags        = var.tags

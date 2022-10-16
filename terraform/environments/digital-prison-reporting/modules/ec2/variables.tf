@@ -48,6 +48,7 @@ variable "cidr" {
 }
 
 variable "ec2_instance_type" {}
+
 variable "ami_image_id" {}
 
 variable "subnet_ids" {
