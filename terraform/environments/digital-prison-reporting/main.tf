@@ -754,7 +754,7 @@ module "ec2_kinesis_agent" {
   ec2_instance_type           = local.instance_type
   ami_image_id                = local.image_id
   aws_region                  = local.account_region
-  ec2_terminate_behavior       = "terminate"
+  ec2_terminate_behavior      = "terminate"
   associate_public_ip_address = false
   ebs_optimized               = true
   monitoring                  = true

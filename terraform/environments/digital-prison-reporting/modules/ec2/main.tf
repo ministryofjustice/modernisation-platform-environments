@@ -2,7 +2,7 @@ data "template_file" "user_data" {
   template = file("${path.module}/scripts/bootstrap_apps.sh")
 
   vars = {
-    some_var              = "some_value"
+    some_var = "some_value"
   }
 }
 
@@ -88,7 +88,7 @@ resource "aws_launch_template" "ec2_template" {
   }
 
   tag_specifications {
-    tags        = var.tags
+    tags = var.tags
   }
 
   user_data = base64encode(data.template_file.user_data.rendered)
