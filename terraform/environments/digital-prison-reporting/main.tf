@@ -753,12 +753,14 @@ module "ec2_kinesis_agent" {
   subnet_ids                  = data.aws_subnet.private_subnets_a.id
   ec2_instance_type           = local.instance_type
   ami_image_id                = local.image_id
+  aws_region                  = local.account_region
+  ec2_terminate_behavior       = "terminate"
   associate_public_ip_address = false
   ebs_optimized               = true
   monitoring                  = true
   ebs_size                    = 20
   ebs_encrypted               = true
-  ebs_delete_on_termination   = true
+  ebs_delete_on_termination   = false
   s3_policy_arn               = aws_iam_policy.read_s3_read_access_policy.arn
 
   tags = merge(

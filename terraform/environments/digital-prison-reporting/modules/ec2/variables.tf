@@ -2,6 +2,10 @@ variable "name" {
   description = "The EC2 Sec name."
 }
 
+variable "aws_region" {}
+
+variable "ec2_terminate_behavior" {}
+
 variable "description" {
   type        = string
   default     = ""
