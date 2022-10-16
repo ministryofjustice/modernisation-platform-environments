@@ -10,9 +10,9 @@ mkdir -p /opt/kinesis/scripts
 
 # Add Kinesis Stream Directory where logs are delivered
 mkdir -p /opt/kinesis/kinesis-demo-stream
-chown -R ssm-user:ssm-user /opt/kinesis/kinesis-demo-stream
-chown -R ssm-user:ssm-user /opt/kinesis
-chmod -R 775 /opt/kinesis/kinesis-demo-stream
+#chown -R ssm-user:ssm-user /opt/kinesis/kinesis-demo-stream
+#chown -R ssm-user:ssm-user /opt/kinesis
+chmod -R 777 /opt/kinesis
 
 echo "assumeyes=1" >> /etc/yum.conf
 
