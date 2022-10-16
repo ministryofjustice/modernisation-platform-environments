@@ -55,6 +55,8 @@ cat <<EOF >/etc/aws-kinesis/agent.json
  }
 EOF
 
+chmod -R 777 /opt/kinesis
+
 # Start Stream at Start of the EC2
 sudo chkconfig aws-kinesis-agent on
 sudo service aws-kinesis-agent start
