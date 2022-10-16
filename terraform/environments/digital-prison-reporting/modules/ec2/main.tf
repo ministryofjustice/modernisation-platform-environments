@@ -88,7 +88,8 @@ resource "aws_launch_template" "ec2_template" {
   }
 
   tag_specifications {
-    tags = var.tags
+    resource_type = "instance"
+    tags          = var.tags
   }
 
   user_data = base64encode(data.template_file.user_data.rendered)
