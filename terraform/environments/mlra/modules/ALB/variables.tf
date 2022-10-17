@@ -14,29 +14,6 @@ variable "public_subnets" {
   type        = list(string)
   description = "Public subnets"
 }
-# variable "loadbalancer_ingress_rules" {
-#   description = "Security group ingress rules for the loadbalancer"
-#   type = map(object({
-#     description     = string
-#     from_port       = number
-#     to_port         = number
-#     protocol        = string
-#     security_groups = list(string)
-#     cidr_blocks     = list(string)
-#   }))
-# }
-
-# variable "loadbalancer_egress_rules" {
-#   description = "Security group egress rules for the loadbalancer"
-#   type = map(object({
-#     description     = string
-#     from_port       = number
-#     to_port         = number
-#     protocol        = string
-#     security_groups = list(string)
-#     cidr_blocks     = list(string)
-#   }))
-# }
 variable "vpc_all" {
   type        = string
   description = "The full name of the VPC (including environment) used to create resources"
@@ -58,29 +35,57 @@ variable "force_destroy_bucket" {
   description = "A boolean that indicates all objects (including any locked objects) should be deleted from the bucket so that the bucket can be destroyed without error. These objects are not recoverable."
   default     = false
 }
+variable "ingress_from_port" {
+  type        = string
+  description = "The from port for the lb ingress rules"
+}
+variable "ingress_to_port" {
+  type        = string
+  description = "The to port for the lb ingress rules"
+}
+variable "ingress_protocol" {
+  type        = string
+  description = "The protocol for the lb ingress rules"
+}
+variable "ingress_cidr_block" {
+  type        = string
+  description = "The cidr block for the lb ingress rules"
+}
 variable "listener_port" {
   type        = string
   description = "The port number for the ALB Listener"
+}
+variable "listener_protocol" {
+  type        = string
+  description = "The protocol for the ALB Listener"
 }
 variable "target_group_port" {
   type        = string
   description = "The port number for the ALB Target Group"
 }
-variable "protocol" {
+variable "target_group_protocol" {
   type        = string
-  description = "The protocol for the ALB Listener"
+  description = "The protocol for the ALB Target Group"
 }
 variable "vpc_id" {
   type        = string
   description = "The id for the VPC"
 }
-variable "deregistration_delay" {
+variable "target_group_deregistration_delay" {
   type        = string
   description = "The time in seconds for the deregistration delay"
 }
 variable "healthcheck_interval" {
   type        = string
   description = "The time in seconds for the health check interval"
+}
+variable "healthcheck_path" {
+  type        = string
+  description = "The path value for the health check"
+}
+variable "healthcheck_protocol" {
+  type        = string
+  description = "The protocol for the health check"
 }
 variable "healthcheck_timeout" {
   type        = string
@@ -106,39 +111,3 @@ variable "stickiness_cookie_duration" {
   type        = string
   description = "The cookie duration in seconds for the stickiness"
 }
-variable "ingress_cidr_block" {
-  type        = string
-  description = "The cidr block for the lb ingress rules"
-}
-variable "healthcheck_path" {
-  type        = string
-  description = "The path value for the health check"
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

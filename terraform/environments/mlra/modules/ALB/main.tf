@@ -19,18 +19,18 @@ module "lb-access-logs-enabled" {
 
 locals {
   loadbalancer_ingress_rules = {
-    "cluster_ec2_lb_ingress" = {
-      description     = "Cluster EC2 loadbalancer ingress rule"
-      from_port       = 443
-      to_port         = 443
-      protocol        = "tcp"
+    "lb_ingress" = {
+      description     = "Loadbalancer ingress rule"
+      from_port       = var.ingress_from_port
+      to_port         = var.ingress_to_port
+      protocol        = var.ingress_protocol
       cidr_blocks     = [var.ingress_cidr_block]
       security_groups = []
     }
   }
   loadbalancer_egress_rules = {
-    "cluster_ec2_lb_egress" = {
-      description     = "Cluster EC2 loadbalancer egress rule"
+    "lb_egress" = {
+      description     = "Loadbalancer egress rule"
       from_port       = 0
       to_port         = 0
       protocol        = "-1"
@@ -43,7 +43,7 @@ locals {
 resource "aws_lb_listener" "alb_listener" {
   load_balancer_arn = module.lb-access-logs-enabled.load_balancer.arn
   port              = var.listener_port
-  protocol          = "HTTP"
+  protocol          = var.listener_protocol
   #TODO CHANGE_TO_HTTPS_AND_CERTIFICATE_ARN_TOBE_ADDED
 
   default_action {
@@ -66,17 +66,15 @@ resource "aws_lb_listener" "alb_listener" {
 #therefore this will need to be added pending cutover strategy decisions
 
 resource "aws_lb_target_group" "alb_target_group" {
-  # name                 = "${local.application_name}-target-group"
   name                 = "${var.application_name}-target-group"
   port                 = var.target_group_port
-  protocol             = var.protocol
+  protocol             = var.target_group_protocol
   vpc_id               = var.vpc_id
-  deregistration_delay = var.deregistration_delay
+  deregistration_delay = var.target_group_deregistration_delay
   health_check {
     interval            = var.healthcheck_interval
-    # path                = local.application_data.accounts[local.environment].alb_target_group_path
     path                = var.healthcheck_path
-    protocol            = var.protocol
+    protocol            = var.healthcheck_protocol
     timeout             = var.healthcheck_timeout
     healthy_threshold   = var.healthcheck_healthy_threshold
     unhealthy_threshold = var.healthcheck_unhealthy_threshold
