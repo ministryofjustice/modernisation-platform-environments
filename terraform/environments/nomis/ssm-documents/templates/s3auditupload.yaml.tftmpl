@@ -46,8 +46,8 @@ mainSteps:
         # Get required extra vars and run ansible
         INSTANCE_ID=$(curl http://instance-data/latest/meta-data/instance-id)
         PY_INTERPRETER=$(which python3.9)
-        git clone -b ${branch} --single-branch "https://github.com/ministryofjustice/modernisation-platform-environments.git"
-        cd modernisation-platform-environments/terraform/environments/nomis/ansible
+        git clone -b ${branch} --single-branch "https://github.com/ministryofjustice/modernisation-platform-configuration-management.git"
+        cd modernisation-platform-configuration-management/ansible
         python3.9 -m pip install -r requirements.txt
         ansible-galaxy role install -r requirements.yml
         ansible-galaxy collection install -r requirements.yml
