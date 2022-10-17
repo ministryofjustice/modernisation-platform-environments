@@ -110,10 +110,10 @@ variable "ingress_cidr_block" {
   type        = string
   description = "The cidr block for the lb ingress rules"
 }
-# variable "egress_cidr_block" {
-#   type        = string
-#   description = "The cidr block for the lb ingress rules"
-# }
+variable "healthcheck_path" {
+  type        = string
+  description = "The path value for the health check"
+}
 
 
 

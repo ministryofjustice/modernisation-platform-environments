@@ -20,6 +20,7 @@ module "alb" {
   # egress_cidr_block          = ["0.0.0.0/0"]
   deregistration_delay       = 30
   healthcheck_interval       = 15
+  healthcheck_path           = "/mlra/"
   healthcheck_timeout        = 5
   healthcheck_healthy_threshold = 2
   healthcheck_unhealthy_threshold = 3

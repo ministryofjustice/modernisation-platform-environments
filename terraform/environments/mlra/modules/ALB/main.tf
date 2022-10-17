@@ -24,7 +24,7 @@ locals {
       from_port       = 443
       to_port         = 443
       protocol        = "tcp"
-      cidr_blocks     = var.ingress_cidr_block
+      cidr_blocks     = [var.ingress_cidr_block]
       security_groups = []
     }
   }
@@ -74,7 +74,8 @@ resource "aws_lb_target_group" "alb_target_group" {
   deregistration_delay = var.deregistration_delay
   health_check {
     interval            = var.healthcheck_interval
-    path                = local.application_data.accounts[local.environment].alb_target_group_path
+    # path                = local.application_data.accounts[local.environment].alb_target_group_path
+    path                = var.healthcheck_path
     protocol            = var.protocol
     timeout             = var.healthcheck_timeout
     healthy_threshold   = var.healthcheck_healthy_threshold
