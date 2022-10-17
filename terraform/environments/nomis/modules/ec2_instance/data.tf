@@ -14,7 +14,7 @@ data "aws_subnet" "this" {
 
 data "aws_ami" "this" {
   most_recent = true
-  owners      = [var.ami_owner]
+  owners      = [try(var.account_ids_lookup[var.ami_owner], var.ami_owner)]
   tags = {
     is-production = true # based on environment
   }

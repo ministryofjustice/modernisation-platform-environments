@@ -6,7 +6,6 @@ run_ansible() {
 
   echo "ansible_repo:         ${ansible_repo}"
   echo "ansible_repo_basedir: ${ansible_repo_basedir}"
-  echo "ansible_args:         ${ansible_args}"
   echo "branch:               ${branch}"
 
   if [[ ${branch} != "main" ]]; then
@@ -72,12 +71,13 @@ run_ansible() {
   echo "# Execute ansible"
   ansible-playbook site.yml \
    --connection=local \
-   --inventory localhost \
+   --inventory localhost, \
    --extra-vars "ansible_python_interpreter=$python" \
    --extra-vars "target=localhost" \
    --extra-vars "@group_vars/environment_name_$environment_name.yml" \
    --extra-vars "@group_vars/server_type_$server_type.yml" \
-   --become ${ansible_args}
+   --tags ec2provisiondata \
+   --become
 
   echo "# Cleanup"
   deactivate
@@ -86,6 +86,6 @@ run_ansible() {
   rmdir $ansible_dir
 }
 
-echo "ansible.sh start" | logger -p local3.info -t user-data
+echo "ansible-ec2provisiondata.sh start" | logger -p local3.info -t user-data
 run_ansible 2>&1 | logger -p local3.info -t user-data
-echo "ansible.sh end" | logger -p local3.info -t user-data
+echo "ansible-ec2provisiondata.sh end" | logger -p local3.info -t user-data

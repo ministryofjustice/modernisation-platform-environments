@@ -7,10 +7,13 @@ on:
     - cron: '0 12 * * 0'
   workflow_dispatch:
 env:
-  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_REGION: "eu-west-2"
+  ENVIRONMENT_MANAGEMENT: ${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}
   NUKE_DO_NOT_RECREATE_ENVIRONMENTS: performance-hub-development,example-development,testing-test-development,
   TF_IN_AUTOMATION: true
+permissions:
+  id-token: write # This is required for requesting the JWT
+  contents: read # This is required for actions/checkout
 defaults:
   run:
     shell: bash
@@ -18,19 +21,36 @@ defaults:
 jobs:
 
   redeploy-after-nuke:
+    strategy:
+      fail-fast: false
+      matrix:
+        # current content of nuke list: {"COOKER_DEVELOPMENT_ACCID","SPRINKLER_DEVELOPMENT_ACCID","EXAMPLE_DEVELOPMENT_ACCID","TESTING_TEST_DEVELOPMENT_ACCID,"DELIUS_IAPS_DEVELOPMENT_ACCID"}
+        # matrix values are contents of that list minus accounts in the exclusion list defined in NUKE_DO_NOT_RECREATE_ENVIRONMENTS.
+        nuke_accts: [sprinkler, delius-iaps]
     name: Redeploy after nuke
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3.1.0
+      - name: Set Account Number
+        run: echo "ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}-development" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)" >> $GITHUB_ENV
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
+          role-session-name: githubactionsrolesession
+          aws-region: ${{ env.AWS_REGION }}
       - name: Load and Configure Terraform
-        uses: hashicorp/setup-terraform@v2.0.0
+        uses: hashicorp/setup-terraform@v2.0.2
         with:
           terraform_version: "~1"
           terraform_wrapper: false
-      - name: Terraform apply - after nuke
+      - name: Apply after nuke - ${{ matrix.nuke_accts }}
         run: |
           terraform --version
-          echo "BEGIN: Redeploy after nuke"
-          bash scripts/terraform-apply-after-nuke.sh
-          echo "END: Redeploy after nuke"
+          echo "Terraform apply - ${ACCOUNT_NAME}"
+          bash scripts/terraform-init.sh terraform/environments/$ACCOUNT_NAME
+          terraform -chdir="terraform/environments/${ACCOUNT_NAME}" workspace select "${ACCOUNT_NAME}-development"
+          bash scripts/terraform-apply.sh terraform/environments/$ACCOUNT_NAME
+    env:
+      ACCOUNT_NAME: ${{ matrix.nuke_accts }}

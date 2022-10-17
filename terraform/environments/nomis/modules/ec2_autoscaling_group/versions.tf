@@ -5,6 +5,15 @@ terraform {
       source                = "hashicorp/aws"
       configuration_aliases = [aws.core-vpc]
     }
+    cloudinit = {
+      version = "~> 2.2"
+      source  = "hashicorp/cloudinit"
+    }
+
+    random = {
+      version = "= 3.4.1"
+      source  = "hashicorp/random"
+    }
   }
   required_version = ">= 1.1.7"
 }
