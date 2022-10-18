@@ -76,6 +76,10 @@ updates:
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
+    directory: "/terraform/environments/maatdb"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
     directory: "/terraform/environments/mlra"
     schedule:
       interval: "daily"
@@ -84,11 +88,11 @@ updates:
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
-    directory: "/terraform/environments/nomis/modules/base_instance"
+    directory: "/terraform/environments/nomis/modules/database"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
-    directory: "/terraform/environments/nomis/modules/database"
+    directory: "/terraform/environments/nomis/modules/ec2_autoscaling_group"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
@@ -97,10 +101,6 @@ updates:
       interval: "daily"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/nomis/modules/sns_topic"
-    schedule:
-      interval: "daily"
-  - package-ecosystem: "terraform"
-    directory: "/terraform/environments/nomis/modules/test_instance_asg"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"

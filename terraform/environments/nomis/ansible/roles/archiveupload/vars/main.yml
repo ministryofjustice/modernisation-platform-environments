@@ -1,4 +1,0 @@
----
-# vars file for archiveupload
-bucket_name: ${bucket_name}
-bucket_prefix: ${bucket_prefix}

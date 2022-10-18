@@ -1,11 +1,12 @@
 #------------------------------------------------------------------------------
 # S3 Bucket
 #------------------------------------------------------------------------------
-module "s3-bucket" {
+module "s3-bucket" { #tfsec:ignore:aws-s3-enable-versioning
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.2.0"
 
   bucket_prefix      = "s3-bucket-example"
   versioning_enabled = false
+  bucket_policy      = [data.aws_iam_policy_document.bucket_policy.json]
 
   # Refer to the below section "Replication" before enabling replication
   replication_enabled = false
@@ -64,4 +65,58 @@ module "s3-bucket" {
   tags = merge(local.tags,
     { Name = lower(format("s3-bucket-%s-%s-example", local.application_name, local.environment)) }
   )
+}
+
+data "aws_iam_policy_document" "bucket_policy" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "s3:PutObject"
+    ]
+    resources = ["${module.s3-bucket.bucket.arn}/test-lb/AWSLogs/*"]
+    principals {
+      type        = "AWS"
+      identifiers = [data.aws_elb_service_account.default.arn]
+    }
+  }
+  statement {
+    sid = "AWSLogDeliveryWrite"
+
+    principals {
+      type        = "Service"
+      identifiers = ["delivery.logs.amazonaws.com"]
+    }
+
+    actions = [
+      "s3:PutObject"
+    ]
+
+    resources = ["${module.s3-bucket.bucket.arn}/test-lb/AWSLogs/*"]
+
+    condition {
+      test     = "StringEquals"
+      variable = "s3:x-amz-acl"
+
+      values = [
+        "bucket-owner-full-control"
+      ]
+    }
+  }
+
+  statement {
+    sid = "AWSLogDeliveryAclCheck"
+
+    principals {
+      type        = "Service"
+      identifiers = ["delivery.logs.amazonaws.com"]
+    }
+
+    actions = [
+      "s3:GetBucketAcl"
+    ]
+
+    resources = [
+      module.s3-bucket.bucket.arn
+    ]
+  }
 }
