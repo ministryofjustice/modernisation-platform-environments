@@ -99,6 +99,21 @@ resource "aws_lb_target_group" "alb_target_group" {
 #  appnameenv = "${local.application_name}-${local.environment}"
 #}
 
+# Get the map of pagerduty integration keys from the modernisation platform account
+data "aws_secretsmanager_secret" "pagerduty_integration_keys" {
+  provider = aws.modernisation-platform
+  name     = "pagerduty_integration_keys"
+}
 
+data "aws_secretsmanager_secret_version" "pagerduty_integration_keys" {
+  provider  = aws.modernisation-platform
+  secret_id = data.aws_secretsmanager_secret.pagerduty_integration_keys.id
+}
+
+module "pagerduty_core_alerts" {
+  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=1.0"
+  sns_topics                = ["config", "securityhub-alarms", "cloudtrail"]
+  pagerduty_integration_key = local.pagerduty_integration_keys["core_alerts_cloudwatch"]
+}
 
 
