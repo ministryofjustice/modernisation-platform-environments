@@ -100,6 +100,11 @@ resource "aws_lb_target_group" "alb_target_group" {
 #}
 
 # Get the map of pagerduty integration keys from the modernisation platform account
+# SNS topic for monitoring to send alarms to
+resource "aws_sns_topic" "high_priority" {
+  name = "high_priority"
+}
+
 data "aws_secretsmanager_secret" "pagerduty_integration_keys" {
   provider = aws.modernisation-platform
   name     = "pagerduty_integration_keys"
@@ -112,7 +117,7 @@ data "aws_secretsmanager_secret_version" "pagerduty_integration_keys" {
 
 module "pagerduty_core_alerts" {
   source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=1.0"
-  sns_topics                = ["config", "securityhub-alarms", "cloudtrail"]
+  sns_topics                = [aws_sns_topic.high_priority.name]
   pagerduty_integration_key = local.pagerduty_integration_keys["core_alerts_cloudwatch"]
 }
 

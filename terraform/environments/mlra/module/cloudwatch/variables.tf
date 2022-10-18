@@ -27,7 +27,7 @@ variable "appnameenv" {
 }
 
 data "aws_sns_topic" "mlrasns" {
-  name = "cloudtrail"
+  name = "high_priority"
 }
 
 variable "pECSCPUAlarmThreshold" {
