@@ -25,6 +25,11 @@ variable "appnameenv" {
   default = ""
 
 }
+
+data "aws_sns_topic" "mlrasns" {
+  name = "cloudtrail"
+}
+
 variable "pECSCPUAlarmThreshold" {
   description = "ECS CPU Alarm Threshold"
   type        = number
