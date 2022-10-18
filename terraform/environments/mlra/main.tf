@@ -87,7 +87,17 @@ resource "aws_lb_target_group" "alb_target_group" {
 }
 
 
-
+#TODO currently the cloud watch module is ready but is missing a few key imputs from the ALB setup
+#just waiting for these to be complete before making this section live
+#module "cwalarm" {
+#  source = "./modules/cloudwatch"
+#
+#  pClusterName = " "
+#  pAutoscalingGroupName = " "
+#  pLoadBalancerName = " "
+#  pTargetGroupName = aws_lb_target_group.alb_target_group.name 
+#  appnameenv = "${local.application_name}-${local.environment}"
+#}
 
 
 

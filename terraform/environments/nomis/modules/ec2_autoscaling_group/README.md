@@ -1,3 +1,3 @@
-# ec2-instance module
+# ec2-autoscaling-group module
 
-Terraform module for standing up a single EC2 instance
+Terraform module for standing up an auto-scale group
