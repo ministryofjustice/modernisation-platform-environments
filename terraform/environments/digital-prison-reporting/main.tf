@@ -18,6 +18,8 @@ locals {
   enable_glue_registry   = local.application_data.accounts[local.environment].create_glue_registries
   setup_buckets          = local.application_data.accounts[local.environment].setup_s3_buckets
   create_glue_connection = local.application_data.accounts[local.environment].create_glue_connections
+  image_id               = local.application_data.accounts[local.environment].ami_image_id
+  instance_type          = local.application_data.accounts[local.environment].ec2_instance_type
 
 
   all_tags = merge(
@@ -133,6 +135,29 @@ module "kinesis_stream_domain_data" {
       Name          = "${local.project}-kinesis-domain-data-${local.env}"
       Resource_Type = "Kinesis Data Stream"
       Component     = "Domain Data"
+    }
+  )
+}
+
+# kinesis DEMO Data Stream
+module "kinesis_stream_demo_data" {
+  source                    = "./modules/kinesis_stream"
+  create_kinesis_stream     = local.create_kinesis
+  name                      = "${local.project}-kinesis-data-demo-${local.env}"
+  shard_count               = 1
+  retention_period          = 24
+  shard_level_metrics       = ["IncomingBytes", "OutgoingBytes"]
+  enforce_consumer_deletion = false
+  encryption_type           = "KMS"
+  kms_key_id                = local.kinesis_kms_id
+  project_id                = local.project
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-kinesis-data-demo-${local.env}"
+      Resource_Type = "Kinesis Data Stream"
+      Component     = "Demo"
     }
   )
 }
@@ -714,6 +739,35 @@ module "s3_application_tf_state" {
     {
       Name          = "${local.project}-terraform-state-${local.environment}"
       Resource_Type = "S3 Bucket"
+    }
+  )
+}
+
+# Ec2
+module "ec2_kinesis_agent" {
+  source                      = "./modules/ec2"
+  name                        = "${local.project}-ec2-kinesis-agent-${local.env}"
+  description                 = "EC2 instance for kinesis agent"
+  vpc                         = data.aws_vpc.shared.id
+  cidr                        = [data.aws_vpc.shared.cidr_block]
+  subnet_ids                  = data.aws_subnet.private_subnets_a.id
+  ec2_instance_type           = local.instance_type
+  ami_image_id                = local.image_id
+  aws_region                  = local.account_region
+  ec2_terminate_behavior      = "terminate"
+  associate_public_ip_address = false
+  ebs_optimized               = true
+  monitoring                  = true
+  ebs_size                    = 20
+  ebs_encrypted               = true
+  ebs_delete_on_termination   = false
+  s3_policy_arn               = aws_iam_policy.read_s3_read_access_policy.arn
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-ec2-kinesis-agent-${local.env}"
+      Resource_Type = "EC2 Instance"
     }
   )
 }
