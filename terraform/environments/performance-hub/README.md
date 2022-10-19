@@ -13,7 +13,7 @@ _If you have any questions surrounding this page please post in the `#performanc
 
 ### **Description:**
 
-The HMPPS Performance Hub is a .NET Framework application with SQL Server database, which ingests data from various sources to produce performance metrics and reports for prisons and probation. 
+The HMPPS Performance Hub is a .NET Framework application with SQL Server database, which ingests data from various sources to produce performance metrics and reports for prisons and probation.
 
 It only holds aggreagted or anonymised information. Data ingestion is generally via manual upload of Excel and CSV files rather than direct feeds from other systems.
 
@@ -41,7 +41,6 @@ Also via MS Teams: ["HMPPS Performance Hub"](https://teams.microsoft.com/l/chann
 
 Modernisation Platform
 
-
 ## Optional
 
 ### **Other URLs:**
@@ -60,7 +59,7 @@ Unhandled exceptions and serious errors generate email alerts to performance-hub
 
 ### **Impact of an outage:**
 
-Short-term: minimal. The Performance Hub works on generally monthly reporting cycles, so a downtime of a few hours or even a couple of days is an inconvenience, not a disaster. 
+Short-term: minimal. The Performance Hub works on generally monthly reporting cycles, so a downtime of a few hours or even a couple of days is an inconvenience, not a disaster.
 
 Contact `hubusers@justice.gov.uk` for assitance in notifying key users and stakeholders of an outage.
 
@@ -77,4 +76,3 @@ There are no direct consumers of the application. The Performance Hub does perio
 The Performance Hub periodically performs automatic overnight data imports of data dropped into an Analyical Platform bucket. There are "manual" alternatives to this if it fails - users can upload data into the application directly.
 
 There is also a dependency on the GOV.UK Notify serice (see ["other URLs"](#other-urls) above).
-
