@@ -9,10 +9,10 @@ variable "cidr" {
 variable "redshift_ingress_sec_rules" {
   description = "A Map of map of security group Rules to associate with"
   default = {
-    "redshift" = {
+    "redshift-tcp" = {
       "from_port" = 5439,
       "to_port" : 5439,
-      "protocol" = "redshift-tcp"
+      "protocol" = "TCP"
     }
   }
 }
