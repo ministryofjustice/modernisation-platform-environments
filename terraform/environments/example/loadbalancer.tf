@@ -1,4 +1,5 @@
 # Build loadbalancer security group
+
 resource "aws_security_group" "example_load_balancer_sg" {
   name        = "example-lb-sg"
   description = "controls access to load balancer"
@@ -43,7 +44,7 @@ resource "aws_lb" "external" {
   security_groups = [aws_security_group.example_load_balancer_sg.id]
 
   access_logs {
-    bucket  = "example-bucket"
+    bucket  = module.s3-bucket.bucket.id
     prefix  = "test-lb"
     enabled = true
   }
@@ -57,7 +58,7 @@ resource "aws_lb" "external" {
 
   depends_on = [aws_security_group.example_ec2_sg]
 }
-# Create the target group 
+# Create the target group
 resource "aws_lb_target_group" "target_group" {
   name                 = "${local.application_name}-tg-${local.environment}"
   port                 = local.application_data.accounts[local.environment].server_port
@@ -100,7 +101,7 @@ resource "aws_lb_listener" "external" {
   port              = local.application_data.accounts[local.environment].server_port
   protocol          = local.application_data.accounts[local.environment].lb_listener_protocol
   #checkov:skip=CKV_AWS_2: "protocol for lb set in application_variables"
-  ssl_policy = "ELBSecurityPolicy-2016-08"
+  ssl_policy = local.application_data.accounts[local.environment].lb_listener_protocol == "HTTP" ? "" : "ELBSecurityPolicy-2016-08"
   #checkov:skip=CKV_AWS_103: "ssl_policy for lb set in application_variables"
 
   default_action {

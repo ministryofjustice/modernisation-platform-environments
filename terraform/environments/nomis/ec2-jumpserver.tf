@@ -98,7 +98,7 @@ resource "aws_autoscaling_group" "jumpserver" {
   }
   desired_capacity    = 1
   name                = "jumpserver-autoscaling-group"
-  min_size            = 1
+  min_size            = 0
   max_size            = 1
   force_delete        = true
   vpc_zone_identifier = data.aws_subnets.jumpserver.ids
@@ -138,7 +138,7 @@ resource "aws_security_group" "jumpserver-windows" {
     from_port   = "9100"
     to_port     = "9100"
     protocol    = "TCP"
-    cidr_blocks = [local.accounts[local.environment].database_external_access_cidr.cloud_platform]
+    cidr_blocks = [local.cidrs.cloud_platform]
   }
 
   egress {

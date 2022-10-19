@@ -10,7 +10,7 @@ resource "aws_instance" "this" {
   iam_instance_profile        = aws_iam_instance_profile.this.name
   instance_type               = var.instance.instance_type
   key_name                    = var.instance.key_name
-  monitoring                  = true
+  monitoring                  = var.instance.monitoring
   subnet_id                   = data.aws_subnet.this.id
   user_data                   = length(data.cloudinit_config.this) == 0 ? null : data.cloudinit_config.this[0].rendered
   vpc_security_group_ids      = var.instance.vpc_security_group_ids
@@ -18,8 +18,7 @@ resource "aws_instance" "this" {
   #checkov:skip=CKV_AWS_79:We are tied to v1 metadata service
   metadata_options {
     http_endpoint = "enabled"
-    #tfsec:ignore:aws-ec2-enforce-http-token-imds:the Oracle installer cannot accommodate a token
-    http_tokens = "optional"
+    http_tokens   = var.instance.metadata_options_http_tokens
   }
 
   root_block_device {
@@ -40,6 +39,15 @@ resource "aws_instance" "this" {
     content {
       device_name = ephemeral_block_device.value.device_name
       no_device   = true
+    }
+  }
+
+  dynamic "private_dns_name_options" {
+    for_each = var.instance.private_dns_name_options != null ? [var.instance.private_dns_name_options] : []
+    content {
+      enable_resource_name_dns_aaaa_record = private_dns_name_options.value.enable_resource_name_dns_aaaa_record
+      enable_resource_name_dns_a_record    = private_dns_name_options.value.enable_resource_name_dns_a_record
+      hostname_type                        = private_dns_name_options.value.hostname_type
     }
   }
 
