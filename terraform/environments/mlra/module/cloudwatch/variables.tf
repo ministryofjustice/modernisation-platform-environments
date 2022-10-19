@@ -27,7 +27,7 @@ variable "appnameenv" {
 }
 
 data "aws_sns_topic" "mlrasns" {
-  name = "high_priority"
+  name = "MLRA-Alerting-Topic-NonProd"
 }
 
 variable "pECSCPUAlarmThreshold" {

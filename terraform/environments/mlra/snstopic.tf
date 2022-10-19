@@ -1,3 +1,7 @@
+#Get Pagerduty keys from modplatform
+  pagerduty_integration_keys = jsondecode(data.aws_secretsmanager_secret_version.pagerduty_integration_keys.secret_string)
+
+
 # SNS topic for monitoring to send alarms to
 resource "aws_sns_topic" "mlra-alerting-topic-nonprod" {
   name = "MLRA-Alerting-Topic-NonProd"
