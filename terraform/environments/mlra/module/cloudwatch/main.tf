@@ -46,7 +46,7 @@ resource "aws_cloudwatch_metric_alarm" "cpuoverthreshold" {
   evaluation_periods = "5"
   #TODO needs alarm actions and snstopics resources added
   alarm_actions      = data.mlrasns.arn
-  ok_actions         = data.mlrasns.arn 
+  ok_actions         = data.mlrasns.arn
   threshold          = var.pASGCPUAlarmThreshold
   treat_missing_data = "breaching"
   dimensions = {
@@ -64,7 +64,7 @@ resource "aws_cloudwatch_metric_alarm" "statuscheckfailure" {
   evaluation_periods = "5"
   #TODO needs alarm actions and snstopics resources added
   alarm_actions      = data.mlrasns.arn
-  ok_actions         = data.mlrasns.arn 
+  ok_actions         = data.mlrasns.arn
   threshold          = var.pASGStatusFailureAlarmThreshold
   treat_missing_data = "breaching"
   dimensions = {
@@ -83,7 +83,7 @@ resource "aws_cloudwatch_metric_alarm" "targetresponsetime" {
   evaluation_periods = "5"
   #TODO needs alarm actions and snstopics resources added
   alarm_actions      = data.mlrasns.arn
-  ok_actions         = data.mlrasns.arn 
+  ok_actions         = data.mlrasns.arn
   threshold          = var.pALBTargetResponseTimeThreshold
   treat_missing_data = "notBreaching"
   dimensions = {
@@ -101,7 +101,7 @@ resource "aws_cloudwatch_metric_alarm" "targetResponsetimemaximum" {
   evaluation_periods = "1"
   #TODO needs alarm actions and snstopics resources added
   alarm_actions      = data.mlrasns.arn
-  ok_actions         = data.mlrasns.arn 
+  ok_actions         = data.mlrasns.arn
   threshold          = var.pALBTargetResponseTimeThresholdMaximum
   treat_missing_data = "notBreaching"
   dimensions = {
@@ -120,7 +120,7 @@ resource "aws_cloudwatch_metric_alarm" "unhealthyhosts" {
   #TODO needs alarm actions and snstopics resources added
   #AlarmActions
   alarm_actions      = data.mlrasns.arn
-  ok_actions         = data.mlrasns.arn 
+  ok_actions         = data.mlrasns.arn
   threshold          = var.pALBUnhealthyAlarmThreshold
   treat_missing_data = "notBreaching"
   dimensions = {
@@ -139,7 +139,7 @@ resource "aws_cloudwatch_metric_alarm" "rejectedconnectioncount" {
   evaluation_periods = "5"
   #TODO needs alarm actions and snstopics resources added
   alarm_actions      = data.mlrasns.arn
-  ok_actions         = data.mlrasns.arn 
+  ok_actions         = data.mlrasns.arn
   threshold          = var.pALBRejectedAlarmThreshold
   treat_missing_data = "notBreaching"
   dimensions = {
@@ -158,7 +158,7 @@ resource "aws_cloudwatch_metric_alarm" "http5xxerror" {
   #TODO needs alarm actions and snstopics resources added
   #AlarmActions
   alarm_actions      = data.mlrasns.arn
-  ok_actions         = data.mlrasns.arn  
+  ok_actions         = data.mlrasns.arn
   threshold          = var.pALBTarget5xxAlarmThreshold
   treat_missing_data = "notBreaching"
   dimensions = {
@@ -177,7 +177,7 @@ resource "aws_cloudwatch_metric_alarm" "applicationelb5xxerror" {
   #TODO needs alarm actions and snstopics resources added
   #AlarmActions
   alarm_actions      = data.mlrasns.arn
-  ok_actions         = data.mlrasns.arn  
+  ok_actions         = data.mlrasns.arn
   threshold          = var.pALB5xxAlarmThreshold
   treat_missing_data = "notBreaching"
   dimensions = {
@@ -196,7 +196,7 @@ resource "aws_cloudwatch_metric_alarm" "http4xxerror" {
   #TODO needs alarm actions and snstopics resources added
   #AlarmActions
   alarm_actions      = data.mlrasns.arn
-  ok_actions         = data.mlrasns.arn  
+  ok_actions         = data.mlrasns.arn
   threshold          = var.pALBTarget4xxAlarmThreshold
   treat_missing_data = "notBreaching"
   dimensions = {
@@ -215,7 +215,7 @@ resource "aws_cloudwatch_metric_alarm" "applicationelb4xxerror" {
   #TODO needs alarm actions and snstopics resources added
   #AlarmActions
   alarm_actions      = data.mlrasns.arn
-  ok_actions         = data.mlrasns.arn  
+  ok_actions         = data.mlrasns.arn
   threshold          = var.pALB4xxAlarmThreshold
   treat_missing_data = "notBreaching"
   dimensions = {
