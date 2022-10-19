@@ -1,5 +1,4 @@
 module "alb" {
-  # source = "github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer"
   source = "./modules/alb"
   providers = {
     aws.bucket-replication = aws
