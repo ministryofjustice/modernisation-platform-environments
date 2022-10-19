@@ -55,6 +55,9 @@ locals {
           description = "Standalone EC2 for testing RHEL6.10 base image"
           monitored   = false
         }
+        instance = {
+          instance_type = "t2.medium"
+        }
         ami_name = "nomis_rhel_6_10_baseimage*"
         # branch   = var.BRANCH_NAME # comment in if testing ansible
       }
