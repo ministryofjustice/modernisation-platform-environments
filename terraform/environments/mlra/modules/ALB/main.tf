@@ -21,9 +21,9 @@ locals {
   loadbalancer_ingress_rules = {
     "lb_ingress" = {
       description     = "Loadbalancer ingress rule"
-      from_port       = var.ingress_from_port
-      to_port         = var.ingress_to_port
-      protocol        = var.ingress_protocol
+      from_port       = var.security_group_ingress_from_port
+      to_port         = var.security_group_ingress_to_port
+      protocol        = var.security_group_ingress_protocol
       cidr_blocks     = [var.ingress_cidr_block]
       security_groups = []
     }

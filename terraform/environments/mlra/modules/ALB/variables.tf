@@ -35,15 +35,15 @@ variable "force_destroy_bucket" {
   description = "A boolean that indicates all objects (including any locked objects) should be deleted from the bucket so that the bucket can be destroyed without error. These objects are not recoverable."
   default     = false
 }
-variable "ingress_from_port" {
+variable "security_group_ingress_from_port" {
   type        = string
   description = "The from port for the lb ingress rules"
 }
-variable "ingress_to_port" {
+variable "security_group_ingress_to_port" {
   type        = string
   description = "The to port for the lb ingress rules"
 }
-variable "ingress_protocol" {
+variable "security_group_ingress_protocol" {
   type        = string
   description = "The protocol for the lb ingress rules"
 }

@@ -13,9 +13,9 @@ module "alb" {
   enable_deletion_protection = false
   idle_timeout               = 60
   force_destroy_bucket       = true
-  ingress_from_port          = 443
-  ingress_to_port            = 443
-  ingress_protocol           = "tcp"
+  security_group_ingress_from_port          = 443
+  security_group_ingress_to_port            = 443
+  security_group_ingress_protocol           = "tcp"
   ingress_cidr_block         = data.aws_vpc.shared.cidr_block
 
   listener_protocol = "HTTP"
@@ -46,6 +46,6 @@ module "alb" {
 #  pClusterName = " "
 #  pAutoscalingGroupName = " "
 #  pLoadBalancerName = " "
-#  pTargetGroupName = aws_lb_target_group.alb_target_group.name 
+#  pTargetGroupName = aws_lb_target_group.alb_target_group.name
 #  appnameenv = "${local.application_name}-${local.environment}"
 #}
