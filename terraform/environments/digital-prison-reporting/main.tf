@@ -771,3 +771,42 @@ module "ec2_kinesis_agent" {
     }
   )
 }
+
+# DataMart
+module "datamart" {
+  source                      = "./modules/redshift"
+  create_redshift_cluster     = true
+  name                        = "${local.project}-redshift-${local.env}"
+  allow_version_upgrade       = true
+  node_type                   = "ra3.xlplus"
+  number_of_nodes             = 1
+  database_name               = "datamart-${local.env}"
+  master_username             = "dpruser"
+  create_random_password      = true
+  encrypted                   = true
+  kms_key_arn                 = aws_kms_key.redshift-kms-key.arn
+  enhanced_vpc_routing        = false
+  subnet_ids                  = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id, data.aws_subnet.private_subnets_c.id]
+  vpc                         = data.aws_vpc.shared.id
+  cidr                        = [data.aws_vpc.shared.cidr_block]
+
+# Endpoint access - only available when using the ra3.x type, for S3 Simple Service
+  create_endpoint_access      = false
+
+# Scheduled actions
+  create_scheduled_action_iam_role = true
+  scheduled_actions = {
+    pause = {
+      name          = "${var.name}-pause"
+      description   = "Pause cluster every night"
+      schedule      = "cron(0 02 * * ? *)"
+      pause_cluster = true
+    }
+    resume = {
+      name           = "${var.name}-resume"
+      description    = "Resume cluster every morning"
+      schedule       = "cron(0 08 * * ? *)"
+      resume_cluster = true
+    }
+  }  
+}
