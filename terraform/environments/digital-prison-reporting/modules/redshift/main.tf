@@ -113,7 +113,7 @@ resource "aws_redshift_cluster_iam_roles" "this" {
 resource "aws_redshift_parameter_group" "this" {
   count = var.create_redshift_cluster && var.create_parameter_group ? 1 : 0
 
-  name        = coalesce(var.parameter_group_name, replace(var.cluster_identifier, ".", "-"))
+  name        = coalesce(var.parameter_group_name, replace(var.name, ".", "-"))
   description = var.parameter_group_description
   family      = var.parameter_group_family
 
@@ -135,7 +135,7 @@ resource "aws_redshift_parameter_group" "this" {
 resource "aws_redshift_subnet_group" "this" {
   count = var.create_redshift_cluster && var.create_subnet_group ? 1 : 0
 
-  name        = coalesce(var.subnet_group_name, var.cluster_identifier)
+  name        = coalesce(var.subnet_group_name, var.name)
   description = var.subnet_group_description
   subnet_ids  = var.subnet_ids
 
@@ -170,7 +170,7 @@ resource "aws_redshift_snapshot_schedule_association" "this" {
 ################################################################################
 
 locals {
-  iam_role_name = coalesce(var.iam_role_name, "${var.cluster_identifier}-scheduled-action")
+  iam_role_name = coalesce(var.iam_role_name, "${var.name}-scheduled-action")
 }
 
 resource "aws_redshift_scheduled_action" "this" {
