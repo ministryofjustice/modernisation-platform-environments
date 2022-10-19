@@ -50,6 +50,14 @@ locals {
         ami_name = "nomis_rhel_7_9_baseimage*"
         # branch   = var.BRANCH_NAME # comment in if testing ansible
       }
+      dev-base-rhel610 = {
+        tags = {
+          description = "Standalone EC2 for testing RHEL6.10 base image"
+          monitored   = false
+        }
+        ami_name = "nomis_rhel_6_10_baseimage*"
+        # branch   = var.BRANCH_NAME # comment in if testing ansible
+      }
     }
   }
 }
