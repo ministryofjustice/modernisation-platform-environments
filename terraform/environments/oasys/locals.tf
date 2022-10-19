@@ -45,6 +45,9 @@ locals {
   vpc_all         = "${local.vpc_name}-${local.environment}"
   subnet_set_name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}"
 
+  region            = "eu-west-2"
+  availability_zone = "eu-west-2a"
+
   is_live       = [substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-production" || substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-preproduction" ? "live" : "non-live"]
   provider_name = "core-vpc-${local.environment}"
 
