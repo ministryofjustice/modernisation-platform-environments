@@ -1,4 +1,5 @@
-[ {
+[
+  {
     "name": "xray-daemon",
     "image": "${ecr_url}:xray-daemon",
     "essential": false,
@@ -13,10 +14,10 @@
     "logConfiguration": {
       "logDriver": "awslogs",
       "options": {
-          "awslogs-region": "${app_name}",
-          "awslogs-stream-prefix": "${app_name}-app"
+        "awslogs-region": "${app_name}",
+        "awslogs-stream-prefix": "${app_name}-app"
       }
-      }
+    }
   },
   {
     "name": "${app_name}",
@@ -32,46 +33,47 @@
     "logConfiguration": {
       "logDriver": "awslogs",
       "options": {
-          "awslogs-region": "${app_name}",
-          "awslogs-stream-prefix": "${app_name}-app"
-       }
-      },
-    "environment" : [
+        "awslogs-region": "${app_name}",
+        "awslogs-stream-prefix": "${app_name}-app"
+      }
+    },
+    "environment": [
       {
-        "name" : "MAAT_API_END_POINT",
-        "value" : "${maat_api_end_point}"
+        "name": "MAAT_API_END_POINT",
+        "value": "${maat_api_end_point}"
       },
       {
-        "name" : "APP_DB_URL",
+        "name": "APP_DB_URL",
         "value": "${maat_db_url}"
       },
       {
-        "name" : "APP_DB_USERID",
-        "value" : "MLA"
+        "name": "APP_DB_USERID",
+        "value": "MLA"
       },
       {
-        "name" : "APP_DB_PASSWORD",
-        "value" : "${maat_db_password}"
+        "name": "APP_DB_PASSWORD",
+        "value": "${maat_db_password}"
       },
       {
-        "name" : "APP_DB_POOL_MAX_CONNECTION",
-        "value" : "130"
+        "name": "APP_DB_POOL_MAX_CONNECTION",
+        "value": "130"
       },
       {
-        "name" : "APP_LOG_LEVEL",
-        "value" : "debug"
+        "name": "APP_LOG_LEVEL",
+        "value": "debug"
       },
       {
-        "name" : "APP_LIBRA_WSDL_URL",
-        "value" : "${maat_libra_wsdl_url}"
+        "name": "APP_LIBRA_WSDL_URL",
+        "value": "${maat_libra_wsdl_url}"
       },
       {
-        "name" : "AWS_XRAY_DAEMON_ADDRESS",
-        "value" : "xray-daemon:2000"
+        "name": "AWS_XRAY_DAEMON_ADDRESS",
+        "value": "xray-daemon:2000"
       },
       {
-        "name" : "SENTRY_ENVIRONMENT",
-        "value" : "${sentry_env}"
+        "name": "SENTRY_ENVIRONMENT",
+        "value": "${sentry_env}"
       }
     ]
-  }]
+  }
+]

@@ -38,23 +38,23 @@ data "template_file" "launch-template" {
   template = file("user_data.txt")
   vars = {
     AppEcsCluster = local.cluster_name
-    pAppName  = local.application_name
+    pAppName      = local.application_name
   }
 }
 
 data "template_file" "task_definition" {
   template = file("task_definition.json")
   vars = {
-    app_name = local.application_name
-    ecr_url = local.application_data.accounts[local.environment].ecr_url
+    app_name         = local.application_name
+    ecr_url          = local.application_data.accounts[local.environment].ecr_url
     docker_image_tag = local.application_data.accounts[local.environment].docker_image_tag
     #TODO cloudwatch_logs_group 
-    region = local.application_data.accounts[local.environment].region
-    maat_api_end_point = local.application_data.accounts[local.environment].maat_api_end_point
-    maat_db_url = local.application_data.accounts[local.environment].maat_db_url
-    maat_db_password = local.application_data.accounts[local.environment].maat_db_password
+    region              = local.application_data.accounts[local.environment].region
+    maat_api_end_point  = local.application_data.accounts[local.environment].maat_api_end_point
+    maat_db_url         = local.application_data.accounts[local.environment].maat_db_url
+    maat_db_password    = local.application_data.accounts[local.environment].maat_db_password
     maat_libra_wsdl_url = local.application_data.accounts[local.environment].maat_libra_wsdl_url
-    sentry_env = local.environment
+    sentry_env          = local.environment
 
   }
 }
