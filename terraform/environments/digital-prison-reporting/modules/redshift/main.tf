@@ -170,7 +170,7 @@ resource "aws_redshift_snapshot_schedule_association" "this" {
 ################################################################################
 
 locals {
-  iam_role_name = coalesce(var.iam_role_name, "${var.name}-scheduled-action")
+  iam_role_name = coalesce(var.iam_role_name, "redshift-scheduled-action")
 }
 
 resource "aws_redshift_scheduled_action" "this" {
