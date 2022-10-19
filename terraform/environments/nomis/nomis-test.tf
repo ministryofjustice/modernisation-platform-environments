@@ -43,18 +43,6 @@ locals {
           monitored = false
         }
       }
-      CNAUDT1 = {
-        always_on              = true
-        ami_name               = "nomis_db-2022-03-03*"
-        asm_data_capacity      = 200
-        asm_flash_capacity     = 2
-        description            = "Copy of Test NOMIS Audit database in Azure T1PDL0010, replicating with T1PDL0010."
-        termination_protection = true
-        oracle_sids            = ["T1CNMAUD"]
-        tags = {
-          monitored = true
-        }
-      }
     }
 
     # Add database instances here. They will be created using ec2-database.tf
