@@ -19,7 +19,7 @@
       "ec2_min_size": 2,
       "container_cpu": 2048,
       "container_memory": 7763,
-      "task_definition_volume": "",
+      "task_definition_volume": "upload_volume",
       "network_mode": "none",
       "server_port": 8080,
       "app_count": 1
