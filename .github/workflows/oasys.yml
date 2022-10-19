@@ -38,7 +38,7 @@ jobs:
         include:
           - environment: test
           - environment: development
-    name: Terraform plan - oasys - ${{ matrix.environment }}
+    name: Terraform plan - ${{ github.workflow }} - ${{ matrix.environment }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -60,11 +60,13 @@ jobs:
         run: |
           terraform --version
           echo "Terraform plan - ${TF_ENV}"
-          bash scripts/terraform-init.sh terraform/environments/oasys
-          terraform -chdir="terraform/environments/oasys" workspace select "oasys-${TF_ENV}"
-          bash scripts/terraform-plan.sh terraform/environments/oasys
+          bash scripts/terraform-init.sh terraform/environments/${ENV}
+          terraform -chdir="terraform/environments/${ENV}" workspace select "${ENV}-${TF_ENV}"
+          bash scripts/terraform-plan.sh terraform/environments/${ENV}
     env:
       TF_ENV: ${{ matrix.environment }}
+      ENV: ${{ github.workflow }}
+
 
   deploy-dev-test:
     needs: plan-dev-test
@@ -74,10 +76,10 @@ jobs:
         include:
           - environment: test
           - environment: development
-    name: Terraform apply - oasys - ${{ matrix.environment }}
+    name: Terraform apply - ${{ github.workflow }} - ${{ matrix.environment }}
     runs-on: ubuntu-latest
     environment:
-      name: oasys-${{ matrix.environment }}
+      name: ${{ github.workflow }}-${{ matrix.environment }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3.1.0
@@ -98,11 +100,12 @@ jobs:
         run: |
           terraform --version
           echo "Terraform apply - ${TF_ENV}"
-          bash scripts/terraform-init.sh terraform/environments/oasys
-          terraform -chdir="terraform/environments/oasys" workspace select "oasys-${TF_ENV}"
-          bash scripts/terraform-apply.sh terraform/environments/oasys
+          bash scripts/terraform-init.sh terraform/environments/${ENV}
+          terraform -chdir="terraform/environments/${ENV}" workspace select "${ENV}-${TF_ENV}"
+          bash scripts/terraform-apply.sh terraform/environments/${ENV}
     env:
-        TF_ENV: ${{ matrix.environment }}
+      TF_ENV: ${{ matrix.environment }}
+      ENV: ${{ github.workflow }}
 
   # Plan + deploy for pre-production and production environments, only from main
   plan-preprod-prod:
@@ -112,7 +115,7 @@ jobs:
         include:
           - environment: preproduction
           - environment: production
-    name: Terraform plan - oasys - ${{ matrix.environment }}
+    name: Terraform plan - ${{ github.workflow }} - ${{ matrix.environment }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -134,11 +137,12 @@ jobs:
         run: |
           terraform --version
           echo "Terraform plan - ${TF_ENV}"
-          bash scripts/terraform-init.sh terraform/environments/oasys
-          terraform -chdir="terraform/environments/oasys" workspace select "oasys-${TF_ENV}"
-          bash scripts/terraform-plan.sh terraform/environments/oasys
+          bash scripts/terraform-init.sh terraform/environments/${ENV}
+          terraform -chdir="terraform/environments/${ENV}" workspace select "${ENV}-${TF_ENV}"
+          bash scripts/terraform-plan.sh terraform/environments/${ENV}
     env:
       TF_ENV: ${{ matrix.environment }}
+      ENV: ${{ github.workflow }}
 
   deploy-preprod-prod:
     needs: plan-preprod-prod
@@ -148,10 +152,10 @@ jobs:
         include:
           - environment: preproduction
           - environment: production
-    name: Terraform apply - oasys - ${{ matrix.environment }}
+    name: Terraform apply - ${{ github.workflow }} - ${{ matrix.environment }}
     runs-on: ubuntu-latest
     environment:
-      name: oasys-${{ matrix.environment }}
+      name: ${{ github.workflow }}-${{ matrix.environment }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3.1.0
@@ -172,9 +176,10 @@ jobs:
         run: |
           terraform --version
           echo "Terraform apply - ${TF_ENV}"
-          bash scripts/terraform-init.sh terraform/environments/oasys
-          terraform -chdir="terraform/environments/oasys" workspace select "oasys-${TF_ENV}"
-          bash scripts/terraform-apply.sh terraform/environments/oasys
+          bash scripts/terraform-init.sh terraform/environments/${ENV}
+          terraform -chdir="terraform/environments/${ENV}" workspace select "${ENV}-${TF_ENV}"
+          bash scripts/terraform-apply.sh terraform/environments/${ENV}
     env:
-        TF_ENV: ${{ matrix.environment }}
+      TF_ENV: ${{ matrix.environment }}
+      ENV: ${{ github.workflow }}
 
