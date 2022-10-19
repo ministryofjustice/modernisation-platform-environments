@@ -296,7 +296,7 @@ variable "parameter_group_tags" {
 variable "create_subnet_group" {
   description = "Determines whether to create a subnet group or use existing"
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "subnet_group_name" {

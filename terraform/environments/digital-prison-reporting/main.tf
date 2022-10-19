@@ -20,6 +20,7 @@ locals {
   create_glue_connection = local.application_data.accounts[local.environment].create_glue_connections
   image_id               = local.application_data.accounts[local.environment].ami_image_id
   instance_type          = local.application_data.accounts[local.environment].ec2_instance_type
+  redshift_cluster_name  = "${local.application_data.accounts[local.environment].project_short_id}-redshift-${local.environment}"
 
 
   all_tags = merge(
@@ -774,39 +775,48 @@ module "ec2_kinesis_agent" {
 
 # DataMart
 module "datamart" {
-  source                  = "./modules/redshift"
-  create_redshift_cluster = true
-  name                    = "${local.project}-redshift-${local.env}"
-  allow_version_upgrade   = true
-  node_type               = "ra3.xlplus"
-  number_of_nodes         = 1
-  database_name           = "datamart-${local.env}"
-  master_username         = "dpruser"
-  create_random_password  = true
-  encrypted               = true
-  kms_key_arn             = aws_kms_key.redshift-kms-key.arn
-  enhanced_vpc_routing    = false
-  subnet_ids              = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id, data.aws_subnet.private_subnets_c.id]
-  vpc                     = data.aws_vpc.shared.id
-  cidr                    = [data.aws_vpc.shared.cidr_block]
+  source                      = "./modules/redshift"
+  create_redshift_cluster     = true
+  name                        = local.redshift_cluster_name
+  node_type                   = "ra3.xlplus"
+  number_of_nodes             = 1
+  database_name               = "datamart"
+  master_username             = "dpruser"
+  master_password             = "Datamartpass2022"
+  create_random_password      = false
+  encrypted                   = true
+  create_subnet_group         = true
+  kms_key_arn                 = aws_kms_key.redshift-kms-key.arn
+  enhanced_vpc_routing        = false
+  subnet_ids                  = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id, data.aws_subnet.private_subnets_c.id]
+  vpc                         = data.aws_vpc.shared.id
+  cidr                        = [data.aws_vpc.shared.cidr_block]
 
-  # Endpoint access - only available when using the ra3.x type, for S3 Simple Service
-  create_endpoint_access = false
+# Endpoint access - only available when using the ra3.x type, for S3 Simple Service
+  create_endpoint_access      = false
 
-  # Scheduled actions
+# Scheduled actions
   create_scheduled_action_iam_role = true
   scheduled_actions = {
     pause = {
-      name          = "${var.name}-pause"
+      name          = "${local.redshift_cluster_name}-pause"
       description   = "Pause cluster every night"
       schedule      = "cron(0 02 * * ? *)"
       pause_cluster = true
     }
     resume = {
-      name           = "${var.name}-resume"
+      name           = "${local.redshift_cluster_name}-resume"
       description    = "Resume cluster every morning"
       schedule       = "cron(0 08 * * ? *)"
       resume_cluster = true
     }
   }
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.redshift_cluster_name}"
+      Resource_Type = "Redshift Cluster"
+    }
+  )    
 }
