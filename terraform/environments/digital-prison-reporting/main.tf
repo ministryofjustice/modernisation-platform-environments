@@ -775,27 +775,27 @@ module "ec2_kinesis_agent" {
 
 # DataMart
 module "datamart" {
-  source                      = "./modules/redshift"
-  create_redshift_cluster     = true
-  name                        = local.redshift_cluster_name
-  node_type                   = "ra3.xlplus"
-  number_of_nodes             = 1
-  database_name               = "datamart"
-  master_username             = "dpruser"
-  master_password             = "Datamartpass2022"
-  create_random_password      = false
-  encrypted                   = true
-  create_subnet_group         = true
-  kms_key_arn                 = aws_kms_key.redshift-kms-key.arn
-  enhanced_vpc_routing        = false
-  subnet_ids                  = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id, data.aws_subnet.private_subnets_c.id]
-  vpc                         = data.aws_vpc.shared.id
-  cidr                        = [data.aws_vpc.shared.cidr_block]
+  source                  = "./modules/redshift"
+  create_redshift_cluster = true
+  name                    = local.redshift_cluster_name
+  node_type               = "ra3.xlplus"
+  number_of_nodes         = 1
+  database_name           = "datamart"
+  master_username         = "dpruser"
+  master_password         = "Datamartpass2022"
+  create_random_password  = false
+  encrypted               = true
+  create_subnet_group     = true
+  kms_key_arn             = aws_kms_key.redshift-kms-key.arn
+  enhanced_vpc_routing    = false
+  subnet_ids              = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id, data.aws_subnet.private_subnets_c.id]
+  vpc                     = data.aws_vpc.shared.id
+  cidr                    = [data.aws_vpc.shared.cidr_block]
 
-# Endpoint access - only available when using the ra3.x type, for S3 Simple Service
-  create_endpoint_access      = false
+  # Endpoint access - only available when using the ra3.x type, for S3 Simple Service
+  create_endpoint_access = false
 
-# Scheduled actions
+  # Scheduled actions
   create_scheduled_action_iam_role = true
   scheduled_actions = {
     pause = {
@@ -818,5 +818,5 @@ module "datamart" {
       Name          = "${local.redshift_cluster_name}"
       Resource_Type = "Redshift Cluster"
     }
-  )    
+  )
 }
