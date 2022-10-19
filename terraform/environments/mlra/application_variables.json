@@ -20,7 +20,7 @@
       "container_cpu": 2048,
       "container_memory": 7763,
       "task_definition_volume": "upload_volume",
-      "network_mode": "none",
+      "network_mode": "",
       "server_port": 8080,
       "app_count": 1
     },
