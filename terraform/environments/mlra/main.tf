@@ -116,7 +116,10 @@ data "aws_secretsmanager_secret_version" "pagerduty_integration_keys" {
 }
 
 module "pagerduty_core_alerts" {
-  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=1.0"
+  depends_on = [
+    aws_sns_topic.high_priority
+  ]
+  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v1.0.0"
   sns_topics                = [aws_sns_topic.high_priority.name]
   pagerduty_integration_key = local.pagerduty_integration_keys["core_alerts_cloudwatch"]
 }
