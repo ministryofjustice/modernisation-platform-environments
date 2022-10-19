@@ -1,7 +1,7 @@
 locals {
   subnet_group_name    = var.create_redshift_cluster && var.create_subnet_group ? aws_redshift_subnet_group.this[0].name : var.subnet_group_name
   parameter_group_name = var.create_redshift_cluster && var.create_parameter_group ? aws_redshift_parameter_group.this[0].id : var.parameter_group_name
-  master_password = var.create_redshift_cluster && var.create_random_password ? random_password.master_password[0].result : var.master_password
+  master_password      = var.create_redshift_cluster && var.create_random_password ? random_password.master_password[0].result : var.master_password
 }
 
 data "aws_partition" "current" {}
@@ -337,12 +337,12 @@ resource "aws_security_group_rule" "redshift_egress_1" {
 }
 
 resource "aws_security_group_rule" "redshift_ingress" {
-  for_each                 = var.redshift_ingress_sec_rules
-  description              = format("Traffic for %s %d", each.value.protocol, each.value.from_port)
-  security_group_id        = aws_security_group.redshift.id
-  type                     = "ingress"
-  from_port                = each.value.from_port
-  to_port                  = each.value.to_port
-  protocol                 = each.value.protocol
-  cidr_blocks              = var.cidr  
+  for_each          = var.redshift_ingress_sec_rules
+  description       = format("Traffic for %s %d", each.value.protocol, each.value.from_port)
+  security_group_id = aws_security_group.redshift.id
+  type              = "ingress"
+  from_port         = each.value.from_port
+  to_port           = each.value.to_port
+  protocol          = each.value.protocol
+  cidr_blocks       = var.cidr
 }
