@@ -66,7 +66,7 @@ Contact `hubusers@justice.gov.uk` for assitance in notifying key users and stake
 
 ### **Out of hours response types:**
 
-There are no official out of hours response arrangements (see ["imapct of an outtage"](#impact-of-an-outage) above).
+There are no official out of hours response arrangements (see ["imapct of an outage"](#impact-of-an-outage) above).
 
 ### **Consumers of this service:**
 
