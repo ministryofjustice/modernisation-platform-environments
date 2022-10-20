@@ -78,7 +78,7 @@ resource "aws_iam_role" "redshift-role" {
     "arn:aws:iam::aws:policy/service-role/AWSServiceRoleForRedshift"
   ]
 
-  merge(
+  tags = merge(
     local.tags,
     {
       name = "redshift-service-role"
