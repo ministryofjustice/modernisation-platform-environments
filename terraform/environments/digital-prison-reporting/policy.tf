@@ -1,6 +1,7 @@
 locals {
   current_account_id     = data.aws_caller_identity.current.account_id
   current_account_region = data.aws_region.current.name
+  create_datamart        = local.application_data.accounts[local.environment].setup_redshift
 }
 
 
@@ -51,4 +52,83 @@ resource "aws_iam_policy" "read_s3_read_access_policy" {
       }
     ]
   })
+}
+
+### Iam Role for AWS Redshift
+resource "aws_iam_role" "redshift-role" {
+  count = var.create_datamart ? 1 : 0
+  name  = "dpr-redshift-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "sts:AssumeRole"
+        ]
+        Principal = {
+          "Service" = "redshift.amazonaws.com"
+        }
+      }
+    ]
+  })
+
+  managed_policy_arns = [
+    "arn:aws:iam::aws:policy/service-role/AWSServiceRoleForRedshift"
+  ]
+
+  merge(
+    local.tags,
+    {
+      name = "redshift-service-role"
+      project = "dpr"    
+    }
+  )
+}
+
+# Amazon Redshift supports only identity-based policies (IAM policies).
+data "aws_iam_policy_document" "redshift-additional-policy" {
+  statement {
+    actions = [
+      "glue:*"
+    ]
+    resources = [
+      "*"
+    ]
+  }
+  statement {
+    actions = [
+      "logs:CreateLogGroup",
+      "logs:CreateLogStream",
+      "logs:PutLogEvents",
+      "logs:AssociateKmsKey",
+      "logs:DescribeLogStreams",
+      "logs:GetLogEvents",
+      "logs:PutRetentionPolicy"
+    ]
+    resources = [
+      "arn:aws:logs:*:*:log-group:/aws/redshift/*"
+    ]
+  }
+  statement {
+    actions = [
+      "s3:Get*",
+      "s3:List*"
+    ]
+    resources = [
+      "*"
+    ]
+  }  
+}
+
+resource "aws_iam_policy" "additional-policy" {
+  name        = "dpr-redshift-policy"
+  description = "Extra Policy for AWS Redshift"
+  policy      = data.aws_iam_policy_document.redshift-additional-policy.json
+}
+
+resource "aws_iam_role_policy_attachment" "redshift" {
+  role       = aws_iam_role.redshift-role
+  policy_arn = aws_iam_policy.additional-policy.arn
 }

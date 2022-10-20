@@ -20,6 +20,7 @@ locals {
   create_glue_connection = local.application_data.accounts[local.environment].create_glue_connections
   image_id               = local.application_data.accounts[local.environment].ami_image_id
   instance_type          = local.application_data.accounts[local.environment].ec2_instance_type
+  create_datamart        = local.application_data.accounts[local.environment].setup_redshift
   redshift_cluster_name  = "${local.application_data.accounts[local.environment].project_short_id}-redshift-${local.environment}"
 
 
@@ -776,7 +777,7 @@ module "ec2_kinesis_agent" {
 # DataMart
 module "datamart" {
   source                  = "./modules/redshift"
-  create_redshift_cluster = true
+  create_redshift_cluster = local.create_datamart
   name                    = local.redshift_cluster_name
   node_type               = "ra3.xlplus"
   number_of_nodes         = 1
@@ -791,6 +792,7 @@ module "datamart" {
   subnet_ids              = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id, data.aws_subnet.private_subnets_c.id]
   vpc                     = data.aws_vpc.shared.id
   cidr                    = [data.aws_vpc.shared.cidr_block]
+  iam_role_arns           = [aws_iam_role.redshift-role.arn]
 
   # Endpoint access - only available when using the ra3.x type, for S3 Simple Service
   create_endpoint_access = false
