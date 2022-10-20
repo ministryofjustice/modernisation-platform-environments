@@ -803,13 +803,13 @@ module "datamart" {
     pause = {
       name          = "${local.redshift_cluster_name}-pause"
       description   = "Pause cluster every night"
-      schedule      = "cron(0 07 * * ? *)"
+      schedule      = "cron(0 02 * * ? *)"
       pause_cluster = true
     }
     resume = {
       name           = "${local.redshift_cluster_name}-resume"
       description    = "Resume cluster every morning"
-      schedule       = "cron(0 08 * * ? *)"
+      schedule       = "cron(0 03 * * ? *)"
       resume_cluster = true
     }
   }
