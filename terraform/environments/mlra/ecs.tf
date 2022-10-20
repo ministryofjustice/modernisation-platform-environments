@@ -13,9 +13,22 @@ module "windows-ecs" {
   environment             = local.environment
   ami_image_id            = local.application_data.accounts[local.environment].ami_image_id
   instance_type           = local.application_data.accounts[local.environment].instance_type
-  user_data               = base64encode(data.template_file.launch-template.rendered)
+  user_data               = base64encode(templatefile("user_data.sh", {
+    app_ecs_cluster = local.cluster_name
+    app_name        = local.application_name
+  }))
   key_name                = local.application_data.accounts[local.environment].key_name
-  task_definition         = data.template_file.task_definition.rendered
+  task_definition         = templatefile("task_definition.json", {
+    app_name            = local.application_name
+    ecr_url             = local.application_data.accounts[local.environment].ecr_url
+    docker_image_tag    = local.application_data.accounts[local.environment].docker_image_tag
+    region              = local.application_data.accounts[local.environment].region
+    maat_api_end_point  = local.application_data.accounts[local.environment].maat_api_end_point
+    maat_db_url         = local.application_data.accounts[local.environment].maat_db_url
+    maat_db_password    = local.application_data.accounts[local.environment].maat_db_password
+    maat_libra_wsdl_url = local.application_data.accounts[local.environment].maat_libra_wsdl_url
+    sentry_env          = local.environment
+  })
   ec2_desired_capacity    = local.application_data.accounts[local.environment].ec2_desired_capacity
   ec2_max_size            = local.application_data.accounts[local.environment].ec2_max_size
   ec2_min_size            = local.application_data.accounts[local.environment].ec2_min_size
@@ -34,29 +47,29 @@ module "windows-ecs" {
 
 # Input for ECS module
 
-data "template_file" "launch-template" {
-  template = file("user_data.sh")
-  vars = {
-    app_ecs_cluster = local.cluster_name
-    app_name        = local.application_name
-  }
-}
+# data "template_file" "launch-template" {
+#   template = file("user_data.sh")
+#   vars = {
+#     app_ecs_cluster = local.cluster_name
+#     app_name        = local.application_name
+#   }
+# }
 
-data "template_file" "task_definition" {
-  template = file("task_definition.json")
-  vars = {
-    app_name            = local.application_name
-    ecr_url             = local.application_data.accounts[local.environment].ecr_url
-    docker_image_tag    = local.application_data.accounts[local.environment].docker_image_tag
-    region              = local.application_data.accounts[local.environment].region
-    maat_api_end_point  = local.application_data.accounts[local.environment].maat_api_end_point
-    maat_db_url         = local.application_data.accounts[local.environment].maat_db_url
-    maat_db_password    = local.application_data.accounts[local.environment].maat_db_password
-    maat_libra_wsdl_url = local.application_data.accounts[local.environment].maat_libra_wsdl_url
-    sentry_env          = local.environment
+# data "template_file" "task_definition" {
+#   template = file("task_definition.json")
+#   vars = {
+#     app_name            = local.application_name
+#     ecr_url             = local.application_data.accounts[local.environment].ecr_url
+#     docker_image_tag    = local.application_data.accounts[local.environment].docker_image_tag
+#     region              = local.application_data.accounts[local.environment].region
+#     maat_api_end_point  = local.application_data.accounts[local.environment].maat_api_end_point
+#     maat_db_url         = local.application_data.accounts[local.environment].maat_db_url
+#     maat_db_password    = local.application_data.accounts[local.environment].maat_db_password
+#     maat_libra_wsdl_url = local.application_data.accounts[local.environment].maat_libra_wsdl_url
+#     sentry_env          = local.environment
 
-  }
-}
+#   }
+# }
 
 locals {
   ec2_ingress_rules = {
