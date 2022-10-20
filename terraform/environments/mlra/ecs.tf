@@ -13,12 +13,12 @@ module "windows-ecs" {
   environment             = local.environment
   ami_image_id            = local.application_data.accounts[local.environment].ami_image_id
   instance_type           = local.application_data.accounts[local.environment].instance_type
-  user_data               = base64encode(templatefile("user_data.sh", {
+  user_data = base64encode(templatefile("user_data.sh", {
     app_ecs_cluster = local.cluster_name
     app_name        = local.application_name
   }))
-  key_name                = local.application_data.accounts[local.environment].key_name
-  task_definition         = templatefile("task_definition.json", {
+  key_name = local.application_data.accounts[local.environment].key_name
+  task_definition = templatefile("task_definition.json", {
     app_name            = local.application_name
     ecr_url             = local.application_data.accounts[local.environment].ecr_url
     docker_image_tag    = local.application_data.accounts[local.environment].docker_image_tag
@@ -29,18 +29,18 @@ module "windows-ecs" {
     maat_libra_wsdl_url = local.application_data.accounts[local.environment].maat_libra_wsdl_url
     sentry_env          = local.environment
   })
-  ec2_desired_capacity    = local.application_data.accounts[local.environment].ec2_desired_capacity
-  ec2_max_size            = local.application_data.accounts[local.environment].ec2_max_size
-  ec2_min_size            = local.application_data.accounts[local.environment].ec2_min_size
-  container_cpu           = local.application_data.accounts[local.environment].container_cpu
-  container_memory        = local.application_data.accounts[local.environment].container_memory
-  task_definition_volume  = local.application_data.accounts[local.environment].task_definition_volume
-  network_mode            = local.application_data.accounts[local.environment].network_mode
-  server_port             = local.application_data.accounts[local.environment].server_port
-  app_count               = local.application_data.accounts[local.environment].app_count
-  ec2_ingress_rules       = local.ec2_ingress_rules
-  ec2_egress_rules        = local.ec2_egress_rules
-  tags_common             = local.tags
+  ec2_desired_capacity   = local.application_data.accounts[local.environment].ec2_desired_capacity
+  ec2_max_size           = local.application_data.accounts[local.environment].ec2_max_size
+  ec2_min_size           = local.application_data.accounts[local.environment].ec2_min_size
+  container_cpu          = local.application_data.accounts[local.environment].container_cpu
+  container_memory       = local.application_data.accounts[local.environment].container_memory
+  task_definition_volume = local.application_data.accounts[local.environment].task_definition_volume
+  network_mode           = local.application_data.accounts[local.environment].network_mode
+  server_port            = local.application_data.accounts[local.environment].server_port
+  app_count              = local.application_data.accounts[local.environment].app_count
+  ec2_ingress_rules      = local.ec2_ingress_rules
+  ec2_egress_rules       = local.ec2_egress_rules
+  tags_common            = local.tags
 
   depends_on = [aws_lb_listener.alb_listener, aws_cloudwatch_log_group.ecs_log_group]
 }
