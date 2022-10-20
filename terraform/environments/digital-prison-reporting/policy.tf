@@ -77,7 +77,7 @@ resource "aws_iam_role" "redshift-role" {
   })
 
   managed_policy_arns = [
-    "arn:aws:iam::aws:policy/service-role/AWSServiceRoleForRedshift"
+    "arn:aws:iam::aws:policy/aws-service-role/AmazonRedshiftServiceLinkedRolePolicy"
   ]
 
   tags = merge(
