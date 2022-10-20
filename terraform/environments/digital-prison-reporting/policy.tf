@@ -59,7 +59,7 @@ resource "aws_iam_policy" "read_s3_read_access_policy" {
 
 resource "aws_iam_role" "redshift-role" {
   count = local.setup_datamart ? 1 : 0
-  name  = "dpr-redshift-role"
+  name  = "dpr-redshift-service-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
