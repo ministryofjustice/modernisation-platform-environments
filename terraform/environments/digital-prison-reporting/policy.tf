@@ -81,8 +81,8 @@ resource "aws_iam_role" "redshift-role" {
   tags = merge(
     local.tags,
     {
-      name = "redshift-service-role"
-      project = "dpr"    
+      name    = "redshift-service-role"
+      project = "dpr"
     }
   )
 }
@@ -119,7 +119,7 @@ data "aws_iam_policy_document" "redshift-additional-policy" {
     resources = [
       "*"
     ]
-  }  
+  }
 }
 
 resource "aws_iam_policy" "additional-policy" {
