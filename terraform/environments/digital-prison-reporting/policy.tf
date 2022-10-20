@@ -1,7 +1,7 @@
 locals {
   current_account_id     = data.aws_caller_identity.current.account_id
   current_account_region = data.aws_region.current.name
-  create_datamart        = local.application_data.accounts[local.environment].setup_redshift
+  setup_datamart         = local.application_data.accounts[local.environment].setup_redshift
 }
 
 
@@ -56,7 +56,7 @@ resource "aws_iam_policy" "read_s3_read_access_policy" {
 
 ### Iam Role for AWS Redshift
 resource "aws_iam_role" "redshift-role" {
-  count = var.create_datamart ? 1 : 0
+  count = var.setup_datamart ? 1 : 0
   name  = "dpr-redshift-role"
 
   assume_role_policy = jsonencode({
