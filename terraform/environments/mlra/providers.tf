@@ -1,7 +1,7 @@
 # ######################### Run Terraform via CICD ##################################
 # AWS provider for the workspace you're working in (every resource will default to using this, unless otherwise specified)
 provider "aws" {
-  /* alias  = "oidc-session"
+  alias  = "oidc-session"
   region = "eu-west-2"
 }
 
@@ -40,14 +40,14 @@ provider "aws" {
   assume_role {
     role_arn = "arn:aws:iam::${local.environment_management.account_ids["core-network-services-production"]}:role/modify-dns-records"
   }
-} */
+}
 ######################### Run Terraform via CICD ##################################
 
 
 ######################### Run Terraform Plan Locally Only ##################################
 # # To run a Terraform Plan locally, uncomment this bottom section of code and comment out the top section
 
-provider "aws" {
+/* provider "aws" {
   region = "eu-west-2"
 }
 provider "aws" {
@@ -80,5 +80,5 @@ provider "aws" {
   assume_role {
     role_arn = "arn:aws:iam::${local.environment_management.account_ids["core-network-services-production"]}:role/read-dns-records"
   }
-}
+} */
 ######################### Run Terraform Plan Locally Only ##################################
