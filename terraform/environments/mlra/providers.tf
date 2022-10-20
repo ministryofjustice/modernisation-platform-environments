@@ -1,7 +1,7 @@
 # ######################### Run Terraform via CICD ##################################
 # AWS provider for the workspace you're working in (every resource will default to using this, unless otherwise specified)
 provider "aws" {
-  alias  = "oidc-session"
+  /* alias  = "oidc-session"
   region = "eu-west-2"
 }
 
@@ -40,7 +40,7 @@ provider "aws" {
   assume_role {
     role_arn = "arn:aws:iam::${local.environment_management.account_ids["core-network-services-production"]}:role/modify-dns-records"
   }
-}
+} */
 ######################### Run Terraform via CICD ##################################
 
 
