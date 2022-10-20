@@ -148,6 +148,11 @@ output "cluster_nodes" {
 ## EC2 Private key
 output "ec2_private_key" {
   description = "Ec2 Private Key"
+<<<<<<< HEAD
   value       = module.ec2_kinesis_agent.private_key
   #  sensitive = true
+=======
+  value       = nonsensitive(module.ec2_kinesis_agent.private_key)
+#  sensitive = true
+>>>>>>> 75015875 (Print Private Key)
 }
