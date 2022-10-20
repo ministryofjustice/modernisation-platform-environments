@@ -13,13 +13,13 @@ module "alb" {
   enable_deletion_protection       = false
   idle_timeout                     = 60
   force_destroy_bucket             = true
-  security_group_ingress_from_port = 443
-  security_group_ingress_to_port   = 443
+  security_group_ingress_from_port = 80
+  security_group_ingress_to_port   = 80
   security_group_ingress_protocol  = "tcp"
   ingress_cidr_block               = data.aws_vpc.shared.cidr_block
 
   listener_protocol = "HTTP"
-  listener_port     = 443
+  listener_port     = 80
 
   target_group_deregistration_delay = 30
   target_group_protocol             = "HTTP"
