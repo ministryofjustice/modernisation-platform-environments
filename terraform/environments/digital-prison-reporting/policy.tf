@@ -131,6 +131,6 @@ resource "aws_iam_policy" "additional-policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "redshift" {
-  role       = aws_iam_role.redshift-role
+  role       = aws_iam_role.redshift-role.*.name
   policy_arn = aws_iam_policy.additional-policy.arn
 }
