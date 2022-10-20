@@ -55,8 +55,10 @@ resource "aws_iam_policy" "read_s3_read_access_policy" {
 }
 
 ### Iam Role for AWS Redshift
+# Amazon Redshift supports only identity-based policies (IAM policies).
+
 resource "aws_iam_role" "redshift-role" {
-  count = var.setup_datamart ? 1 : 0
+  count = local.setup_datamart ? 1 : 0
   name  = "dpr-redshift-role"
 
   assume_role_policy = jsonencode({
