@@ -29,26 +29,25 @@ module "windows-ecs" {
   ec2_egress_rules        = local.ec2_egress_rules
   tags_common             = local.tags
 
-  depends_on = [aws_lb_listener.alb_listener]
+  depends_on = [aws_lb_listener.alb_listener, aws_cloudwatch_log_group.ecs_log_group]
 }
 
 # Input for ECS module
 
 data "template_file" "launch-template" {
-  template = file("user_data.txt")
+  template = file("user_data.sh")
   vars = {
-    AppEcsCluster = local.cluster_name
-    pAppName      = local.application_name
+    app_ecs_cluster = local.cluster_name
+    app_name        = local.application_name
   }
 }
 
 data "template_file" "task_definition" {
   template = file("task_definition.json")
   vars = {
-    app_name         = local.application_name
-    ecr_url          = local.application_data.accounts[local.environment].ecr_url
-    docker_image_tag = local.application_data.accounts[local.environment].docker_image_tag
-    #TODO cloudwatch_logs_group 
+    app_name            = local.application_name
+    ecr_url             = local.application_data.accounts[local.environment].ecr_url
+    docker_image_tag    = local.application_data.accounts[local.environment].docker_image_tag
     region              = local.application_data.accounts[local.environment].region
     maat_api_end_point  = local.application_data.accounts[local.environment].maat_api_end_point
     maat_db_url         = local.application_data.accounts[local.environment].maat_db_url
@@ -81,3 +80,9 @@ locals {
     }
   }
 }
+
+#TODO This needs to be added in the cloudwatch module in the future
+resource "aws_cloudwatch_log_group" "ecs_log_group" {
+  name = "${local.application_name}-ecs-log-group"
+}
+
