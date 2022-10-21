@@ -55,5 +55,5 @@ resource "aws_lb_target_group" "alb-target" {
 
 resource "aws_lb_target_group_attachment" "alb-target-attachment" {
   target_group_arn = aws_lb_target_group.alb-target.arn
-  target_id        = module.lb-access-logs-enabled.aws_lb.loadbalancer.id
+  target_id        = module.lb-access-logs-enabled.load_balancer
 }
