@@ -15,8 +15,12 @@ on:
       - 'terraform/environments/oasys/**'
       - '.github/workflows/oasys.yml'
   workflow_dispatch:
+
 env:
+  GITHUB_TOKEN: ${{ secrets.DSO_GITHUB_AUTOMATION_PAT }}
   TF_IN_AUTOMATION: true
+  TF_VAR_BRANCH_NAME: ${{ github.event_name == 'pull_request' && 'main' || (github.head_ref || github.ref_name) }}
+  TF_VAR_GH_ACTOR_NAME: ${{ github.actor}}
   AWS_REGION: "eu-west-2"
   ENVIRONMENT_MANAGEMENT: ${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}
 permissions:
@@ -27,18 +31,15 @@ defaults:
     shell: bash
 
 jobs:
-
+  # Plan + deploy for development and test enironments, never from main
   plan-dev-test:
     strategy:
       matrix:
         include:
-          - environment: development
           - environment: test
-    name: Plan - ${{  matrix.environment }}
+          - environment: development
+    name: Terraform plan - ${{ github.workflow }} - ${{ matrix.environment }}
     runs-on: ubuntu-latest
-    if: github.ref != 'refs/heads/main' || github.event_name == 'workflow_dispatch'
-    env:
-      TF_ENV: ${{ matrix.environment }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3.1.0
@@ -55,27 +56,28 @@ jobs:
         with:
           terraform_version: "~1"
           terraform_wrapper: false
-      - name: Plan - ${{ matrix.environment }}
+      - name: Terraform plan - ${{ matrix.environment }}
         run: |
           terraform --version
           echo "Terraform plan - ${TF_ENV}"
-          bash scripts/terraform-init.sh terraform/environments/$GITHUB_WORKFLOW
-          terraform -chdir="terraform/environments/${GITHUB_WORKFLOW}" workspace select "${GITHUB_WORKFLOW}-${TF_ENV}"
-          bash scripts/terraform-plan.sh terraform/environments/$GITHUB_WORKFLOW
+          bash scripts/terraform-init.sh terraform/environments/${ENV}
+          terraform -chdir="terraform/environments/${ENV}" workspace select "${ENV}-${TF_ENV}"
+          bash scripts/terraform-plan.sh terraform/environments/${ENV}
+    env:
+      TF_ENV: ${{ matrix.environment }}
+      ENV: ${{ github.workflow }}
 
-  # These jobs run when creating a pull request
+
   deploy-dev-test:
     needs: plan-dev-test
     if: success()
     strategy:
       matrix:
         include:
-          - environment: development
           - environment: test
-    name: Apply - ${{  matrix.environment }}
+          - environment: development
+    name: Terraform apply - ${{ github.workflow }} - ${{ matrix.environment }}
     runs-on: ubuntu-latest
-    env:
-      TF_ENV: ${{ matrix.environment }}
     environment:
       name: ${{ github.workflow }}-${{ matrix.environment }}
     steps:
@@ -94,26 +96,27 @@ jobs:
         with:
           terraform_version: "~1"
           terraform_wrapper: false
-      - name: Apply - ${{ matrix.environment }}
+      - name: Run Terrform Apply
         run: |
           terraform --version
           echo "Terraform apply - ${TF_ENV}"
-          bash scripts/terraform-init.sh terraform/environments/$GITHUB_WORKFLOW
-          terraform -chdir="terraform/environments/${GITHUB_WORKFLOW}" workspace select "${GITHUB_WORKFLOW}-${TF_ENV}"
-          bash scripts/terraform-apply.sh terraform/environments/$GITHUB_WORKFLOW
+          bash scripts/terraform-init.sh terraform/environments/${ENV}
+          terraform -chdir="terraform/environments/${ENV}" workspace select "${ENV}-${TF_ENV}"
+          bash scripts/terraform-apply.sh terraform/environments/${ENV}
+    env:
+      TF_ENV: ${{ matrix.environment }}
+      ENV: ${{ github.workflow }}
 
-#  # Plan + deploy for pre-production and production environments, only from main
+  # Plan + deploy for pre-production and production environments, only from main
   plan-preprod-prod:
+    if: github.ref == 'refs/heads/main'
     strategy:
       matrix:
         include:
           - environment: preproduction
           - environment: production
-    name: Plan - ${{  matrix.environment }}
+    name: Terraform plan - ${{ github.workflow }} - ${{ matrix.environment }}
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    env:
-      TF_ENV: ${{ matrix.environment }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3.1.0
@@ -130,26 +133,27 @@ jobs:
         with:
           terraform_version: "~1"
           terraform_wrapper: false
-      - name: Plan - ${{ matrix.environment }}
+      - name: Terraform plan - ${{ matrix.environment }}
         run: |
           terraform --version
           echo "Terraform plan - ${TF_ENV}"
-          bash scripts/terraform-init.sh terraform/environments/$GITHUB_WORKFLOW
-          terraform -chdir="terraform/environments/${GITHUB_WORKFLOW}" workspace select "${GITHUB_WORKFLOW}-${TF_ENV}"
-          bash scripts/terraform-plan.sh terraform/environments/$GITHUB_WORKFLOW
-  # These jobs run when creating a pull request
+          bash scripts/terraform-init.sh terraform/environments/${ENV}
+          terraform -chdir="terraform/environments/${ENV}" workspace select "${ENV}-${TF_ENV}"
+          bash scripts/terraform-plan.sh terraform/environments/${ENV}
+    env:
+      TF_ENV: ${{ matrix.environment }}
+      ENV: ${{ github.workflow }}
+
   deploy-preprod-prod:
     needs: plan-preprod-prod
-    if: success()
+    if: success() && github.ref == 'refs/heads/main'
     strategy:
       matrix:
         include:
           - environment: preproduction
           - environment: production
-    name: Apply - ${{  matrix.environment }}
+    name: Terraform apply - ${{ github.workflow }} - ${{ matrix.environment }}
     runs-on: ubuntu-latest
-    env:
-      TF_ENV: ${{ matrix.environment }}
     environment:
       name: ${{ github.workflow }}-${{ matrix.environment }}
     steps:
@@ -168,10 +172,14 @@ jobs:
         with:
           terraform_version: "~1"
           terraform_wrapper: false
-      - name: Apply - ${{ matrix.environment }}
+      - name: Run Terrform Apply
         run: |
           terraform --version
           echo "Terraform apply - ${TF_ENV}"
-          bash scripts/terraform-init.sh terraform/environments/$GITHUB_WORKFLOW
-          terraform -chdir="terraform/environments/${GITHUB_WORKFLOW}" workspace select "${GITHUB_WORKFLOW}-${TF_ENV}"
-          bash scripts/terraform-apply.sh terraform/environments/$GITHUB_WORKFLOW
+          bash scripts/terraform-init.sh terraform/environments/${ENV}
+          terraform -chdir="terraform/environments/${ENV}" workspace select "${ENV}-${TF_ENV}"
+          bash scripts/terraform-apply.sh terraform/environments/${ENV}
+    env:
+      TF_ENV: ${{ matrix.environment }}
+      ENV: ${{ github.workflow }}
+
