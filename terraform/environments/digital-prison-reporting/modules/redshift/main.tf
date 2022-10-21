@@ -97,7 +97,7 @@ resource "aws_redshift_cluster" "this" {
 ################################################################################
 # IAM Roles
 ################################################################################
-
+# This is Redshift Service Role - Not IAM
 resource "aws_redshift_cluster_iam_roles" "this" {
   count = var.create_redshift_cluster && length(var.iam_role_arns) > 0 ? 1 : 0
 
@@ -215,6 +215,7 @@ resource "aws_redshift_scheduled_action" "this" {
   }
 }
 
+# This Role is for Cluster Resizing, Pause and Resume specific
 data "aws_iam_policy_document" "scheduled_action_assume" {
   count = var.create_redshift_cluster && var.create_scheduled_action_iam_role ? 1 : 0
 
