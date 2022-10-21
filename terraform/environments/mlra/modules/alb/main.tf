@@ -66,7 +66,7 @@ resource "aws_lb_listener" "alb_listener" {
 #therefore this will need to be added pending cutover strategy decisions
 
 resource "aws_lb_target_group" "alb_target_group" {
-  name                 = "${var.application_name}-target-group"
+  name                 = "${var.application_name}-tg-${var.environment}"
   port                 = var.target_group_port
   protocol             = var.target_group_protocol
   vpc_id               = var.vpc_id

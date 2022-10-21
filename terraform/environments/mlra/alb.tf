@@ -9,6 +9,7 @@ module "alb" {
   public_subnets                   = [data.aws_subnet.public_subnets_a.id, data.aws_subnet.public_subnets_b.id, data.aws_subnet.public_subnets_c.id]
   tags                             = local.tags
   account_number                   = local.environment_management.account_ids[terraform.workspace]
+  environment                      = local.environment
   region                           = "eu-west-2"
   enable_deletion_protection       = false
   idle_timeout                     = 60
