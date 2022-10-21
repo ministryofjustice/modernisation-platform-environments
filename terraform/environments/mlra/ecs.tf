@@ -29,7 +29,7 @@ module "mlra-ecs" {
   ec2_egress_rules        = local.ec2_egress_rules
   tags_common             = local.tags
 
-  depends_on = [module.alb, aws_cloudwatch_log_group.ecs_log_group]  # TODO module.alb will have to be passed-in as in input once the ecs work is put into a module
+  depends_on = [module.alb, aws_cloudwatch_log_group.ecs_log_group] # TODO module.alb will have to be passed-in as in input once the ecs work is put into a module
 }
 
 locals {
