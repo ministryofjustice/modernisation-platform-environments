@@ -6,7 +6,7 @@ resource "aws_lb" "ingress-network-lb" {
   internal           = true
   load_balancer_type = "network"
   subnets            = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id, data.aws_subnet.private_subnets_c.id]
-  security_groups    = [aws_security_group.nlb-ingress]
+  security_groups    = [aws_security_group.nlb-ingress.id]
 
   enable_deletion_protection = false
 
@@ -22,7 +22,7 @@ resource "aws_security_group" "nlb-ingress" {
     from_port        = 80
     to_port          = 80
     protocol         = "tcp"
-    cidr_blocks      = [10.202.0.0/20]
+    cidr_blocks      = ["10.202.0.0/20"]
   }
 
   egress {
@@ -55,5 +55,5 @@ resource "aws_lb_target_group" "alb-target" {
 
 resource "aws_lb_target_group_attachment" "alb-target-attachment" {
   target_group_arn = aws_lb_target_group.alb-target.arn
-  target_id        = module.lb-access-logs-enabled.aws_lb.loadbalancer.id
+  target_id        = module.lb-access-logs-enabled.load_balancer.id
 }
