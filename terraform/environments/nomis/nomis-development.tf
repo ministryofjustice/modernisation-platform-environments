@@ -43,6 +43,7 @@ locals {
     ec2_test_instances = {
       ssm_test_instance = {
         tags = {
+          server-type = "base"
           description = "instance for ssm permissions testing"
           monitored   = false
         }
