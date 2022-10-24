@@ -155,10 +155,10 @@ resource "aws_security_group_rule" "sms-inbound-bastion" {
 }
 
 resource "aws_security_group_rule" "sms-inbound-importmachine" {
-  depends_on               = [aws_security_group.sms_server]
-  security_group_id        = aws_security_group.sms_server.id
-  type                     = "ingress"
-# description update gg 21 Oct
+  depends_on        = [aws_security_group.sms_server]
+  security_group_id = aws_security_group.sms_server.id
+  type              = "ingress"
+  # description update gg 21 Oct
   description              = "allow all from importmachine"
   from_port                = 0
   to_port                  = 0
