@@ -39,7 +39,7 @@ locals {
       # *-nomis-db-3: HA
 
     }
-    weblogics          = {}
+    weblogics = {}
     ec2_test_instances = {
       ssm_test_instance = {
         tags = {
