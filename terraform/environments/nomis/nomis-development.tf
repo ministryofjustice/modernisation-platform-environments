@@ -43,7 +43,7 @@ locals {
     ec2_test_instances = {
       ssm_test_instance = {
         tags = {
-          description = "test instance for ssm permissions testing"
+          description = "instance for ssm permissions testing"
           monitored   = false
         }
         ami_name = "nomis_rhel_7_9_baseimage*"
