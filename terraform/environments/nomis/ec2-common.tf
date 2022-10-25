@@ -26,6 +26,7 @@ data "aws_iam_policy_document" "ssm_custom" {
       "ssm:DescribeDocument",
       "ssm:GetDeployablePatchSnapshotForInstance",
       "ssm:GetDocument",
+      "ssm:GetParameters",
       "ssm:GetManifest",
       "ssm:ListAssociations",
       "ssm:ListInstanceAssociations",
