@@ -14,5 +14,5 @@ This document is used to run the same site.yml file with roles against particula
 
 1. The EC2 instance running the role must have ssm:GetDocuments permissions.
 2. There must be an ssm:parameter for a GitHub token available in the account that the instance is running in.
-    - at the moment this only exists in nomis-test and nomis-development
+   - at the moment this only exists in nomis-test and nomis-development
 3. Currently LINUX ONLY
