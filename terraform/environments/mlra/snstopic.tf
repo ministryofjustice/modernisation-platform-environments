@@ -19,7 +19,7 @@ data "aws_secretsmanager_secret_version" "pagerduty_integration_keys" {
 #just waiting for these to be complete before making this section live
 
 # module "cwalarm" {
-#  source = "./module/cloudwatch"
+#  source = "./modules/cloudwatch"
 #
 #  pClusterName = " "
 #  pAutoscalingGroupName = " "

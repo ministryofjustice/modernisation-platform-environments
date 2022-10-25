@@ -25,7 +25,6 @@ variable "appnameenv" {
   default = ""
 
 }
-
 variable "pECSCPUAlarmThreshold" {
   description = "ECS CPU Alarm Threshold"
   type        = number
@@ -85,10 +84,4 @@ variable "pALBTargetResponseTimeThresholdMaximum" {
   description = "ALB Target Response Time Alarm Threshold Maximum"
   type        = number
   default     = "60"
-}
-
-variable "snsTopicName" {
-  description = "Name of the SNS Topic"
-  type        = string
-
 }
