@@ -19,14 +19,14 @@ locals {
     }
 
     ec2_test_autoscaling_groups = {
-      rhel-7-9-base = {
-        tags = {
-          description = "Standalone EC2 for testing RHEL7.9 base image"
-          monitored   = false
-        }
-        ami_name = "oasys_rhel_7_9_baseimage*"
-        # branch   = var.BRANCH_NAME # comment in if testing ansible
-      }
+      # rhel-7-9-base = {
+      #   tags = {
+      #     description = "Standalone EC2 for testing RHEL7.9 base image"
+      #     monitored   = false
+      #   }
+      #   ami_name = "oasys_rhel_7_9_baseimage*"
+      #   # branch   = var.BRANCH_NAME # comment in if testing ansible
+      # }
     }
 
     ec2_common = {

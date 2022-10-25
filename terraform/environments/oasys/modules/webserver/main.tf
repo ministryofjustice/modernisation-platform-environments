@@ -108,7 +108,7 @@ resource "aws_launch_template" "weblogic" {
         Name       = "weblogic-${var.name}"
         component  = "application"
         os_type    = "Linux"
-        os_version = "RHEL 6.10"
+        os_version = "RHEL 7.9"
       }
     )
   }
