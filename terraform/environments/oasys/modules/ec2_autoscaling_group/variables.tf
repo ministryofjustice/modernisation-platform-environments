@@ -93,11 +93,11 @@ variable "name" {
 variable "instance" {
   description = "EC2 instance settings, see aws_instance documentation"
   type = object({
-    disable_api_termination      = bool
-    instance_type                = string
-    key_name                     = string
-    monitoring                   = optional(bool)
-    vpc_security_group_ids       = list(string)
+    disable_api_termination = bool
+    instance_type           = string
+    key_name                = string
+    monitoring              = optional(bool)
+    vpc_security_group_ids  = list(string)
     private_dns_name_options = optional(object({
       enable_resource_name_dns_aaaa_record = optional(bool)
       enable_resource_name_dns_a_record    = optional(bool)
