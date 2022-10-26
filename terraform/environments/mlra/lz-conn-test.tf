@@ -11,7 +11,7 @@ module "ec2_instance" {
   name                   = "landingzone-httptest"
   ami                    = "ami-06672d07f62285d1d"
   instance_type          = "t3a.small"
-  vpc_security_group_ids = [module.mikereidhttptest_sg.security_group_id]
+  vpc_security_group_ids = [module.httptest_sg.security_group_id]
   subnet_id              = "subnet-06594eda5221bd3c9"
   user_data_base64       = base64encode(local.instance-userdata)
   tags = {
@@ -19,7 +19,7 @@ module "ec2_instance" {
     Environment = "dev"
   }
 }
-module "mikereidhttptest_sg" {
+module "httptest_sg" {
   source      = "terraform-aws-modules/security-group/aws"
   version     = "~> 4.0"
   name        = "landingzone-httptest-sg"
@@ -31,7 +31,7 @@ module "mikereidhttptest_sg" {
       to_port     = 65535
       protocol    = "tcp"
       description = "Outgoing"
-      cidr_blocks = "0.0.0.0/0"
+      cidr_blocks = local.lz_vpc_cidr
     }
   ]
   ingress_with_cidr_blocks = [
@@ -40,7 +40,7 @@ module "mikereidhttptest_sg" {
       to_port     = 80
       protocol    = "tcp"
       description = "HTTP"
-      cidr_blocks = "10.202.0.0/16"
+      cidr_blocks = local.lz_vpc_cidr
     }
   ]
 }
