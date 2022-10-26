@@ -37,6 +37,11 @@ variable "ec2_sec_rules" {
       "from_port" = 22,
       "to_port"   = 22,
       "protocol"  = "TCP"
+    },
+    "redshift" = {
+      "from_port" = 5439,
+      "to_port"   = 5439,
+      "protocol"  = "TCP"
     }
   }
 }
