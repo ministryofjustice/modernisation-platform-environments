@@ -18,31 +18,6 @@ resource "aws_lb" "ingress-network-lb" {
 
 }
 
-# resource "aws_security_group" "nlb-ingress" {
-# 
-#   ## lz_vpc_cidr = local.application_data.accounts[local.environment].lz_vpc_cidr
-# 
-#   name        = "nlb-ingress"
-#   description = "Allow inbound traffic on port 80"
-#   vpc_id      = data.aws_vpc.shared.id
-# 
-#   ingress {
-#     description      = "Port 80 from LAA LandingZone"
-#     from_port        = 80
-#     to_port          = 80
-#     protocol         = "tcp"
-#     cidr_blocks      = [local.lz_vpc_cidr]
-#   }
-# 
-#   egress {
-#     from_port        = 80
-#     to_port          = 80
-#     protocol         = "tcp"
-#     cidr_blocks      = [local.lz_vpc_cidr]
-#   }
-# 
-# }
-
 resource "aws_lb_listener" "lz-ingress" {
   load_balancer_arn = aws_lb.ingress-network-lb.arn
   port              = "80"
