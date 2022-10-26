@@ -92,6 +92,13 @@ variable "business_unit" {
   nullable    = false
 }
 
+variable "description" {
+  type        = string
+  description = "VM description, should include information such as what is running on it, etc."
+  default     = ""
+  nullable    = false
+}
+
 variable "extra_ingress_rules" {
   type = list(object({
     description = string
@@ -141,10 +148,24 @@ variable "oracle_app_disk_size" {
   type        = map(any)
   description = "Capcity of each Oracle application disk, /u01 and /u02.  If not specified, the default values from the AMI block device mappings will be used."
   default = {
-    # "/dev/sdb" = 100
-    # "/dev/sdc" = 100
+    # "/dev/sdb" = 100 # /u01
+    # "/dev/sdc" = 100 # /u02
   }
   nullable = false
+}
+
+variable "oracle_sids" {
+  type        = list(string)
+  description = "List of databases hosted on the server"
+  default     = []
+  nullable    = false
+}
+
+variable "restored_from_snapshot" {
+  type        = bool
+  description = "Instance is being restored from an existing Oracle database EC2 snapshot"
+  default     = false
+  nullable    = false
 }
 
 variable "subnet_set" {

@@ -8,6 +8,7 @@ locals {
 
 resource "aws_kms_key" "this" {
   enable_key_rotation = true
+  policy              = local.is-development ? data.aws_iam_policy_document.kms_policy[0].json : ""
 }
 
 resource "aws_kms_alias" "this" {
@@ -137,7 +138,7 @@ locals {
     }
     COR-A-CTX03 = {
       instance_type          = "t3a.large"
-      subnet_id              = data.aws_subnet.private_subnet_b.id
+      subnet_id              = data.aws_subnet.private_subnet_a.id
       vpc_security_group_ids = [aws_security_group.aws_citrix_security_group.id, aws_security_group.all_internal_groups.id]
       root_block_device = [
         {
@@ -255,12 +256,13 @@ data "aws_ami" "windows_2016_std_SQL17_ami" {
 }
 
 resource "aws_instance" "SOC" {
+  lifecycle { ignore_changes = [ebs_block_device] }
   ami = "ami-0781096210795e2d3"
 
   instance_type          = "t3a.xlarge"
   availability_zone      = "${local.region}a"
   subnet_id              = data.aws_subnet.private_subnet_a.id
-  vpc_security_group_ids = [aws_security_group.aws_proxy_security_group.id, aws_security_group.all_internal_groups.id]
+  vpc_security_group_ids = [aws_security_group.aws_proxy_security_group.id, aws_security_group.all_internal_groups.id, aws_security_group.aws_soc_security_group.id]
   monitoring             = true
   ebs_optimized          = true
   user_data              = data.template_file.windows-userdata.rendered
@@ -466,7 +468,7 @@ locals {
     }
     COR-A-EQP02 = {
       instance_type          = "t3a.xlarge"
-      subnet_id              = data.aws_subnet.private_subnet_b.id
+      subnet_id              = data.aws_subnet.private_subnet_a.id
       vpc_security_group_ids = [aws_security_group.aws_equip_security_group.id, aws_security_group.all_internal_groups.id]
       root_block_device = [
         {

@@ -17,3 +17,5 @@ tmp/
 *.iws
 out/
 .idea_modules/
+
+.tfsec/

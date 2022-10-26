@@ -1,0 +1,46 @@
+# This is an EC2Launch V2 type user-data script
+# https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2launch-v2-settings.html#ec2launch-v2-task-configuration
+# See C:\ProgramData\Amazon\EC2Launch\log for logs
+version: 1.0
+tasks:
+  - task: executeScript
+    inputs:
+      - frequency: once
+        type: powershell
+        runAs: admin
+        #not actually a secret
+        #checkov:skip=CKV_SECRET_6: "Base64 High Entropy String"
+        content: |
+          Set-TimeZone "GMT Standard Time"
+          Set-WinSystemLocale "en-GB"
+
+          # Scheduled job to add new users - jobs can be found under Task Scheduler -> Powershell -> ScheduledJobs
+          $add_users = '
+            Add-Type -AssemblyName "System.Web" # used for generating random password
+
+            $secret_prefix = "${SECRET_PREFIX}/" # from Terraform templating
+
+            $secrets = Get-SECSecretList -Filter @{Key="name";Values=$secret_prefix}
+
+            foreach($secret in $secrets){
+                $username = $secret.Name.SubString($secret_prefix.Length) # secrets are stored like /Jumpserver/Users/JoeBloggs, so trim prefix
+                $user_exists = Get-LocalUser $username -ErrorAction SilentlyContinue
+
+                if ($user_exists -eq $null) {
+                    # create password and add to secret manager
+                    $password = [System.Web.Security.Membership]::GeneratePassword(32,5)
+                    Write-SECSecretValue -SecretId $secret.ARN -SecretString $password
+
+                    # Create user and add to RD group
+                    $secure_string = ConvertTo-SecureString -String $password -AsPlainText -Force
+                    New-LocalUser $username -Password $secure_string -FullName $username
+                    Add-LocalGroupMember -Group "Remote Desktop Users" -Member $username
+                    Add-LocalGroupMember -Group "Administrators" -Member $username
+                }
+            }
+          '
+
+          # add_user script is written to file and added as a recurring job
+          $path = "C:\Users\Administrator\Documents\add_users.ps1"
+          Out-File -FilePath $path -InputObject $add_users
+          Register-ScheduledJob -Name "add_users" -FilePath $path -RunEvery $(New-TimeSpan -Minutes 15) -RunNow

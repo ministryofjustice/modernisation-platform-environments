@@ -2,6 +2,9 @@ data "aws_ec2_managed_prefix_list" "cf" {
   name = "com.amazonaws.global.cloudfront.origin-facing"
 }
 
+# to get account id
+data "aws_caller_identity" "current" {}
+
 resource "aws_security_group_rule" "allow_cloudfront_ips" {
   depends_on        = [aws_security_group.waf_lb]
   security_group_id = aws_security_group.waf_lb.id
@@ -238,6 +241,7 @@ resource "aws_acm_certificate_validation" "waf_lb_cert_validation" {
 
 resource "aws_wafv2_web_acl" "waf_acl" {
   name        = "waf-acl"
+  count       = local.is-production ? 0 : 1
   description = "WAF for Xhibit Portal."
   scope       = "REGIONAL"
 
@@ -305,13 +309,18 @@ resource "aws_wafv2_web_acl" "waf_acl" {
 
 resource "aws_wafv2_web_acl_association" "aws_lb_waf_association" {
   resource_arn = aws_lb.waf_lb.arn
-  web_acl_arn  = aws_wafv2_web_acl.waf_acl.arn
+  count        = local.is-production ? 0 : 1
+  web_acl_arn  = aws_wafv2_web_acl.waf_acl[0].arn
 }
 
 resource "aws_s3_bucket" "loadbalancer_logs" {
   bucket        = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}-lblogs"
-  acl           = "log-delivery-write"
   force_destroy = true
+}
+
+resource "aws_s3_bucket_acl" "loadbalancer_logs" {
+  bucket = aws_s3_bucket.loadbalancer_logs.id
+  acl    = "log-delivery-write"
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "default_encryption_loadbalancer_logs" {
@@ -331,6 +340,31 @@ resource "aws_s3_bucket_policy" "loadbalancer_logs_policy" {
 
 
 data "aws_iam_policy_document" "s3_bucket_lb_write" {
+
+  statement {
+    sid = "AllowSSLRequestsOnly"
+    actions = [
+      "s3:*",
+    ]
+    effect = "Deny"
+    resources = [
+      "${aws_s3_bucket.loadbalancer_logs.arn}/*",
+      "${aws_s3_bucket.loadbalancer_logs.arn}"
+    ]
+
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values = [
+        "false"
+      ]
+    }
+
+    principals {
+      identifiers = ["*"]
+      type        = "AWS"
+    }
+  }
 
   statement {
     actions = [
@@ -353,6 +387,7 @@ data "aws_iam_policy_document" "s3_bucket_lb_write" {
     ]
     effect    = "Allow"
     resources = ["${aws_s3_bucket.loadbalancer_logs.arn}/*"]
+
     principals {
       identifiers = ["delivery.logs.amazonaws.com"]
       type        = "Service"
@@ -365,6 +400,7 @@ data "aws_iam_policy_document" "s3_bucket_lb_write" {
     ]
     effect    = "Allow"
     resources = ["${aws_s3_bucket.loadbalancer_logs.arn}"]
+
     principals {
       identifiers = ["delivery.logs.amazonaws.com"]
       type        = "Service"
@@ -373,13 +409,20 @@ data "aws_iam_policy_document" "s3_bucket_lb_write" {
 }
 
 resource "aws_s3_bucket" "waf_logs" {
+  count         = local.is-production ? 0 : 1
   bucket        = "aws-waf-logs-${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}"
-  acl           = "log-delivery-write"
   force_destroy = true
 }
 
+resource "aws_s3_bucket_acl" "waf_logs" {
+  count  = local.is-production ? 0 : 1
+  bucket = aws_s3_bucket.waf_logs[0].id
+  acl    = "log-delivery-write"
+}
+
 resource "aws_s3_bucket_server_side_encryption_configuration" "default_encryption_waf_logs" {
-  bucket = aws_s3_bucket.waf_logs.bucket
+  count  = local.is-production ? 0 : 1
+  bucket = aws_s3_bucket.waf_logs[0].bucket
 
   rule {
     apply_server_side_encryption_by_default {
@@ -389,6 +432,113 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "default_encryptio
 }
 
 resource "aws_wafv2_web_acl_logging_configuration" "waf_logs" {
-  log_destination_configs = ["${aws_s3_bucket.waf_logs.arn}"]
-  resource_arn            = aws_wafv2_web_acl.waf_acl.arn
+  count                   = local.is-production ? 0 : 1
+  log_destination_configs = ["${aws_s3_bucket.waf_logs[0].arn}"]
+  resource_arn            = aws_wafv2_web_acl.waf_acl[0].arn
+}
+
+resource "aws_s3_bucket_policy" "waf_logs_policy" {
+  count  = local.is-production ? 0 : 1
+  bucket = aws_s3_bucket.waf_logs[0].bucket
+  policy = data.aws_iam_policy_document.s3_bucket_waf_logs_policy[0].json
+}
+
+data "aws_iam_policy_document" "s3_bucket_waf_logs_policy" {
+  count = local.is-production ? 0 : 1
+  statement {
+    sid = "AllowSSLRequestsOnly"
+    actions = [
+      "s3:*",
+    ]
+    effect = "Deny"
+    resources = [
+      "${aws_s3_bucket.waf_logs[0].arn}/*",
+      "${aws_s3_bucket.waf_logs[0].arn}"
+    ]
+
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values = [
+        "false"
+      ]
+    }
+
+    principals {
+      identifiers = ["*"]
+      type        = "AWS"
+    }
+  }
+
+  statement {
+    sid = "AWSLogDeliveryWrite"
+    actions = [
+      "s3:PutObject",
+    ]
+    effect = "Allow"
+    resources = [
+      "${aws_s3_bucket.waf_logs[0].arn}/AWSLogs/*"
+    ]
+
+    condition {
+      test     = "StringEquals"
+      variable = "s3:x-amz-acl"
+      values = [
+        "bucket-owner-full-control"
+      ]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceAccount"
+      values = [
+        "${data.aws_caller_identity.current.account_id}"
+      ]
+    }
+
+    condition {
+      test     = "ArnLike"
+      variable = "aws:SourceArn"
+      values = [
+        "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.account_id}:*"
+      ]
+    }
+
+    principals {
+      identifiers = ["delivery.logs.amazonaws.com"]
+      type        = "Service"
+    }
+  }
+
+  statement {
+    sid = "AWSLogDeliveryAclCheck"
+    actions = [
+      "s3:GetBucketAcl"
+    ]
+    effect = "Allow"
+    resources = [
+      "${aws_s3_bucket.waf_logs[0].arn}"
+    ]
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceAccount"
+      values = [
+        "${data.aws_caller_identity.current.account_id}"
+      ]
+    }
+
+    condition {
+      test     = "ArnLike"
+      variable = "aws:SourceArn"
+      values = [
+        "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.account_id}:*"
+      ]
+    }
+
+    principals {
+      identifiers = ["delivery.logs.amazonaws.com"]
+      type        = "Service"
+    }
+  }
 }

@@ -11,19 +11,6 @@
 # EC2
 #------------------------------------------------------------------------------
 
-# user-data template
-data "template_file" "user_data" {
-  template = file("${path.module}/user-data/user-data.sh")
-  vars = {
-    ENV                     = var.name
-    DB_HOSTNAME             = "db.${var.name}.${var.application_name}.${data.aws_route53_zone.internal.name}"
-    USE_DEFAULT_CREDS       = var.use_default_creds
-    AUTO_SCALING_GROUP_NAME = local.auto_scaling_group_name
-    LIFECYCLE_HOOK_NAME     = local.initial_lifecycle_hook_name
-    REGION                  = var.region
-  }
-}
-
 data "aws_vpc" "shared_vpc" {
   tags = {
     Name = "${var.business_unit}-${var.environment}"
@@ -38,6 +25,30 @@ data "aws_subnets" "private" {
   tags = {
     Name = "${var.business_unit}-${var.environment}-${var.subnet_set}-private-${var.region}*"
   }
+}
+
+resource "aws_security_group" "weblogic" {
+  description = "Security group rules specific to this weblogic instance"
+  name        = "weblogic-${var.name}"
+  vpc_id      = data.aws_vpc.shared_vpc.id
+
+  tags = merge(
+    var.tags,
+    {
+      Name = "weblogic-${var.name}",
+  })
+}
+
+# Extra ingress rules that might be specified
+resource "aws_security_group_rule" "extra_rules" {
+  for_each          = { for rule in var.extra_ingress_rules : "${rule.description}-${rule.to_port}" => rule }
+  type              = "ingress"
+  security_group_id = aws_security_group.weblogic.id
+  description       = each.value.description
+  from_port         = each.value.from_port
+  to_port           = each.value.to_port
+  cidr_blocks       = each.value.cidr_blocks
+  protocol          = each.value.protocol
 }
 
 resource "aws_launch_template" "weblogic" {
@@ -69,11 +80,11 @@ resource "aws_launch_template" "weblogic" {
   instance_type                        = var.instance_type
   key_name                             = var.key_name
 
-  #tfsec:ignore:aws-autoscaling-enforce-http-token-imds
-  # metadata_options { # http_endpoint/http_tokens forces instance to use IMDSv2 which is incompatible with Weblogic
-  #   http_endpoint = "enabled"
-  #   http_tokens   = "required"
-  # }
+  #checkov:skip=CKV_AWS_79 # skip "Ensure Instance Metadata Service Version 1 is not enabled" incompatible with Weblogic
+  metadata_options {
+    http_endpoint = "enabled"
+    http_tokens   = "optional" #tfsec:ignore:aws-autoscaling-enforce-http-token-imds: http_tokens forces instance to use IMDSv2 which is incompatible with Weblogic
+  }
 
   monitoring {
     enabled = true
@@ -81,8 +92,11 @@ resource "aws_launch_template" "weblogic" {
 
   network_interfaces {
     associate_public_ip_address = false
-    security_groups             = [var.common_security_group_id]
-    delete_on_termination       = true
+    security_groups = [
+      var.common_security_group_id,
+      aws_security_group.weblogic.id
+    ]
+    delete_on_termination = true
   }
 
   tag_specifications {
@@ -110,7 +124,18 @@ resource "aws_launch_template" "weblogic" {
     )
   }
 
-  user_data = base64encode(data.template_file.user_data.rendered)
+  user_data = base64encode(templatefile(
+    "${path.module}/templates/user-data.sh.tftmpl",
+    {
+      ENV                     = var.name
+      DB_HOSTNAME             = "db.${var.name}.${var.application_name}.${data.aws_route53_zone.internal.name}"
+      USE_DEFAULT_CREDS       = var.use_default_creds
+      AUTO_SCALING_GROUP_NAME = local.auto_scaling_group_name
+      LIFECYCLE_HOOK_NAME     = local.initial_lifecycle_hook_name
+      REGION                  = var.region
+    }
+    )
+  )
 
   tags = merge(
     var.tags,
@@ -123,7 +148,7 @@ resource "aws_launch_template" "weblogic" {
 
   lifecycle {
     ignore_changes = [
-      tags, description, image_id, latest_version
+      tags, description, image_id
     ]
   }
 
@@ -135,7 +160,7 @@ resource "aws_launch_template" "weblogic" {
 resource "aws_autoscaling_group" "weblogic" {
   launch_template {
     id      = aws_launch_template.weblogic.id
-    version = aws_launch_template.weblogic.latest_version
+    version = "$Default"
   }
 
   initial_lifecycle_hook {
@@ -191,11 +216,11 @@ resource "aws_autoscaling_group" "weblogic" {
       propagate_at_launch = true
     }
   }
-  lifecycle {
-    ignore_changes = [
-      launch_template[0].version
-    ]
-  }
+  #   lifecycle {
+  #     ignore_changes = [
+  #       launch_template[0].version
+  #     ]
+  #   }
 }
 
 resource "aws_autoscaling_schedule" "scale_down" {
@@ -321,6 +346,7 @@ data "aws_iam_policy_document" "weblogic" {
     sid     = "ParameterAccessForWeblogicSetup"
     effect  = "Allow"
     actions = ["ssm:GetParameter"]
+    #tfsec:ignore:aws-iam-no-policy-wildcards: access scoped to parameter path
     resources = [
       "arn:aws:ssm:${var.region}:${data.aws_caller_identity.current.id}:parameter/weblogic/default/*",
       "arn:aws:ssm:${var.region}:${data.aws_caller_identity.current.id}:parameter/weblogic/${var.name}/*"
@@ -328,10 +354,10 @@ data "aws_iam_policy_document" "weblogic" {
   }
 
   statement {
-    #tfsec:ignore:aws-iam-no-policy-wildcards:this needs to be created before the autoscaling group, therefore the ASG ID needs to be wildcarded
     sid     = "TriggerInstanceLifecycleHooks"
     effect  = "Allow"
     actions = ["autoscaling:CompleteLifecycleAction"]
+    #tfsec:ignore:aws-iam-no-policy-wildcards: this needs to be created before the autoscaling group, therefore the ASG ID needs to be wildcarded
     resources = [
       "arn:aws:autoscaling:${var.region}:${data.aws_caller_identity.current.id}:autoScalingGroup:*:autoScalingGroupName/${local.auto_scaling_group_name}"
     ]

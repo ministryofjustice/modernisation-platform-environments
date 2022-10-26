@@ -12,15 +12,63 @@ updates:
   # a dependabot configuration, so we need to add all directories individually
   # See: github.com/dependabot/dependabot-core/issues/2178
   - package-ecosystem: "terraform"
+    directory: "/terraform/environments/apex"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/ccms-ebs"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
     directory: "/terraform/environments/cooker"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
-    directory: "/terraform/environments/equip"
+    directory: "/terraform/environments/data-and-insights-wepi"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
-    directory: "/terraform/environments/equip/acm-dns"
+    directory: "/terraform/environments/delius-iaps"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/digital-prison-reporting"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/digital-prison-reporting/modules/ec2"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/digital-prison-reporting/modules/glue_connection"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/digital-prison-reporting/modules/glue_database"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/digital-prison-reporting/modules/glue_job"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/digital-prison-reporting/modules/glue_registry"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/digital-prison-reporting/modules/glue_table"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/digital-prison-reporting/modules/kinesis_stream"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/digital-prison-reporting/modules/s3_bucket"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/equip"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
@@ -36,6 +84,18 @@ updates:
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
+    directory: "/terraform/environments/maatdb"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/mlra"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/mlra/module/cloudwatch"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
     directory: "/terraform/environments/nomis"
     schedule:
       interval: "daily"
@@ -44,7 +104,23 @@ updates:
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
+    directory: "/terraform/environments/nomis/modules/ec2_autoscaling_group"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/nomis/modules/ec2_instance"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/nomis/modules/sns_topic"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
     directory: "/terraform/environments/nomis/modules/weblogic"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/oasys"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
@@ -56,6 +132,10 @@ updates:
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
+    directory: "/terraform/environments/refer-monitor"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
     directory: "/terraform/environments/sprinkler"
     schedule:
       interval: "daily"
@@ -64,7 +144,7 @@ updates:
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
-    directory: "/terraform/environments/testing"
+    directory: "/terraform/environments/threat-and-vulnerability-mgmt"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"

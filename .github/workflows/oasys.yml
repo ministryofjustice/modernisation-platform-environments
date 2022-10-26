@@ -1,0 +1,185 @@
+---
+name: oasys
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'terraform/environments/oasys/**'
+      - '.github/workflows/oasys.yml'
+  pull_request:
+    branches:
+      - main
+    types: [opened, edited, reopened, synchronize]
+    paths:
+      - 'terraform/environments/oasys/**'
+      - '.github/workflows/oasys.yml'
+  workflow_dispatch:
+
+env:
+  GITHUB_TOKEN: ${{ secrets.DSO_GITHUB_AUTOMATION_PAT }}
+  TF_IN_AUTOMATION: true
+  TF_VAR_BRANCH_NAME: ${{ github.event_name == 'pull_request' && 'main' || (github.head_ref || github.ref_name) }}
+  TF_VAR_GH_ACTOR_NAME: ${{ github.actor}}
+  AWS_REGION: "eu-west-2"
+  ENVIRONMENT_MANAGEMENT: ${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}
+permissions:
+  id-token: write # This is required for requesting the JWT
+  contents: read # This is required for actions/checkout
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  # Plan + deploy for development and test enironments, never from main
+  plan-dev-test:
+    strategy:
+      matrix:
+        include:
+          - environment: test
+          - environment: development
+    name: Terraform plan - ${{ github.workflow }} - ${{ matrix.environment }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3.1.0
+      - name: Set Account Number
+        run: echo "ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${GITHUB_WORKFLOW}-${TF_ENV}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)" >> $GITHUB_ENV
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
+          role-session-name: githubactionsrolesession
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Load and Configure Terraform
+        uses: hashicorp/setup-terraform@v2.0.2
+        with:
+          terraform_version: "~1"
+          terraform_wrapper: false
+      - name: Terraform plan - ${{ matrix.environment }}
+        run: |
+          terraform --version
+          echo "Terraform plan - ${TF_ENV}"
+          bash scripts/terraform-init.sh terraform/environments/${ENV}
+          terraform -chdir="terraform/environments/${ENV}" workspace select "${ENV}-${TF_ENV}"
+          bash scripts/terraform-plan.sh terraform/environments/${ENV}
+    env:
+      TF_ENV: ${{ matrix.environment }}
+      ENV: ${{ github.workflow }}
+
+
+  deploy-dev-test:
+    needs: plan-dev-test
+    if: success()
+    strategy:
+      matrix:
+        include:
+          - environment: test
+          - environment: development
+    name: Terraform apply - ${{ github.workflow }} - ${{ matrix.environment }}
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.workflow }}-${{ matrix.environment }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3.1.0
+      - name: Set Account Number
+        run: echo "ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${GITHUB_WORKFLOW}-${TF_ENV}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)" >> $GITHUB_ENV
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
+          role-session-name: githubactionsrolesession
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Load and Configure Terraform
+        uses: hashicorp/setup-terraform@v2.0.2
+        with:
+          terraform_version: "~1"
+          terraform_wrapper: false
+      - name: Run Terrform Apply
+        run: |
+          terraform --version
+          echo "Terraform apply - ${TF_ENV}"
+          bash scripts/terraform-init.sh terraform/environments/${ENV}
+          terraform -chdir="terraform/environments/${ENV}" workspace select "${ENV}-${TF_ENV}"
+          bash scripts/terraform-apply.sh terraform/environments/${ENV}
+    env:
+      TF_ENV: ${{ matrix.environment }}
+      ENV: ${{ github.workflow }}
+
+  # Plan + deploy for pre-production and production environments, only from main
+  plan-preprod-prod:
+    if: github.ref == 'refs/heads/main'
+    strategy:
+      matrix:
+        include:
+          - environment: preproduction
+          - environment: production
+    name: Terraform plan - ${{ github.workflow }} - ${{ matrix.environment }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3.1.0
+      - name: Set Account Number
+        run: echo "ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${GITHUB_WORKFLOW}-${TF_ENV}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)" >> $GITHUB_ENV
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
+          role-session-name: githubactionsrolesession
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Load and Configure Terraform
+        uses: hashicorp/setup-terraform@v2.0.2
+        with:
+          terraform_version: "~1"
+          terraform_wrapper: false
+      - name: Terraform plan - ${{ matrix.environment }}
+        run: |
+          terraform --version
+          echo "Terraform plan - ${TF_ENV}"
+          bash scripts/terraform-init.sh terraform/environments/${ENV}
+          terraform -chdir="terraform/environments/${ENV}" workspace select "${ENV}-${TF_ENV}"
+          bash scripts/terraform-plan.sh terraform/environments/${ENV}
+    env:
+      TF_ENV: ${{ matrix.environment }}
+      ENV: ${{ github.workflow }}
+
+  deploy-preprod-prod:
+    needs: plan-preprod-prod
+    if: success() && github.ref == 'refs/heads/main'
+    strategy:
+      matrix:
+        include:
+          - environment: preproduction
+          - environment: production
+    name: Terraform apply - ${{ github.workflow }} - ${{ matrix.environment }}
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.workflow }}-${{ matrix.environment }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3.1.0
+      - name: Set Account Number
+        run: echo "ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${GITHUB_WORKFLOW}-${TF_ENV}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)" >> $GITHUB_ENV
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
+          role-session-name: githubactionsrolesession
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Load and Configure Terraform
+        uses: hashicorp/setup-terraform@v2.0.2
+        with:
+          terraform_version: "~1"
+          terraform_wrapper: false
+      - name: Run Terrform Apply
+        run: |
+          terraform --version
+          echo "Terraform apply - ${TF_ENV}"
+          bash scripts/terraform-init.sh terraform/environments/${ENV}
+          terraform -chdir="terraform/environments/${ENV}" workspace select "${ENV}-${TF_ENV}"
+          bash scripts/terraform-apply.sh terraform/environments/${ENV}
+    env:
+      TF_ENV: ${{ matrix.environment }}
+      ENV: ${{ github.workflow }}
+

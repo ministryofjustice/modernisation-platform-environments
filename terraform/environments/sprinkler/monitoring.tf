@@ -19,7 +19,8 @@ resource "aws_cloudwatch_metric_alarm" "ddos_attack_external" {
 
 # SNS topic for monitoring to send alarms to
 resource "aws_sns_topic" "sprinkler_high_priority" {
-  name = "sprinkler_high_priority"
+  name              = "sprinkler_high_priority"
+  kms_master_key_id = data.aws_kms_key.sns.id
 }
 
 ## Pager duty integration

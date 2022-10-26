@@ -18,6 +18,7 @@ redeployed_envs=()
 skipped_envs=()
 failed_envs=()
 for key in "${!account_ids[@]}"; do
+  exit_code=0
   to_dir_name "$key"
   if [[ "$NUKE_DO_NOT_RECREATE_ENVIRONMENTS" != *"${dir_name}-development,"* ]]; then
     echo "BEGIN: terraform apply ${dir_name}-development"

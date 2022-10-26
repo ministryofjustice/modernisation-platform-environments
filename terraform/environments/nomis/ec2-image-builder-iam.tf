@@ -5,6 +5,16 @@ data "aws_caller_identity" "mod-platform" {
   provider = aws.modernisation-platform
 }
 
+data "aws_kms_key" "nomis_key" {
+  # Look up the CMK used to create AMIs, which is in the test account (maybe it should be in prod?)
+  key_id = "arn:aws:kms:${local.region}:${local.environment_management.account_ids["nomis-test"]}:alias/nomis-image-builder"
+}
+
+data "aws_kms_key" "hmpps_key" {
+  # Look up the shared CMK used to create AMIs in the MP shared services account
+  key_id = "arn:aws:kms:${local.region}:${local.environment_management.account_ids["core-shared-services-production"]}:alias/ebs-hmpps"
+}
+
 data "aws_iam_policy_document" "image-builder-distro-assume-role" {
   statement {
     actions = ["sts:AssumeRole"]
@@ -28,28 +38,40 @@ resource "aws_iam_role" "image-builder-distro-role" {
 
 }
 
-
+#tfsec:ignore:aws-iam-no-policy-wildcards AWS Managed Policy
 resource "aws_iam_role_policy_attachment" "image-builder-distro-policy-attach" {
   policy_arn = "arn:aws:iam::aws:policy/Ec2ImageBuilderCrossAccountDistributionAccess"
   role       = aws_iam_role.image-builder-distro-role.name
 }
 
-
+#tfsec:ignore:aws-iam-no-policy-wildcards needed to look up launch template ids from another account
 data "aws_iam_policy_document" "image-builder-launch-template-policy" {
   statement {
     effect = "Allow"
-    actions = ["ec2:CreateLaunchTemplateVersion",
+    actions = [
+      "ec2:DescribeLaunchTemplates"
+    ]
+
+    resources = ["*"]
+  }
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "ec2:CreateLaunchTemplateVersion",
       "ec2:ModifyLaunchTemplate",
-      "ec2:DescribeLaunchTemplates",
       "ec2:CreateTags"
     ]
-    resources = ["*"]
+    # coalescelist as there are no weblogics in prod at the moment and empty resource is not acceptable
+    # resources = coalescelist([for item in module.weblogic : item.launch_template_arn], ["arn:aws:ec2:${local.region}:${data.aws_caller_identity.current.id}:launch-template/dummy"])
+    resources = ["arn:aws:ec2:${local.region}:${data.aws_caller_identity.current.id}:launch-template/*"]
   }
 }
 
 data "aws_iam_policy_document" "image-builder-distro-kms-policy" {
   statement {
     effect = "Allow"
+    #tfsec:ignore:aws-iam-no-policy-wildcards
     actions = [
       "kms:Encrypt",
       "kms:Decrypt",
@@ -58,10 +80,11 @@ data "aws_iam_policy_document" "image-builder-distro-kms-policy" {
       "kms:GenerateDataKey*",
       "kms:DescribeKey",
       "kms:CreateGrant",
-      "kms:ListGrant",
+      "kms:ListGrants",
       "kms:RevokeGrant"
     ]
-    resources = ["*"]
+    # we use the same AMIs in test and production, which are encrypted with a single key that only exists in test, hence the below
+    resources = [local.environment == "test" ? aws_kms_key.nomis-cmk[0].arn : data.aws_kms_key.nomis_key.arn, data.aws_kms_key.hmpps_key.arn]
   }
 }
 
@@ -144,4 +167,19 @@ resource "aws_iam_role_policy_attachment" "launch-template-reader-policy-attach"
   policy_arn = aws_iam_policy.launch-template-reader-policy.arn
   role       = aws_iam_role.core-services-launch-template-reader.name
 
+}
+
+resource "aws_kms_grant" "image-builder-shared-cmk-grant" {
+  name              = "image-builder-shared-cmk-grant"
+  key_id            = data.aws_kms_key.hmpps_key.arn
+  grantee_principal = "arn:aws:iam::${local.account_id}:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling"
+  operations = [
+    "Encrypt",
+    "Decrypt",
+    "ReEncryptFrom",
+    "GenerateDataKey",
+    "GenerateDataKeyWithoutPlaintext",
+    "DescribeKey",
+    "CreateGrant"
+  ]
 }

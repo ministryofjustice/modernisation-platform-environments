@@ -12,6 +12,7 @@
 		},
 		"metrics_collected": {
 			"cpu": {
+				"resources": ["*"],
 				"measurement": [
 					"cpu_usage_idle",
 					"cpu_usage_iowait",
@@ -44,13 +45,15 @@
 				"measurement": [
 					"mem_used_percent"
 				],
-				"metrics_collection_interval": 60
+				"metrics_collection_interval": 60,
+				"resources": ["*"]
 			},
 			"swap": {
 				"measurement": [
 					"swap_used_percent"
 				],
-				"metrics_collection_interval": 60
+				"metrics_collection_interval": 60,
+				"resources": ["*"]
 			}
 		}
 	},

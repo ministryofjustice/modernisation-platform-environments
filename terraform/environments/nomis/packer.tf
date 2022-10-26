@@ -84,7 +84,8 @@ data "aws_iam_policy_document" "packer_minimum_permissions" {
       "ec2:ModifyImageAttribute",
       "ec2:ModifySnapshotAttribute",
       "ec2:RegisterImage",
-      "ec2:RunInstances"
+      "ec2:RunInstances",
+      "sns:*" # just temporary to test subscriptions
     ]
     resources = ["*"]
   }
@@ -153,7 +154,7 @@ data "aws_iam_policy_document" "packer_minimum_permissions" {
     ]
   }
 
-  statement { # need so Packer can use CMK to encrypt snapshots so can be shared with other accounts
+  statement { # need this so Packer can use CMK to encrypt snapshots so can be shared with other accounts
     effect = "Allow"
     actions = [
       "kms:Encrypt",
@@ -164,12 +165,13 @@ data "aws_iam_policy_document" "packer_minimum_permissions" {
       "kms:DescribeKey",
       "kms:CreateGrant"
     ]
-    resources = [aws_kms_key.nomis-cmk[0].arn]
+    resources = [aws_kms_key.nomis-cmk[0].arn, data.aws_kms_key.hmpps_key.arn]
   }
 }
 
 # build policy json for Packer session manager permissions
 data "aws_iam_policy_document" "packer_ssm_permissions" {
+  #checkov:skip=CKV_AWS_108 # skip "Ensure IAM policies does not allow data exfiltration" while using the packer role which requires broad range of permissions
   count = local.environment == "test" ? 1 : 0
   statement {
     effect    = "Allow"
@@ -223,9 +225,7 @@ data "aws_iam_policy_document" "packer_ansible_permissions" {
       "ec2:DescribeInstanceTypes",
       "ec2:DescribeVpcs",
       "ec2:DescribeKeyPairs",
-      "sts:DecodeAuthorizationMessage",
-      "kms:ReEncrypt*", # for building from cmk-encrypted AMIs
-      "logs:DeleteLogGroup"
+      "sts:DecodeAuthorizationMessage"
     ]
     resources = ["*"]
   }
@@ -290,7 +290,8 @@ data "aws_iam_policy_document" "packer_s3_bucket_access" {
     effect = "Allow"
     actions = [
       "s3:GetObject",
-      "s3:ListBucket"
+      "s3:ListBucket",
+      "s3:PutObject"
     ]
     resources = [
       module.s3-bucket.bucket.arn,
@@ -301,12 +302,35 @@ data "aws_iam_policy_document" "packer_s3_bucket_access" {
   }
 }
 
+# build policy document for listing/describing EC2 instances
+data "aws_iam_policy_document" "packer_ec2_instance_access" {
+  count = local.environment == "test" ? 1 : 0
+  statement {
+    effect = "Allow"
+    actions = [
+      "ec2:DescribeInstances",
+      "ec2:DescribeImages",
+      "ec2:DescribeTags",
+      "ec2:DescribeSnapshots"
+    ]
+    resources = ["*"]
+  }
+}
+
 # attach s3 document as inline policy
 resource "aws_iam_role_policy" "packer_s3_bucket_access" {
   count  = local.environment == "test" ? 1 : 0
   name   = "nomis-apps-bucket-access"
   role   = aws_iam_role.packer_ssm_role[0].name
   policy = data.aws_iam_policy_document.packer_s3_bucket_access[0].json
+}
+
+# attach ec2 document as inline policy
+resource "aws_iam_role_policy" "packer_ec2_instance_access" {
+  count  = local.environment == "test" ? 1 : 0
+  name   = "nomis-describe-instance-access"
+  role   = aws_iam_role.packer_ssm_role[0].name
+  policy = data.aws_iam_policy_document.packer_ec2_instance_access[0].json
 }
 
 # create instance profile from role

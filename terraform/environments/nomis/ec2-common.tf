@@ -1,19 +1,31 @@
 #------------------------------------------------------------------------------
 # Common IAM policies for all ec2 instance profiles
 #------------------------------------------------------------------------------
-
+resource "aws_kms_grant" "ssm-start-stop-shared-cmk-grant" {
+  count             = local.environment == "test" ? 1 : 0
+  name              = "image-builder-shared-cmk-grant"
+  key_id            = data.aws_kms_key.hmpps_key.arn
+  grantee_principal = aws_iam_role.ssm_ec2_start_stop.arn
+  operations = [
+    "Encrypt",
+    "Decrypt",
+    "ReEncryptFrom",
+    "GenerateDataKey",
+    "GenerateDataKeyWithoutPlaintext",
+    "DescribeKey",
+    "CreateGrant"
+  ]
+}
 # custom policy for SSM as managed policy AmazonSSMManagedInstanceCore is too permissive
 data "aws_iam_policy_document" "ssm_custom" {
-  #tfsec:ignore:AWS099:this is derived from AmazonSSMManagedInstanceCore managed policy
-  #checkov:skip=CKV_AWS_111:this is derived from AmazonSSMManagedInstanceCore managed policy
   statement {
     sid    = "CustomSsmPolicy"
     effect = "Allow"
     actions = [
       "ssm:DescribeAssociation",
+      "ssm:DescribeDocument",
       "ssm:GetDeployablePatchSnapshotForInstance",
       "ssm:GetDocument",
-      "ssm:DescribeDocument",
       "ssm:GetManifest",
       "ssm:ListAssociations",
       "ssm:ListInstanceAssociations",
@@ -34,7 +46,10 @@ data "aws_iam_policy_document" "ssm_custom" {
       "ec2messages:GetMessages",
       "ec2messages:SendReply"
     ]
-    resources = ["*"]
+    # skiping these as policy is a scoped down version of Amazon provided AmazonSSMManagedInstanceCore managed policy.  Permissions required for SSM function
+
+    #checkov:skip=CKV_AWS_111: "Ensure IAM policies does not allow write access without constraints"
+    resources = ["*"] #tfsec:ignore:aws-iam-no-policy-wildcards
   }
 }
 
@@ -52,7 +67,9 @@ data "aws_iam_policy_document" "cloud_watch_custom" {
       "logs:DescribeLogGroups",
       "logs:CreateLogStream"
     ]
-    resources = ["*"]
+    # skiping these as policy is a scoped down version of Amazon provided CloudWatchAgentServerPolicy managed policy
+    #checkov:skip=CKV_AWS_111: "Ensure IAM policies does not allow write access without constraints"
+    resources = ["*"] #tfsec:ignore:aws-iam-no-policy-wildcards
   }
 
   statement {
@@ -78,6 +95,15 @@ data "aws_iam_policy_document" "cloud_watch_custom" {
 # create policy document for access to s3 artefact bucket
 data "aws_iam_policy_document" "s3_bucket_access" {
   statement {
+    sid    = "AllowOracleSecureWebListBucketandGetLocation"
+    effect = "Allow"
+    actions = [
+      "s3:ListAllMyBuckets",
+      "s3:GetBucketLocation"
+    ]
+    resources = ["arn:aws:s3:::*"]
+  }
+  statement {
     sid    = "AccessToInstallationArtefactBucket"
     effect = "Allow"
     actions = [
@@ -88,6 +114,21 @@ data "aws_iam_policy_document" "s3_bucket_access" {
     ]
     resources = [module.s3-bucket.bucket.arn,
     "${module.s3-bucket.bucket.arn}/*"]
+  }
+
+  statement {
+    sid    = "AccessToAuditAchiveBucket"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:PutObjectAcl",
+      "s3:ListBucket"
+    ]
+    resources = [
+      module.nomis-audit-archives.bucket.arn,
+      "${module.nomis-audit-archives.bucket.arn}/*"
+    ]
   }
 }
 
@@ -126,7 +167,7 @@ locals {
 #------------------------------------------------------------------------------
 resource "aws_key_pair" "ec2-user" {
   key_name   = "ec2-user"
-  public_key = local.accounts[local.environment].ec2_common.public_key
+  public_key = local.environment_config.ec2_common.public_key
   tags = merge(
     local.tags,
     {
@@ -195,7 +236,7 @@ resource "aws_ssm_document" "session_manager_settings" {
 #tfsec:ignore:AWS089
 resource "aws_cloudwatch_log_group" "groups" {
   #checkov:skip=CKV_AWS_158:skip KMS CMK encryption check while logging solution is being determined
-  for_each          = local.accounts[local.environment].log_groups
+  for_each          = local.environment_config.log_groups
   name              = each.key
   retention_in_days = each.value.retention_days
 
@@ -283,7 +324,7 @@ resource "aws_ssm_document" "node_exporter_linux" {
   name            = "InstallNodeExporterLinux"
   document_type   = "Command"
   document_format = "JSON"
-  content         = file("./ssm-documents/node-exporter-linux.json")
+  content         = templatefile("${path.module}/ssm-documents/templates/node-exporter-linux.json.tmpl", { bucket_name = module.s3-bucket.bucket.id })
   target_type     = "/AWS::EC2::Instance"
 
   tags = merge(
@@ -303,28 +344,61 @@ resource "aws_ssm_association" "node_exporter_linux" {
   }
 }
 
-resource "aws_ssm_document" "node_exporter_windows" {
-  name            = "InstallNodeExporterWindows"
+resource "aws_ssm_document" "script_exporter" {
+  name            = "InstallScriptExporterLinux"
   document_type   = "Command"
-  document_format = "JSON"
-  content         = file("./ssm-documents/node-exporter-windows.json")
+  document_format = "YAML"
+  content         = file("./ssm-documents/install-and-manage-script-exporter.yaml")
+  target_type     = "/AWS::EC2::Instance"
 
   tags = merge(
     local.tags,
     {
-      Name = "install-node-exporter-windows"
+      Name = "install-and-manage-script-exporter"
     },
   )
 }
 
-resource "aws_ssm_association" "node_exporter_windows" {
-  name             = aws_ssm_document.node_exporter_windows.name
-  association_name = "node-exporter-windows"
+resource "aws_ssm_association" "script-exporter" {
+  name             = aws_ssm_document.script_exporter.name
+  association_name = "install-and-manage-script-exporter"
   targets {
-    key    = "tag:os_type"
-    values = ["Windows"]
+    key    = "tag-key"
+    values = ["oracle_sids"]
   }
 }
+
+
+#------------------------------------------------------------------------------
+# Oracle Secure Web - Install Oracle Secure Web s3 Backup Module
+#------------------------------------------------------------------------------
+
+resource "aws_ssm_document" "oracle_secure_web" {
+  name            = "InstallOracleSecureWeb"
+  document_type   = "Command"
+  document_format = "JSON"
+  content         = templatefile("${path.module}/ssm-documents/templates/oracle-secure-web-install.json.tmpl", { bucket_name = module.s3-bucket.bucket.id })
+  target_type     = "/AWS::EC2::Instance"
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "install-and-test-oracle-secure-web-backup"
+    },
+  )
+}
+
+# resource "aws_ssm_association" "oracle_secure_web" {
+#   name             = aws_ssm_document.oracle_secure_web.name
+#   association_name = "install-and-test-oracle-secure-web-backup"
+#   targets {
+#     key    = "tag-key"
+#     values = ["oracle_sids"]
+#   }
+# }
+
+
+# TODO: Temporarily disable automatic provisioning while performing DR tests.
 
 #------------------------------------------------------------------------------
 # Scheduled overnight shutdown
@@ -376,6 +450,42 @@ resource "aws_ssm_association" "ec2_scheduled_stop" {
   schedule_expression         = "cron(0 19 ? * ${each.value} *)"
 }
 
+data "aws_iam_policy_document" "ssm_ec2_start_stop_kms" {
+  statement {
+    sid    = "manageSharedAMIsEncryptedEBSVolumes"
+    effect = "Allow"
+    #tfsec:ignore:aws-iam-no-policy-wildcards
+    actions = [
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:ReEncrypt*",
+      "kms:ReEncryptFrom",
+      "kms:GenerateDataKey*",
+      "kms:DescribeKey",
+      "kms:CreateGrant",
+      "kms:ListGrants",
+      "kms:RevokeGrant"
+    ]
+    # we have a legacy CMK that's used in production that will be retired but in the meantime requires permissions
+    resources = [local.environment == "test" ? aws_kms_key.nomis-cmk[0].arn : data.aws_kms_key.nomis_key.arn, data.aws_kms_key.hmpps_key.arn]
+  }
+
+  statement {
+    sid    = "modifyAautoscalingGroupProcesses"
+    effect = "Allow"
+
+    actions = [
+      "autoscaling:SuspendProcesses",
+      "autoscaling:ResumeProcesses",
+      "autoscaling:DescribeAutoScalingGroups",
+    ]
+    #this role manages all the autoscaling groups in an account
+    #checkov:skip=CKV_AWS_111: "Ensure IAM policies does not allow write access without constraints"
+    #checkov:skip=CKV_AWS_109: "Ensure IAM policies does not allow permissions management / resource exposure without constraints"
+    resources = ["*"] #tfsec:ignore:aws-iam-no-policy-wildcards
+  }
+}
+
 resource "aws_iam_role" "ssm_ec2_start_stop" {
   name                 = "ssm-ec2-start-stop"
   path                 = "/"
@@ -399,6 +509,13 @@ resource "aws_iam_role" "ssm_ec2_start_stop" {
     "arn:aws:iam::aws:policy/service-role/AmazonSSMAutomationRole"
     # todo: This policy gives a lot of permissions. We should create a custom policy if we keep the solution long term
   ]
+  inline_policy {
+
+    name   = "ssm-ec2-start-stop-kms"
+    policy = data.aws_iam_policy_document.ssm_ec2_start_stop_kms.json
+
+  }
+
   tags = merge(
     local.tags,
     {
@@ -406,6 +523,7 @@ resource "aws_iam_role" "ssm_ec2_start_stop" {
     },
   )
 }
+
 
 #------------------------------------------------------------------------------
 # Patch Manager
@@ -415,7 +533,7 @@ resource "aws_iam_role" "ssm_ec2_start_stop" {
 resource "aws_ssm_maintenance_window" "maintenance" {
   name                       = "weekly-patching"
   description                = "Maintenance window for applying OS patches"
-  schedule                   = "cron(0 2 ? * ${local.accounts[local.environment].ec2_common.patch_day} *)"
+  schedule                   = "cron(0 2 ? * ${local.environment_config.ec2_common.patch_day} *)"
   duration                   = 3
   cutoff                     = 1
   enabled                    = true
@@ -565,7 +683,7 @@ resource "aws_ssm_patch_baseline" "rhel" {
   operating_system = "REDHAT_ENTERPRISE_LINUX"
 
   approval_rule {
-    approve_after_days = local.accounts[local.environment].ec2_common.patch_approval_delay_days
+    approve_after_days = local.environment_config.ec2_common.patch_approval_delay_days
     compliance_level   = "CRITICAL"
     patch_filter {
       key    = "CLASSIFICATION"
@@ -578,7 +696,7 @@ resource "aws_ssm_patch_baseline" "rhel" {
   }
 
   approval_rule {
-    approve_after_days = local.accounts[local.environment].ec2_common.patch_approval_delay_days
+    approve_after_days = local.environment_config.ec2_common.patch_approval_delay_days
     compliance_level   = "HIGH"
     patch_filter {
       key    = "CLASSIFICATION"
@@ -591,7 +709,7 @@ resource "aws_ssm_patch_baseline" "rhel" {
   }
 
   approval_rule {
-    approve_after_days = local.accounts[local.environment].ec2_common.patch_approval_delay_days
+    approve_after_days = local.environment_config.ec2_common.patch_approval_delay_days
     compliance_level   = "MEDIUM"
     patch_filter {
       key    = "CLASSIFICATION"
@@ -612,7 +730,7 @@ resource "aws_ssm_patch_baseline" "windows" {
   operating_system = "WINDOWS"
 
   approval_rule {
-    approve_after_days = local.accounts[local.environment].ec2_common.patch_approval_delay_days
+    approve_after_days = local.environment_config.ec2_common.patch_approval_delay_days
     compliance_level   = "CRITICAL"
     patch_filter {
       key    = "CLASSIFICATION"
@@ -625,7 +743,7 @@ resource "aws_ssm_patch_baseline" "windows" {
   }
 
   approval_rule {
-    approve_after_days = local.accounts[local.environment].ec2_common.patch_approval_delay_days
+    approve_after_days = local.environment_config.ec2_common.patch_approval_delay_days
     compliance_level   = "HIGH"
     patch_filter {
       key    = "CLASSIFICATION"
@@ -654,4 +772,114 @@ resource "aws_ssm_patch_group" "rhel" {
 resource "aws_ssm_patch_group" "windows" {
   baseline_id = aws_ssm_patch_baseline.windows.id
   patch_group = "Windows"
+}
+# CloudWatch Monitoring Role and Policies
+
+data "aws_iam_policy_document" "cloud-platform-monitoring-assume-role" {
+  statement {
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::754256621582:root"]
+    }
+  }
+}
+
+resource "aws_iam_role" "cloudwatch-datasource-role" {
+  name               = "CloudwatchDatasourceRole"
+  assume_role_policy = data.aws_iam_policy_document.cloud-platform-monitoring-assume-role.json
+  tags = merge(
+    local.tags,
+    {
+      Name = "cloudwatch-datasource-role"
+    },
+  )
+
+}
+
+data "aws_iam_policy_document" "cloudwatch_datasource" {
+  statement {
+    sid    = "AllowReadingMetricsFromCloudWatch"
+    effect = "Allow"
+    actions = [
+      "cloudwatch:DescribeAlarmsForMetric",
+      "cloudwatch:DescribeAlarmHistory",
+      "cloudwatch:DescribeAlarms",
+      "cloudwatch:ListMetrics",
+      "cloudwatch:GetMetricData",
+      "cloudwatch:GetInsightRuleReport"
+    ]
+    #tfsec:ignore:aws-iam-no-policy-wildcards
+    resources = ["*"]
+  }
+  statement {
+    sid    = "AllowReadingLogsFromCloudWatch"
+    effect = "Allow"
+    actions = [
+      "logs:DescribeLogGroups",
+      "logs:GetLogGroupFields",
+      "logs:StartQuery",
+      "logs:StopQuery",
+      "logs:GetQueryResults",
+      "logs:GetLogEvents"
+    ]
+    #tfsec:ignore:aws-iam-no-policy-wildcards
+    resources = ["*"]
+  }
+  statement {
+    sid    = "AllowReadingTagsInstancesRegionsFromEC2"
+    effect = "Allow"
+    actions = [
+      "ec2:DescribeTags",
+      "ec2:DescribeInstances",
+      "ec2:DescribeRegions"
+    ]
+    resources = ["*"]
+  }
+  statement {
+    sid    = "AllowReadingResourcesForTags"
+    effect = "Allow"
+    actions = [
+      "tag:GetResources"
+    ]
+    resources = ["*"]
+  }
+
+}
+
+resource "aws_iam_policy" "cloudwatch_datasource_policy" {
+  name        = "cloudwatch-datasource-policy"
+  path        = "/"
+  description = "Policy for the Monitoring Cloudwatch Datasource"
+  policy      = data.aws_iam_policy_document.cloudwatch_datasource.json
+  tags = merge(
+    local.tags,
+    {
+      Name = "cloudwatch-datasource-policy"
+    },
+  )
+}
+
+resource "aws_iam_role_policy_attachment" "cloudwatch_datasource_policy_attach" {
+  policy_arn = aws_iam_policy.cloudwatch_datasource_policy.arn
+  role       = aws_iam_role.cloudwatch-datasource-role.name
+
+}
+
+resource "aws_iam_role" "prometheus-ec2-discovery-role" {
+  name               = "PrometheusEC2DiscoveryRole"
+  assume_role_policy = data.aws_iam_policy_document.cloud-platform-monitoring-assume-role.json
+  tags = merge(
+    local.tags,
+    {
+      Name = "prometheus-ec2-discovery-role"
+    },
+  )
+}
+
+resource "aws_iam_role_policy_attachment" "prometheus_ec2_discovery_policy_attach" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess"
+  role       = aws_iam_role.prometheus-ec2-discovery-role.name
+
 }

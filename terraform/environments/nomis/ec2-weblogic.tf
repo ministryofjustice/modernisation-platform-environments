@@ -9,7 +9,7 @@ module "weblogic" {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
   }
 
-  for_each = local.accounts[local.environment].weblogics
+  for_each = local.environment_config.weblogics
 
   name = each.key
 
@@ -18,7 +18,7 @@ module "weblogic" {
   asg_min_size         = try(each.value.asg_min_size, null)
   asg_desired_capacity = try(each.value.asg_desired_capacity, null)
 
-  ami_owner              = try(each.value.ami_owner, "${local.environment_management.account_ids["core-shared-services-production"]}")
+  ami_owner              = try(each.value.ami_owner, local.environment_management.account_ids["core-shared-services-production"])
   termination_protection = try(each.value.termination_protection, null)
 
   common_security_group_id   = aws_security_group.weblogic_common.id
@@ -83,7 +83,15 @@ resource "aws_security_group" "weblogic_common" {
     from_port   = "9100"
     to_port     = "9100"
     protocol    = "TCP"
-    cidr_blocks = [local.accounts[local.environment].database_external_access_cidr.cloud_platform]
+    cidr_blocks = [local.cidrs.cloud_platform]
+  }
+
+  ingress {
+    description = "access from Cloud Platform Prometheus script exporter collector"
+    from_port   = "9172"
+    to_port     = "9172"
+    protocol    = "TCP"
+    cidr_blocks = [local.cidrs.cloud_platform]
   }
 
   egress {

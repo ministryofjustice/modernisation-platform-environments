@@ -1,0 +1,28 @@
+---
+schemaVersion: "2.2"
+description: "Installs script exporter on Linux instances"
+mainSteps:
+- action: aws:downloadContent
+  name: DownloadScriptExporterServiceFile
+  inputs:
+    sourceType: GitHub
+    destinationPath: "/etc/systemd/system/"
+    sourceInfo: "{\"owner\":\"ministryofjustice\", \"repository\":\"modernisation-platform-environments\",\"getOptions\" : \"branch:main\",\"path\" :\"terraform/environments/nomis/ssm-documents/files/script-exporter-service\"}"
+- action: "aws:runShellScript"
+  name: "InstallScriptExporter"
+  inputs:
+    runCommand:
+    - "wget https://github.com/adhocteam/script_exporter/releases/download/v1.2.0/script_exporter-1.2.0.linux-amd64.tar.gz -P /tmp"
+    - "tar -xf /tmp/script_exporter-1.2.0.linux-amd64.tar.gz -C /tmp"
+    - "rm /tmp/script_exporter-1.2.0.linux-amd64.tar.gz"
+    - "mv /tmp/script_exporter-1.2.0.linux-amd64/script_exporter /usr/bin/script-exporter"
+    - "chmod +x /usr/bin/script-exporter"
+    - "rm -rf /tmp/script_exporter-1.2.0.linux-amd64"
+    - "touch /home/oracle/script-exporter.env"
+    - "chown oracle:oinstall /home/oracle/script-exporter.env"
+    - "killall script-exporter"
+    - "echo 'Create Script Exporter Service'"
+    - "systemctl enable script-exporter"
+    - "systemctl daemon-reload"
+    - "echo 'Start Script Exporter'"
+    - "systemctl start script-exporter"
