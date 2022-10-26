@@ -3,10 +3,31 @@ data "aws_region" "current" {}
 
 data "aws_caller_identity" "current" {}
 
+###### Platform Secrets
+
+# Get modernisation account id from ssm parameter
+data "aws_ssm_parameter" "modernisation_platform_account_id" {
+  name = "modernisation_platform_account_id"
+}
+
+# Get secret by arn for environment management
+data "aws_secretsmanager_secret" "environment_management" {
+  provider = aws.modernisation-platform
+  name     = "environment_management"
+}
+
+# Get latest secret value with ID from above. This secret stores account IDs for the Modernisation Platform sub-accounts
+data "aws_secretsmanager_secret_version" "environment_management" {
+  provider  = aws.modernisation-platform
+  secret_id = data.aws_secretsmanager_secret.environment_management.id
+}
+
+######
+
 # VPC and subnet data
 data "aws_vpc" "shared" {
   tags = {
-    "Name" = "${var.networking[0].business-unit}-${local.environment}"
+    "Name" = "${local.business_unit}-${local.environment}"
   }
 }
 
@@ -16,7 +37,7 @@ data "aws_subnets" "shared-data" {
     values = [data.aws_vpc.shared.id]
   }
   tags = {
-    Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-data*"
+    Name = "${local.business_unit}-${local.environment}-${local.networking_set}-data*"
   }
 }
 
@@ -26,7 +47,7 @@ data "aws_subnets" "private-public" {
     values = [data.aws_vpc.shared.id]
   }
   tags = {
-    Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-private*"
+    Name = "${local.business_unit}-${local.environment}-${local.networking_set}-private*"
   }
 }
 
@@ -36,70 +57,70 @@ data "aws_subnets" "shared-public" {
     values = [data.aws_vpc.shared.id]
   }
   tags = {
-    Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public*"
+    Name = "${local.business_unit}-${local.environment}-${local.networking_set}-public*"
   }
 }
 
 data "aws_subnet" "data_subnets_a" {
   vpc_id = data.aws_vpc.shared.id
   tags = {
-    "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-data-${data.aws_region.current.name}a"
+    "Name" = "${local.business_unit}-${local.environment}-${local.networking_set}-data-${data.aws_region.current.name}a"
   }
 }
 
 data "aws_subnet" "data_subnets_b" {
   vpc_id = data.aws_vpc.shared.id
   tags = {
-    "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-data-${data.aws_region.current.name}b"
+    "Name" = "${local.business_unit}-${local.environment}-${local.networking_set}-data-${data.aws_region.current.name}b"
   }
 }
 
 data "aws_subnet" "data_subnets_c" {
   vpc_id = data.aws_vpc.shared.id
   tags = {
-    "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-data-${data.aws_region.current.name}c"
+    "Name" = "${local.business_unit}-${local.environment}-${local.networking_set}-data-${data.aws_region.current.name}c"
   }
 }
 
 data "aws_subnet" "private_subnets_a" {
   vpc_id = data.aws_vpc.shared.id
   tags = {
-    "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-private-${data.aws_region.current.name}a"
+    "Name" = "${local.business_unit}-${local.environment}-${local.networking_set}-private-${data.aws_region.current.name}a"
   }
 }
 
 data "aws_subnet" "private_subnets_b" {
   vpc_id = data.aws_vpc.shared.id
   tags = {
-    "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-private-${data.aws_region.current.name}b"
+    "Name" = "${local.business_unit}-${local.environment}-${local.networking_set}-private-${data.aws_region.current.name}b"
   }
 }
 
 data "aws_subnet" "private_subnets_c" {
   vpc_id = data.aws_vpc.shared.id
   tags = {
-    "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-private-${data.aws_region.current.name}c"
+    "Name" = "${local.business_unit}-${local.environment}-${local.networking_set}-private-${data.aws_region.current.name}c"
   }
 }
 
 data "aws_subnet" "public_subnets_a" {
   vpc_id = data.aws_vpc.shared.id
   tags = {
-    Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public-${data.aws_region.current.name}a"
+    Name = "${local.business_unit}-${local.environment}-${local.networking_set}-public-${data.aws_region.current.name}a"
   }
 }
 
 data "aws_subnet" "public_subnets_b" {
   vpc_id = data.aws_vpc.shared.id
   tags = {
-    Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public-${data.aws_region.current.name}b"
+    Name = "${local.business_unit}-${local.environment}-${local.networking_set}-public-${data.aws_region.current.name}b"
   }
 }
 
 data "aws_subnet" "public_subnets_c" {
   vpc_id = data.aws_vpc.shared.id
   tags = {
-    Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public-${data.aws_region.current.name}c"
+    Name = "${local.business_unit}-${local.environment}-${local.networking_set}-public-${data.aws_region.current.name}c"
   }
 }
 
@@ -107,14 +128,14 @@ data "aws_subnet" "public_subnets_c" {
 data "aws_route53_zone" "external" {
   provider = aws.core-vpc
 
-  name         = "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk."
+  name         = "${local.business_unit}-${local.environment}.modernisation-platform.service.justice.gov.uk."
   private_zone = false
 }
 
 data "aws_route53_zone" "inner" {
   provider = aws.core-vpc
 
-  name         = "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.internal."
+  name         = "${local.business_unit}-${local.environment}.modernisation-platform.internal."
   private_zone = true
 }
 
@@ -123,6 +144,23 @@ data "aws_route53_zone" "network-services" {
 
   name         = "modernisation-platform.service.justice.gov.uk."
   private_zone = false
+}
+
+# This data sources allows us to get the Modernisation Platform account information for use elsewhere
+# (when we want to assume a role in the MP, for instance)
+data "aws_organizations_organization" "root_account" {}
+
+# Get the environments file from the main repository
+data "http" "environments_file" {
+  url = "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/${local.application_name}.json"
+}
+
+data "aws_caller_identity" "oidc_session" {
+  provider = aws.oidc-session
+}
+
+data "aws_caller_identity" "modernisation_platform" {
+  provider = aws.modernisation-platform
 }
 
 # State for core-network-services resource information
