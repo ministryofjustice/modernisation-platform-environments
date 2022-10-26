@@ -28,7 +28,7 @@ resource "aws_launch_template" "this" {
   }
   metadata_options {
     http_endpoint = "enabled"
-    http_tokens   = try(var.instance.metadata_options_http_tokens, "required")
+    http_tokens   = "required"
   }
 
   monitoring {
