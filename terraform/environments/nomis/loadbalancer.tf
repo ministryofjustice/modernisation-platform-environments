@@ -315,3 +315,25 @@ resource "aws_acm_certificate_validation" "internal_lb_az" {
   certificate_arn         = aws_acm_certificate.internal_lb_az[0].arn
   validation_record_fqdns = [for record in aws_route53_record.internal_lb_validation_az : record.fqdn]
 }
+
+# DSOS-109
+#
+# Playing with the Mod Platform load balancer module.
+module "jb_load_balancer_test" {
+  source = "git@github.com:ministryofjustice/modernisation-platform-terraform-loadbalancer.git"
+  count = local.environment == "development" ? 1 : 0
+
+  # Input variables
+  account_number = local.modernisation_platform_account_id
+  application_name = ""
+  enable_deletion_protection = ""
+  existing_bucket_name = ""
+  force_destroy_bucket = ""
+  idle_timeout = ""
+  loadbalancer_egress_rules = ""
+  loadbalancer_ingress_rules = ""
+  public_subnets = ""
+  region = ""
+  tags = ""
+  vpc_all = ""
+}
