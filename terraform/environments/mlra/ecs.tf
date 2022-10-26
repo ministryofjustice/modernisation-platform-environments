@@ -29,7 +29,7 @@ module "mlra-ecs" {
   ec2_egress_rules        = local.ec2_egress_rules
   tags_common             = local.tags
 
- depends_on = [module.alb, aws_cloudwatch_log_group.ecs_log_group] # TODO module.alb dependancy may have to be re-factored further into development
+  depends_on = [module.alb, aws_cloudwatch_log_group.ecs_log_group] # TODO module.alb dependancy may have to be re-factored further into development
 }
 
 locals {
