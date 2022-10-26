@@ -27,18 +27,18 @@ resource "aws_security_group" "nlb-ingress" {
   vpc_id      = data.aws_vpc.shared.id
 
   ingress {
-    description      = "Port 80 from LAA LandingZone"
-    from_port        = 80
-    to_port          = 80
-    protocol         = "tcp"
-    cidr_blocks      = [local.lz_vpc_cidr]
+    description = "Port 80 from LAA LandingZone"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = [local.lz_vpc_cidr]
   }
 
   egress {
-    from_port        = 80
-    to_port          = 80
-    protocol         = "tcp"
-    cidr_blocks      = [local.lz_vpc_cidr]
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = [local.lz_vpc_cidr]
   }
 
 }
