@@ -3,8 +3,8 @@
 locals {
 
   application_name = "oasys"
-  business_unit = "hmpps"
-  networking_set = "general"
+  business_unit    = "hmpps"
+  networking_set   = "general"
 
   accounts = {
     development   = local.oasys_development

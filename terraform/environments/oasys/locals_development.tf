@@ -35,7 +35,7 @@ locals {
       patch_day                 = "TUE"
     }
 
-    webservers = {}
+    webservers         = {}
     ec2_test_instances = {}
   }
 }
