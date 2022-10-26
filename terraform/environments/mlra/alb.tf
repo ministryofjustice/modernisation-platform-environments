@@ -1,4 +1,4 @@
-module "alb" {
+/* module "alb" {
   source = "./modules/alb"
   providers = {
     aws.bucket-replication = aws
@@ -37,4 +37,4 @@ module "alb" {
   stickiness_enabled         = true
   stickiness_type            = "lb_cookie"
   stickiness_cookie_duration = 10800
-}
+} */
