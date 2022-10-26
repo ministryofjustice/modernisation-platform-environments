@@ -20,6 +20,8 @@ locals {
   create_glue_connection = local.application_data.accounts[local.environment].create_glue_connections
   image_id               = local.application_data.accounts[local.environment].ami_image_id
   instance_type          = local.application_data.accounts[local.environment].ec2_instance_type
+  create_datamart        = local.application_data.accounts[local.environment].setup_redshift
+  redshift_cluster_name  = "${local.application_data.accounts[local.environment].project_short_id}-redshift-${local.environment}"
 
 
   all_tags = merge(
@@ -768,6 +770,55 @@ module "ec2_kinesis_agent" {
     {
       Name          = "${local.project}-ec2-kinesis-agent-${local.env}"
       Resource_Type = "EC2 Instance"
+    }
+  )
+}
+
+# DataMart
+module "datamart" {
+  source                  = "./modules/redshift"
+  create_redshift_cluster = local.create_datamart
+  name                    = local.redshift_cluster_name
+  node_type               = "ra3.xlplus"
+  number_of_nodes         = 1
+  database_name           = "datamart"
+  master_username         = "dpruser"
+  master_password         = "Datamartpass2022"
+  create_random_password  = false
+  encrypted               = true
+  create_subnet_group     = true
+  kms_key_arn             = aws_kms_key.redshift-kms-key.arn
+  enhanced_vpc_routing    = false
+  subnet_ids              = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id, data.aws_subnet.private_subnets_c.id]
+  vpc                     = data.aws_vpc.shared.id
+  cidr                    = [data.aws_vpc.shared.cidr_block]
+  iam_role_arns           = aws_iam_role.redshift-role.*.arn
+
+  # Endpoint access - only available when using the ra3.x type, for S3 Simple Service
+  create_endpoint_access = false
+
+  # Scheduled actions
+  create_scheduled_action_iam_role = true
+  scheduled_actions = {
+    pause = {
+      name          = "${local.redshift_cluster_name}-pause"
+      description   = "Pause cluster every night"
+      schedule      = "cron(0 20 * * ? *)"
+      pause_cluster = true
+    }
+    resume = {
+      name           = "${local.redshift_cluster_name}-resume"
+      description    = "Resume cluster every morning"
+      schedule       = "cron(30 07 * * ? *)"
+      resume_cluster = true
+    }
+  }
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.redshift_cluster_name}"
+      Resource_Type = "Redshift Cluster"
     }
   )
 }
