@@ -12,36 +12,36 @@ resource "aws_lb" "ingress-network-lb" {
   internal           = true
   load_balancer_type = "network"
   subnets            = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id, data.aws_subnet.private_subnets_c.id]
-  security_groups    = [aws_security_group.nlb-ingress.id]
+  #security_groups    = [aws_security_group.nlb-ingress.id]
 
   enable_deletion_protection = false
 
 }
 
-resource "aws_security_group" "nlb-ingress" {
-
-  ## lz_vpc_cidr = local.application_data.accounts[local.environment].lz_vpc_cidr
-
-  name        = "nlb-ingress"
-  description = "Allow inbound traffic on port 80"
-  vpc_id      = data.aws_vpc.shared.id
-
-  ingress {
-    description      = "Port 80 from LAA LandingZone"
-    from_port        = 80
-    to_port          = 80
-    protocol         = "tcp"
-    cidr_blocks      = [local.lz_vpc_cidr]
-  }
-
-  egress {
-    from_port        = 80
-    to_port          = 80
-    protocol         = "tcp"
-    cidr_blocks      = [local.lz_vpc_cidr]
-  }
-
-}
+# resource "aws_security_group" "nlb-ingress" {
+# 
+#   ## lz_vpc_cidr = local.application_data.accounts[local.environment].lz_vpc_cidr
+# 
+#   name        = "nlb-ingress"
+#   description = "Allow inbound traffic on port 80"
+#   vpc_id      = data.aws_vpc.shared.id
+# 
+#   ingress {
+#     description      = "Port 80 from LAA LandingZone"
+#     from_port        = 80
+#     to_port          = 80
+#     protocol         = "tcp"
+#     cidr_blocks      = [local.lz_vpc_cidr]
+#   }
+# 
+#   egress {
+#     from_port        = 80
+#     to_port          = 80
+#     protocol         = "tcp"
+#     cidr_blocks      = [local.lz_vpc_cidr]
+#   }
+# 
+# }
 
 resource "aws_lb_listener" "lz-ingress" {
   load_balancer_arn = aws_lb.ingress-network-lb.arn
