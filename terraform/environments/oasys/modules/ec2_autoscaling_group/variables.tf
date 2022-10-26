@@ -132,7 +132,7 @@ variable "ebs_volume_config" {
 
 variable "ebs_volumes" {
   description = "EC2 volumes, see aws_ebs_volume for documentation.  key=volume name, value=ebs_volume_config key.  label is used as part of the Name tag"
-  type = map(any)
+  type        = map(any)
 }
 
 variable "iam_resource_names_prefix" {
