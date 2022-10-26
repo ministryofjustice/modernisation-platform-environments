@@ -6,6 +6,11 @@ data "aws_caller_identity" "oidc_session" {
   provider = aws.oidc-session
 }
 
+data "aws_iam_session_context" "whoami" {
+  provider = aws.oidc-session
+  arn = data.aws_caller_identity.oidc_session.arn
+}
+
 data "aws_caller_identity" "modernisation_platform" {
   provider = aws.modernisation-platform
 }
