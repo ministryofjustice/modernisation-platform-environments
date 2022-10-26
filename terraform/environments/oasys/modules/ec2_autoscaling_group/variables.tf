@@ -51,6 +51,7 @@ variable "tags" {
 
 variable "account_ids_lookup" {
   description = "A map of account names to account ids that can be used for AMI owner"
+  type        = map(any)
   default     = {}
 }
 
@@ -132,15 +133,7 @@ variable "ebs_volume_config" {
 
 variable "ebs_volumes" {
   description = "EC2 volumes, see aws_ebs_volume for documentation.  key=volume name, value=ebs_volume_config key.  label is used as part of the Name tag"
-  # Commenting below out as it has unexpected results when used with merge()
-  #  type = map(object({
-  #    label       = string
-  #    snapshot_id = optional(string)
-  #    iops        = optional(number)
-  #    throughput  = optional(number)
-  #    size        = optional(number)
-  #    type        = optional(string)
-  #  }))
+  type = map(any)
 }
 
 variable "iam_resource_names_prefix" {
