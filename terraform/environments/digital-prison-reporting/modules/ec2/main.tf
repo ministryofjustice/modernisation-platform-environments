@@ -7,11 +7,16 @@ data "template_file" "user_data" {
 }
 
 # Keypair for ec2-user
-#resource "aws_key_pair" "ec2-user" {
-#  key_name   = "${var.name}-keypair"
-#  public_key = var.public_key
-#  tags = var.tags
-#}
+resource "tls_private_key" "ec2-user" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
+resource "aws_key_pair" "ec2-user" {
+  key_name   = "${var.name}-keypair"
+  public_key = tls_private_key.ec2-user.public_key_openssh
+  tags       = var.tags
+}
 
 # Build the security group for the EC2
 resource "aws_security_group" "ec2_sec_group" {
@@ -64,6 +69,7 @@ resource "aws_launch_template" "ec2_template" {
   image_id                             = var.ami_image_id
   instance_initiated_shutdown_behavior = var.ec2_terminate_behavior
   instance_type                        = var.ec2_instance_type
+  key_name                             = aws_key_pair.ec2-user.key_name
 
   metadata_options {
     http_endpoint               = "enabled" # defaults to enabled but is required if http_tokens is specified

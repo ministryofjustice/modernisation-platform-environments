@@ -71,3 +71,16 @@ resource "aws_kms_alias" "kinesis-kms-alias" {
   name          = "alias/kinesis"
   target_key_id = aws_kms_key.kinesis-kms-key.arn
 }
+
+### KINESIS KMS
+resource "aws_kms_key" "redshift-kms-key" {
+  description         = "Encryption key for Redshift Cluster"
+  enable_key_rotation = true
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-redshift-kms"
+    }
+  )
+}
