@@ -22,7 +22,8 @@
       "task_definition_volume": "upload_volume",
       "network_mode": "bridge",
       "server_port": 8080,
-      "app_count": 1
+      "app_count": 1,
+      "lz_vpc_cidr": "10.202.0.0/20"
     },
     "test": {
       "example_var": "test-data"
