@@ -1,5 +1,11 @@
 # This creates a network load balancer listening on port 80 with a target of the internal ALB.
 
+locals {
+
+  lz_vpc_cidr = local.application_data.accounts[local.environment].lz_vpc_cidr
+
+}
+
 resource "aws_lb" "ingress-network-lb" {
 
   name               = "ingress-network-lb"
@@ -13,6 +19,9 @@ resource "aws_lb" "ingress-network-lb" {
 }
 
 resource "aws_security_group" "nlb-ingress" {
+
+  ## lz_vpc_cidr = local.application_data.accounts[local.environment].lz_vpc_cidr
+
   name        = "nlb-ingress"
   description = "Allow inbound traffic on port 80"
   vpc_id      = data.aws_vpc.shared.id
@@ -22,14 +31,14 @@ resource "aws_security_group" "nlb-ingress" {
     from_port        = 80
     to_port          = 80
     protocol         = "tcp"
-    cidr_blocks      = ["10.202.0.0/20"]
+    cidr_blocks      = [local.lz_vpc_cidr]
   }
 
   egress {
     from_port        = 80
     to_port          = 80
     protocol         = "tcp"
-    cidr_blocks      = ["0.0.0.0/0"]
+    cidr_blocks      = [local.lz_vpc_cidr]
   }
 
 }
