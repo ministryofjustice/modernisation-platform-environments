@@ -41,7 +41,7 @@ module "bastion_linux" {
   # bastion
   allow_ssh_commands = false
 
-  app_name      = var.networking[0].application
+  app_name      = local.application_name
   business_unit = local.vpc_name
   subnet_set    = local.subnet_set
   environment   = local.environment
