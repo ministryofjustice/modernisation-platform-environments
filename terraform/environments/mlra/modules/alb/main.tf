@@ -63,21 +63,13 @@ resource "aws_lb_listener" "alb_listener" {
 
 # Forward action
 
-resource "aws_lb_listener_rule" "routing requests from listener to ecs cluster nodes" {
-  listener_arn = aws_lb_listener.front_end.arn
-  priority     = 99
+resource "aws_lb_listener_rule" "alb_listener_rule" {
+  listener_arn = aws_lb_listener.alb_listener.arn
 
   action {
     type             = "forward"
-    # target_group_arn = aws_lb_target_group.static.arn
     target_group_arn = aws_lb_target_group.alb_target_group.arn
   }
-
-  # condition {
-  #   host_header {
-  #     values = ["my-service.*.terraform.io"]
-  #   }
-  # }
 }
 
 #TODO currently the EcsAlbHTTPSListenerRule has not been provisioned
