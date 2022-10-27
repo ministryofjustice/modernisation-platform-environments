@@ -46,7 +46,7 @@ resource "aws_instance" "build-server" {
 resource "aws_ebs_volume" "build-disk1" {
   depends_on        = [aws_instance.build-server]
   availability_zone = "${local.region}a"
-  type              = "gp2"
+  type              = "gp3"
   encrypted         = true
 
   snapshot_id = local.application_data.accounts[local.environment].buildserver-disk-1-snapshot
