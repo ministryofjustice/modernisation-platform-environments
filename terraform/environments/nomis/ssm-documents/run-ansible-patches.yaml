@@ -16,17 +16,17 @@ parameters:
     type: "String"
     description: "(Optional) Use this parameter to run a check of the Ansible execution. The system doesn’t make any changes to your systems. Instead, any module that supports check mode reports the changes it would make rather than making them. Modules that don’t support check mode take no action and don’t report changes that would be made."
     allowedValues:
-    - "True"
-    - "False"
+      - "True"
+      - "False"
     default: "False"
   Verbose:
     type: "String"
     description: "(Optional) Set the verbosity level for logging Playbook executions. Specify -v for low verbosity, -vv or –vvv for medium verbosity, and -vvvv for debug level."
     allowedValues:
-    - "-v"
-    - "-vv"
-    - "-vvv"
-    - "-vvvv"
+      - "-v"
+      - "-vv"
+      - "-vvv"
+      - "-vvvv"
     default: "-v"
   TimeoutSeconds:
     type: "String"
@@ -36,93 +36,93 @@ parameters:
     type: "String"
     description: "(Optional) The role to run"
 mainSteps:
-- action: "aws:runShellScript"
-  name: "checkPythonVersion"
-  inputs:
-    runCommand:
-      - |
-        if [[ $(which python3.9) ]]; then
-          python=$(which python3.9)
-        elif [[ $(which python3.6) ]]; then
-          python=$(which python3.6)
-        else
+  - action: "aws:runShellScript"
+    name: "checkPythonVersion"
+    inputs:
+      runCommand:
+        - |
+          if [[ $(which python3.9) ]]; then
+            python=$(which python3.9)
+          elif [[ $(which python3.6) ]]; then
+            python=$(which python3.6)
+          else
+            echo "Python3.9/3.6 not found"
+          exit 1
+          fi
+          echo "# Using python: $python" "python3 --version"
+  - action: "aws:runShellScript"
+    name: "gitInstalled"
+    inputs:
+      runCommand:
+        - 'if which git; then echo "git is installed"; else sudo yum install git -y; fi'
+  - action: "aws:downloadContent"
+    name: "downloadFromConfigurationManagementRepo"
+    inputs:
+      sourceType: "GitHub"
+      sourceInfo: '{"owner":"ministryofjustice","repository":"modernisation-platform-configuration-management","path":"ansible","getOptions":"branch:refs/heads/main","tokenInfo":"{{ssm-secure:github-ci-user-pat}}"}'
+      destinationPath: "tmp/python-venv"
+  - action: "aws:runShellScript"
+    name: "installAnsible"
+    inputs:
+      timeoutSeconds: "{{ TimeoutSeconds }}"
+      runCommand:
+        - |
+          # set python version
+          if [[ $(which python3.9) ]]; then
+            python=$(which python3.9)
+          elif [[ $(which python3.6) ]]; then
+            python=$(which python3.6)
+          else
           echo "Python3.9/3.6 not found"
-        exit 1
-        fi
-        echo "# Using python: $python" "python3 --version"
-- action: "aws:runShellScript"
-  name: "gitInstalled"
-  inputs:
-    runCommand: 
-    - "if which git; then echo \"git is installed\"; else sudo yum install git -y; fi"
-- action: "aws:downloadContent"
-  name: "downloadFromConfigurationManagementRepo"
-  inputs:
-    sourceType: "GitHub"
-    sourceInfo: "{\"owner\":\"ministryofjustice\",\"repository\":\"modernisation-platform-configuration-management\",\"path\":\"ansible\",\"getOptions\":\"branch:refs/heads/main\",\"tokenInfo\":\"{{ssm-secure:github-ci-user-pat}}\"}"
-    destinationPath: "tmp/python-venv"
-- action: "aws:runShellScript"
-  name: "installAnsible"
-  inputs:
-    timeoutSeconds: "{{ TimeoutSeconds }}"
-    runCommand:
-    - |
-      # set python version
-      if [[ $(which python3.9) ]]; then
-        python=$(which python3.9)
-      elif [[ $(which python3.6) ]]; then
-        python=$(which python3.6)
-      else
-      echo "Python3.9/3.6 not found"
-      exit 1
-      fi
-      echo "# Using python: $python"
-      # activate virtual environment
-      pwd
-      cd tmp/python-venv
-      $python -m venv ansible
-      source ansible/bin/activate
-      $python -m pip install --upgrade pip
-      if [[ "$python" =~ 3.6 ]]; then
-        $python -m pip install wheel
-        $python -m pip install cryptography==2.3
-        export LC_ALL=en_US.UTF-8
-        $python -m pip install ansible-core==2.11.12
-      else
-        $python -m pip install ansible==6.0.0
-      fi
-      # install requirements in virtual env
-      echo "# Installing ansible requirements"
-      pwd
-      cd tmp/python-venv
-      ls
-      $python -m pip install -r requirements.txt
-      ansible-galaxy role install -r requirements.yml
-      ansible-galaxy collection install -r requirements.yml
-      # run ansible (comma after localhost deliberate)
-      echo "# Execute ansible"
-      if [[ "{{Check}}" == True ]]; then \
-        ansible-playbook site.yml \
-        --check \
-        --connection=local \
-        --inventory localhost, \
-        --extra-vars "force_role={{Role}}" \
-        --extra-vars "ansible_python_interpreter=$python" \
-        --extra-vars "target=localhost" \
-        "{{Verbose}}" \
-        --become
-      else
-        ansible-playbook site.yml \
-        --connection=local \
-        --inventory localhost, \
-        --extra-vars "force_role={{Role}}" \
-        --extra-vars "ansible_python_interpreter=$python" \
-        --extra-vars "target=localhost" \
-        "{{Verbose}}" \
-        --become
-      fi
-      echo "# Cleanup"
-      deactivate
-      rm -rf tmp/python-venv
-      # rm -rf $ansible_dir/${ansible_repo}
-      # rmdir tmp/
+          exit 1
+          fi
+          echo "# Using python: $python"
+          # activate virtual environment
+          pwd
+          cd tmp/python-venv
+          $python -m venv ansible
+          source ansible/bin/activate
+          $python -m pip install --upgrade pip
+          if [[ "$python" =~ 3.6 ]]; then
+            $python -m pip install wheel
+            $python -m pip install cryptography==2.3
+            export LC_ALL=en_US.UTF-8
+            $python -m pip install ansible-core==2.11.12
+          else
+            $python -m pip install ansible==6.0.0
+          fi
+          # install requirements in virtual env
+          echo "# Installing ansible requirements"
+          pwd
+          cd tmp/python-venv
+          ls
+          $python -m pip install -r requirements.txt
+          ansible-galaxy role install -r requirements.yml
+          ansible-galaxy collection install -r requirements.yml
+          # run ansible (comma after localhost deliberate)
+          echo "# Execute ansible"
+          if [[ "{{Check}}" == True ]]; then \
+            ansible-playbook site.yml \
+            --check \
+            --connection=local \
+            --inventory localhost, \
+            --extra-vars "force_role={{Role}}" \
+            --extra-vars "ansible_python_interpreter=$python" \
+            --extra-vars "target=localhost" \
+            "{{Verbose}}" \
+            --become
+          else
+            ansible-playbook site.yml \
+            --connection=local \
+            --inventory localhost, \
+            --extra-vars "force_role={{Role}}" \
+            --extra-vars "ansible_python_interpreter=$python" \
+            --extra-vars "target=localhost" \
+            "{{Verbose}}" \
+            --become
+          fi
+          echo "# Cleanup"
+          deactivate
+          rm -rf tmp/python-venv
+          # rm -rf $ansible_dir/${ansible_repo}
+          # rmdir tmp/
