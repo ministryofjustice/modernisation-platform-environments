@@ -7,14 +7,8 @@
       "Principal": {
         "Service": "redshift.amazonaws.com"
       },
-      "Action": [
-        "s3:GetBucketAcl",
-        "s3:PutObject"
-      ],
-      "Resource": [
-        "${bucket_arn}",
-        "${bucket_arn}/*"
-      ]
+      "Action": ["s3:GetBucketAcl", "s3:PutObject"],
+      "Resource": ["${bucket_arn}", "${bucket_arn}/*"]
     }
   ]
 }

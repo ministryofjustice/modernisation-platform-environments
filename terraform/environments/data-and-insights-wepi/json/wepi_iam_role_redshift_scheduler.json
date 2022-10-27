@@ -4,9 +4,7 @@
     {
       "Action": "sts:AssumeRole",
       "Principal": {
-        "Service": [
-          "scheduler.redshift.amazonaws.com"
-        ]
+        "Service": ["scheduler.redshift.amazonaws.com"]
       },
       "Effect": "Allow",
       "Sid": ""

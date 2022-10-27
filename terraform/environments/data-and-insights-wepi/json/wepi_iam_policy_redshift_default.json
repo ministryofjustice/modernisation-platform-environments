@@ -1,17 +1,11 @@
 {
   "Version": "2012-10-17",
   "Statement": [
-      {
-          "Sid": "",
-          "Effect": "Allow",
-          "Action": [
-              "s3:PutObject",
-              "s3:GetBucketAcl"
-          ],
-          "Resource": [
-              "${bucket_arn}",
-              "${bucket_arn}/*"
-          ]
-      }
+    {
+      "Sid": "",
+      "Effect": "Allow",
+      "Action": ["s3:PutObject", "s3:GetBucketAcl"],
+      "Resource": ["${bucket_arn}", "${bucket_arn}/*"]
+    }
   ]
 }

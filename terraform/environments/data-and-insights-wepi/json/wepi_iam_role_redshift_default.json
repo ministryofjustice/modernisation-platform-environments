@@ -4,9 +4,7 @@
     {
       "Action": "sts:AssumeRole",
       "Principal": {
-        "Service": [
-          "redshift.amazonaws.com"
-        ]
+        "Service": ["redshift.amazonaws.com"]
       },
       "Effect": "Allow",
       "Sid": ""
