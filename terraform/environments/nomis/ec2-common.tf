@@ -369,6 +369,25 @@ resource "aws_ssm_association" "script-exporter" {
   }
 }
 
+#------------------------------------------------------------------------------
+# Patch Management - Run Ansible Roles manually from SSM document
+#------------------------------------------------------------------------------
+
+resource "aws_ssm_document" "run_ansible_patches" {
+  name            = "RunAnsiblePatches"
+  document_type   = "Command"
+  document_format = "YAML"
+  content         = file("./ssm-documents/run-ansible-patches.yaml")
+  target_type     = "/AWS::EC2::Instance"
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "run-ansible-patches"
+    },
+  )
+}
+
 
 #------------------------------------------------------------------------------
 # Oracle Secure Web - Install Oracle Secure Web s3 Backup Module

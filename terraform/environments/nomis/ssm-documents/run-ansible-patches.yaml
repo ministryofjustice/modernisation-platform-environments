@@ -109,7 +109,7 @@ mainSteps:
         --extra-vars "force_role={{Role}}" \
         --extra-vars "ansible_python_interpreter=$python" \
         --extra-vars "target=localhost" \
-        --verbose "{{Verbose}}" \
+        "{{Verbose}}" \
         --become
       else
         ansible-playbook site.yml \
@@ -118,7 +118,7 @@ mainSteps:
         --extra-vars "force_role={{Role}}" \
         --extra-vars "ansible_python_interpreter=$python" \
         --extra-vars "target=localhost" \
-        --verbose "{{Verbose}}" \
+        "{{Verbose}}" \
         --become
       fi
       echo "# Cleanup"
