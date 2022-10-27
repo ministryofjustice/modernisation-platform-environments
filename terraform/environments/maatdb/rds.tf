@@ -92,7 +92,7 @@ resource "aws_db_instance" "appdb1" {
   backup_window = "22:00-01:00"
   maintenance_window = "Mon:01:15-Mon:06:00"
   character_set_name = "WE8MSWIN1252"
-  multi_az = false
+  multi_az = true
   username = "admin"
   password = "development"
   vpc_security_group_ids = [aws_security_group.appdb-secgroup.id]
@@ -101,7 +101,11 @@ resource "aws_db_instance" "appdb1" {
   option_group_name = "appdboptiongroup19"
   db_subnet_group_name = "appdbsubnetgroup"
   license_model = "license-included"
+  performance_insights_enabled = true
+  deletion_protection = true
   copy_tags_to_snapshot = true
+  storage_encrypted = true
+  enabled_cloudwatch_logs_exports = ["general", "error", "slowquery"]
   tags = {
     Name = "maatdb19c database"
   }
@@ -161,11 +165,10 @@ resource "aws_security_group" "appdb-secgroup" {
   }
 
   egress {
-    from_port        = 0
-    to_port          = 0
-    protocol         = "-1"
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
+    from_port        = 1521
+    to_port          = 1521
+    protocol         = "tcp"
+    cidr_blocks      = ["10.202.0.0/20"]
   }
 
   tags = {
