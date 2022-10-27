@@ -85,7 +85,7 @@ resource "aws_db_instance" "appdb1" {
   engine_version       = "19.0.0.0.ru-2021-10.rur-2021-10.r1"
   instance_class       = "db.t3.small"
   allow_major_version_upgrade = true
-  auto_minor_version_upgrade = false
+  auto_minor_version_upgrade = true
   storage_type = "gp2"
   iops = 300
   backup_retention_period = 35
@@ -165,6 +165,7 @@ resource "aws_security_group" "appdb-secgroup" {
   }
 
   egress {
+    description      = "Sql Net on 1521"
     from_port        = 1521
     to_port          = 1521
     protocol         = "tcp"
