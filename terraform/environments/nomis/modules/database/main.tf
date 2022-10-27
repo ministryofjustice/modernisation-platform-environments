@@ -36,17 +36,6 @@ resource "aws_security_group_rule" "extra_rules" { # Extra ingress rules that mi
 # EC2
 #------------------------------------------------------------------------------
 
-# user-data template
-data "template_file" "user_data" {
-  template = file("${path.module}/user-data/user-data.sh")
-  vars = {
-    parameter_name_ASMSYS  = aws_ssm_parameter.asm_sys.name
-    parameter_name_ASMSNMP = aws_ssm_parameter.asm_snmp.name
-    volume_ids             = join(" ", local.volume_ids)
-    restored_from_snapshot = var.restored_from_snapshot
-  }
-}
-
 # get data subnet for the AZ
 data "aws_subnet" "data" {
   tags = {
@@ -64,7 +53,14 @@ resource "aws_instance" "database" {
   key_name                    = var.key_name
   monitoring                  = true
   subnet_id                   = data.aws_subnet.data.id
-  user_data                   = length(var.oracle_sids) == 0 ? base64encode(data.template_file.user_data.rendered) : data.cloudinit_config.oracle_monitoring_and_userdata.rendered
+  user_data = length(var.oracle_sids) == 0 ? base64encode(templatefile(
+    "${path.module}/templates/user-data.sh.tftmpl",
+    {
+      parameter_name_ASMSYS  = aws_ssm_parameter.asm_sys.name
+      parameter_name_ASMSNMP = aws_ssm_parameter.asm_snmp.name
+      volume_ids             = join(" ", local.volume_ids)
+      restored_from_snapshot = var.restored_from_snapshot
+  })) : data.cloudinit_config.oracle_monitoring_and_userdata.rendered
   vpc_security_group_ids = [
     var.common_security_group_id,
     aws_security_group.database.id
@@ -79,8 +75,7 @@ resource "aws_instance" "database" {
   root_block_device {
     delete_on_termination = true
     encrypted             = true
-    # volume_size           = lookup(var.drive_map, data.aws_ami.database.root_device_name, local.root_device_size)
-    volume_type = "gp3"
+    volume_type           = "gp3"
 
     tags = merge(
       var.tags,
@@ -119,7 +114,7 @@ resource "aws_instance" "database" {
     },
   [length(var.oracle_sids) > 0 ? { oracle_sids = try(join(",", var.oracle_sids), "") } : null]...)
 }
-#tfsec:ignore:aws-ebs-encryption-customer-key:exp:2022-08-31: I don't think we need the fine grained control CMK would provide
+#tfsec:ignore:aws-ebs-encryption-customer-key:exp:2022-10-31: I don't think we need the fine grained control CMK would provide
 resource "aws_ebs_volume" "oracle_app" {
   for_each = toset(local.oracle_app_disks)
 
@@ -145,7 +140,7 @@ resource "aws_volume_attachment" "oracle_app" {
   instance_id = aws_instance.database.id
 }
 
-#tfsec:ignore:aws-ebs-encryption-customer-key:exp:2022-08-31: I don't think we need the fine grained control CMK would provide
+#tfsec:ignore:aws-ebs-encryption-customer-key:exp:2022-10-31: I don't think we need the fine grained control CMK would provide
 resource "aws_ebs_volume" "asm_data" {
   for_each = toset(local.asm_data_disks)
 
@@ -177,7 +172,7 @@ resource "aws_volume_attachment" "asm_data" {
   instance_id = aws_instance.database.id
 }
 
-#tfsec:ignore:aws-ebs-encryption-customer-key:exp:2022-08-31: I don't think we need the fine grained control CMK would provide
+#tfsec:ignore:aws-ebs-encryption-customer-key:exp:2022-10-31: I don't think we need the fine grained control CMK would provide
 resource "aws_ebs_volume" "asm_flash" {
   for_each = toset(local.asm_flash_disks)
 
@@ -209,7 +204,7 @@ resource "aws_volume_attachment" "asm_flash" {
   instance_id = aws_instance.database.id
 }
 
-#tfsec:ignore:aws-ebs-encryption-customer-key:exp:2022-08-31: I don't think we need the fine grained control CMK would provide
+#tfsec:ignore:aws-ebs-encryption-customer-key:exp:2022-10-31: I don't think we need the fine grained control CMK would provide
 resource "aws_ebs_volume" "swap" {
   availability_zone = var.availability_zone
   encrypted         = true
@@ -397,7 +392,14 @@ resource "aws_iam_instance_profile" "database" {
 data "cloudinit_config" "oracle_monitoring_and_userdata" {
   part {
     content_type = "text/x-shellscript"
-    content      = data.template_file.user_data.rendered
+    content = templatefile(
+      "${path.module}/templates/user-data.sh.tftmpl",
+      {
+        parameter_name_ASMSYS  = aws_ssm_parameter.asm_sys.name
+        parameter_name_ASMSNMP = aws_ssm_parameter.asm_snmp.name
+        volume_ids             = join(" ", local.volume_ids)
+        restored_from_snapshot = var.restored_from_snapshot
+    })
   }
   dynamic "part" {
     for_each = var.oracle_sids[*]

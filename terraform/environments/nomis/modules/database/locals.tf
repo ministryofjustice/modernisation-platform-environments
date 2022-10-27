@@ -43,7 +43,6 @@ locals {
   asm_data_disk_size  = floor(var.asm_data_capacity / length(local.asm_data_disks))
   asm_flash_disk_size = floor(var.asm_flash_capacity / length(local.asm_flash_disks))
   block_device_map    = { for bdm in data.aws_ami.database.block_device_mappings : bdm.device_name => bdm }
-  root_device_size    = one([for bdm in data.aws_ami.database.block_device_mappings : bdm.ebs.volume_size if bdm.device_name == data.aws_ami.database.root_device_name])
 
   # set swap space according to https://docs.oracle.com/cd/E11882_01/install.112/e47689/oraclerestart.htm#LADBI1214 (assuming we will never have instances < 2GB)
   # output from datasource is in MiB, we spec swap sapce in GiB

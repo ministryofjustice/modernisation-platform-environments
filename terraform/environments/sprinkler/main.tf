@@ -882,6 +882,7 @@ resource "aws_db_instance" "app" {
   db_subnet_group_name            = aws_db_subnet_group.app.id
   skip_final_snapshot             = true
   storage_encrypted               = true
+  allow_major_version_upgrade     = false
 
   tags = merge(
     local.tags,

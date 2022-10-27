@@ -38,13 +38,13 @@ resource "aws_iam_role" "image-builder-distro-role" {
 
 }
 
-
+#tfsec:ignore:aws-iam-no-policy-wildcards AWS Managed Policy
 resource "aws_iam_role_policy_attachment" "image-builder-distro-policy-attach" {
   policy_arn = "arn:aws:iam::aws:policy/Ec2ImageBuilderCrossAccountDistributionAccess"
   role       = aws_iam_role.image-builder-distro-role.name
 }
 
-
+#tfsec:ignore:aws-iam-no-policy-wildcards needed to look up launch template ids from another account
 data "aws_iam_policy_document" "image-builder-launch-template-policy" {
   statement {
     effect = "Allow"
@@ -63,14 +63,15 @@ data "aws_iam_policy_document" "image-builder-launch-template-policy" {
       "ec2:CreateTags"
     ]
     # coalescelist as there are no weblogics in prod at the moment and empty resource is not acceptable
-    resources = coalescelist([for item in module.weblogic : item.launch_template_arn], ["arn:aws:ec2:${local.region}:${data.aws_caller_identity.current.id}:launch-template/dummy"])
+    # resources = coalescelist([for item in module.weblogic : item.launch_template_arn], ["arn:aws:ec2:${local.region}:${data.aws_caller_identity.current.id}:launch-template/dummy"])
+    resources = ["arn:aws:ec2:${local.region}:${data.aws_caller_identity.current.id}:launch-template/*"]
   }
 }
 
 data "aws_iam_policy_document" "image-builder-distro-kms-policy" {
   statement {
     effect = "Allow"
-    #tfsec:ignore:aws-iam-no-policy-wildcards:exp:2022-08-25
+    #tfsec:ignore:aws-iam-no-policy-wildcards
     actions = [
       "kms:Encrypt",
       "kms:Decrypt",
@@ -171,7 +172,7 @@ resource "aws_iam_role_policy_attachment" "launch-template-reader-policy-attach"
 resource "aws_kms_grant" "image-builder-shared-cmk-grant" {
   name              = "image-builder-shared-cmk-grant"
   key_id            = data.aws_kms_key.hmpps_key.arn
-  grantee_principal = "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling"
+  grantee_principal = "arn:aws:iam::${local.account_id}:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling"
   operations = [
     "Encrypt",
     "Decrypt",

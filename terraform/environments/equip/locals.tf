@@ -7,11 +7,22 @@ data "http" "environments_file" {
   url = "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/${local.application_name}.json"
 }
 
+data "aws_caller_identity" "oidc_session" {
+  provider = aws.oidc-session
+}
+
+data "aws_caller_identity" "modernisation_platform" {
+  provider = aws.modernisation-platform
+}
+
 locals {
 
   application_name = "equip"
 
   environment_management = jsondecode(data.aws_secretsmanager_secret_version.environment_management.secret_string)
+
+  # Stores modernisation platform account id for setting up the modernisation-platform provider
+  modernisation_platform_account_id = data.aws_ssm_parameter.modernisation_platform_account_id.value
 
   # This takes the name of the Terraform workspace (e.g. core-vpc-production), strips out the application name (e.g. core-vpc), and checks if
   # the string leftover is `-production`, if it isn't (e.g. core-vpc-non-production => -non-production) then it sets the var to false.
@@ -22,7 +33,7 @@ locals {
 
   # Merge tags from the environment json file with additional ones
   tags = merge(
-    jsondecode(data.http.environments_file.body).tags,
+    jsondecode(data.http.environments_file.response_body).tags,
     { "is-production" = local.is-production },
     { "environment-name" = terraform.workspace },
     { "source-code" = "https://github.com/ministryofjustice/modernisation-platform-environments" }
@@ -38,7 +49,7 @@ locals {
   provider_name = "core-vpc-${local.environment}"
 
   # environment specfic variables
-  # example usage:  
+  # example usage:
   # example_data = local.application_data.accounts[local.environment].example_var
   application_data = fileexists("./application_variables.json") ? jsondecode(file("./application_variables.json")) : {}
 }

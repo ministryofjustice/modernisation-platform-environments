@@ -1,7 +1,6 @@
 data "aws_region" "current" {}
 
-data "aws_caller_identity" "current" {}
-
+data "aws_elb_service_account" "default" {}
 data "aws_vpc" "shared" {
   tags = {
     "Name" = "${var.networking[0].business-unit}-${local.environment}"
@@ -161,7 +160,7 @@ data "aws_iam_policy_document" "ebs-kms" {
 
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.oidc_session.id}:root"]
     }
   }
 }

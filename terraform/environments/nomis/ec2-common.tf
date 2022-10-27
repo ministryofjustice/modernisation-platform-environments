@@ -1,7 +1,21 @@
 #------------------------------------------------------------------------------
 # Common IAM policies for all ec2 instance profiles
 #------------------------------------------------------------------------------
-
+resource "aws_kms_grant" "ssm-start-stop-shared-cmk-grant" {
+  count             = local.environment == "test" ? 1 : 0
+  name              = "image-builder-shared-cmk-grant"
+  key_id            = data.aws_kms_key.hmpps_key.arn
+  grantee_principal = aws_iam_role.ssm_ec2_start_stop.arn
+  operations = [
+    "Encrypt",
+    "Decrypt",
+    "ReEncryptFrom",
+    "GenerateDataKey",
+    "GenerateDataKeyWithoutPlaintext",
+    "DescribeKey",
+    "CreateGrant"
+  ]
+}
 # custom policy for SSM as managed policy AmazonSSMManagedInstanceCore is too permissive
 data "aws_iam_policy_document" "ssm_custom" {
   statement {
@@ -9,9 +23,9 @@ data "aws_iam_policy_document" "ssm_custom" {
     effect = "Allow"
     actions = [
       "ssm:DescribeAssociation",
+      "ssm:DescribeDocument",
       "ssm:GetDeployablePatchSnapshotForInstance",
       "ssm:GetDocument",
-      "ssm:DescribeDocument",
       "ssm:GetManifest",
       "ssm:ListAssociations",
       "ssm:ListInstanceAssociations",
@@ -153,7 +167,7 @@ locals {
 #------------------------------------------------------------------------------
 resource "aws_key_pair" "ec2-user" {
   key_name   = "ec2-user"
-  public_key = local.accounts[local.environment].ec2_common.public_key
+  public_key = local.environment_config.ec2_common.public_key
   tags = merge(
     local.tags,
     {
@@ -222,7 +236,7 @@ resource "aws_ssm_document" "session_manager_settings" {
 #tfsec:ignore:AWS089
 resource "aws_cloudwatch_log_group" "groups" {
   #checkov:skip=CKV_AWS_158:skip KMS CMK encryption check while logging solution is being determined
-  for_each          = local.accounts[local.environment].log_groups
+  for_each          = local.environment_config.log_groups
   name              = each.key
   retention_in_days = each.value.retention_days
 
@@ -306,17 +320,11 @@ resource "aws_ssm_association" "update_ssm_agent" {
 # Node Exporter - Install/Start Node Exporter Service
 #------------------------------------------------------------------------------
 
-data "template_file" "node_exporter_install_template" {
-  template = file("${path.module}/ssm-documents/templates/node-exporter-linux.json.tmpl")
-  vars = {
-    bucket_name = module.s3-bucket.bucket.id
-  }
-}
 resource "aws_ssm_document" "node_exporter_linux" {
   name            = "InstallNodeExporterLinux"
   document_type   = "Command"
   document_format = "JSON"
-  content         = data.template_file.node_exporter_install_template.rendered
+  content         = templatefile("${path.module}/ssm-documents/templates/node-exporter-linux.json.tmpl", { bucket_name = module.s3-bucket.bucket.id })
   target_type     = "/AWS::EC2::Instance"
 
   tags = merge(
@@ -335,37 +343,6 @@ resource "aws_ssm_association" "node_exporter_linux" {
     values = ["Linux"]
   }
 }
-
-data "template_file" "node_exporter_windows_install_template" {
-  template = file("${path.module}/ssm-documents/templates/node-exporter-windows.json.tmpl")
-  vars = {
-    bucket_name = module.s3-bucket.bucket.id
-  }
-}
-
-resource "aws_ssm_document" "node_exporter_windows" {
-  name            = "InstallNodeExporterWindows"
-  document_type   = "Command"
-  document_format = "JSON"
-  content         = data.template_file.node_exporter_windows_install_template.rendered
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "install-node-exporter-windows"
-    },
-  )
-}
-
-# Commented out as this gets a really old version from s3 bucket and jumpserver AMI has latest version already installed
-# resource "aws_ssm_association" "node_exporter_windows" {
-#   name             = aws_ssm_document.node_exporter_windows.name
-#   association_name = "node-exporter-windows"
-#   targets {
-#     key    = "tag:os_type"
-#     values = ["Windows"]
-#   }
-# }
 
 resource "aws_ssm_document" "script_exporter" {
   name            = "InstallScriptExporterLinux"
@@ -391,21 +368,16 @@ resource "aws_ssm_association" "script-exporter" {
   }
 }
 
+
 #------------------------------------------------------------------------------
 # Oracle Secure Web - Install Oracle Secure Web s3 Backup Module
 #------------------------------------------------------------------------------
 
-data "template_file" "oracle_secure_web_install_template" {
-  template = file("${path.module}/ssm-documents/templates/oracle-secure-web-install.json.tmpl")
-  vars = {
-    bucket_name = module.s3-bucket.bucket.id
-  }
-}
 resource "aws_ssm_document" "oracle_secure_web" {
   name            = "InstallOracleSecureWeb"
   document_type   = "Command"
   document_format = "JSON"
-  content         = data.template_file.oracle_secure_web_install_template.rendered
+  content         = templatefile("${path.module}/ssm-documents/templates/oracle-secure-web-install.json.tmpl", { bucket_name = module.s3-bucket.bucket.id })
   target_type     = "/AWS::EC2::Instance"
 
   tags = merge(
@@ -424,6 +396,7 @@ resource "aws_ssm_document" "oracle_secure_web" {
 #     values = ["oracle_sids"]
 #   }
 # }
+
 
 # TODO: Temporarily disable automatic provisioning while performing DR tests.
 
@@ -477,6 +450,42 @@ resource "aws_ssm_association" "ec2_scheduled_stop" {
   schedule_expression         = "cron(0 19 ? * ${each.value} *)"
 }
 
+data "aws_iam_policy_document" "ssm_ec2_start_stop_kms" {
+  statement {
+    sid    = "manageSharedAMIsEncryptedEBSVolumes"
+    effect = "Allow"
+    #tfsec:ignore:aws-iam-no-policy-wildcards
+    actions = [
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:ReEncrypt*",
+      "kms:ReEncryptFrom",
+      "kms:GenerateDataKey*",
+      "kms:DescribeKey",
+      "kms:CreateGrant",
+      "kms:ListGrants",
+      "kms:RevokeGrant"
+    ]
+    # we have a legacy CMK that's used in production that will be retired but in the meantime requires permissions
+    resources = [local.environment == "test" ? aws_kms_key.nomis-cmk[0].arn : data.aws_kms_key.nomis_key.arn, data.aws_kms_key.hmpps_key.arn]
+  }
+
+  statement {
+    sid    = "modifyAautoscalingGroupProcesses"
+    effect = "Allow"
+
+    actions = [
+      "autoscaling:SuspendProcesses",
+      "autoscaling:ResumeProcesses",
+      "autoscaling:DescribeAutoScalingGroups",
+    ]
+    #this role manages all the autoscaling groups in an account
+    #checkov:skip=CKV_AWS_111: "Ensure IAM policies does not allow write access without constraints"
+    #checkov:skip=CKV_AWS_109: "Ensure IAM policies does not allow permissions management / resource exposure without constraints"
+    resources = ["*"] #tfsec:ignore:aws-iam-no-policy-wildcards
+  }
+}
+
 resource "aws_iam_role" "ssm_ec2_start_stop" {
   name                 = "ssm-ec2-start-stop"
   path                 = "/"
@@ -500,6 +509,13 @@ resource "aws_iam_role" "ssm_ec2_start_stop" {
     "arn:aws:iam::aws:policy/service-role/AmazonSSMAutomationRole"
     # todo: This policy gives a lot of permissions. We should create a custom policy if we keep the solution long term
   ]
+  inline_policy {
+
+    name   = "ssm-ec2-start-stop-kms"
+    policy = data.aws_iam_policy_document.ssm_ec2_start_stop_kms.json
+
+  }
+
   tags = merge(
     local.tags,
     {
@@ -507,6 +523,7 @@ resource "aws_iam_role" "ssm_ec2_start_stop" {
     },
   )
 }
+
 
 #------------------------------------------------------------------------------
 # Patch Manager
@@ -516,7 +533,7 @@ resource "aws_iam_role" "ssm_ec2_start_stop" {
 resource "aws_ssm_maintenance_window" "maintenance" {
   name                       = "weekly-patching"
   description                = "Maintenance window for applying OS patches"
-  schedule                   = "cron(0 2 ? * ${local.accounts[local.environment].ec2_common.patch_day} *)"
+  schedule                   = "cron(0 2 ? * ${local.environment_config.ec2_common.patch_day} *)"
   duration                   = 3
   cutoff                     = 1
   enabled                    = true
@@ -666,7 +683,7 @@ resource "aws_ssm_patch_baseline" "rhel" {
   operating_system = "REDHAT_ENTERPRISE_LINUX"
 
   approval_rule {
-    approve_after_days = local.accounts[local.environment].ec2_common.patch_approval_delay_days
+    approve_after_days = local.environment_config.ec2_common.patch_approval_delay_days
     compliance_level   = "CRITICAL"
     patch_filter {
       key    = "CLASSIFICATION"
@@ -679,7 +696,7 @@ resource "aws_ssm_patch_baseline" "rhel" {
   }
 
   approval_rule {
-    approve_after_days = local.accounts[local.environment].ec2_common.patch_approval_delay_days
+    approve_after_days = local.environment_config.ec2_common.patch_approval_delay_days
     compliance_level   = "HIGH"
     patch_filter {
       key    = "CLASSIFICATION"
@@ -692,7 +709,7 @@ resource "aws_ssm_patch_baseline" "rhel" {
   }
 
   approval_rule {
-    approve_after_days = local.accounts[local.environment].ec2_common.patch_approval_delay_days
+    approve_after_days = local.environment_config.ec2_common.patch_approval_delay_days
     compliance_level   = "MEDIUM"
     patch_filter {
       key    = "CLASSIFICATION"
@@ -713,7 +730,7 @@ resource "aws_ssm_patch_baseline" "windows" {
   operating_system = "WINDOWS"
 
   approval_rule {
-    approve_after_days = local.accounts[local.environment].ec2_common.patch_approval_delay_days
+    approve_after_days = local.environment_config.ec2_common.patch_approval_delay_days
     compliance_level   = "CRITICAL"
     patch_filter {
       key    = "CLASSIFICATION"
@@ -726,7 +743,7 @@ resource "aws_ssm_patch_baseline" "windows" {
   }
 
   approval_rule {
-    approve_after_days = local.accounts[local.environment].ec2_common.patch_approval_delay_days
+    approve_after_days = local.environment_config.ec2_common.patch_approval_delay_days
     compliance_level   = "HIGH"
     patch_filter {
       key    = "CLASSIFICATION"
@@ -793,7 +810,7 @@ data "aws_iam_policy_document" "cloudwatch_datasource" {
       "cloudwatch:GetMetricData",
       "cloudwatch:GetInsightRuleReport"
     ]
-    #tfsec:ignore:aws-iam-no-policy-wildcards:exp:2022-08-25
+    #tfsec:ignore:aws-iam-no-policy-wildcards
     resources = ["*"]
   }
   statement {
@@ -807,7 +824,7 @@ data "aws_iam_policy_document" "cloudwatch_datasource" {
       "logs:GetQueryResults",
       "logs:GetLogEvents"
     ]
-    #tfsec:ignore:aws-iam-no-policy-wildcards:exp:2022-08-25
+    #tfsec:ignore:aws-iam-no-policy-wildcards
     resources = ["*"]
   }
   statement {

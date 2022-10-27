@@ -2,7 +2,7 @@
 name: tariff
 on:
   push:
-    branches: 
+    branches:
       - main
     paths:
       - 'terraform/environments/tariff/**'
@@ -16,197 +16,162 @@ on:
       - '.github/workflows/tariff.yml'
   workflow_dispatch:
 env:
-  AWS_ACCESS_KEY_ID:  ${{ secrets.AWS_ACCESS_KEY_ID }}
-  AWS_SECRET_ACCESS_KEY:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   TF_IN_AUTOMATION: true
+  AWS_REGION: "eu-west-2"
+  ENVIRONMENT_MANAGEMENT: ${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}
+permissions:
+  id-token: write # This is required for requesting the JWT
+  contents: read # This is required for actions/checkout
 defaults:
   run:
     shell: bash
 
 jobs:
-  
-  # These jobs run when creating a pull request
-  plan-development:
-    name: Plan Development - tariff
+
+  plan-dev-test:
+    strategy:
+      matrix:
+        include:
+          - environment: development
+          # - environment: test
+    name: Plan - ${{  matrix.environment }}
     runs-on: ubuntu-latest
     if: github.ref != 'refs/heads/main' || github.event_name == 'workflow_dispatch'
+    env:
+      TF_ENV: ${{ matrix.environment }}
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3.0.2
+        uses: actions/checkout@v3.1.0
+      - name: Set Account Number
+        run: echo "ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${GITHUB_WORKFLOW}-${TF_ENV}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)" >> $GITHUB_ENV
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
+          role-session-name: githubactionsrolesession
+          aws-region: ${{ env.AWS_REGION }}
       - name: Load and Configure Terraform
-        uses: hashicorp/setup-terraform@v2.0.0
+        uses: hashicorp/setup-terraform@v2.0.2
         with:
           terraform_version: "~1"
           terraform_wrapper: false
-      - name: Terraform plan - development
+      - name: Plan - ${{ matrix.environment }}
         run: |
           terraform --version
           echo "Terraform plan - ${TF_ENV}"
-          bash scripts/terraform-init.sh terraform/environments/tariff
-          terraform -chdir="terraform/environments/tariff" workspace select "tariff-${TF_ENV}"
-          bash scripts/terraform-plan.sh terraform/environments/tariff
-        env:
-          TF_ENV: development
+          bash scripts/terraform-init.sh terraform/environments/$GITHUB_WORKFLOW
+          terraform -chdir="terraform/environments/${GITHUB_WORKFLOW}" workspace select "${GITHUB_WORKFLOW}-${TF_ENV}"
+          bash scripts/terraform-plan.sh terraform/environments/$GITHUB_WORKFLOW
 
-  deploy-development:
-    name: Deploy Development - tariff
+  # These jobs run when creating a pull request
+  deploy-dev-test:
+    needs: plan-dev-test
+    if: success()
+    strategy:
+      matrix:
+        include:
+          - environment: development
+          # - environment: test
+    name: Apply - ${{  matrix.environment }}
     runs-on: ubuntu-latest
-    if: github.ref != 'refs/heads/main' || github.event_name == 'workflow_dispatch'
+    env:
+      TF_ENV: ${{ matrix.environment }}
     environment:
-      name: tariff-development
+      name: ${{ github.workflow }}-${{ matrix.environment }}
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3.0.2
+        uses: actions/checkout@v3.1.0
+      - name: Set Account Number
+        run: echo "ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${GITHUB_WORKFLOW}-${TF_ENV}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)" >> $GITHUB_ENV
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
+          role-session-name: githubactionsrolesession
+          aws-region: ${{ env.AWS_REGION }}
       - name: Load and Configure Terraform
-        uses: hashicorp/setup-terraform@v2.0.0
+        uses: hashicorp/setup-terraform@v2.0.2
         with:
           terraform_version: "~1"
           terraform_wrapper: false
-      - name: Terraform apply - development
+      - name: Apply - ${{ matrix.environment }}
         run: |
           terraform --version
           echo "Terraform apply - ${TF_ENV}"
-          bash scripts/terraform-init.sh terraform/environments/tariff
-          terraform -chdir="terraform/environments/tariff" workspace select "tariff-${TF_ENV}"
-          bash scripts/terraform-apply.sh terraform/environments/tariff
-        env:
-          TF_ENV: development
+          bash scripts/terraform-init.sh terraform/environments/$GITHUB_WORKFLOW
+          terraform -chdir="terraform/environments/${GITHUB_WORKFLOW}" workspace select "${GITHUB_WORKFLOW}-${TF_ENV}"
+          bash scripts/terraform-apply.sh terraform/environments/$GITHUB_WORKFLOW
 
-#   plan-test:
-#     name: Plan Test - tariff
+#  # Plan + deploy for pre-production and production environments, only from main
+#   plan-preprod-prod:
+#     strategy:
+#       matrix:
+#         include:
+#           - environment: preproduction
+#           - environment: production
+#     name: Plan - ${{  matrix.environment }}
 #     runs-on: ubuntu-latest
-#     if: github.ref != 'refs/heads/main' || github.event_name == 'workflow_dispatch'
+#     if: github.ref == 'refs/heads/main'
+#     env:
+#       TF_ENV: ${{ matrix.environment }}
 #     steps:
 #       - name: Checkout Repository
-#         uses: actions/checkout@v3.0.2
+#         uses: actions/checkout@v3.1.0
+#       - name: Set Account Number
+#         run: echo "ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${GITHUB_WORKFLOW}-${TF_ENV}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)" >> $GITHUB_ENV
+#       - name: configure aws credentials
+#         uses: aws-actions/configure-aws-credentials@v1
+#         with:
+#           role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
+#           role-session-name: githubactionsrolesession
+#           aws-region: ${{ env.AWS_REGION }}
 #       - name: Load and Configure Terraform
-#         uses: hashicorp/setup-terraform@v2.0.0
+#         uses: hashicorp/setup-terraform@v2.0.2
 #         with:
 #           terraform_version: "~1"
 #           terraform_wrapper: false
-#       - name: Terraform plan - test
+#       - name: Plan - ${{ matrix.environment }}
 #         run: |
 #           terraform --version
 #           echo "Terraform plan - ${TF_ENV}"
-#           bash scripts/terraform-init.sh terraform/environments/tariff
-#           terraform -chdir="terraform/environments/tariff" workspace select "tariff-${TF_ENV}"
-#           bash scripts/terraform-plan.sh terraform/environments/tariff
-#         env:
-#           TF_ENV: test
-
-#   deploy-test:
-#     name: Deploy Test - tariff
+#           bash scripts/terraform-init.sh terraform/environments/$GITHUB_WORKFLOW
+#           terraform -chdir="terraform/environments/${GITHUB_WORKFLOW}" workspace select "${GITHUB_WORKFLOW}-${TF_ENV}"
+#           bash scripts/terraform-plan.sh terraform/environments/$GITHUB_WORKFLOW
+#   # These jobs run when creating a pull request
+#   deploy-preprod-prod:
+#     needs: plan-preprod-prod
+#     if: success()
+#     strategy:
+#       matrix:
+#         include:
+#           - environment: preproduction
+#           - environment: production
+#     name: Apply - ${{  matrix.environment }}
 #     runs-on: ubuntu-latest
-#     if: github.ref != 'refs/heads/main' || github.event_name == 'workflow_dispatch'
+#     env:
+#       TF_ENV: ${{ matrix.environment }}
 #     environment:
-#       name: tariff-test
+#       name: ${{ github.workflow }}-${{ matrix.environment }}
 #     steps:
 #       - name: Checkout Repository
-#         uses: actions/checkout@v3.0.2
+#         uses: actions/checkout@v3.1.0
+#       - name: Set Account Number
+#         run: echo "ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${GITHUB_WORKFLOW}-${TF_ENV}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)" >> $GITHUB_ENV
+#       - name: configure aws credentials
+#         uses: aws-actions/configure-aws-credentials@v1
+#         with:
+#           role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
+#           role-session-name: githubactionsrolesession
+#           aws-region: ${{ env.AWS_REGION }}
 #       - name: Load and Configure Terraform
-#         uses: hashicorp/setup-terraform@v2.0.0
+#         uses: hashicorp/setup-terraform@v2.0.2
 #         with:
 #           terraform_version: "~1"
 #           terraform_wrapper: false
-#       - name: Terraform apply - test
+#       - name: Apply - ${{ matrix.environment }}
 #         run: |
 #           terraform --version
 #           echo "Terraform apply - ${TF_ENV}"
-#           bash scripts/terraform-init.sh terraform/environments/tariff
-#           terraform -chdir="terraform/environments/tariff" workspace select "tariff-${TF_ENV}"
-#           bash scripts/terraform-apply.sh terraform/environments/tariff
-#         env:
-#           TF_ENV: test
-
-#   # These jobs run after merging to main
-#   plan-preproduction:
-#     name: Plan Preproduction - tariff
-#     runs-on: ubuntu-latest
-#     if: github.ref == 'refs/heads/main'
-#     steps:
-#       - name: Checkout Repository
-#         uses: actions/checkout@v3.0.2
-#       - name: Load and Configure Terraform
-#         uses: hashicorp/setup-terraform@v2.0.0
-#         with:
-#           terraform_version: "~1"
-#           terraform_wrapper: false
-#       - name: Terraform plan - preproduction
-#         run: |
-#           terraform --version
-#           echo "Terraform plan - ${TF_ENV}"
-#           bash scripts/terraform-init.sh terraform/environments/tariff
-#           terraform -chdir="terraform/environments/tariff" workspace select "tariff-${TF_ENV}"
-#           bash scripts/terraform-plan.sh terraform/environments/tariff
-#         env:
-#           TF_ENV: preproduction
-
-#   deploy-preproduction:
-#     name: Deploy Preproduction - tariff
-#     runs-on: ubuntu-latest
-#     if: github.ref == 'refs/heads/main'
-#     environment:
-#       name: tariff-preproduction
-#     steps:
-#       - name: Checkout Repository
-#         uses: actions/checkout@v3.0.2
-#       - name: Load and Configure Terraform
-#         uses: hashicorp/setup-terraform@v2.0.0
-#         with:
-#           terraform_version: "~1"
-#           terraform_wrapper: false
-#       - name: Terraform apply - preproduction
-#         run: |
-#           terraform --version
-#           echo "Terraform apply - ${TF_ENV}"
-#           bash scripts/terraform-init.sh terraform/environments/tariff
-#           terraform -chdir="terraform/environments/tariff" workspace select "tariff-${TF_ENV}"
-#           bash scripts/terraform-apply.sh terraform/environments/tariff
-#         env:
-#           TF_ENV: preproduction
-  
-#   plan-production:
-#     name: Plan Production - tariff
-#     runs-on: ubuntu-latest
-#     if: github.ref == 'refs/heads/main'
-#     steps:
-#       - name: Checkout Repository
-#         uses: actions/checkout@v3.0.2
-#       - name: Load and Configure Terraform
-#         uses: hashicorp/setup-terraform@v2.0.0
-#         with:
-#           terraform_version: "~1"
-#           terraform_wrapper: false
-#       - name: Terraform plan - production
-#         run: |
-#           terraform --version
-#           echo "Terraform plan - ${TF_ENV}"
-#           bash scripts/terraform-init.sh terraform/environments/tariff
-#           terraform -chdir="terraform/environments/tariff" workspace select "tariff-${TF_ENV}"
-#           bash scripts/terraform-plan.sh terraform/environments/tariff
-#         env:
-#           TF_ENV: production
-
-#   deploy-production:
-#     name: Deploy Production - tariff
-#     runs-on: ubuntu-latest
-#     if: github.ref == 'refs/heads/main'
-#     environment:
-#       name: tariff-production
-#     steps:
-#       - name: Checkout Repository
-#         uses: actions/checkout@v3.0.2
-#       - name: Load and Configure Terraform
-#         uses: hashicorp/setup-terraform@v2.0.0
-#         with:
-#           terraform_version: "~1"
-#           terraform_wrapper: false
-#       - name: Terraform apply - production
-#         run: |
-#           terraform --version
-#           echo "Terraform apply - ${TF_ENV}"
-#           bash scripts/terraform-init.sh terraform/environments/tariff
-#           terraform -chdir="terraform/environments/tariff" workspace select "tariff-${TF_ENV}"
-#           bash scripts/terraform-apply.sh terraform/environments/tariff
-#         env:
-#           TF_ENV: production
+#           bash scripts/terraform-init.sh terraform/environments/$GITHUB_WORKFLOW
+#           terraform -chdir="terraform/environments/${GITHUB_WORKFLOW}" workspace select "${GITHUB_WORKFLOW}-${TF_ENV}"
+#           bash scripts/terraform-apply.sh terraform/environments/$GITHUB_WORKFLOW

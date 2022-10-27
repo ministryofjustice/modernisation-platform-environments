@@ -34,21 +34,12 @@ data "aws_ami" "jumpserver" {
 
   filter {
     name   = "name"
-    values = ["nomis_jumpserver_2022-06-21*"]
+    values = ["nomis_windows_server_2022_jumpserver*"]
   }
 
   filter {
     name   = "virtualization-type"
     values = ["hvm"]
-  }
-}
-
-# user-data template
-data "template_file" "user_data" {
-  template = file("./templates/jumpserver-user-data.yaml")
-  vars = {
-    SECRET_PREFIX = local.secret_prefix
-    S3_BUCKET     = module.s3-bucket.bucket.id
   }
 }
 
@@ -77,7 +68,9 @@ resource "aws_launch_template" "jumpserver" {
     delete_on_termination       = true
   }
 
-  user_data = base64encode(data.template_file.user_data.rendered)
+  #checkov:skip=CKV_SECRET_6: "Base64 High Entropy String"
+  user_data = base64encode(templatefile("./templates/jumpserver-user-data.yaml", { SECRET_PREFIX = local.secret_prefix, S3_BUCKET = module.s3-bucket.bucket.id }))
+
   tag_specifications {
     resource_type = "instance"
     tags = merge(
@@ -91,6 +84,10 @@ resource "aws_launch_template" "jumpserver" {
       }
     )
   }
+
+  lifecycle {
+    ignore_changes = [image_id, description, tags, tags_all]
+  }
 }
 
 # autoscaling
@@ -101,7 +98,7 @@ resource "aws_autoscaling_group" "jumpserver" {
   }
   desired_capacity    = 1
   name                = "jumpserver-autoscaling-group"
-  min_size            = 1
+  min_size            = 0
   max_size            = 1
   force_delete        = true
   vpc_zone_identifier = data.aws_subnets.jumpserver.ids
@@ -141,7 +138,7 @@ resource "aws_security_group" "jumpserver-windows" {
     from_port   = "9100"
     to_port     = "9100"
     protocol    = "TCP"
-    cidr_blocks = [local.accounts[local.environment].database_external_access_cidr.cloud_platform]
+    cidr_blocks = [local.cidrs.cloud_platform]
   }
 
   egress {

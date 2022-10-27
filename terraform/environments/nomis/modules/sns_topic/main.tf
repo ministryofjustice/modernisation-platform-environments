@@ -1,11 +1,7 @@
 data "aws_caller_identity" "current" {}
 
-data "aws_ssm_parameter" "subscriptions" {
-  name = "/monitoring/subscriptions"
-}
-
 locals {
-  subscriptions_data = sensitive(jsondecode(data.aws_ssm_parameter.subscriptions.value))
+  subscriptions_data = sensitive(jsondecode(var.ssm_parameter))
 }
 
 resource "aws_sns_topic" "sns_topic" {

@@ -2,10 +2,6 @@ locals {
   public_key_data = jsondecode(file("./bastion_linux.json"))
 }
 
-data "aws_iam_instance_profile" "bastion_instance_profile" {
-  name = "bastion-ec2-profile"
-}
-
 # create single managed policy
 resource "aws_iam_policy" "ec2_bastion_policy" {
   name        = "ec2-nomis-bastion-policy"
@@ -20,15 +16,9 @@ resource "aws_iam_policy" "ec2_bastion_policy" {
   )
 }
 
-resource "aws_iam_role_policy_attachment" "ec2_nomis_bastion_policy_attach" {
-  policy_arn = aws_iam_policy.ec2_bastion_policy.arn
-  role       = data.aws_iam_instance_profile.bastion_instance_profile.role_name
-}
-
-
 # tfsec:ignore:aws-s3-enable-bucket-encryption tfsec:ignore:aws-s3-encryption-customer-key tfsec:ignore:aws-s3-enable-bucket-logging tfsec:ignore:aws-s3-enable-versioning
 module "bastion_linux" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=v3.0.4"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=v3.0.5"
 
   providers = {
     aws.share-host   = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
@@ -53,7 +43,14 @@ module "bastion_linux" {
   business_unit = local.vpc_name
   subnet_set    = local.subnet_set
   environment   = local.environment
-  region        = "eu-west-2"
+  region        = local.region
+
+  extra_user_data_content = templatefile("templates/bastion-user-data.sh.tftpl", {
+    region           = local.region
+    vpc_name         = local.vpc_name
+    application_name = local.application_name
+    environment      = local.environment
+  })
 
   # Tags
   tags_common = merge(
@@ -71,7 +68,7 @@ resource "aws_security_group_rule" "CP_monitoring_ingress" {
   from_port         = 9100
   to_port           = 9100
   protocol          = "tcp"
-  cidr_blocks       = [local.accounts[local.environment].database_external_access_cidr.cloud_platform]
+  cidr_blocks       = [local.cidrs.cloud_platform]
   security_group_id = module.bastion_linux.bastion_security_group
 }
 
@@ -81,7 +78,7 @@ resource "aws_security_group_rule" "CP_monitoring_egress" {
   from_port         = 9100
   to_port           = 9100
   protocol          = "tcp"
-  cidr_blocks       = [local.accounts[local.environment].database_external_access_cidr.cloud_platform]
+  cidr_blocks       = [local.cidrs.cloud_platform]
   security_group_id = module.bastion_linux.bastion_security_group
 }
 
@@ -91,7 +88,7 @@ resource "aws_security_group_rule" "CP_oracle_monitoring_ingress" {
   from_port         = 9172
   to_port           = 9172
   protocol          = "tcp"
-  cidr_blocks       = [local.accounts[local.environment].database_external_access_cidr.cloud_platform]
+  cidr_blocks       = [local.cidrs.cloud_platform]
   security_group_id = module.bastion_linux.bastion_security_group
 }
 
@@ -101,6 +98,6 @@ resource "aws_security_group_rule" "CP_oracle_monitoring_egress" {
   from_port         = 9172
   to_port           = 9172
   protocol          = "tcp"
-  cidr_blocks       = [local.accounts[local.environment].database_external_access_cidr.cloud_platform]
+  cidr_blocks       = [local.cidrs.cloud_platform]
   security_group_id = module.bastion_linux.bastion_security_group
 }

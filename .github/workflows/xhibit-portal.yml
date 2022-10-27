@@ -16,9 +16,12 @@ on:                                          # Put ALL the triggers for any part
       - '.github/workflows/xhibit-portal.yml'
   workflow_dispatch:
 env:
-  AWS_ACCESS_KEY_ID:  ${{ secrets.AWS_ACCESS_KEY_ID }}
-  AWS_SECRET_ACCESS_KEY:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   TF_IN_AUTOMATION: true
+  AWS_REGION: "eu-west-2"
+  ENVIRONMENT_MANAGEMENT: ${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}
+permissions:
+  id-token: write # This is required for requesting the JWT
+  contents: read # This is required for actions/checkout
 defaults:
   run:
     shell: bash
@@ -30,9 +33,17 @@ jobs:
     if: github.ref != 'refs/heads/main' || github.event_name == 'workflow_dispatch' # job only runs for pull requests
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3.0.2
+        uses: actions/checkout@v3.1.0
+      - name: Set Account Number
+        run: echo "ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${GITHUB_WORKFLOW}-${TF_ENV}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)" >> $GITHUB_ENV
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
+          role-session-name: githubactionsrolesession
+          aws-region: ${{ env.AWS_REGION }}
       - name: Load and Configure Terraform
-        uses: hashicorp/setup-terraform@v2.0.0
+        uses: hashicorp/setup-terraform@v2.0.2
         with:
           terraform_version: "~1"
           terraform_wrapper: false
@@ -44,8 +55,8 @@ jobs:
           terraform -chdir="terraform/environments/xhibit-portal" workspace list
           terraform -chdir="terraform/environments/xhibit-portal" workspace select "xhibit-portal-${TF_ENV}"
           bash scripts/terraform-plan.sh terraform/environments/xhibit-portal
-        env:
-          TF_ENV: development
+    env:
+      TF_ENV: development
 
   deploy-development:
     needs: plan-development # job only runs if plan-development runs successfully
@@ -54,9 +65,17 @@ jobs:
     if: github.ref != 'refs/heads/main' || github.event_name == 'workflow_dispatch'
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3.0.2
+        uses: actions/checkout@v3.1.0
+      - name: Set Account Number
+        run: echo "ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${GITHUB_WORKFLOW}-${TF_ENV}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)" >> $GITHUB_ENV
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
+          role-session-name: githubactionsrolesession
+          aws-region: ${{ env.AWS_REGION }}
       - name: Load and Configure Terraform
-        uses: hashicorp/setup-terraform@v2.0.0
+        uses: hashicorp/setup-terraform@v2.0.2
         with:
           terraform_version: "~1"
           terraform_wrapper: false
@@ -67,8 +86,8 @@ jobs:
           bash scripts/terraform-init.sh terraform/environments/xhibit-portal
           terraform -chdir="terraform/environments/xhibit-portal" workspace select "xhibit-portal-${TF_ENV}"
           bash scripts/terraform-apply.sh terraform/environments/xhibit-portal
-        env:
-          TF_ENV: development
+    env:
+      TF_ENV: development
 
   plan-preproduction:
     name: Plan Pre-Production - xhibit-portal
@@ -76,9 +95,17 @@ jobs:
     if: github.ref == 'refs/heads/main' # job only runs for merges in the main branch
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3.0.2
+        uses: actions/checkout@v3.1.0
+      - name: Set Account Number
+        run: echo "ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${GITHUB_WORKFLOW}-${TF_ENV}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)" >> $GITHUB_ENV
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
+          role-session-name: githubactionsrolesession
+          aws-region: ${{ env.AWS_REGION }}
       - name: Load and Configure Terraform
-        uses: hashicorp/setup-terraform@v2.0.0
+        uses: hashicorp/setup-terraform@v2.0.2
         with:
           terraform_version: "~1"
           terraform_wrapper: false
@@ -89,8 +116,8 @@ jobs:
           bash scripts/terraform-init.sh terraform/environments/xhibit-portal
           terraform -chdir="terraform/environments/xhibit-portal" workspace select "xhibit-portal-${TF_ENV}"
           bash scripts/terraform-plan.sh terraform/environments/xhibit-portal
-        env:
-          TF_ENV: preproduction
+    env:
+      TF_ENV: preproduction
 
   deploy-preproduction:
     needs: plan-preproduction # job only runs if plan-production runs successfully
@@ -99,9 +126,17 @@ jobs:
     if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3.0.2
+        uses: actions/checkout@v3.1.0
+      - name: Set Account Number
+        run: echo "ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${GITHUB_WORKFLOW}-${TF_ENV}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)" >> $GITHUB_ENV
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
+          role-session-name: githubactionsrolesession
+          aws-region: ${{ env.AWS_REGION }}
       - name: Load and Configure Terraform
-        uses: hashicorp/setup-terraform@v2.0.0
+        uses: hashicorp/setup-terraform@v2.0.2
         with:
           terraform_version: "~1"
           terraform_wrapper: false
@@ -112,8 +147,8 @@ jobs:
           bash scripts/terraform-init.sh terraform/environments/xhibit-portal
           terraform -chdir="terraform/environments/xhibit-portal" workspace select "xhibit-portal-${TF_ENV}"
           bash scripts/terraform-apply.sh terraform/environments/xhibit-portal
-        env:
-          TF_ENV: preproduction
+    env:
+      TF_ENV: preproduction
 
   plan-production:
     name: Plan Production - xhibit-portal
@@ -121,9 +156,17 @@ jobs:
     if: github.ref == 'refs/heads/main' # job only runs for merges to the main branch
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3.0.2
+        uses: actions/checkout@v3.1.0
+      - name: Set Account Number
+        run: echo "ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${GITHUB_WORKFLOW}-${TF_ENV}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)" >> $GITHUB_ENV
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
+          role-session-name: githubactionsrolesession
+          aws-region: ${{ env.AWS_REGION }}
       - name: Load and Configure Terraform
-        uses: hashicorp/setup-terraform@v2.0.0
+        uses: hashicorp/setup-terraform@v2.0.2
         with:
           terraform_version: "~1"
           terraform_wrapper: false
@@ -134,8 +177,8 @@ jobs:
           bash scripts/terraform-init.sh terraform/environments/xhibit-portal
           terraform -chdir="terraform/environments/xhibit-portal" workspace select "xhibit-portal-${TF_ENV}"
           bash scripts/terraform-plan.sh terraform/environments/xhibit-portal
-        env:
-          TF_ENV: production
+    env:
+      TF_ENV: production
 
   deploy-production:
     needs: plan-production # job only runs if plan-production runs successfully
@@ -146,9 +189,17 @@ jobs:
       name: xhibit-portal-production        # put this in if you want to click-to-deploy with a review button in the Github Actions tab
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3.0.2
+        uses: actions/checkout@v3.1.0
+      - name: Set Account Number
+        run: echo "ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${GITHUB_WORKFLOW}-${TF_ENV}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)" >> $GITHUB_ENV
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
+          role-session-name: githubactionsrolesession
+          aws-region: ${{ env.AWS_REGION }}
       - name: Load and Configure Terraform
-        uses: hashicorp/setup-terraform@v2.0.0
+        uses: hashicorp/setup-terraform@v2.0.2
         with:
           terraform_version: "~1"
           terraform_wrapper: false
@@ -159,5 +210,5 @@ jobs:
           bash scripts/terraform-init.sh terraform/environments/xhibit-portal
           terraform -chdir="terraform/environments/xhibit-portal" workspace select "xhibit-portal-${TF_ENV}"
           bash scripts/terraform-apply.sh terraform/environments/xhibit-portal
-        env:
-          TF_ENV: production
+    env:
+      TF_ENV: production

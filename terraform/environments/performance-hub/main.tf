@@ -143,7 +143,7 @@ data "template_file" "task_definition" {
 
 module "windows-ecs" {
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs?ref=v2.0.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs?ref=v2.1.0"
 
   subnet_set_name         = local.subnet_set_name
   vpc_all                 = local.vpc_all
@@ -164,8 +164,8 @@ module "windows-ecs" {
   network_mode            = local.app_data.accounts[local.environment].network_mode
   server_port             = local.app_data.accounts[local.environment].server_port
   app_count               = local.app_data.accounts[local.environment].app_count
-  public_cidrs            = [data.aws_subnet.public_az_a.cidr_block, data.aws_subnet.public_az_b.cidr_block, data.aws_subnet.public_az_c.cidr_block]
   ec2_ingress_rules       = local.ec2_ingress_rules
+  ec2_egress_rules        = local.ec2_egress_rules
   tags_common             = local.tags
 
   depends_on = [aws_lb_listener.listener]
@@ -470,6 +470,46 @@ resource "aws_security_group_rule" "db_bastion_ingress_rule" {
   protocol                 = "tcp"
   security_group_id        = aws_security_group.db.id
   source_security_group_id = module.bastion_linux.bastion_security_group
+}
+
+resource "aws_security_group_rule" "db_windows_server_failover_tcp_ingress_rule" {
+  type                     = "ingress"
+  description              = "Windows Server Failover Cluster port TCP Ingress"
+  from_port                = 3343
+  to_port                  = 3343
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.db.id
+  source_security_group_id = aws_security_group.db_mgmt_server_security_group.id
+}
+
+resource "aws_security_group_rule" "db_windows_server_failover_tcp_egress_rule" {
+  type                     = "egress"
+  description              = "Windows Server Failover Cluster port TCP Egress"
+  from_port                = 3343
+  to_port                  = 3343
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.db.id
+  source_security_group_id = aws_security_group.db_mgmt_server_security_group.id
+}
+
+resource "aws_security_group_rule" "db_windows_server_failover_udp_ingress_rule" {
+  type                     = "ingress"
+  description              = "Windows Server Failover Cluster port UDP Ingress"
+  from_port                = 3343
+  to_port                  = 3343
+  protocol                 = "udp"
+  security_group_id        = aws_security_group.db.id
+  source_security_group_id = aws_security_group.db_mgmt_server_security_group.id
+}
+
+resource "aws_security_group_rule" "db_windows_server_failover_udp_egress_rule" {
+  type                     = "egress"
+  description              = "Windows Server Failover Cluster port UDP Egress"
+  from_port                = 3343
+  to_port                  = 3343
+  protocol                 = "udp"
+  security_group_id        = aws_security_group.db.id
+  source_security_group_id = aws_security_group.db_mgmt_server_security_group.id
 }
 
 #------------------------------------------------------------------------------

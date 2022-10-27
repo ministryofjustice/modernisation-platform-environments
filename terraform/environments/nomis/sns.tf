@@ -1,3 +1,14 @@
+resource "aws_ssm_parameter" "subscriptions" {
+  name  = "/monitoring/subscriptions"
+  type  = "SecureString"
+  value = jsonencode({ "emails" = [] })
+  lifecycle {
+    ignore_changes = [
+      value,
+    ]
+  }
+}
+
 module "monitoring-sns-topic" {
   source             = "./modules/sns_topic"
   application        = "nomis-monitoring"
@@ -5,8 +16,14 @@ module "monitoring-sns-topic" {
   topic_display_name = "Nomis monitoring ${local.environment} SNS topic"
   kms_master_key_arn = aws_kms_key.sns.arn
   kms_master_key_id  = aws_kms_key.sns.key_id
+  ssm_parameter      = aws_ssm_parameter.subscriptions.value
+
+  depends_on = [
+    aws_ssm_parameter.subscriptions
+  ]
 
 }
+
 
 resource "aws_iam_role" "alertmanager-sns-role" {
   name               = "AlertmanagerSNSTopicRole"
