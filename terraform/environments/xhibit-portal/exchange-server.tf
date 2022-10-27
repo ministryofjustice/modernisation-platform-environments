@@ -25,6 +25,7 @@ resource "aws_instance" "exchange-server" {
     tags = {
       Name = "root-block-device-exchange-server-${local.application_name}"
     }
+    volume_type = "gp3"
   }
 
   lifecycle {
@@ -53,7 +54,7 @@ resource "aws_instance" "exchange-server" {
 resource "aws_ebs_volume" "exchange-disk1" {
   depends_on        = [aws_instance.exchange-server]
   availability_zone = "${local.region}a"
-  type              = "gp2"
+  type              = "gp3"
   encrypted         = true
 
   snapshot_id = local.application_data.accounts[local.environment].infra6-disk-1-snapshot
@@ -80,7 +81,7 @@ resource "aws_volume_attachment" "exchange-disk1" {
 resource "aws_ebs_volume" "exchange-disk2" {
   depends_on        = [aws_instance.exchange-server]
   availability_zone = "${local.region}a"
-  type              = "gp2"
+  type              = "gp3"
   encrypted         = true
 
   snapshot_id = local.application_data.accounts[local.environment].infra6-disk-2-snapshot

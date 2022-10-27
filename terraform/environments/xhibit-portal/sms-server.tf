@@ -21,6 +21,7 @@ resource "aws_instance" "sms-server" {
     tags = {
       Name = "root-block-device-sms-server-${local.application_name}"
     }
+    volume_type = "gp3"
   }
 
   lifecycle {

@@ -22,6 +22,7 @@ resource "aws_instance" "database-server" {
     tags = {
       Name = "root-block-device-database-${local.application_name}"
     }
+    volume_type = "gp3"
   }
 
   lifecycle {
@@ -50,7 +51,7 @@ resource "aws_instance" "database-server" {
 resource "aws_ebs_volume" "database-disk1" {
   depends_on        = [aws_instance.database-server]
   availability_zone = "${local.region}a"
-  type              = "gp2"
+  type              = "gp3"
   encrypted         = true
 
   snapshot_id = local.application_data.accounts[local.environment].suprig01-disk-1-snapshot
@@ -77,7 +78,7 @@ resource "aws_volume_attachment" "database-disk1" {
 resource "aws_ebs_volume" "database-disk2" {
   depends_on        = [aws_instance.database-server]
   availability_zone = "${local.region}a"
-  type              = "gp2"
+  type              = "gp3"
   encrypted         = true
 
   snapshot_id = local.application_data.accounts[local.environment].suprig01-disk-2-snapshot
@@ -102,7 +103,7 @@ resource "aws_volume_attachment" "database-disk2" {
 resource "aws_ebs_volume" "database-disk3" {
   depends_on        = [aws_instance.database-server]
   availability_zone = "${local.region}a"
-  type              = "gp2"
+  type              = "gp3"
   encrypted         = true
 
   snapshot_id = local.application_data.accounts[local.environment].suprig01-disk-3-snapshot
@@ -126,7 +127,7 @@ resource "aws_volume_attachment" "database-disk3" {
 resource "aws_ebs_volume" "database-disk4" {
   depends_on        = [aws_instance.database-server]
   availability_zone = "${local.region}a"
-  type              = "gp2"
+  type              = "gp3"
   encrypted         = true
 
   snapshot_id = local.application_data.accounts[local.environment].suprig01-disk-4-snapshot
@@ -150,7 +151,7 @@ resource "aws_volume_attachment" "database-disk4" {
 resource "aws_ebs_volume" "database-disk5" {
   depends_on        = [aws_instance.database-server]
   availability_zone = "${local.region}a"
-  type              = "gp2"
+  type              = "gp3"
   encrypted         = true
 
   snapshot_id = local.application_data.accounts[local.environment].suprig01-disk-5-snapshot
@@ -175,7 +176,7 @@ resource "aws_volume_attachment" "database-disk5" {
 resource "aws_ebs_volume" "database-disk6" {
   depends_on        = [aws_instance.database-server]
   availability_zone = "${local.region}a"
-  type              = "gp2"
+  type              = "gp3"
   encrypted         = true
 
   #snapshot_id = local.application_data.accounts[local.environment].suprig01-disk-6-snapshot
@@ -201,7 +202,7 @@ resource "aws_volume_attachment" "database-disk6" {
 resource "aws_ebs_volume" "database-disk7" {
   depends_on        = [aws_instance.database-server]
   availability_zone = "${local.region}a"
-  type              = "gp2"
+  type              = "gp3"
   encrypted         = true
 
   size = 300

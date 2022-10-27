@@ -25,6 +25,7 @@ resource "aws_instance" "database-server-baremetal" {
     tags = {
       Name = "root-block-device-baremetal-${local.application_name}"
     }
+    volume_type = "gp3"
   }
 
   lifecycle {
@@ -54,7 +55,7 @@ resource "aws_ebs_volume" "database-baremetal-disk1" {
   count             = local.only_in_production
   depends_on        = [aws_instance.database-server-baremetal]
   availability_zone = "${local.region}a"
-  type              = "gp2"
+  type              = "gp3"
   encrypted         = true
   size              = 4000
 
@@ -99,7 +100,7 @@ resource "aws_ebs_volume" "app-baremetal-disk2" {
   count             = local.only_in_production
   depends_on        = [aws_instance.database-server-baremetal]
   availability_zone = "${local.region}a"
-  type              = "gp2"
+  type              = "gp3"
   encrypted         = true
   size              = 2000
 

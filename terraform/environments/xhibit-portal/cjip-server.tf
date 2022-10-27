@@ -20,6 +20,7 @@ resource "aws_instance" "cjip-server" {
     tags = {
       Name = "root-block-device-cjip-${local.application_name}"
     }
+    volume_type = "gp3"
   }
 
   lifecycle {
@@ -48,7 +49,7 @@ resource "aws_instance" "cjip-server" {
 resource "aws_ebs_volume" "cjip-disk1" {
   depends_on        = [aws_instance.cjip-server]
   availability_zone = "${local.region}a"
-  type              = "gp2"
+  type              = "gp3"
   encrypted         = true
 
   snapshot_id = local.application_data.accounts[local.environment].suprig05-disk-1-snapshot

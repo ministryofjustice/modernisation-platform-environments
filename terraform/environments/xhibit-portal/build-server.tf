@@ -20,6 +20,7 @@ resource "aws_instance" "build-server" {
     tags = {
       Name = "root-block-device-build-${local.application_name}"
     }
+    volume_type = "gp3"
   }
 
   lifecycle {

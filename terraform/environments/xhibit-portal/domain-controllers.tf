@@ -121,6 +121,7 @@ resource "aws_instance" "infra1" {
     tags = {
       Name = "root-block-device-infra1-${local.application_name}"
     }
+    volume_type = "gp3"
   }
 
   lifecycle {
@@ -145,7 +146,7 @@ resource "aws_instance" "infra1" {
 
 resource "aws_ebs_volume" "infra1-disk1" {
   availability_zone = "${local.region}a"
-  type              = "gp2"
+  type              = "gp3"
   encrypted         = true
 
   snapshot_id = local.application_data.accounts[local.environment].infra1-disk-1-snapshot

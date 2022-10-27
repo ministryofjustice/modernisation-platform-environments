@@ -20,6 +20,7 @@ resource "aws_instance" "portal-server" {
     tags = {
       Name = "root-block-device-portal-${local.application_name}"
     }
+    volume_type = "gp3"
   }
 
   lifecycle {
