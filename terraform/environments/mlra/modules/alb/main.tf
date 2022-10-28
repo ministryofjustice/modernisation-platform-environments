@@ -104,6 +104,11 @@ resource "aws_lb_listener_rule" "alb_listener_rule" {
     type             = "forward"
     target_group_arn = aws_lb_target_group.alb_target_group.arn
   }
+  condition {
+    path_pattern {
+      values = ["/"]
+    }
+  }
 }
 
 resource "aws_lb_target_group" "alb_target_group" {
