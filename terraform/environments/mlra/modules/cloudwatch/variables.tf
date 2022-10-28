@@ -89,6 +89,6 @@ variable "pALBTargetResponseTimeThresholdMaximum" {
 
 variable "snsTopicName" {
   description = "Name of the SNS Topic"
-  type        = string
+  type = string
 
 }
