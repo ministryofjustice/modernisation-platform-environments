@@ -1,7 +1,10 @@
 # DSOS-109
 module "jb_load_balancer_test" {
-  source = "git@github.com:ministryofjustice/modernisation-platform-terraform-loadbalancer.git"
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer.git"
   count  = local.environment == "development" ? 1 : 0
+  providers = {
+    aws.bucket-replication = aws
+  }
 
   account_number             = local.modernisation_platform_account_id
   application_name           = "jbtest"
