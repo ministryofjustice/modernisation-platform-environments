@@ -109,6 +109,7 @@ mainSteps:
           ansible-galaxy collection install -r requirements.yml
           # run ansible (comma after localhost deliberate)
           echo "# Execute ansible"
+          sudo su
           if [[ "{{Check}}" == True ]]; then \
             ansible-playbook site.yml \
             --check \
