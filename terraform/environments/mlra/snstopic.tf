@@ -14,10 +14,6 @@ data "aws_secretsmanager_secret_version" "pagerduty_integration_keys" {
   secret_id = data.aws_secretsmanager_secret.pagerduty_integration_keys.id
 }
 
-
-#TODO currently the cloud watch module is ready but is missing a few key imputs from the ALB setup
-#just waiting for these to be complete before making this section live
-
 module "cwalarm" {
   source = "./modules/cloudwatch"
 
