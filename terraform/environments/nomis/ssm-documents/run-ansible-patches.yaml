@@ -67,6 +67,10 @@ mainSteps:
       timeoutSeconds: "{{ TimeoutSeconds }}"
       runCommand:
         - |
+          # Retrieving API Token
+          token=$(curl -sS -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
+          # Retrieving Instance ID
+          instance_id=$(curl -sS -H "X-aws-ec2-metadata-token: $token" -v http://169.254.169.254/latest/meta-data/instance-id)
           # Retrieving tag server-type value using aws cli
           server_type=$(aws ec2 describe-tags --filters "Name=resource-id,Values=$instance_id" "Name=key,Values=server-type" --output=text | cut -f5 | sed 's/-/_/g')
           # Retrieving tag environment-name value using aws cli
