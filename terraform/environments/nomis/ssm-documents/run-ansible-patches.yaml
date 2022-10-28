@@ -60,7 +60,7 @@ mainSteps:
     inputs:
       sourceType: "GitHub"
       sourceInfo: '{"owner":"ministryofjustice","repository":"modernisation-platform-configuration-management","path":"ansible","getOptions":"branch:refs/heads/main","tokenInfo":"{{ssm-secure:github-ci-user-pat}}"}'
-      destinationPath: "tmp/python-venv"
+      destinationPath: "tmp/"
   - action: "aws:runShellScript"
     name: "installAndRunAnsible"
     inputs:
@@ -87,9 +87,10 @@ mainSteps:
           echo "# Using python: $python"
           # activate virtual environment
           pwd
-          cd tmp/python-venv
-          $python -m venv ansible
-          source ansible/bin/activate
+          cd tmp/
+          pwd
+          $python -m venv python-venv
+          source python-venv/bin/activate
           $python -m pip install --upgrade pip
           if [[ "$python" =~ 3.6 ]]; then
             $python -m pip install wheel
@@ -101,17 +102,14 @@ mainSteps:
           fi
           # install requirements in virtual env
           echo "# Installing ansible requirements"
-          pwd
-          cd tmp/python-venv
-          ls
           $python -m pip install -r requirements.txt
           ansible-galaxy role install -r requirements.yml
           ansible-galaxy collection install -r requirements.yml
           # run ansible (comma after localhost deliberate)
           echo "# Execute ansible"
-          sudo su
+          pwd
           if [[ "{{Check}}" == True ]]; then \
-            ansible-playbook site.yml \
+            ansible-playbook "{{Verbose}}" site.yml \
             --check \
             --connection=local \
             --inventory localhost, \
@@ -121,10 +119,9 @@ mainSteps:
             --extra-vars "@group_vars/environment_name_$environment_name.yml" \
             --extra-vars "@group_vars/server_type_$server_type.yml" \
             --tags "{{Tags}}" \
-            "{{Verbose}}" \
             --become
           else
-            ansible-playbook site.yml \
+            ansible-playbook "{{Verbose}}" site.yml \
             --connection=local \
             --inventory localhost, \
             --extra-vars "role={{Role}}" \
@@ -133,11 +130,10 @@ mainSteps:
             --extra-vars "@group_vars/environment_name_$environment_name.yml" \
             --extra-vars "@group_vars/server_type_$server_type.yml" \
             --tags "{{Tags}}" \
-            "{{Verbose}}" \
             --become
           fi
           echo "# Cleanup"
           deactivate
           rm -rf tmp/python-venv
-          # rm -rf $ansible_dir/${ansible_repo}
+          rm -rf tmp/
           # rmdir tmp/
