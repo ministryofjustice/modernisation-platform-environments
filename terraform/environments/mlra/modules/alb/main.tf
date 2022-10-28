@@ -43,27 +43,73 @@ locals {
 resource "aws_lb_listener" "alb_listener" {
   load_balancer_arn = module.lb-access-logs-enabled.load_balancer.arn
   port              = var.listener_port
-  protocol          = var.listener_protocol
-  #TODO CHANGE_TO_HTTPS_AND_CERTIFICATE_ARN_TOBE_ADDED
+  protocol          = var.listener_protocol # tls termination performed by the laa platform mlra alb (phase 1)
 
   default_action {
     type = "forward"
-    #TODO default action type fixed-response has not been added
-    #as this depends on cloudfront which is is not currently configured
-    #therefore this will need to be added pending cutover strategy decisions
+    # during phase 1 of migration into modernisation platform, an effort
+    # is being made to retain the current application url in order to
+    # limit disruption to the application architecture itself. therefore,
+    # the current laa alb which is performing tls termination is going to
+    # forward queries on here. this also means that waf and cdn resources
+    # are retained in laa. the cdn there adds a custom header to the query,
+    # with the alb there then forwarding those permitted queries on:
     #
     # - Type: fixed-response
     #   FixedResponseConfig:
     #     ContentType: text/plain
     #     MessageBody: Access Denied - must access via CloudFront
     #     StatusCode: '403'
+    #
+    # in the meantime, therefore, we simply forward queries to a target
+    # group. however, in another phase of the migration, where cdn resources
+    # are carried into the modernisation platform, the above configuration
+    # may need to be applied.
+    #
+    # see: https://docs.google.com/document/d/15BUaNNx6SW2fa6QNzdMUWscWWBQ44YCiFz-e3SOwouQ
+
     target_group_arn = aws_lb_target_group.alb_target_group.arn
   }
 }
 
-#TODO currently the EcsAlbHTTPSListenerRule has not been provisioned
-#as this depends on cloudfront which is is not currently configured
-#therefore this will need to be added pending cutover strategy decisions
+resource "aws_lb_listener_rule" "alb_listener_rule" {
+  listener_arn = aws_lb_listener.alb_listener.arn
+
+  # during phase 1 of migration into modernisation platform, an effort
+  # is being made to retain the current application url in order to
+  # limit disruption to the application architecture itself. therefore,
+  # the current laa alb which is performing tls termination is going to
+  # forward queries on here. this also means that waf and cdn resources
+  # are retained in laa. the cdn there adds a custom header to the query,
+  # with the alb there then forwarding those permitted queries on:
+  #
+  # Actions:
+  #   - Type: forward
+  #     TargetGroupArn: !Ref 'TargetGroup'
+  # Conditions:
+  #   - Field: http-header
+  #     HttpHeaderConfig:
+  #     HttpHeaderName: X-Custom-Header-LAA-MLRA
+  #     Values:
+  #       - '{{resolve:secretsmanager:cloudfront-secret-MLRA}}'
+  #
+  # in the meantime, therefore, we are simply forwarding traffic to a
+  # target group here. However, in another phase of the migration, where
+  # cdn resources are carried into modernisation platform, the above 
+  # configuration is very likely going to be required.
+  #
+  # see: https://docs.google.com/document/d/15BUaNNx6SW2fa6QNzdMUWscWWBQ44YCiFz-e3SOwouQ
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.alb_target_group.arn
+  }
+  condition {
+    path_pattern {
+      values = ["/"]
+    }
+  }
+}
 
 resource "aws_lb_target_group" "alb_target_group" {
   name                 = "${var.application_name}-tg-${var.environment}"
