@@ -14,7 +14,7 @@ module "jb_load_balancer_test" {
   loadbalancer_ingress_rules = local.jb_ingress_rules
   public_subnets             = []
   region                     = local.region
-  vpc_all                    = local.vpc_name
+  vpc_all                    = local.vpc_id
   tags = merge(
     local.tags,
     {
