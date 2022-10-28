@@ -47,7 +47,7 @@ parameters:
   Tags:
     type: "StringList"
     description: "(Optional) The ansible tags to run (comma separated)"
-    default: "ec2patch"
+    default: ["ec2patch"]
     displayType: "textarea"
 mainSteps:
   - action: "aws:runShellScript"
