@@ -155,6 +155,12 @@ data "aws_caller_identity" "oidc_session" {
   provider = aws.oidc-session
 }
 
+# Used to determine the name of the role running the terraform
+data "aws_iam_session_context" "whoami" {
+  provider = aws.oidc-session
+  arn      = data.aws_caller_identity.oidc_session.arn
+}
+
 # Get modernisation account id from ssm parameter
 data "aws_ssm_parameter" "modernisation_platform_account_id" {
   name = "modernisation_platform_account_id"
