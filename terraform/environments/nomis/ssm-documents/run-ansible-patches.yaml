@@ -18,7 +18,7 @@ parameters:
     allowedValues:
       - "True"
       - "False"
-    default: "False"
+    default: "True"
   Verbose:
     type: "String"
     description: "(Optional) Set the verbosity level for logging Playbook executions. Specify -v for low verbosity, -vv or –vvv for medium verbosity, and -vvvv for debug level."
@@ -34,22 +34,22 @@ parameters:
     default: "3600"
   Role:
     type: "String"
-    description: "(Optional) The role to run"
+    description: "(Optional) The role to run, not that not all roles are applicable for all targets!"
+    allowedValues:
+      - "all"
+      - "db-restore"
+      - "domain-search"
+      - "get-ec2-facts"
+      - "set-ec2-hostname"
+      - "oracle-db-monitoring"
+      - "oracle-secure-web"
+    default: "all"
+  Tags:
+    type: "StringList"
+    description: "(Optional) The ansible tags to run (comma separated)"
+    default: "ec2patch"
+    displayType: "textarea"
 mainSteps:
-  - action: "aws:runShellScript"
-    name: "checkPythonVersion"
-    inputs:
-      runCommand:
-        - |
-          if [[ $(which python3.9) ]]; then
-            python=$(which python3.9)
-          elif [[ $(which python3.6) ]]; then
-            python=$(which python3.6)
-          else
-            echo "Python3.9/3.6 not found"
-          exit 1
-          fi
-          echo "# Using python: $python" "python3 --version"
   - action: "aws:runShellScript"
     name: "gitInstalled"
     inputs:
@@ -62,11 +62,15 @@ mainSteps:
       sourceInfo: '{"owner":"ministryofjustice","repository":"modernisation-platform-configuration-management","path":"ansible","getOptions":"branch:refs/heads/main","tokenInfo":"{{ssm-secure:github-ci-user-pat}}"}'
       destinationPath: "tmp/python-venv"
   - action: "aws:runShellScript"
-    name: "installAnsible"
+    name: "installAndRunAnsible"
     inputs:
       timeoutSeconds: "{{ TimeoutSeconds }}"
       runCommand:
         - |
+          # Retrieving tag server-type value using aws cli
+          server_type=$(aws ec2 describe-tags --filters "Name=resource-id,Values=$instance_id" "Name=key,Values=server-type" --output=text | cut -f5 | sed 's/-/_/g')
+          # Retrieving tag environment-name value using aws cli
+          environment_name=$(aws ec2 describe-tags --filters "Name=resource-id,Values=$instance_id" "Name=key,Values=environment-name" --output=text | cut -f5 | sed 's/-/_/g')
           # set python version
           if [[ $(which python3.9) ]]; then
             python=$(which python3.9)
@@ -106,18 +110,24 @@ mainSteps:
             --check \
             --connection=local \
             --inventory localhost, \
-            --extra-vars "force_role={{Role}}" \
+            --extra-vars "role={{Role}}" \
             --extra-vars "ansible_python_interpreter=$python" \
             --extra-vars "target=localhost" \
+            --extra-vars "@group_vars/environment_name_$environment_name.yml" \
+            --extra-vars "@group_vars/server_type_$server_type.yml" \
+            --tags "{{Tags}}" \
             "{{Verbose}}" \
             --become
           else
             ansible-playbook site.yml \
             --connection=local \
             --inventory localhost, \
-            --extra-vars "force_role={{Role}}" \
+            --extra-vars "role={{Role}}" \
             --extra-vars "ansible_python_interpreter=$python" \
             --extra-vars "target=localhost" \
+            --extra-vars "@group_vars/environment_name_$environment_name.yml" \
+            --extra-vars "@group_vars/server_type_$server_type.yml" \
+            --tags "{{Tags}}" \
             "{{Verbose}}" \
             --become
           fi

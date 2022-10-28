@@ -379,6 +379,7 @@ resource "aws_ssm_document" "run_ansible_patches" {
   document_format = "YAML"
   content         = file("./ssm-documents/run-ansible-patches.yaml")
   target_type     = "/AWS::EC2::Instance"
+  platform_types  = ["Linux"]
 
   tags = merge(
     local.tags,
