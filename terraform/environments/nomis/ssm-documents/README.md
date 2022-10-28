@@ -38,11 +38,12 @@ IMPORTANT: You do need to make sure that the correct tags are present to allow t
 
 ### running
 
-TODO: Add a specific reference to tags here
+The ssm document will run against the server-type and environment tags of the target instance.
+Roles can be selected from the list but the default is 'all'
 
 ### discovering what's been run against a given EC2 instance target
 
-TODO: Add a set of steps for how to do this here
+All manually run SSM documents should be logged in Cloudwatch. Pending further changes to the way we're doing this the best way to find out what's been run against a particular instance is to look at the Cloudwatch logs for the SSM Agent on that instance.
 
 ### debugging/output
 
