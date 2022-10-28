@@ -31,7 +31,7 @@ locals {
       to_port         = 7777
       protocol        = "tcp"
       security_groups = [aws_security_group.weblogic_common.id]
-      cidr_blocks     = []
+      cidr_blocks     = [""]
     }
   }
   jb_ingress_rules = {
@@ -40,7 +40,7 @@ locals {
       from_port       = 443
       to_port         = 443
       protocol        = "tcp"
-      security_groups = []
+      security_groups = [""]
       cidr_blocks     = ["10.184.0.0/16"] # Global Protect PTTP devices
     }
     jb_internal_lb_ingress_2 = {
@@ -49,14 +49,14 @@ locals {
       to_port         = 443
       protocol        = "tcp"
       security_groups = [aws_security_group.jumpserver-windows.id]
-      cidr_blocks     = []
+      cidr_blocks     = [""]
     }
     jb_internal_lb_ingress_3 = {
       description     = "allow 80 inbound from PTTP devices"
       from_port       = 80
       to_port         = 80
       protocol        = "tcp"
-      security_groups = []
+      security_groups = [""]
       cidr_blocks     = ["10.184.0.0/16"] # Global Protect PTTP devices
     }
     jb_internal_lb_ingress_4 = {
@@ -65,7 +65,7 @@ locals {
       to_port         = 80
       protocol        = "tcp"
       security_groups = aws_security_group.jumpserver-windows.id
-      cidr_blocks     = []
+      cidr_blocks     = [""]
     }
   }
 }
