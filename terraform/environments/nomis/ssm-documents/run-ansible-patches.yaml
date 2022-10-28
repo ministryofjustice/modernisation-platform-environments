@@ -45,9 +45,9 @@ parameters:
       - "oracle-secure-web"
     default: "all"
   Tags:
-    type: "StringList"
+    type: "String"
     description: "(Optional) The ansible tags to run (comma separated)"
-    default: ["ec2patch"]
+    default: "ec2patch"
     displayType: "textarea"
 mainSteps:
   - action: "aws:runShellScript"
