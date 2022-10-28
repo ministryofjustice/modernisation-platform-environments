@@ -63,7 +63,7 @@ resource "aws_lb_listener" "alb_listener" {
     #
     # in the meantime, therefore, we simply forward queries to a target
     # group. however, in another phase of the migration, where cdn resources
-    # are carried into the modernisation platform, the above  configuration
+    # are carried into the modernisation platform, the above configuration
     # may need to be applied.
     #
     # see: https://docs.google.com/document/d/15BUaNNx6SW2fa6QNzdMUWscWWBQ44YCiFz-e3SOwouQ
