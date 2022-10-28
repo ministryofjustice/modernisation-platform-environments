@@ -43,7 +43,7 @@ locals {
 resource "aws_lb_listener" "alb_listener" {
   load_balancer_arn = module.lb-access-logs-enabled.load_balancer.arn
   port              = var.listener_port
-  protocol          = var.listener_protocol  # tls termination performed by the laa platform mlra alb (phase 1)
+  protocol          = var.listener_protocol # tls termination performed by the laa platform mlra alb (phase 1)
 
   default_action {
     type = "forward"
