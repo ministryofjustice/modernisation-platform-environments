@@ -28,13 +28,13 @@ variable "db_engine_version" {
   description = "Engine version for the DB Option Group"
 }
 
-variable "db_full_engine_version"{
+variable "db_full_engine_version" {
   type        = string
   description = "Full engine version for the DB instance resource"
 }
 
 variable "db_subnet_ids" {
-  type        = list
+  type        = list(any)
   description = "Database subnet ids for RDS subnet group"
 }
 
