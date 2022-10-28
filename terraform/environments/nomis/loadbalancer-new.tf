@@ -12,7 +12,7 @@ module "jb_load_balancer_test" {
   idle_timeout               = "60"
   loadbalancer_egress_rules  = local.jb_egress_rules
   loadbalancer_ingress_rules = local.jb_ingress_rules
-  public_subnets             = []
+  public_subnets             = [data.aws_subnets.private.ids]
   region                     = local.region
   vpc_all                    = "hmpps-development"
   tags = merge(
