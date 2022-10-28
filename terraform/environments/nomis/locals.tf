@@ -21,6 +21,11 @@ data "aws_vpc" "shared_vpc" {
   }
 }
 
+data "aws_iam_session_context" "whoami" {
+  provider = aws.oidc-session
+  arn      = data.aws_caller_identity.oidc_session.arn
+}
+
 locals {
 
   # Stores modernisation platform account id for setting up the modernisation-platform provider

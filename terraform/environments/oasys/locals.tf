@@ -1,23 +1,20 @@
-# This data sources allows us to get the Modernisation Platform account information for use elsewhere
-# (when we want to assume a role in the MP, for instance)
-data "aws_organizations_organization" "root_account" {}
 
-# Get the environments file from the main repository
-data "http" "environments_file" {
-  url = "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/${local.application_name}.json"
-}
-
-data "aws_caller_identity" "oidc_session" {
-  provider = aws.oidc-session
-}
-
-data "aws_caller_identity" "modernisation_platform" {
-  provider = aws.modernisation-platform
-}
 
 locals {
 
   application_name = "oasys"
+  business_unit    = "hmpps"
+  networking_set   = "general"
+
+  accounts = {
+    development   = local.oasys_development
+    test          = local.oasys_test
+    preproduction = local.oasys_preproduction
+    production    = local.oasys_production
+  }
+
+  account_id         = local.environment_management.account_ids[terraform.workspace]
+  environment_config = local.accounts[local.environment]
 
   environment_management = jsondecode(data.aws_secretsmanager_secret_version.environment_management.secret_string)
 
@@ -39,11 +36,11 @@ locals {
     { "source-code" = "https://github.com/ministryofjustice/modernisation-platform-environments" }
   )
 
-  environment     = trimprefix(terraform.workspace, "${var.networking[0].application}-")
-  vpc_name        = var.networking[0].business-unit
-  subnet_set      = var.networking[0].set
+  environment     = trimprefix(terraform.workspace, "${local.application_name}-")
+  vpc_name        = local.business_unit
+  subnet_set      = local.networking_set
   vpc_all         = "${local.vpc_name}-${local.environment}"
-  subnet_set_name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}"
+  subnet_set_name = "${local.business_unit}-${local.environment}-${local.networking_set}"
 
   region            = "eu-west-2"
   availability_zone = "eu-west-2a"
