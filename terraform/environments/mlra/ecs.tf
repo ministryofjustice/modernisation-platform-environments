@@ -75,4 +75,3 @@ locals {
 resource "aws_cloudwatch_log_group" "ecs_log_group" {
   name = "${local.application_name}-ecs-log-group"
 }
-

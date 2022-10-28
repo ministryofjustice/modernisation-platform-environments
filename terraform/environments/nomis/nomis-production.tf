@@ -105,7 +105,7 @@ locals {
         }
         ebs_volumes = {
           "/dev/sdb" = { size = 100 }  # /u01
-          "/dev/sdc" = { size = 1000 } # /u02
+          "/dev/sdc" = { size = 3000 } # /u02
         }
         ebs_volume_config = {
           data  = { total_size = 4000 }
