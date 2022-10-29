@@ -108,6 +108,8 @@ mainSteps:
           # run ansible (comma after localhost deliberate)
           echo "# Execute ansible"
           pwd
+          ls -l
+          sudo su
           if [[ "{{Check}}" == True ]]; then \
             ansible-playbook "{{Verbose}}" site.yml \
             --check \
@@ -136,4 +138,4 @@ mainSteps:
           deactivate
           rm -rf tmp/python-venv
           rm -rf tmp/
-          # rmdir tmp/
+          rmdir tmp/
