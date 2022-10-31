@@ -140,5 +140,4 @@ mainSteps:
           fi
           echo "# Cleanup"
           deactivate
-          rm -rf /python-venv
-          rm -rf /
+          # rm -rf /python-venv
