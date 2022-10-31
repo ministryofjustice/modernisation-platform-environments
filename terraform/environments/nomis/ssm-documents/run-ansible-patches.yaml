@@ -6,12 +6,6 @@ parameters:
     type: "String"
     description: "(Optional) The Playbook file to run (including relative path). If the main Playbook file is located in the ./automation directory, then specify automation/playbook.yml."
     default: "site.yml"
-  ExtraVariables:
-    type: "String"
-    description: "(Optional) Additional variables to pass to Ansible at runtime. Enter key/value pairs separated by a space. For example: color=red flavor=cherry"
-    default: "SSM=True"
-    displayType: "textarea"
-    allowedPattern: "^$|^\\w+\\=(([^\\s|:();&]+)|('[^|:();&]+'))(\\s+\\w+\\=(([^\\s|:();&]+)|('[^|:();&]+')))*$"
   Check:
     type: "String"
     description: "(Optional) Use this parameter to run a check of the Ansible execution. The system doesn’t make any changes to your systems. Instead, any module that supports check mode reports the changes it would make rather than making them. Modules that don’t support check mode take no action and don’t report changes that would be made."
@@ -35,14 +29,6 @@ parameters:
   Role:
     type: "String"
     description: "(Optional) The role to run, not that not all roles are applicable for all targets!"
-    allowedValues:
-      - "all"
-      - "db-restore"
-      - "domain-search"
-      - "get-ec2-facts"
-      - "set-ec2-hostname"
-      - "oracle-db-monitoring"
-      - "oracle-secure-web"
     default: "all"
   Tags:
     type: "String"
