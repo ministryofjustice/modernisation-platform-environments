@@ -55,20 +55,11 @@ mainSteps:
     inputs:
       runCommand:
         - 'if which git; then echo "git is installed"; else sudo yum install git -y; fi'
-  - action: "aws:runShellScript"
-    name: "createTempDir"
-    inputs:
-      runCommand:
-        - |
-          ansible_dir=$(mktemp -d)
-          echo "ansible_dir=$ansible_dir"
-          export ansible_dir
   - action: "aws:downloadContent"
     name: "downloadFromConfigurationManagementRepo"
     inputs:
       sourceType: "GitHub"
       sourceInfo: '{"owner":"ministryofjustice","repository":"modernisation-platform-configuration-management","path":"ansible","getOptions":"branch:refs/heads/main","tokenInfo":"{{ssm-secure:github-ci-user-pat}}"}'
-      destinationPath: "$ansible_dir"
   - action: "aws:runShellScript"
     name: "installAndRunAnsible"
     inputs:
@@ -97,7 +88,7 @@ mainSteps:
           fi
           echo "# Using python: $python"
           # activate virtual environment
-          mkdir $ansible_dir/python-venv && cd "$_"
+          mkdir python-venv && cd "$_"
           $python -m venv ansible
           source ansible/bin/activate
           $python -m pip install --upgrade pip
@@ -110,9 +101,7 @@ mainSteps:
             $python -m pip install ansible==6.0.0
           fi
           # install requirements in virtual env
-          cd $ansible_dir
-          pwd
-          ls -l
+          cd ../
           echo "# Installing ansible requirements"
           $python -m pip install -r requirements.txt
           ansible-galaxy role install -r requirements.yml
@@ -145,5 +134,4 @@ mainSteps:
           fi
           echo "# Cleanup"
           deactivate
-          rm -rf $ansible_dir/python-venv
-          rm -rf $ansible_dir
+          rm -rf python-venv

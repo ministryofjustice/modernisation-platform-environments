@@ -41,6 +41,8 @@ IMPORTANT: You do need to make sure that the correct tags are present to allow t
 The ssm document will run against the server-type and environment tags of the target instance.
 Roles can be selected from the list but the default is 'all'
 
+IMPORTANT: You do need to make sure that you use the correct server-type or EC2 instance names. If you call something test-base then the ansible-playbook site.yml
+will go looking for an @group called server_type_base and will FAIL because this server-type doesn't exist! 
 ### discovering what's been run against a given EC2 instance target
 
 All manually run SSM documents should be logged in Cloudwatch. Pending further changes to the way we're doing this the best way to find out what's been run against a particular instance is to look at the Cloudwatch logs for the SSM Agent on that instance.
