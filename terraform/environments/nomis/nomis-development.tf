@@ -41,14 +41,13 @@ locals {
     }
     weblogics = {}
     ec2_test_instances = {
-      /* ssm_test_instance = {
+      ssm_base-rhel79 = {
         tags = {
-          server-type = "base-rhel79"
           description = "instance for ssm permissions testing"
           monitored   = false
         }
         ami_name = "nomis_rhel_7_9_baseimage*"
-      } */
+      }
     }
     ec2_test_autoscaling_groups = {
       dev-base-rhel79 = {
