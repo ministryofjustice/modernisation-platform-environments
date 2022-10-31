@@ -72,7 +72,7 @@ resource "aws_lb_listener" "alb_listener" {
   }
 }
 
-resource "aws_lb_listener_rule" "alb_listener_rule" {
+/* resource "aws_lb_listener_rule" "alb_listener_rule" {
   listener_arn = aws_lb_listener.alb_listener.arn
 
   # during phase 1 of migration into modernisation platform, an effort
@@ -109,7 +109,7 @@ resource "aws_lb_listener_rule" "alb_listener_rule" {
       values = ["/"]
     }
   }
-}
+} */
 
 resource "aws_lb_target_group" "alb_target_group" {
   name                 = "${var.application_name}-tg-${var.environment}"
