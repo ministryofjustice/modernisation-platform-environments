@@ -1,0 +1,21 @@
+[{
+  "name": "testing",
+  "image": "mcr.microsoft.com/windows/servercore/iis",
+  "cpu": 1536,
+  "portMappings": [
+    {
+      "containerPort": 80,
+      "hostPort": 8080
+    }
+  ],
+  "memory": 3072,
+  "logConfiguration": {
+    "logDriver": "awslogs",
+    "options": {
+        "awslogs-group": "testing-test",
+        "awslogs-region": "eu-west-2",
+        "awslogs-stream-prefix": "test"
+     }
+   },
+  "essential": true
+}]

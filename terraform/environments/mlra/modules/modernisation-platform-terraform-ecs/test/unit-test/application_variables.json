@@ -1,0 +1,22 @@
+{
+  "accounts": {
+    "test": {
+      "region": "eu-west-2",
+      "instance_type": "t3.medium",
+      "app_count": "1",
+      "key_name": "testing-test",
+      "ec2_desired_capacity": 2,
+      "ec2_max_size": 3,
+      "ec2_min_size": 2,
+      "appscaling_min_capacity": 1,
+      "server_port": "80",
+      "container_instance_type": "windows",
+      "container_version": "test",
+      "container_cpu": "2048",
+      "container_memory": "3072",
+      "task_definition_volume": "upload_volume",
+      "network_mode": "none",
+      "env_name": "development"
+    }
+  }
+}
