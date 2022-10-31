@@ -142,4 +142,3 @@ mainSteps:
           deactivate
           rm -rf $ansible_dir/python-venv
           rm -rf $ansible_dir/
-          
