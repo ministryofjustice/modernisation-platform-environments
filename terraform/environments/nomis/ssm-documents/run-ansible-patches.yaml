@@ -106,7 +106,7 @@ mainSteps:
             $python -m pip install ansible==6.0.0
           fi
           # install requirements in virtual env
-          cd tmp/
+          cd ../
           ls -l
           echo "# Installing ansible requirements"
           $python -m pip install -r requirements.txt
@@ -140,5 +140,5 @@ mainSteps:
           fi
           echo "# Cleanup"
           deactivate
-          rm -rf tmp/python-venv
-          rm -rf tmp/
+          rm -rf /python-venv
+          rm -rf /
