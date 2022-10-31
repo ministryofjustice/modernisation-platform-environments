@@ -59,7 +59,10 @@ mainSteps:
     name: "createTempDir"
     inputs:
       runCommand:
-        - 'ansible_dir=$(mktemp -d); echo "ansible_dir=$ansible_dir"'
+        - |
+          ansible_dir=$(mktemp -d)
+          echo "ansible_dir=$ansible_dir"
+          export ansible_dir
   - action: "aws:downloadContent"
     name: "downloadFromConfigurationManagementRepo"
     inputs:
@@ -72,6 +75,7 @@ mainSteps:
       timeoutSeconds: "{{ TimeoutSeconds }}"
       runCommand:
         - |
+          env
           # Retrieving API Token
           token=$(curl -sS -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
           # Retrieving Instance ID
