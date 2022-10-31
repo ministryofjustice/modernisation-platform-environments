@@ -55,12 +55,17 @@ mainSteps:
     inputs:
       runCommand:
         - 'if which git; then echo "git is installed"; else sudo yum install git -y; fi'
+  - action: "aws:runShellScript"
+    name: "createTempDir"
+    inputs:
+      runCommand:
+        - 'ansible_dir=$(mkdir -d); echo "ansible_dir=$ansible_dir"'
   - action: "aws:downloadContent"
     name: "downloadFromConfigurationManagementRepo"
     inputs:
       sourceType: "GitHub"
       sourceInfo: '{"owner":"ministryofjustice","repository":"modernisation-platform-configuration-management","path":"ansible","getOptions":"branch:refs/heads/main","tokenInfo":"{{ssm-secure:github-ci-user-pat}}"}'
-      destinationPath: "tmp/"
+      destinationPath: "$ansible_dir"
   - action: "aws:runShellScript"
     name: "installAndRunAnsible"
     inputs:
@@ -75,6 +80,8 @@ mainSteps:
           server_type=$(aws ec2 describe-tags --filters "Name=resource-id,Values=$instance_id" "Name=key,Values=server-type" --output=text | cut -f5 | sed 's/-/_/g')
           # Retrieving tag environment-name value using aws cli
           environment_name=$(aws ec2 describe-tags --filters "Name=resource-id,Values=$instance_id" "Name=key,Values=environment-name" --output=text | cut -f5 | sed 's/-/_/g')
+          echo "server_type=$server_type"
+          echo "environment_name=$environment_name"
           # set python version
           if [[ $(which python3.9) ]]; then
             python=$(which python3.9)
@@ -86,11 +93,9 @@ mainSteps:
           fi
           echo "# Using python: $python"
           # activate virtual environment
-          pwd
-          cd tmp/
-          pwd
-          $python -m venv python-venv
-          source python-venv/bin/activate
+          mkdir $ansible_dir/python-venv && cd "$_"
+          $python -m venv ansible
+          source ansible/bin/activate
           $python -m pip install --upgrade pip
           if [[ "$python" =~ 3.6 ]]; then
             $python -m pip install wheel
@@ -101,15 +106,14 @@ mainSteps:
             $python -m pip install ansible==6.0.0
           fi
           # install requirements in virtual env
+          cd $ansible_dir
+          ls -l
           echo "# Installing ansible requirements"
           $python -m pip install -r requirements.txt
           ansible-galaxy role install -r requirements.yml
           ansible-galaxy collection install -r requirements.yml
           # run ansible (comma after localhost deliberate)
           echo "# Execute ansible"
-          pwd
-          ls -l
-          sudo su
           if [[ "{{Check}}" == True ]]; then \
             ansible-playbook "{{Verbose}}" site.yml \
             --check \
@@ -136,6 +140,6 @@ mainSteps:
           fi
           echo "# Cleanup"
           deactivate
-          rm -rf tmp/python-venv
-          rm -rf tmp/
-          rmdir tmp/
+          rm -rf $ansible_dir/python-venv
+          rm -rf $ansible_dir/
+          
