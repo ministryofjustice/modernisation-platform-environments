@@ -59,7 +59,7 @@ mainSteps:
     name: "createTempDir"
     inputs:
       runCommand:
-        - 'ansible_dir=$(mkdir -d); echo "ansible_dir=$ansible_dir"'
+        - 'ansible_dir=$(mktemp -d); echo "ansible_dir=$ansible_dir"'
   - action: "aws:downloadContent"
     name: "downloadFromConfigurationManagementRepo"
     inputs:
