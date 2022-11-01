@@ -26,6 +26,7 @@ data "aws_iam_policy_document" "ssm_custom" {
       "ssm:DescribeDocument",
       "ssm:GetDeployablePatchSnapshotForInstance",
       "ssm:GetDocument",
+      "ssm:GetParameters",
       "ssm:GetManifest",
       "ssm:ListAssociations",
       "ssm:ListInstanceAssociations",
@@ -366,6 +367,25 @@ resource "aws_ssm_association" "script-exporter" {
     key    = "tag-key"
     values = ["oracle_sids"]
   }
+}
+
+#------------------------------------------------------------------------------
+# Patch Management - Run Ansible Roles manually from SSM document
+#------------------------------------------------------------------------------
+
+resource "aws_ssm_document" "run_ansible_patches" {
+  name            = "RunAnsiblePatches"
+  document_type   = "Command"
+  document_format = "YAML"
+  content         = file("./ssm-documents/run-ansible-patches.yaml")
+  target_type     = "/AWS::EC2::Instance"
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "run-ansible-patches"
+    },
+  )
 }
 
 
