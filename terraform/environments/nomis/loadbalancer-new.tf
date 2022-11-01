@@ -14,7 +14,7 @@ module "jb_load_balancer_test" {
   loadbalancer_ingress_rules = local.jb_ingress_rules
   public_subnets             = data.aws_subnets.private.ids
   region                     = local.region
-  vpc_all                    = "hmpps-development"
+  vpc_all                    = "hmpps-development" # TODO: Find the local for this
   tags = merge(
     local.tags,
     {
