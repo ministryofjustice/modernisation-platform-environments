@@ -1,7 +1,7 @@
 # DSOS-109
 module "jb_load_balancer_test" {
   source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer.git"
-  count  = local.environment == "development" ? 1 : 0
+  count  = local.environment == "test" ? 1 : 0
   providers = {
     aws.bucket-replication = aws
   }
@@ -14,7 +14,7 @@ module "jb_load_balancer_test" {
   loadbalancer_ingress_rules = local.jb_ingress_rules
   public_subnets             = data.aws_subnets.private.ids
   region                     = local.region
-  vpc_all                    = "hmpps-development" # TODO: Find the local for this
+  vpc_all                    = "hmpps-test" # TODO: Find or create a local for this
   tags = merge(
     local.tags,
     {
