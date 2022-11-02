@@ -1,4 +1,4 @@
-# DSOS-109
+# DSOS-1553
 module "jb_load_balancer_test" {
   source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer.git"
   count  = local.environment == "test" ? 1 : 0
