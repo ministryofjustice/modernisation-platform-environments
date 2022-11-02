@@ -725,26 +725,6 @@ module "glue_connection_redshift" {
   username          = ""
 }
 
-##########################
-# Application Backend TF # 
-##########################
-
-# S3 Bucket (Terraform State for Application IAAC)
-module "s3_application_tf_state" {
-  source         = "./modules/s3_bucket"
-  create_s3      = local.setup_buckets
-  name           = "${local.project}-terraform-state-${local.environment}"
-  custom_kms_key = local.s3_kms_arn
-
-  tags = merge(
-    local.all_tags,
-    {
-      Name          = "${local.project}-terraform-state-${local.environment}"
-      Resource_Type = "S3 Bucket"
-    }
-  )
-}
-
 # Ec2
 module "ec2_kinesis_agent" {
   source                      = "./modules/ec2"
@@ -819,6 +799,44 @@ module "datamart" {
     {
       Name          = "${local.redshift_cluster_name}"
       Resource_Type = "Redshift Cluster"
+    }
+  )
+}
+
+###############################
+# Application Artifacts Store # 
+###############################
+# S3 Bucket (Application Artifacts Store)
+module "s3_artifacts_store" {
+  source         = "./modules/s3_bucket"
+  create_s3      = local.setup_buckets
+  name           = "${local.project}-artifact-store-${local.environment}"
+  custom_kms_key = local.s3_kms_arn
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-artifact-store-${local.environment}"
+      Resource_Type = "S3 Bucket"
+    }
+  )
+}
+
+##########################
+# Application Backend TF # 
+##########################
+# S3 Bucket (Terraform State for Application IAAC)
+module "s3_application_tf_state" {
+  source         = "./modules/s3_bucket"
+  create_s3      = local.setup_buckets
+  name           = "${local.project}-terraform-state-${local.environment}"
+  custom_kms_key = local.s3_kms_arn
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-terraform-state-${local.environment}"
+      Resource_Type = "S3 Bucket"
     }
   )
 }
