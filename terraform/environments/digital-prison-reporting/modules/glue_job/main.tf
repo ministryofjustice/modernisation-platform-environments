@@ -75,7 +75,7 @@ resource "aws_iam_role" "glue-service-role" {
   count = var.create_role && var.create_job ? 1 : 0
   name  = "${var.name}-role"
   tags  = local.tags
-  path = "/"
+  path  = "/"
 
   assume_role_policy = <<EOF
 {
@@ -119,7 +119,7 @@ data "aws_iam_policy_document" "extra-policy-document" {
     ]
     resources = [
       "arn:aws:logs:*:*:/aws-glue/*"
-    ] 
+    ]
   }
   statement {
     actions = [
