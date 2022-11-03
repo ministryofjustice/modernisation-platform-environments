@@ -20,8 +20,10 @@ locals {
     "--raw.path"                         = "s3://dpr-raw-development-20220916083016137800000006"
     "--sink.url"                         = "https://kinesis.eu-west-2.amazonaws.com"
     "--sink.stream"                      = "dpr-kinesis-data-domain-development"
+    "--sink.region"                      = "eu-west-2"
     "--source.stream"                    = "dpr-kinesis-ingestor-development"
     "--source.url"                       = "https://kinesis.eu-west-2.amazonaws.com"
+    "--source.region"                    = "eu-west-2"
     "--spark-event-logs-path"            = "s3://dpr-glue-jobs-development-20220916083016134900000005/logs/"
     "--structured.path"                  = "s3://dpr-structured-development-20220916083016132200000004"
   }
