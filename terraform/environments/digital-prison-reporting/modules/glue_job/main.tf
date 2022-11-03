@@ -98,14 +98,11 @@ resource "aws_iam_role" "role" {
 data "aws_iam_policy_document" "extra-policy-document" {
   statement {
     actions = [
-      "s3:GetBucketLocation",
-      "s3:ListBucket",
-      "s3:ListAllMyBuckets",
-      "s3:GetBucketAcl",
-      "s3:GetObject"
+      "s3:*"
     ]
     resources = [
-      "arn:aws:s3:::${var.project_id}-*"
+      "arn:aws:s3:::${var.project_id}-*/*",
+      "arn:aws:s3:::${var.project_id}-*"      
     ]
   }
   statement {
@@ -122,7 +119,6 @@ data "aws_iam_policy_document" "extra-policy-document" {
   statement {
     actions = [
       "glue:*",
-      "s3:*,
       "iam:ListRolePolicies",
       "iam:GetRole",
       "iam:GetRolePolicy",
