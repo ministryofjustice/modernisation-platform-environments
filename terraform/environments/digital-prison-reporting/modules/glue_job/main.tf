@@ -119,7 +119,7 @@ data "aws_iam_policy_document" "extra-policy-document" {
     ]
     resources = [
       "arn:aws:logs:*:*:/aws-glue/*"
-    ]
+    ] 
   }
   statement {
     actions = [
