@@ -122,10 +122,7 @@ data "aws_iam_policy_document" "extra-policy-document" {
   statement {
     actions = [
       "glue:*",
-      "s3:GetBucketLocation",
-      "s3:ListBucket",
-      "s3:ListAllMyBuckets",
-      "s3:GetBucketAcl",
+      "s3:*,
       "iam:ListRolePolicies",
       "iam:GetRole",
       "iam:GetRolePolicy",
