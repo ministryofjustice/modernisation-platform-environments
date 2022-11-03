@@ -6,7 +6,7 @@ module "jb_load_balancer_test" {
     aws.bucket-replication = aws
   }
 
-  account_number             = local.modernisation_platform_account_id
+  account_number             = local.environment_management.account_ids[terraform.workspace]
   application_name           = "jbtest"
   enable_deletion_protection = false
   idle_timeout               = "60"
