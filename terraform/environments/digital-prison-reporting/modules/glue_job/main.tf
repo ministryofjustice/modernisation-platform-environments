@@ -71,29 +71,33 @@ resource "aws_glue_job" "glue_job" {
   }
 }
 
-resource "aws_iam_role" "role" {
+resource "aws_iam_role" "glue-service-role" {
   count = var.create_role && var.create_job ? 1 : 0
   name  = "${var.name}-role"
   tags  = local.tags
+  path = "/"
 
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "sts:AssumeRole"
-        ]
-        Principal = {
-          "Service" = "glue.amazonaws.com"
+  assume_role_policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": "sts:AssumeRole",
+            "Principal": {
+               "Service": "glue.amazonaws.com"
+            },
+            "Effect": "Allow",
+            "Sid": ""
         }
-      }
     ]
-  })
+}
+EOF
+}
 
-  managed_policy_arns = [
-    "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"
-  ]
+resource "aws_iam_policy_attachment" "glue-service-policy" {
+  name       = "${var.name}-role-attach"
+  roles      = [aws_iam_role.glue-service-role.name]
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"
 }
 
 data "aws_iam_policy_document" "extra-policy-document" {
