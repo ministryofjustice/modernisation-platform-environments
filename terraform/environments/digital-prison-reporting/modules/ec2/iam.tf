@@ -123,7 +123,7 @@ data "aws_iam_policy_document" "glue-access" {
         "glue.amazonaws.com"
       ]
     }
-  }     
+  }
 }
 
 resource "aws_iam_instance_profile" "kinesis-agent-instance-profile" {
