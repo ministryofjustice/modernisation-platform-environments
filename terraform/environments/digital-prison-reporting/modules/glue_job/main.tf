@@ -102,7 +102,7 @@ data "aws_iam_policy_document" "extra-policy-document" {
     ]
     resources = [
       "arn:aws:s3:::${var.project_id}-*/*",
-      "arn:aws:s3:::${var.project_id}-*"      
+      "arn:aws:s3:::${var.project_id}-*"
     ]
   }
   statement {
