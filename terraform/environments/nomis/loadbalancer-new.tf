@@ -15,6 +15,7 @@ module "jb_load_balancer_test" {
   public_subnets             = data.aws_subnets.private.ids
   region                     = local.region
   vpc_all                    = "hmpps-test" # TODO: Find or create a local for this
+  force_destroy_bucket       = true
   tags = merge(
     local.tags,
     {
