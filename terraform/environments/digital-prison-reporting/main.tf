@@ -198,7 +198,7 @@ module "glue_job" {
   job_language                  = "scala"
   temp_dir                      = "s3://dpr-glue-jobs-development-20220916083016134900000005/tmp/"
   tags                          = local.all_tags
-  script_location               = "s3://${local.project}-artifact-store-${local.environment}/artifacts/cloud-platform/digital-prison-reporting-poc/cloud-platform*.scala"
+  script_location               = "s3://${local.project}-artifact-store-${local.environment}/artifacts/cloud-platform/digital-prison-reporting-poc/cloud-platform.scala" 
   enable_continuous_log_filter  = false
   project_id                    = local.project
   aws_kms_key                   = local.s3_kms_arn
