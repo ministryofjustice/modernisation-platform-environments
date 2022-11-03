@@ -45,7 +45,7 @@ locals {
       dev-redhat-rhel79 = {
         tags = {
           description = "Standalone EC2 with actual RedHat RHEL7.9 base image"
-          server-type = base-rhel79
+          server-type = "base-rhel79"
           monitored   = false
         }
         ami_name  = "RHEL-7.9_HVM-*"
