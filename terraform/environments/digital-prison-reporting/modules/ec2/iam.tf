@@ -71,6 +71,61 @@ data "aws_iam_policy_document" "kinesis-cloudwatch-kms" {
   }
 }
 
+## Glue Access Policy
+resource "aws_iam_policy" "glue-full-access" {
+  name        = "${var.name}-glue-admin"
+  description = "Glue Full Policy"
+  path        = "/"
+
+  policy = data.aws_iam_policy_document.glue-access.json
+}
+
+## Glue Access Policy Document
+data "aws_iam_policy_document" "glue-access" {
+  statement {
+    actions = [
+      "glue:*",
+    ]
+    resources = [
+      "*"
+    ]
+  }
+
+  statement {
+    actions = [
+      "iam:PassRole",
+    ]
+    resources = [
+      "arn:aws:iam::*:role/AWSGlueServiceRole*"
+    ]
+    condition {
+      test     = "StringLike"
+      variable = "iam:PassedToService"
+
+      values = [
+        "glue.amazonaws.com"
+      ]
+    }
+  }
+
+  statement {
+    actions = [
+      "iam:PassRole",
+    ]
+    resources = [
+      "arn:aws:iam::*:role/service-role/AWSGlueServiceRole*"
+    ]
+    condition {
+      test     = "StringLike"
+      variable = "iam:PassedToService"
+
+      values = [
+        "glue.amazonaws.com"
+      ]
+    }
+  }     
+}
+
 resource "aws_iam_instance_profile" "kinesis-agent-instance-profile" {
   name = "${var.name}-profile"
   role = aws_iam_role.kinesis-agent-instance-role.name
@@ -79,6 +134,11 @@ resource "aws_iam_instance_profile" "kinesis-agent-instance-profile" {
 resource "aws_iam_role_policy_attachment" "this" {
   role       = aws_iam_role.kinesis-agent-instance-role.name
   policy_arn = aws_iam_policy.kinesis-data-stream-developer.arn
+}
+
+resource "aws_iam_role_policy_attachment" "this" {
+  role       = aws_iam_role.kinesis-agent-instance-role.name
+  policy_arn = aws_iam_policy.glue-full-access.arn
 }
 
 resource "aws_iam_role_policy_attachment" "cloudwatch-kms" {
