@@ -192,11 +192,13 @@ module "glue_database" {
 module "glue_job" {
   source                        = "./modules/glue_job"
   create_job                    = local.create_job
-  name                          = "${local.project}-${local.glue_job}-${local.env}"
+  name                          = "${local.project}-cloud-platform-etl-${local.env}"
   description                   = local.description
   create_security_configuration = local.create_sec_conf
+  job_language                  = "scala"
+  temp_dir                      = "s3://dpr-glue-jobs-development-20220916083016134900000005/tmp/"
   tags                          = local.all_tags
-  script_location               = "s3://dpr-glue-jobs-development-20220916083016134900000005/scripts/injector.py"
+  script_location               = "s3://${module.s3_artifacts_store.name}/artifacts/cloud-platform/digital-prison-reporting-poc/cloud-platform*.scala"
   enable_continuous_log_filter  = false
   project_id                    = local.project
   aws_kms_key                   = local.s3_kms_arn
