@@ -136,7 +136,7 @@ resource "aws_iam_role_policy_attachment" "this" {
   policy_arn = aws_iam_policy.kinesis-data-stream-developer.arn
 }
 
-resource "aws_iam_role_policy_attachment" "this" {
+resource "aws_iam_role_policy_attachment" "glue-access" {
   role       = aws_iam_role.kinesis-agent-instance-role.name
   policy_arn = aws_iam_policy.glue-full-access.arn
 }
