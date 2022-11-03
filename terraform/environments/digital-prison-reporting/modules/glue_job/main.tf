@@ -98,7 +98,7 @@ EOF
 
 resource "aws_iam_policy_attachment" "glue-service-policy" {
   name       = "${var.name}-role-attach"
-  roles      = [aws_iam_role.glue-service-role.*.name]
+  roles      = aws_iam_role.glue-service-role[*].name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"
 }
 
