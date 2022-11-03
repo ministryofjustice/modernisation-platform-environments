@@ -4,8 +4,8 @@ locals {
     "--class"                            = "GlueApp"
     "--job-bookmark-option"              = "${lookup(var.bookmark_options, var.bookmark)}"
     "--TempDir"                          = "${var.temp_dir}"
-    "--checkpoint.location               = "s3://dpr-glue-jobs-development-20220916083016134900000005/checkpoint/"
-    "--continuous-log-logGroup"          = aws_cloudwatch_log_group.log_group.name
+    "--checkpoint.location"              = "s3://dpr-glue-jobs-development-20220916083016134900000005/checkpoint/"
+    "--continuous-log-logGroup"          = "aws_cloudwatch_log_group.log_group.name"
     "--enable-continuous-cloudwatch-log" = "true"
     "--enable-continuous-log-filter"     = "true"
     "--continuous-log-logStreamPrefix"   = var.continuous_log_stream_prefix
