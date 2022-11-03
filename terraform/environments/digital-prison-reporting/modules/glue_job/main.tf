@@ -129,7 +129,8 @@ data "aws_iam_policy_document" "extra-policy-document" {
       "iam:ListRolePolicies",
       "iam:GetRole",
       "iam:GetRolePolicy",
-      "cloudwatch:PutMetricData"
+      "cloudwatch:PutMetricData",
+      "kms:*"
     ]
     resources = [
       "*"
