@@ -4,6 +4,7 @@ locals {
     "--class"                            = "GlueApp"
     "--job-bookmark-option"              = "${lookup(var.bookmark_options, var.bookmark)}"
     "--TempDir"                          = "${var.temp_dir}"
+    "--checkpoint.location               = "s3://dpr-glue-jobs-development-20220916083016134900000005/checkpoint/"
     "--continuous-log-logGroup"          = aws_cloudwatch_log_group.log_group.name
     "--enable-continuous-cloudwatch-log" = "true"
     "--enable-continuous-log-filter"     = "true"
@@ -17,10 +18,10 @@ locals {
     "--extra-jars"                       = "s3://dpr-artifact-store-development/artifacts/cloud-platform/digital-prison-reporting-poc/cloud-platform-v0.0.3.jar"
     "--job-bookmark-option"              = "job-bookmark-enable"
     "--raw.path"                         = "s3://dpr-raw-development-20220916083016137800000006"
-    "--sink.url"                         = "<https://kinesis.eu-west-2.amazonaws.com>"
+    "--sink.url"                         = "https://kinesis.eu-west-2.amazonaws.com"
     "--sink.stream"                      = "dpr-kinesis-data-domain-development"
     "--source.stream"                    = "dpr-kinesis-ingestor-development"
-    "--source.url"                       = "<source-kinesis https://kinesis.eu-west-2.amazonaws.com>"
+    "--source.url"                       = "https://kinesis.eu-west-2.amazonaws.com"
     "--spark-event-logs-path"            = "s3://dpr-glue-jobs-development-20220916083016134900000005/logs/"
     "--structured.path"                  = "s3://dpr-structured-development-20220916083016132200000004"
   }
