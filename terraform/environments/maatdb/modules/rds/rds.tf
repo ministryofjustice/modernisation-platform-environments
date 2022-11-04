@@ -145,13 +145,13 @@ resource "aws_db_instance" "appdb1" {
   deletion_protection                   = true
   copy_tags_to_snapshot                 = true
   storage_encrypted                     = true
-  enabled_cloudwatch_logs_exports       = ["general", "error", "slowquery"]
   tags = {
     Name = "${var.application_name}-${var.environment}-database"
   }
 }
 
 # snapshot_identifier                   = var.snapshot_arn
+# enabled_cloudwatch_logs_exports       = ["general", "error", "slowquery"]
 
 # Security Group
 
