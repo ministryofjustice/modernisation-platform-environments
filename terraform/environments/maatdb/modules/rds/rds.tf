@@ -24,7 +24,7 @@ resource "aws_db_parameter_group" "appdbparametergroup19" {
   description = "${var.application_name}-${var.environment}-parametergroup"
 
   parameter {
-    name  = "emote_dependencies_mode"
+    name  = "remote_dependencies_mode"
     value = "SIGNATURE"
   }
 
