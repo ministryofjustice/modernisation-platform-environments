@@ -9,27 +9,29 @@ _If you have any questions surrounding this page please post in the `#team-name`
 
 ### **Last review date:**
 
-<!-- Adding the last date this page was reviewed, with any accompanying information -->
+<!-- Adding the last date this page was reviewed, with any accompanying information --> 24th October 2022
 
 ### **Description:**
 
-<!-- A short (less than 50 word) description of what your service does, and who it’s for.-->
+<!-- A short (less than 50 word) description of what your service does, and who it’s for.--> EQuiP is a process management application detailing all of the organisation's processes and procedures.
 
 ### **Service URLs:**
 
-<!--  The URL(s) of the service’s production environment, and test environments if possible-->
+<!--  The URL(s) of the service’s production environment, and test environments if possible--> End users: https://equip-portal.equip.service.justice.gov.uk/
+
+Nimbus (editable version available only to EQuiP team: https://gateway.equip.service.justice.gov.uk/
 
 ### **Incident response hours:**
 
-<!-- When your service receives support for urgent issues. This should be written in a clear, unambiguous way. For example: 24/7/365, Office hours, usually 9am-6pm on working days, or 7am-10pm, 365 days a year. -->
+<!-- When your service receives support for urgent issues. This should be written in a clear, unambiguous way. For example: 24/7/365, Office hours, usually 9am-6pm on working days, or 7am-10pm, 365 days a year. --> Monday to Friday 9am to 5pm
 
 ### **Incident contact details:**
 
-<!-- How people can raise an urgent issue with your service. This must not be the email address or phone number of an individual on your team, it should be a shared email address, phone number, or website that allows someone with an urgent issue to raise it quickly. -->
+<!-- How people can raise an urgent issue with your service. This must not be the email address or phone number of an individual on your team, it should be a shared email address, phone number, or website that allows someone with an urgent issue to raise it quickly. --> equip.admin@justice.gov.uk
 
 ### **Service team contact:**
 
-<!-- How people with non-urgent issues or questions can get in touch with your team. As with incident contact details, this must not be the email address or phone number of an individual on the team, it should be a shared email address or a ticket tracking system.-->
+<!-- How people with non-urgent issues or questions can get in touch with your team. As with incident contact details, this must not be the email address or phone number of an individual on the team, it should be a shared email address or a ticket tracking system.--> equip.admin@justice.gov.uk
 
 ### **Hosting environment:**
 
