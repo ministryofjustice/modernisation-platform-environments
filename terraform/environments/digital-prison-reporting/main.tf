@@ -104,9 +104,9 @@ module "glue_cloudplatform_etl_job" {
   description                   = local.description
   create_security_configuration = local.create_sec_conf
   job_language                  = "scala"
-  temp_dir                      = "s3://${module.s3_glue_jobs_bucket[0].bucket.name}/tmp/"
-  checkpoint_dir                = "s3://${module.s3_glue_jobs_bucket[0].bucket.name}/checkpoint/"
-  spark_event_logs              = "s3://dpr-glue-jobs-development-20220916083016134900000005/spark-logs/"
+  temp_dir                      = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/tmp/"
+  checkpoint_dir                = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/checkpoint/"
+  spark_event_logs              = "s3://dpr-glue-jobs-development-20220916083016134900000005/spark-logs/"  
   tags                          = local.all_tags
   script_location               = "s3://${local.project}-artifact-store-${local.environment}/artifacts/cloud-platform/digital-prison-reporting-poc/cloud-platform.scala"
   enable_continuous_log_filter  = false
