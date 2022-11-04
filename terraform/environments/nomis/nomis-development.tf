@@ -53,7 +53,7 @@ locals {
           data  = { total_size = 200 }
           flash = { total_size = 2 }
         }
-        branch = var.BRANCH_NAME # comment in if testing ansible
+        # branch = var.BRANCH_NAME # comment in if testing ansible
       }
     }
     weblogics          = {}
