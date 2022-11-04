@@ -38,6 +38,21 @@ locals {
       # *-nomis-db-2: MIS, AUDIT
       # *-nomis-db-3: HA
 
+      # For ad-hoc testing.  Comment in and out as needed
+      dev-nomis-db-1 = {
+        tags = {
+          server-type       = "nomis-db"
+          description       = "Dev database using T1 data set"
+          oracle-sids       = "CNOMT1"
+          monitored         = false
+          s3-db-restore-dir = "CNOMT1_20211214"
+        }
+        ami_name = "nomis_rhel_7_9_oracledb_11_2_*"
+        ebs_volume_config = {
+          data  = { total_size = 200 }
+          flash = { total_size = 2 }
+        }
+      }
     }
     weblogics          = {}
     ec2_test_instances = {}
