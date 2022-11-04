@@ -22,7 +22,9 @@ locals {
   instance_type          = local.application_data.accounts[local.environment].ec2_instance_type
   create_datamart        = local.application_data.accounts[local.environment].setup_redshift
   redshift_cluster_name  = "${local.application_data.accounts[local.environment].project_short_id}-redshift-${local.environment}"
-
+  kinesis_stream_ingestor    = "${local.application_data.accounts[local.environment].project_short_id}-kinesis-ingestor-${local.environment}"
+  kinesis_stream_data_domain = "${local.application_data.accounts[local.environment].project_short_id}-kinesis-data-domain-${local.environment}"
+  kinesis_endpoint           = "https://kinesis.eu-west-2.amazonaws.com"
 
   all_tags = merge(
     local.tags,
@@ -106,7 +108,7 @@ module "glue_cloudplatform_etl_job" {
   job_language                  = "scala"
   temp_dir                      = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/tmp/"
   checkpoint_dir                = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/checkpoint/"
-  spark_event_logs              = "s3://dpr-glue-jobs-development-20220916083016134900000005/spark-logs/"
+  spark_event_logs              = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/spark-logs/"
   tags                          = local.all_tags
   script_location               = "s3://${local.project}-artifact-store-${local.environment}/artifacts/cloud-platform/digital-prison-reporting-poc/cloud-platform.scala"
   enable_continuous_log_filter  = false
@@ -115,17 +117,17 @@ module "glue_cloudplatform_etl_job" {
   create_kinesis_ingester       = local.create_kinesis
   additional_policies           = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_read_only_arn
   arguments = {
-    "--curated.path"        = "s3://dpr-curated-development-20220916083016128800000003"
-    "--extra-jars"          = "s3://dpr-artifact-store-development/artifacts/cloud-platform/digital-prison-reporting-poc/cloud-platform-v0.0.3.jar"
-    "--job-bookmark-option" = "job-bookmark-enable"
-    "--raw.path"            = "s3://dpr-raw-development-20220916083016137800000006"
-    "--sink.url"            = "https://kinesis.eu-west-2.amazonaws.com"
-    "--sink.stream"         = "dpr-kinesis-data-domain-development"
-    "--sink.region"         = "eu-west-2"
-    "--source.stream"       = "dpr-kinesis-ingestor-development"
-    "--source.url"          = "https://kinesis.eu-west-2.amazonaws.com"
-    "--source.region"       = "eu-west-2"
-    "--structured.path"     = "s3://dpr-structured-development-20220916083016132200000004"
+    "--extra-jars"              = "s3://dpr-artifact-store-development/artifacts/cloud-platform/digital-prison-reporting-poc/cloud-platform-v0.0.3.jar"
+    "--curated.path"            = "s3://${module.s3_curated_bucket[0].bucket.id}"
+    "--raw.path"                = "s3://${module.s3_raw_bucket[0].bucket.id}"
+    "--structured.path"         = "s3://${module.s3_structured_bucket[0].bucket.id}"
+    "--sink.url"                = local.kinesis_endpoint
+    "--sink.stream"             = local.kinesis_stream_data_domain
+    "--sink.region"             = local.account_region
+    "--source.url"              = local.kinesis_endpoint
+    "--source.stream"           = local.kinesis_stream_ingestor
+    "--source.region"           = local.account_region
+    "--job-bookmark-option"     = "job-bookmark-enable"
   }
 }
 
@@ -133,7 +135,7 @@ module "glue_cloudplatform_etl_job" {
 module "kinesis_stream_ingestor" {
   source                    = "./modules/kinesis_stream"
   create_kinesis_stream     = local.create_kinesis
-  name                      = "${local.project}-kinesis-ingestor-${local.env}"
+  name                      = local.kinesis_stream_ingestor
   shard_count               = 1
   retention_period          = 24
   shard_level_metrics       = ["IncomingBytes", "OutgoingBytes"]
@@ -155,7 +157,7 @@ module "kinesis_stream_ingestor" {
 module "kinesis_stream_domain_data" {
   source                    = "./modules/kinesis_stream"
   create_kinesis_stream     = local.create_kinesis
-  name                      = "${local.project}-kinesis-data-domain-${local.env}"
+  name                      = local.kinesis_stream_data_domain
   shard_count               = 1
   retention_period          = 24
   shard_level_metrics       = ["IncomingBytes", "OutgoingBytes"]
