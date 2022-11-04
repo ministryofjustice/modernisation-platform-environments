@@ -1,6 +1,6 @@
 # DSOS-1553
 module "jb_load_balancer_test" {
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer.git"
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer.git?ref=1981116be7ef580c7550045dce04551e74d627e6"
   count  = local.environment == "test" ? 1 : 0
   providers = {
     aws.bucket-replication = aws
@@ -16,6 +16,7 @@ module "jb_load_balancer_test" {
   region                     = local.region
   vpc_all                    = "hmpps-test" # TODO: Find or create a local for this
   force_destroy_bucket       = true
+  internal_lb                = true
   tags = merge(
     local.tags,
     {
