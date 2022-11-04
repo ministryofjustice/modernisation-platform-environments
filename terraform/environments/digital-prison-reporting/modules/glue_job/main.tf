@@ -4,28 +4,16 @@ locals {
     "--class"                            = "GlueApp"
     "--job-bookmark-option"              = "${lookup(var.bookmark_options, var.bookmark)}"
     "--TempDir"                          = "${var.temp_dir}"
-    "--checkpoint.location"              = "s3://dpr-glue-jobs-development-20220916083016134900000005/checkpoint/"
-    "--continuous-log-logGroup"          = "aws_cloudwatch_log_group.log_group.name"
+    "--checkpoint.location"              = "${var.checkpoint_dir}"
+    "--spark-event-logs-path"            = "${var.spark_event_logs}"
+    "--continuous-log-logGroup"          = aws_cloudwatch_log_group.log_group.name
     "--enable-continuous-cloudwatch-log" = "true"
     "--enable-continuous-log-filter"     = "true"
+    "--enable-glue-datacatalog"          = "true"
+    "--enable-job-insights"              = "true"    
     "--continuous-log-logStreamPrefix"   = var.continuous_log_stream_prefix
     "--extra-py-files"                   = length(var.extra_py_files) > 0 ? join(",", var.extra_py_files) : null
     "--enable-continuous-log-filter"     = var.enable_continuous_log_filter
-    "--curated.path"                     = "s3://dpr-curated-development-20220916083016128800000003"
-    "--enable-continuous-cloudwatch-log" = "false"
-    "--enable-glue-datacatalog"          = "true"
-    "--enable-job-insights"              = "true"
-    "--extra-jars"                       = "s3://dpr-artifact-store-development/artifacts/cloud-platform/digital-prison-reporting-poc/cloud-platform-v0.0.3.jar"
-    "--job-bookmark-option"              = "job-bookmark-enable"
-    "--raw.path"                         = "s3://dpr-raw-development-20220916083016137800000006"
-    "--sink.url"                         = "https://kinesis.eu-west-2.amazonaws.com"
-    "--sink.stream"                      = "dpr-kinesis-data-domain-development"
-    "--sink.region"                      = "eu-west-2"
-    "--source.stream"                    = "dpr-kinesis-ingestor-development"
-    "--source.url"                       = "https://kinesis.eu-west-2.amazonaws.com"
-    "--source.region"                    = "eu-west-2"
-    "--spark-event-logs-path"            = "s3://dpr-glue-jobs-development-20220916083016134900000005/logs/"
-    "--structured.path"                  = "s3://dpr-structured-development-20220916083016132200000004"
   }
 
   tags = merge(
@@ -74,7 +62,6 @@ resource "aws_glue_job" "glue_job" {
 }
 
 ### Glue Job Service Role
-
 resource "aws_iam_role" "glue-service-role" {
   count = var.create_role && var.create_job ? 1 : 0
   name  = "${var.name}-glue-role"

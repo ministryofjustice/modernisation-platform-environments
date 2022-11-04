@@ -188,24 +188,6 @@ module "glue_database" {
   aws_region     = local.account_region
 }
 
-# Glue JOB
-module "glue_job" {
-  source                        = "./modules/glue_job"
-  create_job                    = local.create_job
-  name                          = "${local.project}-cloud-platform-etl-${local.env}"
-  description                   = local.description
-  create_security_configuration = local.create_sec_conf
-  job_language                  = "scala"
-  temp_dir                      = "s3://dpr-glue-jobs-development-20220916083016134900000005/tmp/"
-  tags                          = local.all_tags
-  script_location               = "s3://${local.project}-artifact-store-${local.environment}/artifacts/cloud-platform/digital-prison-reporting-poc/cloud-platform.scala"
-  enable_continuous_log_filter  = false
-  project_id                    = local.project
-  aws_kms_key                   = local.s3_kms_arn
-  create_kinesis_ingester       = local.create_kinesis
-  additional_policies           = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_read_only_arn
-}
-
 # S3 Demo
 module "s3_demo_bucket" {
   count  = local.create_bucket ? 1 : 0
