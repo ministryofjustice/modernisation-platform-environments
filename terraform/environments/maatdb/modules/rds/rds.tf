@@ -148,6 +148,12 @@ resource "aws_db_instance" "appdb1" {
   tags = {
     Name = "${var.application_name}-${var.environment}-database"
   }
+
+  timeouts {
+    create = "60m"
+    delete = "2h"
+  }
+
 }
 
 # snapshot_identifier                   = var.snapshot_arn
