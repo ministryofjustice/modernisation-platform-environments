@@ -7,13 +7,13 @@ resource "aws_iam_role" "ssm_ec2_instance_role" {
   assume_role_policy = ""
 }
 
-resource "aws_iam_instance_profile" "poc_service_ssm"{
+resource "aws_iam_instance_profile" "poc_service_ssm" {
   name = "service_ec2_ssm"
   role = aws_iam_role.ssm_ec2_instance_role.name
 }
 
 
-resource "aws_resourcegroups_group" "ssm_patch_group_dev"{
+resource "aws_resourcegroups_group" "ssm_patch_group_dev" {
   name = 'ssm_patch_group_dev'
 
   resource_query {
