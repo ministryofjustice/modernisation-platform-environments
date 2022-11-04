@@ -106,7 +106,7 @@ module "glue_cloudplatform_etl_job" {
   job_language                  = "scala"
   temp_dir                      = "s3://${module.s3_glue_jobs_bucket[0].bucket.name}/tmp/"
   checkpoint_dir                = "s3://${module.s3_glue_jobs_bucket[0].bucket.name}/checkpoint/"
-  spark_event_logs              = "s3://dpr-glue-jobs-development-20220916083016134900000005/spark-logs/"  
+  spark_event_logs              = "s3://dpr-glue-jobs-development-20220916083016134900000005/spark-logs/"
   tags                          = local.all_tags
   script_location               = "s3://${local.project}-artifact-store-${local.environment}/artifacts/cloud-platform/digital-prison-reporting-poc/cloud-platform.scala"
   enable_continuous_log_filter  = false
@@ -114,19 +114,19 @@ module "glue_cloudplatform_etl_job" {
   aws_kms_key                   = local.s3_kms_arn
   create_kinesis_ingester       = local.create_kinesis
   additional_policies           = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_read_only_arn
-  arguments  = {
-    "--curated.path"            = "s3://dpr-curated-development-20220916083016128800000003"
-    "--extra-jars"              = "s3://dpr-artifact-store-development/artifacts/cloud-platform/digital-prison-reporting-poc/cloud-platform-v0.0.3.jar"
-    "--job-bookmark-option"     = "job-bookmark-enable"
-    "--raw.path"                = "s3://dpr-raw-development-20220916083016137800000006"
-    "--sink.url"                = "https://kinesis.eu-west-2.amazonaws.com"
-    "--sink.stream"             = "dpr-kinesis-data-domain-development"
-    "--sink.region"             = "eu-west-2"
-    "--source.stream"           = "dpr-kinesis-ingestor-development"
-    "--source.url"              = "https://kinesis.eu-west-2.amazonaws.com"
-    "--source.region"           = "eu-west-2"
-    "--structured.path"         = "s3://dpr-structured-development-20220916083016132200000004"
-  }  
+  arguments = {
+    "--curated.path"        = "s3://dpr-curated-development-20220916083016128800000003"
+    "--extra-jars"          = "s3://dpr-artifact-store-development/artifacts/cloud-platform/digital-prison-reporting-poc/cloud-platform-v0.0.3.jar"
+    "--job-bookmark-option" = "job-bookmark-enable"
+    "--raw.path"            = "s3://dpr-raw-development-20220916083016137800000006"
+    "--sink.url"            = "https://kinesis.eu-west-2.amazonaws.com"
+    "--sink.stream"         = "dpr-kinesis-data-domain-development"
+    "--sink.region"         = "eu-west-2"
+    "--source.stream"       = "dpr-kinesis-ingestor-development"
+    "--source.url"          = "https://kinesis.eu-west-2.amazonaws.com"
+    "--source.region"       = "eu-west-2"
+    "--structured.path"     = "s3://dpr-structured-development-20220916083016132200000004"
+  }
 }
 
 # kinesis Data Stream Ingestor
