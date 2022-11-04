@@ -14,7 +14,7 @@ resource "aws_iam_instance_profile" "poc_service_ssm" {
 
 
 resource "aws_resourcegroups_group" "ssm_patch_group_dev" {
-  name = 'ssm_patch_group_dev'
+  name = "poc"
 
   resource_query {
     query = <<JSON
