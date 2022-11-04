@@ -387,7 +387,7 @@ module "win2019_SQL_multiple" {
   ebs_block_device   = lookup(each.value, "ebs_block_device", [])
 
   tags = merge(each.value.tags, local.tags, {
-    Environment       = "development"
+    Environment = "development"
     terraform_managed = "true" },
     { instance-scheduling = local.application_data.accounts[local.environment].instance-scheduling }
   )
@@ -588,7 +588,7 @@ module "win2012_STD_multiple" {
   ebs_block_device   = lookup(each.value, "ebs_block_device", [])
 
   tags = merge(each.value.tags, local.tags, {
-    Environment       = "development"
+    Environment = "development"
     terraform_managed = "true" },
     { instance-scheduling = local.application_data.accounts[local.environment].instance-scheduling }
   )
