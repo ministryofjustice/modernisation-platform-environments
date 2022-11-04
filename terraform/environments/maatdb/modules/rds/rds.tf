@@ -135,8 +135,7 @@ resource "aws_db_instance" "appdb1" {
   username                              = var.username
   password                              = random_password.rds_password.result
   vpc_security_group_ids                = [aws_security_group.laalz-secgroup.id, aws_security_group.vpc-secgroup.id]
-  skip_final_snapshot                   = false
-  final_snapshot_identifier             = "${var.application_name}-finalsnapshot"
+  skip_final_snapshot                   = true
   parameter_group_name                  = aws_db_parameter_group.appdbparametergroup19.name
   option_group_name                     = aws_db_option_group.appdboptiongroup19.name
   db_subnet_group_name                  = aws_db_subnet_group.appdbsubnetgroup.name
@@ -146,6 +145,7 @@ resource "aws_db_instance" "appdb1" {
   deletion_protection                   = true
   copy_tags_to_snapshot                 = true
   storage_encrypted                     = true
+  apply_immediately                     = true
   tags = {
     Name = "${var.application_name}-${var.environment}-database"
   }
@@ -158,6 +158,7 @@ resource "aws_db_instance" "appdb1" {
 }
 
 # snapshot_identifier                   = var.snapshot_arn
+# final_snapshot_identifier             = "${var.application_name}-finalsnapshot"
 # enabled_cloudwatch_logs_exports       = ["general", "error", "slowquery"]
 
 # Security Group
