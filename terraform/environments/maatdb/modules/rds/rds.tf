@@ -136,7 +136,7 @@ resource "aws_db_instance" "appdb1" {
   password                              = random_password.rds_password.result
   vpc_security_group_ids                = [aws_security_group.laalz-secgroup.id, aws_security_group.vpc-secgroup.id]
   skip_final_snapshot                   = false
-  final_snapshot_identifier             = "${var.application_name}-${formatdate("DDMMMYYYYhhmm",timestamp())}-finalsnapshot"
+  final_snapshot_identifier             = "${var.application_name}-${formatdate("DDMMMYYYYhhmm", timestamp())}-finalsnapshot"
   parameter_group_name                  = aws_db_parameter_group.appdbparametergroup19.name
   option_group_name                     = aws_db_option_group.appdboptiongroup19.name
   db_subnet_group_name                  = aws_db_subnet_group.appdbsubnetgroup.name
