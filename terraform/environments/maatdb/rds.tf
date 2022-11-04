@@ -14,7 +14,7 @@ module "rds" {
   auto_minor_version_upgrade            = local.application_data.accounts[local.environment].auto_minor_version_upgrade
   storage_type                          = local.application_data.accounts[local.environment].storage_type
   iops                                  = local.application_data.accounts[local.environment].iops
-  backup_retention_period               = local.application_data.accounts[local.environment].backup_retention_period 
+  backup_retention_period               = local.application_data.accounts[local.environment].backup_retention_period
   backup_window                         = local.application_data.accounts[local.environment].backup_window
   maintenance_window                    = local.application_data.accounts[local.environment].maintenance_window
   character_set_name                    = local.application_data.accounts[local.environment].character_set_name

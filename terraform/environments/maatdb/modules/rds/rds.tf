@@ -82,15 +82,15 @@ resource "aws_db_option_group" "appdboptiongroup19" {
 # Random Secret for the DB Password.
 
 resource "random_password" "rds_password" {
-  length           = 12
-  special          = false
+  length  = 12
+  special = false
 }
 
- 
+
 resource "aws_secretsmanager_secret" "rds_password_secret" {
-   name = "${var.application_name}-${var.environment}-rds_password_secret"
+  name = "${var.application_name}-${var.environment}-rds_password_secret"
 }
- 
+
 
 resource "aws_secretsmanager_secret_version" "rds_password_secret_version" {
   secret_id = aws_secretsmanager_secret.rds_password_secret.id
