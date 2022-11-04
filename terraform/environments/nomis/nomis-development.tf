@@ -47,11 +47,13 @@ locals {
           monitored         = false
           s3-db-restore-dir = "CNOMT1_20211214"
         }
-        ami_name = "nomis_rhel_7_9_oracledb_11_2_*"
+        ami_name  = "nomis_rhel_7_9_oracledb_11_2_*"
+        ami_owner = "self"
         ebs_volume_config = {
           data  = { total_size = 200 }
           flash = { total_size = 2 }
         }
+        branch = var.BRANCH_NAME # comment in if testing ansible
       }
     }
     weblogics          = {}
