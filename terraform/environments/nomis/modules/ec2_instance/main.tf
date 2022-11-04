@@ -75,8 +75,8 @@ resource "aws_ebs_volume" "this" {
   availability_zone = var.availability_zone
   encrypted         = true
   snapshot_id       = each.value.snapshot_id
-  iops              = each.value.iops
-  throughput        = each.value.throughput
+  iops              = try(each.value.iops > 0, false) ? each.value.iops : null
+  throughput        = try(each.value.throughput > 0, false) ? each.value.throughput : null
   size              = each.value.size
   type              = each.value.type
 
