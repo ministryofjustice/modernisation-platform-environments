@@ -35,14 +35,14 @@ module "mlra-ecs" {
 locals {
   ec2_ingress_rules = {
     "cluster_ec2_lb_ingress" = {
-      description     = "Cluster EC2 ingress rule"
+      description     = "Cluster EC2 ingress rule 1"
       from_port       = 22
       to_port         = 22
       protocol        = "tcp"
       cidr_blocks     = [data.aws_vpc.shared.cidr_block]
       security_groups = []
     }
-    "cluster_ec2_lb_ingress" = {
+    "cluster_ec2_lb_ingress_2" = {
       description     = "Cluster EC2 ingress rule 2"
       from_port       = 8080
       to_port         = 8080
@@ -50,8 +50,8 @@ locals {
       cidr_blocks     = [data.aws_vpc.shared.cidr_block]
       security_groups = []
     }
-    "cluster_ec2_lb_ingress" = {
-      description     = "Cluster EC2 ingress rule 2"
+    "cluster_ec2_lb_ingress_3" = {
+      description     = "Cluster EC2 ingress rule 3"
       from_port       = 3389
       to_port         = 3389
       protocol        = "tcp"
