@@ -43,6 +43,26 @@ locals {
       security_groups = []
     }
   }
+  ec2_ingress_rules2 = {
+    "cluster_ec2_lb_ingress" = {
+      description     = "Cluster EC2 ingress rule 2"
+      from_port       = 8080
+      to_port         = 8080
+      protocol        = "tcp"
+      cidr_blocks     = [data.aws_vpc.shared.cidr_block]
+      security_groups = []
+    }
+  }
+  ec2_ingress_rules3 = {
+    "cluster_ec2_lb_ingress" = {
+      description     = "Cluster EC2 ingress rule 2"
+      from_port       = 3389
+      to_port         = 3389
+      protocol        = "tcp"
+      cidr_blocks     = [data.aws_vpc.shared.cidr_block]
+      security_groups = []
+    }
+  }
   ec2_egress_rules = {
     "cluster_ec2_lb_egress" = {
       description     = "Cluster EC2 loadbalancer egress rule"
