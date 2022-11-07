@@ -43,7 +43,7 @@ def lambda_handler(event, context):
                                     "DeleteOnTermination": True,
                                     "SnapshotId": snapshot_id,
                                     "VolumeSize": snapshot_volume_size,
-                                    "VolumeType": "gp2",
+                                    "VolumeType": "gp3",
                                 },
                             },
                         ],
