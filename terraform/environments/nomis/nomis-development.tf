@@ -44,7 +44,7 @@ locals {
     ec2_test_autoscaling_groups = {
       dev-redhat-rhel79 = {
         tags = {
-          description = "Standalone EC2 with actual RedHat RHEL7.9 base image"
+          description = "For testing official RedHat RHEL7.9 base image"
           server-type = "base-rhel79"
           monitored   = false
         }
@@ -54,7 +54,7 @@ locals {
       }
       dev-base-rhel79 = {
         tags = {
-          description = "Standalone EC2 for testing RHEL7.9 base image"
+          description = "For testing our base RHEL7.9 base image"
           monitored   = false
         }
         ami_name = "nomis_rhel_7_9_baseimage*"
@@ -62,13 +62,24 @@ locals {
       }
       dev-base-rhel610 = {
         tags = {
-          description = "Standalone EC2 for testing RHEL6.10 base image"
+          description = "For testing our base RHEL6.10 base image"
           monitored   = false
         }
         instance = {
           instance_type = "t2.medium"
         }
         ami_name = "nomis_rhel_6_10_baseimage*"
+        # branch   = var.BRANCH_NAME # comment in if testing ansible
+      }
+      dev-weblogic-appserver103 = {
+        tags = {
+          description = "For testing our weblogic appserver 10.3 image without final provisioning"
+          monitored   = false
+        }
+        instance = {
+          instance_type = "t2.medium"
+        }
+        ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3*"
         # branch   = var.BRANCH_NAME # comment in if testing ansible
       }
     }
