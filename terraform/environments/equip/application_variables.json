@@ -2,7 +2,8 @@
   "accounts": {
     "development": {
       "example_var": "dev-data",
-      "public_dns_name_web": "equip.hmpps-development.modernisation-platform.service.justice.gov.uk"
+      "public_dns_name_web": "equip.hmpps-development.modernisation-platform.service.justice.gov.uk",
+      "instance-scheduling": "skip-auto-start"
     },
     "test": {
       "example_var": "test-data"
@@ -12,7 +13,8 @@
     },
     "production": {
       "example_var": "production-data",
-      "public_dns_name_web": "equip.hmpps-development.modernisation-platform.service.justice.gov.uk"
+      "public_dns_name_web": "equip.hmpps-development.modernisation-platform.service.justice.gov.uk",
+      "instance-scheduling": "skip-scheduling"
     }
   },
   "internet_to_alb_rules": {
@@ -283,7 +285,8 @@
       "from_port": 2598,
       "to_port": 2598,
       "protocol": "TCP"
-    }},
+    }
+  },
   "ctx_to_equip_rules": {
     "ICMP_ALL": {
       "from_port": -1,
