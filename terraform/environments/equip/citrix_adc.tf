@@ -59,7 +59,8 @@ resource "aws_instance" "citrix_adc_instance" {
   tags = merge(local.tags,
     { Name = "NPS-COR-A-ADC01"
       Role = "Citrix Netscaler ADC VPX"
-    }
+    },
+    { instance-scheduling = local.application_data.accounts[local.environment].instance-scheduling }
   )
 }
 

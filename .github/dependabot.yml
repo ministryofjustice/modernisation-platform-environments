@@ -64,6 +64,10 @@ updates:
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
+    directory: "/terraform/environments/digital-prison-reporting/modules/redshift"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
     directory: "/terraform/environments/digital-prison-reporting/modules/s3_bucket"
     schedule:
       interval: "daily"
@@ -92,7 +96,11 @@ updates:
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
-    directory: "/terraform/environments/mlra/module/cloudwatch"
+    directory: "/terraform/environments/mlra/modules/alb"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/mlra/modules/cloudwatch"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
@@ -121,6 +129,14 @@ updates:
       interval: "daily"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/oasys"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/oasys/modules/ec2_autoscaling_group"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/oasys/modules/webserver"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"

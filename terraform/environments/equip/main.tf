@@ -235,7 +235,8 @@ module "win2016_multiple" {
 
   tags = merge(each.value.tags, local.tags,
     { Environment = "development"
-    terraform_managed = "true" }
+    terraform_managed = "true" },
+    { instance-scheduling = local.application_data.accounts[local.environment].instance-scheduling }
   )
 }
 
@@ -305,7 +306,8 @@ resource "aws_instance" "SOC" {
 
   tags = merge(local.tags,
     { Name = "NPS-COR-A-SOC01"
-    ROLE = "Security Operation Center Gateway" }
+    ROLE = "Security Operation Center Gateway" },
+    { instance-scheduling = local.application_data.accounts[local.environment].instance-scheduling }
   )
 
 }
@@ -385,9 +387,10 @@ module "win2019_SQL_multiple" {
   ebs_block_device   = lookup(each.value, "ebs_block_device", [])
 
   tags = merge(each.value.tags, local.tags, {
-    Environment       = "development"
-    terraform_managed = "true"
-  })
+    Environment = "development"
+    terraform_managed = "true" },
+    { instance-scheduling = local.application_data.accounts[local.environment].instance-scheduling }
+  )
 
 }
 
@@ -585,7 +588,8 @@ module "win2012_STD_multiple" {
   ebs_block_device   = lookup(each.value, "ebs_block_device", [])
 
   tags = merge(each.value.tags, local.tags, {
-    Environment       = "development"
-    terraform_managed = "true"
-  })
+    Environment = "development"
+    terraform_managed = "true" },
+    { instance-scheduling = local.application_data.accounts[local.environment].instance-scheduling }
+  )
 }
