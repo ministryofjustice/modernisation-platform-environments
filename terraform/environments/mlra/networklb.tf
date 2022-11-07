@@ -5,10 +5,10 @@ locals {
 }
 
 resource "aws_lb" "ingress-network-lb" {
-  name               = "ingress-network-lb"
-  internal           = true
-  load_balancer_type = "network"
-  subnets            = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id, data.aws_subnet.private_subnets_c.id]
+  name                       = "ingress-network-lb"
+  internal                   = true
+  load_balancer_type         = "network"
+  subnets                    = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id, data.aws_subnet.private_subnets_c.id]
   enable_deletion_protection = true
 }
 
@@ -32,5 +32,5 @@ resource "aws_lb_target_group" "alb-target" {
 
 resource "aws_lb_target_group_attachment" "alb-target-attachment" {
   target_group_arn = aws_lb_target_group.alb-target.arn
-  target_id = module.alb.load_balancer.id
+  target_id        = module.alb.load_balancer.id
 }
