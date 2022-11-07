@@ -1,7 +1,7 @@
 {
   "accounts": {
     "development": {
-      "application_name": "maatdb",
+      "application_name": "MAATDB",
       "region": "eu-west-2",
       "allocated_storage": 10,
       "engine": "oracle-se2",
