@@ -363,7 +363,7 @@ resource "aws_db_instance" "database" {
   #checkov:skip=CKV_AWS_157
   identifier                          = local.application_name
   allocated_storage                   = local.app_data.accounts[local.environment].db_allocated_storage
-  storage_type                        = "gp2"
+  storage_type                        = "gp3"
   engine                              = "sqlserver-se"
   engine_version                      = "15.00.4073.23.v1"
   license_model                       = "license-included"
