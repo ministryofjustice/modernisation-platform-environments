@@ -7,10 +7,8 @@ resource "aws_cloudwatch_metric_alarm" "esccpuoverthreshold" {
   period             = "60"
   evaluation_periods = "5"
   #TODO needs alarm actions and snstopics resources added
-  #AlarmActions
-  #      - !Ref pSnsTopicArn
-  #OKActions
-  #      - !Ref pSnsTopicArn
+  alarm_actions      = [aws_sns_topic.mlra_alerting_topic.arn]
+  ok_actions         = [aws_sns_topic.mlra_alerting_topic.arn]
   threshold          = var.pECSCPUAlarmThreshold
   treat_missing_data = "breaching"
   dimensions = {
@@ -28,10 +26,8 @@ resource "aws_cloudwatch_metric_alarm" "ecsmemoryoverthreshold" {
   period             = "60"
   evaluation_periods = "5"
   #TODO needs alarm actions and snstopics resources added
-  #AlarmActions
-  #      - !Ref pSnsTopicArn
-  #OKActions
-  #      - !Ref pSnsTopicArn  
+  alarm_actions      = [aws_sns_topic.mlra_alerting_topic.arn]
+  ok_actions         = [aws_sns_topic.mlra_alerting_topic.arn]
   threshold          = var.pECSMemoryAlarmThreshold
   treat_missing_data = "breaching"
   dimensions = {
@@ -49,10 +45,8 @@ resource "aws_cloudwatch_metric_alarm" "cpuoverthreshold" {
   period             = "60"
   evaluation_periods = "5"
   #TODO needs alarm actions and snstopics resources added
-  #AlarmActions
-  #      - !Ref pSnsTopicArn
-  #OKActions
-  #      - !Ref pSnsTopicArn  
+  alarm_actions      = [aws_sns_topic.mlra_alerting_topic.arn]
+  ok_actions         = [aws_sns_topic.mlra_alerting_topic.arn]
   threshold          = var.pASGCPUAlarmThreshold
   treat_missing_data = "breaching"
   dimensions = {
@@ -69,10 +63,8 @@ resource "aws_cloudwatch_metric_alarm" "statuscheckfailure" {
   period             = "60"
   evaluation_periods = "5"
   #TODO needs alarm actions and snstopics resources added
-  #AlarmActions
-  #      - !Ref pSnsTopicArn
-  #OKActions
-  #      - !Ref pSnsTopicArn  
+  alarm_actions      = [aws_sns_topic.mlra_alerting_topic.arn]
+  ok_actions         = [aws_sns_topic.mlra_alerting_topic.arn]
   threshold          = var.pASGStatusFailureAlarmThreshold
   treat_missing_data = "breaching"
   dimensions = {
@@ -90,10 +82,8 @@ resource "aws_cloudwatch_metric_alarm" "targetresponsetime" {
   period             = "60"
   evaluation_periods = "5"
   #TODO needs alarm actions and snstopics resources added
-  #AlarmActions
-  #      - !Ref pSnsTopicArn
-  #OKActions
-  #      - !Ref pSnsTopicArn  
+  alarm_actions      = [aws_sns_topic.mlra_alerting_topic.arn]
+  ok_actions         = [aws_sns_topic.mlra_alerting_topic.arn]
   threshold          = var.pALBTargetResponseTimeThreshold
   treat_missing_data = "notBreaching"
   dimensions = {
@@ -110,10 +100,8 @@ resource "aws_cloudwatch_metric_alarm" "targetResponsetimemaximum" {
   period             = "60"
   evaluation_periods = "1"
   #TODO needs alarm actions and snstopics resources added
-  #AlarmActions
-  #      - !Ref pSnsTopicArn
-  #OKActions
-  #      - !Ref pSnsTopicArn  
+  alarm_actions      = [aws_sns_topic.mlra_alerting_topic.arn]
+  ok_actions         = [aws_sns_topic.mlra_alerting_topic.arn]
   threshold          = var.pALBTargetResponseTimeThresholdMaximum
   treat_missing_data = "notBreaching"
   dimensions = {
@@ -131,9 +119,8 @@ resource "aws_cloudwatch_metric_alarm" "unhealthyhosts" {
   evaluation_periods = "5"
   #TODO needs alarm actions and snstopics resources added
   #AlarmActions
-  #      - !Ref pSnsTopicArn
-  #OKActions
-  #      - !Ref pSnsTopicArn  
+  alarm_actions      = [aws_sns_topic.mlra_alerting_topic.arn]
+  ok_actions         = [aws_sns_topic.mlra_alerting_topic.arn]
   threshold          = var.pALBUnhealthyAlarmThreshold
   treat_missing_data = "notBreaching"
   dimensions = {
@@ -151,10 +138,8 @@ resource "aws_cloudwatch_metric_alarm" "rejectedconnectioncount" {
   period             = "60"
   evaluation_periods = "5"
   #TODO needs alarm actions and snstopics resources added
-  #AlarmActions
-  #      - !Ref pSnsTopicArn
-  #OKActions
-  #      - !Ref pSnsTopicArn  
+  alarm_actions      = [aws_sns_topic.mlra_alerting_topic.arn]
+  ok_actions         = [aws_sns_topic.mlra_alerting_topic.arn]
   threshold          = var.pALBRejectedAlarmThreshold
   treat_missing_data = "notBreaching"
   dimensions = {
@@ -172,9 +157,8 @@ resource "aws_cloudwatch_metric_alarm" "http5xxerror" {
   evaluation_periods = "5"
   #TODO needs alarm actions and snstopics resources added
   #AlarmActions
-  #      - !Ref pSnsTopicArn
-  #OKActions
-  #      - !Ref pSnsTopicArn  
+  alarm_actions      = [aws_sns_topic.mlra_alerting_topic.arn]
+  ok_actions         = [aws_sns_topic.mlra_alerting_topic.arn]
   threshold          = var.pALBTarget5xxAlarmThreshold
   treat_missing_data = "notBreaching"
   dimensions = {
@@ -192,9 +176,8 @@ resource "aws_cloudwatch_metric_alarm" "applicationelb5xxerror" {
   evaluation_periods = "5"
   #TODO needs alarm actions and snstopics resources added
   #AlarmActions
-  #      - !Ref pSnsTopicArn
-  #OKActions
-  #      - !Ref pSnsTopicArn  
+  alarm_actions      = [aws_sns_topic.mlra_alerting_topic.arn]
+  ok_actions         = [aws_sns_topic.mlra_alerting_topic.arn]
   threshold          = var.pALB5xxAlarmThreshold
   treat_missing_data = "notBreaching"
   dimensions = {
@@ -212,9 +195,8 @@ resource "aws_cloudwatch_metric_alarm" "http4xxerror" {
   evaluation_periods = "5"
   #TODO needs alarm actions and snstopics resources added
   #AlarmActions
-  #      - !Ref pSnsTopicArn
-  #OKActions
-  #      - !Ref pSnsTopicArn  
+  alarm_actions      = [aws_sns_topic.mlra_alerting_topic.arn]
+  ok_actions         = [aws_sns_topic.mlra_alerting_topic.arn]
   threshold          = var.pALBTarget4xxAlarmThreshold
   treat_missing_data = "notBreaching"
   dimensions = {
@@ -232,9 +214,8 @@ resource "aws_cloudwatch_metric_alarm" "applicationelb4xxerror" {
   evaluation_periods = "5"
   #TODO needs alarm actions and snstopics resources added
   #AlarmActions
-  #      - !Ref pSnsTopicArn
-  #OKActions
-  #      - !Ref pSnsTopicArn  
+  alarm_actions      = [aws_sns_topic.mlra_alerting_topic.arn]
+  ok_actions         = [aws_sns_topic.mlra_alerting_topic.arn]
   threshold          = var.pALB4xxAlarmThreshold
   treat_missing_data = "notBreaching"
   dimensions = {
@@ -347,4 +328,9 @@ resource "aws_cloudwatch_dashboard" "mlradash" {
   ]
 }
 EOF
+}
+
+# SNS topic for monitoring to send alarms to
+resource "aws_sns_topic" "mlra_alerting_topic" {
+  name = var.snsTopicName
 }

@@ -43,7 +43,7 @@ jobs:
           role-session-name: githubactionsrolesession
           aws-region: ${{ env.AWS_REGION }}
       - name: Load and Configure Terraform
-        uses: hashicorp/setup-terraform@v2.0.2
+        uses: hashicorp/setup-terraform@v2.0.3
         with:
           terraform_version: "~1"
           terraform_wrapper: false
@@ -75,7 +75,7 @@ jobs:
           role-session-name: githubactionsrolesession
           aws-region: ${{ env.AWS_REGION }}
       - name: Load and Configure Terraform
-        uses: hashicorp/setup-terraform@v2.0.2
+        uses: hashicorp/setup-terraform@v2.0.3
         with:
           terraform_version: "~1"
           terraform_wrapper: false
@@ -105,7 +105,7 @@ jobs:
           role-session-name: githubactionsrolesession
           aws-region: ${{ env.AWS_REGION }}
       - name: Load and Configure Terraform
-        uses: hashicorp/setup-terraform@v2.0.2
+        uses: hashicorp/setup-terraform@v2.0.3
         with:
           terraform_version: "~1"
           terraform_wrapper: false
@@ -136,7 +136,7 @@ jobs:
           role-session-name: githubactionsrolesession
           aws-region: ${{ env.AWS_REGION }}
       - name: Load and Configure Terraform
-        uses: hashicorp/setup-terraform@v2.0.2
+        uses: hashicorp/setup-terraform@v2.0.3
         with:
           terraform_version: "~1"
           terraform_wrapper: false
@@ -166,7 +166,7 @@ jobs:
           role-session-name: githubactionsrolesession
           aws-region: ${{ env.AWS_REGION }}
       - name: Load and Configure Terraform
-        uses: hashicorp/setup-terraform@v2.0.2
+        uses: hashicorp/setup-terraform@v2.0.3
         with:
           terraform_version: "~1"
           terraform_wrapper: false
@@ -199,7 +199,7 @@ jobs:
           role-session-name: githubactionsrolesession
           aws-region: ${{ env.AWS_REGION }}
       - name: Load and Configure Terraform
-        uses: hashicorp/setup-terraform@v2.0.2
+        uses: hashicorp/setup-terraform@v2.0.3
         with:
           terraform_version: "~1"
           terraform_wrapper: false
