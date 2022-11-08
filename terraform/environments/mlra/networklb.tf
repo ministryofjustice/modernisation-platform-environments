@@ -2,7 +2,7 @@
 
 locals {
   application_name = local.application_data.accounts[local.environment].application_name
-  environment = local.application_data.accounts[local.environment].environment
+  environment      = local.application_data.accounts[local.environment].environment
 }
 
 resource "aws_lb" "ingress-network-lb" {
