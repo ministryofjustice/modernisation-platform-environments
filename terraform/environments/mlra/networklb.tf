@@ -1,7 +1,8 @@
 # This creates a network load balancer listening on port 80 with a target of the internal ALB.
 
 locals {
-  lz_vpc_cidr = local.application_data.accounts[local.environment].lz_vpc_cidr
+  application_name = local.application_data.accounts[local.environment].application_name
+  environment = local.application_data.accounts[local.environment].environment
 }
 
 resource "aws_lb" "ingress-network-lb" {
@@ -11,7 +12,7 @@ resource "aws_lb" "ingress-network-lb" {
   subnets                    = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id, data.aws_subnet.private_subnets_c.id]
   enable_deletion_protection = true
   tags = {
-    Name = "${var.application_name}-${var.environment}-ingress-network-lb"
+    Name = "${local.application_name}-${local.environment}-ingress-network-lb"
   }
 }
 
@@ -24,7 +25,7 @@ resource "aws_lb_listener" "lz-ingress" {
     target_group_arn = aws_lb_target_group.alb-target.arn
   }
   tags = {
-    Name = "${var.application_name}-${var.environment}-lz-ingress"
+    Name = "${local.application_name}-${local.environment}-lz-ingress"
   }
 }
 
@@ -35,7 +36,7 @@ resource "aws_lb_target_group" "alb-target" {
   protocol    = "TCP"
   vpc_id      = data.aws_vpc.shared.id
   tags = {
-    Name = "${var.application_name}-${var.environment}-alb-target"
+    Name = "${local.application_name}-${local.environment}-alb-target"
   }
 }
 
@@ -44,7 +45,7 @@ resource "aws_lb_target_group_attachment" "alb-target-attachment" {
   target_group_arn = aws_lb_target_group.alb-target.arn
   target_id        = module.alb.load_balancer.id
   tags = {
-    Name = "${var.application_name}-${var.environment}-alb-target-attachment"
+    Name = "${local.application_name}-${local.environment}-alb-target-attachment"
   }
 }
 
