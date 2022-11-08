@@ -41,6 +41,7 @@ locals {
       # For ad-hoc testing.  Comment in and out as needed
       dev-nomis-db-1 = {
         tags = {
+          ami               = "nomis-rhel-7-9-oracledb"
           server-type       = "nomis-db"
           description       = "Dev database using T1 data set"
           oracle-sids       = "CNOMT1"
@@ -61,6 +62,7 @@ locals {
     ec2_test_autoscaling_groups = {
       dev-redhat-rhel79 = {
         tags = {
+          ami         = "nomis_rhel_7_9_oracledb"
           description = "For testing official RedHat RHEL7.9 base image"
           server-type = "base-rhel79"
           monitored   = false
@@ -71,6 +73,7 @@ locals {
       }
       dev-base-rhel79 = {
         tags = {
+          ami         = "nomis_rhel_7_9_baseimage"
           description = "For testing our base RHEL7.9 base image"
           monitored   = false
         }
@@ -79,11 +82,13 @@ locals {
       }
       dev-base-rhel610 = {
         tags = {
+          ami         = "nomis_rhel_6_10_baseimage"
           description = "For testing our base RHEL6.10 base image"
           monitored   = false
         }
         instance = {
-          instance_type = "t2.medium"
+          instance_type                = "t2.medium"
+          metadata_options_http_tokens = "optional"
         }
         ami_name = "nomis_rhel_6_10_baseimage*"
         # branch   = var.BRANCH_NAME # comment in if testing ansible
@@ -94,7 +99,8 @@ locals {
           monitored   = false
         }
         instance = {
-          instance_type = "t2.medium"
+          instance_type                = "t2.medium"
+          metadata_options_http_tokens = "optional"
         }
         ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3*"
         # branch   = var.BRANCH_NAME # comment in if testing ansible
