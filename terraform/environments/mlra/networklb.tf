@@ -1,10 +1,5 @@
 # This creates a network load balancer listening on port 80 with a target of the internal ALB.
 
-locals {
-  application_name = local.application_data.accounts[local.environment].application_name
-  environment      = local.application_data.accounts[local.environment].environment
-}
-
 resource "aws_lb" "ingress-network-lb" {
   name                       = "ingress-network-lb"
   internal                   = true
