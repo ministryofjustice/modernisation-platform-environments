@@ -92,8 +92,8 @@ resource "aws_cloudwatch_log_group" "ecs_log_group" {
   name = "${local.application_name}-ecs-log-group"
 }
 
-resource "aws_lb_target_group_attachment" "ecs-target-group-test" {
-  target_group_arn = module.alb.target_group_arn.arn
-  target_id        = module.mlra-ecs.ecs_service.id
-  port             = 80
-}
+# resource "aws_lb_target_group_attachment" "ecs-target-group-test" {
+#   target_group_arn = module.alb.target_group_arn.arn
+#   target_id        = module.mlra-ecs.ecs_service.id
+#   port             = 80
+# }
