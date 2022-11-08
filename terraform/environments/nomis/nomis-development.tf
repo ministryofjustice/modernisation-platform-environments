@@ -41,7 +41,6 @@ locals {
       # For ad-hoc testing.  Comment in and out as needed
       dev-nomis-db-1 = {
         tags = {
-          ami               = "nomis-rhel-7-9-oracledb"
           server-type       = "nomis-db"
           description       = "Dev database using T1 data set"
           oracle-sids       = "CNOMT1"
@@ -62,7 +61,6 @@ locals {
     ec2_test_autoscaling_groups = {
       dev-redhat-rhel79 = {
         tags = {
-          ami         = "nomis_rhel_7_9_oracledb"
           description = "For testing official RedHat RHEL7.9 base image"
           server-type = "base-rhel79"
           monitored   = false
