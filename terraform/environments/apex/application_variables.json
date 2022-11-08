@@ -8,7 +8,7 @@
       "ami_image_id": "ami-0631049bf050d0d46",
       "instance_type": "m5.large",
       "key_name": "",
-      "ecr_url": "http://374269020027.dkr.ecr.eu-west-2.amazonaws.com/mlra-ecr-repo",
+      "ecr_url": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/mlra-ecr-repo",
       "docker_image_tag": "latest",
       "maat_api_end_point": "http://maat-cd-api.aws.dev.legalservices.gov.uk/maatApi/laaStatus",
       "maat_db_url": "rds.maat.aws.dev.legalservices.gov.uk:1521:MAATDB",
