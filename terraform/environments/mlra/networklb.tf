@@ -39,9 +39,6 @@ resource "aws_lb_target_group" "alb-target" {
 resource "aws_lb_target_group_attachment" "alb-target-attachment" {
   target_group_arn = aws_lb_target_group.alb-target.arn
   target_id        = module.alb.load_balancer.id
-  tags = {
-    Name = "${local.application_name}-${local.environment}-alb-target-attachment"
-  }
 }
 
 
