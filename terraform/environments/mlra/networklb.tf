@@ -10,6 +10,9 @@ resource "aws_lb" "ingress-network-lb" {
   load_balancer_type         = "network"
   subnets                    = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id, data.aws_subnet.private_subnets_c.id]
   enable_deletion_protection = true
+  tags = {
+    Name = "${var.application_name}-${var.environment}-ingress-network-lb"
+  }
 }
 
 resource "aws_lb_listener" "lz-ingress" {
@@ -20,6 +23,9 @@ resource "aws_lb_listener" "lz-ingress" {
     type             = "forward"
     target_group_arn = aws_lb_target_group.alb-target.arn
   }
+  tags = {
+    Name = "${var.application_name}-${var.environment}-lz-ingress"
+  }
 }
 
 resource "aws_lb_target_group" "alb-target" {
@@ -28,9 +34,18 @@ resource "aws_lb_target_group" "alb-target" {
   port        = 80
   protocol    = "TCP"
   vpc_id      = data.aws_vpc.shared.id
+  tags = {
+    Name = "${var.application_name}-${var.environment}-alb-target"
+  }
 }
+
 
 resource "aws_lb_target_group_attachment" "alb-target-attachment" {
   target_group_arn = aws_lb_target_group.alb-target.arn
   target_id        = module.alb.load_balancer.id
+  tags = {
+    Name = "${var.application_name}-${var.environment}-alb-target-attachment"
+  }
 }
+
+
