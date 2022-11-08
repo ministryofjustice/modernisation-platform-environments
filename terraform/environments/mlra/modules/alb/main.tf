@@ -130,4 +130,9 @@ resource "aws_lb_target_group" "alb_target_group" {
     type            = var.stickiness_type
     cookie_duration = var.stickiness_cookie_duration
   }
+
+  tags = {
+    Name = "${var.application_name}-tg-${var.environment}"
+  }
+
 }
