@@ -50,19 +50,39 @@ locals {
         ami_name  = "nomis_rhel_7_9_oracledb_11_2_*"
         ami_owner = "self"
         ebs_volume_config = {
-          data  = { total_size = 200 }
-          flash = { total_size = 2 }
+          app = {
+            iops       = 300   # Temporary. See DSOS-1561
+            throughput = 0     # Temporary. See DSOS-1561
+            type       = "gp2" # Temporary. See DSOS-1561
+          }
+          data = {
+            iops       = 120   # Temporary. See DSOS-1561
+            throughput = 0     # Temporary. See DSOS-1561
+            type       = "gp2" # Temporary. See DSOS-1561
+            total_size = 200
+          }
+          flash = {
+            iops       = 100   # Temporary. See DSOS-1561
+            throughput = 0     # Temporary. See DSOS-1561
+            type       = "gp2" # Temporary. See DSOS-1561
+            total_size = 2
+          }
+          swap = {
+            iops       = 100   # Temporary. See DSOS-1561
+            throughput = 0     # Temporary. See DSOS-1561
+            type       = "gp2" # Temporary. See DSOS-1561
+          }
         }
         # branch = var.BRANCH_NAME # comment in if testing ansible
       }
       dev-nomis-db-2 = {
         tags = {
-          server-type       = "nomis-db"
-          description       = "temp, testing terraform only"
-          oracle-sids       = "CNOMT1"
-          monitored         = false
+          server-type = "nomis-db"
+          description = "temp, testing terraform only"
+          oracle-sids = "CNOMT1"
+          monitored   = false
         }
-        ami_name  = "nomis_rhel_7_9_oracledb_11_2_*"
+        ami_name = "nomis_rhel_7_9_oracledb_11_2_*"
         ebs_volume_config = {
           data  = { total_size = 200 }
           flash = { total_size = 2 }

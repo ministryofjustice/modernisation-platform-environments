@@ -38,7 +38,7 @@ locals {
     label => length([for key, value in var.ebs_volumes : key if try(value.label == label, false)])
   }
   ebs_volumes_swap_size = data.aws_ec2_instance_type.this.memory_size >= 16384 ? 16 : (data.aws_ec2_instance_type.this.memory_size / 1024)
-  ebs_volumes_from_config = {
+  ebs_volumes_from_config_with_nulls = {
     for key, value in var.ebs_volumes :
     key => {
       iops       = try(var.ebs_volume_config[value.label].iops, null)
@@ -48,6 +48,14 @@ locals {
         floor(var.ebs_volume_config[value.label].total_size / local.ebs_volume_count[value.label]),
         try(value.label == "swap", false) ? local.ebs_volumes_swap_size : null
       )
+    }
+  }
+  # unfortunately the merge() command actually includes nulls, so we must
+  # explicitly remove them from the map.
+  ebs_volumes_from_config = {
+    for key1, value1 in local.ebs_volumes_from_config_with_nulls :
+    key1 => {
+      for key2, value2 in value1 : key2 => value2 if value2 != null
     }
   }
 
