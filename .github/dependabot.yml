@@ -96,7 +96,11 @@ updates:
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
-    directory: "/terraform/environments/mlra/module/cloudwatch"
+    directory: "/terraform/environments/mlra/modules/alb"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/mlra/modules/cloudwatch"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"

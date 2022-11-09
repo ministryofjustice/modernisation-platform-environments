@@ -2,7 +2,7 @@
 # S3 Bucket for DPR Application IAAC
 #------------------------------------------------------------------------------
 #tfsec:ignore:AWS002 tfsec:ignore:AWS098
-resource "aws_s3_bucket" "application_tf_state" {
+resource "aws_s3_bucket" "application_tf_state" { # TBC "application_tf_state" should be generic
   count = var.create_s3 ? 1 : 0
 
   #checkov:skip=CKV_AWS_18
@@ -17,7 +17,7 @@ resource "aws_s3_bucket" "application_tf_state" {
   tags = var.tags
 }
 
-resource "aws_s3_bucket_acl" "application_tf_state" {
+resource "aws_s3_bucket_acl" "application_tf_state" { # TBC "application_tf_state" should be generic
   bucket = aws_s3_bucket.application_tf_state[0].id
   acl    = "private"
 }
