@@ -54,11 +54,12 @@ locals {
 
       t1-nomis-db-2 = {
         tags = {
-          server-type = "nomis-db"
-          description = "T1 NOMIS Audit database to replace Azure T1PDL0010"
-          oracle-sids = "T1CNMAUD"
-          monitored   = false
-          always-on   = true
+          server-type         = "nomis-db"
+          description         = "T1 NOMIS Audit database to replace Azure T1PDL0010"
+          oracle-sids         = "T1CNMAUD"
+          monitored           = false
+          always-on           = true
+          instance-scheduling = "skip-scheduling"
         }
         ami_name  = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-07T12-48-08.562Z"
         ami_owner = "self" # remove this line next time AMI is updated so core-shared-services-production used instead
@@ -77,6 +78,25 @@ locals {
       CNOMT1 = {
         ami_name     = "nomis_Weblogic_2022*"
         asg_max_size = 1
+      }
+    }
+
+    ec2_test_instances = {
+      t1-ndh-app = {
+        tags = {
+          description = "Standalone EC2 for testing RHEL7.9 NDH App"
+          monitored   = false
+        }
+        ami_name = "nomis_rhel_7_9_baseimage_2022-11-01T13-43-46.384Z"
+        # branch   = var.BRANCH_NAME # comment in if testing ansible
+      }
+      t1-ndh-ems = {
+        tags = {
+          description = "Standalone EC2 for testing RHEL7.9 NDH EMS"
+          monitored   = false
+        }
+        ami_name = "nomis_rhel_7_9_baseimage_2022-11-01T13-43-46.384Z"
+        # branch   = var.BRANCH_NAME # comment in if testing ansible
       }
     }
   }
