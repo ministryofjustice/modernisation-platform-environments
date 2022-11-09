@@ -1,5 +1,6 @@
 #!/bin/bash
-set -euo pipefail
+# Don't set set -u as ansible activate script fails with it on RHEL6
+set -eo pipefail
 
 run_ansible() {
   export PATH=/usr/local/bin:$PATH
@@ -36,9 +37,9 @@ run_ansible() {
   git clone -b ${branch} "https://github.com/ministryofjustice/${ansible_repo}.git" || git clone "https://github.com/ministryofjustice/${ansible_repo}.git"
 
   # set python version
-  if [[ $(which python3.9) ]]; then
+  if [[ $(which python3.9 2> /dev/null) ]]; then
     python=$(which python3.9)
-  elif [[ $(which python3.6) ]]; then
+  elif [[ $(which python3.6 2> /dev/null) ]]; then
     python=$(which python3.6)
   else
     echo "Python3.9/3.6 not found"
