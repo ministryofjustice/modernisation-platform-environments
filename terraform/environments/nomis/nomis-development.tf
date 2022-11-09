@@ -55,6 +55,20 @@ locals {
         }
         # branch = var.BRANCH_NAME # comment in if testing ansible
       }
+      dev-nomis-db-2 = {
+        tags = {
+          server-type       = "nomis-db"
+          description       = "temp, testing terraform only"
+          oracle-sids       = "CNOMT1"
+          monitored         = false
+        }
+        ami_name  = "nomis_rhel_7_9_oracledb_11_2_*"
+        ebs_volume_config = {
+          data  = { total_size = 200 }
+          flash = { total_size = 2 }
+        }
+        # branch = var.BRANCH_NAME # comment in if testing ansible
+      }
     }
     weblogics          = {}
     ec2_test_instances = {}
