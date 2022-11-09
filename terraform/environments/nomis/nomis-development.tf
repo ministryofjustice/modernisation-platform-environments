@@ -71,6 +71,7 @@ locals {
       }
       dev-base-rhel79 = {
         tags = {
+          ami         = "nomis_rhel_7_9_baseimage"
           description = "For testing our base RHEL7.9 base image"
           monitored   = false
         }
@@ -79,11 +80,13 @@ locals {
       }
       dev-base-rhel610 = {
         tags = {
+          ami         = "nomis_rhel_6_10_baseimage"
           description = "For testing our base RHEL6.10 base image"
           monitored   = false
         }
         instance = {
-          instance_type = "t2.medium"
+          instance_type                = "t2.medium"
+          metadata_options_http_tokens = "optional"
         }
         ami_name = "nomis_rhel_6_10_baseimage*"
         # branch   = var.BRANCH_NAME # comment in if testing ansible
@@ -94,7 +97,8 @@ locals {
           monitored   = false
         }
         instance = {
-          instance_type = "t2.medium"
+          instance_type                = "t2.medium"
+          metadata_options_http_tokens = "optional"
         }
         ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3*"
         # branch   = var.BRANCH_NAME # comment in if testing ansible
