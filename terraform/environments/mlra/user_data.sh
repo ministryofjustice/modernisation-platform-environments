@@ -1,5 +1,5 @@
 #!/bin/bash -xe
-echo ECS_CLUSTER=${app_name}-ecs-cluster >> /etc/ecs/ecs.config
+echo ECS_CLUSTER=${app_name} >> /etc/ecs/ecs.config
 yum install -y awslogs
 cat >/etc/awslogs/awslogs.conf <<-EOF
 [general]

@@ -8,7 +8,7 @@
       "ami_image_id": "ami-0631049bf050d0d46",
       "instance_type": "m5.large",
       "key_name": "",
-      "ecr_url": "http://374269020027.dkr.ecr.eu-west-2.amazonaws.com/mlra-ecr-repo",
+      "ecr_url": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/mlra-ecr-repo",
       "docker_image_tag": "latest",
       "maat_api_end_point": "http://maat-cd-api.aws.dev.legalservices.gov.uk/maatApi/laaStatus",
       "maat_db_url": "rds.maat.aws.dev.legalservices.gov.uk:1521:MAATDB",
@@ -23,7 +23,8 @@
       "network_mode": "bridge",
       "server_port": 8080,
       "app_count": 1,
-      "lz_vpc_cidr": "10.202.0.0/20"
+      "lz_vpc_cidr": "10.202.0.0/20",
+      "lb_tg_name": "mlra-tg-development"
     },
     "test": {
       "example_var": "test-data"
