@@ -82,7 +82,7 @@ locals {
     }
 
     ec2_test_instances = {
-      t2-ndh-app = {
+      t1-ndh-app = {
         tags = {
           description = "Standalone EC2 for testing RHEL7.9 NDH App"
           monitored   = false
@@ -90,7 +90,7 @@ locals {
         ami_name = "nomis_rhel_7_9_baseimage*"
         # branch   = var.BRANCH_NAME # comment in if testing ansible
       }
-      t2-ndh-ems = {
+      t1-ndh-ems = {
         tags = {
           description = "Standalone EC2 for testing RHEL7.9 NDH EMS"
           monitored   = false
