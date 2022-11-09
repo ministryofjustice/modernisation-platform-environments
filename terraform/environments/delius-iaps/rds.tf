@@ -1,12 +1,12 @@
 resource "aws_db_instance" "iaps" {
-  engine                     = "oracle-ee"
-  engine_version             = "19.0.0.0.ru-2022-07.rur-2022-07.r1"
-  license_model              = "bring-your-own-license"
-  instance_class             = local.application_data.accounts[local.environment].db_instance_class
-  db_name                    = "${local.application_name}${local.environment}database"
-  identifier                 = "${local.application_name}-${local.environment}-database"
-  username                   = local.application_data.accounts[local.environment].db_user
-  password                   = aws_secretsmanager_secret_version.db_password.secret_string
+  engine         = "oracle-ee"
+  engine_version = "19.0.0.0.ru-2022-07.rur-2022-07.r1"
+  license_model  = "bring-your-own-license"
+  instance_class = local.application_data.accounts[local.environment].db_instance_class
+  db_name        = "${local.application_name}${local.environment}database"
+  identifier     = "${local.application_name}-${local.environment}-database"
+  username       = local.application_data.accounts[local.environment].db_user
+  password       = aws_secretsmanager_secret_version.db_password.secret_string
   # tflint-ignore: aws_db_instance_default_parameter_group
   parameter_group_name        = "default.oracle-ee-19"
   skip_final_snapshot         = local.application_data.accounts[local.environment].db_skip_final_snapshot
