@@ -70,11 +70,11 @@ resource "aws_instance" "this" {
 resource "aws_ebs_volume" "this" {
   for_each = local.ebs_volumes
 
-  # Note that block devices must be also present in the AMI.  AMI values are used
-  # if they are not otherwise defined  
+  # Values are retrieved from AMI data rather than using snapshot_id, since 
+  # it's not always possible to access the snapshot_id if the AMI is in a 
+  # different account.
   availability_zone = var.availability_zone
   encrypted         = true
-  snapshot_id       = each.value.snapshot_id
   iops              = try(each.value.iops > 0, false) ? each.value.iops : null
   throughput        = try(each.value.throughput > 0, false) ? each.value.throughput : null
   size              = each.value.size
