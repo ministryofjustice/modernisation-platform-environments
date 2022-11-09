@@ -78,7 +78,7 @@ locals {
       dev-nomis-db-2 = {
         tags = {
           server-type = "nomis-db"
-          description = "temp, testing terraform only"
+          description = "temp for testing terraform only"
           oracle-sids = "CNOMT1"
           monitored   = false
         }
