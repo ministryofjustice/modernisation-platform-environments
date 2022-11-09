@@ -1,6 +1,6 @@
 # DSOS-1553
 module "jb_load_balancer_test" {
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer.git?ref=1981116be7ef580c7550045dce04551e74d627e6"
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer.git?ref=v2.1.0"
   count  = local.environment == "test" ? 1 : 0
   providers = {
     aws.bucket-replication = aws
