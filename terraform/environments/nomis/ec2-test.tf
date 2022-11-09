@@ -191,14 +191,6 @@ resource "aws_security_group" "ec2_test" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  egress {
-    description = "allow all outbound traffic from same security group"
-    from_port   = 0
-    to_port     = 0
-    protocol    = -1
-    self        = true
-  }
-
   tags = merge(
     local.tags,
     {
