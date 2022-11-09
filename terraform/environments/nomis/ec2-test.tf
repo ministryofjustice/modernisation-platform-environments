@@ -174,6 +174,14 @@ resource "aws_security_group" "ec2_test" {
     cidr_blocks = [local.cidrs.cloud_platform]
   }
 
+  ingress {
+    description = "allow all inbound traffic from same security group"
+    from_port   = 0
+    to_port     = 0
+    protocol    = -1
+    self        = true
+  }
+
   egress {
     description = "allow all"
     from_port   = 0
