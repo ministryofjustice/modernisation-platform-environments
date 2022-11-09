@@ -14,7 +14,7 @@
     "logConfiguration": {
       "logDriver": "awslogs",
       "options": {
-        "awslogs-region": "${app_name}",
+        "awslogs-region": "${region}",
         "awslogs-stream-prefix": "${app_name}-app",
         "awslogs-group": "${app_name}-ecs-log-group"
       }
@@ -34,7 +34,7 @@
     "logConfiguration": {
       "logDriver": "awslogs",
       "options": {
-        "awslogs-region": "${app_name}",
+        "awslogs-region": "${region}",
         "awslogs-stream-prefix": "${app_name}-app",
         "awslogs-group": "${app_name}-ecs-log-group"
       }
