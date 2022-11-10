@@ -122,8 +122,9 @@ locals {
           instance_type                = "t2.medium"
           metadata_options_http_tokens = "optional"
         }
-        ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3*"
-        branch   = var.BRANCH_NAME # comment in if testing ansible
+        ssm_parameters = {}
+        ami_name       = "nomis_rhel_6_10_weblogic_appserver_10_3*"
+        branch         = var.BRANCH_NAME # comment in if testing ansible
       }
     }
   }
