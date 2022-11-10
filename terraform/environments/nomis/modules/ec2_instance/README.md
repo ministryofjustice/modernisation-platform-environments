@@ -80,12 +80,14 @@ NOTE: oracle-sids is used earlier in the setup and there may be more then one in
 Connect to the new database instance using aws ssm as normal
 
 Run the following commands
+
 ```
 sudo su - oracle
 . oraenv
 +ASM
 crsctl stat res -t
 ```
+
 You should see the following output:
 
 ```
