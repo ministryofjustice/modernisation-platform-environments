@@ -113,8 +113,10 @@ locals {
       }
       dev-weblogic-appserver103 = {
         tags = {
-          description = "For testing our weblogic appserver 10.3 image without final provisioning"
-          monitored   = false
+          description        = "For testing our weblogic appserver 10.3 image without final provisioning"
+          monitored          = false
+          oracle-db-hostname = "dev-nomis-db-1"
+          oracle-sid         = "CNOMT1"
         }
         instance = {
           instance_type                = "t2.medium"
