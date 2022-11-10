@@ -101,4 +101,4 @@ This is another case where a tag in the ec2-instance module is used to run a rol
 
 Specify a target for the connection check by including a `fixngo-connection-target` tag as an IP address. This will extend the 'oracle-db-monitoring' role in modernisation-platforms-configuration-management to check the connection back to the Azure/fixngo environment. For example adding the tag `fixngo-connection-target = "10.40.0.136"` for checking connections to Azure/fixngo PCMCL00041.
 
-Usually this is only needed on database instances but it can be added to any instance by supplying this tag.
+This tag/setup is only currently available on database instances as this the only one which calls the oracle-db-monitoring playbook.
