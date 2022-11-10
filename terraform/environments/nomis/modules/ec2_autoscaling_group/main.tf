@@ -1,6 +1,7 @@
 resource "aws_launch_template" "this" {
   name                                 = var.name
   disable_api_termination              = var.instance.disable_api_termination
+  ebs_optimized                        = data.aws_ec2_instance_type.this.ebs_optimized_support == "unsupported" ? false : true
   image_id                             = data.aws_ami.this.id
   instance_initiated_shutdown_behavior = "terminate"
   instance_type                        = var.instance.instance_type
@@ -84,6 +85,7 @@ resource "aws_autoscaling_group" "this" {
   min_size                  = var.autoscaling_group.min_size
   health_check_grace_period = var.autoscaling_group.health_check_grace_period
   health_check_type         = var.autoscaling_group.health_check_type
+  force_delete              = var.autoscaling_group.force_delete
   termination_policies      = var.autoscaling_group.termination_policies
   target_group_arns         = var.autoscaling_group.target_group_arns
   vpc_zone_identifier       = [data.aws_subnet.this.id]
@@ -92,6 +94,16 @@ resource "aws_autoscaling_group" "this" {
   launch_template {
     id      = aws_launch_template.this.id
     version = "$Default"
+  }
+
+  dynamic "initial_lifecycle_hook" {
+    for_each = var.autoscaling_group.initial_lifecycle_hooks != null ? var.autoscaling_group.initial_lifecycle_hooks : {}
+    content {
+      name                 = "${var.name}-${initial_lifecycle_hook.key}"
+      default_result       = initial_lifecycle_hook.value.default_result
+      heartbeat_timeout    = initial_lifecycle_hook.value.heartbeat_timeout
+      lifecycle_transition = initial_lifecycle_hook.value.lifecycle_transition
+    }
   }
 
   dynamic "instance_refresh" {
@@ -113,7 +125,7 @@ resource "aws_autoscaling_group" "this" {
     content {
       pool_state                  = warm_pool.value.pool_state
       min_size                    = warm_pool.value.min_size
-      max_group_prepared_capacity = warm_pool.value.max_group_prepared_capacity
+      max_group_prepared_capacity = coalesce(warm_pool.value.max_group_prepared_capacity, var.autoscaling_group.max_size)
 
       instance_reuse_policy {
         reuse_on_scale_in = warm_pool.value.reuse_on_scale_in
@@ -137,16 +149,6 @@ resource "aws_autoscaling_group" "this" {
   ]
 }
 
-resource "aws_autoscaling_lifecycle_hook" "this" {
-  for_each = var.autoscaling_lifecycle_hooks
-
-  name                   = "${var.name}-${each.key}"
-  autoscaling_group_name = aws_autoscaling_group.this.name
-  default_result         = each.value.default_result
-  heartbeat_timeout      = each.value.heartbeat_timeout
-  lifecycle_transition   = each.value.lifecycle_transition
-}
-
 resource "aws_autoscaling_schedule" "this" {
   for_each = var.autoscaling_schedules
 
@@ -156,6 +158,29 @@ resource "aws_autoscaling_schedule" "this" {
   desired_capacity       = coalesce(each.value.desired_capacity, var.autoscaling_group.desired_capacity)
   recurrence             = each.value.recurrence
   autoscaling_group_name = aws_autoscaling_group.this.name
+}
+
+resource "random_password" "this" {
+  for_each = var.ssm_parameters != null ? var.ssm_parameters : {}
+
+  length  = each.value.random.length
+  special = lookup(each.value.random, "special", null)
+}
+
+resource "aws_ssm_parameter" "this" {
+  for_each = var.ssm_parameters != null ? var.ssm_parameters : {}
+
+  name        = "/${var.ssm_parameters_prefix}${var.name}/${each.key}"
+  description = each.value.description
+  type        = "SecureString"
+  value       = random_password.this[each.key].result
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "${var.name}-${each.key}"
+    }
+  )
 }
 
 resource "aws_iam_role" "this" {
@@ -184,6 +209,41 @@ resource "aws_iam_role" "this" {
     Name = "${var.iam_resource_names_prefix}-role-${var.name}"
     }
   )
+}
+
+data "aws_iam_policy_document" "asm_parameter" {
+  statement {
+    effect  = "Allow"
+    actions = ["ssm:GetParameter"]
+    #tfsec:ignore:aws-iam-no-policy-wildcards: acccess scoped to parameter path
+    resources = ["arn:aws:ssm:${var.region}:${data.aws_caller_identity.current.id}:parameter/${var.ssm_parameters_prefix}${var.name}/*"]
+  }
+}
+
+resource "aws_iam_role_policy" "asm_parameter" {
+  count  = var.ssm_parameters != null ? 1 : 0
+  name   = "asm-parameter-access-${var.name}"
+  role   = aws_iam_role.this.id
+  policy = data.aws_iam_policy_document.asm_parameter.json
+}
+
+data "aws_iam_policy_document" "lifecycle_hooks" {
+  statement {
+    sid     = "TriggerInstanceLifecycleHooks"
+    effect  = "Allow"
+    actions = ["autoscaling:CompleteLifecycleAction"]
+    #tfsec:ignore:aws-iam-no-policy-wildcards: this needs to be created before the autoscaling group, therefore the ASG ID needs to be wildcarded
+    resources = [
+      "arn:aws:autoscaling:${var.region}:${data.aws_caller_identity.current.id}:autoScalingGroup:*:autoScalingGroupName/${var.name}"
+    ]
+  }
+}
+
+resource "aws_iam_role_policy" "lifecycle_hooks" {
+  count  = var.autoscaling_group.initial_lifecycle_hooks != null ? 1 : 0
+  name   = "trigger-instance-lifecycle-hooks-${var.name}"
+  role   = aws_iam_role.this.id
+  policy = data.aws_iam_policy_document.lifecycle_hooks.json
 }
 
 resource "aws_iam_instance_profile" "this" {

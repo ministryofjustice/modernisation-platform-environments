@@ -2,16 +2,7 @@
 # EC2 Instances following naming convention
 #------------------------------------------------------------------------------
 
-# SET TAGS
 locals {
-
-  # user can manually increase the desired capacity to 1 via CLI/console 
-  # to create an instance
-  ec2_test_autoscaling_group = {
-    desired_capacity = 0
-    max_size         = 2
-    min_size         = 0
-  }
 
   ec2_test = {
 
@@ -31,7 +22,6 @@ locals {
 
     ebs_volume_config = {}
     ebs_volumes       = {}
-    ssm_parameters    = {}
 
     user_data = {
       scripts     = ["ansible-ec2provision.sh.tftpl"]
@@ -43,9 +33,13 @@ locals {
       create_external_record = false
     }
 
-    autoscaling_group = local.ec2_test_autoscaling_group
-
-    autoscaling_lifecycle_hooks = {}
+    # user can manually increase the desired capacity to 1 via CLI/console 
+    # to create an instance
+    autoscaling_group = {
+      desired_capacity = 0
+      max_size         = 2
+      min_size         = 0
+    }
 
     autoscaling_schedules = {
       # if sizes not set, use the values defined in autoscaling_group
@@ -79,8 +73,8 @@ module "ec2_test_instance" {
   user_data             = merge(local.ec2_test.user_data, lookup(each.value, "user_data", {}))
   ebs_volume_config     = merge(local.ec2_test.ebs_volume_config, lookup(each.value, "ebs_volume_config", {}))
   ebs_volumes           = { for k, v in local.ec2_test.ebs_volumes : k => merge(v, try(each.value.ebs_volumes[k], {})) }
-  ssm_parameters_prefix = "test/"
-  ssm_parameters        = merge(local.ec2_test.ssm_parameters, lookup(each.value, "ssm_parameters", {}))
+  ssm_parameters_prefix = lookup(each.value, "ssm_parameters_prefix", "test/")
+  ssm_parameters        = lookup(each.value, "ssm_parameters", null)
   route53_records       = merge(local.ec2_test.route53_records, lookup(each.value, "route53_records", {}))
 
   iam_resource_names_prefix = "ec2-test-instance"
@@ -112,15 +106,16 @@ module "ec2_test_autoscaling_group" {
 
   name = each.key
 
-  ami_name                    = each.value.ami_name
-  ami_owner                   = try(each.value.ami_owner, "core-shared-services-production")
-  instance                    = merge(local.ec2_test.instance, lookup(each.value, "instance", {}))
-  user_data                   = merge(local.ec2_test.user_data, lookup(each.value, "user_data", {}))
-  ebs_volume_config           = merge(local.ec2_test.ebs_volume_config, lookup(each.value, "ebs_volume_config", {}))
-  ebs_volumes                 = { for k, v in local.ec2_test.ebs_volumes : k => merge(v, try(each.value.ebs_volumes[k], {})) }
-  autoscaling_group           = merge(local.ec2_test.autoscaling_group, lookup(each.value, "autoscaling_group", {}))
-  autoscaling_lifecycle_hooks = merge(local.ec2_test.autoscaling_lifecycle_hooks, lookup(each.value, "autoscaling_lifecycle_hooks", {}))
-  autoscaling_schedules       = coalesce(lookup(each.value, "autoscaling_schedules", null), local.ec2_test.autoscaling_schedules)
+  ami_name              = each.value.ami_name
+  ami_owner             = try(each.value.ami_owner, "core-shared-services-production")
+  instance              = merge(local.ec2_test.instance, lookup(each.value, "instance", {}))
+  user_data             = merge(local.ec2_test.user_data, lookup(each.value, "user_data", {}))
+  ebs_volume_config     = merge(local.ec2_test.ebs_volume_config, lookup(each.value, "ebs_volume_config", {}))
+  ebs_volumes           = { for k, v in local.ec2_test.ebs_volumes : k => merge(v, try(each.value.ebs_volumes[k], {})) }
+  ssm_parameters_prefix = lookup(each.value, "ssm_parameters_prefix", "test/")
+  ssm_parameters        = lookup(each.value, "ssm_parameters", null)
+  autoscaling_group     = merge(local.ec2_test.autoscaling_group, lookup(each.value, "autoscaling_group", {}))
+  autoscaling_schedules = coalesce(lookup(each.value, "autoscaling_schedules", null), local.ec2_test.autoscaling_schedules)
 
   iam_resource_names_prefix = "ec2-test-asg"
   instance_profile_policies = local.ec2_common_managed_policies
