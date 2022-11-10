@@ -55,11 +55,11 @@ e.g. nomis-test.tf
 ```
       t1-nomis-db-1 = {
         tags = {
-          server-type = "nomis-db"
-          description = "T1 NOMIS test database to replace Azure T1PDL0009"
-          oracle-sids = "CNOMT1"
-          monitored   = false
-          always-on   = true
+          server-type       = "nomis-db"
+          description       = "T1 NOMIS test database to replace Azure T1PDL0009"
+          oracle-sids       = "CNOMT1"
+          monitored         = false
+          always-on         = true
           s3-db-restore-dir = "CNOMT1_20211214"
         }
         ami_name = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-07T12-48-08.562Z"
@@ -74,3 +74,29 @@ e.g. nomis-test.tf
 ```
 
 NOTE: oracle-sids is used earlier in the setup and there may be more then one in some cases.
+
+### Checking database restore has completed succesfully
+
+Connect to the new database instance using aws ssm as normal
+
+Run the following commands
+```
+sudo su - oracle
+. oraenv
++ASM
+crsctl stat res -t
+```
+You should see the following output:
+
+```
+ora.<database_name>.db
+          1       ONLINE         ONLINE         <machine_name>        Open
+```
+
+## Adding Monitoring config to check connection back to Azure/fixngo environment
+
+This is another case where a tag in the ec2-instance module is used to run a role in [modernisation-platforms-configuration-management](https://github.com/ministryofjustice/modernisation-platform-configuration-management)
+
+Specify a target for the connection check by including a `fixngo-connection-target` tag as an IP address. This will extend the 'oracle-db-monitoring' role in modernisation-platforms-configuration-management to check the connection back to the Azure/fixngo environment. For example adding the tag `fixngo-connection-target = "10.40.0.136"` for checking connections to Azure/fixngo PCMCL00041.
+
+Usually this is only needed on database instances but it can be added to any instance by supplying this tag.
