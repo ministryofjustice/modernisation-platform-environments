@@ -111,9 +111,9 @@ locals {
         ami_name = "nomis_rhel_6_10_baseimage*"
         # branch   = var.BRANCH_NAME # comment in if testing ansible
       }
-      dev-weblogic-appserver103 = {
+      dev-nomis-web = {
         tags = {
-          description        = "For testing our weblogic appserver 10.3 image without final provisioning"
+          description        = "For testing nomis weblogic appserver 10.3"
           monitored          = false
           oracle-db-hostname = "dev-nomis-db-1"
           oracle-sid         = "CNOMT1"
