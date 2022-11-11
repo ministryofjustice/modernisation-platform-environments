@@ -7,7 +7,10 @@ locals {
     always_on         = lookup(var.tags, "always-on", true) # backward compat.
     server-name       = var.name
   }
-  tags = merge(local.default_tags, var.tags)
+  ssm_parameters_prefix_tag = var.ssm_parameters_prefix == "" ? {} : {
+    ssm-parameters-prefix = var.ssm_parameters_prefix
+  }
+  tags = merge(local.default_tags, local.ssm_parameters_prefix_tag, var.tags)
 
   ami_block_device_mappings = {
     for bdm in data.aws_ami.this.block_device_mappings : bdm.device_name => bdm
