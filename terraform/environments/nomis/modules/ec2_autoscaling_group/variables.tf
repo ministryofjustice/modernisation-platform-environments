@@ -177,9 +177,9 @@ variable "autoscaling_group" {
       instance_warmup        = number
     }))
     warm_pool = optional(object({
-      pool_state                  = string
-      min_size                    = number
-      max_group_prepared_capacity = number
+      pool_state                  = optional(string)
+      min_size                    = optional(number)
+      max_group_prepared_capacity = optional(number)
       reuse_on_scale_in           = bool
     }))
   })

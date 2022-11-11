@@ -130,6 +130,9 @@ locals {
               lifecycle_transition = "autoscaling:EC2_INSTANCE_LAUNCHING"
             }
           }
+          warm_pool = {
+            reuse_on_scale_in = true
+          }
         }
         ssm_parameters = {}
         ami_name       = "nomis_rhel_6_10_weblogic_appserver_10_3*"
