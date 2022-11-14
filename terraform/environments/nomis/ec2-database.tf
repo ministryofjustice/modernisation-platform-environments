@@ -190,7 +190,7 @@ resource "aws_security_group" "database_common" {
     protocol    = "TCP"
     security_groups = [
       aws_security_group.weblogic_common.id,
-      aws_security_group.ec2_test
+      aws_security_group.ec2_test.id
     ]
   }
 
