@@ -107,7 +107,19 @@ locals {
       }
     }
 
-    # Add weblogic instances here.  They will be created using the weblogic module
+    # Add weblogic instances here
+    weblogic_autoscaling_groups = {
+      t1-nomis-web = {
+        tags = {
+          oracle-db-hostname = "db.CNOMT1.nomis.hmpps-test.modernisation-platform.internal"
+          oracle-sid         = "CNOMT1"
+        }
+        ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2022-11-14T13-19-15.629Z"
+        branch   = var.BRANCH_NAME # comment in if testing ansible
+      }
+    }
+
+    # Legacy weblogic, to be zapped imminently
     weblogics = {
       CNOMT1 = {
         ami_name     = "nomis_Weblogic_2022*"
@@ -155,33 +167,6 @@ locals {
         }
         ami_name = "nomis_rhel_6_10_baseimage*"
         # branch   = var.BRANCH_NAME # comment in if testing ansible
-      }
-      test-nomis-web = {
-        tags = {
-          description        = "For testing nomis weblogic appserver 10.3"
-          monitored          = false
-          oracle-db-hostname = "db.CNOMT1.nomis.hmpps-test.modernisation-platform.internal"
-          oracle-sid         = "CNOMT1"
-        }
-        instance = {
-          instance_type                = "t2.medium"
-          metadata_options_http_tokens = "optional"
-        }
-        autoscaling_group = {
-          initial_lifecycle_hooks = {
-            "ready-hook" = {
-              default_result       = "ABANDON"
-              heartbeat_timeout    = 3000 # inital weblogic setup takes about 45 mins!
-              lifecycle_transition = "autoscaling:EC2_INSTANCE_LAUNCHING"
-            }
-          }
-          #          warm_pool = {
-          #            reuse_on_scale_in = true
-          #          }
-        }
-        ssm_parameters = {}
-        ami_name       = "nomis_rhel_6_10_weblogic_appserver_10_3*"
-        branch         = var.BRANCH_NAME # comment in if testing ansible
       }
     }
   }
