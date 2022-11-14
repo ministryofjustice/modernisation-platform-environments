@@ -49,7 +49,7 @@ locals {
       initial_lifecycle_hooks = {
         "ready-hook" = {
           default_result       = "ABANDON"
-          heartbeat_timeout    = 3000 # inital weblogic setup takes about 45 mins!
+          heartbeat_timeout    = 7200 # on a good day it takes 30 mins, but can be much longer
           lifecycle_transition = "autoscaling:EC2_INSTANCE_LAUNCHING"
         }
       }
@@ -61,7 +61,7 @@ locals {
       instance_refresh = {
         strategy               = "Rolling"
         min_healthy_percentage = 90 # seems that instances in the warm pool are included in the % health count so this needs to be set fairly high
-        instance_warmup        = 3000
+        instance_warmup        = 300
       }
     }
   }
