@@ -24,7 +24,13 @@ locals {
     ebs_volumes       = {}
 
     user_data = {
-      scripts     = ["ansible-ec2provision.sh.tftpl"]
+      args = {
+        lifecycle_hook_name = "ready-hook"
+      }
+      scripts = [
+        "ansible-ec2provision.sh.tftpl",
+        "post-ec2provision.sh.tftpl"
+      ]
       write_files = {}
     }
 
