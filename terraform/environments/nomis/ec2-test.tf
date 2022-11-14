@@ -53,8 +53,6 @@ locals {
         recurrence = "0 7 * * Mon-Fri"
       }
       "scale_down" = {
-        min_size         = 0
-        max_size         = 0
         desired_capacity = 0
         recurrence       = "0 19 * * Mon-Fri"
       }
