@@ -34,7 +34,7 @@ locals {
 
     autoscaling_group = {
       desired_capacity = 1
-      max_size         = 6
+      max_size         = 2
       min_size         = 0
 
       health_check_grace_period = 300
@@ -54,7 +54,8 @@ locals {
         }
       }
       warm_pool = {
-        reuse_on_scale_in = true
+        reuse_on_scale_in           = true
+        max_group_prepared_capacity = 1
       }
 
       instance_refresh = {
@@ -114,8 +115,8 @@ module "ec2_weblogic_autoscaling_group" {
   user_data             = merge(local.ec2_weblogic.user_data, lookup(each.value, "user_data", {}))
   ebs_volume_config     = lookup(each.value, "ebs_volume_config", {})
   ebs_volumes           = lookup(each.value, "ebs_volumes", {})
-  ssm_parameters_prefix = lookup(each.value, "ssm_parameters_prefix", "weblogic/")
-  ssm_parameters        = lookup(each.value, "ssm_parameters", null)
+  ssm_parameters_prefix = "weblogic/"
+  ssm_parameters        = {}
   autoscaling_group     = merge(local.ec2_weblogic.autoscaling_group, lookup(each.value, "autoscaling_group", {}))
   autoscaling_schedules = coalesce(lookup(each.value, "autoscaling_schedules", null), {
     # if sizes not set, use the values defined in autoscaling_group
