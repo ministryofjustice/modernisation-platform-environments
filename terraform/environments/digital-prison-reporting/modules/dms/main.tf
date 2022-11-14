@@ -1,0 +1,72 @@
+# Create a new DMS replication instance
+resource "aws_dms_replication_instance" "link" {
+  allocated_storage            = "${var.replication_instance_storage}"
+  apply_immediately            = true
+  auto_minor_version_upgrade   = true
+  availability_zone            = "${lookup(var.availability_zones, count.index)}"
+  engine_version               = "${var.replication_instance_version}"
+  multi_az                     = false
+  preferred_maintenance_window = "${var.replication_instance_maintenance_window}"
+  publicly_accessible          = false
+  replication_instance_class   = "${var.replication_instance_class}"
+  replication_instance_id      = "dms-replication-instance-tf"
+  replication_subnet_group_id  = "${aws_dms_replication_subnet_group.dms.id}"
+  vpc_security_group_ids       = ["${aws_security_group.rds.id}"]
+
+  tags = var.tags
+}
+
+# Create an endpoint for the source database
+resource "aws_dms_endpoint" "source" {
+  database_name = "${var.source_db_name}"
+  endpoint_id   = "${var.stack_name}-dms-${var.environment}-source"
+  endpoint_type = "source"
+  engine_name   = "${var.source_engine_name}"
+  password      = "${var.source_app_password}"
+  port          = "${var.source_db_port}"
+  server_name   = "${aws_db_instance.source.address}" // TBC
+  ssl_mode      = "none"
+  username      = "${var.source_app_username}"
+
+  tags = var.tags
+}
+
+# Create an endpoint for the target Kinesis
+resource "aws_dms_endpoint" "target" {
+  endpoint_id   = "${var.stack_name}-dms-${var.environment}-target"
+  endpoint_type = "target"
+  engine_name   = "${var.target_engine}"
+
+  kinesis_settings = {
+    service_access_role_arn        = aws_iam_role.dms-kinesis-role.arn
+    stream_arn                     = data.aws_kinesis_stream.rating_replication_stream.arn
+    partition_include_schema_table = true
+    include_partition_value        = true
+  }
+
+  tags = var.tags
+}
+
+# Create a subnet in each availability zone
+resource "aws_subnet" "database" {
+  count  = "${length(var.availability_zones)}"
+  vpc_id = "${aws_vpc.vpc.id}"
+
+  cidr_block        = "${element(var.database_subnet_cidr, count.index)}"
+  availability_zone = "${lookup(var.availability_zones, count.index)}"
+
+  tags {
+    Name        = "${var.stack_name}-database-subnet-${var.environment}-${lookup(var.availability_zones, count.index)}"
+    owner       = "${var.owner}"
+    stack_name  = "${var.stack_name}"
+    environment = "${var.environment}"
+    created_by  = "terraform"
+  }
+}
+
+# Create a subnet group using existing VPC subnets
+resource "aws_dms_replication_subnet_group" "dms" {
+  replication_subnet_group_description = "DMS replication subnet group"
+  replication_subnet_group_id          = "dms-replication-subnet-group-tf"
+  subnet_ids                           = ["${aws_subnet.database.*.id}"]
+}
