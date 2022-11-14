@@ -114,12 +114,12 @@ locals {
           oracle-db-hostname = "db.CNOMT1.nomis.hmpps-test.modernisation-platform.internal"
           oracle-sid         = "CNOMT1"
         }
-        ami_name                 = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2022-11-02T00-00-24.828Z"
-        offpeak_desired_capacity = 0
+        # ami_name                 = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2022-11-02T00-00-24.828Z"
+        offpeak_desired_capacity = 1               # set to 0 after testing
         branch                   = var.BRANCH_NAME # comment in if testing ansible
 
         # NOTE: The following stig enabled image is timing out during provisioning (>45mins)
-        # ami_name                 = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2022-11-14T13-19-15.629Z"
+        ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2022-11-14T13-19-15.629Z"
       }
     }
 
