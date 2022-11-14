@@ -841,6 +841,20 @@ module "s3_artifacts_store" {
   )
 }
 
+# DMS Data Collector
+module "dms_nomis_t3" {
+  source            = "./modules/dms"
+  create_connection = local.create_glue_connection
+  name              = "${local.project}-dms-nomis-ingestor-${local.env}"
+  connection_url    = ""
+  description       = "DMS"
+  security_groups   = []
+  availability_zone = ""
+  subnet            = ""
+  password          = ""
+  username          = ""
+}
+
 ##########################
 # Application Backend TF # 
 ##########################
