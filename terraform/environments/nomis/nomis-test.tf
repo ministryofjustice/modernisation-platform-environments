@@ -114,8 +114,12 @@ locals {
           oracle-db-hostname = "db.CNOMT1.nomis.hmpps-test.modernisation-platform.internal"
           oracle-sid         = "CNOMT1"
         }
-        ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2022-11-14T13-19-15.629Z"
-        branch   = var.BRANCH_NAME # comment in if testing ansible
+        ami_name                 = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2022-11-02T00-00-24.828Z"
+        offpeak_desired_capacity = 0
+        branch                   = var.BRANCH_NAME # comment in if testing ansible
+
+        # NOTE: The following stig enabled image is timing out during provisioning (>45mins)
+        # ami_name                 = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2022-11-14T13-19-15.629Z"
       }
     }
 
@@ -142,30 +146,6 @@ locals {
           monitored   = false
         }
         ami_name = "nomis_rhel_7_9_baseimage_2022-11-01T13-43-46.384Z"
-        # branch   = var.BRANCH_NAME # comment in if testing ansible
-      }
-    }
-    ec2_test_autoscaling_groups = {
-      test-base-rhel79 = {
-        tags = {
-          ami         = "nomis_rhel_7_9_baseimage"
-          description = "For testing our base RHEL7.9 base image"
-          monitored   = false
-        }
-        ami_name = "nomis_rhel_7_9_baseimage*"
-        # branch   = var.BRANCH_NAME # comment in if testing ansible
-      }
-      test-base-rhel610 = {
-        tags = {
-          ami         = "nomis_rhel_6_10_baseimage"
-          description = "For testing our base RHEL6.10 base image"
-          monitored   = false
-        }
-        instance = {
-          instance_type                = "t2.medium"
-          metadata_options_http_tokens = "optional"
-        }
-        ami_name = "nomis_rhel_6_10_baseimage*"
         # branch   = var.BRANCH_NAME # comment in if testing ansible
       }
     }
