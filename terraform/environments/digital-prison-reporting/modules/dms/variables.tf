@@ -30,6 +30,20 @@ variable "availability_zone" {
   default = null
 }
 
+variable "create" {
+  default = true
+}
+
+variable "create_iam_roles" {
+  default = true  
+}
+
+variable "iam_role_permissions_boundary" {
+  description = "ARN of the policy that is used to set the permissions boundary for the role"
+  type        = string
+  default     = null
+}
+
 # Used in tagginga and naming the resources
 
 variable "stack_name" {
