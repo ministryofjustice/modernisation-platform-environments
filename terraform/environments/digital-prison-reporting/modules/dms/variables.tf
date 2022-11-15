@@ -10,12 +10,12 @@ variable "tags" {
 
 variable "availability_zones" {
   default = [
-      {
-          0 = "eu-west-2a"
-          1 = "eu-west-2b"
-          2 = "eu-west-2c"
-      }
-      ]
+    {
+      0 = "eu-west-2a"
+      1 = "eu-west-2b"
+      2 = "eu-west-2c"
+    }
+  ]
 }
 
 variable "source_address" {}
