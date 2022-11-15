@@ -74,6 +74,8 @@ resource "aws_security_group_rule" "internal_lb_egress_1" {
   source_security_group_id = aws_security_group.weblogic_common.id
 }
 
+# TODO: This resource should be removed once testing of the MP load balancer
+# module in nomis-test is complete.
 resource "aws_lb" "internal" {
   #checkov:skip=CKV_AWS_91:skip "Ensure the ELBv2 (Application/Network) has access logging enabled". Logging can be considered when the MP load balancer module is available
   count                      = local.environment == "test" ? 0 : 1
@@ -93,10 +95,11 @@ resource "aws_lb" "internal" {
   )
 }
 
+# TODO: Add an 'arn' output to the MP load balancer module. Hardcoding as a
+# string for now. The 'load_balancer_arn' condition should also be removed when
+# testing in nomis-test is complete.
 resource "aws_lb_listener" "internal" {
-  # TODO: Add an 'arn' output to the MP load balancer module. Hardcoding as a
-  # string for now.
-  load_balancer_arn = "arn:aws:elasticloadbalancing:eu-west-2:612659970365:loadbalancer/app/jbtest-lb/7e3d2cc41770e409"
+  load_balancer_arn = local.environment == "test" ? "arn:aws:elasticloadbalancing:eu-west-2:612659970365:loadbalancer/app/jbtest-lb/7e3d2cc41770e409" : aws_lb.internal.arn
   port              = "443"
   protocol          = "HTTPS"
   #checkov:skip=CKV_AWS_103:the application does not support tls 1.2
@@ -119,14 +122,16 @@ resource "aws_lb_listener_certificate" "certificate_az" {
   listener_arn    = aws_lb_listener.internal.arn
   certificate_arn = aws_acm_certificate.internal_lb_az[0].arn
 }
+
+# TODO: Add an 'arn' output to the MP load balancer module. Hardcoding as a
+# string for now. The 'load_balancer_arn' condition should also be removed when
+# testing in nomis-test is complete.
 resource "aws_lb_listener" "internal_http" {
   depends_on = [
     aws_acm_certificate_validation.internal_lb
   ]
 
-  # TODO: Add an 'arn' output to the MP load balancer module. Hardcoding as a
-  # string for now.
-  load_balancer_arn = "arn:aws:elasticloadbalancing:eu-west-2:612659970365:loadbalancer/app/jbtest-lb/7e3d2cc41770e409"
+  load_balancer_arn = local.environment == "test" ? "arn:aws:elasticloadbalancing:eu-west-2:612659970365:loadbalancer/app/jbtest-lb/7e3d2cc41770e409" : aws_lb.internal.arn
   port              = "80"
   protocol          = "HTTP"
 
@@ -143,6 +148,9 @@ resource "aws_lb_listener" "internal_http" {
 #------------------------------------------------------------------------------
 # Route 53 record
 #------------------------------------------------------------------------------
+# TODO: Add outputs 'dns_name' and 'zone_id' to the MP load balancer module.
+# Hardcoding as strings for now. The 'alias.name' and 'alias.zone_id' conditions
+# should also be removed when testing in nomis-test is complete.
 resource "aws_route53_record" "internal_lb" {
   provider = aws.core-vpc
 
@@ -151,10 +159,8 @@ resource "aws_route53_record" "internal_lb" {
   type    = "A"
 
   alias {
-    # TODO: Add outputs 'dns_name' and 'zone_id' to the MP load balancer module.
-    # Hardcoding as strings for now.
-    name                   = "internal-jbtest-lb-1400065058.eu-west-2.elb.amazonaws.com"
-    zone_id                = "ZHURV8PSTC4K8"
+    name                   = local.environment == "test" ? "internal-jbtest-lb-1400065058.eu-west-2.elb.amazonaws.com" : aws_lb.internal.dns_name
+    zone_id                = local.environment == "test" ? "ZHURV8PSTC4K8" : aws_lb.internal.zone_id
     evaluate_target_health = true
   }
 }
@@ -258,6 +264,9 @@ resource "aws_route53_zone" "az" {
   )
 }
 
+# TODO: Add outputs 'dns_name' and 'zone_id' to the MP load balancer module.
+# Hardcoding as strings for now. The 'alias.name' and 'alias.zone_id' conditions
+# should also be removed when testing in nomis-test is complete.
 resource "aws_route53_record" "internal_lb_az" {
   count   = local.environment == "test" ? 1 : 0
   zone_id = aws_route53_zone.az[0].zone_id
@@ -265,10 +274,8 @@ resource "aws_route53_record" "internal_lb_az" {
   type    = "A"
 
   alias {
-    # TODO: Add outputs 'dns_name' and 'zone_id' to the MP load balancer module.
-    # Hardcoding as strings for now.   
-    name                   = "internal-jbtest-lb-1400065058.eu-west-2.elb.amazonaws.com"
-    zone_id                = "ZHURV8PSTC4K8"
+    name                   = local.environment == "test" ? "internal-jbtest-lb-1400065058.eu-west-2.elb.amazonaws.com" : aws_lb.internal.dns_name
+    zone_id                = local.environment == "test" ? "ZHURV8PSTC4K8" : aws_lb.internal.zone_id
     evaluate_target_health = true
   }
 }
