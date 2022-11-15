@@ -99,7 +99,9 @@
 # }
 
 resource "aws_lb_listener" "internal" {
-  load_balancer_arn = aws_lb.internal.arn
+  # TODO: Add an ARN output to the MP load balancer module. Hardcoding as a
+  # string for now.
+  load_balancer_arn = "arn:aws:elasticloadbalancing:eu-west-2:612659970365:loadbalancer/app/jbtest-lb/7e3d2cc41770e409"
   port              = "443"
   protocol          = "HTTPS"
   #checkov:skip=CKV_AWS_103:the application does not support tls 1.2
@@ -127,7 +129,9 @@ resource "aws_lb_listener" "internal_http" {
     aws_acm_certificate_validation.internal_lb
   ]
 
-  load_balancer_arn = aws_lb.internal.arn
+  # TODO: Add an ARN output to the MP load balancer module. Hardcoding as a
+  # string for now.
+  load_balancer_arn = "arn:aws:elasticloadbalancing:eu-west-2:612659970365:loadbalancer/app/jbtest-lb/7e3d2cc41770e409"
   port              = "80"
   protocol          = "HTTP"
 
