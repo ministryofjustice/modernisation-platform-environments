@@ -3,7 +3,7 @@ resource "aws_dms_replication_instance" "dms" {
   allocated_storage            = "${var.replication_instance_storage}"
   apply_immediately            = true
   auto_minor_version_upgrade   = true
-  availability_zone            = "${lookup(var.availability_zones, count.index)}"
+  availability_zone            = "eu-west-2a"
   engine_version               = "${var.replication_instance_version}"
   multi_az                     = false
   preferred_maintenance_window = "${var.replication_instance_maintenance_window}"
@@ -11,13 +11,13 @@ resource "aws_dms_replication_instance" "dms" {
   replication_instance_class   = "${var.replication_instance_class}"
   replication_instance_id      = var.name
   replication_subnet_group_id  = "${aws_dms_replication_subnet_group.dms.id}"
-  vpc_security_group_ids       = ["${aws_security_group.rds.id}"]
+  vpc_security_group_ids       = ["${aws_dms_replication_subnet_group.dms.id}"]
 
   tags = var.tags
 }
 
-data "template_file" "table-mappings-from-oracle-to-pg" {
-  template = file("./templates/table-mappings-from-oracle-to-kinesis.json.tpl")
+data "template_file" "table-mappings-from-oracle-to-kinesis" {
+  template = file("${path.module}/templates/table-mappings-from-oracle-to-kinesis.json.tpl")
 }
 
 resource "aws_dms_replication_task" "rt-mssql-pg" {
@@ -28,7 +28,12 @@ resource "aws_dms_replication_task" "rt-mssql-pg" {
   source_endpoint_arn       = aws_dms_endpoint.source.endpoint_arn
   target_endpoint_arn       = aws_dms_endpoint.target.endpoint_arn
   table_mappings            = data.template_file.table-mappings-from-oracle-to-kinesis.rendered
-  replication_task_settings = file("./userdata/task-settings-from-mssql-to-pg.json")
+  replication_task_settings = file("${path.module}/templates/replication-settings.json")
+
+
+  lifecycle {
+	  ignore_changes = ["replication_task_settings"]
+  }
 }
 
 # Create an endpoint for the source database
@@ -39,7 +44,7 @@ resource "aws_dms_endpoint" "source" {
   engine_name   = "${var.source_engine_name}"
   password      = "${var.source_app_password}"
   port          = "${var.source_db_port}"
-  server_name   = "${aws_db_instance.source.address}" // TBC
+  server_name   = var.source_address // TBC
   ssl_mode      = "none"
   username      = "${var.source_app_username}"
 
@@ -52,9 +57,9 @@ resource "aws_dms_endpoint" "target" {
   endpoint_type = "target"
   engine_name   = "${var.target_engine}"
 
-  kinesis_settings = {
+  kinesis_settings {
     service_access_role_arn        = aws_iam_role.dms-kinesis-role.arn
-    stream_arn                     = data.aws_kinesis_stream.rating_replication_stream.arn
+    stream_arn                     = var.kinesis_target_stream
     partition_include_schema_table = true
     include_partition_value        = true
   }
@@ -65,18 +70,13 @@ resource "aws_dms_endpoint" "target" {
 # Create a subnet in each availability zone
 resource "aws_subnet" "database" {
   count  = "${length(var.availability_zones)}"
-  vpc_id = "${aws_vpc.vpc.id}"
+  vpc_id = var.vpc
 
   cidr_block        = "${element(var.database_subnet_cidr, count.index)}"
   availability_zone = "${lookup(var.availability_zones, count.index)}"
 
-  tags {
-    Name        = "${var.stack_name}-database-subnet-${var.environment}-${lookup(var.availability_zones, count.index)}"
-    owner       = "${var.owner}"
-    stack_name  = "${var.stack_name}"
-    environment = "${var.environment}"
-    created_by  = "terraform"
-  }
+  tags = var.tags
+
 }
 
 # Create a subnet group using existing VPC subnets

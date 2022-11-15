@@ -16,6 +16,14 @@ variable "availability_zones" {
     }
 }
 
+variable "source_address" {}
+
+variable "vpc" {}
+
+variable "kinesis_target_stream" {}
+
+variable "kinesis_stream_policy" {}
+
 # Used in tagginga and naming the resources
 
 variable "stack_name" {
@@ -58,9 +66,9 @@ variable "target_backup_window" {
   description = "RDS backup window"
 }
 
-variable "target_db_name" {
-  description = "Name of the target database"
-}
+#variable "target_db_name" {
+#  description = "Name of the target database"
+#}
 
 variable "target_db_port" {
   description = "The port the Application Server will access the database on"
@@ -87,9 +95,9 @@ variable "target_maintenance_window" {
   description = "RDS maintenance window"
 }
 
-variable "target_password" {
-  description = "Password of the target database"
-}
+#variable "target_password" {
+#  description = "Password of the target database"
+#}
 
 variable "target_rds_is_multi_az" {
   description = "Create backup database in separate availability zone"
@@ -106,9 +114,9 @@ variable "target_storage_encrypted" {
   default     = false
 }
 
-variable "target_username" {
-  description = "Username to access the target database"
-}
+#variable "target_username" {
+#  description = "Username to access the target database"
+#}
 
 #--------------------------------------------------------------
 # DMS source config
@@ -179,9 +187,9 @@ variable "source_rds_is_multi_az" {
   default     = "false"
 }
 
-variable "source_snapshot" {
-  description = "Snapshot ID"
-}
+#variable "source_snapshot" {
+#  description = "Snapshot ID"
+#}
 
 variable "source_storage" {
   default     = "10"

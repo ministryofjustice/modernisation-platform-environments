@@ -843,14 +843,19 @@ module "s3_artifacts_store" {
 
 # DMS Data Collector
 module "dms_nomis_t3" {
-  source            = "./modules/dms"
-  name              = "${local.project}-dms-t3nomis-ingestor-${local.env}"
-  description       = "DMS"
-  vpc_cidr          = [data.aws_vpc.shared.cidr_block]
+  source                = "./modules/dms"
+  name                  = "${local.project}-dms-t3nomis-ingestor-${local.env}"
+  vpc_cidr              = [data.aws_vpc.shared.cidr_block]
+  source_app_username   = "digital_prison_reporting"
+  source_app_password   = "DSkpo4n7GhnmIV"
+  source_address        = "test-address"
+  vpc                   = data.aws_vpc.shared.id
+  kinesis_target_stream = local.kinesis_stream_ingestor
+  kinesis_stream_policy = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_write_only_arn
+
   availability_zones= {
         0 = "eu-west-2a"
   }
-  replication_instance_storageq= 20
 
   tags = merge(
     local.all_tags,

@@ -71,6 +71,6 @@ EOF
 #DMS Role with kinesis Write Access
 resource "aws_iam_role_policy_attachment" "dms-kinesis-attachment" {
   role       = aws_iam_role.dms-kinesis-role.name
-  policy_arn = var.<kinesis-ingestor-write-acces-arn>
+  policy_arn = var.kinesis_stream_policy
 }
 
