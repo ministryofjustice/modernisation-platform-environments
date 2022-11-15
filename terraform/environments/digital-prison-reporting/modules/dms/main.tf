@@ -17,7 +17,7 @@ resource "aws_dms_replication_instance" "dms" {
 }
 
 data "template_file" "table-mappings-from-oracle-to-kinesis" {
-  template = file("${path.module}/templates/table-mappings-from-oracle-to-kinesis.json.tpl")
+  template = file("${path.module}/config/table-mappings-from-oracle-to-kinesis.json.tpl")
 }
 
 resource "aws_dms_replication_task" "rt-mssql-pg" {
@@ -28,7 +28,7 @@ resource "aws_dms_replication_task" "rt-mssql-pg" {
   source_endpoint_arn       = aws_dms_endpoint.source.endpoint_arn
   target_endpoint_arn       = aws_dms_endpoint.target.endpoint_arn
   table_mappings            = data.template_file.table-mappings-from-oracle-to-kinesis.rendered
-  replication_task_settings = file("${path.module}/templates/replication-settings.json")
+  replication_task_settings = file("${path.module}/config/replication-settings.json")
 
 
   lifecycle {

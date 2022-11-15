@@ -49,7 +49,7 @@ EOF
 
 #DMS Kinesis Endpoint role
 resource "aws_iam_role" "dms-kinesis-role" {
-  name = "dms-vpc-role-1"
+  name = "dms-kenisis-endpoint-role"
   path = "/"
 
   assume_role_policy = <<EOF
