@@ -111,33 +111,6 @@ locals {
         ami_name = "nomis_rhel_6_10_baseimage*"
         # branch   = var.BRANCH_NAME # comment in if testing ansible
       }
-      dev-nomis-web = {
-        tags = {
-          description        = "For testing nomis weblogic appserver 10.3"
-          monitored          = false
-          oracle-db-hostname = "dev-nomis-db-1"
-          oracle-sid         = "CNOMT1"
-        }
-        instance = {
-          instance_type                = "t2.medium"
-          metadata_options_http_tokens = "optional"
-        }
-        autoscaling_group = {
-          initial_lifecycle_hooks = {
-            "ready-hook" = {
-              default_result       = "ABANDON"
-              heartbeat_timeout    = 3000 # inital weblogic setup takes about 45 mins!
-              lifecycle_transition = "autoscaling:EC2_INSTANCE_LAUNCHING"
-            }
-          }
-          #          warm_pool = {
-          #            reuse_on_scale_in = true
-          #          }
-        }
-        ssm_parameters = {}
-        ami_name       = "nomis_rhel_6_10_weblogic_appserver_10_3*"
-        branch         = var.BRANCH_NAME # comment in if testing ansible
-      }
     }
   }
 }
