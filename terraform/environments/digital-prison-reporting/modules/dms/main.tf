@@ -78,7 +78,7 @@ resource "aws_subnet" "database" {
   tags = merge(
     var.tags,
     {
-      subnet_index  = "dms-pri-subnet-${count.index+1}"
+      subnet_index = "dms-pri-subnet-${count.index + 1}"
     }
   )
 
