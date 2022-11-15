@@ -1,7 +1,7 @@
 {
   "accounts": {
     "development": {
-      "application_name": "MAATDB", # Must be upper case.
+      "application_name": "MAATDB",
       "region": "eu-west-2",
       "allocated_storage": 10,
       "engine": "oracle-se2",
