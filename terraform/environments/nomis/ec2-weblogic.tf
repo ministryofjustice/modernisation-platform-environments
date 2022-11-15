@@ -191,7 +191,9 @@ resource "aws_security_group" "weblogic_common" {
     protocol    = "TCP"
     security_groups = [
       aws_security_group.jumpserver-windows.id,
-      aws_security_group.internal_elb.id
+      # TODO: Add a 'security_group_id' output to the MP load balancer module.
+      # Hardcoding as a string for now.
+      "sg-075cf385b5a966b04"
     ]
   }
 
