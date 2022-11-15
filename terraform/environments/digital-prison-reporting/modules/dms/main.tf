@@ -21,7 +21,7 @@ data "template_file" "table-mappings-from-oracle-to-kinesis" {
 }
 
 resource "aws_dms_replication_task" "dms-replication" {
-  count                     = 0  
+  count                     = 0
   migration_type            = "cdc"
   replication_instance_arn  = aws_dms_replication_instance.dms.replication_instance_arn
   replication_task_id       = "dms-rt-mssql-pg"
@@ -32,7 +32,7 @@ resource "aws_dms_replication_task" "dms-replication" {
 
 
   lifecycle {
-	  ignore_changes = [replication_task_settings]
+    ignore_changes = [replication_task_settings]
   }
 }
 
