@@ -156,10 +156,10 @@ resource "aws_route53_record" "internal_lb" {
   type    = "A"
 
   alias {
-    # TODO: Add a 'dns_name' output to the MP load balancer module. Hardcoding
-    # as a string for now.
+    # TODO: Add outputs 'dns_name' and 'zone_id' to the MP load balancer module.
+    # Hardcoding as strings for now.
     name                   = "internal-jbtest-lb-1400065058.eu-west-2.elb.amazonaws.com"
-    zone_id                = aws_lb.internal.zone_id
+    zone_id                = "ZHURV8PSTC4K8"
     evaluate_target_health = true
   }
 }
@@ -270,10 +270,10 @@ resource "aws_route53_record" "internal_lb_az" {
   type    = "A"
 
   alias {
-    # TODO: Add a 'dns_name' output to the MP load balancer module. Hardcoding
-    # as a string for now.    
+    # TODO: Add outputs 'dns_name' and 'zone_id' to the MP load balancer module.
+    # Hardcoding as strings for now.   
     name                   = "internal-jbtest-lb-1400065058.eu-west-2.elb.amazonaws.com"
-    zone_id                = aws_lb.internal.zone_id
+    zone_id                = "ZHURV8PSTC4K8"
     evaluate_target_health = true
   }
 }
