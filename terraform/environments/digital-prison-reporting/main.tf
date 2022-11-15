@@ -853,8 +853,8 @@ module "dms_nomis_t3" {
   kinesis_target_stream = local.kinesis_stream_ingestor
   kinesis_stream_policy = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_write_only_arn
 
-  availability_zones= {
-        0 = "eu-west-2a"
+  availability_zones = {
+    0 = "eu-west-2a"
   }
 
   tags = merge(

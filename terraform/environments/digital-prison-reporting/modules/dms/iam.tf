@@ -22,7 +22,7 @@ EOF
 # Attach an admin policy to the role
 resource "aws_iam_role_policy" "dmsvpcpolicy" {
   name = "dmsvpcpolicy"
-  role = "${aws_iam_role.dmsvpcrole.id}"
+  role = aws_iam_role.dmsvpcrole.id
 
   policy = <<EOF
 {

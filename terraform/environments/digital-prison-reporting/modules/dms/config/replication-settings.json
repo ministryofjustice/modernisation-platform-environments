@@ -1,5 +1,5 @@
 {
-"FullLoadSettings": {
+  "FullLoadSettings": {
     "TargetTablePrepMode": "DO_NOTHING",
     "CreatePkAfterFullLoad": false,
     "StopTaskCachedChangesApplied": false,
@@ -7,53 +7,53 @@
     "MaxFullLoadSubTasks": 8,
     "TransactionConsistencyTimeout": 600,
     "CommitRate": 10000
-},
-"Logging": {
+  },
+  "Logging": {
     "EnableLogging": true,
     "LogComponents": [
-        {
-            "Id": "SOURCE_UNLOAD",
-            "Severity": "LOGGER_SEVERITY_DEFAULT"
-        },
-        {
-            "Id": "TARGET_LOAD",
-            "Severity": "LOGGER_SEVERITY_DEFAULT"
-        },
-        {
-            "Id": "SOURCE_CAPTURE",
-            "Severity": "LOGGER_SEVERITY_DEFAULT"
-        },
-        {
-            "Id": "TARGET_APPLY",
-            "Severity": "LOGGER_SEVERITY_DEFAULT"
-        },
-        {
-            "Id": "TASK_MANAGER",
-            "Severity": "LOGGER_SEVERITY_DEFAULT"
-        }
+      {
+        "Id": "SOURCE_UNLOAD",
+        "Severity": "LOGGER_SEVERITY_DEFAULT"
+      },
+      {
+        "Id": "TARGET_LOAD",
+        "Severity": "LOGGER_SEVERITY_DEFAULT"
+      },
+      {
+        "Id": "SOURCE_CAPTURE",
+        "Severity": "LOGGER_SEVERITY_DEFAULT"
+      },
+      {
+        "Id": "TARGET_APPLY",
+        "Severity": "LOGGER_SEVERITY_DEFAULT"
+      },
+      {
+        "Id": "TASK_MANAGER",
+        "Severity": "LOGGER_SEVERITY_DEFAULT"
+      }
     ],
     "CloudWatchLogGroup": "dms-nomis",
     "CloudWatchLogStream": null
-},
-"ControlTablesSettings": {
+  },
+  "ControlTablesSettings": {
     "historyTimeslotInMinutes": 5,
     "ControlSchema": "",
     "HistoryTimeslotInMinutes": 5,
     "HistoryTableEnabled": false,
     "SuspendedTablesTableEnabled": false,
     "StatusTableEnabled": false
-},
-"StreamBufferSettings": {
+  },
+  "StreamBufferSettings": {
     "StreamBufferCount": 3,
     "StreamBufferSizeInMB": 8,
     "CtrlStreamBufferSizeInMB": 5
-},
-"ChangeProcessingDdlHandlingPolicy": {
+  },
+  "ChangeProcessingDdlHandlingPolicy": {
     "HandleSourceTableDropped": true,
     "HandleSourceTableTruncated": true,
     "HandleSourceTableAltered": true
-},
-"ErrorBehavior": {
+  },
+  "ErrorBehavior": {
     "DataErrorPolicy": "LOG_ERROR",
     "DataTruncationErrorPolicy": "LOG_ERROR",
     "DataErrorEscalationPolicy": "SUSPEND_TABLE",
@@ -74,8 +74,8 @@
     "FullLoadIgnoreConflicts": true,
     "FailOnTransactionConsistencyBreached": false,
     "FailOnNoTablesCaptured": false
-},
-"ChangeProcessingTuning": {
+  },
+  "ChangeProcessingTuning": {
     "BatchApplyPreserveTransaction": true,
     "BatchApplyTimeoutMin": 1,
     "BatchApplyTimeoutMax": 30,
@@ -86,8 +86,8 @@
     "MemoryLimitTotal": 1024,
     "MemoryKeepTime": 60,
     "StatementCacheSize": 50
-},
-"PostProcessingRules": null,
-"CharacterSetSettings": null,
-"LoopbackPreventionSettings": null
+  },
+  "PostProcessingRules": null,
+  "CharacterSetSettings": null,
+  "LoopbackPreventionSettings": null
 }
