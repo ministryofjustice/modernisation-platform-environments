@@ -6,9 +6,10 @@ data "aws_iam_policy_document" "dms_assume_role" {
     actions = ["sts:AssumeRole"]
 
     principals {
-      identifiers = [dms.amazonaws.com]
-      type        = "Service"
+      identifiers = ["dms.amazonaws.com"]
+      type        = "Service"  
     }
+    
   }
 }
 
