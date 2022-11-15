@@ -12,7 +12,6 @@ data "aws_subnets" "private" {
 }
 
 resource "aws_security_group" "internal_elb" {
-  count       = local.environment == "test" ? 0 : 1
   name        = "internal-lb-${local.application_name}"
   description = "Allow inbound traffic to internal load balancer"
   vpc_id      = local.vpc_id
@@ -26,7 +25,6 @@ resource "aws_security_group" "internal_elb" {
 }
 
 resource "aws_security_group_rule" "internal_lb_ingress_1" {
-  count             = local.environment == "test" ? 0 : 1
   description       = "allow 443 inbound from PTTP devices"
   security_group_id = aws_security_group.internal_elb.id
   type              = "ingress"
@@ -37,7 +35,6 @@ resource "aws_security_group_rule" "internal_lb_ingress_1" {
 }
 
 resource "aws_security_group_rule" "internal_lb_ingress_2" {
-  count                    = local.environment == "test" ? 0 : 1
   description              = "allow 443 inbound from Jump Server"
   security_group_id        = aws_security_group.internal_elb.id
   type                     = "ingress"
@@ -48,7 +45,6 @@ resource "aws_security_group_rule" "internal_lb_ingress_2" {
 }
 
 resource "aws_security_group_rule" "internal_lb_ingress_3" {
-  count             = local.environment == "test" ? 0 : 1
   description       = "allow 80 inbound from PTTP devices"
   security_group_id = aws_security_group.internal_elb.id
   type              = "ingress"
@@ -59,7 +55,6 @@ resource "aws_security_group_rule" "internal_lb_ingress_3" {
 }
 
 resource "aws_security_group_rule" "internal_lb_ingress_4" {
-  count                    = local.environment == "test" ? 0 : 1
   description              = "allow 80 inbound from Jump Server"
   security_group_id        = aws_security_group.internal_elb.id
   type                     = "ingress"
@@ -70,7 +65,6 @@ resource "aws_security_group_rule" "internal_lb_ingress_4" {
 }
 
 resource "aws_security_group_rule" "internal_lb_egress_1" {
-  count                    = local.environment == "test" ? 0 : 1
   description              = "allow outbound to weblogic targets"
   security_group_id        = aws_security_group.internal_elb.id
   type                     = "egress"
