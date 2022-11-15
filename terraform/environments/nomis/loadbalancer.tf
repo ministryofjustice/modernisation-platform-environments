@@ -11,92 +11,93 @@ data "aws_subnets" "private" {
   }
 }
 
-# resource "aws_security_group" "internal_elb" {
+resource "aws_security_group" "internal_elb" {
+  count       = local.environment == "test" ? 0 : 1
+  name        = "internal-lb-${local.application_name}"
+  description = "Allow inbound traffic to internal load balancer"
+  vpc_id      = local.vpc_id
 
-#   name        = "internal-lb-${local.application_name}"
-#   description = "Allow inbound traffic to internal load balancer"
-#   vpc_id      = local.vpc_id
+  tags = merge(
+    local.tags,
+    {
+      Name = "internal-loadbalancer-sg"
+    },
+  )
+}
 
-#   tags = merge(
-#     local.tags,
-#     {
-#       Name = "internal-loadbalancer-sg"
-#     },
-#   )
-# }
+resource "aws_security_group_rule" "internal_lb_ingress_1" {
+  count             = local.environment == "test" ? 0 : 1
+  description       = "allow 443 inbound from PTTP devices"
+  security_group_id = aws_security_group.internal_elb.id
+  type              = "ingress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  cidr_blocks       = ["10.184.0.0/16"] # Global Protect PTTP devices
+}
 
-# resource "aws_security_group_rule" "internal_lb_ingress_1" {
+resource "aws_security_group_rule" "internal_lb_ingress_2" {
+  count                    = local.environment == "test" ? 0 : 1
+  description              = "allow 443 inbound from Jump Server"
+  security_group_id        = aws_security_group.internal_elb.id
+  type                     = "ingress"
+  from_port                = 443
+  to_port                  = 443
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.jumpserver-windows.id
+}
 
-#   description       = "allow 443 inbound from PTTP devices"
-#   security_group_id = aws_security_group.internal_elb.id
-#   type              = "ingress"
-#   from_port         = 443
-#   to_port           = 443
-#   protocol          = "tcp"
-#   cidr_blocks       = ["10.184.0.0/16"] # Global Protect PTTP devices
-# }
+resource "aws_security_group_rule" "internal_lb_ingress_3" {
+  count             = local.environment == "test" ? 0 : 1
+  description       = "allow 80 inbound from PTTP devices"
+  security_group_id = aws_security_group.internal_elb.id
+  type              = "ingress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  cidr_blocks       = ["10.184.0.0/16"] # Global Protect PTTP devices
+}
 
-# resource "aws_security_group_rule" "internal_lb_ingress_2" {
+resource "aws_security_group_rule" "internal_lb_ingress_4" {
+  count                    = local.environment == "test" ? 0 : 1
+  description              = "allow 80 inbound from Jump Server"
+  security_group_id        = aws_security_group.internal_elb.id
+  type                     = "ingress"
+  from_port                = 80
+  to_port                  = 80
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.jumpserver-windows.id
+}
 
-#   description              = "allow 443 inbound from Jump Server"
-#   security_group_id        = aws_security_group.internal_elb.id
-#   type                     = "ingress"
-#   from_port                = 443
-#   to_port                  = 443
-#   protocol                 = "tcp"
-#   source_security_group_id = aws_security_group.jumpserver-windows.id
-# }
+resource "aws_security_group_rule" "internal_lb_egress_1" {
+  count                    = local.environment == "test" ? 0 : 1
+  description              = "allow outbound to weblogic targets"
+  security_group_id        = aws_security_group.internal_elb.id
+  type                     = "egress"
+  from_port                = 7777
+  to_port                  = 7777
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.weblogic_common.id
+}
 
-# resource "aws_security_group_rule" "internal_lb_ingress_3" {
+resource "aws_lb" "internal" {
+  #checkov:skip=CKV_AWS_91:skip "Ensure the ELBv2 (Application/Network) has access logging enabled". Logging can be considered when the MP load balancer module is available
+  count                      = local.environment == "test" ? 0 : 1
+  name                       = "lb-internal-${local.application_name}"
+  internal                   = true
+  load_balancer_type         = "application"
+  security_groups            = [aws_security_group.internal_elb.id]
+  subnets                    = data.aws_subnets.private.ids
+  enable_deletion_protection = true
+  drop_invalid_header_fields = true
 
-#   description       = "allow 80 inbound from PTTP devices"
-#   security_group_id = aws_security_group.internal_elb.id
-#   type              = "ingress"
-#   from_port         = 80
-#   to_port           = 80
-#   protocol          = "tcp"
-#   cidr_blocks       = ["10.184.0.0/16"] # Global Protect PTTP devices
-# }
-
-# resource "aws_security_group_rule" "internal_lb_ingress_4" {
-
-#   description              = "allow 80 inbound from Jump Server"
-#   security_group_id        = aws_security_group.internal_elb.id
-#   type                     = "ingress"
-#   from_port                = 80
-#   to_port                  = 80
-#   protocol                 = "tcp"
-#   source_security_group_id = aws_security_group.jumpserver-windows.id
-# }
-
-# resource "aws_security_group_rule" "internal_lb_egress_1" {
-
-#   description              = "allow outbound to weblogic targets"
-#   security_group_id        = aws_security_group.internal_elb.id
-#   type                     = "egress"
-#   from_port                = 7777
-#   to_port                  = 7777
-#   protocol                 = "tcp"
-#   source_security_group_id = aws_security_group.weblogic_common.id
-# }
-
-# resource "aws_lb" "internal" {
-#   #checkov:skip=CKV_AWS_91:skip "Ensure the ELBv2 (Application/Network) has access logging enabled". Logging can be considered when the MP load balancer module is available
-#   name                       = "lb-internal-${local.application_name}"
-#   internal                   = true
-#   load_balancer_type         = "application"
-#   security_groups            = [aws_security_group.internal_elb.id]
-#   subnets                    = data.aws_subnets.private.ids
-#   enable_deletion_protection = true
-#   drop_invalid_header_fields = true
-
-#   tags = merge(
-#     local.tags,
-#     {
-#       Name = "internal-loadbalancer"
-#     },
-#   )
-# }
+  tags = merge(
+    local.tags,
+    {
+      Name = "internal-loadbalancer"
+    },
+  )
+}
 
 resource "aws_lb_listener" "internal" {
   # TODO: Add an 'arn' output to the MP load balancer module. Hardcoding as a
