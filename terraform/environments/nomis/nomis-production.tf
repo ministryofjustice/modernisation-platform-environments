@@ -119,7 +119,7 @@ locals {
           oracle-sids              = "PCNMAUD"
           monitored                = false
           always-on                = true
-          fixngo-connection-target = "10.40.3.132"
+          fixngo-connection-target = "10.40.0.136"
         }
         ami_name  = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-07T12-48-08.562Z"
         ami_owner = "self" # remove this line next time AMI is updated so core-shared-services-production used instead
