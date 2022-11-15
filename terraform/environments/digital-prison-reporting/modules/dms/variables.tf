@@ -35,7 +35,7 @@ variable "create" {
 }
 
 variable "create_iam_roles" {
-  default = true  
+  default = true
 }
 
 variable "iam_role_permissions_boundary" {
