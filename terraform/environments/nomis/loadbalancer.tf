@@ -78,7 +78,6 @@ resource "aws_security_group_rule" "internal_lb_egress_1" {
 # module in nomis-test is complete.
 resource "aws_lb" "internal" {
   #checkov:skip=CKV_AWS_91:skip "Ensure the ELBv2 (Application/Network) has access logging enabled". Logging can be considered when the MP load balancer module is available
-  count                      = local.environment == "test" ? 0 : 1
   name                       = "lb-internal-${local.application_name}"
   internal                   = true
   load_balancer_type         = "application"
