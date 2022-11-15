@@ -1,8 +1,40 @@
+#------------------------------------------------------------------------------
+# Jumpserver
+#------------------------------------------------------------------------------
+
 locals {
-  ec2_jumpserver_autoscaling_group = {
-    desired_capacity = 1
-    max_size         = 2
-    min_size         = 1
+  ec2_jumpserver = {
+    
+    tags = {
+      description = "nomis windows jumpserver"
+      component   = "jumpserver"
+    }
+
+    instance = {
+      disable_api_termination  = false # <= TODO: check what this is
+      metadata_options_http_tokens = "required" # (/)
+      metadata_options_http_endpoint = "enabled" # <= TODO: chech whether the module knows what this is
+      instance_type                        = "t3.medium" # (/)
+      key_name                             = aws_key_pair.ec2-user.key_name # (/)
+      # vpc_security_group_ids       = [aws_security_group.weblogic_common.id] <= TODO: is this needed?
+      monitoring = false
+    }
+
+    secret_prefix = "/Jumpserver/Users"
+
+    #checkov:skip=CKV_SECRET_6: "Base64 High Entropy String"
+    user_data = base64encode(templatefile("./templates/jumpserver-user-data.yaml", { SECRET_PREFIX = local.ec2_jumpserver.secret_prefix, S3_BUCKET = module.s3-bucket.bucket.id }))
+
+    autoscaling_group = {  
+      desired_capacity = 1
+      max_size         = 2
+      min_size         = 0
+
+      # TODO: fill in the rest of the values here
+      force_delete        = true
+      vpc_zone_identifier = data.aws_subnets.jumpserver.ids # FIXME: <--- check this!
+    }
+  
   }
 }
 
@@ -13,18 +45,41 @@ module "ec2_jumpserver_autoscaling_group" {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
   }
 
-  # name = 
-  # ami_name =
-  # ami_owner = "core-shared-services-production"
-  /* instance                    = merge(local.ec2_test.instance, lookup(each.value, "instance", {}))
-  user_data                   = merge(local.ec2_test.user_data, lookup(each.value, "user_data", {}))
-  ebs_volume_config           = merge(local.ec2_test.ebs_volume_config, lookup(each.value, "ebs_volume_config", {}))
-  ebs_volumes                 = { for k, v in local.ec2_test.ebs_volumes : k => merge(v, try(each.value.ebs_volumes[k], {})) }
-  autoscaling_group           = merge(local.ec2_test.autoscaling_group, lookup(each.value, "autoscaling_group", {}))
-  autoscaling_lifecycle_hooks = merge(local.ec2_test.autoscaling_lifecycle_hooks, lookup(each.value, "autoscaling_lifecycle_hooks", {}))
-  autoscaling_schedules       = coalesce(lookup(each.value, "autoscaling_schedules", null), local.ec2_test.autoscaling_schedules)
+  for_each = try(local.environment_config.jumpserver_autoscaling_groups, {})
 
-  iam_resource_names_prefix = "ec2-test-asg"
+  name = each.key
+  ami_name = each.value.ami_name
+  ami_owner = try(each.value.ami_owner, "core-shared-services-production")
+  instance                    = merge(local.ec2_jumpserver.instance, lookup(each.value, "instance", {}))
+  user_data                   = merge(local.ec2_jumpserver.user_data, lookup(each.value, "user_data", {}))
+
+  # TODO: check which of these is correct
+  #ebs_volume_config           = merge(local.ec2_test.ebs_volume_config, lookup(each.value, "ebs_volume_config", {}))
+  #ebs_volumes                 = { for k, v in local.ec2_test.ebs_volumes : k => merge(v, try(each.value.ebs_volumes[k], {})) }
+  ebs_volume_config     = lookup(each.value, "ebs_volume_config", {})
+  ebs_volumes           = lookup(each.value, "ebs_volumes", {})
+  
+  # TODO: check where this is used
+  ssm_parameters_prefix = "jumpserver/"
+  ssm_parameters        = {}
+
+  autoscaling_group           = merge(local.ec2_jumpserver.autoscaling_group, lookup(each.value, "autoscaling_group", {}))
+  
+  # TODO: come back and check this
+  # autoscaling_lifecycle_hooks = merge(local.ec2_test.autoscaling_lifecycle_hooks, lookup(each.value, "autoscaling_lifecycle_hooks", {}))
+
+  autoscaling_schedules = coalesce(lookup(each.value, "autoscaling_schedules", null), {
+    # if sizes not set, use the values defined in autoscaling_group
+    "scale_up" = {
+      recurrence = "0 7 * * Mon-Fri"
+    }
+    "scale_down" = {
+      desired_capacity = lookup(each.value, "offpeak_desired_capacity", 0)
+      recurrence       = "0 19 * * Mon-Fri"
+    }
+  })
+
+  iam_resource_names_prefix = "ec2-jumpserver-asg"
   instance_profile_policies = local.ec2_common_managed_policies
 
   business_unit      = local.vpc_name
@@ -34,9 +89,9 @@ module "ec2_jumpserver_autoscaling_group" {
   availability_zone  = local.availability_zone
   subnet_set         = local.subnet_set
   subnet_name        = "data"
-  tags               = merge(local.tags, local.ec2_test.tags, try(each.value.tags, {}))
+  tags               = merge(local.tags, local.ec2_jumpserver.tags, try(each.value.tags, {}))
   account_ids_lookup = local.environment_management.account_ids
-  */
+
 
   ansible_repo         = "modernisation-platform-configuration-management"
   ansible_repo_basedir = "ansible"
@@ -44,6 +99,39 @@ module "ec2_jumpserver_autoscaling_group" {
   
 }
 
+#------------------------------------------------------------------------------
+# Common Security Group for Jumpserver Instances
+#------------------------------------------------------------------------------
+
+resource "aws_security_group" "jumpserver-windows" {
+  description = "Configure Windows jumpserver egress"
+  name        = "jumpserver-windows-${local.application_name}"
+  vpc_id      = local.vpc_id
+
+  ingress {
+    description = "access from Cloud Platform Prometheus server"
+    from_port   = "9100"
+    to_port     = "9100"
+    protocol    = "TCP"
+    cidr_blocks = [local.cidrs.cloud_platform]
+  }
+
+  egress {
+    description = "allow all"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    #tfsec:ignore:aws-vpc-no-public-egress-sgr
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "jumpserver-commmon"
+    }
+  )
+}
 
 #------------------------------------------------------------------------------
 # Windows Jumpserver
@@ -52,19 +140,17 @@ module "ec2_jumpserver_autoscaling_group" {
 # password to Secrets Manager, which only said user can access.
 #------------------------------------------------------------------------------
 
-locals {
-  secret_prefix = "/Jumpserver/Users"
-}
-
+# required as part of the user manager setup
 data "github_team" "jumpserver" {
   slug = "studio-webops"
 }
 
-data "aws_vpc" "jumpserver" {
+# TODO: remove this - part of the module
+/* data "aws_vpc" "jumpserver" {
   tags = {
     Name = "${local.vpc_name}-${local.environment}"
   }
-}
+} */
 data "aws_subnets" "jumpserver" {
   filter {
     name   = "vpc-id"
@@ -75,49 +161,30 @@ data "aws_subnets" "jumpserver" {
   }
 }
 
-data "aws_ami" "jumpserver" {
-  most_recent = true
-  owners      = [local.environment_management.account_ids["core-shared-services-production"]]
-
-  filter {
-    name   = "name"
-    values = ["nomis_windows_server_2022_jumpserver*"]
-  }
-
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
-}
-
 # instance launch template
 resource "aws_launch_template" "jumpserver" {
   name                                 = "${local.vpc_name}-${local.environment}-jumpserver"
   image_id                             = data.aws_ami.jumpserver.id
   instance_initiated_shutdown_behavior = "terminate"
-  instance_type                        = "t3.medium"
-  key_name                             = aws_key_pair.ec2-user.key_name
+  # // instance_type                        = "t3.medium"
+  # // key_name                             = aws_key_pair.ec2-user.key_name
   iam_instance_profile {
     arn = aws_iam_instance_profile.jumpserver.arn
   }
-  metadata_options {
-    http_endpoint = "enabled"
-    http_tokens   = "required"
-  }
+  # // metadata_options {
+  #  http_endpoint = "enabled"
+  #  http_tokens   = "required"
+  # }
 
-  monitoring {
+  /* monitoring {
     enabled = false
-  }
+  } */
 
   network_interfaces {
     associate_public_ip_address = false
     security_groups             = [aws_security_group.jumpserver-windows.id]
     delete_on_termination       = true
   }
-
-  #checkov:skip=CKV_SECRET_6: "Base64 High Entropy String"
-  user_data = base64encode(templatefile("./templates/jumpserver-user-data.yaml", { SECRET_PREFIX = local.secret_prefix, S3_BUCKET = module.s3-bucket.bucket.id }))
-
   tag_specifications {
     resource_type = "instance"
     tags = merge(
@@ -142,12 +209,12 @@ resource "aws_autoscaling_group" "jumpserver" {
     id      = aws_launch_template.jumpserver.id
     version = "$Default"
   }
-  desired_capacity    = 1
+  /* desired_capacity    = 1
   name                = "jumpserver-autoscaling-group"
   min_size            = 0
-  max_size            = 1
-  force_delete        = true
-  vpc_zone_identifier = data.aws_subnets.jumpserver.ids
+  max_size            = 1 */
+  /* force_delete        = true
+  vpc_zone_identifier = data.aws_subnets.jumpserver.ids */
   tag {
     key                 = "Name"
     value               = "jumpserver"
@@ -156,45 +223,6 @@ resource "aws_autoscaling_group" "jumpserver" {
   depends_on = [
     aws_launch_template.jumpserver
   ]
-}
-resource "aws_autoscaling_schedule" "scale_up" {
-  scheduled_action_name  = "jumpserver_scale_up"
-  min_size               = 0
-  max_size               = 1
-  desired_capacity       = 1
-  recurrence             = "0 7 * * Mon-Fri"
-  autoscaling_group_name = aws_autoscaling_group.jumpserver.name
-}
-
-resource "aws_autoscaling_schedule" "scale_down" {
-  scheduled_action_name  = "jumpserver_scale_down"
-  min_size               = 0
-  max_size               = 0
-  desired_capacity       = 0
-  recurrence             = "0 19 * * Mon-Fri"
-  autoscaling_group_name = aws_autoscaling_group.jumpserver.name
-}
-resource "aws_security_group" "jumpserver-windows" {
-  description = "Configure Windows jumpserver egress"
-  name        = "jumpserver-windows-${local.application_name}"
-  vpc_id      = local.vpc_id
-
-  ingress {
-    description = "access from Cloud Platform Prometheus server"
-    from_port   = "9100"
-    to_port     = "9100"
-    protocol    = "TCP"
-    cidr_blocks = [local.cidrs.cloud_platform]
-  }
-
-  egress {
-    description = "allow all"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    #tfsec:ignore:aws-vpc-no-public-egress-sgr
-    cidr_blocks = ["0.0.0.0/0"]
-  }
 }
 
 resource "aws_iam_role" "jumpserver" {
@@ -236,7 +264,7 @@ resource "aws_iam_instance_profile" "jumpserver" {
 resource "aws_secretsmanager_secret" "jumpserver" {
   #checkov:skip=CKV_AWS_149: "Ensure that Secrets Manager secret is encrypted using KMS CMK"
   for_each                = toset(data.github_team.jumpserver.members)
-  name                    = "${local.secret_prefix}/${each.value}"
+  name                    = "${local.ec2_jumpserver.secret_prefix}/${each.value}"
   policy                  = data.aws_iam_policy_document.jumpserver_secrets[each.value].json
   recovery_window_in_days = 0
   tags = merge(
@@ -274,7 +302,7 @@ data "aws_iam_policy_document" "jumpserver_users" {
   statement {
     effect    = "Allow"
     actions   = ["secretsmanager:PutSecretValue"]
-    resources = ["arn:aws:secretsmanager:${local.region}:${data.aws_caller_identity.current.id}:secret:${local.secret_prefix}/*"]
+    resources = ["arn:aws:secretsmanager:${local.region}:${data.aws_caller_identity.current.id}:secret:${local.ec2_jumpserver.secret_prefix}/*"]
   }
   statement {
     effect    = "Allow"
