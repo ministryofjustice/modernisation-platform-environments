@@ -50,7 +50,7 @@ resource "aws_iam_role" "dms_cloudwatch_logs_role" {
   description           = "DMS IAM role for CloudWatch logs permissions"
   permissions_boundary  = var.iam_role_permissions_boundary
   assume_role_policy    = data.aws_iam_policy_document.dms_assume_role[0].json
-  managed_policy_arns   = ["arn:${local.partition}:iam::aws:policy/service-role/AmazonDMSCloudWatchLogsRole"]
+  managed_policy_arns   = ["arn:aws:iam::aws:policy/service-role/AmazonDMSCloudWatchLogsRole"]
   force_detach_policies = true
 
   tags = merge(var.tags, var.iam_role_tags)
@@ -64,7 +64,7 @@ resource "aws_iam_role" "dmsvpcrole" {
   description           = "DMS IAM role for VPC permissions"
   permissions_boundary  = var.iam_role_permissions_boundary
   assume_role_policy    = data.aws_iam_policy_document.dms_assume_role[0].json
-  managed_policy_arns   = ["arn:${local.partition}:iam::aws:policy/service-role/AmazonDMSVPCManagementRole"]
+  managed_policy_arns   = ["arn:aws:iam::aws:policy/service-role/AmazonDMSVPCManagementRole"]
   force_detach_policies = true
 
   tags = var.tags
