@@ -20,8 +20,8 @@ data "template_file" "table-mappings-from-oracle-to-kinesis" {
   template = file("${path.module}/config/table-mappings-from-oracle-to-kinesis.json.tpl")
 }
 
-resource "aws_dms_replication_task" "rt-mssql-pg" {
-  count                     = 0
+resource "aws_dms_replication_task" "dms-replication" {
+  count                     = 0  
   migration_type            = "cdc"
   replication_instance_arn  = aws_dms_replication_instance.dms.replication_instance_arn
   replication_task_id       = "dms-rt-mssql-pg"
@@ -32,7 +32,7 @@ resource "aws_dms_replication_task" "rt-mssql-pg" {
 
 
   lifecycle {
-    ignore_changes = ["replication_task_settings"]
+	  ignore_changes = [replication_task_settings]
   }
 }
 
