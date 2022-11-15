@@ -28,7 +28,7 @@ jobs:
       with:
         fetch-depth: 0
     - name: Run Analysis
-      uses: ministryofjustice/github-actions/terraform-static-analysis@main
+      uses: ministryofjustice/github-actions/terraform-static-analysis@9a8388207b7cedd2684d766121108c90cb010234
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
@@ -46,7 +46,7 @@ jobs:
       with:
         fetch-depth: 0
     - name: Run Analysis
-      uses: ministryofjustice/github-actions/terraform-static-analysis@main
+      uses: ministryofjustice/github-actions/terraform-static-analysis@9a8388207b7cedd2684d766121108c90cb010234
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
@@ -64,14 +64,14 @@ jobs:
       with:
         fetch-depth: 0
     - name: Run Analysis
-      uses: ministryofjustice/github-actions/terraform-static-analysis@main
+      uses: ministryofjustice/github-actions/terraform-static-analysis@9a8388207b7cedd2684d766121108c90cb010234
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         scan_type: full
         tfsec_exclude: AWS095
         tflint_exclude: terraform_unused_declarations
-    - uses: 8398a7/action-slack@v3
+    - uses: 8398a7/action-slack@a189acbf0b7ea434558662ae25a0de71df69a435 # v3.14.0
       name: Slack failure notification
       with:
         job_name: Terraform Static Analysis - scheduled scan of all directories
