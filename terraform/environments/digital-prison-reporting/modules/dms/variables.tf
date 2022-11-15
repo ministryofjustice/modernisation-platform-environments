@@ -1,3 +1,21 @@
+variable "name" {
+  description = "DMS Replication name."
+}
+
+variable "tags" {
+  type        = map(string)
+  default     = {}
+  description = "(Optional) Key-value map of resource tags."
+}
+
+variable "availability_zones" {
+    default = {
+        0 = "eu-west-2a"
+        1 = "eu-west-2b"
+        2 = "eu-west-2c"
+    }
+}
+
 # Used in tagginga and naming the resources
 
 variable "stack_name" {
@@ -196,7 +214,7 @@ variable "replication_instance_storage" {
 
 variable "replication_instance_version" {
   description = "Engine version of the replication instance"
-  default     = "1.9.0"
+  default     = "3.4.6"
 }
 
 variable "replication_instance_class" {

@@ -844,15 +844,21 @@ module "s3_artifacts_store" {
 # DMS Data Collector
 module "dms_nomis_t3" {
   source            = "./modules/dms"
-  create_connection = local.create_glue_connection
-  name              = "${local.project}-dms-nomis-ingestor-${local.env}"
-  connection_url    = ""
+  name              = "${local.project}-dms-t3nomis-ingestor-${local.env}"
   description       = "DMS"
-  security_groups   = []
-  availability_zone = ""
-  subnet            = ""
-  password          = ""
-  username          = ""
+  vpc_cidr          = [data.aws_vpc.shared.cidr_block]
+  availability_zones= {
+        0 = "eu-west-2a"
+  }
+  replication_instance_storageq= 20
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-dms-t3nomis-ingestor-${local.env}"
+      Resource_Type = "DMS Replication"
+    }
+  )
 }
 
 ##########################

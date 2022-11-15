@@ -1,5 +1,5 @@
 # Create a new DMS replication instance
-resource "aws_dms_replication_instance" "link" {
+resource "aws_dms_replication_instance" "dms" {
   allocated_storage            = "${var.replication_instance_storage}"
   apply_immediately            = true
   auto_minor_version_upgrade   = true
@@ -9,11 +9,26 @@ resource "aws_dms_replication_instance" "link" {
   preferred_maintenance_window = "${var.replication_instance_maintenance_window}"
   publicly_accessible          = false
   replication_instance_class   = "${var.replication_instance_class}"
-  replication_instance_id      = "dms-replication-instance-tf"
+  replication_instance_id      = var.name
   replication_subnet_group_id  = "${aws_dms_replication_subnet_group.dms.id}"
   vpc_security_group_ids       = ["${aws_security_group.rds.id}"]
 
   tags = var.tags
+}
+
+data "template_file" "table-mappings-from-oracle-to-pg" {
+  template = file("./templates/table-mappings-from-oracle-to-kinesis.json.tpl")
+}
+
+resource "aws_dms_replication_task" "rt-mssql-pg" {
+  count                     = 0  
+  migration_type            = "cdc"
+  replication_instance_arn  = aws_dms_replication_instance.dms.replication_instance_arn
+  replication_task_id       = "dms-rt-mssql-pg"
+  source_endpoint_arn       = aws_dms_endpoint.source.endpoint_arn
+  target_endpoint_arn       = aws_dms_endpoint.target.endpoint_arn
+  table_mappings            = data.template_file.table-mappings-from-oracle-to-kinesis.rendered
+  replication_task_settings = file("./userdata/task-settings-from-mssql-to-pg.json")
 }
 
 # Create an endpoint for the source database
