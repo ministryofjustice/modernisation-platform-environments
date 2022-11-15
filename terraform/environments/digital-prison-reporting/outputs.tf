@@ -151,3 +151,9 @@ output "ec2_private_key" {
   value       = module.ec2_kinesis_agent.private_key
   #  sensitive = true
 }
+
+# DMS Subnet ids
+output "dms_subnets" {
+  description = "DMS Subnet IDs"
+  value       = module.dms_nomis_t3.dms_private_subnet_ids
+}

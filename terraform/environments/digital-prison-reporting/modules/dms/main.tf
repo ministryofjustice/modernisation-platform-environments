@@ -75,10 +75,14 @@ resource "aws_subnet" "database" {
   cidr_block        = element(var.database_subnet_cidr, count.index)
   availability_zone = lookup(var.availability_zones, count.index)
 
-  tags = var.tags
+  tags = merge(
+    var.tags,
+    {
+      subnet_index  = "dms-pri-subnet-${count.index+1}"
+    }
+  )
 
   # ${count.index+1} (probably use inside tags for Subnets //)
-
 }
 
 # Create a subnet group using existing VPC subnets
