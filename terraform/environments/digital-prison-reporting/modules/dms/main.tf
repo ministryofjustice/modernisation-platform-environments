@@ -3,9 +3,9 @@ resource "aws_dms_replication_instance" "dms" {
   allocated_storage            = var.replication_instance_storage
   apply_immediately            = true
   auto_minor_version_upgrade   = true
-  availability_zone            = "eu-west-2a"
+  availability_zone            = var.availability_zone
   engine_version               = var.replication_instance_version
-  multi_az                     = false
+  multi_az                     = true
   preferred_maintenance_window = var.replication_instance_maintenance_window
   publicly_accessible          = false
   replication_instance_class   = var.replication_instance_class

@@ -9,11 +9,7 @@ variable "tags" {
 }
 
 variable "availability_zones" {
-  default = {
-    0 = "eu-west-2a"
-    1 = "eu-west-2b"
-    2 = "eu-west-2c"
-  }
+  default = ["eu-west-2a", "eu-west-2b", "eu-west-2c"]
 }
 
 variable "source_address" {}
@@ -23,6 +19,10 @@ variable "vpc" {}
 variable "kinesis_target_stream" {}
 
 variable "kinesis_stream_policy" {}
+
+variable "availability_zone" {
+  default = null
+}
 
 # Used in tagginga and naming the resources
 
