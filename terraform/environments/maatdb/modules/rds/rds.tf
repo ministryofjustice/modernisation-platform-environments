@@ -147,6 +147,7 @@ resource "aws_db_instance" "appdb1" {
   copy_tags_to_snapshot                 = true
   storage_encrypted                     = true
   apply_immediately                     = true
+  snapshot_identifier                   = var.snapshot_arn
   tags = {
     Name = "${var.application_name}-${var.environment}-database"
   }
@@ -158,8 +159,6 @@ resource "aws_db_instance" "appdb1" {
 
 }
 
-# snapshot_identifier                   = var.snapshot_arn
-# final_snapshot_identifier             = "${var.application_name}-finalsnapshot"
 # enabled_cloudwatch_logs_exports       = ["general", "error", "slowquery"]
 
 # Security Group
