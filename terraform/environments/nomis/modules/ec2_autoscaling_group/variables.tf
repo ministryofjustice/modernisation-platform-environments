@@ -162,30 +162,27 @@ variable "autoscaling_group" {
     min_size                  = number
     health_check_grace_period = optional(number)
     health_check_type         = optional(string)
+    force_delete              = optional(bool)
     termination_policies      = optional(list(string))
     target_group_arns         = optional(list(string))
     wait_for_capacity_timeout = optional(number)
+    initial_lifecycle_hooks = optional(map(object({
+      default_result       = string
+      heartbeat_timeout    = number
+      lifecycle_transition = string
+    })))
     instance_refresh = optional(object({
       strategy               = string
       min_healthy_percentage = number
       instance_warmup        = number
     }))
     warm_pool = optional(object({
-      pool_state                  = string
-      min_size                    = number
-      max_group_prepared_capacity = number
+      pool_state                  = optional(string)
+      min_size                    = optional(number)
+      max_group_prepared_capacity = optional(number)
       reuse_on_scale_in           = bool
     }))
   })
-}
-
-variable "autoscaling_lifecycle_hooks" {
-  description = "See aws_autoscaling_lifecycle_hook documentation.  Key=name"
-  type = map(object({
-    default_result       = string
-    heartbeat_timeout    = number
-    lifecycle_transition = string
-  }))
 }
 
 variable "autoscaling_schedules" {
@@ -196,4 +193,22 @@ variable "autoscaling_schedules" {
     desired_capacity = optional(number)
     recurrence       = string
   }))
+}
+
+variable "ssm_parameters_prefix" {
+  type        = string
+  description = "Optionally prefix ssm parameters with this prefix.  Add a trailing /"
+  default     = ""
+}
+
+variable "ssm_parameters" {
+  description = "A map of SSM parameters to create.  If parameters are manually created, set to {} so IAM role still created"
+  type = map(object({
+    random = object({
+      length  = number
+      special = bool
+    })
+    description = string
+  }))
+  default = null
 }

@@ -172,6 +172,7 @@ variable "ssm_parameters_prefix" {
 }
 
 variable "ssm_parameters" {
+  description = "A map of SSM parameters to create.  If parameters are manually created, set to {} so IAM role still created"
   type = map(object({
     random = object({
       length  = number
@@ -179,4 +180,5 @@ variable "ssm_parameters" {
     })
     description = string
   }))
+  default = null
 }
