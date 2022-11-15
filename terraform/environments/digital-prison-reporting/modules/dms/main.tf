@@ -72,8 +72,8 @@ resource "aws_subnet" "database" {
   count  = length(var.availability_zones)
   vpc_id = var.vpc
 
-  cidr_block        = element(var.database_subnet_cidr, count.index)
-  availability_zone = lookup(var.availability_zones, count.index)
+  cidr_block        = element(var.database_subnet_cidr[count.index])
+  availability_zone = lookup(var.availability_zones[count.index])
 
   tags = var.tags
 
