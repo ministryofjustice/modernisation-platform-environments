@@ -1,3 +1,50 @@
+locals {
+  ec2_jumpserver_autoscaling_group = {
+    desired_capacity = 1
+    max_size         = 2
+    min_size         = 1
+  }
+}
+
+module "ec2_jumpserver_autoscaling_group" {
+  source = "./modules/ec2_autoscaling_group"
+
+  providers = {
+    aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
+  }
+
+  # name = 
+  # ami_name =
+  # ami_owner = "core-shared-services-production"
+  /* instance                    = merge(local.ec2_test.instance, lookup(each.value, "instance", {}))
+  user_data                   = merge(local.ec2_test.user_data, lookup(each.value, "user_data", {}))
+  ebs_volume_config           = merge(local.ec2_test.ebs_volume_config, lookup(each.value, "ebs_volume_config", {}))
+  ebs_volumes                 = { for k, v in local.ec2_test.ebs_volumes : k => merge(v, try(each.value.ebs_volumes[k], {})) }
+  autoscaling_group           = merge(local.ec2_test.autoscaling_group, lookup(each.value, "autoscaling_group", {}))
+  autoscaling_lifecycle_hooks = merge(local.ec2_test.autoscaling_lifecycle_hooks, lookup(each.value, "autoscaling_lifecycle_hooks", {}))
+  autoscaling_schedules       = coalesce(lookup(each.value, "autoscaling_schedules", null), local.ec2_test.autoscaling_schedules)
+
+  iam_resource_names_prefix = "ec2-test-asg"
+  instance_profile_policies = local.ec2_common_managed_policies
+
+  business_unit      = local.vpc_name
+  application_name   = local.application_name
+  environment        = local.environment
+  region             = local.region
+  availability_zone  = local.availability_zone
+  subnet_set         = local.subnet_set
+  subnet_name        = "data"
+  tags               = merge(local.tags, local.ec2_test.tags, try(each.value.tags, {}))
+  account_ids_lookup = local.environment_management.account_ids
+  */
+
+  ansible_repo         = "modernisation-platform-configuration-management"
+  ansible_repo_basedir = "ansible"
+  branch               = try(each.value.branch, "main") 
+  
+}
+
+
 #------------------------------------------------------------------------------
 # Windows Jumpserver
 # To add a new local user account, add a github username to `jumpserver_users`
