@@ -77,11 +77,13 @@ resource "aws_subnet" "database" {
 
   tags = var.tags
 
+  # ${count.index+1} (probably use inside tags for Subnets //)
+
 }
 
 # Create a subnet group using existing VPC subnets
 resource "aws_dms_replication_subnet_group" "dms" {
   replication_subnet_group_description = "DMS replication subnet group"
   replication_subnet_group_id          = "dms-replication-subnet-group-tf"
-  subnet_ids                           = ["${aws_subnet.database.*.id}"]
+  subnet_ids                           = aws_subnet.database.*.id
 }
