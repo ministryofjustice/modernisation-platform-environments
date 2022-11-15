@@ -26,6 +26,7 @@ module "rds" {
   performance_insights_retention_period = local.application_data.accounts[local.environment].performance_insights_retention_period
   lz_vpc_cidr                           = local.application_data.accounts[local.environment].lz_vpc_cidr
   snapshot_arn                          = local.application_data.accounts[local.environment].snapshot_arn
+  deletion_protection                   = local.application_data.accounts[local.environment].deletion_protection
   vpc_shared_id                         = data.aws_vpc.shared.id
   vpc_shared_cidr                       = data.aws_vpc.shared.cidr_block
   vpc_subnet_a_id                       = data.aws_subnet.data_subnets_a.id

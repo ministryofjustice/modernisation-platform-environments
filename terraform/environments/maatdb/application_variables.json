@@ -22,7 +22,8 @@
       "performance_insights_enabled": true,
       "performance_insights_retention_period": 7,
       "lz_vpc_cidr": "10.202.0.0/20",
-      "snapshot_arn": "arn:aws:rds:eu-west-2:411213865113:snapshot:maatdb-modplatform-copy"
+      "snapshot_arn": "arn:aws:rds:eu-west-2:411213865113:snapshot:maatdb-modplatform-copy",
+      "deletion_protection": false
     },
     "test": {
       "example_var": "test-data"

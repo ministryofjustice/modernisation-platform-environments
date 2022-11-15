@@ -114,6 +114,11 @@ variable "snapshot_arn" {
   description = "The ARN of the source snapshot"
 }
 
+variable "deletion_protection" {
+  type        = string
+  description = "deletion_protection"
+}
+
 variable "vpc_shared_id" {
   type        = string
   description = "vpc_shared_id"
@@ -138,6 +143,9 @@ variable "vpc_subnet_c_id" {
   type        = string
   description = "vpc_subnet_c_id"
 }
+
+
+
 
 
 

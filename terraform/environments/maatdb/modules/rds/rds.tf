@@ -143,7 +143,7 @@ resource "aws_db_instance" "appdb1" {
   license_model                         = var.license_model
   performance_insights_enabled          = var.performance_insights_enabled
   performance_insights_retention_period = var.performance_insights_retention_period
-  deletion_protection                   = true
+  deletion_protection                   = var.deletion_protection
   copy_tags_to_snapshot                 = true
   storage_encrypted                     = true
   apply_immediately                     = true
