@@ -31,7 +31,7 @@ module "httptest_sg" {
       to_port     = 65535
       protocol    = "tcp"
       description = "Outgoing"
-      cidr_blocks = local.lz_vpc_cidr
+      cidr_blocks = var.lz_vpc_cidr
     }
   ]
   ingress_with_cidr_blocks = [
@@ -40,7 +40,7 @@ module "httptest_sg" {
       to_port     = 80
       protocol    = "tcp"
       description = "HTTP"
-      cidr_blocks = local.lz_vpc_cidr
+      cidr_blocks = var.lz_vpc_cidr
     }
   ]
 }
