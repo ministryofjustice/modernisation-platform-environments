@@ -99,7 +99,7 @@ data "aws_subnets" "private" {
 # }
 
 resource "aws_lb_listener" "internal" {
-  # TODO: Add an ARN output to the MP load balancer module. Hardcoding as a
+  # TODO: Add an 'arn' output to the MP load balancer module. Hardcoding as a
   # string for now.
   load_balancer_arn = "arn:aws:elasticloadbalancing:eu-west-2:612659970365:loadbalancer/app/jbtest-lb/7e3d2cc41770e409"
   port              = "443"
@@ -129,7 +129,7 @@ resource "aws_lb_listener" "internal_http" {
     aws_acm_certificate_validation.internal_lb
   ]
 
-  # TODO: Add an ARN output to the MP load balancer module. Hardcoding as a
+  # TODO: Add an 'arn' output to the MP load balancer module. Hardcoding as a
   # string for now.
   load_balancer_arn = "arn:aws:elasticloadbalancing:eu-west-2:612659970365:loadbalancer/app/jbtest-lb/7e3d2cc41770e409"
   port              = "80"
@@ -156,7 +156,9 @@ resource "aws_route53_record" "internal_lb" {
   type    = "A"
 
   alias {
-    name                   = aws_lb.internal.dns_name
+    # TODO: Add a 'dns_name' output to the MP load balancer module. Hardcoding
+    # as a string for now.
+    name                   = "internal-jbtest-lb-1400065058.eu-west-2.elb.amazonaws.com"
     zone_id                = aws_lb.internal.zone_id
     evaluate_target_health = true
   }
@@ -268,7 +270,9 @@ resource "aws_route53_record" "internal_lb_az" {
   type    = "A"
 
   alias {
-    name                   = aws_lb.internal.dns_name
+    # TODO: Add a 'dns_name' output to the MP load balancer module. Hardcoding
+    # as a string for now.    
+    name                   = "internal-jbtest-lb-1400065058.eu-west-2.elb.amazonaws.com"
     zone_id                = aws_lb.internal.zone_id
     evaluate_target_health = true
   }
