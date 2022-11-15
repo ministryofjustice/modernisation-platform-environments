@@ -107,7 +107,26 @@ locals {
       }
     }
 
-    # Add weblogic instances here.  They will be created using the weblogic module
+    # Add weblogic instances here
+    weblogic_autoscaling_groups = {
+      t1-nomis-web = {
+        tags = {
+          oracle-db-hostname = "db.CNOMT1.nomis.hmpps-test.modernisation-platform.internal"
+          oracle-sid         = "CNOMT1"
+        }
+        ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2022-11-02T00-00-24.828Z"
+        # branch = var.BRANCH_NAME # comment in if testing ansible
+
+        # NOTE: setting desired capacity to 0 as this is not fully working yet
+        # See DSOS-1570 and DSOS-1571
+        autoscaling_group = {
+          desired_capacity = 0
+        }
+        offpeak_desired_capacity = 0
+      }
+    }
+
+    # Legacy weblogic, to be zapped imminently
     weblogics = {
       CNOMT1 = {
         ami_name     = "nomis_Weblogic_2022*"

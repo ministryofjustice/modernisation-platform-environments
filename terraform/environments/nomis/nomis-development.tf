@@ -111,19 +111,6 @@ locals {
         ami_name = "nomis_rhel_6_10_baseimage*"
         # branch   = var.BRANCH_NAME # comment in if testing ansible
       }
-      dev-weblogic-appserver103 = {
-        tags = {
-          description = "For testing our weblogic appserver 10.3 image without final provisioning"
-          monitored   = false
-        }
-        instance = {
-          instance_type                = "t2.medium"
-          metadata_options_http_tokens = "optional"
-        }
-        ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3*"
-        # branch   = var.BRANCH_NAME # comment in if testing ansible
-      }
     }
   }
 }
-
