@@ -3,6 +3,9 @@
 #------------------------------------------------------------------------------
 
 locals {
+
+  secret_prefix = "/Jumpserver/Users"
+
   ec2_jumpserver = {
     
     tags = {
@@ -19,17 +22,17 @@ locals {
       vpc_security_group_ids       = [aws_security_group.jumpserver-windows.id]
     }
 
-    secret_prefix = "/Jumpserver/Users"
-
     #checkov:skip=CKV_SECRET_6: "Base64 High Entropy String"
-    user_data = base64encode(templatefile("./templates/jumpserver-user-data.yaml", { SECRET_PREFIX = local.ec2_jumpserver.secret_prefix, S3_BUCKET = module.s3-bucket.bucket.id }))
+    user_data = {
+      write_files = base64encode(templatefile("./templates/jumpserver-user-data.yaml", { SECRET_PREFIX = local.secret_prefix, S3_BUCKET = module.s3-bucket.bucket.id }))
+    }
 
     autoscaling_group = {  
       desired_capacity = 1
       max_size         = 2
       min_size         = 0
       force_delete        = true
-      vpc_zone_identifier = data.aws_subnets.jumpserver.ids # FIXME: <--- check this!
+      # vpc_zone_identifier = data.aws_subnets.jumpserver.ids # FIXME: <--- check this!
     }  
   }
 }
@@ -131,7 +134,7 @@ data "github_team" "jumpserver" {
   slug = "studio-webops"
 }
 
-data "aws_subnets" "jumpserver" {
+/* data "aws_subnets" "jumpserver" {
   filter {
     name   = "vpc-id"
     values = [data.aws_vpc.jumpserver.id]
@@ -139,14 +142,14 @@ data "aws_subnets" "jumpserver" {
   tags = {
     Name = "${local.vpc_name}-${local.environment}-${local.subnet_set}-private-${local.region}*"
   }
-}
+} */
 
-# create empty secret in secret manager
+/* # create empty secret in secret manager
 #tfsec:ignore:aws-ssm-secret-use-customer-key
 resource "aws_secretsmanager_secret" "jumpserver" {
   #checkov:skip=CKV_AWS_149: "Ensure that Secrets Manager secret is encrypted using KMS CMK"
   for_each                = toset(data.github_team.jumpserver.members)
-  name                    = "${local.ec2_jumpserver.secret_prefix}/${each.value}"
+  name                    = "${local.secret_prefix}/${each.value}"
   policy                  = data.aws_iam_policy_document.jumpserver_secrets[each.value].json
   recovery_window_in_days = 0
   tags = merge(
@@ -155,7 +158,7 @@ resource "aws_secretsmanager_secret" "jumpserver" {
       Name = "jumpserver-user-${each.value}"
     },
   )
-}
+} */
 
 # resource policy to restrict access to secret value to specific user and the CICD role used to deploy terraform
 data "aws_iam_policy_document" "jumpserver_secrets" {
@@ -179,12 +182,53 @@ data "aws_iam_policy_document" "jumpserver_secrets" {
   }
 }
 
+/* # IAM policy permissions to enable jumpserver to list secrets and put user passwords into secret manager
+data "aws_iam_policy_document" "jumpserver_users" {
+  statement {
+    effect    = "Allow"
+    actions   = ["secretsmanager:PutSecretValue"]
+    resources = ["arn:aws:secretsmanager:${local.region}:${data.aws_caller_identity.current.id}:secret:${local.secret_prefix}/*"]
+  }
+  statement {
+    effect    = "Allow"
+    actions   = ["secretsmanager:ListSecrets"]
+    resources = ["*"]
+  }
+}
+
+# Add policy to role
+resource "aws_iam_role_policy" "jumpserver_users" {
+  name   = "secrets-access-jumpserver-users"
+  role   = aws_iam_role.jumpserver.id
+  policy = data.aws_iam_policy_document.jumpserver_users.json
+} */
+
+#------
+# Jumpserver specific
+#------
+
+# create empty secret in secret manager
+#tfsec:ignore:aws-ssm-secret-use-customer-key
+resource "aws_secretsmanager_secret" "jumpserver" {
+  #checkov:skip=CKV_AWS_149: "Ensure that Secrets Manager secret is encrypted using KMS CMK"
+  for_each                = toset(data.github_team.jumpserver.members)
+  name                    = "${local.secret_prefix}/${each.value}"
+  policy                  = data.aws_iam_policy_document.jumpserver_secrets[each.value].json
+  recovery_window_in_days = 0
+  tags = merge(
+    local.tags,
+    {
+      Name = "jumpserver-user-${each.value}"
+    },
+  )
+}
+
 # IAM policy permissions to enable jumpserver to list secrets and put user passwords into secret manager
 data "aws_iam_policy_document" "jumpserver_users" {
   statement {
     effect    = "Allow"
     actions   = ["secretsmanager:PutSecretValue"]
-    resources = ["arn:aws:secretsmanager:${local.region}:${data.aws_caller_identity.current.id}:secret:${local.ec2_jumpserver.secret_prefix}/*"]
+    resources = ["arn:aws:secretsmanager:${local.region}:${data.aws_caller_identity.current.id}:secret:${local.secret_prefix}/*"]
   }
   statement {
     effect    = "Allow"

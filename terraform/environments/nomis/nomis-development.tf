@@ -111,5 +111,14 @@ locals {
         # branch   = var.BRANCH_NAME # comment in if testing ansible
       }
     }
+    ec2_jumpserver_autoscaling_group = {
+      test-jumpserver = {
+        tags = {
+          description = "test jumpserver instance"
+          monitored   = false
+        }
+        ami_name  = "nomis_windows_server_2022_jumpserver_2022-09-27T14-03-50.698Z"
+      }
+    }
   }
 }

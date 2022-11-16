@@ -69,4 +69,5 @@ locals {
   }
 
   user_data_args = merge(local.user_data_args_common, local.user_data_args_ssm_params, try(var.user_data.args, {}))
+
 }
