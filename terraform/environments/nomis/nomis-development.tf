@@ -38,42 +38,42 @@ locals {
       # *-nomis-db-3: HA
 
       # For ad-hoc testing.  Comment in and out as needed
-      dev-nomis-db-1 = {
-        tags = {
-          server-type       = "nomis-db"
-          description       = "Dev database using T1 data set"
-          oracle-sids       = "CNOMT1"
-          monitored         = false
-          s3-db-restore-dir = "CNOMT1_20211214"
-        }
-        ami_name  = "nomis_rhel_7_9_oracledb_11_2_*"
-        ami_owner = "self"
-        ebs_volume_config = {
-          app = {
-            iops       = 300   # Temporary. See DSOS-1561
-            throughput = 0     # Temporary. See DSOS-1561
-            type       = "gp2" # Temporary. See DSOS-1561
-          }
-          data = {
-            iops       = 120   # Temporary. See DSOS-1561
-            throughput = 0     # Temporary. See DSOS-1561
-            type       = "gp2" # Temporary. See DSOS-1561
-            total_size = 200
-          }
-          flash = {
-            iops       = 100   # Temporary. See DSOS-1561
-            throughput = 0     # Temporary. See DSOS-1561
-            type       = "gp2" # Temporary. See DSOS-1561
-            total_size = 2
-          }
-          swap = {
-            iops       = 100   # Temporary. See DSOS-1561
-            throughput = 0     # Temporary. See DSOS-1561
-            type       = "gp2" # Temporary. See DSOS-1561
-          }
-        }
-        # branch = var.BRANCH_NAME # comment in if testing ansible
-      }
+      #      dev-nomis-db-1 = {
+      #        tags = {
+      #          server-type       = "nomis-db"
+      #          description       = "Dev database using T1 data set"
+      #          oracle-sids       = "CNOMT1"
+      #          monitored         = false
+      #          s3-db-restore-dir = "CNOMT1_20211214"
+      #        }
+      #        ami_name  = "nomis_rhel_7_9_oracledb_11_2_*"
+      #        ami_owner = "self"
+      #        ebs_volume_config = {
+      #          app = {
+      #            iops       = 300   # Temporary. See DSOS-1561
+      #            throughput = 0     # Temporary. See DSOS-1561
+      #            type       = "gp2" # Temporary. See DSOS-1561
+      #          }
+      #          data = {
+      #            iops       = 120   # Temporary. See DSOS-1561
+      #            throughput = 0     # Temporary. See DSOS-1561
+      #            type       = "gp2" # Temporary. See DSOS-1561
+      #            total_size = 200
+      #          }
+      #          flash = {
+      #            iops       = 100   # Temporary. See DSOS-1561
+      #            throughput = 0     # Temporary. See DSOS-1561
+      #            type       = "gp2" # Temporary. See DSOS-1561
+      #            total_size = 2
+      #          }
+      #          swap = {
+      #            iops       = 100   # Temporary. See DSOS-1561
+      #            throughput = 0     # Temporary. See DSOS-1561
+      #            type       = "gp2" # Temporary. See DSOS-1561
+      #          }
+      #        }
+      #        # branch = var.BRANCH_NAME # comment in if testing ansible
+      #      }
     }
     weblogics          = {}
     ec2_test_instances = {}
