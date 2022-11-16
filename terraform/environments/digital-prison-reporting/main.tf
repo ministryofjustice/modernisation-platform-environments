@@ -845,7 +845,7 @@ module "s3_artifacts_store" {
 module "dms_nomis_t3" {
   source                = "./modules/dms"
   name                  = "${local.project}-dms-t3nomis-ingestor-${local.env}"
-  vpc_cidr              = [data.aws_vpc.shared.cidr_block]
+  vpc_dms_cidr          = [data.aws_vpc.data.cidr_block]
   source_app_username   = "digital_prison_reporting"
   source_app_password   = "DSkpo4n7GhnmIV"
   source_address        = "test-address"

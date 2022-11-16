@@ -10,6 +10,13 @@ data "aws_vpc" "shared" {
   }
 }
 
+# VPC and subnet data
+data "aws_vpc" "data" {
+  tags = {
+    "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-data"
+  }
+}
+
 data "aws_subnets" "shared-data" {
   filter {
     name   = "vpc-id"

@@ -87,6 +87,25 @@ resource "aws_dms_endpoint" "target" {
 # Create a subnet group using existing VPC subnets
 resource "aws_dms_replication_subnet_group" "dms" {
   replication_subnet_group_description = "DMS replication subnet group"
-  replication_subnet_group_id          = "dms-replication-subnet-group-tf"
+  replication_subnet_group_id          = "${var.project_id}-dms-${var.dms_src_taget}-subnet-group"
   subnet_ids                           = var.subnet_ids
+}
+
+# Security Groups
+resource "aws_security_group" "dms_sec_group" {
+  name               = "${var.project_id}-dms-${var.dms_src_taget}-security-group"
+  vpc_id             = var.vpc
+
+  ingress {
+    from_port        = 443
+    to_port          = 443
+    protocol         = "tcp"
+    cidr_blocks      = [var.vpc_dms_cidr]
+  }
+  egress {
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+  }
 }
