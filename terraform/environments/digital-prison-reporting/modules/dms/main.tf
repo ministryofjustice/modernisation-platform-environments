@@ -40,12 +40,6 @@ resource "aws_dms_replication_task" "dms-replication" {
   lifecycle {
     ignore_changes = [replication_task_settings]
   }
-
-  timeouts {
-    create = "1h"
-    update = "1h"
-    delete = "1h"
-  }
 }
 
 # Create an endpoint for the source database
