@@ -2,10 +2,29 @@ variable "name" {
   description = "DMS Replication name."
 }
 
+variable "project_id" {
+  type        = string
+  description = "(Required) Project Short ID that will be used for resources."
+}
+
+variable "env" {
+  type        = string
+  description = "Env Type"
+}
+
 variable "tags" {
   type        = map(string)
   default     = {}
   description = "(Optional) Key-value map of resource tags."
+}
+
+variable "dms_src_taget" {
+  type        = string
+}
+
+variable "migration_type" {
+  type        = string
+  description = "DMS Migration Type"
 }
 
 variable "availability_zones" {
@@ -16,6 +35,13 @@ variable "availability_zones" {
       2 = "eu-west-2c"
     }
   ]
+}
+
+
+variable "subnet_ids" {
+  description = "An List of VPC subnet IDs to use in the subnet group"
+  type        = list(string)
+  default     = []
 }
 
 variable "source_address" {}
@@ -54,11 +80,6 @@ variable "stack_name" {
 variable "owner" {
   description = "A group email address to be used in tags"
   default     = "autobots@ga.gov.au"
-}
-
-variable "environment" {
-  description = "Used for seperating terraform backends and naming items"
-  default     = "prod"
 }
 
 #--------------------------------------------------------------
