@@ -345,30 +345,6 @@ resource "aws_ssm_association" "node_exporter_linux" {
   }
 }
 
-resource "aws_ssm_document" "script_exporter" {
-  name            = "InstallScriptExporterLinux"
-  document_type   = "Command"
-  document_format = "YAML"
-  content         = file("./ssm-documents/install-and-manage-script-exporter.yaml")
-  target_type     = "/AWS::EC2::Instance"
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "install-and-manage-script-exporter"
-    },
-  )
-}
-
-resource "aws_ssm_association" "script-exporter" {
-  name             = aws_ssm_document.script_exporter.name
-  association_name = "install-and-manage-script-exporter"
-  targets {
-    key    = "tag-key"
-    values = ["oracle_sids"]
-  }
-}
-
 #------------------------------------------------------------------------------
 # Patch Management - Run Ansible Roles manually from SSM document
 #------------------------------------------------------------------------------
