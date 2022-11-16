@@ -282,5 +282,6 @@ variable "database_subnet_cidr" {
 
 variable "vpc_cidr" {
   description = "CIDR for the  VPC"
-  default     = ""
+  type        = list(string)
+  default     = null
 }
