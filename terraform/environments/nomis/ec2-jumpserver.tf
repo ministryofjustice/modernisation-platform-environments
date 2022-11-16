@@ -11,13 +11,12 @@ locals {
     }
 
     instance = {
-      disable_api_termination  = false # <= TODO: check what this is
-      metadata_options_http_tokens = "required" # (/)
-      metadata_options_http_endpoint = "enabled" # <= TODO: chech whether the module knows what this is
-      instance_type                        = "t3.medium" # (/)
-      key_name                             = aws_key_pair.ec2-user.key_name # (/)
-      # vpc_security_group_ids       = [aws_security_group.weblogic_common.id] <= TODO: is this needed?
-      monitoring = false
+      disable_api_termination      = false
+      instance_type                = "t3.medium"
+      key_name                     = aws_key_pair.ec2-user.key_name
+      monitoring                   = false
+      metadata_options_http_tokens = "required"
+      vpc_security_group_ids       = [aws_security_group.jumpserver-windows.id]
     }
 
     secret_prefix = "/Jumpserver/Users"
@@ -29,12 +28,9 @@ locals {
       desired_capacity = 1
       max_size         = 2
       min_size         = 0
-
-      # TODO: fill in the rest of the values here
       force_delete        = true
       vpc_zone_identifier = data.aws_subnets.jumpserver.ids # FIXME: <--- check this!
-    }
-  
+    }  
   }
 }
 
@@ -47,26 +43,19 @@ module "ec2_jumpserver_autoscaling_group" {
 
   for_each = try(local.environment_config.jumpserver_autoscaling_groups, {})
 
-  name = each.key
-  ami_name = each.value.ami_name
-  ami_owner = try(each.value.ami_owner, "core-shared-services-production")
-  instance                    = merge(local.ec2_jumpserver.instance, lookup(each.value, "instance", {}))
-  user_data                   = merge(local.ec2_jumpserver.user_data, lookup(each.value, "user_data", {}))
-
-  # TODO: check which of these is correct
-  #ebs_volume_config           = merge(local.ec2_test.ebs_volume_config, lookup(each.value, "ebs_volume_config", {}))
-  #ebs_volumes                 = { for k, v in local.ec2_test.ebs_volumes : k => merge(v, try(each.value.ebs_volumes[k], {})) }
+  name                  = each.key
+  ami_name              = each.value.ami_name
+  ami_owner             = try(each.value.ami_owner, "core-shared-services-production")
+  instance              = merge(local.ec2_jumpserver.instance, lookup(each.value, "instance", {}))
+  user_data             = merge(local.ec2_jumpserver.user_data, lookup(each.value, "user_data", {}))
   ebs_volume_config     = lookup(each.value, "ebs_volume_config", {})
   ebs_volumes           = lookup(each.value, "ebs_volumes", {})
-  
-  # TODO: check where this is used
   ssm_parameters_prefix = "jumpserver/"
   ssm_parameters        = {}
-
-  autoscaling_group           = merge(local.ec2_jumpserver.autoscaling_group, lookup(each.value, "autoscaling_group", {}))
+  autoscaling_group     = merge(local.ec2_jumpserver.autoscaling_group, lookup(each.value, "autoscaling_group", {}))
   
   # TODO: come back and check this
-  # autoscaling_lifecycle_hooks = merge(local.ec2_test.autoscaling_lifecycle_hooks, lookup(each.value, "autoscaling_lifecycle_hooks", {}))
+  # autoscaling_lifecycle_hooks = merge(local.ec2_Jumpserver.autoscaling_lifecycle_hooks, lookup(each.value, "autoscaling_lifecycle_hooks", {}))
 
   autoscaling_schedules = coalesce(lookup(each.value, "autoscaling_schedules", null), {
     # if sizes not set, use the values defined in autoscaling_group
@@ -81,21 +70,18 @@ module "ec2_jumpserver_autoscaling_group" {
 
   iam_resource_names_prefix = "ec2-jumpserver-asg"
   instance_profile_policies = local.ec2_common_managed_policies
-
-  business_unit      = local.vpc_name
-  application_name   = local.application_name
-  environment        = local.environment
-  region             = local.region
-  availability_zone  = local.availability_zone
-  subnet_set         = local.subnet_set
-  subnet_name        = "data"
-  tags               = merge(local.tags, local.ec2_jumpserver.tags, try(each.value.tags, {}))
-  account_ids_lookup = local.environment_management.account_ids
-
-
-  ansible_repo         = "modernisation-platform-configuration-management"
-  ansible_repo_basedir = "ansible"
-  branch               = try(each.value.branch, "main") 
+  business_unit             = local.vpc_name
+  application_name          = local.application_name
+  environment               = local.environment
+  region                    = local.region
+  availability_zone         = local.availability_zone
+  subnet_set                = local.subnet_set
+  subnet_name               = "data"
+  tags                      = merge(local.tags, local.ec2_jumpserver.tags, try(each.value.tags, {}))
+  account_ids_lookup        = local.environment_management.account_ids
+  ansible_repo              = "modernisation-platform-configuration-management"
+  ansible_repo_basedir      = "ansible"
+  branch                    = try(each.value.branch, "main") 
   
 }
 
@@ -145,12 +131,6 @@ data "github_team" "jumpserver" {
   slug = "studio-webops"
 }
 
-# TODO: remove this - part of the module
-/* data "aws_vpc" "jumpserver" {
-  tags = {
-    Name = "${local.vpc_name}-${local.environment}"
-  }
-} */
 data "aws_subnets" "jumpserver" {
   filter {
     name   = "vpc-id"
@@ -159,104 +139,6 @@ data "aws_subnets" "jumpserver" {
   tags = {
     Name = "${local.vpc_name}-${local.environment}-${local.subnet_set}-private-${local.region}*"
   }
-}
-
-# instance launch template
-resource "aws_launch_template" "jumpserver" {
-  name                                 = "${local.vpc_name}-${local.environment}-jumpserver"
-  image_id                             = data.aws_ami.jumpserver.id
-  instance_initiated_shutdown_behavior = "terminate"
-  # // instance_type                        = "t3.medium"
-  # // key_name                             = aws_key_pair.ec2-user.key_name
-  iam_instance_profile {
-    arn = aws_iam_instance_profile.jumpserver.arn
-  }
-  # // metadata_options {
-  #  http_endpoint = "enabled"
-  #  http_tokens   = "required"
-  # }
-
-  /* monitoring {
-    enabled = false
-  } */
-
-  network_interfaces {
-    associate_public_ip_address = false
-    security_groups             = [aws_security_group.jumpserver-windows.id]
-    delete_on_termination       = true
-  }
-  tag_specifications {
-    resource_type = "instance"
-    tags = merge(
-      local.tags,
-      {
-        Name          = "jumpserver_windows"
-        os_type       = "Windows"
-        os_version    = "2022"
-        "Patch Group" = aws_ssm_patch_group.windows.patch_group
-      }
-    )
-  }
-
-  lifecycle {
-    ignore_changes = [image_id, description, tags, tags_all]
-  }
-}
-
-# autoscaling
-resource "aws_autoscaling_group" "jumpserver" {
-  launch_template {
-    id      = aws_launch_template.jumpserver.id
-    version = "$Default"
-  }
-  /* desired_capacity    = 1
-  name                = "jumpserver-autoscaling-group"
-  min_size            = 0
-  max_size            = 1 */
-  /* force_delete        = true
-  vpc_zone_identifier = data.aws_subnets.jumpserver.ids */
-  tag {
-    key                 = "Name"
-    value               = "jumpserver"
-    propagate_at_launch = true
-  }
-  depends_on = [
-    aws_launch_template.jumpserver
-  ]
-}
-
-resource "aws_iam_role" "jumpserver" {
-  name                 = "ec2-jumpserver-role"
-  path                 = "/"
-  max_session_duration = "3600"
-  assume_role_policy = jsonencode(
-    {
-      "Version" : "2012-10-17",
-      "Statement" : [
-        {
-          "Effect" : "Allow",
-          "Principal" : {
-            "Service" : "ec2.amazonaws.com"
-          }
-          "Action" : "sts:AssumeRole",
-          "Condition" : {}
-        }
-      ]
-    }
-  )
-  managed_policy_arns = local.ec2_common_managed_policies
-  tags = merge(
-    local.tags,
-    {
-      Name = "ec2-jumpserver-role"
-    },
-  )
-}
-
-resource "aws_iam_instance_profile" "jumpserver" {
-  name = "ec2-jumpserver-profile"
-  role = aws_iam_role.jumpserver.name
-  path = "/"
 }
 
 # create empty secret in secret manager
