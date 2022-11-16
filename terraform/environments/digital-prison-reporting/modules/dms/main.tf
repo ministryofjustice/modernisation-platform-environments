@@ -11,7 +11,7 @@ resource "aws_dms_replication_instance" "dms" {
   replication_instance_class   = var.replication_instance_class
   replication_instance_id      = var.name
   replication_subnet_group_id  = aws_dms_replication_subnet_group.dms.id
-  vpc_security_group_ids       = ["${aws_dms_replication_subnet_group.dms.id}"]
+  vpc_security_group_ids       = [aws_security_group.dms_sec_group.id]
 
   tags = var.tags
 }
@@ -93,7 +93,7 @@ resource "aws_dms_replication_subnet_group" "dms" {
 
 # Security Groups
 resource "aws_security_group" "dms_sec_group" {
-  name   = "${var.project_id}-dms-${var.dms_src_taget}-security-group"
+  name   = "${var.project_id}-dms-${var.dms_src_target}-security-group"
   vpc_id = var.vpc
 
   ingress {
