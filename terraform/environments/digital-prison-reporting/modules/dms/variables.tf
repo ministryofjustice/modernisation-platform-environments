@@ -19,7 +19,7 @@ variable "tags" {
 }
 
 variable "dms_src_taget" {
-  type        = string
+  type = string
 }
 
 variable "migration_type" {
