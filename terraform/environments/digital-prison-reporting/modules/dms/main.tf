@@ -14,6 +14,12 @@ resource "aws_dms_replication_instance" "dms" {
   vpc_security_group_ids       = [aws_security_group.dms_sec_group.id]
 
   tags = var.tags
+
+  timeouts {
+    create: "1h",
+    update: "1h",
+    delete: "1h"
+  }  
 }
 
 data "template_file" "table-mappings-from-oracle-to-kinesis" {
@@ -34,6 +40,12 @@ resource "aws_dms_replication_task" "dms-replication" {
   lifecycle {
     ignore_changes = [replication_task_settings]
   }
+
+  timeouts {
+    create: "1h",
+    update: "1h",
+    delete: "1h"
+  }  
 }
 
 # Create an endpoint for the source database
