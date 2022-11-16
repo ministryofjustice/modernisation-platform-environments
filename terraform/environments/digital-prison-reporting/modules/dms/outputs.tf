@@ -1,3 +1,3 @@
-output "dms_private_subnet_ids" {
-  value = aws_subnet.database.*.id
+output "dms_subnet_ids" {
+  value = var.subnet_ids
 }

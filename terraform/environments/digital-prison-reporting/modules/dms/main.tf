@@ -39,7 +39,7 @@ resource "aws_dms_replication_task" "dms-replication" {
 # Create an endpoint for the source database
 resource "aws_dms_endpoint" "source" {
   database_name = var.source_db_name
-  endpoint_id   = "${var.project_id}-dms-${dms_src_taget}-source-${var.env}"
+  endpoint_id   = "${var.project_id}-dms-${var.dms_src_taget}-source-${var.env}"
   endpoint_type = "source"
   engine_name   = var.source_engine_name
   password      = var.source_app_password
@@ -53,7 +53,7 @@ resource "aws_dms_endpoint" "source" {
 
 # Create an endpoint for the target Kinesis
 resource "aws_dms_endpoint" "target" {
-  endpoint_id   = "${var.project_id}-dms-${dms_src_taget}-target-${var.env}"
+  endpoint_id   = "${var.project_id}-dms-${var.dms_src_taget}-target-${var.env}"
   endpoint_type = "target"
   engine_name   = var.target_engine
 
