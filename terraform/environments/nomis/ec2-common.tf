@@ -168,7 +168,7 @@ locals {
 #------------------------------------------------------------------------------
 resource "aws_key_pair" "ec2-user" {
   key_name   = "ec2-user"
-  public_key = local.environment_config.ec2_common.public_key
+  public_key = file(".ssh/${terraform.workspace}/ec2-user.pub")
   tags = merge(
     local.tags,
     {
