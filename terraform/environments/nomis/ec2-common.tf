@@ -318,34 +318,6 @@ resource "aws_ssm_association" "update_ssm_agent" {
 }
 
 #------------------------------------------------------------------------------
-# Node Exporter - Install/Start Node Exporter Service
-#------------------------------------------------------------------------------
-
-resource "aws_ssm_document" "node_exporter_linux" {
-  name            = "InstallNodeExporterLinux"
-  document_type   = "Command"
-  document_format = "JSON"
-  content         = templatefile("${path.module}/ssm-documents/templates/node-exporter-linux.json.tmpl", { bucket_name = module.s3-bucket.bucket.id })
-  target_type     = "/AWS::EC2::Instance"
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "install-node-exporter-linux"
-    },
-  )
-}
-
-resource "aws_ssm_association" "node_exporter_linux" {
-  name             = aws_ssm_document.node_exporter_linux.name
-  association_name = "node-exporter-linux"
-  targets {
-    key    = "tag:os_type"
-    values = ["Linux"]
-  }
-}
-
-#------------------------------------------------------------------------------
 # Patch Management - Run Ansible Roles manually from SSM document
 #------------------------------------------------------------------------------
 
