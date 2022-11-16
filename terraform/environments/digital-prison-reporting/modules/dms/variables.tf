@@ -280,7 +280,7 @@ variable "database_subnet_cidr" {
   description = "List of subnets to be used for databases"
 }
 
-variable "vpc_dms_cidr" {
-  description = "CIDR for the DMS VPC"
+variable "vpc_cidr" {
+  description = "CIDR for the  VPC"
   default     = ""
 }
