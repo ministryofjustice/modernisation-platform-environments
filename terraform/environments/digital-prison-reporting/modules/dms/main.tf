@@ -93,19 +93,19 @@ resource "aws_dms_replication_subnet_group" "dms" {
 
 # Security Groups
 resource "aws_security_group" "dms_sec_group" {
-  name               = "${var.project_id}-dms-${var.dms_src_taget}-security-group"
-  vpc_id             = var.vpc
+  name   = "${var.project_id}-dms-${var.dms_src_taget}-security-group"
+  vpc_id = var.vpc
 
   ingress {
-    from_port        = 443
-    to_port          = 443
-    protocol         = "tcp"
-    cidr_blocks      = [var.vpc_dms_cidr]
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = [var.vpc_dms_cidr]
   }
   egress {
-    from_port        = 0
-    to_port          = 0
-    protocol         = "-1"
-    cidr_blocks      = ["0.0.0.0/0"]
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 }
