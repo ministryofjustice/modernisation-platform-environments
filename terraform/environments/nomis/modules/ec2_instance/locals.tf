@@ -4,7 +4,6 @@ locals {
   default_tags = {
     server-type       = join("-", slice(local.name_split, 1, length(local.name_split)))
     nomis-environment = local.name_split[0]
-    always_on         = lookup(var.tags, "always-on", true) # backward compat.
     server-name       = var.name
   }
   ssm_parameters_prefix_tag = var.ssm_parameters_prefix == "" ? {} : {

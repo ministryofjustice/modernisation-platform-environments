@@ -39,7 +39,6 @@ locals {
     # Legacy database module, do not add any more entries here
     databases_legacy = {
       AUDIT = {
-        always_on              = true
         ami_name               = "nomis_db_STIG-2022-04-26*"
         instance_type          = "r6i.2xlarge"
         asm_data_capacity      = 4000
@@ -71,7 +70,6 @@ locals {
           description = "PreProduction NOMIS MIS and Audit database to replace Azure PPPDL00017"
           oracle-sids = "PPMIS PPCNMAUD"
           monitored   = false
-          always-on   = true
         }
         ami_name  = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-03T12-51-25.032Z"
         ami_owner = "self" # remove this line next time AMI is updated so core-shared-services-production used instead
@@ -118,7 +116,6 @@ locals {
           description              = "Production NOMIS MIS and Audit database to replace Azure PDPDL00036 and PDPDL00038"
           oracle-sids              = "PCNMAUD"
           monitored                = false
-          always-on                = true
           fixngo-connection-target = "10.40.0.136"
         }
         ami_name  = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-07T12-48-08.562Z"
@@ -165,7 +162,6 @@ locals {
           server-type = "nomis-db"
           description = "Production NOMIS HA database to replace Azure PDPDL00062"
           monitored   = false
-          always-on   = true
         }
         ami_name  = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-07T12-48-08.562Z"
         ami_owner = "self" # remove this line next time AMI is updated so core-shared-services-production used instead

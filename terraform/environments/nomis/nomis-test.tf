@@ -34,7 +34,6 @@ locals {
     # Legacy database module, do not add any more entries here
     databases_legacy = {
       CNOMT1 = {
-        always_on          = false
         ami_name           = "nomis_db_STIG_CNOMT1-2022-04-21*"
         asm_data_capacity  = 100
         asm_flash_capacity = 2
@@ -58,7 +57,6 @@ locals {
           description         = "T1 NOMIS Audit database to replace Azure T1PDL0010"
           oracle-sids         = "T1CNMAUD"
           monitored           = false
-          always-on           = true
           instance-scheduling = "skip-scheduling"
         }
         ami_name  = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-07T12-48-08.562Z"
