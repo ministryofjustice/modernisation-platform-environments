@@ -21,10 +21,10 @@ data "template_file" "table-mappings-from-oracle-to-kinesis" {
 }
 
 resource "aws_dms_replication_task" "dms-replication" {
-  count                     = 0
+  count                     = 1
   migration_type            = var.migration_type
   replication_instance_arn  = aws_dms_replication_instance.dms.replication_instance_arn
-  replication_task_id       = "dms-rt-mssql-pg"
+  replication_task_id       = "${var.project_id}-dms-task-${var.dms_src_target}"
   source_endpoint_arn       = aws_dms_endpoint.source.endpoint_arn
   target_endpoint_arn       = aws_dms_endpoint.target.endpoint_arn
   table_mappings            = data.template_file.table-mappings-from-oracle-to-kinesis.rendered
