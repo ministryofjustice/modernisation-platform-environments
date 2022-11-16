@@ -9,7 +9,7 @@
     "CommitRate": 10000
   },
   "Logging": {
-    "EnableLogging": true,
+    "EnableLogging": false,
     "LogComponents": [
       {
         "Id": "SOURCE_UNLOAD",
