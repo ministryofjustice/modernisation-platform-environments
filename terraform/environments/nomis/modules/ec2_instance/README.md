@@ -59,7 +59,6 @@ e.g. nomis-test.tf
           description       = "T1 NOMIS test database to replace Azure T1PDL0009"
           oracle-sids       = "CNOMT1"
           monitored         = false
-          always-on         = true
           s3-db-restore-dir = "CNOMT1_20211214"
         }
         ami_name = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-07T12-48-08.562Z"
