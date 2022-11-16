@@ -16,8 +16,8 @@ resource "aws_dms_replication_instance" "dms" {
   tags = var.tags
 
   timeouts {
-    create = "1h",
-    update = "1h",
+    create = "1h"
+    update = "1h"
     delete = "1h"
   }  
 }
@@ -42,8 +42,8 @@ resource "aws_dms_replication_task" "dms-replication" {
   }
 
   timeouts {
-    create = "1h",
-    update = "1h",
+    create = "1h"
+    update = "1h"
     delete = "1h"
   }  
 }
