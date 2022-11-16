@@ -845,7 +845,7 @@ module "s3_artifacts_store" {
 module "dms_nomis_t3" {
   source                = "./modules/dms"
   name                  = "${local.project}-dms-t3nomis-ingestor-${local.env}"
-  vpc_dms_cidr          = [data.aws_vpc.data.cidr_block]
+  vpc_dms_cidr          = values(data.aws_subnet.target).*.cidr_block
   source_app_username   = "digital_prison_reporting"
   source_app_password   = "DSkpo4n7GhnmIV"
   source_address        = "test-address"
@@ -854,7 +854,7 @@ module "dms_nomis_t3" {
   kinesis_stream_policy = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_write_only_arn
   project_id            = local.project
   env                   = local.environment
-  dms_src_taget         = "nomis-kinesis"
+  dms_src_target        = "nomis-kinesis"
   migration_type        = "full-load-and-cdc"
   subnet_ids            = [data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id]
 
