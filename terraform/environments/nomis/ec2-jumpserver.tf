@@ -44,7 +44,7 @@ module "ec2_jumpserver_autoscaling_group" {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
   }
 
-  for_each = try(local.environment_config.jumpserver_autoscaling_groups, {})
+  for_each = try(local.environment_config.ec2_jumpserver_autoscaling_groups, {})
 
   name                  = each.key
   ami_name              = each.value.ami_name
@@ -144,22 +144,6 @@ data "github_team" "jumpserver" {
   }
 } */
 
-/* # create empty secret in secret manager
-#tfsec:ignore:aws-ssm-secret-use-customer-key
-resource "aws_secretsmanager_secret" "jumpserver" {
-  #checkov:skip=CKV_AWS_149: "Ensure that Secrets Manager secret is encrypted using KMS CMK"
-  for_each                = toset(data.github_team.jumpserver.members)
-  name                    = "${local.secret_prefix}/${each.value}"
-  policy                  = data.aws_iam_policy_document.jumpserver_secrets[each.value].json
-  recovery_window_in_days = 0
-  tags = merge(
-    local.tags,
-    {
-      Name = "jumpserver-user-${each.value}"
-    },
-  )
-} */
-
 # resource policy to restrict access to secret value to specific user and the CICD role used to deploy terraform
 data "aws_iam_policy_document" "jumpserver_secrets" {
   for_each = toset(data.github_team.jumpserver.members)
@@ -242,4 +226,32 @@ resource "aws_iam_role_policy" "jumpserver_users" {
   name   = "secrets-access-jumpserver-users"
   role   = aws_iam_role.jumpserver.id
   policy = data.aws_iam_policy_document.jumpserver_users.json
+}
+
+resource "aws_iam_role" "jumpserver" {
+  name                 = "ec2-jumpserver-role"
+  path                 = "/"
+  max_session_duration = "3600"
+  assume_role_policy = jsonencode(
+    {
+      "Version" : "2012-10-17",
+      "Statement" : [
+        {
+          "Effect" : "Allow",
+          "Principal" : {
+            "Service" : "ec2.amazonaws.com"
+          }
+          "Action" : "sts:AssumeRole",
+          "Condition" : {}
+        }
+      ]
+    }
+  )
+  managed_policy_arns = local.ec2_common_managed_policies
+  tags = merge(
+    local.tags,
+    {
+      Name = "ec2-jumpserver-role"
+    },
+  )
 }
