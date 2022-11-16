@@ -140,7 +140,7 @@ module "ec2_weblogic_autoscaling_group" {
   availability_zone  = local.availability_zone
   subnet_set         = local.subnet_set
   subnet_name        = "private"
-  tags               = merge(local.tags, local.ec2_test.tags, try(each.value.tags, {}))
+  tags               = merge(local.tags, local.ec2_weblogic.tags, try(each.value.tags, {}))
   account_ids_lookup = local.environment_management.account_ids
 
   ansible_repo         = "modernisation-platform-configuration-management"

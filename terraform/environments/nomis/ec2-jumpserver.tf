@@ -79,7 +79,6 @@ resource "aws_launch_template" "jumpserver" {
         Name          = "jumpserver_windows"
         os_type       = "Windows"
         os_version    = "2022"
-        always_on     = "false"
         "Patch Group" = aws_ssm_patch_group.windows.patch_group
       }
     )

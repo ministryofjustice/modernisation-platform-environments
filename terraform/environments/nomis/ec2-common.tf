@@ -318,58 +318,6 @@ resource "aws_ssm_association" "update_ssm_agent" {
 }
 
 #------------------------------------------------------------------------------
-# Node Exporter - Install/Start Node Exporter Service
-#------------------------------------------------------------------------------
-
-resource "aws_ssm_document" "node_exporter_linux" {
-  name            = "InstallNodeExporterLinux"
-  document_type   = "Command"
-  document_format = "JSON"
-  content         = templatefile("${path.module}/ssm-documents/templates/node-exporter-linux.json.tmpl", { bucket_name = module.s3-bucket.bucket.id })
-  target_type     = "/AWS::EC2::Instance"
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "install-node-exporter-linux"
-    },
-  )
-}
-
-resource "aws_ssm_association" "node_exporter_linux" {
-  name             = aws_ssm_document.node_exporter_linux.name
-  association_name = "node-exporter-linux"
-  targets {
-    key    = "tag:os_type"
-    values = ["Linux"]
-  }
-}
-
-resource "aws_ssm_document" "script_exporter" {
-  name            = "InstallScriptExporterLinux"
-  document_type   = "Command"
-  document_format = "YAML"
-  content         = file("./ssm-documents/install-and-manage-script-exporter.yaml")
-  target_type     = "/AWS::EC2::Instance"
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "install-and-manage-script-exporter"
-    },
-  )
-}
-
-resource "aws_ssm_association" "script-exporter" {
-  name             = aws_ssm_document.script_exporter.name
-  association_name = "install-and-manage-script-exporter"
-  targets {
-    key    = "tag-key"
-    values = ["oracle_sids"]
-  }
-}
-
-#------------------------------------------------------------------------------
 # Patch Management - Run Ansible Roles manually from SSM document
 #------------------------------------------------------------------------------
 
@@ -388,87 +336,7 @@ resource "aws_ssm_document" "run_ansible_patches" {
   )
 }
 
-
-#------------------------------------------------------------------------------
-# Oracle Secure Web - Install Oracle Secure Web s3 Backup Module
-#------------------------------------------------------------------------------
-
-resource "aws_ssm_document" "oracle_secure_web" {
-  name            = "InstallOracleSecureWeb"
-  document_type   = "Command"
-  document_format = "JSON"
-  content         = templatefile("${path.module}/ssm-documents/templates/oracle-secure-web-install.json.tmpl", { bucket_name = module.s3-bucket.bucket.id })
-  target_type     = "/AWS::EC2::Instance"
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "install-and-test-oracle-secure-web-backup"
-    },
-  )
-}
-
-# resource "aws_ssm_association" "oracle_secure_web" {
-#   name             = aws_ssm_document.oracle_secure_web.name
-#   association_name = "install-and-test-oracle-secure-web-backup"
-#   targets {
-#     key    = "tag-key"
-#     values = ["oracle_sids"]
-#   }
-# }
-
-
 # TODO: Temporarily disable automatic provisioning while performing DR tests.
-
-#------------------------------------------------------------------------------
-# Scheduled overnight shutdown
-# This is a pretty basic implementation until Mod Platform build a platform
-# wide solution.  State Manager does not allow cron expressions like MON-FRI
-# so we need to create a separate association for each day in order to deal with
-# weekends.  Alternatively we could use Eventbridge rules as a trigger, but its
-# slightly more complex to setup the IAM roles for that.
-#
-# Note that instances created throught the Weblogic module are not in scope as
-# they are managed by an autoscaling group, and therefore are not tagged as targets
-#------------------------------------------------------------------------------
-
-locals {
-  weekdays = ["MON", "TUE", "WED", "THU", "FRI"]
-}
-
-# Scheduled start
-resource "aws_ssm_association" "ec2_scheduled_start" {
-  for_each                         = toset(local.weekdays)
-  name                             = "AWS-StartEC2Instance" # this is an AWS provided document
-  association_name                 = "ec2_scheduled_start_${each.value}"
-  automation_target_parameter_name = "InstanceId"
-  parameters = {
-    AutomationAssumeRole = aws_iam_role.ssm_ec2_start_stop.arn
-  }
-  targets {
-    key    = "tag:always_on"
-    values = ["false"]
-  }
-  apply_only_at_cron_interval = true
-  schedule_expression         = "cron(0 7 ? * ${each.value} *)"
-}
-
-# Scheduled stop
-resource "aws_ssm_association" "ec2_scheduled_stop" {
-  for_each                         = toset(local.weekdays)
-  name                             = "AWS-StopEC2Instance" # this is an AWS provided document
-  association_name                 = "ec2_scheduled_stop_${each.value}"
-  automation_target_parameter_name = "InstanceId"
-  parameters = {
-    AutomationAssumeRole = aws_iam_role.ssm_ec2_start_stop.arn
-  }
-  targets {
-    key    = "tag:always_on"
-    values = ["false"]
-  }
-  apply_only_at_cron_interval = true
-  schedule_expression         = "cron(0 19 ? * ${each.value} *)"
-}
 
 data "aws_iam_policy_document" "ssm_ec2_start_stop_kms" {
   statement {
@@ -564,50 +432,6 @@ resource "aws_ssm_maintenance_window" "maintenance" {
       Name = "weekly-patching"
     },
   )
-}
-
-# Maintenance window task to start instances in scope of scheduled shutdown
-resource "aws_ssm_maintenance_window_target" "start_instances" {
-  window_id     = aws_ssm_maintenance_window.maintenance.id
-  name          = "start-instances"
-  description   = "Target group for instances in scope of scheduled shutdown"
-  resource_type = "INSTANCE"
-
-  targets {
-    key    = "tag:always_on"
-    values = ["false"]
-  }
-}
-
-resource "aws_ssm_maintenance_window_task" "start_instances" {
-  name            = "Start-Instances"
-  description     = "Starts instances that are in scope of scheduled shutdown"
-  max_concurrency = "100%"
-  max_errors      = "100%"
-  cutoff_behavior = "CANCEL_TASK"
-  priority        = 1
-  task_arn        = "AWS-StartEC2Instance"
-  task_type       = "AUTOMATION"
-  window_id       = aws_ssm_maintenance_window.maintenance.id
-
-  targets {
-    key    = "WindowTargetIds"
-    values = [aws_ssm_maintenance_window_target.start_instances.id]
-  }
-
-  task_invocation_parameters {
-    automation_parameters {
-      document_version = "$LATEST"
-      parameter {
-        name   = "AutomationAssumeRole"
-        values = [aws_iam_role.ssm_ec2_start_stop.arn]
-      }
-      parameter {
-        name   = "InstanceId"
-        values = ["*"]
-      }
-    }
-  }
 }
 
 # Maintenance window task to apply RHEL patches
