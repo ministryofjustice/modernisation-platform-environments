@@ -336,36 +336,6 @@ resource "aws_ssm_document" "run_ansible_patches" {
   )
 }
 
-
-#------------------------------------------------------------------------------
-# Oracle Secure Web - Install Oracle Secure Web s3 Backup Module
-#------------------------------------------------------------------------------
-
-resource "aws_ssm_document" "oracle_secure_web" {
-  name            = "InstallOracleSecureWeb"
-  document_type   = "Command"
-  document_format = "JSON"
-  content         = templatefile("${path.module}/ssm-documents/templates/oracle-secure-web-install.json.tmpl", { bucket_name = module.s3-bucket.bucket.id })
-  target_type     = "/AWS::EC2::Instance"
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "install-and-test-oracle-secure-web-backup"
-    },
-  )
-}
-
-# resource "aws_ssm_association" "oracle_secure_web" {
-#   name             = aws_ssm_document.oracle_secure_web.name
-#   association_name = "install-and-test-oracle-secure-web-backup"
-#   targets {
-#     key    = "tag-key"
-#     values = ["oracle_sids"]
-#   }
-# }
-
-
 # TODO: Temporarily disable automatic provisioning while performing DR tests.
 
 data "aws_iam_policy_document" "ssm_ec2_start_stop_kms" {
