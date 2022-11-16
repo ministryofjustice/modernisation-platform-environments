@@ -8,33 +8,6 @@
     "TransactionConsistencyTimeout": 600,
     "CommitRate": 10000
   },
-  "Logging": {
-    "EnableLogging": false,
-    "LogComponents": [
-      {
-        "Id": "SOURCE_UNLOAD",
-        "Severity": "LOGGER_SEVERITY_DEFAULT"
-      },
-      {
-        "Id": "TARGET_LOAD",
-        "Severity": "LOGGER_SEVERITY_DEFAULT"
-      },
-      {
-        "Id": "SOURCE_CAPTURE",
-        "Severity": "LOGGER_SEVERITY_DEFAULT"
-      },
-      {
-        "Id": "TARGET_APPLY",
-        "Severity": "LOGGER_SEVERITY_DEFAULT"
-      },
-      {
-        "Id": "TASK_MANAGER",
-        "Severity": "LOGGER_SEVERITY_DEFAULT"
-      }
-    ],
-    "CloudWatchLogGroup": "dms-nomis",
-    "CloudWatchLogStream": null
-  },
   "ControlTablesSettings": {
     "historyTimeslotInMinutes": 5,
     "ControlSchema": "",
