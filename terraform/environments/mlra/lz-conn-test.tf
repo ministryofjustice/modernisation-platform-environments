@@ -14,11 +14,37 @@ module "ec2_instance" {
   vpc_security_group_ids = [module.httptest_sg.security_group_id]
   subnet_id              = "subnet-06594eda5221bd3c9"
   user_data_base64       = base64encode(local.instance-userdata)
+  iam_instance_profile   = aws_iam_instance_profile.instance_profile.id
   tags = {
     Name        = "landingzone-httptest"
     Environment = "dev"
   }
 }
+
+resource "aws_iam_instance_profile" "instance_profile" {
+  name = "SsmManagedInstanceProfile"
+  role = aws_iam_role.ssm_managed_instance.name
+}
+
+resource "aws_iam_role" "ssm_managed_instance" {
+  name                = "SsmManagedInstance"
+  managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"]
+  assume_role_policy  = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "Service": "ec2.amazonaws.com"
+            },
+            "Action": "sts:AssumeRole"
+        }
+    ]
+}
+EOF
+}
+
 module "httptest_sg" {
   source      = "terraform-aws-modules/security-group/aws"
   version     = "~> 4.0"
@@ -41,6 +67,15 @@ module "httptest_sg" {
       protocol    = "tcp"
       description = "HTTP"
       cidr_blocks = local.application_data["accounts"][local.environment].lz_vpc_cidr
+    }
+  ]
+  ingress_with_source_security_group_id = [
+    {
+      from_port                = 443
+      to_port                  = 443
+      protocol                 = "tcp"
+      description              = "HTTPS For SSM Session Manager"
+      source_security_group_id = "sg-0754d9a309704addd"  # laa interface endpoint security group in core-vpc-development
     }
   ]
 }
