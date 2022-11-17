@@ -148,8 +148,6 @@ module "ec2_weblogic_autoscaling_group" {
   branch               = try(each.value.branch, "main")
 }
 
-#  load_balancer_listener_arn = aws_lb_listener.internal.arn
-
 #------------------------------------------------------------------------------
 # Common Security Group for Weblogic Instances
 #------------------------------------------------------------------------------
@@ -160,66 +158,6 @@ resource "aws_security_group" "weblogic_common" {
   name        = "weblogic-common"
   vpc_id      = local.vpc_id
 
-  ingress {
-    description     = "SSH from Bastion"
-    from_port       = "22"
-    to_port         = "22"
-    protocol        = "TCP"
-    security_groups = [module.bastion_linux.bastion_security_group]
-  }
-
-  ingress {
-    description     = "access from Windows Jumpserver (admin console)"
-    from_port       = "7001"
-    to_port         = "7001"
-    protocol        = "TCP"
-    security_groups = [aws_security_group.jumpserver-windows.id]
-  }
-
-  ingress {
-    description     = "access from Windows Jumpserver"
-    from_port       = "80"
-    to_port         = "80"
-    protocol        = "TCP"
-    security_groups = [aws_security_group.jumpserver-windows.id]
-  }
-
-  # ingress {
-  #   description = "access from Windows Jumpserver and loadbalancer (forms/reports)"
-  #   from_port   = "7777"
-  #   to_port     = "7777"
-  #   protocol    = "TCP"
-  #   security_groups = [
-  #     aws_security_group.jumpserver-windows.id,
-  #     local.environment == "test" ? module.jb_load_balancer_test[0].security_group.id : aws_security_group.internal_elb.id
-  #   ]
-  # }
-
-  ingress {
-    description = "access from Cloud Platform Prometheus server"
-    from_port   = "9100"
-    to_port     = "9100"
-    protocol    = "TCP"
-    cidr_blocks = [local.cidrs.cloud_platform]
-  }
-
-  ingress {
-    description = "access from Cloud Platform Prometheus script exporter collector"
-    from_port   = "9172"
-    to_port     = "9172"
-    protocol    = "TCP"
-    cidr_blocks = [local.cidrs.cloud_platform]
-  }
-
-  egress {
-    description = "allow all"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    #tfsec:ignore:aws-vpc-no-public-egress-sgr
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
   tags = merge(
     local.tags,
     {
@@ -228,7 +166,7 @@ resource "aws_security_group" "weblogic_common" {
   )
 }
 
-resource "aws_security_group_rule" "weblogic_common_1" {
+resource "aws_security_group_rule" "weblogic_common_ingress_01" {
   description              = "access from Windows Jumpserver and loadbalancer (forms/reports)"
   security_group_id        = aws_security_group.weblogic_common.id
   type                     = "ingress"
@@ -236,7 +174,74 @@ resource "aws_security_group_rule" "weblogic_common_1" {
   to_port                  = "7777"
   protocol                 = "tcp"
   source_security_group_id = aws_security_group.jumpserver-windows.id
-    # aws_security_group.jumpserver-windows.id,
-    # local.environment == "test" ? module.jb_load_balancer_test[0].security_group.id : aws_security_group.internal_elb.id
-  # ]
+}
+
+resource "aws_security_group_rule" "weblogic_common_ingress_02" {
+  description              = "access from Windows Jumpserver and loadbalancer (forms/reports)"
+  security_group_id        = aws_security_group.weblogic_common.id
+  type                     = "ingress"
+  from_port                = "7777"
+  to_port                  = "7777"
+  protocol                 = "tcp"
+  source_security_group_id = local.environment == "test" ? "sg-075cf385b5a966b04" : aws_security_group.internal_elb.id
+}
+
+resource "aws_security_group_rule" "weblogic_common_ingress_03" {
+  description              = "SSH from Bastion"
+  security_group_id        = aws_security_group.weblogic_common.id
+  type                     = "ingress"
+  from_port                = "22"
+  to_port                  = "22"
+  protocol                 = "tcp"
+  source_security_group_id = module.bastion_linux.bastion_security_group
+}
+
+resource "aws_security_group_rule" "weblogic_common_ingress_04" {
+  description              = "access from Windows Jumpserver (admin console)"
+  security_group_id        = aws_security_group.weblogic_common.id
+  type                     = "ingress"
+  from_port                = "7001"
+  to_port                  = "7001"
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.jumpserver-windows.id
+}
+
+resource "aws_security_group_rule" "weblogic_common_ingress_05" {
+  description              = "access from Windows Jumpserver"
+  security_group_id        = aws_security_group.weblogic_common.id
+  type                     = "ingress"
+  from_port                = "80"
+  to_port                  = "80"
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.jumpserver-windows.id
+}
+
+resource "aws_security_group_rule" "weblogic_common_ingress_06" {
+  description       = "access from Cloud Platform Prometheus server"
+  security_group_id = aws_security_group.weblogic_common.id
+  type              = "ingress"
+  from_port         = "9100"
+  to_port           = "9100"
+  protocol          = "tcp"
+  cidr_blocks       = [local.cidrs.cloud_platform]
+}
+
+resource "aws_security_group_rule" "weblogic_common_ingress_07" {
+  description       = "access from Cloud Platform Prometheus script exporter collector"
+  security_group_id = aws_security_group.weblogic_common.id
+  type              = "ingress"
+  from_port         = "9172"
+  to_port           = "9172"
+  protocol          = "tcp"
+  cidr_blocks       = [local.cidrs.cloud_platform]
+}
+
+resource "aws_security_group_rule" "weblogic_common_egress_01" {
+  description       = "allow all"
+  security_group_id = aws_security_group.weblogic_common.id
+  type              = "egress"
+  from_port         = "0"
+  to_port           = "0"
+  protocol          = "t-1"
+  cidr_blocks       = ["0.0.0.0/0"]
 }
