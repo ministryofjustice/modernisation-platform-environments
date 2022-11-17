@@ -23,6 +23,18 @@ variable "temp_dir" {
   description = "(Optional) Specifies an Amazon S3 path to a bucket that can be used as a temporary directory for the job."
 }
 
+variable "checkpoint_dir" {
+  type        = string
+  default     = null
+  description = "(Optional) Specifies an Amazon S3 path to a bucket that can be used as a Checkoint directory for the job."
+}
+
+variable "spark_event_logs" {
+  type        = string
+  default     = null
+  description = "(Optional) Specifies an Amazon S3 path to a bucket that can be used as a Spark Event Logs directory for the job."
+}
+
 variable "bookmark" {
   default     = "disabled"
   description = "It can be enabled, disabled or paused."

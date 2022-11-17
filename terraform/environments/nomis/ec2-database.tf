@@ -15,7 +15,6 @@ module "database" {
 
   name = each.key
 
-  always_on          = each.value.always_on
   ami_name           = each.value.ami_name
   asm_data_capacity  = each.value.asm_data_capacity
   asm_flash_capacity = each.value.asm_flash_capacity
@@ -184,11 +183,14 @@ resource "aws_security_group" "database_common" {
   vpc_id      = data.aws_vpc.shared_vpc.id
 
   ingress {
-    description     = "DB access from weblogic instances"
-    from_port       = "1521"
-    to_port         = "1521"
-    protocol        = "TCP"
-    security_groups = [aws_security_group.weblogic_common.id]
+    description = "DB access from weblogic and test instances"
+    from_port   = "1521"
+    to_port     = "1521"
+    protocol    = "TCP"
+    security_groups = [
+      aws_security_group.weblogic_common.id,
+      aws_security_group.ec2_test.id
+    ]
   }
 
   ingress {

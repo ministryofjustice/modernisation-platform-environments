@@ -10,7 +10,6 @@ module "mlra-ecs" {
   vpc_all                 = local.vpc_all
   app_name                = local.application_name
   container_instance_type = local.application_data.accounts[local.environment].container_instance_type
-  environment             = local.environment
   ami_image_id            = local.application_data.accounts[local.environment].ami_image_id
   instance_type           = local.application_data.accounts[local.environment].instance_type
   user_data               = local.user_data
@@ -27,6 +26,7 @@ module "mlra-ecs" {
   app_count               = local.application_data.accounts[local.environment].app_count
   ec2_ingress_rules       = local.ec2_ingress_rules
   ec2_egress_rules        = local.ec2_egress_rules
+  lb_tg_name              = local.application_data.accounts[local.environment].lb_tg_name
   tags_common             = local.tags
 
   depends_on = [module.alb, aws_cloudwatch_log_group.ecs_log_group] # TODO module.alb dependancy may have to be re-factored further into development
@@ -41,6 +41,22 @@ locals {
       protocol        = "tcp"
       cidr_blocks     = [data.aws_vpc.shared.cidr_block]
       security_groups = []
+    }
+    "cluster_ec2_lb_ingress_2" = {
+      description     = "Cluster EC2 ingress rule 2"
+      from_port       = 8080
+      to_port         = 8080
+      protocol        = "tcp"
+      cidr_blocks     = [data.aws_vpc.shared.cidr_block]
+      security_groups = []
+    }
+    "cluster_ec2_lb_ingress_3" = {
+      description     = "Cluster EC2 ingress rule 3"
+      from_port       = 32768
+      to_port         = 61000
+      protocol        = "tcp"
+      cidr_blocks     = [data.aws_vpc.shared.cidr_block]
+      security_groups = [module.alb.security_group.id]
     }
   }
   ec2_egress_rules = {

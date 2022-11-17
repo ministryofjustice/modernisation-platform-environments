@@ -17,7 +17,7 @@ module "alb" {
   security_group_ingress_from_port = 80
   security_group_ingress_to_port   = 80
   security_group_ingress_protocol  = "tcp"
-  ingress_cidr_block               = data.aws_vpc.shared.cidr_block
+  ingress_cidr_block               = local.application_data.accounts[local.environment].lz_vpc_cidr
 
   listener_protocol = "HTTP"
   listener_port     = 80

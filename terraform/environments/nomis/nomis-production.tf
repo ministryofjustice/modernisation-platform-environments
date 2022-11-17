@@ -15,7 +15,6 @@ locals {
     }
     # vars common across ec2 instances
     ec2_common = {
-      public_key                = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDdCvr+81dRu1qxFi1LSWEybb/ztbzlbfjd3Hj1EOHcEQt6lo9Cr94SUXjjUvD6krNzm9QWs8TdVRNfDCjaZRmO6KFX8UUUwE0UB0p6LZPy2I8cYirGN8f2fwCrh8dZg6x8sxa7fXW5gMZal6Z0O10u0XM5ajXkQz2f4T4zCxff7MDEuqZV0OWhaiTWPT9eph4UZH5FWA8Lxzml6qIAwyHa6O5j7hQpvX4kiMjvg9F9C5Fxo6EBpCAjdRcXgsMmDHQjqLJO3b2wWPlm45yES7NaAwZCb6Yq0BRmDPv2/ZokVNE8tudtf+cNa2+aLB9WiBVnFXggIuFeelArNi5X9U4nLzvaDX3y7+TnY+QY5FcDugJDwHKcb/ah64WMpSiWjrFiyg6fF04jFfV6YKdsH//7E/DSZAkVsj+XKHt23SyWS6RKXag+IW3UIp3pttELNHbIO+7vUGZT8btqIBtN5iM6PLiYzfDFHDRmd/aO0a844ZFioFzabGo7MuyAU+NkfLHIBXazrrxd2s+HXnBtL80iur4Jm7Vut1QoPJmknCq9iBv+itE8RYM8oN74g5BVTPAsw5vr2c5fvXwVdu0XhwRnkSsfCppdntf2ObX51PxjxXcq63jCEYRdq0bBPyGWa8hKiMcwx4TIz3IW2xGmLK6PO+2LLpVg89Q7EicMAFHC3w=="
       patch_approval_delay_days = 7
       patch_day                 = "THU"
     }
@@ -39,7 +38,6 @@ locals {
     # Legacy database module, do not add any more entries here
     databases_legacy = {
       AUDIT = {
-        always_on              = true
         ami_name               = "nomis_db_STIG-2022-04-26*"
         instance_type          = "r6i.2xlarge"
         asm_data_capacity      = 4000
@@ -71,7 +69,6 @@ locals {
           description = "PreProduction NOMIS MIS and Audit database to replace Azure PPPDL00017"
           oracle-sids = "PPMIS PPCNMAUD"
           monitored   = false
-          always-on   = true
         }
         ami_name  = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-03T12-51-25.032Z"
         ami_owner = "self" # remove this line next time AMI is updated so core-shared-services-production used instead
@@ -80,22 +77,45 @@ locals {
           disable_api_termination = true
         }
         ebs_volumes = {
-          "/dev/sdb" = { size = 100 }  # /u01
-          "/dev/sdc" = { size = 5120 } # /u02 - reduce this to 1000 when we move into preprod subscription
+          "/dev/sdb" = { size = 100 } # /u01
+          "/dev/sdc" = {              # /u02
+            iops = 15360              # Temporary. See DSOS-1561
+            size = 5120               # reduce this to 1000 when we move into preprod subscription
+          }
         }
         ebs_volume_config = {
-          data  = { total_size = 4000 }
-          flash = { total_size = 1000 }
+          app = {
+            iops       = 300   # Temporary. See DSOS-1561
+            throughput = 0     # Temporary. See DSOS-1561
+            type       = "gp2" # Temporary. See DSOS-1561
+          }
+          data = {
+            iops       = 2400  # Temporary. See DSOS-1561
+            throughput = 0     # Temporary. See DSOS-1561
+            type       = "gp2" # Temporary. See DSOS-1561
+            total_size = 4000
+          }
+          flash = {
+            iops       = 1500  # Temporary. See DSOS-1561
+            throughput = 0     # Temporary. See DSOS-1561
+            type       = "gp2" # Temporary. See DSOS-1561
+            total_size = 1000
+          }
+          swap = {
+            iops       = 100   # Temporary. See DSOS-1561
+            throughput = 0     # Temporary. See DSOS-1561
+            type       = "gp2" # Temporary. See DSOS-1561
+          }
         }
       }
 
       prod-nomis-db-2 = {
         tags = {
-          server-type = "nomis-db"
-          description = "Production NOMIS MIS and Audit database to replace Azure PDPDL00036 and PDPDL00038"
-          oracle-sids = "PCNMAUD"
-          monitored   = false
-          always-on   = true
+          server-type              = "nomis-db"
+          description              = "Production NOMIS MIS and Audit database to replace Azure PDPDL00036 and PDPDL00038"
+          oracle-sids              = "PCNMAUD"
+          monitored                = false
+          fixngo-connection-target = "10.40.0.136"
         }
         ami_name  = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-07T12-48-08.562Z"
         ami_owner = "self" # remove this line next time AMI is updated so core-shared-services-production used instead
@@ -104,12 +124,35 @@ locals {
           disable_api_termination = true
         }
         ebs_volumes = {
-          "/dev/sdb" = { size = 100 }  # /u01
-          "/dev/sdc" = { size = 3000 } # /u02
+          "/dev/sdb" = { size = 100 } # /u01
+          "/dev/sdc" = {              # /u02
+            size = 3000
+            iops = 9000 # Temporary. See DSOS-1561
+          }
         }
         ebs_volume_config = {
-          data  = { total_size = 4000 }
-          flash = { total_size = 1000 }
+          app = {
+            iops       = 300   # Temporary. See DSOS-1561
+            throughput = 0     # Temporary. See DSOS-1561
+            type       = "gp2" # Temporary. See DSOS-1561
+          }
+          data = {
+            iops       = 2400  # Temporary. See DSOS-1561
+            throughput = 0     # Temporary. See DSOS-1561
+            type       = "gp2" # Temporary. See DSOS-1561
+            total_size = 4000
+          }
+          flash = {
+            iops       = 1500  # Temporary. See DSOS-1561
+            throughput = 0     # Temporary. See DSOS-1561
+            type       = "gp2" # Temporary. See DSOS-1561
+            total_size = 1000
+          }
+          swap = {
+            iops       = 100   # Temporary. See DSOS-1561
+            throughput = 0     # Temporary. See DSOS-1561
+            type       = "gp2" # Temporary. See DSOS-1561
+          }
         }
       }
 
@@ -118,7 +161,6 @@ locals {
           server-type = "nomis-db"
           description = "Production NOMIS HA database to replace Azure PDPDL00062"
           monitored   = false
-          always-on   = true
         }
         ami_name  = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-07T12-48-08.562Z"
         ami_owner = "self" # remove this line next time AMI is updated so core-shared-services-production used instead
@@ -127,12 +169,35 @@ locals {
           disable_api_termination = true
         }
         ebs_volumes = {
-          "/dev/sdb" = { size = 100 }  # /u01
+          "/dev/sdb" = { # /u01
+            iops = 300   # Temporary. See DSOS-1561
+            size = 100
+          }
           "/dev/sdc" = { size = 1000 } # /u02
         }
         ebs_volume_config = {
-          data  = { total_size = 3000 }
-          flash = { total_size = 500 }
+          app = {
+            iops       = 3000  # Temporary. See DSOS-1561
+            throughput = 0     # Temporary. See DSOS-1561
+            type       = "gp2" # Temporary. See DSOS-1561
+          }
+          data = {
+            iops       = 1800  # Temporary. See DSOS-1561
+            throughput = 0     # Temporary. See DSOS-1561
+            type       = "gp2" # Temporary. See DSOS-1561
+            total_size = 3000
+          }
+          flash = {
+            iops       = 750   # Temporary. See DSOS-1561
+            throughput = 0     # Temporary. See DSOS-1561
+            type       = "gp2" # Temporary. See DSOS-1561
+            total_size = 500
+          }
+          swap = {
+            iops       = 100   # Temporary. See DSOS-1561
+            throughput = 0     # Temporary. See DSOS-1561
+            type       = "gp2" # Temporary. See DSOS-1561
+          }
         }
       }
     }
