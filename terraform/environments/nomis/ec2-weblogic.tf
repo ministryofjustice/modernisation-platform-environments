@@ -242,6 +242,6 @@ resource "aws_security_group_rule" "weblogic_common_egress_01" {
   type              = "egress"
   from_port         = "0"
   to_port           = "0"
-  protocol          = "t-1"
+  protocol          = "-1"
   cidr_blocks       = ["0.0.0.0/0"]
 }
