@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "selenium_report" {
-  count = local.environment == "development" ? 1 : 0
+  count  = local.environment == "development" ? 1 : 0
   bucket = "laa-${local.application_name}-deployment-pipeline-pipelinereportbucket"
 
   tags = merge(
@@ -11,17 +11,17 @@ resource "aws_s3_bucket" "selenium_report" {
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "report_sse" {
-  count = local.environment == "development" ? 1 : 0
+  count  = local.environment == "development" ? 1 : 0
   bucket = aws_s3_bucket.selenium_report.bucket
   rule {
     apply_server_side_encryption_by_default {
-      sse_algorithm     = "AES256"
+      sse_algorithm = "AES256"
     }
   }
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "report_lifecycle" {
-  count = local.environment == "development" ? 1 : 0
+  count  = local.environment == "development" ? 1 : 0
   bucket = aws_s3_bucket.selenium_report.id
 
   rule {
@@ -38,7 +38,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "report_lifecycle" {
 }
 
 resource "aws_s3_bucket_versioning" "report_versioning" {
-  count = local.environment == "development" ? 1 : 0
+  count  = local.environment == "development" ? 1 : 0
   bucket = aws_s3_bucket.selenium_report.id
   versioning_configuration {
     status = "Enabled"
