@@ -10,7 +10,6 @@ locals {
 
     # vars common across ec2 instances
     ec2_common = {
-      public_key                = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCv/RZr7NQwO1Ovjbaxs5X9jR1L4QU/WSOIH3qhCriTlzbdnPI5mA79ZWBZ25h5tA2eIu5FbX+DBwYgwARCnS6VL4KiLKq9j7Ys/gx2FE6rWlXEibpK/9dGLu35znDUyO0xiLIu/EPZFpWhn/2L1z82GiEjDaiY00NmxkHHKMaRCDrgCJ4tEhGPWGcPYoNAYmCkncQJjYojSJ0uaP6e85yx2nmE85YDE+QcDoN5HtHex84CCibh98nD2tMhEQ2Ss+g7/nSXw+/Z2RadDznpz0h/8CcgAGpTHJ35+aeWINquw0lWSJldCLfn3PXldcDzFleqoop9jRGn2hB9eOUz2iEC7MXoLPFcen/lzQD+xfwvaq1+4YU7BbiyTtY/lcw0xcE01QBA+nUiHPJMBewr2TmZRHNy1fvg8ZRKLrOcEMz8iPKVtquftl1DZZCO8Xccr3BVpfoXIl5LuEWPqnMABAvgtkHMaIkTqKMgaKVEC9/KTqRn/K2zzGljUJkzcgO95bNksjDRXtbfQ0AD7CLa47xPOLPh4dC2WDindKh3YALa74EBOyEtJWvLt6fRLPhWmOaZkCrjC3TI+onKiPo0nXrN7Uyg2Q6Atiauw6fqz63cRXkzU/e7LVoxT42qaaaGMytgZJXF3Wk4hp88IqqnDXFavLUElsJEgOTWiNTk2N92/w=="
       patch_approval_delay_days = 3
       patch_day                 = "TUE"
     }
@@ -39,42 +38,42 @@ locals {
       # *-nomis-db-3: HA
 
       # For ad-hoc testing.  Comment in and out as needed
-      dev-nomis-db-1 = {
-        tags = {
-          server-type       = "nomis-db"
-          description       = "Dev database using T1 data set"
-          oracle-sids       = "CNOMT1"
-          monitored         = false
-          s3-db-restore-dir = "CNOMT1_20211214"
-        }
-        ami_name  = "nomis_rhel_7_9_oracledb_11_2_*"
-        ami_owner = "self"
-        ebs_volume_config = {
-          app = {
-            iops       = 300   # Temporary. See DSOS-1561
-            throughput = 0     # Temporary. See DSOS-1561
-            type       = "gp2" # Temporary. See DSOS-1561
-          }
-          data = {
-            iops       = 120   # Temporary. See DSOS-1561
-            throughput = 0     # Temporary. See DSOS-1561
-            type       = "gp2" # Temporary. See DSOS-1561
-            total_size = 200
-          }
-          flash = {
-            iops       = 100   # Temporary. See DSOS-1561
-            throughput = 0     # Temporary. See DSOS-1561
-            type       = "gp2" # Temporary. See DSOS-1561
-            total_size = 2
-          }
-          swap = {
-            iops       = 100   # Temporary. See DSOS-1561
-            throughput = 0     # Temporary. See DSOS-1561
-            type       = "gp2" # Temporary. See DSOS-1561
-          }
-        }
-        # branch = var.BRANCH_NAME # comment in if testing ansible
-      }
+      #      dev-nomis-db-1 = {
+      #        tags = {
+      #          server-type       = "nomis-db"
+      #          description       = "Dev database using T1 data set"
+      #          oracle-sids       = "CNOMT1"
+      #          monitored         = false
+      #          s3-db-restore-dir = "CNOMT1_20211214"
+      #        }
+      #        ami_name  = "nomis_rhel_7_9_oracledb_11_2_*"
+      #        ami_owner = "self"
+      #        ebs_volume_config = {
+      #          app = {
+      #            iops       = 300   # Temporary. See DSOS-1561
+      #            throughput = 0     # Temporary. See DSOS-1561
+      #            type       = "gp2" # Temporary. See DSOS-1561
+      #          }
+      #          data = {
+      #            iops       = 120   # Temporary. See DSOS-1561
+      #            throughput = 0     # Temporary. See DSOS-1561
+      #            type       = "gp2" # Temporary. See DSOS-1561
+      #            total_size = 200
+      #          }
+      #          flash = {
+      #            iops       = 100   # Temporary. See DSOS-1561
+      #            throughput = 0     # Temporary. See DSOS-1561
+      #            type       = "gp2" # Temporary. See DSOS-1561
+      #            total_size = 2
+      #          }
+      #          swap = {
+      #            iops       = 100   # Temporary. See DSOS-1561
+      #            throughput = 0     # Temporary. See DSOS-1561
+      #            type       = "gp2" # Temporary. See DSOS-1561
+      #          }
+      #        }
+      #        # branch = var.BRANCH_NAME # comment in if testing ansible
+      #      }
     }
     weblogics          = {}
     ec2_test_instances = {}

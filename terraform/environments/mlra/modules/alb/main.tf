@@ -1,5 +1,5 @@
 module "lb-access-logs-enabled" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer?ref=v2.1.0"
   providers = {
     aws.bucket-replication = aws.bucket-replication
   }
@@ -95,7 +95,7 @@ resource "aws_lb_listener_rule" "alb_listener_rule" {
   #
   # in the meantime, therefore, we are simply forwarding traffic to a
   # target group here. However, in another phase of the migration, where
-  # cdn resources are carried into modernisation platform, the above 
+  # cdn resources are carried into modernisation platform, the above
   # configuration is very likely going to be required.
   #
   # see: https://docs.google.com/document/d/15BUaNNx6SW2fa6QNzdMUWscWWBQ44YCiFz-e3SOwouQ
