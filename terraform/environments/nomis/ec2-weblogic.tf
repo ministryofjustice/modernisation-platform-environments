@@ -184,16 +184,16 @@ resource "aws_security_group" "weblogic_common" {
     security_groups = [aws_security_group.jumpserver-windows.id]
   }
 
-  ingress {
-    description = "access from Windows Jumpserver and loadbalancer (forms/reports)"
-    from_port   = "7777"
-    to_port     = "7777"
-    protocol    = "TCP"
-    security_groups = [
-      aws_security_group.jumpserver-windows.id,
-      local.environment == "test" ? module.jb_load_balancer_test[0].security_group.id : aws_security_group.internal_elb.id
-    ]
-  }
+  # ingress {
+  #   description = "access from Windows Jumpserver and loadbalancer (forms/reports)"
+  #   from_port   = "7777"
+  #   to_port     = "7777"
+  #   protocol    = "TCP"
+  #   security_groups = [
+  #     aws_security_group.jumpserver-windows.id,
+  #     local.environment == "test" ? module.jb_load_balancer_test[0].security_group.id : aws_security_group.internal_elb.id
+  #   ]
+  # }
 
   ingress {
     description = "access from Cloud Platform Prometheus server"
@@ -226,4 +226,17 @@ resource "aws_security_group" "weblogic_common" {
       Name = "weblogic-commmon"
     }
   )
+}
+
+resource "aws_security_group_rule" "weblogic_common_1" {
+  description              = "access from Windows Jumpserver and loadbalancer (forms/reports)"
+  security_group_id        = aws_security_group.weblogic_common.id
+  type                     = "ingress"
+  from_port                = "7777"
+  to_port                  = "7777"
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.jumpserver-windows.id
+    # aws_security_group.jumpserver-windows.id,
+    # local.environment == "test" ? module.jb_load_balancer_test[0].security_group.id : aws_security_group.internal_elb.id
+  # ]
 }
