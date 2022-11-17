@@ -75,7 +75,7 @@ module "httptest_sg" {
       to_port                  = 443
       protocol                 = "tcp"
       description              = "HTTPS For SSM Session Manager"
-      source_security_group_id = "sg-0754d9a309704addd"  # laa interface endpoint security group in core-vpc-development
+      source_security_group_id = "sg-0754d9a309704addd" # laa interface endpoint security group in core-vpc-development
     }
   ]
 }
