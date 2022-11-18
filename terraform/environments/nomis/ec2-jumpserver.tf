@@ -4,6 +4,10 @@
 
 locals {
 
+  jumpserver_users = [
+    "robertiansweetman"
+  ]
+
   secret_prefix = "/Jumpserver/Users"
 
   ec2_jumpserver = {
