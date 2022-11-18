@@ -17,11 +17,13 @@ locals {
 
   ebs_volumes_from_ami = {
     for key, value in local.ami_block_device_mappings : key => {
-      snapshot_id = value.ebs.snapshot_id
-      iops        = value.ebs.iops
-      throughput  = value.ebs.throughput
-      size        = value.ebs.volume_size
-      type        = value.ebs.volume_type
+      snapshot_id  = try(value.ebs.snapshot_id, null)
+      iops         = try(value.ebs.iops, null)
+      throughput   = try(value.ebs.throughput, null)
+      size         = try(value.ebs.volume_size, null)
+      type         = try(value.ebs.volume_type, null)
+      no_device    = value.no_device
+      virtual_name = value.virtual_name
     }
   }
 
@@ -47,6 +49,7 @@ locals {
 
   # merge AMI and var.ebs_volume values, e.g. allow AMI settings to be overridden
   ebs_volume_names = keys(merge(var.ebs_volumes, local.ami_block_device_mappings))
+
   ebs_volumes = {
     for key in local.ebs_volume_names :
     key => merge(
