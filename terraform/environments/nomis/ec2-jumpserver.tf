@@ -13,6 +13,9 @@ locals {
       component   = "jumpserver"
     }
 
+    /* ebs_volumes = {}
+    ebs_volume_config = {} */
+
     instance = {
       disable_api_termination      = false
       instance_type                = "t3.medium"
@@ -22,17 +25,24 @@ locals {
       vpc_security_group_ids       = [aws_security_group.jumpserver-windows.id]
     }
 
-    #checkov:skip=CKV_SECRET_6: "Base64 High Entropy String"
     user_data = {
-      write_files = base64encode(templatefile("./templates/jumpserver-user-data.yaml", { SECRET_PREFIX = local.secret_prefix, S3_BUCKET = module.s3-bucket.bucket.id }))
+      args        = { SECRET_PREFIX = local.secret_prefix, S3_BUCKET = module.s3-bucket.bucket.id }
+      scripts     = []
+      write_files = {
+        "jumpserver-user-data.yaml" = {
+          path        = "C:/"
+          owner       = "user"
+          permissions = ""
+        }
+      }
     }
+    
 
     autoscaling_group = {  
       desired_capacity = 1
       max_size         = 2
       min_size         = 0
-      force_delete        = true
-      # vpc_zone_identifier = data.aws_subnets.jumpserver.ids # FIXME: <--- check this!
+      force_delete     = true
     }  
   }
 }
@@ -51,15 +61,14 @@ module "ec2_jumpserver_autoscaling_group" {
   ami_owner             = try(each.value.ami_owner, "core-shared-services-production")
   instance              = merge(local.ec2_jumpserver.instance, lookup(each.value, "instance", {}))
   user_data             = merge(local.ec2_jumpserver.user_data, lookup(each.value, "user_data", {}))
-  ebs_volume_config     = lookup(each.value, "ebs_volume_config", {})
-  ebs_volumes           = lookup(each.value, "ebs_volumes", {})
+
+  # ebs_volume_config     = merge(local.ec2_jumpserver.ebs_volume_config, lookup(each.value, "ebs_volume_config", {}))
+  # ebs_volumes           = { for k, v in local.ec2_jumpserver.ebs_volumes : k => merge(v, try(each.value.ebs_volumes[k], {})) }
+  ebs_volume_config  = lookup(each.value, "ebs_volume_config", {})
+  ebs_volumes        = lookup(each.value, "ebs_volumes", {})
   ssm_parameters_prefix = "jumpserver/"
   ssm_parameters        = {}
   autoscaling_group     = merge(local.ec2_jumpserver.autoscaling_group, lookup(each.value, "autoscaling_group", {}))
-  
-  # TODO: come back and check this
-  # autoscaling_lifecycle_hooks = merge(local.ec2_Jumpserver.autoscaling_lifecycle_hooks, lookup(each.value, "autoscaling_lifecycle_hooks", {}))
-
   autoscaling_schedules = coalesce(lookup(each.value, "autoscaling_schedules", null), {
     # if sizes not set, use the values defined in autoscaling_group
     "scale_up" = {
@@ -79,7 +88,7 @@ module "ec2_jumpserver_autoscaling_group" {
   region                    = local.region
   availability_zone         = local.availability_zone
   subnet_set                = local.subnet_set
-  subnet_name               = "data"
+  subnet_name               = "private"
   tags                      = merge(local.tags, local.ec2_jumpserver.tags, try(each.value.tags, {}))
   account_ids_lookup        = local.environment_management.account_ids
   ansible_repo              = "modernisation-platform-configuration-management"
@@ -134,16 +143,6 @@ data "github_team" "jumpserver" {
   slug = "studio-webops"
 }
 
-/* data "aws_subnets" "jumpserver" {
-  filter {
-    name   = "vpc-id"
-    values = [data.aws_vpc.jumpserver.id]
-  }
-  tags = {
-    Name = "${local.vpc_name}-${local.environment}-${local.subnet_set}-private-${local.region}*"
-  }
-} */
-
 # resource policy to restrict access to secret value to specific user and the CICD role used to deploy terraform
 data "aws_iam_policy_document" "jumpserver_secrets" {
   for_each = toset(data.github_team.jumpserver.members)
@@ -165,27 +164,6 @@ data "aws_iam_policy_document" "jumpserver_secrets" {
     }
   }
 }
-
-/* # IAM policy permissions to enable jumpserver to list secrets and put user passwords into secret manager
-data "aws_iam_policy_document" "jumpserver_users" {
-  statement {
-    effect    = "Allow"
-    actions   = ["secretsmanager:PutSecretValue"]
-    resources = ["arn:aws:secretsmanager:${local.region}:${data.aws_caller_identity.current.id}:secret:${local.secret_prefix}/*"]
-  }
-  statement {
-    effect    = "Allow"
-    actions   = ["secretsmanager:ListSecrets"]
-    resources = ["*"]
-  }
-}
-
-# Add policy to role
-resource "aws_iam_role_policy" "jumpserver_users" {
-  name   = "secrets-access-jumpserver-users"
-  role   = aws_iam_role.jumpserver.id
-  policy = data.aws_iam_policy_document.jumpserver_users.json
-} */
 
 #------
 # Jumpserver specific
