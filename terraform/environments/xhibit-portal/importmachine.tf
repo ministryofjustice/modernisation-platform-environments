@@ -12,13 +12,13 @@ resource "aws_security_group" "importmachine" {
   }
 
   ingress {
-    description     = "from PRTG load balancer"
-    from_port       = 0
-    to_port         = 0
-    protocol        = "-1"
-    security_groups = [aws_security_group.prtg_lb.id]
 
-
+    description      = "from all"
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
 
   }
 
