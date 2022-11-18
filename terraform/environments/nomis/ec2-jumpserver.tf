@@ -4,10 +4,6 @@
 
 locals {
 
-  jumpserver_users = [
-    "robertiansweetman"
-  ]
-
   secret_prefix = "/Jumpserver/Users"
 
   ec2_jumpserver = {
@@ -16,9 +12,6 @@ locals {
       description = "nomis windows jumpserver"
       component   = "jumpserver"
     }
-
-    /* ebs_volumes = {}
-    ebs_volume_config = {} */
 
     instance = {
       disable_api_termination      = false
@@ -65,9 +58,6 @@ module "ec2_jumpserver_autoscaling_group" {
   ami_owner             = try(each.value.ami_owner, "core-shared-services-production")
   instance              = merge(local.ec2_jumpserver.instance, lookup(each.value, "instance", {}))
   user_data             = merge(local.ec2_jumpserver.user_data, lookup(each.value, "user_data", {}))
-
-  # ebs_volume_config     = merge(local.ec2_jumpserver.ebs_volume_config, lookup(each.value, "ebs_volume_config", {}))
-  # ebs_volumes           = { for k, v in local.ec2_jumpserver.ebs_volumes : k => merge(v, try(each.value.ebs_volumes[k], {})) }
   ebs_volume_config  = lookup(each.value, "ebs_volume_config", {})
   ebs_volumes        = lookup(each.value, "ebs_volumes", {})
   ssm_parameters_prefix = "jumpserver/"
@@ -134,13 +124,6 @@ resource "aws_security_group" "jumpserver-windows" {
     }
   )
 }
-
-#------------------------------------------------------------------------------
-# Windows Jumpserver
-# To add a new local user account, add a github username to `jumpserver_users`
-# local variable.  Scheduled job running on instance will create user and push
-# password to Secrets Manager, which only said user can access.
-#------------------------------------------------------------------------------
 
 # required as part of the user manager setup
 data "github_team" "jumpserver" {
