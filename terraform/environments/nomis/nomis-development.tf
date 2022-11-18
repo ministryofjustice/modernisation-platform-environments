@@ -112,24 +112,14 @@ locals {
       }
     }
     ec2_jumpserver_autoscaling_groups = {
-      jumpserver-autoscaling-group = {
+      test-jumpserver-asg = {
         tags = {
           ami         = "nomis_windows_server_2022_jumpserver"
           description = "jumpserver instance"
           monitored   = false
         }
         ami_name  = "nomis_windows_server_2022_jumpserver*"
-        # ami_owner = "374269020027"
-        #ebs_volumes = {
-        #  "/dev/sda1" = {}
-        #}
-        /* ebs_volume_config = {
-          os = {
-            iops       = 3000  # Temporary. See DSOS-1561
-            throughput = 0     # Temporary. See DSOS-1561
-            type       = "gp3" # Temporary. See DSOS-1561
-          }
-        } */
+        # branch   = var.BRANCH_NAME # comment in if testing ansible
       }
     }
   }
