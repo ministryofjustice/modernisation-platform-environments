@@ -107,7 +107,7 @@ variable "instance" {
 }
 
 variable "user_data" {
-  description = "Map of cloud-init config write_file sections for user data"
+  description = "Map of Linux cloud-init config write_file sections for user data"
   type = object({
     args    = optional(map(string))
     scripts = list(string)
