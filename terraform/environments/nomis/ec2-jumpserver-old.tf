@@ -13,12 +13,6 @@
   slug = "studio-webops"
 } */
 
-locals {
-    jumpserver_users = [
-    "robertiansweetman"
-    ]
-}
-
 data "aws_vpc" "jumpserver" {
   tags = {
     Name = "${local.vpc_name}-${local.environment}"
