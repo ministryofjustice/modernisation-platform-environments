@@ -41,17 +41,17 @@ jobs:
       TF_ENV: ${{ matrix.environment }}
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3.1.0
+        uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
       - name: Set Account Number
         run: echo "ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${GITHUB_WORKFLOW}-${TF_ENV}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)" >> $GITHUB_ENV
       - name: configure aws credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@67fbcbb121271f7775d2e7715933280b06314838 # v1.7.0
         with:
           role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
           role-session-name: githubactionsrolesession
           aws-region: ${{ env.AWS_REGION }}
       - name: Load and Configure Terraform
-        uses: hashicorp/setup-terraform@v2.0.3
+        uses: hashicorp/setup-terraform@633666f66e0061ca3b725c73b2ec20cd13a8fdd1 # v2.0.3
         with:
           terraform_version: "~1"
           terraform_wrapper: false
@@ -80,17 +80,17 @@ jobs:
       name: ${{ github.workflow }}-${{ matrix.environment }}
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3.1.0
+        uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
       - name: Set Account Number
         run: echo "ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${GITHUB_WORKFLOW}-${TF_ENV}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)" >> $GITHUB_ENV
       - name: configure aws credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@67fbcbb121271f7775d2e7715933280b06314838 # v1.7.0
         with:
           role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
           role-session-name: githubactionsrolesession
           aws-region: ${{ env.AWS_REGION }}
       - name: Load and Configure Terraform
-        uses: hashicorp/setup-terraform@v2.0.3
+        uses: hashicorp/setup-terraform@633666f66e0061ca3b725c73b2ec20cd13a8fdd1 # v2.0.3
         with:
           terraform_version: "~1"
           terraform_wrapper: false
@@ -116,17 +116,17 @@ jobs:
 #      TF_ENV: ${{ matrix.environment }}
 #    steps:
 #      - name: Checkout Repository
-#        uses: actions/checkout@v3.1.0
+#        uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
 #      - name: Set Account Number
 #        run: echo "ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${GITHUB_WORKFLOW}-${TF_ENV}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)" >> $GITHUB_ENV
 #      - name: configure aws credentials
-#        uses: aws-actions/configure-aws-credentials@v1
+#        uses: aws-actions/configure-aws-credentials@67fbcbb121271f7775d2e7715933280b06314838 # v1.7.0
 #        with:
 #          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
 #          role-session-name: githubactionsrolesession
 #          aws-region: ${{ env.AWS_REGION }}
 #      - name: Load and Configure Terraform
-#        uses: hashicorp/setup-terraform@v2.0.3
+#        uses: hashicorp/setup-terraform@633666f66e0061ca3b725c73b2ec20cd13a8fdd1 # v2.0.3
 #        with:
 #          terraform_version: "~1"
 #          terraform_wrapper: false
@@ -154,17 +154,17 @@ jobs:
 #      name: ${{ github.workflow }}-${{ matrix.environment }}
 #    steps:
 #      - name: Checkout Repository
-#        uses: actions/checkout@v3.1.0
+#        uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
 #      - name: Set Account Number
 #        run: echo "ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${GITHUB_WORKFLOW}-${TF_ENV}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)" >> $GITHUB_ENV
 #      - name: configure aws credentials
-#        uses: aws-actions/configure-aws-credentials@v1
+#        uses: aws-actions/configure-aws-credentials@67fbcbb121271f7775d2e7715933280b06314838 # v1.7.0
 #        with:
 #          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
 #          role-session-name: githubactionsrolesession
 #          aws-region: ${{ env.AWS_REGION }}
 #      - name: Load and Configure Terraform
-#        uses: hashicorp/setup-terraform@v2.0.3
+#        uses: hashicorp/setup-terraform@633666f66e0061ca3b725c73b2ec20cd13a8fdd1 # v2.0.3
 #        with:
 #          terraform_version: "~1"
 #          terraform_wrapper: false

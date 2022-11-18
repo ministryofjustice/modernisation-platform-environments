@@ -6,7 +6,10 @@ locals {
     nomis-environment = local.name_split[0]
     server-name       = var.name
   }
-  tags = merge(local.default_tags, var.tags)
+  ssm_parameters_prefix_tag = var.ssm_parameters_prefix == "" ? {} : {
+    ssm-parameters-prefix = var.ssm_parameters_prefix
+  }
+  tags = merge(local.default_tags, local.ssm_parameters_prefix_tag, var.tags)
 
   ami_block_device_mappings = {
     for bdm in data.aws_ami.this.block_device_mappings : bdm.device_name => bdm
@@ -53,6 +56,11 @@ locals {
     )
   }
 
+  user_data_args_ssm_params = {
+    for key, value in var.ssm_parameters != null ? var.ssm_parameters : {} :
+    "ssm_parameter_${key}" => aws_ssm_parameter.this[key].name
+  }
+
   user_data_args_common = {
     branch               = var.branch == "" ? "main" : var.branch
     ansible_repo         = var.ansible_repo == null ? "" : var.ansible_repo
@@ -60,5 +68,5 @@ locals {
     ansible_args         = "--tags ec2provision"
   }
 
-  user_data_args = merge(local.user_data_args_common, try(var.user_data.args, {}))
+  user_data_args = merge(local.user_data_args_common, local.user_data_args_ssm_params, try(var.user_data.args, {}))
 }

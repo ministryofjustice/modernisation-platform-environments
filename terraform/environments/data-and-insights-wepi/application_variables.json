@@ -12,7 +12,7 @@
       "redshift_resume_cluster_cron": "cron(0 6 ? * MON-FRI *)",
       "redshift_log_retention": 90
     },
-    "test": {
+    "preproduction": {
       "redshift_node_type": "ra3.xlplus",
       "redshift_cluster_node_count": 1,
       "redshift_auto_snapshot_retention": 7,

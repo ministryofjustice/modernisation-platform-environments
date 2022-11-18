@@ -6,7 +6,7 @@ resource "aws_instance" "this" {
   ami                         = data.aws_ami.this.id
   associate_public_ip_address = false
   disable_api_termination     = var.instance.disable_api_termination
-  ebs_optimized               = true
+  ebs_optimized               = data.aws_ec2_instance_type.this.ebs_optimized_support == "unsupported" ? false : true
   iam_instance_profile        = aws_iam_instance_profile.this.name
   instance_type               = var.instance.instance_type
   key_name                    = var.instance.key_name
@@ -134,14 +134,14 @@ resource "aws_route53_record" "external" {
 #------------------------------------------------------------------------------
 
 resource "random_password" "this" {
-  for_each = var.ssm_parameters
+  for_each = var.ssm_parameters != null ? var.ssm_parameters : {}
 
   length  = each.value.random.length
   special = lookup(each.value.random, "special", null)
 }
 
 resource "aws_ssm_parameter" "this" {
-  for_each = var.ssm_parameters
+  for_each = var.ssm_parameters != null ? var.ssm_parameters : {}
 
   name        = "/${var.ssm_parameters_prefix}${var.name}/${each.key}"
   description = each.value.description
@@ -216,6 +216,7 @@ resource "aws_iam_role" "this" {
 }
 
 resource "aws_iam_role_policy" "asm_parameter" {
+  count  = var.ssm_parameters != null ? 1 : 0
   name   = "asm-parameter-access-${var.name}"
   role   = aws_iam_role.this.id
   policy = data.aws_iam_policy_document.asm_parameter.json
