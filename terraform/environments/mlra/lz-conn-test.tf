@@ -57,6 +57,7 @@ module "httptest_sg" {
       to_port     = 65535
       protocol    = "tcp"
       description = "Outgoing"
+<<<<<<< HEAD
       cidr_blocks = "10.200.0.0/20"
     },
     {
@@ -65,6 +66,9 @@ module "httptest_sg" {
       protocol    = "tcp"
       description = "Outgoing"
       cidr_blocks = "10.202.0.0/20"
+=======
+      cidr_blocks = ["10.200.0.0/20", "10.202.0.0/20"]
+>>>>>>> 95458996 (Add LAA_DEV Cidr)
     }
   ]
   ingress_with_cidr_blocks = [
@@ -73,6 +77,7 @@ module "httptest_sg" {
       to_port     = 80
       protocol    = "tcp"
       description = "HTTP"
+<<<<<<< HEAD
       cidr_blocks = "10.200.0.0/20"
     },
     {
@@ -81,6 +86,9 @@ module "httptest_sg" {
       protocol    = "tcp"
       description = "Outgoing"
       cidr_blocks = "10.202.0.0/20"
+=======
+      cidr_blocks = ["10.200.0.0/20", "10.202.0.0/20"]
+>>>>>>> 95458996 (Add LAA_DEV Cidr)
     }
   ]
   ingress_with_source_security_group_id = [
