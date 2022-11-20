@@ -44,8 +44,7 @@ inline_policy = {
     name = "kinesis-s3-inline-policy"
     policy = jsonencode({    
     "Version" = "2012-10-17",  
-    "Statement" =
-    [    
+    "Statement" = [    
         {      
             "Effect" = "Allow",      
             "Action" = [
