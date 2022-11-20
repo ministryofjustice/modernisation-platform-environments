@@ -40,7 +40,7 @@ resource "aws_iam_role" "firehose_role" {
 }
 EOF
 
-inline_policy {
+inline_policy = {
     "Version": "2012-10-17",  
     "Statement":
     [    
