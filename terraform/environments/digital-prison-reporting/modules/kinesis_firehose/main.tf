@@ -71,24 +71,14 @@ EOF
           Resource = "arn:aws:kinesis:${var.aws_region}:${var.aws_account_id}:stream/${var.kinesis_source_stream_name}"
         },
         {
-          Effect = "Allow",
-          Action = [
-            "kms:Decrypt",
-            "kms:GenerateDataKey"
-          ],
-          Resource = [
-            "*"
-          ]
+           Effect = "Allow",
+           Action = [
+               "logs:PutLogEvents"
+           ],
+           Resource = [
+                "arn:aws:logs:${var.aws_region}:${var.aws_account_id}:/aws/kinesisfirehose/*"
+           ]
         },
-        {
-          Effect = "Allow",
-          Action = [
-            "logs:PutLogEvents"
-          ],
-          Resource = [
-            "arn:aws:logs:${var.aws_region}:${var.aws_account_id}:/aws/kinesisfirehose/*"
-          ]
-        }
       ]
     })
   }
