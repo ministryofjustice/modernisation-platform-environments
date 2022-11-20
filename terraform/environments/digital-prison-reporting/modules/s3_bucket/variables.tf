@@ -22,5 +22,5 @@ variable "custom_kms_key" {
 
 variable "create_notification_queue" {
   description = "Setup Notification Queue"
-  default     = false  
+  default     = false
 }

@@ -52,7 +52,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "application_tf_st
 resource "aws_sqs_queue" "notification_queue" {
   count = var.create_notification_queue ? 1 : 0
 
-  name = "s3-event-queue"
+  name   = "s3-event-queue"
   policy = <<POLICY
 {
   "Version": "2012-10-17",
@@ -73,12 +73,12 @@ POLICY
 }
 
 resource "aws_s3_bucket_notification" "bucket_notification" {
-  count = var.create_notification_queue ? 1 : 0
+  count  = var.create_notification_queue ? 1 : 0
   bucket = aws_s3_bucket.application_tf_state.*.id
 
   queue {
-    queue_arn     = aws_sqs_queue.notification_queue.arn
-    events        = ["s3:ObjectCreated:*"]
+    queue_arn = aws_sqs_queue.notification_queue.arn
+    events    = ["s3:ObjectCreated:*"]
   }
 }
 
