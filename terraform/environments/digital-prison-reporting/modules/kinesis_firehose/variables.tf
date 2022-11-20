@@ -1,5 +1,6 @@
 variable "kinesis_source_stream" {}
 
+variable "kinesis_source_stream_arn" {}
 
 variable "kinesis_source_stream_name" {}
 
