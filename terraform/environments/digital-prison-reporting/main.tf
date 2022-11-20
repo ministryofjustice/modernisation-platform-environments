@@ -888,8 +888,9 @@ module "s3_nomis_oracle_sqs" {
   )
 }
 
-# Kinesis Firehose Stream
+# Kinesis Nomis Stream
 module kinesis_nomis_stream {
+  source                      = "./modules/kinesis_firehose"
   kinesis_source_stream       = "arn:aws:kinesis:eu-west-2:771283872747:stream/dpr-kinesis-ingestor-development"
   kinesis_source_stream_name  = "dpr-kinesis-ingestor-development"
   source_s3_id                = module.s3_nomis_oracle_sqs.bucket_id
