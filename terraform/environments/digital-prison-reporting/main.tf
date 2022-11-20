@@ -900,6 +900,7 @@ module "kinesis_nomis_stream" {
   aws_region                 = local.account_region
   cloudwatch_log_group_name  = "/aws/kinesisfirehose/nomis"
   cloudwatch_log_stream_name = "NomisOracle"
+  cloudwatch_logging_enabled = true
 }
 
 ##########################
