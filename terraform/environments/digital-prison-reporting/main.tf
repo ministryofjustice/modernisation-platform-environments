@@ -850,7 +850,7 @@ module "dms_nomis_t3" {
   source_app_password   = "DSkpo4n7GhnmIV"
   source_address        = "test-address"
   vpc                   = data.aws_vpc.shared.id
-  kinesis_target_stream = local.kinesis_stream_ingestor
+  kinesis_target_stream = "arn:aws:kinesis:eu-west-2:771283872747:stream/dpr-kinesis-ingestor-development"
   kinesis_stream_policy = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_write_only_arn
   project_id            = local.project
   env                   = local.environment
@@ -869,6 +869,36 @@ module "dms_nomis_t3" {
       Resource_Type = "DMS Replication"
     }
   )
+}
+
+# S3 Oracle to Nomis SQS Notification 
+module "s3_nomis_oracle_sqs" {
+  source                    = "./modules/s3_bucket"
+  create_s3                 = local.setup_buckets
+  name                      = "${local.project}-nomis-oracle-sqs-${local.environment}"
+  custom_kms_key            = local.s3_kms_arn
+  create_notification_queue = true
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-nomis-oracle-sqs-${local.environment}"
+      Resource_Type = "S3 Bucket"
+    }
+  )
+}
+
+# Kinesis Firehose Stream
+module kinesis_nomis_stream {
+  kinesis_source_stream       = "arn:aws:kinesis:eu-west-2:771283872747:stream/dpr-kinesis-ingestor-development"
+  kinesis_source_stream_name  = "dpr-kinesis-ingestor-development"
+  source_s3_id                = module.s3_nomis_oracle_sqs.bucket_id
+  source_s3_arn               = module.s3_nomis_oracle_sqs.bucket_arn
+  source_s3_kms               = local.s3_kms_arn
+  aws_account_id              = local.account_id
+  aws_region                  = local.account_region
+  cloudwatch_log_group_name   = "/aws/kinesisfirehose/nomis"
+  cloudwatch_log_stream_name  = "NomisOracle"
 }
 
 ##########################

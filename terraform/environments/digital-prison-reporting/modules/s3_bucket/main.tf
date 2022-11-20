@@ -49,6 +49,39 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "application_tf_st
   }
 }
 
+resource "aws_sqs_queue" "notification_queue" {
+  count = var.create_notification_queue ? 1 : 0
+
+  name = "s3-event-queue"
+  policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Id": "sqspolicy",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": "*",
+      "Action": "sqs:SendMessage",
+      "Resource": "arn:aws:sqs:*:*:s3-event-queue",
+      "Condition": {
+        "ArnEquals": { "aws:SourceArn": "${aws_s3_bucket.application_tf_state.arn}" }
+      }
+    }
+  ]
+}
+POLICY
+}
+
+resource "aws_s3_bucket_notification" "bucket_notification" {
+  count = var.create_notification_queue ? 1 : 0
+  bucket = aws_s3_bucket.application_tf_state.*.id
+
+  queue {
+    queue_arn     = aws_sqs_queue.notification_queue.arn
+    events        = ["s3:ObjectCreated:*"]
+  }
+}
+
 #resource "aws_s3_bucket_versioning" "application_tf_state" {
 #  bucket = aws_s3_bucket.application_tf_state.id
 #  versioning_configuration {

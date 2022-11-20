@@ -19,3 +19,8 @@ variable "custom_kms_key" {
   description = "KMS key ARN to use"
   default     = ""
 }
+
+variable "create_notification_queue" {
+  description = "Setup Notification Queue"
+  default     = false  
+}

@@ -64,7 +64,7 @@ resource "aws_dms_endpoint" "target" {
 
   kinesis_settings {
     service_access_role_arn        = aws_iam_role.dms-kinesis-role.arn
-    stream_arn                     = "arn:aws:kinesis:eu-west-2:771283872747:stream/dpr-kinesis-ingestor-development" #var.kinesis_target_stream
+    stream_arn                     = var.kinesis_target_stream
     partition_include_schema_table = true
     include_partition_value        = true
   }
