@@ -42,52 +42,52 @@ EOF
 
   inline_policy = {
     name = "kinesis-s3-inline-policy"
-    policy = jsonencode({    
-    Version = "2012-10-17",  
-    Statement = [    
-        {      
-            Effect = "Allow",      
-            Action = [
-                "s3:AbortMultipartUpload",
-                "s3:GetBucketLocation",
-                "s3:GetObject",
-                "s3:ListBucket",
-                "s3:ListBucketMultipartUploads",
-                "s3:PutObject"
-            ],      
-            Resource = [        
-                "arn:aws:s3:::${var.source_s3_id}",
-                "arn:aws:s3:::${var.source_s3_id}/*"            
-            ]    
-        },        
+    policy = jsonencode({
+      Version = "2012-10-17",
+      Statement = [
         {
-            Effect = "Allow",
-            Action = [
-                "kinesis:DescribeStream",
-                "kinesis:GetShardIterator",
-                "kinesis:GetRecords",
-                "kinesis:ListShards"
-            ],
-            Resource = "arn:aws:kinesis:${var.aws_region}:${var.aws_account_id}:stream/${var.kinesis_source_stream_name}"
+          Effect = "Allow",
+          Action = [
+            "s3:AbortMultipartUpload",
+            "s3:GetBucketLocation",
+            "s3:GetObject",
+            "s3:ListBucket",
+            "s3:ListBucketMultipartUploads",
+            "s3:PutObject"
+          ],
+          Resource = [
+            "arn:aws:s3:::${var.source_s3_id}",
+            "arn:aws:s3:::${var.source_s3_id}/*"
+          ]
         },
         {
-           Effect = "Allow",
-           Action = [
-               "kms:Decrypt",
-               "kms:GenerateDataKey"
-           ],
-           Resource = [
-               "*"           
-           ]
+          Effect = "Allow",
+          Action = [
+            "kinesis:DescribeStream",
+            "kinesis:GetShardIterator",
+            "kinesis:GetRecords",
+            "kinesis:ListShards"
+          ],
+          Resource = "arn:aws:kinesis:${var.aws_region}:${var.aws_account_id}:stream/${var.kinesis_source_stream_name}"
         },
         {
-           Effect = "Allow",
-           Action = [
-               "logs:PutLogEvents"
-           ],
-           Resource = [
-                "arn:aws:logs:${var.aws_region}:${var.aws_account_id}:/aws/kinesisfirehose/*"
-           ]
+          Effect = "Allow",
+          Action = [
+            "kms:Decrypt",
+            "kms:GenerateDataKey"
+          ],
+          Resource = [
+            "*"
+          ]
+        },
+        {
+          Effect = "Allow",
+          Action = [
+            "logs:PutLogEvents"
+          ],
+          Resource = [
+            "arn:aws:logs:${var.aws_region}:${var.aws_account_id}:/aws/kinesisfirehose/*"
+          ]
         }
       ]
     })
