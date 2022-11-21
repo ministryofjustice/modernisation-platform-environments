@@ -213,6 +213,6 @@ resource "aws_iam_role" "jumpserver" {
 }
 
 /* output "debug" {
-  value = module.ec2_jumpserver_autoscaling_group
+  value = module.ec2_jumpserver_autoscaling_group.value.0
   sensitive = true
 }   */
