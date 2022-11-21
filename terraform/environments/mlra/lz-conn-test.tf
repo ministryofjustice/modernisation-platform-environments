@@ -54,17 +54,10 @@ module "httptest_sg" {
   egress_with_cidr_blocks = [
     {
       from_port   = 0
-      to_port     = 65535
-      protocol    = "tcp"
+      to_port     = 0
+      protocol    = "-1"
       description = "Outgoing"
-      cidr_blocks = "10.200.0.0/20"
-    },
-    {
-      from_port   = 80
-      to_port     = 80
-      protocol    = "tcp"
-      description = "HTTP"
-      cidr_blocks = "10.202.0.0/20"
+      cidr_blocks = "0.0.0.0/0"
     }
   ]
   ingress_with_cidr_blocks = [
