@@ -102,7 +102,7 @@ module "glue_demo_table" {
 module "glue_cloudplatform_etl_job" {
   source                        = "./modules/glue_job"
   create_job                    = local.create_job
-  name                          = "${local.project}-cloud-platform-etl-${local.env}"
+  name                          = "${local.project}-reporting-hub"
   description                   = local.description
   create_security_configuration = local.create_sec_conf
   job_language                  = "scala"
