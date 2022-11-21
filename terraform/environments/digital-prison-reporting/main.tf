@@ -848,13 +848,13 @@ module "dms_nomis_t3" {
   vpc_cidr              = [data.aws_vpc.shared.cidr_block]
   source_app_username   = "digital_prison_reporting"
   source_app_password   = "DSkpo4n7GhnmIV"
-  source_address        = "test-address"
+  source_address        = "10.101.63.135"
   vpc                   = data.aws_vpc.shared.id
   kinesis_target_stream = "arn:aws:kinesis:eu-west-2:771283872747:stream/dpr-kinesis-ingestor-development"
   kinesis_stream_policy = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_write_only_arn
   project_id            = local.project
   env                   = local.environment
-  dms_src_target        = "nomis-kinesis"
+  dms_src_target        = "nomis-oracle"
   migration_type        = "full-load-and-cdc"
   subnet_ids            = [data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id]
 
