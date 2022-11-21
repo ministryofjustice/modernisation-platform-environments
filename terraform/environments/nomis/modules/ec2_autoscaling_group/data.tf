@@ -40,6 +40,7 @@ data "aws_ec2_instance_type" "this" {
 
 locals {
   user_data_part_count = [
+    try(length(var.user_data.user_data_windows), 0),
     try(length(var.user_data.scripts), 0),
     try(length(var.user_data.write_files), 0)
   ]
@@ -47,6 +48,13 @@ locals {
 
 data "cloudinit_config" "this" {
   count = sum(local.user_data_part_count) > 0 ? 1 : 0
+  dynamic "part" {
+    for_each = try(var.user_data.user_data_windows, {})
+    content {
+      content = "${part.value}"
+    }
+  }
+
   dynamic "part" {
     for_each = try(var.user_data.scripts, {})
     content {

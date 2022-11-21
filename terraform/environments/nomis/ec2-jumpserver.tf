@@ -25,15 +25,16 @@ locals {
     # user_data_windows = base64encode(templatefile("./templates/jumpserver-user-data.yaml", { SECRET_PREFIX = local.secret_prefix, S3_BUCKET = module.s3-bucket.bucket.id }))
 
     user_data = {
-      args        = { SECRET_PREFIX = local.secret_prefix, S3_BUCKET = module.s3-bucket.bucket.id }
+      user_data_windows = base64encode(templatefile("./templates/jumpserver-user-data.yaml", { SECRET_PREFIX = local.secret_prefix, S3_BUCKET = module.s3-bucket.bucket.id }))
+      # args        = { SECRET_PREFIX = local.secret_prefix, S3_BUCKET = module.s3-bucket.bucket.id }
       scripts     = []
-      write_files = {
+      /* write_files = {
         "jumpserver-user-data.yaml" = {
           path        = "C:\\Users\\Administrator\\Documents\\add_users.ps1"
           owner       = "BUILTIN\\Administrators"
           permissions = "FullControl"
-        }
-      }
+        } 
+      } */
     }
     
 
