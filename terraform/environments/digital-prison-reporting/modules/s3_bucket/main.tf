@@ -49,7 +49,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "application_tf_st
   }
 }
 
-resource "aws_s3_bucket_policy" "allow_sqs_access" {
+resource "aws_sqs_queue_policy" "allow_sqs_access" {
   count = var.create_notification_queue ? 1 : 0
 
   bucket = aws_s3_bucket.application_tf_state[0].id
@@ -61,16 +61,12 @@ data "aws_iam_policy_document" "allow_sqs_access" {
   statement {
     principals {
       type        = "AWS"
-      identifiers = ["*"]
+      identifiers = ["s3.amazonaws.com"]
     }
 
-    actions = [
-      "SQS:SendMessage",
-    ]
+    actions = ["SQS:SendMessage"]
 
-    resources = [
-      aws_sqs_queue.notification_queue[0].arn,
-    ]
+    resources = [aws_sqs_queue.notification_queue[0].arn]
   }
 }
 
@@ -78,23 +74,6 @@ resource "aws_sqs_queue" "notification_queue" {
   count = var.create_notification_queue ? 1 : 0
 
   name   = var.s3_notification_name
-  policy = <<POLICY
-{
-  "Version": "2012-10-17",
-  "Id": "sqspolicy",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Principal": "*",
-      "Action": "sqs:SendMessage",
-      "Resource": "arn:aws:sqs:*:*:s3-event-queue",
-      "Condition": {
-        "ArnEquals": { "aws:SourceArn": "${aws_s3_bucket.application_tf_state[0].arn}" }
-      }
-    }
-  ]
-}
-POLICY
 }
 
 resource "aws_s3_bucket_notification" "bucket_notification" {
