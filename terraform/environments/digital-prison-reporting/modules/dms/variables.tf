@@ -189,7 +189,7 @@ variable "source_backup_window" {
 
 variable "source_db_name" {
   description = "Name of the target database"
-  default     = "nomis-t3"
+  default     = "oracle"
 }
 
 variable "source_db_port" {

@@ -846,6 +846,7 @@ module "dms_nomis_t3" {
   source                = "./modules/dms"
   name                  = "${local.project}-dms-t3nomis-ingestor-${local.env}"
   vpc_cidr              = [data.aws_vpc.shared.cidr_block]
+  source_db_name        = "CNOMT3"
   source_app_username   = "digital_prison_reporting"
   source_app_password   = "DSkpo4n7GhnmIV"
   source_address        = "10.101.63.135"
