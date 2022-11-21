@@ -50,10 +50,10 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "application_tf_st
 }
 
 resource "aws_sqs_queue_policy" "allow_sqs_access" {
-  count = var.create_notification_queue ? 1 : 0
+  count     = var.create_notification_queue ? 1 : 0
 
-  bucket = aws_s3_bucket.application_tf_state[0].id
-  policy = data.aws_iam_policy_document.allow_sqs_access[0].json
+  queue_url = aws_sqs_queue.notification_queue[0].id
+  policy    = data.aws_iam_policy_document.allow_sqs_access[0].json
 }
 
 data "aws_iam_policy_document" "allow_sqs_access" {
