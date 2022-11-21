@@ -56,6 +56,7 @@ data "aws_iam_policy_document" "firehose-policy" {
   statement {
     actions = [
       "kinesis:DescribeStream",
+      "kinesis:DescribeStream",      
       "kinesis:GetShardIterator",
       "kinesis:GetRecords",
       "kinesis:ListShards",
@@ -73,4 +74,9 @@ data "aws_iam_policy_document" "firehose-policy" {
       "arn:aws:logs:${var.aws_region}:${var.aws_account_id}:/aws/kinesisfirehose/*"
     ]
   }
+}
+
+resource "aws_iam_role_policy_attachment" "firehose-extra-policy" {
+  role       = aws_iam_role.firehose_role.name
+  policy_arn = aws_iam_policy.firehose-add-policy.arn
 }
