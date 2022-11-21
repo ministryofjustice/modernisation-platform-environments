@@ -84,5 +84,5 @@ locals {
     volume_ids           = join(" ", [for key, value in aws_ebs_volume.this : value.id])
   }
 
-  user_data_args = merge(local.user_data_args_common, local.user_data_args_ssm_params, try(var.user_data.args, {}))
+  user_data_args = merge(local.user_data_args_common, local.user_data_args_ssm_params, try(var.user_data_cloud_init.args, {}))
 }

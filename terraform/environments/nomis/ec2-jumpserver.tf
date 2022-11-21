@@ -22,35 +22,21 @@ locals {
       vpc_security_group_ids       = [aws_security_group.jumpserver-windows.id]
     }
 
-    # user_data_windows = base64encode(templatefile("./templates/jumpserver-user-data.yaml", { SECRET_PREFIX = local.secret_prefix, S3_BUCKET = module.s3-bucket.bucket.id }))
-
-    user_data = {
-      # user_data_windows = base64encode(templatefile("./templates/jumpserver-user-data.yaml", { SECRET_PREFIX = local.secret_prefix, S3_BUCKET = module.s3-bucket.bucket.id }))
-      user_data_windows = "jumpserver-user-data.yaml"
-      args        = { SECRET_PREFIX = local.secret_prefix, S3_BUCKET = module.s3-bucket.bucket.id }
-      scripts     = []
-      /* write_files = {
-        "jumpserver-user-data.yaml" = {
-          path        = "C:\\Users\\Administrator\\Documents\\add_users.ps1"
-          owner       = "BUILTIN\\Administrators"
-          permissions = "FullControl"
-        } 
-      } */
-    }
-    
+    user_data_raw = base64encode(templatefile("./templates/jumpserver-user-data.yaml", { SECRET_PREFIX = local.secret_prefix, S3_BUCKET = module.s3-bucket.bucket.id }))
 
     autoscaling_group = {  
       desired_capacity = 1
       max_size         = 2
       min_size         = 0
       force_delete     = true
-    }  
+    }
   }
 }
 
 module "ec2_jumpserver_autoscaling_group" {
   source = "./modules/ec2_autoscaling_group"
 
+  
   providers = {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
   }
@@ -61,7 +47,7 @@ module "ec2_jumpserver_autoscaling_group" {
   ami_name              = each.value.ami_name
   ami_owner             = try(each.value.ami_owner, "core-shared-services-production")
   instance              = merge(local.ec2_jumpserver.instance, lookup(each.value, "instance", {}))
-  user_data             = merge(local.ec2_jumpserver.user_data, lookup(each.value, "user_data", {}))
+  user_data_raw         = local.ec2_jumpserver.user_data_raw
   ebs_volume_config  = lookup(each.value, "ebs_volume_config", {})
   ebs_volumes        = lookup(each.value, "ebs_volumes", {})
   ssm_parameters_prefix = "jumpserver/"
@@ -92,6 +78,7 @@ module "ec2_jumpserver_autoscaling_group" {
   ansible_repo              = "modernisation-platform-configuration-management"
   ansible_repo_basedir      = "ansible"
   branch                    = try(each.value.branch, "main") 
+  
   
 }
 
@@ -224,3 +211,7 @@ resource "aws_iam_role" "jumpserver" {
     },
   )
 }
+
+/* output "debug" {
+  value = module.ec2_test_autoscaling_group.user_data_raw
+}   */

@@ -55,7 +55,7 @@ resource "aws_launch_template" "this" {
     }
   }
 
-  user_data = length(data.cloudinit_config.this) == 0 ? null : data.cloudinit_config.this[0].rendered
+  user_data = length(data.cloudinit_config.this) == 0 ? local.user_data_raw : data.cloudinit_config.this[0].rendered 
 
   tag_specifications {
     resource_type = "instance"

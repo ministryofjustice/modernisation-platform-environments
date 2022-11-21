@@ -71,6 +71,8 @@ locals {
     ansible_args         = "--tags ec2provision"
   }
 
-  user_data_args = merge(local.user_data_args_common, local.user_data_args_ssm_params, try(var.user_data.args, {}))
+  user_data_args = merge(local.user_data_args_common, local.user_data_args_ssm_params, try(var.user_data_cloud_init.args, {}))
+
+  user_data_raw = var.user_data_raw
 
 }
