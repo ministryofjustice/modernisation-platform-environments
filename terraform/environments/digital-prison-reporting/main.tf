@@ -44,12 +44,11 @@ module "glue_demo_table" {
   name   = "${local.project}-glue-demo-table-${local.env}"
 
   # AWS Glue catalog DB
-  enable_glue_catalog_database     = false
   glue_catalog_database_name       = module.glue_database.db_name
   glue_catalog_database_parameters = null
 
   # AWS Glue catalog table
-  enable_glue_catalog_table      = true
+  enable_glue_catalog_table      = false # Create Table with flag
   glue_catalog_table_description = "Demo Table resource managed by Terraform."
   glue_catalog_table_table_type  = "EXTERNAL_TABLE"
   glue_catalog_table_parameters = {
