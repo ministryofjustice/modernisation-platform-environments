@@ -132,6 +132,7 @@ data "aws_iam_policy_document" "s3_bucket_access" {
     ]
   }
 
+  # allow access to ec2-image-builder-nomis buckets in all accounts
   statement {
     sid    = "AccessToImageBuilderBucket"
     effect = "Allow"
@@ -142,8 +143,8 @@ data "aws_iam_policy_document" "s3_bucket_access" {
       "s3:ListBucket"
     ]
     resources = [
-      module.nomis-image-builder-bucket.bucket.arn,
-      "${module.nomis-image-builder-bucket.bucket.arn}/*"
+      "arn:aws:s3:::ec2-image-builder-nomis*",
+      "arn:aws:s3:::ec2-image-builder-nomis*/*"
     ]
   }
 }
