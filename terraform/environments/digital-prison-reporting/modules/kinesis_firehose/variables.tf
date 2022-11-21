@@ -3,7 +3,7 @@ variable "kinesis_source_stream_arn" {}
 variable "kinesis_source_stream_name" {}
 
 variable "name" {
-  default = "kinesis-source"
+  default = "kinesis-stream"
 }
 
 variable "source_s3_id" {}

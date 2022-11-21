@@ -875,14 +875,15 @@ module "dms_nomis_t3" {
 module "s3_nomis_oracle_sqs" {
   source                    = "./modules/s3_bucket"
   create_s3                 = local.setup_buckets
-  name                      = "${local.project}-nomis-oracle-sqs-${local.environment}"
+  name                      = "${local.project}-nomis-cdc-event-${local.environment}"
   custom_kms_key            = local.s3_kms_arn
   create_notification_queue = true
+  s3_notification_name      = "nomis-cdc-event-notification"
 
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-nomis-oracle-sqs-${local.environment}"
+      Name          = "${local.project}-nomis-cdc-event-${local.environment}"
       Resource_Type = "S3 Bucket"
     }
   )
@@ -891,6 +892,7 @@ module "s3_nomis_oracle_sqs" {
 # Kinesis Nomis Stream
 module "kinesis_nomis_stream" {
   source                     = "./modules/kinesis_firehose"
+  name                       = "${local.project}-nomis-target-stream-${local.env}"
   kinesis_source_stream_arn  = "arn:aws:kinesis:eu-west-2:771283872747:stream/dpr-kinesis-ingestor-development"
   kinesis_source_stream_name = "dpr-kinesis-ingestor-development"
   source_s3_id               = module.s3_nomis_oracle_sqs.bucket_id
@@ -898,8 +900,8 @@ module "kinesis_nomis_stream" {
   source_s3_kms              = local.s3_kms_arn
   aws_account_id             = local.account_id
   aws_region                 = local.account_region
-  cloudwatch_log_group_name  = "/aws/kinesisfirehose/nomis"
-  cloudwatch_log_stream_name = "NomisOracle"
+  cloudwatch_log_group_name  = "/aws/kinesisfirehose/nomis-target-stream"
+  cloudwatch_log_stream_name = "NomisTargetStream"
   cloudwatch_logging_enabled = true
 }
 

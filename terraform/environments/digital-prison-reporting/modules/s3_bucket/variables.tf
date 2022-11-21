@@ -9,6 +9,11 @@ variable "tags" {
   type        = map(any)
 }
 
+variable "s3_notification_name" {
+  description = "S3 Notification Event Name"
+  default     = "s3-notification-event"
+}
+
 variable "create_s3" {
   description = "Setup S3 Buckets"
   default     = false

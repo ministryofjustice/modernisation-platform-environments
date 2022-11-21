@@ -52,7 +52,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "application_tf_st
 resource "aws_sqs_queue" "notification_queue" {
   count = var.create_notification_queue ? 1 : 0
 
-  name   = "s3-event-queue"
+  name   = var.s3_notification_name
   policy = <<POLICY
 {
   "Version": "2012-10-17",
@@ -79,6 +79,7 @@ resource "aws_s3_bucket_notification" "bucket_notification" {
   queue {
     queue_arn = aws_sqs_queue.notification_queue[0].arn
     events    = ["s3:ObjectCreated:*"]
+    filter_prefix       = "cdc/"
   }
 }
 
