@@ -73,7 +73,7 @@ data "aws_iam_policy_document" "allow_sqs_access" {
 resource "aws_sqs_queue" "notification_queue" {
   count = var.create_notification_queue ? 1 : 0
 
-  name   = var.s3_notification_name
+  name = var.s3_notification_name
 }
 
 resource "aws_s3_bucket_notification" "bucket_notification" {
