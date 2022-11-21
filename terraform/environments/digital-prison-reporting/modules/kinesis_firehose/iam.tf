@@ -20,7 +20,7 @@ EOF
 
 ## Kines Data Stream Developer Policy
 resource "aws_iam_policy" "firehose-add-policy" {
-  name        = "${var.name}"
+  name        = var.name
   description = "Kinesis Firehose Stream Policy"
   path        = "/"
 
@@ -49,7 +49,7 @@ data "aws_iam_policy_document" "firehose-policy" {
     ]
     resources = [
       "arn:aws:s3:::${var.source_s3_id}",
-      "arn:aws:s3:::${var.source_s3_id}/*"    
+      "arn:aws:s3:::${var.source_s3_id}/*"
     ]
   }
 
@@ -72,5 +72,5 @@ data "aws_iam_policy_document" "firehose-policy" {
     resources = [
       "arn:aws:logs:${var.aws_region}:${var.aws_account_id}:/aws/kinesisfirehose/*"
     ]
-  }  
+  }
 }
