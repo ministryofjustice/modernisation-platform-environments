@@ -58,7 +58,7 @@ resource "aws_s3_bucket_policy" "allow_sqs_access" {
 
 data "aws_iam_policy_document" "allow_sqs_access" {
   count = var.create_notification_queue ? 1 : 0
-  statement {  
+  statement {
     principals {
       type        = "AWS"
       identifiers = ["*"]
