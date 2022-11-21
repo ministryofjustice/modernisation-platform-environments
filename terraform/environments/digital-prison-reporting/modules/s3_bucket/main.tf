@@ -77,7 +77,7 @@ resource "aws_s3_bucket_notification" "bucket_notification" {
   bucket = aws_s3_bucket.application_tf_state[0].id
 
   queue {
-    queue_arn = aws_sqs_queue.notification_queue.arn
+    queue_arn = aws_sqs_queue.notification_queue[0].arn
     events    = ["s3:ObjectCreated:*"]
   }
 }
