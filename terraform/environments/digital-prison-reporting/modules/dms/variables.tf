@@ -18,7 +18,11 @@ variable "tags" {
   description = "(Optional) Key-value map of resource tags."
 }
 
-variable "dms_src_target" {
+variable "dms_source_name" {
+  type = string
+}
+
+variable "dms_target_name" {
   type = string
 }
 

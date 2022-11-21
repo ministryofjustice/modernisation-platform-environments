@@ -854,7 +854,8 @@ module "dms_nomis_t3" {
   kinesis_stream_policy = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_write_only_arn
   project_id            = local.project
   env                   = local.environment
-  dms_src_target        = "nomis-oracle"
+  dms_source_name       = "oracle"
+  dms_target_name       = "kinesis"
   migration_type        = "full-load-and-cdc"
   subnet_ids            = [data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id]
 

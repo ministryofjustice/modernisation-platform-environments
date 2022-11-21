@@ -30,7 +30,7 @@ resource "aws_dms_replication_task" "dms-replication" {
   count                     = 1
   migration_type            = var.migration_type
   replication_instance_arn  = aws_dms_replication_instance.dms.replication_instance_arn
-  replication_task_id       = "${var.project_id}-dms-task-${var.dms_src_target}"
+  replication_task_id       = "${var.project_id}-dms-task-nomis-${var.dms_source_name}-${var.dms_target_name}"
   source_endpoint_arn       = aws_dms_endpoint.source.endpoint_arn
   target_endpoint_arn       = aws_dms_endpoint.target.endpoint_arn
   table_mappings            = data.template_file.table-mappings-from-oracle-to-kinesis.rendered
@@ -44,7 +44,7 @@ resource "aws_dms_replication_task" "dms-replication" {
 # Create an endpoint for the source database
 resource "aws_dms_endpoint" "source" {
   database_name = var.source_db_name
-  endpoint_id   = "${var.project_id}-dms-${var.dms_src_target}-source-${var.env}"
+  endpoint_id   = "${var.project_id}-dms-nomis-${var.dms_source_name}-source"
   endpoint_type = "source"
   engine_name   = var.source_engine_name
   password      = var.source_app_password
@@ -58,7 +58,7 @@ resource "aws_dms_endpoint" "source" {
 
 # Create an endpoint for the target Kinesis
 resource "aws_dms_endpoint" "target" {
-  endpoint_id   = "${var.project_id}-dms-${var.dms_src_target}-target-${var.env}"
+  endpoint_id   = "${var.project_id}-dms-nomis-${var.dms_target_name}-target"
   endpoint_type = "target"
   engine_name   = var.target_engine
 
@@ -92,13 +92,13 @@ resource "aws_dms_endpoint" "target" {
 # Create a subnet group using existing VPC subnets
 resource "aws_dms_replication_subnet_group" "dms" {
   replication_subnet_group_description = "DMS replication subnet group"
-  replication_subnet_group_id          = "${var.project_id}-dms-${var.dms_src_target}-subnet-group"
+  replication_subnet_group_id          = "${var.project_id}-dms-nomis-${var.dms_source_name}-${var.dms_target_name}-subnet-group"
   subnet_ids                           = var.subnet_ids
 }
 
 # Security Groups
 resource "aws_security_group" "dms_sec_group" {
-  name   = "${var.project_id}-dms-${var.dms_src_target}-security-group"
+  name   = "${var.project_id}-dms-nomis-${var.dms_source_name}-${var.dms_target_name}-security-group"
   vpc_id = var.vpc
 
   ingress {
