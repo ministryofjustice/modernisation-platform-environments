@@ -61,7 +61,7 @@ data "aws_iam_policy_document" "allow_sqs_access" {
   statement {
     principals {
       type        = "AWS"
-      identifiers = ["s3.amazonaws.com"]
+      identifiers = ["*"]
     }
 
     actions = ["SQS:SendMessage"]
