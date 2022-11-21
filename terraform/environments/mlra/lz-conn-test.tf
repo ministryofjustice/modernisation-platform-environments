@@ -1,4 +1,4 @@
-/* locals {
+locals {
   instance-userdata = <<EOF
 #!/bin/bash
 yum install -y httpd
@@ -85,4 +85,4 @@ module "httptest_sg" {
       source_security_group_id = "sg-0754d9a309704addd" # laa interface endpoint security group in core-vpc-development
     }
   ]
-} */
+}
