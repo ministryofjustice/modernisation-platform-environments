@@ -56,7 +56,7 @@ data "aws_iam_policy_document" "firehose-policy" {
   statement {
     actions = [
       "kinesis:DescribeStream",
-      "kinesis:DescribeStream",      
+      "kinesis:DescribeStream",
       "kinesis:GetShardIterator",
       "kinesis:GetRecords",
       "kinesis:ListShards",
