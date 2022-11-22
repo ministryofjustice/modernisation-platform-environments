@@ -5,9 +5,9 @@
 # password to Secrets Manager, which only said user can access.
 #------------------------------------------------------------------------------
 
-/* locals {
+locals {
   secret_prefix = "/Jumpserver/Users"
-} */
+}
 
 /* data "github_team" "jumpserver" {
   slug = "studio-webops"

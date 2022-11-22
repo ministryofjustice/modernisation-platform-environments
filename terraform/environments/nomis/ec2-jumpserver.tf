@@ -4,7 +4,7 @@
 
 locals {
 
-  secret_prefix = "/Jumpserver/Users"
+  secret_prefix_asg = "/Jumpserver-Asg/Users"
 
   ec2_jumpserver = {
     
@@ -22,7 +22,7 @@ locals {
       vpc_security_group_ids       = [aws_security_group.jumpserver-windows.id]
     }
 
-    user_data_raw = base64encode(templatefile("./templates/jumpserver-user-data.yaml", { SECRET_PREFIX = local.secret_prefix, S3_BUCKET = module.s3-bucket.bucket.id }))
+    user_data_raw = base64encode(templatefile("./templates/jumpserver-user-data.yaml", { SECRET_PREFIX = local.secret_prefix_asg, S3_BUCKET = module.s3-bucket.bucket.id }))
 
     autoscaling_group = {  
       desired_capacity = 1
@@ -157,7 +157,7 @@ resource "aws_iam_instance_profile" "jumpserver_asg" {
 resource "aws_secretsmanager_secret" "jumpserver_asg" {
   #checkov:skip=CKV_AWS_149: "Ensure that Secrets Manager secret is encrypted using KMS CMK"
   for_each                = toset(data.github_team.jumpserver.members)
-  name                    = "${local.secret_prefix}/${each.value}"
+  name                    = "${local.secret_prefix_asg}/${each.value}"
   policy                  = data.aws_iam_policy_document.jumpserver_secrets_asg[each.value].json
   recovery_window_in_days = 0
   tags = merge(
@@ -173,7 +173,7 @@ data "aws_iam_policy_document" "jumpserver_users_asg" {
   statement {
     effect    = "Allow"
     actions   = ["secretsmanager:PutSecretValue"]
-    resources = ["arn:aws:secretsmanager:${local.region}:${data.aws_caller_identity.current.id}:secret:${local.secret_prefix}/*"]
+    resources = ["arn:aws:secretsmanager:${local.region}:${data.aws_caller_identity.current.id}:secret:${local.secret_prefix_asg}/*"]
   }
   statement {
     effect    = "Allow"
