@@ -184,7 +184,7 @@ data "aws_iam_policy_document" "jumpserver_users_asg" {
 
 # Add policy to role
 resource "aws_iam_role_policy" "jumpserver_users_asg" {
-  name   = "secrets-access-jumpserver-users"
+  name   = "secrets-access-jumpserver-users-asg"
   role   = aws_iam_role.jumpserver_asg.id
   policy = data.aws_iam_policy_document.jumpserver_users_asg.json
 }
