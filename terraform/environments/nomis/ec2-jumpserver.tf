@@ -4,7 +4,7 @@
 
 locals {
 
-  secret_prefix_asg = "/Jumpserver-Asg/Users"
+  secret_prefix_asg = "/jumpserver-asg/Users"
 
   ec2_jumpserver = {
     

@@ -107,7 +107,7 @@ variable "instance" {
 }
 
 variable "user_data_raw" {
-  description = "Windows user data file"
+  description = "Windows user data_file"
   type        = string
   default     = null
 }
