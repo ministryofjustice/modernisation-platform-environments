@@ -147,7 +147,7 @@ data "aws_iam_policy_document" "jumpserver_secrets_asg" {
 # Jumpserver specific
 #------
 resource "aws_iam_instance_profile" "jumpserver_asg" {
-  name = "ec2-jumpserver-profile"
+  name = "ec2-jumpserver-profile-asg"
   role = aws_iam_role.jumpserver_asg.name
   path = "/"
 }
