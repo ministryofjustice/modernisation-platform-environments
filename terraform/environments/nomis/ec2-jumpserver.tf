@@ -6,6 +6,9 @@
 #------------------------------------------------------------------------------
 
 locals {
+	jumpserver_users = [
+	"AntonyGowland"
+	]
   secret_prefix = "/Jumpserver/Users"
 }
 
