@@ -28,12 +28,12 @@ module "jb_load_balancer_test" {
 locals {
   jb_egress_rules = {
     jb_internal_lb_egress_1 = {
-      description     = "allow outbound to weblogic targets"
-      from_port       = 7777
-      to_port         = 7777
-      protocol        = "tcp"
-      security_groups = [aws_security_group.weblogic_common.id]
-      cidr_blocks     = []
+      description     = "Allow all outbound"
+      from_port       = 0
+      to_port         = 0
+      protocol        = "-1"
+      cidr_blocks     = ["0.0.0.0/0"]
+      security_groups = []
     }
   }
   jb_ingress_rules = {

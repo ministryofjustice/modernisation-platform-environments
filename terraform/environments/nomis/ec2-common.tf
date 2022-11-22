@@ -131,6 +131,22 @@ data "aws_iam_policy_document" "s3_bucket_access" {
       "${module.nomis-audit-archives.bucket.arn}/*"
     ]
   }
+
+  # allow access to ec2-image-builder-nomis buckets in all accounts
+  statement {
+    sid    = "AccessToImageBuilderBucket"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:PutObjectAcl",
+      "s3:ListBucket"
+    ]
+    resources = [
+      "arn:aws:s3:::ec2-image-builder-nomis*",
+      "arn:aws:s3:::ec2-image-builder-nomis*/*"
+    ]
+  }
 }
 
 # combine ec2-common policy documents
