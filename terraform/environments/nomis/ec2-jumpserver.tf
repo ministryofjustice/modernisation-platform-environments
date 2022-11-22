@@ -7,7 +7,7 @@ locals {
   secret_prefix_asg = "/jumpserver-asg/Users"
 
   ec2_jumpserver = {
-    
+
     tags = {
       description = "nomis windows jumpserver"
       component   = "jumpserver"
@@ -24,7 +24,7 @@ locals {
 
     user_data_raw = base64encode(templatefile("./templates/jumpserver-user-data.yaml", { SECRET_PREFIX = local.secret_prefix_asg, S3_BUCKET = module.s3-bucket.bucket.id }))
 
-    autoscaling_group = {  
+    autoscaling_group = {
       desired_capacity = 1
       max_size         = 2
       min_size         = 0
@@ -36,7 +36,7 @@ locals {
 module "ec2_jumpserver_autoscaling_group" {
   source = "./modules/ec2_autoscaling_group"
 
-  
+
   providers = {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
   }
@@ -48,8 +48,8 @@ module "ec2_jumpserver_autoscaling_group" {
   ami_owner             = try(each.value.ami_owner, "core-shared-services-production")
   instance              = merge(local.ec2_jumpserver.instance, lookup(each.value, "instance", {}))
   user_data_raw         = local.ec2_jumpserver.user_data_raw
-  ebs_volume_config  = lookup(each.value, "ebs_volume_config", {})
-  ebs_volumes        = lookup(each.value, "ebs_volumes", {})
+  ebs_volume_config     = lookup(each.value, "ebs_volume_config", {})
+  ebs_volumes           = lookup(each.value, "ebs_volumes", {})
   ssm_parameters_prefix = "jumpserver/"
   ssm_parameters        = {}
   autoscaling_group     = merge(local.ec2_jumpserver.autoscaling_group, lookup(each.value, "autoscaling_group", {}))
@@ -77,9 +77,9 @@ module "ec2_jumpserver_autoscaling_group" {
   account_ids_lookup        = local.environment_management.account_ids
   ansible_repo              = "modernisation-platform-configuration-management"
   ansible_repo_basedir      = "ansible"
-  branch                    = try(each.value.branch, "main") 
-  
-  
+  branch                    = try(each.value.branch, "main")
+
+
 }
 
 #------------------------------------------------------------------------------
@@ -182,13 +182,6 @@ data "aws_iam_policy_document" "jumpserver_users_asg" {
   }
 }
 
-# Add policy to role NOTE: removed
-/* resource "aws_iam_role_policy" "jumpserver_users_asg" {
-  name   = "secrets-access-jumpserver-users-asg"
-  role   = aws_iam_role.jumpserver_asg.id
-  policy = data.aws_iam_policy_document.jumpserver_users_asg.json
-} */
-
 # IAM role for jumpserver instances
 resource "aws_iam_policy" "secret_access_jumpserver_asg" {
   name        = "write-access-to-secret-store"
@@ -203,7 +196,6 @@ resource "aws_iam_policy" "secret_access_jumpserver_asg" {
   )
 }
 
-# NOTE: removed
 resource "aws_iam_role" "jumpserver_asg" {
   name                 = "ec2-jumpserver-role-asg"
   path                 = "/"
@@ -231,8 +223,3 @@ resource "aws_iam_role" "jumpserver_asg" {
     },
   )
 }
-
-/* output "debug" {
-  value = module.ec2_jumpserver_autoscaling_group.value.0
-  sensitive = true
-}   */
