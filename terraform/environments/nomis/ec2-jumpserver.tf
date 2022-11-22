@@ -122,7 +122,7 @@ data "github_team" "jumpserver" {
 }
 
 # resource policy to restrict access to secret value to specific user and the CICD role used to deploy terraform
-data "aws_iam_policy_document" "jumpserver_secrets" {
+data "aws_iam_policy_document" "jumpserver_secrets_asg" {
   for_each = toset(data.github_team.jumpserver.members)
   statement {
     effect    = "Deny"
@@ -146,14 +146,19 @@ data "aws_iam_policy_document" "jumpserver_secrets" {
 #------
 # Jumpserver specific
 #------
+resource "aws_iam_instance_profile" "jumpserver_asg" {
+  name = "ec2-jumpserver-profile"
+  role = aws_iam_role.jumpserver_asg.name
+  path = "/"
+}
 
 # create empty secret in secret manager
 #tfsec:ignore:aws-ssm-secret-use-customer-key
-resource "aws_secretsmanager_secret" "jumpserver" {
+resource "aws_secretsmanager_secret" "jumpserver_asg" {
   #checkov:skip=CKV_AWS_149: "Ensure that Secrets Manager secret is encrypted using KMS CMK"
   for_each                = toset(data.github_team.jumpserver.members)
   name                    = "${local.secret_prefix}/${each.value}"
-  policy                  = data.aws_iam_policy_document.jumpserver_secrets[each.value].json
+  policy                  = data.aws_iam_policy_document.jumpserver_secrets_asg[each.value].json
   recovery_window_in_days = 0
   tags = merge(
     local.tags,
@@ -164,7 +169,7 @@ resource "aws_secretsmanager_secret" "jumpserver" {
 }
 
 # IAM policy permissions to enable jumpserver to list secrets and put user passwords into secret manager
-data "aws_iam_policy_document" "jumpserver_users" {
+data "aws_iam_policy_document" "jumpserver_users_asg" {
   statement {
     effect    = "Allow"
     actions   = ["secretsmanager:PutSecretValue"]
@@ -178,13 +183,13 @@ data "aws_iam_policy_document" "jumpserver_users" {
 }
 
 # Add policy to role
-resource "aws_iam_role_policy" "jumpserver_users" {
+resource "aws_iam_role_policy" "jumpserver_users_asg" {
   name   = "secrets-access-jumpserver-users"
-  role   = aws_iam_role.jumpserver.id
-  policy = data.aws_iam_policy_document.jumpserver_users.json
+  role   = aws_iam_role.jumpserver_asg.id
+  policy = data.aws_iam_policy_document.jumpserver_users_asg.json
 }
 
-resource "aws_iam_role" "jumpserver" {
+resource "aws_iam_role" "jumpserver_asg" {
   name                 = "ec2-jumpserver-role"
   path                 = "/"
   max_session_duration = "3600"

@@ -150,7 +150,7 @@ resource "aws_autoscaling_schedule" "scale_down" {
   }
 } */
 
-/* resource "aws_iam_role" "jumpserver" {
+resource "aws_iam_role" "jumpserver" {
   name                 = "ec2-jumpserver-role"
   path                 = "/"
   max_session_duration = "3600"
@@ -176,7 +176,7 @@ resource "aws_autoscaling_schedule" "scale_down" {
       Name = "ec2-jumpserver-role"
     },
   )
-} */
+}
 
 resource "aws_iam_instance_profile" "jumpserver" {
   name = "ec2-jumpserver-profile"
@@ -186,7 +186,7 @@ resource "aws_iam_instance_profile" "jumpserver" {
 
 # create empty secret in secret manager
 #tfsec:ignore:aws-ssm-secret-use-customer-key
-/* resource "aws_secretsmanager_secret" "jumpserver" {
+resource "aws_secretsmanager_secret" "jumpserver" {
   #checkov:skip=CKV_AWS_149: "Ensure that Secrets Manager secret is encrypted using KMS CMK"
   for_each                = toset(data.github_team.jumpserver.members)
   name                    = "${local.secret_prefix}/${each.value}"
@@ -198,10 +198,10 @@ resource "aws_iam_instance_profile" "jumpserver" {
       Name = "jumpserver-user-${each.value}"
     },
   )
-} */
+}
 
 # resource policy to restrict access to secret value to specific user and the CICD role used to deploy terraform
-/* data "aws_iam_policy_document" "jumpserver_secrets" {
+data "aws_iam_policy_document" "jumpserver_secrets" {
   for_each = toset(data.github_team.jumpserver.members)
   statement {
     effect    = "Deny"
@@ -220,10 +220,10 @@ resource "aws_iam_instance_profile" "jumpserver" {
       ]
     }
   }
-} */
+}
 
 # IAM policy permissions to enable jumpserver to list secrets and put user passwords into secret manager
-/* data "aws_iam_policy_document" "jumpserver_users" {
+data "aws_iam_policy_document" "jumpserver_users" {
   statement {
     effect    = "Allow"
     actions   = ["secretsmanager:PutSecretValue"]
@@ -234,11 +234,11 @@ resource "aws_iam_instance_profile" "jumpserver" {
     actions   = ["secretsmanager:ListSecrets"]
     resources = ["*"]
   }
-} */
+}
 
 # Add policy to role
-/* resource "aws_iam_role_policy" "jumpserver_users" {
+resource "aws_iam_role_policy" "jumpserver_users" {
   name   = "secrets-access-jumpserver-users"
   role   = aws_iam_role.jumpserver.id
   policy = data.aws_iam_policy_document.jumpserver_users.json
-} */
+}
