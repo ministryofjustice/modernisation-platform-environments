@@ -6,7 +6,7 @@ resource "aws_db_instance" "oasys" {
   db_name        = "oasdb"
   identifier     = "${local.application_name}-${local.environment}-database"
   username       = local.application_data.accounts[local.environment].db_user
-  password       = aws_secretsmanager_secret_version.db_password.secret_string
+  password       = random_password.db_password.result
   # tflint-ignore: aws_db_instance_default_parameter_group
   parameter_group_name        = "default.oracle-ee-19"
   skip_final_snapshot         = local.application_data.accounts[local.environment].db_skip_final_snapshot
