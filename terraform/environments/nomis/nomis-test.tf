@@ -64,41 +64,29 @@ locals {
           disable_api_termination = true
         }
         ebs_volumes = {
-          "/dev/sdb" = {       # /u01
-            iops       = 300   # Temporary. See DSOS-1561
-            throughput = 0     # Temporary. See DSOS-1561
-            type       = "gp2" # Temporary. See DSOS-1561
-            size       = 100
+          "/dev/sdb" = { # /u01
+            type = "gp3"
+            size = 100
           }
-          "/dev/sdc" = {       # /u02
-            iops       = 300   # Temporary. See DSOS-1561
-            throughput = 0     # Temporary. See DSOS-1561
-            type       = "gp2" # Temporary. See DSOS-1561
-            size       = 100
+          "/dev/sdc" = { # /u02
+            type = "gp3"
+            size = 100
           }
         }
         ebs_volume_config = {
           app = {
-            iops       = 3000  # Temporary. See DSOS-1561
-            throughput = 0     # Temporary. See DSOS-1561
-            type       = "gp2" # Temporary. See DSOS-1561
+            type = "gp3"
           }
           data = {
-            iops       = 120   # Temporary. See DSOS-1561
-            throughput = 0     # Temporary. See DSOS-1561
-            type       = "gp2" # Temporary. See DSOS-1561
+            type       = "gp3"
             total_size = 200
           }
           flash = {
-            iops       = 100   # Temporary. See DSOS-1561
-            throughput = 0     # Temporary. See DSOS-1561
-            type       = "gp2" # Temporary. See DSOS-1561
+            type       = "gp3"
             total_size = 2
           }
           swap = {
-            iops       = 100   # Temporary. See DSOS-1561
-            throughput = 0     # Temporary. See DSOS-1561
-            type       = "gp2" # Temporary. See DSOS-1561
+            type = "gp3"
           }
         }
       }

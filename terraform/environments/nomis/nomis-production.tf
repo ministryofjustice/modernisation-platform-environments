@@ -60,34 +60,29 @@ locals {
           disable_api_termination = true
         }
         ebs_volumes = {
-          "/dev/sdb" = { size = 100 } # /u01
-          "/dev/sdc" = {              # /u02
-            iops = 15360              # Temporary. See DSOS-1561
-            size = 5120               # reduce this to 1000 when we move into preprod subscription
+          "/dev/sdb" = { # /u01
+            size = 100
+            type = "gp3"
+          }
+          "/dev/sdc" = { # /u02
+            type = "gp3"
+            size = 5120 # reduce this to 1000 when we move into preprod subscription
           }
         }
         ebs_volume_config = {
           app = {
-            iops       = 300   # Temporary. See DSOS-1561
-            throughput = 0     # Temporary. See DSOS-1561
-            type       = "gp2" # Temporary. See DSOS-1561
+            type = "gp3"
           }
           data = {
-            iops       = 2400  # Temporary. See DSOS-1561
-            throughput = 0     # Temporary. See DSOS-1561
-            type       = "gp2" # Temporary. See DSOS-1561
+            type       = "gp3"
             total_size = 4000
           }
           flash = {
-            iops       = 1500  # Temporary. See DSOS-1561
-            throughput = 0     # Temporary. See DSOS-1561
-            type       = "gp2" # Temporary. See DSOS-1561
+            type       = "gp3"
             total_size = 1000
           }
           swap = {
-            iops       = 100   # Temporary. See DSOS-1561
-            throughput = 0     # Temporary. See DSOS-1561
-            type       = "gp2" # Temporary. See DSOS-1561
+            type = "gp3"
           }
         }
       }
@@ -107,34 +102,30 @@ locals {
           disable_api_termination = true
         }
         ebs_volumes = {
-          "/dev/sdb" = { size = 100 } # /u01
-          "/dev/sdc" = {              # /u02
+          "/dev/sdb" = { # /u01
+            size = 100
+            type = "gp3"
+          }
+          "/dev/sdc" = { # /u02
             size = 3000
-            iops = 9000 # Temporary. See DSOS-1561
+            type = "gp3"
+            iops = 9000
           }
         }
         ebs_volume_config = {
           app = {
-            iops       = 300   # Temporary. See DSOS-1561
-            throughput = 0     # Temporary. See DSOS-1561
-            type       = "gp2" # Temporary. See DSOS-1561
+            type = "gp3"
           }
           data = {
-            iops       = 2400  # Temporary. See DSOS-1561
-            throughput = 0     # Temporary. See DSOS-1561
-            type       = "gp2" # Temporary. See DSOS-1561
+            type       = "gp3"
             total_size = 4000
           }
           flash = {
-            iops       = 1500  # Temporary. See DSOS-1561
-            throughput = 0     # Temporary. See DSOS-1561
-            type       = "gp2" # Temporary. See DSOS-1561
+            type       = "gp3"
             total_size = 1000
           }
           swap = {
-            iops       = 100   # Temporary. See DSOS-1561
-            throughput = 0     # Temporary. See DSOS-1561
-            type       = "gp2" # Temporary. See DSOS-1561
+            type = "gp3"
           }
         }
       }
@@ -153,33 +144,28 @@ locals {
         }
         ebs_volumes = {
           "/dev/sdb" = { # /u01
-            iops = 300   # Temporary. See DSOS-1561
             size = 100
+            type = "gp3"
           }
-          "/dev/sdc" = { size = 1000 } # /u02
+          "/dev/sdc" = { # /u02
+            size = 1000
+            type = "gp3"
+          }
         }
         ebs_volume_config = {
           app = {
-            iops       = 3000  # Temporary. See DSOS-1561
-            throughput = 0     # Temporary. See DSOS-1561
-            type       = "gp2" # Temporary. See DSOS-1561
+            type = "gp3"
           }
           data = {
-            iops       = 1800  # Temporary. See DSOS-1561
-            throughput = 0     # Temporary. See DSOS-1561
-            type       = "gp2" # Temporary. See DSOS-1561
+            type       = "gp3"
             total_size = 3000
           }
           flash = {
-            iops       = 750   # Temporary. See DSOS-1561
-            throughput = 0     # Temporary. See DSOS-1561
-            type       = "gp2" # Temporary. See DSOS-1561
+            type       = "gp3"
             total_size = 500
           }
           swap = {
-            iops       = 100   # Temporary. See DSOS-1561
-            throughput = 0     # Temporary. See DSOS-1561
-            type       = "gp2" # Temporary. See DSOS-1561
+            type = "gp3"
           }
         }
       }
