@@ -65,7 +65,7 @@ module "ec2_jumpserver_autoscaling_group" {
   })
 
   iam_resource_names_prefix = "ec2-jumpserver-asg"
-  instance_profile_policies = local.ec2_common_managed_policies
+  instance_profile_policies = concat(local.ec2_common_managed_policies, [aws_iam_policy.secret_access_jumpserver_asg.arn])
   business_unit             = local.vpc_name
   application_name          = local.application_name
   environment               = local.environment
@@ -182,13 +182,28 @@ data "aws_iam_policy_document" "jumpserver_users_asg" {
   }
 }
 
-# Add policy to role
-resource "aws_iam_role_policy" "jumpserver_users_asg" {
+# Add policy to role NOTE: removed
+/* resource "aws_iam_role_policy" "jumpserver_users_asg" {
   name   = "secrets-access-jumpserver-users-asg"
   role   = aws_iam_role.jumpserver_asg.id
   policy = data.aws_iam_policy_document.jumpserver_users_asg.json
+} */
+
+# IAM role for jumpserver instances
+resource "aws_iam_policy" "secret_access_jumpserver_asg" {
+  name        = "write-access-to-secret-store"
+  path        = "/"
+  description = "Policy for access to secret store"
+  policy      = data.aws_iam_policy_document.jumpserver_users_asg.json
+  tags = merge(
+    local.tags,
+    {
+      Name = "write-access-to-secret-store"
+    },
+  )
 }
 
+# NOTE: removed
 resource "aws_iam_role" "jumpserver_asg" {
   name                 = "ec2-jumpserver-role-asg"
   path                 = "/"
