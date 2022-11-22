@@ -190,7 +190,7 @@ resource "aws_iam_role_policy" "jumpserver_users_asg" {
 }
 
 resource "aws_iam_role" "jumpserver_asg" {
-  name                 = "ec2-jumpserver-role"
+  name                 = "ec2-jumpserver-role-asg"
   path                 = "/"
   max_session_duration = "3600"
   assume_role_policy = jsonencode(
@@ -212,7 +212,7 @@ resource "aws_iam_role" "jumpserver_asg" {
   tags = merge(
     local.tags,
     {
-      Name = "ec2-jumpserver-role"
+      Name = "ec2-jumpserver-role-asg"
     },
   )
 }
