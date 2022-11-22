@@ -97,7 +97,7 @@ resource "aws_lb" "internal" {
 # TODO: The 'load_balancer_arn' condition should be removed when testing in
 # nomis-test is complete.
 resource "aws_lb_listener" "internal" {
-  load_balancer_arn = local.environment == "test" ? module.lb_weblogic[0].load_balancer.arn : aws_lb.internal.arn
+  load_balancer_arn = local.environment == "test" ? module.lb_internal_nomis[0].load_balancer.arn : aws_lb.internal.arn
   port              = "443"
   protocol          = "HTTPS"
   #checkov:skip=CKV_AWS_103:the application does not support tls 1.2
@@ -128,7 +128,7 @@ resource "aws_lb_listener" "internal_http" {
     aws_acm_certificate_validation.internal_lb
   ]
 
-  load_balancer_arn = local.environment == "test" ? module.lb_weblogic[0].load_balancer.arn : aws_lb.internal.arn
+  load_balancer_arn = local.environment == "test" ? module.lb_internal_nomis[0].load_balancer.arn : aws_lb.internal.arn
   port              = "80"
   protocol          = "HTTP"
 
@@ -155,8 +155,8 @@ resource "aws_route53_record" "internal_lb" {
   type    = "A"
 
   alias {
-    name                   = local.environment == "test" ? module.lb_weblogic[0].load_balancer.dns_name : aws_lb.internal.dns_name
-    zone_id                = local.environment == "test" ? module.lb_weblogic[0].load_balancer.zone_id : aws_lb.internal.zone_id
+    name                   = local.environment == "test" ? module.lb_internal_nomis[0].load_balancer.dns_name : aws_lb.internal.dns_name
+    zone_id                = local.environment == "test" ? module.lb_internal_nomis[0].load_balancer.zone_id : aws_lb.internal.zone_id
     evaluate_target_health = true
   }
 }
@@ -269,8 +269,8 @@ resource "aws_route53_record" "internal_lb_az" {
   type    = "A"
 
   alias {
-    name                   = local.environment == "test" ? module.lb_weblogic[0].load_balancer.dns_name : aws_lb.internal.dns_name
-    zone_id                = local.environment == "test" ? module.lb_weblogic[0].load_balancer.zone_id : aws_lb.internal.zone_id
+    name                   = local.environment == "test" ? module.lb_internal_nomis[0].load_balancer.dns_name : aws_lb.internal.dns_name
+    zone_id                = local.environment == "test" ? module.lb_internal_nomis[0].load_balancer.zone_id : aws_lb.internal.zone_id
     evaluate_target_health = true
   }
 }
@@ -322,7 +322,7 @@ resource "aws_acm_certificate_validation" "internal_lb_az" {
 }
 
 # --- New load balancer ---
-module "lb_weblogic" {
+module "lb_internal_nomis" {
   source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer.git?ref=v2.1.0"
   count  = local.environment == "test" ? 1 : 0
   providers = {
@@ -330,11 +330,11 @@ module "lb_weblogic" {
   }
 
   account_number             = local.environment_management.account_ids[terraform.workspace]
-  application_name           = "${local.application_name}-weblogic"
+  application_name           = "int-${local.application_name}"
   enable_deletion_protection = false
   idle_timeout               = "60"
-  loadbalancer_egress_rules  = local.lb_weblogic_egress_rules
-  loadbalancer_ingress_rules = local.lb_weblogic_ingress_rules
+  loadbalancer_egress_rules  = local.lb_internal_nomis_egress_rules
+  loadbalancer_ingress_rules = local.lb_internal_nomis_ingress_rules
   public_subnets             = data.aws_subnets.private.ids
   region                     = local.region
   vpc_all                    = "${local.vpc_name}-${local.environment}"
@@ -349,8 +349,8 @@ module "lb_weblogic" {
 }
 
 locals {
-  lb_weblogic_egress_rules = {
-    lb_weblogic_egress_1 = {
+  lb_internal_nomis_egress_rules = {
+    lb_internal_nomis_egress_1 = {
       description     = "Allow all outbound"
       from_port       = 0
       to_port         = 0
@@ -359,8 +359,8 @@ locals {
       security_groups = []
     }
   }
-  lb_weblogic_ingress_rules = {
-    lb_weblogic_ingress_1 = {
+  lb_internal_nomis_ingress_rules = {
+    lb_internal_nomis_ingress_1 = {
       description     = "allow 443 inbound from PTTP devices"
       from_port       = 443
       to_port         = 443
@@ -368,7 +368,7 @@ locals {
       security_groups = []
       cidr_blocks     = ["10.184.0.0/16"] # Global Protect PTTP devices
     }
-    lb_weblogic_ingress_2 = {
+    lb_internal_nomis_ingress_2 = {
       description     = "allow 443 inbound from Jump Server"
       from_port       = 443
       to_port         = 443
@@ -376,7 +376,7 @@ locals {
       security_groups = [aws_security_group.jumpserver-windows.id]
       cidr_blocks     = []
     }
-    lb_weblogic_ingress_3 = {
+    lb_internal_nomis_ingress_3 = {
       description     = "allow 80 inbound from PTTP devices"
       from_port       = 80
       to_port         = 80
@@ -384,7 +384,7 @@ locals {
       security_groups = []
       cidr_blocks     = ["10.184.0.0/16"] # Global Protect PTTP devices
     }
-    lb_weblogic_ingress_4 = {
+    lb_internal_nomis_ingress_4 = {
       description     = "allow 80 inbound from Jump Server"
       from_port       = 80
       to_port         = 80
