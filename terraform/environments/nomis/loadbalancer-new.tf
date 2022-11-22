@@ -10,7 +10,7 @@ module "jb_load_balancer_test" {
   application_name           = "jbtest"
   enable_deletion_protection = false
   idle_timeout               = "60"
-  loadbalancer_egress_rules  = local.jb_egress_rules
+  # loadbalancer_egress_rules  = local.jb_egress_rules
   loadbalancer_ingress_rules = local.jb_ingress_rules
   public_subnets             = data.aws_subnets.private.ids
   region                     = local.region
@@ -26,16 +26,16 @@ module "jb_load_balancer_test" {
 }
 
 locals {
-  jb_egress_rules = {
-    jb_internal_lb_egress_1 = {
-      description     = "allow outbound to weblogic targets"
-      from_port       = 7777
-      to_port         = 7777
-      protocol        = "tcp"
-      security_groups = [aws_security_group.weblogic_common.id]
-      cidr_blocks     = []
-    }
-  }
+  # jb_egress_rules = {
+    # jb_internal_lb_egress_1 = {
+    #   description     = "allow outbound to weblogic targets"
+    #   from_port       = 7777
+    #   to_port         = 7777
+    #   protocol        = "tcp"
+    #   security_groups = [aws_security_group.weblogic_common.id]
+    #   cidr_blocks     = []
+    # }
+  # }
   jb_ingress_rules = {
     jb_internal_lb_ingress_1 = {
       description     = "allow 443 inbound from PTTP devices"
