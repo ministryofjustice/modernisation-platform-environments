@@ -13,6 +13,7 @@ resource "aws_db_instance" "oasys" {
   allocated_storage           = local.application_data.accounts[local.environment].db_allocated_storage
   max_allocated_storage       = local.application_data.accounts[local.environment].db_max_allocated_storage
   maintenance_window          = local.application_data.accounts[local.environment].db_maintenance_window
+  #checkov:skip=CKV_AWS_226: "This is a variable set for each environment"
   auto_minor_version_upgrade  = local.application_data.accounts[local.environment].db_auto_minor_version_upgrade
   allow_major_version_upgrade = local.application_data.accounts[local.environment].db_allow_major_version_upgrade
   backup_window               = local.application_data.accounts[local.environment].db_backup_window
@@ -53,6 +54,7 @@ resource "aws_security_group" "oasys" {
     { Name = lower(format("%s-%s-database-security-group", local.application_name, local.environment)) }
   )
   ingress {
+    description = "Allow access from live and test environments"
     from_port   = 1521
     to_port     = 1521
     protocol    = "tcp"
