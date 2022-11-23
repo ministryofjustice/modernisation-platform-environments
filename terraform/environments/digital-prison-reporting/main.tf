@@ -109,7 +109,7 @@ module "glue_cloudplatform_etl_job" {
   checkpoint_dir                = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/checkpoint/reporting-hub/"
   spark_event_logs              = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/spark-logs/reporting-hub/"
   tags                          = local.all_tags
-  script_location               = "s3://${local.project}-artifact-store-${local.environment}/artifacts/cloud-platform/digital-prison-reporting-poc/cloud-platform-vlatest.scala"
+  script_location               = "s3://${local.project}-artifact-store-${local.environment}/artifacts/cloud-platform/digital-prison-reporting-poc/cloud-platform-vLatest.scala"
   enable_continuous_log_filter  = false
   project_id                    = local.project
   aws_kms_key                   = local.s3_kms_arn
@@ -118,7 +118,7 @@ module "glue_cloudplatform_etl_job" {
   timeout                       = 120
   execution_class               = "FLEX"
   arguments = {
-    "--extra-jars"          = "s3://${local.project}-artifact-store-${local.environment}/artifacts/cloud-platform/digital-prison-reporting-poc/cloud-platform-vlatest.jar"
+    "--extra-jars"          = "s3://${local.project}-artifact-store-${local.environment}/artifacts/cloud-platform/digital-prison-reporting-poc/cloud-platform-vLatest.jar"
     "--curated.path"        = "s3://${module.s3_curated_bucket[0].bucket.id}"
     "--raw.path"            = "s3://${module.s3_raw_bucket[0].bucket.id}"
     "--structured.path"     = "s3://${module.s3_structured_bucket[0].bucket.id}"
@@ -142,7 +142,7 @@ module "glue_domainplatform_change_monitor_job" {
   checkpoint_dir                = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/checkpoint/change-monitor/"
   spark_event_logs              = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/spark-logs/change-monitor/"
   tags                          = local.all_tags
-  script_location               = "s3://${local.project}-artifact-store-${local.environment}/artifacts/domain-platform/digital-prison-reporting-poc/domain-platform-table-change-monitor-vlatest.scala"
+  script_location               = "s3://${local.project}-artifact-store-${local.environment}/artifacts/domain-platform/digital-prison-reporting-poc/domain-platform-table-change-monitor-vLatest.scala"
   enable_continuous_log_filter  = false
   project_id                    = local.project
   aws_kms_key                   = local.s3_kms_arn
@@ -151,7 +151,7 @@ module "glue_domainplatform_change_monitor_job" {
   timeout                       = 120
   execution_class               = "FLEX"
   arguments = {
-    "--extra-jars"          = "s3://${local.project}-artifact-store-${local.environment}/artifacts/domain-platform/digital-prison-reporting-poc/domain-platform-vlatest.jar"
+    "--extra-jars"          = "s3://${local.project}-artifact-store-${local.environment}/artifacts/domain-platform/digital-prison-reporting-poc/domain-platform-vLatest.jar"
     "--class"               = "GlueApp"
     "--cloud.platform.path" = "s3://${module.s3_curated_bucket[0].bucket.id}"
     "--domain.files.path"   = "s3://${module.s3_domain_config_bucket[0].bucket.id}"
@@ -175,7 +175,7 @@ module "glue_domainplatform_refresh_job" {
   checkpoint_dir                = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/checkpoint/platform-refresh/"
   spark_event_logs              = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/spark-logs/platform-refresh/"
   tags                          = local.all_tags
-  script_location               = "s3://${local.project}-artifact-store-${local.environment}/artifacts/domain-platform/digital-prison-reporting-poc/domain-platform-refresh-vlatest.scala"
+  script_location               = "s3://${local.project}-artifact-store-${local.environment}/artifacts/domain-platform/digital-prison-reporting-poc/domain-platform-refresh-vLatest.scala"
   enable_continuous_log_filter  = false
   project_id                    = local.project
   aws_kms_key                   = local.s3_kms_arn
@@ -184,7 +184,7 @@ module "glue_domainplatform_refresh_job" {
   timeout                       = 120
   execution_class               = "FLEX"
   arguments = {
-    "--extra-jars"          = "s3://${local.project}-artifact-store-${local.environment}/artifacts/domain-platform/digital-prison-reporting-poc/domain-platform-vlatest.jar"
+    "--extra-jars"          = "s3://${local.project}-artifact-store-${local.environment}/artifacts/domain-platform/digital-prison-reporting-poc/domain-platform-vLatest.jar"
     "--class"               = "GlueApp"
     "--cloud.platform.path" = "s3://${module.s3_curated_bucket[0].bucket.id}"
     "--domain.files.path"   = "s3://${module.s3_domain_config_bucket[0].bucket.id}"
