@@ -157,7 +157,7 @@ variable "timeout" {
 
 variable "execution_class" {
   default     = "FLEX"
-  description = "Execution CLass Standard or FLex"  
+  description = "Execution CLass Standard or FLex"
 }
 
 variable "worker_type" {
