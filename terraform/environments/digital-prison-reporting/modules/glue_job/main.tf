@@ -35,7 +35,6 @@ resource "aws_glue_job" "glue_job" {
   description            = var.description
   glue_version           = var.glue_version
   max_retries            = var.max_retries
-  timeout                = var.timeout
   security_configuration = var.create_security_configuration ? join("", aws_glue_security_configuration.sec_cfg.*.id) : var.security_configuration
   worker_type            = var.worker_type
   number_of_workers      = var.number_of_workers
