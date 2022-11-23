@@ -131,7 +131,7 @@ module "glue_cloudplatform_etl_job" {
 }
 
 # Glue Domain Platform Change Monitor Job
-module "glue_cloudplatform_etl_job" {
+module "glue_domainplatform_change_monitor_job" {
   source                        = "./modules/glue_job"
   create_job                    = local.create_job
   name                          = "${local.project}-domain-platform-table-change-monitor-${local.env}"
@@ -162,7 +162,7 @@ module "glue_cloudplatform_etl_job" {
 }
 
 # Glue Domain Platform Refresh Job
-module "glue_cloudplatform_etl_job" {
+module "glue_domainplatform_refresh_job" {
   source                        = "./modules/glue_job"
   create_job                    = local.create_job
   name                          = "${local.project}-domain-platform-refresh-${local.env}"
