@@ -963,7 +963,7 @@ module "s3_domain_cdc_sqs" {
   custom_kms_key            = local.s3_kms_arn
   create_notification_queue = true
   s3_notification_name      = "domain-cdc-event-notification"
-  sqs_msg_retention_seconds = 1209600  
+  sqs_msg_retention_seconds = 1209600
 
   tags = merge(
     local.all_tags,
