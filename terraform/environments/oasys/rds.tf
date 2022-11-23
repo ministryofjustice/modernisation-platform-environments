@@ -8,11 +8,11 @@ resource "aws_db_instance" "oasys" {
   username       = local.application_data.accounts[local.environment].db_user
   password       = random_password.db_password.result
   # tflint-ignore: aws_db_instance_default_parameter_group
-  parameter_group_name        = "default.oracle-ee-19"
-  skip_final_snapshot         = local.application_data.accounts[local.environment].db_skip_final_snapshot
-  allocated_storage           = local.application_data.accounts[local.environment].db_allocated_storage
-  max_allocated_storage       = local.application_data.accounts[local.environment].db_max_allocated_storage
-  maintenance_window          = local.application_data.accounts[local.environment].db_maintenance_window
+  parameter_group_name  = "default.oracle-ee-19"
+  skip_final_snapshot   = local.application_data.accounts[local.environment].db_skip_final_snapshot
+  allocated_storage     = local.application_data.accounts[local.environment].db_allocated_storage
+  max_allocated_storage = local.application_data.accounts[local.environment].db_max_allocated_storage
+  maintenance_window    = local.application_data.accounts[local.environment].db_maintenance_window
   #checkov:skip=CKV_AWS_226: "This is a variable set for each environment"
   auto_minor_version_upgrade  = local.application_data.accounts[local.environment].db_auto_minor_version_upgrade
   allow_major_version_upgrade = local.application_data.accounts[local.environment].db_allow_major_version_upgrade
