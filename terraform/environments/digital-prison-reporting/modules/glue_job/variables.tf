@@ -151,8 +151,13 @@ variable "create_role" {
 
 variable "timeout" {
   type        = number
-  default     = 2880
+  default     = 120
   description = "(Optional) The job timeout in minutes."
+}
+
+variable "execution_class" {
+  default     = "FLEX"
+  description = "Execution CLass Standard or FLex"  
 }
 
 variable "worker_type" {

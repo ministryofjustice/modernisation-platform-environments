@@ -22,6 +22,18 @@ resource "aws_s3_bucket_acl" "application_tf_state" { # TBC "application_tf_stat
   acl    = "private"
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
 #resource "aws_s3_bucket_lifecycle_configuration" "application_tf_state" {
 #  bucket = aws_s3_bucket.application_tf_state.id
 #  rule {
@@ -74,6 +86,7 @@ resource "aws_sqs_queue" "notification_queue" {
   count = var.create_notification_queue ? 1 : 0
 
   name = var.s3_notification_name
+  message_retention_seconds = var.sqs_msg_retention_seconds
 }
 
 resource "aws_s3_bucket_notification" "bucket_notification" {

@@ -29,3 +29,9 @@ variable "create_notification_queue" {
   description = "Setup Notification Queue"
   default     = false
 }
+
+variable "sqs_msg_retention_seconds" {
+  description = "SQS Message Retention"
+  default     = 86400
+} 
+}

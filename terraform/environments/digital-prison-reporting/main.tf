@@ -115,16 +115,16 @@ module "glue_cloudplatform_etl_job" {
   aws_kms_key                   = local.s3_kms_arn
   create_kinesis_ingester       = local.create_kinesis # If True, Kinesis Policies are applied
   additional_policies           = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_read_only_arn
+  timeout                       = 120
+  execution_class               = "FLEX"  
   arguments = {
     "--extra-jars"          = "s3://${local.project}-artifact-store-${local.environment}/artifacts/cloud-platform/digital-prison-reporting-poc/cloud-platform-vlatest.jar"
     "--curated.path"        = "s3://${module.s3_curated_bucket[0].bucket.id}"
     "--raw.path"            = "s3://${module.s3_raw_bucket[0].bucket.id}"
     "--structured.path"     = "s3://${module.s3_structured_bucket[0].bucket.id}"
-    "--sink.url"            = local.kinesis_endpoint
     "--sink.stream"         = local.kinesis_stream_data_domain
     "--sink.region"         = local.account_region
-    "--source.url"          = local.kinesis_endpoint
-    "--source.stream"       = local.kinesis_stream_ingestor
+    "--source.queue"        = module.s3_nomis_oracle_sqs.sqs_id  
     "--source.region"       = local.account_region
     "--job-bookmark-option" = "job-bookmark-enable"
   }
@@ -148,6 +148,8 @@ module "glue_domainplatform_change_monitor_job" {
   aws_kms_key                   = local.s3_kms_arn
   create_kinesis_ingester       = local.create_kinesis # If True, Kinesis Policies are applied
   additional_policies           = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_read_only_arn
+  timeout                       = 120
+  execution_class               = "FLEX"
   arguments = {
     "--extra-jars"          = "s3://${local.project}-artifact-store-${local.environment}/artifacts/domain-platform/digital-prison-reporting-poc/domain-platform-vlatest.jar"
     "--class"               = "GlueApp"
@@ -179,6 +181,8 @@ module "glue_domainplatform_refresh_job" {
   aws_kms_key                   = local.s3_kms_arn
   create_kinesis_ingester       = local.create_kinesis # If True, Kinesis Policies are applied
   additional_policies           = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_read_only_arn
+  timeout                       = 120
+  execution_class               = "FLEX"  
   arguments = {
     "--extra-jars"          = "s3://${local.project}-artifact-store-${local.environment}/artifacts/domain-platform/digital-prison-reporting-poc/domain-platform-vlatest.jar"
     "--class"               = "GlueApp"
@@ -940,6 +944,7 @@ module "s3_nomis_oracle_sqs" {
   custom_kms_key            = local.s3_kms_arn
   create_notification_queue = true
   s3_notification_name      = "nomis-cdc-event-notification"
+  sqs_msg_retention_seconds = 2592000
 
   tags = merge(
     local.all_tags,
@@ -958,6 +963,7 @@ module "s3_domain_cdc_sqs" {
   custom_kms_key            = local.s3_kms_arn
   create_notification_queue = true
   s3_notification_name      = "domain-cdc-event-notification"
+  sqs_msg_retention_seconds = 2592000  
 
   tags = merge(
     local.all_tags,
