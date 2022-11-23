@@ -1,5 +1,5 @@
 resource "aws_iam_role" "firehose_role" {
-  name = "firehose_role"
+  name = var.name
 
   assume_role_policy = <<EOF
 {
