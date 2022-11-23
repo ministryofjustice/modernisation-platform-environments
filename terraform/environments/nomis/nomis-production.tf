@@ -172,6 +172,7 @@ locals {
     }
 
     # Add weblogic instances here.  They will be created using the weblogic module
-    weblogics = {}
+    weblogics                         = {}
+    ec2_jumpserver_autoscaling_groups = {}
   }
 }

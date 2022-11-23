@@ -109,11 +109,17 @@ variable "instance" {
   })
 }
 
-variable "user_data" {
+variable "user_data_raw" {
+  description = "Windows user_data file"
+  type        = string
+  default     = null
+}
+
+variable "user_data_cloud_init" {
   description = "Map of cloud-init config write_file sections for user data"
   type = object({
     args    = optional(map(string))
-    scripts = list(string)
+    scripts = optional(list(string))
     write_files = optional(map(object({
       path        = string
       owner       = string
