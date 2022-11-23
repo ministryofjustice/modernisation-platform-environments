@@ -1,17 +1,17 @@
-#------------------------------------------------------------------------------
-# Windows Jumpserver
-# To add a new local user account, add a github username to `jumpserver_users`
-# local variable.  Scheduled job running on instance will create user and push
-# password to Secrets Manager, which only said user can access.
-#------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------
+# Windows Jumpserver - Currently in use
+# See comments in the README.md files and DSOS-1584 with respect to this EC" instance.
+# This all needs to be removed once the new jumpserver is in place.
+#-------------------------------------------------------------------------------------
 
 locals {
   secret_prefix = "/Jumpserver/Users"
 }
 
-data "github_team" "jumpserver" {
+# This is defined in the new ec-jumpserver.tf file
+/* data "github_team" "jumpserver" {
   slug = "studio-webops"
-}
+} */
 
 data "aws_vpc" "jumpserver" {
   tags = {
@@ -126,28 +126,6 @@ resource "aws_autoscaling_schedule" "scale_down" {
   desired_capacity       = 0
   recurrence             = "0 19 * * Mon-Fri"
   autoscaling_group_name = aws_autoscaling_group.jumpserver.name
-}
-resource "aws_security_group" "jumpserver-windows" {
-  description = "Configure Windows jumpserver egress"
-  name        = "jumpserver-windows-${local.application_name}"
-  vpc_id      = local.vpc_id
-
-  ingress {
-    description = "access from Cloud Platform Prometheus server"
-    from_port   = "9100"
-    to_port     = "9100"
-    protocol    = "TCP"
-    cidr_blocks = [local.cidrs.cloud_platform]
-  }
-
-  egress {
-    description = "allow all"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    #tfsec:ignore:aws-vpc-no-public-egress-sgr
-    cidr_blocks = ["0.0.0.0/0"]
-  }
 }
 
 resource "aws_iam_role" "jumpserver" {

@@ -12,7 +12,7 @@ resource "aws_instance" "this" {
   key_name                    = var.instance.key_name
   monitoring                  = var.instance.monitoring
   subnet_id                   = data.aws_subnet.this.id
-  user_data                   = length(data.cloudinit_config.this) == 0 ? null : data.cloudinit_config.this[0].rendered
+  user_data                   = length(data.cloudinit_config.this) == 0 ? local.user_data_raw : data.cloudinit_config.this[0].rendered
   vpc_security_group_ids      = var.instance.vpc_security_group_ids
 
   #checkov:skip=CKV_AWS_79:We are tied to v1 metadata service

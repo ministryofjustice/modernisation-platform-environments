@@ -21,7 +21,7 @@ locals {
       vpc_security_group_ids       = [aws_security_group.weblogic_common.id]
     }
 
-    user_data = {
+    user_data_cloud_init = {
       args = {
         lifecycle_hook_name = "ready-hook"
       }
@@ -112,7 +112,7 @@ module "ec2_weblogic_autoscaling_group" {
   ami_name              = each.value.ami_name
   ami_owner             = try(each.value.ami_owner, "core-shared-services-production")
   instance              = merge(local.ec2_weblogic.instance, lookup(each.value, "instance", {}))
-  user_data             = merge(local.ec2_weblogic.user_data, lookup(each.value, "user_data", {}))
+  user_data_cloud_init  = merge(local.ec2_weblogic.user_data_cloud_init, lookup(each.value, "user_data_cloud_init", {}))
   ebs_volume_config     = lookup(each.value, "ebs_volume_config", {})
   ebs_volumes           = lookup(each.value, "ebs_volumes", {})
   ssm_parameters_prefix = "weblogic/"
@@ -191,7 +191,7 @@ resource "aws_security_group" "weblogic_common" {
     protocol    = "TCP"
     security_groups = [
       aws_security_group.jumpserver-windows.id,
-      local.environment == "test" ? module.lb_internal_nomis[0].security_group.id : aws_security_group.internal_elb.id
+      # local.environment == "test" ? module.jb_load_balancer_test[0].security_group.id : aws_security_group.internal_elb.id
     ]
   }
 
