@@ -40,22 +40,23 @@ data "aws_ec2_instance_type" "this" {
 
 locals {
   user_data_part_count = [
-    try(length(var.user_data.scripts), 0),
-    try(length(var.user_data.write_files), 0)
+    try(length(var.user_data_cloud_init.scripts), 0),
+    try(length(var.user_data_cloud_init.write_files), 0)
   ]
 }
 
 data "cloudinit_config" "this" {
   count = sum(local.user_data_part_count) > 0 ? 1 : 0
+
   dynamic "part" {
-    for_each = try(var.user_data.scripts, {})
+    for_each = try(var.user_data_cloud_init.scripts, {})
     content {
       content_type = "text/x-shellscript"
       content      = templatefile("templates/${part.value}", local.user_data_args)
     }
   }
   dynamic "part" {
-    for_each = try(var.user_data.write_files, {})
+    for_each = try(var.user_data_cloud_init.write_files, {})
     content {
       content_type = "text/cloud-config"
       merge_type   = "list(append)+dict(recurse_list)+str(append)"
