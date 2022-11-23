@@ -4,7 +4,7 @@ Terraform module for standing up an auto-scale group
 
 ## Jumpserver (new) example
 
-As this is a windows machine this uses a user_data_raw script which has to be a base64 encoded file. This is part of the ec2-jumpserver.tf locals block. 
+As this is a windows machine this uses a user_data_raw script which has to be a base64 encoded file. This is part of the ec2-jumpserver.tf locals block.
 
 ```hcl
 
