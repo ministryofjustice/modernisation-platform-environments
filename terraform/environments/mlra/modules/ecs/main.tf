@@ -404,61 +404,61 @@ resource "aws_iam_role_policy_attachment" "ecs_task_s3_access" {
   policy_arn = aws_iam_policy.ecs_task_execution_s3_policy.arn
 }
 
-##### ECS autoscaling ##########
-
-resource "aws_appautoscaling_target" "scaling_target" {
-  service_namespace  = "ecs"
-  resource_id        = "service/${aws_ecs_cluster.ecs_cluster.name}/${aws_ecs_service.ecs_service.name}"
-  scalable_dimension = "ecs:service:DesiredCount"
-  min_capacity       = var.appscaling_min_capacity
-  max_capacity       = var.appscaling_max_capacity
-}
-
-# Automatically scale capacity up by one
-resource "aws_appautoscaling_policy" "scaling_policy_up" {
-  name               = "${var.app_name}-scale-up-policy"
-  service_namespace  = "ecs"
-  resource_id        = "service/${aws_ecs_cluster.ecs_cluster.name}/${aws_ecs_service.ecs_service.name}"
-  scalable_dimension = "ecs:service:DesiredCount"
-
-  step_scaling_policy_configuration {
-    adjustment_type         = "ChangeInCapacity"
-    cooldown                = 60
-    metric_aggregation_type = "Maximum"
-
-    step_adjustment {
-      metric_interval_lower_bound = 0
-      scaling_adjustment          = 1
-    }
-  }
-
-  depends_on = [
-    aws_appautoscaling_target.scaling_target,
-  ]
-}
-
-# Automatically scale capacity down by one
-resource "aws_appautoscaling_policy" "scaling_policy_down" {
-  name               = "${var.app_name}-scale-down-policy"
-  service_namespace  = "ecs"
-  resource_id        = "service/${aws_ecs_cluster.ecs_cluster.name}/${aws_ecs_service.ecs_service.name}"
-  scalable_dimension = "ecs:service:DesiredCount"
-
-  step_scaling_policy_configuration {
-    adjustment_type         = "ChangeInCapacity"
-    cooldown                = 60
-    metric_aggregation_type = "Maximum"
-
-    step_adjustment {
-      metric_interval_lower_bound = 0
-      scaling_adjustment          = -1
-    }
-  }
-
-  depends_on = [
-    aws_appautoscaling_target.scaling_target,
-  ]
-}
+# ##### ECS autoscaling ##########
+# 
+# resource "aws_appautoscaling_target" "scaling_target" {
+#   service_namespace  = "ecs"
+#   resource_id        = "service/${aws_ecs_cluster.ecs_cluster.name}/${aws_ecs_service.ecs_service.name}"
+#   scalable_dimension = "ecs:service:DesiredCount"
+#   min_capacity       = var.appscaling_min_capacity
+#   max_capacity       = var.appscaling_max_capacity
+# }
+# 
+# # Automatically scale capacity up by one
+# resource "aws_appautoscaling_policy" "scaling_policy_up" {
+#   name               = "${var.app_name}-scale-up-policy"
+#   service_namespace  = "ecs"
+#   resource_id        = "service/${aws_ecs_cluster.ecs_cluster.name}/${aws_ecs_service.ecs_service.name}"
+#   scalable_dimension = "ecs:service:DesiredCount"
+# 
+#   step_scaling_policy_configuration {
+#     adjustment_type         = "ChangeInCapacity"
+#     cooldown                = 60
+#     metric_aggregation_type = "Maximum"
+# 
+#     step_adjustment {
+#       metric_interval_lower_bound = 0
+#       scaling_adjustment          = 1
+#     }
+#   }
+# 
+#   depends_on = [
+#     aws_appautoscaling_target.scaling_target,
+#   ]
+# }
+# 
+# # Automatically scale capacity down by one
+# resource "aws_appautoscaling_policy" "scaling_policy_down" {
+#   name               = "${var.app_name}-scale-down-policy"
+#   service_namespace  = "ecs"
+#   resource_id        = "service/${aws_ecs_cluster.ecs_cluster.name}/${aws_ecs_service.ecs_service.name}"
+#   scalable_dimension = "ecs:service:DesiredCount"
+# 
+#   step_scaling_policy_configuration {
+#     adjustment_type         = "ChangeInCapacity"
+#     cooldown                = 60
+#     metric_aggregation_type = "Maximum"
+# 
+#     step_adjustment {
+#       metric_interval_lower_bound = 0
+#       scaling_adjustment          = -1
+#     }
+#   }
+# 
+#   depends_on = [
+#     aws_appautoscaling_target.scaling_target,
+#   ]
+# }
 
 # Set up CloudWatch group and log stream and retain logs for 30 days
 resource "aws_cloudwatch_log_group" "cloudwatch_group" {
@@ -476,4 +476,73 @@ resource "aws_cloudwatch_log_group" "cloudwatch_group" {
 resource "aws_cloudwatch_log_stream" "cloudwatch_stream" {
   name           = "${var.app_name}-log-stream"
   log_group_name = aws_cloudwatch_log_group.cloudwatch_group.name
+}
+
+
+
+# Added to support target tracking scaling_adjustment
+
+resource "aws_iam_role" "ecs-autoscale-role" {
+  name = "ecs-scale-application"
+
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "application-autoscaling.amazonaws.com"
+      },
+      "Effect": "Allow"
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "ecs-autoscale" {
+  role = aws_iam_role.ecs-autoscale-role.id
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceAutoscaleRole"
+}
+
+
+resource "aws_appautoscaling_target" "ecs_target" {
+  max_capacity       = var.appscaling_max_capacity
+  min_capacity       = var.appscaling_min_capacity
+  resource_id        = "service/${aws_ecs_cluster.ecs_cluster.name}/${aws_ecs_service.ecs_service.name}"
+  scalable_dimension = "ecs:service:DesiredCount"
+  service_namespace  = "ecs"
+  role_arn           = aws_iam_role.ecs-autoscale-role.arn
+}
+
+resource "aws_appautoscaling_policy" "ecs_target_cpu" {
+  name               = "application-scaling-policy-cpu"
+  policy_type        = "TargetTrackingScaling"
+  resource_id        = aws_appautoscaling_target.ecs_target.resource_id
+  scalable_dimension = aws_appautoscaling_target.ecs_target.scalable_dimension
+  service_namespace  = aws_appautoscaling_target.ecs_target.service_namespace
+
+  target_tracking_scaling_policy_configuration {
+    predefined_metric_specification {
+      predefined_metric_type = "ECSServiceAverageCPUUtilization"
+    }
+    target_value = 80
+  }
+  depends_on = [aws_appautoscaling_target.ecs_target]
+}
+resource "aws_appautoscaling_policy" "ecs_target_memory" {
+  name               = "application-scaling-policy-memory"
+  policy_type        = "TargetTrackingScaling"
+  resource_id        = aws_appautoscaling_target.ecs_target.resource_id
+  scalable_dimension = aws_appautoscaling_target.ecs_target.scalable_dimension
+  service_namespace  = aws_appautoscaling_target.ecs_target.service_namespace
+
+  target_tracking_scaling_policy_configuration {
+    predefined_metric_specification {
+      predefined_metric_type = "ECSServiceAverageMemoryUtilization"
+    }
+    target_value = 80
+  }
+  depends_on = [aws_appautoscaling_target.ecs_target]
 }
