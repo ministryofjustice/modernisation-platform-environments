@@ -29,9 +29,44 @@ resource "aws_db_instance" "oasys" {
   performance_insights_enabled    = local.application_data.accounts[local.environment].db_performance_insights_enabled
   performance_insights_kms_key_id = "" #tfsec:ignore:aws-rds-enable-performance-insights-encryption Left empty so that it will run, however should be populated with real key in scenario.
   enabled_cloudwatch_logs_exports = local.application_data.accounts[local.environment].db_enabled_cloudwatch_logs_exports
+  db_subnet_group_name            = aws_db_subnet_group.oasys.name
+  vpc_security_group_ids          = [aws_security_group.oasys.id]
   tags = merge(local.tags,
     { Name = lower(format("%s-%s-database", local.application_name, local.environment)) }
   )
+}
+
+resource "aws_db_subnet_group" "oasys" {
+  name       = "${local.application_name}-${local.environment}-database-subnet-group"
+  subnet_ids = data.aws_subnets.shared-data.ids
+  tags = merge(local.tags,
+    { Name = lower(format("%s-%s-database-subnet-group", local.application_name, local.environment)) }
+  )
+
+}
+
+resource "aws_security_group" "oasys" {
+  name        = "${local.application_name}-${local.environment}-database-security-group"
+  description = "Security group for ${local.application_name} ${local.environment} database"
+  vpc_id      = data.aws_vpc.shared_vpc.id
+  tags = merge(local.tags,
+    { Name = lower(format("%s-%s-database-security-group", local.application_name, local.environment)) }
+  )
+  ingress {
+    from_port   = 1521
+    to_port     = 1521
+    protocol    = "tcp"
+    cidr_blocks = [local.cidrs.noms_live]
+  }
+  egress {
+    description = "allow all"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    #tfsec:ignore:aws-vpc-no-public-egress-sgr
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
 }
 
 resource "aws_iam_role" "rds_enhanced_monitoring" {
