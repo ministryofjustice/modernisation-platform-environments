@@ -56,7 +56,7 @@ resource "aws_security_group" "oasys" {
     from_port   = 1521
     to_port     = 1521
     protocol    = "tcp"
-    cidr_blocks = [local.cidrs.noms_live, data.aws_vpc.shared_vpc.cidr_block]
+    cidr_blocks = [local.cidrs.noms_live, data.aws_vpc.shared_vpc.cidr_block, local.cidrs.noms_test]
   }
   egress {
     description = "allow all"
