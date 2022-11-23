@@ -1,14 +1,14 @@
-#------------------------------------------------------------------------------
-# Windows Jumpserver
-# To add a new local user account, add a github username to `jumpserver_users`
-# local variable.  Scheduled job running on instance will create user and push
-# password to Secrets Manager, which only said user can access.
-#------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------
+# Windows Jumpserver - Old
+# See comments in the README.md files and DSOS-1584 with respect to this EC" instance.
+# This all needs to be removed once the new jumpserver is in place.
+#-------------------------------------------------------------------------------------
 
 locals {
   secret_prefix = "/Jumpserver/Users"
 }
 
+# This is defined in the new ec-jumpserver.tf file
 /* data "github_team" "jumpserver" {
   slug = "studio-webops"
 } */
