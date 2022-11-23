@@ -48,8 +48,8 @@ data "aws_iam_policy_document" "firehose-policy" {
       "s3:PutObject",
     ]
     resources = [
-      "arn:aws:s3:::${var.source_s3_id}",
-      "arn:aws:s3:::${var.source_s3_id}/*"
+      "arn:aws:s3:::${var.target_s3_id}",
+      "arn:aws:s3:::${var.target_s3_id}/*"
     ]
   }
 
