@@ -6,9 +6,9 @@ variable "name" {
   default = "kinesis-stream"
 }
 
-variable "source_s3_id" {}
+variable "target_s3_id" {}
 
-variable "source_s3_arn" {}
+variable "target_s3_arn" {}
 
 variable "aws_account_id" {}
 
@@ -20,4 +20,4 @@ variable "cloudwatch_log_group_name" {}
 
 variable "cloudwatch_log_stream_name" {}
 
-variable "source_s3_kms" {}
+variable "target_s3_kms" {}

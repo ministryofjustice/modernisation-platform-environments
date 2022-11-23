@@ -153,8 +153,8 @@ module "glue_domainplatform_change_monitor_job" {
     "--class"               = "GlueApp"
     "--cloud.platform.path" = "s3://${module.s3_curated_bucket[0].bucket.id}"
     "--domain.files.path"   = "s3://${module.s3_domain_config_bucket[0].bucket.id}"
-    "--domain.repo.path"    = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/domain-repo/" # Confirm
-    "--source.queue"        = "nomis-cdc-event-notification"                                 # should derive from local variable
+    "--domain.repo.path"    = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/domain-repo/" # Confirm ?
+    "--source.queue"        = module.s3_domain_cdc_sqs.sqs_id # SQS URL/ID (DPR-116)
     "--source.region"       = local.account_region
     "--target.path"         = "s3://${module.s3_domain_bucket[0].bucket.id}" # Path Check
     "--checkpoint.location" = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/checkpoint/change-monitor/"
@@ -950,19 +950,53 @@ module "s3_nomis_oracle_sqs" {
   )
 }
 
+# S3 - CDC Domain Events SQS Notification (DPR-116)
+module "s3_domain_cdc_sqs" {
+  source                    = "./modules/s3_bucket"
+  create_s3                 = local.setup_buckets
+  name                      = "${local.project}-domain-cdc-event-${local.environment}"
+  custom_kms_key            = local.s3_kms_arn
+  create_notification_queue = true
+  s3_notification_name      = "domain-cdc-event-notification"
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-domain-cdc-event-${local.environment}"
+      Resource_Type = "S3 Bucket"
+    }
+  )
+}
+
 # Kinesis Nomis Stream
 module "kinesis_nomis_stream" {
   source                     = "./modules/kinesis_firehose"
-  name                       = "${local.project}-nomis-target-stream-${local.env}"
-  kinesis_source_stream_arn  = "arn:aws:kinesis:eu-west-2:771283872747:stream/dpr-kinesis-ingestor-development"
-  kinesis_source_stream_name = "dpr-kinesis-ingestor-development"
-  source_s3_id               = module.s3_nomis_oracle_sqs.bucket_id
-  source_s3_arn              = module.s3_nomis_oracle_sqs.bucket_arn
-  source_s3_kms              = local.s3_kms_arn
+  name                       = "${local.project}-nomis-target-stream-${local.env}" 
+  kinesis_source_stream_arn  = module.kinesis_stream_ingestor.kinesis_stream_arn # KDS Cloud Platform
+  kinesis_source_stream_name = module.kinesis_stream_ingestor.kinesis_stream_name # KDS Cloud Platform
+  target_s3_id               = module.s3_nomis_oracle_sqs.bucket_id
+  target_s3_arn              = module.s3_nomis_oracle_sqs.bucket_arn
+  target_s3_kms              = local.s3_kms_arn
   aws_account_id             = local.account_id
   aws_region                 = local.account_region
   cloudwatch_log_group_name  = "/aws/kinesisfirehose/nomis-target-stream"
   cloudwatch_log_stream_name = "NomisTargetStream"
+  cloudwatch_logging_enabled = true
+}
+
+# Kinesis cdc domain Stream (DPR-116)
+module "kinesis_cdc_domain_stream" {
+  source                     = "./modules/kinesis_firehose"
+  name                       = "${local.project}-cdc-domain-stream-${local.env}"
+  kinesis_source_stream_arn  = module.kinesis_stream_domain_data.kinesis_stream_arn # KDS Domain Platform
+  kinesis_source_stream_name = module.kinesis_stream_domain_data.kinesis_stream_name # KDS Domain Platform
+  target_s3_id               = module.s3_domain_cdc_sqs.bucket_id
+  target_s3_arn              = module.s3_domain_cdc_sqs.bucket_arn
+  target_s3_kms              = local.s3_kms_arn
+  aws_account_id             = local.account_id
+  aws_region                 = local.account_region
+  cloudwatch_log_group_name  = "/aws/kinesisfirehose/cdc-domain-stream"
+  cloudwatch_log_stream_name = "CdcDomainStream"
   cloudwatch_logging_enabled = true
 }
 
