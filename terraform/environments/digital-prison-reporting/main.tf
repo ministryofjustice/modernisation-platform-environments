@@ -154,7 +154,7 @@ module "glue_cloudplatform_etl_job" {
     "--cloud.platform.path" = "s3://${module.s3_curated_bucket[0].bucket.id}"
     "--domain.files.path"   = "s3://${module.s3_domain_config_bucket[0].bucket.id}"
     "--domain.repo.path"    = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/domain-repo/" # Confirm
-    "--source.queue"        = "nomis-cdc-event-notification" # should derive from local variable
+    "--source.queue"        = "nomis-cdc-event-notification"                                 # should derive from local variable
     "--source.region"       = local.account_region
     "--target.path"         = "s3://${module.s3_domain_bucket[0].bucket.id}" # Path Check
     "--checkpoint.location" = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/checkpoint/change-monitor/"
@@ -185,7 +185,7 @@ module "glue_cloudplatform_etl_job" {
     "--cloud.platform.path" = "s3://${module.s3_curated_bucket[0].bucket.id}"
     "--domain.files.path"   = "s3://${module.s3_domain_config_bucket[0].bucket.id}"
     "--domain.repo.path"    = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/domain-repo/" # Confirm
-    "--target.path"         = "s3://${module.s3_domain_bucket[0].bucket.id}" # Path Check
+    "--target.path"         = "s3://${module.s3_domain_bucket[0].bucket.id}"                 # Path Check
     "--checkpoint.location" = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/checkpoint/platform-refresh/"
   }
 }
