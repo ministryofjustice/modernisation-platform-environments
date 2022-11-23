@@ -33,5 +33,4 @@ variable "create_notification_queue" {
 variable "sqs_msg_retention_seconds" {
   description = "SQS Message Retention"
   default     = 86400
-} 
 }
