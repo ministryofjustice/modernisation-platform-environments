@@ -29,7 +29,7 @@ locals {
 
     autoscaling_group = {
       desired_capacity = 1
-      max_size         = 2
+      max_size         = 1
       min_size         = 0
       force_delete     = true
     }
