@@ -3,7 +3,7 @@ resource "aws_db_instance" "oasys" {
   engine_version = "19.0.0.0.ru-2022-10.rur-2022-10.r1"
   license_model  = "bring-your-own-license"
   instance_class = local.application_data.accounts[local.environment].db_instance_class
-  db_name        = "oasdb"
+  db_name        = "OASDB"
   identifier     = "${local.application_name}-${local.environment}-database"
   username       = local.application_data.accounts[local.environment].db_user
   password       = random_password.db_password.result
