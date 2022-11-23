@@ -101,22 +101,22 @@ module "glue_demo_table" {
 module "glue_cloudplatform_etl_job" {
   source                        = "./modules/glue_job"
   create_job                    = local.create_job
-  name                          = "${local.project}-reporting-hub"
+  name                          = "${local.project}-reporting-hub-${local.env}"
   description                   = local.description
   create_security_configuration = local.create_sec_conf
   job_language                  = "scala"
-  temp_dir                      = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/tmp/"
-  checkpoint_dir                = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/checkpoint/"
-  spark_event_logs              = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/spark-logs/"
+  temp_dir                      = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/tmp/reporting-hub/"
+  checkpoint_dir                = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/checkpoint/reporting-hub/"
+  spark_event_logs              = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/spark-logs/reporting-hub/"
   tags                          = local.all_tags
-  script_location               = "s3://${local.project}-artifact-store-${local.environment}/artifacts/cloud-platform/digital-prison-reporting-poc/cloud-platform.scala"
+  script_location               = "s3://${local.project}-artifact-store-${local.environment}/artifacts/cloud-platform/digital-prison-reporting-poc/cloud-platform-vlatest.scala"
   enable_continuous_log_filter  = false
   project_id                    = local.project
   aws_kms_key                   = local.s3_kms_arn
-  create_kinesis_ingester       = local.create_kinesis
+  create_kinesis_ingester       = local.create_kinesis # If True, Kinesis Policies are applied
   additional_policies           = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_read_only_arn
   arguments = {
-    "--extra-jars"          = "s3://dpr-artifact-store-development/artifacts/cloud-platform/digital-prison-reporting-poc/cloud-platform-v0.0.3.jar"
+    "--extra-jars"          = "s3://${local.project}-artifact-store-${local.environment}/artifacts/cloud-platform/digital-prison-reporting-poc/cloud-platform-vlatest.jar"
     "--curated.path"        = "s3://${module.s3_curated_bucket[0].bucket.id}"
     "--raw.path"            = "s3://${module.s3_raw_bucket[0].bucket.id}"
     "--structured.path"     = "s3://${module.s3_structured_bucket[0].bucket.id}"
@@ -127,6 +127,66 @@ module "glue_cloudplatform_etl_job" {
     "--source.stream"       = local.kinesis_stream_ingestor
     "--source.region"       = local.account_region
     "--job-bookmark-option" = "job-bookmark-enable"
+  }
+}
+
+# Glue Domain Platform Change Monitor Job
+module "glue_cloudplatform_etl_job" {
+  source                        = "./modules/glue_job"
+  create_job                    = local.create_job
+  name                          = "${local.project}-domain-platform-table-change-monitor-${local.env}"
+  description                   = "Monitors the reporting hub for table changes and applies them to domains"
+  create_security_configuration = local.create_sec_conf
+  job_language                  = "scala"
+  temp_dir                      = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/tmp/change-monitor/"
+  checkpoint_dir                = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/checkpoint/change-monitor/"
+  spark_event_logs              = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/spark-logs/change-monitor/"
+  tags                          = local.all_tags
+  script_location               = "s3://${local.project}-artifact-store-${local.environment}/artifacts/domain-platform/digital-prison-reporting-poc/domain-platform-table-change-monitor-vlatest.scala"
+  enable_continuous_log_filter  = false
+  project_id                    = local.project
+  aws_kms_key                   = local.s3_kms_arn
+  create_kinesis_ingester       = local.create_kinesis # If True, Kinesis Policies are applied
+  additional_policies           = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_read_only_arn
+  arguments = {
+    "--extra-jars"          = "s3://${local.project}-artifact-store-${local.environment}/artifacts/domain-platform/digital-prison-reporting-poc/domain-platform-vlatest.jar"
+    "--class"               = "GlueApp"
+    "--cloud.platform.path" = "s3://${module.s3_curated_bucket[0].bucket.id}"
+    "--domain.files.path"   = "s3://${module.s3_domain_config_bucket[0].bucket.id}"
+    "--domain.repo.path"    = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/domain-repo/" # Confirm
+    "--source.queue"        = "nomis-cdc-event-notification" # should derive from local variable
+    "--source.region"       = local.account_region
+    "--target.path"         = "s3://${module.s3_domain_bucket[0].bucket.id}" # Path Check
+    "--checkpoint.location" = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/checkpoint/change-monitor/"
+  }
+}
+
+# Glue Domain Platform Refresh Job
+module "glue_cloudplatform_etl_job" {
+  source                        = "./modules/glue_job"
+  create_job                    = local.create_job
+  name                          = "${local.project}-domain-platform-refresh-${local.env}"
+  description                   = "Monitors the reporting hub for table changes and applies them to domains"
+  create_security_configuration = local.create_sec_conf
+  job_language                  = "scala"
+  temp_dir                      = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/tmp/platform-refresh/"
+  checkpoint_dir                = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/checkpoint/platform-refresh/"
+  spark_event_logs              = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/spark-logs/platform-refresh/"
+  tags                          = local.all_tags
+  script_location               = "s3://${local.project}-artifact-store-${local.environment}/artifacts/domain-platform/digital-prison-reporting-poc/domain-platform-refresh-vlatest.scala"
+  enable_continuous_log_filter  = false
+  project_id                    = local.project
+  aws_kms_key                   = local.s3_kms_arn
+  create_kinesis_ingester       = local.create_kinesis # If True, Kinesis Policies are applied
+  additional_policies           = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_read_only_arn
+  arguments = {
+    "--extra-jars"          = "s3://${local.project}-artifact-store-${local.environment}/artifacts/domain-platform/digital-prison-reporting-poc/domain-platform-vlatest.jar"
+    "--class"               = "GlueApp"
+    "--cloud.platform.path" = "s3://${module.s3_curated_bucket[0].bucket.id}"
+    "--domain.files.path"   = "s3://${module.s3_domain_config_bucket[0].bucket.id}"
+    "--domain.repo.path"    = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/domain-repo/" # Confirm
+    "--target.path"         = "s3://${module.s3_domain_bucket[0].bucket.id}" # Path Check
+    "--checkpoint.location" = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/checkpoint/platform-refresh/"
   }
 }
 
@@ -851,7 +911,7 @@ module "dms_nomis_t3" {
   source_address        = "10.101.63.135"
   vpc                   = data.aws_vpc.shared.id
   kinesis_target_stream = "arn:aws:kinesis:eu-west-2:771283872747:stream/dpr-kinesis-ingestor-development"
-  kinesis_stream_policy = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_write_only_arn
+  kinesis_stream_policy = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_admin_arn
   project_id            = local.project
   env                   = local.environment
   dms_source_name       = "oracle"
