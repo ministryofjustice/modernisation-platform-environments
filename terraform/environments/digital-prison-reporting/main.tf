@@ -154,7 +154,7 @@ module "glue_domainplatform_change_monitor_job" {
     "--cloud.platform.path" = "s3://${module.s3_curated_bucket[0].bucket.id}"
     "--domain.files.path"   = "s3://${module.s3_domain_config_bucket[0].bucket.id}"
     "--domain.repo.path"    = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/domain-repo/" # Confirm ?
-    "--source.queue"        = module.s3_domain_cdc_sqs.sqs_id # SQS URL/ID (DPR-116)
+    "--source.queue"        = module.s3_domain_cdc_sqs.sqs_id                                # SQS URL/ID (DPR-116)
     "--source.region"       = local.account_region
     "--target.path"         = "s3://${module.s3_domain_bucket[0].bucket.id}" # Path Check
     "--checkpoint.location" = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/checkpoint/change-monitor/"
@@ -971,8 +971,8 @@ module "s3_domain_cdc_sqs" {
 # Kinesis Nomis Stream
 module "kinesis_nomis_stream" {
   source                     = "./modules/kinesis_firehose"
-  name                       = "${local.project}-nomis-target-stream-${local.env}" 
-  kinesis_source_stream_arn  = module.kinesis_stream_ingestor.kinesis_stream_arn # KDS Cloud Platform
+  name                       = "${local.project}-nomis-target-stream-${local.env}"
+  kinesis_source_stream_arn  = module.kinesis_stream_ingestor.kinesis_stream_arn  # KDS Cloud Platform
   kinesis_source_stream_name = module.kinesis_stream_ingestor.kinesis_stream_name # KDS Cloud Platform
   target_s3_id               = module.s3_nomis_oracle_sqs.bucket_id
   target_s3_arn              = module.s3_nomis_oracle_sqs.bucket_arn
@@ -988,7 +988,7 @@ module "kinesis_nomis_stream" {
 module "kinesis_cdc_domain_stream" {
   source                     = "./modules/kinesis_firehose"
   name                       = "${local.project}-cdc-domain-stream-${local.env}"
-  kinesis_source_stream_arn  = module.kinesis_stream_domain_data.kinesis_stream_arn # KDS Domain Platform
+  kinesis_source_stream_arn  = module.kinesis_stream_domain_data.kinesis_stream_arn  # KDS Domain Platform
   kinesis_source_stream_name = module.kinesis_stream_domain_data.kinesis_stream_name # KDS Domain Platform
   target_s3_id               = module.s3_domain_cdc_sqs.bucket_id
   target_s3_arn              = module.s3_domain_cdc_sqs.bucket_arn
