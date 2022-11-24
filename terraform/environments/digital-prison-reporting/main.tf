@@ -98,7 +98,7 @@ module "glue_demo_table" {
 }
 
 # Glue Cloud Platform ETL JOB
-module "glue_cloudplatform_etl_job" {
+module "glue_cloudplatform_reporting_job" {
   source                        = "./modules/glue_job"
   create_job                    = local.create_job
   name                          = "${local.project}-reporting-hub-${local.env}"
@@ -109,7 +109,7 @@ module "glue_cloudplatform_etl_job" {
   checkpoint_dir                = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/checkpoint/reporting-hub/"
   spark_event_logs              = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/spark-logs/reporting-hub/"
   tags                          = local.all_tags
-  script_location               = "s3://${local.project}-artifact-store-${local.environment}/artifacts/cloud-platform/digital-prison-reporting-poc/cloud-platform-vLatest.scala"
+  script_location               = "s3://${local.project}-artifact-store-${local.environment}/artifacts/cloud-platform/digital-prison-reporting-poc/cloud-platform-reporting-hub-vLatest.scala"
   enable_continuous_log_filter  = false
   project_id                    = local.project
   aws_kms_key                   = local.s3_kms_arn
