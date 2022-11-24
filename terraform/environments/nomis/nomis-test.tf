@@ -107,8 +107,12 @@ locals {
         # See DSOS-1570 and DSOS-1571
         autoscaling_group = {
           desired_capacity = 2
+          warm_pool = {
+            reuse_on_scale_in           = false
+            max_group_prepared_capacity = 0
+          }
         }
-        offpeak_desired_capacity = 0
+        offpeak_desired_capacity = 1
       }
     }
 
