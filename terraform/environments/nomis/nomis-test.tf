@@ -100,6 +100,7 @@ locals {
           oracle-sid         = "CNOMT1"
         }
         ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2022-11-02T00-00-24.828Z"
+        branch   = "/DSOS-1570/weblogic-cert-fix"
         # branch = var.BRANCH_NAME # comment in if testing ansible
 
         # NOTE: setting desired capacity to 0 as this is not fully working yet
