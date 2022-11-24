@@ -122,7 +122,7 @@ locals {
     ec2_test_instances = {
       t1-ndh-app-1 = {
         tags = {
-          server-type = ndh-app
+          server-type = "ndh-app"
           description = "Standalone EC2 for testing RHEL7.9 NDH App"
           monitored   = false
         }
@@ -131,7 +131,7 @@ locals {
       }
       t1-ndh-ems-1 = {
         tags = {
-          server-type = ndh-ems
+          server-type = "ndh-ems"
           description = "Standalone EC2 for testing RHEL7.9 NDH EMS"
           monitored   = false
         }
