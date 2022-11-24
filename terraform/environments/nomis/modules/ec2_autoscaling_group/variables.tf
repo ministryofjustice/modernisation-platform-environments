@@ -96,7 +96,7 @@ variable "instance" {
     instance_type                = string
     key_name                     = string
     monitoring                   = optional(bool)
-    metadata_options_http_tokens = optional(string)
+    metadata_options_http_tokens = optional(string, "required")
     vpc_security_group_ids       = list(string)
     private_dns_name_options = optional(object({
       enable_resource_name_dns_aaaa_record = optional(bool)

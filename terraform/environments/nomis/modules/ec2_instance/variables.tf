@@ -95,7 +95,7 @@ variable "instance" {
     disable_api_termination      = bool
     instance_type                = string
     key_name                     = string
-    metadata_options_http_tokens = optional(string)
+    metadata_options_http_tokens = optional(string, "required")
     monitoring                   = optional(bool)
     vpc_security_group_ids       = list(string)
     root_block_device = optional(object({
