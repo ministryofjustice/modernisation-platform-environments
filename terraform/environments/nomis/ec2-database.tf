@@ -134,6 +134,7 @@ locals {
 }
 
 module "db_ec2_instance" {
+  #checkov:skip=CKV_AWS_79:Oracle cannot accommodate a token
   source = "./modules/ec2_instance"
 
   providers = {

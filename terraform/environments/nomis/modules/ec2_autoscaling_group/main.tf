@@ -31,13 +31,15 @@ resource "aws_launch_template" "this" {
   iam_instance_profile {
     arn = aws_iam_instance_profile.this.arn
   }
+
+  #checkov:skip=CKV_AWS_79:"We have to use version 1 in some cases"
   metadata_options {
     http_endpoint = "enabled"
-    http_tokens   = try(var.instance.metadata_options_http_tokens, "required")
+    http_tokens   = coalesce(var.instance.metadata_options_http_tokens, "required")
   }
 
   monitoring {
-    enabled = try(var.instance.monitoring, true)
+    enabled = coalesce(var.instance.monitoring, true)
   }
 
   network_interfaces {
