@@ -99,3 +99,59 @@ resource "aws_iam_role_policy_attachment" "dms-kinesis-attachment" {
   policy_arn = var.kinesis_stream_policy
 }
 
+#DMS DMS Operation role
+resource "aws_iam_role" "dms-operator-role" {
+  name = "dms-operator-role"
+  path = "/"
+
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "dms.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+EOF
+}
+
+# Attach an admin policy to the role
+resource "aws_iam_role_policy" "dmsoperatorpolicy" {
+  name = "dmsoperatorpolicy"
+  role = aws_iam_role.dms-operator-role.id
+
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "s3:*",
+                "cloudwatch:*",
+                "ec2:CreateNetworkInterface",
+                "ec2:DescribeAvailabilityZones",
+                "ec2:DescribeInternetGateways",
+                "ec2:DescribeSecurityGroups",
+                "ec2:DescribeSubnets",
+                "ec2:DescribeVpcs",
+                "ec2:DeleteNetworkInterface",
+                "ec2:ModifyNetworkInterfaceAttribute"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+EOF
+}
+
+#DMS Role with kinesis Write Access
+resource "aws_iam_role_policy_attachment" "dms-operator-kinesis-attachment" {
+  role       = aws_iam_role.dms-operator-role.name
+  policy_arn = var.kinesis_stream_policy
+}
