@@ -93,6 +93,28 @@ resource "aws_iam_role" "dms-kinesis-role" {
 EOF
 }
 
+# Attach an admin policy to the role
+resource "aws_iam_role_policy" "dmskinesispolicy" {
+  name = "dmskinesispolicy"
+  role = aws_iam_role.dms-kinesis-role.id
+
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "s3:*",
+                "kms:*"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+EOF
+}
+
 #DMS Role with kinesis Write Access
 resource "aws_iam_role_policy_attachment" "dms-kinesis-attachment" {
   role       = aws_iam_role.dms-kinesis-role.name
@@ -120,7 +142,7 @@ resource "aws_iam_role" "dms-operator-role" {
 EOF
 }
 
-# Attach an admin policy to the role
+# Attach an admin policy to the Operator role
 resource "aws_iam_role_policy" "dmsoperatorpolicy" {
   name = "dmsoperatorpolicy"
   role = aws_iam_role.dms-operator-role.id
