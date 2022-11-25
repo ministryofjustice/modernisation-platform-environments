@@ -191,7 +191,7 @@ resource "aws_security_group" "weblogic_common" {
     protocol    = "TCP"
     security_groups = [
       aws_security_group.jumpserver-windows.id,
-      local.environment == "test" ? module.jb_load_balancer_test[0].security_group.id : aws_security_group.internal_elb.id
+      local.environment == "test" ? module.lb_internal_nomis[0].security_group.id : aws_security_group.internal_elb.id
     ]
   }
 
