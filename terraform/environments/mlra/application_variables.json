@@ -26,7 +26,7 @@
       "lz_vpc_cidr": "10.202.0.0/20",
       "lb_tg_name": "mlra-tg-development",
       "appscaling_min_capacity": 2,
-      "appscaling_max_capacity" : 6
+      "appscaling_max_capacity": 6
     },
     "test": {
       "example_var": "test-data"
