@@ -28,8 +28,8 @@ module "mlra-ecs" {
   ec2_egress_rules        = local.ec2_egress_rules
   lb_tg_name              = local.application_data.accounts[local.environment].lb_tg_name
   tags_common             = local.tags
-  appscaling_min_capacity = local.appscaling_min_capacity
-  appscaling_max_capacity = local.appscaling_max_capacity
+  appscaling_min_capacity = local.application_data.accounts[local.environment].appscaling_min_capacity
+  appscaling_max_capacity = local.application_data.accounts[local.environment].appscaling_max_capacity
 
   depends_on = [module.alb, aws_cloudwatch_log_group.ecs_log_group] # TODO module.alb dependancy may have to be re-factored further into development
 }
