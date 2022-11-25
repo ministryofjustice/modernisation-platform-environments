@@ -15,7 +15,7 @@
       "maat_db_password": "APP_MAATDB_DBPASSWORD_MLA1",
       "maat_libra_wsdl_url": "http://infox.aws.dev.legalservices.gov.uk/infoX/gateway",
       "ec2_desired_capacity": 2,
-      "ec2_max_size": 3,
+      "ec2_max_size": 6,
       "ec2_min_size": 2,
       "container_cpu": 2048,
       "container_memory": 7763,
@@ -24,7 +24,9 @@
       "server_port": 8080,
       "app_count": 1,
       "lz_vpc_cidr": "10.202.0.0/20",
-      "lb_tg_name": "mlra-tg-development"
+      "lb_tg_name": "mlra-tg-development",
+      "appscaling_min_capacity": 2,
+      "appscaling_max_capacity" : 6
     },
     "test": {
       "example_var": "test-data"

@@ -123,13 +123,13 @@ variable "task_definition_volume" {
 variable "appscaling_min_capacity" {
   type        = number
   description = "Minimum capacity of the application scaling target"
-  default     = 1
+  default     = 2
 }
 
 variable "appscaling_max_capacity" {
   type        = number
   description = "Maximum capacity of the application scaling target"
-  default     = 3
+  default     = 6
 }
 
 variable "user_data" {
