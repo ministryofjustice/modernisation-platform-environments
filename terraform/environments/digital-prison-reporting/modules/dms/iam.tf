@@ -133,6 +133,7 @@ resource "aws_iam_role_policy" "dmsoperatorpolicy" {
             "Effect": "Allow",
             "Action": [
                 "s3:*",
+                "kms:*",
                 "cloudwatch:*",
                 "ec2:CreateNetworkInterface",
                 "ec2:DescribeAvailabilityZones",
