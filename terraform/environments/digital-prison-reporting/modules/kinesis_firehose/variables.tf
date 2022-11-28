@@ -22,6 +22,12 @@ variable "cloudwatch_log_stream_name" {}
 
 variable "target_s3_kms" {}
 
-variable "target_s3_error_prefix" {}
+variable "target_s3_error_prefix" {
+  description = "S3 Error Prefix Key"
+  default     = null
+}
 
-variable "target_s3_prefix" {}
+variable "target_s3_prefix" {
+  description = "S3 Prefix Key"
+  default     = null
+}
