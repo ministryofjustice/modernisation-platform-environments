@@ -40,7 +40,7 @@ resource "aws_db_instance" "oasys" {
 }
 
 resource "aws_db_parameter_group" "oasys_parameter" {
-  name   = "oasys_parameter_group_19c"
+  name   = "oasys-parameter-group-19c"
   family = "oracle19c"
 
   parameter {
