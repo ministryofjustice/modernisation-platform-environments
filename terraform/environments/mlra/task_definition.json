@@ -46,7 +46,7 @@
       },
       {
         "name": "APP_DB_URL",
-        "value": "${maat_db_url}"
+        "value": "jdbc:oracle:thin:@${maat_db_url}"
       },
       {
         "name": "APP_DB_USERID",
