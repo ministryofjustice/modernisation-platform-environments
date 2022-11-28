@@ -60,6 +60,14 @@ locals {
       cidr_blocks     = [data.aws_vpc.shared.cidr_block]
       security_groups = [module.alb.security_group.id]
     }
+    "cluster_ec2_lb_ingress_4" = {
+      description     = "Cluster EC2 ingress rule 4"
+      from_port       = 1521
+      to_port         = 1521
+      protocol        = "tcp"
+      cidr_blocks     = [data.aws_vpc.shared.cidr_block]
+      security_groups = [module.alb.security_group.id]
+    }
   }
   ec2_egress_rules = {
     "cluster_ec2_lb_egress" = {
