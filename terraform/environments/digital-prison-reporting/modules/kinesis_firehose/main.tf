@@ -13,7 +13,7 @@ resource "aws_kinesis_firehose_delivery_stream" "extended_s3_stream" {
     kms_key_arn    = var.target_s3_kms
     s3_backup_mode = "Disabled"
 
-    prefix = var.target_s3_prefix
+    prefix              = var.target_s3_prefix
     error-output-prefix = var.target_s3_error_prefix
 
     cloudwatch_logging_options {
