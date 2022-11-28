@@ -9,7 +9,8 @@ resource "aws_db_instance" "oasys" {
   username       = local.application_data.accounts[local.environment].db_user
   password       = random_password.db_password.result
   # tflint-ignore: aws_db_instance_default_parameter_group
-  parameter_group_name  = "default.oracle-ee-19"
+  parameter_group_name  = aws_db_parameter_group.oasys_parameter.name
+  character_set_name    = "WE8MSWIN1252"
   skip_final_snapshot   = local.application_data.accounts[local.environment].db_skip_final_snapshot
   allocated_storage     = local.application_data.accounts[local.environment].db_allocated_storage
   max_allocated_storage = local.application_data.accounts[local.environment].db_max_allocated_storage
@@ -36,6 +37,20 @@ resource "aws_db_instance" "oasys" {
   tags = merge(local.tags,
     { Name = lower(format("%s-%s-database", local.application_name, local.environment)) }
   )
+}
+
+resource "aws_db_parameter_group" "oasys_parameter" {
+  name   = "oasys_parameters_19c"
+  family = "oracle19c"
+
+  parameter {
+    name  = "nls_language"
+    value = "ENGLISH"
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_db_subnet_group" "oasys" {
