@@ -58,6 +58,7 @@ locals {
         instance = {
           instance_type           = "r6i.2xlarge"
           disable_api_termination = true
+          metadata_endpoint_enabled = "enabled"
         }
         ebs_volumes = {
           "/dev/sdb" = { # /u01
@@ -100,6 +101,7 @@ locals {
         instance = {
           instance_type           = "r6i.2xlarge"
           disable_api_termination = true
+          metadata_endpoint_enabled = "enabled"
         }
         ebs_volumes = {
           "/dev/sdb" = { # /u01
@@ -141,6 +143,7 @@ locals {
         instance = {
           instance_type           = "r6i.2xlarge"
           disable_api_termination = true
+          metadata_endpoint_enabled = "enabled"
         }
         ebs_volumes = {
           "/dev/sdb" = { # /u01
