@@ -17,6 +17,7 @@ resource "aws_instance" "this" {
 
   metadata_options {
     #checkov:skip=CKV_AWS_79:This isn't enabled in every environment, so we can't enforce it
+    #tfsec:ignore:aws-ec2-enforce-http-token-imds
     http_endpoint = coalesce(var.instance.metadata_endpoint_enabled, "disabled")
     http_tokens   = coalesce(var.instance.metadata_options_http_tokens, "required")
   }
@@ -67,6 +68,7 @@ resource "aws_instance" "this" {
 #------------------------------------------------------------------------------
 
 #tfsec:ignore:aws-ebs-encryption-customer-key:exp:2022-10-31: I don't think we need the fine grained control CMK would provide
+#checkov:skip=CKV_AWS_189:I don't think we need the fine grained control CMK would provide
 resource "aws_ebs_volume" "this" {
   for_each = local.ebs_volumes
 
