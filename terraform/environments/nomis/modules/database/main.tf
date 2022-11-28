@@ -113,7 +113,7 @@ resource "aws_instance" "database" {
     },
   [length(var.oracle_sids) > 0 ? { oracle_sids = try(join(",", var.oracle_sids), "") } : null]...)
 }
-#tfsec:ignore:aws-ebs-encryption-customer-key:exp:2022-10-31: I don't think we need the fine grained control CMK would provide
+#tfsec:ignore:aws-ebs-encryption-customer-key tfsec:ignore:aws-ec2-volume-encryption-customer-key
 resource "aws_ebs_volume" "oracle_app" {
   for_each = toset(local.oracle_app_disks)
 
@@ -139,7 +139,7 @@ resource "aws_volume_attachment" "oracle_app" {
   instance_id = aws_instance.database.id
 }
 
-#tfsec:ignore:aws-ebs-encryption-customer-key:exp:2022-10-31: I don't think we need the fine grained control CMK would provide
+#tfsec:ignore:aws-ebs-encryption-customer-key tfsec:ignore:aws-ec2-volume-encryption-customer-key
 resource "aws_ebs_volume" "asm_data" {
   for_each = toset(local.asm_data_disks)
 
@@ -171,7 +171,7 @@ resource "aws_volume_attachment" "asm_data" {
   instance_id = aws_instance.database.id
 }
 
-#tfsec:ignore:aws-ebs-encryption-customer-key:exp:2022-10-31: I don't think we need the fine grained control CMK would provide
+#tfsec:ignore:aws-ebs-encryption-customer-key tfsec:ignore:aws-ec2-volume-encryption-customer-key
 resource "aws_ebs_volume" "asm_flash" {
   for_each = toset(local.asm_flash_disks)
 
@@ -203,7 +203,7 @@ resource "aws_volume_attachment" "asm_flash" {
   instance_id = aws_instance.database.id
 }
 
-#tfsec:ignore:aws-ebs-encryption-customer-key:exp:2022-10-31: I don't think we need the fine grained control CMK would provide
+#tfsec:ignore:aws-ebs-encryption-customer-key tfsec:ignore:aws-ec2-volume-encryption-customer-key
 resource "aws_ebs_volume" "swap" {
   availability_zone = var.availability_zone
   encrypted         = true
