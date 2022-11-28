@@ -151,3 +151,24 @@ resource "aws_iam_instance_profile" "jumpserver" {
   role = aws_iam_role.jumpserver.name
   path = "/"
 }
+
+# IAM policy permissions to enable jumpserver to list secrets and put user passwords into secret manager
+data "aws_iam_policy_document" "jumpserver_users" {
+  statement {
+    effect    = "Allow"
+    actions   = ["secretsmanager:GetSecretValue"]
+    resources = ["arn:aws:secretsmanager:${local.region}:${data.aws_caller_identity.current.id}:secret:${local.secret_prefix}/*"]
+  }
+  statement {
+    effect    = "Allow"
+    actions   = ["secretsmanager:ListSecrets"]
+    resources = ["*"]
+  }
+}
+
+# Add policy to role
+resource "aws_iam_role_policy" "jumpserver_users" {
+  name   = "secrets-access-jumpserver-users"
+  role   = aws_iam_role.jumpserver.id
+  policy = data.aws_iam_policy_document.jumpserver_users.json
+}

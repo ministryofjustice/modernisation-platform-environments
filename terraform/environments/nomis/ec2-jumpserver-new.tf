@@ -145,14 +145,14 @@ data "aws_iam_policy_document" "jumpserver_users_asg" {
 
 # IAM role for jumpserver instances
 resource "aws_iam_policy" "secret_access_jumpserver_asg" {
-  name        = "write-access-to-secret-store"
+  name        = "read-access-to-secret-store"
   path        = "/"
-  description = "Policy for access to secret store"
+  description = "Policy for read access to secret store"
   policy      = data.aws_iam_policy_document.jumpserver_users_asg.json
   tags = merge(
     local.tags,
     {
-      Name = "write-access-to-secret-store"
+      Name = "read-access-to-secret-store"
     },
   )
 }
