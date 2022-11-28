@@ -25,17 +25,18 @@ tasks:
             foreach($secret in $secrets){
                 $username = $secret.Name.SubString($secret_prefix.Length) # secrets are stored like /Jumpserver/Users/JoeBloggs, so trim prefix
                 $user_exists = Get-LocalUser $username -ErrorAction SilentlyContinue
+                # get password from secret manager
+                $password = Get-SECSecretValue -SecretId $secret.ARN
 
                 if ($user_exists -eq $null) {
-                    # create password and add to secret manager
-                    $password = [System.Web.Security.Membership]::GeneratePassword(32,5)
-                    Write-SECSecretValue -SecretId $secret.ARN -SecretString $password
-
                     # Create user and add to RD group
-                    $secure_string = ConvertTo-SecureString -String $password -AsPlainText -Force
-                    New-LocalUser $username -Password $secure_string -FullName $username
+                    New-LocalUser $username -Password $SecretString.SecretString -FullName $username
                     Add-LocalGroupMember -Group "Remote Desktop Users" -Member $username
                     Add-LocalGroupMember -Group "Administrators" -Member $username
+                }
+                else {
+                    Write-Host "User $username already exists, updating password"
+                    Set-LocalUser -Name $username -Password $password.SecretString
                 }
             }
           '
