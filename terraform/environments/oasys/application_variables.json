@@ -8,7 +8,7 @@
       "db_retention_period": "15",
       "db_maintenance_window": "mon:00:00-mon:03:00",
       "db_instance_class": "db.t3.small",
-      "db_user": "eor",
+      "db_user": "mojdba",
       "db_allocated_storage": "500",
       "db_max_allocated_storage": "0",
       "db_multi_az": "false",
