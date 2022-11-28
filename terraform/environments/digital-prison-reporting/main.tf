@@ -1004,7 +1004,7 @@ module "kinesis_cdc_domain_stream" {
   target_s3_arn              = module.s3_domain_cdc_sqs.bucket_arn
   target_s3_kms              = local.s3_kms_arn
   target_s3_prefix           = "cdc/year=!{timestamp:yyyy}/month=!{timestamp:MM}/day=!{timestamp:dd}/hour=!{timestamp:HH}/"
-  target_s3_error_prefix     = "cdc-error/type=!{firehose:error-output-type}/"  
+  target_s3_error_prefix     = "cdc-error/type=!{firehose:error-output-type}/"
   aws_account_id             = local.account_id
   aws_region                 = local.account_region
   cloudwatch_log_group_name  = "/aws/kinesisfirehose/cdc-domain-stream"
