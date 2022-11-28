@@ -11,11 +11,11 @@
       "ecr_url": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/mlra-ecr-repo",
       "docker_image_tag": "latest",
       "maat_api_end_point": "http://maat-cd-api.aws.dev.legalservices.gov.uk/maatApi/laaStatus",
-      "maat_db_url": "rds.maat.aws.dev.legalservices.gov.uk:1521:MAATDB",
+      "maat_db_url": "terraform-20221116155914397600000001.cfxq8vgqqxpp.eu-west-2.rds.amazonaws.com:1521:MAATDB",
       "maat_db_password": "APP_MAATDB_DBPASSWORD_MLA1",
       "maat_libra_wsdl_url": "http://infox.aws.dev.legalservices.gov.uk/infoX/gateway",
       "ec2_desired_capacity": 2,
-      "ec2_max_size": 3,
+      "ec2_max_size": 6,
       "ec2_min_size": 2,
       "container_cpu": 2048,
       "container_memory": 7763,
@@ -24,7 +24,9 @@
       "server_port": 8080,
       "app_count": 1,
       "lz_vpc_cidr": "10.202.0.0/20",
-      "lb_tg_name": "mlra-tg-development"
+      "lb_tg_name": "mlra-tg-development",
+      "appscaling_min_capacity": 2,
+      "appscaling_max_capacity": 6
     },
     "test": {
       "example_var": "test-data"

@@ -4,7 +4,7 @@
 
 module "mlra-ecs" {
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs?ref=v.2.1.2"
+  source = "./modules/ecs"
 
   subnet_set_name         = local.subnet_set_name
   vpc_all                 = local.vpc_all
@@ -28,6 +28,8 @@ module "mlra-ecs" {
   ec2_egress_rules        = local.ec2_egress_rules
   lb_tg_name              = local.application_data.accounts[local.environment].lb_tg_name
   tags_common             = local.tags
+  appscaling_min_capacity = local.application_data.accounts[local.environment].appscaling_min_capacity
+  appscaling_max_capacity = local.application_data.accounts[local.environment].appscaling_max_capacity
 
   depends_on = [module.alb, aws_cloudwatch_log_group.ecs_log_group] # TODO module.alb dependancy may have to be re-factored further into development
 }
@@ -54,6 +56,14 @@ locals {
       description     = "Cluster EC2 ingress rule 3"
       from_port       = 32768
       to_port         = 61000
+      protocol        = "tcp"
+      cidr_blocks     = [data.aws_vpc.shared.cidr_block]
+      security_groups = [module.alb.security_group.id]
+    }
+    "cluster_ec2_lb_ingress_4" = {
+      description     = "Cluster EC2 ingress rule 4"
+      from_port       = 1521
+      to_port         = 1521
       protocol        = "tcp"
       cidr_blocks     = [data.aws_vpc.shared.cidr_block]
       security_groups = [module.alb.security_group.id]
