@@ -67,8 +67,8 @@ resource "aws_instance" "this" {
 #------------------------------------------------------------------------------
 
 resource "aws_ebs_volume" "this" {
-#tfsec:ignore:aws-ebs-encryption-customer-key:exp:2022-10-31: I don't think we need the fine grained control CMK would provide
-#checkov:skip=CKV_AWS_189:I don't think we need the fine grained control CMK would provide
+  #tfsec:ignore:aws-ebs-encryption-customer-key:exp:2022-10-31: I don't think we need the fine grained control CMK would provide
+  #checkov:skip=CKV_AWS_189:I don't think we need the fine grained control CMK would provide
   for_each = local.ebs_volumes
 
   # Values are retrieved from AMI data rather than using snapshot_id, since 
