@@ -16,6 +16,7 @@ resource "aws_instance" "this" {
   vpc_security_group_ids      = var.instance.vpc_security_group_ids
 
   metadata_options {
+    #checkov:skip=CKV_AWS_79:This isn't enabled in every environment, so we can't enforce it
     http_endpoint = coalesce(var.instance.metadata_endpoint_enabled, "disabled")
     http_tokens   = coalesce(var.instance.metadata_options_http_tokens, "required")
   }
