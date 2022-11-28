@@ -36,7 +36,7 @@ resource "aws_launch_template" "this" {
     #checkov:skip=CKV_AWS_79:"We have to use version 1 in some cases"
     http_endpoint = coalesce(var.instance.metadata_endpoint_enabled, "disabled")
     #tfsec:ignore:aws-ec2-enforce-http-token-imds tfsec:ignore:aws-ec2-enforce-launch-config-http-token-imds
-    http_tokens   = coalesce(var.instance.metadata_options_http_tokens, "required")
+    http_tokens = coalesce(var.instance.metadata_options_http_tokens, "required")
   }
 
   monitoring {
