@@ -51,6 +51,7 @@ variable "tags" {
 
 variable "account_ids_lookup" {
   description = "A map of account names to account ids that can be used for AMI owner"
+  type        = map(any)
   default     = {}
 }
 
@@ -95,8 +96,9 @@ variable "instance" {
     disable_api_termination      = bool
     instance_type                = string
     key_name                     = string
-    metadata_options_http_tokens = optional(string)
-    monitoring                   = optional(bool)
+    metadata_endpoint_enabled    = optional(string, "disabled")
+    metadata_options_http_tokens = optional(string, "required")
+    monitoring                   = optional(bool, true)
     vpc_security_group_ids       = list(string)
     root_block_device = optional(object({
       volume_size = number
@@ -141,6 +143,7 @@ variable "ebs_volume_config" {
 
 variable "ebs_volumes" {
   description = "EC2 volumes, see aws_ebs_volume for documentation.  key=volume name, value=ebs_volume_config key.  label is used as part of the Name tag"
+  type        = any
   # Commenting below out as it has unexpected results when used with merge()
   #  type = map(object({
   #    label       = string

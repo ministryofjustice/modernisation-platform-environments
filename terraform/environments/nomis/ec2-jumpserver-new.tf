@@ -23,7 +23,7 @@ locals {
       disable_api_termination      = false
       instance_type                = "t3.medium"
       key_name                     = aws_key_pair.ec2-user.key_name
-      monitoring                   = false
+      monitoring                   = true
       metadata_options_http_tokens = "required"
       vpc_security_group_ids       = [aws_security_group.jumpserver-windows.id]
     }

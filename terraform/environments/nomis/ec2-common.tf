@@ -26,7 +26,6 @@ data "aws_iam_policy_document" "ssm_custom" {
       "ssm:DescribeDocument",
       "ssm:GetDeployablePatchSnapshotForInstance",
       "ssm:GetDocument",
-      "ssm:GetParameters",
       "ssm:GetManifest",
       "ssm:ListAssociations",
       "ssm:ListInstanceAssociations",
@@ -51,6 +50,18 @@ data "aws_iam_policy_document" "ssm_custom" {
 
     #checkov:skip=CKV_AWS_111: "Ensure IAM policies does not allow write access without constraints"
     resources = ["*"] #tfsec:ignore:aws-iam-no-policy-wildcards
+  }
+}
+
+# add custom policy to SSM role to allow Ansible to run
+data "aws_iam_policy_document" "ssm_custom_ansible" {
+  statement {
+    sid    = "CustomSsmPolicyAnsible"
+    effect = "Allow"
+    actions = [
+      "ssm:GetParameters",
+    ]
+    resources = ["arn:aws:ec2:*:*:instance/*"]
   }
 }
 
@@ -153,6 +164,7 @@ data "aws_iam_policy_document" "s3_bucket_access" {
 data "aws_iam_policy_document" "ec2_common_combined" {
   source_policy_documents = [
     data.aws_iam_policy_document.ssm_custom.json,
+    data.aws_iam_policy_document.ssm_custom_ansible.json,
     data.aws_iam_policy_document.s3_bucket_access.json,
     data.aws_iam_policy_document.cloud_watch_custom.json
   ]
