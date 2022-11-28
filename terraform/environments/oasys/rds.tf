@@ -41,7 +41,7 @@ resource "aws_db_instance" "oasys" {
 
 resource "aws_db_parameter_group" "oasys_parameter" {
   name   = "oasys-parameter-group-19c"
-  family = "oracle19c"
+  family = "oracle-ee-19"
 
   parameter {
     name  = "nls_language"
