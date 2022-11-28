@@ -39,19 +39,19 @@ resource "aws_db_instance" "oasys" {
   )
 }
 
-resource "aws_db_parameter_group" "oasys_parameter" {
-  name   = "oasys-parameter-group-19c"
-  family = "oracle-ee-19"
+#resource "aws_db_parameter_group" "oasys_parameter" {
+#  name   = "oasys-parameter-group-19c"
+#  family = "oracle-ee-19"
 
-  parameter {
-    name  = "control_management_pack_access"
-    value = "NONE"
-  }
+#  parameter {
+#    name  = "control_management_pack_access"
+#    value = "NONE"
+#  }
 
-  lifecycle {
-    create_before_destroy = true
-  }
-}
+#  lifecycle {
+#    create_before_destroy = true
+#  }
+#}
 
 resource "aws_db_subnet_group" "oasys" {
   name       = "${local.application_name}-${local.environment}-database-subnet-group"
