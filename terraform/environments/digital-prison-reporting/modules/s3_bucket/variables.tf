@@ -34,3 +34,8 @@ variable "sqs_msg_retention_seconds" {
   description = "SQS Message Retention"
   default     = 86400
 }
+
+variable "filter_prefix" {
+  description = "S3 Notification Filter Prefix"
+  default     = ""  
+}
