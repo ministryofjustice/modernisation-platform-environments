@@ -3,16 +3,6 @@
 # See comments in the README.md files and DSOS-1584 with respect to this EC" instance.
 # This all needs to be removed once the new jumpserver is in place.
 #-------------------------------------------------------------------------------------
-
-locals {
-  secret_prefix = "/Jumpserver/Users"
-}
-
-# This is defined in the new ec-jumpserver.tf file
-/* data "github_team" "jumpserver" {
-  slug = "studio-webops"
-} */
-
 data "aws_vpc" "jumpserver" {
   tags = {
     Name = "${local.vpc_name}-${local.environment}"
@@ -160,63 +150,4 @@ resource "aws_iam_instance_profile" "jumpserver" {
   name = "ec2-jumpserver-profile"
   role = aws_iam_role.jumpserver.name
   path = "/"
-}
-
-# create empty secret in secret manager
-#tfsec:ignore:aws-ssm-secret-use-customer-key
-resource "aws_secretsmanager_secret" "jumpserver" {
-  #checkov:skip=CKV_AWS_149: "Ensure that Secrets Manager secret is encrypted using KMS CMK"
-  for_each                = toset(data.github_team.jumpserver.members)
-  name                    = "${local.secret_prefix}/${each.value}"
-  policy                  = data.aws_iam_policy_document.jumpserver_secrets[each.value].json
-  recovery_window_in_days = 0
-  tags = merge(
-    local.tags,
-    {
-      Name = "jumpserver-user-${each.value}"
-    },
-  )
-}
-
-# resource policy to restrict access to secret value to specific user and the CICD role used to deploy terraform
-data "aws_iam_policy_document" "jumpserver_secrets" {
-  for_each = toset(data.github_team.jumpserver.members)
-  statement {
-    effect    = "Deny"
-    actions   = ["secretsmanager:GetSecretValue"]
-    resources = ["*"]
-    principals {
-      type        = "*"
-      identifiers = ["*"]
-    }
-    condition {
-      test     = "StringNotLike"
-      variable = "aws:userid"
-      values = [
-        "*:${each.value}@digital.justice.gov.uk",                       # specific user
-        "${data.aws_iam_role.member_infrastructure_access.unique_id}:*" # terraform CICD role
-      ]
-    }
-  }
-}
-
-# IAM policy permissions to enable jumpserver to list secrets and put user passwords into secret manager
-data "aws_iam_policy_document" "jumpserver_users" {
-  statement {
-    effect    = "Allow"
-    actions   = ["secretsmanager:PutSecretValue"]
-    resources = ["arn:aws:secretsmanager:${local.region}:${data.aws_caller_identity.current.id}:secret:${local.secret_prefix}/*"]
-  }
-  statement {
-    effect    = "Allow"
-    actions   = ["secretsmanager:ListSecrets"]
-    resources = ["*"]
-  }
-}
-
-# Add policy to role
-resource "aws_iam_role_policy" "jumpserver_users" {
-  name   = "secrets-access-jumpserver-users"
-  role   = aws_iam_role.jumpserver.id
-  policy = data.aws_iam_policy_document.jumpserver_users.json
 }
