@@ -4,10 +4,10 @@ data "aws_vpc" "shared" {
   }
 }
 
-# data "aws_ecs_task_definition" "task_definition" {
-#   task_definition = "${var.app_name}-task-definition"
-#   depends_on      = [aws_ecs_task_definition.windows_ecs_task_definition, aws_ecs_task_definition.linux_ecs_task_definition]
-# }
+data "aws_ecs_task_definition" "task_definition" {
+  task_definition = "${var.app_name}-task-definition"
+  depends_on      = [aws_ecs_task_definition.windows_ecs_task_definition, aws_ecs_task_definition.linux_ecs_task_definition]
+}
 
 data "aws_subnets" "shared-private" {
   filter {
@@ -239,271 +239,271 @@ resource "aws_iam_role_policy_attachment" "attach_ec2_policy" {
 
 //ECS cluster
 
-# resource "aws_ecs_cluster" "ecs_cluster" {
-#   name = var.app_name
-#   setting {
-#     name  = "containerInsights"
-#     value = "enabled"
-#   }
-# }
+resource "aws_ecs_cluster" "ecs_cluster" {
+  name = var.app_name
+  setting {
+    name  = "containerInsights"
+    value = "enabled"
+  }
+}
 
-# resource "aws_ecs_cluster_capacity_providers" "ecs_cluster" {
-#   cluster_name = aws_ecs_cluster.ecs_cluster.name
-# }
+resource "aws_ecs_cluster_capacity_providers" "ecs_cluster" {
+  cluster_name = aws_ecs_cluster.ecs_cluster.name
+}
 
-# resource "aws_ecs_task_definition" "windows_ecs_task_definition" {
-#   family             = "${var.app_name}-task-definition"
-#   count              = var.container_instance_type == "windows" ? 1 : 0
-#   execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
-#   task_role_arn      = aws_iam_role.ecs_task_execution_role.arn
-#   requires_compatibilities = [
-#     "EC2",
-#   ]
+resource "aws_ecs_task_definition" "windows_ecs_task_definition" {
+  family             = "${var.app_name}-task-definition"
+  count              = var.container_instance_type == "windows" ? 1 : 0
+  execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
+  task_role_arn      = aws_iam_role.ecs_task_execution_role.arn
+  requires_compatibilities = [
+    "EC2",
+  ]
 
-#   volume {
-#     name = var.task_definition_volume
-#   }
+  volume {
+    name = var.task_definition_volume
+  }
 
-#   container_definitions = var.task_definition
+  container_definitions = var.task_definition
 
-#   tags = merge(
-#     var.tags_common,
-#     {
-#       Name = "${var.app_name}-windows-task-definition"
-#     }
-#   )
-# }
+  tags = merge(
+    var.tags_common,
+    {
+      Name = "${var.app_name}-windows-task-definition"
+    }
+  )
+}
 
-# resource "aws_ecs_task_definition" "linux_ecs_task_definition" {
-#   family             = "${var.app_name}-task-definition"
-#   network_mode       = var.network_mode
-#   cpu                = var.container_cpu
-#   memory             = var.container_memory
-#   count              = var.container_instance_type == "linux" ? 1 : 0
-#   execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
-#   requires_compatibilities = [
-#     "EC2",
-#   ]
+resource "aws_ecs_task_definition" "linux_ecs_task_definition" {
+  family             = "${var.app_name}-task-definition"
+  network_mode       = var.network_mode
+  cpu                = var.container_cpu
+  memory             = var.container_memory
+  count              = var.container_instance_type == "linux" ? 1 : 0
+  execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
+  requires_compatibilities = [
+    "EC2",
+  ]
 
-#   volume {
-#     name = var.task_definition_volume
-#   }
+  volume {
+    name = var.task_definition_volume
+  }
 
-#   container_definitions = var.task_definition
+  container_definitions = var.task_definition
 
-#   tags = merge(
-#     var.tags_common,
-#     {
-#       Name = "${var.app_name}-linux-task-definition"
-#     }
-#   )
-# }
+  tags = merge(
+    var.tags_common,
+    {
+      Name = "${var.app_name}-linux-task-definition"
+    }
+  )
+}
 
-# resource "aws_ecs_service" "ecs_service" {
-#   name            = "${var.app_name}-ecs-service"
-#   cluster         = aws_ecs_cluster.ecs_cluster.id
-#   task_definition = data.aws_ecs_task_definition.task_definition.id
-#   desired_count   = var.app_count
-#   launch_type     = "EC2"
+resource "aws_ecs_service" "ecs_service" {
+  name            = "${var.app_name}-ecs-service"
+  cluster         = aws_ecs_cluster.ecs_cluster.id
+  task_definition = data.aws_ecs_task_definition.task_definition.id
+  desired_count   = var.app_count
+  launch_type     = "EC2"
 
-#   health_check_grace_period_seconds = 300
+  health_check_grace_period_seconds = 300
 
-#   ordered_placement_strategy {
-#     field = "attribute:ecs.availability-zone"
-#     type  = "spread"
-#   }
+  ordered_placement_strategy {
+    field = "attribute:ecs.availability-zone"
+    type  = "spread"
+  }
 
-#   load_balancer {
-#     target_group_arn = data.aws_lb_target_group.target_group.id
-#     container_name   = var.app_name
-#     container_port   = var.server_port
-#   }
+  load_balancer {
+    target_group_arn = data.aws_lb_target_group.target_group.id
+    container_name   = var.app_name
+    container_port   = var.server_port
+  }
 
-#   depends_on = [
-#     aws_iam_role_policy_attachment.ecs_task_execution_role, aws_ecs_task_definition.windows_ecs_task_definition, aws_ecs_task_definition.linux_ecs_task_definition
-#   ]
+  depends_on = [
+    aws_iam_role_policy_attachment.ecs_task_execution_role, aws_ecs_task_definition.windows_ecs_task_definition, aws_ecs_task_definition.linux_ecs_task_definition
+  ]
 
-#   tags = merge(
-#     var.tags_common,
-#     {
-#       Name = "${var.app_name}-ecs-service"
-#     }
-#   )
-# }
+  tags = merge(
+    var.tags_common,
+    {
+      Name = "${var.app_name}-ecs-service"
+    }
+  )
+}
 
-# resource "aws_ecs_capacity_provider" "capacity_provider" {
-#   name = "${var.app_name}-capacity-provider"
+resource "aws_ecs_capacity_provider" "capacity_provider" {
+  name = "${var.app_name}-capacity-provider"
 
-#   auto_scaling_group_provider {
-#     auto_scaling_group_arn = aws_autoscaling_group.cluster-scaling-group.arn
-#   }
+  auto_scaling_group_provider {
+    auto_scaling_group_arn = aws_autoscaling_group.cluster-scaling-group.arn
+  }
 
-#   tags = merge(
-#     var.tags_common,
-#     {
-#       Name = "${var.app_name}-capacity-provider"
-#     }
-#   )
-# }
-# # ECS task execution role data
-# # https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_execution_IAM_role.html
-# data "aws_iam_policy_document" "ecs_task_execution_role" {
-#   version = "2012-10-17"
-#   statement {
-#     sid    = ""
-#     effect = "Allow"
-#     actions = [
-#       "sts:AssumeRole",
-#     ]
+  tags = merge(
+    var.tags_common,
+    {
+      Name = "${var.app_name}-capacity-provider"
+    }
+  )
+}
+# ECS task execution role data
+# https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_execution_IAM_role.html
+data "aws_iam_policy_document" "ecs_task_execution_role" {
+  version = "2012-10-17"
+  statement {
+    sid    = ""
+    effect = "Allow"
+    actions = [
+      "sts:AssumeRole",
+    ]
 
-#     principals {
-#       type = "Service"
-#       identifiers = [
-#         "ecs-tasks.amazonaws.com",
-#       ]
-#     }
-#   }
-# }
+    principals {
+      type = "Service"
+      identifiers = [
+        "ecs-tasks.amazonaws.com",
+      ]
+    }
+  }
+}
 
-# resource "aws_iam_policy" "ecs_task_execution_s3_policy" { #tfsec:ignore:aws-iam-no-policy-wildcards
-#   name   = "${var.app_name}-ecs-task-execution-s3-policy"
-#   policy = <<EOF
-# {
-#   "Version": "2012-10-17",
-#   "Statement": [
-#     {
-#       "Effect": "Allow",
-#       "Action": [
-#         "s3:ListBucket",
-#         "s3:*Object*",
-#         "kms:Decrypt",
-#         "kms:Encrypt",
-#         "kms:GenerateDataKey",
-#         "kms:ReEncrypt",
-#         "kms:GenerateDataKey",
-#         "kms:DescribeKey"
-#       ],
-#       "Resource": ["*"]
-#     }
-#   ]
-# }
-# EOF
-# }
-
-
-# # ECS task execution role
-# resource "aws_iam_role" "ecs_task_execution_role" {
-#   name               = "${var.app_name}-ecs-task-execution-role"
-#   assume_role_policy = data.aws_iam_policy_document.ecs_task_execution_role.json
-#   tags = merge(
-#     var.tags_common,
-#     {
-#       Name = "${var.app_name}-ecs-task-execution-role"
-#     }
-#   )
-# }
-
-# # ECS task execution role policy attachment
-# resource "aws_iam_role_policy_attachment" "ecs_task_execution_role" {
-#   role       = aws_iam_role.ecs_task_execution_role.name
-#   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
-# }
-# resource "aws_iam_role_policy_attachment" "ecs_task_secrets_manager" {
-#   role       = aws_iam_role.ecs_task_execution_role.name
-#   policy_arn = "arn:aws:iam::aws:policy/SecretsManagerReadWrite"
-# }
-# resource "aws_iam_role_policy_attachment" "ecs_task_s3_access" {
-#   role       = aws_iam_role.ecs_task_execution_role.name
-#   policy_arn = aws_iam_policy.ecs_task_execution_s3_policy.arn
-# }
+resource "aws_iam_policy" "ecs_task_execution_s3_policy" { #tfsec:ignore:aws-iam-no-policy-wildcards
+  name   = "${var.app_name}-ecs-task-execution-s3-policy"
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:ListBucket",
+        "s3:*Object*",
+        "kms:Decrypt",
+        "kms:Encrypt",
+        "kms:GenerateDataKey",
+        "kms:ReEncrypt",
+        "kms:GenerateDataKey",
+        "kms:DescribeKey"
+      ],
+      "Resource": ["*"]
+    }
+  ]
+}
+EOF
+}
 
 
-# # Set up CloudWatch group and log stream and retain logs for 30 days
-# resource "aws_cloudwatch_log_group" "cloudwatch_group" {
-#   #checkov:skip=CKV_AWS_158:Temporarily skip KMS encryption check while logging solution is being updated
-#   name              = "${var.app_name}-ecs"
-#   retention_in_days = 30
-#   tags = merge(
-#     var.tags_common,
-#     {
-#       Name = "${var.app_name}-ecs-cloudwatch-group"
-#     }
-#   )
-# }
+# ECS task execution role
+resource "aws_iam_role" "ecs_task_execution_role" {
+  name               = "${var.app_name}-ecs-task-execution-role"
+  assume_role_policy = data.aws_iam_policy_document.ecs_task_execution_role.json
+  tags = merge(
+    var.tags_common,
+    {
+      Name = "${var.app_name}-ecs-task-execution-role"
+    }
+  )
+}
 
-# resource "aws_cloudwatch_log_stream" "cloudwatch_stream" {
-#   name           = "${var.app_name}-log-stream"
-#   log_group_name = aws_cloudwatch_log_group.cloudwatch_group.name
-# }
-
-
-
-# # Added to support target tracking scaling_adjustment
-
-# resource "aws_iam_role" "ecs-autoscale-role" {
-#   name = "ecs-scale-application"
-
-#   assume_role_policy = <<EOF
-# {
-#   "Version": "2012-10-17",
-#   "Statement": [
-#     {
-#       "Action": "sts:AssumeRole",
-#       "Principal": {
-#         "Service": "application-autoscaling.amazonaws.com"
-#       },
-#       "Effect": "Allow"
-#     }
-#   ]
-# }
-# EOF
-# }
-
-# resource "aws_iam_role_policy_attachment" "ecs-autoscale" {
-#   role       = aws_iam_role.ecs-autoscale-role.id
-#   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceAutoscaleRole"
-# }
+# ECS task execution role policy attachment
+resource "aws_iam_role_policy_attachment" "ecs_task_execution_role" {
+  role       = aws_iam_role.ecs_task_execution_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+}
+resource "aws_iam_role_policy_attachment" "ecs_task_secrets_manager" {
+  role       = aws_iam_role.ecs_task_execution_role.name
+  policy_arn = "arn:aws:iam::aws:policy/SecretsManagerReadWrite"
+}
+resource "aws_iam_role_policy_attachment" "ecs_task_s3_access" {
+  role       = aws_iam_role.ecs_task_execution_role.name
+  policy_arn = aws_iam_policy.ecs_task_execution_s3_policy.arn
+}
 
 
-# resource "aws_appautoscaling_target" "ecs_target" {
-#   max_capacity       = var.appscaling_max_capacity
-#   min_capacity       = var.appscaling_min_capacity
-#   resource_id        = "service/${aws_ecs_cluster.ecs_cluster.name}/${aws_ecs_service.ecs_service.name}"
-#   scalable_dimension = "ecs:service:DesiredCount"
-#   service_namespace  = "ecs"
-#   role_arn           = aws_iam_role.ecs-autoscale-role.arn
-# }
+# Set up CloudWatch group and log stream and retain logs for 30 days
+resource "aws_cloudwatch_log_group" "cloudwatch_group" {
+  #checkov:skip=CKV_AWS_158:Temporarily skip KMS encryption check while logging solution is being updated
+  name              = "${var.app_name}-ecs"
+  retention_in_days = 30
+  tags = merge(
+    var.tags_common,
+    {
+      Name = "${var.app_name}-ecs-cloudwatch-group"
+    }
+  )
+}
 
-# resource "aws_appautoscaling_policy" "ecs_target_cpu" {
-#   name               = "application-scaling-policy-cpu"
-#   policy_type        = "TargetTrackingScaling"
-#   resource_id        = aws_appautoscaling_target.ecs_target.resource_id
-#   scalable_dimension = aws_appautoscaling_target.ecs_target.scalable_dimension
-#   service_namespace  = aws_appautoscaling_target.ecs_target.service_namespace
+resource "aws_cloudwatch_log_stream" "cloudwatch_stream" {
+  name           = "${var.app_name}-log-stream"
+  log_group_name = aws_cloudwatch_log_group.cloudwatch_group.name
+}
 
-#   target_tracking_scaling_policy_configuration {
-#     predefined_metric_specification {
-#       predefined_metric_type = "ECSServiceAverageCPUUtilization"
-#     }
-#     target_value = 80
-#   }
-#   depends_on = [aws_appautoscaling_target.ecs_target]
-# }
-# resource "aws_appautoscaling_policy" "ecs_target_memory" {
-#   name               = "application-scaling-policy-memory"
-#   policy_type        = "TargetTrackingScaling"
-#   resource_id        = aws_appautoscaling_target.ecs_target.resource_id
-#   scalable_dimension = aws_appautoscaling_target.ecs_target.scalable_dimension
-#   service_namespace  = aws_appautoscaling_target.ecs_target.service_namespace
 
-#   target_tracking_scaling_policy_configuration {
-#     predefined_metric_specification {
-#       predefined_metric_type = "ECSServiceAverageMemoryUtilization"
-#     }
-#     target_value = 80
-#   }
-#   depends_on = [aws_appautoscaling_target.ecs_target]
-# }
+
+# Added to support target tracking scaling_adjustment
+
+resource "aws_iam_role" "ecs-autoscale-role" {
+  name = "ecs-scale-application"
+
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "application-autoscaling.amazonaws.com"
+      },
+      "Effect": "Allow"
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "ecs-autoscale" {
+  role       = aws_iam_role.ecs-autoscale-role.id
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceAutoscaleRole"
+}
+
+
+resource "aws_appautoscaling_target" "ecs_target" {
+  max_capacity       = var.appscaling_max_capacity
+  min_capacity       = var.appscaling_min_capacity
+  resource_id        = "service/${aws_ecs_cluster.ecs_cluster.name}/${aws_ecs_service.ecs_service.name}"
+  scalable_dimension = "ecs:service:DesiredCount"
+  service_namespace  = "ecs"
+  role_arn           = aws_iam_role.ecs-autoscale-role.arn
+}
+
+resource "aws_appautoscaling_policy" "ecs_target_cpu" {
+  name               = "application-scaling-policy-cpu"
+  policy_type        = "TargetTrackingScaling"
+  resource_id        = aws_appautoscaling_target.ecs_target.resource_id
+  scalable_dimension = aws_appautoscaling_target.ecs_target.scalable_dimension
+  service_namespace  = aws_appautoscaling_target.ecs_target.service_namespace
+
+  target_tracking_scaling_policy_configuration {
+    predefined_metric_specification {
+      predefined_metric_type = "ECSServiceAverageCPUUtilization"
+    }
+    target_value = 80
+  }
+  depends_on = [aws_appautoscaling_target.ecs_target]
+}
+resource "aws_appautoscaling_policy" "ecs_target_memory" {
+  name               = "application-scaling-policy-memory"
+  policy_type        = "TargetTrackingScaling"
+  resource_id        = aws_appautoscaling_target.ecs_target.resource_id
+  scalable_dimension = aws_appautoscaling_target.ecs_target.scalable_dimension
+  service_namespace  = aws_appautoscaling_target.ecs_target.service_namespace
+
+  target_tracking_scaling_policy_configuration {
+    predefined_metric_specification {
+      predefined_metric_type = "ECSServiceAverageMemoryUtilization"
+    }
+    target_value = 80
+  }
+  depends_on = [aws_appautoscaling_target.ecs_target]
+}
 
 
 
