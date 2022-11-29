@@ -119,7 +119,7 @@ locals {
           description = "Jumpserver for NOMIS"
         }
         autoscaling_group = {
-          min_size = 1
+          min_size = 0
           max_size = 1
         }
       }
