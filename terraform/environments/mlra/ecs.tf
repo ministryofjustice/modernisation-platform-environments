@@ -91,10 +91,16 @@ locals {
     region              = local.application_data.accounts[local.environment].region
     maat_api_end_point  = local.application_data.accounts[local.environment].maat_api_end_point
     maat_db_url         = local.application_data.accounts[local.environment].maat_db_url
-    maat_db_password    = local.application_data.accounts[local.environment].maat_db_password
+    maat_db_password    = data.aws_ssm_parameter.db_password.value
     maat_libra_wsdl_url = local.application_data.accounts[local.environment].maat_libra_wsdl_url
     sentry_env          = local.environment
   })
+}
+
+# MAAT DB Password
+
+data "aws_ssm_parameter" "db_password" {
+  name = local.application_data.accounts[local.environment].maat_db_password
 }
 
 #TODO This needs to be added in the cloudwatch module in the future
