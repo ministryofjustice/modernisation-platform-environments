@@ -10,9 +10,7 @@
         "protocol": "udp"
       }
     ],
-    "environment": [
-      { "name" : "AWS_REGION", "value" : "us-east-2" }
-    ],
+    "environment": [{ "name": "AWS_REGION", "value": "us-east-2" }],
     "memory": 256,
     "logConfiguration": {
       "logDriver": "awslogs",
@@ -33,7 +31,7 @@
         "containerPort": 8080
       }
     ],
-    "links":["xray-daemon"],
+    "links": ["xray-daemon"],
     "memory": 2000,
     "logConfiguration": {
       "logDriver": "awslogs",
