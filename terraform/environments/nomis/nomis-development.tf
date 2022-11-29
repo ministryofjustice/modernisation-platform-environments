@@ -114,23 +114,3 @@ locals {
     ec2_jumpserver_autoscaling_groups = {}
   }
 }
-
-data "aws_ami" "test" {
-  most_recent = true
-  owners      = [local.environment_management.account_ids["nomis-development"]]
-
-  filter {
-    name   = "name"
-    values = ["nomis_windows_server_2022_jumpserver_2022-09-27T14-03-50.698Z"]
-  }
-
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
-}
-
-output "aws_ami_test" {
-  value = data.aws_ami.test
-  sensitive = true
-}
