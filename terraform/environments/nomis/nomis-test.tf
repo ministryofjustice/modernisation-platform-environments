@@ -159,7 +159,7 @@ locals {
           metadata_options_http_tokens = "optional"
         }
         ebs_volumes = {
-          "/dev/sdb" = { # /u01
+          "/dev/sdb" = { # /u01 (add for weblogic testing)
             type = "gp3"
             size = 150
           }
