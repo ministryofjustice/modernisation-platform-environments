@@ -37,7 +37,7 @@ locals {
       # *-nomis-db-2: MIS, AUDIT
       # *-nomis-db-3: HA
     }
-    weblogics                         = {}
+    weblogics       = {}
     ec2_jumpservers = {}
   }
 }
