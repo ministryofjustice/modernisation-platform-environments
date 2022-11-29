@@ -38,6 +38,6 @@ locals {
       # *-nomis-db-3: HA
     }
     weblogics                         = {}
-    ec2_jumpserver_autoscaling_groups = {}
+    ec2_jumpservers = {}
   }
 }

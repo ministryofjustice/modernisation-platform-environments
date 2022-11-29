@@ -137,6 +137,6 @@ locals {
         # branch   = var.BRANCH_NAME # comment in if testing ansible
       }
     }
-    ec2_jumpserver_autoscaling_groups = {}
+    ec2_jumpservers = {}
   }
 }

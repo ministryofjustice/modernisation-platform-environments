@@ -5,7 +5,7 @@
 # it uses the ec2_autoscaling_group module
 #
 # Obtain your user password from the AWS Secrets Manager for your user e.g. 
-# /jumpserver-asg/Users/<your-github-username>
+# /Jumpserver/Users/<your-github-username>
 #--------------------------------------------------------------------------------
 
 locals {
@@ -37,7 +37,7 @@ locals {
   }
 }
 
-module "ec2_jumpserver_autoscaling_group" {
+module "ec2_jumpserver" {
   source = "./modules/ec2_autoscaling_group"
 
 
@@ -45,7 +45,7 @@ module "ec2_jumpserver_autoscaling_group" {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
   }
 
-  for_each = try(local.environment_config.ec2_jumpserver_autoscaling_groups, {})
+  for_each = try(local.environment_config.ec2_jumpservers, {})
 
   name                  = each.key
   ami_name              = each.value.ami_name
@@ -68,8 +68,8 @@ module "ec2_jumpserver_autoscaling_group" {
     }
   })
 
-  iam_resource_names_prefix = "ec2-jumpserver-asg"
-  instance_profile_policies = concat(local.ec2_common_managed_policies, [aws_iam_policy.secret_access_jumpserver_asg.arn])
+  iam_resource_names_prefix = "ec2-jumpserver"
+  instance_profile_policies = concat(local.ec2_common_managed_policies, [aws_iam_policy.secret_access_jumpserver.arn])
   business_unit             = local.vpc_name
   application_name          = local.application_name
   environment               = local.environment
@@ -123,14 +123,14 @@ resource "aws_security_group" "jumpserver-windows" {
 #------
 # Jumpserver specific
 #------
-resource "aws_iam_instance_profile" "jumpserver_asg" {
-  name = "ec2-jumpserver-profile-asg"
-  role = aws_iam_role.jumpserver_asg.name
+resource "aws_iam_instance_profile" "jumpserver" {
+  name = "ec2-jumpserver-profil"
+  role = aws_iam_role.jumpserver.name
   path = "/"
 }
 
 # IAM policy permissions to enable jumpserver to list secrets and put user passwords into secret manager
-data "aws_iam_policy_document" "jumpserver_users_asg" {
+data "aws_iam_policy_document" "jumpserver_users" {
   statement {
     effect    = "Allow"
     actions   = ["secretsmanager:PutSecretValue"]
@@ -144,11 +144,11 @@ data "aws_iam_policy_document" "jumpserver_users_asg" {
 }
 
 # IAM role for jumpserver instances
-resource "aws_iam_policy" "secret_access_jumpserver_asg" {
+resource "aws_iam_policy" "secret_access_jumpserver" {
   name        = "read-access-to-secret-store"
   path        = "/"
   description = "Policy for read access to secret store"
-  policy      = data.aws_iam_policy_document.jumpserver_users_asg.json
+  policy      = data.aws_iam_policy_document.jumpserver_users.json
   tags = merge(
     local.tags,
     {
@@ -157,8 +157,8 @@ resource "aws_iam_policy" "secret_access_jumpserver_asg" {
   )
 }
 
-resource "aws_iam_role" "jumpserver_asg" {
-  name                 = "ec2-jumpserver-role-asg"
+resource "aws_iam_role" "jumpserver" {
+  name                 = "ec2-jumpserver-role"
   path                 = "/"
   max_session_duration = "3600"
   assume_role_policy = jsonencode(
@@ -180,7 +180,7 @@ resource "aws_iam_role" "jumpserver_asg" {
   tags = merge(
     local.tags,
     {
-      Name = "ec2-jumpserver-role-asg"
+      Name = "ec2-jumpserver-role"
     },
   )
 }
