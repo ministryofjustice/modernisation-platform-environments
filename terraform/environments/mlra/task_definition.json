@@ -30,7 +30,6 @@
         "containerPort": 8080
       }
     ],
-    "links": ["xray-daemon"],
     "memory": 2000,
     "logConfiguration": {
       "logDriver": "awslogs",
