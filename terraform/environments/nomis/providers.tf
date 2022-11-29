@@ -42,12 +42,3 @@ provider "aws" {
     role_arn = can(regex("modernisation-platform-developer", data.aws_iam_session_context.whoami.issuer_arn)) ? "arn:aws:iam::${local.environment_management.account_ids["core-network-services-production"]}:role/read-dns-records" : "arn:aws:iam::${local.environment_management.account_ids["core-network-services-production"]}:role/modify-dns-records"
   }
 }
-
-provider "aws" {
-  alias                  = "core-shared-services"
-  region                 = "eu-west-2"
-  skip_get_ec2_platforms = true
-  assume_role {
-    role_arn = can(regex("modernisation-platform-developer", data.aws_iam_session_context.whoami.issuer_arn)) ? "arn:aws:iam::${local.environment_management.account_ids["core-shared-services-production"]}:role/member-shared-services" : "arn:aws:iam::${local.environment_management.account_ids["core-shared-services-production"]}:role/member-shared-services"
-  }
-}

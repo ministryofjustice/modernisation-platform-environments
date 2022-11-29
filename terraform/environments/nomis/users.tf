@@ -10,7 +10,7 @@ resource "aws_secretsmanager_secret" "jumpserver" {
   for_each                = toset(data.github_team.dso_users.members)
   name                    = "${local.secret_prefix}/${each.value}"
   policy                  = data.aws_iam_policy_document.jumpserver_secrets[each.value].json
-  kms_key_id              = data.aws_kms_key.general_shared.id
+  # kms_key_id              = data.aws_kms_key.general_shared.id
   recovery_window_in_days = 0
   tags = merge(
     local.tags,
