@@ -13,8 +13,8 @@ resource "aws_launch_template" "this" {
     for_each = local.ebs_volumes
     content {
       device_name  = block_device_mappings.key
-      no_device    = block_device_mappings.value.no_device
-      virtual_name = block_device_mappings.value.virtual_name
+      no_device    = lookup(block_device_mappings.value, "no_device", null)
+      virtual_name = lookup(block_device_mappings.value, "virtual_name", null)
       ebs {
         delete_on_termination = block_device_mappings.value.type != null ? true : null
         encrypted             = block_device_mappings.value.type != null ? true : null
