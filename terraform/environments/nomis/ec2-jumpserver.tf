@@ -1,9 +1,6 @@
 #--------------------------------------------------------------------------------
 # Jumpserver
-# This is not in use YET as we are still using the old ec2-jumpserver.tf file
-# Once the password rotation is worked out we can switch to this new version as
-# it uses the ec2_autoscaling_group module
-#
+
 # Obtain your user password from the AWS Secrets Manager for your user e.g. 
 # /Jumpserver/Users/<your-github-username>
 #--------------------------------------------------------------------------------
