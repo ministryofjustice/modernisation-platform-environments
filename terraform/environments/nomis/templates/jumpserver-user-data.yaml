@@ -24,16 +24,17 @@ tasks:
                 $username = $secret.Name.SubString($secret_prefix.Length) # secrets are stored like /Jumpserver/Users/JoeBloggs, so trim prefix
                 $user_exists = Get-LocalUser $username -ErrorAction SilentlyContinue
                 # get password from secret manager
-                $password = Get-SECSecretValue -SecretId $secret.ARN
+                $secret = Get-SECSecretValue -SecretId $secret.ARN -Select SecretString
+                $password = ConvertTo-SecureString -String $secret -AsPlainText -Force
 
                 if ($user_exists -eq $null) {
                     # Create user and add to RD group
-                    New-LocalUser $username -Password $password.SecretString -FullName $username
+                    New-LocalUser $username -Password $password -FullName $username
                     Add-LocalGroupMember -Group "Remote Desktop Users" -Member $username
                     Add-LocalGroupMember -Group "Administrators" -Member $username
                 }
                 else {
-                    Set-LocalUser -Name $username -Password $password.SecretString
+                    Set-LocalUser -Name $username -Password $password
                 }
             }
           '
