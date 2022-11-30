@@ -25,7 +25,7 @@
       "app_count": 1,
       "lz_vpc_cidr": "10.202.0.0/20",
       "lb_tg_name": "mlra-tg-development",
-      "appscaling_min_capacity": 4,
+      "appscaling_min_capacity": 2,
       "appscaling_max_capacity": 6
     },
     "test": {
