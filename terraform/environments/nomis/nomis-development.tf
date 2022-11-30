@@ -112,17 +112,17 @@ locals {
       }
     }
     ec2_jumpservers = {
-      jumpserver0 = {
-        ami_name = "nomis_windows_server_2022_jumpserver_2022-09-27*"
-        tags = {
-          server-type = "jumpserver"
-          description = "Jumpserver for NOMIS"
-        }
-        autoscaling_group = {
-          min_size = 0
-          max_size = 1
-        }
-      }
+      #jumpserver0 = {
+      #  ami_name = "nomis_windows_server_2022_jumpserver_2022-09-27T13-42-13.688Z""
+      #  tags = {
+      #    server-type = "jumpserver"
+      #    description = "Jumpserver for NOMIS"
+      #  }
+      #  autoscaling_group = {
+      #    min_size = 0
+      #    max_size = 1
+      #  }
+      #}
     }
   }
 }
