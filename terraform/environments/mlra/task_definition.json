@@ -11,6 +11,7 @@
       }
     ],
     "memory": 256,
+    "environment": [{"name" : "AWS_REGION", "value" : "${region}"}],
     "logConfiguration": {
       "logDriver": "awslogs",
       "options": {
