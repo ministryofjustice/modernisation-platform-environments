@@ -1,7 +1,7 @@
 resource "aws_kinesis_stream" "this" {
   count = var.create_kinesis_stream ? 1 : 0
 
-  name                      = var.name
+  name = var.name
   # shard_count             = var.shard_count # Not require in On-Demand Mode
   retention_period          = var.retention_period
   shard_level_metrics       = var.shard_level_metrics
@@ -14,10 +14,10 @@ resource "aws_kinesis_stream" "this" {
     stream_mode = "ON_DEMAND" # Changing to ON_DEMAND
   }
 
-#  // Ignore future changes on the desired count value
-#  lifecycle {
-#    ignore_changes = [shard_count]
-#  }
+  #  // Ignore future changes on the desired count value
+  #  lifecycle {
+  #    ignore_changes = [shard_count]
+  #  }
 
 }
 

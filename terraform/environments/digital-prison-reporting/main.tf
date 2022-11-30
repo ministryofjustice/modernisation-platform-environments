@@ -221,7 +221,7 @@ module "kinesis_stream_domain_data" {
   source                    = "./modules/kinesis_stream"
   create_kinesis_stream     = local.create_kinesis
   name                      = local.kinesis_stream_data_domain
-  shard_count               = 1  # Not Valid when ON-DEMAND Mode
+  shard_count               = 1 # Not Valid when ON-DEMAND Mode
   retention_period          = 24
   shard_level_metrics       = ["IncomingBytes", "OutgoingBytes"]
   enforce_consumer_deletion = false
@@ -244,7 +244,7 @@ module "kinesis_stream_demo_data" {
   source                    = "./modules/kinesis_stream"
   create_kinesis_stream     = local.create_kinesis
   name                      = "${local.project}-kinesis-data-demo-${local.env}"
-  shard_count               = 1   # Not Valid when ON-DEMAND Mode
+  shard_count               = 1 # Not Valid when ON-DEMAND Mode
   retention_period          = 24
   shard_level_metrics       = ["IncomingBytes", "OutgoingBytes"]
   enforce_consumer_deletion = false
