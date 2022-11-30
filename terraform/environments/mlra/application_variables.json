@@ -6,7 +6,7 @@
       "alb_target_group_path": "/mlra/",
       "container_instance_type": "linux",
       "ami_image_id": "ami-0631049bf050d0d46",
-      "instance_type": "m5.large",
+      "instance_type": "m5.xlarge",
       "key_name": "",
       "ecr_url": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/mlra-ecr-repo",
       "docker_image_tag": "latest",
