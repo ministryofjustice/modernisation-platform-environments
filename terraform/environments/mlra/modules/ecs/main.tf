@@ -288,8 +288,6 @@ resource "aws_ecs_task_definition" "windows_ecs_task_definition" {
 resource "aws_ecs_task_definition" "linux_ecs_task_definition" {
   family             = "${var.app_name}-task-definition"
   network_mode       = var.network_mode
-  cpu                = var.container_cpu
-  memory             = var.container_memory
   count              = var.container_instance_type == "linux" ? 1 : 0
   execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
   requires_compatibilities = [
