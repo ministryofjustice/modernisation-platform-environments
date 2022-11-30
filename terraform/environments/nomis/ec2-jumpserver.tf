@@ -44,10 +44,10 @@ module "ec2_jumpserver" {
 
   for_each = try(local.environment_config.ec2_jumpservers, {})
 
-  name                  = each.key
-  ami_name              = each.value.ami_name
-  ami_owner             = try(each.value.ami_owner, "core-shared-services-production")
-  instance              = merge(local.ec2_jumpserver.instance, lookup(each.value, "instance", {}))
+  name      = each.key
+  ami_name  = each.value.ami_name
+  ami_owner = try(each.value.ami_owner, "core-shared-services-production")
+  instance  = merge(local.ec2_jumpserver.instance, lookup(each.value, "instance", {}))
   #user_data_raw         = local.ec2_jumpserver.user_data_raw
   ebs_volume_config     = lookup(each.value, "ebs_volume_config", {})
   ebs_volumes           = lookup(each.value, "ebs_volumes", {})
