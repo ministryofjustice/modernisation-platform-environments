@@ -187,9 +187,9 @@ module "glue_domainplatform_refresh_job" {
     "--extra-jars"          = "s3://${local.project}-artifact-store-${local.environment}/artifacts/domain-platform/digital-prison-reporting-poc/domain-platform-vLatest.jar"
     "--class"               = "GlueApp"
     "--cloud.platform.path" = "s3://${module.s3_curated_bucket[0].bucket.id}"
-    "--domain.files.path"   = "s3://${module.s3_domain_config_bucket[0].bucket.id}/" # Added /
+    "--domain.files.path"   = "s3://${module.s3_domain_config_bucket[0].bucket.id}/"         # Added /
     "--domain.repo.path"    = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/domain-repo/" # Added /
-    "--target.path"         = "s3://${module.s3_domain_bucket[0].bucket.id}/"                 # Added /
+    "--target.path"         = "s3://${module.s3_domain_bucket[0].bucket.id}/"                # Added /
     "--checkpoint.location" = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/checkpoint/platform-refresh/"
   }
 }

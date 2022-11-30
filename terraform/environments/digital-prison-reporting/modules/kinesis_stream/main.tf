@@ -11,7 +11,7 @@ resource "aws_kinesis_stream" "this" {
   tags                      = var.tags
 
   stream_mode_details {
-    stream_mode = "ON_DEMAND"   # Changing to ON_DEMAND
+    stream_mode = "ON_DEMAND" # Changing to ON_DEMAND
   }
 
   // Ignore future changes on the desired count value
