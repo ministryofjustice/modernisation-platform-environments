@@ -287,11 +287,11 @@ module "glue_database" {
 }
 
 # Glue Database Raw Glue Catalog 
-module "glue_database" {
+module "glue_raw_database" {
   source         = "./modules/glue_database"
   create_db      = local.create_db
   name           = "${local.project}-raw-${local.env}"
-  description    = local.description
+  description    = "Glue Database Raw Catalog"
   aws_account_id = local.account_id
   aws_region     = local.account_region
 }
