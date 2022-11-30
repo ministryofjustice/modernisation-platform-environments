@@ -3,10 +3,10 @@ output "kinesis_stream_name" {
   value       = aws_kinesis_stream.this[0].name
 }
 
-output "kinesis_stream_shard_count" {
-  description = "The count of shards for this Kinesis stream"
-  value       = aws_kinesis_stream.this[0].shard_count
-}
+#output "kinesis_stream_shard_count" {
+#  description = "The count of shards for this Kinesis stream"
+#  value       = aws_kinesis_stream.this[0].shard_count
+#}
 
 output "kinesis_stream_arn" {
   description = "The Amazon Resource Name (ARN) specifying the Stream"
