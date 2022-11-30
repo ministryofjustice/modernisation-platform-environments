@@ -16,8 +16,6 @@ tasks:
 
           # Scheduled job to add new users - jobs can be found under Task Scheduler -> Powershell -> ScheduledJobs
           $add_users = '
-            Add-Type -AssemblyName "System.Web" # used for generating random password
-
             $secret_prefix = "${SECRET_PREFIX}/" # from Terraform templating
 
             $secrets = Get-SECSecretList -Filter @{Key="name";Values=$secret_prefix}
@@ -30,12 +28,11 @@ tasks:
 
                 if ($user_exists -eq $null) {
                     # Create user and add to RD group
-                    New-LocalUser $username -Password $SecretString.SecretString -FullName $username
+                    New-LocalUser $username -Password $password.SecretString -FullName $username
                     Add-LocalGroupMember -Group "Remote Desktop Users" -Member $username
                     Add-LocalGroupMember -Group "Administrators" -Member $username
                 }
                 else {
-                    Write-Host "User $username already exists, updating password"
                     Set-LocalUser -Name $username -Password $password.SecretString
                 }
             }
