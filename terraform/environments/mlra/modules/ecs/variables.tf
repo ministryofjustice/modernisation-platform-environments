@@ -13,10 +13,6 @@ variable "app_name" {
   description = "Name of the application"
 }
 
-variable "container_cpu" {
-  type        = string
-  description = "Container instance CPU units to provision (1 vCPU = 1024 CPU units)"
-}
 
 variable "container_instance_type" {
   type        = string
@@ -27,10 +23,6 @@ variable "container_instance_type" {
   }
 }
 
-variable "container_memory" {
-  type        = string
-  description = "Container instance memory to provision (in MiB)"
-}
 
 variable "ec2_desired_capacity" {
   type        = string
