@@ -113,7 +113,7 @@ locals {
     }
     ec2_jumpservers = {
       jumpserver0 = {
-        ami_name = "nomis_windows_server_2022_jumpserver_2022-09-27*"
+        ami_name = "nomis_windows_server_2022_jumpserver_2022-09-27T13-42-13.688Z"
         tags = {
           server-type = "jumpserver"
           description = "Jumpserver for NOMIS"
