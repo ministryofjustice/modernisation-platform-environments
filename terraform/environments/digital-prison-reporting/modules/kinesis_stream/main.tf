@@ -10,6 +10,10 @@ resource "aws_kinesis_stream" "this" {
   kms_key_id                = var.kms_key_id
   tags                      = var.tags
 
+  stream_mode_details {
+    stream_mode = "ON_DEMAND"   # Changing to ON_DEMAND
+  }
+
   // Ignore future changes on the desired count value
   lifecycle {
     ignore_changes = [shard_count]

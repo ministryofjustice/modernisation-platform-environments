@@ -114,7 +114,7 @@ module "glue_cloudplatform_reporting_job" {
   project_id                    = local.project
   aws_kms_key                   = local.s3_kms_arn
   create_kinesis_ingester       = local.create_kinesis # If True, Kinesis Policies are applied
-  additional_policies           = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_read_only_arn
+  additional_policies           = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_admin_arn
   timeout                       = 120
   execution_class               = "FLEX"
   arguments = {
@@ -124,7 +124,7 @@ module "glue_cloudplatform_reporting_job" {
     "--structured.path"     = "s3://${module.s3_structured_bucket[0].bucket.id}"
     "--sink.stream"         = local.kinesis_stream_data_domain
     "--sink.region"         = local.account_region
-    "--source.queue"        = module.s3_nomis_oracle_sqs.sqs_id
+    "--source.queue"        = "${local.project}-nomis-cdc-event-${local.environment}" ## Should be Dynamic SQS Name reference
     "--source.region"       = local.account_region
     "--job-bookmark-option" = "job-bookmark-enable"
   }
@@ -154,11 +154,11 @@ module "glue_domainplatform_change_monitor_job" {
     "--extra-jars"          = "s3://${local.project}-artifact-store-${local.environment}/artifacts/domain-platform/digital-prison-reporting-poc/domain-platform-vLatest.jar"
     "--class"               = "GlueApp"
     "--cloud.platform.path" = "s3://${module.s3_curated_bucket[0].bucket.id}"
-    "--domain.files.path"   = "s3://${module.s3_domain_config_bucket[0].bucket.id}"
-    "--domain.repo.path"    = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/domain-repo/" # Confirm ?
-    "--source.queue"        = module.s3_domain_cdc_sqs.sqs_id                                # SQS URL/ID (DPR-116)
+    "--domain.files.path"   = "s3://${module.s3_domain_config_bucket[0].bucket.id}/"
+    "--domain.repo.path"    = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/domain-repo/" ## Added /
+    "--source.queue"        = "${local.project}-domain-cdc-event-${local.environment}"       ## Should be Dynamic SQS Name reference
     "--source.region"       = local.account_region
-    "--target.path"         = "s3://${module.s3_domain_bucket[0].bucket.id}" # Path Check
+    "--target.path"         = "s3://${module.s3_domain_bucket[0].bucket.id}/" # Added /
     "--checkpoint.location" = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/checkpoint/change-monitor/"
   }
 }
@@ -180,16 +180,16 @@ module "glue_domainplatform_refresh_job" {
   project_id                    = local.project
   aws_kms_key                   = local.s3_kms_arn
   create_kinesis_ingester       = local.create_kinesis # If True, Kinesis Policies are applied
-  additional_policies           = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_read_only_arn
+  additional_policies           = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_admin_arn
   timeout                       = 120
   execution_class               = "FLEX"
   arguments = {
     "--extra-jars"          = "s3://${local.project}-artifact-store-${local.environment}/artifacts/domain-platform/digital-prison-reporting-poc/domain-platform-vLatest.jar"
     "--class"               = "GlueApp"
     "--cloud.platform.path" = "s3://${module.s3_curated_bucket[0].bucket.id}"
-    "--domain.files.path"   = "s3://${module.s3_domain_config_bucket[0].bucket.id}"
-    "--domain.repo.path"    = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/domain-repo/" # Confirm
-    "--target.path"         = "s3://${module.s3_domain_bucket[0].bucket.id}"                 # Path Check
+    "--domain.files.path"   = "s3://${module.s3_domain_config_bucket[0].bucket.id}/" # Added /
+    "--domain.repo.path"    = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/domain-repo/" # Added /
+    "--target.path"         = "s3://${module.s3_domain_bucket[0].bucket.id}/"                 # Added /
     "--checkpoint.location" = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/checkpoint/platform-refresh/"
   }
 }
@@ -281,6 +281,16 @@ module "glue_database" {
   source         = "./modules/glue_database"
   create_db      = local.create_db
   name           = "${local.project}-${local.glue_db}-${local.env}"
+  description    = local.description
+  aws_account_id = local.account_id
+  aws_region     = local.account_region
+}
+
+# Glue Database Raw Glue Catalog 
+module "glue_database" {
+  source         = "./modules/glue_database"
+  create_db      = local.create_db
+  name           = "${local.project}-raw-${local.env}"
   description    = local.description
   aws_account_id = local.account_id
   aws_region     = local.account_region
