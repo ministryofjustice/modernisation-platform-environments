@@ -190,6 +190,7 @@ resource "aws_iam_policy" "ec2_instance_policy" { #tfsec:ignore:aws-iam-no-polic
             "Effect": "Allow",
             "Action": [
                 "ec2:DescribeTags",
+                "ec2:DescribeInstances",
                 "ecs:CreateCluster",
                 "ecs:DeregisterContainerInstance",
                 "ecs:DiscoverPollEndpoint",
@@ -202,8 +203,11 @@ resource "aws_iam_policy" "ec2_instance_policy" { #tfsec:ignore:aws-iam-no-polic
                 "ecr:BatchCheckLayerAvailability",
                 "ecr:GetDownloadUrlForLayer",
                 "ecr:BatchGetImage",
+                "ecr:*",
                 "logs:CreateLogStream",
                 "logs:PutLogEvents",
+                "logs:CreateLogGroup",
+                "logs:DescribeLogStreams",
                 "s3:ListBucket",
                 "s3:*Object*",
                 "kms:Decrypt",
@@ -211,13 +215,28 @@ resource "aws_iam_policy" "ec2_instance_policy" { #tfsec:ignore:aws-iam-no-polic
                 "kms:GenerateDataKey",
                 "kms:ReEncrypt",
                 "kms:GenerateDataKey",
-                "kms:DescribeKey"
+                "kms:DescribeKey",
+                "xray:PutTraceSegments",
+                "xray:PutTelemetryRecords",
+                "xray:GetSamplingRules",
+                "xray:GetSamplingTargets",
+                "xray:GetSamplingStatisticSummaries"
             ],
             "Resource": "*"
         }
     ]
 }
 EOF
+}
+
+resource "aws_iam_role_policy_attachment" "AmazonSSMManagedInstanceCore" {
+  role       = aws_iam_role.ec2_instance_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
+resource "aws_iam_role_policy_attachment" "CloudWatchAgentServerPolicy" {
+  role       = aws_iam_role.ec2_instance_role.name
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
 }
 
 resource "aws_iam_role_policy_attachment" "attach_ec2_policy" {
@@ -269,8 +288,6 @@ resource "aws_ecs_task_definition" "windows_ecs_task_definition" {
 resource "aws_ecs_task_definition" "linux_ecs_task_definition" {
   family             = "${var.app_name}-task-definition"
   network_mode       = var.network_mode
-  cpu                = var.container_cpu
-  memory             = var.container_memory
   count              = var.container_instance_type == "linux" ? 1 : 0
   execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
   requires_compatibilities = [
@@ -373,7 +390,14 @@ resource "aws_iam_policy" "ecs_task_execution_s3_policy" { #tfsec:ignore:aws-iam
         "kms:GenerateDataKey",
         "kms:ReEncrypt",
         "kms:GenerateDataKey",
-        "kms:DescribeKey"
+        "kms:DescribeKey",
+        "elasticloadbalancing:DeregisterInstancesFromLoadBalancer",
+        "elasticloadbalancing:DeregisterTargets",
+        "elasticloadbalancing:Describe*",
+        "elasticloadbalancing:RegisterInstancesWithLoadBalancer",
+        "elasticloadbalancing:RegisterTargets",
+        "ec2:Describe*",
+        "ec2:AuthorizeSecurityGroupIngress"
       ],
       "Resource": ["*"]
     }

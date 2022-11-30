@@ -18,8 +18,6 @@ module "mlra-ecs" {
   ec2_desired_capacity    = local.application_data.accounts[local.environment].ec2_desired_capacity
   ec2_max_size            = local.application_data.accounts[local.environment].ec2_max_size
   ec2_min_size            = local.application_data.accounts[local.environment].ec2_min_size
-  container_cpu           = local.application_data.accounts[local.environment].container_cpu
-  container_memory        = local.application_data.accounts[local.environment].container_memory
   task_definition_volume  = local.application_data.accounts[local.environment].task_definition_volume
   network_mode            = local.application_data.accounts[local.environment].network_mode
   server_port             = local.application_data.accounts[local.environment].server_port
@@ -91,10 +89,16 @@ locals {
     region              = local.application_data.accounts[local.environment].region
     maat_api_end_point  = local.application_data.accounts[local.environment].maat_api_end_point
     maat_db_url         = local.application_data.accounts[local.environment].maat_db_url
-    maat_db_password    = local.application_data.accounts[local.environment].maat_db_password
+    maat_db_password    = data.aws_ssm_parameter.db_password.value
     maat_libra_wsdl_url = local.application_data.accounts[local.environment].maat_libra_wsdl_url
     sentry_env          = local.environment
   })
+}
+
+# MAAT DB Password
+
+data "aws_ssm_parameter" "db_password" {
+  name = local.application_data.accounts[local.environment].maat_db_password
 }
 
 #TODO This needs to be added in the cloudwatch module in the future

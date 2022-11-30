@@ -17,8 +17,6 @@
       "ec2_desired_capacity": 2,
       "ec2_max_size": 6,
       "ec2_min_size": 2,
-      "container_cpu": 2048,
-      "container_memory": 7763,
       "task_definition_volume": "upload_volume",
       "network_mode": "bridge",
       "server_port": 8080,

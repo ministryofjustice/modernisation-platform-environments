@@ -34,7 +34,7 @@ output "ec2_autoscaling_group" {
 #   description = "ARN for app autoscaling - scaling policy up"
 #   value       = aws_appautoscaling_policy.scaling_policy_up.arn
 # }
-# 
+#
 # output "app_scale_down_policy_arn" {
 #   description = "ARN for app autoscaling - scaling policy down"
 #   value       = aws_appautoscaling_policy.scaling_policy_down.arn
