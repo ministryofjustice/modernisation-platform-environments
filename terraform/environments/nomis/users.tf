@@ -1,8 +1,9 @@
 # create a password for each user in data.github_team.dso_users.members
 resource "random_password" "jumpserver" {
-  for_each = toset(data.github_team.dso_users.members)
-  length   = 16
-  special  = true
+  for_each    = toset(data.github_team.dso_users.members)
+  length      = 32
+  min_special = 5
+  special     = true
 }
 
 # create empty secret in secret manager
