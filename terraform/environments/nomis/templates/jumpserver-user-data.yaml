@@ -23,6 +23,7 @@ tasks:
             foreach($secret in $secrets){
                 $username = $secret.Name.SubString($secret_prefix.Length) # secrets are stored like /Jumpserver/Users/JoeBloggs, so trim prefix
                 $user_exists = Get-LocalUser $username -ErrorAction SilentlyContinue
+
                 # get password from secret manager
                 $secret = Get-SECSecretValue -SecretId $secret.ARN -Select SecretString
                 $password = ConvertTo-SecureString -String $secret -AsPlainText -Force
@@ -32,8 +33,7 @@ tasks:
                     New-LocalUser $username -Password $password -FullName $username
                     Add-LocalGroupMember -Group "Remote Desktop Users" -Member $username
                     Add-LocalGroupMember -Group "Administrators" -Member $username
-                }
-                else {
+                } else {
                     Set-LocalUser -Name $username -Password $password
                 }
             }
