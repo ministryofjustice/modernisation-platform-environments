@@ -30,6 +30,7 @@
         "containerPort": 8080
       }
     ],
+    "links": ["xray-daemon"],
     "memory": 2000,
     "logConfiguration": {
       "logDriver": "awslogs",
@@ -40,6 +41,10 @@
       }
     },
     "environment": [
+      {
+        "name": "AWS_REGION",
+        "value": "${region}"
+      },
       {
         "name": "MAAT_API_END_POINT",
         "value": "${maat_api_end_point}"
