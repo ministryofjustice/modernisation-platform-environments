@@ -150,9 +150,6 @@ locals {
         }
         ami_name = "nomis_rhel_6_10_baseimage*"
         # branch   = var.BRANCH_NAME # comment in if testing ansible
-        autoscaling_group = {
-          desired_capacity = 2
-        }
       }
       t1-ndh-app = {
         tags = {
