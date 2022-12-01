@@ -31,6 +31,11 @@ resource "aws_secretsmanager_secret_version" "jumpserver" {
 # resource policy to restrict access to secret value to specific user and the CICD role used to deploy terraform
 data "aws_iam_policy_document" "jumpserver_secrets" {
   for_each = toset(data.github_team.dso_users.members)
+   statement {
+    effect    = "Allow"
+    actions   = ["secretsmanager:GetSecretValue"]
+    resources = ["arn:aws:secretsmanager:${local.region}:${data.aws_caller_identity.current.id}:secret:${local.secret_prefix}/*"]
+  }
   statement {
     effect    = "Deny"
     actions   = ["secretsmanager:GetSecretValue"]
