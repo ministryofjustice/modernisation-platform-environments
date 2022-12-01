@@ -125,7 +125,7 @@ data "aws_iam_policy_document" "redshift-additional-policy" {
     resources = [
       "*"
     ]
-  }  
+  }
 }
 
 resource "aws_iam_policy" "additional-policy" {
