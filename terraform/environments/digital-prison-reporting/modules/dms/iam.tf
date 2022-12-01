@@ -18,7 +18,7 @@ data "aws_iam_policy_document" "dms_assume_role" {
 resource "aws_iam_role" "dms_cloudwatch_logs_role" {
   count = var.create && var.create_iam_roles ? 1 : 0
 
-  name                  = "dms-${short_name}-cloudwatch-logs-role"
+  name                  = "dms-${var.short_name}-cloudwatch-logs-role"
   description           = "DMS IAM role for CloudWatch logs permissions"
   permissions_boundary  = var.iam_role_permissions_boundary
   assume_role_policy    = data.aws_iam_policy_document.dms_assume_role[0].json
@@ -32,7 +32,7 @@ resource "aws_iam_role" "dms_cloudwatch_logs_role" {
 resource "aws_iam_role" "dmsvpcrole" {
   count = var.create && var.create_iam_roles ? 1 : 0
 
-  name                  = "dms-${short_name}-vpc-role"
+  name                  = "dms-${var.short_name}-vpc-role"
   description           = "DMS IAM role for VPC permissions"
   permissions_boundary  = var.iam_role_permissions_boundary
   assume_role_policy    = data.aws_iam_policy_document.dms_assume_role[0].json
@@ -46,7 +46,7 @@ resource "aws_iam_role" "dmsvpcrole" {
 resource "aws_iam_role_policy" "dmsvpcpolicy" {
   count = var.create && var.create_iam_roles ? 1 : 0
 
-  name = "dms-${short_name}-vpc-policy"
+  name = "dms-${var.short_name}-vpc-policy"
   role = aws_iam_role.dmsvpcrole[0].id
 
   policy = <<EOF
@@ -74,7 +74,7 @@ EOF
 
 #DMS Kinesis Endpoint role
 resource "aws_iam_role" "dms-kinesis-role" {
-  name = "dms-${short_name}-kenisis-endpoint-role"
+  name = "dms-${var.short_name}-kenisis-endpoint-role"
   path = "/"
 
   assume_role_policy = <<EOF
@@ -95,7 +95,7 @@ EOF
 
 # Attach an admin policy to the role
 resource "aws_iam_role_policy" "dmskinesispolicy" {
-  name = "dms-${short_name}-kinesis-policy"
+  name = "dms-${var.short_name}-kinesis-policy"
   role = aws_iam_role.dms-kinesis-role.id
 
   policy = <<EOF
@@ -123,7 +123,7 @@ resource "aws_iam_role_policy_attachment" "dms-kinesis-attachment" {
 
 #DMS DMS Operation role
 resource "aws_iam_role" "dms-operator-role" {
-  name = "dms-${short_name}-operator-role"
+  name = "dms-${var.short_name}-operator-role"
   path = "/"
 
   assume_role_policy = <<EOF
@@ -144,7 +144,7 @@ EOF
 
 # Attach an admin policy to the Operator role
 resource "aws_iam_role_policy" "dmsoperatorpolicy" {
-  name = "dms-${short_name}-operator-policy"
+  name = "dms-${var.short_name}-operator-policy"
   role = aws_iam_role.dms-operator-role.id
 
   policy = <<EOF
