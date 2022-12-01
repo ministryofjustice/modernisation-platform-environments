@@ -245,6 +245,33 @@ resource "aws_iam_role_policy_attachment" "attach_ec2_policy" {
 }
 
 
+# EC2 Target Tracking scaling
+
+resource "aws_autoscaling_policy" "ec2-cpu-scaling-target" {
+  name = "ec2-cpu-scaling-target"
+  policy_type = "TargetTrackingScaling"
+  autoscaling_group_name = aws_autoscaling_group.cluster-scaling-group.name
+  estimated_instance_warmup = 200
+  target_tracking_configuration {
+    predefined_metric_specification {
+      predefined_metric_type = "ASGAverageCPUUtilization"
+    }
+    target_value = var.ec2_scaling_cpu_threshold
+  }
+}
+
+resource "aws_autoscaling_policy" "ec2-mem-scaling-target" {
+  name = "ec2-mem-scaling-target"
+  policy_type = "TargetTrackingScaling"
+  autoscaling_group_name = aws_autoscaling_group.cluster-scaling-group.name
+  estimated_instance_warmup = 200
+  target_tracking_configuration {
+    predefined_metric_specification {
+      predefined_metric_type = "ECSServiceAverageMemoryUtilization"
+    }
+    target_value = var.ec2_scaling_mem_threshold
+  }
+}
 
 
 
@@ -475,11 +502,13 @@ resource "aws_iam_role" "ecs-autoscale-role" {
 EOF
 }
 
+
+# ECS cluster scaling
+
 resource "aws_iam_role_policy_attachment" "ecs-autoscale" {
   role       = aws_iam_role.ecs-autoscale-role.id
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceAutoscaleRole"
 }
-
 
 resource "aws_appautoscaling_target" "ecs_target" {
   max_capacity       = var.appscaling_max_capacity
@@ -496,27 +525,26 @@ resource "aws_appautoscaling_policy" "ecs_target_cpu" {
   resource_id        = aws_appautoscaling_target.ecs_target.resource_id
   scalable_dimension = aws_appautoscaling_target.ecs_target.scalable_dimension
   service_namespace  = aws_appautoscaling_target.ecs_target.service_namespace
-
   target_tracking_scaling_policy_configuration {
     predefined_metric_specification {
       predefined_metric_type = "ECSServiceAverageCPUUtilization"
     }
-    target_value = 80
+    target_value = var.ecs_scaling_cpu_threshold
   }
   depends_on = [aws_appautoscaling_target.ecs_target]
 }
+
 resource "aws_appautoscaling_policy" "ecs_target_memory" {
   name               = "application-scaling-policy-memory"
   policy_type        = "TargetTrackingScaling"
   resource_id        = aws_appautoscaling_target.ecs_target.resource_id
   scalable_dimension = aws_appautoscaling_target.ecs_target.scalable_dimension
   service_namespace  = aws_appautoscaling_target.ecs_target.service_namespace
-
   target_tracking_scaling_policy_configuration {
     predefined_metric_specification {
       predefined_metric_type = "ECSServiceAverageMemoryUtilization"
     }
-    target_value = 80
+    target_value = var.ecs_scaling_mem_threshold
   }
   depends_on = [aws_appautoscaling_target.ecs_target]
 }
@@ -528,64 +556,3 @@ resource "aws_appautoscaling_policy" "ecs_target_memory" {
 
 
 
-
-
-
-
-#### Older Step Scaling Code.
-
-# ##### ECS autoscaling ##########
-# 
-# resource "aws_appautoscaling_target" "scaling_target" {
-#   service_namespace  = "ecs"
-#   resource_id        = "service/${aws_ecs_cluster.ecs_cluster.name}/${aws_ecs_service.ecs_service.name}"
-#   scalable_dimension = "ecs:service:DesiredCount"
-#   min_capacity       = var.appscaling_min_capacity
-#   max_capacity       = var.appscaling_max_capacity
-# }
-# 
-# # Automatically scale capacity up by one
-# resource "aws_appautoscaling_policy" "scaling_policy_up" {
-#   name               = "${var.app_name}-scale-up-policy"
-#   service_namespace  = "ecs"
-#   resource_id        = "service/${aws_ecs_cluster.ecs_cluster.name}/${aws_ecs_service.ecs_service.name}"
-#   scalable_dimension = "ecs:service:DesiredCount"
-# 
-#   step_scaling_policy_configuration {
-#     adjustment_type         = "ChangeInCapacity"
-#     cooldown                = 60
-#     metric_aggregation_type = "Maximum"
-# 
-#     step_adjustment {
-#       metric_interval_lower_bound = 0
-#       scaling_adjustment          = 1
-#     }
-#   }
-# 
-#   depends_on = [
-#     aws_appautoscaling_target.scaling_target,
-#   ]
-# }
-# 
-# # Automatically scale capacity down by one
-# resource "aws_appautoscaling_policy" "scaling_policy_down" {
-#   name               = "${var.app_name}-scale-down-policy"
-#   service_namespace  = "ecs"
-#   resource_id        = "service/${aws_ecs_cluster.ecs_cluster.name}/${aws_ecs_service.ecs_service.name}"
-#   scalable_dimension = "ecs:service:DesiredCount"
-# 
-#   step_scaling_policy_configuration {
-#     adjustment_type         = "ChangeInCapacity"
-#     cooldown                = 60
-#     metric_aggregation_type = "Maximum"
-# 
-#     step_adjustment {
-#       metric_interval_lower_bound = 0
-#       scaling_adjustment          = -1
-#     }
-#   }
-# 
-#   depends_on = [
-#     aws_appautoscaling_target.scaling_target,
-#   ]
-# }
