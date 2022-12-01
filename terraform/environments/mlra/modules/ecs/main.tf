@@ -266,10 +266,17 @@ resource "aws_autoscaling_policy" "ec2-mem-scaling-target" {
   autoscaling_group_name = aws_autoscaling_group.cluster-scaling-group.name
   estimated_instance_warmup = 200
   target_tracking_configuration {
-    predefined_metric_specification {
-      predefined_metric_type = "ECSServiceAverageMemoryUtilization"
+    target_value     = var.ec2_scaling_mem_threshold
+    disable_scale_in = false
+    customized_metric_specification {
+      metric_name = "MemoryUtilization"
+      namespace   = "AWS/ECS"
+      statistic   = "Average"
+      metric_dimension {
+        name  = "ClusterName"
+        value = var.app_name
+      }
     }
-    target_value = var.ec2_scaling_mem_threshold
   }
 }
 
