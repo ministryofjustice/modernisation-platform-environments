@@ -37,7 +37,7 @@ data "aws_iam_policy_document" "jumpserver_secrets" {
     resources = ["*"]
     principals {
       type        = "AWS"
-      identifiers = [aws_iam_role.jumpserver.arn]
+      identifiers = ["arn:aws:iam::${local.region}:${data.aws_caller_identity.current.id}:role/${aws_iam_role.jumpserver.name}-*"]
     }
   }
   statement {
