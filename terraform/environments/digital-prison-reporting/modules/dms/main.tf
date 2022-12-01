@@ -27,7 +27,7 @@ resource "aws_dms_replication_instance" "dms" {
     aws_iam_role_policy.dmsvpcpolicy,
     aws_iam_role.dms_cloudwatch_logs_role,
     aws_iam_role.dmsvpcrole
-  ]  
+  ]
 }
 
 data "template_file" "table-mappings" {
