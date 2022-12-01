@@ -105,7 +105,7 @@ locals {
         # NOTE: setting desired capacity to 0 as this is not fully working yet
         # See DSOS-1570 and DSOS-1571
         autoscaling_group = {
-          desired_capacity = 2
+          desired_capacity = 0
           warm_pool        = null
         }
         offpeak_desired_capacity = 0
@@ -150,6 +150,9 @@ locals {
         }
         ami_name = "nomis_rhel_6_10_baseimage*"
         # branch   = var.BRANCH_NAME # comment in if testing ansible
+        autoscaling_group = {
+          desired_capacity = 2
+        }
       }
       t1-ndh-app = {
         tags = {
