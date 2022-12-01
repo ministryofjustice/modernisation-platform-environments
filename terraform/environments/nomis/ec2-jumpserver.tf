@@ -194,8 +194,8 @@ data "aws_iam_policy_document" "jumpserver_secrets" {
       test     = "StringEquals"
       variable = "aws:userid"
       values = [
-        "${each.value}@digital.justice.gov.uk",                       # specific user
-        "${data.aws_iam_role.member_infrastructure_access.unique_id}" # terraform CICD role
+        "*:${each.value}@digital.justice.gov.uk",                       # specific user
+        "${data.aws_iam_role.member_infrastructure_access.unique_id}:*" # terraform CICD role
       ]
     }
   }
