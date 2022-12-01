@@ -34,7 +34,7 @@ data "aws_iam_policy_document" "jumpserver_secrets" {
   statement {
     effect    = "Allow"
     actions   = ["secretsmanager:GetSecretValue"]
-    resources = [aws_iam_instance_profile.jumpserver.arn]
+    resources = [aws_iam_role.jumpserver.arn]
   }
   statement {
     effect    = "Deny"
