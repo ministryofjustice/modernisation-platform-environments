@@ -26,6 +26,10 @@ variable "dms_target_name" {
   type = string
 }
 
+variable "short_name" {
+  type = string
+}
+
 variable "migration_type" {
   type        = string
   description = "DMS Migration Type"
@@ -194,7 +198,7 @@ variable "source_db_name" {
 
 variable "source_db_port" {
   description = "The port the Application Server will access the database on"
-  default     = 1521
+  default     = null
 }
 
 variable "source_engine" {
@@ -203,7 +207,7 @@ variable "source_engine" {
 }
 
 variable "source_engine_name" {
-  default     = "oracle"
+  default     = ""
   description = "Engine name for DMS"
 }
 

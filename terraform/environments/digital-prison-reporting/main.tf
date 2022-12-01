@@ -914,15 +914,17 @@ module "s3_artifacts_store" {
   )
 }
 
-# DMS Data Collector
+# DMS Nomis Data Collector
 module "dms_nomis_t3" {
   source                = "./modules/dms"
   name                  = "${local.project}-dms-t3nomis-ingestor-${local.env}"
   vpc_cidr              = [data.aws_vpc.shared.cidr_block]
+  source_engine_name    = "oracle"
   source_db_name        = "CNOMT3"
   source_app_username   = "digital_prison_reporting"
   source_app_password   = "DSkpo4n7GhnmIV"
   source_address        = "10.101.63.135"
+  source_db_port        = 1521
   vpc                   = data.aws_vpc.shared.id
   kinesis_target_stream = "arn:aws:kinesis:eu-west-2:771283872747:stream/dpr-kinesis-ingestor-development"
   kinesis_stream_policy = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_admin_arn
@@ -930,6 +932,7 @@ module "dms_nomis_t3" {
   env                   = local.environment
   dms_source_name       = "oracle"
   dms_target_name       = "kinesis"
+  short_name            = "nomis"
   migration_type        = "full-load-and-cdc"
   subnet_ids            = [data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id]
 
@@ -941,6 +944,41 @@ module "dms_nomis_t3" {
     local.all_tags,
     {
       Name          = "${local.project}-dms-t3nomis-ingestor-${local.env}"
+      Resource_Type = "DMS Replication"
+    }
+  )
+}
+
+# DMS Useforce Data Collector
+module "dms_use_of_force" {
+  source                = "./modules/dms"
+  name                  = "${local.project}-dms-use-force-ingestor-${local.env}"
+  vpc_cidr              = [data.aws_vpc.shared.cidr_block]
+  source_engine_name    = "postgres"
+  source_db_name        = "use-of-force"
+  source_app_username   = "postgres"
+  source_app_password   = "uof123"
+  source_address        = "dpr-development-use-force-rds.cja8lnnvvipo.eu-west-2.rds.amazonaws.com"
+  source_db_port        = 5432
+  vpc                   = data.aws_vpc.shared.id
+  kinesis_target_stream = "arn:aws:kinesis:eu-west-2:771283872747:stream/dpr-kinesis-ingestor-development"
+  kinesis_stream_policy = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_admin_arn
+  project_id            = local.project
+  env                   = local.environment
+  dms_source_name       = "postgres"
+  dms_target_name       = "kinesis"
+  short_name            = "useforce"
+  migration_type        = "full-load-and-cdc"
+  subnet_ids            = [data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id]
+
+  availability_zones = {
+    0 = "eu-west-2a"
+  }
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-dms-use-of-force-ingestor-${local.env}"
       Resource_Type = "DMS Replication"
     }
   )
