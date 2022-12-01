@@ -24,7 +24,11 @@
       "lz_vpc_cidr": "10.202.0.0/20",
       "lb_tg_name": "mlra-tg-development",
       "appscaling_min_capacity": 2,
-      "appscaling_max_capacity": 6
+      "appscaling_max_capacity": 6,
+      "ec2_scaling_cpu_threshold": 74,
+      "ec2_scaling_mem_threshold": 74,
+      "ecs_scaling_cpu_threshold": 80,
+      "ecs_scaling_mem_threshold": 80
     },
     "test": {
       "example_var": "test-data"

@@ -28,6 +28,10 @@ module "mlra-ecs" {
   tags_common             = local.tags
   appscaling_min_capacity = local.application_data.accounts[local.environment].appscaling_min_capacity
   appscaling_max_capacity = local.application_data.accounts[local.environment].appscaling_max_capacity
+  ec2_scaling_cpu_threshold = local.application_data.accounts[local.environment].ec2_scaling_cpu_threshold
+  ec2_scaling_mem_threshold = local.application_data.accounts[local.environment].ec2_scaling_mem_threshold
+  ecs_scaling_cpu_threshold = local.application_data.accounts[local.environment].ecs_scaling_cpu_threshold
+  ecs_scaling_mem_threshold = local.application_data.accounts[local.environment].ecs_scaling_mem_threshold
 
   depends_on = [module.alb, aws_cloudwatch_log_group.ecs_log_group] # TODO module.alb dependancy may have to be re-factored further into development
 }
