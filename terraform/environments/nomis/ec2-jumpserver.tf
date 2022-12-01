@@ -120,11 +120,6 @@ resource "aws_security_group" "jumpserver-windows" {
 #------
 # Jumpserver specific
 #------
-resource "aws_iam_instance_profile" "jumpserver" {
-  name = "ec2-jumpserver-profile"
-  role = aws_iam_role.jumpserver.name
-  path = "/"
-}
 
 # IAM policy permissions to enable jumpserver to list secrets and put user passwords into secret manager
 data "aws_iam_policy_document" "jumpserver_users" {
@@ -150,34 +145,6 @@ resource "aws_iam_policy" "secret_access_jumpserver" {
     local.tags,
     {
       Name = "read-access-to-secret-store"
-    },
-  )
-}
-
-resource "aws_iam_role" "jumpserver" {
-  name                 = "ec2-jumpserver-role"
-  path                 = "/"
-  max_session_duration = "3600"
-  assume_role_policy = jsonencode(
-    {
-      "Version" : "2012-10-17",
-      "Statement" : [
-        {
-          "Effect" : "Allow",
-          "Principal" : {
-            "Service" : "ec2.amazonaws.com"
-          }
-          "Action" : "sts:AssumeRole",
-          "Condition" : {}
-        }
-      ]
-    }
-  )
-  managed_policy_arns = local.ec2_common_managed_policies
-  tags = merge(
-    local.tags,
-    {
-      Name = "ec2-jumpserver-role"
     },
   )
 }
