@@ -118,6 +118,7 @@ locals {
           server-type = "jumpserver"
           description = "Jumpserver for NOMIS"
         }
+        ebs_volumes = {}
         autoscaling_group = {
           min_size = 0
           max_size = 1
