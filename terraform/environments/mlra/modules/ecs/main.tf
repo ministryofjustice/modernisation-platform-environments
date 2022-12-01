@@ -25,7 +25,7 @@ data "aws_lb_target_group" "target_group" {
 
 resource "aws_autoscaling_group" "cluster-scaling-group" {
   vpc_zone_identifier = sort(data.aws_subnets.shared-private.ids)
-  name = "${var.app_name}-cluster-scaling-group"
+  name                = "${var.app_name}-cluster-scaling-group"
   desired_capacity    = var.ec2_desired_capacity
   max_size            = var.ec2_max_size
   min_size            = var.ec2_min_size
@@ -249,9 +249,9 @@ resource "aws_iam_role_policy_attachment" "attach_ec2_policy" {
 # EC2 Target Tracking scaling
 
 resource "aws_autoscaling_policy" "ec2-cpu-scaling-target" {
-  name = "ec2-cpu-scaling-target"
-  policy_type = "TargetTrackingScaling"
-  autoscaling_group_name = aws_autoscaling_group.cluster-scaling-group.name
+  name                      = "ec2-cpu-scaling-target"
+  policy_type               = "TargetTrackingScaling"
+  autoscaling_group_name    = aws_autoscaling_group.cluster-scaling-group.name
   estimated_instance_warmup = 200
   target_tracking_configuration {
     predefined_metric_specification {
@@ -262,9 +262,9 @@ resource "aws_autoscaling_policy" "ec2-cpu-scaling-target" {
 }
 
 resource "aws_autoscaling_policy" "ec2-mem-scaling-target" {
-  name = "ec2-mem-scaling-target"
-  policy_type = "TargetTrackingScaling"
-  autoscaling_group_name = aws_autoscaling_group.cluster-scaling-group.name
+  name                      = "ec2-mem-scaling-target"
+  policy_type               = "TargetTrackingScaling"
+  autoscaling_group_name    = aws_autoscaling_group.cluster-scaling-group.name
   estimated_instance_warmup = 200
   target_tracking_configuration {
     target_value     = var.ec2_scaling_mem_threshold
