@@ -34,7 +34,7 @@ data "aws_iam_policy_document" "jumpserver_secrets" {
   statement {
     effect    = "Allow"
     actions   = ["secretsmanager:GetSecretValue"]
-    resources = ["arn:aws:secretsmanager:${local.region}:${data.aws_caller_identity.current.id}:secret:${local.secret_prefix}/*"]
+    resources = [aws_iam_instance_profile.jumpserver.arn]
   }
   statement {
     effect    = "Deny"
