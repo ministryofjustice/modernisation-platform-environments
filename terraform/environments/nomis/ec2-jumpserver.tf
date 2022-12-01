@@ -121,7 +121,7 @@ resource "aws_security_group" "jumpserver-windows" {
 # Jumpserver specific
 #------
 resource "aws_iam_instance_profile" "jumpserver" {
-  name = "ec2-jumpserver-profil"
+  name = "ec2-jumpserver-profile"
   role = aws_iam_role.jumpserver.name
   path = "/"
 }
