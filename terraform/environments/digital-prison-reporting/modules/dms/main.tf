@@ -42,7 +42,7 @@ resource "aws_dms_replication_task" "dms-replication" {
   source_endpoint_arn       = aws_dms_endpoint.source.endpoint_arn
   target_endpoint_arn       = aws_dms_endpoint.target.endpoint_arn
   table_mappings            = data.template_file.table-mappings.rendered
-  replication_task_settings = file("${path.module}/config/replication-settings.json")
+  replication_task_settings = file("${path.module}/config/${var.short_name}-replication-settings.json")
 
   lifecycle {
     ignore_changes = [replication_task_settings]
