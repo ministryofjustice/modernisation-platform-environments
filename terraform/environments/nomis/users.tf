@@ -34,11 +34,7 @@ data "aws_iam_policy_document" "jumpserver_secrets" {
   statement {
     effect    = "Allow"
     actions   = ["secretsmanager:GetSecretValue"]
-    resources = ["*"]
-    principals {
-      type        = "AWS"
-      identifiers = ["arn:aws:iam::${local.region}:${data.aws_caller_identity.current.id}:role/${aws_iam_role.jumpserver.name}-*"]
-    }
+    resources = ["arn:aws:ec2:${local.region}:${data.aws_caller_identity.current.id}:instance/*"]
   }
   statement {
     effect    = "Deny"
