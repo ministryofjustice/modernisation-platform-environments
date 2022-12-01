@@ -40,7 +40,7 @@ data "aws_iam_policy_document" "jumpserver_secrets" {
       identifiers = ["*"]
     }
     condition {
-      test     = "StringLike"
+      test     = "StringEquals"
       variable = "aws:userid"
       values = [
         "*:${each.value}@digital.justice.gov.uk",                       # specific user
