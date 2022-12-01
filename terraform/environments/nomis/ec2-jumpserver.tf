@@ -199,13 +199,4 @@ data "aws_iam_policy_document" "jumpserver_secrets" {
       ]
     }
   }
-  statement {
-    effect    = "Deny"
-    actions   = ["secretsmanager:GetSecretValue"]
-    resources = ["*"]
-    principals {
-      type        = "*"
-      identifiers = ["*"]
-    }
-  }
 }
