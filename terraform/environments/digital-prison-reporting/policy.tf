@@ -118,6 +118,14 @@ data "aws_iam_policy_document" "redshift-additional-policy" {
       "*"
     ]
   }
+  statement {
+    actions = [
+      "kms:*"
+    ]
+    resources = [
+      "*"
+    ]
+  }  
 }
 
 resource "aws_iam_policy" "additional-policy" {
