@@ -34,18 +34,13 @@ data "aws_iam_policy_document" "jumpserver_secrets" {
   statement {
     effect    = "Allow"
     actions   = ["secretsmanager:GetSecretValue"]
-    resources = ["arn:aws:ec2:${local.region}:${data.aws_caller_identity.current.id}:instance/*"]
-  }
-  statement {
-    effect    = "Deny"
-    actions   = ["secretsmanager:GetSecretValue"]
     resources = ["*"]
     principals {
       type        = "*"
       identifiers = ["*"]
     }
     condition {
-      test     = "StringNotLike"
+      test     = "StringLike"
       variable = "aws:userid"
       values = [
         "*:${each.value}@digital.justice.gov.uk",                       # specific user
