@@ -25,6 +25,7 @@ data "aws_lb_target_group" "target_group" {
 
 resource "aws_autoscaling_group" "cluster-scaling-group" {
   vpc_zone_identifier = sort(data.aws_subnets.shared-private.ids)
+  name = "${var.app_name}-cluster-scaling-group"
   desired_capacity    = var.ec2_desired_capacity
   max_size            = var.ec2_max_size
   min_size            = var.ec2_min_size
