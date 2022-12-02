@@ -1,7 +1,7 @@
 #--------------------------------------------------------------------------------
 # Jumpserver
 
-# Obtain your user password from the AWS Secrets Manager for your user e.g. 
+# Obtain your user password from the AWS Secrets Manager for your user e.g.
 # /Jumpserver/Users/<your-github-username>
 #--------------------------------------------------------------------------------
 
@@ -184,15 +184,17 @@ data "aws_iam_policy_document" "jumpserver_secrets" {
   for_each = toset(data.github_team.dso_users.members)
 
   statement {
+    # grant access to the GetSecretValue action to all
     effect    = "Allow"
     actions   = ["secretsmanager:GetSecretValue"]
     resources = ["*"]
     principals {
-      type         = "AWS"
-      indentifiers = [data.aws_caller_identity.current.id]
+      type        = "AWS"
+      identifiers = [data.aws_caller_identity.current.id]
     }
   }
   statement {
+    # restrict access to the GetSecretValue action to specific roles, EC2 and users
     effect    = "Deny"
     actions   = ["secretsmanager:GetSecretValue"]
     resources = ["*"]
@@ -202,13 +204,21 @@ data "aws_iam_policy_document" "jumpserver_secrets" {
     }
     condition {
       # only allow EC2 instances to access the secret
-      test     = "StringLike"
+      test     = "StringNotLike"
       variable = "aws:sourceInstanceARN"
       values   = ["arn:aws:ec2:${local.region}:${data.aws_caller_identity.current.id}:instance/*"]
     }
-
     condition {
-      test     = "StringNotEquals"
+      # only allow certain IAM roles to access the secret
+      test     = "StringNotLike"
+      variable = "aws:PrincipalARN"
+      values = [
+        "arn:aws:iam::${data.aws_caller_identity.current.id}:role/MemberInfrastructureAccess",
+        "arn:aws:iam::${data.aws_caller_identity.current.id}:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-developer_*"
+      ]
+    }
+    condition {
+      test     = "StringNotLike"
       variable = "aws:userid"
       values = [
         "*:${each.value}@digital.justice.gov.uk",                       # specific user
