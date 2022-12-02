@@ -187,7 +187,8 @@ resource "aws_iam_role" "dmsvpcrole" {
       name    = "dms-service-vpc-role"
       project = "dpr"
     }
-  )}
+  )
+}
 
 # Attach an admin policy to the role -- Evaluate if this is required
 resource "aws_iam_role_policy" "dmsvpcpolicy" {
