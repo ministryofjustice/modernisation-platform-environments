@@ -163,7 +163,13 @@ resource "aws_iam_role" "dms_cloudwatch_logs_role" {
   managed_policy_arns   = ["arn:aws:iam::aws:policy/service-role/AmazonDMSCloudWatchLogsRole"]
   force_detach_policies = true
 
-  tags = var.tags
+  tags = merge(
+    local.tags,
+    {
+      name    = "dms-service-cw-role"
+      project = "dpr"
+    }
+  )
 }
 
 # DMS VPC
@@ -175,8 +181,13 @@ resource "aws_iam_role" "dmsvpcrole" {
   managed_policy_arns   = ["arn:aws:iam::aws:policy/service-role/AmazonDMSVPCManagementRole"]
   force_detach_policies = true
 
-  tags = var.tags
-}
+  tags = merge(
+    local.tags,
+    {
+      name    = "dms-service-vpc-role"
+      project = "dpr"
+    }
+  )}
 
 # Attach an admin policy to the role -- Evaluate if this is required
 resource "aws_iam_role_policy" "dmsvpcpolicy" {
