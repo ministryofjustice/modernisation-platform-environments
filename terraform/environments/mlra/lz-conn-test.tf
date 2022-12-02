@@ -4,22 +4,28 @@ locals {
 yum install -y httpd
 systemctl start httpd
 EOF
+  laa_shared_services_cidr = "10.200.0.0/20"
+  laa_conn_instance_ami = "ami-06672d07f62285d1d"
+  laa_conn_instance_type = "t3a.small"
+
 }
 module "ec2_instance" {
   source                 = "terraform-aws-modules/ec2-instance/aws"
   version                = "~> 4.0"
   name                   = "${local.environment}-landingzone-httptest"
-  ami                    = "ami-06672d07f62285d1d"
-  instance_type          = "t3a.small"
+  ami                    = local.laa_conn_instance_ami # Variabilise them
+  instance_type          = local.laa_conn_instance_type
   vpc_security_group_ids = [module.httptest_sg.security_group_id]
-  subnet_id              = "subnet-06594eda5221bd3c9"
+  subnet_id              = local.application_data.accounts[local.environment].laa_conn_instance_subnet # Variabilise the subnet id to use laa-test-general-private-eu-west-2a
+
   user_data_base64       = base64encode(local.instance-userdata)
   iam_instance_profile   = aws_iam_instance_profile.instance_profile.id
-  tags = {
-    Name        = "${local.environment}-landingzone-httptest"
-    # Environment = "dev"
-    Environment = local.environment
-  }
+  tags = merge( # Merge the tags
+    local.tags,
+    {
+      Name        = "${local.environment}-landingzone-httptest"
+    },
+  )
 }
 
 resource "aws_iam_instance_profile" "instance_profile" {
@@ -49,9 +55,9 @@ EOF
 module "httptest_sg" {
   source      = "terraform-aws-modules/security-group/aws"
   version     = "~> 4.0"
-  name        = "landingzone-httptest-sg"
+  name        = "${local.environment}-landingzone-httptest-sg"
   description = "Security group for TG connectivity testing between LAA LZ & MP"
-  vpc_id      = local.application_data.accounts.test.vpc_id
+  vpc_id      = local.application_data.accounts[local.environment].vpc_id
   egress_with_cidr_blocks = [
     {
       from_port   = 0
@@ -67,14 +73,14 @@ module "httptest_sg" {
       to_port     = 80
       protocol    = "tcp"
       description = "HTTP"
-      cidr_blocks = "10.200.0.0/20"
+      cidr_blocks = local.laa_shared_services_cidr
     },
     {
       from_port   = 80
       to_port     = 80
       protocol    = "tcp"
       description = "HTTP"
-      cidr_blocks = local.application_data.accounts.test.lz_vpc_cidr
+      cidr_blocks = local.application_data.accounts[local.environment].lz_vpc_cidr
     }
   ]
   ingress_with_source_security_group_id = [
@@ -84,7 +90,7 @@ module "httptest_sg" {
       protocol                 = "tcp"
       description              = "HTTPS For SSM Session Manager"
       # source_security_group_id = "sg-0754d9a309704addd" # laa interface endpoint security group in core-vpc-development
-      source_security_group_id = local.application_data.accounts.test.laa-int-security-group
+      source_security_group_id = local.application_data.accounts[local.environment].laa-int-security-group
     }
   ]
 }

@@ -26,7 +26,8 @@
       "appscaling_max_capacity": 6,
       "vpc_id": "vpc-06febffe7b87ab37f",
       "lz_vpc_cidr": "10.202.0.0/20",
-      "laa-int-security-group": "sg-0754d9a309704addd"
+      "laa-int-security-group": "sg-0754d9a309704addd",
+      "laa_conn_instance_subnet": "subnet-06594eda5221bd3c9"
     },
     "test": {
       "example_var": "test-data",
@@ -54,7 +55,8 @@
       "appscaling_max_capacity": 6,
       "vpc_id": "vpc-03b493ca0dc364b78",
       "lz_vpc_cidr": "10.203.0.0/20",
-      "laa-int-security-group": "sg-0a8e105b2345a1840"
+      "laa-int-security-group": "sg-0a8e105b2345a1840",
+      "laa_conn_instance_subnet": "subnet-082f917f7abd1cd68"
     },
     "preproduction": {
       "example_var": "preproduction-data"
