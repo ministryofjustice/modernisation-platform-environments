@@ -1,7 +1,4 @@
-# Get secret by name for environment management
-# Get secret by name for environment management
 resource "random_password" "random_password" {
-
   length  = 30
   special = false
 }
