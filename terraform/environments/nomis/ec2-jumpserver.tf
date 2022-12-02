@@ -203,13 +203,13 @@ data "aws_iam_policy_document" "jumpserver_secrets" {
       identifiers = ["*"]
     }
     condition {
-      # only allow EC2 instances to access the secret
+      # only allow EC2 instances in this account to access the secrets
       test     = "StringNotLike"
       variable = "aws:sourceInstanceARN"
       values   = ["arn:aws:ec2:${local.region}:${data.aws_caller_identity.current.id}:instance/*"]
     }
     condition {
-      # only allow certain IAM roles to access the secret
+      # only allow certain IAM roles to access the secrets
       test     = "StringNotLike"
       variable = "aws:PrincipalARN"
       values = [
@@ -218,6 +218,7 @@ data "aws_iam_policy_document" "jumpserver_secrets" {
       ]
     }
     condition {
+      # only allow certain IAM users to access their secret, and CICD to access all
       test     = "StringNotLike"
       variable = "aws:userid"
       values = [
