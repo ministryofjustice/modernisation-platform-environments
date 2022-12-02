@@ -177,7 +177,7 @@ resource "aws_iam_role" "dms_cloudwatch_logs_role" {
 resource "aws_iam_role" "dmsvpcrole" {
   name                  = "dms-vpc-role"
   description           = "DMS IAM role for VPC permissions"
-  permissions_boundary  = local.iam_role_permissions_boundary
+  permissions_boundary  = local.dms_iam_role_permissions_boundary
   assume_role_policy    = data.aws_iam_policy_document.dms_assume_role.json
   managed_policy_arns   = ["arn:aws:iam::aws:policy/service-role/AmazonDMSVPCManagementRole"]
   force_detach_policies = true
