@@ -2,6 +2,7 @@ locals {
   current_account_id     = data.aws_caller_identity.current.account_id
   current_account_region = data.aws_region.current.name
   setup_datamart         = local.application_data.accounts[local.environment].setup_redshift
+  dms_iam_role_permissions_boundary = null
 }
 
 
@@ -158,7 +159,7 @@ data "aws_iam_policy_document" "dms_assume_role" {
 resource "aws_iam_role" "dms_cloudwatch_logs_role" {
   name                  = "dms-cloudwatch-logs-role"
   description           = "DMS IAM role for CloudWatch logs permissions"
-  permissions_boundary  = var.iam_role_permissions_boundary
+  permissions_boundary  = var.dms_iam_role_permissions_boundary
   assume_role_policy    = data.aws_iam_policy_document.dms_assume_role.json
   managed_policy_arns   = ["arn:aws:iam::aws:policy/service-role/AmazonDMSCloudWatchLogsRole"]
   force_detach_policies = true
