@@ -1,12 +1,12 @@
 locals {
-  instance-userdata = <<EOF
+  instance-userdata        = <<EOF
 #!/bin/bash
 yum install -y httpd
 systemctl start httpd
 EOF
   laa_shared_services_cidr = "10.200.0.0/20"
-  laa_conn_instance_ami = "ami-06672d07f62285d1d"
-  laa_conn_instance_type = "t3a.small"
+  laa_conn_instance_ami    = "ami-06672d07f62285d1d"
+  laa_conn_instance_type   = "t3a.small"
 
 }
 module "ec2_instance" {
@@ -18,12 +18,12 @@ module "ec2_instance" {
   vpc_security_group_ids = [module.httptest_sg.security_group_id]
   subnet_id              = local.application_data.accounts[local.environment].laa_conn_instance_subnet # Variabilise the subnet id to use laa-test-general-private-eu-west-2a
 
-  user_data_base64       = base64encode(local.instance-userdata)
-  iam_instance_profile   = aws_iam_instance_profile.instance_profile.id
+  user_data_base64     = base64encode(local.instance-userdata)
+  iam_instance_profile = aws_iam_instance_profile.instance_profile.id
   tags = merge( # Merge the tags
     local.tags,
     {
-      Name        = "${local.environment}-landingzone-httptest"
+      Name = "${local.environment}-landingzone-httptest"
     },
   )
 }
@@ -85,10 +85,10 @@ module "httptest_sg" {
   ]
   ingress_with_source_security_group_id = [
     {
-      from_port                = 443
-      to_port                  = 443
-      protocol                 = "tcp"
-      description              = "HTTPS For SSM Session Manager"
+      from_port   = 443
+      to_port     = 443
+      protocol    = "tcp"
+      description = "HTTPS For SSM Session Manager"
       # source_security_group_id = "sg-0754d9a309704addd" # laa interface endpoint security group in core-vpc-development
       source_security_group_id = local.application_data.accounts[local.environment].laa-int-security-group
     }
