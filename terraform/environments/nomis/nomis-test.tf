@@ -121,22 +121,6 @@ locals {
     }
 
     ec2_test_instances = {
-      t1-ndh-app-1 = {
-        tags = {
-          server-type = "ndh-app"
-          description = "Standalone EC2 for testing RHEL7.9 NDH App"
-        }
-        ami_name = "nomis_rhel_7_9_baseimage_2022-11-01T13-43-46.384Z"
-        # branch   = var.BRANCH_NAME # comment in if testing ansible
-      }
-      t1-ndh-ems-1 = {
-        tags = {
-          server-type = "ndh-ems"
-          description = "Standalone EC2 for testing RHEL7.9 NDH EMS"
-        }
-        ami_name = "nomis_rhel_7_9_baseimage_2022-11-01T13-43-46.384Z"
-        # branch   = var.BRANCH_NAME # comment in if testing ansible
-      }
     }
     ec2_test_autoscaling_groups = {
       test-base-rhel79 = {
@@ -166,6 +150,30 @@ locals {
         }
         ami_name = "nomis_rhel_6_10_baseimage*"
         # branch   = var.BRANCH_NAME # comment in if testing ansible
+      }
+      t1-ndh-app = {
+        tags = {
+          server-type = "ndh-app"
+          description = "Standalone EC2 for testing RHEL7.9 NDH App"
+        }
+        ami_name = "nomis_rhel_7_9_baseimage_2022-11-01T13-43-46.384Z"
+        # branch   = var.BRANCH_NAME # comment in if testing ansible
+        autoscaling_group = {
+          desired_capacity = 1
+        }
+        autoscaling_schedules = {}
+      }
+      t1-ndh-ems = {
+        tags = {
+          server-type = "ndh-ems"
+          description = "Standalone EC2 for testing RHEL7.9 NDH EMS"
+        }
+        ami_name = "nomis_rhel_7_9_baseimage_2022-11-01T13-43-46.384Z"
+        # branch   = var.BRANCH_NAME # comment in if testing ansible
+        autoscaling_group = {
+          desired_capacity = 1
+        }
+        autoscaling_schedules = {}
       }
     }
     ec2_jumpserver_autoscaling_groups = {}
