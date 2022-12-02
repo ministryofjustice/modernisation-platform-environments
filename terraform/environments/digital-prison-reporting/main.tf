@@ -286,15 +286,15 @@ module "glue_database" {
   aws_region     = local.account_region
 }
 
-# Glue Database Raw Glue Catalog 
-module "glue_raw_database" {
-  source         = "./modules/glue_database"
-  create_db      = local.create_db
-  name           = "${local.project}-raw-${local.env}"
-  description    = "Glue Database Raw Catalog"
-  aws_account_id = local.account_id
-  aws_region     = local.account_region
-}
+## Glue Database Raw Glue Catalog 
+##module "glue_raw_database" {
+##  source         = "./modules/glue_database"
+##  create_db      = local.create_db
+##  name           = "${local.project}-raw-${local.env}"
+##  description    = "Glue Database Raw Catalog"
+##  aws_account_id = local.account_id
+##  aws_region     = local.account_region
+##}
 
 # S3 Demo
 module "s3_demo_bucket" {
@@ -955,9 +955,9 @@ module "dms_use_of_force" {
   name                  = "${local.project}-dms-use-force-ingestor-${local.env}"
   vpc_cidr              = [data.aws_vpc.shared.cidr_block]
   source_engine_name    = "postgres"
-  source_db_name        = "use-of-force"
+  source_db_name        = "use_of_force"
   source_app_username   = "postgres"
-  source_app_password   = "uof123"
+  source_app_password   = "postgres!password123"
   source_address        = "dpr-development-use-force-rds.cja8lnnvvipo.eu-west-2.rds.amazonaws.com"
   source_db_port        = 5432
   vpc                   = data.aws_vpc.shared.id
