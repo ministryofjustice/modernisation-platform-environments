@@ -935,7 +935,7 @@ module "dms_nomis_t3" {
   short_name            = "nomis"
   migration_type        = "full-load-and-cdc"
   subnet_ids            = [data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id]
-  
+
   vpc_role_dependency        = [aws_iam_role.dmsvpcrole]
   cloudwatch_role_dependency = [aws_iam_role.dms_cloudwatch_logs_role]
 
