@@ -4,14 +4,14 @@ data "aws_iam_policy_document" "iaps_s3_policy" {
       type        = "AWS"
       identifiers = ["arn:aws:iam::*:role/iaps_ec2_role"]
     }
-    actions    = ["s3:GetObject"]
-    resources  = ["*"]
+    actions   = ["s3:GetObject"]
+    resources = ["*"]
   }
 }
 
 module "s3_bucket" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.2.0"
-  count = 0
+  count  = 0
   providers = {
     aws.bucket-replication = aws
   }

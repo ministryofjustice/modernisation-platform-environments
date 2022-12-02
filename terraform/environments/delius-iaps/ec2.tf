@@ -62,7 +62,7 @@ data "aws_iam_policy_document" "iaps_ec2_assume_role_policy" {
       type        = "Service"
       identifiers = ["ec2.amazonaws.com"]
     }
-    actions    = ["sts:AssumeRole"]
+    actions = ["sts:AssumeRole"]
   }
 }
 
