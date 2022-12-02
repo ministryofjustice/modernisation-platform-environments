@@ -16,7 +16,7 @@ module "ec2_instance" {
   user_data_base64       = base64encode(local.instance-userdata)
   iam_instance_profile   = aws_iam_instance_profile.instance_profile.id
   tags = {
-    Name        = "${local.environment}-landingzone-httptest"
+    Name = "${local.environment}-landingzone-httptest"
     # Environment = "dev"
     Environment = local.environment
   }
@@ -79,10 +79,10 @@ module "httptest_sg" {
   ]
   ingress_with_source_security_group_id = [
     {
-      from_port                = 443
-      to_port                  = 443
-      protocol                 = "tcp"
-      description              = "HTTPS For SSM Session Manager"
+      from_port   = 443
+      to_port     = 443
+      protocol    = "tcp"
+      description = "HTTPS For SSM Session Manager"
       # source_security_group_id = "sg-0754d9a309704addd" # laa interface endpoint security group in core-vpc-development
       source_security_group_id = local.application_data.accounts.test.laa-int-security-group
     }
