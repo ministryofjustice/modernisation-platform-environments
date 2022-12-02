@@ -8,7 +8,7 @@ EOF
 module "ec2_instance" {
   source                 = "terraform-aws-modules/ec2-instance/aws"
   version                = "~> 4.0"
-  name                   = "landingzone-httptest"
+  name                   = "${local.environment}-landingzone-httptest"
   ami                    = "ami-06672d07f62285d1d"
   instance_type          = "t3a.small"
   vpc_security_group_ids = [module.httptest_sg.security_group_id]
@@ -16,8 +16,9 @@ module "ec2_instance" {
   user_data_base64       = base64encode(local.instance-userdata)
   iam_instance_profile   = aws_iam_instance_profile.instance_profile.id
   tags = {
-    Name        = "landingzone-httptest"
-    Environment = "dev"
+    Name        = "${local.environment}-landingzone-httptest"
+    # Environment = "dev"
+    Environment = local.environment
   }
 }
 
@@ -50,7 +51,7 @@ module "httptest_sg" {
   version     = "~> 4.0"
   name        = "landingzone-httptest-sg"
   description = "Security group for TG connectivity testing between LAA LZ & MP"
-  vpc_id      = "vpc-06febffe7b87ab37f"
+  vpc_id      = local.application_data.accounts.test.vpc_id
   egress_with_cidr_blocks = [
     {
       from_port   = 0
@@ -73,7 +74,7 @@ module "httptest_sg" {
       to_port     = 80
       protocol    = "tcp"
       description = "HTTP"
-      cidr_blocks = "10.202.0.0/20"
+      cidr_blocks = local.application_data.accounts.test.lz_vpc_cidr
     }
   ]
   ingress_with_source_security_group_id = [
@@ -82,7 +83,8 @@ module "httptest_sg" {
       to_port                  = 443
       protocol                 = "tcp"
       description              = "HTTPS For SSM Session Manager"
-      source_security_group_id = "sg-0754d9a309704addd" # laa interface endpoint security group in core-vpc-development
+      # source_security_group_id = "sg-0754d9a309704addd" # laa interface endpoint security group in core-vpc-development
+      source_security_group_id = local.application_data.accounts.test.laa-int-security-group
     }
   ]
 }
