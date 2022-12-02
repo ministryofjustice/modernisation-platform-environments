@@ -1,5 +1,7 @@
 # Create Managed AD
 resource "aws_directory_service_directory" "active_directory" {
+  count = 0 # Do not try to create the AD resource, as we currently do not have required permissions
+
   name        = "${local.application_name}-${local.environment}.local"
   short_name  = "${replace(local.application_name, "delius-", "")}-${local.environment}" # Form "iaps-development" from "delius-iaps-development" because we need <= 15 chars for NETBIOS name 
   description = "Microsoft AD for ${local.environment}.local"
