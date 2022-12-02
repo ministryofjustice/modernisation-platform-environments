@@ -138,3 +138,70 @@ resource "aws_iam_role_policy_attachment" "redshift" {
   role       = aws_iam_role.redshift-role[0].name
   policy_arn = aws_iam_policy.additional-policy.arn
 }
+
+### DMS Roles
+# Create a role that can be assummed by the root account
+data "aws_iam_policy_document" "dms_assume_role" {
+  statement {
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      identifiers = ["dms.amazonaws.com"]
+      type        = "Service"
+    }
+
+  }
+}
+
+# CW Logs Role
+# DMS CloudWatch Logs
+resource "aws_iam_role" "dms_cloudwatch_logs_role" {
+  name                  = "dms-cloudwatch-logs-role"
+  description           = "DMS IAM role for CloudWatch logs permissions"
+  permissions_boundary  = var.iam_role_permissions_boundary
+  assume_role_policy    = data.aws_iam_policy_document.dms_assume_role.json
+  managed_policy_arns   = ["arn:aws:iam::aws:policy/service-role/AmazonDMSCloudWatchLogsRole"]
+  force_detach_policies = true
+
+  tags = var.tags
+}
+
+# DMS VPC
+resource "aws_iam_role" "dmsvpcrole" {
+  name                  = "dms-vpc-role"
+  description           = "DMS IAM role for VPC permissions"
+  permissions_boundary  = var.iam_role_permissions_boundary
+  assume_role_policy    = data.aws_iam_policy_document.dms_assume_role.json
+  managed_policy_arns   = ["arn:aws:iam::aws:policy/service-role/AmazonDMSVPCManagementRole"]
+  force_detach_policies = true
+
+  tags = var.tags
+}
+
+# Attach an admin policy to the role -- Evaluate if this is required
+resource "aws_iam_role_policy" "dmsvpcpolicy" {
+  name = "dms-vpc-policy"
+  role = aws_iam_role.dmsvpcrole.id
+
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ec2:CreateNetworkInterface",
+                "ec2:DescribeAvailabilityZones",
+                "ec2:DescribeInternetGateways",
+                "ec2:DescribeSecurityGroups",
+                "ec2:DescribeSubnets",
+                "ec2:DescribeVpcs",
+                "ec2:DeleteNetworkInterface",
+                "ec2:ModifyNetworkInterfaceAttribute"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+EOF
+}

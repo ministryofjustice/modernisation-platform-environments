@@ -24,9 +24,8 @@ resource "aws_dms_replication_instance" "dms" {
   depends_on = [
     aws_iam_role_policy_attachment.dms-operator-kinesis-attachment,
     aws_iam_role_policy_attachment.dms-kinesis-attachment,
-    aws_iam_role_policy.dmsvpcpolicy,
-    aws_iam_role.dms_cloudwatch_logs_role,
-    aws_iam_role.dmsvpcrole
+    var.cloudwatch_role_dependency,
+    var.vpc_role_dependency  
   ]
 }
 

@@ -293,3 +293,18 @@ variable "vpc_cidr" {
   type        = list(string)
   default     = null
 }
+
+# Dummy Depends on
+variable "vpc_role_dependency" {
+  # the value doesn't matter; we're just using this variable
+  # to propagate dependencies.
+  type    = any
+  default = []
+}
+
+variable "cloudwatch_role_dependency" {
+  # the value doesn't matter; we're just using this variable
+  # to propagate dependencies.
+  type    = any
+  default = []
+}
