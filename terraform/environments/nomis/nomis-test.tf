@@ -90,6 +90,47 @@ locals {
           }
         }
       }
+
+      # DSOS-1602
+      t3-nomis-db-1 = {
+        tags = {
+          server-type         = "nomis-db"
+          description         = "T1 NOMIS Audit database to replace Azure T1PDL0010"
+          oracle-sids         = "T1CNMAUD"
+          monitored           = false
+          instance-scheduling = "skip-scheduling"
+        }
+        ami_name  = "nomis_rhel_7_9_oracledb_11_2_*"
+        instance = {
+          disable_api_termination = true
+        }
+        ebs_volumes = {
+          "/dev/sdb" = { # /u01
+            type = "gp3"
+            size = 100
+          }
+          "/dev/sdc" = { # /u02
+            type = "gp3"
+            size = 100
+          }
+        }
+        ebs_volume_config = {
+          app = {
+            type = "gp3"
+          }
+          data = {
+            type       = "gp3"
+            total_size = 200
+          }
+          flash = {
+            type       = "gp3"
+            total_size = 2
+          }
+          swap = {
+            type = "gp3"
+          }
+        }
+      }
     }
 
     # Add weblogic instances here
