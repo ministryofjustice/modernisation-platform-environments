@@ -214,7 +214,8 @@ data "aws_iam_policy_document" "jumpserver_secrets" {
       variable = "aws:PrincipalARN"
       values = [
         "arn:aws:iam::${data.aws_caller_identity.current.id}:role/MemberInfrastructureAccess",
-        "arn:aws:iam::${data.aws_caller_identity.current.id}:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-developer_*"
+        "arn:aws:iam::${data.aws_caller_identity.current.id}:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-developer_*",
+        "arn:aws:sts::${data.aws_caller_identity.current.id}:assumed-role/ec2-jumpserver-role-*/*"
       ]
     }
     condition {
