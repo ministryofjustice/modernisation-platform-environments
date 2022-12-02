@@ -95,7 +95,7 @@ locals {
       t3-nomis-db-1 = {
         tags = {
           server-type         = "nomis-db"
-          description         = "T1 NOMIS Audit database to replace Azure T1PDL0010"
+          description         = "T3 NOMIS database"
           oracle-sids         = "T1CNMAUD"
           monitored           = false
           instance-scheduling = "skip-scheduling"
