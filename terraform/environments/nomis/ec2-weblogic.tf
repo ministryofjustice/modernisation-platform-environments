@@ -230,3 +230,4 @@ resource "aws_security_group" "weblogic_common" {
     }
   )
 }
+
