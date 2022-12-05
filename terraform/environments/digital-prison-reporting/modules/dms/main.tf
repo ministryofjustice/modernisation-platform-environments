@@ -60,7 +60,7 @@ resource "aws_dms_endpoint" "source" {
   ssl_mode      = "none"
   username      = var.source_app_username
 
-  extra_connection_attributes  = ${var.extra_attributes}
+  extra_connection_attributes  = var.extra_attributes
 
   tags = var.tags
 }
