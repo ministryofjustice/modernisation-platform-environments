@@ -169,11 +169,14 @@ resource "aws_security_group" "weblogic_common" {
   }
 
   ingress {
-    description     = "access from Windows Jumpserver (admin console)"
+    description     = "access admin console from Windows Jumpserver and Bastion"
     from_port       = "7001"
     to_port         = "7001"
     protocol        = "TCP"
-    security_groups = [aws_security_group.jumpserver-windows.id]
+    security_groups = [
+	aws_security_group.jumpserver-windows.id
+	module.bastion_linux.bastion_security_group
+    ]
   }
 
   ingress {
