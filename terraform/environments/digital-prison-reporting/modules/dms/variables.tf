@@ -19,8 +19,8 @@ variable "tags" {
 }
 
 variable "extra_attributes" {
-  type        = string
-  default     = null
+  type    = string
+  default = null
 }
 
 variable "dms_source_name" {

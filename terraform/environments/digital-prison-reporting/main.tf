@@ -156,7 +156,7 @@ module "glue_domainplatform_change_monitor_job" {
     "--cloud.platform.path" = "s3://${module.s3_curated_bucket[0].bucket.id}"
     "--domain.files.path"   = "s3://${module.s3_domain_config_bucket[0].bucket.id}/"
     "--domain.repo.path"    = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/domain-repo/" ## Added /
-    "--source.queue"        = "domain-cdc-event-notification"       ## Should be Dynamic SQS Name reference
+    "--source.queue"        = "domain-cdc-event-notification"                                ## Should be Dynamic SQS Name reference
     "--source.region"       = local.account_region
     "--target.path"         = "s3://${module.s3_domain_bucket[0].bucket.id}/" # Added /
     "--checkpoint.location" = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/checkpoint/change-monitor/"
@@ -977,7 +977,7 @@ module "dms_use_of_force" {
   vpc_role_dependency        = [aws_iam_role.dmsvpcrole]
   cloudwatch_role_dependency = [aws_iam_role.dms_cloudwatch_logs_role]
 
-  extra_attributes      = "PluginName=PGLOGICAL"
+  extra_attributes = "PluginName=PGLOGICAL"
 
   availability_zones = {
     0 = "eu-west-2a"
