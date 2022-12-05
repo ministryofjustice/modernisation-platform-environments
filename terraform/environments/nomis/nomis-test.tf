@@ -162,7 +162,8 @@ locals {
         # NOTE: setting desired capacity to 0 as this is not fully working yet
         # See DSOS-1570 and DSOS-1571
         autoscaling_group = {
-          desired_capacity = 0
+          desired_capacity = 1
+          warm_pool        = null
         }
         offpeak_desired_capacity = 0
       }
