@@ -124,7 +124,7 @@ module "glue_cloudplatform_reporting_job" {
     "--structured.path"     = "s3://${module.s3_structured_bucket[0].bucket.id}"
     "--sink.stream"         = local.kinesis_stream_data_domain
     "--sink.region"         = local.account_region
-    "--source.queue"        = "${local.project}-nomis-cdc-event-${local.environment}" ## Should be Dynamic SQS Name reference
+    "--source.queue"        = "nomis-cdc-event-notification" ## Should be Dynamic SQS Name reference
     "--source.region"       = local.account_region
     "--job-bookmark-option" = "job-bookmark-enable"
   }
@@ -156,7 +156,7 @@ module "glue_domainplatform_change_monitor_job" {
     "--cloud.platform.path" = "s3://${module.s3_curated_bucket[0].bucket.id}"
     "--domain.files.path"   = "s3://${module.s3_domain_config_bucket[0].bucket.id}/"
     "--domain.repo.path"    = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/domain-repo/" ## Added /
-    "--source.queue"        = "${local.project}-domain-cdc-event-${local.environment}"       ## Should be Dynamic SQS Name reference
+    "--source.queue"        = "domain-cdc-event-notification"       ## Should be Dynamic SQS Name reference
     "--source.region"       = local.account_region
     "--target.path"         = "s3://${module.s3_domain_bucket[0].bucket.id}/" # Added /
     "--checkpoint.location" = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/checkpoint/change-monitor/"
@@ -961,7 +961,7 @@ module "dms_use_of_force" {
   source_db_name        = "use_of_force"
   source_app_username   = "postgres"
   source_app_password   = "postgres!password123"
-  source_address        = "dpr-development-use-force-rds.cja8lnnvvipo.eu-west-2.rds.amazonaws.com"
+  source_address        = "dpr-development-use-of-force-rds.cja8lnnvvipo.eu-west-2.rds.amazonaws.com"
   source_db_port        = 5432
   vpc                   = data.aws_vpc.shared.id
   kinesis_target_stream = "arn:aws:kinesis:eu-west-2:771283872747:stream/dpr-kinesis-ingestor-development"
@@ -976,6 +976,8 @@ module "dms_use_of_force" {
 
   vpc_role_dependency        = [aws_iam_role.dmsvpcrole]
   cloudwatch_role_dependency = [aws_iam_role.dms_cloudwatch_logs_role]
+
+  extra_attributes      = "PluginName=PGLOGICAL"
 
   availability_zones = {
     0 = "eu-west-2a"

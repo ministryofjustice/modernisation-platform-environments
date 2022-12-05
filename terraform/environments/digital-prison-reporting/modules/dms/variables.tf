@@ -18,6 +18,11 @@ variable "tags" {
   description = "(Optional) Key-value map of resource tags."
 }
 
+variable "extra_attributes" {
+  type        = string
+  default     = null
+}
+
 variable "dms_source_name" {
   type = string
 }
