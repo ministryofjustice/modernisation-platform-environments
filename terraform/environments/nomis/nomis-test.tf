@@ -191,9 +191,11 @@ locals {
       }
       test-base-rhel610 = {
         tags = {
-          ami         = "nomis_rhel_6_10_baseimage"
-          description = "For testing our base RHEL6.10 base image"
-          monitored   = false
+          ami                = "nomis_rhel_6_10_baseimage"
+          description        = "For testing our base RHEL6.10 base image"
+          monitored          = false
+          oracle-db-hostname = "db.CNOMT1.nomis.hmpps-test.modernisation-platform.internal"
+          oracle-db-name     = "CNOMT1"
         }
         instance = {
           instance_type                = "t2.medium"
