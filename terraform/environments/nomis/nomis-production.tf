@@ -15,7 +15,6 @@ locals {
     }
     # vars common across ec2 instances
     ec2_common = {
-      public_key                = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDdCvr+81dRu1qxFi1LSWEybb/ztbzlbfjd3Hj1EOHcEQt6lo9Cr94SUXjjUvD6krNzm9QWs8TdVRNfDCjaZRmO6KFX8UUUwE0UB0p6LZPy2I8cYirGN8f2fwCrh8dZg6x8sxa7fXW5gMZal6Z0O10u0XM5ajXkQz2f4T4zCxff7MDEuqZV0OWhaiTWPT9eph4UZH5FWA8Lxzml6qIAwyHa6O5j7hQpvX4kiMjvg9F9C5Fxo6EBpCAjdRcXgsMmDHQjqLJO3b2wWPlm45yES7NaAwZCb6Yq0BRmDPv2/ZokVNE8tudtf+cNa2+aLB9WiBVnFXggIuFeelArNi5X9U4nLzvaDX3y7+TnY+QY5FcDugJDwHKcb/ah64WMpSiWjrFiyg6fF04jFfV6YKdsH//7E/DSZAkVsj+XKHt23SyWS6RKXag+IW3UIp3pttELNHbIO+7vUGZT8btqIBtN5iM6PLiYzfDFHDRmd/aO0a844ZFioFzabGo7MuyAU+NkfLHIBXazrrxd2s+HXnBtL80iur4Jm7Vut1QoPJmknCq9iBv+itE8RYM8oN74g5BVTPAsw5vr2c5fvXwVdu0XhwRnkSsfCppdntf2ObX51PxjxXcq63jCEYRdq0bBPyGWa8hKiMcwx4TIz3IW2xGmLK6PO+2LLpVg89Q7EicMAFHC3w=="
       patch_approval_delay_days = 7
       patch_day                 = "THU"
     }
@@ -37,25 +36,7 @@ locals {
     }
 
     # Legacy database module, do not add any more entries here
-    databases_legacy = {
-      AUDIT = {
-        always_on              = true
-        ami_name               = "nomis_db_STIG-2022-04-26*"
-        instance_type          = "r6i.2xlarge"
-        asm_data_capacity      = 4000
-        asm_flash_capacity     = 1000
-        description            = "Copy of Production NOMIS Audit database in Azure PDPDL00038, replicating with PDPDL00038, a replacement for PDPDL00037."
-        termination_protection = true
-        oracle_sids            = ["PCNMAUD"]
-        oracle_app_disk_size = {
-          "/dev/sdb" = 100  # /u01
-          "/dev/sdc" = 5120 # /u02
-        }
-        tags = {
-          monitored = true
-        }
-      }
-    }
+    databases_legacy = {}
 
     # Add database instances here. They will be created using ec2-database.tf
     databases = {
@@ -71,90 +52,82 @@ locals {
           description = "PreProduction NOMIS MIS and Audit database to replace Azure PPPDL00017"
           oracle-sids = "PPMIS PPCNMAUD"
           monitored   = false
-          always-on   = true
         }
         ami_name  = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-03T12-51-25.032Z"
         ami_owner = "self" # remove this line next time AMI is updated so core-shared-services-production used instead
         instance = {
-          instance_type           = "r6i.2xlarge"
-          disable_api_termination = true
+          instance_type             = "r6i.2xlarge"
+          disable_api_termination   = true
+          metadata_endpoint_enabled = "enabled"
         }
         ebs_volumes = {
-          "/dev/sdb" = { size = 100 } # /u01
-          "/dev/sdc" = {              # /u02
-            iops = 15360              # Temporary. See DSOS-1561
-            size = 5120               # reduce this to 1000 when we move into preprod subscription
+          "/dev/sdb" = { # /u01
+            size = 100
+            type = "gp3"
+          }
+          "/dev/sdc" = { # /u02
+            type = "gp3"
+            size = 5120 # reduce this to 1000 when we move into preprod subscription
           }
         }
         ebs_volume_config = {
           app = {
-            iops       = 300   # Temporary. See DSOS-1561
-            throughput = 0     # Temporary. See DSOS-1561
-            type       = "gp2" # Temporary. See DSOS-1561
+            type = "gp3"
           }
           data = {
-            iops       = 2400  # Temporary. See DSOS-1561
-            throughput = 0     # Temporary. See DSOS-1561
-            type       = "gp2" # Temporary. See DSOS-1561
+            type       = "gp3"
             total_size = 4000
           }
           flash = {
-            iops       = 1500  # Temporary. See DSOS-1561
-            throughput = 0     # Temporary. See DSOS-1561
-            type       = "gp2" # Temporary. See DSOS-1561
+            type       = "gp3"
             total_size = 1000
           }
           swap = {
-            iops       = 100   # Temporary. See DSOS-1561
-            throughput = 0     # Temporary. See DSOS-1561
-            type       = "gp2" # Temporary. See DSOS-1561
+            type = "gp3"
           }
         }
       }
 
       prod-nomis-db-2 = {
         tags = {
-          server-type = "nomis-db"
-          description = "Production NOMIS MIS and Audit database to replace Azure PDPDL00036 and PDPDL00038"
-          oracle-sids = "PCNMAUD"
-          monitored   = false
-          always-on   = true
+          server-type              = "nomis-db"
+          description              = "Production NOMIS MIS and Audit database to replace Azure PDPDL00036 and PDPDL00038"
+          oracle-sids              = "PCNMAUD"
+          monitored                = false
+          fixngo-connection-target = "10.40.0.136"
         }
         ami_name  = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-07T12-48-08.562Z"
         ami_owner = "self" # remove this line next time AMI is updated so core-shared-services-production used instead
         instance = {
-          instance_type           = "r6i.2xlarge"
-          disable_api_termination = true
+          instance_type             = "r6i.2xlarge"
+          disable_api_termination   = true
+          metadata_endpoint_enabled = "enabled"
         }
         ebs_volumes = {
-          "/dev/sdb" = { size = 100 } # /u01
-          "/dev/sdc" = {              # /u02
+          "/dev/sdb" = { # /u01
+            size = 100
+            type = "gp3"
+          }
+          "/dev/sdc" = { # /u02
             size = 3000
-            iops = 9000 # Temporary. See DSOS-1561
+            type = "gp3"
+            iops = 9000
           }
         }
         ebs_volume_config = {
           app = {
-            iops       = 300   # Temporary. See DSOS-1561
-            throughput = 0     # Temporary. See DSOS-1561
-            type       = "gp2" # Temporary. See DSOS-1561
+            type = "gp3"
           }
           data = {
-            iops       = 2400  # Temporary. See DSOS-1561
-            throughput = 0     # Temporary. See DSOS-1561
-            type       = "gp2" # Temporary. See DSOS-1561
+            type       = "gp3"
             total_size = 4000
           }
           flash = {
-            iops       = 1500  # Temporary. See DSOS-1561
-            throughput = 0     # Temporary. See DSOS-1561
-            type       = "gp2" # Temporary. See DSOS-1561
+            type       = "gp3"
             total_size = 1000
           }
           swap = {
-            iops       = 100   # Temporary. See DSOS-1561
-            throughput = 0     # Temporary. See DSOS-1561
-            type       = "gp2" # Temporary. See DSOS-1561
+            type = "gp3"
           }
         }
       }
@@ -164,49 +137,45 @@ locals {
           server-type = "nomis-db"
           description = "Production NOMIS HA database to replace Azure PDPDL00062"
           monitored   = false
-          always-on   = true
         }
         ami_name  = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-07T12-48-08.562Z"
         ami_owner = "self" # remove this line next time AMI is updated so core-shared-services-production used instead
         instance = {
-          instance_type           = "r6i.2xlarge"
-          disable_api_termination = true
+          instance_type             = "r6i.2xlarge"
+          disable_api_termination   = true
+          metadata_endpoint_enabled = "enabled"
         }
         ebs_volumes = {
           "/dev/sdb" = { # /u01
-            iops = 300   # Temporary. See DSOS-1561
             size = 100
+            type = "gp3"
           }
-          "/dev/sdc" = { size = 1000 } # /u02
+          "/dev/sdc" = { # /u02
+            size = 1000
+            type = "gp3"
+          }
         }
         ebs_volume_config = {
           app = {
-            iops       = 3000  # Temporary. See DSOS-1561
-            throughput = 0     # Temporary. See DSOS-1561
-            type       = "gp2" # Temporary. See DSOS-1561
+            type = "gp3"
           }
           data = {
-            iops       = 1800  # Temporary. See DSOS-1561
-            throughput = 0     # Temporary. See DSOS-1561
-            type       = "gp2" # Temporary. See DSOS-1561
+            type       = "gp3"
             total_size = 3000
           }
           flash = {
-            iops       = 750   # Temporary. See DSOS-1561
-            throughput = 0     # Temporary. See DSOS-1561
-            type       = "gp2" # Temporary. See DSOS-1561
+            type       = "gp3"
             total_size = 500
           }
           swap = {
-            iops       = 100   # Temporary. See DSOS-1561
-            throughput = 0     # Temporary. See DSOS-1561
-            type       = "gp2" # Temporary. See DSOS-1561
+            type = "gp3"
           }
         }
       }
     }
 
     # Add weblogic instances here.  They will be created using the weblogic module
-    weblogics = {}
+    weblogics                         = {}
+    ec2_jumpserver_autoscaling_groups = {}
   }
 }

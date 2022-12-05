@@ -6,19 +6,19 @@ resource "aws_instance" "this" {
   ami                         = data.aws_ami.this.id
   associate_public_ip_address = false
   disable_api_termination     = var.instance.disable_api_termination
-  ebs_optimized               = true
+  ebs_optimized               = data.aws_ec2_instance_type.this.ebs_optimized_support == "unsupported" ? false : true
   iam_instance_profile        = aws_iam_instance_profile.this.name
   instance_type               = var.instance.instance_type
   key_name                    = var.instance.key_name
-  monitoring                  = var.instance.monitoring
+  monitoring                  = coalesce(var.instance.monitoring, true)
   subnet_id                   = data.aws_subnet.this.id
-  user_data                   = length(data.cloudinit_config.this) == 0 ? null : data.cloudinit_config.this[0].rendered
+  user_data                   = length(data.cloudinit_config.this) == 0 ? local.user_data_raw : data.cloudinit_config.this[0].rendered
   vpc_security_group_ids      = var.instance.vpc_security_group_ids
 
-  #checkov:skip=CKV_AWS_79:We are tied to v1 metadata service
   metadata_options {
-    http_endpoint = "enabled"
-    http_tokens   = var.instance.metadata_options_http_tokens
+    #checkov:skip=CKV_AWS_79:This isn't enabled in every environment, so we can't enforce it
+    http_endpoint = coalesce(var.instance.metadata_endpoint_enabled, "enabled")
+    http_tokens   = coalesce(var.instance.metadata_options_http_tokens, "required") #tfsec:ignore:aws-ec2-enforce-http-token-imds
   }
 
   root_block_device {
@@ -66,8 +66,9 @@ resource "aws_instance" "this" {
 # DISKS
 #------------------------------------------------------------------------------
 
-#tfsec:ignore:aws-ebs-encryption-customer-key:exp:2022-10-31: I don't think we need the fine grained control CMK would provide
 resource "aws_ebs_volume" "this" {
+  #tfsec:ignore:aws-ebs-encryption-customer-key:exp:2022-10-31: I don't think we need the fine grained control CMK would provide
+  #checkov:skip=CKV_AWS_189:I don't think we need the fine grained control CMK would provide
   for_each = local.ebs_volumes
 
   # Values are retrieved from AMI data rather than using snapshot_id, since 
@@ -134,14 +135,14 @@ resource "aws_route53_record" "external" {
 #------------------------------------------------------------------------------
 
 resource "random_password" "this" {
-  for_each = var.ssm_parameters
+  for_each = var.ssm_parameters != null ? var.ssm_parameters : {}
 
   length  = each.value.random.length
   special = lookup(each.value.random, "special", null)
 }
 
 resource "aws_ssm_parameter" "this" {
-  for_each = var.ssm_parameters
+  for_each = var.ssm_parameters != null ? var.ssm_parameters : {}
 
   name        = "/${var.ssm_parameters_prefix}${var.name}/${each.key}"
   description = each.value.description
@@ -216,6 +217,7 @@ resource "aws_iam_role" "this" {
 }
 
 resource "aws_iam_role_policy" "asm_parameter" {
+  count  = var.ssm_parameters != null ? 1 : 0
   name   = "asm-parameter-access-${var.name}"
   role   = aws_iam_role.this.id
   policy = data.aws_iam_policy_document.asm_parameter.json

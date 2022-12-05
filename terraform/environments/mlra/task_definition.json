@@ -11,6 +11,7 @@
       }
     ],
     "memory": 256,
+    "environment": [{ "name": "AWS_REGION", "value": "${region}" }],
     "logConfiguration": {
       "logDriver": "awslogs",
       "options": {
@@ -30,6 +31,7 @@
         "containerPort": 8080
       }
     ],
+    "links": ["xray-daemon"],
     "memory": 2000,
     "logConfiguration": {
       "logDriver": "awslogs",
@@ -41,12 +43,16 @@
     },
     "environment": [
       {
+        "name": "AWS_REGION",
+        "value": "${region}"
+      },
+      {
         "name": "MAAT_API_END_POINT",
         "value": "${maat_api_end_point}"
       },
       {
         "name": "APP_DB_URL",
-        "value": "${maat_db_url}"
+        "value": "jdbc:oracle:thin:@${maat_db_url}"
       },
       {
         "name": "APP_DB_USERID",

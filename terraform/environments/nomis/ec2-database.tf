@@ -15,7 +15,6 @@ module "database" {
 
   name = each.key
 
-  always_on          = each.value.always_on
   ami_name           = each.value.ami_name
   asm_data_capacity  = each.value.asm_data_capacity
   asm_flash_capacity = each.value.asm_flash_capacity
@@ -74,7 +73,7 @@ locals {
       vpc_security_group_ids       = [aws_security_group.database_common.id]
     }
 
-    user_data = {
+    user_data_cloud_init = {
       args = {
         restored_from_snapshot = false
       }
@@ -135,6 +134,7 @@ locals {
 }
 
 module "db_ec2_instance" {
+  #checkov:skip=CKV_AWS_79:Oracle cannot accommodate a token
   source = "./modules/ec2_instance"
 
   providers = {
@@ -148,7 +148,7 @@ module "db_ec2_instance" {
   ami_name              = each.value.ami_name
   ami_owner             = try(each.value.ami_owner, "core-shared-services-production")
   instance              = merge(local.database.instance, lookup(each.value, "instance", {}))
-  user_data             = merge(local.database.user_data, lookup(each.value, "user_data", {}))
+  user_data_cloud_init  = merge(local.database.user_data_cloud_init, lookup(each.value, "user_data_cloud_init", {}))
   ebs_volume_config     = merge(local.database.ebs_volume_config, lookup(each.value, "ebs_volume_config", {}))
   ebs_volumes           = { for k, v in local.database.ebs_volumes : k => merge(v, try(each.value.ebs_volumes[k], {})) }
   ssm_parameters_prefix = "database/"
@@ -184,11 +184,14 @@ resource "aws_security_group" "database_common" {
   vpc_id      = data.aws_vpc.shared_vpc.id
 
   ingress {
-    description     = "DB access from weblogic instances"
-    from_port       = "1521"
-    to_port         = "1521"
-    protocol        = "TCP"
-    security_groups = [aws_security_group.weblogic_common.id]
+    description = "DB access from weblogic and test instances"
+    from_port   = "1521"
+    to_port     = "1521"
+    protocol    = "TCP"
+    security_groups = [
+      aws_security_group.weblogic_common.id,
+      aws_security_group.ec2_test.id
+    ]
   }
 
   ingress {
