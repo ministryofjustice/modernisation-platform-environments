@@ -53,16 +53,42 @@
       "lb_tg_name": "mlra-tg-test",
       "appscaling_min_capacity": 2,
       "appscaling_max_capacity": 6,
-      "vpc_id": "vpc-03b493ca0dc364b78",
+      "mp_vpc_id": "vpc-03b493ca0dc364b78",
       "lz_vpc_cidr": "10.203.0.0/20",
-      "laa-int-security-group": "sg-0a8e105b2345a1840",
-      "subnet_id": "subnet-082f917f7abd1cd68"
+      "mp_laa_int_endpoint_security_group": "sg-0a8e105b2345a1840",
+      "mp_private_2a_subnet_id": "subnet-082f917f7abd1cd68"
     },
     "preproduction": {
       "example_var": "preproduction-data"
     },
     "production": {
-      "example_var": "production-data"
+      "example_var": "production-data",
+      "region": "eu-west-2",
+      "alb_target_group_path": "/mlra/",
+      "container_instance_type": "linux",
+      "ami_image_id": "ami-0631049bf050d0d46",
+      "instance_type": "m5.large",
+      "key_name": "",
+      "ecr_url": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/mlra-ecr-repo",
+      "docker_image_tag": "latest2",
+      "maat_api_end_point": "http://maat-cd-api.aws.prod.legalservices.gov.uk/maatApi/laaStatus",
+      "maat_db_url": "terraform-20221116155914397600000001.cfxq8vgqqxpp.eu-west-2.rds.amazonaws.com:1521:MAATDB",
+      "maat_db_password": "APP_MAATDB_DBPASSWORD_MLA1",
+      "maat_libra_wsdl_url": "http://infox.aws.prod.legalservices.gov.uk/infoX/gateway",
+      "ec2_desired_capacity": 2,
+      "ec2_max_size": 6,
+      "ec2_min_size": 2,
+      "task_definition_volume": "upload_volume",
+      "network_mode": "bridge",
+      "server_port": 8080,
+      "app_count": 1,
+      "lb_tg_name": "mlra-tg-prod",
+      "appscaling_min_capacity": 2,
+      "appscaling_max_capacity": 6,
+      "mp_vpc_id": "vpc-0fe62e6799b319460",
+      "lz_vpc_cidr": "10.205.0.0/20",
+      "mp_laa_int_endpoint_security_group": "sg-0e7c18081199d1cf1",
+      "mp_private_2a_subnet_id": "subnet-04740cd676f9d84bc"
     }
   }
 }
