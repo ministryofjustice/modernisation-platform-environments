@@ -163,8 +163,8 @@ data "aws_iam_policy_document" "jumpserver_secrets" {
     ]
     resources = ["*"]
     principals {
-      type         = "AWS"
-      indentifiers = [data.aws_caller_identity.current.id]
+      type        = "AWS"
+      identifiers = [data.aws_caller_identity.current.id]
     }
   }
   statement {
