@@ -66,7 +66,7 @@ module "ec2_jumpserver" {
   })
 
   iam_resource_names_prefix = "ec2-jumpserver"
-  instance_profile_policies = concat(local.ec2_common_managed_policies, [aws_iam_policy.secret_access_jumpserver.arn])
+  instance_profile_policies = local.ec2_common_managed_policies
   business_unit             = local.vpc_name
   application_name          = local.application_name
   environment               = local.environment
@@ -121,34 +121,6 @@ resource "aws_security_group" "jumpserver-windows" {
 # Jumpserver specific
 #------
 
-# IAM policy permissions to enable jumpserver to list secrets and put user passwords into secret manager
-data "aws_iam_policy_document" "jumpserver_users" {
-  statement {
-    effect    = "Allow"
-    actions   = ["secretsmanager:GetSecretValue"]
-    resources = ["arn:aws:secretsmanager:${local.region}:${data.aws_caller_identity.current.id}:secret:${local.secret_prefix}/*"]
-  }
-  statement {
-    effect    = "Allow"
-    actions   = ["secretsmanager:ListSecrets"]
-    resources = ["*"]
-  }
-}
-
-# IAM role for jumpserver instances
-resource "aws_iam_policy" "secret_access_jumpserver" {
-  name        = "read-access-to-secret-store"
-  path        = "/"
-  description = "Policy for read access to secret store"
-  policy      = data.aws_iam_policy_document.jumpserver_users.json
-  tags = merge(
-    local.tags,
-    {
-      Name = "read-access-to-secret-store"
-    },
-  )
-}
-
 # create a password for each user in data.github_team.dso_users.members
 resource "random_password" "jumpserver" {
   for_each    = toset(data.github_team.dso_users.members)
@@ -184,29 +156,34 @@ data "aws_iam_policy_document" "jumpserver_secrets" {
   for_each = toset(data.github_team.dso_users.members)
 
   statement {
-    # grant access to the GetSecretValue action to all
-    effect    = "Allow"
-    actions   = ["secretsmanager:GetSecretValue"]
+    effect = "Allow"
+    actions = [
+      "secretsmanager:GetSecretValue",
+      "secretsmanager:ListSecrets"
+    ]
     resources = ["*"]
     principals {
-      type        = "AWS"
-      identifiers = [data.aws_caller_identity.current.id]
+      type         = "AWS"
+      indentifiers = [data.aws_caller_identity.current.id]
     }
   }
   statement {
-    # restrict access to the GetSecretValue action to specific roles, EC2 and users
-    effect    = "Deny"
-    actions   = ["secretsmanager:GetSecretValue"]
+    effect = "Deny"
+    actions = [
+      "secretsmanager:GetSecretValue",
+      "secretsmanager:ListSecrets"
+    ]
     resources = ["*"]
     principals {
       type        = "*"
       identifiers = ["*"]
     }
     condition {
-      # only allow EC2 instances in this account to access the secrets
-      test     = "StringNotLike"
-      variable = "aws:sourceInstanceARN"
-      values   = ["arn:aws:ec2:${local.region}:${data.aws_caller_identity.current.id}:instance/*"]
+      # only allow ec2 IAM role to access secret
+      test     = "StringNotEquals"
+      variable = "aws:PrincipalArn"
+      values   = [for instance in module.ec2_jumpserver : instance.ec2_role_arn]
+
     }
     condition {
       # only allow certain IAM roles to access the secrets
