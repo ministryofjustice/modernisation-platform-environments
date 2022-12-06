@@ -217,33 +217,4 @@ data "aws_iam_policy_document" "jumpserver_secrets" {
       identifiers = [data.aws_caller_identity.current.id]
     }
   }
-  statement {
-    effect = "Deny"
-    actions = [
-      "secretsmanager:GetSecretValue",
-    ]
-    resources = ["*"]
-    principals {
-      type        = "*"
-      identifiers = ["*"]
-    }
-    condition {
-      # only allow certain IAM roles to access the secrets
-      test     = "StringNotLike"
-      variable = "aws:PrincipalARN"
-      values = [
-        "arn:aws:iam::${data.aws_caller_identity.current.id}:role/MemberInfrastructureAccess",
-        "arn:aws:iam::${data.aws_caller_identity.current.id}:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-developer_*"
-      ]
-    }
-    condition {
-      # only allow certain IAM users to access their secret, and CICD to access all
-      test     = "StringNotLike"
-      variable = "aws:userid"
-      values = [
-        "*:${each.value}@digital.justice.gov.uk",                       # specific user
-        "${data.aws_iam_role.member_infrastructure_access.unique_id}:*" # terraform CICD role
-      ]
-    }
-  }
 }
