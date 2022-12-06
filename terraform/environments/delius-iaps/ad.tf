@@ -2,7 +2,7 @@
 # Define local vars that are used in a few placed
 ##
 locals {
-  domain_full_name = "${local.application_name}-${local.environment}.local"
+  domain_full_name  = "${local.application_name}-${local.environment}.local"
   domain_short_name = "${replace(local.application_name, "delius-", "")}-${local.environment}" # Form "iaps-development" from "delius-iaps-development" because we need <= 15 chars for NETBIOS name 
   domain_dns_ips    = sort(aws_directory_service_directory.active_directory.dns_ip_addresses)
 }
@@ -12,7 +12,7 @@ locals {
 ##
 resource "aws_directory_service_directory" "active_directory" {
   name        = local.domain_full_name
-  short_name  = local.domain_short_name 
+  short_name  = local.domain_short_name
   description = "Microsoft AD for ${local.domain_full_name}"
 
   type    = "MicrosoftAD"
