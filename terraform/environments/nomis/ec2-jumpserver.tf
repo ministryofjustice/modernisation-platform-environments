@@ -159,7 +159,7 @@ resource "aws_iam_policy" "jumpserver_users" {
   tags = merge(
     local.tags,
     {
-      Name = aws_iam_policy.jumpserver_users.name
+      Name = "read-access-to-secrets"
     }
   )
 }
