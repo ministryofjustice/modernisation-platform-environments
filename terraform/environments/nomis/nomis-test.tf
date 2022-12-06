@@ -91,7 +91,6 @@ locals {
         }
       }
 
-      # DSOS-1602
       t3-nomis-db-1 = {
         tags = {
           server-type         = "nomis-db"
@@ -100,7 +99,7 @@ locals {
           monitored           = false
           instance-scheduling = "skip-scheduling"
         }
-        ami_name  = "nomis_rhel_7_9_oracledb_11_2_*"
+        ami_name = "nomis_rhel_7_9_oracledb_11_2_*"
         instance = {
           disable_api_termination = true
         }
