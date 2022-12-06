@@ -133,6 +133,10 @@ data "aws_iam_policy_document" "jumpserver_users" {
       "secretsmanager:DescribeSecret",
       "secretsmanager:ListSecretVersionIds",
     ]
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
     resources = [
       "arn:aws:secretsmanager:${local.region}:${data.aws_caller_identity.current.id}:secret:${local.secret_prefix}/*"
     ]
