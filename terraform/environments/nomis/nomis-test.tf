@@ -95,7 +95,7 @@ locals {
       t3-nomis-db-1 = {
         tags = {
           server-type         = "nomis-db"
-          description         = "T3 NOMIS database"
+          description         = "T1 NOMIS Audit database to replace Azure T1PDL0010"
           oracle-sids         = "T1CNMAUD"
           monitored           = false
           instance-scheduling = "skip-scheduling"
@@ -120,11 +120,11 @@ locals {
           }
           data = {
             type       = "gp3"
-            total_size = 200
+            total_size = 2000
           }
           flash = {
             type       = "gp3"
-            total_size = 2
+            total_size = 500
           }
           swap = {
             type = "gp3"
