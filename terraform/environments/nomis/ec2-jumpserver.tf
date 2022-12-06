@@ -203,7 +203,9 @@ data "aws_iam_policy_document" "jumpserver_secrets" {
     effect = "Allow"
     actions = [
       "secretsmanager:GetSecretValue",
-      "secretsmanager:ListSecrets"
+      "secretsmanager:DescribeSecret",
+      "secretsmanager:ListSecretVersionIds",
+      "secretsmanager:ListSecrets",
     ]
     resources = ["*"]
     principals {
@@ -215,7 +217,6 @@ data "aws_iam_policy_document" "jumpserver_secrets" {
     effect = "Deny"
     actions = [
       "secretsmanager:GetSecretValue",
-      "secretsmanager:ListSecrets"
     ]
     resources = ["*"]
     principals {
