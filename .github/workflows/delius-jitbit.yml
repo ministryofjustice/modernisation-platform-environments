@@ -1,19 +1,19 @@
 ---
-name: mlra
+name: delius-jitbit
 on:
   push:
     branches:
       - main
     paths:
-      - 'terraform/environments/mlra/**'
-      - '.github/workflows/mlra.yml'
+      - 'terraform/environments/delius-jitbit/**'
+      - '.github/workflows/delius-jitbit.yml'
   pull_request:
     branches:
       - main
     types: [opened, edited, reopened, synchronize]
     paths:
-      - 'terraform/environments/mlra/**'
-      - '.github/workflows/mlra.yml'
+      - 'terraform/environments/delius-jitbit/**'
+      - '.github/workflows/delius-jitbit.yml'
   workflow_dispatch:
 env:
   TF_IN_AUTOMATION: true
@@ -33,7 +33,7 @@ jobs:
       matrix:
         include:
           - environment: development
-          - environment: test
+          #- environment: test
     name: Plan - ${{  matrix.environment }}
     runs-on: ubuntu-latest
     if: github.ref != 'refs/heads/main' || github.event_name == 'workflow_dispatch'
@@ -71,7 +71,7 @@ jobs:
       matrix:
         include:
           - environment: development
-          - environment: test
+          #- environment: test
     name: Apply - ${{  matrix.environment }}
     runs-on: ubuntu-latest
     env:
@@ -102,7 +102,7 @@ jobs:
           terraform -chdir="terraform/environments/${GITHUB_WORKFLOW}" workspace select "${GITHUB_WORKFLOW}-${TF_ENV}"
           bash scripts/terraform-apply.sh terraform/environments/$GITHUB_WORKFLOW
 
- # Plan + deploy for pre-production and production environments, only from main
+#  # Plan + deploy for pre-production and production environments, only from main
   plan-preprod-prod:
     strategy:
       matrix:
