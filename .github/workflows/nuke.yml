@@ -1,47 +1,60 @@
 ---
-name: Nuke
+name: awsnuke
 on:
-  schedule:
-    # * is a special character in YAML so you have to quote this string
-    # trigger every sunday at 10:00am
-    - cron: '0 10 * * 0'
+  # schedule:
+  #   # * is a special character in YAML so you have to quote this string
+  #   # trigger every sunday at 12:00am
+  #   - cron: '0 12 * * 0'
   workflow_dispatch:
 env:
-  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_REGION: "eu-west-2"
+  ENVIRONMENT_MANAGEMENT: ${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}
+  # NUKE_DO_NOT_RECREATE_ENVIRONMENTS: performance-hub-development,example-development,testing-test-development,
   TF_IN_AUTOMATION: true
+permissions:
+  id-token: write # This is required for requesting the JWT
+  contents: read # This is required for actions/checkout
 defaults:
   run:
     shell: bash
 
-permissions:
-  contents: read
-
 jobs:
 
   nuke:
-    name: Nuke
+    strategy:
+      fail-fast: false
+      matrix:
+        # current content of nuke list: {"COOKER_DEVELOPMENT_ACCID","SPRINKLER_DEVELOPMENT_ACCID","EXAMPLE_DEVELOPMENT_ACCID","TESTING_TEST_DEVELOPMENT_ACCID,"DELIUS_IAPS_DEVELOPMENT_ACCID"}
+        # matrix values are contents of that list minus accounts in the exclusion list defined in NUKE_DO_NOT_RECREATE_ENVIRONMENTS.
+        dev_accts: [analytical-platform-data,apex,ccms-ebs,cooker,data-and-insights-wepi,delius-iaps,delius-jitbit,digital-prison-reporting,equip,example,maatdb,mi-platform,mlra,nomis,oasys,performance-hub,ppud,refer-monitor,sprinkler,tariff,threat-and-vulnerability-mgmt,xhibit-portal]
+    name: Redeploy after nuke
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
         uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
-      - name: Load and Configure Terraform
-        uses: hashicorp/setup-terraform@633666f66e0061ca3b725c73b2ec20cd13a8fdd1 # v2.0.3
+      - name: Check Account Configuration
+        run: echo "ACCOUNT_ENV=$(curl -s https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/$ACCOUNT_NAME.json | jq -r '.|select( .["account-type"] == "member" )|.environments[]|select(.name == "development")|select(.access[].level=="sandbox" and .access[].nuke!="exclude").name')" >> $GITHUB_ENV
+      - name: Set Account Number
+        run: echo "ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}-${ACCOUNT_ENV}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)" >> $GITHUB_ENV
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@67fbcbb121271f7775d2e7715933280b06314838 # v1.7.0
         with:
-          terraform_version: "~1"
-          terraform_wrapper: false
-      - name: Install AWS Nuke
-        run: |
-          echo "BEGIN: Install AWS Nuke"
-          mkdir -p $HOME/bin
-          wget -c "https://github.com/rebuy-de/aws-nuke/releases/download/${AWS_NUKE_VERSION}/aws-nuke-${AWS_NUKE_VERSION}-linux-amd64.tar.gz" -O - | tar -xz -C $HOME/bin
-          mv "$HOME/bin/aws-nuke-${AWS_NUKE_VERSION}-linux-amd64" $HOME/bin/aws-nuke
-          chmod +x $HOME/bin/aws-nuke
-          echo "END: Install AWS Nuke"
-        env:
-          AWS_NUKE_VERSION: v2.19.0
-      - name: Nuke
-        run: |
-          echo "BEGIN: Nuke"
-          bash scripts/nuke.sh
-          echo "END: Nuke"
+          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
+          role-session-name: githubactionsrolesession
+          aws-region: ${{ env.AWS_REGION }}
+      # - name: Load and Configure Terraform
+      #   uses: hashicorp/setup-terraform@633666f66e0061ca3b725c73b2ec20cd13a8fdd1 # v2.0.3
+      #   with:
+      #     terraform_version: "~1"
+      #     terraform_wrapper: false
+      # - name: Apply after nuke - ${{ matrix.nuke_accts }}
+      #   run: |
+      #     terraform --version
+      #     echo "Terraform apply - ${ACCOUNT_NAME}"
+      #     bash scripts/terraform-init.sh terraform/environments/$ACCOUNT_NAME
+      #     terraform -chdir="terraform/environments/${ACCOUNT_NAME}" workspace select "${ACCOUNT_NAME}-development"
+      #     bash scripts/terraform-apply.sh terraform/environments/$ACCOUNT_NAME
+      - name: debug
+        run: echo "${ACCOUNT_NAME}-${ACCOUNT_ENV}"
+    env:
+      ACCOUNT_NAME: ${{ matrix.dev_accts }}
