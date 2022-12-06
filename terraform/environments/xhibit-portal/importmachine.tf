@@ -12,25 +12,26 @@ resource "aws_security_group" "importmachine" {
   }
 
   ingress {
-    description      = "from all"
+    description      = "PRTG lb to importmachine"
     from_port        = 0
     to_port          = 0
     protocol         = "-1"
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
+    security_group_id =  [aws_security_group.importmachine.id]
+    source_security_group_id = [aws_security_group.prtg_lb.id]
+}
 
   }
 
   egress {
-    description      = "allow all"
+    description      = "from importmachine to PRTG lb"
     from_port        = 0
     to_port          = 0
     protocol         = "-1"
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
+    security_group_id =  [aws_security_group.importmachine.id]
+    source_security_group_id = [aws_security_group.prtg_lb.id]
   }
 
-}
+
 
 resource "aws_key_pair" "george" {
   key_name   = "george"
