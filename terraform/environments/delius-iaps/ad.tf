@@ -3,7 +3,7 @@
 ##
 locals {
   domain_full_name  = "${local.application_name}-${local.environment}.local"
-  domain_short_name = "${replace(local.application_name, "delius-", "")}${local.environment}" # Form "iaps-development" from "delius-iaps-development" because we need <= 15 chars for NETBIOS name 
+  domain_short_name = "${replace(local.application_name, "delius-", "")}-${local.application_data.accounts[local.environment].short_environment_name}" # e.g. form "iaps-dev" because we need <= 15 chars for NETBIOS name 
   domain_dns_ips    = sort(aws_directory_service_directory.active_directory.dns_ip_addresses)
 }
 
