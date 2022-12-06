@@ -165,7 +165,7 @@ locals {
           desired_capacity = 1
           warm_pool        = null
         }
-        offpeak_desired_capacity = 0
+        offpeak_desired_capacity = 1
       }
     }
 
@@ -208,9 +208,10 @@ locals {
           }
         }
         autoscaling_group = {
-          desired_capacity = 2
+          desired_capacity = 1
         }
-        ami_name = "nomis_rhel_6_10_baseimage*"
+        offpeak_desired_capacity = 1
+        ami_name                 = "nomis_rhel_6_10_baseimage*"
         # branch   = var.BRANCH_NAME # comment in if testing ansible
       }
       t1-ndh-app = {
