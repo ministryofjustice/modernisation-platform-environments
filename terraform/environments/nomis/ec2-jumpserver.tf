@@ -66,7 +66,7 @@ module "ec2_jumpserver" {
   })
 
   iam_resource_names_prefix = "ec2-jumpserver"
-  instance_profile_policies = local.ec2_common_managed_policies
+  instance_profile_policies = concat(local.ec2_common_managed_policies, [aws_iam_policy.jumpserver_users.arn])
   business_unit             = local.vpc_name
   application_name          = local.application_name
   environment               = local.environment
@@ -120,6 +120,50 @@ resource "aws_security_group" "jumpserver-windows" {
 #------
 # Jumpserver specific
 #------
+
+# IAM policy permissions to enable jumpserver to list secrets and get user passwords from secret manager
+data "aws_iam_policy_document" "jumpserver_users" {
+
+  # Allow getting secrets
+  statement {
+    sid    = "AllowGetSecret"
+    effect = "Allow"
+    actions = [
+      "secretsmanager:GetSecretValue",
+      "secretsmanager:DescribeSecret",
+      "secretsmanager:ListSecretVersionIds",
+    ]
+    resources = [
+      "arn:aws:secretsmanager:${local.region}:${data.aws_caller_identity.current.id}:secret:${local.secret_prefix}/*"
+    ]
+  }
+  # Allow listing of secrets
+  statement {
+    sid    = "AllowListSecrets"
+    effect = "Allow"
+    actions = [
+      "secretsmanager:ListSecrets",
+    ]
+    resources = [
+      "*"
+    ]
+  }
+}
+
+# IAM policy for jumpserver_users
+resource "aws_iam_policy" "jumpserver_users" {
+  name        = "read-access-to-secrets"
+  path        = "/"
+  description = "Allow jumpserver to read and list secrets"
+  policy      = data.aws_iam_policy_document.jumpserver_users.json
+  tags = merge(
+    local.tags,
+    {
+      Name = aws_iam_policy.jumpserver_users.name
+    }
+  )
+}
+
 
 # create a password for each user in data.github_team.dso_users.members
 resource "random_password" "jumpserver" {
@@ -177,13 +221,6 @@ data "aws_iam_policy_document" "jumpserver_secrets" {
     principals {
       type        = "*"
       identifiers = ["*"]
-    }
-    condition {
-      # only allow ec2 IAM role to access secret
-      test     = "StringNotEquals"
-      variable = "aws:PrincipalARN"
-      values   = [for instance in module.ec2_jumpserver : instance.ec2_role_arn]
-
     }
     condition {
       # only allow certain IAM roles to access the secrets
