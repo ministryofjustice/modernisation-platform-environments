@@ -14,6 +14,7 @@ env:
   ENVIRONMENT_MANAGEMENT: ${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}
   # NUKE_DO_NOT_RECREATE_ENVIRONMENTS: performance-hub-development,example-development,testing-test-development,
   TF_IN_AUTOMATION: true
+  NUKE_ACCOUNTS: ${{ secrets.MODERNISATION_PLATFORM_AUTONUKE }}
 permissions:
   id-token: write # This is required for requesting the JWT
   contents: read # This is required for actions/checkout
@@ -29,7 +30,8 @@ jobs:
       matrix:
         # current content of nuke list: {"COOKER_DEVELOPMENT_ACCID","SPRINKLER_DEVELOPMENT_ACCID","EXAMPLE_DEVELOPMENT_ACCID","TESTING_TEST_DEVELOPMENT_ACCID,"DELIUS_IAPS_DEVELOPMENT_ACCID"}
         # matrix values are contents of that list minus accounts in the exclusion list defined in NUKE_DO_NOT_RECREATE_ENVIRONMENTS.
-        dev_accts: [analytical-platform-data,apex,ccms-ebs,cooker,data-and-insights-wepi,delius-iaps,delius-jitbit,digital-prison-reporting,equip,example,maatdb,mi-platform,mlra,nomis,oasys,performance-hub,ppud,refer-monitor,sprinkler,tariff,threat-and-vulnerability-mgmt,xhibit-portal]
+        # dev_accts: ${{ fromJSON({[analytical-platform-data,apex,ccms-ebs,cooker,data-and-insights-wepi,delius-iaps,delius-jitbit,digital-prison-reporting,equip,example,maatdb,mi-platform,mlra,nomis,oasys,performance-hub,ppud,refer-monitor,sprinkler,tariff,threat-and-vulnerability-mgmt,xhibit-portal]}) }}
+        dev_accts: ${{ fromJSON('["analytical-platform-data","apex","delius-jitbit"]') }}
     name: Redeploy after nuke
     runs-on: ubuntu-latest
     steps:
@@ -40,6 +42,8 @@ jobs:
       - name: Set Account Number
         if: ${{ env.ACCOUNT_ENV}} != "nonmember"
         run: echo "ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}-${ACCOUNT_ENV}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)" >> $GITHUB_ENV
+      - name: Setup matrix
+        run: jq -c '.' <<< $NUKE_ACCOUNTS
       - name: configure aws credentials
         uses: aws-actions/configure-aws-credentials@67fbcbb121271f7775d2e7715933280b06314838 # v1.7.0
         if: ${{ env.ACCOUNT_ENV}} != "nonmember"
