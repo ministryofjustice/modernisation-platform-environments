@@ -1,36 +1,41 @@
-# Create Managed AD
-resource "aws_directory_service_directory" "active_directory" {
-  count = 0 # Do not try to create the AD resource, as we currently do not have required permissions
+# All commented out until we are able to deploy Microsoft managed AD
+# locals {
+#   domain_full_name = "${local.application_name}-${local.environment}.local"
+#   domain_short_name = "${replace(local.application_name, "delius-", "")}-${local.environment}" # Form "iaps-development" from "delius-iaps-development" because we need <= 15 chars for NETBIOS name 
+#   domain_dns_ips    = sort(aws_directory_service_directory.active_directory.dns_ip_addresses)
+# }
 
-  name        = "${local.application_name}-${local.environment}.local"
-  short_name  = "${replace(local.application_name, "delius-", "")}-${local.environment}" # Form "iaps-development" from "delius-iaps-development" because we need <= 15 chars for NETBIOS name 
-  description = "Microsoft AD for ${local.environment}.local"
+# # Create Managed AD
+# resource "aws_directory_service_directory" "active_directory" {
+#   name        = local.domain_full_name
+#   short_name  = local.domain_short_name 
+#   description = "Microsoft AD for ${local.domain_full_name}"
 
-  type    = "MicrosoftAD"
-  edition = "Standard"
+#   type    = "MicrosoftAD"
+#   edition = "Standard"
 
-  password   = aws_secretsmanager_secret_version.ad_password.secret_string
-  enable_sso = false
+#   password   = aws_secretsmanager_secret_version.ad_password.secret_string
+#   enable_sso = false
 
-  vpc_settings {
-    vpc_id     = data.aws_vpc.shared.id
-    subnet_ids = slice(data.aws_subnets.private-public.ids, 0, 2) # Retrieve the first 2 subnet ids - must be 2 because 2 DCs are created
-  }
+#   vpc_settings {
+#     vpc_id     = data.aws_vpc.shared.id
+#     subnet_ids = slice(data.aws_subnets.private-public.ids, 0, 2) # Retrieve the first 2 subnet ids - must be 2 because 2 DCs are created
+#   }
 
-  tags = merge(
-    local.tags,
-    {},
-  )
+#   tags = merge(
+#     local.tags,
+#     {},
+#   )
 
-  # Required as AWS does not allow you to change the Admin password post AD Create - you must destroy/recreate 
-  # When we run tf plan against an already created AD it will always show the AD needs destroy/create so we ignore
-  lifecycle {
-    ignore_changes = [
-      password
-    ]
-  }
-}
-
+#   # Required as AWS does not allow you to change the Admin password post AD Create - you must destroy/recreate 
+#   # When we run tf plan against an already created AD it will always show the AD needs destroy/create so we ignore
+#   lifecycle {
+#     ignore_changes = [
+#       password
+#     ]
+#   }
+# }
+# 
 # Set up logging for the Managed AD
 # Commented out while we wait for ability to deploy an AD instance
 # resource "aws_cloudwatch_log_group" "active_directory" {
@@ -64,4 +69,55 @@ resource "aws_directory_service_directory" "active_directory" {
 # resource "aws_directory_service_log_subscription" "active_directory" {
 #   directory_id   = aws_directory_service_directory.active_directory.id
 #   log_group_name = aws_cloudwatch_log_group.active_directory.name
+# }
+
+# Create Route53 Resolve endpoint and rule to ensure that requests to domain FQDN are forwarded to the DCs
+# resource "aws_route53_resolver_endpoint" "resolve_local_entries_using_ad_dns" {
+
+#   name      = "ForwardDomainFQDNDNSLookupsToADDNSServers"
+#   direction = "OUTBOUND"
+
+#   security_group_ids = [
+#     aws_directory_service_directory.active_directory.security_group_id
+#   ]
+
+#   ip_address {
+#     subnet_id = data.aws_subnets.private-public.ids[0]
+#   }
+
+#   ip_address {
+#     subnet_id = data.aws_subnets.private-public.ids[1]
+#   }
+
+#   tags = merge(
+#     local.tags,
+#     {},
+#   )
+# }
+
+# resource "aws_route53_resolver_rule" "r53_fwd_to_ad" {
+#   domain_name = local.domain_full_name
+#   name        = replace(local.domain_full_name, ".", "-")
+#   rule_type   = "FORWARD"
+
+#   resolver_endpoint_id = aws_route53_resolver_endpoint.resolve_local_entries_using_ad_dns.id
+
+#   target_ip {
+#     ip = local.domain_dns_ips[0]
+#   }
+
+#   target_ip {
+#     ip = local.domain_dns_ips[1]
+#   }
+
+#   tags = merge(
+#     local.tags,
+#     {},
+#   )
+# }
+
+# # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_resolver_rule_association
+# resource "aws_route53_resolver_rule_association" "vpc_r53_fwd_to_ad" {
+#   resolver_rule_id = aws_route53_resolver_rule.r53_fwd_to_ad.id
+#   vpc_id           = data.aws_vpc.shared.id
 # }
