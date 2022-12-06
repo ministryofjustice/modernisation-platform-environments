@@ -181,7 +181,7 @@ data "aws_iam_policy_document" "jumpserver_secrets" {
     condition {
       # only allow ec2 IAM role to access secret
       test     = "StringNotEquals"
-      variable = "aws:PrincipalArn"
+      variable = "aws:PrincipalARN"
       values   = [for instance in module.ec2_jumpserver : instance.ec2_role_arn]
 
     }
