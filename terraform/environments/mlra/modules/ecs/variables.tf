@@ -133,3 +133,24 @@ variable "vpc_all" {
   type        = string
   description = "The full name of the VPC (including environment) used to create resources"
 }
+
+variable "ec2_scaling_cpu_threshold" {
+  type        = string
+  description = "The cpu threshold for ec2 cluster scaling"
+}
+
+variable "ec2_scaling_mem_threshold" {
+  type        = string
+  description = "The utilised memory threshold for ec2 cluster scaling"
+}
+
+variable "ecs_scaling_cpu_threshold" {
+  type        = string
+  description = "The cpu threshold for ecs cluster scaling"
+}
+
+variable "ecs_scaling_mem_threshold" {
+  type        = string
+  description = "The utilised memory threshold for ec2 cluster scaling"
+}
+
