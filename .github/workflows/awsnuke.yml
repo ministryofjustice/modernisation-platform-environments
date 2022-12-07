@@ -48,8 +48,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        nuke_accts: ${{ fromJSON(needs.setup-prerequisites.outputs.matrix) }}
-        # nuke_accts: [cooker-development,sprinkler-development]
+        # nuke_accts: ${{ fromJSON(needs.setup-prerequisites.outputs.matrix) }}
+        nuke_accts: [cooker-development,sprinkler-development]
     name: Redeploy after nuke
     runs-on: ubuntu-latest
     needs: setup-prerequisites
@@ -83,6 +83,21 @@ jobs:
           export accounts_str="$ACCOUNTS_STR"
           cat scripts/nuke-config-template.txt | envsubst > nuke-config.yml
           cat nuke-config.yml
+      - name: Nuke
+        run: |
+          assume_role_json=$(aws sts assume-role --role-arn "arn:aws:iam::${ACCOUNT_NUBER}:role/MemberInfrastructureAccess" --role-session-name "${ACCOUNT_NAME}_SESSION" 2>&1)
+          if [[ "$assume_role_json" != *"Credentials"* ]]; then
+            echo "ERROR: while trying to assume-role: ${assume_role_json}"
+            echo "ERROR: Executing the command: aws sts assume-role --role-arn \"arn:aws:iam::${ACCOUNT_NUBER}:role/MemberInfrastructureAccess\" --role-session-name \"${ACCOUNT_NAME}_SESSION\""
+          else
+            aws_env_vars_export=$(echo "$assume_role_json" | jq -r '.Credentials | "export AWS_ACCESS_KEY_ID=\(.AccessKeyId)\nexport AWS_SECRET_ACCESS_KEY=\(.SecretAccessKey)\nexport AWS_SESSION_TOKEN=\(.SessionToken)\n"')
+            eval "$aws_env_vars_export" || exit_code=$?
+            $HOME/bin/aws-nuke --access-key-id "$AWS_ACCESS_KEY_ID" \
+              --secret-access-key "$AWS_SECRET_ACCESS_KEY" \
+              --session-token "$AWS_SESSION_TOKEN" \
+              --config nuke-config.yml \
+              --force
+              # --no-dry-run || exit_code=$?
       # - name: Load and Configure Terraform
       #   uses: hashicorp/setup-terraform@633666f66e0061ca3b725c73b2ec20cd13a8fdd1 # v2.0.3
       #   with:
