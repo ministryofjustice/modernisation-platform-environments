@@ -56,28 +56,24 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
-      # - name: Configure Blocklist
-      #   run: |
-      #     account_blocklist_str=''
-      #     while read -r account_alias _; do
-      #     account_blocklist_str+="  - \"${account_alias}\" # ${account_alias}"
-      #     account_blocklist_str+=$'\n'
-      #     done <<< "$(jq -c -r '.[]' <<< $NUKE_BLOCKLIST_ACCOUNTS)" # Taking this approach as piping (|) to a read opens a subshell and passes the variables to it by value
-      #     echo "Account string: ${account_blocklist_str}"
-      #     echo "BLOCKLIST<<EOF" >> $GITHUB_ENV
-      #     echo "$account_blocklist_str" >> $GITHUB_ENV
-      #     echo "EOF" >> $GITHUB_ENV
       - name: Set Account Number
         run: echo "ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)" >> $GITHUB_ENV
-      - name: Setup matrix
-        run: jq '.' <<< $NUKE_ACCOUNTS
       - name: configure aws credentials
         uses: aws-actions/configure-aws-credentials@67fbcbb121271f7775d2e7715933280b06314838 # v1.7.0
-        if: ${{ env.ACCOUNT_ENV}} != "nonmember"
         with:
           role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
           role-session-name: githubactionsrolesession
           aws-region: ${{ env.AWS_REGION }}
+      - name: Setup Nuke Account String
+        run: |
+          accounts_str=''
+          accounts_str+="  \"${ACCOUNT_NUMBER}\": # ${ACCOUNT_NAME}"
+          accounts_str+=$'\n'
+          accounts_str+="    presets:"
+          accounts_str+=$'\n'
+          accounts_str+="      - \"common\""
+          accounts_str+=$'\n'
+          echo "$accounts_str"
       # - name: Load and Configure Terraform
       #   uses: hashicorp/setup-terraform@633666f66e0061ca3b725c73b2ec20cd13a8fdd1 # v2.0.3
       #   with:
@@ -92,9 +88,7 @@ jobs:
       #     bash scripts/terraform-apply.sh terraform/environments/$ACCOUNT_NAME
       - name: debug
         run: echo "${ACCOUNT_NAME}"
-      - name: debug-blocklist-env
-        run: echo "${{ env.BLOCKLIST }}"
-      - name: debug-blockist-output
-        run: echo "${{ needs.setup-prerequisites.outputs.account_blocklist_str }}"
+      # - name: debug-blockist-output
+      #   run: echo "${{ needs.setup-prerequisites.outputs.account_blocklist_str }}"
     env:
       ACCOUNT_NAME: ${{ matrix.nuke_accts }}
