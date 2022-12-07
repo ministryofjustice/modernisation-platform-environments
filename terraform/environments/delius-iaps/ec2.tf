@@ -1,3 +1,16 @@
+##
+# Local vars for ec2
+##
+locals {
+  ec2_tags = merge(local.tags, {
+    Name = lower(format("%s-%s", local.application_name, local.environment))
+    }
+  )
+}
+
+##
+# Data
+## 
 data "aws_ami" "windows2022" {
   most_recent = true
 
@@ -14,11 +27,14 @@ data "aws_ami" "windows2022" {
   owners = ["801119661308"] # AWS
 }
 
+##
+# Resources
+##
 resource "aws_key_pair" "ec2-user" {
   key_name   = "ec2-user"
   public_key = file(".ssh/${terraform.workspace}/ec2-user.pub")
   tags = merge(
-    local.tags,
+    local.ec2_tags,
     {
       Name = "ec2-user"
     }
@@ -29,9 +45,7 @@ resource "aws_security_group" "iaps" {
   name        = lower(format("%s-%s", local.application_name, local.environment))
   description = "Controls access to IAPS EC2 instance"
   vpc_id      = data.aws_vpc.shared.id
-  tags = merge(local.tags,
-    { Name = lower(format("%s-%s", local.application_name, local.environment)) }
-  )
+  tags        = local.ec2_tags
 }
 
 resource "aws_security_group_rule" "ingress_traffic" {
@@ -86,7 +100,7 @@ resource "aws_iam_role" "iaps_ec2_role" {
     policy = data.aws_iam_policy_document.iaps_ec2_policy.json
   }
   tags = merge(
-    local.tags,
+    local.ec2_tags,
     {
       Name = "iaps_ec2_role"
     },
@@ -105,6 +119,76 @@ data "template_file" "iaps_ec2_config" {
   }
 }
 
+resource "aws_launch_template" "iaps_instance_launch_template" {
+  # Basic options
+  name                   = "iaps-launch-template"
+  image_id               = data.aws_ami.windows2022.id
+  instance_type          = local.application_data.accounts[local.environment].ec2_iaps_instance_type
+  key_name               = aws_key_pair.ec2-user.key_name
+  vpc_security_group_ids = [aws_security_group.iaps.id]
+  user_data              = data.template_file.iaps_ec2_config.rendered
+
+  iam_instance_profile {
+    name = aws_iam_instance_profile.iaps_ec2_profile.id
+  }
+
+
+  # Monitoring
+  monitoring {
+    enabled = true
+  }
+  metadata_options {
+    http_endpoint = "enabled"
+    http_tokens   = "required"
+  }
+
+  # Storage
+  ebs_optimized = true
+  block_device_mappings {
+    device_name = "/dev/sda1"
+    ebs {
+      volume_type           = "gp3"
+      volume_size           = 50
+      encrypted             = true
+      delete_on_termination = true
+    }
+  }
+
+  # Tags
+  dynamic "tag_specifications" {
+    for_each = toset(local.application_data.launch_template_tag_resource_types)
+    content {
+      resource_type = tag_specifications.key # relevant resources in this use case (see https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/launch_template#tag_specifications)
+      tags          = local.ec2_tags
+    }
+  }
+}
+
+resource "aws_autoscaling_group" "iaps_instance_asg" {
+  name_prefix               = "iaps-instance-"
+  min_size                  = 1
+  max_size                  = 1
+  desired_capacity          = 1
+  vpc_zone_identifier       = data.aws_subnets.private-public.ids
+  health_check_grace_period = 300
+  health_check_type         = "EC2"
+  launch_template {
+    id      = aws_launch_template.iaps_instance_launch_template.id
+    version = "$Latest"
+  }
+  dynamic "tag" {
+    for_each = local.ec2_tags
+    content {
+      key                 = tag.key
+      value               = tag.value
+      propagate_at_launch = true
+    }
+
+  }
+}
+
+
+# To be removed when ASG deployed and proven
 resource "aws_instance" "iaps" {
   ami                    = data.aws_ami.windows2022.id
   instance_type          = local.application_data.accounts[local.environment].ec2_iaps_instance_type
@@ -128,8 +212,6 @@ resource "aws_instance" "iaps" {
     encrypted   = true
   }
 
-  tags = merge(local.tags,
-    { Name = lower(format("%s-%s", local.application_name, local.environment)) }
-  )
+  tags       = local.ec2_tags
   depends_on = [aws_security_group.iaps]
 }
