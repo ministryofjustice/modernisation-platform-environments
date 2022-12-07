@@ -27,7 +27,11 @@
       "ec2_scaling_cpu_threshold": 75,
       "ec2_scaling_mem_threshold": 61,
       "ecs_scaling_cpu_threshold": 80,
-      "ecs_scaling_mem_threshold": 80
+      "ecs_scaling_mem_threshold": 80,
+      "mp_vpc_id": "vpc-06febffe7b87ab37f",
+      "lz_vpc_cidr": "10.202.0.0/20",
+      "mp_laa_int_endpoint_security_group": "sg-0754d9a309704addd",
+      "mp_private_2a_subnet_id": "subnet-06594eda5221bd3c9"
     },
     "test": {
       "example_var": "test-data",
