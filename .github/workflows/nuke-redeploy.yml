@@ -53,7 +53,7 @@ jobs:
       - name: Apply after nuke - ${{ matrix.nuke_accts }}
         run: |
           terraform --version
-          echo "Terraform apply - ${ACCOUNT_NAME%-development}"
+          echo "Terraform apply - ${ACCOUNT_NAME%-development}" # removes the -development suffix in order to get the directory name
           bash scripts/terraform-init.sh terraform/environments/${ACCOUNT_NAME%-development}
           terraform -chdir="terraform/environments/${ACCOUNT_NAME%-development}" workspace select "${ACCOUNT_NAME}"
           bash scripts/terraform-apply.sh terraform/environments/${ACCOUNT_NAME%-development}
