@@ -16,7 +16,8 @@ resource "aws_resourcegroups_group" "oracle" {
           {
             "Key": "environment-name",
             "Values": [
-              "nomis-development"
+              "nomis-development",
+              "nomis-test"
             ]
           },
           {
