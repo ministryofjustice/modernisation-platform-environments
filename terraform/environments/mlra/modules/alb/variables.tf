@@ -54,6 +54,10 @@ variable "ingress_cidr_block" {
   type        = string
   description = "The cidr block for the lb ingress rules"
 }
+variable "lz_workspace_ingress_cidr" {
+  type        = string
+  description = "The cidr block for direct access from workspaces to the app via nlb ip"
+}
 variable "listener_port" {
   type        = string
   description = "The port number for the ALB Listener"

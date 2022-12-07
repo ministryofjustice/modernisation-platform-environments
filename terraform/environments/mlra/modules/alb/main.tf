@@ -27,6 +27,14 @@ locals {
       cidr_blocks     = [var.ingress_cidr_block]
       security_groups = []
     }
+    "lb_workspace_ingress" = {
+      description     = "Loadbalancer ingress rule"
+      from_port       = var.security_group_ingress_from_port
+      to_port         = var.security_group_ingress_to_port
+      protocol        = var.security_group_ingress_protocol
+      cidr_blocks     = [var.lz_workspace_ingress_cidr]
+      security_groups = []
+    }
   }
   loadbalancer_egress_rules = {
     "lb_egress" = {
