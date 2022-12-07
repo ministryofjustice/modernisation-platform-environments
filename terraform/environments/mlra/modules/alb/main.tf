@@ -28,7 +28,7 @@ locals {
       security_groups = []
     }
     "lb_workspace_ingress" = {
-      description     = "Loadbalancer ingress rule"
+      description     = "LB workspace ingress rule"
       from_port       = var.security_group_ingress_from_port
       to_port         = var.security_group_ingress_to_port
       protocol        = var.security_group_ingress_protocol
