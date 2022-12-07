@@ -54,7 +54,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu_utilization" {
 # SNS topic for monitoring to send alarms to
 resource "aws_sns_topic" "nomis_alarms" {
   name              = "nomis_alarms"
-  kms_master_key_id = data.aws_kms_key.sns.id
+  # kms_master_key_id = data.aws_kms_key.sns.id
 }
 
 ## Pager duty integration
