@@ -62,5 +62,6 @@
       "protocol": "TCP",
       "destination_cidr": "0.0.0.0/0"
     }
-  }
+  },
+  "launch_template_tag_resource_types": ["instance", "volume", "network-interface"]
 }
