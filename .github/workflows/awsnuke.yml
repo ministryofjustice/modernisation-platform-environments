@@ -15,6 +15,7 @@ env:
   # NUKE_DO_NOT_RECREATE_ENVIRONMENTS: performance-hub-development,example-development,testing-test-development,
   TF_IN_AUTOMATION: true
   NUKE_ACCOUNTS: ${{ secrets.MODERNISATION_PLATFORM_AUTONUKE }}
+  NUKE_BLOCKLIST_ACCOUNTS: ${{ secrets.MODERNISATION_PLATFORM_AUTONUKE_BLOCKLIST }}
 permissions:
   id-token: write # This is required for requesting the JWT
   contents: read # This is required for actions/checkout
@@ -23,28 +24,50 @@ defaults:
     shell: bash
 
 jobs:
-  setup-matrix:
+  setup-prerequisites:
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
+      account_blocklist_str : ${{ steps.set-blocklist-string.outputs.account_blocklist_str }}
     steps:
       - id: set-matrix
         run: echo "matrix=$(jq -c '.| map(select(. !="testing-test"))|sort' <<< $NUKE_ACCOUNTS)" >> $GITHUB_OUTPUT
+      - id: set-blocklist-string
+        run: |
+          account_blocklist_str=''
+          while read -r account_alias _; do
+          account_number=$(jq -r -e --arg account_name "$account_alias" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)
+          account_blocklist_str+="  - \"${account_number}\" # ${account_alias}"
+          account_blocklist_str+=$'\n'
+          done <<< "$(jq -c -r '.[]' <<< $NUKE_BLOCKLIST_ACCOUNTS)" # Taking this approach as piping (|) to a read opens a subshell and passes the variables to it by value
+          # Passing multi-line string output:
+          echo "account_blocklist_str<<EOF" >> $GITHUB_OUTPUT
+          echo "$account_blocklist_str" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
   nuke:
     strategy:
       fail-fast: false
       matrix:
-        nuke_accts: ${{ fromJSON(needs.setup-matrix.outputs.matrix) }}
+        nuke_accts: ${{ fromJSON(needs.setup-prerequisites.outputs.matrix) }}
+        # nuke_accts: [cooker-development,sprinkler-development]
     name: Redeploy after nuke
     runs-on: ubuntu-latest
-    needs: setup-matrix
+    needs: setup-prerequisites
     steps:
       - name: Checkout Repository
         uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
-      - name: Check Account Configuration
-        run: echo "ACCOUNT_ENV=$(curl -s https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/$ACCOUNT_NAME.json | jq -r '.|select( .["account-type"] == "member" )|.environments[]|select(.name == "development")|select(.access[].level=="sandbox" and .access[].nuke!="exclude").name // "nonmember"')" >> $GITHUB_ENV
+      # - name: Configure Blocklist
+      #   run: |
+      #     account_blocklist_str=''
+      #     while read -r account_alias _; do
+      #     account_blocklist_str+="  - \"${account_alias}\" # ${account_alias}"
+      #     account_blocklist_str+=$'\n'
+      #     done <<< "$(jq -c -r '.[]' <<< $NUKE_BLOCKLIST_ACCOUNTS)" # Taking this approach as piping (|) to a read opens a subshell and passes the variables to it by value
+      #     echo "Account string: ${account_blocklist_str}"
+      #     echo "BLOCKLIST<<EOF" >> $GITHUB_ENV
+      #     echo "$account_blocklist_str" >> $GITHUB_ENV
+      #     echo "EOF" >> $GITHUB_ENV
       - name: Set Account Number
-        if: ${{ env.ACCOUNT_ENV}} != "nonmember"
         run: echo "ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)" >> $GITHUB_ENV
       - name: Setup matrix
         run: jq '.' <<< $NUKE_ACCOUNTS
@@ -69,5 +92,9 @@ jobs:
       #     bash scripts/terraform-apply.sh terraform/environments/$ACCOUNT_NAME
       - name: debug
         run: echo "${ACCOUNT_NAME}"
+      - name: debug-blocklist-env
+        run: echo "${{ env.BLOCKLIST }}"
+      - name: debug-blockist-output
+        run: echo "${{ needs.setup-prerequisites.outputs.account_blocklist_str }}"
     env:
-      ACCOUNT_NAME: ${{ matrix.dev_accts }}
+      ACCOUNT_NAME: ${{ matrix.nuke_accts }}
