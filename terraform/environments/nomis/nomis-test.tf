@@ -155,6 +155,7 @@ locals {
         tags = {
           oracle-db-hostname = "db.CNOMT1.nomis.hmpps-test.modernisation-platform.internal"
           oracle-sid         = "CNOMT1"
+          oracle-db-name     = "CNOMT1"
         }
         ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2022-11-02T00-00-24.828Z"
         # branch = var.BRANCH_NAME # comment in if testing ansible
@@ -198,7 +199,8 @@ locals {
           oracle-db-name     = "CNOMT1"
         }
         instance = {
-          instance_type                = "t2.medium"
+          # set to large for weblogic testing
+          instance_type                = "t2.large"
           metadata_options_http_tokens = "optional"
         }
         ebs_volumes = {
@@ -208,9 +210,9 @@ locals {
           }
         }
         autoscaling_group = {
-          desired_capacity = 1
+          desired_capacity = 2
         }
-        offpeak_desired_capacity = 1
+        offpeak_desired_capacity = 2
         ami_name                 = "nomis_rhel_6_10_baseimage*"
         # branch   = var.BRANCH_NAME # comment in if testing ansible
       }
