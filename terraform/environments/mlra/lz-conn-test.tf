@@ -84,7 +84,7 @@ module "httptest_sg" {
       protocol    = "tcp"
       description = "HTTPS For SSM Session Manager"
       # source_security_group_id = "sg-0754d9a309704addd" # laa interface endpoint security group in core-vpc-development
-      source_security_group_id = local.application_data.accounts.production.mp_laa_int_endpoint_security_group
+      source_security_group_id = local.application_data.accounts[local.environment].mp_laa_int_endpoint_security_group
     }
   ]
 }
