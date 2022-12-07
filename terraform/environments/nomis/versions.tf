@@ -14,7 +14,7 @@ terraform {
       version = "~> 4.28.0"
       source  = "integrations/github"
     }
-    random_password = {
+    random = {
       version = "3.4.3"
       source  = "hashicorp/random"
     }
