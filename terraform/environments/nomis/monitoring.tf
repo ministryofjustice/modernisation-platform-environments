@@ -1,9 +1,10 @@
 
-# TODO: make this a lot more specific
+# Restricts monitoring to nomis-production environment and monitored instances only
 data "aws_instances" "nomis" {
-  # instance_tags = {
-  #  name = "value" 
-  # }
+  instance_tags = {
+    environment = "nomis-production"
+    monitored   = true 
+  }
   instance_state_names = ["running"]
 }
 
