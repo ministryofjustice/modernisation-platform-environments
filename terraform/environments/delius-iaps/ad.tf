@@ -115,10 +115,10 @@ resource "aws_route53_resolver_endpoint" "resolve_local_entries_using_ad_dns" {
     }
   }
 
-  tags = merge(
-    local.tags,
-    {},
-  )
+  # tags = merge(
+  #   local.tags,
+  #   {},
+  # )
 }
 
 resource "aws_route53_resolver_rule" "r53_fwd_to_ad" {
