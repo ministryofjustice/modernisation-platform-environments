@@ -82,13 +82,15 @@ data "aws_iam_policy_document" "iaps_ec2_assume_role_policy" {
 
 data "aws_iam_policy_document" "iaps_ec2_policy" {
   statement {
+    sid       = "BucketPermissions"
     actions   = ["s3:ListBucket"]
-    resources = ["arn:aws:s3:::iaps-artifacts-*"]
+    resources = ["arn:aws:s3:::${local.artefact_bucket_name}"]
   }
 
   statement {
+    sid       = "ObjectPermissions"
     actions   = ["s3:GetObject"]
-    resources = ["arn:aws:s3:::iaps-artifacts-*/*"]
+    resources = ["arn:aws:s3:::${local.artefact_bucket_name}/*"]
   }
 }
 
@@ -97,6 +99,7 @@ resource "aws_iam_role" "iaps_ec2_role" {
   assume_role_policy  = data.aws_iam_policy_document.iaps_ec2_assume_role_policy.json
   managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"]
   inline_policy {
+    name   = "IapsEc2Policy"
     policy = data.aws_iam_policy_document.iaps_ec2_policy.json
   }
   tags = merge(
