@@ -115,7 +115,7 @@ resource "aws_route53_resolver_endpoint" "resolve_local_entries_using_ad_dns" {
     }
   }
 
-# Removing tags temporarily due to identity-based policy permission error
+  # Removing tags temporarily due to identity-based policy permission error
   # tags = {
   #   Name = "${replace(local.domain_full_name, ".", "-")}"
   # }
@@ -137,7 +137,7 @@ resource "aws_route53_resolver_rule" "r53_fwd_to_ad" {
     }
   }
 
-# Removing tags temporarily due to identity-based policy permission error
+  # Removing tags temporarily due to identity-based policy permission error
   # tags = {
   #   Name = "${replace(local.domain_full_name, ".", "-")}"
   # }
