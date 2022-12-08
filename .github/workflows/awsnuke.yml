@@ -2,17 +2,22 @@
 name: awsnuke
 on:
   push:
+    paths:
+      - '.github/workflows/awsnuke.yml'
+  pull_request:
     branches:
-      - 'feature/refactor-nuke'
-  # schedule:
-  #   # * is a special character in YAML so you have to quote this string
-  #   # trigger every sunday at 12:00am
-  #   - cron: '0 12 * * 0'
+      - main
+    types: [opened, edited, reopened, synchronize]
+    paths:
+      - '.github/workflows/awsnuke.yml'
+  schedule:
+    # * is a special character in YAML so you have to quote this string
+    # trigger every sunday at 12:00am
+    - cron: '0 12 * * 0'
   workflow_dispatch:
 env:
   AWS_REGION: "eu-west-2"
   ENVIRONMENT_MANAGEMENT: ${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}
-  # NUKE_DO_NOT_RECREATE_ENVIRONMENTS: performance-hub-development,example-development,testing-test-development,
   TF_IN_AUTOMATION: true
   NUKE_ACCOUNTS: ${{ secrets.MODERNISATION_PLATFORM_AUTONUKE }}
   NUKE_BLOCKLIST_ACCOUNTS: ${{ secrets.MODERNISATION_PLATFORM_AUTONUKE_BLOCKLIST }}
@@ -106,7 +111,7 @@ jobs:
             --force
             # --no-dry-run || exit_code=$?
       - name: Nuke Apply (-no-dry-run)
-        if: ${{ github.event_name == 'schedule' }} || ${{ github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'}}
+        if: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') }}
         run: |
           $HOME/bin/aws-nuke --access-key-id "$AWS_ACCESS_KEY_ID" \
             --secret-access-key "$AWS_SECRET_ACCESS_KEY" \
