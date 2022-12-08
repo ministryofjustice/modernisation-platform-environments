@@ -18,6 +18,7 @@ module "alb" {
   security_group_ingress_to_port   = 80
   security_group_ingress_protocol  = "tcp"
   ingress_cidr_block               = local.application_data.accounts[local.environment].lz_vpc_cidr
+  lz_workspace_ingress_cidr        = local.application_data.accounts[local.environment].lz_workspace_ingress_cidr
 
   listener_protocol = "HTTP"
   listener_port     = 80
