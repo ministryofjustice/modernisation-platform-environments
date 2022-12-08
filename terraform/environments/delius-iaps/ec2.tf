@@ -129,12 +129,11 @@ resource "aws_launch_template" "iaps_instance_launch_template" {
   instance_type          = local.application_data.accounts[local.environment].ec2_iaps_instance_type
   key_name               = aws_key_pair.ec2-user.key_name
   vpc_security_group_ids = [aws_security_group.iaps.id]
-  user_data              = data.template_file.iaps_ec2_config.rendered
+  user_data              = base64encode(data.template_file.iaps_ec2_config.rendered)
 
   iam_instance_profile {
     name = aws_iam_instance_profile.iaps_ec2_profile.id
   }
-
 
   # Monitoring
   monitoring {
@@ -188,33 +187,4 @@ resource "aws_autoscaling_group" "iaps_instance_asg" {
     }
 
   }
-}
-
-
-# To be removed when ASG deployed and proven
-resource "aws_instance" "iaps" {
-  ami                    = data.aws_ami.windows2022.id
-  instance_type          = local.application_data.accounts[local.environment].ec2_iaps_instance_type
-  vpc_security_group_ids = [aws_security_group.iaps.id]
-  subnet_id              = data.aws_subnet.private_subnets_a.id
-  monitoring             = true
-  ebs_optimized          = true
-  key_name               = aws_key_pair.ec2-user.key_name
-  iam_instance_profile   = aws_iam_instance_profile.iaps_ec2_profile.id
-
-  user_data = data.template_file.iaps_ec2_config.rendered
-
-  metadata_options {
-    http_endpoint = "enabled"
-    http_tokens   = "required"
-  }
-  # Increase the volume size of the root volume
-  root_block_device {
-    volume_type = "gp3"
-    volume_size = 50
-    encrypted   = true
-  }
-
-  tags       = local.ec2_tags
-  depends_on = [aws_security_group.iaps]
 }
