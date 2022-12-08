@@ -63,5 +63,17 @@
       "destination_cidr": "0.0.0.0/0"
     }
   },
+  "dns_endpoint_egress_rules": {
+    "TCP_53": {
+      "from_port": 53,
+      "to_port": 53,
+      "protocol": "TCP"
+    },
+    "UDP_53": {
+      "from_port": 53,
+      "to_port": 53,
+      "protocol": "UDP"
+    }
+  },
   "launch_template_tag_resource_types": ["instance", "volume", "network-interface"]
 }

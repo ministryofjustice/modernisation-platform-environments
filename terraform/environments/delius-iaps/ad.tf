@@ -77,23 +77,42 @@ resource "aws_directory_service_log_subscription" "active_directory" {
 }
 
 ##
-#  Create Route53 Resolve endpoint and rule to ensure that requests to domain FQDN are forwarded to the DCs
+#  Create Route53 Resolve endpoint, rule and security group to ensure that requests to domain FQDN are forwarded to the DCs
 ##
-resource "aws_route53_resolver_endpoint" "resolve_local_entries_using_ad_dns" {
+resource "aws_security_group" "iaps_ad_dns_resolver_security_group" {
+  provider = aws.core-vpc
 
-  name      = "ForwardDomainFQDNDNSLookupsToADDNSServers"
+  name        = "DNS resolver for ${local.domain_full_name}"
+  description = "Security Group for DNS resolver requests relating to ${local.domain_full_name}"
+  vpc_id      = data.aws_vpc.shared.id
+}
+
+resource "aws_security_group_rule" "iaps_ad_dns_resolver_security_group_rule_egress" {
+  provider = aws.core-vpc
+
+  for_each          = local.application_data.dns_endpoint_egress_rules
+  description       = format("VPC to DNS Endpoint traffic for %s %d", each.value.protocol, each.value.from_port)
+  from_port         = each.value.from_port
+  protocol          = each.value.protocol
+  security_group_id = aws_security_group.iaps_ad_dns_resolver_security_group.id
+  to_port           = each.value.to_port
+  type              = "egress"
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+}
+resource "aws_route53_resolver_endpoint" "resolve_local_entries_using_ad_dns" {
+  provider = aws.core-vpc
+
+  name      = replace(local.domain_full_name, ".", "-")
   direction = "OUTBOUND"
 
   security_group_ids = [
-    aws_directory_service_directory.active_directory.security_group_id
+    aws_security_group.iaps_ad_dns_resolver_security_group.id
   ]
-
-  ip_address {
-    subnet_id = data.aws_subnets.private-public.ids[0]
-  }
-
-  ip_address {
-    subnet_id = data.aws_subnets.private-public.ids[1]
+  dynamic "ip_address" {
+    for_each = data.aws_subnets.private-public.ids
+    content {
+      subnet_id = ip_address.value
+    }
   }
 
   tags = merge(
@@ -103,18 +122,19 @@ resource "aws_route53_resolver_endpoint" "resolve_local_entries_using_ad_dns" {
 }
 
 resource "aws_route53_resolver_rule" "r53_fwd_to_ad" {
+  provider = aws.core-vpc
+
   domain_name = local.domain_full_name
   name        = replace(local.domain_full_name, ".", "-")
   rule_type   = "FORWARD"
 
   resolver_endpoint_id = aws_route53_resolver_endpoint.resolve_local_entries_using_ad_dns.id
 
-  target_ip {
-    ip = local.domain_dns_ips[0]
-  }
-
-  target_ip {
-    ip = local.domain_dns_ips[1]
+  dynamic "target_ip" {
+    for_each = local.domain_dns_ips
+    content {
+      ip = target_ip.value
+    }
   }
 
   tags = merge(
@@ -124,6 +144,8 @@ resource "aws_route53_resolver_rule" "r53_fwd_to_ad" {
 }
 
 resource "aws_route53_resolver_rule_association" "vpc_r53_fwd_to_ad" {
+  provider = aws.core-vpc
+
   resolver_rule_id = aws_route53_resolver_rule.r53_fwd_to_ad.id
   vpc_id           = data.aws_vpc.shared.id
 }
