@@ -42,7 +42,7 @@ jobs:
       - id: set-blocklist-string
         name: Set Up Blocklist
         run: |
-          account_blocklist_str=''
+          account_blocklist_str=""
           while read -r account_alias _; do
           account_number=$(jq -r -e --arg account_name "$account_alias" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)
           account_blocklist_str+="  - \"${account_number}\" # ${account_alias}"
