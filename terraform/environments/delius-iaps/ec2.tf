@@ -48,8 +48,8 @@ resource "aws_security_group" "iaps" {
   tags        = local.ec2_tags
 }
 
-resource "aws_security_group_rule" "ingress_traffic" {
-  for_each          = local.application_data.iaps_sg_ingress_rules
+resource "aws_security_group_rule" "ingress_traffic_vpc" {
+  for_each          = local.application_data.iaps_sg_ingress_rules_vpc
   description       = format("Traffic for %s %d", each.value.protocol, each.value.from_port)
   from_port         = each.value.from_port
   protocol          = each.value.protocol
@@ -59,8 +59,8 @@ resource "aws_security_group_rule" "ingress_traffic" {
   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
 }
 
-resource "aws_security_group_rule" "egress_traffic" {
-  for_each          = local.application_data.iaps_sg_egress_rules
+resource "aws_security_group_rule" "egress_traffic_cidr" {
+  for_each          = local.application_data.iaps_sg_egress_rules_cidr
   description       = format("Outbound traffic for %s %d", each.value.protocol, each.value.from_port)
   from_port         = each.value.from_port
   protocol          = each.value.protocol
@@ -68,6 +68,17 @@ resource "aws_security_group_rule" "egress_traffic" {
   to_port           = each.value.to_port
   type              = "egress"
   cidr_blocks       = [each.value.destination_cidr]
+}
+
+resource "aws_security_group_rule" "egress_traffic_ad" {
+  for_each                 = local.application_data.iaps_sg_egress_rules_ad
+  description              = format("Outbound traffic for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.iaps.id
+  to_port                  = each.value.to_port
+  type                     = "egress"
+  source_security_group_id = aws_directory_service_directory.active_directory.security_group_id
 }
 
 data "aws_iam_policy_document" "iaps_ec2_assume_role_policy" {
