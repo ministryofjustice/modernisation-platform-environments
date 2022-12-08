@@ -2,6 +2,8 @@
 name: awsnuke
 on:
   push:
+    branches:
+      - main
     paths:
       - '.github/workflows/awsnuke.yml'
   pull_request:
