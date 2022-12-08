@@ -54,8 +54,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # nuke_accts: ${{ fromJSON(needs.setup-prerequisites.outputs.matrix) }}
-        nuke_accts: [cooker-development,sprinkler-development]
+        nuke_accts: ${{ fromJSON(needs.setup-prerequisites.outputs.matrix) }}
     name: Sandbox Nuke
     permissions:
       id-token: write # This is required for requesting the JWT
