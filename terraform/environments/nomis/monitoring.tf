@@ -1,6 +1,10 @@
+
+# TODO: make this a lot more specific
 data "aws_instances" "nomis" {
-  # instance_state_names = ["running"]
-  # TODO: make this a lot more specific
+  # instance_tags = {
+  #  name = "value" 
+  # }
+  instance_state_names = ["running"]
 }
 
 # Status and Instance Health Check Alarm
