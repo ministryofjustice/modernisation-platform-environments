@@ -1,6 +1,17 @@
 ---
 name: Redeploy after nuke
 on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/nuke-redeploy.yml'
+  pull_request:
+    branches:
+      - main
+    types: [opened, edited, reopened, synchronize]
+    paths:
+      - '.github/workflows/nuke-redeploy.yml'
   schedule:
     # * is a special character in YAML so you have to quote this string
     # trigger every sunday at 12:00am
@@ -11,9 +22,9 @@ env:
   ENVIRONMENT_MANAGEMENT: ${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}
   NUKE_REDEPLOY_ACCOUNTS: ${{ secrets.MODERNISATION_PLATFORM_AUTONUKE_REBUILD }}
   TF_IN_AUTOMATION: true
-permissions:
-  id-token: write # This is required for requesting the JWT
-  contents: read # This is required for actions/checkout
+
+permissions: {}
+
 defaults:
   run:
     shell: bash
@@ -27,6 +38,9 @@ jobs:
       - id: set-matrix
         run: echo "matrix=$(jq -c '.|sort' <<< $NUKE_REDEPLOY_ACCOUNTS)" >> $GITHUB_OUTPUT
   redeploy-after-nuke:
+    permissions:
+      id-token: write # This is required for requesting the JWT
+      contents: read # This is required for actions/checkout
     strategy:
       fail-fast: false
       matrix:
@@ -50,7 +64,15 @@ jobs:
         with:
           terraform_version: "~1"
           terraform_wrapper: false
+      - name: Plan after nuke - ${{ matrix.nuke_accts }}
+        run: |
+          terraform --version
+          echo "Terraform Plan - ${ACCOUNT_NAME%-development}" # removes the -development suffix in order to get the directory name
+          bash scripts/terraform-init.sh terraform/environments/${ACCOUNT_NAME%-development}
+          terraform -chdir="terraform/environments/${ACCOUNT_NAME%-development}" workspace select "${ACCOUNT_NAME}"
+          bash scripts/terraform-plan.sh terraform/environments/${ACCOUNT_NAME%-development}
       - name: Apply after nuke - ${{ matrix.nuke_accts }}
+        if: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') }}
         run: |
           terraform --version
           echo "Terraform apply - ${ACCOUNT_NAME%-development}" # removes the -development suffix in order to get the directory name
