@@ -12,7 +12,7 @@
 
 resource "aws_cloudwatch_metric_alarm" "status_and_instance_health_check" {
   # for_each            = toset(data.aws_instances.nomis.ids)
-  alarm_name          = "status_and_instance_health_check_${each.value}"
+  alarm_name          = "status_and_instance_health_check"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "1"
   metric_name         = "StatusCheckFailed"
@@ -34,7 +34,7 @@ resource "aws_cloudwatch_metric_alarm" "status_and_instance_health_check" {
 
 resource "aws_cloudwatch_metric_alarm" "cpu_utilization" {
   # for_each            = toset(data.aws_instances.nomis.ids)
-  alarm_name          = "cpu_utilization_${each.value}"
+  alarm_name          = "cpu_utilization"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "2"
   metric_name         = "CPUUtilization"
