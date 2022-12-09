@@ -7,8 +7,11 @@ data "http" "environments_file" {
   url = "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/${local.application_name}.json"
 }
 
-# Get session information from OIDC provider
+data "github_team" "dso_users" {
+  slug = "studio-webops"
+}
 
+# Get session information from OIDC provider
 data "aws_caller_identity" "oidc_session" {
   provider = aws.oidc-session
 }
@@ -21,6 +24,10 @@ data "aws_vpc" "shared_vpc" {
   }
 }
 
+data "aws_kms_key" "general_shared" {
+  key_id = "arn:aws:kms:eu-west-2:${local.environment_management.account_ids["core-shared-services-production"]}:alias/general-${var.networking[0].business-unit}"
+}
+
 data "aws_iam_session_context" "whoami" {
   provider = aws.oidc-session
   arn      = data.aws_caller_identity.oidc_session.arn
@@ -29,6 +36,7 @@ data "aws_iam_session_context" "whoami" {
 locals {
 
   # Stores modernisation platform account id for setting up the modernisation-platform provider
+  secret_prefix = "/Jumpserver/Users"
 
   modernisation_platform_account_id = data.aws_ssm_parameter.modernisation_platform_account_id.value
 
