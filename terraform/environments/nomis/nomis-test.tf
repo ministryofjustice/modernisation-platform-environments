@@ -160,6 +160,6 @@ locals {
     }
 
     ec2_test_instances = {}
-    ec2_jumpservers = {}
+    ec2_jumpservers    = {}
   }
 }
