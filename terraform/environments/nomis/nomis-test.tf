@@ -159,8 +159,7 @@ locals {
       }
     }
 
-    ec2_test_instances = {
-    }
-    ec2_jumpserver_autoscaling_groups = {}
+    ec2_test_instances = {}
+    ec2_jumpservers    = {}
   }
 }
