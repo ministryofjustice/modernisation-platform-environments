@@ -87,6 +87,7 @@ module "ec2_jumpserver" {
 # Common Security Group for Jumpserver Instances
 #------------------------------------------------------------------------------
 
+# checkov:skip=CKV2_AWS_5:This is added via the module
 resource "aws_security_group" "jumpserver-windows" {
   description = "Configure Windows jumpserver egress"
   name        = "jumpserver-windows-${local.application_name}"
@@ -174,6 +175,7 @@ resource "random_password" "jumpserver" {
 }
 
 # create empty secret in secret manager
+# checkov:skip=CKV_AWS_149:coming back to this in DSOS-1587
 resource "aws_secretsmanager_secret" "jumpserver" {
   for_each = toset(data.github_team.dso_users.members)
   name     = "${local.secret_prefix}/${each.value}"
@@ -196,6 +198,7 @@ resource "aws_secretsmanager_secret_version" "jumpserver" {
 }
 
 # resource policy to restrict access to secret value to specific user and the CICD role used to deploy terraform
+# checkov:skip=CKV_AWS_108:This is necessary, so just skip it
 data "aws_iam_policy_document" "jumpserver_secrets" {
   for_each = toset(data.github_team.dso_users.members)
 
