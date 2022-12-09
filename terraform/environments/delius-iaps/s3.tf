@@ -2,21 +2,21 @@ data "aws_iam_policy_document" "iaps_s3_policy" {
   statement {
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::*:role/iaps_ec2_role"]
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/iaps_ec2_role"]
     }
     actions   = ["s3:GetObject"]
-    resources = ["*"]
+    resources = ["arn:aws:s3:::${local.artefact_bucket_name}/*"]
   }
 }
 
 module "s3_bucket" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.2.0"
-  count  = 0
+
   providers = {
     aws.bucket-replication = aws
   }
 
-  bucket_prefix      = "iaps-artifacts-"
+  bucket_name        = local.artefact_bucket_name
   versioning_enabled = true
 
   lifecycle_rule = [
