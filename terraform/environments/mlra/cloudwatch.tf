@@ -1,8 +1,3 @@
-#Get Pagerduty keys from modplatform
-locals {
-  pagerduty_integration_keys = jsondecode(data.aws_secretsmanager_secret_version.pagerduty_integration_keys.secret_string)
-  sns_topic_name             = "${local.application_name}-${local.environment}-alerting-topic"
-}
 
 data "aws_secretsmanager_secret" "pagerduty_integration_keys" {
   provider = aws.modernisation-platform
