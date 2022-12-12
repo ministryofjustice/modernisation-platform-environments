@@ -27,7 +27,10 @@ locals {
     ebs_volumes_copy_all_from_ami = false
 
     ebs_volumes = {
-      "/dev/sda1" = {}
+      "/dev/sda1" = {
+        type = "gp3"
+        size = "100"
+      }
     }
 
     user_data_raw = base64encode(templatefile("./templates/jumpserver-user-data.yaml", { SECRET_PREFIX = local.secret_prefix, S3_BUCKET = module.s3-bucket.bucket.id }))
