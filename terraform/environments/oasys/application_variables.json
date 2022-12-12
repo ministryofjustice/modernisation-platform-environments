@@ -1,6 +1,8 @@
 {
   "accounts": {
-    "development": {},
+    "development": {
+      "db_monitoring_interval": "0"
+    },
     "test": {
       "db_name": "OASDB",
       "db_auto_minor_version_upgrade": "true",
@@ -20,10 +22,10 @@
       "db_skip_final_snapshot": "true"
     },
     "preproduction": {
-      "example_var": "preproduction-data"
+      "db_monitoring_interval": "0"
     },
     "production": {
-      "example_var": "production-data"
+      "db_monitoring_interval": "0"
     }
   }
 }
