@@ -1,5 +1,6 @@
 resource "aws_db_instance" "oasys" {
-  count          = try(local.application_data.accounts[local.environment].db_name, null) != null ? 1 : 0
+  # count          = try(local.application_data.accounts[local.environment].db_name, null) != null ? 1 : 0
+  count          = 0
   engine         = "oracle-ee"
   engine_version = "19.0.0.0.ru-2022-10.rur-2022-10.r1"
   license_model  = "bring-your-own-license"
