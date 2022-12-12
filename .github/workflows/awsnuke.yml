@@ -1,0 +1,204 @@
+---
+name: awsnuke
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/awsnuke.yml'
+  pull_request:
+    branches:
+      - main
+    types: [opened, edited, reopened, synchronize]
+    paths:
+      - '.github/workflows/awsnuke.yml'
+  schedule:
+    # * is a special character in YAML so you have to quote this string
+    # trigger every sunday at 12:00am
+    - cron: '0 12 * * 0'
+  workflow_dispatch:
+env:
+  AWS_REGION: "eu-west-2"
+  ENVIRONMENT_MANAGEMENT: ${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}
+  TF_IN_AUTOMATION: true
+  NUKE_ACCOUNTS: ${{ secrets.MODERNISATION_PLATFORM_AUTONUKE }}
+  NUKE_BLOCKLIST_ACCOUNTS: ${{ secrets.MODERNISATION_PLATFORM_AUTONUKE_BLOCKLIST }}
+permissions: {}
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  setup-prerequisites:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+      account_blocklist_str : ${{ steps.set-blocklist-string.outputs.account_blocklist_str }}
+    steps:
+      - id: set-matrix
+        name: Set Up Matrix
+        run: echo "matrix=$(jq -c '.| map(select(. !="testing-test"))|sort' <<< $NUKE_ACCOUNTS)" >> $GITHUB_OUTPUT
+      - id: set-blocklist-string
+        name: Set Up Blocklist
+        run: |
+          account_blocklist_str=""
+          while read -r account_alias _; do
+          account_number=$(jq -r -e --arg account_name "$account_alias" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)
+          account_blocklist_str+="  - \"${account_number}\" # ${account_alias}"
+          account_blocklist_str+=$'\n'
+          done <<< "$(jq -c -r '.[]' <<< $NUKE_BLOCKLIST_ACCOUNTS)" # Taking this approach as piping (|) to a read opens a subshell and passes the variables to it by value
+          # Encoding and passing blocklist string as an output
+          echo "account_blocklist_str=$(echo -n "${account_blocklist_str}" | base64 -w 0)" >> $GITHUB_OUTPUT
+  nuke:
+    strategy:
+      fail-fast: false
+      matrix:
+        nuke_accts: ${{ fromJSON(needs.setup-prerequisites.outputs.matrix) }}
+    name: Sandbox Nuke
+    permissions:
+      id-token: write # This is required for requesting the JWT
+      contents: read # This is required for actions/checkout
+    runs-on: ubuntu-latest
+    needs: setup-prerequisites
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+      - name: Set Account Number
+        run: echo "ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)" >> $GITHUB_ENV
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@67fbcbb121271f7775d2e7715933280b06314838 # v1.7.0
+        with:
+          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
+          role-session-name: githubactionsrolesession
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Setup Nuke Account String
+        run: |
+          accounts_str=''
+          accounts_str+="  \"${ACCOUNT_NUMBER}\": # ${ACCOUNT_NAME}"
+          accounts_str+=$'\n'
+          accounts_str+="    presets:"
+          accounts_str+=$'\n'
+          accounts_str+="      - \"common\""
+          accounts_str+=$'\n'
+          echo "$accounts_str"
+          echo "ACCOUNTS_STR<<EOF" >> $GITHUB_ENV
+          echo "$accounts_str" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+      - name: Setup Nuke Config
+        run: |
+          export accounts_str="$ACCOUNTS_STR"
+          export account_blocklist_str=$(echo "${{ needs.setup-prerequisites.outputs.account_blocklist_str }}" | base64 --decode)
+          cat scripts/nuke-config-template.txt | envsubst > nuke-config.yml
+      - name: Install AWS Nuke
+        run: |
+          echo "BEGIN: Install AWS Nuke"
+          mkdir -p $HOME/bin
+          wget -c "https://github.com/rebuy-de/aws-nuke/releases/download/${AWS_NUKE_VERSION}/aws-nuke-${AWS_NUKE_VERSION}-linux-amd64.tar.gz" -O - | tar -xz -C $HOME/bin
+          mv "$HOME/bin/aws-nuke-${AWS_NUKE_VERSION}-linux-amd64" $HOME/bin/aws-nuke
+          chmod +x $HOME/bin/aws-nuke
+          echo "END: Install AWS Nuke"
+        env:
+          AWS_NUKE_VERSION: v2.19.0
+      - name: Nuke Plan (Dry Run)
+        run: |
+          aws sts assume-role --role-arn "arn:aws:iam::${ACCOUNT_NUMBER}:role/MemberInfrastructureAccess" --role-session-name githubactionsgotestrolesession > creds
+          $(echo "export AWS_ACCESS_KEY_ID=$(echo $(cat creds) | sed -n 's/.*"AccessKeyId": "\([^"]*\)".*/\1/p')")
+          $(echo "export AWS_SECRET_ACCESS_KEY=$(echo $(cat creds) | sed -n 's/.*"SecretAccessKey": "\([^"]*\)".*/\1/p')")
+          $(echo "export AWS_SESSION_TOKEN=$(echo $(cat creds) | sed -n 's/.*"SessionToken": "\([^"]*\)".*/\1/p')")
+          grep "MemberInfrastructureAccess" <<< $(aws sts get-caller-identity) || { echo 'Failed to assume role' ; exit 1; }
+          $HOME/bin/aws-nuke --access-key-id "$AWS_ACCESS_KEY_ID" \
+            --secret-access-key "$AWS_SECRET_ACCESS_KEY" \
+            --session-token "$AWS_SESSION_TOKEN" \
+            --config nuke-config.yml \
+            --force
+      - name: Nuke Apply (-no-dry-run)
+        if: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') }}
+        run: |
+          # The environment gets reset between steps, so the role needs to be re-assumed.
+          aws sts assume-role --role-arn "arn:aws:iam::${ACCOUNT_NUMBER}:role/MemberInfrastructureAccess" --role-session-name githubactionsgotestrolesession > creds
+          $(echo "export AWS_ACCESS_KEY_ID=$(echo $(cat creds) | sed -n 's/.*"AccessKeyId": "\([^"]*\)".*/\1/p')")
+          $(echo "export AWS_SECRET_ACCESS_KEY=$(echo $(cat creds) | sed -n 's/.*"SecretAccessKey": "\([^"]*\)".*/\1/p')")
+          $(echo "export AWS_SESSION_TOKEN=$(echo $(cat creds) | sed -n 's/.*"SessionToken": "\([^"]*\)".*/\1/p')")
+          grep "MemberInfrastructureAccess" <<< $(aws sts get-caller-identity) || { echo 'Failed to assume role' ; exit 1; }
+          $HOME/bin/aws-nuke --access-key-id "$AWS_ACCESS_KEY_ID" \
+            --secret-access-key "$AWS_SECRET_ACCESS_KEY" \
+            --session-token "$AWS_SESSION_TOKEN" \
+            --config nuke-config.yml \
+            --force \
+            --no-dry-run
+    env:
+      ACCOUNT_NAME: ${{ matrix.nuke_accts }}
+
+  # testing-test account is not set up with OIDC because it is used to terratest OIDC-related resources. Therefore it's handled as a special case
+  # using testing-ci user static credentials.
+  nuke-testing-test:
+    name: Sandbox Nuke (testing-test)
+    permissions:
+      contents: read # This is required for actions/checkout
+    runs-on: ubuntu-latest
+    needs: setup-prerequisites
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+      - name: Set Account Number
+        run: echo "ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)" >> $GITHUB_ENV
+      - name: Setup Nuke Account String
+        run: |
+          accounts_str=''
+          accounts_str+="  \"${ACCOUNT_NUMBER}\": # ${ACCOUNT_NAME}"
+          accounts_str+=$'\n'
+          accounts_str+="    presets:"
+          accounts_str+=$'\n'
+          accounts_str+="      - \"common\""
+          accounts_str+=$'\n'
+          echo "$accounts_str"
+          echo "ACCOUNTS_STR<<EOF" >> $GITHUB_ENV
+          echo "$accounts_str" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+      - name: Setup Nuke Config
+        run: |
+          export accounts_str="$ACCOUNTS_STR"
+          export account_blocklist_str=$(echo "${{ needs.setup-prerequisites.outputs.account_blocklist_str }}" | base64 --decode)
+          cat scripts/nuke-config-template.txt | envsubst > nuke-config.yml
+      - name: Install AWS Nuke
+        run: |
+          echo "BEGIN: Install AWS Nuke"
+          mkdir -p $HOME/bin
+          wget -c "https://github.com/rebuy-de/aws-nuke/releases/download/${AWS_NUKE_VERSION}/aws-nuke-${AWS_NUKE_VERSION}-linux-amd64.tar.gz" -O - | tar -xz -C $HOME/bin
+          mv "$HOME/bin/aws-nuke-${AWS_NUKE_VERSION}-linux-amd64" $HOME/bin/aws-nuke
+          chmod +x $HOME/bin/aws-nuke
+          echo "END: Install AWS Nuke"
+        env:
+          AWS_NUKE_VERSION: v2.19.0
+      - name: Nuke Plan (Dry Run)
+        run: |
+          aws sts assume-role --role-arn "arn:aws:iam::${ACCOUNT_NUMBER}:role/MemberInfrastructureAccess" --role-session-name githubactionsgotestrolesession > creds
+          $(echo "export AWS_ACCESS_KEY_ID=$(echo $(cat creds) | sed -n 's/.*"AccessKeyId": "\([^"]*\)".*/\1/p')")
+          $(echo "export AWS_SECRET_ACCESS_KEY=$(echo $(cat creds) | sed -n 's/.*"SecretAccessKey": "\([^"]*\)".*/\1/p')")
+          $(echo "export AWS_SESSION_TOKEN=$(echo $(cat creds) | sed -n 's/.*"SessionToken": "\([^"]*\)".*/\1/p')")
+          grep "MemberInfrastructureAccess" <<< $(aws sts get-caller-identity) || { echo 'Failed to assume role' ; exit 1; }
+          $HOME/bin/aws-nuke --access-key-id "$AWS_ACCESS_KEY_ID" \
+            --secret-access-key "$AWS_SECRET_ACCESS_KEY" \
+            --session-token "$AWS_SESSION_TOKEN" \
+            --config nuke-config.yml \
+            --force
+      - name: Nuke Apply (-no-dry-run)
+        if: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') }}
+        run: |
+          # The environment gets reset between steps, so the AWS credentials get overwritten and the role needs to be re-assumed.
+          aws sts assume-role --role-arn "arn:aws:iam::${ACCOUNT_NUMBER}:role/MemberInfrastructureAccess" --role-session-name githubactionsgotestrolesession > creds
+          $(echo "export AWS_ACCESS_KEY_ID=$(echo $(cat creds) | sed -n 's/.*"AccessKeyId": "\([^"]*\)".*/\1/p')")
+          $(echo "export AWS_SECRET_ACCESS_KEY=$(echo $(cat creds) | sed -n 's/.*"SecretAccessKey": "\([^"]*\)".*/\1/p')")
+          $(echo "export AWS_SESSION_TOKEN=$(echo $(cat creds) | sed -n 's/.*"SessionToken": "\([^"]*\)".*/\1/p')")
+          grep "MemberInfrastructureAccess" <<< $(aws sts get-caller-identity) || { echo 'Failed to assume role' ; exit 1; }
+          $HOME/bin/aws-nuke --access-key-id "$AWS_ACCESS_KEY_ID" \
+            --secret-access-key "$AWS_SECRET_ACCESS_KEY" \
+            --session-token "$AWS_SESSION_TOKEN" \
+            --config nuke-config.yml \
+            --force \
+            --no-dry-run
+    env:
+      AWS_ACCESS_KEY_ID:  ${{ secrets.TESTING_AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY:  ${{ secrets.TESTING_AWS_SECRET_ACCESS_KEY }}
+      ACCOUNT_NAME: "testing-test"

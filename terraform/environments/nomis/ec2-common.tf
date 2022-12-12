@@ -26,8 +26,9 @@ data "aws_iam_policy_document" "ssm_custom" {
       "ssm:DescribeDocument",
       "ssm:GetDeployablePatchSnapshotForInstance",
       "ssm:GetDocument",
-      "ssm:GetParameters",
       "ssm:GetManifest",
+      "ssm:GetParameter",
+      "ssm:GetParameters",
       "ssm:ListAssociations",
       "ssm:ListInstanceAssociations",
       "ssm:PutInventory",
@@ -47,9 +48,10 @@ data "aws_iam_policy_document" "ssm_custom" {
       "ec2messages:GetMessages",
       "ec2messages:SendReply"
     ]
-    # skiping these as policy is a scoped down version of Amazon provided AmazonSSMManagedInstanceCore managed policy.  Permissions required for SSM function
+    # skipping these as policy is a scoped down version of Amazon provided AmazonSSMManagedInstanceCore managed policy.  Permissions required for SSM function
 
     #checkov:skip=CKV_AWS_111: "Ensure IAM policies does not allow write access without constraints"
+    #checkov:skip=CKV_AWS_108: "Ensure IAM policies does not allow data exfiltration"
     resources = ["*"] #tfsec:ignore:aws-iam-no-policy-wildcards
   }
 }
@@ -129,6 +131,22 @@ data "aws_iam_policy_document" "s3_bucket_access" {
     resources = [
       module.nomis-audit-archives.bucket.arn,
       "${module.nomis-audit-archives.bucket.arn}/*"
+    ]
+  }
+
+  # allow access to ec2-image-builder-nomis buckets in all accounts
+  statement {
+    sid    = "AccessToImageBuilderBucket"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:PutObjectAcl",
+      "s3:ListBucket"
+    ]
+    resources = [
+      "arn:aws:s3:::ec2-image-builder-nomis*",
+      "arn:aws:s3:::ec2-image-builder-nomis*/*"
     ]
   }
 }

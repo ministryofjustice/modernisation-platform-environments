@@ -64,41 +64,69 @@ locals {
           disable_api_termination = true
         }
         ebs_volumes = {
-          "/dev/sdb" = {       # /u01
-            iops       = 300   # Temporary. See DSOS-1561
-            throughput = 0     # Temporary. See DSOS-1561
-            type       = "gp2" # Temporary. See DSOS-1561
-            size       = 100
+          "/dev/sdb" = { # /u01
+            type = "gp3"
+            size = 100
           }
-          "/dev/sdc" = {       # /u02
-            iops       = 300   # Temporary. See DSOS-1561
-            throughput = 0     # Temporary. See DSOS-1561
-            type       = "gp2" # Temporary. See DSOS-1561
-            size       = 100
+          "/dev/sdc" = { # /u02
+            type = "gp3"
+            size = 100
           }
         }
         ebs_volume_config = {
           app = {
-            iops       = 3000  # Temporary. See DSOS-1561
-            throughput = 0     # Temporary. See DSOS-1561
-            type       = "gp2" # Temporary. See DSOS-1561
+            type = "gp3"
           }
           data = {
-            iops       = 120   # Temporary. See DSOS-1561
-            throughput = 0     # Temporary. See DSOS-1561
-            type       = "gp2" # Temporary. See DSOS-1561
+            type       = "gp3"
             total_size = 200
           }
           flash = {
-            iops       = 100   # Temporary. See DSOS-1561
-            throughput = 0     # Temporary. See DSOS-1561
-            type       = "gp2" # Temporary. See DSOS-1561
+            type       = "gp3"
             total_size = 2
           }
           swap = {
-            iops       = 100   # Temporary. See DSOS-1561
-            throughput = 0     # Temporary. See DSOS-1561
-            type       = "gp2" # Temporary. See DSOS-1561
+            type = "gp3"
+          }
+        }
+      }
+
+      t3-nomis-db-1 = {
+        tags = {
+          server-type         = "nomis-db"
+          description         = "T3 NOMIS database to replace Azure T3PDL0070"
+          oracle-sids         = "T3CNOM"
+          monitored           = false
+          instance-scheduling = "skip-scheduling"
+        }
+        ami_name = "nomis_rhel_7_9_oracledb_11_2_*"
+        instance = {
+          disable_api_termination = true
+        }
+        ebs_volumes = {
+          "/dev/sdb" = { # /u01
+            type = "gp3"
+            size = 100
+          }
+          "/dev/sdc" = { # /u02
+            type = "gp3"
+            size = 100
+          }
+        }
+        ebs_volume_config = {
+          app = {
+            type = "gp3"
+          }
+          data = {
+            type       = "gp3"
+            total_size = 2000
+          }
+          flash = {
+            type       = "gp3"
+            total_size = 500
+          }
+          swap = {
+            type = "gp3"
           }
         }
       }
@@ -131,23 +159,7 @@ locals {
       }
     }
 
-    ec2_test_instances = {
-      t1-ndh-app = {
-        tags = {
-          description = "Standalone EC2 for testing RHEL7.9 NDH App"
-          monitored   = false
-        }
-        ami_name = "nomis_rhel_7_9_baseimage_2022-11-01T13-43-46.384Z"
-        # branch   = var.BRANCH_NAME # comment in if testing ansible
-      }
-      t1-ndh-ems = {
-        tags = {
-          description = "Standalone EC2 for testing RHEL7.9 NDH EMS"
-          monitored   = false
-        }
-        ami_name = "nomis_rhel_7_9_baseimage_2022-11-01T13-43-46.384Z"
-        # branch   = var.BRANCH_NAME # comment in if testing ansible
-      }
-    }
+    ec2_test_instances = {}
+    ec2_jumpservers    = {}
   }
 }

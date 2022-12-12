@@ -108,17 +108,19 @@ data "aws_iam_policy_document" "cross-account-s3" {
       "s3:PutObject",
       "s3:PutObjectAcl",
       "s3:ListBucket"
-
     ]
 
     resources = ["${module.nomis-image-builder-bucket.bucket.arn}/*",
     module.nomis-image-builder-bucket.bucket.arn, ]
     principals {
       type = "AWS"
-      identifiers = sort([ # sort to avoid plan changes
-        "arn:aws:iam::${local.account_id}:root",
-        "arn:aws:iam::${local.environment_management.account_ids["core-shared-services-production"]}:root"
-      ])
+      identifiers = [
+        "arn:aws:iam::${local.environment_management.account_ids["core-shared-services-production"]}:root",
+        "arn:aws:iam::${local.environment_management.account_ids["nomis-development"]}:root",
+        "arn:aws:iam::${local.environment_management.account_ids["nomis-test"]}:root",
+        "arn:aws:iam::${local.environment_management.account_ids["nomis-preproduction"]}:root",
+        "arn:aws:iam::${local.environment_management.account_ids["nomis-production"]}:root"
+      ]
     }
   }
 }
@@ -173,11 +175,9 @@ module "nomis-image-builder-bucket" {
   ]
 
   tags = local.tags
-
 }
 
 #  Audit Archive dumps bucket
-
 data "aws_iam_policy_document" "nomis-all-environments-access" {
   statement {
     sid = "all-nomis-environments-access-for-archiving"
@@ -193,10 +193,12 @@ data "aws_iam_policy_document" "nomis-all-environments-access" {
     module.nomis-audit-archives.bucket.arn, ]
     principals {
       type = "AWS"
-      identifiers = sort([ # sort to avoid plan changes
+      identifiers = [
+        "arn:aws:iam::${local.environment_management.account_ids["nomis-development"]}:root",
         "arn:aws:iam::${local.environment_management.account_ids["nomis-test"]}:root",
+        "arn:aws:iam::${local.environment_management.account_ids["nomis-preproduction"]}:root",
         "arn:aws:iam::${local.environment_management.account_ids["nomis-production"]}:root"
-      ])
+      ]
     }
   }
 }

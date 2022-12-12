@@ -20,10 +20,7 @@ locals {
       vpc_security_group_ids       = [aws_security_group.ec2_test.id]
     }
 
-    ebs_volume_config = {}
-    ebs_volumes       = {}
-
-    user_data = {
+    user_data_cloud_init = {
       args = {
         lifecycle_hook_name = "ready-hook"
       }
@@ -61,6 +58,7 @@ locals {
 }
 
 module "ec2_test_instance" {
+  #checkov:skip=CKV_AWS_126:This is a test instance
   source = "./modules/ec2_instance"
 
   providers = {
@@ -74,9 +72,9 @@ module "ec2_test_instance" {
   ami_name              = each.value.ami_name
   ami_owner             = try(each.value.ami_owner, "core-shared-services-production")
   instance              = merge(local.ec2_test.instance, lookup(each.value, "instance", {}))
-  user_data             = merge(local.ec2_test.user_data, lookup(each.value, "user_data", {}))
-  ebs_volume_config     = merge(local.ec2_test.ebs_volume_config, lookup(each.value, "ebs_volume_config", {}))
-  ebs_volumes           = { for k, v in local.ec2_test.ebs_volumes : k => merge(v, try(each.value.ebs_volumes[k], {})) }
+  user_data_cloud_init  = merge(local.ec2_test.user_data_cloud_init, lookup(each.value, "user_data_cloud_init", {}))
+  ebs_volume_config     = lookup(each.value, "ebs_volume_config", {})
+  ebs_volumes           = lookup(each.value, "ebs_volumes", {})
   ssm_parameters_prefix = lookup(each.value, "ssm_parameters_prefix", "test/")
   ssm_parameters        = lookup(each.value, "ssm_parameters", null)
   route53_records       = merge(local.ec2_test.route53_records, lookup(each.value, "route53_records", {}))
@@ -113,9 +111,9 @@ module "ec2_test_autoscaling_group" {
   ami_name              = each.value.ami_name
   ami_owner             = try(each.value.ami_owner, "core-shared-services-production")
   instance              = merge(local.ec2_test.instance, lookup(each.value, "instance", {}))
-  user_data             = merge(local.ec2_test.user_data, lookup(each.value, "user_data", {}))
-  ebs_volume_config     = merge(local.ec2_test.ebs_volume_config, lookup(each.value, "ebs_volume_config", {}))
-  ebs_volumes           = { for k, v in local.ec2_test.ebs_volumes : k => merge(v, try(each.value.ebs_volumes[k], {})) }
+  user_data_cloud_init  = merge(local.ec2_test.user_data_cloud_init, lookup(each.value, "user_data_cloud_init", {}))
+  ebs_volume_config     = lookup(each.value, "ebs_volume_config", {})
+  ebs_volumes           = lookup(each.value, "ebs_volumes", {})
   ssm_parameters_prefix = lookup(each.value, "ssm_parameters_prefix", "test/")
   ssm_parameters        = lookup(each.value, "ssm_parameters", null)
   autoscaling_group     = merge(local.ec2_test.autoscaling_group, lookup(each.value, "autoscaling_group", {}))

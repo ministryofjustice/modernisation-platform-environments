@@ -8,18 +8,22 @@ resource "aws_launch_template" "this" {
   key_name                             = var.instance.key_name
   update_default_version               = true
 
+  # NOTE: ephemeral devices have an empty ebs {} block, hence the null checks
   dynamic "block_device_mappings" {
     for_each = local.ebs_volumes
     content {
-      device_name = block_device_mappings.key
+      device_name  = block_device_mappings.key
+      no_device    = lookup(block_device_mappings.value, "no_device", null)
+      virtual_name = lookup(block_device_mappings.value, "virtual_name", null)
       ebs {
-        delete_on_termination = true
-        encrypted             = true
-        kms_key_id            = data.aws_kms_key.by_alias.arn
-        iops                  = try(block_device_mappings.value.iops > 0, false) ? block_device_mappings.value.iops : null
-        throughput            = try(block_device_mappings.value.throughput > 0, false) ? block_device_mappings.value.throughput : null
-        volume_size           = block_device_mappings.value.size
-        volume_type           = block_device_mappings.value.type
+        delete_on_termination = block_device_mappings.value.type != null ? true : null
+        encrypted             = block_device_mappings.value.type != null ? true : null
+        kms_key_id            = block_device_mappings.value.type != null ? data.aws_kms_key.by_alias.arn : null
+
+        iops        = try(block_device_mappings.value.iops > 0, false) ? block_device_mappings.value.iops : null
+        throughput  = try(block_device_mappings.value.throughput > 0, false) ? block_device_mappings.value.throughput : null
+        volume_size = block_device_mappings.value.size
+        volume_type = block_device_mappings.value.type
       }
     }
   }
@@ -27,13 +31,16 @@ resource "aws_launch_template" "this" {
   iam_instance_profile {
     arn = aws_iam_instance_profile.this.arn
   }
+
   metadata_options {
-    http_endpoint = "enabled"
-    http_tokens   = try(var.instance.metadata_options_http_tokens, "required")
+    #checkov:skip=CKV_AWS_79:"We have to use version 1 in some cases"
+    http_endpoint = coalesce(var.instance.metadata_endpoint_enabled, "enabled")
+    #tfsec:ignore:aws-ec2-enforce-http-token-imds tfsec:ignore:aws-ec2-enforce-launch-config-http-token-imds
+    http_tokens = coalesce(var.instance.metadata_options_http_tokens, "required")
   }
 
   monitoring {
-    enabled = try(var.instance.monitoring, true)
+    enabled = coalesce(var.instance.monitoring, true)
   }
 
   network_interfaces {
@@ -51,7 +58,7 @@ resource "aws_launch_template" "this" {
     }
   }
 
-  user_data = length(data.cloudinit_config.this) == 0 ? null : data.cloudinit_config.this[0].rendered
+  user_data = length(data.cloudinit_config.this) == 0 ? local.user_data_raw : data.cloudinit_config.this[0].rendered
 
   tag_specifications {
     resource_type = "instance"

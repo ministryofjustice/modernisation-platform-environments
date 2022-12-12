@@ -111,5 +111,19 @@ locals {
         # branch   = var.BRANCH_NAME # comment in if testing ansible
       }
     }
+    ec2_jumpservers = {
+      jumpserver0 = {
+        ami_name = "nomis_windows_server_2022_jumpserver_2022*"
+        tags = {
+          server-type = "jumpserver"
+          description = "Jumpserver for NOMIS"
+        }
+        ebs_volumes = {}
+        autoscaling_group = {
+          min_size = 0
+          max_size = 1
+        }
+      }
+    }
   }
 }

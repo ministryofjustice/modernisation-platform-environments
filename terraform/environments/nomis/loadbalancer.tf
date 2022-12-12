@@ -97,7 +97,7 @@ resource "aws_lb" "internal" {
 # TODO: The 'load_balancer_arn' condition should be removed when testing in
 # nomis-test is complete.
 resource "aws_lb_listener" "internal" {
-  load_balancer_arn = local.environment == "test" ? module.jb_load_balancer_test[0].load_balancer.arn : aws_lb.internal.arn
+  load_balancer_arn = local.environment == "test" ? module.lb_internal_nomis[0].load_balancer.arn : aws_lb.internal.arn
   port              = "443"
   protocol          = "HTTPS"
   #checkov:skip=CKV_AWS_103:the application does not support tls 1.2
@@ -128,7 +128,7 @@ resource "aws_lb_listener" "internal_http" {
     aws_acm_certificate_validation.internal_lb
   ]
 
-  load_balancer_arn = local.environment == "test" ? module.jb_load_balancer_test[0].load_balancer.arn : aws_lb.internal.arn
+  load_balancer_arn = local.environment == "test" ? module.lb_internal_nomis[0].load_balancer.arn : aws_lb.internal.arn
   port              = "80"
   protocol          = "HTTP"
 
@@ -155,8 +155,8 @@ resource "aws_route53_record" "internal_lb" {
   type    = "A"
 
   alias {
-    name                   = local.environment == "test" ? module.jb_load_balancer_test[0].load_balancer.dns_name : aws_lb.internal.dns_name
-    zone_id                = local.environment == "test" ? module.jb_load_balancer_test[0].load_balancer.zone_id : aws_lb.internal.zone_id
+    name                   = local.environment == "test" ? module.lb_internal_nomis[0].load_balancer.dns_name : aws_lb.internal.dns_name
+    zone_id                = local.environment == "test" ? module.lb_internal_nomis[0].load_balancer.zone_id : aws_lb.internal.zone_id
     evaluate_target_health = true
   }
 }
@@ -269,8 +269,8 @@ resource "aws_route53_record" "internal_lb_az" {
   type    = "A"
 
   alias {
-    name                   = local.environment == "test" ? module.jb_load_balancer_test[0].load_balancer.dns_name : aws_lb.internal.dns_name
-    zone_id                = local.environment == "test" ? module.jb_load_balancer_test[0].load_balancer.zone_id : aws_lb.internal.zone_id
+    name                   = local.environment == "test" ? module.lb_internal_nomis[0].load_balancer.dns_name : aws_lb.internal.dns_name
+    zone_id                = local.environment == "test" ? module.lb_internal_nomis[0].load_balancer.zone_id : aws_lb.internal.zone_id
     evaluate_target_health = true
   }
 }
@@ -319,4 +319,78 @@ resource "aws_acm_certificate_validation" "internal_lb_az" {
   count                   = local.environment == "test" ? 1 : 0
   certificate_arn         = aws_acm_certificate.internal_lb_az[0].arn
   validation_record_fqdns = [for record in aws_route53_record.internal_lb_validation_az : record.fqdn]
+}
+
+# --- New load balancer ---
+module "lb_internal_nomis" {
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer.git?ref=v2.1.0"
+  count  = local.environment == "test" ? 1 : 0
+  providers = {
+    aws.bucket-replication = aws
+  }
+
+  account_number             = local.environment_management.account_ids[terraform.workspace]
+  application_name           = "int-${local.application_name}"
+  enable_deletion_protection = false
+  idle_timeout               = "60"
+  loadbalancer_egress_rules  = local.lb_internal_nomis_egress_rules
+  loadbalancer_ingress_rules = local.lb_internal_nomis_ingress_rules
+  public_subnets             = data.aws_subnets.private.ids
+  region                     = local.region
+  vpc_all                    = "${local.vpc_name}-${local.environment}"
+  force_destroy_bucket       = true
+  internal_lb                = true
+  tags = merge(
+    local.tags,
+    {
+      Name = "internal-loadbalancer"
+    },
+  )
+}
+
+locals {
+  lb_internal_nomis_egress_rules = {
+    lb_internal_nomis_egress_1 = {
+      description     = "Allow all outbound"
+      from_port       = 0
+      to_port         = 0
+      protocol        = "-1"
+      cidr_blocks     = ["0.0.0.0/0"]
+      security_groups = []
+    }
+  }
+  lb_internal_nomis_ingress_rules = {
+    lb_internal_nomis_ingress_1 = {
+      description     = "allow 443 inbound from PTTP devices"
+      from_port       = 443
+      to_port         = 443
+      protocol        = "tcp"
+      security_groups = []
+      cidr_blocks     = ["10.184.0.0/16"] # Global Protect PTTP devices
+    }
+    lb_internal_nomis_ingress_2 = {
+      description     = "allow 443 inbound from Jump Server"
+      from_port       = 443
+      to_port         = 443
+      protocol        = "tcp"
+      security_groups = [aws_security_group.jumpserver-windows.id]
+      cidr_blocks     = []
+    }
+    lb_internal_nomis_ingress_3 = {
+      description     = "allow 80 inbound from PTTP devices"
+      from_port       = 80
+      to_port         = 80
+      protocol        = "tcp"
+      security_groups = []
+      cidr_blocks     = ["10.184.0.0/16"] # Global Protect PTTP devices
+    }
+    lb_internal_nomis_ingress_4 = {
+      description     = "allow 80 inbound from Jump Server"
+      from_port       = 80
+      to_port         = 80
+      protocol        = "tcp"
+      security_groups = [aws_security_group.jumpserver-windows.id]
+      cidr_blocks     = []
+    }
+  }
 }

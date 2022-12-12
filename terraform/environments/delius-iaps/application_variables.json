@@ -1,6 +1,7 @@
 {
   "accounts": {
     "development": {
+      "short_environment_name": "dev",
       "db_auto_minor_version_upgrade": "true",
       "db_allow_major_version_upgrade": "false",
       "db_backup_window": "03:00-06:00",
@@ -15,16 +16,52 @@
       "db_monitoring_interval": "5",
       "db_enabled_cloudwatch_logs_exports": ["audit", "audit", "listener", "trace"],
       "db_performance_insights_enabled": "false",
-      "db_skip_final_snapshot": "true"
+      "db_skip_final_snapshot": "true",
+      "ec2_iaps_instance_type": "t3.medium"
     },
     "test": {
+      "short_environment_name": "test",
       "example_var": "test-data"
     },
     "preproduction": {
+      "short_environment_name": "preprod",
       "example_var": "preproduction-data"
     },
     "production": {
+      "short_environment_name": "prod",
       "example_var": "production-data"
     }
-  }
+  },
+  "iaps_sg_ingress_rules": {
+    "TCP_80": {
+      "from_port": 80,
+      "to_port": 80,
+      "protocol": "TCP"
+    },
+    "TCP_443": {
+      "from_port": 443,
+      "to_port": 443,
+      "protocol": "TCP"
+    },
+    "TCP_3389": {
+      "from_port": 3389,
+      "to_port": 3389,
+      "protocol": "TCP"
+    }
+  },
+  "iaps_sg_egress_rules": {
+    "TCP_80": {
+      "from_port": 80,
+      "to_port": 80,
+      "protocol": "TCP",
+      "destination_cidr": "0.0.0.0/0"
+    },
+    "TCP_443": {
+      "from_port": 443,
+      "to_port": 443,
+      "protocol": "TCP",
+      "destination_cidr": "0.0.0.0/0"
+    }
+  },
+  "launch_template_tag_resource_types": ["instance", "volume", "network-interface"]
 }

@@ -1,4 +1,5 @@
 ---
+# This file is consumed by the awsnuke.yml workflow
 feature-flags:
   disable-deletion-protection:
     RDSInstance: true
