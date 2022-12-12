@@ -22,6 +22,8 @@ variable "region" {
   description = ""
   default     = "eu-west-2"
 }
+
+# Change to trigger sca...
 # data "aws_iam_policy_document" "assume_policy_document" {
 #   statement {
 #     actions = [
