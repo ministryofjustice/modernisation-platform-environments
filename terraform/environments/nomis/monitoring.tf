@@ -36,12 +36,12 @@ resource "aws_cloudwatch_metric_alarm" "cpu_utilization" {
   # for_each            = toset(data.aws_instances.nomis.ids)
   alarm_name          = "cpu_utilization"
   comparison_operator = "GreaterThanOrEqualToThreshold"
-  evaluation_periods  = "2"
+  evaluation_periods  = "1"
   metric_name         = "CPUUtilization"
   namespace           = "AWS/EC2"
   period              = "60"
   statistic           = "Average"
-  threshold           = "80"
+  threshold           = "5"
   alarm_description   = "This metric monitors ec2 cpu utilization"
   alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
   /* dimensions = {
