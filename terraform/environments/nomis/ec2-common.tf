@@ -46,7 +46,8 @@ data "aws_iam_policy_document" "ssm_custom" {
       "ec2messages:FailMessage",
       "ec2messages:GetEndpoint",
       "ec2messages:GetMessages",
-      "ec2messages:SendReply"
+      "ec2messages:SendReply",
+      "autoscaling:DeleteScheduledAction"
     ]
     # skipping these as policy is a scoped down version of Amazon provided AmazonSSMManagedInstanceCore managed policy.  Permissions required for SSM function
 
@@ -164,7 +165,8 @@ data "aws_iam_policy_document" "application_insights" {
       "iam:ListRoles",
       "resource-groups:ListGroups",
       "resource-groups:CreateGroups",
-      "resource-groups:UpdateGroup"
+      "resource-groups:UpdateGroup",
+      "SNS:CreateTopic"
     ]
     resources = ["*"]
   }
