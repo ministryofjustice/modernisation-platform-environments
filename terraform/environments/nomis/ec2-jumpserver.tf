@@ -23,6 +23,13 @@ locals {
       vpc_security_group_ids       = [aws_security_group.jumpserver-windows.id]
     }
 
+    # the ami has got unwanted ephemeral devices so don't copy these
+    ebs_volumes_copy_all_from_ami = false
+
+    ebs_volumes = {
+      "/dev/sda1" = {}
+    }
+
     user_data_raw = base64encode(templatefile("./templates/jumpserver-user-data.yaml", { SECRET_PREFIX = local.secret_prefix, S3_BUCKET = module.s3-bucket.bucket.id }))
 
     autoscaling_group = {
@@ -44,16 +51,17 @@ module "ec2_jumpserver" {
 
   for_each = try(local.environment_config.ec2_jumpservers, {})
 
-  name                  = each.key
-  ami_name              = each.value.ami_name
-  ami_owner             = try(each.value.ami_owner, "core-shared-services-production")
-  instance              = merge(local.ec2_jumpserver.instance, lookup(each.value, "instance", {}))
-  user_data_raw         = local.ec2_jumpserver.user_data_raw
-  ebs_volume_config     = lookup(each.value, "ebs_volume_config", {})
-  ebs_volumes           = lookup(each.value, "ebs_volumes", {})
-  ssm_parameters_prefix = "jumpserver/"
-  ssm_parameters        = {}
-  autoscaling_group     = merge(local.ec2_jumpserver.autoscaling_group, lookup(each.value, "autoscaling_group", {}))
+  name                          = each.key
+  ami_name                      = each.value.ami_name
+  ami_owner                     = try(each.value.ami_owner, "core-shared-services-production")
+  instance                      = merge(local.ec2_jumpserver.instance, lookup(each.value, "instance", {}))
+  user_data_raw                 = local.ec2_jumpserver.user_data_raw
+  ebs_volumes_copy_all_from_ami = try(each.value.ebs_volumes_copy_all_from_ami, local.ec2_jumpserver.ebs_volumes_copy_all_from_ami)
+  ebs_volume_config             = lookup(each.value, "ebs_volume_config", {})
+  ebs_volumes                   = lookup(each.value, "ebs_volumes", local.ec2_jumpserver.ebs_volumes)
+  ssm_parameters_prefix         = "jumpserver/"
+  ssm_parameters                = {}
+  autoscaling_group             = merge(local.ec2_jumpserver.autoscaling_group, lookup(each.value, "autoscaling_group", {}))
   autoscaling_schedules = coalesce(lookup(each.value, "autoscaling_schedules", null), {
     # if sizes not set, use the values defined in autoscaling_group
     "scale_up" = {

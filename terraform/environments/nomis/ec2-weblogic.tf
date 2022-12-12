@@ -109,15 +109,16 @@ module "ec2_weblogic_autoscaling_group" {
 
   name = each.key
 
-  ami_name              = each.value.ami_name
-  ami_owner             = try(each.value.ami_owner, "core-shared-services-production")
-  instance              = merge(local.ec2_weblogic.instance, lookup(each.value, "instance", {}))
-  user_data_cloud_init  = merge(local.ec2_weblogic.user_data_cloud_init, lookup(each.value, "user_data_cloud_init", {}))
-  ebs_volume_config     = lookup(each.value, "ebs_volume_config", {})
-  ebs_volumes           = lookup(each.value, "ebs_volumes", {})
-  ssm_parameters_prefix = "weblogic/"
-  ssm_parameters        = {}
-  autoscaling_group     = merge(local.ec2_weblogic.autoscaling_group, lookup(each.value, "autoscaling_group", {}))
+  ami_name                      = each.value.ami_name
+  ami_owner                     = try(each.value.ami_owner, "core-shared-services-production")
+  instance                      = merge(local.ec2_weblogic.instance, lookup(each.value, "instance", {}))
+  user_data_cloud_init          = merge(local.ec2_weblogic.user_data_cloud_init, lookup(each.value, "user_data_cloud_init", {}))
+  ebs_volumes_copy_all_from_ami = try(each.value.ebs_volumes_copy_all_from_ami, true)
+  ebs_volume_config             = lookup(each.value, "ebs_volume_config", {})
+  ebs_volumes                   = lookup(each.value, "ebs_volumes", {})
+  ssm_parameters_prefix         = "weblogic/"
+  ssm_parameters                = {}
+  autoscaling_group             = merge(local.ec2_weblogic.autoscaling_group, lookup(each.value, "autoscaling_group", {}))
   autoscaling_schedules = coalesce(lookup(each.value, "autoscaling_schedules", null), {
     # if sizes not set, use the values defined in autoscaling_group
     "scale_up" = {

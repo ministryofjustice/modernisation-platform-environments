@@ -131,6 +131,12 @@ variable "user_data_cloud_init" {
   default = null
 }
 
+variable "ebs_volumes_copy_all_from_ami" {
+  description = "If true, ensure all volumes in AMI are also present in EC2.  If false, only create volumes specified in ebs_volumes var"
+  type        = bool
+  default     = true
+}
+
 variable "ebs_volume_config" {
   description = "EC2 volume configurations, where key is a label, e.g. flash, which is assigned to the disk in ebs_volumes.  All disks with same label have the same configuration.  If not specified, use values from the AMI.  If total_size specified, the volume size is this divided by the number of drives with the given label"
   type = map(object({

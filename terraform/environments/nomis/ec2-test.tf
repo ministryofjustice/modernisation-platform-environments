@@ -69,15 +69,16 @@ module "ec2_test_instance" {
 
   name = each.key
 
-  ami_name              = each.value.ami_name
-  ami_owner             = try(each.value.ami_owner, "core-shared-services-production")
-  instance              = merge(local.ec2_test.instance, lookup(each.value, "instance", {}))
-  user_data_cloud_init  = merge(local.ec2_test.user_data_cloud_init, lookup(each.value, "user_data_cloud_init", {}))
-  ebs_volume_config     = lookup(each.value, "ebs_volume_config", {})
-  ebs_volumes           = lookup(each.value, "ebs_volumes", {})
-  ssm_parameters_prefix = lookup(each.value, "ssm_parameters_prefix", "test/")
-  ssm_parameters        = lookup(each.value, "ssm_parameters", null)
-  route53_records       = merge(local.ec2_test.route53_records, lookup(each.value, "route53_records", {}))
+  ami_name                      = each.value.ami_name
+  ami_owner                     = try(each.value.ami_owner, "core-shared-services-production")
+  instance                      = merge(local.ec2_test.instance, lookup(each.value, "instance", {}))
+  user_data_cloud_init          = merge(local.ec2_test.user_data_cloud_init, lookup(each.value, "user_data_cloud_init", {}))
+  ebs_volumes_copy_all_from_ami = try(each.value.ebs_volumes_copy_all_from_ami, true)
+  ebs_volume_config             = lookup(each.value, "ebs_volume_config", {})
+  ebs_volumes                   = lookup(each.value, "ebs_volumes", {})
+  ssm_parameters_prefix         = lookup(each.value, "ssm_parameters_prefix", "test/")
+  ssm_parameters                = lookup(each.value, "ssm_parameters", null)
+  route53_records               = merge(local.ec2_test.route53_records, lookup(each.value, "route53_records", {}))
 
   iam_resource_names_prefix = "ec2-test-instance"
   instance_profile_policies = local.ec2_common_managed_policies
@@ -108,16 +109,17 @@ module "ec2_test_autoscaling_group" {
 
   name = each.key
 
-  ami_name              = each.value.ami_name
-  ami_owner             = try(each.value.ami_owner, "core-shared-services-production")
-  instance              = merge(local.ec2_test.instance, lookup(each.value, "instance", {}))
-  user_data_cloud_init  = merge(local.ec2_test.user_data_cloud_init, lookup(each.value, "user_data_cloud_init", {}))
-  ebs_volume_config     = lookup(each.value, "ebs_volume_config", {})
-  ebs_volumes           = lookup(each.value, "ebs_volumes", {})
-  ssm_parameters_prefix = lookup(each.value, "ssm_parameters_prefix", "test/")
-  ssm_parameters        = lookup(each.value, "ssm_parameters", null)
-  autoscaling_group     = merge(local.ec2_test.autoscaling_group, lookup(each.value, "autoscaling_group", {}))
-  autoscaling_schedules = coalesce(lookup(each.value, "autoscaling_schedules", null), local.ec2_test.autoscaling_schedules)
+  ami_name                      = each.value.ami_name
+  ami_owner                     = try(each.value.ami_owner, "core-shared-services-production")
+  instance                      = merge(local.ec2_test.instance, lookup(each.value, "instance", {}))
+  user_data_cloud_init          = merge(local.ec2_test.user_data_cloud_init, lookup(each.value, "user_data_cloud_init", {}))
+  ebs_volumes_copy_all_from_ami = try(each.value.ebs_volumes_copy_all_from_ami, true)
+  ebs_volume_config             = lookup(each.value, "ebs_volume_config", {})
+  ebs_volumes                   = lookup(each.value, "ebs_volumes", {})
+  ssm_parameters_prefix         = lookup(each.value, "ssm_parameters_prefix", "test/")
+  ssm_parameters                = lookup(each.value, "ssm_parameters", null)
+  autoscaling_group             = merge(local.ec2_test.autoscaling_group, lookup(each.value, "autoscaling_group", {}))
+  autoscaling_schedules         = coalesce(lookup(each.value, "autoscaling_schedules", null), local.ec2_test.autoscaling_schedules)
 
   iam_resource_names_prefix = "ec2-test-asg"
   instance_profile_policies = local.ec2_common_managed_policies
