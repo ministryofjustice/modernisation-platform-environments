@@ -1,7 +1,6 @@
 {
   "accounts": {
-    "development": {
-    },
+    "development": {},
     "test": {
       "db_name": "OASDB",
       "db_auto_minor_version_upgrade": "true",
