@@ -11,18 +11,18 @@ resource "aws_lb" "ingress-network-lb" {
   }
 }
 
-resource "aws_lb_listener" "lz-ingress" {
-  load_balancer_arn = aws_lb.ingress-network-lb.arn
-  port              = "80"
-  protocol          = "TCP"
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.alb-target.arn
-  }
-  tags = {
-    Name = "${local.application_name}-${local.environment}-lz-ingress"
-  }
-}
+# resource "aws_lb_listener" "lz-ingress" {
+#   load_balancer_arn = aws_lb.ingress-network-lb.arn
+#   port              = "80"
+#   protocol          = "TCP"
+#   default_action {
+#     type             = "forward"
+#     target_group_arn = aws_lb_target_group.alb-target.arn
+#   }
+#   tags = {
+#     Name = "${local.application_name}-${local.environment}-lz-ingress"
+#   }
+# }
 
 # resource "aws_lb_target_group" "alb-target" {
 #   name        = "alb-target"
