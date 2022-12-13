@@ -1,4 +1,4 @@
-# create application insights for nomis in nomis-development environment only (for now)
+# create application insights for EC2 instances where 'server-type' = nomis-db
 resource "aws_applicationinsights_application" "oracle" {
   resource_group_name = aws_resourcegroups_group.oracle.name
 }
