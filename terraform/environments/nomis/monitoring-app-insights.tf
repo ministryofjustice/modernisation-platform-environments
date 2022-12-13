@@ -17,13 +17,15 @@ resource "aws_resourcegroups_group" "oracle" {
             "Key": "environment-name",
             "Values": [
               "nomis-development",
-              "nomis-test"
+              "nomis-test",
+              "nomis-production",
+              "nomis-preprod"
             ]
           },
           {
-            "Key": "application",
+            "Key": "server-type",
             "Values": [
-              "nomis"
+              "nomis-db"
             ]
           }
         ]
