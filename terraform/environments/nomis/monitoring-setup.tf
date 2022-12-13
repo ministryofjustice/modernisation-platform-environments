@@ -4,7 +4,7 @@
 
 # SNS topic for monitoring to send alarms to
 resource "aws_sns_topic" "nomis_alarms" {
-  name              = "nomis_alarms"
+  name = "nomis_alarms"
 }
 
 ## Pager duty integration
