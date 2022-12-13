@@ -7,7 +7,7 @@ module "alb" {
   vpc_all                          = local.vpc_all
   application_name                 = local.application_name
   public_subnets                   = [data.aws_subnet.public_subnets_a.id, data.aws_subnet.public_subnets_b.id, data.aws_subnet.public_subnets_c.id]
-  private_subnets                   = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id, data.aws_subnet.private_subnets_c.id]
+  private_subnets                  = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id, data.aws_subnet.private_subnets_c.id]
   tags                             = local.tags
   account_number                   = local.environment_management.account_ids[terraform.workspace]
   environment                      = local.environment
