@@ -10,6 +10,7 @@ resource "aws_sns_topic" "nomis_alarms" {
 ## Pager duty integration
 
 # integration "nomis_alarms" has to be set up manually in pagerduty by the Modernisation Platform team
+# alarms will currently appear in the dso_alerts_modernisation_platform slack channel
 
 # Get the map of pagerduty integration keys from the modernisation platform account
 data "aws_secretsmanager_secret" "pagerduty_integration_keys" {
