@@ -151,12 +151,32 @@ data "aws_iam_policy_document" "s3_bucket_access" {
   }
 }
 
+# create policy document for application insights
+# this is NOT necessarily the best place to put this but it's being added here for now
+data "aws_iam_policy_document" "application_insights" {
+
+  statement {
+    sid    = "AllowApplicationInsights"
+    effect = "Allow"
+    actions = [
+      "applicationinsights:*",
+      "iam:CreateServiceLinkedRole",
+      "iam:ListRoles",
+      "resource-groups:ListGroups",
+      "resource-groups:CreateGroups",
+      "resource-groups:UpdateGroup"
+    ]
+    resources = ["*"]
+  }
+}
+
 # combine ec2-common policy documents
 data "aws_iam_policy_document" "ec2_common_combined" {
   source_policy_documents = [
     data.aws_iam_policy_document.ssm_custom.json,
     data.aws_iam_policy_document.s3_bucket_access.json,
-    data.aws_iam_policy_document.cloud_watch_custom.json
+    data.aws_iam_policy_document.cloud_watch_custom.json,
+    data.aws_iam_policy_document.application_insights.json # TODO: remove this later
   ]
 }
 
