@@ -241,6 +241,6 @@ locals {
         autoscaling_schedules = {}
       }
     }
-    ec2_jumpservers    = {}
+    ec2_jumpservers = {}
   }
 }
