@@ -63,7 +63,7 @@ jobs:
     needs: setup-prerequisites
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+        uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
       - name: Set Account Number
         run: echo "ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)" >> $GITHUB_ENV
       - name: configure aws credentials
@@ -106,7 +106,7 @@ jobs:
           $(echo "export AWS_ACCESS_KEY_ID=$(echo $(cat creds) | sed -n 's/.*"AccessKeyId": "\([^"]*\)".*/\1/p')")
           $(echo "export AWS_SECRET_ACCESS_KEY=$(echo $(cat creds) | sed -n 's/.*"SecretAccessKey": "\([^"]*\)".*/\1/p')")
           $(echo "export AWS_SESSION_TOKEN=$(echo $(cat creds) | sed -n 's/.*"SessionToken": "\([^"]*\)".*/\1/p')")
-          grep "MemberInfrastructureAccess" <<< $(aws sts get-caller-identity) || { echo 'Failed to assume role' ; exit $?; }
+          grep "MemberInfrastructureAccess" <<< $(aws sts get-caller-identity) || { echo 'Failed to assume role' ; exit 1; }
           $HOME/bin/aws-nuke --access-key-id "$AWS_ACCESS_KEY_ID" \
             --secret-access-key "$AWS_SECRET_ACCESS_KEY" \
             --session-token "$AWS_SESSION_TOKEN" \
@@ -115,6 +115,12 @@ jobs:
       - name: Nuke Apply (-no-dry-run)
         if: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') }}
         run: |
+          # The environment gets reset between steps, so the role needs to be re-assumed.
+          aws sts assume-role --role-arn "arn:aws:iam::${ACCOUNT_NUMBER}:role/MemberInfrastructureAccess" --role-session-name githubactionsgotestrolesession > creds
+          $(echo "export AWS_ACCESS_KEY_ID=$(echo $(cat creds) | sed -n 's/.*"AccessKeyId": "\([^"]*\)".*/\1/p')")
+          $(echo "export AWS_SECRET_ACCESS_KEY=$(echo $(cat creds) | sed -n 's/.*"SecretAccessKey": "\([^"]*\)".*/\1/p')")
+          $(echo "export AWS_SESSION_TOKEN=$(echo $(cat creds) | sed -n 's/.*"SessionToken": "\([^"]*\)".*/\1/p')")
+          grep "MemberInfrastructureAccess" <<< $(aws sts get-caller-identity) || { echo 'Failed to assume role' ; exit 1; }
           $HOME/bin/aws-nuke --access-key-id "$AWS_ACCESS_KEY_ID" \
             --secret-access-key "$AWS_SECRET_ACCESS_KEY" \
             --session-token "$AWS_SESSION_TOKEN" \
@@ -123,3 +129,76 @@ jobs:
             --no-dry-run
     env:
       ACCOUNT_NAME: ${{ matrix.nuke_accts }}
+
+  # testing-test account is not set up with OIDC because it is used to terratest OIDC-related resources. Therefore it's handled as a special case
+  # using testing-ci user static credentials.
+  nuke-testing-test:
+    name: Sandbox Nuke (testing-test)
+    permissions:
+      contents: read # This is required for actions/checkout
+    runs-on: ubuntu-latest
+    needs: setup-prerequisites
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
+      - name: Set Account Number
+        run: echo "ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)" >> $GITHUB_ENV
+      - name: Setup Nuke Account String
+        run: |
+          accounts_str=''
+          accounts_str+="  \"${ACCOUNT_NUMBER}\": # ${ACCOUNT_NAME}"
+          accounts_str+=$'\n'
+          accounts_str+="    presets:"
+          accounts_str+=$'\n'
+          accounts_str+="      - \"common\""
+          accounts_str+=$'\n'
+          echo "$accounts_str"
+          echo "ACCOUNTS_STR<<EOF" >> $GITHUB_ENV
+          echo "$accounts_str" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+      - name: Setup Nuke Config
+        run: |
+          export accounts_str="$ACCOUNTS_STR"
+          export account_blocklist_str=$(echo "${{ needs.setup-prerequisites.outputs.account_blocklist_str }}" | base64 --decode)
+          cat scripts/nuke-config-template.txt | envsubst > nuke-config.yml
+      - name: Install AWS Nuke
+        run: |
+          echo "BEGIN: Install AWS Nuke"
+          mkdir -p $HOME/bin
+          wget -c "https://github.com/rebuy-de/aws-nuke/releases/download/${AWS_NUKE_VERSION}/aws-nuke-${AWS_NUKE_VERSION}-linux-amd64.tar.gz" -O - | tar -xz -C $HOME/bin
+          mv "$HOME/bin/aws-nuke-${AWS_NUKE_VERSION}-linux-amd64" $HOME/bin/aws-nuke
+          chmod +x $HOME/bin/aws-nuke
+          echo "END: Install AWS Nuke"
+        env:
+          AWS_NUKE_VERSION: v2.19.0
+      - name: Nuke Plan (Dry Run)
+        run: |
+          aws sts assume-role --role-arn "arn:aws:iam::${ACCOUNT_NUMBER}:role/MemberInfrastructureAccess" --role-session-name githubactionsgotestrolesession > creds
+          $(echo "export AWS_ACCESS_KEY_ID=$(echo $(cat creds) | sed -n 's/.*"AccessKeyId": "\([^"]*\)".*/\1/p')")
+          $(echo "export AWS_SECRET_ACCESS_KEY=$(echo $(cat creds) | sed -n 's/.*"SecretAccessKey": "\([^"]*\)".*/\1/p')")
+          $(echo "export AWS_SESSION_TOKEN=$(echo $(cat creds) | sed -n 's/.*"SessionToken": "\([^"]*\)".*/\1/p')")
+          grep "MemberInfrastructureAccess" <<< $(aws sts get-caller-identity) || { echo 'Failed to assume role' ; exit 1; }
+          $HOME/bin/aws-nuke --access-key-id "$AWS_ACCESS_KEY_ID" \
+            --secret-access-key "$AWS_SECRET_ACCESS_KEY" \
+            --session-token "$AWS_SESSION_TOKEN" \
+            --config nuke-config.yml \
+            --force
+      - name: Nuke Apply (-no-dry-run)
+        if: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') }}
+        run: |
+          # The environment gets reset between steps, so the AWS credentials get overwritten and the role needs to be re-assumed.
+          aws sts assume-role --role-arn "arn:aws:iam::${ACCOUNT_NUMBER}:role/MemberInfrastructureAccess" --role-session-name githubactionsgotestrolesession > creds
+          $(echo "export AWS_ACCESS_KEY_ID=$(echo $(cat creds) | sed -n 's/.*"AccessKeyId": "\([^"]*\)".*/\1/p')")
+          $(echo "export AWS_SECRET_ACCESS_KEY=$(echo $(cat creds) | sed -n 's/.*"SecretAccessKey": "\([^"]*\)".*/\1/p')")
+          $(echo "export AWS_SESSION_TOKEN=$(echo $(cat creds) | sed -n 's/.*"SessionToken": "\([^"]*\)".*/\1/p')")
+          grep "MemberInfrastructureAccess" <<< $(aws sts get-caller-identity) || { echo 'Failed to assume role' ; exit 1; }
+          $HOME/bin/aws-nuke --access-key-id "$AWS_ACCESS_KEY_ID" \
+            --secret-access-key "$AWS_SECRET_ACCESS_KEY" \
+            --session-token "$AWS_SESSION_TOKEN" \
+            --config nuke-config.yml \
+            --force \
+            --no-dry-run
+    env:
+      AWS_ACCESS_KEY_ID:  ${{ secrets.TESTING_AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY:  ${{ secrets.TESTING_AWS_SECRET_ACCESS_KEY }}
+      ACCOUNT_NAME: "testing-test"

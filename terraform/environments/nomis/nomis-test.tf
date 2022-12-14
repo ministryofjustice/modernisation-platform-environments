@@ -146,7 +146,6 @@ locals {
         # See DSOS-1570 and DSOS-1571
         autoscaling_group = {
           desired_capacity = 0
-          warm_pool        = null
         }
         offpeak_desired_capacity = 0
       }
@@ -160,62 +159,7 @@ locals {
       }
     }
 
-    ec2_test_instances = {
-    }
-    ec2_test_autoscaling_groups = {
-      test-base-rhel79 = {
-        tags = {
-          ami         = "nomis_rhel_7_9_baseimage"
-          description = "For testing our base RHEL7.9 base image"
-          monitored   = false
-        }
-        ami_name = "nomis_rhel_7_9_baseimage*"
-        # branch   = var.BRANCH_NAME # comment in if testing ansible
-      }
-      test-base-rhel610 = {
-        tags = {
-          ami         = "nomis_rhel_6_10_baseimage"
-          description = "For testing our base RHEL6.10 base image"
-          monitored   = false
-        }
-        instance = {
-          instance_type                = "t2.medium"
-          metadata_options_http_tokens = "optional"
-        }
-        ebs_volumes = {
-          "/dev/sdb" = { # /u01 (add for weblogic testing)
-            type = "gp3"
-            size = 150
-          }
-        }
-        ami_name = "nomis_rhel_6_10_baseimage*"
-        # branch   = var.BRANCH_NAME # comment in if testing ansible
-      }
-      t1-ndh-app = {
-        tags = {
-          server-type = "ndh-app"
-          description = "Standalone EC2 for testing RHEL7.9 NDH App"
-        }
-        ami_name = "nomis_rhel_7_9_baseimage_2022-11-01T13-43-46.384Z"
-        # branch   = var.BRANCH_NAME # comment in if testing ansible
-        autoscaling_group = {
-          desired_capacity = 1
-        }
-        autoscaling_schedules = {}
-      }
-      t1-ndh-ems = {
-        tags = {
-          server-type = "ndh-ems"
-          description = "Standalone EC2 for testing RHEL7.9 NDH EMS"
-        }
-        ami_name = "nomis_rhel_7_9_baseimage_2022-11-01T13-43-46.384Z"
-        # branch   = var.BRANCH_NAME # comment in if testing ansible
-        autoscaling_group = {
-          desired_capacity = 1
-        }
-        autoscaling_schedules = {}
-      }
-    }
-    ec2_jumpserver_autoscaling_groups = {}
+    ec2_test_instances = {}
+    ec2_jumpservers    = {}
   }
 }
