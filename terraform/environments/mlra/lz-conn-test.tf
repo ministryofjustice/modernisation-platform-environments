@@ -3,6 +3,7 @@ locals {
 #!/bin/bash
 yum install -y httpd
 systemctl start httpd
+cat "0 8 * * * root systemctl start httpd" > /etc/cron.d/httpd_cron
 EOF
 }
 module "ec2_instance" {
