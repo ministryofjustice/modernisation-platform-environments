@@ -1,11 +1,22 @@
 # nomis-production environment settings
 locals {
   nomis_production = {
-    # ip ranges for external access to database instances
-    database_external_access_cidr = [
+    external_database_access_cidrs = [
       local.cidrs.noms_live,
       local.cidrs.noms_mgmt_live,
-      local.cidrs.cloud_platform
+      local.cidrs.cloud_platform,
+      local.cidrs.analytical_platform_airflow,
+      local.cidrs.aks_studio_hosting_live_1,
+      local.cidrs.nomisapi_preprod_root_vnet,
+      local.cidrs.nomisapi_prod_root_vnet,
+    ]
+    external_oem_agent_access_cidrs = [
+      local.cidrs.noms_live,
+      local.cidrs.noms_mgmt_live,
+    ]
+    external_remote_access_cidrs = [
+      local.cidrs.noms_live,
+      local.cidrs.noms_mgmt_live,
     ]
 
     # Details of OMS Manager in FixNGo (only needs defining if databases in the environment are managed)
