@@ -12,6 +12,7 @@ resource "aws_security_group" "importmachine" {
   }
 
   ingress {
+
     description      = "from all"
     from_port        = 0
     to_port          = 0

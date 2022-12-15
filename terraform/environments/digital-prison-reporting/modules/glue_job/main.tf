@@ -1,11 +1,16 @@
 locals {
   default_arguments = {
     "--job-language"                     = "${var.job_language}"
+    "--class"                            = "GlueApp"
     "--job-bookmark-option"              = "${lookup(var.bookmark_options, var.bookmark)}"
     "--TempDir"                          = "${var.temp_dir}"
+    "--checkpoint.location"              = "${var.checkpoint_dir}"
+    "--spark-event-logs-path"            = "${var.spark_event_logs}"
     "--continuous-log-logGroup"          = aws_cloudwatch_log_group.log_group.name
     "--enable-continuous-cloudwatch-log" = "true"
     "--enable-continuous-log-filter"     = "true"
+    "--enable-glue-datacatalog"          = "true"
+    "--enable-job-insights"              = "true"
     "--continuous-log-logStreamPrefix"   = var.continuous_log_stream_prefix
     "--extra-py-files"                   = length(var.extra_py_files) > 0 ? join(",", var.extra_py_files) : null
     "--enable-continuous-log-filter"     = var.enable_continuous_log_filter
@@ -24,16 +29,17 @@ resource "aws_glue_job" "glue_job" {
   count = var.create_job ? 1 : 0
 
   name        = var.name
-  role_arn    = var.create_role ? join("", aws_iam_role.role.*.arn) : var.role_arn
+  role_arn    = var.create_role ? join("", aws_iam_role.glue-service-role.*.arn) : var.role_arn
   connections = var.connections
   # max_capacity         = var.dpu
   description            = var.description
   glue_version           = var.glue_version
   max_retries            = var.max_retries
-  timeout                = var.timeout
   security_configuration = var.create_security_configuration ? join("", aws_glue_security_configuration.sec_cfg.*.id) : var.security_configuration
   worker_type            = var.worker_type
   number_of_workers      = var.number_of_workers
+  timeout                = var.timeout
+  execution_class        = var.execution_class
   tags                   = local.tags
 
   command {
@@ -56,41 +62,43 @@ resource "aws_glue_job" "glue_job" {
   }
 }
 
-resource "aws_iam_role" "role" {
+### Glue Job Service Role
+resource "aws_iam_role" "glue-service-role" {
   count = var.create_role && var.create_job ? 1 : 0
-  name  = "${var.name}-role"
+  name  = "${var.name}-glue-role"
   tags  = local.tags
+  path  = "/"
 
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "sts:AssumeRole"
-        ]
-        Principal = {
-          "Service" = "glue.amazonaws.com"
+  assume_role_policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": "sts:AssumeRole",
+            "Principal": {
+               "Service": "glue.amazonaws.com"
+            },
+            "Effect": "Allow",
+            "Sid": ""
         }
-      }
     ]
-  })
+}
+EOF
+}
 
-  managed_policy_arns = [
-    "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"
-  ]
+resource "aws_iam_policy_attachment" "glue-service-policy" {
+  name       = "${var.name}-role-attach"
+  roles      = aws_iam_role.glue-service-role[*].name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"
 }
 
 data "aws_iam_policy_document" "extra-policy-document" {
   statement {
     actions = [
-      "s3:GetBucketLocation",
-      "s3:ListBucket",
-      "s3:ListAllMyBuckets",
-      "s3:GetBucketAcl",
-      "s3:GetObject"
+      "s3:*"
     ]
     resources = [
+      "arn:aws:s3:::${var.project_id}-*/*",
       "arn:aws:s3:::${var.project_id}-*"
     ]
   }
@@ -108,14 +116,13 @@ data "aws_iam_policy_document" "extra-policy-document" {
   statement {
     actions = [
       "glue:*",
-      "s3:GetBucketLocation",
-      "s3:ListBucket",
-      "s3:ListAllMyBuckets",
-      "s3:GetBucketAcl",
       "iam:ListRolePolicies",
       "iam:GetRole",
       "iam:GetRolePolicy",
-      "cloudwatch:PutMetricData"
+      "cloudwatch:PutMetricData",
+      "kms:*",
+      "sqs:*",
+      "s3:*" # Not sure if this is required
     ]
     resources = [
       "*"
@@ -130,14 +137,14 @@ resource "aws_iam_policy" "additional-policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "local_policy" {
-  role       = var.create_role ? join("", aws_iam_role.role.*.name) : var.role_name
+  role       = var.create_role ? join("", aws_iam_role.glue-service-role.*.name) : var.role_name
   policy_arn = aws_iam_policy.additional-policy.arn
 }
 
 resource "aws_iam_role_policy_attachment" "additional_policies" {
   count = var.create_kinesis_ingester ? 1 : 0
 
-  role       = var.create_role ? join("", aws_iam_role.role.*.name) : var.role_name
+  role       = var.create_role ? join("", aws_iam_role.glue-service-role.*.name) : var.role_name
   policy_arn = var.additional_policies
 }
 

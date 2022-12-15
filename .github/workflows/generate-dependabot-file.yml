@@ -15,11 +15,16 @@ defaults:
   run:
     shell: bash
 
+permissions:
+  contents: read
+
 jobs:
   create-and-commit-dependabot-file:
+    permissions:
+      pull-requests: write
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3.1.0
+      - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
       - name: Generate file
         run: bash ./scripts/generate-dependabot-file.sh
       - name: Commit changes to GitHub
@@ -28,7 +33,7 @@ jobs:
       - run: bash ./scripts/git-pull-request.sh dependabot
         env:
           SECRET: ${{ secrets.GITHUB_TOKEN }}
-      - uses: 8398a7/action-slack@v3
+      - uses: 8398a7/action-slack@bdc6f9de222d3b7518e6cf99c4f3410f653cfde3 # v3.15.0
         name: Slack failure notification
         with:
           status: ${{ job.status }}

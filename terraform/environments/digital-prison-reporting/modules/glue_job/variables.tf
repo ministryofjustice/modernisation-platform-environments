@@ -23,6 +23,18 @@ variable "temp_dir" {
   description = "(Optional) Specifies an Amazon S3 path to a bucket that can be used as a temporary directory for the job."
 }
 
+variable "checkpoint_dir" {
+  type        = string
+  default     = null
+  description = "(Optional) Specifies an Amazon S3 path to a bucket that can be used as a Checkoint directory for the job."
+}
+
+variable "spark_event_logs" {
+  type        = string
+  default     = null
+  description = "(Optional) Specifies an Amazon S3 path to a bucket that can be used as a Spark Event Logs directory for the job."
+}
+
 variable "bookmark" {
   default     = "disabled"
   description = "It can be enabled, disabled or paused."
@@ -139,8 +151,13 @@ variable "create_role" {
 
 variable "timeout" {
   type        = number
-  default     = 2880
+  default     = 120
   description = "(Optional) The job timeout in minutes."
+}
+
+variable "execution_class" {
+  default     = "FLEX"
+  description = "Execution CLass Standard or FLex"
 }
 
 variable "worker_type" {

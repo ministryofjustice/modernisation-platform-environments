@@ -11,10 +11,11 @@
       }
     ],
     "memory": 256,
+    "environment": [{ "name": "AWS_REGION", "value": "${region}" }],
     "logConfiguration": {
       "logDriver": "awslogs",
       "options": {
-        "awslogs-region": "${app_name}",
+        "awslogs-region": "${region}",
         "awslogs-stream-prefix": "${app_name}-app",
         "awslogs-group": "${app_name}-ecs-log-group"
       }
@@ -30,23 +31,28 @@
         "containerPort": 8080
       }
     ],
+    "links": ["xray-daemon"],
     "memory": 2000,
     "logConfiguration": {
       "logDriver": "awslogs",
       "options": {
-        "awslogs-region": "${app_name}",
+        "awslogs-region": "${region}",
         "awslogs-stream-prefix": "${app_name}-app",
         "awslogs-group": "${app_name}-ecs-log-group"
       }
     },
     "environment": [
       {
+        "name": "AWS_REGION",
+        "value": "${region}"
+      },
+      {
         "name": "MAAT_API_END_POINT",
         "value": "${maat_api_end_point}"
       },
       {
         "name": "APP_DB_URL",
-        "value": "${maat_db_url}"
+        "value": "jdbc:oracle:thin:@${maat_db_url}"
       },
       {
         "name": "APP_DB_USERID",

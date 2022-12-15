@@ -8,10 +8,10 @@ output "kinesis_stream_name" {
   value       = module.kinesis_stream_ingestor.kinesis_stream_name
 }
 
-output "kinesis_stream_shard_count" {
-  description = "The count of Shards for this Stream"
-  value       = module.kinesis_stream_ingestor.kinesis_stream_shard_count
-}
+#output "kinesis_stream_shard_count" {
+#  description = "The count of Shards for this Stream"
+#  value       = module.kinesis_stream_ingestor.kinesis_stream_shard_count
+#}
 
 output "kinesis_stream_arn" {
   description = "The Amazon Resource Name (ARN) specifying the Stream"
@@ -149,5 +149,22 @@ output "cluster_nodes" {
 output "ec2_private_key" {
   description = "Ec2 Private Key"
   value       = module.ec2_kinesis_agent.private_key
-  #  sensitive = true
+  #  sensitive = true 
+}
+
+# DMS Subnet ids
+output "dms_subnets" {
+  description = "DMS Subnet IDs"
+  value       = module.dms_nomis_t3.dms_subnet_ids
+}
+
+## S3 Bucket Outputs
+output "s3_bucket_id" {
+  description = "S3 Nomis Oracle Notification Bucket ID"
+  value       = module.s3_nomis_oracle_sqs.bucket_id
+}
+
+output "s3_bucket_arn" {
+  description = "S3 Nomis Oracle Notification Bucket ARN"
+  value       = module.s3_nomis_oracle_sqs.bucket_arn
 }
