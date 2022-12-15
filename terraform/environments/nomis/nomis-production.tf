@@ -4,6 +4,8 @@ locals {
     external_database_access_cidrs = [
       local.cidrs.noms_live,
       local.cidrs.noms_mgmt_live,
+      local.cidrs.noms_live_dr,
+      local.cidrs.noms_mgmt_live_dr,
       local.cidrs.cloud_platform,
       local.cidrs.analytical_platform_airflow,
       local.cidrs.aks_studio_hosting_live_1,
@@ -13,10 +15,14 @@ locals {
     external_oem_agent_access_cidrs = [
       local.cidrs.noms_live,
       local.cidrs.noms_mgmt_live,
+      local.cidrs.noms_live_dr,
+      local.cidrs.noms_mgmt_live_dr,
     ]
     external_remote_access_cidrs = [
       local.cidrs.noms_live,
       local.cidrs.noms_mgmt_live,
+      local.cidrs.noms_live_dr,
+      local.cidrs.noms_mgmt_live_dr,
     ]
 
     # Details of OMS Manager in FixNGo (only needs defining if databases in the environment are managed)

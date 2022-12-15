@@ -5,6 +5,8 @@ locals {
     external_database_access_cidrs = [
       local.cidrs.noms_test,
       local.cidrs.noms_mgmt,
+      local.cidrs.noms_test_dr,
+      local.cidrs.noms_mgmt_dr,
       local.cidrs.cloud_platform,
       local.cidrs.analytical_platform_airflow,
       local.cidrs.aks_studio_hosting_dev_1,
@@ -13,10 +15,14 @@ locals {
     external_oem_agent_access_cidrs = [
       local.cidrs.noms_test,
       local.cidrs.noms_mgmt,
+      local.cidrs.noms_test_dr,
+      local.cidrs.noms_mgmt_dr,
     ]
     external_remote_access_cidrs = [
       local.cidrs.noms_test,
       local.cidrs.noms_mgmt,
+      local.cidrs.noms_test_dr,
+      local.cidrs.noms_mgmt_dr,
     ]
 
     # vars common across ec2 instances
