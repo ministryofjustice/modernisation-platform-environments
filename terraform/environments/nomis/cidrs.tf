@@ -21,6 +21,7 @@ locals {
     nomisapi_prod_root_vnet    = "10.47.0.128/26"
 
     # AWS
-    cloud_platform = "172.20.0.0/16"
+    cloud_platform              = "172.20.0.0/16"
+    analytical_platform_airflow = "10.200.0.0/15"
   }
 }

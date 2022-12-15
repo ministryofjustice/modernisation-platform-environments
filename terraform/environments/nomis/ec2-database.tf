@@ -185,58 +185,65 @@ resource "aws_security_group" "database_common" {
   vpc_id      = data.aws_vpc.shared_vpc.id
 
   ingress {
-    description = "DB access from weblogic and test instances"
-    from_port   = "1521"
-    to_port     = "1521"
-    protocol    = "TCP"
-    security_groups = [
-      aws_security_group.weblogic_common.id,
-      aws_security_group.ec2_test.id
-    ]
-  }
-
-  ingress {
-    description = "DB access other DB instances for replication"
-    from_port   = "1521"
-    to_port     = "1521"
-    protocol    = "TCP"
+    description = "Internal access to self on all ports"
+    from_port   = 0
+    to_port     = 0
+    protocol    = -1
     self        = true
   }
 
   ingress {
-    description     = "SSH from Bastion"
-    from_port       = "22"
-    to_port         = "22"
-    protocol        = "TCP"
-    security_groups = [module.bastion_linux.bastion_security_group]
-  }
-
-  ingress {
-    description = "External access to database port"
-    from_port   = "1521"
-    to_port     = "1521"
-    protocol    = "TCP"
-    cidr_blocks = local.environment_config.database_external_access_cidr
-  }
-
-  ingress {
-    description = "External access to SSH port for agent management"
+    description = "Internal access to ssh"
     from_port   = "22"
     to_port     = "22"
     protocol    = "TCP"
-    cidr_blocks = local.environment_config.database_external_access_cidr
+    security_groups = [
+      aws_security_group.weblogic_common.id,
+      aws_security_group.ec2_test.id,
+      aws_security_group.jumpserver-windows.id,
+      module.bastion_linux.bastion_security_group
+    ]
   }
 
   ingress {
-    description = "External access to OEM Agent port for metrics collection"
+    description = "External access to ssh"
+    from_port   = "22"
+    to_port     = "22"
+    protocol    = "TCP"
+    cidr_blocks = local.environment_config.external_remote_access_cidrs
+  }
+
+  ingress {
+    description = "Internal access to oracle database"
+    from_port   = "1521"
+    to_port     = "1521"
+    protocol    = "TCP"
+    self        = true
+    security_groups = [
+      aws_security_group.weblogic_common.id,
+      aws_security_group.ec2_test.id,
+      module.bastion_linux.bastion_security_group
+    ]
+  }
+
+  ingress {
+    description = "External access to oracle database"
+    from_port   = "1521"
+    to_port     = "1521"
+    protocol    = "TCP"
+    cidr_blocks = local.environment_config.external_database_access_cidrs
+  }
+
+  ingress {
+    description = "External access to OEM Agent"
     from_port   = "3872"
     to_port     = "3872"
     protocol    = "TCP"
-    cidr_blocks = local.environment_config.database_external_access_cidr
+    cidr_blocks = local.environment_config.external_oem_agent_access_cidrs
   }
 
   ingress {
-    description = "access from Cloud Platform Prometheus server"
+    description = "External access to prometheus node exporter"
     from_port   = "9100"
     to_port     = "9100"
     protocol    = "TCP"
@@ -244,7 +251,7 @@ resource "aws_security_group" "database_common" {
   }
 
   ingress {
-    description = "access from Cloud Platform Prometheus script exporter collector"
+    description = "External access to prometheus script exporter"
     from_port   = "9172"
     to_port     = "9172"
     protocol    = "TCP"
@@ -252,7 +259,7 @@ resource "aws_security_group" "database_common" {
   }
 
   egress {
-    description = "allow all"
+    description = "Allow all egress"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
