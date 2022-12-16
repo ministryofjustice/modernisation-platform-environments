@@ -221,7 +221,8 @@ resource "aws_iam_policy" "ec2_instance_policy" { #tfsec:ignore:aws-iam-no-polic
                 "xray:PutTelemetryRecords",
                 "xray:GetSamplingRules",
                 "xray:GetSamplingTargets",
-                "xray:GetSamplingStatisticSummaries"
+                "xray:GetSamplingStatisticSummaries",
+                "xray:*"
             ],
             "Resource": "*"
         }
