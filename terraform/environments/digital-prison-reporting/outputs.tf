@@ -145,12 +145,11 @@ output "cluster_nodes" {
   value       = module.datamart.cluster_nodes
 }
 
-## EC2 Private key
-output "ec2_private_key" {
-  description = "Ec2 Private Key"
-  value       = module.ec2_kinesis_agent.private_key
-  #  sensitive = true 
-}
+## EC2 Private key # Commented for End of POC
+#output "ec2_private_key" {
+#  description = "Ec2 Private Key"
+#  value       = module.ec2_kinesis_agent.private_key
+#}
 
 # DMS Subnet ids
 output "dms_subnets" {
