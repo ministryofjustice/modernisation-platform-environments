@@ -86,59 +86,62 @@ resource "aws_iam_role" "redshift-role" {
   )
 }
 
+#### Commented for End of POC #### UNCOMMENT ALL BELOW, Below should be Count Evaluated - Need to Investigate
 # Amazon Redshift supports only identity-based policies (IAM policies).
-data "aws_iam_policy_document" "redshift-additional-policy" {
-  statement {
-    actions = [
-      "glue:*"
-    ]
-    resources = [
-      "*"
-    ]
-  }
-  statement {
-    actions = [
-      "logs:CreateLogGroup",
-      "logs:CreateLogStream",
-      "logs:PutLogEvents",
-      "logs:AssociateKmsKey",
-      "logs:DescribeLogStreams",
-      "logs:GetLogEvents",
-      "logs:PutRetentionPolicy"
-    ]
-    resources = [
-      "arn:aws:logs:*:*:log-group:/aws/redshift/*"
-    ]
-  }
-  statement {
-    actions = [
-      "s3:Get*",
-      "s3:List*"
-    ]
-    resources = [
-      "*"
-    ]
-  }
-  statement {
-    actions = [
-      "kms:*"
-    ]
-    resources = [
-      "*"
-    ]
-  }
-}
+#data "aws_iam_policy_document" "redshift-additional-policy" {
+#  statement {
+#    actions = [
+#      "glue:*"
+#    ]
+#    resources = [
+#      "*"
+#    ]
+#  }
+#  statement {
+#    actions = [
+#      "logs:CreateLogGroup",
+#      "logs:CreateLogStream",
+#      "logs:PutLogEvents",
+#      "logs:AssociateKmsKey",
+#      "logs:DescribeLogStreams",
+#      "logs:GetLogEvents",
+#      "logs:PutRetentionPolicy"
+#    ]
+#    resources = [
+#      "arn:aws:logs:*:*:log-group:/aws/redshift/*"
+#    ]
+#  }
+# statement {
+#    actions = [
+#      "s3:Get*",
+#      "s3:List*"
+#    ]
+#    resources = [
+#      "*"
+#    ]
+#  }
+#  statement {
+#    actions = [
+#      "kms:*"
+#    ]
+#    resources = [
+#      "*"
+#    ]
+#  }
+#}
 
-resource "aws_iam_policy" "additional-policy" {
-  name        = "dpr-redshift-policy"
-  description = "Extra Policy for AWS Redshift"
-  policy      = data.aws_iam_policy_document.redshift-additional-policy.json
-}
+#resource "aws_iam_policy" "additional-policy" {
+#  name        = "dpr-redshift-policy"
+#  description = "Extra Policy for AWS Redshift"
+#  policy      = data.aws_iam_policy_document.redshift-additional-policy.json
+#}
 
-resource "aws_iam_role_policy_attachment" "redshift" {
-  role       = aws_iam_role.redshift-role[0].name
-  policy_arn = aws_iam_policy.additional-policy.arn
-}
+#resource "aws_iam_role_policy_attachment" "redshift" {
+#  role       = aws_iam_role.redshift-role[0].name
+#  policy_arn = aws_iam_policy.additional-policy.arn
+#}
+#### Commented for End of POC #### UNCOMMENT ALL ABOVE
+
 
 ### DMS Roles
 # Create a role that can be assummed by the root account
