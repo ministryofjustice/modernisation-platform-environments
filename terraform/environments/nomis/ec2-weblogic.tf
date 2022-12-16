@@ -162,15 +162,34 @@ resource "aws_security_group" "weblogic_common" {
   vpc_id      = local.vpc_id
 
   ingress {
-    description     = "SSH from Bastion"
-    from_port       = "22"
-    to_port         = "22"
-    protocol        = "TCP"
-    security_groups = [module.bastion_linux.bastion_security_group]
+    description = "Internal access to self on all ports"
+    from_port   = 0
+    to_port     = 0
+    protocol    = -1
+    self        = true
   }
 
   ingress {
-    description = "access admin console from Windows Jumpserver and Bastion"
+    description = "Internal access to ssh"
+    from_port   = "22"
+    to_port     = "22"
+    protocol    = "TCP"
+    security_groups = [
+      aws_security_group.jumpserver-windows.id,
+      module.bastion_linux.bastion_security_group
+    ]
+  }
+
+  ingress {
+    description = "External access to ssh"
+    from_port   = "22"
+    to_port     = "22"
+    protocol    = "TCP"
+    cidr_blocks = local.environment_config.external_remote_access_cidrs
+  }
+
+  ingress {
+    description = "Internal access to Weblogic Admin console"
     from_port   = "7001"
     to_port     = "7001"
     protocol    = "TCP"
@@ -181,26 +200,19 @@ resource "aws_security_group" "weblogic_common" {
   }
 
   ingress {
-    description     = "access from Windows Jumpserver"
-    from_port       = "80"
-    to_port         = "80"
-    protocol        = "TCP"
-    security_groups = [aws_security_group.jumpserver-windows.id]
-  }
-
-  ingress {
-    description = "access from Windows Jumpserver and loadbalancer (forms/reports)"
+    description = "Internal access to Weblogic Http"
     from_port   = "7777"
     to_port     = "7777"
     protocol    = "TCP"
     security_groups = [
       aws_security_group.jumpserver-windows.id,
+      module.bastion_linux.bastion_security_group,
       local.environment == "test" ? module.lb_internal_nomis[0].security_group.id : aws_security_group.internal_elb.id
     ]
   }
 
   ingress {
-    description = "access from Cloud Platform Prometheus server"
+    description = "External access to prometheus node exporter"
     from_port   = "9100"
     to_port     = "9100"
     protocol    = "TCP"
@@ -208,7 +220,7 @@ resource "aws_security_group" "weblogic_common" {
   }
 
   ingress {
-    description = "access from Cloud Platform Prometheus script exporter collector"
+    description = "External access to prometheus script exporter"
     from_port   = "9172"
     to_port     = "9172"
     protocol    = "TCP"
@@ -216,7 +228,7 @@ resource "aws_security_group" "weblogic_common" {
   }
 
   egress {
-    description = "allow all"
+    description = "Allow all egress"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
