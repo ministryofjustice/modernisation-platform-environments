@@ -16,7 +16,7 @@
       "create_glue_connections": false,
       "ec2_instance_type": "t3.small",
       "ami_image_id": "ami-00cc4c3fee6bb6c22",
-      "setup_redshift": true
+      "setup_redshift": false
     },
     "test": {
       "example_var": "test-data"

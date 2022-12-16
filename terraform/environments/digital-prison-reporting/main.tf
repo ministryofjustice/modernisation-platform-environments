@@ -817,36 +817,36 @@ module "glue_connection_redshift" {
   username          = ""
 }
 
-# Ec2
-module "ec2_kinesis_agent" {
-  source                      = "./modules/ec2"
-  name                        = "${local.project}-ec2-kinesis-agent-${local.env}"
-  description                 = "EC2 instance for kinesis agent"
-  vpc                         = data.aws_vpc.shared.id
-  cidr                        = [data.aws_vpc.shared.cidr_block]
-  subnet_ids                  = data.aws_subnet.private_subnets_a.id
-  ec2_instance_type           = local.instance_type
-  ami_image_id                = local.image_id
-  aws_region                  = local.account_region
-  ec2_terminate_behavior      = "terminate"
-  associate_public_ip_address = false
-  ebs_optimized               = true
-  monitoring                  = true
-  ebs_size                    = 20
-  ebs_encrypted               = true
-  ebs_delete_on_termination   = false
-  s3_policy_arn               = aws_iam_policy.read_s3_read_access_policy.arn
+# Ec2 ### Commented for End of POC
+#module "ec2_kinesis_agent" {
+#  source                      = "./modules/ec2"
+#  name                        = "${local.project}-ec2-kinesis-agent-${local.env}"
+#  description                 = "EC2 instance for kinesis agent"
+#  vpc                         = data.aws_vpc.shared.id
+#  cidr                        = [data.aws_vpc.shared.cidr_block]
+#  subnet_ids                  = data.aws_subnet.private_subnets_a.id
+#  ec2_instance_type           = local.instance_type
+#  ami_image_id                = local.image_id
+#  aws_region                  = local.account_region
+#  ec2_terminate_behavior      = "terminate"
+#  associate_public_ip_address = false
+#  ebs_optimized               = true
+#  monitoring                  = true
+#  ebs_size                    = 20
+#  ebs_encrypted               = true
+#  ebs_delete_on_termination   = false
+#  s3_policy_arn               = aws_iam_policy.read_s3_read_access_policy.arn
 
-  tags = merge(
-    local.all_tags,
-    {
-      Name          = "${local.project}-ec2-kinesis-agent-${local.env}"
-      Resource_Type = "EC2 Instance"
-    }
-  )
-}
+#  tags = merge(
+#    local.all_tags,
+#    {
+#      Name          = "${local.project}-ec2-kinesis-agent-${local.env}"
+#      Resource_Type = "EC2 Instance"
+#    }
+#  )
+#}
 
-# DataMart
+# DataMart ### Disabled for End of POC
 module "datamart" {
   source                  = "./modules/redshift"
   create_redshift_cluster = local.create_datamart
