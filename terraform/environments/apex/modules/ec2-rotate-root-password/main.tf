@@ -24,6 +24,7 @@ resource "aws_secretsmanager_secret" "system_root_password" {
   name        = "${var.application_name}/app/db-root-password"
   description = "This secret has a dynamically generated password."
 
+  recovery_window_in_days        = 0
   force_overwrite_replica_secret = true
 
   tags = var.tags
