@@ -21,7 +21,7 @@ locals {
 ### AWS SECRETS MANAGER SECRET ###
 ##################################
 resource "aws_secretsmanager_secret" "system_root_password" {
-  name        = "${var.application_name}/app/db-root-password/${random_string.numbers.result}"
+  name        = "${var.application_name}/app/db-root-password"
   description = "This secret has a dynamically generated password."
 
   force_overwrite_replica_secret = true
