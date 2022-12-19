@@ -20,8 +20,16 @@ locals {
 ##################################
 ### AWS SECRETS MANAGER SECRET ###
 ##################################
+resource "random_string" "numbers" {
+  length  = 6
+  numeric = true
+  special = false
+  upper   = false
+
+}
+
 resource "aws_secretsmanager_secret" "system_root_password" {
-  name        = "${var.application_name}/app/db-root-password"
+  name        = "${var.application_name}/app/db-root-password/${random_string.numbers.result}"
   description = "This secret has a dynamically generated password."
 
   tags = var.tags
