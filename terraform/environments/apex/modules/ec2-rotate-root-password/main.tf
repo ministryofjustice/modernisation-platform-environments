@@ -45,7 +45,7 @@ data "archive_file" "lambda_inline_code" {
 
   source {
     filename = var.lambda_function_inline_code_filename
-    content  = file(var.lambda_function_inline_code_filename)
+    content  = file("${path.module}/${var.lambda_function_inline_code_filename}")
   }
 }
 
