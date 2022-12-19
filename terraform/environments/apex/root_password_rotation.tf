@@ -40,6 +40,8 @@ data "archive_file" "lambda_inline_code" {
 resource "aws_secretsmanager_secret" "system_root_password" {
   name        = "${local.application_name}/app/db-root-password"
   description = "This secret has a dynamically generated password."
+
+  tags = local.tags
 }
 
 resource "aws_secretsmanager_secret_rotation" "system_root_password_rotation" {
