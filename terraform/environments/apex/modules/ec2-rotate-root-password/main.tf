@@ -20,14 +20,12 @@ locals {
 ##################################
 ### AWS SECRETS MANAGER SECRET ###
 ##################################
-resource "random_integer" "int" {
-  min = var.secretsmanager_secret_name_suffix_length
-  max = var.secretsmanager_secret_name_suffix_length
-}
-
 resource "aws_secretsmanager_secret" "system_root_password" {
-  name        = "${var.application_name}/app/system-root-password/${random_integer.int.result}"
+  name        = "${var.application_name}/app/system-root-password"
   description = "This secret has a dynamically generated password."
+
+  recovery_window_in_days        = 0  # necessary to ensure re-creation of resource
+  force_overwrite_replica_secret = true
 
   tags = var.tags
 }

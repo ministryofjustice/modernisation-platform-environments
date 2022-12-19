@@ -4,8 +4,6 @@ variable "aws_account_id" {}
 
 variable "secret_rotation_frequency_days" { default = "28" }
 
-variable "secretsmanager_secret_name_suffix_length" { default = "6" }
-
 variable "lambda_function_name" { default = "system-root-password-rotation" }
 
 variable "lambda_function_description" { default = "Rotate AWS Secrets Manager Secret Value" }
@@ -16,7 +14,7 @@ variable "lambda_function_handler" { default = "index.lambda_handler" }
 
 variable "lambda_function_timeout" { default = "300" }
 
-variable "lambda_function_inline_code_filename" { default = "secrets_manager_secret_rotation.py" }
+variable "lambda_function_inline_code_filename" { default = "index.py" }
 
 variable "zip_artefact_filename" { default = "inline.zip" }
 
