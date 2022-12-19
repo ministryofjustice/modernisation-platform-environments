@@ -29,7 +29,7 @@ locals {
 
 data "archive_file" "lambda_inline_code" {
   type        = "zip"
-  output_path = "${path.cwd}/${var.zip_artefact_filename}"
+  output_path = "./${var.zip_artefact_filename}"
 
   source {
     filename = var.lambda_function_inline_code_filename
@@ -80,12 +80,12 @@ resource "aws_lambda_permission" "rotate_secret_function_permission" {
 resource "aws_iam_role" "lambda_function_execution_role" {
   name = "${local.lambda_function_name}-execution-role"
 
-  assume_role_policy = file("${path.cwd}/assume-role-policy.json")
+  assume_role_policy = file("./assume-role-policy.json")
 
   inline_policy {
     name = "${local.lambda_function_name}-execution-policy"
 
-    policy = templatefile("${path.cwd}/lambda-execution-policy.json", {
+    policy = templatefile("./lambda-execution-policy.json", {
       AWS_ACCOUNT_ID = data.aws_caller_identity.current.account_id
       FUNCTION_NAME  = local.lambda_function_name
     })
