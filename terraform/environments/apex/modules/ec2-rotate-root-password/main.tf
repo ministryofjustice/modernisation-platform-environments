@@ -1,4 +1,4 @@
-/* # TODO this part of the implementation rotates a value in aws secrets manager only.
+# TODO this part of the implementation rotates a value in aws secrets manager only.
 # successful rotation of the system's root password is thereafter dependant on the
 # following task being added to cron, as implemented in laa landing zone's edw:
 #
@@ -93,4 +93,4 @@ resource "aws_lambda_permission" "rotate_secret_function_permission" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.rotate_secret_function.function_name
   principal     = "secretsmanager.amazonaws.com"
-} */
+}
