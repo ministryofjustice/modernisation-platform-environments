@@ -22,7 +22,7 @@ locals {
 ##################################
 resource "aws_secretsmanager_secret" "system_root_password" {
   name        = "${var.application_name}/app/system-root-password"
-  description = "This secret has a dynamically generated password."
+  description = "EC2 System-Level Root Password"
 
   recovery_window_in_days        = 0 # necessary to ensure re-creation of resource
   force_overwrite_replica_secret = true
@@ -93,4 +93,14 @@ resource "aws_lambda_permission" "rotate_secret_function_permission" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.rotate_secret_function.function_name
   principal     = "secretsmanager.amazonaws.com"
+}
+
+##############################
+### INVOKE LAMBDA FUNCTION ###
+##############################
+data "aws_lambda_invocation" "invoke-secret-rotation" {
+  function_name = aws_lambda_function.rotate_secret_function.function_name
+  input         = file("${path.module}/duff-invocation-event.json")
+
+  depends_on = [aws_lambda_function.rotate_secret_function]
 }
