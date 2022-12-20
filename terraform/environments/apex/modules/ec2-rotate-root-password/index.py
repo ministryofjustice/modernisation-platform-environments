@@ -30,7 +30,8 @@ def lambda_handler(event, context):
     print(event)
 
     # Setup the client
-    service_client = boto3.client('secretsmanager', endpoint_url=os.environ['SECRETS_MANAGER_ENDPOINT'])
+    service_client = boto3.client(
+        'secretsmanager', endpoint_url=os.environ['SECRETS_MANAGER_ENDPOINT'])
 
     # Make sure the version is staged correctly
     metadata = service_client.describe_secret(SecretId=arn)
@@ -39,14 +40,19 @@ def lambda_handler(event, context):
         raise ValueError("Secret %s is not enabled for rotation" % arn)
     versions = metadata['VersionIdsToStages']
     if token not in versions:
-        logger.error("Secret version %s has no stage for rotation of secret %s." % (token, arn))
-        raise ValueError("Secret version %s has no stage for rotation of secret %s." % (token, arn))
+        logger.error(
+            "Secret version %s has no stage for rotation of secret %s." % (token, arn))
+        raise ValueError(
+            "Secret version %s has no stage for rotation of secret %s." % (token, arn))
     if "AWSCURRENT" in versions[token]:
-        logger.info("Secret version %s already set as AWSCURRENT for secret %s." % (token, arn))
+        logger.info(
+            "Secret version %s already set as AWSCURRENT for secret %s." % (token, arn))
         return
     elif "AWSPENDING" not in versions[token]:
-        logger.error("Secret version %s not set as AWSPENDING for rotation of secret %s." % (token, arn))
-        raise ValueError("Secret version %s not set as AWSPENDING for rotation of secret %s." % (token, arn))
+        logger.error(
+            "Secret version %s not set as AWSPENDING for rotation of secret %s." % (token, arn))
+        raise ValueError(
+            "Secret version %s not set as AWSPENDING for rotation of secret %s." % (token, arn))
 
     if step == "createSecret":
         create_secret(service_client, arn, token)
@@ -80,18 +86,21 @@ def create_secret(service_client, arn, token):
 
     # Now try to get the secret version, if that fails, put a new secret
     try:
-        service_client.get_secret_value(SecretId=arn, VersionId=token, VersionStage="AWSPENDING")
+        service_client.get_secret_value(
+            SecretId=arn, VersionId=token, VersionStage="AWSPENDING")
         logger.info("createSecret: Successfully retrieved secret for %s." % arn)
     except service_client.exceptions.ResourceNotFoundException:
         # Get exclude characters from environment variable
         exclude_characters = os.environ['EXCLUDE_CHARACTERS'] if 'EXCLUDE_CHARACTERS' in os.environ else '/@"\'\\'
         # Generate a random password
-        passwd = service_client.get_random_password(ExcludeCharacters=exclude_characters)
+        passwd = service_client.get_random_password(
+            ExcludeCharacters=exclude_characters)
 
         # Put the secret
         service_client.put_secret_value(SecretId=arn, ClientRequestToken=token, SecretString=passwd['RandomPassword'],
                                         VersionStages=['AWSPENDING'])
-        logger.info("createSecret: Successfully put secret for ARN %s and version %s." % (arn, token))
+        logger.info(
+            "createSecret: Successfully put secret for ARN %s and version %s." % (arn, token))
 
 
 def set_secret(service_client, arn, token):
@@ -140,7 +149,8 @@ def finish_secret(service_client, arn, token):
         if "AWSCURRENT" in metadata["VersionIdsToStages"][version]:
             if version == token:
                 # The correct version is already marked as current, return
-                logger.info("finishSecret: Version %s already marked as AWSCURRENT for %s" % (version, arn))
+                logger.info(
+                    "finishSecret: Version %s already marked as AWSCURRENT for %s" % (version, arn))
                 return
             current_version = version
             break
@@ -148,4 +158,5 @@ def finish_secret(service_client, arn, token):
     # Finalize by staging the secret version current
     service_client.update_secret_version_stage(SecretId=arn, VersionStage="AWSCURRENT", MoveToVersionId=token,
                                                RemoveFromVersionId=current_version)
-    logger.info("finishSecret: Successfully set AWSCURRENT stage to version %s for secret %s." % (token, arn))
+    logger.info(
+        "finishSecret: Successfully set AWSCURRENT stage to version %s for secret %s." % (token, arn))
