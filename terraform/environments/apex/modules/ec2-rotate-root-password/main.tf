@@ -13,7 +13,7 @@
 # for reasoning behind deployment strategy of lambda function, refer to:
 # https://mojdt.slack.com/archives/C01A7QK5VM1/p1671441837036929
 
-/* locals {
+locals {
   lambda_function_name = "${var.application_name}-${var.lambda_function_name}"
 }
 
@@ -93,4 +93,4 @@ resource "aws_lambda_permission" "rotate_secret_function_permission" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.rotate_secret_function.function_name
   principal     = "secretsmanager.amazonaws.com"
-} */
+}
