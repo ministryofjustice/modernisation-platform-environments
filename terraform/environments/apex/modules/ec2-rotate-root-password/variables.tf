@@ -2,7 +2,7 @@ variable "application_name" {}
 
 variable "aws_account_id" {}
 
-variable "secret_id_suffix_length" { default = "5" }
+variable "secret_id_suffix_length" { default = "3" }
 
 variable "secret_rotation_frequency_days" { default = "28" }
 

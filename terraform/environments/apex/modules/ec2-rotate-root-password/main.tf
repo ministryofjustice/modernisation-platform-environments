@@ -20,24 +20,26 @@ locals {
 ##################################
 ### AWS SECRETS MANAGER SECRET ###
 ##################################
-resource "random_string" "duff" {
-  length  = 16
+resource "random_string" "secret_id_suffix" {
+  length  = var.secret_id_suffix_length
+  special = false
+}
+
+resource "random_string" "initial_secret_value" {
+  length  = 32 # as per rotated string
   special = true
 }
 
 resource "aws_secretsmanager_secret" "system_root_password" {
-  name        = "${var.application_name}/app/ec2-system-root-password"
+  name        = "${var.application_name}/app/ec2-system-root-password-${random_string.secret_id_suffix.result}"
   description = "EC2 System-Level Root Password"
-
-  recovery_window_in_days        = 0 # required for a clean teardown of terrform infrastructure
-  force_overwrite_replica_secret = true
 
   tags = var.tags
 }
 
-resource "aws_secretsmanager_secret_version" "this" {
+resource "aws_secretsmanager_secret_version" "system_root_password_version" {
   secret_id     = aws_secretsmanager_secret.system_root_password.id
-  secret_string = random_string.duff.result
+  secret_string = random_string.initial_secret_value.result
 }
 
 resource "aws_secretsmanager_secret_rotation" "system_root_password_rotation" {
