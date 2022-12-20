@@ -20,6 +20,10 @@ locals {
 ##################################
 ### AWS SECRETS MANAGER SECRET ###
 ##################################
+resource "random_string" "duff" {
+  length = 6
+}
+
 resource "aws_secretsmanager_secret" "system_root_password" {
   name        = "${var.application_name}/app/ec2-system-root-password"
   description = "EC2 System-Level Root Password"
