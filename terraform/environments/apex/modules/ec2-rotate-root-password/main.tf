@@ -94,16 +94,3 @@ resource "aws_lambda_permission" "rotate_secret_function_permission" {
   function_name = aws_lambda_function.rotate_secret_function.function_name
   principal     = "secretsmanager.amazonaws.com"
 }
-
-##############################
-### INVOKE LAMBDA FUNCTION ###
-##############################
-data "aws_lambda_invocation" "invoke-secret-rotation" {
-  function_name = aws_lambda_function.rotate_secret_function.function_name
-
-  input = templatefile("${path.module}/first-invoke-event.json", {
-    SECRET_ID = aws_secretsmanager_secret.system_root_password.id
-  })
-
-  depends_on = [aws_lambda_function.rotate_secret_function]
-}
