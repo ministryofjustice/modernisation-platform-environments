@@ -24,7 +24,7 @@ resource "aws_secretsmanager_secret" "system_root_password" {
   name        = "${var.application_name}/app/system-root-password"
   description = "This secret has a dynamically generated password."
 
-  recovery_window_in_days        = 0  # necessary to ensure re-creation of resource
+  recovery_window_in_days        = 0 # necessary to ensure re-creation of resource
   force_overwrite_replica_secret = true
 
   tags = var.tags
@@ -44,7 +44,7 @@ resource "aws_secretsmanager_secret_rotation" "system_root_password_rotation" {
 ###########################
 data "archive_file" "lambda_inline_code" {
   type        = "zip"
-  output_path = "${path.module}/${var.zip_artefact_filename}"
+  output_path = "${path.module}/${replace(var.lambda_function_inline_code_filename, "py", "zip")}"
 
   source {
     filename = var.lambda_function_inline_code_filename

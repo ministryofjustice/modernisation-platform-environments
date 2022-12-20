@@ -16,6 +16,4 @@ variable "lambda_function_timeout" { default = "300" }
 
 variable "lambda_function_inline_code_filename" { default = "index.py" }
 
-variable "zip_artefact_filename" { default = "inline.zip" }
-
 variable "tags" {}
