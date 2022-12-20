@@ -21,7 +21,8 @@ locals {
 ### AWS SECRETS MANAGER SECRET ###
 ##################################
 resource "random_string" "duff" {
-  length = 6
+  length  = 16
+  special = true
 }
 
 resource "aws_secretsmanager_secret" "system_root_password" {
@@ -32,6 +33,11 @@ resource "aws_secretsmanager_secret" "system_root_password" {
   force_overwrite_replica_secret = true
 
   tags = var.tags
+}
+
+resource "aws_secretsmanager_secret_version" "this" {
+  secret_id     = aws_secretsmanager_secret.system_root_password.id
+  secret_string = random_string.duff.result
 }
 
 resource "aws_secretsmanager_secret_rotation" "system_root_password_rotation" {
