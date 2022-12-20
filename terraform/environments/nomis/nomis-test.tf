@@ -210,10 +210,9 @@ locals {
           }
         }
         autoscaling_group = {
-          max_size         = 3
-          desired_capacity = 3
+          desired_capacity = 1
         }
-        offpeak_desired_capacity = 3
+        offpeak_desired_capacity = 1
         ami_name                 = "nomis_rhel_6_10_baseimage*"
         # branch   = var.BRANCH_NAME # comment in if testing ansible
       }
