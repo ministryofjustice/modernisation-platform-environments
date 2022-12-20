@@ -20,12 +20,14 @@ locals {
 ##################################
 ### AWS SECRETS MANAGER SECRET ###
 ##################################
+resource "random_string" "secret_id_suffix" {
+  length  = var.secret_id_suffix_length
+  special = false
+  lower   = false
+}
 resource "aws_secretsmanager_secret" "system_root_password" {
-  name        = "${var.application_name}/app/system-root-password"
+  name        = "${var.application_name}/app/system-root-password-${random_string.secret_id_suffix.result}"
   description = "EC2 System-Level Root Password"
-
-  recovery_window_in_days        = 0 # necessary to ensure re-creation of resource
-  force_overwrite_replica_secret = true
 
   tags = var.tags
 }
