@@ -20,14 +20,12 @@ locals {
 ##################################
 ### AWS SECRETS MANAGER SECRET ###
 ##################################
-resource "random_string" "secret_id_suffix" {
-  length  = var.secret_id_suffix_length
-  special = false
-  lower   = false
-}
 resource "aws_secretsmanager_secret" "system_root_password" {
-  name        = "${var.application_name}/app/system-root-password-${random_string.secret_id_suffix.result}"
+  name        = "${var.application_name}/app/ec2-system-root-password"
   description = "EC2 System-Level Root Password"
+
+  recovery_window_in_days = 0  # required for a clean teardown of terrform infrastructure
+  force_overwrite_replica_secret = true
 
   tags = var.tags
 }
@@ -63,7 +61,7 @@ resource "aws_lambda_function" "rotate_secret_function" {
   timeout       = var.lambda_function_timeout
 
   filename         = data.archive_file.lambda_inline_code.output_path
-  source_code_hash = data.archive_file.lambda_inline_code.output_base64sha256
+  source_code_hash = data.archive_file.lambda_inline_code.output_base64sha256  # hash ensures that changes to inline code are always picked up by a plan/apply
 
   environment {
     variables = {
