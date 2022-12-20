@@ -926,7 +926,7 @@ module "dms_nomis_t3" {
   source_address        = "10.101.63.135"
   source_db_port        = 1521
   vpc                   = data.aws_vpc.shared.id
-  kinesis_target_stream = "arn:aws:kinesis:eu-west-2:771283872747:stream/dpr-kinesis-ingestor-development"
+  kinesis_target_stream = "arn:aws:kinesis:eu-west-2:${data.aws_caller_identity.current.account_id}:stream/dpr-kinesis-ingestor-development"
   kinesis_stream_policy = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_admin_arn
   project_id            = local.project
   env                   = local.environment
@@ -964,7 +964,7 @@ module "dms_use_of_force" {
   source_address        = "dpr-development-use-of-force-rds.cja8lnnvvipo.eu-west-2.rds.amazonaws.com"
   source_db_port        = 5432
   vpc                   = data.aws_vpc.shared.id
-  kinesis_target_stream = "arn:aws:kinesis:eu-west-2:771283872747:stream/dpr-kinesis-ingestor-development"
+  kinesis_target_stream = "arn:aws:kinesis:eu-west-2:${data.aws_caller_identity.current.account_id}:stream/dpr-kinesis-ingestor-development"
   kinesis_stream_policy = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_admin_arn
   project_id            = local.project
   env                   = local.environment
