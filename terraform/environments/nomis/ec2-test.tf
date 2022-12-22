@@ -78,7 +78,7 @@ module "ec2_test_instance" {
   region             = local.region
   availability_zone  = local.availability_zone
   subnet_set         = local.subnet_set
-  subnet_name        = "private"
+  subnet_name        = lookup(each.value, "subnet_name", "private")
   tags               = merge(local.tags, local.ec2_test.tags, try(each.value.tags, {}))
   account_ids_lookup = local.environment_management.account_ids
 
@@ -128,7 +128,7 @@ module "ec2_test_autoscaling_group" {
   region             = local.region
   availability_zone  = local.availability_zone
   subnet_set         = local.subnet_set
-  subnet_name        = "data"
+  subnet_name        = lookup(each.value, "subnet_name", "private")
   tags               = merge(local.tags, local.ec2_test.tags, try(each.value.tags, {}))
   account_ids_lookup = local.environment_management.account_ids
 

@@ -163,10 +163,10 @@ locals {
         # NOTE: setting desired capacity to 0 as this is not fully working yet
         # See DSOS-1570 and DSOS-1571
         autoscaling_group = {
-          desired_capacity = 1
+          desired_capacity = 0
           warm_pool        = null
         }
-        offpeak_desired_capacity = 1
+        offpeak_desired_capacity = 0
       }
     }
 
@@ -179,6 +179,29 @@ locals {
     }
 
     ec2_test_instances = {
+      t1-nomis-web-1 = {
+        tags = {
+          ami                = "nomis_rhel_6_10_weblogic_appserver_10_3"
+          description        = "For testing our RHEL6.10 weblogic image"
+          monitored          = false
+          oracle-db-hostname = "db.CNOMT1.nomis.hmpps-test.modernisation-platform.internal"
+          oracle-db-name     = "CNOMT1"
+        }
+        instance = {
+          # set to large for weblogic testing
+          instance_type                = "t2.large"
+          metadata_options_http_tokens = "optional"
+        }
+        ebs_volumes = {
+          "/dev/sdb" = { # /u01 (add for weblogic testing)
+            type = "gp3"
+            size = 150
+          }
+        }
+        subnet_name = "private"
+        ami_name    = "nomis_rhel_6_10_weblogic_appserver_10_3*"
+        # branch   = var.BRANCH_NAME # comment in if testing ansible
+      }
     }
     ec2_test_autoscaling_groups = {
       test-base-rhel79 = {
@@ -187,7 +210,8 @@ locals {
           description = "For testing our base RHEL7.9 base image"
           monitored   = false
         }
-        ami_name = "nomis_rhel_7_9_baseimage*"
+        subnet_name = "data"
+        ami_name    = "nomis_rhel_7_9_baseimage*"
         # branch   = var.BRANCH_NAME # comment in if testing ansible
       }
       test-base-rhel610 = {
@@ -213,6 +237,7 @@ locals {
           desired_capacity = 1
         }
         offpeak_desired_capacity = 1
+        subnet_name              = "data"
         ami_name                 = "nomis_rhel_6_10_baseimage*"
         # branch   = var.BRANCH_NAME # comment in if testing ansible
       }
@@ -227,6 +252,7 @@ locals {
           desired_capacity = 1
         }
         autoscaling_schedules = {}
+        subnet_name           = "data"
       }
       t1-ndh-ems = {
         tags = {
@@ -239,6 +265,7 @@ locals {
           desired_capacity = 1
         }
         autoscaling_schedules = {}
+        subnet_name           = "data"
       }
     }
     ec2_jumpservers = {}
