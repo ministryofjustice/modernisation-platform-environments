@@ -156,6 +156,7 @@ locals {
           ami                = "nomis_rhel_6_10_weblogic_appserver_10_3"
           description        = "T1 nomis weblogic 10.3"
           oracle-db-hostname = "db.CNOMT1.nomis.hmpps-test.modernisation-platform.internal"
+          nomis-environment  = "t1"
           oracle-db-name     = "CNOMT1"
         }
         ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2022-12-23T13-04-38.814Z"
@@ -181,8 +182,9 @@ locals {
     ec2_test_autoscaling_groups = {
       t1-ndh-app = {
         tags = {
-          server-type = "ndh-app"
-          description = "Standalone EC2 for testing RHEL7.9 NDH App"
+          server-type       = "ndh-app"
+          description       = "Standalone EC2 for testing RHEL7.9 NDH App"
+          nomis-environment = "t1"
         }
         ami_name = "nomis_rhel_7_9_baseimage_2022-11-01T13-43-46.384Z"
         # branch   = var.BRANCH_NAME # comment in if testing ansible
@@ -194,8 +196,9 @@ locals {
       }
       t1-ndh-ems = {
         tags = {
-          server-type = "ndh-ems"
-          description = "Standalone EC2 for testing RHEL7.9 NDH EMS"
+          server-type       = "ndh-ems"
+          description       = "Standalone EC2 for testing RHEL7.9 NDH EMS"
+          nomis-environment = "t1"
         }
         ami_name = "nomis_rhel_7_9_baseimage_2022-11-01T13-43-46.384Z"
         # branch   = var.BRANCH_NAME # comment in if testing ansible

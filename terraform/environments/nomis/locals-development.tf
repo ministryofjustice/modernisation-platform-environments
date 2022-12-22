@@ -97,9 +97,10 @@ locals {
     ec2_test_autoscaling_groups = {
       dev-redhat-rhel79 = {
         tags = {
-          description = "For testing official RedHat RHEL7.9 base image"
-          server-type = "base-rhel79"
-          monitored   = false
+          description       = "For testing official RedHat RHEL7.9 base image"
+          server-type       = "base-rhel79"
+          monitored         = false
+          nomis-environment = "dev"
         }
         ami_name  = "RHEL-7.9_HVM-*"
         ami_owner = "309956199498"
@@ -107,18 +108,20 @@ locals {
       }
       dev-base-rhel79 = {
         tags = {
-          ami         = "nomis_rhel_7_9_baseimage"
-          description = "For testing our base RHEL7.9 base image"
-          monitored   = false
+          ami               = "nomis_rhel_7_9_baseimage"
+          description       = "For testing our base RHEL7.9 base image"
+          monitored         = false
+          nomis-environment = "dev"
         }
         ami_name = "nomis_rhel_7_9_baseimage*"
         # branch   = var.BRANCH_NAME # comment in if testing ansible
       }
       dev-base-rhel610 = {
         tags = {
-          ami         = "nomis_rhel_6_10_baseimage"
-          description = "For testing our base RHEL6.10 base image"
-          monitored   = false
+          ami               = "nomis_rhel_6_10_baseimage"
+          description       = "For testing our base RHEL6.10 base image"
+          monitored         = false
+          nomis-environment = "dev"
         }
         instance = {
           instance_type                = "t2.medium"
@@ -132,8 +135,9 @@ locals {
       jumpserver-2022 = {
         ami_name = "nomis_windows_server_2022_jumpserver_2022*"
         tags = {
-          server-type = "jumpserver"
-          description = "Windows Server 2022 Jumpserver for NOMIS"
+          server-type       = "jumpserver"
+          description       = "Windows Server 2022 Jumpserver for NOMIS"
+          nomis-environment = "jumpserver"
         }
         autoscaling_group = {
           min_size = 0
