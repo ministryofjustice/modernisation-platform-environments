@@ -158,13 +158,12 @@ locals {
           oracle-db-hostname = "db.CNOMT1.nomis.hmpps-test.modernisation-platform.internal"
           oracle-db-name     = "CNOMT1"
         }
-        ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_test_2022-12-22T17-25-08.543Z"
+        ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2022-12-23T13-04-38.814Z"
         # branch = var.BRANCH_NAME # comment in if testing ansible
 
-        # NOTE: setting desired capacity to 0 as this is not fully working yet
-        # See DSOS-1570 and DSOS-1571
+        # NOTE: setting desired capacity to 0 until fully working
         autoscaling_group = {
-          desired_capacity = 1
+          desired_capacity = 0
           warm_pool        = null
         }
         offpeak_desired_capacity = 0
