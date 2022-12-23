@@ -24,6 +24,12 @@ locals {
       local.cidrs.noms_test_dr,
       local.cidrs.noms_mgmt_dr,
     ]
+    external_weblogic_access_cidrs = [
+      local.cidrs.noms_test,
+      local.cidrs.noms_mgmt,
+      local.cidrs.noms_transit_live_fw_devtest,
+      local.cidrs.noms_transit_live_fw_prod,
+    ]
 
     # vars common across ec2 instances
     ec2_common = {

@@ -192,7 +192,7 @@ resource "aws_security_group" "ec2_test" {
     from_port   = "7001"
     to_port     = "7001"
     protocol    = "TCP"
-    cidr_blocks = local.environment_config.external_remote_access_cidrs
+    cidr_blocks = local.environment_config.external_weblogic_access_cidrs
   }
 
   ingress {
@@ -211,7 +211,7 @@ resource "aws_security_group" "ec2_test" {
     from_port   = "7777"
     to_port     = "7777"
     protocol    = "TCP"
-    cidr_blocks = local.environment_config.external_remote_access_cidrs
+    cidr_blocks = local.environment_config.external_weblogic_access_cidrs
   }
 
   ingress {
