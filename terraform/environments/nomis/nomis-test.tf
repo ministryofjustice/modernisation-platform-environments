@@ -180,6 +180,34 @@ locals {
     }
 
     ec2_test_instances = {}
+    ec2_test_autoscaling_groups = {
+      t1-ndh-app = {
+        tags = {
+          server-type = "ndh-app"
+          description = "Standalone EC2 for testing RHEL7.9 NDH App"
+        }
+        ami_name = "nomis_rhel_7_9_baseimage_2022-11-01T13-43-46.384Z"
+        # branch   = var.BRANCH_NAME # comment in if testing ansible
+        autoscaling_group = {
+          desired_capacity = 1
+        }
+        autoscaling_schedules = {}
+        subnet_name           = "data"
+      }
+      t1-ndh-ems = {
+        tags = {
+          server-type = "ndh-ems"
+          description = "Standalone EC2 for testing RHEL7.9 NDH EMS"
+        }
+        ami_name = "nomis_rhel_7_9_baseimage_2022-11-01T13-43-46.384Z"
+        # branch   = var.BRANCH_NAME # comment in if testing ansible
+        autoscaling_group = {
+          desired_capacity = 1
+        }
+        autoscaling_schedules = {}
+        subnet_name           = "data"
+      }
+    }
     ec2_jumpservers    = {}
   }
 }
