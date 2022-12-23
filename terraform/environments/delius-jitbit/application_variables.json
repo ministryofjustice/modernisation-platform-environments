@@ -1,7 +1,16 @@
 {
   "accounts": {
     "development": {
-      "example_var": "dev-data"
+      "example_var": "dev-data",
+      "network_mode": "awsvpc",
+      "app_count": "1",
+      "server_port": "80",
+      "container_instance_type": "windows",
+      "container_version": "development",
+      "container_cpu": "2048",
+      "container_memory": "3072",
+      "task_definition_volume": "upload_volume",
+      "requires_compatibilities": "FARGATE"
     },
     "test": {
       "example_var": "test-data"
