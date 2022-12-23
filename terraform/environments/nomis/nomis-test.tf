@@ -164,7 +164,6 @@ locals {
         # NOTE: setting desired capacity to 0 until fully working
         autoscaling_group = {
           desired_capacity = 0
-          warm_pool        = null
         }
         offpeak_desired_capacity = 0
       }
