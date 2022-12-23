@@ -93,6 +93,7 @@ variable "name" {
 variable "instance" {
   description = "EC2 instance settings, see aws_instance documentation"
   type = object({
+    associate_public_ip_address  = optional(bool, false)
     disable_api_termination      = bool
     instance_type                = string
     key_name                     = string

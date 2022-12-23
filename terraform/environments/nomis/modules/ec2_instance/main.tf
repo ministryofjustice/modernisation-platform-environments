@@ -4,7 +4,7 @@
 
 resource "aws_instance" "this" {
   ami                         = data.aws_ami.this.id
-  associate_public_ip_address = false
+  associate_public_ip_address = var.instance.associate_public_ip_address
   disable_api_termination     = var.instance.disable_api_termination
   ebs_optimized               = data.aws_ec2_instance_type.this.ebs_optimized_support == "unsupported" ? false : true
   iam_instance_profile        = aws_iam_instance_profile.this.name
@@ -127,7 +127,7 @@ resource "aws_route53_record" "external" {
   name    = "${var.name}.${var.application_name}.${data.aws_route53_zone.external.name}"
   type    = "A"
   ttl     = 60
-  records = [aws_instance.this.private_ip]
+  records = [var.instance.associate_public_ip_address ? aws_instance.this.public_ip : aws_instance.this.private_ip]
 }
 
 #------------------------------------------------------------------------------
