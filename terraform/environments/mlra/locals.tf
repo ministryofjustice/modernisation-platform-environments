@@ -54,5 +54,6 @@ locals {
   # example usage:
   # example_data = local.application_data.accounts[local.environment].example_var
   application_data = fileexists("./application_variables.json") ? jsondecode(file("./application_variables.json")) : {}
+  application_test_url = "https://mlra.dev.legalservices.gov.uk"
 
 }
