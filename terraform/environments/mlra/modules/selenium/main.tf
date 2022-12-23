@@ -101,11 +101,11 @@ resource "aws_codebuild_project" "selenium" {
     # location        = "${aws_s3_bucket.codebuild_artifact}/testspec-mp.yml"
   }
 
-  logs_config {
-    cloudwatch_logs {
-      status   = "DISABLED"
-    }
-  }
+  # logs_config {
+  #   cloudwatch_logs {
+  #     status   = "DISABLED"
+  #   }
+  # }
 
   tags = merge(
     var.tags,

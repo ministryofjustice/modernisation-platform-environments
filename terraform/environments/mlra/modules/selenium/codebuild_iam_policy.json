@@ -14,6 +14,18 @@
         "arn:aws:s3:::${aws_s3_bucket.codebuild_artifact}",
         "arn:aws:s3:::${aws_s3_bucket.codebuild_artifact}/*"
       ]
-    }
+    },
+    {
+      "Effect": "Allow",
+      "Resource": [
+        "*"
+      ],
+      "Action": [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+      ]
+    },
+
   ]
 }
