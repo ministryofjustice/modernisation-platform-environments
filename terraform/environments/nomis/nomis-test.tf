@@ -153,20 +153,16 @@ locals {
     weblogic_autoscaling_groups = {
       t1-nomis-web = {
         tags = {
-          ami                = "nomis_rhel_6_10_weblogic_appserver_10_3"
-          description        = "T1 nomis weblogic 10.3"
           oracle-db-hostname = "db.CNOMT1.nomis.hmpps-test.modernisation-platform.internal"
-          oracle-db-name     = "CNOMT1"
+          oracle-sid         = "CNOMT1"
         }
-        ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_test_2022-12-22T17-25-08.543Z"
-        branch   = "nomis/DSOS-1611/migate-weblogic-ami-to-ansible"
+        ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2022-11-02T00-00-24.828Z"
         # branch = var.BRANCH_NAME # comment in if testing ansible
 
         # NOTE: setting desired capacity to 0 as this is not fully working yet
         # See DSOS-1570 and DSOS-1571
         autoscaling_group = {
-          desired_capacity = 1
-          warm_pool        = null
+          desired_capacity = 0
         }
         offpeak_desired_capacity = 0
       }
@@ -243,32 +239,6 @@ locals {
         subnet_name              = "data"
         ami_name                 = "nomis_rhel_6_10_baseimage*"
         # branch   = var.BRANCH_NAME # comment in if testing ansible
-      }
-      t1-ndh-app = {
-        tags = {
-          server-type = "ndh-app"
-          description = "Standalone EC2 for testing RHEL7.9 NDH App"
-        }
-        ami_name = "nomis_rhel_7_9_baseimage_2022-11-01T13-43-46.384Z"
-        # branch   = var.BRANCH_NAME # comment in if testing ansible
-        autoscaling_group = {
-          desired_capacity = 1
-        }
-        autoscaling_schedules = {}
-        subnet_name           = "data"
-      }
-      t1-ndh-ems = {
-        tags = {
-          server-type = "ndh-ems"
-          description = "Standalone EC2 for testing RHEL7.9 NDH EMS"
-        }
-        ami_name = "nomis_rhel_7_9_baseimage_2022-11-01T13-43-46.384Z"
-        # branch   = var.BRANCH_NAME # comment in if testing ansible
-        autoscaling_group = {
-          desired_capacity = 1
-        }
-        autoscaling_schedules = {}
-        subnet_name           = "data"
       }
     }
     ec2_jumpservers = {}
