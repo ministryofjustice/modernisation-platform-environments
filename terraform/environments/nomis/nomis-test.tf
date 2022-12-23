@@ -153,16 +153,19 @@ locals {
     weblogic_autoscaling_groups = {
       t1-nomis-web = {
         tags = {
+          ami                = "nomis_rhel_6_10_weblogic_appserver_10_3"
+          description        = "T1 nomis weblogic 10.3"
           oracle-db-hostname = "db.CNOMT1.nomis.hmpps-test.modernisation-platform.internal"
-          oracle-sid         = "CNOMT1"
+          oracle-db-name     = "CNOMT1"
         }
-        ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2022-11-02T00-00-24.828Z"
+        ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_test_2022-12-22T17-25-08.543Z"
         # branch = var.BRANCH_NAME # comment in if testing ansible
 
         # NOTE: setting desired capacity to 0 as this is not fully working yet
         # See DSOS-1570 and DSOS-1571
         autoscaling_group = {
-          desired_capacity = 0
+          desired_capacity = 1
+          warm_pool        = null
         }
         offpeak_desired_capacity = 0
       }
