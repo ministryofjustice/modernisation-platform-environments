@@ -206,6 +206,6 @@ locals {
         subnet_name           = "data"
       }
     }
-    ec2_jumpservers    = {}
+    ec2_jumpservers = {}
   }
 }
