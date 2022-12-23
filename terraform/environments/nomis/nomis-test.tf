@@ -209,47 +209,11 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
-        ami_name    = "nomis_rhel_6_10_weblogic_appserver_10_3*"
+        ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2022-12-23T13-04-38.814Z"
         # branch   = var.BRANCH_NAME # comment in if testing ansible
       }
     }
     ec2_test_autoscaling_groups = {
-      test-base-rhel79 = {
-        tags = {
-          ami         = "nomis_rhel_7_9_baseimage"
-          description = "For testing our base RHEL7.9 base image"
-          monitored   = false
-        }
-        ami_name    = "nomis_rhel_7_9_baseimage*"
-        # branch   = var.BRANCH_NAME # comment in if testing ansible
-      }
-      test-base-rhel610 = {
-        tags = {
-          ami                = "nomis_rhel_6_10_baseimage"
-          description        = "For testing our base RHEL6.10 base image"
-          monitored          = false
-          oracle-db-hostname = "db.CNOMT1.nomis.hmpps-test.modernisation-platform.internal"
-          oracle-db-name     = "CNOMT1"
-        }
-        instance = {
-          # set to large for weblogic testing
-          instance_type                = "t2.large"
-          metadata_options_http_tokens = "optional"
-        }
-        ebs_volumes = {
-          "/dev/sdb" = { # /u01 (add for weblogic testing)
-            type = "gp3"
-            size = 150
-          }
-        }
-        autoscaling_group = {
-          desired_capacity = 1
-        }
-        offpeak_desired_capacity = 1
-        subnet_name              = "public"
-        ami_name                 = "nomis_rhel_6_10_baseimage*"
-        # branch   = var.BRANCH_NAME # comment in if testing ansible
-      }
       t1-ndh-app = {
         tags = {
           server-type = "ndh-app"
