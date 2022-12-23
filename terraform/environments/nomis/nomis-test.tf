@@ -196,6 +196,7 @@ locals {
           # set to large for weblogic testing
           instance_type                = "t2.large"
           metadata_options_http_tokens = "optional"
+          associate_public_ip_address  = true
         }
         ebs_volumes = {
           "/dev/sdb" = { # /u01 (add for weblogic testing)
@@ -203,7 +204,10 @@ locals {
             size = 150
           }
         }
-        subnet_name = "private"
+        route53_records = {
+          create_internal_record = true
+          create_external_record = true
+        }
         ami_name    = "nomis_rhel_6_10_weblogic_appserver_10_3*"
         # branch   = var.BRANCH_NAME # comment in if testing ansible
       }
@@ -215,7 +219,6 @@ locals {
           description = "For testing our base RHEL7.9 base image"
           monitored   = false
         }
-        subnet_name = "data"
         ami_name    = "nomis_rhel_7_9_baseimage*"
         # branch   = var.BRANCH_NAME # comment in if testing ansible
       }
@@ -242,7 +245,7 @@ locals {
           desired_capacity = 1
         }
         offpeak_desired_capacity = 1
-        subnet_name              = "data"
+        subnet_name              = "public"
         ami_name                 = "nomis_rhel_6_10_baseimage*"
         # branch   = var.BRANCH_NAME # comment in if testing ansible
       }
