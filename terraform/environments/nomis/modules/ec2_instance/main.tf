@@ -24,11 +24,13 @@ resource "aws_instance" "this" {
   root_block_device {
     delete_on_termination = true
     encrypted             = true
-    volume_size           = try(var.instance.root_block_device.volume_size, local.ami_block_device_mappings_root.ebs.volume_size)
-    volume_type           = local.ami_block_device_mappings_root.ebs.volume_type
+    iops                  = try(local.ebs_volume_root.iops > 0, false) ? local.ebs_volume_root.iops : null
+    throughput            = try(local.ebs_volume_root.throughput > 0, false) ? local.ebs_volume_root.throughput : null
+    volume_size           = local.ebs_volume_root.size
+    volume_type           = local.ebs_volume_root.type
 
     tags = merge(local.tags, {
-      Name = join("-", [var.name, "root", local.ami_block_device_mappings_root.device_name])
+      Name = join("-", [var.name, "root", local.ebs_volume_root.device_name])
     })
   }
 
@@ -39,6 +41,21 @@ resource "aws_instance" "this" {
     content {
       device_name = ephemeral_block_device.value.device_name
       no_device   = true
+    }
+  }
+
+  dynamic "ebs_block_device" {
+    for_each = try(var.instance.use_inline_ebs_block_device, false) ? local.ebs_volumes_nonroot : {}
+    content {
+      device_name = ebs_block_device.key
+
+      delete_on_termination = true
+      encrypted             = true
+
+      iops        = try(ebs_block_device.value.iops > 0, false) ? ebs_block_device.value.iops : null
+      throughput  = try(ebs_block_device.value.throughput > 0, false) ? ebs_block_device.value.throughput : null
+      volume_size = ebs_block_device.value.size
+      volume_type = ebs_block_device.value.type
     }
   }
 
@@ -69,7 +86,7 @@ resource "aws_instance" "this" {
 resource "aws_ebs_volume" "this" {
   #tfsec:ignore:aws-ebs-encryption-customer-key:exp:2022-10-31: I don't think we need the fine grained control CMK would provide
   #checkov:skip=CKV_AWS_189:I don't think we need the fine grained control CMK would provide
-  for_each = local.ebs_volumes
+  for_each = try(var.instance.use_inline_ebs_block_device, false) ? {} : local.ebs_volumes_nonroot
 
   # Values are retrieved from AMI data rather than using snapshot_id, since 
   # it's not always possible to access the snapshot_id if the AMI is in a 

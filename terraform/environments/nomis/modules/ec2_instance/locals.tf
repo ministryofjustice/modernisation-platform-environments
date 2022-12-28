@@ -15,8 +15,6 @@ locals {
     for bdm in data.aws_ami.this.block_device_mappings : bdm.device_name => bdm
   }
 
-  ami_block_device_mappings_root = local.ami_block_device_mappings[data.aws_ami.this.root_device_name]
-
   ami_block_device_mappings_nonroot = {
     for key, value in local.ami_block_device_mappings :
     key => value if key != data.aws_ami.this.root_device_name
@@ -62,7 +60,7 @@ locals {
   }
 
   # merge AMI and var.ebs_volume values, e.g. allow AMI settings to be overridden
-  ebs_volume_names = var.ebs_volumes_copy_all_from_ami ? keys(merge(var.ebs_volumes, local.ami_block_device_mappings_nonroot)) : keys(var.ebs_volumes)
+  ebs_volume_names = var.ebs_volumes_copy_all_from_ami ? keys(merge(var.ebs_volumes, local.ami_block_device_mappings)) : keys(var.ebs_volumes)
 
   ebs_volumes = {
     for key in local.ebs_volume_names :
@@ -71,6 +69,13 @@ locals {
       try(local.ebs_volumes_from_config[key], {}),
       try(var.ebs_volumes[key], {})
     )
+  }
+
+  ebs_volume_root = local.ebs_volumes[data.aws_ami.this.root_device_name]
+
+  ebs_volumes_nonroot = {
+    for key, value in local.ebs_volumes :
+    key => value if key != data.aws_ami.this.root_device_name
   }
 
   user_data_args_ssm_params = {

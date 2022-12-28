@@ -184,7 +184,7 @@ locals {
     }
 
     ec2_test_instances = {
-      t1-nomis-web-1 = {
+      t1-nomis-web-2 = {
         tags = {
           ami                = "nomis_rhel_6_10_weblogic_appserver_10_3"
           description        = "For testing our RHEL6.10 weblogic image"
@@ -198,6 +198,7 @@ locals {
           instance_type                = "t2.large"
           metadata_options_http_tokens = "optional"
           associate_public_ip_address  = true
+          use_inline_ebs_block_device  = true
         }
         ebs_volumes = {
           "/dev/sdb" = { # /u01 (add for weblogic testing)
@@ -243,4 +244,26 @@ locals {
     }
     ec2_jumpservers = {}
   }
+}
+
+data "aws_ami" "tmp" {
+  most_recent = true
+  owners      = local.environment_management.account_ids["core-shared-services-production"]
+  tags = {
+    is-production = true # based on environment
+  }
+
+  filter {
+    name   = "name"
+    values = ["nomis_rhel_6_10_weblogic_appserver_10_3_release_2022-12-23T13-04-38.814Z"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+}
+
+output "tmp" {
+  value = data.aws_ami.tmp
 }

@@ -100,10 +100,8 @@ variable "instance" {
     metadata_endpoint_enabled    = optional(string, "enabled")
     metadata_options_http_tokens = optional(string, "required")
     monitoring                   = optional(bool, true)
+    use_inline_ebs_block_device  = optional(bool, false)
     vpc_security_group_ids       = list(string)
-    root_block_device = optional(object({
-      volume_size = number
-    }))
     private_dns_name_options = optional(object({
       enable_resource_name_dns_aaaa_record = optional(bool)
       enable_resource_name_dns_a_record    = optional(bool)
