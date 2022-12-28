@@ -37,15 +37,16 @@ resource "aws_instance" "this" {
   # block devices specified inline cannot be resized later so remove them here
   # and define as ebs_volumes later
   dynamic "ephemeral_block_device" {
-    for_each = try(var.instance.use_inline_ebs_block_device, false) ? {} : local.ami_block_device_mappings_nonroot
+    for_each = try(var.instance.ebs_block_device_inline, false) ? {} : local.ami_block_device_mappings_nonroot
     content {
       device_name = ephemeral_block_device.value.device_name
       no_device   = true
     }
   }
 
+  # only use this inline EBS block if it is easy to recreate the EBS volume
   dynamic "ebs_block_device" {
-    for_each = try(var.instance.use_inline_ebs_block_device, false) ? local.ebs_volumes_nonroot : {}
+    for_each = try(var.instance.ebs_block_device_inline, false) ? local.ebs_volumes_nonroot : {}
     content {
       device_name = ebs_block_device.key
 
@@ -93,17 +94,17 @@ resource "aws_instance" "this" {
 resource "aws_ebs_volume" "this" {
   #tfsec:ignore:aws-ebs-encryption-customer-key:exp:2022-10-31: I don't think we need the fine grained control CMK would provide
   #checkov:skip=CKV_AWS_189:I don't think we need the fine grained control CMK would provide
-  for_each = try(var.instance.use_inline_ebs_block_device, false) ? {} : local.ebs_volumes_nonroot
+  for_each = try(var.instance.ebs_block_device_inline, false) ? {} : local.ebs_volumes_nonroot
 
-  # Values are retrieved from AMI data rather than using snapshot_id, since 
-  # it's not always possible to access the snapshot_id if the AMI is in a 
-  # different account.
   availability_zone = var.availability_zone
   encrypted         = true
   iops              = try(each.value.iops > 0, false) ? each.value.iops : null
   throughput        = try(each.value.throughput > 0, false) ? each.value.throughput : null
   size              = each.value.size
   type              = each.value.type
+
+  # you may run into a permission issue if the AMI is not in self account
+  snapshot_id = each.value.snapshot_id
 
   tags = merge(
     local.tags,
