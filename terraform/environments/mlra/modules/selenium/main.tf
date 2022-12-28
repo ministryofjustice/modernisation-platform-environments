@@ -45,6 +45,15 @@ resource "aws_s3_bucket_versioning" "report_versioning" {
   }
 }
 
+# KMS resources to allow CodeBuild pushing artifacts to S3
+
+resource "aws_kms_key" "codebuild" {
+  description             = "For CodeBuild to access S3 artifacts"
+  enable_key_rotation     = true
+  policy                  = file("${path.module}/kms_policy.json")
+}
+
+
 # Selenium CodeBuild job lifting to MP directly
 
 resource "aws_s3_bucket" "codebuild_artifact" {
@@ -66,6 +75,7 @@ resource "aws_codebuild_project" "selenium" {
   name          = "${var.app_name}-selenium-test"
   description   = "Project to test the Java application ${var.app_name}"
   build_timeout = 20
+  encryption_key = aws_kms_key.codebuild.arn
   service_role  = aws_iam_role.codebuild_s3.arn
 
   artifacts {

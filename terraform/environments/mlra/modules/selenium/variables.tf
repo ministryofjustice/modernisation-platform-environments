@@ -27,3 +27,8 @@ variable "application_test_url" {
   type        = string
   description = "Endpoint to test the application with Selenium upon"
 }
+
+variable "account_id" {
+  type        = string
+  description = "AWS Account ID"
+}

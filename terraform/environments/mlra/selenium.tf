@@ -8,4 +8,5 @@ module "mlra-selenium" {
   s3_lifecycle_expiration_days = 31
   s3_lifecycle_noncurr_version_expiration_days = 31
   application_test_url      = local.application_test_url
+  account_id                = local.modernisation_platform_account_id
 }
