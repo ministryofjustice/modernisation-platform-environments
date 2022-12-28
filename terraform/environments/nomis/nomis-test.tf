@@ -114,46 +114,46 @@ locals {
         }
       }
 
-      t3-nomis-db-1 = {
-        tags = {
-          server-type         = "nomis-db"
-          description         = "T3 NOMIS database to replace Azure T3PDL0070"
-          oracle-sids         = "T3CNOM"
-          monitored           = false
-          instance-scheduling = "skip-scheduling"
-        }
-        ami_name  = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-07T12-48-08.562Z"
-        ami_owner = "self" # remove this line next time AMI is updated so core-shared-services-production used instead
-        instance = {
-          disable_api_termination = true
-        }
-        ebs_volumes = {
-          "/dev/sdb" = { # /u01
-            type = "gp3"
-            size = 100
-          }
-          "/dev/sdc" = { # /u02
-            type = "gp3"
-            size = 100
-          }
-        }
-        ebs_volume_config = {
-          app = {
-            type = "gp3"
-          }
-          data = {
-            type       = "gp3"
-            total_size = 2000
-          }
-          flash = {
-            type       = "gp3"
-            total_size = 500
-          }
-          swap = {
-            type = "gp3"
-          }
-        }
-      }
+#      t3-nomis-db-1 = {
+#        tags = {
+#          server-type         = "nomis-db"
+#          description         = "T3 NOMIS database to replace Azure T3PDL0070"
+#          oracle-sids         = "T3CNOM"
+#          monitored           = false
+#          instance-scheduling = "skip-scheduling"
+#        }
+#        ami_name  = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-07T12-48-08.562Z"
+#        ami_owner = "self" # remove this line next time AMI is updated so core-shared-services-production used instead
+#        instance = {
+#          disable_api_termination = true
+#        }
+#        ebs_volumes = {
+#          "/dev/sdb" = { # /u01
+#            type = "gp3"
+#            size = 100
+#          }
+#          "/dev/sdc" = { # /u02
+#            type = "gp3"
+#            size = 100
+#          }
+#        }
+#        ebs_volume_config = {
+#          app = {
+#            type = "gp3"
+#          }
+#          data = {
+#            type       = "gp3"
+#            total_size = 2000
+#          }
+#          flash = {
+#            type       = "gp3"
+#            total_size = 500
+#          }
+#          swap = {
+#            type = "gp3"
+#          }
+#        }
+#      }
     }
 
     # Add weblogic instances here
@@ -185,35 +185,37 @@ locals {
     }
 
     ec2_test_instances = {
-      t1-nomis-web-1 = {
-        tags = {
-          ami                = "nomis_rhel_6_10_weblogic_appserver_10_3"
-          description        = "For testing our RHEL6.10 weblogic image"
-          monitored          = false
-          server-type        = "nomis-web"
-          oracle-db-hostname = "db.CNOMT1.nomis.hmpps-test.modernisation-platform.internal"
-          oracle-db-name     = "CNOMT1"
-        }
-        instance = {
-          # set to large for weblogic testing
-          instance_type                = "t2.large"
-          metadata_options_http_tokens = "optional"
-          associate_public_ip_address  = true
-          ebs_block_device_inline      = true
-        }
-        ebs_volumes = {
-          "/dev/sdb" = { # /u01 (add for weblogic testing)
-            type = "gp3"
-            size = 150
-          }
-        }
-        route53_records = {
-          create_internal_record = true
-          create_external_record = true
-        }
-        ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2022-12-23T13-04-38.814Z"
-        # branch   = var.BRANCH_NAME # comment in if testing ansible
-      }
+#      t1-nomis-web-1 = {
+#        tags = {
+#          ami                = "nomis_rhel_6_10_weblogic_appserver_10_3"
+#          description        = "For testing our RHEL6.10 weblogic image"
+#          monitored          = false
+#          server-type        = "nomis-web"
+#          oracle-db-hostname = "db.CNOMT1.nomis.hmpps-test.modernisation-platform.internal"
+#          oracle-db-name     = "CNOMT1"
+#          ssm-parameters-prefix = "t1-nomis-web"
+#        }
+#        instance = {
+#          # set to large for weblogic testing
+#          instance_type                = "t2.large"
+#          metadata_options_http_tokens = "optional"
+#          associate_public_ip_address  = true
+#          ebs_block_device_inline      = true
+#        }
+#        ebs_volumes = {
+#          "/dev/sdb" = { # /u01 (add for weblogic testing)
+#            type = "gp3"
+#            size = 150
+#          }
+#        }
+#        route53_records = {
+#          create_internal_record = true
+#          create_external_record = true
+#        }
+#        ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2022-12-23T13-04-38.814Z"
+#        branch   = "nomis/DSOS-1611/weblogic-tweak"
+#        # branch   = var.BRANCH_NAME # comment in if testing ansible
+#      }
     }
     ec2_test_autoscaling_groups = {
       t1-ndh-app = {
