@@ -4,7 +4,9 @@
     {
       "Effect": "Allow",
       "Principal": {
-        "AWS": "arn:aws:iam::${var.account_id}:root"
+        "AWS": [
+            "arn:aws:iam::${var.account_id}:root"
+        ]
       },
       "Action": [
         "kms:Create*",

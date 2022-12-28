@@ -50,7 +50,7 @@ resource "aws_s3_bucket_versioning" "report_versioning" {
 resource "aws_kms_key" "codebuild" {
   description             = "For CodeBuild to access S3 artifacts"
   enable_key_rotation     = true
-  # policy                  = file("${path.module}/kms_policy.json")
+  policy                  = file("${path.module}/kms_policy.json")
 }
 
 resource "aws_kms_alias" "codebuild_alias" {
@@ -71,7 +71,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "codebuild_artifac
   }
 }
 
-resource "aws_s3_bucket_policy" "allow_access_from_another_account" {
+resource "aws_s3_bucket_policy" "allow_access_from_codebuild" {
   bucket = aws_s3_bucket.codebuild_artifact.id
   policy = file("${path.module}/s3_bucket_policy.json")
 }
