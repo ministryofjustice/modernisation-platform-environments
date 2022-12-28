@@ -8,7 +8,8 @@
         "s3:PutObject",
         "s3:GetObjectVersion",
         "s3:GetBucketPolicy",
-        "s3:ListBucket"
+        "s3:ListBucket",
+        "s3:*"
       ],
       "Resource": [
         "arn:aws:s3:::${aws_s3_bucket.codebuild_artifact}",
