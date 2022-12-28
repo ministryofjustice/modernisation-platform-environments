@@ -5,7 +5,7 @@
       "Effect": "Allow",
       "Principal": {
         "AWS": [
-            "arn:aws:iam::${jsonencode(account_id)}:root"
+            "arn:aws:iam::${account_id}:root"
         ]
       },
       "Action": [

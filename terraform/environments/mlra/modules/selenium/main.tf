@@ -47,13 +47,18 @@ resource "aws_s3_bucket_versioning" "report_versioning" {
 
 # KMS and S3 resources to allow CodeBuild connecting to S3 - taken from https://github.com/ministryofjustice/laa-aws-infrastructure/blob/5d89457e67eca00e42406724cfd8380c156060cb/management/templates/LAA-Management-Pipeline-PreReqs.template
 
+data "template_file" "kms_policy" {
+  template = "${file("${path.module}/kms_policy.json.tpl")}"
+
+  vars = {
+    account_id = var.account_id
+  }
+}
+
 resource "aws_kms_key" "codebuild" {
   description             = "For CodeBuild to access S3 artifacts"
   enable_key_rotation     = true
-  policy                  = file("${path.module}/kms_policy.json", {
-      account_id = var.account_id
-    }
-  )
+  policy                  = data.template_file.kms_policy.rendered
 }
 
 resource "aws_kms_alias" "codebuild_alias" {
@@ -74,32 +79,41 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "codebuild_artifac
   }
 }
 
+data "template_file" "s3_bucket_policy" {
+  template = "${file("${path.module}/s3_bucket_policy.json.tpl")}"
+
+  vars = {
+    account_id = var.account_id,
+    s3_artifact_name = aws_s3_bucket.codebuild_artifact.id,
+    codebuild_role_name = aws_iam_role.codebuild_s3.id
+  }
+}
+
 resource "aws_s3_bucket_policy" "allow_access_from_codebuild" {
   bucket = aws_s3_bucket.codebuild_artifact.id
-  policy = templatefile("${path.module}/s3_bucket_policy.json", {
-      account_id = var.account_id,
-      s3_artifact_name = aws_s3_bucket.codebuild_artifact,
-      codebuild_role_name = aws_iam_role.codebuild_s3.id
-    }
-  )
+  policy = data.template_file.s3_bucket_policy.rendered
 }
 
 
 # Selenium CodeBuild job lifting to MP directly
-
 
 resource "aws_iam_role" "codebuild_s3" {
   name = "${var.app_name}-CodeBuildRole"
   assume_role_policy = file("${path.module}/codebuild_iam_role.json")
 }
 
+data "template_file" "codebuild_policy" {
+  template = "${file("${path.module}/codebuild_iam_policy.json.tpl")}"
+
+  vars = {
+    s3_artifact_name = aws_s3_bucket.codebuild_artifact.id
+  }
+}
+
 resource "aws_iam_role_policy" "codebuild_s3" {
   name = "${var.app_name}-CodeBuildPolicy"
   role = aws_iam_role.codebuild_s3.name
-  policy = templatefile("${path.module}/codebuild_iam_policy.json", {
-      s3_artifact_name = aws_s3_bucket.codebuild_artifact
-    }
-  )
+  policy = data.template_file.codebuild_policy.rendered
 }
 
 resource "aws_codebuild_project" "selenium" {

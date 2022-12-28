@@ -4,7 +4,7 @@
     {
       "Principal": {
         "AWS": [
-            "arn:aws:iam::${jsonencode(account_id)}:role/${jsonencode(codebuild_role_name)}"
+            "arn:aws:iam::${account_id}:role/${codebuild_role_name}"
         ]
       },
       "Effect": "Allow",
@@ -12,8 +12,8 @@
         "s3:*"
       ],
       "Resource": [
-        "arn:aws:s3:::${jsonencode(s3_artifact_name)}",
-        "arn:aws:s3:::${jsonencode(s3_artifact_name)}/*"
+        "arn:aws:s3:::${s3_artifact_name}",
+        "arn:aws:s3:::${s3_artifact_name}/*"
       ]
     }
   ]
