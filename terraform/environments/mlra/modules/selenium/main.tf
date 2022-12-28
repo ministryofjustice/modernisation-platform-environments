@@ -50,7 +50,7 @@ resource "aws_s3_bucket_versioning" "report_versioning" {
 resource "aws_kms_key" "codebuild" {
   description             = "For CodeBuild to access S3 artifacts"
   enable_key_rotation     = true
-  policy                  = file("${path.module}/kms_policy.json")
+  # policy                  = file("${path.module}/kms_policy.json")
 }
 
 
