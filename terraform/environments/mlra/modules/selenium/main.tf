@@ -45,7 +45,7 @@ resource "aws_s3_bucket_versioning" "report_versioning" {
   }
 }
 
-# KMS resources to allow CodeBuild pushing artifacts to S3
+# KMS and S3 resources to allow CodeBuild connecting to S3 - taken from https://github.com/ministryofjustice/laa-aws-infrastructure/blob/5d89457e67eca00e42406724cfd8380c156060cb/management/templates/LAA-Management-Pipeline-PreReqs.template
 
 resource "aws_kms_key" "codebuild" {
   description             = "For CodeBuild to access S3 artifacts"
@@ -53,12 +53,32 @@ resource "aws_kms_key" "codebuild" {
   # policy                  = file("${path.module}/kms_policy.json")
 }
 
-
-# Selenium CodeBuild job lifting to MP directly
+resource "aws_kms_alias" "codebuild_alias" {
+  name          = "alias/codebuild"
+  target_key_id = aws_kms_key.codebuild.key_id
+}
 
 resource "aws_s3_bucket" "codebuild_artifact" {
   bucket = "${var.app_name}-selenium-artifact"
 }
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "codebuild_artifact" {
+  bucket = aws_s3_bucket.codebuild_artifact.id
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "allow_access_from_another_account" {
+  bucket = aws_s3_bucket.codebuild_artifact.id
+  policy = file("${path.module}/s3_bucket_policy.json")
+}
+
+
+# Selenium CodeBuild job lifting to MP directly
+
 
 resource "aws_iam_role" "codebuild_s3" {
   name = "${var.app_name}-CodeBuildRole"
