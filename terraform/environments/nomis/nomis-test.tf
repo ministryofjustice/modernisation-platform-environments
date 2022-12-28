@@ -184,7 +184,7 @@ locals {
     }
 
     ec2_test_instances = {
-      t1-nomis-web-2 = {
+      t1-nomis-web-1 = {
         tags = {
           ami                = "nomis_rhel_6_10_weblogic_appserver_10_3"
           description        = "For testing our RHEL6.10 weblogic image"

@@ -37,7 +37,7 @@ resource "aws_instance" "this" {
   # block devices specified inline cannot be resized later so remove them here
   # and define as ebs_volumes later
   dynamic "ephemeral_block_device" {
-    for_each = local.ami_block_device_mappings_nonroot
+    for_each = try(var.instance.use_inline_ebs_block_device, false) ? {} : local.ami_block_device_mappings_nonroot
     content {
       device_name = ephemeral_block_device.value.device_name
       no_device   = true
