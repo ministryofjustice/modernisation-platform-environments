@@ -60,8 +60,8 @@ resource "aws_instance" "this" {
 
       tags = merge(local.tags, {
         Name = try(
-          join("-", [var.name, each.value.label, each.key]),
-          join("-", [var.name, each.key])
+          join("-", [var.name, ebs_block_device.value.label, each.key]),
+          join("-", [var.name, ebs_block_device.key])
         )
       })
     }
