@@ -30,7 +30,7 @@ resource "aws_instance" "this" {
     volume_type           = local.ebs_volume_root.type
 
     tags = merge(local.tags, {
-      Name = join("-", [var.name, "root", local.ebs_volume_root.device_name])
+      Name = join("-", [var.name, "root", data.aws_ami.this.root_device_name])
     })
   }
 

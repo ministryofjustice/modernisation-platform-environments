@@ -245,25 +245,3 @@ locals {
     ec2_jumpservers = {}
   }
 }
-
-data "aws_ami" "tmp" {
-  most_recent = true
-  owners      = local.environment_management.account_ids["core-shared-services-production"]
-  tags = {
-    is-production = true # based on environment
-  }
-
-  filter {
-    name   = "name"
-    values = ["nomis_rhel_6_10_weblogic_appserver_10_3_release_2022-12-23T13-04-38.814Z"]
-  }
-
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
-}
-
-output "tmp" {
-  value = data.aws_ami.tmp
-}
