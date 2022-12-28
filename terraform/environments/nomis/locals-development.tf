@@ -112,6 +112,7 @@ locals {
           description       = "For testing our base RHEL7.9 base image"
           monitored         = false
           nomis-environment = "dev"
+          server-type       = "base-rhel79"
         }
         ami_name = "nomis_rhel_7_9_baseimage*"
         # branch   = var.BRANCH_NAME # comment in if testing ansible
@@ -122,6 +123,7 @@ locals {
           description       = "For testing our base RHEL6.10 base image"
           monitored         = false
           nomis-environment = "dev"
+          server-type       = "base-rhel610"
         }
         instance = {
           instance_type                = "t2.medium"

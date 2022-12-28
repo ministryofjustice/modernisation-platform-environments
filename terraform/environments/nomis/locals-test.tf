@@ -158,6 +158,7 @@ locals {
           oracle-db-hostname = "db.CNOMT1.nomis.hmpps-test.modernisation-platform.internal"
           nomis-environment  = "t1"
           oracle-db-name     = "CNOMT1"
+          server-type        = "nomis-web"
         }
         ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2022-12-23T13-04-38.814Z"
         # branch = var.BRANCH_NAME # comment in if testing ansible
