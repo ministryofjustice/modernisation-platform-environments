@@ -169,7 +169,7 @@ locals {
 
         # NOTE: setting desired capacity to 0 until fully working DSOS-1611
         autoscaling_group = {
-          desired_capacity = 0
+          desired_capacity = 1
         }
         offpeak_desired_capacity = 0
       }
