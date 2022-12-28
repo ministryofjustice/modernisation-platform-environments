@@ -42,6 +42,7 @@ locals {
     for key, value in var.ebs_volumes :
     key => {
       iops       = try(var.ebs_volume_config[value.label].iops, null)
+      kms_key_id = try(var.ebs_volume_config[value.label].kms_key_id, null)
       throughput = try(var.ebs_volume_config[value.label].throughput, null)
       type       = try(var.ebs_volume_config[value.label].type, null)
       size = try(

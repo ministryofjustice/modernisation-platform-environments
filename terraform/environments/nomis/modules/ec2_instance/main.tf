@@ -25,6 +25,7 @@ resource "aws_instance" "this" {
     delete_on_termination = true
     encrypted             = true
     iops                  = try(local.ebs_volume_root.iops > 0, false) ? local.ebs_volume_root.iops : null
+    kms_key_id            = try(local.ebs_volume_root.kms_key_id, null)
     throughput            = try(local.ebs_volume_root.throughput > 0, false) ? local.ebs_volume_root.throughput : null
     volume_size           = local.ebs_volume_root.size
     volume_type           = local.ebs_volume_root.type
@@ -54,6 +55,7 @@ resource "aws_instance" "this" {
       encrypted             = true
 
       iops        = try(ebs_block_device.value.iops > 0, false) ? ebs_block_device.value.iops : null
+      kms_key_id  = try(ebs_block_device.value.kms_key_id, null)
       throughput  = try(ebs_block_device.value.throughput > 0, false) ? ebs_block_device.value.throughput : null
       volume_size = ebs_block_device.value.size
       volume_type = ebs_block_device.value.type
@@ -99,6 +101,7 @@ resource "aws_ebs_volume" "this" {
 
   availability_zone = var.availability_zone
   encrypted         = true
+  kms_key_id        = try(each.value.kms_key_id, null)
   iops              = try(each.value.iops > 0, false) ? each.value.iops : null
   throughput        = try(each.value.throughput > 0, false) ? each.value.throughput : null
   size              = each.value.size

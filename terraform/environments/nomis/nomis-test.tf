@@ -232,8 +232,9 @@ locals {
         }
         ebs_volumes = {
           "/dev/sdb" = { # /u01 (add for weblogic testing)
-            type = "gp3"
-            size = 150
+            type       = "gp3"
+            size       = 150
+            kms_key_id = data.aws_kms_key.hmpps_key.arn
           }
         }
         route53_records = {
