@@ -2,18 +2,18 @@
   "Version": "2012-10-17",
   "Statement": [
     {
-      "Effect": "Allow",
       "Principal": {
         "AWS": [
-            "arn:aws:iam::${var.account_id}:role/${aws_iam_role.codebuild_s3.id}"
+            "arn:aws:iam::${jsonencode(account_id)}:role/${jsonencode(codebuild_role_name)}"
         ]
       },
+      "Effect": "Allow",
       "Action": [
         "s3:*"
       ],
       "Resource": [
-        "arn:aws:s3:::${aws_s3_bucket.codebuild_artifact.id}",
-        "arn:aws:s3:::${aws_s3_bucket.codebuild_artifact.id}/*"
+        "arn:aws:s3:::${jsonencode(s3_artifact_name)}",
+        "arn:aws:s3:::${jsonencode(s3_artifact_name)}/*"
       ]
     }
   ]

@@ -50,7 +50,10 @@ resource "aws_s3_bucket_versioning" "report_versioning" {
 resource "aws_kms_key" "codebuild" {
   description             = "For CodeBuild to access S3 artifacts"
   enable_key_rotation     = true
-  policy                  = file("${path.module}/kms_policy.json")
+  policy                  = file("${path.module}/kms_policy.json", {
+      account_id = var.account_id
+    }
+  )
 }
 
 resource "aws_kms_alias" "codebuild_alias" {
@@ -73,7 +76,12 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "codebuild_artifac
 
 resource "aws_s3_bucket_policy" "allow_access_from_codebuild" {
   bucket = aws_s3_bucket.codebuild_artifact.id
-  policy = file("${path.module}/s3_bucket_policy.json")
+  policy = templatefile("${path.module}/s3_bucket_policy.json", {
+      account_id = var.account_id,
+      s3_artifact_name = aws_s3_bucket.codebuild_artifact,
+      codebuild_role_name = aws_iam_role.codebuild_s3.id
+    }
+  )
 }
 
 
@@ -88,7 +96,10 @@ resource "aws_iam_role" "codebuild_s3" {
 resource "aws_iam_role_policy" "codebuild_s3" {
   name = "${var.app_name}-CodeBuildPolicy"
   role = aws_iam_role.codebuild_s3.name
-  policy = file("${path.module}/codebuild_iam_policy.json")
+  policy = templatefile("${path.module}/codebuild_iam_policy.json", {
+      s3_artifact_name = aws_s3_bucket.codebuild_artifact
+    }
+  )
 }
 
 resource "aws_codebuild_project" "selenium" {
