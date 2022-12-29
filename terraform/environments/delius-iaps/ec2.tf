@@ -104,9 +104,9 @@ data "aws_iam_policy_document" "iaps_ec2_policy" {
     resources = ["arn:aws:s3:::${local.artefact_bucket_name}/*"]
   }
 
-   statement {
-    sid       = "SecretPermissions"
-    actions   = [
+  statement {
+    sid = "SecretPermissions"
+    actions = [
       "secretsmanager:GetSecretValue"
     ]
     resources = [aws_secretsmanager_secret.ad_password.arn]
