@@ -170,9 +170,10 @@ locals {
         ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2022-12-23T13-04-38.814Z"
         # branch = var.BRANCH_NAME # comment in if testing ansible
 
-        # NOTE: setting desired capacity to 0 until fully working DSOS-1611
+        # NOTE: using standalone instance until connectivity from FixNGo in place
         autoscaling_group = {
-          desired_capacity = 1
+          desired_capacity = 0
+          warm_pool        = null
         }
         offpeak_desired_capacity = 0
       }
