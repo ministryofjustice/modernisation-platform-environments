@@ -46,6 +46,7 @@ resource "aws_instance" "this" {
   }
 
   # only use this inline EBS block if it is easy to recreate the EBS volume
+  # as the block is only used when the EC2 is first created
   dynamic "ebs_block_device" {
     for_each = try(var.instance.ebs_block_device_inline, false) ? local.ebs_volumes_nonroot : {}
     content {
@@ -80,7 +81,8 @@ resource "aws_instance" "this" {
 
   lifecycle {
     ignore_changes = [
-      user_data, # Prevent changes to user_data from destroying existing EC2s
+      user_data,        # Prevent changes to user_data from destroying existing EC2s
+      ebs_block_device, # Otherwise EC2 will be refreshed each time
     ]
   }
 
