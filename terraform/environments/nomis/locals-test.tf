@@ -215,8 +215,9 @@ locals {
           create_internal_record = true
           create_external_record = true
         }
-        ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2022-12-23T13-04-38.814Z"
-        branch   = "nomis/DSOS-1611/weblogic-tweak"
+        subnet_name = "public"
+        ami_name    = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2022-12-23T13-04-38.814Z"
+        branch      = "nomis/DSOS-1611/weblogic-tweak"
         # branch   = var.BRANCH_NAME # comment in if testing ansible
       }
     }
