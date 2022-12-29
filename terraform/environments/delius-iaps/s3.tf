@@ -2,7 +2,10 @@ data "aws_iam_policy_document" "iaps_s3_policy" {
   statement {
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/iaps_ec2_role"]
+      identifiers = [
+        "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/iaps_ec2_role",
+        "arn:aws:iam::${local.environment_management.account_ids["core-shared-services-production"]}:root"
+      ]
     }
     actions   = ["s3:GetObject"]
     resources = ["arn:aws:s3:::${local.artefact_bucket_name}/*"]
