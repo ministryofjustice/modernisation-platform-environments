@@ -43,17 +43,6 @@ locals {
       max_size         = 2
       min_size         = 0
     }
-
-    autoscaling_schedules = {
-      # if sizes not set, use the values defined in autoscaling_group
-      "scale_up" = {
-        recurrence = "0 7 * * Mon-Fri"
-      }
-      "scale_down" = {
-        desired_capacity = 0
-        recurrence       = "0 19 * * Mon-Fri"
-      }
-    }
   }
 }
 
@@ -99,7 +88,7 @@ module "ec2_test_instance" {
 }
 
 module "ec2_test_autoscaling_group" {
-  source = "./modules/ec2_autoscaling_group"
+  source = "../../modules/ec2_autoscaling_group"
 
   providers = {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
@@ -119,7 +108,16 @@ module "ec2_test_autoscaling_group" {
   ssm_parameters_prefix         = lookup(each.value, "ssm_parameters_prefix", "test/")
   ssm_parameters                = lookup(each.value, "ssm_parameters", null)
   autoscaling_group             = merge(local.ec2_test.autoscaling_group, lookup(each.value, "autoscaling_group", {}))
-  autoscaling_schedules         = coalesce(lookup(each.value, "autoscaling_schedules", null), local.ec2_test.autoscaling_schedules)
+  autoscaling_schedules = coalesce(lookup(each.value, "autoscaling_schedules", null), {
+    # if sizes not set, use the values defined in autoscaling_group
+    "scale_up" = {
+      recurrence = "0 7 * * Mon-Fri"
+    }
+    "scale_down" = {
+      desired_capacity = lookup(each.value, "offpeak_desired_capacity", 0)
+      recurrence       = "0 19 * * Mon-Fri"
+    }
+  })
 
   iam_resource_names_prefix = "ec2-test-asg"
   instance_profile_policies = local.ec2_common_managed_policies

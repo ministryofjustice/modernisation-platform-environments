@@ -114,4 +114,3 @@ data "aws_route53_zone" "external-environment" {
   name         = "${local.vpc_name}-${local.environment}.modernisation-platform.service.justice.gov.uk."
   private_zone = false
 }
-
