@@ -140,7 +140,7 @@ data "template_file" "iaps_ec2_config" {
 resource "aws_launch_template" "iaps_instance_launch_template" {
   # Basic options
   name                   = "iaps-launch-template"
-  image_id               = "ami-0e322684a5a0074ce" # data.aws_ami.delius_iaps_server.id
+  image_id               = data.aws_ami.delius_iaps_server.id # "ami-0e322684a5a0074ce" # 
   instance_type          = local.application_data.accounts[local.environment].ec2_iaps_instance_type
   key_name               = aws_key_pair.ec2-user.key_name
   vpc_security_group_ids = [aws_security_group.iaps.id]
