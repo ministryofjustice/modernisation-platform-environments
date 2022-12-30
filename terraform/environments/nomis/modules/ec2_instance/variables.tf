@@ -93,16 +93,15 @@ variable "name" {
 variable "instance" {
   description = "EC2 instance settings, see aws_instance documentation"
   type = object({
+    associate_public_ip_address  = optional(bool, false)
     disable_api_termination      = bool
     instance_type                = string
     key_name                     = string
     metadata_endpoint_enabled    = optional(string, "enabled")
     metadata_options_http_tokens = optional(string, "required")
     monitoring                   = optional(bool, true)
+    ebs_block_device_inline      = optional(bool, false)
     vpc_security_group_ids       = list(string)
-    root_block_device = optional(object({
-      volume_size = number
-    }))
     private_dns_name_options = optional(object({
       enable_resource_name_dns_aaaa_record = optional(bool)
       enable_resource_name_dns_a_record    = optional(bool)

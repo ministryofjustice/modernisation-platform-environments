@@ -8,7 +8,6 @@ variable "business_unit" {
 variable "application_name" {
   type        = string
   description = "The name of the application.  This will be name of the environment in Modernisation Platform"
-  default     = "nomis"
   nullable    = false
   validation {
     condition     = can(regex("^[A-Za-z0-9][A-Za-z0-9-.]{1,61}[A-Za-z0-9]$", var.application_name))

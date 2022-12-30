@@ -1,3 +1,5 @@
+data "aws_caller_identity" "current" {}
+
 data "template_file" "user_data" {
   template = file("${path.module}/scripts/bootstrap_apps.sh")
 

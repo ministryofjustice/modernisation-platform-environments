@@ -4,7 +4,7 @@
 
 resource "aws_instance" "this" {
   ami                         = data.aws_ami.this.id
-  associate_public_ip_address = false
+  associate_public_ip_address = var.instance.associate_public_ip_address
   disable_api_termination     = var.instance.disable_api_termination
   ebs_optimized               = data.aws_ec2_instance_type.this.ebs_optimized_support == "unsupported" ? false : true
   iam_instance_profile        = aws_iam_instance_profile.this.name
@@ -24,21 +24,49 @@ resource "aws_instance" "this" {
   root_block_device {
     delete_on_termination = true
     encrypted             = true
-    volume_size           = try(var.instance.root_block_device.volume_size, local.ami_block_device_mappings_root.ebs.volume_size)
-    volume_type           = local.ami_block_device_mappings_root.ebs.volume_type
+    iops                  = try(local.ebs_volume_root.iops > 0, false) ? local.ebs_volume_root.iops : null
+    kms_key_id            = try(local.ebs_volume_root.kms_key_id, null)
+    throughput            = try(local.ebs_volume_root.throughput > 0, false) ? local.ebs_volume_root.throughput : null
+    volume_size           = local.ebs_volume_root.size
+    volume_type           = local.ebs_volume_root.type
 
     tags = merge(local.tags, {
-      Name = join("-", [var.name, "root", local.ami_block_device_mappings_root.device_name])
+      Name = join("-", [var.name, "root", data.aws_ami.this.root_device_name])
     })
   }
 
   # block devices specified inline cannot be resized later so remove them here
   # and define as ebs_volumes later
   dynamic "ephemeral_block_device" {
-    for_each = local.ami_block_device_mappings_nonroot
+    for_each = try(var.instance.ebs_block_device_inline, false) ? {} : local.ami_block_device_mappings_nonroot
     content {
       device_name = ephemeral_block_device.value.device_name
       no_device   = true
+    }
+  }
+
+  # only use this inline EBS block if it is easy to recreate the EBS volume
+  # as the block is only used when the EC2 is first created
+  dynamic "ebs_block_device" {
+    for_each = try(var.instance.ebs_block_device_inline, false) ? local.ebs_volumes_nonroot : {}
+    content {
+      device_name = ebs_block_device.key
+
+      delete_on_termination = true
+      encrypted             = true
+
+      iops        = try(ebs_block_device.value.iops > 0, false) ? ebs_block_device.value.iops : null
+      kms_key_id  = try(ebs_block_device.value.kms_key_id, null)
+      throughput  = try(ebs_block_device.value.throughput > 0, false) ? ebs_block_device.value.throughput : null
+      volume_size = ebs_block_device.value.size
+      volume_type = ebs_block_device.value.type
+
+      tags = merge(local.tags, {
+        Name = try(
+          join("-", [var.name, ebs_block_device.value.label, ebs_block_device.key]),
+          join("-", [var.name, ebs_block_device.key])
+        )
+      })
     }
   }
 
@@ -53,7 +81,8 @@ resource "aws_instance" "this" {
 
   lifecycle {
     ignore_changes = [
-      user_data, # Prevent changes to user_data from destroying existing EC2s
+      user_data,        # Prevent changes to user_data from destroying existing EC2s
+      ebs_block_device, # Otherwise EC2 will be refreshed each time
     ]
   }
 
@@ -69,17 +98,18 @@ resource "aws_instance" "this" {
 resource "aws_ebs_volume" "this" {
   #tfsec:ignore:aws-ebs-encryption-customer-key:exp:2022-10-31: I don't think we need the fine grained control CMK would provide
   #checkov:skip=CKV_AWS_189:I don't think we need the fine grained control CMK would provide
-  for_each = local.ebs_volumes
+  for_each = try(var.instance.ebs_block_device_inline, false) ? {} : local.ebs_volumes_nonroot
 
-  # Values are retrieved from AMI data rather than using snapshot_id, since 
-  # it's not always possible to access the snapshot_id if the AMI is in a 
-  # different account.
   availability_zone = var.availability_zone
   encrypted         = true
+  kms_key_id        = try(each.value.kms_key_id, null)
   iops              = try(each.value.iops > 0, false) ? each.value.iops : null
   throughput        = try(each.value.throughput > 0, false) ? each.value.throughput : null
   size              = each.value.size
   type              = each.value.type
+
+  # you may run into a permission issue if the AMI is not in self account
+  snapshot_id = each.value.snapshot_id
 
   tags = merge(
     local.tags,
@@ -127,7 +157,7 @@ resource "aws_route53_record" "external" {
   name    = "${var.name}.${var.application_name}.${data.aws_route53_zone.external.name}"
   type    = "A"
   ttl     = 60
-  records = [aws_instance.this.private_ip]
+  records = [var.instance.associate_public_ip_address ? aws_instance.this.public_ip : aws_instance.this.private_ip]
 }
 
 #------------------------------------------------------------------------------

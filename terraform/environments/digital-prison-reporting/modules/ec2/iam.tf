@@ -43,9 +43,9 @@ data "aws_iam_policy_document" "kinesis-data-stream" {
       "kinesis:GetRecords",
     ]
     resources = [
-      "arn:aws:kinesis:eu-west-2:771283872747:stream/dpr-kinesis-data-domain-development",
-      "arn:aws:kinesis:eu-west-2:771283872747:stream/dpr-kinesis-ingestor-development",
-      "arn:aws:kinesis:eu-west-2:771283872747:stream/dpr-kinesis-data-demo-development"
+      "arn:aws:kinesis:eu-west-2:${data.aws_caller_identity.current.account_id}:stream/dpr-kinesis-data-domain-development",
+      "arn:aws:kinesis:eu-west-2:${data.aws_caller_identity.current.account_id}:stream/dpr-kinesis-ingestor-development",
+      "arn:aws:kinesis:eu-west-2:${data.aws_caller_identity.current.account_id}:stream/dpr-kinesis-data-demo-development"
     ]
   }
 }

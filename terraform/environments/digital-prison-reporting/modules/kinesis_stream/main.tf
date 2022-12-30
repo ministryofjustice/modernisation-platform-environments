@@ -102,6 +102,6 @@ resource "aws_iam_policy" "admin" {
 
 #### TEMPORARY ####
 #resource "aws_iam_role_policy_attachment" "temporary-policy" {
-#  role       = "arn:aws:sts::771283872747:assumed-role/AWSReservedSSO_modernisation-platform-developer_1425a99d62c4ce2b"
+#  role       = "arn:aws:sts::${data.aws_caller_identity.current.account_id}:assumed-role/AWSReservedSSO_modernisation-platform-developer_1425a99d62c4ce2b"
 #  policy_arn = concat(aws_iam_policy.admin.*.arn, [""])[0]
 #}
