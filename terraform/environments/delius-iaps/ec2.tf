@@ -173,7 +173,7 @@ resource "aws_launch_template" "iaps_instance_launch_template" {
 
   block_device_mappings {
     device_name = "/dev/xvdf"
-    no_device = true
+    no_device   = true
   }
 
   # Tags
