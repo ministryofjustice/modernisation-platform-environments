@@ -12,6 +12,16 @@ run_ansible() {
     set -x
   fi
 
+  if ! command -v aws > /dev/null; then
+    echo "aws cli must be installed, not installing any ansible" >&2
+    exit 0
+  fi
+
+  if ! command -v git > /dev/null; then
+    echo "git must be installed, not installing any ansible" >&2
+    exit 0
+  fi
+
   echo "# Retrieving API Token"
   token=$(curl -sS -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
 

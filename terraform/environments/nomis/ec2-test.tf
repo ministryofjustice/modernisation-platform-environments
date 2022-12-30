@@ -25,6 +25,7 @@ locals {
         lifecycle_hook_name = "ready-hook"
       }
       scripts = [
+        "install-ssm-agent.sh.tftpl",
         "ansible-ec2provision.sh.tftpl",
         "post-ec2provision.sh.tftpl"
       ]
