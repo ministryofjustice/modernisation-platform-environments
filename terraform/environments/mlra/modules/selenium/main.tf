@@ -150,10 +150,10 @@ resource "aws_codebuild_project" "selenium" {
   }
 
   source {
-    type            = "S3"
-    # location        = "https://github.com/ministryofjustice/laa-mlra-application.git"
+    type            = "GitHub"
+    location        = "https://github.com/ministryofjustice/laa-mlra-application.git"
     buildspec       = "testspec-lz.yml"
-    location        = "${aws_s3_bucket.codebuild_artifact.id}/source.zip"
+    # location        = "${aws_s3_bucket.codebuild_artifact.id}/source.zip"
   }
 
   # logs_config {
