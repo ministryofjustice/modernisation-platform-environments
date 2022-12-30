@@ -102,6 +102,7 @@ resource "aws_launch_template" "ec2-launch-template" {
   instance_type = var.instance_type
   key_name      = var.key_name
   ebs_optimized = true
+  update_default_version = true
 
   monitoring {
     enabled = true
