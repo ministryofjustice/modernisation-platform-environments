@@ -168,6 +168,7 @@ resource "aws_launch_template" "iaps_instance_launch_template" {
       volume_size           = 50
       encrypted             = true
       delete_on_termination = true
+      kms_key_id            = data.aws_kms_key.ebs_shared.arn
     }
   }
 
