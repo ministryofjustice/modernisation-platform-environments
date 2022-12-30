@@ -42,7 +42,7 @@ locals {
       aws_iam_policy.ssm_least_privilege_policy.arn
     ]
 
-  }  
+  }
 
 }
 
