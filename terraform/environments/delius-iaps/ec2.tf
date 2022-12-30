@@ -11,20 +11,16 @@ locals {
 ##
 # Data
 ## 
-data "aws_ami" "windows2022" {
+# Can use aws ec2 describe-images --filters "Name=owner-id,Values=374269020027" --filters "Name=description,Values='Delius IAPS server'" --query 'reverse(sort_by(Images, &CreationDate))[0].[Name,ImageId]' to test
+data "aws_ami" "delius_iaps_server" {
   most_recent = true
 
   filter {
     name   = "name"
-    values = ["Windows_Server-2022-English-Full-Base-2022.*"]
+    values = ["delius_iaps_server_*"]
   }
 
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
-
-  owners = ["801119661308"] # AWS
+  owners = [local.environment_management.account_ids["core-shared-services-production"]]
 }
 
 ##
@@ -144,7 +140,7 @@ data "template_file" "iaps_ec2_config" {
 resource "aws_launch_template" "iaps_instance_launch_template" {
   # Basic options
   name                   = "iaps-launch-template"
-  image_id               = data.aws_ami.windows2022.id
+  image_id               = data.aws_ami.delius_iaps_server.id
   instance_type          = local.application_data.accounts[local.environment].ec2_iaps_instance_type
   key_name               = aws_key_pair.ec2-user.key_name
   vpc_security_group_ids = [aws_security_group.iaps.id]
