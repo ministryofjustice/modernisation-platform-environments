@@ -31,9 +31,9 @@ locals {
     user_data_raw = base64encode(data.template_file.iaps_ec2_config.rendered)
 
     autoscaling_group = {
-      desired_capacity = 0
+      desired_capacity = 1
       max_size         = 1
-      min_size         = 0
+      min_size         = 1
       force_delete     = true
     }
 
