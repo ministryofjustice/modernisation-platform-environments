@@ -15,7 +15,6 @@ data "aws_caller_identity" "modernisation_platform" {
   provider = aws.modernisation-platform
 }
 
-
 locals {
 
   application_name = "delius-iaps"
