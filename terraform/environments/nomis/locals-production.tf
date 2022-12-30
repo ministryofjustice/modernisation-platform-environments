@@ -24,6 +24,12 @@ locals {
       local.cidrs.noms_live_dr,
       local.cidrs.noms_mgmt_live_dr,
     ]
+    external_weblogic_access_cidrs = [
+      local.cidrs.noms_live,
+      local.cidrs.noms_mgmt_live,
+      local.cidrs.noms_transit_live_fw_devtest,
+      local.cidrs.noms_transit_live_fw_prod,
+    ]
 
     # Details of OMS Manager in FixNGo (only needs defining if databases in the environment are managed)
     database_oracle_manager = {

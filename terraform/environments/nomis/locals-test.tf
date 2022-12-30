@@ -24,6 +24,12 @@ locals {
       local.cidrs.noms_test_dr,
       local.cidrs.noms_mgmt_dr,
     ]
+    external_weblogic_access_cidrs = [
+      local.cidrs.noms_test,
+      local.cidrs.noms_mgmt,
+      local.cidrs.noms_transit_live_fw_devtest,
+      local.cidrs.noms_transit_live_fw_prod,
+    ]
 
     # vars common across ec2 instances
     ec2_common = {
@@ -116,7 +122,8 @@ locals {
           monitored           = false
           instance-scheduling = "skip-scheduling"
         }
-        ami_name = "nomis_rhel_7_9_oracledb_11_2_*"
+        ami_name  = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-07T12-48-08.562Z"
+        ami_owner = "self" # remove this line next time AMI is updated so core-shared-services-production used instead
         instance = {
           disable_api_termination = true
         }
@@ -163,9 +170,10 @@ locals {
         ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2022-12-23T13-04-38.814Z"
         # branch = var.BRANCH_NAME # comment in if testing ansible
 
-        # NOTE: setting desired capacity to 0 until fully working DSOS-1611
+        # NOTE: using standalone instance until connectivity from FixNGo in place
         autoscaling_group = {
           desired_capacity = 0
+          warm_pool        = null
         }
         offpeak_desired_capacity = 0
       }
@@ -179,7 +187,39 @@ locals {
       }
     }
 
-    ec2_test_instances = {}
+    ec2_test_instances = {
+      t1-nomis-web-1 = {
+        tags = {
+          ami                = "nomis_rhel_6_10_weblogic_appserver_10_3"
+          description        = "For testing our RHEL6.10 weblogic image"
+          monitored          = false
+          server-type        = "nomis-web"
+          oracle-db-hostname = "db.CNOMT1.nomis.hmpps-test.modernisation-platform.internal"
+          oracle-db-name     = "CNOMT1"
+        }
+        instance = {
+          # set to large for weblogic testing
+          instance_type                = "t2.large"
+          metadata_options_http_tokens = "optional"
+          associate_public_ip_address  = true
+          ebs_block_device_inline      = true
+        }
+        ebs_volumes = {
+          "/dev/sdb" = { # /u01 (add for weblogic testing)
+            type       = "gp3"
+            size       = 150
+            kms_key_id = data.aws_kms_key.hmpps_key.arn
+          }
+        }
+        route53_records = {
+          create_internal_record = true
+          create_external_record = true
+        }
+        subnet_name = "public"
+        ami_name    = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2022-12-23T13-04-38.814Z"
+        # branch   = var.BRANCH_NAME # comment in if testing ansible
+      }
+    }
     ec2_test_autoscaling_groups = {
       t1-ndh-app = {
         tags = {
