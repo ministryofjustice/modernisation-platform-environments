@@ -76,7 +76,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "codebuild_artifac
   }
 }
 
-data "template_file" "s3_bucket_policy" {
+data "template_file" "s3_art_bucket_policy" {
   template = "${file("${path.module}/s3_bucket_policy.json.tpl")}"
 
   vars = {
@@ -86,9 +86,24 @@ data "template_file" "s3_bucket_policy" {
   }
 }
 
-resource "aws_s3_bucket_policy" "allow_access_from_codebuild" {
+resource "aws_s3_bucket_policy" "fallow_access_from_codebuild_art" {
   bucket = aws_s3_bucket.codebuild_artifact.id
-  policy = data.template_file.s3_bucket_policy.rendered
+  policy = data.template_file.s3_art_bucket_policy.rendered
+}
+
+data "template_file" "s3_report_bucket_policy" {
+  template = "${file("${path.module}/s3_bucket_policy.json.tpl")}"
+
+  vars = {
+    account_id = var.account_id,
+    s3_artifact_name = aws_s3_bucket.selenium_report.id,
+    codebuild_role_name = aws_iam_role.codebuild_s3.id
+  }
+}
+
+resource "aws_s3_bucket_policy" "allow_access_from_codebuild_report" {
+  bucket = aws_s3_bucket.selenium_report.id
+  policy = data.template_file.s3_report_bucket_policy.rendered
 }
 
 
