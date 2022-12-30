@@ -1,5 +1,4 @@
 resource "aws_s3_bucket" "selenium_report" {
-  # count  = var.environment == "development" ? 1 : 0
   bucket = "laa-${var.app_name}-deployment-pipeline-pipelinereportbucket"
 
   tags = merge(
@@ -11,7 +10,6 @@ resource "aws_s3_bucket" "selenium_report" {
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "report_sse" {
-  # count  = var.environment == "development" ? 1 : 0
   bucket = aws_s3_bucket.selenium_report.id
   rule {
     apply_server_side_encryption_by_default {
@@ -21,7 +19,6 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "report_sse" {
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "report_lifecycle" {
-  # count  = var.environment == "development" ? 1 : 0
   bucket = aws_s3_bucket.selenium_report.id
 
   rule {
@@ -155,12 +152,6 @@ resource "aws_codebuild_project" "selenium" {
     buildspec       = "testspec-lz.yml"
     # location        = "${aws_s3_bucket.codebuild_artifact.id}/source.zip"
   }
-
-  # logs_config {
-  #   cloudwatch_logs {
-  #     status   = "DISABLED"
-  #   }
-  # }
 
   tags = merge(
     var.tags,
