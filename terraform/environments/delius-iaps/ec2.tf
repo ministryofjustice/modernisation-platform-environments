@@ -171,6 +171,11 @@ resource "aws_launch_template" "iaps_instance_launch_template" {
     }
   }
 
+  block_device_mappings {
+    device_name = "/dev/xvdf"
+    no_device = true
+  }
+
   # Tags
   dynamic "tag_specifications" {
     for_each = toset(local.application_data.launch_template_tag_resource_types)
