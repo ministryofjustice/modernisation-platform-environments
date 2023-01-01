@@ -4,7 +4,7 @@ module "alb" {
   #   aws.bucket-replication = aws
   # }
 
-  provider                         = aws.bucket-replication
+  provider = aws.bucket-replication
 
   vpc_all                          = local.vpc_all
   application_name                 = local.application_name
