@@ -1,7 +1,7 @@
 module "alb" {
   source = "./modules/albvars"
   providers = {
-    aws.bucket-replication = aws.bucket-replication
+    aws.bucket-replication = aws
   }
 
   vpc_all                          = local.vpc_all

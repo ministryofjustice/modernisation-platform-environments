@@ -1,8 +1,8 @@
 module "lb-access-logs-enabled" {
   source = "../alb"
-  providers = {
-    aws.bucket-replication = aws.bucket-replication
-  }
+  # providers = {
+  #   aws.bucket-replication = aws.bucket-replication
+  # }
 
   vpc_all                    = var.vpc_all
   internal_lb                = var.internal_lb
