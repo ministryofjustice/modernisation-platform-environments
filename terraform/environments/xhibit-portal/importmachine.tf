@@ -12,21 +12,19 @@ resource "aws_security_group" "importmachine" {
   }
 
   ingress {
-    description              = "PRTG lb to importmachine"
-    from_port                = 0
-    to_port                  = 0
-    protocol                 = "-1"
-    security_group_id        = [aws_security_group.importmachine.id]
-    source_security_group_id = [aws_security_group.prtg_lb.id]
+    description     = "PRTG lb to importmachine"
+    from_port       = 0
+    to_port         = 0
+    protocol        = "-1"
+    security_groups = [aws_security_group.prtg_lb.id]
   }
 
   egress {
-    description              = "from importmachine to PRTG lb"
-    from_port                = 0
-    to_port                  = 0
-    protocol                 = "-1"
-    security_group_id        = [aws_security_group.importmachine.id]
-    source_security_group_id = [aws_security_group.prtg_lb.id]
+    description     = "from importmachine to PRTG lb"
+    from_port       = 0
+    to_port         = 0
+    protocol        = "-1"
+    security_groups = [aws_security_group.prtg_lb.id]
   }
 
 }
