@@ -188,37 +188,37 @@ locals {
     }
 
     ec2_test_instances = {
-      t1-nomis-web-1 = {
-        tags = {
-          ami                = "nomis_rhel_6_10_weblogic_appserver_10_3"
-          description        = "For testing our RHEL6.10 weblogic image"
-          monitored          = false
-          server-type        = "nomis-web"
-          oracle-db-hostname = "db.CNOMT1.nomis.hmpps-test.modernisation-platform.internal"
-          oracle-db-name     = "CNOMT1"
-        }
-        instance = {
-          # set to large for weblogic testing
-          instance_type                = "t2.large"
-          metadata_options_http_tokens = "optional"
-          associate_public_ip_address  = true
-          ebs_block_device_inline      = true
-        }
-        ebs_volumes = {
-          "/dev/sdb" = { # /u01 (add for weblogic testing)
-            type       = "gp3"
-            size       = 150
-            kms_key_id = data.aws_kms_key.hmpps_key.arn
-          }
-        }
-        route53_records = {
-          create_internal_record = true
-          create_external_record = true
-        }
-        subnet_name = "public"
-        ami_name    = "nomis_rhel_6_10_weblogic_appserver_10_3_test_2023-01-03T10-04-08.077Z"
-        # branch   = var.BRANCH_NAME # comment in if testing ansible
-      }
+#      t1-nomis-web-1 = {
+#        tags = {
+#          ami                = "nomis_rhel_6_10_weblogic_appserver_10_3"
+#          description        = "For testing our RHEL6.10 weblogic image"
+#          monitored          = false
+#          server-type        = "nomis-web"
+#          oracle-db-hostname = "db.CNOMT1.nomis.hmpps-test.modernisation-platform.internal"
+#          oracle-db-name     = "CNOMT1"
+#        }
+#        instance = {
+#          # set to large for weblogic testing
+#          instance_type                = "t2.large"
+#          metadata_options_http_tokens = "optional"
+#          associate_public_ip_address  = true
+#          ebs_block_device_inline      = true
+#        }
+#        ebs_volumes = {
+#          "/dev/sdb" = { # /u01 (add for weblogic testing)
+#            type       = "gp3"
+#            size       = 150
+#            kms_key_id = data.aws_kms_key.hmpps_key.arn
+#          }
+#        }
+#        route53_records = {
+#          create_internal_record = true
+#          create_external_record = true
+#        }
+#        subnet_name = "public"
+#        ami_name    = "nomis_rhel_6_10_weblogic_appserver_10_3_test_2023-01-03T10-04-08.077Z"
+#        # branch   = var.BRANCH_NAME # comment in if testing ansible
+#      }
     }
     ec2_test_autoscaling_groups = {
       t1-ndh-app = {
