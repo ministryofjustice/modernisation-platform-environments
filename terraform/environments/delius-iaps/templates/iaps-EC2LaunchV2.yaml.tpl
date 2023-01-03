@@ -9,7 +9,7 @@ tasks:
       $ConfirmPreference="none"
       $ErrorActionPreference="Stop"
       $VerbosePreference="Continue"
-      # Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force # Still needed?
+      Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force # Needed for PS module installs
       Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
       Install-Module -Name AWSPowerShell -MinimumVersion 4.1.196 # Current latest version as of 3/1/23 is 4.1.196
 
@@ -20,5 +20,5 @@ tasks:
       $domainJoinCredential = New-Object System.Management.Automation.PSCredential($domainJoinUserName, $domainJoinPassword)
       $token = invoke-restmethod -Headers @{"X-aws-ec2-metadata-token-ttl-seconds"=3600} -Method PUT -Uri http://169.254.169.254/latest/api/token
       $instanceId = invoke-restmethod -Headers @{"X-aws-ec2-metadata-token" = $token} -Method GET -uri http://169.254.169.254/latest/meta-data/instance-id
-      add-computer -DomainName "${delius_iaps_ad_domain_name}" -Credential $domainJoinCredential -NewName $instanceId 
+      Add-Computer -DomainName "${delius_iaps_ad_domain_name}" -Credential $domainJoinCredential -NewName $instanceId -Force
 
