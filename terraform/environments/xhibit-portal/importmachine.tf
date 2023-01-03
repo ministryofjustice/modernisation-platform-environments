@@ -20,18 +20,16 @@ resource "aws_security_group" "importmachine" {
     source_security_group_id = [aws_security_group.prtg_lb.id]
   }
 
+  egress {
+    description              = "from importmachine to PRTG lb"
+    from_port                = 0
+    to_port                  = 0
+    protocol                 = "-1"
+    security_group_id        = [aws_security_group.importmachine.id]
+    source_security_group_id = [aws_security_group.prtg_lb.id]
+  }
+
 }
-
-egress {
-  description              = "from importmachine to PRTG lb"
-  from_port                = 0
-  to_port                  = 0
-  protocol                 = "-1"
-  security_group_id        = [aws_security_group.importmachine.id]
-  source_security_group_id = [aws_security_group.prtg_lb.id]
-}
-
-
 
 resource "aws_key_pair" "george" {
   key_name   = "george"
