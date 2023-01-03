@@ -115,7 +115,7 @@ locals {
       }
     }
     ec2_jumpservers = {
-      /* jumpserver-2022 = {
+      jumpserver-2022 = {
         ami_name = "nomis_windows_server_2022_jumpserver_2022*"
         tags = {
           server-type       = "jumpserver"
@@ -126,7 +126,7 @@ locals {
           min_size = 0
           max_size = 1
         }
-      } */
+      }
     }
   }
 }
