@@ -4,7 +4,7 @@
 
 resource "aws_instance" "this" {
   ami                         = data.aws_ami.this.id
-  associate_public_ip_address = var.instance.associate_public_ip_address
+  associate_public_ip_address = false # create an EIP instead
   disable_api_termination     = var.instance.disable_api_termination
   ebs_optimized               = data.aws_ec2_instance_type.this.ebs_optimized_support == "unsupported" ? false : true
   iam_instance_profile        = aws_iam_instance_profile.this.name
@@ -92,6 +92,25 @@ resource "aws_instance" "this" {
 }
 
 #------------------------------------------------------------------------------
+# PUBLIC IP
+#------------------------------------------------------------------------------
+
+resource "aws_eip" "this" {
+  #checkov:skip=CKV2_AWS_19: "EIP attachment is handled through separate resource"
+  count = var.instance.associate_public_ip_address ? 1 : 0
+  vpc   = true
+  tags = merge(local.tags, {
+    Name = var.name
+  })
+}
+
+resource "aws_eip_association" "this" {
+  count         = var.instance.associate_public_ip_address ? 1 : 0
+  instance_id   = aws_instance.this.id
+  allocation_id = aws_eip.this[0].id
+}
+
+#------------------------------------------------------------------------------
 # DISKS
 #------------------------------------------------------------------------------
 
@@ -157,7 +176,7 @@ resource "aws_route53_record" "external" {
   name    = "${var.name}.${var.application_name}.${data.aws_route53_zone.external.name}"
   type    = "A"
   ttl     = 60
-  records = [var.instance.associate_public_ip_address ? aws_instance.this.public_ip : aws_instance.this.private_ip]
+  records = [var.instance.associate_public_ip_address ? aws_eip.this[0].public_ip : aws_instance.this.private_ip]
 }
 
 #------------------------------------------------------------------------------
