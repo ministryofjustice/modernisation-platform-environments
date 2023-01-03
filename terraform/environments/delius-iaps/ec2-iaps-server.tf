@@ -235,7 +235,8 @@ resource "aws_iam_policy" "ssm_least_privilege_policy" {
 data "template_file" "iaps_ec2_config" {
   template = file("${path.module}/templates/iaps-EC2LaunchV2.yaml.tpl")
   vars = {
-
+    delius_iaps_ad_password_secret_name = aws_secretsmanager_secret.ad_password.name
+    delius_iaps_ad_domain_name = aws_directory_service_directory.active_directory.name
   }
 }
 
