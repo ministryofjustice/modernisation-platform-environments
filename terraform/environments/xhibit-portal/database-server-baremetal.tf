@@ -5,7 +5,7 @@ resource "aws_instance" "database-server-baremetal" {
   count                       = local.only_in_production
   depends_on                  = [aws_security_group.sms_server]
   instance_type               = "c5d.metal"
-  ami = lookup(local.application_data.accounts[local.environment], "suprig01-baremetal-ami", "")
+  ami                         = lookup(local.application_data.accounts[local.environment], "suprig01-baremetal-ami", "")
   vpc_security_group_ids      = [aws_security_group.sms_server.id]
   monitoring                  = false
   associate_public_ip_address = false
