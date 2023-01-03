@@ -2,7 +2,7 @@ version: 1.0
 tasks:
 - task: executeScript
   inputs:
-  - frequency: always
+  - frequency: once
     type: powershell
     runAs: localSystem
     content: |-
