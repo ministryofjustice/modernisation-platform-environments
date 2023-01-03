@@ -1,6 +1,6 @@
 resource "aws_s3_bucket" "selenium_report" {
-  count  = local.environment == "development" ? 1 : 0
-  bucket = "laa-${local.application_name}-deployment-pipeline-pipelinereportbucket"
+  count         = local.environment == "development" ? 1 : 0
+  bucket        = "laa-${local.application_name}-deployment-pipeline-pipelinereportbucket"
   force_destroy = true
 
   tags = merge(
