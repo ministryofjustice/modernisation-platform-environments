@@ -1,6 +1,17 @@
 ---
 name: Redeploy after nuke
 on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/nuke-redeploy.yml'
+  pull_request:
+    branches:
+      - main
+    types: [opened, edited, reopened, synchronize]
+    paths:
+      - '.github/workflows/nuke-redeploy.yml'
   schedule:
     # * is a special character in YAML so you have to quote this string
     # trigger every sunday at 12:00am
@@ -9,48 +20,64 @@ on:
 env:
   AWS_REGION: "eu-west-2"
   ENVIRONMENT_MANAGEMENT: ${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}
-  NUKE_DO_NOT_RECREATE_ENVIRONMENTS: performance-hub-development,example-development,testing-test-development,
+  NUKE_REDEPLOY_ACCOUNTS: ${{ secrets.MODERNISATION_PLATFORM_AUTONUKE_REBUILD }}
   TF_IN_AUTOMATION: true
-permissions:
-  id-token: write # This is required for requesting the JWT
-  contents: read # This is required for actions/checkout
+
+permissions: {}
+
 defaults:
   run:
     shell: bash
 
 jobs:
-
+  setup-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - id: set-matrix
+        run: echo "matrix=$(jq -c '.|sort' <<< $NUKE_REDEPLOY_ACCOUNTS)" >> $GITHUB_OUTPUT
   redeploy-after-nuke:
+    permissions:
+      id-token: write # This is required for requesting the JWT
+      contents: read # This is required for actions/checkout
     strategy:
       fail-fast: false
       matrix:
-        # current content of nuke list: {"COOKER_DEVELOPMENT_ACCID","SPRINKLER_DEVELOPMENT_ACCID","EXAMPLE_DEVELOPMENT_ACCID","TESTING_TEST_DEVELOPMENT_ACCID,"DELIUS_IAPS_DEVELOPMENT_ACCID"}
-        # matrix values are contents of that list minus accounts in the exclusion list defined in NUKE_DO_NOT_RECREATE_ENVIRONMENTS.
-        nuke_accts: [sprinkler, delius-iaps, data-and-insights-wepi, cooker]
+        nuke_accts: ${{ fromJSON(needs.setup-matrix.outputs.matrix) }}
     name: Redeploy after nuke
+    needs: setup-matrix
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3.1.0
+        uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
       - name: Set Account Number
-        run: echo "ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}-development" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)" >> $GITHUB_ENV
+        run: echo "ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)" >> $GITHUB_ENV
       - name: configure aws credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@67fbcbb121271f7775d2e7715933280b06314838 # v1.7.0
         with:
           role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
           role-session-name: githubactionsrolesession
           aws-region: ${{ env.AWS_REGION }}
       - name: Load and Configure Terraform
-        uses: hashicorp/setup-terraform@v2.0.3
+        uses: hashicorp/setup-terraform@633666f66e0061ca3b725c73b2ec20cd13a8fdd1 # v2.0.3
         with:
           terraform_version: "~1"
           terraform_wrapper: false
-      - name: Apply after nuke - ${{ matrix.nuke_accts }}
+      - name: Plan after nuke - ${{ matrix.nuke_accts }}
         run: |
           terraform --version
-          echo "Terraform apply - ${ACCOUNT_NAME}"
-          bash scripts/terraform-init.sh terraform/environments/$ACCOUNT_NAME
-          terraform -chdir="terraform/environments/${ACCOUNT_NAME}" workspace select "${ACCOUNT_NAME}-development"
-          bash scripts/terraform-apply.sh terraform/environments/$ACCOUNT_NAME
+          echo "Terraform Plan - ${ACCOUNT_NAME%-development}" # removes the -development suffix in order to get the directory name
+          bash scripts/terraform-init.sh terraform/environments/${ACCOUNT_NAME%-development}
+          terraform -chdir="terraform/environments/${ACCOUNT_NAME%-development}" workspace select "${ACCOUNT_NAME}"
+          bash scripts/terraform-plan.sh terraform/environments/${ACCOUNT_NAME%-development}
+      - name: Apply after nuke - ${{ matrix.nuke_accts }}
+        if: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') }}
+        run: |
+          terraform --version
+          echo "Terraform apply - ${ACCOUNT_NAME%-development}" # removes the -development suffix in order to get the directory name
+          bash scripts/terraform-init.sh terraform/environments/${ACCOUNT_NAME%-development}
+          terraform -chdir="terraform/environments/${ACCOUNT_NAME%-development}" workspace select "${ACCOUNT_NAME}"
+          bash scripts/terraform-apply.sh terraform/environments/${ACCOUNT_NAME%-development}
     env:
       ACCOUNT_NAME: ${{ matrix.nuke_accts }}

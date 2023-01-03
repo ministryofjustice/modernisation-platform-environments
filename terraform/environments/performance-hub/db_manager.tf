@@ -117,7 +117,7 @@ resource "aws_iam_policy" "db_mgmt_policy" {
         "Action": [
           "kms:Decrypt"
         ],
-        "Resource": "arn:aws:kms:eu-west-2:322518575883:key/c1b9e987-29e2-458f-b5bd-2e9c2b57f049"
+        "Resource": "arn:aws:kms:eu-west-2:${local.environment_management.account_ids["performance-hub-preproduction"]}:key/c1b9e987-29e2-458f-b5bd-2e9c2b57f049"
       }
     ]
 }

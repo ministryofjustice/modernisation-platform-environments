@@ -51,6 +51,7 @@ variable "tags" {
 
 variable "account_ids_lookup" {
   description = "A map of account names to account ids that can be used for AMI owner"
+  type        = map(any)
   default     = {}
 }
 
@@ -92,15 +93,15 @@ variable "name" {
 variable "instance" {
   description = "EC2 instance settings, see aws_instance documentation"
   type = object({
+    associate_public_ip_address  = optional(bool, false)
     disable_api_termination      = bool
     instance_type                = string
     key_name                     = string
-    metadata_options_http_tokens = optional(string)
-    monitoring                   = optional(bool)
+    metadata_endpoint_enabled    = optional(string, "enabled")
+    metadata_options_http_tokens = optional(string, "required")
+    monitoring                   = optional(bool, true)
+    ebs_block_device_inline      = optional(bool, false)
     vpc_security_group_ids       = list(string)
-    root_block_device = optional(object({
-      volume_size = number
-    }))
     private_dns_name_options = optional(object({
       enable_resource_name_dns_aaaa_record = optional(bool)
       enable_resource_name_dns_a_record    = optional(bool)
@@ -109,11 +110,17 @@ variable "instance" {
   })
 }
 
-variable "user_data" {
+variable "user_data_raw" {
+  description = "Windows user_data file"
+  type        = string
+  default     = null
+}
+
+variable "user_data_cloud_init" {
   description = "Map of cloud-init config write_file sections for user data"
   type = object({
     args    = optional(map(string))
-    scripts = list(string)
+    scripts = optional(list(string))
     write_files = optional(map(object({
       path        = string
       owner       = string
@@ -121,6 +128,12 @@ variable "user_data" {
     })))
   })
   default = null
+}
+
+variable "ebs_volumes_copy_all_from_ami" {
+  description = "If true, ensure all volumes in AMI are also present in EC2.  If false, only create volumes specified in ebs_volumes var"
+  type        = bool
+  default     = true
 }
 
 variable "ebs_volume_config" {
@@ -135,6 +148,7 @@ variable "ebs_volume_config" {
 
 variable "ebs_volumes" {
   description = "EC2 volumes, see aws_ebs_volume for documentation.  key=volume name, value=ebs_volume_config key.  label is used as part of the Name tag"
+  type        = any
   # Commenting below out as it has unexpected results when used with merge()
   #  type = map(object({
   #    label       = string
@@ -172,6 +186,7 @@ variable "ssm_parameters_prefix" {
 }
 
 variable "ssm_parameters" {
+  description = "A map of SSM parameters to create.  If parameters are manually created, set to {} so IAM role still created"
   type = map(object({
     random = object({
       length  = number
@@ -179,4 +194,5 @@ variable "ssm_parameters" {
     })
     description = string
   }))
+  default = null
 }
