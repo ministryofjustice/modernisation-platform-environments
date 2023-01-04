@@ -11,14 +11,14 @@ module "autoscaling_groups" {
 
   ami_name                      = each.value.ami_name
   ami_owner                     = try(each.value.ami_owner, "core-shared-services-production")
-  instance                      = merge(local.ec2_weblogic.instance, lookup(each.value, "instance", {}))
-  user_data_cloud_init          = merge(local.ec2_weblogic.user_data_cloud_init, lookup(each.value, "user_data_cloud_init", {}))
+  instance                      = each.value.instance
+  user_data_cloud_init          = each.value.user_data_cloud_init
   ebs_volumes_copy_all_from_ami = try(each.value.ebs_volumes_copy_all_from_ami, true)
   ebs_volume_config             = lookup(each.value, "ebs_volume_config", {})
   ebs_volumes                   = lookup(each.value, "ebs_volumes", {})
-  ssm_parameters_prefix         = "weblogic/"
+  ssm_parameters_prefix         = each.value.ssm_parameters_prefix
   ssm_parameters                = {}
-  autoscaling_group             = merge(local.ec2_weblogic.autoscaling_group, lookup(each.value, "autoscaling_group", {}))
+  autoscaling_group             = each.value.autoscaling_group
   autoscaling_schedules = coalesce(lookup(each.value, "autoscaling_schedules", null), {
     # if sizes not set, use the values defined in autoscaling_group
     "scale_up" = {
@@ -31,7 +31,7 @@ module "autoscaling_groups" {
   })
 
 
-  iam_resource_names_prefix = "ec2-weblogic-asg"
+  iam_resource_names_prefix = each.value.iam_resource_names_prefix
   instance_profile_policies = local.ec2_common_managed_policies
 
   business_unit      = local.vpc_name
@@ -41,7 +41,7 @@ module "autoscaling_groups" {
   availability_zone  = local.availability_zone
   subnet_set         = local.subnet_set
   subnet_name        = "private"
-  tags               = merge(local.tags, local.ec2_weblogic.tags, try(each.value.tags, {}))
+  tags               = merge(local.tags, try(each.value.tags, {}))
   account_ids_lookup = local.environment_management.account_ids
 
   ansible_repo         = "modernisation-platform-configuration-management"

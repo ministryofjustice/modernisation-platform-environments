@@ -23,8 +23,18 @@ locals {
       patch_day                 = "TUE"
     }
 
+    merge({a="b"}, {a=[1,2], c="z"}, {d=3})
+    {
+      "a" = [
+        1,
+        2,
+      ]
+      "c" = "z"
+      "d" = 3
+    }
+
     autoscaling_groups = {
-      webservers = {
+      webservers = merge(local.webserver, { # merge common config and env specific
         ami_name = "oasys_webserver_*"
         # branch   = var.BRANCH_NAME # comment in if testing ansible
         autoscaling_group = {
@@ -33,12 +43,12 @@ locals {
         autoscaling_schedules = {}
         subnet_name           = "webserver"
         tags = {
-          server-type       = "webserver"
-          description       = "Oasys webserver"
           nomis-environment = "t1"
         }
-      }
+      })
     }
+
+    
   }
 }
 
