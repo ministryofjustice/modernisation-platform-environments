@@ -127,7 +127,7 @@ data "template_file" "codebuild_policy" {
   template = "${file("${path.module}/codebuild_iam_policy.json.tpl")}"
 
   vars = {
-    s3_artifact_name = aws_s3_bucket.selenium_report.id
+    s3_report_bucket_name = aws_s3_bucket.selenium_report.id
   }
 }
 
