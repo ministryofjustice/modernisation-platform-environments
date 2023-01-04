@@ -44,8 +44,8 @@ resource "aws_db_parameter_group" "oasys_parameter" {
   family = "oracle-ee-19"
 
   parameter {
-    name  = "nls_language"
-    value = "ENGLISH"
+    name  = "max_string_size"
+    value = "EXTENDED"
   }
 
   lifecycle {
