@@ -1,6 +1,6 @@
 data "aws_ami" "amzLinuxX86gp2" {
   most_recent = true
-  owners = ["amazon"]
+  owners      = ["amazon"]
   filter {
     name   = "name"
     values = ["amzn2-ami-kernel*-hvm*x86_64-gp2*"]
@@ -59,13 +59,13 @@ resource "aws_security_group_rule" "egress_traffic_igs_dom1_web_proxy" {
 #  Build EC2 
 resource "aws_instance" "ec2_igs_dom1_web_proxy" {
   # Specify the instance type and ami to be used (this is the Amazon free tier option)
-  instance_type          = local.application_data.accounts[local.environment].ec2_igs_dom1_web_proxy_instance_type
-  ami                    = data.aws_ami.amzLinuxX86gp2.id
-  vpc_security_group_ids = [aws_security_group.ec2_sg_igs_dom1_web_proxy.id]
-  subnet_id              = data.aws_subnet.private_subnets_a.id
-  monitoring             = true
-  ebs_optimized          = true
-  user_data              = file("scripts/bootstrap_igs_dom1_web_proxy.tpl")
+  instance_type               = local.application_data.accounts[local.environment].ec2_igs_dom1_web_proxy_instance_type
+  ami                         = data.aws_ami.amzLinuxX86gp2.id
+  vpc_security_group_ids      = [aws_security_group.ec2_sg_igs_dom1_web_proxy.id]
+  subnet_id                   = data.aws_subnet.private_subnets_a.id
+  monitoring                  = true
+  ebs_optimized               = true
+  user_data                   = file("scripts/bootstrap_igs_dom1_web_proxy.tpl")
   associate_public_ip_address = true
 
   metadata_options {
