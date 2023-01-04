@@ -45,7 +45,7 @@ locals {
 }
 
 module "ec2_jumpserver" {
-  source = "./modules/ec2_autoscaling_group"
+  source = "../../modules/ec2_autoscaling_group"
 
 
   providers = {

@@ -99,7 +99,7 @@ module "weblogic" {
 }
 
 module "ec2_weblogic_autoscaling_group" {
-  source = "./modules/ec2_autoscaling_group"
+  source = "../../modules/ec2_autoscaling_group"
 
   providers = {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
