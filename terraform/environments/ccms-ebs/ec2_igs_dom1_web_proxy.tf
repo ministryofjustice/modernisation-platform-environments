@@ -15,14 +15,6 @@ data "aws_ami" "amzLinuxX86gp2" {
   }
 }
 
-#data "template_file" "user_data_igs_dom1_web_proxy" {
-#  template = file("scripts/bootstrap_igs_dom1_web_proxy.sh")
-#
-#  vars = {
-#    some_var = "some_value"
-#  }
-#}
-
 # First build the security group for the EC2
 resource "aws_security_group" "ec2_sg_igs_dom1_web_proxy" {
   name        = "ec2_sg_igs_dom1_web_proxy"
@@ -65,8 +57,7 @@ resource "aws_instance" "ec2_igs_dom1_web_proxy" {
   subnet_id                   = data.aws_subnet.private_subnets_a.id
   monitoring                  = true
   ebs_optimized               = true
-  user_data                   = file("scripts/bootstrap_igs_dom1_web_proxy.tpl")
-  associate_public_ip_address = true
+  user_data                   = base64encode(templatefile("${path.module}/scripts/bootstrap_igs_dom1_web_proxy.sh.tftpl",{}))
 
   metadata_options {
     http_endpoint = "enabled"
