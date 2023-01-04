@@ -167,7 +167,7 @@ locals {
           oracle-db-name     = "CNOMT1"
           server-type        = "nomis-web"
         }
-        ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2022-12-23T13-04-38.814Z"
+        ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-01-03T17-01-12.128Z"
         # branch = var.BRANCH_NAME # comment in if testing ansible
 
         # NOTE: using standalone instance until connectivity from FixNGo in place
@@ -216,7 +216,7 @@ locals {
           create_external_record = true
         }
         subnet_name = "public"
-        ami_name    = "nomis_rhel_6_10_weblogic_appserver_10_3_test_2023-01-03T10-04-08.077Z"
+        ami_name    = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-01-03T17-01-12.128Z"
         # branch   = var.BRANCH_NAME # comment in if testing ansible
       }
     }
