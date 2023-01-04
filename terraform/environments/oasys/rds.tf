@@ -1,4 +1,4 @@
-resource "aws_db_instance" "oasys" {
+resource "aws_db_instance" "oasysrds" {
   count          = local.application_data.accounts[local.environment].db_enabled ? 1 : 0
   engine         = "oracle-ee"
   engine_version = "19.0.0.0.ru-2022-10.rur-2022-10.r1"
@@ -40,7 +40,7 @@ resource "aws_db_instance" "oasys" {
 }
 
 resource "aws_db_parameter_group" "oasys_parameter" {
-  name   = "oasys_parameters_19c"
+  name   = "oasys-parameters-19c"
   family = "oracle19c"
 
   parameter {
