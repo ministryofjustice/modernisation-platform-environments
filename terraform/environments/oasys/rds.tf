@@ -48,9 +48,6 @@ resource "aws_db_parameter_group" "oasys_parameter" {
     value = "EXTENDED"
   }
 
-  lifecycle {
-    create_before_destroy = true
-  }
 }
 
 resource "aws_db_subnet_group" "oasys" {
