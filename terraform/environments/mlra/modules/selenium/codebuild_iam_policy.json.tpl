@@ -11,8 +11,8 @@
         "s3:ListBucket"
       ],
       "Resource": [
-        "arn:aws:s3:::${s3_artifact_name}",
-        "arn:aws:s3:::${s3_artifact_name}/*"
+        "arn:aws:s3:::${s3_report_bucket_name}",
+        "arn:aws:s3:::${s3_report_bucket_name}/*"
       ]
     },
     {

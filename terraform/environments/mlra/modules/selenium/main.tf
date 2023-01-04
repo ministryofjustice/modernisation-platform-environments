@@ -61,7 +61,9 @@ resource "aws_s3_bucket_policy" "allow_access_from_codebuild_report" {
 }
 
 ###################################################################
-# KMS and S3 resources to have CodeBuild Artifacts if required - taken from https://github.com/ministryofjustice/laa-aws-infrastructure/blob/5d89457e67eca00e42406724cfd8380c156060cb/management/templates/LAA-Management-Pipeline-PreReqs.template
+# KMS and S3 resources to have CodeBuild Artifacts if required
+# Taken from https://github.com/ministryofjustice/laa-aws-infrastructure/blob/5d89457e67eca00e42406724cfd8380c156060cb/management/templates/LAA-Management-Pipeline-PreReqs.template
+# If enabled make sure to add aws_s3_bucket.codebuild_artifactbucket to be accessible by the CodeBuild job in codebuild_iam_policy.json.tpl
 ###################################################################
 
 # data "template_file" "kms_policy" {
@@ -125,7 +127,7 @@ data "template_file" "codebuild_policy" {
   template = "${file("${path.module}/codebuild_iam_policy.json.tpl")}"
 
   vars = {
-    s3_artifact_name = aws_s3_bucket.codebuild_artifact.id
+    s3_artifact_name = aws_s3_bucket.selenium_report.id
   }
 }
 
