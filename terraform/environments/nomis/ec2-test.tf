@@ -25,6 +25,7 @@ locals {
         lifecycle_hook_name = "ready-hook"
       }
       scripts = [
+        "install-ssm-agent.sh.tftpl",
         "ansible-ec2provision.sh.tftpl",
         "post-ec2provision.sh.tftpl"
       ]
@@ -78,7 +79,7 @@ module "ec2_test_instance" {
   region             = local.region
   availability_zone  = local.availability_zone
   subnet_set         = local.subnet_set
-  subnet_name        = "private"
+  subnet_name        = lookup(each.value, "subnet_name", "private")
   tags               = merge(local.tags, local.ec2_test.tags, try(each.value.tags, {}))
   account_ids_lookup = local.environment_management.account_ids
 
@@ -128,7 +129,7 @@ module "ec2_test_autoscaling_group" {
   region             = local.region
   availability_zone  = local.availability_zone
   subnet_set         = local.subnet_set
-  subnet_name        = "data"
+  subnet_name        = lookup(each.value, "subnet_name", "private")
   tags               = merge(local.tags, local.ec2_test.tags, try(each.value.tags, {}))
   account_ids_lookup = local.environment_management.account_ids
 
@@ -172,6 +173,44 @@ resource "aws_security_group" "ec2_test" {
     to_port     = "22"
     protocol    = "TCP"
     cidr_blocks = local.environment_config.external_remote_access_cidrs
+  }
+
+  ingress {
+    description = "Internal access to weblogic admin http"
+    from_port   = "7001"
+    to_port     = "7001"
+    protocol    = "TCP"
+    security_groups = [
+      aws_security_group.jumpserver-windows.id,
+      module.bastion_linux.bastion_security_group
+    ]
+  }
+
+  ingress {
+    description = "External access to weblogic admin http"
+    from_port   = "7001"
+    to_port     = "7001"
+    protocol    = "TCP"
+    cidr_blocks = local.environment_config.external_weblogic_access_cidrs
+  }
+
+  ingress {
+    description = "Internal access to weblogic http"
+    from_port   = "7777"
+    to_port     = "7777"
+    protocol    = "TCP"
+    security_groups = [
+      aws_security_group.jumpserver-windows.id,
+      module.bastion_linux.bastion_security_group
+    ]
+  }
+
+  ingress {
+    description = "External access to weblogic http"
+    from_port   = "7777"
+    to_port     = "7777"
+    protocol    = "TCP"
+    cidr_blocks = local.environment_config.external_weblogic_access_cidrs
   }
 
   ingress {

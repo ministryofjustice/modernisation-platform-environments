@@ -97,19 +97,21 @@ resource "aws_security_group" "cluster_ec2" {
 # so that the autoscaling group creates new ones using the new launch template
 
 resource "aws_launch_template" "ec2-launch-template" {
-  name_prefix   = "${var.app_name}-ec2-launch-template"
-  image_id      = var.ami_image_id
-  instance_type = var.instance_type
-  key_name      = var.key_name
-  ebs_optimized = true
+  name_prefix            = "${var.app_name}-ec2-launch-template"
+  image_id               = var.ami_image_id
+  instance_type          = var.instance_type
+  key_name               = var.key_name
+  ebs_optimized          = true
+  update_default_version = true
 
   monitoring {
     enabled = true
   }
 
   metadata_options {
-    http_endpoint = "enabled"
-    http_tokens   = "required"
+    http_endpoint               = "enabled"
+    http_tokens                 = "optional"
+    http_put_response_hop_limit = "2"
   }
 
   iam_instance_profile {
@@ -221,7 +223,8 @@ resource "aws_iam_policy" "ec2_instance_policy" { #tfsec:ignore:aws-iam-no-polic
                 "xray:PutTelemetryRecords",
                 "xray:GetSamplingRules",
                 "xray:GetSamplingTargets",
-                "xray:GetSamplingStatisticSummaries"
+                "xray:GetSamplingStatisticSummaries",
+                "xray:*"
             ],
             "Resource": "*"
         }
