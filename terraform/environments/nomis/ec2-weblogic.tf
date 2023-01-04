@@ -99,7 +99,7 @@ module "weblogic" {
 }
 
 module "ec2_weblogic_autoscaling_group" {
-  source = "./modules/ec2_autoscaling_group"
+  source = "../../modules/ec2_autoscaling_group"
 
   providers = {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
@@ -109,15 +109,16 @@ module "ec2_weblogic_autoscaling_group" {
 
   name = each.key
 
-  ami_name              = each.value.ami_name
-  ami_owner             = try(each.value.ami_owner, "core-shared-services-production")
-  instance              = merge(local.ec2_weblogic.instance, lookup(each.value, "instance", {}))
-  user_data_cloud_init  = merge(local.ec2_weblogic.user_data_cloud_init, lookup(each.value, "user_data_cloud_init", {}))
-  ebs_volume_config     = lookup(each.value, "ebs_volume_config", {})
-  ebs_volumes           = lookup(each.value, "ebs_volumes", {})
-  ssm_parameters_prefix = "weblogic/"
-  ssm_parameters        = {}
-  autoscaling_group     = merge(local.ec2_weblogic.autoscaling_group, lookup(each.value, "autoscaling_group", {}))
+  ami_name                      = each.value.ami_name
+  ami_owner                     = try(each.value.ami_owner, "core-shared-services-production")
+  instance                      = merge(local.ec2_weblogic.instance, lookup(each.value, "instance", {}))
+  user_data_cloud_init          = merge(local.ec2_weblogic.user_data_cloud_init, lookup(each.value, "user_data_cloud_init", {}))
+  ebs_volumes_copy_all_from_ami = try(each.value.ebs_volumes_copy_all_from_ami, true)
+  ebs_volume_config             = lookup(each.value, "ebs_volume_config", {})
+  ebs_volumes                   = lookup(each.value, "ebs_volumes", {})
+  ssm_parameters_prefix         = "weblogic/"
+  ssm_parameters                = {}
+  autoscaling_group             = merge(local.ec2_weblogic.autoscaling_group, lookup(each.value, "autoscaling_group", {}))
   autoscaling_schedules = coalesce(lookup(each.value, "autoscaling_schedules", null), {
     # if sizes not set, use the values defined in autoscaling_group
     "scale_up" = {
@@ -161,42 +162,57 @@ resource "aws_security_group" "weblogic_common" {
   vpc_id      = local.vpc_id
 
   ingress {
-    description     = "SSH from Bastion"
-    from_port       = "22"
-    to_port         = "22"
-    protocol        = "TCP"
-    security_groups = [module.bastion_linux.bastion_security_group]
+    description = "Internal access to self on all ports"
+    from_port   = 0
+    to_port     = 0
+    protocol    = -1
+    self        = true
   }
 
   ingress {
-    description     = "access from Windows Jumpserver (admin console)"
-    from_port       = "7001"
-    to_port         = "7001"
-    protocol        = "TCP"
-    security_groups = [aws_security_group.jumpserver-windows.id]
+    description = "Internal access to ssh"
+    from_port   = "22"
+    to_port     = "22"
+    protocol    = "TCP"
+    security_groups = [
+      aws_security_group.jumpserver-windows.id,
+      module.bastion_linux.bastion_security_group
+    ]
   }
 
   ingress {
-    description     = "access from Windows Jumpserver"
-    from_port       = "80"
-    to_port         = "80"
-    protocol        = "TCP"
-    security_groups = [aws_security_group.jumpserver-windows.id]
+    description = "External access to ssh"
+    from_port   = "22"
+    to_port     = "22"
+    protocol    = "TCP"
+    cidr_blocks = local.environment_config.external_remote_access_cidrs
   }
 
   ingress {
-    description = "access from Windows Jumpserver and loadbalancer (forms/reports)"
+    description = "Internal access to Weblogic Admin console"
+    from_port   = "7001"
+    to_port     = "7001"
+    protocol    = "TCP"
+    security_groups = [
+      aws_security_group.jumpserver-windows.id,
+      module.bastion_linux.bastion_security_group
+    ]
+  }
+
+  ingress {
+    description = "Internal access to Weblogic Http"
     from_port   = "7777"
     to_port     = "7777"
     protocol    = "TCP"
     security_groups = [
       aws_security_group.jumpserver-windows.id,
+      module.bastion_linux.bastion_security_group,
       local.environment == "test" ? module.lb_internal_nomis[0].security_group.id : aws_security_group.internal_elb.id
     ]
   }
 
   ingress {
-    description = "access from Cloud Platform Prometheus server"
+    description = "External access to prometheus node exporter"
     from_port   = "9100"
     to_port     = "9100"
     protocol    = "TCP"
@@ -204,7 +220,7 @@ resource "aws_security_group" "weblogic_common" {
   }
 
   ingress {
-    description = "access from Cloud Platform Prometheus script exporter collector"
+    description = "External access to prometheus script exporter"
     from_port   = "9172"
     to_port     = "9172"
     protocol    = "TCP"
@@ -212,7 +228,7 @@ resource "aws_security_group" "weblogic_common" {
   }
 
   egress {
-    description = "allow all"
+    description = "Allow all egress"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
@@ -227,3 +243,4 @@ resource "aws_security_group" "weblogic_common" {
     }
   )
 }
+

@@ -26,8 +26,9 @@ data "aws_iam_policy_document" "ssm_custom" {
       "ssm:DescribeDocument",
       "ssm:GetDeployablePatchSnapshotForInstance",
       "ssm:GetDocument",
-      "ssm:GetParameters",
       "ssm:GetManifest",
+      "ssm:GetParameter",
+      "ssm:GetParameters",
       "ssm:ListAssociations",
       "ssm:ListInstanceAssociations",
       "ssm:PutInventory",
@@ -47,9 +48,10 @@ data "aws_iam_policy_document" "ssm_custom" {
       "ec2messages:GetMessages",
       "ec2messages:SendReply"
     ]
-    # skiping these as policy is a scoped down version of Amazon provided AmazonSSMManagedInstanceCore managed policy.  Permissions required for SSM function
+    # skipping these as policy is a scoped down version of Amazon provided AmazonSSMManagedInstanceCore managed policy.  Permissions required for SSM function
 
     #checkov:skip=CKV_AWS_111: "Ensure IAM policies does not allow write access without constraints"
+    #checkov:skip=CKV_AWS_108: "Ensure IAM policies does not allow data exfiltration"
     resources = ["*"] #tfsec:ignore:aws-iam-no-policy-wildcards
   }
 }
@@ -149,12 +151,32 @@ data "aws_iam_policy_document" "s3_bucket_access" {
   }
 }
 
+# create policy document for application insights
+# this is NOT necessarily the best place to put this but it's being added here for now
+data "aws_iam_policy_document" "application_insights" {
+
+  statement {
+    sid    = "AllowApplicationInsights"
+    effect = "Allow"
+    actions = [
+      "applicationinsights:*",
+      "iam:CreateServiceLinkedRole",
+      "iam:ListRoles",
+      "resource-groups:ListGroups",
+      "resource-groups:CreateGroups",
+      "resource-groups:UpdateGroup"
+    ]
+    resources = ["*"]
+  }
+}
+
 # combine ec2-common policy documents
 data "aws_iam_policy_document" "ec2_common_combined" {
   source_policy_documents = [
     data.aws_iam_policy_document.ssm_custom.json,
     data.aws_iam_policy_document.s3_bucket_access.json,
-    data.aws_iam_policy_document.cloud_watch_custom.json
+    data.aws_iam_policy_document.cloud_watch_custom.json,
+    data.aws_iam_policy_document.application_insights.json # TODO: remove this later
   ]
 }
 

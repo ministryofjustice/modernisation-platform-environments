@@ -134,6 +134,7 @@ locals {
 }
 
 module "db_ec2_instance" {
+  #checkov:skip=CKV_AWS_79:Oracle cannot accommodate a token
   source = "./modules/ec2_instance"
 
   providers = {
@@ -144,15 +145,16 @@ module "db_ec2_instance" {
 
   name = each.key
 
-  ami_name              = each.value.ami_name
-  ami_owner             = try(each.value.ami_owner, "core-shared-services-production")
-  instance              = merge(local.database.instance, lookup(each.value, "instance", {}))
-  user_data_cloud_init  = merge(local.database.user_data_cloud_init, lookup(each.value, "user_data_cloud_init", {}))
-  ebs_volume_config     = merge(local.database.ebs_volume_config, lookup(each.value, "ebs_volume_config", {}))
-  ebs_volumes           = { for k, v in local.database.ebs_volumes : k => merge(v, try(each.value.ebs_volumes[k], {})) }
-  ssm_parameters_prefix = "database/"
-  ssm_parameters        = merge(local.database.ssm_parameters, lookup(each.value, "ssm_parameters", {}))
-  route53_records       = merge(local.database.route53_records, lookup(each.value, "route53_records", {}))
+  ami_name                      = each.value.ami_name
+  ami_owner                     = try(each.value.ami_owner, "core-shared-services-production")
+  instance                      = merge(local.database.instance, lookup(each.value, "instance", {}))
+  user_data_cloud_init          = merge(local.database.user_data_cloud_init, lookup(each.value, "user_data_cloud_init", {}))
+  ebs_volumes_copy_all_from_ami = try(each.value.ebs_volumes_copy_all_from_ami, true)
+  ebs_volume_config             = merge(local.database.ebs_volume_config, lookup(each.value, "ebs_volume_config", {}))
+  ebs_volumes                   = { for k, v in local.database.ebs_volumes : k => merge(v, try(each.value.ebs_volumes[k], {})) }
+  ssm_parameters_prefix         = "database/"
+  ssm_parameters                = merge(local.database.ssm_parameters, lookup(each.value, "ssm_parameters", {}))
+  route53_records               = merge(local.database.route53_records, lookup(each.value, "route53_records", {}))
 
   iam_resource_names_prefix = "ec2-database"
   instance_profile_policies = concat(local.ec2_common_managed_policies, [aws_iam_policy.s3_db_backup_bucket_access.arn])
@@ -183,58 +185,65 @@ resource "aws_security_group" "database_common" {
   vpc_id      = data.aws_vpc.shared_vpc.id
 
   ingress {
-    description = "DB access from weblogic and test instances"
-    from_port   = "1521"
-    to_port     = "1521"
-    protocol    = "TCP"
-    security_groups = [
-      aws_security_group.weblogic_common.id,
-      aws_security_group.ec2_test.id
-    ]
-  }
-
-  ingress {
-    description = "DB access other DB instances for replication"
-    from_port   = "1521"
-    to_port     = "1521"
-    protocol    = "TCP"
+    description = "Internal access to self on all ports"
+    from_port   = 0
+    to_port     = 0
+    protocol    = -1
     self        = true
   }
 
   ingress {
-    description     = "SSH from Bastion"
-    from_port       = "22"
-    to_port         = "22"
-    protocol        = "TCP"
-    security_groups = [module.bastion_linux.bastion_security_group]
-  }
-
-  ingress {
-    description = "External access to database port"
-    from_port   = "1521"
-    to_port     = "1521"
-    protocol    = "TCP"
-    cidr_blocks = local.environment_config.database_external_access_cidr
-  }
-
-  ingress {
-    description = "External access to SSH port for agent management"
+    description = "Internal access to ssh"
     from_port   = "22"
     to_port     = "22"
     protocol    = "TCP"
-    cidr_blocks = local.environment_config.database_external_access_cidr
+    security_groups = [
+      aws_security_group.weblogic_common.id,
+      aws_security_group.ec2_test.id,
+      aws_security_group.jumpserver-windows.id,
+      module.bastion_linux.bastion_security_group
+    ]
   }
 
   ingress {
-    description = "External access to OEM Agent port for metrics collection"
+    description = "External access to ssh"
+    from_port   = "22"
+    to_port     = "22"
+    protocol    = "TCP"
+    cidr_blocks = local.environment_config.external_remote_access_cidrs
+  }
+
+  ingress {
+    description = "Internal access to oracle database"
+    from_port   = "1521"
+    to_port     = "1521"
+    protocol    = "TCP"
+    self        = true
+    security_groups = [
+      aws_security_group.weblogic_common.id,
+      aws_security_group.ec2_test.id,
+      module.bastion_linux.bastion_security_group
+    ]
+  }
+
+  ingress {
+    description = "External access to oracle database"
+    from_port   = "1521"
+    to_port     = "1521"
+    protocol    = "TCP"
+    cidr_blocks = local.environment_config.external_database_access_cidrs
+  }
+
+  ingress {
+    description = "External access to OEM Agent"
     from_port   = "3872"
     to_port     = "3872"
     protocol    = "TCP"
-    cidr_blocks = local.environment_config.database_external_access_cidr
+    cidr_blocks = local.environment_config.external_oem_agent_access_cidrs
   }
 
   ingress {
-    description = "access from Cloud Platform Prometheus server"
+    description = "External access to prometheus node exporter"
     from_port   = "9100"
     to_port     = "9100"
     protocol    = "TCP"
@@ -242,7 +251,7 @@ resource "aws_security_group" "database_common" {
   }
 
   ingress {
-    description = "access from Cloud Platform Prometheus script exporter collector"
+    description = "External access to prometheus script exporter"
     from_port   = "9172"
     to_port     = "9172"
     protocol    = "TCP"
@@ -250,7 +259,7 @@ resource "aws_security_group" "database_common" {
   }
 
   egress {
-    description = "allow all"
+    description = "Allow all egress"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"

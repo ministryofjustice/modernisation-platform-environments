@@ -24,11 +24,11 @@ jobs:
     if: github.event_name != 'workflow_dispatch' && github.event_name != 'schedule'
     steps:
     - name: Checkout
-      uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+      uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
       with:
         fetch-depth: 0
     - name: Run Analysis
-      uses: ministryofjustice/github-actions/terraform-static-analysis@bffeddf62d99a7486979d9c3afff86913a9abe1a
+      uses: ministryofjustice/github-actions/terraform-static-analysis@389abf67aaf22523386f6f75b47f3423a2959285 # v9
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
@@ -37,16 +37,18 @@ jobs:
         tflint_exclude: terraform_unused_declarations
 
   terraform-static-analysis-full-scan:
+    permissions:
+      pull-requests: write
     name: Terraform Static Analysis - scan all directories
     runs-on: ubuntu-latest
     if: github.event_name == 'workflow_dispatch'
     steps:
     - name: Checkout
-      uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+      uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
       with:
         fetch-depth: 0
     - name: Run Analysis
-      uses: ministryofjustice/github-actions/terraform-static-analysis@bffeddf62d99a7486979d9c3afff86913a9abe1a
+      uses: ministryofjustice/github-actions/terraform-static-analysis@389abf67aaf22523386f6f75b47f3423a2959285 # v9
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
@@ -60,23 +62,14 @@ jobs:
     if: github.event_name == 'schedule'
     steps:
     - name: Checkout
-      uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+      uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
       with:
         fetch-depth: 0
     - name: Run Analysis
-      uses: ministryofjustice/github-actions/terraform-static-analysis@bffeddf62d99a7486979d9c3afff86913a9abe1a
+      uses: ministryofjustice/github-actions/terraform-static-analysis@389abf67aaf22523386f6f75b47f3423a2959285
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         scan_type: full
         tfsec_exclude: AWS095
         tflint_exclude: terraform_unused_declarations
-    - uses: 8398a7/action-slack@a189acbf0b7ea434558662ae25a0de71df69a435 # v3.14.0
-      name: Slack failure notification
-      with:
-        job_name: Terraform Static Analysis - scheduled scan of all directories
-        status: ${{ job.status }}
-        fields: workflow,job,repo,commit,message
-      env:
-        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-      if: ${{ failure() }}

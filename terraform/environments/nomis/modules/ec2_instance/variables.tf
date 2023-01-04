@@ -51,6 +51,7 @@ variable "tags" {
 
 variable "account_ids_lookup" {
   description = "A map of account names to account ids that can be used for AMI owner"
+  type        = map(any)
   default     = {}
 }
 
@@ -92,15 +93,15 @@ variable "name" {
 variable "instance" {
   description = "EC2 instance settings, see aws_instance documentation"
   type = object({
+    associate_public_ip_address  = optional(bool, false)
     disable_api_termination      = bool
     instance_type                = string
     key_name                     = string
-    metadata_options_http_tokens = optional(string)
-    monitoring                   = optional(bool)
+    metadata_endpoint_enabled    = optional(string, "enabled")
+    metadata_options_http_tokens = optional(string, "required")
+    monitoring                   = optional(bool, true)
+    ebs_block_device_inline      = optional(bool, false)
     vpc_security_group_ids       = list(string)
-    root_block_device = optional(object({
-      volume_size = number
-    }))
     private_dns_name_options = optional(object({
       enable_resource_name_dns_aaaa_record = optional(bool)
       enable_resource_name_dns_a_record    = optional(bool)
@@ -129,6 +130,12 @@ variable "user_data_cloud_init" {
   default = null
 }
 
+variable "ebs_volumes_copy_all_from_ami" {
+  description = "If true, ensure all volumes in AMI are also present in EC2.  If false, only create volumes specified in ebs_volumes var"
+  type        = bool
+  default     = true
+}
+
 variable "ebs_volume_config" {
   description = "EC2 volume configurations, where key is a label, e.g. flash, which is assigned to the disk in ebs_volumes.  All disks with same label have the same configuration.  If not specified, use values from the AMI.  If total_size specified, the volume size is this divided by the number of drives with the given label"
   type = map(object({
@@ -141,6 +148,7 @@ variable "ebs_volume_config" {
 
 variable "ebs_volumes" {
   description = "EC2 volumes, see aws_ebs_volume for documentation.  key=volume name, value=ebs_volume_config key.  label is used as part of the Name tag"
+  type        = any
   # Commenting below out as it has unexpected results when used with merge()
   #  type = map(object({
   #    label       = string

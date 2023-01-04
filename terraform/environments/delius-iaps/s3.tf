@@ -1,11 +1,25 @@
-module "s3-bucket" {
+data "aws_iam_policy_document" "iaps_s3_policy" {
+  statement {
+    principals {
+      type = "AWS"
+      identifiers = [
+        "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/ec2-role-iaps-server",
+        "arn:aws:iam::${local.environment_management.account_ids["core-shared-services-production"]}:root"
+      ]
+    }
+    actions   = ["s3:GetObject"]
+    resources = ["arn:aws:s3:::${local.artefact_bucket_name}/*"]
+  }
+}
+
+module "s3_bucket" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.2.0"
 
   providers = {
     aws.bucket-replication = aws
   }
 
-  bucket_prefix      = "iaps-artifacts"
+  bucket_name        = local.artefact_bucket_name
   versioning_enabled = true
 
   lifecycle_rule = [
@@ -33,6 +47,10 @@ module "s3-bucket" {
         days = 730
       }
     }
+  ]
+
+  bucket_policy = [
+    data.aws_iam_policy_document.iaps_s3_policy.json
   ]
 
   tags = local.tags
