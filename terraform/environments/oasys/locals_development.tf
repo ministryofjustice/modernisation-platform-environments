@@ -48,7 +48,7 @@ locals {
           key_name                     = aws_key_pair.ec2-user.key_name
           monitoring                   = true
           metadata_options_http_tokens = "optional"
-          vpc_security_group_ids       = [aws_security_group.webserver.id]
+          vpc_security_group_ids       = [] # [aws_security_group.webserver.id] need to try adding this after it's created
         }
 
         user_data_cloud_init = {
@@ -75,7 +75,7 @@ locals {
           force_delete              = true
           termination_policies      = ["OldestInstance"]
           target_group_arns         = []                        # TODO
-          vpc_zone_identifier       = ["vpc-01d7a2da8f9f1dfec"] #data.aws_subnets.private.ids
+          vpc_zone_identifier       = data.aws_subnets.private.ids
           wait_for_capacity_timeout = 0
 
           # this hook is triggered by the post-ec2provision.sh
