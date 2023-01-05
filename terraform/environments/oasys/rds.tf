@@ -53,17 +53,13 @@ resource "aws_db_parameter_group" "oasys_parameter" {
 
 resource "aws_db_option_group" "oasys_options" {
   name                     = "oasys-options-19c"
-  option_group_description = "Terraform Option Group"
+  option_group_description = "Oasys Option Group"
   engine_name              = "oracle-ee"
   major_engine_version     = "19"
 
   option {
     option_name = "APEX"
-
-    option_settings {
-      name  = "version"
-      value = "20.2.v1"
-    }
+    version = "20.2.v1"
   }
 }
 
