@@ -35,7 +35,7 @@ locals {
     # }
 
     autoscaling_groups = {
-      webservers = { 
+      webservers = {
         ami_name = "oasys_webserver_*"
         # branch   = var.BRANCH_NAME # comment in if testing ansible
         # server-type and nomis-environment auto set by module
