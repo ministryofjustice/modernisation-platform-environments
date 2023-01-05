@@ -28,7 +28,8 @@ resource "aws_security_group_rule" "ingress_traffic_igs_dom1_web_proxy" {
   security_group_id = aws_security_group.ec2_sg_igs_dom1_web_proxy.id
   to_port           = each.value.to_port
   type              = "ingress"
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+  #cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+  cidr_blocks       = ["0.0.0.0/0"]
 }
 
 resource "aws_security_group_rule" "egress_traffic_igs_dom1_web_proxy" {
@@ -50,10 +51,11 @@ resource "aws_instance" "ec2_igs_dom1_web_proxy" {
   instance_type          = local.application_data.accounts[local.environment].ec2_igs_dom1_web_proxy_instance_type
   ami                    = data.aws_ami.amzLinuxX86gp2.id
   vpc_security_group_ids = [aws_security_group.ec2_sg_igs_dom1_web_proxy.id]
-  subnet_id              = data.aws_subnet.private_subnets_a.id
+  subnet_id              = data.aws_subnet.public_subnets_a.id
   monitoring             = true
   user_data_base64       = base64encode(templatefile("${path.module}/scripts/bootstrap_igs_dom1_web_proxy.sh.tftpl", {}))
-
+  associate_public_ip_address = true
+  
   metadata_options {
     http_endpoint = "enabled"
     http_tokens   = "required"
