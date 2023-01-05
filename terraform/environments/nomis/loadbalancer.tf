@@ -117,6 +117,33 @@ resource "aws_acm_certificate_validation" "internal_lb" {
 # #TODO https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/wafv2_web_acl
 # }
 
+# --- New load balancer ---
+module "lb_internal_nomis" {
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer.git?ref=v2.1.0"
+  count  = local.environment == "test" ? 1 : 0
+  providers = {
+    aws.bucket-replication = aws
+  }
+
+  account_number             = local.environment_management.account_ids[terraform.workspace]
+  application_name           = "int-${local.application_name}"
+  enable_deletion_protection = false
+  idle_timeout               = "60"
+  loadbalancer_egress_rules  = local.lb_internal_nomis_egress_rules
+  loadbalancer_ingress_rules = local.lb_internal_nomis_ingress_rules
+  public_subnets             = data.aws_subnets.private.ids
+  region                     = local.region
+  vpc_all                    = "${local.vpc_name}-${local.environment}"
+  force_destroy_bucket       = true
+  internal_lb                = true
+  tags = merge(
+    local.tags,
+    {
+      Name = "internal-loadbalancer"
+    },
+  )
+}
+
 locals {
   lb_internal_nomis_egress_rules = {
     lb_internal_nomis_egress_1 = {
