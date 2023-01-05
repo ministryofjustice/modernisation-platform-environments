@@ -55,7 +55,7 @@ locals {
   ]
 }
 
-data "cloudinit_config" "this" {  # it would make sense to have these templates in a common area 
+data "cloudinit_config" "this" { # it would make sense to have these templates in a common area 
   count = sum(local.user_data_part_count) > 0 ? 1 : 0
   dynamic "part" {
     for_each = try(var.user_data_cloud_init.scripts, {})

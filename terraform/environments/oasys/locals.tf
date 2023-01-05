@@ -85,7 +85,7 @@ locals {
   ###
   ### env independent webserver vars
   ###
-  webserver = { 
+  webserver = {
     # server-type and nomis-environment auto set by module
     tags = {
       description = "oasys webserver"
@@ -113,7 +113,7 @@ locals {
       write_files = {}
     }
 
-    ssm_parameters_prefix = "webserver/"
+    ssm_parameters_prefix     = "webserver/"
     iam_resource_names_prefix = "ec2-webserver-asg"
 
     autoscaling_group = {
