@@ -1,5 +1,3 @@
-# check through this
-
 locals {
   public_key_data = jsondecode(file("./bastion_linux.json"))
 }
