@@ -25,13 +25,9 @@ locals {
 
     autoscaling_groups = {
       webservers = merge(local.webserver, { # merge common config and env specific
-        ami_name = "oasys_webserver_*"
-        # branch   = var.BRANCH_NAME # comment in if testing ansible
         autoscaling_group = {
           desired_capacity = 1
         }
-        autoscaling_schedules = {}
-        subnet_name           = "webserver"
         tags = {
           nomis-environment = "t1"
         }
