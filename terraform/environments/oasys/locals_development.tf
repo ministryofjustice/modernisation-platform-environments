@@ -1,4 +1,4 @@
-# oasys-development environment settings
+# oasys-development environment specific settings
 locals {
   oasys_development = {
 
@@ -21,16 +21,6 @@ locals {
     ec2_common = {
       patch_approval_delay_days = 3
       patch_day                 = "TUE"
-    }
-
-    merge({a="b"}, {a=[1,2], c="z"}, {d=3})
-    {
-      "a" = [
-        1,
-        2,
-      ]
-      "c" = "z"
-      "d" = 3
     }
 
     autoscaling_groups = {
