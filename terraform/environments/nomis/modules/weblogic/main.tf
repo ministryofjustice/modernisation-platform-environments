@@ -282,6 +282,8 @@ resource "aws_lb_target_group" "weblogic" {
 }
 
 resource "aws_lb_listener_rule" "weblogic" {
+  count = var.load_balancer_listener_arn != null ? 1 : 0
+
   listener_arn = var.load_balancer_listener_arn
 
   action {
@@ -290,9 +292,7 @@ resource "aws_lb_listener_rule" "weblogic" {
   }
   condition {
     host_header {
-      # this is a temporary change to support using the az.justice.gov.uk domain
-      # values = ["${var.name}.${var.application_name}.${data.aws_route53_zone.external.name}"]
-      values = ["${var.name}.${data.aws_route53_zone.external.name}"]
+      values = ["${var.name}.${var.application_name}.${data.aws_route53_zone.external.name}"]
     }
   }
 }
