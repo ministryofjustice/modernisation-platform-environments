@@ -9,10 +9,6 @@ data "aws_ami" "amzLinuxX86gp2" {
     name   = "virtualization-type"
     values = ["hvm"]
   }
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
 }
 
 # First build the security group for the EC2
@@ -56,7 +52,7 @@ resource "aws_instance" "ec2_igs_dom1_web_proxy" {
   vpc_security_group_ids = [aws_security_group.ec2_sg_igs_dom1_web_proxy.id]
   subnet_id              = data.aws_subnet.private_subnets_a.id
   monitoring             = true
-  ebs_optimized          = true
+  #ebs_optimized          = true
   #user_data_base64       = base64encode(templatefile("${path.module}/scripts/bootstrap_igs_dom1_web_proxy.sh.tftpl", {}))
 
   metadata_options {
