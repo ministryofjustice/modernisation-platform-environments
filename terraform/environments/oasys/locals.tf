@@ -102,7 +102,7 @@ locals {
       key_name                     = aws_key_pair.ec2-user.key_name
       monitoring                   = true
       metadata_options_http_tokens = "optional"
-      vpc_security_group_ids       = [] # [aws_security_group.webserver.id] need to try adding this after it's created
+      vpc_security_group_ids       = [aws_security_group.webserver.id]
     }
 
     user_data_cloud_init = {
