@@ -57,7 +57,7 @@ data "aws_subnets" "shared-data" {
 data "aws_subnets" "private" {
   filter {
     name   = "vpc-id"
-    values = [local.vpc_id]
+    values = [data.aws_vpc.shared.id]
   }
   tags = {
     Name = "${local.vpc_name}-${local.environment}-${local.subnet_set}-private-${local.region}*"
