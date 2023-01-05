@@ -43,61 +43,6 @@ resource "aws_lb" "internal" {
   )
 }
 
-resource "aws_lb_listener" "internal" {
-  load_balancer_arn = module.lb_internal_nomis[0].load_balancer.arn
-  port              = "443"
-  protocol          = "HTTPS"
-  #checkov:skip=CKV_AWS_103:the application does not support tls 1.2
-  #tfsec:ignore:aws-elb-use-secure-tls-policy:the application does not support tls 1.2
-  ssl_policy      = "ELBSecurityPolicy-2016-08"
-  certificate_arn = aws_acm_certificate.internal_lb.arn
-
-  default_action {
-    type = "fixed-response"
-    fixed_response {
-      content_type = "text/plain"
-      message_body = "Fixed response content"
-      status_code  = "503"
-    }
-  }
-}
-
-resource "aws_lb_listener" "internal_http" {
-  depends_on = [
-    aws_acm_certificate_validation.internal_lb
-  ]
-
-  load_balancer_arn = module.lb_internal_nomis[0].load_balancer.arn
-  port              = "80"
-  protocol          = "HTTP"
-
-  default_action {
-    type = "redirect"
-    redirect {
-      port        = "443"
-      protocol    = "HTTPS"
-      status_code = "HTTP_301"
-    }
-  }
-}
-
-#------------------------------------------------------------------------------
-# Route 53 record
-#------------------------------------------------------------------------------
-resource "aws_route53_record" "internal_lb" {
-  provider = aws.core-vpc
-
-  zone_id = data.aws_route53_zone.external-environment.zone_id
-  name    = "*.${local.application_name}.${data.aws_route53_zone.external-environment.name}"
-  type    = "A"
-
-  alias {
-    name                   = module.lb_internal_nomis[0].load_balancer.dns_name
-    zone_id                = module.lb_internal_nomis[0].load_balancer.zone_id
-    evaluate_target_health = true
-  }
-}
-
 #------------------------------------------------------------------------------
 # Certificate
 #------------------------------------------------------------------------------
@@ -171,33 +116,6 @@ resource "aws_acm_certificate_validation" "internal_lb" {
 # resource "aws_wafv2_web_acl" "waf" {
 # #TODO https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/wafv2_web_acl
 # }
-
-# --- New load balancer ---
-module "lb_internal_nomis" {
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer.git?ref=v2.1.0"
-  count  = 1
-  providers = {
-    aws.bucket-replication = aws
-  }
-
-  account_number             = local.environment_management.account_ids[terraform.workspace]
-  application_name           = "int-${local.application_name}"
-  enable_deletion_protection = false
-  idle_timeout               = "60"
-  loadbalancer_egress_rules  = local.lb_internal_nomis_egress_rules
-  loadbalancer_ingress_rules = local.lb_internal_nomis_ingress_rules
-  public_subnets             = data.aws_subnets.private.ids
-  region                     = local.region
-  vpc_all                    = "${local.vpc_name}-${local.environment}"
-  force_destroy_bucket       = true
-  internal_lb                = true
-  tags = merge(
-    local.tags,
-    {
-      Name = "internal-loadbalancer"
-    },
-  )
-}
 
 locals {
   lb_internal_nomis_egress_rules = {
