@@ -62,12 +62,6 @@ resource "aws_lb_listener" "internal" {
   }
 }
 
-resource "aws_lb_listener_certificate" "certificate_az" {
-  count           = local.environment == "test" ? 1 : 0
-  listener_arn    = aws_lb_listener.internal.arn
-  certificate_arn = aws_acm_certificate.internal_lb_az[0].arn
-}
-
 resource "aws_lb_listener" "internal_http" {
   depends_on = [
     aws_acm_certificate_validation.internal_lb
@@ -177,86 +171,6 @@ resource "aws_acm_certificate_validation" "internal_lb" {
 # resource "aws_wafv2_web_acl" "waf" {
 # #TODO https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/wafv2_web_acl
 # }
-
-
-#------------------------------------------------------------------------------
-# Temporaray resources to support access from PTTP
-# Note will also need to revert the following when this is retired:
-# 1. route 53 external zone datasource in the weblogic module
-# 2. Loadbalancer listener rule host header in weblogic module
-# 3. aws_lb_listener.internal.certificate_arn in this file
-# Hopefully this will be gone by the time we need to create weblogics in prod
-# if not then additional work will be required in the weblogic module
-#------------------------------------------------------------------------------
-
-resource "aws_route53_zone" "az" {
-  #Raised DSOS-1495 to investigate
-  #checkov:skip=CKV2_AWS_38: "Ensure Domain Name System Security Extensions (DNSSEC) signing is enabled for Amazon Route 53 public hosted zones"
-  #checkov:skip=CKV2_AWS_39: "Ensure Domain Name System (DNS) query logging is enabled for Amazon Route 53 hosted zones"
-  count = local.environment == "test" ? 1 : 0
-  name  = "modernisation-platform.nomis.az.justice.gov.uk"
-  tags = merge(
-    local.tags,
-    {
-      Name = "modernisation-platform.nomis.az.justice.gov.uk"
-    }
-  )
-}
-
-resource "aws_route53_record" "internal_lb_az" {
-  count   = local.environment == "test" ? 1 : 0
-  zone_id = aws_route53_zone.az[0].zone_id
-  name    = "*.${aws_route53_zone.az[0].name}"
-  type    = "A"
-
-  alias {
-    name                   = module.lb_internal_nomis[0].load_balancer.dns_name
-    zone_id                = module.lb_internal_nomis[0].load_balancer.zone_id
-    evaluate_target_health = true
-  }
-}
-
-resource "aws_acm_certificate" "internal_lb_az" {
-  count             = local.environment == "test" ? 1 : 0
-  domain_name       = aws_route53_zone.az[0].name
-  validation_method = "DNS"
-
-  subject_alternative_names = ["*.${aws_route53_zone.az[0].name}"]
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "internal-lb-cert-az"
-    },
-  )
-
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
-resource "aws_route53_record" "internal_lb_validation_az" {
-  for_each = {
-    for dvo in local.environment == "test" ? aws_acm_certificate.internal_lb_az[0].domain_validation_options : [] : dvo.domain_name => {
-      name   = dvo.resource_record_name
-      record = dvo.resource_record_value
-      type   = dvo.resource_record_type
-    }
-  }
-
-  allow_overwrite = true
-  name            = each.value.name
-  records         = [each.value.record]
-  ttl             = 60
-  type            = each.value.type
-  zone_id         = aws_route53_zone.az[0].zone_id
-}
-
-resource "aws_acm_certificate_validation" "internal_lb_az" {
-  count                   = local.environment == "test" ? 1 : 0
-  certificate_arn         = aws_acm_certificate.internal_lb_az[0].arn
-  validation_record_fqdns = [for record in aws_route53_record.internal_lb_validation_az : record.fqdn]
-}
 
 # --- New load balancer ---
 module "lb_internal_nomis" {
