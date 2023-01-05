@@ -1,3 +1,56 @@
+module "autoscaling_groups" {
+  source = "../../modules/ec2_autoscaling_group"
+
+  providers = {
+    aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
+  }
+
+  for_each = try(local.environment_config.autoscaling_groups, {})
+
+  name = each.key
+
+  ami_name                      = each.value.ami_name
+  ami_owner                     = try(each.value.ami_owner, "core-shared-services-production")
+  instance                      = each.value.instance
+  user_data_cloud_init          = each.value.user_data_cloud_init
+  ebs_volumes_copy_all_from_ami = try(each.value.ebs_volumes_copy_all_from_ami, true)
+  ebs_volume_config             = lookup(each.value, "ebs_volume_config", {})
+  ebs_volumes                   = lookup(each.value, "ebs_volumes", {})
+  ssm_parameters_prefix         = each.value.ssm_parameters_prefix
+  ssm_parameters                = {}
+  autoscaling_group             = each.value.autoscaling_group
+  autoscaling_schedules = coalesce(lookup(each.value, "autoscaling_schedules", null), {
+    # if sizes not set, use the values defined in autoscaling_group
+    "scale_up" = {
+      recurrence = "0 7 * * Mon-Fri"
+    }
+    "scale_down" = {
+      desired_capacity = lookup(each.value, "offpeak_desired_capacity", 0)
+      recurrence       = "0 19 * * Mon-Fri"
+    }
+  })
+
+
+  iam_resource_names_prefix = each.value.iam_resource_names_prefix
+  instance_profile_policies = local.ec2_common_managed_policies
+
+  business_unit      = local.vpc_name
+  application_name   = local.application_name
+  environment        = local.environment
+  region             = local.region
+  availability_zone  = local.availability_zone
+  subnet_set         = local.subnet_set
+  subnet_name        = "private"
+  tags               = merge(local.tags, try(each.value.tags, {}))
+  account_ids_lookup = local.environment_management.account_ids
+
+  ansible_repo         = "modernisation-platform-configuration-management"
+  ansible_repo_basedir = "ansible"
+  branch               = try(each.value.branch, "main")
+}
+
+
+
 #------------------------------------------------------------------------------
 # Common IAM policies for all ec2 instance profiles
 #------------------------------------------------------------------------------
@@ -18,41 +71,41 @@
 #   ]
 # }
 # custom policy for SSM as managed policy AmazonSSMManagedInstanceCore is too permissive
-# data "aws_iam_policy_document" "ssm_custom" {
-#   statement {
-#     sid    = "CustomSsmPolicy"
-#     effect = "Allow"
-#     actions = [
-#       "ssm:DescribeAssociation",
-#       "ssm:DescribeDocument",
-#       "ssm:GetDeployablePatchSnapshotForInstance",
-#       "ssm:GetDocument",
-#       "ssm:GetManifest",
-#       "ssm:ListAssociations",
-#       "ssm:ListInstanceAssociations",
-#       "ssm:PutInventory",
-#       "ssm:PutComplianceItems",
-#       "ssm:PutConfigurePackageResult",
-#       "ssm:UpdateAssociationStatus",
-#       "ssm:UpdateInstanceAssociationStatus",
-#       "ssm:UpdateInstanceInformation",
-#       "ssmmessages:CreateControlChannel",
-#       "ssmmessages:CreateDataChannel",
-#       "ssmmessages:OpenControlChannel",
-#       "ssmmessages:OpenDataChannel",
-#       "ec2messages:AcknowledgeMessage",
-#       "ec2messages:DeleteMessage",
-#       "ec2messages:FailMessage",
-#       "ec2messages:GetEndpoint",
-#       "ec2messages:GetMessages",
-#       "ec2messages:SendReply"
-#     ]
-#     # skiping these as policy is a scoped down version of Amazon provided AmazonSSMManagedInstanceCore managed policy.  Permissions required for SSM function
+data "aws_iam_policy_document" "ssm_custom" {
+  statement {
+    sid    = "CustomSsmPolicy"
+    effect = "Allow"
+    actions = [
+      "ssm:DescribeAssociation",
+      "ssm:DescribeDocument",
+      "ssm:GetDeployablePatchSnapshotForInstance",
+      "ssm:GetDocument",
+      "ssm:GetManifest",
+      "ssm:ListAssociations",
+      "ssm:ListInstanceAssociations",
+      "ssm:PutInventory",
+      "ssm:PutComplianceItems",
+      "ssm:PutConfigurePackageResult",
+      "ssm:UpdateAssociationStatus",
+      "ssm:UpdateInstanceAssociationStatus",
+      "ssm:UpdateInstanceInformation",
+      "ssmmessages:CreateControlChannel",
+      "ssmmessages:CreateDataChannel",
+      "ssmmessages:OpenControlChannel",
+      "ssmmessages:OpenDataChannel",
+      "ec2messages:AcknowledgeMessage",
+      "ec2messages:DeleteMessage",
+      "ec2messages:FailMessage",
+      "ec2messages:GetEndpoint",
+      "ec2messages:GetMessages",
+      "ec2messages:SendReply"
+    ]
+    # skiping these as policy is a scoped down version of Amazon provided AmazonSSMManagedInstanceCore managed policy.  Permissions required for SSM function
 
-#     #checkov:skip=CKV_AWS_111: "Ensure IAM policies does not allow write access without constraints"
-#     resources = ["*"] #tfsec:ignore:aws-iam-no-policy-wildcards
-#   }
-# }
+    #checkov:skip=CKV_AWS_111: "Ensure IAM policies does not allow write access without constraints"
+    resources = ["*"] #tfsec:ignore:aws-iam-no-policy-wildcards
+  }
+}
 
 # custom policy document for cloudwatch agent, based on CloudWatchAgentServerPolicy but removed CreateLogGroup permission to enforce all log groups in code
 data "aws_iam_policy_document" "cloud_watch_custom" {
@@ -94,75 +147,53 @@ data "aws_iam_policy_document" "cloud_watch_custom" {
 }
 
 # create policy document for access to s3 artefact bucket 
-#                                                       CHECK THIS LATER
-# data "aws_iam_policy_document" "s3_bucket_access" {
-#   statement {
-#     sid    = "AllowOracleSecureWebListBucketandGetLocation"
-#     effect = "Allow"
-#     actions = [
-#       "s3:ListAllMyBuckets",
-#       "s3:GetBucketLocation"
-#     ]
-#     resources = ["arn:aws:s3:::*"]
-#   }
-#   statement {
-#     sid    = "AccessToInstallationArtefactBucket"
-#     effect = "Allow"
-#     actions = [
-#       "s3:PutObject",
-#       "s3:GetObject",
-#       "s3:ListBucket",
-#       "s3:DeleteObject"
-#     ]
-#     resources = [module.s3-bucket.bucket.arn,
-#     "${module.s3-bucket.bucket.arn}/*"]
-#   }
-
-#   statement {
-#     sid    = "AccessToAuditAchiveBucket"
-#     effect = "Allow"
-#     actions = [
-#       "s3:GetObject",
-#       "s3:PutObject",
-#       "s3:PutObjectAcl",
-#       "s3:ListBucket"
-#     ]
-#     resources = [
-#       module.oasys-audit-archives.bucket.arn,
-#       "${module.oasys-audit-archives.bucket.arn}/*"
-#     ]
-#   }
-# }
+data "aws_iam_policy_document" "s3_bucket_access" {
+  statement {
+    sid    = "AllowOracleSecureWebListBucketandGetLocation"
+    effect = "Allow"
+    actions = [
+      "s3:ListAllMyBuckets",
+      "s3:GetBucketLocation"
+    ]
+    resources = ["arn:aws:s3:::*"]
+  }
+  statement {
+    sid    = "AccessToInstallationArtefactBucket"
+    effect = "Allow"
+    actions = [
+      "s3:PutObject",
+      "s3:GetObject",
+      "s3:ListBucket",
+      "s3:DeleteObject"
+    ]
+    resources = [module.s3-bucket.bucket.arn,
+    "${module.s3-bucket.bucket.arn}/*"]
+  }
+}
 
 # combine ec2-common policy documents
-# data "aws_iam_policy_document" "ec2_common_combined" {
-#   source_policy_documents = [
-#     data.aws_iam_policy_document.ssm_custom.json,
-#     data.aws_iam_policy_document.s3_bucket_access.json,
-#     data.aws_iam_policy_document.cloud_watch_custom.json
-#   ]
-# }
+data "aws_iam_policy_document" "ec2_common_combined" {
+  source_policy_documents = [
+    data.aws_iam_policy_document.ssm_custom.json,
+    data.aws_iam_policy_document.s3_bucket_access.json,
+    data.aws_iam_policy_document.cloud_watch_custom.json
+  ]
+}
 
 # create single managed policy
-# resource "aws_iam_policy" "ec2_common_policy" {
-#   name        = "ec2-common-policy"
-#   path        = "/"
-#   description = "Common policy for all ec2 instances"
-#   policy      = data.aws_iam_policy_document.ec2_common_combined.json
-#   tags = merge(
-#     local.tags,
-#     {
-#       Name = "ec2-common-policy"
-#     },
-#   )
-# }
+resource "aws_iam_policy" "ec2_common_policy" {
+  name        = "ec2-common-policy"
+  path        = "/"
+  description = "Common policy for all ec2 instances"
+  policy      = data.aws_iam_policy_document.ec2_common_combined.json
+  tags = merge(
+    local.tags,
+    {
+      Name = "ec2-common-policy"
+    },
+  )
+}
 
-# create list of common managed policies that can be attached to ec2 instance profiles
-# locals {
-#   ec2_common_managed_policies = [
-#     aws_iam_policy.ec2_common_policy.arn
-#   ]
-# }
 
 #------------------------------------------------------------------------------
 # Keypair for ec2-user
