@@ -10,6 +10,7 @@ resource "aws_db_instance" "oasysrds" {
   password       = random_password.db_password.result
   # tflint-ignore: aws_db_instance_default_parameter_group
   parameter_group_name  = aws_db_parameter_group.oasys_parameter.name
+  option_group_name     = aws_db_option_group.oasys_options.name
   character_set_name    = "WE8MSWIN1252"
   skip_final_snapshot   = local.application_data.accounts[local.environment].db_skip_final_snapshot
   allocated_storage     = local.application_data.accounts[local.environment].db_allocated_storage
@@ -48,6 +49,22 @@ resource "aws_db_parameter_group" "oasys_parameter" {
     value = "EXTENDED"
   }
 
+}
+
+resource "aws_db_option_group" "oasys_options" {
+  name                     = "oasys-options-19c"
+  option_group_description = "Terraform Option Group"
+  engine_name              = "oracle-ee"
+  major_engine_version     = "19"
+
+  option {
+    option_name = "APEX"
+
+    option_settings {
+      name  = "version"
+      value = "20.2.v1"
+    }
+  }
 }
 
 resource "aws_db_subnet_group" "oasys" {
