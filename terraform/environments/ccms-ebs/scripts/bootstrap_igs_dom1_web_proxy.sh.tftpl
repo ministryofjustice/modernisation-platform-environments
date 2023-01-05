@@ -3,9 +3,7 @@
 exec > /tmp/userdata.log 2>&1
 echo test of user_data | sudo tee /tmp/user_data.log
 
-# Update all packages
-sudo yum -y update
-sudo yum -y install httpd
-sudo start httpd
-sudo enable httpd
-echo "You have reached IGS Dom1 Proxy Web Server" >> /var/www/html/index.html
+sudo yum update -y
+sudo yum install -y httpd.x86_64
+sudo systemctl start httpd.service
+sudo systemctl enable httpd.service

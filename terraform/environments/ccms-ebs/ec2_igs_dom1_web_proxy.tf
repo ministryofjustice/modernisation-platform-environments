@@ -20,8 +20,8 @@ resource "aws_security_group" "ec2_sg_igs_dom1_web_proxy" {
     { Name = lower(format("sg-%s-%s-IgsDom1WebProxy", local.application_name, local.environment)) }
   )
 }
-resource "aws_security_group_rule" "ingress_traffic_igs_dom1_web_proxy" {
-  for_each          = local.application_data.ec2_sg_ingress_rules_igs_dom1_web_proxy
+resource "aws_security_group_rule" "ec2_sg_ingress_rules_igs_dom1_web_proxy_http" {
+  for_each          = local.application_data.ec2_sg_ingress_rules_igs_dom1_web_proxy_http
   description       = format("Traffic for %s %d", each.value.protocol, each.value.from_port)
   from_port         = each.value.from_port
   protocol          = each.value.protocol
@@ -30,6 +30,17 @@ resource "aws_security_group_rule" "ingress_traffic_igs_dom1_web_proxy" {
   type              = "ingress"
   #cidr_blocks       = [data.aws_vpc.shared.cidr_block]
   cidr_blocks = ["0.0.0.0/0"]
+}
+
+resource "aws_security_group_rule" "ec2_sg_ingress_rules_igs_dom1_web_proxy_ssh" {
+  for_each          = local.application_data.ec2_sg_ingress_rules_igs_dom1_web_proxy_ssh
+  description       = format("Traffic for %s %d", each.value.protocol, each.value.from_port)
+  from_port         = each.value.from_port
+  protocol          = each.value.protocol
+  security_group_id = aws_security_group.ec2_sg_igs_dom1_web_proxy.id
+  to_port           = each.value.to_port
+  type              = "ingress"
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
 }
 
 resource "aws_security_group_rule" "egress_traffic_igs_dom1_web_proxy" {

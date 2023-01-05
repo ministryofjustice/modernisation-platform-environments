@@ -14,7 +14,7 @@
       "example_var": "production-data"
     }
   },
-  "ec2_sg_ingress_rules_igs_dom1_web_proxy": {
+  "ec2_sg_ingress_rules_igs_dom1_web_proxy_http": {
     "TCP_80": {
       "from_port": 80,
       "to_port": 80,
@@ -23,6 +23,13 @@
     "TCP_443": {
       "from_port": 443,
       "to_port": 443,
+      "protocol": "TCP"
+    }
+  },
+  "ec2_sg_ingress_rules_igs_dom1_web_proxy_ssh": {
+    "TCP_22": {
+      "from_port": 22,
+      "to_port": 22,
       "protocol": "TCP"
     }
   },
