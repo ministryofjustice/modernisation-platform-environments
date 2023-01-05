@@ -74,7 +74,7 @@ locals {
           health_check_type         = "ELB"
           force_delete              = true
           termination_policies      = ["OldestInstance"]
-          target_group_arns         = []                        # TODO
+          target_group_arns         = [] # TODO
           vpc_zone_identifier       = data.aws_subnets.private.ids
           wait_for_capacity_timeout = 0
 
