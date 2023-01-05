@@ -47,7 +47,7 @@ locals {
   is_live       = [substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-production" || substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-preproduction" ? "live" : "non-live"]
   provider_name = "core-vpc-${local.environment}"
 
-  artefact_bucket_name = "${local.application_name}-${local.environment}-artefacts"
+  artefact_bucket_name = "ec2-image-builder-iaps-artefacts"
 
   # environment specfic variables
   # example usage:
