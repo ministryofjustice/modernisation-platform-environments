@@ -172,5 +172,3 @@ resource "aws_codebuild_project" "selenium" {
     },
   )
 }
-
-# Trigger rebuild ecs task definition
