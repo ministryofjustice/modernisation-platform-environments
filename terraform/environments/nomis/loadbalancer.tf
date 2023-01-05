@@ -1,16 +1,6 @@
 #------------------------------------------------------------------------------
 # Load Balancer - Internal
 #------------------------------------------------------------------------------
-data "aws_subnets" "private" {
-  filter {
-    name   = "vpc-id"
-    values = [local.vpc_id]
-  }
-  tags = {
-    Name = "${local.vpc_name}-${local.environment}-${local.subnet_set}-private-${local.region}*"
-  }
-}
-
 resource "aws_security_group" "internal_elb" {
   name        = "internal-lb-${local.application_name}"
   description = "Allow inbound traffic to internal load balancer"
