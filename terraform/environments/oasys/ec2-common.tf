@@ -169,21 +169,6 @@ data "aws_iam_policy_document" "s3_bucket_access" {
     resources = [module.s3-bucket.bucket.arn,
     "${module.s3-bucket.bucket.arn}/*"]
   }
-
-  statement {
-    sid    = "AccessToAuditAchiveBucket"
-    effect = "Allow"
-    actions = [
-      "s3:GetObject",
-      "s3:PutObject",
-      "s3:PutObjectAcl",
-      "s3:ListBucket"
-    ]
-    resources = [
-      module.oasys-audit-archives.bucket.arn,
-      "${module.oasys-audit-archives.bucket.arn}/*"
-    ]
-  }
 }
 
 # combine ec2-common policy documents
