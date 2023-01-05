@@ -81,8 +81,9 @@ resource "aws_instance" "this" {
 
   lifecycle {
     ignore_changes = [
-      user_data,        # Prevent changes to user_data from destroying existing EC2s
-      ebs_block_device, # Otherwise EC2 will be refreshed each time
+      user_data,                  # Prevent changes to user_data from destroying existing EC2s
+      ebs_block_device,           # Otherwise EC2 will be refreshed each time
+      associate_public_ip_address # The state erroneously has this set to true after an EC2 is restarted with EIP attached
     ]
   }
 

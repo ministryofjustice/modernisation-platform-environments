@@ -27,5 +27,6 @@ locals {
     # AWS
     cloud_platform              = "172.20.0.0/16"
     analytical_platform_airflow = "10.200.0.0/15"
+    mojo_globalprotect_internal = "10.184.0.0/16"
   }
 }
