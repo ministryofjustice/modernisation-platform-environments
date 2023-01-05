@@ -14,7 +14,7 @@ data "aws_subnets" "private" {
 # TODO: The 'load_balancer_arn' condition should be removed when testing in
 # nomis-test is complete.
 resource "aws_lb_listener" "internal" {
-  load_balancer_arn = module.lb_internal_nomis.load_balancer.arm
+  load_balancer_arn = module.lb_internal_nomis.load_balancer.arn
   port              = "443"
   protocol          = "HTTPS"
   #checkov:skip=CKV_AWS_103:the application does not support tls 1.2
