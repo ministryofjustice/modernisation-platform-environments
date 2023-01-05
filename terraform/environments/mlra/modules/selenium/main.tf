@@ -45,21 +45,6 @@ resource "aws_s3_bucket_versioning" "report_versioning" {
   }
 }
 
-# data "template_file" "s3_report_bucket_policy" {
-#   template = "${file("${path.module}/s3_bucket_policy.json.tpl")}"
-#
-#   vars = {
-#     account_id = var.account_id,
-#     s3_artifact_name = aws_s3_bucket.selenium_report.id,
-#     codebuild_role_name = aws_iam_role.codebuild_s3.id
-#   }
-# }
-#
-# resource "aws_s3_bucket_policy" "allow_access_from_codebuild_report" {
-#   bucket = aws_s3_bucket.selenium_report.id
-#   policy = data.template_file.s3_report_bucket_policy.rendered
-# }
-
 ###################################################################
 # KMS and S3 resources to have CodeBuild Artifacts if required
 # Taken from https://github.com/ministryofjustice/laa-aws-infrastructure/blob/5d89457e67eca00e42406724cfd8380c156060cb/management/templates/LAA-Management-Pipeline-PreReqs.template
