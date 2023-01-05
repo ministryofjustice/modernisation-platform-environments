@@ -5,7 +5,7 @@ resource "aws_security_group" "webserver" {
   #checkov:skip=CKV2_AWS_5:skip "Ensure that Security Groups are attached to another resource" - attached in nomis-stack module
   description = "Common security group for webserver instances"
   name        = "webserver"
-  vpc_id      = data.aws_vpc.private.id
+  vpc_id      = data.aws_vpc.shared.id
 
   ingress {
     description     = "SSH from Bastion"
