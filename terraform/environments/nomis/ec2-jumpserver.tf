@@ -78,13 +78,9 @@ module "ec2_jumpserver" {
 
   iam_resource_names_prefix = "ec2-jumpserver"
   instance_profile_policies = concat(local.ec2_common_managed_policies, [aws_iam_policy.jumpserver_users.arn])
-  business_unit             = local.vpc_name
   application_name          = local.application_name
-  environment               = local.environment
   region                    = local.region
-  availability_zone         = local.availability_zone
-  subnet_set                = local.subnet_set
-  subnet_name               = "private"
+  subnet_ids                = data.aws_subnets.private.ids
   tags                      = merge(local.tags, local.ec2_jumpserver.tags, try(each.value.tags, {}))
   account_ids_lookup        = local.environment_management.account_ids
   ansible_repo              = "modernisation-platform-configuration-management"

@@ -275,16 +275,11 @@ module "ec2_iaps_server" {
   # })
 
   instance_profile_policies = local.iaps_server.iam_policies
-  business_unit             = local.vpc_name
   application_name          = local.application_name
-  environment               = local.environment
   region                    = data.aws_region.current.name
-  # availability_zone         = local.availability_zone 
-  # This defaults to a single zone in the module, we need to span this across multiple AZ
-  subnet_set         = local.subnet_set
-  subnet_name        = local.application_data.ec2_iaps_instance_subnet_name
-  tags               = local.ec2_tags
-  account_ids_lookup = local.environment_management.account_ids
+  subnet_ids                = data.aws_subnets.private-public.ids
+  tags                      = local.ec2_tags
+  account_ids_lookup        = local.environment_management.account_ids
 }
 
 
