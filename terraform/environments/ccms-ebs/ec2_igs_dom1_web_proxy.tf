@@ -55,7 +55,7 @@ resource "aws_instance" "ec2_igs_dom1_web_proxy" {
   monitoring             = true
   user_data_base64       = base64encode(templatefile("${path.module}/scripts/bootstrap_igs_dom1_web_proxy.sh.tftpl", {}))
   associate_public_ip_address = true
-  
+
   metadata_options {
     http_endpoint = "enabled"
     http_tokens   = "required"

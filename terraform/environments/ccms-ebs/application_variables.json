@@ -2,7 +2,7 @@
   "accounts": {
     "development": {
       "example_var": "dev-data",
-      "ec2_igs_dom1_web_proxy_instance_type": "t2.small"
+      "ec2_igs_dom1_web_proxy_instance_type": "t2.micro"
     },
     "test": {
       "example_var": "test-data"
