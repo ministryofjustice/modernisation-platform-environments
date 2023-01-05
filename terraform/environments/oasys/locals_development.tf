@@ -45,7 +45,7 @@ locals {
         instance = {
           disable_api_termination      = false
           instance_type                = "t2.large"
-          key_name                     = "ec2-user" #                                       aws_key_pair.ec2-user.key_name
+          key_name                     = aws_key_pair.ec2-user.key_name
           monitoring                   = true
           metadata_options_http_tokens = "optional"
           vpc_security_group_ids       = []       #[aws_security_group.webserver.id]
