@@ -59,7 +59,7 @@ resource "aws_db_option_group" "oasys_options" {
 
   option {
     option_name = "APEX"
-    version = "20.2.v1"
+    version     = "20.2.v1"
   }
 }
 
