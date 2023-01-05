@@ -14,7 +14,7 @@ data "aws_subnets" "private" {
 # TODO: The 'load_balancer_arn' condition should be removed when testing in
 # nomis-test is complete.
 resource "aws_lb_listener" "internal" {
-  load_balancer_arn = module.lb_internal_nomis.load_balancer.arn
+  load_balancer_arn = module.lb_internal_nomis[0].load_balancer.arn
   port              = "443"
   protocol          = "HTTPS"
   #checkov:skip=CKV_AWS_103:the application does not support tls 1.2
@@ -43,7 +43,7 @@ resource "aws_lb_listener" "internal_http" {
     aws_acm_certificate_validation.internal_lb
   ]
 
-  load_balancer_arn = module.lb_internal_nomis.load_balancer.arn
+  load_balancer_arn = module.lb_internal_nomis[0].load_balancer.arn
   port              = "80"
   protocol          = "HTTP"
 
@@ -68,8 +68,8 @@ resource "aws_route53_record" "internal_lb" {
   type    = "A"
 
   alias {
-    name                   = module.lb_internal_nomis.load_balancer.dns_name
-    zone_id                = module.lb_internal_nomis.load_balancer.zone_id
+    name                   = module.lb_internal_nomis[0].load_balancer.dns_name
+    zone_id                = module.lb_internal_nomis[0].load_balancer.zone_id
     evaluate_target_health = true
   }
 }
@@ -180,8 +180,8 @@ resource "aws_route53_record" "internal_lb_az" {
   type    = "A"
 
   alias {
-    name                   = module.lb_internal_nomis.load_balancer.dns_name
-    zone_id                = module.lb_internal_nomis.load_balancer.zone_id
+    name                   = module.lb_internal_nomis[0].load_balancer.dns_name
+    zone_id                = module.lb_internal_nomis[0].load_balancer.zone_id
     evaluate_target_health = true
   }
 }
@@ -239,6 +239,7 @@ module "lb_internal_nomis" {
     aws.bucket-replication = aws
   }
 
+  count                      = 1 # not possible to undo this without major hassle
   account_number             = local.environment_management.account_ids[terraform.workspace]
   application_name           = "int-${local.application_name}"
   enable_deletion_protection = false
