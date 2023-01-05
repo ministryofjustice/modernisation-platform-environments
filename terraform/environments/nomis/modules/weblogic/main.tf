@@ -281,21 +281,21 @@ resource "aws_lb_target_group" "weblogic" {
   )
 }
 
-#resource "aws_lb_listener_rule" "weblogic" {
-#  listener_arn = var.load_balancer_listener_arn
-#
-#  action {
-#    type             = "forward"
-#    target_group_arn = aws_lb_target_group.weblogic.arn
-#  }
-#  condition {
-#    host_header {
-#      # this is a temporary change to support using the az.justice.gov.uk domain
-#      # values = ["${var.name}.${var.application_name}.${data.aws_route53_zone.external.name}"]
-#      values = ["${var.name}.${data.aws_route53_zone.external.name}"]
-#    }
-#  }
-#}
+resource "aws_lb_listener_rule" "weblogic" {
+  listener_arn = var.load_balancer_listener_arn
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.weblogic.arn
+  }
+  condition {
+    host_header {
+      # this is a temporary change to support using the az.justice.gov.uk domain
+      # values = ["${var.name}.${var.application_name}.${data.aws_route53_zone.external.name}"]
+      values = ["${var.name}.${data.aws_route53_zone.external.name}"]
+    }
+  }
+}
 
 #------------------------------------------------------------------------------
 # Instance profile to be assumed by the ec2 instances

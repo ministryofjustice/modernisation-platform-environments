@@ -99,7 +99,6 @@ variable "key_name" {
 variable "load_balancer_listener_arn" {
   type        = string
   description = "arn for loadbalancer fronting weblogics"
-  default     = null
 }
 
 variable "name" {

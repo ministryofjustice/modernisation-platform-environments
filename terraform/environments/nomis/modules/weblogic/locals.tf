@@ -34,10 +34,10 @@ data "aws_route53_zone" "internal" {
 # }
 
 # temporarily using az.justice.gov.uk
-# data "aws_route53_zone" "external" {
-#   name         = "modernisation-platform.nomis.az.justice.gov.uk."
-#   private_zone = false
-# }
+data "aws_route53_zone" "external" {
+  name         = "modernisation-platform.nomis.az.justice.gov.uk."
+  private_zone = false
+}
 
 
 locals {

@@ -237,7 +237,7 @@ resource "aws_acm_certificate" "internal_lb_az" {
 
 resource "aws_route53_record" "internal_lb_validation_az" {
   for_each = {
-    for dvo in(local.environment == "test" ? aws_acm_certificate.internal_lb_az[0].domain_validation_options : []) : dvo.domain_name => {
+    for dvo in local.environment == "test" ? aws_acm_certificate.internal_lb_az[0].domain_validation_options : [] : dvo.domain_name => {
       name   = dvo.resource_record_name
       record = dvo.resource_record_value
       type   = dvo.resource_record_type
@@ -261,11 +261,11 @@ resource "aws_acm_certificate_validation" "internal_lb_az" {
 # --- New load balancer ---
 module "lb_internal_nomis" {
   source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer.git?ref=v2.1.0"
+  count  = 1
   providers = {
     aws.bucket-replication = aws
   }
 
-  count                      = 1
   account_number             = local.environment_management.account_ids[terraform.workspace]
   application_name           = "int-${local.application_name}"
   enable_deletion_protection = false
