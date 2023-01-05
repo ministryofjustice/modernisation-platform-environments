@@ -1,3 +1,4 @@
+version: 1.0
 tasks:
 - task: executeScript
   inputs:
@@ -13,3 +14,4 @@ tasks:
       Install-Module -Name ComputerManagementDsc -RequiredVersion 8.5.0
       Install-Module -Name cChoco -RequiredVersion 2.5.0.0
       Install-Module -Name NetworkingDsc -RequiredVersion 9.0.0
+      
