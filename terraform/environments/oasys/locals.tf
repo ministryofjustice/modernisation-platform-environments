@@ -80,11 +80,11 @@ locals {
 
     # AWS
     cloud_platform = "172.20.0.0/16"
-
-    ec2_common_managed_policies = [
-      aws_iam_policy.ec2_common_policy.arn
-    ]
   }
+
+  ec2_common_managed_policies = [
+    aws_iam_policy.ec2_common_policy.arn
+  ]
 
   ###
   ### env independent webserver vars
