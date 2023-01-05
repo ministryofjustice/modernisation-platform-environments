@@ -207,7 +207,7 @@ resource "aws_security_group" "weblogic_common" {
     security_groups = [
       aws_security_group.jumpserver-windows.id,
       module.bastion_linux.bastion_security_group,
-      local.environment == "test" ? module.lb_internal_nomis[0].security_group.id : aws_security_group.internal_elb.id
+      module.lb_internal_nomis.security_group.id
     ]
   }
 
