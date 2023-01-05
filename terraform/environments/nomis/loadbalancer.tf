@@ -120,7 +120,7 @@ resource "aws_acm_certificate_validation" "internal_lb" {
 # --- New load balancer ---
 module "lb_internal_nomis" {
   source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer.git?ref=v2.1.0"
-  count  = local.environment == "test" ? 1 : 0
+  count  = 0
   providers = {
     aws.bucket-replication = aws
   }
