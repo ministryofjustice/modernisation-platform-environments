@@ -57,7 +57,7 @@ resource "aws_instance" "ec2_igs_dom1_web_proxy" {
   subnet_id              = data.aws_subnet.private_subnets_a.id
   monitoring             = true
   ebs_optimized          = true
-  user_data_base64       = base64encode(templatefile("${path.module}/scripts/bootstrap_igs_dom1_web_proxy.sh.tftpl", {}))
+  #user_data_base64       = base64encode(templatefile("${path.module}/scripts/bootstrap_igs_dom1_web_proxy.sh.tftpl", {}))
 
   metadata_options {
     http_endpoint = "enabled"
