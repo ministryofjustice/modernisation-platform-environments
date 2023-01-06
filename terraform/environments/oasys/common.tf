@@ -7,23 +7,23 @@ module "autoscaling_groups" {
 
   for_each = try(local.environment_config.autoscaling_groups, {})
 
-  name                          = each.key
-  ami_name                      = each.value.ami_name
-  instance                      = each.value.instance
-  user_data_cloud_init          = each.value.user_data_cloud_init
-  ebs_volume_config             = lookup(each.value, "ebs_volume_config", {})
-  ebs_volumes                   = lookup(each.value, "ebs_volumes", {})
-  ssm_parameters_prefix         = each.value.ssm_parameters_prefix
-  ssm_parameters                = {}
-  autoscaling_group             = each.value.autoscaling_group
-  autoscaling_schedules         = lookup(each.value, "autoscaling_schedules", local.autoscaling_schedules_default)
-  iam_resource_names_prefix     = each.value.iam_resource_names_prefix
-  instance_profile_policies     = local.ec2_common_managed_policies
-  application_name              = local.application_name
-  subnet_ids                    = data.aws_subnets.private.ids
-  tags                          = merge(local.tags, try(each.value.tags, {}))
-  account_ids_lookup            = local.environment_management.account_ids
-  branch                        = try(each.value.branch, "main")
+  name                      = each.key
+  ami_name                  = each.value.ami_name
+  instance                  = each.value.instance
+  user_data_cloud_init      = each.value.user_data_cloud_init
+  ebs_volume_config         = lookup(each.value, "ebs_volume_config", {})
+  ebs_volumes               = lookup(each.value, "ebs_volumes", {})
+  ssm_parameters_prefix     = each.value.ssm_parameters_prefix
+  ssm_parameters            = {}
+  autoscaling_group         = each.value.autoscaling_group
+  autoscaling_schedules     = lookup(each.value, "autoscaling_schedules", local.autoscaling_schedules_default)
+  iam_resource_names_prefix = each.value.iam_resource_names_prefix
+  instance_profile_policies = local.ec2_common_managed_policies
+  application_name          = local.application_name
+  subnet_ids                = data.aws_subnets.private.ids
+  tags                      = merge(local.tags, try(each.value.tags, {}))
+  account_ids_lookup        = local.environment_management.account_ids
+  branch                    = try(each.value.branch, "main")
 }
 
 
