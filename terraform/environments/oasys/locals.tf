@@ -90,7 +90,7 @@ locals {
       recurrence = "0 7 * * Mon-Fri"
     }
     "scale_down" = {
-      desired_capacity = lookup(each.value, "offpeak_desired_capacity", 0)
+      desired_capacity = 0
       recurrence       = "0 19 * * Mon-Fri"
     }
   }
