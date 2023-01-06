@@ -9,6 +9,11 @@ variable "application_name" {
   description = "Name of application"
 }
 
+variable "identifier_name" {
+  type        = string
+  description = "Database Identifier - Must be lowercase"
+}
+
 variable "region" {
   type        = string
   description = "Region for the RD Database"
