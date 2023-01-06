@@ -1,5 +1,6 @@
 #!/bin/bash -xe
 echo ECS_CLUSTER=${app_name} >> /etc/ecs/ecs.config
+echo ECS_IMAGE_PULL_BEHAVIOR=always >> /etc/ecs/ecs.config
 yum install -y awslogs
 cat >/etc/awslogs/awslogs.conf <<-EOF
 [general]
