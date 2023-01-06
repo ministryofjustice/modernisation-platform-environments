@@ -17,7 +17,7 @@ resource "aws_security_group" "ec2_sg_igs_dom1_web_proxy" {
   description = "Controls access to EC2 web server for IGS DOM1 proxy testing"
   vpc_id      = data.aws_vpc.shared.id
   tags = merge(local.tags,
-    { Name = lower(format("sg-%s-%s-IgsDom1WebProxy", local.application_name, local.environment)) }
+    { Name = lower(format("SG-%s-%s-IgsDom1WebProxy", local.application_name, local.environment)) }
   )
 }
 resource "aws_security_group_rule" "ec2_sg_ingress_rules_igs_dom1_web_proxy_http" {
@@ -32,16 +32,19 @@ resource "aws_security_group_rule" "ec2_sg_ingress_rules_igs_dom1_web_proxy_http
   cidr_blocks = ["0.0.0.0/0"]
 }
 
-resource "aws_security_group_rule" "ec2_sg_ingress_rules_igs_dom1_web_proxy_ssh" {
-  for_each          = local.application_data.ec2_sg_ingress_rules_igs_dom1_web_proxy_ssh
-  description       = format("Traffic for %s %d", each.value.protocol, each.value.from_port)
-  from_port         = each.value.from_port
-  protocol          = each.value.protocol
-  security_group_id = aws_security_group.ec2_sg_igs_dom1_web_proxy.id
-  to_port           = each.value.to_port
-  type              = "ingress"
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-}
+#resource "aws_security_group_rule" "ec2_sg_ingress_rules_igs_dom1_web_proxy_ssh" {
+#  for_each          = local.application_data.ec2_sg_ingress_rules_igs_dom1_web_proxy_ssh
+#  description       = format("Traffic for %s %d", each.value.protocol, each.value.from_port)
+#  from_port         = each.value.from_port
+#  protocol          = each.value.protocol
+#  security_group_id = aws_security_group.ec2_sg_igs_dom1_web_proxy.id
+#  to_port           = each.value.to_port
+#  type              = "ingress"
+#  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+#  tags = merge(local.tags,
+#    { Name = lower(format("IngressSsh-%s-%s-IgsDom1WebProxy", local.application_name, local.environment)) }
+#  )
+#}
 
 resource "aws_security_group_rule" "egress_traffic_igs_dom1_web_proxy" {
   for_each                 = local.application_data.ec2_sg_egress_rules_igs_dom1_web_proxy
@@ -54,7 +57,38 @@ resource "aws_security_group_rule" "egress_traffic_igs_dom1_web_proxy" {
   source_security_group_id = aws_security_group.ec2_sg_igs_dom1_web_proxy.id
 }
 
+resource "aws_iam_role" "role_stsassume_igs_dom1_web_proxy" {
+  name                 = "role_stsassume_igs_dom1_web_proxy"
+  path                 = "/"
+  max_session_duration = "3600"
+  assume_role_policy = jsonencode(
+    {
+      "Version" : "2012-10-17",
+      "Statement" : [
+        {
+          "Effect" : "Allow",
+          "Principal" : {
+            "Service" : "ec2.amazonaws.com"
+          }
+          "Action" : "sts:AssumeRole",
+          "Condition" : {}
+        }
+      ]
+    }
+  )
+  tags = merge(local.tags,
+    { Name = lower(format("RoleSsm-%s-%s-IgsDom1WebProxy", local.application_name, local.environment)) }
+  )
+}
 
+resource "aws_iam_instance_profile" "iam_instace_profile_igs_dom1_web_proxy" {
+  name = "iam_instace_profile__igs_dom1_web_proxy"
+  role = aws_iam_role.role_stsassume_igs_dom1_web_proxy.name
+  path = "/"
+  tags = merge(local.tags,
+    { Name = lower(format("IamProfile-%s-%s-IgsDom1WebProxy", local.application_name, local.environment)) }
+  )
+}
 
 #  Build EC2 
 resource "aws_instance" "ec2_igs_dom1_web_proxy" {
@@ -66,6 +100,7 @@ resource "aws_instance" "ec2_igs_dom1_web_proxy" {
   monitoring                  = true
   user_data_base64            = base64encode(templatefile("${path.module}/scripts/bootstrap_igs_dom1_web_proxy.sh.tftpl", {}))
   associate_public_ip_address = true
+  iam_instance_profile        = aws_iam_instance_profile.iam_instace_profile_igs_dom1_web_proxy.name
 
   metadata_options {
     http_endpoint = "enabled"
@@ -74,11 +109,11 @@ resource "aws_instance" "ec2_igs_dom1_web_proxy" {
   # Increase the volume size of the root volume
   root_block_device {
     volume_type = "gp3"
-    volume_size = 20
+    volume_size = 10
     encrypted   = true
   }
   tags = merge(local.tags,
-    { Name = lower(format("ec2-%s-%s-IgsDom1WebProxy", local.application_name, local.environment)) }
+    { Name = lower(format("Ec2-%s-%s-IgsDom1WebProxy", local.application_name, local.environment)) }
   )
   depends_on = [aws_security_group.ec2_sg_igs_dom1_web_proxy]
 }
