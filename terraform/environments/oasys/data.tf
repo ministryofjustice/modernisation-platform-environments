@@ -1,3 +1,16 @@
+# get shared subnet-set vpc object
+data "aws_vpc" "shared_vpc" {
+  # provider = aws.share-host
+  tags = {
+    Name = "${local.vpc_name}-${local.environment}"
+  }
+}
+
+data "aws_iam_session_context" "whoami" {
+  provider = aws.oidc-session
+  arn      = data.aws_caller_identity.oidc_session.arn
+}
+
 # Current account data
 data "aws_region" "current" {}
 
@@ -41,13 +54,13 @@ data "aws_subnets" "shared-data" {
   }
 }
 
-data "aws_subnets" "private-public" {
+data "aws_subnets" "private" {
   filter {
     name   = "vpc-id"
     values = [data.aws_vpc.shared.id]
   }
   tags = {
-    Name = "${local.business_unit}-${local.environment}-${local.networking_set}-private*"
+    Name = "${local.vpc_name}-${local.environment}-${local.subnet_set}-private-${local.region}*"
   }
 }
 

@@ -86,10 +86,10 @@ module "weblogic" {
   ami_owner              = try(each.value.ami_owner, local.environment_management.account_ids["core-shared-services-production"])
   termination_protection = try(each.value.termination_protection, null)
 
-  common_security_group_id   = aws_security_group.weblogic_common.id
-  instance_profile_policies  = local.ec2_common_managed_policies
-  key_name                   = aws_key_pair.ec2-user.key_name
-  load_balancer_listener_arn = aws_lb_listener.internal.arn
+  common_security_group_id  = aws_security_group.weblogic_common.id
+  instance_profile_policies = local.ec2_common_managed_policies
+  key_name                  = aws_key_pair.ec2-user.key_name
+  # load_balancer_listener_arn = aws_lb_listener.internal.arn
 
   application_name = local.application_name
   business_unit    = local.vpc_name
@@ -134,13 +134,9 @@ module "ec2_weblogic_autoscaling_group" {
   iam_resource_names_prefix = "ec2-weblogic-asg"
   instance_profile_policies = local.ec2_common_managed_policies
 
-  business_unit      = local.vpc_name
   application_name   = local.application_name
-  environment        = local.environment
   region             = local.region
-  availability_zone  = local.availability_zone
-  subnet_set         = local.subnet_set
-  subnet_name        = "private"
+  subnet_ids         = data.aws_subnets.private.ids
   tags               = merge(local.tags, local.ec2_weblogic.tags, try(each.value.tags, {}))
   account_ids_lookup = local.environment_management.account_ids
 
@@ -207,7 +203,7 @@ resource "aws_security_group" "weblogic_common" {
     security_groups = [
       aws_security_group.jumpserver-windows.id,
       module.bastion_linux.bastion_security_group,
-      local.environment == "test" ? module.lb_internal_nomis[0].security_group.id : aws_security_group.internal_elb.id
+      #      module.lb_internal_nomis[0].security_group.id
     ]
   }
 
