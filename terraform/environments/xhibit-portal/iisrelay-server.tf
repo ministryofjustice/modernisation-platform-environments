@@ -78,7 +78,7 @@ resource "aws_ebs_volume" "iisrelay-disk2" {
   type              = "gp3"
   encrypted         = true
 
-  snapshot_id = local.application_data.accounts[local.environment].infra6-disk-2-snapshot
+  snapshot_id = local.application_data.accounts[local.environment].iisrelay-disk-2-snapshot
 
   tags = merge(
     local.tags,
