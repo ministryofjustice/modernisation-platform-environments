@@ -42,9 +42,8 @@ locals {
   )
 
   environment     = trimprefix(terraform.workspace, "${local.application_name}-")
-  vpc_name        = local.business_unit
   subnet_set      = local.networking_set
-  vpc_all         = "${local.vpc_name}-${local.environment}"
+  vpc_all         = "${local.business_unit}-${local.environment}"
   subnet_set_name = "${local.business_unit}-${local.environment}-${local.networking_set}"
 
   region            = "eu-west-2"
