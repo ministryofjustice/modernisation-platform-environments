@@ -28,8 +28,8 @@ data "aws_iam_session_context" "whoami" {
 ###
 ###   aws_caller_identity
 ###
-data "aws_caller_identity" "current"                {}
-data "aws_caller_identity" "oidc_session"           { provider = aws.oidc-session }
+data "aws_caller_identity" "current" {}
+data "aws_caller_identity" "oidc_session" { provider = aws.oidc-session }
 data "aws_caller_identity" "modernisation_platform" { provider = aws.modernisation-platform }
 
 ###
@@ -41,7 +41,7 @@ data "aws_organizations_organization" "root_account" {}
 ###
 ###   aws_vpc
 ###
-data "aws_vpc" "shared" { tags = { Name = "${local.business_unit}-${local.environment}" }}
+data "aws_vpc" "shared" { tags = { Name = "${local.business_unit}-${local.environment}" } }
 
 ###
 ###   aws_region
@@ -201,8 +201,8 @@ data "aws_secretsmanager_secret_version" "environment_management" {
 ###
 # Shared KMS keys (per business unit)
 data "aws_kms_key" "general_shared" { key_id = "arn:aws:kms:eu-west-2:${local.environment_management.account_ids["core-shared-services-production"]}:alias/general-${local.business_unit}" }
-data "aws_kms_key" "ebs_shared"     { key_id = "arn:aws:kms:eu-west-2:${local.environment_management.account_ids["core-shared-services-production"]}:alias/ebs-${local.business_unit}"     }
-data "aws_kms_key" "rds_shared"     { key_id = "arn:aws:kms:eu-west-2:${local.environment_management.account_ids["core-shared-services-production"]}:alias/rds-${local.business_unit}"     }
+data "aws_kms_key" "ebs_shared" { key_id = "arn:aws:kms:eu-west-2:${local.environment_management.account_ids["core-shared-services-production"]}:alias/ebs-${local.business_unit}" }
+data "aws_kms_key" "rds_shared" { key_id = "arn:aws:kms:eu-west-2:${local.environment_management.account_ids["core-shared-services-production"]}:alias/rds-${local.business_unit}" }
 
 ###
 ###   aws_iam_policy_document
