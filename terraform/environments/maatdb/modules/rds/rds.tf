@@ -120,7 +120,7 @@ resource "aws_secretsmanager_secret_version" "rds_password_secret_version" {
 resource "aws_db_instance" "appdb1" {
   allocated_storage                     = var.allocated_storage
   db_name                               = var.application_name
-  identifier                            = "${var.application_name}-${var.environment}"
+  identifier                            = "${var.application_name}-${var.environment}-database"
   engine                                = var.engine
   engine_version                        = var.engine_version
   instance_class                        = var.instance_class
