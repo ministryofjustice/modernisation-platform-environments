@@ -26,13 +26,6 @@ data "aws_ec2_instance_type" "this" {
   instance_type = var.instance.instance_type
 }
 
-locals {
-  user_data_part_count = [
-    try(length(var.user_data_cloud_init.scripts), 0),
-    try(length(var.user_data_cloud_init.write_files), 0)
-  ]
-}
-
 data "cloudinit_config" "this" {
   count = sum(local.user_data_part_count) > 0 ? 1 : 0
 
