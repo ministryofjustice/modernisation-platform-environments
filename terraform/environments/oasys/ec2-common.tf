@@ -86,7 +86,7 @@ resource "aws_iam_policy" "ec2_common_policy" {
 #------------------------------------------------------------------------------
 resource "aws_key_pair" "ec2-user" {
   key_name   = "ec2-user"
-  public_key = file("./files/ec2-user_${terraform.workspace}.pub")
+  public_key = file("./files/ec2-user_${local.environment}.pub")
   tags = merge(
     local.tags,
     {
