@@ -56,7 +56,7 @@ locals {
   # environment specfic variables
   # example usage:
   # example_data = local.application_data.accounts[local.environment].example_var
-  application_data = fileexists("./application_variables.json") ? jsondecode(file("./application_variables.json")) : {}
+  application_data = fileexists("./files/application_variables.json") ? jsondecode(file("./files/application_variables.json")) : {} # these should just be in locals_<env>.tf. One place for env specific vars
 
   cidrs = { # this list should be abstracted for multiple environments to use
     # Azure
