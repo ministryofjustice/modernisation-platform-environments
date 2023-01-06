@@ -52,3 +52,24 @@ resource "aws_instance" "app_server" {
   }
 }
 
+# A role is required to allow access to the new EC2 instance. If you want a different name replace "example-EC2" with your preferred name.
+
+resource "aws_iam_role" "this" {
+  name                 = "example-EC2-role"
+  path                 = "/"
+  max_session_duration = "3600"
+  assume_role_policy = jsonencode(
+    {
+      "Version" : "2012-10-17",
+      "Statement" : [
+        {
+          "Effect" : "Allow",
+          "Principal" : {
+            "Service" : "ec2.amazonaws.com"
+          }
+          "Action" : "sts:AssumeRole",
+          "Condition" : {}
+        }
+      ]
+    }
+  )
