@@ -104,12 +104,12 @@ resource "aws_s3_bucket_versioning" "report_versioning" {
 ######################################################
 
 resource "aws_iam_role" "codebuild_s3" {
-  name = "${var.app_name}-CodeBuildRole"
+  name               = "${var.app_name}-CodeBuildRole"
   assume_role_policy = file("${path.module}/codebuild_iam_role.json")
 }
 
 data "template_file" "codebuild_policy" {
-  template = "${file("${path.module}/codebuild_iam_policy.json.tpl")}"
+  template = file("${path.module}/codebuild_iam_policy.json.tpl")
 
   vars = {
     s3_report_bucket_name = aws_s3_bucket.selenium_report.id
@@ -117,8 +117,8 @@ data "template_file" "codebuild_policy" {
 }
 
 resource "aws_iam_role_policy" "codebuild_s3" {
-  name = "${var.app_name}-CodeBuildPolicy"
-  role = aws_iam_role.codebuild_s3.name
+  name   = "${var.app_name}-CodeBuildPolicy"
+  role   = aws_iam_role.codebuild_s3.name
   policy = data.template_file.codebuild_policy.rendered
 }
 
@@ -127,7 +127,7 @@ resource "aws_codebuild_project" "selenium" {
   description   = "Project to test the Java application ${var.app_name}"
   build_timeout = 20
   # encryption_key = aws_kms_key.codebuild.arn
-  service_role  = aws_iam_role.codebuild_s3.arn
+  service_role = aws_iam_role.codebuild_s3.arn
 
   artifacts {
     type = "NO_ARTIFACTS"
@@ -139,9 +139,9 @@ resource "aws_codebuild_project" "selenium" {
   # }
 
   environment {
-    compute_type                = "BUILD_GENERAL1_SMALL"
-    image                       = "aws/codebuild/python:2.7.12"
-    type                        = "LINUX_CONTAINER"
+    compute_type = "BUILD_GENERAL1_SMALL"
+    image        = "aws/codebuild/python:2.7.12"
+    type         = "LINUX_CONTAINER"
 
     environment_variable {
       name  = "APP_URL"
@@ -160,9 +160,9 @@ resource "aws_codebuild_project" "selenium" {
   }
 
   source {
-    type            = "GITHUB"
-    location        = "https://github.com/ministryofjustice/laa-mlra-application.git"
-    buildspec       = "testspec-lz.yml"
+    type      = "GITHUB"
+    location  = "https://github.com/ministryofjustice/laa-mlra-application.git"
+    buildspec = "testspec-lz.yml"
   }
 
   tags = merge(
