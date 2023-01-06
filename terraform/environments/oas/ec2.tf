@@ -1,14 +1,30 @@
 resource "aws_instance" "oas_app_instance" {
-  ami           = local.application_data.accounts[local.environment].ec2amiid
-  instance_type = local.application_data.accounts[local.environment].ec2instancetype
-  security_groups = [aws_security_group.ec2.id]
-  #iam_instance_profile = [appec2instanceprofile]
-  iam_instance_profile = [aws_iam_instance_profile.ec2_instance_profile.name]
+  ami                         = local.application_data.accounts[local.environment].ec2amiid
+  associate_public_ip_address = false
+  availability_zone           = "eu-west-2a"
+  ebs_optimized               = true
+  instance_type               = local.application_data.accounts[local.environment].ec2instancetype
+  security_groups             = [aws_security_group.ec2.id]
+  monitoring                  = true
+  subnet_id                   = data.aws_cloudformation_stack.landing_zone.outputs["rManagementPrivateSubnetA"]
+  iam_instance_profile        = [aws_iam_instance_profile.ec2_instance_profile.name]
 
-  tags = {
-    Name = ""
+root_block_device {
+    delete_on_termination = false
+    encrypted             = false
+    volume_size           = 40
+    volume_type           = "gp2"
   }
-}
+
+  volume_tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}-root-volume" },
+  )
+
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name} Apps Server" },
+  )
 
 resource "aws_security_group" "ec2" {
   name        = local.application_name
@@ -239,7 +255,7 @@ resource "aws_ebs_volume" "EC2ServeVolume01" {
 
   tags = merge(
     local.tags,
-    { "Name" = "${var.oas_app_name???}-EC2ServeVolume01" },
+    { "Name" = "${local.application_name}-EC2ServeVolume01" },
   )
 
   lifecycle {
@@ -263,7 +279,7 @@ resource "aws_ebs_volume" "EC2ServeVolume02" {
 
   tags = merge(
     local.tags,
-    { "Name" = "${var.oas_app_name???}-EC2ServeVolume02" },
+    { "Name" = "${local.application_name}-EC2ServeVolume02" },
   )
 
   lifecycle {
