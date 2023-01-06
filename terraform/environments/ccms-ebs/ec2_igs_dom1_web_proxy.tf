@@ -81,6 +81,11 @@ resource "aws_iam_role" "role_stsassume_igs_dom1_web_proxy" {
   )
 }
 
+resource "aws_iam_role_policy_attachment" "ssm_policy_igs_dom1_web_proxy" {
+  role       = aws_iam_role.role_stsassume_igs_dom1_web_proxy.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
 resource "aws_iam_instance_profile" "iam_instace_profile_igs_dom1_web_proxy" {
   name = "iam_instace_profile__igs_dom1_web_proxy"
   role = aws_iam_role.role_stsassume_igs_dom1_web_proxy.name
