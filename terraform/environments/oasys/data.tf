@@ -161,15 +161,15 @@ data "aws_route53_zone" "network-services" {
 
 # Shared KMS keys (per business unit)
 data "aws_kms_key" "general_shared" {
-  key_id = "arn:aws:kms:eu-west-2:${local.environment_management.account_ids["core-shared-services-production"]}:alias/general-${var.networking[0].business-unit}"
+  key_id = "arn:aws:kms:eu-west-2:${local.environment_management.account_ids["core-shared-services-production"]}:alias/general-${local.business_unit}"
 }
 
 data "aws_kms_key" "ebs_shared" {
-  key_id = "arn:aws:kms:eu-west-2:${local.environment_management.account_ids["core-shared-services-production"]}:alias/ebs-${var.networking[0].business-unit}"
+  key_id = "arn:aws:kms:eu-west-2:${local.environment_management.account_ids["core-shared-services-production"]}:alias/ebs-${local.business_unit}"
 }
 
 data "aws_kms_key" "rds_shared" {
-  key_id = "arn:aws:kms:eu-west-2:${local.environment_management.account_ids["core-shared-services-production"]}:alias/rds-${var.networking[0].business-unit}"
+  key_id = "arn:aws:kms:eu-west-2:${local.environment_management.account_ids["core-shared-services-production"]}:alias/rds-${local.business_unit}"
 }
 
 # This data sources allows us to get the Modernisation Platform account information for use elsewhere
