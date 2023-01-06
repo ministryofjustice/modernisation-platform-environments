@@ -130,7 +130,7 @@ module "ec2_weblogic_autoscaling_group" {
   subnet_ids         = data.aws_subnets.private.ids
   tags               = merge(local.tags, local.ec2_weblogic.tags, try(each.value.tags, {}))
   account_ids_lookup = local.environment_management.account_ids
-  branch               = try(each.value.branch, "main")
+  branch             = try(each.value.branch, "main")
 }
 
 #  load_balancer_listener_arn = aws_lb_listener.internal.arn
