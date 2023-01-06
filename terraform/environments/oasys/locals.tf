@@ -85,6 +85,16 @@ locals {
     aws_iam_policy.ec2_common_policy.arn
   ]
 
+  autoscaling_schedules_default = {
+    "scale_up" = {
+      recurrence = "0 7 * * Mon-Fri"
+    }
+    "scale_down" = {
+      desired_capacity = 0
+      recurrence       = "0 19 * * Mon-Fri"
+    }
+  }
+
   ###
   ### env independent webserver vars
   ###

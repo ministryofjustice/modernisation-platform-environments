@@ -175,7 +175,6 @@ locals {
           desired_capacity = 0
           warm_pool        = null
         }
-        offpeak_desired_capacity = 0
       }
     }
 
