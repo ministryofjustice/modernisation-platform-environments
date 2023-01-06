@@ -1,7 +1,12 @@
 {
   "accounts": {
     "development": {
-      "example_var": "dev-data"
+      "example_var": "dev-data",
+      "ec2amiid": "ami-0a2128d7b4dd8a56c",
+      "ec2instancetype": "r5a.large",
+      "bucketname": "laa-oracle-software",
+      "01orahomesize": "150",
+      "02stageesize": "200"
     },
     "test": {
       "example_var": "test-data"
