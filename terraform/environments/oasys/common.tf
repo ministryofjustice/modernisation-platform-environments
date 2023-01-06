@@ -1,3 +1,33 @@
+module "autoscaling_groups" {
+  source = "../../modules/ec2_autoscaling_group"
+
+  providers = {
+    aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
+  }
+
+  for_each = try(local.environment_config.autoscaling_groups, {})
+
+  name                      = each.key
+  ami_name                  = each.value.ami_name
+  instance                  = each.value.instance
+  user_data_cloud_init      = each.value.user_data_cloud_init
+  ebs_volume_config         = lookup(each.value, "ebs_volume_config", {})
+  ebs_volumes               = lookup(each.value, "ebs_volumes", {})
+  ssm_parameters_prefix     = each.value.ssm_parameters_prefix
+  ssm_parameters            = {}
+  autoscaling_group         = each.value.autoscaling_group
+  autoscaling_schedules     = lookup(each.value, "autoscaling_schedules", local.autoscaling_schedules_default)
+  iam_resource_names_prefix = each.value.iam_resource_names_prefix
+  instance_profile_policies = local.ec2_common_managed_policies
+  application_name          = local.application_name
+  subnet_ids                = data.aws_subnets.private.ids
+  tags                      = merge(local.tags, try(each.value.tags, {}))
+  account_ids_lookup        = local.environment_management.account_ids
+  branch                    = try(each.value.branch, "main")
+}
+
+
+
 #------------------------------------------------------------------------------
 # Common IAM policies for all ec2 instance profiles
 #------------------------------------------------------------------------------
@@ -17,159 +47,27 @@
 #     "CreateGrant"
 #   ]
 # }
-# custom policy for SSM as managed policy AmazonSSMManagedInstanceCore is too permissive
-# data "aws_iam_policy_document" "ssm_custom" {
-#   statement {
-#     sid    = "CustomSsmPolicy"
-#     effect = "Allow"
-#     actions = [
-#       "ssm:DescribeAssociation",
-#       "ssm:DescribeDocument",
-#       "ssm:GetDeployablePatchSnapshotForInstance",
-#       "ssm:GetDocument",
-#       "ssm:GetManifest",
-#       "ssm:ListAssociations",
-#       "ssm:ListInstanceAssociations",
-#       "ssm:PutInventory",
-#       "ssm:PutComplianceItems",
-#       "ssm:PutConfigurePackageResult",
-#       "ssm:UpdateAssociationStatus",
-#       "ssm:UpdateInstanceAssociationStatus",
-#       "ssm:UpdateInstanceInformation",
-#       "ssmmessages:CreateControlChannel",
-#       "ssmmessages:CreateDataChannel",
-#       "ssmmessages:OpenControlChannel",
-#       "ssmmessages:OpenDataChannel",
-#       "ec2messages:AcknowledgeMessage",
-#       "ec2messages:DeleteMessage",
-#       "ec2messages:FailMessage",
-#       "ec2messages:GetEndpoint",
-#       "ec2messages:GetMessages",
-#       "ec2messages:SendReply"
-#     ]
-#     # skiping these as policy is a scoped down version of Amazon provided AmazonSSMManagedInstanceCore managed policy.  Permissions required for SSM function
-
-#     #checkov:skip=CKV_AWS_111: "Ensure IAM policies does not allow write access without constraints"
-#     resources = ["*"] #tfsec:ignore:aws-iam-no-policy-wildcards
-#   }
-# }
-
-# custom policy document for cloudwatch agent, based on CloudWatchAgentServerPolicy but removed CreateLogGroup permission to enforce all log groups in code
-data "aws_iam_policy_document" "cloud_watch_custom" {
-  statement {
-    sid    = "CloudWatchAgentServerPolicy"
-    effect = "Allow"
-    actions = [
-      "cloudwatch:PutMetricData",
-      "ec2:DescribeVolumes",
-      "ec2:DescribeTags",
-      "logs:PutLogEvents",
-      "logs:DescribeLogStreams",
-      "logs:DescribeLogGroups",
-      "logs:CreateLogStream"
-    ]
-    # skiping these as policy is a scoped down version of Amazon provided CloudWatchAgentServerPolicy managed policy
-    #checkov:skip=CKV_AWS_111: "Ensure IAM policies does not allow write access without constraints"
-    resources = ["*"] #tfsec:ignore:aws-iam-no-policy-wildcards
-  }
-
-  statement {
-    sid    = "DenyCreateLogGroups"
-    effect = "Deny"
-    actions = [
-      # Letting instances create log groups makes it difficult to delete them later
-      "logs:CreateLogGroup"
-    ]
-    resources = ["*"]
-  }
-  statement {
-    sid    = "AccessCloudWatchConfigParameter"
-    effect = "Allow"
-    actions = [
-      "ssm:GetParameter",
-      "ssm:GetParameters"
-    ]
-    resources = [aws_ssm_parameter.cloud_watch_config_linux.arn]
-  }
-}
-
-# create policy document for access to s3 artefact bucket 
-#                                                       CHECK THIS LATER
-# data "aws_iam_policy_document" "s3_bucket_access" {
-#   statement {
-#     sid    = "AllowOracleSecureWebListBucketandGetLocation"
-#     effect = "Allow"
-#     actions = [
-#       "s3:ListAllMyBuckets",
-#       "s3:GetBucketLocation"
-#     ]
-#     resources = ["arn:aws:s3:::*"]
-#   }
-#   statement {
-#     sid    = "AccessToInstallationArtefactBucket"
-#     effect = "Allow"
-#     actions = [
-#       "s3:PutObject",
-#       "s3:GetObject",
-#       "s3:ListBucket",
-#       "s3:DeleteObject"
-#     ]
-#     resources = [module.s3-bucket.bucket.arn,
-#     "${module.s3-bucket.bucket.arn}/*"]
-#   }
-
-#   statement {
-#     sid    = "AccessToAuditAchiveBucket"
-#     effect = "Allow"
-#     actions = [
-#       "s3:GetObject",
-#       "s3:PutObject",
-#       "s3:PutObjectAcl",
-#       "s3:ListBucket"
-#     ]
-#     resources = [
-#       module.oasys-audit-archives.bucket.arn,
-#       "${module.oasys-audit-archives.bucket.arn}/*"
-#     ]
-#   }
-# }
-
-# combine ec2-common policy documents
-# data "aws_iam_policy_document" "ec2_common_combined" {
-#   source_policy_documents = [
-#     data.aws_iam_policy_document.ssm_custom.json,
-#     data.aws_iam_policy_document.s3_bucket_access.json,
-#     data.aws_iam_policy_document.cloud_watch_custom.json
-#   ]
-# }
 
 # create single managed policy
-# resource "aws_iam_policy" "ec2_common_policy" {
-#   name        = "ec2-common-policy"
-#   path        = "/"
-#   description = "Common policy for all ec2 instances"
-#   policy      = data.aws_iam_policy_document.ec2_common_combined.json
-#   tags = merge(
-#     local.tags,
-#     {
-#       Name = "ec2-common-policy"
-#     },
-#   )
-# }
-
-# create list of common managed policies that can be attached to ec2 instance profiles
-# locals {
-#   ec2_common_managed_policies = [
-#     aws_iam_policy.ec2_common_policy.arn
-#   ]
-# }
+resource "aws_iam_policy" "ec2_common_policy" {
+  name        = "ec2-common-policy"
+  path        = "/"
+  description = "Common policy for all ec2 instances"
+  policy      = data.aws_iam_policy_document.ec2_common_combined.json
+  tags = merge(
+    local.tags,
+    {
+      Name = "ec2-common-policy"
+    },
+  )
+}
 
 #------------------------------------------------------------------------------
 # Keypair for ec2-user
 #------------------------------------------------------------------------------
 resource "aws_key_pair" "ec2-user" {
   key_name   = "ec2-user"
-  public_key = file(".ssh/${terraform.workspace}/ec2-user.pub")
+  public_key = file("./files/ec2-user_${local.environment}.pub")
   tags = merge(
     local.tags,
     {
@@ -452,25 +350,7 @@ resource "aws_ssm_parameter" "cloud_watch_config_linux" {
 #   schedule_expression         = "cron(0 19 ? * ${each.value} *)"
 # }
 
-# data "aws_iam_policy_document" "ssm_ec2_start_stop_kms" {
-#   statement {
-#     sid    = "manageSharedAMIsEncryptedEBSVolumes"
-#     effect = "Allow"
-#     #tfsec:ignore:aws-iam-no-policy-wildcards
-#     actions = [
-#       "kms:Encrypt",
-#       "kms:Decrypt",
-#       "kms:ReEncrypt*",
-#       "kms:ReEncryptFrom",
-#       "kms:GenerateDataKey*",
-#       "kms:DescribeKey",
-#       "kms:CreateGrant",
-#       "kms:ListGrants",
-#       "kms:RevokeGrant"
-#     ]
-#     # we have a legacy CMK that's used in production that will be retired but in the meantime requires permissions
-#     resources = [local.environment == "test" ? aws_kms_key.oasys-cmk[0].arn : data.aws_kms_key.oasys_key.arn, data.aws_kms_key.hmpps_key.arn]
-#   }
+
 
 #   statement {
 #     sid    = "modifyAautoscalingGroupProcesses"
@@ -777,16 +657,7 @@ resource "aws_ssm_parameter" "cloud_watch_config_linux" {
 # }
 # # CloudWatch Monitoring Role and Policies
 
-# data "aws_iam_policy_document" "cloud-platform-monitoring-assume-role" {
-#   statement {
-#     actions = ["sts:AssumeRole"]
 
-#     principals {
-#       type        = "AWS"
-#       identifiers = ["arn:aws:iam::754256621582:root"]  # cloud-platform-aws account
-#     }
-#   }
-# }
 
 # resource "aws_iam_role" "cloudwatch-datasource-role" {
 #   name               = "CloudwatchDatasourceRole"
@@ -800,55 +671,7 @@ resource "aws_ssm_parameter" "cloud_watch_config_linux" {
 
 # }
 
-# data "aws_iam_policy_document" "cloudwatch_datasource" {
-#   statement {
-#     sid    = "AllowReadingMetricsFromCloudWatch"
-#     effect = "Allow"
-#     actions = [
-#       "cloudwatch:DescribeAlarmsForMetric",
-#       "cloudwatch:DescribeAlarmHistory",
-#       "cloudwatch:DescribeAlarms",
-#       "cloudwatch:ListMetrics",
-#       "cloudwatch:GetMetricData",
-#       "cloudwatch:GetInsightRuleReport"
-#     ]
-#     #tfsec:ignore:aws-iam-no-policy-wildcards
-#     resources = ["*"]
-#   }
-#   statement {
-#     sid    = "AllowReadingLogsFromCloudWatch"
-#     effect = "Allow"
-#     actions = [
-#       "logs:DescribeLogGroups",
-#       "logs:GetLogGroupFields",
-#       "logs:StartQuery",
-#       "logs:StopQuery",
-#       "logs:GetQueryResults",
-#       "logs:GetLogEvents"
-#     ]
-#     #tfsec:ignore:aws-iam-no-policy-wildcards
-#     resources = ["*"]
-#   }
-#   statement {
-#     sid    = "AllowReadingTagsInstancesRegionsFromEC2"
-#     effect = "Allow"
-#     actions = [
-#       "ec2:DescribeTags",
-#       "ec2:DescribeInstances",
-#       "ec2:DescribeRegions"
-#     ]
-#     resources = ["*"]
-#   }
-#   statement {
-#     sid    = "AllowReadingResourcesForTags"
-#     effect = "Allow"
-#     actions = [
-#       "tag:GetResources"
-#     ]
-#     resources = ["*"]
-#   }
 
-# }
 
 # resource "aws_iam_policy" "cloudwatch_datasource_policy" {
 #   name        = "cloudwatch-datasource-policy"

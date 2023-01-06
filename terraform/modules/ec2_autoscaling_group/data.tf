@@ -1,17 +1,5 @@
 data "aws_caller_identity" "current" {}
 
-data "aws_vpc" "shared_vpc" {
-  tags = {
-    Name = "${var.business_unit}-${var.environment}"
-  }
-}
-
-data "aws_subnet" "this" {
-  tags = {
-    Name = "${var.business_unit}-${var.environment}-${var.subnet_set}-${var.subnet_name}-${var.availability_zone}"
-  }
-}
-
 data "aws_ami" "this" {
   most_recent = true
   owners      = [try(var.account_ids_lookup[var.ami_owner], var.ami_owner)]
@@ -36,13 +24,6 @@ data "aws_kms_key" "by_alias" {
 
 data "aws_ec2_instance_type" "this" {
   instance_type = var.instance.instance_type
-}
-
-locals {
-  user_data_part_count = [
-    try(length(var.user_data_cloud_init.scripts), 0),
-    try(length(var.user_data_cloud_init.write_files), 0)
-  ]
 }
 
 data "cloudinit_config" "this" {
