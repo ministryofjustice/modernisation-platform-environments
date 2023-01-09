@@ -34,13 +34,13 @@
 # 3 instance types are listed - uncomment the one you need and comment out the others. If you want a different name replace "example-EC2" with your preferred name.
 
 resource "aws_instance" "app_server" {
-  ami           = "ami-084e8c05825742534"    # Amazon linux 64 bit
+  ami = "ami-084e8c05825742534" # Amazon linux 64 bit
   #ami           = "ami-07c2ae35d31367b3e"   # Canonical, Ubuntu, 22.04 LTS, amd64
   #ami           = "ami-0e322684a5a0074ce"   # Microsoft Windows Server 2022 Full Locale English
   instance_type = "t3.micro"
 
- # If the root volume size is too small you can increase the volume size of the root volume by uncommenting the code below
-  
+  # If the root volume size is too small you can increase the volume size of the root volume by uncommenting the code below
+
   # root_block_device {
   #   volume_type = "gp3"
   #   volume_size = 20
@@ -48,7 +48,7 @@ resource "aws_instance" "app_server" {
   # }
 
   tags = {
-    Name = "example-EC2" 
+    Name = "example-EC2"
   }
 }
 
