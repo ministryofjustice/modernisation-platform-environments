@@ -42,9 +42,8 @@ locals {
   )
 
   environment     = trimprefix(terraform.workspace, "${local.application_name}-")
-  vpc_name        = local.business_unit
   subnet_set      = local.networking_set
-  vpc_all         = "${local.vpc_name}-${local.environment}"
+  vpc_all         = "${local.business_unit}-${local.environment}"
   subnet_set_name = "${local.business_unit}-${local.environment}-${local.networking_set}"
 
   region            = "eu-west-2"
@@ -56,7 +55,7 @@ locals {
   # environment specfic variables
   # example usage:
   # example_data = local.application_data.accounts[local.environment].example_var
-  application_data = fileexists("./application_variables.json") ? jsondecode(file("./application_variables.json")) : {}
+  application_data = fileexists("./files/application_variables.json") ? jsondecode(file("./files/application_variables.json")) : {} # these should just be in locals_<env>.tf. One place for env specific vars
 
   cidrs = { # this list should be abstracted for multiple environments to use
     # Azure
@@ -85,6 +84,16 @@ locals {
   ec2_common_managed_policies = [
     aws_iam_policy.ec2_common_policy.arn
   ]
+
+  autoscaling_schedules_default = {
+    "scale_up" = {
+      recurrence = "0 7 * * Mon-Fri"
+    }
+    "scale_down" = {
+      desired_capacity = 0
+      recurrence       = "0 19 * * Mon-Fri"
+    }
+  }
 
   ###
   ### env independent webserver vars

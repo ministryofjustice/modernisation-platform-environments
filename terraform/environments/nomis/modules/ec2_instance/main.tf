@@ -4,7 +4,7 @@
 
 resource "aws_instance" "this" {
   ami                         = data.aws_ami.this.id
-  associate_public_ip_address = false # create an EIP instead
+  associate_public_ip_address = false # create an EIP instead
   disable_api_termination     = var.instance.disable_api_termination
   ebs_optimized               = data.aws_ec2_instance_type.this.ebs_optimized_support == "unsupported" ? false : true
   iam_instance_profile        = aws_iam_instance_profile.this.name
@@ -45,7 +45,7 @@ resource "aws_instance" "this" {
     }
   }
 
-  # only use this inline EBS block if it is easy to recreate the EBS volume
+  # only use this inline EBS block if it is easy to recreate the EBS volume
   # as the block is only used when the EC2 is first created
   dynamic "ebs_block_device" {
     for_each = try(var.instance.ebs_block_device_inline, false) ? local.ebs_volumes_nonroot : {}
@@ -128,7 +128,7 @@ resource "aws_ebs_volume" "this" {
   size              = each.value.size
   type              = each.value.type
 
-  # you may run into a permission issue if the AMI is not in self account
+  # you may run into a permission issue if the AMI is not in self account
   snapshot_id = each.value.snapshot_id
 
   tags = merge(

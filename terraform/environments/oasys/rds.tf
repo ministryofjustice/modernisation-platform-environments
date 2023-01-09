@@ -65,7 +65,7 @@ resource "aws_db_subnet_group" "oasys" {
 resource "aws_security_group" "oasys" {
   name        = "${local.application_name}-${local.environment}-database-security-group"
   description = "Security group for ${local.application_name} ${local.environment} database"
-  vpc_id      = data.aws_vpc.shared_vpc.id
+  vpc_id      = data.aws_vpc.shared.id
   tags = merge(local.tags,
     { Name = lower(format("%s-%s-database-security-group", local.application_name, local.environment)) }
   )
@@ -74,7 +74,7 @@ resource "aws_security_group" "oasys" {
     from_port   = 1521
     to_port     = 1521
     protocol    = "tcp"
-    cidr_blocks = [local.cidrs.noms_live, data.aws_vpc.shared_vpc.cidr_block, local.cidrs.noms_test]
+    cidr_blocks = [local.cidrs.noms_live, data.aws_vpc.shared.cidr_block, local.cidrs.noms_test]
   }
   egress {
     description = "allow all"

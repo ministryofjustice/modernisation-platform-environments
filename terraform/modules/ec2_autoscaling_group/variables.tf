@@ -33,13 +33,13 @@ variable "account_ids_lookup" {
 variable "ansible_repo" {
   type        = string
   description = "Optionally provision the server using this ansible_repo"
-  default     = null
+  default     = "modernisation-platform-configuration-management"
 }
 
 variable "ansible_repo_basedir" {
   type        = string
   description = "Base directory within ansible_repo where ansible code is located"
-  default     = null
+  default     = "ansible"
 }
 
 variable "branch" {
@@ -56,7 +56,7 @@ variable "ami_name" {
 variable "ami_owner" {
   type        = string
   description = "Owner of AMI to be used to launch the database ec2 instance"
-  default     = "self"
+  default     = "core-shared-services-production"
   nullable    = false
 }
 

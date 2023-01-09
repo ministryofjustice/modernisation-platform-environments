@@ -63,12 +63,12 @@ locals {
 
     # Add database instances here. They will be created using ec2-database.tf
     databases = {
-      # Naming
+      # Naming
       # *-nomis-db-1: NOMIS, NDH, TRDATA
       # *-nomis-db-2: MIS, AUDIT
       # *-nomis-db-3: HA
 
-      # NOTE: this is temporarily under prod account while we wait for network connectivity
+      # NOTE: this is temporarily under prod account while we wait for network connectivity
       preprod-nomis-db-2 = {
         tags = {
           server-type = "nomis-db"

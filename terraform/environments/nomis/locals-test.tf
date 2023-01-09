@@ -68,7 +68,7 @@ locals {
 
     # Add database instances here. They will be created using ec2-database.tf
     databases = {
-      # Naming
+      # Naming
       # *-nomis-db-1: NOMIS, NDH, TRDATA
       # *-nomis-db-2: MIS, AUDIT
       # *-nomis-db-3: HA
@@ -175,7 +175,6 @@ locals {
           desired_capacity = 0
           warm_pool        = null
         }
-        offpeak_desired_capacity = 0
       }
     }
 
