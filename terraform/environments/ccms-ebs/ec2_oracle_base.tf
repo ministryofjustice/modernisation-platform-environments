@@ -46,6 +46,43 @@ resource "aws_security_group_rule" "egress_traffic_oracle_base" {
   source_security_group_id = aws_security_group.ec2_sg_oracle_base.id
 }
 
+resource "aws_iam_role" "role_stsassume_oracle_base" {
+  name                 = "role_stsassume_oracle_base"
+  path                 = "/"
+  max_session_duration = "3600"
+  assume_role_policy = jsonencode(
+    {
+      "Version" : "2012-10-17",
+      "Statement" : [
+        {
+          "Effect" : "Allow",
+          "Principal" : {
+            "Service" : "ec2.amazonaws.com"
+          }
+          "Action" : "sts:AssumeRole",
+          "Condition" : {}
+        }
+      ]
+    }
+  )
+  tags = merge(local.tags,
+    { Name = lower(format("RoleSsm-%s-%s-OracleBase", local.application_name, local.environment)) }
+  )
+}
+
+resource "aws_iam_role_policy_attachment" "ssm_policy_oracle_base" {
+  role       = aws_iam_role.role_stsassume_oracle_base.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
+resource "aws_iam_instance_profile" "iam_instace_profile_oracle_base" {
+  name = "iam_instace_profile_oracle_base"
+  role = aws_iam_role.role_stsassume_oracle_base.name
+  path = "/"
+  tags = merge(local.tags,
+    { Name = lower(format("IamProfile-%s-%s-OracleBase", local.application_name, local.environment)) }
+  )
+}
 
 #  Build EC2 
 resource "aws_instance" "ec2_oracle_base" {
