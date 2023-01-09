@@ -1,6 +1,6 @@
 locals {
 
-  aws_acm_certificates = {
+  acm_certificates = {
 
     # define certs common to all environments
     "star.${local.application_name}.${local.vpc_name}-${local.environment}.modernisation-platform.service.justice.gov.uk" = {
@@ -23,10 +23,10 @@ locals {
   }
 }
 
-module "aws_acm_certificate" {
-  for_each = merge(local.aws_acm_certificates, try(local.environment_config.aws_acm_certificates, {}))
+module "acm_certificate" {
+  for_each = merge(local.acm_certificates, try(local.environment_config.acm_certificates, {}))
 
-  source = "./modules/aws_acm_certificate"
+  source = "./modules/acm_certificate"
 
   providers = {
     aws.core-vpc              = aws.core-vpc
