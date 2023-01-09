@@ -93,6 +93,7 @@ resource "aws_instance" "ec2_oracle_base" {
   subnet_id              = data.aws_subnet.public_subnets_a.id
   monitoring             = true
   ebs_optimized          = false
+  associate_public_ip_address = true
   iam_instance_profile   = aws_iam_instance_profile.iam_instace_profile_oracle_base.name
 
   metadata_options {
