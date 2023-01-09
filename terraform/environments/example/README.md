@@ -39,12 +39,22 @@ Modernisation Platform
 
 ## Optional
 
-### EC2 - ec2.tf
+### EC2 - original-ec2.tf
 
 The EC2 code requires security groups to be used which are created prior to the EC2 service. To ensure this happens there is a step in the code (depends_on) which ensures that is complete before the EC2 is built. In general, the security group is built very quickly so this causes no delay.
 There is a section in there which increases the root volume to 20Gb rather than the default 8Gb that would be used based on the server type. This may not be needed and can be removed.
 
 Some of the other steps use variables stored in application_variables.json - `local.app_variables.accounts[local.environment]`. This is set in locals.tf to point to the correct location - `app_variables = jsondecode(file("./application_variables.json"))`. If another file/location is used this will need to be changed.
+
+### EC2 - ec2.tf
+
+This is a smiplified version of the original-ec2.tf and is intended to create a quick and simple EC2 for sandbox or testing purposes. If used (and needed later) the code should be copied elsewhere so it is available to the correct environment.
+
+Primarily this is designed to create a single EC2 version with a list of suggested amis (Amazon linux 64 bit, Canonical, Ubuntu, 22.04 LTS, amd64, Microsoft Windows Server 2022 Full Locale English) but others can be selected if required. Simply select the one you need and comment out the others.
+
+There is also code to add security groups (if there is no default available) and to change the root volume size if needed. There is also a piece of code to add a role which can be made available to other to control the EC2. Should any additional volumes be needed see the volumes code (below) to use this code as required.
+
+Any other items required may be included in the original code referenced above which can be consulted as needed.
 
 ### Volumes - volumes.tf
 
