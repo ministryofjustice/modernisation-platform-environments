@@ -3,8 +3,7 @@ data "aws_iam_policy_document" "iaps_s3_policy" {
     principals {
       type = "AWS"
       identifiers = [
-        "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/ec2-role-iaps-server",
-        "arn:aws:iam::${local.environment_management.account_ids["core-shared-services-production"]}:root"
+        "arn:aws:iam::${local.environment_management.account_ids["core-shared-services-production"]}:role/ImageBuilder"
       ]
     }
     actions   = ["s3:GetObject"]
@@ -13,6 +12,8 @@ data "aws_iam_policy_document" "iaps_s3_policy" {
 }
 
 module "s3_bucket" {
+  count = local.environment == "development" ? 1 : 0
+
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.2.0"
 
   providers = {
@@ -52,6 +53,8 @@ module "s3_bucket" {
   bucket_policy = [
     data.aws_iam_policy_document.iaps_s3_policy.json
   ]
+
+  sse_algorithm = "AES256"
 
   tags = local.tags
 }
