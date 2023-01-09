@@ -1,0 +1,78 @@
+data "aws_ami" "oracle_base" {
+  most_recent = true
+  owners      = ["self"]
+  filter {
+    name   = "name"
+    values = [local.application_data.accounts[local.environment].orace_base_ami_name]
+    #values = ["import-ami-04fde633abe64028d"]
+  }
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+}
+
+# First build the security group for the EC2
+resource "aws_security_group" "ec2_sg_oracle_base" {
+  name        = "ec2_sg_oracle_base"
+  description = "Baseline image of Oracle Linux 7.9"
+  vpc_id      = data.aws_vpc.shared.id
+  tags = merge(local.tags,
+    { Name = lower(format("sg-%s-%s-OracleBaseImage", local.application_name, local.environment)) }
+  )
+}
+resource "aws_security_group_rule" "ingress_traffic_oracle_base" {
+  for_each          = local.application_data.ec2_sg_ingress_rules_oracle_base_http
+  description       = format("Traffic for %s %d", each.value.protocol, each.value.from_port)
+  from_port         = each.value.from_port
+  protocol          = each.value.protocol
+  security_group_id = aws_security_group.ec2_sg_oracle_base.id
+  to_port           = each.value.to_port
+  type              = "ingress"
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+}
+
+resource "aws_security_group_rule" "egress_traffic_oracle_base" {
+  for_each                 = local.application_data.ec2_sg_egress_rules_oracle_base
+  description              = format("Outbound traffic for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.ec2_sg_oracle_base.id
+  to_port                  = each.value.to_port
+  type                     = "egress"
+  source_security_group_id = aws_security_group.ec2_sg_oracle_base.id
+}
+
+
+#STILL TO ADD AMI ID
+#  Build EC2 
+resource "aws_instance" "ec2_oracle_base" {
+  # Specify the instance type and ami to be used (this is the Amazon free tier option)
+  instance_type          = local.application_data.accounts[local.environment].ec2_oracle_base_instance_type
+  ami                    = data.aws_ami.oracle_base.id
+#  ami                    = ami-043196bdc18733168
+  vpc_security_group_ids = [aws_security_group.ec2_sg_oracle_base.id]
+  subnet_id              = data.aws_subnet.private_subnets_a.id
+  monitoring             = true
+  ebs_optimized          = true
+#  user_data              = base64encode(templatefile("${path.module}/scripts/bootstrap_oracle_base.sh.tftpl", {}))
+
+  metadata_options {
+    http_endpoint = "enabled"
+    http_tokens   = "required"
+  }
+  # Increase the volume size of the root volume
+  root_block_device {
+    volume_type = "gp3"
+    volume_size = 20
+    encrypted   = true
+  }
+  tags = merge(local.tags,
+    { Name = lower(format("ec2-%s-%s-IgsDom1WebProxy", local.application_name, local.environment)) }
+  )
+  depends_on = [aws_security_group.ec2_sg_oracle_base]
+}

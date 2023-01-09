@@ -2,7 +2,9 @@
   "accounts": {
     "development": {
       "example_var": "dev-data",
-      "ec2_igs_dom1_web_proxy_instance_type": "t2.small"
+      "ec2_igs_dom1_web_proxy_instance_type": "t2.small",
+      "ec2_oracle_base_instance_type": "t2.large",
+      "orace_base_ami_name": "import-ami-04fde633abe64028d"
     },
     "test": {
       "example_var": "test-data"
@@ -34,6 +36,39 @@
     }
   },
   "ec2_sg_egress_rules_igs_dom1_web_proxy": {
+    "TCP_80": {
+      "from_port": 80,
+      "to_port": 80,
+      "protocol": "TCP",
+      "destination_cidr": "0.0.0.0/0"
+    },
+    "TCP_443": {
+      "from_port": 443,
+      "to_port": 443,
+      "protocol": "TCP",
+      "destination_cidr": "0.0.0.0/0"
+    }
+  },
+  "ec2_sg_ingress_rules_oracle_base_http": {
+    "TCP_80": {
+      "from_port": 80,
+      "to_port": 80,
+      "protocol": "TCP"
+    },
+    "TCP_443": {
+      "from_port": 443,
+      "to_port": 443,
+      "protocol": "TCP"
+    }
+  },
+  "ec2_sg_ingress_rules_oracle_base_ssh": {
+    "TCP_22": {
+      "from_port": 22,
+      "to_port": 22,
+      "protocol": "TCP"
+    }
+  },
+  "ec2_sg_egress_rules_oracle_base": {
     "TCP_80": {
       "from_port": 80,
       "to_port": 80,
