@@ -188,7 +188,8 @@ data "aws_iam_policy_document" "ec2_instance_policy" {
 }
 
 resource "aws_iam_instance_profile" "ec2_instance_profile" {
-  name = "${local.application_name}-S3-${local.application_data.accounts[local.environment]}.bucketname-RW-ec2-profile"
+  # name = "${local.application_name}-S3-${local.application_data.accounts[local.environment]}.bucketname-RW-ec2-profile"
+  name = "${local.application_name}-ec2-profile"
   role = aws_iam_role.ec2_instance_role.name
 }
 
@@ -220,34 +221,33 @@ resource "aws_iam_role_policy" "ec2_instance_policy" { #tfsec:ignore:aws-iam-no-
     "Version": "2012-10-17",
     "Statement": [
         {
+            "Sid": "VisualEditor0",
             "Effect": "Allow",
-            "Action":
-                "s3:ListBucket"
-            "Resource": "arn:aws:s3:::laa-software-library",
-                        "arn:aws:s3:::laa-software-library/*",
-        },
-        {
-            "Effect": "Allow",
-            "Action":
-                "s3:GetObject"
-            "Resource": "arn:aws:s3:::laa-software-library/*"
-        },
-        {
-            "Effect": "Allow",
-            "Action":
-                "logs:CreateLogGroup",
+            "Action": [
                 "logs:CreateLogStream",
+                "ec2:DescribeInstances",
+                "ec2:CreateTags",
                 "logs:DescribeLogStreams",
                 "logs:PutRetentionPolicy",
-                "logs:PutLogEvents",
-                "ec2:DescribeInstances",
-            "Resource": "*",
+                "logs:CreateLogGroup",
+                "logs:PutLogEvents"
+            ],
+            "Resource": "*"
         },
         {
+            "Sid": "VisualEditor1",
             "Effect": "Allow",
-            "Action":
-                "ec2:CreateTags",
-            "Resource": "*",
+            "Action": "s3:ListBucket",
+            "Resource": [
+                "arn:aws:s3:::laa-software-library",
+                "arn:aws:s3:::laa-software-library/*"
+            ]
+        },
+        {
+            "Sid": "VisualEditor2",
+            "Effect": "Allow",
+            "Action": "s3:GetObject",
+            "Resource": "arn:aws:s3:::laa-software-library/*"
         }
     ]
 }
