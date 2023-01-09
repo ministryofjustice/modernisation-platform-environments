@@ -4,8 +4,8 @@
 module "s3-bucket" { #tfsec:ignore:aws-s3-enable-versioning
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.2.0"
 
-  bucket_name        = local.artefact_bucket_name
-#  bucket_prefix      = "s3-bucket-example"
+  bucket_name = local.artefact_bucket_name
+  #  bucket_prefix      = "s3-bucket-example"
   versioning_enabled = false
   bucket_policy      = [data.aws_iam_policy_document.artefacts_s3_policy.json]
 
