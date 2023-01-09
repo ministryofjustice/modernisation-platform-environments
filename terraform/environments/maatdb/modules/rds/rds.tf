@@ -200,7 +200,7 @@ resource "aws_security_group" "vpc-secgroup" {
     from_port   = 1521
     to_port     = 1521
     protocol    = "tcp"
-    cidr_blocks = [var.vpc_shared_cidr]
+    cidr_blocks = [var.vpc_shared_cidr, "10.200.0.0/20"]
   }
 
   egress {
@@ -208,7 +208,7 @@ resource "aws_security_group" "vpc-secgroup" {
     from_port   = 1521
     to_port     = 1521
     protocol    = "tcp"
-    cidr_blocks = [var.vpc_shared_cidr]
+    cidr_blocks = [var.vpc_shared_cidr, "10.200.0.0/20"]
   }
 
   tags = {
