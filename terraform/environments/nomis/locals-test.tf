@@ -134,7 +134,7 @@ locals {
           }
           "/dev/sdc" = { # /u02
             type = "gp3"
-            size = 100
+            size = 500
           }
         }
         ebs_volume_config = {
