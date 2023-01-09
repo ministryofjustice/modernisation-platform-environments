@@ -4,7 +4,6 @@ data "aws_ami" "oracle_base" {
   filter {
     name   = "name"
     values = [local.application_data.accounts[local.environment].orace_base_ami_name]
-    #values = ["import-ami-04fde633abe64028d"]
   }
   filter {
     name   = "virtualization-type"
@@ -48,7 +47,6 @@ resource "aws_security_group_rule" "egress_traffic_oracle_base" {
 }
 
 
-#STILL TO ADD AMI ID
 #  Build EC2 
 resource "aws_instance" "ec2_oracle_base" {
   # Specify the instance type and ami to be used (this is the Amazon free tier option)
