@@ -35,20 +35,20 @@
 
 resource "aws_instance" "app_server" {
   #ami           = "ami-084e8c05825742534"    # Amazon linux 64 bit
-  ami           = "ami-07c2ae35d31367b3e"   # Canonical, Ubuntu, 22.04 LTS, amd64
+  ami = "ami-07c2ae35d31367b3e" # Canonical, Ubuntu, 22.04 LTS, amd64
   #ami           = "ami-0e322684a5a0074ce"   # Microsoft Windows Server 2022 Full Locale English
   instance_type = "t3.micro"
 
 
-# Increase the volume size of the root volume
-#   root_block_device {
-#     volume_type = "gp3"
-#     volume_size = 20
-#     encrypted   = true
-#   }
+  # Increase the volume size of the root volume
+  #   root_block_device {
+  #     volume_type = "gp3"
+  #     volume_size = 20
+  #     encrypted   = true
+  #   }
 
   tags = {
-    Name = "example-EC2" 
+    Name = "example-EC2"
   }
 }
 
