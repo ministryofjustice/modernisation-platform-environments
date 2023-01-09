@@ -37,8 +37,8 @@ locals {
       create_external_record = false
     }
 
-    # user can manually increase the desired capacity to 1 via CLI/console 
-    # to create an instance
+    # user can manually increase the desired capacity to 1 via CLI/console
+    # to create an instance
     autoscaling_group = {
       desired_capacity = 0
       max_size         = 2
