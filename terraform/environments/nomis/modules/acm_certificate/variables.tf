@@ -14,12 +14,12 @@ variable "subject_alternate_names" {
   default     = []
 }
 
-variable "verification" {
+variable "validation" {
   type = map(object({
     account   = optional(string, "self")
     zone_name = string
   }))
-  description = "Provider a list of zones to use for DNS verification where the key is the cert domain.  Set account to self, core-vpc or core-network-services"
+  description = "Provider a list of zones to use for DNS validation where the key is the cert domain.  Set account to self, core-vpc or core-network-services"
 }
 
 variable "tags" {

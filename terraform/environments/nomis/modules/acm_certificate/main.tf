@@ -19,7 +19,7 @@ resource "aws_route53_record" "validation_core_network_services" {
       name   = dvo.resource_record_name
       record = dvo.resource_record_value
       type   = dvo.resource_record_type
-    } if var.verification[dvo.domain_name].account == "core-network-services"
+    } if var.validation[dvo.domain_name].account == "core-network-services"
   }
 
   allow_overwrite = true
@@ -38,7 +38,7 @@ resource "aws_route53_record" "validation_core_vpc" {
       name   = dvo.resource_record_name
       record = dvo.resource_record_value
       type   = dvo.resource_record_type
-    } if var.verification[dvo.domain_name].account == "core-vpc"
+    } if var.validation[dvo.domain_name].account == "core-vpc"
   }
 
   allow_overwrite = true
@@ -56,7 +56,7 @@ resource "aws_route53_record" "validation_self" {
       name   = dvo.resource_record_name
       record = dvo.resource_record_value
       type   = dvo.resource_record_type
-    } if var.verification[dvo.domain_name].account == "self"
+    } if var.validation[dvo.domain_name].account == "self"
   }
 
   allow_overwrite = true
