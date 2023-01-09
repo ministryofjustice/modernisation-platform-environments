@@ -60,7 +60,7 @@ locals {
     }
   }
 
-  # merge AMI and var.ebs_volume values, e.g. allow AMI settings to be overridden
+  # merge AMI and var.ebs_volume values, e.g. allow AMI settings to be overridden
   ebs_volume_names = var.ebs_volumes_copy_all_from_ami ? keys(merge(var.ebs_volumes, local.ami_block_device_mappings)) : keys(var.ebs_volumes)
 
   ebs_volumes = {
