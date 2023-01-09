@@ -54,12 +54,10 @@ resource "aws_instance" "ec2_oracle_base" {
   # Specify the instance type and ami to be used (this is the Amazon free tier option)
   instance_type          = local.application_data.accounts[local.environment].ec2_oracle_base_instance_type
   ami                    = data.aws_ami.oracle_base.id
-#  ami                    = ami-043196bdc18733168
   vpc_security_group_ids = [aws_security_group.ec2_sg_oracle_base.id]
-  subnet_id              = data.aws_subnet.private_subnets_a.id
+  subnet_id              = data.aws_subnet.public_subnets_a.id
   monitoring             = true
-  ebs_optimized          = true
-#  user_data              = base64encode(templatefile("${path.module}/scripts/bootstrap_oracle_base.sh.tftpl", {}))
+  ebs_optimized          = false
 
   metadata_options {
     http_endpoint = "enabled"
@@ -72,7 +70,7 @@ resource "aws_instance" "ec2_oracle_base" {
     encrypted   = true
   }
   tags = merge(local.tags,
-    { Name = lower(format("ec2-%s-%s-IgsDom1WebProxy", local.application_name, local.environment)) }
+    { Name = lower(format("ec2-%s-%s-OracleBase", local.application_name, local.environment)) }
   )
   depends_on = [aws_security_group.ec2_sg_oracle_base]
 }
