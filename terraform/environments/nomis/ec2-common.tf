@@ -204,9 +204,22 @@ locals {
 #------------------------------------------------------------------------------
 # Keypair for ec2-user
 #------------------------------------------------------------------------------
+resource "tls_private_key" "ec2-user" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
+resource "aws_ssm_parameter" "ec2-user" {
+  name        = "ec2-user_pem"
+  description = "ec2-user private key"
+  type        = "SecureString"
+  value       = tls_private_key.ec2-user.private_key_pem
+  overwrite   = true
+}
+
 resource "aws_key_pair" "ec2-user" {
   key_name   = "ec2-user"
-  public_key = file(".ssh/${terraform.workspace}/ec2-user.pub")
+  public_key = trimspace(tls_private_key.ec2-user.public_key_openssh)
   tags = merge(
     local.tags,
     {
