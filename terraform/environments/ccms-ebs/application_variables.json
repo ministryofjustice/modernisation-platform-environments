@@ -4,7 +4,7 @@
       "example_var": "dev-data",
       "ec2_igs_dom1_web_proxy_instance_type": "t2.small",
       "ec2_oracle_base_instance_type": "t2.large",
-      "orace_base_ami_name": "import-ami-0665286d1cc5903e6"
+      "orace_base_ami_name": "import-ami-0665286d1cc5903e6" 
     },
     "test": {
       "example_var": "test-data"
