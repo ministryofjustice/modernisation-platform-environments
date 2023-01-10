@@ -68,7 +68,7 @@ locals {
 
     # Add database instances here. They will be created using ec2-database.tf
     databases = {
-      # Naming
+      # Naming
       # *-nomis-db-1: NOMIS, NDH, TRDATA
       # *-nomis-db-2: MIS, AUDIT
       # *-nomis-db-3: HA
@@ -134,7 +134,7 @@ locals {
           }
           "/dev/sdc" = { # /u02
             type = "gp3"
-            size = 100
+            size = 500
           }
         }
         ebs_volume_config = {
