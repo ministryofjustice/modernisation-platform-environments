@@ -3,3 +3,5 @@ append domain-search "${region}.compute.internal";
 append domain-search "${application_name}.${vpc_name}-${environment}.modernisation-platform.internal";
 EOF
 systemctl restart network
+sed -i 's/X11Forwarding no/X11Forwarding ${X11Forwarding}/g'  /etc/ssh/sshd_config
+systemctl restart sshd
