@@ -87,14 +87,14 @@ resource "aws_iam_instance_profile" "iam_instace_profile_oracle_base" {
 #  Build EC2 
 resource "aws_instance" "ec2_oracle_base" {
   # Specify the instance type and ami to be used (this is the Amazon free tier option)
-  instance_type          = local.application_data.accounts[local.environment].ec2_oracle_base_instance_type
-  ami                    = data.aws_ami.oracle_base.id
-  vpc_security_group_ids = [aws_security_group.ec2_sg_oracle_base.id]
-  subnet_id              = data.aws_subnet.public_subnets_a.id
-  monitoring             = true
-  ebs_optimized          = false
+  instance_type               = local.application_data.accounts[local.environment].ec2_oracle_base_instance_type
+  ami                         = data.aws_ami.oracle_base.id
+  vpc_security_group_ids      = [aws_security_group.ec2_sg_oracle_base.id]
+  subnet_id                   = data.aws_subnet.public_subnets_a.id
+  monitoring                  = true
+  ebs_optimized               = false
   associate_public_ip_address = true
-  iam_instance_profile   = aws_iam_instance_profile.iam_instace_profile_oracle_base.name
+  iam_instance_profile        = aws_iam_instance_profile.iam_instace_profile_oracle_base.name
 
   metadata_options {
     http_endpoint = "enabled"
