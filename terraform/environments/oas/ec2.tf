@@ -33,25 +33,11 @@ resource "aws_security_group" "ec2" {
   vpc_id      = data.aws_vpc.shared.id
 
   ingress {
-    description = "Access from Bastion via SSH"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = [data.aws_vpc.shared.cidr_block] #!ImportValue env-BastionSSHCIDR
-  }
-  ingress {
-    description = "Access from env-ManagementCIDR via SSH"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = [data.aws_vpc.shared.cidr_block] #!ImportValue env-ManagementCIDR
-  }
-  ingress {
-    description = "Access from env-VpcCidr via SSH"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = [data.aws_vpc.shared.cidr_block] #!!ImportValue env-VpcCidr
+    description     = "Allow AWS SSM Session Manager"
+    from_port       = 443
+    to_port         = 443
+    protocol        = "tcp"
+    security_groups = [local.application_data.accounts[local.environment].ssm_interface_endpoint_security_group]
   }
   ingress {
     description = "access to the admin server"
@@ -111,11 +97,11 @@ resource "aws_security_group" "ec2" {
   }
 
   egress {
-    description = "Access from Bastion via SSH. Requires all access."
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    description     = "Allow AWS SSM Session Manager"
+    from_port       = 443
+    to_port         = 443
+    protocol        = "tcp"
+    security_groups = [local.application_data.accounts[local.environment].ssm_interface_endpoint_security_group]
   }
   egress {
     description = "access to the admin server"

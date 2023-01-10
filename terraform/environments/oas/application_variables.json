@@ -6,7 +6,8 @@
       "ec2instancetype": "r5a.large",
       "bucketname": "laa-oracle-software",
       "orahomesize": "150",
-      "stageesize": "200"
+      "stageesize": "200",
+      "ssm_interface_endpoint_security_group": "sg-0754d9a309704addd"
     },
     "test": {
       "example_var": "test-data"
