@@ -22,17 +22,17 @@ variable "region" {
   description = ""
   default     = "eu-west-2"
 }
-# data "aws_iam_policy_document" "assume_policy_document" {
-#   statement {
-#     actions = [
-#       "sts:AssumeRole"
-#     ]
-#     principals {
-#       type        = "Service"
-#       identifiers = ["ec2.amazonaws.com"]
-#     }
-#   }
-# }
+data "aws_iam_policy_document" "assume_policy_document" {
+  statement {
+    actions = [
+      "sts:AssumeRole"
+    ]
+    principals {
+      type        = "Service"
+      identifiers = ["ec2.amazonaws.com"]
+    }
+  }
+}
 
 # resource "aws_iam_role" "bastion_host_role" {
 #   name               = "bastion_linux_ec2_role"
