@@ -43,7 +43,7 @@ resource "aws_security_group" "webserver" {
   tags = merge(
     local.tags,
     {
-      Name = "webserver-commmon"
+      Name = "webserver-security-group"
     }
   )
 }

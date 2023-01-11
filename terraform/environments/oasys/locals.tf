@@ -114,8 +114,8 @@ locals {
         lifecycle_hook_name = "ready-hook"
       }
       scripts = [ # it would make sense to have these templates in a common area 
-        "ansible-ec2provision.sh.tftpl",
-        "post-ec2provision.sh.tftpl"
+        # "ansible-ec2provision.sh.tftpl",
+        # "post-ec2provision.sh.tftpl"
       ]
       write_files = {}
     }
