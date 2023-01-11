@@ -24,5 +24,8 @@
 /terraform/environments/tariff @ministryofjustice/cica @ministryofjustice/modernisation-platform
 /terraform/environments/testing @ministryofjustice/modernisation-platform @ministryofjustice/modernisation-platform
 /terraform/environments/xhibit-portal @ministryofjustice/xhibit-portal-dev @ministryofjustice/modernisation-platform
+**/providers.tf @ministryofjustice/modernisation-platform # to be removed when projects are terragrunted
+**/backend.tf @ministryofjustice/modernisation-platform # to be removed when projects are terragrunted
+**/networking.auto.tfvars.json @ministryofjustice/modernisation-platform # to be removed when projects are terragrunted
 **/terragrunt.hcl @ministryofjustice/modernisation-platform
 /terraform/modules
