@@ -24,6 +24,7 @@ env:
   AWS_REGION: "eu-west-2"
   ENVIRONMENT_MANAGEMENT: ${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}
   TERRAGRUNT_VERSION: v0.36.1
+  TEAM_DIR: "terraform/environments/${{ github.workflow }}"
 permissions:
   id-token: write # This is required for requesting the JWT
   contents: read # This is required for actions/checkout
@@ -62,14 +63,15 @@ jobs:
           wget -O /usr/local/bin/terragrunt https://github.com/gruntwork-io/terragrunt/releases/download/${TERRAGRUNT_VERSION}/terragrunt_linux_amd64
           chmod u+x /usr/local/bin/terragrunt
       - name: Init
-        working-directory: "${{ env.TEAM_DIR }}/${{ matrix.project }}"
+        working-directory: "${{ env.TEAM_DIR }}"
         run: |
           terragrunt init
           terragrunt workspace select "${ENV}-${TF_ENV}"
       - name: Terragrunt plan - ${{ matrix.environment }}
+        working-directory: "${{ env.TEAM_DIR }}"
         run: |
           chmod +x ${GITHUB_WORKSPACE}/scripts/redact-output.sh
-          terragrunt -chdir="terraform/environments/${ENV}" plan -no-color -detailed-exitcode | ${GITHUB_WORKSPACE}/scripts/redact-output.sh | tee tfplan.txt || exitcode=$?
+          terragrunt plan -no-color -detailed-exitcode | ${GITHUB_WORKSPACE}/scripts/redact-output.sh | tee tfplan.txt || exitcode=$?
           echo "terragrunt plan exit code = $exitcode"
           echo "exitcode=${exitcode}" >> $GITHUB_OUTPUT
           (( exitcode == 1 )) && exit 1 || exit 0
@@ -111,14 +113,15 @@ jobs:
           wget -O /usr/local/bin/terragrunt https://github.com/gruntwork-io/terragrunt/releases/download/${TERRAGRUNT_VERSION}/terragrunt_linux_amd64
           chmod u+x /usr/local/bin/terragrunt
       - name: Init
-        working-directory: "${{ env.TEAM_DIR }}/${{ matrix.project }}"
+        working-directory: "${{ env.TEAM_DIR }}"
         run: |
           terragrunt init
           terragrunt workspace select "${ENV}-${TF_ENV}"
       - name: Run Terrform Apply
+        working-directory: "${{ env.TEAM_DIR }}"
         run: |
           chmod +x ${GITHUB_WORKSPACE}/scripts/redact-output.sh
-          terragrunt -chdir="terraform/environments/${ENV}" apply -no-color -detailed-exitcode | ${GITHUB_WORKSPACE}/scripts/redact-output.sh | tee tfplan.txt || exitcode=$?
+          terragrunt apply -no-color -detailed-exitcode | ${GITHUB_WORKSPACE}/scripts/redact-output.sh | tee tfplan.txt || exitcode=$?
     env:
       TF_ENV: ${{ matrix.environment }}
       ENV: ${{ github.workflow }}
@@ -154,14 +157,15 @@ jobs:
           wget -O /usr/local/bin/terragrunt https://github.com/gruntwork-io/terragrunt/releases/download/${TERRAGRUNT_VERSION}/terragrunt_linux_amd64
           chmod u+x /usr/local/bin/terragrunt
       - name: Init
-        working-directory: "${{ env.TEAM_DIR }}/${{ matrix.project }}"
+        working-directory: "${{ env.TEAM_DIR }}"
         run: |
           terragrunt init
           terragrunt workspace select "${ENV}-${TF_ENV}"
       - name: Run Terrform Plan
+        working-directory: "${{ env.TEAM_DIR }}"
         run: |
           chmod +x ${GITHUB_WORKSPACE}/scripts/redact-output.sh
-          terragrunt -chdir="terraform/environments/${ENV}" plan -no-color -detailed-exitcode | ${GITHUB_WORKSPACE}/scripts/redact-output.sh | tee tfplan.txt || exitcode=$?
+          terragrunt plan -no-color -detailed-exitcode | ${GITHUB_WORKSPACE}/scripts/redact-output.sh | tee tfplan.txt || exitcode=$?
     env:
       TF_ENV: ${{ matrix.environment }}
       ENV: ${{ github.workflow }}
@@ -199,11 +203,12 @@ jobs:
           wget -O /usr/local/bin/terragrunt https://github.com/gruntwork-io/terragrunt/releases/download/${TERRAGRUNT_VERSION}/terragrunt_linux_amd64
           chmod u+x /usr/local/bin/terragrunt
       - name: Init
-        working-directory: "${{ env.TEAM_DIR }}/${{ matrix.project }}"
+        working-directory: "${{ env.TEAM_DIR }}"
         run: |
           terragrunt init
           terragrunt workspace select "${ENV}-${TF_ENV}"
       - name: Run Terrform Apply
+        working-directory: "${{ env.TEAM_DIR }}"
         run: |
           chmod +x ${GITHUB_WORKSPACE}/scripts/redact-output.sh
           terragrunt -chdir="terraform/environments/${ENV}" apply -no-color -detailed-exitcode | ${GITHUB_WORKSPACE}/scripts/redact-output.sh | tee tfplan.txt || exitcode=$?
