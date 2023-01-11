@@ -1,33 +1,35 @@
-[{
-  "name": "jitbit",
-  "image": "",
-  "cpu": 1536,
-  "portMappings": [
-    {
-      "containerPort": 80,
-      "hostPort": 8080
-    }
-  ],
-  "memory": 3072,
-  "logConfiguration": {
-    "logDriver": "awslogs",
-    "options": {
+[
+  {
+    "name": "jitbit",
+    "image": "",
+    "cpu": 1536,
+    "portMappings": [
+      {
+        "containerPort": 80,
+        "hostPort": 8080
+      }
+    ],
+    "memory": 3072,
+    "logConfiguration": {
+      "logDriver": "awslogs",
+      "options": {
         "awslogs-group": "jitbit-ecs",
         "awslogs-region": "eu-west-2",
         "awslogs-stream-prefix": "jitbit"
-     }
+      }
     },
-  "environment" : [
-    {
-      "name" : "TEST_VAR",
-      "value" : "test var"
-    }
-  ],
-  "secrets": [
-    {
-      "name": "TEST_SECRET",
-      "valueFrom": "${TEST_SECRET}"
-    }
-  ],
-  "essential": true
-}]
+    "environment": [
+      {
+        "name": "TEST_VAR",
+        "value": "test var"
+      }
+    ],
+    "secrets": [
+      {
+        "name": "TEST_SECRET",
+        "valueFrom": "${TEST_SECRET}"
+      }
+    ],
+    "essential": true
+  }
+]

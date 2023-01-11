@@ -50,7 +50,7 @@ locals {
   # example usage:
   # example_data = local.application_data.accounts[local.environment].example_var
   application_data = fileexists("./application_variables.json") ? jsondecode(file("./application_variables.json")) : {}
-  app_data = jsondecode(file("./application_variables.json"))
+  app_data         = jsondecode(file("./application_variables.json"))
 
   lb_tg_name = "${local.application_name}-tg-${local.environment}"
 
