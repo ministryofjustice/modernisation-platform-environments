@@ -7,7 +7,6 @@ locals {
   ### env independent common vars
   ###
 
-  application_name = "oasys"
   business_unit    = "hmpps"
   networking_set   = "general"
 

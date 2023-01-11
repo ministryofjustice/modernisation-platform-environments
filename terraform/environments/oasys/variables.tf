@@ -3,6 +3,3 @@
 #   default     = "main"
 #   description = "Github actions running branch"
 # }
-variable "networking" {
-  type = list(any)
-}
