@@ -52,11 +52,6 @@ locals {
   is_live       = [substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-production" || substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-preproduction" ? "live" : "non-live"]
   provider_name = "core-vpc-${local.environment}"
 
-  # environment specfic variables
-  # example usage:
-  # example_data = local.application_data.accounts[local.environment].example_var
-  application_data = fileexists("./files/application_variables.json") ? jsondecode(file("./files/application_variables.json")) : {} # these should just be in locals_<env>.tf. One place for env specific vars
-
   cidrs = { # this list should be abstracted for multiple environments to use
     # Azure
     noms_live                  = "10.40.0.0/18"
@@ -84,6 +79,16 @@ locals {
   ec2_common_managed_policies = [
     aws_iam_policy.ec2_common_policy.arn
   ]
+
+  autoscaling_schedules_default = {
+    "scale_up" = {
+      recurrence = "0 7 * * Mon-Fri"
+    }
+    "scale_down" = {
+      desired_capacity = 0
+      recurrence       = "0 19 * * Mon-Fri"
+    }
+  }
 
   ###
   ### env independent webserver vars

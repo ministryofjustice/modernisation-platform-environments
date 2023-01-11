@@ -13,7 +13,7 @@ to identify, e.g.
 ```
 ebs_volumes = {
   "/dev/sde" = { label = "data" }  # DATA01
-  "/dev/sdf" = { label = "data" }  # DATA02
+  "/dev/sdf" = { label = "data" }  # DATA02
 }
 ```
 

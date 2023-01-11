@@ -30,7 +30,10 @@
       "suprig05-disk-1-snapshot": "snap-0b6d529f807eb9a6a",
       "XHBPRESMS01-ami": "ami-03ad19f47c6725480",
       "buildserver-ami": "ami-096d0bf0a5fc0fadb",
-      "buildserver-disk-1-snapshot": "snap-04ecdbc7c6e980243"
+      "buildserver-disk-1-snapshot": "snap-04ecdbc7c6e980243",
+      "iisrelay-ami": "ami-04f91f9d2c59547ee",
+      "iisrelay-disk-1-snapshot": "snap-051f581d753d3827a",
+      "iisrelay-disk-2-snapshot": "snap-0d54fc02d80b06efe"
     },
     "preproduction": {
       "public_dns_name_web": "prepportal.cjsonline.gov.uk",
