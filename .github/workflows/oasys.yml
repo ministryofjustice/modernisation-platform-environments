@@ -65,8 +65,6 @@ jobs:
       - name: Init
         working-directory: "${{ env.TEAM_DIR }}"
         run: |
-          pwd
-          echo "${{ env.TEAM_DIR }}"
           terragrunt init
           terragrunt workspace select "${ENV}-${TF_ENV}"
       - name: Terragrunt plan - ${{ matrix.environment }}
