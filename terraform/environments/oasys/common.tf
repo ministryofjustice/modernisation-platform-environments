@@ -1,5 +1,5 @@
 module "autoscaling_groups" {
-  source = "../../modules/ec2_autoscaling_group"
+  source = "../modules/ec2_autoscaling_group"
 
   providers = {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
