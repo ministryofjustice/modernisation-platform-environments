@@ -36,3 +36,4 @@ module "bastion_linux" {
   tags_common = local.tags
   tags_prefix = terraform.workspace
 }
+
