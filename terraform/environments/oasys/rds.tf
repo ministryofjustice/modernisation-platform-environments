@@ -1,16 +1,17 @@
 # should turn into a module
-resource "aws_db_instance" "oasys" {
+resource "aws_db_instance" "oasysrds" {
   count          = local.environment_config.db_enabled ? 1 : 0
   engine         = "oracle-ee"
   engine_version = "19.0.0.0.ru-2022-10.rur-2022-10.r1"
   license_model  = "bring-your-own-license"
   instance_class = local.environment_config.db_instance_class
-  db_name        = "OASDB"
+  db_name        = "OASYS"
   identifier     = "${local.application_name}-${local.environment}-database"
   username       = local.environment_config.db_user
   password       = random_password.db_password.result
   # tflint-ignore: aws_db_instance_default_parameter_group
   parameter_group_name  = aws_db_parameter_group.oasys_parameter.name
+  option_group_name     = aws_db_option_group.oasys_options.name
   character_set_name    = "WE8MSWIN1252"
   skip_final_snapshot   = local.environment_config.db_skip_final_snapshot
   allocated_storage     = local.environment_config.db_allocated_storage
@@ -42,16 +43,35 @@ resource "aws_db_instance" "oasys" {
 
 resource "aws_db_parameter_group" "oasys_parameter" {
   name   = "oasys-parameters-19c"
-  family = "oracle19c"
-
+  family = "oracle-ee-19"
   parameter {
-    name  = "nls_language"
-    value = "ENGLISH"
+    name  = "max_string_size"
+    value = "EXTENDED"
   }
+}
 
-  lifecycle {
-    create_before_destroy = true
+resource "aws_db_option_group" "oasys_options" {
+  name                     = "oasys-options-19c"
+  option_group_description = "Oasys Option Group"
+  engine_name              = "oracle-ee"
+  major_engine_version     = "19"
+  option {
+    option_name = "APEX"
+    version     = "20.2.v1"
   }
+}
+
+resource "random_password" "db_password" {
+  length  = 30
+  special = false
+}
+
+#tfsec:ignore:aws-ssm-secret-use-customer-key
+resource "aws_ssm_parameter" "db_password" {
+  name        = "/database/oasys/rds_root_password"
+  description = "RDS password"
+  type        = "SecureString"
+  value       = random_password.db_password.result
 }
 
 resource "aws_db_subnet_group" "oasys" {
@@ -60,32 +80,6 @@ resource "aws_db_subnet_group" "oasys" {
   tags = merge(local.tags,
     { Name = lower(format("%s-%s-database-subnet-group", local.application_name, local.environment)) }
   )
-
-}
-
-resource "aws_security_group" "oasys" {
-  name        = "${local.application_name}-${local.environment}-database-security-group"
-  description = "Security group for ${local.application_name} ${local.environment} database"
-  vpc_id      = data.aws_vpc.shared.id
-  tags = merge(local.tags,
-    { Name = lower(format("%s-%s-database-security-group", local.application_name, local.environment)) }
-  )
-  ingress {
-    description = "Allow access from live and test environments"
-    from_port   = 1521
-    to_port     = 1521
-    protocol    = "tcp"
-    cidr_blocks = [local.cidrs.noms_live, data.aws_vpc.shared.cidr_block, local.cidrs.noms_test]
-  }
-  egress {
-    description = "allow all"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    #tfsec:ignore:aws-vpc-no-public-egress-sgr
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
 }
 
 resource "aws_iam_role" "rds_enhanced_monitoring" {
