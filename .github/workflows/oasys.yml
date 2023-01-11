@@ -23,6 +23,7 @@ env:
   TF_VAR_GH_ACTOR_NAME: ${{ github.actor}}
   AWS_REGION: "eu-west-2"
   ENVIRONMENT_MANAGEMENT: ${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}
+  TERRAGRUNT_VERSION: v0.36.1
 permissions:
   id-token: write # This is required for requesting the JWT
   contents: read # This is required for actions/checkout
@@ -38,7 +39,7 @@ jobs:
         include:
           - environment: test
           - environment: development
-    name: Terraform plan - ${{ github.workflow }} - ${{ matrix.environment }}
+    name: Terragrunt plan - ${{ github.workflow }} - ${{ matrix.environment }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -56,13 +57,22 @@ jobs:
         with:
           terraform_version: "~1"
           terraform_wrapper: false
-      - name: Terraform plan - ${{ matrix.environment }}
+      - name: Setup Terragrunt
         run: |
-          terraform --version
-          echo "Terraform plan - ${TF_ENV}"
-          bash scripts/terraform-init.sh terraform/environments/${ENV}
-          terraform -chdir="terraform/environments/${ENV}" workspace select "${ENV}-${TF_ENV}"
-          bash scripts/terraform-plan.sh terraform/environments/${ENV}
+          wget -O /usr/local/bin/terragrunt https://github.com/gruntwork-io/terragrunt/releases/download/${TERRAGRUNT_VERSION}/terragrunt_linux_amd64
+          chmod u+x /usr/local/bin/terragrunt
+      - name: Init
+        working-directory: "${{ env.TEAM_DIR }}/${{ matrix.project }}"
+        run: |
+          terragrunt init
+          terragrunt workspace select "${ENV}-${TF_ENV}"
+      - name: Terragrunt plan - ${{ matrix.environment }}
+        run: |
+          chmod +x ${GITHUB_WORKSPACE}/scripts/redact-output.sh
+          terragrunt -chdir="terraform/environments/${ENV}" plan -no-color -detailed-exitcode | ${GITHUB_WORKSPACE}/scripts/redact-output.sh | tee tfplan.txt || exitcode=$?
+          echo "terragrunt plan exit code = $exitcode"
+          echo "exitcode=${exitcode}" >> $GITHUB_OUTPUT
+          (( exitcode == 1 )) && exit 1 || exit 0
     env:
       TF_ENV: ${{ matrix.environment }}
       ENV: ${{ github.workflow }}
@@ -76,7 +86,7 @@ jobs:
         include:
           - environment: test
           - environment: development
-    name: Terraform apply - ${{ github.workflow }} - ${{ matrix.environment }}
+    name: Terragrunt apply - ${{ github.workflow }} - ${{ matrix.environment }}
     runs-on: ubuntu-latest
     environment:
       name: ${{ github.workflow }}-${{ matrix.environment }}
@@ -96,13 +106,19 @@ jobs:
         with:
           terraform_version: "~1"
           terraform_wrapper: false
+      - name: Setup Terragrunt
+        run: |
+          wget -O /usr/local/bin/terragrunt https://github.com/gruntwork-io/terragrunt/releases/download/${TERRAGRUNT_VERSION}/terragrunt_linux_amd64
+          chmod u+x /usr/local/bin/terragrunt
+      - name: Init
+        working-directory: "${{ env.TEAM_DIR }}/${{ matrix.project }}"
+        run: |
+          terragrunt init
+          terragrunt workspace select "${ENV}-${TF_ENV}"
       - name: Run Terrform Apply
         run: |
-          terraform --version
-          echo "Terraform apply - ${TF_ENV}"
-          bash scripts/terraform-init.sh terraform/environments/${ENV}
-          terraform -chdir="terraform/environments/${ENV}" workspace select "${ENV}-${TF_ENV}"
-          bash scripts/terraform-apply.sh terraform/environments/${ENV}
+          chmod +x ${GITHUB_WORKSPACE}/scripts/redact-output.sh
+          terragrunt -chdir="terraform/environments/${ENV}" apply -no-color -detailed-exitcode | ${GITHUB_WORKSPACE}/scripts/redact-output.sh | tee tfplan.txt || exitcode=$?
     env:
       TF_ENV: ${{ matrix.environment }}
       ENV: ${{ github.workflow }}
@@ -115,7 +131,7 @@ jobs:
         include:
           - environment: preproduction
           - environment: production
-    name: Terraform plan - ${{ github.workflow }} - ${{ matrix.environment }}
+    name: Terragrunt plan - ${{ github.workflow }} - ${{ matrix.environment }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -133,13 +149,19 @@ jobs:
         with:
           terraform_version: "~1"
           terraform_wrapper: false
-      - name: Terraform plan - ${{ matrix.environment }}
+      - name: Setup Terragrunt
         run: |
-          terraform --version
-          echo "Terraform plan - ${TF_ENV}"
-          bash scripts/terraform-init.sh terraform/environments/${ENV}
-          terraform -chdir="terraform/environments/${ENV}" workspace select "${ENV}-${TF_ENV}"
-          bash scripts/terraform-plan.sh terraform/environments/${ENV}
+          wget -O /usr/local/bin/terragrunt https://github.com/gruntwork-io/terragrunt/releases/download/${TERRAGRUNT_VERSION}/terragrunt_linux_amd64
+          chmod u+x /usr/local/bin/terragrunt
+      - name: Init
+        working-directory: "${{ env.TEAM_DIR }}/${{ matrix.project }}"
+        run: |
+          terragrunt init
+          terragrunt workspace select "${ENV}-${TF_ENV}"
+      - name: Run Terrform Plan
+        run: |
+          chmod +x ${GITHUB_WORKSPACE}/scripts/redact-output.sh
+          terragrunt -chdir="terraform/environments/${ENV}" plan -no-color -detailed-exitcode | ${GITHUB_WORKSPACE}/scripts/redact-output.sh | tee tfplan.txt || exitcode=$?
     env:
       TF_ENV: ${{ matrix.environment }}
       ENV: ${{ github.workflow }}
@@ -172,13 +194,19 @@ jobs:
         with:
           terraform_version: "~1"
           terraform_wrapper: false
+      - name: Setup Terragrunt
+        run: |
+          wget -O /usr/local/bin/terragrunt https://github.com/gruntwork-io/terragrunt/releases/download/${TERRAGRUNT_VERSION}/terragrunt_linux_amd64
+          chmod u+x /usr/local/bin/terragrunt
+      - name: Init
+        working-directory: "${{ env.TEAM_DIR }}/${{ matrix.project }}"
+        run: |
+          terragrunt init
+          terragrunt workspace select "${ENV}-${TF_ENV}"
       - name: Run Terrform Apply
         run: |
-          terraform --version
-          echo "Terraform apply - ${TF_ENV}"
-          bash scripts/terraform-init.sh terraform/environments/${ENV}
-          terraform -chdir="terraform/environments/${ENV}" workspace select "${ENV}-${TF_ENV}"
-          bash scripts/terraform-apply.sh terraform/environments/${ENV}
+          chmod +x ${GITHUB_WORKSPACE}/scripts/redact-output.sh
+          terragrunt -chdir="terraform/environments/${ENV}" apply -no-color -detailed-exitcode | ${GITHUB_WORKSPACE}/scripts/redact-output.sh | tee tfplan.txt || exitcode=$?
     env:
       TF_ENV: ${{ matrix.environment }}
       ENV: ${{ github.workflow }}
