@@ -81,6 +81,16 @@ locals {
 
   region            = "eu-west-2"
   availability_zone = "eu-west-2a"
+
+  autoscaling_schedules_default = {
+    "scale_up" = {
+      recurrence = "0 7 * * Mon-Fri"
+    }
+    "scale_down" = {
+      desired_capacity = 0
+      recurrence       = "0 19 * * Mon-Fri"
+    }
+  }
 }
 
 # This account id
@@ -114,4 +124,3 @@ data "aws_route53_zone" "external-environment" {
   name         = "${local.vpc_name}-${local.environment}.modernisation-platform.service.justice.gov.uk."
   private_zone = false
 }
-

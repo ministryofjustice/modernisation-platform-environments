@@ -25,6 +25,7 @@ locals {
         lifecycle_hook_name = "ready-hook"
       }
       scripts = [
+        "install-ssm-agent.sh.tftpl",
         "ansible-ec2provision.sh.tftpl",
         "post-ec2provision.sh.tftpl"
       ]
@@ -36,30 +37,19 @@ locals {
       create_external_record = false
     }
 
-    # user can manually increase the desired capacity to 1 via CLI/console 
-    # to create an instance
+    # user can manually increase the desired capacity to 1 via CLI/console
+    # to create an instance
     autoscaling_group = {
       desired_capacity = 0
       max_size         = 2
       min_size         = 0
-    }
-
-    autoscaling_schedules = {
-      # if sizes not set, use the values defined in autoscaling_group
-      "scale_up" = {
-        recurrence = "0 7 * * Mon-Fri"
-      }
-      "scale_down" = {
-        desired_capacity = 0
-        recurrence       = "0 19 * * Mon-Fri"
-      }
     }
   }
 }
 
 module "ec2_test_instance" {
   #checkov:skip=CKV_AWS_126:This is a test instance
-  source = "./modules/ec2_instance"
+  source = "../../modules/ec2_instance"
 
   providers = {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
@@ -89,7 +79,7 @@ module "ec2_test_instance" {
   region             = local.region
   availability_zone  = local.availability_zone
   subnet_set         = local.subnet_set
-  subnet_name        = "private"
+  subnet_name        = lookup(each.value, "subnet_name", "private")
   tags               = merge(local.tags, local.ec2_test.tags, try(each.value.tags, {}))
   account_ids_lookup = local.environment_management.account_ids
 
@@ -99,7 +89,7 @@ module "ec2_test_instance" {
 }
 
 module "ec2_test_autoscaling_group" {
-  source = "./modules/ec2_autoscaling_group"
+  source = "../../modules/ec2_autoscaling_group"
 
   providers = {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
@@ -119,24 +109,16 @@ module "ec2_test_autoscaling_group" {
   ssm_parameters_prefix         = lookup(each.value, "ssm_parameters_prefix", "test/")
   ssm_parameters                = lookup(each.value, "ssm_parameters", null)
   autoscaling_group             = merge(local.ec2_test.autoscaling_group, lookup(each.value, "autoscaling_group", {}))
-  autoscaling_schedules         = coalesce(lookup(each.value, "autoscaling_schedules", null), local.ec2_test.autoscaling_schedules)
+  autoscaling_schedules         = lookup(each.value, "autoscaling_schedules", local.autoscaling_schedules_default)
 
   iam_resource_names_prefix = "ec2-test-asg"
   instance_profile_policies = local.ec2_common_managed_policies
-
-  business_unit      = local.vpc_name
-  application_name   = local.application_name
-  environment        = local.environment
-  region             = local.region
-  availability_zone  = local.availability_zone
-  subnet_set         = local.subnet_set
-  subnet_name        = "data"
-  tags               = merge(local.tags, local.ec2_test.tags, try(each.value.tags, {}))
-  account_ids_lookup = local.environment_management.account_ids
-
-  ansible_repo         = "modernisation-platform-configuration-management"
-  ansible_repo_basedir = "ansible"
-  branch               = try(each.value.branch, "main")
+  application_name          = local.application_name
+  region                    = local.region
+  subnet_ids                = data.aws_subnets.private.ids
+  tags                      = merge(local.tags, local.ec2_test.tags, try(each.value.tags, {}))
+  account_ids_lookup        = local.environment_management.account_ids
+  branch                    = try(each.value.branch, "main")
 }
 
 #------------------------------------------------------------------------------
@@ -174,6 +156,44 @@ resource "aws_security_group" "ec2_test" {
     to_port     = "22"
     protocol    = "TCP"
     cidr_blocks = local.environment_config.external_remote_access_cidrs
+  }
+
+  ingress {
+    description = "Internal access to weblogic admin http"
+    from_port   = "7001"
+    to_port     = "7001"
+    protocol    = "TCP"
+    security_groups = [
+      aws_security_group.jumpserver-windows.id,
+      module.bastion_linux.bastion_security_group
+    ]
+  }
+
+  ingress {
+    description = "External access to weblogic admin http"
+    from_port   = "7001"
+    to_port     = "7001"
+    protocol    = "TCP"
+    cidr_blocks = local.environment_config.external_weblogic_access_cidrs
+  }
+
+  ingress {
+    description = "Internal access to weblogic http"
+    from_port   = "7777"
+    to_port     = "7777"
+    protocol    = "TCP"
+    security_groups = [
+      aws_security_group.jumpserver-windows.id,
+      module.bastion_linux.bastion_security_group
+    ]
+  }
+
+  ingress {
+    description = "External access to weblogic http"
+    from_port   = "7777"
+    to_port     = "7777"
+    protocol    = "TCP"
+    cidr_blocks = local.environment_config.external_weblogic_access_cidrs
   }
 
   ingress {

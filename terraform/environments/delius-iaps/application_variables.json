@@ -32,6 +32,11 @@
       "example_var": "production-data"
     }
   },
+  "ec2_iaps_instance_label": "iaps-server",
+  "ec2_iaps_instance_ami_name": "delius_iaps_server_*",
+  "ec2_iaps_instance_ami_owner": "core-shared-services-production",
+  "ec2_iaps_instance_subnet_name": "private",
+
   "iaps_sg_ingress_rules_vpc": {
     "TCP_80": {
       "from_port": 80,

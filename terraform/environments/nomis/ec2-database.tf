@@ -89,7 +89,7 @@ locals {
       "/dev/sdb" = { label = "app" }   # /u01
       "/dev/sdc" = { label = "app" }   # /u02
       "/dev/sde" = { label = "data" }  # DATA01
-      "/dev/sdf" = { label = "data" }  # DATA02
+      "/dev/sdf" = { label = "data" }  # DATA02
       "/dev/sdg" = { label = "data" }  # DATA03
       "/dev/sdh" = { label = "data" }  # DATA04
       "/dev/sdi" = { label = "data" }  # DATA05
@@ -135,7 +135,7 @@ locals {
 
 module "db_ec2_instance" {
   #checkov:skip=CKV_AWS_79:Oracle cannot accommodate a token
-  source = "./modules/ec2_instance"
+  source = "../../modules/ec2_instance"
 
   providers = {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
