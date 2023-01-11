@@ -49,7 +49,7 @@ locals {
 
 module "ec2_test_instance" {
   #checkov:skip=CKV_AWS_126:This is a test instance
-  source = "./modules/ec2_instance"
+  source = "../../modules/ec2_instance"
 
   providers = {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
