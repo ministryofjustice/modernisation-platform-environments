@@ -50,6 +50,7 @@ module "bastion_linux" {
     vpc_name         = local.vpc_name
     application_name = local.application_name
     environment      = local.environment
+    X11Forwarding    = "yes" # set back to no after NDH installation testing
   })
 
   # Tags
