@@ -51,7 +51,7 @@ resource "aws_security_group" "ec2" {
     from_port   = 9500
     to_port     = 9500
     protocol    = "tcp"
-    cidr_blocks = [data.aws_vpc.shared.cidr_block] #!ImportValue env-ManagementCIDR
+    cidr_blocks = [local.application_data.accounts[local.environment].managementcidr] #!ImportValue env-ManagementCIDR
   }
   ingress {
     description = "Access to the managed server"
@@ -65,7 +65,7 @@ resource "aws_security_group" "ec2" {
     from_port   = 9502
     to_port     = 9502
     protocol    = "tcp"
-    cidr_blocks = [data.aws_vpc.shared.cidr_block] #!ImportValue env-ManagementCIDR
+    cidr_blocks = [local.application_data.accounts[local.environment].managementcidr] #!ImportValue env-ManagementCIDR
   }
   ingress {
     description = "Access to the managed server"
@@ -79,7 +79,7 @@ resource "aws_security_group" "ec2" {
     from_port   = 9514
     to_port     = 9514
     protocol    = "tcp"
-    cidr_blocks = [data.aws_vpc.shared.cidr_block] #!ImportValue env-ManagementCIDR
+    cidr_blocks = [local.application_data.accounts[local.environment].managementcidr] #!ImportValue env-ManagementCIDR
   }
   ingress {
     description = "Database connections to rds apex edw and mojfin"
@@ -115,7 +115,7 @@ resource "aws_security_group" "ec2" {
     from_port   = 9500
     to_port     = 9500
     protocol    = "tcp"
-    cidr_blocks = [data.aws_vpc.shared.cidr_block] #!ImportValue env-ManagementCIDR
+    cidr_blocks = [local.application_data.accounts[local.environment].managementcidr] #!ImportValue env-ManagementCIDR
   }
   egress {
     description = "Access to the managed server"
@@ -129,7 +129,7 @@ resource "aws_security_group" "ec2" {
     from_port   = 9502
     to_port     = 9502
     protocol    = "tcp"
-    cidr_blocks = [data.aws_vpc.shared.cidr_block] #!ImportValue env-ManagementCIDR
+    cidr_blocks = [local.application_data.accounts[local.environment].managementcidr] #!ImportValue env-ManagementCIDR
   }
   egress {
     description = "Access to the managed server"
@@ -143,7 +143,7 @@ resource "aws_security_group" "ec2" {
     from_port   = 9514
     to_port     = 9514
     protocol    = "tcp"
-    cidr_blocks = [data.aws_vpc.shared.cidr_block] #!ImportValue env-ManagementCIDR
+    cidr_blocks = [local.application_data.accounts[local.environment].managementcidr] #!ImportValue env-ManagementCIDR
   }
   egress {
     description = "Database connections from rds apex edw and mojfin"
