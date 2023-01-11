@@ -78,6 +78,12 @@ resource "aws_security_group" "build_server" {
   vpc_id      = local.vpc_id
 }
 
+resource "aws_security_group" "iisrelay_server" {
+  description = "Domain traffic"
+  name        = "iisrelay-server-${local.application_name}"
+  vpc_id      = local.vpc_id
+}
+
 resource "aws_security_group_rule" "build-inbound-bastion" {
   depends_on               = [aws_security_group.build_server]
   security_group_id        = aws_security_group.build_server.id
