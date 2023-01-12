@@ -1,10 +1,3 @@
-variable "business_unit" {
-  type        = string
-  description = "This corresponds to the VPC in which the application resides"
-  default     = "hmpps"
-  nullable    = false
-}
-
 variable "application_name" {
   type        = string
   description = "The name of the application.  This will be name of the environment in Modernisation Platform"
@@ -15,32 +8,15 @@ variable "application_name" {
   }
 }
 
-variable "environment" {
-  type        = string
-  description = "Application environment - i.e. the terraform workspace"
-}
-
 variable "region" {
   type        = string
   description = "Destination AWS Region for the infrastructure"
   default     = "eu-west-2"
 }
 
-variable "availability_zone" {
-  type        = string
-  description = "The availability zone in which to deploy the infrastructure"
-  default     = "eu-west-2a"
-  nullable    = false
-}
-
-variable "subnet_set" {
-  type        = string
-  description = "Fixed variable to specify subnet-set for RAM shared subnets"
-}
-
-variable "subnet_name" {
-  type        = string
-  description = "Name of subnet within the given subnet-set"
+variable "subnet_ids" {
+  type        = list(string)
+  description = "List of subnet ids given to the ASG to set the associated AZs (and therefore redundancy of the ASG instances)"
 }
 
 variable "tags" {
@@ -57,13 +33,13 @@ variable "account_ids_lookup" {
 variable "ansible_repo" {
   type        = string
   description = "Optionally provision the server using this ansible_repo"
-  default     = null
+  default     = "modernisation-platform-configuration-management"
 }
 
 variable "ansible_repo_basedir" {
   type        = string
   description = "Base directory within ansible_repo where ansible code is located"
-  default     = null
+  default     = "ansible"
 }
 
 variable "branch" {
@@ -80,7 +56,7 @@ variable "ami_name" {
 variable "ami_owner" {
   type        = string
   description = "Owner of AMI to be used to launch the database ec2 instance"
-  default     = "self"
+  default     = "core-shared-services-production"
   nullable    = false
 }
 

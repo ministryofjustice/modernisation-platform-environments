@@ -95,7 +95,7 @@ resource "aws_autoscaling_group" "this" {
   force_delete              = var.autoscaling_group.force_delete
   termination_policies      = var.autoscaling_group.termination_policies
   target_group_arns         = var.autoscaling_group.target_group_arns
-  vpc_zone_identifier       = [data.aws_subnet.this.id]
+  vpc_zone_identifier       = var.subnet_ids
   wait_for_capacity_timeout = var.autoscaling_group.wait_for_capacity_timeout
 
   launch_template {

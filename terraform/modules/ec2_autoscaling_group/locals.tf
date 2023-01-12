@@ -71,4 +71,9 @@ locals {
 
   user_data_raw = var.user_data_raw
 
+  user_data_part_count = [
+    try(length(var.user_data_cloud_init.scripts), 0),
+    try(length(var.user_data_cloud_init.write_files), 0)
+  ]
+
 }

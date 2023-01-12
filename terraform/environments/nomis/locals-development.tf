@@ -55,7 +55,7 @@ locals {
 
     databases_legacy = {}
     databases = {
-      # Naming
+      # Naming
       # *-nomis-db-1: NOMIS, NDH, TRDATA
       # *-nomis-db-2: MIS, AUDIT
       # *-nomis-db-3: HA
