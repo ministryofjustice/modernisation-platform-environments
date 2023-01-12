@@ -1,6 +1,15 @@
 # oasys-test environment settings
 locals {
   oasys_test = {
+
+    external_remote_access_cidrs = [
+      local.cidrs.noms_test,
+      local.cidrs.noms_mgmt,
+      local.cidrs.noms_test_dr,
+      local.cidrs.noms_mgmt_dr,
+    ]
+
+    
     db_enabled                             = true
     db_auto_minor_version_upgrade          = true
     db_allow_major_version_upgrade         = false

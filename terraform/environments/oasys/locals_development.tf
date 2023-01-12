@@ -18,6 +18,13 @@ locals {
       }
     }
 
+    external_remote_access_cidrs = [
+      local.cidrs.noms_test,
+      local.cidrs.noms_mgmt,
+      local.cidrs.noms_test_dr,
+      local.cidrs.noms_mgmt_dr,
+    ]
+
     ec2_common = {
       patch_approval_delay_days = 3
       patch_day                 = "TUE"
