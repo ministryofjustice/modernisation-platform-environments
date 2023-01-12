@@ -100,7 +100,7 @@
       "lz_vpc_cidr": "10.206.0.0/20",
       "lz_workspace_ingress_cidr": "10.200.16.0/20",
       "mp_laa_int_endpoint_security_group": "sg-0607158c98d5df1bb",
-      "private_subnet_id": "subnet-05d5ceccb00a53ebf"
+      "mp_private_2a_subnet_id": "subnet-05d5ceccb00a53ebf"
     },
     "production": {
       "example_var": "production-data",

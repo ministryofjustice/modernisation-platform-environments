@@ -13,7 +13,7 @@ module "ec2_instance" {
   ami                    = "ami-06672d07f62285d1d"
   instance_type          = "t3a.small"
   vpc_security_group_ids = [module.httptest_sg.security_group_id]
-  subnet_id              = local.application_data.accounts[local.environment].private_subnet_id
+  subnet_id              = local.application_data.accounts[local.environment].mp_private_2a_subnet_id
   user_data_base64       = base64encode(local.instance-userdata)
   iam_instance_profile   = aws_iam_instance_profile.instance_profile.id
   tags = {
