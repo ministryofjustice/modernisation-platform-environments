@@ -1,7 +1,5 @@
-# check through this
-
 locals {
-  public_key_data = jsondecode(file("./bastion_linux.json"))
+  public_key_data = jsondecode(file("./files/bastion_linux.json"))
 }
 
 # create single managed policy
@@ -42,14 +40,14 @@ module "bastion_linux" {
   allow_ssh_commands = false
 
   app_name      = local.application_name
-  business_unit = local.vpc_name
+  business_unit = local.business_unit
   subnet_set    = local.subnet_set
   environment   = local.environment
   region        = local.region
 
   extra_user_data_content = templatefile("templates/bastion-user-data.sh.tftpl", {
     region           = local.region
-    vpc_name         = local.vpc_name
+    vpc_name         = local.business_unit
     application_name = local.application_name
     environment      = local.environment
   })
