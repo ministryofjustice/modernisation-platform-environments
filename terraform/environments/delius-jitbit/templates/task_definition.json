@@ -1,6 +1,6 @@
 [
   {
-    "name": "jitbit",
+    "name": "delius-jitbit",
     "image": "https://docker.io/nginx:latest",
     "cpu": 1536,
     "portMappings": [
