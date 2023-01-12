@@ -1,7 +1,7 @@
 [
   {
     "name": "jitbit",
-    "image": "",
+    "image": "https://docker.io/nginx:latest",
     "cpu": 1536,
     "portMappings": [
       {
