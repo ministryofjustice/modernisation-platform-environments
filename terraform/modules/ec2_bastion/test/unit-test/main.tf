@@ -2,11 +2,9 @@ locals {
   public_key_data = jsondecode(file("./bastion_linux.json"))
 }
 
-
-# tfsec:ignore:aws-s3-enable-bucket-encryption tfsec:ignore:aws-s3-encryption-customer-key tfsec:ignore:aws-s3-enable-bucket-logging tfsec:ignore:aws-s3-enable-versioning
 module "bastion_linux" {
-  #source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=v3.0.6"
-  source = "../../modules/ec2_bastion"
+  source = "../../"
+
   providers = {
     aws.share-host   = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
     aws.share-tenant = aws          # The default provider (unaliased, `aws`) is the tenant
@@ -36,4 +34,3 @@ module "bastion_linux" {
   tags_common = local.tags
   tags_prefix = terraform.workspace
 }
-
