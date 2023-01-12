@@ -107,7 +107,7 @@ locals {
       key_name                     = aws_key_pair.ec2-user.key_name
       monitored                    = false
       metadata_options_http_tokens = "required"
-      vpc_security_group_ids       = [aws_security_group.ec2_test.id]
+      vpc_security_group_ids       = [aws_security_group.webserver.id] #[aws_security_group.ec2_test.id]
     }
 
     route53_records = {
