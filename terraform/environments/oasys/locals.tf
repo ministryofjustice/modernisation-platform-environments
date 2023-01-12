@@ -94,7 +94,7 @@ locals {
   ### env independent webserver vars
   ###
   webserver = {
-    ami_name  = "base_rhel_7_9_*"
+    ami_name = "base_rhel_7_9_*"
     #ami_name = "oasys_webserver_*"
     # branch   = var.BRANCH_NAME # comment in if testing ansible
     # server-type and nomis-environment auto set by module

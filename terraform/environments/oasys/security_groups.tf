@@ -87,10 +87,10 @@ resource "aws_security_group" "ec2_test" {
   }
 
   ingress {
-    description = "Internal access to ssh"
-    from_port   = "22"
-    to_port     = "22"
-    protocol    = "TCP"
+    description     = "Internal access to ssh"
+    from_port       = "22"
+    to_port         = "22"
+    protocol        = "TCP"
     security_groups = [module.bastion_linux.bastion_security_group]
   }
 
@@ -103,10 +103,10 @@ resource "aws_security_group" "ec2_test" {
   }
 
   ingress {
-    description = "Internal access to weblogic admin http"
-    from_port   = "7001"
-    to_port     = "7001"
-    protocol    = "TCP"
+    description     = "Internal access to weblogic admin http"
+    from_port       = "7001"
+    to_port         = "7001"
+    protocol        = "TCP"
     security_groups = [module.bastion_linux.bastion_security_group]
   }
 
@@ -119,10 +119,10 @@ resource "aws_security_group" "ec2_test" {
   }
 
   ingress {
-    description = "Internal access to weblogic http"
-    from_port   = "7777"
-    to_port     = "7777"
-    protocol    = "TCP"
+    description     = "Internal access to weblogic http"
+    from_port       = "7777"
+    to_port         = "7777"
+    protocol        = "TCP"
     security_groups = [module.bastion_linux.bastion_security_group]
   }
 
