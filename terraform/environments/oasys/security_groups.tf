@@ -103,30 +103,6 @@ resource "aws_security_group" "ec2_test" {
   }
 
   ingress {
-    description     = "Internal access to weblogic admin http"
-    from_port       = "7001"
-    to_port         = "7001"
-    protocol        = "TCP"
-    security_groups = [module.bastion_linux.bastion_security_group]
-  }
-
-  ingress {
-    description = "External access to weblogic admin http"
-    from_port   = "7001"
-    to_port     = "7001"
-    protocol    = "TCP"
-    cidr_blocks = local.environment_config.external_weblogic_access_cidrs
-  }
-
-  ingress {
-    description     = "Internal access to weblogic http"
-    from_port       = "7777"
-    to_port         = "7777"
-    protocol        = "TCP"
-    security_groups = [module.bastion_linux.bastion_security_group]
-  }
-
-  ingress {
     description = "External access to prometheus node exporter"
     from_port   = "9100"
     to_port     = "9100"
