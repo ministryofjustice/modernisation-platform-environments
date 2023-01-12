@@ -1,7 +1,7 @@
 # This creates a network load balancer listening on port 80 with a target of the internal ALB.
 
 resource "aws_lb" "ingress-network-lb" {
-  name                       = "ingress-network-lb"
+  name                       = "${local.application_name}-${local.environment}-ingress-network-lb"
   internal                   = true
   load_balancer_type         = "network"
   subnets                    = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id, data.aws_subnet.private_subnets_c.id]
@@ -25,13 +25,13 @@ resource "aws_lb_listener" "lz-ingress" {
 }
 
 resource "aws_lb_target_group" "alb-target" {
-  name        = "alb-target"
+  name        = "${local.application_name}-${local.environment}-nlb-targetgroup"
   target_type = "alb"
   port        = 80
   protocol    = "TCP"
   vpc_id      = data.aws_vpc.shared.id
   tags = {
-    Name = "${local.application_name}-${local.environment}-alb-target"
+    Name = "${local.application_name}-${local.environment}-nlb-targetgroup"
   }
 }
 

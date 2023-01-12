@@ -10,6 +10,10 @@ variable "application_name" {
   type        = string
   description = "Name of application"
 }
+variable "environment" {
+  type        = string
+  description = "Name of environment"
+}
 variable "public_subnets" {
   type        = list(string)
   description = "Public subnets"
