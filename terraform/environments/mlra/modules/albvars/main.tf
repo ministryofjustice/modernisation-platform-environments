@@ -53,7 +53,8 @@ locals {
 resource "aws_lb_listener" "alb_listener" {
   load_balancer_arn = module.lb-access-logs-enabled.load_balancer.arn
   port              = var.listener_port
-  protocol          = var.listener_protocol # tls termination performed by the laa platform mlra alb (phase 1)
+  #checkov:skip=CKV_AWS_2:The ALB protocol is HTTP
+  protocol          = var.listener_protocol #tfsec:ignore:aws-elb-http-not-used
 
   default_action {
     type = "forward"
