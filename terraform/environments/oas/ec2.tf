@@ -8,7 +8,7 @@ resource "aws_instance" "oas_app_instance" {
   monitoring                  = true
   subnet_id                   = data.aws_subnet.private_subnets_a.id
   iam_instance_profile        = aws_iam_instance_profile.ec2_instance_profile.name
-  user_data                   = "${file("user_data.sh")}"
+  user_data                   = file("user_data.sh")
 
   root_block_device {
     delete_on_termination = false
