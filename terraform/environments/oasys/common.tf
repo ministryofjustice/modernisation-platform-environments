@@ -20,9 +20,9 @@ module "autoscaling_groups" {
   instance_profile_policies = local.ec2_common_managed_policies
   application_name          = local.application_name
   #subnet_ids                = data.aws_subnets.private.ids
-  tags                      = merge(local.tags, try(each.value.tags, {}))
-  account_ids_lookup        = local.environment_management.account_ids
-  branch                    = try(each.value.branch, "main")
+  tags               = merge(local.tags, try(each.value.tags, {}))
+  account_ids_lookup = local.environment_management.account_ids
+  branch             = try(each.value.branch, "main")
 }
 
 
