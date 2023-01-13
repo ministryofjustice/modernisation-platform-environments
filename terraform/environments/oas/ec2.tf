@@ -287,3 +287,7 @@ resource "aws_volume_attachment" "oas_EC2ServeVolume02" {
   volume_id   = aws_ebs_volume.EC2ServeVolume02.id
   instance_id = aws_instance.oas_app_instance.id
 }
+
+user_data = base64encode(templatefile("user_data.sh", {
+    app_name = local.application_name
+}))
