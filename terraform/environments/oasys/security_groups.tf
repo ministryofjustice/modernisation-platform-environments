@@ -8,6 +8,14 @@ resource "aws_security_group" "webserver" {
   vpc_id      = data.aws_vpc.shared.id
 
   ingress {
+    description = "Internal access to self on all ports"
+    from_port   = 0
+    to_port     = 0
+    protocol    = -1
+    self        = true
+  }
+  
+  ingress {
     description     = "SSH from Bastion"
     from_port       = "22"
     to_port         = "22"
@@ -39,13 +47,6 @@ resource "aws_security_group" "webserver" {
     #tfsec:ignore:aws-vpc-no-public-egress-sgr
     cidr_blocks = ["0.0.0.0/0"]
   }
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "webserver-security-group"
-    }
-  )
 }
 
 resource "aws_security_group" "oasys" {
@@ -78,21 +79,9 @@ resource "aws_security_group" "ec2_test" {
   name        = "ec2_test"
   vpc_id      = data.aws_vpc.shared.id
 
-  ingress {
-    description = "Internal access to self on all ports"
-    from_port   = 0
-    to_port     = 0
-    protocol    = -1
-    self        = true
-  }
+  
 
-  ingress {
-    description     = "Internal access to ssh"
-    from_port       = "22"
-    to_port         = "22"
-    protocol        = "TCP"
-    security_groups = [module.bastion_linux.bastion_security_group]
-  }
+  
 
   ingress {
     description = "External access to ssh"
