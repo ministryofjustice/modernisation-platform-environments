@@ -6,12 +6,9 @@ resource "aws_security_group" "webserver_test" {
   name        = "webserver-test"
   vpc_id      = data.aws_vpc.shared.id
 
-  tags = merge(
-    var.tags_common,
-    {
-      Name = "webserver-test"
-    }
-  )
+  tags = {
+    Name = "webserver-test"
+  }
 }
 
 resource "aws_security_group_rule" "webserver_linux_egress_1" {
@@ -43,12 +40,9 @@ resource "aws_iam_role" "webserver_test_role" {
   path               = "/"
   assume_role_policy = data.aws_iam_policy_document.webserver_test_assume_policy_document.json
 
-  tags = merge(
-    var.tags_common,
-    {
-      Name = "webserver_test_ec2_role"
-    },
-  )
+  tags = {
+    Name = "webserver_test_ec2_role"
+  }
 }
 
 resource "aws_iam_instance_profile" "webserver_test_profile" {
@@ -120,12 +114,7 @@ resource "aws_launch_template" "webserver_test_template" {
   tag_specifications {
     resource_type = "instance"
 
-    tags = merge(
-      var.tags_common,
-      {
-        Name = "webserver_test"
-      }
-    )
+    tags = { Name = "webserver_test" }
   }
 
   # user_data = base64encode(
@@ -161,15 +150,6 @@ resource "aws_autoscaling_group" "webserver_test" {
     propagate_at_launch = true
   }
 
-  dynamic "tag" {
-    for_each = var.tags_common
-
-    content {
-      key                 = tag.key
-      value               = tag.value
-      propagate_at_launch = true
-    }
-  }
 }
 
 resource "aws_autoscaling_schedule" "webserver_test_scale_down" {
@@ -178,7 +158,7 @@ resource "aws_autoscaling_schedule" "webserver_test_scale_down" {
   max_size               = 0
   desired_capacity       = 0
   recurrence             = "0 20 * * *" # 20.00 UTC time or 21.00 London time
-  autoscaling_group_name = aws_autoscaling_group.webserver_test_daily.name
+  autoscaling_group_name = aws_autoscaling_group.webserver_test.name
 }
 
 resource "aws_autoscaling_schedule" "webserver_test_scale_up" {
@@ -187,7 +167,7 @@ resource "aws_autoscaling_schedule" "webserver_test_scale_up" {
   max_size               = 1
   desired_capacity       = 1
   recurrence             = "0 5 * * *" # 5.00 UTC time or 6.00 London time
-  autoscaling_group_name = aws_autoscaling_group.webserver_test_daily.name
+  autoscaling_group_name = aws_autoscaling_group.webserver_test.name
 }
 
 
