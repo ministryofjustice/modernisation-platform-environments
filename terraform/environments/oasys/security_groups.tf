@@ -14,7 +14,7 @@ resource "aws_security_group" "webserver" {
     protocol    = -1
     self        = true
   }
-  
+
   ingress {
     description     = "SSH from Bastion"
     from_port       = "22"
@@ -79,9 +79,9 @@ resource "aws_security_group" "ec2_test" {
   name        = "ec2_test"
   vpc_id      = data.aws_vpc.shared.id
 
-  
 
-  
+
+
 
   ingress {
     description = "External access to ssh"
