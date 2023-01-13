@@ -17,6 +17,7 @@ variable "region" {
 variable "subnet_ids" {
   type        = list(string)
   description = "List of subnet ids given to the ASG to set the associated AZs (and therefore redundancy of the ASG instances)"
+  default     = null
 }
 
 variable "tags" {

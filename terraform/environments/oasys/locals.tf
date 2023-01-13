@@ -137,9 +137,13 @@ locals {
     iam_resource_names_prefix = "ec2-webserver-asg"
 
     autoscaling_group = {
-      desired_capacity = 1
       max_size         = 2
       min_size         = 0
+      health_check_grace_period = 300
+      health_check_type = "ELB"
+      force_delete = true
+      termination_policies = ["OldestInstance"]
+      autoscaling_group = ["${local.region}a"]
     }
   }
 }
