@@ -31,7 +31,7 @@ locals {
     }
 
     autoscaling_groups = {
-      webservers = merge(local.webserver, { # merge common config and env specific
+      webserver = merge(local.webserver, { # merge common config and env specific
         tags = {
           nomis-environment = "t1"
           description       = "oasys webserver"
