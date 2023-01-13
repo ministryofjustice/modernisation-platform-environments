@@ -52,10 +52,10 @@ resource "aws_lb_listener" "listener" {
 
 
 resource "aws_lb_target_group" "target_group" {
-  name     = "${local.application_name}-tg-${local.environment}"
-  port     = local.app_data.accounts[local.environment].server_port
-  protocol = "HTTP"
-  vpc_id   = data.aws_vpc.shared.id
+  name                 = "${local.application_name}-tg-${local.environment}"
+  port                 = local.app_data.accounts[local.environment].server_port
+  protocol             = "HTTP"
+  vpc_id               = data.aws_vpc.shared.id
   target_type          = "ip"
   deregistration_delay = 30
 
