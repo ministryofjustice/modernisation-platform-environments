@@ -188,9 +188,7 @@ resource "aws_iam_role" "ec2_instance_role" {
     "Statement": [
         {
             "Action": "sts:AssumeRole",
-            "Principal": {
-              "Service": "ec2.amazonaws.com"
-            },
+            "Principal": {"Service": "ec2.amazonaws.com"},
             "Effect": "Allow",
             "Sid": ""
         }
@@ -238,6 +236,11 @@ resource "aws_iam_role_policy" "ec2_instance_policy" { #tfsec:ignore:aws-iam-no-
     ]
 }
 EOF
+}
+
+resource "aws_iam_role_policy_attachment" "ssm-attach-policy" {
+  role       = aws_iam_role.ec2_instance_role.name
+  policy_arn = data.aws_iam_policy.ssm_ec2_policy.arn
 }
 
 resource "aws_ebs_volume" "EC2ServeVolume01" {
