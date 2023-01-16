@@ -41,8 +41,6 @@ data "template_file" "task_definition" {
   template = file("templates/task_definition.json")
   vars = {
     app_name    = local.application_name
-    TEST_VAR    = "test-var"
-    TEST_SECRET = "test-secret"
   }
 }
 
