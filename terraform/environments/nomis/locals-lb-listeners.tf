@@ -1,5 +1,27 @@
 locals {
 
+  lb_http_7777_rule = {
+    port                 = 7777
+    protocol             = "HTTP"
+    target_type          = "instance"
+    deregistration_delay = 30
+    health_check = {
+      enabled             = true
+      interval            = 30
+      healthy_threshold   = 3
+      matcher             = "200-399"
+      path                = "/keepalive.htm"
+      port                = 7777
+      timeout             = 5
+      unhealthy_threshold = 5
+    }
+    stickiness = {
+      enabled = true
+      type    = "lb_cookie"
+    }
+  }
+
+
   lb_listener_defaults = {
     environment_external_dns_zone = {
       account                = "core-vpc"
@@ -34,26 +56,7 @@ locals {
         }
       }
       target_groups = {
-        http-7777 = {
-          port                 = 7777
-          protocol             = "HTTP"
-          target_type          = "instance"
-          deregistration_delay = 30
-          health_check = {
-            enabled             = true
-            interval            = 30
-            healthy_threshold   = 3
-            matcher             = "200-399"
-            path                = "/keepalive.htm"
-            port                = 7777
-            timeout             = 5
-            unhealthy_threshold = 5
-          }
-          stickiness = {
-            enabled = true
-            type    = "lb_cookie"
-          }
-        }
+        http-7777 = local.lb_http_7777_rule
       }
       rules = {
         forward-http-7777 = {
@@ -84,6 +87,23 @@ locals {
       t1-nomis-web-https = merge(local.lb_listener_defaults.nomis_web_https, {
         route53_records = {
           "t1-nomis-web.nomis" = local.lb_listener_defaults.environment_external_dns_zone
+        }
+      })
+
+      t1-nomis-web-1-https = merge(local.lb_listener_defaults.nomis_web_https, {
+        target_groups = {
+          http-7777 = merge(local.lb_http_7777_rule, {
+            attachments = [
+              {
+                # temporary until circular dependencies fixed
+                target_id = local.environment == "test" ? "i-0983877a07e735688" : null
+              }
+            ]
+          })
+        }
+
+        route53_records = {
+          "t1-nomis-web-1.nomis" = local.lb_listener_defaults.environment_external_dns_zone
         }
       })
 
