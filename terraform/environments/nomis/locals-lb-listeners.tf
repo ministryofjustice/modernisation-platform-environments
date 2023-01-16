@@ -103,11 +103,12 @@ locals {
         }
 
         route53_records = {
-          "t1-nomis-web-1.nomis" = local.lb_listener_defaults.environment_external_dns_zone
+          "t1b-nomis-web.nomis" = local.lb_listener_defaults.environment_external_dns_zone
         }
       })
 
       weblogic-cnomt1-https = merge(local.lb_listener_defaults.nomis_web_https, {
+        target_groups = {}
         route53_records = {
           "weblogic-cnomt1.nomis" = local.lb_listener_defaults.environment_external_dns_zone
         }
