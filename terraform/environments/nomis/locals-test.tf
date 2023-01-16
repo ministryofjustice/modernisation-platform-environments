@@ -174,6 +174,7 @@ locals {
         autoscaling_group = {
           desired_capacity = 0
           warm_pool        = null
+          #          target_group_arns = module.lb_listener["t1-nomis-web-https"].aws_lb_target_group["http-7777"].arn
         }
       }
     }
@@ -247,7 +248,7 @@ locals {
         ami_name = "nomis_rhel_7_9_baseimage_2022-11-01T13-43-46.384Z"
         # branch   = var.BRANCH_NAME # comment in if testing ansible
         autoscaling_group = {
-          desired_capacity = 1
+          desired_capacity = 0
         }
         autoscaling_schedules = {}
         subnet_name           = "data"
@@ -261,7 +262,7 @@ locals {
         ami_name = "nomis_rhel_7_9_baseimage_2022-11-01T13-43-46.384Z"
         # branch   = var.BRANCH_NAME # comment in if testing ansible
         autoscaling_group = {
-          desired_capacity = 1
+          desired_capacity = 0
         }
         autoscaling_schedules = {}
         subnet_name           = "data"
