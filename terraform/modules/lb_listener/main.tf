@@ -44,7 +44,7 @@ resource "aws_lb_target_group_attachment" "this" {
     for item in local.target_group_attachments : "${item.name}-${item.attachment.target_id}" => item
   }
 
-  target_group_arn  = aws_lb_target_group.this[each.value.name]
+  target_group_arn  = aws_lb_target_group.this[each.value.name].arn
   target_id         = each.value.attachment.target_id
   port              = each.value.attachment.port
   availability_zone = each.value.attachment.availability_zone
