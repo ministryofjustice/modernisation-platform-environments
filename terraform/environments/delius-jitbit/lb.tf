@@ -16,8 +16,8 @@ resource "aws_security_group" "load_balancer_security_group" {
   ingress {
     protocol    = "tcp"
     description = "Open the server port"
-    from_port   = 80
-    to_port     = 80
+    from_port   = 443
+    to_port     = 443
     cidr_blocks = ["0.0.0.0/0", ]
   }
 
@@ -41,7 +41,7 @@ resource "aws_security_group" "load_balancer_security_group" {
 
 resource "aws_lb_listener" "listener" {
   load_balancer_arn = aws_lb.external.id
-  port              = local.app_data.accounts[local.environment].server_port
+  port              = 443 
   protocol          = "HTTP"
 
   default_action {
