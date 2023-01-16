@@ -179,14 +179,6 @@ locals {
       }
     }
 
-    # Legacy weblogic, to be zapped imminently
-    weblogics = {
-      CNOMT1 = {
-        ami_name     = "nomis_Weblogic_2022*"
-        asg_max_size = 1
-      }
-    }
-
     ec2_test_instances = {
       t1-nomis-web-1 = {
         tags = {

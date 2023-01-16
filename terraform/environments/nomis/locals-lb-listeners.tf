@@ -63,7 +63,7 @@ locals {
           }]
           conditions = [{
             host_header = {
-              values = ["*.nomis.${data.aws_route53_zone.external.name}"]
+              values = ["*-nomis-web.nomis.${data.aws_route53_zone.external.name}"]
             }
           }]
         }
@@ -84,6 +84,25 @@ locals {
       t1-nomis-web-https = merge(local.lb_listener_defaults.nomis_web_https, {
         route53_records = {
           "t1-nomis-web.nomis" = local.lb_listener_defaults.environment_external_dns_zone
+        }
+      })
+
+      weblogic-cnomt1-https = merge(local.lb_listener_defaults.nomis_web_https, {
+        route53_records = {
+          "weblogic-cnomt1.nomis" = local.lb_listener_defaults.environment_external_dns_zone
+        }
+        rules = {
+          forward-http-7777 = {
+            actions = [{
+              type             = "forward"
+              target_group_arn = module.weblogic["CNOMT1"].target_group_arn
+            }]
+            conditions = [{
+              host_header = {
+                values = ["weblogic-cnomt1.nomis.${data.aws_route53_zone.external.name}"]
+              }
+            }]
+          }
         }
       })
     }

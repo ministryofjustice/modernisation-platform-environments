@@ -65,6 +65,18 @@ locals {
       }
     }
   }
+
+  legacy_weblogics = {
+    development = {}
+    test = {
+      CNOMT1 = {
+        ami_name     = "nomis_Weblogic_2022*"
+        asg_max_size = 1
+      }
+    }
+    preproduction = {}
+    production    = {}
+  }
 }
 
 module "weblogic" {
@@ -74,7 +86,7 @@ module "weblogic" {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
   }
 
-  for_each = local.environment_config.weblogics
+  for_each = local.legacy_weblogics[local.environment]
 
   name = each.key
 
