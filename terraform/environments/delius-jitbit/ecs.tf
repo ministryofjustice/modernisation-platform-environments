@@ -40,7 +40,7 @@ data "template_file" "launch-template" {
 data "template_file" "task_definition" {
   template = file("templates/task_definition.json")
   vars = {
-    app_name    = local.application_name
+    app_name = local.application_name
   }
 }
 

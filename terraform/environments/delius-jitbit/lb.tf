@@ -41,7 +41,7 @@ resource "aws_security_group" "load_balancer_security_group" {
 
 resource "aws_lb_listener" "listener" {
   load_balancer_arn = aws_lb.external.id
-  port              = 443 
+  port              = 443
   protocol          = "HTTP"
 
   default_action {
