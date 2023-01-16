@@ -29,8 +29,8 @@ locals {
         type = "fixed-response"
         fixed_response = {
           content_type = "text/plain"
-          message_body = "Fixed response content"
-          status_code  = "503"
+          message_body = "Not implemented"
+          status_code  = "501"
         }
       }
       target_groups = {
@@ -63,7 +63,7 @@ locals {
           }]
           conditions = [{
             host_header = {
-              values = ["*-nomis-web.nomis.${data.aws_route53_zone.external.name}"]
+              values = ["*-nomis-web.nomis.${local.vpc_name}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
             }
           }]
         }
@@ -99,7 +99,7 @@ locals {
             }]
             conditions = [{
               host_header = {
-                values = ["weblogic-cnomt1.nomis.${data.aws_route53_zone.external.name}"]
+                values = ["weblogic-cnomt1.nomis.${local.vpc_name}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
               }
             }]
           }
