@@ -95,7 +95,7 @@ locals {
           forward-http-7777 = {
             actions = [{
               type             = "forward"
-              target_group_arn = module.weblogic["CNOMT1"].target_group_arn
+              target_group_arn = local.environment == "test" ? module.weblogic["CNOMT1"].target_group_arn : null
             }]
             conditions = [{
               host_header = {
