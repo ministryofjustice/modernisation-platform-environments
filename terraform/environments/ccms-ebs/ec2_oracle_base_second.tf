@@ -1,6 +1,6 @@
 data "aws_ami" "oracle_base_second" {
   most_recent = true
-  owners      = ["self"]
+  owners      = ["131827586825"]
   filter {
     name   = "name"
     values = [local.application_data.accounts[local.environment].orace_base_ami_name_second]
@@ -21,6 +21,7 @@ resource "aws_instance" "ec2_oracle_base_second" {
   # Specify the instance type and ami to be used (this is the Amazon free tier option)
   instance_type               = local.application_data.accounts[local.environment].ec2_oracle_base_instance_type
   ami                         = data.aws_ami.oracle_base_second.id
+  key_name                    = local.application_data.accounts[local.environment].key_name
   vpc_security_group_ids      = [aws_security_group.ec2_sg_oracle_base.id]
   subnet_id                   = data.aws_subnet.private_subnets_a.id
   monitoring                  = true
