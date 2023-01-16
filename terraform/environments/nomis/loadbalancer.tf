@@ -8,7 +8,7 @@
 
 # --- New load balancer ---
 module "lb_internal_nomis" {
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer.git?ref=v2.1.0"
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer.git?ref=v2.1.1"
   count  = 0
   providers = {
     aws.bucket-replication = aws
