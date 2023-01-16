@@ -172,9 +172,9 @@ locals {
 
         # NOTE: using standalone instance until connectivity from FixNGo in place
         autoscaling_group = {
-          desired_capacity = 0
-          warm_pool        = null
-          #          target_group_arns = module.lb_listener["t1-nomis-web-https"].aws_lb_target_group["http-7777"].arn
+          desired_capacity  = 0
+          warm_pool         = null
+          target_group_arns = [module.lb_listener["t1-nomis-web-https"].aws_lb_target_group["http-7777"].arn]
         }
       }
     }
