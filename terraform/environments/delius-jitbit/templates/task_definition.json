@@ -13,7 +13,7 @@
     "logConfiguration": {
       "logDriver": "awslogs",
       "options": {
-        "awslogs-group": "jitbit-ecs",
+        "awslogs-group": "delius-jitbit-ecs",
         "awslogs-region": "eu-west-2",
         "awslogs-stream-prefix": "jitbit"
       }
