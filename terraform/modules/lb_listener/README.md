@@ -67,7 +67,7 @@ locals {
           }]
           conditions = [{
             host_header = {
-              values = ["*.nomis.${data.aws_route53_zone.external.name}"]
+              values = ["*-web.nomis.${local.vpc_name}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
             }
           }]
         }
