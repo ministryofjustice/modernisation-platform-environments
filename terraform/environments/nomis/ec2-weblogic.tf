@@ -145,8 +145,6 @@ module "ec2_weblogic_autoscaling_group" {
   branch             = try(each.value.branch, "main")
 }
 
-#  load_balancer_listener_arn = aws_lb_listener.internal.arn
-
 #------------------------------------------------------------------------------
 # Common Security Group for Weblogic Instances
 #------------------------------------------------------------------------------
@@ -200,11 +198,10 @@ resource "aws_security_group" "weblogic_common" {
     from_port   = "7777"
     to_port     = "7777"
     protocol    = "TCP"
-    security_groups = [
+    security_groups = concat([
       aws_security_group.jumpserver-windows.id,
-      module.bastion_linux.bastion_security_group,
-      #      module.lb_internal_nomis[0].security_group.id
-    ]
+      module.bastion_linux.bastion_security_group
+    ], local.lb_security_group_ids)
   }
 
   ingress {
