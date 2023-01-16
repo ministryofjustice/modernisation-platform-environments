@@ -24,12 +24,6 @@
         "value": "test var"
       }
     ],
-    "secrets": [
-      {
-        "name": "TEST_SECRET",
-        "valueFrom": "${TEST_SECRET}"
-      }
-    ],
     "essential": true
   }
 ]
