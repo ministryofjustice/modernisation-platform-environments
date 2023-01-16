@@ -14,8 +14,10 @@ locals {
 
   acm_certificates = {
 
+    #--------------------------------------------------------------------------
+    # define certificates common to all environments here
+    #--------------------------------------------------------------------------
     common = {
-      # define certs common to all environments
       "${local.certificate.modernisation_platform_wildcard.name}" = {
         # domain_name limited to 64 chars so put it in the san instead
         domain_name             = local.certificate.modernisation_platform_top_level.domain_name
@@ -36,7 +38,10 @@ locals {
       }
     }
 
-    # define environmental specific certs here
+    #--------------------------------------------------------------------------
+    # define environment specific certificates here
+    #--------------------------------------------------------------------------
+
     development   = {}
     test          = {}
     preproduction = {}
