@@ -31,7 +31,8 @@
       "XHBPRESMS01-ami": "ami-03ad19f47c6725480",
       "buildserver-ami": "ami-096d0bf0a5fc0fadb",
       "buildserver-disk-1-snapshot": "snap-04ecdbc7c6e980243",
-      "iisrelay-ami": "ami-04f91f9d2c59547ee"
+      "iisrelay-ami": "ami-04f91f9d2c59547ee",
+      "iisrelay-disk-1-snapshot": "snap-051f581d753d3827a"
     },
     "preproduction": {
       "public_dns_name_web": "prepportal.cjsonline.gov.uk",
@@ -64,8 +65,8 @@
       "buildserver-ami": "ami-0da5babad86576eb8",
       "buildserver-disk-1-snapshot": "snap-0b6d529f807eb9a6a",
       "iisrelay-ami": "ami-04f91f9d2c59547ee",
-      "iisrelay-disk-1-snapshot": "snap-051f581d753d3827a",
-      "iisrelay-disk-2-snapshot": "snap-0d54fc02d80b06efe"
+      "iisrelay-disk-1-snapshot": "snap-051f581d753d3827a"
+   
     },
     "production": {
       "public_dns_name_web": "pportal.cjsonline.gov.uk",
@@ -100,8 +101,7 @@
       "buildserver-disk-1-snapshot": "snap-08b1c019201557295",
       "suprig01-baremetal-ami": "ami-00774479ee85c5c3a",
       "iisrelay-ami": "ami-04f91f9d2c59547ee",
-      "iisrelay-disk-1-snapshot": "snap-051f581d753d3827a",
-      "iisrelay-disk-2-snapshot": "snap-0d54fc02d80b06efe"
+      "iisrelay-disk-1-snapshot": "snap-051f581d753d3827a"
     }
   }
 }

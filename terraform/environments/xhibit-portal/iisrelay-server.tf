@@ -39,7 +39,7 @@ resource "aws_instance" "iisrelay-server" {
       #root_block_device,
       # Prevent changes to encryption from destroying existing EC2s - can delete once encryption complete
     ]
-    prevent_destroy = true
+    prevent_destroy = false
   }
 
   tags = merge(
@@ -77,26 +77,3 @@ resource "aws_volume_attachment" "iisrelay-disk1" {
 
 
 
-resource "aws_ebs_volume" "iisrelay-disk2" {
-  depends_on        = [aws_instance.iisrelay-server]
-  availability_zone = "${local.region}a"
-  type              = "gp3"
-  encrypted         = true
-
-  snapshot_id = local.application_data.accounts[local.environment].iisrelay-disk-2-snapshot
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "iisrelay-disk2-${local.application_name}"
-    }
-  )
-}
-
-resource "aws_volume_attachment" "iisrelay-disk2" {
-  depends_on   = [aws_instance.iisrelay-server]
-  device_name  = "xvdm"
-  force_detach = true
-  volume_id    = aws_ebs_volume.iisrelay-disk2.id
-  instance_id  = aws_instance.iisrelay-server.id
-}
