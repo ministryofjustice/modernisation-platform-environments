@@ -73,14 +73,9 @@ resource "aws_iam_role" "role_stsassume_oracle_base_2" {
   )
 }
 
-
-resource "aws_iam_role_policy_attachment" "ssm_policy_base_2" {
-  role = aws_iam_role.role_stsassume_oracle_base_2.name
-  for_each = toset([
-    "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
-    "arn:aws:iam::aws:policy/AmazonSSMFullAccess"
-  ])
-  policy_arn = each.value
+resource "aws_iam_role_policy_attachment" "ssm_policy_oracle_base_2" {
+  role       = aws_iam_role.role_stsassume_oracle_base_2.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
 resource "aws_iam_instance_profile" "iam_instace_profile_oracle_base_2" {
