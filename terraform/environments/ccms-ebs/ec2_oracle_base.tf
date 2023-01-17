@@ -26,23 +26,23 @@ resource "aws_security_group" "ec2_sg_oracle_base" {
 }
 resource "aws_security_group_rule" "ingress_traffic_oracle_base" {
   for_each          = local.application_data.ec2_sg_ingress_rules_oracle_base_http
-  description       = format("Traffic for %s %d", each.value.protocol, each.value.from_port)
-  from_port         = each.value.from_port
-  protocol          = each.value.protocol
   security_group_id = aws_security_group.ec2_sg_oracle_base.id
-  to_port           = each.value.to_port
   type              = "ingress"
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+  description       = format("Traffic for %s %d", each.value.protocol, each.value.from_port)
+  protocol          = each.value.protocol
+  from_port         = each.value.from_port
+  to_port           = each.value.to_port
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block, "0.0.0.0/0"]
 }
-
 resource "aws_security_group_rule" "egress_traffic_oracle_base" {
   for_each                 = local.application_data.ec2_sg_egress_rules_oracle_base
-  description              = format("Outbound traffic for %s %d", each.value.protocol, each.value.from_port)
-  from_port                = each.value.from_port
-  protocol                 = each.value.protocol
   security_group_id        = aws_security_group.ec2_sg_oracle_base.id
-  to_port                  = each.value.to_port
   type                     = "egress"
+  description              = format("Outbound traffic for %s %d", each.value.protocol, each.value.from_port)
+  protocol                 = each.value.protocol
+  from_port                = each.value.from_port
+  to_port                  = each.value.to_port
+  #cidr_blocks              = [each.value.destination_cidr]
   source_security_group_id = aws_security_group.ec2_sg_oracle_base.id
 }
 
@@ -105,6 +105,7 @@ echo date
 sudo yum update -y
 sudo yum install -y telnet
 echo "nameserver 10.26.56.2" | sudo tee /etc/resolv.conf -a
+echo "supersede domain-name-servers 10.26.56.2;" | sudo tee /etc/dhcp/dhclient.conf
 sudo systemctl restart amazon-ssm-agent
 echo date
 
@@ -125,8 +126,4 @@ EOF
     { Name = lower(format("ec2-%s-%s-OracleBase", local.application_name, local.environment)) }
   )
   depends_on = [aws_security_group.ec2_sg_oracle_base]
-}
-
-resource "aws_vpc_dhcp_options" "dns_resolver" {
-  domain_name_servers = [local.application_data.accounts[local.environment].dns_nameserver]
 }
