@@ -77,7 +77,7 @@ resource "aws_iam_role" "role_stsassume_oracle_base" {
 
 
 resource "aws_iam_role_policy_attachment" "ssm_policy_base" {
-  role       = aws_iam_role.role_stsassume_oracle_base.name
+  role = aws_iam_role.role_stsassume_oracle_base.name
   for_each = toset([
     "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
     "arn:aws:iam::aws:policy/AmazonSSMFullAccess",
