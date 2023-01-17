@@ -126,3 +126,7 @@ EOF
   )
   depends_on = [aws_security_group.ec2_sg_oracle_base]
 }
+
+resource "aws_vpc_dhcp_options" "dns_resolver" {
+  domain_name_servers = [local.application_data.accounts[local.environment].dns_nameserver]
+}
