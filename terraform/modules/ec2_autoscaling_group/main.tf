@@ -46,7 +46,7 @@ resource "aws_launch_template" "this" {
   network_interfaces {
     associate_public_ip_address = false
     security_groups             = var.instance.vpc_security_group_ids
-    subnet_id                   = data.aws_subnet.private_subnets_a.id ###################
+    subnet_id                   = var.subnet_ids[0] ###################
     delete_on_termination       = true
   }
 
