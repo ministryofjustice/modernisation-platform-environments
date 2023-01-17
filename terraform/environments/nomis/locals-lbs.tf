@@ -81,3 +81,7 @@ locals {
     production = {}
   }
 }
+
+locals {
+  lb_security_group_ids = [for key, value in module.loadbalancer : value.security_group.id]
+}
