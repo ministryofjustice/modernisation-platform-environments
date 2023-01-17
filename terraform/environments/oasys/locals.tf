@@ -139,6 +139,7 @@ locals {
     autoscaling_group = {
       max_size                  = 2
       min_size                  = 0
+      desired_capacity          = 1
       health_check_grace_period = 300
       health_check_type         = "ELB"
       force_delete              = true
