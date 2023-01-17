@@ -34,7 +34,8 @@ resource "aws_security_group_rule" "ingress_traffic_oracle_base" {
   to_port           = each.value.to_port
   cidr_blocks       = [data.aws_vpc.shared.cidr_block, "0.0.0.0/0"]
 }
-resource "aws_security_group_rule" "egress_traffic_oracle_base" {
+
+resource "aws_security_group_rule" "egress_traffic_oracle_base_sg" {
   for_each                 = local.application_data.ec2_sg_egress_rules_oracle_base
   security_group_id        = aws_security_group.ec2_sg_oracle_base.id
   type                     = "egress"
@@ -42,8 +43,18 @@ resource "aws_security_group_rule" "egress_traffic_oracle_base" {
   protocol                 = each.value.protocol
   from_port                = each.value.from_port
   to_port                  = each.value.to_port
-  #cidr_blocks              = [each.value.destination_cidr]
   source_security_group_id = aws_security_group.ec2_sg_oracle_base.id
+}
+
+resource "aws_security_group_rule" "egress_traffic_oracle_base_cidr" {
+  for_each                 = local.application_data.ec2_sg_egress_rules_oracle_base
+  security_group_id        = aws_security_group.ec2_sg_oracle_base.id
+  type                     = "egress"
+  description              = format("Outbound traffic for %s %d", each.value.protocol, each.value.from_port)
+  protocol                 = each.value.protocol
+  from_port                = each.value.from_port
+  to_port                  = each.value.to_port
+  cidr_blocks              = [each.value.destination_cidr]
 }
 
 resource "aws_iam_role" "role_stsassume_oracle_base" {
@@ -105,7 +116,9 @@ echo date
 sudo yum update -y
 sudo yum install -y telnet
 echo "nameserver 10.26.56.2" | sudo tee /etc/resolv.conf -a
+sudo touch /etc/dhcp/dhclient.conf
 echo "supersede domain-name-servers 10.26.56.2;" | sudo tee /etc/dhcp/dhclient.conf
+#sudo systemctl reload NetworkManager
 sudo systemctl restart amazon-ssm-agent
 echo date
 
