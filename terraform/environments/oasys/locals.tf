@@ -106,7 +106,7 @@ locals {
     # server-type and nomis-environment auto set by module
     autoscaling_schedules = {}
     subnet_name           = "private"
-    subnet_ids            = [data.aws_subnet.private_subnets_a.id]
+    subnet_ids            = [data.aws_subnet.private_subnets_b.id]
 
     instance = {
       disable_api_termination      = false
@@ -145,7 +145,7 @@ locals {
       health_check_type         = "ELB"
       force_delete              = true
       termination_policies      = ["OldestInstance"]
-      availability_zones        = ["${local.region}a"]
+      availability_zones        = ["${local.region}b"]
     }
   }
 }
