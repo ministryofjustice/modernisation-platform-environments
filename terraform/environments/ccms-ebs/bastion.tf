@@ -2,6 +2,7 @@ locals {
   public_key_data = jsondecode(file("./bastion_linux.json"))
 }
 
+
 # tfsec:ignore:aws-s3-enable-bucket-encryption tfsec:ignore:aws-s3-encryption-customer-key tfsec:ignore:aws-s3-enable-bucket-logging tfsec:ignore:aws-s3-enable-versioning
 module "bastion_linux" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=v3.0.7"
@@ -12,7 +13,7 @@ module "bastion_linux" {
   }
 
   # s3 - used for logs and user ssh public keys
-  bucket_name          = "bastion-example"
+  bucket_name          = "bastion"
   bucket_versioning    = true
   bucket_force_destroy = true
   # public keys
