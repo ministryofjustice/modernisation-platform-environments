@@ -47,14 +47,14 @@ resource "aws_security_group_rule" "egress_traffic_oracle_base_sg" {
 }
 
 resource "aws_security_group_rule" "egress_traffic_oracle_base_cidr" {
-  for_each                 = local.application_data.ec2_sg_egress_rules_oracle_base
-  security_group_id        = aws_security_group.ec2_sg_oracle_base.id
-  type                     = "egress"
-  description              = format("Outbound traffic for %s %d", each.value.protocol, each.value.from_port)
-  protocol                 = each.value.protocol
-  from_port                = each.value.from_port
-  to_port                  = each.value.to_port
-  cidr_blocks              = [each.value.destination_cidr]
+  for_each          = local.application_data.ec2_sg_egress_rules_oracle_base
+  security_group_id = aws_security_group.ec2_sg_oracle_base.id
+  type              = "egress"
+  description       = format("Outbound traffic for %s %d", each.value.protocol, each.value.from_port)
+  protocol          = each.value.protocol
+  from_port         = each.value.from_port
+  to_port           = each.value.to_port
+  cidr_blocks       = [each.value.destination_cidr]
 }
 
 resource "aws_iam_role" "role_stsassume_oracle_base" {
