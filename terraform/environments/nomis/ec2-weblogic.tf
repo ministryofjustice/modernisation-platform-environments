@@ -41,7 +41,7 @@ locals {
       health_check_type         = "ELB"
       force_delete              = true
       termination_policies      = ["OldestInstance"]
-      target_group_arns         = [] # TODO
+      target_group_arns         = []
       vpc_zone_identifier       = data.aws_subnets.private.ids
       wait_for_capacity_timeout = 0
 
@@ -65,6 +65,18 @@ locals {
       }
     }
   }
+
+  legacy_weblogics = {
+    development = {}
+    test = {
+      CNOMT1 = {
+        ami_name     = "nomis_Weblogic_2022*"
+        asg_max_size = 1
+      }
+    }
+    preproduction = {}
+    production    = {}
+  }
 }
 
 module "weblogic" {
@@ -74,7 +86,7 @@ module "weblogic" {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
   }
 
-  for_each = local.environment_config.weblogics
+  for_each = local.legacy_weblogics[local.environment]
 
   name = each.key
 
@@ -133,8 +145,6 @@ module "ec2_weblogic_autoscaling_group" {
   branch             = try(each.value.branch, "main")
 }
 
-#  load_balancer_listener_arn = aws_lb_listener.internal.arn
-
 #------------------------------------------------------------------------------
 # Common Security Group for Weblogic Instances
 #------------------------------------------------------------------------------
@@ -188,11 +198,10 @@ resource "aws_security_group" "weblogic_common" {
     from_port   = "7777"
     to_port     = "7777"
     protocol    = "TCP"
-    security_groups = [
+    security_groups = concat([
       aws_security_group.jumpserver-windows.id,
-      module.bastion_linux.bastion_security_group,
-      #      module.lb_internal_nomis[0].security_group.id
-    ]
+      module.bastion_linux.bastion_security_group
+    ], local.lb_security_group_ids)
   }
 
   ingress {
