@@ -1,3 +1,8 @@
+resource "aws_eip" "iisrelay" {
+  instance = aws_instance.iisrelay-server.id
+  vpc      = true
+}
+
 resource "aws_instance" "iisrelay-server" {
 
   depends_on                  = [aws_security_group.iisrelay_server]

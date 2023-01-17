@@ -182,10 +182,10 @@ resource "aws_security_group" "ec2_test" {
     from_port   = "7777"
     to_port     = "7777"
     protocol    = "TCP"
-    security_groups = [
+    security_groups = concat([
       aws_security_group.jumpserver-windows.id,
       module.bastion_linux.bastion_security_group
-    ]
+    ], local.lb_security_group_ids)
   }
 
   ingress {
