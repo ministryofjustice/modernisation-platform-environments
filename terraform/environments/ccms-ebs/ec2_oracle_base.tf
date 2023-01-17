@@ -81,8 +81,8 @@ resource "aws_iam_role_policy_attachment" "ssm_policy_base" {
   for_each = toset([
     "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
     "arn:aws:iam::aws:policy/AmazonSSMFullAccess",
-    "arn:aws:iam::aws:policy/${local.application_data.accounts[local.environment].ec2_policy}",
-    "arn:aws:iam::aws:policy/${local.application_data.accounts[local.environment].ec2_policy_2}",
+  #  "arn:aws:iam::aws:policy/${local.application_data.accounts[local.environment].ec2_policy}",
+  #  "arn:aws:iam::aws:policy/${local.application_data.accounts[local.environment].ec2_policy_2}",
     "arn:aws:iam::aws:policy/${local.application_data.accounts[local.environment].ec2_policy_3}"
   ])
   policy_arn = each.value
