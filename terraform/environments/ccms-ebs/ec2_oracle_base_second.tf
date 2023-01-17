@@ -25,6 +25,12 @@ resource "aws_instance" "ec2_oracle_base_second" {
   ebs_optimized               = false
   associate_public_ip_address = false
   iam_instance_profile        = aws_iam_instance_profile.iam_instace_profile_oracle_base_2.name
+  user_data = <<EOF
+#!/bin/bash
+
+exec > /tmp/userdata.log 2>&1
+sudo yum update -y
+EOF
 
   metadata_options {
     http_endpoint = "enabled"
