@@ -145,7 +145,7 @@ EOF
     volume_type = "gp3"
     volume_size = 200
     encrypted   = true
-#    kms_key_id  = aws_kms_key.this.arn
+    #    kms_key_id  = aws_kms_key.this.arn
     tags = merge(local.tags,
       { Name = "ebs-block1" }
     )
