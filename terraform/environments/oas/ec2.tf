@@ -188,7 +188,7 @@ resource "aws_iam_instance_profile" "ec2_instance_profile" {
 }
 
 resource "aws_iam_role" "ec2_instance_role" {
-  name = "${local.application_name}-role"
+  name                = "${local.application_name}-role"
   managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"]
   assume_role_policy  = <<EOF
 {
