@@ -7,7 +7,7 @@ resource "aws_instance" "oas_app_instance" {
   security_groups             = [aws_security_group.ec2.id]
   monitoring                  = true
   subnet_id                   = data.aws_subnet.private_subnets_a.id
-  iam_instance_profile        = aws_iam_instance_profile.ec2_instance_profile.name
+  iam_instance_profile        = aws_iam_instance_profile.ec2_instance_profile.id
   user_data                   = file("user_data.sh")
 
   root_block_device {
@@ -174,13 +174,14 @@ data "aws_iam_policy_document" "ec2_instance_policy" {
   }
 }
 
-resource "aws_iam_instance_profile" "instance_profile" {
-  name = "SsmManagedInstanceProfile"
-  role = aws_iam_role.ssm_managed_instance.name
+
+resource "aws_iam_instance_profile" "ec2_instance_profile" {
+  name = "${local.application_name}-ec2-profile"
+  role = aws_iam_role.ec2_instance_role.name
 }
 
-resource "aws_iam_role" "ssm_managed_instance" {
-  name                = "SsmManagedInstance"
+resource "aws_iam_role" "ec2_instance_role" {
+  name = "${local.application_name}-role"
   managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"]
   assume_role_policy  = <<EOF
 {
@@ -197,30 +198,6 @@ resource "aws_iam_role" "ssm_managed_instance" {
 }
 EOF
 }
-
-# resource "aws_iam_instance_profile" "ec2_instance_profile" {
-#   # name = "${local.application_name}-S3-${local.application_data.accounts[local.environment]}.bucketname-RW-ec2-profile"
-#   name = "${local.application_name}-ec2-profile"
-#   role = aws_iam_role.ec2_instance_role.name
-# }
-
-# resource "aws_iam_role" "ec2_instance_role" {
-#   name = "${local.application_name}-role"
-
-#   assume_role_policy = <<EOF
-# {
-#     "Version": "2012-10-17",
-#     "Statement": [
-#         {
-#             "Action": "sts:AssumeRole",
-#             "Principal": {"Service": "ec2.amazonaws.com"},
-#             "Effect": "Allow",
-#             "Sid": ""
-#         }
-#     ]
-# }
-# EOF
-# }
 
 resource "aws_iam_role_policy" "ec2_instance_policy" { #tfsec:ignore:aws-iam-no-policy-wildcards
   name   = "${local.application_name}-ec2-policy"
