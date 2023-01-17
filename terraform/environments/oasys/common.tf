@@ -16,7 +16,6 @@ module "autoscaling_groups" {
   ssm_parameters_prefix     = each.value.ssm_parameters_prefix
   autoscaling_group         = each.value.autoscaling_group
   autoscaling_schedules     = lookup(each.value, "autoscaling_schedules", local.autoscaling_schedules_default)
-  availability_zones        = each.value.availability_zones
   iam_resource_names_prefix = each.value.iam_resource_names_prefix
   instance_profile_policies = local.ec2_common_managed_policies
   application_name          = local.application_name

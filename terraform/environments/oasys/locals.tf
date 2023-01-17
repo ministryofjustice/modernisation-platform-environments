@@ -106,7 +106,6 @@ locals {
     # server-type and nomis-environment auto set by module
     autoscaling_schedules = {}
     subnet_name           = "private"
-    availability_zones    = ["${local.region}a"]
 
     instance = {
       disable_api_termination      = false
