@@ -87,14 +87,6 @@ locals {
       https = merge(local.lb_listener_defaults.https, {
         target_groups = {
           http-7777-asg = local.lb_http_7777_rule
-          http-7777-instance = merge(local.lb_http_7777_rule, {
-            attachments = [
-              {
-                # temporary until circular dependencies fixed
-                target_id = local.environment == "test" ? "i-0983877a07e735688" : null
-              }
-            ]
-          })
         }
 
         rules = {
@@ -106,17 +98,6 @@ locals {
             conditions = [{
               host_header = {
                 values = ["*-nomis-web.nomis.${local.vpc_name}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
-              }
-            }]
-          }
-          http-7777-instance = {
-            actions = [{
-              type              = "forward"
-              target_group_name = "http-7777-instance"
-            }]
-            conditions = [{
-              host_header = {
-                values = ["*-nomis-web-instance.nomis.${local.vpc_name}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
               }
             }]
           }
@@ -134,9 +115,8 @@ locals {
         }
 
         route53_records = {
-          "t1-nomis-web.nomis"          = local.lb_listener_defaults.environment_external_dns_zone
-          "t1-nomis-web-instance.nomis" = local.lb_listener_defaults.environment_external_dns_zone
-          "weblogic-cnomt1.nomis"       = local.lb_listener_defaults.environment_external_dns_zone
+          "t1-nomis-web.nomis"    = local.lb_listener_defaults.environment_external_dns_zone
+          "weblogic-cnomt1.nomis" = local.lb_listener_defaults.environment_external_dns_zone
         }
       })
     }
