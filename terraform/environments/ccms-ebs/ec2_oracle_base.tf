@@ -117,7 +117,7 @@ sudo yum update -y
 sudo yum install -y telnet
 echo "nameserver 10.26.56.2" | sudo tee /etc/resolv.conf -a
 sudo touch /etc/dhcp/dhclient.conf
-echo "supersede domain-name-servers 10.26.56.2;" | sudo tee /etc/dhcp/dhclient.conf
+echo "supersede domain-name-servers 10.26.56.2;" | sudo tee /etc/dhcp/dhclient.conf -a
 #sudo systemctl reload NetworkManager
 sudo systemctl restart amazon-ssm-agent
 echo date
