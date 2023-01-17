@@ -104,7 +104,7 @@ exec > /tmp/userdata.log 2>&1
 echo date
 sudo yum update -y
 sudo yum install -y telnet
-echo "nameserver 10.26.56.2" >> /etc/resolv.conf
+echo "nameserver 10.26.56.2" | sudo tee /etc/resolv.conf -a
 sudo systemctl restart amazon-ssm-agent
 echo date
 
