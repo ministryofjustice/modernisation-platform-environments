@@ -106,7 +106,7 @@ locals {
     # server-type and nomis-environment auto set by module
     autoscaling_schedules = {}
     subnet_name           = "private"
-    subnet_ids            = data.aws_subnet.private_subnets_a
+    subnet_ids            = [data.aws_subnet.private_subnets_a]
 
     instance = {
       disable_api_termination      = false
