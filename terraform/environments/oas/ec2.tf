@@ -160,6 +160,13 @@ resource "aws_security_group" "ec2" {
     protocol    = "tcp"
     cidr_blocks = [data.aws_vpc.shared.cidr_block] #!ImportValue env-VpcCidr
   }
+  egress {
+    description = "Access to the internet for yum access"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = [data.aws_vpc.shared.cidr_block] #!ImportValue env-VpcCidr
+  }
 }
 
 
