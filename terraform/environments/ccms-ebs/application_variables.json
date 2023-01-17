@@ -5,7 +5,10 @@
       "ec2_oracle_base_instance_type": "t2.large",
       "orace_base_ami_name": "import-ami-08669b9d9e0af3d67",
       "orace_base_ami_name_second": "OL7.9-x86_64-HVM-2023-01-05",
-      "key_name": "oracle-base-dev"
+      "key_name": "oracle-base-dev",
+      "ec2_policy": "developer_policy",
+      "ec2_policy_2": "sandbox_policy",
+      "ec2_policy_3": "bastion_ssm_s3"
     },
     "test": {
       "example_var": "test-data"
