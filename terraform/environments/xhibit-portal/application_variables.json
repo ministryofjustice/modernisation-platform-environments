@@ -101,7 +101,7 @@
       "buildserver-disk-1-snapshot": "snap-08b1c019201557295",
       "suprig01-baremetal-ami": "ami-00774479ee85c5c3a",
       "iisrelay-ami": "ami-04f91f9d2c59547ee",
-      "iisrelay-disk-1-snapshot": "snap-051f581d753d3827a"
+      "iisrelay-disk-1-snapshot": "snap-0d54fc02d80b06efe"
     }
   }
 }
