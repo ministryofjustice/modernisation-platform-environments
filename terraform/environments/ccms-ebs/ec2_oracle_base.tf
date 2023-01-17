@@ -70,21 +70,9 @@ resource "aws_iam_role" "role_stsassume_oracle_base" {
   )
 }
 
-#resource "aws_iam_role_policy_attachment" "ssm_policy_oracle_base" {
-#  role       = aws_iam_role.role_stsassume_oracle_base.name
-#  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
-#}
-
-
-resource "aws_iam_role_policy_attachment" "ssm_policy_base" {
-  role = aws_iam_role.role_stsassume_oracle_base.name
-  for_each = toset([
-    "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
-    "arn:aws:iam::aws:policy/AmazonSSMFullAccess",
-    #  "arn:aws:iam::aws:policy/${local.application_data.accounts[local.environment].ec2_policy}",
-    #  "arn:aws:iam::aws:policy/${local.application_data.accounts[local.environment].ec2_policy_2}",
-  ])
-  policy_arn = each.value
+resource "aws_iam_role_policy_attachment" "ssm_policy_oracle_base" {
+  role       = aws_iam_role.role_stsassume_oracle_base.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
 resource "aws_iam_instance_profile" "iam_instace_profile_oracle_base" {
@@ -106,8 +94,15 @@ resource "aws_instance" "ec2_oracle_base" {
   subnet_id                   = data.aws_subnet.private_subnets_a.id
   monitoring                  = true
   ebs_optimized               = false
-  associate_public_ip_address = true
+  associate_public_ip_address = false
   iam_instance_profile        = aws_iam_instance_profile.iam_instace_profile_oracle_base.name
+  user_data                   = <<EOF
+#!/bin/bash
+
+exec > /tmp/userdata.log 2>&1
+sudo yum update -y
+EOF
+
 
   metadata_options {
     http_endpoint = "enabled"
