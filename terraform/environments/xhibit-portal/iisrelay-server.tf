@@ -50,30 +50,3 @@ resource "aws_instance" "iisrelay-server" {
   )
 }
 
-resource "aws_ebs_volume" "iisrelay-disk1" {
-  depends_on        = [aws_instance.iisrelay-server]
-  availability_zone = "${local.region}a"
-  type              = "gp3"
-  encrypted         = true
-
-  snapshot_id = local.application_data.accounts[local.environment].iisrelay-disk-1-snapshot
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "iisrelay-disk1-${local.application_name}"
-    }
-  )
-}
-
-resource "aws_volume_attachment" "iisrelay-disk1" {
-  depends_on   = [aws_instance.iisrelay-server]
-  device_name  = "xvdl"
-  force_detach = true
-  volume_id    = aws_ebs_volume.iisrelay-disk1.id
-  instance_id  = aws_instance.iisrelay-server.id
-}
-
-
-
-
