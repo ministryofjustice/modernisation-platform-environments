@@ -29,22 +29,22 @@ resource "aws_iam_policy" "oracle_ec2_ssm_policy" {
           ]
         },
         {
-            "Action": "s3:GetObject",
-            "Effect": "Allow",
-            "Resource": [
-                "arn:aws:s3:::patch-baseline-snapshot-eu-west-2/*",
-                "arn:aws:s3:::eu-west-2-birdwatcher-prod/*",
-                "arn:aws:s3:::aws-windows-downloads-eu-west-2/*",
-                "arn:aws:s3:::aws-ssm-eu-west-2/*",
-                "arn:aws:s3:::aws-ssm-document-attachments-eu-west-2/*",
-                "arn:aws:s3:::aws-ssm-distributor-file-eu-west-2/*",
-                "arn:aws:s3:::amazon-ssm-packages-eu-west-2/*",
-                "arn:aws:s3:::amazon-ssm-eu-west-2/*"
-            ]
+          "Action" : "s3:GetObject",
+          "Effect" : "Allow",
+          "Resource" : [
+            "arn:aws:s3:::patch-baseline-snapshot-eu-west-2/*",
+            "arn:aws:s3:::eu-west-2-birdwatcher-prod/*",
+            "arn:aws:s3:::aws-windows-downloads-eu-west-2/*",
+            "arn:aws:s3:::aws-ssm-eu-west-2/*",
+            "arn:aws:s3:::aws-ssm-document-attachments-eu-west-2/*",
+            "arn:aws:s3:::aws-ssm-distributor-file-eu-west-2/*",
+            "arn:aws:s3:::amazon-ssm-packages-eu-west-2/*",
+            "arn:aws:s3:::amazon-ssm-eu-west-2/*"
+          ]
         }
       ]
     }
-)
+  )
 
 }
 
