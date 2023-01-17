@@ -174,29 +174,53 @@ data "aws_iam_policy_document" "ec2_instance_policy" {
   }
 }
 
-resource "aws_iam_instance_profile" "ec2_instance_profile" {
-  # name = "${local.application_name}-S3-${local.application_data.accounts[local.environment]}.bucketname-RW-ec2-profile"
-  name = "${local.application_name}-ec2-profile"
-  role = aws_iam_role.ec2_instance_role.name
+resource "aws_iam_instance_profile" "instance_profile" {
+  name = "SsmManagedInstanceProfile"
+  role = aws_iam_role.ssm_managed_instance.name
 }
 
-resource "aws_iam_role" "ec2_instance_role" {
-  name = "${local.application_name}-role"
-
-  assume_role_policy = <<EOF
+resource "aws_iam_role" "ssm_managed_instance" {
+  name                = "SsmManagedInstance"
+  managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"]
+  assume_role_policy  = <<EOF
 {
     "Version": "2012-10-17",
     "Statement": [
         {
-            "Action": "sts:AssumeRole",
-            "Principal": {"Service": "ec2.amazonaws.com"},
             "Effect": "Allow",
-            "Sid": ""
+            "Principal": {
+                "Service": "ec2.amazonaws.com"
+            },
+            "Action": "sts:AssumeRole"
         }
     ]
 }
 EOF
 }
+
+# resource "aws_iam_instance_profile" "ec2_instance_profile" {
+#   # name = "${local.application_name}-S3-${local.application_data.accounts[local.environment]}.bucketname-RW-ec2-profile"
+#   name = "${local.application_name}-ec2-profile"
+#   role = aws_iam_role.ec2_instance_role.name
+# }
+
+# resource "aws_iam_role" "ec2_instance_role" {
+#   name = "${local.application_name}-role"
+
+#   assume_role_policy = <<EOF
+# {
+#     "Version": "2012-10-17",
+#     "Statement": [
+#         {
+#             "Action": "sts:AssumeRole",
+#             "Principal": {"Service": "ec2.amazonaws.com"},
+#             "Effect": "Allow",
+#             "Sid": ""
+#         }
+#     ]
+# }
+# EOF
+# }
 
 resource "aws_iam_role_policy" "ec2_instance_policy" { #tfsec:ignore:aws-iam-no-policy-wildcards
   name   = "${local.application_name}-ec2-policy"
@@ -224,15 +248,15 @@ resource "aws_iam_role_policy" "ec2_instance_policy" { #tfsec:ignore:aws-iam-no-
             "Effect": "Allow",
             "Action": "s3:ListBucket",
             "Resource": [
-                "arn:aws:s3:::laa-software-library",
-                "arn:aws:s3:::laa-software-library/*"
+                "arn:aws:s3:::laa-oracle-software",
+                "arn:aws:s3:::laa-oracle-software/*"
             ]
         },
         {
             "Sid": "VisualEditor2",
             "Effect": "Allow",
             "Action": "s3:GetObject",
-            "Resource": "arn:aws:s3:::laa-software-library/*"
+            "Resource": "arn:aws:s3:::laa-oracle-software/*"
         }
     ]
 }

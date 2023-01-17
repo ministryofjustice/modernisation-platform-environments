@@ -161,5 +161,5 @@ data "aws_ssm_parameter" "modernisation_platform_account_id" {
 }
 
 data "aws_iam_policy" "ssm_ec2_policy" {
-  arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM"
+  arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
