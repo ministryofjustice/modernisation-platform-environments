@@ -14,6 +14,12 @@ variable "region" {
   default     = "eu-west-2"
 }
 
+variable "availability_zones" {
+  type        = list(string)
+  description = "List of availability zones"
+  default     = null
+}
+
 variable "subnet_ids" {
   type        = list(string)
   description = "List of subnet ids given to the ASG to set the associated AZs (and therefore redundancy of the ASG instances)"
