@@ -143,7 +143,7 @@ locals {
       health_check_type         = "ELB"
       force_delete              = true
       termination_policies      = ["OldestInstance"]
-      autoscaling_group         = ["${local.region}a"]
+      availability_zones        = ["${local.region}a"]
     }
   }
 }
