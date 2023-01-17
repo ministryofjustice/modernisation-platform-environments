@@ -172,7 +172,6 @@ variable "autoscaling_group" {
       max_group_prepared_capacity = optional(number)
       reuse_on_scale_in           = bool
     }))
-    availability_zones = optional(list(string))
   })
 }
 
