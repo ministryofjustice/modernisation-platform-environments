@@ -47,6 +47,12 @@ resource "aws_security_group" "webserver" {
     #tfsec:ignore:aws-vpc-no-public-egress-sgr
     cidr_blocks = ["0.0.0.0/0"]
   }
+  tags = merge(
+    local.tags,
+    {
+      Name = "webserver"
+    }
+  )
 }
 
 resource "aws_security_group" "oasys" {
