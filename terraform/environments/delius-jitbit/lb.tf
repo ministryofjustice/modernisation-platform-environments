@@ -18,7 +18,7 @@ resource "aws_security_group" "load_balancer_security_group" {
     description = "Open the server port"
     from_port   = 443
     to_port     = 443
-    cidr_blocks = ["0.0.0.0/0", ]
+    cidr_blocks = ["81.134.202.29/32", ]
   }
 
   egress {
@@ -27,7 +27,7 @@ resource "aws_security_group" "load_balancer_security_group" {
     from_port   = 0
     to_port     = 0
     cidr_blocks = [
-      "0.0.0.0/0",
+      "81.134.202.29/32",
     ]
   }
 
