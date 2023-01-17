@@ -132,9 +132,25 @@ EOF
   # Increase the volume size of the root volume
   root_block_device {
     volume_type = "gp3"
-    volume_size = 20
+    volume_size = 50
     encrypted   = true
+    tags = merge(local.tags,
+      { Name = "root-block" }
+    )
   }
+
+
+  ebs_block_device {
+    device_name = "/dev/sdf"
+    volume_type = "gp3"
+    volume_size = 200
+    encrypted   = true
+#    kms_key_id  = aws_kms_key.this.arn
+    tags = merge(local.tags,
+      { Name = "ebs-block1" }
+    )
+  }
+
   tags = merge(local.tags,
     { Name = lower(format("ec2-%s-%s-OracleBase", local.application_name, local.environment)) }
   )
