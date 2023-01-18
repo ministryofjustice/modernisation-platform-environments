@@ -1,4 +1,4 @@
-#tfsec:ignore:aws-elbv2-alb-not-public
+#tfsec:ignore:aws-elb-alb-not-public
 resource "aws_lb" "external" {
   name               = "${local.application_name}-lb"
   internal           = false
@@ -31,7 +31,7 @@ resource "aws_security_group" "load_balancer_security_group" {
   )
 }
 
-#tfsec:ignore:aws-elbv2-http-not-used
+#tfsec:ignore:aws-elb-http-not-used
 resource "aws_lb_listener" "listener" {
   load_balancer_arn = aws_lb.external.id
   port              = 443
