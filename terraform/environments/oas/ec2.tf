@@ -3,8 +3,8 @@ locals {
 #!/bin/bash
 cd /tmp
 yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
-systemctl start amazon-ssm-agent
-systemctl enable amazon-ssm-agent
+sudo systemctl start amazon-ssm-agent
+sudo systemctl enable amazon-ssm-agent
 EOF
 }
 
@@ -18,7 +18,7 @@ resource "aws_instance" "oas_app_instance" {
   monitoring                  = true
   subnet_id                   = data.aws_subnet.private_subnets_a.id
   # iam_instance_profile        = aws_iam_instance_profile.ec2_instance_profile.id
-  iam_instance_profile        = aws_iam_instance_profile.ec2_common_policy.id
+  iam_instance_profile        = aws_iam_instance_profile.ec2_instance_profile.id
   # user_data                 = file("user_data.sh")
   user_data_base64 = base64encode(local.instance-userdata)
 
@@ -220,6 +220,25 @@ resource "aws_iam_instance_profile" "ec2_instance_profile" {
   role = aws_iam_role.ec2_instance_role.name
 }
 
+# resource "aws_iam_role" "ec2_instance_role" {
+#   name                = "${local.application_name}-role"
+#   managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"]
+#   assume_role_policy  = <<EOF
+# {
+#     "Version": "2012-10-17",
+#     "Statement": [
+#         {
+#             "Effect": "Allow",
+#             "Principal": {
+#                 "Service": "ec2.amazonaws.com"
+#             },
+#             "Action": "sts:AssumeRole"
+#         }
+#     ]
+# }
+# EOF
+# }
+
 resource "aws_iam_role" "ec2_instance_role" {
   name                = "${local.application_name}-role"
   managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"]
@@ -282,7 +301,7 @@ EOF
 
 resource "aws_iam_role_policy_attachment" "ssm-attach-policy" {
   role       = aws_iam_role.ec2_instance_role.name
-  policy_arn = data.aws_iam_policy.ssm_ec2_policy.arn
+  policy_arn = aws_iam_policy.ec2_common_policy.arn
 }
 
 data "aws_iam_policy_document" "ssm_custom" {
@@ -333,8 +352,9 @@ data "aws_iam_policy_document" "ec2_common_combined" {
 }
 
 # create single managed policy
-resource "aws_iam_policy" "ec2_common_policy" {
+resource "aws_iam_role_policy" "ec2_common_policy" {
   name        = "ec2-common-policy"
+  role        = aws_iam_role.ec2_instance_role.name
   path        = "/"
   description = "Common policy for all ec2 instances"
   policy      = data.aws_iam_policy_document.ec2_common_combined.json
@@ -345,6 +365,7 @@ resource "aws_iam_policy" "ec2_common_policy" {
     },
   )
 }
+
 
 resource "aws_ebs_volume" "EC2ServeVolume01" {
   availability_zone = "eu-west-2a"
