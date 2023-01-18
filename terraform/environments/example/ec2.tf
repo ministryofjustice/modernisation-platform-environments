@@ -1,35 +1,5 @@
-# The security group code below is required if there is no default one in place or if you want to add a specific one.
-# Uncomment the code below if this is required and chose an appropriate name  
-
-# resource "aws_security_group" "example_ec2_sg" {
-#   name        = "example_ec2_sg"
-#   description = "Controls access to EC2"
-#   vpc_id      = data.aws_vpc.shared.id
-#   tags = merge(local.tags,
-#     { Name = lower(format("sg-%s-%s-example", local.application_name, local.environment)) }
-#   )
-# }
-# resource "aws_security_group_rule" "ingress_traffic" {
-#   for_each          = local.application_data.example_ec2_sg_rules
-#   description       = format("Traffic for %s %d", each.value.protocol, each.value.from_port)
-#   from_port         = each.value.from_port
-#   protocol          = each.value.protocol
-#   security_group_id = aws_security_group.example_ec2_sg.id
-#   to_port           = each.value.to_port
-#   type              = "ingress"
-#   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-# }
-
-# resource "aws_security_group_rule" "egress_traffic" {
-#   for_each                 = local.application_data.example_ec2_sg_rules
-#   description              = format("Outbound traffic for %s %d", each.value.protocol, each.value.from_port)
-#   from_port                = each.value.from_port
-#   protocol                 = each.value.protocol
-#   security_group_id        = aws_security_group.example_ec2_sg.id
-#   to_port                  = each.value.to_port
-#   type                     = "egress"
-#   source_security_group_id = aws_security_group.example_ec2_sg.id
-# }
+# The security group code is in the original-ec2.tf if is required. It will be needed if there is no default one in place or if you want to add a specific one.
+# Copy the code from the above location and give it a suitable name.  
 
 # This code builds a simple EC2 instance and, if needed, increases the size of root volume (commented out at present)
 
@@ -40,12 +10,7 @@ resource "aws_instance" "app_server" {
   instance_type = "t3.micro"
 
 
-  # Increase the volume size of the root volume
-  #   root_block_device {
-  #     volume_type = "gp3"
-  #     volume_size = 20
-  #     encrypted   = true
-  #   }
+  # The code to increase the volume size of the root volume is also in original-ec2.tf if that is needed. Add it here if required.
 
   tags = {
     Name = "example-EC2"
