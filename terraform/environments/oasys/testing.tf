@@ -121,13 +121,11 @@ resource "aws_launch_template" "webserver_test_template" {
   image_id                             = data.aws_ami.linux_2_image.id
   instance_initiated_shutdown_behavior = "terminate"
   instance_type                        = "t3.micro"
-
   metadata_options {
     http_endpoint               = "enabled" # defaults to enabled but is required if http_tokens is specified
     http_put_response_hop_limit = 1         # default is 1, value values are 1 through 64
     http_tokens                 = "required"
   }
-
   monitoring {
     enabled = true
   }
