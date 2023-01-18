@@ -107,6 +107,21 @@ resource "aws_security_group" "ec2" {
     protocol    = "tcp"
     cidr_blocks = [data.aws_vpc.shared.cidr_block] #!ImportValue env-VpcCidr
   }
+  ingress {
+    description = "Inbound internet access"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = [data.aws_vpc.shared.cidr_block] #!ImportValue env-VpcCidr
+  }
+  ingress {
+    description = ""
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = [data.aws_vpc.shared.cidr_block] #!ImportValue env-VpcCidr
+  }
+
 
   egress {
     description     = "Allow AWS SSM Session Manager"
@@ -172,9 +187,16 @@ resource "aws_security_group" "ec2" {
     cidr_blocks = [data.aws_vpc.shared.cidr_block] #!ImportValue env-VpcCidr
   }
   egress {
-    description = "Access to the internet for yum access"
+    description = "Outbound internet access"
     from_port   = 80
     to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = [data.aws_vpc.shared.cidr_block] #!ImportValue env-VpcCidr
+  }
+  egress {
+    description = ""
+    from_port   = 22
+    to_port     = 22
     protocol    = "tcp"
     cidr_blocks = [data.aws_vpc.shared.cidr_block] #!ImportValue env-VpcCidr
   }
