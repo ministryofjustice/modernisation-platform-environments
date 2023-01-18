@@ -1,26 +1,26 @@
 
 
-# Security Groups
-resource "aws_security_group" "webserver_test" {
-  description = "Configure webserver access - ingress should be only from Systems Session Manager (SSM)"
-  name        = "webserver-test"
-  vpc_id      = data.aws_vpc.shared.id
+# # Security Groups
+# resource "aws_security_group" "webserver_test" {
+#   description = "Configure webserver access - ingress should be only from Systems Session Manager (SSM)"
+#   name        = "webserver-test"
+#   vpc_id      = data.aws_vpc.shared.id
 
-  tags = {
-    Name = "webserver-test"
-  }
-}
+#   tags = {
+#     Name = "webserver-test"
+#   }
+# }
 
-resource "aws_security_group_rule" "webserver_linux_egress_1" {
-  security_group_id = aws_security_group.webserver_test.id
+# resource "aws_security_group_rule" "webserver_linux_egress_1" {
+#   security_group_id = aws_security_group.webserver_test.id
 
-  description = "Allow all egress"
-  type        = "egress"
-  from_port   = "0"
-  to_port     = "65535"
-  protocol    = "TCP"
-  cidr_blocks = ["0.0.0.0/0"]
-}
+#   description = "Allow all egress"
+#   type        = "egress"
+#   from_port   = "0"
+#   to_port     = "65535"
+#   protocol    = "TCP"
+#   cidr_blocks = ["0.0.0.0/0"]
+# }
 
 # IAM
 data "aws_iam_policy_document" "webserver_test_assume_policy_document" {
@@ -135,7 +135,7 @@ resource "aws_launch_template" "webserver_test_template" {
   network_interfaces {
     associate_public_ip_address = false
     device_index                = 0
-    security_groups             = [aws_security_group.webserver_test.id]
+    security_groups             = [aws_security_group.webserver.id]
     subnet_id                   = data.aws_subnet.private_subnets_a.id
     delete_on_termination       = true
   }
