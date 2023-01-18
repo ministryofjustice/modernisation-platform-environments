@@ -17,7 +17,8 @@ resource "aws_instance" "oas_app_instance" {
   security_groups             = [aws_security_group.ec2.id]
   monitoring                  = true
   subnet_id                   = data.aws_subnet.private_subnets_a.id
-  iam_instance_profile        = aws_iam_instance_profile.ec2_instance_profile.id
+  # iam_instance_profile        = aws_iam_instance_profile.ec2_instance_profile.id
+  iam_instance_profile        = aws_iam_instance_profile.ec2_common_policy.id
   # user_data                 = file("user_data.sh")
   user_data_base64 = base64encode(local.instance-userdata)
 
@@ -214,7 +215,6 @@ data "aws_iam_policy_document" "ec2_instance_policy" {
   }
 }
 
-
 resource "aws_iam_instance_profile" "ec2_instance_profile" {
   name = "${local.application_name}-ec2-profile"
   role = aws_iam_role.ec2_instance_role.name
@@ -283,6 +283,67 @@ EOF
 resource "aws_iam_role_policy_attachment" "ssm-attach-policy" {
   role       = aws_iam_role.ec2_instance_role.name
   policy_arn = data.aws_iam_policy.ssm_ec2_policy.arn
+}
+
+data "aws_iam_policy_document" "ssm_custom" {
+  statement {
+    sid    = "CustomSsmPolicy"
+    effect = "Allow"
+    actions = [
+      "ssm:DescribeAssociation",
+      "ssm:DescribeDocument",
+      "ssm:GetDeployablePatchSnapshotForInstance",
+      "ssm:GetDocument",
+      "ssm:GetManifest",
+      "ssm:GetParameter",
+      "ssm:GetParameters",
+      "ssm:ListAssociations",
+      "ssm:ListInstanceAssociations",
+      "ssm:PutInventory",
+      "ssm:PutComplianceItems",
+      "ssm:PutConfigurePackageResult",
+      "ssm:UpdateAssociationStatus",
+      "ssm:UpdateInstanceAssociationStatus",
+      "ssm:UpdateInstanceInformation",
+      "ssmmessages:CreateControlChannel",
+      "ssmmessages:CreateDataChannel",
+      "ssmmessages:OpenControlChannel",
+      "ssmmessages:OpenDataChannel",
+      "ec2messages:AcknowledgeMessage",
+      "ec2messages:DeleteMessage",
+      "ec2messages:FailMessage",
+      "ec2messages:GetEndpoint",
+      "ec2messages:GetMessages",
+      "ec2messages:SendReply"
+    ]
+    # skipping these as policy is a scoped down version of Amazon provided AmazonSSMManagedInstanceCore managed policy.  Permissions required for SSM function
+
+    #checkov:skip=CKV_AWS_111: "Ensure IAM policies does not allow write access without constraints"
+    #checkov:skip=CKV_AWS_108: "Ensure IAM policies does not allow data exfiltration"
+    resources = ["*"] #tfsec:ignore:aws-iam-no-policy-wildcards
+  }
+}
+
+# combine ec2-common policy documents
+data "aws_iam_policy_document" "ec2_common_combined" {
+  source_policy_documents = [
+    data.aws_iam_policy_document.ssm_custom.json,
+    data.aws_iam_policy_document.ec2_instance_policy.json
+  ]
+}
+
+# create single managed policy
+resource "aws_iam_policy" "ec2_common_policy" {
+  name        = "ec2-common-policy"
+  path        = "/"
+  description = "Common policy for all ec2 instances"
+  policy      = data.aws_iam_policy_document.ec2_common_combined.json
+  tags = merge(
+    local.tags,
+    {
+      Name = "ec2-common-policy"
+    },
+  )
 }
 
 resource "aws_ebs_volume" "EC2ServeVolume01" {
