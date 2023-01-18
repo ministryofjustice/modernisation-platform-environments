@@ -1,3 +1,5 @@
+# Uncomment this code to create a linux bastion to access EC2s without the SSM agent installed
+
 locals {
   public_key_data = jsondecode(file("./bastion_linux.json"))
 }
