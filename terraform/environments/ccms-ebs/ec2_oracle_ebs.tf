@@ -26,6 +26,18 @@ resource "aws_instance" "ec2_oracle_base_ebs" {
   associate_public_ip_address = false
   iam_instance_profile = aws_iam_instance_profile.iam_instace_profile_oracle_base.name
 
+  user_data = <<EOF
+#!/bin/bash
+
+exec > /tmp/userdata.log 2>&1
+sudo systemctl stop amazon-ssm-agent
+sudo rm -rf /var/lib/amazon/ssm/ipc/
+sudo systemctl start amazon-ssm-agent
+sudo mount -a
+
+EOF
+
+
   metadata_options {
     http_endpoint = "enabled"
     http_tokens   = "required"
