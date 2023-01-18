@@ -9,8 +9,7 @@ resource "aws_instance" "app_server" {
   #ami           = "ami-0e322684a5a0074ce"   # Microsoft Windows Server 2022 Full Locale English
   instance_type = "t3.micro"
 
-
-  # The code to increase the volume size of the root volume is also in original-ec2.tf if that is needed. Add it here if required.
+# The code to increase the volume size of the root volume is also in original-ec2.tf if that is needed. Add it here if required.
 
   tags = {
     Name = "example-EC2"
