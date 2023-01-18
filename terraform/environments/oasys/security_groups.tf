@@ -7,52 +7,62 @@ resource "aws_security_group" "webserver" {
   name        = "webserver"
   vpc_id      = data.aws_vpc.shared.id
 
-  ingress {
-    description = "Internal access to self on all ports"
-    from_port   = 0
-    to_port     = 0
-    protocol    = -1
-    self        = true
-  }
+  # ingress {
+  #   description = "Internal access to self on all ports"
+  #   from_port   = 0
+  #   to_port     = 0
+  #   protocol    = -1
+  #   self        = true
+  # }
 
-  ingress {
-    description     = "SSH from Bastion"
-    from_port       = "22"
-    to_port         = "22"
-    protocol        = "TCP"
-    security_groups = [module.bastion_linux.bastion_security_group]
-  }
+  # ingress {
+  #   description     = "SSH from Bastion"
+  #   from_port       = "22"
+  #   to_port         = "22"
+  #   protocol        = "TCP"
+  #   security_groups = [module.bastion_linux.bastion_security_group]
+  # }
 
-  ingress {
-    description = "access from Cloud Platform Prometheus server"
-    from_port   = "9100"
-    to_port     = "9100"
-    protocol    = "TCP"
-    cidr_blocks = [local.cidrs.cloud_platform]
-  }
+  # ingress {
+  #   description = "access from Cloud Platform Prometheus server"
+  #   from_port   = "9100"
+  #   to_port     = "9100"
+  #   protocol    = "TCP"
+  #   cidr_blocks = [local.cidrs.cloud_platform]
+  # }
 
-  ingress {
-    description = "access from Cloud Platform Prometheus script exporter collector"
-    from_port   = "9172"
-    to_port     = "9172"
-    protocol    = "TCP"
-    cidr_blocks = [local.cidrs.cloud_platform]
-  }
+  # ingress {
+  #   description = "access from Cloud Platform Prometheus script exporter collector"
+  #   from_port   = "9172"
+  #   to_port     = "9172"
+  #   protocol    = "TCP"
+  #   cidr_blocks = [local.cidrs.cloud_platform]
+  # }
 
-  egress {
-    description = "allow all"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    #tfsec:ignore:aws-vpc-no-public-egress-sgr
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+  # egress {
+  #   description = "allow all"
+  #   from_port   = 0
+  #   to_port     = 0
+  #   protocol    = "-1"
+  #   #tfsec:ignore:aws-vpc-no-public-egress-sgr
+  #   cidr_blocks = ["0.0.0.0/0"]
+  # }
   tags = merge(
     local.tags,
     {
       Name = "webserver"
     }
   )
+}
+resource "aws_security_group_rule" "webserver_linux_egress_1" {
+  security_group_id = aws_security_group.webserver.id
+
+  description = "Allow all egress"
+  type        = "egress"
+  from_port   = "0"
+  to_port     = "65535"
+  protocol    = "TCP"
+  cidr_blocks = ["0.0.0.0/0"]
 }
 
 resource "aws_security_group" "oasys" {
