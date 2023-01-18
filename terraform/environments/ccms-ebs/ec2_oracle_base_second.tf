@@ -26,7 +26,7 @@ resource "aws_instance" "ec2_oracle_base_second" {
   ebs_optimized               = false
   associate_public_ip_address = false
   #iam_instance_profile        = aws_iam_instance_profile.iam_instace_profile_oracle_base_2.name
-  iam_instance_profile        = aws_iam_instance_profile.iam_instace_profile_oracle_base.name
+  iam_instance_profile = aws_iam_instance_profile.iam_instace_profile_oracle_base.name
   # explicitly adding namespace server due to oracle linux not having the servers
   user_data = <<EOF
 #!/bin/bash
