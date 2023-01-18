@@ -120,21 +120,21 @@ resource "aws_instance" "ec2_oracle_base" {
   associate_public_ip_address = false
   iam_instance_profile        = aws_iam_instance_profile.iam_instace_profile_oracle_base.name
   # explicitly adding namespace server due to oracle linux not having the servers
-#  user_data = <<EOF
-##!/bin/bash
-#
-#exec > /tmp/userdata.log 2>&1
-#echo date
-#sudo yum update -y
-#sudo yum install -y telnet
-#echo "nameserver 10.26.56.2" | sudo tee /etc/resolv.conf -a
-#sudo touch /etc/dhcp/dhclient.conf
-#echo "supersede domain-name-servers 10.26.56.2;" | sudo tee /etc/dhcp/dhclient.conf -a
-##sudo systemctl reload NetworkManager
-#sudo systemctl restart amazon-ssm-agent
-#echo date
-#
-#EOF
+  #  user_data = <<EOF
+  ##!/bin/bash
+  #
+  #exec > /tmp/userdata.log 2>&1
+  #echo date
+  #sudo yum update -y
+  #sudo yum install -y telnet
+  #echo "nameserver 10.26.56.2" | sudo tee /etc/resolv.conf -a
+  #sudo touch /etc/dhcp/dhclient.conf
+  #echo "supersede domain-name-servers 10.26.56.2;" | sudo tee /etc/dhcp/dhclient.conf -a
+  ##sudo systemctl reload NetworkManager
+  #sudo systemctl restart amazon-ssm-agent
+  #echo date
+  #
+  #EOF
 
   metadata_options {
     http_endpoint = "enabled"
