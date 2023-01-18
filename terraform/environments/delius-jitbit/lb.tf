@@ -21,16 +21,6 @@ resource "aws_security_group" "load_balancer_security_group" {
     cidr_blocks = ["81.134.202.29/32", ]
   }
 
-  egress {
-    protocol    = "-1"
-    description = "Open all outbound ports"
-    from_port   = 0
-    to_port     = 0
-    cidr_blocks = [
-      "0.0.0.0/0",
-    ]
-  }
-
   tags = merge(
     local.tags,
     {
