@@ -1,6 +1,7 @@
+#tfsec:ignore:aws-elbv2-alb-not-public
 resource "aws_lb" "external" {
   name               = "${local.application_name}-lb"
-  internal           = false #tfsec:ignore:aws-elbv2-alb-not-public
+  internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.load_balancer_security_group.id]
   subnets            = data.aws_subnets.shared-public.ids
@@ -30,10 +31,11 @@ resource "aws_security_group" "load_balancer_security_group" {
   )
 }
 
+#tfsec:ignore:aws-elbv2-http-not-used
 resource "aws_lb_listener" "listener" {
   load_balancer_arn = aws_lb.external.id
   port              = 443
-  protocol          = "HTTP" #tfsec:ignore:aws-elbv2-http-not-used
+  protocol          = "HTTP"
 
   default_action {
     target_group_arn = aws_lb_target_group.target_group.id
