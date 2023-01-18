@@ -220,25 +220,6 @@ resource "aws_iam_instance_profile" "ec2_instance_profile" {
   role = aws_iam_role.ec2_instance_role.name
 }
 
-# resource "aws_iam_role" "ec2_instance_role" {
-#   name                = "${local.application_name}-role"
-#   managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"]
-#   assume_role_policy  = <<EOF
-# {
-#     "Version": "2012-10-17",
-#     "Statement": [
-#         {
-#             "Effect": "Allow",
-#             "Principal": {
-#                 "Service": "ec2.amazonaws.com"
-#             },
-#             "Action": "sts:AssumeRole"
-#         }
-#     ]
-# }
-# EOF
-# }
-
 resource "aws_iam_role" "ec2_instance_role" {
   name                = "${local.application_name}-role"
   managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"]
@@ -258,50 +239,11 @@ resource "aws_iam_role" "ec2_instance_role" {
 EOF
 }
 
-resource "aws_iam_role_policy" "ec2_instance_policy" { #tfsec:ignore:aws-iam-no-policy-wildcards
+resource "aws_iam_role_policy" "ec2_instance_policy" {
+  #tfsec:ignore:aws-iam-no-policy-wildcards
   name   = "${local.application_name}-ec2-policy"
   role   = aws_iam_role.ec2_instance_role.id
-  policy = <<EOF
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Sid": "VisualEditor0",
-            "Effect": "Allow",
-            "Action": [
-                "logs:CreateLogStream",
-                "ec2:DescribeInstances",
-                "ec2:CreateTags",
-                "logs:DescribeLogStreams",
-                "logs:PutRetentionPolicy",
-                "logs:CreateLogGroup",
-                "logs:PutLogEvents"
-            ],
-            "Resource": "*"
-        },
-        {
-            "Sid": "VisualEditor1",
-            "Effect": "Allow",
-            "Action": "s3:ListBucket",
-            "Resource": [
-                "arn:aws:s3:::laa-oracle-software",
-                "arn:aws:s3:::laa-oracle-software/*"
-            ]
-        },
-        {
-            "Sid": "VisualEditor2",
-            "Effect": "Allow",
-            "Action": "s3:GetObject",
-            "Resource": "arn:aws:s3:::laa-oracle-software/*"
-        }
-    ]
-}
-EOF
-}
-
-resource "aws_iam_role_policy_attachment" "ssm-attach-policy" {
-  role       = aws_iam_role.ec2_instance_role.name
-  policy_arn = aws_iam_policy.ec2_common_policy.arn
+  policy = data.aws_iam_policy_document.ec2_common_combined.json
 }
 
 data "aws_iam_policy_document" "ssm_custom" {
@@ -349,21 +291,6 @@ data "aws_iam_policy_document" "ec2_common_combined" {
     data.aws_iam_policy_document.ssm_custom.json,
     data.aws_iam_policy_document.ec2_instance_policy.json
   ]
-}
-
-# create single managed policy
-resource "aws_iam_role_policy" "ec2_common_policy" {
-  name        = "ec2-common-policy"
-  role        = aws_iam_role.ec2_instance_role.name
-  path        = "/"
-  description = "Common policy for all ec2 instances"
-  policy      = data.aws_iam_policy_document.ec2_common_combined.json
-  tags = merge(
-    local.tags,
-    {
-      Name = "ec2-common-policy"
-    },
-  )
 }
 
 
