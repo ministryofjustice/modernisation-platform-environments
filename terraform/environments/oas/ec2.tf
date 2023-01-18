@@ -18,7 +18,7 @@ resource "aws_instance" "oas_app_instance" {
   monitoring                  = true
   subnet_id                   = data.aws_subnet.private_subnets_a.id
   # iam_instance_profile        = aws_iam_instance_profile.ec2_instance_profile.id
-  iam_instance_profile        = aws_iam_instance_profile.ec2_common_policy.id
+  iam_instance_profile = aws_iam_instance_profile.ec2_common_policy.id
   # user_data                 = file("user_data.sh")
   user_data_base64 = base64encode(local.instance-userdata)
 
