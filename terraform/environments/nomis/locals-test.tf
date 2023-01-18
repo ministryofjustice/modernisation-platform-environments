@@ -208,7 +208,6 @@ locals {
         }
         subnet_name = "public"
         ami_name    = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-01-03T17-01-12.128Z"
-        branch      = "nomis/DSOS-1620/weblogic-tagsar-fix"
         # branch   = var.BRANCH_NAME # comment in if testing ansible
       }
       t1-ndh-app-1 = {
