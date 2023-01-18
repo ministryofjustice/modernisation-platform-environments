@@ -47,3 +47,27 @@ resource "aws_security_group" "webserver" {
     }
   )
 }
+
+resource "aws_security_group" "oasys" {
+  name        = "${local.application_name}-${local.environment}-database-security-group"
+  description = "Security group for ${local.application_name} ${local.environment} database"
+  vpc_id      = data.aws_vpc.shared.id
+  tags = merge(local.tags,
+    { Name = lower(format("%s-%s-database-security-group", local.application_name, local.environment)) }
+  )
+  ingress {
+    description = "Allow access from live and test environments"
+    from_port   = 1521
+    to_port     = 1521
+    protocol    = "tcp"
+    cidr_blocks = [local.cidrs.noms_live, data.aws_vpc.shared.cidr_block, local.cidrs.noms_test]
+  }
+  egress {
+    description = "allow all"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    #tfsec:ignore:aws-vpc-no-public-egress-sgr
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}

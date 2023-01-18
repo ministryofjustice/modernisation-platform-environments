@@ -170,19 +170,11 @@ locals {
         ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-01-03T17-01-12.128Z"
         # branch = var.BRANCH_NAME # comment in if testing ansible
 
-        # NOTE: using standalone instance until connectivity from FixNGo in place
         autoscaling_group = {
-          desired_capacity = 0
-          warm_pool        = null
+          desired_capacity  = 1
+          warm_pool         = null
+          target_group_arns = local.environment == "test" ? [module.lb_listener["https"].aws_lb_target_group["http-7777-asg"].arn] : []
         }
-      }
-    }
-
-    # Legacy weblogic, to be zapped imminently
-    weblogics = {
-      CNOMT1 = {
-        ami_name     = "nomis_Weblogic_2022*"
-        asg_max_size = 1
       }
     }
 
@@ -218,6 +210,24 @@ locals {
         ami_name    = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-01-03T17-01-12.128Z"
         # branch   = var.BRANCH_NAME # comment in if testing ansible
       }
+      t1-ndh-app-1 = {
+        tags = {
+          server-type       = "ndh-app"
+          description       = "Standalone EC2 for testing RHEL7.9 NDH App"
+          nomis-environment = "t1"
+        }
+        ami_name = "nomis_rhel_7_9_baseimage_2022-11-01T13-43-46.384Z"
+        # branch   = var.BRANCH_NAME # comment in if testing ansible
+      }
+      t1-ndh-ems-1 = {
+        tags = {
+          server-type       = "ndh-ems"
+          description       = "Standalone EC2 for testing RHEL7.9 NDH EMS"
+          nomis-environment = "t1"
+        }
+        ami_name = "nomis_rhel_7_9_baseimage_2022-11-01T13-43-46.384Z"
+        # branch   = var.BRANCH_NAME # comment in if testing ansible
+      }
     }
     ec2_test_autoscaling_groups = {
       t1-ndh-app = {
@@ -229,7 +239,7 @@ locals {
         ami_name = "nomis_rhel_7_9_baseimage_2022-11-01T13-43-46.384Z"
         # branch   = var.BRANCH_NAME # comment in if testing ansible
         autoscaling_group = {
-          desired_capacity = 1
+          desired_capacity = 0
         }
         autoscaling_schedules = {}
         subnet_name           = "data"
@@ -243,7 +253,7 @@ locals {
         ami_name = "nomis_rhel_7_9_baseimage_2022-11-01T13-43-46.384Z"
         # branch   = var.BRANCH_NAME # comment in if testing ansible
         autoscaling_group = {
-          desired_capacity = 1
+          desired_capacity = 0
         }
         autoscaling_schedules = {}
         subnet_name           = "data"
