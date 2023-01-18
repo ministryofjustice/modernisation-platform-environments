@@ -115,13 +115,13 @@ resource "aws_security_group" "ec2" {
     protocol    = "tcp"
     cidr_blocks = [data.aws_vpc.shared.cidr_block] #!ImportValue env-VpcCidr
   }
-  ingress {
-    description = ""
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = [data.aws_vpc.shared.cidr_block] #!ImportValue env-VpcCidr
-  }
+  # ingress {
+  #   description = ""
+  #   from_port   = 22
+  #   to_port     = 22
+  #   protocol    = "tcp"
+  #   cidr_blocks = [data.aws_vpc.shared.cidr_block] #!ImportValue env-VpcCidr
+  # }
 
 
   egress {
@@ -194,26 +194,25 @@ resource "aws_security_group" "ec2" {
     protocol    = "tcp"
     cidr_blocks = [data.aws_vpc.shared.cidr_block] #!ImportValue env-VpcCidr
   }
-  egress {
-    description = ""
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = [data.aws_vpc.shared.cidr_block] #!ImportValue env-VpcCidr
-  }
+  # egress {
+  #   description = ""
+  #   from_port   = 22
+  #   to_port     = 22
+  #   protocol    = "tcp"
+  #   cidr_blocks = [data.aws_vpc.shared.cidr_block] #!ImportValue env-VpcCidr
+  # }
 }
 
+# data "aws_iam_policy_document" "ec2_instance_policy" {
+#   statement {
+#     actions = ["sts:AssumeRole"]
 
-data "aws_iam_policy_document" "ec2_instance_policy" {
-  statement {
-    actions = ["sts:AssumeRole"]
-
-    principals {
-      type        = "Service"
-      identifiers = ["ec2.amazonaws.com"]
-    }
-  }
-}
+#     principals {
+#       type        = "Service"
+#       identifiers = ["ec2.amazonaws.com"]
+#     }
+#   }
+# }
 
 resource "aws_iam_instance_profile" "ec2_instance_profile" {
   name = "${local.application_name}-ec2-profile"
@@ -243,55 +242,76 @@ resource "aws_iam_role_policy" "ec2_instance_policy" {
   #tfsec:ignore:aws-iam-no-policy-wildcards
   name   = "${local.application_name}-ec2-policy"
   role   = aws_iam_role.ec2_instance_role.id
-  policy = data.aws_iam_policy_document.ec2_common_combined.json
-}
 
-data "aws_iam_policy_document" "ssm_custom" {
-  statement {
-    sid    = "CustomSsmPolicy"
-    effect = "Allow"
-    actions = [
-      "ssm:DescribeAssociation",
-      "ssm:DescribeDocument",
-      "ssm:GetDeployablePatchSnapshotForInstance",
-      "ssm:GetDocument",
-      "ssm:GetManifest",
-      "ssm:GetParameter",
-      "ssm:GetParameters",
-      "ssm:ListAssociations",
-      "ssm:ListInstanceAssociations",
-      "ssm:PutInventory",
-      "ssm:PutComplianceItems",
-      "ssm:PutConfigurePackageResult",
-      "ssm:UpdateAssociationStatus",
-      "ssm:UpdateInstanceAssociationStatus",
-      "ssm:UpdateInstanceInformation",
-      "ssmmessages:CreateControlChannel",
-      "ssmmessages:CreateDataChannel",
-      "ssmmessages:OpenControlChannel",
-      "ssmmessages:OpenDataChannel",
-      "ec2messages:AcknowledgeMessage",
-      "ec2messages:DeleteMessage",
-      "ec2messages:FailMessage",
-      "ec2messages:GetEndpoint",
-      "ec2messages:GetMessages",
-      "ec2messages:SendReply"
+  # Terraform's "jsonencode" function converts a
+  # Terraform expression result to valid JSON syntax.
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "ec2:Describe*",
+        ]
+        Effect   = "Allow"
+        Resource = "*"
+      },
     ]
-    # skipping these as policy is a scoped down version of Amazon provided AmazonSSMManagedInstanceCore managed policy.  Permissions required for SSM function
-
-    #checkov:skip=CKV_AWS_111: "Ensure IAM policies does not allow write access without constraints"
-    #checkov:skip=CKV_AWS_108: "Ensure IAM policies does not allow data exfiltration"
-    resources = ["*"] #tfsec:ignore:aws-iam-no-policy-wildcards
-  }
+  })
 }
 
-# combine ec2-common policy documents
-data "aws_iam_policy_document" "ec2_common_combined" {
-  source_policy_documents = [
-    data.aws_iam_policy_document.ssm_custom.json,
-    data.aws_iam_policy_document.ec2_instance_policy.json
-  ]
-}
+# resource "aws_iam_role_policy" "ec2_instance_policy" {
+#   #tfsec:ignore:aws-iam-no-policy-wildcards
+#   name   = "${local.application_name}-ec2-policy"
+#   role   = aws_iam_role.ec2_instance_role.id
+#   policy = data.aws_iam_policy_document.ec2_common_combined.json
+# }
+
+# data "aws_iam_policy_document" "ssm_custom" {
+#   statement {
+#     sid    = "CustomSsmPolicy"
+#     effect = "Allow"
+#     actions = [
+#       "ssm:DescribeAssociation",
+#       "ssm:DescribeDocument",
+#       "ssm:GetDeployablePatchSnapshotForInstance",
+#       "ssm:GetDocument",
+#       "ssm:GetManifest",
+#       "ssm:GetParameter",
+#       "ssm:GetParameters",
+#       "ssm:ListAssociations",
+#       "ssm:ListInstanceAssociations",
+#       "ssm:PutInventory",
+#       "ssm:PutComplianceItems",
+#       "ssm:PutConfigurePackageResult",
+#       "ssm:UpdateAssociationStatus",
+#       "ssm:UpdateInstanceAssociationStatus",
+#       "ssm:UpdateInstanceInformation",
+#       "ssmmessages:CreateControlChannel",
+#       "ssmmessages:CreateDataChannel",
+#       "ssmmessages:OpenControlChannel",
+#       "ssmmessages:OpenDataChannel",
+#       "ec2messages:AcknowledgeMessage",
+#       "ec2messages:DeleteMessage",
+#       "ec2messages:FailMessage",
+#       "ec2messages:GetEndpoint",
+#       "ec2messages:GetMessages",
+#       "ec2messages:SendReply"
+#     ]
+#     # skipping these as policy is a scoped down version of Amazon provided AmazonSSMManagedInstanceCore managed policy.  Permissions required for SSM function
+
+#     #checkov:skip=CKV_AWS_111: "Ensure IAM policies does not allow write access without constraints"
+#     #checkov:skip=CKV_AWS_108: "Ensure IAM policies does not allow data exfiltration"
+#     resources = ["*"] #tfsec:ignore:aws-iam-no-policy-wildcards
+#   }
+# }
+
+# # combine ec2-common policy documents
+# data "aws_iam_policy_document" "ec2_common_combined" {
+#   source_policy_documents = [
+#     data.aws_iam_policy_document.ssm_custom.json,
+#     data.aws_iam_policy_document.ec2_instance_policy.json
+#   ]
+# }
 
 
 resource "aws_ebs_volume" "EC2ServeVolume01" {
