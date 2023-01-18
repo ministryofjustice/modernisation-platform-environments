@@ -8,6 +8,8 @@ module "s3-bucket" { #tfsec:ignore:aws-s3-enable-versioning
   versioning_enabled = false
   bucket_policy      = [data.aws_iam_policy_document.bucket_policy.json]
 
+  # Enable bucket to be destroyed when not empty
+  force_destroy = true
   # Refer to the below section "Replication" before enabling replication
   replication_enabled = false
   # Below three variables and providers configuration are only relevant if 'replication_enabled' is set to true
