@@ -86,88 +86,88 @@ resource "aws_launch_template" "this" {
   }
 }
 
-resource "aws_autoscaling_group" "this" {
-  name                      = var.name
-  desired_capacity          = var.autoscaling_group.desired_capacity
-  max_size                  = var.autoscaling_group.max_size
-  min_size                  = var.autoscaling_group.min_size
-  health_check_grace_period = var.autoscaling_group.health_check_grace_period
-  health_check_type         = var.autoscaling_group.health_check_type
-  force_delete              = var.autoscaling_group.force_delete
-  termination_policies      = var.autoscaling_group.termination_policies
-  target_group_arns         = var.autoscaling_group.target_group_arns
-  vpc_zone_identifier       = var.subnet_ids
-  #availability_zones        = var.autoscaling_group.availability_zones
-  wait_for_capacity_timeout = var.autoscaling_group.wait_for_capacity_timeout
+# resource "aws_autoscaling_group" "this" {
+#   name                      = var.name
+#   desired_capacity          = var.autoscaling_group.desired_capacity
+#   max_size                  = var.autoscaling_group.max_size
+#   min_size                  = var.autoscaling_group.min_size
+#   health_check_grace_period = var.autoscaling_group.health_check_grace_period
+#   health_check_type         = var.autoscaling_group.health_check_type
+#   force_delete              = var.autoscaling_group.force_delete
+#   termination_policies      = var.autoscaling_group.termination_policies
+#   target_group_arns         = var.autoscaling_group.target_group_arns
+#   vpc_zone_identifier       = var.subnet_ids
+#   #availability_zones        = var.autoscaling_group.availability_zones
+#   wait_for_capacity_timeout = var.autoscaling_group.wait_for_capacity_timeout
 
-  launch_template {
-    id      = aws_launch_template.this.id
-    version = "$Latest"
-  }
+#   launch_template {
+#     id      = aws_launch_template.this.id
+#     version = "$Latest"
+#   }
 
-  dynamic "initial_lifecycle_hook" {
-    for_each = var.autoscaling_group.initial_lifecycle_hooks != null ? var.autoscaling_group.initial_lifecycle_hooks : {}
-    content {
-      name                 = "${var.name}-${initial_lifecycle_hook.key}"
-      default_result       = initial_lifecycle_hook.value.default_result
-      heartbeat_timeout    = initial_lifecycle_hook.value.heartbeat_timeout
-      lifecycle_transition = initial_lifecycle_hook.value.lifecycle_transition
-    }
-  }
+#   dynamic "initial_lifecycle_hook" {
+#     for_each = var.autoscaling_group.initial_lifecycle_hooks != null ? var.autoscaling_group.initial_lifecycle_hooks : {}
+#     content {
+#       name                 = "${var.name}-${initial_lifecycle_hook.key}"
+#       default_result       = initial_lifecycle_hook.value.default_result
+#       heartbeat_timeout    = initial_lifecycle_hook.value.heartbeat_timeout
+#       lifecycle_transition = initial_lifecycle_hook.value.lifecycle_transition
+#     }
+#   }
 
-  dynamic "instance_refresh" {
-    for_each = var.autoscaling_group.instance_refresh != null ? [var.autoscaling_group.instance_refresh] : []
+#   dynamic "instance_refresh" {
+#     for_each = var.autoscaling_group.instance_refresh != null ? [var.autoscaling_group.instance_refresh] : []
 
-    content {
-      strategy = instance_refresh.value.strategy
+#     content {
+#       strategy = instance_refresh.value.strategy
 
-      preferences {
-        min_healthy_percentage = instance_refresh.value.min_healthy_percentage
-        instance_warmup        = instance_refresh.value.instance_warmup
-      }
-    }
-  }
+#       preferences {
+#         min_healthy_percentage = instance_refresh.value.min_healthy_percentage
+#         instance_warmup        = instance_refresh.value.instance_warmup
+#       }
+#     }
+#   }
 
-  dynamic "warm_pool" {
-    for_each = var.autoscaling_group.warm_pool != null ? [var.autoscaling_group.warm_pool] : []
+#   dynamic "warm_pool" {
+#     for_each = var.autoscaling_group.warm_pool != null ? [var.autoscaling_group.warm_pool] : []
 
-    content {
-      pool_state                  = warm_pool.value.pool_state
-      min_size                    = warm_pool.value.min_size
-      max_group_prepared_capacity = coalesce(warm_pool.value.max_group_prepared_capacity, var.autoscaling_group.max_size)
+#     content {
+#       pool_state                  = warm_pool.value.pool_state
+#       min_size                    = warm_pool.value.min_size
+#       max_group_prepared_capacity = coalesce(warm_pool.value.max_group_prepared_capacity, var.autoscaling_group.max_size)
 
-      instance_reuse_policy {
-        reuse_on_scale_in = warm_pool.value.reuse_on_scale_in
-      }
-    }
-  }
+#       instance_reuse_policy {
+#         reuse_on_scale_in = warm_pool.value.reuse_on_scale_in
+#       }
+#     }
+#   }
 
-  dynamic "tag" {
-    for_each = merge(local.tags, {
-      Name = var.name
-    })
-    content {
-      key                 = tag.key
-      value               = tag.value
-      propagate_at_launch = true
-    }
-  }
+#   dynamic "tag" {
+#     for_each = merge(local.tags, {
+#       Name = var.name
+#     })
+#     content {
+#       key                 = tag.key
+#       value               = tag.value
+#       propagate_at_launch = true
+#     }
+#   }
 
-  depends_on = [
-    aws_launch_template.this
-  ]
-}
+#   depends_on = [
+#     aws_launch_template.this
+#   ]
+# }
 
-resource "aws_autoscaling_schedule" "this" {
-  for_each = var.autoscaling_schedules
+# resource "aws_autoscaling_schedule" "this" {
+#   for_each = var.autoscaling_schedules
 
-  scheduled_action_name  = "${var.name}-${each.key}"
-  min_size               = coalesce(each.value.min_size, var.autoscaling_group.min_size)
-  max_size               = coalesce(each.value.max_size, var.autoscaling_group.max_size)
-  desired_capacity       = coalesce(each.value.desired_capacity, var.autoscaling_group.desired_capacity)
-  recurrence             = each.value.recurrence
-  autoscaling_group_name = aws_autoscaling_group.this.name
-}
+#   scheduled_action_name  = "${var.name}-${each.key}"
+#   min_size               = coalesce(each.value.min_size, var.autoscaling_group.min_size)
+#   max_size               = coalesce(each.value.max_size, var.autoscaling_group.max_size)
+#   desired_capacity       = coalesce(each.value.desired_capacity, var.autoscaling_group.desired_capacity)
+#   recurrence             = each.value.recurrence
+#   autoscaling_group_name = aws_autoscaling_group.this.name
+# }
 
 resource "random_password" "this" {
   for_each = var.ssm_parameters != null ? var.ssm_parameters : {}
