@@ -75,7 +75,7 @@ resource "aws_iam_role" "webserver_test_role" {
 
 resource "aws_iam_instance_profile" "webserver_test_profile" {
   name = "webserver-test-ec2-profile"
-  role = aws_iam_role.webserver_test_role.name
+  role = aws_iam_role.webserver_test_role.name # webserver-test-ec2-profile
   path = "/"
 }
 # resource "aws_iam_instance_profile" "this" {
@@ -115,7 +115,7 @@ resource "aws_launch_template" "webserver_test_template" {
   ebs_optimized = true
 
   iam_instance_profile {
-    name = aws_iam_instance_profile.webserver_test_profile.id
+    arn = "arn:aws:iam::003430027717"
   }
 
   image_id                             = data.aws_ami.linux_2_image.id
