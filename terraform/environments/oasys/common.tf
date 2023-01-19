@@ -13,7 +13,7 @@ module "autoscaling_groups" {
   user_data_cloud_init      = lookup(each.value, "user_data_cloud_init", null)
   ebs_volume_config         = lookup(each.value, "ebs_volume_config", {})
   ebs_volumes               = lookup(each.value, "ebs_volumes", {})
-  ssm_parameters_prefix     = each.value.ssm_parameters_prefix
+  ssm_parameters_prefix     = lookup(each.value, "ssm_parameters_prefix", "")
   ssm_parameters            = {}
   autoscaling_group         = each.value.autoscaling_group
   autoscaling_schedules     = lookup(each.value, "autoscaling_schedules", local.autoscaling_schedules_default)
