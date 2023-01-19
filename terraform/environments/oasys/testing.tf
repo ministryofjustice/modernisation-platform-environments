@@ -55,7 +55,7 @@ resource "aws_launch_template" "webserver_test_template" {
     arn = "arn:aws:iam::003430027717:instance-profile/ec2-webserver-asg-profile-webserver"
   }
 
-  image_id                             = "ami-0d7e8ba2c13b09494"
+  image_id                             = data.aws_ami.linux_2_image.id #"ami-0d7e8ba2c13b09494"
   instance_initiated_shutdown_behavior = "terminate"
   instance_type                        = "t3.micro"
   metadata_options {
