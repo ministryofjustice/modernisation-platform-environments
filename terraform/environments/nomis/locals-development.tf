@@ -127,6 +127,18 @@ locals {
           max_size = 1
         }
       }
+      jumpserver-2019 = {
+        ami_name = "nomis_windows_server_2019_jumpserver_release_*"
+        tags = {
+          server-type       = "jumpserver"
+          description       = "Windows Server 2019 Jumpserver for NOMIS"
+          nomis-environment = "jumpserver"
+        }
+        autoscaling_group = {
+          min_size = 0
+          max_size = 1
+        }
+      }
     }
   }
 }
