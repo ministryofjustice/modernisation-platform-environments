@@ -48,6 +48,17 @@ resource "aws_security_group" "webserver" {
   )
 }
 
+resource "aws_security_group_rule" "webserver_linux_egress_1" {
+  security_group_id = aws_security_group.webserver.id
+
+  description = "Allow all egress"
+  type        = "egress"
+  from_port   = "0"
+  to_port     = "65535"
+  protocol    = "TCP"
+  cidr_blocks = ["0.0.0.0/0"]
+}
+
 resource "aws_security_group" "oasys" {
   name        = "${local.application_name}-${local.environment}-database-security-group"
   description = "Security group for ${local.application_name} ${local.environment} database"
