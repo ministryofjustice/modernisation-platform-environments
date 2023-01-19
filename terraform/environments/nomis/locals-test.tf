@@ -61,7 +61,7 @@ locals {
         asm_flash_capacity = 2
         description        = "Test NOMIS T1 database with a dataset of T1PDL0009 (note: only NOMIS db, NDH db is not included."
         tags = {
-          monitored   = true
+          monitored   = false
           oracle-sids = "CNOMT1"
         }
       }
@@ -184,7 +184,7 @@ locals {
         tags = {
           ami                = "nomis_rhel_6_10_weblogic_appserver_10_3"
           description        = "For testing our RHEL6.10 weblogic image"
-          monitored          = true
+          monitored          = false
           os-type            = "Linux"
           component          = "web"
           server-type        = "nomis-web"
