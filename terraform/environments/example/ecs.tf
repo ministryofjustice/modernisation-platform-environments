@@ -9,7 +9,7 @@ module "ecs" {
   ami_image_id            = local.application_data.accounts[local.environment].container_ami_image_id
   instance_type           = local.application_data.accounts[local.environment].container_instance_type
   user_data               = base64encode(templatefile("${path.module}/templates/user_data.sh.tftpl", {}))
-  key_name                = local.application_data.accounts[local.environment].container_key_name
+  key_name                = local.application_data.accounts[local.environment].ecs_key_name
   task_definition         = templatefile("${path.module}/templates/task_definition.json.tftpl", {})
   ec2_desired_capacity    = local.application_data.accounts[local.environment].ec2_desired_capacity
   ec2_max_size            = local.application_data.accounts[local.environment].ec2_max_size
