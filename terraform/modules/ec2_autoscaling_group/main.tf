@@ -29,7 +29,7 @@ resource "aws_launch_template" "this" {
   }
 
   iam_instance_profile {
-    arn = aws_iam_instance_profile.this.arn
+    arn = aws_iam_instance_profile.this.name
   }
 
   metadata_options {
@@ -102,7 +102,7 @@ resource "aws_autoscaling_group" "this" {
 
   launch_template {
     id      = aws_launch_template.this.id
-    version = "$Default"
+    version = "$Latest"
   }
 
   dynamic "initial_lifecycle_hook" {
