@@ -22,29 +22,49 @@
 #   cidr_blocks = ["0.0.0.0/0"]
 # }
 
-data "aws_ami" "linux_2_image" {
-  most_recent = true
-  owners      = ["amazon"]
+# data "aws_ami" "linux_2_image" {
+#   most_recent = true
+#   owners      = ["amazon"]
 
-  filter {
-    name   = "name"
-    values = ["amzn2-ami-hvm*"]
-  }
+#   filter {
+#     name   = "name"
+#     values = ["amzn2-ami-hvm*"]
+#   }
 
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
-}
+#   filter {
+#     name   = "virtualization-type"
+#     values = ["hvm"]
+#   }
+# }
 
 resource "aws_launch_template" "webserver_test_template" {
   name = "webserver_test_template"
 
   block_device_mappings {
-    device_name = "/dev/xvda"
-
+    device_name = "/dev/sda1"
     ebs {
-      volume_size = 8
+      volume_size = 30
+      encrypted   = true
+    }
+  }
+  block_device_mappings {
+    device_name = "/dev/sda2"
+    ebs {
+      volume_size = 30
+      encrypted   = true
+    }
+  }
+  block_device_mappings {
+    device_name = "/dev/sdb" # /u01 oracle app disk
+    ebs {
+      volume_size = 128
+      encrypted   = true
+    }
+  }
+  block_device_mappings {
+    device_name = "/dev/sdc" # /u02 oracle app disk
+    ebs {
+      volume_size = 128
       encrypted   = true
     }
   }
@@ -55,7 +75,7 @@ resource "aws_launch_template" "webserver_test_template" {
     arn = "arn:aws:iam::003430027717:instance-profile/ec2-webserver-asg-profile-webserver"
   }
 
-  image_id                             = data.aws_ami.linux_2_image.id #"ami-0d7e8ba2c13b09494"
+  image_id                             = "ami-0d7e8ba2c13b09494" # data.aws_ami.linux_2_image.id #
   instance_initiated_shutdown_behavior = "terminate"
   instance_type                        = "t3.micro"
   metadata_options {
