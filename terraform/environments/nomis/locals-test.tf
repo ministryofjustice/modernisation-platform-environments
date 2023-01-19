@@ -61,7 +61,8 @@ locals {
         asm_flash_capacity = 2
         description        = "Test NOMIS T1 database with a dataset of T1PDL0009 (note: only NOMIS db, NDH db is not included."
         tags = {
-          monitored = false
+          monitored   = true
+          oracle-sids = "CNOMT1"
         }
       }
     }
@@ -78,7 +79,7 @@ locals {
           server-type         = "nomis-db"
           description         = "T1 NOMIS Audit database to replace Azure T1PDL0010"
           oracle-sids         = "T1CNMAUD"
-          monitored           = false
+          monitored           = true
           instance-scheduling = "skip-scheduling"
         }
         ami_name  = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-07T12-48-08.562Z"
@@ -119,7 +120,7 @@ locals {
           server-type         = "nomis-db"
           description         = "T3 NOMIS database to replace Azure T3PDL0070"
           oracle-sids         = "T3CNOM"
-          monitored           = false
+          monitored           = true
           instance-scheduling = "skip-scheduling"
         }
         ami_name  = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-07T12-48-08.562Z"
@@ -183,7 +184,9 @@ locals {
         tags = {
           ami                = "nomis_rhel_6_10_weblogic_appserver_10_3"
           description        = "For testing our RHEL6.10 weblogic image"
-          monitored          = false
+          monitored          = true
+          os-type            = "Linux"
+          component          = "web"
           server-type        = "nomis-web"
           oracle-db-hostname = "db.CNOMT1.nomis.hmpps-test.modernisation-platform.internal"
           oracle-db-name     = "CNOMT1"
@@ -214,6 +217,9 @@ locals {
         tags = {
           server-type       = "ndh-app"
           description       = "Standalone EC2 for testing RHEL7.9 NDH App"
+          monitored         = false
+          os-type           = "Linux"
+          component         = "ndh"
           nomis-environment = "t1"
         }
         ami_name = "nomis_rhel_7_9_baseimage_2022-11-01T13-43-46.384Z"
@@ -223,6 +229,9 @@ locals {
         tags = {
           server-type       = "ndh-ems"
           description       = "Standalone EC2 for testing RHEL7.9 NDH EMS"
+          monitored         = false
+          os-type           = "Linux"
+          component         = "ndh"
           nomis-environment = "t1"
         }
         ami_name = "nomis_rhel_7_9_baseimage_2022-11-01T13-43-46.384Z"
@@ -234,6 +243,9 @@ locals {
         tags = {
           server-type       = "ndh-app"
           description       = "Standalone EC2 for testing RHEL7.9 NDH App"
+          monitored         = false
+          os-type           = "Linux"
+          component         = "ndh"
           nomis-environment = "t1"
         }
         ami_name = "nomis_rhel_7_9_baseimage_2022-11-01T13-43-46.384Z"
@@ -248,6 +260,9 @@ locals {
         tags = {
           server-type       = "ndh-ems"
           description       = "Standalone EC2 for testing RHEL7.9 NDH EMS"
+          monitored         = false
+          os-type           = "Linux"
+          component         = "ndh"
           nomis-environment = "t1"
         }
         ami_name = "nomis_rhel_7_9_baseimage_2022-11-01T13-43-46.384Z"
