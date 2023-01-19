@@ -22,83 +22,20 @@
 #   cidr_blocks = ["0.0.0.0/0"]
 # }
 
-# IAM
-data "aws_iam_policy_document" "webserver_test_assume_policy_document" {
-  statement {
-    actions = [
-      "sts:AssumeRole"
-    ]
-    principals {
-      type        = "Service"
-      identifiers = ["ec2.amazonaws.com"]
-    }
-  }
-}
+# data "aws_ami" "linux_2_image" {
+#   most_recent = true
+#   owners      = ["amazon"]
 
-resource "aws_iam_role" "webserver_test_role" {
-  name               = "webserver_test_ec2_role"
-  path               = "/"
-  assume_role_policy = data.aws_iam_policy_document.webserver_test_assume_policy_document.json
+#   filter {
+#     name   = "name"
+#     values = ["amzn2-ami-hvm*"]
+#   }
 
-  tags = {
-    Name = "webserver_test_ec2_role"
-  }
-}
-
-# resource "aws_iam_role" "this" {
-#   name                 = "${var.iam_resource_names_prefix}-role-${var.name}"
-#   path                 = "/"
-#   max_session_duration = "3600"
-#   assume_role_policy = jsonencode(
-#     {
-#       "Version" : "2012-10-17",
-#       "Statement" : [
-#         {
-#           "Effect" : "Allow",
-#           "Principal" : {
-#             "Service" : "ec2.amazonaws.com"
-#           }
-#           "Action" : "sts:AssumeRole",
-#           "Condition" : {}
-#         }
-#       ]
-#     }
-#   )
-
-#   managed_policy_arns = var.instance_profile_policies
-
-#   tags = merge(local.tags, {
-#     Name = "${var.iam_resource_names_prefix}-role-${var.name}"
-#     }
-#   )
+#   filter {
+#     name   = "virtualization-type"
+#     values = ["hvm"]
+#   }
 # }
-
-resource "aws_iam_instance_profile" "webserver_test_profile" {
-  name = "webserver-test-ec2-profile"
-  role = aws_iam_role.webserver_test_role.name # webserver-test-ec2-profile
-  path = "/"
-}
-# resource "aws_iam_instance_profile" "this" {
-#   name = "${var.iam_resource_names_prefix}-profile-${var.name}"
-#   role = aws_iam_role.this.name
-#   path = "/"
-# }
-
-
-data "aws_ami" "linux_2_image" {
-  most_recent = true
-  owners      = ["amazon"]
-
-  filter {
-    name   = "name"
-    values = ["amzn2-ami-hvm*"]
-  }
-
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
-}
 
 resource "aws_launch_template" "webserver_test_template" {
   name = "webserver_test_template"
@@ -118,7 +55,7 @@ resource "aws_launch_template" "webserver_test_template" {
     arn = "arn:aws:iam::003430027717:instance-profile/ec2-webserver-asg-profile-webserver"
   }
 
-  image_id                             = data.aws_ami.linux_2_image.id
+  image_id                             = "oasys_webserver"
   instance_initiated_shutdown_behavior = "terminate"
   instance_type                        = "t3.micro"
   metadata_options {
