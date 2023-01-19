@@ -231,3 +231,4 @@ resource "aws_autoscaling_schedule" "webserver_test_scale_up" {
   recurrence             = "0 5 * * *" # 5.00 UTC time or 6.00 London time
   autoscaling_group_name = aws_autoscaling_group.webserver_test.name
 }
+
