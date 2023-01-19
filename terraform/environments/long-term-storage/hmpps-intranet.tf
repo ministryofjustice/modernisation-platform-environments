@@ -4,6 +4,7 @@
 # Use the AMIs to create a new instance of each server from the snapshots
 # To access the file system connect via a bastion using the root user and the password stored in the secret
 # To access the database dump create a volume from the snapshot and attach to any EC2 instance
+# More info on accessing the data here https://docs.google.com/document/d/1Ky02UTaHYdmvMP-w89iDHjEmRDc-1OAW79OUPwvM-VU/
 
 # KMS key for snapshot encryption
 resource "aws_kms_key" "hmpps_intranet" {
