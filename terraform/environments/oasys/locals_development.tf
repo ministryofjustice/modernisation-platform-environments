@@ -33,7 +33,7 @@ locals {
       #   }
       # })
       test = {
-        ami_name = "base_rhel_7_9_*"
+        ami_name              = "base_rhel_7_9_*"
         autoscaling_schedules = {}
         instance = {
           disable_api_termination = false
