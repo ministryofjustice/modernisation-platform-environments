@@ -184,7 +184,7 @@ locals {
         tags = {
           ami                = "nomis_rhel_6_10_weblogic_appserver_10_3"
           description        = "For testing our RHEL6.10 weblogic image"
-          monitored          = false
+          monitored          = true
           os-type            = "Linux"
           component          = "web"
           server-type        = "nomis-web"
