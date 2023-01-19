@@ -28,11 +28,10 @@
       "ec2_desired_capacity": "2",
       "ec2_max_size": "4",
       "ec2_min_size": "1",
-      "container_cpu": "1",
+      "container_cpu": "256",
       "container_memory": "1024",
       "task_definition_volume":  "application_volume",
-      "network_mode": "awsvpc",
-      "server_port": "80",
+      "network_mode": "bridge",
       "app_count": "1"
     },
     "test": {
