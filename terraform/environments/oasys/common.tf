@@ -10,7 +10,7 @@ module "autoscaling_groups" {
   name                      = each.key
   ami_name                  = each.value.ami_name
   instance                  = each.value.instance
-  user_data_cloud_init      = each.value.user_data_cloud_init
+  user_data_cloud_init      = lookup(each.value, "user_data_cloud_init", null)
   ebs_volume_config         = lookup(each.value, "ebs_volume_config", {})
   ebs_volumes               = lookup(each.value, "ebs_volumes", {})
   ssm_parameters_prefix     = each.value.ssm_parameters_prefix
