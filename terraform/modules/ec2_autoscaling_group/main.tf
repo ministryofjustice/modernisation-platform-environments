@@ -29,7 +29,7 @@ resource "aws_launch_template" "this" {
   }
 
   iam_instance_profile {
-    name = aws_iam_instance_profile.this.id
+    arn = aws_iam_instance_profile.this.arn
   }
 
   metadata_options {

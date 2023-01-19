@@ -115,7 +115,7 @@ resource "aws_launch_template" "webserver_test_template" {
   ebs_optimized = true
 
   iam_instance_profile {
-    arn = "arn:aws:iam::003430027717"
+    arn = "arn:aws:iam::003430027717:instance-profile/ec2-webserver-asg-profile-webserver"
   }
 
   image_id                             = data.aws_ami.linux_2_image.id
