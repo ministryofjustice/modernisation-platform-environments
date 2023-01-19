@@ -238,7 +238,7 @@ resource "aws_launch_template" "webserver_test_template" {
 resource "aws_autoscaling_group" "webserver_test" { # should have changed the asg to be the same now
   launch_template {
     id      = aws_launch_template.webserver_test_template.id
-    version = "$Default"
+    version = "$Latest"
   }
   name                      = "webserver_test"
   availability_zones        = ["${local.region}a"]

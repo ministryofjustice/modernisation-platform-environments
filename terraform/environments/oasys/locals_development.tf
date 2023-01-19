@@ -31,14 +31,14 @@ locals {
     }
 
     autoscaling_groups = {
-      # webserver = merge(local.webserver, { # merge common config and env specific
-      #   tags = {
-      #     nomis-environment = "t1"
-      #     description       = "oasys webserver"
-      #     component         = "web"
-      #     server-type       = "webserver"
-      #   }
-      # })
+      webserver = merge(local.webserver, { # merge common config and env specific
+        tags = {
+          nomis-environment = "t1"
+          description       = "oasys webserver"
+          component         = "web"
+          server-type       = "webserver"
+        }
+      })
     }
     db_enabled                             = false
     db_auto_minor_version_upgrade          = "true"
