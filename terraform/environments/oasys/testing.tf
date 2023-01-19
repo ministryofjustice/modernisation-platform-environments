@@ -22,20 +22,20 @@
 #   cidr_blocks = ["0.0.0.0/0"]
 # }
 
-# data "aws_ami" "linux_2_image" {
-#   most_recent = true
-#   owners      = ["amazon"]
+data "aws_ami" "linux_2_image" {
+  most_recent = true
+  owners      = ["amazon"]
 
-#   filter {
-#     name   = "name"
-#     values = ["amzn2-ami-hvm*"]
-#   }
+  filter {
+    name   = "name"
+    values = ["amzn2-ami-hvm*"]
+  }
 
-#   filter {
-#     name   = "virtualization-type"
-#     values = ["hvm"]
-#   }
-# }
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+}
 
 resource "aws_launch_template" "webserver_test_template" {
   name = "webserver_test_template"
