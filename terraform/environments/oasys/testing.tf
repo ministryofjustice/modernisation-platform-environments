@@ -75,13 +75,13 @@ resource "aws_launch_template" "webserver_test_template" {
     arn = "arn:aws:iam::003430027717:instance-profile/ec2-webserver-asg-profile-webserver"
   }
 
-  image_id                             = "ami-0d7e8ba2c13b09494" # data.aws_ami.linux_2_image.id #
+  image_id                             = "ami-0d7e8ba2c13b09494" # base_rhel_7_9-> "ami-0c7073ea8c6e6ff7b" #  # data.aws_ami.linux_2_image.id #
   instance_initiated_shutdown_behavior = "terminate"
-  instance_type                        = "t3.micro"
+  instance_type                        = "t3.large"
   metadata_options {
     http_endpoint               = "enabled" # defaults to enabled but is required if http_tokens is specified
     http_put_response_hop_limit = 1         # default is 1, value values are 1 through 64
-    http_tokens                 = "required"
+    http_tokens                 = "optional"
   }
   monitoring {
     enabled = true
