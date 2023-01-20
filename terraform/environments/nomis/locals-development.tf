@@ -69,6 +69,8 @@ locals {
         tags = {
           description = "For testing official RedHat RHEL6.10 image"
           monitored   = false
+          os-type     = "Linux"
+          component   = "test"
         }
         instance = {
           instance_type                = "t2.medium"
@@ -82,6 +84,8 @@ locals {
         tags = {
           description = "For testing official RedHat RHEL7.9 image"
           monitored   = false
+          os-type     = "Linux"
+          component   = "test"
         }
         ami_name  = "RHEL-7.9_HVM-*"
         ami_owner = "309956199498"
@@ -92,6 +96,8 @@ locals {
           ami               = "base_rhel_7_9"
           description       = "For testing our base RHEL7.9 base image"
           monitored         = false
+          os-type           = "Linux"
+          component         = "test"
           nomis-environment = "dev"
           server-type       = "base-rhel79"
         }
@@ -103,6 +109,8 @@ locals {
           ami               = "base_rhel_6_10"
           description       = "For testing our base RHEL6.10 base image"
           monitored         = false
+          os-type           = "Linux"
+          component         = "test"
           nomis-environment = "dev"
           server-type       = "base-rhel610"
         }
@@ -120,7 +128,10 @@ locals {
         tags = {
           server-type       = "jumpserver"
           description       = "Windows Server 2022 Jumpserver for NOMIS"
-          nomis-environment = "jumpserver"
+          monitored         = true
+          os-type           = "Windows"
+          component         = "jumpserver"
+          nomis-environment = "dev"
         }
         autoscaling_group = {
           min_size = 0

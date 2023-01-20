@@ -73,8 +73,8 @@ locals {
         tags = {
           server-type = "nomis-db"
           description = "PreProduction NOMIS MIS and Audit database to replace Azure PPPDL00017"
-          oracle-sids = "PPMIS PPCNMAUD"
-          monitored   = false
+          oracle-sids = "PPCNMAUD"
+          monitored   = true
         }
         ami_name  = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-03T12-51-25.032Z"
         ami_owner = "self" # remove this line next time AMI is updated so core-shared-services-production used instead
@@ -115,8 +115,8 @@ locals {
         tags = {
           server-type              = "nomis-db"
           description              = "Production NOMIS MIS and Audit database to replace Azure PDPDL00036 and PDPDL00038"
-          oracle-sids              = "PCNMAUD"
-          monitored                = false
+          oracle-sids              = "CNMAUD"
+          monitored                = true
           fixngo-connection-target = "10.40.0.136"
         }
         ami_name  = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-07T12-48-08.562Z"
@@ -159,7 +159,8 @@ locals {
         tags = {
           server-type = "nomis-db"
           description = "Production NOMIS HA database to replace Azure PDPDL00062"
-          monitored   = false
+          monitored   = true
+          oracle-sids = "PCNOMHA"
         }
         ami_name  = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-07T12-48-08.562Z"
         ami_owner = "self" # remove this line next time AMI is updated so core-shared-services-production used instead
