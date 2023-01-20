@@ -30,9 +30,9 @@ locals {
     mojo_globalprotect_internal = "10.184.0.0/16"
 
     # AWS Modernisation Platform
-    hmpps_development           = "10.26.24.0/21"
-    hmpps_test                  = "10.26.8.0/21"
-    hmpps_preproduction         = "10.27.0.0/21"
-    hmpps_production            = "10.27.8.0/21"
+    hmpps_development   = "10.26.24.0/21"
+    hmpps_test          = "10.26.8.0/21"
+    hmpps_preproduction = "10.27.0.0/21"
+    hmpps_production    = "10.27.8.0/21"
   }
 }
