@@ -29,7 +29,9 @@ defaults:
 jobs:
 
   plan-dev-test:
+    continue-on-error: true
     strategy:
+      fail-fast: false
       matrix:
         include:
           - environment: development
@@ -67,7 +69,9 @@ jobs:
   deploy-dev-test:
     needs: plan-dev-test
     if: success()
+    continue-on-error: true
     strategy:
+      fail-fast: false
       matrix:
         include:
           - environment: development
