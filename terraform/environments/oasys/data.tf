@@ -231,21 +231,6 @@ data "aws_iam_policy_document" "s3_bucket_access" {
     "${module.s3-bucket.bucket.arn}/*"]
   }
 
-  statement {
-    sid    = "AccessToAuditAchiveBucket"
-    effect = "Allow"
-    actions = [
-      "s3:GetObject",
-      "s3:PutObject",
-      "s3:PutObjectAcl",
-      "s3:ListBucket"
-    ]
-    resources = [
-      module.oasys-audit-archives.bucket.arn,
-      "${module.oasys-audit-archives.bucket.arn}/*"
-    ]
-  }
-
   # allow access to ec2-image-builder-oasys buckets in all accounts
   statement {
     sid    = "AccessToImageBuilderBucket"
