@@ -23,36 +23,36 @@ locals {
     lb_ingress_rules = {
       # map keys are not used other than for ordering
       http_external = {
-        description     = "External access to http"
-        from_port       = 80
-        to_port         = 80
-        protocol        = "tcp"
-        security_groups = []
-        cidr_blocks     = local.environment_config.external_weblogic_access_cidrs
-      }
-      http_internal = {
-        description     = "Internal access to http"
+        description     = "Allow Inbound Http"
         from_port       = 80
         to_port         = 80
         protocol        = "tcp"
         security_groups = [aws_security_group.jumpserver-windows.id]
-        cidr_blocks     = []
+        cidr_blocks     = local.environment_config.external_weblogic_access_cidrs
+      }
+      http7001_external = {
+        description     = "Allow Inbound Http port 7001"
+        from_port       = 7001
+        to_port         = 7001
+        protocol        = "tcp"
+        security_groups = [aws_security_group.jumpserver-windows.id]
+        cidr_blocks     = local.environment_config.external_weblogic_access_cidrs
+      }
+      http7777_external = {
+        description     = "Allow Inbound Http port 7777"
+        from_port       = 7777
+        to_port         = 7777
+        protocol        = "tcp"
+        security_groups = [aws_security_group.jumpserver-windows.id]
+        cidr_blocks     = local.environment_config.external_weblogic_access_cidrs
       }
       https_external = {
-        description     = "External access to https"
-        from_port       = 443
-        to_port         = 443
-        protocol        = "tcp"
-        security_groups = []
-        cidr_blocks     = local.environment_config.external_weblogic_access_cidrs
-      }
-      https_internal = {
-        description     = "Internal access to https"
+        description     = "Allow Inbound Https"
         from_port       = 443
         to_port         = 443
         protocol        = "tcp"
         security_groups = [aws_security_group.jumpserver-windows.id]
-        cidr_blocks     = []
+        cidr_blocks     = local.environment_config.external_weblogic_access_cidrs
       }
     }
   }

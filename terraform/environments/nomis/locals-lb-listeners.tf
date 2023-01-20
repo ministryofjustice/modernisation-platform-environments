@@ -62,6 +62,30 @@ locals {
         }
       }
     }
+    http-7001 = {
+      lb_application_name = "nomis-public"
+      port                = 7001
+      protocol            = "HTTP"
+      target_groups = {
+        http-7001-asg = local.lb_http_7001_rule
+      }
+      default_action = {
+        type              = "forward"
+        target_group_name = "http-7001-asg"
+      }
+    }
+    http-7777 = {
+      lb_application_name = "nomis-public"
+      port                = 7777
+      protocol            = "HTTP"
+      target_groups = {
+        http-7777-asg = local.lb_http_7777_rule
+      }
+      default_action = {
+        type              = "forward"
+        target_group_name = "http-7777-asg"
+      }
+    }
     https = {
       lb_application_name = "nomis-public"
       port                = 443
