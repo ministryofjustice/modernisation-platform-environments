@@ -29,6 +29,7 @@ defaults:
 jobs:
 
   plan-dev-test:
+    continue-on-error: true
     strategy:
       fail-fast: false
       matrix:
@@ -68,6 +69,7 @@ jobs:
   deploy-dev-test:
     needs: plan-dev-test
     if: success()
+    continue-on-error: true
     strategy:
       fail-fast: false
       matrix:
@@ -107,7 +109,6 @@ jobs:
   # Plan + deploy for pre-production and production environments, only from main
   plan-preprod-prod:
     strategy:
-      fail-fast: false
       matrix:
         include:
           - environment: preproduction
@@ -145,7 +146,6 @@ jobs:
     needs: plan-preprod-prod
     if: success()
     strategy:
-      fail-fast: false
       matrix:
         include:
           - environment: preproduction
