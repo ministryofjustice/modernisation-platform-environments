@@ -66,49 +66,6 @@ locals {
       }
     }
   }
-
-  legacy_weblogics = {
-    development = {}
-    test = {
-      CNOMT1 = {
-        ami_name     = "nomis_Weblogic_2022*"
-        asg_max_size = 1
-      }
-    }
-    preproduction = {}
-    production    = {}
-  }
-}
-
-module "weblogic" {
-  source = "./modules/weblogic"
-
-  providers = {
-    aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
-  }
-
-  for_each = local.legacy_weblogics[local.environment]
-
-  name = each.key
-
-  ami_name             = each.value.ami_name
-  asg_max_size         = try(each.value.asg_max_size, null)
-  asg_min_size         = try(each.value.asg_min_size, null)
-  asg_desired_capacity = try(each.value.asg_desired_capacity, null)
-
-  ami_owner              = try(each.value.ami_owner, local.environment_management.account_ids["core-shared-services-production"])
-  termination_protection = try(each.value.termination_protection, null)
-
-  common_security_group_id  = aws_security_group.weblogic_common.id
-  instance_profile_policies = local.ec2_common_managed_policies
-  key_name                  = aws_key_pair.ec2-user.key_name
-  # load_balancer_listener_arn = aws_lb_listener.internal.arn
-
-  application_name = local.application_name
-  business_unit    = local.vpc_name
-  environment      = local.environment
-  tags             = local.tags
-  subnet_set       = local.subnet_set
 }
 
 module "ec2_weblogic_autoscaling_group" {
