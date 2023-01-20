@@ -1,46 +1,5 @@
 locals {
 
-  lb_http_7001_rule = {
-    port                 = 7001
-    protocol             = "HTTP"
-    target_type          = "instance"
-    deregistration_delay = 30
-    health_check = {
-      enabled             = true
-      interval            = 30
-      healthy_threshold   = 3
-      matcher             = "200-399"
-      path                = "/"
-      port                = 7001
-      timeout             = 5
-      unhealthy_threshold = 5
-    }
-    stickiness = {
-      enabled = true
-      type    = "lb_cookie"
-    }
-  }
-
-  lb_http_7777_rule = {
-    port                 = 7777
-    protocol             = "HTTP"
-    target_type          = "instance"
-    deregistration_delay = 30
-    health_check = {
-      enabled             = true
-      interval            = 30
-      healthy_threshold   = 3
-      matcher             = "200-399"
-      path                = "/keepalive.htm"
-      port                = 7777
-      timeout             = 5
-      unhealthy_threshold = 5
-    }
-    stickiness = {
-      enabled = true
-      type    = "lb_cookie"
-    }
-  }
 
 
   lb_listener_defaults = {
@@ -72,7 +31,7 @@ locals {
       port     = 7001
       protocol = "HTTP"
       target_groups = {
-        http-7001-asg = local.lb_http_7001_rule
+        http-7001-asg = local.lb_target_group_http_7001
       }
       default_action = {
         type              = "forward"
@@ -83,7 +42,7 @@ locals {
       port     = 7777
       protocol = "HTTP"
       target_groups = {
-        http-7777-asg = local.lb_http_7777_rule
+        http-7777-asg = local.lb_target_group_http_7777
       }
       default_action = {
         type              = "forward"
@@ -104,8 +63,8 @@ locals {
         }
       }
       target_groups = {
-        http-7001-asg = local.lb_http_7001_rule
-        http-7777-asg = local.lb_http_7777_rule
+        http-7001-asg = local.lb_target_group_http_7001
+        http-7777-asg = local.lb_target_group_http_7777
       }
       rules = {
         forward-http-7001-asg = {

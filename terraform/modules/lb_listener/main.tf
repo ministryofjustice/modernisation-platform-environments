@@ -31,9 +31,6 @@ resource "aws_lb_target_group" "this" {
     }
   }
 
-  lifecycle {
-    create_before_destroy = true
-  }
   tags = merge(var.tags, {
     Name = "${var.name}-${each.key}"
   })

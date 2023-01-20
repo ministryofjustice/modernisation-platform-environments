@@ -19,7 +19,7 @@ variable "load_balancer_arn" {
 }
 
 variable "target_groups" {
-  description = "Map of target groups, where key is the name_prefix"
+  description = "Map of target groups, where key is the name"
   type = map(object({
     port                 = optional(number)
     protocol             = optional(string)

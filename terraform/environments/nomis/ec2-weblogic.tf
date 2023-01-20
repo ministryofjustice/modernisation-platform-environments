@@ -4,6 +4,48 @@
 
 locals {
 
+  lb_target_group_http_7001 = {
+    port                 = 7001
+    protocol             = "HTTP"
+    target_type          = "instance"
+    deregistration_delay = 30
+    health_check = {
+      enabled             = true
+      interval            = 30
+      healthy_threshold   = 3
+      matcher             = "200-399"
+      path                = "/"
+      port                = 7001
+      timeout             = 5
+      unhealthy_threshold = 5
+    }
+    stickiness = {
+      enabled = true
+      type    = "lb_cookie"
+    }
+  }
+
+  lb_target_group_http_7777 = {
+    port                 = 7777
+    protocol             = "HTTP"
+    target_type          = "instance"
+    deregistration_delay = 30
+    health_check = {
+      enabled             = true
+      interval            = 30
+      healthy_threshold   = 3
+      matcher             = "200-399"
+      path                = "/keepalive.htm"
+      port                = 7777
+      timeout             = 5
+      unhealthy_threshold = 5
+    }
+    stickiness = {
+      enabled = true
+      type    = "lb_cookie"
+    }
+  }
+
   ec2_weblogic = {
 
     # server-type and nomis-environment auto set by module
@@ -65,6 +107,11 @@ locals {
         instance_warmup        = 300
       }
     }
+
+    lb_target_groups = {
+      http-7001 = local.lb_target_group_http_7001
+      http-7777 = local.lb_target_group_http_7777
+    }
   }
 }
 
@@ -90,7 +137,8 @@ module "ec2_weblogic_autoscaling_group" {
   ssm_parameters                = {}
   autoscaling_group             = merge(local.ec2_weblogic.autoscaling_group, lookup(each.value, "autoscaling_group", {}))
   autoscaling_schedules         = lookup(each.value, "autoscaling_schedules", local.autoscaling_schedules_default)
-
+  lb_target_groups              = merge(local.ec2_weblogic.lb_target_groups, lookup(each.value, "lb_target_groups", {}))
+  vpc_id                        = local.vpc_id
 
   iam_resource_names_prefix = "ec2-weblogic-asg"
   instance_profile_policies = local.ec2_common_managed_policies
