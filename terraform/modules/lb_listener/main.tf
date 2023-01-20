@@ -174,6 +174,12 @@ resource "aws_lb_listener_rule" "this" {
           values = host_header.value.values
         }
       }
+      dynamic "path_pattern" {
+        for_each = condition.value.path_pattern != null ? [condition.value.path_pattern] : []
+        content {
+          values = path_pattern.value.values
+        }
+      }
     }
   }
 
