@@ -104,6 +104,7 @@ variable "default_action" {
 variable "rules" {
   description = "Map of additional aws_lb_listener_rules where key is the tag:Name"
   type = map(object({
+    priority = optional(number)
     actions = list(object({
       type              = string
       target_group_name = optional(string, null)

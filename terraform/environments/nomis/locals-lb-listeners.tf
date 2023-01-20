@@ -82,6 +82,7 @@ locals {
       }
       rules = {
         forward-http-7001-asg = {
+          priority = 100
           actions = [{
             type              = "forward"
             target_group_name = "http-7001-asg"
@@ -94,11 +95,12 @@ locals {
             },
             {
               path_pattern = {
-                values = ["/console/*"]
+                values = ["/console", "/console/*"]
               }
           }]
         }
         forward-http-7777-asg = {
+          priority = 200
           actions = [{
             type              = "forward"
             target_group_name = "http-7777-asg"

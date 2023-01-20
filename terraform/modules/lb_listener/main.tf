@@ -117,6 +117,7 @@ resource "aws_lb_listener_rule" "this" {
   for_each = var.rules
 
   listener_arn = aws_lb_listener.this.arn
+  priority     = each.value.priority
 
   dynamic "action" {
     for_each = each.value.actions
