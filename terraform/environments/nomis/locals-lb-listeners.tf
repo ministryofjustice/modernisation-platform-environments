@@ -53,7 +53,7 @@ locals {
       lb_application_name = "nomis-public"
     }
     nomis_internal = {
-      lb_application_name = "nomis-public"
+      lb_application_name = "nomis-internal"
     }
 
     http = {
