@@ -49,10 +49,16 @@ locals {
       zone_id                = data.aws_route53_zone.external-environment.zone_id
       evaluate_target_health = true
     }
-    http = {
+    nomis_public = {
       lb_application_name = "nomis-public"
-      port                = 80
-      protocol            = "HTTP"
+    }
+    nomis_internal = {
+      lb_application_name = "nomis-public"
+    }
+
+    http = {
+      port     = 80
+      protocol = "HTTP"
       default_action = {
         type = "redirect"
         redirect = {
@@ -63,9 +69,8 @@ locals {
       }
     }
     http-7001 = {
-      lb_application_name = "nomis-public"
-      port                = 7001
-      protocol            = "HTTP"
+      port     = 7001
+      protocol = "HTTP"
       target_groups = {
         http-7001-asg = local.lb_http_7001_rule
       }
@@ -75,9 +80,8 @@ locals {
       }
     }
     http-7777 = {
-      lb_application_name = "nomis-public"
-      port                = 7777
-      protocol            = "HTTP"
+      port     = 7777
+      protocol = "HTTP"
       target_groups = {
         http-7777-asg = local.lb_http_7777_rule
       }
@@ -87,11 +91,10 @@ locals {
       }
     }
     https = {
-      lb_application_name = "nomis-public"
-      port                = 443
-      protocol            = "HTTPS"
-      ssl_policy          = "ELBSecurityPolicy-2016-08"
-      certificate_arns    = [module.acm_certificate[local.certificate.modernisation_platform_wildcard.name].arn]
+      port             = 443
+      protocol         = "HTTPS"
+      ssl_policy       = "ELBSecurityPolicy-2016-08"
+      certificate_arns = [module.acm_certificate[local.certificate.modernisation_platform_wildcard.name].arn]
       default_action = {
         type = "fixed-response"
         fixed_response = {
@@ -147,12 +150,20 @@ locals {
     development = {}
 
     test = {
-      http      = local.lb_listener_defaults.http
-      http-7001 = local.lb_listener_defaults.http-7001
-      http-7777 = local.lb_listener_defaults.http-7777
-      https = merge(local.lb_listener_defaults.https, {
+      http      = merge(local.lb_listener_defaults.http, local.lb_listener_defaults.nomis_public)
+      http-7001 = merge(local.lb_listener_defaults.http-7001, local.lb_listener_defaults.nomis_public)
+      http-7777 = merge(local.lb_listener_defaults.http-7777, local.lb_listener_defaults.nomis_public)
+      https = merge(local.lb_listener_defaults.https, local.lb_listener_defaults.nomis_public, {
         route53_records = {
           "t1-nomis-web.nomis" = local.lb_listener_defaults.environment_external_dns_zone
+        }
+      })
+      internal-http      = merge(local.lb_listener_defaults.http, local.lb_listener_defaults.nomis_internal)
+      internal-http-7001 = merge(local.lb_listener_defaults.http-7001, local.lb_listener_defaults.nomis_internal)
+      internal-http-7777 = merge(local.lb_listener_defaults.http-7777, local.lb_listener_defaults.nomis_internal)
+      internal-https = merge(local.lb_listener_defaults.https, local.lb_listener_defaults.nomis_internal, {
+        route53_records = {
+          "t1-nomis-web-internal.nomis" = local.lb_listener_defaults.environment_external_dns_zone
         }
       })
     }
