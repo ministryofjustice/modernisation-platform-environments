@@ -177,7 +177,9 @@ locals {
           warm_pool        = null
           target_group_arns = local.environment == "test" ? [
             module.lb_listener["https"].aws_lb_target_group["http-7001-asg"].arn,
-            module.lb_listener["https"].aws_lb_target_group["http-7777-asg"].arn
+            module.lb_listener["https"].aws_lb_target_group["http-7777-asg"].arn,
+            module.lb_listener["http-7001"].aws_lb_target_group["http-7001-asg"].arn,
+            module.lb_listener["http-7777"].aws_lb_target_group["http-7777-asg"].arn,
           ] : []
         }
       }
