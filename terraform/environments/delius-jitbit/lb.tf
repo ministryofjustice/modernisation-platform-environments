@@ -31,11 +31,12 @@ resource "aws_security_group" "load_balancer_security_group" {
   )
 }
 
-#tfsec:ignore:aws-elb-http-not-used
 resource "aws_lb_listener" "listener" {
   load_balancer_arn = aws_lb.external.id
   port              = 443
-  protocol          = "HTTP"
+  protocol          = "HTTPS"
+  certificate_arn   = aws_acm_certificate.external.arn
+  ssl_policy        = "ELBSecurityPolicy-TLS-1-2-2017-01"
 
   default_action {
     target_group_arn = aws_lb_target_group.target_group.id
