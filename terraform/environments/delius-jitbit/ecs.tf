@@ -22,11 +22,15 @@ module "ecs" {
   server_port             = local.app_data.accounts[local.environment].server_port
   app_count               = local.app_data.accounts[local.environment].app_count
   tags_common             = local.tags
-  lb_tg_name              = local.lb_tg_name
+  lb_tg_name              = aws_lb_target_group.target_group.name
   ec2_ingress_rules       = local.ec2_ingress_rules
   ec2_egress_rules        = local.ec2_egress_rules
 
-  depends_on = [aws_lb_listener.listener]
+   # removed a depends on here on the loadbalancer listener - if plan failing, try re-add
+   # adding a module dependson forced terraform to plan the recreation of resources in the module
+   # e.g. the ec2 cluster security group
+
+   # depends_on = [aws_lb_listener.listener]
 }
 
 
