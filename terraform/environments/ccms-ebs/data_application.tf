@@ -1,4 +1,5 @@
 ## AMI data blocks
+/*
 data "aws_ami" "oracle_base" {
   most_recent = true
   owners      = ["self"]
@@ -24,6 +25,7 @@ data "aws_ami" "oracle_base_marketplace" {
     values = ["hvm"]
   }
 }
+*/
 data "aws_ami" "oracle_base_ready" {
   most_recent = true
 
