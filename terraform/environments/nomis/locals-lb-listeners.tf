@@ -147,8 +147,9 @@ locals {
     development = {}
 
     test = {
-      http = local.lb_listener_defaults.http
-
+      http      = local.lb_listener_defaults.http
+      http-7001 = local.lb_listener_defaults.http-7001
+      http-7777 = local.lb_listener_defaults.http-7777
       https = merge(local.lb_listener_defaults.https, {
         route53_records = {
           "t1-nomis-web.nomis" = local.lb_listener_defaults.environment_external_dns_zone
