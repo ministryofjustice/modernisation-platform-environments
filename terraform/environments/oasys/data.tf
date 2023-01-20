@@ -207,6 +207,61 @@ data "aws_kms_key" "rds_shared" { key_id = "arn:aws:kms:eu-west-2:${local.enviro
 ###
 ###   aws_iam_policy_document
 ###
+# create policy document for access to s3 artefact bucket
+data "aws_iam_policy_document" "s3_bucket_access" {
+  statement {
+    sid    = "AllowOracleSecureWebListBucketandGetLocation"
+    effect = "Allow"
+    actions = [
+      "s3:ListAllMyBuckets",
+      "s3:GetBucketLocation"
+    ]
+    resources = ["arn:aws:s3:::*"]
+  }
+  statement {
+    sid    = "AccessToInstallationArtefactBucket"
+    effect = "Allow"
+    actions = [
+      "s3:PutObject",
+      "s3:GetObject",
+      "s3:ListBucket",
+      "s3:DeleteObject"
+    ]
+    resources = [module.s3-bucket.bucket.arn,
+    "${module.s3-bucket.bucket.arn}/*"]
+  }
+
+  statement {
+    sid    = "AccessToAuditAchiveBucket"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:PutObjectAcl",
+      "s3:ListBucket"
+    ]
+    resources = [
+      module.oasys-audit-archives.bucket.arn,
+      "${module.oasys-audit-archives.bucket.arn}/*"
+    ]
+  }
+
+  # allow access to ec2-image-builder-oasys buckets in all accounts
+  statement {
+    sid    = "AccessToImageBuilderBucket"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:PutObjectAcl",
+      "s3:ListBucket"
+    ]
+    resources = [
+      "arn:aws:s3:::ec2-image-builder-oasys*",
+      "arn:aws:s3:::ec2-image-builder-oasys*/*"
+    ]
+  }
+}
 # custom policy for SSM as managed policy AmazonSSMManagedInstanceCore is too permissive
 data "aws_iam_policy_document" "ssm_custom" {
   statement {
@@ -342,7 +397,7 @@ data "aws_iam_policy_document" "ssm_ec2_start_stop_kms" {
       "kms:RevokeGrant"
     ]
     # we have a legacy CMK that's used in production that will be retired but in the meantime requires permissions
-    resources = [local.environment == "test" ? aws_kms_key.nomis-cmk[0].arn : data.aws_kms_key.nomis_key.arn, data.aws_kms_key.hmpps_key.arn]
+    resources = [local.environment == "test" ? aws_kms_key.oasys-cmk[0].arn : data.aws_kms_key.oasys_key.arn, data.aws_kms_key.hmpps_key.arn]
   }
 
   statement {

@@ -96,7 +96,7 @@ locals {
   webserver = {
     ami_name = "oasys_webserver_*"
     # branch   = var.BRANCH_NAME # comment in if testing ansible
-    # server-type and nomis-environment auto set by module
+    # server-type and oasys-environment auto set by module
     autoscaling_schedules = {}
     subnet_name           = "webserver"
 

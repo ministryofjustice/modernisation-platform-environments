@@ -13,7 +13,7 @@ locals {
       cwagent-var-log-secure = {
         retention_days = 90
       }
-      cwagent-nomis-autologoff = {
+      cwagent-oasys-autologoff = {
         retention_days = 90
       }
     }
@@ -26,7 +26,7 @@ locals {
     autoscaling_groups = {
       # webservers = merge(local.webserver, { # merge common config and env specific
       #   tags = {
-      #     nomis-environment = "t1"
+      #     oasys-environment = "t1"
       #     description       = "oasys webserver"
       #     component         = "web"
       #     server-type       = "webserver"
@@ -48,7 +48,7 @@ locals {
       #   }
       #   iam_resource_names_prefix = "oasys-test"
       #   tags = {
-      #     nomis-environment = "t1"
+      #     oasys-environment = "t1"
       #     description       = "test"
       #     component         = "web"
       #     server-type       = "webserver"

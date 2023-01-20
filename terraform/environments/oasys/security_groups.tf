@@ -2,7 +2,7 @@
 # since we'd need to define the in/egresses. Unless maybe we add default entries.
 
 resource "aws_security_group" "webserver" {
-  #checkov:skip=CKV2_AWS_5:skip "Ensure that Security Groups are attached to another resource" - attached in nomis-stack module
+  #checkov:skip=CKV2_AWS_5:skip "Ensure that Security Groups are attached to another resource"
   description = "Common security group for webserver instances"
   name        = "webserver"
   vpc_id      = data.aws_vpc.shared.id
