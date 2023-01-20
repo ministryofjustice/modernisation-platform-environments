@@ -4,7 +4,6 @@ resource "aws_eip" "exchange" {
 }
 
 resource "aws_instance" "exchange-server" {
-
   depends_on                  = [aws_security_group.exchange_server]
   instance_type               = "t2.medium"
   ami                         = local.application_data.accounts[local.environment].infra6-ami
