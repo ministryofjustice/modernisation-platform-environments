@@ -35,7 +35,7 @@ EOF
   root_block_device {
     volume_type = "gp3"
     volume_size = 50
-    encrypted   = true
+    encrypted   = false
     tags = merge(local.tags,
       { Name = "root-block" }
     )
@@ -45,7 +45,7 @@ EOF
     device_name = "/dev/sdf"
     volume_type = "gp3"
     volume_size = 200
-    encrypted   = true
+    encrypted   = false
     #    kms_key_id  = aws_kms_key.this.arn
     tags = merge(local.tags,
       { Name = "ebs-block1" }
