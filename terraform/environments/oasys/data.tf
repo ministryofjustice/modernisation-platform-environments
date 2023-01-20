@@ -367,7 +367,7 @@ data "aws_iam_policy_document" "cloud-platform-monitoring-assume-role" {
 
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::754256621582:root"]  # cloud-platform-aws account
+      identifiers = ["arn:aws:iam::754256621582:root"] # cloud-platform-aws account
     }
   }
 }
