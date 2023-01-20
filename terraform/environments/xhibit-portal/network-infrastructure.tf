@@ -727,13 +727,5 @@ resource "aws_security_group_rule" "iisrelay-inbound-exchange" {
   source_security_group_id = aws_security_group.exchange_server.id
 }
 
-resource "aws_security_group_rule" "iisrelay-to-exchange" {
-  depends_on               = [aws_security_group.iisrelay_server, aws_security_group.exchange_server]
-  security_group_id        = aws_security_group.iisrelay_server.id
-  type                     = "egress"
-  description              = "allow all traffic to exchange"
-  from_port                = 0
-  to_port                  = 0
-  protocol                 = "-1"
-  source_security_group_id = aws_security_group.iisrelay_server.id
-}
+
+
