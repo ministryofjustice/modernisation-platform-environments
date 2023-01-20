@@ -30,6 +30,7 @@ jobs:
 
   plan-dev-test:
     strategy:
+      fail-fast: false
       matrix:
         include:
           - environment: development
@@ -68,6 +69,7 @@ jobs:
     needs: plan-dev-test
     if: success()
     strategy:
+      fail-fast: false
       matrix:
         include:
           - environment: development
@@ -105,6 +107,7 @@ jobs:
   # Plan + deploy for pre-production and production environments, only from main
   plan-preprod-prod:
     strategy:
+      fail-fast: false
       matrix:
         include:
           - environment: preproduction
@@ -142,6 +145,7 @@ jobs:
     needs: plan-preprod-prod
     if: success()
     strategy:
+      fail-fast: false
       matrix:
         include:
           - environment: preproduction
