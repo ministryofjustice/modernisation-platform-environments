@@ -9,6 +9,7 @@ locals {
     # server-type and nomis-environment auto set by module
     tags = {
       description = "nomis weblogic appserver 10.3"
+      os-type     = "Linux"
       component   = "web"
     }
 
