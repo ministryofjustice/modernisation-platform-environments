@@ -145,10 +145,10 @@ resource "aws_security_group" "weblogic_common" {
     from_port   = "7001"
     to_port     = "7001"
     protocol    = "TCP"
-    security_groups = [
+    security_groups = concat([
       aws_security_group.jumpserver-windows.id,
       module.bastion_linux.bastion_security_group
-    ]
+    ], local.lb_security_group_ids)
   }
 
   ingress {
