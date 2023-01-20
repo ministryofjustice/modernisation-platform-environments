@@ -74,6 +74,9 @@ locals {
       nomis-public = {
         internal_lb = false
       }
+      nomis-internal = {
+        internal_lb = true
+      }
     }
 
     preproduction = {}
