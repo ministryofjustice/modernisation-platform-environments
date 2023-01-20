@@ -26,11 +26,11 @@ module "ecs" {
   ec2_ingress_rules       = local.ec2_ingress_rules
   ec2_egress_rules        = local.ec2_egress_rules
 
-   # removed a depends on here on the loadbalancer listener - if plan failing, try re-add
-   # adding a module dependson forced terraform to plan the recreation of resources in the module
-   # e.g. the ec2 cluster security group
+  # removed a depends on here on the loadbalancer listener - if plan failing, try re-add
+  # adding a module dependson forced terraform to plan the recreation of resources in the module
+  # e.g. the ec2 cluster security group
 
-   # depends_on = [aws_lb_listener.listener]
+  # depends_on = [aws_lb_listener.listener]
 }
 
 
