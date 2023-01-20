@@ -1,5 +1,26 @@
 locals {
 
+  lb_http_7001_rule = {
+    port                 = 7001
+    protocol             = "HTTP"
+    target_type          = "instance"
+    deregistration_delay = 30
+    health_check = {
+      enabled             = true
+      interval            = 30
+      healthy_threshold   = 3
+      matcher             = "200-399"
+      path                = "/"
+      port                = 7001
+      timeout             = 5
+      unhealthy_threshold = 5
+    }
+    stickiness = {
+      enabled = true
+      type    = "lb_cookie"
+    }
+  }
+
   lb_http_7777_rule = {
     port                 = 7777
     protocol             = "HTTP"
@@ -56,13 +77,31 @@ locals {
         }
       }
       target_groups = {
-        http-7777 = local.lb_http_7777_rule
+        http-7001-asg = local.lb_http_7001_rule
+        http-7777-asg = local.lb_http_7777_rule
       }
       rules = {
-        forward-http-7777 = {
+        forward-http-7001-asg = {
           actions = [{
             type              = "forward"
-            target_group_name = "http-7777"
+            target_group_name = "http-7001-asg"
+          }]
+          conditions = [
+            {
+              host_header = {
+                values = ["*-nomis-web.nomis.${local.vpc_name}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
+              }
+            },
+            {
+              path_pattern = {
+                values = ["/console/*"]
+              }
+          }]
+        }
+        forward-http-7777-asg = {
+          actions = [{
+            type              = "forward"
+            target_group_name = "http-7777-asg"
           }]
           conditions = [{
             host_header = {
@@ -85,38 +124,8 @@ locals {
       http = local.lb_listener_defaults.http
 
       https = merge(local.lb_listener_defaults.https, {
-        target_groups = {
-          http-7777-asg = local.lb_http_7777_rule
-        }
-
-        rules = {
-          http-7777-asg = {
-            actions = [{
-              type              = "forward"
-              target_group_name = "http-7777-asg"
-            }]
-            conditions = [{
-              host_header = {
-                values = ["*-nomis-web.nomis.${local.vpc_name}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
-              }
-            }]
-          }
-          http-7777-weblogic-cnomt1 = {
-            actions = [{
-              type             = "forward"
-              target_group_arn = local.environment == "test" ? module.weblogic["CNOMT1"].target_group_arn : null
-            }]
-            conditions = [{
-              host_header = {
-                values = ["weblogic-cnomt1.nomis.${local.vpc_name}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
-              }
-            }]
-          }
-        }
-
         route53_records = {
-          "t1-nomis-web.nomis"    = local.lb_listener_defaults.environment_external_dns_zone
-          "weblogic-cnomt1.nomis" = local.lb_listener_defaults.environment_external_dns_zone
+          "t1-nomis-web.nomis" = local.lb_listener_defaults.environment_external_dns_zone
         }
       })
     }
