@@ -281,27 +281,20 @@ data "aws_iam_policy_document" "cloud_watch_custom" {
   }
 }
 # create policy document for access to s3 artefact bucket 
-data "aws_iam_policy_document" "s3_bucket_access" {
+data "aws_iam_policy_document" "application_insights" {
+
   statement {
-    sid    = "AllowOracleSecureWebListBucketandGetLocation"
+    sid    = "AllowApplicationInsights"
     effect = "Allow"
     actions = [
-      "s3:ListAllMyBuckets",
-      "s3:GetBucketLocation"
+      "applicationinsights:*",
+      "iam:CreateServiceLinkedRole",
+      "iam:ListRoles",
+      "resource-groups:ListGroups",
+      "resource-groups:CreateGroups",
+      "resource-groups:UpdateGroup"
     ]
-    resources = ["arn:aws:s3:::*"]
-  }
-  statement {
-    sid    = "AccessToInstallationArtefactBucket"
-    effect = "Allow"
-    actions = [
-      "s3:PutObject",
-      "s3:GetObject",
-      "s3:ListBucket",
-      "s3:DeleteObject"
-    ]
-    resources = [module.s3-bucket.bucket.arn,
-    "${module.s3-bucket.bucket.arn}/*"]
+    resources = ["*"]
   }
 }
 # combine ec2-common policy documents
@@ -332,86 +325,101 @@ data "aws_iam_policy_document" "cross-account-s3" {
     }
   }
 }
-# data "aws_iam_policy_document" "ssm_ec2_start_stop_kms" {
-#   statement {
-#     sid    = "manageSharedAMIsEncryptedEBSVolumes"
-#     effect = "Allow"
-#     #tfsec:ignore:aws-iam-no-policy-wildcards
-#     actions = [
-#       "kms:Encrypt",
-#       "kms:Decrypt",
-#       "kms:ReEncrypt*",
-#       "kms:ReEncryptFrom",
-#       "kms:GenerateDataKey*",
-#       "kms:DescribeKey",
-#       "kms:CreateGrant",
-#       "kms:ListGrants",
-#       "kms:RevokeGrant"
-#     ]
-#     # we have a legacy CMK that's used in production that will be retired but in the meantime requires permissions
-#     resources = [local.environment == "test" ? aws_kms_key.oasys-cmk[0].arn : data.aws_kms_key.oasys_key.arn, data.aws_kms_key.hmpps_key.arn]
-#   }
-# }
+data "aws_iam_policy_document" "ssm_ec2_start_stop_kms" {
+  statement {
+    sid    = "manageSharedAMIsEncryptedEBSVolumes"
+    effect = "Allow"
+    #tfsec:ignore:aws-iam-no-policy-wildcards
+    actions = [
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:ReEncrypt*",
+      "kms:ReEncryptFrom",
+      "kms:GenerateDataKey*",
+      "kms:DescribeKey",
+      "kms:CreateGrant",
+      "kms:ListGrants",
+      "kms:RevokeGrant"
+    ]
+    # we have a legacy CMK that's used in production that will be retired but in the meantime requires permissions
+    resources = [local.environment == "test" ? aws_kms_key.nomis-cmk[0].arn : data.aws_kms_key.nomis_key.arn, data.aws_kms_key.hmpps_key.arn]
+  }
 
-# data "aws_iam_policy_document" "cloud-platform-monitoring-assume-role" {
-#   statement {
-#     actions = ["sts:AssumeRole"]
+  statement {
+    sid    = "modifyAautoscalingGroupProcesses"
+    effect = "Allow"
 
-#     principals {
-#       type        = "AWS"
-#       identifiers = ["arn:aws:iam::754256621582:root"]  # cloud-platform-aws account
-#     }
-#   }
-# }
+    actions = [
+      "autoscaling:SuspendProcesses",
+      "autoscaling:ResumeProcesses",
+      "autoscaling:DescribeAutoScalingGroups",
+    ]
+    #this role manages all the autoscaling groups in an account
+    #checkov:skip=CKV_AWS_111: "Ensure IAM policies does not allow write access without constraints"
+    #checkov:skip=CKV_AWS_109: "Ensure IAM policies does not allow permissions management / resource exposure without constraints"
+    resources = ["*"] #tfsec:ignore:aws-iam-no-policy-wildcards
+  }
+}
 
-# data "aws_iam_policy_document" "cloudwatch_datasource" {
-#   statement {
-#     sid    = "AllowReadingMetricsFromCloudWatch"
-#     effect = "Allow"
-#     actions = [
-#       "cloudwatch:DescribeAlarmsForMetric",
-#       "cloudwatch:DescribeAlarmHistory",
-#       "cloudwatch:DescribeAlarms",
-#       "cloudwatch:ListMetrics",
-#       "cloudwatch:GetMetricData",
-#       "cloudwatch:GetInsightRuleReport"
-#     ]
-#     #tfsec:ignore:aws-iam-no-policy-wildcards
-#     resources = ["*"]
-#   }
-#   statement {
-#     sid    = "AllowReadingLogsFromCloudWatch"
-#     effect = "Allow"
-#     actions = [
-#       "logs:DescribeLogGroups",
-#       "logs:GetLogGroupFields",
-#       "logs:StartQuery",
-#       "logs:StopQuery",
-#       "logs:GetQueryResults",
-#       "logs:GetLogEvents"
-#     ]
-#     #tfsec:ignore:aws-iam-no-policy-wildcards
-#     resources = ["*"]
-#   }
-#   statement {
-#     sid    = "AllowReadingTagsInstancesRegionsFromEC2"
-#     effect = "Allow"
-#     actions = [
-#       "ec2:DescribeTags",
-#       "ec2:DescribeInstances",
-#       "ec2:DescribeRegions"
-#     ]
-#     resources = ["*"]
-#   }
-#   statement {
-#     sid    = "AllowReadingResourcesForTags"
-#     effect = "Allow"
-#     actions = [
-#       "tag:GetResources"
-#     ]
-#     resources = ["*"]
-#   }
-# }
+data "aws_iam_policy_document" "cloud-platform-monitoring-assume-role" {
+  statement {
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::754256621582:root"]  # cloud-platform-aws account
+    }
+  }
+}
+
+data "aws_iam_policy_document" "cloudwatch_datasource" {
+  statement {
+    sid    = "AllowReadingMetricsFromCloudWatch"
+    effect = "Allow"
+    actions = [
+      "cloudwatch:DescribeAlarmsForMetric",
+      "cloudwatch:DescribeAlarmHistory",
+      "cloudwatch:DescribeAlarms",
+      "cloudwatch:ListMetrics",
+      "cloudwatch:GetMetricData",
+      "cloudwatch:GetInsightRuleReport"
+    ]
+    #tfsec:ignore:aws-iam-no-policy-wildcards
+    resources = ["*"]
+  }
+  statement {
+    sid    = "AllowReadingLogsFromCloudWatch"
+    effect = "Allow"
+    actions = [
+      "logs:DescribeLogGroups",
+      "logs:GetLogGroupFields",
+      "logs:StartQuery",
+      "logs:StopQuery",
+      "logs:GetQueryResults",
+      "logs:GetLogEvents"
+    ]
+    #tfsec:ignore:aws-iam-no-policy-wildcards
+    resources = ["*"]
+  }
+  statement {
+    sid    = "AllowReadingTagsInstancesRegionsFromEC2"
+    effect = "Allow"
+    actions = [
+      "ec2:DescribeTags",
+      "ec2:DescribeInstances",
+      "ec2:DescribeRegions"
+    ]
+    resources = ["*"]
+  }
+  statement {
+    sid    = "AllowReadingResourcesForTags"
+    effect = "Allow"
+    actions = [
+      "tag:GetResources"
+    ]
+    resources = ["*"]
+  }
+}
 
 ###
 ###   http
