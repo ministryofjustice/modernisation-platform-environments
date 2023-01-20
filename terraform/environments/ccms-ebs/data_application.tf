@@ -31,7 +31,7 @@ data "aws_ami" "oracle_base_ready" {
 
   #owners = ["amazon"]
   #owners = ["self"]
-  owners      = [local.application_data.accounts[local.environment].ami_owner]
+  owners = [local.application_data.accounts[local.environment].ami_owner]
   filter {
     name   = "name"
     values = [local.application_data.accounts[local.environment].orace_base_ami_name_ready]
