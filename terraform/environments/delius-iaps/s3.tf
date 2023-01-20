@@ -6,8 +6,14 @@ data "aws_iam_policy_document" "iaps_s3_policy" {
         "arn:aws:iam::${local.environment_management.account_ids["core-shared-services-production"]}:role/ImageBuilder"
       ]
     }
-    actions   = ["s3:GetObject"]
-    resources = ["arn:aws:s3:::${local.artefact_bucket_name}/*"]
+    actions = [
+      "s3:ListBucket",
+      "s3:GetObject"
+    ]
+    resources = [
+      "arn:aws:s3:::${local.artefact_bucket_name}",
+      "arn:aws:s3:::${local.artefact_bucket_name}/*"
+    ]
   }
 }
 
