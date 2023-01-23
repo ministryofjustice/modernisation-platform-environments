@@ -49,6 +49,11 @@ variable "target_groups" {
   }))
 }
 
+variable "existing_target_groups" {
+  description = "Map of existing aws_lb_target_groups, if looking up target group by name (map key)"
+  default     = {}
+}
+
 variable "port" {
   type        = number
   description = "Port on which the load balancer is listening"
