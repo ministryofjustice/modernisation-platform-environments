@@ -89,7 +89,6 @@ resource "aws_cloudwatch_metric_alarm" "instance_health_check" {
   }
 }
 
-
 # Status Check Alarm
 
 resource "aws_cloudwatch_metric_alarm" "system_health_check" {
@@ -118,8 +117,8 @@ resource "aws_cloudwatch_metric_alarm" "cpu_utilization" {
   # for_each            = toset(data.aws_instances.nomis.ids)
   alarm_name          = "cpu_utilization"                          # name of the alarm
   comparison_operator = "GreaterThanOrEqualToThreshold"            # threshold to trigger the alarm state
-  evaluation_periods  = "15"                                        # how many periods over which to evaluate the alarm
-  datapoints_to_alarm = "15"                                        # how many datapoints must be breaching the threshold to trigger the alarm
+  evaluation_periods  = "15"                                       # how many periods over which to evaluate the alarm
+  datapoints_to_alarm = "15"                                       # how many datapoints must be breaching the threshold to trigger the alarm
   metric_name         = "CPUUtilization"                           # name of the alarm's associated metric   
   namespace           = "AWS/EC2"                                  # namespace of the alarm's associated metric
   period              = "60"                                       # period in seconds over which the specified statistic is applied
