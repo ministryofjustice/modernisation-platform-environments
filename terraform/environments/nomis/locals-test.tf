@@ -169,12 +169,21 @@ locals {
           server-type        = "nomis-web"
         }
         ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-01-03T17-01-12.128Z"
-        # branch = var.BRANCH_NAME # comment in if testing ansible
+        branch   = var.BRANCH_NAME # comment in if testing ansible
 
         autoscaling_group = {
-          desired_capacity  = 1
-          warm_pool         = null
-          target_group_arns = local.environment == "test" ? [module.lb_listener["https"].aws_lb_target_group["http-7777-asg"].arn] : []
+          desired_capacity = 1
+          warm_pool        = null
+          target_group_arns = local.environment == "test" ? [
+            module.lb_listener["https"].aws_lb_target_group["http-7001-asg"].arn,
+            module.lb_listener["https"].aws_lb_target_group["http-7777-asg"].arn,
+            module.lb_listener["http-7001"].aws_lb_target_group["http-7001-asg"].arn,
+            module.lb_listener["http-7777"].aws_lb_target_group["http-7777-asg"].arn,
+            module.lb_listener["internal-https"].aws_lb_target_group["http-7001-asg"].arn,
+            module.lb_listener["internal-https"].aws_lb_target_group["http-7777-asg"].arn,
+            module.lb_listener["internal-http-7001"].aws_lb_target_group["http-7001-asg"].arn,
+            module.lb_listener["internal-http-7777"].aws_lb_target_group["http-7777-asg"].arn,
+          ] : []
         }
       }
     }
@@ -274,6 +283,22 @@ locals {
         subnet_name           = "data"
       }
     }
-    ec2_jumpservers = {}
+    ec2_jumpservers = {
+      jumpserver-2022 = {
+        ami_name = "nomis_windows_server_2022_jumpserver_release_*"
+        tags = {
+          server-type       = "jumpserver"
+          description       = "Windows Server 2022 Jumpserver for NOMIS"
+          monitored         = true
+          os-type           = "Windows"
+          component         = "jumpserver"
+          nomis-environment = "dev"
+        }
+        autoscaling_group = {
+          min_size = 0
+          max_size = 1
+        }
+      }
+    }
   }
 }

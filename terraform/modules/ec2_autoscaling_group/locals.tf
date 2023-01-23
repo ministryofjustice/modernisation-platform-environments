@@ -76,4 +76,6 @@ locals {
     try(length(var.user_data_cloud_init.write_files), 0)
   ]
 
+  lb_target_group_arns        = [for key, value in aws_lb_target_group.this : value.arn]
+  merged_lb_target_group_arns = concat(coalesce(var.autoscaling_group.target_group_arns, []), local.lb_target_group_arns)
 }

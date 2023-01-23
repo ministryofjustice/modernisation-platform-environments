@@ -1,25 +1,5 @@
 locals {
 
-  lb_http_7777_rule = {
-    port                 = 7777
-    protocol             = "HTTP"
-    target_type          = "instance"
-    deregistration_delay = 30
-    health_check = {
-      enabled             = true
-      interval            = 30
-      healthy_threshold   = 3
-      matcher             = "200-399"
-      path                = "/keepalive.htm"
-      port                = 7777
-      timeout             = 5
-      unhealthy_threshold = 5
-    }
-    stickiness = {
-      enabled = true
-      type    = "lb_cookie"
-    }
-  }
 
 
   lb_listener_defaults = {
@@ -28,10 +8,16 @@ locals {
       zone_id                = data.aws_route53_zone.external-environment.zone_id
       evaluate_target_health = true
     }
-    http = {
+    nomis_public = {
       lb_application_name = "nomis-public"
-      port                = 80
-      protocol            = "HTTP"
+    }
+    nomis_internal = {
+      lb_application_name = "nomis-internal"
+    }
+
+    http = {
+      port     = 80
+      protocol = "HTTP"
       default_action = {
         type = "redirect"
         redirect = {
@@ -41,12 +27,33 @@ locals {
         }
       }
     }
+    http-7001 = {
+      port     = 7001
+      protocol = "HTTP"
+      target_groups = {
+        http-7001-asg = local.lb_target_group_http_7001
+      }
+      default_action = {
+        type              = "forward"
+        target_group_name = "http-7001-asg"
+      }
+    }
+    http-7777 = {
+      port     = 7777
+      protocol = "HTTP"
+      target_groups = {
+        http-7777-asg = local.lb_target_group_http_7777
+      }
+      default_action = {
+        type              = "forward"
+        target_group_name = "http-7777-asg"
+      }
+    }
     https = {
-      lb_application_name = "nomis-public"
-      port                = 443
-      protocol            = "HTTPS"
-      ssl_policy          = "ELBSecurityPolicy-2016-08"
-      certificate_arns    = [module.acm_certificate[local.certificate.modernisation_platform_wildcard.name].arn]
+      port             = 443
+      protocol         = "HTTPS"
+      ssl_policy       = "ELBSecurityPolicy-2016-08"
+      certificate_arns = [module.acm_certificate[local.certificate.modernisation_platform_wildcard.name].arn]
       default_action = {
         type = "fixed-response"
         fixed_response = {
@@ -56,17 +63,37 @@ locals {
         }
       }
       target_groups = {
-        http-7777 = local.lb_http_7777_rule
+        http-7001-asg = local.lb_target_group_http_7001
+        http-7777-asg = local.lb_target_group_http_7777
       }
       rules = {
-        forward-http-7777 = {
+        forward-http-7001-asg = {
+          priority = 100
           actions = [{
             type              = "forward"
-            target_group_name = "http-7777"
+            target_group_name = "http-7001-asg"
+          }]
+          conditions = [
+            {
+              host_header = {
+                values = ["*.nomis.${local.vpc_name}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
+              }
+            },
+            {
+              path_pattern = {
+                values = ["/console", "/console/*"]
+              }
+          }]
+        }
+        forward-http-7777-asg = {
+          priority = 200
+          actions = [{
+            type              = "forward"
+            target_group_name = "http-7777-asg"
           }]
           conditions = [{
             host_header = {
-              values = ["*-nomis-web.nomis.${local.vpc_name}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
+              values = ["*.nomis.${local.vpc_name}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
             }
           }]
         }
@@ -82,41 +109,20 @@ locals {
     development = {}
 
     test = {
-      http = local.lb_listener_defaults.http
-
-      https = merge(local.lb_listener_defaults.https, {
-        target_groups = {
-          http-7777-asg = local.lb_http_7777_rule
-        }
-
-        rules = {
-          http-7777-asg = {
-            actions = [{
-              type              = "forward"
-              target_group_name = "http-7777-asg"
-            }]
-            conditions = [{
-              host_header = {
-                values = ["*-nomis-web.nomis.${local.vpc_name}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
-              }
-            }]
-          }
-          http-7777-weblogic-cnomt1 = {
-            actions = [{
-              type             = "forward"
-              target_group_arn = local.environment == "test" ? module.weblogic["CNOMT1"].target_group_arn : null
-            }]
-            conditions = [{
-              host_header = {
-                values = ["weblogic-cnomt1.nomis.${local.vpc_name}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
-              }
-            }]
-          }
-        }
-
+      http      = merge(local.lb_listener_defaults.http, local.lb_listener_defaults.nomis_public)
+      http-7001 = merge(local.lb_listener_defaults.http-7001, local.lb_listener_defaults.nomis_public)
+      http-7777 = merge(local.lb_listener_defaults.http-7777, local.lb_listener_defaults.nomis_public)
+      https = merge(local.lb_listener_defaults.https, local.lb_listener_defaults.nomis_public, {
         route53_records = {
-          "t1-nomis-web.nomis"    = local.lb_listener_defaults.environment_external_dns_zone
-          "weblogic-cnomt1.nomis" = local.lb_listener_defaults.environment_external_dns_zone
+          "t1-nomis-web.nomis" = local.lb_listener_defaults.environment_external_dns_zone
+        }
+      })
+      internal-http      = merge(local.lb_listener_defaults.http, local.lb_listener_defaults.nomis_internal)
+      internal-http-7001 = merge(local.lb_listener_defaults.http-7001, local.lb_listener_defaults.nomis_internal)
+      internal-http-7777 = merge(local.lb_listener_defaults.http-7777, local.lb_listener_defaults.nomis_internal)
+      internal-https = merge(local.lb_listener_defaults.https, local.lb_listener_defaults.nomis_internal, {
+        route53_records = {
+          "t1-nomis-web-internal.nomis" = local.lb_listener_defaults.environment_external_dns_zone
         }
       })
     }

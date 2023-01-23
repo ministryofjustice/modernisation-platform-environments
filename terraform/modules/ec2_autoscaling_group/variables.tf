@@ -14,6 +14,12 @@ variable "region" {
   default     = "eu-west-2"
 }
 
+variable "vpc_id" {
+  type        = string
+  description = "vpc id which only needs populating if lb_target_groups is set"
+  default     = null
+}
+
 variable "subnet_ids" {
   type        = list(string)
   description = "List of subnet ids given to the ASG to set the associated AZs (and therefore redundancy of the ASG instances)"
@@ -200,4 +206,36 @@ variable "ssm_parameters" {
     description = string
   }))
   default = null
+}
+
+variable "lb_target_groups" {
+  description = "Map of load balancer target groups, where key is the name.  vpc_id needs setting if this is used"
+  type = map(object({
+    port                 = optional(number)
+    protocol             = optional(string)
+    target_type          = string
+    deregistration_delay = optional(number)
+    health_check = optional(object({
+      enabled             = optional(bool)
+      interval            = optional(number)
+      healthy_threshold   = optional(number)
+      matcher             = optional(string)
+      path                = optional(string)
+      port                = optional(number)
+      timeout             = optional(number)
+      unhealthy_threshold = optional(number)
+    }))
+    stickiness = optional(object({
+      enabled         = optional(bool)
+      type            = string
+      cookie_duration = optional(number)
+      cookie_name     = optional(string)
+    }))
+    attachments = optional(list(object({
+      target_id         = string
+      port              = optional(number)
+      availability_zone = optional(string)
+    })), [])
+  }))
+  default = {}
 }

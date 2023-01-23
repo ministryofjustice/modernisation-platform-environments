@@ -94,7 +94,7 @@ resource "aws_autoscaling_group" "this" {
   health_check_type         = var.autoscaling_group.health_check_type
   force_delete              = var.autoscaling_group.force_delete
   termination_policies      = var.autoscaling_group.termination_policies
-  target_group_arns         = var.autoscaling_group.target_group_arns
+  target_group_arns         = length(local.merged_lb_target_group_arns) != 0 ? local.merged_lb_target_group_arns : null
   vpc_zone_identifier       = var.subnet_ids
   wait_for_capacity_timeout = var.autoscaling_group.wait_for_capacity_timeout
 
@@ -214,8 +214,7 @@ resource "aws_iam_role" "this" {
 
   tags = merge(local.tags, {
     Name = "${var.iam_resource_names_prefix}-role-${var.name}"
-    }
-  )
+  })
 }
 
 data "aws_iam_policy_document" "asm_parameter" {
@@ -257,4 +256,42 @@ resource "aws_iam_instance_profile" "this" {
   name = "${var.iam_resource_names_prefix}-profile-${var.name}"
   role = aws_iam_role.this.name
   path = "/"
+}
+
+resource "aws_lb_target_group" "this" {
+  for_each = var.lb_target_groups
+
+  name                 = "${var.name}-${each.key}"
+  port                 = each.value.port
+  protocol             = each.value.protocol
+  target_type          = "instance"
+  deregistration_delay = each.value.deregistration_delay
+  vpc_id               = var.vpc_id
+
+  dynamic "health_check" {
+    for_each = each.value.health_check != null ? [each.value.health_check] : []
+    content {
+      enabled             = health_check.value.enabled
+      interval            = health_check.value.interval
+      healthy_threshold   = health_check.value.healthy_threshold
+      matcher             = health_check.value.matcher
+      path                = health_check.value.path
+      port                = health_check.value.port
+      timeout             = health_check.value.timeout
+      unhealthy_threshold = health_check.value.unhealthy_threshold
+    }
+  }
+  dynamic "stickiness" {
+    for_each = each.value.stickiness != null ? [each.value.stickiness] : []
+    content {
+      enabled         = stickiness.value.enabled
+      type            = stickiness.value.type
+      cookie_duration = stickiness.value.cookie_duration
+      cookie_name     = stickiness.value.cookie_name
+    }
+  }
+
+  tags = merge(var.tags, {
+    Name = "${var.name}-${each.key}"
+  })
 }

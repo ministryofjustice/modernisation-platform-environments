@@ -7,4 +7,6 @@ locals {
       }
     ]
   ])
+
+  target_groups = merge(var.existing_target_groups, aws_lb_target_group.this)
 }
