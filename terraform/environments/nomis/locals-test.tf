@@ -182,6 +182,10 @@ locals {
             module.lb_listener["https"].aws_lb_target_group["http-7777-asg"].arn,
             module.lb_listener["http-7001"].aws_lb_target_group["http-7001-asg"].arn,
             module.lb_listener["http-7777"].aws_lb_target_group["http-7777-asg"].arn,
+            module.lb_listener["internal-https"].aws_lb_target_group["http-7001-asg"].arn,
+            module.lb_listener["internal-https"].aws_lb_target_group["http-7777-asg"].arn,
+            module.lb_listener["internal-http-7001"].aws_lb_target_group["http-7001-asg"].arn,
+            module.lb_listener["internal-http-7777"].aws_lb_target_group["http-7777-asg"].arn,
           ] : []
         }
       }
