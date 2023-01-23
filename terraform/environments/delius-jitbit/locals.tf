@@ -71,7 +71,7 @@ locals {
       from_port       = 1433
       to_port         = 1433
       protocol        = "tcp"
-      cidr_blocks     = data.aws_subnets.shared-data.ids
+      cidr_blocks     = [data.aws_subnet.data_subnets_a.cidr_block, data.aws_subnet.data_subnets_b.cidr_block, data.aws_subnet.data_subnets_c.cidr_block]
       security_groups = [aws_security_group.load_balancer_security_group.id]
     }
   }
