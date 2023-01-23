@@ -1,8 +1,9 @@
 #  Build EC2 
-resource "aws_instance" "ec2_oracle_base_ebs_cmk" {
+resource "aws_instance" "ec2_oracle_base_ebs_final" {
   instance_type               = local.application_data.accounts[local.environment].ec2_oracle_instance_type_ebs_cmk
 #  ami                         = data.aws_ami.oracle_base_ready.id
-  ami                         = data.aws_ami.oracle_base_marketplace.id
+  ami                         = data.aws_ami.oracle_base_ready_cmk.id
+#  ami                         = data.aws_ami.oracle_base_marketplace.id
   key_name                    = local.application_data.accounts[local.environment].key_name
   vpc_security_group_ids      = [aws_security_group.ec2_sg_oracle_base.id]
   subnet_id                   = data.aws_subnet.private_subnets_a.id

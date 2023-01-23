@@ -56,3 +56,18 @@ data "aws_ami" "oracle_base_prereqs" {
   }
 }
 
+data "aws_ami" "oracle_base_ready_cmk" {
+  most_recent = true
+
+  #owners = ["amazon"]
+  #owners = ["self"]
+  owners = [local.application_data.accounts[local.environment].ami_owner]
+  filter {
+    name   = "name"
+    values = [local.application_data.accounts[local.environment].orace_base_prereqs_final_ami_name]
+  }
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+}

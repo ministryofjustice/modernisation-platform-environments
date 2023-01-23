@@ -12,6 +12,7 @@
       "orace_base_ami_name_mp": "OL7.9-x86_64-HVM-2023-01-05",
       "orace_base_ami_name_ready": "Oracle-79-base-preinstall-ready",
       "orace_base_prereqs_ami_name": "Oracle79-prereqs",
+      "orace_base_prereqs_final_ami_name": "Oracle79-prereqs-v1_1",
       "key_name": "oracle-base-dev",
       "dns_nameserver": "10.26.56.2"
     },
