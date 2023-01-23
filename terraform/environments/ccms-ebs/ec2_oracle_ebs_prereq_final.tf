@@ -6,7 +6,7 @@ resource "aws_instance" "ec2_oracle_base_ebs_final" {
 #  ami                         = data.aws_ami.oracle_base_marketplace.id
   key_name                    = local.application_data.accounts[local.environment].key_name
   vpc_security_group_ids      = [aws_security_group.ec2_sg_oracle_base.id]
-  subnet_id                   = data.aws_subnet.private_subnets_a.id
+  subnet_id                   = data.aws_subnet.data_subnets_a.id
   monitoring                  = true
   ebs_optimized               = false
   associate_public_ip_address = false
