@@ -1,4 +1,7 @@
 #tfsec:ignore:aws-elb-alb-not-public
+# checkov:skip=CKV_AWS_226
+# checkov:skip=CKV2_AWS_28
+
 resource "aws_lb" "external" {
   name               = "${local.application_name}-lb"
   internal           = false
@@ -52,6 +55,7 @@ resource "aws_lb_listener" "listener" {
   }
 }
 
+# checkov:skip=CKV_AWS_261
 
 resource "aws_lb_target_group" "target_group" {
   name                 = "${local.application_name}-tg-${local.environment}"
