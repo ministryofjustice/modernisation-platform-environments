@@ -1,6 +1,6 @@
 #  Build EC2 
-resource "aws_instance" "ec2_oracle_base_ebs_nokms" {
-  instance_type               = local.application_data.accounts[local.environment].ec2_oracle_instance_type_ebs_no_kms
+resource "aws_instance" "ec2_oracle_base_ebs_cmk" {
+  instance_type               = local.application_data.accounts[local.environment].ec2_oracle_instance_type_ebs_cmk
   ami                         = data.aws_ami.oracle_base_ready.id
   key_name                    = local.application_data.accounts[local.environment].key_name
   vpc_security_group_ids      = [aws_security_group.ec2_sg_oracle_base.id]
@@ -36,6 +36,7 @@ EOF
     volume_type = "gp3"
     volume_size = 50
     encrypted   = false
+    kms_key_id = aws_kms_key.oracle_ec2.arn
     tags = merge(local.tags,
       { Name = "root-block" }
     )
@@ -46,7 +47,7 @@ EOF
     volume_type = "gp3"
     volume_size = 200
     encrypted   = false
-    #    kms_key_id  = aws_kms_key.this.arn
+    kms_key_id = aws_kms_key.oracle_ec2.arn
     tags = merge(local.tags,
       { Name = "ebs-block1" }
     )
