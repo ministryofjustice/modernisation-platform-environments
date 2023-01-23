@@ -171,8 +171,7 @@ locals {
           server-type        = "nomis-web"
         }
         ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-01-03T17-01-12.128Z"
-        branch   = "nomis/DSOS-1644/fix-tagsar-deployment"
-        # branch = var.BRANCH_NAME # comment in if testing ansible
+        branch   = var.BRANCH_NAME # comment in if testing ansible
 
         autoscaling_group = {
           desired_capacity = 1
