@@ -36,7 +36,7 @@ EOF
     volume_type = "gp3"
     volume_size = 50
     encrypted   = false
-    kms_key_id = aws_kms_key.oracle_ec2.arn
+    kms_key_id  = aws_kms_key.oracle_ec2.arn
     tags = merge(local.tags,
       { Name = "root-block" }
     )
@@ -47,7 +47,7 @@ EOF
     volume_type = "gp3"
     volume_size = 200
     encrypted   = false
-    kms_key_id = aws_kms_key.oracle_ec2.arn
+    kms_key_id  = aws_kms_key.oracle_ec2.arn
     tags = merge(local.tags,
       { Name = "ebs-block1" }
     )
