@@ -1,16 +1,9 @@
 #  Build EC2 
-<<<<<<< HEAD:terraform/environments/ccms-ebs/ec2_oracle_ebs_prereq_final.tf
 resource "aws_instance" "ec2_oracle_base_ebs_final" {
   instance_type               = local.application_data.accounts[local.environment].ec2_oracle_instance_type_ebs_cmk
 #  ami                         = data.aws_ami.oracle_base_ready.id
   ami                         = data.aws_ami.oracle_base_ready_cmk.id
 #  ami                         = data.aws_ami.oracle_base_marketplace.id
-=======
-resource "aws_instance" "ec2_oracle_base_ebs_cmk" {
-  instance_type = local.application_data.accounts[local.environment].ec2_oracle_instance_type_ebs_cmk
-  #  ami                         = data.aws_ami.oracle_base_ready.id
-  ami                         = data.aws_ami.oracle_base_marketplace.id
->>>>>>> f0a38524bf21fa11b5d8de4739e6684ebe8fa0d4:terraform/environments/ccms-ebs/ec2_oracle_ebs_prereq_no_kms.tf
   key_name                    = local.application_data.accounts[local.environment].key_name
   vpc_security_group_ids      = [aws_security_group.ec2_sg_oracle_base.id]
   subnet_id                   = data.aws_subnet.private_subnets_a.id
