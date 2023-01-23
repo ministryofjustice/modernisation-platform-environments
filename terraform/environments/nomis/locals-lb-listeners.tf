@@ -76,7 +76,7 @@ locals {
           conditions = [
             {
               host_header = {
-                values = ["*-nomis-web.nomis.${local.vpc_name}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
+                values = ["*.nomis.${local.vpc_name}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
               }
             },
             {
@@ -93,7 +93,7 @@ locals {
           }]
           conditions = [{
             host_header = {
-              values = ["*-nomis-web.nomis.${local.vpc_name}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
+              values = ["*.nomis.${local.vpc_name}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
             }
           }]
         }
