@@ -29,8 +29,6 @@ locals {
       local.cidrs.noms_mgmt,
       local.cidrs.noms_transit_live_fw_devtest,
       local.cidrs.noms_transit_live_fw_prod,
-      local.cidrs.hmpps_development,
-      local.cidrs.hmpps_test,
     ]
 
     # vars common across ec2 instances
