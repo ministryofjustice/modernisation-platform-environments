@@ -15,6 +15,7 @@ terraform {
     template = {
       version = "2.2.0"
       source  = "hashicorp/template"
+    }
   }
   required_version = "~> 1.0"
 }
