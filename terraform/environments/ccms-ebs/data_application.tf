@@ -55,12 +55,9 @@ data "aws_ami" "oracle_base_prereqs" {
     values = ["hvm"]
   }
 }
-
+/*
 data "aws_ami" "oracle_base_ready_cmk" {
   most_recent = true
-
-  #owners = ["amazon"]
-  #owners = ["self"]
   owners = [local.application_data.accounts[local.environment].ami_owner]
   filter {
     name   = "name"
@@ -71,3 +68,4 @@ data "aws_ami" "oracle_base_ready_cmk" {
     values = ["hvm"]
   }
 }
+*/
