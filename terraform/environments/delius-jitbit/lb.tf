@@ -23,6 +23,14 @@ resource "aws_security_group" "load_balancer_security_group" {
     cidr_blocks = ["81.134.202.29/32", ]
   }
 
+  egress {
+    protocol    = "tcp"
+    description = "Open the server port"
+    from_port   = 80
+    to_port     = 80
+    cidr_blocks = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
+  }
+
   tags = merge(
     local.tags,
     {

@@ -72,7 +72,15 @@ locals {
       to_port         = 1433
       protocol        = "tcp"
       cidr_blocks     = [data.aws_subnet.data_subnets_a.cidr_block, data.aws_subnet.data_subnets_b.cidr_block, data.aws_subnet.data_subnets_c.cidr_block]
-      security_groups = [aws_security_group.load_balancer_security_group.id]
+      security_groups = null
+    },
+    "cluster_ec2_lb_egress" = {
+      description     = "Allow 443 to internet"
+      from_port       = 443
+      to_port         = 443
+      protocol        = "tcp"
+      cidr_blocks     = ["0.0.0.0/0"]
+      security_groups = null
     }
   }
 
