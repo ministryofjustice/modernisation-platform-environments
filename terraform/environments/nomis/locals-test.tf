@@ -285,6 +285,37 @@ locals {
         subnet_name           = "data"
       }
     }
-    ec2_jumpservers = {}
+    ec2_jumpservers = {
+      jumpserver-2022 = {
+        ami_name = "nomis_windows_server_2022_jumpserver_release_*"
+        tags = {
+          server-type       = "jumpserver"
+          description       = "Windows Server 2022 Jumpserver for NOMIS"
+          monitored         = true
+          os-type           = "Windows"
+          component         = "jumpserver"
+          nomis-environment = "dev"
+        }
+        autoscaling_group = {
+          min_size = 0
+          max_size = 1
+        }
+      }
+      jumpserver-2019 = {
+        ami_name = "nomis_windows_server_2019_jumpserver_test_*"
+        tags = {
+          server-type       = "jumpserver"
+          description       = "Windows Server 2019 Jumpserver for NOMIS"
+          monitored         = true
+          os-type           = "Windows"
+          component         = "jumpserver"
+          nomis-environment = "dev"
+        }
+        autoscaling_group = {
+          min_size = 0
+          max_size = 1
+        }
+      }
+    }
   }
 }
