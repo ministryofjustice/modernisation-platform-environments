@@ -1,5 +1,5 @@
 #tfsec:ignore:aws-cloudwatch-log-group-customer-key
-/*
+
 module "ecs" {
 
   source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs?ref=654c2b2"
@@ -79,4 +79,4 @@ data "aws_ami" "ecs_ami" {
     values = ["hvm"]
   }
 }
-*/
+
