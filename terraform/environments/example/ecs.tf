@@ -29,7 +29,7 @@ module "ecs" {
 }
 
 locals {
-  ecs_application_name = "example-ecs"
+  ecs_application_name = "example-app"
   # Build EC2 ingress and egress rules
   ec2_ingress_rules = {
     "cluster_ec2_lb_ingress" = {
@@ -43,8 +43,8 @@ locals {
     }
     "cluster_ec2_lb_ingress_2" = {
       description = "Cluster EC2 ingress rule 2"
-      from_port   = 8080
-      to_port     = 8080
+      from_port   = 80
+      to_port     = 80
       protocol    = "tcp"
       cidr_blocks = [
       data.aws_vpc.shared.cidr_block]
@@ -66,8 +66,8 @@ locals {
   ecs_loadbalancer_ingress_rules = {
     "cluster_ec2_lb_ingress" = {
       description     = "Cluster EC2 loadbalancer ingress rule"
-      from_port       = 8080
-      to_port         = 8080
+      from_port       = 80
+      to_port         = 80
       protocol        = "tcp"
       cidr_blocks     = []
       security_groups = []

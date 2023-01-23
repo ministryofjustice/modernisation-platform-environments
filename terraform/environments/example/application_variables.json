@@ -27,7 +27,7 @@
       "ecs_key_name": "",
       "ec2_desired_capacity": "2",
       "ec2_max_size": "4",
-      "ec2_min_size": "1",
+      "ec2_min_size": "2",
       "container_cpu": "256",
       "container_memory": "1024",
       "task_definition_volume":  "application_volume",
