@@ -12,6 +12,7 @@ data "aws_ami" "oracle_base" {
     values = ["hvm"]
   }
 }
+*/
 data "aws_ami" "oracle_base_marketplace" {
   most_recent = true
   owners      = ["131827586825"]
@@ -25,7 +26,7 @@ data "aws_ami" "oracle_base_marketplace" {
     values = ["hvm"]
   }
 }
-*/
+
 data "aws_ami" "oracle_base_ready" {
   most_recent = true
 
