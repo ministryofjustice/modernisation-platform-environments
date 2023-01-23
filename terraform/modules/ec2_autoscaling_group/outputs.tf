@@ -1,4 +1,4 @@
-output "lb_target_group_arns" {
-  description = "list of lb_target_group arns linked to the autoscaling group"
-  value       = local.lb_target_group_arns
+output "lb_target_groups" {
+  description = "map of aws_lb_target_group resources"
+  value       = aws_lb_target_group.this
 }
