@@ -125,11 +125,11 @@ resource "aws_security_group" "ec2" {
     security_groups = [local.application_data.accounts[local.environment].ssm_interface_endpoint_security_group]
   }
   egress {
-    description     = "Allow AWS SSM Session Manager"
-    from_port       = 443
-    to_port         = 443
-    protocol        = "tcp"
-    cidr_blocks     = [local.application_data.accounts[local.environment].outbound_access_cidr]
+    description = "Allow AWS SSM Session Manager"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = [local.application_data.accounts[local.environment].outbound_access_cidr]
   }
   egress {
     description = "access to the admin server"
