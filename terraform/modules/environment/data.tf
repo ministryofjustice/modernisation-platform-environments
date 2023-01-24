@@ -29,6 +29,24 @@ data "aws_subnets" "this" {
   }
 }
 
+data "aws_route53_zone" "core_network_services" {
+  for_each = { for key, value in local.route53_zones : key => value if value.account == "core-network-services" }
+
+  provider = aws.core-network-services
+
+  name         = "${each.key}."
+  private_zone = each.value.private_zone
+}
+
+data "aws_route53_zone" "core_vpc" {
+  for_each = { for key, value in local.route53_zones : key => value if value.account == "core-vpc" }
+
+  provider = aws.core-vpc
+
+  name         = "${each.key}."
+  private_zone = each.value.private_zone
+}
+
 #------------------------------------------------------------------------------
 # KMS
 #------------------------------------------------------------------------------

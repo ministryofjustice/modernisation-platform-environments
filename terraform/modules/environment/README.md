@@ -1,12 +1,13 @@
 # Environment module
 
 Module for grabbing common resources from a modernisation platform account.
-Returns some useful outputs to save some typing and duplication.
+This doesn't create any resources, but it does return some useful outputs to save duplication.
 
 ## Pre-requisites
 
 - An application configuration file accessible via http, for example [nomis.json](https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/nomis.json)
 - Business-unit customer-managed keys in the `core-shared-serviced-production` account's KMS, e.g. `general-hmpps`, `ebs-hmpps`, `rds-hmpps`
+- Modernisation platform provided Route53 zones (top level zones in `core-network-services` account and business unit zones in `core-vpc` account)
 
 ## Usage
 
@@ -15,6 +16,11 @@ For example:
 ```
 module "environment" {
   source = "../../modules/environment"
+
+  providers = {
+    aws.core-network-services = aws.core-network-services
+    aws.core-vpc              = aws.core-vpc
+  }
 
   environment_management = local.environment_management
   business_unit          = local.business_unit
@@ -29,6 +35,13 @@ module.environment.kms_keys["ebs"].arn
 # Access business unit environment VPC id
 module.environment.vpc.id
 
-# Accuess private subnet ids
+# Access private subnet ids
 module.environment.subnets["private"].ids
+
+# Access application public and/or internal domain name
+module.environment.domains.public.application_environment
+module.environment.domains.internal.application_environment
+
+# Access business unit specific public route53_zone id
+module.environment.route53_zones[module.environment.domains.public.business_unit_environment].id
 ```

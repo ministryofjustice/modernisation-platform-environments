@@ -77,27 +77,3 @@ data "aws_caller_identity" "current" {}
 data "aws_iam_role" "member_infrastructure_access" {
   name = "MemberInfrastructureAccess"
 }
-
-#------------------------------------------------------------------------------
-# Route 53 Zones
-#------------------------------------------------------------------------------
-data "aws_route53_zone" "internal" {
-  provider = aws.core-vpc
-
-  name         = "${module.environment.vpc_name}.modernisation-platform.internal."
-  private_zone = true
-}
-
-data "aws_route53_zone" "external" {
-  provider = aws.core-network-services
-
-  name         = "modernisation-platform.service.justice.gov.uk."
-  private_zone = false
-}
-
-data "aws_route53_zone" "external-environment" {
-  provider = aws.core-vpc
-
-  name         = "${module.environment.vpc_name}.modernisation-platform.service.justice.gov.uk."
-  private_zone = false
-}

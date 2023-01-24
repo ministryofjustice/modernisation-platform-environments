@@ -5,7 +5,7 @@ locals {
   lb_listener_defaults = {
     environment_external_dns_zone = {
       account                = "core-vpc"
-      zone_id                = data.aws_route53_zone.external-environment.zone_id
+      zone_id                = module.environment.route53_zones[module.environment.domains.public.business_unit_environment].zone_id
       evaluate_target_health = true
     }
     nomis_public = {
@@ -53,7 +53,7 @@ locals {
       port             = 443
       protocol         = "HTTPS"
       ssl_policy       = "ELBSecurityPolicy-2016-08"
-      certificate_arns = [module.acm_certificate[local.certificate.modernisation_platform_wildcard.name].arn]
+      certificate_arns = [module.acm_certificate["star.${module.environment.domains.public.application_environment}"].arn]
       default_action = {
         type = "fixed-response"
         fixed_response = {
