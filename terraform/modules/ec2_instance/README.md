@@ -76,9 +76,9 @@ NOTE: oracle-sids is used earlier in the setup and there may be more then one in
 
 ### Checking database restore has completed succesfully
 
-Connect to the new database instance using aws ssm as normal
+Connect to the new database instance using aws ssm as normal.
 
-Run the following commands
+Run the following commands to enter the oracle environment.
 
 ```
 sudo su - oracle
