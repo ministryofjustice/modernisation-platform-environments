@@ -129,7 +129,7 @@ resource "aws_security_group" "ec2" {
     from_port       = 443
     to_port         = 443
     protocol        = "tcp"
-    security_groups = "0.0.0.0/0"
+    security_groups = [local.application_data.accounts[local.environment].outbound_access_cidr]
   }
   egress {
     description = "access to the admin server"
@@ -199,7 +199,7 @@ resource "aws_security_group" "ec2" {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = "0.0.0.0/0"
+    cidr_blocks = [local.application_data.accounts[local.environment].outbound_access_cidr]
   }
 }
 

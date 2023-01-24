@@ -8,7 +8,8 @@
       "orahomesize": "150",
       "stageesize": "200",
       "ssm_interface_endpoint_security_group": "sg-0754d9a309704addd",
-      "managementcidr": "10.200.0.0/20"
+      "managementcidr": "10.200.0.0/20",
+      "outbound_access_cidr": "0.0.0.0/0"
     },
     "test": {
       "example_var": "test-data"
