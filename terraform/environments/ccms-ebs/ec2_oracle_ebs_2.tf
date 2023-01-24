@@ -2,7 +2,8 @@
 resource "aws_instance" "ec2_oracle_ebs2" {
 
   instance_type               = local.application_data.accounts[local.environment].ec2_oracle_instance_type_ebs_cmk
-  ami                         = data.aws_ami.oracle_base_prereqs.id
+  ami                         = data.aws_ami.oracle_base_marketplace.id
+  #ami                         = data.aws_ami.oracle_base_prereqs.id
   key_name                    = local.application_data.accounts[local.environment].key_name
   vpc_security_group_ids      = [aws_security_group.ec2_sg_oracle_base.id]
   subnet_id                   = data.aws_subnet.data_subnets_a.id
@@ -32,9 +33,65 @@ EOF
     http_endpoint = "enabled"
     http_tokens   = "required"
   }
+  root_block_device {
+    volume_type = "gp3"
+    volume_size = 50
+    encrypted   = true
+    kms_key_id  = data.aws_kms_key.ebs_shared.key_id
+    tags = merge(local.tags,
+      { Name = "root-block" }
+    )
+  }
+
+  ebs_block_device {
+    device_name = "/dev/sdf"
+    volume_type = "gp3"
+    volume_size = 200
+    encrypted   = true
+    kms_key_id  = data.aws_kms_key.ebs_shared.key_id
+    tags = merge(local.tags,
+      { Name = "ebs-block1" }
+    )
+  }
 
   tags = merge(local.tags,
     { Name = lower(format("ec2-%s-%s-Oracle-EBS-deleteme", local.application_name, local.environment)) }
   )
   depends_on = [aws_security_group.ec2_sg_oracle_base]
 }
+
+/*
+
+#Create 6 EBS volumes and attach 2 per instance.
+resource "aws_ebs_volume" "vertica_ebs" {
+  availability_zone               = "${var.availability_zone}"
+  size                            = "500"
+  type                            = "io2"
+
+}
+
+  ebs_block_device {
+    device_name = "/dev/sdf"
+    volume_type = "gp3"
+    volume_size = 200
+    encrypted   = true
+    tags = merge(local.tags,
+      { Name = "ebs-block1" }
+    )
+  }
+
+
+#Attach ebs volume
+resource "aws_volume_attachment" "ebs_att" {
+  count = "6"
+  volume {
+    device_name = "/dev/sdf"
+    volume_id = "[${element(aws_ebs_volume.vertica_ebs.*.id, count.index)}]"
+  }
+  volume{
+    device_name = "/dev/sdg"
+    volume_id = "[${element(aws_ebs_volume.vertica_ebs.*.id, count.index)}]"
+  }
+  instance_id = "[${element(aws_instance.vertica1.*.id,count.index)}]"
+}
+*/

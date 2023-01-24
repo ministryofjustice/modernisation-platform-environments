@@ -11,9 +11,9 @@ resource "aws_instance" "ec2_oracle_ebs" {
   iam_instance_profile        = aws_iam_instance_profile.iam_instace_profile_oracle_base.name
 
   # Due to a bug in terraform wanting to rebuild the ec2 if more than 1 ebs block is attached, we need the lifecycle clause below
-  lifecycle {
-    ignore_changes = [ebs_block_device]
-  }
+  #lifecycle {
+  #  ignore_changes = [ebs_block_device]
+  #}
 
   user_data = <<EOF
 #!/bin/bash
@@ -31,6 +31,7 @@ EOF
     http_endpoint = "enabled"
     http_tokens   = "required"
   }
+  /*
   # Increase the volume size of the root volume
   root_block_device {
     volume_type = "gp3"
@@ -46,11 +47,11 @@ EOF
     volume_type = "gp3"
     volume_size = 200
     encrypted   = true
-    #    kms_key_id  = aws_kms_key.this.arn
     tags = merge(local.tags,
       { Name = "ebs-block1" }
     )
   }
+  */
   tags = merge(local.tags,
     { Name = lower(format("ec2-%s-%s-Oracle-EBS", local.application_name, local.environment)) }
   )
