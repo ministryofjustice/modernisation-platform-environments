@@ -26,7 +26,21 @@ data "aws_ami" "oracle_base_marketplace" {
     values = ["hvm"]
   }
 }
+data "aws_ami" "oracle_base" {
+  most_recent = true
 
+  #owners = ["amazon"]
+  #owners = ["self"]
+  owners = [local.application_data.accounts[local.environment].ami_owner]
+  filter {
+    name   = "name"
+    values = [local.application_data.accounts[local.environment].orace_base_ami_name]
+  }
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+}
 data "aws_ami" "oracle_base_ready" {
   most_recent = true
 
