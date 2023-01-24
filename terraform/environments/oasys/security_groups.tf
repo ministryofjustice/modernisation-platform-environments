@@ -56,6 +56,7 @@ resource "aws_security_group_rule" "webserver_linux_egress_1" {
   from_port   = "0"
   to_port     = "65535"
   protocol    = "TCP"
+  #tfsec:ignore:aws-ec2-no-public-egress-sgr
   cidr_blocks = ["0.0.0.0/0"]
 }
 

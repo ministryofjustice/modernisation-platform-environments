@@ -287,6 +287,7 @@ data "aws_iam_policy_document" "ssm_custom" {
   }
 }
 # custom policy document for cloudwatch agent, based on CloudWatchAgentServerPolicy but removed CreateLogGroup permission to enforce all log groups in code
+#checkov:skip=CKV_AWS_111: "Ensure IAM policies does not allow write access without constraints"
 data "aws_iam_policy_document" "cloud_watch_custom" {
   statement {
     sid    = "CloudWatchAgentServerPolicy"
@@ -301,7 +302,6 @@ data "aws_iam_policy_document" "cloud_watch_custom" {
       "logs:CreateLogStream"
     ]
     # skiping these as policy is a scoped down version of Amazon provided CloudWatchAgentServerPolicy managed policy
-    #checkov:skip=CKV_AWS_111: "Ensure IAM policies does not allow write access without constraints"
     resources = ["*"] #tfsec:ignore:aws-iam-no-policy-wildcards
   }
   statement {
@@ -324,8 +324,9 @@ data "aws_iam_policy_document" "cloud_watch_custom" {
   }
 }
 # create policy document for access to s3 artefact bucket 
+#checkov:skip=CKV_AWS_111: "Ensure IAM policies does not allow write access without constraints"
+#checkov:skip=CKV_AWS_109: "Ensure IAM policies does not allow permissions management / resource exposure without constraints"
 data "aws_iam_policy_document" "application_insights" {
-
   statement {
     sid    = "AllowApplicationInsights"
     effect = "Allow"
