@@ -200,9 +200,12 @@ data "aws_secretsmanager_secret_version" "environment_management" {
 ###   aws_kms_key
 ###
 # Shared KMS keys (per business unit)
-data "aws_kms_key" "general_shared" { key_id = "arn:aws:kms:eu-west-2:${local.environment_management.account_ids["core-shared-services-production"]}:alias/general-${local.business_unit}" }
-data "aws_kms_key" "ebs_shared" { key_id = "arn:aws:kms:eu-west-2:${local.environment_management.account_ids["core-shared-services-production"]}:alias/ebs-${local.business_unit}" }
-data "aws_kms_key" "rds_shared" { key_id = "arn:aws:kms:eu-west-2:${local.environment_management.account_ids["core-shared-services-production"]}:alias/rds-${local.business_unit}" }
+data "aws_kms_key" "general_shared" { key_id = "arn:aws:kms:${local.region}:${local.environment_management.account_ids["core-shared-services-production"]}:alias/general-${local.business_unit}" }
+# shared CMK used to create AMIs in the MP shared services account
+data "aws_kms_key" "ebs_hmpps" { key_id = "arn:aws:kms:${local.region}:${local.environment_management.account_ids["core-shared-services-production"]}:alias/ebs-${local.business_unit}" }
+data "aws_kms_key" "rds_shared" { key_id = "arn:aws:kms:${local.region}:${local.environment_management.account_ids["core-shared-services-production"]}:alias/rds-${local.business_unit}" }
+# data "aws_kms_key" "oasys_key" { key_id = "arn:aws:kms:${local.region}:${local.environment_management.account_ids["oasys-test"]}:alias/oasys-image-builder" }
+
 
 ###
 ###   aws_iam_policy_document
@@ -382,7 +385,7 @@ data "aws_iam_policy_document" "ssm_ec2_start_stop_kms" {
       "kms:RevokeGrant"
     ]
     # we have a legacy CMK that's used in production that will be retired but in the meantime requires permissions
-    resources = [data.aws_kms_key.hmpps_key.arn]
+    resources = [data.aws_kms_key.ebs_hmpps.arn]
   }
 
   statement {
@@ -456,6 +459,88 @@ data "aws_iam_policy_document" "cloudwatch_datasource" {
     effect = "Allow"
     actions = [
       "tag:GetResources"
+    ]
+    resources = ["*"]
+  }
+}
+
+data "aws_iam_policy_document" "image-builder-distro-assume-role" {
+  statement {
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${local.environment_management.account_ids["core-shared-services-production"]}:root"]
+    }
+  }
+}
+
+#tfsec:ignore:aws-iam-no-policy-wildcards needed to look up launch template ids from another account
+data "aws_iam_policy_document" "image-builder-launch-template-policy" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "ec2:DescribeLaunchTemplates"
+    ]
+    resources = ["*"]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "ec2:CreateLaunchTemplateVersion",
+      "ec2:ModifyLaunchTemplate",
+      "ec2:CreateTags"
+    ]
+    # coalescelist as there are no weblogics in prod at the moment and empty resource is not acceptable
+    # resources = coalescelist([for item in module.weblogic : item.launch_template_arn], ["arn:aws:ec2:${local.region}:${data.aws_caller_identity.current.id}:launch-template/dummy"])
+    resources = ["arn:aws:ec2:${local.region}:${data.aws_caller_identity.current.id}:launch-template/*"]
+  }
+}
+
+data "aws_iam_policy_document" "image-builder-distro-kms-policy" {
+  statement {
+    effect = "Allow"
+    #tfsec:ignore:aws-iam-no-policy-wildcards
+    actions = [
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:ReEncrypt*",
+      "kms:ReEncryptFrom",
+      "kms:GenerateDataKey*",
+      "kms:DescribeKey",
+      "kms:CreateGrant",
+      "kms:ListGrants",
+      "kms:RevokeGrant"
+    ]
+    # we use the same AMIs in test and production, which are encrypted with a single key that only exists in test, hence the below
+    resources = [data.aws_kms_key.ebs_hmpps.arn]
+  }
+}
+
+data "aws_iam_policy_document" "image-builder-combined" {
+  source_policy_documents = [
+    data.aws_iam_policy_document.image-builder-distro-kms-policy.json,
+    data.aws_iam_policy_document.image-builder-launch-template-policy.json
+  ]
+}
+
+data "aws_iam_policy_document" "mod-platform-assume-role" {
+  statement {
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.modernisation_platform.account_id}:root"]
+    }
+  }
+}
+
+data "aws_iam_policy_document" "launch-template-reader-policy-doc" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "ec2:DescribeLaunchTemplates",
+      "ec2:DescribeLaunchTemplateVersions"
     ]
     resources = ["*"]
   }

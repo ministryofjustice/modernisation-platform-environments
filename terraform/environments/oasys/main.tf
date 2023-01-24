@@ -1,3 +1,7 @@
+#------------------------------------------------------------------------------
+# autoscaling group stuff
+#------------------------------------------------------------------------------
+
 module "autoscaling_groups" {
   source = "../../modules/ec2_autoscaling_group"
 
@@ -26,6 +30,92 @@ module "autoscaling_groups" {
   branch                    = try(each.value.branch, "main")
 }
 
+resource "aws_kms_grant" "image-builder-shared-cmk-grant" {
+  name              = "image-builder-shared-cmk-grant"
+  key_id            = data.aws_kms_key.ebs_hmpps.arn
+  grantee_principal = "arn:aws:iam::${local.account_id}:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling"
+  operations = [
+    "Encrypt",
+    "Decrypt",
+    "ReEncryptFrom",
+    "GenerateDataKey",
+    "GenerateDataKeyWithoutPlaintext",
+    "DescribeKey",
+    "CreateGrant"
+  ]
+}
+
+
+#------------------------------------------------------------------------------
+# launch template stuff
+#------------------------------------------------------------------------------
+resource "aws_iam_policy" "image-builder-combined-policy" {
+  name        = "image-builder-distro-additional-policy"
+  path        = "/"
+  description = "Image Builder Required Launch Template and KMS Permissions"
+  policy      = data.aws_iam_policy_document.image-builder-combined.json
+  tags = merge(
+    local.tags,
+    {
+      Name = "image-builder-distro-additional-policy"
+    },
+  )
+}
+
+resource "aws_iam_role_policy_attachment" "image-builder-launch-template-attach" {
+  policy_arn = aws_iam_policy.image-builder-combined-policy.arn
+  role       = aws_iam_role.image-builder-distro-role.name
+}
+
+resource "aws_iam_role" "core-services-launch-template-reader" {
+  name               = "OasysLaunchTemplateReaderRole"
+  assume_role_policy = data.aws_iam_policy_document.mod-platform-assume-role.json
+  tags = merge(
+    local.tags,
+    {
+      Name = "core-services-launch-template-reader"
+    },
+  )
+
+}
+
+resource "aws_iam_policy" "launch-template-reader-policy" {
+  name        = "launch-template-reader-policy"
+  path        = "/"
+  description = "Policy to Allow Core Shared Services Account to Look up Launch Templates"
+  policy      = data.aws_iam_policy_document.launch-template-reader-policy-doc.json
+  tags = merge(
+    local.tags,
+    {
+      Name = "launch-template-reader-policy"
+    },
+  )
+}
+
+resource "aws_iam_role_policy_attachment" "launch-template-reader-policy-attach" {
+  policy_arn = aws_iam_policy.launch-template-reader-policy.arn
+  role       = aws_iam_role.core-services-launch-template-reader.name
+}
+
+#------------------------------------------------------------------------------
+# image builder stuff
+#------------------------------------------------------------------------------
+resource "aws_iam_role" "image-builder-distro-role" {
+  name               = "EC2ImageBuilderDistributionCrossAccountRole"
+  assume_role_policy = data.aws_iam_policy_document.image-builder-distro-assume-role.json
+  tags = merge(
+    local.tags,
+    {
+      Name = "image-builder-distro-role"
+    },
+  )
+}
+
+#tfsec:ignore:aws-iam-no-policy-wildcards AWS Managed Policy
+resource "aws_iam_role_policy_attachment" "image-builder-distro-policy-attach" {
+  policy_arn = "arn:aws:iam::aws:policy/Ec2ImageBuilderCrossAccountDistributionAccess"
+  role       = aws_iam_role.image-builder-distro-role.name
+}
 
 
 #------------------------------------------------------------------------------
@@ -34,7 +124,7 @@ module "autoscaling_groups" {
 resource "aws_kms_grant" "ssm-start-stop-shared-cmk-grant" {
   count             = local.environment == "test" ? 1 : 0
   name              = "image-builder-shared-cmk-grant"
-  key_id            = data.aws_kms_key.hmpps_key.arn
+  key_id            = data.aws_kms_key.ebs_hmpps.arn
   grantee_principal = aws_iam_role.ssm_ec2_start_stop.arn
   operations = [
     "Encrypt",
@@ -707,4 +797,6 @@ resource "aws_ssm_document" "run_ansible_patches" {
     },
   )
 }
+
+
 
