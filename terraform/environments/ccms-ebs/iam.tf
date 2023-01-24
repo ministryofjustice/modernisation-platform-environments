@@ -1,6 +1,6 @@
 ## SSM Specific
-resource "aws_iam_policy" "oracle_ec2_ssm_policy" {
-  name        = "ssm_oracle_ec2_policy-${local.environment}"
+resource "aws_iam_policy" "ec2_ssm_policy" {
+  name        = "ssm_ec2_policy-${local.environment}"
   description = "allows SSM Connect logging"
 
   policy = jsonencode(
@@ -50,7 +50,7 @@ resource "aws_iam_policy" "oracle_ec2_ssm_policy" {
 }
 resource "aws_iam_role_policy_attachment" "ssm_logging_oracle_base" {
   role       = aws_iam_role.role_stsassume_oracle_base.name
-  policy_arn = aws_iam_policy.oracle_ec2_ssm_policy.arn
+  policy_arn = aws_iam_policy.ec2_ssm_policy.arn
 }
 
 ## Oracle EC2 Policies
