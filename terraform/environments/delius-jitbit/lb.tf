@@ -1,8 +1,8 @@
 # checkov:skip=CKV_AWS_226
 # checkov:skip=CKV2_AWS_28
 
+#tfsec:ignore:aws-elb-alb-not-public
 resource "aws_lb" "external" {
-  #tfsec:ignore:aws-elb-alb-not-public
 
   name               = "${local.application_name}-lb"
   internal           = false

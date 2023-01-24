@@ -1,6 +1,6 @@
+#tfsec:ignore:aws-ec2-no-public-egress-sgr
+#tfsec:ignore:aws-cloudwatch-log-group-customer-key
 module "ecs" {
-  #tfsec:ignore:aws-ec2-no-public-egress-sgr
-  #tfsec:ignore:aws-cloudwatch-log-group-customer-key
 
   source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs?ref=654c2b2"
 
