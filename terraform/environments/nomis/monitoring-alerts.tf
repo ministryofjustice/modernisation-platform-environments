@@ -34,8 +34,8 @@ resource "aws_cloudwatch_metric_alarm" "low_available_memory" {
 resource "aws_cloudwatch_metric_alarm" "cpu_usage_iowait" {
   alarm_name          = "cpu_usage_iowait"
   comparison_operator = "GreaterThanOrEqualToThreshold"
-  evaluation_periods  = "5"
-  datapoints_to_alarm = "6"
+  evaluation_periods  = "6"
+  datapoints_to_alarm = "5"
   metric_name         = "cpu_usage_iowait"
   namespace           = "CWAgent"
   period              = "60"
