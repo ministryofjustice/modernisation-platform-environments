@@ -4,6 +4,48 @@
 
 locals {
 
+  lb_target_group_http_7001 = {
+    port                 = 7001
+    protocol             = "HTTP"
+    target_type          = "instance"
+    deregistration_delay = 30
+    health_check = {
+      enabled             = true
+      interval            = 30
+      healthy_threshold   = 3
+      matcher             = "200-399"
+      path                = "/"
+      port                = 7001
+      timeout             = 5
+      unhealthy_threshold = 5
+    }
+    stickiness = {
+      enabled = true
+      type    = "lb_cookie"
+    }
+  }
+
+  lb_target_group_http_7777 = {
+    port                 = 7777
+    protocol             = "HTTP"
+    target_type          = "instance"
+    deregistration_delay = 30
+    health_check = {
+      enabled             = true
+      interval            = 30
+      healthy_threshold   = 3
+      matcher             = "200-399"
+      path                = "/keepalive.htm"
+      port                = 7777
+      timeout             = 5
+      unhealthy_threshold = 5
+    }
+    stickiness = {
+      enabled = true
+      type    = "lb_cookie"
+    }
+  }
+
   ec2_weblogic = {
 
     # server-type and nomis-environment auto set by module
@@ -65,50 +107,12 @@ locals {
         instance_warmup        = 300
       }
     }
+
+    lb_target_groups = {}
+    #   TODO: create target groups here instead of in load balancer
+    #      http-7001 = local.lb_target_group_http_7001
+    #      http-7777 = local.lb_target_group_http_7777
   }
-
-  legacy_weblogics = {
-    development = {}
-    test = {
-      CNOMT1 = {
-        ami_name     = "nomis_Weblogic_2022*"
-        asg_max_size = 1
-      }
-    }
-    preproduction = {}
-    production    = {}
-  }
-}
-
-module "weblogic" {
-  source = "./modules/weblogic"
-
-  providers = {
-    aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
-  }
-
-  for_each = local.legacy_weblogics[local.environment]
-
-  name = each.key
-
-  ami_name             = each.value.ami_name
-  asg_max_size         = try(each.value.asg_max_size, null)
-  asg_min_size         = try(each.value.asg_min_size, null)
-  asg_desired_capacity = try(each.value.asg_desired_capacity, null)
-
-  ami_owner              = try(each.value.ami_owner, local.environment_management.account_ids["core-shared-services-production"])
-  termination_protection = try(each.value.termination_protection, null)
-
-  common_security_group_id  = aws_security_group.weblogic_common.id
-  instance_profile_policies = local.ec2_common_managed_policies
-  key_name                  = aws_key_pair.ec2-user.key_name
-  # load_balancer_listener_arn = aws_lb_listener.internal.arn
-
-  application_name = local.application_name
-  business_unit    = local.vpc_name
-  environment      = local.environment
-  tags             = local.tags
-  subnet_set       = local.subnet_set
 }
 
 module "ec2_weblogic_autoscaling_group" {
@@ -133,7 +137,8 @@ module "ec2_weblogic_autoscaling_group" {
   ssm_parameters                = {}
   autoscaling_group             = merge(local.ec2_weblogic.autoscaling_group, lookup(each.value, "autoscaling_group", {}))
   autoscaling_schedules         = lookup(each.value, "autoscaling_schedules", local.autoscaling_schedules_default)
-
+  lb_target_groups              = merge(local.ec2_weblogic.lb_target_groups, lookup(each.value, "lb_target_groups", {}))
+  vpc_id                        = local.vpc_id
 
   iam_resource_names_prefix = "ec2-weblogic-asg"
   instance_profile_policies = local.ec2_common_managed_policies
@@ -188,10 +193,10 @@ resource "aws_security_group" "weblogic_common" {
     from_port   = "7001"
     to_port     = "7001"
     protocol    = "TCP"
-    security_groups = [
+    security_groups = concat([
       aws_security_group.jumpserver-windows.id,
       module.bastion_linux.bastion_security_group
-    ]
+    ], local.lb_security_group_ids)
   }
 
   ingress {
@@ -210,7 +215,7 @@ resource "aws_security_group" "weblogic_common" {
     from_port   = "9100"
     to_port     = "9100"
     protocol    = "TCP"
-    cidr_blocks = [local.cidrs.cloud_platform]
+    cidr_blocks = [module.ip_addresses.moj_cidr.aws_cloud_platform_vpc]
   }
 
   ingress {
@@ -218,7 +223,7 @@ resource "aws_security_group" "weblogic_common" {
     from_port   = "9172"
     to_port     = "9172"
     protocol    = "TCP"
-    cidr_blocks = [local.cidrs.cloud_platform]
+    cidr_blocks = [module.ip_addresses.moj_cidr.aws_cloud_platform_vpc]
   }
 
   egress {
