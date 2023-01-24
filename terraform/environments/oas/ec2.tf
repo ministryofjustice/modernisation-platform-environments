@@ -361,3 +361,28 @@ resource "aws_volume_attachment" "oas_EC2ServeVolume02" {
   volume_id   = aws_ebs_volume.EC2ServeVolume02.id
   instance_id = aws_instance.oas_app_instance.id
 }
+
+resource "aws_vpc_endpoint" "s3" {
+  vpc_id       = aws_vpc.main.id
+  service_name = "com.amazonaws.eu-west-2.s3"
+}
+
+resource "aws_vpc_endpoint_route_table_association" "s3_endpoint_route_table" {
+  route_table_id  = data.aws_route_table.subnet_route_table.id
+  vpc_endpoint_id = aws_vpc_endpoint.s3.id
+}
+
+# data "aws_caller_identity" "current" {}
+
+# resource "aws_vpc_endpoint_service" "s3_endpoint_service" {
+#   acceptance_required        = false
+#   allowed_principals         = [data.aws_caller_identity.current.arn]
+#   gateway_load_balancer_arns = [aws_lb.example.arn]
+# }
+
+# resource "aws_vpc_endpoint" "s3_endpoint" {
+#   service_name      = aws_vpc_endpoint_service.s3_endpoint_service
+#   subnet_ids        = [aws_subnet.example.id]
+#   vpc_endpoint_type = aws_vpc_endpoint_service.example.service_type
+#   vpc_id            = aws_vpc.example.id
+# }
