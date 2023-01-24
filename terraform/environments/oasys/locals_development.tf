@@ -32,28 +32,28 @@ locals {
       #     server-type       = "webserver"
       #   }
       # })
-      # test = {
-      #   ami_name              = "base_rhel_7_9_*"
-      #   autoscaling_schedules = {}
-      #   instance = {
-      #     disable_api_termination = false
-      #     instance_type           = "t3.large"
-      #     key_name                = aws_key_pair.ec2-user.key_name
-      #     vpc_security_group_ids  = [aws_security_group.webserver.id]
-      #   }
-      #   autoscaling_group = {
-      #     desired_capacity = 1
-      #     max_size         = 1
-      #     min_size         = 1
-      #   }
-      #   iam_resource_names_prefix = "oasys-test"
-      #   tags = {
-      #     oasys-environment = "t1"
-      #     description       = "test"
-      #     component         = "web"
-      #     server-type       = "webserver"
-      #   }
-      # }
+      test = {
+        ami_name              = "base_rhel_7_9_*"
+        autoscaling_schedules = {}
+        instance = {
+          disable_api_termination = false
+          instance_type           = "t3.large"
+          key_name                = aws_key_pair.ec2-user.key_name
+          vpc_security_group_ids  = [aws_security_group.webserver.id]
+        }
+        autoscaling_group = {
+          desired_capacity = 1
+          max_size         = 1
+          min_size         = 1
+        }
+        iam_resource_names_prefix = "oasys-test"
+        tags = {
+          oasys-environment = "t1"
+          description       = "test"
+          component         = "web"
+          server-type       = "webserver"
+        }
+      }
     }
     db_enabled                             = false
     db_auto_minor_version_upgrade          = "true"

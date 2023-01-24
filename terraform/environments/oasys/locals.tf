@@ -148,12 +148,6 @@ locals {
         reuse_on_scale_in           = true
         max_group_prepared_capacity = 1
       }
-
-      instance_refresh = {
-        strategy               = "Rolling"
-        min_healthy_percentage = 90 # seems that instances in the warm pool are included in the % health count so this needs to be set fairly high
-        instance_warmup        = 300
-      }
     }
   }
 }
