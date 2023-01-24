@@ -29,7 +29,7 @@
       "example_var": "production-data"
     }
   },
-  "ec2_sg_ingress_rules_oracle_base_http": {
+  "ec2_sg_ingress_rules": {
     "TCP_80": {
       "from_port": 80,
       "to_port": 80,
@@ -46,7 +46,7 @@
       "protocol": "TCP"
     }
   },
-  "ec2_sg_egress_rules_oracle_base": {
+  "ec2_sg_egress_rules": {
     "TCP_80": {
       "from_port": 80,
       "to_port": 80,

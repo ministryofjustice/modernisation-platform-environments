@@ -8,7 +8,7 @@ resource "aws_security_group" "ec2_sg_oracle_base" {
   )
 }
 resource "aws_security_group_rule" "ingress_traffic_oracle_base" {
-  for_each          = local.application_data.ec2_sg_ingress_rules_oracle_base_http
+  for_each          = local.application_data.ec2_sg_ingress_rules
   security_group_id = aws_security_group.ec2_sg_oracle_base.id
   type              = "ingress"
   description       = format("Traffic for %s %d", each.value.protocol, each.value.from_port)
@@ -18,7 +18,7 @@ resource "aws_security_group_rule" "ingress_traffic_oracle_base" {
   cidr_blocks       = [data.aws_vpc.shared.cidr_block, "0.0.0.0/0"]
 }
 resource "aws_security_group_rule" "egress_traffic_oracle_base_sg" {
-  for_each                 = local.application_data.ec2_sg_egress_rules_oracle_base
+  for_each                 = local.application_data.ec2_sg_egress_rules
   security_group_id        = aws_security_group.ec2_sg_oracle_base.id
   type                     = "egress"
   description              = format("Outbound traffic for %s %d", each.value.protocol, each.value.from_port)
@@ -28,7 +28,7 @@ resource "aws_security_group_rule" "egress_traffic_oracle_base_sg" {
   source_security_group_id = aws_security_group.ec2_sg_oracle_base.id
 }
 resource "aws_security_group_rule" "egress_traffic_oracle_base_cidr" {
-  for_each          = local.application_data.ec2_sg_egress_rules_oracle_base
+  for_each          = local.application_data.ec2_sg_egress_rules
   security_group_id = aws_security_group.ec2_sg_oracle_base.id
   type              = "egress"
   description       = format("Outbound traffic for %s %d", each.value.protocol, each.value.from_port)
