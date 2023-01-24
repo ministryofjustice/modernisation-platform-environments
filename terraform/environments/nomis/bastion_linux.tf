@@ -69,7 +69,7 @@ resource "aws_security_group_rule" "CP_monitoring_ingress" {
   from_port         = 9100
   to_port           = 9100
   protocol          = "tcp"
-  cidr_blocks       = [local.cidrs.cloud_platform]
+  cidr_blocks       = [module.ip_addresses.moj_cidr.aws_cloud_platform_vpc]
   security_group_id = module.bastion_linux.bastion_security_group
 }
 
@@ -79,7 +79,7 @@ resource "aws_security_group_rule" "CP_monitoring_egress" {
   from_port         = 9100
   to_port           = 9100
   protocol          = "tcp"
-  cidr_blocks       = [local.cidrs.cloud_platform]
+  cidr_blocks       = [module.ip_addresses.moj_cidr.aws_cloud_platform_vpc]
   security_group_id = module.bastion_linux.bastion_security_group
 }
 
@@ -89,7 +89,7 @@ resource "aws_security_group_rule" "CP_oracle_monitoring_ingress" {
   from_port         = 9172
   to_port           = 9172
   protocol          = "tcp"
-  cidr_blocks       = [local.cidrs.cloud_platform]
+  cidr_blocks       = [module.ip_addresses.moj_cidr.aws_cloud_platform_vpc]
   security_group_id = module.bastion_linux.bastion_security_group
 }
 
@@ -99,6 +99,6 @@ resource "aws_security_group_rule" "CP_oracle_monitoring_egress" {
   from_port         = 9172
   to_port           = 9172
   protocol          = "tcp"
-  cidr_blocks       = [local.cidrs.cloud_platform]
+  cidr_blocks       = [module.ip_addresses.moj_cidr.aws_cloud_platform_vpc]
   security_group_id = module.bastion_linux.bastion_security_group
 }
