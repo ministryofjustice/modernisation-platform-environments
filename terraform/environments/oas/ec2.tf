@@ -17,9 +17,7 @@ resource "aws_instance" "oas_app_instance" {
   security_groups             = [aws_security_group.ec2.id]
   monitoring                  = true
   subnet_id                   = data.aws_subnet.private_subnets_a.id
-  # iam_instance_profile        = aws_iam_instance_profile.ec2_instance_profile.id
   iam_instance_profile = aws_iam_instance_profile.ec2_instance_profile.id
-  # user_data                 = file("user_data.sh")
   user_data_base64 = base64encode(local.instance-userdata)
 
   root_block_device {
@@ -45,13 +43,6 @@ resource "aws_security_group" "ec2" {
   description = "OAS DB Server Security Group"
   vpc_id      = data.aws_vpc.shared.id
 
-  ingress {
-    description     = "Allow AWS SSM Session Manager"
-    from_port       = 443
-    to_port         = 443
-    protocol        = "tcp"
-    security_groups = [local.application_data.accounts[local.environment].ssm_interface_endpoint_security_group]
-  }
   ingress {
     description = "access to the admin server"
     from_port   = 9500
@@ -108,22 +99,22 @@ resource "aws_security_group" "ec2" {
     protocol    = "tcp"
     cidr_blocks = [data.aws_vpc.shared.cidr_block] #!ImportValue env-VpcCidr
   }
-  ingress {
-    description = "Inbound internet access"
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = [data.aws_vpc.shared.cidr_block] #!ImportValue env-VpcCidr
-  }
+  # ingress {
+  #   description = "Inbound internet access"
+  #   from_port   = 80
+  #   to_port     = 80
+  #   protocol    = "tcp"
+  #   cidr_blocks = [data.aws_vpc.shared.cidr_block] #!ImportValue env-VpcCidr
+  # }
 
 
-  egress {
-    description     = "Allow AWS SSM Session Manager"
-    from_port       = 443
-    to_port         = 443
-    protocol        = "tcp"
-    security_groups = [local.application_data.accounts[local.environment].ssm_interface_endpoint_security_group]
-  }
+  # egress {
+  #   description     = "Allow AWS SSM Session Manager"
+  #   from_port       = 443
+  #   to_port         = 443
+  #   protocol        = "tcp"
+  #   security_groups = [local.application_data.accounts[local.environment].ssm_interface_endpoint_security_group]
+  # }
   egress {
     description = "Allow AWS SSM Session Manager"
     from_port   = 443
@@ -187,13 +178,13 @@ resource "aws_security_group" "ec2" {
     protocol    = "tcp"
     cidr_blocks = [data.aws_vpc.shared.cidr_block] #!ImportValue env-VpcCidr
   }
-  egress {
-    description = "Outbound internet access"
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = [data.aws_vpc.shared.cidr_block] #!ImportValue env-VpcCidr
-  }
+  # egress {
+  #   description = "Outbound internet access"
+  #   from_port   = 80
+  #   to_port     = 80
+  #   protocol    = "tcp"
+  #   cidr_blocks = [data.aws_vpc.shared.cidr_block] #!ImportValue env-VpcCidr
+  # }
   egress {
     description = "Outbound internet access"
     from_port   = 80
@@ -202,17 +193,6 @@ resource "aws_security_group" "ec2" {
     cidr_blocks = [local.application_data.accounts[local.environment].outbound_access_cidr]
   }
 }
-
-# data "aws_iam_policy_document" "ec2_instance_policy" {
-#   statement {
-#     actions = ["sts:AssumeRole"]
-
-#     principals {
-#       type        = "Service"
-#       identifiers = ["ec2.amazonaws.com"]
-#     }
-#   }
-# }
 
 resource "aws_iam_instance_profile" "ec2_instance_profile" {
   name = "${local.application_name}-ec2-profile"
@@ -259,115 +239,51 @@ resource "aws_iam_role_policy" "ec2_instance_policy" {
   })
 }
 
-# resource "aws_iam_role_policy" "ec2_instance_policy" {
-#   #tfsec:ignore:aws-iam-no-policy-wildcards
-#   name   = "${local.application_name}-ec2-policy"
-#   role   = aws_iam_role.ec2_instance_role.id
-#   policy = data.aws_iam_policy_document.ec2_common_combined.json
-# }
+# NON-ROOT EBS VOLUMES COMMENTED OUT AS MAYBE REQUIRED LATER
+# resource "aws_ebs_volume" "EC2ServeVolume01" {
+#   availability_zone = "eu-west-2a"
+#   size              = local.application_data.accounts[local.environment].orahomesize
+#   type              = "gp3"
+#   encrypted         = false
 
-# data "aws_iam_policy_document" "ssm_custom" {
-#   statement {
-#     sid    = "CustomSsmPolicy"
-#     effect = "Allow"
-#     actions = [
-#       "ssm:DescribeAssociation",
-#       "ssm:DescribeDocument",
-#       "ssm:GetDeployablePatchSnapshotForInstance",
-#       "ssm:GetDocument",
-#       "ssm:GetManifest",
-#       "ssm:GetParameter",
-#       "ssm:GetParameters",
-#       "ssm:ListAssociations",
-#       "ssm:ListInstanceAssociations",
-#       "ssm:PutInventory",
-#       "ssm:PutComplianceItems",
-#       "ssm:PutConfigurePackageResult",
-#       "ssm:UpdateAssociationStatus",
-#       "ssm:UpdateInstanceAssociationStatus",
-#       "ssm:UpdateInstanceInformation",
-#       "ssmmessages:CreateControlChannel",
-#       "ssmmessages:CreateDataChannel",
-#       "ssmmessages:OpenControlChannel",
-#       "ssmmessages:OpenDataChannel",
-#       "ec2messages:AcknowledgeMessage",
-#       "ec2messages:DeleteMessage",
-#       "ec2messages:FailMessage",
-#       "ec2messages:GetEndpoint",
-#       "ec2messages:GetMessages",
-#       "ec2messages:SendReply"
+#   tags = merge(
+#     local.tags,
+#     { "Name" = "${local.application_name}-EC2ServeVolume01" },
+#   )
+
+#   lifecycle {
+#     ignore_changes = [
+#       snapshot_id,
 #     ]
-#     # skipping these as policy is a scoped down version of Amazon provided AmazonSSMManagedInstanceCore managed policy.  Permissions required for SSM function
-
-#     #checkov:skip=CKV_AWS_111: "Ensure IAM policies does not allow write access without constraints"
-#     #checkov:skip=CKV_AWS_108: "Ensure IAM policies does not allow data exfiltration"
-#     resources = ["*"] #tfsec:ignore:aws-iam-no-policy-wildcards
 #   }
 # }
 
-# # combine ec2-common policy documents
-# data "aws_iam_policy_document" "ec2_common_combined" {
-#   source_policy_documents = [
-#     data.aws_iam_policy_document.ssm_custom.json,
-#     data.aws_iam_policy_document.ec2_instance_policy.json
-#   ]
+# resource "aws_volume_attachment" "oas_EC2ServeVolume01" {
+#   device_name = "/dev/sdb"
+#   volume_id   = aws_ebs_volume.EC2ServeVolume01.id
+#   instance_id = aws_instance.oas_app_instance.id
 # }
 
+# resource "aws_ebs_volume" "EC2ServeVolume02" {
+#   availability_zone = "eu-west-2a"
+#   size              = local.application_data.accounts[local.environment].stageesize
+#   type              = "gp3"
+#   encrypted         = false
 
-resource "aws_ebs_volume" "EC2ServeVolume01" {
-  availability_zone = "eu-west-2a"
-  size              = local.application_data.accounts[local.environment].orahomesize
-  type              = "gp3"
-  encrypted         = false
+#   tags = merge(
+#     local.tags,
+#     { "Name" = "${local.application_name}-EC2ServeVolume02" },
+#   )
 
-  tags = merge(
-    local.tags,
-    { "Name" = "${local.application_name}-EC2ServeVolume01" },
-  )
-
-  lifecycle {
-    ignore_changes = [
-      snapshot_id,
-    ]
-  }
-}
-
-resource "aws_volume_attachment" "oas_EC2ServeVolume01" {
-  device_name = "/dev/sdb"
-  volume_id   = aws_ebs_volume.EC2ServeVolume01.id
-  instance_id = aws_instance.oas_app_instance.id
-}
-
-resource "aws_ebs_volume" "EC2ServeVolume02" {
-  availability_zone = "eu-west-2a"
-  size              = local.application_data.accounts[local.environment].stageesize
-  type              = "gp3"
-  encrypted         = false
-
-  tags = merge(
-    local.tags,
-    { "Name" = "${local.application_name}-EC2ServeVolume02" },
-  )
-
-  lifecycle {
-    ignore_changes = [
-      snapshot_id,
-    ]
-  }
-}
-
-resource "aws_volume_attachment" "oas_EC2ServeVolume02" {
-  device_name = "/dev/sdc"
-  volume_id   = aws_ebs_volume.EC2ServeVolume02.id
-  instance_id = aws_instance.oas_app_instance.id
-}
-
-# resource "aws_vpc_endpoint" "s3" {
-#   vpc_id       = data.aws_vpc.shared.id
-#   service_name = "com.amazonaws.eu-west-2.s3"
+#   lifecycle {
+#     ignore_changes = [
+#       snapshot_id,
+#     ]
+#   }
 # }
 
-# resource "aws_vpc_endpoint_route_table_association" "s3_endpoint_route_table" {
-#   route_table_id  = data.aws_route_table.subnet_route_table.id
-#   vpc_endpoint_id = aws_vpc_endpoint.s3.id
+# resource "aws_volume_attachment" "oas_EC2ServeVolume02" {
+#   device_name = "/dev/sdc"
+#   volume_id   = aws_ebs_volume.EC2ServeVolume02.id
+#   instance_id = aws_instance.oas_app_instance.id
 # }
