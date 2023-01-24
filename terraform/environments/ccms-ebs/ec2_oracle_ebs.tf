@@ -57,3 +57,59 @@ EOF
   )
   depends_on = [aws_security_group.ec2_sg_oracle_base]
 }
+
+resource "aws_ebs_volume" "export_home" {
+  availability_zone = "eu-west-2a"
+  size              = "60"
+  type              = "io2"
+  iops              = 3000
+  encrypted         = true
+  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+}
+resource "aws_volume_attachment" "export_home_att" {
+  device_name = "/dev/sdh"
+  volume_id   = aws_ebs_volume.export_home.id
+  instance_id = aws_instance.ec2_oracle_ebs.id
+}
+/*
+resource "aws_ebs_volume" "u01"{
+  availability_zone   = "eu-west-2a"
+  size                = "75"
+  type                = "io2"
+  iops                = 3000
+  encrypted           = true
+  kms_key_id          = data.aws_kms_key.ebs_shared.key_id
+}
+resource "aws_ebs_volume" "arch"{
+  availability_zone   = "eu-west-2a"
+  size                = "50"
+  type                = "io2"
+  iops                = 3000
+  encrypted           = true
+  kms_key_id          = data.aws_kms_key.ebs_shared.key_id
+}
+resource "aws_ebs_volume" "dbf"{
+  availability_zone   = "eu-west-2a"
+  size                = "8000"
+  type                = "io2"
+  iops                = 3000
+  encrypted           = true
+  kms_key_id          = data.aws_kms_key.ebs_shared.key_id
+}
+resource "aws_ebs_volume" "redoA"{
+  availability_zone   = "eu-west-2a"
+  size                = "100"
+  type                = "io2"
+  iops                = 3000
+  encrypted           = true
+  kms_key_id          = data.aws_kms_key.ebs_shared.key_id
+}
+resource "aws_ebs_volume" "techst"{
+  availability_zone   = "eu-west-2a"
+  size                = "50"
+  type                = "io2"
+  iops                = 3000
+  encrypted           = true
+  kms_key_id          = data.aws_kms_key.ebs_shared.key_id
+}
+*/
