@@ -1,8 +1,9 @@
-#tfsec:ignore:aws-elb-alb-not-public
 # checkov:skip=CKV_AWS_226
 # checkov:skip=CKV2_AWS_28
 
 resource "aws_lb" "external" {
+  #tfsec:ignore:aws-elb-alb-not-public
+
   name               = "${local.application_name}-lb"
   internal           = false
   load_balancer_type = "application"
