@@ -4,7 +4,7 @@
 resource "aws_kms_grant" "ssm-start-stop-shared-cmk-grant" {
   count             = local.environment == "test" ? 1 : 0
   name              = "image-builder-shared-cmk-grant"
-  key_id            = data.aws_kms_key.hmpps_key.arn
+  key_id            = module.environment.kms_keys["ebs"].arn
   grantee_principal = aws_iam_role.ssm_ec2_start_stop.arn
   operations = [
     "Encrypt",
@@ -393,7 +393,7 @@ data "aws_iam_policy_document" "ssm_ec2_start_stop_kms" {
       "kms:RevokeGrant"
     ]
     # we have a legacy CMK that's used in production that will be retired but in the meantime requires permissions
-    resources = [local.environment == "test" ? aws_kms_key.nomis-cmk[0].arn : data.aws_kms_key.nomis_key.arn, data.aws_kms_key.hmpps_key.arn]
+    resources = [local.environment == "test" ? aws_kms_key.nomis-cmk[0].arn : data.aws_kms_key.nomis_key.arn, module.environment.kms_keys["ebs"].arn]
   }
 
   statement {

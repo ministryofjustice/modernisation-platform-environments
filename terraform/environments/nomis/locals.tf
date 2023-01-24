@@ -1,11 +1,16 @@
-# This data sources allows us to get the Modernisation Platform account information for use elsewhere
-# (when we want to assume a role in the MP, for instance)
-# data "aws_organizations_organization" "root_account" {}
-
-# Get the environments file from the main repository
-data "http" "environments_file" {
-  url = "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/${local.application_name}.json"
+locals {
+  business_unit    = var.networking[0].business-unit
+  application_name = var.networking[0].application
+  environment      = trimprefix(terraform.workspace, "${var.networking[0].application}-")
+  subnet_set       = var.networking[0].set
 }
+
+locals {
+  modernisation_platform_account_id = data.aws_ssm_parameter.modernisation_platform_account_id.value
+  environment_management            = jsondecode(data.aws_secretsmanager_secret_version.environment_management.secret_string)
+}
+
+
 
 data "github_team" "dso_users" {
   slug = "studio-webops"
@@ -14,14 +19,6 @@ data "github_team" "dso_users" {
 # Get session information from OIDC provider
 data "aws_caller_identity" "oidc_session" {
   provider = aws.oidc-session
-}
-
-# get shared subnet-set vpc object
-data "aws_vpc" "shared_vpc" {
-  # provider = aws.share-host
-  tags = {
-    Name = "${local.vpc_name}-${local.environment}"
-  }
 }
 
 data "aws_kms_key" "general_shared" {
@@ -38,11 +35,6 @@ locals {
   # Stores modernisation platform account id for setting up the modernisation-platform provider
   secret_prefix = "/Jumpserver/Users"
 
-  modernisation_platform_account_id = data.aws_ssm_parameter.modernisation_platform_account_id.value
-
-  application_name = var.networking[0].application
-
-  environment_management = jsondecode(data.aws_secretsmanager_secret_version.environment_management.secret_string)
 
   # This takes the name of the Terraform workspace (e.g. core-vpc-production), strips out the application name (e.g. core-vpc), and checks if
   # the string leftover is `-production`, if it isn't (e.g. core-vpc-non-production => -non-production) then it sets the var to false.
@@ -55,19 +47,8 @@ locals {
   # tflint-ignore: terraform_unused_declarations
   is-development = substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-development"
 
-  # Merge tags from the environment json file with additional ones
-  # The environment file contains application, business-unit, infrastructure-support and owner tags
-  tags = merge(
-    jsondecode(data.http.environments_file.response_body).tags,
-    { "is-production" = local.is-production },
-    { "environment-name" = terraform.workspace },
-    { "source-code" = "https://github.com/ministryofjustice/modernisation-platform-environments" }
-  )
+  tags = module.environment.tags
 
-  environment = trimprefix(terraform.workspace, "${var.networking[0].application}-")
-  vpc_name    = var.networking[0].business-unit
-  vpc_id      = data.aws_vpc.shared_vpc.id
-  subnet_set  = var.networking[0].set
 
   # tflint-ignore: terraform_unused_declarations
   is_live       = [substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-production" || substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-preproduction" ? "live" : "non-live"]
@@ -107,7 +88,7 @@ data "aws_iam_role" "member_infrastructure_access" {
 data "aws_route53_zone" "internal" {
   provider = aws.core-vpc
 
-  name         = "${local.vpc_name}-${local.environment}.modernisation-platform.internal."
+  name         = "${module.environment.vpc_name}.modernisation-platform.internal."
   private_zone = true
 }
 
@@ -121,6 +102,6 @@ data "aws_route53_zone" "external" {
 data "aws_route53_zone" "external-environment" {
   provider = aws.core-vpc
 
-  name         = "${local.vpc_name}-${local.environment}.modernisation-platform.service.justice.gov.uk."
+  name         = "${module.environment.vpc_name}.modernisation-platform.service.justice.gov.uk."
   private_zone = false
 }

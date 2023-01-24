@@ -40,14 +40,14 @@ module "bastion_linux" {
   allow_ssh_commands = false
 
   app_name      = var.networking[0].application
-  business_unit = local.vpc_name
+  business_unit = local.business_unit
   subnet_set    = local.subnet_set
   environment   = local.environment
   region        = local.region
 
   extra_user_data_content = templatefile("templates/bastion-user-data.sh.tftpl", {
     region           = local.region
-    vpc_name         = local.vpc_name
+    vpc_name         = local.business_unit
     application_name = local.application_name
     environment      = local.environment
     X11Forwarding    = "yes" # set back to no after NDH installation testing

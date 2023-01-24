@@ -6,9 +6,9 @@ locals {
       zone_name   = "modernisation-platform.service.justice.gov.uk"
     }
     modernisation_platform_wildcard = {
-      name        = "star.${local.application_name}.${local.vpc_name}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-      zone_name   = "${local.vpc_name}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-      domain_name = "*.${local.application_name}.${local.vpc_name}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+      name        = "star.${local.application_name}.${module.environment.vpc_name}.modernisation-platform.service.justice.gov.uk"
+      zone_name   = "${module.environment.vpc_name}.modernisation-platform.service.justice.gov.uk"
+      domain_name = "*.${local.application_name}.${module.environment.vpc_name}.modernisation-platform.service.justice.gov.uk"
     }
   }
 
