@@ -12,7 +12,7 @@ module "ecs" {
   instance_type           = local.app_data.accounts[local.environment].instance_type
   user_data               = base64encode(data.template_file.launch-template.rendered)
   key_name                = local.app_data.accounts[local.environment].key_name
-  task_definition         = data.template_file.task_definition.rendered
+  task_definition         = local.task_definition
   ec2_desired_capacity    = local.app_data.accounts[local.environment].ec2_desired_capacity
   ec2_max_size            = local.app_data.accounts[local.environment].ec2_max_size
   ec2_min_size            = local.app_data.accounts[local.environment].ec2_min_size
@@ -43,12 +43,12 @@ data "template_file" "launch-template" {
   }
 }
 
-data "template_file" "task_definition" {
-  template = file("templates/task_definition.json")
-  vars = {
-    app_name = local.application_name
-  }
-}
+# data "template_file" "task_definition" {
+#   template = file("templates/task_definition.json")
+#   vars = {
+#     app_name = local.application_name
+#   }
+# }
 
 resource "aws_key_pair" "jitbit-ec2" {
   key_name   = "jitbit-ec2"

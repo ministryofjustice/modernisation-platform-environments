@@ -57,8 +57,8 @@ locals {
   ec2_ingress_rules = {
     "cluster_ec2_lb_ingress" = {
       description     = "Cluster EC2 loadbalancer ingress rule"
-      from_port       = 80
-      to_port         = 80
+      from_port       = 5000
+      to_port         = 5000
       protocol        = "tcp"
       cidr_blocks     = []
       security_groups = [aws_security_group.load_balancer_security_group.id]
@@ -99,4 +99,8 @@ locals {
   domain_type_main   = [for k, v in local.domain_types : v.type if k == "modernisation-platform.service.justice.gov.uk"]
   domain_type_sub    = [for k, v in local.domain_types : v.type if k != "modernisation-platform.service.justice.gov.uk"]
 
+  task_definition = templatefile("${path.module}/templates/task_definition.json", {
+    APP_NAME     = local.application_name,
+    DOCKER_IMAGE = "${aws_ecr_repository.jitbit_app_ecr_repo.repository_url}:0.1"
+  })
 }

@@ -23,7 +23,7 @@ resource "aws_security_group" "load_balancer_security_group" {
 
   ingress {
     protocol    = "tcp"
-    description = "Open the server port"
+    description = "Allow ingress from white listed CIDRs"
     from_port   = 443
     to_port     = 443
     cidr_blocks = ["81.134.202.29/32", ]
@@ -31,9 +31,9 @@ resource "aws_security_group" "load_balancer_security_group" {
 
   egress {
     protocol    = "tcp"
-    description = "Open the server port"
-    from_port   = 80
-    to_port     = 80
+    description = "Allow egress to ECS instances"
+    from_port   = 5000
+    to_port     = 5000
     cidr_blocks = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
   }
 
