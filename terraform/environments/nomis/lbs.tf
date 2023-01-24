@@ -18,6 +18,6 @@ module "loadbalancer" {
   loadbalancer_ingress_rules = try(each.value.lb_ingress_rules, local.lb_defaults.lb_ingress_rules)
   public_subnets             = try(each.value.public_subnets, local.lb_defaults.public_subnets)
   region                     = local.region
-  vpc_all                    = "${local.vpc_name}-${local.environment}"
+  vpc_all                    = module.environment.vpc_name
   tags                       = try(each.value.tags, local.lb_defaults.tags)
 }

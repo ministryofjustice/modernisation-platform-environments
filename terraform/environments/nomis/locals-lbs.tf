@@ -3,7 +3,7 @@ locals {
   lb_defaults = {
     enable_delete_protection = false
     idle_timeout             = "60"
-    public_subnets           = data.aws_subnets.public.ids
+    public_subnets           = module.environment.subnets["public"].ids
     force_destroy_bucket     = true
     internal_lb              = true
     tags                     = local.tags
