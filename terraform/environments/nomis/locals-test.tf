@@ -200,7 +200,7 @@ locals {
           "/dev/sdb" = { # /u01 (add for weblogic testing)
             type       = "gp3"
             size       = 150
-            kms_key_id = data.aws_kms_key.hmpps_key.arn
+            kms_key_id = module.environment.kms_keys["general"].arn
           }
         }
         route53_records = {

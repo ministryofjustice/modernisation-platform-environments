@@ -1,6 +1,6 @@
 cat > /etc/dhcp/dhclient-eth0.conf << 'EOF'
 append domain-search "${region}.compute.internal"; 
-append domain-search "${application_name}.${vpc_name}-${environment}.modernisation-platform.internal";
+append domain-search "${application_environment_internal_domain}";
 EOF
 systemctl restart network
 if [[ "${X11Forwarding}" == "yes" ]]; then
