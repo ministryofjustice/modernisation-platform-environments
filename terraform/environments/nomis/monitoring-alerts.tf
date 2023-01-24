@@ -59,7 +59,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free" {
   period              = "60"
   statistic           = "Average"
   threshold           = "15"
-  alarm_description   = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space falls below 15% for 2 minutes, the alarm will trigger: https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4289822860/Disk+Free+alarm+-+Linux" 
+  alarm_description   = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space falls below 15% for 2 minutes, the alarm will trigger: https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4289822860/Disk+Free+alarm+-+Linux"
   alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
   tags = {
     Name = "disk_free"
