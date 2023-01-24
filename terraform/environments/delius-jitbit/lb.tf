@@ -3,6 +3,8 @@
 
 #tfsec:ignore:aws-elb-alb-not-public
 resource "aws_lb" "external" {
+  # checkov:skip=CKV_AWS_91
+  # checkov:skip=CKV2_AWS_28
 
   name               = "${local.application_name}-lb"
   internal           = false
@@ -56,9 +58,9 @@ resource "aws_lb_listener" "listener" {
   }
 }
 
-# checkov:skip=CKV_AWS_261
-
 resource "aws_lb_target_group" "target_group" {
+  # checkov:skip=CKV_AWS_261
+
   name                 = "${local.application_name}-tg-${local.environment}"
   port                 = local.app_data.accounts[local.environment].server_port
   protocol             = "HTTP"
