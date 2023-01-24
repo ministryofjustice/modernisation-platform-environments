@@ -33,6 +33,7 @@ EOF
     http_endpoint = "enabled"
     http_tokens   = "required"
   }
+  /*
   root_block_device {
     volume_type = "gp3"
     volume_size = 50
@@ -53,9 +54,9 @@ EOF
       { Name = "ebs-block1" }
     )
   }
-
+*/
   tags = merge(local.tags,
-    { Name = lower(format("ec2-%s-%s-Oracle-EBS-deleteme", local.application_name, local.environment)) }
+    { Name = lower(format("ec2-%s-%s-Oracle-EBS-deleteme2", local.application_name, local.environment)) }
   )
   depends_on = [aws_security_group.ec2_sg_oracle_base]
 }

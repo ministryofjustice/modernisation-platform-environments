@@ -3,7 +3,7 @@
     "development": {
       "example_var": "dev-data",
       "ec2_oracle_base_instance_type": "t2.large",
-      "ec2_oracle_instance_type_ebs": "m4.2xlarge",
+      "ec2_oracle_instance_type_ebs": "m5d.2xlarge",
       "ec2_oracle_instance_type_ebs_cmk": "m5d.2xlarge",
       "ec2_oracle_instance_type_webgate": "m4.large",
       "ec2_oracle_instance_type_accessgate": "m4.xlarge",
@@ -12,6 +12,7 @@
       "orace_base_ami_name_mp": "OL7.9-x86_64-HVM-2023-01-05",
       "orace_base_ami_name_ready": "Oracle-79-base-preinstall-ready",
       "orace_base_prereqs_ami_name": "Oracle79-prereqs-v1_2",
+      "orace_base_prereqs_ami_name3": "Oracle79-prereqs-v1_3",
       "key_name": "oracle-base-dev",
       "dns_nameserver": "10.26.56.2"
     },
