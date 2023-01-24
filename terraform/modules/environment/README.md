@@ -1,7 +1,13 @@
 # Environment module
 
-Module for grabbing common resources from a modernisation platform account.
-This doesn't create any resources, but it does return some useful outputs to save duplication.
+Module for grabbing common resources from a modernisation platform environment
+account. This doesn't create any resources. It does output some common data
+resources and local variables which are often needed, such as:
+
+- vpc and subnet ids
+- business unit kms keys
+- domain names
+- route53 zones (top level and business unit specific)
 
 ## Pre-requisites
 
