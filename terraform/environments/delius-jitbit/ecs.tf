@@ -43,13 +43,6 @@ data "template_file" "launch-template" {
   }
 }
 
-# data "template_file" "task_definition" {
-#   template = file("templates/task_definition.json")
-#   vars = {
-#     app_name = local.application_name
-#   }
-# }
-
 resource "aws_key_pair" "jitbit-ec2" {
   key_name   = "jitbit-ec2"
   public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQD1G18ojDkMZuCDmlTdOGy50g9MYKSkwFF6Mu5v4ubH+ST9T8gUoYDO7U0DlP5q5APG95V7AavZve51SU5cgEQ0THaDACWPi96V95gQUWt4gGoZ5C8nKvqMJgzD+yG4z6bbK5fL7kmWxUEWUdjXzw/lwSI6jr2atmxVB8rdMug6ckKo0z7KZ8S/8ZjmJpEzhALG8/0GISYpLKCY0qlGPm6oUGi8NcUtRcU0AS67praV8LVAqMgLLGrJXu4oQBxb4oYu3xB3xKEQmtT4G57S8eAzb9J5DM7WOTZXXOOIqZuiod6x78h077SKFYmtN6ruuapbg0qyIzkmhNLCSlvPdtdWr/jxG3xCynvoqJeFIHWlv9TA3Rq18dNAAitQxZRedG/hQ1Db/CtIi63lLxq8Wj4qRvgVhAeJKQKlSJPlztZtd240b0raVtBZ0mPaHo3Y0+tJCGZ9NSoenG7Fqadosi/zYs2s9S2vVPlypo+a1YBlAv0uhAk3u1wzbTwcqXE10g8= sebastian.norris@MJ003357"
