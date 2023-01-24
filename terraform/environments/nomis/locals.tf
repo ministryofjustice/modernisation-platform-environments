@@ -21,10 +21,6 @@ data "aws_caller_identity" "oidc_session" {
   provider = aws.oidc-session
 }
 
-data "aws_kms_key" "general_shared" {
-  key_id = "arn:aws:kms:eu-west-2:${local.environment_management.account_ids["core-shared-services-production"]}:alias/general-${var.networking[0].business-unit}"
-}
-
 data "aws_iam_session_context" "whoami" {
   provider = aws.oidc-session
   arn      = data.aws_caller_identity.oidc_session.arn
