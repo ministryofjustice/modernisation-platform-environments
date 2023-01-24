@@ -322,7 +322,6 @@ data "aws_iam_policy_document" "cloud_watch_custom" {
     resources = [aws_ssm_parameter.cloud_watch_config_linux.arn]
   }
 }
-# create policy document for access to s3 artefact bucket 
 
 data "aws_iam_policy_document" "application_insights" {
   statement {
@@ -336,7 +335,8 @@ data "aws_iam_policy_document" "application_insights" {
       "resource-groups:CreateGroups",
       "resource-groups:UpdateGroup"
     ]
-    resources = ["*"] #checkov:skip=CKV_AWS_111: "Ensure IAM policies does not allow write access without constraints" #checkov:skip=CKV_AWS_109: "Ensure IAM policies does not allow permissions management / resource exposure without constraints"
+    #checkov:skip=CKV_AWS_109: "Ensure IAM policies does not allow permissions management / resource exposure without constraints"
+    resources = ["*"] #checkov:skip=CKV_AWS_111: "Ensure IAM policies does not allow write access without constraints"
   }
 }
 # combine ec2-common policy documents
