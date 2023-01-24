@@ -115,13 +115,6 @@ resource "aws_security_group" "ec2" {
     protocol    = "tcp"
     cidr_blocks = [data.aws_vpc.shared.cidr_block] #!ImportValue env-VpcCidr
   }
-  # ingress {
-  #   description = ""
-  #   from_port   = 22
-  #   to_port     = 22
-  #   protocol    = "tcp"
-  #   cidr_blocks = [data.aws_vpc.shared.cidr_block] #!ImportValue env-VpcCidr
-  # }
 
 
   egress {
@@ -130,6 +123,13 @@ resource "aws_security_group" "ec2" {
     to_port         = 443
     protocol        = "tcp"
     security_groups = [local.application_data.accounts[local.environment].ssm_interface_endpoint_security_group]
+  }
+  egress {
+    description     = "Allow AWS SSM Session Manager"
+    from_port       = 443
+    to_port         = 443
+    protocol        = "tcp"
+    security_groups = "0.0.0.0/0"
   }
   egress {
     description = "access to the admin server"
@@ -194,13 +194,13 @@ resource "aws_security_group" "ec2" {
     protocol    = "tcp"
     cidr_blocks = [data.aws_vpc.shared.cidr_block] #!ImportValue env-VpcCidr
   }
-  # egress {
-  #   description = ""
-  #   from_port   = 22
-  #   to_port     = 22
-  #   protocol    = "tcp"
-  #   cidr_blocks = [data.aws_vpc.shared.cidr_block] #!ImportValue env-VpcCidr
-  # }
+  egress {
+    description = "Outbound internet access"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = "0.0.0.0/0"
+  }
 }
 
 # data "aws_iam_policy_document" "ec2_instance_policy" {
