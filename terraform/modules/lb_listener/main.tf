@@ -31,9 +31,6 @@ resource "aws_lb_target_group" "this" {
     }
   }
 
-  lifecycle {
-    create_before_destroy = true
-  }
   tags = merge(var.tags, {
     Name = "${var.name}-${each.key}"
   })
@@ -62,7 +59,7 @@ resource "aws_lb_listener" "this" {
 
     content {
       type             = default_action.value.type
-      target_group_arn = default_action.value.target_group_name != null ? aws_lb_target_group.this[default_action.value.target_group_name].arn : default_action.value.target_group_arn
+      target_group_arn = default_action.value.target_group_name != null ? local.target_groups[default_action.value.target_group_name].arn : default_action.value.target_group_arn
 
       dynamic "fixed_response" {
         for_each = default_action.value.fixed_response != null ? [default_action.value.fixed_response] : []
@@ -79,7 +76,7 @@ resource "aws_lb_listener" "this" {
           dynamic "target_group" {
             for_each = forward.value.target_group
             content {
-              arn    = target_group.value.name != null ? aws_lb_target_group.this[target_group.value.name].arn : target_group.value.arn
+              arn    = target_group.value.name != null ? local.target_groups[target_group.value.name].arn : target_group.value.arn
               weight = target_group.value.weight
             }
           }
@@ -117,13 +114,14 @@ resource "aws_lb_listener_rule" "this" {
   for_each = var.rules
 
   listener_arn = aws_lb_listener.this.arn
+  priority     = each.value.priority
 
   dynamic "action" {
     for_each = each.value.actions
 
     content {
       type             = action.value.type
-      target_group_arn = action.value.target_group_name != null ? aws_lb_target_group.this[action.value.target_group_name].arn : action.value.target_group_arn
+      target_group_arn = action.value.target_group_name != null ? local.target_groups[action.value.target_group_name].arn : action.value.target_group_arn
 
       dynamic "fixed_response" {
         for_each = action.value.fixed_response != null ? [action.value.fixed_response] : []
@@ -140,7 +138,7 @@ resource "aws_lb_listener_rule" "this" {
           dynamic "target_group" {
             for_each = forward.value.target_group
             content {
-              arn    = target_group.value.name != null ? aws_lb_target_group.this[target_group.value.name].arn : target_value.value.arn
+              arn    = target_group.value.name != null ? local.target_groups[target_group.value.name].arn : target_value.value.arn
               weight = target_group.value.weight
             }
           }
@@ -172,6 +170,12 @@ resource "aws_lb_listener_rule" "this" {
         for_each = condition.value.host_header != null ? [condition.value.host_header] : []
         content {
           values = host_header.value.values
+        }
+      }
+      dynamic "path_pattern" {
+        for_each = condition.value.path_pattern != null ? [condition.value.path_pattern] : []
+        content {
+          values = path_pattern.value.values
         }
       }
     }

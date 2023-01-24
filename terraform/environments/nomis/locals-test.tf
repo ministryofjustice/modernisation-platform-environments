@@ -2,34 +2,23 @@
 locals {
   nomis_test = {
     # account specific CIDRs for EC2 security groups
-    external_database_access_cidrs = [
-      local.cidrs.noms_test,
-      local.cidrs.noms_mgmt,
-      local.cidrs.noms_test_dr,
-      local.cidrs.noms_mgmt_dr,
-      local.cidrs.cloud_platform,
-      local.cidrs.analytical_platform_airflow,
-      local.cidrs.aks_studio_hosting_dev_1,
-      local.cidrs.nomisapi_t3_root_vnet,
-    ]
-    external_oem_agent_access_cidrs = [
-      local.cidrs.noms_test,
-      local.cidrs.noms_mgmt,
-      local.cidrs.noms_test_dr,
-      local.cidrs.noms_mgmt_dr,
-    ]
-    external_remote_access_cidrs = [
-      local.cidrs.noms_test,
-      local.cidrs.noms_mgmt,
-      local.cidrs.noms_test_dr,
-      local.cidrs.noms_mgmt_dr,
-    ]
-    external_weblogic_access_cidrs = [
-      local.cidrs.noms_test,
-      local.cidrs.noms_mgmt,
-      local.cidrs.noms_transit_live_fw_devtest,
-      local.cidrs.noms_transit_live_fw_prod,
-    ]
+    external_database_access_cidrs = flatten([
+      module.ip_addresses.azure_fixngo_cidrs.devtest,
+      module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
+      module.ip_addresses.moj_cidr.aws_analytical_platform_aggregate,
+      module.ip_addresses.azure_studio_hosting_cidrs.devtest,
+      module.ip_addresses.azure_nomisapi_cidrs.devtest,
+    ])
+    external_oem_agent_access_cidrs = flatten([
+      module.ip_addresses.azure_fixngo_cidrs.devtest,
+    ])
+    external_remote_access_cidrs = flatten([
+      module.ip_addresses.azure_fixngo_cidrs.devtest,
+    ])
+    external_weblogic_access_cidrs = flatten([
+      module.ip_addresses.azure_fixngo_cidrs.devtest,
+      module.ip_addresses.azure_fixngo_cidrs.internet_egress
+    ])
 
     # vars common across ec2 instances
     ec2_common = {
@@ -169,12 +158,21 @@ locals {
           server-type        = "nomis-web"
         }
         ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-01-03T17-01-12.128Z"
-        # branch = var.BRANCH_NAME # comment in if testing ansible
+        branch   = var.BRANCH_NAME # comment in if testing ansible
 
         autoscaling_group = {
-          desired_capacity  = 1
-          warm_pool         = null
-          target_group_arns = local.environment == "test" ? [module.lb_listener["https"].aws_lb_target_group["http-7777-asg"].arn] : []
+          desired_capacity = 1
+          warm_pool        = null
+          target_group_arns = local.environment == "test" ? [
+            module.lb_listener["https"].aws_lb_target_group["http-7001-asg"].arn,
+            module.lb_listener["https"].aws_lb_target_group["http-7777-asg"].arn,
+            module.lb_listener["http-7001"].aws_lb_target_group["http-7001-asg"].arn,
+            module.lb_listener["http-7777"].aws_lb_target_group["http-7777-asg"].arn,
+            module.lb_listener["internal-https"].aws_lb_target_group["http-7001-asg"].arn,
+            module.lb_listener["internal-https"].aws_lb_target_group["http-7777-asg"].arn,
+            module.lb_listener["internal-http-7001"].aws_lb_target_group["http-7001-asg"].arn,
+            module.lb_listener["internal-http-7777"].aws_lb_target_group["http-7777-asg"].arn,
+          ] : []
         }
       }
     }
@@ -274,6 +272,22 @@ locals {
         subnet_name           = "data"
       }
     }
-    ec2_jumpservers = {}
+    ec2_jumpservers = {
+      jumpserver-2022 = {
+        ami_name = "nomis_windows_server_2022_jumpserver_release_*"
+        tags = {
+          server-type       = "jumpserver"
+          description       = "Windows Server 2022 Jumpserver for NOMIS"
+          monitored         = true
+          os-type           = "Windows"
+          component         = "jumpserver"
+          nomis-environment = "dev"
+        }
+        autoscaling_group = {
+          min_size = 0
+          max_size = 1
+        }
+      }
+    }
   }
 }

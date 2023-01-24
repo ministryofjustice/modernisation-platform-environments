@@ -19,7 +19,7 @@ variable "load_balancer_arn" {
 }
 
 variable "target_groups" {
-  description = "Map of target groups, where key is the name_prefix"
+  description = "Map of target groups, where key is the name"
   type = map(object({
     port                 = optional(number)
     protocol             = optional(string)
@@ -47,6 +47,11 @@ variable "target_groups" {
       availability_zone = optional(string)
     })), [])
   }))
+}
+
+variable "existing_target_groups" {
+  description = "Map of existing aws_lb_target_groups, if looking up target group by name (map key)"
+  default     = {}
 }
 
 variable "port" {
@@ -104,6 +109,7 @@ variable "default_action" {
 variable "rules" {
   description = "Map of additional aws_lb_listener_rules where key is the tag:Name"
   type = map(object({
+    priority = optional(number)
     actions = list(object({
       type              = string
       target_group_name = optional(string, null)
@@ -132,6 +138,9 @@ variable "rules" {
     }))
     conditions = list(object({
       host_header = optional(object({
+        values = list(string)
+      }))
+      path_pattern = optional(object({
         values = list(string)
       }))
     }))
