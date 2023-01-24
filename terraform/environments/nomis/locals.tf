@@ -1,5 +1,6 @@
 locals {
   business_unit     = var.networking[0].business-unit
+  vpc_name          = var.networking[0].business-unit
   application_name  = var.networking[0].application
   environment       = trimprefix(terraform.workspace, "${var.networking[0].application}-")
   subnet_set        = var.networking[0].set
