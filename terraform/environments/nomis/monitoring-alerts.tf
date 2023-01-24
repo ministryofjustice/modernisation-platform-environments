@@ -34,14 +34,14 @@ resource "aws_cloudwatch_metric_alarm" "low_available_memory" {
 resource "aws_cloudwatch_metric_alarm" "cpu_usage_iowait" {
   alarm_name          = "cpu_usage_iowait"
   comparison_operator = "GreaterThanOrEqualToThreshold"
-  evaluation_periods  = "5"
-  datapoints_to_alarm = "6"
+  evaluation_periods  = "6"
+  datapoints_to_alarm = "5"
   metric_name         = "cpu_usage_iowait"
   namespace           = "CWAgent"
   period              = "60"
   statistic           = "Average"
   threshold           = "90"
-  alarm_description   = "This metric monitors the amount of CPU time spent waiting for I/O to complete. If the amount of CPU time spent waiting for I/O to complete is greater than 90% for 30 minutes, the alarm will trigger."
+  alarm_description   = "This metric monitors the amount of CPU time spent waiting for I/O to complete. If the average CPU time spent waiting for I/O to complete is greater than 90% for 30 minutes, the alarm will trigger."
   alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
   tags = {
     Name = "cpu_usage_iowait"
