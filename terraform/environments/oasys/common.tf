@@ -311,61 +311,81 @@ resource "aws_ssm_association" "update_ssm_agent" {
 # they are managed by an autoscaling group, and therefore are not tagged as targets
 #------------------------------------------------------------------------------
 
-# locals {
-#   weekdays = ["MON", "TUE", "WED", "THU", "FRI"]
-# }
+locals {
+  weekdays = ["MON", "TUE", "WED", "THU", "FRI"]
+}
 
-# # Scheduled start
-# resource "aws_ssm_association" "ec2_scheduled_start" {
-#   for_each                         = toset(local.weekdays)
-#   name                             = "AWS-StartEC2Instance" # this is an AWS provided document
-#   association_name                 = "ec2_scheduled_start_${each.value}"
-#   automation_target_parameter_name = "InstanceId"
-#   parameters = {
-#     AutomationAssumeRole = aws_iam_role.ssm_ec2_start_stop.arn
-#   }
-#   targets {
-#     key    = "tag:always_on"
-#     values = ["false"]
-#   }
-#   apply_only_at_cron_interval = true
-#   schedule_expression         = "cron(0 7 ? * ${each.value} *)"
-# }
+# Scheduled start
+resource "aws_ssm_association" "ec2_scheduled_start" {
+  for_each                         = toset(local.weekdays)
+  name                             = "AWS-StartEC2Instance" # this is an AWS provided document
+  association_name                 = "ec2_scheduled_start_${each.value}"
+  automation_target_parameter_name = "InstanceId"
+  parameters = {
+    AutomationAssumeRole = aws_iam_role.ssm_ec2_start_stop.arn
+  }
+  targets {
+    key    = "tag:always_on"
+    values = ["false"]
+  }
+  apply_only_at_cron_interval = true
+  schedule_expression         = "cron(0 7 ? * ${each.value} *)"
+}
 
-# # Scheduled stop
-# resource "aws_ssm_association" "ec2_scheduled_stop" {
-#   for_each                         = toset(local.weekdays)
-#   name                             = "AWS-StopEC2Instance" # this is an AWS provided document
-#   association_name                 = "ec2_scheduled_stop_${each.value}"
-#   automation_target_parameter_name = "InstanceId"
-#   parameters = {
-#     AutomationAssumeRole = aws_iam_role.ssm_ec2_start_stop.arn
-#   }
-#   targets {
-#     key    = "tag:always_on"
-#     values = ["false"]
-#   }
-#   apply_only_at_cron_interval = true
-#   schedule_expression         = "cron(0 19 ? * ${each.value} *)"
-# }
+# Scheduled stop
+resource "aws_ssm_association" "ec2_scheduled_stop" {
+  for_each                         = toset(local.weekdays)
+  name                             = "AWS-StopEC2Instance" # this is an AWS provided document
+  association_name                 = "ec2_scheduled_stop_${each.value}"
+  automation_target_parameter_name = "InstanceId"
+  parameters = {
+    AutomationAssumeRole = aws_iam_role.ssm_ec2_start_stop.arn
+  }
+  targets {
+    key    = "tag:always_on"
+    values = ["false"]
+  }
+  apply_only_at_cron_interval = true
+  schedule_expression         = "cron(0 19 ? * ${each.value} *)"
+}
 
 
 
-#   statement {
-#     sid    = "modifyAautoscalingGroupProcesses"
-#     effect = "Allow"
+data "aws_iam_policy_document" "ssm_ec2_start_stop_kms" {
+  statement {
+    sid    = "manageSharedAMIsEncryptedEBSVolumes"
+    effect = "Allow"
+    #tfsec:ignore:aws-iam-no-policy-wildcards
+    actions = [
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:ReEncrypt*",
+      "kms:ReEncryptFrom",
+      "kms:GenerateDataKey*",
+      "kms:DescribeKey",
+      "kms:CreateGrant",
+      "kms:ListGrants",
+      "kms:RevokeGrant"
+    ]
+    # we have a legacy CMK that's used in production that will be retired but in the meantime requires permissions
+    resources = [data.aws_kms_key.hmpps_key.arn]
+  }
 
-#     actions = [
-#       "autoscaling:SuspendProcesses",
-#       "autoscaling:ResumeProcesses",
-#       "autoscaling:DescribeAutoScalingGroups",
-#     ]
-#     #this role manages all the autoscaling groups in an account
-#     #checkov:skip=CKV_AWS_111: "Ensure IAM policies does not allow write access without constraints"
-#     #checkov:skip=CKV_AWS_109: "Ensure IAM policies does not allow permissions management / resource exposure without constraints"
-#     resources = ["*"] #tfsec:ignore:aws-iam-no-policy-wildcards
-#   }
-# }
+  statement {
+    sid    = "modifyAautoscalingGroupProcesses"
+    effect = "Allow"
+
+    actions = [
+      "autoscaling:SuspendProcesses",
+      "autoscaling:ResumeProcesses",
+      "autoscaling:DescribeAutoScalingGroups",
+    ]
+    #this role manages all the autoscaling groups in an account
+    #checkov:skip=CKV_AWS_111: "Ensure IAM policies does not allow write access without constraints"
+    #checkov:skip=CKV_AWS_109: "Ensure IAM policies does not allow permissions management / resource exposure without constraints"
+    resources = ["*"] #tfsec:ignore:aws-iam-no-policy-wildcards
+  }
+}
 
 resource "aws_iam_role" "ssm_ec2_start_stop" {
   name                 = "ssm-ec2-start-stop"

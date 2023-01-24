@@ -382,7 +382,7 @@ data "aws_iam_policy_document" "ssm_ec2_start_stop_kms" {
       "kms:RevokeGrant"
     ]
     # we have a legacy CMK that's used in production that will be retired but in the meantime requires permissions
-    resources = [local.environment == "test" ? aws_kms_key.oasys-cmk[0].arn : data.aws_kms_key.oasys_key.arn, data.aws_kms_key.hmpps_key.arn]
+    resources = [data.aws_kms_key.hmpps_key.arn]
   }
 
   statement {

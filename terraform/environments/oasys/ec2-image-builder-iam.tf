@@ -5,10 +5,9 @@ data "aws_caller_identity" "mod-platform" {
   provider = aws.modernisation-platform
 }
 
-data "aws_kms_key" "oasys_key" {
-  # Look up the CMK used to create AMIs, which is in the test account (maybe it should be in prod?)
-  key_id = "arn:aws:kms:${local.region}:${local.environment_management.account_ids["oasys-test"]}:alias/oasys-image-builder"
-}
+# data "aws_kms_key" "oasys_key" {
+#   key_id = "arn:aws:kms:${local.region}:${local.environment_management.account_ids["oasys-test"]}:alias/oasys-image-builder"
+# }
 
 data "aws_kms_key" "hmpps_key" {
   # Look up the shared CMK used to create AMIs in the MP shared services account
@@ -84,7 +83,7 @@ data "aws_iam_policy_document" "image-builder-distro-kms-policy" {
       "kms:RevokeGrant"
     ]
     # we use the same AMIs in test and production, which are encrypted with a single key that only exists in test, hence the below
-    resources = [local.environment == "test" ? aws_kms_key.oasys-cmk[0].arn : data.aws_kms_key.oasys_key.arn, data.aws_kms_key.hmpps_key.arn]
+    resources = [data.aws_kms_key.hmpps_key.arn]
   }
 }
 

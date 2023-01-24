@@ -5,22 +5,21 @@
 # to use this key
 #------------------------------------------------------------------------------
 
-resource "aws_kms_key" "oasys-cmk" {
-  count                   = local.environment == "test" ? 1 : 0
-  description             = "oasys Managed Key for AMI Sharing"
-  deletion_window_in_days = 10
-  policy                  = data.aws_iam_policy_document.shared_image_builder_cmk_policy[0].json
-  enable_key_rotation     = true
-}
+# resource "aws_kms_key" "oasys-cmk" {
+#   count                   = local.environment == "test" ? 1 : 0
+#   description             = "oasys Managed Key for AMI Sharing"
+#   deletion_window_in_days = 10
+#   policy                  = data.aws_iam_policy_document.shared_image_builder_cmk_policy[0].json
+#   enable_key_rotation     = true
+# }
 
-resource "aws_kms_alias" "oasys-key" {
-  count         = local.environment == "test" ? 1 : 0
-  name          = "alias/oasys-image-builder"
-  target_key_id = aws_kms_key.oasys-cmk[0].key_id
-}
+# resource "aws_kms_alias" "oasys-key" {
+#   count         = local.environment == "test" ? 1 : 0
+#   name          = "alias/oasys-image-builder"
+#   target_key_id = aws_kms_key.oasys-cmk[0].key_id
+# }
 
 data "aws_iam_policy_document" "shared_image_builder_cmk_policy" {
-  count = local.environment == "test" ? 1 : 0
   statement {
     effect = "Allow"
     actions = ["kms:Encrypt",
