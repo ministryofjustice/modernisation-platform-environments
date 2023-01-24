@@ -73,7 +73,7 @@ module "ec2_test_instance" {
   iam_resource_names_prefix = "ec2-test-instance"
   instance_profile_policies = local.ec2_common_managed_policies
 
-  business_unit      = local.vpc_name
+  business_unit      = local.business_unit
   application_name   = local.application_name
   environment        = local.environment
   region             = local.region
@@ -115,7 +115,7 @@ module "ec2_test_autoscaling_group" {
   instance_profile_policies = local.ec2_common_managed_policies
   application_name          = local.application_name
   region                    = local.region
-  subnet_ids                = data.aws_subnets.private.ids
+  subnet_ids                = module.environment.subnets["private"].ids
   tags                      = merge(local.tags, local.ec2_test.tags, try(each.value.tags, {}))
   account_ids_lookup        = local.environment_management.account_ids
   branch                    = try(each.value.branch, "main")
@@ -129,7 +129,7 @@ resource "aws_security_group" "ec2_test" {
   #checkov:skip=CKV2_AWS_5:skip "Ensure that Security Groups are attached to another resource" - attached in nomis-stack module
   description = "Security group for ec2_test instances"
   name        = "ec2_test"
-  vpc_id      = data.aws_vpc.shared_vpc.id
+  vpc_id      = module.environment.vpc.id
 
   ingress {
     description = "Internal access to self on all ports"

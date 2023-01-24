@@ -1,39 +1,28 @@
 locals {
 
-  certificate = {
-    modernisation_platform_top_level = {
-      domain_name = "modernisation-platform.service.justice.gov.uk"
-      zone_name   = "modernisation-platform.service.justice.gov.uk"
-    }
-    modernisation_platform_wildcard = {
-      name        = "star.${local.application_name}.${local.vpc_name}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-      zone_name   = "${local.vpc_name}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-      domain_name = "*.${local.application_name}.${local.vpc_name}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-    }
-  }
-
   acm_certificates = {
 
     #--------------------------------------------------------------------------
     # define certificates common to all environments here
     #--------------------------------------------------------------------------
     common = {
-      "${local.certificate.modernisation_platform_wildcard.name}" = {
+      # e.g. star.nomis.hmpps-development.modernisation-platform.service.justice.gov.uk
+      "star.${module.environment.domains.public.application_environment}" = {
         # domain_name limited to 64 chars so put it in the san instead
-        domain_name             = local.certificate.modernisation_platform_top_level.domain_name
-        subject_alternate_names = [local.certificate.modernisation_platform_wildcard.domain_name]
+        domain_name             = module.environment.domains.public.modernisation_platform
+        subject_alternate_names = ["*.${module.environment.domains.public.application_environment}"]
         validation = {
-          "modernisation-platform.service.justice.gov.uk" = {
+          "${module.environment.domains.public.modernisation_platform}" = {
             account   = "core-network-services"
-            zone_name = "${local.certificate.modernisation_platform_top_level.zone_name}."
+            zone_name = "${module.environment.domains.public.modernisation_platform}."
           }
-          "${local.certificate.modernisation_platform_wildcard.domain_name}" = {
+          "*.${module.environment.domains.public.application_environment}" = {
             account   = "core-vpc"
-            zone_name = "${local.certificate.modernisation_platform_wildcard.zone_name}."
+            zone_name = "${module.environment.domains.public.business_unit_environment}."
           }
         }
         tags = {
-          description = "wildcard cert for ${local.certificate.modernisation_platform_wildcard.zone_name} domain"
+          description = "wildcard cert for ${module.environment.domains.public.application_environment} domain"
         }
       }
     }
