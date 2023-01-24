@@ -65,13 +65,16 @@ resource "aws_ebs_volume" "export_home" {
   iops              = 3000
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
 }
 resource "aws_volume_attachment" "export_home_att" {
   device_name = "/dev/sdh"
   volume_id   = aws_ebs_volume.export_home.id
   instance_id = aws_instance.ec2_oracle_ebs.id
 }
-/*
+
 resource "aws_ebs_volume" "u01"{
   availability_zone   = "eu-west-2a"
   size                = "75"
@@ -79,7 +82,16 @@ resource "aws_ebs_volume" "u01"{
   iops                = 3000
   encrypted           = true
   kms_key_id          = data.aws_kms_key.ebs_shared.key_id
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
 }
+resource "aws_volume_attachment" "u01_att" {
+  device_name = "/dev/sdi"
+  volume_id   = aws_ebs_volume.u01.id
+  instance_id = aws_instance.ec2_oracle_ebs.id
+}
+
 resource "aws_ebs_volume" "arch"{
   availability_zone   = "eu-west-2a"
   size                = "50"
@@ -87,6 +99,14 @@ resource "aws_ebs_volume" "arch"{
   iops                = 3000
   encrypted           = true
   kms_key_id          = data.aws_kms_key.ebs_shared.key_id
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
+}
+resource "aws_volume_attachment" "arch_att" {
+  device_name = "/dev/sdj"
+  volume_id   = aws_ebs_volume.arch.id
+  instance_id = aws_instance.ec2_oracle_ebs.id
 }
 resource "aws_ebs_volume" "dbf"{
   availability_zone   = "eu-west-2a"
@@ -95,6 +115,14 @@ resource "aws_ebs_volume" "dbf"{
   iops                = 3000
   encrypted           = true
   kms_key_id          = data.aws_kms_key.ebs_shared.key_id
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
+}
+resource "aws_volume_attachment" "dbf_att" {
+  device_name = "/dev/sdk"
+  volume_id   = aws_ebs_volume.dbf.id
+  instance_id = aws_instance.ec2_oracle_ebs.id
 }
 resource "aws_ebs_volume" "redoA"{
   availability_zone   = "eu-west-2a"
@@ -103,6 +131,14 @@ resource "aws_ebs_volume" "redoA"{
   iops                = 3000
   encrypted           = true
   kms_key_id          = data.aws_kms_key.ebs_shared.key_id
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
+}
+resource "aws_volume_attachment" "redoA_att" {
+  device_name = "/dev/sdl"
+  volume_id   = aws_ebs_volume.redoA.id
+  instance_id = aws_instance.ec2_oracle_ebs.id
 }
 resource "aws_ebs_volume" "techst"{
   availability_zone   = "eu-west-2a"
@@ -111,5 +147,12 @@ resource "aws_ebs_volume" "techst"{
   iops                = 3000
   encrypted           = true
   kms_key_id          = data.aws_kms_key.ebs_shared.key_id
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
 }
-*/
+resource "aws_volume_attachment" "techst_att" {
+  device_name = "/dev/sdm"
+  volume_id   = aws_ebs_volume.techst.id
+  instance_id = aws_instance.ec2_oracle_ebs.id
+}
