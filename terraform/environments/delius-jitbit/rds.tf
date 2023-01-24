@@ -4,10 +4,10 @@ resource "aws_security_group" "database_security_group" {
   vpc_id      = data.aws_vpc.shared.id
 
   ingress {
-    protocol        = "tcp"
-    description     = "Allow MSSQL traffic"
-    from_port       = 1433
-    to_port         = 1433
+    protocol    = "tcp"
+    description = "Allow MSSQL traffic"
+    from_port   = 1433
+    to_port     = 1433
     security_groups = [
       module.ecs.cluster_ec2_security_group_id,
     ]
@@ -22,7 +22,7 @@ resource "aws_security_group" "database_security_group" {
 }
 
 resource "aws_db_subnet_group" "jitbit" {
-  name       = "data-tier"
+  name = "data-tier"
   subnet_ids = [
     data.aws_subnet.data_subnets_a.id,
     data.aws_subnet.data_subnets_b.id,
