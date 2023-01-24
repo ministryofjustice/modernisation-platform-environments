@@ -117,7 +117,7 @@ resource "aws_security_group" "jumpserver-windows" {
     from_port   = "9100"
     to_port     = "9100"
     protocol    = "TCP"
-    cidr_blocks = [local.cidrs.cloud_platform]
+    cidr_blocks = [module.ip_addresses.moj_cidr.aws_cloud_platform_vpc]
   }
 
   ingress {
@@ -125,7 +125,7 @@ resource "aws_security_group" "jumpserver-windows" {
     from_port   = "9182"
     to_port     = "9182"
     protocol    = "TCP"
-    cidr_blocks = [local.cidrs.cloud_platform]
+    cidr_blocks = [module.ip_addresses.moj_cidr.aws_cloud_platform_vpc]
   }
 
   egress {
