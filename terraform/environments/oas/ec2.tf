@@ -99,22 +99,7 @@ resource "aws_security_group" "ec2" {
     protocol    = "tcp"
     cidr_blocks = [data.aws_vpc.shared.cidr_block] #!ImportValue env-VpcCidr
   }
-  # ingress {
-  #   description = "Inbound internet access"
-  #   from_port   = 80
-  #   to_port     = 80
-  #   protocol    = "tcp"
-  #   cidr_blocks = [data.aws_vpc.shared.cidr_block] #!ImportValue env-VpcCidr
-  # }
 
-
-  # egress {
-  #   description     = "Allow AWS SSM Session Manager"
-  #   from_port       = 443
-  #   to_port         = 443
-  #   protocol        = "tcp"
-  #   security_groups = [local.application_data.accounts[local.environment].ssm_interface_endpoint_security_group]
-  # }
   egress {
     description = "Allow AWS SSM Session Manager"
     from_port   = 443
@@ -178,13 +163,6 @@ resource "aws_security_group" "ec2" {
     protocol    = "tcp"
     cidr_blocks = [data.aws_vpc.shared.cidr_block] #!ImportValue env-VpcCidr
   }
-  # egress {
-  #   description = "Outbound internet access"
-  #   from_port   = 80
-  #   to_port     = 80
-  #   protocol    = "tcp"
-  #   cidr_blocks = [data.aws_vpc.shared.cidr_block] #!ImportValue env-VpcCidr
-  # }
   egress {
     description = "Outbound internet access"
     from_port   = 80
@@ -239,7 +217,7 @@ resource "aws_iam_role_policy" "ec2_instance_policy" {
   })
 }
 
-# NON-ROOT EBS VOLUMES COMMENTED OUT AS MAYBE REQUIRED LATER
+# EBS VOLUMES CODE COMMENTED OUT AS THESE WILL BE INCLUDED IN AMI FROM LZ DEVELOPMENT ACCOUNT
 # resource "aws_ebs_volume" "EC2ServeVolume01" {
 #   availability_zone = "eu-west-2a"
 #   size              = local.application_data.accounts[local.environment].orahomesize
