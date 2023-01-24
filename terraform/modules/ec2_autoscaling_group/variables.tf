@@ -77,7 +77,7 @@ variable "instance" {
     disable_api_termination      = bool
     instance_type                = string
     key_name                     = string
-    monitoring                   = optional(bool, "enabled")
+    monitoring                   = optional(string, "enabled")
     metadata_options_http_tokens = optional(string, "required")
     metadata_endpoint_enabled    = optional(string, "enabled")
     vpc_security_group_ids       = list(string)
