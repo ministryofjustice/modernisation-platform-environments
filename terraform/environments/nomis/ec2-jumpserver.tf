@@ -7,6 +7,9 @@
 
 locals {
 
+  # Stores modernisation platform account id for setting up the modernisation-platform provider
+  secret_prefix = "/Jumpserver/Users"
+
   ec2_jumpserver = {
 
     tags = {
