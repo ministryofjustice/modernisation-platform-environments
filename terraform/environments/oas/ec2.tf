@@ -240,8 +240,8 @@ EOF
 
 resource "aws_iam_role_policy" "ec2_instance_policy" {
   #tfsec:ignore:aws-iam-no-policy-wildcards
-  name   = "${local.application_name}-ec2-policy"
-  role   = aws_iam_role.ec2_instance_role.id
+  name = "${local.application_name}-ec2-policy"
+  role = aws_iam_role.ec2_instance_role.id
 
   # Terraform's "jsonencode" function converts a
   # Terraform expression result to valid JSON syntax.
