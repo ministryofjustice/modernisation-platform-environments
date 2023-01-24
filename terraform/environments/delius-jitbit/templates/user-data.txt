@@ -1,0 +1,2 @@
+#!/bin/bash
+echo "ECS_CLUSTER=delius-jitbit" >> /etc/ecs/ecs.config
