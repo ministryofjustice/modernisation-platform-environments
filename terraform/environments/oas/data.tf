@@ -164,6 +164,6 @@ data "aws_iam_policy" "ssm_ec2_policy" {
   arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
-data "aws_route_table" "subnet_route_table" {
-  subnet_id = data.aws_subnet.private_subnets_a.id
-}
+# data "aws_route_table" "subnet_route_table" {
+#   subnet_id = data.aws_subnet.private_subnets_a.id
+# }
