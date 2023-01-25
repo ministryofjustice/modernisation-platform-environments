@@ -54,9 +54,9 @@ locals {
   ec2_egress_rules = {
     "cluster_ec2_lb_egress" = {
       description = "Cluster EC2 loadbalancer egress rule"
-      from_port   = 0
-      to_port     = 0
-      protocol    = "-1"
+      from_port   = 443
+      to_port     = 443
+      protocol    = "tcp"
       cidr_blocks = [
       "0.0.0.0/0"]
       security_groups = []
@@ -69,7 +69,7 @@ locals {
       from_port       = 80
       to_port         = 80
       protocol        = "tcp"
-      cidr_blocks     = []
+      cidr_blocks     = [data.aws_vpc.shared.cidr_block]
       security_groups = []
     },
     "cluster_ec2_bastion_ingress" = {
@@ -77,7 +77,7 @@ locals {
       from_port       = 3389
       to_port         = 3389
       protocol        = "tcp"
-      cidr_blocks     = []
+      cidr_blocks     = [data.aws_vpc.shared.cidr_block]
       security_groups = []
     }
   }
