@@ -12,7 +12,7 @@ resource "aws_instance" "ec2_oracle_ebs_base" {
 
   # Due to a bug in terraform wanting to rebuild the ec2 if more than 1 ebs block is attached, we need the lifecycle clause below
   lifecycle {
-    ignore_changes = [ebs_block_device]
+    ignore_changes = [ebs_block_device,root_block_device]
   }
 
   user_data = <<EOF
@@ -83,15 +83,18 @@ EOF
 }
 
 resource "aws_ebs_volume" "export_home_base" {
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
   availability_zone = "eu-west-2a"
   size              = "60"
   type              = "io2"
   iops              = 3000
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  lifecycle {
-    ignore_changes = [kms_key_id]
-  }
+  tags = merge(local.tags,
+    { Name = "export/home" }
+  )
 }
 resource "aws_volume_attachment" "export_home_att_base" {
   device_name = "/dev/sdh"
@@ -100,16 +103,20 @@ resource "aws_volume_attachment" "export_home_att_base" {
 }
 
 resource "aws_ebs_volume" "u01_base" {
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
   availability_zone = "eu-west-2a"
   size              = "75"
   type              = "io2"
   iops              = 3000
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  lifecycle {
-    ignore_changes = [kms_key_id]
-  }
+  tags = merge(local.tags,
+    { Name = "u01" }
+  )
 }
+
 resource "aws_volume_attachment" "u01_att_base" {
   device_name = "/dev/sdi"
   volume_id   = aws_ebs_volume.u01_base.id
@@ -117,15 +124,18 @@ resource "aws_volume_attachment" "u01_att_base" {
 }
 
 resource "aws_ebs_volume" "arch_base" {
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
   availability_zone = "eu-west-2a"
   size              = "50"
   type              = "io2"
   iops              = 3000
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  lifecycle {
-    ignore_changes = [kms_key_id]
-  }
+  tags = merge(local.tags,
+    { Name = "arch" }
+  )
 }
 resource "aws_volume_attachment" "arch_att_base" {
   device_name = "/dev/sdj"
@@ -134,15 +144,18 @@ resource "aws_volume_attachment" "arch_att_base" {
 }
 /*
 resource "aws_ebs_volume" "dbf_base" {
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
   availability_zone = "eu-west-2a"
   size              = "8000"
   type              = "io2"
   iops              = 3000
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  lifecycle {
-    ignore_changes = [kms_key_id]
-  }
+  tags = merge(local.tags,
+    { Name = "dbf" }
+  )
 }
 resource "aws_volume_attachment" "dbf_att_base" {
   device_name = "/dev/sdk"
@@ -151,15 +164,18 @@ resource "aws_volume_attachment" "dbf_att_base" {
 }
 */
 resource "aws_ebs_volume" "redoA_base" {
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
   availability_zone = "eu-west-2a"
   size              = "100"
   type              = "io2"
   iops              = 3000
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  lifecycle {
-    ignore_changes = [kms_key_id]
-  }
+  tags = merge(local.tags,
+    { Name = "redoA" }
+  )
 }
 resource "aws_volume_attachment" "redoA_att_base" {
   device_name = "/dev/sdl"
@@ -167,15 +183,18 @@ resource "aws_volume_attachment" "redoA_att_base" {
   instance_id = aws_instance.ec2_oracle_ebs_base.id
 }
 resource "aws_ebs_volume" "techst_base" {
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
   availability_zone = "eu-west-2a"
   size              = "50"
   type              = "io2"
   iops              = 3000
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  lifecycle {
-    ignore_changes = [kms_key_id]
-  }
+  tags = merge(local.tags,
+    { Name = "techst" }
+  )
 }
 resource "aws_volume_attachment" "techst_att_base" {
   device_name = "/dev/sdm"
