@@ -96,7 +96,7 @@ locals {
           }
           flash = {
             type       = "gp3"
-            total_size = 2
+            total_size = 50
           }
           swap = {
             type = "gp3"
