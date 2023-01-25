@@ -49,7 +49,7 @@ EOF
     volume_type = "gp3"
     volume_size = 20
     encrypted   = true
-    kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+    kms_key_id  = data.aws_kms_key.ebs_shared.key_id
     tags = merge(local.tags,
       { Name = "swap" }
     )
@@ -59,7 +59,7 @@ EOF
     volume_type = "gp3"
     volume_size = 100
     encrypted   = true
-    kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+    kms_key_id  = data.aws_kms_key.ebs_shared.key_id
     tags = merge(local.tags,
       { Name = "temp" }
     )
@@ -69,7 +69,7 @@ EOF
     volume_type = "gp3"
     volume_size = 100
     encrypted   = true
-    kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+    kms_key_id  = data.aws_kms_key.ebs_shared.key_id
     tags = merge(local.tags,
       { Name = "home" }
     )
