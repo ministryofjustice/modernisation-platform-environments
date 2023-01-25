@@ -53,13 +53,11 @@ locals {
   }
   ec2_egress_rules = {
     "cluster_ec2_lb_egress" = {
-      description = "Cluster EC2 loadbalancer egress rule"
-      from_port   = 443
-      to_port     = 443
-      protocol    = "tcp"
-
-      cidr_blocks = [
-      "0.0.0.0/0"]
+      description     = "Cluster EC2 loadbalancer egress rule"
+      from_port       = 443
+      to_port         = 443
+      protocol        = "tcp"
+      cidr_blocks     = ["0.0.0.0/0"]
       security_groups = []
     }
   }
@@ -96,7 +94,7 @@ locals {
 }
 
 # Load balancer build using the module
-module "ecs_lb_access_logs_enabled" { #tfsec:ignore:aws-ec2-no-public-egress-sgr
+module "ecs_lb_access_logs_enabled" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer?ref=v2.1.1"
   providers = {
     # Here we use the default provider for the S3 bucket module, buck replication is disabled but we still
@@ -151,6 +149,7 @@ resource "aws_lb_listener" "ecs-example" {
   }
   #checkov:skip=CKV_AWS_103:"LB has no public endpoints"
   #checkov:skip=CKV_AWS_2:"LB has no public endpoints"
+  #tfsec:ignore:aws-elb-http-not-used LB has no public endpoints
   port = local.application_data.accounts[local.environment].server_port
 
   depends_on = [aws_lb_target_group.ecs_target_group]

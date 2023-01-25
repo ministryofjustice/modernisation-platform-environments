@@ -5,6 +5,7 @@
 
 
 resource "aws_db_instance" "Example-RDS" {
+  #tfsec:ignore:iam_database_authentication_enabled this is a short-lived example RDS
   engine                     = "mysql"
   engine_version             = "5.7"
   auto_minor_version_upgrade = true
@@ -23,6 +24,7 @@ resource "aws_db_instance" "Example-RDS" {
   backup_window               = local.application_data.accounts[local.environment].backup_window
   backup_retention_period     = local.application_data.accounts[local.environment].retention_period
   #checkov:skip=CKV_AWS_133: "backup_retention enabled, can be edited it application_variables.json"
+  #tfsec:ignore:iam_database_authentication_enabled this DB is an example DB with no meaningful data
   iam_database_authentication_enabled = local.application_data.accounts[local.environment].db_iam_database_authentication_enabled
   #checkov:skip=CKV_AWS_161: "iam auth enabled, but optional"
   multi_az = local.application_data.accounts[local.environment].db_multi_az
