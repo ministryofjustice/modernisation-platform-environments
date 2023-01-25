@@ -40,6 +40,7 @@ EOF
     volume_type = "gp3"
     volume_size = 50
     encrypted   = true
+    kms_key_id  = data.aws_kms_key.ebs_shared.key_id
     tags = merge(local.tags,
       { Name = "root-block" }
     )
