@@ -8,7 +8,7 @@ module "lb_listener" {
   }
 
   name              = each.key
-  business_unit     = local.vpc_name
+  business_unit     = local.business_unit
   environment       = local.environment
   load_balancer_arn = module.loadbalancer[each.value.lb_application_name].load_balancer.arn
   target_groups     = try(each.value.target_groups, {})
