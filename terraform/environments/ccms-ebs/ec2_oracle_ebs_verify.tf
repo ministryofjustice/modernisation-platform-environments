@@ -41,17 +41,18 @@ EOF
       { Name = "root-block" }
     )
   }
-
+  */
   ebs_block_device {
-    device_name = "/dev/sdf"
+    device_name = "/dev/sdb"
     volume_type = "gp3"
-    volume_size = 200
+    volume_size = 20
     encrypted   = true
+    kms_key_id        = data.aws_kms_key.ebs_shared.key_id
     tags = merge(local.tags,
-      { Name = "ebs-block1" }
+      { Name = "swap" }
     )
   }
-  */
+
   tags = merge(local.tags,
     { Name = lower(format("ec2-%s-%s-Oracle-EBS-db-image-test", local.application_name, local.environment)) }
   )
