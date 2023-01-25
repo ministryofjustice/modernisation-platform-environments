@@ -19,10 +19,10 @@ resource "aws_instance" "ec2_oracle_ebs_verify" {
 #!/bin/bash
 
 exec > /tmp/userdata.log 2>&1
-sudo systemctl stop amazon-ssm-agent
-sudo rm -rf /var/lib/amazon/ssm/ipc/
-sudo systemctl start amazon-ssm-agent
-sudo mount -a
+systemctl stop amazon-ssm-agent
+rm -rf /var/lib/amazon/ssm/ipc/
+systemctl start amazon-ssm-agent
+mount -a
 
 EOF
 
