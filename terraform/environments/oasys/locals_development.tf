@@ -29,7 +29,7 @@ locals {
           oasys-environment = "t1"
           description       = "oasys webserver"
           component         = "web"
-          server-type       = "webserver"
+          server-type       = "web"
         }
       })
       # test = {
