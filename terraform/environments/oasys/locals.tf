@@ -109,16 +109,16 @@ locals {
       vpc_security_group_ids       = [aws_security_group.webserver.id]
     }
 
-    # user_data_cloud_init = {
-    #   args = {
-    #     lifecycle_hook_name = "ready-hook"
-    #   }
-    #   scripts = [ # it would make sense to have these templates in a common area 
-    #     "ansible-ec2provision.sh.tftpl",
-    #     "post-ec2provision.sh.tftpl"
-    #   ]
-    #   write_files = {}
-    # }
+    user_data_cloud_init = {
+      args = {
+        lifecycle_hook_name = "ready-hook"
+      }
+      scripts = [ # it would make sense to have these templates in a common area 
+        "ansible-ec2provision.sh.tftpl",
+        "post-ec2provision.sh.tftpl"
+      ]
+      write_files = {}
+    }
 
     # ssm_parameters_prefix     = "webserver/"
     iam_resource_names_prefix = "webserver-asg"
