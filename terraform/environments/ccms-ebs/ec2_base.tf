@@ -11,15 +11,15 @@ resource "aws_instance" "ec2_oracle_ebs_base" {
   iam_instance_profile        = aws_iam_instance_profile.iam_instace_profile_oracle_base.name
 
   # Due to a bug in terraform wanting to rebuild the ec2 if more than 1 ebs block is attached, we need the lifecycle clause below
-  #lifecycle {
-  #  ignore_changes = [ebs_block_device]
-  #}
+  lifecycle {
+    ignore_changes = [ebs_block_device]
+  }
 
   user_data = <<EOF
 #!/bin/bash
 
 exec > /tmp/userdata.log 2>&1
-yum install wget unzip
+yum install -y wget unzip
 yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
 unzip awscliv2.zip
