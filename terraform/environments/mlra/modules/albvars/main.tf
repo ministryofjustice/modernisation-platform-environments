@@ -123,7 +123,7 @@ resource "aws_lb_listener_rule" "alb_listener_rule" {
 }
 
 resource "aws_lb_target_group" "alb_target_group" {
-  name                 = "${var.application_name}-tg-${var.environment}"
+  name                 = "${var.application_name}-tg-${var.environment}-alb-tg"
   port                 = var.target_group_port
   protocol             = var.target_group_protocol
   vpc_id               = var.vpc_id
@@ -143,7 +143,7 @@ resource "aws_lb_target_group" "alb_target_group" {
   }
 
   tags = {
-    Name = "${var.application_name}-tg-${var.environment}"
+    Name = "${var.application_name}-tg-${var.environment}-tg"
   }
 
 }
