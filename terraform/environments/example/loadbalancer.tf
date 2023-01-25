@@ -33,11 +33,11 @@ resource "aws_security_group_rule" "egress_traffic_lb" {
 
 # Build loadbalancer
 #tfsec:ignore:aws-elb-alb-not-public as the external lb needs to be public.
-#checkov:skip=CKV_AWS_150:Short-lived example environment, hence no need for deletion protection
 resource "aws_lb" "external" {
   name                       = "${local.application_name}-loadbalancer"
   load_balancer_type         = "application"
   subnets                    = data.aws_subnets.shared-public.ids
+  #checkov:skip=CKV_AWS_150:Short-lived example environment, hence no need for deletion protection
   enable_deletion_protection = false
   # allow 60*4 seconds before 504 gateway timeout for long-running DB operations
   idle_timeout               = 240
