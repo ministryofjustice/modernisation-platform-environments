@@ -31,7 +31,9 @@ resource "aws_security_group_rule" "egress_traffic_lb" {
   source_security_group_id = aws_security_group.example_load_balancer_sg.id
 }
 
-# Build loadbalancer #tfsec:ignore:aws-elb-alb-not-public as the external lb needs to be public. #checkov:skip=CKV_AWS_150: "short-lived example environment, hence no need for deletion protection"
+# Build loadbalancer
+#tfsec:ignore:aws-elb-alb-not-public as the external lb needs to be public.
+#checkov:skip=CKV_AWS_150:Short-lived example environment, hence no need for deletion protection
 resource "aws_lb" "external" {
   name                       = "${local.application_name}-loadbalancer"
   load_balancer_type         = "application"

@@ -57,6 +57,7 @@ locals {
       from_port   = 443
       to_port     = 443
       protocol    = "tcp"
+
       cidr_blocks = [
       "0.0.0.0/0"]
       security_groups = []
@@ -148,6 +149,7 @@ resource "aws_lb_listener" "ecs-example" {
     target_group_arn = aws_lb_target_group.ecs_target_group.arn
     type             = "forward"
   }
+  #CKV_AWS_103:LB has no public endpoints
   port = local.application_data.accounts[local.environment].server_port
 
   depends_on = [aws_lb_target_group.ecs_target_group]

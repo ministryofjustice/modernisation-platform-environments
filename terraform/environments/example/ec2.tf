@@ -31,7 +31,8 @@ resource "aws_security_group_rule" "egress_traffic" {
 
 
 
-#  Build EC2 "example-ec2" #checkov:skip=CKV2_AWS_41: "IAM role is not implemented for this example EC2. SSH/AWS keys are not used either."
+#  Build EC2 "example-ec2"
+#checkov:skip=CKV2_AWS_41:IAM role is not implemented for this example EC2. SSH/AWS keys are not used either.
 resource "aws_instance" "develop" {
   # Specify the instance type and ami to be used (this is the Amazon free tier option)
   instance_type          = local.application_data.accounts[local.environment].instance_type
