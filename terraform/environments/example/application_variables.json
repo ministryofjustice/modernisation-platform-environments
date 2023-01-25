@@ -30,7 +30,7 @@
       "ec2_min_size": "2",
       "container_cpu": "256",
       "container_memory": "1024",
-      "task_definition_volume":  "application_volume",
+      "task_definition_volume": "application_volume",
       "network_mode": "bridge",
       "app_count": "1"
     },
