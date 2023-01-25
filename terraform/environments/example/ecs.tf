@@ -1,6 +1,6 @@
 module "ecs" {
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs/"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs?ref=v2.1.3"
 
   subnet_set_name         = local.subnet_set_name
   vpc_all                 = local.vpc_all
@@ -140,7 +140,7 @@ resource "aws_lb_target_group" "ecs_target_group" {
   }
 }
 
-resource "aws_lb_listener" "ecs-example" {
+resource "aws_lb_listener" "ecs-example" { #tfsec:ignore:aws-elb-http-not-used LB has no public endpoints
   load_balancer_arn = module.ecs_lb_access_logs_enabled.load_balancer.arn
 
   default_action {
@@ -149,7 +149,6 @@ resource "aws_lb_listener" "ecs-example" {
   }
   #checkov:skip=CKV_AWS_103:"LB has no public endpoints"
   #checkov:skip=CKV_AWS_2:"LB has no public endpoints"
-  #tfsec:ignore:aws-elb-http-not-used LB has no public endpoints
   port = local.application_data.accounts[local.environment].server_port
 
   depends_on = [aws_lb_target_group.ecs_target_group]
