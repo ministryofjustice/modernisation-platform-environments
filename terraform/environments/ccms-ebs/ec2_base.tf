@@ -132,6 +132,7 @@ resource "aws_volume_attachment" "arch_att_base" {
   volume_id   = aws_ebs_volume.arch_base.id
   instance_id = aws_instance.ec2_oracle_ebs_base.id
 }
+/*
 resource "aws_ebs_volume" "dbf_base" {
   availability_zone = "eu-west-2a"
   size              = "8000"
@@ -148,6 +149,7 @@ resource "aws_volume_attachment" "dbf_att_base" {
   volume_id   = aws_ebs_volume.dbf_base.id
   instance_id = aws_instance.ec2_oracle_ebs_base.id
 }
+*/
 resource "aws_ebs_volume" "redoA_base" {
   availability_zone = "eu-west-2a"
   size              = "100"
