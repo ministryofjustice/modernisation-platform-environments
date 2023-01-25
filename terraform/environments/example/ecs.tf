@@ -148,7 +148,7 @@ resource "aws_lb_listener" "ecs-example" {
     target_group_arn = aws_lb_target_group.ecs_target_group.arn
     type             = "forward"
   }
-  port = 80
+  port = local.application_data.accounts[local.environment].server_port
 
   depends_on = [aws_lb_target_group.ecs_target_group]
 }
