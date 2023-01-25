@@ -28,3 +28,24 @@ tasks:
         Add-Computer -DomainName "${delius_iaps_ad_domain_name}" -Credential $domainJoinCredential -NewName $instanceId -Force
         exit 3010 # Reboot instance, see https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2launch-v2-settings.html#ec2launch-v2-exit-codes-reboots
       }
+  - frequency: once
+    type: powershell
+    runAs: admin
+    content: |-
+      # Configure IM Interface
+      $ErrorActionPreference = "Stop"
+      $VerbosePreference = "Continue"
+
+      $IMConfigFile = "C:\Program Files (x86)\I2N\IapsIMInterface\Config\IMIAPS.xml"
+      $configXML = [xml](Get-Content $IMConfigFile)
+      $configXML.DLLDEF.IAPSORACLE.USER = (Get-SSMParameter -Name "/IMInterface/IAPSOracle/user" -WithDecryption $true).Value
+      $configXML.DLLDEF.IAPSORACLE.PASSWORD = (Get-SSMParameter -Name "/IMInterface/IAPSOracle/password" -WithDecryption $true).Value
+      $configXML.save($IMConfigFile)
+
+      $service = Restart-Service -Name IMIapsInterfaceWinService -Force -PassThru
+      if ($service.Status -match "Running") {
+          Write-Host('Restart of IMIapsInterfaceWinService successful')
+      } else {
+          Write-Host('Error - Failed to restart IMIapsInterfaceWinService - see logs')
+          Exit 1
+      }
