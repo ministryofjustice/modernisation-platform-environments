@@ -31,11 +31,12 @@ resource "aws_lb_target_group" "nlb-target" {
   protocol    = "TCP"
   vpc_id      = data.aws_vpc.shared.id
   depends_on = [
-    module.ecs.ecs_service,
-    module.ecs.ec2_autoscaling_group,
-    module.albvars.load_balancer,
-    module.albvars.loab_balancer_listener,
-    module.albvars.target_group_name
+    module.ecs,
+    module.alb,
+    module.albvars
+    # module.albvars.load_balancer,
+    # module.albvars.loab_balancer_listener,
+    # module.albvars.target_group_name
   ]
   tags = {
     Name = "${local.application_name}-${local.environment}-nlb-tg"
