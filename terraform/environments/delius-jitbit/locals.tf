@@ -66,7 +66,7 @@ locals {
   }
 
   ec2_egress_rules = {
-    "cluster_ec2_lb_egress" = {
+    "cluster_ec2_lb_rds_egress" = {
       description     = "Cluster EC2 loadbalancer egress rule"
       from_port       = 1433
       to_port         = 1433
@@ -74,7 +74,7 @@ locals {
       cidr_blocks     = [data.aws_subnet.data_subnets_a.cidr_block, data.aws_subnet.data_subnets_b.cidr_block, data.aws_subnet.data_subnets_c.cidr_block]
       security_groups = null
     },
-    "cluster_ec2_lb_egress" = {
+    "cluster_ec2_lb_https_egress" = {
       description     = "Allow 443 to internet"
       from_port       = 443
       to_port         = 443

@@ -17,5 +17,13 @@ locals {
     db_enabled_cloudwatch_logs_exports     = ["audit", "audit", "listener", "trace"]
     db_performance_insights_enabled        = false
     db_skip_final_snapshot                 = true
+
+
+    log_groups = {}
+
+    ec2_common = {
+      patch_approval_delay_days = 3
+      patch_day                 = "TUE"
+    }
   }
 }

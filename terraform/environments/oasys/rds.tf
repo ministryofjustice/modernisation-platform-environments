@@ -31,6 +31,7 @@ resource "aws_db_instance" "oasysrds" {
   monitoring_role_arn = local.environment_config.db_monitoring_interval == 0 ? "" : aws_iam_role.rds_enhanced_monitoring[0].arn
   #checkov:skip=CKV_AWS_118: "enhanced monitoring is enabled, but optional"
   storage_encrypted               = true
+  deletion_protection             = false #tfsec:ignore:AVD-AWS-0177
   performance_insights_enabled    = local.environment_config.db_performance_insights_enabled
   performance_insights_kms_key_id = "" #tfsec:ignore:aws-rds-enable-performance-insights-encryption Left empty so that it will run, however should be populated with real key in scenario.
   enabled_cloudwatch_logs_exports = local.environment_config.db_enabled_cloudwatch_logs_exports
