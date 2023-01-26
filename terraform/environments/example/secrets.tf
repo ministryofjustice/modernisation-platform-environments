@@ -9,7 +9,7 @@ resource "random_password" "random_password" {
 #tfsec:ignore:aws-ssm-secret-use-customer-key
 resource "aws_secretsmanager_secret" "db_password" {
   #checkov:skip=CKV_AWS_149
-  name                    = "${var.networking[0].application}-database-password"
+  name                    = "${var.networking[0].application}-db-password"
   recovery_window_in_days = 0
   tags = merge(
     local.tags,
