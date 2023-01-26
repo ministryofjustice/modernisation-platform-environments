@@ -101,7 +101,7 @@ locals {
 
   task_definition = templatefile("${path.module}/templates/task_definition.json", {
     APP_NAME                                = local.application_name,
-    DOCKER_IMAGE                            = "${aws_ecr_repository.jitbit_app_ecr_repo.repository_url}:0.2"
+    DOCKER_IMAGE                            = "${aws_ecr_repository.jitbit_app_ecr_repo.repository_url}:0.3"
     DATABASE_PASSWORD_CONNECTION_STRING_ARN = aws_secretsmanager_secret.db_app_connection_string.arn
   })
 }
