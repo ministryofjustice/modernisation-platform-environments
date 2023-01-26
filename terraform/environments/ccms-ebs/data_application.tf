@@ -13,6 +13,7 @@ data "aws_ami" "oracle_base_prereqs" {
   }
 }
 
+/*
 data "aws_ami" "oracle_base_prereqs_verify" {
   most_recent = true
   owners      = [local.application_data.accounts[local.environment].ami_owner]
@@ -26,3 +27,4 @@ data "aws_ami" "oracle_base_prereqs_verify" {
     values = ["hvm"]
   }
 }
+*/
