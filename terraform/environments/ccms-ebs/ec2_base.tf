@@ -77,8 +77,10 @@ EOF
   }
 
   tags = merge(local.tags,
-    { Name = lower(format("ec2-%s-%s-Oracle-EBS-db-base-build", local.application_name, local.environment)) }
+    { Name = lower(format("ec2-%s-%s-Oracle-EBS-db-base-build", local.application_name, local.environment)) },
+    { instance-scheduling = "skip-auto-start" }
   )
+
   depends_on = [aws_security_group.ec2_sg_oracle_base]
 }
 /*
