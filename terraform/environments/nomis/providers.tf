@@ -1,6 +1,4 @@
-provider "github" {
-  owner = "ministryofjustice"
-}
+# AWS provider for the workspace you're working in (every resource will default to using this, unless otherwise specified)
 provider "aws" {
   alias  = "oidc-session"
   region = "eu-west-2"

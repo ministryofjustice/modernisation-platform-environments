@@ -14,6 +14,12 @@ data "aws_caller_identity" "oidc_session" {
 data "aws_caller_identity" "modernisation_platform" {
   provider = aws.modernisation-platform
 }
+
+data "aws_iam_session_context" "whoami" {
+  provider = aws.oidc-session
+  arn      = data.aws_caller_identity.oidc_session.arn
+}
+
 locals {
 
   application_name = "refer-monitor"

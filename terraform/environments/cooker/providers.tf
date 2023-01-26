@@ -25,7 +25,7 @@ provider "aws" {
   alias  = "core-vpc"
   region = "eu-west-2"
   assume_role {
-    role_arn = can(regex("modernisation-platform-developer", data.aws_iam_session_context.whoami.issuer_arn)) ? "arn:aws:iam::${local.environment_management.account_ids[local.provider_name]}:role/member-delegation-read-only" : "arn:aws:iam::${local.environment_management.account_ids[local.provider_name]}:role/member-delegation-${local.vpc_name}-sandbox"
+    role_arn = can(regex("modernisation-platform-developer", data.aws_iam_session_context.whoami.issuer_arn)) ? "arn:aws:iam::${local.environment_management.account_ids[local.provider_name]}:role/member-delegation-read-only" : "arn:aws:iam::${local.environment_management.account_ids[local.provider_name]}:role/member-delegation-${local.vpc_name}-${local.environment}"
   }
 }
 

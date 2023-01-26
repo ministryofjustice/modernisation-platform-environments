@@ -25,3 +25,7 @@ locals {
   }
 }
 
+data "aws_iam_session_context" "whoami" {
+  provider = aws.oidc-session
+  arn      = data.aws_caller_identity.oidc_session.arn
+}
