@@ -32,7 +32,7 @@ resource "aws_lb_target_group" "nlb-target" {
   vpc_id      = data.aws_vpc.shared.id
   depends_on = [
     module.mlra-ecs,
-    module.lb-access-logs-enabled
+    module.alb
     # module.albvars.load_balancer,
     # module.albvars.loab_balancer_listener,
     # module.albvars.target_group_name
