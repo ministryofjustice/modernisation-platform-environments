@@ -265,3 +265,12 @@ resource "aws_iam_role_policy" "ec2_instance_policy" {
 #   volume_id   = aws_ebs_volume.EC2ServeVolume02.id
 #   instance_id = aws_instance.oas_app_instance.id
 # }
+
+resource "aws_route53_record" "oas-app" {
+  zone_id = data.aws_route53_zone.inner.id
+  name    = "oas"
+  type    = "A"
+  ttl     = 900
+  records = [aws_eip.lb.public_ip]
+}
+
