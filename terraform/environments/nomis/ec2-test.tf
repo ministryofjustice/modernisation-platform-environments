@@ -127,5 +127,13 @@ resource "aws_security_group" "ec2_test" {
   description = "Security group for ec2_test instances"
   name        = "ec2_test"
   vpc_id      = module.environment.vpc.id
+
+  ingress {
+    description = "Internal access to self on all ports"
+    from_port   = 0
+    to_port     = 0
+    protocol    = -1
+    self        = true
+  }
 }
 

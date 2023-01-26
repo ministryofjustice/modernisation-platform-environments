@@ -180,6 +180,14 @@ resource "aws_security_group" "database_common" {
   description = "Common security group for database instances"
   name        = "database-common"
   vpc_id      = module.environment.vpc.id
+
+  ingress {
+    description = "Internal access to self on all ports"
+    from_port   = 0
+    to_port     = 0
+    protocol    = -1
+    self        = true
+  }
 }
 
 #------------------------------------------------------------------------------
