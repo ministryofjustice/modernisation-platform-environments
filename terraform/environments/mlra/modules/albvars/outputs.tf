@@ -13,3 +13,7 @@ output "load_balancer" {
 output "target_group_name" {
   value = aws_lb_target_group.alb_target_group.name
 }
+
+output "loab_balancer_listener" {
+  value = aws_lb_listener.alb_listener
+}
