@@ -31,9 +31,8 @@ resource "aws_lb_target_group" "nlb-target" {
   protocol    = "TCP"
   vpc_id      = data.aws_vpc.shared.id
   depends_on = [
-    module.ecs,
-    module.alb,
-    module.albvars
+    module.mlra-ecs,
+    module.lb-access-logs-enabled
     # module.albvars.load_balancer,
     # module.albvars.loab_balancer_listener,
     # module.albvars.target_group_name
