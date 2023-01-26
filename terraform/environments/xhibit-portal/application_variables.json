@@ -11,7 +11,7 @@
       "infra1-ami": "ami-00ee4cb5fb06692fa",
       "infra1-disk-1-snapshot": "snap-078d43138754490c0",
       "infra2-ami": "ami-09837cf3ef7241fca",
-      "infra6-ami": "ami-023e422e00218ec96",
+      "infra6-ami": "ami-0405b2560bb5a2f93",
       "infra6-disk-1-snapshot": "snap-03705d5c189d8e8a3",
       "infra6-disk-2-snapshot": "snap-0e1d1f114fee60628",
       "nat-instance-ami": "ami-087e7082959f51a02",
