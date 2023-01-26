@@ -79,6 +79,13 @@ module "ec2_jumpserver" {
   branch                        = try(each.value.branch, "main")
 }
 
+# Delete in next PR
+resource "aws_security_group" "jumpserver-windows" {
+  description = "Configure Windows jumpserver egress"
+  name        = "jumpserver-windows-${local.application_name}"
+  vpc_id      = module.environment.vpc.id
+}
+
 #------
 # Jumpserver specific
 #------
