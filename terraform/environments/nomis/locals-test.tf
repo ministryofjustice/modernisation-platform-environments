@@ -1,25 +1,6 @@
 # nomis-test environment settings
 locals {
   nomis_test = {
-    # account specific CIDRs for EC2 security groups
-    external_database_access_cidrs = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.devtest,
-      module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
-      module.ip_addresses.moj_cidr.aws_analytical_platform_aggregate,
-      module.ip_addresses.azure_studio_hosting_cidrs.devtest,
-      module.ip_addresses.azure_nomisapi_cidrs.devtest,
-    ])
-    external_oem_agent_access_cidrs = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.devtest,
-    ])
-    external_remote_access_cidrs = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.devtest,
-    ])
-    external_weblogic_access_cidrs = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.devtest,
-      module.ip_addresses.azure_fixngo_cidrs.internet_egress
-    ])
-
     # vars common across ec2 instances
     ec2_common = {
       patch_approval_delay_days = 3
@@ -39,20 +20,6 @@ locals {
       }
       cwagent-nomis-autologoff = {
         retention_days = 90
-      }
-    }
-
-    # Legacy database module, do not add any more entries here
-    databases_legacy = {
-      CNOMT1 = {
-        ami_name           = "nomis_db_STIG_CNOMT1-2022-04-21*"
-        asm_data_capacity  = 100
-        asm_flash_capacity = 2
-        description        = "Test NOMIS T1 database with a dataset of T1PDL0009 (note: only NOMIS db, NDH db is not included."
-        tags = {
-          monitored   = false
-          oracle-sids = "CNOMT1"
-        }
       }
     }
 
