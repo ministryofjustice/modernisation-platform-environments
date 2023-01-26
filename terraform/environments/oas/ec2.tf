@@ -268,7 +268,7 @@ resource "aws_iam_role_policy" "ec2_instance_policy" {
 
 resource "aws_route53_record" "oas-app" {
   zone_id = data.aws_route53_zone.inner.zone_id
-  name    = "oas"
+  name    = "${locals.application_name}.${data.aws_route53_zone.inner.name}"
   type    = "A"
   ttl     = 900
   records = [aws_instance.oas_app_instance.private_ip]
