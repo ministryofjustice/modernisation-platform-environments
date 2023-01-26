@@ -28,10 +28,10 @@ unzip awscliv2.zip
 wget https://s3.amazonaws.com/amazoncloudwatch-agent/oracle_linux/amd64/latest/amazon-cloudwatch-agent.rpm
 rpm -U ./amazon-cloudwatch-agent.rpm
 
-sudo systemctl stop amazon-ssm-agent
-sudo rm -rf /var/lib/amazon/ssm/ipc/
-sudo systemctl start amazon-ssm-agent
-sudo mount -a
+systemctl stop amazon-ssm-agent
+rm -rf /var/lib/amazon/ssm/ipc/
+systemctl start amazon-ssm-agent
+mount -a
 
 EOF
 
