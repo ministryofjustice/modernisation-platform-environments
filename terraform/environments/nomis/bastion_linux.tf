@@ -40,17 +40,15 @@ module "bastion_linux" {
   allow_ssh_commands = false
 
   app_name      = var.networking[0].application
-  business_unit = local.vpc_name
+  business_unit = local.business_unit
   subnet_set    = local.subnet_set
   environment   = local.environment
   region        = local.region
 
   extra_user_data_content = templatefile("templates/bastion-user-data.sh.tftpl", {
-    region           = local.region
-    vpc_name         = local.vpc_name
-    application_name = local.application_name
-    environment      = local.environment
-    X11Forwarding    = "yes" # set back to no after NDH installation testing
+    region                                  = local.region
+    application_environment_internal_domain = module.environment.domains.internal.application_environment
+    X11Forwarding                           = "yes" # set back to no after NDH installation testing
   })
 
   # Tags
@@ -69,7 +67,7 @@ resource "aws_security_group_rule" "CP_monitoring_ingress" {
   from_port         = 9100
   to_port           = 9100
   protocol          = "tcp"
-  cidr_blocks       = [local.cidrs.cloud_platform]
+  cidr_blocks       = [module.ip_addresses.moj_cidr.aws_cloud_platform_vpc]
   security_group_id = module.bastion_linux.bastion_security_group
 }
 
@@ -79,7 +77,7 @@ resource "aws_security_group_rule" "CP_monitoring_egress" {
   from_port         = 9100
   to_port           = 9100
   protocol          = "tcp"
-  cidr_blocks       = [local.cidrs.cloud_platform]
+  cidr_blocks       = [module.ip_addresses.moj_cidr.aws_cloud_platform_vpc]
   security_group_id = module.bastion_linux.bastion_security_group
 }
 
@@ -89,7 +87,7 @@ resource "aws_security_group_rule" "CP_oracle_monitoring_ingress" {
   from_port         = 9172
   to_port           = 9172
   protocol          = "tcp"
-  cidr_blocks       = [local.cidrs.cloud_platform]
+  cidr_blocks       = [module.ip_addresses.moj_cidr.aws_cloud_platform_vpc]
   security_group_id = module.bastion_linux.bastion_security_group
 }
 
@@ -99,6 +97,6 @@ resource "aws_security_group_rule" "CP_oracle_monitoring_egress" {
   from_port         = 9172
   to_port           = 9172
   protocol          = "tcp"
-  cidr_blocks       = [local.cidrs.cloud_platform]
+  cidr_blocks       = [module.ip_addresses.moj_cidr.aws_cloud_platform_vpc]
   security_group_id = module.bastion_linux.bastion_security_group
 }

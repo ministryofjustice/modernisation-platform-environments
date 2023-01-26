@@ -75,6 +75,7 @@ resource "aws_key_pair" "ec2-user" {
   )
 }
 
+#checkov:skip=CKV2_AWS_5
 resource "aws_security_group" "iaps" {
   name        = lower(format("%s-%s", local.application_name, local.environment))
   description = "Controls access to IAPS EC2 instance"
@@ -93,6 +94,7 @@ resource "aws_security_group_rule" "ingress_traffic_vpc" {
   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
 }
 
+#tfsec:ignore:aws-ec2-no-public-egress-sgr
 resource "aws_security_group_rule" "egress_traffic_cidr" {
   for_each          = local.application_data.iaps_sg_egress_rules_cidr
   description       = format("Outbound traffic for %s %d", each.value.protocol, each.value.from_port)

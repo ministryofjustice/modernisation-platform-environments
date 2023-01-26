@@ -2,34 +2,23 @@
 locals {
   nomis_test = {
     # account specific CIDRs for EC2 security groups
-    external_database_access_cidrs = [
-      local.cidrs.noms_test,
-      local.cidrs.noms_mgmt,
-      local.cidrs.noms_test_dr,
-      local.cidrs.noms_mgmt_dr,
-      local.cidrs.cloud_platform,
-      local.cidrs.analytical_platform_airflow,
-      local.cidrs.aks_studio_hosting_dev_1,
-      local.cidrs.nomisapi_t3_root_vnet,
-    ]
-    external_oem_agent_access_cidrs = [
-      local.cidrs.noms_test,
-      local.cidrs.noms_mgmt,
-      local.cidrs.noms_test_dr,
-      local.cidrs.noms_mgmt_dr,
-    ]
-    external_remote_access_cidrs = [
-      local.cidrs.noms_test,
-      local.cidrs.noms_mgmt,
-      local.cidrs.noms_test_dr,
-      local.cidrs.noms_mgmt_dr,
-    ]
-    external_weblogic_access_cidrs = [
-      local.cidrs.noms_test,
-      local.cidrs.noms_mgmt,
-      local.cidrs.noms_transit_live_fw_devtest,
-      local.cidrs.noms_transit_live_fw_prod,
-    ]
+    external_database_access_cidrs = flatten([
+      module.ip_addresses.azure_fixngo_cidrs.devtest,
+      module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
+      module.ip_addresses.moj_cidr.aws_analytical_platform_aggregate,
+      module.ip_addresses.azure_studio_hosting_cidrs.devtest,
+      module.ip_addresses.azure_nomisapi_cidrs.devtest,
+    ])
+    external_oem_agent_access_cidrs = flatten([
+      module.ip_addresses.azure_fixngo_cidrs.devtest,
+    ])
+    external_remote_access_cidrs = flatten([
+      module.ip_addresses.azure_fixngo_cidrs.devtest,
+    ])
+    external_weblogic_access_cidrs = flatten([
+      module.ip_addresses.azure_fixngo_cidrs.devtest,
+      module.ip_addresses.azure_fixngo_cidrs.internet_egress
+    ])
 
     # vars common across ec2 instances
     ec2_common = {
@@ -73,6 +62,47 @@ locals {
       # *-nomis-db-1: NOMIS, NDH, TRDATA
       # *-nomis-db-2: MIS, AUDIT
       # *-nomis-db-3: HA
+      t1-nomis-db-1 = {
+        tags = {
+          server-type         = "nomis-db"
+          description         = "T1 NOMIS database"
+          oracle-sids         = "CNOMT1"
+          s3-db-restore-dir   = "CNOMT1_20230125"
+          monitored           = true
+          instance-scheduling = "skip-scheduling"
+        }
+        ami_name  = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-07T12-48-08.562Z"
+        ami_owner = "self" # remove this line next time AMI is updated so core-shared-services-production used instead
+        instance = {
+          disable_api_termination = true
+        }
+        ebs_volumes = {
+          "/dev/sdb" = { # /u01
+            type = "gp3"
+            size = 100
+          }
+          "/dev/sdc" = { # /u02
+            type = "gp3"
+            size = 100
+          }
+        }
+        ebs_volume_config = {
+          app = {
+            type = "gp3"
+          }
+          data = {
+            type       = "gp3"
+            total_size = 100
+          }
+          flash = {
+            type       = "gp3"
+            total_size = 50
+          }
+          swap = {
+            type = "gp3"
+          }
+        }
+      }
 
       t1-nomis-db-2 = {
         tags = {
@@ -163,7 +193,7 @@ locals {
         tags = {
           ami                = "nomis_rhel_6_10_weblogic_appserver_10_3"
           description        = "T1 nomis weblogic 10.3"
-          oracle-db-hostname = "db.CNOMT1.nomis.hmpps-test.modernisation-platform.internal"
+          oracle-db-hostname = "t1-nomis-db-1"
           nomis-environment  = "t1"
           oracle-db-name     = "CNOMT1"
           server-type        = "nomis-web"
@@ -189,39 +219,6 @@ locals {
     }
 
     ec2_test_instances = {
-      t1-nomis-web-1 = {
-        tags = {
-          ami                = "nomis_rhel_6_10_weblogic_appserver_10_3"
-          description        = "For testing our RHEL6.10 weblogic image"
-          monitored          = false
-          os-type            = "Linux"
-          component          = "web"
-          server-type        = "nomis-web"
-          oracle-db-hostname = "db.CNOMT1.nomis.hmpps-test.modernisation-platform.internal"
-          oracle-db-name     = "CNOMT1"
-        }
-        instance = {
-          # set to large for weblogic testing
-          instance_type                = "t2.large"
-          metadata_options_http_tokens = "optional"
-          associate_public_ip_address  = true
-          ebs_block_device_inline      = true
-        }
-        ebs_volumes = {
-          "/dev/sdb" = { # /u01 (add for weblogic testing)
-            type       = "gp3"
-            size       = 150
-            kms_key_id = data.aws_kms_key.hmpps_key.arn
-          }
-        }
-        route53_records = {
-          create_internal_record = true
-          create_external_record = true
-        }
-        subnet_name = "public"
-        ami_name    = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-01-03T17-01-12.128Z"
-        # branch   = var.BRANCH_NAME # comment in if testing ansible
-      }
       t1-ndh-app-1 = {
         tags = {
           server-type       = "ndh-app"

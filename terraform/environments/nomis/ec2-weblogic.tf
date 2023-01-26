@@ -85,7 +85,7 @@ locals {
       force_delete              = true
       termination_policies      = ["OldestInstance"]
       target_group_arns         = []
-      vpc_zone_identifier       = data.aws_subnets.private.ids
+      vpc_zone_identifier       = module.environment.subnets["private"].ids
       wait_for_capacity_timeout = 0
 
       # this hook is triggered by the post-ec2provision.sh
@@ -138,14 +138,14 @@ module "ec2_weblogic_autoscaling_group" {
   autoscaling_group             = merge(local.ec2_weblogic.autoscaling_group, lookup(each.value, "autoscaling_group", {}))
   autoscaling_schedules         = lookup(each.value, "autoscaling_schedules", local.autoscaling_schedules_default)
   lb_target_groups              = merge(local.ec2_weblogic.lb_target_groups, lookup(each.value, "lb_target_groups", {}))
-  vpc_id                        = local.vpc_id
+  vpc_id                        = module.environment.vpc.id
 
   iam_resource_names_prefix = "ec2-weblogic-asg"
   instance_profile_policies = local.ec2_common_managed_policies
 
   application_name   = local.application_name
   region             = local.region
-  subnet_ids         = data.aws_subnets.private.ids
+  subnet_ids         = module.environment.subnets["private"].ids
   tags               = merge(local.tags, local.ec2_weblogic.tags, try(each.value.tags, {}))
   account_ids_lookup = local.environment_management.account_ids
   branch             = try(each.value.branch, "main")
@@ -159,7 +159,7 @@ resource "aws_security_group" "weblogic_common" {
   #checkov:skip=CKV2_AWS_5:skip "Ensure that Security Groups are attached to another resource" - attached in nomis-stack module
   description = "Common security group for weblogic instances"
   name        = "weblogic-common"
-  vpc_id      = local.vpc_id
+  vpc_id      = module.environment.vpc.id
 
   ingress {
     description = "Internal access to self on all ports"
@@ -215,7 +215,7 @@ resource "aws_security_group" "weblogic_common" {
     from_port   = "9100"
     to_port     = "9100"
     protocol    = "TCP"
-    cidr_blocks = [local.cidrs.cloud_platform]
+    cidr_blocks = [module.ip_addresses.moj_cidr.aws_cloud_platform_vpc]
   }
 
   ingress {
@@ -223,7 +223,7 @@ resource "aws_security_group" "weblogic_common" {
     from_port   = "9172"
     to_port     = "9172"
     protocol    = "TCP"
-    cidr_blocks = [local.cidrs.cloud_platform]
+    cidr_blocks = [module.ip_addresses.moj_cidr.aws_cloud_platform_vpc]
   }
 
   egress {

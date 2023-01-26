@@ -7,6 +7,9 @@
 
 locals {
 
+  # Stores modernisation platform account id for setting up the modernisation-platform provider
+  secret_prefix = "/Jumpserver/Users"
+
   ec2_jumpserver = {
 
     tags = {
@@ -70,7 +73,7 @@ module "ec2_jumpserver" {
   instance_profile_policies     = concat(local.ec2_common_managed_policies, [aws_iam_policy.jumpserver_users.arn])
   application_name              = local.application_name
   region                        = local.region
-  subnet_ids                    = data.aws_subnets.private.ids
+  subnet_ids                    = module.environment.subnets["private"].ids
   tags                          = merge(local.tags, local.ec2_jumpserver.tags, try(each.value.tags, {}))
   account_ids_lookup            = local.environment_management.account_ids
   branch                        = try(each.value.branch, "main")
@@ -84,7 +87,7 @@ module "ec2_jumpserver" {
 resource "aws_security_group" "jumpserver-windows" {
   description = "Configure Windows jumpserver egress"
   name        = "jumpserver-windows-${local.application_name}"
-  vpc_id      = local.vpc_id
+  vpc_id      = module.environment.vpc.id
 
   ingress {
     description = "Internal access to self on all ports"
@@ -117,7 +120,7 @@ resource "aws_security_group" "jumpserver-windows" {
     from_port   = "9100"
     to_port     = "9100"
     protocol    = "TCP"
-    cidr_blocks = [local.cidrs.cloud_platform]
+    cidr_blocks = [module.ip_addresses.moj_cidr.aws_cloud_platform_vpc]
   }
 
   ingress {
@@ -125,7 +128,7 @@ resource "aws_security_group" "jumpserver-windows" {
     from_port   = "9182"
     to_port     = "9182"
     protocol    = "TCP"
-    cidr_blocks = [local.cidrs.cloud_platform]
+    cidr_blocks = [module.ip_addresses.moj_cidr.aws_cloud_platform_vpc]
   }
 
   egress {
@@ -207,7 +210,7 @@ resource "aws_secretsmanager_secret" "jumpserver" {
   for_each = toset(data.github_team.dso_users.members)
   name     = "${local.secret_prefix}/${each.value}"
   policy   = data.aws_iam_policy_document.jumpserver_secrets[each.value].json
-  #kms_key_id              = data.aws_kms_key.general_shared.id
+  #kms_key_id              = module.environment.kms_keys["general"].id
   recovery_window_in_days = 0
   tags = merge(
     local.tags,

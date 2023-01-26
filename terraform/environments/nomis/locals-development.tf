@@ -2,34 +2,23 @@
 locals {
   nomis_development = {
     # account specific CIDRs for EC2 security groups
-    external_database_access_cidrs = [
-      local.cidrs.noms_test,
-      local.cidrs.noms_mgmt,
-      local.cidrs.noms_test_dr,
-      local.cidrs.noms_mgmt_dr,
-      local.cidrs.cloud_platform,
-      local.cidrs.analytical_platform_airflow,
-      local.cidrs.aks_studio_hosting_dev_1,
-      local.cidrs.nomisapi_t3_root_vnet,
-    ]
-    external_oem_agent_access_cidrs = [
-      local.cidrs.noms_test,
-      local.cidrs.noms_mgmt,
-      local.cidrs.noms_test_dr,
-      local.cidrs.noms_mgmt_dr,
-    ]
-    external_remote_access_cidrs = [
-      local.cidrs.noms_test,
-      local.cidrs.noms_mgmt,
-      local.cidrs.noms_test_dr,
-      local.cidrs.noms_mgmt_dr,
-    ]
-    external_weblogic_access_cidrs = [
-      local.cidrs.noms_test,
-      local.cidrs.noms_mgmt,
-      local.cidrs.noms_transit_live_fw_devtest,
-      local.cidrs.noms_transit_live_fw_prod,
-    ]
+    external_database_access_cidrs = flatten([
+      module.ip_addresses.azure_fixngo_cidrs.devtest,
+      module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
+      module.ip_addresses.moj_cidr.aws_analytical_platform_aggregate,
+      module.ip_addresses.azure_studio_hosting_cidrs.devtest,
+      module.ip_addresses.azure_nomisapi_cidrs.devtest,
+    ])
+    external_oem_agent_access_cidrs = flatten([
+      module.ip_addresses.azure_fixngo_cidrs.devtest,
+    ])
+    external_remote_access_cidrs = flatten([
+      module.ip_addresses.azure_fixngo_cidrs.devtest,
+    ])
+    external_weblogic_access_cidrs = flatten([
+      module.ip_addresses.azure_fixngo_cidrs.devtest,
+      module.ip_addresses.azure_fixngo_cidrs.internet_egress
+    ])
 
     # vars common across ec2 instances
     ec2_common = {
@@ -128,21 +117,6 @@ locals {
         tags = {
           server-type       = "jumpserver"
           description       = "Windows Server 2022 Jumpserver for NOMIS"
-          monitored         = true
-          os-type           = "Windows"
-          component         = "jumpserver"
-          nomis-environment = "dev"
-        }
-        autoscaling_group = {
-          min_size = 0
-          max_size = 1
-        }
-      }
-      jumpserver-2019 = {
-        ami_name = "nomis_windows_server_2019_jumpserver_test_*"
-        tags = {
-          server-type       = "jumpserver"
-          description       = "Windows Server 2019 Jumpserver for NOMIS"
           monitored         = true
           os-type           = "Windows"
           component         = "jumpserver"

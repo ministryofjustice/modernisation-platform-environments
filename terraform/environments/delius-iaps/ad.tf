@@ -43,6 +43,7 @@ resource "aws_directory_service_directory" "active_directory" {
 ##
 # Set up logging for the Managed AD
 #
+#checkov:skip=CKV_AWS_158
 resource "aws_cloudwatch_log_group" "active_directory" {
   name              = "/aws/directoryservice/${aws_directory_service_directory.active_directory.id}"
   retention_in_days = 14

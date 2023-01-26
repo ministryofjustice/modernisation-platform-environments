@@ -1,0 +1,29 @@
+[
+  {
+    "name": "${APP_NAME}",
+    "image": "${DOCKER_IMAGE}",
+    "cpu": 1536,
+    "portMappings": [
+      {
+        "containerPort": 5000,
+        "hostPort": 5000
+      }
+    ],
+    "memory": 3072,
+    "logConfiguration": {
+      "logDriver": "awslogs",
+      "options": {
+        "awslogs-group": "delius-jitbit-ecs",
+        "awslogs-region": "eu-west-2",
+        "awslogs-stream-prefix": "jitbit"
+      }
+    },
+    "environment": [
+      {
+        "name": "TEST_VAR",
+        "value": "test var"
+      }
+    ],
+    "essential": true
+  }
+]

@@ -37,7 +37,7 @@ module "database" {
   key_name                  = aws_key_pair.ec2-user.key_name
 
   application_name = local.application_name
-  business_unit    = local.vpc_name
+  business_unit    = local.business_unit
   environment      = local.environment
   subnet_set       = local.subnet_set
   tags             = merge(local.tags, try(each.value.tags, {}))
@@ -159,7 +159,7 @@ module "db_ec2_instance" {
   iam_resource_names_prefix = "ec2-database"
   instance_profile_policies = concat(local.ec2_common_managed_policies, [aws_iam_policy.s3_db_backup_bucket_access.arn])
 
-  business_unit      = local.vpc_name
+  business_unit      = local.business_unit
   application_name   = local.application_name
   environment        = local.environment
   region             = local.region
@@ -182,7 +182,7 @@ resource "aws_security_group" "database_common" {
   #checkov:skip=CKV2_AWS_5:skip "Ensure that Security Groups are attached to another resource" - attached in nomis-stack module
   description = "Common security group for database instances"
   name        = "database-common"
-  vpc_id      = data.aws_vpc.shared_vpc.id
+  vpc_id      = module.environment.vpc.id
 
   ingress {
     description = "Internal access to self on all ports"
@@ -247,7 +247,7 @@ resource "aws_security_group" "database_common" {
     from_port   = "9100"
     to_port     = "9100"
     protocol    = "TCP"
-    cidr_blocks = [local.cidrs.cloud_platform]
+    cidr_blocks = [module.ip_addresses.moj_cidr.aws_cloud_platform_vpc]
   }
 
   ingress {
@@ -255,7 +255,7 @@ resource "aws_security_group" "database_common" {
     from_port   = "9172"
     to_port     = "9172"
     protocol    = "TCP"
-    cidr_blocks = [local.cidrs.cloud_platform]
+    cidr_blocks = [module.ip_addresses.moj_cidr.aws_cloud_platform_vpc]
   }
 
   egress {
