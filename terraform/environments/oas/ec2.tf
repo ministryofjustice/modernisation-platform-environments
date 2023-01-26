@@ -267,7 +267,7 @@ resource "aws_iam_role_policy" "ec2_instance_policy" {
 # }
 
 resource "aws_route53_record" "oas-app" {
-  zone_id = data.aws_route53_zone.inner.id
+  zone_id = data.aws_route53_zone.inner.zone_id
   name    = "oas"
   type    = "A"
   ttl     = 900
