@@ -1,4 +1,9 @@
-#  Build EC2 
+###########################################################################
+#  NOTE:  This EC2 has hardcoded values as it is just a baseline image
+#         and not intended for ammendment once the image has been AMI'd
+###########################################################################
+
+#  Build EC2
 resource "aws_instance" "ec2_oracle_ebs_base" {
   instance_type               = "m5d.4xlarge"
   ami                         = "ami-08f3f19e17410c832"
