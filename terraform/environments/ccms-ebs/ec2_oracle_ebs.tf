@@ -59,15 +59,18 @@ EOF
 }
 
 resource "aws_ebs_volume" "export_home" {
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
   availability_zone = "eu-west-2a"
   size              = "60"
   type              = "io2"
   iops              = 3000
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  lifecycle {
-    ignore_changes = [kms_key_id]
-  }
+  tags = merge(local.tags,
+    { Name = "export/home" }
+  )
 }
 resource "aws_volume_attachment" "export_home_att" {
   device_name = "/dev/sdh"
@@ -76,15 +79,18 @@ resource "aws_volume_attachment" "export_home_att" {
 }
 
 resource "aws_ebs_volume" "u01" {
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
   availability_zone = "eu-west-2a"
   size              = "75"
   type              = "io2"
   iops              = 3000
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  lifecycle {
-    ignore_changes = [kms_key_id]
-  }
+  tags = merge(local.tags,
+    { Name = "u01" }
+  )
 }
 resource "aws_volume_attachment" "u01_att" {
   device_name = "/dev/sdi"
@@ -93,15 +99,18 @@ resource "aws_volume_attachment" "u01_att" {
 }
 
 resource "aws_ebs_volume" "arch" {
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
   availability_zone = "eu-west-2a"
   size              = "50"
   type              = "io2"
   iops              = 3000
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  lifecycle {
-    ignore_changes = [kms_key_id]
-  }
+  tags = merge(local.tags,
+    { Name = "arch" }
+  )
 }
 resource "aws_volume_attachment" "arch_att" {
   device_name = "/dev/sdj"
@@ -109,15 +118,18 @@ resource "aws_volume_attachment" "arch_att" {
   instance_id = aws_instance.ec2_oracle_ebs.id
 }
 resource "aws_ebs_volume" "dbf" {
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
   availability_zone = "eu-west-2a"
   size              = "8000"
   type              = "io2"
   iops              = 3000
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  lifecycle {
-    ignore_changes = [kms_key_id]
-  }
+  tags = merge(local.tags,
+    { Name = "dbf" }
+  )
 }
 resource "aws_volume_attachment" "dbf_att" {
   device_name = "/dev/sdk"
@@ -125,15 +137,18 @@ resource "aws_volume_attachment" "dbf_att" {
   instance_id = aws_instance.ec2_oracle_ebs.id
 }
 resource "aws_ebs_volume" "redoA" {
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
   availability_zone = "eu-west-2a"
   size              = "100"
   type              = "io2"
   iops              = 3000
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  lifecycle {
-    ignore_changes = [kms_key_id]
-  }
+  tags = merge(local.tags,
+    { Name = "redoA" }
+  )
 }
 resource "aws_volume_attachment" "redoA_att" {
   device_name = "/dev/sdl"
@@ -141,15 +156,18 @@ resource "aws_volume_attachment" "redoA_att" {
   instance_id = aws_instance.ec2_oracle_ebs.id
 }
 resource "aws_ebs_volume" "techst" {
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
   availability_zone = "eu-west-2a"
   size              = "50"
   type              = "io2"
   iops              = 3000
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  lifecycle {
-    ignore_changes = [kms_key_id]
-  }
+  tags = merge(local.tags,
+    { Name = "techst" }
+  )
 }
 resource "aws_volume_attachment" "techst_att" {
   device_name = "/dev/sdm"

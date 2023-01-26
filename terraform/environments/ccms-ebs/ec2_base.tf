@@ -81,7 +81,7 @@ EOF
   )
   depends_on = [aws_security_group.ec2_sg_oracle_base]
 }
-
+/*
 resource "aws_ebs_volume" "export_home_base" {
   lifecycle {
     ignore_changes = [kms_key_id]
@@ -96,12 +96,15 @@ resource "aws_ebs_volume" "export_home_base" {
     { Name = "export/home" }
   )
 }
+*/
+/*
 resource "aws_volume_attachment" "export_home_att_base" {
   device_name = "/dev/sdh"
   volume_id   = aws_ebs_volume.export_home_base.id
   instance_id = aws_instance.ec2_oracle_ebs_base.id
 }
-
+*/
+/*
 resource "aws_ebs_volume" "u01_base" {
   lifecycle {
     ignore_changes = [kms_key_id]
@@ -116,13 +119,15 @@ resource "aws_ebs_volume" "u01_base" {
     { Name = "u01" }
   )
 }
-
+*/
+/*
 resource "aws_volume_attachment" "u01_att_base" {
   device_name = "/dev/sdi"
   volume_id   = aws_ebs_volume.u01_base.id
   instance_id = aws_instance.ec2_oracle_ebs_base.id
 }
-
+*/
+/*
 resource "aws_ebs_volume" "arch_base" {
   lifecycle {
     ignore_changes = [kms_key_id]
@@ -137,11 +142,14 @@ resource "aws_ebs_volume" "arch_base" {
     { Name = "arch" }
   )
 }
+*/
+/*
 resource "aws_volume_attachment" "arch_att_base" {
   device_name = "/dev/sdj"
   volume_id   = aws_ebs_volume.arch_base.id
   instance_id = aws_instance.ec2_oracle_ebs_base.id
 }
+*/
 /*
 resource "aws_ebs_volume" "dbf_base" {
   lifecycle {
@@ -157,12 +165,15 @@ resource "aws_ebs_volume" "dbf_base" {
     { Name = "dbf" }
   )
 }
+*/
+/*
 resource "aws_volume_attachment" "dbf_att_base" {
   device_name = "/dev/sdk"
   volume_id   = aws_ebs_volume.dbf_base.id
   instance_id = aws_instance.ec2_oracle_ebs_base.id
 }
 */
+/*
 resource "aws_ebs_volume" "redoA_base" {
   lifecycle {
     ignore_changes = [kms_key_id]
@@ -177,11 +188,15 @@ resource "aws_ebs_volume" "redoA_base" {
     { Name = "redoA" }
   )
 }
+*/
+/*
 resource "aws_volume_attachment" "redoA_att_base" {
   device_name = "/dev/sdl"
   volume_id   = aws_ebs_volume.redoA_base.id
   instance_id = aws_instance.ec2_oracle_ebs_base.id
 }
+*/
+/*
 resource "aws_ebs_volume" "techst_base" {
   lifecycle {
     ignore_changes = [kms_key_id]
@@ -196,8 +211,11 @@ resource "aws_ebs_volume" "techst_base" {
     { Name = "techst" }
   )
 }
+*/
+/*
 resource "aws_volume_attachment" "techst_att_base" {
   device_name = "/dev/sdm"
   volume_id   = aws_ebs_volume.techst_base.id
   instance_id = aws_instance.ec2_oracle_ebs_base.id
 }
+*/
