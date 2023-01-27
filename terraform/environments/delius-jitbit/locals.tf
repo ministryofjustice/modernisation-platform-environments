@@ -103,5 +103,6 @@ locals {
     APP_NAME                                = local.application_name,
     DOCKER_IMAGE                            = "${aws_ecr_repository.jitbit_app_ecr_repo.repository_url}:0.3"
     DATABASE_PASSWORD_CONNECTION_STRING_ARN = aws_secretsmanager_secret.db_app_connection_string.arn
+    APP_URL                                 = "https://${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk/"
   })
 }

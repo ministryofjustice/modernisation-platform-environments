@@ -18,6 +18,12 @@
         "awslogs-stream-prefix": "jitbit"
       }
     },
+    "environment": [
+      {
+        "name": "AppURL",
+        "value": "${APP_URL}"
+      }
+    ],
     "secrets": [
       {
         "name": "ConnectionStrings__DBConnectionString",
