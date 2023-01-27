@@ -121,7 +121,7 @@ resource "aws_cloudwatch_metric_alarm" "oracle_batch_error" {
   alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
   tags = {
     Name = "oracle_batch_error"
-  } 
+  }
 }
 
 # ==============================================================================
