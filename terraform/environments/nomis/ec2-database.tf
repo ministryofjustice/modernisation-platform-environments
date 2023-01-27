@@ -1,15 +1,13 @@
 #------------------------------------------------------------------------------
 # Database
 #------------------------------------------------------------------------------
-# OLD NAMING - DEPRECATE
-#------------------------------------------------------------------------------
 
-#------------------------------------------------------------------------------
-# EC2 Instances following naming convention
-#------------------------------------------------------------------------------
-# NEW NAMING
+# Use `s3-db-restore-dir` tag to trigger a restore from backup. See
+# https://github.com/ministryofjustice/modernisation-platform-configuration-management/blob/main/ansible/roles/db-restore
+#
+# Use `fixngo-connection-target` to monitor connectivity to a target in FixNGo.  See
+# https://github.com/ministryofjustice/modernisation-platform-configuration-management/tree/main/ansible/roles/oracle-db-monitoring
 
-# SET TAGS
 locals {
 
   database = {

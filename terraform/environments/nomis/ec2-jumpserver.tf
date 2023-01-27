@@ -3,6 +3,14 @@
 
 # Obtain your user password from the AWS Secrets Manager for your user e.g.
 # /Jumpserver/Users/<your-github-username>
+#
+# The windows user_data_raw jumpserver-user-data.yaml file gets a list of users
+# from AWS Secrets Manager using [the AWS Get-SECSecretList](https://docs.aws.amazon.com/powershell/latest/reference/items/Get-SECSecretList.html)
+# cmdlet. This creates a user with the password held in Secrets Manager which
+# is put there by terraform as part of the resource in this file. A scheduled
+# task on the EC2 jumpserver instance checks for password changes every 15
+# minutes as this process runs locally on each machine..
+
 #--------------------------------------------------------------------------------
 
 locals {
