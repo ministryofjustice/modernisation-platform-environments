@@ -11,7 +11,7 @@ module "database" {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
   }
 
-  for_each = local.environment_config.databases_legacy
+  for_each = {}
 
   name = each.key
 
@@ -32,7 +32,7 @@ module "database" {
   oracle_sids            = try(each.value.oracle_sids, null)
   restored_from_snapshot = try(each.value.restored_from_snapshot, false)
 
-  common_security_group_id  = aws_security_group.database_common.id
+  common_security_group_id  = aws_security_group.data.id
   instance_profile_policies = concat(local.ec2_common_managed_policies, [aws_iam_policy.s3_db_backup_bucket_access.arn])
   key_name                  = aws_key_pair.ec2-user.key_name
 
@@ -70,7 +70,7 @@ locals {
       key_name                     = aws_key_pair.ec2-user.key_name
       metadata_options_http_tokens = "optional" # the Oracle installer cannot accommodate a token
       monitoring                   = true
-      vpc_security_group_ids       = [aws_security_group.database_common.id]
+      vpc_security_group_ids       = [aws_security_group.data.id]
     }
 
     user_data_cloud_init = {
@@ -172,107 +172,6 @@ module "db_ec2_instance" {
   ansible_repo         = "modernisation-platform-configuration-management"
   ansible_repo_basedir = "ansible"
   branch               = try(each.value.branch, "main")
-}
-
-#------------------------------------------------------------------------------
-# Common Security Group for Database Instances
-#------------------------------------------------------------------------------
-
-resource "aws_security_group" "database_common" {
-  #checkov:skip=CKV2_AWS_5:skip "Ensure that Security Groups are attached to another resource" - attached in nomis-stack module
-  description = "Common security group for database instances"
-  name        = "database-common"
-  vpc_id      = module.environment.vpc.id
-
-  ingress {
-    description = "Internal access to self on all ports"
-    from_port   = 0
-    to_port     = 0
-    protocol    = -1
-    self        = true
-  }
-
-  ingress {
-    description = "Internal access to ssh"
-    from_port   = "22"
-    to_port     = "22"
-    protocol    = "TCP"
-    security_groups = [
-      aws_security_group.weblogic_common.id,
-      aws_security_group.ec2_test.id,
-      aws_security_group.jumpserver-windows.id,
-      module.bastion_linux.bastion_security_group
-    ]
-  }
-
-  ingress {
-    description = "External access to ssh"
-    from_port   = "22"
-    to_port     = "22"
-    protocol    = "TCP"
-    cidr_blocks = local.environment_config.external_remote_access_cidrs
-  }
-
-  ingress {
-    description = "Internal access to oracle database"
-    from_port   = "1521"
-    to_port     = "1521"
-    protocol    = "TCP"
-    self        = true
-    security_groups = [
-      aws_security_group.weblogic_common.id,
-      aws_security_group.ec2_test.id,
-      module.bastion_linux.bastion_security_group
-    ]
-  }
-
-  ingress {
-    description = "External access to oracle database"
-    from_port   = "1521"
-    to_port     = "1521"
-    protocol    = "TCP"
-    cidr_blocks = local.environment_config.external_database_access_cidrs
-  }
-
-  ingress {
-    description = "External access to OEM Agent"
-    from_port   = "3872"
-    to_port     = "3872"
-    protocol    = "TCP"
-    cidr_blocks = local.environment_config.external_oem_agent_access_cidrs
-  }
-
-  ingress {
-    description = "External access to prometheus node exporter"
-    from_port   = "9100"
-    to_port     = "9100"
-    protocol    = "TCP"
-    cidr_blocks = [module.ip_addresses.moj_cidr.aws_cloud_platform_vpc]
-  }
-
-  ingress {
-    description = "External access to prometheus script exporter"
-    from_port   = "9172"
-    to_port     = "9172"
-    protocol    = "TCP"
-    cidr_blocks = [module.ip_addresses.moj_cidr.aws_cloud_platform_vpc]
-  }
-
-  egress {
-    description = "Allow all egress"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    #tfsec:ignore:aws-vpc-no-public-egress-sgr
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "database-common"
-    }
-  )
 }
 
 #------------------------------------------------------------------------------
