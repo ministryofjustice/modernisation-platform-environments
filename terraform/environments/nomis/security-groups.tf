@@ -18,6 +18,7 @@ resource "aws_security_group" "public" {
       protocol        = lookup(ingress.value, "protocol", null)
       cidr_blocks     = lookup(ingress.value, "cidr_blocks", null)
       security_groups = lookup(ingress.value, "security_groups", null)
+      self            = lookup(ingress.value, "self", null)
     }
   }
 
@@ -30,6 +31,7 @@ resource "aws_security_group" "public" {
       protocol        = lookup(egress.value, "protocol", null)
       cidr_blocks     = lookup(egress.value, "cidr_blocks", null)
       security_groups = lookup(egress.value, "security_groups", null)
+      self            = lookup(egress.value, "self", null)
     }
   }
 
@@ -53,6 +55,7 @@ resource "aws_security_group" "private" {
       protocol        = lookup(ingress.value, "protocol", null)
       cidr_blocks     = lookup(ingress.value, "cidr_blocks", null)
       security_groups = lookup(ingress.value, "security_groups", null)
+      self            = lookup(ingress.value, "self", null)
     }
   }
 
@@ -65,6 +68,7 @@ resource "aws_security_group" "private" {
       protocol        = lookup(egress.value, "protocol", null)
       cidr_blocks     = lookup(egress.value, "cidr_blocks", null)
       security_groups = lookup(egress.value, "security_groups", null)
+      self            = lookup(egress.value, "self", null)
     }
   }
 
@@ -88,6 +92,7 @@ resource "aws_security_group" "data" {
       protocol        = lookup(ingress.value, "protocol", null)
       cidr_blocks     = lookup(ingress.value, "cidr_blocks", null)
       security_groups = lookup(ingress.value, "security_groups", null)
+      self            = lookup(ingress.value, "self", null)
     }
   }
 
@@ -100,6 +105,7 @@ resource "aws_security_group" "data" {
       protocol        = lookup(egress.value, "protocol", null)
       cidr_blocks     = lookup(egress.value, "cidr_blocks", null)
       security_groups = lookup(egress.value, "security_groups", null)
+      self            = lookup(egress.value, "self", null)
     }
   }
 
@@ -123,6 +129,7 @@ resource "aws_security_group" "jumpserver" {
       protocol        = lookup(ingress.value, "protocol", null)
       cidr_blocks     = lookup(ingress.value, "cidr_blocks", null)
       security_groups = lookup(ingress.value, "security_groups", null)
+      self            = lookup(ingress.value, "self", null)
     }
   }
 
@@ -135,6 +142,7 @@ resource "aws_security_group" "jumpserver" {
       protocol        = lookup(egress.value, "protocol", null)
       cidr_blocks     = lookup(egress.value, "cidr_blocks", null)
       security_groups = lookup(egress.value, "security_groups", null)
+      self            = lookup(egress.value, "self", null)
     }
   }
 

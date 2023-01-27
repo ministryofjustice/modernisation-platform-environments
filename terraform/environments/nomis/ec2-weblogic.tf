@@ -150,19 +150,3 @@ module "ec2_weblogic_autoscaling_group" {
   account_ids_lookup = local.environment_management.account_ids
   branch             = try(each.value.branch, "main")
 }
-
-# Delete in next PR
-resource "aws_security_group" "weblogic_common" {
-  #checkov:skip=CKV2_AWS_5:skip "Ensure that Security Groups are attached to another resource" - attached in nomis-stack module
-  description = "Common security group for weblogic instances"
-  name        = "weblogic-common"
-  vpc_id      = module.environment.vpc.id
-
-  ingress {
-    description = "Internal access to self on all ports"
-    from_port   = 0
-    to_port     = 0
-    protocol    = -1
-    self        = true
-  }
-}
