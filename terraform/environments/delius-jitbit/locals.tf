@@ -52,6 +52,14 @@ locals {
   application_data = fileexists("./application_variables.json") ? jsondecode(file("./application_variables.json")) : {}
   app_data         = jsondecode(file("./application_variables.json"))
 
+  ##
+  # Variables used across multiple areas
+  ##
+  app_url = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+
+  ##
+  # Variables related to ECS module
+  ##
   lb_tg_name = "${local.application_name}-tg-${local.environment}"
 
   ec2_ingress_rules = {
@@ -84,7 +92,16 @@ locals {
     }
   }
 
+  task_definition = templatefile("${path.module}/templates/task_definition.json", {
+    APP_NAME                                = local.application_name,
+    DOCKER_IMAGE                            = "${aws_ecr_repository.jitbit_app_ecr_repo.repository_url}:0.4"
+    DATABASE_PASSWORD_CONNECTION_STRING_ARN = aws_secretsmanager_secret.db_app_connection_string.arn
+    APP_URL                                 = "https://${local.app_url}/"
+  })
 
+  ##
+  # Variables used by certificate validation, as part of the load balancer listener, cert and route 53 record configuration
+  ##
   domain_types = { for dvo in aws_acm_certificate.external.domain_validation_options : dvo.domain_name => {
     name   = dvo.resource_record_name
     record = dvo.resource_record_value
@@ -98,11 +115,4 @@ locals {
   domain_record_sub  = [for k, v in local.domain_types : v.record if k != "modernisation-platform.service.justice.gov.uk"]
   domain_type_main   = [for k, v in local.domain_types : v.type if k == "modernisation-platform.service.justice.gov.uk"]
   domain_type_sub    = [for k, v in local.domain_types : v.type if k != "modernisation-platform.service.justice.gov.uk"]
-
-  task_definition = templatefile("${path.module}/templates/task_definition.json", {
-    APP_NAME                                = local.application_name,
-    DOCKER_IMAGE                            = "${aws_ecr_repository.jitbit_app_ecr_repo.repository_url}:0.4"
-    DATABASE_PASSWORD_CONNECTION_STRING_ARN = aws_secretsmanager_secret.db_app_connection_string.arn
-    APP_URL                                 = "https://${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk/"
-  })
 }
