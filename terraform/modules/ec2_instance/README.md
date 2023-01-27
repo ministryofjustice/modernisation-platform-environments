@@ -65,10 +65,6 @@ e.g. nomis-test.tf
         instance = {
           disable_api_termination = true
         }
-        ebs_volume_config = {
-          data  = { total_size = 200 }
-          flash = { total_size = 2 }
-        }
       }
 ```
 
