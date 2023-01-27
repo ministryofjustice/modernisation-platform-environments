@@ -3,7 +3,7 @@
 module "loadbalancer" {
   for_each = merge(local.lbs.common, local.lbs[local.environment])
 
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer.git?ref=v2.1.1"
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer.git?ref=v2.1.2"
   providers = {
     aws.bucket-replication = aws
   }
