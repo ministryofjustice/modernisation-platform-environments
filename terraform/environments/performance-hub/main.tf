@@ -114,7 +114,7 @@ data "template_file" "task_definition" {
     app_name                         = local.application_name
     env_name                         = local.environment
     system_account_id                = local.app_data.accounts[local.environment].system_account_id
-    ecr_url                          = format("%s%s%s", "374269020027.dkr.ecr.", local.app_data.accounts[local.environment].region, ".amazonaws.com/performance-hub-ecr-repo")
+    ecr_url                          = format("%s%s%s%s", local.environment_management.account_ids["core-shared-services-production"], ".dkr.ecr.", local.app_data.accounts[local.environment].region, ".amazonaws.com/performance-hub-ecr-repo")
     server_port                      = local.app_data.accounts[local.environment].server_port
     aws_region                       = local.app_data.accounts[local.environment].region
     container_version                = local.app_data.accounts[local.environment].container_version
@@ -303,7 +303,7 @@ resource "aws_lb_listener" "https_listener" {
   load_balancer_arn = aws_lb.external.id
   port              = "443"
   protocol          = "HTTPS"
-  certificate_arn   = local.app_data.accounts[local.environment].cert_arn
+  certificate_arn   = format("arn:aws:acm:eu-west-2:%s:certificate/%s", data.aws_caller_identity.current.account_id, local.app_data.accounts[local.environment].cert_arn)
 
   default_action {
     target_group_arn = aws_lb_target_group.target_group.id
@@ -374,7 +374,7 @@ resource "aws_db_instance" "database" {
   storage_encrypted                   = true
   iam_database_authentication_enabled = false
   vpc_security_group_ids              = [aws_security_group.db.id]
-  snapshot_identifier                 = local.app_data.accounts[local.environment].db_snapshot_identifier
+  snapshot_identifier                 = format("arn:aws:rds:eu-west-2:%s:snapshot:%s", data.aws_caller_identity.current.account_id, local.app_data.accounts[local.environment].db_snapshot_identifier)
   backup_retention_period             = 30
   maintenance_window                  = "Mon:00:00-Mon:03:00"
   backup_window                       = "03:00-06:00"

@@ -1,8 +1,8 @@
 resource "aws_kinesis_stream" "this" {
   count = var.create_kinesis_stream ? 1 : 0
 
-  name                      = var.name
-  shard_count               = var.shard_count
+  name = var.name
+  # shard_count             = var.shard_count # Not require in On-Demand Mode
   retention_period          = var.retention_period
   shard_level_metrics       = var.shard_level_metrics
   enforce_consumer_deletion = var.enforce_consumer_deletion
@@ -10,10 +10,14 @@ resource "aws_kinesis_stream" "this" {
   kms_key_id                = var.kms_key_id
   tags                      = var.tags
 
-  // Ignore future changes on the desired count value
-  lifecycle {
-    ignore_changes = [shard_count]
+  stream_mode_details {
+    stream_mode = "ON_DEMAND" # Changing to ON_DEMAND
   }
+
+  #  // Ignore future changes on the desired count value
+  #  lifecycle {
+  #    ignore_changes = [shard_count]
+  #  }
 
 }
 
@@ -98,6 +102,6 @@ resource "aws_iam_policy" "admin" {
 
 #### TEMPORARY ####
 #resource "aws_iam_role_policy_attachment" "temporary-policy" {
-#  role       = "arn:aws:sts::771283872747:assumed-role/AWSReservedSSO_modernisation-platform-developer_1425a99d62c4ce2b"
+#  role       = "arn:aws:sts::${data.aws_caller_identity.current.account_id}:assumed-role/AWSReservedSSO_modernisation-platform-developer_1425a99d62c4ce2b"
 #  policy_arn = concat(aws_iam_policy.admin.*.arn, [""])[0]
 #}

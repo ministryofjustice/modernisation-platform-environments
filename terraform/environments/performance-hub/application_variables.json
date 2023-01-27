@@ -19,13 +19,13 @@
       "db_instance_class": "db.m5.large",
       "db_user": "admin",
       "db_allocated_storage": "100",
-      "db_snapshot_identifier": "arn:aws:rds:eu-west-2:938841708445:snapshot:performance-hub-final-snapshot",
+      "db_snapshot_identifier": "performance-hub-final-snapshot",
       "env_name": "development",
       "system_account_id": "C67AF61C-F010-4C37-8912-99308FD03241",
       "friendly_name": "HMPPS Development Hub",
       "app_db_name": "NomsPMU",
       "memebership_db_name": "Membership",
-      "cert_arn": "arn:aws:acm:eu-west-2:938841708445:certificate/977c968e-1992-46a4-bfe8-e4043ab5a982",
+      "cert_arn": "977c968e-1992-46a4-bfe8-e4043ab5a982",
       "hub_wwwroot": "C:/inetpub/wwwroot"
     },
     "preproduction": {
@@ -47,13 +47,13 @@
       "db_instance_class": "db.m5.large",
       "db_user": "admin",
       "db_allocated_storage": "100",
-      "db_snapshot_identifier": "arn:aws:rds:eu-west-2:322518575883:snapshot:performance-hub-final-snapshot-new-kms-key-07032022",
+      "db_snapshot_identifier": "performance-hub-final-snapshot-new-kms-key-07032022",
       "env_name": "preproduction",
       "system_account_id": "C67AF61C-F010-4C37-8912-99308FD03241",
       "friendly_name": "HMPPS Test Hub",
       "app_db_name": "NomsPMU_Staging",
       "memebership_db_name": "Membership_Staging",
-      "cert_arn": "arn:aws:acm:eu-west-2:322518575883:certificate/28a9aefd-4f6c-4850-afdb-ea2910614f74",
+      "cert_arn": "28a9aefd-4f6c-4850-afdb-ea2910614f74",
       "hub_wwwroot": "C:/inetpub/wwwroot"
     },
     "production": {
@@ -75,13 +75,13 @@
       "db_instance_class": "db.m5.large",
       "db_user": "admin",
       "db_allocated_storage": "400",
-      "db_snapshot_identifier": "arn:aws:rds:eu-west-2:143664002102:snapshot:performance-hub-final-snapshot-081221",
+      "db_snapshot_identifier": "performance-hub-final-snapshot-081221",
       "env_name": "production",
       "system_account_id": "B554E4A1-3171-43F5-AEC1-B1B4050BF071",
       "friendly_name": "HMPPS Performance Hub",
       "app_db_name": "NomsPMU_Live",
       "memebership_db_name": "Membership_Live",
-      "cert_arn": "arn:aws:acm:eu-west-2:143664002102:certificate/cfd47546-c13e-4870-8d03-e2accaa11382",
+      "cert_arn": "cfd47546-c13e-4870-8d03-e2accaa11382",
       "hub_wwwroot": "C:/inetpub/wwwroot"
     }
   }

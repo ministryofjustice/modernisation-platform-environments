@@ -4,16 +4,16 @@ locals {
   default_tags = {
     server-type       = join("-", slice(local.name_split, 1, length(local.name_split)))
     nomis-environment = local.name_split[0]
-    always_on         = lookup(var.tags, "always-on", true) # backward compat.
     server-name       = var.name
   }
-  tags = merge(local.default_tags, var.tags)
+  ssm_parameters_prefix_tag = var.ssm_parameters_prefix == "" ? {} : {
+    ssm-parameters-prefix = var.ssm_parameters_prefix
+  }
+  tags = merge(local.default_tags, local.ssm_parameters_prefix_tag, var.tags)
 
   ami_block_device_mappings = {
     for bdm in data.aws_ami.this.block_device_mappings : bdm.device_name => bdm
   }
-
-  ami_block_device_mappings_root = local.ami_block_device_mappings[data.aws_ami.this.root_device_name]
 
   ami_block_device_mappings_nonroot = {
     for key, value in local.ami_block_device_mappings :
@@ -42,6 +42,7 @@ locals {
     for key, value in var.ebs_volumes :
     key => {
       iops       = try(var.ebs_volume_config[value.label].iops, null)
+      kms_key_id = try(var.ebs_volume_config[value.label].kms_key_id, null)
       throughput = try(var.ebs_volume_config[value.label].throughput, null)
       type       = try(var.ebs_volume_config[value.label].type, null)
       size = try(
@@ -60,7 +61,8 @@ locals {
   }
 
   # merge AMI and var.ebs_volume values, e.g. allow AMI settings to be overridden
-  ebs_volume_names = keys(merge(var.ebs_volumes, local.ami_block_device_mappings_nonroot))
+  ebs_volume_names = var.ebs_volumes_copy_all_from_ami ? keys(merge(var.ebs_volumes, local.ami_block_device_mappings)) : keys(var.ebs_volumes)
+
   ebs_volumes = {
     for key in local.ebs_volume_names :
     key => merge(
@@ -70,8 +72,15 @@ locals {
     )
   }
 
+  ebs_volume_root = local.ebs_volumes[data.aws_ami.this.root_device_name]
+
+  ebs_volumes_nonroot = {
+    for key, value in local.ebs_volumes :
+    key => value if key != data.aws_ami.this.root_device_name
+  }
+
   user_data_args_ssm_params = {
-    for key, value in var.ssm_parameters :
+    for key, value in var.ssm_parameters != null ? var.ssm_parameters : {} :
     "ssm_parameter_${key}" => aws_ssm_parameter.this[key].name
   }
 
@@ -82,5 +91,7 @@ locals {
     volume_ids           = join(" ", [for key, value in aws_ebs_volume.this : value.id])
   }
 
-  user_data_args = merge(local.user_data_args_common, local.user_data_args_ssm_params, try(var.user_data.args, {}))
+  user_data_args = merge(local.user_data_args_common, local.user_data_args_ssm_params, try(var.user_data_cloud_init.args, {}))
+
+  user_data_raw = var.user_data_raw
 }

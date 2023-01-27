@@ -1,7 +1,8 @@
 locals {
-  current_account_id     = data.aws_caller_identity.current.account_id
-  current_account_region = data.aws_region.current.name
-  setup_datamart         = local.application_data.accounts[local.environment].setup_redshift
+  current_account_id                = data.aws_caller_identity.current.account_id
+  current_account_region            = data.aws_region.current.name
+  setup_datamart                    = local.application_data.accounts[local.environment].setup_redshift
+  dms_iam_role_permissions_boundary = null
 }
 
 
@@ -118,6 +119,14 @@ data "aws_iam_policy_document" "redshift-additional-policy" {
       "*"
     ]
   }
+  statement {
+    actions = [
+      "kms:*"
+    ]
+    resources = [
+      "*"
+    ]
+  }
 }
 
 resource "aws_iam_policy" "additional-policy" {
@@ -129,4 +138,83 @@ resource "aws_iam_policy" "additional-policy" {
 resource "aws_iam_role_policy_attachment" "redshift" {
   role       = aws_iam_role.redshift-role[0].name
   policy_arn = aws_iam_policy.additional-policy.arn
+}
+
+### DMS Roles
+# Create a role that can be assummed by the root account
+data "aws_iam_policy_document" "dms_assume_role" {
+  statement {
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      identifiers = ["dms.amazonaws.com"]
+      type        = "Service"
+    }
+
+  }
+}
+
+# CW Logs Role
+# DMS CloudWatch Logs
+resource "aws_iam_role" "dms_cloudwatch_logs_role" {
+  name                  = "dms-cloudwatch-logs-role"
+  description           = "DMS IAM role for CloudWatch logs permissions"
+  permissions_boundary  = local.dms_iam_role_permissions_boundary
+  assume_role_policy    = data.aws_iam_policy_document.dms_assume_role.json
+  managed_policy_arns   = ["arn:aws:iam::aws:policy/service-role/AmazonDMSCloudWatchLogsRole"]
+  force_detach_policies = true
+
+  tags = merge(
+    local.tags,
+    {
+      name    = "dms-service-cw-role"
+      project = "dpr"
+    }
+  )
+}
+
+# DMS VPC
+resource "aws_iam_role" "dmsvpcrole" {
+  name                  = "dms-vpc-role"
+  description           = "DMS IAM role for VPC permissions"
+  permissions_boundary  = local.dms_iam_role_permissions_boundary
+  assume_role_policy    = data.aws_iam_policy_document.dms_assume_role.json
+  managed_policy_arns   = ["arn:aws:iam::aws:policy/service-role/AmazonDMSVPCManagementRole"]
+  force_detach_policies = true
+
+  tags = merge(
+    local.tags,
+    {
+      name    = "dms-service-vpc-role"
+      project = "dpr"
+    }
+  )
+}
+
+# Attach an admin policy to the role -- Evaluate if this is required
+resource "aws_iam_role_policy" "dmsvpcpolicy" {
+  name = "dms-vpc-policy"
+  role = aws_iam_role.dmsvpcrole.id
+
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ec2:CreateNetworkInterface",
+                "ec2:DescribeAvailabilityZones",
+                "ec2:DescribeInternetGateways",
+                "ec2:DescribeSecurityGroups",
+                "ec2:DescribeSubnets",
+                "ec2:DescribeVpcs",
+                "ec2:DeleteNetworkInterface",
+                "ec2:ModifyNetworkInterfaceAttribute"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+EOF
 }
