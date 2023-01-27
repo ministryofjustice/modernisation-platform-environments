@@ -188,18 +188,6 @@ resource "aws_security_group_rule" "sms-outbound-importmachine" {
   source_security_group_id = aws_security_group.importmachine.id
 }
 
-# resource "aws_security_group_rule" "sms-inbound-all" {
-#   depends_on        = [aws_security_group.sms_server]
-#   security_group_id = aws_security_group.sms_server.id
-#   type              = "ingress"
-#   description       = "allow all"
-#   from_port         = 0
-#   to_port           = 0
-#   protocol          = "-1"
-#   cidr_blocks       = ["0.0.0.0/0"]
-#   ipv6_cidr_blocks  = ["::/0"]
-# }
-
 resource "aws_security_group_rule" "sms-outbound-all-ipv4" {
   depends_on        = [aws_security_group.sms_server]
   security_group_id = aws_security_group.sms_server.id
@@ -246,24 +234,24 @@ resource "aws_security_group_rule" "waf_lb-outbound-importmachine" {
 
 resource "aws_security_group_rule" "prtg_lb-inbound-importmachine" {
   depends_on               = [aws_security_group.prtg_lb]
-  security_group_id        = aws_security_group.prtg_lb.id
+  security_group_id        = [aws_security_group.prtg_lb.id]
   type                     = "ingress"
   description              = "allow HTTPS from prtg-lb to importmachine"
   from_port                = 443
   to_port                  = 443
   protocol                 = "TCP"
-  source_security_group_id = aws_security_group.importmachine.id
+  source_security_group_id = [aws_security_group.importmachine.id]
 }
 
 resource "aws_security_group_rule" "prtg_lb-outbound-importmachine" {
   depends_on               = [aws_security_group.prtg_lb]
-  security_group_id        = aws_security_group.prtg_lb.id
+  security_group_id        = [aws_security_group.prtg_lb.id]
   type                     = "egress"
   description              = "allow HTTPS to prtg-lb from importmachine"
   from_port                = 443
   to_port                  = 443
   protocol                 = "TCP"
-  source_security_group_id = aws_security_group.importmachine.id
+  source_security_group_id = [aws_security_group.importmachine.id]
 }
 
 resource "aws_security_group_rule" "egress-to-portal" {
