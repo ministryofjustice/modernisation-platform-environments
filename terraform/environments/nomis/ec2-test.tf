@@ -120,20 +120,3 @@ module "ec2_test_autoscaling_group" {
   account_ids_lookup        = local.environment_management.account_ids
   branch                    = try(each.value.branch, "main")
 }
-
-# Delete in next PR
-resource "aws_security_group" "ec2_test" {
-  #checkov:skip=CKV2_AWS_5:skip "Ensure that Security Groups are attached to another resource" - attached in nomis-stack module
-  description = "Security group for ec2_test instances"
-  name        = "ec2_test"
-  vpc_id      = module.environment.vpc.id
-
-  ingress {
-    description = "Internal access to self on all ports"
-    from_port   = 0
-    to_port     = 0
-    protocol    = -1
-    self        = true
-  }
-}
-
