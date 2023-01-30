@@ -27,7 +27,6 @@ module "autoscaling_groups" {
   subnet_ids                = data.aws_subnets.private.ids
   tags                      = merge(local.tags, try(each.value.tags, {}))
   account_ids_lookup        = local.environment_management.account_ids
-  branch                    = try(each.value.branch, "main")
 }
 
 resource "aws_kms_grant" "image-builder-shared-cmk-grant" {

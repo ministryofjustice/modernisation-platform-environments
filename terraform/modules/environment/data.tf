@@ -11,6 +11,13 @@ data "http" "environments_file" {
 # Network
 #------------------------------------------------------------------------------
 
+data "aws_availability_zones" "this" {
+  filter {
+    name   = "opt-in-status"
+    values = ["opt-in-not-required"]
+  }
+}
+
 data "aws_vpc" "this" {
   tags = {
     Name = local.vpc_name
@@ -26,6 +33,22 @@ data "aws_subnets" "this" {
   }
   tags = {
     Name = "${local.vpc_name}-${var.subnet_set}-${each.key}-${local.region}*"
+  }
+}
+
+data "aws_subnet" "this" {
+  for_each = toset(flatten([
+    for subnet_name in local.subnet_names[var.subnet_set] : [
+      for zone_name in data.aws_availability_zones.this.names : "${subnet_name}-${zone_name}"
+    ]
+  ]))
+
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.this.id]
+  }
+  tags = {
+    Name = "${local.vpc_name}-${var.subnet_set}-${each.key}"
   }
 }
 
