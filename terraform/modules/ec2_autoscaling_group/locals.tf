@@ -60,16 +60,7 @@ locals {
     "ssm_parameter_${key}" => aws_ssm_parameter.this[key].name
   }
 
-  user_data_args_common = {
-    branch               = var.branch == "" ? "main" : var.branch
-    ansible_repo         = var.ansible_repo == null ? "" : var.ansible_repo
-    ansible_repo_basedir = var.ansible_repo_basedir == null ? "" : var.ansible_repo_basedir
-    ansible_args         = "--tags ec2provision"
-  }
-
-  user_data_args = merge(local.user_data_args_common, local.user_data_args_ssm_params, try(var.user_data_cloud_init.args, {}))
-
-  user_data_raw = var.user_data_raw
+  user_data_args = merge(local.user_data_args_ssm_params, try(var.user_data_cloud_init.args, {}))
 
   user_data_part_count = [
     try(length(var.user_data_cloud_init.scripts), 0),

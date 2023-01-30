@@ -22,14 +22,17 @@ locals {
 
     user_data_cloud_init = {
       args = {
-        lifecycle_hook_name = "ready-hook"
+        lifecycle_hook_name  = "ready-hook"
+        branch               = "main"
+        ansible_repo         = "modernisation-platform-configuration-management"
+        ansible_repo_basedir = "ansible"
+        ansible_args         = "--tags ec2provision"
       }
       scripts = [
         "install-ssm-agent.sh.tftpl",
         "ansible-ec2provision.sh.tftpl",
         "post-ec2provision.sh.tftpl"
       ]
-      write_files = {}
     }
 
     route53_records = {
@@ -78,14 +81,9 @@ module "ec2_test_instance" {
   environment        = local.environment
   region             = local.region
   availability_zone  = local.availability_zone
-  subnet_set         = local.subnet_set
-  subnet_name        = lookup(each.value, "subnet_name", "private")
+  subnet_id          = module.environment.subnet["private"][local.availability_zone].id
   tags               = merge(local.tags, local.ec2_test.tags, try(each.value.tags, {}))
   account_ids_lookup = local.environment_management.account_ids
-
-  ansible_repo         = "modernisation-platform-configuration-management"
-  ansible_repo_basedir = "ansible"
-  branch               = try(each.value.branch, "main")
 }
 
 module "ec2_test_autoscaling_group" {
@@ -118,5 +116,4 @@ module "ec2_test_autoscaling_group" {
   subnet_ids                = module.environment.subnets["private"].ids
   tags                      = merge(local.tags, local.ec2_test.tags, try(each.value.tags, {}))
   account_ids_lookup        = local.environment_management.account_ids
-  branch                    = try(each.value.branch, "main")
 }

@@ -8,6 +8,11 @@ output "tags" {
   value       = local.tags
 }
 
+output "availability_zones" {
+  description = "availability zones for this account, see aws_availability_zones data object"
+  value       = data.aws_availability_zones.this
+}
+
 output "vpc_name" {
   description = "name of vpc, e.g. hmpps-development"
   value       = local.vpc_name
@@ -21,6 +26,15 @@ output "vpc" {
 output "subnets" {
   description = "map of aws_subnets resources where the key is the subnet name, e.g. data, private, public"
   value       = data.aws_subnets.this
+}
+
+output "subnet" {
+  description = "map of individual aws_subnet resources.  first map key is subnet name, second is zone name, e.g. subnet['private']['eu-west-2a']"
+  value = {
+    for subnet_name in local.subnet_names[var.subnet_set] : subnet_name => {
+      for zone_name in data.aws_availability_zones.this.names : zone_name => data.aws_subnet.this["${subnet_name}-${zone_name}"]
+    }
+  }
 }
 
 output "domains" {

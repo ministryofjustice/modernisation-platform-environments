@@ -36,32 +36,14 @@ variable "account_ids_lookup" {
   default     = {}
 }
 
-variable "ansible_repo" {
-  type        = string
-  description = "Optionally provision the server using this ansible_repo"
-  default     = "modernisation-platform-configuration-management"
-}
-
-variable "ansible_repo_basedir" {
-  type        = string
-  description = "Base directory within ansible_repo where ansible code is located"
-  default     = "ansible"
-}
-
-variable "branch" {
-  type        = string
-  description = "Git hub branch code is being run from.  For cloning ansible repo"
-  default     = ""
-}
-
 variable "ami_name" {
   type        = string
-  description = "Name of AMI to be used to launch the database ec2 instance"
+  description = "Name of AMI to be used to launch the ec2 instance"
 }
 
 variable "ami_owner" {
   type        = string
-  description = "Owner of AMI to be used to launch the database ec2 instance"
+  description = "Owner of AMI to be used to launch the ec2 instance"
   default     = "core-shared-services-production"
   nullable    = false
 }
@@ -72,7 +54,7 @@ variable "name" {
 }
 
 variable "instance" {
-  description = "EC2 instance settings, see aws_instance documentation"
+  description = "EC2 launch template / instance settings, see aws_instance documentation"
   type = object({
     disable_api_termination      = bool
     instance_type                = string
@@ -90,12 +72,13 @@ variable "instance" {
 }
 
 variable "user_data_raw" {
-  description = "Windows user data_file"
+  description = "Base64 encoded user data, script or cloud formation template"
   type        = string
   default     = null
 }
+
 variable "user_data_cloud_init" {
-  description = "Map of Linux cloud-init config write_file sections for user data"
+  description = "Use this instead of user_data_raw to run multiple scripts using cloud_init"
   type = object({
     args    = optional(map(string))
     scripts = optional(list(string))
@@ -103,7 +86,7 @@ variable "user_data_cloud_init" {
       path        = string
       owner       = string
       permissions = string
-    })))
+    })), {})
   })
   default = null
 }
@@ -146,7 +129,7 @@ variable "iam_resource_names_prefix" {
 
 variable "instance_profile_policies" {
   type        = list(string)
-  description = "A list of managed IAM policy document ARNs to be attached to the database instance profile"
+  description = "A list of managed IAM policy document ARNs to be attached to the instance profile"
 }
 
 variable "autoscaling_group" {

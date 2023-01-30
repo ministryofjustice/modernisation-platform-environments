@@ -1,10 +1,6 @@
 locals {
-  name_split = split("-", var.name)
-
   default_tags = {
-    server-type       = join("-", slice(local.name_split, 1, length(local.name_split)))
-    nomis-environment = local.name_split[0]
-    server-name       = var.name
+    server-name = var.name
   }
   ssm_parameters_prefix_tag = var.ssm_parameters_prefix == "" ? {} : {
     ssm-parameters-prefix = var.ssm_parameters_prefix
@@ -85,13 +81,8 @@ locals {
   }
 
   user_data_args_common = {
-    branch               = var.branch == "" ? "main" : var.branch
-    ansible_repo         = var.ansible_repo == null ? "" : var.ansible_repo
-    ansible_repo_basedir = var.ansible_repo_basedir == null ? "" : var.ansible_repo_basedir
-    volume_ids           = join(" ", [for key, value in aws_ebs_volume.this : value.id])
+    volume_ids = join(" ", [for key, value in aws_ebs_volume.this : value.id])
   }
 
   user_data_args = merge(local.user_data_args_common, local.user_data_args_ssm_params, try(var.user_data_cloud_init.args, {}))
-
-  user_data_raw = var.user_data_raw
 }
