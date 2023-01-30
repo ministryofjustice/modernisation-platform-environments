@@ -72,7 +72,7 @@ resource "aws_alb_target_group" "webgate_tg" {
   protocol    = "HTTP"
   vpc_id      = data.aws_vpc.shared.id
   target_type = "instance"
-/*
+  /*
   health_check {
     interval            = 30
     path                = "/index.html"
