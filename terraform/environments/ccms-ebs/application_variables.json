@@ -3,11 +3,12 @@
     "development": {
       "example_var": "dev-data",
       "ec2_oracle_instance_type_ebs_db": "m5d.4xlarge",
-      "ec2_oracle_instance_type_ebs_apps": "m4.2xlarge",
-      "ec2_oracle_instance_type_webgate": "m4.large",
-      "ec2_oracle_instance_type_accessgate": "m4.xlarge",
+      "ec2_oracle_instance_type_ebs_apps": "m5d.2xlarge",
+      "ec2_oracle_instance_type_webgate": "m5d.large",
+      "ec2_oracle_instance_type_accessgate": "m5d.xlarge",
       "ami_owner": "self",
       "orace_base_prereqs_ami_name": "Oracle79-prereqs-v1_5",
+      "orace_ebs_db_ami_name": "Oracle79-db-v1.0",
       "key_name": "oracle-base-dev",
       "dns_nameserver": "10.26.56.2"
     },
@@ -20,6 +21,7 @@
       "ami_owner": "131827586825",
       "orace_base_ami_name_ready": "OL7.9-x86_64-HVM-2023-01-05",
       "orace_base_prereqs_ami_name": "OL7.9-x86_64-HVM-2023-01-05",
+      "orace_ebs_db_ami_name": "Oracle79-db-v1.0",
       "key_name": "oracle-base-dev"
     },
     "preproduction": {
