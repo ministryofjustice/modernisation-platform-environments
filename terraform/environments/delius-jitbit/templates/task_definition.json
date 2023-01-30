@@ -20,8 +20,14 @@
     },
     "environment": [
       {
-        "name": "TEST_VAR",
-        "value": "test var"
+        "name": "AppURL",
+        "value": "${APP_URL}"
+      }
+    ],
+    "secrets": [
+      {
+        "name": "ConnectionStrings__DBConnectionString",
+        "valueFrom": "${DATABASE_PASSWORD_CONNECTION_STRING_ARN}"
       }
     ],
     "essential": true

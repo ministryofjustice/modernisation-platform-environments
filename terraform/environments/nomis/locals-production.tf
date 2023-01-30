@@ -1,24 +1,6 @@
 # nomis-production environment settings
 locals {
   nomis_production = {
-    external_database_access_cidrs = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.prod,
-      module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
-      module.ip_addresses.moj_cidr.aws_analytical_platform_aggregate,
-      module.ip_addresses.azure_studio_hosting_cidrs.prod,
-      module.ip_addresses.azure_nomisapi_cidrs.prod,
-    ])
-    external_oem_agent_access_cidrs = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.prod,
-    ])
-    external_remote_access_cidrs = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.prod,
-    ])
-    external_weblogic_access_cidrs = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.prod,
-      module.ip_addresses.azure_fixngo_cidrs.internet_egress
-    ])
-
     # Details of OMS Manager in FixNGo (only needs defining if databases in the environment are managed)
     database_oracle_manager = {
       oms_ip_address = "10.40.0.136"
@@ -45,9 +27,6 @@ locals {
         retention_days = 400
       }
     }
-
-    # Legacy database module, do not add any more entries here
-    databases_legacy = {}
 
     # Add database instances here. They will be created using ec2-database.tf
     databases = {
