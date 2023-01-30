@@ -5,27 +5,28 @@ resource "aws_launch_template" "webgate_asg_tpl" {
   key_name               = local.application_data.accounts[local.environment].key_name
   vpc_security_group_ids = [aws_security_group.ec2_sg_oracle_base.id]
 }
-/*
+
 resource "aws_autoscaling_group" "webgate_asg" {
   name_prefix         = "webgate-"
   desired_capacity    = 1
   max_size            = 1
   min_size            = 1
-  vpc_zone_identifier = [data.aws_subnet.private_subnets_a.id]
-
+  vpc_zone_identifier = [ data.aws_subnet.private_subnets_a.id ]
+  target_group_arns   = [ aws_alb_target_group.webgate_tg.arn ]
   launch_template {
     id      = aws_launch_template.webgate_asg_tpl.id
     version = "$Latest"
   }
 }
-*/
-/*
+
+
 resource "aws_lb" "webgate_alb" {
-  #name               = lower(format("alb-%s-%s-Webgate", local.application_name, local.environment)) 
+  name               = lower(format("alb-%s-%s-Webgate", local.application_name, local.environment)) 
   internal                   = false
   load_balancer_type         = "application"
-  enable_deletion_protection = true
-  security_groups            = [aws_security_group.webgate-alb-sg.id]
+  enable_cross_zone_load_balancing = "true"
+ # enable_deletion_protection = true
+  security_groups            = [aws_security_group.ec2_sg_oracle_base.id]
   subnets = [data.aws_subnet.private_subnets_a.id,
     data.aws_subnet.private_subnets_a.id,
     data.aws_subnet.private_subnets_a.id
@@ -41,9 +42,10 @@ resource "aws_lb" "webgate_alb" {
     { Name = lower(format("alb-%s-%s-webgate", local.application_name, local.environment)) }
   )
 }
-*/
 
 
+
+/*
 resource "aws_security_group" "webgate-alb-sg" {
   #name               = lower(format("sg-%s-%s-Webgate", local.application_name, local.environment)) 
   description = "allow HTTPS to Webgate ALB"
@@ -58,7 +60,7 @@ resource "aws_security_group" "webgate-alb-sg" {
     { Name = lower(format("sg-%s-%s-webgate", local.application_name, local.environment)) }
   )
 }
-
+*/
 /*
 resource "aws_autoscaling_attachment" "webgate_asg_att" {
   autoscaling_group_name = aws_autoscaling_group.webgate_asg.id
@@ -68,22 +70,19 @@ resource "aws_autoscaling_attachment" "webgate_asg_att" {
 
 resource "aws_alb_target_group" "webgate_tg" {
   name        = "webgate-targetgroup"
+  target_type = "instance"
   port        = 80
   protocol    = "HTTP"
-  vpc_id      = data.aws_vpc.shared.id
-  target_type = "instance"
-  /*
+  vpc_id      = data.aws_vpc.shared.id  
   health_check {
     interval            = 30
-    path                = "/index.html"
     port                = 80
     healthy_threshold   = 5
     unhealthy_threshold = 2
     timeout             = 5
-    protocol            = "HTTP"
-    matcher             = "200,202"
+    path                = "/"
   }
-*/
+
 }
 
 /*
