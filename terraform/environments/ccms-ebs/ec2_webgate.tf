@@ -2,10 +2,12 @@ resource "aws_launch_template" "webgate_asg_tpl" {
   name_prefix            = lower(format("asg-tpl-%s-%s-Webgate", local.application_name, local.environment))
   image_id               = data.aws_ami.oracle_base_prereqs.id
   instance_type          = local.application_data.accounts[local.environment].ec2_oracle_instance_type_webgate
+  key_name               = local.application_data.accounts[local.environment].key_name
   vpc_security_group_ids = [aws_security_group.ec2_sg_oracle_base.id]
 }
-
+/*
 resource "aws_autoscaling_group" "webgate_asg" {
+  name_prefix         = "webgate-"
   desired_capacity    = 1
   max_size            = 1
   min_size            = 1
@@ -16,7 +18,7 @@ resource "aws_autoscaling_group" "webgate_asg" {
     version = "$Latest"
   }
 }
-
+*/
 /*
 resource "aws_lb" "webgate_alb" {
   #name               = lower(format("alb-%s-%s-Webgate", local.application_name, local.environment)) 
