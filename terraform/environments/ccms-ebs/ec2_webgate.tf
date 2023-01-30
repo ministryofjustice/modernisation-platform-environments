@@ -1,8 +1,8 @@
 resource "aws_launch_template" "webgate_asg_tpl" {
-  name_prefix               = lower(format("asg-tpl-%s-%s-Webgate", local.application_name, local.environment)) 
-  image_id                  = data.aws_ami.oracle_base_prereqs.id
-  instance_type             = local.application_data.accounts[local.environment].ec2_oracle_instance_type_webgate
-  vpc_security_group_ids    = [aws_security_group.ec2_sg_oracle_base.id]
+  name_prefix            = lower(format("asg-tpl-%s-%s-Webgate", local.application_name, local.environment))
+  image_id               = data.aws_ami.oracle_base_prereqs.id
+  instance_type          = local.application_data.accounts[local.environment].ec2_oracle_instance_type_webgate
+  vpc_security_group_ids = [aws_security_group.ec2_sg_oracle_base.id]
 }
 
 resource "aws_autoscaling_group" "webgate_asg" {
