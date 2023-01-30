@@ -18,19 +18,16 @@ resource "aws_autoscaling_group" "webgate_asg" {
 }
 
 
-
 resource "aws_lb" "webgate_alb" {
   #name               = lower(format("alb-%s-%s-Webgate", local.application_name, local.environment)) 
   internal           = false
   load_balancer_type = "application"
+  enable_deletion_protection = true
   security_groups    = [ aws_security_group.webgate-alb-sg.id ]
   subnets            = [ data.aws_subnet.private_subnets_a.id,
                         data.aws_subnet.private_subnets_a.id,
                         data.aws_subnet.private_subnets_a.id
   ]
-
-  enable_deletion_protection = true
-
   /*
   access_logs {
     bucket  = aws_s3_bucket.lb_logs.bucket
@@ -38,7 +35,6 @@ resource "aws_lb" "webgate_alb" {
     enabled = true
   }
   */
-
   tags = merge(local.tags,
     { Name = lower(format("alb-%s-%s-webgate", local.application_name, local.environment)) }
   )
@@ -70,7 +66,7 @@ resource "aws_alb_target_group" "webgate_tg" {
   protocol    = "HTTP"
   vpc_id = data.aws_vpc.shared.id
   target_type = "instance"
-/*
+
   health_check {
     interval            = 30
     path                = "/index.html"
@@ -81,9 +77,8 @@ resource "aws_alb_target_group" "webgate_tg" {
     protocol            = "HTTP"
     matcher             = "200,202"
   }
-*/
-}
 
+}
 
 
 resource "aws_alb_listener" "hhtps_webgate" {
@@ -95,7 +90,3 @@ resource "aws_alb_listener" "hhtps_webgate" {
     type             = "forward"
   }
 }
-
-
-
-
