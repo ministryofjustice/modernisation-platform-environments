@@ -24,23 +24,23 @@ resource "aws_autoscaling_group" "webgate_asg" {
 
 
 resource "aws_lb" "webgate_alb" {
-  name               = lower(format("alb-%s-%s-Webgate", local.application_name, local.environment)) 
-  internal                   = false
-  load_balancer_type         = "application"
+  name                             = lower(format("alb-%s-%s-Webgate", local.application_name, local.environment))
+  internal                         = false
+  load_balancer_type               = "application"
   enable_cross_zone_load_balancing = "true"
- # enable_deletion_protection = true
-  security_groups            = [aws_security_group.ec2_sg_oracle_base.id]
+  # enable_deletion_protection = true
+  security_groups = [aws_security_group.ec2_sg_oracle_base.id]
   subnets = [data.aws_subnet.private_subnets_a.id,
     data.aws_subnet.private_subnets_a.id,
     data.aws_subnet.private_subnets_a.id
   ]
-  
+
   #access_logs {
   #  bucket  = aws_s3_bucket.lb_logs.bucket
   #  prefix  = "webgate-lb"
   #  enabled = true
   #}
-  
+
   tags = merge(local.tags,
     { Name = lower(format("alb-%s-%s-webgate", local.application_name, local.environment)) }
   )
@@ -76,7 +76,7 @@ resource "aws_alb_target_group" "webgate_tg" {
   target_type = "instance"
   port        = 80
   protocol    = "HTTP"
-  vpc_id      = data.aws_vpc.shared.id  
+  vpc_id      = data.aws_vpc.shared.id
   health_check {
     interval            = 30
     port                = 80
