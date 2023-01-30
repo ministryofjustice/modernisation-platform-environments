@@ -29,9 +29,9 @@ resource "aws_lb" "webgate_alb" {
   enable_cross_zone_load_balancing = "true"
   # enable_deletion_protection = true
   security_groups = [aws_security_group.ec2_sg_oracle_base.id]
-  subnets = [data.aws_subnet.private_subnets_a.id,
-    data.aws_subnet.private_subnets_b.id,
-    data.aws_subnet.private_subnets_c.id
+  subnets = [data.aws_subnet.public_subnets_a.id,
+    data.aws_subnet.public_subnets_b.id,
+    data.aws_subnet.public_subnets_c.id
   ]
 
   #access_logs {
