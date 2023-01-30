@@ -53,4 +53,10 @@ locals {
     environment-name = local.application_environment
     source-code      = "https://github.com/ministryofjustice/modernisation-platform-environments"
   })
+
+  subnet_name_availability_zone = [
+    for subnet_name in local.subnet_names[var.subnet_set] : [
+      for zone_name in data.aws_availability_zones.this.names : "${subnet_name}-${zone_name}"
+    ]
+  ]
 }

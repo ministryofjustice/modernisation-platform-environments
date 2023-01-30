@@ -1,54 +1,13 @@
 #------------------------------------------------------------------------------
 # Database
 #------------------------------------------------------------------------------
-# OLD NAMING - DEPRECATE
-#------------------------------------------------------------------------------
 
-module "database" {
-  source = "./modules/database"
+# Use `s3-db-restore-dir` tag to trigger a restore from backup. See
+# https://github.com/ministryofjustice/modernisation-platform-configuration-management/blob/main/ansible/roles/db-restore
+#
+# Use `fixngo-connection-target` to monitor connectivity to a target in FixNGo.  See
+# https://github.com/ministryofjustice/modernisation-platform-configuration-management/tree/main/ansible/roles/oracle-db-monitoring
 
-  providers = {
-    aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
-  }
-
-  for_each = {}
-
-  name = each.key
-
-  ami_name           = each.value.ami_name
-  asm_data_capacity  = each.value.asm_data_capacity
-  asm_flash_capacity = each.value.asm_flash_capacity
-  description        = each.value.description
-
-  ami_owner              = try(each.value.ami_owner, local.environment_management.account_ids["nomis-test"])
-  asm_data_iops          = try(each.value.asm_data_iops, null)
-  asm_data_throughput    = try(each.value.asm_data_throughput, null)
-  asm_flash_iops         = try(each.value.asm_flash_iops, null)
-  asm_flash_throughput   = try(each.value.asm_data_throughput, null)
-  oracle_app_disk_size   = try(each.value.oracle_app_disk_size, null)
-  extra_ingress_rules    = try(each.value.extra_ingress_rules, null)
-  termination_protection = try(each.value.termination_protection, null)
-  instance_type          = try(each.value.instance_type, null)
-  oracle_sids            = try(each.value.oracle_sids, null)
-  restored_from_snapshot = try(each.value.restored_from_snapshot, false)
-
-  common_security_group_id  = aws_security_group.data.id
-  instance_profile_policies = concat(local.ec2_common_managed_policies, [aws_iam_policy.s3_db_backup_bucket_access.arn])
-  key_name                  = aws_key_pair.ec2-user.key_name
-
-  application_name = local.application_name
-  business_unit    = local.business_unit
-  environment      = local.environment
-  subnet_set       = local.subnet_set
-  tags             = merge(local.tags, try(each.value.tags, {}))
-}
-
-#------------------------------------------------------------------------------
-# EC2 Instances following naming convention
-#------------------------------------------------------------------------------
-# NEW NAMING
-
-# SET TAGS
 locals {
 
   database = {
@@ -75,6 +34,11 @@ locals {
 
     user_data_cloud_init = {
       args = {
+        lifecycle_hook_name    = "ready-hook"
+        branch                 = "main"
+        ansible_repo           = "modernisation-platform-configuration-management"
+        ansible_repo_basedir   = "ansible"
+        ansible_args           = "--tags ec2provision"
         restored_from_snapshot = false
       }
       scripts = [
@@ -82,7 +46,6 @@ locals {
         "oracle_init.sh.tftpl",
         "ansible-ec2provisiondata.sh.tftpl"
       ]
-      write_files = {}
     }
 
     ebs_volumes = {
@@ -164,14 +127,9 @@ module "db_ec2_instance" {
   environment        = local.environment
   region             = local.region
   availability_zone  = local.availability_zone
-  subnet_set         = local.subnet_set
-  subnet_name        = "data"
+  subnet_id          = module.environment.subnet["data"][local.availability_zone].id
   tags               = merge(local.tags, local.database.tags, try(each.value.tags, {}))
   account_ids_lookup = local.environment_management.account_ids
-
-  ansible_repo         = "modernisation-platform-configuration-management"
-  ansible_repo_basedir = "ansible"
-  branch               = try(each.value.branch, "main")
 }
 
 #------------------------------------------------------------------------------

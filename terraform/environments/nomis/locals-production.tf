@@ -38,10 +38,11 @@ locals {
       # NOTE: this is temporarily under prod account while we wait for network connectivity
       preprod-nomis-db-2 = {
         tags = {
-          server-type = "nomis-db"
-          description = "PreProduction NOMIS MIS and Audit database to replace Azure PPPDL00017"
-          oracle-sids = "PPCNMAUD"
-          monitored   = true
+          nomis-environment = "preprod"
+          server-type       = "nomis-db"
+          description       = "PreProduction NOMIS MIS and Audit database to replace Azure PPPDL00017"
+          oracle-sids       = "PPCNMAUD"
+          monitored         = true
         }
         ami_name  = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-03T12-51-25.032Z"
         ami_owner = "self" # remove this line next time AMI is updated so core-shared-services-production used instead
@@ -80,6 +81,7 @@ locals {
 
       prod-nomis-db-2 = {
         tags = {
+          nomis-environment        = "prod"
           server-type              = "nomis-db"
           description              = "Production NOMIS MIS and Audit database to replace Azure PDPDL00036 and PDPDL00038"
           oracle-sids              = "CNMAUD"
@@ -124,10 +126,11 @@ locals {
 
       prod-nomis-db-3 = {
         tags = {
-          server-type = "nomis-db"
-          description = "Production NOMIS HA database to replace Azure PDPDL00062"
-          monitored   = true
-          oracle-sids = "PCNOMHA"
+          nomis-environment = "prod"
+          server-type       = "nomis-db"
+          description       = "Production NOMIS HA database to replace Azure PDPDL00062"
+          monitored         = true
+          oracle-sids       = "PCNOMHA"
         }
         ami_name  = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-07T12-48-08.562Z"
         ami_owner = "self" # remove this line next time AMI is updated so core-shared-services-production used instead

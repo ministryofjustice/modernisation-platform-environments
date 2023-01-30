@@ -66,13 +66,16 @@ locals {
 
     user_data_cloud_init = {
       args = {
-        lifecycle_hook_name = "ready-hook"
+        lifecycle_hook_name  = "ready-hook"
+        branch               = "main"
+        ansible_repo         = "modernisation-platform-configuration-management"
+        ansible_repo_basedir = "ansible"
+        ansible_args         = "--tags ec2provision"
       }
       scripts = [
         "ansible-ec2provision.sh.tftpl",
         "post-ec2provision.sh.tftpl"
       ]
-      write_files = {}
     }
 
     autoscaling_group = {
@@ -148,5 +151,4 @@ module "ec2_weblogic_autoscaling_group" {
   subnet_ids         = module.environment.subnets["private"].ids
   tags               = merge(local.tags, local.ec2_weblogic.tags, try(each.value.tags, {}))
   account_ids_lookup = local.environment_management.account_ids
-  branch             = try(each.value.branch, "main")
 }
