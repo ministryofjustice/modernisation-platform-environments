@@ -11,7 +11,10 @@ resource "aws_autoscaling_group" "webgate_asg" {
   desired_capacity    = 1
   max_size            = 1
   min_size            = 1
-  vpc_zone_identifier = [ data.aws_subnet.private_subnets_a.id ]
+  vpc_zone_identifier = [ data.aws_subnet.private_subnets_a.id,
+                          data.aws_subnet.private_subnets_b.id,
+                          data.aws_subnet.private_subnets_c.id 
+                        ]
   target_group_arns   = [ aws_alb_target_group.webgate_tg.arn ]
   launch_template {
     id      = aws_launch_template.webgate_asg_tpl.id
