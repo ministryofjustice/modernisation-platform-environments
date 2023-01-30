@@ -22,7 +22,6 @@ resource "aws_autoscaling_group" "webgate_asg" {
   }
 }
 
-
 resource "aws_lb" "webgate_alb" {
   name                             = lower(format("alb-%s-%s-Webgate", local.application_name, local.environment))
   internal                         = false
@@ -31,8 +30,8 @@ resource "aws_lb" "webgate_alb" {
   # enable_deletion_protection = true
   security_groups = [aws_security_group.ec2_sg_oracle_base.id]
   subnets = [data.aws_subnet.private_subnets_a.id,
-    data.aws_subnet.private_subnets_a.id,
-    data.aws_subnet.private_subnets_a.id
+    data.aws_subnet.private_subnets_b.id,
+    data.aws_subnet.private_subnets_c.id
   ]
 
   #access_logs {
