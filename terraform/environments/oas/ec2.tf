@@ -99,6 +99,13 @@ resource "aws_security_group" "ec2" {
     protocol    = "tcp"
     cidr_blocks = [data.aws_vpc.shared.cidr_block] #!ImportValue env-VpcCidr
   }
+  ingress {
+    description = "http access from LZ to oas-mp to test connectivity"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = [local.application_data.accounts[local.environment].inbound_cidr_lz]
+  }
 
   egress {
     description = "Allow AWS SSM Session Manager"

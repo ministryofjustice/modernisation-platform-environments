@@ -8,7 +8,8 @@
       "orahomesize": "150",
       "stageesize": "200",
       "managementcidr": "10.200.0.0/20",
-      "outbound_access_cidr": "0.0.0.0/0"
+      "outbound_access_cidr": "0.0.0.0/0",
+      "inbound_cidr_lz": "10.202.0.0/20"
     },
     "test": {
       "example_var": "test-data"
