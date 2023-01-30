@@ -13,7 +13,7 @@ resource "aws_lb" "ingress-network-lb" {
 
 resource "aws_lb_listener" "lz-ingress" {
   load_balancer_arn = aws_lb.ingress-network-lb.arn
-  port              = local.application_data.accounts[local.environment].server_port
+  port              = "80"
   protocol          = "TCP"
   default_action {
     type             = "forward"
@@ -27,7 +27,7 @@ resource "aws_lb_listener" "lz-ingress" {
 resource "aws_lb_target_group" "nlb-target" {
   name        = "${local.application_name}-${local.environment}-network-lb-tg"
   target_type = "alb"
-  port        = local.application_data.accounts[local.environment].server_port
+  port        = "80"
   protocol    = "TCP"
   vpc_id      = data.aws_vpc.shared.id
   depends_on = [
