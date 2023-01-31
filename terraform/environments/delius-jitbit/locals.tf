@@ -91,9 +91,9 @@ locals {
       security_groups = null
     }
   }
-  
+
   ecr_repo_name = "delius-jitbit-ecr-repo"
-  ecr_uri = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.${data.aws_region.current.name}.amazonaws.com/${local.ecr_repo_name}"
+  ecr_uri       = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.${data.aws_region.current.name}.amazonaws.com/${local.ecr_repo_name}"
 
   task_definition = templatefile("${path.module}/templates/task_definition.json", {
     APP_NAME                                = local.application_name,
