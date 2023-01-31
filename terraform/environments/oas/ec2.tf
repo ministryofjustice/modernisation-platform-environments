@@ -99,6 +99,13 @@ resource "aws_security_group" "ec2" {
     protocol    = "tcp"
     cidr_blocks = [data.aws_vpc.shared.cidr_block] #!ImportValue env-VpcCidr
   }
+  ingress {
+    description = "http access from LZ to oas-mp to test connectivity"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = [local.application_data.accounts[local.environment].inbound_cidr_lz]
+  }
 
   egress {
     description = "Allow AWS SSM Session Manager"
@@ -265,3 +272,13 @@ resource "aws_iam_role_policy" "ec2_instance_policy" {
 #   volume_id   = aws_ebs_volume.EC2ServeVolume02.id
 #   instance_id = aws_instance.oas_app_instance.id
 # }
+
+resource "aws_route53_record" "oas-app" {
+  provider = aws.core-vpc
+  zone_id  = data.aws_route53_zone.inner.zone_id
+  name     = "${local.application_name}.${data.aws_route53_zone.inner.name}"
+  type     = "A"
+  ttl      = 900
+  records  = [aws_instance.oas_app_instance.private_ip]
+}
+
