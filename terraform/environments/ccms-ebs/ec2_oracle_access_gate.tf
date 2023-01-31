@@ -4,9 +4,9 @@ resource "aws_launch_template" "accessgate_asg_tpl" {
   instance_type          = local.application_data.accounts[local.environment].ec2_oracle_instance_type_accessgate
   key_name               = local.application_data.accounts[local.environment].key_name
   vpc_security_group_ids = [aws_security_group.ec2_sg_oracle_base.id]
-  iam_instance_profile {
-    name = aws_iam_instance_profile.iam_instace_profile_oracle_base.arn
-  }
+  #iam_instance_profile {
+  #  name = aws_iam_instance_profile.iam_instace_profile_oracle_base.arn
+  #}
 
   # AMI ebs mappings from /dev/sd[a-d]
   # root
