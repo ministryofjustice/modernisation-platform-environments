@@ -17,19 +17,22 @@ locals {
       key_name                     = aws_key_pair.ec2-user.key_name
       monitoring                   = false
       metadata_options_http_tokens = "required"
-      vpc_security_group_ids       = [aws_security_group.ec2_test.id]
+      vpc_security_group_ids       = [aws_security_group.private.id]
     }
 
     user_data_cloud_init = {
       args = {
-        lifecycle_hook_name = "ready-hook"
+        lifecycle_hook_name  = "ready-hook"
+        branch               = "main"
+        ansible_repo         = "modernisation-platform-configuration-management"
+        ansible_repo_basedir = "ansible"
+        ansible_args         = "--tags ec2provision"
       }
       scripts = [
         "install-ssm-agent.sh.tftpl",
         "ansible-ec2provision.sh.tftpl",
         "post-ec2provision.sh.tftpl"
       ]
-      write_files = {}
     }
 
     route53_records = {
@@ -78,14 +81,9 @@ module "ec2_test_instance" {
   environment        = local.environment
   region             = local.region
   availability_zone  = local.availability_zone
-  subnet_set         = local.subnet_set
-  subnet_name        = lookup(each.value, "subnet_name", "private")
+  subnet_id          = module.environment.subnet["private"][local.availability_zone].id
   tags               = merge(local.tags, local.ec2_test.tags, try(each.value.tags, {}))
   account_ids_lookup = local.environment_management.account_ids
-
-  ansible_repo         = "modernisation-platform-configuration-management"
-  ansible_repo_basedir = "ansible"
-  branch               = try(each.value.branch, "main")
 }
 
 module "ec2_test_autoscaling_group" {
@@ -118,114 +116,4 @@ module "ec2_test_autoscaling_group" {
   subnet_ids                = module.environment.subnets["private"].ids
   tags                      = merge(local.tags, local.ec2_test.tags, try(each.value.tags, {}))
   account_ids_lookup        = local.environment_management.account_ids
-  branch                    = try(each.value.branch, "main")
 }
-
-#------------------------------------------------------------------------------
-# Common Security Group for Test Instances
-#------------------------------------------------------------------------------
-
-resource "aws_security_group" "ec2_test" {
-  #checkov:skip=CKV2_AWS_5:skip "Ensure that Security Groups are attached to another resource" - attached in nomis-stack module
-  description = "Security group for ec2_test instances"
-  name        = "ec2_test"
-  vpc_id      = module.environment.vpc.id
-
-  ingress {
-    description = "Internal access to self on all ports"
-    from_port   = 0
-    to_port     = 0
-    protocol    = -1
-    self        = true
-  }
-
-  ingress {
-    description = "Internal access to ssh"
-    from_port   = "22"
-    to_port     = "22"
-    protocol    = "TCP"
-    security_groups = [
-      aws_security_group.jumpserver-windows.id,
-      module.bastion_linux.bastion_security_group
-    ]
-  }
-
-  ingress {
-    description = "External access to ssh"
-    from_port   = "22"
-    to_port     = "22"
-    protocol    = "TCP"
-    cidr_blocks = local.environment_config.external_remote_access_cidrs
-  }
-
-  ingress {
-    description = "Internal access to weblogic admin http"
-    from_port   = "7001"
-    to_port     = "7001"
-    protocol    = "TCP"
-    security_groups = [
-      aws_security_group.jumpserver-windows.id,
-      module.bastion_linux.bastion_security_group
-    ]
-  }
-
-  ingress {
-    description = "External access to weblogic admin http"
-    from_port   = "7001"
-    to_port     = "7001"
-    protocol    = "TCP"
-    cidr_blocks = local.environment_config.external_weblogic_access_cidrs
-  }
-
-  ingress {
-    description = "Internal access to weblogic http"
-    from_port   = "7777"
-    to_port     = "7777"
-    protocol    = "TCP"
-    security_groups = concat([
-      aws_security_group.jumpserver-windows.id,
-      module.bastion_linux.bastion_security_group
-    ], local.lb_security_group_ids)
-  }
-
-  ingress {
-    description = "External access to weblogic http"
-    from_port   = "7777"
-    to_port     = "7777"
-    protocol    = "TCP"
-    cidr_blocks = local.environment_config.external_weblogic_access_cidrs
-  }
-
-  ingress {
-    description = "External access to prometheus node exporter"
-    from_port   = "9100"
-    to_port     = "9100"
-    protocol    = "TCP"
-    cidr_blocks = [module.ip_addresses.moj_cidr.aws_cloud_platform_vpc]
-  }
-
-  ingress {
-    description = "External access to prometheus script exporter"
-    from_port   = "9172"
-    to_port     = "9172"
-    protocol    = "TCP"
-    cidr_blocks = [module.ip_addresses.moj_cidr.aws_cloud_platform_vpc]
-  }
-
-  egress {
-    description = "Allow all egress"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    #tfsec:ignore:aws-vpc-no-public-egress-sgr
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "ec2-test-common"
-    }
-  )
-}
-

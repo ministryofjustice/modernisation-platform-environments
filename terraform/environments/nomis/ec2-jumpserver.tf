@@ -3,6 +3,14 @@
 
 # Obtain your user password from the AWS Secrets Manager for your user e.g.
 # /Jumpserver/Users/<your-github-username>
+#
+# The windows user_data_raw jumpserver-user-data.yaml file gets a list of users
+# from AWS Secrets Manager using [the AWS Get-SECSecretList](https://docs.aws.amazon.com/powershell/latest/reference/items/Get-SECSecretList.html)
+# cmdlet. This creates a user with the password held in Secrets Manager which
+# is put there by terraform as part of the resource in this file. A scheduled
+# task on the EC2 jumpserver instance checks for password changes every 15
+# minutes as this process runs locally on each machine..
+
 #--------------------------------------------------------------------------------
 
 locals {
@@ -23,7 +31,7 @@ locals {
       key_name                     = aws_key_pair.ec2-user.key_name
       monitoring                   = true
       metadata_options_http_tokens = "required"
-      vpc_security_group_ids       = [aws_security_group.jumpserver-windows.id]
+      vpc_security_group_ids       = [aws_security_group.jumpserver.id]
     }
 
     # the ami has got unwanted ephemeral devices so don't copy these
@@ -76,76 +84,6 @@ module "ec2_jumpserver" {
   subnet_ids                    = module.environment.subnets["private"].ids
   tags                          = merge(local.tags, local.ec2_jumpserver.tags, try(each.value.tags, {}))
   account_ids_lookup            = local.environment_management.account_ids
-  branch                        = try(each.value.branch, "main")
-}
-
-#------------------------------------------------------------------------------
-# Common Security Group for Jumpserver Instances
-#------------------------------------------------------------------------------
-
-# checkov:skip=CKV2_AWS_5:This is added via the module
-resource "aws_security_group" "jumpserver-windows" {
-  description = "Configure Windows jumpserver egress"
-  name        = "jumpserver-windows-${local.application_name}"
-  vpc_id      = module.environment.vpc.id
-
-  ingress {
-    description = "Internal access to self on all ports"
-    from_port   = 0
-    to_port     = 0
-    protocol    = -1
-    self        = true
-  }
-
-  ingress {
-    description = "Internal access to RDP"
-    from_port   = "3389"
-    to_port     = "3389"
-    protocol    = "TCP"
-    security_groups = [
-      module.bastion_linux.bastion_security_group
-    ]
-  }
-
-  ingress {
-    description = "External access to RDP"
-    from_port   = "3389"
-    to_port     = "3389"
-    protocol    = "TCP"
-    cidr_blocks = local.environment_config.external_remote_access_cidrs
-  }
-
-  ingress {
-    description = "External access to prometheus node exporter"
-    from_port   = "9100"
-    to_port     = "9100"
-    protocol    = "TCP"
-    cidr_blocks = [module.ip_addresses.moj_cidr.aws_cloud_platform_vpc]
-  }
-
-  ingress {
-    description = "External access to prometheus wmi exporter"
-    from_port   = "9182"
-    to_port     = "9182"
-    protocol    = "TCP"
-    cidr_blocks = [module.ip_addresses.moj_cidr.aws_cloud_platform_vpc]
-  }
-
-  egress {
-    description = "Allow all egress"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    #tfsec:ignore:aws-vpc-no-public-egress-sgr
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "jumpserver-commmon"
-    }
-  )
 }
 
 #------
