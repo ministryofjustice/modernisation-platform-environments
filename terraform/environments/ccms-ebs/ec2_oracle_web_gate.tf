@@ -59,7 +59,7 @@ resource "aws_launch_template" "webgate_asg_tpl" {
       volume_size = 100
       encrypted   = true
       #kms_key_id  = data.aws_kms_key.ebs_shared.key_id
-    #}
+    }
   }
 }
 
