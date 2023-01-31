@@ -19,7 +19,7 @@ resource "aws_launch_template" "webgate_asg_tpl" {
       kms_key_id  = data.aws_kms_key.ebs_shared.key_id
     }
   }
-  # swap  
+  # swap
   block_device_mappings {
     device_name = "/dev/sdb"
     ebs {
