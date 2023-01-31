@@ -19,7 +19,6 @@ resource "aws_launch_template" "webgate_asg_tpl" {
     }
   }
   
-  # swap
   block_device_mappings {
     device_name = "/dev/sdb"
     ebs {
@@ -52,18 +51,6 @@ resource "aws_launch_template" "webgate_asg_tpl" {
     }
   }
 
-  # non-AMI mappings start at /dev/sdh
-  # u01
-  block_device_mappings {
-    device_name = "/dev/sdh"
-    ebs {
-      volume_type = "io2"
-      iops        = 3000
-      volume_size = 100
-      encrypted   = true
-      kms_key_id  = data.aws_kms_key.ebs_shared.key_id
-    }
-  }
 }
 
 resource "aws_autoscaling_group" "webgate_asg" {
