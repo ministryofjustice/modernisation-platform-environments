@@ -4,6 +4,46 @@ resource "aws_launch_template" "webgate_asg_tpl" {
   instance_type          = local.application_data.accounts[local.environment].ec2_oracle_instance_type_webgate
   key_name               = local.application_data.accounts[local.environment].key_name
   vpc_security_group_ids = [aws_security_group.ec2_sg_oracle_base.id]
+  block_device_mappings {
+    device_name = "/dev/sda1"
+    ebs {
+      volume_type = "gp3"
+      volume_size = 50
+      encrypted   = true
+      kms_key_id  = data.aws_kms_key.ebs_shared.key_id
+    }
+  }
+  
+  block_device_mappings {
+    device_name = "/dev/sdb"
+    ebs {
+      volume_type = "gp3"
+      volume_size = 20
+      encrypted   = true
+      kms_key_id  = data.aws_kms_key.ebs_shared.key_id
+    }
+  }
+
+  block_device_mappings {
+    device_name = "/dev/sdc"
+    ebs {
+      volume_type = "gp3"
+      volume_size = 100
+      encrypted   = true
+      kms_key_id  = data.aws_kms_key.ebs_shared.key_id
+    }
+  }
+
+  block_device_mappings {
+    device_name = "/dev/sdd"
+    ebs {
+      volume_type = "gp3"
+      volume_size = 100
+      encrypted   = true
+      kms_key_id  = data.aws_kms_key.ebs_shared.key_id
+    }
+  }
+  
 }
 
 resource "aws_autoscaling_group" "webgate_asg" {
@@ -21,6 +61,7 @@ resource "aws_autoscaling_group" "webgate_asg" {
     version = "$Latest"
   }
 }
+
 
 resource "aws_lb" "webgate_alb" {
   name                             = lower(format("alb-%s-%s-Webgate", local.application_name, local.environment))
