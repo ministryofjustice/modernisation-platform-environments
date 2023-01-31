@@ -75,6 +75,11 @@
 						"file_path": "/u01/tag/autologoff/autologoff.log",
 						"log_group_name": "cwagent-nomis-autologoff",
 						"log_stream_name": "{instance_id}"
+					},
+					{
+						"file_path": "/u01/app/oracle/Middleware/logs/wlst_*.log",
+						"log_group_name": "cwagent-weblogic-logs",
+						"log_stream_name": "{instance_id}"
 					}
 				]
 			}
