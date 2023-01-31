@@ -1,7 +1,7 @@
 #  Build EC2 
 resource "aws_instance" "ec2_oracle_ebs" {
   instance_type               = local.application_data.accounts[local.environment].ec2_oracle_instance_type_ebs_db
-  ami                         = data.aws_ami.oracle_base_prereqs.id
+  ami                         = data.aws_ami.oracle_base_prereqs_final.id
   key_name                    = local.application_data.accounts[local.environment].key_name
   vpc_security_group_ids      = [aws_security_group.ec2_sg_oracle_base.id]
   subnet_id                   = data.aws_subnet.data_subnets_a.id
@@ -41,23 +41,44 @@ EOF
     http_tokens   = "required"
   }
   /*
-  # Increase the volume size of the root volume
+  # AMI ebs mappings from /dev/sd[a-d]
   root_block_device {
     volume_type = "gp3"
     volume_size = 50
     encrypted   = true
+    kms_key_id  = data.aws_kms_key.ebs_shared.key_id
     tags = merge(local.tags,
       { Name = "root-block" }
     )
   }
-
   ebs_block_device {
-    device_name = "/dev/sdf"
+    device_name = "/dev/sdb"
     volume_type = "gp3"
-    volume_size = 200
+    volume_size = 20
     encrypted   = true
+    kms_key_id  = data.aws_kms_key.ebs_shared.key_id
     tags = merge(local.tags,
-      { Name = "ebs-block1" }
+      { Name = "swap" }
+    )
+  }
+  ebs_block_device {
+    device_name = "/dev/sdc"
+    volume_type = "gp3"
+    volume_size = 100
+    encrypted   = true
+    kms_key_id  = data.aws_kms_key.ebs_shared.key_id
+    tags = merge(local.tags,
+      { Name = "temp" }
+    )
+  }
+  ebs_block_device {
+    device_name = "/dev/sdd"
+    volume_type = "gp3"
+    volume_size = 100
+    encrypted   = true
+    kms_key_id  = data.aws_kms_key.ebs_shared.key_id
+    tags = merge(local.tags,
+      { Name = "home" }
     )
   }
   */
@@ -68,6 +89,7 @@ EOF
   depends_on = [aws_security_group.ec2_sg_oracle_base]
 }
 
+# non-AMI mappings start at /dev/sdh
 resource "aws_ebs_volume" "export_home" {
   lifecycle {
     ignore_changes = [kms_key_id]
@@ -87,7 +109,6 @@ resource "aws_volume_attachment" "export_home_att" {
   volume_id   = aws_ebs_volume.export_home.id
   instance_id = aws_instance.ec2_oracle_ebs.id
 }
-
 resource "aws_ebs_volume" "u01" {
   lifecycle {
     ignore_changes = [kms_key_id]
@@ -107,7 +128,6 @@ resource "aws_volume_attachment" "u01_att" {
   volume_id   = aws_ebs_volume.u01.id
   instance_id = aws_instance.ec2_oracle_ebs.id
 }
-
 resource "aws_ebs_volume" "arch" {
   lifecycle {
     ignore_changes = [kms_key_id]

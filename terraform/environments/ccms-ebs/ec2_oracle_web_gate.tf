@@ -4,6 +4,11 @@ resource "aws_launch_template" "webgate_asg_tpl" {
   instance_type          = local.application_data.accounts[local.environment].ec2_oracle_instance_type_webgate
   key_name               = local.application_data.accounts[local.environment].key_name
   vpc_security_group_ids = [aws_security_group.ec2_sg_oracle_base.id]
+  iam_instance_profile {
+    name = aws_iam_instance_profile.iam_instace_profile_oracle_base.arn
+  }
+
+  # root
   block_device_mappings {
     device_name = "/dev/sda1"
     ebs {
@@ -14,6 +19,7 @@ resource "aws_launch_template" "webgate_asg_tpl" {
     }
   }
   
+  # swap
   block_device_mappings {
     device_name = "/dev/sdb"
     ebs {
@@ -24,6 +30,7 @@ resource "aws_launch_template" "webgate_asg_tpl" {
     }
   }
 
+  # temp
   block_device_mappings {
     device_name = "/dev/sdc"
     ebs {
@@ -34,6 +41,7 @@ resource "aws_launch_template" "webgate_asg_tpl" {
     }
   }
 
+  # home
   block_device_mappings {
     device_name = "/dev/sdd"
     ebs {
@@ -43,7 +51,19 @@ resource "aws_launch_template" "webgate_asg_tpl" {
       kms_key_id  = data.aws_kms_key.ebs_shared.key_id
     }
   }
-  
+
+  # non-AMI mappings start at /dev/sdh
+  # u01
+  block_device_mappings {
+    device_name = "/dev/sdh"
+    ebs {
+      volume_type = "io2"
+      iops        = 3000
+      volume_size = 100
+      encrypted   = true
+      kms_key_id  = data.aws_kms_key.ebs_shared.key_id
+    }
+  }
 }
 
 resource "aws_autoscaling_group" "webgate_asg" {
@@ -86,7 +106,22 @@ resource "aws_lb" "webgate_alb" {
   )
 }
 
+resource "aws_alb_target_group" "webgate_tg" {
+  name        = "webgate-targetgroup"
+  target_type = "instance"
+  port        = 80
+  protocol    = "HTTP"
+  vpc_id      = data.aws_vpc.shared.id
+  health_check {
+    interval            = 30
+    port                = 80
+    healthy_threshold   = 5
+    unhealthy_threshold = 2
+    timeout             = 5
+    path                = "/"
+  }
 
+}
 
 /*
 resource "aws_security_group" "webgate-alb-sg" {
@@ -111,22 +146,7 @@ resource "aws_autoscaling_attachment" "webgate_asg_att" {
 }
 */
 
-resource "aws_alb_target_group" "webgate_tg" {
-  name        = "webgate-targetgroup"
-  target_type = "instance"
-  port        = 80
-  protocol    = "HTTP"
-  vpc_id      = data.aws_vpc.shared.id
-  health_check {
-    interval            = 30
-    port                = 80
-    healthy_threshold   = 5
-    unhealthy_threshold = 2
-    timeout             = 5
-    path                = "/"
-  }
 
-}
 
 /*
 resource "aws_alb_listener" "hhtps_webgate" {

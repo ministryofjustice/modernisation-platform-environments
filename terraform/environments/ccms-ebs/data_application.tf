@@ -1,5 +1,5 @@
 ## AMI data blocks
-data "aws_ami" "oracle_base_prereqs" {
+data "aws_ami" "oracle_base_prereqs_final" {
   most_recent = true
   owners      = [local.application_data.accounts[local.environment].ami_owner]
 
@@ -12,7 +12,19 @@ data "aws_ami" "oracle_base_prereqs" {
     values = ["hvm"]
   }
 }
+data "aws_ami" "oracle_base_prereqs" {
+  most_recent = true
+  owners      = ["131827586825"]
 
+  filter {
+    name   = "name"
+    values = [local.application_data.accounts[local.environment].orace_base_ami_name_mp]
+  }
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+}
 /*
 data "aws_ami" "oracle_base_prereqs_verify" {
   most_recent = true
