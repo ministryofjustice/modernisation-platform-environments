@@ -174,7 +174,7 @@ resource "aws_security_group" "laalz-secgroup" {
 }
 
 resource "aws_security_group" "vpc-secgroup" {
-  name        = "ecs-secgroup"
+  name        = "vpc-secgroup"
   description = "RDS Access with the shared vpc"
   vpc_id      = var.vpc_shared_id
 
