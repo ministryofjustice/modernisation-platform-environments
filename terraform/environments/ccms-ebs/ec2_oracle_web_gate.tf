@@ -57,10 +57,18 @@ resource "aws_launch_template" "webgate_asg_tpl" {
     ebs {
       volume_type = "io2"
       volume_size = 100
+      iops        = 3000
       encrypted   = true
       kms_key_id  = data.aws_kms_key.ebs_shared.key_id
     }
   }
+
+  tags = merge(local.tags,
+    { Name = lower(format("ec2-%s-%s-Oracle-EBS-db", local.application_name, local.environment)) },
+    { instance-scheduling = "skip-scheduling" }
+  )
+  depends_on = [aws_security_group.ec2_sg_oracle_base]
+
 }
 
 resource "aws_autoscaling_group" "webgate_asg" {
@@ -136,13 +144,13 @@ resource "aws_security_group" "webgate-alb-sg" {
   )
 }
 */
-/*
+
 resource "aws_autoscaling_attachment" "webgate_asg_att" {
   autoscaling_group_name = aws_autoscaling_group.webgate_asg.id
   lb_target_group_arn    = aws_alb_target_group.webgate_tg.arn
 }
-*/
-/*
+
+
 resource "aws_alb_listener" "hhtps_webgate" {
   load_balancer_arn = aws_lb.webgate_alb.arn
   port              = "443"
@@ -152,7 +160,7 @@ resource "aws_alb_listener" "hhtps_webgate" {
     type             = "forward"
   }
 }
-*/
+
 
 resource "aws_kms_grant" "kms_assume" {
   name              = "kms-grant"
