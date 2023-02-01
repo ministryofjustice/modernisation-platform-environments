@@ -55,7 +55,7 @@ resource "aws_launch_template" "webgate_asg_tpl" {
   block_device_mappings {
     device_name = "/dev/sdh"
     ebs {
-      volume_type = "gp3"
+      volume_type = "io2"
       volume_size = 100
       encrypted   = true
       #kms_key_id  = data.aws_kms_key.ebs_shared.key_id
@@ -142,9 +142,6 @@ resource "aws_autoscaling_attachment" "webgate_asg_att" {
   lb_target_group_arn    = aws_alb_target_group.webgate_tg.arn
 }
 */
-
-
-
 /*
 resource "aws_alb_listener" "hhtps_webgate" {
   load_balancer_arn = aws_lb.webgate_alb.arn
@@ -156,12 +153,7 @@ resource "aws_alb_listener" "hhtps_webgate" {
   }
 }
 */
-
-
-
-
-
-
+/*
 resource "aws_iam_role" "kms_assume" {
   name = "iam-role-for-grant"
 
@@ -188,3 +180,4 @@ resource "aws_kms_grant" "kms_assume" {
   grantee_principal = aws_iam_role.kms_assume.arn
   operations        = ["Encrypt", "Decrypt", "GenerateDataKey"]
 }
+*/
