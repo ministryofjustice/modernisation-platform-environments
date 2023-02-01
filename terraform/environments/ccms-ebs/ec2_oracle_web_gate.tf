@@ -64,7 +64,7 @@ resource "aws_launch_template" "webgate_asg_tpl" {
   }
 
   tags = merge(local.tags,
-    { Name = lower(format("ec2-%s-%s-Oracle-EBS-db", local.application_name, local.environment)) },
+    { Name = lower(format("ec2-%s-%s-Oracle-webgate", local.application_name, local.environment)) },
     { instance-scheduling = "skip-scheduling" }
   )
   depends_on = [aws_security_group.ec2_sg_oracle_base]
@@ -150,7 +150,7 @@ resource "aws_autoscaling_attachment" "webgate_asg_att" {
   lb_target_group_arn    = aws_alb_target_group.webgate_tg.arn
 }
 
-
+/*
 resource "aws_alb_listener" "hhtps_webgate" {
   load_balancer_arn = aws_lb.webgate_alb.arn
   port              = "443"
@@ -160,7 +160,7 @@ resource "aws_alb_listener" "hhtps_webgate" {
     type             = "forward"
   }
 }
-
+*/
 
 resource "aws_kms_grant" "kms_assume" {
   name              = "kms-grant"
