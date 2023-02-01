@@ -63,6 +63,11 @@ variable "character_set_name" {
   description = "DB Character Set"
 }
 
+variable "availability_zone" {
+  type        = string
+  description = "Availability Zone"
+}
+
 variable "multi_az" {
   type        = string
   description = "Wether multi az failover is enabled or not"

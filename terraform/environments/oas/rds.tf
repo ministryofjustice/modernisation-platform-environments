@@ -19,6 +19,7 @@ module "rds" {
   backup_window               = local.application_data.accounts[local.environment].backup_window
   maintenance_window          = local.application_data.accounts[local.environment].maintenance_window
   character_set_name          = local.application_data.accounts[local.environment].character_set_name
+  availability_zone           = local.application_data.accounts[local.environment].availability_zone
   multi_az                    = local.application_data.accounts[local.environment].multi_az
   username                    = local.application_data.accounts[local.environment].username
   db_password_rotation_period = local.application_data.accounts[local.environment].db_password_rotation_period

@@ -22,6 +22,7 @@
       "backup_window": "22:00-01:00",
       "maintenance_window": "Mon:01:15-Mon:06:00",
       "character_set_name": "AL32UTF8",
+      "availability_zone": "eu-west-2a",
       "multi_az": false,
       "username": "sysdba",
       "db_password_rotation_period": 28,

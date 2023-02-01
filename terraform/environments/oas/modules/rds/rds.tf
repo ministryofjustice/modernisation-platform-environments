@@ -116,6 +116,7 @@ resource "aws_db_instance" "appdb1" {
   backup_window               = var.backup_window
   maintenance_window          = var.maintenance_window
   character_set_name          = var.character_set_name
+  availability_zone           = var.availability_zone
   multi_az                    = var.multi_az
   username                    = var.username
   password                    = random_password.rds_password.result
