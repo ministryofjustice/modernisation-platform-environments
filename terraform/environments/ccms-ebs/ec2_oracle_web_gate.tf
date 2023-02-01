@@ -181,7 +181,7 @@ resource "aws_kms_grant" "kms_assume" {
   key_id            = data.aws_kms_key.ebs_shared.key_id
   grantee_principal = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling"
   #grantee_principal = aws_iam_role.kms_assume.arn
-  operations        = ["Encrypt", "Decrypt", "GenerateDataKey"]
+  operations = ["Encrypt", "Decrypt", "GenerateDataKey"]
 }
 
 
