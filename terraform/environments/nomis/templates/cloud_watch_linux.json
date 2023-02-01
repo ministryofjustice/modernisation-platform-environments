@@ -79,7 +79,8 @@
 					{
 						"file_path": "/u01/app/oracle/Middleware/logs/wlst_*.log",
 						"log_group_name": "cwagent-weblogic-logs",
-						"log_stream_name": "{instance_id}"
+						"log_stream_name": "{instance_id}",
+						"timestamp_format": "%Y-%m-%d %H:%M:%S,%-S"
 					}
 				]
 			}
