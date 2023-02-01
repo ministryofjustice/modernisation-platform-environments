@@ -21,6 +21,9 @@ locals {
       cwagent-nomis-autologoff = {
         retention_days = 90
       }
+      cwagent-weblogic-logs = {
+        retention_days = 30
+      }
     }
 
     databases = {
