@@ -16,7 +16,7 @@ locals {
       threshold           = "90"
       treat_missing_data  = "breaching"
       dimensions = {
-        InstanceId = "" # TODO
+        InstanceId = aws_instance.oas_app_instance.id
       }
       widget_name = "EC2 CPU Usage"
       # dashboard_widget_type = "metric"
@@ -40,8 +40,8 @@ locals {
       threshold           = "90"
       treat_missing_data  = "breaching"
       dimensions = {
-        ImageId      = "" # TODO
-        InstanceId   = "" # TODO
+        ImageId      = local.application_data.accounts[local.environment].ec2amiid
+        InstanceId   = aws_instance.oas_app_instance.id
         InstanceType = "db.t3.small"
       }
       widget_name = "EC2 Memory Usage"
@@ -65,8 +65,8 @@ locals {
       threshold           = "90"
       treat_missing_data  = "breaching"
       dimensions = {
-        ImageId    = "" # TODO
-        InstanceId = "" # TODO
+        ImageId    = local.application_data.accounts[local.environment].ec2amiid
+        InstanceId = aws_instance.oas_app_instance.id
         path       = "/oracle/software"
         fstype     = "ext4"
       }
@@ -91,8 +91,8 @@ locals {
       threshold           = "90"
       treat_missing_data  = "breaching"
       dimensions = {
-        ImageId    = "" # TODO
-        InstanceId = "" # TODO
+        ImageId    = local.application_data.accounts[local.environment].ec2amiid
+        InstanceId = aws_instance.oas_app_instance.id
         path       = "/"
         fstype     = "xfs"
       }
