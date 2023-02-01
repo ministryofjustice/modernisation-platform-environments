@@ -16,7 +16,7 @@ resource "aws_launch_template" "webgate_asg_tpl" {
       volume_type = "gp3"
       volume_size = 50
       encrypted   = true
-      kms_key_id  = data.aws_kms_key.ebs_shared.key_id
+      #kms_key_id  = data.aws_kms_key.ebs_shared.key_id
     }
   }
   # swap
@@ -26,7 +26,7 @@ resource "aws_launch_template" "webgate_asg_tpl" {
       volume_type = "gp3"
       volume_size = 20
       encrypted   = true
-      kms_key_id  = data.aws_kms_key.ebs_shared.key_id
+      #kms_key_id  = data.aws_kms_key.ebs_shared.key_id
     }
   }
   # temp
@@ -36,7 +36,7 @@ resource "aws_launch_template" "webgate_asg_tpl" {
       volume_type = "gp3"
       volume_size = 100
       encrypted   = true
-      kms_key_id  = data.aws_kms_key.ebs_shared.key_id
+      #kms_key_id  = data.aws_kms_key.ebs_shared.key_id
     }
   }
   # home
@@ -46,10 +46,10 @@ resource "aws_launch_template" "webgate_asg_tpl" {
       volume_type = "gp3"
       volume_size = 100
       encrypted   = true
-      kms_key_id  = data.aws_kms_key.ebs_shared.key_id
+      #kms_key_id  = data.aws_kms_key.ebs_shared.key_id
     }
   }
-
+/*
   # non-AMI mappings start at /dev/sdh
   # u01
   block_device_mappings {
@@ -62,7 +62,7 @@ resource "aws_launch_template" "webgate_asg_tpl" {
       kms_key_id  = data.aws_kms_key.ebs_shared.key_id
     }
   }
-
+*/
   tags = merge(local.tags,
     { Name = lower(format("ec2-%s-%s-Oracle-webgate", local.application_name, local.environment)) },
     { instance-scheduling = "skip-scheduling" }
