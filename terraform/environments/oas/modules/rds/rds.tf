@@ -44,7 +44,7 @@ resource "aws_db_parameter_group" "appdbparametergroup19" {
 
 # RDS Option group
 
-#TODO - These settings are for MAATDB only so we need to consider whether they should be in the module or not.
+#TODO - These settings are for OAS only so we need to consider whether they should be in the module or not.
 
 resource "aws_db_option_group" "appdboptiongroup19" {
   name                     = "appdboptiongroup19"

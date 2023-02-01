@@ -5,7 +5,7 @@ module "rds" {
   source                                = "./modules/rds"
 
   application_name                      = local.application_name
-  identifier_name                       = local.application_data.accounts[local.environment].identifier_name
+  identifier_name                       = local.application_name
   environment                           = local.environment
   region                                = local.application_data.accounts[local.environment].region
   allocated_storage                     = local.application_data.accounts[local.environment].allocated_storage

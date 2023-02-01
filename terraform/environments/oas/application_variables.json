@@ -11,7 +11,6 @@
       "outbound_access_cidr": "0.0.0.0/0",
       "inbound_cidr_lz": "10.202.0.0/20",
       "region": "eu-west-2",
-      "identifier_name": "oas",
       "allocated_storage": "50",
       "engine": "oracle-se2",
       "engine_version": "19.0.0.0.ru-2021-10.rur-2021-10.r1",
