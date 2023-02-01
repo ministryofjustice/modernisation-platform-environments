@@ -1,6 +1,6 @@
 resource "aws_launch_template" "webgate_asg_tpl" {
   name_prefix            = lower(format("asg-tpl-%s-%s-Webgate", local.application_name, local.environment))
-  image_id               = data.aws_ami.oracle_base_prereqs.id
+  image_id               = data.aws_ami.oracle_base_prereqs_final.id
   instance_type          = local.application_data.accounts[local.environment].ec2_oracle_instance_type_webgate
   key_name               = local.application_data.accounts[local.environment].key_name
   vpc_security_group_ids = [aws_security_group.ec2_sg_oracle_base.id]
@@ -16,7 +16,7 @@ resource "aws_launch_template" "webgate_asg_tpl" {
       volume_type = "gp3"
       volume_size = 50
       encrypted   = true
-      #kms_key_id  = data.aws_kms_key.ebs_shared.key_id
+      kms_key_id  = data.aws_kms_key.ebs_shared.key_id
     }
   }
   # swap
@@ -26,7 +26,7 @@ resource "aws_launch_template" "webgate_asg_tpl" {
       volume_type = "gp3"
       volume_size = 20
       encrypted   = true
-      #kms_key_id  = data.aws_kms_key.ebs_shared.key_id
+      kms_key_id  = data.aws_kms_key.ebs_shared.key_id
     }
   }
   # temp
@@ -36,7 +36,7 @@ resource "aws_launch_template" "webgate_asg_tpl" {
       volume_type = "gp3"
       volume_size = 100
       encrypted   = true
-      #kms_key_id  = data.aws_kms_key.ebs_shared.key_id
+      kms_key_id  = data.aws_kms_key.ebs_shared.key_id
     }
   }
   # home
@@ -46,7 +46,7 @@ resource "aws_launch_template" "webgate_asg_tpl" {
       volume_type = "gp3"
       volume_size = 100
       encrypted   = true
-      #kms_key_id  = data.aws_kms_key.ebs_shared.key_id
+      kms_key_id  = data.aws_kms_key.ebs_shared.key_id
     }
   }
 
@@ -58,7 +58,7 @@ resource "aws_launch_template" "webgate_asg_tpl" {
       volume_type = "io2"
       volume_size = 100
       encrypted   = true
-      #kms_key_id  = data.aws_kms_key.ebs_shared.key_id
+      kms_key_id  = data.aws_kms_key.ebs_shared.key_id
     }
   }
 }
