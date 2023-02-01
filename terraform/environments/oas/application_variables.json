@@ -9,7 +9,26 @@
       "stageesize": "200",
       "managementcidr": "10.200.0.0/20",
       "outbound_access_cidr": "0.0.0.0/0",
-      "inbound_cidr_lz": "10.202.0.0/20"
+      "inbound_cidr_lz": "10.202.0.0/20",
+      "region": "eu-west-2",
+      "allocated_storage": "50",
+      "engine": "oracle-se2",
+      "engine_version": "19.0.0.0.ru-2021-10.rur-2021-10.r1",
+      "instance_class": "db.t3.small",
+      "allow_major_version_upgrade": true,
+      "auto_minor_version_upgrade": false,
+      "storage_type": "gp2",
+      "backup_retention_period": 35,
+      "backup_window": "22:00-01:00",
+      "maintenance_window": "Mon:01:15-Mon:06:00",
+      "character_set_name": "AL32UTF8",
+      "availability_zone": "eu-west-2a",
+      "multi_az": false,
+      "username": "sysdba",
+      "db_password_rotation_period": 28,
+      "license_model": "license-included",
+      "lz_vpc_cidr": "10.202.0.0/20",
+      "deletion_protection": "false"
     },
     "test": {
       "example_var": "test-data"
