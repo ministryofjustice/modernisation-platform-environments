@@ -14,7 +14,7 @@ resource "aws_instance" "ec2_instance" {
   name                   = "${local.environment}-landingzone-httptest"
   ami                    = "ami-06672d07f62285d1d"
   instance_type          = "t3a.small"
-  vpc_security_group_ids = [module.httptest_sg.security_group_id]
+  vpc_security_group_ids = [aws_security_group.httptest_sg.security_group_id]
   subnet_id              = local.application_data.accounts[local.environment].mp_private_2a_subnet_id
   user_data_base64       = base64encode(local.instance-userdata)
   iam_instance_profile   = aws_iam_instance_profile.instance_profile.id
@@ -52,29 +52,26 @@ resource "aws_security_group" "httptest_sg" {
   name        = "landingzone-httptest-sg"
   description = "Security group for TG connectivity testing between LAA LZ & MP"
   vpc_id      = local.application_data.accounts[local.environment].mp_vpc_id
-  egress_with_cidr_blocks = [
-    {
+
+  ingress {
+      from_port   = 80
+      to_port     = 80
+      protocol    = "tcp"
+      description = "HTTP"
+      cidr_blocks = local.application_data.accounts[local.environment].lz_workspace_ingress_cidr
+    }
+  egress  {
       from_port   = 0
       to_port     = 0
       protocol    = "-1"
       description = "Outgoing"
       cidr_blocks = "0.0.0.0/0"
     }
-  ]
-  ingress_with_cidr_blocks = [
-    {
-      from_port   = 80
-      to_port     = 80
-      protocol    = "tcp"
-      description = "HTTP"
-      cidr_blocks = local.application_data.accounts[local.environment].lz_workspace_ingress_cidr
-    },
-    {
-      from_port   = 80
-      to_port     = 80
-      protocol    = "tcp"
-      description = "HTTP"
-      cidr_blocks = local.application_data.accounts[local.environment].lz_vpc_cidr
-    }
-  ]
+
+  tags = {
+    Name = "ingress-from-shared-services"
+  }
 }
+
+
+
