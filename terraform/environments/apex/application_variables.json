@@ -1,8 +1,7 @@
 {
   "accounts": {
     "development": {
-      "lz_vpc_cidr": "10.202.0.0/20",
-      "lz_workspace_ingress_cidr": "10.200.0.0/20"
+      "example_var": "dev-data"
     },
     "test": {
       "example_var": "test-data"
