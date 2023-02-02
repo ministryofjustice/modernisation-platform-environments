@@ -142,14 +142,6 @@ resource "aws_db_instance" "appdb1" {
     delete = "2h"
   }
 
-  # # Temporary add of this lifecycle since we keep getting the follow in the plan and thus recreating the DB
-  # # db_name = "OAS" -> "oas" # forces replacement
-  # lifecycle {
-  #   ignore_changes = [
-  #     db_name
-  #   ]
-  # }
-
 }
 
 # enabled_cloudwatch_logs_exports       = ["general", "error", "slowquery"]

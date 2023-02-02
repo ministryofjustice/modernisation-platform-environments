@@ -18,6 +18,7 @@
                           "legend": {
                                   "position": "hidden"
                           },
+                          "period": 60,
                           "region": "${aws_region}",
                           "stacked": true
                   }
@@ -39,6 +40,7 @@
                           "legend": {
                                   "position": "hidden"
                           },
+                          "period": 60,
                           "region": "${aws_region}",
                           "stacked": true
                   }
@@ -60,6 +62,7 @@
                           "legend": {
                                   "position": "hidden"
                           },
+                          "period": 60,
                           "region": "${aws_region}",
                           "stacked": true
                   }
@@ -81,6 +84,7 @@
                           "legend": {
                                   "position": "hidden"
                           },
+                          "period": 60,
                           "region": "${aws_region}",
                           "stacked": true
                   }
