@@ -10,7 +10,7 @@ EOF
 }
 
 
-resource "ec2-instance" "ec2_instance" {
+resource "aws_instance" "ec2_instance" {
   name                   = "${local.environment}-landingzone-httptest"
   ami                    = "ami-06672d07f62285d1d"
   instance_type          = "t3a.small"
@@ -48,9 +48,7 @@ resource "aws_iam_role" "ssm_managed_instance" {
 EOF
 }
 
-module "httptest_sg" {
-  source      = "terraform-aws-modules/security-group/aws"
-  version     = "~> 4.0"
+resource "aws_security_group" "httptest_sg" {
   name        = "landingzone-httptest-sg"
   description = "Security group for TG connectivity testing between LAA LZ & MP"
   vpc_id      = local.application_data.accounts[local.environment].mp_vpc_id
