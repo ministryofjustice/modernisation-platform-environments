@@ -49,7 +49,7 @@ resource "aws_launch_template" "webgate_asg_tpl" {
       #kms_key_id  = data.aws_kms_key.ebs_shared.key_id
     }
   }
-/*
+  /*
   # non-AMI mappings start at /dev/sdh
   # u01
   block_device_mappings {
