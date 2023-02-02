@@ -1,5 +1,6 @@
 # Get modernisation account id from ssm parameter
 data "aws_ssm_parameter" "modernisation_platform_account_id" {
+  provider = aws.original-session
   name = "modernisation_platform_account_id"
 }
 
