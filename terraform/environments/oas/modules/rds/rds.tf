@@ -142,13 +142,13 @@ resource "aws_db_instance" "appdb1" {
     delete = "2h"
   }
 
-  # Temporary add of this lifecycle since we keep getting the follow in the plan and thus recreating the DB
-  # db_name = "OAS" -> "oas" # forces replacement
-  lifecycle {
-    ignore_changes = [
-      db_name
-    ]
-  }
+  # # Temporary add of this lifecycle since we keep getting the follow in the plan and thus recreating the DB
+  # # db_name = "OAS" -> "oas" # forces replacement
+  # lifecycle {
+  #   ignore_changes = [
+  #     db_name
+  #   ]
+  # }
 
 }
 
