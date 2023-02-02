@@ -28,7 +28,8 @@
       "db_password_rotation_period": 28,
       "license_model": "license-included",
       "lz_vpc_cidr": "10.202.0.0/20",
-      "deletion_protection": "false"
+      "deletion_protection": "false",
+      "dashboard_widget_period": 120
     },
     "test": {
       "example_var": "test-data"

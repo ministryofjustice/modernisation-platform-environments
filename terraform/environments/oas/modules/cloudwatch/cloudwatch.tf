@@ -20,13 +20,6 @@ data "template_file" "dashboard" {
   template = "${file("${path.module}/dashboard.tpl")}"
 
   vars = {
-    # dashboard_widget_type = widget.dashboard_widget_type
-		# coord_x = widget.coord_x
-		# coord_y = widget.coord_y
-		# dashboard_widget_height = widget.dashboard_widget_height
-		# dashboard_widget_width = widget.dashboard_widget_width
-		# widget_name = widget.widget_name
-		# dashboard_widget_view = widget.dashboard_widget_view
 		dashboard_widget_refresh_period = var.dashboard_widget_refresh_period
 		aws_region = var.aws_region
 		cpu_alarm_arn = aws_cloudwatch_metric_alarm.alarm["ec2_cpu_utilisation_too_high"].arn

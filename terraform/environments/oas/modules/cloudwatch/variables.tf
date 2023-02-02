@@ -24,17 +24,7 @@ variable "dashboard_widget_refresh_period" {
   default = 60
 }
 
-# variable "dashboard_widget_type" {} # metric
-#
-# variable "dashboard_widget_height" {} # 5
-#
-# variable "dashboard_widget_width" {} # 8
-#
-# variable "dashboard_widget_view" {} # timeSeries
-
 variable "cloudwatch_metric_alarms" {}
-
-variable "dashboard_widgets" {}
 
 variable "dashboard_name" {}
 

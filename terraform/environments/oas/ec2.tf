@@ -22,7 +22,7 @@ resource "aws_instance" "oas_app_instance" {
 
   root_block_device {
     delete_on_termination = false
-    encrypted             = false
+    encrypted             = true # TODO Confirm if encrypted volumes can work for OAS, as it looks like in MP they must be encrypted
     volume_size           = 40
     volume_type           = "gp2"
   }

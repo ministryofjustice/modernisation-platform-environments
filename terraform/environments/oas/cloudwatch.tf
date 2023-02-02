@@ -18,14 +18,6 @@ locals {
       dimensions = {
         InstanceId = aws_instance.oas_app_instance.id
       }
-      widget_name = "EC2 CPU Usage"
-      # dashboard_widget_type = "metric"
-      # coord_x = 0
-      # coord_y = 0
-      # dashboard_widget_height = 5
-      # dashboard_widget_width = 8
-      # dashboard_widget_view = "timeSeries"
-      dashboard_widget_refresh_period = 60
 
     },
     ec2_memory_over_threshold = {
@@ -34,7 +26,7 @@ locals {
       comparison_operator = "GreaterThanOrEqualToThreshold"
       evaluation_periods  = "5"
       metric_name         = "mem_used_percent"
-      namespace           = "CWAgent"
+      namespace           = "CWAgent" # TODO CW Agent on in Instance yet so need confirming metrics are sending across to CW once AMI implemented
       period              = "60"
       statistic           = "Average"
       threshold           = "90"
@@ -44,14 +36,7 @@ locals {
         InstanceId   = aws_instance.oas_app_instance.id
         InstanceType = "db.t3.small"
       }
-      widget_name = "EC2 Memory Usage"
-      # dashboard_widget_type = "metric"
-      # coord_x = 0
-      # coord_y = 1
-      # dashboard_widget_height = 5
-      # dashboard_widget_width = 8
-      # dashboard_widget_view = "timeSeries"
-      dashboard_widget_refresh_period = 60
+
     },
     ebs_software_disk_space_used_over_threshold = {
       alarm_name          = "${local.appnameenv}-EBS-DiskSpace-Alarm"
@@ -59,7 +44,7 @@ locals {
       comparison_operator = "GreaterThanOrEqualToThreshold"
       evaluation_periods  = "1"
       metric_name         = "disk_used_percent"
-      namespace           = "CWAgent"
+      namespace           = "CWAgent" # TODO CW Agent on in Instance yet so need confirming metrics are sending across to CW once AMI implemented
       period              = "60"
       statistic           = "Average"
       threshold           = "90"
@@ -70,14 +55,7 @@ locals {
         path       = "/oracle/software"
         fstype     = "ext4"
       }
-      widget_name = "EBS Disk Usage"
-      # dashboard_widget_type = "metric"
-      # coord_x = 1
-      # coord_y = 0
-      # dashboard_widget_height = 5
-      # dashboard_widget_width = 8
-      # dashboard_widget_view = "timeSeries"
-      dashboard_widget_refresh_period = 60
+
     },
     ebs_root_disk_space_used_over_threshold = {
       alarm_name          = "${local.appnameenv}-EBS-Root-DiskSpace-Alarm"
@@ -85,7 +63,7 @@ locals {
       comparison_operator = "GreaterThanOrEqualToThreshold"
       evaluation_periods  = "1"
       metric_name         = "disk_used_percent"
-      namespace           = "CWAgent"
+      namespace           = "CWAgent" # TODO CW Agent on in Instance yet so need confirming metrics are sending across to CW once AMI implemented
       period              = "60"
       statistic           = "Average"
       threshold           = "90"
@@ -96,18 +74,10 @@ locals {
         path       = "/"
         fstype     = "xfs"
       }
-      widget_name = "Root EBS Disk Usage"
-      # dashboard_widget_type = "metric"
-      # coord_x = 1
-      # coord_y = 1
-      # dashboard_widget_height = 5
-      # dashboard_widget_width = 8
-      # dashboard_widget_view = "timeSeries"
-      dashboard_widget_refresh_period = 60
+
     }
   }
 
-  dashboard_widgets = [for widget in local.cloudwatch_metric_alarms : widget if widget.widget_name != null]
 }
 
 data "aws_secretsmanager_secret" "pagerduty_integration_keys" {
@@ -124,8 +94,8 @@ module "cwalarm" {
   source = "./modules/cloudwatch"
   snsTopicName             = local.sns_topic_name
   cloudwatch_metric_alarms = local.cloudwatch_metric_alarms
-  dashboard_widgets        = local.dashboard_widgets
   dashboard_name           = local.dashboard_name
+  dashboard_widget_refresh_period = local.application_data.accounts[local.environment].dashboard_widget_period
 }
 
 module "pagerduty_core_alerts" {
