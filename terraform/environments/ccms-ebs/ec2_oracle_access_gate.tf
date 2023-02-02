@@ -1,7 +1,7 @@
-resource "aws_launch_template" "webgate_asg_tpl" {
-  name_prefix            = lower(format("asg-tpl-%s-%s-Webgate", local.application_name, local.environment))
+resource "aws_launch_template" "accessgate_asg_tpl" {
+  name_prefix            = lower(format("asg-tpl-%s-%s-accessgate", local.application_name, local.environment))
   image_id               = data.aws_ami.oracle_base_prereqs_final.id
-  instance_type          = local.application_data.accounts[local.environment].ec2_oracle_instance_type_webgate
+  instance_type          = local.application_data.accounts[local.environment].ec2_oracle_instance_type_accessgate
   key_name               = local.application_data.accounts[local.environment].key_name
   vpc_security_group_ids = [aws_security_group.ec2_sg_oracle_base.id]
   #iam_instance_profile {
@@ -19,6 +19,7 @@ resource "aws_launch_template" "webgate_asg_tpl" {
       #kms_key_id  = data.aws_kms_key.ebs_shared.key_id
     }
   }
+
   # swap
   block_device_mappings {
     device_name = "/dev/sdb"
@@ -29,6 +30,7 @@ resource "aws_launch_template" "webgate_asg_tpl" {
       #kms_key_id  = data.aws_kms_key.ebs_shared.key_id
     }
   }
+
   # temp
   block_device_mappings {
     device_name = "/dev/sdc"
@@ -39,6 +41,7 @@ resource "aws_launch_template" "webgate_asg_tpl" {
       #kms_key_id  = data.aws_kms_key.ebs_shared.key_id
     }
   }
+
   # home
   block_device_mappings {
     device_name = "/dev/sdd"
@@ -49,29 +52,27 @@ resource "aws_launch_template" "webgate_asg_tpl" {
       #kms_key_id  = data.aws_kms_key.ebs_shared.key_id
     }
   }
-/*
+
   # non-AMI mappings start at /dev/sdh
   # u01
   block_device_mappings {
     device_name = "/dev/sdh"
     ebs {
       volume_type = "io2"
-      volume_size = 100
-      iops        = 3000
+      volume_size = 150
       encrypted   = true
-      kms_key_id  = data.aws_kms_key.ebs_shared.key_id
+      #kms_key_id  = data.aws_kms_key.ebs_shared.key_id
     }
   }
-*/
+
   tags = merge(local.tags,
-    { Name = lower(format("ec2-%s-%s-Oracle-webgate", local.application_name, local.environment)) }
+    { Name = lower(format("ec2-%s-%s-Oracle-access", local.application_name, local.environment)) }
   )
   depends_on = [aws_security_group.ec2_sg_oracle_base]
-
 }
 
-resource "aws_autoscaling_group" "webgate_asg" {
-  name_prefix      = "webgate-"
+resource "aws_autoscaling_group" "accessgate_asg" {
+  name_prefix      = "accessgate-"
   desired_capacity = 1
   max_size         = 1
   min_size         = 1
@@ -79,16 +80,16 @@ resource "aws_autoscaling_group" "webgate_asg" {
     data.aws_subnet.private_subnets_b.id,
     data.aws_subnet.private_subnets_c.id
   ]
-  target_group_arns = [aws_alb_target_group.webgate_tg.arn]
+  target_group_arns = [aws_alb_target_group.accessgate_tg.arn]
   launch_template {
-    id      = aws_launch_template.webgate_asg_tpl.id
+    id      = aws_launch_template.accessgate_asg_tpl.id
     version = "$Latest"
   }
 }
 
 
-resource "aws_lb" "webgate_alb" {
-  name                             = lower(format("alb-%s-%s-Webgate", local.application_name, local.environment))
+resource "aws_lb" "accessgate_alb" {
+  name                             = lower(format("alb-%s-%s-accgate", local.application_name, local.environment))
   internal                         = false
   load_balancer_type               = "application"
   enable_cross_zone_load_balancing = "true"
@@ -101,17 +102,17 @@ resource "aws_lb" "webgate_alb" {
 
   #access_logs {
   #  bucket  = aws_s3_bucket.lb_logs.bucket
-  #  prefix  = "webgate-lb"
+  #  prefix  = "accessgate-lb"
   #  enabled = true
   #}
 
   tags = merge(local.tags,
-    { Name = lower(format("alb-%s-%s-webgate", local.application_name, local.environment)) }
+    { Name = lower(format("alb-%s-%s-accessgate", local.application_name, local.environment)) }
   )
 }
 
-resource "aws_alb_target_group" "webgate_tg" {
-  name        = "webgate-targetgroup"
+resource "aws_alb_target_group" "accessgate_tg" {
+  name        = "accessgate-targetgroup"
   target_type = "instance"
   port        = 80
   protocol    = "HTTP"
@@ -128,9 +129,9 @@ resource "aws_alb_target_group" "webgate_tg" {
 }
 
 /*
-resource "aws_security_group" "webgate-alb-sg" {
-  #name               = lower(format("sg-%s-%s-Webgate", local.application_name, local.environment)) 
-  description = "allow HTTPS to Webgate ALB"
+resource "aws_security_group" "accessgate-alb-sg" {
+  #name               = lower(format("sg-%s-%s-accessgate", local.application_name, local.environment)) 
+  description = "allow HTTPS to accessgate ALB"
   vpc_id      = data.aws_vpc.shared.id
   ingress {
     from_port   = "443"
@@ -139,33 +140,27 @@ resource "aws_security_group" "webgate-alb-sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
   tags = merge(local.tags,
-    { Name = lower(format("sg-%s-%s-webgate", local.application_name, local.environment)) }
+    { Name = lower(format("sg-%s-%s-accessgate", local.application_name, local.environment)) }
   )
 }
 */
 
-resource "aws_autoscaling_attachment" "webgate_asg_att" {
-  autoscaling_group_name = aws_autoscaling_group.webgate_asg.id
-  lb_target_group_arn    = aws_alb_target_group.webgate_tg.arn
+resource "aws_autoscaling_attachment" "accessgate_asg_att" {
+  autoscaling_group_name = aws_autoscaling_group.accessgate_asg.id
+  lb_target_group_arn    = aws_alb_target_group.accessgate_tg.arn
 }
 
+
+
+
 /*
-resource "aws_alb_listener" "hhtps_webgate" {
-  load_balancer_arn = aws_lb.webgate_alb.arn
+resource "aws_alb_listener" "hhtps_accessgate" {
+  load_balancer_arn = aws_lb.accessgate_alb.arn
   port              = "443"
   protocol          = "HTTPS"
   default_action {
-    target_group_arn = aws_alb_target_group.webgate_tg.arn
+    target_group_arn = aws_alb_target_group.accessgate_tg.arn
     type             = "forward"
   }
 }
 */
-
-resource "aws_kms_grant" "kms_assume" {
-  name              = "kms-grant"
-  key_id            = data.aws_kms_key.ebs_shared.arn
-  grantee_principal = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling"
-  operations        = ["Encrypt", "Decrypt", "GenerateDataKey"]
-}
-
-
