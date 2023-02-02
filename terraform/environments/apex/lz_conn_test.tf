@@ -10,9 +10,7 @@ EOF
 }
 
 
-module "ec2_instance" {
-  source                 = "terraform-aws-modules/ec2-instance/aws"
-  version                = "~> 4.0"
+resource "ec2-instance" "ec2_instance" {
   name                   = "${local.environment}-landingzone-httptest"
   ami                    = "ami-06672d07f62285d1d"
   instance_type          = "t3a.small"
