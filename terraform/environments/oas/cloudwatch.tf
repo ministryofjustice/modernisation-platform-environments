@@ -1,7 +1,7 @@
 locals {
-  appnameenv               = "${local.application_name}-${local.environment}"
-  sns_topic_name           = "${local.appnameenv}-alerting-topic"
-  dashboard_name           = "${local.appnameenv}-Appication-Dashboard"
+  appnameenv                 = "${local.application_name}-${local.environment}"
+  sns_topic_name             = "${local.appnameenv}-alerting-topic"
+  dashboard_name             = "${local.appnameenv}-Appication-Dashboard"
   pagerduty_integration_keys = jsondecode(data.aws_secretsmanager_secret_version.pagerduty_integration_keys.secret_string)
   cloudwatch_metric_alarms = {
     ec2_cpu_utilisation_too_high = {
@@ -121,7 +121,7 @@ data "aws_secretsmanager_secret_version" "pagerduty_integration_keys" {
 }
 
 module "cwalarm" {
-  source = "./modules/cloudwatch"
+  source                   = "./modules/cloudwatch"
   snsTopicName             = local.sns_topic_name
   cloudwatch_metric_alarms = local.cloudwatch_metric_alarms
   dashboard_widgets        = local.dashboard_widgets
