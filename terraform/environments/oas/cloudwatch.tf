@@ -25,7 +25,7 @@ locals {
       # dashboard_widget_height = 5
       # dashboard_widget_width = 8
       # dashboard_widget_view = "timeSeries"
-      # dashboard_widget_refresh_period = 60
+      dashboard_widget_refresh_period = 60
 
     },
     ec2_memory_over_threshold = {
@@ -51,7 +51,7 @@ locals {
       # dashboard_widget_height = 5
       # dashboard_widget_width = 8
       # dashboard_widget_view = "timeSeries"
-      # dashboard_widget_refresh_period = 60
+      dashboard_widget_refresh_period = 60
     },
     ebs_software_disk_space_used_over_threshold = {
       alarm_name          = "${local.appnameenv}-EBS-DiskSpace-Alarm"
@@ -77,7 +77,7 @@ locals {
       # dashboard_widget_height = 5
       # dashboard_widget_width = 8
       # dashboard_widget_view = "timeSeries"
-      # dashboard_widget_refresh_period = 60
+      dashboard_widget_refresh_period = 60
     },
     ebs_root_disk_space_used_over_threshold = {
       alarm_name          = "${local.appnameenv}-EBS-Root-DiskSpace-Alarm"
@@ -103,7 +103,7 @@ locals {
       # dashboard_widget_height = 5
       # dashboard_widget_width = 8
       # dashboard_widget_view = "timeSeries"
-      # dashboard_widget_refresh_period = 60
+      dashboard_widget_refresh_period = 60
     }
   }
 
