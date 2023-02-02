@@ -88,7 +88,7 @@ resource "aws_secretsmanager_secret_version" "rds_password_secret_version" {
 }
 
 # From Vincent's PR
-# TODO Rotation of secret which requires Lambda fucntion created and permissions granted to Lambda to rotate. 
+# TODO Rotation of secret which requires Lambda fucntion created and permissions granted to Lambda to rotate.
 #
 # resource "aws_secretsmanager_secret_rotation" "rds_password-rotation" {
 #   secret_id           = aws_secretsmanager_secret.rds_password_secret.id
@@ -104,7 +104,7 @@ resource "aws_secretsmanager_secret_version" "rds_password_secret_version" {
 
 resource "aws_db_instance" "appdb1" {
   allocated_storage           = var.allocated_storage
-  db_name                     = var.application_name
+  db_name                     = upper(var.application_name)
   identifier                  = var.identifier_name
   engine                      = var.engine
   engine_version              = var.engine_version
@@ -140,6 +140,14 @@ resource "aws_db_instance" "appdb1" {
   timeouts {
     create = "60m"
     delete = "2h"
+  }
+
+  # Temporary add of this lifecycle since we keep getting the follow in the plan and thus recreating the DB
+  # db_name = "OAS" -> "oas" # forces replacement
+  lifecycle {
+    ignore_changes = [
+      db_name
+    ]
   }
 
 }
