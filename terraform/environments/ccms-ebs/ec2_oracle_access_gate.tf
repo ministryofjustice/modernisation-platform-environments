@@ -61,6 +61,7 @@ resource "aws_launch_template" "accessgate_asg_tpl" {
       volume_type = "io2"
       volume_size = 150
       encrypted   = true
+      iops        = 3000
       #kms_key_id  = data.aws_kms_key.ebs_shared.key_id
     }
   }
