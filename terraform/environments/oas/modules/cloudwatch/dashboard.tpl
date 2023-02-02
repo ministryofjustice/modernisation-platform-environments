@@ -18,7 +18,7 @@
                           "legend": {
                                   "position": "hidden"
                           },
-                          "period": 60,
+                          "period": ${dashboard_widget_refresh_period},
                           "region": "${aws_region}",
                           "stacked": true
                   }
@@ -40,7 +40,7 @@
                           "legend": {
                                   "position": "hidden"
                           },
-                          "period": 60,
+                          "period": ${dashboard_widget_refresh_period},
                           "region": "${aws_region}",
                           "stacked": true
                   }
@@ -62,7 +62,7 @@
                           "legend": {
                                   "position": "hidden"
                           },
-                          "period": 60,
+                          "period": ${dashboard_widget_refresh_period},
                           "region": "${aws_region}",
                           "stacked": true
                   }
@@ -84,7 +84,7 @@
                           "legend": {
                                   "position": "hidden"
                           },
-                          "period": 60,
+                          "period": ${dashboard_widget_refresh_period},
                           "region": "${aws_region}",
                           "stacked": true
                   }
