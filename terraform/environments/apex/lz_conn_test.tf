@@ -54,19 +54,19 @@ resource "aws_security_group" "httptest_sg" {
   vpc_id      = local.application_data.accounts[local.environment].mp_vpc_id
 
   ingress {
-      from_port   = 80
-      to_port     = 80
-      protocol    = "tcp"
-      description = "HTTP"
-      cidr_blocks = local.application_data.accounts[local.environment].lz_workspace_ingress_cidr
-    }
-  egress  {
-      from_port   = 0
-      to_port     = 0
-      protocol    = "-1"
-      description = "Outgoing"
-      cidr_blocks = "0.0.0.0/0"
-    }
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    description = "HTTP"
+    cidr_blocks = local.application_data.accounts[local.environment].lz_workspace_ingress_cidr
+  }
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    description = "Outgoing"
+    cidr_blocks = "0.0.0.0/0"
+  }
 
   tags = {
     Name = "ingress-from-shared-services"
