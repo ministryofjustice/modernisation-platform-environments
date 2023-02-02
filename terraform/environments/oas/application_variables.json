@@ -29,7 +29,7 @@
       "license_model": "license-included",
       "lz_vpc_cidr": "10.202.0.0/20",
       "deletion_protection": "false",
-      "dashboard_widget_period": 120
+      "dashboard_widget_period": 60
     },
     "test": {
       "example_var": "test-data"
