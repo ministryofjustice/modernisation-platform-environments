@@ -1,5 +1,5 @@
 resource "aws_cloudwatch_metric_alarm" "alarm" {
-	for_each = var.cloudwatch_metric_alarms
+  for_each = var.cloudwatch_metric_alarms
 
   alarm_name          = each.value.alarm_name
   alarm_description   = each.value.alarm_description
@@ -17,28 +17,28 @@ resource "aws_cloudwatch_metric_alarm" "alarm" {
 }
 
 data "template_file" "dashboard" {
-  template = "${file("${path.module}/dashboard.tpl")}"
+  template = file("${path.module}/dashboard.tpl")
 
   vars = {
     # dashboard_widget_type = widget.dashboard_widget_type
-		# coord_x = widget.coord_x
-		# coord_y = widget.coord_y
-		# dashboard_widget_height = widget.dashboard_widget_height
-		# dashboard_widget_width = widget.dashboard_widget_width
-		# widget_name = widget.widget_name
-		# dashboard_widget_view = widget.dashboard_widget_view
-		dashboard_widget_refresh_period = var.dashboard_widget_refresh_period
-		aws_region = var.aws_region
-		cpu_alarm_arn = aws_cloudwatch_metric_alarm.alarm["ec2_cpu_utilisation_too_high"].arn
-		memory_alarm_arn = aws_cloudwatch_metric_alarm.alarm["ec2_memory_over_threshold"].arn
-		ebs_volume_alarm_arn = aws_cloudwatch_metric_alarm.alarm["ebs_software_disk_space_used_over_threshold"].arn
-		ebs_root_volume_alarm_arn = aws_cloudwatch_metric_alarm.alarm["ebs_root_disk_space_used_over_threshold"].arn
+    # coord_x = widget.coord_x
+    # coord_y = widget.coord_y
+    # dashboard_widget_height = widget.dashboard_widget_height
+    # dashboard_widget_width = widget.dashboard_widget_width
+    # widget_name = widget.widget_name
+    # dashboard_widget_view = widget.dashboard_widget_view
+    dashboard_widget_refresh_period = var.dashboard_widget_refresh_period
+    aws_region                      = var.aws_region
+    cpu_alarm_arn                   = aws_cloudwatch_metric_alarm.alarm["ec2_cpu_utilisation_too_high"].arn
+    memory_alarm_arn                = aws_cloudwatch_metric_alarm.alarm["ec2_memory_over_threshold"].arn
+    ebs_volume_alarm_arn            = aws_cloudwatch_metric_alarm.alarm["ebs_software_disk_space_used_over_threshold"].arn
+    ebs_root_volume_alarm_arn       = aws_cloudwatch_metric_alarm.alarm["ebs_root_disk_space_used_over_threshold"].arn
   }
 }
 
 resource "aws_cloudwatch_dashboard" "dashboard" {
-	dashboard_name = var.dashboard_name
-	dashboard_body = data.template_file.dashboard.rendered
+  dashboard_name = var.dashboard_name
+  dashboard_body = data.template_file.dashboard.rendered
 }
 
 # SNS topic for monitoring to send alarms to
