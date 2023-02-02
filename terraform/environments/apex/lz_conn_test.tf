@@ -1,3 +1,12 @@
+terraform {
+  required_providers {
+    random = {
+      source = "hashicorp/random"
+      version = "2.3.0"
+    }
+  }
+}
+
 locals {
   instance-userdata = <<EOF
 #!/bin/bash
@@ -7,6 +16,8 @@ systemctl start httpd
 cat "0 8 * * * root systemctl start httpd" > /etc/cron.d/httpd_cron
 EOF
 }
+
+
 module "ec2_instance" {
   source                 = "terraform-aws-modules/ec2-instance/aws"
   version                = "~> 4.0"
@@ -19,7 +30,6 @@ module "ec2_instance" {
   iam_instance_profile   = aws_iam_instance_profile.instance_profile.id
   tags = {
     Name = "${local.environment}-landingzone-httptest"
-    # Environment = "dev"
     Environment = local.environment
   }
 }
