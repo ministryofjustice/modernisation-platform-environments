@@ -1,7 +1,7 @@
 terraform {
   required_providers {
     random = {
-      source = "hashicorp/random"
+      source  = "hashicorp/random"
       version = "2.3.0"
     }
   }
@@ -29,7 +29,7 @@ module "ec2_instance" {
   user_data_base64       = base64encode(local.instance-userdata)
   iam_instance_profile   = aws_iam_instance_profile.instance_profile.id
   tags = {
-    Name = "${local.environment}-landingzone-httptest"
+    Name        = "${local.environment}-landingzone-httptest"
     Environment = local.environment
   }
 }
