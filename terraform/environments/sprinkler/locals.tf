@@ -8,7 +8,7 @@ data "http" "environments_file" {
 }
 
 data "aws_caller_identity" "oidc_session" {
-  provider = aws.oidc-session
+  provider = aws.original-session
 }
 
 data "aws_caller_identity" "modernisation_platform" {
@@ -16,7 +16,7 @@ data "aws_caller_identity" "modernisation_platform" {
 }
 
 data "aws_iam_session_context" "whoami" {
-  provider = aws.oidc-session
+  provider = aws.original-session
   arn      = data.aws_caller_identity.oidc_session.arn
 }
 
