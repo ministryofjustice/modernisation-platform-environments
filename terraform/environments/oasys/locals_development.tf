@@ -25,9 +25,9 @@ locals {
 
     autoscaling_groups = {
       webservers = merge(local.webserver, { # merge common config and env specific
-        tags = {
+        tags = merge(local.webserver_tags, {
           oasys-environment = "t1"
-        }
+        })
       })
       # test = {
       #   ami_name              = "base_rhel_7_9_*"
