@@ -116,10 +116,10 @@ locals {
 
     user_data_cloud_init = {
       args = {
-        lifecycle_hook_name    = "ready-hook"
-        branch                 = "main"
-        ansible_repo           = "modernisation-platform-configuration-management"
-        ansible_repo_basedir   = "ansible"
+        lifecycle_hook_name  = "ready-hook"
+        branch               = "main"
+        ansible_repo         = "modernisation-platform-configuration-management"
+        ansible_repo_basedir = "ansible"
         # ansible_args           = "--tags ec2provision"
       }
       scripts = [ # it would make sense to have these templates in a common area 
