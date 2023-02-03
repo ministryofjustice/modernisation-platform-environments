@@ -81,10 +81,10 @@ EOF
     encrypted   = true
     kms_key_id  = data.aws_kms_key.ebs_shared.key_id
   }
-  
+
 
   tags = merge(local.tags,
-    { Name = lower(format("ec2-%s-%s-accessgate-%s", local.application_name, local.environment, count.index+1)) }
+    { Name = lower(format("ec2-%s-%s-accessgate-%s", local.application_name, local.environment, count.index + 1)) }
   )
   depends_on = [aws_security_group.ec2_sg_oracle_base]
 
