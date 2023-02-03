@@ -81,6 +81,6 @@
       "mapping": "u01",
       "type": "io2",
       "device_name": "/dev/sdh"
-    }  
+    }
   }
 }
