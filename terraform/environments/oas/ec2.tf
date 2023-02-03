@@ -14,7 +14,7 @@ resource "aws_instance" "oas_app_instance" {
   availability_zone           = "eu-west-2a"
   ebs_optimized               = true
   instance_type               = local.application_data.accounts[local.environment].ec2instancetype
-  security_groups             = [aws_security_group.ec2.id]
+  vpc_security_group_ids      = [aws_security_group.ec2.id]
   monitoring                  = true
   subnet_id                   = data.aws_subnet.private_subnets_a.id
   iam_instance_profile        = aws_iam_instance_profile.ec2_instance_profile.id
@@ -22,7 +22,7 @@ resource "aws_instance" "oas_app_instance" {
 
   root_block_device {
     delete_on_termination = false
-    encrypted             = false
+    encrypted             = true # TODO Confirm if encrypted volumes can work for OAS, as it looks like in MP they must be encrypted
     volume_size           = 40
     volume_type           = "gp2"
   }
@@ -281,4 +281,3 @@ resource "aws_route53_record" "oas-app" {
   ttl      = 900
   records  = [aws_instance.oas_app_instance.private_ip]
 }
-

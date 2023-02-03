@@ -84,7 +84,8 @@ locals {
       min_size         = 0
 
       health_check_grace_period = 300
-      health_check_type         = "ELB"
+      # health_check_type         = "ELB"
+      health_check_type         = "EC2" # using EC2 for now while we test, otherwise server is killed if weblogic stopped
       force_delete              = true
       termination_policies      = ["OldestInstance"]
       target_group_arns         = []
