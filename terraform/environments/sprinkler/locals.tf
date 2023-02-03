@@ -7,12 +7,18 @@ data "http" "environments_file" {
   url = "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/${local.application_name}.json"
 }
 
-data "aws_caller_identity" "oidc_session" {
-  provider = aws.oidc-session
+data "aws_caller_identity" "original_session" {
+  provider = aws.original-session
 }
 
 data "aws_caller_identity" "modernisation_platform" {
   provider = aws.modernisation-platform
+}
+
+variable "collaborator_access" {
+  type        = string
+  default     = "developer"
+  description = "Collaborators must specify which access level they are using"
 }
 
 locals {
