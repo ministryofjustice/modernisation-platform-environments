@@ -27,9 +27,6 @@ locals {
       webservers = merge(local.webserver, { # merge common config and env specific
         tags = {
           oasys-environment = "t1"
-          description       = "oasys webserver"
-          component         = "web"
-          server-type       = "web"
         }
       })
       # test = {
