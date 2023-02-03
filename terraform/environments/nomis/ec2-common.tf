@@ -92,7 +92,7 @@ data "aws_iam_policy_document" "cloud_watch_custom" {
       "ssm:GetParameters"
     ]
     resources = [aws_ssm_parameter.cloud_watch_config_linux.arn,
-      aws_ssm_parameter.cloud_watch_config_windows.arn]
+    aws_ssm_parameter.cloud_watch_config_windows.arn]
   }
 }
 
