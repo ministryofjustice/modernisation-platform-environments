@@ -43,3 +43,39 @@ tasks:
           $path = "C:\Users\Administrator\Documents\add_users.ps1"
           Out-File -FilePath $path -InputObject $add_users
           Register-ScheduledJob -Name "add_users" -FilePath $path -RunEvery $(New-TimeSpan -Minutes 15) -RunNow
+
+          # Install AWS PowerShell modules dependencies
+          Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+          Install-Module -Name AWS.Tools.Installer -Force -AllowClobber
+          Install-AWSToolsModule -Name AWS.Tools.SimpleSystemsManagement -Force -Cleanup -AllowClobber
+
+          $ConfigFilePath = "C:\Program Files\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-config.json"
+
+          function Get-AmazonCloudWatchAgentConfig {
+            param(
+              [string]$OutFilePath
+            )
+            (Get-SSMParameter -Name "cloud-watch-config-windows").Value | Out-File -FilePath $OutFilePath -Force -NoNewline  
+          }
+          
+          function Start-AmazonCloudWatchAgent {
+            param(
+              [string]$ConfigurationFilePath
+            )
+            "C:\Program Files\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent-ctl.ps1 -a fetch-config -m ec2 -s -c file:$ConfigurationFilePath"
+          }
+          
+          # Check CWAgent is installed, if it isn't then install it
+          $cwagent = Get-Service -Name "AmazonCloudWatchAgent" -ErrorAction SilentlyContinue
+          if ($cwagent) {
+            Write-Output "CloudWatch Agent is already installed"
+            Get-AmazonCloudWatchAgentConfig -OutFilePath $ConfigFilePath
+            Start-AmazonCloudWatchAgent -ConfigurationFilePath $ConfigFilePath
+          } else {
+            Write-Output "Installing CloudWatch Agent"
+            Invoke-WebRequest -Uri "https://s3.amazonaws.com/amazoncloudwatch-agent/windows/amd64/latest/amazon-cloudwatch-agent.msi" -OutFile "C:\Program Files\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent.msi"
+            $cwagent_installer = "C:\Program Files\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent.msi"
+            Start-Process -FilePath msiexec.exe -ArgumentList "/i $cwagent_installer /qn" -Wait
+            Get-AmazonCloudWatchAgentConfig -OutFilePath $ConfigFilePath
+            Start-AmazonCloudWatchAgent -ConfigurationFilePath $ConfigFilePath
+          }
