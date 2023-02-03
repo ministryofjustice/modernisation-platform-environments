@@ -15,6 +15,12 @@ data "aws_caller_identity" "modernisation_platform" {
   provider = aws.modernisation-platform
 }
 
+variable "collaborator_access" {
+  type        = string
+  default     = "developer"
+  description = "Collaborators must specify which access level they are using"
+}
+
 locals {
 
   application_name = "sprinkler"

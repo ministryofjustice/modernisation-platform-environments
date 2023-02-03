@@ -7,7 +7,7 @@ provider "aws" {
 provider "aws" {
   region = "eu-west-2"
   assume_role {
-    role_arn = can(regex("developer|sandbox", data.aws_caller_identity.original_session.arn)) ? null : can(regex("user", data.aws_caller_identity.original_session.arn)) ? "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/developer" : "arn:aws:iam::${data.aws_caller_identity.original_session.id}:role/MemberInfrastructureAccess"
+    role_arn = can(regex("developer|sandbox|migration", data.aws_caller_identity.original_session.arn)) ? null : can(regex("user", data.aws_caller_identity.original_session.arn)) ? "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/${var.collaborator_access}" : "arn:aws:iam::${data.aws_caller_identity.original_session.id}:role/MemberInfrastructureAccess"
   }
 }
 
@@ -25,7 +25,7 @@ provider "aws" {
   alias  = "core-vpc"
   region = "eu-west-2"
   assume_role {
-    role_arn = can(regex("developer|sandbox|user", data.aws_caller_identity.original_session.arn)) ? "arn:aws:iam::${local.environment_management.account_ids[local.provider_name]}:role/member-delegation-read-only" : "arn:aws:iam::${local.environment_management.account_ids[local.provider_name]}:role/member-delegation-${local.vpc_name}-sandbox"
+    role_arn = can(regex("developer|sandbox|migration|user", data.aws_caller_identity.original_session.arn)) ? "arn:aws:iam::${local.environment_management.account_ids[local.provider_name]}:role/member-delegation-read-only" : "arn:aws:iam::${local.environment_management.account_ids[local.provider_name]}:role/member-delegation-${local.vpc_name}-sandbox"
   }
 }
 
@@ -34,6 +34,6 @@ provider "aws" {
   alias  = "core-network-services"
   region = "eu-west-2"
   assume_role {
-    role_arn = can(regex("developer|sandbox|user", data.aws_caller_identity.original_session.arn)) ? "arn:aws:iam::${local.environment_management.account_ids["core-network-services-production"]}:role/read-dns-records" : "arn:aws:iam::${local.environment_management.account_ids["core-network-services-production"]}:role/modify-dns-records"
+    role_arn = can(regex("developer|sandbox|migration|user", data.aws_caller_identity.original_session.arn)) ? "arn:aws:iam::${local.environment_management.account_ids["core-network-services-production"]}:role/read-dns-records" : "arn:aws:iam::${local.environment_management.account_ids["core-network-services-production"]}:role/modify-dns-records"
   }
 }
