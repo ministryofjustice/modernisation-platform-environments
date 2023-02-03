@@ -15,19 +15,6 @@ data "aws_caller_identity" "modernisation_platform" {
   provider = aws.modernisation-platform
 }
 
-data "aws_iam_session_context" "whoami" {
-  provider = aws.original-session
-  arn      = data.aws_caller_identity.original_session.arn
-}
-
-output "original-session" {
-  value = data.aws_caller_identity.original_session
-}
-
-output "session_context" {
-  value = data.aws_iam_session_context.whoami
-}
-
 locals {
 
   application_name = "sprinkler"
