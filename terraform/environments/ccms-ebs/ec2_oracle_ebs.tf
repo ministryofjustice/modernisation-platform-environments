@@ -107,7 +107,6 @@ resource "aws_volume_attachment" "u01_att" {
   volume_id   = aws_ebs_volume.u01.id
   instance_id = aws_instance.ec2_oracle_ebs.id
 }
-
 resource "aws_ebs_volume" "arch" {
   lifecycle {
     ignore_changes = [kms_key_id]
@@ -182,5 +181,24 @@ resource "aws_ebs_volume" "techst" {
 resource "aws_volume_attachment" "techst_att" {
   device_name = "/dev/sdm"
   volume_id   = aws_ebs_volume.techst.id
+  instance_id = aws_instance.ec2_oracle_ebs.id
+}
+resource "aws_ebs_volume" "backup" {
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
+  availability_zone = "eu-west-2a"
+  size              = "8000"
+  type              = "io2"
+  iops              = 3000
+  encrypted         = true
+  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  tags = merge(local.tags,
+    { Name = "backup" }
+  )
+}
+resource "aws_volume_attachment" "backup_att" {
+  device_name = "/dev/sdn"
+  volume_id   = aws_ebs_volume.backup.id
   instance_id = aws_instance.ec2_oracle_ebs.id
 }

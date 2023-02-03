@@ -11,9 +11,9 @@ resource "aws_instance" "ec2_ebsapps" {
   iam_instance_profile        = aws_iam_instance_profile.iam_instace_profile_oracle_base.name
 
   # Due to a bug in terraform wanting to rebuild the ec2 if more than 1 ebs block is attached, we need the lifecycle clause below
-  #lifecycle {
-  #  ignore_changes = [ebs_block_device]
-  #}
+  lifecycle {
+    ignore_changes = [ebs_block_device]
+  }
   user_data_replace_on_change = true
   user_data                   = <<EOF
 #!/bin/bash
