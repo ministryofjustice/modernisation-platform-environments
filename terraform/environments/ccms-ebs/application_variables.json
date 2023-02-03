@@ -9,6 +9,7 @@
       "ami_owner": "self",
       "orace_base_prereqs_ami_name": "Oracle79-prereqs-v1_5",
       "key_name": "oracle-base-dev",
+      "key_name2": "",
       "webgate_no_instances": 1,
       "webgate_default_iops": 3000,
       "webgate_u01_size": 100,
@@ -42,10 +43,44 @@
       "ebsapps_u03_size": 50
     },
     "preproduction": {
-      "example_var": "preproduction-data"
+      "ec2_oracle_instance_type_ebsdb": "m5d.4xlarge",
+      "ec2_oracle_instance_type_ebsapps": "m5d.2xlarge",
+      "ec2_oracle_instance_type_webgate": "m5d.large",
+      "ec2_oracle_instance_type_accessgate": "m5d.xlarge",
+      "ami_owner": "767123802783",
+      "orace_base_prereqs_ami_name": "Oracle79-prereqs-v1_5",
+      "key_name": "oracle-base-dev",
+      "webgate_no_instances": 1,
+      "webgate_default_iops": 3000,
+      "webgate_u01_size": 100,
+      "accessgate_no_instances": 2,
+      "accessgate_default_iops": 3000,
+      "accessgate_u01_size": 150,
+      "ebsapps_no_instances": 1,
+      "ebsapps_default_iops": 3000,
+      "ebsapps_exhome_size": 60,
+      "ebsapps_u01_size": 10,
+      "ebsapps_u03_size": 50
     },
     "production": {
-      "example_var": "production-data"
+      "ec2_oracle_instance_type_ebsdb": "m5d.4xlarge",
+      "ec2_oracle_instance_type_ebsapps": "m5d.2xlarge",
+      "ec2_oracle_instance_type_webgate": "m5d.large",
+      "ec2_oracle_instance_type_accessgate": "m5d.xlarge",
+      "ami_owner": "767123802783",
+      "orace_base_prereqs_ami_name": "Oracle79-prereqs-v1_5",
+      "key_name": "oracle-base-dev",
+      "webgate_no_instances": 1,
+      "webgate_default_iops": 3000,
+      "webgate_u01_size": 100,
+      "accessgate_no_instances": 2,
+      "accessgate_default_iops": 3000,
+      "accessgate_u01_size": 150,
+      "ebsapps_no_instances": 1,
+      "ebsapps_default_iops": 3000,
+      "ebsapps_exhome_size": 60,
+      "ebsapps_u01_size": 10,
+      "ebsapps_u03_size": 50
     }
   },
   "ec2_sg_ingress_rules": {
