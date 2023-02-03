@@ -109,9 +109,9 @@ locals {
       vpc_security_group_ids       = [aws_security_group.webserver.id]
     }
     tags = {
-      description       = "oasys webserver"
-      component         = "web"
-      server-type       = "oasys-web"
+      description = "oasys webserver"
+      component   = "web"
+      server-type = "oasys-web"
     }
 
     user_data_cloud_init = {
