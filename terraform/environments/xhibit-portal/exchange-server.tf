@@ -74,9 +74,6 @@ resource "aws_volume_attachment" "exchange-disk1" {
   instance_id  = aws_instance.exchange-server.id
 }
 
-
-
-
 resource "aws_ebs_volume" "exchange-disk2" {
   depends_on        = [aws_instance.exchange-server]
   availability_zone = "${local.region}a"

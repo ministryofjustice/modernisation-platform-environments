@@ -61,18 +61,21 @@ locals {
       key_name                     = aws_key_pair.ec2-user.key_name
       monitoring                   = true
       metadata_options_http_tokens = "optional"
-      vpc_security_group_ids       = [aws_security_group.weblogic_common.id]
+      vpc_security_group_ids       = [aws_security_group.private.id]
     }
 
     user_data_cloud_init = {
       args = {
-        lifecycle_hook_name = "ready-hook"
+        lifecycle_hook_name  = "ready-hook"
+        branch               = "main"
+        ansible_repo         = "modernisation-platform-configuration-management"
+        ansible_repo_basedir = "ansible"
+        ansible_args         = "--tags ec2provision"
       }
       scripts = [
         "ansible-ec2provision.sh.tftpl",
         "post-ec2provision.sh.tftpl"
       ]
-      write_files = {}
     }
 
     autoscaling_group = {
@@ -81,7 +84,8 @@ locals {
       min_size         = 0
 
       health_check_grace_period = 300
-      health_check_type         = "ELB"
+      # health_check_type         = "ELB"
+      health_check_type         = "EC2" # using EC2 for now while we test, otherwise server is killed if weblogic stopped
       force_delete              = true
       termination_policies      = ["OldestInstance"]
       target_group_arns         = []
@@ -148,98 +152,4 @@ module "ec2_weblogic_autoscaling_group" {
   subnet_ids         = module.environment.subnets["private"].ids
   tags               = merge(local.tags, local.ec2_weblogic.tags, try(each.value.tags, {}))
   account_ids_lookup = local.environment_management.account_ids
-  branch             = try(each.value.branch, "main")
 }
-
-#------------------------------------------------------------------------------
-# Common Security Group for Weblogic Instances
-#------------------------------------------------------------------------------
-
-resource "aws_security_group" "weblogic_common" {
-  #checkov:skip=CKV2_AWS_5:skip "Ensure that Security Groups are attached to another resource" - attached in nomis-stack module
-  description = "Common security group for weblogic instances"
-  name        = "weblogic-common"
-  vpc_id      = module.environment.vpc.id
-
-  ingress {
-    description = "Internal access to self on all ports"
-    from_port   = 0
-    to_port     = 0
-    protocol    = -1
-    self        = true
-  }
-
-  ingress {
-    description = "Internal access to ssh"
-    from_port   = "22"
-    to_port     = "22"
-    protocol    = "TCP"
-    security_groups = [
-      aws_security_group.jumpserver-windows.id,
-      module.bastion_linux.bastion_security_group
-    ]
-  }
-
-  ingress {
-    description = "External access to ssh"
-    from_port   = "22"
-    to_port     = "22"
-    protocol    = "TCP"
-    cidr_blocks = local.environment_config.external_remote_access_cidrs
-  }
-
-  ingress {
-    description = "Internal access to Weblogic Admin console"
-    from_port   = "7001"
-    to_port     = "7001"
-    protocol    = "TCP"
-    security_groups = concat([
-      aws_security_group.jumpserver-windows.id,
-      module.bastion_linux.bastion_security_group
-    ], local.lb_security_group_ids)
-  }
-
-  ingress {
-    description = "Internal access to Weblogic Http"
-    from_port   = "7777"
-    to_port     = "7777"
-    protocol    = "TCP"
-    security_groups = concat([
-      aws_security_group.jumpserver-windows.id,
-      module.bastion_linux.bastion_security_group
-    ], local.lb_security_group_ids)
-  }
-
-  ingress {
-    description = "External access to prometheus node exporter"
-    from_port   = "9100"
-    to_port     = "9100"
-    protocol    = "TCP"
-    cidr_blocks = [module.ip_addresses.moj_cidr.aws_cloud_platform_vpc]
-  }
-
-  ingress {
-    description = "External access to prometheus script exporter"
-    from_port   = "9172"
-    to_port     = "9172"
-    protocol    = "TCP"
-    cidr_blocks = [module.ip_addresses.moj_cidr.aws_cloud_platform_vpc]
-  }
-
-  egress {
-    description = "Allow all egress"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    #tfsec:ignore:aws-vpc-no-public-egress-sgr
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "weblogic-commmon"
-    }
-  )
-}
-

@@ -1,27 +1,16 @@
-# ec2-autoscaling-group module
+# `ec2_autoscaling_group` module
 
-Terraform module for standing up an auto-scale group
+Terraform module for standing up ec2 autoscaling group resources:
 
-## Jumpserver example
+- launch template
+- autoscaling group
+- optional autoscaling group schedules, e.g. for reducing desired count out of hours
+- optional ssm parameters
+- iam role and policy
+- optional load balancer target group
 
-As this is a windows machine this uses a user_data_raw script which has to be a base64 encoded file. This is part of the ec2-jumpserver.tf locals block.
+The launch template is defined by the instance variable which follows the
+`aws_ec2_instance` resource parameters. So you can easily swap between using
+this `ec2_autoscaling_group` module and the `ec2_instance` module.
 
-```hcl
-
-    ec2_jumpservers = {
-      jumpserver0 = {
-        tags = {
-          ami         = "nomis_windows_server_2022_jumpserver"
-          description = "jumpserver instance"
-          monitored   = false
-        }
-        ami_name  = "nomis_windows_server_2022_jumpserver*"
-        # branch   = var.BRANCH_NAME # comment in if testing ansible
-      }
-    }
-
-```
-
-The windows user_data_raw jumpserver-user-data.yaml file gets a list of users from AWS Secrets Manager using [the AWS Get-SECSecretList](https://docs.aws.amazon.com/powershell/latest/reference/items/Get-SECSecretList.html) cmdlet. This creates a user with the password held in Secrets Manager which is put there by terraform as part of the resource in the ec2-jumpserver.tf file. A scheduled task on the EC2 jumpserver instance checks for password changes every 15 minutes as this process runs locally on each machine..
-
-Non-Windows EC2 instances use a user_data_cloud_init variable instead which doesn't require all these steps.
+See `environments/nomis` for usage examples.

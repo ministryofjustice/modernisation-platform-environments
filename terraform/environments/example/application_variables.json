@@ -20,7 +20,19 @@
       "region": "eu-west-2",
       "retention_period": "14",
       "server_port": "80",
-      "skip_final_snapshot": "true"
+      "skip_final_snapshot": "true",
+      "container_instance_type": "t3.micro",
+      "container_os_type": "linux",
+      "container_ami_image_id": "ami-07bce8cc7445f0677",
+      "ecs_key_name": "",
+      "ec2_desired_capacity": "2",
+      "ec2_max_size": "4",
+      "ec2_min_size": "2",
+      "container_cpu": "256",
+      "container_memory": "1024",
+      "task_definition_volume": "application_volume",
+      "network_mode": "bridge",
+      "app_count": "1"
     },
     "test": {
       "example_var": "test-data"

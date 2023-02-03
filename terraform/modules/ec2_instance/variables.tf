@@ -34,14 +34,9 @@ variable "availability_zone" {
   nullable    = false
 }
 
-variable "subnet_set" {
+variable "subnet_id" {
   type        = string
-  description = "Fixed variable to specify subnet-set for RAM shared subnets"
-}
-
-variable "subnet_name" {
-  type        = string
-  description = "Name of subnet within the given subnet-set"
+  description = "The subnet id in which to deploy the infrastructure"
 }
 
 variable "tags" {
@@ -53,24 +48,6 @@ variable "account_ids_lookup" {
   description = "A map of account names to account ids that can be used for AMI owner"
   type        = map(any)
   default     = {}
-}
-
-variable "ansible_repo" {
-  type        = string
-  description = "Optionally provision the server using this ansible_repo"
-  default     = null
-}
-
-variable "ansible_repo_basedir" {
-  type        = string
-  description = "Base directory within ansible_repo where ansible code is located"
-  default     = null
-}
-
-variable "branch" {
-  type        = string
-  description = "Git hub branch code is being run from.  For cloning ansible repo"
-  default     = ""
 }
 
 variable "ami_name" {
@@ -111,13 +88,13 @@ variable "instance" {
 }
 
 variable "user_data_raw" {
-  description = "Windows user_data file"
+  description = "Base64 encoded user data, script or cloud formation template"
   type        = string
   default     = null
 }
 
 variable "user_data_cloud_init" {
-  description = "Map of cloud-init config write_file sections for user data"
+  description = "Use this instead of user_data_raw to run multiple scripts using cloud_init"
   type = object({
     args    = optional(map(string))
     scripts = optional(list(string))
@@ -125,7 +102,7 @@ variable "user_data_cloud_init" {
       path        = string
       owner       = string
       permissions = string
-    })))
+    })), {})
   })
   default = null
 }
