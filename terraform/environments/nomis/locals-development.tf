@@ -1,25 +1,6 @@
 # nomis-development environment settings
 locals {
   nomis_development = {
-    # account specific CIDRs for EC2 security groups
-    external_database_access_cidrs = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.devtest,
-      module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
-      module.ip_addresses.moj_cidr.aws_analytical_platform_aggregate,
-      module.ip_addresses.azure_studio_hosting_cidrs.devtest,
-      module.ip_addresses.azure_nomisapi_cidrs.devtest,
-    ])
-    external_oem_agent_access_cidrs = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.devtest,
-    ])
-    external_remote_access_cidrs = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.devtest,
-    ])
-    external_weblogic_access_cidrs = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.devtest,
-      module.ip_addresses.azure_fixngo_cidrs.internet_egress
-    ])
-
     # vars common across ec2 instances
     ec2_common = {
       patch_approval_delay_days = 3
@@ -40,9 +21,11 @@ locals {
       cwagent-nomis-autologoff = {
         retention_days = 90
       }
+      cwagent-weblogic-logs = {
+        retention_days = 30
+      }
     }
 
-    databases_legacy = {}
     databases = {
       # Naming
       # *-nomis-db-1: NOMIS, NDH, TRDATA

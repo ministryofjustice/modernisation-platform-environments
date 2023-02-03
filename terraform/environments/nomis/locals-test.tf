@@ -1,25 +1,6 @@
 # nomis-test environment settings
 locals {
   nomis_test = {
-    # account specific CIDRs for EC2 security groups
-    external_database_access_cidrs = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.devtest,
-      module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
-      module.ip_addresses.moj_cidr.aws_analytical_platform_aggregate,
-      module.ip_addresses.azure_studio_hosting_cidrs.devtest,
-      module.ip_addresses.azure_nomisapi_cidrs.devtest,
-    ])
-    external_oem_agent_access_cidrs = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.devtest,
-    ])
-    external_remote_access_cidrs = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.devtest,
-    ])
-    external_weblogic_access_cidrs = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.devtest,
-      module.ip_addresses.azure_fixngo_cidrs.internet_egress
-    ])
-
     # vars common across ec2 instances
     ec2_common = {
       patch_approval_delay_days = 3
@@ -40,19 +21,8 @@ locals {
       cwagent-nomis-autologoff = {
         retention_days = 90
       }
-    }
-
-    # Legacy database module, do not add any more entries here
-    databases_legacy = {
-      CNOMT1 = {
-        ami_name           = "nomis_db_STIG_CNOMT1-2022-04-21*"
-        asm_data_capacity  = 100
-        asm_flash_capacity = 2
-        description        = "Test NOMIS T1 database with a dataset of T1PDL0009 (note: only NOMIS db, NDH db is not included."
-        tags = {
-          monitored   = false
-          oracle-sids = "CNOMT1"
-        }
+      cwagent-weblogic-logs = {
+        retention_days = 30
       }
     }
 
@@ -64,6 +34,7 @@ locals {
       # *-nomis-db-3: HA
       t1-nomis-db-1 = {
         tags = {
+          nomis-environment   = "t1"
           server-type         = "nomis-db"
           description         = "T1 NOMIS database"
           oracle-sids         = "CNOMT1"
@@ -106,6 +77,7 @@ locals {
 
       t1-nomis-db-2 = {
         tags = {
+          nomis-environment   = "t1"
           server-type         = "nomis-db"
           description         = "T1 NOMIS Audit database to replace Azure T1PDL0010"
           oracle-sids         = "T1CNMAUD"
@@ -147,6 +119,7 @@ locals {
 
       t3-nomis-db-1 = {
         tags = {
+          nomis-environment   = "t3"
           server-type         = "nomis-db"
           description         = "T3 NOMIS database to replace Azure T3PDL0070"
           oracle-sids         = "T3CNOM"
@@ -193,7 +166,7 @@ locals {
         tags = {
           ami                = "nomis_rhel_6_10_weblogic_appserver_10_3"
           description        = "T1 nomis weblogic 10.3"
-          oracle-db-hostname = "db.CNOMT1.nomis.hmpps-test.modernisation-platform.internal"
+          oracle-db-hostname = "t1-nomis-db-1"
           nomis-environment  = "t1"
           oracle-db-name     = "CNOMT1"
           server-type        = "nomis-web"

@@ -85,6 +85,46 @@ resource "aws_cloudwatch_metric_alarm" "cpu_utilization" {
 }
 
 # ==============================================================================
+# Oracle DB Alerts
+# ==============================================================================
+
+# Oracle db connection issue
+resource "aws_cloudwatch_metric_alarm" "oracle_db_disconnected" {
+  alarm_name          = "oracle_db_disconnected"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = "5"
+  datapoints_to_alarm = "5"
+  metric_name         = "collectd_exec-db_connected"
+  namespace           = "CWAgent"
+  period              = "60"
+  statistic           = "Average"
+  threshold           = "1"
+  alarm_description   = "Oracle db connection to a particular SID is not working. See: https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4294246698/Oracle+db+connection+alarm for remediation steps."
+  alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
+  tags = {
+    Name = "oracle_db_disconnected"
+  }
+}
+
+# Oracle batch processing issue
+resource "aws_cloudwatch_metric_alarm" "oracle_batch_error" {
+  alarm_name          = "oracle_batch_error"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = "5"
+  datapoints_to_alarm = "5"
+  metric_name         = "collectd_exec-batch_error"
+  namespace           = "CWAgent"
+  period              = "60"
+  statistic           = "Average"
+  threshold           = "1"
+  alarm_description   = "Oracle db is either in long-running batch or failed batch status. See: https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4295000327/Oracle+Batch+alert for remediation steps."
+  alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
+  tags = {
+    Name = "oracle_batch_error"
+  }
+}
+
+# ==============================================================================
 # EC2 Instance Statuses
 # ==============================================================================
 
