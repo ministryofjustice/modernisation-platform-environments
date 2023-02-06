@@ -18,8 +18,8 @@ resource "aws_launch_template" "this" {
       ebs {
         delete_on_termination = block_device_mappings.value.type != null ? true : null
         encrypted             = block_device_mappings.value.type != null ? true : null
-        kms_key_id            = block_device_mappings.value.type != null ? data.aws_kms_key.by_alias.arn : null
 
+        kms_key_id  = try(block_device_mappings.value.kms_key_id, local.ebs_kms_key_id)
         iops        = try(block_device_mappings.value.iops > 0, false) ? block_device_mappings.value.iops : null
         throughput  = try(block_device_mappings.value.throughput > 0, false) ? block_device_mappings.value.throughput : null
         volume_size = block_device_mappings.value.size
@@ -67,7 +67,7 @@ resource "aws_launch_template" "this" {
     })
   }
 
-  # all volumes will get tagged with the same name
+  # all volumes will get tagged with the same name
   tag_specifications {
     resource_type = "volume"
     tags = merge(local.tags, {
@@ -76,7 +76,7 @@ resource "aws_launch_template" "this" {
   }
 
   lifecycle {
-    # description and tags will be updated by Image Builder
+    # description and tags will be updated by Image Builder
     ignore_changes = [
       description,
       tags["CreatedBy"],

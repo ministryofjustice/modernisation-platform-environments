@@ -97,6 +97,12 @@ variable "ebs_volumes_copy_all_from_ami" {
   default     = true
 }
 
+variable "ebs_kms_key_id" {
+  description = "KMS Key to use for EBS volumes if not explicitly set in ebs_volumes variable"
+  type        = string
+  default     = null
+}
+
 variable "ebs_volume_config" {
   description = "EC2 volume configurations, where key is a label, e.g. flash, which is assigned to the disk in ebs_volumes.  All disks with same label have the same configuration.  If not specified, use values from the AMI.  If total_size specified, the volume size is this divided by the number of drives with the given label"
   type = map(object({
@@ -104,21 +110,21 @@ variable "ebs_volume_config" {
     throughput = optional(number)
     total_size = optional(number)
     type       = optional(string)
+    kms_key_id = optional(string)
   }))
 }
 
 variable "ebs_volumes" {
   description = "EC2 volumes, see aws_ebs_volume for documentation.  key=volume name, value=ebs_volume_config key.  label is used as part of the Name tag"
-  type        = any
-  # Commenting below out as it has unexpected results when used with merge()
-  #  type = map(object({
-  #    label       = string
-  #    snapshot_id = optional(string)
-  #    iops        = optional(number)
-  #    throughput  = optional(number)
-  #    size        = optional(number)
-  #    type        = optional(string)
-  #  }))
+  type = map(object({
+    label       = optional(string)
+    snapshot_id = optional(string)
+    iops        = optional(number)
+    throughput  = optional(number)
+    size        = optional(number)
+    type        = optional(string)
+    kms_key_id  = optional(string)
+  }))
 }
 
 variable "iam_resource_names_prefix" {
