@@ -98,7 +98,7 @@ variable "ebs_volumes_copy_all_from_ami" {
 }
 
 variable "ebs_kms_key_id" {
-  description = "KMS Key to use for EBS volumes if not explicitly set in ebs_volumes variable"
+  description = "KMS Key to use for EBS volumes if not explicitly set in ebs_volumes variable.  If null, uses the local account key or the corresponding AMI volume ebs key"
   type        = string
   default     = null
 }

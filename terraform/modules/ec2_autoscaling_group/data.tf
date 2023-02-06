@@ -18,10 +18,6 @@ data "aws_ami" "this" {
   }
 }
 
-data "aws_kms_key" "by_alias" {
-  key_id = "alias/aws/ebs"
-}
-
 data "aws_ec2_instance_type" "this" {
   instance_type = var.instance.instance_type
 }

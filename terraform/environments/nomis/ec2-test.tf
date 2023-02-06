@@ -80,8 +80,8 @@ module "ec2_test_instance" {
   application_name   = local.application_name
   environment        = local.environment
   region             = local.region
-  availability_zone  = local.availability_zone
-  subnet_id          = module.environment.subnet["private"][local.availability_zone].id
+  availability_zone  = local.availability_zone_1
+  subnet_id          = module.environment.subnet["private"][local.availability_zone_1].id
   tags               = merge(local.tags, local.ec2_test.tags, try(each.value.tags, {}))
   account_ids_lookup = local.environment_management.account_ids
 }

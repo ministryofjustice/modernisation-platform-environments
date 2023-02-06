@@ -48,30 +48,12 @@ locals {
           disable_api_termination = true
         }
         ebs_volumes = {
-          "/dev/sdb" = { # /u01
-            type = "gp3"
-            size = 100
-          }
-          "/dev/sdc" = { # /u02
-            type = "gp3"
-            size = 100
-          }
+          "/dev/sdb" = { size = 100 }
+          "/dev/sdc" = { size = 100 }
         }
         ebs_volume_config = {
-          app = {
-            type = "gp3"
-          }
-          data = {
-            type       = "gp3"
-            total_size = 100
-          }
-          flash = {
-            type       = "gp3"
-            total_size = 50
-          }
-          swap = {
-            type = "gp3"
-          }
+          data  = { total_size = 100 }
+          flash = { total_size = 50 }
         }
       }
 
@@ -90,30 +72,12 @@ locals {
           disable_api_termination = true
         }
         ebs_volumes = {
-          "/dev/sdb" = { # /u01
-            type = "gp3"
-            size = 100
-          }
-          "/dev/sdc" = { # /u02
-            type = "gp3"
-            size = 100
-          }
+          "/dev/sdb" = { size = 100 }
+          "/dev/sdc" = { size = 100 }
         }
         ebs_volume_config = {
-          app = {
-            type = "gp3"
-          }
-          data = {
-            type       = "gp3"
-            total_size = 200
-          }
-          flash = {
-            type       = "gp3"
-            total_size = 2
-          }
-          swap = {
-            type = "gp3"
-          }
+          data  = { total_size = 200 }
+          flash = { total_size = 2 }
         }
       }
 
@@ -132,30 +96,12 @@ locals {
           disable_api_termination = true
         }
         ebs_volumes = {
-          "/dev/sdb" = { # /u01
-            type = "gp3"
-            size = 100
-          }
-          "/dev/sdc" = { # /u02
-            type = "gp3"
-            size = 500
-          }
+          "/dev/sdb" = { size = 100 }
+          "/dev/sdc" = { size = 500 }
         }
         ebs_volume_config = {
-          app = {
-            type = "gp3"
-          }
-          data = {
-            type       = "gp3"
-            total_size = 2000
-          }
-          flash = {
-            type       = "gp3"
-            total_size = 500
-          }
-          swap = {
-            type = "gp3"
-          }
+          data  = { total_size = 2000 }
+          flash = { total_size = 500 }
         }
       }
     }

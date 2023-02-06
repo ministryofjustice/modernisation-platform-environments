@@ -7,8 +7,6 @@ locals {
   }
   tags = merge(local.default_tags, local.ssm_parameters_prefix_tag, var.tags)
 
-  ebs_kms_key_id = coalesce(var.ebs_kms_key_id, data.aws_kms_key.by_alias.arn)
-
   ami_block_device_mappings = {
     for bdm in data.aws_ami.this.block_device_mappings : bdm.device_name => bdm
   }
