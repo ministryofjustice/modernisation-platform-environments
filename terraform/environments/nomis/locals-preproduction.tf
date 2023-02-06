@@ -24,6 +24,9 @@ locals {
       cwagent-weblogic-logs = {
         retention_days = 30
       }
+      cwagent-windows-system = {
+        retention_days = 30
+      }
     }
 
     databases = {

@@ -29,6 +29,9 @@ locals {
       cwagent-weblogic-logs = {
         retention_days = 30
       }
+      cwagent-windows-system = {
+        retention_days = 30
+      }
     }
 
     # Add database instances here. They will be created using ec2-database.tf
