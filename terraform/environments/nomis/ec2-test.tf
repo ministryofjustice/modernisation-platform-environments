@@ -67,6 +67,7 @@ module "ec2_test_instance" {
   instance                      = merge(local.ec2_test.instance, lookup(each.value, "instance", {}))
   user_data_cloud_init          = merge(local.ec2_test.user_data_cloud_init, lookup(each.value, "user_data_cloud_init", {}))
   ebs_volumes_copy_all_from_ami = try(each.value.ebs_volumes_copy_all_from_ami, true)
+  ebs_kms_key_id                = module.environment.kms_keys["ebs"].arn
   ebs_volume_config             = lookup(each.value, "ebs_volume_config", {})
   ebs_volumes                   = lookup(each.value, "ebs_volumes", {})
   ssm_parameters_prefix         = lookup(each.value, "ssm_parameters_prefix", "test/")
@@ -102,6 +103,7 @@ module "ec2_test_autoscaling_group" {
   instance                      = merge(local.ec2_test.instance, lookup(each.value, "instance", {}))
   user_data_cloud_init          = merge(local.ec2_test.user_data_cloud_init, lookup(each.value, "user_data_cloud_init", {}))
   ebs_volumes_copy_all_from_ami = try(each.value.ebs_volumes_copy_all_from_ami, true)
+  ebs_kms_key_id                = module.environment.kms_keys["ebs"].arn
   ebs_volume_config             = lookup(each.value, "ebs_volume_config", {})
   ebs_volumes                   = lookup(each.value, "ebs_volumes", {})
   ssm_parameters_prefix         = lookup(each.value, "ssm_parameters_prefix", "test/")

@@ -71,6 +71,7 @@ module "ec2_jumpserver" {
   instance                      = merge(local.ec2_jumpserver.instance, lookup(each.value, "instance", {}))
   user_data_raw                 = local.ec2_jumpserver.user_data_raw
   ebs_volumes_copy_all_from_ami = try(each.value.ebs_volumes_copy_all_from_ami, local.ec2_jumpserver.ebs_volumes_copy_all_from_ami)
+  ebs_kms_key_id                = module.environment.kms_keys["ebs"].arn
   ebs_volume_config             = lookup(each.value, "ebs_volume_config", {})
   ebs_volumes                   = lookup(each.value, "ebs_volumes", local.ec2_jumpserver.ebs_volumes)
   ssm_parameters_prefix         = "jumpserver/"

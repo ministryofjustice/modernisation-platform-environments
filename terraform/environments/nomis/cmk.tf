@@ -5,6 +5,10 @@
 # to use this key
 #------------------------------------------------------------------------------
 
+data "aws_kms_key" "default_ebs" {
+  key_id = "alias/aws/ebs"
+}
+
 resource "aws_kms_key" "nomis-cmk" {
   count                   = local.environment == "test" ? 1 : 0
   description             = "Nomis Managed Key for AMI Sharing"

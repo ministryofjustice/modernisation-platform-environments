@@ -138,6 +138,7 @@ locals {
     }
 
     ec2_test_instances = {
+      # Remove data.aws_kms_key from cmk.tf once the NDH servers are removed
       t1-ndh-app-1 = {
         tags = {
           server-type       = "ndh-app"
@@ -146,6 +147,9 @@ locals {
           os-type           = "Linux"
           component         = "ndh"
           nomis-environment = "t1"
+        }
+        ebs_volumes = {
+          "/dev/sda1" = { kms_key_id = data.aws_kms_key.default_ebs.arn }
         }
         ami_name = "nomis_rhel_7_9_baseimage_2022-11-01T13-43-46.384Z"
         # branch   = var.BRANCH_NAME # comment in if testing ansible
@@ -158,6 +162,9 @@ locals {
           os-type           = "Linux"
           component         = "ndh"
           nomis-environment = "t1"
+        }
+        ebs_volumes = {
+          "/dev/sda1" = { kms_key_id = data.aws_kms_key.default_ebs.arn }
         }
         ami_name = "nomis_rhel_7_9_baseimage_2022-11-01T13-43-46.384Z"
         # branch   = var.BRANCH_NAME # comment in if testing ansible
