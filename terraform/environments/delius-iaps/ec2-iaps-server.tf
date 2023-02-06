@@ -51,7 +51,9 @@ locals {
 
     iam_policies = [
       aws_iam_policy.iaps_ec2_policy.arn,
-      aws_iam_policy.ssm_least_privilege_policy.arn
+      aws_iam_policy.ssm_least_privilege_policy.arn,
+      "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy" # Managed policy for cloudwatch agent to talk to CloudWatch
+
     ]
 
   }
