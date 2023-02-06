@@ -55,14 +55,14 @@ tasks:
             param(
               [string]$OutFilePath
             )
-            (Get-SSMParameter -Name "cloud-watch-config-windows").Value | Out-File -FilePath $OutFilePath -Force -NoNewline  
+            (Get-SSMParameter -Name "cloud-watch-config-windows").Value | Out-File -FilePath $OutFilePath -Force -NoNewline -Encoding Ascii 
           }
 
           function Start-AmazonCloudWatchAgent {
             param(
               [string]$ConfigurationFilePath
             )
-            "C:\Program Files\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent-ctl.ps1 -a fetch-config -m ec2 -s -c file:$ConfigurationFilePath"
+            & "C:\Program Files\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent-ctl.ps1" -a fetch-config -m ec2 -s -c file:"$ConfigurationFilePath"
           }
 
           # Check CWAgent is installed, if it isn't then install it
