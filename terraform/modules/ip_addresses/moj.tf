@@ -25,7 +25,7 @@ locals {
     atos_arkc_ras = "10.175.0.0/16"
     atos_arkf_ras = "10.176.0.0/16"
 
-    # for connectivity from other platforms
+    # for connectivity from other platforms
     aws_cloud_platform_vpc            = "172.20.0.0/16"
     aws_analytical_platform_aggregate = "10.200.0.0/15"
   }
