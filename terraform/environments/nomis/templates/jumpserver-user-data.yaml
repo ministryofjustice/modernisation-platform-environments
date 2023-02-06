@@ -43,4 +43,3 @@ tasks:
           $path = "C:\Users\Administrator\Documents\add_users.ps1"
           Out-File -FilePath $path -InputObject $add_users
           Register-ScheduledJob -Name "add_users" -FilePath $path -RunEvery $(New-TimeSpan -Minutes 15) -RunNow
-          
