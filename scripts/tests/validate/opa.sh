@@ -2,7 +2,7 @@
 
 set -e
 
-files=$(find . -type f -name *.tf -not -path "*/.terraform/*" -not -path "*/providers.tf" -not -path "*/backend.tf")
+files=$(find . -type f -name *.tf -not -path "*/.terraform/*" -not -path "*/*providers.tf" -not -path "*/*backend.tf")
 
 terraform(){
   for file in $files

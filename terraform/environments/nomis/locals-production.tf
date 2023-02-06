@@ -29,6 +29,9 @@ locals {
       cwagent-weblogic-logs = {
         retention_days = 30
       }
+      cwagent-windows-system = {
+        retention_days = 30
+      }
     }
 
     # Add database instances here. They will be created using ec2-database.tf
@@ -54,31 +57,14 @@ locals {
           disable_api_termination   = true
           metadata_endpoint_enabled = "enabled"
         }
+        # reduce sdc to 1000 when we move into preprod subscription
         ebs_volumes = {
-          "/dev/sdb" = { # /u01
-            size = 100
-            type = "gp3"
-          }
-          "/dev/sdc" = { # /u02
-            type = "gp3"
-            size = 5120 # reduce this to 1000 when we move into preprod subscription
-          }
+          "/dev/sdb" = { size = 100 }
+          "/dev/sdc" = { size = 5120 }
         }
         ebs_volume_config = {
-          app = {
-            type = "gp3"
-          }
-          data = {
-            type       = "gp3"
-            total_size = 4000
-          }
-          flash = {
-            type       = "gp3"
-            total_size = 1000
-          }
-          swap = {
-            type = "gp3"
-          }
+          data  = { total_size = 4000 }
+          flash = { total_size = 1000 }
         }
       }
 
@@ -99,31 +85,15 @@ locals {
           metadata_endpoint_enabled = "enabled"
         }
         ebs_volumes = {
-          "/dev/sdb" = { # /u01
-            size = 100
-            type = "gp3"
-          }
-          "/dev/sdc" = { # /u02
+          "/dev/sdb" = { size = 100 }
+          "/dev/sdc" = {
             size = 3000
-            type = "gp3"
             iops = 9000
           }
         }
         ebs_volume_config = {
-          app = {
-            type = "gp3"
-          }
-          data = {
-            type       = "gp3"
-            total_size = 4000
-          }
-          flash = {
-            type       = "gp3"
-            total_size = 1000
-          }
-          swap = {
-            type = "gp3"
-          }
+          data  = { total_size = 4000 }
+          flash = { total_size = 1000 }
         }
       }
 
@@ -143,30 +113,12 @@ locals {
           metadata_endpoint_enabled = "enabled"
         }
         ebs_volumes = {
-          "/dev/sdb" = { # /u01
-            size = 100
-            type = "gp3"
-          }
-          "/dev/sdc" = { # /u02
-            size = 1000
-            type = "gp3"
-          }
+          "/dev/sdb" = { size = 100 }
+          "/dev/sdc" = { size = 1000 }
         }
         ebs_volume_config = {
-          app = {
-            type = "gp3"
-          }
-          data = {
-            type       = "gp3"
-            total_size = 3000
-          }
-          flash = {
-            type       = "gp3"
-            total_size = 500
-          }
-          swap = {
-            type = "gp3"
-          }
+          data  = { total_size = 3000 }
+          flash = { total_size = 500 }
         }
       }
     }

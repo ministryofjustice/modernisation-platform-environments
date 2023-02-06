@@ -48,7 +48,7 @@ module "bastion_linux" {
   extra_user_data_content = templatefile("templates/bastion-user-data.sh.tftpl", {
     region                                  = local.region
     application_environment_internal_domain = module.environment.domains.internal.application_environment
-    X11Forwarding                           = "yes" # set back to no after NDH installation testing
+    X11Forwarding                           = "yes" # set back to no after NDH installation testing
   })
 
   # Tags

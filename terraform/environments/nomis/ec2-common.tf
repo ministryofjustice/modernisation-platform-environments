@@ -91,7 +91,8 @@ data "aws_iam_policy_document" "cloud_watch_custom" {
       "ssm:GetParameter",
       "ssm:GetParameters"
     ]
-    resources = [aws_ssm_parameter.cloud_watch_config_linux.arn]
+    resources = [aws_ssm_parameter.cloud_watch_config_linux.arn,
+    aws_ssm_parameter.cloud_watch_config_windows.arn]
   }
 }
 
@@ -305,7 +306,7 @@ resource "aws_ssm_document" "cloud_watch_agent" {
   )
 }
 
-resource "aws_ssm_association" "manage_cloud_watch_agent_linux" {
+/* resource "aws_ssm_association" "manage_cloud_watch_agent_linux" {
   name             = aws_ssm_document.cloud_watch_agent.name
   association_name = "manage-cloud-watch-agent"
   parameters = { # name of ssm parameter containing cloud watch agent config file
@@ -317,7 +318,7 @@ resource "aws_ssm_association" "manage_cloud_watch_agent_linux" {
   }
   apply_only_at_cron_interval = false
   schedule_expression         = "cron(45 7 ? * TUE *)"
-}
+} */
 
 resource "aws_ssm_parameter" "cloud_watch_config_linux" {
   #checkov:skip=CKV2_AWS_34:there should not be anything secret in this config
@@ -334,7 +335,20 @@ resource "aws_ssm_parameter" "cloud_watch_config_linux" {
   )
 }
 
-# TODO: config for windows
+resource "aws_ssm_parameter" "cloud_watch_config_windows" {
+  #checkov:skip=CKV2_AWS_34:there should not be anything secret in this config
+  description = "cloud watch agent config for windows"
+  name        = "cloud-watch-config-windows"
+  type        = "String"
+  value       = file("./templates/cloud_watch_windows.json")
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "cloud-watch-config-windows"
+    },
+  )
+}
 
 #------------------------------------------------------------------------------
 # SSM Agent - update Systems Manager Agent
@@ -392,8 +406,8 @@ data "aws_iam_policy_document" "ssm_ec2_start_stop_kms" {
       "kms:ListGrants",
       "kms:RevokeGrant"
     ]
-    # we have a legacy CMK that's used in production that will be retired but in the meantime requires permissions
-    resources = [local.environment == "test" ? aws_kms_key.nomis-cmk[0].arn : data.aws_kms_key.nomis_key.arn, module.environment.kms_keys["ebs"].arn]
+    # Allow access to the AMI encryption key
+    resources = [module.environment.kms_keys["ebs"].arn]
   }
 
   statement {
