@@ -51,30 +51,12 @@ locals {
           disable_api_termination = true
         }
         ebs_volumes = {
-          "/dev/sdb" = { # /u01
-            type = "gp3"
-            size = 100
-          }
-          "/dev/sdc" = { # /u02
-            type = "gp3"
-            size = 100
-          }
+          "/dev/sdb" = { size = 100 }
+          "/dev/sdc" = { size = 100 }
         }
         ebs_volume_config = {
-          app = {
-            type = "gp3"
-          }
-          data = {
-            type       = "gp3"
-            total_size = 100
-          }
-          flash = {
-            type       = "gp3"
-            total_size = 50
-          }
-          swap = {
-            type = "gp3"
-          }
+          data  = { total_size = 100 }
+          flash = { total_size = 50 }
         }
       }
 
@@ -93,30 +75,12 @@ locals {
           disable_api_termination = true
         }
         ebs_volumes = {
-          "/dev/sdb" = { # /u01
-            type = "gp3"
-            size = 100
-          }
-          "/dev/sdc" = { # /u02
-            type = "gp3"
-            size = 100
-          }
+          "/dev/sdb" = { size = 100 }
+          "/dev/sdc" = { size = 100 }
         }
         ebs_volume_config = {
-          app = {
-            type = "gp3"
-          }
-          data = {
-            type       = "gp3"
-            total_size = 200
-          }
-          flash = {
-            type       = "gp3"
-            total_size = 2
-          }
-          swap = {
-            type = "gp3"
-          }
+          data  = { total_size = 200 }
+          flash = { total_size = 2 }
         }
       }
 
@@ -135,30 +99,12 @@ locals {
           disable_api_termination = true
         }
         ebs_volumes = {
-          "/dev/sdb" = { # /u01
-            type = "gp3"
-            size = 100
-          }
-          "/dev/sdc" = { # /u02
-            type = "gp3"
-            size = 500
-          }
+          "/dev/sdb" = { size = 100 }
+          "/dev/sdc" = { size = 500 }
         }
         ebs_volume_config = {
-          app = {
-            type = "gp3"
-          }
-          data = {
-            type       = "gp3"
-            total_size = 2000
-          }
-          flash = {
-            type       = "gp3"
-            total_size = 500
-          }
-          swap = {
-            type = "gp3"
-          }
+          data  = { total_size = 2000 }
+          flash = { total_size = 500 }
         }
       }
     }
@@ -195,6 +141,7 @@ locals {
     }
 
     ec2_test_instances = {
+      # Remove data.aws_kms_key from cmk.tf once the NDH servers are removed
       t1-ndh-app-1 = {
         tags = {
           server-type       = "ndh-app"
@@ -203,6 +150,9 @@ locals {
           os-type           = "Linux"
           component         = "ndh"
           nomis-environment = "t1"
+        }
+        ebs_volumes = {
+          "/dev/sda1" = { kms_key_id = data.aws_kms_key.default_ebs.arn }
         }
         ami_name = "nomis_rhel_7_9_baseimage_2022-11-01T13-43-46.384Z"
         # branch   = var.BRANCH_NAME # comment in if testing ansible
@@ -215,6 +165,9 @@ locals {
           os-type           = "Linux"
           component         = "ndh"
           nomis-environment = "t1"
+        }
+        ebs_volumes = {
+          "/dev/sda1" = { kms_key_id = data.aws_kms_key.default_ebs.arn }
         }
         ami_name = "nomis_rhel_7_9_baseimage_2022-11-01T13-43-46.384Z"
         # branch   = var.BRANCH_NAME # comment in if testing ansible
