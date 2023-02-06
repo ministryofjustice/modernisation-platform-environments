@@ -1,4 +1,4 @@
-# Get secret by name for environment management
+#### This file can be used to store secrets specific to the member account ####
 # Get secret by name for environment management
 resource "random_password" "random_password" {
 
