@@ -27,6 +27,7 @@
       "username": "sysdba",
       "db_password_rotation_period": 28,
       "license_model": "license-included",
+      "rds_snapshot_arn": "placeholder",
       "lz_vpc_cidr": "10.202.0.0/20",
       "deletion_protection": "false",
       "dashboard_widget_period": 60
