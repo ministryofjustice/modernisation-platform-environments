@@ -1,29 +1,6 @@
-# This data sources allows us to get the Modernisation Platform account information for use elsewhere
-# (when we want to assume a role in the MP, for instance)
-data "aws_organizations_organization" "root_account" {}
-
-# Get the environments file from the main repository
-data "http" "environments_file" {
-  url = "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/${local.application_name}.json"
-}
-
-data "aws_caller_identity" "original_session" {
-  provider = aws.original-session
-}
-
-data "aws_caller_identity" "modernisation_platform" {
-  provider = aws.modernisation-platform
-}
-
-variable "collaborator_access" {
-  type        = string
-  default     = "developer"
-  description = "Collaborators must specify which access level they are using"
-}
-
 locals {
 
-  application_name = "sprinkler"
+  application_name = "example"
 
   environment_management = jsondecode(data.aws_secretsmanager_secret_version.environment_management.secret_string)
 
@@ -41,14 +18,20 @@ locals {
     jsondecode(data.http.environments_file.response_body).tags,
     { "is-production" = local.is-production },
     { "environment-name" = terraform.workspace },
-    { "source-code" = "https://github.com/ministryofjustice/modernisation-platform" }
+    { "source-code" = "https://github.com/ministryofjustice/modernisation-platform-environments" }
   )
 
-  environment = trimprefix(terraform.workspace, "${var.networking[0].application}-")
-  vpc_name    = var.networking[0].business-unit
-  subnet_set  = var.networking[0].set
+  environment     = trimprefix(terraform.workspace, "${var.networking[0].application}-")
+  vpc_name        = var.networking[0].business-unit
+  subnet_set      = var.networking[0].set
+  vpc_all         = "${local.vpc_name}-${local.environment}"
+  subnet_set_name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}"
 
   is_live       = [substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-production" || substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-preproduction" ? "live" : "non-live"]
-  provider_name = "core-vpc-sandbox"
+  provider_name = "core-vpc-${local.environment}"
 
+  # environment specfic variables
+  # example usage:
+  # example_data = local.application_data.accounts[local.environment].example_var
+  application_data = jsondecode(file("./application_variables.json"))
 }
