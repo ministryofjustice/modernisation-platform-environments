@@ -7,6 +7,18 @@ locals {
     Name = lower(format("%s-%s", local.application_name, local.environment))
   })
 
+  # Set of log groups references by the clouda watch agent config
+  cloudwatch_agent_log_group_names = [
+    "amazon-cloudwatch-agent.log",
+    "access.log",
+    "error.log",
+    "i2n-xmltransfer.log",
+    "i2n-daysummary.log",
+    "imiapsif.log",
+    "system-events",
+    "application-events"
+  ]
+
   iaps_server = {
 
     instance = {
@@ -284,4 +296,16 @@ module "ec2_iaps_server" {
   account_ids_lookup        = local.environment_management.account_ids
 }
 
-
+##
+# Set up cloud watch log groups (referenced by the cloud watch agent to send events to log streams in the group)
+##
+resource "aws_cloudwatch_log_group" "cloudwatch_agent_log_groups" {
+  for_each          = toset(local.cloudwatch_agent_log_group_names)
+  name              = each.key
+  retention_in_days = local.application_data.accounts[local.environment].cloudwatch_agent_log_group_retention_period
+  tags = merge(
+    local.ec2_tags,
+    {
+      "Name" = "iaps/${each.key}"
+  })
+}
