@@ -406,8 +406,8 @@ data "aws_iam_policy_document" "ssm_ec2_start_stop_kms" {
       "kms:ListGrants",
       "kms:RevokeGrant"
     ]
-    # we have a legacy CMK that's used in production that will be retired but in the meantime requires permissions
-    resources = [local.environment == "test" ? aws_kms_key.nomis-cmk[0].arn : data.aws_kms_key.nomis_key.arn, module.environment.kms_keys["ebs"].arn]
+    # Allow access to the AMI encryption key
+    resources = [module.environment.kms_keys["ebs"].arn]
   }
 
   statement {
