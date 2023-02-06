@@ -1,7 +1,6 @@
 locals {
-  region                  = "eu-west-2"
-  vpc_name                = "${var.business_unit}-${var.environment}"    # e.g. hmpps-development
-  application_environment = "${var.application_name}-${var.environment}" # e.g. nomis-development
+  vpc_name     = "${var.business_unit}-${var.environment}"    # e.g. hmpps-development
+  account_name = "${var.application_name}-${var.environment}" # e.g. nomis-development
 
   subnet_names = {
     general = ["data", "private", "public"]
@@ -50,7 +49,7 @@ locals {
   # environments_file provides application, business-unit, infrastructure-support and owner tags
   tags = merge(local.environments_file.tags, {
     is-production    = var.environment == "production" ? "true" : "false"
-    environment-name = local.application_environment
+    environment-name = local.account_name
     source-code      = "https://github.com/ministryofjustice/modernisation-platform-environments"
   })
 
