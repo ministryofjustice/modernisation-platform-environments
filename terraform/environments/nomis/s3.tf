@@ -7,7 +7,7 @@ module "s3-bucket" {
   }
   bucket_prefix       = "s3-bucket"
   replication_enabled = false
-  custom_kms_key      = module.environment.kms_keys["general"].id
+  custom_kms_key      = module.environment.kms_keys["general"].arn
 
   lifecycle_rule = [
     {
@@ -58,7 +58,7 @@ module "nomis-db-backup-bucket" {
   }
   bucket_prefix       = "nomis-db-backup-bucket"
   replication_enabled = false
-  custom_kms_key      = module.environment.kms_keys["general"].id
+  custom_kms_key      = module.environment.kms_keys["general"].arn
 
   lifecycle_rule = [
     {
@@ -135,7 +135,7 @@ module "nomis-image-builder-bucket" {
   }
   bucket_prefix       = "ec2-image-builder-nomis"
   replication_enabled = false
-  custom_kms_key      = module.environment.kms_keys["general"].id
+  custom_kms_key      = module.environment.kms_keys["general"].arn
 
   bucket_policy = [data.aws_iam_policy_document.cross-account-s3.json]
 
@@ -214,7 +214,7 @@ module "nomis-audit-archives" {
   }
   bucket_prefix       = "nomis-audit-archives"
   replication_enabled = false
-  custom_kms_key      = module.environment.kms_keys["general"].id
+  custom_kms_key      = module.environment.kms_keys["general"].arn
 
   bucket_policy = [data.aws_iam_policy_document.nomis-all-environments-access.json]
 
