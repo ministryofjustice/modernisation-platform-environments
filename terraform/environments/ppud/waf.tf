@@ -16,7 +16,7 @@ resource "aws_wafv2_web_acl" "WAM-rule" {
     }
 
     statement {
-     managed_rule_group_statement {
+      managed_rule_group_statement {
         name        = "AWSManagedRulesCommonRuleSet"
         vendor_name = "AWS"
       }
@@ -118,7 +118,7 @@ resource "aws_wafv2_web_acl" "WAM-rule" {
     }
   }
 
-    rule {
+  rule {
     name     = "AWSManagedRulesKnownBadInputsRuleSet"
     priority = 5
 
@@ -139,7 +139,7 @@ resource "aws_wafv2_web_acl" "WAM-rule" {
       sampled_requests_enabled   = true
     }
   }
-/*
+  /*
   rule {
     name  = "regex-rule"
     priority = 6
@@ -168,7 +168,7 @@ resource "aws_wafv2_web_acl" "WAM-rule" {
       }
     }
 */
-    rule {
+  rule {
     name     = "RateLimitingRule"
     priority = 7
 
@@ -195,41 +195,41 @@ resource "aws_wafv2_web_acl" "WAM-rule" {
     name     = "query-string-rule"
     priority = 8
     action {
-      block { }
+      block {}
     }
 
     statement {
       byte_match_statement {
         positional_constraint = "CONTAINS"
-        search_string = "admin"
+        search_string         = "admin"
         field_to_match {
-         uri_path { }
+          uri_path {}
         }
-        
+
         text_transformation {
           priority = 0
           type     = "NONE"
         }
+      }
     }
-  }
     visibility_config {
       cloudwatch_metrics_enabled = true
       metric_name                = "string-rule"
       sampled_requests_enabled   = true
-}
+    }
   }
- 
+
 
   rule {
     name     = "geolocation"
     priority = 9
 
     statement {
-     geo_match_statement {
-      country_codes = ["GB"]  
+      geo_match_statement {
+        country_codes = ["GB"]
+      }
     }
-  }
-/*
+    /*
     statement {
       not_statement {
         statement {
@@ -243,7 +243,7 @@ resource "aws_wafv2_web_acl" "WAM-rule" {
     action {
       allow {}
     }
-     
+
     visibility_config {
       cloudwatch_metrics_enabled = true
       metric_name                = "Geolocation"
@@ -252,13 +252,13 @@ resource "aws_wafv2_web_acl" "WAM-rule" {
   }
 
 
-/*
+  /*
   tags = {
     Name = "${var.prefix}-${var.name}"
   }
 */
 
- visibility_config {
+  visibility_config {
     cloudwatch_metrics_enabled = true
     metric_name                = "PPUDRules"
     sampled_requests_enabled   = true
@@ -268,10 +268,10 @@ resource "aws_wafv2_web_acl" "WAM-rule" {
 
 resource "aws_wafv2_web_acl_association" "ALB1-WAF" {
   resource_arn = aws_lb.PPUD-ALB.arn
-  web_acl_arn = aws_wafv2_web_acl.WAM-rule.arn
+  web_acl_arn  = aws_wafv2_web_acl.WAM-rule.arn
 }
 
 resource "aws_wafv2_web_acl_association" "ALB2-WAF" {
   resource_arn = aws_lb.WAM-ALB.arn
-  web_acl_arn = aws_wafv2_web_acl.WAM-rule.arn
+  web_acl_arn  = aws_wafv2_web_acl.WAM-rule.arn
 }

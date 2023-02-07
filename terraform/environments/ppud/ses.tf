@@ -40,9 +40,9 @@ resource "aws_route53_record" "asquareus_amazonses_verification_record" {
 */
 resource "aws_ses_domain_identity_verification" "asquareus_verification" {
   domain = aws_ses_domain_identity.asquareus.id
-#  depends_on = [aws_route53_record.asquareus_amazonses_verification_record]
+  #  depends_on = [aws_route53_record.asquareus_amazonses_verification_record]
 
-    timeouts {
+  timeouts {
     create = "10m"
   }
 }
