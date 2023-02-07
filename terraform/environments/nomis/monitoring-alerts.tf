@@ -26,7 +26,7 @@ resource "aws_cloudwatch_metric_alarm" "low_available_memory_windows" {
 
 
 # High CPU - Windows
-resource "aws_cloud_metric_alarm" "high_cpu_windows" {
+resource "aws_cloudwatch_metric_alarm" "high_cpu_windows" {
   alarm_name          = "high_cpu_windows"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "5"
@@ -45,7 +45,7 @@ resource "aws_cloud_metric_alarm" "high_cpu_windows" {
 
 # Disk Free - Windows
 
-resource "aws_cloud_metric_alarm" "disk_free_windows" {
+resource "aws_cloudwatch_metric_alarm" "disk_free_windows" {
   alarm_name          = "disk_free_windows"
   comparison_operator = "LessThanOrEqualToThreshold"
   evaluation_periods  = "2"
