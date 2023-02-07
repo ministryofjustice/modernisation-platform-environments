@@ -1,6 +1,15 @@
 #------------------------------------------------------------------------------
 # Common IAM policies for all ec2 instance profiles
 #------------------------------------------------------------------------------
+resource "aws_kms_grant" "hmpps_ebs_kms_key_for_autoscaling" {
+  name              = "hmpps-ebs-kms-grant-for-autoscaling"
+  key_id            = module.environment.kms_keys["ebs"].arn
+  grantee_principal = "arn:aws:iam::${module.environment.account_id}:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling"
+  operations = [
+    "CreateGrant"
+  ]
+}
+
 resource "aws_kms_grant" "ssm-start-stop-shared-cmk-grant" {
   count             = local.environment == "test" ? 1 : 0
   name              = "image-builder-shared-cmk-grant"
