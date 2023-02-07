@@ -145,6 +145,11 @@ variable "vpc_subnet_c_id" {
   description = "vpc_subnet_c_id"
 }
 
+variable "rds_record_provider" {
+  type        = string
+  description = "Provider for the Route 53 record for RDS"
+}
+
 variable "rds_record_zone_inner_id" {
   type        = string
   description = "Inner Zone ID for the Route 53 record for RDS"
