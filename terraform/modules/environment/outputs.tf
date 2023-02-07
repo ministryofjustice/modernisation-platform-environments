@@ -1,3 +1,43 @@
+output "region" {
+  description = "AWS region"
+  value       = var.region
+}
+
+output "business_unit" {
+  description = "name of business unit which is also used as part of the VPC name, e.g. hmpps"
+  value       = var.business_unit
+}
+
+output "account_name" {
+  description = "name of the application account / terraform workspace, e.g. nomis-test"
+  value       = local.account_name
+}
+
+output "account_id" {
+  description = "id of the application account"
+  value       = var.environment_management.account_ids[local.account_name]
+}
+
+output "application_name" {
+  description = "name of application, e.g. nomis, oasys etc.."
+  value       = var.application_name
+}
+
+output "environment" {
+  description = "name of environment, e.g. development, test, preproduction, production"
+  value       = var.environment
+}
+
+output "subnet_set" {
+  description = "modernisation platform subnet set, e.g. general"
+  value       = var.subnet_set
+}
+
+output "account_ids" {
+  description = "account id map where the key is the account name and the value is the account id"
+  value       = var.environment_management.account_ids
+}
+
 output "access" {
   description = "map of access elements found in the environments file json, e.g. nomis.json.  Map keys include github_slug, level, nuke"
   value       = local.environments_access[var.environment]

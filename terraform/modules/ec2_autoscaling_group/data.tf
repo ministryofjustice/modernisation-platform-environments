@@ -4,7 +4,7 @@ data "aws_ami" "this" {
   most_recent = true
   owners      = [try(var.account_ids_lookup[var.ami_owner], var.ami_owner)]
   tags = {
-    is-production = true # based on environment
+    is-production = true # based on environment
   }
 
   filter {
@@ -16,10 +16,6 @@ data "aws_ami" "this" {
     name   = "virtualization-type"
     values = ["hvm"]
   }
-}
-
-data "aws_kms_key" "by_alias" {
-  key_id = "alias/aws/ebs"
 }
 
 data "aws_ec2_instance_type" "this" {

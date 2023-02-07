@@ -1,3 +1,9 @@
+variable "region" {
+  description = "AWS region"
+  type        = string
+  default     = "eu-west-2"
+}
+
 variable "environment_management" {
   description = "The json decoded environment_management secret from modernisation-platform account"
 }
@@ -22,4 +28,3 @@ variable "subnet_set" {
   type        = string
   default     = "general"
 }
-
