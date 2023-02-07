@@ -18,7 +18,7 @@
             "unit": "Percent"
           },
           "% Interrupt Time",
-          "% User Time"   
+          "% User Time"
         ],
         "resources": ["*"]
       },
@@ -44,15 +44,15 @@
       "Memory": {
         "metrics_collection_interval": 5,
         "measurement": [
-            {
-                "name:": "% Committed Bytes In Use",
-                "rename": "COMMITTED_BYTES_IN_USE",
-                "unit": "Percent"
-            },
-            "Available Bytes", 
-            "Cache Faults/sec", 
-            "Page Faults/sec", 
-            "Pages/sec"
+          {
+            "name:": "% Committed Bytes In Use",
+            "rename": "COMMITTED_BYTES_IN_USE",
+            "unit": "Percent"
+          },
+          "Available Bytes",
+          "Cache Faults/sec",
+          "Page Faults/sec",
+          "Pages/sec"
         ]
       },
       "Network Interface": {
