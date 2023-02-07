@@ -312,7 +312,7 @@ resource "aws_ssm_association" "update_ssm_agent" {
 #   name            = "InstallNodeExporterLinux"
 #   document_type   = "Command"
 #   document_format = "JSON"
-#   content         = templatefile("${path.module}/ssm-documents/templates/node-exporter-linux.json.tmpl", { bucket_name = module.s3-bucket.bucket.id })
+#   content         = templatefile("${path.module}/ssm-documents/templates/node-exporter-linux.json.tmpl", { bucket_name = module.s3-bucket["s3-bucket"].bucket.id })
 #   target_type     = "/AWS::EC2::Instance"
 
 #   tags = merge(
@@ -365,7 +365,7 @@ resource "aws_ssm_association" "update_ssm_agent" {
 #   name            = "InstallOracleSecureWeb"
 #   document_type   = "Command"
 #   document_format = "JSON"
-#   content         = templatefile("${path.module}/ssm-documents/templates/oracle-secure-web-install.json.tmpl", { bucket_name = module.s3-bucket.bucket.id })
+#   content         = templatefile("${path.module}/ssm-documents/templates/oracle-secure-web-install.json.tmpl", { bucket_name = module.s3-bucket["s3-bucket"].bucket.id })
 #   target_type     = "/AWS::EC2::Instance"
 
 #   tags = merge(
