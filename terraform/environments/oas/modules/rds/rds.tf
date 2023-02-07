@@ -167,7 +167,7 @@ resource "aws_security_group" "laalz-secgroup" {
     from_port   = 1521
     to_port     = 1521
     protocol    = "tcp"
-    cidr_blocks = "10.200.0.0/20"
+    cidr_blocks = ["10.200.0.0/20"]
   }
 
   egress {
