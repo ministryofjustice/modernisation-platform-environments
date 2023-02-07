@@ -43,13 +43,7 @@
       },
       "Memory": {
         "metrics_collection_interval": 5,
-        "measurement": [
-          "% Committed Bytes In Use",
-          "Available Bytes",
-          "Cache Faults/sec",
-          "Page Faults/sec",
-          "Pages/sec"
-        ]
+        "measurement": ["% Committed Bytes In Use", "Available Bytes", "Cache Faults/sec", "Page Faults/sec", "Pages/sec"]
       },
       "Network Interface": {
         "metrics_collection_interval": 5,
