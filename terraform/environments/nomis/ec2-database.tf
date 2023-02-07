@@ -113,6 +113,7 @@ module "db_ec2_instance" {
   instance                      = merge(local.database.instance, lookup(each.value, "instance", {}))
   user_data_cloud_init          = merge(local.database.user_data_cloud_init, lookup(each.value, "user_data_cloud_init", {}))
   ebs_volumes_copy_all_from_ami = try(each.value.ebs_volumes_copy_all_from_ami, true)
+  ebs_kms_key_id                = module.environment.kms_keys["ebs"].arn
   ebs_volume_config             = merge(local.database.ebs_volume_config, lookup(each.value, "ebs_volume_config", {}))
   ebs_volumes                   = { for k, v in local.database.ebs_volumes : k => merge(v, try(each.value.ebs_volumes[k], {})) }
   ssm_parameters_prefix         = "database/"
@@ -126,8 +127,8 @@ module "db_ec2_instance" {
   application_name   = local.application_name
   environment        = local.environment
   region             = local.region
-  availability_zone  = local.availability_zone
-  subnet_id          = module.environment.subnet["data"][local.availability_zone].id
+  availability_zone  = local.availability_zone_1
+  subnet_id          = module.environment.subnet["data"][local.availability_zone_1].id
   tags               = merge(local.tags, local.database.tags, try(each.value.tags, {}))
   account_ids_lookup = local.environment_management.account_ids
 }

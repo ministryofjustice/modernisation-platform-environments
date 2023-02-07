@@ -32,7 +32,7 @@ data "aws_subnets" "this" {
     values = [data.aws_vpc.this.id]
   }
   tags = {
-    Name = "${local.vpc_name}-${var.subnet_set}-${each.key}-${local.region}*"
+    Name = "${local.vpc_name}-${var.subnet_set}-${each.key}-${var.region}*"
   }
 }
 

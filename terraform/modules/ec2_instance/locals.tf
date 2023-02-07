@@ -17,40 +17,54 @@ locals {
   }
 
   ebs_volumes_from_ami = {
-    for key, value in local.ami_block_device_mappings :
-    key => {
-      snapshot_id = value.ebs.snapshot_id
-      iops        = value.ebs.iops
-      throughput  = value.ebs.throughput
-      size        = value.ebs.volume_size
-      type        = value.ebs.volume_type
+    for key, value in local.ami_block_device_mappings : key => {
+      snapshot_id  = lookup(value.ebs, "snapshot_id", null)
+      iops         = lookup(value.ebs, "iops", null)
+      throughput   = lookup(value.ebs, "throughput", null)
+      size         = lookup(value.ebs, "volume_size", null)
+      type         = lookup(value.ebs, "volume_type", null)
+      no_device    = value.no_device
+      virtual_name = value.virtual_name
+    }
+  }
+
+  # remove nulls so merge() doesn't include them
+  ebs_volumes_without_nulls = {
+    for key1, value1 in var.ebs_volumes :
+    key1 => {
+      for key2, value2 in value1 : key2 => value2 if value2 != null
     }
   }
 
   # See README, allow volumes to be grouped by labels, e.g. "data", "app" and so on.
-  ebs_volume_labels = distinct(flatten([for key, value in var.ebs_volumes : lookup(value, "label", [])]))
+  ebs_volume_labels = distinct(flatten([for key, value in local.ebs_volumes_without_nulls : lookup(value, "label", [])]))
   ebs_volume_count = {
     for label in local.ebs_volume_labels :
-    label => length([for key, value in var.ebs_volumes : key if try(value.label == label, false)])
+    label => length([for key, value in local.ebs_volumes_without_nulls : key if value.label == label])
   }
-  ebs_volumes_swap_size = data.aws_ec2_instance_type.this.memory_size >= 16384 ? 16 : (data.aws_ec2_instance_type.this.memory_size / 1024)
-  ebs_volumes_from_config_with_nulls = {
-    for key, value in var.ebs_volumes :
-    key => {
-      iops       = try(var.ebs_volume_config[value.label].iops, null)
-      kms_key_id = try(var.ebs_volume_config[value.label].kms_key_id, null)
-      throughput = try(var.ebs_volume_config[value.label].throughput, null)
-      type       = try(var.ebs_volume_config[value.label].type, null)
-      size = try(
-        floor(var.ebs_volume_config[value.label].total_size / local.ebs_volume_count[value.label]),
-        try(value.label == "swap", false) ? local.ebs_volumes_swap_size : null
-      )
-    }
-  }
-  # unfortunately the merge() command actually includes nulls, so we must
-  # explicitly remove them from the map.
   ebs_volumes_from_config = {
-    for key1, value1 in local.ebs_volumes_from_config_with_nulls :
+    for key, value in local.ebs_volumes_without_nulls :
+    key => {
+      iops       = var.ebs_volume_config[value.label].iops
+      kms_key_id = var.ebs_volume_config[value.label].kms_key_id
+      throughput = var.ebs_volume_config[value.label].throughput
+      type       = var.ebs_volume_config[value.label].type
+      size       = var.ebs_volume_config[value.label].total_size != null ? var.ebs_volume_config[value.label].total_size / local.ebs_volume_count[value.label] : null
+    } if contains(keys(var.ebs_volume_config), lookup(value, "label", "-"))
+  }
+
+  # Auto calculate swap volume size based on instance memory size
+  ebs_volumes_swap_size = data.aws_ec2_instance_type.this.memory_size >= 16384 ? 16 : (data.aws_ec2_instance_type.this.memory_size / 1024)
+  ebs_volumes_swap = {
+    for key, value in local.ebs_volumes_without_nulls :
+    key => {
+      size = local.ebs_volumes_swap_size
+    } if lookup(value, "label", null) == "swap"
+  }
+
+  # remove nulls so merge() doesn't include them
+  ebs_volumes_from_config_without_nulls = {
+    for key1, value1 in local.ebs_volumes_from_config :
     key1 => {
       for key2, value2 in value1 : key2 => value2 if value2 != null
     }
@@ -62,9 +76,10 @@ locals {
   ebs_volumes = {
     for key in local.ebs_volume_names :
     key => merge(
-      try(local.ebs_volumes_from_ami[key], {}),
-      try(local.ebs_volumes_from_config[key], {}),
-      try(var.ebs_volumes[key], {})
+      lookup(local.ebs_volumes_from_ami, key, {}),
+      lookup(local.ebs_volumes_from_config_without_nulls, key, {}),
+      lookup(local.ebs_volumes_swap, key, {}),
+      lookup(local.ebs_volumes_without_nulls, key, {})
     )
   }
 
@@ -85,4 +100,9 @@ locals {
   }
 
   user_data_args = merge(local.user_data_args_common, local.user_data_args_ssm_params, try(var.user_data_cloud_init.args, {}))
+
+  user_data_part_count = [
+    try(length(var.user_data_cloud_init.scripts), 0),
+    try(length(var.user_data_cloud_init.write_files), 0)
+  ]
 }
