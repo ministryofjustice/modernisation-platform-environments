@@ -74,10 +74,7 @@ data "aws_iam_policy_document" "image-builder-distro-kms-policy" {
       "kms:RevokeGrant"
     ]
     # Allow access to the AMI encryption key
-    resources = [
-      module.environment.kms_keys["ebs"].arn,
-      module.environment.kms_keys["general"].arn,
-    ]
+    resources = [module.environment.kms_keys["ebs"].arn]
   }
 }
 
@@ -162,7 +159,7 @@ resource "aws_iam_role_policy_attachment" "launch-template-reader-policy-attach"
 
 }
 
-# duplicate grant which isn't quite right (other is in ec2-common), but no permissions to delete
+# this can be zapped at some point as the correct definition is in ec2-common
 resource "aws_kms_grant" "image-builder-shared-cmk-grant" {
   name              = "image-builder-shared-cmk-grant"
   key_id            = module.environment.kms_keys["ebs"].arn
