@@ -26,7 +26,7 @@ module "rds" {
   license_model               = local.application_data.accounts[local.environment].license_model
   lz_vpc_cidr                 = local.application_data.accounts[local.environment].lz_vpc_cidr
   deletion_protection         = local.application_data.accounts[local.environment].deletion_protection
-  rds_snapshot_arn            = local.application_data.accounts[local.environment].rds_snapshot_arn
+  rds_snapshot_arn            = format("arn:aws:rds:eu-west-2:%s:snapshot:%s", data.aws_caller_identity.current.account_id, local.application_data.accounts[local.environment].rds_snapshot_name)
   rds_kms_key_arn             = data.aws_kms_key.rds_shared.arn
   vpc_shared_id               = data.aws_vpc.shared.id
   vpc_shared_cidr             = data.aws_vpc.shared.cidr_block
