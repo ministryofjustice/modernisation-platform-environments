@@ -144,3 +144,8 @@ variable "vpc_subnet_c_id" {
   type        = string
   description = "vpc_subnet_c_id"
 }
+
+variable "rds_record_provider" {
+  type        = string
+  description = "Provider for the Route 53 record for RDS"
+}
