@@ -161,15 +161,6 @@ resource "aws_security_group" "laalz-secgroup" {
     cidr_blocks = [var.lz_vpc_cidr]
   }
 
-  # Temp rule for testing purposes only
-  ingress {
-    description = "Sql Net on 1521 from WorkSpace in Landing Zone"
-    from_port   = 1521
-    to_port     = 1521
-    protocol    = "tcp"
-    cidr_blocks = ["10.200.0.0/20"]
-  }
-
   egress {
     description = "Sql Net on 1521"
     from_port   = 1521
