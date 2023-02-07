@@ -44,11 +44,7 @@
       "Memory": {
         "metrics_collection_interval": 5,
         "measurement": [
-          {
-            "name:": "% Committed Bytes In Use",
-            "rename": "COMMITTED_BYTES_IN_USE",
-            "unit": "Percent"
-          },
+          "% Committed Bytes In Use",
           "Available Bytes",
           "Cache Faults/sec",
           "Page Faults/sec",

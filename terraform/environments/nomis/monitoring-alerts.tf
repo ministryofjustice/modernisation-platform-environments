@@ -11,7 +11,7 @@ resource "aws_cloudwatch_metric_alarm" "low_available_memory_windows" {
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "2"
   datapoints_to_alarm = "2"
-  metric_name         = "COMMITTED_BYTES_IN_USE"
+  metric_name         = "Memory % Committed Bytes In Use"
   namespace           = "CWAgent"
   period              = "60"
   statistic           = "Average"

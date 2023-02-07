@@ -49,7 +49,7 @@ tasks:
           Install-Module -Name AWS.Tools.Installer -Force -AllowClobber
           Install-AWSToolsModule -Name AWS.Tools.SimpleSystemsManagement -Force -AllowClobber
 
-          $ConfigFilePath = "C:\ProgramData\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-config.json"
+          $ConfigFilePath = "C:\ProgramData\Amazon\AmazonCloudWatchAgent\\amazon-cloudwatch-config.json"
 
           function Get-AmazonCloudWatchAgentConfig {
             param(
@@ -65,12 +65,17 @@ tasks:
             & "C:\Program Files\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent-ctl.ps1" -a fetch-config -m ec2 -s -c file:"$ConfigurationFilePath"
           }
 
+          function Start-AmazonCloudWatchAgentSSM {
+            & "C:\Program Files\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent-ctl.ps1" -a fetch-config -m ec2 -s -c ssm:cloud-watch-config-windows
+          }
+
           # Check CWAgent is installed, if it isn't then install it
           $cwagent = Get-Service -Name "AmazonCloudWatchAgent" -ErrorAction SilentlyContinue
           if ($cwagent) {
             Write-Output "CloudWatch Agent is already installed"
-            Get-AmazonCloudWatchAgentConfig -OutFilePath $ConfigFilePath
-            Start-AmazonCloudWatchAgent -ConfigurationFilePath $ConfigFilePath
+            # Get-AmazonCloudWatchAgentConfig -OutFilePath $ConfigFilePath
+            # Start-AmazonCloudWatchAgent -ConfigurationFilePath $ConfigFilePath
+            Start-AmazonCloudWatchAgentSSM
           } else {
             Write-Output "Installing CloudWatch Agent"
             Invoke-WebRequest -Uri "https://s3.amazonaws.com/amazoncloudwatch-agent/windows/amd64/latest/amazon-cloudwatch-agent.msi" -OutFile "C:\Program Files\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent.msi"
