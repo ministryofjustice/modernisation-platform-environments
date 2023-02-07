@@ -7,9 +7,9 @@ module "s3-bucket" {
 
   for_each = try(local.environment_config.s3_buckets, {})
 
-  bucket_prefix             = each.key
-  replication_enabled       = false
-  bucket_policy             = lookup(each.value, "bucket_policy", null)
+  bucket_prefix       = each.key
+  replication_enabled = false
+  bucket_policy       = lookup(each.value, "bucket_policy", null)
   lifecycle_rule = [
     {
       id      = "main"
