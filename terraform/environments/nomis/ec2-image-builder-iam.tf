@@ -161,3 +161,19 @@ resource "aws_iam_role_policy_attachment" "launch-template-reader-policy-attach"
   role       = aws_iam_role.core-services-launch-template-reader.name
 
 }
+
+# duplicate grant which isn't quite right (other is in ec2-common), but no permissions to delete
+resource "aws_kms_grant" "image-builder-shared-cmk-grant" {
+  name              = "image-builder-shared-cmk-grant"
+  key_id            = module.environment.kms_keys["ebs"].arn
+  grantee_principal = "arn:aws:iam::${local.account_id}:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling"
+  operations = [
+    "Encrypt",
+    "Decrypt",
+    "ReEncryptFrom",
+    "GenerateDataKey",
+    "GenerateDataKeyWithoutPlaintext",
+    "DescribeKey",
+    "CreateGrant"
+  ]
+}
