@@ -52,6 +52,16 @@ locals {
       #   }
       # }
     }
+
+    s3_buckets = {
+      "s3-bucket" = {
+
+      }
+      "ec2-image-builder-${local.application_name}" = {
+        bucket_policy = [data.aws_iam_policy_document.cross-account-s3.json]
+      }
+    }
+
     db_enabled                             = false
     db_auto_minor_version_upgrade          = "true"
     db_allow_major_version_upgrade         = "false"
