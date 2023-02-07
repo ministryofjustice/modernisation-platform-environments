@@ -47,7 +47,7 @@ tasks:
           # Install AWS PowerShell modules dependencies
           Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
           Install-Module -Name AWS.Tools.Installer -Force -AllowClobber
-          Install-AWSToolsModule -Name AWS.Tools.SimpleSystemsManagement -Force -Cleanup -AllowClobber
+          Install-AWSToolsModule -Name AWS.Tools.SimpleSystemsManagement -Force -AllowClobber
 
           $ConfigFilePath = "C:\Program Files\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-config.json"
 
@@ -55,7 +55,7 @@ tasks:
             param(
               [string]$OutFilePath
             )
-            (Get-SSMParameter -Name "cloud-watch-config-windows").Value | Out-File -FilePath $OutFilePath -Force -Encoding Ascii 
+            (Get-SSMParameter -Name "cloud-watch-config-windows").Value | Out-File -FilePath $OutFilePath -Force -Encoding Ascii -NoNewline
           }
 
           function Start-AmazonCloudWatchAgent {

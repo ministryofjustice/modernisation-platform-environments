@@ -12,14 +12,23 @@
             "rename": "CPU_IDLE",
             "unit": "Percent"
           },
+          {
+            "name": "% Processor Time",
+            "rename": "PROCESSOR_TIME",
+            "unit": "Percent"
+          },
           "% Interrupt Time",
-          "% User Time",
-          "% Processor Time"
+          "% User Time"   
         ],
         "resources": ["*"]
       },
       "LogicalDisk": {
         "measurement": [
+          {
+            "name": "% Free Space",
+            "rename": "DISK_FREE",
+            "unit": "Percent"
+          },
           {
             "name": "% Idle Time",
             "unit": "Percent"
@@ -34,15 +43,22 @@
       },
       "Memory": {
         "metrics_collection_interval": 5,
-        "measurement": ["Available Bytes", "Cache Faults/sec", "Page Faults/sec", "Pages/sec"]
+        "measurement": [
+            {
+                "name:": "% Committed Bytes In Use",
+                "rename": "COMMITTED_BYTES_IN_USE",
+                "unit": "Percent"
+            },
+            "Available Bytes", 
+            "Cache Faults/sec", 
+            "Page Faults/sec", 
+            "Pages/sec"
+        ]
       },
       "Network Interface": {
         "metrics_collection_interval": 5,
         "measurement": ["Bytes Received/sec", "Bytes Sent/sec", "Packets Received/sec", "Packets Sent/sec"],
-        "resources": ["*"],
-        "append_dimensions": {
-          "d3": "win_bo"
-        }
+        "resources": ["*"]
       },
       "System": {
         "measurement": ["Context Switches/sec", "System Calls/sec", "Processor Queue Length"]
@@ -55,16 +71,6 @@
   },
   "logs": {
     "logs_collected": {
-      "files": {
-        "collect_list": [
-          {
-            "file_path": "c:\\ProgramData\\Amazon\\AmazonCloudWatchAgent\\Logs\\amazon-cloudwatch-agent.log",
-            "log_group_name": "amazon-cloudwatch-agent.log",
-            "log_stream_name": "{instance_id}",
-            "timezone": "UTC"
-          }
-        ]
-      },
       "windows_events": {
         "collect_list": [
           {
