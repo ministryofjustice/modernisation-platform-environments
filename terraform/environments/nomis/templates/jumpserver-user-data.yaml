@@ -56,5 +56,7 @@ tasks:
             Invoke-WebRequest -Uri "https://s3.amazonaws.com/amazoncloudwatch-agent/windows/amd64/latest/amazon-cloudwatch-agent.msi" -OutFile "C:\Program Files\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent.msi"
             $cwagent_installer = "C:\Program Files\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent.msi"
             Start-Process -FilePath msiexec.exe -ArgumentList "/i $cwagent_installer /qn" -Wait
+            Do {
             & "C:\Program Files\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent-ctl.ps1" -a fetch-config -m ec2 -s -c ssm:cloud-watch-config-windows
+            } Until ((Get-Service -Name "AmazonCloudWatchAgent" | Where-Object {$_.Status -eq "Running"}) -or ((Get-Date) -gt $endTime))
           }
