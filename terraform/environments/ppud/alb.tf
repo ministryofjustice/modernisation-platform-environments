@@ -6,7 +6,7 @@ resource "aws_lb" "PPUD-ALB" {
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.PPUD-ALB.id]
-  subnets            = [data.aws_subnet.public_subnets_a.id,data.aws_subnet.public_subnets_b.id]
+  subnets            = [data.aws_subnet.public_subnets_a.id, data.aws_subnet.public_subnets_b.id]
 
   enable_deletion_protection = false
 
@@ -33,7 +33,7 @@ resource "aws_lb_target_group" "PPUD-Target-Group" {
   port     = 443
   protocol = "HTTPS"
   vpc_id   = data.aws_vpc.shared.id
-    stickiness {
+  stickiness {
     cookie_duration = 86400
     type            = "lb_cookie"
     enabled         = true
@@ -59,7 +59,7 @@ resource "aws_lb" "WAM-ALB" {
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.WAM-ALB.id]
-  subnets            = [data.aws_subnet.public_subnets_a.id,data.aws_subnet.public_subnets_b.id]
+  subnets            = [data.aws_subnet.public_subnets_a.id, data.aws_subnet.public_subnets_b.id]
 
   enable_deletion_protection = false
 
