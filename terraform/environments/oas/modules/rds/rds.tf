@@ -202,8 +202,8 @@ resource "aws_security_group" "vpc-secgroup" {
 
 resource "aws_route53_record" "oas-rds" {
   # provider = var.rds_record_provider
-  zone_id  = data.aws_route53_zone.inner.zone_id
-  name     = "rds.${local.application_name}.${data.aws_route53_zone.inner.name}"
+  zone_id  = var.rds_record_zone_id
+  name     = "rds.${local.application_name}.${var.rds_record_zone_inner_name}"
   type     = "CNAME"
   ttl      = 60
   records  = [aws_db_instance.appdb1.address]
