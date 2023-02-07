@@ -189,6 +189,7 @@ data "aws_iam_policy_document" "application_insights" {
 
 data "aws_iam_policy_document" "hmpps_kms_keys" {
   statement {
+    sid    = "AllowBusinessUnitSharedKmsKeys"
     effect = "Allow"
     actions = [
       "kms:Encrypt",
