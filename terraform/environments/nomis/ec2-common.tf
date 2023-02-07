@@ -6,6 +6,13 @@ resource "aws_kms_grant" "hmpps_ebs_kms_key_for_autoscaling" {
   key_id            = module.environment.kms_keys["ebs"].arn
   grantee_principal = "arn:aws:iam::${module.environment.account_id}:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling"
   operations = [
+    "Encrypt",
+    "Decrypt",
+    "ReEncryptFrom",
+    "ReEncryptTo",
+    "GenerateDataKey",
+    "GenerateDataKeyWithoutPlaintext",
+    "DescribeKey",
     "CreateGrant"
   ]
 }
