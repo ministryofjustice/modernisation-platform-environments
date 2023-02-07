@@ -1,7 +1,61 @@
 version: 1.0
 tasks:
+- task: writeFile
+  inputs:
+  - frequency: always
+    destination: C:\tools\nginx.conf
+    content: |-
+      worker_processes auto;
+
+      error_log  logs/error.log;
+
+      events {
+        worker_connections  1024;
+      }
+
+      http {
+        include              mime.types;
+        default_type         application/octet-stream;
+        sendfile             on;
+        client_max_body_size 10M;
+        keepalive_timeout    65;
+
+        server {
+          listen 80;
+          server_name localhost;
+
+          allow 127.0.0.1;
+          deny  all;
+
+          # Proxy requests to the NDelius Interface
+          location ^~ /NDeliusIAPS {
+            proxy_pass        https://${ndelius_interface_url}$request_uri;
+            proxy_ssl_ciphers ALL:!aNULL:!EXPORT56:RC4+RSA:+HIGH:+MEDIUM:+LOW:+SSLv2:+EXP;
+          }
+
+          # Proxy all other requests IM servers
+          location / {
+            proxy_pass                    https://${im_interface_url};
+            proxy_ssl_verify_depth        2;
+            proxy_ssl_verify              on;
+            proxy_ssl_server_name         on;
+            proxy_ssl_protocols           TLSv1.3;
+            proxy_ssl_ciphers             EECDH+CHACHA20:EECDH+AESGCM:EECDH+AES;
+            proxy_http_version            1.1;
+            client_max_body_size          10m;
+          }
+        }
+      }
+
 - task: executeScript
   inputs:
+  - frequency: always
+    type: powershell
+    runAs: admin
+    content: |-
+      # Move previously templated config file to correct location
+      Move-Item -Path 'C:\tools\nginx.conf' -Destination (Resolve-Path 'C:\tools\nginx-*\conf\nginx.conf').Path -Force
+      Restart-Service -Name nginx
   - frequency: once
     type: powershell
     runAs: localSystem
