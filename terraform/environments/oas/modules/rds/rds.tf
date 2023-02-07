@@ -199,3 +199,12 @@ resource "aws_security_group" "vpc-secgroup" {
     Name = "${var.application_name}-${var.environment}-vpc-secgroup"
   }
 }
+
+resource "aws_route53_record" "oas-rds" {
+  provider = aws.core-vpc
+  zone_id  = data.aws_route53_zone.inner.zone_id
+  name     = "rds.${local.application_name}.${data.aws_route53_zone.inner.name}"
+  type     = "CNAME"
+  ttl      = 60
+  records  = [aws_db_instance.appdb1.address]
+}
