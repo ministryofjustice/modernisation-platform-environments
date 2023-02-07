@@ -37,3 +37,12 @@ module "rds" {
   rds_record_zone_inner_id    = data.aws_route53_zone.inner.zone_id
   rds_record_zone_inner_name  = data.aws_route53_zone.inner.name
 }
+
+resource "aws_route53_record" "oas-rds" {
+  provider = aws.core-vpc
+  zone_id  = data.aws_route53_zone.inner.zone_id
+  name     = "rds.${local.application_name}.${data.aws_route53_zone.inner.name}"
+  type     = "CNAME"
+  ttl      = 60
+  records  = [module.rds.aws_db_instance.appdb1.address]
+}
