@@ -3,6 +3,9 @@
 
 module "rds" {
   source = "./modules/rds"
+  providers = {
+    aws = aws.core-vpc
+  }
 
   application_name            = local.application_name
   identifier_name             = local.application_name
@@ -33,7 +36,7 @@ module "rds" {
   vpc_subnet_a_id             = data.aws_subnet.data_subnets_a.id
   vpc_subnet_b_id             = data.aws_subnet.data_subnets_b.id
   vpc_subnet_c_id             = data.aws_subnet.data_subnets_c.id
-  provider         = aws.core-vpc
+  # rds_record_provider         = aws.core-vpc
   rds_record_zone_inner_id    = data.aws_route53_zone.inner.zone_id
   rds_record_zone_inner_name  = data.aws_route53_zone.inner.name
 }
