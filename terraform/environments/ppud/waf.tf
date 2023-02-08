@@ -1,6 +1,6 @@
 
 resource "aws_wafv2_web_acl" "WAM-rule" {
-  count = local.is-development == true ? 1 : 0
+# count = local.is-development == true ? 1 : 0
   name  = "WAM-rule"
   scope = "REGIONAL"
 
@@ -221,11 +221,11 @@ resource "aws_wafv2_web_acl" "WAM-rule" {
 
 
 resource "aws_wafv2_web_acl_association" "ALB1-WAF" {
-  resource_arn = aws_lb.PPUD-ALB[count.index].arn
-  web_acl_arn  = aws_wafv2_web_acl.WAM-rule[count.index].arn
+  resource_arn = aws_lb.PPUD-ALB.arn
+  web_acl_arn  = aws_wafv2_web_acl.WAM-rule.arn
 }
 
 resource "aws_wafv2_web_acl_association" "ALB2-WAF" {
-  resource_arn = aws_lb.WAM-ALB[count.index].arn
-  web_acl_arn  = aws_wafv2_web_acl.WAM-rule[count.index].arn
+  resource_arn = aws_lb.WAM-ALB.arn
+  web_acl_arn  = aws_wafv2_web_acl.WAM-rule.arn
 }

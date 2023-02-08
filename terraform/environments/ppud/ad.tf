@@ -74,7 +74,7 @@ resource "aws_iam_policy_attachment" "ec2_attach2" {
 
 # Connect to AWS Directory Service
 data "aws_directory_service_directory" "ad" {
-  directory_id = aws_directory_service_directory.UKGOV[count.index].id
+  directory_id = aws_directory_service_directory.UKGOV.id
 }
 
 # AD Join 
