@@ -221,7 +221,7 @@ resource "aws_wafv2_web_acl" "WAM-rule" {
     metric_name                = "PPUDRules"
     sampled_requests_enabled   = true
   }
-}
+ }
 
 
 resource "aws_wafv2_web_acl_association" "ALB1-WAF" {
