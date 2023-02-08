@@ -347,7 +347,7 @@ data "aws_iam_policy_document" "ec2_common_combined" {
     data.aws_iam_policy_document.cloud_watch_custom.json
   ]
 }
-data "aws_iam_policy_document" "cross-account-s3" {
+data "aws_iam_policy_document" "user-s3-access" {
   statement {
     sid = "user-s3-access"
     actions = [
