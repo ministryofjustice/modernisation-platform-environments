@@ -60,13 +60,13 @@ resource "aws_iam_instance_profile" "ec2_profile" {
 }
 # Attach Policies to Instance Role
 resource "aws_iam_policy_attachment" "ec2_attach1" {
-#  count      = local.is-development == true ? 1 : 0
+  #  count      = local.is-development == true ? 1 : 0
   name       = "ec2-iam-attachment"
   roles      = aws_iam_role.ec2_iam_role[0].id
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 resource "aws_iam_policy_attachment" "ec2_attach2" {
-# count      = local.is-development == true ? 1 : 0
+  # count      = local.is-development == true ? 1 : 0
   name       = "ec2-iam-attachment"
   roles      = aws_iam_role.ec2_iam_role[0].id
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM"
