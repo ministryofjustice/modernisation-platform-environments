@@ -54,6 +54,7 @@ resource "aws_iam_role" "ec2_iam_role" {
 }
 # Create EC2 IAM Instance Profile
 resource "aws_iam_instance_profile" "ec2_profile" {
+<<<<<<< HEAD
   count = local.is-development == true ? 1 : 0
   name  = "ec2-profile"
   role  =  aws_iam_role.ec2_iam_role[count.index].name
@@ -62,12 +63,25 @@ resource "aws_iam_instance_profile" "ec2_profile" {
 # Attach Policies to Instance Role
 resource "aws_iam_policy_attachment" "ec2_attach1" {
   count      = local.is-development == true ? 1 : 0
+=======
+  #  count = local.is-development == true ? 1 : 0
+  name = "ec2-profile"
+  role = aws_iam_role.ec2_iam_role.name
+}
+# Attach Policies to Instance Role
+resource "aws_iam_policy_attachment" "ec2_attach1" {
+  # count      = local.is-development == true ? 1 : 0
+>>>>>>> c46e4cf4782da84fbef01315493bbc8150764026
   name       = "ec2-iam-attachment"
   roles      = aws_iam_role.ec2_iam_role[count.index].id
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 resource "aws_iam_policy_attachment" "ec2_attach2" {
+<<<<<<< HEAD
   count      = local.is-development == true ? 1 : 0
+=======
+  # count      = local.is-development == true ? 1 : 0
+>>>>>>> c46e4cf4782da84fbef01315493bbc8150764026
   name       = "ec2-iam-attachment"
   roles      = aws_iam_role.ec2_iam_role[count.index].id
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM"
