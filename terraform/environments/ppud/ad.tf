@@ -18,7 +18,7 @@ output "Password" {
 }
 
 resource "aws_directory_service_directory" "UKGOV" {
-# count    = local.is-development == true ? 1 : 0
+  # count    = local.is-development == true ? 1 : 0
   name     = "UKGOV.DEV"
   password = local.ad_creds.password
   edition  = "Standard"
