@@ -106,9 +106,9 @@ resource "aws_ssm_document" "api_ad_join_domain" {
 resource "aws_ssm_association" "ad_join_domain_association" {
   count      = local.is-development == true ? 1 : 0
   depends_on = [aws_instance.s609693lo6vw109, aws_instance.s609693lo6vw105, aws_instance.s609693lo6vw104, aws_instance.s609693lo6vw100, aws_instance.s609693lo6vw101, aws_instance.s609693lo6vw103, aws_instance.s609693lo6vw106, aws_instance.s609693lo6vw107, aws_instance.PPUDWEBSERVER2, aws_instance.s609693lo6vw102, aws_instance.s609693lo6vw108]
-  name       = aws_ssm_document.api_ad_join_domain.name
+  name       = aws_ssm_document.api_ad_join_domain[0].name
   targets {
-    key    = "InstanceIds"
-    values = [aws_instance.s609693lo6vw109.id, aws_instance.s609693lo6vw105.id, aws_instance.s609693lo6vw104.id, aws_instance.s609693lo6vw100.id, aws_instance.s609693lo6vw101.id, aws_instance.s609693lo6vw103.id, aws_instance.s609693lo6vw106.id, aws_instance.s609693lo6vw107.id, aws_instance.PPUDWEBSERVER2.id, aws_instance.s609693lo6vw102.id, aws_instance.s609693lo6vw108.id]
+    key    = "InstanceIds"[0]
+    values = [aws_instance.s609693lo6vw109[0].id, aws_instance.s609693lo6vw105[0].id, aws_instance.s609693lo6vw104[0].id, aws_instance.s609693lo6vw100[0].id, aws_instance.s609693lo6vw101[0].id, aws_instance.s609693lo6vw103[0].id, aws_instance.s609693lo6vw106[0].id, aws_instance.s609693lo6vw107[0].id, aws_instance.PPUDWEBSERVER2[0].id, aws_instance.s609693lo6vw102[0].id, aws_instance.s609693lo6vw108[0].id]
   }
 }
