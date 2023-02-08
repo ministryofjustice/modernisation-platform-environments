@@ -55,8 +55,8 @@ resource "aws_iam_role" "ec2_iam_role" {
 # Create EC2 IAM Instance Profile
 resource "aws_iam_instance_profile" "ec2_profile" {
   count = local.is-development == true ? 1 : 0
-  name = "ec2-profile"
-  role = aws_iam_role.ec2_iam_role[0].name
+  name  = "ec2-profile"
+  role  = aws_iam_role.ec2_iam_role[0].name
 }
 
 # Attach Policies to Instance Role
