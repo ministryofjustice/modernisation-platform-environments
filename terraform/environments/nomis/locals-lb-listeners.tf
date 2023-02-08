@@ -109,22 +109,22 @@ locals {
     development = {}
 
     test = {
-      http      = merge(local.lb_listener_defaults.http, local.lb_listener_defaults.nomis_public)
-      http-7001 = merge(local.lb_listener_defaults.http-7001, local.lb_listener_defaults.nomis_public)
-      http-7777 = merge(local.lb_listener_defaults.http-7777, local.lb_listener_defaults.nomis_public)
-      https = merge(local.lb_listener_defaults.https, local.lb_listener_defaults.nomis_public, {
-        route53_records = {
-          "t1-nomis-web.nomis" = local.lb_listener_defaults.environment_external_dns_zone
-        }
-      })
-      internal-http      = merge(local.lb_listener_defaults.http, local.lb_listener_defaults.nomis_internal)
-      internal-http-7001 = merge(local.lb_listener_defaults.http-7001, local.lb_listener_defaults.nomis_internal)
-      internal-http-7777 = merge(local.lb_listener_defaults.http-7777, local.lb_listener_defaults.nomis_internal)
-      internal-https = merge(local.lb_listener_defaults.https, local.lb_listener_defaults.nomis_internal, {
-        route53_records = {
-          "t1-nomis-web-internal.nomis" = local.lb_listener_defaults.environment_external_dns_zone
-        }
-      })
+      #      http      = merge(local.lb_listener_defaults.http, local.lb_listener_defaults.nomis_public)
+      #      http-7001 = merge(local.lb_listener_defaults.http-7001, local.lb_listener_defaults.nomis_public)
+      #      http-7777 = merge(local.lb_listener_defaults.http-7777, local.lb_listener_defaults.nomis_public)
+      #      https = merge(local.lb_listener_defaults.https, local.lb_listener_defaults.nomis_public, {
+      #        route53_records = {
+      #          "t1-nomis-web.nomis" = local.lb_listener_defaults.environment_external_dns_zone
+      #        }
+      #      })
+      #      internal-http      = merge(local.lb_listener_defaults.http, local.lb_listener_defaults.nomis_internal)
+      #      internal-http-7001 = merge(local.lb_listener_defaults.http-7001, local.lb_listener_defaults.nomis_internal)
+      #      internal-http-7777 = merge(local.lb_listener_defaults.http-7777, local.lb_listener_defaults.nomis_internal)
+      #      internal-https = merge(local.lb_listener_defaults.https, local.lb_listener_defaults.nomis_internal, {
+      #        route53_records = {
+      #          "t1-nomis-web-internal.nomis" = local.lb_listener_defaults.environment_external_dns_zone
+      #        }
+      #      })
     }
 
     preproduction = {}
