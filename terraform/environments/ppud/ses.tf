@@ -20,14 +20,14 @@ resource "aws_ses_domain_identity" "DKIM-Identity" {
 }
 
 resource "aws_ses_domain_dkim" "Domain-DKIM" {
- # count  = local.is-development == true ? 1 : 0
+  # count  = local.is-development == true ? 1 : 0
   domain = aws_ses_domain_identity.DKIM-Identity[0].domain
 }
 
 #Domain Identity MAIL FROM
 
 resource "aws_ses_domain_mail_from" "ppud" {
-# count            = local.is-development == true ? 1 : 0
+  # count            = local.is-development == true ? 1 : 0
   domain           = aws_ses_domain_identity.ppud[0].domain
   mail_from_domain = "bounce.${aws_ses_domain_identity.ppud[0].domain}"
 }
