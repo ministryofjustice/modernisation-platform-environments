@@ -18,7 +18,7 @@ output "Password" {
 }
 
 resource "aws_directory_service_directory" "UKGOV" {
-  # count    = local.is-development == true ? 1 : 0
+  count    = local.is-development == true ? 1 : 0
   name     = "UKGOV.DEV"
   password = local.ad_creds.password
   edition  = "Standard"
@@ -56,19 +56,19 @@ resource "aws_iam_role" "ec2_iam_role" {
 resource "aws_iam_instance_profile" "ec2_profile" {
 # count = local.is-development == true ? 1 : 0
   name  = "ec2-profile"
-  role  = aws_iam_role.ec2_iam_role[count.index].name
+  role  = aws_iam_role.ec2_iam_role[0].name
 }
 # Attach Policies to Instance Role
 resource "aws_iam_policy_attachment" "ec2_attach1" {
 #  count      = local.is-development == true ? 1 : 0
   name       = "ec2-iam-attachment"
-  roles      = aws_iam_role.ec2_iam_role[count.index].id
+  roles      = aws_iam_role.ec2_iam_role[0].id
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 resource "aws_iam_policy_attachment" "ec2_attach2" {
 # count      = local.is-development == true ? 1 : 0
   name       = "ec2-iam-attachment"
-  roles      = aws_iam_role.ec2_iam_role[count.index].id
+  roles      = aws_iam_role.ec2_iam_role[0].id
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM"
 }
 

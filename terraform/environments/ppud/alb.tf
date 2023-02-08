@@ -2,7 +2,7 @@
 # PPUD ALB Configuration
 
 resource "aws_lb" "PPUD-ALB" {
-  # count              = local.is-development == true ? 1 : 0
+  count              = local.is-development == true ? 1 : 0
   name               = "PPUD-ALB"
   internal           = false
   load_balancer_type = "application"
@@ -56,7 +56,7 @@ resource "aws_lb_target_group_attachment" "PPUD-PORTAL-1" {
 # WAM ALB Configuration
 
 resource "aws_lb" "WAM-ALB" {
-  # count              = local.is-development == true ? 1 : 0
+  count              = local.is-development == true ? 1 : 0
   name               = "WAM-ALB"
   internal           = false
   load_balancer_type = "application"
