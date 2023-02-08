@@ -1,6 +1,6 @@
 
 resource "aws_wafv2_web_acl" "WAM-rule" {
-  count = local.is-development == true ? 1 : 0
+# count = local.is-development == true ? 1 : 0
   name  = "WAM-rule"
   scope = "REGIONAL"
 
