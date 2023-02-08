@@ -112,10 +112,10 @@ locals {
       }
     }
 
-    lb_target_groups = {}
-    #   TODO: create target groups here instead of in load balancer
-    #      http-7001 = local.lb_target_group_http_7001
-    #      http-7777 = local.lb_target_group_http_7777
+    lb_target_groups = {
+      http-7001 = local.lb_target_group_http_7001
+      http-7777 = local.lb_target_group_http_7777
+    }
   }
 }
 
