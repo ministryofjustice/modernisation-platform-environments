@@ -1,6 +1,22 @@
 #------------------------------------------------------------------------------
 # Common IAM policies for all ec2 instance profiles
 #------------------------------------------------------------------------------
+resource "aws_kms_grant" "hmpps_ebs_kms_key_for_autoscaling" {
+  name              = "hmpps-ebs-kms-grant-for-autoscaling"
+  key_id            = module.environment.kms_keys["ebs"].arn
+  grantee_principal = "arn:aws:iam::${local.account_id}:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling"
+  operations = [
+    "Encrypt",
+    "Decrypt",
+    "ReEncryptFrom",
+    "ReEncryptTo",
+    "GenerateDataKey",
+    "GenerateDataKeyWithoutPlaintext",
+    "DescribeKey",
+    "CreateGrant"
+  ]
+}
+
 resource "aws_kms_grant" "ssm-start-stop-shared-cmk-grant" {
   count             = local.environment == "test" ? 1 : 0
   name              = "image-builder-shared-cmk-grant"
@@ -171,12 +187,35 @@ data "aws_iam_policy_document" "application_insights" {
   }
 }
 
+data "aws_iam_policy_document" "hmpps_kms_keys" {
+  statement {
+    sid    = "AllowBusinessUnitSharedKmsKeys"
+    effect = "Allow"
+    actions = [
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*",
+      "kms:DescribeKey",
+      "kms:CreateGrant",
+      "kms:ListGrants",
+      "kms:RevokeGrant"
+    ]
+    # Allow access to the AMI encryption key
+    resources = [
+      module.environment.kms_keys["ebs"].arn,
+      module.environment.kms_keys["general"].arn,
+    ]
+  }
+}
+
 # combine ec2-common policy documents
 data "aws_iam_policy_document" "ec2_common_combined" {
   source_policy_documents = [
     data.aws_iam_policy_document.ssm_custom.json,
     data.aws_iam_policy_document.s3_bucket_access.json,
     data.aws_iam_policy_document.cloud_watch_custom.json,
+    data.aws_iam_policy_document.hmpps_kms_keys.json,
     data.aws_iam_policy_document.application_insights.json # TODO: remove this later
   ]
 }
@@ -406,8 +445,8 @@ data "aws_iam_policy_document" "ssm_ec2_start_stop_kms" {
       "kms:ListGrants",
       "kms:RevokeGrant"
     ]
-    # we have a legacy CMK that's used in production that will be retired but in the meantime requires permissions
-    resources = [local.environment == "test" ? aws_kms_key.nomis-cmk[0].arn : data.aws_kms_key.nomis_key.arn, module.environment.kms_keys["ebs"].arn]
+    # Allow access to the AMI encryption key
+    resources = [module.environment.kms_keys["ebs"].arn]
   }
 
   statement {

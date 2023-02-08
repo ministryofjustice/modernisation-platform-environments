@@ -2,11 +2,66 @@
 # Alerts - WINDOWS
 # ==============================================================================
 
-# Low Available Memory Alarm - Windows
-# High CPU - Windows
-# Disk Free - Windows
-# CPU IOWait - Windows
 # Remote Desktop Services - Windows
+# CPU Idle Time - Windows
+
+# Low Available Memory Alarm - Windows
+resource "aws_cloudwatch_metric_alarm" "low_available_memory_windows" {
+  alarm_name          = "low_available_memory_windows"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = "2"
+  datapoints_to_alarm = "2"
+  metric_name         = "Memory % Committed Bytes In Use"
+  namespace           = "CWAgent"
+  period              = "60"
+  statistic           = "Average"
+  threshold           = "80"
+  alarm_description   = "This metric monitors the amount of available memory. If Committed Bytes in Use is > 80% for 2 minutes, the alarm will trigger."
+  alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
+  tags = {
+    Name = "low_available_memory_windows"
+  }
+}
+
+
+
+# High CPU - Windows
+resource "aws_cloudwatch_metric_alarm" "high_cpu_windows" {
+  alarm_name          = "high_cpu_windows"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = "5"
+  datapoints_to_alarm = "5"
+  metric_name         = "PROCESSOR_TIME"
+  namespace           = "CWAgent"
+  period              = "60"
+  statistic           = "Average"
+  threshold           = "95"
+  alarm_description   = "This metric monitors the Processor time. If the Processor time is greater than 95% for 5 minutes, the alarm will trigger: "
+  alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
+  tags = {
+    Name = "high_cpu_windows"
+  }
+}
+
+# Disk Free - Windows
+
+resource "aws_cloudwatch_metric_alarm" "disk_free_windows" {
+  alarm_name          = "disk_free_windows"
+  comparison_operator = "LessThanOrEqualToThreshold"
+  evaluation_periods  = "2"
+  datapoints_to_alarm = "2"
+  metric_name         = "DISK_FREE"
+  namespace           = "CWAgent"
+  period              = "60"
+  statistic           = "Average"
+  threshold           = "15"
+  alarm_description   = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space falls below 15% for 2 minutes, the alarm will trigger: https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4305453159/Disk+Free+alarm+-+Windows"
+  alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
+  tags = {
+    Name = "disk_free_windows"
+  }
+}
+
 
 # ==============================================================================
 # Alerts - LINUX

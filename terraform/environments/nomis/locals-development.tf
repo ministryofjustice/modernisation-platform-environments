@@ -103,7 +103,7 @@ locals {
         tags = {
           server-type       = "jumpserver"
           description       = "Windows Server 2022 Jumpserver for NOMIS"
-          monitored         = true
+          monitored         = false
           os-type           = "Windows"
           component         = "jumpserver"
           nomis-environment = "dev"

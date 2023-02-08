@@ -17,19 +17,22 @@
       "db_enabled_cloudwatch_logs_exports": ["audit", "audit", "listener", "trace"],
       "db_performance_insights_enabled": "false",
       "db_skip_final_snapshot": "true",
-      "ec2_iaps_instance_type": "t3.medium"
-    },
-    "test": {
-      "short_environment_name": "test",
-      "example_var": "test-data"
+      "ec2_iaps_instance_type": "t3.medium",
+      "cloudwatch_agent_log_group_retention_period": "7",
+      "iaps_ndelius_interface_url": "placeholder.nd.address",
+      "iaps_im_interface_url": "placeholder.im.address"
     },
     "preproduction": {
       "short_environment_name": "preprod",
-      "example_var": "preproduction-data"
+      "cloudwatch_agent_log_group_retention_period": "14",
+      "iaps_ndelius_interface_url": "interface.stage.probation.service.justice.gov.uk",
+      "iaps_im_interface_url": "preprod-im-data.i2ncloud.com"
     },
     "production": {
       "short_environment_name": "prod",
-      "example_var": "production-data"
+      "cloudwatch_agent_log_group_retention_period": "14",
+      "iaps_ndelius_interface_url": "interface.probation.service.justice.gov.uk",
+      "iaps_im_interface_url": "im-data.i2ncloud.com"
     }
   },
   "ec2_iaps_instance_label": "iaps-server",

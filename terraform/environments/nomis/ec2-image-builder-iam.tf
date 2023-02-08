@@ -5,11 +5,6 @@ data "aws_caller_identity" "mod-platform" {
   provider = aws.modernisation-platform
 }
 
-data "aws_kms_key" "nomis_key" {
-  # Look up the CMK used to create AMIs, which is in the test account (maybe it should be in prod?)
-  key_id = "arn:aws:kms:${local.region}:${local.environment_management.account_ids["nomis-test"]}:alias/nomis-image-builder"
-}
-
 data "aws_iam_policy_document" "image-builder-distro-assume-role" {
   statement {
     actions = ["sts:AssumeRole"]
@@ -78,8 +73,8 @@ data "aws_iam_policy_document" "image-builder-distro-kms-policy" {
       "kms:ListGrants",
       "kms:RevokeGrant"
     ]
-    # we use the same AMIs in test and production, which are encrypted with a single key that only exists in test, hence the below
-    resources = [local.environment == "test" ? aws_kms_key.nomis-cmk[0].arn : data.aws_kms_key.nomis_key.arn, module.environment.kms_keys["ebs"].arn]
+    # Allow access to the AMI encryption key
+    resources = [module.environment.kms_keys["ebs"].arn]
   }
 }
 
@@ -164,6 +159,7 @@ resource "aws_iam_role_policy_attachment" "launch-template-reader-policy-attach"
 
 }
 
+# this can be zapped at some point as the correct definition is in ec2-common
 resource "aws_kms_grant" "image-builder-shared-cmk-grant" {
   name              = "image-builder-shared-cmk-grant"
   key_id            = module.environment.kms_keys["ebs"].arn
