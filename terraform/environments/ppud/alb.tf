@@ -17,7 +17,7 @@ resource "aws_lb" "PPUD-ALB" {
 }
 
 resource "aws_lb_listener" "PPUD-Front-End" {
-  load_balancer_arn = aws_lb.PPUD-ALB.arn
+  load_balancer_arn = aws_lb.PPUD-ALB[count.index].arn
   port              = "443"
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
@@ -43,13 +43,13 @@ resource "aws_lb_target_group" "PPUD-Target-Group" {
 
 resource "aws_lb_target_group_attachment" "PPUD-PORTAL" {
   target_group_arn = aws_lb_target_group.PPUD-Target-Group.arn
-  target_id        = aws_instance.s609693lo6vw101.id
+  target_id        = aws_instance.s609693lo6vw101[count.index].id
   port             = 443
 }
 
 resource "aws_lb_target_group_attachment" "PPUD-PORTAL-1" {
   target_group_arn = aws_lb_target_group.PPUD-Target-Group.arn
-  target_id        = aws_instance.PPUDWEBSERVER2.id
+  target_id        = aws_instance.PPUDWEBSERVER2[count.index].id
   port             = 443
 }
 
@@ -71,7 +71,7 @@ resource "aws_lb" "WAM-ALB" {
 }
 
 resource "aws_lb_listener" "WAM-Front-End" {
-  load_balancer_arn = aws_lb.WAM-ALB.arn
+  load_balancer_arn = aws_lb.WAM-ALB[count.index].arn
   port              = "443"
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
@@ -92,6 +92,6 @@ resource "aws_lb_target_group" "WAM-Target-Group" {
 
 resource "aws_lb_target_group_attachment" "WAM-Portal" {
   target_group_arn = aws_lb_target_group.WAM-Target-Group.arn
-  target_id        = aws_instance.s609693lo6vw105.id
+  target_id        = aws_instance.s609693lo6vw105[count.index].id
   port             = 80
 }
