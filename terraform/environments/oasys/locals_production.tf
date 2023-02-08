@@ -20,13 +20,6 @@ locals {
 
     log_groups = {}
 
-    s3_buckets = {
-      "s3-bucket" = {}
-      "ec2-image-builder-${local.application_name}" = {
-        bucket_policy = [data.aws_iam_policy_document.cross-account-s3.json]
-      }
-    }
-
     ec2_common = {
       patch_approval_delay_days = 7
       patch_day                 = "THU"

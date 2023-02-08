@@ -1,15 +1,14 @@
-module "s3-bucket" {
+module "image-builder-bucket" {
   source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.2.0"
 
   providers = {
     aws.bucket-replication = aws
   }
-
-  for_each = try(local.environment_config.s3_buckets, {})
-
-  bucket_prefix       = each.key
+  bucket_prefix       = "${local.application_name}-${local.environment}-"
   replication_enabled = false
-  bucket_policy       = lookup(each.value, "bucket_policy", null)
+
+  bucket_policy = [data.aws_iam_policy_document.cross-account-s3.json]
+
   lifecycle_rule = [
     {
       id      = "main"
@@ -18,7 +17,7 @@ module "s3-bucket" {
 
       tags = {
         rule      = "log"
-        autoclean = "true"
+        autoclean = "Enabled"
       }
 
       transition = [
@@ -47,5 +46,7 @@ module "s3-bucket" {
       }
     }
   ]
+
   tags = local.tags
+
 }
