@@ -3,9 +3,6 @@
 
 module "rds" {
   source = "./modules/rds"
-  providers = {
-    aws = aws.core-vpc
-  }
 
   application_name            = local.application_name
   identifier_name             = local.application_name
@@ -39,4 +36,13 @@ module "rds" {
   # rds_record_provider         = aws.core-vpc
   rds_record_zone_inner_id    = data.aws_route53_zone.inner.zone_id
   rds_record_zone_inner_name  = data.aws_route53_zone.inner.name
+}
+
+resource "aws_route53_record" "oas-rds" {
+  provider = aws.core-vpc
+  zone_id  = data.aws_route53_zone.inner.zone_id
+  name     = "rds.${local.application_name}.${data.aws_route53_zone.inner.name}"
+  type     = "CNAME"
+  ttl      = 60
+  records  = [module.rds.rds_endpoint]
 }
