@@ -230,8 +230,8 @@ data "aws_iam_policy_document" "s3_bucket_access" {
       "s3:ListBucket",
       "s3:DeleteObject"
     ]
-    resources = [module.s3-bucket["s3-bucket"].bucket.arn,
-    "${module.s3-bucket["s3-bucket"].bucket.arn}/*"]
+    resources = [module.s3-bucket.bucket.arn,
+    "${module.s3-bucket.bucket.arn}/*"]
   }
 
   # allow access to ec2-image-builder-oasys buckets in all accounts
@@ -349,15 +349,17 @@ data "aws_iam_policy_document" "ec2_common_combined" {
 }
 data "aws_iam_policy_document" "cross-account-s3" {
   statement {
-    sid = "cross-account-s3-access-for-image-builder"
+    sid = "user-s3-access"
     actions = [
       "s3:GetObject",
       "s3:PutObject",
       "s3:PutObjectAcl",
       "s3:ListBucket"
     ]
-    resources = ["${module.s3-bucket["ec2-image-builder-${local.application_name}"].bucket.arn}/*",
-    module.s3-bucket["ec2-image-builder-${local.application_name}"].bucket.arn, ]
+    resources = [
+      "${module.s3-bucket.bucket.arn}/*",
+      module.s3-bucket.bucket.arn,
+    ]
     principals {
       type = "AWS"
       identifiers = sort([ # sort to avoid plan changes
