@@ -217,11 +217,11 @@ resource "aws_security_group" "sg_ebsapps_lb" {
     cidr_blocks = ["0.0.0.0/0"]
   }
   egress {
-    description      = "allow all outgoing traffic"
-    from_port        = 0
-    to_port          = 0
-    protocol         = "-1"
-    cidr_blocks      = ["0.0.0.0/0"]
+    description = "allow all outgoing traffic"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
     #from_port   = 80
     #to_port     = 80
     #protocol    = "tcp"
