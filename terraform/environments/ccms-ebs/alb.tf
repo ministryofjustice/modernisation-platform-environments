@@ -28,7 +28,7 @@ resource "aws_lb_target_group" "ebsapp_tg" {
     protocol = "HTTP"
   }
 }
-/*
+
 resource "aws_lb_listener" "ebsapps_listener" {
   #depends_on = [
   #  aws_acm_certificate_validation.external
@@ -45,7 +45,7 @@ resource "aws_lb_listener" "ebsapps_listener" {
     target_group_arn = aws_lb_target_group.ebsapp_tg.id
   }
 }
-*/
+
 resource "aws_route53_record" "external" {
   provider = aws.core-vpc
 
