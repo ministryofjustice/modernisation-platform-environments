@@ -18,6 +18,38 @@ resource "aws_lb" "ebsapps_lb" {
   )
 }
 
+resource "aws_lb_target_group" "ebsapp_tg" {
+  name     = lower(format("tg-%s-%s-ebsapps", local.application_name, local.environment))
+  port     = 80
+  protocol = "HTTP"
+  vpc_id   = data.aws_vpc.shared.id
+  health_check {
+    port     = 80
+    protocol = "HTTP"
+  }
+}
+
+/*
+ccms-ebs.laa-dev.modernisation-platform.service.justice.gov.uk
+ccms-ebs.laa-test.modernisation-platform.service.justice.gov.uk
+ccms-ebs.laa-preproduction.modernisation-platform.service.justice.gov.uk
+ccms-ebs.laa-production.modernisation-platform.service.justice.gov.uk
+*/
+
+resource "aws_acm_certificate" "external" {
+  domain_name       = "modernisation-platform.service.justice.gov.uk"
+  validation_method = "DNS"
+  subject_alternative_names = ["${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
+  tags = {
+    Environment = local.environment
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+
 /*
 resource "aws_lb_listener" "ebsapps_listener" {
   depends_on = [
@@ -35,31 +67,9 @@ resource "aws_lb_listener" "ebsapps_listener" {
     target_group_arn = aws_lb_target_group.ebsapp_tg.id
   }
 }
+
 */
-resource "aws_lb_target_group" "ebsapp_tg" {
-  name     = lower(format("tg-%s-%s-ebsapps", local.application_name, local.environment))
-  port     = 80
-  protocol = "HTTP"
-  vpc_id   = data.aws_vpc.shared.id
-  health_check {
-    port     = 80
-    protocol = "HTTP"
-  }
-}
 /*
-resource "aws_acm_certificate" "external" {
-  domain_name       = "modernisation-platform.service.justice.gov.uk"
-  validation_method = "DNS"
-
-  subject_alternative_names = ["${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
-  tags = {
-    Environment = local.environment
-  }
-
-  lifecycle {
-    create_before_destroy = true
-  }
-}
 resource "aws_route53_record" "external_validation" {
   provider = aws.core-vpc
   for_each = {
@@ -77,7 +87,8 @@ resource "aws_route53_record" "external_validation" {
   type            = each.value.type
   zone_id         = data.aws_route53_zone.external.zone_id
 }
-
+*/
+/*
 resource "aws_acm_certificate_validation" "external" {
   certificate_arn         = aws_acm_certificate.external.arn
   validation_record_fqdns = [for record in aws_route53_record.external_validation : record.fqdn]

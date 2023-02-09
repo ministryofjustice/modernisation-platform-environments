@@ -217,9 +217,15 @@ resource "aws_security_group" "sg_ebsapps_lb" {
     cidr_blocks = ["0.0.0.0/0"]
   }
   egress {
-    from_port = 0
-    to_port   = 0
-    protocol  = "-1"
+    description      = "allow all outgoing traffic"
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+    #from_port   = 80
+    #to_port     = 80
+    #protocol    = "tcp"
+    #cidr_blocks = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
   }
 
   tags = merge(local.tags,
