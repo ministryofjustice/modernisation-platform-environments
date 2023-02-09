@@ -242,6 +242,10 @@ data "template_file" "iaps_ec2_config" {
     delius_iaps_ad_domain_name          = aws_directory_service_directory.active_directory.name
     ndelius_interface_url               = local.application_data.accounts[local.environment].iaps_ndelius_interface_url
     im_interface_url                    = local.application_data.accounts[local.environment].iaps_im_interface_url
+
+    # TODO: remove environment variable and related conditional statements
+    # temporarily needed to ensure no connections to delius and im are attempted
+    environment = local.environment
   }
 }
 
