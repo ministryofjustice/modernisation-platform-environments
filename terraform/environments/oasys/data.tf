@@ -203,7 +203,7 @@ data "aws_secretsmanager_secret_version" "environment_management" {
 data "aws_kms_key" "general_shared" { key_id = "arn:aws:kms:${local.region}:${local.environment_management.account_ids["core-shared-services-production"]}:alias/general-${local.business_unit}" }
 # shared CMK used to create AMIs in the MP shared services account
 data "aws_kms_key" "ebs_hmpps" { key_id = "arn:aws:kms:${local.region}:${local.environment_management.account_ids["core-shared-services-production"]}:alias/ebs-${local.business_unit}" }
-data "aws_kms_key" "rds_shared" { key_id = "arn:aws:kms:${local.region}:${local.environment_management.account_ids["core-shared-services-production"]}:alias/rds-${local.business_unit}" }
+# data "aws_kms_key" "rds_shared" { key_id = "arn:aws:kms:${local.region}:${local.environment_management.account_ids["core-shared-services-production"]}:alias/rds-${local.business_unit}" }
 # data "aws_kms_key" "oasys_key" { key_id = "arn:aws:kms:${local.region}:${local.environment_management.account_ids["oasys-test"]}:alias/oasys-image-builder" }
 
 
