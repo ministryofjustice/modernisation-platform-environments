@@ -113,8 +113,8 @@ locals {
     }
 
     lb_target_groups = {
-      public-http-7001 = local.lb_target_group_http_7001
-      public-http-7777 = local.lb_target_group_http_7777
+      public-http-7001   = local.lb_target_group_http_7001
+      public-http-7777   = local.lb_target_group_http_7777
       internal-http-7001 = local.lb_target_group_http_7001
       internal-http-7777 = local.lb_target_group_http_7777
     }
