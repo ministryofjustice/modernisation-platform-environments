@@ -292,7 +292,7 @@ resource "aws_cloudwatch_metric_alarm" "cert_expires_in_30_days" {
     Name = "cert_expires_in_30_days"
   }
 }
-  
+
 resource "aws_clouwatch_metric_alarm" "cert_expires_in_2_days" {
   alarm_name          = "cert_expires_in_2_days"
   comparison_operator = "LessThanThreshold"
