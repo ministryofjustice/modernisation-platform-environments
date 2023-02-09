@@ -18,13 +18,7 @@ resource "aws_acm_certificate" "external" {
     create_before_destroy = true
   }
 }
-/*
-resource "aws_acm_certificate_validation" "external" {
-  certificate_arn         = aws_acm_certificate.external.arn
-  validation_record_fqdns = [for record in aws_route53_record.external_validation : record.fqdn]
-}
-*/
-/*
+
 resource "aws_route53_record" "external_validation" {
   provider = aws.core-network-services
   for_each = {
@@ -42,4 +36,8 @@ resource "aws_route53_record" "external_validation" {
   type            = each.value.type
   zone_id         = data.aws_route53_zone.external.zone_id
 }
-*/
+
+resource "aws_acm_certificate_validation" "external" {
+  certificate_arn         = aws_acm_certificate.external.arn
+  validation_record_fqdns = [for record in aws_route53_record.external_validation : record.fqdn]
+}
