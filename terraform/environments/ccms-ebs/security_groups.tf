@@ -99,24 +99,24 @@ resource "aws_security_group_rule" "ingress_traffic_ebsapps" {
   cidr_blocks       = [data.aws_vpc.shared.cidr_block, "0.0.0.0/0"]
 }
 resource "aws_security_group_rule" "egress_traffic_ebsapps_sg" {
-  for_each                  = local.application_data.ec2_sg_egress_rules
-  security_group_id         = aws_security_group.ec2_sg_ebsapps.id
-  type                      = "egress"
-  description               = format("Outbound traffic for %s %d", each.value.protocol, each.value.from_port)
-  protocol                  = each.value.protocol
-  from_port                 = each.value.from_port
-  to_port                   = each.value.to_port
-  source_security_group_id  = aws_security_group.ec2_sg_ebsapps.id
+  for_each                 = local.application_data.ec2_sg_egress_rules
+  security_group_id        = aws_security_group.ec2_sg_ebsapps.id
+  type                     = "egress"
+  description              = format("Outbound traffic for %s %d", each.value.protocol, each.value.from_port)
+  protocol                 = each.value.protocol
+  from_port                = each.value.from_port
+  to_port                  = each.value.to_port
+  source_security_group_id = aws_security_group.ec2_sg_ebsapps.id
 }
 resource "aws_security_group_rule" "egress_traffic_ebsapps_cidr" {
-  for_each                  = local.application_data.ec2_sg_egress_rules
-  security_group_id         = aws_security_group.ec2_sg_ebsapps.id
-  type                      = "egress"
-  description               = format("Outbound traffic for %s %d", each.value.protocol, each.value.from_port)
-  protocol                  = each.value.protocol
-  from_port                 = each.value.from_port
-  to_port                   = each.value.to_port
-  cidr_blocks               = [each.value.destination_cidr]
+  for_each          = local.application_data.ec2_sg_egress_rules
+  security_group_id = aws_security_group.ec2_sg_ebsapps.id
+  type              = "egress"
+  description       = format("Outbound traffic for %s %d", each.value.protocol, each.value.from_port)
+  protocol          = each.value.protocol
+  from_port         = each.value.from_port
+  to_port           = each.value.to_port
+  cidr_blocks       = [each.value.destination_cidr]
 }
 
 # Security Group for WebGate
@@ -139,24 +139,24 @@ resource "aws_security_group_rule" "ingress_traffic_webgate" {
   cidr_blocks       = [data.aws_vpc.shared.cidr_block, "0.0.0.0/0"]
 }
 resource "aws_security_group_rule" "egress_traffic_webgate_sg" {
-  for_each                  = local.application_data.ec2_sg_egress_rules
-  security_group_id         = aws_security_group.ec2_sg_webgate.id
-  type                      = "egress"
-  description               = format("Outbound traffic for %s %d", each.value.protocol, each.value.from_port)
-  protocol                  = each.value.protocol
-  from_port                 = each.value.from_port
-  to_port                   = each.value.to_port
-  source_security_group_id  = aws_security_group.ec2_sg_webgate.id
+  for_each                 = local.application_data.ec2_sg_egress_rules
+  security_group_id        = aws_security_group.ec2_sg_webgate.id
+  type                     = "egress"
+  description              = format("Outbound traffic for %s %d", each.value.protocol, each.value.from_port)
+  protocol                 = each.value.protocol
+  from_port                = each.value.from_port
+  to_port                  = each.value.to_port
+  source_security_group_id = aws_security_group.ec2_sg_webgate.id
 }
 resource "aws_security_group_rule" "egress_traffic_webgate_cidr" {
-  for_each                  = local.application_data.ec2_sg_egress_rules
-  security_group_id         = aws_security_group.ec2_sg_webgate.id
-  type                      = "egress"
-  description               = format("Outbound traffic for %s %d", each.value.protocol, each.value.from_port)
-  protocol                  = each.value.protocol
-  from_port                 = each.value.from_port
-  to_port                   = each.value.to_port
-  cidr_blocks               = [each.value.destination_cidr]
+  for_each          = local.application_data.ec2_sg_egress_rules
+  security_group_id = aws_security_group.ec2_sg_webgate.id
+  type              = "egress"
+  description       = format("Outbound traffic for %s %d", each.value.protocol, each.value.from_port)
+  protocol          = each.value.protocol
+  from_port         = each.value.from_port
+  to_port           = each.value.to_port
+  cidr_blocks       = [each.value.destination_cidr]
 }
 
 # Security Group for AccessGate
@@ -179,24 +179,24 @@ resource "aws_security_group_rule" "ingress_traffic_accessgate" {
   cidr_blocks       = [data.aws_vpc.shared.cidr_block, "0.0.0.0/0"]
 }
 resource "aws_security_group_rule" "egress_traffic_accessgate_sg" {
-  for_each                  = local.application_data.ec2_sg_egress_rules
-  security_group_id         = aws_security_group.ec2_sg_accessgate.id
-  type                      = "egress"
-  description               = format("Outbound traffic for %s %d", each.value.protocol, each.value.from_port)
-  protocol                  = each.value.protocol
-  from_port                 = each.value.from_port
-  to_port                   = each.value.to_port
-  source_security_group_id  = aws_security_group.ec2_sg_accessgate.id
+  for_each                 = local.application_data.ec2_sg_egress_rules
+  security_group_id        = aws_security_group.ec2_sg_accessgate.id
+  type                     = "egress"
+  description              = format("Outbound traffic for %s %d", each.value.protocol, each.value.from_port)
+  protocol                 = each.value.protocol
+  from_port                = each.value.from_port
+  to_port                  = each.value.to_port
+  source_security_group_id = aws_security_group.ec2_sg_accessgate.id
 }
 resource "aws_security_group_rule" "egress_traffic_accessgate_cidr" {
-  for_each                  = local.application_data.ec2_sg_egress_rules
-  security_group_id         = aws_security_group.ec2_sg_accessgate.id
-  type                      = "egress"
-  description               = format("Outbound traffic for %s %d", each.value.protocol, each.value.from_port)
-  protocol                  = each.value.protocol
-  from_port                 = each.value.from_port
-  to_port                   = each.value.to_port
-  cidr_blocks               = [each.value.destination_cidr]
+  for_each          = local.application_data.ec2_sg_egress_rules
+  security_group_id = aws_security_group.ec2_sg_accessgate.id
+  type              = "egress"
+  description       = format("Outbound traffic for %s %d", each.value.protocol, each.value.from_port)
+  protocol          = each.value.protocol
+  from_port         = each.value.from_port
+  to_port           = each.value.to_port
+  cidr_blocks       = [each.value.destination_cidr]
 }
 
 
@@ -210,15 +210,15 @@ resource "aws_security_group" "sg_ebsapps_lb" {
   vpc_id      = data.aws_vpc.shared.id
 
   ingress {
-    from_port = 443
-    to_port = 443
-    protocol = "tcp"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
   egress {
     from_port = 0
-    to_port = 0
-    protocol = "-1"
+    to_port   = 0
+    protocol  = "-1"
   }
 
   tags = merge(local.tags,
