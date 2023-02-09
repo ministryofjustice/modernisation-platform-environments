@@ -1,6 +1,6 @@
 # Security Group for the baseline EC2
 resource "aws_security_group" "ec2_sg_oracle_base" {
-  name        = "ec2_sg_oracle_base"
+  name = "ec2_sg_oracle_base"
   ######## Fix this description, once all rules are matched up in code ########
   description = "Baseline image of Oracle Linux 7.9"
   vpc_id      = data.aws_vpc.shared.id
