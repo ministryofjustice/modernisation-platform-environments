@@ -286,7 +286,7 @@ resource "aws_cloudwatch_metric_alarm" "cert_expires_in_30_days" {
   period              = "60"
   statistic           = "Average"
   threshold           = "30"
-  alarm_description   = "This metric monitors the number of days until the certificate expires. If the number of days is less than 30 for 1 minute."
+  alarm_description   = "This metric monitors the number of days until the certificate expires. If the number of days is less than 30."
   alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
   tags = {
     Name = "cert_expires_in_30_days"
@@ -302,7 +302,7 @@ resource "aws_clouwatch_metric_alarm" "cert_expires_in_2_days" {
   period              = "60"
   statistic           = "Average"
   threshold           = "2"
-  alarm_description   = "This metric monitors the number of days until the certificate expires. If the number of days is less than 2 for 1 minute."
+  alarm_description   = "This metric monitors the number of days until the certificate expires. If the number of days is less than 2."
   alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
   tags = {
     Name = "cert_expires_in_2_days"
