@@ -271,3 +271,40 @@ resource "aws_cloudwatch_metric_alarm" "load_balancer_unhealthy_state_target" {
     Name = "load_balancer_unhealthy_state_target"
   }
 }
+
+# ==============================================================================
+# Certificate Alerts - Days to Expiry
+# Certificates are managed by AWS Certificate Manager (ACM) so there shouldn't be any reason why these don't renew automatically.
+# ==============================================================================
+
+resource "aws_cloudwatch_metric_alarm" "cert_expires_in_30_days" {
+  alarm_name          = "cert_expires_in_30_days"
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods  = "1"
+  metric_name         = "DaysToExpiry"
+  namespace           = "AWS/ACM"
+  period              = "60"
+  statistic           = "Average"
+  threshold           = "30"
+  alarm_description   = "This metric monitors the number of days until the certificate expires. If the number of days is less than 30 for 1 minute."
+  alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
+  tags = {
+    Name = "cert_expires_in_30_days"
+  }
+}
+  
+resource "aws_clouwatch_metric_alarm" "cert_expires_in_2_days" {
+  alarm_name          = "cert_expires_in_2_days"
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods  = "1"
+  metric_name         = "DaysToExpiry"
+  namespace           = "AWS/ACM"
+  period              = "60"
+  statistic           = "Average"
+  threshold           = "2"
+  alarm_description   = "This metric monitors the number of days until the certificate expires. If the number of days is less than 2 for 1 minute."
+  alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
+  tags = {
+    Name = "cert_expires_in_2_days"
+  }
+}
