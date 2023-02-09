@@ -5,7 +5,7 @@ locals {
     idle_timeout             = "60"
     public_subnets           = module.environment.subnets["public"].ids
     # TODO: no point having in eu-west-2c
-    public_subnets       = [module.environment.subnet["public"]["eu-west-2a"].id]
+    # public_subnets       = [module.environment.subnet["public"]["eu-west-2a"].id]
     force_destroy_bucket = true
     internal_lb          = true
     tags                 = local.tags
