@@ -32,7 +32,7 @@
       "orace_base_prereqs_ami_name": "Oracle79-prereqs-v1_5",
       "webgate_ami_name": "ebs-sso-v1_0",
       "accessgate_ami_name": "ebs-sso-v1_0",
-      "key_name": "oracle-base-dev",
+      "key_name": "",
       "webgate_no_instances": 1,
       "webgate_default_iops": 3000,
       "webgate_u01_size": 100,
