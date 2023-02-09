@@ -105,8 +105,8 @@ locals {
         local.lb_listener_defaults.http-7001,
         local.lb_listener_defaults.nomis_internal, {
           replace = {
-            target_group_name_replace                       = "t1-nomis-web"
-            condition_host_header_target_group_name_replace = "t1-nomis-web"
+            target_group_name_replace     = "t1-nomis-web"
+            condition_host_header_replace = "t1-nomis-web"
           }
         }
       )
@@ -114,8 +114,8 @@ locals {
         local.lb_listener_defaults.http-7777,
         local.lb_listener_defaults.nomis_internal, {
           replace = {
-            target_group_name_replace                       = "t1-nomis-web"
-            condition_host_header_target_group_name_replace = "t1-nomis-web"
+            target_group_name_replace     = "t1-nomis-web"
+            condition_host_header_replace = "t1-nomis-web"
           }
         }
       )
@@ -124,9 +124,9 @@ locals {
         local.lb_listener_defaults.nomis_internal,
         local.lb_listener_defaults.route53, {
           replace = {
-            target_group_name_replace                       = "t1-nomis-web"
-            condition_host_header_target_group_name_replace = "t1-nomis-web"
-            route53_record_name_replace                     = "t1-nomis-web"
+            target_group_name_replace     = "t1-nomis-web"
+            condition_host_header_replace = "t1-nomis-web"
+            route53_record_name_replace   = "t1-nomis-web"
           }
       })
     }
