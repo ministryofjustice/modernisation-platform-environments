@@ -18,6 +18,7 @@ resource "aws_lb" "ebsapps_lb" {
   )
 }
 
+/*
 resource "aws_lb_listener" "ebsapps_listener" {
   depends_on = [
     aws_acm_certificate_validation.external
@@ -34,7 +35,7 @@ resource "aws_lb_listener" "ebsapps_listener" {
     target_group_arn = aws_lb_target_group.ebsapp_tg.id
   }
 }
-
+*/
 resource "aws_lb_target_group" "ebsapp_tg" {
   name     = lower(format("tg-%s-%s-ebsapps", local.application_name, local.environment))
   port     = 80
@@ -45,7 +46,7 @@ resource "aws_lb_target_group" "ebsapp_tg" {
     protocol = "HTTP"
   }
 }
-
+/*
 resource "aws_acm_certificate" "external" {
   domain_name       = "modernisation-platform.service.justice.gov.uk"
   validation_method = "DNS"
@@ -81,3 +82,4 @@ resource "aws_acm_certificate_validation" "external" {
   certificate_arn         = aws_acm_certificate.external.arn
   validation_record_fqdns = [for record in aws_route53_record.external_validation : record.fqdn]
 }
+*/
