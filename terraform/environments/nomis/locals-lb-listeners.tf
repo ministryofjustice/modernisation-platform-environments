@@ -139,7 +139,7 @@ locals {
           }
         }
       )
-      nomis-internal-t1-nomis-web-http-7777 = merge(
+      nomis-public-t1-nomis-web-http-7777 = merge(
         local.lb_listener_defaults.http-7777,
         local.lb_listener_defaults.nomis_public, {
           replace = {
@@ -148,7 +148,7 @@ locals {
           }
         }
       )
-      nomis-internal-t1-nomis-web-https = merge(
+      nomis-public-t1-nomis-web-https = merge(
         local.lb_listener_defaults.https,
         local.lb_listener_defaults.nomis_public,
         local.lb_listener_defaults.route53, {
