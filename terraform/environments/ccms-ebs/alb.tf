@@ -61,7 +61,7 @@ resource "aws_lb_target_group" "ebsapp_tg" {
 }
 
 resource "aws_lb_target_group_attachment" "ebsapps" {
-  count = local.application_data.accounts[local.environment].accessgate_no_instances
+  count            = local.application_data.accounts[local.environment].accessgate_no_instances
   target_group_arn = aws_lb_target_group.ebsapp_tg.arn
   target_id        = element(aws_instance.ec2_ebsapps.*.id, count.index)
   port             = 80
