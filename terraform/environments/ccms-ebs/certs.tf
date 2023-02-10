@@ -35,6 +35,7 @@ resource "aws_acm_certificate" "external" {
 }
 
 
+
 resource "aws_route53_record" "external_validation" {
   provider = aws.core-network-services
   for_each = {
@@ -44,14 +45,15 @@ resource "aws_route53_record" "external_validation" {
       type   = dvo.resource_record_type
     }
   }
-
   allow_overwrite = true
   name            = each.value.name
   records         = [each.value.record]
   ttl             = 60
   type            = each.value.type
-  zone_id         = data.aws_route53_zone.external.zone_id
+  #zone_id         = data.aws_route53_zone.external.zone_id
+  zone_id         = data.aws_route53_zone.network-services.zone_id
 }
+
 
 /*
 resource "aws_route53_record" "external_validation" {
