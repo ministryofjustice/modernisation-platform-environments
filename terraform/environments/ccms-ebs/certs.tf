@@ -51,7 +51,7 @@ resource "aws_route53_record" "external_validation" {
   ttl             = 60
   type            = each.value.type
   #zone_id         = data.aws_route53_zone.external.zone_id
-  zone_id         = data.aws_route53_zone.network-services.zone_id
+  zone_id = data.aws_route53_zone.network-services.zone_id
 }
 
 
