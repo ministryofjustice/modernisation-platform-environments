@@ -6,9 +6,9 @@ ccms-ebs.laa-production.modernisation-platform.service.justice.gov.uk
 */
 
 resource "aws_acm_certificate" "external-service" {
-  count    = local.is-production ? 0 : 1
-  domain_name               = "*.service.justice.gov.uk"
-  validation_method         = "DNS"
+  count             = local.is-production ? 0 : 1
+  domain_name       = "*.service.justice.gov.uk"
+  validation_method = "DNS"
   #subject_alternative_names = ["${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
 
   tags = merge(local.tags,
@@ -20,9 +20,9 @@ resource "aws_acm_certificate" "external-service" {
   }
 }
 resource "aws_acm_certificate" "external" {
-  count    = local.is-production ? 0 : 1
-  domain_name               = "*.modernisation-platform.service.justice.gov.uk"
-  validation_method         = "DNS"
+  count             = local.is-production ? 0 : 1
+  domain_name       = "*.modernisation-platform.service.justice.gov.uk"
+  validation_method = "DNS"
   #subject_alternative_names = ["${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
 
   tags = merge(local.tags,
