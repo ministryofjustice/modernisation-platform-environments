@@ -20,7 +20,7 @@ resource "aws_acm_certificate" "external" {
   }
 }
 
-resource "aws_route53_record" "external_validation" {
+resource "aws_route53_record" "external-validation" {
   provider = aws.core-network-services
   for_each = {
     for dvo in aws_acm_certificate.external[0].domain_validation_options : dvo.domain_name => {
@@ -38,14 +38,14 @@ resource "aws_route53_record" "external_validation" {
   zone_id = data.aws_route53_zone.network-services.zone_id
 }
 
-resource "aws_acm_certificate_validation" "external_validation" {
+resource "aws_acm_certificate_validation" "external-validation" {
   certificate_arn         = aws_acm_certificate.external[0].arn
-  validation_record_fqdns = [for record in aws_route53_record.external_validation : record.fqdn]
+  validation_record_fqdns = [for record in aws_route53_record.external-validation : record.fqdn]
 }
 
 
 
-
+/*
 resource "aws_acm_certificate" "external-service" {
   count             = local.is-production ? 0 : 1
   domain_name       = "*.service.justice.gov.uk"
@@ -60,7 +60,7 @@ resource "aws_acm_certificate" "external-service" {
     create_before_destroy = true
   }
 }
-resource "aws_route53_record" "ext_service_validation" {
+resource "aws_route53_record" "external-service-validation" {
   provider = aws.core-network-services
   for_each = {
     for dvo in aws_acm_certificate.external-service[0].domain_validation_options : dvo.domain_name => {
@@ -78,10 +78,11 @@ resource "aws_route53_record" "ext_service_validation" {
   zone_id = data.aws_route53_zone.network-services.zone_id
 }
 
-resource "aws_acm_certificate_validation" "ext_service_validation" {
+resource "aws_acm_certificate_validation" "external-service-validation" {
   certificate_arn         = aws_acm_certificate.external-service[0].arn
-  validation_record_fqdns = [for record in aws_route53_record.ext_service_validation : record.fqdn]
+  validation_record_fqdns = [for record in aws_route53_record.external-service-validation : record.fqdn]
 }
+*/
 /*
 resource "aws_route53_record" "external_validation" {
   provider = aws.core-vpc
