@@ -59,7 +59,7 @@ resource "aws_lb_listener" "this" {
 
     content {
       type             = default_action.value.type
-      target_group_arn = default_action.value.target_group_name != null ? local.target_groups[default_action.value.target_group_name].arn : default_action.value.target_group_arn
+      target_group_arn = default_action.value.target_group_name != null ? local.target_groups[replace(default_action.value.target_group_name, var.replace.target_group_name_match, var.replace.target_group_name_replace)].arn : default_action.value.target_group_arn
 
       dynamic "fixed_response" {
         for_each = default_action.value.fixed_response != null ? [default_action.value.fixed_response] : []
@@ -121,7 +121,7 @@ resource "aws_lb_listener_rule" "this" {
 
     content {
       type             = action.value.type
-      target_group_arn = action.value.target_group_name != null ? local.target_groups[action.value.target_group_name].arn : action.value.target_group_arn
+      target_group_arn = action.value.target_group_name != null ? local.target_groups[replace(action.value.target_group_name, var.replace.target_group_name_match, var.replace.target_group_name_replace)].arn : action.value.target_group_arn
 
       dynamic "fixed_response" {
         for_each = action.value.fixed_response != null ? [action.value.fixed_response] : []
@@ -169,7 +169,10 @@ resource "aws_lb_listener_rule" "this" {
       dynamic "host_header" {
         for_each = condition.value.host_header != null ? [condition.value.host_header] : []
         content {
-          values = host_header.value.values
+          values = [
+            for value in host_header.value.values :
+            replace(value, var.replace.condition_host_header_match, var.replace.condition_host_header_replace)
+          ]
         }
       }
       dynamic "path_pattern" {
@@ -201,7 +204,7 @@ resource "aws_route53_record" "core_vpc" {
   provider = aws.core-vpc
 
   zone_id = each.value.zone_id
-  name    = each.key
+  name    = replace(each.key, var.replace.route53_record_name_match, var.replace.route53_record_name_replace)
   type    = "A"
 
   alias {
@@ -215,7 +218,7 @@ resource "aws_route53_record" "self" {
   for_each = { for key, value in var.route53_records : key => value if value.account == "self" }
 
   zone_id = each.value.zone_id
-  name    = each.value.key
+  name    = replace(each.value.key, var.replace.route53_record_name_match, var.replace.route53_record_name_replace)
   type    = "A"
 
   alias {
