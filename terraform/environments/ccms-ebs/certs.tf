@@ -54,7 +54,10 @@ resource "aws_route53_record" "external_validation" {
   zone_id         = data.aws_route53_zone.network-services.zone_id
 }
 
-
+resource "aws_acm_certificate_validation" "external_validation" {
+  certificate_arn         = aws_acm_certificate.external[0].arn
+  validation_record_fqdns = [for record in aws_route53_record.external_validation : record.fqdn]
+}
 /*
 resource "aws_route53_record" "external_validation" {
   provider = aws.core-vpc
