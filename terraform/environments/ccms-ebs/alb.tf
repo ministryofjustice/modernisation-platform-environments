@@ -32,18 +32,6 @@ resource "aws_route53_record" "external" {
   }
 }
 
-resource "aws_lb_target_group" "ebsapp_tg" {
-  name     = lower(format("tg-%s-%s-ebsapps", local.application_name, local.environment))
-  port     = 80
-  protocol = "HTTP"
-  vpc_id   = data.aws_vpc.shared.id
-  health_check {
-    port     = 80
-    protocol = "HTTP"
-  }
-}
-
-
 resource "aws_lb_listener" "ebsapps_listener" {
   depends_on = [
     aws_acm_certificate_validation.external-mp
@@ -59,4 +47,22 @@ resource "aws_lb_listener" "ebsapps_listener" {
     type             = "forward"
     target_group_arn = aws_lb_target_group.ebsapp_tg.id
   }
+}
+
+resource "aws_lb_target_group" "ebsapp_tg" {
+  name     = lower(format("tg-%s-%s-ebsapps", local.application_name, local.environment))
+  port     = 80
+  protocol = "HTTP"
+  vpc_id   = data.aws_vpc.shared.id
+  health_check {
+    port     = 80
+    protocol = "HTTP"
+  }
+}
+
+resource "aws_lb_target_group_attachment" "ebsapps" {
+  count = local.application_data.accounts[local.environment].accessgate_no_instances
+  target_group_arn = aws_lb_target_group.ebsapp_tg.arn
+  target_id        = element(aws_instance.ec2_ebsapps.*.id, count.index)
+  port             = 80
 }
