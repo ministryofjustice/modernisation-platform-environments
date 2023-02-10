@@ -21,7 +21,7 @@ resource "aws_lb_listener" "PPUD-Front-End" {
   port              = "443"
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = "arn:aws:acm:eu-west-2:075585660276:certificate/e45192bf-7779-4f83-808d-139381cb9c02"
+  certificate_arn   = data.aws_acm_certificate.internaltest_cert.arn
 
   default_action {
     type             = "forward"
@@ -75,7 +75,7 @@ resource "aws_lb_listener" "WAM-Front-End" {
   port              = "443"
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = "arn:aws:acm:eu-west-2:075585660276:certificate/e45192bf-7779-4f83-808d-139381cb9c02"
+  certificate_arn   = data.aws_acm_certificate.internaltest_cert.arn
 
   default_action {
     type             = "forward"
