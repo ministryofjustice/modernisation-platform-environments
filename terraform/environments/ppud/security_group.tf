@@ -182,6 +182,16 @@ resource "aws_security_group_rule" "SCR-Team-Foundation-Server-Egress" {
   security_group_id = aws_security_group.SCR-Team-Foundation-Server.id
 }
 
+resource "aws_security_group_rule" "SCR-Team-Foundation-Server-Egress-1" {
+  type              = "egress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.SCR-Team-Foundation-Server.id
+}
+
+
 resource "aws_security_group" "Dev-Box-VW106" {
   vpc_id      = data.aws_vpc.shared.id
   name        = "s609693lo6vw106"
@@ -307,6 +317,15 @@ resource "aws_security_group_rule" "Primary-DOC-Server-Egress" {
   to_port           = 0
   protocol          = "all"
   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+  security_group_id = aws_security_group.Primary-DOC-Server.id
+}
+
+resource "aws_security_group_rule" "Primary-DOC-Server-Egress-1" {
+  type              = "egress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.Primary-DOC-Server.id
 }
 

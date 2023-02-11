@@ -1,7 +1,7 @@
 
 resource "aws_wafv2_web_acl" "WAM-rule" {
   count = local.is-development == true ? 1 : 0
-  name  = "WAM-rule"
+  name  = "PPUD-WAM-rule"
   scope = "REGIONAL"
 
   default_action {
@@ -75,30 +75,8 @@ resource "aws_wafv2_web_acl" "WAM-rule" {
   }
 
   rule {
-    name     = "AWSManagedRulesWindowsRuleSet"
-    priority = 4
-
-    override_action {
-      none {}
-    }
-
-    statement {
-      managed_rule_group_statement {
-        name        = "AWSManagedRulesWindowsRuleSet"
-        vendor_name = "AWS"
-      }
-    }
-
-    visibility_config {
-      cloudwatch_metrics_enabled = true
-      metric_name                = "AWSManagedRulesWindowsRuleSet"
-      sampled_requests_enabled   = true
-    }
-  }
-
-  rule {
     name     = "AWSManagedRulesKnownBadInputsRuleSet"
-    priority = 5
+    priority = 4
 
     override_action {
       none {}
@@ -119,7 +97,7 @@ resource "aws_wafv2_web_acl" "WAM-rule" {
   }
   rule {
     name     = "RateLimitingRule"
-    priority = 7
+    priority = 5
 
     action {
       block {}
@@ -142,7 +120,7 @@ resource "aws_wafv2_web_acl" "WAM-rule" {
 
   rule {
     name     = "query-string-rule"
-    priority = 8
+    priority = 6
     action {
       block {}
     }
@@ -171,7 +149,7 @@ resource "aws_wafv2_web_acl" "WAM-rule" {
 
   rule {
     name     = "geolocation"
-    priority = 9
+    priority = 7
 
     statement {
       geo_match_statement {
