@@ -216,3 +216,95 @@ resource "aws_cloudwatch_metric_alarm" "system_health_check" {
     Name = "system_health_check"
   }
 }
+
+# Key Servers Instance alert - sensitive alert for key servers changing status from healthy. If this triggers often then we've got a problem.
+
+# ==============================================================================
+# Load Balancer Alerts
+# ==============================================================================
+
+resource "aws_cloudwatch_metric_alarm" "load_balancer_unhealthy_state_routing" {
+  alarm_name          = "load_balancer_unhealthy_state_routing"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = "3"
+  metric_name         = "UnHealthyStateRouting"
+  namespace           = "AWS/ApplicationELB"
+  period              = "60"
+  statistic           = "Average"
+  threshold           = "1"
+  alarm_description   = "This metric monitors the number of unhealthy hosts in the routing table for the load balancer. If the number of unhealthy hosts is greater than 0 for 3 minutes."
+  alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
+  tags = {
+    Name = "load_balancer_unhealthy_state_routing"
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "load_balancer_unhealthy_state_dns" {
+  alarm_name          = "load_balancer_unhealthy_state_dns"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = "3"
+  metric_name         = "UnHealthyStateDNS"
+  namespace           = "AWS/ApplicationELB"
+  period              = "60"
+  statistic           = "Average"
+  threshold           = "1"
+  alarm_description   = "This metric monitors the number of unhealthy hosts in the DNS table for the load balancer. If the number of unhealthy hosts is greater than 0 for 3 minutes."
+  alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
+  tags = {
+    Name = "load_balancer_unhealthy_state_dns"
+  }
+}
+
+# This may be overkill as unhealthy hosts will trigger an alert themselves (or should do) independently.
+resource "aws_cloudwatch_metric_alarm" "load_balancer_unhealthy_state_target" {
+  alarm_name          = "load_balancer_unhealthy_state_target"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = "3"
+  metric_name         = "UnHealthyStateTarget"
+  namespace           = "AWS/ApplicationELB"
+  period              = "60"
+  statistic           = "Average"
+  threshold           = "1"
+  alarm_description   = "This metric monitors the number of unhealthy hosts in the target table for the load balancer. If the number of unhealthy hosts is greater than 0 for 3 minutes."
+  alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
+  tags = {
+    Name = "load_balancer_unhealthy_state_target"
+  }
+}
+
+# ==============================================================================
+# Certificate Alerts - Days to Expiry
+# Certificates are managed by AWS Certificate Manager (ACM) so there shouldn't be any reason why these don't renew automatically.
+# ==============================================================================
+
+resource "aws_cloudwatch_metric_alarm" "cert_expires_in_30_days" {
+  alarm_name          = "cert_expires_in_30_days"
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods  = "1"
+  metric_name         = "DaysToExpiry"
+  namespace           = "AWS/ACM"
+  period              = "60"
+  statistic           = "Average"
+  threshold           = "30"
+  alarm_description   = "This metric monitors the number of days until the certificate expires. If the number of days is less than 30."
+  alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
+  tags = {
+    Name = "cert_expires_in_30_days"
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "cert_expires_in_2_days" {
+  alarm_name          = "cert_expires_in_2_days"
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods  = "1"
+  metric_name         = "DaysToExpiry"
+  namespace           = "AWS/ACM"
+  period              = "60"
+  statistic           = "Average"
+  threshold           = "2"
+  alarm_description   = "This metric monitors the number of days until the certificate expires. If the number of days is less than 2."
+  alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
+  tags = {
+    Name = "cert_expires_in_2_days"
+  }
+}

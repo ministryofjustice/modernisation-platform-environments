@@ -142,18 +142,6 @@ data "aws_iam_policy_document" "iaps_ec2_assume_role_policy" {
 
 data "aws_iam_policy_document" "iaps_ec2_policy" {
   statement {
-    sid       = "BucketPermissions"
-    actions   = ["s3:ListBucket"]
-    resources = ["arn:aws:s3:::${local.artefact_bucket_name}"]
-  }
-
-  statement {
-    sid       = "ObjectPermissions"
-    actions   = ["s3:GetObject"]
-    resources = ["arn:aws:s3:::${local.artefact_bucket_name}/*"]
-  }
-
-  statement {
     sid = "SecretPermissions"
     actions = [
       "secretsmanager:GetSecretValue"
