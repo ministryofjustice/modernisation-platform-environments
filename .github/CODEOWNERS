@@ -29,4 +29,5 @@
 **/backend.tf @ministryofjustice/modernisation-platform
 **/subnet_share.tf @ministryofjustice/modernisation-platform
 **/networking.auto.tfvars.json @ministryofjustice/modernisation-platform
+**/platform_*.tf @ministryofjustice/modernisation-platform
 /terraform/modules

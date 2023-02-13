@@ -2,11 +2,66 @@
 # Alerts - WINDOWS
 # ==============================================================================
 
-# Low Available Memory Alarm - Windows
-# High CPU - Windows
-# Disk Free - Windows
-# CPU IOWait - Windows
 # Remote Desktop Services - Windows
+# CPU Idle Time - Windows
+
+# Low Available Memory Alarm - Windows
+resource "aws_cloudwatch_metric_alarm" "low_available_memory_windows" {
+  alarm_name          = "low_available_memory_windows"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = "2"
+  datapoints_to_alarm = "2"
+  metric_name         = "Memory % Committed Bytes In Use"
+  namespace           = "CWAgent"
+  period              = "60"
+  statistic           = "Average"
+  threshold           = "80"
+  alarm_description   = "This metric monitors the amount of available memory. If Committed Bytes in Use is > 80% for 2 minutes, the alarm will trigger."
+  alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
+  tags = {
+    Name = "low_available_memory_windows"
+  }
+}
+
+
+
+# High CPU - Windows
+resource "aws_cloudwatch_metric_alarm" "high_cpu_windows" {
+  alarm_name          = "high_cpu_windows"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = "5"
+  datapoints_to_alarm = "5"
+  metric_name         = "PROCESSOR_TIME"
+  namespace           = "CWAgent"
+  period              = "60"
+  statistic           = "Average"
+  threshold           = "95"
+  alarm_description   = "This metric monitors the Processor time. If the Processor time is greater than 95% for 5 minutes, the alarm will trigger: "
+  alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
+  tags = {
+    Name = "high_cpu_windows"
+  }
+}
+
+# Disk Free - Windows
+
+resource "aws_cloudwatch_metric_alarm" "disk_free_windows" {
+  alarm_name          = "disk_free_windows"
+  comparison_operator = "LessThanOrEqualToThreshold"
+  evaluation_periods  = "2"
+  datapoints_to_alarm = "2"
+  metric_name         = "DISK_FREE"
+  namespace           = "CWAgent"
+  period              = "60"
+  statistic           = "Average"
+  threshold           = "15"
+  alarm_description   = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space falls below 15% for 2 minutes, the alarm will trigger: https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4305453159/Disk+Free+alarm+-+Windows"
+  alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
+  tags = {
+    Name = "disk_free_windows"
+  }
+}
+
 
 # ==============================================================================
 # Alerts - LINUX
@@ -159,5 +214,97 @@ resource "aws_cloudwatch_metric_alarm" "system_health_check" {
   alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
   tags = {
     Name = "system_health_check"
+  }
+}
+
+# Key Servers Instance alert - sensitive alert for key servers changing status from healthy. If this triggers often then we've got a problem.
+
+# ==============================================================================
+# Load Balancer Alerts
+# ==============================================================================
+
+resource "aws_cloudwatch_metric_alarm" "load_balancer_unhealthy_state_routing" {
+  alarm_name          = "load_balancer_unhealthy_state_routing"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = "3"
+  metric_name         = "UnHealthyStateRouting"
+  namespace           = "AWS/ApplicationELB"
+  period              = "60"
+  statistic           = "Average"
+  threshold           = "1"
+  alarm_description   = "This metric monitors the number of unhealthy hosts in the routing table for the load balancer. If the number of unhealthy hosts is greater than 0 for 3 minutes."
+  alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
+  tags = {
+    Name = "load_balancer_unhealthy_state_routing"
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "load_balancer_unhealthy_state_dns" {
+  alarm_name          = "load_balancer_unhealthy_state_dns"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = "3"
+  metric_name         = "UnHealthyStateDNS"
+  namespace           = "AWS/ApplicationELB"
+  period              = "60"
+  statistic           = "Average"
+  threshold           = "1"
+  alarm_description   = "This metric monitors the number of unhealthy hosts in the DNS table for the load balancer. If the number of unhealthy hosts is greater than 0 for 3 minutes."
+  alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
+  tags = {
+    Name = "load_balancer_unhealthy_state_dns"
+  }
+}
+
+# This may be overkill as unhealthy hosts will trigger an alert themselves (or should do) independently.
+resource "aws_cloudwatch_metric_alarm" "load_balancer_unhealthy_state_target" {
+  alarm_name          = "load_balancer_unhealthy_state_target"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = "3"
+  metric_name         = "UnHealthyStateTarget"
+  namespace           = "AWS/ApplicationELB"
+  period              = "60"
+  statistic           = "Average"
+  threshold           = "1"
+  alarm_description   = "This metric monitors the number of unhealthy hosts in the target table for the load balancer. If the number of unhealthy hosts is greater than 0 for 3 minutes."
+  alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
+  tags = {
+    Name = "load_balancer_unhealthy_state_target"
+  }
+}
+
+# ==============================================================================
+# Certificate Alerts - Days to Expiry
+# Certificates are managed by AWS Certificate Manager (ACM) so there shouldn't be any reason why these don't renew automatically.
+# ==============================================================================
+
+resource "aws_cloudwatch_metric_alarm" "cert_expires_in_30_days" {
+  alarm_name          = "cert_expires_in_30_days"
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods  = "1"
+  metric_name         = "DaysToExpiry"
+  namespace           = "AWS/ACM"
+  period              = "60"
+  statistic           = "Average"
+  threshold           = "30"
+  alarm_description   = "This metric monitors the number of days until the certificate expires. If the number of days is less than 30."
+  alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
+  tags = {
+    Name = "cert_expires_in_30_days"
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "cert_expires_in_2_days" {
+  alarm_name          = "cert_expires_in_2_days"
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods  = "1"
+  metric_name         = "DaysToExpiry"
+  namespace           = "AWS/ACM"
+  period              = "60"
+  statistic           = "Average"
+  threshold           = "2"
+  alarm_description   = "This metric monitors the number of days until the certificate expires. If the number of days is less than 2."
+  alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
+  tags = {
+    Name = "cert_expires_in_2_days"
   }
 }
