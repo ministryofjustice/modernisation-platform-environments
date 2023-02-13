@@ -28,6 +28,47 @@ wget https://s3.amazonaws.com/amazoncloudwatch-agent/oracle_linux/amd64/latest/a
 rpm -U ./amazon-cloudwatch-agent.rpm
 yum install -y vsftpd
 
+B=(laa-ccms-inbound-${local.application_data.accounts[local.environment].lz_ftp_bucket_environment} laa-ccms-outbound-${local.application_data.accounts[local.environment].lz_ftp_bucket_environment} laa-cis-outbound-${local.application_data.accounts[local.environment].lz_ftp_bucket_environment} laa-cis-inbound-development bacway-${local.application_data.accounts[local.environment].lz_ftp_bucket_environment}-eu-west-2-${local.application_data.accounts[local.environment].lz_aws_account_id_env})
+
+if [[ $(which jq) ]]; then
+  echo "jq is installed."
+else
+  yum install -y jq
+fi
+
+if [[ $(which s3fs) ]]; then
+  echo "s3fs is installed."
+else
+  yum install -y s3fs-fuse
+fi
+
+C=$(aws secretsmanager get-secret-value --secret-id ftp-s3-${local.environment} --region eu-west-2)
+K=$(jq -r '.SecretString' <<< $${C} |cut -d'"' -f2)
+S=$(jq -r '.SecretString' <<< $${C} |cut -d'"' -f4)
+F=/etc/passwd-s3fs
+echo "$${K}:$${S}" > "$${F}"
+chmod 600 $${F}
+
+for b in $${B[@]}; do
+  D=/mnt/$${b}
+
+
+  if [[ -d $${D} ]]; then
+    echo "$${D} exists."
+  else
+    mkdir -p $${D}
+  fi
+
+  s3fs $${b} $${D} -o passwd_file=$${F}
+  if [[ $? -eq 0 ]]; then
+    s3fs $${b} $${D} -o passwd_file=$${F}
+    echo "$${b} has been mounted in $${D}"
+  else
+    echo "$${b} has not been mounted! Please investigate."
+  fi
+done
+
+rm $${F}
 EOF
   metadata_options {
     http_endpoint = "enabled"
@@ -62,6 +103,6 @@ EOF
     { instance-scheduling = "skip-auto-start" }
   )
 
-  depends_on = [aws_security_group.ec2_sg_oracle_base]
+  depends_on = [aws_security_group.ec2_sg_ftp]
 }
 
