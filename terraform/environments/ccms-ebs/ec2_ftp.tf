@@ -19,6 +19,7 @@ resource "aws_instance" "ec2_ftp" {
 #!/bin/bash
 
 exec > /tmp/userdata.log 2>&1
+
 yum install -y wget unzip
 yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
@@ -74,6 +75,11 @@ for b in $${B[@]}; do
 done
 
 rm $${F}
+
+chmod +x /tmp/userdata.sh
+
+echo "/tmp/userdata.sh" >> /etc/rc.local
+
 EOF
   metadata_options {
     http_endpoint = "enabled"
