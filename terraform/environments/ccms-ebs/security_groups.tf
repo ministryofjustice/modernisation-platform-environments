@@ -200,9 +200,6 @@ resource "aws_security_group_rule" "egress_traffic_accessgate_cidr" {
 }
 
 
-
-
-
 # Security Group for EBSAPP-Loadbalancer
 resource "aws_security_group" "sg_ebsapps_lb" {
   name        = "sg_ebsapps_lb"
