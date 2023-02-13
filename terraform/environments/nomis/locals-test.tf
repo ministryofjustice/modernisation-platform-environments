@@ -176,7 +176,7 @@ locals {
         ami_name = "nomis_rhel_7_9_baseimage_2022-11-01T13-43-46.384Z"
         # branch   = var.BRANCH_NAME # comment in if testing ansible
         autoscaling_group = {
-          desired_capacity = 0
+          desired_capacity = 1
         }
         autoscaling_schedules = {}
         subnet_name           = "data"
@@ -193,7 +193,7 @@ locals {
         ami_name = "nomis_rhel_7_9_baseimage_2022-11-01T13-43-46.384Z"
         # branch   = var.BRANCH_NAME # comment in if testing ansible
         autoscaling_group = {
-          desired_capacity = 0
+          desired_capacity = 1
         }
         autoscaling_schedules = {}
         subnet_name           = "data"
