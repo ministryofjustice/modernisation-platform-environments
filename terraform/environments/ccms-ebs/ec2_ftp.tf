@@ -29,25 +29,17 @@ wget https://s3.amazonaws.com/amazoncloudwatch-agent/oracle_linux/amd64/latest/a
 rpm -U ./amazon-cloudwatch-agent.rpm
 yum install -y vsftpd
 amazon-linux-extras install -y epel
+yum install -y jq
+yum install -y s3fs-fuse
 
 systemctl stop amazon-ssm-agent
 rm -rf /var/lib/amazon/ssm/ipc/
 systemctl start amazon-ssm-agent
 
-cat > /tmp/userdata.sh <<- EOM
+cat > /etc/mount_s3.sh <<- EOM
+#!/bin/bash
+
 B=(laa-ccms-inbound-${local.application_data.accounts[local.environment].lz_ftp_bucket_environment} laa-ccms-outbound-${local.application_data.accounts[local.environment].lz_ftp_bucket_environment} laa-cis-outbound-${local.application_data.accounts[local.environment].lz_ftp_bucket_environment} laa-cis-inbound-development bacway-${local.application_data.accounts[local.environment].lz_ftp_bucket_environment}-eu-west-2-${local.application_data.accounts[local.environment].lz_aws_account_id_env})
-
-if [[ $(which jq) ]]; then
-  echo "jq is installed."
-else
-  yum install -y jq
-fi
-
-if [[ $(which s3fs) ]]; then
-  echo "s3fs is installed."
-else
-  yum install -y s3fs-fuse
-fi
 
 C=$(aws secretsmanager get-secret-value --secret-id ftp-s3-${local.environment} --region eu-west-2)
 K=$(jq -r '.SecretString' <<< $${C} |cut -d'"' -f2)
@@ -78,11 +70,9 @@ done
 rm $${F}
 EOM
 
+chmod +x /etc/mount_s3.sh
 
-
-chmod +x /tmp/userdata.sh
-
-echo "/tmp/userdata.sh" >> /etc/rc.local
+echo "/etc/mount_s3.sh" >> /etc/rc.local
 
 EOF
   metadata_options {
