@@ -8,7 +8,7 @@ resource "aws_lb" "ebsapps_lb" {
   enable_deletion_protection = false
 
   access_logs {
-    bucket  = module.s3-bucket-logging.bucket.arn
+    bucket  = module.s3-bucket-logging.bucket.id
     prefix  = "ebsapps-lb"
     enabled = true
   }
