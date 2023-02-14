@@ -46,7 +46,7 @@ CREATE EXTERNAL TABLE IF NOT EXISTS alb_logs (
   (
     "projection.enabled" = "true",
     "projection.day.type" = "date",
-    "projection.day.range" = "2022/01/01,NOW",
+    "projection.day.range" = "2023/02/14,NOW",
     "projection.day.format" = "yyyy/MM/dd",
     "projection.day.interval" = "1",
     "projection.day.interval.unit" = "DAYS",
