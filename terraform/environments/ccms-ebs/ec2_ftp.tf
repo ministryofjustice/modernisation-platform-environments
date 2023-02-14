@@ -3,7 +3,7 @@ resource "aws_instance" "ec2_ftp" {
   instance_type               = "c5d.large"
   ami                         = "ami-08cd358d745620807"
   key_name                    = local.application_data.accounts[local.environment].key_name
-  vpc_security_group_ids      = [aws_security_group.ec2_sg_webgate.id]
+  vpc_security_group_ids      = [aws_security_group.ec2_sg_ftp.id]
   subnet_id                   = data.aws_subnet.data_subnets_a.id
   monitoring                  = true
   ebs_optimized               = false
