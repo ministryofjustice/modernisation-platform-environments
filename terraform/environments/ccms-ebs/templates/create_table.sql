@@ -1,4 +1,4 @@
-CREATE EXTERNAL TABLE IF NOT EXISTS lb_logs (
+CREATE EXTERNAL TABLE IF NOT EXISTS alb_logs (
   type string,
   time string,
   elb string,
@@ -9,7 +9,7 @@ CREATE EXTERNAL TABLE IF NOT EXISTS lb_logs (
   request_processing_time double,
   target_processing_time double,
   response_processing_time double,
-  elb_status_code string,
+  elb_status_code int,
   target_status_code string,
   received_bytes bigint,
   sent_bytes bigint,
@@ -27,7 +27,11 @@ CREATE EXTERNAL TABLE IF NOT EXISTS lb_logs (
   request_creation_time string,
   actions_executed string,
   redirect_url string,
-  new_field string
+  lambda_error_reason string,
+  target_port_list string,
+  target_status_code_list string,
+  classification string,
+  classification_reason string
   )
   ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.RegexSerDe'
   WITH SERDEPROPERTIES (
