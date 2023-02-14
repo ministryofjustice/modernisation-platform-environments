@@ -6,13 +6,13 @@ resource "aws_lb" "ebsapps_lb" {
   subnets            = data.aws_subnets.shared-public.ids
 
   enable_deletion_protection = false
-  /*
+  
   access_logs {
-    bucket  = module.s3-bucket.arn #aws_s3_bucket.lb_logs.bucket
+    bucket  = module.s3-bucket.bucket.arn
     prefix  = "ebsapps-lb"
     enabled = true
   }
-*/
+
   tags = merge(local.tags,
     { Name = lower(format("lb-%s-%s-ebsapps", local.application_name, local.environment)) }
   )
