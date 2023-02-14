@@ -24,7 +24,7 @@ resource "aws_athena_workgroup" "lb-access-logs" {
 
 resource "aws_athena_named_query" "main_table" {
   name      = lower(format("%s-%s-create-table", local.application_name, local.environment))
-  workgroup = aws_athena_workgroup.lb-access-logs
+  workgroup = aws_athena_workgroup.lb-access-logs.id
   database  = aws_athena_database.lb-access-logs.name
   query = templatefile(
     "./templates/create_table.sql",
