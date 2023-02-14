@@ -230,8 +230,8 @@ data "aws_iam_policy_document" "s3_bucket_access" {
       "s3:ListBucket",
       "s3:DeleteObject"
     ]
-    resources = [module.s3-bucket["s3-bucket"].bucket.arn,
-    "${module.s3-bucket["s3-bucket"].bucket.arn}/*"]
+    resources = [module.s3-bucket.bucket.arn,
+    "${module.s3-bucket.bucket.arn}/*"]
   }
 
   # allow access to ec2-image-builder-oasys buckets in all accounts
