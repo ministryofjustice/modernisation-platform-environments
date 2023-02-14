@@ -88,9 +88,9 @@ data "aws_iam_policy_document" "artefacts_s3_policy" {
 module "s3-bucket-logging" { #tfsec:ignore:aws-s3-enable-versioning
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.2.0"
 
-  bucket_name         = local.logging_bucket_name
-  versioning_enabled  = false
-  bucket_policy       = [data.aws_iam_policy_document.logging_s3_policy.json]
+  bucket_name        = local.logging_bucket_name
+  versioning_enabled = false
+  bucket_policy      = [data.aws_iam_policy_document.logging_s3_policy.json]
 
   # Refer to the below section "Replication" before enabling replication
   replication_enabled = false
@@ -160,10 +160,10 @@ data "aws_iam_policy_document" "logging_s3_policy" {
         "arn:aws:iam::${local.environment_management.account_ids["core-shared-services-production"]}:root"
       ]
     }
-    actions   = [
+    actions = [
       "s3:PutObject"
     ]
-    resources = [ 
+    resources = [
       "arn:aws:s3:::${local.logging_bucket_name}/*"
     ]
   }
