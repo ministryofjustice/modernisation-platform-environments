@@ -98,6 +98,16 @@ variable "license_model" {
   description = "Licence Type for the RDS"
 }
 
+variable "rds_snapshot_arn" {
+  type        = string
+  description = "RDS snapshot ARN to build database from"
+}
+
+variable "rds_kms_key_arn" {
+  type        = string
+  description = "KMS key to encrypt RDS"
+}
+
 
 variable "lz_vpc_cidr" {
   type        = string

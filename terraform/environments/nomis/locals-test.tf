@@ -126,16 +126,6 @@ locals {
         autoscaling_group = {
           desired_capacity = 1
           warm_pool        = null
-          target_group_arns = local.environment == "test" ? [
-            module.lb_listener["https"].aws_lb_target_group["http-7001-asg"].arn,
-            module.lb_listener["https"].aws_lb_target_group["http-7777-asg"].arn,
-            module.lb_listener["http-7001"].aws_lb_target_group["http-7001-asg"].arn,
-            module.lb_listener["http-7777"].aws_lb_target_group["http-7777-asg"].arn,
-            module.lb_listener["internal-https"].aws_lb_target_group["http-7001-asg"].arn,
-            module.lb_listener["internal-https"].aws_lb_target_group["http-7777-asg"].arn,
-            module.lb_listener["internal-http-7001"].aws_lb_target_group["http-7001-asg"].arn,
-            module.lb_listener["internal-http-7777"].aws_lb_target_group["http-7777-asg"].arn,
-          ] : []
         }
       }
     }
@@ -215,7 +205,7 @@ locals {
         tags = {
           server-type       = "jumpserver"
           description       = "Windows Server 2022 Jumpserver for NOMIS"
-          monitored         = true
+          monitored         = false
           os-type           = "Windows"
           component         = "jumpserver"
           nomis-environment = "dev"

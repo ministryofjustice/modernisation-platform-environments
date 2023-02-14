@@ -202,6 +202,7 @@ locals {
           aws_security_group.public.id,
           module.bastion_linux.bastion_security_group
         ]
+        cidr_blocks = local.security_group_cidrs.http7xxx
       },
       {
         description = "Allow http7777 ingress"
@@ -213,6 +214,7 @@ locals {
           aws_security_group.public.id,
           module.bastion_linux.bastion_security_group
         ]
+        cidr_blocks = local.security_group_cidrs.http7xxx
       },
     ]
     egress = [

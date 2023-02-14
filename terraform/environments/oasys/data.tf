@@ -203,7 +203,7 @@ data "aws_secretsmanager_secret_version" "environment_management" {
 data "aws_kms_key" "general_shared" { key_id = "arn:aws:kms:${local.region}:${local.environment_management.account_ids["core-shared-services-production"]}:alias/general-${local.business_unit}" }
 # shared CMK used to create AMIs in the MP shared services account
 data "aws_kms_key" "ebs_hmpps" { key_id = "arn:aws:kms:${local.region}:${local.environment_management.account_ids["core-shared-services-production"]}:alias/ebs-${local.business_unit}" }
-data "aws_kms_key" "rds_shared" { key_id = "arn:aws:kms:${local.region}:${local.environment_management.account_ids["core-shared-services-production"]}:alias/rds-${local.business_unit}" }
+# data "aws_kms_key" "rds_shared" { key_id = "arn:aws:kms:${local.region}:${local.environment_management.account_ids["core-shared-services-production"]}:alias/rds-${local.business_unit}" }
 # data "aws_kms_key" "oasys_key" { key_id = "arn:aws:kms:${local.region}:${local.environment_management.account_ids["oasys-test"]}:alias/oasys-image-builder" }
 
 
@@ -347,17 +347,19 @@ data "aws_iam_policy_document" "ec2_common_combined" {
     data.aws_iam_policy_document.cloud_watch_custom.json
   ]
 }
-data "aws_iam_policy_document" "cross-account-s3" {
+data "aws_iam_policy_document" "user-s3-access" {
   statement {
-    sid = "cross-account-s3-access-for-image-builder"
+    sid = "user-s3-access"
     actions = [
       "s3:GetObject",
       "s3:PutObject",
       "s3:PutObjectAcl",
       "s3:ListBucket"
     ]
-    resources = ["${module.s3-bucket["ec2-image-builder-${local.application_name}"].bucket.arn}/*",
-    module.s3-bucket["ec2-image-builder-${local.application_name}"].bucket.arn, ]
+    resources = [
+      "${module.s3-bucket.bucket.arn}/*",
+      module.s3-bucket.bucket.arn,
+    ]
     principals {
       type = "AWS"
       identifiers = sort([ # sort to avoid plan changes
