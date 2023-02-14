@@ -1,9 +1,9 @@
 resource "aws_instance" "ec2_accessgate" {
   count                       = local.application_data.accounts[local.environment].accessgate_no_instances
   instance_type               = local.application_data.accounts[local.environment].ec2_oracle_instance_type_accessgate
-  ami                         = data.aws_ami.oracle_base_prereqs.id
+  ami                         = data.aws_ami.accessgate.id
   key_name                    = local.application_data.accounts[local.environment].key_name
-  vpc_security_group_ids      = [aws_security_group.ec2_sg_oracle_base.id]
+  vpc_security_group_ids      = [aws_security_group.ec2_sg_accessgate.id]
   subnet_id                   = data.aws_subnet.data_subnets_a.id
   monitoring                  = true
   ebs_optimized               = false
@@ -86,7 +86,7 @@ EOF
   tags = merge(local.tags,
     { Name = lower(format("ec2-%s-%s-accessgate-%s", local.application_name, local.environment, count.index + 1)) }
   )
-  depends_on = [aws_security_group.ec2_sg_oracle_base]
+  depends_on = [aws_security_group.ec2_sg_accessgate]
 
 }
 
