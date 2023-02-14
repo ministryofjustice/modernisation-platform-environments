@@ -22,6 +22,7 @@ resource "aws_athena_workgroup" "lb-access-logs" {
   }
 }
 
+# SQL query to creates the table in the athena db
 resource "aws_athena_named_query" "main_table" {
   name      = lower(format("%s-%s-create-table", local.application_name, local.environment))
   workgroup = aws_athena_workgroup.lb-access-logs.id
@@ -37,6 +38,7 @@ resource "aws_athena_named_query" "main_table" {
   )
 }
 
+# SQL query to count the number of HTTP GET requests to the loadbalancer grouped by IP
 resource "aws_athena_named_query" "http_requests" {
   name      = lower(format("%s-%s-http-get-requests", local.application_name, local.environment))
   workgroup = aws_athena_workgroup.lb-access-logs.id
