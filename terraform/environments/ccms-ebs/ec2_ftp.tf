@@ -85,7 +85,7 @@ EOF
   root_block_device {
     volume_type = "gp3"
     volume_size = 50
-    iops = 12000
+    iops        = 12000
     encrypted   = true
     kms_key_id  = data.aws_kms_key.ebs_shared.key_id
     tags = merge(local.tags,
@@ -96,9 +96,9 @@ EOF
     device_name = "/dev/sdb"
     volume_type = "gp3"
     volume_size = 20
-//    iops = 12000
-    encrypted   = true
-    kms_key_id  = data.aws_kms_key.ebs_shared.key_id
+    //    iops = 12000
+    encrypted  = true
+    kms_key_id = data.aws_kms_key.ebs_shared.key_id
     tags = merge(local.tags,
       { Name = "swap" }
     )

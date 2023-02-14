@@ -250,15 +250,15 @@ resource "aws_security_group_rule" "ingress_traffic_ftp" {
 
 # Egree Traffic FTP
 resource "aws_security_group_rule" "egress_traffic_ftp" {
-  for_each                 = local.application_data.ec2_sg_ftp_egress_rules
-  security_group_id        = aws_security_group.ec2_sg_ftp.id
-  type                     = "egress"
-  description              = format("Outbound traffic for %s %d", each.value.protocol, each.value.from_port)
-  protocol                 = each.value.protocol
-  from_port                = each.value.from_port
-  to_port                  = each.value.to_port
-  cidr_blocks              = [each.value.destination_cidr]
-//  source_security_group_id = aws_security_group.ec2_sg_ftp.id
+  for_each          = local.application_data.ec2_sg_ftp_egress_rules
+  security_group_id = aws_security_group.ec2_sg_ftp.id
+  type              = "egress"
+  description       = format("Outbound traffic for %s %d", each.value.protocol, each.value.from_port)
+  protocol          = each.value.protocol
+  from_port         = each.value.from_port
+  to_port           = each.value.to_port
+  cidr_blocks       = [each.value.destination_cidr]
+  //  source_security_group_id = aws_security_group.ec2_sg_ftp.id
 }
 /*
 resource "aws_security_group_rule" "ingress_traffic_ebsapps_lb" {
