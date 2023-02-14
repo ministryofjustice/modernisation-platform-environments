@@ -1,7 +1,7 @@
 resource "aws_athena_database" "lb-access-logs" {
   name   = "loadbalancer_access_logs"
-  bucket     = module.s3-bucket.bucket.arn
-#  bucket = var.existing_bucket_name != "" ? var.existing_bucket_name : module.s3-bucket[0].bucket.id
+  bucket = module.s3-bucket.bucket.arn
+  #  bucket = var.existing_bucket_name != "" ? var.existing_bucket_name : module.s3-bucket[0].bucket.id
   encryption_configuration {
     encryption_option = "SSE_S3"
   }

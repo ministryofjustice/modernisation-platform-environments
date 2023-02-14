@@ -6,7 +6,7 @@ resource "aws_lb" "ebsapps_lb" {
   subnets            = data.aws_subnets.shared-public.ids
 
   enable_deletion_protection = false
-  
+
   access_logs {
     bucket  = module.s3-bucket.bucket.arn
     prefix  = "ebsapps-lb"
