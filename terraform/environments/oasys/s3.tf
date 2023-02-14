@@ -8,7 +8,7 @@ module "s3-bucket" {
   bucket_prefix       = "${local.application_name}-${local.environment}-"
   replication_enabled = false
 
-  #bucket_policy = [data.aws_iam_policy_document.user-s3-access.json]
+  bucket_policy = [data.aws_iam_policy_document.user-s3-access.json]
 
 
   lifecycle_rule = [
