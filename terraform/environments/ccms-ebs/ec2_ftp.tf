@@ -39,7 +39,7 @@ systemctl start amazon-ssm-agent
 cat > /etc/mount_s3.sh <<- EOM
 #!/bin/bash
 
-B=(laa-ccms-inbound-${local.application_data.accounts[local.environment].lz_ftp_bucket_environment} laa-ccms-outbound-${local.application_data.accounts[local.environment].lz_ftp_bucket_environment} laa-cis-outbound-${local.application_data.accounts[local.environment].lz_ftp_bucket_environment} laa-cis-inbound-development bacway-${local.application_data.accounts[local.environment].lz_ftp_bucket_environment}-eu-west-2-${local.application_data.accounts[local.environment].lz_aws_account_id_env})
+B=(laa-ccms-inbound-${local.application_data.accounts[local.environment].lz_ftp_bucket_environment} laa-ccms-outbound-${local.application_data.accounts[local.environment].lz_ftp_bucket_environment} laa-cis-outbound-${local.application_data.accounts[local.environment].lz_ftp_bucket_environment} laa-cis-inbound-${local.application_data.accounts[local.environment].lz_ftp_bucket_environment} bacway-${local.application_data.accounts[local.environment].lz_ftp_bucket_environment}-eu-west-2-${local.application_data.accounts[local.environment].lz_aws_account_id_env})
 
 C=\$(aws secretsmanager get-secret-value --secret-id ftp-s3-${local.environment}-aws-key --region eu-west-2)
 K=\$(jq -r '.SecretString' <<< \$${C} |cut -d'"' -f2)
