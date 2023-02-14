@@ -28,6 +28,14 @@
       {
         "name": "ConnectionStrings__DBConnectionString",
         "valueFrom": "${DATABASE_PASSWORD_CONNECTION_STRING_ARN}"
+      },
+      {
+        "name": "S3_User_Key",
+        "valueFrom": "${S3_USER_KEY_ARN}"
+      },
+      {
+        "name": "S3_User_Secret",
+        "valueFrom": "${S3_USER_SECRET_ARN}"
       }
     ],
     "essential": true

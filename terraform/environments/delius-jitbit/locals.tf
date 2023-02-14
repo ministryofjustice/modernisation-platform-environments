@@ -99,6 +99,8 @@ locals {
     APP_NAME                                = local.application_name,
     DOCKER_IMAGE                            = "${local.ecr_uri}:latest"
     DATABASE_PASSWORD_CONNECTION_STRING_ARN = aws_secretsmanager_secret.db_app_connection_string.arn
+    S3_USER_KEY_ARN                         = "arn:aws:secretsmanager:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:secret:delius-jitbit-s3-user-access-key-*"
+    S3_USER_SECRET_ARN                      = "arn:aws:secretsmanager:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:secret:delius-jitbit-s3-user-secret-key-*"
     APP_URL                                 = "https://${local.app_url}/"
   })
 
