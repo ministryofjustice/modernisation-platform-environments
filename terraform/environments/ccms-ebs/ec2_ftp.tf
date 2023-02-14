@@ -42,32 +42,31 @@ cat > /etc/mount_s3.sh <<- EOM
 B=(laa-ccms-inbound-${local.application_data.accounts[local.environment].lz_ftp_bucket_environment} laa-ccms-outbound-${local.application_data.accounts[local.environment].lz_ftp_bucket_environment} laa-cis-outbound-${local.application_data.accounts[local.environment].lz_ftp_bucket_environment} laa-cis-inbound-development bacway-${local.application_data.accounts[local.environment].lz_ftp_bucket_environment}-eu-west-2-${local.application_data.accounts[local.environment].lz_aws_account_id_env})
 
 C=$(aws secretsmanager get-secret-value --secret-id ftp-s3-${local.environment} --region eu-west-2)
-K=$(jq -r '.SecretString' <<< $${C} |cut -d'"' -f2)
-S=$(jq -r '.SecretString' <<< $${C} |cut -d'"' -f4)
+K=$(jq -r '.SecretString' <<< \$${C} |cut -d'"' -f2)
+S=$(jq -r '.SecretString' <<< \$${C} |cut -d'"' -f4)
 F=/etc/passwd-s3fs
-echo "$${K}:$${S}" > "$${F}"
-chmod 600 $${F}
+echo "\$${K}:\$${S}" > "\$${F}"
+chmod 600 \$${F}
 
-for b in $${B[@]}; do
-  D=/mnt/$${b}
+for b in "\$${B[@]}"; do
+  D=/mnt/\$${b}
 
-
-  if [[ -d $${D} ]]; then
-    echo "$${D} exists."
+  if [[ -d \$${D} ]]; then
+    echo "\$${D} exists."
   else
-    mkdir -p $${D}
+    mkdir -p \$${D}
   fi
 
-  s3fs $${b} $${D} -o passwd_file=$${F}
-  if [[ $? -eq 0 ]]; then
-    s3fs $${b} $${D} -o passwd_file=$${F}
-    echo "$${b} has been mounted in $${D}"
+  s3fs \$${b} \$${D} -o passwd_file=\$${F}
+  if [[ \$? -eq 0 ]]; then
+    s3fs \$${b} \$${D} -o passwd_file=\$${F}
+    echo "\$${b} has been mounted in \$${D}"
   else
-    echo "$${b} has not been mounted! Please investigate."
+    echo "\$${b} has not been mounted! Please investigate."
   fi
 done
 
-rm $${F}
+rm \$${F}
 EOM
 
 chmod +x /etc/mount_s3.sh
