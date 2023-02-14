@@ -5,11 +5,12 @@ module "s3-bucket" {
     aws.bucket-replication = aws
   }
 
-  for_each = try(local.environment_config.s3_buckets, {})
-
-  bucket_prefix       = each.key
+  bucket_prefix       = "${local.application_name}-${local.environment}-"
   replication_enabled = false
-  bucket_policy       = lookup(each.value, "bucket_policy", null)
+
+  bucket_policy = [data.aws_iam_policy_document.user-s3-access.json]
+
+
   lifecycle_rule = [
     {
       id      = "main"
@@ -49,3 +50,4 @@ module "s3-bucket" {
   ]
   tags = local.tags
 }
+

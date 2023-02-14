@@ -356,10 +356,8 @@ data "aws_iam_policy_document" "user-s3-access" {
       "s3:PutObjectAcl",
       "s3:ListBucket"
     ]
-    resources = [
-      "${module.s3-bucket.bucket.arn}/*",
-      module.s3-bucket.bucket.arn,
-    ]
+    resources = ["${module.s3-bucket["ec2-image-builder-${local.application_name}"].bucket.arn}/*",
+    module.s3-bucket["ec2-image-builder-${local.application_name}"].bucket.arn, ]
     principals {
       type = "AWS"
       identifiers = sort([ # sort to avoid plan changes
