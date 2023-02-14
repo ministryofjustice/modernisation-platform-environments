@@ -154,10 +154,10 @@ module "s3-bucket-logging" {
 data "aws_iam_policy_document" "logging_s3_policy" {
   statement {
     principals {
-      type = "AWS"
+      type        = "AWS"
       identifiers = ["arn:aws:iam::652711504416:root"]
     }
-    actions = [ "s3:PutObject" ]
-    resources = [ "${module.s3-bucket-logging.bucket.arn}/*" ]
+    actions   = ["s3:PutObject"]
+    resources = ["${module.s3-bucket-logging.bucket.arn}/*"]
   }
 }
