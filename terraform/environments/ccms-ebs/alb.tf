@@ -9,7 +9,7 @@ resource "aws_lb" "ebsapps_lb" {
 
   access_logs {
     bucket  = module.s3-bucket-logging.bucket.id
-    prefix  = "ebsapps-lb"
+    prefix  = local.lb_log_prefix
     enabled = true
   }
 

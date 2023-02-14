@@ -33,8 +33,22 @@ CREATE EXTERNAL TABLE IF NOT EXISTS alb_logs (
   classification string,
   classification_reason string
   )
+  PARTITIONED BY
+  (
+    day STRING
+  )
   ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.RegexSerDe'
   WITH SERDEPROPERTIES (
   'serialization.format' = '1',
   'input.regex' = '([^ ]*) ([^ ]*) ([^ ]*) ([^ ]*):([0-9]*) ([^ ]*)[:-]([0-9]*) ([-.0-9]*) ([-.0-9]*) ([-.0-9]*) (|[-0-9]*) (-|[-0-9]*) ([-0-9]*) ([-0-9]*) \"([^ ]*) ([^ ]*) (- |[^ ]*)\" \"([^\"]*)\" ([A-Z0-9-]+) ([A-Za-z0-9.-]*) ([^ ]*) \"([^\"]*)\" \"([^\"]*)\" \"([^\"]*)\" ([-.0-9]*) ([^ ]*) \"([^\"]*)\"($| \"[^ ]*\")(.*)')
-  LOCATION 's3://${bucket}/AWSLogs/${account_id}/elasticloadbalancing/${region}/';
+  LOCATION 's3://${bucket}/${key}/AWSLogs/${account_id}/elasticloadbalancing/${region}/'
+  TBLPROPERTIES
+  (
+    "projection.enabled" = "true",
+    "projection.day.type" = "date",
+    "projection.day.range" = "2022/01/01,NOW",
+    "projection.day.format" = "yyyy/MM/dd",
+    "projection.day.interval" = "1",
+    "projection.day.interval.unit" = "DAYS",
+    "storage.location.template" = "s3://${bucket}/${key}/AWSLogs/${account_id}/elasticloadbalancing/${region}/$${day}"
+  )

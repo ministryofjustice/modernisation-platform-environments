@@ -52,5 +52,6 @@ locals {
   application_data     = fileexists("./application_variables.json") ? jsondecode(file("./application_variables.json")) : {}
   artefact_bucket_name = "${local.application_name}-${local.environment}-artefacts"
   logging_bucket_name  = "${local.application_name}-${local.environment}-logging"
+  lb_log_prefix        = "ebsapps-lb"
 
 }
