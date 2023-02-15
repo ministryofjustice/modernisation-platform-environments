@@ -127,6 +127,7 @@ locals {
           desired_capacity = 1
           warm_pool        = null
         }
+        autoscaling_schedules = {}
       }
     }
 
