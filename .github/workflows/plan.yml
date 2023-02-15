@@ -23,10 +23,10 @@ on:
 # TF_VAR_BRANCH_NAME: ${{ github.event_name == 'pull_request' && 'main' || (github.head_ref || github.ref_name) }}
 # TF_VAR_GH_ACTOR_NAME: ${{ github.actor }}
 # AWS_REGION: "eu-west-2"
-# ACCOUNT_NAME: "${{ input.application }}-${{ input.environment }}"
 # APPLICATION: "${{ input.application }}"
 
 env:
+  ACCOUNT_NAME: "${{ input.application }}-${{ input.environment }}"
   ENVIRONMENT_MANAGEMENT: ${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}
 
 jobs:
@@ -40,12 +40,9 @@ jobs:
 
       - name: Get Account Number
         run: |
-          echo "account name: ${ACCOUNT_NAME}"
+          echo "Retrieving account number for '${ACCOUNT_NAME}' from MODERNISATION_PLATFORM_ENVIRONMENTS github secret"
           ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)
-          if [[ -z $ACCOUNT_NUMBER ]]; then
-            echo "Could not retrieve account number from MODERNISATION_PLATFORM_ENVIRONMENTS github secret"
-            exit 1
-          fi
+          [[ -z $ACCOUNT_NUMBER ]] && exit 1
           echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
 
 #     - name: configure aws credentials
