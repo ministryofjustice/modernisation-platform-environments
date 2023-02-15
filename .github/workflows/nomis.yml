@@ -37,9 +37,12 @@ defaults:
 jobs:
 
   plan-dev:
+    strategy:
+      matrix:
+        target: [development, test]
     uses: ministryofjustice/modernisation-platform-environments/.github/workflows/plan.yml@nomis/DSOS-1519/pipeline-improvements
     with:
-      environment: development
+      environment: "${{ matrix.target }}"
       application: "${{ github.workflow }}"
     secrets: inherit
 
