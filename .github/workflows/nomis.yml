@@ -37,7 +37,7 @@ defaults:
 jobs:
 
   plan-dev:
-    uses: ministryofjustic/emodernisation-platform-environments/.github/workflows/plan.yml@nomis/DSOS-1519/pipeline-improvements
+    uses: ministryofjustice/modernisation-platform-environments/.github/workflows/plan.yml@nomis/DSOS-1519/pipeline-improvements
 
 # runs-on: ubuntu-latest
 # permissions:
