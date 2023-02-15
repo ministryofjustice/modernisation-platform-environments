@@ -14,12 +14,12 @@ on:
       modernisation_platform_environments:
         type: string
         required: true
-      github_token:
+      pipeline_github_token:
         type: string
         required: true
 
 env:
-  GITHUB_TOKEN: ${{ secrets.github_token }}
+  GITHUB_TOKEN: ${{ secrets.pipeline_github_token }}
   TF_VAR_BRANCH_NAME: ${{ github.event_name == 'pull_request' && 'main' || (github.head_ref || github.ref_name) }}
   TF_VAR_GH_ACTOR_NAME: ${{ github.actor }}
   AWS_REGION: "eu-west-2"
