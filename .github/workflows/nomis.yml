@@ -41,6 +41,7 @@ jobs:
     with:
       environment: development
       application: $GITHUB_WORKFLOW
+    secrets: inherit
 
 # runs-on: ubuntu-latest
 # permissions:
