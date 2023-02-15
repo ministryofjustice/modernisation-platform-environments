@@ -27,8 +27,8 @@ env:
   ENVIRONMENT_MANAGEMENT: ${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}
 
 permissions:
-  id-token: write # This is required for requesting the JWT
-  contents: read # This is required for actions/checkout
+  id-token: write  # This is required for requesting the JWT
+  contents: read  # This is required for actions/checkout
 
 defaults:
   run:
@@ -36,15 +36,16 @@ defaults:
 
 jobs:
 
-  plan_dev:
-    runs-on: ubuntu-latest
-    permissions:
-      id-token: write # This is required for requesting the JWT
-      contents: read # This is required for actions/checkout
-    uses: ./.github/workflows/plan.yml
-    with:
-      environment: development
-      application: $GITHUB_WORKFLOW
-    secrets:
-      modernisation_platform_environments: ${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}
-      pipeline_github_token: ${{ secrets.DSO_GITHUB_AUTOMATION_PAT }}
+  plan-dev:
+    uses: ministryofjustic/emodernisation-platform-environments/.github/workflows/plan.yml@nomis/DSOS-1519/pipeline-improvements
+
+# runs-on: ubuntu-latest
+# permissions:
+#   id-token: write # This is required for requesting the JWT
+#   contents: read # This is required for actions/checkout
+# with:
+#   environment: development
+#   application: $GITHUB_WORKFLOW
+# secrets:
+#   modernisation_platform_environments: ${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}
+#   pipeline_github_token: ${{ secrets.DSO_GITHUB_AUTOMATION_PAT }}
