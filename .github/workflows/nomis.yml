@@ -36,7 +36,7 @@ defaults:
 
 jobs:
 
-  plan-dev:
+  plan:
     strategy:
       matrix:
         target: [development, test]

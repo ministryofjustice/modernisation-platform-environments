@@ -65,3 +65,11 @@ jobs:
 #         bash scripts/terraform-init.sh terraform/environments/${APPLICATION}
 #         terraform -chdir="terraform/environments/$APPLICATION}" workspace select "${ACCOUNT_NAME}"
 #         bash scripts/terraform-plan.sh terraform/environments/${APPLICATION}
+
+  apply:
+    name: terraform apply
+    runs-on: ubuntu-latest
+      #    environment: "${{ env.ACCOUNT_NAMNE }}"
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c  # v3.3.0
