@@ -38,6 +38,9 @@ jobs:
 
   plan-dev:
     uses: ministryofjustice/modernisation-platform-environments/.github/workflows/plan.yml@nomis/DSOS-1519/pipeline-improvements
+    with:
+      environment: development
+      application: $GITHUB_WORKFLOW
 
 # runs-on: ubuntu-latest
 # permissions:
