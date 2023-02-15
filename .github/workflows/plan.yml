@@ -26,7 +26,7 @@ on:
 # APPLICATION: "${{ input.application }}"
 
 env:
-  ACCOUNT_NAME: "${{ input.application }}-${{ input.environment }}"
+  ACCOUNT_NAME: "${{ github.event.inputs.application }}-${{ github.event.inputs.environment }}"
   ENVIRONMENT_MANAGEMENT: ${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}
 
 jobs:
