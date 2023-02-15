@@ -109,16 +109,20 @@ locals {
       vpc_security_group_ids       = [aws_security_group.webserver.id]
     }
 
-    # user_data_cloud_init = {
-    #   args = {
-    #     lifecycle_hook_name = "ready-hook"
-    #   }
-    #   scripts = [ # it would make sense to have these templates in a common area 
-    #     "ansible-ec2provision.sh.tftpl",
-    #     "post-ec2provision.sh.tftpl"
-    #   ]
-    #   write_files = {}
-    # }
+    user_data_cloud_init = {
+      args = {
+        lifecycle_hook_name  = "ready-hook"
+        branch               = "main" # if you want to use a branch of ansible
+        ansible_repo         = "modernisation-platform-configuration-management"
+        ansible_repo_basedir = "ansible"
+        # ansible_args           = "--tags ec2provision"
+      }
+      scripts = [ # it would make sense to have these templates in a common area 
+        "ansible-ec2provision.sh.tftpl",
+        "post-ec2provision.sh.tftpl"
+      ]
+      write_files = {}
+    }
 
     # ssm_parameters_prefix     = "webserver/"
     iam_resource_names_prefix = "webserver-asg"
@@ -149,5 +153,10 @@ locals {
       #   max_group_prepared_capacity = 1
       # }
     }
+  }
+  webserver_tags = {
+    description = "oasys webserver"
+    component   = "web"
+    server-type = "oasys-web"
   }
 }
