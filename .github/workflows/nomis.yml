@@ -40,7 +40,7 @@ jobs:
     uses: ministryofjustice/modernisation-platform-environments/.github/workflows/plan.yml@nomis/DSOS-1519/pipeline-improvements
     with:
       environment: development
-      application: $GITHUB_WORKFLOW
+      application: "${{ github.workflow }}"
     secrets: inherit
 
 # runs-on: ubuntu-latest
