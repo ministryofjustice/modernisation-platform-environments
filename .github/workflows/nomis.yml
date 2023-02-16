@@ -35,7 +35,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      init:
+      - name: Init
         run: |
           if [[ ${{github.ref != 'refs/head/main' ]]; then
             matrix=$(cat << EOF
