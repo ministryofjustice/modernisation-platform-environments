@@ -95,6 +95,7 @@ jobs:
           POST_PLAN_TO_PR: "${{ github.event_name == 'pull_request' && steps.plan.outputs.exitcode == '2' && inputs.post_plan_to_pr == true }}"
         working-directory: "terraform/environments/${{ inputs.application }}"
         run: |
+          set -o pipefail
           exitcode=0
           tf_args="-detailed-exitcode ${{ inputs.additional_tfargs }}"
           [[ ${POST_PLAN_TO_PR} == 'true' ]] && tf_args="${tg_args} -no-color"
