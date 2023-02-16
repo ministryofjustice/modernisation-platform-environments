@@ -31,67 +31,16 @@ permissions:
   contents: read  # This is required for actions/checkout
 
 jobs:
-  init:
-    runs-on: ubuntu-latest
-    outputs:
-      matrix: ${{ steps.init.outputs.matrix }}
-    steps:
-      - name: Init
-        id: init
-        run: |
-          if [[ ${{ github.ref }} != 'refs/head/main' ]]; then
-            matrix=$(cat << EOF
-            {
-              "include": [{
-                "target": "development",
-                "action": "plan_apply"
-              }, {
-                "target": "test",
-                "action": "plan_apply"
-              }, {
-                "target": "preproduction",
-                "action": "plan"
-              }, {
-                "target": "production",
-                "action": "plan"
-              }]
-            }
-          EOF
-          )
-          else
-            matrix=$(cat << EOF
-            {
-              "include": [{
-                "target": "development",
-                "action": "plan_apply"
-              }, {
-                "target": "test",
-                "action": "plan_apply"
-              }, {
-                "target": "preproduction",
-                "action": "plan_apply"
-              }, {
-                "target": "production",
-                "action": "plan_apply"
-              }]
-            }
-          EOF
-          )
-          fi
-          echo 'matrix<<EOF' >> $GITHUB_OUTPUT
-          echo "${matrix}" >> $GITHUB_OUTPUT
-          echo 'EOF' >> $GITHUB_OUTPUT
-          echo "${matrix}"
-
-      - name: Debug
-        run: |
-          echo "${{ steps.init.outputs.matrix }}"
+  setup:
+    uses: ministryofjustice/modernisation-platform-environments/.github/workflows/reusable_terraform_plan_apply_setup.yml@nomis/DSOS-1519/pipeline-improvements
+    with:
+      setup_type: "standard_four_accounts" # allow apply to dev/test from branch
 
   terraform:
-    needs: init
+    needs: setup
     strategy:
       fail-fast: false
-      matrix: ${{ fromJson(needs.init.outputs.matrix) }}
+      matrix: ${{ fromJson(needs.setup.outputs.matrix) }}
     uses: ministryofjustice/modernisation-platform-environments/.github/workflows/reusable_terraform_plan_apply.yml@nomis/DSOS-1519/pipeline-improvements
     with:
       application: "${{ github.workflow }}"

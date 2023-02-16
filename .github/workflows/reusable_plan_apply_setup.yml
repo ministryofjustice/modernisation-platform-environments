@@ -1,0 +1,80 @@
+---
+name: terraform plan apply setup
+
+# setup how to plan/apply to the different modernisation platform accounts
+# designed to be used in conjunction with reusable_terraform_plan_apply.yml
+#
+# standard_four_accounts
+#   branch: run plan on all 4 accounts but allow apply to development and test
+#   main:   run plan and apply on all 4 accounts
+
+on:
+  workflow_call:
+    inputs:
+      setup_type:
+        type: string
+        required: true
+        description: "Set to standard_four_accounts"
+    outputs:
+      matrix:
+        description: "Matrix json string to feed into plan/apply job"
+        value: ${{ jobs.setup.outputs.matrix }}
+
+jobs:
+  setup:
+    name: "setup"
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: "${{ steps.setup.outputs.matrix }}"
+    steps:
+      - name: Setup
+        id: setup
+        run: |
+          if [[ ${{ inputs.setup_type == "standard_four_accounts" }} ]]; then
+            if [[ ${{ github.ref }} != 'refs/head/main' ]]; then
+              matrix=$(cat << EOF
+              {
+                "include": [{
+                  "target": "development",
+                  "action": "plan_apply"
+                }, {
+                  "target": "test",
+                  "action": "plan_apply"
+                }, {
+                  "target": "preproduction",
+                  "action": "plan"
+                }, {
+                  "target": "production",
+                  "action": "plan"
+                }]
+              }
+          EOF
+          )
+            else
+              matrix=$(cat << EOF
+              {
+                "include": [{
+                  "target": "development",
+                  "action": "plan_apply"
+                }, {
+                  "target": "test",
+                  "action": "plan_apply"
+                }, {
+                  "target": "preproduction",
+                  "action": "plan_apply"
+                }, {
+                  "target": "production",
+                  "action": "plan_apply"
+                }]
+              }
+          EOF
+          )
+            fi
+          else
+            echo "Unexpected value for inputs.setup_type [${{ inputs.setup_type }}]"
+            exit 1
+          fi
+          echo 'matrix<<EOF' >> $GITHUB_OUTPUT
+          echo "${matrix}" >> $GITHUB_OUTPUT
+          echo 'EOF' >> $GITHUB_OUTPUT
+          echo "${matrix}"
