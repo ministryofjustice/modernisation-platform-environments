@@ -47,11 +47,10 @@ env:
 jobs:
 
   plan:
-    name: "1. plan"
     if: inputs.action == 'plan' || inputs.action == 'plan_apply'
     runs-on: ubuntu-latest
     outputs:
-      plan_exitcode: steps.plan.exitcode
+      plan_exitcode: "${{ steps.plan.exitcode }}"
     steps:
       - name: Debug
         run: |
@@ -147,7 +146,6 @@ jobs:
 
 
   apply:
-    name: "2. apply"
     needs: plan
     #if: (inputs.action == 'plan_apply' || inputs.action == 'apply') && needs.plan.outputs.plan_exitcode == '2' 
     if: (inputs.action == 'plan_apply' || inputs.action == 'apply') 
