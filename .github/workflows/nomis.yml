@@ -33,51 +33,59 @@ permissions:
 jobs:
   init:
     runs-on: ubuntu-latest
-
+    outputs:
+      matrix: ${{ steps.init.outputs.matrix }}
     steps:
       - name: Init
+        id: init
         run: |
           if [[ ${{ github.ref }} != 'refs/head/main' ]]; then
             matrix=$(cat << EOF
             {
-              "include": [
-              {
+              "include": [{
                 "target": "development",
                 "action": "plan_apply"
-              },
-              {
+              }, {
                 "target": "test",
                 "action": "plan_apply"
-              },
-              {
+              }, {
                 "target": "preproduction",
                 "action": "plan"
-              },
-              {
+              }, {
                 "target": "production",
                 "action": "plan"
               }]
             }
           EOF
           )
+          else
+            matrix=$(cat << EOF
+            {
+              "include": [{
+                "target": "development",
+                "action": "plan_apply"
+              }, {
+                "target": "test",
+                "action": "plan_apply"
+              }, {
+                "target": "preproduction",
+                "action": "plan_apply"
+              }, {
+                "target": "production",
+                "action": "plan_apply"
+              }]
+            }
+          EOF
+          )
           fi
-          echo "matrix"
           echo "${matrix}"
+          echo matrix=$matrix >> $GITHUB_ENV
 
   terraform:
     needs: init
     strategy:
       fail-fast: false
-      matrix:
-        include:
-          - target: "development"
-            action: "plan_apply"
-          - target: "test"
-            action: "plan_apply"
-          - target: "preproduction"
-            action: "plan"
-          - target: "production"
-            action: "plan"
+      matrix: ${{ fromJson(needs.init.outputs.matrix) }}
     uses: ministryofjustice/modernisation-platform-environments/.github/workflows/reusable_terraform_plan_apply.yml@nomis/DSOS-1519/pipeline-improvements
     with:
       application: "${{ github.workflow }}"
