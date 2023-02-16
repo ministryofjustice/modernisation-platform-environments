@@ -58,13 +58,14 @@ jobs:
                 "action": "plan"
               }]
             }
-            EOF
-            )
+          EOF
+          )
           fi
           echo "matrix"
           echo "${matrix}"
 
   terraform:
+    needs: init
     strategy:
       fail-fast: false
       matrix:
