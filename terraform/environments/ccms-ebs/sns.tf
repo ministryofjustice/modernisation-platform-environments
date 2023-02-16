@@ -1,5 +1,5 @@
 resource "aws_sns_topic" "cw_alerts" {
-    name = "ccms-ebs-ec2-alerts"
+  name = "ccms-ebs-ec2-alerts"
 }
 
 resource "aws_sns_topic_policy" "sns_policy" {
