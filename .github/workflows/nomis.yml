@@ -32,7 +32,7 @@ permissions:
 
 jobs:
   setup:
-    uses: ministryofjustice/modernisation-platform-environments/.github/workflows/reusable_terraform_plan_apply_setup.yml@nomis/DSOS-1519/pipeline-improvements
+    uses: ministryofjustice/modernisation-platform-environments/.github/workflows/reusable_plan_apply_setup.yml@nomis/DSOS-1519/pipeline-improvements
     with:
       setup_type: "standard_four_accounts" # allow apply to dev/test from branch
 
