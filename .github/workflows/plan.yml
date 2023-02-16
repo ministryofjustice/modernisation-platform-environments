@@ -87,14 +87,17 @@ jobs:
         if: inputs.do_state_refresh == true
         working-directory: "terraform/environments/${{ inputs.application }}"
         run: |
-          terraform apply -refresh-only -auto-approve {{ inputs.additional_tfargs }} | ${GITHUB_WORKSPACE}/scripts/redact-output.sh
+          terraform apply -refresh-only -auto-approve {{ inputs.additional_tfargs }} | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh
 
       - name: Terraform Plan
         id: plan
+        env:
+          POST_PLAN_TO_PR: "${{ github.event_name == 'pull_request' && steps.plan.outputs.exitcode == '2' && inputs.post_plan_to_pr == true }}"
         working-directory: "terraform/environments/${{ inputs.application }}"
         run: |
           exitcode=0
-          terraform plan -detailed-exitcode {{ inputs.additional_tfargs }} | ${GITHUB_WORKSPACE}/scripts/redact-output.sh | tee tfplan.txt || exitcode=$?
+          echo "post plan [${POST_PLAN_TO_PR}]"
+          terraform plan -detailed-exitcode {{ inputs.additional_tfargs }} | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh | tee tfplan.txt || exitcode=$?
           echo "exitcode=${exitcode}" >> $GITHUB_OUTPUT
           (( exitcode == 1 )) && exit 1 || exit 0
 
