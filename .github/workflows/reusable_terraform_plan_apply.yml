@@ -204,7 +204,6 @@ jobs:
           terraform workspace select "${WORKSPACE_NAME}"
 
       - name: Terraform Plan
-        id: plan
         working-directory: "terraform/environments/${{ inputs.application }}"
         run: |
           set -o pipefail
@@ -213,7 +212,6 @@ jobs:
           terraform plan ${tf_args} | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh
 
       - name: Terraform Apply
-        id: plan
         working-directory: "terraform/environments/${{ inputs.application }}"
         run: |
           set -o pipefail
