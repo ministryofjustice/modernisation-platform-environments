@@ -27,22 +27,19 @@ on:
         required: false
         description: "Set to true to post terraform plan as a comment to the PR"
         default: false
-#   secrets:
-#     modernisation_platform_environments:
-#       type: string
-#       required: true
-#     pipeline_github_token:
-#       type: string
-#       required: true
-
-# env:
-# GITHUB_TOKEN: ${{ secrets.pipeline_github_token }}
-# APPLICATION: "${{ input.application }}"
+   secrets:
+     modernisation_platform_environments:
+       type: string
+       required: true
+     pipeline_github_token:
+       type: string
+       required: true
 
 env:
   ACCOUNT_NAME: "${{ inputs.application }}-${{ inputs.environment }}"
   WORKSPACE_NAME: "${{ inputs.application }}-${{ inputs.environment }}"
-  ENVIRONMENT_MANAGEMENT: "${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}"
+  ENVIRONMENT_MANAGEMENT: "${{ secrets.modernisation_platform_environments }}"
+  GITHUB_TOKEN: "${{ secrets.pipeline_github_token }}"
 
 jobs:
 
