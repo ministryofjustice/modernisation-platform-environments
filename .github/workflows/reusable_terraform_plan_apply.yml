@@ -47,10 +47,11 @@ env:
 jobs:
 
   plan:
-    if: inputs.action == 'plan' || inputs.action == 'plan_apply'
+    name: "1. plan"  # at time or writing, jobs are sorted alphabetically in the UI for reusable jobs
+    if: inputs.action == 'plan' || inputs.action == 'plan_apply'      
     runs-on: ubuntu-latest
     outputs:
-      plan_exitcode: "${{ steps.plan.exitcode }}"
+      plan_exitcode: "${{ steps.plan.outputs.exitcode }}"
     steps:
       - name: Debug
         run: |
@@ -146,6 +147,7 @@ jobs:
 
 
   apply:
+    name: "2. apply"  # at time or writing, jobs are sorted alphabetically in the UI for reusable jobs
     needs: plan
     #if: (inputs.action == 'plan_apply' || inputs.action == 'apply') && needs.plan.outputs.plan_exitcode == '2' 
     if: (inputs.action == 'plan_apply' || inputs.action == 'apply') 
