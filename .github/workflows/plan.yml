@@ -29,10 +29,8 @@ on:
         default: false
     secrets:
       modernisation_platform_environments:
-        type: string
         required: true
       pipeline_github_token:
-        type: string
         required: true
 
 env:
