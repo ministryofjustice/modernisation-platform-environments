@@ -13,14 +13,10 @@ on:
         required: true
         description: "Name of the environment, e.g. development"
       action:
-        type: choice
+        type: string
         required: true
-        description: "Choose whether to run terraform plan and/or apply"
+        description: "Set to plan, plan_apply or apply"
         default: plan
-        options:
-        - plan
-        - plan_apply
-        - apply
       additional_tfargs:
         type: string
         required: false
