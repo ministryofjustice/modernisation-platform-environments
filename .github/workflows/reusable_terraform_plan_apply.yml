@@ -229,4 +229,4 @@ jobs:
           set -o pipefail
           tf_args="x.tfplan ${{ inputs.init_plan_apply_tfargs }} ${{ inputs.additional_tfargs }}"
           echo "terraform apply ${tf_args}"
-          # terraform apply ${tf_args} | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh
+          terraform apply ${tf_args} | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh
