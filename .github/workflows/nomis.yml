@@ -78,9 +78,14 @@ jobs:
           EOF
           )
           fi
+          echo "${matrix}"
           echo 'matrix<<EOF' >> $GITHUB_ENV
           echo "${matrix}" >> $GITHUB_ENV
           echo 'EOF' >> $GITHUB_ENV
+
+      - name: Debug
+        run: |
+          echo "${{ steps.init.outputs.matrix }}"
 
   terraform:
     needs: init
