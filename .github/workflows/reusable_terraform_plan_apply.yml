@@ -121,7 +121,8 @@ jobs:
           set -o pipefail
           exitcode=0
           tf_args="-detailed-exitcode ${{ inputs.init_plan_apply_tfargs }} ${{ inputs.additional_tfargs }}"
-          [[ ${POST_PLAN_TO_PR} == 'true' ]] && tf_args="${tf_args} -no-color"
+          echo "${POST_PLAN_TO_PR}"
+          [[ ${POST_PLAN_TO_PR} != 'false' ]] && tf_args="${tf_args} -no-color"
           [[ ${{ inputs.do_state_refresh_on_plan }} == 'true' ]] && tf_args="${tf_args} -refresh=false"
           echo "terraform plan ${tf_args}"
           terraform plan ${tf_args} | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh | tee tfplan.txt || exitcode=$?
@@ -139,7 +140,7 @@ jobs:
             echo '**`${{ env.WORKSPACE_NAME }}`** terragrunt plan on `${{ github.event_name }}` event [#${{ github.run_number }}]('${url}')'
             echo
             echo '```'
-            head -c 65476 tfplan.txt
+            head -c 65476 tfplan.txt | sed -n '/Terraform will perform/,$p'
             echo
             echo '```'
             if [[ $len -gt 65476 ]]; then
@@ -149,6 +150,16 @@ jobs:
           echo 'TF_PLAN_OUT<<EOF' >> $GITHUB_ENV
           comment >> $GITHUB_ENV
           echo 'EOF' >> $GITHUB_ENV
+
+      - name: Hide Previous PR comment (Optional)
+        if: ${{ github.event_name == 'pull_request' }}
+        working-directory: "scripts/minimise-comments"
+        env:
+          COMMENT_BODY_CONTAINS: "**`${{ env.WORKSPACE_NAME }}`**"
+          PR_NUMBER: "${{ github.event.pull_request.number }}"
+        run: |
+          go build
+          ./minimise-comments
 
       - name: Post Plan to PR (Optional)
         if: github.event_name == 'pull_request' && steps.plan.outputs.exitcode == '2' && inputs.post_plan_to_pr == true
