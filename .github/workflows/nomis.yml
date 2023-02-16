@@ -78,10 +78,10 @@ jobs:
           EOF
           )
           fi
-          echo "${matrix}"
           echo 'matrix<<EOF' >> $GITHUB_ENV
           echo "${matrix}" >> $GITHUB_ENV
-          echo 'EOF' >> $GITHUB_ENV
+          echo 'EOF' >> $GITHUB_ENV          
+          echo "${matrix}"
 
       - name: Debug
         run: |
