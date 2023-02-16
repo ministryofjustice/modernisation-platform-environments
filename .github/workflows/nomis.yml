@@ -31,8 +31,40 @@ permissions:
   contents: read  # This is required for actions/checkout
 
 jobs:
-  terraform_from_branch:
-    if: github.ref != 'refs/heads/main'
+  init:
+    runs-on: ubuntu-latest
+
+    steps:
+      init:
+        run: |
+          if [[ ${{github.ref != 'refs/head/main' ]]; then
+            matrix=$(cat << EOF
+            {
+              "include": [
+              {
+                "target": "development",
+                "action": "plan_apply"
+              },
+              {
+                "target": "test",
+                "action": "plan_apply"
+              },
+              {
+                "target": "preproduction",
+                "action": "plan"
+              },
+              {
+                "target": "production",
+                "action": "plan"
+              }]
+            }
+            EOF
+            )
+          fi
+          echo "matrix"
+          echo "${matrix}"
+
+  terraform:
     strategy:
       fail-fast: false
       matrix:
@@ -50,25 +82,6 @@ jobs:
       application: "${{ github.workflow }}"
       environment: "${{ matrix.target }}"
       action: "${{ matrix.action }}"
-    secrets:
-      modernisation_platform_environments: "${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}"
-      pipeline_github_token: "${{ secrets.DSO_GITHUB_AUTOMATION_PAT }}"
-
-  terraform_from_main:
-    if: github.ref == 'refs/heads/main'
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - target: "development"
-          - target: "test"
-          - target: "preproduction"
-          - target: "production"
-    uses: ministryofjustice/modernisation-platform-environments/.github/workflows/reusable_terraform_plan_apply.yml@nomis/DSOS-1519/pipeline-improvements
-    with:
-      application: "${{ github.workflow }}"
-      environment: "${{ matrix.target }}"
-      action: "plan_apply"
     secrets:
       modernisation_platform_environments: "${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}"
       pipeline_github_token: "${{ secrets.DSO_GITHUB_AUTOMATION_PAT }}"
