@@ -136,7 +136,7 @@ jobs:
           comment() {
             url="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
             len=$(cat tfplan.txt | wc -c)
-            echo '**`${{ env.WORKSPACE_NAME }}`** terragrunt plan on `${{ github.event_name }}` event [#${{ github.run_number }}]'(${url})
+            echo '**`${{ env.WORKSPACE_NAME }}`** terragrunt plan on `${{ github.event_name }}` event [#${{ github.run_number }}]('${url}')'
             echo
             echo '```'
             head -c 65476 tfplan.txt
