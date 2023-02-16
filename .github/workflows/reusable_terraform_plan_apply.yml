@@ -56,7 +56,7 @@ jobs:
       - name: Debug
         run: |
           echo "application=${{ inputs.application }} environment=${{ inputs.environment }} apply=${{ inputs.apply }}"
-          echo "additional_tfargs=${{ inputs.additional_tfargs }} do_state_refresh=${{ do_state_refresh }} post_plan_to_pr=${{ post_plan_to_pr }}"
+          echo "additional_tfargs=${{ inputs.additional_tfargs }} do_state_refresh=${{ inputs.do_state_refresh }} post_plan_to_pr=${{ inputs.post_plan_to_pr }}"
 
       - name: Checkout Repository
         uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c  # v3.3.0
