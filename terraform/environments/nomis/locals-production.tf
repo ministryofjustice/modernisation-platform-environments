@@ -117,7 +117,7 @@ locals {
           "/dev/sdc" = { size = 1000 }
         }
         ebs_volume_config = {
-          data  = { total_size = 3000 }
+          data  = { total_size = 3000, iops = 3750 }
           flash = { total_size = 500 }
         }
       }
