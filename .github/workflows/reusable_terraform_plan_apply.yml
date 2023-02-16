@@ -12,11 +12,15 @@ on:
         type: string
         required: true
         description: "Name of the environment, e.g. development"
-      apply:
-        type: boolean
-        required: false
-        description: "Set to true to apply the terraform"
-        default: false
+      action:
+        type: choice
+        required: true
+        description: "Choose whether to run terraform plan and/or apply"
+        default: plan
+        options:
+        - plan
+        - plan_apply
+        - apply
       additional_tfargs:
         type: string
         required: false
@@ -24,12 +28,12 @@ on:
         default: ""
       do_state_refresh:
         type: boolean
-        required: false
+        required: true
         description: "Set to true to do a state refresh prior to the plan"
         default: false
       post_plan_to_pr:
         type: boolean
-        required: false
+        required: true
         description: "Set to true to post terraform plan as a comment to the PR"
         default: false
     secrets:
@@ -49,13 +53,14 @@ jobs:
   # jobs are shown in alphabetical order in re-usable workflows, hence the job[n] prefix
   job1_plan:
     name: plan
+    if: inputs.action == 'plan' || inputs.action == 'plan_apply'
     runs-on: ubuntu-latest
     outputs:
       plan_exitcode: steps.plan.exitcode
     steps:
       - name: Debug
         run: |
-          echo "application=${{ inputs.application }} environment=${{ inputs.environment }} apply=${{ inputs.apply }}"
+          echo "application=${{ inputs.application }} environment=${{ inputs.environment }} action=${{ inputs.action }}"
           echo "additional_tfargs=${{ inputs.additional_tfargs }} do_state_refresh=${{ inputs.do_state_refresh }} post_plan_to_pr=${{ inputs.post_plan_to_pr }}"
 
       - name: Checkout Repository
@@ -148,7 +153,7 @@ jobs:
   job2_apply:
     name: apply
     needs: job1_plan
-    if: inputs.apply == true && needs.plan.outputs.plan_exitcode == '2' 
+    if: (inputs.action == 'plan_apply' || inputs.action == 'apply') && needs.plan.outputs.plan_exitcode == '2' 
     runs-on: ubuntu-latest
     environment: "${{ inputs.application }}-${{ inputs.environment }}"
     steps:
