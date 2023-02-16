@@ -11,5 +11,5 @@ resource "aws_sns_topic_subscription" "user_subscription" {
   count     = local.is-production ? 0 : 1
   topic_arn = aws_sns_topic.cw_alerts.arn
   protocol  = "email"
-  endpoint  = data.aws_secretsmanager_secret.support_email.id
+  endpoint  = data.aws_secretsmanager_secret_version.current.secret_string
 }
