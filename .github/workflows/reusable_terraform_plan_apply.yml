@@ -14,7 +14,7 @@ on:
         description: "Name of the environment, e.g. development"
       action:
         type: string
-        required: true
+        required: false
         description: "Set to plan, plan_apply or apply"
         default: plan
       additional_tfargs:
@@ -24,12 +24,12 @@ on:
         default: ""
       do_state_refresh:
         type: boolean
-        required: true
+        required: false
         description: "Set to true to do a state refresh prior to the plan"
         default: false
       post_plan_to_pr:
         type: boolean
-        required: true
+        required: false
         description: "Set to true to post terraform plan as a comment to the PR"
         default: false
     secrets:
