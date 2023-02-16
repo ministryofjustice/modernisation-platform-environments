@@ -30,38 +30,45 @@ permissions:
   id-token: write  # This is required for requesting the JWT
   contents: read  # This is required for actions/checkout
 
-defaults:
-  run:
-    shell: bash
-
 jobs:
-
-  terraform:
-    name: terraform
+  terraform_from_branch:
+    if: github.ref != 'refs/heads/main'
     strategy:
       fail-fast: false
       matrix:
         include:
           - target: "development"
-            action: "plan"
+            action: "plan_apply"
           - target: "test"
             action: "plan_apply"
+          - target: "preproduction"
+            action: "plan"
+          - target: "production"
+            action: "plan"
     uses: ministryofjustice/modernisation-platform-environments/.github/workflows/reusable_terraform_plan_apply.yml@nomis/DSOS-1519/pipeline-improvements
     with:
+      application: "${{ github.workflow }}"
       environment: "${{ matrix.target }}"
       action: "${{ matrix.action }}"
-      application: "${{ github.workflow }}"
     secrets:
       modernisation_platform_environments: "${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}"
       pipeline_github_token: "${{ secrets.DSO_GITHUB_AUTOMATION_PAT }}"
 
-# runs-on: ubuntu-latest
-# permissions:
-#   id-token: write # This is required for requesting the JWT
-#   contents: read # This is required for actions/checkout
-# with:
-#   environment: development
-#   application: $GITHUB_WORKFLOW
-# secrets:
-#   modernisation_platform_environments: ${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}
-#   pipeline_github_token: ${{ secrets.DSO_GITHUB_AUTOMATION_PAT }}
+  terraform_from_main:
+    if: github.ref == 'refs/heads/main'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: "development"
+          - target: "test"
+          - target: "preproduction"
+          - target: "production"
+    uses: ministryofjustice/modernisation-platform-environments/.github/workflows/reusable_terraform_plan_apply.yml@nomis/DSOS-1519/pipeline-improvements
+    with:
+      application: "${{ github.workflow }}"
+      environment: "${{ matrix.target }}"
+      action: "plan_apply"
+    secrets:
+      modernisation_platform_environments: "${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}"
+      pipeline_github_token: "${{ secrets.DSO_GITHUB_AUTOMATION_PAT }}"
