@@ -36,7 +36,7 @@ defaults:
 
 jobs:
 
-  plan:
+  terraform_branch:
     strategy:
       fail-fast: false
       matrix:
@@ -44,7 +44,7 @@ jobs:
         include:
           - apply: true
             target: development
-    uses: ministryofjustice/modernisation-platform-environments/.github/workflows/plan.yml@nomis/DSOS-1519/pipeline-improvements
+    uses: ministryofjustice/modernisation-platform-environments/.github/workflows/reusable_terraform_plan_apply.yml@nomis/DSOS-1519/pipeline-improvements
     with:
       environment: "${{ matrix.target }}"
       application: "${{ github.workflow }}"
