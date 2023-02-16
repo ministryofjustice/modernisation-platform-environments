@@ -53,6 +53,7 @@ locals {
       description = "nomis weblogic appserver 10.3"
       os-type     = "Linux"
       component   = "web"
+      delete-me   = "do not forget to delete this, just added for a test"
     }
 
     instance = {
