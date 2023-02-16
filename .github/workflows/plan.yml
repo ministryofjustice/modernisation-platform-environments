@@ -27,13 +27,13 @@ on:
         required: false
         description: "Set to true to post terraform plan as a comment to the PR"
         default: false
-   secrets:
-     modernisation_platform_environments:
-       type: string
-       required: true
-     pipeline_github_token:
-       type: string
-       required: true
+    secrets:
+      modernisation_platform_environments:
+        type: string
+        required: true
+      pipeline_github_token:
+        type: string
+        required: true
 
 env:
   ACCOUNT_NAME: "${{ inputs.application }}-${{ inputs.environment }}"
