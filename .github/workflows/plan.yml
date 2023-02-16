@@ -60,8 +60,14 @@ jobs:
             echo "MODERNISATION_PLATFORM_ENVIRONMENTS secret or ACCOUNT_NAME var is empty"
             exit 1
           fi
-          ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< ${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }})
-          [[ -z $ACCOUNT_NUMBER ]] && exit 1
+          echo "Testing json well formed"
+          echo ${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }} | jq -e > /dev/null
+          echo "Extracting account number"
+          ACCOUNT_NUMBER=$(echo ${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }} | jq -r ".account_ids[${ACCOUNT_NAME}]")
+          if [[ -z $ACCOUNT_NUMBER ]]; then
+            echo "Account number not found"
+            exit 1
+          fi
           echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
 
       - name: Configure AWS Credentials
