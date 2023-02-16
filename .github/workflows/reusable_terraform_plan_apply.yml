@@ -115,7 +115,7 @@ jobs:
       - name: Terraform Plan
         id: plan
         env:
-          POST_PLAN_TO_PR: "${{ github.event_name == 'pull_request' && steps.plan.outputs.exitcode == '2' && inputs.post_plan_to_pr == 'true' }}"
+          POST_PLAN_TO_PR: "${{ github.event_name == 'pull_request' && inputs.post_plan_to_pr == 'true' }}"
         working-directory: "terraform/environments/${{ inputs.application }}"
         run: |
           set -o pipefail
@@ -123,7 +123,6 @@ jobs:
           tf_args="-detailed-exitcode ${{ inputs.init_plan_apply_tfargs }} ${{ inputs.additional_tfargs }}"
           echo "${POST_PLAN_TO_PR}"
           echo "${{ github.event_name }}"
-          echo "${{ steps.plan.outputs.exitcode }}"
           echo "${{ inputs.post_plan_to_pr }}"
           # [[ ${POST_PLAN_TO_PR} != 'false' ]] && tf_args="${tf_args} -no-color"
           tf_args="${tf_args} -no-color"
@@ -141,7 +140,7 @@ jobs:
           comment() {
             url="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
             len=$(cat tfplan.txt | wc -c)
-            echo '**`${{ env.WORKSPACE_NAME }}`** terragrunt plan on `${{ github.event_name }}` event [#${{ github.run_number }}]('${url}')'
+            echo '**`${{ env.WORKSPACE_NAME }}`** terraform plan on `${{ github.event_name }}` event [#${{ github.run_number }}]('${url}')'
             echo
             echo '```'
             head -c 65476 tfplan.txt | sed -n '/Terraform will perform/,$p'
