@@ -7,9 +7,26 @@ on:
       application:
         type: string
         required: true
+        description: "Name of the application, e.g. nomis"
       environment:
         type: string
         required: true
+        description: "Name of the environment, e.g. development"
+      additional_tfargs:
+        type: string
+        required: false
+        description: "Any additional terraform arguments to be passed in to terraform plan/apply, e.g. -var 'foo=bar'"
+        default: ""
+      do_state_refresh:
+        type: boolean
+        required: false
+        description: "Set to true to do a state refresh prior to the plan"
+        default: false
+      post_plan_to_pr:
+        type: boolean
+        required: false
+        description: "Set to true to post terraform plan as a comment to the PR"
+        default: false
 #   secrets:
 #     modernisation_platform_environments:
 #       type: string
@@ -20,54 +37,105 @@ on:
 
 # env:
 # GITHUB_TOKEN: ${{ secrets.pipeline_github_token }}
-# TF_VAR_BRANCH_NAME: ${{ github.event_name == 'pull_request' && 'main' || (github.head_ref || github.ref_name) }}
-# TF_VAR_GH_ACTOR_NAME: ${{ github.actor }}
-# AWS_REGION: "eu-west-2"
 # APPLICATION: "${{ input.application }}"
 
 env:
   ACCOUNT_NAME: "${{ inputs.application }}-${{ inputs.environment }}"
-  ENVIRONMENT_MANAGEMENT: ${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}
+  WORKSPACE_NAME: "${{ inputs.application }}-${{ inputs.environment }}"
 
 jobs:
 
   plan:
-    name: terraform plan
     runs-on: ubuntu-latest
+    outputs:
+      plan_exitcode: steps.plan.exitcode
     steps:
       - name: Checkout Repository
         uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c  # v3.3.0
 
-      - name: Get Account Number
+      - name: Get AWS Account Number
         run: |
           echo "Retrieving account number for '${ACCOUNT_NAME}' from MODERNISATION_PLATFORM_ENVIRONMENTS github secret"
-          ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)
+          ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< ${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }})
           [[ -z $ACCOUNT_NUMBER ]] && exit 1
           echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
 
-#     - name: configure aws credentials
-#       uses: aws-actions/configure-aws-credentials@67fbcbb121271f7775d2e7715933280b06314838  # v1.7.0
-#       with:
-#         role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
-#         role-session-name: githubactionsrolesession
-#         aws-region: ${{ env.AWS_REGION }}
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@67fbcbb121271f7775d2e7715933280b06314838  # v1.7.0
+        with:
+          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
+          role-session-name: githubactionsrolesession
+          aws-region: "eu-west-2"
 
-#     - name: Load and Configure Terraform
-#       uses: hashicorp/setup-terraform@633666f66e0061ca3b725c73b2ec20cd13a8fdd1  # v2.0.3
-#       with:
-#         terraform_version: "~1"
-#         terraform_wrapper: false
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@633666f66e0061ca3b725c73b2ec20cd13a8fdd1  # v2.0.3
+        with:
+          terraform_version: "~1"
+          terraform_wrapper: false
 
-#     - name: Terraform plan
-#       run: |
-#         terraform --version
-#         echo "Terraform plan - ${ACCOUNT_NAME}"
-#         bash scripts/terraform-init.sh terraform/environments/${APPLICATION}
-#         terraform -chdir="terraform/environments/$APPLICATION}" workspace select "${ACCOUNT_NAME}"
-#         bash scripts/terraform-plan.sh terraform/environments/${APPLICATION}
+      - name: Terraform Init
+        working-directory: "terraform/environments/${{ inputs.application }}"
+        run: |
+          terraform --version
+          terraform init -input=false -lock-timeout=300s
+
+      - name: Terraform Workspace Select
+        working-directory: "terraform/environments/${{ inputs.application }}"
+        run: |
+          terraform workspace select "${WORKSPACE_NAME}"
+
+      - name: Terraform State Refresh
+        if: inputs.do_state_refresh == true
+        working-directory: "terraform/environments/${{ inputs.application }}"
+        run: |
+          terraform apply -refresh-only -auto-approve {{ inputs.additional_tfargs }} | ${GITHUB_WORKSPACE}/scripts/redact-output.sh
+
+      - name: Terraform Plan
+        id: plan
+        working-directory: "terraform/environments/${{ inputs.application }}"
+        run: |
+          exitcode=0
+          terraform plan -detailed-exitcode {{ inputs.additional_tfargs }} | ${GITHUB_WORKSPACE}/scripts/redact-output.sh | tee tfplan.txt || exitcode=$?
+          echo "exitcode=${exitcode}" >> $GITHUB_OUTPUT
+          (( exitcode == 1 )) && exit 1 || exit 0
+
+      - name: Create Plan PR message
+        if: github.event_name == 'pull_request' && steps.plan.outputs.exitcode == '2' && inputs.post_plan_to_pr == true
+        working-directory: "terraform/environments/${{ inputs.application }}"
+        run: |
+          comment() {
+            url="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            len=$(cat tfplan.txt | wc -c)
+            echo '**`${{ env.WORKSPACE_NAME }}`** terragrunt plan on `${{ github.event_name }}` event [#${{ github.run_number }}]'(${url})
+            echo
+            echo '```'
+            head -c 65476 tfplan.txt
+            echo
+            echo '```'
+            if [[ $len -gt 65476 ]]; then
+              echo "** Truncated output.  See $url for the rest **"
+            fi
+          }
+          echo 'TF_PLAN_OUT<<EOF' >> $GITHUB_ENV
+          comment >> $GITHUB_ENV
+          echo 'EOF' >> $GITHUB_ENV
+
+      - name: Post Plan to PR
+        if: github.event_name == 'pull_request' && steps.plan.outputs.exitcode == '2' && inputs.post_plan_to_pr == true
+        env:
+          message: "${{ env.TF_PLAN_OUT }}"
+        run: |
+          escaped_message=$(echo "$message" | jq -Rsa .)
+          curl -sS -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments" \
+            -d '{"body":'"${escaped_message}"'}'
+
 
   apply:
-    name: terraform apply
+    needs: plan
+    if: needs.plan.outputs.plan_exitcode == '2'
     runs-on: ubuntu-latest
     environment: "${{ inputs.application }}-${{ inputs.environment }}"
     steps:
