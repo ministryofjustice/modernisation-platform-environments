@@ -115,14 +115,18 @@ jobs:
       - name: Terraform Plan
         id: plan
         env:
-          POST_PLAN_TO_PR: "${{ github.event_name == 'pull_request' && steps.plan.outputs.exitcode == '2' && inputs.post_plan_to_pr == true }}"
+          POST_PLAN_TO_PR: "${{ github.event_name == 'pull_request' && steps.plan.outputs.exitcode == '2' && inputs.post_plan_to_pr == 'true' }}"
         working-directory: "terraform/environments/${{ inputs.application }}"
         run: |
           set -o pipefail
           exitcode=0
           tf_args="-detailed-exitcode ${{ inputs.init_plan_apply_tfargs }} ${{ inputs.additional_tfargs }}"
           echo "${POST_PLAN_TO_PR}"
-          [[ ${POST_PLAN_TO_PR} != 'false' ]] && tf_args="${tf_args} -no-color"
+          echo "${{ github.event_name }}"
+          echo "${{ steps.plan.outputs.exitcode }}"
+          echo "${{ inputs.post_plan_to_pr }}"
+          # [[ ${POST_PLAN_TO_PR} != 'false' ]] && tf_args="${tf_args} -no-color"
+          tf_args="${tf_args} -no-color"
           [[ ${{ inputs.do_state_refresh_on_plan }} == 'true' ]] && tf_args="${tf_args} -refresh=false"
           echo "terraform plan ${tf_args}"
           terraform plan ${tf_args} | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh | tee tfplan.txt || exitcode=$?
