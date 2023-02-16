@@ -41,6 +41,9 @@ jobs:
       fail-fast: false
       matrix:
         target: [development, test]
+        include:
+          apply: true
+          target: development 
     uses: ministryofjustice/modernisation-platform-environments/.github/workflows/plan.yml@nomis/DSOS-1519/pipeline-improvements
     with:
       environment: "${{ matrix.target }}"

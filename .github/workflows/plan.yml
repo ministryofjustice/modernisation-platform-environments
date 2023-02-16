@@ -12,6 +12,11 @@ on:
         type: string
         required: true
         description: "Name of the environment, e.g. development"
+      apply:
+        type: boolean
+        required: false
+        description: "Set to true to apply the terraform"
+        default: false
       additional_tfargs:
         type: string
         required: false
@@ -135,7 +140,7 @@ jobs:
 
   apply:
     needs: plan
-    if: needs.plan.outputs.plan_exitcode == '2'
+    if: inputs.apply == true && needs.plan.outputs.plan_exitcode == '2' 
     runs-on: ubuntu-latest
     environment: "${{ inputs.application }}-${{ inputs.environment }}"
     steps:
