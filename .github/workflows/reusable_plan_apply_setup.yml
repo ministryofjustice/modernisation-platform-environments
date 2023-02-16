@@ -14,7 +14,7 @@ on:
       setup_type:
         type: string
         required: true
-        description: "Set to standard_four_accounts"
+        description: "See setup task, control which environments to plan/apply to, e.g. standard_four_accounts"
     outputs:
       matrix:
         description: "Matrix json string to feed into plan/apply job"
@@ -30,7 +30,7 @@ jobs:
       - name: Setup
         id: setup
         run: |
-          if [[ ${{ inputs.setup_type == "standard_four_accounts" }} ]]; then
+          if [[ ${{ inputs.setup_type }} == "standard_four_accounts" ]]; then
             if [[ ${{ github.ref }} != 'refs/head/main' ]]; then
               matrix=$(cat << EOF
               {
