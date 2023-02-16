@@ -38,6 +38,7 @@ jobs:
 
   plan:
     strategy:
+      fail-fast: false
       matrix:
         target: [development, test]
     uses: ministryofjustice/modernisation-platform-environments/.github/workflows/plan.yml@nomis/DSOS-1519/pipeline-improvements

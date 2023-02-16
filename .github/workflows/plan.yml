@@ -56,6 +56,10 @@ jobs:
       - name: Get AWS Account Number
         run: |
           echo "Retrieving account number for '${ACCOUNT_NAME}' from MODERNISATION_PLATFORM_ENVIRONMENTS github secret"
+          if [[ -z secrets.MODERNISATION_PLATFORM_ENVIRONMENTS ]]; then
+            echo "MODERNISATION_PLATFORM_ENVIRONMENTS secret is empty"
+            exit 1
+          fi
           ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< ${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }})
           [[ -z $ACCOUNT_NUMBER ]] && exit 1
           echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
