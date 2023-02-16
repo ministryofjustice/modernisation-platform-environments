@@ -96,8 +96,10 @@ jobs:
         working-directory: "terraform/environments/${{ inputs.application }}"
         run: |
           exitcode=0
-          echo "post plan [${POST_PLAN_TO_PR}]"
-          terraform plan -detailed-exitcode {{ inputs.additional_tfargs }} | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh | tee tfplan.txt || exitcode=$?
+          tf_args="-detailed-exitcode ${{ inputs.additional_tfargs }}"
+          [[ ${POST_PLAN_TO_PR} == 'true' ]] && tf_args="${tg_args} -no-color"
+          echo "terraform plan ${tf_args}"
+          terraform plan ${tf_args} | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh | tee tfplan.txt || exitcode=$?
           echo "exitcode=${exitcode}" >> $GITHUB_OUTPUT
           (( exitcode == 1 )) && exit 1 || exit 0
 
