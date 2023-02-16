@@ -1,19 +1,19 @@
 
 
-resource "aws_cloudwatch_metric_alarm" "cpu"{
-    alarm_name = "example"
-    comparison_operator = "GreaterThanOrEqualToThreshold"
-    evaluation_periods = "1"
-    metric_name = "CPUUtilization"
-    namespace = "AWS/EC2"
-    period = "60"
-    statistic = "Average"
-    threshold = "80"
-    alarm_description = "Monitors ec2 cpu utilisation"
-    alarm_actions       = [aws_sns_topic.cw_alerts.arn]
-    dimensions = {
-        instanceId = aws_instance.ec2_oracle_ebs.id
-    }
+resource "aws_cloudwatch_metric_alarm" "cpu" {
+  alarm_name          = "example"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = "1"
+  metric_name         = "CPUUtilization"
+  namespace           = "AWS/EC2"
+  period              = "60"
+  statistic           = "Average"
+  threshold           = "80"
+  alarm_description   = "Monitors ec2 cpu utilisation"
+  alarm_actions       = [aws_sns_topic.cw_alerts.arn]
+  dimensions = {
+    instanceId = aws_instance.ec2_oracle_ebs.id
+  }
 }
 # ==============================================================================
 # Alerts - LINUX

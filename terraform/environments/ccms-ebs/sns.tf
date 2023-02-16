@@ -3,8 +3,8 @@ resource "aws_sns_topic" "cw_alerts" {
 }
 
 resource "aws_sns_topic_policy" "sns_policy" {
-    arn = aws_sns_topic.cw_alerts.arn
-    policy = data.aws_iam_policy_document.sns_topic_policy.json
+  arn    = aws_sns_topic.cw_alerts.arn
+  policy = data.aws_iam_policy_document.sns_topic_policy.json
 }
 
 resource "aws_sns_topic_subscription" "user_subscription" {
