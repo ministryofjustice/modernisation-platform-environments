@@ -46,9 +46,8 @@ env:
 
 jobs:
 
-  # jobs are shown in alphabetical order in re-usable workflows, hence the job[n] prefix
-  job1_plan:
-    name: plan
+  plan:
+    name: "1. plan"
     if: inputs.action == 'plan' || inputs.action == 'plan_apply'
     runs-on: ubuntu-latest
     outputs:
@@ -109,6 +108,7 @@ jobs:
           [[ ${POST_PLAN_TO_PR} == 'true' ]] && tf_args="${tg_args} -no-color"
           echo "terraform plan ${tf_args}"
           terraform plan ${tf_args} | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh | tee tfplan.txt || exitcode=$?
+          echo "exitcode=${exitcode}"
           echo "exitcode=${exitcode}" >> $GITHUB_OUTPUT
           (( exitcode == 1 )) && exit 1 || exit 0
 
@@ -146,12 +146,15 @@ jobs:
             -d '{"body":'"${escaped_message}"'}'
 
 
-  job2_apply:
-    name: apply
-    needs: job1_plan
-    if: (inputs.action == 'plan_apply' || inputs.action == 'apply') && needs.plan.outputs.plan_exitcode == '2' 
+  apply:
+    name: "2. apply"
+    needs: plan
+    #if: (inputs.action == 'plan_apply' || inputs.action == 'apply') && needs.plan.outputs.plan_exitcode == '2' 
+    if: (inputs.action == 'plan_apply' || inputs.action == 'apply') 
     runs-on: ubuntu-latest
     environment: "${{ inputs.application }}-${{ inputs.environment }}"
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c  # v3.3.0
+      - name: Debug
+        run: |
+          echo "${{ needs.plan.outputs.plan_exitcode }}"          
+      
