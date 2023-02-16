@@ -78,8 +78,9 @@ jobs:
           EOF
           )
           fi
-          echo "${matrix}"
-          echo matrix=$matrix >> $GITHUB_ENV
+          echo 'matrix<<EOF' >> $GITHUB_ENV
+          echo "${matrix}" >> $GITHUB_ENV
+          echo 'EOF' >> $GITHUB_ENV
 
   terraform:
     needs: init
