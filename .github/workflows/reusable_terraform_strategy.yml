@@ -1,8 +1,14 @@
 ---
-name: terraform plan apply setup
+name: terraform strategy
 
-# setup how to plan/apply to the different modernisation platform accounts
-# designed to be used in conjunction with reusable_terraform_plan_apply.yml
+# Create a variable that can be used in a strategy matrix in a separate
+# job, for example, reusable_terraform_plan_apply.yml.
+#
+# The variable will contain each of the environments for the application
+# and a variable for whether a plan or apply should be run, depending on
+# whether the job is run from the main branch or not.
+#
+# Possible values of strategy_type listed below:
 #
 # standard_four_accounts
 #   branch: run plan on all 4 accounts but allow apply to development and test
@@ -11,26 +17,26 @@ name: terraform plan apply setup
 on:
   workflow_call:
     inputs:
-      setup_type:
+      strategy_type:
         type: string
         required: true
-        description: "See setup task, control which environments to plan/apply to, e.g. standard_four_accounts"
+        description: "Set to the a string representing the desired workflow strategy, e.g. standard_four_accounts, see comments for more info"
     outputs:
       matrix:
-        description: "Matrix json string to feed into plan/apply job"
-        value: ${{ jobs.setup.outputs.matrix }}
+        description: "Matrix json string to feed that can be used as strategy in separate terraform job"
+        value: ${{ jobs.strategy.outputs.matrix }}
 
 jobs:
-  setup:
-    name: "setup"
+  strategy:
+    name: "strategy"
     runs-on: ubuntu-latest
     outputs:
-      matrix: "${{ steps.setup.outputs.matrix }}"
+      matrix: "${{ steps.strategy.outputs.matrix }}"
     steps:
-      - name: Setup
-        id: setup
+      - name: Set Strategy Matrix
+        id: strategy
         run: |
-          if [[ ${{ inputs.setup_type }} == "standard_four_accounts" ]]; then
+          if [[ ${{ inputs.strategy_type }} == "standard_four_accounts" ]]; then
             if [[ ${{ github.ref }} != 'refs/head/main' ]]; then
               matrix=$(cat << EOF
               {
@@ -71,7 +77,7 @@ jobs:
           )
             fi
           else
-            echo "Unexpected value for inputs.setup_type [${{ inputs.setup_type }}]"
+            echo "Unexpected value for inputs.strategy_type [${{ inputs.strategy_type }}]"
             exit 1
           fi
           echo 'matrix<<EOF' >> $GITHUB_OUTPUT
