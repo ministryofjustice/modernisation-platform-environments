@@ -108,7 +108,7 @@ locals {
         ami_name  = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-07T12-48-08.562Z"
         ami_owner = "self" # remove this line next time AMI is updated so core-shared-services-production used instead
         instance = {
-          instance_type             = "r6i.2xlarge"
+          instance_type             = "r6i.4xlarge"
           disable_api_termination   = true
           metadata_endpoint_enabled = "enabled"
         }
@@ -117,7 +117,7 @@ locals {
           "/dev/sdc" = { size = 1000 }
         }
         ebs_volume_config = {
-          data  = { total_size = 3000 }
+          data  = { total_size = 3000, iops = 3750 }
           flash = { total_size = 500 }
         }
       }

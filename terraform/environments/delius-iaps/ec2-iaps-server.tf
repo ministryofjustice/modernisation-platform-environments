@@ -142,18 +142,6 @@ data "aws_iam_policy_document" "iaps_ec2_assume_role_policy" {
 
 data "aws_iam_policy_document" "iaps_ec2_policy" {
   statement {
-    sid       = "BucketPermissions"
-    actions   = ["s3:ListBucket"]
-    resources = ["arn:aws:s3:::${local.artefact_bucket_name}"]
-  }
-
-  statement {
-    sid       = "ObjectPermissions"
-    actions   = ["s3:GetObject"]
-    resources = ["arn:aws:s3:::${local.artefact_bucket_name}/*"]
-  }
-
-  statement {
     sid = "SecretPermissions"
     actions = [
       "secretsmanager:GetSecretValue"
@@ -248,12 +236,16 @@ resource "aws_iam_policy" "ssm_least_privilege_policy" {
 # }
 
 data "template_file" "iaps_ec2_config" {
-  template = file("${path.module}/templates/iaps-EC2LaunchV2.yaml.tpl")
+  template = file("${path.module}/templates/iaps-EC2LaunchV2.yaml.tftpl")
   vars = {
     delius_iaps_ad_password_secret_name = aws_secretsmanager_secret.ad_password.name
     delius_iaps_ad_domain_name          = aws_directory_service_directory.active_directory.name
     ndelius_interface_url               = local.application_data.accounts[local.environment].iaps_ndelius_interface_url
     im_interface_url                    = local.application_data.accounts[local.environment].iaps_im_interface_url
+
+    # TODO: remove environment variable and related conditional statements
+    # temporarily needed to ensure no connections to delius and im are attempted
+    environment = local.environment
   }
 }
 

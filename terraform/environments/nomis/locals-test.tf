@@ -127,6 +127,25 @@ locals {
           desired_capacity = 1
           warm_pool        = null
         }
+        autoscaling_schedules = {}
+      }
+
+      t1a-nomis-web = {
+        tags = {
+          ami                = "nomis_rhel_6_10_weblogic_appserver_10_3"
+          description        = "T1 nomis weblogic 10.3 additional test scaling group"
+          oracle-db-hostname = "t1-nomis-db-1"
+          nomis-environment  = "t1"
+          oracle-db-name     = "CNOMT1"
+          server-type        = "nomis-web"
+        }
+        ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-01-03T17-01-12.128Z"
+        branch   = var.BRANCH_NAME # comment in if testing ansible
+
+        autoscaling_group = {
+          desired_capacity = 1
+          warm_pool        = null
+        }
       }
     }
 
@@ -176,7 +195,7 @@ locals {
         ami_name = "nomis_rhel_7_9_baseimage_2022-11-01T13-43-46.384Z"
         # branch   = var.BRANCH_NAME # comment in if testing ansible
         autoscaling_group = {
-          desired_capacity = 0
+          desired_capacity = 1
         }
         autoscaling_schedules = {}
         subnet_name           = "data"
@@ -193,7 +212,7 @@ locals {
         ami_name = "nomis_rhel_7_9_baseimage_2022-11-01T13-43-46.384Z"
         # branch   = var.BRANCH_NAME # comment in if testing ansible
         autoscaling_group = {
-          desired_capacity = 0
+          desired_capacity = 1
         }
         autoscaling_schedules = {}
         subnet_name           = "data"

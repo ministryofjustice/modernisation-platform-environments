@@ -47,6 +47,7 @@ variable "target_groups" {
       availability_zone = optional(string)
     })), [])
   }))
+  default = {}
 }
 
 variable "existing_target_groups" {
@@ -154,6 +155,19 @@ variable "route53_records" {
     zone_id                = string # id of zone to create the record in
     evaluate_target_health = bool
   }))
+  default = {}
+}
+
+variable "replace" {
+  description = "A bit of a bodge to make definition of rules and default_action reusable.  Does a search/replace on the target_group_name field in rules/default_action contains with target_group_name_match/target_group_name_replace.  Likewise with the condition host header.  Useful when you have multiple environments with same config"
+  type = object({
+    target_group_name_match       = optional(string, "$(name)")
+    target_group_name_replace     = optional(string, "")
+    condition_host_header_match   = optional(string, "$(name)")
+    condition_host_header_replace = optional(string, "")
+    route53_record_name_match     = optional(string, "$(name)")
+    route53_record_name_replace   = optional(string, "")
+  })
   default = {}
 }
 
