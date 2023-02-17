@@ -53,5 +53,6 @@ locals {
   artefact_bucket_name = "${local.application_name}-${local.environment}-artefacts"
   logging_bucket_name  = "${local.application_name}-${local.environment}-logging"
   lb_log_prefix        = "ebsapps-lb"
-
+  support              = data.aws_secretsmanager_secret_version.email.secret_string
+  
 }

@@ -86,6 +86,7 @@ data "aws_secretsmanager_secret" "support_email_account" {
     aws_secretsmanager_secret.support_email_account
   ]
 }
+
 data "aws_secretsmanager_secret_version" "email" {
   secret_id = data.aws_secretsmanager_secret.support_email_account.id
 }
