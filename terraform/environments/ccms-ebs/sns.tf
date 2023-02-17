@@ -1,5 +1,5 @@
-resource "aws_secretsmanager_secret" "support_email" {
-  name        = "support_email"
+resource "aws_secretsmanager_secret" "support_email_account" {
+  name        = "support_email_account"
   description = "emial address of the support acount for cw alerts"
 }
 
@@ -16,5 +16,5 @@ resource "aws_sns_topic_subscription" "user_subscription" {
   count     = local.is-production ? 0 : 1
   topic_arn = aws_sns_topic.cw_alerts.arn
   protocol  = "email"
-  endpoint  = data.aws_secretsmanager_secret_version.current.secret_string
+  endpoint  = data.aws_secretsmanager_secret_version.email.secret_string
 }

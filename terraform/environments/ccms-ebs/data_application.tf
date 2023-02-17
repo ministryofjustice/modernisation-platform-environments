@@ -80,12 +80,12 @@ data "aws_iam_policy_document" "sns_topic_policy" {
   }
 }
 
-data "aws_secretsmanager_secret" "support_email" {
-  name = "support_email"
+data "aws_secretsmanager_secret" "support_email_account" {
+  name = "support_email_account"
   depends_on = [
-    aws_secretsmanager_secret.support_email
+    aws_secretsmanager_secret.support_email_account
   ]
 }
-data "aws_secretsmanager_secret_version" "current" {
-  secret_id = data.aws_secretsmanager_secret.support_email.id
+data "aws_secretsmanager_secret_version" "email" {
+  secret_id = data.aws_secretsmanager_secret.support_email_account.id
 }
