@@ -3,8 +3,8 @@ resource "aws_secretsmanager_secret" "support_email_account" {
   description = "email address of the support account for cw alerts"
 }
 resource "aws_secretsmanager_secret_version" "support_email_account" {
-  secret_id = aws_secretsmanager_secret.support_email_account.id
-  secret_string = local.support != "" ? local.support  : "default@example.com"
+  secret_id     = aws_secretsmanager_secret.support_email_account.id
+  secret_string = local.support != "" ? local.support : "default@example.com"
 }
 
 resource "aws_sns_topic" "cw_alerts" {
