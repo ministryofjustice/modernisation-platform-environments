@@ -51,7 +51,7 @@ resource "aws_lb_target_group" "PPUD-Target-Group" {
     unhealthy_threshold = 2
     matcher             = "302"
   }
-    tags = {
+  tags = {
     Name = "${var.networking[0].business-unit}-${local.environment}"
   }
 
@@ -116,7 +116,7 @@ resource "aws_lb_target_group" "WAM-Target-Group" {
     unhealthy_threshold = 2
     matcher             = "302"
   }
-    tags = {
+  tags = {
     Name = "${var.networking[0].business-unit}-${local.environment}"
   }
 }
