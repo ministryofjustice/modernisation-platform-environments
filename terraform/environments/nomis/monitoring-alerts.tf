@@ -149,13 +149,16 @@ resource "aws_cloudwatch_metric_alarm" "oracle_db_disconnected" {
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "5"
   datapoints_to_alarm = "5"
-  metric_name         = "collectd_exec-db_connected"
+  metric_name         = "collectd_exec_value"
   namespace           = "CWAgent"
   period              = "60"
   statistic           = "Average"
   threshold           = "1"
   alarm_description   = "Oracle db connection to a particular SID is not working. See: https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4294246698/Oracle+db+connection+alarm for remediation steps."
   alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
+  dimensions = {
+    instance = "db_connected"
+  } 
   tags = {
     Name = "oracle_db_disconnected"
   }
