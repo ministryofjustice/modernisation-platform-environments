@@ -9,9 +9,9 @@ resource "aws_cloudwatch_metric_alarm" "cpu" {
   threshold           = "80"
   alarm_description   = "Monitors ec2 cpu utilisation"
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
-  dimensions = {
-    instanceId = aws_instance.ec2_oracle_ebs.id
-  }
+  #dimensions = {
+  #  instanceId = aws_instance.ec2_oracle_ebs.id
+  #}
 }
 # ==============================================================================
 # Alerts - LINUX
