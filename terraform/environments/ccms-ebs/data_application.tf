@@ -82,6 +82,9 @@ data "aws_iam_policy_document" "sns_topic_policy" {
 
 data "aws_secretsmanager_secret" "support_email" {
   name = "support_email"
+  depends_on = [
+    aws_secretsmanager_secret.support_email
+  ]
 }
 data "aws_secretsmanager_secret_version" "current" {
   secret_id = data.aws_secretsmanager_secret.support_email.id
