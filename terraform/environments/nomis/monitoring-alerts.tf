@@ -158,7 +158,7 @@ resource "aws_cloudwatch_metric_alarm" "oracle_db_disconnected" {
   alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
   dimensions = {
     instance = "db_connected"
-  } 
+  }
   tags = {
     Name = "oracle_db_disconnected"
   }
