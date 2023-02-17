@@ -22,3 +22,8 @@ resource "aws_kms_key" "ebs" {
     { "Name" = "${local.application_name} EBS KMS" },
   )
 }
+
+resource "aws_kms_alias" "ebs" {
+  name          = "alias/oas-ebs-kms"
+  target_key_id = aws_kms_key.ebs.key_id
+}
