@@ -1,3 +1,8 @@
+resource "aws_secretsmanager_secret" "support_email" {
+  name        = "support_email"
+  description = "emial address of the support acount for cw alerts"
+}
+
 resource "aws_sns_topic" "cw_alerts" {
   name = "ccms-ebs-ec2-alerts"
 }

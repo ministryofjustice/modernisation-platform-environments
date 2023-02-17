@@ -1,5 +1,3 @@
-
-
 resource "aws_cloudwatch_metric_alarm" "cpu" {
   alarm_name          = "example"
   comparison_operator = "GreaterThanOrEqualToThreshold"
