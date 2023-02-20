@@ -120,7 +120,7 @@ module "db_ec2_instance" {
   route53_records               = merge(local.database.route53_records, lookup(each.value, "route53_records", {}))
 
   iam_resource_names_prefix = "ec2-database"
-  instance_profile_policies = concat(local.ec2_common_managed_policies, [aws_iam_policy.s3_db_backup_bucket_access.arn])
+  instance_profile_policies = local.ec2_common_managed_policies
 
   business_unit      = local.business_unit
   application_name   = local.application_name
