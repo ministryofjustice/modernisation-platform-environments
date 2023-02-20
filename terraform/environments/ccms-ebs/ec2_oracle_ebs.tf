@@ -8,7 +8,7 @@ resource "aws_instance" "ec2_oracle_ebs" {
   monitoring                  = true
   ebs_optimized               = false
   associate_public_ip_address = false
-  iam_instance_profile        = aws_iam_instance_profile.iam_instace_profile_oracle_base.name
+  iam_instance_profile        = aws_iam_instance_profile.iam_instace_profile_ccms_base.name
 
   # Due to a bug in terraform wanting to rebuild the ec2 if more than 1 ebs block is attached, we need the lifecycle clause below
   #lifecycle {

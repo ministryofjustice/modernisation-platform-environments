@@ -46,8 +46,8 @@ resource "aws_iam_policy" "ec2_ssm_policy" {
       ]
     }
   )
-
 }
+
 resource "aws_iam_role_policy_attachment" "ssm_logging_oracle_base" {
   role       = aws_iam_role.role_stsassume_oracle_base.name
   policy_arn = aws_iam_policy.ec2_ssm_policy.arn
@@ -77,6 +77,7 @@ resource "aws_iam_role" "role_stsassume_oracle_base" {
     { Name = lower(format("RoleSsm-%s-%s-OracleBase", local.application_name, local.environment)) }
   )
 }
+
 resource "aws_iam_role_policy_attachment" "ssm_policy_oracle_base" {
   role       = aws_iam_role.role_stsassume_oracle_base.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
@@ -87,8 +88,9 @@ resource "aws_iam_role_policy_attachment" "secrets_manager_policy_oracle_base" {
   role       = aws_iam_role.role_stsassume_oracle_base.name
   policy_arn = "arn:aws:iam::aws:policy/SecretsManagerReadWrite"
 }
-resource "aws_iam_instance_profile" "iam_instace_profile_oracle_base" {
-  name = "iam_instace_profile_oracle_base"
+
+resource "aws_iam_instance_profile" "iam_instace_profile_ccms_base" {
+  name = "iam_instace_profile_ccms_base"
   role = aws_iam_role.role_stsassume_oracle_base.name
   path = "/"
   tags = merge(local.tags,
