@@ -1,30 +1,24 @@
-/*
-
-locals {
+/*locals {
   userdata = templatefile("userdata.sh", {
-    ssm_cloudwatch_config = aws_ssm_parameter.cw_agent.name
+    ssm_cloudwatch_config = aws_ssm_parameter.cw_agent_config.name
   })
 }
-
-resource "aws_instance" "this" {
-  ami                  = "ami-0cbc6aae997c6538a"
-  instance_type        = "t3.micro"
-  iam_instance_profile = aws_iam_instance_profile.this.name
-  user_data            = local.userdata
-  tags                 = { Name = "EC2-with-cw-agent" }
-}
-
-resource "aws_ssm_parameter" "cw_agent" {
-  description = "Cloudwatch agent config to configure custom log"
-  name        = "/cloudwatch-agent/config"
-  type        = "String"
-  value       = file("cw_agent_config.json")
-}
 */
+resource "aws_cloudwatch_log_group" "groups" {
+  for_each          = local.application_data.cw_log_groups
+  name              = each.key
+  retention_in_days = each.value.retention_days
 
-resource "aws_ssm_parameter" "cloud_watch_config_linux" {
-  description = "cloud watch agent config for linux"
-  name        = "cloud-watch-config-linux"
+  tags = merge(
+    local.tags,
+    {
+      Name = each.key
+    },
+  )
+}
+resource "aws_ssm_parameter" "cw_agent_config" {
+  description = "cloud watch agent config"
+  name        = "cloud-watch-config"
   type        = "String"
   value       = file("./templates/cw_agent_config.json")
 

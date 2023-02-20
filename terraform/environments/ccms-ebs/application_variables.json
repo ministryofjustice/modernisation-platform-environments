@@ -219,5 +219,13 @@
       "period": 60,
       "threshold": 1
     }
+  },
+  "cw_log_groups": {
+    "cwagent-var-log-messages":  {
+      "retention_days": 30
+    },
+    "cwagent-var-log-secure":  {
+      "retention_days": 90
+    }
   }
 }

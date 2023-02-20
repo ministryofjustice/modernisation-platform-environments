@@ -107,22 +107,6 @@ EOF
 
 }
 
-/*
-output "InstanceId" {
-  value = aws_instance.ec2_ebsapps[*].id
-}
-*/
-/*
-locals {
-  ec2_ebsapps = {
-    for inst in aws_instance.ec2_ebsapps : inst.id => inst
-  }
-}
-output e2_ebsapps_ids {
-  value = local.ec2_ebsapps.id
-}
-*/
-
 module "cw-ebsapps-ec2" {
   source = "./modules/cw-ec2"
 
