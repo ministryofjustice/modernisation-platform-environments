@@ -1,22 +1,22 @@
 locals {
   topic       = var.topic
-  instanceIds  = var.instanceIds
+  instanceIds = var.instanceIds
   name        = var.name
 }
 
 # CPU Utilization
 resource "aws_cloudwatch_metric_alarm" "cpu_utilization" {
-  count               = var.metric == "cpu" ? 1 : 0
-  alarm_name          = "${local.name}-cpu_utilization" 
-  alarm_description   = "Monitors ec2 cpu utilisation"
-  comparison_operator = "GreaterThanOrEqualToThreshold"
-  metric_name         = "CPUUtilization"
-  namespace           = "AWS/EC2"
-  statistic           = "Average"
+  count                     = var.metric == "cpu" ? 1 : 0
+  alarm_name                = "${local.name}-cpu_utilization"
+  alarm_description         = "Monitors ec2 cpu utilisation"
+  comparison_operator       = "GreaterThanOrEqualToThreshold"
+  metric_name               = "CPUUtilization"
+  namespace                 = "AWS/EC2"
+  statistic                 = "Average"
   insufficient_data_actions = []
 
   evaluation_periods  = var.eval_periods
-  datapoints_to_alarm = var.eval_periods 
+  datapoints_to_alarm = var.eval_periods
   period              = var.period
   threshold           = var.threshold
   alarm_actions       = [local.topic]
@@ -36,7 +36,7 @@ resource "aws_cloudwatch_metric_alarm" "low_available_memory" {
   statistic           = "Average"
 
   evaluation_periods  = var.eval_periods
-  datapoints_to_alarm = var.eval_periods 
+  datapoints_to_alarm = var.eval_periods
   period              = var.period
   threshold           = var.threshold
   alarm_actions       = [var.topic]
@@ -54,7 +54,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free" {
   metric_name         = "disk_free"
   namespace           = "CWAgent"
   statistic           = "Average"
-  
+
   evaluation_periods  = var.eval_periods
   datapoints_to_alarm = var.eval_periods
   period              = var.period
@@ -74,7 +74,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu_usage_iowait" {
   metric_name         = "cpu_usage_iowait"
   namespace           = "CWAgent"
   statistic           = "Average"
-  
+
   evaluation_periods  = var.eval_periods
   datapoints_to_alarm = var.eval_periods
   period              = var.period
@@ -100,11 +100,11 @@ resource "aws_cloudwatch_metric_alarm" "instance_health_check" {
   metric_name         = "StatusCheckFailed_Instance"
   namespace           = "AWS/EC2"
   statistic           = "Average"
-  
-  evaluation_periods  = var.eval_periods
-  period              = var.period
-  threshold           = var.threshold
-  alarm_actions       = [var.topic]
+
+  evaluation_periods = var.eval_periods
+  period             = var.period
+  threshold          = var.threshold
+  alarm_actions      = [var.topic]
   dimensions = {
     instanceId = tostring(local.instanceIds)
   }
@@ -119,11 +119,11 @@ resource "aws_cloudwatch_metric_alarm" "system_health_check" {
   metric_name         = "StatusCheckFailed_System"
   namespace           = "AWS/EC2"
   statistic           = "Average"
-  
-  evaluation_periods  = var.eval_periods
-  period              = var.period
-  threshold           = var.threshold
-  alarm_actions       = [var.topic]
+
+  evaluation_periods = var.eval_periods
+  period             = var.period
+  threshold          = var.threshold
+  alarm_actions      = [var.topic]
   dimensions = {
     instanceId = tostring(local.instanceIds)
   }

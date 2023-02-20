@@ -123,18 +123,18 @@ output e2_ebsapps_ids {
 }
 */
 
-module cw-ebsapps-ec2 {
+module "cw-ebsapps-ec2" {
   source = "./modules/cw-ec2"
 
-  name  = "ec2-ebsapps"
-  topic = aws_sns_topic.cw_alerts.arn
-  instanceIds = element(aws_instance.ec2_ebsapps.*.id, 0 )
+  name        = "ec2-ebsapps"
+  topic       = aws_sns_topic.cw_alerts.arn
+  instanceIds = element(aws_instance.ec2_ebsapps.*.id, 0)
 
-  for_each      = local.application_data.cloudwatch_ec2
-  metric        = each.key
-  eval_periods  = each.value.eval_periods
-  period        = each.value.period
-  threshold     = each.value.threshold
+  for_each     = local.application_data.cloudwatch_ec2
+  metric       = each.key
+  eval_periods = each.value.eval_periods
+  period       = each.value.period
+  threshold    = each.value.threshold
 }
 
 
