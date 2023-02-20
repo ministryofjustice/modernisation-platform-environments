@@ -140,7 +140,20 @@ locals {
           server-type        = "nomis-web"
         }
         ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-01-03T17-01-12.128Z"
-        branch   = "nomis/DSOS-1757/weblogic-fixes"
+
+        user_data_cloud_init = {
+          args = {
+            lifecycle_hook_name  = "ready-hook"
+            branch               = "nomis/DSOS-1757/weblogic-fixes"
+            ansible_repo         = "modernisation-platform-configuration-management"
+            ansible_repo_basedir = "ansible"
+            ansible_args         = "--tags ec2provision"
+          }
+          scripts = [
+            "ansible-ec2provision.sh.tftpl",
+            "post-ec2provision.sh.tftpl"
+          ]
+        }
 
         autoscaling_group = {
           desired_capacity = 1
