@@ -875,7 +875,7 @@ module "datamart" {
     pause = {
       name          = "${local.redshift_cluster_name}-pause"
       description   = "Pause cluster every night"
-      schedule      = "cron(0 20 * * ? *)"
+      schedule      = "cron(30 20 * * ? *)"
       pause_cluster = true
     }
     resume = {
