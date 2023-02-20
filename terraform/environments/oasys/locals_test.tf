@@ -25,5 +25,7 @@ locals {
       patch_approval_delay_days = 3
       patch_day                 = "TUE"
     }
+
+    databases = {}
   }
 }
