@@ -112,8 +112,8 @@ EOF
   depends_on = [aws_security_group.ec2_sg_ftp]
 }
 
-module cw-ftp-ec2 {
-  source        = "./modules/cw-ec2"
+module "cw-ftp-ec2" {
+  source = "./modules/cw-ec2"
 
   name          = "ec2-ftp"
   topic         = aws_sns_topic.cw_alerts.arn

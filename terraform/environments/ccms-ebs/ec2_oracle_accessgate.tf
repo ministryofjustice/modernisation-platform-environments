@@ -90,8 +90,8 @@ EOF
 
 }
 
-module cw-accgate-ec2 {
-  source        = "./modules/cw-ec2"
+module "cw-accgate-ec2" {
+  source = "./modules/cw-ec2"
 
   name          = "ec2-accgate"
   topic         = aws_sns_topic.cw_alerts.arn

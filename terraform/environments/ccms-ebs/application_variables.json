@@ -191,32 +191,32 @@
   "cloudwatch_ec2": {
     "cpu": {
       "eval_periods": 1,
-      "period":   60,
+      "period": 60,
       "threshold": 80
     },
     "mem": {
       "eval_periods": 2,
-      "period":   60,
+      "period": 60,
       "threshold": 10
     },
     "disk": {
       "eval_periods": 2,
-      "period":   60,
+      "period": 60,
       "threshold": 15
     },
     "iowait": {
       "eval_periods": 6,
-      "period":   60,
+      "period": 60,
       "threshold": 90
     },
     "insthc": {
       "eval_periods": 3,
-      "period":   60,
+      "period": 60,
       "threshold": 1
     },
     "syshc": {
       "eval_periods": 3,
-      "period":   60,
+      "period": 60,
       "threshold": 1
     }
   }

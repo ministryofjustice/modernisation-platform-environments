@@ -10,7 +10,7 @@ variable "instanceIds" {
   type        = string
   description = "instanceIds to monitor"
 }
-variable "metric"{
+variable "metric" {
   type        = string
   description = "metric to be reported on"
 }
