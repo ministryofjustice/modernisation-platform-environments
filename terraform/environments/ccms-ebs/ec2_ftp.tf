@@ -118,7 +118,7 @@ module cw-ftp-ec2 {
   name          = "ec2-ftp"
   topic         = aws_sns_topic.cw_alerts.arn
   instanceIds   = aws_instance.ec2_ftp.id
-
+  
   for_each      = local.application_data.cloudwatch_ec2
   metric        = each.key
   eval_periods  = each.value.eval_periods
