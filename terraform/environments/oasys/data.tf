@@ -347,17 +347,17 @@ data "aws_iam_policy_document" "ec2_common_combined" {
     data.aws_iam_policy_document.cloud_watch_custom.json
   ]
 }
-data "aws_iam_policy_document" "cross-account-s3" {
+data "aws_iam_policy_document" "user-s3-access" {
   statement {
-    sid = "cross-account-s3-access-for-image-builder"
+    sid = "user-s3-access"
     actions = [
       "s3:GetObject",
       "s3:PutObject",
       "s3:PutObjectAcl",
       "s3:ListBucket"
     ]
-    resources = ["${module.image-builder-bucket.bucket.arn}/*",
-    module.image-builder-bucket.bucket.arn, ]
+    resources = ["${module.s3-bucket.bucket.arn}/*",
+    module.s3-bucket.bucket.arn, ]
     principals {
       type = "AWS"
       identifiers = sort([ # sort to avoid plan changes

@@ -25,12 +25,9 @@ locals {
 
     autoscaling_groups = {
       webservers = merge(local.webserver, { # merge common config and env specific
-        tags = {
+        tags = merge(local.webserver_tags, {
           oasys-environment = "t1"
-          description       = "oasys webserver"
-          component         = "web"
-          server-type       = "webserver"
-        }
+        })
       })
       # test = {
       #   ami_name              = "base_rhel_7_9_*"
@@ -73,5 +70,6 @@ locals {
     # db_enabled_cloudwatch_logs_exports     = ["audit", "audit", "listener", "trace"]
     # db_performance_insights_enabled        = "false"
     # db_skip_final_snapshot                 = "true"
+
   }
 }

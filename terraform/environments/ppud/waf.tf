@@ -153,7 +153,7 @@ resource "aws_wafv2_web_acl" "WAM-rule" {
 
     statement {
       geo_match_statement {
-        country_codes = ["GB"]
+        country_codes = ["GB", "US"]
       }
     }
     action {
