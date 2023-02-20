@@ -202,3 +202,18 @@ resource "aws_volume_attachment" "backup_att" {
   volume_id   = aws_ebs_volume.backup.id
   instance_id = aws_instance.ec2_oracle_ebs.id
 }
+
+
+module cw-ebs-ec2 {
+  source        = "./modules/cw-ec2"
+
+  name          = "ec2-ebs"
+  topic         = aws_sns_topic.cw_alerts.arn
+  instanceIds   = element(aws_instance.ec2_oracle_ebs.*.id, 0 )
+
+  for_each      = local.application_data.cloudwatch_ec2
+  metric        = each.key
+  eval_periods  = each.value.eval_periods
+  period        = each.value.period
+  threshold     = each.value.threshold
+}

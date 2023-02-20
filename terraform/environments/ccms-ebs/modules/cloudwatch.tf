@@ -9,9 +9,9 @@ resource "aws_cloudwatch_metric_alarm" "cpu" {
   threshold           = "80"
   alarm_description   = "Monitors ec2 cpu utilisation"
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
-  #dimensions = {
-  #  instanceId = aws_instance.ec2_oracle_ebs.id
-  #}
+  dimensions = {
+    instanceId = aws_instance.ec2_oracle_ebs.id
+  }
 }
 # ==============================================================================
 # Alerts - LINUX
@@ -161,6 +161,10 @@ resource "aws_cloudwatch_metric_alarm" "load_balancer_unhealthy_state_routing" {
   threshold           = "1"
   alarm_description   = "This metric monitors the number of unhealthy hosts in the routing table for the load balancer. If the number of unhealthy hosts is greater than 0 for 3 minutes."
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
+  dimensions = {
+    TargetGroup  = aws_lb_target_group.ebsapp_tg.arn_suffix
+    LoadBalancer = aws_lb.ebsapps_lb.arn_suffix
+  }
   tags = {
     Name = "load_balancer_unhealthy_state_routing"
   }
@@ -177,6 +181,10 @@ resource "aws_cloudwatch_metric_alarm" "load_balancer_unhealthy_state_dns" {
   threshold           = "1"
   alarm_description   = "This metric monitors the number of unhealthy hosts in the DNS table for the load balancer. If the number of unhealthy hosts is greater than 0 for 3 minutes."
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
+  dimensions = {
+    TargetGroup  = aws_lb_target_group.ebsapp_tg.arn_suffix
+    LoadBalancer = aws_lb.ebsapps_lb.arn_suffix
+  }
   tags = {
     Name = "load_balancer_unhealthy_state_dns"
   }
