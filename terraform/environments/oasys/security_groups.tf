@@ -83,3 +83,40 @@ resource "aws_security_group" "oasys" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
+
+resource "aws_security_group" "data" {
+  #checkov:skip=CKV2_AWS_5:skip "Ensure that Security Groups are attached to another resource"
+  name        = "data"
+  description = "Security group for data subnet"
+  vpc_id      = module.environment.vpc.id
+
+  dynamic "ingress" {
+    for_each = local.security_group_data.ingress
+    content {
+      description     = lookup(ingress.value, "description", null)
+      from_port       = lookup(ingress.value, "from_port", null)
+      to_port         = lookup(ingress.value, "to_port", null)
+      protocol        = lookup(ingress.value, "protocol", null)
+      cidr_blocks     = lookup(ingress.value, "cidr_blocks", null)
+      security_groups = lookup(ingress.value, "security_groups", null)
+      self            = lookup(ingress.value, "self", null)
+    }
+  }
+
+  dynamic "egress" {
+    for_each = local.security_group_data.egress
+    content {
+      description     = lookup(egress.value, "description", null)
+      from_port       = lookup(egress.value, "from_port", null)
+      to_port         = lookup(egress.value, "to_port", null)
+      protocol        = lookup(egress.value, "protocol", null)
+      cidr_blocks     = lookup(egress.value, "cidr_blocks", null)
+      security_groups = lookup(egress.value, "security_groups", null)
+      self            = lookup(egress.value, "self", null)
+    }
+  }
+
+  tags = merge(local.tags, {
+    Name = "data"
+  })
+}
