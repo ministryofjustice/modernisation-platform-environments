@@ -73,7 +73,7 @@ resource "aws_lb_target_group" "target_group" {
   }
 
   health_check {
-    # path                = "/"
+    path                = "/User/Login?ReturnUrl=%2f"
     healthy_threshold   = "5"
     interval            = "120"
     protocol            = "HTTP"

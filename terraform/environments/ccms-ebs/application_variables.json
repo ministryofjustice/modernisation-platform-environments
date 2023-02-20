@@ -16,7 +16,7 @@
       "webgate_no_instances": 1,
       "webgate_default_iops": 3000,
       "webgate_u01_size": 100,
-      "accessgate_no_instances": 2,
+      "accessgate_no_instances": 1,
       "accessgate_default_iops": 3000,
       "accessgate_u01_size": 150,
       "ebsapps_no_instances": 1,
@@ -41,7 +41,7 @@
       "webgate_no_instances": 1,
       "webgate_default_iops": 3000,
       "webgate_u01_size": 100,
-      "accessgate_no_instances": 2,
+      "accessgate_no_instances": 1,
       "accessgate_default_iops": 3000,
       "accessgate_u01_size": 150,
       "ebsapps_no_instances": 1,
@@ -59,7 +59,7 @@
       "orace_base_prereqs_ami_name": "Oracle79-prereqs-v1_5",
       "webgate_ami_name": "ebs-sso-v1_0",
       "accessgate_ami_name": "ebs-sso-v1_0",
-      "key_name": "oracle-base-dev",
+      "key_name": "",
       "lz_aws_account_id_env": "484221692666",
       "lz_aws_subnet_env": "10.204.0.0/20",
       "lz_ftp_bucket_environment": "staging",
@@ -84,7 +84,7 @@
       "orace_base_prereqs_ami_name": "Oracle79-prereqs-v1_5",
       "webgate_ami_name": "ebs-sso-v1_0",
       "accessgate_ami_name": "ebs-sso-v1_0",
-      "key_name": "oracle-base-dev",
+      "key_name": "",
       "lz_aws_account_id_env": "842522700642",
       "lz_aws_subnet_env": "10.205.0.0/20",
       "lz_ftp_bucket_environment": "production",
@@ -186,6 +186,38 @@
       "mapping": "u01",
       "type": "io2",
       "device_name": "/dev/sdh"
+    }
+  },
+  "cloudwatch_ec2": {
+    "cpu": {
+      "eval_periods": 1,
+      "period": 60,
+      "threshold": 80
+    },
+    "mem": {
+      "eval_periods": 2,
+      "period": 60,
+      "threshold": 10
+    },
+    "disk": {
+      "eval_periods": 2,
+      "period": 60,
+      "threshold": 15
+    },
+    "iowait": {
+      "eval_periods": 6,
+      "period": 60,
+      "threshold": 90
+    },
+    "insthc": {
+      "eval_periods": 3,
+      "period": 60,
+      "threshold": 1
+    },
+    "syshc": {
+      "eval_periods": 3,
+      "period": 60,
+      "threshold": 1
     }
   }
 }

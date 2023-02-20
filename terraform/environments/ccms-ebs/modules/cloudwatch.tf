@@ -1,68 +1,18 @@
-# ==============================================================================
-# Alerts - WINDOWS
-# ==============================================================================
-
-# Remote Desktop Services - Windows
-# CPU Idle Time - Windows
-
-# Low Available Memory Alarm - Windows
-resource "aws_cloudwatch_metric_alarm" "low_available_memory_windows" {
-  alarm_name          = "low_available_memory_windows"
+resource "aws_cloudwatch_metric_alarm" "cpu" {
+  alarm_name          = "example"
   comparison_operator = "GreaterThanOrEqualToThreshold"
-  evaluation_periods  = "2"
-  datapoints_to_alarm = "2"
-  metric_name         = "Memory % Committed Bytes In Use"
-  namespace           = "CWAgent"
+  evaluation_periods  = "1"
+  metric_name         = "CPUUtilization"
+  namespace           = "AWS/EC2"
   period              = "60"
   statistic           = "Average"
   threshold           = "80"
-  alarm_description   = "This metric monitors the amount of available memory. If Committed Bytes in Use is > 80% for 2 minutes, the alarm will trigger."
-  alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
-  tags = {
-    Name = "low_available_memory_windows"
+  alarm_description   = "Monitors ec2 cpu utilisation"
+  alarm_actions       = [aws_sns_topic.cw_alerts.arn]
+  dimensions = {
+    instanceId = aws_instance.ec2_oracle_ebs.id
   }
 }
-
-
-
-# High CPU - Windows
-resource "aws_cloudwatch_metric_alarm" "high_cpu_windows" {
-  alarm_name          = "high_cpu_windows"
-  comparison_operator = "GreaterThanOrEqualToThreshold"
-  evaluation_periods  = "5"
-  datapoints_to_alarm = "5"
-  metric_name         = "PROCESSOR_TIME"
-  namespace           = "CWAgent"
-  period              = "60"
-  statistic           = "Average"
-  threshold           = "95"
-  alarm_description   = "This metric monitors the Processor time. If the Processor time is greater than 95% for 5 minutes, the alarm will trigger: "
-  alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
-  tags = {
-    Name = "high_cpu_windows"
-  }
-}
-
-# Disk Free - Windows
-
-resource "aws_cloudwatch_metric_alarm" "disk_free_windows" {
-  alarm_name          = "disk_free_windows"
-  comparison_operator = "LessThanOrEqualToThreshold"
-  evaluation_periods  = "2"
-  datapoints_to_alarm = "2"
-  metric_name         = "DISK_FREE"
-  namespace           = "CWAgent"
-  period              = "60"
-  statistic           = "Average"
-  threshold           = "15"
-  alarm_description   = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space falls below 15% for 2 minutes, the alarm will trigger: https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4305453159/Disk+Free+alarm+-+Windows"
-  alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
-  tags = {
-    Name = "disk_free_windows"
-  }
-}
-
-
 # ==============================================================================
 # Alerts - LINUX
 # ==============================================================================
@@ -79,7 +29,11 @@ resource "aws_cloudwatch_metric_alarm" "low_available_memory" {
   statistic           = "Average"
   threshold           = "10"
   alarm_description   = "This metric monitors the amount of available memory. If the amount of available memory is less than 10% for 2 minutes, the alarm will trigger."
-  alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
+  alarm_actions       = [aws_sns_topic.cw_alerts.arn]
+  dimensions = {
+    instanceId = aws_instance.ec2_oracle_ebs.id
+  }
+
   tags = {
     Name = "low_available_memory"
   }
@@ -97,7 +51,10 @@ resource "aws_cloudwatch_metric_alarm" "cpu_usage_iowait" {
   statistic           = "Average"
   threshold           = "90"
   alarm_description   = "This metric monitors the amount of CPU time spent waiting for I/O to complete. If the average CPU time spent waiting for I/O to complete is greater than 90% for 30 minutes, the alarm will trigger."
-  alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
+  alarm_actions       = [aws_sns_topic.cw_alerts.arn]
+  dimensions = {
+    instanceId = aws_instance.ec2_oracle_ebs.id
+  }
   tags = {
     Name = "cpu_usage_iowait"
   }
@@ -114,8 +71,11 @@ resource "aws_cloudwatch_metric_alarm" "disk_free" {
   period              = "60"
   statistic           = "Average"
   threshold           = "15"
-  alarm_description   = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space falls below 15% for 2 minutes, the alarm will trigger: https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4289822860/Disk+Free+alarm+-+Linux"
-  alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
+  alarm_description   = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space falls below 15% for 2 minutes, the alarm will trigger"
+  alarm_actions       = [aws_sns_topic.cw_alerts.arn]
+  dimensions = {
+    instanceId = aws_instance.ec2_oracle_ebs.id
+  }
   tags = {
     Name = "disk_free"
   }
@@ -133,52 +93,12 @@ resource "aws_cloudwatch_metric_alarm" "cpu_utilization" {
   statistic           = "Average"                       # could be Average/Minimum/Maximum etc.
   threshold           = "95"                            # threshold for the alarm - see comparison_operator for usage
   alarm_description   = "Triggers if the average cpu remains at 95% utilization or above for 15 minutes"
-  alarm_actions       = [aws_sns_topic.nomis_alarms.arn] # SNS topic to send the alarm to
+  alarm_actions       = [aws_sns_topic.cw_alerts.arn] # SNS topic to send the alarm to
+  dimensions = {
+    instanceId = aws_instance.ec2_oracle_ebs.id
+  }
   tags = {
     Name = "cpu_utilization"
-  }
-}
-
-# ==============================================================================
-# Oracle DB Alerts
-# ==============================================================================
-
-# Oracle db connection issue
-resource "aws_cloudwatch_metric_alarm" "oracle_db_disconnected" {
-  alarm_name          = "oracle_db_disconnected"
-  comparison_operator = "GreaterThanOrEqualToThreshold"
-  evaluation_periods  = "5"
-  datapoints_to_alarm = "5"
-  metric_name         = "collectd_exec_value"
-  namespace           = "CWAgent"
-  period              = "60"
-  statistic           = "Average"
-  threshold           = "1"
-  alarm_description   = "Oracle db connection to a particular SID is not working. See: https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4294246698/Oracle+db+connection+alarm for remediation steps."
-  alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
-  dimensions = {
-    instance = "db_connected"
-  }
-  tags = {
-    Name = "oracle_db_disconnected"
-  }
-}
-
-# Oracle batch processing issue
-resource "aws_cloudwatch_metric_alarm" "oracle_batch_error" {
-  alarm_name          = "oracle_batch_error"
-  comparison_operator = "GreaterThanOrEqualToThreshold"
-  evaluation_periods  = "5"
-  datapoints_to_alarm = "5"
-  metric_name         = "collectd_exec-batch_error"
-  namespace           = "CWAgent"
-  period              = "60"
-  statistic           = "Average"
-  threshold           = "1"
-  alarm_description   = "Oracle db is either in long-running batch or failed batch status. See: https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4295000327/Oracle+Batch+alert for remediation steps."
-  alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
-  tags = {
-    Name = "oracle_batch_error"
   }
 }
 
@@ -197,7 +117,10 @@ resource "aws_cloudwatch_metric_alarm" "instance_health_check" {
   statistic           = "Average"
   threshold           = "1"
   alarm_description   = "Instance status checks monitor the software and network configuration of your individual instance. When an instance status check fails, you typically must address the problem yourself: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/monitoring-system-instance-status-check.html"
-  alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
+  alarm_actions       = [aws_sns_topic.cw_alerts.arn]
+  dimensions = {
+    instanceId = aws_instance.ec2_oracle_ebs.id
+  }
   tags = {
     Name = "instance_health_check"
   }
@@ -214,13 +137,14 @@ resource "aws_cloudwatch_metric_alarm" "system_health_check" {
   statistic           = "Average"
   threshold           = "1"
   alarm_description   = "System status checks monitor the AWS systems on which your instance runs. These checks detect underlying problems with your instance that require AWS involvement to repair: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/monitoring-system-instance-status-check.html"
-  alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
+  alarm_actions       = [aws_sns_topic.cw_alerts.arn]
+  dimensions = {
+    instanceId = aws_instance.ec2_oracle_ebs.id
+  }
   tags = {
     Name = "system_health_check"
   }
 }
-
-# Key Servers Instance alert - sensitive alert for key servers changing status from healthy. If this triggers often then we've got a problem.
 
 # ==============================================================================
 # Load Balancer Alerts
@@ -236,7 +160,11 @@ resource "aws_cloudwatch_metric_alarm" "load_balancer_unhealthy_state_routing" {
   statistic           = "Average"
   threshold           = "1"
   alarm_description   = "This metric monitors the number of unhealthy hosts in the routing table for the load balancer. If the number of unhealthy hosts is greater than 0 for 3 minutes."
-  alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
+  alarm_actions       = [aws_sns_topic.cw_alerts.arn]
+  dimensions = {
+    TargetGroup  = aws_lb_target_group.ebsapp_tg.arn_suffix
+    LoadBalancer = aws_lb.ebsapps_lb.arn_suffix
+  }
   tags = {
     Name = "load_balancer_unhealthy_state_routing"
   }
@@ -252,11 +180,56 @@ resource "aws_cloudwatch_metric_alarm" "load_balancer_unhealthy_state_dns" {
   statistic           = "Average"
   threshold           = "1"
   alarm_description   = "This metric monitors the number of unhealthy hosts in the DNS table for the load balancer. If the number of unhealthy hosts is greater than 0 for 3 minutes."
-  alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
+  alarm_actions       = [aws_sns_topic.cw_alerts.arn]
+  dimensions = {
+    TargetGroup  = aws_lb_target_group.ebsapp_tg.arn_suffix
+    LoadBalancer = aws_lb.ebsapps_lb.arn_suffix
+  }
   tags = {
     Name = "load_balancer_unhealthy_state_dns"
   }
 }
+/*
+# ==============================================================================
+# Oracle DB Alerts
+# ==============================================================================
+
+# Oracle db connection issue
+resource "aws_cloudwatch_metric_alarm" "oracle_db_disconnected" {
+  alarm_name          = "oracle_db_disconnected"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = "5"
+  datapoints_to_alarm = "5"
+  metric_name         = "collectd_exec-db_connected"
+  namespace           = "CWAgent"
+  period              = "60"
+  statistic           = "Average"
+  threshold           = "1"
+  alarm_description   = "Oracle db connection to a particular SID is not working"
+  alarm_actions       = [aws_sns_topic.cw_alerts.arn]
+  tags = {
+    Name = "oracle_db_disconnected"
+  }
+}
+
+# Oracle batch processing issue
+resource "aws_cloudwatch_metric_alarm" "oracle_batch_error" {
+  alarm_name          = "oracle_batch_error"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = "5"
+  datapoints_to_alarm = "5"
+  metric_name         = "collectd_exec-batch_error"
+  namespace           = "CWAgent"
+  period              = "60"
+  statistic           = "Average"
+  threshold           = "1"
+  alarm_description   = "Oracle db is either in long-running batch or failed batch status"
+  alarm_actions       = [aws_sns_topic.cw_alerts.arn]
+  tags = {
+    Name = "oracle_batch_error"
+  }
+}
+
 
 # This may be overkill as unhealthy hosts will trigger an alert themselves (or should do) independently.
 resource "aws_cloudwatch_metric_alarm" "load_balancer_unhealthy_state_target" {
@@ -269,7 +242,7 @@ resource "aws_cloudwatch_metric_alarm" "load_balancer_unhealthy_state_target" {
   statistic           = "Average"
   threshold           = "1"
   alarm_description   = "This metric monitors the number of unhealthy hosts in the target table for the load balancer. If the number of unhealthy hosts is greater than 0 for 3 minutes."
-  alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
+  alarm_actions       = [aws_sns_topic.cw_alerts.arn]
   tags = {
     Name = "load_balancer_unhealthy_state_target"
   }
@@ -290,7 +263,7 @@ resource "aws_cloudwatch_metric_alarm" "cert_expires_in_30_days" {
   statistic           = "Average"
   threshold           = "30"
   alarm_description   = "This metric monitors the number of days until the certificate expires. If the number of days is less than 30."
-  alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
+  alarm_actions       = [aws_sns_topic.cw_alerts.arn]
   tags = {
     Name = "cert_expires_in_30_days"
   }
@@ -306,8 +279,9 @@ resource "aws_cloudwatch_metric_alarm" "cert_expires_in_2_days" {
   statistic           = "Average"
   threshold           = "2"
   alarm_description   = "This metric monitors the number of days until the certificate expires. If the number of days is less than 2."
-  alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
+  alarm_actions       = [aws_sns_topic.cw_alerts.arn]
   tags = {
     Name = "cert_expires_in_2_days"
   }
 }
+*/
