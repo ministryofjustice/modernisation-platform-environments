@@ -126,8 +126,8 @@ module "db_ec2_instance" {
   application_name   = local.application_name
   environment        = local.environment
   region             = local.region
-  availability_zone  = local.availability_zone_1
-  subnet_id          = module.environment.subnet["data"][local.availability_zone_1].id
+  availability_zone  = local.availability_zone
+  subnet_id          = module.environment.subnet["data"][local.availability_zone].id
   tags               = merge(local.tags, local.database.tags, try(each.value.tags, {}))
   account_ids_lookup = local.environment_management.account_ids
 }
