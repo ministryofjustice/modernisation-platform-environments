@@ -98,9 +98,17 @@ tasks:
       $VerbosePreference = "Continue"
 
       $IMConfigFile = "C:\Program Files (x86)\I2N\IapsIMInterface\Config\IMIAPS.xml"
+
       $configXML = [xml](Get-Content $IMConfigFile)
       $configXML.DLLDEF.IAPSORACLE.USER = (Get-SSMParameter -Name "/IMInterface/IAPSOracle/user" -WithDecryption $true).Value
       $configXML.DLLDEF.IAPSORACLE.PASSWORD = (Get-SSMParameter -Name "/IMInterface/IAPSOracle/password" -WithDecryption $true).Value
+
+      $SOAPServerODBCdsn = (Get-SSMParameter -Name "/IMInterface/SOAPServer/ODBC/dsn" -WithDecryption $true).Value
+      $SOAPServerODBCserver = (Get-SSMParameter -Name "/IMInterface/SOAPServer/ODBC/server" -WithDecryption $true).Value
+      $SOAPServerODBCdatabase = (Get-SSMParameter -Name "/IMInterface/SOAPServer/ODBC/database" -WithDecryption $true).Value
+      $SOAPServerODBCuid = (Get-SSMParameter -Name "/IMInterface/SOAPServer/ODBC/uid" -WithDecryption $true).Value
+      $SOAPServerODBCpwd = (Get-SSMParameter -Name "/IMInterface/SOAPServer/ODBC/pwd" -WithDecryption $true).Value
+      $configXML.DLLDEF.SOAPSERVER.ODBC = "DSN=$${SOAPServerODBCdsn};Server=$${SOAPServerODBCserver};Database=$${SOAPServerODBCdatabase};uid=$${SOAPServerODBCuid};pwd=$${SOAPServerODBCpwd}"
       $configXML.save($IMConfigFile)
 
 %{if environment == "development"}
