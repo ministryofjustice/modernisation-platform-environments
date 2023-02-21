@@ -41,7 +41,7 @@ locals {
       }
     }
 
-    user_data_raw = base64encode(templatefile("./templates/jumpserver-user-data.yaml", {  S3_BUCKET = module.s3-bucket.bucket.id }))
+    user_data_raw = base64encode(templatefile("./templates/jumpserver-user-data.yaml", { S3_BUCKET = module.s3-bucket.bucket.id }))
 
     autoscaling_group = {
       desired_capacity = 1
