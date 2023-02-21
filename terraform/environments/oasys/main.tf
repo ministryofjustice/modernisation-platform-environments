@@ -1,3 +1,7 @@
+module "ip_addresses" {
+  source = "../../modules/ip_addresses"
+}
+
 #------------------------------------------------------------------------------
 # autoscaling group stuff
 #------------------------------------------------------------------------------
@@ -795,8 +799,4 @@ resource "aws_ssm_document" "run_ansible_patches" {
       Name = "run-ansible-patches"
     },
   )
-}
-
-module "ip_addresses" {
-  source = "../../modules/ip_addresses"
 }
