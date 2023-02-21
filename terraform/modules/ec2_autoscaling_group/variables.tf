@@ -244,10 +244,8 @@ variable "cloudwatch_metric_alarms" {
     alarm_description   = optional(string)
     datapoints_to_alarm = optional(number)
     treat_missing_data  = optional(string, "missing")
-    dimensions = optional(object({
-      AutoScalingGroupName = string
-    }))
-    tags = optional(map(string))
+    dimensions          = optional(map(string), {})
+    tags                = optional(map(string))
   }))
 }
 

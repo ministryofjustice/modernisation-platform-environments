@@ -311,8 +311,8 @@ resource "aws_cloudwatch_metric_alarm" "this" {
   alarm_description   = each.value.alarm_description
   datapoints_to_alarm = each.value.datapoints_to_alarm
   treat_missing_data  = each.value.treat_missing_data
-  dimensions = {
+  dimensions = merge(each.value.dimensions,{
     "AutoScalingGroupName" = aws_autoscaling_group.this.name
-  }
+  })
   tags = {}
 }

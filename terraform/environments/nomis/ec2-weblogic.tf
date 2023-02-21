@@ -150,10 +150,10 @@ module "ec2_weblogic_autoscaling_group" {
   iam_resource_names_prefix = "ec2-weblogic-asg"
   instance_profile_policies = local.ec2_common_managed_policies
 
-  application_name   = local.application_name
-  region             = local.region
-  subnet_ids         = module.environment.subnets["private"].ids
-  tags               = merge(local.tags, local.ec2_weblogic.tags, try(each.value.tags, {}))
-  account_ids_lookup = local.environment_management.account_ids
-  cloudwatch_metric_alarms = lookup(each.value, "cloudwatch_metric_alarms", local.cloudwatch_metric_alarms)
+  application_name         = local.application_name
+  region                   = local.region
+  subnet_ids               = module.environment.subnets["private"].ids
+  tags                     = merge(local.tags, local.ec2_weblogic.tags, try(each.value.tags, {}))
+  account_ids_lookup       = local.environment_management.account_ids
+  cloudwatch_metric_alarms = merge(local.cloudwatch_metric_alarms_linux)
 }
