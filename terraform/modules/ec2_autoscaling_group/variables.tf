@@ -232,20 +232,20 @@ variable "lb_target_groups" {
 variable "cloudwatch_metric_alarms" {
   description = "Map of cloudwatch metric alarms."
   type = map(object({
-    alarm_name                = string
-    comparison_operator       = string
-    evaluation_periods        = number
-    metric_name               = string
-    namespace                 = string
-    period                    = number
-    statistic                 = string
-    threshold                 = number
-    alarm_actions             = (list(string))
-    actions_enabled           = optional(bool, false)
-    alarm_description         = optional(string)
-    datapoints_to_alarm       = optional(number)
-    treat_missing_data        = optional(string, "missing")
-    dimensions                = object({
+    alarm_name          = string
+    comparison_operator = string
+    evaluation_periods  = number
+    metric_name         = string
+    namespace           = string
+    period              = number
+    statistic           = string
+    threshold           = number
+    alarm_actions       = (list(string))
+    actions_enabled     = optional(bool, false)
+    alarm_description   = optional(string)
+    datapoints_to_alarm = optional(number)
+    treat_missing_data  = optional(string, "missing")
+    dimensions = object({
       AutoScalingGroupName = string
     })
     tags = optional(map(string))
