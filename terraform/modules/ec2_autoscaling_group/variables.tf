@@ -240,7 +240,7 @@ variable "cloudwatch_metric_alarms" {
     period              = number
     statistic           = string
     threshold           = number
-    alarm_actions       = (list(string))
+    alarm_actions       = list(string)
     actions_enabled     = optional(bool, false)
     alarm_description   = optional(string)
     datapoints_to_alarm = optional(number)
