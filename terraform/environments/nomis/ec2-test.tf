@@ -4,6 +4,8 @@
 
 locals {
 
+  cloudwatch_metric_alarms = {}
+
   ec2_test = {
 
     # server-type and nomis-environment auto set by module
