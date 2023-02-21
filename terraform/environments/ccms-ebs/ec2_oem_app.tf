@@ -1,21 +1,3 @@
-data "template_file" "oem-shell-script-app" {
-  template = file("./templates/oem-filesystem.sh")
-  vars = {
-    efs_id   = aws_efs_file_system.oem-app-efs.id
-    hostname = "ccms-oem-app"
-  }
-}
-
-data "template_cloudinit_config" "cloudinit-oem-app" {
-  gzip          = false
-  base64_encode = false
-
-  part {
-    content_type = "text/x-shellscript"
-    content      = data.template_file.oem-shell-script-app.rendered
-  }
-}
-
 resource "aws_instance" "oem_app" {
   ami                         = "ami-0c6f19670d053404e"
   associate_public_ip_address = false
@@ -26,8 +8,12 @@ resource "aws_instance" "oem_app" {
   key_name                    = local.application_data.accounts[local.environment].key_name
   monitoring                  = true
   subnet_id                   = data.aws_subnet.data_subnets_a.id
-  user_data                   = data.template_cloudinit_config.cloudinit-oem-app.rendered
-  vpc_security_group_ids      = [aws_security_group.oem_app_security_group_1.id, aws_security_group.oem_app_security_group_2.id]
+  user_data = base64encode(templatefile("./templates/oem-filesystem.sh", {
+    efs_id   = aws_efs_file_system.oem-app-efs.id
+    hostname = "ccms-oem-app"
+  }))
+
+  vpc_security_group_ids = [aws_security_group.oem_app_security_group_1.id, aws_security_group.oem_app_security_group_2.id]
 
   root_block_device {
     delete_on_termination = true
