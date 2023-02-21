@@ -299,7 +299,7 @@ resource "aws_lb_target_group" "this" {
 resource "aws_cloudwatch_metric_alarm" "this" {
   for_each = var.cloudwatch_metric_alarms
 
-  alarm_name          = "${var.name}-${each.key}"
+  alarm_name          = each.key
   comparison_operator = each.value.comparison_operator
   evaluation_periods  = each.value.evaluation_periods
   metric_name         = each.value.metric_name

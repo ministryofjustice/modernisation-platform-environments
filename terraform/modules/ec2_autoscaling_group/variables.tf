@@ -232,7 +232,6 @@ variable "lb_target_groups" {
 variable "cloudwatch_metric_alarms" {
   description = "Map of cloudwatch metric alarms."
   type = map(object({
-    alarm_name          = string
     comparison_operator = string
     evaluation_periods  = number
     metric_name         = string
