@@ -111,9 +111,31 @@ tasks:
           Write-Host('Error - Failed to restart IMIapsInterfaceWinService - see logs')
           Exit 1
       }
+  - frequency: once
+    type: powershell
+    runAs: admin
+    content: |-
+      # Configure NDelius Interface
+      $ErrorActionPreference = "Stop"
+      $VerbosePreference = "Continue"
+
+      $NDeliusConfigFile = "C:\Program Files (x86)I2N\IapsNDeliusInterface\Config\NDELIUSIF.xml"
+      $configXML = [xml](Get-Content $INDeliusConfigFile)
+      $configXML.DLLDEF.IAPSORACLE.USER = (Get-SSMParameter -Name "/NDeliusInterface/IAPSOracle/user" -WithDecryption $true).Value
+      $configXML.DLLDEF.IAPSORACLE.PASSWORD = (Get-SSMParameter -Name "/NDeliusInterface/IAPSOracle/password" -WithDecryption $true).Value
+      $configXML.save($NDeliusConfigFile)
+
+%{if environment == "development"}
+      $service = Restart-Service -Name NDeliusInterfaceIapsWinService -Force -PassThru
+      if ($service.Status -match "Running") {
+          Write-Host('Restart of NDeliusInterfaceIapsWinService successful')
+      } else {
+          Write-Host('Error - Failed to restart NDeliusInterfaceIapsWinService - see logs')
+          Exit 1
+      }
 %{endif}
 %{if environment != "development"}
       # TODO: remove or edit if statement once migration gets a green light
-      Stop-Service -Name IMIapsInterfaceWinService -Force
-      Set-Service -Name IMIapsInterfaceWinService -StartupType Disabled
+      Stop-Service -Name NDeliusInterfaceIapsWinService -Force
+      Set-Service -Name NDeliusInterfaceIapsWinService -StartupType Disabled
 %{endif}
