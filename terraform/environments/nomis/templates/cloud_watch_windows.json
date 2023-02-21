@@ -58,7 +58,8 @@
       "ImageId": "${aws:ImageId}",
       "InstanceId": "${aws:InstanceId}",
       "AutoScalingGroupName": "${aws:AutoScalingGroupName}"
-    }
+    },
+    "aggregation_dimensions" : [["AutoScalingGroupName"]]
   },
   "logs": {
     "logs_collected": {
