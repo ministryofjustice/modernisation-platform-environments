@@ -214,7 +214,7 @@ locals {
     preproduction = local.security_group_cidrs_preprod_prod
     production    = local.security_group_cidrs_preprod_prod
   }
-  
+
   security_group_cidrs = local.security_group_cidrs_by_environment[local.environment]
 
   security_group_common = {
@@ -299,31 +299,31 @@ locals {
       local.security_group_common.prometheus_node_exporter_ingress,
       local.security_group_common.prometheus_script_exporter_ingress,
 
-        {
-          description = "Allow oracle database 1521 ingress"
-          from_port   = "1521"
-          to_port     = "1521"
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.oracle_db
-          security_groups = [
-            module.bastion_linux.bastion_security_group
-          ]
-        },
+      {
+        description = "Allow oracle database 1521 ingress"
+        from_port   = "1521"
+        to_port     = "1521"
+        protocol    = "TCP"
+        cidr_blocks = local.security_group_cidrs.oracle_db
+        security_groups = [
+          module.bastion_linux.bastion_security_group
+        ]
+      },
 
-        {
-          description = "Allow oem agent ingress"
-          from_port   = "3872"
-          to_port     = "3872"
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.oracle_oem_agent
-          security_groups = [
-            module.bastion_linux.bastion_security_group
-          ]
-        },
+      {
+        description = "Allow oem agent ingress"
+        from_port   = "3872"
+        to_port     = "3872"
+        protocol    = "TCP"
+        cidr_blocks = local.security_group_cidrs.oracle_oem_agent
+        security_groups = [
+          module.bastion_linux.bastion_security_group
+        ]
+      },
     ]
 
     egress = [
       local.security_group_common.all_egress,
     ]
-  }  
+  }
 }
