@@ -42,6 +42,7 @@ resource "aws_ebs_volume" "oem_app_volume_ccms_oem_app" {
   availability_zone = "eu-west-2a"
   size              = 100
   type              = "gp2"
+  depends_on        = [resource.aws_instance.oem_app]
 
   tags = merge(tomap(
     { "Name" = "${local.application_name_oem}-oem-app-volume-ccms-oem-app" }
@@ -64,6 +65,7 @@ resource "aws_ebs_volume" "oem_app_volume_ccms_oem_inst" {
   availability_zone = "eu-west-2a"
   size              = 50
   type              = "gp2"
+  depends_on        = [resource.aws_instance.oem_app]
 
   tags = merge(tomap(
     { "Name" = "${local.application_name_oem}-oem-app-volume-ccms-oem-inst" }
@@ -86,6 +88,7 @@ resource "aws_ebs_volume" "oem_app_volume_swap" {
   availability_zone = "eu-west-2a"
   size              = 32
   type              = "gp2"
+  depends_on        = [resource.aws_instance.oem_app]
 
   tags = merge(tomap(
     { "Name" = "${local.application_name_oem}-volume-swap" }
