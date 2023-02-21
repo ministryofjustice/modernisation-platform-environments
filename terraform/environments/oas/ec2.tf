@@ -237,12 +237,6 @@ resource "aws_ebs_volume" "EC2ServerVolumeORAHOME" {
     local.tags,
     { "Name" = "${local.application_name}-EC2ServerVolumeORAHOME" },
   )
-
-  lifecycle {
-    ignore_changes = [
-      snapshot_id,
-    ]
-  }
 }
 
 resource "aws_volume_attachment" "oas_EC2ServerVolume01" {
