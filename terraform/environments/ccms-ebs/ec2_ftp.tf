@@ -15,7 +15,7 @@ resource "aws_instance" "ec2_ftp" {
     ignore_changes = [ebs_block_device, root_block_device]
   }
   user_data_replace_on_change = false
-  user_data = <<EOF
+  user_data                   = <<EOF
 #!/bin/bash
 
 exec > /tmp/userdata.log 2>&1
