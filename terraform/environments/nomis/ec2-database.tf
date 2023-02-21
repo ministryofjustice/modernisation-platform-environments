@@ -131,7 +131,6 @@ module "db_ec2_instance" {
   subnet_id          = module.environment.subnet["data"][local.availability_zone_1].id
   tags               = merge(local.tags, local.database.tags, try(each.value.tags, {}))
   account_ids_lookup = local.environment_management.account_ids
-  cloudwatch_metric_alarms = lookup(each.value, "cloudwatch_metric_alarms", local.cloudwatch_metric_alarms)
 }
 
 #------------------------------------------------------------------------------
