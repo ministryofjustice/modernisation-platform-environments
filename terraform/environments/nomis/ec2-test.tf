@@ -118,4 +118,5 @@ module "ec2_test_autoscaling_group" {
   subnet_ids                = module.environment.subnets["private"].ids
   tags                      = merge(local.tags, local.ec2_test.tags, try(each.value.tags, {}))
   account_ids_lookup        = local.environment_management.account_ids
+  cloudwatch_metric_alarms  = lookup(each.value, "cloudwatch_metric_alarms", local.cloudwatch_metric_alarms)
 }
