@@ -1,5 +1,5 @@
 module "ssm-auto-patching" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ssm-patching.git?ref=v.0.0.1"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ssm-patching.git?ref=0.0.1"
   count  = local.environment == "development" ? 1 : 0
   providers = {
     aws.bucket-replication = aws
@@ -8,12 +8,11 @@ module "ssm-auto-patching" {
 
   account_number   = local.environment_management.account_ids[terraform.workspace]
   application_name = local.application_name
-  vpc_all          = "garden-sandbox"
   patch_schedule   = "cron(30 17 ? * MON *)"
   tags = merge(
-  local.tags,
-  {
-    Name = "ssm-patching"
-  },
+    local.tags,
+    {
+      Name = "ssm-patching"
+    },
   )
 }
