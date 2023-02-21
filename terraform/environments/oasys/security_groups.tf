@@ -90,31 +90,38 @@ resource "aws_security_group" "data" {
   description = "Security group for data subnet"
   vpc_id      = module.environment.vpc.id
 
-  dynamic "ingress" {
-    for_each = local.security_group_data.ingress
-    content {
-      description     = lookup(ingress.value, "description", null)
-      from_port       = lookup(ingress.value, "from_port", null)
-      to_port         = lookup(ingress.value, "to_port", null)
-      protocol        = lookup(ingress.value, "protocol", null)
-      cidr_blocks     = lookup(ingress.value, "cidr_blocks", null)
-      security_groups = lookup(ingress.value, "security_groups", null)
-      self            = lookup(ingress.value, "self", null)
-    }
-  }
+  ingress = [
+    local.security_group_common.self_ingress,
+    local.security_group_common.ssh_ingress,
+    local.security_group_common.prometheus_node_exporter_ingress,
+    local.security_group_common.prometheus_script_exporter_ingress,
 
-  dynamic "egress" {
-    for_each = local.security_group_data.egress
-    content {
-      description     = lookup(egress.value, "description", null)
-      from_port       = lookup(egress.value, "from_port", null)
-      to_port         = lookup(egress.value, "to_port", null)
-      protocol        = lookup(egress.value, "protocol", null)
-      cidr_blocks     = lookup(egress.value, "cidr_blocks", null)
-      security_groups = lookup(egress.value, "security_groups", null)
-      self            = lookup(egress.value, "self", null)
-    }
-  }
+    {
+      description = "Allow oracle database 1521 ingress"
+      from_port   = "1521"
+      to_port     = "1521"
+      protocol    = "TCP"
+      cidr_blocks = local.security_group_cidrs.oracle_db
+      security_groups = [
+        module.bastion_linux.bastion_security_group
+      ]
+    },
+
+    {
+      description = "Allow oem agent ingress"
+      from_port   = "3872"
+      to_port     = "3872"
+      protocol    = "TCP"
+      cidr_blocks = local.security_group_cidrs.oracle_oem_agent
+      security_groups = [
+        module.bastion_linux.bastion_security_group
+      ]
+    },
+  ]
+
+  egress = [
+    local.security_group_common.all_egress,
+  ]
 
   tags = merge(local.tags, {
     Name = "data"
