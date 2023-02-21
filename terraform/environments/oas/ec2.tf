@@ -25,12 +25,11 @@ resource "aws_instance" "oas_app_instance" {
     encrypted             = true # TODO Confirm if encrypted volumes can work for OAS, as it looks like in MP they must be encrypted
     volume_size           = 40
     volume_type           = "gp2"
+    tags = merge(
+      local.tags,
+      { "Name" = "${local.application_name}-root-volume" },
+    )
   }
-
-  volume_tags = merge(
-    local.tags,
-    { "Name" = "${local.application_name}-root-volume" },
-  )
 
   tags = merge(
     local.tags,
@@ -232,6 +231,10 @@ resource "aws_ebs_volume" "EC2ServerVolumeORAHOME" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   snapshot_id       = local.application_data.accounts[local.environment].orahome_snapshot
+
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
 
   tags = merge(
     local.tags,
