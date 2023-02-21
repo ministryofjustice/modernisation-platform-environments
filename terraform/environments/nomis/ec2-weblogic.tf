@@ -4,8 +4,6 @@
 
 locals {
 
-  cloudwatch_metric_alarms = {}
-
   lb_target_group_http_7001 = {
     port                 = 7001
     protocol             = "HTTP"
