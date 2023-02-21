@@ -1,7 +1,8 @@
 resource "aws_route53_record" "route53_record_app_lb" {
-  zone_id = data.aws_route53_zone.external.zone_id
-  name    = "${var.networking[0].application}-app.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-  type    = "A"
+  provider = aws.core-vpc
+  zone_id  = data.aws_route53_zone.external.zone_id
+  name     = "${var.networking[0].application}-app.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type     = "A"
 
   alias {
     name                   = aws_lb.oem_app.dns_name
@@ -11,9 +12,10 @@ resource "aws_route53_record" "route53_record_app_lb" {
 }
 
 resource "aws_route53_record" "route53_record_db" {
-  zone_id = data.aws_route53_zone.external.zone_id
-  name    = "${var.networking[0].application}-db.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-  type    = "A"
-  ttl     = "300"
-  records = [aws_instance.oem_db.private_ip]
+  provider = aws.core-vpc
+  zone_id  = data.aws_route53_zone.external.zone_id
+  name     = "${var.networking[0].application}-db.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type     = "A"
+  ttl      = "300"
+  records  = [aws_instance.oem_db.private_ip]
 }
