@@ -12,7 +12,7 @@ MOUNT_DIR=/mnt
 # Create appst mount point
 FS_LABEL="APP"
 FS_DIR=$${MOUNT_DIR}/oem/app
-mkdir -p $$${FS_DIR}
+mkdir -p $${FS_DIR}
 mkfs.ext4 -L $${FS_LABEL} /dev/xvdf
 echo "LABEL=$${FS_LABEL} $${MOUNT_DIR}/oem/app ext4 defaults 0 0" >> $${FSTAB}
 
