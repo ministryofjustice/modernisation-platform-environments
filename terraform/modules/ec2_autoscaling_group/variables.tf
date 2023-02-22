@@ -247,5 +247,6 @@ variable "cloudwatch_metric_alarms" {
     dimensions          = optional(map(string), {})
     tags                = optional(map(string))
   }))
+  default = {}
 }
 
