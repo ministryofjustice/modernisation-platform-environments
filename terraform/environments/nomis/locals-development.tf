@@ -53,11 +53,11 @@ locals {
       }
     }
     weblogic_autoscaling_groups = {
-      test-nomis-web = {
+      tst-nomis-web = {
         tags = {
           ami                = "nomis_rhel_6_10_weblogic_appserver_10_3"
           description        = "test nomis weblogic 10.3"
-          oracle-db-hostname = "test-nomis-db-3"
+          oracle-db-hostname = "tst-nomis-db-3"
           nomis-environment  = "t3"
           oracle-db-name     = "CNOMT1"
           server-type        = "nomis-web"
