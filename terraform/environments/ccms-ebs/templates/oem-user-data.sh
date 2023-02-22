@@ -1,15 +1,20 @@
 #!/usr/bin/env bash
 
-# Create oinstall group
-groupadd oinstall
+yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
+yum install -y https://s3.amazonaws.com/amazoncloudwatch-agent/oracle_linux/amd64/latest/amazon-cloudwatch-agent.rpm
+yum install -y jq telnet
 
-# Create applmgr user
+systemctl stop amazon-ssm-agent
+rm -rf /var/lib/amazon/ssm/ipc/
+systemctl start amazon-ssm-agent
+
+groupadd oinstall
 useradd -g oinstall applmgr
 
 FSTAB=/etc/fstab
 MOUNT_DIR=/mnt
 
-# Create appst mount point
+# Create app mount point
 FS_LABEL="APP"
 FS_DIR=$${MOUNT_DIR}/oem/app
 mkdir -p $${FS_DIR}

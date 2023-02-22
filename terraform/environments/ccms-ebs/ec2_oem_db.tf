@@ -8,7 +8,7 @@ resource "aws_instance" "oem_db" {
   key_name                    = local.application_data.accounts[local.environment].key_name
   monitoring                  = true
   subnet_id                   = data.aws_subnet.data_subnets_a.id
-  user_data = base64encode(templatefile("./templates/oem-filesystem.sh", {
+  user_data = base64encode(templatefile("./templates/oem-user-data.sh", {
     efs_id   = aws_efs_file_system.oem-db-efs.id
     hostname = "ccms-oem-db"
   }))
