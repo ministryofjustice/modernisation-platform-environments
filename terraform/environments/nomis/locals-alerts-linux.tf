@@ -1,15 +1,15 @@
 locals {
   cloudwatch_metric_alarms_linux = {
-    low_available_memory = {
-      comparison_operator = "LessThanOrEqualToThreshold"
+    high_memory_usage = {
+      comparison_operator = "GreaterThanOrEqualToThreshold"
       evaluation_periods  = "2"
       datapoints_to_alarm = "2"
-      metric_name         = "mem_available_percent"
+      metric_name         = "mem_used_percent"
       namespace           = "CWAgent"
       period              = "60"
       statistic           = "Average"
-      threshold           = "10"
-      alarm_description   = "This metric monitors the amount of available memory. If the amount of available memory is less than 10% for 2 minutes, the alarm will trigger."
+      threshold           = "90"
+      alarm_description   = "This metric monitors the amount of available memory. If the amount of available memory is greater than 90% for 2 minutes, the alarm will trigger."
       alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
     }
     cpu_usage_iowait = {
@@ -24,16 +24,16 @@ locals {
       alarm_description   = "This metric monitors the amount of CPU time spent waiting for I/O to complete. If the average CPU time spent waiting for I/O to complete is greater than 90% for 30 minutes, the alarm will trigger."
       alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
     }
-    disk_free = {
-      comparison_operator = "LessThanOrEqualToThreshold"
+    disk_used_percent = {
+      comparison_operator = "GreaterThanOrEqualToThreshold"
       evaluation_periods  = "2"
       datapoints_to_alarm = "2"
-      metric_name         = "disk_free"
+      metric_name         = "disk_used_percent"
       namespace           = "CWAgent"
       period              = "60"
       statistic           = "Average"
-      threshold           = "15"
-      alarm_description   = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space falls below 15% for 2 minutes, the alarm will trigger: https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4289822860/Disk+Free+alarm+-+Linux"
+      threshold           = "85"
+      alarm_description   = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space is above 85% for 2 minutes, the alarm will trigger: https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4289822860/Disk+Free+alarm+-+Linux"
       alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
     }
     cpu_utilization = {
