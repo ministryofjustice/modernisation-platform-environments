@@ -71,7 +71,7 @@ jobs:
       matrix:
         include:
           - environment: development
-          - environment: test
+    #      - environment: test
     name: Apply - ${{  matrix.environment }}
     runs-on: ubuntu-latest
     env:
