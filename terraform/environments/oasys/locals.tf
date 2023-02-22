@@ -160,6 +160,89 @@ locals {
     server-type = "oasys-web"
   }
 
+  database = {
+
+    tags = {
+      component            = "data"
+      os-type              = "Linux"
+      os-major-version     = 7
+      os-version           = "RHEL 7.9"
+      licence-requirements = "Oracle Database"
+      ami                  = "oasys_oracle_db_release_2023-02-14T09-53-15.859Z"
+      "Patch Group"        = "RHEL"
+    }
+
+    instance = {
+      disable_api_termination      = false
+      instance_type                = "r6i.xlarge"
+      key_name                     = aws_key_pair.ec2-user.key_name
+      metadata_options_http_tokens = "optional" # the Oracle installer cannot accommodate a token
+      monitoring                   = true
+      vpc_security_group_ids       = [aws_security_group.data.id]
+    }
+
+    user_data_cloud_init = {
+      args = {
+        lifecycle_hook_name  = "ready-hook"
+        branch               = "main"
+        ansible_repo         = "modernisation-platform-configuration-management"
+        ansible_repo_basedir = "ansible"
+        # ansible_tags           = "ec2provisiondata"
+        restored_from_snapshot = false
+      }
+      scripts = [
+        "ansible-ec2provision.sh.tftpl",
+        "oracle_init.sh.tftpl",
+      ]
+    }
+
+    ebs_volumes = {
+      # "/dev/sdb" = { label = "app" }   # /u01
+      # "/dev/sdc" = { label = "app" }   # /u02
+      # "/dev/sde" = { label = "data" }  # DATA01
+      # "/dev/sdf" = { label = "data" }  # DATA02
+      # "/dev/sdg" = { label = "data" }  # DATA03
+      # "/dev/sdh" = { label = "data" }  # DATA04
+      # "/dev/sdi" = { label = "data" }  # DATA05
+      # "/dev/sdj" = { label = "flash" } # FLASH01
+      # "/dev/sdk" = { label = "flash" } # FLASH02
+      # "/dev/sds" = { label = "swap" }
+    }
+
+    ebs_volume_config = {
+      data = {
+        iops       = 3000
+        throughput = 125
+      }
+      flash = {
+        iops       = 3000
+        throughput = 125
+      }
+    }
+
+    route53_records = {
+      create_internal_record = true
+      create_external_record = true
+    }
+
+    ssm_parameters = {
+      ASMSYS = {
+        random = {
+          length  = 30
+          special = false
+        }
+        description = "ASMSYS password"
+      }
+      ASMSNMP = {
+        random = {
+          length  = 30
+          special = false
+        }
+        description = "ASMSNMP password"
+      }
+    }
+  }
+
   security_group_cidrs_devtest = {
     ssh = module.ip_addresses.azure_fixngo_cidrs.devtest
     https = flatten([

@@ -48,6 +48,43 @@ module "autoscaling_groups" {
   account_ids_lookup        = local.environment_management.account_ids
 }
 
+module "db_ec2_instance" {
+  #checkov:skip=CKV_AWS_79:Oracle cannot accommodate a token
+  source = "../../modules/ec2_instance"
+
+  providers = {
+    aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
+  }
+
+  for_each = local.environment_config.databases
+
+  name = each.key
+
+  ami_name                      = each.value.ami_name
+  ami_owner                     = try(each.value.ami_owner, "core-shared-services-production")
+  instance                      = merge(local.database.instance, lookup(each.value, "instance", {}))
+  user_data_cloud_init          = merge(local.database.user_data_cloud_init, lookup(each.value, "user_data_cloud_init", {}))
+  ebs_volumes_copy_all_from_ami = try(each.value.ebs_volumes_copy_all_from_ami, true)
+  ebs_kms_key_id                = module.environment.kms_keys["ebs"].arn
+  ebs_volume_config             = merge(local.database.ebs_volume_config, lookup(each.value, "ebs_volume_config", {}))
+  ebs_volumes                   = { for k, v in local.database.ebs_volumes : k => merge(v, try(each.value.ebs_volumes[k], {})) }
+  ssm_parameters_prefix         = "database/"
+  ssm_parameters                = merge(local.database.ssm_parameters, lookup(each.value, "ssm_parameters", {}))
+  route53_records               = merge(local.database.route53_records, lookup(each.value, "route53_records", {}))
+
+  iam_resource_names_prefix = "ec2-database"
+  instance_profile_policies = local.ec2_common_managed_policies
+
+  business_unit      = local.business_unit
+  application_name   = local.application_name
+  environment        = local.environment
+  region             = local.region
+  availability_zone  = local.availability_zone
+  subnet_id          = module.environment.subnet["data"][local.availability_zone].id
+  tags               = merge(local.tags, local.database.tags, try(each.value.tags, {}))
+  account_ids_lookup = local.environment_management.account_ids
+}
+
 resource "aws_kms_grant" "image-builder-shared-cmk-grant" {
   name              = "image-builder-shared-cmk-grant"
   key_id            = data.aws_kms_key.ebs_hmpps.arn
