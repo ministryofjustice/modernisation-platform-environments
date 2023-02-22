@@ -61,11 +61,11 @@ resource "aws_security_group" "cluster_ec2" {
   description = "controls access to the cluster ec2 instance"
   vpc_id      = data.aws_vpc.shared.id
 
-  lifecycle {
-    ignore_changes = [
-      vpc_id
-    ]
-  }
+  # lifecycle {
+  #   ignore_changes = [
+  #     vpc_id
+  #   ]
+  # }
 
   dynamic "ingress" {
     for_each = var.ec2_ingress_rules
