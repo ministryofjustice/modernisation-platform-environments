@@ -56,7 +56,7 @@ module "db_ec2_instance" {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
   }
 
-  for_each = local.environment_config.databases
+  for_each = try(local.environment_config.databases, {})
 
   name = each.key
 
