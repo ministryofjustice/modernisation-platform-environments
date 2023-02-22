@@ -61,6 +61,10 @@ resource "aws_security_group" "cluster_ec2" {
   description = "controls access to the cluster ec2 instance"
   vpc_id      = data.aws_vpc.shared.id
 
+  lifecycle {
+    create_before_destroy = true
+  }
+
   dynamic "ingress" {
     for_each = var.ec2_ingress_rules
     content {
@@ -559,11 +563,3 @@ resource "aws_appautoscaling_policy" "ecs_target_memory" {
   }
   depends_on = [aws_appautoscaling_target.ecs_target]
 }
-
-
-
-
-
-
-
-
