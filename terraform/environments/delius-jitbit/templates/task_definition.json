@@ -22,6 +22,14 @@
       {
         "name": "AppURL",
         "value": "${APP_URL}"
+      },
+      {
+        "name": "AttachmentsS3Bucket",
+        "valueFrom": "${S3_BUCKET_NAME}"
+      },
+      {
+        "name": "AttachmentsS3Region",
+        "valueFrom": "eu-west-2"
       }
     ],
     "secrets": [
@@ -36,14 +44,6 @@
       {
         "name": "AttachmentsS3Password",
         "valueFrom": "${S3_USER_SECRET_ARN}"
-      },
-      {
-        "name": "AttachmentsS3Bucket",
-        "valueFrom": "${S3_BUCKET_NAME}"
-      },
-      {
-        "name": "AttachmentsS3Region",
-        "valueFrom": "eu-west-2"
       }
     ],
     "essential": true
