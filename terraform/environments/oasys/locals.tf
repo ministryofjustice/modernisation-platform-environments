@@ -192,7 +192,6 @@ locals {
       }
       scripts = [
         "ansible-ec2provision.sh.tftpl",
-        "oracle_init.sh.tftpl",
       ]
     }
 
