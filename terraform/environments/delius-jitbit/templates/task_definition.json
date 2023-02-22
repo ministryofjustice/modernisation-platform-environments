@@ -30,12 +30,20 @@
         "valueFrom": "${DATABASE_PASSWORD_CONNECTION_STRING_ARN}"
       },
       {
-        "name": "S3_User_Key",
+        "name": "AttachmentsS3Login",
         "valueFrom": "${S3_USER_KEY_ARN}"
       },
       {
-        "name": "S3_User_Secret",
+        "name": "AttachmentsS3Password",
         "valueFrom": "${S3_USER_SECRET_ARN}"
+      },
+      {
+        "name": "AttachmentsS3Bucket",
+        "valueFrom": "${S3_BUCKET_NAME}"
+      },
+      {
+        "name": "AttachmentsS3Region",
+        "valueFrom": "eu-west-2"
       }
     ],
     "essential": true
