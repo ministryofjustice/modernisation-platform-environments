@@ -93,7 +93,7 @@ locals {
         description = "ASMSNMP password"
       }
     }
-    cloudwatch_metric_alarm_database = {
+    cloudwatch_metric_alarms_database = {
       oracle_db_disconnected = {
         comparison_operator = "GreaterThanOrEqualToThreshold"
         evaluation_periods  = "5"
@@ -165,7 +165,7 @@ module "db_ec2_instance" {
   subnet_id                = module.environment.subnet["data"][local.availability_zone_1].id
   tags                     = merge(local.tags, local.database.tags, try(each.value.tags, {}))
   account_ids_lookup       = local.environment_management.account_ids
-  cloudwatch_metric_alarms = merge(local.database.cloudwatch_metric_alarm_database, local.cloudwatch_metric_alarms_linux)
+  cloudwatch_metric_alarms = merge(local.database.cloudwatch_metric_alarms_database, local.cloudwatch_metric_alarms_linux)
 }
 
 #------------------------------------------------------------------------------
