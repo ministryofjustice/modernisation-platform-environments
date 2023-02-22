@@ -36,7 +36,7 @@ locals {
       # *-nomis-db-3: HA
 
       # add databases here as needed
-      /* tst-nomis-db-3 = {
+      tst-nomis-db-3 = {
         tags = {
           server-type         = "nomis-db"
           description         = "Test database for monitoring automation development"
@@ -50,9 +50,9 @@ locals {
         instance = {
           disable_api_termination = true
         }
-      } */
+      }
     }
-    /* weblogic_autoscaling_groups = {
+    weblogic_autoscaling_groups = {
       tst-nomis-web = {
         tags = {
           ami                = "nomis_rhel_6_10_weblogic_appserver_10_3"
@@ -70,7 +70,7 @@ locals {
           warm_pool        = null
         }
       }
-    } */
+    }
     weblogics          = {}
     ec2_test_instances = {}
     ec2_test_autoscaling_groups = {
