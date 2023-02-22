@@ -33,10 +33,10 @@ locals {
 
     user_data_cloud_init = {
       args = {
-        lifecycle_hook_name    = "ready-hook"
-        branch                 = "main"
-        ansible_repo           = "modernisation-platform-configuration-management"
-        ansible_repo_basedir   = "ansible"
+        lifecycle_hook_name  = "ready-hook"
+        branch               = "main"
+        ansible_repo         = "modernisation-platform-configuration-management"
+        ansible_repo_basedir = "ansible"
         # ansible_tags           = "ec2provisiondata"
         restored_from_snapshot = false
       }
