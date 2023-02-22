@@ -121,7 +121,6 @@ locals {
           server-type        = "nomis-web"
         }
         ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-01-03T17-01-12.128Z"
-        branch   = var.BRANCH_NAME # comment in if testing ansible
 
         autoscaling_group = {
           desired_capacity = 1
@@ -140,10 +139,9 @@ locals {
           server-type        = "nomis-web"
         }
         ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-01-03T17-01-12.128Z"
-        branch   = var.BRANCH_NAME # comment in if testing ansible
 
         autoscaling_group = {
-          desired_capacity = 1
+          desired_capacity = 0
           warm_pool        = null
         }
       }
@@ -164,7 +162,6 @@ locals {
           "/dev/sda1" = { kms_key_id = data.aws_kms_key.default_ebs.arn }
         }
         ami_name = "nomis_rhel_7_9_baseimage_2022-11-01T13-43-46.384Z"
-        # branch   = var.BRANCH_NAME # comment in if testing ansible
       }
       t1-ndh-ems-1 = {
         tags = {
@@ -179,7 +176,6 @@ locals {
           "/dev/sda1" = { kms_key_id = data.aws_kms_key.default_ebs.arn }
         }
         ami_name = "nomis_rhel_7_9_baseimage_2022-11-01T13-43-46.384Z"
-        # branch   = var.BRANCH_NAME # comment in if testing ansible
       }
     }
     ec2_test_autoscaling_groups = {
@@ -193,7 +189,6 @@ locals {
           nomis-environment = "t1"
         }
         ami_name = "nomis_rhel_7_9_baseimage_2022-11-01T13-43-46.384Z"
-        # branch   = var.BRANCH_NAME # comment in if testing ansible
         autoscaling_group = {
           desired_capacity = 1
         }
@@ -210,7 +205,6 @@ locals {
           nomis-environment = "t1"
         }
         ami_name = "nomis_rhel_7_9_baseimage_2022-11-01T13-43-46.384Z"
-        # branch   = var.BRANCH_NAME # comment in if testing ansible
         autoscaling_group = {
           desired_capacity = 1
         }

@@ -8,29 +8,28 @@ resource "aws_instance" "ec2_ftp" {
   monitoring                  = true
   ebs_optimized               = false
   associate_public_ip_address = false
-  iam_instance_profile        = aws_iam_instance_profile.iam_instace_profile_oracle_base.name
+  iam_instance_profile        = aws_iam_instance_profile.iam_instace_profile_ccms_base.name
 
   # Due to a bug in terraform wanting to rebuild the ec2 if more than 1 ebs block is attached, we need the lifecycle clause below
   lifecycle {
     ignore_changes = [ebs_block_device, root_block_device]
   }
-
-  user_data = <<EOF
+  user_data_replace_on_change = false
+  user_data                   = <<EOF
 #!/bin/bash
 
 exec > /tmp/userdata.log 2>&1
 
-yum install -y wget unzip
+yum install -y wget unzip vsftpd jq s3fs-fuse
 yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
 unzip awscliv2.zip
 ./aws/install
 wget https://s3.amazonaws.com/amazoncloudwatch-agent/oracle_linux/amd64/latest/amazon-cloudwatch-agent.rpm
 rpm -U ./amazon-cloudwatch-agent.rpm
-yum install -y vsftpd
 amazon-linux-extras install -y epel
-yum install -y jq
-yum install -y s3fs-fuse
+
+/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c ssm:cloud-watch-config
 
 systemctl stop amazon-ssm-agent
 rm -rf /var/lib/amazon/ssm/ipc/
@@ -112,3 +111,17 @@ EOF
   depends_on = [aws_security_group.ec2_sg_ftp]
 }
 
+module "cw-ftp-ec2" {
+  source = "./modules/cw-ec2"
+
+  name        = "ec2-ftp"
+  topic       = aws_sns_topic.cw_alerts.arn
+  instanceIds = aws_instance.ec2_ftp.id
+
+  for_each     = local.application_data.cloudwatch_ec2
+  metric       = each.key
+  eval_periods = each.value.eval_periods
+  period       = each.value.period
+  threshold    = each.value.threshold
+
+}

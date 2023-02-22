@@ -1,21 +1,6 @@
-# This data sources allows us to get the Modernisation Platform account information for use elsewhere
-# (when we want to assume a role in the MP, for instance)
-data "aws_organizations_organization" "root_account" {}
-
-# Get the environments file from the main repository
-data "http" "environments_file" {
-  url = "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/${local.application_name}.json"
-}
-
-# Retrieve information about the modernisation platform account
-data "aws_caller_identity" "modernisation_platform" {
-  provider = aws.modernisation-platform
-}
-
-
 locals {
 
-  application_name = "ccms-ebs"
+  application_name = "tipstaff"
 
   environment_management = jsondecode(data.aws_secretsmanager_secret_version.environment_management.secret_string)
 
@@ -49,8 +34,5 @@ locals {
   # environment specfic variables
   # example usage:
   # example_data = local.application_data.accounts[local.environment].example_var
-  application_data     = fileexists("./application_variables.json") ? jsondecode(file("./application_variables.json")) : {}
-  artefact_bucket_name = "${local.application_name}-${local.environment}-artefacts"
-  logging_bucket_name  = "${local.application_name}-${local.environment}-logging"
-  lb_log_prefix        = "ebsapps-lb"
+  application_data = fileexists("./application_variables.json") ? jsondecode(file("./application_variables.json")) : {}
 }
