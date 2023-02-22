@@ -12,7 +12,6 @@ resource "aws_instance" "oem_app" {
     efs_id   = aws_efs_file_system.oem-app-efs.id
     hostname = "ccms-oem-app"
   }))
-
   vpc_security_group_ids = [aws_security_group.oem_app_security_group_1.id, aws_security_group.oem_app_security_group_2.id]
 
   root_block_device {
@@ -23,11 +22,11 @@ resource "aws_instance" "oem_app" {
   }
 
   volume_tags = merge(tomap(
-    { "Name" = "${local.application_name_oem}-root-volume-app" }
+    { "Name" = "${local.application_name_oem}-app-root" }
   ), local.tags)
 
   tags = merge(tomap(
-    { "Name" = "${local.application_name_oem}-app" }
+    { "Name" = lower(format("ec2-%s-%s-app", local.application_name_oem, local.environment)) }
   ), local.tags)
 
   lifecycle {
@@ -45,7 +44,7 @@ resource "aws_ebs_volume" "oem_app_volume_ccms_oem_app" {
   depends_on        = [resource.aws_instance.oem_app]
 
   tags = merge(tomap(
-    { "Name" = "${local.application_name_oem}-oem-app-volume-ccms-oem-app" }
+    { "Name" = "${local.application_name_oem}-app-ccms-oem-app" }
   ), local.tags)
 
   lifecycle {
@@ -68,7 +67,7 @@ resource "aws_ebs_volume" "oem_app_volume_ccms_oem_inst" {
   depends_on        = [resource.aws_instance.oem_app]
 
   tags = merge(tomap(
-    { "Name" = "${local.application_name_oem}-oem-app-volume-ccms-oem-inst" }
+    { "Name" = "${local.application_name_oem}-app-ccms-oem-inst" }
   ), local.tags)
 
   lifecycle {
@@ -91,7 +90,7 @@ resource "aws_ebs_volume" "oem_app_volume_swap" {
   depends_on        = [resource.aws_instance.oem_app]
 
   tags = merge(tomap(
-    { "Name" = "${local.application_name_oem}-volume-swap" }
+    { "Name" = "${local.application_name_oem}-app-swap" }
   ), local.tags)
 }
 

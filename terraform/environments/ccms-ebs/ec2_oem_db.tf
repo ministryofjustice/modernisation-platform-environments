@@ -22,11 +22,11 @@ resource "aws_instance" "oem_db" {
   }
 
   volume_tags = merge(tomap(
-    { "Name" = "${local.application_name_oem}-root-volume-db" }
+    { "Name" = "${local.application_name_oem}-db-root" }
   ), local.tags)
 
   tags = merge(tomap(
-    { "Name" = "${local.application_name_oem}-db" }
+    { "Name" = lower(format("ec2-%s-%s-db", local.application_name_oem, local.environment)) }
   ), local.tags)
 
   lifecycle {
@@ -44,7 +44,7 @@ resource "aws_ebs_volume" "oem_db_volume_ccms_oem_inst" {
   depends_on        = [resource.aws_instance.oem_db]
 
   tags = merge(tomap(
-    { "Name" = "${local.application_name_oem}-volume-ccms-oem-inst" }
+    { "Name" = "${local.application_name_oem}-db-ccms-oem-inst" }
   ), local.tags)
 
   lifecycle {
@@ -67,7 +67,7 @@ resource "aws_ebs_volume" "oem_db_volume_ccms_oem_dbf" {
   depends_on        = [resource.aws_instance.oem_db]
 
   tags = merge(tomap(
-    { "Name" = "${local.application_name_oem}-volume-ccms-oem-dbf" }
+    { "Name" = "${local.application_name_oem}-db-ccms-oem-dbf" }
   ), local.tags)
 
   lifecycle {
@@ -90,7 +90,7 @@ resource "aws_ebs_volume" "oem_db_volume_swap" {
   depends_on        = [resource.aws_instance.oem_db]
 
   tags = merge(tomap(
-    { "Name" = "${local.application_name_oem}-volume-swap" }
+    { "Name" = "${local.application_name_oem}-db-swap" }
   ), local.tags)
 }
 
