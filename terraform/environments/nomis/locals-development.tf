@@ -50,9 +50,9 @@ locals {
         instance = {
           disable_api_termination = true
         }
-      }
+      } */
     }
-    weblogic_autoscaling_groups = {
+    /* weblogic_autoscaling_groups = {
       tst-nomis-web = {
         tags = {
           ami                = "nomis_rhel_6_10_weblogic_appserver_10_3"
