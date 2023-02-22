@@ -62,7 +62,9 @@ resource "aws_security_group" "cluster_ec2" {
   vpc_id      = data.aws_vpc.shared.id
 
   lifecycle {
-    create_before_destroy = true
+    ignore_changes = [
+      vpc_id
+    ]
   }
 
   dynamic "ingress" {
