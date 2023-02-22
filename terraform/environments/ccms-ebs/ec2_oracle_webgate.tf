@@ -14,7 +14,7 @@ resource "aws_instance" "ec2_webgate" {
   lifecycle {
     ignore_changes = [ebs_block_device]
   }
-  user_data_replace_on_change = true
+  user_data_replace_on_change = false
   user_data                   = <<EOF
 #!/bin/bash
 
@@ -27,6 +27,7 @@ unzip awscliv2.zip
 ./aws/install
 wget https://s3.amazonaws.com/amazoncloudwatch-agent/oracle_linux/amd64/latest/amazon-cloudwatch-agent.rpm
 rpm -U ./amazon-cloudwatch-agent.rpm
+/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c ssm:cloud-watch-config
 
 systemctl stop amazon-ssm-agent
 rm -rf /var/lib/amazon/ssm/ipc/
