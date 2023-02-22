@@ -14,36 +14,6 @@ tasks:
           Set-TimeZone "GMT Standard Time"
           Set-WinSystemLocale "en-GB"
 
-          # Scheduled job to add new users - jobs can be found under Task Scheduler -> Powershell -> ScheduledJobs
-          $add_users = '
-            $secret_prefix = "${SECRET_PREFIX}/" # from Terraform templating
-
-            $secrets = Get-SECSecretList -Filter @{Key="name";Values=$secret_prefix}
-
-            foreach($secret in $secrets){
-                $username = $secret.Name.SubString($secret_prefix.Length) # secrets are stored like /Jumpserver/Users/JoeBloggs, so trim prefix
-                $user_exists = Get-LocalUser $username -ErrorAction SilentlyContinue
-
-                # get password from secret manager
-                $secret = Get-SECSecretValue -SecretId $secret.ARN -Select SecretString
-                $password = ConvertTo-SecureString -String $secret -AsPlainText -Force
-
-                if ($user_exists -eq $null) {
-                    # Create user and add to RD group
-                    New-LocalUser $username -Password $password -FullName $username
-                    Add-LocalGroupMember -Group "Remote Desktop Users" -Member $username
-                    Add-LocalGroupMember -Group "Administrators" -Member $username
-                } else {
-                    Set-LocalUser -Name $username -Password $password
-                }
-            }
-          '
-
-          # add_user script is written to file and added as a recurring job
-          $path = "C:\Users\Administrator\Documents\add_users.ps1"
-          Out-File -FilePath $path -InputObject $add_users
-          Register-ScheduledJob -Name "add_users" -FilePath $path -RunEvery $(New-TimeSpan -Minutes 15) -RunNow
-
           # Check CWAgent is installed, if it isn't then install it
           $timeout = New-TimeSpan -Seconds 600
           $endTime = (Get-Date).Add($timeout)
