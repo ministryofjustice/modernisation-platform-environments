@@ -37,7 +37,7 @@ locals {
         branch                 = "main"
         ansible_repo           = "modernisation-platform-configuration-management"
         ansible_repo_basedir   = "ansible"
-        ansible_args           = "ec2provisiondata"
+        ansible_tags           = "ec2provisiondata"
         restored_from_snapshot = false
       }
       scripts = [
