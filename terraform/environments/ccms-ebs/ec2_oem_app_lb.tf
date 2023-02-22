@@ -1,5 +1,5 @@
 resource "aws_lb" "oem_app" {
-  name               = "${local.application_name_oem}-oem-app-lb"
+  name               = "lb-${local.application_name_oem}-app"
   load_balancer_type = "application"
   internal           = false
   security_groups    = [aws_security_group.load_balancer_security_group.id]
@@ -9,7 +9,7 @@ resource "aws_lb" "oem_app" {
 }
 
 resource "aws_lb_target_group" "oem_app" {
-  name        = "${local.application_name_oem}-oem-app-tg"
+  name        = "tg-${local.application_name_oem}-app-8000"
   port        = 8000
   protocol    = "HTTP"
   vpc_id      = data.aws_vpc.shared.id
@@ -33,7 +33,7 @@ resource "aws_lb_target_group" "oem_app" {
 }
 
 resource "aws_lb_target_group" "oem_app_7102" {
-  name        = "${local.application_name_oem}-oem-app-tg-7102"
+  name        = "tg-${local.application_name_oem}-app-7102"
   port        = 7102
   protocol    = "HTTPS"
   vpc_id      = data.aws_vpc.shared.id
@@ -57,7 +57,7 @@ resource "aws_lb_target_group" "oem_app_7102" {
 }
 
 resource "aws_lb_target_group" "oem_app_7803" {
-  name        = "${local.application_name_oem}-oem-app-tg-7803"
+  name        = "tg-${local.application_name_oem}-app-7803"
   port        = 7803
   protocol    = "HTTPS"
   vpc_id      = data.aws_vpc.shared.id

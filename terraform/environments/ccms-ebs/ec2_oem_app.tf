@@ -44,7 +44,7 @@ resource "aws_ebs_volume" "oem_app_volume_ccms_oem_app" {
   depends_on        = [resource.aws_instance.oem_app]
 
   tags = merge(tomap(
-    { "Name" = "${local.application_name_oem}-app-ccms-oem-app" }
+    { "Name" = "${local.application_name_oem}-app-mnt-oem-app" }
   ), local.tags)
 
   lifecycle {
@@ -67,7 +67,7 @@ resource "aws_ebs_volume" "oem_app_volume_ccms_oem_inst" {
   depends_on        = [resource.aws_instance.oem_app]
 
   tags = merge(tomap(
-    { "Name" = "${local.application_name_oem}-app-ccms-oem-inst" }
+    { "Name" = "${local.application_name_oem}-app-mnt-oem-inst" }
   ), local.tags)
 
   lifecycle {
