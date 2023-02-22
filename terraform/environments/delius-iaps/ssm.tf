@@ -117,7 +117,7 @@ resource "aws_ssm_parameter" "ndelius-interface-password" {
 }
 
 resource "aws_ssm_parameter" "ndelius-interface-replicapasswordcoded" {
-  name      = "/NDeliusInterface/Interface/replicapasswordcoded"
+  name      = "/NDeliusInterface/Interface/replicapwdcoded"
   type      = "SecureString"
   value     = "dev-placeholder-ndelius-interface-replicapasswordcoded"
   overwrite = false
@@ -130,7 +130,7 @@ resource "aws_ssm_parameter" "ndelius-interface-replicapasswordcoded" {
 }
 
 resource "aws_ssm_parameter" "ndelius-interface-soappasscoded" {
-  name      = "/NDeliusInterface/Interface/soappasscoded"
+  name      = "/NDeliusInterface/Interface/soappwdcoded"
   type      = "SecureString"
   value     = "dev-placeholder-ndelius-interface-soappasscoded"
   overwrite = false
@@ -143,7 +143,7 @@ resource "aws_ssm_parameter" "ndelius-interface-soappasscoded" {
 }
 
 resource "aws_ssm_parameter" "ndelius-interface-pwdcoded" {
-  name      = "/NDeliusInterface/Interface/passwordcoded"
+  name      = "/NDeliusInterface/Interface/pwdcoded"
   type      = "SecureString"
   value     = "dev-placeholder-ndelius-interface-passwordcoded"
   overwrite = false
