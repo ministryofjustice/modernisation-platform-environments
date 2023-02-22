@@ -294,7 +294,7 @@ resource "aws_cloudwatch_metric_alarm" "this" {
   alarm_description   = each.value.alarm_description
   datapoints_to_alarm = each.value.datapoints_to_alarm
   treat_missing_data  = each.value.treat_missing_data
-  dimensions = merge(each.value.dimensions,{
+  dimensions = merge(each.value.dimensions, {
     "InstanceId" = aws_instance.this.id
   })
   tags = {}
