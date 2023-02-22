@@ -14,7 +14,7 @@ resource "aws_instance" "ec2_ebsapps" {
   lifecycle {
     ignore_changes = [ebs_block_device]
   }
-  user_data_replace_on_change = true
+  user_data_replace_on_change = false
   user_data                   = <<EOF
 #!/bin/bash
 
@@ -27,6 +27,7 @@ unzip awscliv2.zip
 ./aws/install
 wget https://s3.amazonaws.com/amazoncloudwatch-agent/oracle_linux/amd64/latest/amazon-cloudwatch-agent.rpm
 rpm -U ./amazon-cloudwatch-agent.rpm
+/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c ssm:cloud-watch-config
 
 systemctl stop amazon-ssm-agent
 rm -rf /var/lib/amazon/ssm/ipc/
@@ -106,22 +107,6 @@ EOF
   depends_on = [aws_security_group.ec2_sg_ebsapps]
 
 }
-
-/*
-output "InstanceId" {
-  value = aws_instance.ec2_ebsapps[*].id
-}
-*/
-/*
-locals {
-  ec2_ebsapps = {
-    for inst in aws_instance.ec2_ebsapps : inst.id => inst
-  }
-}
-output e2_ebsapps_ids {
-  value = local.ec2_ebsapps.id
-}
-*/
 
 module "cw-ebsapps-ec2" {
   source = "./modules/cw-ec2"
