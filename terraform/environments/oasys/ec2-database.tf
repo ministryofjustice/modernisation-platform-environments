@@ -37,13 +37,12 @@ locals {
         branch                 = "main"
         ansible_repo           = "modernisation-platform-configuration-management"
         ansible_repo_basedir   = "ansible"
-        ansible_args           = "--tags ec2provision"
+        ansible_tags           = "ec2provisiondata"
         restored_from_snapshot = false
       }
       scripts = [
         "ansible-ec2provision.sh.tftpl",
         "oracle_init.sh.tftpl",
-        "ansible-ec2provisiondata.sh.tftpl"
       ]
     }
 
