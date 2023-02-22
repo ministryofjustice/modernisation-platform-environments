@@ -25,11 +25,11 @@
       },
       {
         "name": "AttachmentsS3Bucket",
-        "valueFrom": "${S3_BUCKET_NAME}"
+        "value": "${S3_BUCKET_NAME}"
       },
       {
         "name": "AttachmentsS3Region",
-        "valueFrom": "eu-west-2"
+        "value": "eu-west-2"
       }
     ],
     "secrets": [
