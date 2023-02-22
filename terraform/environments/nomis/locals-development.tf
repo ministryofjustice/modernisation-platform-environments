@@ -36,7 +36,40 @@ locals {
       # *-nomis-db-3: HA
 
       # add databases here as needed
+      tst-nomis-db-3 = {
+        tags = {
+          server-type         = "nomis-db"
+          description         = "Test database for monitoring automation development"
+          oracle-sids         = "CNOMT1"
+          monitored           = false
+          s3-db-restore-dir   = "CNOMT1_20211214"
+          # instance-scheduling = "skip-scheduling"
+        }
+        ami_name  = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-07T12-48-08.562Z"
+        ami_owner = "self" # remove this line next time AMI is updated so core-shared-services-production used instead
+        instance = {
+          disable_api_termination = true
+        }
+      }
+    }
+    weblogic_autoscaling_groups = {
+      test-nomis-web = {
+        tags = {
+          ami                = "nomis_rhel_6_10_weblogic_appserver_10_3"
+          description        = "test nomis weblogic 10.3"
+          oracle-db-hostname = "test-nomis-db-3"
+          nomis-environment  = "t3"
+          oracle-db-name     = "CNOMT1"
+          server-type        = "nomis-web"
+        }
+        ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-01-03T17-01-12.128Z"
+        branch   = var.BRANCH_NAME # comment in if testing ansible
 
+        autoscaling_group = {
+          desired_capacity = 1
+          warm_pool        = null
+        }
+      }
     }
     weblogics          = {}
     ec2_test_instances = {}
