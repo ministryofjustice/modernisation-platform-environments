@@ -35,6 +35,7 @@ jobs:
       - name: Run TFLint
         run: tflint --format sarif --force > tflint.sarif
       - name: Upload SARIF file
+        if: success() || failure()
         uses: github/codeql-action/upload-sarif@17573ee1cc1b9d061760f3a006fc4aac4f944fd5 # v2.2.4
         with:
           sarif_file: tflint.sarif
@@ -52,6 +53,7 @@ jobs:
         with:
           additional_args: '--format sarif --out tfsec.sarif'
       - name: Upload SARIF file
+        if: success() || failure()
         uses: github/codeql-action/upload-sarif@17573ee1cc1b9d061760f3a006fc4aac4f944fd5 # v2.2.4
         with:
           sarif_file: tfsec.sarif
@@ -66,13 +68,14 @@ jobs:
           fetch-depth: 0
       - name: Run Checkov action
         id: checkov
-        uses: bridgecrewio/checkov-action@d760887e9ca1a14f871195ab650988ac39c90a0a # v12.2138.0
+        uses: bridgecrewio/checkov-action@b27dd5f8cf181eb58102b1e83a533d92d89ea172 # v12.2150.0
         with:
           directory: ./
           framework: terraform
           output_file_path: ./checkov.sarif
           output_format: sarif
       - name: Upload SARIF file
+        if: success() || failure()
         uses: github/codeql-action/upload-sarif@17573ee1cc1b9d061760f3a006fc4aac4f944fd5 # v2.2.4
         with:
           sarif_file: ./checkov.sarif
