@@ -142,10 +142,10 @@ tasks:
       $configXML.DLLDEF.INTERFACE.SOAPPASSCODED = (Get-SSMParameter -Name "/NDeliusInterface/Interface/soappwdcoded" -WithDecryption $true).Value
       $configXML.DLLDEF.INTERFACE.PASSWORDCODED = (Get-SSMParameter -Name "/NDeliusInterface/Interface/pwdcoded" -WithDecryption $true).Value
 
-      $SOAPServerODBCdsn = (Get-SSMParameter -Name "/NDeliusInterface/Interface/ODBC/dsn" -WithDecryption $true).Value
-      $SOAPServerODBCuid = (Get-SSMParameter -Name "/NDeliusInterface/Interface/ODBC/uid" -WithDecryption $true).Value
-      $SOAPServerODBCpwd = (Get-SSMParameter -Name "/NDeliusInterface/Interface/ODBC/pwd" -WithDecryption $true).Value
-      $configXML.DLLDEF.INTERFACE.ODBC = "DSN=$${SOAPServerODBCdsn};uid=$${SOAPServerODBCuid};pwd=$${SOAPServerODBCpwd}"
+      $InterfaceODBCdsn = (Get-SSMParameter -Name "/NDeliusInterface/Interface/ODBC/dsn" -WithDecryption $true).Value
+      $InterfaceODBCuid = (Get-SSMParameter -Name "/NDeliusInterface/Interface/ODBC/uid" -WithDecryption $true).Value
+      $InterfaceODBCpwd = (Get-SSMParameter -Name "/NDeliusInterface/Interface/ODBC/pwd" -WithDecryption $true).Value
+      $configXML.DLLDEF.INTERFACE.ODBC = "DSN=$${InterfaceODBCdsn};uid=$${InterfaceODBCuid};pwd=$${InterfaceODBCpwd}"
       $configXML.save($NDeliusConfigFile)
 
 %{if environment == "development"}
