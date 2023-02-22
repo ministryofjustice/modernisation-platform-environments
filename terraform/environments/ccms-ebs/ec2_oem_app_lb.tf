@@ -89,7 +89,7 @@ resource "aws_lb_target_group_attachment" "oem_app" {
 resource "aws_lb_target_group_attachment" "oem_app_7102" {
   target_group_arn = aws_lb_target_group.oem_app_7102.arn
   target_id        = aws_instance.oem_app.id
-  port             = 7803
+  port             = 7102
 }
 
 resource "aws_lb_target_group_attachment" "oem_app_7803" {
@@ -121,7 +121,7 @@ resource "aws_lb_listener" "oem_app_7102" {
   certificate_arn = aws_acm_certificate.external-mp[0].arn
 
   default_action {
-    target_group_arn = aws_lb_target_group.oem_app_7803.id
+    target_group_arn = aws_lb_target_group.oem_app_7102.id
     type             = "forward"
   }
 }
