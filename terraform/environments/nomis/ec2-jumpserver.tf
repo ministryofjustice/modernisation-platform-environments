@@ -44,7 +44,7 @@ locals {
       }
     }
 
-    user_data_raw = base64encode(templatefile("./templates/jumpserver-user-data.yaml", { SECRET_PREFIX = local.secret_prefix, S3_BUCKET = module.s3-bucket.bucket.id }))
+    user_data_raw = base64encode(templatefile("./templates/jumpserver-user-data.yaml", { S3_BUCKET = module.s3-bucket.bucket.id }))
 
     autoscaling_group = {
       desired_capacity = 1
@@ -85,6 +85,7 @@ module "ec2_jumpserver" {
   subnet_ids                    = module.environment.subnets["private"].ids
   tags                          = merge(local.tags, local.ec2_jumpserver.tags, try(each.value.tags, {}))
   account_ids_lookup            = local.environment_management.account_ids
+  cloudwatch_metric_alarms      = local.cloudwatch_metric_alarms_windows
 }
 
 #------
@@ -132,38 +133,6 @@ resource "aws_iam_policy" "jumpserver_users" {
       Name = "read-access-to-secrets"
     }
   )
-}
-
-
-# create a password for each user in data.github_team.dso_users.members
-resource "random_password" "jumpserver" {
-  for_each    = toset(data.github_team.dso_users.members)
-  length      = 32
-  min_special = 5
-  special     = true
-}
-
-# create empty secret in secret manager
-# checkov:skip=CKV_AWS_149:coming back to this in DSOS-1587
-resource "aws_secretsmanager_secret" "jumpserver" {
-  for_each = toset(data.github_team.dso_users.members)
-  name     = "${local.secret_prefix}/${each.value}"
-  policy   = data.aws_iam_policy_document.jumpserver_secrets[each.value].json
-  #kms_key_id              = module.environment.kms_keys["general"].id
-  recovery_window_in_days = 0
-  tags = merge(
-    local.tags,
-    {
-      Name = "jumpserver-user-${each.value}"
-    },
-  )
-}
-
-# populate secret with password
-resource "aws_secretsmanager_secret_version" "jumpserver" {
-  for_each      = random_password.jumpserver
-  secret_id     = aws_secretsmanager_secret.jumpserver[each.key].id
-  secret_string = each.value.result
 }
 
 # resource policy to restrict access to secret value to specific user and the CICD role used to deploy terraform

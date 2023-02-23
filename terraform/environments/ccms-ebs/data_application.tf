@@ -56,3 +56,40 @@ data "aws_ami" "oracle_base_prereqs_verify" {
   }
 }
 */
+
+data "aws_iam_policy_document" "sns_topic_policy" {
+  policy_id = "SnsTopicId"
+  statement {
+    sid = "statement1"
+    principals {
+      type        = "AWS"
+      identifiers = ["*"]
+    }
+    effect = "Allow"
+    actions = [
+      "SNS:GetTopicAttributes",
+      "SNS:SetTopicAttributes",
+      "SNS:AddPermission",
+      "SNS:DeleteTopic",
+      "SNS:Subscribe",
+      "SNS:ListSubscriptionsByTopic",
+      "SNS:Publish",
+      "SNS:Receive"
+    ]
+    resources = [aws_sns_topic.cw_alerts.arn]
+  }
+}
+
+data "aws_secretsmanager_secret" "support_email_account" {
+  name = "support_email_account"
+  depends_on = [
+    aws_secretsmanager_secret.support_email_account
+  ]
+}
+
+data "aws_secretsmanager_secret_version" "support_email_account" {
+  secret_id = data.aws_secretsmanager_secret.support_email_account.id
+  depends_on = [
+    aws_secretsmanager_secret_version.support_email_account
+  ]
+}
