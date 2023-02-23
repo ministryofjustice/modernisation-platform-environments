@@ -11,7 +11,7 @@ resource "aws_cloudwatch_metric_alarm" "load_balancer_unhealthy_state_routing" {
   statistic           = "Average"
   threshold           = "1"
   alarm_description   = "This metric monitors the number of unhealthy hosts in the routing table for the load balancer. If the number of unhealthy hosts is greater than 0 for 3 minutes."
-  alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
+  alarm_actions       = [aws_sns_topic.nomis_nonprod_alarms.arn]
 }
 
 resource "aws_cloudwatch_metric_alarm" "load_balancer_unhealthy_state_dns" {
@@ -24,7 +24,7 @@ resource "aws_cloudwatch_metric_alarm" "load_balancer_unhealthy_state_dns" {
   statistic           = "Average"
   threshold           = "1"
   alarm_description   = "This metric monitors the number of unhealthy hosts in the DNS table for the load balancer. If the number of unhealthy hosts is greater than 0 for 3 minutes."
-  alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
+  alarm_actions       = [aws_sns_topic.nomis_nonprod_alarms.arn]
 }
 
 # This may be overkill as unhealthy hosts will trigger an alert themselves (or should do) independently.
@@ -38,7 +38,7 @@ resource "aws_cloudwatch_metric_alarm" "load_balancer_unhealthy_state_target" {
   statistic           = "Average"
   threshold           = "1"
   alarm_description   = "This metric monitors the number of unhealthy hosts in the target table for the load balancer. If the number of unhealthy hosts is greater than 0 for 3 minutes."
-  alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
+  alarm_actions       = [aws_sns_topic.nomis_nonprod_alarms.arn]
 }
 
 # ==============================================================================
@@ -55,7 +55,7 @@ resource "aws_cloudwatch_metric_alarm" "cert_expires_in_30_days" {
   statistic           = "Average"
   threshold           = "30"
   alarm_description   = "This metric monitors the number of days until the certificate expires. If the number of days is less than 30."
-  alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
+  alarm_actions       = [aws_sns_topic.nomis_nonprod_alarms.arn]
   /* dimensions = {
     "CertificateArn" = "value"
   } */
@@ -71,7 +71,7 @@ resource "aws_cloudwatch_metric_alarm" "cert_expires_in_2_days" {
   statistic           = "Average"
   threshold           = "2"
   alarm_description   = "This metric monitors the number of days until the certificate expires. If the number of days is less than 2."
-  alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
+  alarm_actions       = [aws_sns_topic.nomis_nonprod_alarms.arn]
   /* dimensions = {
     "CertificateArn" = "value"
   } */

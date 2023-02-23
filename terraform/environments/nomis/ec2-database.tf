@@ -104,7 +104,7 @@ locals {
         statistic           = "Average"
         threshold           = "1"
         alarm_description   = "Oracle db connection to a particular SID is not working. See: https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4294246698/Oracle+db+connection+alarm for remediation steps."
-        alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
+        alarm_actions       = [aws_sns_topic.nomis_nonprod_alarms.arn]
         dimensions = {
           instance = "db_connected"
         }
@@ -119,7 +119,7 @@ locals {
         statistic           = "Average"
         threshold           = "1"
         alarm_description   = "Oracle db is either in long-running batch or failed batch status. See: https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4295000327/Oracle+Batch+alert for remediation steps."
-        alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
+        alarm_actions       = [aws_sns_topic.nomis_nonprod_alarms.arn]
         dimensions = {
           instance = "batch_error"
         }
