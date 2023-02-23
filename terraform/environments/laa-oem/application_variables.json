@@ -1,16 +1,20 @@
 {
   "accounts": {
     "development": {
-      "example_var": "dev-data"
+      "ec2_oem_instance_type_app": "m5d.xlarge",
+      "ec2_oem_instance_type_db": "m5d.xlarge"
     },
     "test": {
-      "example_var": "test-data"
+      "ec2_oem_instance_type_app": "m5d.xlarge",
+      "ec2_oem_instance_type_db": "m5d.xlarge"
     },
     "preproduction": {
-      "example_var": "preproduction-data"
+      "ec2_oem_instance_type_app": "m5d.xlarge",
+      "ec2_oem_instance_type_db": "m5d.xlarge"
     },
     "production": {
-      "example_var": "production-data"
+      "ec2_oem_instance_type_app": "m5d.xlarge",
+      "ec2_oem_instance_type_db": "m5d.xlarge"
     }
   }
 }
