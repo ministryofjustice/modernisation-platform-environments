@@ -78,7 +78,7 @@ locals {
           oasys-environment = "development"
           server-type       = "oasys-db"
           description       = "Development OASys database"
-          oracle-sids       = "OASPROD,BIPINFRA"
+          oracle-sids       = "OASPROD BIPINFRA"
           monitored         = true
         }
         ami_name = "oasys_oracle_db_release_2023-02-14T09-53-15.859Z"
