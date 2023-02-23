@@ -101,7 +101,7 @@ locals {
     DATABASE_PASSWORD_CONNECTION_STRING_ARN = aws_secretsmanager_secret.db_app_connection_string.arn
     S3_USER_KEY_ARN                         = "arn:aws:secretsmanager:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:secret:delius-jitbit-s3-user-access-key"
     S3_USER_SECRET_ARN                      = "arn:aws:secretsmanager:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:secret:delius-jitbit-s3-user-secret-key"
-    S3_BUCKET_NAME                          = "${module.s3_bucket[0].bucket.bucket}:443"
+    S3_BUCKET_NAME                          = module.s3_bucket[0].bucket.bucket
     APP_URL                                 = "https://${local.app_url}/"
   })
 
