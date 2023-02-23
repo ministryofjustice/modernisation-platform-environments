@@ -107,8 +107,8 @@ jobs:
     strategy:
       matrix:
         include:
-          # - environment: preproduction
-          - environment: production
+          - environment: preproduction
+          # - environment: production
     name: Plan - ${{  matrix.environment }}
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
@@ -144,8 +144,8 @@ jobs:
     strategy:
       matrix:
         include:
-          # - environment: preproduction
-          - environment: production
+          - environment: preproduction
+          # - environment: production
     name: Apply - ${{  matrix.environment }}
     runs-on: ubuntu-latest
     env:
