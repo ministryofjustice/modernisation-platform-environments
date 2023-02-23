@@ -30,6 +30,10 @@
       {
         "name": "AttachmentsS3Region",
         "value": "eu-west-2"
+      },
+      {
+        "name": "Logging__LogLevel__Default",
+        "value": "Trace"
       }
     ],
     "secrets": [
