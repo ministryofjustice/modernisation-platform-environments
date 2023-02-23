@@ -157,15 +157,19 @@ module "db_ec2_instance" {
   iam_resource_names_prefix = "ec2-database"
   instance_profile_policies = concat(local.ec2_common_managed_policies, [aws_iam_policy.s3_db_backup_bucket_access.arn])
 
-  business_unit            = local.business_unit
-  application_name         = local.application_name
-  environment              = local.environment
-  region                   = local.region
-  availability_zone        = local.availability_zone_1
-  subnet_id                = module.environment.subnet["data"][local.availability_zone_1].id
-  tags                     = merge(local.tags, local.database.tags, try(each.value.tags, {}))
-  account_ids_lookup       = local.environment_management.account_ids
-  cloudwatch_metric_alarms = merge(local.database.cloudwatch_metric_alarms_database, local.cloudwatch_metric_alarms_linux)
+  business_unit      = local.business_unit
+  application_name   = local.application_name
+  environment        = local.environment
+  region             = local.region
+  availability_zone  = local.availability_zone_1
+  subnet_id          = module.environment.subnet["data"][local.availability_zone_1].id
+  tags               = merge(local.tags, local.database.tags, try(each.value.tags, {}))
+  account_ids_lookup = local.environment_management.account_ids
+  cloudwatch_metric_alarms = {
+    for key, value in merge(local.database.cloudwatch_metric_alarms_database, local.cloudwatch_metric_alarms_linux) :
+    key => merge(value, {
+      alarm_actions = [lookup(each.value, "sns_topic", aws_sns_topic.nomis_nonprod_alarms.arn)]
+  }) }
 }
 
 #------------------------------------------------------------------------------
