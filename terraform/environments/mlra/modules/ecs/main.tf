@@ -57,7 +57,7 @@ resource "aws_autoscaling_group" "cluster-scaling-group" {
 
 resource "aws_security_group" "cluster_ec2" {
   #checkov:skip=CKV_AWS_23
-  name        = "${var.app_name}-cluster-ec2-security-group"
+  name        = "${var.app_name}-cluster-ec2-security-group-test"
   description = "controls access to the cluster ec2 instance"
   vpc_id      = data.aws_vpc.shared.id
 
