@@ -282,7 +282,7 @@ resource "aws_iam_instance_profile" "this" {
 resource "aws_cloudwatch_metric_alarm" "this" {
   for_each = var.cloudwatch_metric_alarms
 
-  alarm_name          = each.key
+  alarm_name          = "${var.name}_${each.key}"
   comparison_operator = each.value.comparison_operator
   evaluation_periods  = each.value.evaluation_periods
   metric_name         = each.value.metric_name
