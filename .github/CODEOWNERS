@@ -14,6 +14,7 @@
 /terraform/environments/long-term-storage @ministryofjustice/modernisation-platform @ministryofjustice/modernisation-platform
 /terraform/environments/maatdb @ministryofjustice/laa-aws-infrastructure @ministryofjustice/modernisation-platform
 /terraform/environments/mlra @ministryofjustice/laa-aws-infrastructure @ministryofjustice/modernisation-platform
+/terraform/environments/nomis-combined-reporting @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
 /terraform/environments/nomis @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
 /terraform/environments/oas @ministryofjustice/laa-aws-infrastructure @ministryofjustice/modernisation-platform
 /terraform/environments/oasys @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
