@@ -76,6 +76,17 @@ jobs:
           EOF
           )
             fi
+          elif [[ ${{ inputs.strategy_type }} == "development" ]]; then
+            matrix=$(cat << EOF
+              {
+                "include": [{
+                  "target": "development",
+                  "action": "destroy"
+                }
+                }]
+              }
+          EOF
+          )
           else
             echo "Unexpected value for inputs.strategy_type [${{ inputs.strategy_type }}]"
             exit 1

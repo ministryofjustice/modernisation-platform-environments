@@ -244,3 +244,51 @@ jobs:
           tf_args="x.tfplan ${{ inputs.init_plan_apply_tfargs }} ${{ inputs.additional_tfargs }}"
           echo "terraform apply ${tf_args}"
           terraform apply ${tf_args} | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh
+
+  destroy:
+    name: "destroy"
+    needs: plan
+    if: inputs.action == 'destroy' && needs.plan.outputs.plan_exitcode == '2'
+    runs-on: ubuntu-latest
+    environment: "${{ inputs.application }}-${{ inputs.environment }}"
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c  # v3.3.0
+
+      - name: Get AWS Account Number
+        run: |
+          ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)
+          echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@67fbcbb121271f7775d2e7715933280b06314838  # v1.7.0
+        with:
+          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
+          role-session-name: githubactionsrolesession
+          aws-region: "eu-west-2"
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@633666f66e0061ca3b725c73b2ec20cd13a8fdd1  # v2.0.3
+        with:
+          terraform_version: "~1"
+          terraform_wrapper: false
+
+      - name: Terraform Init
+        working-directory: "terraform/environments/${{ inputs.application }}"
+        run: |
+          terraform --version
+          echo "terraform init ${{ inputs.init_plan_apply_tfargs }}"
+          terraform init ${{ inputs.init_plan_apply_tfargs }}
+
+      - name: Terraform Workspace Select
+        working-directory: "terraform/environments/${{ inputs.application }}"
+        run: |
+          terraform workspace select "${WORKSPACE_NAME}"
+
+      - name: Terraform Destroy
+        working-directory: "terraform/environments/${{ inputs.application }}"
+        run: |
+          set -o pipefail
+          tf_args=" ${{ inputs.additional_tfargs }}"
+          echo "terraform apply -destroy ${tf_args}"
+          terraform apply -destroy ${tf_args} | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh
