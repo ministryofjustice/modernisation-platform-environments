@@ -241,6 +241,6 @@ jobs:
         working-directory: "terraform/environments/${{ inputs.application }}"
         run: |
           set -o pipefail
-          tf_args="x.tfplan ${{ inputs.init_plan_apply_tfargs }} ${{ inputs.additional_tfargs }}"
+          tf_args="${{ inputs.init_plan_apply_tfargs }} ${{ inputs.additional_tfargs }} x.tfplan"
           echo "terraform apply ${tf_args}"
           terraform apply ${tf_args} | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh
