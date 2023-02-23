@@ -61,12 +61,6 @@ resource "aws_security_group" "cluster_ec2" {
   description = "controls access to the cluster ec2 instance"
   vpc_id      = data.aws_vpc.shared.id
 
-  # lifecycle {
-  #   ignore_changes = [
-  #     vpc_id
-  #   ]
-  # }
-
   dynamic "ingress" {
     for_each = var.ec2_ingress_rules
     content {
@@ -500,32 +494,32 @@ resource "aws_cloudwatch_log_stream" "cloudwatch_stream" {
 
 # Added to support target tracking scaling_adjustment
 
-resource "aws_iam_role" "ecs-autoscale-role" {
-  name = "ecs-scale-application"
-
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "application-autoscaling.amazonaws.com"
-      },
-      "Effect": "Allow"
-    }
-  ]
-}
-EOF
-}
+# resource "aws_iam_role" "ecs-autoscale-role" {
+#   name = "ecs-scale-application"
+#
+#   assume_role_policy = <<EOF
+# {
+#   "Version": "2012-10-17",
+#   "Statement": [
+#     {
+#       "Action": "sts:AssumeRole",
+#       "Principal": {
+#         "Service": "application-autoscaling.amazonaws.com"
+#       },
+#       "Effect": "Allow"
+#     }
+#   ]
+# }
+# EOF
+# }
 
 
 # ECS cluster scaling
 
-resource "aws_iam_role_policy_attachment" "ecs-autoscale" {
-  role       = aws_iam_role.ecs-autoscale-role.id
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceAutoscaleRole"
-}
+# resource "aws_iam_role_policy_attachment" "ecs-autoscale" {
+#   role       = aws_iam_role.ecs-autoscale-role.id
+#   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceAutoscaleRole"
+# }
 
 resource "aws_appautoscaling_target" "ecs_target" {
   max_capacity       = var.appscaling_max_capacity
@@ -533,7 +527,7 @@ resource "aws_appautoscaling_target" "ecs_target" {
   resource_id        = "service/${aws_ecs_cluster.ecs_cluster.name}/${aws_ecs_service.ecs_service.name}"
   scalable_dimension = "ecs:service:DesiredCount"
   service_namespace  = "ecs"
-  role_arn           = aws_iam_role.ecs-autoscale-role.arn
+  # role_arn           = aws_iam_role.ecs-autoscale-role.arn
 }
 
 resource "aws_appautoscaling_policy" "ecs_target_cpu" {
