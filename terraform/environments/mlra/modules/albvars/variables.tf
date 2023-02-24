@@ -126,6 +126,30 @@ variable "internal_lb" {
   type        = bool
   description = "Internal Schema LB or not. Use true for internal"
 }
-
-
-
+# variable "loadbalancer_ingress_rules" {
+#   description = "Security group ingress rules for the loadbalancer"
+#   type = map(object({
+#     description     = string
+#     from_port       = number
+#     to_port         = number
+#     protocol        = string
+#     security_groups = list(string)
+#     cidr_blocks     = list(string)
+#   }))
+# }
+# variable "loadbalancer_egress_rules" {
+#   description = "Security group egress rules for the loadbalancer"
+#   type = map(object({
+#     description     = string
+#     from_port       = number
+#     to_port         = number
+#     protocol        = string
+#     security_groups = list(string)
+#     cidr_blocks     = list(string)
+#   }))
+# }
+variable "existing_bucket_name" {
+  type        = string
+  default     = ""
+  description = "The name of the existing bucket name. If no bucket is provided one will be created for them."
+}

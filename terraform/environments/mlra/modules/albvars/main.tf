@@ -1,23 +1,23 @@
-module "lb-access-logs-enabled" {
-  source = "../alb"
-  providers = {
-    aws.bucket-replication = aws.bucket-replication
-  }
-
-  vpc_all                    = var.vpc_all
-  internal_lb                = var.internal_lb
-  application_name           = var.application_name
-  public_subnets             = var.public_subnets
-  private_subnets            = var.private_subnets
-  region                     = var.region
-  enable_deletion_protection = var.enable_deletion_protection
-  idle_timeout               = var.idle_timeout
-  force_destroy_bucket       = var.force_destroy_bucket
-  tags                       = var.tags
-  account_number             = var.account_number
-  loadbalancer_ingress_rules = local.loadbalancer_ingress_rules
-  loadbalancer_egress_rules  = local.loadbalancer_egress_rules
-}
+# module "lb-access-logs-enabled" {
+#   source = "../alb"
+#   providers = {
+#     aws.bucket-replication = aws.bucket-replication
+#   }
+#
+#   vpc_all                    = var.vpc_all
+#   internal_lb                = var.internal_lb
+#   application_name           = var.application_name
+#   public_subnets             = var.public_subnets
+#   private_subnets            = var.private_subnets
+#   region                     = var.region
+#   enable_deletion_protection = var.enable_deletion_protection
+#   idle_timeout               = var.idle_timeout
+#   force_destroy_bucket       = var.force_destroy_bucket
+#   tags                       = var.tags
+#   account_number             = var.account_number
+#   loadbalancer_ingress_rules = local.loadbalancer_ingress_rules
+#   loadbalancer_egress_rules  = local.loadbalancer_egress_rules
+# }
 
 locals {
   loadbalancer_ingress_rules = {
@@ -51,7 +51,7 @@ locals {
 }
 
 resource "aws_lb_listener" "alb_listener" {
-  load_balancer_arn = module.lb-access-logs-enabled.load_balancer.arn
+  load_balancer_arn = aws_lb.loadbalancer.arn
   port              = var.listener_port
   #checkov:skip=CKV_AWS_2:The ALB protocol is HTTP
   protocol = var.listener_protocol #tfsec:ignore:aws-elb-http-not-used
