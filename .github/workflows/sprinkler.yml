@@ -114,7 +114,7 @@ jobs:
       matrix:
         include:
           - environment: development
-    name: Terraform plan - ${{ github.workflow }} - ${{  matrix.environment }}
+    name: Terraform destroy - ${{ github.workflow }} - ${{  matrix.environment }}
     runs-on: ubuntu-latest
     if: github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'destroy'
     env:
