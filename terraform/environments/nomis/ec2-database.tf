@@ -104,7 +104,7 @@ locals {
         statistic           = "Average"
         threshold           = "1"
         alarm_description   = "Oracle db connection to a particular SID is not working. See: https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4294246698/Oracle+db+connection+alarm for remediation steps."
-        alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
+        alarm_actions       = [aws_sns_topic.nomis_nonprod_alarms.arn]
         dimensions = {
           instance = "db_connected"
         }
@@ -119,7 +119,7 @@ locals {
         statistic           = "Average"
         threshold           = "1"
         alarm_description   = "Oracle db is either in long-running batch or failed batch status. See: https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4295000327/Oracle+Batch+alert for remediation steps."
-        alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
+        alarm_actions       = [aws_sns_topic.nomis_nonprod_alarms.arn]
         dimensions = {
           instance = "batch_error"
         }
@@ -157,15 +157,19 @@ module "db_ec2_instance" {
   iam_resource_names_prefix = "ec2-database"
   instance_profile_policies = concat(local.ec2_common_managed_policies, [aws_iam_policy.s3_db_backup_bucket_access.arn])
 
-  business_unit            = local.business_unit
-  application_name         = local.application_name
-  environment              = local.environment
-  region                   = local.region
-  availability_zone        = local.availability_zone_1
-  subnet_id                = module.environment.subnet["data"][local.availability_zone_1].id
-  tags                     = merge(local.tags, local.database.tags, try(each.value.tags, {}))
-  account_ids_lookup       = local.environment_management.account_ids
-  cloudwatch_metric_alarms = merge(local.database.cloudwatch_metric_alarms_database, local.cloudwatch_metric_alarms_linux)
+  business_unit      = local.business_unit
+  application_name   = local.application_name
+  environment        = local.environment
+  region             = local.region
+  availability_zone  = local.availability_zone_1
+  subnet_id          = module.environment.subnet["data"][local.availability_zone_1].id
+  tags               = merge(local.tags, local.database.tags, try(each.value.tags, {}))
+  account_ids_lookup = local.environment_management.account_ids
+  cloudwatch_metric_alarms = {
+    for key, value in merge(local.database.cloudwatch_metric_alarms_database, local.cloudwatch_metric_alarms_linux) :
+    key => merge(value, {
+      alarm_actions = [lookup(each.value, "sns_topic", aws_sns_topic.nomis_nonprod_alarms.arn)]
+  }) }
 }
 
 #------------------------------------------------------------------------------

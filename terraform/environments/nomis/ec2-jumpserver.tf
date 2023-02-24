@@ -85,7 +85,11 @@ module "ec2_jumpserver" {
   subnet_ids                    = module.environment.subnets["private"].ids
   tags                          = merge(local.tags, local.ec2_jumpserver.tags, try(each.value.tags, {}))
   account_ids_lookup            = local.environment_management.account_ids
-  cloudwatch_metric_alarms      = local.cloudwatch_metric_alarms_windows
+  cloudwatch_metric_alarms = {
+    for key, value in local.cloudwatch_metric_alarms_windows :
+    key => merge(value, {
+      alarm_actions = [lookup(each.value, "sns_topic", aws_sns_topic.nomis_nonprod_alarms.arn)]
+  }) }
 }
 
 #------
