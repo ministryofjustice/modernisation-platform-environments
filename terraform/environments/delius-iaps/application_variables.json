@@ -22,6 +22,9 @@
       "iaps_ndelius_interface_url": "placeholder.nd.address",
       "iaps_im_interface_url": "placeholder.im.address"
     },
+    "test": {
+      "example_var": "test-data"
+    },
     "preproduction": {
       "short_environment_name": "preprod",
       "db_auto_minor_version_upgrade": "true",
