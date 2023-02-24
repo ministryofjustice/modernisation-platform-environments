@@ -32,24 +32,23 @@ data "aws_secretsmanager_secret_version" "pagerduty_integration_keys" {
 # Add a local to get the keys
 locals {
   pagerduty_integration_keys = jsondecode(data.aws_secretsmanager_secret_version.pagerduty_integration_keys.secret_string)
-  sns_topics                 = ["nomis_alarms", "nomis_nonprod_alarms"]
 }
 
 # link the sns topic to the service
 
 module "pagerduty_integration_prod" {
-  /* depends_on = [
+  depends_on = [
     aws_sns_topic.nomis_alarms
-  ] */
+  ]
   source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v1.0.0"
   sns_topics                = [aws_sns_topic.nomis_alarms.name]
   pagerduty_integration_key = local.pagerduty_integration_keys["nomis_alarms"]
 }
 
 module "pagerduty_integration_nonprod" {
-  /* depends_on = [
+  depends_on = [
     aws_sns_topic.nomis_nonprod_alarms
-  ] */
+  ]
   source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v1.0.0"
   sns_topics                = [aws_sns_topic.nomis_nonprod_alarms.name]
   pagerduty_integration_key = local.pagerduty_integration_keys["nomis_nonprod_alarms"]
