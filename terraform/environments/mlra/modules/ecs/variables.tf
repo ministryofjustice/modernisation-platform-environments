@@ -49,7 +49,7 @@ variable "key_name" {
   description = "Key to access EC2s in ECS cluster"
 }
 
-variable "lb_tg_name" {
+variable "lb_tg_arn" {
   type        = string
   description = "Load balancer target group ARN used by ECS service"
 }
