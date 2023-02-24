@@ -21,10 +21,7 @@ module "cwalarm" {
 }
 
 module "pagerduty_core_alerts" {
-  depends_on = [
-    module.cwalarm.aws_sns_topic.mlra_alerting_topic
-  ]
   source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v1.0.0"
-  sns_topics                = [local.sns_topic_name]
+  sns_topics                = [module.cwalarm.aws_sns_topic.mlra_alerting_topic.name] # Establish dependency with module cwalarm's sns topic
   pagerduty_integration_key = local.pagerduty_integration_keys[local.pagerduty_integration_key_name]
 }
