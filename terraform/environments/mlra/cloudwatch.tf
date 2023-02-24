@@ -21,9 +21,9 @@ module "cwalarm" {
 }
 
 module "pagerduty_core_alerts" {
-  depends_on = [
-    module.cwalarm
-  ]
+  # depends_on = [
+  #   module.cwalarm
+  # ]
   source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v1.0.0"
   sns_topics                = [local.sns_topic_name]
   pagerduty_integration_key = local.pagerduty_integration_keys[local.pagerduty_integration_key_name]
