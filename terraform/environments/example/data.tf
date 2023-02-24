@@ -21,7 +21,7 @@ data "aws_iam_policy_document" "ebs-kms" {
     principals {
       type = "AWS"
       identifiers = [
-      "arn:aws:iam::${data.aws_caller_identity.oidc_session.id}:root"]
+      "arn:aws:iam::${data.aws_caller_identity.original_session.id}:root"]
     }
   }
 }
