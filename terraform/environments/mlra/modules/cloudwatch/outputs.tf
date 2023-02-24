@@ -60,5 +60,5 @@ output "applicationelb4xxerror" {
 }
 output "sns_topic_name" {
   description = "Output SNS topic name to establish dependency between this module and pagerduty_core_alerts module"
-  value       = aws_sns_topic.mlra_alerting_topic.id
+  value       = aws_sns_topic.mlra_alerting_topic.name
 }
