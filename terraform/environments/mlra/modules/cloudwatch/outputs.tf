@@ -60,5 +60,5 @@ output "applicationelb4xxerror" {
 }
 output "sns_topic_name" {
   description = "Output SNS topic name to establish dependency between this module and pagerduty_core_alerts module"
-  value       = local.sns_topic_name
+  value       = local.sns_topic_id
 }
