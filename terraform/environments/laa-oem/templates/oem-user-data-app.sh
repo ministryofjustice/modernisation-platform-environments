@@ -11,35 +11,33 @@ systemctl start amazon-ssm-agent
 groupadd oinstall
 useradd -g oinstall applmgr
 
+# /                12    gp3 3000
+# swap             32    gp3      /dev/sdb
+# /oem/app         50    gp3 3000 /dev/sdc
+# /oem/inst        50    gp3 3000 /dev/sdd
+
 FSTAB=/etc/fstab
 MOUNT_DIR=/mnt
+
+# Create the swap partition
+swapoff -a
+mkswap /dev/xvdi
+swapon -L swap1 /dev/xvdb
+echo "/dev/xvdi swap swap defaults 0 0" >> $${FSTAB}
 
 # Create app mount point
 FS_LABEL="APP"
 FS_DIR=$${MOUNT_DIR}/oem/app
 mkdir -p $${FS_DIR}
-mkfs.ext4 -L $${FS_LABEL} /dev/xvdf
+mkfs.ext4 -L $${FS_LABEL} /dev/xvdc
 echo "LABEL=$${FS_LABEL} $${MOUNT_DIR}/oem/app ext4 defaults 0 0" >> $${FSTAB}
 
 # Create inst mount point
 FS_LABEL="INST"
 FS_DIR=$${MOUNT_DIR}/oem/inst
 mkdir -p $${FS_DIR}
-mkfs.ext4 -L $${FS_LABEL} /dev/xvdg
+mkfs.ext4 -L $${FS_LABEL} /dev/xvdd
 echo "LABEL=$${FS_LABEL} $${MOUNT_DIR}/oem/inst ext4 defaults 0 0" >> $${FSTAB}
-
-# Create dbf mount point
-FS_LABEL="DBF"
-FS_DIR=$${MOUNT_DIR}/oem/dbf
-mkdir -p $${FS_DIR}
-mkfs.ext4 -L $${FS_LABEL} /dev/xvdh
-echo "LABEL=$${FS_LABEL} $${MOUNT_DIR}/oem/dbf ext4 defaults 0 0" >> $${FSTAB}
-
-# Create the swap partition
-swapoff -a
-mkswap /dev/xvdi
-swapon -L swap1 /dev/xvdi
-echo "/dev/xvdi swap swap defaults 0 0" >> $${FSTAB}
 
 # File Permissions
 chown -R oracle:dba $${MOUNT_DIR}

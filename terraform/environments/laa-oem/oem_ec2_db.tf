@@ -17,8 +17,9 @@ resource "aws_instance" "oem_db" {
   root_block_device {
     delete_on_termination = true
     encrypted             = true
+    iops                  = 3000
     volume_size           = 12
-    volume_type           = "gp2"
+    volume_type           = "gp3"
   }
 
   volume_tags = merge(tomap(
@@ -37,57 +38,12 @@ resource "aws_instance" "oem_db" {
   }
 }
 
-resource "aws_ebs_volume" "oem_db_volume_ccms_oem_inst" {
-  availability_zone = "eu-west-2a"
-  size              = 50
-  type              = "gp2"
-  depends_on        = [resource.aws_instance.oem_db]
-
-  tags = merge(tomap(
-    { "Name" = "${local.application_name}-db-mnt-oem-inst" }
-  ), local.tags)
-
-  lifecycle {
-    ignore_changes = [
-      snapshot_id,
-    ]
-  }
-}
-
-resource "aws_volume_attachment" "oem_db_volume_ccms_oem_inst" {
-  instance_id = aws_instance.oem_db.id
-  volume_id   = aws_ebs_volume.oem_db_volume_ccms_oem_inst.id
-  device_name = "/dev/sdg"
-}
-
-resource "aws_ebs_volume" "oem_db_volume_ccms_oem_dbf" {
-  availability_zone = "eu-west-2a"
-  size              = 500
-  type              = "gp2"
-  depends_on        = [resource.aws_instance.oem_db]
-
-  tags = merge(tomap(
-    { "Name" = "${local.application_name}-db-mnt-oem-dbf" }
-  ), local.tags)
-
-  lifecycle {
-    ignore_changes = [
-      snapshot_id,
-    ]
-  }
-}
-
-resource "aws_volume_attachment" "oem_db_volume_ccms_oem_dbf" {
-  instance_id = aws_instance.oem_db.id
-  volume_id   = aws_ebs_volume.oem_db_volume_ccms_oem_dbf.id
-  device_name = "/dev/sdh"
-}
-
 resource "aws_ebs_volume" "oem_db_volume_swap" {
   availability_zone = "eu-west-2a"
-  size              = 32
-  type              = "gp2"
   depends_on        = [resource.aws_instance.oem_db]
+  encrypted         = true
+  size              = 32
+  type              = "gp3"
 
   tags = merge(tomap(
     { "Name" = "${local.application_name}-db-swap" }
@@ -97,9 +53,125 @@ resource "aws_ebs_volume" "oem_db_volume_swap" {
 resource "aws_volume_attachment" "oem_db_volume_swap" {
   instance_id = aws_instance.oem_db.id
   volume_id   = aws_ebs_volume.oem_db_volume_swap.id
-  device_name = "/dev/sdi"
+  device_name = "/dev/sdb"
 }
 
+resource "aws_ebs_volume" "oem_db_volume_ccms_oem_app" {
+  availability_zone = "eu-west-2a"
+  depends_on        = [resource.aws_instance.oem_db]
+  encrypted         = true
+  size              = 50
+  type              = "gp3"
+
+  tags = merge(tomap(
+    { "Name" = "${local.application_name}-db-mnt-oem-app" }
+  ), local.tags)
+
+  lifecycle {
+    ignore_changes = [
+      snapshot_id
+    ]
+  }
+}
+
+resource "aws_volume_attachment" "oem_db_volume_ccms_oem_app" {
+  instance_id = aws_instance.oem_db.id
+  volume_id   = aws_ebs_volume.oem_db_volume_ccms_oem_app.id
+  device_name = "/dev/sdc"
+}
+
+resource "aws_ebs_volume" "oem_db_volume_ccms_oem_inst" {
+  availability_zone = "eu-west-2a"
+  depends_on        = [resource.aws_instance.oem_db]
+  encrypted         = true
+  size              = 50
+  type              = "gp3"
+
+  tags = merge(tomap(
+    { "Name" = "${local.application_name}-db-mnt-oem-inst" }
+  ), local.tags)
+
+  lifecycle {
+    ignore_changes = [
+      snapshot_id
+    ]
+  }
+}
+
+resource "aws_volume_attachment" "oem_db_volume_ccms_oem_inst" {
+  instance_id = aws_instance.oem_db.id
+  volume_id   = aws_ebs_volume.oem_db_volume_ccms_oem_inst.id
+  device_name = "/dev/sdd"
+}
+
+resource "aws_ebs_volume" "oem_db_volume_ccms_oem_dbf" {
+  availability_zone = "eu-west-2a"
+  size              = 200
+  type              = "io2"
+  depends_on        = [resource.aws_instance.oem_db]
+
+  tags = merge(tomap(
+    { "Name" = "${local.application_name}-db-mnt-oem-dbf" }
+  ), local.tags)
+
+  lifecycle {
+    ignore_changes = [
+      snapshot_id
+    ]
+  }
+}
+
+resource "aws_volume_attachment" "oem_db_volume_ccms_oem_dbf" {
+  instance_id = aws_instance.oem_db.id
+  volume_id   = aws_ebs_volume.oem_db_volume_ccms_oem_dbf.id
+  device_name = "/dev/sde"
+}
+
+resource "aws_ebs_volume" "oem_db_volume_ccms_oem_redo" {
+  availability_zone = "eu-west-2a"
+  size              = 20
+  type              = "io2"
+  depends_on        = [resource.aws_instance.oem_db]
+
+  tags = merge(tomap(
+    { "Name" = "${local.application_name}-db-mnt-oem-redo" }
+  ), local.tags)
+
+  lifecycle {
+    ignore_changes = [
+      snapshot_id
+    ]
+  }
+}
+
+resource "aws_volume_attachment" "oem_db_volume_ccms_oem_redo" {
+  instance_id = aws_instance.oem_db.id
+  volume_id   = aws_ebs_volume.oem_db_volume_ccms_oem_redo.id
+  device_name = "/dev/sde"
+}
+
+resource "aws_ebs_volume" "oem_db_volume_ccms_oem_archive" {
+  availability_zone = "eu-west-2a"
+  size              = 200
+  type              = "io2"
+  depends_on        = [resource.aws_instance.oem_db]
+
+  tags = merge(tomap(
+    { "Name" = "${local.application_name}-db-mnt-oem-archive" }
+  ), local.tags)
+
+  lifecycle {
+    ignore_changes = [
+      snapshot_id
+    ]
+  }
+}
+
+resource "aws_volume_attachment" "oem_db_volume_ccms_oem_archive" {
+  instance_id = aws_instance.oem_db.id
+  volume_id   = aws_ebs_volume.oem_db_volume_ccms_oem_archive.id
+  device_name = "/dev/sde"
+}
 
 resource "aws_security_group" "oem_db_security_group" {
   name_prefix = "${local.application_name}-db-server-sg"
@@ -111,7 +183,7 @@ resource "aws_security_group" "oem_db_security_group" {
     from_port = 22
     to_port   = 22
     cidr_blocks = [
-      "10.202.0.0/20", "10.200.0.0/20", "10.200.16.0/20",
+      "10.202.0.0/20", "10.200.0.0/20", "10.200.16.0/20"
     ]
   }
 
@@ -120,7 +192,7 @@ resource "aws_security_group" "oem_db_security_group" {
     from_port = 1159
     to_port   = 1159
     cidr_blocks = [
-      "10.202.0.0/20", "10.200.0.0/20", "10.200.16.0/20",
+      "10.202.0.0/20", "10.200.0.0/20", "10.200.16.0/20"
     ]
   }
 
@@ -129,7 +201,7 @@ resource "aws_security_group" "oem_db_security_group" {
     from_port = 1521
     to_port   = 1521
     cidr_blocks = [
-      "10.202.0.0/20", "10.200.0.0/20", "10.200.16.0/20",
+      "10.202.0.0/20", "10.200.0.0/20", "10.200.16.0/20"
     ]
   }
 
@@ -138,7 +210,7 @@ resource "aws_security_group" "oem_db_security_group" {
     from_port = 1830
     to_port   = 1849
     cidr_blocks = [
-      "10.202.0.0/20", "10.200.0.0/20", "10.200.16.0/20",
+      "10.202.0.0/20", "10.200.0.0/20", "10.200.16.0/20"
     ]
   }
 
@@ -147,7 +219,7 @@ resource "aws_security_group" "oem_db_security_group" {
     from_port = 2049
     to_port   = 2049
     cidr_blocks = [
-      "10.202.0.0/20", "10.200.0.0/20", "10.200.16.0/20",
+      "10.202.0.0/20", "10.200.0.0/20", "10.200.16.0/20"
     ]
   }
 
@@ -156,7 +228,7 @@ resource "aws_security_group" "oem_db_security_group" {
     from_port = 3872
     to_port   = 3872
     cidr_blocks = [
-      "10.202.0.0/20", "10.200.0.0/20", "10.200.16.0/20",
+      "10.202.0.0/20", "10.200.0.0/20", "10.200.16.0/20"
     ]
   }
 
@@ -165,7 +237,7 @@ resource "aws_security_group" "oem_db_security_group" {
     from_port = 4889
     to_port   = 4889
     cidr_blocks = [
-      "10.202.0.0/20", "10.200.0.0/20", "10.200.16.0/20",
+      "10.202.0.0/20", "10.200.0.0/20", "10.200.16.0/20"
     ]
   }
 
@@ -174,7 +246,7 @@ resource "aws_security_group" "oem_db_security_group" {
     from_port = 7101
     to_port   = 7101
     cidr_blocks = [
-      "10.202.0.0/20", "10.200.0.0/20", "10.200.16.0/20",
+      "10.202.0.0/20", "10.200.0.0/20", "10.200.16.0/20"
     ]
   }
 
@@ -183,7 +255,7 @@ resource "aws_security_group" "oem_db_security_group" {
     from_port = 7799
     to_port   = 7799
     cidr_blocks = [
-      "10.202.0.0/20", "10.200.0.0/20", "10.200.16.0/20",
+      "10.202.0.0/20", "10.200.0.0/20", "10.200.16.0/20"
     ]
   }
 
@@ -192,7 +264,7 @@ resource "aws_security_group" "oem_db_security_group" {
     from_port = 0
     to_port   = 0
     cidr_blocks = [
-      "0.0.0.0/0",
+      "0.0.0.0/0"
     ]
   }
 

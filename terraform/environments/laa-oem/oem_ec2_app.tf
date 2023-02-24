@@ -17,8 +17,9 @@ resource "aws_instance" "oem_app" {
   root_block_device {
     delete_on_termination = true
     encrypted             = true
+    iops                  = 3000
     volume_size           = 12
-    volume_type           = "gp2"
+    volume_type           = "gp3"
   }
 
   volume_tags = merge(tomap(
@@ -37,57 +38,12 @@ resource "aws_instance" "oem_app" {
   }
 }
 
-resource "aws_ebs_volume" "oem_app_volume_ccms_oem_app" {
-  availability_zone = "eu-west-2a"
-  size              = 100
-  type              = "gp2"
-  depends_on        = [resource.aws_instance.oem_app]
-
-  tags = merge(tomap(
-    { "Name" = "${local.application_name}-app-mnt-oem-app" }
-  ), local.tags)
-
-  lifecycle {
-    ignore_changes = [
-      snapshot_id,
-    ]
-  }
-}
-
-resource "aws_volume_attachment" "oem_app_volume_ccms_oem_app" {
-  instance_id = aws_instance.oem_app.id
-  volume_id   = aws_ebs_volume.oem_app_volume_ccms_oem_app.id
-  device_name = "/dev/sdf"
-}
-
-resource "aws_ebs_volume" "oem_app_volume_ccms_oem_inst" {
-  availability_zone = "eu-west-2a"
-  size              = 50
-  type              = "gp2"
-  depends_on        = [resource.aws_instance.oem_app]
-
-  tags = merge(tomap(
-    { "Name" = "${local.application_name}-app-mnt-oem-inst" }
-  ), local.tags)
-
-  lifecycle {
-    ignore_changes = [
-      snapshot_id,
-    ]
-  }
-}
-
-resource "aws_volume_attachment" "oem_app_volume_ccms_oem_inst" {
-  instance_id = aws_instance.oem_app.id
-  volume_id   = aws_ebs_volume.oem_app_volume_ccms_oem_inst.id
-  device_name = "/dev/sdg"
-}
-
 resource "aws_ebs_volume" "oem_app_volume_swap" {
   availability_zone = "eu-west-2a"
-  size              = 32
-  type              = "gp2"
   depends_on        = [resource.aws_instance.oem_app]
+  encrypted         = true
+  size              = 32
+  type              = "gp3"
 
   tags = merge(tomap(
     { "Name" = "${local.application_name}-app-swap" }
@@ -97,7 +53,55 @@ resource "aws_ebs_volume" "oem_app_volume_swap" {
 resource "aws_volume_attachment" "oem_app_volume_swap" {
   instance_id = aws_instance.oem_app.id
   volume_id   = aws_ebs_volume.oem_app_volume_swap.id
-  device_name = "/dev/sdi"
+  device_name = "/dev/sdb"
+}
+
+resource "aws_ebs_volume" "oem_app_volume_ccms_oem_app" {
+  availability_zone = "eu-west-2a"
+  depends_on        = [resource.aws_instance.oem_app]
+  encrypted         = true
+  size              = 50
+  type              = "gp3"
+
+  tags = merge(tomap(
+    { "Name" = "${local.application_name}-app-mnt-oem-app" }
+  ), local.tags)
+
+  lifecycle {
+    ignore_changes = [
+      snapshot_id
+    ]
+  }
+}
+
+resource "aws_volume_attachment" "oem_app_volume_ccms_oem_app" {
+  instance_id = aws_instance.oem_app.id
+  volume_id   = aws_ebs_volume.oem_app_volume_ccms_oem_app.id
+  device_name = "/dev/sdc"
+}
+
+resource "aws_ebs_volume" "oem_app_volume_ccms_oem_inst" {
+  availability_zone = "eu-west-2a"
+  depends_on        = [resource.aws_instance.oem_app]
+  encrypted         = true
+  size              = 50
+  type              = "gp3"
+
+  tags = merge(tomap(
+    { "Name" = "${local.application_name}-app-mnt-oem-inst" }
+  ), local.tags)
+
+  lifecycle {
+    ignore_changes = [
+      snapshot_id
+    ]
+  }
+}
+
+resource "aws_volume_attachment" "oem_app_volume_ccms_oem_inst" {
+  instance_id = aws_instance.oem_app.id
+  volume_id   = aws_ebs_volume.oem_app_volume_ccms_oem_inst.id
+  device_name = "/dev/sdd"
 }
 
 resource "aws_security_group" "oem_app_security_group_1" {
@@ -114,7 +118,7 @@ resource "aws_security_group" "oem_app_security_group_1" {
     from_port = 0
     to_port   = 0
     cidr_blocks = [
-      "0.0.0.0/0",
+      "0.0.0.0/0"
     ]
   }
 
@@ -123,7 +127,7 @@ resource "aws_security_group" "oem_app_security_group_1" {
     from_port = 22
     to_port   = 22
     cidr_blocks = [
-      "10.202.0.0/20", "10.200.0.0/20", "10.200.16.0/20",
+      "10.202.0.0/20", "10.200.0.0/20", "10.200.16.0/20"
     ]
   }
 
@@ -132,7 +136,7 @@ resource "aws_security_group" "oem_app_security_group_1" {
     from_port = 1159
     to_port   = 1159
     cidr_blocks = [
-      "10.202.0.0/20", "10.200.0.0/20", "10.200.16.0/20",
+      "10.202.0.0/20", "10.200.0.0/20", "10.200.16.0/20"
     ]
     security_groups = [aws_security_group.load_balancer_security_group.id]
   }
@@ -222,7 +226,7 @@ resource "aws_security_group" "oem_app_security_group_2" {
     from_port = 7202
     to_port   = 7202
     cidr_blocks = [
-      "10.202.0.0/20", "10.200.0.0/20", "10.200.16.0/20",
+      "10.202.0.0/20", "10.200.0.0/20", "10.200.16.0/20"
     ]
     security_groups = [aws_security_group.load_balancer_security_group.id]
   }
@@ -232,7 +236,7 @@ resource "aws_security_group" "oem_app_security_group_2" {
     from_port = 7301
     to_port   = 7301
     cidr_blocks = [
-      "10.202.0.0/20", "10.200.0.0/20", "10.200.16.0/20",
+      "10.202.0.0/20", "10.200.0.0/20", "10.200.16.0/20"
     ]
     security_groups = [aws_security_group.load_balancer_security_group.id]
   }
@@ -242,7 +246,7 @@ resource "aws_security_group" "oem_app_security_group_2" {
     from_port = 7403
     to_port   = 7403
     cidr_blocks = [
-      "10.202.0.0/20", "10.200.0.0/20", "10.200.16.0/20",
+      "10.202.0.0/20", "10.200.0.0/20", "10.200.16.0/20"
     ]
     security_groups = [aws_security_group.load_balancer_security_group.id]
   }
@@ -252,7 +256,7 @@ resource "aws_security_group" "oem_app_security_group_2" {
     from_port = 7788
     to_port   = 7788
     cidr_blocks = [
-      "10.202.0.0/20", "10.200.0.0/20", "10.200.16.0/20",
+      "10.202.0.0/20", "10.200.0.0/20", "10.200.16.0/20"
     ]
     security_groups = [aws_security_group.load_balancer_security_group.id]
   }
@@ -262,7 +266,7 @@ resource "aws_security_group" "oem_app_security_group_2" {
     from_port = 7799
     to_port   = 7799
     cidr_blocks = [
-      "10.202.0.0/20", "10.200.0.0/20", "10.200.16.0/20",
+      "10.202.0.0/20", "10.200.0.0/20", "10.200.16.0/20"
     ]
     security_groups = [aws_security_group.load_balancer_security_group.id]
   }
@@ -272,7 +276,7 @@ resource "aws_security_group" "oem_app_security_group_2" {
     from_port = 7803
     to_port   = 7803
     cidr_blocks = [
-      "10.202.0.0/20", "10.200.0.0/20", "10.200.16.0/20",
+      "10.202.0.0/20", "10.200.0.0/20", "10.200.16.0/20"
     ]
     security_groups = [aws_security_group.load_balancer_security_group.id]
   }
@@ -282,7 +286,7 @@ resource "aws_security_group" "oem_app_security_group_2" {
     from_port = 9788
     to_port   = 9788
     cidr_blocks = [
-      "10.202.0.0/20", "10.200.0.0/20", "10.200.16.0/20",
+      "10.202.0.0/20", "10.200.0.0/20", "10.200.16.0/20"
     ]
     security_groups = [aws_security_group.load_balancer_security_group.id]
   }
@@ -292,7 +296,7 @@ resource "aws_security_group" "oem_app_security_group_2" {
     from_port = 9851
     to_port   = 9851
     cidr_blocks = [
-      "10.202.0.0/20", "10.200.0.0/20", "10.200.16.0/20",
+      "10.202.0.0/20", "10.200.0.0/20", "10.200.16.0/20"
     ]
     security_groups = [aws_security_group.load_balancer_security_group.id]
   }
