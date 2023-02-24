@@ -107,7 +107,7 @@ EOF
   depends_on = [aws_security_group.ec2_sg_ebsapps]
 
 }
-
+/*
 module "cw-ebsapps-ec2" {
   source = "./modules/cw-ec2"
 
@@ -121,7 +121,7 @@ module "cw-ebsapps-ec2" {
   period       = each.value.period
   threshold    = each.value.threshold
 }
-
+*/
 
 /*
 resource "aws_ebs_volume" "ebsapps_create" {
