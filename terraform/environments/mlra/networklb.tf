@@ -30,13 +30,13 @@ resource "aws_lb_target_group" "nlb-target" {
   port        = "80"
   protocol    = "TCP"
   vpc_id      = data.aws_vpc.shared.id
-  depends_on = [
-    module.mlra-ecs,
-    module.alb
-    # module.albvars.load_balancer,
-    # module.albvars.loab_balancer_listener,
-    # module.albvars.target_group_name
-  ]
+  # depends_on = [
+  #   module.mlra-ecs,
+  #   module.alb
+  #   # module.albvars.load_balancer,
+  #   # module.albvars.loab_balancer_listener,
+  #   # module.albvars.target_group_name
+  # ]
   tags = {
     Name = "${local.application_name}-${local.environment}-nlb-tg"
   }
