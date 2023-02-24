@@ -7,6 +7,10 @@ resource "aws_sns_topic" "nomis_alarms" {
   name = "nomis_alarms"
 }
 
+resource "aws_sns_topic" "nomis_nonprod_alarms" {
+  name = "nomis_nonprod_alarms"
+}
+
 ## Pager duty integration
 
 # integration "nomis_alarms" has to be set up manually in pagerduty by the Modernisation Platform team
