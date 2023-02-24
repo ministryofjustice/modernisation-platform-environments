@@ -36,8 +36,8 @@ jobs:
       - name: Set Strategy Matrix
         id: strategy
         run: |
-          if [[ ${{ inputs.strategy_type }} == "standard_four_accounts" ]]; then
-            if [[ ${{ github.ref }} != 'refs/head/main' ]]; then
+          if [[ "${{ inputs.strategy_type }}" == "standard_four_accounts" ]]; then
+            if [[ "${{ github.ref }}" != "refs/heads/main" ]]; then
               matrix=$(cat << EOF
               {
                 "include": [{
