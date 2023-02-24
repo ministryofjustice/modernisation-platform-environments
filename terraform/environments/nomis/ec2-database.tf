@@ -126,21 +126,6 @@ locals {
         # oracleasm_service = {}
         # oracle_ohasd_service = {}
       }
-      oracle-monitoring-file_error = {
-        comparison_operator = "GreaterThanOrEqualToThreshold"
-        evaluation_periods  = "20"
-        datapoints_to_alarm = "20"
-        metric_name         = "collectd_exec_value"
-        namespace           = "CWAgent"
-        period              = "60"
-        statistic           = "Average"
-        threshold           = "1"
-        alarm_description   = "Oracle db monitoring file doesn't exist. Usually indicates that the oracle setup hasn't completed fully."
-        alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
-        dimensions = {
-          instance = "file_error"
-        }
-      }
     }
   }
 }
