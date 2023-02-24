@@ -24,7 +24,7 @@ module "mlra-ecs" {
   app_count                 = local.application_data.accounts[local.environment].app_count
   ec2_ingress_rules         = local.ec2_ingress_rules
   ec2_egress_rules          = local.ec2_egress_rules
-  lb_tg_name                = local.application_data.accounts[local.environment].lb_tg_name
+  lb_tg_name                = module.alb.target_group_name
   tags_common               = local.tags
   appscaling_min_capacity   = local.application_data.accounts[local.environment].appscaling_min_capacity
   appscaling_max_capacity   = local.application_data.accounts[local.environment].appscaling_max_capacity
@@ -32,8 +32,7 @@ module "mlra-ecs" {
   ec2_scaling_mem_threshold = local.application_data.accounts[local.environment].ec2_scaling_mem_threshold
   ecs_scaling_cpu_threshold = local.application_data.accounts[local.environment].ecs_scaling_cpu_threshold
   ecs_scaling_mem_threshold = local.application_data.accounts[local.environment].ecs_scaling_mem_threshold
-
-  depends_on = [module.alb, aws_cloudwatch_log_group.ecs_log_group] # TODO module.alb dependancy may have to be re-factored further into development
+  
 }
 
 locals {
@@ -103,9 +102,4 @@ locals {
 
 data "aws_ssm_parameter" "db_password" {
   name = local.application_data.accounts[local.environment].maat_db_password
-}
-
-#TODO This needs to be added in the cloudwatch module in the future
-resource "aws_cloudwatch_log_group" "ecs_log_group" {
-  name = "${local.application_name}-ecs-log-group"
 }

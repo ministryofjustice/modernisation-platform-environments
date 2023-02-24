@@ -366,8 +366,9 @@ resource "aws_ecs_service" "ecs_service" {
     container_port   = var.server_port
   }
 
+  # TODO What are these dependencies for and can remove the depends_on here?
   depends_on = [
-    aws_iam_role_policy_attachment.ecs_task_execution_role, aws_ecs_task_definition.windows_ecs_task_definition, aws_ecs_task_definition.linux_ecs_task_definition
+    aws_iam_role_policy_attachment.ecs_task_execution_role, aws_ecs_task_definition.windows_ecs_task_definition, aws_ecs_task_definition.linux_ecs_task_definition, aws_cloudwatch_log_group.cloudwatch_group
   ]
 
   tags = merge(
@@ -475,12 +476,12 @@ resource "aws_iam_role_policy_attachment" "ecs_task_s3_access" {
 # Set up CloudWatch group and log stream and retain logs for 30 days
 resource "aws_cloudwatch_log_group" "cloudwatch_group" {
   #checkov:skip=CKV_AWS_158:Temporarily skip KMS encryption check while logging solution is being updated
-  name              = "${var.app_name}-ecs"
+  name              = "${var.app_name}-ecs-log-group"
   retention_in_days = 30
   tags = merge(
     var.tags_common,
     {
-      Name = "${var.app_name}-ecs-cloudwatch-group"
+      Name = "${var.app_name}-ecs-log-group"
     }
   )
 }
