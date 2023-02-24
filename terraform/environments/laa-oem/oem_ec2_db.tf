@@ -106,6 +106,7 @@ resource "aws_volume_attachment" "oem_db_volume_ccms_oem_inst" {
 
 resource "aws_ebs_volume" "oem_db_volume_ccms_oem_dbf" {
   availability_zone = "eu-west-2a"
+  iops              = 3000
   size              = 200
   type              = "io2"
   depends_on        = [resource.aws_instance.oem_db]
@@ -129,6 +130,7 @@ resource "aws_volume_attachment" "oem_db_volume_ccms_oem_dbf" {
 
 resource "aws_ebs_volume" "oem_db_volume_ccms_oem_redo" {
   availability_zone = "eu-west-2a"
+  iops              = 3000
   size              = 20
   type              = "io2"
   depends_on        = [resource.aws_instance.oem_db]
@@ -152,6 +154,7 @@ resource "aws_volume_attachment" "oem_db_volume_ccms_oem_redo" {
 
 resource "aws_ebs_volume" "oem_db_volume_ccms_oem_archive" {
   availability_zone = "eu-west-2a"
+  iops              = 3000
   size              = 200
   type              = "io2"
   depends_on        = [resource.aws_instance.oem_db]
