@@ -331,6 +331,6 @@ EOF
 }
 
 # SNS topic for monitoring to send alarms to
-resource "aws_sns_topic" "mlra_alerting_topic" {
-  name = var.snsTopicName
-}
+# resource "aws_sns_topic" "mlra_alerting_topic" {
+#   name = var.snsTopicName
+# }
