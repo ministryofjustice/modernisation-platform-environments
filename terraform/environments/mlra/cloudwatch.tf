@@ -27,7 +27,7 @@ module "cwalarm" {
 }
 
 resource "aws_sns_topic" "mlra_alerting_topic" {
-  name = var.snsTopicName
+  name = local.sns_topic_name
 }
 
 module "pagerduty_core_alerts" {
