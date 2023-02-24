@@ -338,3 +338,9 @@ EOF
 resource "aws_sns_topic" "mlra_alerting_topic" {
   name = local.sns_topic_name
 }
+
+resource "aws_sns_topic_subscription" "pagerduty_subscription" {
+  topic_arn = aws_sns_topic.mlra_alerting_topic.arn
+  protocol  = "https"
+  endpoint  = "https://events.pagerduty.com/integration/${var.pagerduty_integration_key}/enqueue"
+}
