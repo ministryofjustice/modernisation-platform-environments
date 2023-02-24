@@ -198,7 +198,6 @@ resource "aws_security_group" "public" {
     to_port     = 443
     protocol    = "tcp"
     security_groups = [
-      aws_security_group.jumpserver.id,
       module.bastion_linux.bastion_security_group
     ]
     cidr_blocks = local.security_group_cidrs.https
@@ -210,7 +209,6 @@ resource "aws_security_group" "public" {
     to_port     = 7001
     protocol    = "tcp"
     security_groups = [
-      aws_security_group.jumpserver.id,
       module.bastion_linux.bastion_security_group
     ]
     cidr_blocks = local.security_group_cidrs.http7xxx
@@ -222,7 +220,6 @@ resource "aws_security_group" "public" {
     to_port     = 7777
     protocol    = "tcp"
     security_groups = [
-      aws_security_group.jumpserver.id,
       module.bastion_linux.bastion_security_group
 
     ]
