@@ -1,6 +1,6 @@
 locals {
   cloudwatch_metric_alarms_linux = {
-    high_memory_usage = {
+    high-memory-usage = {
       comparison_operator = "GreaterThanOrEqualToThreshold"
       evaluation_periods  = "2"
       datapoints_to_alarm = "2"
@@ -12,7 +12,7 @@ locals {
       alarm_description   = "This metric monitors the amount of available memory. If the amount of available memory is greater than 90% for 2 minutes, the alarm will trigger."
       alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
     }
-    cpu_usage_iowait = {
+    cpu-usage-iowait = {
       comparison_operator = "GreaterThanOrEqualToThreshold"
       evaluation_periods  = "6"
       datapoints_to_alarm = "5"
@@ -24,7 +24,7 @@ locals {
       alarm_description   = "This metric monitors the amount of CPU time spent waiting for I/O to complete. If the average CPU time spent waiting for I/O to complete is greater than 90% for 30 minutes, the alarm will trigger."
       alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
     }
-    disk_used_percent = {
+    disk-used-percent = {
       comparison_operator = "GreaterThanOrEqualToThreshold"
       evaluation_periods  = "2"
       datapoints_to_alarm = "2"
@@ -36,7 +36,7 @@ locals {
       alarm_description   = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space is above 85% for 2 minutes, the alarm will trigger: https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4289822860/Disk+Free+alarm+-+Linux"
       alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
     }
-    cpu_utilization = {
+    cpu-utilization = {
       comparison_operator = "GreaterThanOrEqualToThreshold" # threshold to trigger the alarm state
       evaluation_periods  = "15"                            # how many periods over which to evaluate the alarm
       datapoints_to_alarm = "15"                            # how many datapoints must be breaching the threshold to trigger the alarm
@@ -50,7 +50,7 @@ locals {
     }
     # Key Servers Instance alert - sensitive alert for key servers changing status from healthy. 
     # If this triggers often then we've got a problem.
-    instance_health_check_failed = {
+    instance-health-check-failed = {
       comparison_operator = "GreaterThanOrEqualToThreshold"
       evaluation_periods  = "3"
       metric_name         = "StatusCheckFailed_Instance"
@@ -61,7 +61,7 @@ locals {
       alarm_description   = "Instance status checks monitor the software and network configuration of your individual instance. When an instance status check fails, you typically must address the problem yourself: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/monitoring-system-instance-status-check.html"
       alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
     }
-    system_health_check_failed = {
+    system-health-check-failed = {
       comparison_operator = "GreaterThanOrEqualToThreshold"
       evaluation_periods  = "3"
       metric_name         = "StatusCheckFailed_System"

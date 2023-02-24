@@ -2,7 +2,7 @@
 # Load Balancer Alerts - TO BE MOVED
 # ==============================================================================
 resource "aws_cloudwatch_metric_alarm" "load_balancer_unhealthy_state_routing" {
-  alarm_name          = "load_balancer_unhealthy_state_routing"
+  alarm_name          = "load-balancer-unhealthy-state-routing"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "3"
   metric_name         = "UnHealthyStateRouting"
@@ -15,7 +15,7 @@ resource "aws_cloudwatch_metric_alarm" "load_balancer_unhealthy_state_routing" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "load_balancer_unhealthy_state_dns" {
-  alarm_name          = "load_balancer_unhealthy_state_dns"
+  alarm_name          = "load-balancer-unhealthy-state-dns"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "3"
   metric_name         = "UnHealthyStateDNS"
@@ -29,7 +29,7 @@ resource "aws_cloudwatch_metric_alarm" "load_balancer_unhealthy_state_dns" {
 
 # This may be overkill as unhealthy hosts will trigger an alert themselves (or should do) independently.
 resource "aws_cloudwatch_metric_alarm" "load_balancer_unhealthy_state_target" {
-  alarm_name          = "load_balancer_unhealthy_state_target"
+  alarm_name          = "load-balancer-unhealthy-state-target"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "3"
   metric_name         = "UnHealthyStateTarget"
@@ -46,7 +46,7 @@ resource "aws_cloudwatch_metric_alarm" "load_balancer_unhealthy_state_target" {
 # Certificates are managed by AWS Certificate Manager (ACM) so there shouldn't be any reason why these don't renew automatically. 
 # ==============================================================================
 resource "aws_cloudwatch_metric_alarm" "cert_expires_in_30_days" {
-  alarm_name          = "cert_expires_in_30_days"
+  alarm_name          = "cert-expires-in-30-days"
   comparison_operator = "LessThanThreshold"
   evaluation_periods  = "1"
   metric_name         = "DaysToExpiry"
@@ -62,7 +62,7 @@ resource "aws_cloudwatch_metric_alarm" "cert_expires_in_30_days" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "cert_expires_in_2_days" {
-  alarm_name          = "cert_expires_in_2_days"
+  alarm_name          = "cert-expires-in-2-days"
   comparison_operator = "LessThanThreshold"
   evaluation_periods  = "1"
   metric_name         = "DaysToExpiry"

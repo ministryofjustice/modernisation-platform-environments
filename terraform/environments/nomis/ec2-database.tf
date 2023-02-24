@@ -94,7 +94,7 @@ locals {
       }
     }
     cloudwatch_metric_alarms_database = {
-      oracle_db_disconnected = {
+      oracle-db-disconnected = {
         comparison_operator = "GreaterThanOrEqualToThreshold"
         evaluation_periods  = "5"
         datapoints_to_alarm = "5"
@@ -109,7 +109,7 @@ locals {
           instance = "db_connected"
         }
       }
-      oracle_batch_error = {
+      oracle-batch-error = {
         comparison_operator = "GreaterThanOrEqualToThreshold"
         evaluation_periods  = "5"
         datapoints_to_alarm = "5"
@@ -125,21 +125,6 @@ locals {
         }
         # oracleasm_service = {}
         # oracle_ohasd_service = {}
-      }
-      oracle_monitoring_file_error = {
-        comparison_operator = "GreaterThanOrEqualToThreshold"
-        evaluation_periods  = "20"
-        datapoints_to_alarm = "20"
-        metric_name         = "collectd_exec_value"
-        namespace           = "CWAgent"
-        period              = "60"
-        statistic           = "Average"
-        threshold           = "1"
-        alarm_description   = "Oracle db monitoring file doesn't exist. Usually indicates that the oracle setup hasn't completed fully."
-        alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
-        dimensions = {
-          instance = "file_error"
-        }
       }
     }
   }
