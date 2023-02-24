@@ -191,7 +191,7 @@ resource "aws_ebs_volume" "backup" {
   availability_zone = "eu-west-2a"
   size              = "8000"
   type              = "io2"
-  iops              = 12000
+  iops              = 3000
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,

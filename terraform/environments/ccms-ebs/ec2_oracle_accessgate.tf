@@ -85,7 +85,8 @@ EOF
 
 
   tags = merge(local.tags,
-    { Name = lower(format("ec2-%s-%s-accessgate-%s", local.application_name, local.environment, count.index + 1)) }
+    { Name = lower(format("ec2-%s-%s-accessgate-%s", local.application_name, local.environment, count.index + 1)) },
+    { instance-scheduling = "skip-scheduling" }
   )
   depends_on = [aws_security_group.ec2_sg_accessgate]
 
