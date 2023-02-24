@@ -1,6 +1,6 @@
 locals {
   cloudwatch_metric_alarms_windows = {
-    disk_free_windows = {
+    disk-free-windows = {
       comparison_operator = "LessThanOrEqualToThreshold"
       evaluation_periods  = "2"
       datapoints_to_alarm = "2"
@@ -12,7 +12,7 @@ locals {
       alarm_description   = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space falls below 15% for 2 minutes, the alarm will trigger: https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4305453159/Disk+Free+alarm+-+Windows"
       alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
     }
-    high_cpu_windows = {
+    high-cpu-windows = {
       comparison_operator = "GreaterThanOrEqualToThreshold"
       evaluation_periods  = "5"
       datapoints_to_alarm = "5"
@@ -24,7 +24,7 @@ locals {
       alarm_description   = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space falls below 15% for 2 minutes, the alarm will trigger: https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4305453159/Disk+Free+alarm+-+Windows"
       alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
     }
-    low_available_memory_windows = {
+    low-available-memory-windows = {
       comparison_operator = "GreaterThanOrEqualToThreshold"
       evaluation_periods  = "2"
       datapoints_to_alarm = "2"
