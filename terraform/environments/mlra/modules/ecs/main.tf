@@ -539,7 +539,7 @@ resource "aws_appautoscaling_policy" "ecs_target_cpu" {
     }
     target_value = var.ecs_scaling_cpu_threshold
   }
-  depends_on = [aws_appautoscaling_target.ecs_target]
+  # depends_on = [aws_appautoscaling_target.ecs_target]
 }
 
 resource "aws_appautoscaling_policy" "ecs_target_memory" {
@@ -554,5 +554,5 @@ resource "aws_appautoscaling_policy" "ecs_target_memory" {
     }
     target_value = var.ecs_scaling_mem_threshold
   }
-  depends_on = [aws_appautoscaling_target.ecs_target]
+  # depends_on = [aws_appautoscaling_target.ecs_target]
 }
