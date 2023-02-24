@@ -24,7 +24,7 @@ module "mlra-ecs" {
   app_count                 = local.application_data.accounts[local.environment].app_count
   ec2_ingress_rules         = local.ec2_ingress_rules
   ec2_egress_rules          = local.ec2_egress_rules
-  lb_tg_name                = module.alb.target_group_name
+  lb_tg_arn                 = module.alb.target_group_arn
   tags_common               = local.tags
   appscaling_min_capacity   = local.application_data.accounts[local.environment].appscaling_min_capacity
   appscaling_max_capacity   = local.application_data.accounts[local.environment].appscaling_max_capacity
