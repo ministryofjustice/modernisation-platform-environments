@@ -17,7 +17,7 @@ on:
   workflow_dispatch:
     inputs:
       action:
-        description: 'The action to undertake. Either deploy or destroy are acceptable'
+        description: 'Set either `[deploy|destroy]`. `destroy` will only run against the main branch.'
         default: 'deploy'
         required: true
         type: string
@@ -116,7 +116,7 @@ jobs:
           - environment: development
     name: Terraform destroy plan - ${{ github.workflow }} - ${{  matrix.environment }}
     runs-on: ubuntu-latest
-    if: github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'destroy'
+    if: github.ref = 'refs/heads/main' && github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'destroy'
     env:
       TF_ENV: ${{ matrix.environment }}
     steps:
