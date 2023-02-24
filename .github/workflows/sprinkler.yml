@@ -44,7 +44,8 @@ jobs:
           - environment: development
     name: Terraform plan - ${{ github.workflow }} - ${{  matrix.environment }}
     runs-on: ubuntu-latest
-    if: github.ref != 'refs/heads/main' || github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'deploy'
+   # if: github.ref != 'refs/heads/main' || github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'deploy'
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'deploy'
     env:
       TF_ENV: ${{ matrix.environment }}
     steps:
