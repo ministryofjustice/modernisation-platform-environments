@@ -26,6 +26,9 @@ variable "appnameenv" {
 
 }
 
+variable "pagerduty_integration_key" {
+}
+
 variable "pECSCPUAlarmThreshold" {
   description = "ECS CPU Alarm Threshold"
   type        = number
