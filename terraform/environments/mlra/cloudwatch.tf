@@ -2,7 +2,6 @@ locals {
   # sns variables
   pagerduty_integration_keys     = jsondecode(data.aws_secretsmanager_secret_version.pagerduty_integration_keys.secret_string)
   pagerduty_integration_key_name = local.application_data.accounts[local.environment].pagerduty_integration_key_name
-  sns_topic_name                 = "${local.application_name}-${local.environment}-alerting-topic"
 }
 
 data "aws_secretsmanager_secret" "pagerduty_integration_keys" {
@@ -25,9 +24,3 @@ module "cwalarm" {
   appnameenv            = "${local.application_name}-${local.environment}"
   pagerduty_integration_key = local.pagerduty_integration_keys[local.pagerduty_integration_key_name]
 }
-
-# module "pagerduty_core_alerts" {
-#   source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v1.0.0"
-#   sns_topics                = [jsonencode(split(":",module.cwalarm.sns_topic_id)[5])] # Establish dependency with module cwalarm's sns topic
-#   pagerduty_integration_key = local.pagerduty_integration_keys[local.pagerduty_integration_key_name]
-# }
