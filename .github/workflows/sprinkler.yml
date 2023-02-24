@@ -74,7 +74,7 @@ jobs:
   # These jobs run when creating a pull request
   deploy-dev-test:
     needs: plan-dev-test
-    if: success()
+    if: success() && github.event.inputs.action != 'destroy'
     strategy:
       matrix:
         include:
@@ -116,7 +116,7 @@ jobs:
           - environment: development
     name: Terraform destroy plan - ${{ github.workflow }} - ${{  matrix.environment }}
     runs-on: ubuntu-latest
-    if: github.ref = 'refs/heads/main' && github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'destroy'
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'destroy'
     env:
       TF_ENV: ${{ matrix.environment }}
     steps:
