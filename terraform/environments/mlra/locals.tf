@@ -5,7 +5,7 @@ locals {
   # sns variables
   pagerduty_integration_keys     = jsondecode(data.aws_secretsmanager_secret_version.pagerduty_integration_keys.secret_string)
   pagerduty_integration_key_name = local.application_data.accounts[local.environment].pagerduty_integration_key_name
-  sns_topic_name                 = "aws_sns_topic"
+  sns_topic_name                 = "mlra-alerting-topic"
   # environment specfic variables
   # example usage:
   # example_data = local.application_data.accounts[local.environment].example_var
