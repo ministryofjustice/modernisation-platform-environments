@@ -21,6 +21,7 @@ module "alb" {
   ingress_cidr_block               = local.application_data.accounts[local.environment].lz_vpc_cidr
   lz_workspace_ingress_cidr        = local.application_data.accounts[local.environment].lz_workspace_ingress_cidr
   internal_lb                      = true
+  # existing_bucket_name = "" # An s3 bucket name can be provided in the module by adding the `existing_bucket_name` variable and adding the bucket name
 
   listener_protocol = "HTTP"
   listener_port     = 80
