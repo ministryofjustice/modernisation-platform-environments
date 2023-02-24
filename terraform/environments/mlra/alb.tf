@@ -1,5 +1,5 @@
 module "alb" {
-  source = "./modules/albvars"
+  source = "./modules/alb"
   providers = {
     aws.bucket-replication = aws
   }
