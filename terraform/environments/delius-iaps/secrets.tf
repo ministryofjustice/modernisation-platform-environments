@@ -14,10 +14,10 @@ resource "aws_secretsmanager_secret" "db_password" {
   name                    = "${var.networking[0].application}-db-password"
   recovery_window_in_days = 0
   tags = merge(
-  local.tags,
-  {
-    Name = "${var.networking[0].application}-db-password"
-  },
+    local.tags,
+    {
+      Name = "${var.networking[0].application}-db-password"
+    },
   )
 }
 
@@ -43,10 +43,10 @@ resource "aws_secretsmanager_secret" "ad_password" {
   name                    = "${var.networking[0].application}-ad-password"
   recovery_window_in_days = 0
   tags = merge(
-  local.tags,
-  {
-    Name = "${var.networking[0].application}-ad-password"
-  },
+    local.tags,
+    {
+      Name = "${var.networking[0].application}-ad-password"
+    },
   )
 }
 
