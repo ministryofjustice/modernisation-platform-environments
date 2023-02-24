@@ -98,29 +98,29 @@ locals {
         }
       }
 
-      dev-onr-db-1 = {
-        tags = {
-          oasys-environment = "development"
-          server-type       = "onr-db"
-          description       = "Development ONR database"
-          oracle-sids       = "onrbods ONRAUD ONRSYS MISTRANS OASYSREP"
-          monitored         = true
-        }
-        ami_name = "onr_oracle_db_*"
-        instance = {
-          instance_type             = "r6i.xlarge"
-          disable_api_termination   = true
-          metadata_endpoint_enabled = "enabled"
-        }
-        ebs_volumes = {
-          "/dev/sdb" = { size = 100 }
-          "/dev/sdc" = { size = 5120 }
-        }
-        ebs_volume_config = {
-          data  = { total_size = 4000 }
-          flash = { total_size = 1000 }
-        }
-      }
+      # dev-onr-db-1 = {
+      #   tags = {
+      #     oasys-environment = "development"
+      #     server-type       = "onr-db"
+      #     description       = "Development ONR database"
+      #     oracle-sids       = "onrbods ONRAUD ONRSYS MISTRANS OASYSREP"
+      #     monitored         = true
+      #   }
+      #   ami_name = "onr_oracle_db_*"
+      #   instance = {
+      #     instance_type             = "r6i.xlarge"
+      #     disable_api_termination   = true
+      #     metadata_endpoint_enabled = "enabled"
+      #   }
+      #   ebs_volumes = {
+      #     "/dev/sdb" = { size = 100 }
+      #     "/dev/sdc" = { size = 5120 }
+      #   }
+      #   ebs_volume_config = {
+      #     data  = { total_size = 4000 }
+      #     flash = { total_size = 1000 }
+      #   }
+      # }
     }
   }
 }
