@@ -58,7 +58,7 @@ output "applicationelb4xxerror" {
   value       = aws_cloudwatch_metric_alarm.applicationelb4xxerror.arn
 
 }
-output "sns_topic_name" {
+output "sns_topic_id" {
   description = "Output SNS topic name to establish dependency between this module and pagerduty_core_alerts module"
-  value       = aws_sns_topic.mlra_alerting_topic.name
+  value       = aws_sns_topic.mlra_alerting_topic.id
 }
