@@ -31,7 +31,8 @@
       "rds_snapshot_name": "man-oas-migration-laws-3029",
       "lz_vpc_cidr": "10.202.0.0/20",
       "deletion_protection": "false",
-      "dashboard_widget_period": 60
+      "dashboard_widget_period": 60,
+      "pagerduty_integration_key_name": "laa_oas_nonprod_alarms"
     },
     "test": {
       "example_var": "test-data"
@@ -40,7 +41,8 @@
       "example_var": "preproduction-data"
     },
     "production": {
-      "example_var": "production-data"
+      "example_var": "production-data",
+      "pagerduty_integration_key_name": "laa_oas_prod_alarms"
     }
   }
 }

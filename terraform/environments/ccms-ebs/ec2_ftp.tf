@@ -84,7 +84,7 @@ EOF
   root_block_device {
     volume_type = "gp3"
     volume_size = 50
-    iops        = 12000
+    iops        = 3000
     encrypted   = true
     kms_key_id  = data.aws_kms_key.ebs_shared.key_id
     tags = merge(local.tags,
@@ -104,8 +104,7 @@ EOF
   }
 
   tags = merge(local.tags,
-    { Name = lower(format("ec2-%s-%s-FTP", local.application_name, local.environment)) },
-    { instance-scheduling = "skip-auto-start" }
+    { Name = lower(format("ec2-%s-%s-FTP", local.application_name, local.environment)) }
   )
 
   depends_on = [aws_security_group.ec2_sg_ftp]

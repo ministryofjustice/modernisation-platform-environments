@@ -1,0 +1,86 @@
+---
+name: terraform strategy
+
+# Create a variable that can be used in a strategy matrix in a separate
+# job, for example, reusable_terraform_plan_apply.yml.
+#
+# The variable will contain each of the environments for the application
+# and a variable for whether a plan or apply should be run, depending on
+# whether the job is run from the main branch or not.
+#
+# Possible values of strategy_type listed below:
+#
+# standard_four_accounts
+#   branch: run plan on all 4 accounts but allow apply to development and test
+#   main:   run plan and apply on all 4 accounts
+
+on:
+  workflow_call:
+    inputs:
+      strategy_type:
+        type: string
+        required: true
+        description: "Set to the a string representing the desired workflow strategy, e.g. standard_four_accounts, see comments for more info"
+    outputs:
+      matrix:
+        description: "Matrix json string to feed that can be used as strategy in separate terraform job"
+        value: ${{ jobs.strategy.outputs.matrix }}
+
+jobs:
+  strategy:
+    name: "strategy"
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: "${{ steps.strategy.outputs.matrix }}"
+    steps:
+      - name: Set Strategy Matrix
+        id: strategy
+        run: |
+          if [[ "${{ inputs.strategy_type }}" == "standard_four_accounts" ]]; then
+            if [[ "${{ github.ref }}" != "refs/heads/main" ]]; then
+              matrix=$(cat << EOF
+              {
+                "include": [{
+                  "target": "development",
+                  "action": "plan_apply"
+                }, {
+                  "target": "test",
+                  "action": "plan_apply"
+                }, {
+                  "target": "preproduction",
+                  "action": "plan"
+                }, {
+                  "target": "production",
+                  "action": "plan"
+                }]
+              }
+          EOF
+          )
+            else
+              matrix=$(cat << EOF
+              {
+                "include": [{
+                  "target": "development",
+                  "action": "plan_apply"
+                }, {
+                  "target": "test",
+                  "action": "plan_apply"
+                }, {
+                  "target": "preproduction",
+                  "action": "plan_apply"
+                }, {
+                  "target": "production",
+                  "action": "plan_apply"
+                }]
+              }
+          EOF
+          )
+            fi
+          else
+            echo "Unexpected value for inputs.strategy_type [${{ inputs.strategy_type }}]"
+            exit 1
+          fi
+          echo 'matrix<<EOF' >> $GITHUB_OUTPUT
+          echo "${matrix}" >> $GITHUB_OUTPUT
+          echo 'EOF' >> $GITHUB_OUTPUT
+          echo "${matrix}"

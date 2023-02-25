@@ -77,14 +77,15 @@ module "ec2_test_instance" {
   iam_resource_names_prefix = "ec2-test-instance"
   instance_profile_policies = local.ec2_common_managed_policies
 
-  business_unit      = local.business_unit
-  application_name   = local.application_name
-  environment        = local.environment
-  region             = local.region
-  availability_zone  = local.availability_zone_1
-  subnet_id          = module.environment.subnet["private"][local.availability_zone_1].id
-  tags               = merge(local.tags, local.ec2_test.tags, try(each.value.tags, {}))
-  account_ids_lookup = local.environment_management.account_ids
+  business_unit            = local.business_unit
+  application_name         = local.application_name
+  environment              = local.environment
+  region                   = local.region
+  availability_zone        = local.availability_zone_1
+  subnet_id                = module.environment.subnet["private"][local.availability_zone_1].id
+  tags                     = merge(local.tags, local.ec2_test.tags, try(each.value.tags, {}))
+  account_ids_lookup       = local.environment_management.account_ids
+  cloudwatch_metric_alarms = {}
 }
 
 module "ec2_test_autoscaling_group" {
@@ -118,4 +119,5 @@ module "ec2_test_autoscaling_group" {
   subnet_ids                = module.environment.subnets["private"].ids
   tags                      = merge(local.tags, local.ec2_test.tags, try(each.value.tags, {}))
   account_ids_lookup        = local.environment_management.account_ids
+  cloudwatch_metric_alarms  = {}
 }
