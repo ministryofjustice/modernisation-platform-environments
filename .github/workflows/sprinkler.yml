@@ -17,7 +17,7 @@ on:
   workflow_dispatch:
     inputs:
       action:
-        description: 'Set either [deploy|destroy]. destroy will only run against the main branch.'
+        description: 'Set either [deploy|destroy].'
         default: 'deploy'
         required: true
         type: string
