@@ -33,7 +33,7 @@ module "ecs" {
   # e.g. the ec2 cluster security group
 
   depends_on = [aws_lb_listener.listener, aws_lb_target_group.target_group]
-  vpc_id      = data.aws_vpc.shared.id
+  vpc_id     = data.aws_vpc.shared.id
 }
 
 data "aws_ami" "ecs_ami" {
