@@ -149,6 +149,6 @@ resource "aws_iam_policy" "cloudwatch_datasource_policy" {
 resource "aws_iam_role_policy_attachment" "cloudwatch_datasource_policy_attach" {
   policy_arn = aws_iam_policy.cloudwatch_datasource_policy.arn
   #role       = aws_iam_role.cloudwatch-datasource-role.name
-  role       = aws_iam_role.role_stsassume_oracle_base.name
+  role = aws_iam_role.role_stsassume_oracle_base.name
 
 }
