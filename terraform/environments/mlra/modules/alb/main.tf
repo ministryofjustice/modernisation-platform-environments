@@ -246,6 +246,11 @@ resource "aws_athena_workgroup" "lb-access-logs" {
 }
 
 resource "aws_lb_listener" "alb_listener" {
+
+  lifecycle {
+    create_before_destroy = true
+  }
+  
   load_balancer_arn = aws_lb.loadbalancer.arn
   port              = var.listener_port
   #checkov:skip=CKV_AWS_2:The ALB protocol is HTTP
