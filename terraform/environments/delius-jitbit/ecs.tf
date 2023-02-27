@@ -2,10 +2,9 @@
 #tfsec:ignore:aws-cloudwatch-log-group-customer-key
 module "ecs" {
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs?ref=654c2b2"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs?ref=a851639"
 
   subnet_set_name         = local.subnet_set_name
-  vpc_all                 = local.vpc_all
   app_name                = local.application_name
   container_instance_type = local.app_data.accounts[local.environment].container_instance_type
   ami_image_id            = data.aws_ami.ecs_ami.id
@@ -34,6 +33,7 @@ module "ecs" {
   # e.g. the ec2 cluster security group
 
    depends_on = [aws_lb_listener.listener, aws_lb_target_group.target_group]
+  vpc_id      = data.aws_vpc.shared.id
 }
 
 data "aws_ami" "ecs_ami" {
