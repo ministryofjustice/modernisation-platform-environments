@@ -1,13 +1,20 @@
 {
     "accounts": {
         "development": {
-          "example_var": "dev-data"
+          "directory_service_name": "UKGOV.DEV",
+          "SES_domain": "internaltest.ppud.justice.gov.uk",
+          "DEV_WAM_ALB": "WAM-ALB",
+          "PPUD_Internal_ALB": "PPUD-ALB"
         },
         "test": {
           "example_var": "test-data"
         },
         "preproduction": {
-          "example_var": "preproduction-data"
+          "directory_service_name": "PPUD.UAT",
+          "SES_domain": "uat.ppud.justice.gov.uk",
+          "DEV_WAM_ALB": "WAM-ALB",
+          "PPUD_Internal_ALB": "PPUD-ALB"
+          
         },
         "production": {
           "example_var": "production-data"

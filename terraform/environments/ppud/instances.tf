@@ -155,3 +155,68 @@ resource "aws_instance" "PPUD-DEV-AWS-AD" {
     Name = "PPUD-DEV-AWS-AD"
   }
 }
+
+resource "aws_instance" "s618358rgvw201" {
+  count                  = local.is-preproduction == true ? 1 : 0
+  ami                    = "ami-0e79a3f367356535e"
+  instance_type          = "c5.large"
+  source_dest_check      = false
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile[0].id
+  vpc_security_group_ids = [aws_security_group.WAM-Portal.id]
+  subnet_id              = data.aws_subnet.private_subnets_a.id
+  tags = {
+    Name = "s618358rgvw201"
+  }
+}
+
+resource "aws_instance" "S618358RGVW202" {
+  count                  = local.is-preproduction == true ? 1 : 0
+  ami                    = "ami-066d0fe7085076548"
+  instance_type          = "m5.large"
+  source_dest_check      = false
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile[0].id
+  vpc_security_group_ids = [aws_security_group.Bridge-Server-Preprod.id]
+  subnet_id              = data.aws_subnet.private_subnets_a.id
+  tags = {
+    Name = "S618358RGVW202"
+  }
+}
+
+resource "aws_instance" "s618358rgsw025" {
+  count                  = local.is-preproduction == true ? 1 : 0
+  ami                    = "ami-0ad4be40d57ecc994"
+  instance_type          = "c5.4xlarge"
+  source_dest_check      = false
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile[0].id
+  vpc_security_group_ids = [aws_security_group.WAM-Data-Access-Server.id]
+  subnet_id              = data.aws_subnet.private_subnets_a.id
+  tags = {
+    Name = "s618358rgsw025"
+  }
+}
+
+resource "aws_instance" "s618358rgvw024" {
+  count                  = local.is-preproduction == true ? 1 : 0
+  ami                    = "ami-0d3d8251678e13330"
+  instance_type          = "m5.xlarge"
+  source_dest_check      = false
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile[0].id
+  vpc_security_group_ids = [aws_security_group.PPUD-Database-Server.id]
+  subnet_id              = data.aws_subnet.data_subnets_a.id
+  tags = {
+    Name = "s618358rgvw024"
+  }
+}
+
+resource "aws_instance" "s618358rgvw023" {
+  count                  = local.is-preproduction == true ? 1 : 0
+  ami                    = "ami-04944a7de56185ec3"
+  instance_type          = "c5.large"
+  source_dest_check      = false
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile[0].id
+  vpc_security_group_ids = [aws_security_group.PPUD-WEB-Portal.id]
+  subnet_id              = data.aws_subnet.private_subnets_b.id
+  tags = {
+    Name = "s618358rgvw023"
+  }
+}
