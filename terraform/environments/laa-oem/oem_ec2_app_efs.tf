@@ -23,9 +23,7 @@ resource "aws_security_group" "oem-app-efs-sg" {
     protocol  = "tcp"
     from_port = 2049
     to_port   = 2049
-    cidr_blocks = [
-      "10.202.0.0/20", "10.200.0.0/20", "10.200.16.0/20",
-    ]
+    cidr_blocks = [data.aws_subnets.shared-public.ids]
   }
 
   egress {
