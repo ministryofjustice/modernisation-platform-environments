@@ -42,8 +42,7 @@ resource "aws_lb_target_group" "nlb-target" {
   }
 }
 
-
-# resource "aws_lb_target_group_attachment" "nlb-target-attachment" {
-#   target_group_arn = aws_lb_target_group.nlb-target.arn
-#   target_id        = module.alb.load_balancer.id
-# }
+resource "aws_lb_target_group_attachment" "nlb-target-attachment" {
+  target_group_arn = aws_lb_target_group.nlb-target.arn
+  target_id        = module.alb.load_balancer.id
+}
