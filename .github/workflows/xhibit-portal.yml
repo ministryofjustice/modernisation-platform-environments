@@ -15,7 +15,6 @@ on:                                          # Put ALL the triggers for any part
       - 'terraform/environments/xhibit-portal/**'
       - '.github/workflows/xhibit-portal.yml'
   workflow_dispatch:
-  workflow_dispatch:
     inputs:
       action:
         description: 'Set either [deploy|destroy].'

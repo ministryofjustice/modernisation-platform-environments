@@ -15,6 +15,7 @@ on:
       - 'terraform/environments/ccms-ebs/**'
       - '.github/workflows/ccms-ebs.yml'
   workflow_dispatch:
+    inputs:
       action:
         description: 'Set either [deploy|destroy].'
         default: 'deploy'

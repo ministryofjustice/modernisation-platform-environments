@@ -15,6 +15,7 @@ on:
       - 'terraform/environments/apex/**'
       - '.github/workflows/apex.yml'
   workflow_dispatch:
+    inputs:
       action:
         description: 'Set either [deploy|destroy].'
         default: 'deploy'

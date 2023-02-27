@@ -15,6 +15,7 @@ on:
       - 'terraform/environments/data-and-insights-wepi/**'
       - '.github/workflows/data-and-insights-wepi.yml'
   workflow_dispatch:
+    inputs:
       action:
         description: 'Set either [deploy|destroy].'
         default: 'deploy'
