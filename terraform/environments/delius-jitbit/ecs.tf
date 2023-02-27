@@ -32,7 +32,7 @@ module "ecs" {
   # adding a module dependson forced terraform to plan the recreation of resources in the module
   # e.g. the ec2 cluster security group
 
-   depends_on = [aws_lb_listener.listener, aws_lb_target_group.target_group]
+  depends_on = [aws_lb_listener.listener, aws_lb_target_group.target_group]
   vpc_id      = data.aws_vpc.shared.id
 }
 
