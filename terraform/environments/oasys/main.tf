@@ -47,6 +47,7 @@ module "autoscaling_groups" {
   tags                      = merge(local.tags, try(each.value.tags, {}))
   account_ids_lookup        = local.environment_management.account_ids
   lb_target_groups          = lookup(each.value, "lb_target_groups", {})
+  vpc_id                    = module.environment.vpc.id
 }
 
 module "db_ec2_instance" {
