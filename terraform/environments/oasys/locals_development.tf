@@ -24,11 +24,33 @@ locals {
     }
 
     autoscaling_groups = {
-      # webservers = merge(local.webserver, { # merge common config and env specific
-      #   tags = merge(local.webserver_tags, {
-      #     oasys-environment = "t1"
-      #   })
-      # })
+      webservers = merge(local.webserver, { # merge common config and env specific
+        tags = merge(local.webserver_tags, {
+          oasys-environment = "t1"
+        })
+        lb_target_groups = {
+          https = {
+            port                 = 443
+            protocol             = "HTTP"
+            target_type          = "instance"
+            deregistration_delay = 30
+            health_check = {
+              enabled             = true
+              interval            = 30
+              healthy_threshold   = 3
+              matcher             = "200-399"
+              path                = "/"
+              port                = 443
+              timeout             = 5
+              unhealthy_threshold = 5
+            }
+            stickiness = {
+              enabled = true
+              type    = "lb_cookie"
+            }
+          }
+        }
+      })
       # test = { # minimum config
       #   ami_name              = "base_rhel_7_9_*"
       #   autoscaling_schedules = {}
