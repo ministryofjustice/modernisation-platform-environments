@@ -3,7 +3,7 @@
 resource "aws_lb" "PPUD-internal-ALB" {
   count              = local.is-development == false ? 1 : 0
   name               = local.application_data.accounts[local.environment].PPUD_Internal_ALB
-  internal           =  true
+  internal           = true
   load_balancer_type = "application"
   security_groups    = [aws_security_group.PPUD-ALB.id]
   subnets            = [data.aws_subnet.private_subnets_b.id, data.aws_subnet.private_subnets_c.id]
@@ -71,7 +71,7 @@ resource "aws_lb_target_group_attachment" "PPUD-PORTAL-1" {
 */
 
 resource "aws_lb_target_group_attachment" "target_group_attachment_1" {
-  count           = length(var.instance_ids_ppud_internal_alb[terraform.workspace])
+  count            = length(var.instance_ids_ppud_internal_alb[terraform.workspace])
   target_group_arn = aws_lb_target_group.PPUD-Target-Group.arn
-  target_id       = var.instance_ids_ppud_internal_alb[terraform.workspace][count.index]
+  target_id        = var.instance_ids_ppud_internal_alb[terraform.workspace][count.index]
 }

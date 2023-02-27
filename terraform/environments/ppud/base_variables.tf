@@ -5,9 +5,9 @@ variable "networking" {
 variable "instance_ids_wam_alb" {
   type = map(list(string))
   default = {
-    dev  = ["aws_instance.s609693lo6vw105.id"]
-    uat  = ["aws_instance.s618358rgvw201.id"]
-  #  prod = ["i-0123456789abcdef", "i-abcdef0123456789"]
+    dev = ["aws_instance.s609693lo6vw105.id"]
+    uat = ["aws_instance.s618358rgvw201.id"]
+    #  prod = ["i-0123456789abcdef", "i-abcdef0123456789"]
   }
 }
 
