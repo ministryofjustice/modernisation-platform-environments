@@ -72,7 +72,7 @@ resource "aws_lb_target_group_attachment" "PPUD-PORTAL-1" {
 # WAM Internet Facing ALB
 
 resource "aws_lb" "WAM-ALB" {
-# count              = local.is-development == true ? 1 : 0
+  # count              = local.is-development == true ? 1 : 0
   name               = local.application_data.accounts[local.environment].DEV_WAM_ALB
   internal           = false
   load_balancer_type = "application"
@@ -87,7 +87,7 @@ resource "aws_lb" "WAM-ALB" {
 }
 
 resource "aws_lb_listener" "WAM-Front-End" {
-# load_balancer_arn = aws_lb.WAM-ALB[0].arn
+  # load_balancer_arn = aws_lb.WAM-ALB[0].arn
   load_balancer_arn = aws_lb.WAM-ALB.arn
   port              = "443"
   protocol          = "HTTPS"
@@ -132,7 +132,7 @@ resource "aws_lb_target_group_attachment" "WAM-Portal" {
 */
 
 resource "aws_lb_target_group_attachment" "target_group_attachment" {
-  count           = length(var.instance_ids_wam_alb[terraform.workspace])
+  count            = length(var.instance_ids_wam_alb[terraform.workspace])
   target_group_arn = aws_lb_target_group.WAM-Target-Group.arn
-  target_id       = var.instance_ids_wam_alb[terraform.workspace][count.index]
+  target_id        = var.instance_ids_wam_alb[terraform.workspace][count.index]
 }
