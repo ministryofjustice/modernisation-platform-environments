@@ -182,65 +182,65 @@ resource "aws_security_group" "oem_db_security_group" {
   vpc_id      = data.aws_vpc.shared.id
 
   ingress {
-    protocol  = "tcp"
-    from_port = 22
-    to_port   = 22
+    protocol    = "tcp"
+    from_port   = 22
+    to_port     = 22
     cidr_blocks = [data.aws_subnets.shared-public.ids]
   }
 
   ingress {
-    protocol  = "tcp"
-    from_port = 1159
-    to_port   = 1159
+    protocol    = "tcp"
+    from_port   = 1159
+    to_port     = 1159
     cidr_blocks = [data.aws_subnets.shared-public.ids]
   }
 
   ingress {
-    protocol  = "tcp"
-    from_port = 1521
-    to_port   = 1521
+    protocol    = "tcp"
+    from_port   = 1521
+    to_port     = 1521
     cidr_blocks = [data.aws_subnets.shared-public.ids]
   }
 
   ingress {
-    protocol  = "tcp"
-    from_port = 1830
-    to_port   = 1849
+    protocol    = "tcp"
+    from_port   = 1830
+    to_port     = 1849
     cidr_blocks = [data.aws_subnets.shared-public.ids]
   }
 
   ingress {
-    protocol  = "tcp"
-    from_port = 2049
-    to_port   = 2049
+    protocol    = "tcp"
+    from_port   = 2049
+    to_port     = 2049
     cidr_blocks = [data.aws_subnets.shared-public.ids]
   }
 
   ingress {
-    protocol  = "tcp"
-    from_port = 3872
-    to_port   = 3872
+    protocol    = "tcp"
+    from_port   = 3872
+    to_port     = 3872
     cidr_blocks = [data.aws_subnets.shared-public.ids]
   }
 
   ingress {
-    protocol  = "tcp"
-    from_port = 4889
-    to_port   = 4889
+    protocol    = "tcp"
+    from_port   = 4889
+    to_port     = 4889
     cidr_blocks = [data.aws_subnets.shared-public.ids]
   }
 
   ingress {
-    protocol  = "tcp"
-    from_port = 7101
-    to_port   = 7101
+    protocol    = "tcp"
+    from_port   = 7101
+    to_port     = 7101
     cidr_blocks = [data.aws_subnets.shared-public.ids]
   }
 
   ingress {
-    protocol  = "tcp"
-    from_port = 7799
-    to_port   = 7799
+    protocol    = "tcp"
+    from_port   = 7799
+    to_port     = 7799
     cidr_blocks = [data.aws_subnets.shared-public.ids]
   }
 

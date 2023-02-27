@@ -20,9 +20,9 @@ resource "aws_security_group" "oem-app-efs-sg" {
   vpc_id      = data.aws_vpc.shared.id
 
   ingress {
-    protocol  = "tcp"
-    from_port = 2049
-    to_port   = 2049
+    protocol    = "tcp"
+    from_port   = 2049
+    to_port     = 2049
     cidr_blocks = [data.aws_subnets.shared-public.ids]
   }
 
