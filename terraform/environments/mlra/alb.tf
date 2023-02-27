@@ -1,9 +1,4 @@
 module "alb" {
-  lifecycle {
-    replace_triggered_by = [
-      idle_timeout
-    ]
-  }
   source = "./modules/alb"
   providers = {
     aws.bucket-replication = aws
