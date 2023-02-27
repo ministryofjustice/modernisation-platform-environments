@@ -19,25 +19,46 @@ useradd -g oinstall applmgr
 FSTAB=/etc/fstab
 MOUNT_DIR=/mnt
 
-# Create the swap partition
-swapoff -a
-mkswap /dev/xvdi
-swapon -L swap1 /dev/xvdb
-echo "/dev/xvdi swap swap defaults 0 0" >> $${FSTAB}
+declare -A MOUNTS=(
+    [/dev/sdb]="swap"
+    [/dev/sdc]="APP"
+    [/dev/sdd]="INST"
+)
 
-# Create app mount point
-FS_LABEL="APP"
-FS_DIR=$${MOUNT_DIR}/oem/app
-mkdir -p $${FS_DIR}
-mkfs.ext4 -L $${FS_LABEL} /dev/xvdc
-echo "LABEL=$${FS_LABEL} $${MOUNT_DIR}/oem/app ext4 defaults 0 0" >> $${FSTAB}
+declare -A NVMES=()
+for n in /dev/nvme*n1; do
+    D=$(ebsnvme-id $${n} |grep '^/dev')
+    if [[ -n $${D} ]]; then
+        NVMES[$${n}]=$${D}
+    fi
+done
 
-# Create inst mount point
-FS_LABEL="INST"
-FS_DIR=$${MOUNT_DIR}/oem/inst
-mkdir -p $${FS_DIR}
-mkfs.ext4 -L $${FS_LABEL} /dev/xvdd
-echo "LABEL=$${FS_LABEL} $${MOUNT_DIR}/oem/inst ext4 defaults 0 0" >> $${FSTAB}
+#for k in $${!NVMES[@]}; do
+#    v=$${NVMES[$${k}]}
+#    echo "$${k} : $${v}"
+#done
+#
+# /dev/nvme3n1 : /dev/sdd
+# /dev/nvme2n1 : /dev/sdb
+# /dev/nvme1n1 : /dev/sdc
+
+for n in $${!NVMES[@]}; do
+    D=$${NVMES[$${n}]}
+    L=$${MOUNTS[$${D}]}
+#   echo "Mount $${D} as $${L}"
+    if [[ $${L} == "swap" ]]; then
+        swapoff -a
+        mkswap -L $${L} $${D}
+        swapon -L $${L}
+        echo "LABEL=$${L} swap swap defaults 0 0" >> $${FSTAB}
+    else
+        FS_DIR=$${MOUNT_DIR}/oem/$${L,,}
+        mkdir -p $${FS_DIR}
+        mkfs.ext4 -L $${L} $${D}
+        echo "LABEL=$${L} $${FS_DIR} ext4 defaults 0 0" >> $${FSTAB}
+        mount -L $${L}
+    fi
+done
 
 # File Permissions
 chown -R oracle:dba $${MOUNT_DIR}
@@ -51,7 +72,3 @@ echo "${efs_id}.eu-west-2.amazonaws.com:/ $${FS_DIR} nfs4 nfsvers=4.1,rsize=1048
 
 # Set hostname
 hostnamectl set-hostname ${hostname}
-
-# Mount all file systems in fstab
-sed -i '11d' $${FSTAB}
-mount -a
