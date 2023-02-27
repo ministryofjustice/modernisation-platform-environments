@@ -137,7 +137,7 @@ locals {
         alarm_actions       = [aws_sns_topic.nomis_nonprod_alarms.arn]
         dimensions = {
           instance = "nomis_long_running_batch"
-        } 
+        }
       }
       # oracleasm_service = {}
       # oracle_ohasd_service = {}
