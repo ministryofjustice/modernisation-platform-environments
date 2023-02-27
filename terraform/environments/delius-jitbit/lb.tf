@@ -82,10 +82,6 @@ resource "aws_lb_target_group" "target_group" {
     timeout             = "5"
   }
 
-  lifecycle {
-    create_before_destroy = true
-  }
-
   tags = merge(
     local.tags,
     {
