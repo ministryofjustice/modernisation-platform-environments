@@ -106,6 +106,12 @@ resource "aws_s3_bucket_versioning" "report_versioning" {
 resource "aws_iam_role" "codebuild_s3" {
   name               = "${var.app_name}-CodeBuildRole"
   assume_role_policy = file("${path.module}/codebuild_iam_role.json")
+  tags = merge(
+    var.tags_common,
+    {
+      Name = "${var.app_name}-CodeBuildRole"
+    }
+  )
 }
 
 data "template_file" "codebuild_policy" {
@@ -120,6 +126,12 @@ resource "aws_iam_role_policy" "codebuild_s3" {
   name   = "${var.app_name}-CodeBuildPolicy"
   role   = aws_iam_role.codebuild_s3.name
   policy = data.template_file.codebuild_policy.rendered
+  tags = merge(
+    var.tags_common,
+    {
+      Name = "${var.app_name}-CodeBuildPolicy"
+    }
+  )
 }
 
 resource "aws_codebuild_project" "selenium" {
