@@ -1,5 +1,4 @@
-resource "aws_db_instance" "tipstaffdbdev" {
-  provider               = aws.member-infra-access
+resource "aws_db_instance" "tftipstaffdb" {
   allocated_storage      = local.application_data.accounts[local.environment].allocated_storage
   db_name                = local.application_data.accounts[local.environment].db_name
   storage_type           = local.application_data.accounts[local.environment].storage_type
@@ -11,14 +10,7 @@ resource "aws_db_instance" "tipstaffdbdev" {
   password               = jsondecode(data.aws_secretsmanager_secret_version.db_password.secret_string)["LOCAL_DB_PASSWORD"]
   skip_final_snapshot    = true
   vpc_security_group_ids = [aws_security_group.postgresql_db_sc.id]
-  db_subnet_group_name   = aws_db_subnet_group.dbsubnetgroup.name
   publicly_accessible    = true
-}
-
-resource "aws_db_subnet_group" "dbsubnetgroup" {
-  provider   = aws.member-infra-access
-  name       = "dbsubnetgroup"
-  subnet_ids = [data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id]
 }
 
 resource "aws_security_group" "postgresql_db_sc" {
@@ -41,6 +33,7 @@ resource "aws_security_group" "postgresql_db_sc" {
     description = "Allows codebuild access to RDS"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
   egress {
     from_port   = 0
     to_port     = 0
