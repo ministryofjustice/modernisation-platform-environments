@@ -143,3 +143,4 @@ resource "aws_ssm_association" "ad_join_domain_association_preprod" {
    # values = var.instance_ids_ad_ids[terraform.workspace][count.index]
   }
 }
+
