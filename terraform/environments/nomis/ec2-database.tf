@@ -109,7 +109,7 @@ locals {
           instance = "db_connected"
         }
       }
-      oracle-batch-error = {
+      oracle-batch-failure = {
         comparison_operator = "GreaterThanOrEqualToThreshold"
         evaluation_periods  = "5"
         datapoints_to_alarm = "5"
@@ -118,14 +118,29 @@ locals {
         period              = "60"
         statistic           = "Average"
         threshold           = "1"
-        alarm_description   = "Oracle db is either in long-running batch or failed batch status. See: https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4295000327/Oracle+Batch+alert for remediation steps."
+        alarm_description   = "Oracle db has recorded a failed batch status. See: https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4295000327/Batch+Failure for remediation steps."
         alarm_actions       = [aws_sns_topic.nomis_nonprod_alarms.arn]
         dimensions = {
-          instance = "batch_error"
+          instance = "nomis_batch_failure_status"
         }
-        # oracleasm_service = {}
-        # oracle_ohasd_service = {}
       }
+      oracle-long-running-batch = {
+        comparison_operator = "GreaterThanOrEqualToThreshold"
+        evaluation_periods  = "5"
+        datapoints_to_alarm = "5"
+        metric_name         = "collectd_exec_value"
+        namespace           = "CWAgent"
+        period              = "60"
+        statistic           = "Average"
+        threshold           = "1"
+        alarm_description   = "Oracle db has recorded a long-running batch status. See: https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4325966186/Long+Running+Batch for remediation steps."
+        alarm_actions       = [aws_sns_topic.nomis_nonprod_alarms.arn]
+        dimensions = {
+          instance = "nomis_long_running_batch"
+        }
+      }
+      # oracleasm_service = {}
+      # oracle_ohasd_service = {}
     }
   }
 }
