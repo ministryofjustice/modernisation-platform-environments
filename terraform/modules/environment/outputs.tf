@@ -13,6 +13,16 @@ output "account_name" {
   value       = local.account_name
 }
 
+output "account_names" {
+  description = "list of all accounts for ghte given application, e.g. ['nomis-development', 'nomis-test', 'nomis-preproduction', 'nomis-production']"
+  value       = local.account_names
+}
+
+output "modernisation_platform_account_id" {
+  description = "id of the modernisation platform account retrieved from local ssm parameter"
+  value       = data.aws_ssm_parameter.modernisation_platform_account_id.value
+}
+
 output "account_id" {
   description = "id of the application account"
   value       = var.environment_management.account_ids[local.account_name]
@@ -36,6 +46,11 @@ output "subnet_set" {
 output "account_ids" {
   description = "account id map where the key is the account name and the value is the account id"
   value       = var.environment_management.account_ids
+}
+
+output "account_root_arns" {
+  description = "account arn map where the key is the account name and the value is the account id"
+  value       = { for name, id in var.environment_management.account_ids : name => "arn:aws:iam::${id}:root" }
 }
 
 output "access" {
