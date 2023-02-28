@@ -16,7 +16,7 @@ resource "aws_lb" "PPUD-ALB" {
   }
 }
 
-resource "aws_lb_listener" "PPUD-Front-End" {
+resource "aws_lb_listener" "PPUD-external-Front-End" {
   load_balancer_arn = aws_lb.PPUD-ALB[0].arn
   port              = "443"
   protocol          = "HTTPS"
@@ -29,7 +29,7 @@ resource "aws_lb_listener" "PPUD-Front-End" {
   }
 }
 
-resource "aws_lb_target_group" "PPUD-Target-Group" {
+resource "aws_lb_target_group" "PPUD-external-Target-Group" {
   name     = "PPUD"
   port     = 443
   protocol = "HTTPS"
