@@ -64,7 +64,7 @@ resource "aws_lb_target_group_attachment" "PPUD-PORTAL" {
 }
 */
 
-resource "aws_lb_target_group_attachment" "PPUD-PORTAL-1" {
+resource "aws_lb_target_group_attachment" "PPUD-PORTAL-internal" {
   target_group_arn = aws_lb_target_group.PPUD-Target-Group.arn
 # target_id        = aws_instance.PPUDWEBSERVER2[0].id
   target_id        = local.application_data.accounts[local.environment].alb_intances_ppud
