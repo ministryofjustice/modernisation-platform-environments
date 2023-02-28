@@ -6,7 +6,7 @@
       "db_name": "tipstaff-db-dev",
       "allocated_storage": "20",
       "storage_type": "gp2",
-      "identifier": "tipstaffDBdev",
+      "identifier": "tipstaff-db-dev",
       "engine": "postgres",
       "engine_version": "10.21",
       "instance_class": "db.t3.micro"
