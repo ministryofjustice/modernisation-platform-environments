@@ -15,11 +15,10 @@ module "alb" {
   enable_deletion_protection       = false
   idle_timeout                     = 60
   force_destroy_bucket             = true
-  security_group_ingress_from_port = 80
-  security_group_ingress_to_port   = 80
+  security_group_ingress_from_port = 443
+  security_group_ingress_to_port   = 443
   security_group_ingress_protocol  = "tcp"
-  ingress_cidr_block               = local.application_data.accounts[local.environment].lz_vpc_cidr
-  lz_workspace_ingress_cidr        = local.application_data.accounts[local.environment].lz_workspace_ingress_cidr
+  ingress_cidr_block               = local.application_data.accounts[local.environment].moj_vpn_cidr
   internal_lb                      = true
   # existing_bucket_name = "" # An s3 bucket name can be provided in the module by adding the `existing_bucket_name` variable and adding the bucket name
 
