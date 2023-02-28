@@ -62,7 +62,7 @@ resource "aws_lb_target_group" "target_group" {
   # checkov:skip=CKV_AWS_261
 
   name                 = "${local.application_name}-tg-${local.environment}"
-  port                 = local.app_data.accounts[local.environment].server_port
+  port                 = local.application_data.accounts[local.environment].server_port
   protocol             = "HTTP"
   vpc_id               = data.aws_vpc.shared.id
   target_type          = "instance"
