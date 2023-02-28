@@ -3,7 +3,7 @@
     "development": {
       "instance_type": "t2.nano",
       "moj_ip": "81.134.202.29/32",
-      "db_name": "tipstaffdbdev",
+      "db_name": "tipstaff-db-dev",
       "allocated_storage": "20",
       "storage_type": "gp2",
       "identifier": "tipstaff-db-dev",
