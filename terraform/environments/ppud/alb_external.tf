@@ -1,5 +1,5 @@
-/*
-# PPUD ALB Configuration
+
+# PPUD Internet Facing ALB
 
 resource "aws_lb" "PPUD-ALB" {
   count              = local.is-development == true ? 1 : 0
@@ -16,7 +16,7 @@ resource "aws_lb" "PPUD-ALB" {
   }
 }
 
-resource "aws_lb_listener" "PPUD-Front-End" {
+resource "aws_lb_listener" "PPUD-external-Front-End" {
   load_balancer_arn = aws_lb.PPUD-ALB[0].arn
   port              = "443"
   protocol          = "HTTPS"
@@ -29,7 +29,7 @@ resource "aws_lb_listener" "PPUD-Front-End" {
   }
 }
 
-resource "aws_lb_target_group" "PPUD-Target-Group" {
+resource "aws_lb_target_group" "PPUD-external-Target-Group" {
   name     = "PPUD"
   port     = 443
   protocol = "HTTPS"
@@ -69,11 +69,11 @@ resource "aws_lb_target_group_attachment" "PPUD-PORTAL-1" {
   port             = 443
 }
 
-# WAM ALB Configuration
+# WAM Internet Facing ALB
 
 resource "aws_lb" "WAM-ALB" {
-  count              = local.is-development == true ? 1 : 0
-  name               = "WAM-ALB"
+  # count              = local.is-development == true ? 1 : 0
+  name               = local.application_data.accounts[local.environment].DEV_WAM_ALB
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.WAM-ALB.id]
@@ -87,7 +87,8 @@ resource "aws_lb" "WAM-ALB" {
 }
 
 resource "aws_lb_listener" "WAM-Front-End" {
-  load_balancer_arn = aws_lb.WAM-ALB[0].arn
+  # load_balancer_arn = aws_lb.WAM-ALB[0].arn
+  load_balancer_arn = aws_lb.WAM-ALB.arn
   port              = "443"
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
@@ -121,10 +122,17 @@ resource "aws_lb_target_group" "WAM-Target-Group" {
   }
 }
 
+/*
 resource "aws_lb_target_group_attachment" "WAM-Portal" {
   target_group_arn = aws_lb_target_group.WAM-Target-Group.arn
-  target_id        = aws_instance.s609693lo6vw105[0].id
+# target_id        = aws_instance.s609693lo6vw105[0].id
+  target_id        = aws_instance.s609693lo6vw105.id
   port             = 80
 }
-
 */
+
+resource "aws_lb_target_group_attachment" "target_group_attachment" {
+  count            = length(var.instance_ids_wam_alb[terraform.workspace])
+  target_group_arn = aws_lb_target_group.WAM-Target-Group.arn
+  target_id        = var.instance_ids_wam_alb[terraform.workspace][count.index]
+}
