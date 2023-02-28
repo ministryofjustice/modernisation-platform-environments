@@ -111,6 +111,6 @@ module "s3_bucket_app_deployment" {
   tags = local.tags
 }
 
-output "s3_bucket_app_deployment" {
+output "s3_bucket_app_deployment_name" {
   value = module.s3_bucket_app_deployment.bucket.id
 }
