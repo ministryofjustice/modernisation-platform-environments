@@ -6,11 +6,7 @@ variable "instance_ids_wam_alb" {
   type = map(list(string))
   default = {
     development = ["aws_instance.s609693lo6vw105.id"]
-<<<<<<< HEAD
-    preproduction = ["aws_instance.s618358rgvw201.id"]
-=======
-    uat         = ["aws_instance.s618358rgvw201.id"]
->>>>>>> 05880098643bb09911bdf4673c1594fbad92b6d2
+    preprod = ["aws_instance.s618358rgvw201.id"]
     #  prod = ["i-0123456789abcdef", "i-abcdef0123456789"]
   }
 }
@@ -18,13 +14,8 @@ variable "instance_ids_wam_alb" {
 variable "instance_ids_ppud_internal_alb" {
   type = map(list(string))
   default = {
-<<<<<<< HEAD
-     preproduction  = ["aws_instance.s618358rgvw023.id"]
+     preprod = ["aws_instance.s618358rgvw023.id"]
   #  prod = ["i-0123456789abcdef", "i-abcdef0123456789"]
-=======
-    uat = ["aws_instance.s618358rgvw023.id"]
-    #  prod = ["i-0123456789abcdef", "i-abcdef0123456789"]
->>>>>>> 05880098643bb09911bdf4673c1594fbad92b6d2
   }
 }
 
