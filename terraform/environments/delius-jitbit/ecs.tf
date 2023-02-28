@@ -79,8 +79,7 @@ module "s3_bucket_app_deployment" {
   providers = {
     aws.bucket-replication = aws
   }
-
-  bucket_prefix      = "${local.application_name}-${local.environment}-app-deployment-"
+  bucket_prefix      = "${local.application_name}-${local.environment}-app-"
   versioning_enabled = true
 
   lifecycle_rule = [
