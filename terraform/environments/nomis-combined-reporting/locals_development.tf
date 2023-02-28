@@ -1,5 +1,18 @@
 locals {
   development_config = {
+
+    baseline_s3_buckets = {
+      #    ec2-image-builder-nomis-combined-reporting = {
+      #      custom_kms_key = module.environment.kms_keys["general"].arn
+      #      bucket_policy_v2 = [
+      #        module.baseline_presets.s3_bucket_policies.ImageBuilderWriteAccessBucketPolicy,
+      #        module.baseline_presets.s3_bucket_policies.AllEnvironmentsWriteAccessBucketPolicy
+      #      ]
+      #      iam_policies = module.baseline_presets.s3_iam_policies
+      #    }
+      #  }
+    }
+
     baseline_ec2_instances = {
       dev-redhat-rhel79-1 = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
