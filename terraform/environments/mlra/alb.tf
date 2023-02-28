@@ -18,7 +18,7 @@ module "alb" {
   security_group_ingress_from_port = 443
   security_group_ingress_to_port   = 443
   security_group_ingress_protocol  = "tcp"
-  ingress_cidr_block               = local.application_data.accounts[local.environment].moj_vpn_cidr
+  moj_vpn_cidr_block               = local.application_data.accounts[local.environment].moj_vpn_cidr
   internal_lb                      = true
   # existing_bucket_name = "" # An s3 bucket name can be provided in the module by adding the `existing_bucket_name` variable and adding the bucket name
 

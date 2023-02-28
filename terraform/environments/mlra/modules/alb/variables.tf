@@ -54,9 +54,9 @@ variable "security_group_ingress_protocol" {
   type        = string
   description = "The protocol for the lb ingress rules"
 }
-variable "ingress_cidr_block" {
+variable "moj_vpn_cidr_block" {
   type        = string
-  description = "The cidr block for the lb ingress rules"
+  description = "The cidr block for the lb ingress rules from MoJ VPN"
 }
 variable "listener_port" {
   type        = string

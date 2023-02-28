@@ -15,6 +15,12 @@ resource "aws_cloudwatch_metric_alarm" "esccpuoverthreshold" {
     ClusterName = var.pClusterName
   }
   comparison_operator = "GreaterThanThreshold"
+  tags = merge(
+    var.tags,
+    {
+      Name = "${var.appnameenv}-ECS-CPU-high-threshold-alarm"
+    }
+  )
 }
 
 resource "aws_cloudwatch_metric_alarm" "ecsmemoryoverthreshold" {
@@ -34,6 +40,12 @@ resource "aws_cloudwatch_metric_alarm" "ecsmemoryoverthreshold" {
     ClusterName = var.pClusterName
   }
   comparison_operator = "GreaterThanThreshold"
+  tags = merge(
+    var.tags,
+    {
+      Name = "${var.appnameenv}-ECS-Memory-Over-Threshold"
+    }
+  )
 }
 resource "aws_cloudwatch_metric_alarm" "cpuoverthreshold" {
 
@@ -53,6 +65,12 @@ resource "aws_cloudwatch_metric_alarm" "cpuoverthreshold" {
     AutoScalingGroupName = var.pAutoscalingGroupName
   }
   comparison_operator = "GreaterThanThreshold"
+  tags = merge(
+    var.tags,
+    {
+      Name = "${var.appnameenv}-CPU-high-threshold-alarm"
+    }
+  )
 }
 resource "aws_cloudwatch_metric_alarm" "statuscheckfailure" {
   alarm_name         = "${var.appnameenv}-status-check-failure-alarm"
@@ -71,6 +89,12 @@ resource "aws_cloudwatch_metric_alarm" "statuscheckfailure" {
     AutoScalingGroupName = var.pAutoscalingGroupName
   }
   comparison_operator = "GreaterThanThreshold"
+  tags = merge(
+    var.tags,
+    {
+      Name = "${var.appnameenv}-status-check-failure-alarm"
+    }
+  )
 }
 # Application Load Balancer Alerting
 resource "aws_cloudwatch_metric_alarm" "targetresponsetime" {
@@ -90,6 +114,12 @@ resource "aws_cloudwatch_metric_alarm" "targetresponsetime" {
     LoadBalancer = var.pLoadBalancerName
   }
   comparison_operator = "GreaterThanThreshold"
+  tags = merge(
+    var.tags,
+    {
+      Name = "${var.appnameenv}-alb-target-response-time-alarm"
+    }
+  )
 }
 resource "aws_cloudwatch_metric_alarm" "targetResponsetimemaximum" {
   alarm_name         = "${var.appnameenv}-alb-target-response-time-alarm-maximum"
@@ -108,6 +138,12 @@ resource "aws_cloudwatch_metric_alarm" "targetResponsetimemaximum" {
     LoadBalancer = var.pLoadBalancerName
   }
   comparison_operator = "GreaterThanThreshold"
+  tags = merge(
+    var.tags,
+    {
+      Name = "${var.appnameenv}-alb-target-response-time-alarm-maximum"
+    }
+  )
 }
 resource "aws_cloudwatch_metric_alarm" "unhealthyhosts" {
   alarm_name         = "${var.appnameenv}-unhealthy-hosts-alarm"
@@ -128,6 +164,12 @@ resource "aws_cloudwatch_metric_alarm" "unhealthyhosts" {
     TargetGroup  = var.pTargetGroupName
   }
   comparison_operator = "GreaterThanThreshold"
+  tags = merge(
+    var.tags,
+    {
+      Name = "${var.appnameenv}-unhealthy-hosts-alarm"
+    }
+  )
 }
 resource "aws_cloudwatch_metric_alarm" "rejectedconnectioncount" {
   alarm_name         = "${var.appnameenv}-RejectedConnectionCount-alarm"
@@ -146,6 +188,12 @@ resource "aws_cloudwatch_metric_alarm" "rejectedconnectioncount" {
     LoadBalancer = var.pLoadBalancerName
   }
   comparison_operator = "GreaterThanThreshold"
+  tags = merge(
+    var.tags,
+    {
+      Name = "${var.appnameenv}-RejectedConnectionCount-alarm"
+    }
+  )
 }
 resource "aws_cloudwatch_metric_alarm" "http5xxerror" {
   alarm_name         = "${var.appnameenv}-http-5xx-error-alarm"
@@ -165,6 +213,12 @@ resource "aws_cloudwatch_metric_alarm" "http5xxerror" {
     LoadBalancer = var.pLoadBalancerName
   }
   comparison_operator = "GreaterThanThreshold"
+  tags = merge(
+    var.tags,
+    {
+      Name = "${var.appnameenv}-http-5xx-error-alarm"
+    }
+  )
 }
 resource "aws_cloudwatch_metric_alarm" "applicationelb5xxerror" {
   alarm_name         = "${var.appnameenv}-elb-5xx-error-alarm"
@@ -184,6 +238,12 @@ resource "aws_cloudwatch_metric_alarm" "applicationelb5xxerror" {
     LoadBalancer = var.pLoadBalancerName
   }
   comparison_operator = "GreaterThanThreshold"
+  tags = merge(
+    var.tags,
+    {
+      Name = "${var.appnameenv}-elb-5xx-error-alarm"
+    }
+  )
 }
 resource "aws_cloudwatch_metric_alarm" "http4xxerror" {
   alarm_name         = "${var.appnameenv}-http-4xx-error-alarm"
@@ -203,6 +263,12 @@ resource "aws_cloudwatch_metric_alarm" "http4xxerror" {
     LoadBalancer = var.pLoadBalancerName
   }
   comparison_operator = "GreaterThanThreshold"
+  tags = merge(
+    var.tags,
+    {
+      Name = "${var.appnameenv}-http-4xx-error-alarm"
+    }
+  )
 }
 resource "aws_cloudwatch_metric_alarm" "applicationelb4xxerror" {
   alarm_name         = "${var.appnameenv}-elb-4xx-error-alarm"
@@ -222,6 +288,12 @@ resource "aws_cloudwatch_metric_alarm" "applicationelb4xxerror" {
     LoadBalancer = var.pLoadBalancerName
   }
   comparison_operator = "GreaterThanThreshold"
+  tags = merge(
+    var.tags,
+    {
+      Name = "${var.appnameenv}-elb-4xx-error-alarm"
+    }
+  )
 }
 resource "aws_cloudwatch_dashboard" "mlradash" {
   dashboard_name = "MLRA"
@@ -333,6 +405,12 @@ EOF
 # SNS topic for monitoring to send alarms to
 resource "aws_sns_topic" "mlra_alerting_topic" {
   name = var.sns_topic_name
+  tags = merge(
+    var.tags,
+    {
+      Name = var.sns_topic_name
+    }
+  )
 }
 
 resource "aws_sns_topic_subscription" "pagerduty_subscription" {
