@@ -36,7 +36,6 @@ mount -a
 
 EOF
 
-
   metadata_options {
     http_endpoint = "enabled"
     http_tokens   = "required"
