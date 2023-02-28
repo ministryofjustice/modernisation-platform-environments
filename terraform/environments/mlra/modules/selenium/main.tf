@@ -107,7 +107,7 @@ resource "aws_iam_role" "codebuild_s3" {
   name               = "${var.app_name}-CodeBuildRole"
   assume_role_policy = file("${path.module}/codebuild_iam_role.json")
   tags = merge(
-    var.tags_common,
+    var.tags,
     {
       Name = "${var.app_name}-CodeBuildRole"
     }
@@ -127,7 +127,7 @@ resource "aws_iam_role_policy" "codebuild_s3" {
   role   = aws_iam_role.codebuild_s3.name
   policy = data.template_file.codebuild_policy.rendered
   tags = merge(
-    var.tags_common,
+    var.tags,
     {
       Name = "${var.app_name}-CodeBuildPolicy"
     }
