@@ -6,23 +6,24 @@ module "ecs" {
 
   subnet_set_name         = local.subnet_set_name
   app_name                = local.application_name
-  container_instance_type = local.app_data.accounts[local.environment].container_instance_type
+  container_instance_type = local.application_data.accounts[local.environment].container_instance_type
   ami_image_id            = data.aws_ami.ecs_ami.id
-  instance_type           = local.app_data.accounts[local.environment].instance_type
+
+  instance_type = local.application_data.accounts[local.environment].instance_type
   user_data = base64encode(templatefile("templates/user-data.txt", {
     CLUSTER_NAME = local.application_name
   }))
-  key_name               = local.app_data.accounts[local.environment].key_name
+  key_name               = local.application_data.accounts[local.environment].key_name
   task_definition        = local.task_definition
-  ec2_desired_capacity   = local.app_data.accounts[local.environment].ec2_desired_capacity
-  ec2_max_size           = local.app_data.accounts[local.environment].ec2_max_size
-  ec2_min_size           = local.app_data.accounts[local.environment].ec2_min_size
-  container_cpu          = local.app_data.accounts[local.environment].container_cpu
-  container_memory       = local.app_data.accounts[local.environment].container_memory
-  task_definition_volume = local.app_data.accounts[local.environment].task_definition_volume
-  network_mode           = local.app_data.accounts[local.environment].network_mode
-  server_port            = local.app_data.accounts[local.environment].server_port
-  app_count              = local.app_data.accounts[local.environment].app_count
+  ec2_desired_capacity   = local.application_data.accounts[local.environment].ec2_desired_capacity
+  ec2_max_size           = local.application_data.accounts[local.environment].ec2_max_size
+  ec2_min_size           = local.application_data.accounts[local.environment].ec2_min_size
+  container_cpu          = local.application_data.accounts[local.environment].container_cpu
+  container_memory       = local.application_data.accounts[local.environment].container_memory
+  task_definition_volume = local.application_data.accounts[local.environment].task_definition_volume
+  network_mode           = local.application_data.accounts[local.environment].network_mode
+  server_port            = local.application_data.accounts[local.environment].server_port
+  app_count              = local.application_data.accounts[local.environment].app_count
   tags_common            = local.tags
   lb_tg_name             = aws_lb_target_group.target_group.name
   ec2_ingress_rules      = local.ec2_ingress_rules
