@@ -111,3 +111,7 @@ module "s3_bucket_app_deployment" {
 
   tags = local.tags
 }
+
+output "s3_bucket_app_deployment" {
+  value = s3_bucket_app_deployment.bucket
+}
