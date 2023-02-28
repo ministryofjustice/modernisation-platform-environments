@@ -73,6 +73,5 @@ resource "aws_lb_target_group_attachment" "PPUD-PORTAL-1" {
 resource "aws_lb_target_group_attachment" "target_group_attachment_1" {
   count            = length(var.instance_ids_ppud_internal_alb[terraform.workspace])
   target_group_arn = aws_lb_target_group.PPUD-Target-Group.arn
-# target_id        = var.instance_ids_ppud_internal_alb[terraform.workspace][count.index]
-  target_id        = aws_instance.PPUDWEBSERVER2[0].id
-}
+  target_id        = var.instance_ids_ppud_internal_alb[terraform.workspace][count.index]
+ }
