@@ -8,14 +8,6 @@ locals {
       cidr_blocks     = [var.ingress_cidr_block]
       security_groups = []
     }
-    "lb_workspace_ingress" = {
-      description     = "LB workspace ingress rule"
-      from_port       = var.security_group_ingress_from_port
-      to_port         = var.security_group_ingress_to_port
-      protocol        = var.security_group_ingress_protocol
-      cidr_blocks     = [var.lz_workspace_ingress_cidr]
-      security_groups = []
-    }
   }
   loadbalancer_egress_rules = {
     "lb_egress" = {
@@ -243,6 +235,14 @@ resource "aws_athena_workgroup" "lb-access-logs" {
       }
     }
   }
+
+  tags = merge(
+    var.tags,
+    {
+      Name = "${var.application_name}-lb-access-logs"
+    }
+  )
+
 }
 
 resource "aws_lb_listener" "alb_listener" {
@@ -277,6 +277,9 @@ resource "aws_lb_listener" "alb_listener" {
 
     target_group_arn = aws_lb_target_group.alb_target_group.arn
   }
+
+  tags = var.tags
+
 }
 
 resource "aws_lb_listener_rule" "alb_listener_rule" {
@@ -338,8 +341,11 @@ resource "aws_lb_target_group" "alb_target_group" {
     cookie_duration = var.stickiness_cookie_duration
   }
 
-  tags = {
-    Name = "${var.application_name}-alb-tg"
-  }
+  tags = merge(
+    var.tags,
+    {
+      Name = "${var.application_name}-alb-tg"
+    },
+  )
 
 }
