@@ -149,7 +149,7 @@ resource "aws_ebs_volume" "oem_db_volume_ccms_oem_redo" {
 resource "aws_volume_attachment" "oem_db_volume_ccms_oem_redo" {
   instance_id = aws_instance.oem_db.id
   volume_id   = aws_ebs_volume.oem_db_volume_ccms_oem_redo.id
-  device_name = "/dev/sde"
+  device_name = "/dev/sdf"
 }
 
 resource "aws_ebs_volume" "oem_db_volume_ccms_oem_archive" {
@@ -173,7 +173,7 @@ resource "aws_ebs_volume" "oem_db_volume_ccms_oem_archive" {
 resource "aws_volume_attachment" "oem_db_volume_ccms_oem_archive" {
   instance_id = aws_instance.oem_db.id
   volume_id   = aws_ebs_volume.oem_db_volume_ccms_oem_archive.id
-  device_name = "/dev/sde"
+  device_name = "/dev/sdg"
 }
 
 resource "aws_security_group" "oem_db_security_group" {
