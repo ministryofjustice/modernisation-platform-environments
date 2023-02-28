@@ -1,4 +1,4 @@
-resource "aws_db_instance" "tftipstaffdb" {
+resource "aws_db_instance" "tipstaffdbdev" {
   provider               = aws.member-infra-access
   allocated_storage      = local.application_data.accounts[local.environment].allocated_storage
   db_name                = local.application_data.accounts[local.environment].db_name
