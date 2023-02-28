@@ -60,9 +60,9 @@ resource "aws_iam_role_policy_attachment" "this" {
 resource "aws_iam_service_linked_role" "this" {
   for_each = var.iam_service_linked_roles
 
-  name          = each.key
-  custom_suffix = each.value.custom_suffix
-  description   = each.value.description
+  aws_service_name = each.key
+  custom_suffix    = each.value.custom_suffix
+  description      = each.value.description
   tags = merge(local.tags, each.value.tags, {
     Name = "each.key"
   })
