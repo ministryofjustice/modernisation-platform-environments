@@ -1,0 +1,4 @@
+locals {
+  test_config = {
+  }
+}
