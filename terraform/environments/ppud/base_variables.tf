@@ -30,7 +30,7 @@ variable "instance_ids_ad_name" {
   }
 }
 
-*/
+
 
 variable "instance_ids_ad_ids" {
   type = map(list(string))
@@ -40,3 +40,5 @@ variable "instance_ids_ad_ids" {
   #  prod = ["i-0123456789abcdef", "i-abcdef0123456789"]
   }
 }
+
+*/
