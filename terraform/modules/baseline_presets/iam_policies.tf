@@ -25,7 +25,7 @@ locals {
         }, {
         effect = "Allow"
         actions = [
-          "DescribeLaunchTemplates"
+          "ec2:DescribeLaunchTemplates"
         ]
         resources = ["arn:aws:ec2:*:*:launch-template/*"]
         conditions = [{
