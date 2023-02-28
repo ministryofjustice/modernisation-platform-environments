@@ -29,7 +29,7 @@ locals {
 module "s3_bucket" {
   for_each = var.s3_buckets
 
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=feature/one-pass-custom-bucket-policy"
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.3.0"
 
   providers = {
     aws.bucket-replication = aws
