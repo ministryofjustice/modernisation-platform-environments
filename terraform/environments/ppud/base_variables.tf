@@ -5,8 +5,8 @@ variable "networking" {
 variable "instance_ids_wam_alb" {
   type = map(list(string))
   default = {
-    "development" = ["aws_instance.s609693lo6vw105.id"]
-    "preprod" = ["aws_instance.s618358rgvw201.id"]
+    "development" = [data.aws_instance.s609693lo6vw105.id]
+    "preprod" = [data.aws_instance.s618358rgvw201.id]
     #  prod = ["i-0123456789abcdef", "i-abcdef0123456789"]
   }
 }
@@ -14,7 +14,7 @@ variable "instance_ids_wam_alb" {
 variable "instance_ids_ppud_internal_alb" {
   type = map(list(string))
   default = {
-     "preprod" = ["aws_instance.s618358rgvw023.id"]
+     "preprod" = [data.aws_instance.s618358rgvw023.id]
   #  prod = ["i-0123456789abcdef", "i-abcdef0123456789"]
   }
 }
