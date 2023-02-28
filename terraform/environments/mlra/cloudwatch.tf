@@ -10,7 +10,7 @@ data "aws_secretsmanager_secret_version" "pagerduty_integration_keys" {
 
 module "cwalarm" {
   source = "./modules/cloudwatch"
-
+  tags                  = local.tags
   pClusterName          = local.application_name
   pAutoscalingGroupName = "${local.application_name}-cluster-scaling-group"
   pLoadBalancerName     = module.alb.load_balancer.arn_suffix

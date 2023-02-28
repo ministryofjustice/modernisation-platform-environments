@@ -2,6 +2,11 @@ variable "region" {
   default = "eu-west-2"
 
 }
+variable "tags" {
+  type        = map(string)
+  description = "Common tags to be used by all resources"
+}
+
 variable "pClusterName" {
   type    = string
   default = ""
