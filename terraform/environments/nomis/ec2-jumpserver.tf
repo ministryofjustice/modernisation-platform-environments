@@ -138,24 +138,3 @@ resource "aws_iam_policy" "jumpserver_users" {
     }
   )
 }
-
-# resource policy to restrict access to secret value to specific user and the CICD role used to deploy terraform
-# checkov:skip=CKV_AWS_108:This is necessary, so just skip it
-data "aws_iam_policy_document" "jumpserver_secrets" {
-  for_each = toset(data.github_team.dso_users.members)
-
-  statement {
-    effect = "Allow"
-    actions = [
-      "secretsmanager:GetSecretValue",
-      "secretsmanager:DescribeSecret",
-      "secretsmanager:ListSecretVersionIds",
-      "secretsmanager:ListSecrets",
-    ]
-    resources = ["*"]
-    principals {
-      type        = "AWS"
-      identifiers = [data.aws_caller_identity.current.id]
-    }
-  }
-}

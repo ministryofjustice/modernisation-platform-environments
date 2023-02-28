@@ -15,7 +15,3 @@ data "aws_caller_identity" "current" {}
 data "aws_iam_role" "member_infrastructure_access" {
   name = "MemberInfrastructureAccess"
 }
-
-data "github_team" "dso_users" {
-  slug = "studio-webops"
-}
