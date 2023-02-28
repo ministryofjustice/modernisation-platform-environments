@@ -5,6 +5,7 @@ variable "environment" {
 variable "options" {
   description = "Map of options controlling what resources to return"
   type = object({
+    cloudwatch_log_groups                        = optional(list(string))
     enable_application_environment_wildcard_cert = optional(bool, false)
     enable_business_unit_kms_cmks                = optional(bool, false)
     enable_image_builder                         = optional(bool, false)

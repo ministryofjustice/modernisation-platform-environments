@@ -6,6 +6,32 @@ output "acm_certificates" {
   }
 }
 
+output "cloudwatch_log_groups" {
+  description = "Map of log groups"
+
+  value = var.options.cloudwatch_log_groups != null ? {
+    for key, value in local.cloudwatch_log_groups : key => value if contains(var.options.cloudwatch_log_groups, key)
+  } : local.cloudwatch_log_groups
+}
+
+output "ec2_autoscaling_group" {
+  description = "Common EC2 autoscaling group configuration for ec2_autoscaling_group module"
+
+  value = local.ec2_autoscaling_group
+}
+
+output "ec2_autoscaling_schedules" {
+  description = "Common EC2 autoscaling schedules configuration for ec2_autoscaling_group module"
+
+  value = local.ec2_autoscaling_schedules
+}
+
+output "ec2_instance" {
+  description = "Common EC2 instance configuration for ec2_instance module"
+
+  value = local.ec2_instance
+}
+
 output "iam_roles" {
   description = "Map of iam roles to create depending on options provided"
 
@@ -22,6 +48,12 @@ output "iam_policies" {
   }
 }
 
+output "key_pairs" {
+  description = "Common key pairs to create"
+
+  value = local.key_pairs
+}
+
 output "kms_grants" {
   description = "Map of kms grants to create depending on options provided"
 
@@ -30,8 +62,14 @@ output "kms_grants" {
   }
 }
 
+output "s3_bucket_policies" {
+  description = "Map of common bucket policies to use on s3_buckets"
+
+  value = local.s3_bucket_policies
+}
+
 output "s3_iam_policies" {
-  description = "Map of iam_policies that can be used to give access to s3_buckets"
+  description = "Map of common iam_policies that can be used to give access to s3_buckets"
 
   value = var.options.s3_iam_policies != null ? {
     for key, value in local.s3_iam_policies : key => value if contains(var.options.s3_iam_policies, key)
