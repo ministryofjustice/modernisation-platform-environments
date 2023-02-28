@@ -11,7 +11,7 @@ resource "aws_db_instance" "tipstaffdbdev" {
   password               = jsondecode(data.aws_secretsmanager_secret_version.db_password.secret_string)["LOCAL_DB_PASSWORD"]
   skip_final_snapshot    = true
   vpc_security_group_ids = [aws_security_group.postgresql_db_sc.id]
-  db_subnet_group_name   = data.aws_subnets.shared-data.id
+  db_subnet_group_name   = data.aws_subnets.shared-data
   publicly_accessible    = true
 }
 
