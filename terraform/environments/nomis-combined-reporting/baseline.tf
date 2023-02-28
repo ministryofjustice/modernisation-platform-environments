@@ -10,8 +10,11 @@ module "baseline" {
 
   environment = module.environment
 
-  security_groups          = local.baseline_security_groups
-  acm_certificates         = module.baseline_presets.acm_certificates
+  security_groups = local.baseline_security_groups
+
+  # commenting out certs for now - needs some work to do enable in a single pass
+  # acm_certificates         = module.baseline_presets.acm_certificates
+
   cloudwatch_log_groups    = module.baseline_presets.cloudwatch_log_groups
   iam_policies             = module.baseline_presets.iam_policies
   iam_roles                = module.baseline_presets.iam_roles
