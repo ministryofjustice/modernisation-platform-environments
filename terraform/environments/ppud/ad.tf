@@ -124,9 +124,9 @@ resource "aws_ssm_association" "ad_join_domain_association_dev" {
   # name       = aws_ssm_document.api_ad_join_domain[0].name
   name = aws_ssm_document.api_ad_join_domain.name
   targets {
-    key = "InstanceIds"
+    key    = "InstanceIds"
     values = [aws_instance.s609693lo6vw109[0].id, aws_instance.s609693lo6vw105[0].id, aws_instance.s609693lo6vw104[0].id, aws_instance.s609693lo6vw100[0].id, aws_instance.s609693lo6vw101[0].id, aws_instance.s609693lo6vw103[0].id, aws_instance.s609693lo6vw106[0].id, aws_instance.s609693lo6vw107[0].id, aws_instance.PPUDWEBSERVER2[0].id, aws_instance.s609693lo6vw102[0].id, aws_instance.s609693lo6vw108[0].id, aws_instance.PPUD-DEV-AWS-AD[0].id]
-  # values = var.instance_ids_ad_ids[terraform.workspace][count.index]
+    # values = var.instance_ids_ad_ids[terraform.workspace][count.index]
   }
 }
 
@@ -138,8 +138,8 @@ resource "aws_ssm_association" "ad_join_domain_association_preprod" {
   # name       = aws_ssm_document.api_ad_join_domain[0].name
   name = aws_ssm_document.api_ad_join_domain.name
   targets {
-    key = "InstanceIds"
+    key    = "InstanceIds"
     values = [aws_instance.s609693lo6vw109[0].id, aws_instance.s609693lo6vw105[0].id, aws_instance.s609693lo6vw104[0].id, aws_instance.s609693lo6vw100[0].id, aws_instance.s609693lo6vw101[0].id, aws_instance.s609693lo6vw103[0].id, aws_instance.s609693lo6vw106[0].id, aws_instance.s609693lo6vw107[0].id, aws_instance.PPUDWEBSERVER2[0].id, aws_instance.s609693lo6vw102[0].id, aws_instance.s609693lo6vw108[0].id, aws_instance.PPUD-DEV-AWS-AD[0].id]
-  # values = var.instance_ids_ad_ids[terraform.workspace][count.index]
+    # values = var.instance_ids_ad_ids[terraform.workspace][count.index]
   }
 }
