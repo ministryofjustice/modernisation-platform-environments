@@ -58,7 +58,7 @@ output "kms_grants" {
   description = "Map of kms grants to create depending on options provided"
 
   value = {
-    for key, value in local.kms_grants : key => value if contains(local.iam_policies_filter, key)
+    for key, value in local.kms_grants : key => value if contains(local.kms_grants_filter, key)
   }
 }
 
