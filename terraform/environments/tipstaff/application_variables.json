@@ -18,8 +18,8 @@
       "example_var": "preproduction-data"
     },
     "production": {
-      "instance_type" : "t2.nano",
-      "moj_ip" : "81.134.202.29/32",
+      "instance_type": "t2.nano",
+      "moj_ip": "81.134.202.29/32",
       "db_name": "tipstaff-db-prod",
       "allocated_storage": "20",
       "storage_type": "gp2",
