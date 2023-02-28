@@ -126,12 +126,6 @@ resource "aws_iam_role_policy" "codebuild_s3" {
   name   = "${var.app_name}-CodeBuildPolicy"
   role   = aws_iam_role.codebuild_s3.name
   policy = data.template_file.codebuild_policy.rendered
-  tags = merge(
-    var.tags,
-    {
-      Name = "${var.app_name}-CodeBuildPolicy"
-    }
-  )
 }
 
 resource "aws_codebuild_project" "selenium" {
