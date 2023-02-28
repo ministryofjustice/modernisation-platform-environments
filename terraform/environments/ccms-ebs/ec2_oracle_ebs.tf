@@ -64,7 +64,8 @@ EOF
   */
   tags = merge(local.tags,
     { Name = lower(format("ec2-%s-%s-Oracle-EBS-db", local.application_name, local.environment)) },
-    { instance-scheduling = "skip-scheduling" }
+    { instance-scheduling = "skip-scheduling" },
+    { backup = "true" }
   )
   depends_on = [aws_security_group.ec2_sg_ebsdb]
 }
