@@ -17,4 +17,8 @@ locals {
       ]
     }
   }
+
+  iam_service_linked_roles = {
+    "autoscaling.amazonaws.com" = {}
+  }
 }

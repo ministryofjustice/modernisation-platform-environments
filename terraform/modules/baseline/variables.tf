@@ -275,6 +275,18 @@ variable "iam_roles" {
     assume_role_policy_principals_type        = string
     assume_role_policy_principals_identifiers = list(string)
     policy_attachments                        = optional(list(string), [])
+    tags                                      = optional(map(string), {})
+  }))
+  default = {}
+}
+
+variable "iam_service_linked_roles" {
+  description = "map of service linked roles to create, where key is the name of the service"
+  for_each    = var.iam_service_linked_roles
+  type = map(object({
+    custom_suffix = optional(string)
+    description   = optional(string)
+    tags          = optional(map(string), {})
   }))
   default = {}
 }

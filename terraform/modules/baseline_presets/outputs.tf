@@ -40,6 +40,12 @@ output "iam_roles" {
   }
 }
 
+output "iam_service_linked_roles" {
+  description = "Map of common service linked roles to create"
+
+  value = local.iam_service_linked_roles
+}
+
 output "iam_policies" {
   description = "Map of iam policies to create depending on options provided"
 

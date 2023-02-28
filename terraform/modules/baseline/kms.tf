@@ -5,4 +5,10 @@ resource "aws_kms_grant" "this" {
   key_id            = each.value.key_id
   grantee_principal = each.value.grantee_principal
   operations        = each.value.operations
+
+  # ensure principals are created first
+  depends_on = [
+    aws_iam_role.this,
+    aws_iam_service_linked_role.this
+  ]
 }

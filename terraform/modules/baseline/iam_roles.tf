@@ -45,7 +45,7 @@ resource "aws_iam_role" "this" {
   name               = each.key
   assume_role_policy = data.aws_iam_policy_document.assume_role[each.key].json
 
-  tags = merge(local.tags, {
+  tags = merge(local.tags, each.value.tags, {
     Name = "each.key"
   })
 }
@@ -55,4 +55,15 @@ resource "aws_iam_role_policy_attachment" "this" {
 
   policy_arn = lookup(aws_iam_policy.this, each.value.policy, null) != null ? aws_iam_policy.this[each.value.policy].arn : each.value.policy
   role       = aws_iam_role.this[each.value.role].name
+}
+
+resource "aws_iam_service_linked_role" "this" {
+  for_each = var.iam_service_linked_roles
+
+  name          = each.key
+  custom_suffix = each.value.custom_suffix
+  description   = each.value.description
+  tags = merge(local.tags, each.value.tags, {
+    Name = "each.key"
+  })
 }
