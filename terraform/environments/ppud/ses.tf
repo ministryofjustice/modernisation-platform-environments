@@ -6,7 +6,7 @@ resource "aws_ses_domain_identity" "ppud" {
 
 resource "aws_ses_domain_identity_verification" "ppud_verification" {
   domain = aws_ses_domain_identity.ppud[0].id
- 
+
 
   timeouts {
     create = "40m"
@@ -23,7 +23,7 @@ resource "aws_ses_domain_identity" "DKIM-Identity" {
 
 resource "aws_ses_domain_dkim" "Domain-DKIM" {
   domain = aws_ses_domain_identity.DKIM-Identity[0].domain
-  }
+}
 
 #Domain Identity MAIL FROM
 
