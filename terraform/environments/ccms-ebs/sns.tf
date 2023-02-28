@@ -14,9 +14,7 @@ resource "aws_secretsmanager_secret_version" "support_email_account" {
   depends_on = [
     aws_secretsmanager_secret.support_email_account
   ]
-
 }
-
 
 #### SNS ####
 resource "aws_sns_topic" "cw_alerts" {

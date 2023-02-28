@@ -136,7 +136,7 @@ resource "aws_security_group_rule" "ingress_traffic_webgate" {
   protocol          = each.value.protocol
   from_port         = each.value.from_port
   to_port           = each.value.to_port
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block, "0.0.0.0/0"]
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block, "0.0.0.0/0", "10.200.0.0/20"]
 }
 resource "aws_security_group_rule" "egress_traffic_webgate_sg" {
   for_each                 = local.application_data.ec2_sg_egress_rules
@@ -176,7 +176,7 @@ resource "aws_security_group_rule" "ingress_traffic_accessgate" {
   protocol          = each.value.protocol
   from_port         = each.value.from_port
   to_port           = each.value.to_port
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block, "0.0.0.0/0"]
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block, "0.0.0.0/0", "10.200.0.0/20"]
 }
 resource "aws_security_group_rule" "egress_traffic_accessgate_sg" {
   for_each                 = local.application_data.ec2_sg_egress_rules
