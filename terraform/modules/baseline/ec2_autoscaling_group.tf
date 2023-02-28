@@ -59,4 +59,9 @@ module "ec2_autoscaling_group" {
   lb_target_groups      = each.value.lb_target_groups
 
   tags = each.value.tags
+
+  # ensure service linked role is created first if defined in code
+  depends_on = [
+    aws_iam_service_linked_role.this
+  ]
 }
