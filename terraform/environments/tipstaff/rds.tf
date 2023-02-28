@@ -34,20 +34,6 @@ resource "aws_security_group" "postgresql_db_sc" {
     description = "Allows codebuild access to RDS"
     cidr_blocks = ["0.0.0.0/0"]
   }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-}
-
-resource "aws_security_group" "vpc-secgroup" {
-  name        = "vpc-secgroup"
-  description = "RDS Access with the shared vpc"
-  vpc_id      = data.aws_vpc.shared.id
   ingress {
     from_port   = 5432
     to_port     = 5432
@@ -55,11 +41,17 @@ resource "aws_security_group" "vpc-secgroup" {
     description = "Allows default VPC to access to RDS"
     cidr_blocks = [data.aws_vpc.shared.cidr_block]
   }
-
   egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+   egress {
     from_port   = 0
     to_port     = 0
     protocol    = "tcp"
     cidr_blocks = [data.aws_vpc.shared.cidr_block]
   }
+
 }
