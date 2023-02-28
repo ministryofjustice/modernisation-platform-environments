@@ -19,6 +19,8 @@ variable "instance_ids_ppud_internal_alb" {
   }
 }
 
+/*
+
 variable "instance_ids_ad_name" {
   type = map(list(string))
   default = {
@@ -27,6 +29,8 @@ variable "instance_ids_ad_name" {
   #  prod = ["i-0123456789abcdef", "i-abcdef0123456789"]
   }
 }
+
+*/
 
 variable "instance_ids_ad_ids" {
   type = map(list(string))
