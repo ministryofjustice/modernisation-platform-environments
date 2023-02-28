@@ -1,4 +1,4 @@
-# PPUD Intenral ALB
+# PPUD Internal ALB
 
 resource "aws_lb" "PPUD-internal-ALB" {
   count              = local.is-development == false ? 1 : 0
@@ -62,16 +62,20 @@ resource "aws_lb_target_group_attachment" "PPUD-PORTAL" {
   target_id        = aws_instance.s609693lo6vw101[0].id
   port             = 443
 }
+*/
 
 resource "aws_lb_target_group_attachment" "PPUD-PORTAL-1" {
   target_group_arn = aws_lb_target_group.PPUD-Target-Group.arn
-  target_id        = aws_instance.PPUDWEBSERVER2[0].id
+# target_id        = aws_instance.PPUDWEBSERVER2[0].id
+  target_id        = local.application_data.accounts[local.environment].alb_intances_ppud
   port             = 443
 }
-*/
 
+
+/*
 resource "aws_lb_target_group_attachment" "target_group_attachment_1" {
   count            = length(var.instance_ids_ppud_internal_alb[terraform.workspace])
   target_group_arn = aws_lb_target_group.PPUD-Target-Group.arn
   target_id        = var.instance_ids_ppud_internal_alb[terraform.workspace][count.index]
  }
+ */
