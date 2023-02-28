@@ -31,7 +31,7 @@ data "aws_iam_policy_document" "assume_role" {
     principals {
       type = each.value.assume_role_policy_principals_type
 
-      # allow account names to be specified rather than the full arn
+      # allow account names to be specified rather than the full arn
       identifiers = [for id in each.value.assume_role_policy_principals_identifiers :
         lookup(var.environment.account_root_arns, id, null) != null ? var.environment.account_root_arns[id] : id
       ]

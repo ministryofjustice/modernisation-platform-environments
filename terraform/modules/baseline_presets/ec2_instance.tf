@@ -24,7 +24,7 @@ locals {
 
     instance = {
 
-      # assumes there is a 'private' security group created
+      # assumes there is a 'private' security group created
       default = {
         disable_api_termination      = false
         instance_type                = "t3.medium"

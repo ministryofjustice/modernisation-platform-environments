@@ -1,6 +1,6 @@
 locals {
 
-  # get list of policy names
+  # get list of policy names
   s3_buckets_iam_policy_names = distinct(flatten([
     for s3_key, s3_value in var.s3_buckets : keys(s3_value.iam_policies)
   ]))

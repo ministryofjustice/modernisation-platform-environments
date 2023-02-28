@@ -7,7 +7,7 @@ locals {
   # Unfortunately, the individual aws_security_group_rule doesn't allow combined 
   # self/cidr/security_groups to we split them out here.
 
-  # flatten security group rules
+  # flatten security group rules
   security_group_rule_list = [[
     for sg_key, sg_value in var.security_groups : [
       for rule_key, rule_value in sg_value.ingress : {
@@ -73,7 +73,7 @@ locals {
     local.security_group_rule_list_others]) : item.key => item.value
   }
 
-  # get map of security group ids that can be referenced by the rules
+  # get map of security group ids that can be referenced by the rules
   security_group_ids_bastion = length(module.bastion_linux) == 1 ? {
     bastion-linux = module.bastion_linux[0].bastion_security_group
   } : {}
