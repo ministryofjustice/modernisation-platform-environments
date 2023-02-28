@@ -118,6 +118,7 @@ locals {
         period              = "60"
         statistic           = "Average"
         threshold           = "1"
+        treat_missing_data  = "notBreaching"
         alarm_description   = "Oracle db has recorded a failed batch status. See: https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4295000327/Batch+Failure for remediation steps."
         alarm_actions       = [aws_sns_topic.nomis_nonprod_alarms.arn]
         dimensions = {
@@ -133,6 +134,7 @@ locals {
         period              = "60"
         statistic           = "Average"
         threshold           = "1"
+        treat_missing_data  = "notBreaching"
         alarm_description   = "Oracle db has recorded a long-running batch status. See: https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4325966186/Long+Running+Batch for remediation steps."
         alarm_actions       = [aws_sns_topic.nomis_nonprod_alarms.arn]
         dimensions = {
