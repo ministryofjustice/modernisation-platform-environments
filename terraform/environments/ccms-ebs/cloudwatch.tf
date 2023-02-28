@@ -49,36 +49,6 @@ resource "aws_ssm_association" "update_ssm_agent" {
   schedule_expression         = "cron(30 7 ? * MON *)"
 }
 
-
-
-
-
-
-
-/*
-data "aws_iam_policy_document" "cloud-platform-monitoring-assume-role" {
-  statement {
-    actions = ["sts:AssumeRole"]
-
-    principals {
-      type        = "AWS"
-      identifiers = ["arn:aws:iam::754256621582:root"]
-    }
-  }
-}
-*/
-/*
-resource "aws_iam_role" "cloudwatch-datasource-role" {
-  name               = "CloudwatchDatasourceRole"
-  assume_role_policy = data.aws_iam_policy_document.cloud-platform-monitoring-assume-role.json
-  tags = merge(
-    local.tags,
-    {
-      Name = "cloudwatch-datasource-role"
-    },
-  )
-}
-*/
 data "aws_iam_policy_document" "cloudwatch_datasource" {
   statement {
     sid    = "AllowReadWriteForCloudWatch"
