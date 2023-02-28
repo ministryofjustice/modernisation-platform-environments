@@ -432,7 +432,7 @@ data "aws_iam_policy_document" "ecs_task_execution_role" {
 }
 
 resource "aws_iam_policy" "ecs_task_execution_s3_policy" { #tfsec:ignore:aws-iam-no-policy-wildcards
-  name   = "${var.app_name}-ecs-task-execution-s3-policy"
+  name = "${var.app_name}-ecs-task-execution-s3-policy"
   tags = merge(
     var.tags_common,
     {
