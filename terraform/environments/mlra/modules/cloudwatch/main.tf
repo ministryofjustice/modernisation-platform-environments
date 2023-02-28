@@ -1,7 +1,3 @@
-locals {
-  sns_topic_name                 = "${var.appnameenv}-alerting-topic"
-}
-
 resource "aws_cloudwatch_metric_alarm" "esccpuoverthreshold" {
   alarm_name         = "${var.appnameenv}-ECS-CPU-high-threshold-alarm"
   alarm_description  = "If the CPU exceeds the predefined threshold, this alarm will trigger. \n Please investigate."
@@ -336,7 +332,7 @@ EOF
 
 # SNS topic for monitoring to send alarms to
 resource "aws_sns_topic" "mlra_alerting_topic" {
-  name = local.sns_topic_name
+  name = var.sns_topic_name
 }
 
 resource "aws_sns_topic_subscription" "pagerduty_subscription" {

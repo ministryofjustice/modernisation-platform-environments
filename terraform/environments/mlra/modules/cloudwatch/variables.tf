@@ -25,6 +25,10 @@ variable "appnameenv" {
   default = ""
 
 }
+variable "sns_topic_name" {
+  default = ""
+
+}
 
 variable "pagerduty_integration_key" {
 }
