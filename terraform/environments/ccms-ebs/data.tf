@@ -1,3 +1,5 @@
+#### This file can be used to store data specific to the member account ####
+
 ## AMI data blocks
 data "aws_ami" "oracle_base_prereqs" {
   most_recent = true
