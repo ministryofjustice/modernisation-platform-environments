@@ -1,5 +1,5 @@
 resource "aws_db_instance" "tipstaffdbdev" {
-  provider               = aws.core-vpc
+  provider               = aws.member-infra-access
   allocated_storage      = local.application_data.accounts[local.environment].allocated_storage
   db_name                = local.application_data.accounts[local.environment].db_name
   storage_type           = local.application_data.accounts[local.environment].storage_type
