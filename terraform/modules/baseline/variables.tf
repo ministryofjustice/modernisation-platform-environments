@@ -38,6 +38,7 @@ variable "cloudwatch_log_groups" {
     kms_key_id        = optional(string)
     tags              = optional(map(string), {})
   }))
+  default = {}
 }
 
 variable "ec2_autoscaling_groups" {
@@ -392,6 +393,7 @@ variable "kms_grants" {
     grantee_principal = string
     operations        = list(string)
   }))
+  default = {}
 }
 
 variable "s3_buckets" {
