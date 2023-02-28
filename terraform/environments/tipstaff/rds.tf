@@ -1,4 +1,5 @@
 resource "aws_db_instance" "tftipstaffdb" {
+  provider               = aws.modernisation-platform
   allocated_storage      = local.application_data.accounts[local.environment].allocated_storage
   db_name                = local.application_data.accounts[local.environment].db_name
   storage_type           = local.application_data.accounts[local.environment].storage_type

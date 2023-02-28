@@ -18,7 +18,15 @@
       "example_var": "preproduction-data"
     },
     "production": {
-      "example_var": "production-data"
+      "instance_type" : "t2.nano",
+      "moj_ip" : "81.134.202.29/32",
+      "db_name": "tipstaff-db-prod",
+      "allocated_storage": "20",
+      "storage_type": "gp2",
+      "identifier": "tipstaff-db-prod",
+      "engine": "postgres",
+      "engine_version": "10.21",
+      "instance_class": "db.t3.micro"
     }
   }
 }
