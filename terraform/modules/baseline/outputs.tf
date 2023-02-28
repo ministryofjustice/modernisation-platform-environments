@@ -8,11 +8,9 @@ output "bastion_linux" {
   value       = length(module.bastion_linux) == 1 ? module.bastion_linux[0] : null
 }
 
-output "debug" {
-  description = "Add anything you want to debug here, e.g. local variables"
-  value = {
-    s3_buckets_iam_policies = local.s3_buckets_iam_policies
-  }
+output "cloudwatch_log_groups" {
+  description = "map of aws_cloudwatch_log_group resources"
+  value       = aws_cloudwatch_log_group.this
 }
 
 output "ec2_autoscaling_groups" {
@@ -33,6 +31,11 @@ output "iam_policies" {
 output "iam_roles" {
   description = "map of aws_iam_role resources"
   value       = aws_iam_role.this
+}
+
+output "key_pairs" {
+  description = "map of aws_key_pair resources"
+  value       = aws_key_pair.this
 }
 
 output "lbs" {

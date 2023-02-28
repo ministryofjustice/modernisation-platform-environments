@@ -30,6 +30,16 @@ variable "bastion_linux" {
   default = null
 }
 
+variable "cloudwatch_log_groups" {
+  description = "set of cloudwatch log groups to create where the key is the name of the group"
+  type = map(object({
+    retention_in_days = optional(number)
+    skip_destroy      = optional(bool)
+    kms_key_id        = optional(string)
+    tags              = optional(map(string), {})
+  }))
+}
+
 variable "ec2_autoscaling_groups" {
   description = "map of ec2 autoscaling groups to create where the map key is the tags.Name.  See ec2_autoscaling_group module for more variable details"
   type = map(object({
@@ -76,7 +86,7 @@ variable "ec2_autoscaling_groups" {
       total_size = optional(number)
       type       = optional(string)
       kms_key_id = optional(string)
-    })))
+    })), {})
     ebs_volumes = optional(map(object({
       label       = optional(string)
       snapshot_id = optional(string)
@@ -85,11 +95,11 @@ variable "ec2_autoscaling_groups" {
       size        = optional(number)
       type        = optional(string)
       kms_key_id  = optional(string)
-    })))
+    })), {})
     autoscaling_group = object({
       desired_capacity          = number
       max_size                  = number
-      min_size                  = number
+      min_size                  = optional(number, 0)
       health_check_grace_period = optional(number)
       health_check_type         = optional(string)
       force_delete              = optional(bool)
@@ -118,7 +128,7 @@ variable "ec2_autoscaling_groups" {
       max_size         = optional(number)
       desired_capacity = optional(number)
       recurrence       = string
-    })))
+    })), {})
     ssm_parameters = optional(map(object({
       random = object({
         length  = number
@@ -152,7 +162,7 @@ variable "ec2_autoscaling_groups" {
         port              = optional(number)
         availability_zone = optional(string)
       })), [])
-    })))
+    })), {})
     tags = optional(map(string), {})
   }))
   default = {}
@@ -202,7 +212,7 @@ variable "ec2_instances" {
       total_size = optional(number)
       type       = optional(string)
       kms_key_id = optional(string)
-    })))
+    })), {})
     ebs_volumes = optional(map(object({
       label       = optional(string)
       snapshot_id = optional(string)
@@ -211,7 +221,7 @@ variable "ec2_instances" {
       size        = optional(number)
       type        = optional(string)
       kms_key_id  = optional(string)
-    })))
+    })), {})
     ssm_parameters = optional(map(object({
       random = object({
         length  = number
@@ -264,6 +274,16 @@ variable "iam_roles" {
     assume_role_policy_principals_type        = string
     assume_role_policy_principals_identifiers = list(string)
     policy_attachments                        = optional(list(string), [])
+  }))
+  default = {}
+}
+
+variable "key_pairs" {
+  description = "map of aws_key_pairs to create, where the key is the key name.  Provide a filename containing the key or the key itself"
+  type = map(object({
+    public_key          = optional(string)
+    public_key_filename = optional(string)
+    tags                = optional(map(string), {})
   }))
   default = {}
 }
