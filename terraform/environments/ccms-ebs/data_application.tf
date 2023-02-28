@@ -82,7 +82,7 @@ data "aws_iam_policy_document" "sns_topic_policy" {
 
 
 data "aws_secretsmanager_secret" "support_email_account" {
-  name = "support_email_account"
+  name = "support_email"
   depends_on = [
     aws_secretsmanager_secret.support_email_account
   ]

@@ -1,6 +1,6 @@
 #### Secret for support email address ###
 resource "aws_secretsmanager_secret" "support_email_account" {
-  name        = "support_email_account"
+  name        = "support_email"
   description = "email address of the support account for cw alerts"
 }
 
