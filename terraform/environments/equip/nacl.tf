@@ -4,7 +4,7 @@ data "aws_network_acls" "public_acl" {
 
   filter {
     name   = "association.subnet-id"
-    values = [data.aws_subnet.public_subnet_a.id]
+    values = [data.aws_subnet.public_subnets_a.id]
   }
 }
 
