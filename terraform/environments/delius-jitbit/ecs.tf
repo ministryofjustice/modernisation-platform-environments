@@ -113,5 +113,5 @@ module "s3_bucket_app_deployment" {
 }
 
 output "s3_bucket_app_deployment" {
-  value = module.s3_bucket_app_deployment.bucket.id
+  value = module.s3_bucket_app_deployment.bucket
 }
