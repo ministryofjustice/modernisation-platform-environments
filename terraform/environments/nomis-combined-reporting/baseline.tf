@@ -21,6 +21,6 @@ module "baseline" {
   s3_buckets               = merge(local.baseline_s3_buckets, lookup(local.environment_config, "baseline_s3_buckets", {}))
 
   ec2_instances          = lookup(local.environment_config, "baseline_ec2_instances", {})
-  #ec2_autoscaling_groups = lookup(local.environment_config, "baseline_ec2_autoscaling_groups", {})
-  #lbs                    = lookup(local.environment_config, "baseline_lbs", {})
+  ec2_autoscaling_groups = lookup(local.environment_config, "baseline_ec2_autoscaling_groups", {})
+  lbs                    = lookup(local.environment_config, "baseline_lbs", {})
 }

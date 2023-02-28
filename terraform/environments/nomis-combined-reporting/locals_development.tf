@@ -47,10 +47,9 @@ locals {
     }
 
     baseline_ec2_autoscaling_groups = {
-      dev-redhat-rhel79 = {
+      dev-base-rhel79 = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name  = "RHEL-7.9_HVM-*"
-          ami_owner = "309956199498"
+          ami_name = "base_rhel_7_9_*"
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           vpc_security_group_ids = ["private"]
