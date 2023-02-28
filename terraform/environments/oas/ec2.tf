@@ -233,6 +233,8 @@ resource "aws_iam_role_policy" "ec2_instance_policy" {
         Effect = "Allow",
         Action = [
           "s3:GetObject",
+          "s3:PutObject",
+          "s3:PutObjectAcl",
         ],
         Resource = [
           "arn:aws:s3:::modernisation-platform-software20230224000709766100000001/*",
