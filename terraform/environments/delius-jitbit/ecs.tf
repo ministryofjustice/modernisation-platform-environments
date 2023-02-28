@@ -72,7 +72,6 @@ module "ecs-new" {
 
 #Create s3 bucket for deployment state
 module "s3_bucket_app_deployment" {
-  count = local.environment == "development" ? 1 : 0
 
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.2.0"
 
@@ -113,5 +112,5 @@ module "s3_bucket_app_deployment" {
 }
 
 output "s3_bucket_app_deployment" {
-  value = module.s3_bucket_app_deployment.bucket
+  value = module.s3_bucket_app_deployment.bucket.id
 }
