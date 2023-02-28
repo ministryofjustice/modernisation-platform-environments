@@ -5,8 +5,8 @@ resource "aws_ses_domain_identity" "ppud" {
 }
 
 resource "aws_ses_domain_identity_verification" "ppud_verification" {
-  #  domain = aws_ses_domain_identity.ppud[0].id
-  domain = aws_ses_domain_identity.ppud.id
+  domain = aws_ses_domain_identity.ppud[0].id
+ 
 
   timeouts {
     create = "40m"
@@ -22,15 +22,14 @@ resource "aws_ses_domain_identity" "DKIM-Identity" {
 }
 
 resource "aws_ses_domain_dkim" "Domain-DKIM" {
-  #  domain = aws_ses_domain_identity.DKIM-Identity[0].domain
-  domain = aws_ses_domain_identity.DKIM-Identity.domain
-}
+  domain = aws_ses_domain_identity.DKIM-Identity[0].domain
+  }
 
 #Domain Identity MAIL FROM
 
 resource "aws_ses_domain_mail_from" "ppud" {
   # domain           = aws_ses_domain_identity.ppud[0].domain
   # mail_from_domain = "noreply.${aws_ses_domain_identity.ppud[0].domain}"
-  domain           = aws_ses_domain_identity.ppud.domain
-  mail_from_domain = "noreply.${aws_ses_domain_identity.ppud.domain}"
+  domain           = aws_ses_domain_identity.ppud[0].domain
+  mail_from_domain = "noreply.${aws_ses_domain_identity.ppud[0].domain}"
 }
