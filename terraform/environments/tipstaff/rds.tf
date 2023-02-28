@@ -11,8 +11,13 @@ resource "aws_db_instance" "tipstaffdbdev" {
   password               = jsondecode(data.aws_secretsmanager_secret_version.db_password.secret_string)["LOCAL_DB_PASSWORD"]
   skip_final_snapshot    = true
   vpc_security_group_ids = [aws_security_group.postgresql_db_sc.id]
-  db_subnet_group_name   = data.aws_subnets.shared-data
+  db_subnet_group_name   = aws_db_subnet_group.dbsubnetgroup.name
   publicly_accessible    = true
+}
+
+resource "aws_db_subnet_group" "dbsubnetgroup" {
+  name       = "dbsubnetgroup"
+  subnet_ids = [data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id]
 }
 
 resource "aws_security_group" "postgresql_db_sc" {
