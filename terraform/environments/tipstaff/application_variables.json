@@ -1,6 +1,8 @@
 {
   "accounts": {
     "development": {
+      "application_name": "tipstaff",
+      "environment_name": "tipstaff-dev-env",
       "instance_type": "t2.nano",
       "moj_ip": "81.134.202.29/32",
       "db_name": "tipstaffdbdev",
