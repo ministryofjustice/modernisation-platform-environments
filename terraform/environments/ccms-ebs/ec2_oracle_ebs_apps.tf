@@ -103,7 +103,8 @@ EOF
 
   tags = merge(local.tags,
     { Name = lower(format("ec2-%s-%s-ebsapps-%s", local.application_name, local.environment, count.index + 1)) },
-    { instance-scheduling = "skip-scheduling" }
+    { instance-scheduling = "skip-scheduling" },
+    { backup = "true" }
   )
   depends_on = [aws_security_group.ec2_sg_ebsapps]
 
