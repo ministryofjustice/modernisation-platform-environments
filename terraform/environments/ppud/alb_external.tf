@@ -25,11 +25,11 @@ resource "aws_lb_listener" "PPUD-external-Front-End" {
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.PPUD-external-Target-Group.arn
+    target_group_arn = aws_lb_target_group.PPUD-Target-Group.arn
   }
 }
 
-resource "aws_lb_target_group" "PPUD-external-Target-Group" {
+resource "aws_lb_target_group" "PPUD-Target-Group" {
   name     = "PPUD"
   port     = 443
   protocol = "HTTPS"
@@ -58,13 +58,13 @@ resource "aws_lb_target_group" "PPUD-external-Target-Group" {
 }
 
 resource "aws_lb_target_group_attachment" "PPUD-PORTAL" {
-  target_group_arn = aws_lb_target_group.PPUD-external-Target-Group.arn
+  target_group_arn = aws_lb_target_group.PPUD-Target-Group.arn
   target_id        = aws_instance.s609693lo6vw101[0].id
   port             = 443
 }
 
 resource "aws_lb_target_group_attachment" "PPUD-PORTAL-1" {
-  target_group_arn = aws_lb_target_group.PPUD-external-Target-Group.arn
+  target_group_arn = aws_lb_target_group.PPUD-Target-Group.arn
   target_id        = aws_instance.PPUDWEBSERVER2[0].id
   port             = 443
 }
