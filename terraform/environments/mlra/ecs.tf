@@ -1,7 +1,7 @@
-# ------------------------------------------------------------------------------
-# ECS
-# ------------------------------------------------------------------------------
-
+# # ------------------------------------------------------------------------------
+# # ECS
+# # ------------------------------------------------------------------------------
+#
 # module "mlra-ecs" {
 #
 #   source = "./modules/ecs"
@@ -34,9 +34,9 @@
 #   ecs_scaling_mem_threshold = local.application_data.accounts[local.environment].ecs_scaling_mem_threshold
 #
 # }
-
-# MAAT DB Password
-
-data "aws_ssm_parameter" "db_password" {
-  name = local.application_data.accounts[local.environment].maat_db_password
-}
+#
+# # MAAT DB Password
+#
+# data "aws_ssm_parameter" "db_password" {
+#   name = local.application_data.accounts[local.environment].maat_db_password
+# }
