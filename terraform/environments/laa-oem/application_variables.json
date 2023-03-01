@@ -3,21 +3,25 @@
     "development": {
       "ec2_oem_instance_type_app": "m5.xlarge",
       "ec2_oem_instance_type_db": "m5.xlarge",
+      "ec2_zone": "eu-west-2b",
       "key_name": "oem-ec2-key-development"
     },
     "test": {
       "ec2_oem_instance_type_app": "m5.xlarge",
       "ec2_oem_instance_type_db": "m5.xlarge",
+      "ec2_zone": "eu-west-2b",
       "key_name": "oem-ec2-key-test"
     },
     "preproduction": {
       "ec2_oem_instance_type_app": "m5.xlarge",
       "ec2_oem_instance_type_db": "m5.xlarge",
+      "ec2_zone": "eu-west-2b",
       "key_name": "oem-ec2-key-preproduction"
     },
     "production": {
       "ec2_oem_instance_type_app": "m5.xlarge",
       "ec2_oem_instance_type_db": "m5.xlarge",
+      "ec2_zone": "eu-west-2b",
       "key_name": "oem-ec2-key-production"
     }
   }

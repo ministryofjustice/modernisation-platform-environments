@@ -1,13 +1,14 @@
 resource "aws_instance" "oem_app" {
   ami                         = "ami-0c6f19670d053404e"
   associate_public_ip_address = false
-  availability_zone           = "eu-west-2a"
+  availability_zone           = local.application_data.accounts[local.environment].ec2_zone
   ebs_optimized               = true
   iam_instance_profile        = aws_iam_instance_profile.iam_instace_profile_ccms_base.name
   instance_type               = local.application_data.accounts[local.environment].ec2_oem_instance_type_app
   key_name                    = local.application_data.accounts[local.environment].key_name
   monitoring                  = true
-  subnet_id                   = data.aws_subnet.data_subnets_a.id
+  subnet_id                   = data.aws_subnet.data_subnets_b.id
+  user_data_replace_on_change = true
   user_data = base64encode(templatefile("./templates/oem-user-data-app.sh", {
     efs_id   = aws_efs_file_system.oem-app-efs.id
     hostname = "ccms-oem-app"
@@ -39,7 +40,7 @@ resource "aws_instance" "oem_app" {
 }
 
 resource "aws_ebs_volume" "oem_app_volume_swap" {
-  availability_zone = "eu-west-2a"
+  availability_zone = local.application_data.accounts[local.environment].ec2_zone
   depends_on        = [resource.aws_instance.oem_app]
   encrypted         = true
   size              = 32
@@ -57,7 +58,7 @@ resource "aws_volume_attachment" "oem_app_volume_swap" {
 }
 
 resource "aws_ebs_volume" "oem_app_volume_ccms_oem_app" {
-  availability_zone = "eu-west-2a"
+  availability_zone = local.application_data.accounts[local.environment].ec2_zone
   depends_on        = [resource.aws_instance.oem_app]
   encrypted         = true
   size              = 50
@@ -81,7 +82,7 @@ resource "aws_volume_attachment" "oem_app_volume_ccms_oem_app" {
 }
 
 resource "aws_ebs_volume" "oem_app_volume_ccms_oem_inst" {
-  availability_zone = "eu-west-2a"
+  availability_zone = local.application_data.accounts[local.environment].ec2_zone
   depends_on        = [resource.aws_instance.oem_app]
   encrypted         = true
   size              = 50

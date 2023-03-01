@@ -1,13 +1,14 @@
 resource "aws_instance" "oem_db" {
   ami                         = "ami-0c6f19670d053404e"
   associate_public_ip_address = false
-  availability_zone           = "eu-west-2a"
+  availability_zone           = local.application_data.accounts[local.environment].ec2_zone
   ebs_optimized               = true
   iam_instance_profile        = aws_iam_instance_profile.iam_instace_profile_ccms_base.name
   instance_type               = local.application_data.accounts[local.environment].ec2_oem_instance_type_db
   key_name                    = local.application_data.accounts[local.environment].key_name
   monitoring                  = true
-  subnet_id                   = data.aws_subnet.data_subnets_a.id
+  subnet_id                   = data.aws_subnet.data_subnets_b.id
+  user_data_replace_on_change = true
   user_data = base64encode(templatefile("./templates/oem-user-data-db.sh", {
     efs_id   = aws_efs_file_system.oem-db-efs.id
     hostname = "ccms-oem-db"
@@ -39,7 +40,7 @@ resource "aws_instance" "oem_db" {
 }
 
 resource "aws_ebs_volume" "oem_db_volume_swap" {
-  availability_zone = "eu-west-2a"
+  availability_zone = local.application_data.accounts[local.environment].ec2_zone
   depends_on        = [resource.aws_instance.oem_db]
   encrypted         = true
   size              = 32
@@ -57,7 +58,7 @@ resource "aws_volume_attachment" "oem_db_volume_swap" {
 }
 
 resource "aws_ebs_volume" "oem_db_volume_ccms_oem_app" {
-  availability_zone = "eu-west-2a"
+  availability_zone = local.application_data.accounts[local.environment].ec2_zone
   depends_on        = [resource.aws_instance.oem_db]
   encrypted         = true
   size              = 50
@@ -81,7 +82,7 @@ resource "aws_volume_attachment" "oem_db_volume_ccms_oem_app" {
 }
 
 resource "aws_ebs_volume" "oem_db_volume_ccms_oem_inst" {
-  availability_zone = "eu-west-2a"
+  availability_zone = local.application_data.accounts[local.environment].ec2_zone
   depends_on        = [resource.aws_instance.oem_db]
   encrypted         = true
   size              = 50
@@ -105,7 +106,7 @@ resource "aws_volume_attachment" "oem_db_volume_ccms_oem_inst" {
 }
 
 resource "aws_ebs_volume" "oem_db_volume_ccms_oem_dbf" {
-  availability_zone = "eu-west-2a"
+  availability_zone = local.application_data.accounts[local.environment].ec2_zone
   iops              = 3000
   size              = 200
   type              = "io2"
@@ -129,7 +130,7 @@ resource "aws_volume_attachment" "oem_db_volume_ccms_oem_dbf" {
 }
 
 resource "aws_ebs_volume" "oem_db_volume_ccms_oem_redo" {
-  availability_zone = "eu-west-2a"
+  availability_zone = local.application_data.accounts[local.environment].ec2_zone
   iops              = 3000
   size              = 20
   type              = "io2"
@@ -153,7 +154,7 @@ resource "aws_volume_attachment" "oem_db_volume_ccms_oem_redo" {
 }
 
 resource "aws_ebs_volume" "oem_db_volume_ccms_oem_archive" {
-  availability_zone = "eu-west-2a"
+  availability_zone = local.application_data.accounts[local.environment].ec2_zone
   iops              = 3000
   size              = 200
   type              = "io2"
