@@ -1,3 +1,5 @@
+This `alb` local Terraform module is taken from the MP provided module - https://github.com/ministryofjustice/modernisation-platform-terraform-ecs, and subsequently we have developed from the code there. Below is the README.md taken form the MP module.
+
 # Modernisation Platform ECS Cluster Module
 
 [![repo standards badge](https://img.shields.io/badge/dynamic/json?color=blue&style=for-the-badge&logo=github&label=MoJ%20Compliant&query=%24.result&url=https%3A%2F%2Foperations-engineering-reports.cloud-platform.service.justice.gov.uk%2Fapi%2Fv1%2Fcompliant_public_repositories%2Fmodernisation-platform-terraform-ecs)](https://operations-engineering-reports.cloud-platform.service.justice.gov.uk/public-github-repositories.html#modernisation-platform-terraform-ecs "Link to report")
