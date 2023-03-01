@@ -219,10 +219,30 @@ resource "aws_iam_role_policy" "ec2_instance_policy" {
         Effect   = "Allow"
         Resource = "*"
       },
+      {
+        Effect = "Allow",
+        Action = [
+          "s3:ListBucket",
+        ],
+        Resource = [
+          "arn:aws:s3:::modernisation-platform-software20230224000709766100000001",
+          "arn:aws:s3:::modernisation-platform-software20230224000709766100000001/*",
+        ]
+      },
+      {
+        Effect = "Allow",
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:PutObjectAcl",
+        ],
+        Resource = [
+          "arn:aws:s3:::modernisation-platform-software20230224000709766100000001/*",
+        ]
+      }
     ]
   })
 }
-
 
 resource "aws_ebs_volume" "EC2ServerVolumeORAHOME" {
   availability_zone = "eu-west-2a"
