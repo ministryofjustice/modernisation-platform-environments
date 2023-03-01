@@ -125,9 +125,9 @@ resource "aws_lb_target_group" "WAM-Target-Group" {
 
 resource "aws_lb_target_group_attachment" "WAM-Portal" {
   target_group_arn = aws_lb_target_group.WAM-Target-Group.arn
-# target_id        = aws_instance.s609693lo6vw105[0].id
-  target_id        = local.application_data.accounts[local.environment].alb_intances_wam
-  port             = 80
+  # target_id        = aws_instance.s609693lo6vw105[0].id
+  target_id = local.application_data.accounts[local.environment].alb_intances_wam
+  port      = 80
 }
 
 
