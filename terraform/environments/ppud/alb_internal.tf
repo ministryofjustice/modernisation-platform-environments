@@ -30,6 +30,7 @@ resource "aws_lb_listener" "PPUD-Front-End" {
 }
 
 resource "aws_lb_target_group" "PPUD-internal-Target-Group" {
+  count    = local.is-development == false ? 1 : 0
   name     = "PPUD"
   port     = 443
   protocol = "HTTPS"
