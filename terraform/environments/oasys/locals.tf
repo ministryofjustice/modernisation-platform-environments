@@ -392,9 +392,9 @@ locals {
       })
     }
 
-    development = {}
+    development   = {}
     preproduction = {}
-    production = {}
+    production    = {}
   }
 
   existing_target_groups = module.autoscaling_groups["webservers"].lb_target_groups
