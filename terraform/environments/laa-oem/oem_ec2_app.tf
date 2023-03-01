@@ -17,7 +17,7 @@ resource "aws_instance" "oem_app" {
   root_block_device {
     delete_on_termination = true
     encrypted             = true
-    iops                  = 3000
+    iops                  = 3100
     volume_size           = 12
     volume_type           = "gp3"
   }
