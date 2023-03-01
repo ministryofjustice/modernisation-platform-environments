@@ -22,7 +22,7 @@ module "alb" {
   internal_lb                      = false
   # existing_bucket_name = "" # An s3 bucket name can be provided in the module by adding the `existing_bucket_name` variable and adding the bucket name
 
-  listener_protocol = "HTTPS"
+  listener_protocol = "HTTP" # TODO This needs changing to HTTPS as part of https://dsdmoj.atlassian.net/browse/LAWS-3076
   listener_port     = 443
 
   target_group_deregistration_delay = 30
