@@ -50,7 +50,8 @@ resource "aws_security_group_rule" "WAM-Portal-ingress" {
   from_port                = 80
   to_port                  = 80
   protocol                 = "tcp"
-  source_security_group_id = aws_security_group.WAM-ALB.id
+# source_security_group_id = aws_security_group.WAM-ALB.id
+  cidr_blocks              = [data.aws_vpc.shared.cidr_block]
   security_group_id        = aws_security_group.WAM-Portal.id
 }
 
@@ -514,4 +515,40 @@ resource "aws_security_group_rule" "WAM-ALB-Egress-1" {
   protocol          = "tcp"
   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
   security_group_id = aws_security_group.WAM-ALB.id
+}
+
+resource "aws_security_group" "Bridge-Server-Preprod" {
+  vpc_id      = data.aws_vpc.shared.id
+  name        = "Bride-Server-Preprod"
+  description = "Bride-Server-Preprod"
+
+  tags = {
+    Name = "${var.networking[0].business-unit}-${local.environment}"
+  }
+}
+
+resource "aws_security_group_rule" "Bridge-Server-Preprod-Ingress" {
+  type              = "ingress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.Bridge-Server-Preprod.id
+}
+
+resource "aws_security_group_rule" "Bridge-Server-Preprod-Egress" {
+  type              = "egress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+  security_group_id = aws_security_group.Bridge-Server-Preprod.id
+}
+resource "aws_security_group_rule" "Bridge-Server-Preprod-Egress-1" {
+  type              = "egress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.Bridge-Server-Preprod.id
 }
