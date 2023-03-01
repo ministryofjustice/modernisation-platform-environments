@@ -34,19 +34,19 @@ declare -A MOUNTS=(
 
 declare -A NVMES=()
 for n in /dev/nvme*n1; do
-    D=$(ebsnvme-id ${n} |grep -v 'Volume ID')
-    if [[ -n ${D} ]]; then
-        if [[ ${D} =~ /dev ]]; then
-            NVMES[${D}]=${n}
+    D=$(ebsnvme-id $${n} |grep -v 'Volume ID')
+    if [[ -n $${D} ]]; then
+        if [[ $${D} =~ /dev ]]; then
+            NVMES[$${D}]=$${n}
         else
-            NVMES[/dev/${D}]=${n}
+            NVMES[/dev/$${D}]=$${n}
         fi
     fi
 done
 
-#for k in ${!NVMES[@]}; do
-#    v=${NVMES[${k}]}
-#    echo "${k} : ${v}"
+#for k in $${!NVMES[@]}; do
+#    v=$${NVMES[$${k}]}
+#    echo "$${k} : $${v}"
 #done
 #
 # /dev/sdf : /dev/nvme5n1
@@ -57,26 +57,26 @@ done
 # /dev/sdc : /dev/nvme4n1
 # /dev/sda1 : /dev/nvme0n1
 
-for M in ${!MOUNTS[@]}; do
-    L=${MOUNTS[${M}]}
-    N=${NVMES[${M}]}
-    if [[ -n ${N} ]]; then
-#       echo "${M} -> ${N} as ${L}"
-        if [[ ${L} == "swap" ]]; then
+for M in $${!MOUNTS[@]}; do
+    L=$${MOUNTS[$${M}]}
+    N=$${NVMES[$${M}]}
+    if [[ -n $${N} ]]; then
+#       echo "$${M} -> $${N} as $${L}"
+        if [[ $${L} == "swap" ]]; then
             swapoff -a
-            mkswap -L ${L} ${M}
-            swapon -L ${L}
-            echo "LABEL=${L} swap swap defaults 0 0" >> ${FSTAB}
+            mkswap -L $${L} $${M}
+            swapon -L $${L}
+            echo "LABEL=$${L} swap swap defaults 0 0" >> $${FSTAB}
         else
-            FS_DIR=${MOUNT_DIR}/oem/${L,,}
-            if [[ ! $(mount -t ext4,xfs |grep "${FS_DIR}") ]]; then
-                mkdir -p ${FS_DIR}
-                yes |mkfs.ext4 -qL ${L} ${M}
-                echo "LABEL=${L} ${FS_DIR} ext4 defaults 0 0" >> ${FSTAB}
-                mount -L ${L}
+            FS_DIR=$${MOUNT_DIR}/oem/$${L,,}
+            if [[ ! $(mount -t ext4,xfs |grep "$${FS_DIR}") ]]; then
+                mkdir -p $${FS_DIR}
+                yes |mkfs.ext4 -qL $${L} $${M}
+                echo "LABEL=$${L} $${FS_DIR} ext4 defaults 0 0" >> $${FSTAB}
+                mount -L $${L}
             else
-                echo "${FS_DIR} is already mounted:"
-                mount -t ext4,xfs |grep "${FS_DIR}"
+                echo "$${FS_DIR} is already mounted:"
+                mount -t ext4,xfs |grep "$${FS_DIR}"
             fi
         fi
     fi
