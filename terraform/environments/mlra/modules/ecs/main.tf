@@ -384,7 +384,6 @@ resource "aws_ecs_service" "ecs_service" {
     container_port   = var.server_port
   }
 
-  # TODO What are these dependencies for and can remove the depends_on here?
   depends_on = [
     aws_iam_role_policy_attachment.ecs_task_execution_role, aws_ecs_task_definition.windows_ecs_task_definition, aws_ecs_task_definition.linux_ecs_task_definition, aws_cloudwatch_log_group.cloudwatch_group
   ]

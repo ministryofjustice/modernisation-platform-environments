@@ -6,7 +6,6 @@ resource "aws_cloudwatch_metric_alarm" "esccpuoverthreshold" {
   statistic          = "Average"
   period             = "60"
   evaluation_periods = "5"
-  #TODO needs alarm actions and snstopics resources added
   alarm_actions      = [aws_sns_topic.mlra_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.mlra_alerting_topic.arn]
   threshold          = var.pECSCPUAlarmThreshold
@@ -31,7 +30,6 @@ resource "aws_cloudwatch_metric_alarm" "ecsmemoryoverthreshold" {
   statistic          = "Average"
   period             = "60"
   evaluation_periods = "5"
-  #TODO needs alarm actions and snstopics resources added
   alarm_actions      = [aws_sns_topic.mlra_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.mlra_alerting_topic.arn]
   threshold          = var.pECSMemoryAlarmThreshold
@@ -56,7 +54,6 @@ resource "aws_cloudwatch_metric_alarm" "cpuoverthreshold" {
   statistic          = "Average"
   period             = "60"
   evaluation_periods = "5"
-  #TODO needs alarm actions and snstopics resources added
   alarm_actions      = [aws_sns_topic.mlra_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.mlra_alerting_topic.arn]
   threshold          = var.pASGCPUAlarmThreshold
@@ -80,7 +77,6 @@ resource "aws_cloudwatch_metric_alarm" "statuscheckfailure" {
   statistic          = "Average"
   period             = "60"
   evaluation_periods = "5"
-  #TODO needs alarm actions and snstopics resources added
   alarm_actions      = [aws_sns_topic.mlra_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.mlra_alerting_topic.arn]
   threshold          = var.pASGStatusFailureAlarmThreshold
@@ -105,7 +101,6 @@ resource "aws_cloudwatch_metric_alarm" "targetresponsetime" {
   extended_statistic = "p99"
   period             = "60"
   evaluation_periods = "5"
-  #TODO needs alarm actions and snstopics resources added
   alarm_actions      = [aws_sns_topic.mlra_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.mlra_alerting_topic.arn]
   threshold          = var.pALBTargetResponseTimeThreshold
@@ -129,7 +124,6 @@ resource "aws_cloudwatch_metric_alarm" "targetResponsetimemaximum" {
   statistic          = "Maximum"
   period             = "60"
   evaluation_periods = "1"
-  #TODO needs alarm actions and snstopics resources added
   alarm_actions      = [aws_sns_topic.mlra_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.mlra_alerting_topic.arn]
   threshold          = var.pALBTargetResponseTimeThresholdMaximum
@@ -153,8 +147,6 @@ resource "aws_cloudwatch_metric_alarm" "unhealthyhosts" {
   statistic          = "Average"
   period             = "60"
   evaluation_periods = "5"
-  #TODO needs alarm actions and snstopics resources added
-  #AlarmActions
   alarm_actions      = [aws_sns_topic.mlra_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.mlra_alerting_topic.arn]
   threshold          = var.pALBUnhealthyAlarmThreshold
@@ -179,7 +171,6 @@ resource "aws_cloudwatch_metric_alarm" "rejectedconnectioncount" {
   statistic          = "Sum"
   period             = "60"
   evaluation_periods = "5"
-  #TODO needs alarm actions and snstopics resources added
   alarm_actions      = [aws_sns_topic.mlra_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.mlra_alerting_topic.arn]
   threshold          = var.pALBRejectedAlarmThreshold
@@ -203,8 +194,6 @@ resource "aws_cloudwatch_metric_alarm" "http5xxerror" {
   statistic          = "Sum"
   period             = "60"
   evaluation_periods = "5"
-  #TODO needs alarm actions and snstopics resources added
-  #AlarmActions
   alarm_actions      = [aws_sns_topic.mlra_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.mlra_alerting_topic.arn]
   threshold          = var.pALBTarget5xxAlarmThreshold
@@ -228,8 +217,6 @@ resource "aws_cloudwatch_metric_alarm" "applicationelb5xxerror" {
   statistic          = "Sum"
   period             = "60"
   evaluation_periods = "5"
-  #TODO needs alarm actions and snstopics resources added
-  #AlarmActions
   alarm_actions      = [aws_sns_topic.mlra_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.mlra_alerting_topic.arn]
   threshold          = var.pALB5xxAlarmThreshold
@@ -253,8 +240,6 @@ resource "aws_cloudwatch_metric_alarm" "http4xxerror" {
   statistic          = "Sum"
   period             = "60"
   evaluation_periods = "5"
-  #TODO needs alarm actions and snstopics resources added
-  #AlarmActions
   alarm_actions      = [aws_sns_topic.mlra_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.mlra_alerting_topic.arn]
   threshold          = var.pALBTarget4xxAlarmThreshold
@@ -278,8 +263,6 @@ resource "aws_cloudwatch_metric_alarm" "applicationelb4xxerror" {
   statistic          = "Sum"
   period             = "60"
   evaluation_periods = "5"
-  #TODO needs alarm actions and snstopics resources added
-  #AlarmActions
   alarm_actions      = [aws_sns_topic.mlra_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.mlra_alerting_topic.arn]
   threshold          = var.pALB4xxAlarmThreshold
