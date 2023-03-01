@@ -28,7 +28,7 @@ locals {
     }
   }
 
-  # remove nulls so merge() doesn't include them
+  # remove nulls so merge() doesn't include them
   ebs_volumes_without_nulls = {
     for key1, value1 in var.ebs_volumes :
     key1 => {
@@ -53,7 +53,7 @@ locals {
     } if contains(keys(var.ebs_volume_config), lookup(value, "label", "-"))
   }
 
-  # Auto calculate swap volume size based on instance memory size
+  # Auto calculate swap volume size based on instance memory size
   ebs_volumes_swap_size = data.aws_ec2_instance_type.this.memory_size >= 16384 ? 16 : (data.aws_ec2_instance_type.this.memory_size / 1024)
   ebs_volumes_swap = {
     for key, value in local.ebs_volumes_without_nulls :
@@ -62,7 +62,7 @@ locals {
     } if lookup(value, "label", null) == "swap"
   }
 
-  # remove nulls so merge() doesn't include them
+  # remove nulls so merge() doesn't include them
   ebs_volumes_from_config_without_nulls = {
     for key1, value1 in local.ebs_volumes_from_config :
     key1 => {
