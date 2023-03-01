@@ -28,11 +28,13 @@ data "aws_subnets" "tf-subnets" {
 }
 
 resource "aws_elastic_beanstalk_application" "tipstaff-elastic-beanstalk-app-dev" {
+  provider    = aws.modernisation-platform
   name        = local.application_data.accounts[local.environment].application_name
   description = "this is the application elastic bean Tipstaff"
 }
 
 resource "aws_elastic_beanstalk_environment" "tipstaff-elastic-beanstalk-env-dev" {
+  provider               = aws.modernisation-platform
   name                   = local.application_data.accounts[local.environment].environment_name
   application            = aws_elastic_beanstalk_application.tipstaff-elastic-beanstalk-app-dev.name
   solution_stack_name    = "64bit Windows Server 2019 v2.10.6 running IIS 10.0"
