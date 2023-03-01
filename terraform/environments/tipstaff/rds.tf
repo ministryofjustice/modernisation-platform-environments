@@ -1,5 +1,4 @@
 resource "aws_db_instance" "tipstaffdbdev" {
-  provider               = aws.member-infra-access
   allocated_storage      = local.application_data.accounts[local.environment].allocated_storage
   db_name                = local.application_data.accounts[local.environment].db_name
   storage_type           = local.application_data.accounts[local.environment].storage_type
@@ -16,7 +15,6 @@ resource "aws_db_instance" "tipstaffdbdev" {
 }
 
 resource "aws_db_subnet_group" "dbsubnetgroup" {
-  provider   = aws.member-infra-access
   name       = "dbsubnetgroup"
   subnet_ids = [data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id]
 }
@@ -25,7 +23,6 @@ resource "aws_security_group" "postgresql_db_sc" {
   name        = "postgres_security_group"
   description = "control access to the database"
   vpc_id      = data.aws_vpc.shared.id
-
   ingress {
     from_port   = 0
     to_port     = 65535
@@ -33,7 +30,6 @@ resource "aws_security_group" "postgresql_db_sc" {
     description = "MOJ Digital VPN access"
     cidr_blocks = [local.application_data.accounts[local.environment].moj_ip]
   }
-
   ingress {
     from_port   = 5432
     to_port     = 5432
