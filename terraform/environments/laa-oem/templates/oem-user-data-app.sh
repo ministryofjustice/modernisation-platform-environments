@@ -87,4 +87,4 @@ hostnamectl set-hostname ${hostname}
 
 # Update /etc/hosts
 H=$(curl -s 'http://169.254.169.254/latest/meta-data/local-ipv4')
-echo "${H} ${hostname} ${hostname}.dev.legalservices.gov.uk" >> /etc/hosts
+echo "$${H} ${hostname} ${hostname}.dev.legalservices.gov.uk" >> /etc/hosts
