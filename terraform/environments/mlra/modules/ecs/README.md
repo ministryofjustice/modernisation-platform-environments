@@ -1,4 +1,4 @@
-This `alb` local Terraform module is taken from the MP provided module - https://github.com/ministryofjustice/modernisation-platform-terraform-ecs, and subsequently we have developed from the code there. Below is the README.md taken form the MP module.
+This `ecs` local Terraform module is taken from the MP provided module - https://github.com/ministryofjustice/modernisation-platform-terraform-ecs, and subsequently we have developed from the code there. Below is the README.md taken form the MP module.
 
 # Modernisation Platform ECS Cluster Module
 
