@@ -38,7 +38,7 @@ jobs:
       application: "${{ github.workflow }}"
       environment: "${{ matrix.target }}"
       action: "${{ matrix.action }}"
-      do_state_refresh_on_plan: true
+      do_state_refresh_on_plan: false
       post_plan_to_pr: true
     secrets:
       modernisation_platform_environments: "${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}"
