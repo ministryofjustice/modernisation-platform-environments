@@ -396,20 +396,20 @@ resource "aws_ecs_service" "ecs_service" {
   )
 }
 
-resource "aws_ecs_capacity_provider" "capacity_provider" {
-  name = "${var.app_name}-capacity-provider"
-
-  auto_scaling_group_provider {
-    auto_scaling_group_arn = aws_autoscaling_group.cluster-scaling-group.arn
-  }
-
-  tags = merge(
-    var.tags_common,
-    {
-      Name = "${var.app_name}-capacity-provider"
-    }
-  )
-}
+# resource "aws_ecs_capacity_provider" "capacity_provider" {
+#   name = "${var.app_name}-capacity-provider"
+#
+#   auto_scaling_group_provider {
+#     auto_scaling_group_arn = aws_autoscaling_group.cluster-scaling-group.arn
+#   }
+#
+#   tags = merge(
+#     var.tags_common,
+#     {
+#       Name = "${var.app_name}-capacity-provider"
+#     }
+#   )
+# }
 # ECS task execution role data
 # https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_execution_IAM_role.html
 data "aws_iam_policy_document" "ecs_task_execution_role" {
