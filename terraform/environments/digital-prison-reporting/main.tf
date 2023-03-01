@@ -993,24 +993,24 @@ module "dms_use_of_force" {
 }
 
 # S3 Oracle to Nomis SQS Notification # Disabled DPR-287 - TBC
-module "s3_nomis_oracle_sqs" {
-  source                    = "./modules/s3_bucket"
-  create_s3                 = false # Commented DPR-287 - TBC
-  name                      = "${local.project}-nomis-cdc-event-${local.environment}"
-  custom_kms_key            = local.s3_kms_arn
-  create_notification_queue = true
-  filter_prefix             = "cdc/"
-  s3_notification_name      = "nomis-cdc-event-notification"
-  sqs_msg_retention_seconds = 1209600
+# module "s3_nomis_oracle_sqs" {
+#  source                    = "./modules/s3_bucket"
+#  create_s3                 = local.setup_buckets
+#  name                      = "${local.project}-nomis-cdc-event-${local.environment}"
+#  custom_kms_key            = local.s3_kms_arn
+#  create_notification_queue = true
+#  filter_prefix             = "cdc/"
+#  s3_notification_name      = "nomis-cdc-event-notification"
+#  sqs_msg_retention_seconds = 1209600
 
-  tags = merge(
-    local.all_tags,
-    {
-      Name          = "${local.project}-nomis-cdc-event-${local.environment}"
-      Resource_Type = "S3 Bucket"
-    }
-  )
-}
+#  tags = merge(
+#    local.all_tags,
+#    {
+#      Name          = "${local.project}-nomis-cdc-event-${local.environment}"
+#      Resource_Type = "S3 Bucket"
+#    }
+#  )
+#}
 
 # S3 - CDC Domain Events SQS Notification (DPR-116)
 module "s3_domain_cdc_sqs" {
