@@ -80,7 +80,7 @@ resource "aws_dlm_lifecycle_policy" "lifecyclerole" {
     }
 
     target_tags = {
-      Snapshot = "true"
+      backup = "true"
     }
   }
 }
