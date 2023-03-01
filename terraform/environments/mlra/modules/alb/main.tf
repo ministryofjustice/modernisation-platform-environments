@@ -150,7 +150,7 @@ resource "aws_lb" "loadbalancer" {
   internal                   = var.internal_lb
   load_balancer_type         = "application"
   security_groups            = [aws_security_group.lb.id]
-  subnets                    = [var.private_subnets[0], var.private_subnets[1], var.private_subnets[2]]
+  subnets                    = [var.public_subnets[0], var.public_subnets[1], var.public_subnets[2]]
   enable_deletion_protection = var.enable_deletion_protection
   idle_timeout               = var.idle_timeout
   drop_invalid_header_fields = true

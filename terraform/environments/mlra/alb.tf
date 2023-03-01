@@ -19,11 +19,11 @@ module "alb" {
   security_group_ingress_to_port   = 443
   security_group_ingress_protocol  = "tcp"
   moj_vpn_cidr_block               = local.application_data.accounts[local.environment].moj_vpn_cidr
-  internal_lb                      = true
+  internal_lb                      = false
   # existing_bucket_name = "" # An s3 bucket name can be provided in the module by adding the `existing_bucket_name` variable and adding the bucket name
 
   listener_protocol = "HTTP"
-  listener_port     = 80
+  listener_port     = 443
 
   target_group_deregistration_delay = 30
   target_group_protocol             = "HTTP"
