@@ -1,0 +1,4 @@
+locals {
+  production_config = {
+  }
+}
