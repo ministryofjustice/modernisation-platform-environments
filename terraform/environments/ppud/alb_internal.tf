@@ -16,7 +16,7 @@ resource "aws_lb" "PPUD-internal-ALB" {
 }
 
 resource "aws_lb_listener" "PPUD-Front-End" {
-  load_balancer_arn = aws_lb.PPUD-internal-ALB[0].arn
+  load_balancer_arn = aws_lb.PPUD-internal-ALB.arn
   port              = "443"
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
