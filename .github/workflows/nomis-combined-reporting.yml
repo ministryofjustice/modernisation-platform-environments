@@ -26,7 +26,7 @@ jobs:
   strategy:
     uses: ./.github/workflows/reusable_terraform_strategy.yml
     with:
-      strategy_type: "standard_four_accounts" # allow apply to dev/test from branch
+      strategy_type: "standard_four_accounts"  # allow apply to dev/test from branch
 
   terraform:
     needs: strategy
@@ -38,8 +38,8 @@ jobs:
       application: "${{ github.workflow }}"
       environment: "${{ matrix.target }}"
       action: "${{ matrix.action }}"
-      do_state_refresh_on_plan: false
-      post_plan_to_pr: true
+      do_state_refresh_on_plan: false  # doesn't work with ACM module
+      post_plan_to_pr: false  # pipeline can be triggered by other teams so avoid posting into their PRs for now
     secrets:
       modernisation_platform_environments: "${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}"
       pipeline_github_token: "${{ secrets.DSO_GITHUB_AUTOMATION_PAT }}"
