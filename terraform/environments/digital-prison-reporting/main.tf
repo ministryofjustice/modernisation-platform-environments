@@ -124,7 +124,7 @@ module "glue_cloudplatform_reporting_job" {
     "--structured.path"     = "s3://${module.s3_structured_bucket[0].bucket.id}"
     "--sink.stream"         = local.kinesis_stream_data_domain
     "--sink.region"         = local.account_region
-    "--source.queue"        = "nomis-cdc-event-notification" ## Should be Dynamic SQS Name reference
+    "--source.queue"        = "nomis-cdc-event-notification" ## DPR-287, needs right source - TBC
     "--source.region"       = local.account_region
     "--job-bookmark-option" = "job-bookmark-enable"
   }
@@ -875,7 +875,7 @@ module "datamart" {
     pause = {
       name          = "${local.redshift_cluster_name}-pause"
       description   = "Pause cluster every night"
-      schedule      = "cron(0 20 * * ? *)"
+      schedule      = "cron(30 20 * * ? *)"
       pause_cluster = true
     }
     resume = {
@@ -992,10 +992,10 @@ module "dms_use_of_force" {
   )
 }
 
-# S3 Oracle to Nomis SQS Notification 
+# S3 Oracle to Nomis SQS Notification # Disabled DPR-287 - TBC
 module "s3_nomis_oracle_sqs" {
   source                    = "./modules/s3_bucket"
-  create_s3                 = local.setup_buckets
+  create_s3                 = false # Commented DPR-287 - TBC
   name                      = "${local.project}-nomis-cdc-event-${local.environment}"
   custom_kms_key            = local.s3_kms_arn
   create_notification_queue = true
@@ -1032,23 +1032,23 @@ module "s3_domain_cdc_sqs" {
   )
 }
 
-# Kinesis Nomis Stream
-module "kinesis_nomis_stream" {
-  source                     = "./modules/kinesis_firehose"
-  name                       = "${local.project}-nomis-target-stream-${local.env}"
-  kinesis_source_stream_arn  = module.kinesis_stream_ingestor.kinesis_stream_arn  # KDS Cloud Platform
-  kinesis_source_stream_name = module.kinesis_stream_ingestor.kinesis_stream_name # KDS Cloud Platform
-  target_s3_id               = module.s3_nomis_oracle_sqs.bucket_id
-  target_s3_arn              = module.s3_nomis_oracle_sqs.bucket_arn
-  target_s3_kms              = local.s3_kms_arn
-  target_s3_prefix           = "cdc/year=!{timestamp:yyyy}/month=!{timestamp:MM}/day=!{timestamp:dd}/hour=!{timestamp:HH}/"
-  target_s3_error_prefix     = "cdc-error/type=!{firehose:error-output-type}/"
-  aws_account_id             = local.account_id
-  aws_region                 = local.account_region
-  cloudwatch_log_group_name  = "/aws/kinesisfirehose/nomis-target-stream"
-  cloudwatch_log_stream_name = "NomisTargetStream"
-  cloudwatch_logging_enabled = true
-}
+# Kinesis Nomis Stream # Commented DPR-287 - TBC
+# module "kinesis_nomis_stream" {
+#  source                     = "./modules/kinesis_firehose"
+#  name                       = "${local.project}-nomis-target-stream-${local.env}"
+#  kinesis_source_stream_arn  = module.kinesis_stream_ingestor.kinesis_stream_arn  # KDS Cloud Platform
+#  kinesis_source_stream_name = module.kinesis_stream_ingestor.kinesis_stream_name # KDS Cloud Platform
+#  target_s3_id               = module.s3_nomis_oracle_sqs.bucket_id
+#  target_s3_arn              = module.s3_nomis_oracle_sqs.bucket_arn
+#  target_s3_kms              = local.s3_kms_arn
+#  target_s3_prefix           = "cdc/year=!{timestamp:yyyy}/month=!{timestamp:MM}/day=!{timestamp:dd}/hour=!{timestamp:HH}/"
+#  target_s3_error_prefix     = "cdc-error/type=!{firehose:error-output-type}/"
+#  aws_account_id             = local.account_id
+#  aws_region                 = local.account_region
+#  cloudwatch_log_group_name  = "/aws/kinesisfirehose/nomis-target-stream"
+#  cloudwatch_log_stream_name = "NomisTargetStream"
+#  cloudwatch_logging_enabled = true
+#}
 
 # Kinesis cdc domain Stream (DPR-116)
 module "kinesis_cdc_domain_stream" {
