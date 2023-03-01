@@ -146,7 +146,7 @@ data "aws_elb_service_account" "default" {}
 resource "aws_lb" "loadbalancer" {
   #checkov:skip=CKV_AWS_150:preventing destroy can be controlled outside of the module
   #checkov:skip=CKV2_AWS_28:WAF is configured outside of the module for more flexibility
-  name                       = "${var.application_name}-application-lb-test"
+  name                       = "${var.application_name}-application-external-lb"
   internal                   = var.internal_lb
   load_balancer_type         = "application"
   security_groups            = [aws_security_group.lb.id]
