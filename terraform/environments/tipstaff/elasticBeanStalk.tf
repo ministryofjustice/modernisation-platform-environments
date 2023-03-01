@@ -27,22 +27,12 @@ data "aws_subnets" "tf-subnets" {
   }
 }
 
-provider "aws" {
-  alias  = "modernisation-platform-access"
-  region = "eu-west-2"
-  assume_role {
-    role_arn = "arn:aws:iam::${local.modernisation_platform_account_id}:role/ModernisationPlatformAccess"
-  }
-}
-
 resource "aws_elastic_beanstalk_application" "tipstaff-elastic-beanstalk-app-dev" {
-  provider    = aws.modernisation-platform-access
   name        = local.application_data.accounts[local.environment].application_name
   description = "this is the application elastic bean Tipstaff"
 }
 
 resource "aws_elastic_beanstalk_environment" "tipstaff-elastic-beanstalk-env-dev" {
-  provider               = aws.modernisation-platform-access
   name                   = local.application_data.accounts[local.environment].environment_name
   application            = aws_elastic_beanstalk_application.tipstaff-elastic-beanstalk-app-dev.name
   solution_stack_name    = "64bit Windows Server 2019 v2.10.6 running IIS 10.0"
