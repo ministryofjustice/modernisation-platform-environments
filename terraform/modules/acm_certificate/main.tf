@@ -28,6 +28,10 @@ resource "aws_route53_record" "validation_core_network_services" {
   ttl             = 60
   type            = each.value.type
   zone_id         = data.aws_route53_zone.core_network_services[each.key].zone_id
+
+  depends_on = [
+    aws_acm_certificate.this
+  ]
 }
 
 # use core-vpc provider to validate business-unit domain
@@ -47,6 +51,10 @@ resource "aws_route53_record" "validation_core_vpc" {
   ttl             = 60
   type            = each.value.type
   zone_id         = data.aws_route53_zone.core_vpc[each.key].zone_id
+
+  depends_on = [
+    aws_acm_certificate.this
+  ]
 }
 
 # assume any other domains are defined in the current workspace
@@ -65,6 +73,10 @@ resource "aws_route53_record" "validation_self" {
   ttl             = 60
   type            = each.value.type
   zone_id         = data.aws_route53_zone.self[each.key].zone_id
+
+  depends_on = [
+    aws_acm_certificate.this
+  ]
 }
 
 resource "aws_acm_certificate_validation" "this" {
