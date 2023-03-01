@@ -79,15 +79,15 @@ resource "aws_route53_resolver_endpoint" "equip-domain" {
   ]
 
   ip_address {
-    subnet_id = data.aws_subnet.private_subnet_a.id
+    subnet_id = data.aws_subnet.private_subnets_a.id
   }
 
   ip_address {
-    subnet_id = data.aws_subnet.private_subnet_b.id
+    subnet_id = data.aws_subnet.private_subnets_b.id
   }
 
   ip_address {
-    subnet_id = data.aws_subnet.private_subnet_c.id
+    subnet_id = data.aws_subnet.private_subnets_c.id
   }
 
   tags = {
