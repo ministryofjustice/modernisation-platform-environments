@@ -6,12 +6,12 @@ data "aws_instance" "tipstaff-ec2-instance-dev" {
     aws_elastic_beanstalk_application.tipstaff-elastic-beanstalk-app-dev,
     aws_elastic_beanstalk_environment.tipstaff-elastic-beanstalk-env-dev
   ]
-  filter  {
+  filter {
     name   = "tag:Name"
     values = [local.application_data.accounts[local.environment].environment_name]
   }
   filter {
-    name = "instance-state-name"
+    name   = "instance-state-name"
     values = ["running"]
   }
 }
@@ -22,7 +22,7 @@ data "aws_subnets" "tf-subnets" {
     values = ["dts-legacy"]
   }
   filter {
-    name = "tag:availability"
+    name   = "tag:availability"
     values = ["public"]
   }
 }
@@ -162,7 +162,7 @@ resource "aws_elastic_beanstalk_environment" "tipstaff-elastic-beanstalk-env-dev
     value     = "Average"
   }
 
-###=========================== Environment Variables ========================== ###
+  ###=========================== Environment Variables ========================== ###
   //Not sure what the client_ID is??
   # setting {
   #   namespace = "aws:elasticbeanstalk:application:environment"
@@ -209,51 +209,51 @@ resource "aws_elastic_beanstalk_environment" "tipstaff-elastic-beanstalk-env-dev
     name      = "supportTeam"
     value     = "DTS Legacy Apps Support Team"
   }
-##=========================== Environment Default Process ========================== ###
-   setting {
+  ##=========================== Environment Default Process ========================== ###
+  setting {
     namespace = "aws:elasticbeanstalk:environment:process:default"
     name      = "HealthCheckPath"
     value     = "/"
   }
-   setting {
+  setting {
     namespace = "aws:elasticbeanstalk:environment:process:default"
     name      = "HealthyThresholdCount"
     value     = "5"
   }
-   setting {
+  setting {
     namespace = "aws:elasticbeanstalk:environment:process:default"
     name      = "UnhealthyThresholdCount"
     value     = "3"
   }
-    setting {
+  setting {
     namespace = "aws:elasticbeanstalk:environment:process:default"
     name      = "Port"
     value     = "80"
   }
-   setting {
+  setting {
     namespace = "aws:elasticbeanstalk:environment:process:default"
     name      = "MatcherHTTPCode"
     value     = "200-302"
   }
-   setting {
+  setting {
     namespace = "aws:elasticbeanstalk:environment:process:default"
     name      = "HealthCheckTimeout"
     value     = "5"
   }
-   setting {
+  setting {
     namespace = "aws:elasticbeanstalk:environment:process:default"
     name      = "HealthCheckInterval"
     value     = "15"
   }
 
-##=========================== Load Balancer ========================== ###
+  ##=========================== Load Balancer ========================== ###
 
   setting {
     namespace = "aws:elasticbeanstalk:environment"
     name      = "LoadBalancerType"
     value     = "application"
   }
-   setting {
+  setting {
     namespace = "aws:elbv2:listener:default"
     name      = "ListenerEnabled"
     value     = "true"
@@ -284,7 +284,7 @@ resource "aws_elastic_beanstalk_environment" "tipstaff-elastic-beanstalk-env-dev
   #   name      = "SSLCertificateArns"
   #   value     = var.certificate
   # }
-   setting {
+  setting {
     namespace = "aws:elbv2:listener:443"
     name      = "SSLPolicy"
     value     = "ELBSecurityPolicy-2016-08"
