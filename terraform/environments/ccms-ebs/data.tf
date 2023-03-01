@@ -15,6 +15,20 @@ data "aws_ami" "oracle_base_prereqs" {
   }
 }
 
+data "aws_ami" "oracle_db" {
+  most_recent = true
+  owners      = [local.application_data.accounts[local.environment].ami_owner]
+
+  filter {
+    name   = "name"
+    values = [local.application_data.accounts[local.environment].orace_db_ami_name]
+  }
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+}
+
 data "aws_ami" "webgate" {
   most_recent = true
   owners      = [local.application_data.accounts[local.environment].ami_owner]
