@@ -1,15 +1,15 @@
 resource "aws_ec2_subnet_cidr_reservation" "vip-reservation" {
   provider         = aws.core-vpc
-  cidr_block       = cidrsubnet(data.aws_subnet.public_subnet_a.cidr_block, 5, 30)
+  cidr_block       = cidrsubnet(data.aws_subnet.public_subnets_a.cidr_block, 5, 30)
   reservation_type = "explicit"
-  subnet_id        = data.aws_subnet.public_subnet_a.id
+  subnet_id        = data.aws_subnet.public_subnets_a.id
 }
 
 resource "aws_ec2_subnet_cidr_reservation" "snip-reservation" {
   provider         = aws.core-vpc
-  cidr_block       = cidrsubnet(data.aws_subnet.private_subnet_a.cidr_block, 6, 62)
+  cidr_block       = cidrsubnet(data.aws_subnet.private_subnets_a.cidr_block, 6, 62)
   reservation_type = "explicit"
-  subnet_id        = data.aws_subnet.private_subnet_a.id
+  subnet_id        = data.aws_subnet.private_subnets_a.id
 }
 
 resource "aws_eip" "public-vip" {
@@ -67,7 +67,7 @@ resource "aws_instance" "citrix_adc_instance" {
 resource "aws_network_interface" "adc_mgmt_interface" {
   security_groups   = [aws_security_group.citrix_adc_mgmt.id]
   source_dest_check = false
-  subnet_id         = data.aws_subnet.data_subnet_a.id
+  subnet_id         = data.aws_subnet.data_subnets_a.id
 
   tags = merge(local.tags,
     { Name = "ENI-NPS-COR-A-ADC01_MGMT"
@@ -85,7 +85,7 @@ resource "aws_network_interface" "adc_vip_interface" {
   ]
   security_groups   = [aws_security_group.citrix_adc_vip.id]
   source_dest_check = false
-  subnet_id         = data.aws_subnet.public_subnet_a.id
+  subnet_id         = data.aws_subnet.public_subnets_a.id
 
   attachment {
     device_index = 1
@@ -110,7 +110,7 @@ resource "aws_network_interface" "adc_snip_interface" {
   ]
   security_groups   = [aws_security_group.citrix_adc_snip.id]
   source_dest_check = false
-  subnet_id         = data.aws_subnet.private_subnet_a.id
+  subnet_id         = data.aws_subnet.private_subnets_a.id
 
   attachment {
     device_index = 2
