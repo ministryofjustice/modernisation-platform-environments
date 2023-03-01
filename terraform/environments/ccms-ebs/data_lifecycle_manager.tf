@@ -1,6 +1,6 @@
 resource "aws_iam_role" "dlm_lifecycle_role" {
-  count             = local.is-production ? 0 : 1
-  name = "dlm-lifecycle-role"
+  count = local.is-production ? 0 : 1
+  name  = "dlm-lifecycle-role"
 
   assume_role_policy = <<EOF
 {
@@ -20,9 +20,9 @@ EOF
 }
 
 resource "aws_iam_role_policy" "dlm_lifecycle" {
-  count   = local.is-production ? 0 : 1
-  name    = "dlm-lifecycle-policy"
-  role    = aws_iam_role.dlm_lifecycle_role[0].id
+  count = local.is-production ? 0 : 1
+  name  = "dlm-lifecycle-policy"
+  role  = aws_iam_role.dlm_lifecycle_role[0].id
 
   policy = <<EOF
 {
@@ -51,13 +51,13 @@ EOF
 }
 
 resource "aws_dlm_lifecycle_policy" "lifecyclerole" {
-  count               = local.is-production ? 0 : 1
-  description         = "DLM lifecycle policy"
-  execution_role_arn  = aws_iam_role.dlm_lifecycle_role[0].arn
-  state               = "ENABLED"
+  count              = local.is-production ? 0 : 1
+  description        = "DLM lifecycle policy"
+  execution_role_arn = aws_iam_role.dlm_lifecycle_role[0].arn
+  state              = "ENABLED"
 
   policy_details {
-    resource_types    = ["VOLUME"]
+    resource_types = ["VOLUME"]
 
     schedule {
       name = "2 weeks of daily snapshots"
