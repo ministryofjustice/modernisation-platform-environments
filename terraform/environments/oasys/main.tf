@@ -134,6 +134,23 @@ module "lb_listener" {
   tags                   = try(each.value.tags, local.tags)
 }
 
+module "acm_certificate" {
+  for_each = merge(local.acm_certificates.common, local.acm_certificates[local.environment])
+
+  source = "../../modules/acm_certificate"
+
+  providers = {
+    aws.core-vpc              = aws.core-vpc
+    aws.core-network-services = aws.core-network-services
+  }
+
+  name                    = each.key
+  domain_name             = each.value.domain_name
+  subject_alternate_names = each.value.subject_alternate_names
+  validation              = each.value.validation
+  tags                    = merge(local.tags, lookup(each.value, "tags", {}))
+}
+
 resource "aws_kms_grant" "image-builder-shared-cmk-grant" {
   name              = "image-builder-shared-cmk-grant"
   key_id            = data.aws_kms_key.ebs_hmpps.arn
