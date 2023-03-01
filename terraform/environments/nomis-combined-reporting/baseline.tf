@@ -1,6 +1,5 @@
 module "baseline" {
-  # source = "../../modules/baseline"
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-environments//terraform/modules/baseline?ref=nomis/DSOS-1759/baseline-module"
+  source = "../../modules/baseline"
 
   providers = {
     aws                       = aws

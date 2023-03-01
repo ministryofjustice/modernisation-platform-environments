@@ -1,6 +1,5 @@
 module "baseline_presets" {
-  # source = "../../modules/baseline_presets"
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-environments//terraform/modules/baseline_presets?ref=nomis/DSOS-1759/baseline-module"
+  source = "../../modules/baseline_presets"
 
   environment = module.environment
 
