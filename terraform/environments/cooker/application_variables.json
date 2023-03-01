@@ -1,6 +1,6 @@
 {
   "accounts": {
-    "development": {
+    "sandbox": {
       "ecs_type": "FARGATE",
       "rds_storage": 5,
       "rds_postgresql_version": "12.8",
