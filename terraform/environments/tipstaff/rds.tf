@@ -16,7 +16,7 @@ resource "aws_db_instance" "tipstaffdbdev" {
 
 resource "aws_db_subnet_group" "dbsubnetgroup" {
   name       = "dbsubnetgroup"
-  subnet_ids = [data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id]
+  subnet_ids = data.aws_subnets.shared-data.ids
 }
 
 resource "aws_security_group" "postgresql_db_sc" {
