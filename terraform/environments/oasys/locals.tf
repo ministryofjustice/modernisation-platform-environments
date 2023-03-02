@@ -350,15 +350,15 @@ locals {
 
   lb_listeners = {
 
-    test = {
+    development = {
       oasys-public = merge(
         local.lb_listener_defaults.https,
         local.lb_listener_defaults.oasys_public,
-        local.lb_listener_defaults.route53, {
-      })
+        local.lb_listener_defaults.route53,
+      )
     }
 
-    development   = {}
+    test          = {}
     preproduction = {}
     production    = {}
   }
