@@ -2,6 +2,21 @@ module "ip_addresses" {
   source = "../../modules/ip_addresses"
 }
 
+module "environment" {
+  source = "../../modules/environment"
+
+  providers = {
+    aws.core-network-services = aws.core-network-services
+    aws.core-vpc              = aws.core-vpc
+  }
+
+  environment_management = local.environment_management
+  business_unit          = local.business_unit
+  application_name       = local.application_name
+  environment            = local.environment
+  subnet_set             = local.subnet_set
+}
+
 #------------------------------------------------------------------------------
 # autoscaling group stuff
 #------------------------------------------------------------------------------
@@ -28,9 +43,69 @@ module "autoscaling_groups" {
   iam_resource_names_prefix = each.value.iam_resource_names_prefix
   instance_profile_policies = local.ec2_common_managed_policies
   application_name          = local.application_name
-  subnet_ids                = data.aws_subnets.private.ids
+  subnet_ids                = data.aws_subnets.shared-private.ids
   tags                      = merge(local.tags, try(each.value.tags, {}))
   account_ids_lookup        = local.environment_management.account_ids
+  lb_target_groups          = lookup(each.value, "lb_target_groups", {})
+  vpc_id                    = module.environment.vpc.id
+}
+
+module "db_ec2_instance" {
+  #checkov:skip=CKV_AWS_79:Oracle cannot accommodate a token
+  source = "../../modules/ec2_instance"
+
+  providers = {
+    aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
+  }
+
+  for_each = try(local.environment_config.databases, {})
+
+  name = each.key
+
+  ami_name                      = each.value.ami_name
+  ami_owner                     = try(each.value.ami_owner, "core-shared-services-production")
+  instance                      = merge(local.database.instance, lookup(each.value, "instance", {}))
+  user_data_cloud_init          = merge(local.database.user_data_cloud_init, lookup(each.value, "user_data_cloud_init", {}))
+  ebs_volumes_copy_all_from_ami = try(each.value.ebs_volumes_copy_all_from_ami, true)
+  ebs_kms_key_id                = module.environment.kms_keys["ebs"].arn
+  ebs_volume_config             = merge(local.database.ebs_volume_config, lookup(each.value, "ebs_volume_config", {}))
+  ebs_volumes                   = { for k, v in local.database.ebs_volumes : k => merge(v, try(each.value.ebs_volumes[k], {})) }
+  ssm_parameters_prefix         = "database/"
+  ssm_parameters                = merge(local.database.ssm_parameters, lookup(each.value, "ssm_parameters", {}))
+  route53_records               = merge(local.database.route53_records, lookup(each.value, "route53_records", {}))
+
+  iam_resource_names_prefix = "ec2-database"
+  instance_profile_policies = local.ec2_common_managed_policies
+
+  business_unit      = local.business_unit
+  application_name   = local.application_name
+  environment        = local.environment
+  region             = local.region
+  availability_zone  = local.availability_zone
+  subnet_id          = module.environment.subnet["data"][local.availability_zone].id
+  tags               = merge(local.tags, local.database.tags, try(each.value.tags, {}))
+  account_ids_lookup = local.environment_management.account_ids
+}
+
+module "loadbalancer" {
+  for_each = merge(local.lbs.common, local.lbs[local.environment])
+
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer.git?ref=v2.1.2"
+  providers = {
+    aws.bucket-replication = aws
+  }
+
+  account_number             = local.environment_management.account_ids[terraform.workspace]
+  application_name           = each.key
+  enable_deletion_protection = coalesce(lookup(each.value, "enable_delete_protection", null), local.lb_defaults.enable_delete_protection)
+  force_destroy_bucket       = coalesce(lookup(each.value, "force_destroy_bucket", null), local.lb_defaults.force_destroy_bucket)
+  idle_timeout               = coalesce(lookup(each.value, "idle_timeout", null), local.lb_defaults.idle_timeout)
+  internal_lb                = coalesce(lookup(each.value, "internal_lb", null), local.lb_defaults.internal_lb)
+  security_groups            = coalesce(lookup(each.value, "security_groups", null), local.lb_defaults.security_groups)
+  public_subnets             = coalesce(lookup(each.value, "public_subnets", null), local.lb_defaults.public_subnets)
+  region                     = local.region
+  vpc_all                    = module.environment.vpc_name
+  tags                       = coalesce(lookup(each.value, "tags", null), local.lb_defaults.tags)
 }
 
 resource "aws_kms_grant" "image-builder-shared-cmk-grant" {

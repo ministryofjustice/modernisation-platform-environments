@@ -1,0 +1,246 @@
+---
+name: terraform plan apply
+
+# Reusable pipeline for running terraform plan and/or apply on a single
+# modernisation platform application environment, e.g. nomis-test.
+#
+# Constraints:
+# - The terraform state must be in a workspace with the same name as the
+#   application account, e.g. ${application}-${environment}
+#
+# Features:
+# - redacts plan and apply output for use in public repo
+# - the apply step sets a deployment environment so a separate approval
+#   step can be added in the github UI.
+# - the apply step is skipped if there is nothing to do in the plan (to
+#   avoid unnecessary apply approvals)
+# - you can optional refresh state as part of the plan (useful if there
+#   are often AWS changes outside of terraform, and you don't want to
+#   see this in the plan step)
+# - you can optionally post PR plans into the corresponding PR
+# - colour output is used unless a PR plan is going to be posted into
+#   a PR.
+
+on:
+  workflow_call:
+    inputs:
+      application:
+        type: string
+        required: true
+        description: "Name of the application, e.g. nomis"
+      environment:
+        type: string
+        required: true
+        description: "Name of the environment, e.g. development"
+      action:
+        type: string
+        required: false
+        description: "Set to plan or plan_apply"
+        default: plan
+      init_plan_apply_tfargs:
+        type: string
+        required: false
+        description: "Any terraform arguments to be passed into terrafrom init, plan and apply, e.g. --lock-timeout=300s"
+        default: "-input=false -lock-timeout=300s"
+      plan_apply_tfargs:
+        type: string
+        required: false
+        description: "Any additional terraform arguments to be passed in to terraform plan/apply, e.g. -var 'foo=bar'"
+        default: ""
+      do_state_refresh_on_plan:
+        type: boolean
+        required: false
+        description: "Set to true to do a state refresh prior to the plan"
+        default: false
+      post_plan_to_pr:
+        type: boolean
+        required: false
+        description: "Set to true to post terraform plan as a comment to the PR"
+        default: false
+    secrets:
+      modernisation_platform_environments:
+        required: true
+      pipeline_github_token:
+        required: true
+
+env:
+  ACCOUNT_NAME: "${{ inputs.application }}-${{ inputs.environment }}"
+  WORKSPACE_NAME: "${{ inputs.application }}-${{ inputs.environment }}"
+  ENVIRONMENT_MANAGEMENT: "${{ secrets.modernisation_platform_environments }}"
+  GITHUB_TOKEN: "${{ secrets.pipeline_github_token }}"
+
+jobs:
+
+  plan:
+    name: "plan"
+    runs-on: ubuntu-latest
+    outputs:
+      plan_exitcode: "${{ steps.plan.outputs.exitcode }}"
+    steps:
+      - name: Debug
+        run: |
+          echo "application=${{ inputs.application }}"
+          echo "environment=${{ inputs.environment }}"
+          echo "action=${{ inputs.action }}"
+          echo "init_plan_apply_tfargs=${{ inputs.init_plan_apply_tfargs }}"
+          echo "plan_apply_tfargs=${{ inputs.plan_apply_tfargs }}"
+          echo "do_state_refresh_on_plan=${{ inputs.do_state_refresh_on_plan }}"
+          echo "post_plan_to_pr=${{ inputs.post_plan_to_pr }}"
+
+      - name: Checkout Repository
+        uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c  # v3.3.0
+
+      - name: Get AWS Account Number
+        run: |
+          ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)
+          echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@67fbcbb121271f7775d2e7715933280b06314838  # v1.7.0
+        with:
+          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
+          role-session-name: githubactionsrolesession
+          aws-region: "eu-west-2"
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@633666f66e0061ca3b725c73b2ec20cd13a8fdd1  # v2.0.3
+        with:
+          terraform_version: "~1"
+          terraform_wrapper: false
+
+      - name: Terraform Init
+        working-directory: "terraform/environments/${{ inputs.application }}"
+        run: |
+          terraform --version
+          echo "terraform init ${{ inputs.init_plan_apply_tfargs }}"
+          terraform init ${{ inputs.init_plan_apply_tfargs }}
+
+      - name: Terraform Workspace Select
+        working-directory: "terraform/environments/${{ inputs.application }}"
+        run: |
+          terraform workspace select "${WORKSPACE_NAME}"
+
+      - name: Terraform State Refresh (Optional)
+        if: inputs.do_state_refresh_on_plan == true
+        working-directory: "terraform/environments/${{ inputs.application }}"
+        run: |
+          set -o pipefail
+          tf_args="${{ inputs.init_plan_apply_tfargs }} ${{ inputs.additional_tfargs }}"
+          echo "terraform apply -refresh-only -auto-approve ${tf_args}"
+          terraform apply -refresh-only -auto-approve ${tf_args} | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh
+
+      - name: Terraform Plan
+        id: plan
+        env:
+          POST_PLAN_TO_PR: "${{ github.event_name == 'pull_request' && inputs.post_plan_to_pr == true }}"
+        working-directory: "terraform/environments/${{ inputs.application }}"
+        run: |
+          set -o pipefail
+          exitcode=0
+          tf_args="-detailed-exitcode ${{ inputs.init_plan_apply_tfargs }} ${{ inputs.additional_tfargs }}"
+          [[ ${POST_PLAN_TO_PR} == 'true' ]] && tf_args="${tf_args} -no-color"
+          [[ ${{ inputs.do_state_refresh_on_plan }} == 'true' ]] && tf_args="${tf_args} -refresh=false"
+          echo "terraform plan ${tf_args}"
+          terraform plan ${tf_args} | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh | tee tfplan.txt || exitcode=$?
+          echo "exitcode=${exitcode}"  # 0=clean plan, 1=error, 2=stuff in plan
+          echo "exitcode=${exitcode}" >> $GITHUB_OUTPUT
+          (( exitcode == 1 )) && exit 1 || exit 0
+
+      - name: Create Plan PR message (Optional)
+        if: github.event_name == 'pull_request' && steps.plan.outputs.exitcode == '2' && inputs.post_plan_to_pr == true
+        working-directory: "terraform/environments/${{ inputs.application }}"
+        run: |
+          comment() {
+            url="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            len=$(cat tfplan.txt | wc -c)
+            echo '**`${{ env.WORKSPACE_NAME }}`** terraform plan on `${{ github.event_name }}` event [#${{ github.run_number }}]('${url}')'
+            echo
+            echo '```'
+            head -c 65476 tfplan.txt | sed -n '/Terraform will perform/,$p'
+            echo
+            echo '```'
+            if [[ $len -gt 65476 ]]; then
+              echo "** Truncated output.  See $url for the rest **"
+            fi
+          }
+          echo 'TF_PLAN_OUT<<EOF' >> $GITHUB_ENV
+          comment >> $GITHUB_ENV
+          echo 'EOF' >> $GITHUB_ENV
+
+      - name: Hide Previous PR comment (Optional)
+        if: ${{ github.event_name == 'pull_request' }}
+        working-directory: "scripts/minimise-comments"
+        env:
+          COMMENT_BODY_CONTAINS: "**`${{ env.WORKSPACE_NAME }}`**"
+          PR_NUMBER: "${{ github.event.pull_request.number }}"
+        run: |
+          go build
+          ./minimise-comments
+
+      - name: Post Plan to PR (Optional)
+        if: github.event_name == 'pull_request' && steps.plan.outputs.exitcode == '2' && inputs.post_plan_to_pr == true
+        env:
+          message: "${{ env.TF_PLAN_OUT }}"
+        run: |
+          escaped_message=$(echo "$message" | jq -Rsa .)
+          curl -sS -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{ env.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments" \
+            -d '{"body":'"${escaped_message}"'}'
+
+  apply:
+    name: "apply"
+    needs: plan
+    if: inputs.action == 'plan_apply' && needs.plan.outputs.plan_exitcode == '2'
+    runs-on: ubuntu-latest
+    environment: "${{ inputs.application }}-${{ inputs.environment }}"
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c  # v3.3.0
+
+      - name: Get AWS Account Number
+        run: |
+          ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)
+          echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@67fbcbb121271f7775d2e7715933280b06314838  # v1.7.0
+        with:
+          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
+          role-session-name: githubactionsrolesession
+          aws-region: "eu-west-2"
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@633666f66e0061ca3b725c73b2ec20cd13a8fdd1  # v2.0.3
+        with:
+          terraform_version: "~1"
+          terraform_wrapper: false
+
+      - name: Terraform Init
+        working-directory: "terraform/environments/${{ inputs.application }}"
+        run: |
+          terraform --version
+          echo "terraform init ${{ inputs.init_plan_apply_tfargs }}"
+          terraform init ${{ inputs.init_plan_apply_tfargs }}
+
+      - name: Terraform Workspace Select
+        working-directory: "terraform/environments/${{ inputs.application }}"
+        run: |
+          terraform workspace select "${WORKSPACE_NAME}"
+
+      - name: Terraform Plan
+        working-directory: "terraform/environments/${{ inputs.application }}"
+        run: |
+          set -o pipefail
+          tf_args="-out x.tfplan ${{ inputs.init_plan_apply_tfargs }} ${{ inputs.additional_tfargs }}"
+          echo "terraform plan ${tf_args}"
+          terraform plan ${tf_args} | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh
+
+      - name: Terraform Apply
+        working-directory: "terraform/environments/${{ inputs.application }}"
+        run: |
+          set -o pipefail
+          tf_args="${{ inputs.init_plan_apply_tfargs }} ${{ inputs.additional_tfargs }} x.tfplan"
+          echo "terraform apply ${tf_args}"
+          terraform apply ${tf_args} | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh

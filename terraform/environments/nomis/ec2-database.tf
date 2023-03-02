@@ -93,6 +93,83 @@ locals {
         description = "ASMSNMP password"
       }
     }
+    cloudwatch_metric_alarms_database = {
+      oracle-db-disconnected = {
+        comparison_operator = "GreaterThanOrEqualToThreshold"
+        evaluation_periods  = "5"
+        datapoints_to_alarm = "5"
+        metric_name         = "collectd_exec_value"
+        namespace           = "CWAgent"
+        period              = "60"
+        statistic           = "Average"
+        threshold           = "1"
+        alarm_description   = "Oracle db connection to a particular SID is not working. See: https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4294246698/Oracle+db+connection+alarm for remediation steps."
+        alarm_actions       = [aws_sns_topic.nomis_nonprod_alarms.arn]
+        dimensions = {
+          instance = "db_connected"
+        }
+      }
+      oracle-batch-failure = {
+        comparison_operator = "GreaterThanOrEqualToThreshold"
+        evaluation_periods  = "5"
+        datapoints_to_alarm = "5"
+        metric_name         = "collectd_exec_value"
+        namespace           = "CWAgent"
+        period              = "60"
+        statistic           = "Average"
+        threshold           = "1"
+        treat_missing_data  = "notBreaching"
+        alarm_description   = "Oracle db has recorded a failed batch status. See: https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4295000327/Batch+Failure for remediation steps."
+        alarm_actions       = [aws_sns_topic.nomis_nonprod_alarms.arn]
+        dimensions = {
+          instance = "nomis_batch_failure_status"
+        }
+      }
+      oracle-long-running-batch = {
+        comparison_operator = "GreaterThanOrEqualToThreshold"
+        evaluation_periods  = "5"
+        datapoints_to_alarm = "5"
+        metric_name         = "collectd_exec_value"
+        namespace           = "CWAgent"
+        period              = "60"
+        statistic           = "Average"
+        threshold           = "1"
+        treat_missing_data  = "notBreaching"
+        alarm_description   = "Oracle db has recorded a long-running batch status. See: https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4325966186/Long+Running+Batch for remediation steps."
+        alarm_actions       = [aws_sns_topic.nomis_nonprod_alarms.arn]
+        dimensions = {
+          instance = "nomis_long_running_batch"
+        }
+      }
+      oracleasm-service = {
+        comparison_operator = "GreaterThanOrEqualToThreshold"
+        evaluation_periods  = "3"
+        namespace           = "CWAgent"
+        metric_name         = "collectd_exec_value"
+        period              = "60"
+        statistic           = "Average"
+        threshold           = "1"
+        alarm_description   = "oracleasm service has stopped"
+        alarm_actions       = [aws_sns_topic.nomis_nonprod_alarms.arn]
+        dimensions = {
+          instance = "oracleasm"
+        }
+      }
+      oracle-ohasd-service = {
+        comparison_operator = "GreaterThanOrEqualToThreshold"
+        evaluation_periods  = "3"
+        namespace           = "CWAgent"
+        metric_name         = "collectd_exec_value"
+        period              = "60"
+        statistic           = "Average"
+        threshold           = "1"
+        alarm_description   = "oracleasm service has stopped"
+        alarm_actions       = [aws_sns_topic.nomis_nonprod_alarms.arn]
+        dimensions = {
+          instance = "oracle_ohasd"
+        }
+      }
+    }
   }
 }
 
@@ -131,6 +208,11 @@ module "db_ec2_instance" {
   subnet_id          = module.environment.subnet["data"][local.availability_zone_1].id
   tags               = merge(local.tags, local.database.tags, try(each.value.tags, {}))
   account_ids_lookup = local.environment_management.account_ids
+  cloudwatch_metric_alarms = {
+    for key, value in merge(local.database.cloudwatch_metric_alarms_database, local.cloudwatch_metric_alarms_linux) :
+    key => merge(value, {
+      alarm_actions = [lookup(each.value, "sns_topic", aws_sns_topic.nomis_nonprod_alarms.arn)]
+  }) }
 }
 
 #------------------------------------------------------------------------------

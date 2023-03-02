@@ -295,3 +295,24 @@ resource "aws_lb_target_group" "this" {
     Name = "${var.name}-${each.key}"
   })
 }
+
+resource "aws_cloudwatch_metric_alarm" "this" {
+  for_each = var.cloudwatch_metric_alarms
+
+  alarm_name          = "${aws_autoscaling_group.this.name}-${each.key}"
+  comparison_operator = each.value.comparison_operator
+  evaluation_periods  = each.value.evaluation_periods
+  metric_name         = each.value.metric_name
+  namespace           = each.value.namespace
+  period              = each.value.period
+  statistic           = each.value.statistic
+  threshold           = each.value.threshold
+  alarm_actions       = each.value.alarm_actions
+  alarm_description   = each.value.alarm_description
+  datapoints_to_alarm = each.value.datapoints_to_alarm
+  treat_missing_data  = each.value.treat_missing_data
+  dimensions = merge(each.value.dimensions, {
+    "AutoScalingGroupName" = aws_autoscaling_group.this.name
+  })
+  tags = {}
+}

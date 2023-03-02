@@ -85,12 +85,14 @@ EOF
 
 
   tags = merge(local.tags,
-    { Name = lower(format("ec2-%s-%s-webgate-%s", local.application_name, local.environment, count.index + 1)) }
+    { Name = lower(format("ec2-%s-%s-webgate-%s", local.application_name, local.environment, count.index + 1)) },
+    { instance-scheduling = "skip-scheduling" },
+    { backup = "true" }
   )
   depends_on = [aws_security_group.ec2_sg_webgate]
 
 }
-
+/*
 module "cw-webgate-ec2" {
   source = "./modules/cw-ec2"
 
@@ -104,7 +106,7 @@ module "cw-webgate-ec2" {
   period       = each.value.period
   threshold    = each.value.threshold
 }
-
+*/
 /*
 resource "aws_ebs_volume" "webgate_create" {
   lifecycle {

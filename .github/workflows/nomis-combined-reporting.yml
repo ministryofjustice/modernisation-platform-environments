@@ -1,0 +1,45 @@
+---
+name: nomis-combined-reporting
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'terraform/environments/nomis-combined-reporting/**'
+      - '.github/workflows/nomis-combined-reporting.yml'
+
+  pull_request:
+    branches:
+      - main
+    types: [opened, edited, reopened, synchronize]
+    paths:
+      - 'terraform/environments/nomis-combined-reporting/**'
+      - '.github/workflows/nomis-combined-reporting.yml'
+
+  workflow_dispatch:
+
+permissions:
+  id-token: write  # This is required for requesting the JWT
+  contents: read  # This is required for actions/checkout
+
+jobs:
+  strategy:
+    uses: ./.github/workflows/reusable_terraform_strategy.yml
+    with:
+      strategy_type: "standard_four_accounts"  # allow apply to dev/test from branch
+
+  terraform:
+    needs: strategy
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.strategy.outputs.matrix) }}
+    uses: ./.github/workflows/reusable_terraform_plan_apply.yml
+    with:
+      application: "${{ github.workflow }}"
+      environment: "${{ matrix.target }}"
+      action: "${{ matrix.action }}"
+      do_state_refresh_on_plan: false  # doesn't work with ACM module
+      post_plan_to_pr: false  # pipeline can be triggered by other teams so avoid posting into their PRs for now
+    secrets:
+      modernisation_platform_environments: "${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}"
+      pipeline_github_token: "${{ secrets.DSO_GITHUB_AUTOMATION_PAT }}"

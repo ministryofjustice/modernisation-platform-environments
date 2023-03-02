@@ -15,6 +15,9 @@
 
 locals {
 
+  # Stores modernisation platform account id for setting up the modernisation-platform provider
+  secret_prefix = "/Jumpserver/Users"
+
   ec2_jumpserver = {
 
     tags = {
@@ -76,11 +79,62 @@ module "ec2_jumpserver" {
   autoscaling_group             = merge(local.ec2_jumpserver.autoscaling_group, lookup(each.value, "autoscaling_group", {}))
   autoscaling_schedules         = lookup(each.value, "autoscaling_schedules", local.autoscaling_schedules_default)
   iam_resource_names_prefix     = "ec2-jumpserver"
-  instance_profile_policies     = local.ec2_common_managed_policies
+  instance_profile_policies     = concat(local.ec2_common_managed_policies, [aws_iam_policy.jumpserver_users.arn])
   application_name              = local.application_name
   region                        = local.region
   subnet_ids                    = module.environment.subnets["private"].ids
   tags                          = merge(local.tags, local.ec2_jumpserver.tags, try(each.value.tags, {}))
   account_ids_lookup            = local.environment_management.account_ids
+  cloudwatch_metric_alarms = {
+    for key, value in local.cloudwatch_metric_alarms_windows :
+    key => merge(value, {
+      alarm_actions = [lookup(each.value, "sns_topic", aws_sns_topic.nomis_nonprod_alarms.arn)]
+  }) }
 }
 
+#------
+# Jumpserver specific
+#------
+
+# IAM policy permissions to enable jumpserver to list secrets and get user passwords from secret manager
+data "aws_iam_policy_document" "jumpserver_users" {
+
+  # Allow getting secrets
+  statement {
+    sid    = "AllowGetSecret"
+    effect = "Allow"
+    actions = [
+      "secretsmanager:GetSecretValue",
+      "secretsmanager:DescribeSecret",
+      "secretsmanager:ListSecretVersionIds",
+    ]
+    resources = [
+      "arn:aws:secretsmanager:${local.region}:${data.aws_caller_identity.current.id}:secret:${local.secret_prefix}/*"
+    ]
+  }
+  # Allow listing of secrets
+  statement {
+    sid    = "AllowListSecrets"
+    effect = "Allow"
+    actions = [
+      "secretsmanager:ListSecrets",
+    ]
+    resources = [
+      "*"
+    ]
+  }
+}
+
+# IAM policy for jumpserver_users
+resource "aws_iam_policy" "jumpserver_users" {
+  name        = "read-access-to-secrets"
+  path        = "/"
+  description = "Allow jumpserver to read and list secrets"
+  policy      = data.aws_iam_policy_document.jumpserver_users.json
+  tags = merge(
+    local.tags,
+    {
+      Name = "read-access-to-secrets"
+    }
+  )
+}

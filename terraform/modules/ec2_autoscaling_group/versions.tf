@@ -6,7 +6,7 @@ terraform {
       configuration_aliases = [aws.core-vpc]
     }
     cloudinit = {
-      version = "~> 2.2"
+      version = "~> 2.2.0"
       source  = "hashicorp/cloudinit"
     }
 

@@ -6,12 +6,12 @@ terraform {
       configuration_aliases = [aws.core-vpc]
     }
     cloudinit = {
-      version = "~> 2.2"
+      version = "~> 2.2.0"
       source  = "hashicorp/cloudinit"
     }
 
     random = {
-      version = "= 3.4.1"
+      version = "~> 3.4.1"
       source  = "hashicorp/random"
     }
 
