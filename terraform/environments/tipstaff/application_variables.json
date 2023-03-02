@@ -12,7 +12,8 @@
       "engine": "postgres",
       "engine_version": "10.21",
       "instance_class": "db.t3.micro",
-      "ami": "ami-00d0096b223242201"
+      "ami": "ami-00d0096b223242201",
+      "subdomain_name": "tipstaff-dev"
     },
     "test": {
       "example_var": "test-data"

@@ -27,5 +27,3 @@ resource "aws_security_group" "tipstaff-dev-ec2-sc" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
-
-//May also need a load balancer
