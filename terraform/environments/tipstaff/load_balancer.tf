@@ -3,7 +3,7 @@ resource "aws_lb" "tipstaff-dev-lb" {
   name               = "tipstaff-dev-load-balancer"
   internal           = false
   load_balancer_type = "application"
-  security_groups            = [aws_security_group.tipstaff-dev-lb-sc.id]
+  security_groups    = [aws_security_group.tipstaff-dev-lb-sc.id]
   # security_groups            = [resource.aws_security_group.postgresql_db_sc.id]
   subnets                    = [data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id]
   enable_deletion_protection = false
