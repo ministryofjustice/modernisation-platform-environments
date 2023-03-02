@@ -1,0 +1,13 @@
+#!/bin/bash
+# Any generic post ansible steps, e.g. calling lifecycle hook
+
+main() {
+  if [[ -x /usr/local/bin/autoscaling-lifecycle-${lifecycle_hook_name}.sh ]]; then
+    echo "# running: /usr/local/bin/autoscaling-lifecycle-${lifecycle_hook_name}.sh"
+    /usr/local/bin/autoscaling-lifecycle-${lifecycle_hook_name}.sh
+  fi
+}
+
+echo "post-ec2provision.sh start" | logger -p local3.info -t user-data
+main 2>&1 | logger -p local3.info -t user-data
+echo "post-ec2provision.sh end" | logger -p local3.info -t user-data

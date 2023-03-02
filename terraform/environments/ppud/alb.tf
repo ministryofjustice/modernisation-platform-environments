@@ -1,4 +1,4 @@
-
+/*
 # PPUD ALB Configuration
 
 resource "aws_lb" "PPUD-ALB" {
@@ -126,3 +126,5 @@ resource "aws_lb_target_group_attachment" "WAM-Portal" {
   target_id        = aws_instance.s609693lo6vw105[0].id
   port             = 80
 }
+
+*/

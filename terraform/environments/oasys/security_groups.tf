@@ -166,3 +166,76 @@ resource "aws_security_group" "data" {
     Name = "data"
   })
 }
+
+resource "aws_security_group" "public" {
+  #checkov:skip=CKV2_AWS_5:skip "Ensure that Security Groups are attached to another resource"
+  name        = "public"
+  description = "Security group for public subnet"
+  vpc_id      = module.environment.vpc.id
+
+  ingress {
+    description = "Allow all ingress to self"
+    from_port   = 0
+    to_port     = 0
+    protocol    = -1
+    self        = true
+  }
+
+  ingress {
+    description = "Allow ssh ingress"
+    from_port   = "22"
+    to_port     = "22"
+    protocol    = "TCP"
+    cidr_blocks = local.security_group_cidrs.ssh
+    security_groups = [
+      module.bastion_linux.bastion_security_group
+    ]
+  }
+
+  ingress {
+    description = "Allow https ingress"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    security_groups = [
+      module.bastion_linux.bastion_security_group
+    ]
+    cidr_blocks = local.security_group_cidrs.https
+  }
+
+  ingress {
+    description = "Allow http7001 ingress"
+    from_port   = 7001
+    to_port     = 7001
+    protocol    = "tcp"
+    security_groups = [
+      module.bastion_linux.bastion_security_group
+    ]
+    cidr_blocks = local.security_group_cidrs.http7xxx
+  }
+
+  ingress {
+    description = "Allow http7777 ingress"
+    from_port   = 7777
+    to_port     = 7777
+    protocol    = "tcp"
+    security_groups = [
+      module.bastion_linux.bastion_security_group
+
+    ]
+    cidr_blocks = local.security_group_cidrs.http7xxx
+  }
+
+  egress {
+    description     = "Allow all egress"
+    from_port       = 0
+    to_port         = 0
+    protocol        = "-1"
+    cidr_blocks     = ["0.0.0.0/0"]
+    security_groups = []
+  }
+
+  tags = merge(local.tags, {
+    Name = "public"
+  })
+}

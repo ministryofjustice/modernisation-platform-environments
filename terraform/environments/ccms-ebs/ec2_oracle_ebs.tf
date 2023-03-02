@@ -1,7 +1,7 @@
 #  Build EC2 
 resource "aws_instance" "ec2_oracle_ebs" {
   instance_type               = local.application_data.accounts[local.environment].ec2_oracle_instance_type_ebsdb
-  ami                         = data.aws_ami.oracle_base_prereqs.id
+  ami                         = data.aws_ami.oracle_db.id
   key_name                    = local.application_data.accounts[local.environment].key_name
   vpc_security_group_ids      = [aws_security_group.ec2_sg_ebsdb.id]
   subnet_id                   = data.aws_subnet.data_subnets_a.id
@@ -36,7 +36,6 @@ mount -a
 
 EOF
 
-
   metadata_options {
     http_endpoint = "enabled"
     http_tokens   = "required"
@@ -64,7 +63,8 @@ EOF
   */
   tags = merge(local.tags,
     { Name = lower(format("ec2-%s-%s-Oracle-EBS-db", local.application_name, local.environment)) },
-    { instance-scheduling = "skip-scheduling" }
+    { instance-scheduling = "skip-scheduling" },
+    { backup = "true" }
   )
   depends_on = [aws_security_group.ec2_sg_ebsdb]
 }
@@ -204,7 +204,7 @@ resource "aws_volume_attachment" "backup_att" {
   instance_id = aws_instance.ec2_oracle_ebs.id
 }
 
-
+/*
 module "cw-ebs-ec2" {
   source = "./modules/cw-ec2"
 
@@ -218,3 +218,4 @@ module "cw-ebs-ec2" {
   period       = each.value.period
   threshold    = each.value.threshold
 }
+*/

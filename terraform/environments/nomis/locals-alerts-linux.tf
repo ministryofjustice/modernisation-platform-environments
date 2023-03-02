@@ -10,7 +10,7 @@ locals {
       statistic           = "Average"
       threshold           = "90"
       alarm_description   = "This metric monitors the amount of available memory. If the amount of available memory is greater than 90% for 2 minutes, the alarm will trigger."
-      alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
+      alarm_actions       = [aws_sns_topic.nomis_nonprod_alarms.arn]
     }
     cpu-usage-iowait = {
       comparison_operator = "GreaterThanOrEqualToThreshold"
@@ -22,7 +22,7 @@ locals {
       statistic           = "Average"
       threshold           = "90"
       alarm_description   = "This metric monitors the amount of CPU time spent waiting for I/O to complete. If the average CPU time spent waiting for I/O to complete is greater than 90% for 30 minutes, the alarm will trigger."
-      alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
+      alarm_actions       = [aws_sns_topic.nomis_nonprod_alarms.arn]
     }
     disk-used-percent = {
       comparison_operator = "GreaterThanOrEqualToThreshold"
@@ -34,7 +34,7 @@ locals {
       statistic           = "Average"
       threshold           = "85"
       alarm_description   = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space is above 85% for 2 minutes, the alarm will trigger: https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4289822860/Disk+Free+alarm+-+Linux"
-      alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
+      alarm_actions       = [aws_sns_topic.nomis_nonprod_alarms.arn]
     }
     cpu-utilization = {
       comparison_operator = "GreaterThanOrEqualToThreshold" # threshold to trigger the alarm state
@@ -46,7 +46,7 @@ locals {
       statistic           = "Average"                       # could be Average/Minimum/Maximum etc.
       threshold           = "95"                            # threshold for the alarm - see comparison_operator for usage
       alarm_description   = "Triggers if the average cpu remains at 95% utilization or above for 15 minutes"
-      alarm_actions       = [aws_sns_topic.nomis_alarms.arn] # SNS topic to send the alarm to
+      alarm_actions       = [aws_sns_topic.nomis_nonprod_alarms.arn] # SNS topic to send the alarm to
     }
     # Key Servers Instance alert - sensitive alert for key servers changing status from healthy. 
     # If this triggers often then we've got a problem.
@@ -59,7 +59,7 @@ locals {
       statistic           = "Average"
       threshold           = "1"
       alarm_description   = "Instance status checks monitor the software and network configuration of your individual instance. When an instance status check fails, you typically must address the problem yourself: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/monitoring-system-instance-status-check.html"
-      alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
+      alarm_actions       = [aws_sns_topic.nomis_nonprod_alarms.arn]
     }
     system-health-check-failed = {
       comparison_operator = "GreaterThanOrEqualToThreshold"
@@ -70,7 +70,7 @@ locals {
       statistic           = "Average"
       threshold           = "1"
       alarm_description   = "System status checks monitor the AWS systems on which your instance runs. These checks detect underlying problems with your instance that require AWS involvement to repair: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/monitoring-system-instance-status-check.html"
-      alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
+      alarm_actions       = [aws_sns_topic.nomis_nonprod_alarms.arn]
     }
     # Service alert - chronyd
     # Service alert - sshd

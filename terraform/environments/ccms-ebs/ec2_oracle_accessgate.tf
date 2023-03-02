@@ -86,12 +86,13 @@ EOF
 
   tags = merge(local.tags,
     { Name = lower(format("ec2-%s-%s-accessgate-%s", local.application_name, local.environment, count.index + 1)) },
-    { instance-scheduling = "skip-scheduling" }
+    { instance-scheduling = "skip-scheduling" },
+    { backup = "true" }
   )
   depends_on = [aws_security_group.ec2_sg_accessgate]
 
 }
-
+/*
 module "cw-accgate-ec2" {
   source = "./modules/cw-ec2"
 
@@ -106,7 +107,7 @@ module "cw-accgate-ec2" {
   threshold    = each.value.threshold
 
 }
-
+*/
 /*
 resource "aws_ebs_volume" "accessgate_create" {
   lifecycle {

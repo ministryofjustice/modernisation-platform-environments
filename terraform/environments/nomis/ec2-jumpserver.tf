@@ -85,7 +85,11 @@ module "ec2_jumpserver" {
   subnet_ids                    = module.environment.subnets["private"].ids
   tags                          = merge(local.tags, local.ec2_jumpserver.tags, try(each.value.tags, {}))
   account_ids_lookup            = local.environment_management.account_ids
-  cloudwatch_metric_alarms      = local.cloudwatch_metric_alarms_windows
+  cloudwatch_metric_alarms = {
+    for key, value in local.cloudwatch_metric_alarms_windows :
+    key => merge(value, {
+      alarm_actions = [lookup(each.value, "sns_topic", aws_sns_topic.nomis_nonprod_alarms.arn)]
+  }) }
 }
 
 #------
@@ -133,25 +137,4 @@ resource "aws_iam_policy" "jumpserver_users" {
       Name = "read-access-to-secrets"
     }
   )
-}
-
-# resource policy to restrict access to secret value to specific user and the CICD role used to deploy terraform
-# checkov:skip=CKV_AWS_108:This is necessary, so just skip it
-data "aws_iam_policy_document" "jumpserver_secrets" {
-  for_each = toset(data.github_team.dso_users.members)
-
-  statement {
-    effect = "Allow"
-    actions = [
-      "secretsmanager:GetSecretValue",
-      "secretsmanager:DescribeSecret",
-      "secretsmanager:ListSecretVersionIds",
-      "secretsmanager:ListSecrets",
-    ]
-    resources = ["*"]
-    principals {
-      type        = "AWS"
-      identifiers = [data.aws_caller_identity.current.id]
-    }
-  }
 }

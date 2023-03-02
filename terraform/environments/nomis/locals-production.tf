@@ -1,6 +1,8 @@
 # nomis-production environment settings
 locals {
   nomis_production = {
+    # production SNS channel for alarms
+    sns_topic = aws_sns_topic.nomis_alarms.arn
     # Details of OMS Manager in FixNGo (only needs defining if databases in the environment are managed)
     database_oracle_manager = {
       oms_ip_address = "10.40.0.136"
@@ -66,6 +68,7 @@ locals {
           data  = { total_size = 4000 }
           flash = { total_size = 1000 }
         }
+        sns_topic = aws_sns_topic.nomis_alarms.arn
       }
 
       prod-nomis-db-2 = {
@@ -95,6 +98,7 @@ locals {
           data  = { total_size = 4000 }
           flash = { total_size = 1000 }
         }
+        sns_topic = aws_sns_topic.nomis_alarms.arn
       }
 
       prod-nomis-db-3 = {
@@ -120,6 +124,7 @@ locals {
           data  = { total_size = 3000, iops = 3750, throughput = 750 }
           flash = { total_size = 500 }
         }
+        sns_topic = aws_sns_topic.nomis_alarms.arn
       }
     }
 

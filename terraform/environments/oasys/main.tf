@@ -46,6 +46,8 @@ module "autoscaling_groups" {
   subnet_ids                = data.aws_subnets.private.ids
   tags                      = merge(local.tags, try(each.value.tags, {}))
   account_ids_lookup        = local.environment_management.account_ids
+  lb_target_groups          = lookup(each.value, "lb_target_groups", {})
+  vpc_id                    = module.environment.vpc.id
 }
 
 module "db_ec2_instance" {
@@ -83,6 +85,27 @@ module "db_ec2_instance" {
   subnet_id          = module.environment.subnet["data"][local.availability_zone].id
   tags               = merge(local.tags, local.database.tags, try(each.value.tags, {}))
   account_ids_lookup = local.environment_management.account_ids
+}
+
+module "loadbalancer" {
+  for_each = merge(local.lbs.common, local.lbs[local.environment])
+
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer.git?ref=v2.1.2"
+  providers = {
+    aws.bucket-replication = aws
+  }
+
+  account_number             = local.environment_management.account_ids[terraform.workspace]
+  application_name           = each.key
+  enable_deletion_protection = coalesce(lookup(each.value, "enable_delete_protection", null), local.lb_defaults.enable_delete_protection)
+  force_destroy_bucket       = coalesce(lookup(each.value, "force_destroy_bucket", null), local.lb_defaults.force_destroy_bucket)
+  idle_timeout               = coalesce(lookup(each.value, "idle_timeout", null), local.lb_defaults.idle_timeout)
+  internal_lb                = coalesce(lookup(each.value, "internal_lb", null), local.lb_defaults.internal_lb)
+  security_groups            = coalesce(lookup(each.value, "security_groups", null), local.lb_defaults.security_groups)
+  public_subnets             = coalesce(lookup(each.value, "public_subnets", null), local.lb_defaults.public_subnets)
+  region                     = local.region
+  vpc_all                    = module.environment.vpc_name
+  tags                       = coalesce(lookup(each.value, "tags", null), local.lb_defaults.tags)
 }
 
 resource "aws_kms_grant" "image-builder-shared-cmk-grant" {

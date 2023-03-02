@@ -2,6 +2,19 @@ locals {
   vpc_name     = "${var.business_unit}-${var.environment}"    # e.g. hmpps-development
   account_name = "${var.application_name}-${var.environment}" # e.g. nomis-development
 
+  possible_account_names = [
+    "${var.application_name}-development",
+    "${var.application_name}-test",
+    "${var.application_name}-preproduction",
+    "${var.application_name}-production",
+  ]
+
+  account_names = flatten([
+    for name in local.possible_account_names : [
+      contains(keys(var.environment_management.account_ids), name) ? [name] : []
+    ]
+  ])
+
   subnet_names = {
     general = ["data", "private", "public"]
   }
