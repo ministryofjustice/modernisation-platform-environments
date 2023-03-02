@@ -5,7 +5,7 @@ resource "aws_instance" "db_mgmt_server" {
   ebs_optimized               = true
   iam_instance_profile        = aws_iam_instance_profile.db_mgmt_profile.name
   instance_type               = "t3.large"
-  #  key_name                    = local.app_data.accounts[local.environment].key_name
+  #  key_name                    = local.application_data.accounts[local.environment].key_name
   monitoring             = true
   subnet_id              = data.aws_subnet.private_subnets_a.id
   user_data              = data.template_cloudinit_config.cloudinit-db-mgmt.rendered
