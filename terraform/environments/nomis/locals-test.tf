@@ -154,6 +154,12 @@ locals {
           warm_pool        = null
         }
         autoscaling_schedules = {}
+        ebs_volumes = {
+          "/dev/sdb" = {
+            type = "gp3"
+            size = 150
+          }
+        }
       }
     }
 
