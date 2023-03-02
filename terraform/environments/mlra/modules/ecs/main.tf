@@ -319,9 +319,9 @@ resource "aws_ecs_cluster" "ecs_cluster" {
   )
 }
 
-resource "aws_ecs_cluster_capacity_providers" "ecs_cluster" {
-  cluster_name = aws_ecs_cluster.ecs_cluster.name
-}
+# resource "aws_ecs_cluster_capacity_providers" "ecs_cluster" {
+#   cluster_name = aws_ecs_cluster.ecs_cluster.name
+# }
 
 resource "aws_ecs_task_definition" "windows_ecs_task_definition" {
   family             = "${var.app_name}-task-definition"
@@ -401,27 +401,28 @@ resource "aws_ecs_service" "ecs_service" {
   )
 }
 
-resource "aws_ecs_capacity_provider" "capacity_provider" {
-  name = "${var.app_name}-capacity-provider"
+# resource "aws_ecs_capacity_provider" "capacity_provider" {
+#   name = "${var.app_name}-capacity-provider"
+#
+#   auto_scaling_group_provider {
+#     auto_scaling_group_arn = aws_autoscaling_group.cluster-scaling-group.arn
+#     # managed_scaling {
+#     #     maximum_scaling_step_size = 1000
+#     #     minimum_scaling_step_size = 1
+#     #     status                    = "ENABLED"
+#     #     target_capacity           = 10
+#     # }
+#
+#   }
+#
+#   tags = merge(
+#     var.tags_common,
+#     {
+#       Name = "${var.app_name}-capacity-provider"
+#     }
+#   )
+# }
 
-  auto_scaling_group_provider {
-    auto_scaling_group_arn = aws_autoscaling_group.cluster-scaling-group.arn
-    # managed_scaling {
-    #     maximum_scaling_step_size = 1000
-    #     minimum_scaling_step_size = 1
-    #     status                    = "ENABLED"
-    #     target_capacity           = 10
-    # }
-
-  }
-
-  tags = merge(
-    var.tags_common,
-    {
-      Name = "${var.app_name}-capacity-provider"
-    }
-  )
-}
 # ECS task execution role data
 # https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_execution_IAM_role.html
 data "aws_iam_policy_document" "ecs_task_execution_role" {
