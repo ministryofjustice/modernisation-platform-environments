@@ -144,11 +144,12 @@ module "acm_certificate" {
     aws.core-network-services = aws.core-network-services
   }
 
-  name                    = each.key
-  domain_name             = each.value.domain_name
-  subject_alternate_names = each.value.subject_alternate_names
-  validation              = each.value.validation
-  tags                    = merge(local.tags, lookup(each.value, "tags", {}))
+  name                     = each.key
+  domain_name              = each.value.domain_name
+  subject_alternate_names  = each.value.subject_alternate_names
+  validation               = each.value.validation
+  tags                     = merge(local.tags, lookup(each.value, "tags", {}))
+  cloudwatch_metric_alarms = local.acm_certificates.cloudwatch_metric_alarms_acm
 }
 
 resource "aws_kms_grant" "image-builder-shared-cmk-grant" {
