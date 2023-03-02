@@ -14,19 +14,9 @@ resource "aws_db_instance" "tipstaffdbdev" {
   publicly_accessible    = true
 }
 
-resource "aws_db_subnet_group" "db_subnet_group_shared_data" {
-  name       = "dbsubnetgroup"
-  subnet_ids = data.aws_subnets.shared-data.ids
-}
-
-resource "aws_db_subnet_group" "db_subnet_group_private_public" {
+resource "aws_db_subnet_group" "dbsubnetgroup" {
   name       = "dbsubnetgroup"
   subnet_ids = data.aws_subnets.private-public.ids
-}
-
-resource "aws_db_subnet_group" "db_subnet_group_shared_public" {
-  name       = "dbsubnetgroup"
-  subnet_ids = data.aws_subnets.shared-public.ids
 }
 
 resource "aws_security_group" "postgresql_db_sc" {
