@@ -1,6 +1,6 @@
 {
   "accounts": {
-    "development": {
+    "sandbox": {
       "key_name": "sprinkler-ec2",
       "region": "eu-west-2",
       "ecs_type": "FARGATE",
