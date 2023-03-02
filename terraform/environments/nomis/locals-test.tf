@@ -138,12 +138,22 @@ locals {
           oracle-db-name     = "CNOMT1"
           server-type        = "nomis-web"
         }
-        ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-01-03T17-01-12.128Z"
-
+        # ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-01-03T17-01-12.128Z"
+        ami_name = "base_rhel_6_10_test_2022-12-30T16-10-33.253Z"
+        user_data_cloud_init = {
+          args = {
+            lifecycle_hook_name  = "ready-hook"
+            branch               = "nomis/weblogic-test-for-sandhya"
+            ansible_repo         = "modernisation-platform-configuration-management"
+            ansible_repo_basedir = "ansible"
+            ansible_args         = "--tags ec2provision"
+          }
+        }
         autoscaling_group = {
-          desired_capacity = 0
+          desired_capacity = 1
           warm_pool        = null
         }
+        autoscaling_schedules = {}
       }
     }
 
