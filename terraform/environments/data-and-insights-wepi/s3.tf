@@ -17,7 +17,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "wepi_redshift_logging_bucket_l
     id = "expiry"
 
     expiration {
-      days = local.app_data.accounts[local.environment].redshift_log_retention
+      days = local.application_data.accounts[local.environment].redshift_log_retention
     }
 
     status = "Enabled"
