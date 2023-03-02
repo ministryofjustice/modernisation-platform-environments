@@ -300,6 +300,7 @@ locals {
 
     oasys_public = {
       lb_application_name = "oasys-public"
+      asg_instance        = "webservers"
     }
 
     route53 = {
