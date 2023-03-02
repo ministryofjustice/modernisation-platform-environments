@@ -250,8 +250,8 @@ resource "aws_lb_listener" "alb_listener" {
   load_balancer_arn = aws_lb.loadbalancer.arn
   port              = var.listener_port
   #checkov:skip=CKV_AWS_2:The ALB protocol is HTTP
-  protocol = var.listener_protocol #tfsec:ignore:aws-elb-http-not-used
-  ssl_policy = var.listener_protocol == "true" ? "" : null
+  protocol        = var.listener_protocol #tfsec:ignore:aws-elb-http-not-used
+  ssl_policy      = var.listener_protocol == "true" ? "" : null
   certificate_arn = var.listener_protocol == "true" ? "" : null # This needs the ARN of the certificate from Mod Platform
 
   default_action {
