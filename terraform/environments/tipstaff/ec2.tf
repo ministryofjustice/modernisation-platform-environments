@@ -5,7 +5,6 @@ resource "aws_instance" "tipstaff-ec2-instance-dev" {
   count                  = "1"
   subnet_id              = data.aws_subnet.data_subnets_a.id
   vpc_security_group_ids = [aws_security_group.tipstaff-dev-ec2-sc.id]
-  vpc_id                 = data.aws_vpc.shared.id
 }
 resource "aws_eip" "ec2-elastic-ip" {
   vpc      = true
