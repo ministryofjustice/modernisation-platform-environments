@@ -350,20 +350,20 @@ locals {
 
   lb_listeners = {
 
-    development = {}
-    #     oasys-public = merge(
-    #       local.lb_listener_defaults.https,
-    #       local.lb_listener_defaults.oasys_public,
-    #       local.lb_listener_defaults.route53,
-    #     )
-    #   }
+    development = {
+      oasys-public = merge(
+        local.lb_listener_defaults.https,
+        local.lb_listener_defaults.oasys_public,
+        local.lb_listener_defaults.route53,
+      )
+    }
 
     test          = {}
     preproduction = {}
     production    = {}
   }
 
-  existing_target_groups = module.autoscaling_groups["webservers"].lb_target_groups
+  # existing_target_groups = module.autoscaling_groups["webservers"].lb_target_groups
 
   acm_certificates = {
 
