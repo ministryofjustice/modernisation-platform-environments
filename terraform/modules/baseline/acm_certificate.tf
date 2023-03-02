@@ -13,4 +13,5 @@ module "acm_certificate" {
   subject_alternate_names = each.value.subject_alternate_names
   validation              = each.value.validation
   tags                    = merge(local.tags, lookup(each.value, "tags", {}))
+  cloudwatch_metric_alarms = {}
 }
