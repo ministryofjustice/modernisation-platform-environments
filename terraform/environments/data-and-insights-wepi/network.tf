@@ -3,7 +3,7 @@ resource "aws_security_group" "wepi_sg_allow_redshift" {
   # checkov:skip=CKV2_AWS_5: Configured in Redshfit cluster, Checkov not detecting reference.
   name        = "wepi_allow_redshift"
   description = "Allow Redshift inbound traffic from bastion"
-  vpc_id      = data.aws_vpc.wepi_vpc.id
+  vpc_id      = data.aws_vpc.shared.id
 
   ingress {
     description = "Redshift ingress from bastion"

@@ -5,7 +5,7 @@ resource "aws_instance" "s609693lo6vw109" {
   vpc_security_group_ids = [aws_security_group.SCR-Team-Foundation-Server.id]
   source_dest_check      = false
   subnet_id              = data.aws_subnet.private_subnets_a.id
-  iam_instance_profile   = aws_iam_instance_profile.ec2_profile[0].id
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   tags = {
     Name   = "s609693lo6vw109"
     backup = true
@@ -17,7 +17,7 @@ resource "aws_instance" "s609693lo6vw105" {
   ami                    = "ami-0edd8d3e58d106f40"
   instance_type          = "m5.large"
   source_dest_check      = false
-  iam_instance_profile   = aws_iam_instance_profile.ec2_profile[0].id
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.WAM-Portal.id]
   subnet_id              = data.aws_subnet.private_subnets_a.id
   tags = {
@@ -30,7 +30,7 @@ resource "aws_instance" "s609693lo6vw104" {
   ami                    = "ami-0f115a52a37278d93"
   instance_type          = "m5.large"
   source_dest_check      = false
-  iam_instance_profile   = aws_iam_instance_profile.ec2_profile[0].id
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.WAM-Data-Access-Server.id]
   subnet_id              = data.aws_subnet.private_subnets_a.id
   tags = {
@@ -43,7 +43,7 @@ resource "aws_instance" "s609693lo6vw100" {
   ami                    = "ami-0fbad994892c0f0c4"
   instance_type          = "m5.large"
   source_dest_check      = false
-  iam_instance_profile   = aws_iam_instance_profile.ec2_profile[0].id
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.PPUD-Database-Server.id]
   subnet_id              = data.aws_subnet.private_subnets_a.id
   tags = {
@@ -57,7 +57,7 @@ resource "aws_instance" "s609693lo6vw101" {
   ami                    = "ami-0fe72f8cd9b3d4df6"
   instance_type          = "m5.large"
   source_dest_check      = false
-  iam_instance_profile   = aws_iam_instance_profile.ec2_profile[0].id
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.PPUD-WEB-Portal.id]
   subnet_id              = data.aws_subnet.private_subnets_b.id
   tags = {
@@ -70,7 +70,7 @@ resource "aws_instance" "s609693lo6vw103" {
   ami                    = "ami-09bf383e2d58df1c7"
   instance_type          = "m5.large"
   source_dest_check      = false
-  iam_instance_profile   = aws_iam_instance_profile.ec2_profile[0].id
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.Primary-DOC-Server.id]
   subnet_id              = data.aws_subnet.private_subnets_b.id
   tags = {
@@ -83,7 +83,7 @@ resource "aws_instance" "s609693lo6vw106" {
   ami                    = "ami-0f9ea6b08039bb33b"
   instance_type          = "m5.large"
   source_dest_check      = false
-  iam_instance_profile   = aws_iam_instance_profile.ec2_profile[0].id
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.Dev-Box-VW106.id]
   subnet_id              = data.aws_subnet.private_subnets_b.id
   tags = {
@@ -96,7 +96,7 @@ resource "aws_instance" "s609693lo6vw107" {
   ami                    = "ami-04682227c9aa18702"
   instance_type          = "m5.large"
   source_dest_check      = false
-  iam_instance_profile   = aws_iam_instance_profile.ec2_profile[0].id
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.Dev-Box-VW107.id]
   subnet_id              = data.aws_subnet.private_subnets_b.id
   tags = {
@@ -109,7 +109,7 @@ resource "aws_instance" "PPUDWEBSERVER2" {
   ami                    = "ami-06135685d04b2ebea"
   instance_type          = "m5.large"
   source_dest_check      = false
-  iam_instance_profile   = aws_iam_instance_profile.ec2_profile[0].id
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.PPUD-WEB-Portal.id]
   subnet_id              = data.aws_subnet.private_subnets_c.id
   tags = {
@@ -122,7 +122,7 @@ resource "aws_instance" "s609693lo6vw102" {
   ami                    = "ami-0640473a9b0267bac"
   instance_type          = "m5.large"
   source_dest_check      = false
-  iam_instance_profile   = aws_iam_instance_profile.ec2_profile[0].id
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.Secondary-DOC-Server.id]
   subnet_id              = data.aws_subnet.private_subnets_c.id
   tags = {
@@ -135,7 +135,7 @@ resource "aws_instance" "s609693lo6vw108" {
   ami                    = "ami-0e0b7dbcff71ddd9c"
   instance_type          = "m5.large"
   source_dest_check      = false
-  iam_instance_profile   = aws_iam_instance_profile.ec2_profile[0].id
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.Dev-Box-VW108.id]
   subnet_id              = data.aws_subnet.private_subnets_c.id
   tags = {
@@ -148,10 +148,75 @@ resource "aws_instance" "PPUD-DEV-AWS-AD" {
   ami                    = "ami-04a9f465215b89a4b"
   instance_type          = "t2.micro"
   source_dest_check      = false
-  iam_instance_profile   = aws_iam_instance_profile.ec2_profile[0].id
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.PPUD-DEV-AD.id]
   subnet_id              = data.aws_subnet.private_subnets_a.id
   tags = {
     Name = "PPUD-DEV-AWS-AD"
+  }
+}
+
+resource "aws_instance" "s618358rgvw201" {
+  count                  = local.is-preproduction == true ? 1 : 0
+  ami                    = "ami-0e79a3f367356535e"
+  instance_type          = "c5.large"
+  source_dest_check      = false
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.WAM-Portal.id]
+  subnet_id              = data.aws_subnet.private_subnets_a.id
+  tags = {
+    Name = "s618358rgvw201"
+  }
+}
+
+resource "aws_instance" "S618358RGVW202" {
+  count                  = local.is-preproduction == true ? 1 : 0
+  ami                    = "ami-066d0fe7085076548"
+  instance_type          = "m5.large"
+  source_dest_check      = false
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.Bridge-Server-Preprod.id]
+  subnet_id              = data.aws_subnet.private_subnets_a.id
+  tags = {
+    Name = "S618358RGVW202"
+  }
+}
+
+resource "aws_instance" "s618358rgsw025" {
+  count                  = local.is-preproduction == true ? 1 : 0
+  ami                    = "ami-0ad4be40d57ecc994"
+  instance_type          = "c5.4xlarge"
+  source_dest_check      = false
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.WAM-Data-Access-Server.id]
+  subnet_id              = data.aws_subnet.private_subnets_a.id
+  tags = {
+    Name = "s618358rgsw025"
+  }
+}
+
+resource "aws_instance" "s618358rgvw024" {
+  count                  = local.is-preproduction == true ? 1 : 0
+  ami                    = "ami-0d3d8251678e13330"
+  instance_type          = "m5.xlarge"
+  source_dest_check      = false
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.PPUD-Database-Server.id]
+  subnet_id              = data.aws_subnet.data_subnets_a.id
+  tags = {
+    Name = "s618358rgvw024"
+  }
+}
+
+resource "aws_instance" "s618358rgvw023" {
+  count                  = local.is-preproduction == true ? 1 : 0
+  ami                    = "ami-04944a7de56185ec3"
+  instance_type          = "c5.large"
+  source_dest_check      = false
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.PPUD-WEB-Portal.id]
+  subnet_id              = data.aws_subnet.private_subnets_b.id
+  tags = {
+    Name = "s618358rgvw023"
   }
 }
