@@ -1,22 +1,3 @@
-data "aws_caller_identity" "current" {}
-
-data "aws_subnet" "private_subnets_a" {
-  vpc_id = data.aws_vpc.shared.id
-  tags = {
-    "Name" = "${var.networking[0].business-unit}-sandbox-${var.networking[0].set}-private-${local.app_data.accounts[local.environment].region}a"
-  }
-}
-
-data "aws_subnets" "private_subnets_a" {
-  filter {
-    name   = "vpc-id"
-    values = [data.aws_vpc.shared.id]
-  }
-  tags = {
-    Name = "${var.networking[0].business-unit}-sandbox-${var.networking[0].set}-private-${local.app_data.accounts[local.environment].region}a"
-  }
-}
-
 variable "region" {
   type        = string
   description = ""
@@ -86,72 +67,6 @@ variable "region" {
 #   role = aws_iam_role.bastion_host_role.name
 #   path = "/"
 # }
-
-
-
-
-
-
-
-
-
-
-
-
-
-locals {
-  app_data = jsondecode(file("./app_variables.json"))
-}
-
-data "aws_vpc" "shared" {
-  tags = {
-    "Name" = "${var.networking[0].business-unit}-sandbox"
-  }
-}
-
-data "aws_subnets" "shared-data" {
-  filter {
-    name   = "vpc-id"
-    values = [data.aws_vpc.shared.id]
-  }
-  tags = {
-    Name = "${var.networking[0].business-unit}-sandbox-${var.networking[0].set}-data*"
-  }
-}
-
-data "aws_subnets" "shared-private" {
-  filter {
-    name   = "vpc-id"
-    values = [data.aws_vpc.shared.id]
-  }
-  tags = {
-    Name = "${var.networking[0].business-unit}-sandbox-${var.networking[0].set}-private*"
-  }
-}
-
-data "aws_subnets" "shared-public" {
-  filter {
-    name   = "vpc-id"
-    values = [data.aws_vpc.shared.id]
-  }
-  tags = {
-    Name = "${var.networking[0].business-unit}-sandbox-${var.networking[0].set}-public*"
-  }
-}
-
-data "aws_route53_zone" "external" {
-  provider = aws.core-vpc
-
-  name         = "${var.networking[0].business-unit}-sandbox.modernisation-platform.service.justice.gov.uk."
-  private_zone = false
-}
-
-data "aws_route53_zone" "inner" {
-  provider = aws.core-vpc
-
-  name         = "${var.networking[0].business-unit}-sandbox.modernisation-platform.internal."
-  private_zone = true
-}
 
 #------------------------------------------------------------------------------
 # Application - ECS Fargate
@@ -236,12 +151,12 @@ resource "aws_ecs_service" "app" {
   }
   cluster                           = aws_ecs_cluster.app.id
   task_definition                   = aws_ecs_task_definition.app.arn
-  launch_type                       = local.app_data.accounts[local.environment].ecs_type
+  launch_type                       = local.application_data.accounts[local.environment].ecs_type
   enable_execute_command            = true
   desired_count                     = "1"
   health_check_grace_period_seconds = "120"
   network_configuration {
-    subnets          = data.aws_subnets.shared-private.ids
+    subnets          = data.aws_subnets.private-public.ids
     security_groups  = [aws_security_group.app.id]
     assign_public_ip = false
   }
@@ -268,7 +183,7 @@ resource "aws_ecs_service" "app" {
 resource "aws_ecs_task_definition" "app" {
 
   network_mode             = "awsvpc"
-  requires_compatibilities = [local.app_data.accounts[local.environment].ecs_type]
+  requires_compatibilities = [local.application_data.accounts[local.environment].ecs_type]
   execution_role_arn       = aws_iam_role.app_execution.arn
   task_role_arn            = aws_iam_role.app_task.arn
   family                   = var.networking[0].application
@@ -668,7 +583,7 @@ resource "aws_lb" "inner" {
   internal                   = true
   load_balancer_type         = "application"
   security_groups            = [aws_security_group.inner_lb.id]
-  subnets                    = data.aws_subnets.shared-private.ids
+  subnets                    = data.aws_subnets.private-public.ids
   enable_deletion_protection = false
 
   tags = merge(
@@ -735,17 +650,6 @@ resource "aws_route53_record" "inner" {
     name                   = aws_lb.inner.dns_name
     zone_id                = aws_lb.inner.zone_id
     evaluate_target_health = true
-  }
-}
-
-data "terraform_remote_state" "core_network_services" {
-  backend = "s3"
-  config = {
-    acl     = "bucket-owner-full-control"
-    bucket  = "modernisation-platform-terraform-state"
-    key     = "environments/accounts/core-network-services/core-network-services-production/terraform.tfstate"
-    region  = "eu-west-2"
-    encrypt = "true"
   }
 }
 
@@ -868,10 +772,10 @@ resource "aws_db_instance" "app" {
   # checkov:skip=CKV_AWS_161: "IAM authentication excessive for sprinkler"
   # checkov:skip=CKV_AWS_226: "auto_upgrade_minor_version true by default"
   identifier                      = var.networking[0].application
-  allocated_storage               = local.app_data.accounts[local.environment].rds_storage
+  allocated_storage               = local.application_data.accounts[local.environment].rds_storage
   engine                          = "postgres"
-  engine_version                  = local.app_data.accounts[local.environment].rds_postgresql_version
-  instance_class                  = local.app_data.accounts[local.environment].rds_instance_class
+  engine_version                  = local.application_data.accounts[local.environment].rds_postgresql_version
+  instance_class                  = local.application_data.accounts[local.environment].rds_instance_class
   db_name                         = var.networking[0].application
   username                        = "dbmain"
   parameter_group_name            = aws_db_parameter_group.app.name
