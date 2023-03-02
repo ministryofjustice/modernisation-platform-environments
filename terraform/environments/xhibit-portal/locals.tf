@@ -2,7 +2,7 @@
 
 locals {
   region = "eu-west-2"
-  vpc_id   = data.aws_vpc.shared.id
+  vpc_id = data.aws_vpc.shared.id
 
   domain_types = { for dvo in aws_acm_certificate.waf_lb_cert.domain_validation_options : dvo.domain_name => {
     name   = dvo.resource_record_name
