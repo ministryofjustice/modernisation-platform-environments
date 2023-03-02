@@ -129,6 +129,7 @@ locals {
     description = "oasys webserver"
     component   = "web"
     server-type = "oasys-web"
+    os-version  = "RHEL 8.5"
   }
 
   database = {
@@ -137,9 +138,8 @@ locals {
       component            = "data"
       os-type              = "Linux"
       os-major-version     = 7
-      os-version           = "RHEL 7.9"
+      os-version           = "RHEL 8.5"
       licence-requirements = "Oracle Database"
-      ami                  = "oasys_oracle_db_release_2023-02-14T09-53-15.859Z"
       "Patch Group"        = "RHEL"
     }
 

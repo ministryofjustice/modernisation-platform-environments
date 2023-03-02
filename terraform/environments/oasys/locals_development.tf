@@ -103,7 +103,7 @@ locals {
           oracle-sids       = "OASPROD BIPINFRA"
           monitored         = true
         }
-        ami_name = "oasys_oracle_db_release_2023-02-14T09-53-15.859Z"
+        ami_name = "oasys_oracle_db_*"
         # ami_owner = "self" # remove this line next time AMI is updated so core-shared-services-production used instead
         instance = {
           instance_type             = "r6i.2xlarge"
