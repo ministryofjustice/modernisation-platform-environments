@@ -29,7 +29,7 @@ locals {
           oasys-environment = "t1"
         })
         lb_target_groups = {
-          https = {
+          http-8080 = {
             port                 = 443
             protocol             = "HTTP"
             target_type          = "instance"
@@ -40,7 +40,7 @@ locals {
               healthy_threshold   = 3
               matcher             = "200-399"
               path                = "/"
-              port                = 443
+              port                = 8080
               timeout             = 5
               unhealthy_threshold = 5
             }
