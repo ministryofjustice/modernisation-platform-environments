@@ -141,8 +141,34 @@ locals {
           instance = "nomis_long_running_batch"
         }
       }
-      # oracleasm_service = {}
-      # oracle_ohasd_service = {}
+      oracleasm-service = {
+        comparison_operator = "GreaterThanOrEqualToThreshold"
+        evaluation_periods  = "3"
+        namespace           = "CWAgent"
+        metric_name         = "collectd_exec_value"
+        period              = "60"
+        statistic           = "Average"
+        threshold           = "1"
+        alarm_description   = "oracleasm service has stopped"
+        alarm_actions       = [aws_sns_topic.nomis_nonprod_alarms.arn]
+        dimensions = {
+          instance = "oracleasm"
+        }
+      }
+      oracle-ohasd-service = {
+        comparison_operator = "GreaterThanOrEqualToThreshold"
+        evaluation_periods  = "3"
+        namespace           = "CWAgent"
+        metric_name         = "collectd_exec_value"
+        period              = "60"
+        statistic           = "Average"
+        threshold           = "1"
+        alarm_description   = "oracleasm service has stopped"
+        alarm_actions       = [aws_sns_topic.nomis_nonprod_alarms.arn]
+        dimensions = {
+          instance = "oracle_ohasd"
+        }
+      }
     }
   }
 }
