@@ -306,7 +306,7 @@ resource "aws_ecs_cluster" "ecs_cluster" {
     name  = "containerInsights"
     value = "enabled"
   }
-  capacity_providers = [aws_ecs_cluster.ecs_cluster.name]
+  capacity_providers = [aws_ecs_capacity_provider.capacity_provider.name]
 
   tags = merge(
     var.tags_common,
