@@ -31,14 +31,9 @@ resource "aws_autoscaling_group" "cluster-scaling-group" {
     version = "$Latest"
   }
 
-  # tag {
-  #   key                 = "Name"
-  #   value               = "${var.app_name}-cluster-scaling-group"
-  #   propagate_at_launch = true
-  # }
   tag {
-    key                 = "AmazonECSManaged"
-    value               = true
+    key                 = "Name"
+    value               = "${var.app_name}-cluster-scaling-group"
     propagate_at_launch = true
   }
 
@@ -268,38 +263,38 @@ resource "aws_iam_role_policy_attachment" "attach_ec2_policy" {
 
 # EC2 Target Tracking scaling
 
-# resource "aws_autoscaling_policy" "ec2-cpu-scaling-target" {
-#   name                      = "ec2-cpu-scaling-target"
-#   policy_type               = "TargetTrackingScaling"
-#   autoscaling_group_name    = aws_autoscaling_group.cluster-scaling-group.name
-#   estimated_instance_warmup = 200
-#   target_tracking_configuration {
-#     predefined_metric_specification {
-#       predefined_metric_type = "ASGAverageCPUUtilization"
-#     }
-#     target_value = var.ec2_scaling_cpu_threshold
-#   }
-# }
-#
-# resource "aws_autoscaling_policy" "ec2-mem-scaling-target" {
-#   name                      = "ec2-mem-scaling-target"
-#   policy_type               = "TargetTrackingScaling"
-#   autoscaling_group_name    = aws_autoscaling_group.cluster-scaling-group.name
-#   estimated_instance_warmup = 200
-#   target_tracking_configuration {
-#     target_value     = var.ec2_scaling_mem_threshold
-#     disable_scale_in = false
-#     customized_metric_specification {
-#       metric_name = "MemoryUtilization"
-#       namespace   = "AWS/ECS"
-#       statistic   = "Average"
-#       metric_dimension {
-#         name  = "ClusterName"
-#         value = var.app_name
-#       }
-#     }
-#   }
-# }
+resource "aws_autoscaling_policy" "ec2-cpu-scaling-target" {
+  name                      = "ec2-cpu-scaling-target"
+  policy_type               = "TargetTrackingScaling"
+  autoscaling_group_name    = aws_autoscaling_group.cluster-scaling-group.name
+  estimated_instance_warmup = 200
+  target_tracking_configuration {
+    predefined_metric_specification {
+      predefined_metric_type = "ASGAverageCPUUtilization"
+    }
+    target_value = var.ec2_scaling_cpu_threshold
+  }
+}
+
+resource "aws_autoscaling_policy" "ec2-mem-scaling-target" {
+  name                      = "ec2-mem-scaling-target"
+  policy_type               = "TargetTrackingScaling"
+  autoscaling_group_name    = aws_autoscaling_group.cluster-scaling-group.name
+  estimated_instance_warmup = 200
+  target_tracking_configuration {
+    target_value     = var.ec2_scaling_mem_threshold
+    disable_scale_in = false
+    customized_metric_specification {
+      metric_name = "MemoryUtilization"
+      namespace   = "AWS/ECS"
+      statistic   = "Average"
+      metric_dimension {
+        name  = "ClusterName"
+        value = var.app_name
+      }
+    }
+  }
+}
 
 
 
@@ -406,13 +401,6 @@ resource "aws_ecs_capacity_provider" "capacity_provider" {
 
   auto_scaling_group_provider {
     auto_scaling_group_arn = aws_autoscaling_group.cluster-scaling-group.arn
-    managed_scaling {
-        maximum_scaling_step_size = 1000
-        minimum_scaling_step_size = 1
-        status                    = "ENABLED"
-        target_capacity           = 10
-    }
-
   }
 
   tags = merge(
@@ -422,7 +410,6 @@ resource "aws_ecs_capacity_provider" "capacity_provider" {
     }
   )
 }
-
 # ECS task execution role data
 # https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_execution_IAM_role.html
 data "aws_iam_policy_document" "ecs_task_execution_role" {
@@ -444,7 +431,7 @@ data "aws_iam_policy_document" "ecs_task_execution_role" {
 }
 
 resource "aws_iam_policy" "ecs_task_execution_s3_policy" { #tfsec:ignore:aws-iam-no-policy-wildcards
-  name   = "${var.app_name}-ecs-task-execution-s3-policy"
+  name = "${var.app_name}-ecs-task-execution-s3-policy"
   tags = merge(
     var.tags_common,
     {
