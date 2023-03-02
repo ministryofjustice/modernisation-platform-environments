@@ -35,4 +35,6 @@ locals {
   # example usage:
   # example_data = local.application_data.accounts[local.environment].example_var
   application_data = fileexists("./application_variables.json") ? jsondecode(file("./application_variables.json")) : null
+
+  ndelius_interface_params = yamldecode(file("${path.module}/files/ndelius_interface_ssm_params.yml"))
 }
