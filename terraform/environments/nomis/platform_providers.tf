@@ -43,6 +43,7 @@ provider "aws" {
 
 ######################### Run Terraform Plan Locally Only ##################################
 # # To run a Terraform Plan locally, uncomment this bottom section of code and comment out the top section
+
 # provider "aws" {
 #   region = "eu-west-2"
 # }
