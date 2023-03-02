@@ -56,7 +56,7 @@ resource "aws_security_group_rule" "ingress_traffic_ebsdb" {
   protocol          = each.value.protocol
   from_port         = each.value.from_port
   to_port           = each.value.to_port
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block, "0.0.0.0/0"]
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block, "0.0.0.0/0", local.application_data.accounts[local.environment].mp_aws_subnet_env]
 }
 resource "aws_security_group_rule" "egress_traffic_ebsdb_sg" {
   for_each                 = local.application_data.ec2_sg_egress_rules
@@ -96,7 +96,7 @@ resource "aws_security_group_rule" "ingress_traffic_ebsapps" {
   protocol          = each.value.protocol
   from_port         = each.value.from_port
   to_port           = each.value.to_port
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block, "0.0.0.0/0"]
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block, "0.0.0.0/0", local.application_data.accounts[local.environment].mp_aws_subnet_env]
 }
 resource "aws_security_group_rule" "egress_traffic_ebsapps_sg" {
   for_each                 = local.application_data.ec2_sg_egress_rules
@@ -136,7 +136,7 @@ resource "aws_security_group_rule" "ingress_traffic_webgate" {
   protocol          = each.value.protocol
   from_port         = each.value.from_port
   to_port           = each.value.to_port
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block, "0.0.0.0/0"]
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block, "0.0.0.0/0", local.application_data.accounts[local.environment].mp_aws_subnet_env]
 }
 resource "aws_security_group_rule" "egress_traffic_webgate_sg" {
   for_each                 = local.application_data.ec2_sg_egress_rules
@@ -176,7 +176,7 @@ resource "aws_security_group_rule" "ingress_traffic_accessgate" {
   protocol          = each.value.protocol
   from_port         = each.value.from_port
   to_port           = each.value.to_port
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block, "0.0.0.0/0"]
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block, "0.0.0.0/0", local.application_data.accounts[local.environment].mp_aws_subnet_env]
 }
 resource "aws_security_group_rule" "egress_traffic_accessgate_sg" {
   for_each                 = local.application_data.ec2_sg_egress_rules
@@ -248,7 +248,7 @@ resource "aws_security_group_rule" "ingress_traffic_ftp" {
   cidr_blocks       = [data.aws_vpc.shared.cidr_block, local.application_data.accounts[local.environment].lz_aws_subnet_env]
 }
 
-# Egree Traffic FTP
+# Egress Traffic FTP
 resource "aws_security_group_rule" "egress_traffic_ftp" {
   for_each          = local.application_data.ec2_sg_ftp_egress_rules
   security_group_id = aws_security_group.ec2_sg_ftp.id
