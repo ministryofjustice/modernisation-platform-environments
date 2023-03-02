@@ -516,44 +516,12 @@ resource "aws_cloudwatch_log_stream" "cloudwatch_stream" {
   log_group_name = aws_cloudwatch_log_group.cloudwatch_group.name
 }
 
-
-
-# Added to support target tracking scaling_adjustment
-
-# resource "aws_iam_role" "ecs-autoscale-role" {
-#   name = "ecs-scale-application"
-#
-#   assume_role_policy = <<EOF
-# {
-#   "Version": "2012-10-17",
-#   "Statement": [
-#     {
-#       "Action": "sts:AssumeRole",
-#       "Principal": {
-#         "Service": "application-autoscaling.amazonaws.com"
-#       },
-#       "Effect": "Allow"
-#     }
-#   ]
-# }
-# EOF
-# }
-
-
-# ECS cluster scaling
-
-# resource "aws_iam_role_policy_attachment" "ecs-autoscale" {
-#   role       = aws_iam_role.ecs-autoscale-role.id
-#   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceAutoscaleRole"
-# }
-
 resource "aws_appautoscaling_target" "ecs_target" {
   max_capacity       = var.appscaling_max_capacity
   min_capacity       = var.appscaling_min_capacity
   resource_id        = "service/${aws_ecs_cluster.ecs_cluster.name}/${aws_ecs_service.ecs_service.name}"
   scalable_dimension = "ecs:service:DesiredCount"
   service_namespace  = "ecs"
-  # role_arn           = aws_iam_role.ecs-autoscale-role.arn
 }
 
 resource "aws_appautoscaling_policy" "ecs_target_cpu" {
@@ -568,7 +536,6 @@ resource "aws_appautoscaling_policy" "ecs_target_cpu" {
     }
     target_value = var.ecs_scaling_cpu_threshold
   }
-  # depends_on = [aws_appautoscaling_target.ecs_target]
 }
 
 resource "aws_appautoscaling_policy" "ecs_target_memory" {
@@ -583,5 +550,4 @@ resource "aws_appautoscaling_policy" "ecs_target_memory" {
     }
     target_value = var.ecs_scaling_mem_threshold
   }
-  # depends_on = [aws_appautoscaling_target.ecs_target]
 }
