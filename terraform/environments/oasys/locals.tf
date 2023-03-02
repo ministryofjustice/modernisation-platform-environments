@@ -7,9 +7,8 @@ locals {
   ### env independent common vars
   ###
 
-  application_name = "oasys"
-  business_unit    = "hmpps"
-  networking_set   = "general"
+  business_unit  = "hmpps"
+  networking_set = "general"
 
   accounts = {
     development   = local.oasys_development
@@ -21,36 +20,8 @@ locals {
   account_id         = local.environment_management.account_ids[terraform.workspace]
   environment_config = local.accounts[local.environment]
 
-  environment_management = jsondecode(data.aws_secretsmanager_secret_version.environment_management.secret_string)
-
-  # Stores modernisation platform account id for setting up the modernisation-platform provider
-  modernisation_platform_account_id = data.aws_ssm_parameter.modernisation_platform_account_id.value
-
-  # This takes the name of the Terraform workspace (e.g. core-vpc-production), strips out the application name (e.g. core-vpc), and checks if
-  # the string leftover is `-production`, if it isn't (e.g. core-vpc-non-production => -non-production) then it sets the var to false.
-  is-production    = substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-production"
-  is-preproduction = substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-preproduction"
-  is-test          = substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-test"
-  is-development   = substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-development"
-
-  # Merge tags from the environment json file with additional ones
-  tags = merge(
-    jsondecode(data.http.environments_file.response_body).tags,
-    { "is-production" = local.is-production },
-    { "environment-name" = terraform.workspace },
-    { "source-code" = "https://github.com/ministryofjustice/modernisation-platform-environments" }
-  )
-
-  environment     = trimprefix(terraform.workspace, "${local.application_name}-")
-  subnet_set      = local.networking_set
-  vpc_all         = "${local.business_unit}-${local.environment}"
-  subnet_set_name = "${local.business_unit}-${local.environment}-${local.networking_set}"
-
   region            = "eu-west-2"
   availability_zone = "eu-west-2a"
-
-  is_live       = [substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-production" || substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-preproduction" ? "live" : "non-live"]
-  provider_name = "core-vpc-${local.environment}"
 
   cidrs = { # this list should be abstracted for multiple environments to use
     # Azure
