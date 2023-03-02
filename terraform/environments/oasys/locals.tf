@@ -304,7 +304,7 @@ locals {
 
     route53 = {
       route53_records = {
-        "$(name).oasys" = {
+        "web.oasys" = {
           account                = "core-vpc"
           zone_id                = module.environment.route53_zones[module.environment.domains.public.business_unit_environment].zone_id
           evaluate_target_health = true
@@ -331,12 +331,12 @@ locals {
         priority = 100
         actions = [{
           type              = "forward"
-          target_group_name = "$(name)"
+          target_group_name = "webservers-http-8080"
         }]
         conditions = [
           {
             host_header = {
-              values = ["$(name).oasys.${module.environment.vpc_name}.modernisation-platform.service.justice.gov.uk"]
+              values = ["web.oasys.${module.environment.vpc_name}.modernisation-platform.service.justice.gov.uk"]
             }
           },
           {
@@ -355,11 +355,6 @@ locals {
         local.lb_listener_defaults.https,
         local.lb_listener_defaults.oasys_public,
         local.lb_listener_defaults.route53, {
-          replace = {
-            target_group_name_replace     = "webservers-https"
-            condition_host_header_replace = "web"
-            route53_record_name_replace   = "web"
-          }
       })
     }
 
