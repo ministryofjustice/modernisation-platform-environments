@@ -118,6 +118,22 @@ locals {
       internal-http-7001 = local.lb_target_group_http_7001
       internal-http-7777 = local.lb_target_group_http_7777
     }
+    cloudwatch_metric_alarms_weblogic = {
+      weblogic-node-manager-service = {
+        comparison_operator = "GreaterThanOrEqualToThreshold"
+        evaluation_periods  = "3"
+        namespace           = "CWAgent"
+        metric_name         = "collectd_exec_value"
+        period              = "60"
+        statistic           = "Average"
+        threshold           = "1"
+        alarm_description   = "weblogic-node-manager service has stopped"
+        alarm_actions       = [aws_sns_topic.nomis_nonprod_alarms.arn]
+        dimensions = {
+          instance = "weblogic_node_manager"
+        }
+      }
+    }
   }
 }
 
@@ -156,7 +172,7 @@ module "ec2_weblogic_autoscaling_group" {
   tags               = merge(local.tags, local.ec2_weblogic.tags, try(each.value.tags, {}))
   account_ids_lookup = local.environment_management.account_ids
   cloudwatch_metric_alarms = {
-    for key, value in local.cloudwatch_metric_alarms_linux :
+    for key, value in merge(local.ec2_weblogic.cloudwatch_metric_alarms_weblogic, local.cloudwatch_metric_alarms_linux) :
     key => merge(value, {
       alarm_actions = [lookup(each.value, "sns_topic", aws_sns_topic.nomis_nonprod_alarms.arn)]
   }) }
