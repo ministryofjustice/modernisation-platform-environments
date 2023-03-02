@@ -1,9 +1,9 @@
 resource "aws_lb" "tipstaff-dev-lb" {
-  name               = "tipstaff-dev-load-balancer"
-  internal           = false
-  load_balancer_type = "application"
-  security_groups    = [aws_security_group.tipstaff-dev-lb-sc.id]
-  subnets            = data.aws_subnets.shared-public.ids
+  name                       = "tipstaff-dev-load-balancer"
+  internal                   = false
+  load_balancer_type         = "application"
+  security_groups            = [aws_security_group.tipstaff-dev-lb-sc.id]
+  subnets                    = data.aws_subnets.shared-public.ids
   enable_deletion_protection = false
 }
 
