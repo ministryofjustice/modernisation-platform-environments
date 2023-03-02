@@ -193,3 +193,42 @@ resource "aws_ssm_parameter" "ndelius-interface-odbc-pwd" {
     ]
   }
 }
+
+resource "aws_ssm_parameter" "ndelius-interface-email-smtpuser" {
+  name      = "/NDeliusInterface/Email/smtpuser"
+  type      = "SecureString"
+  value     = "dev-placeholder-ndelius-interface-email-smtpuser"
+  overwrite = false
+
+  lifecycle {
+    ignore_changes = [
+      value
+    ]
+  }
+}
+
+resource "aws_ssm_parameter" "ndelius-interface-email-password" {
+  name      = "/NDeliusInterface/Email/password"
+  type      = "SecureString"
+  value     = "dev-placeholder-ndelius-interface-email-password"
+  overwrite = false
+
+  lifecycle {
+    ignore_changes = [
+      value
+    ]
+  }
+}
+
+resource "aws_ssm_parameter" "ndelius-interface-email-passwordcoded" {
+  name      = "/NDeliusInterface/Email/passwordcoded"
+  type      = "SecureString"
+  value     = "dev-placeholder-ndelius-interface-email-passwordcoded"
+  overwrite = false
+
+  lifecycle {
+    ignore_changes = [
+      value
+    ]
+  }
+}

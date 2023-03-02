@@ -146,6 +146,10 @@ tasks:
       $InterfaceODBCuid = (Get-SSMParameter -Name "/NDeliusInterface/Interface/ODBC/uid" -WithDecryption $true).Value
       $InterfaceODBCpwd = (Get-SSMParameter -Name "/NDeliusInterface/Interface/ODBC/pwd" -WithDecryption $true).Value
       $configXML.DLLDEF.INTERFACE.ODBC = "DSN=$${InterfaceODBCdsn};uid=$${InterfaceODBCuid};pwd=$${InterfaceODBCpwd}"
+
+      $configXML.DLLDEF.EMAIL.SMTPUSER = (Get-SSMParameter -Name "/NDeliusInterface/Email/smtpuser" -WithDecryption $true).Value
+      $configXML.DLLDEF.EMAIL.PASSWORD = (Get-SSMParameter -Name "/NDeliusInterface/Email/password" -WithDecryption $true).Value
+      $configXML.DLLDEF.EMAIL.PASSWORDCODED = (Get-SSMParameter -Name "/NDeliusInterface/Email/passwordcoded" -WithDecryption $true).Value
       $configXML.save($NDeliusConfigFile)
 
 %{if environment == "development"}
