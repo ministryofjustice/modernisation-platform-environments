@@ -1,9 +1,9 @@
 
 resource "aws_instance" "tipstaff-ec2-instance-dev" {
-  instance_type          = local.application_data.accounts[local.environment].instance_type
-  ami                    = local.application_data.accounts[local.environment].ami
-  count                  = "1"
-  subnet_id              = data.aws_subnet.data_subnets_a.id
+  instance_type = local.application_data.accounts[local.environment].instance_type
+  ami           = local.application_data.accounts[local.environment].ami
+  count         = "1"
+  subnet_id     = data.aws_subnet.data_subnets_a.id
   # vpc_security_group_ids = [aws_security_group.tipstaff-dev-ec2-sc.id]
   vpc_security_group_ids = [resource.aws_security_group.postgresql_db_sc.id]
 }
