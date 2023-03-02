@@ -16,7 +16,7 @@ resource "aws_db_instance" "tipstaffdbdev" {
 
 resource "aws_db_subnet_group" "dbsubnetgroup" {
   name       = "dbsubnetgroup"
-  subnet_ids = data.aws_subnets.shared-public.ids
+  subnet_ids = [data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id]
 }
 
 resource "aws_security_group" "postgresql_db_sc" {
@@ -47,18 +47,18 @@ resource "aws_security_group" "postgresql_db_sc" {
 
 }
 
-resource "null_resource" "setup_db" {
-  depends_on = [aws_db_instance.tipstaffdbdev]
+# resource "null_resource" "setup_db" {
+#   depends_on = [aws_db_instance.tipstaffdbdev]
 
-  provisioner "local-exec" {
-    interpreter = ["bash", "-c"]
-    command     = "chmod +x ./setup-postgresql.sh; ./setup-postgresql.sh"
+#   provisioner "local-exec" {
+#     interpreter = ["bash", "-c"]
+#     command     = "chmod +x ./setup-postgresql.sh; ./setup-postgresql.sh"
 
-    environment = {
-      DB_HOSTNAME = aws_db_instance.tipstaffdbdev.address
-    }
-  }
-  triggers = {
-    always_run = "${timestamp()}"
-  }
-}
+#     environment = {
+#       DB_HOSTNAME = aws_db_instance.tipstaffdbdev.address
+#     }
+#   }
+#   triggers = {
+#     always_run = "${timestamp()}"
+#   }
+# }
