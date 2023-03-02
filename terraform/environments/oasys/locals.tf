@@ -389,6 +389,8 @@ locals {
         }
       }
     }
+    # Alarms for certificates
+    cloudwatch_metric_alarms_acm = {}
 
     # Environment specific certificates
     development   = {}
