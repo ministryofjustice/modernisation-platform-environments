@@ -6,10 +6,6 @@ resource "aws_instance" "tipstaff-ec2-instance-dev" {
   subnet_id              = data.aws_subnet.data_subnets_a.id
   vpc_security_group_ids = [aws_security_group.tipstaff-dev-ec2-sc.id]
 }
-resource "aws_eip" "ec2-elastic-ip" {
-  vpc      = true
-  instance = aws_instance.tipstaff-ec2-instance-dev.id
-}
 
 resource "aws_security_group" "tipstaff-dev-ec2-sc" {
   name        = "ec2 security group"
