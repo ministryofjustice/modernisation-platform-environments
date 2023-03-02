@@ -52,7 +52,7 @@ resource "null_resource" "setup_db" {
 
   provisioner "local-exec" {
     interpreter = ["bash", "-c"]
-    command =  "chmod +x ./setup-postgresql.sh; ./setup-postgresql.sh"
+    command     = "chmod +x ./setup-postgresql.sh; ./setup-postgresql.sh"
 
     environment = {
       DB_HOSTNAME = aws_db_instance.tipstaffdbdev.address
