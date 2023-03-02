@@ -36,5 +36,17 @@ locals {
       alarm_description   = "This metric monitors the amount of available memory. If Committed Bytes in Use is > 80% for 2 minutes, the alarm will trigger."
       alarm_actions       = [aws_sns_topic.nomis_nonprod_alarms.arn]
     }
+    cpu-utilization-windows = {
+      comparison_operator = "GreaterThanOrEqualToThreshold"
+      evaluation_periods  = "15"
+      datapoints_to_alarm = "15"
+      metric_name         = "CPUUtilization"
+      namespace           = "AWS/EC2"
+      period              = "60"
+      statistic           = "Average"
+      threshold           = "95"
+      alarm_description   = "Triggers if the average cpu remains at 95% utilization or above for 15 minutes"
+      alarm_actions       = [aws_sns_topic.nomis_nonprod_alarms.arn]
+    }
   }
 }

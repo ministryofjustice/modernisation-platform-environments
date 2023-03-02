@@ -20,8 +20,8 @@ locals {
       namespace           = "CWAgent"
       period              = "60"
       statistic           = "Average"
-      threshold           = "90"
-      alarm_description   = "This metric monitors the amount of CPU time spent waiting for I/O to complete. If the average CPU time spent waiting for I/O to complete is greater than 90% for 30 minutes, the alarm will trigger."
+      threshold           = "30"
+      alarm_description   = "This metric monitors the amount of CPU time spent waiting for I/O to complete. If the average CPU time spent waiting for I/O to complete is greater than 30% for 30 minutes, the alarm will trigger."
       alarm_actions       = [aws_sns_topic.nomis_nonprod_alarms.arn]
     }
     disk-used-percent = {
@@ -72,9 +72,61 @@ locals {
       alarm_description   = "System status checks monitor the AWS systems on which your instance runs. These checks detect underlying problems with your instance that require AWS involvement to repair: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/monitoring-system-instance-status-check.html"
       alarm_actions       = [aws_sns_topic.nomis_nonprod_alarms.arn]
     }
-    # Service alert - chronyd
-    # Service alert - sshd
-    # Service alert - cloudwatch_agent_status
-    # Service alert - ssm_agent_status
+    chronyd-service = {
+      comparison_operator = "GreaterThanOrEqualToThreshold"
+      evaluation_periods  = "3"
+      namespace           = "CWAgent"
+      metric_name         = "collectd_exec_value"
+      period              = "60"
+      statistic           = "Average"
+      threshold           = "1"
+      alarm_description   = "chronyd service has stopped"
+      alarm_actions       = [aws_sns_topic.nomis_nonprod_alarms.arn]
+      dimensions = {
+        instance = "chronyd"
+      }
+    }
+    sshd-service = {
+      comparison_operator = "GreaterThanOrEqualToThreshold"
+      evaluation_periods  = "3"
+      namespace           = "CWAgent"
+      metric_name         = "collectd_exec_value"
+      period              = "60"
+      statistic           = "Average"
+      threshold           = "1"
+      alarm_description   = "sshd service has stopped"
+      alarm_actions       = [aws_sns_topic.nomis_nonprod_alarms.arn]
+      dimensions = {
+        instance = "sshd"
+      }
+    }
+    cloudwatch-agent-status = {
+      comparison_operator = "GreaterThanOrEqualToThreshold"
+      evaluation_periods  = "3"
+      namespace           = "CWAgent"
+      metric_name         = "collectd_exec_value"
+      period              = "60"
+      statistic           = "Average"
+      threshold           = "1"
+      alarm_description   = "cloudwatch agent service has stopped"
+      alarm_actions       = [aws_sns_topic.nomis_nonprod_alarms.arn]
+      dimensions = {
+        instance = "cloudwatch_agent_status"
+      }
+    }
+    ssm-agent-status = {
+      comparison_operator = "GreaterThanOrEqualToThreshold"
+      evaluation_periods  = "3"
+      namespace           = "CWAgent"
+      metric_name         = "collectd_exec_value"
+      period              = "60"
+      statistic           = "Average"
+      threshold           = "1"
+      alarm_description   = "ssm agent service has stopped"
+      alarm_actions       = [aws_sns_topic.nomis_nonprod_alarms.arn]
+      dimensions = {
+        instance = "ssm_agent_status"
+      }
+    }
   }
 }
