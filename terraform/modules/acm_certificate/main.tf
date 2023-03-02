@@ -114,7 +114,4 @@ resource "aws_cloudwatch_metric_alarm" "this" {
     "CertificateArn" = aws_acm_certificate.this.arn
   })
   tags = {}
-  depends_on = [
-    aws_acm_certificate.this
-  ]
 }
