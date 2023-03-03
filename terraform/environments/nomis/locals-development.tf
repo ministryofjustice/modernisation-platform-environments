@@ -75,6 +75,9 @@ locals {
           server-type       = "base-rhel79"
         }
         ami_name = "base_rhel_7_9_*"
+        autoscaling_group = {
+          desired_capacity = 1
+        }
       }
       dev-base-rhel610 = {
         tags = {
