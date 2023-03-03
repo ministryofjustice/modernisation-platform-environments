@@ -19,10 +19,6 @@ data "aws_subnets" "shared-private" {
   }
 }
 
-data "aws_lb_target_group" "target_group" {
-  name = var.lb_tg_name
-}
-
 resource "aws_autoscaling_group" "cluster-scaling-group" {
   vpc_zone_identifier = sort(data.aws_subnets.shared-private.ids)
   name                = "${var.app_name}-cluster-scaling-group"
@@ -160,11 +156,22 @@ resource "aws_launch_template" "ec2-launch-template" {
 resource "aws_iam_instance_profile" "ec2_instance_profile" {
   name = "${var.app_name}-ec2-instance-profile"
   role = aws_iam_role.ec2_instance_role.name
+  tags = merge(
+    var.tags_common,
+    {
+      Name = "${var.app_name}-ec2-instance-profile"
+    }
+  )
 }
 
 resource "aws_iam_role" "ec2_instance_role" {
   name = "${var.app_name}-ec2-instance-role"
-
+  tags = merge(
+    var.tags_common,
+    {
+      Name = "${var.app_name}-ec2-instance-role"
+    }
+  )
   assume_role_policy = <<EOF
 {
     "Version": "2012-10-17",
@@ -184,7 +191,12 @@ EOF
 
 resource "aws_iam_policy" "ec2_instance_policy" { #tfsec:ignore:aws-iam-no-policy-wildcards
   name = "${var.app_name}-ec2-instance-policy"
-
+  tags = merge(
+    var.tags_common,
+    {
+      Name = "${var.app_name}-ec2-instance-policy"
+    }
+  )
   policy = <<EOF
 {
     "Version": "2012-10-17",
@@ -294,10 +306,18 @@ resource "aws_ecs_cluster" "ecs_cluster" {
     name  = "containerInsights"
     value = "enabled"
   }
+
+  tags = merge(
+    var.tags_common,
+    {
+      Name = var.app_name
+    }
+  )
 }
 
 resource "aws_ecs_cluster_capacity_providers" "ecs_cluster" {
   cluster_name = aws_ecs_cluster.ecs_cluster.name
+  # capacity_providers = [aws_ecs_capacity_provider.capacity_provider.name]
 }
 
 resource "aws_ecs_task_definition" "windows_ecs_task_definition" {
@@ -361,13 +381,13 @@ resource "aws_ecs_service" "ecs_service" {
   }
 
   load_balancer {
-    target_group_arn = data.aws_lb_target_group.target_group.id
+    target_group_arn = var.lb_tg_arn
     container_name   = var.app_name
     container_port   = var.server_port
   }
 
   depends_on = [
-    aws_iam_role_policy_attachment.ecs_task_execution_role, aws_ecs_task_definition.windows_ecs_task_definition, aws_ecs_task_definition.linux_ecs_task_definition
+    aws_iam_role_policy_attachment.ecs_task_execution_role, aws_ecs_task_definition.windows_ecs_task_definition, aws_ecs_task_definition.linux_ecs_task_definition, aws_cloudwatch_log_group.cloudwatch_group
   ]
 
   tags = merge(
@@ -413,7 +433,13 @@ data "aws_iam_policy_document" "ecs_task_execution_role" {
 }
 
 resource "aws_iam_policy" "ecs_task_execution_s3_policy" { #tfsec:ignore:aws-iam-no-policy-wildcards
-  name   = "${var.app_name}-ecs-task-execution-s3-policy"
+  name = "${var.app_name}-ecs-task-execution-s3-policy"
+  tags = merge(
+    var.tags_common,
+    {
+      Name = "${var.app_name}-ecs-task-execution-s3-policy"
+    }
+  )
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -475,12 +501,12 @@ resource "aws_iam_role_policy_attachment" "ecs_task_s3_access" {
 # Set up CloudWatch group and log stream and retain logs for 30 days
 resource "aws_cloudwatch_log_group" "cloudwatch_group" {
   #checkov:skip=CKV_AWS_158:Temporarily skip KMS encryption check while logging solution is being updated
-  name              = "${var.app_name}-ecs"
+  name              = "${var.app_name}-ecs-log-group"
   retention_in_days = 30
   tags = merge(
     var.tags_common,
     {
-      Name = "${var.app_name}-ecs-cloudwatch-group"
+      Name = "${var.app_name}-ecs-log-group"
     }
   )
 }
@@ -490,44 +516,12 @@ resource "aws_cloudwatch_log_stream" "cloudwatch_stream" {
   log_group_name = aws_cloudwatch_log_group.cloudwatch_group.name
 }
 
-
-
-# Added to support target tracking scaling_adjustment
-
-resource "aws_iam_role" "ecs-autoscale-role" {
-  name = "ecs-scale-application"
-
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "application-autoscaling.amazonaws.com"
-      },
-      "Effect": "Allow"
-    }
-  ]
-}
-EOF
-}
-
-
-# ECS cluster scaling
-
-resource "aws_iam_role_policy_attachment" "ecs-autoscale" {
-  role       = aws_iam_role.ecs-autoscale-role.id
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceAutoscaleRole"
-}
-
 resource "aws_appautoscaling_target" "ecs_target" {
   max_capacity       = var.appscaling_max_capacity
   min_capacity       = var.appscaling_min_capacity
   resource_id        = "service/${aws_ecs_cluster.ecs_cluster.name}/${aws_ecs_service.ecs_service.name}"
   scalable_dimension = "ecs:service:DesiredCount"
   service_namespace  = "ecs"
-  role_arn           = aws_iam_role.ecs-autoscale-role.arn
 }
 
 resource "aws_appautoscaling_policy" "ecs_target_cpu" {
@@ -542,7 +536,6 @@ resource "aws_appautoscaling_policy" "ecs_target_cpu" {
     }
     target_value = var.ecs_scaling_cpu_threshold
   }
-  depends_on = [aws_appautoscaling_target.ecs_target]
 }
 
 resource "aws_appautoscaling_policy" "ecs_target_memory" {
@@ -557,13 +550,4 @@ resource "aws_appautoscaling_policy" "ecs_target_memory" {
     }
     target_value = var.ecs_scaling_mem_threshold
   }
-  depends_on = [aws_appautoscaling_target.ecs_target]
 }
-
-
-
-
-
-
-
-
