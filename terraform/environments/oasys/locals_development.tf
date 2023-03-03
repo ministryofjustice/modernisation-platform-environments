@@ -30,7 +30,7 @@ locals {
         })
         lb_target_groups = {
           http-8080 = {
-            port                 = 443
+            port                 = 8080
             protocol             = "HTTP"
             target_type          = "instance"
             deregistration_delay = 30
