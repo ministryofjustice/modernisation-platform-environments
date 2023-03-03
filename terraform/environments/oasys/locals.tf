@@ -300,6 +300,7 @@ locals {
 
     oasys_public = {
       lb_application_name = "oasys-public"
+      asg_instance        = "webservers"
     }
 
     route53 = {
@@ -325,25 +326,26 @@ locals {
           status_code  = "501"
         }
       }
-    }
-    rules = {
-      forward-https = {
-        priority = 100
-        actions = [{
-          type              = "forward"
-          target_group_name = "webservers-http-8080"
-        }]
-        conditions = [
-          {
-            host_header = {
-              values = ["web.oasys.${module.environment.vpc_name}.modernisation-platform.service.justice.gov.uk"]
-            }
-          },
-          {
-            path_pattern = {
-              values = ["/"]
-            }
-        }]
+
+      rules = {
+        forward-http-8080 = {
+          priority = 100
+          actions = [{
+            type              = "forward"
+            target_group_name = "http-8080"
+          }]
+          conditions = [
+            {
+              host_header = {
+                values = ["web.oasys.${module.environment.vpc_name}.modernisation-platform.service.justice.gov.uk"]
+              }
+            },
+            {
+              path_pattern = {
+                values = ["/"]
+              }
+          }]
+        }
       }
     }
   }
@@ -362,8 +364,6 @@ locals {
     preproduction = {}
     production    = {}
   }
-
-  # existing_target_groups = module.autoscaling_groups["webservers"].lb_target_groups
 
   acm_certificates = {
 
