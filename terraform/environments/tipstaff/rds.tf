@@ -16,10 +16,10 @@ resource "aws_db_instance" "tipstaffdbdev" {
 }
 
 //Not needed??
-# resource "aws_db_subnet_group" "dbsubnetgroup" {
-#   name       = "dbsubnetgroup"
-#   subnet_ids = [data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id]
-# }
+resource "aws_db_subnet_group" "dbsubnetgroup" {
+  name       = "dbsubnetgroup"
+  subnet_ids = [data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id]
+}
 
 //Not needed??
 # resource "aws_security_group" "postgresql_db_sc" {
