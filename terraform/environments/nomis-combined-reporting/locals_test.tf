@@ -47,6 +47,15 @@ locals {
       }
     }
     baseline_lbs = {
+      rhel85-test = {
+        enable_delete_protection = false
+        idle_timeout             = "60"
+        public_subnets           = module.environment.subnets["public"].ids
+        force_destroy_bucket     = true
+        internal_lb              = true
+        tags                     = local.tags
+        security_groups          = [aws_security_group.public.id]
+      }
     }
   }
 }
