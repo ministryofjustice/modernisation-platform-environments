@@ -299,6 +299,7 @@ resource "aws_cloudfront_distribution" "external_lb" {
     domain_name              = aws_lb.loadbalancer.dns_name
     origin_id                = aws_lb.loadbalancer.id
     custom_origin_config {
+      http_port = 80   # TODO confirm the ports since http_port was not defined in CloudFormation
       https_port = 443
       origin_protocol_policy = "https-only"
       origin_ssl_protocols   = ["TLSv1.2"]
@@ -341,6 +342,9 @@ resource "aws_cloudfront_distribution" "external_lb" {
     forwarded_values {
       query_string = false
       headers      = ["Host", "User-Agent"]
+      cookies {
+        forward = "none"
+      }
     }
     viewer_protocol_policy = "https-only"
   }
@@ -355,6 +359,9 @@ resource "aws_cloudfront_distribution" "external_lb" {
     forwarded_values {
       query_string = false
       headers      = ["Host", "User-Agent"]
+      cookies {
+        forward = "none"
+      }
     }
     viewer_protocol_policy = "https-only"
   }
@@ -369,6 +376,9 @@ resource "aws_cloudfront_distribution" "external_lb" {
     forwarded_values {
       query_string = false
       headers      = ["Host", "User-Agent"]
+      cookies {
+        forward = "none"
+      }
     }
     viewer_protocol_policy = "https-only"
   }
@@ -383,6 +393,9 @@ resource "aws_cloudfront_distribution" "external_lb" {
     forwarded_values {
       query_string = false
       headers      = ["Host", "User-Agent"]
+      cookies {
+        forward = "none"
+      }
     }
     viewer_protocol_policy = "https-only"
   }
@@ -397,6 +410,9 @@ resource "aws_cloudfront_distribution" "external_lb" {
     forwarded_values {
       query_string = false
       headers      = ["Host", "User-Agent"]
+      cookies {
+        forward = "none"
+      }
     }
     viewer_protocol_policy = "https-only"
   }
@@ -412,6 +428,13 @@ resource "aws_cloudfront_distribution" "external_lb" {
     prefix          = var.application_name
   }
   web_acl_id = aws_waf_web_acl.waf_acl.id
+
+  restrictions {
+    geo_restriction {
+      restriction_type = "none"
+      locations        = []
+    }
+  }
 
 }
 
@@ -516,7 +539,7 @@ resource "aws_route53_record" "cloudfront" {
   #   }
   # }
   provider = aws.core-vpc
-  zone_id  = services_zone_id
+  zone_id  = var.services_zone_id
   name     = local.domain_name
   type     = "A"
 
@@ -537,7 +560,7 @@ resource "aws_route53_record" "external_validation" {
   records         = local.domain_record_main
   ttl             = 60
   type            = local.domain_type_main[0]
-  zone_id         = services_zone_id
+  zone_id         = var.services_zone_id
 }
 
 resource "aws_route53_record" "external_validation_subdomain" {
@@ -549,7 +572,7 @@ resource "aws_route53_record" "external_validation_subdomain" {
   records         = [local.domain_record_sub[count.index]]
   ttl             = 60
   type            = local.domain_type_sub[count.index]
-  zone_id         = external_zone_id
+  zone_id         = var.external_zone_id
 }
 
 ######################
@@ -560,7 +583,7 @@ resource "aws_lb_listener" "alb_listener" {
   port              = var.listener_port
   #checkov:skip=CKV_AWS_2:The ALB protocol is HTTP
   protocol        = var.listener_protocol #tfsec:ignore:aws-elb-http-not-used
-  ssl_policy      = var.listener_protocol == "true" ? var.alb_ssl-policy : null
+  ssl_policy      = var.listener_protocol == "true" ? var.alb_ssl_policy : null
   certificate_arn = var.listener_protocol == "true" ? aws_acm_certificate_validation.external.certificate_arn : null # This needs the ARN of the certificate from Mod Platform
 
   # default_action {
