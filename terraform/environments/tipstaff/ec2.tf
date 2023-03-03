@@ -1,43 +1,38 @@
-
-resource "aws_instance" "tipstaff-ec2-instance-dev" {
-  instance_type          = local.application_data.accounts[local.environment].instance_type
-  ami                    = local.application_data.accounts[local.environment].ami
-  count                  = "1"
-  subnet_id              = data.aws_subnet.data_subnets_a.id
-  vpc_security_group_ids = [aws_security_group.tipstaff-dev-ec2-sc.id]
-  # vpc_security_group_ids = [resource.aws_security_group.postgresql_db_sc.id]
-}
-
-resource "aws_security_group" "tipstaff-dev-ec2-sc" {
+resource "aws_security_group" "tipstaff_dev_ec2_sc" {
   name        = "ec2 security group"
   description = "control access to the ec2 instance"
   vpc_id      = data.aws_vpc.shared.id
-  ingress {
-    description = "Allow all traffic through HTTP"
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-  ingress {
-    from_port   = 5432
-    to_port     = 5432
-    protocol    = "tcp"
-    description = "Allows access to load balancer"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-  ingress {
-    description = "Allow all traffic through HTTPS"
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-  egress {
-    description = "allow all outbound traffic"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
 }
+resource "aws_security_group_rule" "ingress_traffic" {
+  for_each          = local.application_data.ec2_sg_rules
+  description       = format("Traffic for %s %d", each.value.protocol, each.value.from_port)
+  from_port         = each.value.from_port
+  protocol          = each.value.protocol
+  security_group_id = aws_security_group.tipstaff_dev_ec2_sc.id
+  to_port           = each.value.to_port
+  type              = "ingress"
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+}
+
+resource "aws_security_group_rule" "egress_traffic" {
+  for_each                 = local.application_data.ec2_sg_rules
+  description              = format("Outbound traffic for %s %d", each.value.protocol, each.value.from_port)
+  from_port                = each.value.from_port
+  protocol                 = each.value.protocol
+  security_group_id        = aws_security_group.tipstaff_dev_ec2_sc.id
+  to_port                  = each.value.to_port
+  type                     = "egress"
+  source_security_group_id = aws_security_group.tipstaff_dev_ec2_sc.id
+}
+resource "aws_instance" "tipstaff_ec2_instance_dev" {
+  instance_type = local.application_data.accounts[local.environment].instance_type
+  ami           = local.application_data.accounts[local.environment].ami_image_id
+  count         = "1"
+  subnet_id     = data.aws_subnet.private_subnets_a.id
+  vpc_security_group_ids = [aws_security_group.tipstaff_dev_ec2_sc.id]
+  monitoring             = true
+  ebs_optimized          = true
+  depends_on = [aws_security_group.tipstaff_dev_ec2_sc]
+}
+
+

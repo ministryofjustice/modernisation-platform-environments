@@ -10,8 +10,10 @@
       "engine": "postgres",
       "engine_version": "10.21",
       "instance_class": "db.t3.micro",
-      "ami": "ami-00d0096b223242201",
-      "subdomain_name": "tipstaff-dev"
+      "ami_image_id": "ami-00d0096b223242201",
+      "subdomain_name": "tipstaff-dev",
+      "server_port": "80",
+      "lb_listener_protocol": "HTTP"
     },
     "test": {
       "example_var": "test-data"
@@ -21,6 +23,18 @@
     },
     "production": {
       "example_var": "production-data"
+    }
+  },
+  "ec2_sg_rules": {
+    "TCP_80": {
+      "from_port": 80,
+      "to_port": 80,
+      "protocol": "TCP"
+    },
+    "TCP_443": {
+      "from_port": 443,
+      "to_port": 443,
+      "protocol": "TCP"
     }
   }
 }
