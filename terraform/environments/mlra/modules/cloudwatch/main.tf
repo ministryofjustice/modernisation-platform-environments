@@ -6,7 +6,6 @@ resource "aws_cloudwatch_metric_alarm" "esccpuoverthreshold" {
   statistic          = "Average"
   period             = "60"
   evaluation_periods = "5"
-  #TODO needs alarm actions and snstopics resources added
   alarm_actions      = [aws_sns_topic.mlra_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.mlra_alerting_topic.arn]
   threshold          = var.pECSCPUAlarmThreshold
@@ -15,6 +14,12 @@ resource "aws_cloudwatch_metric_alarm" "esccpuoverthreshold" {
     ClusterName = var.pClusterName
   }
   comparison_operator = "GreaterThanThreshold"
+  tags = merge(
+    var.tags,
+    {
+      Name = "${var.appnameenv}-ECS-CPU-high-threshold-alarm"
+    }
+  )
 }
 
 resource "aws_cloudwatch_metric_alarm" "ecsmemoryoverthreshold" {
@@ -25,7 +30,6 @@ resource "aws_cloudwatch_metric_alarm" "ecsmemoryoverthreshold" {
   statistic          = "Average"
   period             = "60"
   evaluation_periods = "5"
-  #TODO needs alarm actions and snstopics resources added
   alarm_actions      = [aws_sns_topic.mlra_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.mlra_alerting_topic.arn]
   threshold          = var.pECSMemoryAlarmThreshold
@@ -34,6 +38,12 @@ resource "aws_cloudwatch_metric_alarm" "ecsmemoryoverthreshold" {
     ClusterName = var.pClusterName
   }
   comparison_operator = "GreaterThanThreshold"
+  tags = merge(
+    var.tags,
+    {
+      Name = "${var.appnameenv}-ECS-Memory-Over-Threshold"
+    }
+  )
 }
 resource "aws_cloudwatch_metric_alarm" "cpuoverthreshold" {
 
@@ -44,7 +54,6 @@ resource "aws_cloudwatch_metric_alarm" "cpuoverthreshold" {
   statistic          = "Average"
   period             = "60"
   evaluation_periods = "5"
-  #TODO needs alarm actions and snstopics resources added
   alarm_actions      = [aws_sns_topic.mlra_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.mlra_alerting_topic.arn]
   threshold          = var.pASGCPUAlarmThreshold
@@ -53,6 +62,12 @@ resource "aws_cloudwatch_metric_alarm" "cpuoverthreshold" {
     AutoScalingGroupName = var.pAutoscalingGroupName
   }
   comparison_operator = "GreaterThanThreshold"
+  tags = merge(
+    var.tags,
+    {
+      Name = "${var.appnameenv}-CPU-high-threshold-alarm"
+    }
+  )
 }
 resource "aws_cloudwatch_metric_alarm" "statuscheckfailure" {
   alarm_name         = "${var.appnameenv}-status-check-failure-alarm"
@@ -62,7 +77,6 @@ resource "aws_cloudwatch_metric_alarm" "statuscheckfailure" {
   statistic          = "Average"
   period             = "60"
   evaluation_periods = "5"
-  #TODO needs alarm actions and snstopics resources added
   alarm_actions      = [aws_sns_topic.mlra_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.mlra_alerting_topic.arn]
   threshold          = var.pASGStatusFailureAlarmThreshold
@@ -71,6 +85,12 @@ resource "aws_cloudwatch_metric_alarm" "statuscheckfailure" {
     AutoScalingGroupName = var.pAutoscalingGroupName
   }
   comparison_operator = "GreaterThanThreshold"
+  tags = merge(
+    var.tags,
+    {
+      Name = "${var.appnameenv}-status-check-failure-alarm"
+    }
+  )
 }
 # Application Load Balancer Alerting
 resource "aws_cloudwatch_metric_alarm" "targetresponsetime" {
@@ -81,7 +101,6 @@ resource "aws_cloudwatch_metric_alarm" "targetresponsetime" {
   extended_statistic = "p99"
   period             = "60"
   evaluation_periods = "5"
-  #TODO needs alarm actions and snstopics resources added
   alarm_actions      = [aws_sns_topic.mlra_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.mlra_alerting_topic.arn]
   threshold          = var.pALBTargetResponseTimeThreshold
@@ -90,6 +109,12 @@ resource "aws_cloudwatch_metric_alarm" "targetresponsetime" {
     LoadBalancer = var.pLoadBalancerName
   }
   comparison_operator = "GreaterThanThreshold"
+  tags = merge(
+    var.tags,
+    {
+      Name = "${var.appnameenv}-alb-target-response-time-alarm"
+    }
+  )
 }
 resource "aws_cloudwatch_metric_alarm" "targetResponsetimemaximum" {
   alarm_name         = "${var.appnameenv}-alb-target-response-time-alarm-maximum"
@@ -99,7 +124,6 @@ resource "aws_cloudwatch_metric_alarm" "targetResponsetimemaximum" {
   statistic          = "Maximum"
   period             = "60"
   evaluation_periods = "1"
-  #TODO needs alarm actions and snstopics resources added
   alarm_actions      = [aws_sns_topic.mlra_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.mlra_alerting_topic.arn]
   threshold          = var.pALBTargetResponseTimeThresholdMaximum
@@ -108,6 +132,12 @@ resource "aws_cloudwatch_metric_alarm" "targetResponsetimemaximum" {
     LoadBalancer = var.pLoadBalancerName
   }
   comparison_operator = "GreaterThanThreshold"
+  tags = merge(
+    var.tags,
+    {
+      Name = "${var.appnameenv}-alb-target-response-time-alarm-maximum"
+    }
+  )
 }
 resource "aws_cloudwatch_metric_alarm" "unhealthyhosts" {
   alarm_name         = "${var.appnameenv}-unhealthy-hosts-alarm"
@@ -117,8 +147,6 @@ resource "aws_cloudwatch_metric_alarm" "unhealthyhosts" {
   statistic          = "Average"
   period             = "60"
   evaluation_periods = "5"
-  #TODO needs alarm actions and snstopics resources added
-  #AlarmActions
   alarm_actions      = [aws_sns_topic.mlra_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.mlra_alerting_topic.arn]
   threshold          = var.pALBUnhealthyAlarmThreshold
@@ -128,6 +156,12 @@ resource "aws_cloudwatch_metric_alarm" "unhealthyhosts" {
     TargetGroup  = var.pTargetGroupName
   }
   comparison_operator = "GreaterThanThreshold"
+  tags = merge(
+    var.tags,
+    {
+      Name = "${var.appnameenv}-unhealthy-hosts-alarm"
+    }
+  )
 }
 resource "aws_cloudwatch_metric_alarm" "rejectedconnectioncount" {
   alarm_name         = "${var.appnameenv}-RejectedConnectionCount-alarm"
@@ -137,7 +171,6 @@ resource "aws_cloudwatch_metric_alarm" "rejectedconnectioncount" {
   statistic          = "Sum"
   period             = "60"
   evaluation_periods = "5"
-  #TODO needs alarm actions and snstopics resources added
   alarm_actions      = [aws_sns_topic.mlra_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.mlra_alerting_topic.arn]
   threshold          = var.pALBRejectedAlarmThreshold
@@ -146,6 +179,12 @@ resource "aws_cloudwatch_metric_alarm" "rejectedconnectioncount" {
     LoadBalancer = var.pLoadBalancerName
   }
   comparison_operator = "GreaterThanThreshold"
+  tags = merge(
+    var.tags,
+    {
+      Name = "${var.appnameenv}-RejectedConnectionCount-alarm"
+    }
+  )
 }
 resource "aws_cloudwatch_metric_alarm" "http5xxerror" {
   alarm_name         = "${var.appnameenv}-http-5xx-error-alarm"
@@ -155,8 +194,6 @@ resource "aws_cloudwatch_metric_alarm" "http5xxerror" {
   statistic          = "Sum"
   period             = "60"
   evaluation_periods = "5"
-  #TODO needs alarm actions and snstopics resources added
-  #AlarmActions
   alarm_actions      = [aws_sns_topic.mlra_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.mlra_alerting_topic.arn]
   threshold          = var.pALBTarget5xxAlarmThreshold
@@ -165,6 +202,12 @@ resource "aws_cloudwatch_metric_alarm" "http5xxerror" {
     LoadBalancer = var.pLoadBalancerName
   }
   comparison_operator = "GreaterThanThreshold"
+  tags = merge(
+    var.tags,
+    {
+      Name = "${var.appnameenv}-http-5xx-error-alarm"
+    }
+  )
 }
 resource "aws_cloudwatch_metric_alarm" "applicationelb5xxerror" {
   alarm_name         = "${var.appnameenv}-elb-5xx-error-alarm"
@@ -174,8 +217,6 @@ resource "aws_cloudwatch_metric_alarm" "applicationelb5xxerror" {
   statistic          = "Sum"
   period             = "60"
   evaluation_periods = "5"
-  #TODO needs alarm actions and snstopics resources added
-  #AlarmActions
   alarm_actions      = [aws_sns_topic.mlra_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.mlra_alerting_topic.arn]
   threshold          = var.pALB5xxAlarmThreshold
@@ -184,6 +225,12 @@ resource "aws_cloudwatch_metric_alarm" "applicationelb5xxerror" {
     LoadBalancer = var.pLoadBalancerName
   }
   comparison_operator = "GreaterThanThreshold"
+  tags = merge(
+    var.tags,
+    {
+      Name = "${var.appnameenv}-elb-5xx-error-alarm"
+    }
+  )
 }
 resource "aws_cloudwatch_metric_alarm" "http4xxerror" {
   alarm_name         = "${var.appnameenv}-http-4xx-error-alarm"
@@ -193,8 +240,6 @@ resource "aws_cloudwatch_metric_alarm" "http4xxerror" {
   statistic          = "Sum"
   period             = "60"
   evaluation_periods = "5"
-  #TODO needs alarm actions and snstopics resources added
-  #AlarmActions
   alarm_actions      = [aws_sns_topic.mlra_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.mlra_alerting_topic.arn]
   threshold          = var.pALBTarget4xxAlarmThreshold
@@ -203,6 +248,12 @@ resource "aws_cloudwatch_metric_alarm" "http4xxerror" {
     LoadBalancer = var.pLoadBalancerName
   }
   comparison_operator = "GreaterThanThreshold"
+  tags = merge(
+    var.tags,
+    {
+      Name = "${var.appnameenv}-http-4xx-error-alarm"
+    }
+  )
 }
 resource "aws_cloudwatch_metric_alarm" "applicationelb4xxerror" {
   alarm_name         = "${var.appnameenv}-elb-4xx-error-alarm"
@@ -212,8 +263,6 @@ resource "aws_cloudwatch_metric_alarm" "applicationelb4xxerror" {
   statistic          = "Sum"
   period             = "60"
   evaluation_periods = "5"
-  #TODO needs alarm actions and snstopics resources added
-  #AlarmActions
   alarm_actions      = [aws_sns_topic.mlra_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.mlra_alerting_topic.arn]
   threshold          = var.pALB4xxAlarmThreshold
@@ -222,6 +271,12 @@ resource "aws_cloudwatch_metric_alarm" "applicationelb4xxerror" {
     LoadBalancer = var.pLoadBalancerName
   }
   comparison_operator = "GreaterThanThreshold"
+  tags = merge(
+    var.tags,
+    {
+      Name = "${var.appnameenv}-elb-4xx-error-alarm"
+    }
+  )
 }
 resource "aws_cloudwatch_dashboard" "mlradash" {
   dashboard_name = "MLRA"
@@ -332,5 +387,17 @@ EOF
 
 # SNS topic for monitoring to send alarms to
 resource "aws_sns_topic" "mlra_alerting_topic" {
-  name = var.snsTopicName
+  name = var.sns_topic_name
+  tags = merge(
+    var.tags,
+    {
+      Name = var.sns_topic_name
+    }
+  )
+}
+
+resource "aws_sns_topic_subscription" "pagerduty_subscription" {
+  topic_arn = aws_sns_topic.mlra_alerting_topic.arn
+  protocol  = "https"
+  endpoint  = "https://events.pagerduty.com/integration/${var.pagerduty_integration_key}/enqueue"
 }

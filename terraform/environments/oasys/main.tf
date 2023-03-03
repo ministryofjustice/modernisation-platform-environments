@@ -108,31 +108,31 @@ module "loadbalancer" {
   tags                       = coalesce(lookup(each.value, "tags", null), local.lb_defaults.tags)
 }
 
-# module "lb_listener" {
-#   for_each = local.lb_listeners[local.environment]
+module "lb_listener" {
+  for_each = local.lb_listeners[local.environment]
 
-#   source = "../../modules/lb_listener"
+  source = "../../modules/lb_listener"
 
-#   providers = {
-#     aws.core-vpc = aws.core-vpc
-#   }
+  providers = {
+    aws.core-vpc = aws.core-vpc
+  }
 
-#   name                   = each.key
-#   business_unit          = local.business_unit
-#   environment            = local.environment
-#   load_balancer_arn      = module.loadbalancer[each.value.lb_application_name].load_balancer.arn
-#   target_groups          = try(each.value.target_groups, {})
-#   existing_target_groups = local.existing_target_groups
-#   port                   = each.value.port
-#   protocol               = each.value.protocol
-#   ssl_policy             = try(each.value.ssl_policy, null)
-#   certificate_arns       = try(each.value.certificate_arns, [])
-#   default_action         = each.value.default_action
-#   rules                  = try(each.value.rules, {})
-#   route53_records        = try(each.value.route53_records, {})
-#   replace                = try(each.value.replace, {})
-#   tags                   = try(each.value.tags, local.tags)
-# }
+  name                   = each.key
+  business_unit          = local.business_unit
+  environment            = local.environment
+  load_balancer_arn      = module.loadbalancer[each.value.lb_application_name].load_balancer.arn
+  target_groups          = try(each.value.target_groups, {})
+  existing_target_groups = module.autoscaling_groups[each.value.asg_instance].lb_target_groups
+  port                   = each.value.port
+  protocol               = each.value.protocol
+  ssl_policy             = try(each.value.ssl_policy, null)
+  certificate_arns       = try(each.value.certificate_arns, [])
+  default_action         = each.value.default_action
+  rules                  = try(each.value.rules, {})
+  route53_records        = try(each.value.route53_records, {})
+  replace                = try(each.value.replace, {})
+  tags                   = try(each.value.tags, local.tags)
+}
 
 module "acm_certificate" {
   for_each = merge(local.acm_certificates.common, local.acm_certificates[local.environment])
@@ -144,11 +144,12 @@ module "acm_certificate" {
     aws.core-network-services = aws.core-network-services
   }
 
-  name                    = each.key
-  domain_name             = each.value.domain_name
-  subject_alternate_names = each.value.subject_alternate_names
-  validation              = each.value.validation
-  tags                    = merge(local.tags, lookup(each.value, "tags", {}))
+  name                     = each.key
+  domain_name              = each.value.domain_name
+  subject_alternate_names  = each.value.subject_alternate_names
+  validation               = each.value.validation
+  tags                     = merge(local.tags, lookup(each.value, "tags", {}))
+  cloudwatch_metric_alarms = local.acm_certificates.cloudwatch_metric_alarms_acm
 }
 
 resource "aws_kms_grant" "image-builder-shared-cmk-grant" {
