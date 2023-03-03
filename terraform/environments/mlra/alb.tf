@@ -5,7 +5,6 @@ module "alb" {
     aws.core-vpc = aws.core-vpc
     aws.core-network-services = aws.core-network-services
   }
-  }
 
   vpc_all                          = local.vpc_all
   application_name                 = local.application_name
