@@ -29,8 +29,8 @@ locals {
           oasys-environment = "t1"
         })
         lb_target_groups = {
-          https = {
-            port                 = 443
+          http-8080 = {
+            port                 = 8080
             protocol             = "HTTP"
             target_type          = "instance"
             deregistration_delay = 30
@@ -40,7 +40,7 @@ locals {
               healthy_threshold   = 3
               matcher             = "200-399"
               path                = "/"
-              port                = 443
+              port                = 8080
               timeout             = 5
               unhealthy_threshold = 5
             }
@@ -103,7 +103,7 @@ locals {
           oracle-sids       = "OASPROD BIPINFRA"
           monitored         = true
         }
-        ami_name = "oasys_oracle_db_release_2023-02-14T09-53-15.859Z"
+        ami_name = "oasys_oracle_db_*"
         # ami_owner = "self" # remove this line next time AMI is updated so core-shared-services-production used instead
         instance = {
           instance_type             = "r6i.2xlarge"

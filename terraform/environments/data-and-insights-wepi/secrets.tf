@@ -1,3 +1,5 @@
+#### This file can be used to store secrets specific to the member account ####
+
 # Redshift admin password secret
 resource "aws_secretsmanager_secret" "wepi_redshift_admin_secret" {
   name       = "redshift-wepi-${local.environment}-admin-secret"

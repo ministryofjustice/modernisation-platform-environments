@@ -7,9 +7,8 @@ locals {
   ### env independent common vars
   ###
 
-  application_name = "oasys"
-  business_unit    = "hmpps"
-  networking_set   = "general"
+  business_unit  = "hmpps"
+  networking_set = "general"
 
   accounts = {
     development   = local.oasys_development
@@ -21,36 +20,8 @@ locals {
   account_id         = local.environment_management.account_ids[terraform.workspace]
   environment_config = local.accounts[local.environment]
 
-  environment_management = jsondecode(data.aws_secretsmanager_secret_version.environment_management.secret_string)
-
-  # Stores modernisation platform account id for setting up the modernisation-platform provider
-  modernisation_platform_account_id = data.aws_ssm_parameter.modernisation_platform_account_id.value
-
-  # This takes the name of the Terraform workspace (e.g. core-vpc-production), strips out the application name (e.g. core-vpc), and checks if
-  # the string leftover is `-production`, if it isn't (e.g. core-vpc-non-production => -non-production) then it sets the var to false.
-  is-production    = substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-production"
-  is-preproduction = substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-preproduction"
-  is-test          = substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-test"
-  is-development   = substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-development"
-
-  # Merge tags from the environment json file with additional ones
-  tags = merge(
-    jsondecode(data.http.environments_file.response_body).tags,
-    { "is-production" = local.is-production },
-    { "environment-name" = terraform.workspace },
-    { "source-code" = "https://github.com/ministryofjustice/modernisation-platform-environments" }
-  )
-
-  environment     = trimprefix(terraform.workspace, "${local.application_name}-")
-  subnet_set      = local.networking_set
-  vpc_all         = "${local.business_unit}-${local.environment}"
-  subnet_set_name = "${local.business_unit}-${local.environment}-${local.networking_set}"
-
   region            = "eu-west-2"
   availability_zone = "eu-west-2a"
-
-  is_live       = [substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-production" || substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-preproduction" ? "live" : "non-live"]
-  provider_name = "core-vpc-${local.environment}"
 
   cidrs = { # this list should be abstracted for multiple environments to use
     # Azure
@@ -158,6 +129,7 @@ locals {
     description = "oasys webserver"
     component   = "web"
     server-type = "oasys-web"
+    os-version  = "RHEL 8.5"
   }
 
   database = {
@@ -166,9 +138,8 @@ locals {
       component            = "data"
       os-type              = "Linux"
       os-major-version     = 7
-      os-version           = "RHEL 7.9"
+      os-version           = "RHEL 8.5"
       licence-requirements = "Oracle Database"
-      ami                  = "oasys_oracle_db_release_2023-02-14T09-53-15.859Z"
       "Patch Group"        = "RHEL"
     }
 
@@ -325,165 +296,106 @@ locals {
     production = {}
   }
 
-  # lb_listener_defaults = {
-  #   oasys_public = {
-  #     lb_application_name = "oasys-public"
-  #   }
-  #   route53 = {
-  #     route53_records = {
-  #       "$(name).oasys" = {
-  #         account                = "core-vpc"
-  #         zone_id                = module.environment.route53_zones[module.environment.domains.public.business_unit_environment].zone_id
-  #         evaluate_target_health = true
-  #       }
-  #     }
-  #   }
+  lb_listener_defaults = {
 
-  #   http = {
-  #     port     = 80
-  #     protocol = "HTTP"
-  #     default_action = {
-  #       type = "redirect"
-  #       redirect = {
-  #         status_code = "HTTP_301"
-  #         port        = 443
-  #         protocol    = "HTTPS"
-  #       }
-  #     }
-  #   }
-  #   http-7001 = {
-  #     port     = 7001
-  #     protocol = "HTTP"
-  #     default_action = {
-  #       type              = "forward"
-  #       target_group_name = "$(name)-http-7001"
-  #     }
-  #   }
-  #   http-7777 = {
-  #     port     = 7777
-  #     protocol = "HTTP"
-  #     default_action = {
-  #       type              = "forward"
-  #       target_group_name = "$(name)-http-7777"
-  #     }
-  #   }
-  #   https = {
-  #     port             = 443
-  #     protocol         = "HTTPS"
-  #     ssl_policy       = "ELBSecurityPolicy-2016-08"
-  #     certificate_arns = [module.acm_certificate["star.${module.environment.domains.public.application_environment}"].arn]
-  #     default_action = {
-  #       type = "fixed-response"
-  #       fixed_response = {
-  #         content_type = "text/plain"
-  #         message_body = "Not implemented"
-  #         status_code  = "501"
-  #       }
-  #     }
-  #     rules = {
-  #       forward-http-7001 = {
-  #         priority = 100
-  #         actions = [{
-  #           type              = "forward"
-  #           target_group_name = "$(name)-http-7001"
-  #         }]
-  #         conditions = [
-  #           {
-  #             host_header = {
-  #               values = ["$(name).nomis.${module.environment.vpc_name}.modernisation-platform.service.justice.gov.uk"]
-  #             }
-  #           },
-  #           {
-  #             path_pattern = {
-  #               values = ["/console", "/console/*"]
-  #             }
-  #         }]
-  #       }
-  #       forward-http-7777 = {
-  #         priority = 200
-  #         actions = [{
-  #           type              = "forward"
-  #           target_group_name = "$(name)-http-7777"
-  #         }]
-  #         conditions = [{
-  #           host_header = {
-  #             values = ["$(name).nomis.${module.environment.vpc_name}.modernisation-platform.service.justice.gov.uk"]
-  #           }
-  #         }]
-  #       }
-  #     }
-  #   }
-  # }
+    oasys_public = {
+      lb_application_name = "oasys-public"
+      asg_instance        = "webservers"
+    }
 
-  # lb_listeners = {
+    route53 = {
+      route53_records = {
+        "web.oasys" = {
+          account                = "core-vpc"
+          zone_id                = module.environment.route53_zones[module.environment.domains.public.business_unit_environment].zone_id
+          evaluate_target_health = true
+        }
+      }
+    }
 
-  #   #--------------------------------------------------------------------------
-  #   # define environment specific load balancer listeners here
-  #   #--------------------------------------------------------------------------
-  #   development = {
-  #     oasys-public-web-https = merge(
-  #       local.lb_listener_defaults.https,
-  #       local.lb_listener_defaults.oasys_public,
-  #       local.lb_listener_defaults.route53, {
-  #         replace = {
-  #           target_group_name_replace     = "t1-nomis-web-internal"
-  #           condition_host_header_replace = "t1-nomis-web-internal"
-  #           route53_record_name_replace   = "t1-nomis-web-internal"
-  #         }
-  #     })
-  #   }
+    https = {
+      port             = 443
+      protocol         = "HTTPS"
+      ssl_policy       = "ELBSecurityPolicy-2016-08"
+      certificate_arns = [module.acm_certificate["star.${module.environment.domains.public.application_environment}"].arn]
+      default_action = {
+        type = "fixed-response"
+        fixed_response = {
+          content_type = "text/plain"
+          message_body = "Not implemented"
+          status_code  = "501"
+        }
+      }
 
-  #   test = {
-  #     nomis-internal-t1-nomis-web-http-7001 = merge(
-  #       local.lb_listener_defaults.http-7001,
-  #       local.lb_listener_defaults.nomis_internal, {
-  #         replace = {
-  #           target_group_name_replace     = "t1-nomis-web-internal"
-  #           condition_host_header_replace = "t1-nomis-web-internal"
-  #         }
-  #       }
-  #     )
-  #     nomis-internal-t1-nomis-web-http-7777 = merge(
-  #       local.lb_listener_defaults.http-7777,
-  #       local.lb_listener_defaults.nomis_internal, {
-  #         replace = {
-  #           target_group_name_replace     = "t1-nomis-web-internal"
-  #           condition_host_header_replace = "t1-nomis-web-internal"
-  #         }
-  #       }
-  #     )
+      rules = {
+        forward-http-8080 = {
+          priority = 100
+          actions = [{
+            type              = "forward"
+            target_group_name = "http-8080"
+          }]
+          conditions = [
+            {
+              host_header = {
+                values = ["web.oasys.${module.environment.vpc_name}.modernisation-platform.service.justice.gov.uk"]
+              }
+            },
+            {
+              path_pattern = {
+                values = ["/"]
+              }
+          }]
+        }
+      }
+    }
+  }
 
-  #     nomis-public-t1-nomis-web-http-7001 = merge(
-  #       local.lb_listener_defaults.http-7001,
-  #       local.lb_listener_defaults.nomis_public, {
-  #         replace = {
-  #           target_group_name_replace     = "t1-nomis-web-public"
-  #           condition_host_header_replace = "t1-nomis-web"
-  #         }
-  #       }
-  #     )
-  #     nomis-public-t1-nomis-web-http-7777 = merge(
-  #       local.lb_listener_defaults.http-7777,
-  #       local.lb_listener_defaults.nomis_public, {
-  #         replace = {
-  #           target_group_name_replace     = "t1-nomis-web-public"
-  #           condition_host_header_replace = "t1-nomis-web"
-  #         }
-  #       }
-  #     )
-  #     nomis-public-t1-nomis-web-https = merge(
-  #       local.lb_listener_defaults.https,
-  #       local.lb_listener_defaults.nomis_public,
-  #       local.lb_listener_defaults.route53, {
-  #         replace = {
-  #           target_group_name_replace     = "t1-nomis-web-public"
-  #           condition_host_header_replace = "t1-nomis-web"
-  #           route53_record_name_replace   = "t1-nomis-web"
-  #         }
-  #     })
-  #   }
+  lb_listeners = {
 
-  #   preproduction = {}
-  #   production    = {}
-  # }
+    development = {
+      oasys-public = merge(
+        local.lb_listener_defaults.https,
+        local.lb_listener_defaults.oasys_public,
+        local.lb_listener_defaults.route53,
+      )
+    }
+
+    test          = {}
+    preproduction = {}
+    production    = {}
+  }
+
+  acm_certificates = {
+
+    # Certificates common to all environments
+    common = {
+      # e.g. star.nomis.hmpps-development.modernisation-platform.service.justice.gov.uk
+      "star.${module.environment.domains.public.application_environment}" = {
+        # domain_name limited to 64 chars so put it in the san instead
+        domain_name             = module.environment.domains.public.modernisation_platform
+        subject_alternate_names = ["*.${module.environment.domains.public.application_environment}"]
+        validation = {
+          "${module.environment.domains.public.modernisation_platform}" = {
+            account   = "core-network-services"
+            zone_name = "${module.environment.domains.public.modernisation_platform}."
+          }
+          "*.${module.environment.domains.public.application_environment}" = {
+            account   = "core-vpc"
+            zone_name = "${module.environment.domains.public.business_unit_environment}."
+          }
+        }
+        tags = {
+          description = "wildcard cert for ${module.environment.domains.public.application_environment} domain"
+        }
+      }
+    }
+    # Alarms for certificates
+    cloudwatch_metric_alarms_acm = {}
+
+    # Environment specific certificates
+    development   = {}
+    test          = {}
+    preproduction = {}
+    production    = {}
+  }
 }
