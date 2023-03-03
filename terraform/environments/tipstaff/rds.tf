@@ -22,33 +22,32 @@ resource "aws_db_subnet_group" "dbsubnetgroup" {
 }
 
 //Not needed??
-# resource "aws_security_group" "postgresql_db_sc" {
-#   name        = "postgres_security_group"
-#   description = "control access to the database"
-#   vpc_id      = data.aws_vpc.shared.id
-#   ingress {
-#     from_port   = 0
-#     to_port     = 65535
-#     protocol    = "tcp"
-#     description = "MOJ Digital VPN access"
-#     cidr_blocks = [local.application_data.accounts[local.environment].moj_ip]
-#   }
-#   ingress {
-#     from_port   = 5432
-#     to_port     = 5432
-#     protocol    = "tcp"
-#     description = "Allows codebuild access to RDS"
-#     cidr_blocks = ["0.0.0.0/0"]
-#   }
-#   egress {
-#     description = "allow all outbound traffic"
-#     from_port   = 0
-#     to_port     = 0
-#     protocol    = "-1"
-#     cidr_blocks = ["0.0.0.0/0"]
-#   }
-
-# }
+resource "aws_security_group" "postgresql_db_sc" {
+  name        = "postgres_security_group"
+  description = "control access to the database"
+  vpc_id      = data.aws_vpc.shared.id
+  ingress {
+    from_port   = 0
+    to_port     = 65535
+    protocol    = "tcp"
+    description = "MOJ Digital VPN access"
+    cidr_blocks = [local.application_data.accounts[local.environment].moj_ip]
+  }
+  ingress {
+    from_port   = 5432
+    to_port     = 5432
+    protocol    = "tcp"
+    description = "Allows codebuild access to RDS"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  egress {
+    description = "allow all outbound traffic"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
 
 resource "null_resource" "setup_db" {
   depends_on = [aws_db_instance.tipstaffdbdev]
