@@ -1,6 +1,6 @@
 locals {
 
-  application_name = "nomis-combined-reporting"
+  application_name = "data-and-insights-wepi"
 
   environment_management = jsondecode(data.aws_secretsmanager_secret_version.environment_management.secret_string)
 

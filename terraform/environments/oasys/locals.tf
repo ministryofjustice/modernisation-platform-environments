@@ -129,6 +129,7 @@ locals {
     description = "oasys webserver"
     component   = "web"
     server-type = "oasys-web"
+    os-version  = "RHEL 8.5"
   }
 
   database = {
@@ -137,9 +138,8 @@ locals {
       component            = "data"
       os-type              = "Linux"
       os-major-version     = 7
-      os-version           = "RHEL 7.9"
+      os-version           = "RHEL 8.5"
       licence-requirements = "Oracle Database"
-      ami                  = "oasys_oracle_db_release_2023-02-14T09-53-15.859Z"
       "Patch Group"        = "RHEL"
     }
 
@@ -296,165 +296,106 @@ locals {
     production = {}
   }
 
-  # lb_listener_defaults = {
-  #   oasys_public = {
-  #     lb_application_name = "oasys-public"
-  #   }
-  #   route53 = {
-  #     route53_records = {
-  #       "$(name).oasys" = {
-  #         account                = "core-vpc"
-  #         zone_id                = module.environment.route53_zones[module.environment.domains.public.business_unit_environment].zone_id
-  #         evaluate_target_health = true
-  #       }
-  #     }
-  #   }
+  lb_listener_defaults = {
 
-  #   http = {
-  #     port     = 80
-  #     protocol = "HTTP"
-  #     default_action = {
-  #       type = "redirect"
-  #       redirect = {
-  #         status_code = "HTTP_301"
-  #         port        = 443
-  #         protocol    = "HTTPS"
-  #       }
-  #     }
-  #   }
-  #   http-7001 = {
-  #     port     = 7001
-  #     protocol = "HTTP"
-  #     default_action = {
-  #       type              = "forward"
-  #       target_group_name = "$(name)-http-7001"
-  #     }
-  #   }
-  #   http-7777 = {
-  #     port     = 7777
-  #     protocol = "HTTP"
-  #     default_action = {
-  #       type              = "forward"
-  #       target_group_name = "$(name)-http-7777"
-  #     }
-  #   }
-  #   https = {
-  #     port             = 443
-  #     protocol         = "HTTPS"
-  #     ssl_policy       = "ELBSecurityPolicy-2016-08"
-  #     certificate_arns = [module.acm_certificate["star.${module.environment.domains.public.application_environment}"].arn]
-  #     default_action = {
-  #       type = "fixed-response"
-  #       fixed_response = {
-  #         content_type = "text/plain"
-  #         message_body = "Not implemented"
-  #         status_code  = "501"
-  #       }
-  #     }
-  #     rules = {
-  #       forward-http-7001 = {
-  #         priority = 100
-  #         actions = [{
-  #           type              = "forward"
-  #           target_group_name = "$(name)-http-7001"
-  #         }]
-  #         conditions = [
-  #           {
-  #             host_header = {
-  #               values = ["$(name).nomis.${module.environment.vpc_name}.modernisation-platform.service.justice.gov.uk"]
-  #             }
-  #           },
-  #           {
-  #             path_pattern = {
-  #               values = ["/console", "/console/*"]
-  #             }
-  #         }]
-  #       }
-  #       forward-http-7777 = {
-  #         priority = 200
-  #         actions = [{
-  #           type              = "forward"
-  #           target_group_name = "$(name)-http-7777"
-  #         }]
-  #         conditions = [{
-  #           host_header = {
-  #             values = ["$(name).nomis.${module.environment.vpc_name}.modernisation-platform.service.justice.gov.uk"]
-  #           }
-  #         }]
-  #       }
-  #     }
-  #   }
-  # }
+    oasys_public = {
+      lb_application_name = "oasys-public"
+    }
 
-  # lb_listeners = {
+    route53 = {
+      route53_records = {
+        "web.oasys" = {
+          account                = "core-vpc"
+          zone_id                = module.environment.route53_zones[module.environment.domains.public.business_unit_environment].zone_id
+          evaluate_target_health = true
+        }
+      }
+    }
 
-  #   #--------------------------------------------------------------------------
-  #   # define environment specific load balancer listeners here
-  #   #--------------------------------------------------------------------------
-  #   development = {
-  #     oasys-public-web-https = merge(
-  #       local.lb_listener_defaults.https,
-  #       local.lb_listener_defaults.oasys_public,
-  #       local.lb_listener_defaults.route53, {
-  #         replace = {
-  #           target_group_name_replace     = "t1-nomis-web-internal"
-  #           condition_host_header_replace = "t1-nomis-web-internal"
-  #           route53_record_name_replace   = "t1-nomis-web-internal"
-  #         }
-  #     })
-  #   }
+    https = {
+      port             = 443
+      protocol         = "HTTPS"
+      ssl_policy       = "ELBSecurityPolicy-2016-08"
+      certificate_arns = [module.acm_certificate["star.${module.environment.domains.public.application_environment}"].arn]
+      default_action = {
+        type = "fixed-response"
+        fixed_response = {
+          content_type = "text/plain"
+          message_body = "Not implemented"
+          status_code  = "501"
+        }
+      }
+    }
+    rules = {
+      forward-https = {
+        priority = 100
+        actions = [{
+          type              = "forward"
+          target_group_name = "webservers-http-8080"
+        }]
+        conditions = [
+          {
+            host_header = {
+              values = ["web.oasys.${module.environment.vpc_name}.modernisation-platform.service.justice.gov.uk"]
+            }
+          },
+          {
+            path_pattern = {
+              values = ["/"]
+            }
+        }]
+      }
+    }
+  }
 
-  #   test = {
-  #     nomis-internal-t1-nomis-web-http-7001 = merge(
-  #       local.lb_listener_defaults.http-7001,
-  #       local.lb_listener_defaults.nomis_internal, {
-  #         replace = {
-  #           target_group_name_replace     = "t1-nomis-web-internal"
-  #           condition_host_header_replace = "t1-nomis-web-internal"
-  #         }
-  #       }
-  #     )
-  #     nomis-internal-t1-nomis-web-http-7777 = merge(
-  #       local.lb_listener_defaults.http-7777,
-  #       local.lb_listener_defaults.nomis_internal, {
-  #         replace = {
-  #           target_group_name_replace     = "t1-nomis-web-internal"
-  #           condition_host_header_replace = "t1-nomis-web-internal"
-  #         }
-  #       }
-  #     )
+  lb_listeners = {
 
-  #     nomis-public-t1-nomis-web-http-7001 = merge(
-  #       local.lb_listener_defaults.http-7001,
-  #       local.lb_listener_defaults.nomis_public, {
-  #         replace = {
-  #           target_group_name_replace     = "t1-nomis-web-public"
-  #           condition_host_header_replace = "t1-nomis-web"
-  #         }
-  #       }
-  #     )
-  #     nomis-public-t1-nomis-web-http-7777 = merge(
-  #       local.lb_listener_defaults.http-7777,
-  #       local.lb_listener_defaults.nomis_public, {
-  #         replace = {
-  #           target_group_name_replace     = "t1-nomis-web-public"
-  #           condition_host_header_replace = "t1-nomis-web"
-  #         }
-  #       }
-  #     )
-  #     nomis-public-t1-nomis-web-https = merge(
-  #       local.lb_listener_defaults.https,
-  #       local.lb_listener_defaults.nomis_public,
-  #       local.lb_listener_defaults.route53, {
-  #         replace = {
-  #           target_group_name_replace     = "t1-nomis-web-public"
-  #           condition_host_header_replace = "t1-nomis-web"
-  #           route53_record_name_replace   = "t1-nomis-web"
-  #         }
-  #     })
-  #   }
+    development = {
+      oasys-public = merge(
+        local.lb_listener_defaults.https,
+        local.lb_listener_defaults.oasys_public,
+        local.lb_listener_defaults.route53,
+      )
+    }
 
-  #   preproduction = {}
-  #   production    = {}
-  # }
+    test          = {}
+    preproduction = {}
+    production    = {}
+  }
+
+  # existing_target_groups = module.autoscaling_groups["webservers"].lb_target_groups
+
+  acm_certificates = {
+
+    # Certificates common to all environments
+    common = {
+      # e.g. star.nomis.hmpps-development.modernisation-platform.service.justice.gov.uk
+      "star.${module.environment.domains.public.application_environment}" = {
+        # domain_name limited to 64 chars so put it in the san instead
+        domain_name             = module.environment.domains.public.modernisation_platform
+        subject_alternate_names = ["*.${module.environment.domains.public.application_environment}"]
+        validation = {
+          "${module.environment.domains.public.modernisation_platform}" = {
+            account   = "core-network-services"
+            zone_name = "${module.environment.domains.public.modernisation_platform}."
+          }
+          "*.${module.environment.domains.public.application_environment}" = {
+            account   = "core-vpc"
+            zone_name = "${module.environment.domains.public.business_unit_environment}."
+          }
+        }
+        tags = {
+          description = "wildcard cert for ${module.environment.domains.public.application_environment} domain"
+        }
+      }
+    }
+    # Alarms for certificates
+    cloudwatch_metric_alarms_acm = {}
+
+    # Environment specific certificates
+    development   = {}
+    test          = {}
+    preproduction = {}
+    production    = {}
+  }
 }
