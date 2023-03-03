@@ -8,7 +8,7 @@ resource "aws_security_group_rule" "ingress_traffic_lb" {
   description       = format("Traffic for %s %d", each.value.protocol, each.value.from_port)
   from_port         = each.value.from_port
   protocol          = each.value.protocol
-  security_group_id = aws_security_group.example_load_balancer_sg.id
+  security_group_id = aws_security_group.tipstaff_dev_lb_sc.id
   to_port           = each.value.to_port
   type              = "ingress"
   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
@@ -18,10 +18,10 @@ resource "aws_security_group_rule" "egress_traffic_lb" {
   description              = format("Outbound traffic for %s %d", each.value.protocol, each.value.from_port)
   from_port                = each.value.from_port
   protocol                 = each.value.protocol
-  security_group_id        = aws_security_group.example_load_balancer_sg.id
+  security_group_id        = aws_security_group.tipstaff_dev_lb_sc.id
   to_port                  = each.value.to_port
   type                     = "egress"
-  source_security_group_id = aws_security_group.example_load_balancer_sg.id
+  source_security_group_id = aws_security_group.tipstaff_dev_lb_sc.id
 }
 resource "aws_lb" "tipstaff_dev_lb" {
   name                       = "tipstaff-dev-load-balancer"
