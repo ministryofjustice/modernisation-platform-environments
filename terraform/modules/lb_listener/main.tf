@@ -243,9 +243,7 @@ resource "aws_cloudwatch_metric_alarm" "this" {
   alarm_description   = each.value.alarm_description
   datapoints_to_alarm = each.value.datapoints_to_alarm
   treat_missing_data  = each.value.treat_missing_data
-  dimensions = merge(each.value.dimensions, {
-    "LoadBalancer" = data.aws_lb.this.arn_suffix
-    "TargetGroup"  = aws_lb_target_group.this.arn_suffix
-  })
   tags = {}
+  dimensions = merge(each.value.dimensions,
+    { "LoadBalancer" = data.aws_lb.this.arn_suffix })
 }

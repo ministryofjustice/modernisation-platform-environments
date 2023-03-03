@@ -10,13 +10,13 @@ locals {
   existing_target_groups = { for item in flatten(local.existing_target_groups_list) : item.key => item.value }
 
   cloudwatch_metric_alarms_listener = {
-    load-balancer-unhealthy-state-target = {
+    lb-unhealthy-host-count = {
       comparison_operator = "GreaterThanOrEqualToThreshold"
       evaluation_periods  = "3"
-      metric_name         = "UnHealthyStateTarget"
+      metric_name         = "UnHealthyHostCount"
       namespace           = "AWS/ApplicationELB"
       period              = "60"
-      statistic           = "Average"
+      statistic           = "Minimum"
       threshold           = "1"
       alarm_description   = "This metric monitors the number of unhealthy hosts in the target table for the load balancer. If the number of unhealthy hosts is greater than 0 for 3 minutes."
       alarm_actions       = [aws_sns_topic.nomis_nonprod_alarms.arn]
