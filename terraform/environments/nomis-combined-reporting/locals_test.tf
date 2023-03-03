@@ -54,7 +54,7 @@ locals {
         force_destroy_bucket     = true
         internal_lb              = true
         tags                     = local.tags
-        security_groups          = [aws_security_group.public.id]
+        security_groups          = [module.baseline.security_groups["public"]]
       }
     }
   }
