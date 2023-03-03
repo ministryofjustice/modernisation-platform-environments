@@ -3,7 +3,7 @@
 <!-- This is a template that should be populated by the development team when moving to the modernisation platform, but also reviewed and kept up to date.
 To ensure that people looking at your runbook can get the information they need quickly, your runbook should be short but clear. Throughout, only use acronyms if you’re confident that someone who has just been woken up at 3am would understand them. -->
 
-_If you have any questions surrounding this page please post in the `#team-name` channel._
+_If you have any questions surrounding this page please post in the `#laa-ops` channel._
 
 ## Mandatory Information
 
@@ -14,10 +14,14 @@ _If you have any questions surrounding this page please post in the `#team-name`
 ### **Description:**
 
 <!-- A short (less than 50 word) description of what your service does, and who it’s for.-->
+MLRA (Means Assessment Administration Tool - Libra Record Access) is a web enabled application used to process criminal legal aid applications in the Magistrates and Crown Courts.
+
+Also used for assessing if defendants are entitled to legal aid for criminal cases. End users consist of approximately 400 criminal case workers.
 
 ### **Service URLs:**
 
 <!--  The URL(s) of the service’s production environment, and test environments if possible-->
+
 
 ### **Incident response hours:**
 
@@ -50,6 +54,7 @@ Modernisation Platform
 ### **Automatic alerts:**
 
 <!-- List, briefly, problems (or types of problem) that will automatically alert your team when they occur. -->
+
 
 ### **Impact of an outage:**
 
