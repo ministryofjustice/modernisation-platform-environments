@@ -66,6 +66,10 @@ variable "listener_protocol" {
   type        = string
   description = "The protocol for the ALB Listener"
 }
+variable "alb_ssl_policy" {
+  type        = string
+  description = "Name of the SSL Policy for the listener"
+}
 variable "target_group_port" {
   type        = string
   description = "The port number for the ALB Target Group"
@@ -117,10 +121,6 @@ variable "stickiness_type" {
 variable "stickiness_cookie_duration" {
   type        = string
   description = "The cookie duration in seconds for the stickiness"
-}
-variable "internal_lb" {
-  type        = bool
-  description = "Internal Schema LB or not. Use true for internal"
 }
 variable "existing_bucket_name" {
   type        = string

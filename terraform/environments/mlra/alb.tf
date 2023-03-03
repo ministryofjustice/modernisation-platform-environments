@@ -19,11 +19,11 @@ module "alb" {
   security_group_ingress_to_port   = 443
   security_group_ingress_protocol  = "tcp"
   moj_vpn_cidr_block               = local.application_data.accounts[local.environment].moj_vpn_cidr
-  internal_lb                      = false
   # existing_bucket_name = "" # An s3 bucket name can be provided in the module by adding the `existing_bucket_name` variable and adding the bucket name
 
-  listener_protocol = "HTTP" # TODO This needs changing to HTTPS as part of https://dsdmoj.atlassian.net/browse/LAWS-3076
+  listener_protocol = "HTTPS" # TODO This needs changing to HTTPS as part of https://dsdmoj.atlassian.net/browse/LAWS-3076
   listener_port     = 443
+  alb_ssl_policy    = "ELBSecurityPolicy-TLS-1-2-2017-01" # TODO This enforces TLSv1.2. For general, use ELBSecurityPolicy-2016-08 instead
 
   target_group_deregistration_delay = 30
   target_group_protocol             = "HTTP"
