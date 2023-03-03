@@ -65,10 +65,10 @@ resource "aws_instance" "develop" {
 #------------------------------------------------------------------------------
 
 locals {
-  business_unit       = var.networking[0].business-unit
-  region              = "eu-west-2"
-  availability_zone_1 = "eu-west-2a"
-  availability_zone_2 = "eu-west-2b"
+  business_unit                 = var.networking[0].business-unit
+  region                        = "eu-west-2"
+  availability_zone_1           = "eu-west-2a"
+  availability_zone_2           = "eu-west-2b"
   autoscaling_schedules_default = {
     "scale_up" = {
       recurrence = "0 7 * * Mon-Fri"
@@ -79,8 +79,6 @@ locals {
     }
   }
   ec2_test = {
-
-    # server-type and nomis-environment auto set by module
     tags = {
       component = "test"
     }
@@ -124,14 +122,14 @@ locals {
 
     ec2_test_instances = {
       # Remove data.aws_kms_key from cmk.tf once the NDH servers are removed
-      t1-ndh-app-1 = {
+      example-test-instance-1 = {
         tags = {
-          server-type       = "ndh-app"
+          server-type       = "private"
           description       = "Standalone EC2 for testing RHEL7.9 NDH App"
           monitored         = false
           os-type           = "Linux"
           component         = "ndh"
-          nomis-environment = "t1"
+          environment       = "test"
         }
         ebs_volumes = {
           "/dev/sda1" = { kms_key_id = data.aws_kms_key.default_ebs.arn }
@@ -139,20 +137,37 @@ locals {
         ami_name  = "RHEL-6.10_HVM-*"
         ami_owner = "309956199498"
       }
-      t1-ndh-ems-1 = {
+      example-test-instance-2 = {
         tags = {
-          server-type       = "ndh-ems"
+          server-type       = "private"
           description       = "Standalone EC2 for testing RHEL7.9 NDH EMS"
           monitored         = false
           os-type           = "Linux"
           component         = "ndh"
-          nomis-environment = "t1"
+          environment       = "test"
         }
         ebs_volumes = {
           "/dev/sda1" = { kms_key_id = data.aws_kms_key.default_ebs.arn }
         }
-        ami_name = "RHEL-7.9_HVM-*"
-      ami_owner = "309956199498" }
+        ami_name  = "RHEL-7.9_HVM-*"
+        ami_owner = "309956199498"
+      }
+    }
+    ec2_test_autoscaling_groups = {
+      dev-redhat-rhel610 = {
+        tags = {
+          description = "For testing official RedHat RHEL6.10 image"
+          monitored   = false
+          os-type     = "Linux"
+          component   = "test"
+        }
+        instance = {
+          instance_type                = "t2.medium"
+          metadata_options_http_tokens = "optional"
+        }
+        ami_name  = "RHEL-6.10_HVM-*"
+        ami_owner = "309956199498"
+      }
     }
   }
 }
@@ -216,8 +231,7 @@ resource "aws_key_pair" "ec2-user" {
 }
 
 module "ec2_test_instance" {
-  #checkov:skip=CKV_AWS_126:This is a test instance
-  source = "../../../../modernisation-platform-terraform-ec2-instance"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance"
 
   providers = {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
@@ -227,10 +241,9 @@ module "ec2_test_instance" {
 
   name = each.key
 
-  ami_name  = each.value.ami_name
-  ami_owner = try(each.value.ami_owner, "core-shared-services-production")
-  instance  = merge(local.ec2_test.instance, lookup(each.value, "instance", {}))
-  #  user_data_cloud_init          = merge(local.ec2_test.user_data_cloud_init, lookup(each.value, "user_data_cloud_init", {}))
+  ami_name                      = each.value.ami_name
+  ami_owner                     = try(each.value.ami_owner, "core-shared-services-production")
+  instance                      = merge(local.ec2_test.instance, lookup(each.value, "instance", {}))
   ebs_volumes_copy_all_from_ami = try(each.value.ebs_volumes_copy_all_from_ami, true)
   ebs_kms_key_id                = module.environment.kms_keys["ebs"].arn
   ebs_volume_config             = lookup(each.value, "ebs_volume_config", {})
@@ -252,37 +265,36 @@ module "ec2_test_instance" {
   account_ids_lookup       = local.environment_management.account_ids
   cloudwatch_metric_alarms = {}
 }
-#
-#module "ec2_test_autoscaling_group" {
-#  source = "../../../../modernisation-platform-terraform-ec2-autoscaling-group"
-#
-#  providers = {
-#    aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
-#  }
-#
-#  for_each = try(local.environment_config.ec2_test_autoscaling_groups, {})
-#
-#  name = each.key
-#
-#  ami_name                      = each.value.ami_name
-#  ami_owner                     = try(each.value.ami_owner, "core-shared-services-production")
-#  instance                      = merge(local.ec2_test.instance, lookup(each.value, "instance", {}))
-#  user_data_cloud_init          = merge(local.ec2_test.user_data_cloud_init, lookup(each.value, "user_data_cloud_init", {}))
-#  ebs_volumes_copy_all_from_ami = try(each.value.ebs_volumes_copy_all_from_ami, true)
-#  ebs_kms_key_id                = module.environment.kms_keys["ebs"].arn
-#  ebs_volume_config             = lookup(each.value, "ebs_volume_config", {})
-#  ebs_volumes                   = lookup(each.value, "ebs_volumes", {})
-#  ssm_parameters_prefix         = lookup(each.value, "ssm_parameters_prefix", "test/")
-#  ssm_parameters                = lookup(each.value, "ssm_parameters", null)
-#  autoscaling_group             = merge(local.ec2_test.autoscaling_group, lookup(each.value, "autoscaling_group", {}))
-#  autoscaling_schedules         = lookup(each.value, "autoscaling_schedules", local.autoscaling_schedules_default)
-#
-#  iam_resource_names_prefix = "ec2-test-asg"
-#  instance_profile_policies = local.ec2_common_managed_policies
-#  application_name          = local.application_name
-#  region                    = local.region
-#  subnet_ids                = module.environment.subnets["private"].ids
-#  tags                      = merge(local.tags, local.ec2_test.tags, try(each.value.tags, {}))
-#  account_ids_lookup        = local.environment_management.account_ids
-#  cloudwatch_metric_alarms  = {}
-#}
+
+module "ec2_test_autoscaling_group" {
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-autoscaling-group"
+
+  providers = {
+    aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
+  }
+
+  for_each = try(local.ec2_test.ec2_test_autoscaling_groups, {})
+
+  name = each.key
+
+  ami_name                      = each.value.ami_name
+  ami_owner                     = try(each.value.ami_owner, "core-shared-services-production")
+  instance                      = merge(local.ec2_test.instance, lookup(each.value, "instance", {}))
+  ebs_volumes_copy_all_from_ami = try(each.value.ebs_volumes_copy_all_from_ami, true)
+  ebs_kms_key_id                = module.environment.kms_keys["ebs"].arn
+  ebs_volume_config             = lookup(each.value, "ebs_volume_config", {})
+  ebs_volumes                   = lookup(each.value, "ebs_volumes", {})
+  ssm_parameters_prefix         = lookup(each.value, "ssm_parameters_prefix", "test/")
+  ssm_parameters                = lookup(each.value, "ssm_parameters", null)
+  autoscaling_group             = merge(local.ec2_test.autoscaling_group, lookup(each.value, "autoscaling_group", {}))
+  autoscaling_schedules         = lookup(each.value, "autoscaling_schedules", local.autoscaling_schedules_default)
+
+  iam_resource_names_prefix = "ec2-test-asg"
+  instance_profile_policies = local.ec2_common_managed_policies
+  application_name          = local.application_name
+  region                    = local.region
+  subnet_ids                = module.environment.subnets["private"].ids
+  tags                      = merge(local.tags, local.ec2_test.tags, try(each.value.tags, {}))
+  account_ids_lookup        = local.environment_management.account_ids
+  cloudwatch_metric_alarms  = {}
+}
