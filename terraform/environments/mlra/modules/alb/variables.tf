@@ -70,6 +70,14 @@ variable "alb_ssl_policy" {
   type        = string
   description = "Name of the SSL Policy for the listener"
 }
+variable "services_zone_id" {
+  type        = string
+  description = "Zone Id of the Network Services for the Route 53 records"
+}
+variable "external_zone_id" {
+  type        = string
+  description = "Zone Id of the External for the Route 53 records"
+}
 variable "target_group_port" {
   type        = string
   description = "The port number for the ALB Target Group"

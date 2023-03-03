@@ -19,9 +19,26 @@ locals {
       security_groups = []
     }
   }
-  domain_name = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-  ip_set_list = [for ip in split("\n", chomp(file("waf_ip_set.txt"))): ip]
+
+  ## Variables used by certificate validation, as part of the cloudfront, cert and route 53 record configuration
+  domain_types = { for dvo in aws_acm_certificate.external.domain_validation_options : dvo.domain_name => {
+    name   = dvo.resource_record_name
+    record = dvo.resource_record_value
+    type   = dvo.resource_record_type
+    }
+  }
+
+  domain_name_main   = [for k, v in local.domain_types : v.name if k == "modernisation-platform.service.justice.gov.uk"]
+  domain_name_sub    = [for k, v in local.domain_types : v.name if k != "modernisation-platform.service.justice.gov.uk"]
+  domain_record_main = [for k, v in local.domain_types : v.record if k == "modernisation-platform.service.justice.gov.uk"]
+  domain_record_sub  = [for k, v in local.domain_types : v.record if k != "modernisation-platform.service.justice.gov.uk"]
+  domain_type_main   = [for k, v in local.domain_types : v.type if k == "modernisation-platform.service.justice.gov.uk"]
+  domain_type_sub    = [for k, v in local.domain_types : v.type if k != "modernisation-platform.service.justice.gov.uk"]
+
+  domain_name = "${var.application_name}.${var.business_unit}-${var.environment}.modernisation-platform.service.justice.gov.uk"
+  ip_set_list = [for ip in split("\n", chomp(file("${path.module}/waf_ip_set.txt"))): ip]
   custom_header = "X-Custom-Header-LAA-${upper(var.application_name)}"
+
 }
 
 
@@ -216,7 +233,7 @@ resource "aws_secretsmanager_secret" "cloudfront" {
 
 resource "aws_secretsmanager_secret_version" "cloudfront" {
   secret_id     = aws_secretsmanager_secret.cloudfront.id
-  secret_string = random_password.random_password.result
+  secret_string = random_password.cloudfront.result
 }
 
 # Importing the AWS secrets created previously using arn.
@@ -239,7 +256,7 @@ resource "aws_acm_certificate" "cloudfront" {
   # ]
 
   tags = {
-    Environment = local.environment
+    Environment = var.environment
   }
 
   lifecycle {
@@ -250,12 +267,12 @@ resource "aws_acm_certificate" "cloudfront" {
 # TODO This was a centralised bucket in LAA Landing Zone - do we want one for each application/env account in MP?
 
 resource "aws_s3_bucket" "cloudfront" {
-  bucket = "laa-${var.app_name}-cloudfront-logging"
+  bucket = "laa-${var.application_name}-cloudfront-logging"
   # force_destroy = true # Enable to recreate bucket deleting everything inside
   tags = merge(
     var.tags,
     {
-      Name = "laa-${var.app_name}-cloudfront-logging"
+      Name = "laa-${var.application_name}-cloudfront-logging"
     }
   )
 }
@@ -476,7 +493,7 @@ resource "aws_acm_certificate" "external_lb" {
   ]
 
   tags = {
-    Environment = local.environment
+    Environment = var.environment
   }
 
   lifecycle {
@@ -499,7 +516,7 @@ resource "aws_route53_record" "cloudfront" {
   #   }
   # }
   provider = aws.core-vpc
-  zone_id  = data.aws_route53_zone.network-services.zone_id
+  zone_id  = services_zone_id
   name     = local.domain_name
   type     = "A"
 
@@ -520,7 +537,7 @@ resource "aws_route53_record" "external_validation" {
   records         = local.domain_record_main
   ttl             = 60
   type            = local.domain_type_main[0]
-  zone_id         = data.aws_route53_zone.network-services.zone_id
+  zone_id         = services_zone_id
 }
 
 resource "aws_route53_record" "external_validation_subdomain" {
@@ -532,7 +549,7 @@ resource "aws_route53_record" "external_validation_subdomain" {
   records         = [local.domain_record_sub[count.index]]
   ttl             = 60
   type            = local.domain_type_sub[count.index]
-  zone_id         = data.aws_route53_zone.external.zone_id
+  zone_id         = external_zone_id
 }
 
 ######################
@@ -544,7 +561,7 @@ resource "aws_lb_listener" "alb_listener" {
   #checkov:skip=CKV_AWS_2:The ALB protocol is HTTP
   protocol        = var.listener_protocol #tfsec:ignore:aws-elb-http-not-used
   ssl_policy      = var.listener_protocol == "true" ? var.alb_ssl-policy : null
-  certificate_arn = var.listener_protocol == "true" ? aws_acm_certificate_validation.external_lb.certificate_arn : null # This needs the ARN of the certificate from Mod Platform
+  certificate_arn = var.listener_protocol == "true" ? aws_acm_certificate_validation.external.certificate_arn : null # This needs the ARN of the certificate from Mod Platform
 
   # default_action {
   #   type = "forward"
