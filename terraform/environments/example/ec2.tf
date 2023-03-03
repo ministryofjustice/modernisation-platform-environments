@@ -65,10 +65,10 @@ resource "aws_instance" "develop" {
 #------------------------------------------------------------------------------
 
 locals {
-  business_unit                 = var.networking[0].business-unit
-  region                        = "eu-west-2"
-  availability_zone_1           = "eu-west-2a"
-  availability_zone_2           = "eu-west-2b"
+  business_unit       = var.networking[0].business-unit
+  region              = "eu-west-2"
+  availability_zone_1 = "eu-west-2a"
+  availability_zone_2 = "eu-west-2b"
   autoscaling_schedules_default = {
     "scale_up" = {
       recurrence = "0 7 * * Mon-Fri"
@@ -124,12 +124,12 @@ locals {
       # Remove data.aws_kms_key from cmk.tf once the NDH servers are removed
       example-test-instance-1 = {
         tags = {
-          server-type       = "private"
-          description       = "Standalone EC2 for testing RHEL7.9 NDH App"
-          monitored         = false
-          os-type           = "Linux"
-          component         = "ndh"
-          environment       = "test"
+          server-type = "private"
+          description = "Standalone EC2 for testing RHEL7.9 NDH App"
+          monitored   = false
+          os-type     = "Linux"
+          component   = "ndh"
+          environment = "test"
         }
         ebs_volumes = {
           "/dev/sda1" = { kms_key_id = data.aws_kms_key.default_ebs.arn }
@@ -139,12 +139,12 @@ locals {
       }
       example-test-instance-2 = {
         tags = {
-          server-type       = "private"
-          description       = "Standalone EC2 for testing RHEL7.9 NDH EMS"
-          monitored         = false
-          os-type           = "Linux"
-          component         = "ndh"
-          environment       = "test"
+          server-type = "private"
+          description = "Standalone EC2 for testing RHEL7.9 NDH EMS"
+          monitored   = false
+          os-type     = "Linux"
+          component   = "ndh"
+          environment = "test"
         }
         ebs_volumes = {
           "/dev/sda1" = { kms_key_id = data.aws_kms_key.default_ebs.arn }
