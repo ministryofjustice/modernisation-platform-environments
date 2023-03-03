@@ -21,7 +21,7 @@ locals {
   }
 
   ## Variables used by certificate validation, as part of the cloudfront, cert and route 53 record configuration
-  domain_types = { for dvo in aws_acm_certificate.external.domain_validation_options : dvo.domain_name => {
+  domain_types = { for dvo in aws_acm_certificate.external_lb.domain_validation_options : dvo.domain_name => {
     name   = dvo.resource_record_name
     record = dvo.resource_record_value
     type   = dvo.resource_record_type
@@ -307,7 +307,7 @@ resource "aws_cloudfront_distribution" "external_lb" {
     }
     custom_header {
       name = local.custom_header
-      value = jsondecode(data.aws_secretsmanager_secret_version.creds.secret_string)
+      value = jsondecode(data.aws_secretsmanager_secret_version.cloudfront.secret_string)
     }
   }
   enabled = true
@@ -645,7 +645,7 @@ resource "aws_lb_listener_rule" "alb_listener_rule" {
   condition {
     http_header {
       http_header_name = local.custom_header
-      values           = [jsondecode(data.aws_secretsmanager_secret_version.creds.secret_string)]
+      values           = [jsondecode(data.aws_secretsmanager_secret_version.cloudfront.secret_string)]
     }
   }
 }
