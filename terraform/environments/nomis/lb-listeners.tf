@@ -16,7 +16,7 @@ locals {
       metric_name         = "UnHealthyHostCount"
       namespace           = "AWS/ApplicationELB"
       period              = "60"
-      statistic           = "Minimum"
+      statistic           = "Average"
       threshold           = "1"
       alarm_description   = "This metric monitors the number of unhealthy hosts in the target table for the load balancer. If the number of unhealthy hosts is greater than 0 for 3 minutes."
       alarm_actions       = [aws_sns_topic.nomis_nonprod_alarms.arn]
