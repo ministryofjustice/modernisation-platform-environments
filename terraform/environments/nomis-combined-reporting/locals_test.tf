@@ -22,7 +22,31 @@ locals {
           os-type     = "Linux"
           component   = "test"
         }
+        lb_target_groups = {
+          http-7777 = {
+            port                 = 7777
+            protocol             = "HTTP"
+            target_type          = "instance"
+            deregistration_delay = 30
+            health_check = {
+              enabled             = true
+              interval            = 30
+              healthy_threshold   = 3
+              matcher             = "200-399"
+              path                = "/"
+              port                = 7777
+              timeout             = 5
+              unhealthy_threshold = 5
+            }
+            stickiness = {
+              enabled = true
+              type    = "lb_cookie"
+            }
+          }
+        }
       }
+    }
+    baseline_lbs = {
     }
   }
 }
