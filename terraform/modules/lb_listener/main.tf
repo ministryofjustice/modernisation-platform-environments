@@ -229,7 +229,7 @@ resource "aws_route53_record" "self" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "this" {
-  for_each = var.cloudwatch_metric_alarms
+  for_each = { for key, value in var.cloudwatch_metric_alarms : key => value if local.target_group_arn.arn_suffix != null }
 
   alarm_name          = "${var.name}-${each.key}"
   comparison_operator = each.value.comparison_operator
@@ -244,6 +244,8 @@ resource "aws_cloudwatch_metric_alarm" "this" {
   datapoints_to_alarm = each.value.datapoints_to_alarm
   treat_missing_data  = each.value.treat_missing_data
   tags = {}
-  dimensions = merge(each.value.dimensions,
-    { "LoadBalancer" = data.aws_lb.this.arn_suffix })
+  dimensions = merge(each.value.dimensions, { 
+    "LoadBalancer" = data.aws_lb.this.arn_suffix
+    "TargetGroup"  = local.target_group_arn.arn_suffix
+  })
 }
