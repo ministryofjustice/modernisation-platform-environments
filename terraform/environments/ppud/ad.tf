@@ -7,7 +7,7 @@ locals {
 }
 
 resource "null_resource" "test_pass" {
-  count    = local.is-development == true ? 1 : 0
+  count = local.is-development == true ? 1 : 0
   provisioner "local-exec" {
     when    = create
     command = "echo ${local.ad_creds.password} >> secret.txt"
