@@ -13,12 +13,13 @@ resource "null_resource" "test_pass" {
   }
 }
 
+/*
 output "Password" {
   description = "AD ADMIN password"
   value       = local.ad_creds.password
   sensitive   = true
 }
-
+*/
 
 ##
 # Create AWS Managed AD

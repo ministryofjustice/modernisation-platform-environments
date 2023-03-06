@@ -2,6 +2,7 @@
 
 # Get AWS directory service password from secret manager
 data "aws_secretsmanager_secret_version" "creds" {
+  count = local.is-development == true ? 1 : 0
   # Fill in the name you gave to your secret
   secret_id = "ad-creds"
 }
