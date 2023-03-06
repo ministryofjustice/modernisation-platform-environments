@@ -14,7 +14,7 @@ locals {
     for key, value in aws_lb_listener.this : [
       for key, value in aws_lb_listener.this.default_action : {
         arn_suffix = value.target_group_arn != "" ? (regex("[^:]*$", value.target_group_arn)) : null
-      } 
+      }
     ]
   ])...)
 }
