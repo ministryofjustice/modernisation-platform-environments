@@ -1,7 +1,7 @@
 
 locals {
   ad_creds = jsondecode(
-    data.aws_secretsmanager_secret_version.creds.secret_string
+    data.aws_secretsmanager_secret_version.creds[0].secret_string
   )
 }
 
