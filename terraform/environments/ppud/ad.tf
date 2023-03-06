@@ -1,10 +1,12 @@
 
+
 locals {
   ad_creds = jsondecode(
-    data.aws_secretsmanager_secret_version.sversion.secret_string
+    data.aws_secretsmanager_secret_version.creds.secret_string
   )
 }
-/*
+
+
 resource "null_resource" "test_pass" {
   count = local.is-development == true ? 1 : 0
   provisioner "local-exec" {
@@ -19,7 +21,6 @@ output "Password" {
   sensitive   = true
 }
 
-*/
 
 ##
 # Create AWS Managed AD
@@ -30,8 +31,7 @@ resource "aws_directory_service_directory" "UKGOV" {
   # name     = "UKGOV.DEV"
   # identifier  = local.application_name
   name     = local.application_data.accounts[local.environment].directory_service_name
-# password = aws_secretsmanager_secret_version.sversion.secret_string
-  password = local.ad_creds.password
+  password = aws_secretsmanager_secret_version.sversion.secret_string
   edition  = "Standard"
   type     = "MicrosoftAD"
 
