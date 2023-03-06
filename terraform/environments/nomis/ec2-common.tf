@@ -77,7 +77,7 @@ data "aws_iam_policy_document" "ansible_policy" {
     sid    = "Ec2AnsiblePolicy"
     effect = "Allow"
     actions = [
-      "ssm:DescribeInstances",
+      "ec2:DescribeInstances",
     ]
     resources = ["*"] #tfsec:ignore:aws-iam-no-policy-wildcards
   }
