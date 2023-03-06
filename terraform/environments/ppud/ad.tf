@@ -1,3 +1,4 @@
+/*
 locals {
   ad_creds = jsondecode(
     data.aws_secretsmanager_secret_version.creds.secret_string
@@ -17,7 +18,8 @@ output "Password" {
   value       = local.ad_creds.password
   sensitive   = true
 }
-
+*/
+provider "null" {}
 
 ##
 # Create AWS Managed AD
