@@ -95,30 +95,30 @@ locals {
 
     # Add database instances here. They will be created using ec2-database.tf
     databases = {
-      # development-oasys-db-1 = {
-      #   tags = {
-      #     oasys-environment = "development"
-      #     server-type       = "oasys-db"
-      #     description       = "Development OASys database"
-      #     oracle-sids       = "OASPROD BIPINFRA"
-      #     monitored         = true
-      #   }
-      #   ami_name = "oasys_oracle_db_*"
-      #   # ami_owner = "self" # remove this line next time AMI is updated so core-shared-services-production used instead
-      #   instance = {
-      #     instance_type             = "r6i.2xlarge"
-      #     disable_api_termination   = true
-      #     metadata_endpoint_enabled = "enabled"
-      #   }
-      #   ebs_volumes = {
-      #     "/dev/sdb" = { size = 100 }
-      #     "/dev/sdc" = { size = 5120 }
-      #   }
-      #   ebs_volume_config = {
-      #     data  = { total_size = 4000 }
-      #     flash = { total_size = 1000 }
-      #   }
-      # }
+      development-oasys-db-1 = {
+        tags = {
+          oasys-environment = "development"
+          server-type       = "oasys-db"
+          description       = "Development OASys database"
+          oracle-sids       = "OASPROD BIPINFRA"
+          monitored         = true
+        }
+        ami_name = "oasys_oracle_db_*"
+        # ami_owner = "self" # remove this line next time AMI is updated so core-shared-services-production used instead
+        instance = {
+          instance_type             = "r6i.2xlarge"
+          disable_api_termination   = true
+          metadata_endpoint_enabled = "enabled"
+        }
+        ebs_volumes = {
+          "/dev/sdb" = { size = 100 }
+          "/dev/sdc" = { size = 5120 }
+        }
+        ebs_volume_config = {
+          data  = { total_size = 4000 }
+          flash = { total_size = 1000 }
+        }
+      }
 
       # dev-onr-db-1 = {
       #   tags = {
