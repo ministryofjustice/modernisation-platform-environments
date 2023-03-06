@@ -17,6 +17,7 @@ resource "aws_lb" "PPUD-ALB" {
 }
 
 resource "aws_lb_listener" "PPUD-external-Front-End" {
+  count              = local.is-development == true ? 1 : 0
   load_balancer_arn = aws_lb.PPUD-ALB[0].arn
   port              = "443"
   protocol          = "HTTPS"
@@ -58,12 +59,14 @@ resource "aws_lb_target_group" "PPUD-Target-Group" {
 }
 
 resource "aws_lb_target_group_attachment" "PPUD-PORTAL" {
+  count              = local.is-development == true ? 1 : 0
   target_group_arn = aws_lb_target_group.PPUD-Target-Group.arn
   target_id        = aws_instance.s609693lo6vw101[0].id
   port             = 443
 }
 
 resource "aws_lb_target_group_attachment" "PPUD-PORTAL-1" {
+  count              = local.is-development == true ? 1 : 0
   target_group_arn = aws_lb_target_group.PPUD-Target-Group.arn
   target_id        = aws_instance.PPUDWEBSERVER2[0].id
   port             = 443
