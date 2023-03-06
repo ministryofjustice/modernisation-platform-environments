@@ -47,20 +47,18 @@ resource "aws_security_group" "postgresql_db_sc" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
+resource "null_resource" "setup_db" {
+  depends_on = [aws_db_instance.tipstaffdbdev]
 
-//Get rid of the null resource for now
-# resource "null_resource" "setup_db" {
-#   depends_on = [aws_db_instance.tipstaffdbdev]
+  provisioner "local-exec" {
+    interpreter = ["bash", "-c"]
+    command     = "chmod +x ./setup-postgresql.sh; ./setup-postgresql.sh"
 
-#   provisioner "local-exec" {
-#     interpreter = ["bash", "-c"]
-#     command     = "chmod +x ./setup-postgresql.sh; ./setup-postgresql.sh"
-
-#     environment = {
-#       DB_HOSTNAME = aws_db_instance.tipstaffdbdev.address
-#     }
-#   }
-#   triggers = {
-#     always_run = "${timestamp()}"
-#   }
-# }
+    environment = {
+      DB_HOSTNAME = aws_db_instance.tipstaffdbdev.address
+    }
+  }
+  triggers = {
+    always_run = "${timestamp()}"
+  }
+}
