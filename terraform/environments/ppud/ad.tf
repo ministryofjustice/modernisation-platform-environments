@@ -29,8 +29,8 @@ resource "aws_directory_service_directory" "UKGOV" {
   # count    = local.is-development == true ? 1 : 0
   # name     = "UKGOV.DEV"
   # identifier  = local.application_name
-  name     = local.application_data.accounts[local.environment].directory_service_name
-# password = aws_secretsmanager_secret_version.sversion.secret_string
+  name = local.application_data.accounts[local.environment].directory_service_name
+  # password = aws_secretsmanager_secret_version.sversion.secret_string
   password = local.ad_creds.password
   edition  = "Standard"
   type     = "MicrosoftAD"
