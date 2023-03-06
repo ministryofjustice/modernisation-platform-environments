@@ -1,3 +1,13 @@
 #!/bin/bash
 
-aws rds-data execute-statement --database $DB_NAME --resource-arn $RDS_ARN --secret-arn $SECRETS_ARN --sql tipstaff_staging_predata_backup.sql
+# if database contains schema dbo then store schema name inside variable.
+SCHEMA=$(psql -h ${DB_HOSTNAME} -p 5432 -U $LOCAL_DB_USERNAME -d $DB_NAME -c "SELECT schema_name FROM information_schema.schemata WHERE schema_name = 'dbo'" | grep -o 'dbo') 
+echo "$SCHEMA"
+
+if [ "$TF_MODE" == "" ]; then
+    if [ "$SCHEMA" == "dbo" ]; then 
+    echo "The Schema dbo is already present in the database"
+    else 
+    psql -h ${DB_HOSTNAME} -p 5432 -U $LOCAL_DB_USERNAME -d $DB_NAME -c "\i tipstaff_staging_predata_backup.sql;";
+    fi
+fi
