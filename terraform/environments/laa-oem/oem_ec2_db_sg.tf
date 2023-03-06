@@ -1,13 +1,26 @@
 resource "aws_security_group" "oem_db_security_group" {
-  name_prefix = "${local.application_name}-db-server-sg"
+  name_prefix = "${local.application_name}-db-server-sg-"
   description = "controls access to the ebs app server"
   vpc_id      = data.aws_vpc.shared.id
+
+  tags = merge(tomap(
+    { "Name" = "${local.application_name}-db-server-sg-1" }
+  ), local.tags)
+
+  egress {
+    protocol  = "-1"
+    from_port = 0
+    to_port   = 0
+    cidr_blocks = [
+      "0.0.0.0/0"
+    ]
+  }
 
   ingress {
     protocol    = "tcp"
     from_port   = 22
     to_port     = 22
-    cidr_blocks = [data.aws_vpc.shared.cidr_block]
+    cidr_blocks = [data.aws_vpc.shared.cidr_block, local.cidr_lz_workspaces]
   }
 
   ingress {
@@ -65,15 +78,4 @@ resource "aws_security_group" "oem_db_security_group" {
     to_port     = 7799
     cidr_blocks = [data.aws_vpc.shared.cidr_block]
   }
-
-  egress {
-    protocol  = "-1"
-    from_port = 0
-    to_port   = 0
-    cidr_blocks = [
-      "0.0.0.0/0"
-    ]
-  }
-
-  tags = local.tags
 }

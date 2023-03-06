@@ -20,7 +20,7 @@ resource "aws_security_group" "oem_app_security_group_1" {
     protocol    = "tcp"
     from_port   = 22
     to_port     = 22
-    cidr_blocks = [data.aws_vpc.shared.cidr_block]
+    cidr_blocks = [data.aws_vpc.shared.cidr_block, local.cidr_lz_workspaces]
   }
 
   ingress {
