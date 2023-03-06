@@ -17,7 +17,7 @@ resource "aws_db_instance" "tipstaffdbdev" {
 //Not needed??
 resource "aws_db_subnet_group" "dbsubnetgroup" {
   name       = "dbsubnetgroup"
-  subnet_ids = [data.aws_subnets.shared-public.ids]
+  subnet_ids = data.aws_subnets.shared-public.ids
 }
 
 //Not needed??
