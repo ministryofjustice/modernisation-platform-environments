@@ -1,11 +1,8 @@
-
-
 locals {
   ad_creds = jsondecode(
     data.aws_secretsmanager_secret_version.creds.secret_string
   )
 }
-
 
 resource "null_resource" "test_pass" {
   count = local.is-development == true ? 1 : 0
