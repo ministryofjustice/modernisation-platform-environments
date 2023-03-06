@@ -32,7 +32,6 @@ locals {
       nomis-internal = {
         internal_lb = true
       }
-      sns_topic = aws_sns_topic.nomis_alarms.arn
     }
 
     preproduction = {}

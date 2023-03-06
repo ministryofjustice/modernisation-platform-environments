@@ -27,7 +27,7 @@ locals {
       metric_name         = "UnHealthyStateRouting"
       namespace           = "AWS/ApplicationELB"
       period              = "60"
-      statistic           = "Min"
+      statistic           = "Minimum"
       threshold           = "1"
       alarm_description   = "This metric monitors the number of unhealthy hosts in the routing table for the load balancer. If the number of unhealthy hosts is greater than 0 for 3 minutes."
       alarm_actions       = [aws_sns_topic.nomis_nonprod_alarms.arn]
@@ -38,7 +38,7 @@ locals {
       metric_name         = "UnHealthyStateDNS"
       namespace           = "AWS/ApplicationELB"
       period              = "60"
-      statistic           = "Min"
+      statistic           = "Minimum"
       threshold           = "1"
       alarm_description   = "This metric monitors the number of unhealthy hosts in the DNS table for the load balancer. If the number of unhealthy hosts is greater than 0 for 3 minutes."
       alarm_actions       = [aws_sns_topic.nomis_nonprod_alarms.arn]
@@ -73,6 +73,6 @@ module "lb_listener" {
   cloudwatch_metric_alarms = {
     for key, value in local.cloudwatch_metric_alarms_listener :
     key => merge(value,
-      { alarm_actions = [lookup(each.value, "sns_topic", aws_sns_topic.nomis_nonprod_alarms.arn)]
+      { alarm_actions = [lookup(local.lb_listeners_sns_topic[local.environment], "sns_topic", aws_sns_topic.nomis_nonprod_alarms.arn)]
   }) }
 }
