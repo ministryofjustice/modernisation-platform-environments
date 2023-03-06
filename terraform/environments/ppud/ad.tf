@@ -1,8 +1,9 @@
 
+/*
 locals {
   ad_creds = jsondecode(
-    data.aws_secretsmanager_secret_version.creds[0].secret_string
-  )
+    data.aws_secretsmanager_secret_version.creds.secret_string
+    )
 }
 
 resource "null_resource" "test_pass" {
@@ -13,7 +14,6 @@ resource "null_resource" "test_pass" {
   }
 }
 
-/*
 output "Password" {
   description = "AD ADMIN password"
   value       = local.ad_creds.password
