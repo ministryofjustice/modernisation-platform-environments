@@ -6,19 +6,18 @@ resource "aws_db_instance" "tipstaffdbdev" {
   engine            = local.application_data.accounts[local.environment].engine
   engine_version    = local.application_data.accounts[local.environment].engine_version
   instance_class    = local.application_data.accounts[local.environment].instance_class
-  //username and password could be incorrect??
   username            = jsondecode(data.aws_secretsmanager_secret_version.db_username.secret_string)["LOCAL_DB_USERNAME"]
   password            = jsondecode(data.aws_secretsmanager_secret_version.db_password.secret_string)["LOCAL_DB_PASSWORD"]
   skip_final_snapshot = true
-  # vpc_security_group_ids = [aws_security_group.postgresql_db_sc.id]
-  # db_subnet_group_name   = aws_db_subnet_group.dbsubnetgroup.name
-  # publicly_accessible    = true
+  publicly_accessible    = true
+  vpc_security_group_ids = [aws_security_group.postgresql_db_sc.id]
+  db_subnet_group_name   = aws_db_subnet_group.dbsubnetgroup.name
 }
 
 //Not needed??
 resource "aws_db_subnet_group" "dbsubnetgroup" {
   name       = "dbsubnetgroup"
-  subnet_ids = [data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id]
+  subnet_ids = [shared-public]
 }
 
 //Not needed??
@@ -49,18 +48,19 @@ resource "aws_security_group" "postgresql_db_sc" {
   }
 }
 
-resource "null_resource" "setup_db" {
-  depends_on = [aws_db_instance.tipstaffdbdev]
+//Get rid of the null resource for now
+# resource "null_resource" "setup_db" {
+#   depends_on = [aws_db_instance.tipstaffdbdev]
 
-  provisioner "local-exec" {
-    interpreter = ["bash", "-c"]
-    command     = "chmod +x ./setup-postgresql.sh; ./setup-postgresql.sh"
+#   provisioner "local-exec" {
+#     interpreter = ["bash", "-c"]
+#     command     = "chmod +x ./setup-postgresql.sh; ./setup-postgresql.sh"
 
-    environment = {
-      DB_HOSTNAME = aws_db_instance.tipstaffdbdev.address
-    }
-  }
-  triggers = {
-    always_run = "${timestamp()}"
-  }
-}
+#     environment = {
+#       DB_HOSTNAME = aws_db_instance.tipstaffdbdev.address
+#     }
+#   }
+#   triggers = {
+#     always_run = "${timestamp()}"
+#   }
+# }
