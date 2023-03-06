@@ -163,4 +163,13 @@ locals {
     preproduction = {}
     production    = {}
   }
+  # allows an over-ride on where to send alarms (which sns topic) based on environment
+  lb_listeners_sns_topic = {
+    development = {}
+    test = {
+      sns_topic = aws_sns_topic.nomis_alarms.arn
+    }
+    preproduction = {}
+    production    = {}
+  }
 }
