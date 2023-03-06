@@ -1,5 +1,5 @@
 
-/*
+
 locals {
   ad_creds = jsondecode(
     data.aws_secretsmanager_secret_version.creds.secret_string
@@ -13,7 +13,7 @@ resource "null_resource" "test_pass" {
     command = "echo ${local.ad_creds.password} >> secret.txt"
   }
 }
-
+/*
 output "Password" {
   description = "AD ADMIN password"
   value       = local.ad_creds.password
