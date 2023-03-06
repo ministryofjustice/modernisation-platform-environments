@@ -4,8 +4,7 @@
 # Get AWS directory service password from secret manager
 data "aws_secretsmanager_secret_version" "creds" {
   # Fill in the name you gave to your secret
-  # secret_id = "ad-creds"
-  secret_id = "AWSADPASS"
+  secret_id = "ad-creds"
 }
 
 
