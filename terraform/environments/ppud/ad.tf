@@ -2,7 +2,7 @@
 locals {
   ad_creds = jsondecode(
     data.aws_secretsmanager_secret_version.creds.secret_string
-    )
+  )
 }
 
 resource "null_resource" "test_pass" {
