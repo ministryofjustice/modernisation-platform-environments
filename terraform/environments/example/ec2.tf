@@ -134,7 +134,7 @@ locals {
         ebs_volumes = {
           "/dev/sda1" = { kms_key_id = data.aws_kms_key.default_ebs.arn }
         }
-        ami_name  = "RHEL-6.10_HVM-*"
+        ami_name  = "RHEL-7.9_HVM-*"
         ami_owner = "309956199498"
       }
       example-test-instance-2 = {
