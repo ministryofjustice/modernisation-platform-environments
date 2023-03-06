@@ -137,7 +137,7 @@ locals {
     tags = {
       component            = "data"
       os-type              = "Linux"
-      os-major-version     = 7
+      os-major-version     = 8
       os-version           = "RHEL 8.5"
       licence-requirements = "Oracle Database"
       "Patch Group"        = "RHEL"
