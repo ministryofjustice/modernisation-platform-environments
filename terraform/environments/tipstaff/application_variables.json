@@ -10,7 +10,6 @@
       "engine": "postgres",
       "engine_version": "10.21",
       "instance_class": "db.t3.micro",
-      "ami_image_id": "ami-00d0096b223242201",
       "subdomain_name": "tipstaff-dev",
       "server_port": "80",
       "lb_listener_protocol": "HTTP"
