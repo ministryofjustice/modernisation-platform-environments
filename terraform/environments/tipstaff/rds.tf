@@ -55,7 +55,7 @@ resource "null_resource" "setup_db" {
     command     = "chmod +x ./setup-postgresql.sh; ./setup-postgresql.sh"
 
     environment = {
-      DB_HOSTNAME = aws_db_instance.tipstaffdbdev.address
+      DB_HOSTNAME       = aws_db_instance.tipstaffdbdev.address
       LOCAL_DB_USERNAME = jsondecode(data.aws_secretsmanager_secret_version.db_username.secret_string)["LOCAL_DB_USERNAME"]
       LOCAL_DB_PASSWORD = jsondecode(data.aws_secretsmanager_secret_version.db_password.secret_string)["LOCAL_DB_PASSWORD"]
     }
