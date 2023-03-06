@@ -24,18 +24,9 @@ resource "aws_security_group_rule" "egress_traffic" {
   type                     = "egress"
   source_security_group_id = aws_security_group.tipstaff_dev_ec2_sc.id
 }
-# Get latest Windows Server 2019 AMI
-data "aws_ami" "windows-2019" {
-  most_recent = true
-  owners      = ["amazon"]
-  filter {
-    name   = "name"
-    values = ["Windows_Server-2019-English-Full-Base*"]
-  }
-}
 resource "aws_instance" "tipstaff_ec2_instance_dev" {
   instance_type          = local.application_data.accounts[local.environment].instance_type
-  ami                    = data.aws_ami.windows-2019
+  ami                    = local.application_data.accounts[local.environment].ami_image_id
   subnet_id              = data.aws_subnet.private_subnets_a.id
   vpc_security_group_ids = [aws_security_group.tipstaff_dev_ec2_sc.id]
   # monitoring             = true

@@ -12,7 +12,8 @@
       "instance_class": "db.t3.micro",
       "subdomain_name": "tipstaff-dev",
       "server_port": "80",
-      "lb_listener_protocol": "HTTP"
+      "lb_listener_protocol": "HTTP",
+      "ami_image_id": "ami-00d0096b223242201"
     },
     "test": {
       "example_var": "test-data"
