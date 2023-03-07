@@ -1097,20 +1097,20 @@ module "dynamo_tab_domain_registry" {
 
   global_secondary_indexes = [
     {
-      name               = "primaryId-Index"
-      hash_key           = "primaryId"
-      range_key          = "type"
-      write_capacity     = 10
-      read_capacity      = 10
-      projection_type    = "ALL"
+      name            = "primaryId-Index"
+      hash_key        = "primaryId"
+      range_key       = "type"
+      write_capacity  = 10
+      read_capacity   = 10
+      projection_type = "ALL"
     },
     {
-      name               = "secondaryId-Index"
-      hash_key           = "secondaryId"
-      range_key          = "type"
-      write_capacity     = 10
-      read_capacity      = 10
-      projection_type    = "ALL"
+      name            = "secondaryId-Index"
+      hash_key        = "secondaryId"
+      range_key       = "type"
+      write_capacity  = 10
+      read_capacity   = 10
+      projection_type = "ALL"
     }
   ]
 
