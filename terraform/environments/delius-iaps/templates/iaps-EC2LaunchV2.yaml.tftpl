@@ -144,11 +144,11 @@ tasks:
 
       $NDeliusConfigFile = "C:\Program Files (x86)\I2N\IapsNDeliusInterface\Config\NDELIUSIF.xml"
       $configXML = [xml](Get-Content $INDeliusConfigFile)
-      $configXML.DLLDEF.INTERFACE.USER = (Get-SSMParameter -Name "/NDeliusInterface/Interface/user" -WithDecryption $true).Value
-      $configXML.DLLDEF.INTERFACE.PASSWORD = (Get-SSMParameter -Name "/NDeliusInterface/Interface/password" -WithDecryption $true).Value
-      $configXML.DLLDEF.INTERFACE.REPLICAPASSWORDCODED = (Get-SSMParameter -Name "/NDeliusInterface/Interface/replicapwdcoded" -WithDecryption $true).Value
-      $configXML.DLLDEF.INTERFACE.SOAPPASSCODED = (Get-SSMParameter -Name "/NDeliusInterface/Interface/soappwdcoded" -WithDecryption $true).Value
-      $configXML.DLLDEF.INTERFACE.PASSWORDCODED = (Get-SSMParameter -Name "/NDeliusInterface/Interface/pwdcoded" -WithDecryption $true).Value
+      $configXML.DLLDEF.INTERFACES.INTERFACE.USER = (Get-SSMParameter -Name "/NDeliusInterface/Interface/user" -WithDecryption $true).Value
+      $configXML.DLLDEF.INTERFACES.INTERFACE.PASSWORD = (Get-SSMParameter -Name "/NDeliusInterface/Interface/password" -WithDecryption $true).Value
+      $configXML.DLLDEF.INTERFACES.INTERFACE.REPLICAPASSWORDCODED = (Get-SSMParameter -Name "/NDeliusInterface/Interface/replicapwdcoded" -WithDecryption $true).Value
+      $configXML.DLLDEF.INTERFACES.INTERFACE.SOAPPASSCODED = (Get-SSMParameter -Name "/NDeliusInterface/Interface/soappwdcoded" -WithDecryption $true).Value
+      $configXML.DLLDEF.INTERFACES.INTERFACE.PASSWORDCODED = (Get-SSMParameter -Name "/NDeliusInterface/Interface/pwdcoded" -WithDecryption $true).Value
 
       $InterfaceODBCdsn = (Get-SSMParameter -Name "/NDeliusInterface/Interface/ODBC/dsn" -WithDecryption $true).Value
       $InterfaceODBCuid = (Get-SSMParameter -Name "/NDeliusInterface/Interface/ODBC/uid" -WithDecryption $true).Value
