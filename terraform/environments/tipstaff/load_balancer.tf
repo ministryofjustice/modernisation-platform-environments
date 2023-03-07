@@ -70,7 +70,7 @@ resource "aws_lb_listener" "tipstaff_dev_lb_1" {
   load_balancer_arn = aws_lb.tipstaff_dev_lb.arn
   port              = local.application_data.accounts[local.environment].server_port_1
   protocol          = local.application_data.accounts[local.environment].lb_listener_protocol_1
-  ssl_policy        = local.application_data.accounts[local.environment].lb_listener_protocol == "HTTP" ? "" : "ELBSecurityPolicy-2016-08"
+  ssl_policy        = local.application_data.accounts[local.environment].lb_listener_protocol_1 == "HTTP" ? "" : "ELBSecurityPolicy-2016-08"
 
   default_action {
     type             = "forward"
@@ -81,7 +81,7 @@ resource "aws_lb_listener" "tipstaff_dev_lb_2" {
   load_balancer_arn = aws_lb.tipstaff_dev_lb.arn
   port              = local.application_data.accounts[local.environment].server_port_2
   protocol          = local.application_data.accounts[local.environment].lb_listener_protocol_2
-  ssl_policy        = local.application_data.accounts[local.environment].lb_listener_protocol == "HTTP" ? "" : "ELBSecurityPolicy-2016-08"
+  ssl_policy        = local.application_data.accounts[local.environment].lb_listener_protocol_2 == "HTTP" ? "" : "ELBSecurityPolicy-2016-08"
 
   default_action {
     type             = "forward"
