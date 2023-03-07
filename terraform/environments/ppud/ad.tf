@@ -19,7 +19,8 @@ output "Password" {
   sensitive   = true
 }
 */
-provider "null" {}
+
+# provider "null" {}
 
 ##
 # Create AWS Managed AD
