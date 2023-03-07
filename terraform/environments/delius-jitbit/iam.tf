@@ -140,26 +140,3 @@ resource "aws_iam_policy" "jitbit_secrets_reader" {
     ]
   })
 }
-
-
-resource "aws_iam_policy" "secrets_manager_reader" {
-  name        = "SecretsManagerRead"
-  description = "Policy to allow Full Read access to Secrets Manager"
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "secretsmanager:GetResourcePolicy",
-          "secretsmanager:GetSecretValue",
-          "secretsmanager:DescribeSecret",
-          "secretsmanager:ListSecrets",
-          "secretsmanager:ListSecretVersionIds"
-        ]
-        Resource = "*"
-      }
-    ]
-  })
-}
