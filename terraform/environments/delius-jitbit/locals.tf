@@ -4,6 +4,8 @@ locals {
   ##
   app_url = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
 
+  app_port = 5000
+
   ##
   # Variables related to ECS module
   ##
@@ -12,8 +14,8 @@ locals {
   ec2_ingress_rules = {
     "cluster_ec2_lb_ingress" = {
       description     = "Cluster EC2 loadbalancer ingress rule"
-      from_port       = 5000
-      to_port         = 5000
+      from_port       = local.app_port
+      to_port         = local.app_port
       protocol        = "tcp"
       cidr_blocks     = []
       security_groups = [aws_security_group.load_balancer_security_group.id]

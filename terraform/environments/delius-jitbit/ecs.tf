@@ -63,7 +63,7 @@ data "aws_ami" "ecs_ami" {
 }
 
 module "ecs-new" {
-  source = "github.com/ministryofjustice/terraform-ecs//cluster?ref=4f18199b40db858581c0e21af018e1cf8575d0f3"
+  source = "github.com/ministryofjustice/terraform-ecs//cluster?ref=3c9a5a0762c7b2dbff6608e606a2784c8a4ef9c4"
 
   environment = local.environment
   name        = format("%s-new", local.application_name)
@@ -110,6 +110,37 @@ module "s3_bucket_app_deployment" {
   ]
 
   tags = local.tags
+}
+
+resource "aws_security_group" "jitbit" {
+  vpc_id      = data.aws_vpc.shared.id
+  name        = format("hmpps-%s-%s-service", local.environment, local.application_name)
+  description = "Security group for the ${local.application_name} service"
+  tags        = local.tags
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_security_group_rule" "allow_all_egress" {
+  description       = "Allow all outbound traffic to any IPv4 address"
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.jitbit.id
+}
+
+resource "aws_security_group_rule" "alb" {
+  description              = "Allow inbound traffic from ALB"
+  type                     = "ingress"
+  from_port                = local.app_port
+  to_port                  = local.app_port
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.load_balancer_security_group.id
+  security_group_id        = aws_security_group.jitbit.id
 }
 
 output "s3_bucket_app_deployment_name" {

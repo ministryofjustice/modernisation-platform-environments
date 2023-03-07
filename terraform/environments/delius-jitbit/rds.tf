@@ -11,6 +11,7 @@ resource "aws_security_group" "database_security_group" {
     security_groups = [
       module.bastion_linux.bastion_security_group,
       module.ecs.cluster_ec2_security_group_id,
+      aws_security_group.jitbit.id,
     ]
   }
 
