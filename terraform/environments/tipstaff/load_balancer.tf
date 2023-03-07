@@ -84,6 +84,7 @@ resource "aws_lb_listener" "tipstaff_dev_lb_1" {
 }
 
 resource "aws_lb_listener" "tipstaff_dev_lb_2" {
+  certificate_arn   = aws_acm_certificate.tipstaff_app_cert.arn
   load_balancer_arn = aws_lb.tipstaff_dev_lb.arn
   port              = local.application_data.accounts[local.environment].server_port_2
   protocol          = local.application_data.accounts[local.environment].lb_listener_protocol_2
