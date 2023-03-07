@@ -78,6 +78,8 @@ data "aws_iam_policy_document" "ansible_policy" {
     effect = "Allow"
     actions = [
       "ec2:DescribeInstances",
+      "ec2:DescribeVolumes",
+      "ec2:DescribeTags",
     ]
     resources = ["*"] #tfsec:ignore:aws-iam-no-policy-wildcards
   }
