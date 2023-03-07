@@ -32,7 +32,7 @@ resource "aws_lb" "tipstaff_dev_lb" {
   security_groups            = [aws_security_group.tipstaff_dev_lb_sc.id]
   subnets                    = data.aws_subnets.shared-public.ids
   enable_deletion_protection = false
-  depends_on = [aws_security_group.tipstaff_dev_lb_sc]
+  depends_on                 = [aws_security_group.tipstaff_dev_lb_sc]
 }
 
 resource "aws_lb_target_group" "tipstaff_dev_target_group" {
