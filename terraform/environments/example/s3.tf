@@ -13,9 +13,8 @@ module "s3-bucket" { #tfsec:ignore:aws-s3-enable-versioning
   # Refer to the below section "Replication" before enabling replication
   replication_enabled = false
   # Below three variables and providers configuration are only relevant if 'replication_enabled' is set to true
-  replication_region                       = "eu-west-2"
-  versioning_enabled_on_replication_bucket = false
-  # replication_role_arn                     = module.s3-bucket-replication-role.role.arn
+  replication_region = "eu-west-2"
+  # replication_role_arn = module.s3-bucket-replication-role.role.arn
   providers = {
     # Here we use the default provider Region for replication. Destination buckets can be within the same Region as the
     # source bucket. On the other hand, if you need to enable cross-region replication, please contact the Modernisation
