@@ -66,7 +66,7 @@ resource "aws_lb_target_group_attachment" "tipstaff_ec2_instance_dev" {
   target_id        = aws_instance.tipstaff_ec2_instance_dev.id
   port             = 80
 }
-resource "aws_lb_listener" "tipstaff_dev_lb" {
+resource "aws_lb_listener" "tipstaff_dev_lb_1" {
   load_balancer_arn = aws_lb.tipstaff_dev_lb.arn
   port              = local.application_data.accounts[local.environment].server_port_1
   protocol          = local.application_data.accounts[local.environment].lb_listener_protocol_1
@@ -77,7 +77,7 @@ resource "aws_lb_listener" "tipstaff_dev_lb" {
     target_group_arn = aws_lb_target_group.tipstaff_dev_target_group.arn
   }
 }
-resource "aws_lb_listener" "tipstaff_dev_lb" {
+resource "aws_lb_listener" "tipstaff_dev_lb_2" {
   load_balancer_arn = aws_lb.tipstaff_dev_lb.arn
   port              = local.application_data.accounts[local.environment].server_port_2
   protocol          = local.application_data.accounts[local.environment].lb_listener_protocol_2
