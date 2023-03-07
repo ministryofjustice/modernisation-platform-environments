@@ -40,9 +40,9 @@ resource "aws_cloudwatch_metric_alarm" "low_available_memory" {
   period              = var.period
   threshold           = var.threshold
   alarm_actions       = [var.topic]
-  dimensions = {
-    instanceId = tostring(local.instanceIds)
-  }
+  #dimensions = {
+  #  instanceId = tostring(local.instanceIds)
+  #}
 }
 
 # Disk Free Alarm
@@ -60,9 +60,9 @@ resource "aws_cloudwatch_metric_alarm" "disk_free" {
   period              = var.period
   threshold           = var.threshold
   alarm_actions       = [var.topic]
-  dimensions = {
-    instanceId = tostring(local.instanceIds)
-  }
+  #dimensions = {
+  #  instanceId = tostring(local.instanceIds)
+  #}
 }
 
 # High CPU IOwait Alarm
@@ -80,9 +80,9 @@ resource "aws_cloudwatch_metric_alarm" "cpu_usage_iowait" {
   period              = var.period
   threshold           = var.threshold
   alarm_actions       = [var.topic]
-  dimensions = {
-    instanceId = tostring(local.instanceIds)
-  }
+  #dimensions = {
+  #  instanceId = tostring(local.instanceIds)
+  #}
 
 }
 
@@ -105,9 +105,9 @@ resource "aws_cloudwatch_metric_alarm" "instance_health_check" {
   period             = var.period
   threshold          = var.threshold
   alarm_actions      = [var.topic]
-  dimensions = {
-    instanceId = tostring(local.instanceIds)
-  }
+  #dimensions = {
+  #  instanceId = tostring(local.instanceIds)
+  #}
 }
 
 # Status Check Alarm
@@ -124,7 +124,7 @@ resource "aws_cloudwatch_metric_alarm" "system_health_check" {
   period             = var.period
   threshold          = var.threshold
   alarm_actions      = [var.topic]
-  dimensions = {
-    instanceId = tostring(local.instanceIds)
-  }
+  #dimensions = {
+  #  instanceId = tostring(local.instanceIds)
+  #}
 }
