@@ -1,6 +1,7 @@
 {
   "accounts": {
     "development": {
+      "dns": "laa-dev",
       "instance-scheduling": "skip-scheduling",
       "ec2_oracle_instance_type_ebsdb": "m5d.4xlarge",
       "ec2_oracle_instance_type_ebsapps": "m5d.2xlarge",
@@ -29,6 +30,7 @@
       "ebsapps_u03_size": 50
     },
     "test": {
+      "dns": "laa-test",
       "instance-scheduling": "skip-auto-start",
       "ec2_oracle_instance_type_ebsdb": "m5d.4xlarge",
       "ec2_oracle_instance_type_ebsapps": "m5d.2xlarge",
@@ -57,6 +59,7 @@
       "ebsapps_u03_size": 50
     },
     "preproduction": {
+      "dns": "laa-preproduction",
       "instance-scheduling": "skip-auto-start",
       "ec2_oracle_instance_type_ebsdb": "x2iedn.4xlarge",
       "ec2_oracle_instance_type_ebsapps": "m5d.16xlarge",
@@ -85,6 +88,7 @@
       "ebsapps_u03_size": 50
     },
     "production": {
+      "dns": "laa",
       "instance-scheduling": "skip-auto-start",
       "ec2_oracle_instance_type_ebsdb": "x2iedn.4xlarge",
       "ec2_oracle_instance_type_ebsapps": "m5d.16xlarge",
