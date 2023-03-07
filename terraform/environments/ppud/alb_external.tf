@@ -126,10 +126,19 @@ resource "aws_lb_target_group" "WAM-Target-Group" {
 }
 
 
-resource "aws_lb_target_group_attachment" "WAM-Portal" {
+resource "aws_lb_target_group_attachment" "WAM-Portal-development" {
+  count              = local.is-development == true ? 1 : 0
   target_group_arn = aws_lb_target_group.WAM-Target-Group.arn
-  # target_id        = aws_instance.s609693lo6vw105[0].id
-  target_id = local.application_data.accounts[local.environment].alb_intances_wam
+  target_id        = aws_instance.s609693lo6vw105[0].id
+ # target_id = local.application_data.accounts[local.environment].alb_intances_wam
+  port      = 80
+}
+
+resource "aws_lb_target_group_attachment" "WAM-Portal-preproduction" {
+  count              = local.is-preproduction == true ? 1 : 0
+  target_group_arn = aws_lb_target_group.WAM-Target-Group.arn
+  target_id        = aws_instance.s618358rgvw201[0].id
+# target_id = local.application_data.accounts[local.environment].alb_intances_wam
   port      = 80
 }
 
