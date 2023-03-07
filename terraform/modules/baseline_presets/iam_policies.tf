@@ -3,7 +3,14 @@ locals {
   iam_policies_filter = flatten([
     var.options.enable_business_unit_kms_cmks ? ["BusinessUnitKmsCmkPolicy"] : [],
     var.options.enable_image_builder ? ["ImageBuilderLaunchTemplatePolicy"] : [],
-    var.options.enable_ec2_cloud_watch_agent ? ["CloudWatchAgentServerReducedPolicy"] : []
+    var.options.enable_ec2_cloud_watch_agent ? ["CloudWatchAgentServerReducedPolicy"] : [],
+    var.options.enable_ec2_self_provision ? ["Ec2SelfProvisionPolicy"] : [],
+  ])
+
+  iam_policies_ec2_default = flatten([
+    var.options.enable_business_unit_kms_cmks ? ["BusinessUnitKmsCmkPolicy"] : [],
+    var.options.enable_ec2_cloud_watch_agent ? ["CloudWatchAgentServerReducedPolicy"] : [],
+    var.options.enable_ec2_self_provision ? ["Ec2SelfProvisionPolicy"] : [],
   ])
 
   iam_policies = {
@@ -85,6 +92,19 @@ locals {
           "ssm:GetParameters"
         ]
         resources = ["arn:aws:ssm:*:*:parameter/AmazonCloudWatch-*"]
+      }]
+    }
+
+    Ec2SelfProvisionPolicy = {
+      description = "Permissions to allow EC2 to self provision by pulling ec2 instance, volume and tag info"
+      statements = [{
+        effect = "Allow"
+        actions = [
+          "ec2:DescribeVolumes",
+          "ec2:DescribeTags",
+          "ec2:DescribeInstances",
+        ]
+        resources = ["*"]
       }]
     }
   }

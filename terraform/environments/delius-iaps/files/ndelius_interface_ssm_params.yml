@@ -1,0 +1,56 @@
+parameter:
+  ndelius-interface-user:
+    name: /NDeliusInterface/Interface/user
+    type: "String"
+    value: "dev-placeholder-ndelius-interface-user"
+    overwrite: false
+  ndelius-interface-password:
+    name: /NDeliusInterface/Interface/password
+    type: "SecureString"
+    value: "dev-placeholder-ndelius-interface-password"
+    overwrite: false
+  ndelius-interface-replicapasswordcoded:
+    name: /NDeliusInterface/Interface/replicapwdcoded
+    type: "SecureString"
+    value: "dev-placeholder-ndelius-interface-replicapasswordcoded"
+    overwrite: false
+  ndelius-interface-soappasscoded:
+    name: /NDeliusInterface/Interface/soappwdcoded
+    type: "SecureString"
+    value: "dev-placeholder-ndelius-interface-soappasscoded"
+    overwrite: false
+  ndelius-interface-pwdcoded:
+    name: /NDeliusInterface/Interface/pwdcoded
+    type: "SecureString"
+    value: "dev-placeholder-ndelius-interface-passwordcoded"
+    overwrite: false
+  ndelius-interface-odbc-dsn:
+    name: /NDeliusInterface/Interface/ODBC/dsn
+    type: "String"
+    value: "dev-placeholder-ndelius-interface-odbc-dsn"
+    overwrite: false
+  ndelius-interface-odbc-uid:
+    name: /NDeliusInterface/Interface/ODBC/uid
+    type: "String"
+    value: "dev-placeholder-ndelius-interface-odbc-uid"
+    overwrite: false
+  ndelius-interface-odbc-pwd:
+    name: /NDeliusInterface/Interface/ODBC/pwd
+    type: "SecureString"
+    value: "dev-placeholder-ndelius-interface-odbc-pwd"
+    overwrite: false
+  ndelius-interface-email-smtpuser:
+    name: /NDeliusInterface/Email/smtpuser
+    type: "String"
+    value: "dev-placeholder-ndelius-interface-email-smtpuser"
+    overwrite: false
+  ndelius-interface-email-password:
+    name: /NDeliusInterface/Email/password
+    type: "SecureString"
+    value: "dev-placeholder-ndelius-interface-email-password"
+    overwrite: false
+  ndelius-interface-email-passwordcoded:
+    name: /NDeliusInterface/Email/passwordcoded
+    type: "SecureString"
+    value: "dev-placeholder-ndelius-interface-email-passwordcoded"
+    overwrite: false
