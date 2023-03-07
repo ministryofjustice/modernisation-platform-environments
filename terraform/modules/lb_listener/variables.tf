@@ -176,3 +176,23 @@ variable "tags" {
   description = "Default tags to be applied to resources"
 }
 
+variable "cloudwatch_metric_alarms" {
+  description = "Map of cloudwatch metric alarms."
+  type = map(object({
+    comparison_operator = string
+    evaluation_periods  = number
+    metric_name         = string
+    namespace           = string
+    period              = number
+    statistic           = string
+    threshold           = number
+    alarm_actions       = list(string)
+    actions_enabled     = optional(bool, false)
+    alarm_description   = optional(string)
+    datapoints_to_alarm = optional(number)
+    treat_missing_data  = optional(string, "missing")
+    dimensions          = optional(map(string), {})
+    tags                = optional(map(string))
+  }))
+  default = {}
+}
