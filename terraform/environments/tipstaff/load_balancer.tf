@@ -34,7 +34,7 @@ resource "aws_lb" "tipstaff_dev_lb" {
 }
 resource "aws_lb_target_group" "tipstaff_dev_target_group" {
   name                 = "tipstaff-dev-target-group"
-  port                 = local.application_data.accounts[local.environment].server_port
+  port                 = local.application_data.accounts[local.environment].server_port_1
   protocol             = "HTTP"
   vpc_id               = data.aws_vpc.shared.id
   target_type          = "instance"
