@@ -1068,6 +1068,69 @@ module "kinesis_cdc_domain_stream" {
   cloudwatch_logging_enabled = true
 }
 
+# Dynamo DB for DomainRegistry, DPR-306/DPR-218
+module "dynamo_tab_domain_registry" {
+  source              = "./modules/dynamo_tables"
+  create_table        = true
+  autoscaling_enabled = false  
+  name                = "${local.project}-domain-registry-${local.environment}"
+
+  hash_key    = "primaryId"
+  range_key   = "secondaryId"
+  table_class = "STANDARD"
+
+  attributes = [
+    {
+      name = "primaryId"
+      type = "S"
+    },
+    {
+      name = "secondaryId"
+      type = "S"
+    },
+    {
+      name = "data"
+      type = "S"
+    },
+    {
+      name = "type"
+      type = "S"
+    }
+  ]
+
+  ttl {
+    attribute_name = "TimeToExist"
+    enabled        = false
+  }
+  
+  global_secondary_indexes = [
+    {
+      name               = "primaryId-Index"
+      hash_key           = "primaryId"
+      range_key          = "type"
+      write_capacity     = 10
+      read_capacity      = 10      
+      projection_type    = "All"
+    },
+    {
+      name               = "secondaryId-Index"
+      hash_key           = "secondaryId"
+      range_key          = "type"
+      write_capacity     = 10
+      read_capacity      = 10      
+      projection_type    = "All"
+    }    
+  ]
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-domain-registry-${local.environment}"
+      Resource_Type = "Dynamo Table"
+    }
+  )
+}
+
 ##########################
 # Application Backend TF # 
 ##########################
