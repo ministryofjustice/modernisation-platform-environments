@@ -5,7 +5,7 @@
       "SES_domain": "internaltest.ppud.justice.gov.uk",
       "DEV_WAM_ALB": "WAM-ALB",
       "PPUD_Internal_ALB": "PPUD-ALB",
-      "alb_intances_wam": "[aws_instance.s609693lo6vw102.id]"
+      "alb_intances_wam": "aws_instance.s609693lo6vw102.id"
     },
     "test": {
       "example_var": "test-data"
