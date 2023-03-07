@@ -93,7 +93,6 @@ tasks:
         Install-WindowsFeature -Name RSAT-ADDS-Tools
 
         # Allow Domain Users to connect via RDP and give them local admin rights
-        Add-LocalGroupMember -Group "Remote Desktop Users" -Member "Domain Users@${delius_iaps_ad_domain_name}"
         Add-LocalGroupMember -Group "Administrators" -Member "Domain Users@${delius_iaps_ad_domain_name}"
 
         exit 3010 # Reboot instance, see https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2launch-v2-settings.html#ec2launch-v2-exit-codes-reboots
