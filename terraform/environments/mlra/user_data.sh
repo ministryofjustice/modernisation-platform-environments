@@ -43,6 +43,6 @@ systemctl enable docker
 # Cloudwatch Agent
 amazon-linux-extras install collectd
 yum install -y amazon-cloudwatch-agent
-aws s3 cp s3://laa-software-library/cloudwatch-agent-config/config.json /opt/aws/amazon-cloudwatch-agent/bin/.
+aws s3 cp s3://modernisation-platform-software20230224000709766100000001/laa-platform/cloudwatch-agent-config/config.json /opt/aws/amazon-cloudwatch-agent/bin/.
 amazon-cloudwatch-agent-ctl -a stop
 amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/bin/config.json -s
