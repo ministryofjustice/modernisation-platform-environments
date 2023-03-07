@@ -10,6 +10,7 @@ variable "options" {
     enable_business_unit_kms_cmks                = optional(bool, false)
     enable_image_builder                         = optional(bool, false)
     enable_ec2_cloud_watch_agent                 = optional(bool, false)
+    enable_ec2_self_provision                    = optional(bool, false)
     s3_iam_policies                              = optional(list(string))
   })
 }
