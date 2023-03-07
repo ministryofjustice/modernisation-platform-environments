@@ -1078,6 +1078,7 @@ module "dynamo_tab_domain_registry" {
   hash_key    = "primaryId"
   range_key   = "secondaryId"
   table_class = "STANDARD"
+  ttl_enabled = false
 
   attributes = [
     {
@@ -1097,11 +1098,6 @@ module "dynamo_tab_domain_registry" {
       type = "S"
     }
   ]
-
-  ttl {
-    attribute_name = "TimeToExist"
-    enabled        = false
-  }
 
   global_secondary_indexes = [
     {
