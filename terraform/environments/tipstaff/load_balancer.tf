@@ -88,19 +88,3 @@ resource "aws_lb_listener" "tipstaff_dev_lb_2" {
     target_group_arn = aws_lb_target_group.tipstaff_dev_target_group.arn
   }
 }
-
-
-// Look into the route53 stuff as well:
-# resource "aws_route53_record" "external" {
-#   provider = aws.core-vpc
-
-#   zone_id = data.aws_route53_zone.external.zone_id
-#   name    = "${local.application_data.accounts[local.environment].subdomain_name}.modernisation-platform.service.justice.gov.uk"
-#   type    = "A"
-
-#   alias {
-#     name                   = aws_lb.tipstaff-dev-lb.dns_name
-#     zone_id                = aws_lb.tipstaff-dev-lb.zone_id
-#     evaluate_target_health = true
-#   }
-# }
