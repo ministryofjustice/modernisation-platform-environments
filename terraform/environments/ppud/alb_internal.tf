@@ -31,7 +31,8 @@ resource "aws_lb_listener" "PPUD-Front-End" {
 
 resource "aws_lb_target_group" "PPUD-internal-Target-Group" {
   count    = local.is-development == false ? 1 : 0
-  name     = "PPUD"
+# name     = "PPUD"
+  name     = local.application_data.accounts[local.environment].PPUD_Target
   port     = 443
   protocol = "HTTPS"
   vpc_id   = data.aws_vpc.shared.id
