@@ -246,33 +246,28 @@ data "aws_secretsmanager_secret_version" "cloudfront" {
   secret_id = data.aws_secretsmanager_secret.cloudfront.arn
 }
 
-# TODO Is this cert necessary?
 resource "aws_acm_certificate" "cloudfront" {
-  domain_name       = "modernisation-platform.service.justice.gov.uk"
+  domain_name       = var.acm_cert_domain_name
   validation_method = "DNS"
 
-  # subject_alternative_names = [
-  #   "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-  # ]
+  subject_alternative_names = var.environment == "production" ? null : [local.domain_name]
 
-  tags = {
-    Environment = var.environment
-  }
+  tags = var.tags
 
   lifecycle {
     create_before_destroy = true
   }
 }
 
-# TODO This was a centralised bucket in LAA Landing Zone - do we want one for each application/env account in MP?
+# TODO This was a centralised bucket in LAA Landing Zone - do we want one for each application/env account in MP? Yes for now
 
-resource "aws_s3_bucket" "cloudfront" {
-  bucket = "laa-${var.application_name}-cloudfront-logging"
+resource "aws_s3_bucket" "cloudfront" { # Mirroring laa-cloudfront-logging-development in laa-dev
+  bucket = "laa-${var.application_name}-cloudfront-logging-${var.environment}"
   # force_destroy = true # Enable to recreate bucket deleting everything inside
   tags = merge(
     var.tags,
     {
-      Name = "laa-${var.application_name}-cloudfront-logging"
+      Name = "laa-${var.application_name}-cloudfront-logging-${var.environment}"
     }
   )
 }
@@ -286,10 +281,17 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "cloudfront" {
   }
 }
 
-# TODO Add in cloudfront bucket policies
+resource "aws_s3_bucket_public_access_block" "cloudfront" {
+  bucket = aws_s3_bucket.cloudfront.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
 
 # resource "aws_acm_certificate_validation" "cloudfront" {
-#   certificate_arn         = aws_acm_certificate.external_lb.arn
+#   certificate_arn         = aws_acm_certificate.cloudfront.arn
 #   validation_record_fqdns = [aws_route53_record.aws_route53_record.fqdn]
 # }
 
@@ -308,7 +310,7 @@ resource "aws_cloudfront_distribution" "external_lb" {
     }
     custom_header {
       name = local.custom_header
-      value = jsondecode(data.aws_secretsmanager_secret_version.cloudfront.secret_string)
+      value = data.aws_secretsmanager_secret_version.cloudfront.secret_string
     }
   }
   enabled = true
@@ -508,12 +510,10 @@ resource "aws_waf_web_acl" "waf_acl" {
 ## ALB Listener
 
 resource "aws_acm_certificate" "external_lb" {
-  domain_name       = "modernisation-platform.service.justice.gov.uk"
+  domain_name       = var.acm_cert_domain_name
   validation_method = "DNS"
 
-  subject_alternative_names = [
-    local.domain_name
-  ]
+  subject_alternative_names = var.environment == "production" ? null : [local.domain_name]
 
   tags = {
     Environment = var.environment
@@ -583,8 +583,8 @@ resource "aws_lb_listener" "alb_listener" {
   port              = var.listener_port
   #checkov:skip=CKV_AWS_2:The ALB protocol is HTTP
   protocol        = var.listener_protocol #tfsec:ignore:aws-elb-http-not-used
-  ssl_policy      = var.listener_protocol == "true" ? var.alb_ssl_policy : null
-  certificate_arn = var.listener_protocol == "true" ? aws_acm_certificate_validation.external.certificate_arn : null # This needs the ARN of the certificate from Mod Platform
+  ssl_policy      = var.listener_protocol == "HTTPS" ? var.alb_ssl_policy : null
+  certificate_arn = var.listener_protocol == "HTTPS" ? aws_acm_certificate_validation.external.certificate_arn : null # This needs the ARN of the certificate from Mod Platform
 
   # default_action {
   #   type = "forward"
@@ -668,7 +668,7 @@ resource "aws_lb_listener_rule" "alb_listener_rule" {
   condition {
     http_header {
       http_header_name = local.custom_header
-      values           = [jsondecode(data.aws_secretsmanager_secret_version.cloudfront.secret_string)]
+      values           = [data.aws_secretsmanager_secret_version.cloudfront.secret_string]
     }
   }
 }

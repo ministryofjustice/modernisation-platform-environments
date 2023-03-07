@@ -29,7 +29,8 @@
       "ecs_scaling_mem_threshold": 80,
       "moj_vpn_cidr": "81.134.202.29/32",
       "nlb_prevent_deletion": false,
-      "pagerduty_integration_key_name": "laa_mlra_nonprod_alarms"
+      "pagerduty_integration_key_name": "laa_mlra_nonprod_alarms",
+      "acm_cert_domain_name": "modernisation-platform.service.justice.gov.uk",
     },
     "test": {
       "example_var": "test-data",
@@ -60,7 +61,8 @@
       "ecs_scaling_mem_threshold": 80,
       "moj_vpn_cidr": "81.134.202.29/32",
       "nlb_prevent_deletion": false,
-      "pagerduty_integration_key_name": "laa_mlra_nonprod_alarms"
+      "pagerduty_integration_key_name": "laa_mlra_nonprod_alarms",
+      "acm_cert_domain_name": "modernisation-platform.service.justice.gov.uk",
     },
     "preproduction": {
       "example_var": "preproduction-data",
@@ -91,7 +93,8 @@
       "ecs_scaling_mem_threshold": 80,
       "moj_vpn_cidr": "81.134.202.29/32",
       "nlb_prevent_deletion": true,
-      "pagerduty_integration_key_name": "laa_mlra_nonprod_alarms"
+      "pagerduty_integration_key_name": "laa_mlra_nonprod_alarms",
+      "acm_cert_domain_name": "modernisation-platform.service.justice.gov.uk",
     },
     "production": {
       "example_var": "production-data",
@@ -122,7 +125,8 @@
       "ecs_scaling_mem_threshold": 80,
       "moj_vpn_cidr": "81.134.202.29/32",
       "nlb_prevent_deletion": true,
-      "pagerduty_integration_key_name": "laa_mlra_prod_alarms"
+      "pagerduty_integration_key_name": "laa_mlra_prod_alarms",
+      "acm_cert_domain_name": "mlra.service.justice.gov.uk - TBD",
     }
   }
 }

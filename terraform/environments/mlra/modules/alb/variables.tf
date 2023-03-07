@@ -139,3 +139,7 @@ variable "existing_bucket_name" {
   default     = ""
   description = "The name of the existing bucket name. If no bucket is provided one will be created for them."
 }
+variable "acm_cert_domain_name" {
+  type        = string
+  description = "The domain name of the ACM certificate for CloudFront and ALB HTTPS Listener"
+}
