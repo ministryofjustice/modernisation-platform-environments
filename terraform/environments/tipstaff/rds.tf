@@ -47,6 +47,7 @@ resource "aws_security_group" "postgresql_db_sc" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
+
 resource "null_resource" "setup_db" {
   depends_on = [aws_db_instance.tipstaffdbdev]
 

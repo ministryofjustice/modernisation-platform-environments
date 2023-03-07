@@ -1,4 +1,4 @@
-resource "aws_route53_record" "tipstaff-app-record" {
+resource "aws_route53_record" "tipstaff_app_direct_traffic" {
   provider = aws.core-vpc
   zone_id  = data.aws_route53_zone.inner.zone_id
   name     = "${local.application_data.accounts[local.environment].subdomain_name}.modernisation-platform.internal"
@@ -7,10 +7,43 @@ resource "aws_route53_record" "tipstaff-app-record" {
   records  = [aws_lb.tipstaff_dev_lb.dns_name]
 }
 
-resource "aws_acm_certificate" "tipstaff-app-cert" {
-  domain_name       = local.application_data.accounts[local.environment].subdomain_name
+resource "aws_acm_certificate" "tipstaff_app_cert" {
+  domain_name       = "modernisation-platform.service.justice.gov.uk"
   validation_method = "DNS"
+
+  subject_alternative_names = [
+    "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk",
+    "${local.application_data.accounts[local.environment].subdomain_name}"
+  ]
+
+  tags = {
+    Environment = local.environment
+  }
+
   lifecycle {
     create_before_destroy = true
   }
+}
+
+resource "aws_route53_record" "external_validation_subdomain_tipstaff" {
+  provider = aws.core-vpc
+  for_each = {
+    for dvo in aws_acm_certificate.tipstaff_app_cert.domain_validation_options : dvo.domain_name => {
+      name   = dvo.resource_record_name
+      record = dvo.resource_record_value
+      type   = dvo.resource_record_type
+    }
+  }
+
+  allow_overwrite = true
+  name            = each.value.name
+  records         = [each.value.record]
+  ttl             = 60
+  type            = each.value.type
+  zone_id         = data.aws_route53_zone.external.zone_id
+}
+
+resource "aws_acm_certificate_validation" "tipstaff_lb_cert_validation" {
+  certificate_arn         = aws_acm_certificate.tipstaff_app_cert.arn
+  validation_record_fqdns = [for record in aws_route53_record.external_validation_subdomain_tipstaff : record.fqdn]
 }
