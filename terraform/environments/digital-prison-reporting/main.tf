@@ -1114,7 +1114,7 @@ module "dynamo_tab_domain_registry" {
       range_key       = "type"
       write_capacity  = 10
       read_capacity   = 10
-      projection_type = "All"
+      projection_type = "ALL"
     }
   ]
 
