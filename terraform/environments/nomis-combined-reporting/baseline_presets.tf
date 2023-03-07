@@ -8,6 +8,7 @@ module "baseline_presets" {
     enable_business_unit_kms_cmks                = true
     enable_image_builder                         = true
     enable_ec2_cloud_watch_agent                 = true
+    enable_ec2_self_provision                    = true
     s3_iam_policies                              = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
   }
 }
