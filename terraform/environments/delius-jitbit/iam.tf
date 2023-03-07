@@ -118,3 +118,48 @@ resource "aws_iam_role_policy" "ecs_exec" {
   policy = data.aws_iam_policy_document.ecs_exec.json
   role   = aws_iam_role.ecs_exec.id
 }
+
+resource "aws_iam_policy" "jitbit_secrets_reader" {
+  name_prefix = "secrets_manager_policy"
+  description = "Policy to allow Full Read access to JitBit Secrets"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "secretsmanager:GetResourcePolicy",
+          "secretsmanager:GetSecretValue",
+          "secretsmanager:DescribeSecret",
+          "secretsmanager:ListSecrets",
+          "secretsmanager:ListSecretVersionIds"
+        ]
+        Resource = "arn:aws:secretsmanager:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:secret:${local.application_name}*"
+      }
+    ]
+  })
+}
+
+
+resource "aws_iam_policy" "secrets_manager_reader" {
+  name        = "SecretsManagerRead"
+  description = "Policy to allow Full Read access to Secrets Manager"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "secretsmanager:GetResourcePolicy",
+          "secretsmanager:GetSecretValue",
+          "secretsmanager:DescribeSecret",
+          "secretsmanager:ListSecrets",
+          "secretsmanager:ListSecretVersionIds"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}
