@@ -120,7 +120,7 @@ resource "aws_iam_role_policy" "ecs_exec" {
 }
 
 resource "aws_iam_policy" "jitbit_secrets_reader" {
-  name_prefix = "secrets_manager_policy"
+  name        = "jitbit-secrets-reader"
   description = "Policy to allow Full Read access to JitBit Secrets"
 
   policy = jsonencode({
