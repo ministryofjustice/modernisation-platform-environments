@@ -68,11 +68,20 @@ resource "aws_lb_target_group_attachment" "tipstaff_ec2_instance_dev" {
 }
 resource "aws_lb_listener" "tipstaff_dev_lb" {
   load_balancer_arn = aws_lb.tipstaff_dev_lb.arn
-  port              = local.application_data.accounts[local.environment].server_port
-  protocol          = local.application_data.accounts[local.environment].lb_listener_protocol
-  #checkov:skip=CKV_AWS_2: "protocol for lb set in application_variables"
+  port              = local.application_data.accounts[local.environment].server_port_1
+  protocol          = local.application_data.accounts[local.environment].lb_listener_protocol_1
   ssl_policy = local.application_data.accounts[local.environment].lb_listener_protocol == "HTTP" ? "" : "ELBSecurityPolicy-2016-08"
-  #checkov:skip=CKV_AWS_103: "ssl_policy for lb set in application_variables"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.tipstaff_dev_target_group.arn
+  }
+}
+resource "aws_lb_listener" "tipstaff_dev_lb" {
+  load_balancer_arn = aws_lb.tipstaff_dev_lb.arn
+  port              = local.application_data.accounts[local.environment].server_port_2
+  protocol          = local.application_data.accounts[local.environment].lb_listener_protocol_2
+  ssl_policy = local.application_data.accounts[local.environment].lb_listener_protocol == "HTTP" ? "" : "ELBSecurityPolicy-2016-08"
 
   default_action {
     type             = "forward"
