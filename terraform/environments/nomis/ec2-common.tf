@@ -72,6 +72,19 @@ data "aws_iam_policy_document" "ssm_custom" {
   }
 }
 
+data "aws_iam_policy_document" "ansible_policy" {
+  statement {
+    sid    = "Ec2AnsiblePolicy"
+    effect = "Allow"
+    actions = [
+      "ec2:DescribeInstances",
+      "ec2:DescribeVolumes",
+      "ec2:DescribeTags",
+    ]
+    resources = ["*"] #tfsec:ignore:aws-iam-no-policy-wildcards
+  }
+}
+
 # custom policy document for cloudwatch agent, based on CloudWatchAgentServerPolicy but removed CreateLogGroup permission to enforce all log groups in code
 data "aws_iam_policy_document" "cloud_watch_custom" {
   statement {
@@ -216,7 +229,8 @@ data "aws_iam_policy_document" "ec2_common_combined" {
     data.aws_iam_policy_document.s3_bucket_access.json,
     data.aws_iam_policy_document.cloud_watch_custom.json,
     data.aws_iam_policy_document.hmpps_kms_keys.json,
-    data.aws_iam_policy_document.application_insights.json # TODO: remove this later
+    data.aws_iam_policy_document.application_insights.json, # TODO: remove this later
+    data.aws_iam_policy_document.ansible_policy.json,
   ]
 }
 
