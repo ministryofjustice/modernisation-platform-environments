@@ -20,6 +20,7 @@ locals {
 
     log_groups = {}
 
+
     ec2_common = {
       patch_approval_delay_days = 3
       patch_day                 = "TUE"

@@ -8,13 +8,13 @@ resource "aws_instance" "ec2_ebsapps" {
   monitoring                  = true
   ebs_optimized               = false
   associate_public_ip_address = false
-  iam_instance_profile        = aws_iam_instance_profile.iam_instace_profile_oracle_base.name
+  iam_instance_profile        = aws_iam_instance_profile.iam_instace_profile_ccms_base.name
 
   # Due to a bug in terraform wanting to rebuild the ec2 if more than 1 ebs block is attached, we need the lifecycle clause below
   lifecycle {
     ignore_changes = [ebs_block_device]
   }
-  user_data_replace_on_change = true
+  user_data_replace_on_change = false
   user_data                   = <<EOF
 #!/bin/bash
 
@@ -27,6 +27,7 @@ unzip awscliv2.zip
 ./aws/install
 wget https://s3.amazonaws.com/amazoncloudwatch-agent/oracle_linux/amd64/latest/amazon-cloudwatch-agent.rpm
 rpm -U ./amazon-cloudwatch-agent.rpm
+/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c ssm:cloud-watch-config
 
 systemctl stop amazon-ssm-agent
 rm -rf /var/lib/amazon/ssm/ipc/
@@ -94,43 +95,33 @@ EOF
   ebs_block_device {
     device_name = "/dev/sdj"
     volume_type = "io2"
-    volume_size = local.application_data.accounts[local.environment].ebsapps_u01_size
+    volume_size = local.application_data.accounts[local.environment].ebsapps_u03_size
     iops        = local.application_data.accounts[local.environment].ebsapps_default_iops
     encrypted   = true
     kms_key_id  = data.aws_kms_key.ebs_shared.key_id
   }
 
   tags = merge(local.tags,
-    { Name = lower(format("ec2-%s-%s-ebsapps-%s", local.application_name, local.environment, count.index + 1)) }
+    { Name = lower(format("ec2-%s-%s-ebsapps-%s", local.application_name, local.environment, count.index + 1)) },
+    { instance-scheduling = local.application_data.accounts[local.environment].instance-scheduling },
+    { backup = "true" }
   )
   depends_on = [aws_security_group.ec2_sg_ebsapps]
 
 }
 
-/*
-resource "aws_ebs_volume" "ebsapps_create" {
-  lifecycle {
-    ignore_changes = [kms_key_id]
-  }
-  #for_each          = local.application_data.accounts[local.environment].ebsapps_ebs
-  for_each          = local.application_data.ebsapps_ebs
-  availability_zone = "eu-west-2a"
-  encrypted         = true
-  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
 
-  type              = each.value.type
-  iops              = local.application_data.accounts[local.environment].ebsapps_default_iops
-  size              = local.application_data.accounts[local.environment].ebsapps_u01_size
 
-  tags = merge(local.tags,
-    { Name = each.key }
-  )
+module "cw-ebsapps-ec2" {
+  source = "./modules/cw-ec2"
+
+  name        = "ec2-ebsapps"
+  topic       = aws_sns_topic.cw_alerts.arn
+  instanceIds = join(",", [for instance in aws_instance.ec2_ebsapps : instance.id])
+
+  for_each     = local.application_data.cloudwatch_ec2
+  metric       = each.key
+  eval_periods = each.value.eval_periods
+  period       = each.value.period
+  threshold    = each.value.threshold
 }
-
-
-resource "aws_volume_attachment" "ebsapps_att" {
-  for_each    = local.application_data.ebsapps_ebs
-  device_name = each.value.device_name
-  volume_id   = aws_ebs_volume.ebsapps_create[[each.key]].id
-  instance_id = aws_instance.ec2_oracle_ebs.id
-}*/

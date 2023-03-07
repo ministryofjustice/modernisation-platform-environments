@@ -1,20 +1,20 @@
 resource "aws_lb" "ebsapps_lb" {
-  name               = lower(format("lb-%s-%s-ebsapps", local.application_name, local.environment))
+  name               = lower(format("lb-%s-%s-ebsapp", local.application_name, local.environment))
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.sg_ebsapps_lb.id]
   subnets            = data.aws_subnets.shared-public.ids
 
   enable_deletion_protection = false
-  /*
+
   access_logs {
-    bucket  = module.s3-bucket.arn #aws_s3_bucket.lb_logs.bucket
-    prefix  = "ebsapps-lb"
+    bucket  = module.s3-bucket-logging.bucket.id
+    prefix  = local.lb_log_prefix
     enabled = true
   }
-*/
+
   tags = merge(local.tags,
-    { Name = lower(format("lb-%s-%s-ebsapps", local.application_name, local.environment)) }
+    { Name = lower(format("lb-%s-%s-ebsapp", local.application_name, local.environment)) }
   )
 }
 
@@ -50,7 +50,7 @@ resource "aws_lb_listener" "ebsapps_listener" {
 }
 
 resource "aws_lb_target_group" "ebsapp_tg" {
-  name     = lower(format("tg-%s-%s-ebsapps", local.application_name, local.environment))
+  name     = lower(format("tg-%s-%s-ebsapp", local.application_name, local.environment))
   port     = 80
   protocol = "HTTP"
   vpc_id   = data.aws_vpc.shared.id

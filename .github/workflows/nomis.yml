@@ -15,167 +15,31 @@ on:
     paths:
       - 'terraform/environments/nomis/**'
       - '.github/workflows/nomis.yml'
+
   workflow_dispatch:
 
-env:
-  GITHUB_TOKEN: ${{ secrets.DSO_GITHUB_AUTOMATION_PAT }}
-  TF_IN_AUTOMATION: true
-  TF_VAR_BRANCH_NAME: ${{ github.event_name == 'pull_request' && 'main' || (github.head_ref || github.ref_name) }}
-  TF_VAR_GH_ACTOR_NAME: ${{ github.actor}}
-  AWS_REGION: "eu-west-2"
-  ENVIRONMENT_MANAGEMENT: ${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}
 permissions:
-  id-token: write # This is required for requesting the JWT
-  contents: read # This is required for actions/checkout
-defaults:
-  run:
-    shell: bash
+  id-token: write  # This is required for requesting the JWT
+  contents: read  # This is required for actions/checkout
 
 jobs:
-  # Plan + deploy for development and test enironments, never from main
-  plan-dev-test:
-    strategy:
-      matrix:
-        include:
-          - environment: test
-          - environment: development
-    name: Terraform plan - nomis - ${{ matrix.environment }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
-      - name: Set Account Number
-        run: echo "ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${GITHUB_WORKFLOW}-${TF_ENV}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)" >> $GITHUB_ENV
-      - name: configure aws credentials
-        uses: aws-actions/configure-aws-credentials@67fbcbb121271f7775d2e7715933280b06314838 # v1.7.0
-        with:
-          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
-          role-session-name: githubactionsrolesession
-          aws-region: ${{ env.AWS_REGION }}
-      - name: Load and Configure Terraform
-        uses: hashicorp/setup-terraform@633666f66e0061ca3b725c73b2ec20cd13a8fdd1 # v2.0.3
-        with:
-          terraform_version: "~1"
-          terraform_wrapper: false
-      - name: Terraform plan - ${{ matrix.environment }}
-        run: |
-          terraform --version
-          echo "Terraform plan - ${TF_ENV}"
-          bash scripts/terraform-init.sh terraform/environments/nomis
-          terraform -chdir="terraform/environments/nomis" workspace select "nomis-${TF_ENV}"
-          bash scripts/terraform-plan.sh terraform/environments/nomis
-    env:
-      TF_ENV: ${{ matrix.environment }}
+  strategy:
+    uses: ./.github/workflows/reusable_terraform_strategy.yml
+    with:
+      strategy_type: "standard_four_accounts"  # allow apply to dev/test from branch
 
-  deploy-dev-test:
-    needs: plan-dev-test
-    if: success()
+  terraform:
+    needs: strategy
     strategy:
-      matrix:
-        include:
-          - environment: test
-          - environment: development
-    name: Terraform apply - nomis - ${{ matrix.environment }}
-    runs-on: ubuntu-latest
-    environment:
-      name: nomis-${{ matrix.environment }}
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
-      - name: Set Account Number
-        run: echo "ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${GITHUB_WORKFLOW}-${TF_ENV}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)" >> $GITHUB_ENV
-      - name: configure aws credentials
-        uses: aws-actions/configure-aws-credentials@67fbcbb121271f7775d2e7715933280b06314838 # v1.7.0
-        with:
-          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
-          role-session-name: githubactionsrolesession
-          aws-region: ${{ env.AWS_REGION }}
-      - name: Load and Configure Terraform
-        uses: hashicorp/setup-terraform@633666f66e0061ca3b725c73b2ec20cd13a8fdd1 # v2.0.3
-        with:
-          terraform_version: "~1"
-          terraform_wrapper: false
-      - name: Run Terrform Apply
-        run: |
-          terraform --version
-          echo "Terraform apply - ${TF_ENV}"
-          bash scripts/terraform-init.sh terraform/environments/nomis
-          terraform -chdir="terraform/environments/nomis" workspace select "nomis-${TF_ENV}"
-          bash scripts/terraform-apply.sh terraform/environments/nomis
-    env:
-        TF_ENV: ${{ matrix.environment }}
-
-  # Plan + deploy for pre-production and production enironments, only from main
-  plan-preprod-prod:
-    if: github.ref == 'refs/heads/main'
-    strategy:
-      matrix:
-        include:
-          - environment: preproduction
-          - environment: production
-    name: Terraform plan - nomis - ${{ matrix.environment }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
-      - name: Set Account Number
-        run: echo "ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${GITHUB_WORKFLOW}-${TF_ENV}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)" >> $GITHUB_ENV
-      - name: configure aws credentials
-        uses: aws-actions/configure-aws-credentials@67fbcbb121271f7775d2e7715933280b06314838 # v1.7.0
-        with:
-          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
-          role-session-name: githubactionsrolesession
-          aws-region: ${{ env.AWS_REGION }}
-      - name: Load and Configure Terraform
-        uses: hashicorp/setup-terraform@633666f66e0061ca3b725c73b2ec20cd13a8fdd1 # v2.0.3
-        with:
-          terraform_version: "~1"
-          terraform_wrapper: false
-      - name: Terraform plan - ${{ matrix.environment }}
-        run: |
-          terraform --version
-          echo "Terraform plan - ${TF_ENV}"
-          bash scripts/terraform-init.sh terraform/environments/nomis
-          terraform -chdir="terraform/environments/nomis" workspace select "nomis-${TF_ENV}"
-          bash scripts/terraform-plan.sh terraform/environments/nomis
-    env:
-      TF_ENV: ${{ matrix.environment }}
-
-  deploy-preprod-prod:
-    needs: plan-preprod-prod
-    if: success() && github.ref == 'refs/heads/main'
-    strategy:
-      matrix:
-        include:
-          - environment: preproduction
-          - environment: production
-    name: Terraform apply - nomis - ${{ matrix.environment }}
-    runs-on: ubuntu-latest
-    environment:
-      name: nomis-${{ matrix.environment }}
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
-      - name: Set Account Number
-        run: echo "ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${GITHUB_WORKFLOW}-${TF_ENV}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)" >> $GITHUB_ENV
-      - name: configure aws credentials
-        uses: aws-actions/configure-aws-credentials@67fbcbb121271f7775d2e7715933280b06314838 # v1.7.0
-        with:
-          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
-          role-session-name: githubactionsrolesession
-          aws-region: ${{ env.AWS_REGION }}
-      - name: Load and Configure Terraform
-        uses: hashicorp/setup-terraform@633666f66e0061ca3b725c73b2ec20cd13a8fdd1 # v2.0.3
-        with:
-          terraform_version: "~1"
-          terraform_wrapper: false
-      - name: Run Terrform Apply
-        run: |
-          terraform --version
-          echo "Terraform apply - ${TF_ENV}"
-          bash scripts/terraform-init.sh terraform/environments/nomis
-          terraform -chdir="terraform/environments/nomis" workspace select "nomis-${TF_ENV}"
-          bash scripts/terraform-apply.sh terraform/environments/nomis
-    env:
-        TF_ENV: ${{ matrix.environment }}
-
+      fail-fast: false
+      matrix: ${{ fromJson(needs.strategy.outputs.matrix) }}
+    uses: ./.github/workflows/reusable_terraform_plan_apply.yml
+    with:
+      application: "${{ github.workflow }}"
+      environment: "${{ matrix.target }}"
+      action: "${{ matrix.action }}"
+      do_state_refresh_on_plan: false  # doesn't work with ACM module
+      post_plan_to_pr: false  # pipeline can be triggered by other teams so avoid posting into their PRs for now
+    secrets:
+      modernisation_platform_environments: "${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}"
+      pipeline_github_token: "${{ secrets.DSO_GITHUB_AUTOMATION_PAT }}"

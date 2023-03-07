@@ -1,20 +1,25 @@
 {
   "accounts": {
     "development": {
-      "example_var": "dev-data",
+      "instance-scheduling": "skip-scheduling",
       "ec2_oracle_instance_type_ebsdb": "m5d.4xlarge",
       "ec2_oracle_instance_type_ebsapps": "m5d.2xlarge",
       "ec2_oracle_instance_type_webgate": "m5d.large",
       "ec2_oracle_instance_type_accessgate": "m5d.xlarge",
       "ami_owner": "self",
       "orace_base_prereqs_ami_name": "Oracle79-prereqs-v1_5",
-      "webgate_ami_name": "ebs-sso-v1_0",
-      "accessgate_ami_name": "ebs-sso-v1_0",
+      "orace_db_ami_name": "AwsBackup_i-0e1b4048a0b32f460_30402405-C957-9219-9AE0-23F1A5F059F0",
+      "webgate_ami_name": "ebs-webgate-v1_1",
+      "accessgate_ami_name": "ebs-accessgate-v1_1",
       "key_name": "oracle-base-dev",
+      "lz_aws_account_id_env": "411213865113",
+      "lz_aws_subnet_env": "10.202.0.0/20",
+      "lz_ftp_bucket_environment": "development",
+      "mp_aws_subnet_env": "10.200.0.0/20",
       "webgate_no_instances": 1,
       "webgate_default_iops": 3000,
       "webgate_u01_size": 100,
-      "accessgate_no_instances": 2,
+      "accessgate_no_instances": 1,
       "accessgate_default_iops": 3000,
       "accessgate_u01_size": 150,
       "ebsapps_no_instances": 1,
@@ -24,19 +29,25 @@
       "ebsapps_u03_size": 50
     },
     "test": {
+      "instance-scheduling": "skip-auto-start",
       "ec2_oracle_instance_type_ebsdb": "m5d.4xlarge",
       "ec2_oracle_instance_type_ebsapps": "m5d.2xlarge",
       "ec2_oracle_instance_type_webgate": "m5d.large",
       "ec2_oracle_instance_type_accessgate": "m5d.xlarge",
       "ami_owner": "767123802783",
       "orace_base_prereqs_ami_name": "Oracle79-prereqs-v1_5",
-      "webgate_ami_name": "ebs-sso-v1_0",
-      "accessgate_ami_name": "ebs-sso-v1_0",
+      "orace_db_ami_name": "Oracle79-prereqs-v1_5",
+      "webgate_ami_name": "ebs-webgate-v1_1",
+      "accessgate_ami_name": "ebs-accessgate-v1_1",
       "key_name": "",
+      "lz_aws_account_id_env": "140455166311",
+      "lz_aws_subnet_env": "10.206.0.0/20",
+      "lz_ftp_bucket_environment": "uat",
+      "mp_aws_subnet_env": "10.200.0.0/20",
       "webgate_no_instances": 1,
       "webgate_default_iops": 3000,
       "webgate_u01_size": 100,
-      "accessgate_no_instances": 2,
+      "accessgate_no_instances": 1,
       "accessgate_default_iops": 3000,
       "accessgate_u01_size": 150,
       "ebsapps_no_instances": 1,
@@ -46,15 +57,21 @@
       "ebsapps_u03_size": 50
     },
     "preproduction": {
+      "instance-scheduling": "skip-auto-start",
       "ec2_oracle_instance_type_ebsdb": "x2iedn.4xlarge",
       "ec2_oracle_instance_type_ebsapps": "m5d.16xlarge",
       "ec2_oracle_instance_type_webgate": "c5d.2xlarge",
       "ec2_oracle_instance_type_accessgate": "c5d.2xlarge",
       "ami_owner": "767123802783",
       "orace_base_prereqs_ami_name": "Oracle79-prereqs-v1_5",
-      "webgate_ami_name": "ebs-sso-v1_0",
-      "accessgate_ami_name": "ebs-sso-v1_0",
-      "key_name": "oracle-base-dev",
+      "orace_db_ami_name": "Oracle79-prereqs-v1_5",
+      "webgate_ami_name": "ebs-webgate-v1_1",
+      "accessgate_ami_name": "ebs-accessgate-v1_1",
+      "key_name": "",
+      "lz_aws_account_id_env": "484221692666",
+      "lz_aws_subnet_env": "10.204.0.0/20",
+      "lz_ftp_bucket_environment": "staging",
+      "mp_aws_subnet_env": "10.200.0.0/20",
       "webgate_no_instances": 1,
       "webgate_default_iops": 3000,
       "webgate_u01_size": 100,
@@ -68,15 +85,21 @@
       "ebsapps_u03_size": 50
     },
     "production": {
+      "instance-scheduling": "skip-auto-start",
       "ec2_oracle_instance_type_ebsdb": "x2iedn.4xlarge",
       "ec2_oracle_instance_type_ebsapps": "m5d.16xlarge",
       "ec2_oracle_instance_type_webgate": "c5d.2xlarge",
       "ec2_oracle_instance_type_accessgate": "c5d.2xlarge",
       "ami_owner": "767123802783",
       "orace_base_prereqs_ami_name": "Oracle79-prereqs-v1_5",
-      "webgate_ami_name": "ebs-sso-v1_0",
-      "accessgate_ami_name": "ebs-sso-v1_0",
-      "key_name": "oracle-base-dev",
+      "orace_db_ami_name": "Oracle79-prereqs-v1_5",
+      "webgate_ami_name": "ebs-webgate-v1_1",
+      "accessgate_ami_name": "ebs-accessgate-v1_1",
+      "key_name": "",
+      "lz_aws_account_id_env": "842522700642",
+      "lz_aws_subnet_env": "10.205.0.0/20",
+      "lz_ftp_bucket_environment": "production",
+      "mp_aws_subnet_env": "10.200.0.0/20",
       "webgate_no_instances": 1,
       "webgate_default_iops": 3000,
       "webgate_u01_size": 100,
@@ -127,11 +150,94 @@
       "destination_cidr": "0.0.0.0/0"
     }
   },
+  "ec2_sg_ftp_ingress_rules": {
+    "FTP_20": {
+      "from_port": 20,
+      "to_port": 20,
+      "protocol": "TCP"
+    },
+    "FTP_21": {
+      "from_port": 21,
+      "to_port": 21,
+      "protocol": "TCP"
+    },
+    "SSH_22": {
+      "from_port": 22,
+      "to_port": 22,
+      "protocol": "TCP"
+    }
+  },
+  "ec2_sg_ftp_egress_rules": {
+    "FTP_20": {
+      "from_port": 20,
+      "to_port": 20,
+      "protocol": "TCP",
+      "destination_cidr": "10.200.0.0/13"
+    },
+    "FTP_21": {
+      "from_port": 21,
+      "to_port": 21,
+      "protocol": "TCP",
+      "destination_cidr": "10.200.0.0/13"
+    },
+    "SSH_22": {
+      "from_port": 22,
+      "to_port": 22,
+      "protocol": "TCP",
+      "destination_cidr": "10.200.0.0/13"
+    },
+    "TCP_443": {
+      "from_port": 443,
+      "to_port": 443,
+      "protocol": "TCP",
+      "destination_cidr": "0.0.0.0/0"
+    }
+  },
   "webgate_ebs": {
     "u01": {
       "mapping": "u01",
       "type": "io2",
       "device_name": "/dev/sdh"
+    }
+  },
+  "cloudwatch_ec2": {
+    "cpu": {
+      "eval_periods": 1,
+      "period": 60,
+      "threshold": 80
+    },
+    "mem": {
+      "eval_periods": 2,
+      "period": 60,
+      "threshold": 10
+    },
+    "disk": {
+      "eval_periods": 2,
+      "period": 60,
+      "threshold": 15
+    },
+    "iowait": {
+      "eval_periods": 6,
+      "period": 60,
+      "threshold": 90
+    },
+    "insthc": {
+      "eval_periods": 3,
+      "period": 60,
+      "threshold": 1
+    },
+    "syshc": {
+      "eval_periods": 3,
+      "period": 60,
+      "threshold": 1
+    }
+  },
+  "cw_log_groups": {
+    "cwagent-var-log-messages": {
+      "retention_days": 30
+    },
+    "cwagent-var-log-secure": {
+      "retention_days": 90
     }
   }
 }

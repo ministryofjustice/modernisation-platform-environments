@@ -49,9 +49,9 @@ variable "key_name" {
   description = "Key to access EC2s in ECS cluster"
 }
 
-variable "lb_tg_name" {
+variable "lb_tg_arn" {
   type        = string
-  description = "Load balancer target group name used by ECS service"
+  description = "Load balancer target group ARN used by ECS service"
 }
 
 variable "network_mode" {
@@ -153,4 +153,3 @@ variable "ecs_scaling_mem_threshold" {
   type        = string
   description = "The utilised memory threshold for ec2 cluster scaling"
 }
-

@@ -1,0 +1,24 @@
+{
+  "accounts": {
+    "development": {
+      "instance_type": "t2.nano",
+      "moj_ip": "81.134.202.29/32",
+      "db_name": "tipstaffdbdev",
+      "allocated_storage": "20",
+      "storage_type": "gp2",
+      "identifier": "tipstaff-db-dev",
+      "engine": "postgres",
+      "engine_version": "10.21",
+      "instance_class": "db.t3.micro"
+    },
+    "test": {
+      "example_var": "test-data"
+    },
+    "preproduction": {
+      "example_var": "preproduction-data"
+    },
+    "production": {
+      "example_var": "production-data"
+    }
+  }
+}

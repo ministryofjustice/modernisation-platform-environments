@@ -10,9 +10,11 @@
 /terraform/environments/digital-prison-reporting @ministryofjustice/hmpps-digital-prison-reporting @ministryofjustice/modernisation-platform
 /terraform/environments/equip @ministryofjustice/modernisation-platform-engineers @ministryofjustice/modernisation-platform
 /terraform/environments/example @ministryofjustice/modernisation-platform @ministryofjustice/modernisation-platform
+/terraform/environments/laa-oem @ministryofjustice/laa-ccms-migration-team @ministryofjustice/modernisation-platform
 /terraform/environments/long-term-storage @ministryofjustice/modernisation-platform @ministryofjustice/modernisation-platform
 /terraform/environments/maatdb @ministryofjustice/laa-aws-infrastructure @ministryofjustice/modernisation-platform
 /terraform/environments/mlra @ministryofjustice/laa-aws-infrastructure @ministryofjustice/modernisation-platform
+/terraform/environments/nomis-combined-reporting @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
 /terraform/environments/nomis @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
 /terraform/environments/oas @ministryofjustice/laa-aws-infrastructure @ministryofjustice/modernisation-platform
 /terraform/environments/oasys @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
@@ -24,6 +26,7 @@
 /terraform/environments/sprinkler @ministryofjustice/modernisation-platform @ministryofjustice/modernisation-platform
 /terraform/environments/tariff @ministryofjustice/cica @ministryofjustice/modernisation-platform
 /terraform/environments/testing @ministryofjustice/modernisation-platform @ministryofjustice/modernisation-platform
+/terraform/environments/tipstaff @ministryofjustice/dts-heritage-services @ministryofjustice/modernisation-platform
 /terraform/environments/xhibit-portal @ministryofjustice/xhibit-portal-dev @ministryofjustice/modernisation-platform
 **/providers.tf @ministryofjustice/modernisation-platform
 **/backend.tf @ministryofjustice/modernisation-platform

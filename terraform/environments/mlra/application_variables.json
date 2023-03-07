@@ -21,19 +21,15 @@
       "network_mode": "bridge",
       "server_port": 8080,
       "app_count": 1,
-      "lb_tg_name": "mlra-alb-tg",
       "appscaling_min_capacity": 1,
       "appscaling_max_capacity": 6,
       "ec2_scaling_cpu_threshold": 75,
       "ec2_scaling_mem_threshold": 61,
       "ecs_scaling_cpu_threshold": 80,
       "ecs_scaling_mem_threshold": 80,
-      "mp_vpc_id": "vpc-06febffe7b87ab37f",
-      "lz_vpc_cidr": "10.202.0.0/20",
-      "lz_workspace_ingress_cidr": "10.200.0.0/20",
-      "mp_laa_int_endpoint_security_group": "sg-0754d9a309704addd",
-      "mp_private_2a_subnet_id": "subnet-06594eda5221bd3c9",
-      "nlb_prevent_deletion": false
+      "moj_vpn_cidr": "81.134.202.29/32",
+      "nlb_prevent_deletion": false,
+      "pagerduty_integration_key_name": "laa_mlra_nonprod_alarms"
     },
     "test": {
       "example_var": "test-data",
@@ -56,19 +52,15 @@
       "network_mode": "bridge",
       "server_port": 8080,
       "app_count": 1,
-      "lb_tg_name": "mlra-alb-tg",
       "appscaling_min_capacity": 2,
       "appscaling_max_capacity": 6,
       "ec2_scaling_cpu_threshold": 75,
       "ec2_scaling_mem_threshold": 61,
       "ecs_scaling_cpu_threshold": 80,
       "ecs_scaling_mem_threshold": 80,
-      "mp_vpc_id": "vpc-03b493ca0dc364b78",
-      "lz_vpc_cidr": "10.203.0.0/20",
-      "lz_workspace_ingress_cidr": "10.200.0.0/20",
-      "mp_laa_int_endpoint_security_group": "sg-0a8e105b2345a1840",
-      "mp_private_2a_subnet_id": "subnet-082f917f7abd1cd68",
-      "nlb_prevent_deletion": false
+      "moj_vpn_cidr": "81.134.202.29/32",
+      "nlb_prevent_deletion": false,
+      "pagerduty_integration_key_name": "laa_mlra_nonprod_alarms"
     },
     "preproduction": {
       "example_var": "preproduction-data",
@@ -91,19 +83,15 @@
       "network_mode": "bridge",
       "server_port": 8080,
       "app_count": 1,
-      "lb_tg_name": "mlra-alb-tg",
       "appscaling_min_capacity": 2,
       "appscaling_max_capacity": 6,
       "ec2_scaling_cpu_threshold": 75,
       "ec2_scaling_mem_threshold": 61,
       "ecs_scaling_cpu_threshold": 80,
       "ecs_scaling_mem_threshold": 80,
-      "mp_vpc_id": "vpc-045c1efc32aa54598",
-      "lz_vpc_cidr": "10.206.0.0/20",
-      "lz_workspace_ingress_cidr": "10.200.16.0/20",
-      "mp_laa_int_endpoint_security_group": "sg-0607158c98d5df1bb",
-      "mp_private_2a_subnet_id": "subnet-063bec8ad1ef41959",
-      "nlb_prevent_deletion": true
+      "moj_vpn_cidr": "81.134.202.29/32",
+      "nlb_prevent_deletion": true,
+      "pagerduty_integration_key_name": "laa_mlra_nonprod_alarms"
     },
     "production": {
       "example_var": "production-data",
@@ -126,19 +114,15 @@
       "network_mode": "bridge",
       "server_port": 8080,
       "app_count": 1,
-      "lb_tg_name": "mlra-alb-tg",
       "appscaling_min_capacity": 2,
       "appscaling_max_capacity": 6,
       "ec2_scaling_cpu_threshold": 75,
       "ec2_scaling_mem_threshold": 61,
       "ecs_scaling_cpu_threshold": 80,
       "ecs_scaling_mem_threshold": 80,
-      "mp_vpc_id": "vpc-0fe62e6799b319460",
-      "lz_vpc_cidr": "10.205.0.0/20",
-      "lz_workspace_ingress_cidr": "10.200.16.0/20",
-      "mp_laa_int_endpoint_security_group": "sg-0e7c18081199d1cf1",
-      "mp_private_2a_subnet_id": "subnet-04740cd676f9d84bc",
-      "nlb_prevent_deletion": true
+      "moj_vpn_cidr": "81.134.202.29/32",
+      "nlb_prevent_deletion": true,
+      "pagerduty_integration_key_name": "laa_mlra_prod_alarms"
     }
   }
 }

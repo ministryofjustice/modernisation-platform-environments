@@ -5,8 +5,9 @@
       "ec2amiid": "ami-0a2128d7b4dd8a56c",
       "ec2instancetype": "r5a.large",
       "bucketname": "laa-oracle-software",
-      "orahomesize": "150",
-      "stageesize": "200",
+      "orahomesize": "200",
+      "orahome_snapshot": "snap-062e6d36e02d32898",
+      "stageesize": "150",
       "managementcidr": "10.200.0.0/20",
       "outbound_access_cidr": "0.0.0.0/0",
       "inbound_cidr_lz": "10.202.0.0/20",
@@ -30,7 +31,8 @@
       "rds_snapshot_name": "man-oas-migration-laws-3029",
       "lz_vpc_cidr": "10.202.0.0/20",
       "deletion_protection": "false",
-      "dashboard_widget_period": 60
+      "dashboard_widget_period": 60,
+      "pagerduty_integration_key_name": "laa_oas_nonprod_alarms"
     },
     "test": {
       "example_var": "test-data"
@@ -39,7 +41,8 @@
       "example_var": "preproduction-data"
     },
     "production": {
-      "example_var": "production-data"
+      "example_var": "production-data",
+      "pagerduty_integration_key_name": "laa_oas_prod_alarms"
     }
   }
 }

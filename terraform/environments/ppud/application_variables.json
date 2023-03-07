@@ -1,16 +1,25 @@
 {
-    "accounts": {
-        "development": {
-          "example_var": "dev-data"
-        },
-        "test": {
-          "example_var": "test-data"
-        },
-        "preproduction": {
-          "example_var": "preproduction-data"
-        },
-        "production": {
-          "example_var": "production-data"
-        }
+  "accounts": {
+    "development": {
+      "directory_service_name": "UKGOV.DEV",
+      "SES_domain": "internaltest.ppud.justice.gov.uk",
+      "DEV_WAM_ALB": "WAM-ALB",
+      "PPUD_Internal_ALB": "PPUD-ALB",
+      "alb_intances_wam": "aws_instance.s609693lo6vw102"
+    },
+    "test": {
+      "example_var": "test-data"
+    },
+    "preproduction": {
+      "directory_service_name": "PPUD.UAT",
+      "SES_domain": "uat.ppud.justice.gov.uk",
+      "DEV_WAM_ALB": "WAM-ALB",
+      "PPUD_Internal_ALB": "PPUD-ALB",
+      "alb_intances_wam": "i-05471f2d0d8f365c0",
+      "alb_intances_ppud": "i-04d9127f2311beda5"
+    },
+    "production": {
+      "example_var": "production-data"
     }
+  }
 }

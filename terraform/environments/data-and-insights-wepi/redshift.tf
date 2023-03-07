@@ -1,7 +1,7 @@
 # Redshift subnet group configuration
 resource "aws_redshift_subnet_group" "wepi_redhsift_subnet_group" {
   name       = "wepi-redshift-${local.environment}-subnet-group"
-  subnet_ids = data.aws_subnets.wepi_vpc_subnets_data_all.ids
+  subnet_ids = data.aws_subnets.shared-data.ids
 
   tags = merge(
     local.tags,
@@ -14,7 +14,7 @@ resource "aws_redshift_subnet_group" "wepi_redhsift_subnet_group" {
 # Redshift parameter group
 resource "aws_redshift_parameter_group" "wepi_redshift_param_group" {
   name   = "wepi-redshift-${local.environment}-param-group"
-  family = local.app_data.accounts[local.environment].redshift_param_group_family
+  family = local.application_data.accounts[local.environment].redshift_param_group_family
 
   parameter {
     name  = "require_ssl"
@@ -41,9 +41,9 @@ resource "aws_redshift_cluster" "wepi_redshift_cluster" {
   master_username = "wepidbadmin"
   master_password = random_password.wepi_redshift_admin_pw.result
 
-  node_type       = local.app_data.accounts[local.environment].redshift_node_type
-  cluster_type    = local.app_data.accounts[local.environment].redshift_cluster_node_count > 1 ? "multi-node" : "single-node"
-  number_of_nodes = local.app_data.accounts[local.environment].redshift_cluster_node_count
+  node_type       = local.application_data.accounts[local.environment].redshift_node_type
+  cluster_type    = local.application_data.accounts[local.environment].redshift_cluster_node_count > 1 ? "multi-node" : "single-node"
+  number_of_nodes = local.application_data.accounts[local.environment].redshift_cluster_node_count
 
   encrypted  = true
   kms_key_id = aws_kms_key.wepi_kms_cmk.arn
@@ -59,8 +59,8 @@ resource "aws_redshift_cluster" "wepi_redshift_cluster" {
 
   aqua_configuration_status = "enabled"
 
-  automated_snapshot_retention_period = local.app_data.accounts[local.environment].redshift_auto_snapshot_retention
-  manual_snapshot_retention_period    = local.app_data.accounts[local.environment].redshift_manual_snapshot_retention
+  automated_snapshot_retention_period = local.application_data.accounts[local.environment].redshift_auto_snapshot_retention
+  manual_snapshot_retention_period    = local.application_data.accounts[local.environment].redshift_manual_snapshot_retention
   skip_final_snapshot                 = true
   /* 
   logging {
@@ -88,7 +88,7 @@ resource "aws_redshift_cluster" "wepi_redshift_cluster" {
 resource "aws_redshift_snapshot_schedule" "wepi_redshift_snapshot_sched" {
   identifier = "wepi-redshift-${local.environment}-snapshot-sched"
   definitions = [
-    local.app_data.accounts[local.environment].redshift_snapshot_cron
+    local.application_data.accounts[local.environment].redshift_snapshot_cron
   ]
 
   tags = local.tags
@@ -101,10 +101,10 @@ resource "aws_redshift_snapshot_schedule_association" "wepi_redshift_snapshot_as
 
 # Redshift cluster pause and resume
 resource "aws_redshift_scheduled_action" "wepi_redshift_pause_schedule" {
-  count = local.app_data.accounts[local.environment].redshift_pause_cluster_enabled ? 1 : 0
+  count = local.application_data.accounts[local.environment].redshift_pause_cluster_enabled ? 1 : 0
 
   name     = "wepi-redshift-${local.environment}-pause-schedule"
-  schedule = local.app_data.accounts[local.environment].redshift_pause_cluster_cron
+  schedule = local.application_data.accounts[local.environment].redshift_pause_cluster_cron
   iam_role = aws_iam_role.wepi_iam_role_redshift_scheduler.arn
 
   target_action {
@@ -115,10 +115,10 @@ resource "aws_redshift_scheduled_action" "wepi_redshift_pause_schedule" {
 }
 
 resource "aws_redshift_scheduled_action" "wepi_redshift_resume_schedule" {
-  count = local.app_data.accounts[local.environment].redshift_pause_cluster_enabled ? 1 : 0
+  count = local.application_data.accounts[local.environment].redshift_pause_cluster_enabled ? 1 : 0
 
   name     = "wepi-redshift-${local.environment}-resume-schedule"
-  schedule = local.app_data.accounts[local.environment].redshift_resume_cluster_cron
+  schedule = local.application_data.accounts[local.environment].redshift_resume_cluster_cron
   iam_role = aws_iam_role.wepi_iam_role_redshift_scheduler.arn
 
   target_action {

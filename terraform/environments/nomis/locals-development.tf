@@ -53,7 +53,6 @@ locals {
         }
         ami_name  = "RHEL-6.10_HVM-*"
         ami_owner = "309956199498"
-        # branch   = var.BRANCH_NAME # comment in if testing ansible
       }
       dev-redhat-rhel79 = {
         tags = {
@@ -64,7 +63,6 @@ locals {
         }
         ami_name  = "RHEL-7.9_HVM-*"
         ami_owner = "309956199498"
-        # branch   = var.BRANCH_NAME # comment in if testing ansible
       }
       dev-base-rhel79 = {
         tags = {
@@ -77,7 +75,9 @@ locals {
           server-type       = "base-rhel79"
         }
         ami_name = "base_rhel_7_9_*"
-        # branch   = var.BRANCH_NAME # comment in if testing ansible
+        autoscaling_group = {
+          desired_capacity = 1
+        }
       }
       dev-base-rhel610 = {
         tags = {
@@ -94,7 +94,6 @@ locals {
           metadata_options_http_tokens = "optional"
         }
         ami_name = "base_rhel_6_10*"
-        # branch   = var.BRANCH_NAME # comment in if testing ansible
       }
     }
     ec2_jumpservers = {

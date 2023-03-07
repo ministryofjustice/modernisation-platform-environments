@@ -1,59 +1,71 @@
-# This data sources allows us to get the Modernisation Platform account information for use elsewhere
-# (when we want to assume a role in the MP, for instance)
-data "aws_organizations_organization" "root_account" {}
-
-# Get the environments file from the main repository
-data "http" "environments_file" {
-  url = "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/${local.application_name}.json"
-}
-
-data "aws_caller_identity" "oidc_session" {
-  provider = aws.oidc-session
-}
-
-data "aws_caller_identity" "modernisation_platform" {
-  provider = aws.modernisation-platform
-}
+#### This file can be used to store locals specific to the member account ####
 
 locals {
-
-  application_name = "mlra"
-
-  environment_management = jsondecode(data.aws_secretsmanager_secret_version.environment_management.secret_string)
-
-  # Stores modernisation platform account id for setting up the modernisation-platform provider
-  modernisation_platform_account_id = data.aws_ssm_parameter.modernisation_platform_account_id.value
-
-  # This takes the name of the Terraform workspace (e.g. core-vpc-production), strips out the application name (e.g. core-vpc), and checks if
-  # the string leftover is `-production`, if it isn't (e.g. core-vpc-non-production => -non-production) then it sets the var to false.
-  is-production    = substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-production"
-  is-preproduction = substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-preproduction"
-  is-test          = substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-test"
-  is-development   = substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-development"
-
-  # Merge tags from the environment json file with additional ones
-  tags = merge(
-    jsondecode(data.http.environments_file.response_body).tags,
-    { "is-production" = local.is-production },
-    { "environment-name" = terraform.workspace },
-    { "source-code" = "https://github.com/ministryofjustice/modernisation-platform-environments" }
-  )
-
-  environment     = trimprefix(terraform.workspace, "${var.networking[0].application}-")
-  vpc_name        = var.networking[0].business-unit
-  subnet_set      = var.networking[0].set
-  vpc_all         = "${local.vpc_name}-${local.environment}"
-  subnet_set_name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}"
-
-  is_live       = [substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-production" || substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-preproduction" ? "live" : "non-live"]
-  provider_name = "core-vpc-${local.environment}"
-  # sns variables
-  pagerduty_integration_keys = jsondecode(data.aws_secretsmanager_secret_version.pagerduty_integration_keys.secret_string)
-  sns_topic_name             = "${local.application_name}-${local.environment}-alerting-topic"
-  # environment specfic variables
-  # example usage:
-  # example_data = local.application_data.accounts[local.environment].example_var
-  application_data     = fileexists("./application_variables.json") ? jsondecode(file("./application_variables.json")) : {}
   application_test_url = "https://mlra.dev.legalservices.gov.uk"
 
+  # ECS local variables for ecs.tf
+  ec2_ingress_rules = {
+    "cluster_ec2_lb_ingress" = {
+      description     = "Cluster EC2 ingress rule"
+      from_port       = 22
+      to_port         = 22
+      protocol        = "tcp"
+      cidr_blocks     = [data.aws_vpc.shared.cidr_block]
+      security_groups = []
+    }
+    "cluster_ec2_lb_ingress_2" = {
+      description     = "Cluster EC2 ingress rule 2"
+      from_port       = 8080
+      to_port         = 8080
+      protocol        = "tcp"
+      cidr_blocks     = [data.aws_vpc.shared.cidr_block]
+      security_groups = []
+    }
+    "cluster_ec2_lb_ingress_3" = {
+      description     = "Cluster EC2 ingress rule 3"
+      from_port       = 32768
+      to_port         = 61000
+      protocol        = "tcp"
+      cidr_blocks     = [data.aws_vpc.shared.cidr_block]
+      security_groups = [module.alb.security_group.id]
+    }
+    "cluster_ec2_lb_ingress_4" = {
+      description     = "Cluster EC2 ingress rule 4"
+      from_port       = 1521
+      to_port         = 1521
+      protocol        = "tcp"
+      cidr_blocks     = [data.aws_vpc.shared.cidr_block]
+      security_groups = [module.alb.security_group.id]
+    }
+  }
+  ec2_egress_rules = {
+    "cluster_ec2_lb_egress" = {
+      description     = "Cluster EC2 loadbalancer egress rule"
+      from_port       = 0
+      to_port         = 0
+      protocol        = "-1"
+      cidr_blocks     = ["0.0.0.0/0"]
+      security_groups = []
+    }
+  }
+
+  user_data = base64encode(templatefile("user_data.sh", {
+    app_name = local.application_name
+  }))
+
+  task_definition = templatefile("task_definition.json", {
+    app_name            = local.application_name
+    ecr_url             = local.application_data.accounts[local.environment].ecr_url
+    docker_image_tag    = local.application_data.accounts[local.environment].docker_image_tag
+    region              = local.application_data.accounts[local.environment].region
+    maat_api_end_point  = local.application_data.accounts[local.environment].maat_api_end_point
+    maat_db_url         = local.application_data.accounts[local.environment].maat_db_url
+    maat_db_password    = data.aws_ssm_parameter.db_password.value
+    maat_libra_wsdl_url = local.application_data.accounts[local.environment].maat_libra_wsdl_url
+    sentry_env          = local.environment
+  })
+
+  # SNS local variables for cloudwatch.tf
+  pagerduty_integration_keys     = jsondecode(data.aws_secretsmanager_secret_version.pagerduty_integration_keys.secret_string)
+  pagerduty_integration_key_name = local.application_data.accounts[local.environment].pagerduty_integration_key_name
 }

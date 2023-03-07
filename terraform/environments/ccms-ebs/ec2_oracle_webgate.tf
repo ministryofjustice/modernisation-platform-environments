@@ -8,13 +8,13 @@ resource "aws_instance" "ec2_webgate" {
   monitoring                  = true
   ebs_optimized               = false
   associate_public_ip_address = false
-  iam_instance_profile        = aws_iam_instance_profile.iam_instace_profile_oracle_base.name
+  iam_instance_profile        = aws_iam_instance_profile.iam_instace_profile_ccms_base.name
 
   # Due to a bug in terraform wanting to rebuild the ec2 if more than 1 ebs block is attached, we need the lifecycle clause below
   lifecycle {
     ignore_changes = [ebs_block_device]
   }
-  user_data_replace_on_change = true
+  user_data_replace_on_change = false
   user_data                   = <<EOF
 #!/bin/bash
 
@@ -27,6 +27,7 @@ unzip awscliv2.zip
 ./aws/install
 wget https://s3.amazonaws.com/amazoncloudwatch-agent/oracle_linux/amd64/latest/amazon-cloudwatch-agent.rpm
 rpm -U ./amazon-cloudwatch-agent.rpm
+/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c ssm:cloud-watch-config
 
 systemctl stop amazon-ssm-agent
 rm -rf /var/lib/amazon/ssm/ipc/
@@ -84,12 +85,28 @@ EOF
 
 
   tags = merge(local.tags,
-    { Name = lower(format("ec2-%s-%s-webgate-%s", local.application_name, local.environment, count.index + 1)) }
+    { Name = lower(format("ec2-%s-%s-webgate-%s", local.application_name, local.environment, count.index + 1)) },
+    { instance-scheduling = local.application_data.accounts[local.environment].instance-scheduling },
+    { backup = "true" }
   )
   depends_on = [aws_security_group.ec2_sg_webgate]
 
 }
+/*
+module "cw-webgate-ec2" {
+  source = "./modules/cw-ec2"
 
+  name        = "ec2-webgate"
+  topic       = aws_sns_topic.cw_alerts.arn
+  instanceIds = join(",", [for instance in aws_instance.ec2_webgate : instance.id])
+
+  for_each     = local.application_data.cloudwatch_ec2
+  metric       = each.key
+  eval_periods = each.value.eval_periods
+  period       = each.value.period
+  threshold    = each.value.threshold
+}
+*/
 /*
 resource "aws_ebs_volume" "webgate_create" {
   lifecycle {

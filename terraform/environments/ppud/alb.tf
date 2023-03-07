@@ -1,4 +1,4 @@
-
+/*
 # PPUD ALB Configuration
 
 resource "aws_lb" "PPUD-ALB" {
@@ -7,7 +7,7 @@ resource "aws_lb" "PPUD-ALB" {
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.PPUD-ALB.id]
-  subnets            = [data.aws_subnet.public_subnets_a.id, data.aws_subnet.public_subnets_b.id]
+  subnets            = [data.aws_subnet.public_subnets_b.id, data.aws_subnet.public_subnets_c.id]
 
   enable_deletion_protection = false
 
@@ -39,6 +39,22 @@ resource "aws_lb_target_group" "PPUD-Target-Group" {
     type            = "lb_cookie"
     enabled         = true
   }
+
+  health_check {
+    enabled             = true
+    path                = "/"
+    interval            = 30
+    protocol            = "HTTPS"
+    port                = 443
+    timeout             = 5
+    healthy_threshold   = 5
+    unhealthy_threshold = 2
+    matcher             = "302"
+  }
+  tags = {
+    Name = "${var.networking[0].business-unit}-${local.environment}"
+  }
+
 }
 
 resource "aws_lb_target_group_attachment" "PPUD-PORTAL" {
@@ -88,6 +104,21 @@ resource "aws_lb_target_group" "WAM-Target-Group" {
   port     = 80
   protocol = "HTTP"
   vpc_id   = data.aws_vpc.shared.id
+
+  health_check {
+    enabled             = true
+    path                = "/"
+    interval            = 30
+    protocol            = "HTTPS"
+    port                = 443
+    timeout             = 5
+    healthy_threshold   = 5
+    unhealthy_threshold = 2
+    matcher             = "302"
+  }
+  tags = {
+    Name = "${var.networking[0].business-unit}-${local.environment}"
+  }
 }
 
 resource "aws_lb_target_group_attachment" "WAM-Portal" {
@@ -95,3 +126,5 @@ resource "aws_lb_target_group_attachment" "WAM-Portal" {
   target_id        = aws_instance.s609693lo6vw105[0].id
   port             = 80
 }
+
+*/

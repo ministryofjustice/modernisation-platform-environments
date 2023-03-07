@@ -46,8 +46,8 @@ resource "aws_iam_policy" "ec2_ssm_policy" {
       ]
     }
   )
-
 }
+
 resource "aws_iam_role_policy_attachment" "ssm_logging_oracle_base" {
   role       = aws_iam_role.role_stsassume_oracle_base.name
   policy_arn = aws_iam_policy.ec2_ssm_policy.arn
@@ -77,15 +77,54 @@ resource "aws_iam_role" "role_stsassume_oracle_base" {
     { Name = lower(format("RoleSsm-%s-%s-OracleBase", local.application_name, local.environment)) }
   )
 }
+
 resource "aws_iam_role_policy_attachment" "ssm_policy_oracle_base" {
   role       = aws_iam_role.role_stsassume_oracle_base.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
-resource "aws_iam_instance_profile" "iam_instace_profile_oracle_base" {
-  name = "iam_instace_profile_oracle_base"
+
+# Attach Secrets Manager Policy to Role
+resource "aws_iam_role_policy_attachment" "secrets_manager_policy_oracle_base" {
+  role       = aws_iam_role.role_stsassume_oracle_base.name
+  policy_arn = "arn:aws:iam::aws:policy/SecretsManagerReadWrite"
+}
+
+resource "aws_iam_instance_profile" "iam_instace_profile_ccms_base" {
+  name = "iam_instace_profile_ccms_base"
   role = aws_iam_role.role_stsassume_oracle_base.name
   path = "/"
   tags = merge(local.tags,
     { Name = lower(format("IamProfile-%s-%s-OracleBase", local.application_name, local.environment)) }
   )
 }
+
+resource "aws_iam_policy" "cw_logging_policy" {
+  name        = "cw_log_policy-${local.environment}"
+  description = "allows EC2 CW logging"
+
+  policy = jsonencode(
+    {
+      "Version" : "2012-10-17",
+      "Statement" : [
+        {
+          "Effect" : "Allow",
+          "Action" : [
+            "logs:CreateLogGroup",
+            "logs:CreateLogStream",
+            "logs:DescribeLogGroups",
+            "logs:DescribeLogStreams",
+            "logs:PutLogEvents"
+          ],
+          "Resource" : [
+            "arn:aws:logs:*:*:*"
+          ]
+        }
+      ]
+    }
+  )
+}
+resource "aws_iam_role_policy_attachment" "cw_logging_policy" {
+  role       = aws_iam_role.role_stsassume_oracle_base.name
+  policy_arn = aws_iam_policy.cw_logging_policy.arn
+}
+

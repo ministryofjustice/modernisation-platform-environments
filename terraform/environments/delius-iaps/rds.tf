@@ -16,7 +16,7 @@ resource "aws_db_instance" "iaps" {
   auto_minor_version_upgrade  = local.application_data.accounts[local.environment].db_auto_minor_version_upgrade
   allow_major_version_upgrade = local.application_data.accounts[local.environment].db_allow_major_version_upgrade
   backup_window               = local.application_data.accounts[local.environment].db_backup_window
-  backup_retention_period     = local.application_data.accounts[local.environment].db_retention_period
+  backup_retention_period     = local.application_data.accounts[local.environment].db_backup_retention_period
   #checkov:skip=CKV_AWS_133: "backup_retention enabled, can be edited it application_variables.json"
   iam_database_authentication_enabled = local.application_data.accounts[local.environment].db_iam_database_authentication_enabled
   #checkov:skip=CKV_AWS_161: "iam auth enabled, but optional"
