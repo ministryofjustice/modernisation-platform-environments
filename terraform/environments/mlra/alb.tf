@@ -1,9 +1,15 @@
+provider "aws" {
+  alias  = "us-east-1"
+  region = "us-east-1"
+}
+
 module "alb" {
   source = "./modules/alb"
   providers = {
     aws.bucket-replication = aws
     aws.core-vpc = aws.core-vpc
     aws.core-network-services = aws.core-network-services
+    aws.us-east-1 = aws.us-east-1
   }
 
   vpc_all                          = local.vpc_all
