@@ -143,7 +143,7 @@ tasks:
       $VerbosePreference = "Continue"
 
       $NDeliusConfigFile = "C:\Program Files (x86)\I2N\IapsNDeliusInterface\Config\NDELIUSIF.xml"
-      $configXML = [xml](Get-Content $INDeliusConfigFile)
+      $configXML = [xml](Get-Content $NDeliusConfigFile)
       $configXML.DLLDEF.INTERFACES.INTERFACE.USER = (Get-SSMParameter -Name "/NDeliusInterface/Interface/user" -WithDecryption $true).Value
       $configXML.DLLDEF.INTERFACES.INTERFACE.PASSWORD = (Get-SSMParameter -Name "/NDeliusInterface/Interface/password" -WithDecryption $true).Value
       $configXML.DLLDEF.INTERFACES.INTERFACE.REPLICAPASSWORDCODED = (Get-SSMParameter -Name "/NDeliusInterface/Interface/replicapwdcoded" -WithDecryption $true).Value
