@@ -1072,7 +1072,7 @@ module "kinesis_cdc_domain_stream" {
 module "dynamo_tab_domain_registry" {
   source              = "./modules/dynamo_tables"
   create_table        = true
-  autoscaling_enabled = false  
+  autoscaling_enabled = false
   name                = "${local.project}-domain-registry-${local.environment}"
 
   hash_key    = "primaryId"
@@ -1102,24 +1102,24 @@ module "dynamo_tab_domain_registry" {
     attribute_name = "TimeToExist"
     enabled        = false
   }
-  
+
   global_secondary_indexes = [
     {
-      name               = "primaryId-Index"
-      hash_key           = "primaryId"
-      range_key          = "type"
-      write_capacity     = 10
-      read_capacity      = 10      
-      projection_type    = "All"
+      name            = "primaryId-Index"
+      hash_key        = "primaryId"
+      range_key       = "type"
+      write_capacity  = 10
+      read_capacity   = 10
+      projection_type = "All"
     },
     {
-      name               = "secondaryId-Index"
-      hash_key           = "secondaryId"
-      range_key          = "type"
-      write_capacity     = 10
-      read_capacity      = 10      
-      projection_type    = "All"
-    }    
+      name            = "secondaryId-Index"
+      hash_key        = "secondaryId"
+      range_key       = "type"
+      write_capacity  = 10
+      read_capacity   = 10
+      projection_type = "All"
+    }
   ]
 
   tags = merge(
