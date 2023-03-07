@@ -111,7 +111,6 @@ EOF
 }
 
 
-
 module "cw-ebsapps-ec2" {
   source = "./modules/cw-ec2"
 
