@@ -20,9 +20,9 @@ resource "aws_cloudwatch_metric_alarm" "cpu_utilization" {
   period              = var.period
   threshold           = var.threshold
   alarm_actions       = [local.topic]
-#  dimensions = {
-#    instanceId = tostring(local.instanceIds)
-#  }
+  #  dimensions = {
+  #    instanceId = tostring(local.instanceIds)
+  #  }
 }
 
 # Low Available Memory Alarm
