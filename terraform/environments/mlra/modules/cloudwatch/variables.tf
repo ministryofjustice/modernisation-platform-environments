@@ -2,6 +2,11 @@ variable "region" {
   default = "eu-west-2"
 
 }
+variable "tags" {
+  type        = map(string)
+  description = "Common tags to be used by all resources"
+}
+
 variable "pClusterName" {
   type    = string
   default = ""
@@ -24,6 +29,13 @@ variable "pTargetGroupName" {
 variable "appnameenv" {
   default = ""
 
+}
+variable "sns_topic_name" {
+  default = ""
+
+}
+
+variable "pagerduty_integration_key" {
 }
 
 variable "pECSCPUAlarmThreshold" {
@@ -85,10 +97,4 @@ variable "pALBTargetResponseTimeThresholdMaximum" {
   description = "ALB Target Response Time Alarm Threshold Maximum"
   type        = number
   default     = "60"
-}
-
-variable "snsTopicName" {
-  description = "Name of the SNS Topic"
-  type        = string
-
 }

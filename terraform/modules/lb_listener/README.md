@@ -139,3 +139,5 @@ module "lb_listener" {
   tags              = try(each.value.tags, local.tags)
 }
 ```
+
+Alarms are being configured in this module. You can specify the alarm actions in the local.lb_listeners_sns_topic[local.environment] "sns_topic" value.
