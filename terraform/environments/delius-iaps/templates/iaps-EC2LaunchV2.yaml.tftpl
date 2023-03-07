@@ -125,3 +125,44 @@ tasks:
       Stop-Service -Name IMIapsInterfaceWinService -Force
       Set-Service -Name IMIapsInterfaceWinService -StartupType Disabled
 %{endif}
+
+  - frequency: once
+    type: powershell
+    runAs: admin
+    content: |-
+      # Configure NDelius Interface
+      $ErrorActionPreference = "Stop"
+      $VerbosePreference = "Continue"
+
+      $NDeliusConfigFile = "C:\Program Files (x86)\I2N\IapsNDeliusInterface\Config\NDELIUSIF.xml"
+      $configXML = [xml](Get-Content $INDeliusConfigFile)
+      $configXML.DLLDEF.INTERFACE.USER = (Get-SSMParameter -Name "/NDeliusInterface/Interface/user" -WithDecryption $true).Value
+      $configXML.DLLDEF.INTERFACE.PASSWORD = (Get-SSMParameter -Name "/NDeliusInterface/Interface/password" -WithDecryption $true).Value
+      $configXML.DLLDEF.INTERFACE.REPLICAPASSWORDCODED = (Get-SSMParameter -Name "/NDeliusInterface/Interface/replicapwdcoded" -WithDecryption $true).Value
+      $configXML.DLLDEF.INTERFACE.SOAPPASSCODED = (Get-SSMParameter -Name "/NDeliusInterface/Interface/soappwdcoded" -WithDecryption $true).Value
+      $configXML.DLLDEF.INTERFACE.PASSWORDCODED = (Get-SSMParameter -Name "/NDeliusInterface/Interface/pwdcoded" -WithDecryption $true).Value
+
+      $InterfaceODBCdsn = (Get-SSMParameter -Name "/NDeliusInterface/Interface/ODBC/dsn" -WithDecryption $true).Value
+      $InterfaceODBCuid = (Get-SSMParameter -Name "/NDeliusInterface/Interface/ODBC/uid" -WithDecryption $true).Value
+      $InterfaceODBCpwd = (Get-SSMParameter -Name "/NDeliusInterface/Interface/ODBC/pwd" -WithDecryption $true).Value
+      $configXML.DLLDEF.INTERFACE.ODBC = "DSN=$${InterfaceODBCdsn};uid=$${InterfaceODBCuid};pwd=$${InterfaceODBCpwd}"
+
+      $configXML.DLLDEF.EMAIL.SMTPUSER = (Get-SSMParameter -Name "/NDeliusInterface/Email/smtpuser" -WithDecryption $true).Value
+      $configXML.DLLDEF.EMAIL.PASSWORD = (Get-SSMParameter -Name "/NDeliusInterface/Email/password" -WithDecryption $true).Value
+      $configXML.DLLDEF.EMAIL.PASSWORDCODED = (Get-SSMParameter -Name "/NDeliusInterface/Email/passwordcoded" -WithDecryption $true).Value
+      $configXML.save($NDeliusConfigFile)
+
+%{if environment == "development"}
+      $service = Restart-Service -Name NDeliusInterfaceIapsWinService -Force -PassThru
+      if ($service.Status -match "Running") {
+          Write-Host('Restart of NDeliusInterfaceIapsWinService successful')
+      } else {
+          Write-Host('Error - Failed to restart NDeliusInterfaceIapsWinService - see logs')
+          Exit 1
+      }
+%{endif}
+%{if environment != "development"}
+      # TODO: remove or edit if statement once migration gets a green light
+      Stop-Service -Name NDeliusInterfaceIapsWinService -Force
+      Set-Service -Name NDeliusInterfaceIapsWinService -StartupType Disabled
+%{endif}
