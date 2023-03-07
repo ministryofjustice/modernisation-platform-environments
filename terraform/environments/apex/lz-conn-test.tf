@@ -3,45 +3,6 @@ locals {
 #!/bin/bash
 yum install -y httpd
 systemctl start httpd
-cat "{
-	"agent": {
-		"metrics_collection_interval": 60,
-		"run_as_user": "root"
-	},
-	"metrics": {
-		"aggregation_dimensions": [
-			[
-				"InstanceId"
-			]
-		],
-		"append_dimensions": {
-			"AutoScalingGroupName": "${aws:AutoScalingGroupName}",
-			"ImageId": "${aws:ImageId}",
-			"InstanceId": "${aws:InstanceId}",
-			"InstanceType": "${aws:InstanceType}"
-		},
-		"metrics_collected": {
-			"collectd": {
-				"metrics_aggregation_interval": 60
-			},
-			"disk": {
-				"measurement": [
-					"used_percent"
-				],
-				"metrics_collection_interval": 60,
-				"resources": [
-					"*"
-				]
-			},
-			"mem": {
-				"measurement": [
-					"mem_used_percent"
-				],
-				"metrics_collection_interval": 60
-			}
-		}
-	}
-}" > /home/ec2-user/config.json
 cat "0 8 * * * root systemctl start httpd" > /etc/cron.d/httpd_cron
 EOF
 }
