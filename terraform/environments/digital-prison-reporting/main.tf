@@ -1090,10 +1090,6 @@ module "dynamo_tab_domain_registry" {
       type = "S"
     },
     {
-      name = "data"
-      type = "S"
-    },
-    {
       name = "type"
       type = "S"
     }
@@ -1107,8 +1103,6 @@ module "dynamo_tab_domain_registry" {
       write_capacity     = 10
       read_capacity      = 10
       projection_type    = "ALL"
-      non_key_attributes = ["data"]
-
     },
     {
       name               = "secondaryId-Index"
@@ -1117,7 +1111,6 @@ module "dynamo_tab_domain_registry" {
       write_capacity     = 10
       read_capacity      = 10
       projection_type    = "ALL"
-      non_key_attributes = ["data"]
     }
   ]
 
