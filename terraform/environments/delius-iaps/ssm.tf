@@ -90,3 +90,16 @@ resource "aws_ssm_parameter" "im-interface-soap-odbc-pwd" {
   }
 }
 
+resource "aws_ssm_parameter" "ndelius-interface-ssm-param" {
+  for_each  = local.ndelius_interface_params.parameter
+  name      = each.value.name
+  type      = each.value.type
+  value     = each.value.value
+  overwrite = each.value.overwrite
+
+  lifecycle {
+    ignore_changes = [
+      value
+    ]
+  }
+}

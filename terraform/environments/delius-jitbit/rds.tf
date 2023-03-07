@@ -9,8 +9,7 @@ resource "aws_security_group" "database_security_group" {
     from_port   = 1433
     to_port     = 1433
     security_groups = [
-      module.bastion_linux.bastion_security_group,
-      module.ecs.cluster_ec2_security_group_id,
+      module.bastion_linux.bastion_security_group
     ]
   }
 
