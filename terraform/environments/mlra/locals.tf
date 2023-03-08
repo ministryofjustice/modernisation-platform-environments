@@ -5,34 +5,10 @@ locals {
 
   # ECS local variables for ecs.tf
   ec2_ingress_rules = {
-    "cluster_ec2_lb_ingress" = {
-      description     = "Cluster EC2 ingress rule"
-      from_port       = 22
-      to_port         = 22
-      protocol        = "tcp"
-      cidr_blocks     = [data.aws_vpc.shared.cidr_block]
-      security_groups = []
-    }
-    "cluster_ec2_lb_ingress_2" = {
-      description     = "Cluster EC2 ingress rule 2"
-      from_port       = 8080
-      to_port         = 8080
-      protocol        = "tcp"
-      cidr_blocks     = [data.aws_vpc.shared.cidr_block]
-      security_groups = []
-    }
     "cluster_ec2_lb_ingress_3" = {
       description     = "Cluster EC2 ingress rule 3"
       from_port       = 32768
       to_port         = 61000
-      protocol        = "tcp"
-      cidr_blocks     = [data.aws_vpc.shared.cidr_block]
-      security_groups = [module.alb.security_group.id]
-    }
-    "cluster_ec2_lb_ingress_4" = {
-      description     = "Cluster EC2 ingress rule 4"
-      from_port       = 1521
-      to_port         = 1521
       protocol        = "tcp"
       cidr_blocks     = [data.aws_vpc.shared.cidr_block]
       security_groups = [module.alb.security_group.id]
