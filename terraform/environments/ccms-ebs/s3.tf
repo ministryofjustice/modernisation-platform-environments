@@ -2,7 +2,7 @@
 # S3 Bucket - Artefacts
 #------------------------------------------------------------------------------
 module "s3-bucket" { #tfsec:ignore:aws-s3-enable-versioning
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.2.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.3.0"
 
   bucket_name = local.artefact_bucket_name
   #  bucket_prefix      = "s3-bucket-example"
