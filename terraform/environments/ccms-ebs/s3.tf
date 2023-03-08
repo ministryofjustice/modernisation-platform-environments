@@ -252,16 +252,16 @@ data "aws_iam_policy_document" "rsync_s3_policy" {
 data "aws_iam_policy_document" "deny_http_s3_policy" {
   statement {
     principals {
-      type = "AWS"
+      type        = "AWS"
       identifiers = []
     }
     actions   = ["s3:*"]
     resources = ["${module.s3-bucket-db-backup.bucket.arn}/"]
     effect    = "Deny"
     condition {
-      test      = "StringNotEquals"
-      variable  = "aws:SecureTransport"
-      values    = ["false"]
+      test     = "StringNotEquals"
+      variable = "aws:SecureTransport"
+      values   = ["false"]
     }
   }
 }
