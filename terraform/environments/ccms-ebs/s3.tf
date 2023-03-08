@@ -249,7 +249,7 @@ data "aws_iam_policy_document" "dbbackup_s3_policy" {
       type        = "AWS"
       identifiers = ["*"]
     }
-    actions   = [
+    actions = [
       "s3:GetObject",
       "s3:PutObject",
       "s3:ListBucket",
