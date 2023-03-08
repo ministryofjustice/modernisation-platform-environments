@@ -30,8 +30,8 @@ resource "aws_lb_listener" "PPUD-Front-End" {
 }
 
 resource "aws_lb_target_group" "PPUD-internal-Target-Group" {
-  count    = local.is-development == false ? 1 : 0
-# name     = "PPUD"
+  count = local.is-development == false ? 1 : 0
+  # name     = "PPUD"
   name     = local.application_data.accounts[local.environment].PPUD_Target
   port     = 443
   protocol = "HTTPS"
@@ -71,8 +71,8 @@ resource "aws_lb_target_group_attachment" "PPUD-PORTAL-internal-development" {
   count            = local.is-preproduction == true ? 1 : 0
   target_group_arn = aws_lb_target_group.PPUD-internal-Target-Group[0].arn
   target_id        = aws_instance.s618358rgvw023[0].id
-# target_id = local.application_data.accounts[local.environment].alb_intances_ppud
-  port      = 443
+  # target_id = local.application_data.accounts[local.environment].alb_intances_ppud
+  port = 443
 }
 
 /*
