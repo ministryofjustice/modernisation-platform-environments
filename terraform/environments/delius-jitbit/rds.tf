@@ -9,6 +9,7 @@ resource "aws_security_group" "database_security_group" {
     from_port   = 1433
     to_port     = 1433
     security_groups = [
+      aws_security_group.jitbit.id,
       module.bastion_linux.bastion_security_group
     ]
   }

@@ -4,6 +4,8 @@ locals {
   ##
   app_url = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
 
+  app_port = 5000
+
   ##
   # Variables used by certificate validation, as part of the load balancer listener, cert and route 53 record configuration
   ##
