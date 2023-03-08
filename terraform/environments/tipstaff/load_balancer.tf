@@ -84,6 +84,10 @@ resource "aws_lb_listener" "tipstaff_dev_lb_1" {
 }
 
 resource "aws_lb_listener" "tipstaff_dev_lb_2" {
+  depends_on = [
+    aws_acm_certificate_validation.tipstaff_lb_cert_validation,
+    aws_lb_target_group.tipstaff_dev_target_group
+  ]
   certificate_arn   = aws_acm_certificate.tipstaff_app_cert.arn
   load_balancer_arn = aws_lb.tipstaff_dev_lb.arn
   port              = local.application_data.accounts[local.environment].server_port_2
