@@ -2,10 +2,18 @@ locals {
 
   ec2_instance = {
 
+    profile_policies = {
+
+      # remember to add the appropriate S3 policy to this
+      default = flatten([
+        "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+        local.iam_policies_ec2_default,
+      ])
+    }
+
     config = {
 
-      # example configuration (assumes image builder, business unit kms cmks and
-      # cloud watch agent policies have been created)
+      # example configuration
       default = {
         availability_zone             = "eu-west-2a"
         subnet_name                   = "private"
@@ -13,12 +21,11 @@ locals {
         user_data_raw                 = null
         ssm_parameters_prefix         = "ec2/"
         iam_resource_names_prefix     = "ec2-instance"
-        instance_profile_policies = [
+        instance_profile_policies = flatten([
           "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+          local.iam_policies_ec2_default,
           "EC2S3BucketWriteAndDeleteAccessPolicy",
-          "BusinessUnitKmsCmkPolicy",
-          "CloudWatchAgentServerReducedPolicy"
-        ]
+        ])
       }
     }
 

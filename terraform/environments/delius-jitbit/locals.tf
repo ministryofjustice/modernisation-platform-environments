@@ -4,50 +4,7 @@ locals {
   ##
   app_url = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
 
-  ##
-  # Variables related to ECS module
-  ##
-  lb_tg_name = "${local.application_name}-tg-${local.environment}"
-
-  ec2_ingress_rules = {
-    "cluster_ec2_lb_ingress" = {
-      description     = "Cluster EC2 loadbalancer ingress rule"
-      from_port       = 5000
-      to_port         = 5000
-      protocol        = "tcp"
-      cidr_blocks     = []
-      security_groups = [aws_security_group.load_balancer_security_group.id]
-    }
-  }
-
-  ec2_egress_rules = {
-    "cluster_ec2_lb_rds_egress" = {
-      description     = "Cluster EC2 loadbalancer egress rule"
-      from_port       = 1433
-      to_port         = 1433
-      protocol        = "tcp"
-      cidr_blocks     = [data.aws_subnet.data_subnets_a.cidr_block, data.aws_subnet.data_subnets_b.cidr_block, data.aws_subnet.data_subnets_c.cidr_block]
-      security_groups = null
-    },
-    "cluster_ec2_lb_https_egress" = {
-      description     = "Allow 443 to internet"
-      from_port       = 443
-      to_port         = 443
-      protocol        = "tcp"
-      cidr_blocks     = ["0.0.0.0/0"]
-      security_groups = null
-    }
-  }
-
-  ecr_repo_name = "delius-jitbit-ecr-repo"
-  ecr_uri       = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.${data.aws_region.current.name}.amazonaws.com/${local.ecr_repo_name}"
-
-  task_definition = templatefile("${path.module}/templates/task_definition.json", {
-    APP_NAME                                = local.application_name,
-    DOCKER_IMAGE                            = "${local.ecr_uri}:latest"
-    DATABASE_PASSWORD_CONNECTION_STRING_ARN = aws_secretsmanager_secret.db_app_connection_string.arn
-    APP_URL                                 = "https://${local.app_url}/"
-  })
+  app_port = 5000
 
   ##
   # Variables used by certificate validation, as part of the load balancer listener, cert and route 53 record configuration
