@@ -1,5 +1,5 @@
 #############################################
-# S3 Bucket for storing Selenium Report
+# S3 Bucket for storing Selenium reports and other outputs
 #############################################
 
 resource "aws_s3_bucket" "selenium_report" {
@@ -99,8 +99,10 @@ resource "aws_s3_bucket_versioning" "report_versioning" {
 #   policy = data.template_file.s3_art_bucket_policy.rendered
 # }
 
+
+
 ######################################################
-# Selenium CodeBuild job lifting to MP directly
+# CodeBuild projects
 ######################################################
 
 resource "aws_iam_role" "codebuild_s3" {
@@ -127,6 +129,71 @@ resource "aws_iam_role_policy" "codebuild_s3" {
   role   = aws_iam_role.codebuild_s3.name
   policy = data.template_file.codebuild_policy.rendered
 }
+
+
+resource "aws_codebuild_project" "app-build" {
+  name          = "${var.app_name}-app-build"
+  description   = "Project to build the ${var.app_name} java application and xray docker images"
+  build_timeout = 20
+  # encryption_key = aws_kms_key.codebuild.arn
+  service_role = aws_iam_role.codebuild_s3.arn
+
+  artifacts {
+    type = "NO_ARTIFACTS"
+  }
+  # Comment above and uncomment below to use artifact
+  # artifacts {
+  #   type = "S3"
+  #   location = aws_s3_bucket.codebuild_artifact.id
+  # }
+
+  environment {
+    compute_type = "BUILD_GENERAL1_SMALL"
+    image        = "aws/codebuild/docker:1.12.1"
+    type         = "LINUX_CONTAINER"
+
+    environment_variable {
+      name  = "AWS_DEFAULT_REGION"
+      value = "eu-west-2"
+    }
+
+    environment_variable {
+      name  = "REPOSITORY_URI"
+      value = "${var.ecr_account_id}.dkr.ecr.eu-west-2.amazonaws.com/${var.ecr_repository_name}"
+    }
+
+    environment_variable {
+      name  = "ARTIFACT_BUCKET"
+      value = "selenium_report"
+    }
+
+    environment_variable {
+      name  = "APPLICATION_NAME"
+      value = "mlra"
+    }
+
+    environment_variable {
+      name  = "REPORT_S3_BUCKET"
+      value = "selenium_report"
+    }
+
+  }
+
+  source {
+    type      = "GITHUB"
+    location  = "https://github.com/ministryofjustice/laa-mlra-application.git"
+    buildspec = "buildspec-mp.yml"
+  }
+
+  tags = merge(
+    var.tags,
+    {
+      Name = "${var.app_name}-app-build"
+    },
+  )
+}
+
+
 
 resource "aws_codebuild_project" "selenium" {
   name          = "${var.app_name}-selenium-test"
