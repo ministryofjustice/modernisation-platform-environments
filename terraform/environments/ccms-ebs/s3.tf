@@ -253,7 +253,7 @@ data "aws_iam_policy_document" "deny_http_s3_policy" {
   statement {
     principals {
       type = "AWS"
-      identifiers = []
+      identifiers = [""]
     }
     actions   = ["s3:*"]
     resources = ["${module.s3-bucket-db-backup.bucket.arn}/"]
