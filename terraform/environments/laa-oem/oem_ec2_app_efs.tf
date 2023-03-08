@@ -2,7 +2,10 @@ resource "aws_efs_file_system" "oem-app-efs" {
   encrypted        = true
   performance_mode = "generalPurpose"
   tags = merge(tomap({
-    "Name" = "${local.application_name}-app-efs"
+    "Name"                 = "${local.application_name}-app-efs"
+    "volume-attach-host"   = "app",
+    "volume-attach-device" = "efs://",
+    "volume-mount-path"    = "/opt/oem/backups"
   }), local.tags)
 }
 

@@ -13,12 +13,21 @@ useradd -g oinstall applmgr
 
 # /                    12    gp3 3000
 # swap                 32    gp3      /dev/sdb
-# /oem/app             50    gp3 3000 /dev/sdc
-# /oem/inst            50    gp3 3000 /dev/sdd
-# /oem/dbf            200    io2 3000 /dev/sde
-# /oem/redo            20    io2 3000 /dev/sdf
-# /oem/archive        200    io2 3000 /dev/sdg
+# /opt/oem/app         50    gp3 3000 /dev/sdc
+# /opt/oem/inst        50    gp3 3000 /dev/sdd
+# /opt/oem/dbf        200    io2 3000 /dev/sde
+# /opt/oem/redo        20    io2 3000 /dev/sdf
+# /opt/oem/arch       200    io2 3000 /dev/sdg
 # /opt/oem/backups    EFS
+
+# 2023-03-08 - snapshots of volumes:
+# vol_snap_app_app  = "snap-0345307239f01c8ab"
+# vol_snap_app_inst = "snap-09f32d294decca5ca"
+# vol_snap_db_app   = "snap-0abed8d20d4ad01d4"
+# vol_snap_db_inst  = "snap-0bc2bc6b4d11534aa"
+# vol_snap_db_dbf   = "snap-0611d48ac056efe54"
+# vol_snap_db_redo  = "snap-0cf269973426fa7c0"
+# vol_snap_db_arch  = "snap-02b71be8ef196aebc"
 
 FSTAB=/etc/fstab
 MOUNT_DIR=/opt
@@ -71,7 +80,7 @@ for M in $${!MOUNTS[@]}; do
             FS_DIR=$${MOUNT_DIR}/oem/$${L,,}
             if [[ ! $(mount -t ext4,xfs |grep "$${FS_DIR}") ]]; then
                 mkdir -p $${FS_DIR}
-                yes |mkfs.ext4 -qL $${L} $${M}
+#               yes |mkfs.ext4 -qL $${L} $${M} # We are using snapshots now, so don't erase the volume.
                 echo "LABEL=$${L} $${FS_DIR} ext4 defaults 0 0" >> $${FSTAB}
                 mount -L $${L}
             else
@@ -97,4 +106,4 @@ hostnamectl set-hostname ${hostname}
 
 # Update /etc/hosts
 H=$(curl -s 'http://169.254.169.254/latest/meta-data/local-ipv4')
-echo "$${H} ${hostname} ${hostname}.dev.legalservices.gov.uk" >> /etc/hosts
+echo "$${H} ${hostname} ${hostname}.${env_in_fqdn}.legalservices.gov.uk" >> /etc/hosts

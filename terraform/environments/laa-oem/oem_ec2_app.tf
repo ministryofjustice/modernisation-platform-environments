@@ -10,8 +10,9 @@ resource "aws_instance" "oem_app" {
   subnet_id                   = data.aws_subnet.data_subnets_b.id
   user_data_replace_on_change = true
   user_data = base64encode(templatefile("./templates/oem-user-data-app.sh", {
-    efs_id   = aws_efs_file_system.oem-app-efs.id
-    hostname = "ccms-oem-app"
+    efs_id      = aws_efs_file_system.oem-app-efs.id
+    env_in_fqdn = local.application_data.accounts[local.environment].env_in_fqdn
+    hostname    = "ccms-oem-app"
   }))
   vpc_security_group_ids = [aws_security_group.oem_app_security_group_1.id, aws_security_group.oem_app_security_group_2.id]
 
@@ -23,13 +24,16 @@ resource "aws_instance" "oem_app" {
     volume_type           = "gp3"
   }
 
-  volume_tags = merge(tomap(
-    { "Name" = "${local.application_name}-app-root" }
-  ), local.tags)
+  volume_tags = merge(tomap({
+    "Name"                 = "${local.application_name}-app-root",
+    "volume-attach-host"   = "app",
+    "volume-attach-device" = "/dev/sda1",
+    "volume-mount-path"    = "/"
+  }), local.tags)
 
-  tags = merge(tomap(
-    { "Name" = lower(format("ec2-%s-%s-app", local.application_name, local.environment)) }
-  ), local.tags)
+  tags = merge(tomap({
+    "Name" = lower(format("ec2-%s-%s-app", local.application_name, local.environment))
+  }), local.tags)
 
   lifecycle {
     ignore_changes = [
@@ -41,14 +45,18 @@ resource "aws_instance" "oem_app" {
 
 resource "aws_ebs_volume" "oem_app_volume_swap" {
   availability_zone = local.application_data.accounts[local.environment].ec2_zone
-  depends_on        = [resource.aws_instance.oem_app]
   encrypted         = true
+  iops              = 3000
   size              = 32
   type              = "gp3"
+  depends_on        = [resource.aws_instance.oem_app]
 
-  tags = merge(tomap(
-    { "Name" = "${local.application_name}-app-swap" }
-  ), local.tags)
+  tags = merge(tomap({
+    "Name"                 = "${local.application_name}-app-swap",
+    "volume-attach-host"   = "app",
+    "volume-attach-device" = "/dev/sdb",
+    "volume-mount-path"    = "swap"
+  }), local.tags)
 }
 
 resource "aws_volume_attachment" "oem_app_volume_swap" {
@@ -59,14 +67,19 @@ resource "aws_volume_attachment" "oem_app_volume_swap" {
 
 resource "aws_ebs_volume" "oem_app_volume_ccms_oem_app" {
   availability_zone = local.application_data.accounts[local.environment].ec2_zone
-  depends_on        = [resource.aws_instance.oem_app]
   encrypted         = true
+  iops              = 3000
   size              = 50
+  snapshot_id       = local.vol_snap_app_app
   type              = "gp3"
+  depends_on        = [resource.aws_instance.oem_app]
 
-  tags = merge(tomap(
-    { "Name" = "${local.application_name}-app-mnt-oem-app" }
-  ), local.tags)
+  tags = merge(tomap({
+    "Name"                 = "${local.application_name}-app-mnt-oem-app",
+    "volume-attach-host"   = "app",
+    "volume-attach-device" = "/dev/sdc",
+    "volume-mount-path"    = "/opt/oem/app"
+  }), local.tags)
 
   lifecycle {
     ignore_changes = [
@@ -83,14 +96,19 @@ resource "aws_volume_attachment" "oem_app_volume_ccms_oem_app" {
 
 resource "aws_ebs_volume" "oem_app_volume_ccms_oem_inst" {
   availability_zone = local.application_data.accounts[local.environment].ec2_zone
-  depends_on        = [resource.aws_instance.oem_app]
   encrypted         = true
+  iops              = 3000
   size              = 50
+  snapshot_id       = local.vol_snap_app_inst
   type              = "gp3"
+  depends_on        = [resource.aws_instance.oem_app]
 
-  tags = merge(tomap(
-    { "Name" = "${local.application_name}-app-mnt-oem-inst" }
-  ), local.tags)
+  tags = merge(tomap({
+    "Name"                 = "${local.application_name}-app-mnt-oem-inst",
+    "volume-attach-host"   = "app",
+    "volume-attach-device" = "/dev/sdd",
+    "volume-mount-path"    = "/opt/oem/inst"
+  }), local.tags)
 
   lifecycle {
     ignore_changes = [
