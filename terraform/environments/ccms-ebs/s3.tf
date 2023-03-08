@@ -170,10 +170,7 @@ module "s3-bucket-dbbackup" {
 
   bucket_name        = local.rsync_bucket_name
   versioning_enabled = false
-  bucket_policy = [
-    data.aws_iam_policy_document.dbbackup_s3_policy.json
-  #  data.aws_iam_policy_document.deny_http_s3_policy.json
-  ]
+  bucket_policy = [ data.aws_iam_policy_document.dbbackup_s3_policy.json ]
 
   # Refer to the below section "Replication" before enabling replication
   replication_enabled = false
@@ -246,7 +243,25 @@ data "aws_iam_policy_document" "dbbackup_s3_policy" {
     actions   = ["s3:PutObject"]
     resources = ["${module.s3-bucket-dbbackup.bucket.arn}/*"]
   }
+  statement {
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+    actions   = ["s3:*"]
+    resources = [
+      "${module.s3-bucket-dbbackup.bucket.arn}/",
+      "${module.s3-bucket-dbbackup.bucket.arn}/*"
+      ]
+    effect    = "Deny"
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values   = ["false"]
+    }
+  }
 }
+
 /*
 data "aws_iam_policy_document" "deny_http_s3_policy" {
   statement {
