@@ -107,7 +107,7 @@
       "ecr_url": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/mlra-ecr-repo",
       "docker_image_tag": "latest",
       "maat_api_end_point": "http://maat-cd-api.aws.prod.legalservices.gov.uk/maatApi/laaStatus",
-      "maat_db_url": "terraform-20221116155914397600000001.cfxq8vgqqxpp.eu-west-2.rds.amazonaws.com:1521:MAATDB",
+      "maat_db_url": "rds.maat.aws.dev.legalservices.gov.uk:1521:MAATDB",
       "maat_db_password": "APP_MAATDB_DBPASSWORD_MLA1",
       "maat_libra_wsdl_url": "http://infox.aws.prod.legalservices.gov.uk/infoX/gateway",
       "ec2_desired_capacity": 2,
