@@ -33,7 +33,7 @@ locals {
 
 # Load balancer build using the module
 module "lb_access_logs_enabled" { #tfsec:ignore:aws-ec2-no-public-egress-sgr
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer?ref=v2.1.1"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer?ref=v2.1.2"
   providers = {
     # Here we use the default provider for the S3 bucket module, buck replication is disabled but we still
     # Need to pass the provider to the S3 bucket module
