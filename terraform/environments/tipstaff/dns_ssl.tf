@@ -8,7 +8,7 @@ resource "aws_route53_record" "tipstaff_app_direct_traffic" {
 }
 
 resource "aws_acm_certificate" "tipstaff_app_cert" {
-  domain_name       = "modernisation-platform.service.justice.gov.uk"
+  domain_name       = "tipstaff-dev.modernisation-platform.service.justice.gov.uk"
   validation_method = "DNS"
 
   subject_alternative_names = [
