@@ -35,8 +35,8 @@ locals {
   domain_type_main   = [for k, v in local.domain_types : v.type if k == "modernisation-platform.service.justice.gov.uk"]
   domain_type_sub    = [for k, v in local.domain_types : v.type if k != "modernisation-platform.service.justice.gov.uk"]
 
-  domain_name = "${var.application_name}.${var.business_unit}-${var.environment}.modernisation-platform.service.justice.gov.uk"
-  ip_set_list = [for ip in split("\n", chomp(file("${path.module}/waf_ip_set.txt"))): ip]
+  domain_name   = "${var.application_name}.${var.business_unit}-${var.environment}.modernisation-platform.service.justice.gov.uk"
+  ip_set_list   = [for ip in split("\n", chomp(file("${path.module}/waf_ip_set.txt"))) : ip]
   custom_header = "X-Custom-Header-LAA-${upper(var.application_name)}"
 
 }
@@ -222,12 +222,12 @@ resource "aws_security_group" "lb" {
 ## Cloudfront
 
 resource "random_password" "cloudfront" {
-  length           = 16
-  special          = false
+  length  = 16
+  special = false
 }
 
 resource "aws_secretsmanager_secret" "cloudfront" {
-  name = "cloudfront-secret-${var.application_name}"
+  name        = "cloudfront-secret-${var.application_name}"
   description = "Simple secret created by AWS CloudFormation to be shared between ALB and CloudFront"
 }
 
@@ -454,8 +454,8 @@ resource "aws_waf_ipset" "allow" {
   dynamic "ip_set_descriptors" {
     for_each = local.ip_set_list
     content {
-      type     = "IPV4"
-      value    = ip_set_descriptors.value
+      type  = "IPV4"
+      value = ip_set_descriptors.value
     }
   }
 }
@@ -616,7 +616,7 @@ resource "aws_lb_listener" "alb_listener" {
   # }
 
   default_action {
-    type             = "fixed-response"
+    type = "fixed-response"
     fixed_response {
       content_type = "text/plain"
       message_body = "Access Denied - must access via CloudFront"
