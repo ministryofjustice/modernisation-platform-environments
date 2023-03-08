@@ -240,29 +240,30 @@ data "aws_iam_policy_document" "dbbackup_s3_policy" {
         "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/developer"
       ]
     }
-    actions   = ["s3:PutObject"]
-    resources = ["${module.s3-bucket-dbbackup.bucket.arn}/*"]
-  }
-/*
-  statement {
-    principals {
-      type        = "AWS"
-      identifiers = ["*"]
-    }
-    actions = [
+    actions   = [
       "s3:GetObject",
       "s3:PutObject",
-      "s3:ListBucket",
+      "s3:ListBucket"
     ]
-    resources = [
-      "${module.s3-bucket-dbbackup.bucket.arn}/"
-    ]
-    effect = "Deny"
-    condition {
-      test     = "Bool"
-      variable = "aws:SecureTransport"
-      values   = ["false"]
-    }
+    resources = ["${module.s3-bucket-dbbackup.bucket.arn}/*"]
   }
-*/
+
+#  statement {
+#    principals {
+#      type        = "AWS"
+#      identifiers = ["*"]
+#    }
+#    effect = "Deny"
+#    actions = ["s3:*"]
+#    resources = [
+#      module.s3-bucket-dbbackup.bucket.arn,
+#      "${module.s3-bucket-dbbackup.bucket.arn}/*"
+#    ]
+#    condition {
+#      test     = "Bool"
+#      variable = "aws:SecureTransport"
+#      values   = ["false"]
+#    }
+#  }
+
 }
