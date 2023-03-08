@@ -39,3 +39,18 @@ module "s3_bucket" {
 
   tags = local.tags
 }
+
+resource "aws_s3_bucket_intelligent_tiering_configuration" "jitbit-bucket" {
+  bucket = module.s3_bucket[0].bucket.id
+  name   = "JitbitBucket"
+
+  tiering {
+    access_tier = "ARCHIVE_ACCESS"
+    days        = 120
+  }
+
+  tiering {
+    access_tier = "DEEP_ARCHIVE_ACCESS"
+    days        = 180
+  }
+}
