@@ -52,8 +52,8 @@ resource "aws_route53_record" "inner" {
 }
 
 resource "aws_acm_certificate" "inner" {
-  domain_name       = "${var.networking[0].business-unit}-sandbox.modernisation-platform.internal"
-  validation_method = "DNS"
+  domain_name               = "${var.networking[0].business-unit}-sandbox.modernisation-platform.internal"
+  validation_method         = "DNS"
 
   subject_alternative_names = ["*.${var.networking[0].business-unit}-sandbox.modernisation-platform.internal"]
   tags = {
