@@ -2,7 +2,7 @@
   "accounts": {
     "development": {
       "region": "eu-west-2",
-      "ami_image_id": "ami-00ab9c4b796eba4d4",
+      "ami_image_id": "ami-05d3f644a4baadebd",
       "instance_type": "t3.medium",
       "key_name": "performance-hub-ec2",
       "app_count": "1",
@@ -30,7 +30,7 @@
     },
     "preproduction": {
       "region": "eu-west-2",
-      "ami_image_id": "ami-00ab9c4b796eba4d4",
+      "ami_image_id": "ami-05d3f644a4baadebd",
       "instance_type": "t3.medium",
       "key_name": "performance-hub-ec2",
       "app_count": "1",
@@ -58,7 +58,7 @@
     },
     "production": {
       "region": "eu-west-2",
-      "ami_image_id": "ami-00ab9c4b796eba4d4",
+      "ami_image_id": "ami-05d3f644a4baadebd",
       "instance_type": "t3.medium",
       "key_name": "performance-hub-ec2",
       "app_count": "1",
