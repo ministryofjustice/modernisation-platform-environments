@@ -1,6 +1,6 @@
 module "s3-bucket-ukcloud-replica" {
   count               = local.is-development ? 1 : 0
-  source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.2.0"
+  source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.3.0"
   bucket_prefix       = "s3-bucket-ukcloud-replica"
   versioning_enabled  = false
   replication_enabled = false
