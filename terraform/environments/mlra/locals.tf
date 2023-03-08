@@ -10,6 +10,7 @@ locals {
       from_port       = 32768
       to_port         = 61000
       protocol        = "tcp"
+      cidr_blocks     = []
       security_groups = [module.alb.security_group.id]
     }
   }
