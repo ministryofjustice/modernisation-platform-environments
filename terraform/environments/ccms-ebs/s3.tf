@@ -241,9 +241,7 @@ data "aws_iam_policy_document" "dbbackup_s3_policy" {
       ]
     }
     actions = [
-      "s3:GetObject",
-      "s3:PutObject",
-      "s3:ListBucket"
+      "s3:PutObject"
     ]
     resources = ["${module.s3-bucket-dbbackup.bucket.arn}/*"]
   }
