@@ -1,5 +1,5 @@
 resource "aws_acm_certificate" "tipstaff_app_cert" {
-  domain_name       = "modernisation-platform.service.justice.gov.uk"
+  domain_name       = "modernisation-platform.internal"
   validation_method = "DNS"
 
   tags = {
@@ -46,7 +46,7 @@ resource "aws_route53_record" "tipstaff_app_direct_traffic" {
 # }
 
 resource "aws_route53_record" "internal_validation_subdomain_tipstaff" {
-  provider = aws.core-network-services
+  provider = aws.core-vpc
 
   for_each = {
     for dvo in aws_acm_certificate.tipstaff_app_cert.domain_validation_options : dvo.domain_name => {
