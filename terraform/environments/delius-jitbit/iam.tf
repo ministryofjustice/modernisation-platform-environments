@@ -142,6 +142,6 @@ resource "aws_iam_policy" "jitbit_secrets_reader" {
 }
 
 resource "aws_iam_role_policy_attachment" "task_exec_jitbit_secrets_reader" {
-  role       = aws_iam_role.ecs_exec
+  role       = aws_iam_role.ecs_exec.name
   policy_arn = aws_iam_policy.jitbit_secrets_reader.arn
 }
