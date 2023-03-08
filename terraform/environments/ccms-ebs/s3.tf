@@ -162,7 +162,7 @@ data "aws_iam_policy_document" "logging_s3_policy" {
   }
 }
 
-/*
+
 #------------------------------------------------------------------------------
 # S3 Bucket - R-sync
 #------------------------------------------------------------------------------
@@ -171,7 +171,10 @@ module "s3-bucket-db-backup" {
 
   bucket_name        = local.rsync_bucket_name
   versioning_enabled = false
-  bucket_policy      = [data.aws_iam_policy_document.rsync_s3_policy.json]
+  bucket_policy      = [
+    data.aws_iam_policy_document.rsync_s3_policy.json,
+    data.aws_iam_policy_document.deny_http_s3_policy.json
+  ]
 
   # Refer to the below section "Replication" before enabling replication
   replication_enabled = false
@@ -236,18 +239,25 @@ data "aws_iam_policy_document" "rsync_s3_policy" {
   statement {
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::652711504416:root"]
+      identifiers = [
+        "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/developer",
+        "arn:aws:iam::${local.environment_management.account_ids["core-shared-services-production"]}:root"
+      ]
     }
     actions   = ["s3:PutObject"]
     resources = ["${module.s3-bucket-db-backup.bucket.arn}/*"]
   }
 }
+
 data "aws_iam_policy_document" "deny_http_s3_policy" {
   statement {
-    principals {
+/*    principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::652711504416:root"]
-    }
+      identifiers = [
+        "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/developer",
+        "arn:aws:iam::${local.environment_management.account_ids["core-shared-services-production"]}:root"
+      ]
+    }*/
     actions   = ["s3:*"]
     resources = ["${module.s3-bucket-db-backup.bucket.arn}/"]
     effect = "Deny"
@@ -258,7 +268,7 @@ data "aws_iam_policy_document" "deny_http_s3_policy" {
     }
   }
 }
-*/
+
 /*
  "Statement": [ 
     { 
