@@ -162,17 +162,16 @@ data "aws_iam_policy_document" "logging_s3_policy" {
   }
 }
 
-
 #------------------------------------------------------------------------------
 # S3 Bucket - R-sync
 #------------------------------------------------------------------------------
-module "s3-bucket-db-backup" {
+module "s3-bucket-dbbackup" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.2.0"
 
   bucket_name        = local.rsync_bucket_name
   versioning_enabled = false
   bucket_policy = [
-    data.aws_iam_policy_document.rsync_s3_policy.json,
+    data.aws_iam_policy_document.rsync_s3_policy.json
   #  data.aws_iam_policy_document.deny_http_s3_policy.json
   ]
 
@@ -231,7 +230,7 @@ module "s3-bucket-db-backup" {
   ]
 
   tags = merge(local.tags,
-    { Name = lower(format("s3-%s-%s-db-backup", local.application_name, local.environment)) }
+    { Name = lower(format("s3-%s-%s-dbbackup", local.application_name, local.environment)) }
   )
 }
 
