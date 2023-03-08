@@ -35,7 +35,7 @@ resource "aws_route53_record" "tipstaff_app_direct_traffic" {
 
 # resource "aws_route53_record" "internal_validation_subdomain_tipstaff" {
 #   count    = length(local.tipstaff_domain_name_sub)
-#   provider = aws.aws.core-network-services
+#   provider = aws.core-network-services
 
 #   allow_overwrite = true
 #   name            = local.tipstaff_domain_name_sub[count.index]
@@ -46,7 +46,7 @@ resource "aws_route53_record" "tipstaff_app_direct_traffic" {
 # }
 
 resource "aws_route53_record" "internal_validation_subdomain_tipstaff" {
-  provider = aws.aws.core-network-services
+  provider = aws.core-network-services
 
   for_each = {
     for dvo in aws_acm_certificate.tipstaff_app_cert.domain_validation_options : dvo.domain_name => {
