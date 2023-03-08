@@ -366,7 +366,7 @@ module "s3_demo_bucket" {
 # S3 Glue Jobs
 module "s3_glue_jobs_bucket" {
   count  = local.create_bucket ? 1 : 0
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.2.0"
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.3.0"
 
   providers = {
     aws.bucket-replication = aws
