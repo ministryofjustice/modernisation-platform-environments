@@ -33,7 +33,7 @@ variable "account_id" {
   description = "AWS Account ID"
 }
 
-variable "ecr_account_id" {
+variable "ecr_url" {
   type        = string
-  description = "AWS Account ID for the shared ECR repo"
+  description = "URL for the shared ECR repo"
 }

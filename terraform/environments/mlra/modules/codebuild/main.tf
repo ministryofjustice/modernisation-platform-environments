@@ -159,7 +159,7 @@ resource "aws_codebuild_project" "app-build" {
 
     environment_variable {
       name  = "REPOSITORY_URI"
-      value = "${var.ecr_account_id}.dkr.ecr.eu-west-2.amazonaws.com/${var.ecr_repository_name}"
+      value = "${var.ecr_url}"
     }
 
     environment_variable {
