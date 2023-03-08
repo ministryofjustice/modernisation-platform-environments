@@ -10,7 +10,7 @@
       "engine": "postgres",
       "engine_version": "10.21",
       "instance_class": "db.t3.micro",
-      "subdomain_name": "tipstaff.legacy-development",
+      "subdomain_name": "tipstaff.legacy-dev",
       "server_port_1": "80",
       "lb_listener_protocol_1": "HTTP",
       "server_port_2": "443",
