@@ -39,7 +39,7 @@ resource "aws_route53_record" "external_validation_subdomain_tipstaff" {
 }
 
 resource "aws_acm_certificate_validation" "tipstaff_lb_cert_validation" {
-  provider = aws.core-network-services
+  provider                = aws.core-network-services
   certificate_arn         = aws_acm_certificate.tipstaff_app_cert.arn
   validation_record_fqdns = [for record in aws_route53_record.external_validation_subdomain_tipstaff : record.fqdn]
 }
