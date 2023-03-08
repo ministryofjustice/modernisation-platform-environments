@@ -172,7 +172,7 @@ module "s3-bucket-dbbackup" {
   versioning_enabled = false
   bucket_policy = [
     data.aws_iam_policy_document.dbbackup_s3_policy.json
-  #  data.aws_iam_policy_document.deny_http_s3_policy.json
+    #  data.aws_iam_policy_document.deny_http_s3_policy.json
   ]
 
   # Refer to the below section "Replication" before enabling replication
