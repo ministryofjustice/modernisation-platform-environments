@@ -79,6 +79,11 @@ resource "aws_security_group_rule" "alb" {
   security_group_id        = aws_security_group.jitbit.id
 }
 
+resource "aws_cloudwatch_log_group" "jitbit" {
+  name              = format("%s-ecs", local.application_name)
+  retention_in_days = 30
+}
+
 output "s3_bucket_app_deployment_name" {
   value = module.s3_bucket_app_deployment.bucket.id
 }
