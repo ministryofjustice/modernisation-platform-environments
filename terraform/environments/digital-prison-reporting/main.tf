@@ -427,7 +427,7 @@ module "s3_glue_jobs_bucket" {
 # S3 Landing
 module "s3_landing_bucket" {
   count  = local.create_bucket ? 1 : 0
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.2.0"
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.3.0"
 
   providers = {
     aws.bucket-replication = aws
