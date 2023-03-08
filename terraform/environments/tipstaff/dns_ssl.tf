@@ -61,7 +61,7 @@ resource "aws_route53_record" "internal_validation_subdomain_tipstaff" {
   records         = [each.value.record]
   ttl             = 60
   type            = each.value.type
-  zone_id         = data.aws_route53_zone.public.zone_id
+  zone_id         = data.aws_route53_zone.inner.zone_id
 }
 
 resource "aws_acm_certificate_validation" "tipstaff_lb_cert_validation" {
