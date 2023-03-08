@@ -252,7 +252,7 @@ data "aws_iam_policy_document" "rsync_s3_policy" {
 data "aws_iam_policy_document" "deny_http_s3_policy" {
   statement {
     principals {
-      type = "*"
+      type        = "*"
       identifiers = ["*"]
     }
     actions   = ["s3:*"]
