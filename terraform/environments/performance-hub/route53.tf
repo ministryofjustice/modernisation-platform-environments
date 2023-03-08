@@ -1,3 +1,4 @@
+# Note: The production record is managed by operations engineering and has a CNAME to this record
 resource "aws_route53_record" "external" {
   provider = aws.core-vpc
 
@@ -12,7 +13,9 @@ resource "aws_route53_record" "external" {
   }
 }
 
+# Note: Production certificate is a Gandi cert which is manually imported
 resource "aws_acm_certificate" "external" {
+  count             = local.is-production ? 0 : 1
   domain_name       = "modernisation-platform.service.justice.gov.uk"
   validation_method = "DNS"
 
@@ -27,6 +30,7 @@ resource "aws_acm_certificate" "external" {
 }
 
 resource "aws_route53_record" "external_validation" {
+  count    = local.is-production ? 0 : 1
   provider = aws.core-network-services
 
   allow_overwrite = true
@@ -38,6 +42,7 @@ resource "aws_route53_record" "external_validation" {
 }
 
 resource "aws_route53_record" "external_validation_subdomain" {
+  count    = local.is-production ? 0 : 1
   provider = aws.core-vpc
 
   allow_overwrite = true
@@ -49,6 +54,7 @@ resource "aws_route53_record" "external_validation_subdomain" {
 }
 
 resource "aws_acm_certificate_validation" "external" {
-  certificate_arn         = aws_acm_certificate.external.arn
+  count                   = local.is-production ? 0 : 1
+  certificate_arn         = aws_acm_certificate.external[0].arn
   validation_record_fqdns = [local.domain_name_main[0], local.domain_name_sub[0]]
 }

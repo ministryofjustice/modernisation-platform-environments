@@ -5,7 +5,7 @@
       "SES_domain": "internaltest.ppud.justice.gov.uk",
       "DEV_WAM_ALB": "WAM-ALB",
       "PPUD_Internal_ALB": "PPUD-ALB",
-      "alb_intances_wam": "i-0250650f9a020e097"
+      "alb_intances_wam": "aws_instance.s609693lo6vw102"
     },
     "test": {
       "example_var": "test-data"
@@ -15,6 +15,7 @@
       "SES_domain": "uat.ppud.justice.gov.uk",
       "DEV_WAM_ALB": "WAM-ALB",
       "PPUD_Internal_ALB": "PPUD-ALB",
+      "PPUD_Target": "PPUD",
       "alb_intances_wam": "i-05471f2d0d8f365c0",
       "alb_intances_ppud": "i-04d9127f2311beda5"
     },
