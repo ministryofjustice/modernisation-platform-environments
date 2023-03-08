@@ -11,11 +11,6 @@ resource "aws_acm_certificate" "tipstaff_app_cert" {
   domain_name       = "tipstaff-dev.modernisation-platform.service.justice.gov.uk"
   validation_method = "DNS"
 
-  subject_alternative_names = [
-    "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk",
-    "${local.application_data.accounts[local.environment].subdomain_name}"
-  ]
-
   tags = {
     Environment = local.environment
   }
