@@ -15,7 +15,7 @@ resource "aws_efs_mount_target" "oem-db-efs" {
 }
 
 resource "aws_security_group" "oem-db-efs-sg" {
-  name_prefix = "${local.application_name}-oem-db-efs-sg"
+  name_prefix = "${local.application_name}-db-efs-sg"
   description = "Allow inbound access from instances"
   vpc_id      = data.aws_vpc.shared.id
 

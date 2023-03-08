@@ -1,5 +1,5 @@
 resource "aws_instance" "oem_db" {
-  ami                         = "ami-0c6f19670d053404e"
+  ami                         = local.application_data.accounts[local.environment].ami_app
   associate_public_ip_address = false
   availability_zone           = local.application_data.accounts[local.environment].ec2_zone
   ebs_optimized               = true
