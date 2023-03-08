@@ -114,7 +114,7 @@ data "aws_iam_policy_document" "ecs_exec" {
 }
 
 resource "aws_iam_role_policy" "ecs_exec" {
-  name   = format("hmpps-%s-%s-service-exec", local.environment, local.application_name)
+  name   = format("hmpps-%s-%s-task-exec", local.environment, local.application_name)
   policy = data.aws_iam_policy_document.ecs_exec.json
   role   = aws_iam_role.ecs_exec.id
 }
@@ -139,4 +139,9 @@ resource "aws_iam_policy" "jitbit_secrets_reader" {
       }
     ]
   })
+}
+
+resource "aws_iam_role_policy_attachment" "task_exec_jitbit_secrets_reader" {
+  role       = aws_iam_role.ecs_exec
+  policy_arn = aws_iam_policy.jitbit_secrets_reader.arn
 }
