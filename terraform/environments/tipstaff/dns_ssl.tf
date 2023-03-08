@@ -21,7 +21,7 @@ resource "aws_acm_certificate" "tipstaff_app_cert" {
 }
 
 resource "aws_route53_record" "external_validation_subdomain_tipstaff" {
-  provider = aws.core-vpc
+  provider = aws.core-network-services
   for_each = {
     for dvo in aws_acm_certificate.tipstaff_app_cert.domain_validation_options : dvo.domain_name => {
       name   = dvo.resource_record_name
