@@ -17,7 +17,7 @@ resource "aws_acm_certificate" "tipstaff_app_cert" {
   }
 }
 resource "aws_route53_record" "external_validation_tipstaff" {
-  provider = aws.core-network-services
+  provider        = aws.core-network-services
   allow_overwrite = true
   name            = local.tipstaff_domain_name_main[0]
   records         = local.tipstaff_domain_record_main
@@ -26,8 +26,8 @@ resource "aws_route53_record" "external_validation_tipstaff" {
   zone_id         = data.aws_route53_zone.network-services.zone_id
 }
 resource "aws_route53_record" "external_validation_subdomain_tipstaff" {
-  count    = length(local.tipstaff_domain_name_sub)
-  provider = aws.core-vpc
+  count           = length(local.tipstaff_domain_name_sub)
+  provider        = aws.core-vpc
   allow_overwrite = true
   name            = local.tipstaff_domain_name_sub[count.index]
   records         = [local.tipstaff_domain_record_sub[count.index]]
