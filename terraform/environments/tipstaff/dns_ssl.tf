@@ -16,11 +16,11 @@ resource "aws_route53_record" "tipstaff_app_direct_traffic" {
   provider = aws.core-vpc
 
   allow_overwrite = true
-  name     = "${local.application_data.accounts[local.environment].subdomain_name}.modernisation-platform.internal"
-  records  = [aws_lb.tipstaff_dev_lb.dns_name]
-  ttl      = 900
-  type     = "CNAME"
-  zone_id  = data.aws_route53_zone.inner.zone_id
+  name            = "${local.application_data.accounts[local.environment].subdomain_name}.modernisation-platform.internal"
+  records         = [aws_lb.tipstaff_dev_lb.dns_name]
+  ttl             = 900
+  type            = "CNAME"
+  zone_id         = data.aws_route53_zone.inner.zone_id
 }
 
 
