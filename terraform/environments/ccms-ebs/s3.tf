@@ -171,7 +171,7 @@ module "s3-bucket-dbbackup" {
   bucket_name        = local.rsync_bucket_name
   versioning_enabled = false
   bucket_policy = [
-    data.aws_iam_policy_document.rsync_s3_policy.json
+    data.aws_iam_policy_document.dbbackup_s3_policy.json
   #  data.aws_iam_policy_document.deny_http_s3_policy.json
   ]
 
@@ -234,7 +234,7 @@ module "s3-bucket-dbbackup" {
   )
 }
 
-data "aws_iam_policy_document" "rsync_s3_policy" {
+data "aws_iam_policy_document" "dbbackup_s3_policy" {
   statement {
     principals {
       type = "AWS"
@@ -244,10 +244,10 @@ data "aws_iam_policy_document" "rsync_s3_policy" {
       ]
     }
     actions   = ["s3:PutObject"]
-    resources = ["${module.s3-bucket-db-backup.bucket.arn}/*"]
+    resources = ["${module.s3-bucket-dbbackup.bucket.arn}/*"]
   }
 }
-
+/*
 data "aws_iam_policy_document" "deny_http_s3_policy" {
   statement {
     principals {
@@ -264,3 +264,4 @@ data "aws_iam_policy_document" "deny_http_s3_policy" {
     }
   }
 }
+*/
