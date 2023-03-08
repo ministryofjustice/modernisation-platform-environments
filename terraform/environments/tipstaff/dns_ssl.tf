@@ -40,7 +40,7 @@ resource "aws_route53_record" "external_validation_subdomain_tipstaff" {
   records         = [local.tipstaff_domain_record_sub[count.index]]
   ttl             = 60
   type            = local.tipstaff_domain_type_sub[count.index]
-  zone_id         = data.aws_route53_zone.external_r53_zone.zone_id
+  zone_id         = data.aws_route53_zone.external.zone_id
 }
 
 resource "aws_acm_certificate_validation" "tipstaff_lb_cert_validation" {
