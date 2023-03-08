@@ -236,19 +236,24 @@ data "aws_iam_policy_document" "dbbackup_s3_policy" {
     principals {
       type = "AWS"
       identifiers = [
-        "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/developer",
-        "arn:aws:iam::${local.environment_management.account_ids["core-shared-services-production"]}:root"
+        "arn:aws:iam::${local.environment_management.account_ids["core-shared-services-production"]}:root",
+        "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/developer"
       ]
     }
     actions   = ["s3:PutObject"]
     resources = ["${module.s3-bucket-dbbackup.bucket.arn}/*"]
   }
+
   statement {
     principals {
-      type        = "*"
+      type        = "AWS"
       identifiers = ["*"]
     }
-    actions   = ["s3:*"]
+    actions   = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:ListObject",
+    ]
     resources = [
       "${module.s3-bucket-dbbackup.bucket.arn}/",
       "${module.s3-bucket-dbbackup.bucket.arn}/*"
@@ -260,23 +265,5 @@ data "aws_iam_policy_document" "dbbackup_s3_policy" {
       values   = ["false"]
     }
   }
-}
 
-/*
-data "aws_iam_policy_document" "deny_http_s3_policy" {
-  statement {
-    principals {
-      type        = "*"
-      identifiers = ["*"]
-    }
-    actions   = ["s3:*"]
-    resources = ["${module.s3-bucket-db-backup.bucket.arn}/"]
-    effect    = "Deny"
-    condition {
-      test     = "Bool"
-      variable = "aws:SecureTransport"
-      values   = ["false"]
-    }
-  }
 }
-*/
