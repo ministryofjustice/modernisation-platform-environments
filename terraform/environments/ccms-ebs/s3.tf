@@ -171,7 +171,7 @@ module "s3-bucket-db-backup" {
 
   bucket_name        = local.rsync_bucket_name
   versioning_enabled = false
-  bucket_policy      = [
+  bucket_policy = [
     data.aws_iam_policy_document.rsync_s3_policy.json,
     data.aws_iam_policy_document.deny_http_s3_policy.json
   ]
@@ -238,7 +238,7 @@ module "s3-bucket-db-backup" {
 data "aws_iam_policy_document" "rsync_s3_policy" {
   statement {
     principals {
-      type        = "AWS"
+      type = "AWS"
       identifiers = [
         "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/developer",
         "arn:aws:iam::${local.environment_management.account_ids["core-shared-services-production"]}:root"
@@ -251,7 +251,7 @@ data "aws_iam_policy_document" "rsync_s3_policy" {
 
 data "aws_iam_policy_document" "deny_http_s3_policy" {
   statement {
-/*    principals {
+    /*    principals {
       type        = "AWS"
       identifiers = [
         "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/developer",
@@ -260,11 +260,11 @@ data "aws_iam_policy_document" "deny_http_s3_policy" {
     }*/
     actions   = ["s3:*"]
     resources = ["${module.s3-bucket-db-backup.bucket.arn}/"]
-    effect = "Deny"
+    effect    = "Deny"
     condition {
-      test      = "StringNotEquals"
-      variable  = "aws:SecureTransport"
-      values    = ["https"]
+      test     = "StringNotEquals"
+      variable = "aws:SecureTransport"
+      values   = ["https"]
     }
   }
 }
