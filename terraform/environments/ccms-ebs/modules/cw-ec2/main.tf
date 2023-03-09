@@ -32,7 +32,7 @@ resource "aws_cloudwatch_metric_alarm" "low_available_memory" {
   alarm_description         = "This metric monitors the amount of available memory. If the amount of available memory is less than 10% for 2 minutes, the alarm will trigger."
   comparison_operator       = "LessThanOrEqualToThreshold"
   metric_name               = "mem_available_percent"
-  namespace                 = "AWS/EC2"
+  namespace                 = "CWAgent"
   statistic                 = "Average"
   insufficient_data_actions = []
 
