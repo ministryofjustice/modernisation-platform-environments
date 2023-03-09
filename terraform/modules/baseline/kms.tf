@@ -1,6 +1,6 @@
 resource "aws_kms_grant" "this" {
   # for_each keys only to avoid sensitive value for_each error
-  for_each = toset(keys(var.kms_grants))
+  for_each = nonsensitive(toset(keys(var.kms_grants)))
 
   name              = each.key
   key_id            = var.kms_grants[each.key].key_id

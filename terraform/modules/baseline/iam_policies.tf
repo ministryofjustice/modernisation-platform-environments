@@ -4,7 +4,7 @@ locals {
 
 data "aws_iam_policy_document" "this" {
   # for_each keys only to avoid sensitive value for_each error
-  for_each = toset(keys(local.iam_policies))
+  for_each = nonsensitive(toset(keys(local.iam_policies)))
 
   dynamic "statement" {
     for_each = local.iam_policies[each.key].statements
@@ -37,7 +37,7 @@ data "aws_iam_policy_document" "this" {
 
 resource "aws_iam_policy" "this" {
   # for_each keys only to avoid sensitive value for_each error
-  for_each = toset(keys(local.iam_policies))
+  for_each = nonsensitive(toset(keys(local.iam_policies)))
 
   name        = each.key
   path        = local.iam_policies[each.key].path
