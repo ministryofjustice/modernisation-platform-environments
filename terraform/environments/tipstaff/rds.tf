@@ -14,13 +14,11 @@ resource "aws_db_instance" "tipstaffdbdev" {
   db_subnet_group_name   = aws_db_subnet_group.dbsubnetgroup.name
 }
 
-//Not needed??
 resource "aws_db_subnet_group" "dbsubnetgroup" {
   name       = "dbsubnetgroup"
   subnet_ids = data.aws_subnets.shared-public.ids
 }
 
-//Not needed??
 resource "aws_security_group" "postgresql_db_sc" {
   name        = "postgres_security_group"
   description = "control access to the database"
