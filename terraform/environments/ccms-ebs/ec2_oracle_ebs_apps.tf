@@ -110,7 +110,7 @@ EOF
 
 }
 
-
+/*
 module "cw-ebsapps-ec2" {
   source = "./modules/cw-ec2"
 
@@ -124,3 +124,4 @@ module "cw-ebsapps-ec2" {
   period       = each.value.period
   threshold    = each.value.threshold
 }
+*/

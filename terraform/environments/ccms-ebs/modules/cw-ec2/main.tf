@@ -24,7 +24,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu_utilization" {
   #    instanceId = tostring(local.instanceIds)
   #  }
 }
-/*
+
 # Low Available Memory Alarm
 resource "aws_cloudwatch_metric_alarm" "low_available_memory" {
   count                     = var.metric == "mem" ? 1 : 0
@@ -134,4 +134,3 @@ resource "aws_cloudwatch_metric_alarm" "system_health_check" {
   #  instanceId = tostring(local.instanceIds)
   #}
 }
-*/

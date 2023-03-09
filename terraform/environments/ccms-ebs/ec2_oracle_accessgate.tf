@@ -93,7 +93,7 @@ EOF
 
 }
 
-
+/*
 module "cw-accgate-ec2" {
   source = "./modules/cw-ec2"
 
@@ -108,7 +108,7 @@ module "cw-accgate-ec2" {
   threshold    = each.value.threshold
 
 }
-
+*/
 /*
 resource "aws_ebs_volume" "accessgate_create" {
   lifecycle {

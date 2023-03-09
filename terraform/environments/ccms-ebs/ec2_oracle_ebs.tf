@@ -204,7 +204,7 @@ resource "aws_volume_attachment" "backup_att" {
   instance_id = aws_instance.ec2_oracle_ebs.id
 }
 
-
+/*
 module "cw-ebs-ec2" {
   source = "./modules/cw-ec2"
 
@@ -218,3 +218,4 @@ module "cw-ebs-ec2" {
   period       = each.value.period
   threshold    = each.value.threshold
 }
+*/

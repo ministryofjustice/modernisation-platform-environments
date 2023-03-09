@@ -112,7 +112,7 @@ EOF
   depends_on = [aws_security_group.ec2_sg_ftp]
 }
 
-
+/*
 module "cw-ftp-ec2" {
   source = "./modules/cw-ec2"
 
@@ -127,3 +127,4 @@ module "cw-ftp-ec2" {
   threshold    = each.value.threshold
 
 }
+*/
