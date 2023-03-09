@@ -27,21 +27,21 @@ resource "aws_security_group_rule" "egress_traffic" {
   ipv6_cidr_blocks  = ["::/0"]
 }
 
-# resource "aws_instance" "tipstaff_ec2_instance_dev" {
-#   instance_type               = local.application_data.accounts[local.environment].instance_type
-#   ami                         = local.application_data.accounts[local.environment].ami_image_id
-#   subnet_id                   = data.aws_subnet.public_subnets_a.id
-#   vpc_security_group_ids      = [aws_security_group.tipstaff_dev_ec2_sc.id]
-#   associate_public_ip_address = true
-#   key_name                    = aws_key_pair.ec2_access_key.key_name
-#   user_data                   = <<-EOF
-#               <powershell>
-#               Install-WindowsFeature -name Web-Server -IncludeManagementTools
-#               New-Item -Path C:\inetpub\wwwroot\index.html -ItemType File -Value "Hello, World!" -Force
-#               </powershell>
-#               EOF
-#   depends_on                  = [aws_security_group.tipstaff_dev_ec2_sc]
-# }
+resource "aws_instance" "tipstaff_ec2_instance_dev" {
+  instance_type               = local.application_data.accounts[local.environment].instance_type
+  ami                         = local.application_data.accounts[local.environment].ami_image_id
+  subnet_id                   = data.aws_subnet.public_subnets_a.id
+  vpc_security_group_ids      = [aws_security_group.tipstaff_dev_ec2_sc.id]
+  associate_public_ip_address = true
+  key_name                    = aws_key_pair.ec2_access_key.key_name
+  user_data                   = <<-EOF
+              <powershell>
+              Install-WindowsFeature -name Web-Server -IncludeManagementTools
+              New-Item -Path C:\inetpub\wwwroot\index.html -ItemType File -Value "Hello, World!" -Force
+              </powershell>
+              EOF
+  depends_on                  = [aws_security_group.tipstaff_dev_ec2_sc]
+}
 
 resource "aws_key_pair" "ec2_access_key" {
   key_name   = "ec2_access_key"
