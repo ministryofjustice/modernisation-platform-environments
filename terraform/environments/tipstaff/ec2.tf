@@ -24,7 +24,8 @@ resource "aws_security_group_rule" "egress_traffic" {
   security_group_id        = aws_security_group.tipstaff_dev_ec2_sc.id
   to_port                  = each.value.to_port
   type                     = "egress"
-  source_security_group_id = aws_security_group.tipstaff_dev_ec2_sc.id
+  cidr_blocks              = ["0.0.0.0/0"]
+  # source_security_group_id = aws_security_group.tipstaff_dev_ec2_sc.id
 }
 
 resource "aws_instance" "tipstaff_ec2_instance_dev" {
