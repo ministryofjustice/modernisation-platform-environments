@@ -242,6 +242,8 @@ resource "aws_codebuild_project" "selenium" {
     buildspec = "testspec-lz.yml"
   }
 
+  source_version = "LAWS-3074-gha"
+
   tags = merge(
     var.tags,
     {
