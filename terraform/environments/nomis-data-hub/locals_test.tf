@@ -6,9 +6,9 @@ locals {
       effect = "Allow"
       actions = [
         "s3:GetObject",
-        "s3:ListBucket",
         "s3:PutObject",
         "s3:PutObjectAcl",
+        "s3:ListBucket"
       ]
       principals = {
         type = "AWS"
@@ -29,6 +29,7 @@ locals {
         bucket_policy_v2 = [
           module.baseline_presets.s3_bucket_policies.ImageBuilderWriteAccessBucketPolicy,
           module.baseline_presets.s3_bucket_policies.AllEnvironmentsWriteAccessBucketPolicy,
+          local.test_s3_policies.NomisTestWriteAccessBucketPolicy
         ]
         iam_policies = module.baseline_presets.s3_iam_policies
       }
