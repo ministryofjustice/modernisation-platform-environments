@@ -152,33 +152,36 @@ resource "aws_instance" "PPUD-DEV-AWS-AD" {
   vpc_security_group_ids = [aws_security_group.PPUD-DEV-AD.id]
   subnet_id              = data.aws_subnet.private_subnets_a.id
   tags = {
-    Name = "PPUD-DEV-AWS-AD"
+    Name   = "PPUD-DEV-AWS-AD"
+    backup = true
   }
 }
 
 resource "aws_instance" "s618358rgvw201" {
   count                  = local.is-preproduction == true ? 1 : 0
-  ami                    = "ami-0e79a3f367356535e"
+  ami                    = "ami-0d1cb68fb6c1f131b"
   instance_type          = "c5.large"
   source_dest_check      = false
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.WAM-Portal.id]
   subnet_id              = data.aws_subnet.private_subnets_a.id
   tags = {
-    Name = "s618358rgvw201"
+    Name   = "s618358rgvw201"
+    backup = true
   }
 }
 
 resource "aws_instance" "S618358RGVW202" {
   count                  = local.is-preproduction == true ? 1 : 0
-  ami                    = "ami-066d0fe7085076548"
+  ami                    = "ami-02c124419ed883447"
   instance_type          = "m5.large"
   source_dest_check      = false
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.Bridge-Server-Preprod.id]
   subnet_id              = data.aws_subnet.private_subnets_a.id
   tags = {
-    Name = "S618358RGVW202"
+    Name   = "S618358RGVW202"
+    backup = true
   }
 }
 
@@ -191,7 +194,8 @@ resource "aws_instance" "s618358rgsw025" {
   vpc_security_group_ids = [aws_security_group.WAM-Data-Access-Server.id]
   subnet_id              = data.aws_subnet.private_subnets_a.id
   tags = {
-    Name = "s618358rgsw025"
+    Name   = "s618358rgsw025"
+    backup = true
   }
 }
 
@@ -204,7 +208,8 @@ resource "aws_instance" "s618358rgvw024" {
   vpc_security_group_ids = [aws_security_group.PPUD-Database-Server.id]
   subnet_id              = data.aws_subnet.data_subnets_a.id
   tags = {
-    Name = "s618358rgvw024"
+    Name   = "s618358rgvw024"
+    backup = true
   }
 }
 
@@ -217,6 +222,7 @@ resource "aws_instance" "s618358rgvw023" {
   vpc_security_group_ids = [aws_security_group.PPUD-WEB-Portal.id]
   subnet_id              = data.aws_subnet.private_subnets_b.id
   tags = {
-    Name = "s618358rgvw023"
+    Name   = "s618358rgvw023"
+    backup = true
   }
 }

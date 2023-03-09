@@ -12,9 +12,9 @@ locals {
     "amazon-cloudwatch-agent.log",
     "access.log",
     "error.log",
-    "i2n-xmltransfer.log",
-    "i2n-daysummary.log",
-    "imiapsif.log",
+    "ndinterface/xmltransfer.log",
+    "ndinterface/daysummary.log",
+    "iminterface/imiapsif.log",
     "system-events",
     "application-events"
   ]
