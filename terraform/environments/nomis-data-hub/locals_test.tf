@@ -29,7 +29,6 @@ locals {
         bucket_policy_v2 = [
           module.baseline_presets.s3_bucket_policies.ImageBuilderWriteAccessBucketPolicy,
           module.baseline_presets.s3_bucket_policies.AllEnvironmentsWriteAccessBucketPolicy,
-          local.test_s3_policies.NomisTestWriteAccessBucketPolicy # remove once software copied from nomis-test
         ]
         iam_policies = module.baseline_presets.s3_iam_policies
       }
