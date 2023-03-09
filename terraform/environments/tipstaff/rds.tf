@@ -11,14 +11,14 @@ resource "aws_db_instance" "tipstaffdbdev" {
   skip_final_snapshot    = true
   publicly_accessible    = true
   vpc_security_group_ids = [aws_security_group.postgresql_db_sc.id]
-  db_subnet_group_name   = aws_db_subnet_group.dbsubnetgroup.name
+  # db_subnet_group_name   = aws_db_subnet_group.dbsubnetgroup.name
 }
 
 //Not needed??
-resource "aws_db_subnet_group" "dbsubnetgroup" {
-  name       = "dbsubnetgroup"
-  subnet_ids = data.aws_subnets.shared-public.ids
-}
+# resource "aws_db_subnet_group" "dbsubnetgroup" {
+#   name       = "dbsubnetgroup"
+#   subnet_ids = data.aws_subnets.shared-public.ids
+# }
 
 //Not needed??
 resource "aws_security_group" "postgresql_db_sc" {
