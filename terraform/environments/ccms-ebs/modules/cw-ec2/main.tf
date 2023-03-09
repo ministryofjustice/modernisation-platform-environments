@@ -36,11 +36,11 @@ resource "aws_cloudwatch_metric_alarm" "low_available_memory" {
   statistic                 = "Average"
   insufficient_data_actions = []
 
-  evaluation_periods        = var.eval_periods
-  datapoints_to_alarm       = var.eval_periods
-  period                    = var.period
-  threshold                 = var.threshold
-  alarm_actions             = [var.topic]
+  evaluation_periods  = var.eval_periods
+  datapoints_to_alarm = var.eval_periods
+  period              = var.period
+  threshold           = var.threshold
+  alarm_actions       = [var.topic]
   #dimensions = {
   #  instanceId = tostring(local.instanceIds)
   #}
@@ -57,11 +57,11 @@ resource "aws_cloudwatch_metric_alarm" "disk_free" {
   statistic                 = "Average"
   insufficient_data_actions = []
 
-  evaluation_periods        = var.eval_periods
-  datapoints_to_alarm       = var.eval_periods
-  period                    = var.period
-  threshold                 = var.threshold
-  alarm_actions             = [var.topic]
+  evaluation_periods  = var.eval_periods
+  datapoints_to_alarm = var.eval_periods
+  period              = var.period
+  threshold           = var.threshold
+  alarm_actions       = [var.topic]
   #dimensions = {
   #  instanceId = tostring(local.instanceIds)
   #}
@@ -79,11 +79,11 @@ resource "aws_cloudwatch_metric_alarm" "cpu_usage_iowait" {
   statistic                 = "Average"
   insufficient_data_actions = []
 
-  evaluation_periods        = var.eval_periods
-  datapoints_to_alarm       = var.eval_periods
-  period                    = var.period
-  threshold                 = var.threshold
-  alarm_actions             = [var.topic]
+  evaluation_periods  = var.eval_periods
+  datapoints_to_alarm = var.eval_periods
+  period              = var.period
+  threshold           = var.threshold
+  alarm_actions       = [var.topic]
   #dimensions = {
   #  instanceId = tostring(local.instanceIds)
   #}
