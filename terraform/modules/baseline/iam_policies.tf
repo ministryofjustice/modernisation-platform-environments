@@ -3,10 +3,11 @@ locals {
 }
 
 data "aws_iam_policy_document" "this" {
-  for_each = local.iam_policies
+  # for_each keys only to avoid sensitive value for_each error
+  for_each = toset(keys(local.iam_policies))
 
   dynamic "statement" {
-    for_each = each.value.statements
+    for_each = local.iam_policies[each.key].statements
 
     content {
       effect    = statement.value.effect
@@ -35,11 +36,12 @@ data "aws_iam_policy_document" "this" {
 }
 
 resource "aws_iam_policy" "this" {
-  for_each = local.iam_policies
+  # for_each keys only to avoid sensitive value for_each error
+  for_each = toset(keys(local.iam_policies))
 
   name        = each.key
-  path        = each.value.path
-  description = each.value.description
+  path        = local.iam_policies[each.key].path
+  description = local.iam_policies[each.key].description
   policy      = data.aws_iam_policy_document.this[each.key].json
 
   tags = merge(local.tags, {
