@@ -28,3 +28,16 @@ variable "threshold" {
   type        = string
   description = "threshold for the alarm"
 }
+
+variable "instanceId" {
+  type        = string
+  description = "the instanceId for the alarm"
+}
+variable "imageId" {
+  type        = string
+  description = "the imageId for the alarm"
+}
+variable "instanceType" {
+  type        = string
+  description = "the instanceType for the alarm"
+}

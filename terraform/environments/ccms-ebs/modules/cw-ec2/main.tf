@@ -41,9 +41,11 @@ resource "aws_cloudwatch_metric_alarm" "low_available_memory" {
   period              = var.period
   threshold           = var.threshold
   alarm_actions       = [var.topic]
-  #dimensions = {
-  #  instanceId = tostring(local.instanceIds)
-  #}
+  dimensions = {
+    InstanceId = var.instanceId
+    ImageId = var.imageId
+    InstanceType = var.instanceType
+  }
 }
 
 # Disk Free Alarm

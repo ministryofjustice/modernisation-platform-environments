@@ -106,6 +106,11 @@ module "cw-webgate-ec2" {
   eval_periods = each.value.eval_periods
   period       = each.value.period
   threshold    = each.value.threshold
+
+  instanceId   = aws_instance.ec2_webgate[local.application_data.accounts[local.environment].webgate_no_instances - 1].id
+  imageId      = data.aws_ami.webgate.id
+  instanceType = local.application_data.accounts[local.environment].ec2_oracle_instance_type_webgate
+
 }
 
 /*
