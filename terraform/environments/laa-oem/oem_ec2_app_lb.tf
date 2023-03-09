@@ -149,21 +149,21 @@ resource "aws_security_group" "load_balancer_security_group" {
     protocol    = "tcp"
     from_port   = 443
     to_port     = 443
-    cidr_blocks = ["10.26.56.0/21"]
+    cidr_blocks = [data.aws_vpc.shared.cidr_block, local.cidr_lz_workspaces]
   }
 
   ingress {
     protocol    = "tcp"
     from_port   = 7102
     to_port     = 7102
-    cidr_blocks = ["10.26.56.0/21"]
+    cidr_blocks = [data.aws_vpc.shared.cidr_block, local.cidr_lz_workspaces]
   }
 
   ingress {
     protocol    = "tcp"
     from_port   = 7803
     to_port     = 7803
-    cidr_blocks = ["10.26.56.0/21"]
+    cidr_blocks = [data.aws_vpc.shared.cidr_block, local.cidr_lz_workspaces]
   }
 
   egress {
