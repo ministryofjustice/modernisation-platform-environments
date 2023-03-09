@@ -48,7 +48,7 @@ resource "aws_lb_target_group" "tipstaff_dev_target_group" {
   }
 
   health_check {
-    healthy_threshold   = "5"
+    healthy_threshold   = "2"
     interval            = "120"
     protocol            = "HTTP"
     unhealthy_threshold = "2"

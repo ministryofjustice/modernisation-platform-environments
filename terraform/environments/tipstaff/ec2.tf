@@ -24,6 +24,7 @@ resource "aws_security_group_rule" "egress_traffic" {
   to_port           = each.value.to_port
   type              = "egress"
   cidr_blocks       = ["0.0.0.0/0"]
+  ipv6_cidr_blocks         = ["::/0"]
 }
 
 resource "aws_instance" "tipstaff_ec2_instance_dev" {
@@ -32,12 +33,16 @@ resource "aws_instance" "tipstaff_ec2_instance_dev" {
   subnet_id                   = data.aws_subnet.public_subnets_a.id
   vpc_security_group_ids      = [aws_security_group.tipstaff_dev_ec2_sc.id]
   associate_public_ip_address = true
-  # monitoring             = true
-  # ebs_optimized          = true
+  key_name                    = aws_key_pair.ec2_access_key.key_name
   user_data  = <<-EOF
               <powershell>
               Install-WindowsFeature -name Web-Server -IncludeManagementTools
               </powershell>
               EOF
   depends_on = [aws_security_group.tipstaff_dev_ec2_sc]
+}
+
+resource "aws_key_pair" "ec2_access_key" {
+  key_name   = "ec2_access_key"
+  public_key = jsondecode(data.aws_secretsmanager_secret_version.public_key.secret_string)["tipstaff_public_key"]
 }
