@@ -1,8 +1,8 @@
 #### This file can be used to store locals specific to the member account ####
 
 locals {
-  ami_app            = "ami-0c6f19670d053404e"
-  ami_db             = "ami-0c6f19670d053404e"
+  ami_app            = "ami-02910fa58ecfa8cc1"
+  ami_db             = "ami-0df91be9692d293d8"
   application_name   = "laa-oem"
   cidr_lz_workspaces = "10.200.0.0/20"
   vol_snap_app_app   = "snap-0345307239f01c8ab"
