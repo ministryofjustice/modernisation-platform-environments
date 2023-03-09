@@ -52,7 +52,7 @@ module "autoscaling_groups" {
 
 module "db_ec2_instance" {
   #checkov:skip=CKV_AWS_79:Oracle cannot accommodate a token
-  source = "../../modules/ec2_instance"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance"
 
   providers = {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
