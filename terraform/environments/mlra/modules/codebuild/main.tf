@@ -148,9 +148,9 @@ resource "aws_codebuild_project" "app-build" {
   # }
 
   environment {
-    compute_type = "BUILD_GENERAL1_SMALL"
-    image        = "aws/codebuild/docker:1.12.1"
-    type         = "LINUX_CONTAINER"
+    compute_type    = "BUILD_GENERAL1_SMALL"
+    image           = "aws/codebuild/docker:1.12.1"
+    type            = "LINUX_CONTAINER"
     privileged_mode = true
 
     environment_variable {
