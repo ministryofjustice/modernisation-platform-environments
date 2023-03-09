@@ -110,14 +110,14 @@ locals {
           disable_api_termination   = true
           metadata_endpoint_enabled = "enabled"
         }
-        ebs_volumes = {
-          "/dev/sdb" = { size = 100 }
-          "/dev/sdc" = { size = 100 }
-        }
-        ebs_volume_config = {
-          data  = { total_size = 200 }
-          flash = { total_size = 50 }
-        }
+        # ebs_volumes = {
+        #   "/dev/sdb" = { size = 100 }
+        #   "/dev/sdc" = { size = 100 }
+        # }
+        # ebs_volume_config = {
+        #   data  = { total_size = 200 }
+        #   flash = { total_size = 50 }
+        # }
       }
 
       # dev-onr-db-1 = {
