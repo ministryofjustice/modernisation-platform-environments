@@ -40,6 +40,7 @@
         "ecr:InitiateLayerUpload",
         "ecr:UploadLayerPart",
         "ecr:CompleteLayerUpload",
+        "ecr:DescribeRepositories",
         "ecr:GetAuthorizationToken"
       ]
     }
