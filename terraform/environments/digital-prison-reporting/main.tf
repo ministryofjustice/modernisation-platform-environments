@@ -1070,7 +1070,7 @@ module "kinesis_cdc_domain_stream" {
 
 
 # S3 Violation Zone Bucket, DPR-318/DPR-301
-module "s3_nomis_oracle_sqs" {
+module "s3_violation_bucket" {
   source                    = "./modules/s3_bucket"
   create_s3                 = local.setup_buckets
   name                      = "${local.project}-violation-${local.environment}"
