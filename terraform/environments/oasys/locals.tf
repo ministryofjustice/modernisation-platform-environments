@@ -172,7 +172,7 @@ locals {
         label = "app"
         type = null
         snapshot_id = null
-      } 
+      }
       # "/dev/sdc" = {    # /u02
       #   label = "app"
       #   type = null
@@ -204,8 +204,8 @@ locals {
       #   snapshot_id = null
       # }
       "/dev/sdj" = { # FLASH01
-        label = "flash"
-        type = null
+        label       = "flash"
+        type        = null
         snapshot_id = null
         size = 50
       }
