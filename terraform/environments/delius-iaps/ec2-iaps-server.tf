@@ -296,7 +296,7 @@ module "ec2_iaps_server" {
 ##
 resource "aws_cloudwatch_log_group" "cloudwatch_agent_log_groups" {
   for_each          = toset(local.cloudwatch_agent_log_group_names)
-  name              = "iaps/${each.key}"
+  name              = "/iaps/${each.key}"
   retention_in_days = local.application_data.accounts[local.environment].cloudwatch_agent_log_group_retention_period
   tags = merge(
     local.ec2_tags,
