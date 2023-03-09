@@ -12,7 +12,7 @@ resource "aws_security_group_rule" "ingress_traffic" {
   security_group_id        = aws_security_group.tipstaff_dev_ec2_sc.id
   to_port                  = each.value.to_port
   type                     = "ingress"
-  cidr_blocks              = [data.aws_vpc.shared.cidr_block, local.application_data.accounts[local.environment].moj_ip]
+  # cidr_blocks              = [data.aws_vpc.shared.cidr_block, local.application_data.accounts[local.environment].moj_ip]
   source_security_group_id = aws_security_group.tipstaff_dev_lb_sc.id
 }
 
