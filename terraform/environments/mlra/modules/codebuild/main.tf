@@ -154,6 +154,7 @@ resource "aws_codebuild_project" "app-build" {
     image           = "aws/codebuild/docker:1.12.1"
     type            = "LINUX_CONTAINER"
     privileged_mode = true
+    source_version = "LAWS-3074-gha"
 
     environment_variable {
       name  = "AWS_DEFAULT_REGION"
@@ -187,8 +188,6 @@ resource "aws_codebuild_project" "app-build" {
     location  = "https://github.com/ministryofjustice/laa-mlra-application.git"
     buildspec = "buildspec-mp.yml"
   }
-
-  source_version = "LAWS-3074-gha"
 
   tags = merge(
     var.tags,
