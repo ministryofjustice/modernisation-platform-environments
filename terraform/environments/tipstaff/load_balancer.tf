@@ -23,7 +23,7 @@ resource "aws_security_group_rule" "egress_traffic_lb" {
   security_group_id        = aws_security_group.tipstaff_dev_lb_sc.id
   to_port                  = each.value.to_port
   type                     = "egress"
-  source_security_group_id = aws_security_group.tipstaff_dev_lb_sc.id
+  cidr_blocks              = ["0.0.0.0/0"]
 }
 
 resource "aws_lb" "tipstaff_dev_lb" {
