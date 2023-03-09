@@ -23,7 +23,8 @@
       "Action": [
         "logs:CreateLogGroup",
         "logs:CreateLogStream",
-        "logs:PutLogEvents"
+        "logs:PutLogEvents",
+        "ecr:GetAuthorizationToken"
       ]
     },
     {
