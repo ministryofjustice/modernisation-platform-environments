@@ -1,3 +1,42 @@
+resource "aws_instance" "oem_app_old" {
+  ami                         = ami-06de1db74d0e038b4
+  associate_public_ip_address = false
+  availability_zone           = local.application_data.accounts[local.environment].ec2_zone
+  ebs_optimized               = true
+  iam_instance_profile        = aws_iam_instance_profile.iam_instace_profile_ccms_base.name
+  instance_type               = local.application_data.accounts[local.environment].ec2_oem_instance_type_app
+  key_name                    = local.application_data.accounts[local.environment].key_name
+  monitoring                  = true
+  subnet_id                   = data.aws_subnet.data_subnets_b.id
+  vpc_security_group_ids      = [aws_security_group.oem_app_security_group_1.id, aws_security_group.oem_app_security_group_2.id]
+
+  root_block_device {
+    delete_on_termination = true
+    encrypted             = true
+    iops                  = 3100
+    volume_size           = 12
+    volume_type           = "gp3"
+  }
+
+  volume_tags = merge(tomap({
+    "Name"                 = "${local.application_name}-app-root",
+    "volume-attach-host"   = "app",
+    "volume-attach-device" = "/dev/sda1",
+    "volume-mount-path"    = "/"
+  }), local.tags)
+
+  tags = merge(tomap({
+    "Name" = lower(format("ec2-%s-%s-app", local.application_name, local.environment))
+  }), local.tags)
+
+  lifecycle {
+    ignore_changes = [
+      volume_tags,
+      user_data
+    ]
+  }
+}
+
 resource "aws_instance" "oem_app" {
   ami                         = local.ami_app
   associate_public_ip_address = false
