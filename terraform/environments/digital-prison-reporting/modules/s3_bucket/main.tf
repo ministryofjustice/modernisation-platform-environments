@@ -22,34 +22,29 @@ resource "aws_s3_bucket_acl" "application_tf_state" { # TBC "application_tf_stat
   acl    = "private"
 }
 
+resource "aws_s3_bucket_lifecycle_configuration" "lifecycle" {
+  count = var.enable_lifecycle ? 1 : 0  
+  bucket = aws_s3_bucket.application_tf_state[0].id
+  rule {
+    id     = var.name
+    status = "enabled"
+    noncurrent_version_transition = [
+      {
+        days          = 90
+        storage_class = "STANDARD_IA"
+        }, 
+        {
+        days          = 365
+        storage_class = "GLACIER"
+      }
+    ]
 
-
-
-
-
-
-
-
-
-
-
-
-#resource "aws_s3_bucket_lifecycle_configuration" "application_tf_state" {
-#  bucket = aws_s3_bucket.application_tf_state.id
-#  rule {
-#    id     = "tf-s3-lifecycle"
-#    status = "Disabled"
-#    noncurrent_version_transition {
-#      noncurrent_days = 30
-#      storage_class   = "STANDARD_IA"
-#    }
-
-#    transition {
-#      days          = 60
-#      storage_class = "STANDARD_IA"
-#    }
-#  }
-#}
+    transition {
+      days          = 60
+      storage_class = "STANDARD_IA"
+    }
+  }
+}
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "application_tf_state" {
   bucket = aws_s3_bucket.application_tf_state[0].id

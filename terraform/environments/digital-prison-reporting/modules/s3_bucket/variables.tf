@@ -19,6 +19,11 @@ variable "create_s3" {
   default     = false
 }
 
+variable "enable_lifecycle" {
+  description = "Enabled Lifecycle for S3 Storage, Default is False"
+  default     = false
+}
+
 variable "custom_kms_key" {
   type        = string
   description = "KMS key ARN to use"
