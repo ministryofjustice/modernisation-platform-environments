@@ -14,14 +14,14 @@ locals {
     }
     cpu-usage-iowait = {
       comparison_operator = "GreaterThanOrEqualToThreshold"
-      evaluation_periods  = "6"
-      datapoints_to_alarm = "5"
+      evaluation_periods  = "60"
+      datapoints_to_alarm = "60"
       metric_name         = "cpu_usage_iowait"
       namespace           = "CWAgent"
       period              = "60"
       statistic           = "Average"
       threshold           = "30"
-      alarm_description   = "This metric monitors the amount of CPU time spent waiting for I/O to complete. If the average CPU time spent waiting for I/O to complete is greater than 30% for 30 minutes, the alarm will trigger."
+      alarm_description   = "This metric monitors the amount of CPU time spent waiting for I/O to complete. If the average CPU time spent waiting for I/O to complete is greater than 30% for 60 minutes, the alarm will trigger."
       alarm_actions       = [aws_sns_topic.nomis_nonprod_alarms.arn]
     }
     disk-used-percent = {
