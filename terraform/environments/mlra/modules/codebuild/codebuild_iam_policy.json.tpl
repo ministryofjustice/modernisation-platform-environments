@@ -30,7 +30,7 @@
     {
       "Effect": "Allow",
       "Resource": [
-        "arn:aws:ecr:eu-west-2:${core_shared_services_production_account_id}:repository/${application_name}-ecr-repo"
+        "arn:aws:ecr:eu-west-2:${core_shared_services_production_account_id}:repository/${application_name}-ecr-repo*"
       ],
       "Action": [
         "ecr:GetDownloadUrlForLayer",
