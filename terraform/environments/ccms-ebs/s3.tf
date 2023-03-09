@@ -246,22 +246,4 @@ data "aws_iam_policy_document" "dbbackup_s3_policy" {
     resources = ["${module.s3-bucket-dbbackup.bucket.arn}/*"]
   }
 
-  #  statement {
-  #    principals {
-  #      type        = "AWS"
-  #      identifiers = ["*"]
-  #    }
-  #    effect = "Deny"
-  #    actions = ["s3:*"]
-  #    resources = [
-  #      module.s3-bucket-dbbackup.bucket.arn,
-  #      "${module.s3-bucket-dbbackup.bucket.arn}/*"
-  #    ]
-  #    condition {
-  #      test     = "Bool"
-  #      variable = "aws:SecureTransport"
-  #      values   = ["false"]
-  #    }
-  #  }
-
 }
