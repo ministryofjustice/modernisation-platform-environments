@@ -10,4 +10,5 @@ module "mlra-selenium" {
   application_test_url                         = local.application_test_url
   account_id                                   = local.environment_management.account_ids[terraform.workspace]
   ecr_url                                      = local.application_data.accounts[local.environment].ecr_url
+  core_shared_services_production_account_id   = local.environment_management.account_ids["core-shared-services-production"]
 }
