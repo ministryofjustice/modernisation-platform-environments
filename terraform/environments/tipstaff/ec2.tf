@@ -1,7 +1,7 @@
 resource "aws_security_group" "tipstaff_dev_ec2_sc" {
   name        = "ec2 security group"
   description = "control access to the ec2 instance"
-  vpc_id      = data.aws_vpc.shared.id
+  # vpc_id      = data.aws_vpc.shared.id
 }
 
 resource "aws_security_group_rule" "ingress_traffic" {

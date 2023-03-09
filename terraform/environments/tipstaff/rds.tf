@@ -24,7 +24,7 @@ resource "aws_db_subnet_group" "dbsubnetgroup" {
 resource "aws_security_group" "postgresql_db_sc" {
   name        = "postgres_security_group"
   description = "control access to the database"
-  vpc_id      = data.aws_vpc.shared.id
+  # vpc_id      = data.aws_vpc.shared.id
   ingress {
     from_port   = 0
     to_port     = 65535

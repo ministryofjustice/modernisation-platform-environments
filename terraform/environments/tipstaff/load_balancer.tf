@@ -1,7 +1,7 @@
 resource "aws_security_group" "tipstaff_dev_lb_sc" {
   name        = "load balancer security group"
   description = "control access to the load balancer"
-  vpc_id      = data.aws_vpc.shared.id
+  # vpc_id      = data.aws_vpc.shared.id
 }
 
 resource "aws_security_group_rule" "ingress_traffic_lb" {
@@ -12,7 +12,7 @@ resource "aws_security_group_rule" "ingress_traffic_lb" {
   security_group_id = aws_security_group.tipstaff_dev_lb_sc.id
   to_port           = each.value.to_port
   type              = "ingress"
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block, local.application_data.accounts[local.environment].moj_ip]
+  cidr_blocks       = [local.application_data.accounts[local.environment].moj_ip]
 }
 
 resource "aws_security_group_rule" "egress_traffic_lb" {
@@ -39,7 +39,7 @@ resource "aws_lb_target_group" "tipstaff_dev_target_group" {
   name                 = "tipstaff-dev-target-group"
   port                 = local.application_data.accounts[local.environment].server_port_1
   protocol             = "HTTP"
-  vpc_id               = data.aws_vpc.shared.id
+  vpc_id               = "vpc-01a6f475362d4d67d"
   target_type          = "instance"
   deregistration_delay = 30
 
