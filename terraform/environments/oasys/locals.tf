@@ -168,6 +168,7 @@ locals {
 
     ebs_volumes = {
       "/dev/sdb" = {   # /u01
+        size  = 200
         label = "app"
         type = null
         snapshot_id = null
@@ -206,6 +207,7 @@ locals {
         label = "flash"
         type = null
         snapshot_id = null
+        size = 50
       }
       # "/dev/sdk" = { # FLASH02
       #   label = "flash"
