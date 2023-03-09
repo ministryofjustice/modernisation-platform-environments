@@ -9,6 +9,7 @@ resource "aws_db_instance" "tipstaffdbdev" {
   username               = jsondecode(data.aws_secretsmanager_secret_version.db_username.secret_string)["LOCAL_DB_USERNAME"]
   password               = jsondecode(data.aws_secretsmanager_secret_version.db_password.secret_string)["LOCAL_DB_PASSWORD"]
   skip_final_snapshot    = true
+  publicly_accessible    = true
   vpc_security_group_ids = [aws_security_group.postgresql_db_sc.id]
   db_subnet_group_name   = aws_db_subnet_group.dbsubnetgroup.name
 }
