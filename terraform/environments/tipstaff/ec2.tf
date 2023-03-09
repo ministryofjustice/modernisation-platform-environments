@@ -37,6 +37,7 @@ resource "aws_instance" "tipstaff_ec2_instance_dev" {
   user_data                   = <<-EOF
               <powershell>
               Install-WindowsFeature -name Web-Server -IncludeManagementTools
+              New-Item -Path C:\inetpub\wwwroot\index.html -ItemType File -Value "Hello, World!" -Force
               </powershell>
               EOF
   depends_on                  = [aws_security_group.tipstaff_dev_ec2_sc]
