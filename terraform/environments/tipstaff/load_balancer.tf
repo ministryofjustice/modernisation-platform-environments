@@ -85,7 +85,7 @@ resource "aws_lb_listener" "tipstaff_dev_lb_1" {
 
 resource "aws_lb_listener" "tipstaff_dev_lb_2" {
   depends_on = [
-    aws_lb_target_group.tipstaff_dev_target_group
+    aws_acm_certificate.external
   ]
   certificate_arn   = aws_acm_certificate.external.arn
   load_balancer_arn = aws_lb.tipstaff_dev_lb.arn
