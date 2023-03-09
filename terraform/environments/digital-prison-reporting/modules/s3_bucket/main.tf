@@ -23,7 +23,7 @@ resource "aws_s3_bucket_acl" "application_tf_state" { # TBC "application_tf_stat
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "lifecycle" {
-  count = var.enable_lifecycle ? 1 : 0  
+  count  = var.enable_lifecycle ? 1 : 0
   bucket = aws_s3_bucket.application_tf_state[0].id
   rule {
     id     = var.name
@@ -32,8 +32,8 @@ resource "aws_s3_bucket_lifecycle_configuration" "lifecycle" {
       {
         days          = 90
         storage_class = "STANDARD_IA"
-        }, 
-        {
+      },
+      {
         days          = 365
         storage_class = "GLACIER"
       }
