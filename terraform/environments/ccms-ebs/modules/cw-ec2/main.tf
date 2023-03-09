@@ -42,8 +42,8 @@ resource "aws_cloudwatch_metric_alarm" "low_available_memory" {
   threshold           = var.threshold
   alarm_actions       = [var.topic]
   dimensions = {
-    InstanceId = var.instanceId
-    ImageId = var.imageId
+    InstanceId   = var.instanceId
+    ImageId      = var.imageId
     InstanceType = var.instanceType
   }
 }
