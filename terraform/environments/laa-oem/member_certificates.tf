@@ -85,7 +85,7 @@ resource "aws_route53_record" "external-service-validation" {
   zone_id = data.aws_route53_zone.network-services.zone_id
 }
 
-resource "aws_acm_certificate_validation" "external-servvice-validation" {
+resource "aws_acm_certificate_validation" "external-service-validation" {
   depends_on = [
     aws_route53_record.external-service-validation
   ]
