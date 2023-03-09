@@ -2,7 +2,7 @@
   "accounts": {
     "development": {
       "example_var": "dev-data",
-      "ec2amiid": "ami-0a2128d7b4dd8a56c",
+      "ec2amiid": "ami-03bf877cb7de87163",
       "ec2instancetype": "r5a.large",
       "bucketname": "laa-oracle-software",
       "orahomesize": "200",
