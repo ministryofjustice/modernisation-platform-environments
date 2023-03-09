@@ -112,11 +112,11 @@ locals {
         }
         ebs_volumes = {
           "/dev/sdb" = { size = 100 }
-          "/dev/sdc" = { size = 5120 }
+          "/dev/sdc" = { size = 100 }
         }
         ebs_volume_config = {
-          data  = { total_size = 4000 }
-          flash = { total_size = 1000 }
+          data  = { total_size = 200 }
+          flash = { total_size = 50 }
         }
       }
 
