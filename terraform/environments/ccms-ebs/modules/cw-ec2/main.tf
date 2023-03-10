@@ -94,10 +94,10 @@ resource "aws_cloudwatch_metric_alarm" "cpu_usage_iowait" {
   threshold           = var.threshold
   alarm_actions       = [var.topic]
   dimensions = {
-    InstanceId    = var.instanceId
-    ImageId       = var.imageId
-    InstanceType  = var.instanceType
-    cpu           = ""
+    InstanceId   = var.instanceId
+    ImageId      = var.imageId
+    InstanceType = var.instanceType
+    cpu          = ""
   }
 }
 */
@@ -122,7 +122,7 @@ resource "aws_cloudwatch_metric_alarm" "instance_health_check" {
   threshold          = var.threshold
   alarm_actions      = [var.topic]
   dimensions = {
-    InstanceId    = var.instanceId
+    InstanceId = var.instanceId
   }
 }
 
@@ -142,6 +142,6 @@ resource "aws_cloudwatch_metric_alarm" "system_health_check" {
   threshold          = var.threshold
   alarm_actions      = [var.topic]
   dimensions = {
-    InstanceId    = var.instanceId
+    InstanceId = var.instanceId
   }
 }
