@@ -40,7 +40,7 @@ resource "aws_lb_target_group" "tipstaff_dev_target_group" {
   name                 = "tipstaff-dev-target-group"
   port                 = local.application_data.accounts[local.environment].server_port_1
   protocol             = "HTTP"
-  vpc_id               = "vpc-01a6f475362d4d67d"
+  vpc_id               = data.aws_vpc.shared.id
   target_type          = "instance"
   deregistration_delay = 30
 
