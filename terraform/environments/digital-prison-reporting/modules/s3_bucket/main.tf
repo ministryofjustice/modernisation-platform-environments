@@ -27,7 +27,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "lifecycle" {
   bucket = aws_s3_bucket.application_tf_state[0].id
   rule {
     id     = var.name
-    status = "enabled"
+    status = "Enabled"
     #noncurrent_version_transition = [
     #  {
     #    days          = 90
