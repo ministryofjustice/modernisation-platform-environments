@@ -58,7 +58,7 @@ jobs:
     uses: ./.github/workflows/reusable_terraform_plan_apply.yml
     with:
       application: "${{ github.workflow }}"
-      environment: "nomis-data-hub-development"
+      environment: "development"
       action: "plan_apply"
       plan_apply_tfargs: "-destroy"
     secrets:
