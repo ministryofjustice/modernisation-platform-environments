@@ -26,6 +26,7 @@ resource "aws_instance" "oem_app" {
 
   volume_tags = merge(tomap({
     "Name"                 = "${local.application_name}-app-root",
+    "hostname"             = "${local.application_name}-app",
     "volume-attach-host"   = "app",
     "volume-attach-device" = "/dev/sda1",
     "volume-mount-path"    = "/"

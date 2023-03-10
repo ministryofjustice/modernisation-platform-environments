@@ -26,6 +26,7 @@ resource "aws_instance" "oem_db" {
 
   volume_tags = merge(tomap({
     "Name"                 = "${local.application_name}-db-root",
+    "hostname"             = "${local.application_name}-db",
     "volume-attach-host"   = "db",
     "volume-attach-device" = "/dev/sda1",
     "volume-mount-path"    = "/"
