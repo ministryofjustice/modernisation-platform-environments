@@ -33,7 +33,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "lifecycle" {
       days          = 90
       storage_class = "STANDARD_IA"
     }
-    
+
     noncurrent_version_transition {
       days          = 365
       storage_class = "GLACIER"
