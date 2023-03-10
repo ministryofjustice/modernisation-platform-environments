@@ -26,14 +26,14 @@ resource "aws_instance" "oem_db" {
 
   volume_tags = merge(tomap({
     "Name"                 = "${local.application_name}-db-root",
-    "hostname"             = "${local.application_name}-db",
     "volume-attach-host"   = "db",
     "volume-attach-device" = "/dev/sda1",
     "volume-mount-path"    = "/"
   }), local.tags)
 
   tags = merge(tomap({
-    "Name" = lower(format("ec2-%s-%s-db", local.application_name, local.environment))
+    "Name"     = lower(format("ec2-%s-%s-db", local.application_name, local.environment)),
+    "hostname" = "${local.application_name}-db"
   }), local.tags)
 
   lifecycle {

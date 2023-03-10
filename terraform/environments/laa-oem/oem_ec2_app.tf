@@ -26,14 +26,14 @@ resource "aws_instance" "oem_app" {
 
   volume_tags = merge(tomap({
     "Name"                 = "${local.application_name}-app-root",
-    "hostname"             = "${local.application_name}-app",
     "volume-attach-host"   = "app",
     "volume-attach-device" = "/dev/sda1",
     "volume-mount-path"    = "/"
   }), local.tags)
 
   tags = merge(tomap({
-    "Name" = lower(format("ec2-%s-%s-app", local.application_name, local.environment))
+    "Name"     = lower(format("ec2-%s-%s-app", local.application_name, local.environment)),
+    "hostname" = "${local.application_name}-app"
   }), local.tags)
 
   lifecycle {
