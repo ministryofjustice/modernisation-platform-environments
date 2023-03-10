@@ -1,7 +1,7 @@
 locals {
-  topic       = var.topic
+  topic = var.topic
   #instanceIds = var.instanceIds
-  name        = var.name
+  name = var.name
 }
 
 # CPU Utilization
@@ -21,9 +21,9 @@ resource "aws_cloudwatch_metric_alarm" "cpu_utilization" {
   threshold           = var.threshold
   alarm_actions       = [local.topic]
   dimensions = {
-    InstanceId    = var.instanceId
-    ImageId       = var.imageId
-    InstanceType  = var.instanceType
+    InstanceId   = var.instanceId
+    ImageId      = var.imageId
+    InstanceType = var.instanceType
   }
 }
 
@@ -44,9 +44,9 @@ resource "aws_cloudwatch_metric_alarm" "low_available_memory" {
   threshold           = var.threshold
   alarm_actions       = [var.topic]
   dimensions = {
-    InstanceId    = var.instanceId
-    ImageId       = var.imageId
-    InstanceType  = var.instanceType
+    InstanceId   = var.instanceId
+    ImageId      = var.imageId
+    InstanceType = var.instanceType
   }
 }
 

@@ -105,8 +105,8 @@ module "cw-webgate-ec2" {
   imageId      = data.aws_ami.webgate.id
   instanceType = local.application_data.accounts[local.environment].ec2_oracle_instance_type_webgate
 
-  name         = "ec2-webgate"
-  topic        = aws_sns_topic.cw_alerts.arn
+  name  = "ec2-webgate"
+  topic = aws_sns_topic.cw_alerts.arn
   #instanceIds  = join(",", [for instance in aws_instance.ec2_webgate : instance.id])
 
   for_each     = local.application_data.cloudwatch_ec2
