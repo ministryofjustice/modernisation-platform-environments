@@ -17,18 +17,18 @@ resource "aws_lambda_function" "secrets" {
   # }
 }
 
-data "aws_iam_policy_document" "assume_role" {
-  statement {
-    effect = "Allow"
+# data "aws_iam_policy_document" "assume_role" {
+#   statement {
+#     effect = "Allow"
 
-    principals {
-      type        = "Service"
-      identifiers = ["lambda.amazonaws.com"]
-    }
+#     principals {
+#       type        = "Service"
+#       identifiers = ["lambda.amazonaws.com"]
+#     }
 
-    actions = ["sts:AssumeRole"]
-  }
-}
+#     actions = ["sts:AssumeRole"]
+#   }
+# }
 
 # resource "aws_iam_instance_profile" "lambda_profile" {
 #   name = "${var.app_name}-lambda-profile"
@@ -41,10 +41,10 @@ data "aws_iam_policy_document" "assume_role" {
 #   )
 # }
 
-# resource "aws_iam_role" "iam_for_lambda" {
-#   name               = "iam_for_lambda"
-#   assume_role_policy = data.aws_iam_policy_document.assume_role.json
-# }
+resource "aws_iam_role" "iam_for_lambda" {
+  name               = "iam_for_lambda"
+  assume_role_policy = data.aws_iam_policy_document.assume_role.json
+}
 
 # resource "aws_iam_policy" "iam_lambda_policy" { #tfsec:ignore:aws-iam-no-policy-wildcards
 #   name = "iam_for_lambda_policy"
