@@ -17,18 +17,18 @@ resource "aws_lambda_function" "secrets" {
   # }
 }
 
-# data "aws_iam_policy_document" "assume_role" {
-#   statement {
-#     effect = "Allow"
+data "aws_iam_policy_document" "assume_role" {
+  statement {
+    effect = "Allow"
 
-#     principals {
-#       type        = "Service"
-#       identifiers = ["lambda.amazonaws.com"]
-#     }
+    principals {
+      type        = "Service"
+      identifiers = ["lambda.amazonaws.com"]
+    }
 
-#     actions = ["sts:AssumeRole"]
-#   }
-# }
+    actions = ["sts:AssumeRole"]
+  }
+}
 
 # resource "aws_iam_instance_profile" "lambda_profile" {
 #   name = "${var.app_name}-lambda-profile"
