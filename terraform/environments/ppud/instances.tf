@@ -173,7 +173,7 @@ resource "aws_instance" "s618358rgvw201" {
 
 resource "aws_instance" "S618358RGVW202" {
   count                  = local.is-preproduction == true ? 1 : 0
-  ami                    = "ami-02c124419ed883447"
+  ami                    = "ami-0919b31013640e21c"
   instance_type          = "m5.large"
   source_dest_check      = false
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
@@ -205,7 +205,7 @@ resource "aws_instance" "s618358rgvw024" {
   instance_type          = "m5.xlarge"
   source_dest_check      = false
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.PPUD-Database-Server.id]
+  vpc_security_group_ids = [aws_security_group.UAT-Document-Service.id]
   subnet_id              = data.aws_subnet.data_subnets_a.id
   tags = {
     Name   = "s618358rgvw024"

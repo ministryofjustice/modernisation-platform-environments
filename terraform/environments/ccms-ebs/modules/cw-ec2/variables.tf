@@ -6,10 +6,12 @@ variable "name" {
   type        = string
   description = "name of the instance"
 }
+/*
 variable "instanceIds" {
   type        = string
   description = "instanceIds to monitor"
 }
+*/
 variable "metric" {
   type        = string
   description = "metric to be reported on"
@@ -27,4 +29,25 @@ variable "period" {
 variable "threshold" {
   type        = string
   description = "threshold for the alarm"
+}
+
+variable "instanceId" {
+  type        = string
+  description = "the instanceId for the alarm"
+}
+variable "imageId" {
+  type        = string
+  description = "the imageId for the alarm"
+}
+variable "instanceType" {
+  type        = string
+  description = "the instanceType for the alarm"
+}
+variable "rootDevice" {
+  type        = string
+  description = "the rootDevice for the alarm"
+}
+variable "fileSystem" {
+  type        = string
+  description = "the fileSystem for the alarm"
 }

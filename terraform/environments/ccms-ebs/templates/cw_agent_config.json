@@ -18,7 +18,7 @@
         "totalcpu": false
       },
       "disk": {
-        "measurement": ["used_percent", "inodes_free"],
+        "measurement": ["used_percent", "inodes_free", "disk_free"],
         "metrics_collection_interval": 60,
         "resources": ["*"]
       },
@@ -28,7 +28,7 @@
         "resources": ["*"]
       },
       "mem": {
-        "measurement": ["mem_used_percent"],
+        "measurement": ["mem_used_percent", "mem_available_percent"],
         "metrics_collection_interval": 60,
         "resources": ["*"]
       },
