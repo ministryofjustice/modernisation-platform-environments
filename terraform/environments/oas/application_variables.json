@@ -6,7 +6,7 @@
       "ec2instancetype": "r5a.large",
       "bucketname": "laa-oracle-software",
       "orahomesize": "200",
-      "orahome_snapshot": "snap-062e6d36e02d32898",
+      "orahome_snapshot": "snap-030be41bc8ad5ef3d",
       "stageesize": "150",
       "managementcidr": "10.200.0.0/20",
       "outbound_access_cidr": "0.0.0.0/0",
