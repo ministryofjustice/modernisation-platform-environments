@@ -3,7 +3,7 @@ resource "aws_instance" "oem_db" {
   associate_public_ip_address = false
   availability_zone           = local.application_data.accounts[local.environment].ec2_zone
   ebs_optimized               = true
-  iam_instance_profile        = aws_iam_instance_profile.iam_instace_profile_ccms_base.name
+  iam_instance_profile        = aws_iam_instance_profile.iam_instace_profile_oem_base.name
   instance_type               = local.application_data.accounts[local.environment].ec2_oem_instance_type_db
   key_name                    = local.application_data.accounts[local.environment].key_name
   monitoring                  = true
@@ -12,7 +12,7 @@ resource "aws_instance" "oem_db" {
   user_data = base64encode(templatefile("./templates/oem-user-data-db.sh", {
     efs_id      = aws_efs_file_system.oem-db-efs.id
     env_in_fqdn = local.application_data.accounts[local.environment].env_in_fqdn
-    hostname    = "ccms-oem-db"
+    hostname    = "laa-oem-db"
   }))
   vpc_security_group_ids = [aws_security_group.oem_db_security_group.id]
 
