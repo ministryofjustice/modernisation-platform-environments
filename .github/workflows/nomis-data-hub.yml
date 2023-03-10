@@ -17,6 +17,15 @@ on:
       - '.github/workflows/nomis-data-hub.yml'
 
   workflow_dispatch:
+    inputs:
+      action:
+        description: 'Set either [deploy|destroy].'
+        default: 'deploy'
+        required: true
+        type: string
+        options:
+          - deploy
+          - destroy
 
 permissions:
   id-token: write  # This is required for requesting the JWT
@@ -25,11 +34,13 @@ permissions:
 jobs:
   strategy:
     uses: ./.github/workflows/reusable_terraform_strategy.yml
+    if: inputs.action != 'destroy'
     with:
       strategy_type: "standard_four_accounts"  # allow apply to dev/test from branch
 
   terraform:
     needs: strategy
+    if: inputs.action != 'destroy'
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.strategy.outputs.matrix) }}
@@ -38,8 +49,19 @@ jobs:
       application: "${{ github.workflow }}"
       environment: "${{ matrix.target }}"
       action: "${{ matrix.action }}"
-      do_state_refresh_on_plan: false  # doesn't work with ACM module
-      post_plan_to_pr: false  # pipeline can be triggered by other teams so avoid posting into their PRs for now
+    secrets:
+      modernisation_platform_environments: "${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}"
+      pipeline_github_token: "${{ secrets.DSO_GITHUB_AUTOMATION_PAT }}"
+
+  destroy:
+    needs: strategy
+    if: inputs.action == 'destroy'
+    uses: ./.github/workflows/reusable_terraform_plan_apply.yml
+    with:
+      application: "${{ github.workflow }}"
+      environment: "nomis-data-hub-development"
+      action: "plan_apply"
+      plan_apply_tfargs: "-destroy"
     secrets:
       modernisation_platform_environments: "${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}"
       pipeline_github_token: "${{ secrets.DSO_GITHUB_AUTOMATION_PAT }}"
