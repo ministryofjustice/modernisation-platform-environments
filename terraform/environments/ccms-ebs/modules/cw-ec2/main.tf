@@ -1,7 +1,6 @@
 locals {
   topic = var.topic
-  #instanceIds = var.instanceIds
-  name = var.name
+  name  = var.name
 }
 
 # CPU Utilization
@@ -53,8 +52,8 @@ resource "aws_cloudwatch_metric_alarm" "low_available_memory" {
 # Disk Free Alarm
 resource "aws_cloudwatch_metric_alarm" "disk_free" {
   count                     = var.metric == "disk" ? 1 : 0
-  alarm_name                = "${local.name}-disk_free"
-  alarm_description         = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space falls below 15% for 2 minutes, the alarm will trigger"
+  alarm_name                = "${local.name}-disk_free_root"
+  alarm_description         = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space on root falls below 15% for 2 minutes, the alarm will trigger"
   comparison_operator       = "LessThanOrEqualToThreshold"
   metric_name               = "disk_free"
   namespace                 = "CWAgent"
@@ -70,13 +69,14 @@ resource "aws_cloudwatch_metric_alarm" "disk_free" {
     InstanceId    = var.instanceId
     ImageId       = var.imageId
     InstanceType  = var.instanceType
-    path          = ""
-    device        = ""
-    fstype        = ""
+    path          = "/"
+    device        = var.rootDevice
+    fstype        = var.fileSystem
+    
   }
 }
 
-
+/*
 # High CPU IOwait Alarm
 resource "aws_cloudwatch_metric_alarm" "cpu_usage_iowait" {
   count                     = var.metric == "iowait" ? 1 : 0
@@ -99,9 +99,8 @@ resource "aws_cloudwatch_metric_alarm" "cpu_usage_iowait" {
     InstanceType  = var.instanceType
     cpu           = ""
   }
-
 }
-
+*/
 
 # ==============================================================================
 # EC2 Instance Statuses

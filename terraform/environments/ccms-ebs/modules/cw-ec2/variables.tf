@@ -43,3 +43,11 @@ variable "instanceType" {
   type        = string
   description = "the instanceType for the alarm"
 }
+variable "rootDevice" {
+  type        = string
+  description = "the rootDevice for the alarm"
+}
+variable "fileSystem" {
+  type        = string
+  description = "the fileSystem for the alarm"
+}
