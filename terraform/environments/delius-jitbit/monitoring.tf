@@ -60,3 +60,20 @@ resource "aws_cloudwatch_metric_alarm" "read_latency_over_threshold" {
     }
   )
 }
+
+# SNS topic for monitoring to send alarms to
+resource "aws_sns_topic" "jitbit_alerting_topic" {
+  name = "jitbit_alerting_topic"
+  tags = merge(
+    var.tags,
+    {
+      Name = "jitbit_alerting_topic"
+    }
+  )
+}
+
+#resource "aws_sns_topic_subscription" "pagerduty_subscription" {
+#  topic_arn = aws_sns_topic.jitbit_alerting_topic.arn
+#  protocol  = "https"
+#  endpoint  = "https://events.pagerduty.com/integration/${var.pagerduty_integration_key}/enqueue"
+#}
