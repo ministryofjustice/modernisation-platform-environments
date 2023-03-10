@@ -22,6 +22,7 @@
 /terraform/environments/oas @ministryofjustice/laa-aws-infrastructure @ministryofjustice/modernisation-platform
 /terraform/environments/oasys @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
 /terraform/environments/performance-hub @ministryofjustice/performance-hub-developers @ministryofjustice/modernisation-platform
+/terraform/environments/portal @ministryofjustice/laa-aws-infrastructure @ministryofjustice/modernisation-platform
 /terraform/environments/ppud @ministryofjustice/modernisation-platform @ministryofjustice/ppud-replacement-devs @ministryofjustice/modernisation-platform
 /terraform/environments/refer-monitor @ministryofjustice/hmpps-interventions-dashboard-access @ministryofjustice/hmpps-interventions-dev @ministryofjustice/modernisation-platform
 /terraform/environments/sprinkler @ministryofjustice/modernisation-platform @ministryofjustice/modernisation-platform
