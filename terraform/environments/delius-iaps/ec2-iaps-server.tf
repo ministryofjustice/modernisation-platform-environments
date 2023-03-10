@@ -40,17 +40,18 @@ locals {
       }
     }
 
-    user_data_raw = base64decode(templatefile("${path.module}/templates/iaps-EC2LaunchV2.yaml.tftpl", {
-      delius_iaps_ad_password_secret_name = aws_secretsmanager_secret.ad_password.name
-      delius_iaps_ad_domain_name          = aws_directory_service_directory.active_directory.name
-      ndelius_interface_url               = local.application_data.accounts[local.environment].iaps_ndelius_interface_url
-      im_interface_url                    = local.application_data.accounts[local.environment].iaps_im_interface_url
-
-      # TODO: remove environment variable and related conditional statements
-      # temporarily needed to ensure no connections to delius and im are attempted
-      environment = local.environment
-
-    }))
+    user_data_raw = base64encode(data.template_file.iaps_ec2_config.rendered)
+#    user_data_raw = base64decode(templatefile("${path.module}/templates/iaps-EC2LaunchV2.yaml.tftpl", {
+#      delius_iaps_ad_password_secret_name = aws_secretsmanager_secret.ad_password.name
+#      delius_iaps_ad_domain_name          = aws_directory_service_directory.active_directory.name
+#      ndelius_interface_url               = local.application_data.accounts[local.environment].iaps_ndelius_interface_url
+#      im_interface_url                    = local.application_data.accounts[local.environment].iaps_im_interface_url
+#
+#      # TODO: remove environment variable and related conditional statements
+#      # temporarily needed to ensure no connections to delius and im are attempted
+#      environment = local.environment
+#
+#    }))
 
     autoscaling_group = {
       desired_capacity = 1
@@ -67,6 +68,21 @@ locals {
 
   }
 
+}
+
+
+data "template_file" "iaps_ec2_config" {
+  template = file("${path.module}/templates/iaps-EC2LaunchV2.yaml.tftpl")
+  vars = {
+    delius_iaps_ad_password_secret_name = aws_secretsmanager_secret.ad_password.name
+    delius_iaps_ad_domain_name          = aws_directory_service_directory.active_directory.name
+    ndelius_interface_url               = local.application_data.accounts[local.environment].iaps_ndelius_interface_url
+    im_interface_url                    = local.application_data.accounts[local.environment].iaps_im_interface_url
+
+    # TODO: remove environment variable and related conditional statements
+    # temporarily needed to ensure no connections to delius and im are attempted
+    environment = local.environment
+  }
 }
 
 ##
