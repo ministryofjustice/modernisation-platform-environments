@@ -63,7 +63,7 @@ resource "aws_iam_policy" "iam_lambda_policy" { #tfsec:ignore:aws-iam-no-policy-
             "Action": [
                 "logs:CreateLogGroup"
             ],
-            "Resource": "!Sub 'arn:aws:logs:${AWS::Region}:${pFunctionAWSaccount}:*'"
+            Resources = ["arn:aws:logs:${local.application_data.accounts[local.environment].region}:*"]
         }
         {
             "Effect": "Allow",
@@ -71,7 +71,7 @@ resource "aws_iam_policy" "iam_lambda_policy" { #tfsec:ignore:aws-iam-no-policy-
                 "logs:CreateLogStream",
                 "logs:PutLogEvents"
             ],
-            "Resource": "!Sub 'arn:aws:logs:${AWS::Region}:${pFunctionAWSaccount}:log-group:/aws/lambda/${pFunctionName}:*'"
+            Resources = ["arn:aws:logs:${local.application_data.accounts[local.environment].region}:*:log-group:/aws/lambda/:*"]
         }
         {
             "Effect": "Allow",
