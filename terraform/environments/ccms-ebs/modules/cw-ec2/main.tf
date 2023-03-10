@@ -66,13 +66,13 @@ resource "aws_cloudwatch_metric_alarm" "disk_free" {
   threshold           = var.threshold
   alarm_actions       = [var.topic]
   dimensions = {
-    InstanceId    = var.instanceId
-    ImageId       = var.imageId
-    InstanceType  = var.instanceType
-    path          = "/"
-    device        = var.rootDevice
-    fstype        = var.fileSystem
-    
+    InstanceId   = var.instanceId
+    ImageId      = var.imageId
+    InstanceType = var.instanceType
+    path         = "/"
+    device       = var.rootDevice
+    fstype       = var.fileSystem
+
   }
 }
 
