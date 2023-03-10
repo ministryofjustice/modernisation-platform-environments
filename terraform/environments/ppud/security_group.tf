@@ -552,3 +552,40 @@ resource "aws_security_group_rule" "Bridge-Server-Preprod-Egress-1" {
   cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.Bridge-Server-Preprod.id
 }
+
+resource "aws_security_group" "UAT-Document-Service" {
+  vpc_id      = data.aws_vpc.shared.id
+  name        = "s618358rgvw024"
+  description = "UAT-Document-Service"
+
+  tags = {
+    Name = "${var.networking[0].business-unit}-${local.environment}"
+  }
+}
+
+resource "aws_security_group_rule" "UAT-Document-Service-Ingress" {
+  type              = "ingress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+  security_group_id = aws_security_group.UAT-Document-Service.id
+}
+
+resource "aws_security_group_rule" "UAT-Document-Service-Egress" {
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "all"
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+  security_group_id = aws_security_group.UAT-Document-Service.id
+}
+
+resource "aws_security_group_rule" "UAT-Document-Service-Egress-1" {
+  type              = "egress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.UAT-Document-Service.id
+}
