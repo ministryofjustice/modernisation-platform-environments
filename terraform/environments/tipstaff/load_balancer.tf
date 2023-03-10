@@ -27,9 +27,9 @@ resource "aws_security_group_rule" "egress_traffic_lb" {
 }
 
 resource "aws_lb" "tipstaff_dev_lb" {
-  name               = "tipstaff-dev-load-balancer"
-  load_balancer_type = "application"
-  security_groups    = [aws_security_group.tipstaff_dev_lb_sc.id]
+  name                       = "tipstaff-dev-load-balancer"
+  load_balancer_type         = "application"
+  security_groups            = [aws_security_group.tipstaff_dev_lb_sc.id]
   subnets                    = data.aws_subnets.default_subnet.ids
   enable_deletion_protection = false
   depends_on                 = [aws_security_group.tipstaff_dev_lb_sc]
