@@ -208,7 +208,7 @@ resource "aws_volume_attachment" "backup_att" {
 module "cw-ebs-ec2" {
   source = "./modules/cw-ec2"
 
-  name        = "ec2-ebs"
+  name  = "ec2-ebs"
   topic = aws_sns_topic.cw_alerts.arn
 
   for_each     = local.application_data.cloudwatch_ec2
@@ -221,8 +221,8 @@ module "cw-ebs-ec2" {
   instanceId   = aws_instance.ec2_oracle_ebs.id
   imageId      = data.aws_ami.oracle_db.id
   instanceType = local.application_data.accounts[local.environment].ec2_oracle_instance_type_ebsdb
-  fileSystem   = "xfs"        # Linux root filesystem
-  rootDevice   = "nvme0n1p1"  # This is used by default for root on all the ec2 images
+  fileSystem   = "xfs"       # Linux root filesystem
+  rootDevice   = "nvme0n1p1" # This is used by default for root on all the ec2 images
 }
 /*
 module "cw-ebs-ec2" {
