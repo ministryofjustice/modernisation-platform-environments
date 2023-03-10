@@ -1,7 +1,7 @@
 {
   "accounts": {
     "development": {
-      "instance_type": "t2.nano",
+      "instance_type": "t2.micro",
       "moj_ip": "81.134.202.29/32",
       "db_name": "tipstaffdbdev",
       "allocated_storage": "20",
