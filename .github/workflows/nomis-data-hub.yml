@@ -54,7 +54,6 @@ jobs:
       pipeline_github_token: "${{ secrets.DSO_GITHUB_AUTOMATION_PAT }}"
 
   destroy:
-    needs: strategy
     if: inputs.action == 'destroy'
     uses: ./.github/workflows/reusable_terraform_plan_apply.yml
     with:
