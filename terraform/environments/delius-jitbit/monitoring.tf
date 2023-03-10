@@ -56,7 +56,7 @@ resource "aws_cloudwatch_metric_alarm" "read_latency_over_threshold" {
   tags = merge(
     var.tags,
     {
-      Name = "jitbit-rds-ram-threshold"
+      Name = "jitbit-rds-read-latency-threshold"
     }
   )
 }
