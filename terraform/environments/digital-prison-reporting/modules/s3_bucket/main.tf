@@ -28,16 +28,16 @@ resource "aws_s3_bucket_lifecycle_configuration" "lifecycle" {
   rule {
     id     = var.name
     status = "Enabled"
-    #noncurrent_version_transition = [
-    #  {
-    #    days          = 90
-    #    storage_class = "STANDARD_IA"
-    #  },
-    #  {
-    #    days          = 365
-    #    storage_class = "GLACIER"
-    #  }
-    #]
+
+    noncurrent_version_transition {
+      days          = 90
+      storage_class = "STANDARD_IA"
+    }
+    
+    noncurrent_version_transition {
+      days          = 365
+      storage_class = "GLACIER"
+    }
 
     transition {
       days          = 60
