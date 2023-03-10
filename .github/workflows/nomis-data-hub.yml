@@ -53,7 +53,7 @@ jobs:
       modernisation_platform_environments: "${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}"
       pipeline_github_token: "${{ secrets.DSO_GITHUB_AUTOMATION_PAT }}"
 
-  destroy:
+  destroy-development:
     if: inputs.action == 'destroy'
     uses: ./.github/workflows/reusable_terraform_plan_apply.yml
     with:
