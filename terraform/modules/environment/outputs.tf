@@ -104,5 +104,5 @@ output "route53_zones" {
 
 output "kms_keys" {
   description = "a map of business unit customer-managed keys where the map key is the prefix name, e.g. general, ebs, rds"
-  value       = data.aws_kms_key.this
+  value       = nonsensitive(sensitive(data.aws_kms_key.this))
 }
