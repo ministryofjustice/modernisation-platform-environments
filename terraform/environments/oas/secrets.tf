@@ -30,50 +30,50 @@ data "aws_iam_policy_document" "assume_role" {
   }
 }
 
-resource "aws_iam_instance_profile" "ec2_instance_profile" {
-  name = "${var.app_name}-ec2-instance-profile"
-  role = aws_iam_role.ec2_instance_role.name
-  tags = merge(
-    var.tags_common,
-    {
-      Name = "${var.app_name}-ec2-instance-profile"
-    }
-  )
-}
+# resource "aws_iam_instance_profile" "lambda_profile" {
+#   name = "${var.app_name}-lambda-profile"
+#   role = aws_iam_role.iam_for_lambda.name
+#   tags = merge(
+#     var.tags_common,
+#     {
+#       Name = "${var.app_name}-lambda-profile"
+#     }
+#   )
+# }
 
-resource "aws_iam_role" "iam_for_lambda" {
-  name               = "iam_for_lambda"
-  assume_role_policy = data.aws_iam_policy_document.assume_role.json
-}
+# resource "aws_iam_role" "iam_for_lambda" {
+#   name               = "iam_for_lambda"
+#   assume_role_policy = data.aws_iam_policy_document.assume_role.json
+# }
 
-resource "aws_iam_policy" "iam_lambda_policy" { #tfsec:ignore:aws-iam-no-policy-wildcards
-  name = "iam_for_lambda_policy"
-  # tags = merge(
-  #   var.tags_common,
-  #   {
-  #     Name = "${var.app_name}-ec2-instance-policy"
-  #   }
-  # )
-  policy = <<EOF
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Action": [
-                "ec2:DescribeTags",
-                "ec2:DescribeInstances",
-                "xray:GetSamplingStatisticSummaries",
-                "xray:*"
-            ],
-            "Resource": "*"
-        }
-    ]
-}
-EOF
-}
+# resource "aws_iam_policy" "iam_lambda_policy" { #tfsec:ignore:aws-iam-no-policy-wildcards
+#   name = "iam_for_lambda_policy"
+#   # tags = merge(
+#   #   var.tags_common,
+#   #   {
+#   #     Name = "${var.app_name}-ec2-instance-policy"
+#   #   }
+#   # )
+#   policy = <<EOF
+# {
+#     "Version": "2012-10-17",
+#     "Statement": [
+#         {
+#             "Effect": "Allow",
+#             "Action": [
+#                 "ec2:DescribeTags",
+#                 "ec2:DescribeInstances",
+#                 "xray:GetSamplingStatisticSummaries",
+#                 "xray:*"
+#             ],
+#             "Resource": "!Sub 'arn:aws:logs:${AWS::Region}:${pFunctionAWSaccount}:*'"
+#         }
+#     ]
+# }
+# EOF
+# }
 
-resource "aws_iam_role_policy_attachment" "attach_lambda_policy" {
-  role       = aws_iam_role.iam_for_lambda.name
-  policy_arn = aws_iam_policy.ec2_instance_policy.arn
-}
+# resource "aws_iam_role_policy_attachment" "attach_lambda_policy" {
+#   role       = aws_iam_role.iam_for_lambda.name
+#   policy_arn = aws_iam_policy.ec2_instance_policy.arn
+# }

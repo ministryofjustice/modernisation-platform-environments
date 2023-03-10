@@ -73,7 +73,7 @@ resource "random_password" "rds_password" {
 
 
 resource "aws_secretsmanager_secret" "rds_password_secret" {
-  name = "${var.application_name}-${var.environment}-rds-password-secret"
+  name = "${var.application_name}-${var.environment}-rds-password"
 }
 
 
