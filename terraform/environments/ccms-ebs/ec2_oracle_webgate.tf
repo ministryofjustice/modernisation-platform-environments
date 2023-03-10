@@ -94,23 +94,26 @@ EOF
 }
 
 
+#locals {
+#  instance_ids = [for instance in aws_instance.ec2_webgate : instance.id]
+#}
+
 module "cw-webgate-ec2" {
   source = "./modules/cw-ec2"
 
-  name        = "ec2-webgate"
-  topic       = aws_sns_topic.cw_alerts.arn
-  instanceIds = join(",", [for instance in aws_instance.ec2_webgate : instance.id])
+  instanceId   = aws_instance.ec2_webgate[local.application_data.accounts[local.environment].webgate_no_instances - 1].id
+  imageId      = data.aws_ami.webgate.id
+  instanceType = local.application_data.accounts[local.environment].ec2_oracle_instance_type_webgate
+
+  name         = "ec2-webgate"
+  topic        = aws_sns_topic.cw_alerts.arn
+  #instanceIds  = join(",", [for instance in aws_instance.ec2_webgate : instance.id])
 
   for_each     = local.application_data.cloudwatch_ec2
   metric       = each.key
   eval_periods = each.value.eval_periods
   period       = each.value.period
   threshold    = each.value.threshold
-
-  instanceId   = aws_instance.ec2_webgate[local.application_data.accounts[local.environment].webgate_no_instances - 1].id
-  imageId      = data.aws_ami.webgate.id
-  instanceType = local.application_data.accounts[local.environment].ec2_oracle_instance_type_webgate
-
 }
 
 /*

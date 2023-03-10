@@ -1,6 +1,6 @@
 locals {
   topic       = var.topic
-  instanceIds = var.instanceIds
+  #instanceIds = var.instanceIds
   name        = var.name
 }
 
@@ -20,9 +20,11 @@ resource "aws_cloudwatch_metric_alarm" "cpu_utilization" {
   period              = var.period
   threshold           = var.threshold
   alarm_actions       = [local.topic]
-  #  dimensions = {
-  #    instanceId = tostring(local.instanceIds)
-  #  }
+  dimensions = {
+    InstanceId    = var.instanceId
+    ImageId       = var.imageId
+    InstanceType  = var.instanceType
+  }
 }
 
 # Low Available Memory Alarm
@@ -42,9 +44,9 @@ resource "aws_cloudwatch_metric_alarm" "low_available_memory" {
   threshold           = var.threshold
   alarm_actions       = [var.topic]
   dimensions = {
-    InstanceId = var.instanceId
-    ImageId = var.imageId
-    InstanceType = var.instanceType
+    InstanceId    = var.instanceId
+    ImageId       = var.imageId
+    InstanceType  = var.instanceType
   }
 }
 
@@ -64,9 +66,11 @@ resource "aws_cloudwatch_metric_alarm" "disk_free" {
   period              = var.period
   threshold           = var.threshold
   alarm_actions       = [var.topic]
-  #dimensions = {
-  #  instanceId = tostring(local.instanceIds)
-  #}
+  dimensions = {
+    InstanceId    = var.instanceId
+    ImageId       = var.imageId
+    InstanceType  = var.instanceType
+  }
 }
 
 
@@ -86,9 +90,11 @@ resource "aws_cloudwatch_metric_alarm" "cpu_usage_iowait" {
   period              = var.period
   threshold           = var.threshold
   alarm_actions       = [var.topic]
-  #dimensions = {
-  #  instanceId = tostring(local.instanceIds)
-  #}
+  dimensions = {
+    InstanceId    = var.instanceId
+    ImageId       = var.imageId
+    InstanceType  = var.instanceType
+  }
 
 }
 
@@ -112,9 +118,11 @@ resource "aws_cloudwatch_metric_alarm" "instance_health_check" {
   period             = var.period
   threshold          = var.threshold
   alarm_actions      = [var.topic]
-  #dimensions = {
-  #  instanceId = tostring(local.instanceIds)
-  #}
+  dimensions = {
+    InstanceId    = var.instanceId
+    ImageId       = var.imageId
+    InstanceType  = var.instanceType
+  }
 }
 
 # Status Check Alarm
@@ -132,7 +140,9 @@ resource "aws_cloudwatch_metric_alarm" "system_health_check" {
   period             = var.period
   threshold          = var.threshold
   alarm_actions      = [var.topic]
-  #dimensions = {
-  #  instanceId = tostring(local.instanceIds)
-  #}
+  dimensions = {
+    InstanceId    = var.instanceId
+    ImageId       = var.imageId
+    InstanceType  = var.instanceType
+  }
 }

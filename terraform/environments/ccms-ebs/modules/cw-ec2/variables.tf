@@ -6,10 +6,12 @@ variable "name" {
   type        = string
   description = "name of the instance"
 }
+/*
 variable "instanceIds" {
   type        = string
   description = "instanceIds to monitor"
 }
+*/
 variable "metric" {
   type        = string
   description = "metric to be reported on"
