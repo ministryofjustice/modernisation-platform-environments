@@ -248,10 +248,10 @@ locals {
         description = "ASMSNMP password"
       }
     }
-    ssm_parameters_prefix = "database/"
+    ssm_parameters_prefix     = "database/"
     iam_resource_names_prefix = "ec2-database"
-    subnet_id = module.environment.subnet["data"][local.availability_zone].id  # for ec2_instance
-    subnet_ids = module.environment.subnet["data"][local.availability_zone].id # for ASG
+    subnet_id                 = module.environment.subnet["data"][local.availability_zone].id # for ec2_instance
+    subnet_ids                = module.environment.subnet["data"][local.availability_zone].id # for ASG
   }
   database_tags = {
     component            = "data"
