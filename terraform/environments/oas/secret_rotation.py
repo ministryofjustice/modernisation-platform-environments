@@ -113,7 +113,7 @@ def set_secret(service_client, arn, token):
         token (string): The ClientRequestToken associated with the secret version
     """
     # This is where the secret should be set in the service
-    #raise NotImplementedError
+    # raise NotImplementedError
     pass
 
 
@@ -128,7 +128,7 @@ def test_secret(service_client, arn, token):
         token (string): The ClientRequestToken associated with the secret version
     """
     # This is where the secret should be tested against the service
-    #raise NotImplementedError
+    # raise NotImplementedError
     pass
 
 
