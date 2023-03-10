@@ -3,7 +3,7 @@
 resource "aws_lambda_function" "secrets" {
   # If the file is not in the current working directory you will need to include a
   # path.module in the filename.
-  filename        = "${path.module}/secret_rotation.py"
+  filename        = "${path.module}/secret_rotation.zip"
   function_name   = local.application_data.accounts[local.environment].lambda_function_name
   role            = aws_iam_role.iam_for_lambda.arn
   # role_arn      = aws_iam_role.lambda.arn
@@ -23,18 +23,18 @@ data "archive_file" "lambda" {
   output_path = "${path.module}/secret_rotation.zip"
 }
 
-# data "aws_iam_policy_document" "assume_role" {
-#   statement {
-#     effect = "Allow"
+data "aws_iam_policy_document" "assume_role" {
+  statement {
+    effect = "Allow"
 
-#     principals {
-#       type        = "Service"
-#       identifiers = ["lambda.amazonaws.com"]
-#     }
+    principals {
+      type        = "Service"
+      identifiers = ["lambda.amazonaws.com"]
+    }
 
-#     actions = ["sts:AssumeRole"]
-#   }
-# }
+    actions = ["sts:AssumeRole"]
+  }
+}
 
 # resource "aws_iam_instance_profile" "lambda_profile" {
 #   name = "${var.app_name}-lambda-profile"
@@ -47,10 +47,10 @@ data "archive_file" "lambda" {
 #   )
 # }
 
-# resource "aws_iam_role" "iam_for_lambda" {
-#   name               = "iam_for_lambda"
-#   assume_role_policy = data.aws_iam_policy_document.assume_role.json
-# }
+resource "aws_iam_role" "iam_for_lambda" {
+  name               = "iam_for_lambda"
+  assume_role_policy = data.aws_iam_policy_document.assume_role.json
+}
 
 # resource "aws_iam_policy" "iam_lambda_policy" { #tfsec:ignore:aws-iam-no-policy-wildcards
 #   name = "iam_for_lambda_policy"
