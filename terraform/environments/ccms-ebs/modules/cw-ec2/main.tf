@@ -70,6 +70,9 @@ resource "aws_cloudwatch_metric_alarm" "disk_free" {
     InstanceId    = var.instanceId
     ImageId       = var.imageId
     InstanceType  = var.instanceType
+    path          = ""
+    device        = ""
+    fstype        = ""
   }
 }
 
@@ -94,6 +97,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu_usage_iowait" {
     InstanceId    = var.instanceId
     ImageId       = var.imageId
     InstanceType  = var.instanceType
+    cpu           = ""
   }
 
 }
@@ -120,8 +124,6 @@ resource "aws_cloudwatch_metric_alarm" "instance_health_check" {
   alarm_actions      = [var.topic]
   dimensions = {
     InstanceId    = var.instanceId
-    ImageId       = var.imageId
-    InstanceType  = var.instanceType
   }
 }
 
@@ -142,7 +144,5 @@ resource "aws_cloudwatch_metric_alarm" "system_health_check" {
   alarm_actions      = [var.topic]
   dimensions = {
     InstanceId    = var.instanceId
-    ImageId       = var.imageId
-    InstanceType  = var.instanceType
   }
 }
