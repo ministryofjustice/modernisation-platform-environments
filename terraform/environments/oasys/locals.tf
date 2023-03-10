@@ -167,7 +167,7 @@ locals {
       "/dev/sdb" = { # /u01
         size        = 200
         label       = "app"
-        type        = null
+        type        = "gp3"
         snapshot_id = null
       }
       # "/dev/sdc" = {    # /u02
@@ -202,7 +202,7 @@ locals {
       # }
       "/dev/sdj" = { # FLASH01
         label       = "flash"
-        type        = null
+        type        = "gp3"
         snapshot_id = null
         size        = 50
       }
