@@ -130,18 +130,3 @@ module "cw-ebsapps-ec2" {
   fileSystem   = "xfs"        # Linux root filesystem
   rootDevice   = "nvme0n1p1"  # This is used by default for root on all the ec2 images
 }
-/*
-module "cw-ebsapps-ec2" {
-  source = "./modules/cw-ec2"
-
-  name        = "ec2-ebsapps"
-  topic       = aws_sns_topic.cw_alerts.arn
-  instanceIds = join(",", [for instance in aws_instance.ec2_ebsapps : instance.id])
-
-  for_each     = local.application_data.cloudwatch_ec2
-  metric       = each.key
-  eval_periods = each.value.eval_periods
-  period       = each.value.period
-  threshold    = each.value.threshold
-}
-*/

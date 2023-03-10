@@ -224,18 +224,3 @@ module "cw-ebs-ec2" {
   fileSystem   = "xfs"        # Linux root filesystem
   rootDevice   = "nvme0n1p1"  # This is used by default for root on all the ec2 images
 }
-/*
-module "cw-ebs-ec2" {
-  source = "./modules/cw-ec2"
-
-  name        = "ec2-ebs"
-  topic       = aws_sns_topic.cw_alerts.arn
-  instanceIds = aws_instance.ec2_oracle_ebs.id
-
-  for_each     = local.application_data.cloudwatch_ec2
-  metric       = each.key
-  eval_periods = each.value.eval_periods
-  period       = each.value.period
-  threshold    = each.value.threshold
-}
-*/
