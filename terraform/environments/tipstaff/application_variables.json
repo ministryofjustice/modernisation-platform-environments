@@ -37,11 +37,6 @@
       "from_port": 443,
       "to_port": 443,
       "protocol": "TCP"
-    },
-    "TCP_5432": {
-      "from_port": 5432,
-      "to_port": 5432,
-      "protocol": "TCP"
     }
   }
 }

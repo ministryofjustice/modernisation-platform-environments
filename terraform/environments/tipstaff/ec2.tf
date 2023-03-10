@@ -24,7 +24,6 @@ resource "aws_security_group_rule" "egress_traffic" {
   to_port           = each.value.to_port
   type              = "egress"
   cidr_blocks       = ["0.0.0.0/0"]
-  ipv6_cidr_blocks  = ["::/0"]
 }
 
 resource "aws_instance" "tipstaff_ec2_instance_dev" {
