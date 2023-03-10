@@ -110,6 +110,6 @@ module "cw-webgate-ec2" {
   instanceId   = aws_instance.ec2_webgate[local.application_data.accounts[local.environment].webgate_no_instances - 1].id
   imageId      = data.aws_ami.webgate.id
   instanceType = local.application_data.accounts[local.environment].ec2_oracle_instance_type_webgate
-  fileSystem   = "xfs"        # Linux root filesystem
-  rootDevice   = "nvme0n1p1"  # This is used by default for root on all the ec2 images
+  fileSystem   = "xfs"       # Linux root filesystem
+  rootDevice   = "nvme0n1p1" # This is used by default for root on all the ec2 images
 }

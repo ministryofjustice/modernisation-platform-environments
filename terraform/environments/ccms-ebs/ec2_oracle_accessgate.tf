@@ -97,7 +97,7 @@ EOF
 module "cw-accgate-ec2" {
   source = "./modules/cw-ec2"
 
-  name        = "ec2-accgate"
+  name  = "ec2-accgate"
   topic = aws_sns_topic.cw_alerts.arn
 
   for_each     = local.application_data.cloudwatch_ec2
@@ -110,6 +110,6 @@ module "cw-accgate-ec2" {
   instanceId   = aws_instance.ec2_accessgate[local.application_data.accounts[local.environment].accessgate_no_instances - 1].id
   imageId      = data.aws_ami.accessgate.id
   instanceType = local.application_data.accounts[local.environment].ec2_oracle_instance_type_accessgate
-  fileSystem   = "xfs"        # Linux root filesystem
-  rootDevice   = "nvme0n1p1"  # This is used by default for root on all the ec2 images
+  fileSystem   = "xfs"       # Linux root filesystem
+  rootDevice   = "nvme0n1p1" # This is used by default for root on all the ec2 images
 }
