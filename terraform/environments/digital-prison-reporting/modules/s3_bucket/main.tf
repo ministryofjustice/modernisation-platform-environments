@@ -26,8 +26,8 @@ resource "aws_s3_bucket_lifecycle_configuration" "lifecycle" {
   count  = var.enable_lifecycle ? 1 : 0
   bucket = aws_s3_bucket.application_tf_state[0].id
   rule {
-    id      = var.name
-    status  = "Enabled"
+    id     = var.name
+    status = "Enabled"
 
     noncurrent_version_transition {
       noncurrent_days = 90
@@ -40,8 +40,8 @@ resource "aws_s3_bucket_lifecycle_configuration" "lifecycle" {
     }
 
     transition {
-      days            = 60
-      storage_class   = "STANDARD_IA"
+      days          = 60
+      storage_class = "STANDARD_IA"
     }
   }
 }
