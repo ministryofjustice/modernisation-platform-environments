@@ -53,3 +53,62 @@ resource "aws_sns_topic" "jitbit_alerting_topic" {
 #  protocol  = "https"
 #  endpoint  = "https://events.pagerduty.com/integration/${var.pagerduty_integration_key}/enqueue"
 #}
+
+resource "aws_cloudwatch_dashboard" "jitbit_rds" {
+  dashboard_name = "jitbit_rds"
+  depends_on = [
+    aws_cloudwatch_metric_alarm.cpu_over_threshold,
+    aws_cloudwatch_metric_alarm.ram_over_threshold,
+    aws_cloudwatch_metric_alarm.read_latency_over_threshold,
+  ]
+  dashboard_body = <<EOF
+  {
+    "widgets": [
+        {
+            "type": "explorer",
+            "x": 0,
+            "y": 0,
+            "width": 24,
+            "height": 15,
+            "properties": {
+                "metrics": [
+                    {
+                        "metricName": "FreeableMemory",
+                        "resourceType": "AWS::RDS::DBInstance",
+                        "stat": "Average"
+                    },
+                    {
+                        "metricName": "ReadLatency",
+                        "resourceType": "AWS::RDS::DBInstance",
+                        "stat": "Average"
+                    },
+                    {
+                        "metricName": "CPUUtilization",
+                        "resourceType": "AWS::RDS::DBInstance",
+                        "stat": "Average"
+                    }
+                ],
+                "labels": [
+                    {
+                        "key": "Name",
+                        "value": "delius-jitbit-development-database"
+                    }
+                ],
+                "widgetOptions": {
+                    "legend": {
+                        "position": "bottom"
+                    },
+                    "view": "timeSeries",
+                    "stacked": false,
+                    "rowsPerPage": 50,
+                    "widgetsPerRow": 2
+                },
+                "period": 300,
+                "splitBy": "",
+                "region": "eu-west-2"
+            }
+        }
+      ]
+    }
+  EOF
+}
