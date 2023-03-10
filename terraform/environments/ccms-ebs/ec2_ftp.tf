@@ -4,7 +4,8 @@ resource "aws_instance" "ec2_ftp" {
   ami                         = local.application_data.accounts[local.environment].ftp_ami_id
   key_name                    = local.application_data.accounts[local.environment].key_name
   vpc_security_group_ids      = [aws_security_group.ec2_sg_ftp.id]
-  subnet_id                   = data.aws_subnet.data_subnets_a.id
+  subnet_id                   = local.environment == "development" ? data.aws_subnet.data_subnets_a.id : data.aws_subnet.private_subnets_a.id
+  #subnet_id                   = data.aws_subnet.data_subnets_a.id
   monitoring                  = true
   ebs_optimized               = false
   associate_public_ip_address = false
