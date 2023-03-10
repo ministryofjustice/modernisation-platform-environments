@@ -134,15 +134,6 @@ locals {
 
   database = {
 
-    tags = {
-      component            = "data"
-      os-type              = "Linux"
-      os-major-version     = 8
-      os-version           = "RHEL 8.5"
-      licence-requirements = "Oracle Database"
-      "Patch Group"        = "RHEL"
-    }
-
     instance = {
       disable_api_termination      = false
       instance_type                = "r6i.xlarge"
@@ -257,6 +248,18 @@ locals {
         description = "ASMSNMP password"
       }
     }
+    ssm_parameters_prefix = "database/"
+    iam_resource_names_prefix = "ec2-database"
+    subnet_id = module.environment.subnet["data"][local.availability_zone].id  # for ec2_instance
+    subnet_ids = module.environment.subnet["data"][local.availability_zone].id # for ASG
+  }
+  database_tags = {
+    component            = "data"
+    os-type              = "Linux"
+    os-major-version     = 8
+    os-version           = "RHEL 8.5"
+    licence-requirements = "Oracle Database"
+    "Patch Group"        = "RHEL"
   }
 
   security_group_cidrs_devtest = {
