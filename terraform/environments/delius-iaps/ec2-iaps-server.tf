@@ -40,22 +40,22 @@ locals {
       }
     }
 
-    #    user_data_raw = base64encode(
-    #      templatefile(
-    #        "${path.module}/templates/iaps-EC2LaunchV2.yaml.tftpl",
-    #        {
-    #          delius_iaps_ad_password_secret_name = aws_secretsmanager_secret.ad_password.name
-    #          delius_iaps_ad_domain_name          = aws_directory_service_directory.active_directory.name
-    #          ndelius_interface_url               = local.application_data.accounts[local.environment].iaps_ndelius_interface_url
-    #          im_interface_url                    = local.application_data.accounts[local.environment].iaps_im_interface_url
-    #
-    #          # TODO: remove environment variable and related conditional statements
-    #          # temporarily needed to ensure no connections to delius and im are attempted
-    #          environment = local.environment
-    #
-    #        }
-    #      )
-    #    )
+    user_data_raw = base64encode(
+      templatefile(
+        "${path.module}/templates/iaps-EC2LaunchV2.yaml.tftpl",
+        {
+          delius_iaps_ad_password_secret_name = aws_secretsmanager_secret.ad_password.name
+          delius_iaps_ad_domain_name          = aws_directory_service_directory.active_directory.name
+          ndelius_interface_url               = local.application_data.accounts[local.environment].iaps_ndelius_interface_url
+          im_interface_url                    = local.application_data.accounts[local.environment].iaps_im_interface_url
+
+          # TODO: remove environment variable and related conditional statements
+          # temporarily needed to ensure no connections to delius and im are attempted
+          environment = local.environment
+
+        }
+      )
+    )
 
     autoscaling_group = {
       desired_capacity = 1
@@ -263,26 +263,11 @@ module "ec2_iaps_server" {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
   }
 
-  name      = local.application_data.ec2_iaps_instance_label
-  ami_name  = local.application_data.ec2_iaps_instance_ami_name
-  ami_owner = local.application_data.ec2_iaps_instance_ami_owner
-  instance  = local.iaps_server.instance
-  user_data_raw = base64encode(
-    templatefile(
-      "${path.module}/templates/iaps-EC2LaunchV2.yaml.tftpl",
-      {
-        delius_iaps_ad_password_secret_name = aws_secretsmanager_secret.ad_password.name
-        delius_iaps_ad_domain_name          = aws_directory_service_directory.active_directory.name
-        ndelius_interface_url               = local.application_data.accounts[local.environment].iaps_ndelius_interface_url
-        im_interface_url                    = local.application_data.accounts[local.environment].iaps_im_interface_url
-
-        # TODO: remove environment variable and related conditional statements
-        # temporarily needed to ensure no connections to delius and im are attempted
-        environment = local.environment
-
-      }
-    )
-  )
+  name                          = local.application_data.ec2_iaps_instance_label
+  ami_name                      = local.application_data.ec2_iaps_instance_ami_name
+  ami_owner                     = local.application_data.ec2_iaps_instance_ami_owner
+  instance                      = local.iaps_server.instance
+  user_data_raw                 = local.iaps_server.user_data_raw
   ebs_volumes_copy_all_from_ami = local.iaps_server.ebs_volumes_copy_all_from_ami
   ebs_volume_config             = {}
   ebs_volumes                   = local.iaps_server.ebs_volumes
