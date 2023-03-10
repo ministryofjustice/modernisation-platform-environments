@@ -1,11 +1,13 @@
 resource "aws_kms_grant" "this" {
-  # for_each workaround as kms_grants may sometimes contain sensitive values
+  # There's a weird issue where args can flip between sensitive and non-sensitive
+  # value seen in nomis-data-hub accounts only.  Hence the nonsensitive workaround
+  # here.  Looks like a bug so try removing at some point in future.
   for_each = nonsensitive(sensitive(toset(keys(var.kms_grants))))
 
   name              = each.key
-  key_id            = var.kms_grants[each.key].key_id
+  key_id            = nonsensitive(sensitive(var.kms_grants[each.key].key_id))
   grantee_principal = var.kms_grants[each.key].grantee_principal
-  operations        = var.kms_grants[each.key].operations
+  operations        = nonsensitive(sensitive(var.kms_grants[each.key].operations))
 
   # ensure principals are created first
   depends_on = [

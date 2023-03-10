@@ -36,12 +36,14 @@ data "aws_iam_policy_document" "this" {
 }
 
 resource "aws_iam_policy" "this" {
-  # for_each workaround as iam_policies may sometimes contain sensitive values
+  # There's a weird issue where args can flip between sensitive and non-sensitive
+  # value seen in nomis-data-hub accounts only.  Hence the nonsensitive workaround
+  # here.  Looks like a bug so try removing at some point in future.
   for_each = nonsensitive(sensitive(toset(keys(local.iam_policies))))
 
   name        = each.key
-  path        = local.iam_policies[each.key].path
-  description = local.iam_policies[each.key].description
+  path        = nonsensitive(sensitive(local.iam_policies[each.key].path))
+  description = nonsensitive(sensitive(local.iam_policies[each.key].description))
   policy      = data.aws_iam_policy_document.this[each.key].json
 
   tags = merge(local.tags, {
