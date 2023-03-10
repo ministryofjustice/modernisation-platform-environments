@@ -427,7 +427,7 @@ variable "s3_buckets" {
         variable = string
         values   = list(string)
       })), [])
-    })))
+    })), [])
     custom_kms_key             = optional(string)
     custom_replication_kms_key = optional(string)
     lifecycle_rule = optional(any, [{

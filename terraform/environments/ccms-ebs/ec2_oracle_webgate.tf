@@ -92,45 +92,24 @@ EOF
   depends_on = [aws_security_group.ec2_sg_webgate]
 
 }
-/*
+
+
 module "cw-webgate-ec2" {
   source = "./modules/cw-ec2"
 
-  name        = "ec2-webgate"
-  topic       = aws_sns_topic.cw_alerts.arn
-  instanceIds = join(",", [for instance in aws_instance.ec2_webgate : instance.id])
+  name  = "ec2-webgate"
+  topic = aws_sns_topic.cw_alerts.arn
 
   for_each     = local.application_data.cloudwatch_ec2
   metric       = each.key
   eval_periods = each.value.eval_periods
   period       = each.value.period
   threshold    = each.value.threshold
+
+  # Dimensions used across all alarms
+  instanceId   = aws_instance.ec2_webgate[local.application_data.accounts[local.environment].webgate_no_instances - 1].id
+  imageId      = data.aws_ami.webgate.id
+  instanceType = local.application_data.accounts[local.environment].ec2_oracle_instance_type_webgate
+  fileSystem   = "xfs"       # Linux root filesystem
+  rootDevice   = "nvme0n1p1" # This is used by default for root on all the ec2 images
 }
-*/
-/*
-resource "aws_ebs_volume" "webgate_create" {
-  lifecycle {
-    ignore_changes = [kms_key_id]
-  }
-  #for_each          = local.application_data.accounts[local.environment].webgate_ebs
-  for_each          = local.application_data.webgate_ebs
-  availability_zone = "eu-west-2a"
-  encrypted         = true
-  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-
-  type              = each.value.type
-  iops              = local.application_data.accounts[local.environment].webgate_default_iops
-  size              = local.application_data.accounts[local.environment].webgate_u01_size
-
-  tags = merge(local.tags,
-    { Name = each.key }
-  )
-}
-
-
-resource "aws_volume_attachment" "webgate_att" {
-  for_each    = local.application_data.webgate_ebs
-  device_name = each.value.device_name
-  volume_id   = aws_ebs_volume.webgate_create[[each.key]].id
-  instance_id = aws_instance.ec2_oracle_ebs.id
-}*/

@@ -134,15 +134,6 @@ locals {
 
   database = {
 
-    tags = {
-      component            = "data"
-      os-type              = "Linux"
-      os-major-version     = 8
-      os-version           = "RHEL 8.5"
-      licence-requirements = "Oracle Database"
-      "Patch Group"        = "RHEL"
-    }
-
     instance = {
       disable_api_termination      = false
       instance_type                = "r6i.xlarge"
@@ -150,6 +141,12 @@ locals {
       metadata_options_http_tokens = "optional" # the Oracle installer cannot accommodate a token
       monitoring                   = true
       vpc_security_group_ids       = [aws_security_group.data.id]
+    }
+    autoscaling_schedules = {}
+    autoscaling_group = {
+      desired_capacity = 1
+      max_size         = 2
+      min_size         = 0
     }
 
     user_data_cloud_init = {
@@ -167,26 +164,72 @@ locals {
     }
 
     ebs_volumes = {
-      # "/dev/sdb" = { label = "app" }   # /u01
-      # "/dev/sdc" = { label = "app" }   # /u02
-      # "/dev/sde" = { label = "data" }  # DATA01
-      # "/dev/sdf" = { label = "data" }  # DATA02
-      # "/dev/sdg" = { label = "data" }  # DATA03
-      # "/dev/sdh" = { label = "data" }  # DATA04
-      # "/dev/sdi" = { label = "data" }  # DATA05
-      # "/dev/sdj" = { label = "flash" } # FLASH01
-      # "/dev/sdk" = { label = "flash" } # FLASH02
-      # "/dev/sds" = { label = "swap" }
+      "/dev/sdb" = { # /u01
+        size        = 200
+        label       = "app"
+        type        = "gp3"
+        snapshot_id = null
+      }
+      # "/dev/sdc" = {    # /u02
+      #   label = "app"
+      #   type = null
+      #   snapshot_id = null
+      # }
+      # "/dev/sde" = {  # DATA01
+      #   label = "data"
+      #   type = null
+      #   snapshot_id = null
+      # }
+      # "/dev/sdf" = {  # DATA02
+      #   label = "data"
+      #   type = null
+      #   snapshot_id = null
+      # }
+      # "/dev/sdg" = {  # DATA03
+      #   label = "data"
+      #   type = null
+      #   snapshot_id = null
+      # }
+      # "/dev/sdh" = {  # DATA04
+      #   label = "data"
+      #   type = null
+      #   snapshot_id = null
+      # }
+      # "/dev/sdi" = {  # DATA05
+      #   label = "data"
+      #   type = null
+      #   snapshot_id = null
+      # }
+      "/dev/sdj" = { # FLASH01
+        label       = "flash"
+        type        = "gp3"
+        snapshot_id = null
+        size        = 50
+      }
+      # "/dev/sdk" = { # FLASH02
+      #   label = "flash"
+      #   type = null
+      #   snapshot_id = null
+      # }
+      # "/dev/sds" = {
+      #   label = "swap"
+      #   type = null
+      #   snapshot_id = null
+      # }
     }
 
     ebs_volume_config = {
       data = {
         iops       = 3000
+        type       = "gp3"
         throughput = 125
+        total_size = 200
       }
       flash = {
         iops       = 3000
+        type       = "gp3"
         throughput = 125
+        total_size = 50
       }
     }
 
@@ -211,6 +254,18 @@ locals {
         description = "ASMSNMP password"
       }
     }
+    ssm_parameters_prefix     = "database/"
+    iam_resource_names_prefix = "ec2-database"
+    subnet_id                 = module.environment.subnet["data"][local.availability_zone].id # for ec2_instance
+    subnet_ids                = module.environment.subnet["data"][local.availability_zone].id # for ASG
+  }
+  database_tags = {
+    component            = "data"
+    os-type              = "Linux"
+    os-major-version     = 8
+    os-version           = "RHEL 8.5"
+    licence-requirements = "Oracle Database"
+    "Patch Group"        = "RHEL"
   }
 
   security_group_cidrs_devtest = {
