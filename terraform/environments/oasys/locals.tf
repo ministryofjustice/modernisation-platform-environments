@@ -142,6 +142,12 @@ locals {
       monitoring                   = true
       vpc_security_group_ids       = [aws_security_group.data.id]
     }
+    autoscaling_schedules = {}
+    autoscaling_group = {
+      desired_capacity = 1
+      max_size         = 2
+      min_size         = 0
+    }
 
     user_data_cloud_init = {
       args = {
