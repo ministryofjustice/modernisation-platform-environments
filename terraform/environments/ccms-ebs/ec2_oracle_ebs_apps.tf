@@ -110,6 +110,26 @@ EOF
 
 }
 
+
+module "cw-ebsapps-ec2" {
+  source = "./modules/cw-ec2"
+
+  name        = "ec2-ebsapps"
+  topic = aws_sns_topic.cw_alerts.arn
+
+  for_each     = local.application_data.cloudwatch_ec2
+  metric       = each.key
+  eval_periods = each.value.eval_periods
+  period       = each.value.period
+  threshold    = each.value.threshold
+
+  # Dimensions used across all alarms
+  instanceId   = aws_instance.ec2_ebsapps[local.application_data.accounts[local.environment].ebsapps_no_instances - 1].id
+  imageId      = data.aws_ami.oracle_base_prereqs.id
+  instanceType = local.application_data.accounts[local.environment].ec2_oracle_instance_type_ebsapps
+  fileSystem   = "xfs"        # Linux root filesystem
+  rootDevice   = "nvme0n1p1"  # This is used by default for root on all the ec2 images
+}
 /*
 module "cw-ebsapps-ec2" {
   source = "./modules/cw-ec2"
