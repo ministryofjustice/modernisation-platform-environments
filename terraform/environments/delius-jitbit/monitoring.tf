@@ -11,12 +11,6 @@ resource "aws_cloudwatch_metric_alarm" "cpu_over_threshold" {
   threshold          = "80"
   treat_missing_data = "missing"
   comparison_operator = "GreaterThanThreshold"
-  tags = merge(
-    var.tags,
-    {
-      Name = "jitbit-rds-cpu-threshold"
-    }
-  )
 }
 
 resource "aws_cloudwatch_metric_alarm" "ram_over_threshold" {
@@ -32,12 +26,6 @@ resource "aws_cloudwatch_metric_alarm" "ram_over_threshold" {
   threshold          = "2500"
   treat_missing_data = "missing"
   comparison_operator = "LessThanThreshold"
-  tags = merge(
-    var.tags,
-    {
-      Name = "jitbit-rds-ram-threshold"
-    }
-  )
 }
 
 resource "aws_cloudwatch_metric_alarm" "read_latency_over_threshold" {
@@ -53,23 +41,11 @@ resource "aws_cloudwatch_metric_alarm" "read_latency_over_threshold" {
   threshold          = "5"
   treat_missing_data = "missing"
   comparison_operator = "GreaterThanThreshold"
-  tags = merge(
-    var.tags,
-    {
-      Name = "jitbit-rds-read-latency-threshold"
-    }
-  )
 }
 
 # SNS topic for monitoring to send alarms to
 resource "aws_sns_topic" "jitbit_alerting_topic" {
   name = "jitbit_alerting_topic"
-  tags = merge(
-    var.tags,
-    {
-      Name = "jitbit_alerting_topic"
-    }
-  )
 }
 
 #resource "aws_sns_topic_subscription" "pagerduty_subscription" {
