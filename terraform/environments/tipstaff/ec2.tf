@@ -1,7 +1,7 @@
 resource "aws_security_group" "tipstaff_dev_ec2_sc" {
   name        = "ec2 security group"
   description = "control access to the ec2 instance"
-  # vpc_id      = data.aws_vpc.shared.id
+  vpc_id      = data.aws_vpc.shared.id
 }
 
 resource "aws_security_group_rule" "ingress_traffic" {
@@ -30,7 +30,7 @@ resource "aws_security_group_rule" "egress_traffic" {
 resource "aws_instance" "tipstaff_ec2_instance_dev" {
   instance_type = local.application_data.accounts[local.environment].instance_type
   ami           = local.application_data.accounts[local.environment].ami_image_id
-  # subnet_id                   = data.aws_subnet.public_subnets_a.id
+  subnet_id                   = data.aws_subnet.private_subnets_a.id
   vpc_security_group_ids      = [aws_security_group.tipstaff_dev_ec2_sc.id]
   associate_public_ip_address = true
   key_name                    = aws_key_pair.ec2_access_key.key_name

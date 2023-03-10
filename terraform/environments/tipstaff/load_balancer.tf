@@ -1,7 +1,7 @@
 resource "aws_security_group" "tipstaff_dev_lb_sc" {
   name        = "load balancer security group"
   description = "control access to the load balancer"
-  # vpc_id      = data.aws_vpc.shared.id
+  vpc_id      = data.aws_vpc.shared.id
 }
 
 resource "aws_security_group_rule" "ingress_traffic_lb" {
@@ -30,8 +30,9 @@ resource "aws_lb" "tipstaff_dev_lb" {
   name                       = "tipstaff-dev-load-balancer"
   load_balancer_type         = "application"
   security_groups            = [aws_security_group.tipstaff_dev_lb_sc.id]
-  subnets                    = data.aws_subnets.default_subnet.ids
+  subnets                    = data.aws_subnets.shared-public.ids
   enable_deletion_protection = false
+  internal                   = false
   depends_on                 = [aws_security_group.tipstaff_dev_lb_sc]
 }
 
