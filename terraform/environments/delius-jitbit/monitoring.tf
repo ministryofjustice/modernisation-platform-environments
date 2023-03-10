@@ -23,7 +23,7 @@ resource "aws_cloudwatch_metric_alarm" "ram_over_threshold" {
   evaluation_periods = "5"
   alarm_actions      = [aws_sns_topic.jitbit_alerting_topic.arn]
   ok_actions         = [aws_sns_topic.jitbit_alerting_topic.arn]
-  threshold          = "2500"
+  threshold          = "2500000000"
   treat_missing_data = "missing"
   comparison_operator = "LessThanThreshold"
 }
