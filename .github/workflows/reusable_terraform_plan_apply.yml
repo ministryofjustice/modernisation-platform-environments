@@ -37,6 +37,11 @@ on:
         required: false
         description: "Set to plan or plan_apply"
         default: plan
+      terraform_version:
+        type: string
+        required: false
+        description: "The terraform version to use"
+        default: "~1"
       init_plan_apply_tfargs:
         type: string
         required: false
@@ -105,7 +110,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@633666f66e0061ca3b725c73b2ec20cd13a8fdd1  # v2.0.3
         with:
-          terraform_version: "~1"
+          terraform_version: "${{ inputs.terraform_version }}"
           terraform_wrapper: false
 
       - name: Terraform Init
@@ -214,7 +219,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@633666f66e0061ca3b725c73b2ec20cd13a8fdd1  # v2.0.3
         with:
-          terraform_version: "~1"
+          terraform_version: "${{ inputs.terraform_version }}"
           terraform_wrapper: false
 
       - name: Terraform Init
