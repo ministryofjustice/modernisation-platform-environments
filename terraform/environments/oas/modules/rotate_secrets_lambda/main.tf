@@ -1,24 +1,25 @@
 #### This file can be used to store secrets specific to the member account ####
 
-# TODO Do we need to add account ids to the lambda policy?
+# TODO Do we need to restrict account ids to the lambda policy?
 # TODO Turn this into a module with appropriate variables
 
+locals {
+
+}
+
 resource "aws_lambda_function" "rotate_secrets" {
-  # If the file is not in the current working directory you will need to include a
-  # path.module in the filename.
   filename      = "${path.module}/secret_rotation.zip"
   function_name = "SecretsRotation"
   description   = "Secrets Manager password rotation"
   role          = aws_iam_role.lambda.arn
-  # role_arn      = aws_iam_role.lambda.arn
   handler = "index.lambda_handler"
-  timeout = 300
-  runtime = "python3.8"
+  timeout = var.lambda_timeout
+  runtime = var.lambda_runtime
 
   environment {
     variables = {
-      databaseName = "lambdadb"
-      databaseUser = "admin"
+      databaseName = var.database_name
+      databaseUser = var.database_user
       SECRETS_MANAGER_ENDPOINT = "https://secretsmanager.eu-west-2.amazonaws.com"
     }
   }
@@ -71,7 +72,7 @@ resource "aws_iam_policy" "lambda" { #tfsec:ignore:aws-iam-no-policy-wildcards
             Action = [
                 "logs:CreateLogGroup"
             ],
-            Resource = ["arn:aws:logs:${local.application_data.accounts[local.environment].region}:*"]
+            Resource = ["arn:aws:logs:${var.region}:*"]
         },
         {
             Effect = "Allow",
@@ -79,7 +80,7 @@ resource "aws_iam_policy" "lambda" { #tfsec:ignore:aws-iam-no-policy-wildcards
                 "logs:CreateLogStream",
                 "logs:PutLogEvents"
             ],
-            Resource = ["arn:aws:logs:${local.application_data.accounts[local.environment].region}:*:log-group:/aws/lambda/${aws_lambda_function.rotate_secrets.function_name}:*"]
+            Resource = ["arn:aws:logs:${var.region}:*:log-group:/aws/lambda/${aws_lambda_function.rotate_secrets.function_name}:*"]
         },
         {
             Effect = "Allow",
@@ -121,7 +122,7 @@ resource "aws_lambda_permission" "allow_secret_manager" {
 
 resource "aws_cloudwatch_log_group" "rotate_secrets_lambda" {
   name = aws_lambda_function.rotate_secrets.function_name
-  retention_in_days = 180
+  retention_in_days = var.log_group_retention_days
   lifecycle {
     prevent_destroy = true
   }
