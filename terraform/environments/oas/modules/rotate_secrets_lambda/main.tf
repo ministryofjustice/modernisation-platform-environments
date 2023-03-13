@@ -67,20 +67,20 @@ resource "aws_iam_policy" "lambda" { #tfsec:ignore:aws-iam-no-policy-wildcards
         {
             Effect = "Allow",
             Action = [
-                "logs:CreateLogGroup"
+                "logs:CreateLogGroup",
             ],
             Resource = [
-              "arn:aws:logs:${var.region}:${var.account_number}:*"
+              "arn:aws:logs:${var.region}:${var.account_number}:*",
             ]
         },
         {
             Effect = "Allow",
             Action = [
                 "logs:CreateLogStream",
-                "logs:PutLogEvents"
+                "logs:PutLogEvents",
             ],
             Resource = [
-              "arn:aws:logs:${var.region}:${var.account_number}:log-group:/aws/lambda/${local.function_name}:*"
+              "arn:aws:logs:${var.region}:${var.account_number}:log-group:/aws/lambda/${local.function_name}:*",
             ]
         },
         {
@@ -93,7 +93,7 @@ resource "aws_iam_policy" "lambda" { #tfsec:ignore:aws-iam-no-policy-wildcards
                 "secretsmanager:PutSecretValue",
                 "secretsmanager:UpdateSecretVersionStage",
                 "secretsmanager:GetRandomPassword",
-                "lambda:InvokeFunction"
+                "lambda:InvokeFunction",
             ],
             Resources = "*"
         },
@@ -101,7 +101,7 @@ resource "aws_iam_policy" "lambda" { #tfsec:ignore:aws-iam-no-policy-wildcards
             # Sid = "GenerateARandomStringToExecuteRotation"
             Effect = "Allow",
             Action = [
-                "secretsmanager:GetRandomPassword"
+                "secretsmanager:GetRandomPassword",
             ],
             Resources = "*"
         }
