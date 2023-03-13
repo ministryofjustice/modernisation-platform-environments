@@ -125,7 +125,7 @@ data "aws_iam_policy_document" "mlra-local-ecr-policy-data" {
 
     principals {
       type        = "AWS"
-      identifiers = "arn:aws:iam::890609150221:role/mlra-CodeBuildRole"
+      identifiers = ["arn:aws:iam::890609150221:role/mlra-CodeBuildRole"]
     }
 
     actions = [
