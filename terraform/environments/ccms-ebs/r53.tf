@@ -31,7 +31,7 @@ resource "aws_route53_record" "external-mp" {
   records         = [each.value.record]
   ttl             = 60
   type            = each.value.type
-  zone_id = data.aws_route53_zone.network-services.zone_id
+  zone_id         = data.aws_route53_zone.network-services.zone_id
 }
 
 ## EBSDB
