@@ -1,6 +1,6 @@
 #### This file can be used to store secrets specific to the member account ####
 
-resource "aws_lambda_function" "secrets" {
+resource "aws_lambda_function" "rotate_secrets" {
   # If the file is not in the current working directory you will need to include a
   # path.module in the filename.
   filename      = "${path.module}/secret_rotation.zip"
@@ -36,17 +36,6 @@ data "aws_iam_policy_document" "assume_role" {
   }
 }
 
-# resource "aws_iam_instance_profile" "lambda_profile" {
-#   name = "${var.app_name}-lambda-profile"
-#   role = aws_iam_role.iam_for_lambda.name
-#   tags = merge(
-#     var.tags_common,
-#     {
-#       Name = "${var.app_name}-lambda-profile"
-#     }
-#   )
-# }
-
 resource "aws_iam_role" "iam_for_lambda" {
   name               = "iam_for_lambda"
   assume_role_policy = data.aws_iam_policy_document.assume_role.json
@@ -71,7 +60,7 @@ resource "aws_iam_policy" "iam_lambda_policy" { #tfsec:ignore:aws-iam-no-policy-
                 "logs:CreateLogStream",
                 "logs:PutLogEvents"
             ],
-            Resources = ["arn:aws:logs:${local.application_data.accounts[local.environment].region}:*:log-group:/aws/lambda/:*"]
+            Resources = ["arn:aws:logs:${local.application_data.accounts[local.environment].region}:*:log-group:/aws/lambda/${aws_lambda_function.rotate_secrets.name}:*"]
         }
         {
             "Effect": "Allow",
