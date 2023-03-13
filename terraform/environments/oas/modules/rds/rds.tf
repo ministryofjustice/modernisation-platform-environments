@@ -74,11 +74,11 @@ resource "random_password" "rds_password" {
 
 
 resource "aws_secretsmanager_secret" "rds_password_secret" {
-  name = "${var.application_name}/app/db-master-password-tmp" # TODO This name needs changing back to without -tmp to be compatible with hardcoded OAS installation
+  name = "${var.application_name}/app/db-master-password-tmp2" # TODO This name needs changing back to without -tmp2 to be compatible with hardcoded OAS installation
   description = "This secret has a dynamically generated password."
   tags = merge(
     var.tags,
-    { "Name" = "${var.application_name}/app/db-master-password-tmp" }, # TODO This name needs changing back to without -tmp to be compatible with hardcoded OAS installation
+    { "Name" = "${var.application_name}/app/db-master-password-tmp2" }, # TODO This name needs changing back to without -tmp2 to be compatible with hardcoded OAS installation
   )
 }
 

@@ -5,11 +5,11 @@ resource "random_password" "weblogic" {
 
 
 resource "aws_secretsmanager_secret" "weblogic" {
-  name = "${local.application_name}/app/weblogic-admin-password-tmp" # TODO This name needs changing back to without -tmp to be compatible with hardcoded OAS installation
+  name = "${local.application_name}/app/weblogic-admin-password-tmp2" # TODO This name needs changing back to without -tmp2 to be compatible with hardcoded OAS installation
   description = "This secret has a dynamically generated password. This is OAS administrator (weblogic) password, where developers very frequently use as part of accessing OAS and other admin activities."
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_name}/app/weblogic-admin-password-tmp" }, # TODO This name needs changing back to without -tmp to be compatible with hardcoded OAS installation
+    { "Name" = "${local.application_name}/app/weblogic-admin-password-tmp2" }, # TODO This name needs changing back to without -tmp2 to be compatible with hardcoded OAS installation
   )
 }
 
