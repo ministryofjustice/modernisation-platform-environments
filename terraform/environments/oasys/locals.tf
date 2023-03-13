@@ -170,13 +170,13 @@ locals {
         type        = "gp3"
         snapshot_id = null
       }
-      "/dev/sdc" = {    # /u02
+      "/dev/sdc" = { # /u02
         size        = 500
         label       = "app"
         type        = "gp3"
         snapshot_id = null
       }
-      "/dev/sde" = {  # DATA01
+      "/dev/sde" = { # DATA01
         label       = "data"
         size        = 200
         type        = "gp3"
