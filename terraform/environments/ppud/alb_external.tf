@@ -26,11 +26,12 @@ resource "aws_lb_listener" "PPUD-external-Front-End" {
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.PPUD-Target-Group.arn
+    target_group_arn = aws_lb_target_group.PPUD-Target-Group[0].arn
   }
 }
 
 resource "aws_lb_target_group" "PPUD-Target-Group" {
+  count    = local.is-development == true ? 1 : 0
   name     = "PPUD"
   port     = 443
   protocol = "HTTPS"
@@ -60,14 +61,14 @@ resource "aws_lb_target_group" "PPUD-Target-Group" {
 
 resource "aws_lb_target_group_attachment" "PPUD-PORTAL" {
   count            = local.is-development == true ? 1 : 0
-  target_group_arn = aws_lb_target_group.PPUD-Target-Group.arn
+  target_group_arn = aws_lb_target_group.PPUD-Target-Group[0].arn
   target_id        = aws_instance.s609693lo6vw101[0].id
   port             = 443
 }
 
 resource "aws_lb_target_group_attachment" "PPUD-PORTAL-1" {
   count            = local.is-development == true ? 1 : 0
-  target_group_arn = aws_lb_target_group.PPUD-Target-Group.arn
+  target_group_arn = aws_lb_target_group.PPUD-Target-Group[0].arn
   target_id        = aws_instance.PPUDWEBSERVER2[0].id
   port             = 443
 }
@@ -75,7 +76,6 @@ resource "aws_lb_target_group_attachment" "PPUD-PORTAL-1" {
 # WAM Internet Facing ALB
 
 resource "aws_lb" "WAM-ALB" {
-  # count              = local.is-development == true ? 1 : 0
   name               = local.application_data.accounts[local.environment].DEV_WAM_ALB
   internal           = false
   load_balancer_type = "application"
@@ -90,7 +90,6 @@ resource "aws_lb" "WAM-ALB" {
 }
 
 resource "aws_lb_listener" "WAM-Front-End" {
-  # load_balancer_arn = aws_lb.WAM-ALB[0].arn
   load_balancer_arn = aws_lb.WAM-ALB.arn
   port              = "443"
   protocol          = "HTTPS"
@@ -130,23 +129,12 @@ resource "aws_lb_target_group_attachment" "WAM-Portal-development" {
   count            = local.is-development == true ? 1 : 0
   target_group_arn = aws_lb_target_group.WAM-Target-Group.arn
   target_id        = aws_instance.s609693lo6vw105[0].id
-  # target_id = local.application_data.accounts[local.environment].alb_intances_wam
-  port = 80
+  port             = 80
 }
 
 resource "aws_lb_target_group_attachment" "WAM-Portal-preproduction" {
   count            = local.is-preproduction == true ? 1 : 0
   target_group_arn = aws_lb_target_group.WAM-Target-Group.arn
   target_id        = aws_instance.s618358rgvw201[0].id
-  # target_id = local.application_data.accounts[local.environment].alb_intances_wam
-  port = 80
+  port             = 80
 }
-
-
-/*
-resource "aws_lb_target_group_attachment" "target_group_attachment" {
-  count            = length(var.instance_ids_wam_alb[terraform.workspace])
-  target_group_arn = aws_lb_target_group.WAM-Target-Group.arn
-  target_id        = var.instance_ids_wam_alb[terraform.workspace][count.index]
-  }
-  */

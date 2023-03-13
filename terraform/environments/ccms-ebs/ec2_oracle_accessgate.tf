@@ -1,10 +1,11 @@
 resource "aws_instance" "ec2_accessgate" {
-  count                       = local.application_data.accounts[local.environment].accessgate_no_instances
-  instance_type               = local.application_data.accounts[local.environment].ec2_oracle_instance_type_accessgate
-  ami                         = data.aws_ami.accessgate.id
-  key_name                    = local.application_data.accounts[local.environment].key_name
-  vpc_security_group_ids      = [aws_security_group.ec2_sg_accessgate.id]
-  subnet_id                   = data.aws_subnet.data_subnets_a.id
+  count                  = local.application_data.accounts[local.environment].accessgate_no_instances
+  instance_type          = local.application_data.accounts[local.environment].ec2_oracle_instance_type_accessgate
+  ami                    = data.aws_ami.accessgate.id
+  key_name               = local.application_data.accounts[local.environment].key_name
+  vpc_security_group_ids = [aws_security_group.ec2_sg_accessgate.id]
+  subnet_id              = local.environment == "development" ? local.data_subnets[count.index] : local.private_subnets[count.index]
+  #subnet_id                   = data.aws_subnet.data_subnets_a.id
   monitoring                  = true
   ebs_optimized               = false
   associate_public_ip_address = false
@@ -92,13 +93,13 @@ EOF
   depends_on = [aws_security_group.ec2_sg_accessgate]
 
 }
-/*
+
+
 module "cw-accgate-ec2" {
   source = "./modules/cw-ec2"
 
-  name        = "ec2-accgate"
-  topic       = aws_sns_topic.cw_alerts.arn
-  instanceIds = join(",", [for instance in aws_instance.ec2_accessgate : instance.id])
+  name  = "ec2-accgate"
+  topic = aws_sns_topic.cw_alerts.arn
 
   for_each     = local.application_data.cloudwatch_ec2
   metric       = each.key
@@ -106,32 +107,10 @@ module "cw-accgate-ec2" {
   period       = each.value.period
   threshold    = each.value.threshold
 
+  # Dimensions used across all alarms
+  instanceId   = aws_instance.ec2_accessgate[local.application_data.accounts[local.environment].accessgate_no_instances - 1].id
+  imageId      = data.aws_ami.accessgate.id
+  instanceType = local.application_data.accounts[local.environment].ec2_oracle_instance_type_accessgate
+  fileSystem   = "xfs"       # Linux root filesystem
+  rootDevice   = "nvme0n1p1" # This is used by default for root on all the ec2 images
 }
-*/
-/*
-resource "aws_ebs_volume" "accessgate_create" {
-  lifecycle {
-    ignore_changes = [kms_key_id]
-  }
-  #for_each          = local.application_data.accounts[local.environment].accessgate_ebs
-  for_each          = local.application_data.accessgate_ebs
-  availability_zone = "eu-west-2a"
-  encrypted         = true
-  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-
-  type              = each.value.type
-  iops              = local.application_data.accounts[local.environment].accessgate_default_iops
-  size              = local.application_data.accounts[local.environment].accessgate_u01_size
-
-  tags = merge(local.tags,
-    { Name = each.key }
-  )
-}
-
-
-resource "aws_volume_attachment" "accessgate_att" {
-  for_each    = local.application_data.accessgate_ebs
-  device_name = each.value.device_name
-  volume_id   = aws_ebs_volume.accessgate_create[[each.key]].id
-  instance_id = aws_instance.ec2_oracle_ebs.id
-}*/

@@ -1,10 +1,11 @@
 #  Build EC2 
 resource "aws_instance" "ec2_ftp" {
-  instance_type               = "c5d.large"
-  ami                         = "ami-08cd358d745620807"
-  key_name                    = local.application_data.accounts[local.environment].key_name
-  vpc_security_group_ids      = [aws_security_group.ec2_sg_ftp.id]
-  subnet_id                   = data.aws_subnet.data_subnets_a.id
+  instance_type          = local.application_data.accounts[local.environment].ec2_instance_type_ftp
+  ami                    = local.application_data.accounts[local.environment].ftp_ami_id
+  key_name               = local.application_data.accounts[local.environment].key_name
+  vpc_security_group_ids = [aws_security_group.ec2_sg_ftp.id]
+  subnet_id              = local.environment == "development" ? data.aws_subnet.data_subnets_a.id : data.aws_subnet.private_subnets_a.id
+  #subnet_id                   = data.aws_subnet.data_subnets_a.id
   monitoring                  = true
   ebs_optimized               = false
   associate_public_ip_address = false
@@ -111,13 +112,12 @@ EOF
 
   depends_on = [aws_security_group.ec2_sg_ftp]
 }
-/*
+
 module "cw-ftp-ec2" {
   source = "./modules/cw-ec2"
 
-  name        = "ec2-ftp"
-  topic       = aws_sns_topic.cw_alerts.arn
-  instanceIds = aws_instance.ec2_ftp.id
+  name  = "ec2-ftp"
+  topic = aws_sns_topic.cw_alerts.arn
 
   for_each     = local.application_data.cloudwatch_ec2
   metric       = each.key
@@ -125,5 +125,10 @@ module "cw-ftp-ec2" {
   period       = each.value.period
   threshold    = each.value.threshold
 
+  # Dimensions used across all alarms
+  instanceId   = aws_instance.ec2_ftp.id
+  imageId      = local.application_data.accounts[local.environment].ftp_ami_id
+  instanceType = local.application_data.accounts[local.environment].ec2_instance_type_ftp
+  fileSystem   = "xfs"       # Linux root filesystem
+  rootDevice   = "nvme0n1p1" # This is used by default for root on all the ec2 images
 }
-*/
