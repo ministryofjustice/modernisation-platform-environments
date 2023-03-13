@@ -30,7 +30,7 @@
     {
       "Effect": "Allow",
       "Resource": [
-        "*"
+        "arn:aws:ecr:eu-west-2:374269020027.dkr.ecr.eu-west-2.amazonaws.com/mlra-ecr-repo"
       ],
       "Action": [
         "ecr:GetDownloadUrlForLayer",
