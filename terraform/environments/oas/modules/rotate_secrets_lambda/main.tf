@@ -9,7 +9,7 @@ resource "aws_lambda_function" "rotate_secrets" {
   function_name = local.function_name
   description   = "Secrets Manager password rotation"
   role          = aws_iam_role.lambda.arn
-  handler = "main.lambda_handler"
+  handler = "secret_rotation.lambda_handler"
   timeout = var.lambda_timeout
   runtime = var.lambda_runtime
 
