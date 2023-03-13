@@ -150,43 +150,63 @@ resource "aws_s3_bucket_acl" "codepipeline_bucket_acl" {
   acl    = "private"
 }
 
-resource "aws_iam_role" "codepipeline_role" {
-  name = "codepipeline-role"
+# resource "aws_iam_role" "codepipeline_role" {
+#   name = "codepipeline-role"
 
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action = "sts:AssumeRole"
-        Effect = "Allow"
-        Principal = {
-          Service = "codepipeline.amazonaws.com"
-        }
-      },
-      {
-        Action = "sts:AssumeRole"
-        Effect = "Allow"
-        Principal = {
-          Service = "codebuild.amazonaws.com"
-        }
-      }
-    ]
-  })
+#   assume_role_policy = jsonencode({
+#     Version = "2012-10-17"
+#     Statement = [
+#       {
+#         Action = "sts:AssumeRole"
+#         Effect = "Allow"
+#         Principal = {
+#           Service = "codepipeline.amazonaws.com"
+#         }
+#       },
+#       {
+#         Action = "sts:AssumeRole"
+#         Effect = "Allow"
+#         Principal = {
+#           Service = "codebuild.amazonaws.com"
+#         }
+#       }
+#     ]
+#   })
+# }
+
+data "aws_iam_policy_document" "assume_role" {
+  effect = "Allow"
+
+  principals {
+    type        = "Service"
+    identifiers = ["ec2.amazonaws.com"]
+  }
+
+  actions = ["sts:AssumeRole"]
 }
 
-resource "aws_iam_role_policy_attachment" "codepipeline_policy_attachment" {
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "codepipeline:*"
-        ]
-        Resource = "*"
-      }
+resource "aws_iam_role" "codepipeline_role" {
+  name               = "codepipeline_role"
+  assume_role_policy = data.aws_iam_policy_document.assume_role.json
+}
+
+data "aws_iam_policy_document" "codepipeline_policy" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "ec2:DescribeInstances",
+      "ec2:StartInstances",
+      "ec2:StopInstances",
+      "codepipeline:*"
     ]
-  })
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_policy" "policy" {
+  name        = "codepipeline-policy"
+  description = "A test policy for codepipeline"
+  policy      = data.aws_iam_policy_document.codepipeline_policy.json
 
   role = aws_iam_role.codepipeline_role.name
 }
@@ -194,61 +214,6 @@ resource "aws_iam_role_policy_attachment" "codepipeline_policy_attachment" {
 # resource "aws_iam_role_policy_attachment" "s3_policy_attachment" {
 #   policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
 #   role       = aws_iam_role.example_codepipeline_role.name
-# }
-
-resource "aws_iam_role_policy_attachment" "ec2_policy_attachment" {
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "ec2:DescribeInstances",
-          "ec2:StartInstances",
-          "ec2:StopInstances"
-        ]
-        Resource = "*"
-      }
-    ]
-  })
-
-  role = aws_iam_role.codepipeline_role.name
-}
-
-# data "aws_iam_policy_document" "codepipeline_policy" {
-#   statement {
-#     effect = "Allow"
-
-#     actions = [
-#       "s3:GetObject",
-#       "s3:GetObjectVersion",
-#       "s3:GetBucketVersioning",
-#       "s3:PutObjectAcl",
-#       "s3:PutObject",
-#     ]
-
-#     resources = [
-#       aws_s3_bucket.codepipeline_bucket.arn,
-#       "${aws_s3_bucket.codepipeline_bucket.arn}/*"
-#     ]
-#   }
-
-#   statement {
-#     effect   = "Allow"
-#     actions  = ["codestar-connections:UseConnection"]
-#     resource = [aws_codestarconnections_connection.example.arn]
-#   }
-
-#   statement {
-#     effect = "Allow"
-
-#     actions = [
-#       "codebuild:BatchGetBuilds",
-#       "codebuild:StartBuild",
-#     ]
-
-#     resources = ["*"]
-#   }
 # }
 
 # resource "aws_iam_role_policy" "codepipeline_policy" {
