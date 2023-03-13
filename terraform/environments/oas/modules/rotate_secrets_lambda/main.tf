@@ -94,7 +94,7 @@ resource "aws_iam_policy" "lambda" { #tfsec:ignore:aws-iam-no-policy-wildcards
             Resources = "*"
         },
         {
-            Sid = "GenerateARandomStringToExecuteRotation"
+            # Sid = "GenerateARandomStringToExecuteRotation"
             Effect = "Allow",
             Action = [
                 "secretsmanager:GetRandomPassword"
