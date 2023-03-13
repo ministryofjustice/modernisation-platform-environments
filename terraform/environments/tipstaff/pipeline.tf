@@ -59,6 +59,7 @@ resource "aws_codepipeline" "codepipeline" {
       owner           = "AWS"
       provider        = "CodeDeployToEC2"
       input_artifacts = ["build_output"]
+      version         = "1"
 
       configuration = {
         ApplicationName     = "my-dotnet-app"
@@ -74,7 +75,6 @@ resource "aws_codebuild_project" "my_build_project" {
   name               = "my-dotnet-build-project"
   description        = "Build .NET application"
   service_role       = "arn:aws:iam::${data.aws_caller_identity.original_session.id}:role/MemberInfrastructureAccess"
-  timeout_in_minutes = 60
   artifacts {
     type = "CODEPIPELINE"
   }
