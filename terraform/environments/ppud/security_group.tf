@@ -572,6 +572,15 @@ resource "aws_security_group_rule" "UAT-Document-Service-Ingress" {
   security_group_id = aws_security_group.UAT-Document-Service.id
 }
 
+resource "aws_security_group_rule" "PPUD-Database-Server-Ingress-1" {
+  type              = "ingress"
+  from_port         = 1433
+  to_port           = 1433
+  protocol          = "tcp"
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+  security_group_id = aws_security_group.UAT-Document-Service.id
+}
+
 resource "aws_security_group_rule" "UAT-Document-Service-Egress" {
   type              = "egress"
   from_port         = 0
