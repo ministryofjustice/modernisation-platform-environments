@@ -60,7 +60,7 @@ resource "aws_iam_policy" "iam_lambda_policy" { #tfsec:ignore:aws-iam-no-policy-
                 "logs:CreateLogStream",
                 "logs:PutLogEvents"
             ],
-            Resources = ["arn:aws:logs:${local.application_data.accounts[local.environment].region}:*:log-group:/aws/lambda/${aws_lambda_function.rotate_secrets.name}:*"]
+            Resources = ["arn:aws:logs:${local.application_data.accounts[local.environment].region}:*:log-group:/aws/lambda/${aws_lambda_function.rotate_secrets.function_name}:*"]
         }
         {
             "Effect": "Allow",
