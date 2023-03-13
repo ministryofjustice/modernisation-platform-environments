@@ -72,9 +72,9 @@ resource "aws_codepipeline" "codepipeline" {
 
 # Create CodeBuild project
 resource "aws_codebuild_project" "my_build_project" {
-  name               = "my-dotnet-build-project"
-  description        = "Build .NET application"
-  service_role       = "arn:aws:iam::${data.aws_caller_identity.original_session.id}:role/MemberInfrastructureAccess"
+  name         = "my-dotnet-build-project"
+  description  = "Build .NET application"
+  service_role = "arn:aws:iam::${data.aws_caller_identity.original_session.id}:role/MemberInfrastructureAccess"
   artifacts {
     type = "CODEPIPELINE"
   }
