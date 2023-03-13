@@ -4,12 +4,12 @@
 # TODO Turn this into a module with appropriate variables
 
 locals {
-
+  function_name = "SecretsRotation"
 }
 
 resource "aws_lambda_function" "rotate_secrets" {
   filename      = "${path.module}/secret_rotation.zip"
-  function_name = "SecretsRotation"
+  function_name = local.function_name
   description   = "Secrets Manager password rotation"
   role          = aws_iam_role.lambda.arn
   handler = "index.lambda_handler"
@@ -50,19 +50,19 @@ data "aws_iam_policy_document" "assume_role" {
 }
 
 resource "aws_iam_role" "lambda" {
-  name               = "${aws_lambda_function.rotate_secrets.function_name}-ExecutionRole"
+  name               = "${local.function_name}-ExecutionRole"
   assume_role_policy = data.aws_iam_policy_document.assume_role.json
   tags = merge(
     local.tags,
-    { "Name" = "${aws_lambda_function.rotate_secrets.function_name}-ExecutionRole" },
+    { "Name" = "${local.function_name}-ExecutionRole" },
   )
 }
 
 resource "aws_iam_policy" "lambda" { #tfsec:ignore:aws-iam-no-policy-wildcards
-  name   = "${aws_lambda_function.rotate_secrets.function_name}-Policy"
+  name   = "${local.function_name}-Policy"
   tags = merge(
     local.tags,
-    { "Name" = "${aws_lambda_function.rotate_secrets.function_name}-Policy" },
+    { "Name" = "${local.function_name}-Policy" },
   )
   policy = jsonencode({
     Version: "2012-10-17"
@@ -80,7 +80,7 @@ resource "aws_iam_policy" "lambda" { #tfsec:ignore:aws-iam-no-policy-wildcards
                 "logs:CreateLogStream",
                 "logs:PutLogEvents"
             ],
-            Resource = ["arn:aws:logs:${var.region}:*:log-group:/aws/lambda/${aws_lambda_function.rotate_secrets.function_name}:*"]
+            Resource = ["arn:aws:logs:${var.region}:*:log-group:/aws/lambda/${local.function_name}:*"]
         },
         {
             Effect = "Allow",
