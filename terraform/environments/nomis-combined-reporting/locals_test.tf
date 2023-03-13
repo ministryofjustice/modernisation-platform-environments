@@ -46,63 +46,60 @@ locals {
         }
       }
     }
-    baseline_lbs = {
-      rhel85-test = {
-        enable_delete_protection = false
-        idle_timeout             = "60"
-        public_subnets           = module.environment.subnets["public"].ids
-        force_destroy_bucket     = true
-        internal_lb              = true
-        tags                     = local.tags
-        security_groups          = [module.baseline.security_groups["public"].id]
-        # listeners = {
-        #   https = {
-        #     port             = 443
-        #     protocol         = "HTTPS"
-        #     ssl_policy       = "ELBSecurityPolicy-2016-08"
-        #     certificate_arns = [module.acm_certificate["star.${module.environment.domains.public.application_environment}"].arn]
-        #     default_action = {
-        #       type = "fixed-response"
-        #       fixed_response = {
-        #         content_type = "text/plain"
-        #         message_body = "Not implemented"
-        #         status_code  = "501"
-        #       }
-        #     }
+    # baseline_lbs = {
+    #   rhel85-test = {
+    #     enable_delete_protection = false
+    #     idle_timeout             = "60"
+    #     public_subnets           = module.environment.subnets["public"].ids
+    #     force_destroy_bucket     = true
+    #     internal_lb              = true
+    #     tags                     = local.tags
+    #     security_groups          = [module.baseline.security_groups["public"].id]
+    #     listeners = {
+    #       https = {
+    #         port             = 443
+    #         protocol         = "HTTPS"
+    #         ssl_policy       = "ELBSecurityPolicy-2016-08"
+    #         certificate_arns = [module.acm_certificate["star.${module.environment.domains.public.application_environment}"].arn]
+    #         default_action = {
+    #           type = "fixed-response"
+    #           fixed_response = {
+    #             content_type = "text/plain"
+    #             message_body = "Not implemented"
+    #             status_code  = "501"
+    #           }
+    #         }
 
-        #     rules = {
-        #       forward-http-8080 = {
-        #         priority = 100
-        #         actions = [{
-        #           type              = "forward"
-        #           target_group_name = "http-8080"
-        #         }]
-        #         conditions = [
-        #           {
-        #             host_header = {
-        #               values = ["web.oasys.${module.environment.vpc_name}.modernisation-platform.service.justice.gov.uk"]
-        #             }
-        #           },
-        #           {
-        #             path_pattern = {
-        #               values = ["/"]
-        #             }
-        #         }]
-        #       }
-        #     }
-        #   }
-
-        #   route53 = {
-        #     route53_records = {
-        #       "web.oasys" = {
-        #         account                = "core-vpc"
-        #         zone_id                = module.environment.route53_zones[module.environment.domains.public.business_unit_environment].zone_id
-        #         evaluate_target_health = true
-        #       }
-        #     }
-        #   }
-        # }
-      }
-    }
+    #         rules = {
+    #           forward-http-8080 = {
+    #             priority = 100
+    #             actions = [{
+    #               type              = "forward"
+    #               target_group_name = "http-8080"
+    #             }]
+    #             conditions = [
+    #               {
+    #                 host_header = {
+    #                   values = ["web.oasys.${module.environment.vpc_name}.modernisation-platform.service.justice.gov.uk"]
+    #                 }
+    #               },
+    #               {
+    #                 path_pattern = {
+    #                   values = ["/"]
+    #                 }
+    #             }]
+    #           }
+    #         }
+    #       }
+    #       route53_records = {
+    #         "web.oasys" = {
+    #           account                = "core-vpc"
+    #           zone_id                = module.environment.route53_zones[module.environment.domains.public.business_unit_environment].zone_id
+    #           evaluate_target_health = true
+    #         }
+    #       }
+    #     }
+    #   }
+    # }
   }
 }
