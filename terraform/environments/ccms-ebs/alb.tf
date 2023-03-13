@@ -18,6 +18,7 @@ resource "aws_lb" "ebsapps_lb" {
   )
 }
 
+/*
 resource "aws_route53_record" "external" {
   provider = aws.core-vpc
 
@@ -31,6 +32,7 @@ resource "aws_route53_record" "external" {
     evaluate_target_health = true
   }
 }
+*/
 
 resource "aws_lb_listener" "ebsapps_listener" {
   depends_on = [
