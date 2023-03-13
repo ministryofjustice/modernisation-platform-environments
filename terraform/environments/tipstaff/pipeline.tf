@@ -1,11 +1,3 @@
-provider "aws" {
-  region = "eu-west-1"
-  alias  = "ireland"
-  assume_role {
-    role_arn = "arn:aws:iam::${data.aws_caller_identity.original_session.id}:role/MemberInfrastructureAccess"
-  }
-}
-
 # Define the GitHub repository information
 data "github_repository" "my_repo" {
   full_name = "ministryofjustice/Tipstaff"
@@ -34,7 +26,6 @@ resource "aws_codepipeline" "codepipeline" {
 
       configuration = {
         FullRepositoryId = data.github_repository.my_repo.full_name
-        Region           = "eu-west-1"
         BranchName       = "master"
         OAuthToken       = jsondecode(data.aws_secretsmanager_secret_version.oauth_token.secret_string)["OAUTH_TOKEN"]
       }
@@ -74,7 +65,6 @@ resource "aws_codepipeline" "codepipeline" {
       configuration = {
         ApplicationName     = "my-dotnet-app"
         DeploymentGroupName = "my-dotnet-deployment-group"
-        Region              = "eu-west-1"
       }
     }
   }
@@ -82,7 +72,7 @@ resource "aws_codepipeline" "codepipeline" {
 
 # Create CodeBuild project
 resource "aws_codebuild_project" "my_build_project" {
-  provider     = aws.ireland
+  region_override = "eu-west-1"
   name         = "my-dotnet-build-project"
   description  = "Build .NET application"
   service_role = "arn:aws:iam::${data.aws_caller_identity.original_session.id}:role/MemberInfrastructureAccess"
@@ -154,7 +144,50 @@ resource "aws_iam_policy" "allow_ec2_policy" {
 
 }
 
-resource "aws_iam_role_policy_attachment" "s3_policy_attachment" {
+resource "aws_iam_role_policy_attachment" "codepipeline_policy_attachment" {
   policy_arn = aws_iam_policy.allow_ec2_policy.arn
   role       = aws_iam_role.codepipeline_role.name
+}
+
+// create CodeBuild role, create policy, and attach policy
+
+resource "aws_iam_role" "codebuild_role" {
+  name = "codebuild_role"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Sid    = ""
+        Principal = {
+          Service = "codebuild.amazonaws.com"
+        }
+      },
+    ]
+  })
+}
+
+resource "aws_iam_policy" "allow_codebuild_policy" {
+  name        = "allow_codebuild_policy"
+  description = "A test policy for codebuild"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "codebuild:*"
+        ]
+        Effect   = "Allow"
+        Resource = "*"
+      },
+    ]
+  })
+
+}
+
+resource "aws_iam_role_policy_attachment" "codebuild_policy_attachment" {
+  policy_arn = aws_iam_policy.allow_codebuild_policy.arn
+  role       = aws_iam_role.codebuild_role.name
 }
