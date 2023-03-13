@@ -100,6 +100,47 @@ resource "aws_s3_bucket_versioning" "report_versioning" {
 # }
 
 
+######################################################
+# ECR Resources
+######################################################
+
+resource "aws_ecr_repository" "mlra-local-ecr" {
+  name                 = "mlra-local-ecr"
+  image_tag_mutability = "MUTABLE"
+
+  image_scanning_configuration {
+    scan_on_push = false
+  }
+}
+
+resource "aws_ecr_repository_policy" "mlra-local-ecr-policy" {
+  repository = aws_ecr_repository.mlra-local-ecr.name
+  policy     = data.aws_iam_policy_document.mlra-local-ecr-policy-data.json
+}
+
+data "aws_iam_policy_document" "mlra-local-ecr-policy-data" {
+  statement {
+    sid    = "AccessECR"
+    effect = "Allow"
+
+    Principal = { "AWS": "arn:aws:iam::890609150221:role/mlra-CodeBuildRole" }
+
+    actions = [
+      "ecr:GetDownloadUrlForLayer",
+      "ecr:BatchGetImage",
+      "ecr:BatchCheckLayerAvailability",
+      "ecr:PutImage",
+      "ecr:InitiateLayerUpload",
+      "ecr:UploadLayerPart",
+      "ecr:CompleteLayerUpload",
+      "ecr:DescribeRepositories",
+      "ecr:GetRepositoryPolicy",
+      "ecr:ListImages"
+    ]
+  }
+}
+
+
 
 ######################################################
 # CodeBuild projects
@@ -139,6 +180,7 @@ resource "aws_codebuild_project" "app-build" {
   build_timeout = 20
   # encryption_key = aws_kms_key.codebuild.arn
   service_role = aws_iam_role.codebuild_s3.arn
+  source_version = "LAWS-3074-gha"
 
   artifacts {
     type = "NO_ARTIFACTS"
@@ -186,6 +228,15 @@ resource "aws_codebuild_project" "app-build" {
     type      = "GITHUB"
     location  = "https://github.com/ministryofjustice/laa-mlra-application.git"
     buildspec = "buildspec-mp.yml"
+  }
+
+  secondary_sources {
+    type              = "BITBUCKET"
+    source_identifier = "qa"
+    location          = "https://xxxxxx.git"
+    git_clone_depth   = 0
+    source_version = "refs/heads/master"
+
   }
 
   tags = merge(
