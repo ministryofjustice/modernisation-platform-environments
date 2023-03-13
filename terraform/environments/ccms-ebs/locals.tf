@@ -22,6 +22,3 @@ locals {
     data.aws_subnet.public_subnets_c.id
   ]
 }
-
-
-
