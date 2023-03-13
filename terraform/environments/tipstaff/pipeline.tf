@@ -19,26 +19,26 @@ resource "aws_codepipeline" "codepipeline" {
     # }
   }
 
-#   stage {
-#     name = "Source"
+  #   stage {
+  #     name = "Source"
 
-#     action {
-#       name             = "Source"
-#       category         = "Source"
-#       owner            = "AWS"
-#       provider         = "CodeStarSourceConnection"
-#       version          = "1"
-#       output_artifacts = ["source_output"]
+  #     action {
+  #       name             = "Source"
+  #       category         = "Source"
+  #       owner            = "AWS"
+  #       provider         = "CodeStarSourceConnection"
+  #       version          = "1"
+  #       output_artifacts = ["source_output"]
 
-#       configuration = {
-#         ConnectionArn    = aws_codestarconnections_connection.source-repo-connection.arn
-#         FullRepositoryId = "47194958"
-#         BranchName       = "master"
-#       }
-#     }
-#   }
+  #       configuration = {
+  #         ConnectionArn    = aws_codestarconnections_connection.source-repo-connection.arn
+  #         FullRepositoryId = "47194958"
+  #         BranchName       = "master"
+  #       }
+  #     }
+  #   }
 
-# Define the source stage with the GitHub repository
+  # Define the source stage with the GitHub repository
   stage {
     name = "Source"
 
@@ -74,7 +74,7 @@ resource "aws_codepipeline" "codepipeline" {
 
       configuration = {
         ProjectName = "my-dotnet-build-project"
-        Region              = "eu-west-1"
+        Region      = "eu-west-1"
       }
     }
   }
