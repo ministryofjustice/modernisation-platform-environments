@@ -248,7 +248,7 @@ resource "aws_codebuild_project" "selenium" {
   description   = "Project to test the Java application ${var.app_name}"
   build_timeout = 20
   # encryption_key = aws_kms_key.codebuild.arn
-  service_role   = aws_iam_role.codebuild_s3.arn
+  service_role = aws_iam_role.codebuild_s3.arn
 
   artifacts {
     type = "NO_ARTIFACTS"
