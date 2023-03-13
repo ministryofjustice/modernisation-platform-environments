@@ -36,6 +36,41 @@ locals {
       # *-nomis-db-3: HA
 
       # add databases here as needed
+      test-nomis-db-3 = {
+        tags = {
+          server-type         = "nomis-db"
+          description         = "Test database for monitoring automation development"
+          oracle-sids         = "CNOMT1"
+          monitored           = false
+          s3-db-restore-dir   = "CNOMT1_20211214"
+          # instance-scheduling = "skip-scheduling"
+          fixngo-connection-target = "10.40.0.136"
+        }
+        ami_name  = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-07T12-48-08.562Z"
+        ami_owner = "self" # remove this line next time AMI is updated so core-shared-services-production used instead
+        instance = {
+          disable_api_termination = true
+        }
+        cloudwatch_metric_alarms = {
+          fixngo-connection = {
+            comparison_operator = "GreaterThanOrEqualToThreshold"
+            evaluation_periods  = "3"
+            namespace           = "CWAgent"
+            metric_name         = "collectd_exec_value"
+            period              = "60"
+            statistic           = "Average"
+            threshold           = "1"
+            alarm_description   = "ssm agent service has stopped"
+            alarm_actions       = [aws_sns_topic.nomis_nonprod_alarms.arn]
+            dimensions = {
+              instance = "fixngo_connected"
+            }
+          }
+        }
+      }
+    }
+
+
     }
     weblogics          = {}
     ec2_test_instances = {}
