@@ -8,6 +8,10 @@ terraform {
       version = "~> 3.0"
       source  = "hashicorp/http"
     }
+    random = {
+      source = "hashicorp/random"
+      version = "~> 3.4"
+    }
   }
   required_version = "~> 1.0"
 }
