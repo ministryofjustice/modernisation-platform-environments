@@ -1,7 +1,6 @@
 # Define the GitHub repository information
 data "github_repository" "my_repo" {
-  owner = "ministryofjustice"
-  name  = "Tipstaff"
+  full_name = "ministryofjustice/Tipstaff"
 }
 
 # Create CodePipeline
