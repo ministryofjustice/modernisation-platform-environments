@@ -1,10 +1,11 @@
 resource "aws_instance" "ec2_ebsapps" {
-  count                       = local.application_data.accounts[local.environment].ebsapps_no_instances
-  instance_type               = local.application_data.accounts[local.environment].ec2_oracle_instance_type_ebsapps
-  ami                         = data.aws_ami.oracle_base_prereqs.id
-  key_name                    = local.application_data.accounts[local.environment].key_name
-  vpc_security_group_ids      = [aws_security_group.ec2_sg_ebsapps.id]
-  subnet_id                   = data.aws_subnet.data_subnets_a.id
+  count                  = local.application_data.accounts[local.environment].ebsapps_no_instances
+  instance_type          = local.application_data.accounts[local.environment].ec2_oracle_instance_type_ebsapps
+  ami                    = data.aws_ami.oracle_base_prereqs.id
+  key_name               = local.application_data.accounts[local.environment].key_name
+  vpc_security_group_ids = [aws_security_group.ec2_sg_ebsapps.id]
+  subnet_id              = local.environment == "development" ? local.data_subnets[count.index] : local.private_subnets[count.index]
+  #subnet_id                   = data.aws_subnet.data_subnets_a.id
   monitoring                  = true
   ebs_optimized               = false
   associate_public_ip_address = false
