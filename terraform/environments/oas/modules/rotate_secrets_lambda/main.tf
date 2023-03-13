@@ -18,7 +18,7 @@ resource "aws_lambda_function" "rotate_secrets" {
       databaseName = var.database_name
       databaseUser = var.database_user
       SECRETS_MANAGER_ENDPOINT = "https://secretsmanager.eu-west-2.amazonaws.com"
-      EXCLUDE_CHARACTERS = "!@£$%^&*()_+-={}[]\"\\'|<>?,./~`:;#" # Characters to exclude for rotated secrets
+      # EXCLUDE_CHARACTERS = "!@£$%^&*()_+-={}[]" # Characters to exclude for rotated secrets, currently not working
     }
   }
 
