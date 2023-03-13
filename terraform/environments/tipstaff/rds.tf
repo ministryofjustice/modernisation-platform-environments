@@ -9,14 +9,14 @@ resource "aws_db_instance" "tipstaffdbdev" {
   username               = jsondecode(data.aws_secretsmanager_secret_version.db_username.secret_string)["LOCAL_DB_USERNAME"]
   password               = jsondecode(data.aws_secretsmanager_secret_version.db_password.secret_string)["LOCAL_DB_PASSWORD"]
   skip_final_snapshot    = true
+  publicly_accessible    = true
   vpc_security_group_ids = [aws_security_group.postgresql_db_sc.id]
   db_subnet_group_name   = aws_db_subnet_group.dbsubnetgroup.name
-  publicly_accessible    = true
 }
 
 resource "aws_db_subnet_group" "dbsubnetgroup" {
   name       = "dbsubnetgroup"
-  subnet_ids = [data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id]
+  subnet_ids = data.aws_subnets.shared-public.ids
 }
 
 resource "aws_security_group" "postgresql_db_sc" {
@@ -38,10 +38,29 @@ resource "aws_security_group" "postgresql_db_sc" {
     cidr_blocks = ["0.0.0.0/0"]
   }
   egress {
+    description = "allow all outbound traffic"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+}
 
+resource "null_resource" "setup_db" {
+  depends_on = [aws_db_instance.tipstaffdbdev]
+
+  provisioner "local-exec" {
+    interpreter = ["bash", "-c"]
+    command     = "chmod +x ./setup-postgresql.sh; ./setup-postgresql.sh"
+
+    environment = {
+      DB_HOSTNAME       = aws_db_instance.tipstaffdbdev.address
+      DB_NAME           = aws_db_instance.tipstaffdbdev.db_name
+      LOCAL_DB_USERNAME = jsondecode(data.aws_secretsmanager_secret_version.db_username.secret_string)["LOCAL_DB_USERNAME"]
+      LOCAL_DB_PASSWORD = jsondecode(data.aws_secretsmanager_secret_version.db_password.secret_string)["LOCAL_DB_PASSWORD"]
+    }
+  }
+  triggers = {
+    always_run = "${timestamp()}"
+  }
 }
