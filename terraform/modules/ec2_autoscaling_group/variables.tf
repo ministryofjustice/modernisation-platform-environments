@@ -124,6 +124,7 @@ variable "ebs_volumes" {
     size        = optional(number)
     type        = optional(string)
     kms_key_id  = optional(string)
+    no_device   = optional(bool)
   }))
 }
 
