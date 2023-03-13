@@ -107,7 +107,7 @@ resource "aws_s3_bucket_acl" "codepipeline_bucket_acl" {
 }
 
 resource "aws_iam_role" "codepipeline_role" {
-  name               = "codepipeline_role"
+  name = "codepipeline_role"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
