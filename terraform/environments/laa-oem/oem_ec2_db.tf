@@ -12,7 +12,7 @@ resource "aws_instance" "oem_db" {
   user_data = base64encode(templatefile("./templates/oem-user-data-db.sh", {
     efs_id      = aws_efs_file_system.oem-db-efs.id
     env_in_fqdn = local.application_data.accounts[local.environment].env_in_fqdn
-    hostname    = "ccms-oem-db"
+    hostname    = "laa-oem-db"
   }))
   vpc_security_group_ids = [aws_security_group.oem_db_security_group.id]
 
@@ -33,7 +33,8 @@ resource "aws_instance" "oem_db" {
 
   tags = merge(tomap({
     "Name"     = lower(format("ec2-%s-%s-db", local.application_name, local.environment)),
-    "hostname" = "${local.application_name}-db"
+    "hostname" = "${local.application_name}-db",
+    "env-fqdn" = "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   }), local.tags)
 
   lifecycle {

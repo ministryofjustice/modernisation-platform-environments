@@ -83,10 +83,14 @@ resource "aws_iam_role_policy_attachment" "ssm_policy_oracle_base" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
-# Attach Secrets Manager Policy to Role
 resource "aws_iam_role_policy_attachment" "secrets_manager_policy_oracle_base" {
   role       = aws_iam_role.role_stsassume_oracle_base.name
   policy_arn = "arn:aws:iam::aws:policy/SecretsManagerReadWrite"
+}
+
+resource "aws_iam_role_policy_attachment" "ec2_readonly_policy_oracle_base" {
+  role       = aws_iam_role.role_stsassume_oracle_base.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess"
 }
 
 resource "aws_iam_instance_profile" "iam_instace_profile_ccms_base" {
