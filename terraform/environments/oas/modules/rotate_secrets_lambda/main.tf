@@ -1,5 +1,3 @@
-#### This file can be used to store secrets specific to the member account ####
-
 locals {
   function_name = "SecretsRotation"
 }
@@ -18,7 +16,7 @@ resource "aws_lambda_function" "rotate_secrets" {
       databaseName = var.database_name
       databaseUser = var.database_user
       SECRETS_MANAGER_ENDPOINT = "https://secretsmanager.eu-west-2.amazonaws.com"
-      # EXCLUDE_CHARACTERS = "!@£$%^&*()_+-={}[]" # Characters to exclude for rotated secrets, currently not working
+      # EXCLUDE_CHARACTERS = "!@£$%^&*()_+-={}[]" # Characters to exclude for rotated secrets, currently not working so updated the secret_rotation.py with ExcludePunctuation=True instead
     }
   }
 
