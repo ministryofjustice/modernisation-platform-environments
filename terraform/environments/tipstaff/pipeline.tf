@@ -61,9 +61,9 @@ resource "aws_codepipeline" "codepipeline" {
       input_artifacts = ["build_output"]
 
       configuration = {
-        ApplicationName  = "my-dotnet-app"
+        ApplicationName     = "my-dotnet-app"
         DeploymentGroupName = "my-dotnet-deployment-group"
-        Region = "eu-west-2"
+        Region              = "eu-west-2"
       }
     }
   }
@@ -71,9 +71,9 @@ resource "aws_codepipeline" "codepipeline" {
 
 # Create CodeBuild project
 resource "aws_codebuild_project" "my_build_project" {
-  name          = "my-dotnet-build-project"
-  description   = "Build .NET application"
-  service_role  = "arn:aws:iam::${data.aws_caller_identity.original_session.id}:role/MemberInfrastructureAccess"
+  name               = "my-dotnet-build-project"
+  description        = "Build .NET application"
+  service_role       = "arn:aws:iam::${data.aws_caller_identity.original_session.id}:role/MemberInfrastructureAccess"
   timeout_in_minutes = 60
   artifacts {
     type = "CODEPIPELINE"
@@ -97,15 +97,15 @@ resource "aws_codebuild_project" "my_build_project" {
 
 # CodeDeploy Application
 resource "aws_codedeploy_app" "my_dotnet_app" {
-  name = "my-dotnet-app"
+  name             = "my-dotnet-app"
   compute_platform = "Server"
 }
 
 # CodeDeploy Deployment Group
 resource "aws_codedeploy_deployment_group" "my_deployment_group" {
-  app_name = aws_codedeploy_app.my_dotnet_app.name
+  app_name              = aws_codedeploy_app.my_dotnet_app.name
   deployment_group_name = "my-dotnet-deployment-group"
-  service_role_arn  = "arn:aws:iam::${data.aws_caller_identity.original_session.id}:role/MemberInfrastructureAccess"
+  service_role_arn      = "arn:aws:iam::${data.aws_caller_identity.original_session.id}:role/MemberInfrastructureAccess"
 }
 
 resource "aws_codestarconnections_connection" "source-repo-connection" {
