@@ -28,7 +28,6 @@ module "rds" {
   deletion_protection         = local.application_data.accounts[local.environment].deletion_protection
   rds_snapshot_arn            = format("arn:aws:rds:eu-west-2:%s:snapshot:%s", data.aws_caller_identity.current.account_id, local.application_data.accounts[local.environment].rds_snapshot_name)
   rds_kms_key_arn             = data.aws_kms_key.rds_shared.arn
-  rotation_lambda_arn         = module.rotate_secrets_lambda.lambda_arn
   vpc_shared_id               = data.aws_vpc.shared.id
   vpc_shared_cidr             = data.aws_vpc.shared.cidr_block
   vpc_subnet_a_id             = data.aws_subnet.data_subnets_a.id

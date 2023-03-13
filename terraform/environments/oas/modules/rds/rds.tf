@@ -64,7 +64,8 @@ resource "aws_db_option_group" "appdboptiongroup19" {
 }
 
 
-# Random Secret for the DB Password.
+# Random Secret for the DB Password to be used for installation of OAS only
+# TODO Is this still required when AMI is being copied over instead? If so need to make sure that Terraform deployment either will not update the password in Secret Manager, of that wherever the password is being used gets updated to utilise the new password
 
 resource "random_password" "rds_password" {
   length  = 16
@@ -75,6 +76,10 @@ resource "random_password" "rds_password" {
 resource "aws_secretsmanager_secret" "rds_password_secret" {
   name = "${var.application_name}/app/db-master-password"
   description = "This secret has a dynamically generated password."
+  tags = merge(
+    var.tags,
+    { "Name" = "${var.application_name}/app/db-master-password" },
+  )
 }
 
 
@@ -87,18 +92,6 @@ resource "aws_secretsmanager_secret_version" "rds_password_secret_version" {
     }
   )
 }
-
-# TODO Do we need password rotation for db?
-
-resource "aws_secretsmanager_secret_rotation" "rds_password-rotation" {
-  secret_id           = aws_secretsmanager_secret.rds_password_secret.id
-  rotation_lambda_arn = var.rotation_lambda_arn
-
-  rotation_rules {
-    automatically_after_days = var.db_password_rotation_period
-  }
-}
-
 
 # RDS database
 

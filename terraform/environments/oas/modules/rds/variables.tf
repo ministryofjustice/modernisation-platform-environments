@@ -108,12 +108,6 @@ variable "rds_kms_key_arn" {
   description = "KMS key to encrypt RDS"
 }
 
-variable "rotation_lambda_arn" {
-  type        = string
-  description = "ARN of the Secret Rotation Lambda created in rotate_secrets_lambda module"
-}
-
-
 variable "lz_vpc_cidr" {
   type        = string
   description = "The CIDR range of the LAA LZ"
