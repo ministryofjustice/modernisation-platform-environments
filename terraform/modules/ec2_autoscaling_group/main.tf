@@ -29,16 +29,6 @@ resource "aws_launch_template" "this" {
           volume_type = ebs.value.type
         }
       }
-      #      ebs {
-      #        delete_on_termination = block_device_mappings.value.type != null ? true : null
-      #        encrypted             = block_device_mappings.value.type != null ? true : null
-      #
-      #        kms_key_id  = try(block_device_mappings.value.kms_key_id, var.ebs_kms_key_id)
-      #        iops        = try(block_device_mappings.value.iops > 0, false) ? block_device_mappings.value.iops : null
-      #        throughput  = try(block_device_mappings.value.throughput > 0, false) ? block_device_mappings.value.throughput : null
-      #        volume_size = block_device_mappings.value.size
-      #        volume_type = block_device_mappings.value.type
-      #      }
     }
   }
 
