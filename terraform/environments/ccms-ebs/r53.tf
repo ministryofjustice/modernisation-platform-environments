@@ -67,10 +67,10 @@ resource "aws_route53_record" "ebsdb_cname" {
 ## EBSWEBGATE
 resource "aws_route53_record" "ebswgate" {
   provider = aws.core-vpc
-  count   = local.application_data.accounts[local.environment].webgate_no_instances
-  
+  count    = local.application_data.accounts[local.environment].webgate_no_instances
+
   zone_id = data.aws_route53_zone.external.zone_id
-  name    = "ccms-ebswg${count.index +1}.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  name    = "ccms-ebswg${count.index + 1}.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   type    = "A"
   ttl     = 300
   records = [aws_instance.ec2_webgate[count.index].private_ip]
@@ -78,10 +78,10 @@ resource "aws_route53_record" "ebswgate" {
 }
 resource "aws_route53_record" "ebswgate_cname" {
   provider = aws.core-vpc
-  count   = local.application_data.accounts[local.environment].webgate_no_instances
+  count    = local.application_data.accounts[local.environment].webgate_no_instances
 
   zone_id = data.aws_route53_zone.external.zone_id
-  name    = "ccms-ebswg${count.index +1}"
+  name    = "ccms-ebswg${count.index + 1}"
   ttl     = "300"
   type    = "CNAME"
   records = [aws_route53_record.ebswgate[count.index].fqdn]
@@ -90,10 +90,10 @@ resource "aws_route53_record" "ebswgate_cname" {
 ## EBSACCESSGATE
 resource "aws_route53_record" "ebsagate" {
   provider = aws.core-vpc
-  count   = local.application_data.accounts[local.environment].accessgate_no_instances
-  
+  count    = local.application_data.accounts[local.environment].accessgate_no_instances
+
   zone_id = data.aws_route53_zone.external.zone_id
-  name    = "ccms-ebsag${count.index +1}.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  name    = "ccms-ebsag${count.index + 1}.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   type    = "A"
   ttl     = 300
   records = [aws_instance.ec2_accessgate[count.index].private_ip]
@@ -101,10 +101,10 @@ resource "aws_route53_record" "ebsagate" {
 }
 resource "aws_route53_record" "ebsagate_cname" {
   provider = aws.core-vpc
-  count   = local.application_data.accounts[local.environment].accessgate_no_instances
-  
+  count    = local.application_data.accounts[local.environment].accessgate_no_instances
+
   zone_id = data.aws_route53_zone.external.zone_id
-  name    = "ccms-ebsag${count.index +1}"
+  name    = "ccms-ebsag${count.index + 1}"
   ttl     = "300"
   type    = "CNAME"
   records = [aws_route53_record.ebsagate[count.index].fqdn]
