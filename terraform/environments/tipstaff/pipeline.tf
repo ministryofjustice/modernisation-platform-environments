@@ -38,7 +38,7 @@ resource "aws_codepipeline" "codepipeline" {
 #     }
 #   }
 
-    # Define the source stage with the GitHub repository
+# Define the source stage with the GitHub repository
   stage {
     name = "Source"
 
