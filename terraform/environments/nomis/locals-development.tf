@@ -69,9 +69,6 @@ locals {
         }
       }
     }
-
-
-    }
     weblogics          = {}
     ec2_test_instances = {}
     ec2_test_autoscaling_groups = {
