@@ -6,7 +6,7 @@ data "github_repository" "my_repo" {
 # Create CodePipeline
 resource "aws_codepipeline" "codepipeline" {
   name     = "tf_tipstaff_pipeline"
-  role_arn = "arn:aws:iam::${data.aws_caller_identity.original_session.id}:role/MemberInfrastructureAccess"
+  role_arn = aws_iam_role.codepipeline_role.arn
 
   artifact_store {
     location = aws_s3_bucket.codepipeline_bucket.bucket
@@ -150,22 +150,69 @@ resource "aws_s3_bucket_acl" "codepipeline_bucket_acl" {
   acl    = "private"
 }
 
-data "aws_iam_policy_document" "assume_role" {
-  statement {
-    effect = "Allow"
+resource "aws_iam_role" "codepipeline_role" {
+  name = "codepipeline-role"
 
-    principals {
-      type        = "Service"
-      identifiers = ["codepipeline.amazonaws.com"]
-    }
-
-    actions = ["sts:AssumeRole"]
-  }
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "codepipeline.amazonaws.com"
+        }
+      },
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "codebuild.amazonaws.com"
+        }
+      }
+    ]
+  })
 }
 
-resource "aws_iam_role" "codepipeline_role" {
-  name               = "test-role"
-  assume_role_policy = data.aws_iam_policy_document.assume_role.json
+resource "aws_iam_role_policy_attachment" "codepipeline_policy_attachment" {
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "codepipeline:*"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+
+  role       = aws_iam_role.codepipeline_role.name
+}
+
+# resource "aws_iam_role_policy_attachment" "s3_policy_attachment" {
+#   policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+#   role       = aws_iam_role.example_codepipeline_role.name
+# }
+
+resource "aws_iam_role_policy_attachment" "ec2_policy_attachment" {
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "ec2:DescribeInstances",
+          "ec2:StartInstances",
+          "ec2:StopInstances"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+
+  role = aws_iam_role.codepipeline_role.name
 }
 
 # data "aws_iam_policy_document" "codepipeline_policy" {
