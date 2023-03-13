@@ -73,25 +73,25 @@ resource "random_password" "rds_password" {
 }
 
 
-resource "aws_secretsmanager_secret" "rds_password_secret" {
-  name = "${var.application_name}/app/db-master-password"
-  description = "This secret has a dynamically generated password."
-  tags = merge(
-    var.tags,
-    { "Name" = "${var.application_name}/app/db-master-password" },
-  )
-}
-
-
-resource "aws_secretsmanager_secret_version" "rds_password_secret_version" {
-  secret_id = aws_secretsmanager_secret.rds_password_secret.id
-  secret_string = jsonencode(
-    {
-      username = var.username
-      password = random_password.rds_password.result
-    }
-  )
-}
+# resource "aws_secretsmanager_secret" "rds_password_secret" {
+#   name = "${var.application_name}/app/db-master-password"
+#   description = "This secret has a dynamically generated password."
+#   tags = merge(
+#     var.tags,
+#     { "Name" = "${var.application_name}/app/db-master-password" },
+#   )
+# }
+#
+#
+# resource "aws_secretsmanager_secret_version" "rds_password_secret_version" {
+#   secret_id = aws_secretsmanager_secret.rds_password_secret.id
+#   secret_string = jsonencode(
+#     {
+#       username = var.username
+#       password = random_password.rds_password.result
+#     }
+#   )
+# }
 
 # RDS database
 
