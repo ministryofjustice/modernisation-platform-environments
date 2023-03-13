@@ -64,46 +64,46 @@ resource "aws_iam_policy" "lambda" { #tfsec:ignore:aws-iam-no-policy-wildcards
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
-        # {
-        #     Effect = "Allow",
-        #     Action = [
-        #         "logs:CreateLogGroup",
-        #     ],
-        #     Resource = [
-        #       "arn:aws:logs:${var.region}:${var.account_number}:*",
-        #     ]
-        # },
-        # {
-        #     Effect = "Allow",
-        #     Action = [
-        #         "logs:CreateLogStream",
-        #         "logs:PutLogEvents",
-        #     ],
-        #     Resource = [
-        #       "arn:aws:logs:${var.region}:${var.account_number}:log-group:/aws/lambda/${local.function_name}:*",
-        #     ]
-        # },
-        # {
-        #     Effect = "Allow",
-        #     Action = [
-        #         "secretsmanager:CreateSecret",
-        #         "secretsmanager:ListSecrets",
-        #         "secretsmanager:DescribeSecret",
-        #         "secretsmanager:GetSecretValue",
-        #         "secretsmanager:PutSecretValue",
-        #         "secretsmanager:UpdateSecretVersionStage",
-        #         "secretsmanager:GetRandomPassword",
-        #         "lambda:InvokeFunction",
-        #     ],
-        #     Resources = "*"
-        # },
+        {
+            Effect = "Allow",
+            Action = [
+                "logs:CreateLogGroup",
+            ],
+            Resource = [
+              "arn:aws:logs:${var.region}:${var.account_number}:*",
+            ]
+        },
+        {
+            Effect = "Allow",
+            Action = [
+                "logs:CreateLogStream",
+                "logs:PutLogEvents",
+            ],
+            Resource = [
+              "arn:aws:logs:${var.region}:${var.account_number}:log-group:/aws/lambda/${local.function_name}:*",
+            ]
+        },
+        {
+            Effect = "Allow",
+            Action = [
+                "secretsmanager:CreateSecret",
+                "secretsmanager:ListSecrets",
+                "secretsmanager:DescribeSecret",
+                "secretsmanager:GetSecretValue",
+                "secretsmanager:PutSecretValue",
+                "secretsmanager:UpdateSecretVersionStage",
+                "secretsmanager:GetRandomPassword",
+                "lambda:InvokeFunction",
+            ],
+            Resource = "*"
+        },
         {
             Sid = "GenerateARandomStringToExecuteRotation",
             Effect = "Allow",
             Action = [
                 "secretsmanager:GetRandomPassword",
             ],
-            Resources = "*"
+            Resource = "*"
         }
     ]
 })
