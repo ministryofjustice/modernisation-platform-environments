@@ -233,15 +233,6 @@ resource "aws_codebuild_project" "app-build" {
     buildspec = "buildspec-mp.yml"
   }
 
-  secondary_sources {
-    type              = "BITBUCKET"
-    source_identifier = "qa"
-    location          = "https://xxxxxx.git"
-    git_clone_depth   = 0
-    source_version = "refs/heads/master"
-
-  }
-
   tags = merge(
     var.tags,
     {
