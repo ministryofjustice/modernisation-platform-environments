@@ -62,14 +62,16 @@ resource "aws_iam_policy" "lambda" { #tfsec:ignore:aws-iam-no-policy-wildcards
     { "Name" = "${local.function_name}-Policy" },
   )
   policy = jsonencode({
-    Version: "2012-10-17"
-    Statement: [
+    Version = "2012-10-17"
+    Statement = [
         {
             Effect = "Allow",
             Action = [
                 "logs:CreateLogGroup"
             ],
-            Resource = ["arn:aws:logs:${var.region}:${var.account_number}:*"]
+            Resource = [
+              "arn:aws:logs:${var.region}:${var.account_number}:*"
+            ]
         },
         {
             Effect = "Allow",
@@ -77,7 +79,9 @@ resource "aws_iam_policy" "lambda" { #tfsec:ignore:aws-iam-no-policy-wildcards
                 "logs:CreateLogStream",
                 "logs:PutLogEvents"
             ],
-            Resource = ["arn:aws:logs:${var.region}:${var.account_number}:log-group:/aws/lambda/${local.function_name}:*"]
+            Resource = [
+              "arn:aws:logs:${var.region}:${var.account_number}:log-group:/aws/lambda/${local.function_name}:*"
+            ]
         },
         {
             Effect = "Allow",
