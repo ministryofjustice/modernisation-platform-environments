@@ -1,3 +1,11 @@
+provider "aws" {
+  region = "eu-west-1"
+  alias  = "ireland"
+  assume_role {
+    role_arn = "arn:aws:iam::${data.aws_caller_identity.original_session.id}:role/MemberInfrastructureAccess"
+  }
+}
+
 # Define the GitHub repository information
 data "github_repository" "my_repo" {
   full_name = "ministryofjustice/Tipstaff"
@@ -19,8 +27,8 @@ resource "aws_codepipeline" "codepipeline" {
     action {
       name             = "Source"
       category         = "Source"
-      owner            = "AWS"
-      provider         = "CodeStarSourceConnection"
+      owner            = "ThirdParty"
+      provider         = "GitHub"
       version          = "1"
       output_artifacts = ["source_output"]
 
@@ -74,6 +82,7 @@ resource "aws_codepipeline" "codepipeline" {
 
 # Create CodeBuild project
 resource "aws_codebuild_project" "my_build_project" {
+  provider     = aws.ireland
   name         = "my-dotnet-build-project"
   description  = "Build .NET application"
   service_role = "arn:aws:iam::${data.aws_caller_identity.original_session.id}:role/MemberInfrastructureAccess"
