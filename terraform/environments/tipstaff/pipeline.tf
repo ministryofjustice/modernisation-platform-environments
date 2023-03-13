@@ -1,3 +1,9 @@
+# Define the GitHub repository information
+data "github_repository" "my_repo" {
+  owner = "ministryofjustice"
+  name  = "Tipstaff"
+}
+
 # Create CodePipeline
 resource "aws_codepipeline" "codepipeline" {
   name     = "tf_tipstaff_pipeline"
@@ -13,24 +19,46 @@ resource "aws_codepipeline" "codepipeline" {
     # }
   }
 
+#   stage {
+#     name = "Source"
+
+#     action {
+#       name             = "Source"
+#       category         = "Source"
+#       owner            = "AWS"
+#       provider         = "CodeStarSourceConnection"
+#       version          = "1"
+#       output_artifacts = ["source_output"]
+
+#       configuration = {
+#         ConnectionArn    = aws_codestarconnections_connection.source-repo-connection.arn
+#         FullRepositoryId = "47194958"
+#         BranchName       = "master"
+#       }
+#     }
+#   }
+
+    # Define the source stage with the GitHub repository
   stage {
     name = "Source"
 
     action {
       name             = "Source"
       category         = "Source"
-      owner            = "AWS"
-      provider         = "CodeStarSourceConnection"
+      owner            = "ThirdParty"
+      provider         = "GitHub"
       version          = "1"
       output_artifacts = ["source_output"]
 
       configuration = {
-        ConnectionArn    = aws_codestarconnections_connection.source-repo-connection.arn
-        FullRepositoryId = "47194958"
-        BranchName       = "master"
+        Owner      = data.github_repository.my_repo.owner
+        Repo       = data.github_repository.my_repo.name
+        Branch     = "master"
+        OAuthToken = jsondecode(data.aws_secretsmanager_secret_version.oauth_token.secret_string)["OAUTH_TOKEN"]
       }
     }
   }
+
 
   stage {
     name = "Build"
@@ -46,6 +74,7 @@ resource "aws_codepipeline" "codepipeline" {
 
       configuration = {
         ProjectName = "my-dotnet-build-project"
+        Region              = "eu-west-1"
       }
     }
   }
@@ -64,7 +93,6 @@ resource "aws_codepipeline" "codepipeline" {
       configuration = {
         ApplicationName     = "my-dotnet-app"
         DeploymentGroupName = "my-dotnet-deployment-group"
-        Region              = "eu-west-2"
       }
     }
   }
@@ -95,23 +123,23 @@ resource "aws_codebuild_project" "my_build_project" {
   source_version = "master"
 }
 
-# CodeDeploy Application
-resource "aws_codedeploy_app" "my_dotnet_app" {
-  name             = "my-dotnet-app"
-  compute_platform = "Server"
-}
+# # CodeDeploy Application
+# resource "aws_codedeploy_app" "my_dotnet_app" {
+#   name             = "my-dotnet-app"
+#   compute_platform = "Server"
+# }
 
-# CodeDeploy Deployment Group
-resource "aws_codedeploy_deployment_group" "my_deployment_group" {
-  app_name              = aws_codedeploy_app.my_dotnet_app.name
-  deployment_group_name = "my-dotnet-deployment-group"
-  service_role_arn      = "arn:aws:iam::${data.aws_caller_identity.original_session.id}:role/MemberInfrastructureAccess"
-}
+# # CodeDeploy Deployment Group
+# resource "aws_codedeploy_deployment_group" "my_deployment_group" {
+#   app_name              = aws_codedeploy_app.my_dotnet_app.name
+#   deployment_group_name = "my-dotnet-deployment-group"
+#   service_role_arn      = "arn:aws:iam::${data.aws_caller_identity.original_session.id}:role/MemberInfrastructureAccess"
+# }
 
-resource "aws_codestarconnections_connection" "source-repo-connection" {
-  name          = "source-repo-connection"
-  provider_type = "GitHub"
-}
+# resource "aws_codestarconnections_connection" "source-repo-connection" {
+#   name          = "source-repo-connection"
+#   provider_type = "GitHub"
+# }
 
 resource "aws_s3_bucket" "codepipeline_bucket" {
   bucket = "tipstaff-pipeline-bucket"
