@@ -2,11 +2,11 @@
   "accounts": {
     "development": {
       "example_var": "dev-data",
-      "ec2amiid": "ami-0d5b0068ebc43024b",
+      "ec2amiid": "ami-03bf877cb7de87163",
       "ec2instancetype": "r5a.large",
       "bucketname": "laa-oracle-software",
       "orahomesize": "200",
-      "orahome_snapshot": "snap-0d8e3c6f6c23f5a72",
+      "orahome_snapshot": "snap-030be41bc8ad5ef3d",
       "stageesize": "150",
       "managementcidr": "10.200.0.0/20",
       "outbound_access_cidr": "0.0.0.0/0",
@@ -32,10 +32,7 @@
       "lz_vpc_cidr": "10.202.0.0/20",
       "deletion_protection": "false",
       "dashboard_widget_period": 60,
-      "pagerduty_integration_key_name": "laa_oas_nonprod_alarms",
-      "lambda_function_name": "secret_rotation",
-      "lambda_handler": "main.lambda_handler",
-      "lambda_runtime": "python3.8"
+      "pagerduty_integration_key_name": "laa_oas_nonprod_alarms"
     },
     "test": {
       "example_var": "test-data"
