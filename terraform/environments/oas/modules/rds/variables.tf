@@ -143,3 +143,8 @@ variable "vpc_subnet_c_id" {
   type        = string
   description = "vpc_subnet_c_id"
 }
+
+variable "tags" {
+  type        = map(string)
+  description = "Common tags to be used by all resources"
+}

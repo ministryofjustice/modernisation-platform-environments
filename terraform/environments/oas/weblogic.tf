@@ -5,11 +5,11 @@ resource "random_password" "weblogic" {
 
 
 resource "aws_secretsmanager_secret" "weblogic" {
-  name = "${var.application_name}/app/weblogic-admin-password"
+  name = "${local.application_name}/app/weblogic-admin-password"
   description = "This secret has a dynamically generated password. This is OAS administrator (weblogic) password, where developers very frequently use as part of accessing OAS and other admin activities."
   tags = merge(
-    var.tags,
-    { "Name" = "${var.application_name}/app/weblogic-admin-password" },
+    local.tags,
+    { "Name" = "${local.application_name}/app/weblogic-admin-password" },
   )
 }
 

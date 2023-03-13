@@ -126,9 +126,10 @@ resource "aws_db_instance" "appdb1" {
   apply_immediately           = true
   snapshot_identifier         = var.rds_snapshot_arn
   kms_key_id                  = var.rds_kms_key_arn
-  tags = {
-    Name = "${var.application_name}-${var.environment}-database"
-  }
+  tags = merge(
+    var.tags,
+    { "Name" = "${var.application_name}-${var.environment}-database" },
+  )
 
   timeouts {
     create = "60m"
