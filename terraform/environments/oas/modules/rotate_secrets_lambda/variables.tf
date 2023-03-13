@@ -27,3 +27,13 @@ variable "log_group_retention_days" {
   type        = string
   description = "CloudWatch Log Group for Lambda function retention in days"
 }
+
+variable "tags" {
+  type        = map(string)
+  description = "Common tags to be used by all resources"
+}
+
+variable "account_number" {
+  type        = string
+  description = "Account number of current environment"
+}

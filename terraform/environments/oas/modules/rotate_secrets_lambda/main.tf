@@ -1,8 +1,5 @@
 #### This file can be used to store secrets specific to the member account ####
 
-# TODO Do we need to restrict account ids to the lambda policy?
-# TODO Turn this into a module with appropriate variables
-
 locals {
   function_name = "SecretsRotation"
 }
@@ -25,7 +22,7 @@ resource "aws_lambda_function" "rotate_secrets" {
   }
 
   tags = merge(
-    local.tags,
+    var.tags,
     { "Name" = "SecretsRotation" },
   )
 }
@@ -53,7 +50,7 @@ resource "aws_iam_role" "lambda" {
   name               = "${local.function_name}-ExecutionRole"
   assume_role_policy = data.aws_iam_policy_document.assume_role.json
   tags = merge(
-    local.tags,
+    var.tags,
     { "Name" = "${local.function_name}-ExecutionRole" },
   )
 }
@@ -61,7 +58,7 @@ resource "aws_iam_role" "lambda" {
 resource "aws_iam_policy" "lambda" { #tfsec:ignore:aws-iam-no-policy-wildcards
   name   = "${local.function_name}-Policy"
   tags = merge(
-    local.tags,
+    var.tags,
     { "Name" = "${local.function_name}-Policy" },
   )
   policy = jsonencode({
@@ -72,7 +69,7 @@ resource "aws_iam_policy" "lambda" { #tfsec:ignore:aws-iam-no-policy-wildcards
             Action = [
                 "logs:CreateLogGroup"
             ],
-            Resource = ["arn:aws:logs:${var.region}:*"]
+            Resource = ["arn:aws:logs:${var.region}:${var.account_number}:*"]
         },
         {
             Effect = "Allow",
@@ -80,7 +77,7 @@ resource "aws_iam_policy" "lambda" { #tfsec:ignore:aws-iam-no-policy-wildcards
                 "logs:CreateLogStream",
                 "logs:PutLogEvents"
             ],
-            Resource = ["arn:aws:logs:${var.region}:*:log-group:/aws/lambda/${local.function_name}:*"]
+            Resource = ["arn:aws:logs:${var.region}:${var.account_number}:log-group:/aws/lambda/${local.function_name}:*"]
         },
         {
             Effect = "Allow",
