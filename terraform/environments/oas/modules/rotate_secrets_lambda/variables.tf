@@ -15,12 +15,12 @@ variable "lambda_runtime" {
 
 variable "database_name" {
   type        = string
-  description = "TBC"
+  description = "TBC "
 }
 
 variable "database_user" {
   type        = string
-  description = "TBC"
+  description = "TBC "
 }
 
 variable "lambda_runtime" {
