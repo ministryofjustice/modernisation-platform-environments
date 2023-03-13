@@ -30,7 +30,7 @@
     {
       "Effect": "Allow",
       "Resource": [
-        "arn:aws:ecr:eu-west-2:374269020027:repository/mlra-ecr-repo"
+        "arn:aws:ecr:eu-west-2:374269020027:repository/mlra-ecr-repo",
         "arn:aws:ecr:eu-west-2:890609150221:repository/mlra-local-ecr"
       ],
       "Action": [
