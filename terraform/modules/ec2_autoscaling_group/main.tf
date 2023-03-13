@@ -19,14 +19,14 @@ resource "aws_launch_template" "this" {
       dynamic "ebs" {
         for_each = lookup(block_device_mappings.value, "no_device", null) != true ? [block_device_mappings.value] : []
         content {
-          delete_on_termination = ebs.type != null ? true : null
-          encrypted             = ebs.type != null ? true : null
+          delete_on_termination = ebs.value.type != null ? true : null
+          encrypted             = ebs.value.type != null ? true : null
 
-          kms_key_id  = try(ebs.kms_key_id, var.ebs_kms_key_id)
-          iops        = try(ebs.iops > 0, false) ? ebs.iops : null
-          throughput  = try(ebs.throughput > 0, false) ? ebs.throughput : null
-          volume_size = ebs.size
-          volume_type = ebs.type
+          kms_key_id  = try(ebs.value.kms_key_id, var.ebs_kms_key_id)
+          iops        = try(ebs.value.iops > 0, false) ? ebs.value.iops : null
+          throughput  = try(ebs.value.throughput > 0, false) ? ebs.value.throughput : null
+          volume_size = ebs.value.size
+          volume_type = ebs.value.type
         }
       }
       #      ebs {
