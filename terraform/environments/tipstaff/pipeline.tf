@@ -51,6 +51,7 @@ resource "aws_codepipeline" "codepipeline" {
 
       configuration = {
         FullRepositoryId = data.github_repository.my_repo.full_name
+        Region           = "eu-west-1"
         BranchName       = "master"
         OAuthToken       = jsondecode(data.aws_secretsmanager_secret_version.oauth_token.secret_string)["OAUTH_TOKEN"]
       }
@@ -91,6 +92,7 @@ resource "aws_codepipeline" "codepipeline" {
       configuration = {
         ApplicationName     = "my-dotnet-app"
         DeploymentGroupName = "my-dotnet-deployment-group"
+        Region              = "eu-west-1"
       }
     }
   }
@@ -148,23 +150,23 @@ resource "aws_s3_bucket_acl" "codepipeline_bucket_acl" {
   acl    = "private"
 }
 
-# data "aws_iam_policy_document" "assume_role" {
-#   statement {
-#     effect = "Allow"
+data "aws_iam_policy_document" "assume_role" {
+  statement {
+    effect = "Allow"
 
-#     principals {
-#       type        = "Service"
-#       identifiers = ["codepipeline.amazonaws.com"]
-#     }
+    principals {
+      type        = "Service"
+      identifiers = ["codepipeline.amazonaws.com"]
+    }
 
-#     actions = ["sts:AssumeRole"]
-#   }
-# }
+    actions = ["sts:AssumeRole"]
+  }
+}
 
-# resource "aws_iam_role" "codepipeline_role" {
-#   name               = "test-role"
-#   assume_role_policy = data.aws_iam_policy_document.assume_role.json
-# }
+resource "aws_iam_role" "codepipeline_role" {
+  name               = "test-role"
+  assume_role_policy = data.aws_iam_policy_document.assume_role.json
+}
 
 # data "aws_iam_policy_document" "codepipeline_policy" {
 #   statement {
