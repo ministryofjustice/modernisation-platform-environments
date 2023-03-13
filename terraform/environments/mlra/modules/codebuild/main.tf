@@ -182,7 +182,7 @@ resource "aws_codebuild_project" "app-build" {
   description   = "Project to build the ${var.app_name} java application and xray docker images"
   build_timeout = 20
   # encryption_key = aws_kms_key.codebuild.arn
-  service_role = aws_iam_role.codebuild_s3.arn
+  service_role   = aws_iam_role.codebuild_s3.arn
   source_version = "LAWS-3074-gha"
 
   artifacts {
@@ -231,6 +231,15 @@ resource "aws_codebuild_project" "app-build" {
     type      = "GITHUB"
     location  = "https://github.com/ministryofjustice/laa-mlra-application.git"
     buildspec = "buildspec-mp.yml"
+  }
+
+  secondary_sources {
+    type              = "BITBUCKET"
+    source_identifier = "qa"
+    location          = "https://xxxxxx.git"
+    git_clone_depth   = 0
+    source_version = "refs/heads/master"
+
   }
 
   tags = merge(
