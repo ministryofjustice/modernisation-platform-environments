@@ -50,10 +50,9 @@ resource "aws_codepipeline" "codepipeline" {
       output_artifacts = ["source_output"]
 
       configuration = {
-        Owner      = data.github_repository.my_repo.owner
-        Repo       = data.github_repository.my_repo.name
-        Branch     = "master"
-        OAuthToken = jsondecode(data.aws_secretsmanager_secret_version.oauth_token.secret_string)["OAUTH_TOKEN"]
+        FullRepositoryId = data.github_repository.my_repo.full_name
+        Branch           = "master"
+        OAuthToken       = jsondecode(data.aws_secretsmanager_secret_version.oauth_token.secret_string)["OAUTH_TOKEN"]
       }
     }
   }
