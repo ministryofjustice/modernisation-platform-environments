@@ -40,8 +40,8 @@ on:
       terraform_version:
         type: string
         required: false
-        description: "The terraform version to use"
-        default: "~1"
+        description: "The terraform version to use, default is temporarily set to 1.3.9 due to bugs in 1.4.0"
+        default: "1.3.9"
       init_plan_apply_tfargs:
         type: string
         required: false
