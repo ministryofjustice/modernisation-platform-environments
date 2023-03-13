@@ -58,8 +58,9 @@ run_ansible() {
   elif [[ $(which python3.6 2> /dev/null) ]]; then
     python=$(which python3.6)
   else
-    echo "Python3.9/3.6 not found"
-    exit 1
+    echo "Python3.9/3.6 not found. Installing 3.9"
+    yum install python39 -y
+    python=$(which python3.6)
   fi
   echo "# Using python: $python"
 
