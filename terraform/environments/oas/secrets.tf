@@ -43,28 +43,27 @@ resource "aws_iam_role" "iam_for_lambda" {
 
 resource "aws_iam_policy" "iam_lambda_policy" { #tfsec:ignore:aws-iam-no-policy-wildcards
   name   = "iam_lambda_policy"
-  policy = <<EOF
-{
-    "Version": "2012-10-17",
-    "Statement": [
+  policy = jsonencode({
+    Version: "2012-10-17"
+    Statement: [
         {
-            "Effect": "Allow",
-            "Action": [
+            Effect = "Allow",
+            Action = [
                 "logs:CreateLogGroup"
             ],
-            Resources: ["arn:aws:logs:${local.application_data.accounts[local.environment].region}:*"]
+            Resource = ["arn:aws:logs:${local.application_data.accounts[local.environment].region}:*"]
         },
         {
-            "Effect": "Allow",
-            "Action": [
+            Effect = "Allow",
+            Action = [
                 "logs:CreateLogStream",
                 "logs:PutLogEvents"
             ],
-            Resources: ["arn:aws:logs:${local.application_data.accounts[local.environment].region}:*:log-group:/aws/lambda/${aws_lambda_function.rotate_secrets.function_name}:*"]
+            Resource = ["arn:aws:logs:${local.application_data.accounts[local.environment].region}:*:log-group:/aws/lambda/${aws_lambda_function.rotate_secrets.function_name}:*"]
         },
         {
-            "Effect": "Allow",
-            "Action": [
+            Effect = "Allow",
+            Action = [
                 "secretsmanager:CreateSecret",
                 "secretsmanager:ListSecrets",
                 "secretsmanager:DescribeSecret",
@@ -74,18 +73,18 @@ resource "aws_iam_policy" "iam_lambda_policy" { #tfsec:ignore:aws-iam-no-policy-
                 "secretsmanager:GetRandomPassword",
                 "lambda:InvokeFunction"
             ],
-            "Resource": "*"
+            Resources = "*"
         },
         {
-            "Effect": "Allow",
-            "Action": [
+            Effect = "Allow",
+            Action = [
                 "secretsmanager:GetRandomPassword"
             ],
-            "Resource": "*"
+            Resources = "*"
         }
     ]
-}
-EOF
+})
+
 }
 
 resource "aws_iam_role_policy_attachment" "attach_lambda_policy" {
