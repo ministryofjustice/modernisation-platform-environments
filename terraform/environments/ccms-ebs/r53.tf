@@ -46,7 +46,7 @@ resource "aws_route53_record" "ebsdb" {
 
 }
 resource "aws_route53_record" "ebsdb_cname" {
-  provider = aws.core-network-services
+  provider = aws.core-vpc
 
   zone_id = data.aws_route53_zone.external.zone_id
   name    = "ebsdb"
