@@ -188,7 +188,7 @@ resource "aws_iam_role_policy_attachment" "codepipeline_policy_attachment" {
     ]
   })
 
-  role       = aws_iam_role.codepipeline_role.name
+  role = aws_iam_role.codepipeline_role.name
 }
 
 # resource "aws_iam_role_policy_attachment" "s3_policy_attachment" {
