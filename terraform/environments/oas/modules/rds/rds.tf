@@ -67,13 +67,14 @@ resource "aws_db_option_group" "appdboptiongroup19" {
 # Random Secret for the DB Password.
 
 resource "random_password" "rds_password" {
-  length  = 12
+  length  = 16
   special = false
 }
 
 
 resource "aws_secretsmanager_secret" "rds_password_secret" {
-  name = "${var.application_name}-${var.environment}-rds-password"
+  name = "${var.application_name}/app/db-master-password"
+  description = "This secret has a dynamically generated password."
 }
 
 
@@ -87,17 +88,16 @@ resource "aws_secretsmanager_secret_version" "rds_password_secret_version" {
   )
 }
 
-# From Vincent's PR
-# TODO Rotation of secret which requires Lambda fucntion created and permissions granted to Lambda to rotate.
-#
-# resource "aws_secretsmanager_secret_rotation" "rds_password-rotation" {
-#   secret_id           = aws_secretsmanager_secret.rds_password_secret.id
-#   rotation_lambda_arn = aws_lambda_function.<<<<example.arn>>>>>>
-#
-#   rotation_rules {
-#     automatically_after_days = var.db_password_rotation_period
-#   }
-# }
+# TODO Do we need password rotation for db?
+
+resource "aws_secretsmanager_secret_rotation" "rds_password-rotation" {
+  secret_id           = aws_secretsmanager_secret.rds_password_secret.id
+  rotation_lambda_arn = var.rotation_lambda_arn
+
+  rotation_rules {
+    automatically_after_days = var.db_password_rotation_period
+  }
+}
 
 
 # RDS database
