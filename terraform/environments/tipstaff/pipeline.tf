@@ -124,8 +124,19 @@ resource "aws_iam_role" "codebuild_role" {
   })
 }
 
-# resource "aws_iam_role_policy" "codebuild_role_policy" {
-#   name   = "CodeBuildPolicy"
-#   role   = aws_iam_role.codebuild_role.name
-#   policy = data.template_file.codebuild_policy.rendered
-# }
+resource "aws_iam_role_policy" "codebuild_role_policy" {
+  name   = "CodeBuildPolicy"
+  role   = aws_iam_role.codebuild_role.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "codebuild:*",
+        ]
+        Effect   = "Allow"
+        Resource = "*"
+      },
+    ]
+  })
+}
