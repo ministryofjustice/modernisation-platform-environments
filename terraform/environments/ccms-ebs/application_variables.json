@@ -165,12 +165,12 @@
   "ec2_sg_ftp_ingress_rules": {
     "FTP_20": {
       "from_port": 20,
-      "to_port": 20,
+      "to_port": 22,
       "protocol": "TCP"
     },
-    "FTP_21": {
-      "from_port": 21,
-      "to_port": 21,
+    "FTP_3010": {
+      "from_port": 3000,
+      "to_port": 3010,
       "protocol": "TCP"
     },
     "SSH_22": {
@@ -182,13 +182,7 @@
   "ec2_sg_ftp_egress_rules": {
     "FTP_20": {
       "from_port": 20,
-      "to_port": 20,
-      "protocol": "TCP",
-      "destination_cidr": "10.200.0.0/13"
-    },
-    "FTP_21": {
-      "from_port": 21,
-      "to_port": 21,
+      "to_port": 22,
       "protocol": "TCP",
       "destination_cidr": "10.200.0.0/13"
     },
