@@ -38,11 +38,6 @@ variable "core_shared_services_production_account_id" {
   description = "AWS Account ID of Core Shared Services Production where the shared ECR resides"
 }
 
-variable "ecr_url" {
-  type        = string
-  description = "URL for the shared ECR repo"
-}
-
 variable "local_ecr_url" {
   type        = string
   description = "URL for the local ECR repo"
