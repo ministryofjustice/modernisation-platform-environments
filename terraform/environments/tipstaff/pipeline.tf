@@ -212,11 +212,11 @@ resource "aws_iam_role_policy" "codebuild_role_policy" {
 
 resource "aws_codedeploy_app" "tipstaff_codedeploy" {
   provider = aws.ireland_provider
-  name = "tipstaff-codedeploy"
+  name     = "tipstaff-codedeploy"
 }
 
 resource "aws_codedeploy_deployment_group" "tipstaff_deployment_group" {
-  provider = aws.ireland_provider
+  provider              = aws.ireland_provider
   app_name              = aws_codedeploy_app.tipstaff_codedeploy.name
   deployment_group_name = "tipstaff-deployment-group"
   service_role_arn      = aws_iam_role.codedeploy_role.arn
@@ -230,7 +230,7 @@ resource "aws_codedeploy_deployment_group" "tipstaff_deployment_group" {
 
 resource "aws_iam_role" "codedeploy_role" {
   provider = aws.ireland_provider
-  name = "CodeDeployRole"
+  name     = "CodeDeployRole"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
