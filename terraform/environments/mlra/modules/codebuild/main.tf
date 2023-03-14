@@ -223,7 +223,7 @@ resource "aws_codebuild_project" "app-build" {
 
     environment_variable {
       name  = "APPLICATION_NAME"
-      value = "${var.app_name}"
+      value = var.app_name
     }
 
     environment_variable {
