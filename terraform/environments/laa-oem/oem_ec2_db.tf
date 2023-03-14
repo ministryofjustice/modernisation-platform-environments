@@ -3,7 +3,7 @@ resource "aws_instance" "oem_db" {
   associate_public_ip_address = false
   availability_zone           = local.application_data.accounts[local.environment].ec2_zone
   ebs_optimized               = true
-  iam_instance_profile        = aws_iam_instance_profile.iam_instace_profile_ccms_base.name
+  iam_instance_profile        = aws_iam_instance_profile.iam_instace_profile_oem_base.name
   instance_type               = local.application_data.accounts[local.environment].ec2_oem_instance_type_db
   key_name                    = local.application_data.accounts[local.environment].key_name
   monitoring                  = true
@@ -67,7 +67,7 @@ resource "aws_volume_attachment" "oem_db_volume_swap" {
   device_name = "/dev/sdb"
 }
 
-resource "aws_ebs_volume" "oem_db_volume_ccms_oem_app" {
+resource "aws_ebs_volume" "oem_db_volume_opt_oem_app" {
   availability_zone = local.application_data.accounts[local.environment].ec2_zone
   encrypted         = true
   iops              = 3000
@@ -90,13 +90,13 @@ resource "aws_ebs_volume" "oem_db_volume_ccms_oem_app" {
   }
 }
 
-resource "aws_volume_attachment" "oem_db_volume_ccms_oem_app" {
+resource "aws_volume_attachment" "oem_db_volume_opt_oem_app" {
   instance_id = aws_instance.oem_db.id
-  volume_id   = aws_ebs_volume.oem_db_volume_ccms_oem_app.id
+  volume_id   = aws_ebs_volume.oem_db_volume_opt_oem_app.id
   device_name = "/dev/sdc"
 }
 
-resource "aws_ebs_volume" "oem_db_volume_ccms_oem_inst" {
+resource "aws_ebs_volume" "oem_db_volume_opt_oem_inst" {
   availability_zone = local.application_data.accounts[local.environment].ec2_zone
   encrypted         = true
   iops              = 3000
@@ -119,13 +119,13 @@ resource "aws_ebs_volume" "oem_db_volume_ccms_oem_inst" {
   }
 }
 
-resource "aws_volume_attachment" "oem_db_volume_ccms_oem_inst" {
+resource "aws_volume_attachment" "oem_db_volume_opt_oem_inst" {
   instance_id = aws_instance.oem_db.id
-  volume_id   = aws_ebs_volume.oem_db_volume_ccms_oem_inst.id
+  volume_id   = aws_ebs_volume.oem_db_volume_opt_oem_inst.id
   device_name = "/dev/sdd"
 }
 
-resource "aws_ebs_volume" "oem_db_volume_ccms_oem_dbf" {
+resource "aws_ebs_volume" "oem_db_volume_opt_oem_dbf" {
   availability_zone = local.application_data.accounts[local.environment].ec2_zone
   encrypted         = true
   iops              = 3000
@@ -148,13 +148,13 @@ resource "aws_ebs_volume" "oem_db_volume_ccms_oem_dbf" {
   }
 }
 
-resource "aws_volume_attachment" "oem_db_volume_ccms_oem_dbf" {
+resource "aws_volume_attachment" "oem_db_volume_opt_oem_dbf" {
   instance_id = aws_instance.oem_db.id
-  volume_id   = aws_ebs_volume.oem_db_volume_ccms_oem_dbf.id
+  volume_id   = aws_ebs_volume.oem_db_volume_opt_oem_dbf.id
   device_name = "/dev/sde"
 }
 
-resource "aws_ebs_volume" "oem_db_volume_ccms_oem_redo" {
+resource "aws_ebs_volume" "oem_db_volume_opt_oem_redo" {
   availability_zone = local.application_data.accounts[local.environment].ec2_zone
   encrypted         = true
   iops              = 3000
@@ -177,13 +177,13 @@ resource "aws_ebs_volume" "oem_db_volume_ccms_oem_redo" {
   }
 }
 
-resource "aws_volume_attachment" "oem_db_volume_ccms_oem_redo" {
+resource "aws_volume_attachment" "oem_db_volume_opt_oem_redo" {
   instance_id = aws_instance.oem_db.id
-  volume_id   = aws_ebs_volume.oem_db_volume_ccms_oem_redo.id
+  volume_id   = aws_ebs_volume.oem_db_volume_opt_oem_redo.id
   device_name = "/dev/sdf"
 }
 
-resource "aws_ebs_volume" "oem_db_volume_ccms_oem_arch" {
+resource "aws_ebs_volume" "oem_db_volume_opt_oem_arch" {
   availability_zone = local.application_data.accounts[local.environment].ec2_zone
   encrypted         = true
   iops              = 3000
@@ -206,8 +206,8 @@ resource "aws_ebs_volume" "oem_db_volume_ccms_oem_arch" {
   }
 }
 
-resource "aws_volume_attachment" "oem_db_volume_ccms_oem_arch" {
+resource "aws_volume_attachment" "oem_db_volume_opt_oem_arch" {
   instance_id = aws_instance.oem_db.id
-  volume_id   = aws_ebs_volume.oem_db_volume_ccms_oem_arch.id
+  volume_id   = aws_ebs_volume.oem_db_volume_opt_oem_arch.id
   device_name = "/dev/sdg"
 }

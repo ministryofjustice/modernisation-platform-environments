@@ -1,12 +1,11 @@
-################################################################
-#   *.modernisation-platform.service.justice.gov.uk
-################################################################
+###################################################
+# *.modernisation-platform.service.justice.gov.uk #
+###################################################
 resource "aws_acm_certificate" "external-mp" {
   count             = local.is-production ? 0 : 1
   domain_name       = "*.modernisation-platform.service.justice.gov.uk"
   validation_method = "DNS"
   #subject_alternative_names = ["${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
-  ########  ccms-ebs.laa-development.modernisation-platform.service.justice.gov.uk
   tags = merge(local.tags,
     { Environment = local.environment }
   )
@@ -45,9 +44,9 @@ resource "aws_acm_certificate_validation" "external-mp" {
   validation_record_fqdns = [for record in aws_route53_record.external-mp : record.fqdn]
 }
 
-################################################################
-#   *.service.justice.gov.uk
-################################################################
+############################
+# *.service.justice.gov.uk #
+############################
 /*
 resource "aws_acm_certificate" "external-service" {
   count             = local.is-production ? 0 : 1

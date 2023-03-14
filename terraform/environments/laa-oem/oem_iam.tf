@@ -91,8 +91,8 @@ resource "aws_iam_role_policy_attachment" "ec2_readonly_policy_oem_base" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess"
 }
 
-resource "aws_iam_instance_profile" "iam_instace_profile_ccms_base" {
-  name = "iam_instace_profile_ccms_base"
+resource "aws_iam_instance_profile" "iam_instace_profile_oem_base" {
+  name = "iam_instace_profile_oem_base"
   role = aws_iam_role.role_stsassume_oem_base.name
   path = "/"
   tags = merge(local.tags,

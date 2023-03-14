@@ -3,7 +3,7 @@ resource "aws_instance" "oem_app" {
   associate_public_ip_address = false
   availability_zone           = local.application_data.accounts[local.environment].ec2_zone
   ebs_optimized               = true
-  iam_instance_profile        = aws_iam_instance_profile.iam_instace_profile_ccms_base.name
+  iam_instance_profile        = aws_iam_instance_profile.iam_instace_profile_oem_base.name
   instance_type               = local.application_data.accounts[local.environment].ec2_oem_instance_type_app
   key_name                    = local.application_data.accounts[local.environment].key_name
   monitoring                  = true
@@ -67,7 +67,7 @@ resource "aws_volume_attachment" "oem_app_volume_swap" {
   device_name = "/dev/sdb"
 }
 
-resource "aws_ebs_volume" "oem_app_volume_ccms_oem_app" {
+resource "aws_ebs_volume" "oem_app_volume_opt_oem_app" {
   availability_zone = local.application_data.accounts[local.environment].ec2_zone
   encrypted         = true
   iops              = 3000
@@ -90,13 +90,13 @@ resource "aws_ebs_volume" "oem_app_volume_ccms_oem_app" {
   }
 }
 
-resource "aws_volume_attachment" "oem_app_volume_ccms_oem_app" {
+resource "aws_volume_attachment" "oem_app_volume_opt_oem_app" {
   instance_id = aws_instance.oem_app.id
-  volume_id   = aws_ebs_volume.oem_app_volume_ccms_oem_app.id
+  volume_id   = aws_ebs_volume.oem_app_volume_opt_oem_app.id
   device_name = "/dev/sdc"
 }
 
-resource "aws_ebs_volume" "oem_app_volume_ccms_oem_inst" {
+resource "aws_ebs_volume" "oem_app_volume_opt_oem_inst" {
   availability_zone = local.application_data.accounts[local.environment].ec2_zone
   encrypted         = true
   iops              = 3000
@@ -119,8 +119,8 @@ resource "aws_ebs_volume" "oem_app_volume_ccms_oem_inst" {
   }
 }
 
-resource "aws_volume_attachment" "oem_app_volume_ccms_oem_inst" {
+resource "aws_volume_attachment" "oem_app_volume_opt_oem_inst" {
   instance_id = aws_instance.oem_app.id
-  volume_id   = aws_ebs_volume.oem_app_volume_ccms_oem_inst.id
+  volume_id   = aws_ebs_volume.oem_app_volume_opt_oem_inst.id
   device_name = "/dev/sdd"
 }
