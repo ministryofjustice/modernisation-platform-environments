@@ -72,10 +72,10 @@ resource "aws_codepipeline" "codepipeline" {
 
 # Create CodeBuild project
 resource "aws_codebuild_project" "my_build_project" {
-  region_override = "eu-west-1"
-  name            = "my-dotnet-build-project"
-  description     = "Build .NET application"
-  service_role    = "arn:aws:iam::${data.aws_caller_identity.original_session.id}:role/MemberInfrastructureAccess"
+  provider     = aws.ireland_provider
+  name         = "my-dotnet-build-project"
+  description  = "Build .NET application"
+  service_role = "arn:aws:iam::${data.aws_caller_identity.original_session.id}:role/MemberInfrastructureAccess"
   artifacts {
     type = "CODEPIPELINE"
   }
