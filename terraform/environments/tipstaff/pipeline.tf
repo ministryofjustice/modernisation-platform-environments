@@ -4,81 +4,140 @@ data "github_repository" "my_repo" {
 }
 
 # Create CodePipeline
-# resource "aws_codepipeline" "codepipeline" {
-#   name     = "tf_tipstaff_pipeline"
-#   role_arn = "arn:aws:iam::${data.aws_caller_identity.original_session.id}:role/MemberInfrastructureAccess"
+resource "aws_codepipeline" "codepipeline" {
+  provider = aws.ireland_provider
+  name     = "tf_tipstaff_pipeline"
+  role_arn = aws_iam_role.codepipeline_role.arn
 
-#   artifact_store {
-#     location = aws_s3_bucket.codepipeline_bucket.bucket
-#     type     = "S3"
-#   }
+  artifact_store {
+    location = aws_s3_bucket.codepipeline_bucket.bucket
+    type     = "S3"
+  }
 
-#   stage {
-#     name = "Source"
+  stage {
+    name = "Source"
 
-#     action {
-#       name             = "Source"
-#       category         = "Source"
-#       owner            = "ThirdParty"
-#       provider         = "GitHub"
-#       version          = "1"
-#       output_artifacts = ["source_output"]
+    action {
+      name             = "Source"
+      category         = "Source"
+      owner            = "ThirdParty"
+      provider         = "GitHub"
+      version          = "1"
+      output_artifacts = ["source_output"]
 
-#       configuration = {
-#         Owner      = "ministryofjustice"
-#         Repo       = "Tipstaff"
-#         Branch     = "master"
-#         OAuthToken = jsondecode(data.aws_secretsmanager_secret_version.oauth_token.secret_string)["OAUTH_TOKEN"]
-#       }
-#     }
-#   }
+      configuration = {
+        Owner      = "ministryofjustice"
+        Repo       = "Tipstaff"
+        Branch     = "master"
+        OAuthToken = jsondecode(data.aws_secretsmanager_secret_version.oauth_token.secret_string)["OAUTH_TOKEN"]
+      }
+    }
+  }
 
-#   stage {
-#     name = "Build"
+  # stage {
+  #   name = "Build"
 
-#     action {
-#       name             = "Build"
-#       category         = "Build"
-#       owner            = "AWS"
-#       provider         = "CodeBuild"
-#       input_artifacts  = ["source_output"]
-#       output_artifacts = ["build_output"]
-#       version          = "1"
+  #   action {
+  #     name             = "Build"
+  #     category         = "Build"
+  #     owner            = "AWS"
+  #     provider         = "CodeBuild"
+  #     input_artifacts  = ["source_output"]
+  #     output_artifacts = ["build_output"]
+  #     version          = "1"
 
-#       configuration = {
-#         ProjectName = "my-dotnet-build-project"
-#         Region      = "eu-west-1"
-#       }
-#     }
-#   }
+  #     configuration = {
+  #       ProjectName = "my-dotnet-build-project"
+  #       Region      = "eu-west-1"
+  #     }
+  #   }
+  # }
 
-#   stage {
-#     name = "Deploy"
+  # stage {
+  #   name = "Deploy"
 
-#     action {
-#       name            = "Deploy"
-#       category        = "Deploy"
-#       owner           = "AWS"
-#       provider        = "CodeDeployToEC2"
-#       input_artifacts = ["build_output"]
-#       version         = "1"
+  #   action {
+  #     name            = "Deploy"
+  #     category        = "Deploy"
+  #     owner           = "AWS"
+  #     provider        = "CodeDeployToEC2"
+  #     input_artifacts = ["build_output"]
+  #     version         = "1"
 
-#       configuration = {
-#         ApplicationName     = "my-dotnet-app"
-#         DeploymentGroupName = "my-dotnet-deployment-group"
-#       }
-#     }
-#   }
-# }
+  #     configuration = {
+  #       ApplicationName     = "my-dotnet-app"
+  #       DeploymentGroupName = "my-dotnet-deployment-group"
+  #     }
+  #   }
+  # }
+}
 
-# resource "aws_s3_bucket" "codepipeline_bucket" {
-#   bucket = "tipstaff-pipeline-bucket"
-# }
+resource "aws_s3_bucket" "codepipeline_bucket" {
+  bucket = "tipstaff-pipeline-bucket"
+}
 
-# resource "aws_s3_bucket_acl" "codepipeline_bucket_acl" {
-#   bucket = aws_s3_bucket.codepipeline_bucket.id
-#   acl    = "private"
-# }
+resource "aws_s3_bucket_acl" "codepipeline_bucket_acl" {
+  bucket = aws_s3_bucket.codepipeline_bucket.id
+  acl    = "private"
+}
+
+// CodePipeline IAM Role & Policy
+
+resource "aws_iam_role" "codepipeline_role" {
+  provider = aws.ireland_provider
+  name     = "CodePipelineRole"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "codepipeline.amazonaws.com"
+        }
+      },
+    ]
+  })
+}
+
+resource "aws_iam_role_policy" "codepipeline_role_policy" {
+  provider = aws.ireland_provider
+  name     = "CodePipelinePolicy"
+  role     = aws_iam_role.codepipeline_role.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "codepipeline:*",
+          "iam:*",
+          "logs:*",
+          "s3:*",
+          "codedeploy:CreateDeployment",
+          "codedeploy:GetApplication",
+          "codedeploy:GetApplicationRevision",
+          "codedeploy:GetDeployment",
+          "codedeploy:GetDeploymentConfig",
+          "codedeploy:RegisterApplicationRevision",
+          "ec2:*",
+          "codebuild:BatchGetBuilds",
+          "codebuild:StartBuild",
+          "codebuild:BatchGetBuildBatches",
+          "codebuild:StartBuildBatch",
+          "ecr:DescribeImages",
+          "states:DescribeExecution",
+          "states:DescribeStateMachine",
+          "states:StartExecution",
+          "appconfig:StartDeployment",
+          "appconfig:StopDeployment",
+          "appconfig:GetDeployment",
+        ]
+        Effect   = "Allow"
+        Resource = "*"
+      },
+    ]
+  })
+}
 
 # Create CodeBuild project
 resource "aws_codebuild_project" "my_build_project" {
@@ -133,7 +192,9 @@ resource "aws_iam_role_policy" "codebuild_role_policy" {
       {
         Action = [
           "codebuild:*",
-          "iam:*"
+          "iam:*",
+          "logs:*",
+          "s3:*"
         ]
         Effect   = "Allow"
         Resource = "*"
