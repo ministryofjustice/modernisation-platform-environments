@@ -1,5 +1,5 @@
 resource "aws_ses_domain_identity" "ppud" {
-  count = local.is-production == false ? 1 : 0
+  count  = local.is-production == false ? 1 : 0
   domain = local.application_data.accounts[local.environment].SES_domain
 }
 
@@ -15,7 +15,7 @@ resource "aws_ses_domain_identity_verification" "ppud_verification" {
 #SES domain DKIM
 
 resource "aws_ses_domain_identity" "DKIM-Identity" {
-  count = local.is-production == false ? 1 : 0
+  count  = local.is-production == false ? 1 : 0
   domain = local.application_data.accounts[local.environment].SES_domain
 }
 
