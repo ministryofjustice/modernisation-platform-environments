@@ -49,6 +49,16 @@ tasks:
 
 - task: executeScript
   inputs:
+  - frequency: once
+    type: powershell
+    runAs: admin
+    content: |-
+      $connectionsXMLPath = "C:\Users\Public\Desktop\connections.xml"
+      (Get-Content $connectionsXMLPath).replace('[DELIUS_IAPS_RDS_DB_ADDRESS]', '${delius_iaps_rds_db_address}') | Set-Content $connectionsXMLPath
+      (Get-Content $connectionsXMLPath).replace('[IM_DB_URL]', '${im_db_url}') | Set-Content $connectionsXMLPath
+
+- task: executeScript
+  inputs:
   - frequency: always
     type: powershell
     runAs: admin
@@ -142,6 +152,14 @@ tasks:
       $ErrorActionPreference = "Stop"
       $VerbosePreference = "Continue"
 
+      $NDeliusIAPSCMSConfigFile = "C:\Program Files (x86)\I2N\IapsNDeliusInterface\Config\IAPSCMSIF.xml"
+      $NDeliusIAPSCMSConfigXML = [xml](Get-Content $NDeliusIAPSCMSConfigFile)
+
+      $NDeliusIAPSCMSConfigXML.DLLDEF.INTERFACES.INTERFACE.USER = (Get-SSMParameter -Name "/NDeliusInterface/IAPSCMSIF/Interface/user" -WithDecryption $true).Value
+      $NDeliusIAPSCMSConfigXML.DLLDEF.INTERFACES.INTERFACE.PASSWORDCODED = (Get-SSMParameter -Name "/NDeliusInterface/IAPSCMSIF/Interface/passwordcoded" -WithDecryption $true).Value
+
+      $NDeliusIAPSCMSConfigXML.save($NDeliusIAPSCMSConfigFile)
+
       $NDeliusConfigFile = "C:\Program Files (x86)\I2N\IapsNDeliusInterface\Config\NDELIUSIF.xml"
       $configXML = [xml](Get-Content $NDeliusConfigFile)
       $configXML.DLLDEF.INTERFACES.INTERFACE.USER = (Get-SSMParameter -Name "/NDeliusInterface/Interface/user" -WithDecryption $true).Value
@@ -158,6 +176,7 @@ tasks:
       $configXML.DLLDEF.EMAIL.SMTPUSER = (Get-SSMParameter -Name "/NDeliusInterface/Email/smtpuser" -WithDecryption $true).Value
       $configXML.DLLDEF.EMAIL.PASSWORD = (Get-SSMParameter -Name "/NDeliusInterface/Email/password" -WithDecryption $true).Value
       $configXML.DLLDEF.EMAIL.PASSWORDCODED = (Get-SSMParameter -Name "/NDeliusInterface/Email/passwordcoded" -WithDecryption $true).Value
+      $configXML.DLLDEF.EMAIL.FROMADDRESS = (Get-SSMParameter -Name "/NDeliusInterface/Email/fromaddress" -WithDecryption $true).Value
       $configXML.save($NDeliusConfigFile)
 
 %{if environment == "development"}

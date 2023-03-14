@@ -1,4 +1,14 @@
 parameter:
+  ndelius-interface-iapscmsif-interface-user:
+    name: /NDeliusInterface/IAPSCMSIF/Interface/user
+    type: "String"
+    value: "dev-placeholder-ndelius-interface-iapscmsif-interface-user"
+    overwrite: false
+  ndelius-interface-iapscmsif-interface-passwordcoded:
+    name: /NDeliusInterface/IAPSCMSIF/Interface/passwordcoded
+    type: "String"
+    value: "dev-placeholder-ndelius-interface-iapscmsif-interface-passwordcoded"
+    overwrite: false
   ndelius-interface-user:
     name: /NDeliusInterface/Interface/user
     type: "String"
@@ -53,4 +63,9 @@ parameter:
     name: /NDeliusInterface/Email/passwordcoded
     type: "SecureString"
     value: "dev-placeholder-ndelius-interface-email-passwordcoded"
+    overwrite: false
+  ndelius-interface-email-fromaddress:
+    name: /NDeliusInterface/Email/fromaddress
+    type: "SecureString"
+    value: "dev-placeholder-ndelius-interface-email-fromaddress"
     overwrite: false
