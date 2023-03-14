@@ -6,7 +6,7 @@ data "github_repository" "my_repo" {
 # Create CodePipeline
 resource "aws_codepipeline" "codepipeline" {
   name     = "tf_tipstaff_pipeline"
-  role_arn = aws_iam_role.codepipeline_role.arn
+  role_arn = "arn:aws:iam::${data.aws_caller_identity.original_session.id}:role/MemberInfrastructureAccess"
 
   artifact_store {
     location = aws_s3_bucket.codepipeline_bucket.bucket
