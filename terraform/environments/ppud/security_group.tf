@@ -536,23 +536,26 @@ resource "aws_security_group" "Bridge-Server" {
 }
 
 resource "aws_security_group_rule" "UAT-Bridge-Server-Ingress" {
+  count             = local.is-development == false ? 1 : 0
   type              = "ingress"
   from_port         = 80
   to_port           = 80
   protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = aws_security_group.Bridge-Server.id
+  security_group_id = aws_security_group.Bridge-Server[0].id
 }
 
 resource "aws_security_group_rule" "UAT-Bridge-Server-Egress" {
+  count             = local.is-development == false ? 1 : 0
   type              = "egress"
   from_port         = 0
   to_port           = 0
   protocol          = "all"
   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-  security_group_id = aws_security_group.Bridge-Server.id
+  security_group_id = aws_security_group.Bridge-Server[0].id
 }
 resource "aws_security_group_rule" "UAT-Bridge-Server-Egress-1" {
+  count             = local.is-development == false ? 1 : 0
   type              = "egress"
   from_port         = 443
   to_port           = 443
@@ -573,6 +576,7 @@ resource "aws_security_group" "UAT-Document-Service" {
 }
 
 resource "aws_security_group_rule" "UAT-Document-Service-Ingress" {
+  count             = local.is-preproduction == true ? 1 : 0
   type              = "ingress"
   from_port         = 80
   to_port           = 80
@@ -582,6 +586,7 @@ resource "aws_security_group_rule" "UAT-Document-Service-Ingress" {
 }
 
 resource "aws_security_group_rule" "UAT-Document-Service-Ingress-1" {
+  count             = local.is-preproduction == true ? 1 : 0
   type              = "ingress"
   from_port         = 1433
   to_port           = 1433
@@ -591,6 +596,7 @@ resource "aws_security_group_rule" "UAT-Document-Service-Ingress-1" {
 }
 
 resource "aws_security_group_rule" "UAT-Document-Service-Egress" {
+  count             = local.is-preproduction == true ? 1 : 0
   type              = "egress"
   from_port         = 0
   to_port           = 0
@@ -600,6 +606,7 @@ resource "aws_security_group_rule" "UAT-Document-Service-Egress" {
 }
 
 resource "aws_security_group_rule" "UAT-Document-Service-Egress-1" {
+  count             = local.is-preproduction == true ? 1 : 0
   type              = "egress"
   from_port         = 443
   to_port           = 443
