@@ -24,7 +24,7 @@ jobs:
           token: '${{ secrets.GITHUB_TOKEN }}'
           fetch-depth: 0
       - name: Cache plugin dir
-        uses: actions/cache@940f3d7cf195ba83374c77632d1e2cbb2f24ae68 # v3.3.0
+        uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8 # v3.3.1
         with:
           path: ~/.tflint.d/plugins
           key: '${{ matrix.os }}-tflint-${{ hashFiles(''.tflint.hcl'') }}'
@@ -78,7 +78,7 @@ jobs:
           fetch-depth: 0
       - name: Run Checkov action
         id: checkov
-        uses: bridgecrewio/checkov-action@877fb46c1f485a191e5d34a79ac585adb27ad7a0 # v12.2191.0
+        uses: bridgecrewio/checkov-action@8499f833479aedb247b675faf387fdc1ae5f4837 # v12.2197.0
         with:
           directory: ./
           framework: terraform
