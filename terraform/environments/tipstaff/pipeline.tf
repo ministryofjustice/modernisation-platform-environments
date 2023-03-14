@@ -135,6 +135,7 @@ resource "aws_iam_role_policy" "codebuild_role_policy" {
       {
         Action = [
           "codebuild:*",
+          "iam:*"
         ]
         Effect   = "Allow"
         Resource = "*"
