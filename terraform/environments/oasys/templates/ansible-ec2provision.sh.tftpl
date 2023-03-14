@@ -94,8 +94,8 @@ run_ansible() {
    --extra-vars "target=localhost" \
    --extra-vars "@group_vars/environment_name_$environment_name.yml" \
    --extra-vars "@group_vars/server_type_$server_type.yml" \
-   #--tags ec2provision \
-   --become
+   --become #\
+   # --tags ec2provision
 
   echo "# Cleanup"
   deactivate
