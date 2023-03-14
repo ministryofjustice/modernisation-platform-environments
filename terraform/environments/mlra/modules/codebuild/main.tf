@@ -132,7 +132,7 @@ data "aws_iam_policy_document" "local-ecr-policy-data" {
 
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::${var.account_id}:role/${var.app-name}-CodeBuildRole", "arn:aws:iam::${var.account_id}:user/cicd-member-user"]
+      identifiers = ["arn:aws:iam::${var.account_id}:role/${var.app_name}-CodeBuildRole", "arn:aws:iam::${var.account_id}:user/cicd-member-user"]
     }
 
     actions = [
@@ -223,7 +223,7 @@ resource "aws_codebuild_project" "app-build" {
 
     environment_variable {
       name  = "APPLICATION_NAME"
-      value = "${var.app-name}"
+      value = "${var.app_name}"
     }
 
     environment_variable {
@@ -235,7 +235,7 @@ resource "aws_codebuild_project" "app-build" {
 
   source {
     type      = "GITHUB"
-    location  = "https://github.com/ministryofjustice/laa-${var.app-name}-application.git"
+    location  = "https://github.com/ministryofjustice/laa-${var.app_name}-application.git"
     buildspec = "buildspec-mp.yml"
   }
 
@@ -288,7 +288,7 @@ resource "aws_codebuild_project" "selenium" {
 
   source {
     type      = "GITHUB"
-    location  = "https://github.com/ministryofjustice/laa-${var.app-name}-application.git"
+    location  = "https://github.com/ministryofjustice/laa-${var.app_name}-application.git"
     buildspec = "testspec-lz.yml"
   }
 
