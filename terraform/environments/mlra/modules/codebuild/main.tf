@@ -132,7 +132,7 @@ data "aws_iam_policy_document" "mlra-local-ecr-policy-data" {
 
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::890609150221:role/mlra-CodeBuildRole", "arn:aws:iam::890609150221:user/cicd-member-user" ]
+      identifiers = ["arn:aws:iam::890609150221:role/mlra-CodeBuildRole", "arn:aws:iam::890609150221:user/cicd-member-user"]
     }
 
     actions = [
