@@ -91,11 +91,11 @@ run_ansible() {
   ansible-playbook site.yml \
    --connection=local \
    --inventory localhost, \
-   --extra-vars "ansible_python_interpreter=$python" \ 
+   --extra-vars "ansible_python_interpreter=$python" \
    --extra-vars "target=localhost" \
    --extra-vars "@group_vars/environment_name_$environment_name.yml" \
    --extra-vars "@group_vars/server_type_$server_type.yml" \
-   --become 
+   --become
    # --tags ec2provision
 
   echo "# Cleanup"
