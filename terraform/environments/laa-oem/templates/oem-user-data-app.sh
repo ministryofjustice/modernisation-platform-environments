@@ -2,7 +2,7 @@
 
 yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
 yum install -y https://s3.amazonaws.com/amazoncloudwatch-agent/oracle_linux/amd64/latest/amazon-cloudwatch-agent.rpm
-yum install -y jq telnet
+yum install -y awscli jq telnet
 
 systemctl stop amazon-ssm-agent
 rm -rf /var/lib/amazon/ssm/ipc/
@@ -96,4 +96,4 @@ hostnamectl set-hostname ${hostname}
 
 # Update /etc/hosts
 H=$(curl -s 'http://169.254.169.254/latest/meta-data/local-ipv4')
-echo "$${H} ${hostname} ${hostname}.${env_in_fqdn}.legalservices.gov.uk" >> /etc/hosts
+echo "$${H} ${hostname} ${hostname}.${env_fqdn}" >> /etc/hosts

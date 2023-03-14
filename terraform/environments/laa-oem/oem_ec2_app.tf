@@ -10,9 +10,9 @@ resource "aws_instance" "oem_app" {
   subnet_id                   = data.aws_subnet.data_subnets_b.id
   user_data_replace_on_change = true
   user_data = base64encode(templatefile("./templates/oem-user-data-app.sh", {
-    efs_id      = aws_efs_file_system.oem-app-efs.id
-    env_in_fqdn = local.application_data.accounts[local.environment].env_in_fqdn
-    hostname    = "laa-oem-app"
+    efs_id   = aws_efs_file_system.oem-app-efs.id
+    env_fqdn = "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+    hostname = "laa-oem-app"
   }))
   vpc_security_group_ids = [aws_security_group.oem_app_security_group_1.id, aws_security_group.oem_app_security_group_2.id]
 
