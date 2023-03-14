@@ -64,7 +64,7 @@ resource "aws_codepipeline" "codepipeline" {
       version         = "1"
 
       configuration = {
-        ApplicationName     = "Tipstaff"
+        ApplicationName     = "tipstaff-codedeploy"
         DeploymentGroupName = "tipstaff-deployment-group"
       }
     }
@@ -203,6 +203,40 @@ resource "aws_iam_role_policy" "codebuild_role_policy" {
         ]
         Effect   = "Allow"
         Resource = "*"
+      },
+    ]
+  })
+}
+
+// Create CodeDeploy app and deployment group
+
+resource "aws_codedeploy_app" "tipstaff_codedeploy" {
+  name = "tipstaff-codedeploy"
+}
+
+resource "aws_codedeploy_deployment_group" "tipstaff_deployment_group" {
+  app_name              = aws_codedeploy_app.tipstaff_codedeploy.name
+  deployment_group_name = "tipstaff-deployment-group"
+  service_role_arn      = aws_iam_role.codedeploy_role.arn
+
+  auto_rollback_configuration {
+    enabled = false
+    events  = ["DEPLOYMENT_FAILURE"]
+  }
+
+}
+
+resource "aws_iam_role" "codedeploy_role" {
+  name = "CodeDeployRole"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "codedeploy.amazonaws.com"
+        }
       },
     ]
   })
