@@ -122,6 +122,7 @@ resource "aws_security_group" "SCR-Team-Foundation-Server" {
 }
 
 resource "aws_security_group_rule" "SCR-Team-Foundation-Server-Ingress" {
+  count                    = local.is-development == true ? 1 : 0
   type                     = "ingress"
   from_port                = 8080
   to_port                  = 8080
@@ -131,6 +132,7 @@ resource "aws_security_group_rule" "SCR-Team-Foundation-Server-Ingress" {
 }
 
 resource "aws_security_group_rule" "SCR-Team-Foundation-Server-Ingress-1" {
+  count                    = local.is-development == true ? 1 : 0
   type                     = "ingress"
   from_port                = 8080
   to_port                  = 8080
@@ -140,6 +142,7 @@ resource "aws_security_group_rule" "SCR-Team-Foundation-Server-Ingress-1" {
 }
 
 resource "aws_security_group_rule" "SCR-Team-Foundation-Server-Ingress-2" {
+  count                    = local.is-development == true ? 1 : 0
   type                     = "ingress"
   from_port                = 8080
   to_port                  = 8080
@@ -149,6 +152,7 @@ resource "aws_security_group_rule" "SCR-Team-Foundation-Server-Ingress-2" {
 
 }
 resource "aws_security_group_rule" "SCR-Team-Foundation-Server-Ingress-3" {
+  count                    = local.is-development == true ? 1 : 0
   type                     = "ingress"
   from_port                = 80
   to_port                  = 80
@@ -158,6 +162,7 @@ resource "aws_security_group_rule" "SCR-Team-Foundation-Server-Ingress-3" {
 }
 
 resource "aws_security_group_rule" "SCR-Team-Foundation-Server-Ingress-4" {
+  count                    = local.is-development == true ? 1 : 0
   type                     = "ingress"
   from_port                = 80
   to_port                  = 80
@@ -167,6 +172,7 @@ resource "aws_security_group_rule" "SCR-Team-Foundation-Server-Ingress-4" {
 }
 
 resource "aws_security_group_rule" "SCR-Team-Foundation-Server-Ingress-5" {
+  count                    = local.is-development == true ? 1 : 0
   type                     = "ingress"
   from_port                = 80
   to_port                  = 80
@@ -176,6 +182,7 @@ resource "aws_security_group_rule" "SCR-Team-Foundation-Server-Ingress-5" {
 }
 
 resource "aws_security_group_rule" "SCR-Team-Foundation-Server-Egress" {
+  count             = local.is-development == true ? 1 : 0
   type              = "egress"
   from_port         = 0
   to_port           = 0
@@ -185,6 +192,7 @@ resource "aws_security_group_rule" "SCR-Team-Foundation-Server-Egress" {
 }
 
 resource "aws_security_group_rule" "SCR-Team-Foundation-Server-Egress-1" {
+  count             = local.is-development == true ? 1 : 0
   type              = "egress"
   from_port         = 443
   to_port           = 443
@@ -208,6 +216,7 @@ resource "aws_security_group" "Dev-Box-VW106" {
 }
 
 resource "aws_security_group_rule" "Dev-Box-VW106-Egress" {
+  count             = local.is-development == true ? 1 : 0
   type              = "egress"
   from_port         = 0
   to_port           = 0
@@ -217,6 +226,7 @@ resource "aws_security_group_rule" "Dev-Box-VW106-Egress" {
 }
 
 resource "aws_security_group_rule" "Dev-Box-VW106-Egress-1" {
+  count             = local.is-development == true ? 1 : 0
   type              = "egress"
   from_port         = 443
   to_port           = 443
@@ -240,6 +250,7 @@ resource "aws_security_group" "Dev-Box-VW107" {
 }
 
 resource "aws_security_group_rule" "Dev-Box-VW107-Egress" {
+  count             = local.is-development == true ? 1 : 0
   type              = "egress"
   from_port         = 0
   to_port           = 0
@@ -249,6 +260,7 @@ resource "aws_security_group_rule" "Dev-Box-VW107-Egress" {
 }
 
 resource "aws_security_group_rule" "Dev-Box-VW107-Egress-1" {
+  count             = local.is-development == true ? 1 : 0
   type              = "egress"
   from_port         = 443
   to_port           = 443
@@ -271,6 +283,7 @@ resource "aws_security_group" "Dev-Box-VW108" {
 }
 
 resource "aws_security_group_rule" "Dev-Box-VW108-Egress" {
+  count             = local.is-development == true ? 1 : 0
   type              = "egress"
   from_port         = 0
   to_port           = 0
@@ -280,6 +293,7 @@ resource "aws_security_group_rule" "Dev-Box-VW108-Egress" {
 }
 
 resource "aws_security_group_rule" "Dev-Box-VW108-Egress-1" {
+  count             = local.is-development == true ? 1 : 0
   type              = "egress"
   from_port         = 443
   to_port           = 443
@@ -300,6 +314,7 @@ resource "aws_security_group" "Primary-DOC-Server" {
 }
 
 resource "aws_security_group_rule" "Primary-DOC-Server-Ingress" {
+  count             = local.is-preproduction == false ? 1 : 0
   type              = "ingress"
   from_port         = 80
   to_port           = 80
@@ -309,6 +324,7 @@ resource "aws_security_group_rule" "Primary-DOC-Server-Ingress" {
 }
 
 resource "aws_security_group_rule" "Primary-DOC-Server-Ingress-1" {
+  count             = local.is-preproduction == false ? 1 : 0
   type              = "ingress"
   from_port         = 445
   to_port           = 445
@@ -318,6 +334,7 @@ resource "aws_security_group_rule" "Primary-DOC-Server-Ingress-1" {
 }
 
 resource "aws_security_group_rule" "Primary-DOC-Server-Egress" {
+  count             = local.is-preproduction == false ? 1 : 0
   type              = "egress"
   from_port         = 0
   to_port           = 0
@@ -327,6 +344,7 @@ resource "aws_security_group_rule" "Primary-DOC-Server-Egress" {
 }
 
 resource "aws_security_group_rule" "Primary-DOC-Server-Egress-1" {
+  count             = local.is-preproduction == false ? 1 : 0
   type              = "egress"
   from_port         = 443
   to_port           = 443
@@ -347,6 +365,7 @@ resource "aws_security_group" "Secondary-DOC-Server" {
 }
 
 resource "aws_security_group_rule" "Secondary-DOC-Server-Ingress" {
+  count             = local.is-preproduction == false ? 1 : 0
   type              = "ingress"
   from_port         = 80
   to_port           = 80
@@ -356,6 +375,7 @@ resource "aws_security_group_rule" "Secondary-DOC-Server-Ingress" {
 }
 
 resource "aws_security_group_rule" "Secondary-DOC-Server-Ingress-2" {
+  count             = local.is-preproduction == false ? 1 : 0
   type              = "ingress"
   from_port         = 445
   to_port           = 445
@@ -365,6 +385,7 @@ resource "aws_security_group_rule" "Secondary-DOC-Server-Ingress-2" {
 }
 
 resource "aws_security_group_rule" "Secondary-DOC-Server-Egress" {
+  count             = local.is-preproduction == false ? 1 : 0
   type              = "egress"
   from_port         = 0
   to_port           = 0
@@ -374,6 +395,7 @@ resource "aws_security_group_rule" "Secondary-DOC-Server-Egress" {
 }
 
 resource "aws_security_group_rule" "Secondary-DOC-Server-Egress-1" {
+  count             = local.is-preproduction == false ? 1 : 0
   type              = "egress"
   from_port         = 443
   to_port           = 443
@@ -394,6 +416,7 @@ resource "aws_security_group" "PPUD-Database-Server" {
 }
 
 resource "aws_security_group_rule" "PPUD-Database-Server-Ingress" {
+  count             = local.is-development == true ? 1 : 0
   type              = "ingress"
   from_port         = 1433
   to_port           = 1433
@@ -403,6 +426,7 @@ resource "aws_security_group_rule" "PPUD-Database-Server-Ingress" {
 }
 
 resource "aws_security_group_rule" "PPUD-Database-Server-Egress" {
+  count             = local.is-development == true ? 1 : 0
   type              = "egress"
   from_port         = 0
   to_port           = 0
@@ -412,6 +436,7 @@ resource "aws_security_group_rule" "PPUD-Database-Server-Egress" {
 }
 
 resource "aws_security_group_rule" "PPUD-Database-Server-Egress-1" {
+  count             = local.is-development == true ? 1 : 0
   type              = "egress"
   from_port         = 443
   to_port           = 443
