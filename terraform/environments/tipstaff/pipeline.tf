@@ -98,9 +98,7 @@ resource "aws_codebuild_project" "my_build_project" {
   }
 
   source {
-    type            = "GITHUB"
-    location        = "https://github.com/ministryofjustice/Tipstaff.git"
-    git_clone_depth = 1
+    type            = "CODEPIPELINE"
   }
 
   source_version = "master"
