@@ -34,24 +34,23 @@ resource "aws_codepipeline" "codepipeline" {
     }
   }
 
-  # stage {
-  #   name = "Build"
+  stage {
+    name = "Build"
 
-  #   action {
-  #     name             = "Build"
-  #     category         = "Build"
-  #     owner            = "AWS"
-  #     provider         = "CodeBuild"
-  #     input_artifacts  = ["source_output"]
-  #     output_artifacts = ["build_output"]
-  #     version          = "1"
+    action {
+      name             = "Build"
+      category         = "Build"
+      owner            = "AWS"
+      provider         = "CodeBuild"
+      input_artifacts  = ["source_output"]
+      output_artifacts = ["build_output"]
+      version          = "1"
 
-  #     configuration = {
-  #       ProjectName = "my-dotnet-build-project"
-  #       Region      = "eu-west-1"
-  #     }
-  #   }
-  # }
+      configuration = {
+        ProjectName = "my-dotnet-build-project"
+      }
+    }
+  }
 
   # stage {
   #   name = "Deploy"
