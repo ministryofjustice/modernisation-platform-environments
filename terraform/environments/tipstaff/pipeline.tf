@@ -28,7 +28,7 @@ resource "aws_codepipeline" "codepipeline" {
       configuration = {
         Owner      = "ministryofjustice"
         Repo       = "Tipstaff"
-        Branch     = "master"
+        Branch     = "terraform-build"
         OAuthToken = jsondecode(data.aws_secretsmanager_secret_version.oauth_token.secret_string)["OAUTH_TOKEN"]
       }
     }
@@ -52,23 +52,23 @@ resource "aws_codepipeline" "codepipeline" {
     }
   }
 
-  # stage {
-  #   name = "Deploy"
+  stage {
+    name = "Deploy"
 
-  #   action {
-  #     name            = "Deploy"
-  #     category        = "Deploy"
-  #     owner           = "AWS"
-  #     provider        = "CodeDeployToEC2"
-  #     input_artifacts = ["build_output"]
-  #     version         = "1"
+    action {
+      name            = "Deploy"
+      category        = "Deploy"
+      owner           = "AWS"
+      provider        = "CodeDeploy"
+      input_artifacts = ["build_output"]
+      version         = "1"
 
-  #     configuration = {
-  #       ApplicationName     = "my-dotnet-app"
-  #       DeploymentGroupName = "my-dotnet-deployment-group"
-  #     }
-  #   }
-  # }
+      configuration = {
+        ApplicationName     = "Tipstaff"
+        DeploymentGroupName = "tipstaff-deployment-group"
+      }
+    }
+  }
 }
 
 # resource "aws_s3_bucket" "codepipeline_bucket" {
