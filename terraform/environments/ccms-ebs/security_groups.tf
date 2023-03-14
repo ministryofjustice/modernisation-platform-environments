@@ -50,7 +50,7 @@ resource "aws_security_group" "ec2_sg_ebsdb" {
   description = "SG traffic control for EBSDB"
   vpc_id      = data.aws_vpc.shared.id
   tags = merge(local.tags,
-    { Name = lower(format("sg-%s-%s-OracleBaseImage", local.application_name, local.environment)) }
+    { Name = lower(format("sg-%s-%s-ebsdb", local.application_name, local.environment)) }
   )
 }
 resource "aws_security_group_rule" "ingress_traffic_ebsdb" {
@@ -90,7 +90,7 @@ resource "aws_security_group" "ec2_sg_ebsapps" {
   description = "SG traffic control for EBSAPPS"
   vpc_id      = data.aws_vpc.shared.id
   tags = merge(local.tags,
-    { Name = lower(format("sg-%s-%s-OracleBaseImage", local.application_name, local.environment)) }
+    { Name = lower(format("sg-%s-%s-ebsapps", local.application_name, local.environment)) }
   )
 }
 resource "aws_security_group_rule" "ingress_traffic_ebsapps" {
@@ -130,7 +130,7 @@ resource "aws_security_group" "ec2_sg_webgate" {
   description = "SG traffic control for WebGate"
   vpc_id      = data.aws_vpc.shared.id
   tags = merge(local.tags,
-    { Name = lower(format("sg-%s-%s-OracleBaseImage", local.application_name, local.environment)) }
+    { Name = lower(format("sg-%s-%s-webgate", local.application_name, local.environment)) }
   )
 }
 resource "aws_security_group_rule" "ingress_traffic_webgate" {
@@ -170,7 +170,7 @@ resource "aws_security_group" "ec2_sg_accessgate" {
   description = "SG traffic control for AccessGate"
   vpc_id      = data.aws_vpc.shared.id
   tags = merge(local.tags,
-    { Name = lower(format("sg-%s-%s-OracleBaseImage", local.application_name, local.environment)) }
+    { Name = lower(format("sg-%s-%s-accessgate", local.application_name, local.environment)) }
   )
 }
 resource "aws_security_group_rule" "ingress_traffic_accessgate" {
@@ -226,7 +226,7 @@ resource "aws_security_group" "sg_ebsapps_lb" {
   }
 
   tags = merge(local.tags,
-    { Name = lower(format("sg-%s-%s-OracleBaseImage", local.application_name, local.environment)) }
+    { Name = lower(format("sg-%s-%s-loadbalancer", local.application_name, local.environment)) }
   )
 }
 
