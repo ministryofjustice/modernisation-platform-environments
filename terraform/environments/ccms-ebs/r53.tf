@@ -44,7 +44,7 @@ resource "aws_route53_record" "ebsapps_cname" {
   records = [aws_route53_record.external.fqdn]
 }
 */
-/*
+
 ## EBSDB
 resource "aws_route53_record" "ebsdb" {
   provider = aws.core-vpc
@@ -134,4 +134,3 @@ resource "aws_route53_record" "ebsagate_cname" {
   type    = "CNAME"
   records = [aws_route53_record.ebsagate[count.index].fqdn]
 }
-*/
