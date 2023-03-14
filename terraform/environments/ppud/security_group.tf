@@ -541,7 +541,7 @@ resource "aws_security_group_rule" "UAT-Bridge-Server-Ingress" {
   to_port           = 80
   protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = aws_security_group.Bridge-Server.id
+  security_group_id = aws_security_group.Bridge-Server[0].id
 }
 
 resource "aws_security_group_rule" "UAT-Bridge-Server-Egress" {
@@ -550,7 +550,7 @@ resource "aws_security_group_rule" "UAT-Bridge-Server-Egress" {
   to_port           = 0
   protocol          = "all"
   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-  security_group_id = aws_security_group.Bridge-Server.id
+  security_group_id = aws_security_group.Bridge-Server[0].id
 }
 resource "aws_security_group_rule" "UAT-Bridge-Server-Egress-1" {
   type              = "egress"
@@ -558,7 +558,7 @@ resource "aws_security_group_rule" "UAT-Bridge-Server-Egress-1" {
   to_port           = 443
   protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = aws_security_group.Bridge-Server.id
+  security_group_id = aws_security_group.Bridge-Server[0].id
 }
 
 resource "aws_security_group" "UAT-Document-Service" {
