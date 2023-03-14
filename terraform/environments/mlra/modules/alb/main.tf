@@ -247,20 +247,20 @@ data "aws_secretsmanager_secret_version" "cloudfront" {
   secret_id = data.aws_secretsmanager_secret.cloudfront.arn
 }
 
-resource "aws_acm_certificate" "cloudfront" {
-  domain_name       = var.acm_cert_domain_name
-  validation_method = "DNS"
-  provider = aws.us-east-1
+# resource "aws_acm_certificate" "cloudfront" {
+#   domain_name       = var.acm_cert_domain_name
+#   validation_method = "DNS"
+#   provider = aws.us-east-1
 
 
-  subject_alternative_names = var.environment == "production" ? null : [local.domain_name]
+#   subject_alternative_names = var.environment == "production" ? null : [local.domain_name]
 
-  tags = var.tags
+#   tags = var.tags
 
-  lifecycle {
-    create_before_destroy = true
-  }
-}
+#   lifecycle {
+#     create_before_destroy = true
+#   }
+# }
 
 # TODO This was a centralised bucket in LAA Landing Zone - do we want one for each application/env account in MP? Yes for now
 
