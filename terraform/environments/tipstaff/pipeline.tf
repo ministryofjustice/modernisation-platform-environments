@@ -10,7 +10,7 @@ resource "aws_codepipeline" "codepipeline" {
   role_arn = aws_iam_role.codepipeline_role.arn
 
   artifact_store {
-    location = aws_s3_bucket.codepipeline_bucket.bucket
+    location = aws_s3_bucket.tipstaff_pipeline.bucket
     type     = "S3"
   }
 
@@ -71,9 +71,14 @@ resource "aws_codepipeline" "codepipeline" {
   # }
 }
 
-resource "aws_s3_bucket" "codepipeline_bucket" {
+# resource "aws_s3_bucket" "codepipeline_bucket" {
+#   provider = aws.ireland_provider
+#   bucket   = "tipstaff-pipeline-bucket"
+# }
+
+resource "aws_s3_bucket" "tipstaff_pipeline" {
   provider = aws.ireland_provider
-  bucket   = "tipstaff-pipeline-bucket"
+  bucket   = "tipstaff_pipeline"
 }
 
 # resource "aws_s3_bucket_acl" "codepipeline_bucket_acl" {
