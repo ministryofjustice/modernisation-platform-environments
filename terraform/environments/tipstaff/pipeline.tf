@@ -98,7 +98,7 @@ resource "aws_codebuild_project" "my_build_project" {
   }
 
   source {
-    type            = "CODEPIPELINE"
+    type = "CODEPIPELINE"
   }
 
   source_version = "master"
