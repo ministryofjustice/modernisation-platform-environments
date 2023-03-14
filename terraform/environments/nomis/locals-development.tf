@@ -36,7 +36,7 @@ locals {
       # *-nomis-db-3: HA
 
       # add databases here as needed
-      /* t3-nomis-db-3 = {
+      t3-nomis-db-3 = {
         tags = {
           server-type         = "nomis-db"
           description         = "Test database for monitoring automation development"
@@ -67,7 +67,7 @@ locals {
             }
           }
         }
-      } */
+      }
     }
     weblogics          = {}
     ec2_test_instances = {}
