@@ -165,21 +165,23 @@ locals {
 
     ebs_volumes = {
       "/dev/sdb" = { # /u01
-        size        = 200
+        size        = 100
         label       = "app"
         type        = "gp3"
         snapshot_id = null
       }
-      # "/dev/sdc" = {    # /u02
-      #   label = "app"
-      #   type = null
-      #   snapshot_id = null
-      # }
-      # "/dev/sde" = {  # DATA01
-      #   label = "data"
-      #   type = null
-      #   snapshot_id = null
-      # }
+      "/dev/sdc" = { # /u02
+        size        = 500
+        label       = "app"
+        type        = "gp3"
+        snapshot_id = null
+      }
+      "/dev/sde" = { # DATA01
+        label       = "data"
+        size        = 200
+        type        = "gp3"
+        snapshot_id = null
+      }
       # "/dev/sdf" = {  # DATA02
       #   label = "data"
       #   type = null

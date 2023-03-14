@@ -38,6 +38,13 @@ locals {
         type = "gp3"
         size = "50"
       }
+
+      // unmount volume from parent AMI
+      // that was used to enable windows features
+      // without needing to go out to the internet.
+      "/dev/xvdf" = {
+        no_device = true
+      }
     }
 
     user_data_raw = base64encode(
