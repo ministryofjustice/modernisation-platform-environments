@@ -109,6 +109,7 @@ resource "aws_codebuild_project" "my_build_project" {
 // CodeBuild IAM Role & Policy
 
 resource "aws_iam_role" "codebuild_role" {
+  provider     = aws.ireland_provider
   name = "CodeBuildRole"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -125,6 +126,7 @@ resource "aws_iam_role" "codebuild_role" {
 }
 
 resource "aws_iam_role_policy" "codebuild_role_policy" {
+  provider     = aws.ireland_provider
   name = "CodeBuildPolicy"
   role = aws_iam_role.codebuild_role.id
   policy = jsonencode({
