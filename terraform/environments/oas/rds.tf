@@ -33,6 +33,7 @@ module "rds" {
   vpc_subnet_a_id             = data.aws_subnet.data_subnets_a.id
   vpc_subnet_b_id             = data.aws_subnet.data_subnets_b.id
   vpc_subnet_c_id             = data.aws_subnet.data_subnets_c.id
+  tags                        = local.tags
 }
 
 resource "aws_route53_record" "oas-rds" {
