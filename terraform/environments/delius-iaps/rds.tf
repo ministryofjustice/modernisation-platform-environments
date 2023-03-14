@@ -41,7 +41,7 @@ resource "aws_db_instance" "iaps" {
 }
 
 resource "aws_db_subnet_group" "iaps" {
-  name       = "iaps_data_subnets"
+  name = "iaps_data_subnets"
   subnet_ids = [
     data.aws_subnet.data_subnets_a.id,
     data.aws_subnet.data_subnets_b.id,
@@ -63,9 +63,9 @@ resource "aws_vpc_security_group_ingress_rule" "allow_db_in" {
   security_group_id = aws_security_group.iaps_db.id
 
   referenced_security_group_id = aws_security_group.iaps.id
-  ip_protocol = "tcp"
-  from_port   = 1521
-  to_port     = 1521
+  ip_protocol                  = "tcp"
+  from_port                    = 1521
+  to_port                      = 1521
 }
 
 resource "aws_iam_role" "rds_enhanced_monitoring" {
