@@ -78,7 +78,7 @@ resource "aws_codepipeline" "codepipeline" {
 
 resource "aws_s3_bucket" "tipstaff_pipeline" {
   provider = aws.ireland_provider
-  bucket   = "tipstaff_pipeline"
+  bucket   = "tipstaff-pipeline"
 }
 
 # resource "aws_s3_bucket_acl" "codepipeline_bucket_acl" {
