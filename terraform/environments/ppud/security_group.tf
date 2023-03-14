@@ -126,8 +126,8 @@ resource "aws_security_group_rule" "SCR-Team-Foundation-Server-Ingress" {
   from_port                = 8080
   to_port                  = 8080
   protocol                 = "tcp"
-  source_security_group_id = aws_security_group.Dev-Box-VW106.id
-  security_group_id        = aws_security_group.SCR-Team-Foundation-Server.id
+  source_security_group_id = aws_security_group.Dev-Box-VW106[0].id
+  security_group_id        = aws_security_group.SCR-Team-Foundation-Server[0].id
 }
 
 resource "aws_security_group_rule" "SCR-Team-Foundation-Server-Ingress-1" {
@@ -135,8 +135,8 @@ resource "aws_security_group_rule" "SCR-Team-Foundation-Server-Ingress-1" {
   from_port                = 8080
   to_port                  = 8080
   protocol                 = "tcp"
-  source_security_group_id = aws_security_group.Dev-Box-VW107.id
-  security_group_id        = aws_security_group.SCR-Team-Foundation-Server.id
+  source_security_group_id = aws_security_group.Dev-Box-VW107[0].id
+  security_group_id        = aws_security_group.SCR-Team-Foundation-Server[0].id
 }
 
 resource "aws_security_group_rule" "SCR-Team-Foundation-Server-Ingress-2" {
@@ -144,8 +144,8 @@ resource "aws_security_group_rule" "SCR-Team-Foundation-Server-Ingress-2" {
   from_port                = 8080
   to_port                  = 8080
   protocol                 = "tcp"
-  source_security_group_id = aws_security_group.Dev-Box-VW108.id
-  security_group_id        = aws_security_group.SCR-Team-Foundation-Server.id
+  source_security_group_id = aws_security_group.Dev-Box-VW108[0].id
+  security_group_id        = aws_security_group.SCR-Team-Foundation-Server[0].id
 
 }
 resource "aws_security_group_rule" "SCR-Team-Foundation-Server-Ingress-3" {
@@ -153,8 +153,8 @@ resource "aws_security_group_rule" "SCR-Team-Foundation-Server-Ingress-3" {
   from_port                = 80
   to_port                  = 80
   protocol                 = "tcp"
-  source_security_group_id = aws_security_group.Dev-Box-VW106.id
-  security_group_id        = aws_security_group.SCR-Team-Foundation-Server.id
+  source_security_group_id = aws_security_group.Dev-Box-VW106[0].id
+  security_group_id        = aws_security_group.SCR-Team-Foundation-Server[0].id
 }
 
 resource "aws_security_group_rule" "SCR-Team-Foundation-Server-Ingress-4" {
@@ -162,8 +162,8 @@ resource "aws_security_group_rule" "SCR-Team-Foundation-Server-Ingress-4" {
   from_port                = 80
   to_port                  = 80
   protocol                 = "tcp"
-  source_security_group_id = aws_security_group.Dev-Box-VW107.id
-  security_group_id        = aws_security_group.SCR-Team-Foundation-Server.id
+  source_security_group_id = aws_security_group.Dev-Box-VW107[0].id
+  security_group_id        = aws_security_group.SCR-Team-Foundation-Server[0].id
 }
 
 resource "aws_security_group_rule" "SCR-Team-Foundation-Server-Ingress-5" {
@@ -171,8 +171,8 @@ resource "aws_security_group_rule" "SCR-Team-Foundation-Server-Ingress-5" {
   from_port                = 80
   to_port                  = 80
   protocol                 = "tcp"
-  source_security_group_id = aws_security_group.Dev-Box-VW108.id
-  security_group_id        = aws_security_group.SCR-Team-Foundation-Server.id
+  source_security_group_id = aws_security_group.Dev-Box-VW108[0].id
+  security_group_id        = aws_security_group.SCR-Team-Foundation-Server[0].id
 }
 
 resource "aws_security_group_rule" "SCR-Team-Foundation-Server-Egress" {
@@ -181,7 +181,7 @@ resource "aws_security_group_rule" "SCR-Team-Foundation-Server-Egress" {
   to_port           = 0
   protocol          = "all"
   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-  security_group_id = aws_security_group.SCR-Team-Foundation-Server.id
+  security_group_id = aws_security_group.SCR-Team-Foundation-Server[0].id
 }
 
 resource "aws_security_group_rule" "SCR-Team-Foundation-Server-Egress-1" {
@@ -190,7 +190,7 @@ resource "aws_security_group_rule" "SCR-Team-Foundation-Server-Egress-1" {
   to_port           = 443
   protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = aws_security_group.SCR-Team-Foundation-Server.id
+  security_group_id = aws_security_group.SCR-Team-Foundation-Server[0].id
 }
 
 
@@ -213,7 +213,7 @@ resource "aws_security_group_rule" "Dev-Box-VW106-Egress" {
   to_port           = 0
   protocol          = "all"
   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-  security_group_id = aws_security_group.Dev-Box-VW106.id
+  security_group_id = aws_security_group.Dev-Box-VW106[0].id
 }
 
 resource "aws_security_group_rule" "Dev-Box-VW106-Egress-1" {
@@ -222,7 +222,7 @@ resource "aws_security_group_rule" "Dev-Box-VW106-Egress-1" {
   to_port           = 443
   protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = aws_security_group.Dev-Box-VW106.id
+  security_group_id = aws_security_group.Dev-Box-VW106[0].id
 }
 
 resource "aws_security_group" "Dev-Box-VW107" {
@@ -245,7 +245,7 @@ resource "aws_security_group_rule" "Dev-Box-VW107-Egress" {
   to_port           = 0
   protocol          = "all"
   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-  security_group_id = aws_security_group.Dev-Box-VW107.id
+  security_group_id = aws_security_group.Dev-Box-VW107[0].id
 }
 
 resource "aws_security_group_rule" "Dev-Box-VW107-Egress-1" {
@@ -254,7 +254,7 @@ resource "aws_security_group_rule" "Dev-Box-VW107-Egress-1" {
   to_port           = 443
   protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = aws_security_group.Dev-Box-VW107.id
+  security_group_id = aws_security_group.Dev-Box-VW107[0].id
 }
 
 resource "aws_security_group" "Dev-Box-VW108" {
@@ -276,7 +276,7 @@ resource "aws_security_group_rule" "Dev-Box-VW108-Egress" {
   to_port           = 0
   protocol          = "all"
   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-  security_group_id = aws_security_group.Dev-Box-VW108.id
+  security_group_id = aws_security_group.Dev-Box-VW108[0].id
 }
 
 resource "aws_security_group_rule" "Dev-Box-VW108-Egress-1" {
@@ -285,7 +285,7 @@ resource "aws_security_group_rule" "Dev-Box-VW108-Egress-1" {
   to_port           = 443
   protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = aws_security_group.Dev-Box-VW108.id
+  security_group_id = aws_security_group.Dev-Box-VW108[0].id
 }
 
 resource "aws_security_group" "Primary-DOC-Server" {
@@ -305,7 +305,7 @@ resource "aws_security_group_rule" "Primary-DOC-Server-Ingress" {
   to_port           = 80
   protocol          = "tcp"
   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-  security_group_id = aws_security_group.Primary-DOC-Server.id
+  security_group_id = aws_security_group.Primary-DOC-Server[0].id
 }
 
 resource "aws_security_group_rule" "Primary-DOC-Server-Ingress-1" {
@@ -314,7 +314,7 @@ resource "aws_security_group_rule" "Primary-DOC-Server-Ingress-1" {
   to_port           = 445
   protocol          = "tcp"
   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-  security_group_id = aws_security_group.Primary-DOC-Server.id
+  security_group_id = aws_security_group.Primary-DOC-Server[0].id
 }
 
 resource "aws_security_group_rule" "Primary-DOC-Server-Egress" {
@@ -323,7 +323,7 @@ resource "aws_security_group_rule" "Primary-DOC-Server-Egress" {
   to_port           = 0
   protocol          = "all"
   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-  security_group_id = aws_security_group.Primary-DOC-Server.id
+  security_group_id = aws_security_group.Primary-DOC-Server[0].id
 }
 
 resource "aws_security_group_rule" "Primary-DOC-Server-Egress-1" {
@@ -332,7 +332,7 @@ resource "aws_security_group_rule" "Primary-DOC-Server-Egress-1" {
   to_port           = 443
   protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = aws_security_group.Primary-DOC-Server.id
+  security_group_id = aws_security_group.Primary-DOC-Server[0].id
 }
 
 resource "aws_security_group" "Secondary-DOC-Server" {
@@ -352,7 +352,7 @@ resource "aws_security_group_rule" "Secondary-DOC-Server-Ingress" {
   to_port           = 80
   protocol          = "tcp"
   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-  security_group_id = aws_security_group.Secondary-DOC-Server.id
+  security_group_id = aws_security_group.Secondary-DOC-Server[0].id
 }
 
 resource "aws_security_group_rule" "Secondary-DOC-Server-Ingress-2" {
@@ -361,7 +361,7 @@ resource "aws_security_group_rule" "Secondary-DOC-Server-Ingress-2" {
   to_port           = 445
   protocol          = "tcp"
   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-  security_group_id = aws_security_group.Secondary-DOC-Server.id
+  security_group_id = aws_security_group.Secondary-DOC-Server[0].id
 }
 
 resource "aws_security_group_rule" "Secondary-DOC-Server-Egress" {
@@ -370,7 +370,7 @@ resource "aws_security_group_rule" "Secondary-DOC-Server-Egress" {
   to_port           = 0
   protocol          = "all"
   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-  security_group_id = aws_security_group.Secondary-DOC-Server.id
+  security_group_id = aws_security_group.Secondary-DOC-Server[0].id
 }
 
 resource "aws_security_group_rule" "Secondary-DOC-Server-Egress-1" {
@@ -379,7 +379,7 @@ resource "aws_security_group_rule" "Secondary-DOC-Server-Egress-1" {
   to_port           = 443
   protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = aws_security_group.Secondary-DOC-Server.id
+  security_group_id = aws_security_group.Secondary-DOC-Server[0].id
 }
 
 resource "aws_security_group" "PPUD-Database-Server" {
@@ -399,7 +399,7 @@ resource "aws_security_group_rule" "PPUD-Database-Server-Ingress" {
   to_port           = 1433
   protocol          = "tcp"
   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-  security_group_id = aws_security_group.PPUD-Database-Server.id
+  security_group_id = aws_security_group.PPUD-Database-Server[0].id
 }
 
 resource "aws_security_group_rule" "PPUD-Database-Server-Egress" {
@@ -408,7 +408,7 @@ resource "aws_security_group_rule" "PPUD-Database-Server-Egress" {
   to_port           = 0
   protocol          = "all"
   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-  security_group_id = aws_security_group.PPUD-Database-Server.id
+  security_group_id = aws_security_group.PPUD-Database-Server[0].id
 }
 
 resource "aws_security_group_rule" "PPUD-Database-Server-Egress-1" {
@@ -417,7 +417,7 @@ resource "aws_security_group_rule" "PPUD-Database-Server-Egress-1" {
   to_port           = 443
   protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = aws_security_group.PPUD-Database-Server.id
+  security_group_id = aws_security_group.PPUD-Database-Server[0].id
 }
 
 
@@ -541,7 +541,7 @@ resource "aws_security_group_rule" "UAT-Bridge-Server-Ingress" {
   to_port           = 80
   protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = aws_security_group.UAT-Bridge-Server.id
+  security_group_id = aws_security_group.Bridge-Server.id
 }
 
 resource "aws_security_group_rule" "UAT-Bridge-Server-Egress" {
@@ -550,7 +550,7 @@ resource "aws_security_group_rule" "UAT-Bridge-Server-Egress" {
   to_port           = 0
   protocol          = "all"
   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-  security_group_id = aws_security_group.UAT-Bridge-Server.id
+  security_group_id = aws_security_group.Bridge-Server.id
 }
 resource "aws_security_group_rule" "UAT-Bridge-Server-Egress-1" {
   type              = "egress"
@@ -558,7 +558,7 @@ resource "aws_security_group_rule" "UAT-Bridge-Server-Egress-1" {
   to_port           = 443
   protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = aws_security_group.UAT-Bridge-Server.id
+  security_group_id = aws_security_group.Bridge-Server.id
 }
 
 resource "aws_security_group" "UAT-Document-Service" {
@@ -578,7 +578,7 @@ resource "aws_security_group_rule" "UAT-Document-Service-Ingress" {
   to_port           = 80
   protocol          = "tcp"
   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-  security_group_id = aws_security_group.UAT-Document-Service.id
+  security_group_id = aws_security_group.UAT-Document-Service[0].id
 }
 
 resource "aws_security_group_rule" "UAT-Document-Service-Ingress-1" {
@@ -587,7 +587,7 @@ resource "aws_security_group_rule" "UAT-Document-Service-Ingress-1" {
   to_port           = 1433
   protocol          = "tcp"
   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-  security_group_id = aws_security_group.UAT-Document-Service.id
+  security_group_id = aws_security_group.UAT-Document-Service[0].id
 }
 
 resource "aws_security_group_rule" "UAT-Document-Service-Egress" {
@@ -596,7 +596,7 @@ resource "aws_security_group_rule" "UAT-Document-Service-Egress" {
   to_port           = 0
   protocol          = "all"
   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-  security_group_id = aws_security_group.UAT-Document-Service.id
+  security_group_id = aws_security_group.UAT-Document-Service[0].id
 }
 
 resource "aws_security_group_rule" "UAT-Document-Service-Egress-1" {
@@ -605,5 +605,5 @@ resource "aws_security_group_rule" "UAT-Document-Service-Egress-1" {
   to_port           = 443
   protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = aws_security_group.UAT-Document-Service.id
+  security_group_id = aws_security_group.UAT-Document-Service[0].id
 }

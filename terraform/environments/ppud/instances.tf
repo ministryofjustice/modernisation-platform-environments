@@ -186,7 +186,7 @@ resource "aws_instance" "S618358RGVW202" {
   instance_type          = "m5.large"
   source_dest_check      = false
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.UAT-Bridge-Server[0].id]
+  vpc_security_group_ids = [aws_security_group.Bridge-Server[0].id]
   subnet_id              = data.aws_subnet.private_subnets_a.id
   tags = {
     Name   = "S618358RGVW202"
