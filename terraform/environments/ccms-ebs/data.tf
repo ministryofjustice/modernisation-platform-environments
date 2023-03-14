@@ -118,7 +118,7 @@ data "aws_secretsmanager_secret_version" "support_email_account" {
 
 data "aws_security_groups" "all_security_groups" {
   filter {
-    name = "tag:Name"
+    name   = "tag:Name"
     values = ["*ccms*"]
   }
 }
