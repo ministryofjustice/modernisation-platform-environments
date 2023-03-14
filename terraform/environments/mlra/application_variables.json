@@ -9,6 +9,7 @@
       "instance_type": "m5.large",
       "key_name": "",
       "ecr_url": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/mlra-ecr-repo",
+      "local_ecr_url": "890609150221.dkr.ecr.eu-west-2.amazonaws.com/mlra-local-ecr",
       "docker_image_tag": "latest",
       "maat_api_end_point": "http://maat-cd-api.aws.dev.legalservices.gov.uk/maatApi/laaStatus",
       "maat_db_url": "rds.maat.aws.dev.legalservices.gov.uk:1521:MAATDB",

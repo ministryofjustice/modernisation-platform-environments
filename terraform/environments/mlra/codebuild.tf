@@ -9,6 +9,6 @@ module "mlra-selenium" {
   s3_lifecycle_noncurr_version_expiration_days = 31
   application_test_url                         = local.application_test_url
   account_id                                   = local.environment_management.account_ids[terraform.workspace]
-  ecr_url                                      = local.application_data.accounts[local.environment].ecr_url
+  local_ecr_url                                = local.application_data.accounts[local.environment].local_ecr_url
   core_shared_services_production_account_id   = local.environment_management.account_ids["core-shared-services-production"]
 }
