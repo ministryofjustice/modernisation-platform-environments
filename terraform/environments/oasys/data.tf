@@ -139,6 +139,18 @@ data "aws_iam_policy_document" "cloud_watch_custom" {
   }
 }
 
+data "aws_iam_policy_document" "ec2_describe" {
+  statement {
+    sid    = "AllowApplicationInsights"
+    effect = "Allow"
+    actions = [
+      "ec2:DescribeInstances"
+    ]
+    #checkov:skip=CKV_AWS_109: "Ensure IAM policies does not allow permissions management / resource exposure without constraints"
+    resources = ["*"] #checkov:skip=CKV_AWS_111: "Ensure IAM policies does not allow write access without constraints"
+  }
+}
+
 data "aws_iam_policy_document" "application_insights" {
   statement {
     sid    = "AllowApplicationInsights"
@@ -160,7 +172,8 @@ data "aws_iam_policy_document" "ec2_common_combined" {
   source_policy_documents = [
     data.aws_iam_policy_document.ssm_custom.json,
     data.aws_iam_policy_document.s3_bucket_access.json,
-    data.aws_iam_policy_document.cloud_watch_custom.json
+    data.aws_iam_policy_document.cloud_watch_custom.json,
+    data.aws_iam_policy_document.ec2_describe.json
   ]
 }
 data "aws_iam_policy_document" "user-s3-access" {
