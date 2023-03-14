@@ -125,8 +125,8 @@ resource "aws_iam_role" "codebuild_role" {
 }
 
 resource "aws_iam_role_policy" "codebuild_role_policy" {
-  name   = "CodeBuildPolicy"
-  role   = aws_iam_role.codebuild_role.id
+  name = "CodeBuildPolicy"
+  role = aws_iam_role.codebuild_role.id
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
