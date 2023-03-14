@@ -250,7 +250,7 @@ data "aws_secretsmanager_secret_version" "cloudfront" {
 resource "aws_acm_certificate" "cloudfront" {
   domain_name       = var.acm_cert_domain_name
   validation_method = "DNS"
-  provider = aws.us-east-1
+  provider          = aws.us-east-1
 
 
   subject_alternative_names = var.environment == "production" ? null : [local.domain_name]
