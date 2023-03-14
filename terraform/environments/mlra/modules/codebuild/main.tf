@@ -104,8 +104,8 @@ resource "aws_s3_bucket_versioning" "report_versioning" {
 # ECR Resources
 ######################################################
 
-resource "aws_ecr_repository" "mlra-local-ecr" {
-  name                 = "mlra-local-ecr"
+resource "aws_ecr_repository" "local-ecr" {
+  name                 = "${var.app_name}-local-ecr"
   image_tag_mutability = "MUTABLE"
 
   image_scanning_configuration {
@@ -120,19 +120,19 @@ resource "aws_ecr_repository" "mlra-local-ecr" {
   )
 }
 
-resource "aws_ecr_repository_policy" "mlra-local-ecr-policy" {
-  repository = aws_ecr_repository.mlra-local-ecr.name
-  policy     = data.aws_iam_policy_document.mlra-local-ecr-policy-data.json
+resource "aws_ecr_repository_policy" "local-ecr-policy" {
+  repository = aws_ecr_repository.local-ecr.name
+  policy     = data.aws_iam_policy_document.local-ecr-policy-data.json
 }
 
-data "aws_iam_policy_document" "mlra-local-ecr-policy-data" {
+data "aws_iam_policy_document" "local-ecr-policy-data" {
   statement {
     sid    = "AccessECR"
     effect = "Allow"
 
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::890609150221:role/mlra-CodeBuildRole", "arn:aws:iam::890609150221:user/cicd-member-user"]
+      identifiers = ["arn:aws:iam::${var.account_id}:role/${var.app-name}-CodeBuildRole", "arn:aws:iam::${var.account_id}:user/cicd-member-user"]
     }
 
     actions = [
@@ -223,7 +223,7 @@ resource "aws_codebuild_project" "app-build" {
 
     environment_variable {
       name  = "APPLICATION_NAME"
-      value = "mlra"
+      value = "${var.app-name}"
     }
 
     environment_variable {
@@ -235,7 +235,7 @@ resource "aws_codebuild_project" "app-build" {
 
   source {
     type      = "GITHUB"
-    location  = "https://github.com/ministryofjustice/laa-mlra-application.git"
+    location  = "https://github.com/ministryofjustice/laa-${var.app-name}-application.git"
     buildspec = "buildspec-mp.yml"
   }
 
@@ -288,7 +288,7 @@ resource "aws_codebuild_project" "selenium" {
 
   source {
     type      = "GITHUB"
-    location  = "https://github.com/ministryofjustice/laa-mlra-application.git"
+    location  = "https://github.com/ministryofjustice/laa-${var.app-name}-application.git"
     buildspec = "testspec-lz.yml"
   }
 

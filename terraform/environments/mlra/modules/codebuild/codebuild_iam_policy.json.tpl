@@ -30,8 +30,8 @@
     {
       "Effect": "Allow",
       "Resource": [
-        "arn:aws:ecr:eu-west-2:374269020027:repository/mlra-ecr-repo",
-        "arn:aws:ecr:eu-west-2:890609150221:repository/mlra-local-ecr"
+        "arn:aws:ecr:eu-west-2:${var.core_shared_services_production_account_id}:repository/${var.app_name}-ecr-repo",
+        "arn:aws:ecr:eu-west-2:${var.account_id}:repository/${var.app_name}-local-ecr"
       ],
       "Action": [
         "ecr:GetDownloadUrlForLayer",
