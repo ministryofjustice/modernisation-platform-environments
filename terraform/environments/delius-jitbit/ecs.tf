@@ -4,6 +4,8 @@ module "ecs-new" {
   environment = local.environment
   name        = format("%s-new", local.application_name)
 
+  exec_enabled = true
+
   tags = local.tags
 }
 
