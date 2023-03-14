@@ -173,7 +173,8 @@ data "template_file" "codebuild_policy" {
   vars = {
     s3_report_bucket_name                      = aws_s3_bucket.selenium_report.id
     core_shared_services_production_account_id = var.core_shared_services_production_account_id
-    application_name                           = var.app_name
+    account_id                                 = var.account_id
+    app_name                                   = var.app_name
   }
 }
 
