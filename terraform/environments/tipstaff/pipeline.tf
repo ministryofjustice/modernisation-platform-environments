@@ -4,79 +4,88 @@ data "github_repository" "my_repo" {
 }
 
 # Create CodePipeline
-resource "aws_codepipeline" "codepipeline" {
-  name     = "tf_tipstaff_pipeline"
-  role_arn = "arn:aws:iam::${data.aws_caller_identity.original_session.id}:role/MemberInfrastructureAccess"
+# resource "aws_codepipeline" "codepipeline" {
+#   name     = "tf_tipstaff_pipeline"
+#   role_arn = "arn:aws:iam::${data.aws_caller_identity.original_session.id}:role/MemberInfrastructureAccess"
 
-  artifact_store {
-    location = aws_s3_bucket.codepipeline_bucket.bucket
-    type     = "S3"
-  }
+#   artifact_store {
+#     location = aws_s3_bucket.codepipeline_bucket.bucket
+#     type     = "S3"
+#   }
 
-  stage {
-    name = "Source"
+#   stage {
+#     name = "Source"
 
-    action {
-      name             = "Source"
-      category         = "Source"
-      owner            = "ThirdParty"
-      provider         = "GitHub"
-      version          = "1"
-      output_artifacts = ["source_output"]
+#     action {
+#       name             = "Source"
+#       category         = "Source"
+#       owner            = "ThirdParty"
+#       provider         = "GitHub"
+#       version          = "1"
+#       output_artifacts = ["source_output"]
 
-      configuration = {
-        Owner      = "ministryofjustice"
-        Repo       = "Tipstaff"
-        Branch     = "master"
-        OAuthToken = jsondecode(data.aws_secretsmanager_secret_version.oauth_token.secret_string)["OAUTH_TOKEN"]
-      }
-    }
-  }
+#       configuration = {
+#         Owner      = "ministryofjustice"
+#         Repo       = "Tipstaff"
+#         Branch     = "master"
+#         OAuthToken = jsondecode(data.aws_secretsmanager_secret_version.oauth_token.secret_string)["OAUTH_TOKEN"]
+#       }
+#     }
+#   }
 
-  stage {
-    name = "Build"
+#   stage {
+#     name = "Build"
 
-    action {
-      name             = "Build"
-      category         = "Build"
-      owner            = "AWS"
-      provider         = "CodeBuild"
-      input_artifacts  = ["source_output"]
-      output_artifacts = ["build_output"]
-      version          = "1"
+#     action {
+#       name             = "Build"
+#       category         = "Build"
+#       owner            = "AWS"
+#       provider         = "CodeBuild"
+#       input_artifacts  = ["source_output"]
+#       output_artifacts = ["build_output"]
+#       version          = "1"
 
-      configuration = {
-        ProjectName = "my-dotnet-build-project"
-        Region      = "eu-west-1"
-      }
-    }
-  }
+#       configuration = {
+#         ProjectName = "my-dotnet-build-project"
+#         Region      = "eu-west-1"
+#       }
+#     }
+#   }
 
-  stage {
-    name = "Deploy"
+#   stage {
+#     name = "Deploy"
 
-    action {
-      name            = "Deploy"
-      category        = "Deploy"
-      owner           = "AWS"
-      provider        = "CodeDeployToEC2"
-      input_artifacts = ["build_output"]
-      version         = "1"
+#     action {
+#       name            = "Deploy"
+#       category        = "Deploy"
+#       owner           = "AWS"
+#       provider        = "CodeDeployToEC2"
+#       input_artifacts = ["build_output"]
+#       version         = "1"
 
-      configuration = {
-        ApplicationName     = "my-dotnet-app"
-        DeploymentGroupName = "my-dotnet-deployment-group"
-      }
-    }
-  }
-}
+#       configuration = {
+#         ApplicationName     = "my-dotnet-app"
+#         DeploymentGroupName = "my-dotnet-deployment-group"
+#       }
+#     }
+#   }
+# }
+
+# resource "aws_s3_bucket" "codepipeline_bucket" {
+#   bucket = "tipstaff-pipeline-bucket"
+# }
+
+# resource "aws_s3_bucket_acl" "codepipeline_bucket_acl" {
+#   bucket = aws_s3_bucket.codepipeline_bucket.id
+#   acl    = "private"
+# }
 
 # Create CodeBuild project
 resource "aws_codebuild_project" "my_build_project" {
   provider     = aws.ireland_provider
   name         = "my-dotnet-build-project"
   description  = "Build .NET application"
-  service_role = "arn:aws:iam::${data.aws_caller_identity.original_session.id}:role/MemberInfrastructureAccess"
+  service_role = aws_iam_role.codebuild_role.arn
   artifacts {
     type = "CODEPIPELINE"
   }
@@ -97,97 +106,26 @@ resource "aws_codebuild_project" "my_build_project" {
   source_version = "master"
 }
 
-resource "aws_s3_bucket" "codepipeline_bucket" {
-  bucket = "tipstaff-pipeline-bucket"
+// CodeBuild IAM Role & Policy
+
+resource "aws_iam_role" "codebuild_role" {
+  name               = "${var.app_name}-CodeBuildRole"
+  assume_role_policy = jsonencode({
+      Version = "2012-10-17"
+      Statement = [
+        {
+          Action = "sts:AssumeRole"
+          Effect = "Allow"
+          Principal = {
+            Service = "codebuild.amazonaws.com"
+          }
+        },
+      ]
+    })
 }
 
-resource "aws_s3_bucket_acl" "codepipeline_bucket_acl" {
-  bucket = aws_s3_bucket.codepipeline_bucket.id
-  acl    = "private"
-}
-
-# resource "aws_iam_role" "codepipeline_role" {
-#   name = "codepipeline_role"
-#   assume_role_policy = jsonencode({
-#     Version = "2012-10-17"
-#     Statement = [
-#       {
-#         Action = "sts:AssumeRole"
-#         Effect = "Allow"
-#         Sid    = ""
-#         Principal = {
-#           Service = "codepipeline.amazonaws.com"
-#         }
-#       },
-#     ]
-#   })
-# }
-
-# resource "aws_iam_policy" "allow_ec2_policy" {
-#   name        = "codepipeline-policy"
-#   description = "A test policy for codepipeline"
-
-#   policy = jsonencode({
-#     Version = "2012-10-17"
-#     Statement = [
-#       {
-#         Action = [
-#           "ec2:DescribeInstances",
-#           "ec2:StartInstances",
-#           "ec2:StopInstances",
-#           "codepipeline:*"
-#         ]
-#         Effect   = "Allow"
-#         Resource = "*"
-#       },
-#     ]
-#   })
-
-# }
-
-# resource "aws_iam_role_policy_attachment" "codepipeline_policy_attachment" {
-#   policy_arn = aws_iam_policy.allow_ec2_policy.arn
-#   role       = aws_iam_role.codepipeline_role.name
-# }
-
-// create CodeBuild role, create policy, and attach policy
-
-# resource "aws_iam_role" "codebuild_role" {
-#   name = "codebuild_role"
-#   assume_role_policy = jsonencode({
-#     Version = "2012-10-17"
-#     Statement = [
-#       {
-#         Action = "sts:AssumeRole"
-#         Effect = "Allow"
-#         Principal = {
-#           Service = "codebuild.amazonaws.com"
-#         }
-#       },
-#     ]
-#   })
-# }
-
-# resource "aws_iam_policy" "allow_codebuild_policy" {
-#   name        = "allow_codebuild_policy"
-#   description = "A test policy for codebuild"
-
-#   policy = jsonencode({
-#     Version = "2012-10-17"
-#     Statement = [
-#       {
-#         Action = [
-#           "codebuild:*"
-#         ]
-#         Effect   = "Allow"
-#         Resource = "*"
-#       },
-#     ]
-#   })
-
-# }
-
-# resource "aws_iam_role_policy_attachment" "codebuild_policy_attachment" {
-#   policy_arn = aws_iam_policy.allow_codebuild_policy.arn
-#   role       = aws_iam_role.codebuild_role.name
+# resource "aws_iam_role_policy" "codebuild_role_policy" {
+#   name   = "CodeBuildPolicy"
+#   role   = aws_iam_role.codebuild_role.name
+#   policy = data.template_file.codebuild_policy.rendered
 # }
