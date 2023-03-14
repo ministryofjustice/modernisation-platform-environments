@@ -73,13 +73,13 @@ resource "aws_codepipeline" "codepipeline" {
 
 resource "aws_s3_bucket" "codepipeline_bucket" {
   provider = aws.ireland_provider
-  bucket = "tipstaff-pipeline-bucket"
+  bucket   = "tipstaff-pipeline-bucket"
 }
 
 resource "aws_s3_bucket_acl" "codepipeline_bucket_acl" {
   provider = aws.ireland_provider
-  bucket = aws_s3_bucket.codepipeline_bucket.id
-  acl    = "private"
+  bucket   = aws_s3_bucket.codepipeline_bucket.id
+  acl      = "private"
 }
 
 // CodePipeline IAM Role & Policy
