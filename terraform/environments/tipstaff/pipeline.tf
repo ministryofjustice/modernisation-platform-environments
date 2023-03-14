@@ -25,10 +25,10 @@ resource "aws_codepipeline" "codepipeline" {
       output_artifacts = ["source_output"]
 
       configuration = {
-        Owner            = "ministryofjustice"
-        Repo             = "Tipstaff"
-        Branch           = "master"
-        OAuthToken       = jsondecode(data.aws_secretsmanager_secret_version.oauth_token.secret_string)["OAUTH_TOKEN"]
+        Owner      = "ministryofjustice"
+        Repo       = "Tipstaff"
+        Branch     = "master"
+        OAuthToken = jsondecode(data.aws_secretsmanager_secret_version.oauth_token.secret_string)["OAUTH_TOKEN"]
       }
     }
   }
