@@ -44,18 +44,6 @@
         "ecr:DescribeRepositories",
         "ecr:GetAuthorizationToken"
       ]
-    },
-      {
-      "Effect": "Allow",
-      "Resource": [
-        "arn:aws:ecr:eu-west-2:890609150221:user/cicd-member-user"
-      ],
-      "Action": [
-        "codebuild:BatchGetBuilds",
-        "codebuild:StartBuild",
-        "codebuild:BatchGetProjects",
-        "codebuild:BatchGetReports"
-      ]
     }
   ]
 }
