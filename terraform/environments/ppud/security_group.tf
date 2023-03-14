@@ -84,12 +84,12 @@ resource "aws_security_group" "WAM-Data-Access-Server" {
 }
 
 resource "aws_security_group_rule" "WAM-Data-Access-Server-ingress" {
-  type                     = "ingress"
-  from_port                = 80
-  to_port                  = 80
-  protocol                 = "tcp"
-  cidr_blocks              = ["0.0.0.0/0"]
-  security_group_id        = aws_security_group.WAM-Data-Access-Server.id
+  type              = "ingress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.WAM-Data-Access-Server.id
 }
 
 resource "aws_security_group_rule" "WAM-Data-Access-Server-egress" {
@@ -562,7 +562,7 @@ resource "aws_security_group_rule" "UAT-Bridge-Server-Egress-1" {
 }
 
 resource "aws_security_group" "UAT-Document-Service" {
-  count      = local.is-preproduction == true ? 1 : 0
+  count       = local.is-preproduction == true ? 1 : 0
   vpc_id      = data.aws_vpc.shared.id
   name        = "UAT-Document-Service"
   description = "Document-Service for UAT"
