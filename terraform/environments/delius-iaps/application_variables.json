@@ -21,7 +21,8 @@
       "ec2_iaps_instance_type": "t3.medium",
       "cloudwatch_agent_log_group_retention_period": "7",
       "iaps_ndelius_interface_url": "placeholder.nd.address",
-      "iaps_im_interface_url": "placeholder.im.address"
+      "iaps_im_interface_url": "placeholder.im.address",
+      "iaps_im_db_url": "placeholder.db.address"
     },
     "preproduction": {
       "short_environment_name": "preprod",
@@ -44,7 +45,8 @@
       "ec2_iaps_instance_type": "t3.medium",
       "cloudwatch_agent_log_group_retention_period": "365",
       "iaps_ndelius_interface_url": "interface.stage.probation.service.justice.gov.uk",
-      "iaps_im_interface_url": "preprod-im-data.i2ncloud.com"
+      "iaps_im_interface_url": "preprod-im-data.i2ncloud.com",
+      "iaps_im_db_url": "imnledb01.nle.im.i2ncloud.com"
     },
     "production": {
       "short_environment_name": "prod",
