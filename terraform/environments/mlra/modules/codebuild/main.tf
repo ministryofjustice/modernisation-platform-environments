@@ -106,11 +106,18 @@ resource "aws_s3_bucket_versioning" "report_versioning" {
 
 resource "aws_ecr_repository" "mlra-local-ecr" {
   name                 = "mlra-local-ecr"
-  image_tag_mutability = "MUTABLE"
+  image_tag_mutability = "IMMUTABLE"
 
   image_scanning_configuration {
     scan_on_push = false
   }
+
+  tags = merge(
+    var.tags,
+    {
+      Name = "${var.app_name}-local-ecr"
+    },
+  )
 }
 
 resource "aws_ecr_repository_policy" "mlra-local-ecr-policy" {
@@ -125,7 +132,7 @@ data "aws_iam_policy_document" "mlra-local-ecr-policy-data" {
 
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::890609150221:role/mlra-CodeBuildRole"]
+      identifiers = ["arn:aws:iam::890609150221:role/mlra-CodeBuildRole", "arn:aws:iam::890609150221:user/cicd-member-user" ]
     }
 
     actions = [
