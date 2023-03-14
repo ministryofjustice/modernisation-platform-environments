@@ -241,3 +241,23 @@ resource "aws_iam_role" "codedeploy_role" {
     ]
   })
 }
+
+resource "aws_iam_role_policy" "codedeploy_role_policy" {
+  name     = "CodeDeployPolicy"
+  role     = aws_iam_role.codedeploy_role.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "codedeploy:*",
+          "iam:*",
+          "logs:*",
+          "s3:*"
+        ]
+        Effect   = "Allow"
+        Resource = "*"
+      },
+    ]
+  })
+}
