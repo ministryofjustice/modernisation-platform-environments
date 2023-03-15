@@ -5,11 +5,14 @@
 ################################################################
 resource "aws_acm_certificate" "external-mp" {
   count       = local.is-production ? 0 : 1
-  domain_name = "*.modernisation-platform.service.justice.gov.uk"
-  #domain_name       = "*.${local.application_data.accounts[local.environment].dns}.modernisation-platform.service.justice.gov.uk"
+
   validation_method = "DNS"
-  #subject_alternative_names = ["${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
-  #######  ccms-ebs.laa-development.modernisation-platform.service.justice.gov.uk
+  domain_name = "modernisation-platform.service.justice.gov.uk"
+  subject_alternative_names = ["*.modernisation-platform.service.justice.gov.uk"]
+ 
+  #domain_name = "*.modernisation-platform.service.justice.gov.uk"
+  
+
   tags = merge(local.tags,
     { Environment = local.environment }
   )
