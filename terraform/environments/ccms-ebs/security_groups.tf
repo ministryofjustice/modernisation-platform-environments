@@ -211,7 +211,7 @@ resource "aws_security_group" "sg_ebsapps_lb" {
   description = "Inbound traffic control for EBSAPPS loadbalancer"
   vpc_id      = data.aws_vpc.shared.id
 
-/*
+  /*
   ingress {
     from_port   = 443
     to_port     = 443
@@ -241,8 +241,8 @@ resource "aws_security_group_rule" "ingress_traffic_ebslb" {
   cidr_blocks       = [data.aws_vpc.shared.cidr_block, local.application_data.accounts[local.environment].mp_aws_subnet_env]
 }
 resource "aws_security_group_rule" "egress_traffic_ebslb_sg" {
-  for_each          = local.application_data.lb_sg_egress_rules
-  security_group_id = aws_security_group.sg_ebsapps_lb.id
+  for_each                 = local.application_data.lb_sg_egress_rules
+  security_group_id        = aws_security_group.sg_ebsapps_lb.id
   type                     = "egress"
   description              = format("Outbound traffic for %s %d", each.value.protocol, each.value.from_port)
   protocol                 = each.value.protocol
