@@ -225,7 +225,7 @@ resource "aws_codedeploy_deployment_group" "tipstaff_deployment_group" {
   }
 
   ec2_tag_set {
-    key = "Name"
+    key   = "Name"
     value = aws_instance.tipstaff_ec2_instance.tags["Name"]
   }
 
