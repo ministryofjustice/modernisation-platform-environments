@@ -1,12 +1,11 @@
 ## CERT
-/*
-resource "aws_route53_record" "external-mp" {
+resource "aws_route53_record" "internal-mp" {
   depends_on = [
-    aws_acm_certificate.external-mp
+    aws_acm_certificate.internal-mp
   ]
   provider = aws.core-network-services
   for_each = {
-    for dvo in aws_acm_certificate.external-mp[0].domain_validation_options : dvo.domain_name => {
+    for dvo in aws_acm_certificate.internal-mp[0].domain_validation_options : dvo.domain_name => {
       name   = dvo.resource_record_name
       record = dvo.resource_record_value
       type   = dvo.resource_record_type
@@ -19,7 +18,7 @@ resource "aws_route53_record" "external-mp" {
   type            = each.value.type
   zone_id         = data.aws_route53_zone.network-services.zone_id
 }
-*/
+
 ## LOADBALANCER
 resource "aws_route53_record" "external" {
   provider = aws.core-vpc
