@@ -1,6 +1,7 @@
 {
   "accounts": {
     "development": {
+      "short_env": "dev",
       "dns": "laa-development",
       "instance-scheduling": "skip-scheduling",
       "ec2_oracle_instance_type_ebsdb": "m5d.4xlarge",
@@ -32,6 +33,7 @@
       "ebsapps_u03_size": 50
     },
     "test": {
+      "short_env": "tst",
       "dns": "laa-test",
       "instance-scheduling": "skip-auto-start",
       "ec2_oracle_instance_type_ebsdb": "m5d.4xlarge",
@@ -63,6 +65,7 @@
       "ebsapps_u03_size": 50
     },
     "preproduction": {
+      "short_env": "prep",
       "dns": "laa-preproduction",
       "instance-scheduling": "skip-auto-start",
       "ec2_oracle_instance_type_ebsdb": "x2iedn.4xlarge",
@@ -94,6 +97,7 @@
       "ebsapps_u03_size": 50
     },
     "production": {
+      "short_env": "prod",
       "dns": "laa",
       "instance-scheduling": "skip-auto-start",
       "ec2_oracle_instance_type_ebsdb": "x2iedn.4xlarge",
@@ -125,6 +129,43 @@
       "ebsapps_u03_size": 50
     }
   },
+  "ec2_sg_base_ingress_rules": {
+    "TCP_80": {
+      "from_port": 80,
+      "to_port": 80,
+      "protocol": "TCP"
+    },
+    "TCP_443": {
+      "from_port": 443,
+      "to_port": 443,
+      "protocol": "TCP"
+    },
+    "TCP_22": {
+      "from_port": 22,
+      "to_port": 22,
+      "protocol": "TCP"
+    }
+  },
+  "ec2_sg_base_egress_rules": {
+    "TCP_80": {
+      "from_port": 80,
+      "to_port": 80,
+      "protocol": "TCP",
+      "destination_cidr": "0.0.0.0/0"
+    },
+    "TCP_443": {
+      "from_port": 443,
+      "to_port": 443,
+      "protocol": "TCP",
+      "destination_cidr": "0.0.0.0/0"
+    },
+    "SSH_22": {
+      "from_port": 22,
+      "to_port": 22,
+      "protocol": "TCP",
+      "destination_cidr": "0.0.0.0/0"
+    }
+  },
   "ec2_sg_ingress_rules": {
     "TCP_80": {
       "from_port": 80,
@@ -140,6 +181,12 @@
       "from_port": 22,
       "to_port": 22,
       "protocol": "TCP"
+    },
+    "TCP_8000": {
+      "from_port": 8000,
+      "to_port": 8000,
+      "protocol": "TCP",
+      "destination_cidr": "10.200.0.0/13"
     }
   },
   "ec2_sg_egress_rules": {
@@ -160,6 +207,12 @@
       "to_port": 22,
       "protocol": "TCP",
       "destination_cidr": "0.0.0.0/0"
+    },
+    "TCP_8000": {
+      "from_port": 8000,
+      "to_port": 8000,
+      "protocol": "TCP",
+      "destination_cidr": "10.200.0.0/13"
     }
   },
   "ec2_sg_ftp_ingress_rules": {
@@ -244,6 +297,33 @@
     },
     "cwagent-var-log-secure": {
       "retention_days": 90
+    }
+  },
+  "ec2_sg_ingress_rules_db": {
+    "UDP_ALL": {
+      "from_port": 0,
+      "to_port": 65535,
+      "protocol": "UDP"
+    }
+  },
+  "ec2_sg_egress_rules_db": {
+    "TCP_80": {
+      "from_port": 80,
+      "to_port": 80,
+      "protocol": "TCP",
+      "destination_cidr": "0.0.0.0/0"
+    },
+    "TCP_443": {
+      "from_port": 443,
+      "to_port": 443,
+      "protocol": "TCP",
+      "destination_cidr": "0.0.0.0/0"
+    },
+    "SSH_22": {
+      "from_port": 22,
+      "to_port": 22,
+      "protocol": "TCP",
+      "destination_cidr": "0.0.0.0/0"
     }
   }
 }
