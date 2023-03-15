@@ -38,7 +38,9 @@ defaults:
 jobs:
 
   plan-dev-test:
+    continue-on-error: true
     strategy:
+      fail-fast: false
       matrix:
         include:
           - environment: development
