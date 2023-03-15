@@ -66,9 +66,9 @@ resource "aws_lb_target_group" "tipstaff_dev_target_group" {
 }
 
 # Link target group to the EC2 instance on port 80
-resource "aws_lb_target_group_attachment" "tipstaff_ec2_instance_dev" {
+resource "aws_lb_target_group_attachment" "tipstaff_ec2_instance" {
   target_group_arn = aws_lb_target_group.tipstaff_dev_target_group.arn
-  target_id        = aws_instance.tipstaff_ec2_instance_dev.id
+  target_id        = aws_instance.tipstaff_ec2_instance.id
   port             = 80
 }
 

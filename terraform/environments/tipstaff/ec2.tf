@@ -26,7 +26,7 @@ resource "aws_security_group_rule" "egress_traffic" {
   cidr_blocks       = ["0.0.0.0/0"]
 }
 
-resource "aws_instance" "tipstaff_ec2_instance_dev" {
+resource "aws_instance" "tipstaff_ec2_instance" {
   instance_type               = local.application_data.accounts[local.environment].instance_type
   ami                         = local.application_data.accounts[local.environment].ami_image_id
   subnet_id                   = data.aws_subnet.private_subnets_a.id
@@ -36,11 +36,20 @@ resource "aws_instance" "tipstaff_ec2_instance_dev" {
   user_data                   = <<-EOF
               <powershell>
               Install-WindowsFeature -name Web-Server -IncludeManagementTools
-              New-Item -Path C:\inetpub\wwwroot\index.html -ItemType File -Value "Hello, World!" -Force
+              Set-Location -Path "C:\"
+              Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Force
+              Invoke-WebRequest -Uri https://aws-codedeploy-us-east-1.s3.us-east-1.amazonaws.com/latest/codedeploy-agent.msi -OutFile codedeploy-agent.msi
+              Start-Process -FilePath msiexec.exe -ArgumentList "/i", "codedeploy-agent.msi", "/quiet" -Wait
+              Set-Service -Name codedeployagent -StartupType "Automatic"
+              Start-Service -Name codedeployagent
               </powershell>
               EOF
   depends_on                  = [aws_security_group.tipstaff_dev_ec2_sc]
+  tags = {
+    Name = "tipstaff-ec2"
+  }
 }
+
 
 resource "aws_key_pair" "ec2_access_key" {
   key_name   = "ec2_access_key"
