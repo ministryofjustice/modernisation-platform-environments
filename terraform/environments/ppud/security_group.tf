@@ -142,7 +142,7 @@ resource "aws_security_group_rule" "SCR-Team-Foundation-Server-Ingress-1" {
 }
 
 resource "aws_security_group_rule" "SCR-Team-Foundation-Server-Ingress-2" {
-  count       = local.is-development == true ? 1 : 0
+  count                    = local.is-development == true ? 1 : 0
   type                     = "ingress"
   from_port                = 8080
   to_port                  = 8080
