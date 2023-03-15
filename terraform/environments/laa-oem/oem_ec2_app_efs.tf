@@ -45,6 +45,4 @@ resource "aws_security_group" "oem-app-efs-sg" {
   lifecycle {
     create_before_destroy = true
   }
-
-  tags = local.tags
 }

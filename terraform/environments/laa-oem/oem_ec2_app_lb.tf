@@ -178,6 +178,4 @@ resource "aws_security_group" "load_balancer_security_group" {
       "0.0.0.0/0",
     ]
   }
-
-  tags = local.tags
 }
