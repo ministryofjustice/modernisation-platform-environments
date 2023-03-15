@@ -76,7 +76,7 @@ resource "aws_codepipeline" "codepipeline" {
 
 resource "aws_s3_bucket" "pipeline-tipstaff-bucket" {
   provider = aws.ireland_provider
-  bucket = "pipeline-tipstaff-bucket"
+  bucket   = "pipeline-tipstaff-bucket"
 }
 
 // CodePipeline IAM Role & Policy
