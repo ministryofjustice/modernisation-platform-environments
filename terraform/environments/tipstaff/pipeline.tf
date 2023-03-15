@@ -3,7 +3,6 @@ data "github_repository" "my_repo" {
 }
 
 resource "aws_codepipeline" "codepipeline" {
-  provider = aws.ireland_provider
   name     = "tf_tipstaff_pipeline"
   role_arn = aws_iam_role.codepipeline_role.arn
 
@@ -70,14 +69,12 @@ resource "aws_codepipeline" "codepipeline" {
 }
 
 resource "aws_s3_bucket" "tipstaff_pipeline" {
-  provider = aws.ireland_provider
   bucket   = "tipstaff-pipeline"
 }
 
 // CodePipeline IAM Role & Policy
 
 resource "aws_iam_role" "codepipeline_role" {
-  provider = aws.ireland_provider
   name     = "CodePipelineRole"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -94,7 +91,6 @@ resource "aws_iam_role" "codepipeline_role" {
 }
 
 resource "aws_iam_role_policy" "codepipeline_role_policy" {
-  provider = aws.ireland_provider
   name     = "CodePipelinePolicy"
   role     = aws_iam_role.codepipeline_role.id
   policy = jsonencode({
