@@ -28,7 +28,8 @@ module "autoscaling_groups" {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
   }
 
-  for_each = try(local.environment_config.autoscaling_groups, {})
+  # Temporary condition while we test using the new Baseline Module.
+  for_each = local.environment == "development" ? {} : try(local.environment_config.autoscaling_groups, {})
 
   name                      = each.key
   ami_name                  = each.value.ami_name
