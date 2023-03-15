@@ -1,5 +1,5 @@
 resource "aws_instance" "oem_app" {
-  ami                         = local.ami_app
+  ami                         = data.aws_ami.ec2_laa_oem_development_app.id
   associate_public_ip_address = false
   availability_zone           = local.application_data.accounts[local.environment].ec2_zone
   ebs_optimized               = true
@@ -72,7 +72,7 @@ resource "aws_ebs_volume" "oem_app_volume_opt_oem_app" {
   encrypted         = true
   iops              = 3000
   size              = 50
-  snapshot_id       = local.vol_snap_app_app
+  snapshot_id       = data.aws_ebs_snapshot.oem_app_volume_opt_oem_app.id
   type              = "gp3"
   depends_on        = [resource.aws_instance.oem_app]
 
@@ -101,7 +101,7 @@ resource "aws_ebs_volume" "oem_app_volume_opt_oem_inst" {
   encrypted         = true
   iops              = 3000
   size              = 50
-  snapshot_id       = local.vol_snap_app_inst
+  snapshot_id       = data.aws_ebs_snapshot.oem_app_volume_opt_oem_inst.id
   type              = "gp3"
   depends_on        = [resource.aws_instance.oem_app]
 

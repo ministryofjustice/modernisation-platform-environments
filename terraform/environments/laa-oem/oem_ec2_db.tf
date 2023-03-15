@@ -1,5 +1,5 @@
 resource "aws_instance" "oem_db" {
-  ami                         = local.ami_db
+  ami                         = data.aws_ami.ec2_laa_oem_development_db.id
   associate_public_ip_address = false
   availability_zone           = local.application_data.accounts[local.environment].ec2_zone
   ebs_optimized               = true
@@ -72,7 +72,7 @@ resource "aws_ebs_volume" "oem_db_volume_opt_oem_app" {
   encrypted         = true
   iops              = 3000
   size              = 50
-  snapshot_id       = local.vol_snap_db_app
+  snapshot_id       = data.aws_ebs_snapshot.oem_db_volume_opt_oem_app.id
   type              = "gp3"
   depends_on        = [resource.aws_instance.oem_db]
 
@@ -101,7 +101,7 @@ resource "aws_ebs_volume" "oem_db_volume_opt_oem_inst" {
   encrypted         = true
   iops              = 3000
   size              = 50
-  snapshot_id       = local.vol_snap_db_inst
+  snapshot_id       = data.aws_ebs_snapshot.oem_db_volume_opt_oem_db.id
   type              = "gp3"
   depends_on        = [resource.aws_instance.oem_db]
 
@@ -130,7 +130,7 @@ resource "aws_ebs_volume" "oem_db_volume_opt_oem_dbf" {
   encrypted         = true
   iops              = 3000
   size              = 200
-  snapshot_id       = local.vol_snap_db_dbf
+  snapshot_id       = data.aws_ebs_snapshot.oem_db_volume_opt_oem_dbf.id
   type              = "io2"
   depends_on        = [resource.aws_instance.oem_db]
 
@@ -159,7 +159,7 @@ resource "aws_ebs_volume" "oem_db_volume_opt_oem_redo" {
   encrypted         = true
   iops              = 3000
   size              = 20
-  snapshot_id       = local.vol_snap_db_redo
+  snapshot_id       = data.aws_ebs_snapshot.oem_db_volume_opt_oem_redo.id
   type              = "io2"
   depends_on        = [resource.aws_instance.oem_db]
 
@@ -188,7 +188,7 @@ resource "aws_ebs_volume" "oem_db_volume_opt_oem_arch" {
   encrypted         = true
   iops              = 3000
   size              = 200
-  snapshot_id       = local.vol_snap_db_arch
+  snapshot_id       = data.aws_ebs_snapshot.oem_db_volume_opt_oem_arch.id
   type              = "io2"
   depends_on        = [resource.aws_instance.oem_db]
 
