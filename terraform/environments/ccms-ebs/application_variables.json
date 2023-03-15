@@ -186,7 +186,13 @@
       "from_port": 8000,
       "to_port": 8000,
       "protocol": "TCP",
-      "destination_cidr": "10.200.0.0/13"
+      "destination_cidr": "10.200.0.0/20"
+    },
+    "TCP_444x": {
+      "from_port": 4443,
+      "to_port": 4444,
+      "protocol": "TCP",
+      "destination_cidr": "10.200.0.0/20"
     }
   },
   "ec2_sg_egress_rules": {
@@ -212,7 +218,13 @@
       "from_port": 8000,
       "to_port": 8000,
       "protocol": "TCP",
-      "destination_cidr": "10.200.0.0/13"
+      "destination_cidr": "10.200.0.0/20"
+    },
+    "TCP_444x": {
+      "from_port": 4443,
+      "to_port": 4444,
+      "protocol": "TCP",
+      "destination_cidr": "10.200.0.0/20"
     }
   },
   "ec2_sg_ftp_ingress_rules": {
