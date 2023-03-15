@@ -152,7 +152,7 @@ locals {
     user_data_cloud_init = {
       args = {
         lifecycle_hook_name  = "ready-hook"
-        branch               = "oasys-db"
+        branch               = "main"
         ansible_repo         = "modernisation-platform-configuration-management"
         ansible_repo_basedir = "ansible"
         # ansible_tags           = "ec2provisiondata"
