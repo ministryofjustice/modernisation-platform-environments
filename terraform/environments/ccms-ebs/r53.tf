@@ -1,4 +1,5 @@
 ## CERT
+/*
 resource "aws_route53_record" "external-mp" {
   depends_on = [
     aws_acm_certificate.external-mp
@@ -18,7 +19,7 @@ resource "aws_route53_record" "external-mp" {
   type            = each.value.type
   zone_id         = data.aws_route53_zone.network-services.zone_id
 }
-
+*/
 ## LOADBALANCER
 resource "aws_route53_record" "external" {
   provider = aws.core-vpc

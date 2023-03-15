@@ -19,7 +19,7 @@ resource "aws_acm_certificate" "external-mp" {
     create_before_destroy = true
   }
 }
-
+/*
 resource "aws_acm_certificate_validation" "external-mp" {
   depends_on = [
     aws_route53_record.external-mp
@@ -27,6 +27,7 @@ resource "aws_acm_certificate_validation" "external-mp" {
   certificate_arn         = aws_acm_certificate.external-mp[0].arn
   validation_record_fqdns = [for record in aws_route53_record.external-mp : record.fqdn]
 }
+*/
 /*
 ################################################################
 #   *.service.justice.gov.uk
