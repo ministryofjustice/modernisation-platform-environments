@@ -55,3 +55,36 @@ resource "aws_key_pair" "ec2_access_key" {
   key_name   = "ec2_access_key"
   public_key = jsondecode(data.aws_secretsmanager_secret_version.public_key.secret_string)["tipstaff_public_key"]
 }
+
+resource "aws_iam_role" "ec2_role" {
+  name     = "ec2-role"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+      },
+    ]
+  })
+}
+
+resource "aws_iam_role_policy" "ec2_role_policy" {
+  name     = "ec2-policy"
+  role     = aws_iam_role.ec2_role.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "codedeploy:*",
+        ]
+        Effect   = "Allow"
+        Resource = "*"
+      },
+    ]
+  })
+}
