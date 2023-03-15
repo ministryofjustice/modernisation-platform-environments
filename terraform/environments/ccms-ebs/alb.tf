@@ -3,7 +3,7 @@ resource "aws_lb" "ebsapps_lb" {
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.sg_ebsapps_lb.id]
-  subnets            = data.aws_subnets.shared-private.ids
+  subnets            = data.aws_subnets.private-public.ids
 
   enable_deletion_protection = false
 
