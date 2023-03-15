@@ -22,10 +22,21 @@ resource "aws_lb_listener" "PPUD-Front-End" {
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
   certificate_arn   = data.aws_acm_certificate.internaltest_cert.arn
-
+  /*
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.PPUD-internal-Target-Group[0].arn
+  }
+
+*/
+  default_action {
+    type = "fixed-response"
+
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "Hi, I am PPUD Internal ALB"
+      status_code  = "200"
+    }
   }
 }
 
