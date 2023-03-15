@@ -7,7 +7,7 @@ resource "aws_codepipeline" "codepipeline" {
   role_arn = aws_iam_role.codepipeline_role.arn
 
   artifact_store {
-    location = aws_s3_bucket.tipstaff_pipeline.bucket
+    location = aws_s3_bucket.pipeline-bucket.bucket
     type     = "S3"
   }
 
@@ -68,8 +68,12 @@ resource "aws_codepipeline" "codepipeline" {
   }
 }
 
-resource "aws_s3_bucket" "tipstaff_pipeline" {
-  bucket = "tipstaff-pipeline"
+# resource "aws_s3_bucket" "tipstaff_pipeline" {
+#   bucket   = "tipstaff-pipeline"
+# }
+
+resource "aws_s3_bucket" "pipeline-bucket" {
+  bucket = "pipeline-bucket"
 }
 
 // CodePipeline IAM Role & Policy
