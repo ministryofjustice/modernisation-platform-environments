@@ -3,7 +3,7 @@ data "github_repository" "my_repo" {
 }
 
 resource "aws_codepipeline" "codepipeline" {
-  # provider = aws.ireland_provider
+  provider = aws.ireland_provider
   name     = "tf_tipstaff_pipeline"
   role_arn = aws_iam_role.codepipeline_role.arn
 
@@ -46,7 +46,6 @@ resource "aws_codepipeline" "codepipeline" {
 
       configuration = {
         ProjectName = "my-dotnet-build-project"
-        Region      = "eu-west-1"
       }
     }
   }
@@ -65,6 +64,7 @@ resource "aws_codepipeline" "codepipeline" {
       configuration = {
         ApplicationName     = "tipstaff-codedeploy"
         DeploymentGroupName = "tipstaff-deployment-group"
+        Region              = "eu-west-2"
       }
     }
   }
