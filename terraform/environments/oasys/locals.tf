@@ -213,11 +213,12 @@ locals {
       #   type = null
       #   snapshot_id = null
       # }
-      # "/dev/sds" = {
-      #   label = "swap"
-      #   type = null
-      #   snapshot_id = null
-      # }
+      "/dev/sds" = {
+        label       = "swap"
+        type        = "gp3"
+        snapshot_id = null
+        size        = 2
+      }
     }
 
     ebs_volume_config = {
