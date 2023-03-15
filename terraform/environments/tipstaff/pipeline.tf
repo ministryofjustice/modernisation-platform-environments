@@ -69,13 +69,13 @@ resource "aws_codepipeline" "codepipeline" {
 }
 
 resource "aws_s3_bucket" "tipstaff_pipeline" {
-  bucket   = "tipstaff-pipeline"
+  bucket = "tipstaff-pipeline"
 }
 
 // CodePipeline IAM Role & Policy
 
 resource "aws_iam_role" "codepipeline_role" {
-  name     = "CodePipelineRole"
+  name = "CodePipelineRole"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -91,8 +91,8 @@ resource "aws_iam_role" "codepipeline_role" {
 }
 
 resource "aws_iam_role_policy" "codepipeline_role_policy" {
-  name     = "CodePipelinePolicy"
-  role     = aws_iam_role.codepipeline_role.id
+  name = "CodePipelinePolicy"
+  role = aws_iam_role.codepipeline_role.id
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
