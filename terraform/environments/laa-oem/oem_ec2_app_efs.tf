@@ -18,9 +18,13 @@ resource "aws_efs_mount_target" "oem-app-efs" {
 }
 
 resource "aws_security_group" "oem-app-efs-sg" {
-  name_prefix = "${local.application_name}-app-efs-sg"
+  name_prefix = "${local.application_name}-app-efs-sg-"
   description = "Allow inbound access from instances"
   vpc_id      = data.aws_vpc.shared.id
+
+  tags = merge(tomap(
+    { "Name" = "${local.application_name}-app-efs-sg" }
+  ), local.tags)
 
   ingress {
     protocol    = "tcp"
