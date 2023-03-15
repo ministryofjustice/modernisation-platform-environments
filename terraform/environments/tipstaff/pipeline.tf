@@ -73,7 +73,7 @@ resource "aws_codepipeline" "codepipeline" {
 # }
 
 resource "aws_s3_bucket" "pipeline-bucket" {
-  bucket = "pipeline-bucket"
+  bucket = "pipeline-bucket-tipstaff"
 }
 
 // CodePipeline IAM Role & Policy
