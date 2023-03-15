@@ -29,6 +29,7 @@
 /terraform/environments/tariff @ministryofjustice/cica @ministryofjustice/modernisation-platform
 /terraform/environments/testing @ministryofjustice/modernisation-platform @ministryofjustice/modernisation-platform
 /terraform/environments/tipstaff @ministryofjustice/dts-heritage-services @ministryofjustice/modernisation-platform
+/terraform/environments/tribunals @ministryofjustice/DTS Heritage Services @ministryofjustice/modernisation-platform
 /terraform/environments/xhibit-portal @ministryofjustice/xhibit-portal-dev @ministryofjustice/modernisation-platform
 **/providers.tf @ministryofjustice/modernisation-platform
 **/backend.tf @ministryofjustice/modernisation-platform
