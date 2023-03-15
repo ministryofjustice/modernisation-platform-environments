@@ -1,11 +1,11 @@
 resource "aws_lb" "ebsapps_lb" {
   name               = lower(format("lb-%s-%s-ebsapp", local.application_name, local.environment))
-  internal           = false
+  internal           = true
   load_balancer_type = "application"
   security_groups    = [aws_security_group.sg_ebsapps_lb.id]
   subnets            = data.aws_subnets.private-public.ids
-
-  enable_deletion_protection = false
+  
+  enable_deletion_protection = true
 
   access_logs {
     bucket  = module.s3-bucket-logging.bucket.id
