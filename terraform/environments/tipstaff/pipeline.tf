@@ -1,3 +1,7 @@
+data "github_repository" "my_repo" {
+  full_name = "ministryofjustice/Tipstaff"
+}
+
 resource "aws_codepipeline" "codepipeline" {
   provider = aws.ireland_provider
   name     = "tf_tipstaff_pipeline"
