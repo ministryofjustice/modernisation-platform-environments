@@ -57,7 +57,7 @@ resource "aws_key_pair" "ec2_access_key" {
 }
 
 resource "aws_iam_role" "ec2_role" {
-  name     = "ec2-role"
+  name = "ec2-role"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -73,8 +73,8 @@ resource "aws_iam_role" "ec2_role" {
 }
 
 resource "aws_iam_role_policy" "ec2_role_policy" {
-  name     = "ec2-policy"
-  role     = aws_iam_role.ec2_role.id
+  name = "ec2-policy"
+  role = aws_iam_role.ec2_role.id
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
