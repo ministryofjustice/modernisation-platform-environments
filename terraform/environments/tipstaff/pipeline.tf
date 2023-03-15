@@ -157,7 +157,7 @@ resource "aws_codebuild_project" "my_build_project" {
 // CodeBuild IAM Role & Policy
 
 resource "aws_iam_role" "codebuild_role" {
-  name     = "CodeBuildRole"
+  name = "CodeBuildRole"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -173,8 +173,8 @@ resource "aws_iam_role" "codebuild_role" {
 }
 
 resource "aws_iam_role_policy" "codebuild_role_policy" {
-  name     = "CodeBuildPolicy"
-  role     = aws_iam_role.codebuild_role.id
+  name = "CodeBuildPolicy"
+  role = aws_iam_role.codebuild_role.id
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -196,11 +196,11 @@ resource "aws_iam_role_policy" "codebuild_role_policy" {
 
 resource "aws_codedeploy_app" "tipstaff_codedeploy" {
   provider = aws.ireland_provider
-  name = "tipstaff-codedeploy"
+  name     = "tipstaff-codedeploy"
 }
 
 resource "aws_codedeploy_deployment_group" "tipstaff_deployment_group" {
-  provider = aws.ireland_provider
+  provider              = aws.ireland_provider
   app_name              = aws_codedeploy_app.tipstaff_codedeploy.name
   deployment_group_name = "tipstaff-deployment-group"
   service_role_arn      = aws_iam_role.codedeploy_role.arn
