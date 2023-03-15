@@ -3,7 +3,7 @@ data "github_repository" "my_repo" {
 }
 
 resource "aws_codepipeline" "codepipeline" {
-  provider = aws.ireland_provider
+  # provider = aws.ireland_provider
   name     = "tf_tipstaff_pipeline"
   role_arn = aws_iam_role.codepipeline_role.arn
 
@@ -46,6 +46,7 @@ resource "aws_codepipeline" "codepipeline" {
 
       configuration = {
         ProjectName = "my-dotnet-build-project"
+        Region      = "eu-west-1"
       }
     }
   }
@@ -64,7 +65,6 @@ resource "aws_codepipeline" "codepipeline" {
       configuration = {
         ApplicationName     = "tipstaff-codedeploy"
         DeploymentGroupName = "tipstaff-deployment-group"
-        Region              = "eu-west-2"
       }
     }
   }
@@ -195,12 +195,12 @@ resource "aws_iam_role_policy" "codebuild_role_policy" {
 // Create CodeDeploy app and deployment group
 
 resource "aws_codedeploy_app" "tipstaff_codedeploy" {
-  provider = aws.ireland_provider
+  # provider = aws.ireland_provider
   name     = "tipstaff-codedeploy"
 }
 
 resource "aws_codedeploy_deployment_group" "tipstaff_deployment_group" {
-  provider              = aws.ireland_provider
+  # provider              = aws.ireland_provider
   app_name              = aws_codedeploy_app.tipstaff_codedeploy.name
   deployment_group_name = "tipstaff-deployment-group"
   service_role_arn      = aws_iam_role.codedeploy_role.arn
