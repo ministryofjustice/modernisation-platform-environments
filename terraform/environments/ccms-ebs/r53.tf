@@ -1,4 +1,5 @@
 ## CERT
+/*
 resource "aws_route53_record" "internal-mp" {
   depends_on = [
     aws_acm_certificate.internal-mp
@@ -18,6 +19,19 @@ resource "aws_route53_record" "internal-mp" {
   type            = each.value.type
   zone_id         = data.aws_route53_zone.network-services.zone_id
 }
+*/
+resource "aws_route53_record" "external_validation" {
+  count    = local.is-production ? 0 : 1
+  provider = aws.core-network-services
+
+  allow_overwrite = true
+  name            = local.domain_name_main[0]
+  records         = local.domain_record_main
+  ttl             = 60
+  type            = local.domain_type_main[0]
+  zone_id         = data.aws_route53_zone.network-services.zone_id
+}
+
 
 ## LOADBALANCER
 resource "aws_route53_record" "external" {

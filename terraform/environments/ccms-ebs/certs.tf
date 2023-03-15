@@ -3,7 +3,7 @@
 ################################################################
 #   *.modernisation-platform.service.justice.gov.uk
 ################################################################
-resource "aws_acm_certificate" "internal-mp" {
+resource "aws_acm_certificate" "external" {
   count = local.is-production ? 0 : 1
 
   validation_method = "DNS"
@@ -20,12 +20,12 @@ resource "aws_acm_certificate" "internal-mp" {
   }
 }
 
-resource "aws_acm_certificate_validation" "internal-mp" {
+resource "aws_acm_certificate_validation" "external" {
   depends_on = [
-    aws_route53_record.internal-mp
+    aws_route53_record.external_validation
   ]
-  certificate_arn         = aws_acm_certificate.internal-mp[0].arn
-  validation_record_fqdns = [for record in aws_route53_record.internal-mp : record.fqdn]
+  certificate_arn         = aws_acm_certificate.external[0].arn
+  validation_record_fqdns = [for record in aws_route53_record.external_validation : record.fqdn]
 }
 
 /*
