@@ -25,7 +25,7 @@ data "aws_ami" "ec2_laa_oem_development_db" {
 data "aws_ebs_snapshot" "oem_app_volume_opt_oem_app" {
   most_recent = true
   filter {
-    name   = "state"
+    name   = "status"
     values = ["completed"]
   }
   filter {
@@ -37,7 +37,7 @@ data "aws_ebs_snapshot" "oem_app_volume_opt_oem_app" {
 data "aws_ebs_snapshot" "oem_app_volume_opt_oem_inst" {
   most_recent = true
   filter {
-    name   = "state"
+    name   = "status"
     values = ["completed"]
   }
   filter {
@@ -49,7 +49,7 @@ data "aws_ebs_snapshot" "oem_app_volume_opt_oem_inst" {
 data "aws_ebs_snapshot" "oem_db_volume_opt_oem_app" {
   most_recent = true
   filter {
-    name   = "state"
+    name   = "status"
     values = ["completed"]
   }
   filter {
@@ -61,7 +61,7 @@ data "aws_ebs_snapshot" "oem_db_volume_opt_oem_app" {
 data "aws_ebs_snapshot" "oem_db_volume_opt_oem_inst" {
   most_recent = true
   filter {
-    name   = "state"
+    name   = "status"
     values = ["completed"]
   }
   filter {
@@ -73,7 +73,7 @@ data "aws_ebs_snapshot" "oem_db_volume_opt_oem_inst" {
 data "aws_ebs_snapshot" "oem_db_volume_opt_oem_dbf" {
   most_recent = true
   filter {
-    name   = "state"
+    name   = "status"
     values = ["completed"]
   }
   filter {
@@ -85,7 +85,7 @@ data "aws_ebs_snapshot" "oem_db_volume_opt_oem_dbf" {
 data "aws_ebs_snapshot" "oem_db_volume_opt_oem_redo" {
   most_recent = true
   filter {
-    name   = "state"
+    name   = "status"
     values = ["completed"]
   }
   filter {
@@ -97,7 +97,7 @@ data "aws_ebs_snapshot" "oem_db_volume_opt_oem_redo" {
 data "aws_ebs_snapshot" "oem_db_volume_opt_oem_arch" {
   most_recent = true
   filter {
-    name   = "state"
+    name   = "status"
     values = ["completed"]
   }
   filter {
