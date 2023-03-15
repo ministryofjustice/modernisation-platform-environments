@@ -738,3 +738,13 @@ resource "aws_cloudwatch_log_group" "app" {
     },
   )
 }
+
+resource "aws_acm_certificate" "cloudfront" {
+  domain_name       = "us-east-test.modernisation-platform.service.justice.gov.uk"
+  validation_method = "DNS"
+  provider          = aws.us-east-1
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}

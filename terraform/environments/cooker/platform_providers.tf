@@ -12,6 +12,15 @@ provider "aws" {
   }
 }
 
+# AWS provider for the ACM usage in us-east-1
+provider "aws" {
+  alias  = "us-east-1"
+  region = "us-east-1"
+  assume_role {
+    role_arn = "arn:aws:iam::${data.aws_caller_identity.original_session.id}:role/MemberInfrastructureAccessUSEast"
+  }
+}
+
 # AWS provider for the Modernisation Platform, to get things from there if required
 provider "aws" {
   alias  = "modernisation-platform"
