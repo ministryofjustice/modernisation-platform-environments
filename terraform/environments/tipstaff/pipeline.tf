@@ -263,7 +263,8 @@ resource "aws_iam_role_policy" "codedeploy_role_policy" {
           "codedeploy:*",
           "iam:*",
           "logs:*",
-          "s3:*"
+          "s3:*",
+          "ec2:*"
         ]
         Effect   = "Allow"
         Resource = "*"
