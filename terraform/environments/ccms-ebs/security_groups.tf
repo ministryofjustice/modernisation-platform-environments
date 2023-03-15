@@ -211,6 +211,7 @@ resource "aws_security_group" "sg_ebsapps_lb" {
   description = "Inbound traffic control for EBSAPPS loadbalancer"
   vpc_id      = data.aws_vpc.shared.id
 
+/*
   ingress {
     from_port   = 443
     to_port     = 443
@@ -224,11 +225,42 @@ resource "aws_security_group" "sg_ebsapps_lb" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
-
+*/
   tags = merge(local.tags,
     { Name = lower(format("sg-%s-%s-loadbalancer", local.application_name, local.environment)) }
   )
 }
+resource "aws_security_group_rule" "ingress_traffic_ebslb" {
+  for_each          = local.application_data.lb_sg_ingress_rules
+  security_group_id = aws_security_group.sg_ebsapps_lb.id
+  type              = "ingress"
+  description       = format("Traffic for %s %d", each.value.protocol, each.value.from_port)
+  protocol          = each.value.protocol
+  from_port         = each.value.from_port
+  to_port           = each.value.to_port
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block, local.application_data.accounts[local.environment].mp_aws_subnet_env]
+}
+resource "aws_security_group_rule" "egress_traffic_ebslb_sg" {
+  for_each          = local.application_data.lb_sg_egress_rules
+  security_group_id = aws_security_group.sg_ebsapps_lb.id
+  type                     = "egress"
+  description              = format("Outbound traffic for %s %d", each.value.protocol, each.value.from_port)
+  protocol                 = each.value.protocol
+  from_port                = each.value.from_port
+  to_port                  = each.value.to_port
+  source_security_group_id = aws_security_group.ec2_sg_ebsdb.id
+}
+resource "aws_security_group_rule" "egress_traffic_ebslb_cidr" {
+  for_each          = local.application_data.lb_sg_egress_rules
+  security_group_id = aws_security_group.sg_ebsapps_lb.id
+  type              = "egress"
+  description       = format("Outbound traffic for %s %d", each.value.protocol, each.value.from_port)
+  protocol          = each.value.protocol
+  from_port         = each.value.from_port
+  to_port           = each.value.to_port
+  cidr_blocks       = [each.value.destination_cidr]
+}
+
 
 # Security Group for FTP Server
 resource "aws_security_group" "ec2_sg_ftp" {
