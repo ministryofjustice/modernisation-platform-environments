@@ -101,7 +101,7 @@ resource "aws_ebs_volume" "oem_db_volume_opt_oem_inst" {
   encrypted         = true
   iops              = 3000
   size              = 50
-  snapshot_id       = data.aws_ebs_snapshot.oem_db_volume_opt_oem_db.id
+  snapshot_id       = data.aws_ebs_snapshot.oem_db_volume_opt_oem_inst.id
   type              = "gp3"
   depends_on        = [resource.aws_instance.oem_db]
 
