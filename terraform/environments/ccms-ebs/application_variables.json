@@ -181,6 +181,12 @@
       "from_port": 22,
       "to_port": 22,
       "protocol": "TCP"
+    },
+    "TCP_8000": {
+      "from_port": 8000,
+      "to_port": 8000,
+      "protocol": "TCP",
+      "destination_cidr": "10.200.0.0/13"
     }
   },
   "ec2_sg_egress_rules": {
@@ -201,6 +207,12 @@
       "to_port": 22,
       "protocol": "TCP",
       "destination_cidr": "0.0.0.0/0"
+    },
+    "TCP_8000": {
+      "from_port": 8000,
+      "to_port": 8000,
+      "protocol": "TCP",
+      "destination_cidr": "10.200.0.0/13"
     }
   },
   "ec2_sg_ftp_ingress_rules": {
