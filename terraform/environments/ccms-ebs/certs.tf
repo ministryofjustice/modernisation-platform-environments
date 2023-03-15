@@ -4,7 +4,7 @@
 #   *.modernisation-platform.service.justice.gov.uk
 ################################################################
 resource "aws_acm_certificate" "external-mp" {
-  count       = local.is-production ? 0 : 1
+  count = local.is-production ? 0 : 1
 
   validation_method = "DNS"
   domain_name = "*.modernisation-platform.service.justice.gov.uk"
