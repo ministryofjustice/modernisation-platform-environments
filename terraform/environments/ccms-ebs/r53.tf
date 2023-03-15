@@ -1,12 +1,12 @@
 ## CERT
-/*
-resource "aws_route53_record" "internal-mp" {
+
+resource "aws_route53_record"  "external_validation" {
   depends_on = [
-    aws_acm_certificate.internal-mp
+    aws_acm_certificate.external
   ]
   provider = aws.core-network-services
   for_each = {
-    for dvo in aws_acm_certificate.internal-mp[0].domain_validation_options : dvo.domain_name => {
+    for dvo in aws_acm_certificate.external[0].domain_validation_options : dvo.domain_name => {
       name   = dvo.resource_record_name
       record = dvo.resource_record_value
       type   = dvo.resource_record_type
@@ -19,19 +19,20 @@ resource "aws_route53_record" "internal-mp" {
   type            = each.value.type
   zone_id         = data.aws_route53_zone.network-services.zone_id
 }
-*/
+/*
 resource "aws_route53_record" "external_validation" {
   count    = local.is-production ? 0 : 1
   provider = aws.core-network-services
 
-  allow_overwrite = true
-  name            = local.domain_name_main[0]
-  records         = local.domain_record_main
-  ttl             = 60
-  type            = local.domain_type_main[0]
-  zone_id         = data.aws_route53_zone.network-services.zone_id
-}
+  zone_id          = data.aws_route53_zone.network-services.zone_id
+  allow_overwrite  = true
+  name             = "ccms-ebslb"
+  ttl              = "300"
+  type             = "CNAME"
+  records          = [aws_route53_record.external.fqdn]
 
+}
+*/
 
 ## LOADBALANCER
 resource "aws_route53_record" "external" {
