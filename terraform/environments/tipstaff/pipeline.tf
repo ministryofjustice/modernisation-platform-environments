@@ -199,7 +199,7 @@ resource "aws_iam_role_policy" "codebuild_role_policy" {
 // Create CodeDeploy app and deployment group
 
 resource "aws_codedeploy_app" "tipstaff_codedeploy" {
-  name     = "tipstaff-codedeploy"
+  name = "tipstaff-codedeploy"
 }
 
 resource "aws_codedeploy_deployment_group" "tipstaff_deployment_group" {
@@ -223,7 +223,7 @@ resource "aws_codedeploy_deployment_group" "tipstaff_deployment_group" {
 }
 
 resource "aws_iam_role" "codedeploy_role" {
-  name     = "CodeDeployRole"
+  name = "CodeDeployRole"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -239,8 +239,8 @@ resource "aws_iam_role" "codedeploy_role" {
 }
 
 resource "aws_iam_role_policy" "codedeploy_role_policy" {
-  name     = "CodeDeployPolicy"
-  role     = aws_iam_role.codedeploy_role.id
+  name = "CodeDeployPolicy"
+  role = aws_iam_role.codedeploy_role.id
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
