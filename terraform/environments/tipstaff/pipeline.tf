@@ -1,9 +1,3 @@
-# Define the GitHub repository information
-data "github_repository" "my_repo" {
-  full_name = "ministryofjustice/Tipstaff"
-}
-
-# Create CodePipeline
 resource "aws_codepipeline" "codepipeline" {
   provider = aws.ireland_provider
   name     = "tf_tipstaff_pipeline"
