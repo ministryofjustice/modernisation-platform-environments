@@ -27,7 +27,6 @@ resource "aws_security_group_rule" "egress_traffic_lb" {
 }
 
 resource "aws_lb" "tipstaff_dev_lb" {
-  provider                   = aws.eu-west-1
   name                       = "tipstaff-dev-load-balancer"
   load_balancer_type         = "application"
   security_groups            = [aws_security_group.tipstaff_dev_lb_sc.id]
