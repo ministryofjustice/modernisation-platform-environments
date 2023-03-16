@@ -1,8 +1,3 @@
-provider "aws" {
-  alias  = "us-east-1"
-  region = "us-east-1"
-}
-
 module "alb" {
   source = "./modules/alb"
   providers = {
