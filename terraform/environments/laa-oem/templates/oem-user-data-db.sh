@@ -20,15 +20,6 @@ useradd -g oinstall applmgr
 # /opt/oem/arch       200    io2 3000 /dev/sdg
 # /opt/oem/backups    EFS
 
-# 2023-03-08 - snapshots of volumes:
-# vol_snap_app_app  = "snap-0345307239f01c8ab"
-# vol_snap_app_inst = "snap-09f32d294decca5ca"
-# vol_snap_db_app   = "snap-0abed8d20d4ad01d4"
-# vol_snap_db_inst  = "snap-0bc2bc6b4d11534aa"
-# vol_snap_db_dbf   = "snap-0611d48ac056efe54"
-# vol_snap_db_redo  = "snap-0cf269973426fa7c0"
-# vol_snap_db_arch  = "snap-02b71be8ef196aebc"
-
 FSTAB=/etc/fstab
 MOUNT_DIR=/opt
 
@@ -98,12 +89,13 @@ chown -R oracle:dba $${MOUNT_DIR}
 FS_DIR=$${MOUNT_DIR}/oem/backups
 mkdir -p $${FS_DIR}
 chmod go+rw $${FS_DIR}
-mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport ${efs_id}.efs.eu-west-2.amazonaws.com:/ $${FS_DIR}
-echo "${efs_id}.efs.eu-west-2.amazonaws.com:/ $${FS_DIR} nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport 0 0" >> $${FSTAB}
+mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport ${efs_fqdn}:/ $${FS_DIR}
+echo "${efs_fqdn}:/ $${FS_DIR} nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport 0 0" >> $${FSTAB}
 
-# Set hostname
 hostnamectl set-hostname ${hostname}
 
-# Update /etc/hosts
 H=$(curl -s 'http://169.254.169.254/latest/meta-data/local-ipv4')
-echo "$${H} ${hostname} ${hostname}.${env_fqdn}" >> /etc/hosts
+echo "127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+::1         localhost localhost.localdomain localhost6 localhost6.localdomain6" > $${EHOSTS}.new
+echo "$${H} ${hostname} ${hostname}.${env_fqdn}" >> $${EHOSTS}.new
+mv $${EHOSTS}.new $${EHOSTS}
