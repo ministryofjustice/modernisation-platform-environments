@@ -110,7 +110,7 @@ locals {
         }
         ami_name = "base_rhel_7_9_*"
         autoscaling_group = {
-          desired_capacity = 1
+          desired_capacity = 0
         }
       }
       dev-base-rhel610 = {

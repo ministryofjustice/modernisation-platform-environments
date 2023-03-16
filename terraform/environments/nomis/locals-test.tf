@@ -120,7 +120,7 @@ locals {
           oracle-db-name     = "CNOMT1"
           server-type        = "nomis-web"
         }
-        ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-03-13T17-17-03.625Z"
+        ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-03-15T17-18-22.178Z"
 
         autoscaling_group = {
           desired_capacity = 1
@@ -211,6 +211,38 @@ locals {
           max_size = 1
         }
       }
+    }
+
+    baseline_lbs = {
+      # AWS doesn't let us call it internal
+      private = {
+        internal_lb              = true
+        enable_delete_protection = false
+        force_destroy_bucket     = true
+        idle_timeout             = 3600
+        public_subnets           = module.environment.subnets["private"].ids
+        security_groups          = [aws_security_group.public.id]
+
+        # listeners = {
+        #   t1-nomis-web-http-7001 = merge(
+        #      local.lb_listener_defaults.http-7001, {
+        #       replace = {
+        #         target_group_name_replace     = "t1-nomis-web-internal"
+        #         condition_host_header_replace = "t1-nomis-web-internal"
+        #       }
+        #   })
+        # }
+      }
+
+      # public LB not needed right now
+      # public = {
+      #   internal_lb              = false
+      #   enable_delete_protection = false
+      #   force_destroy_bucket     = true
+      #   idle_timeout             = 3600
+      #   public_subnets           = module.environment.subnets["public"].ids
+      #   security_groups          = [aws_security_group.public.id]
+      # }
     }
   }
 }
