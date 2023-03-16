@@ -20,6 +20,7 @@ resource "aws_instance" "oem_app" {
     delete_on_termination = true
     encrypted             = true
     iops                  = 3100
+    kms_key_id            = data.aws_kms_key.ebs_shared.id
     volume_size           = 12
     volume_type           = "gp3"
   }
@@ -49,6 +50,7 @@ resource "aws_ebs_volume" "oem_app_volume_swap" {
   availability_zone = local.application_data.accounts[local.environment].ec2_zone
   encrypted         = true
   iops              = 3000
+  kms_key_id        = data.aws_kms_key.ebs_shared.id
   size              = 32
   type              = "gp3"
   depends_on        = [resource.aws_instance.oem_app]
@@ -71,6 +73,7 @@ resource "aws_ebs_volume" "oem_app_volume_opt_oem_app" {
   availability_zone = local.application_data.accounts[local.environment].ec2_zone
   encrypted         = true
   iops              = 3000
+  kms_key_id        = data.aws_kms_key.ebs_shared.id
   size              = 50
   snapshot_id       = data.aws_ebs_snapshot.oem_app_volume_opt_oem_app.id
   type              = "gp3"
@@ -100,6 +103,7 @@ resource "aws_ebs_volume" "oem_app_volume_opt_oem_inst" {
   availability_zone = local.application_data.accounts[local.environment].ec2_zone
   encrypted         = true
   iops              = 3000
+  kms_key_id        = data.aws_kms_key.ebs_shared.id
   size              = 50
   snapshot_id       = data.aws_ebs_snapshot.oem_app_volume_opt_oem_inst.id
   type              = "gp3"

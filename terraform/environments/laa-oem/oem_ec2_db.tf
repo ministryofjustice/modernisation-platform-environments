@@ -19,6 +19,7 @@ resource "aws_instance" "oem_db" {
   root_block_device {
     delete_on_termination = true
     encrypted             = true
+    kms_key_id            = data.aws_kms_key.ebs_shared.id
     iops                  = 3100
     volume_size           = 12
     volume_type           = "gp3"
@@ -49,6 +50,7 @@ resource "aws_ebs_volume" "oem_db_volume_swap" {
   availability_zone = local.application_data.accounts[local.environment].ec2_zone
   encrypted         = true
   iops              = 3000
+  kms_key_id        = data.aws_kms_key.ebs_shared.id
   size              = 32
   type              = "gp3"
   depends_on        = [resource.aws_instance.oem_db]
@@ -71,6 +73,7 @@ resource "aws_ebs_volume" "oem_db_volume_opt_oem_app" {
   availability_zone = local.application_data.accounts[local.environment].ec2_zone
   encrypted         = true
   iops              = 3000
+  kms_key_id        = data.aws_kms_key.ebs_shared.id
   size              = 50
   snapshot_id       = data.aws_ebs_snapshot.oem_db_volume_opt_oem_app.id
   type              = "gp3"
@@ -100,6 +103,7 @@ resource "aws_ebs_volume" "oem_db_volume_opt_oem_inst" {
   availability_zone = local.application_data.accounts[local.environment].ec2_zone
   encrypted         = true
   iops              = 3000
+  kms_key_id        = data.aws_kms_key.ebs_shared.id
   size              = 50
   snapshot_id       = data.aws_ebs_snapshot.oem_db_volume_opt_oem_inst.id
   type              = "gp3"
@@ -129,6 +133,7 @@ resource "aws_ebs_volume" "oem_db_volume_opt_oem_dbf" {
   availability_zone = local.application_data.accounts[local.environment].ec2_zone
   encrypted         = true
   iops              = 3000
+  kms_key_id        = data.aws_kms_key.ebs_shared.id
   size              = 200
   snapshot_id       = data.aws_ebs_snapshot.oem_db_volume_opt_oem_dbf.id
   type              = "io2"
@@ -158,6 +163,7 @@ resource "aws_ebs_volume" "oem_db_volume_opt_oem_redo" {
   availability_zone = local.application_data.accounts[local.environment].ec2_zone
   encrypted         = true
   iops              = 3000
+  kms_key_id        = data.aws_kms_key.ebs_shared.id
   size              = 20
   snapshot_id       = data.aws_ebs_snapshot.oem_db_volume_opt_oem_redo.id
   type              = "io2"
@@ -187,6 +193,7 @@ resource "aws_ebs_volume" "oem_db_volume_opt_oem_arch" {
   availability_zone = local.application_data.accounts[local.environment].ec2_zone
   encrypted         = true
   iops              = 3000
+  kms_key_id        = data.aws_kms_key.ebs_shared.id
   size              = 200
   snapshot_id       = data.aws_ebs_snapshot.oem_db_volume_opt_oem_arch.id
   type              = "io2"
