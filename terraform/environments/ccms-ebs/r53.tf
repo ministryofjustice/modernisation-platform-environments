@@ -19,7 +19,7 @@ resource "aws_route53_record"  "external_validation" {
   zone_id         = data.aws_route53_zone.network-services.zone_id
 }
 
-
+/*
 ## LOADBALANCER
 resource "aws_route53_record" "external" {
   provider = aws.core-vpc
@@ -44,7 +44,7 @@ resource "aws_route53_record" "ebslb_cname" {
   type    = "CNAME"
   records = [aws_route53_record.external.fqdn]
 }
-
+*/
 
 ## EBSDB
 resource "aws_route53_record" "ebsdb" {
