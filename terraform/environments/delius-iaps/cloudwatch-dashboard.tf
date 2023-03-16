@@ -21,10 +21,8 @@ locals {
       stacked = false
       region  = data.aws_region.current.name
       metrics = [
-        [
-          ["CWAgent", "Processor % Idle Time", "instance", "_Total", "AutoScalingGroupName", module.ec2_iaps_server.autoscaling_group_name, "objectname", "Processor", { color = "#2ca02c", stat = "Minimum", period = "60" }],
-          [".", "Processor % User Time", ".", ".", ".", ".", ".", ".", { color = "#d62728", stat = "Maximum", period = "60" }]
-        ],
+        ["CWAgent", "Processor % Idle Time", "instance", "_Total", "AutoScalingGroupName", module.ec2_iaps_server.autoscaling_group_name, "objectname", "Processor", { color = "#2ca02c", stat = "Minimum", period = "60" }],
+        [".", "Processor % User Time", ".", ".", ".", ".", ".", ".", { color = "#d62728", stat = "Maximum", period = "60" }]
       ]
     }
   }
