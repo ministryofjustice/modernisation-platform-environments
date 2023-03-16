@@ -8,7 +8,12 @@ resource "aws_codepipeline" "codepipeline" {
   role_arn = aws_iam_role.codepipeline_role.arn
 
   artifact_store {
-    location = aws_s3_bucket.pipeline-s3.bucket
+    location = aws_s3_bucket.pipeline-s3-eu-west-1.bucket
+    type     = "S3"
+  }
+
+  artifact_store {
+    location = aws_s3_bucket.pipeline-s3-eu-west-2.bucket
     type     = "S3"
   }
 
@@ -70,9 +75,13 @@ resource "aws_codepipeline" "codepipeline" {
   }
 }
 
-resource "aws_s3_bucket" "pipeline-s3" {
+resource "aws_s3_bucket" "pipeline-s3-eu-west-1" {
   provider = aws.eu-west-1
-  bucket   = "tipstaff-pipeline-bucket"
+  bucket   = "pipeline-s3-eu-west-1"
+}
+
+resource "aws_s3_bucket" "pipeline-s3-eu-west-2" {
+  bucket   = "pipeline-s3-eu-west-2"
 }
 
 // CodePipeline IAM Role & Policy

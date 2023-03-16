@@ -15,7 +15,7 @@
       "lb_listener_protocol_1": "HTTP",
       "server_port_2": "443",
       "lb_listener_protocol_2": "HTTPS",
-      "ami_image_id": "ami-0dd81ccf5c7490c56"
+      "ami_image_id": "ami-00d0096b223242201"
     },
     "test": {
       "example_var": "test-data"
