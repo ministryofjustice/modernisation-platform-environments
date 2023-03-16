@@ -27,7 +27,6 @@ resource "aws_security_group_rule" "egress_traffic" {
 }
 
 resource "aws_instance" "tipstaff_ec2_instance" {
-  provider                    = aws.eu-west-1
   instance_type               = local.application_data.accounts[local.environment].instance_type
   ami                         = local.application_data.accounts[local.environment].ami_image_id
   subnet_id                   = data.aws_subnet.private_subnets_a.id

@@ -196,12 +196,10 @@ resource "aws_iam_role_policy" "codebuild_role_policy" {
 // Create CodeDeploy app and deployment group
 
 resource "aws_codedeploy_app" "tipstaff_codedeploy" {
-  provider = aws.eu-west-1
   name     = "tipstaff-codedeploy"
 }
 
 resource "aws_codedeploy_deployment_group" "tipstaff_deployment_group" {
-  provider              = aws.eu-west-1
   app_name              = aws_codedeploy_app.tipstaff_codedeploy.name
   deployment_group_name = "tipstaff-deployment-group"
   service_role_arn      = aws_iam_role.codedeploy_role.arn
