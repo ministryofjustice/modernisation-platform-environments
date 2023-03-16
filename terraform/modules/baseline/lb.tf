@@ -57,7 +57,7 @@ module "lb_listener" {
   port                   = each.value.port
   protocol               = each.value.protocol
   ssl_policy             = each.value.ssl_policy
-  certificate_arns       = each.value.certificate_arns
+  certificate_arns       = [for item in each.value.certificate_names_or_arns : lookup(module.acm_certificate, item, null) != null ? module.acm_certificate[item].arn : item]
   default_action         = each.value.default_action
   rules                  = each.value.rules
   route53_records        = each.value.route53_records
