@@ -17,8 +17,9 @@ useradd -g oinstall applmgr
 # /opt/oem/inst       50    gp3 3000 /dev/sdd
 # /opt/oem/backups    EFS
 
+EFSTAB=/etc/fstab
 EHOSTS=/etc/hosts
-FSTAB=/etc/fstab
+ERCONF=/etc/resolv.conf
 MOUNT_DIR=/opt
 
 declare -A MOUNTS=(
@@ -57,13 +58,13 @@ for M in $${!MOUNTS[@]}; do
             swapoff -a
             mkswap -L $${L} $${M}
             swapon -L $${L}
-            echo "LABEL=$${L} swap swap defaults 0 0" >> $${FSTAB}
+#           echo "LABEL=$${L} swap swap defaults 0 0" >> $${EFSTAB}
         else
             FS_DIR=$${MOUNT_DIR}/oem/$${L,,}
             if [[ ! $(mount -t ext4,xfs |grep "$${FS_DIR}") ]]; then
                 mkdir -p $${FS_DIR}
 #               yes |mkfs.ext4 -qL $${L} $${M} # We are using snapshots now, so don't erase the volume.
-                echo "LABEL=$${L} $${FS_DIR} ext4 defaults 0 0" >> $${FSTAB}
+                echo "LABEL=$${L} $${FS_DIR} ext4 defaults 0 0" >> $${EFSTAB}
                 mount -L $${L}
             else
                 echo "$${FS_DIR} is already mounted:"
@@ -80,8 +81,10 @@ chown -R oracle:dba $${MOUNT_DIR}
 FS_DIR=$${MOUNT_DIR}/oem/backups
 mkdir -p $${FS_DIR}
 chmod go+rw $${FS_DIR}
+grep -v '/opt/oem/backups' $${EFSTAB} > $${EFSTAB}.new
+echo "${efs_fqdn}:/ $${FS_DIR} nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport 0 0" >> $${EFSTAB}.new
+mv $${EFSTAB}.new $${EFSTAB}
 mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport ${efs_fqdn}:/ $${FS_DIR}
-echo "${efs_fqdn}:/ $${FS_DIR} nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport 0 0" >> $${FSTAB}
 
 hostnamectl set-hostname ${hostname}
 
@@ -90,3 +93,5 @@ echo "127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdom
 ::1         localhost localhost.localdomain localhost6 localhost6.localdomain6" > $${EHOSTS}.new
 echo "$${H} ${hostname} ${hostname}.${env_fqdn}" >> $${EHOSTS}.new
 mv $${EHOSTS}.new $${EHOSTS}
+
+sed -i "s/^search .*/search ${env_fqdn}/" $${ERCONF}
