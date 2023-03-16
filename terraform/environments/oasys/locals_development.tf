@@ -23,7 +23,7 @@ locals {
       patch_day                 = "TUE"
     }
 
-    baseline_autoscaling_groups = {
+    autoscaling_groups = {
       webservers = merge(local.webserver, { # merge common config and env specific
         tags = merge(local.webserver_tags, {
           oasys-environment = "t1"
