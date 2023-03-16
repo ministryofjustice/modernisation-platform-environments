@@ -1,5 +1,4 @@
 resource "aws_efs_file_system" "oem_db_efs" {
-  availability_zone_name = local.application_data.accounts[local.environment].ec2_zone
   encrypted              = true
   kms_key_id             = data.aws_kms_key.ebs_shared.arn
   performance_mode       = "generalPurpose"
