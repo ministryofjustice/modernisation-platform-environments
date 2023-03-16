@@ -212,5 +212,37 @@ locals {
         }
       }
     }
+
+    baseline_lbs = {
+      # AWS doesn't let us call it internal
+      private = {
+        internal_lb              = true
+        enable_delete_protection = false
+        force_destroy_bucket     = true
+        idle_timeout             = 3600
+        public_subnets           = module.environment.subnets["private"].ids
+        security_groups          = [aws_security_group.public.id]
+
+        # listeners = {
+        #   t1-nomis-web-http-7001 = merge(
+        #      local.lb_listener_defaults.http-7001, {
+        #       replace = {
+        #         target_group_name_replace     = "t1-nomis-web-internal"
+        #         condition_host_header_replace = "t1-nomis-web-internal"
+        #       }
+        #   })
+        # }
+      }
+
+      # public LB not needed right now
+      # public = {
+      #   internal_lb              = false
+      #   enable_delete_protection = false
+      #   force_destroy_bucket     = true
+      #   idle_timeout             = 3600
+      #   public_subnets           = module.environment.subnets["public"].ids
+      #   security_groups          = [aws_security_group.public.id]
+      # }
+    }
   }
 }
