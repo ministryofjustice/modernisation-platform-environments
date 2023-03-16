@@ -1,3 +1,4 @@
+/*
 ## CERT
 resource "aws_route53_record" "external_validation" {
   depends_on = [
@@ -18,7 +19,7 @@ resource "aws_route53_record" "external_validation" {
   type            = each.value.type
   zone_id         = data.aws_route53_zone.network-services.zone_id
 }
-
+*/
 /*
 ## LOADBALANCER
 resource "aws_route53_record" "external" {
