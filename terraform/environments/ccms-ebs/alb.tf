@@ -1,4 +1,3 @@
-/*
 resource "aws_lb" "ebsapps_lb" {
   name               = lower(format("lb-%s-%s-ebsapp", local.application_name, local.environment))
   internal           = true
@@ -53,4 +52,3 @@ resource "aws_lb_target_group_attachment" "ebsapps" {
   target_id        = element(aws_instance.ec2_ebsapps.*.id, count.index)
   port             = 80
 }
-*/
