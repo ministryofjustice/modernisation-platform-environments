@@ -7,7 +7,7 @@ resource "aws_codepipeline" "codepipeline" {
   name     = "tf_tipstaff_pipeline"
   role_arn = aws_iam_role.codepipeline_role.arn
 
-  artifact_stores {
+  artifact_store {
     location = [aws_s3_bucket.pipeline-s3-eu-west-1.bucket, aws_s3_bucket.pipeline-s3-eu-west-2.bucket]
     type     = "S3"
   }
