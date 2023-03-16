@@ -71,6 +71,7 @@ resource "aws_instance" "tipstaff_ec2_instance" {
   vpc_security_group_ids      = [aws_security_group.tipstaff_dev_ec2_sc.id, aws_security_group.rdp.id]
   associate_public_ip_address = true
   key_name                    = aws_key_pair.ec2_access_key.key_name
+  iam_instance_profile        = aws_iam_instance_profile.codedeploy_instance_profile.name
   user_data                   = <<-EOF
               <powershell>
               Install-WindowsFeature -name Web-Server -IncludeManagementTools
@@ -119,10 +120,19 @@ resource "aws_iam_role_policy" "ec2_role_policy" {
       {
         Action = [
           "codedeploy:*",
+          "s3:*"
         ]
         Effect   = "Allow"
         Resource = "*"
       },
     ]
   })
+}
+
+resource "aws_iam_instance_profile" "codedeploy_instance_profile" {
+  name = "codedeploy-instance-profile"
+
+  roles = [
+    aws_iam_role.ec2_role.name,
+  ]
 }
