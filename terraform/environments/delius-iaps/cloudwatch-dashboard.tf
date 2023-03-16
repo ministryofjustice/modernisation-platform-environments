@@ -28,7 +28,7 @@ locals {
             "instance",
             "_Total",
             "AutoScalingGroupName",
-            module.ec2_iaps_server.autoscaling_group_name,
+            "${module.ec2_iaps_server.autoscaling_group_name}",
             "objectname",
             "Processor",
             {
