@@ -105,6 +105,13 @@ resource "aws_security_group" "ec2" {
     protocol    = "tcp"
     cidr_blocks = [local.application_data.accounts[local.environment].inbound_cidr_lz]
   }
+  ingress {
+    description = "http access from LZ to oas-mp to test connectivity"
+    from_port   = 1389
+    to_port     = 1389
+    protocol    = "tcp"
+    cidr_blocks = [local.application_data.accounts[local.environment].inbound_cidr_lz]
+  }
 
   egress {
     description = "Allow AWS SSM Session Manager"
@@ -175,6 +182,20 @@ resource "aws_security_group" "ec2" {
     to_port     = 80
     protocol    = "tcp"
     cidr_blocks = [local.application_data.accounts[local.environment].outbound_access_cidr]
+  }
+  egress {
+    description = "http access from LZ to oas-mp to test connectivity"
+    from_port   = 1389
+    to_port     = 1389
+    protocol    = "tcp"
+    cidr_blocks = [local.application_data.accounts[local.environment].inbound_cidr_lz]
+  }
+  egress {
+    description = "http access from LZ to oas-mp to test connectivity"
+    from_port   = 1521
+    to_port     = 1521
+    protocol    = "tcp"
+    cidr_blocks = [local.application_data.accounts[local.environment].inbound_cidr_lz]
   }
 }
 

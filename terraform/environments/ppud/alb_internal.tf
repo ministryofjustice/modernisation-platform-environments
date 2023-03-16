@@ -22,16 +22,27 @@ resource "aws_lb_listener" "PPUD-Front-End" {
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
   certificate_arn   = data.aws_acm_certificate.internaltest_cert.arn
-
+  /*
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.PPUD-internal-Target-Group[0].arn
+  }
+
+*/
+  default_action {
+    type = "fixed-response"
+
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "Hi, I am PPUD Internal ALB"
+      status_code  = "200"
+    }
   }
 }
 
 resource "aws_lb_target_group" "PPUD-internal-Target-Group" {
   count    = local.is-development == false ? 1 : 0
-  name     = "PPUD"
+  name     = local.application_data.accounts[local.environment].PPUD_Target
   port     = 443
   protocol = "HTTPS"
   vpc_id   = data.aws_vpc.shared.id
@@ -58,27 +69,10 @@ resource "aws_lb_target_group" "PPUD-internal-Target-Group" {
 
 }
 
-/*
-resource "aws_lb_target_group_attachment" "PPUD-PORTAL" {
-  target_group_arn = aws_lb_target_group.PPUD-Target-Group.arn
-  target_id        = aws_instance.s609693lo6vw101[0].id
+
+resource "aws_lb_target_group_attachment" "PPUD-PORTAL-internal-development" {
+  count            = local.is-preproduction == true ? 1 : 0
+  target_group_arn = aws_lb_target_group.PPUD-internal-Target-Group[0].arn
+  target_id        = aws_instance.s618358rgvw023[0].id
   port             = 443
 }
-*/
-
-resource "aws_lb_target_group_attachment" "PPUD-PORTAL-internal" {
-  count            = local.is-development == false ? 1 : 0
-  target_group_arn = aws_lb_target_group.PPUD-internal-Target-Group[0].arn
-  # target_id        = aws_instance.PPUDWEBSERVER2[0].id
-  target_id = local.application_data.accounts[local.environment].alb_intances_ppud
-  port      = 443
-}
-
-
-/*
-resource "aws_lb_target_group_attachment" "target_group_attachment_1" {
-  count            = length(var.instance_ids_ppud_internal_alb[terraform.workspace])
-  target_group_arn = aws_lb_target_group.PPUD-Target-Group.arn
-  target_id        = var.instance_ids_ppud_internal_alb[terraform.workspace][count.index]
- }
- */

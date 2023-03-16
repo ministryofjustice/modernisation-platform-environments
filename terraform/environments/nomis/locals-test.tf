@@ -120,46 +120,13 @@ locals {
           oracle-db-name     = "CNOMT1"
           server-type        = "nomis-web"
         }
-        ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-01-03T17-01-12.128Z"
+        ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-03-15T17-18-22.178Z"
 
         autoscaling_group = {
           desired_capacity = 1
           warm_pool        = null
         }
         autoscaling_schedules = {}
-      }
-
-      t1a-nomis-web = {
-        tags = {
-          ami                = "nomis_rhel_6_10_weblogic_appserver_10_3"
-          description        = "T1 nomis weblogic 10.3 additional test scaling group"
-          oracle-db-hostname = "t1-nomis-db-1"
-          nomis-environment  = "t1"
-          oracle-db-name     = "CNOMT1"
-          server-type        = "nomis-web"
-        }
-        # ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-01-03T17-01-12.128Z"
-        ami_name = "base_rhel_6_10_test_2022-12-30T16-10-33.253Z"
-        user_data_cloud_init = {
-          args = {
-            lifecycle_hook_name  = "ready-hook"
-            branch               = "nomis/weblogic-test-for-sandhya"
-            ansible_repo         = "modernisation-platform-configuration-management"
-            ansible_repo_basedir = "ansible"
-            ansible_args         = "--tags ec2provision"
-          }
-        }
-        autoscaling_group = {
-          desired_capacity = 1
-          warm_pool        = null
-        }
-        autoscaling_schedules = {}
-        ebs_volumes = {
-          "/dev/sdb" = {
-            type = "gp3"
-            size = 150
-          }
-        }
       }
     }
 
@@ -244,6 +211,38 @@ locals {
           max_size = 1
         }
       }
+    }
+
+    baseline_lbs = {
+      # AWS doesn't let us call it internal
+      private = {
+        internal_lb              = true
+        enable_delete_protection = false
+        force_destroy_bucket     = true
+        idle_timeout             = 3600
+        public_subnets           = module.environment.subnets["private"].ids
+        security_groups          = [aws_security_group.public.id]
+
+        # listeners = {
+        #   t1-nomis-web-http-7001 = merge(
+        #      local.lb_listener_defaults.http-7001, {
+        #       replace = {
+        #         target_group_name_replace     = "t1-nomis-web-internal"
+        #         condition_host_header_replace = "t1-nomis-web-internal"
+        #       }
+        #   })
+        # }
+      }
+
+      # public LB not needed right now
+      # public = {
+      #   internal_lb              = false
+      #   enable_delete_protection = false
+      #   force_destroy_bucket     = true
+      #   idle_timeout             = 3600
+      #   public_subnets           = module.environment.subnets["public"].ids
+      #   security_groups          = [aws_security_group.public.id]
+      # }
     }
   }
 }

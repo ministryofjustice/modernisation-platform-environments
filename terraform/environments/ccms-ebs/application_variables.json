@@ -1,12 +1,16 @@
 {
   "accounts": {
     "development": {
+      "short_env": "dev",
+      "dns": "laa-development",
       "instance-scheduling": "skip-scheduling",
       "ec2_oracle_instance_type_ebsdb": "m5d.4xlarge",
       "ec2_oracle_instance_type_ebsapps": "m5d.2xlarge",
       "ec2_oracle_instance_type_webgate": "m5d.large",
       "ec2_oracle_instance_type_accessgate": "m5d.xlarge",
       "ami_owner": "self",
+      "ec2_instance_type_ftp": "c5d.large",
+      "ftp_ami_id": "ami-08cd358d745620807",
       "orace_base_prereqs_ami_name": "Oracle79-prereqs-v1_5",
       "orace_db_ami_name": "AwsBackup_i-0e1b4048a0b32f460_30402405-C957-9219-9AE0-23F1A5F059F0",
       "webgate_ami_name": "ebs-webgate-v1_1",
@@ -29,16 +33,20 @@
       "ebsapps_u03_size": 50
     },
     "test": {
+      "short_env": "tst",
+      "dns": "laa-test",
       "instance-scheduling": "skip-auto-start",
       "ec2_oracle_instance_type_ebsdb": "m5d.4xlarge",
       "ec2_oracle_instance_type_ebsapps": "m5d.2xlarge",
       "ec2_oracle_instance_type_webgate": "m5d.large",
       "ec2_oracle_instance_type_accessgate": "m5d.xlarge",
       "ami_owner": "767123802783",
-      "orace_base_prereqs_ami_name": "Oracle79-prereqs-v1_5",
-      "orace_db_ami_name": "Oracle79-prereqs-v1_5",
-      "webgate_ami_name": "ebs-webgate-v1_1",
-      "accessgate_ami_name": "ebs-accessgate-v1_1",
+      "ec2_instance_type_ftp": "c5d.large",
+      "ftp_ami_id": "ami-08cd358d745620807",
+      "orace_base_prereqs_ami_name": "Oracle79-prereqs-v1_7",
+      "orace_db_ami_name": "Oracle79-prereqs-v1_7",
+      "webgate_ami_name": "ebs-webgate-v1_2",
+      "accessgate_ami_name": "ebs-accessgate-v1_2",
       "key_name": "",
       "lz_aws_account_id_env": "140455166311",
       "lz_aws_subnet_env": "10.206.0.0/20",
@@ -57,16 +65,20 @@
       "ebsapps_u03_size": 50
     },
     "preproduction": {
+      "short_env": "prep",
+      "dns": "laa-preproduction",
       "instance-scheduling": "skip-auto-start",
       "ec2_oracle_instance_type_ebsdb": "x2iedn.4xlarge",
       "ec2_oracle_instance_type_ebsapps": "m5d.16xlarge",
       "ec2_oracle_instance_type_webgate": "c5d.2xlarge",
       "ec2_oracle_instance_type_accessgate": "c5d.2xlarge",
       "ami_owner": "767123802783",
-      "orace_base_prereqs_ami_name": "Oracle79-prereqs-v1_5",
-      "orace_db_ami_name": "Oracle79-prereqs-v1_5",
-      "webgate_ami_name": "ebs-webgate-v1_1",
-      "accessgate_ami_name": "ebs-accessgate-v1_1",
+      "ec2_instance_type_ftp": "c5d.large",
+      "ftp_ami_id": "ami-08cd358d745620807",
+      "orace_base_prereqs_ami_name": "Oracle79-prereqs-v1_7",
+      "orace_db_ami_name": "Oracle79-prereqs-v1_7",
+      "webgate_ami_name": "ebs-webgate-v1_2",
+      "accessgate_ami_name": "ebs-accessgate-v1_2",
       "key_name": "",
       "lz_aws_account_id_env": "484221692666",
       "lz_aws_subnet_env": "10.204.0.0/20",
@@ -85,16 +97,20 @@
       "ebsapps_u03_size": 50
     },
     "production": {
+      "short_env": "prod",
+      "dns": "laa",
       "instance-scheduling": "skip-auto-start",
       "ec2_oracle_instance_type_ebsdb": "x2iedn.4xlarge",
       "ec2_oracle_instance_type_ebsapps": "m5d.16xlarge",
       "ec2_oracle_instance_type_webgate": "c5d.2xlarge",
       "ec2_oracle_instance_type_accessgate": "c5d.2xlarge",
       "ami_owner": "767123802783",
-      "orace_base_prereqs_ami_name": "Oracle79-prereqs-v1_5",
-      "orace_db_ami_name": "Oracle79-prereqs-v1_5",
-      "webgate_ami_name": "ebs-webgate-v1_1",
-      "accessgate_ami_name": "ebs-accessgate-v1_1",
+      "ec2_instance_type_ftp": "c5d.large",
+      "ftp_ami_id": "ami-08cd358d745620807",
+      "orace_base_prereqs_ami_name": "Oracle79-prereqs-v1_7",
+      "orace_db_ami_name": "Oracle79-prereqs-v1_7",
+      "webgate_ami_name": "ebs-webgate-v1_2",
+      "accessgate_ami_name": "ebs-accessgate-v1_2",
       "key_name": "",
       "lz_aws_account_id_env": "842522700642",
       "lz_aws_subnet_env": "10.205.0.0/20",
@@ -113,6 +129,43 @@
       "ebsapps_u03_size": 50
     }
   },
+  "ec2_sg_base_ingress_rules": {
+    "TCP_80": {
+      "from_port": 80,
+      "to_port": 80,
+      "protocol": "TCP"
+    },
+    "TCP_443": {
+      "from_port": 443,
+      "to_port": 443,
+      "protocol": "TCP"
+    },
+    "TCP_22": {
+      "from_port": 22,
+      "to_port": 22,
+      "protocol": "TCP"
+    }
+  },
+  "ec2_sg_base_egress_rules": {
+    "TCP_80": {
+      "from_port": 80,
+      "to_port": 80,
+      "protocol": "TCP",
+      "destination_cidr": "0.0.0.0/0"
+    },
+    "TCP_443": {
+      "from_port": 443,
+      "to_port": 443,
+      "protocol": "TCP",
+      "destination_cidr": "0.0.0.0/0"
+    },
+    "SSH_22": {
+      "from_port": 22,
+      "to_port": 22,
+      "protocol": "TCP",
+      "destination_cidr": "0.0.0.0/0"
+    }
+  },
   "ec2_sg_ingress_rules": {
     "TCP_80": {
       "from_port": 80,
@@ -128,6 +181,18 @@
       "from_port": 22,
       "to_port": 22,
       "protocol": "TCP"
+    },
+    "TCP_8000": {
+      "from_port": 8000,
+      "to_port": 8000,
+      "protocol": "TCP",
+      "destination_cidr": "10.200.0.0/20"
+    },
+    "TCP_444x": {
+      "from_port": 4443,
+      "to_port": 4444,
+      "protocol": "TCP",
+      "destination_cidr": "10.200.0.0/20"
     }
   },
   "ec2_sg_egress_rules": {
@@ -148,17 +213,29 @@
       "to_port": 22,
       "protocol": "TCP",
       "destination_cidr": "0.0.0.0/0"
+    },
+    "TCP_8000": {
+      "from_port": 8000,
+      "to_port": 8000,
+      "protocol": "TCP",
+      "destination_cidr": "10.200.0.0/20"
+    },
+    "TCP_444x": {
+      "from_port": 4443,
+      "to_port": 4444,
+      "protocol": "TCP",
+      "destination_cidr": "10.200.0.0/20"
     }
   },
   "ec2_sg_ftp_ingress_rules": {
     "FTP_20": {
       "from_port": 20,
-      "to_port": 20,
+      "to_port": 22,
       "protocol": "TCP"
     },
-    "FTP_21": {
-      "from_port": 21,
-      "to_port": 21,
+    "FTP_3010": {
+      "from_port": 3000,
+      "to_port": 3010,
       "protocol": "TCP"
     },
     "SSH_22": {
@@ -170,13 +247,7 @@
   "ec2_sg_ftp_egress_rules": {
     "FTP_20": {
       "from_port": 20,
-      "to_port": 20,
-      "protocol": "TCP",
-      "destination_cidr": "10.200.0.0/13"
-    },
-    "FTP_21": {
-      "from_port": 21,
-      "to_port": 21,
+      "to_port": 22,
       "protocol": "TCP",
       "destination_cidr": "10.200.0.0/13"
     },
@@ -238,6 +309,33 @@
     },
     "cwagent-var-log-secure": {
       "retention_days": 90
+    }
+  },
+  "ec2_sg_ingress_rules_db": {
+    "UDP_ALL": {
+      "from_port": 0,
+      "to_port": 65535,
+      "protocol": "UDP"
+    }
+  },
+  "ec2_sg_egress_rules_db": {
+    "TCP_80": {
+      "from_port": 80,
+      "to_port": 80,
+      "protocol": "TCP",
+      "destination_cidr": "0.0.0.0/0"
+    },
+    "TCP_443": {
+      "from_port": 443,
+      "to_port": 443,
+      "protocol": "TCP",
+      "destination_cidr": "0.0.0.0/0"
+    },
+    "SSH_22": {
+      "from_port": 22,
+      "to_port": 22,
+      "protocol": "TCP",
+      "destination_cidr": "0.0.0.0/0"
     }
   }
 }

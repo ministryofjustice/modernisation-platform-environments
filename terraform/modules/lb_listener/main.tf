@@ -227,3 +227,25 @@ resource "aws_route53_record" "self" {
     evaluate_target_health = each.value.evaluate_target_health
   }
 }
+
+resource "aws_cloudwatch_metric_alarm" "this" {
+  for_each = { for key, value in var.cloudwatch_metric_alarms : key => value if local.target_group_arn.arn_suffix != null }
+
+  alarm_name          = "${var.name}-${each.key}"
+  comparison_operator = each.value.comparison_operator
+  evaluation_periods  = each.value.evaluation_periods
+  metric_name         = each.value.metric_name
+  namespace           = each.value.namespace
+  period              = each.value.period
+  statistic           = each.value.statistic
+  threshold           = each.value.threshold
+  alarm_actions       = each.value.alarm_actions
+  alarm_description   = each.value.alarm_description
+  datapoints_to_alarm = each.value.datapoints_to_alarm
+  treat_missing_data  = each.value.treat_missing_data
+  tags                = {}
+  dimensions = merge(each.value.dimensions, {
+    "LoadBalancer" = data.aws_lb.this.arn_suffix
+    "TargetGroup"  = local.target_group_arn.arn_suffix
+  })
+}

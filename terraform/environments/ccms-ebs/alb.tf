@@ -18,20 +18,6 @@ resource "aws_lb" "ebsapps_lb" {
   )
 }
 
-resource "aws_route53_record" "external" {
-  provider = aws.core-vpc
-
-  zone_id = data.aws_route53_zone.external.zone_id
-  name    = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-  type    = "A"
-
-  alias {
-    name                   = aws_lb.ebsapps_lb.dns_name
-    zone_id                = aws_lb.ebsapps_lb.zone_id
-    evaluate_target_health = true
-  }
-}
-
 resource "aws_lb_listener" "ebsapps_listener" {
   depends_on = [
     aws_acm_certificate_validation.external-mp

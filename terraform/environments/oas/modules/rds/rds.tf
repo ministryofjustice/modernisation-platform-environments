@@ -64,16 +64,22 @@ resource "aws_db_option_group" "appdboptiongroup19" {
 }
 
 
-# Random Secret for the DB Password.
+# Random Secret for the DB Password to be used for installation of OAS only
+# TODO Is this still required when AMI is being copied over instead? If so need to make sure that Terraform deployment either will not update the password in Secret Manager, of that wherever the password is being used gets updated to utilise the new password
 
 resource "random_password" "rds_password" {
-  length  = 12
+  length  = 16
   special = false
 }
 
 
 resource "aws_secretsmanager_secret" "rds_password_secret" {
-  name = "${var.application_name}-${var.environment}-rds-password-secret"
+  name        = "${var.application_name}/app/db-master-password-tmp2" # TODO This name needs changing back to without -tmp2 to be compatible with hardcoded OAS installation
+  description = "This secret has a dynamically generated password."
+  tags = merge(
+    var.tags,
+    { "Name" = "${var.application_name}/app/db-master-password-tmp2" }, # TODO This name needs changing back to without -tmp2 to be compatible with hardcoded OAS installation
+  )
 }
 
 
@@ -86,19 +92,6 @@ resource "aws_secretsmanager_secret_version" "rds_password_secret_version" {
     }
   )
 }
-
-# From Vincent's PR
-# TODO Rotation of secret which requires Lambda fucntion created and permissions granted to Lambda to rotate.
-#
-# resource "aws_secretsmanager_secret_rotation" "rds_password-rotation" {
-#   secret_id           = aws_secretsmanager_secret.rds_password_secret.id
-#   rotation_lambda_arn = aws_lambda_function.<<<<example.arn>>>>>>
-#
-#   rotation_rules {
-#     automatically_after_days = var.db_password_rotation_period
-#   }
-# }
-
 
 # RDS database
 
@@ -133,9 +126,10 @@ resource "aws_db_instance" "appdb1" {
   apply_immediately           = true
   snapshot_identifier         = var.rds_snapshot_arn
   kms_key_id                  = var.rds_kms_key_arn
-  tags = {
-    Name = "${var.application_name}-${var.environment}-database"
-  }
+  tags = merge(
+    var.tags,
+    { "Name" = "${var.application_name}-${var.environment}-database" },
+  )
 
   timeouts {
     create = "60m"

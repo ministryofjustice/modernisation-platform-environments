@@ -98,6 +98,7 @@ resource "aws_iam_instance_profile" "iam_instace_profile_ccms_base" {
   )
 }
 
+# Cloudwatch Logging
 resource "aws_iam_policy" "cw_logging_policy" {
   name        = "cw_log_policy-${local.environment}"
   description = "allows EC2 CW logging"
@@ -127,4 +128,3 @@ resource "aws_iam_role_policy_attachment" "cw_logging_policy" {
   role       = aws_iam_role.role_stsassume_oracle_base.name
   policy_arn = aws_iam_policy.cw_logging_policy.arn
 }
-

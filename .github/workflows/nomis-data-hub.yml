@@ -1,0 +1,66 @@
+---
+name: nomis-data-hub
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'terraform/environments/nomis-data-hub/**'
+      - '.github/workflows/nomis-data-hub.yml'
+
+  pull_request:
+    branches:
+      - main
+    types: [opened, edited, reopened, synchronize]
+    paths:
+      - 'terraform/environments/nomis-data-hub/**'
+      - '.github/workflows/nomis-data-hub.yml'
+
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Set either [deploy|destroy].'
+        default: 'deploy'
+        required: true
+        type: string
+        options:
+          - deploy
+          - destroy
+
+permissions:
+  id-token: write  # This is required for requesting the JWT
+  contents: read  # This is required for actions/checkout
+
+jobs:
+  strategy:
+    uses: ./.github/workflows/reusable_terraform_strategy.yml
+    if: inputs.action != 'destroy'
+    with:
+      strategy_type: "standard_four_accounts"  # allow apply to dev/test from branch
+
+  terraform:
+    needs: strategy
+    if: inputs.action != 'destroy'
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.strategy.outputs.matrix) }}
+    uses: ./.github/workflows/reusable_terraform_plan_apply.yml
+    with:
+      application: "${{ github.workflow }}"
+      environment: "${{ matrix.target }}"
+      action: "${{ matrix.action }}"
+    secrets:
+      modernisation_platform_environments: "${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}"
+      pipeline_github_token: "${{ secrets.DSO_GITHUB_AUTOMATION_PAT }}"
+
+  destroy-development:
+    if: inputs.action == 'destroy'
+    uses: ./.github/workflows/reusable_terraform_plan_apply.yml
+    with:
+      application: "${{ github.workflow }}"
+      environment: "development"
+      action: "plan_apply"
+      plan_apply_tfargs: "-destroy"
+    secrets:
+      modernisation_platform_environments: "${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}"
+      pipeline_github_token: "${{ secrets.DSO_GITHUB_AUTOMATION_PAT }}"

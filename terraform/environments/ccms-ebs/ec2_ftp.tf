@@ -1,10 +1,11 @@
 #  Build EC2 
 resource "aws_instance" "ec2_ftp" {
-  instance_type               = "c5d.large"
-  ami                         = "ami-08cd358d745620807"
-  key_name                    = local.application_data.accounts[local.environment].key_name
-  vpc_security_group_ids      = [aws_security_group.ec2_sg_ftp.id]
-  subnet_id                   = data.aws_subnet.data_subnets_a.id
+  instance_type          = local.application_data.accounts[local.environment].ec2_instance_type_ftp
+  ami                    = local.application_data.accounts[local.environment].ftp_ami_id
+  key_name               = local.application_data.accounts[local.environment].key_name
+  vpc_security_group_ids = [aws_security_group.ec2_sg_ftp.id]
+  subnet_id              = local.environment == "development" ? data.aws_subnet.data_subnets_a.id : data.aws_subnet.private_subnets_a.id
+  #subnet_id                   = data.aws_subnet.data_subnets_a.id
   monitoring                  = true
   ebs_optimized               = false
   associate_public_ip_address = false
@@ -35,6 +36,14 @@ systemctl stop amazon-ssm-agent
 rm -rf /var/lib/amazon/ssm/ipc/
 systemctl start amazon-ssm-agent
 
+useradd -m s3xfer
+
+echo "pasv_enable=YES" >> /etc/vsftpd/vsftpd.conf
+echo "pasv_min_port=3000" >> /etc/vsftpd/vsftpd.conf
+echo "pasv_max_port=3010" >> /etc/vsftpd/vsftpd.conf
+
+systemctl restart vsftpd.service
+
 cat > /etc/mount_s3.sh <<- EOM
 #!/bin/bash
 
@@ -43,12 +52,14 @@ B=(laa-ccms-inbound-${local.application_data.accounts[local.environment].lz_ftp_
 C=\$(aws secretsmanager get-secret-value --secret-id ftp-s3-${local.environment}-aws-key --region eu-west-2)
 K=\$(jq -r '.SecretString' <<< \$${C} |cut -d'"' -f2)
 S=\$(jq -r '.SecretString' <<< \$${C} |cut -d'"' -f4)
+U=\$(id -u s3xfer)
+G=\$(id -g s3xfer)
 F=/etc/passwd-s3fs
 echo "\$${K}:\$${S}" > "\$${F}"
 chmod 600 \$${F}
 
 for b in "\$${B[@]}"; do
-  D=/mnt/\$${b}
+  D=/s3xfer/S3/\$${b}
 
   if [[ -d \$${D} ]]; then
     echo "\$${D} exists."
@@ -56,7 +67,10 @@ for b in "\$${B[@]}"; do
     mkdir -p \$${D}
   fi
 
-  s3fs \$${b} \$${D} -o passwd_file=\$${F}
+  chown -R s3xfer:users \$${D}
+  chmod 755 \$${D}
+
+  s3fs \$${b} \$${D} -o passwd_file=\$${F} -o _netdev,allow_other,use_cache=/tmp,url=https://s3-eu-west-2.amazonaws.com,endpoint=eu-west-2,umask=022,uid=\$${U},gid=\$${G}
   if [[ \$? -eq 0 ]]; then
     s3fs \$${b} \$${D} -o passwd_file=\$${F}
     echo "\$${b} has been mounted in \$${D}"
@@ -64,6 +78,12 @@ for b in "\$${B[@]}"; do
     echo "\$${b} has not been mounted! Please investigate."
   fi
 done
+
+ln -s /s3xfer/S3/laa-ccms-inbound-${local.application_data.accounts[local.environment].lz_ftp_bucket_environment}/CCMS_PRD_TDX/Inbound /home/s3xfer/CCMS_PRD_TDX_Inbound
+ln -s /s3xfer/S3/laa-ccms-outbound-${local.application_data.accounts[local.environment].lz_ftp_bucket_environment}/CCMS_PRD_TDX/Outbound /home/s3xfer/CCMS_PRD_TDX_Outbound
+
+chown -h s3xfer:s3xfer /home/s3xfer/CCMS_PRD_TDX_Inbound
+chown -h s3xfer:s3xfer /home/s3xfer/CCMS_PRD_TDX_Outbound
 
 rm \$${F}
 EOM
@@ -111,13 +131,12 @@ EOF
 
   depends_on = [aws_security_group.ec2_sg_ftp]
 }
-/*
+
 module "cw-ftp-ec2" {
   source = "./modules/cw-ec2"
 
-  name        = "ec2-ftp"
-  topic       = aws_sns_topic.cw_alerts.arn
-  instanceIds = aws_instance.ec2_ftp.id
+  name  = "ec2-ftp"
+  topic = aws_sns_topic.cw_alerts.arn
 
   for_each     = local.application_data.cloudwatch_ec2
   metric       = each.key
@@ -125,5 +144,10 @@ module "cw-ftp-ec2" {
   period       = each.value.period
   threshold    = each.value.threshold
 
+  # Dimensions used across all alarms
+  instanceId   = aws_instance.ec2_ftp.id
+  imageId      = local.application_data.accounts[local.environment].ftp_ami_id
+  instanceType = local.application_data.accounts[local.environment].ec2_instance_type_ftp
+  fileSystem   = "xfs"       # Linux root filesystem
+  rootDevice   = "nvme0n1p1" # This is used by default for root on all the ec2 images
 }
-*/

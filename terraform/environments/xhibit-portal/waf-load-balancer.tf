@@ -2,9 +2,6 @@ data "aws_ec2_managed_prefix_list" "cf" {
   name = "com.amazonaws.global.cloudfront.origin-facing"
 }
 
-# to get account id
-data "aws_caller_identity" "current" {}
-
 resource "aws_security_group_rule" "allow_cloudfront_ips" {
   depends_on        = [aws_security_group.waf_lb]
   security_group_id = aws_security_group.waf_lb.id
@@ -164,25 +161,10 @@ resource "aws_alb_listener_rule" "web_listener_rule" {
 
 }
 
-
-data "aws_route53_zone" "external_r53_zone" {
-  provider = aws.core-vpc
-
-  name         = "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk."
-  private_zone = false
-}
-
-data "aws_route53_zone" "network-services" {
-  provider = aws.core-network-services
-
-  name         = "modernisation-platform.service.justice.gov.uk."
-  private_zone = false
-}
-
 resource "aws_route53_record" "external" {
   provider = aws.core-vpc
 
-  zone_id = data.aws_route53_zone.external_r53_zone.zone_id
+  zone_id = data.aws_route53_zone.external.zone_id
   name    = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   type    = "A"
 
@@ -231,7 +213,7 @@ resource "aws_route53_record" "external_validation_subdomain" {
   records         = [local.domain_record_sub[count.index]]
   ttl             = 60
   type            = local.domain_type_sub[count.index]
-  zone_id         = data.aws_route53_zone.external_r53_zone.zone_id
+  zone_id         = data.aws_route53_zone.external.zone_id
 }
 
 resource "aws_acm_certificate_validation" "waf_lb_cert_validation" {

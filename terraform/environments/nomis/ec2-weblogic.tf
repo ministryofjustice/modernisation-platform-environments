@@ -172,7 +172,7 @@ module "ec2_weblogic_autoscaling_group" {
   tags               = merge(local.tags, local.ec2_weblogic.tags, try(each.value.tags, {}))
   account_ids_lookup = local.environment_management.account_ids
   cloudwatch_metric_alarms = {
-    for key, value in merge(local.ec2_weblogic.cloudwatch_metric_alarms_weblogic, local.cloudwatch_metric_alarms_linux) :
+    for key, value in merge(local.ec2_weblogic.cloudwatch_metric_alarms_weblogic, local.cloudwatch_metric_alarms_linux, lookup(each.value, "cloudwatch_metric_alarms", {})) :
     key => merge(value, {
       alarm_actions = [lookup(each.value, "sns_topic", aws_sns_topic.nomis_nonprod_alarms.arn)]
   }) }

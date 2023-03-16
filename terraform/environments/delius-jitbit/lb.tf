@@ -32,8 +32,8 @@ resource "aws_security_group" "load_balancer_security_group" {
   egress {
     protocol    = "tcp"
     description = "Allow egress to ECS instances"
-    from_port   = 5000
-    to_port     = 5000
+    from_port   = local.app_port
+    to_port     = local.app_port
     cidr_blocks = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
   }
 

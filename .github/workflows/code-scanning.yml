@@ -24,7 +24,7 @@ jobs:
           token: '${{ secrets.GITHUB_TOKEN }}'
           fetch-depth: 0
       - name: Cache plugin dir
-        uses: actions/cache@69d9d449aced6a2ede0bc19182fadc3a0a42d2b0 # v3.2.6
+        uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8 # v3.3.1
         with:
           path: ~/.tflint.d/plugins
           key: '${{ matrix.os }}-tflint-${{ hashFiles(''.tflint.hcl'') }}'
@@ -38,7 +38,7 @@ jobs:
         run: tflint --disable-rule=terraform_unused_declarations --format sarif > tflint.sarif
       - name: Upload SARIF file
         if: success() || failure()
-        uses: github/codeql-action/upload-sarif@32dc499307d133bb5085bae78498c0ac2cf762d5 # v2.2.5
+        uses: github/codeql-action/upload-sarif@16964e90ba004cdf0cd845b866b5df21038b7723 # v2.2.6
         with:
           sarif_file: tflint.sarif
   tfsec:
@@ -60,7 +60,7 @@ jobs:
           additional_args: '--format sarif --out tfsec.sarif --exclude aws-ssm-secret-use-customer-key,github-repositories-private,aws-vpc-no-excessive-port-access,github-repositories-require-signed-commits'
       - name: Upload SARIF file
         if: success() || failure()
-        uses: github/codeql-action/upload-sarif@32dc499307d133bb5085bae78498c0ac2cf762d5 # v2.2.5
+        uses: github/codeql-action/upload-sarif@16964e90ba004cdf0cd845b866b5df21038b7723 # v2.2.6
         with:
           sarif_file: tfsec.sarif
   checkov:
@@ -78,7 +78,7 @@ jobs:
           fetch-depth: 0
       - name: Run Checkov action
         id: checkov
-        uses: bridgecrewio/checkov-action@cc85d6a591395cae646fc76672068770fbbfbcb8 # v12.2172.0
+        uses: bridgecrewio/checkov-action@50699f0d664f994024fca76e6daba1311293d31e # v12.2203.0
         with:
           directory: ./
           framework: terraform
@@ -87,6 +87,6 @@ jobs:
           skip_check: CKV_GIT_1,CKV_AWS_126,CKV2_AWS_38,CKV2_AWS_39
       - name: Upload SARIF file
         if: success() || failure()
-        uses: github/codeql-action/upload-sarif@32dc499307d133bb5085bae78498c0ac2cf762d5 # v2.2.5
+        uses: github/codeql-action/upload-sarif@16964e90ba004cdf0cd845b866b5df21038b7723 # v2.2.6
         with:
           sarif_file: ./checkov.sarif

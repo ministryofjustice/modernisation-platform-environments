@@ -49,6 +49,16 @@ tasks:
 
 - task: executeScript
   inputs:
+  - frequency: once
+    type: powershell
+    runAs: admin
+    content: |-
+      $connectionsXMLPath = "C:\Users\Public\Desktop\connections.xml"
+      (Get-Content $connectionsXMLPath).replace('[DELIUS_IAPS_RDS_DB_ADDRESS]', '${delius_iaps_rds_db_address}') | Set-Content $connectionsXMLPath
+      (Get-Content $connectionsXMLPath).replace('[IM_DB_URL]', '${im_db_url}') | Set-Content $connectionsXMLPath
+
+- task: executeScript
+  inputs:
   - frequency: always
     type: powershell
     runAs: admin
@@ -87,6 +97,14 @@ tasks:
         $token = invoke-restmethod -Headers @{"X-aws-ec2-metadata-token-ttl-seconds"=3600} -Method PUT -Uri http://169.254.169.254/latest/api/token
         $instanceId = invoke-restmethod -Headers @{"X-aws-ec2-metadata-token" = $token} -Method GET -uri http://169.254.169.254/latest/meta-data/instance-id
         Add-Computer -DomainName "${delius_iaps_ad_domain_name}" -Credential $domainJoinCredential -NewName $instanceId -Force
+
+        # Install AD Management Tools
+        Install-WindowsFeature -Name RSAT-AD-PowerShell
+        Install-WindowsFeature -Name RSAT-ADDS-Tools
+
+        # Allow Domain Users to connect via RDP and give them local admin rights
+        Add-LocalGroupMember -Group "Administrators" -Member "Domain Users@${delius_iaps_ad_domain_name}"
+
         exit 3010 # Reboot instance, see https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2launch-v2-settings.html#ec2launch-v2-exit-codes-reboots
       }
   - frequency: once
@@ -124,4 +142,54 @@ tasks:
       # TODO: remove or edit if statement once migration gets a green light
       Stop-Service -Name IMIapsInterfaceWinService -Force
       Set-Service -Name IMIapsInterfaceWinService -StartupType Disabled
+%{endif}
+
+  - frequency: once
+    type: powershell
+    runAs: admin
+    content: |-
+      # Configure NDelius Interface
+      $ErrorActionPreference = "Stop"
+      $VerbosePreference = "Continue"
+
+      $NDeliusIAPSCMSConfigFile = "C:\Program Files (x86)\I2N\IapsNDeliusInterface\Config\IAPSCMSIF.xml"
+      $NDeliusIAPSCMSConfigXML = [xml](Get-Content $NDeliusIAPSCMSConfigFile)
+
+      $NDeliusIAPSCMSConfigXML.DLLDEF.INTERFACES.INTERFACE.USER = (Get-SSMParameter -Name "/NDeliusInterface/IAPSCMSIF/Interface/user" -WithDecryption $true).Value
+      $NDeliusIAPSCMSConfigXML.DLLDEF.INTERFACES.INTERFACE.PASSWORDCODED = (Get-SSMParameter -Name "/NDeliusInterface/IAPSCMSIF/Interface/passwordcoded" -WithDecryption $true).Value
+
+      $NDeliusIAPSCMSConfigXML.save($NDeliusIAPSCMSConfigFile)
+
+      $NDeliusConfigFile = "C:\Program Files (x86)\I2N\IapsNDeliusInterface\Config\NDELIUSIF.xml"
+      $configXML = [xml](Get-Content $NDeliusConfigFile)
+      $configXML.DLLDEF.INTERFACES.INTERFACE.USER = (Get-SSMParameter -Name "/NDeliusInterface/Interface/user" -WithDecryption $true).Value
+      $configXML.DLLDEF.INTERFACES.INTERFACE.PASSWORD = (Get-SSMParameter -Name "/NDeliusInterface/Interface/password" -WithDecryption $true).Value
+      $configXML.DLLDEF.INTERFACES.INTERFACE.REPLICAPASSWORDCODED = (Get-SSMParameter -Name "/NDeliusInterface/Interface/replicapwdcoded" -WithDecryption $true).Value
+      $configXML.DLLDEF.INTERFACES.INTERFACE.SOAPPASSCODED = (Get-SSMParameter -Name "/NDeliusInterface/Interface/soappwdcoded" -WithDecryption $true).Value
+      $configXML.DLLDEF.INTERFACES.INTERFACE.PASSWORDCODED = (Get-SSMParameter -Name "/NDeliusInterface/Interface/pwdcoded" -WithDecryption $true).Value
+
+      $InterfaceODBCdsn = (Get-SSMParameter -Name "/NDeliusInterface/Interface/ODBC/dsn" -WithDecryption $true).Value
+      $InterfaceODBCuid = (Get-SSMParameter -Name "/NDeliusInterface/Interface/ODBC/uid" -WithDecryption $true).Value
+      $InterfaceODBCpwd = (Get-SSMParameter -Name "/NDeliusInterface/Interface/ODBC/pwd" -WithDecryption $true).Value
+      $configXML.DLLDEF.INTERFACES.INTERFACE.ODBC = "DSN=$${InterfaceODBCdsn};uid=$${InterfaceODBCuid};pwd=$${InterfaceODBCpwd}"
+
+      $configXML.DLLDEF.EMAIL.SMTPUSER = (Get-SSMParameter -Name "/NDeliusInterface/Email/smtpuser" -WithDecryption $true).Value
+      $configXML.DLLDEF.EMAIL.PASSWORD = (Get-SSMParameter -Name "/NDeliusInterface/Email/password" -WithDecryption $true).Value
+      $configXML.DLLDEF.EMAIL.PASSWORDCODED = (Get-SSMParameter -Name "/NDeliusInterface/Email/passwordcoded" -WithDecryption $true).Value
+      $configXML.DLLDEF.EMAIL.FROMADDRESS = (Get-SSMParameter -Name "/NDeliusInterface/Email/fromaddress" -WithDecryption $true).Value
+      $configXML.save($NDeliusConfigFile)
+
+%{if environment == "development"}
+      $service = Restart-Service -Name NDeliusInterfaceIapsWinService -Force -PassThru
+      if ($service.Status -match "Running") {
+          Write-Host('Restart of NDeliusInterfaceIapsWinService successful')
+      } else {
+          Write-Host('Error - Failed to restart NDeliusInterfaceIapsWinService - see logs')
+          Exit 1
+      }
+%{endif}
+%{if environment != "development"}
+      # TODO: remove or edit if statement once migration gets a green light
+      Stop-Service -Name NDeliusInterfaceIapsWinService -Force
+      Set-Service -Name NDeliusInterfaceIapsWinService -StartupType Disabled
 %{endif}

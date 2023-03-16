@@ -1,10 +1,11 @@
 resource "aws_instance" "ec2_ebsapps" {
-  count                       = local.application_data.accounts[local.environment].ebsapps_no_instances
-  instance_type               = local.application_data.accounts[local.environment].ec2_oracle_instance_type_ebsapps
-  ami                         = data.aws_ami.oracle_base_prereqs.id
-  key_name                    = local.application_data.accounts[local.environment].key_name
-  vpc_security_group_ids      = [aws_security_group.ec2_sg_ebsapps.id]
-  subnet_id                   = data.aws_subnet.data_subnets_a.id
+  count                  = local.application_data.accounts[local.environment].ebsapps_no_instances
+  instance_type          = local.application_data.accounts[local.environment].ec2_oracle_instance_type_ebsapps
+  ami                    = data.aws_ami.oracle_base_prereqs.id
+  key_name               = local.application_data.accounts[local.environment].key_name
+  vpc_security_group_ids = [aws_security_group.ec2_sg_ebsapps.id]
+  subnet_id              = local.environment == "development" ? local.data_subnets[count.index] : local.private_subnets[count.index]
+  #subnet_id                   = data.aws_subnet.data_subnets_a.id
   monitoring                  = true
   ebs_optimized               = false
   associate_public_ip_address = false
@@ -111,17 +112,22 @@ EOF
 }
 
 
-
 module "cw-ebsapps-ec2" {
   source = "./modules/cw-ec2"
 
-  name        = "ec2-ebsapps"
-  topic       = aws_sns_topic.cw_alerts.arn
-  instanceIds = join(",", [for instance in aws_instance.ec2_ebsapps : instance.id])
+  name  = "ec2-ebsapps"
+  topic = aws_sns_topic.cw_alerts.arn
 
   for_each     = local.application_data.cloudwatch_ec2
   metric       = each.key
   eval_periods = each.value.eval_periods
   period       = each.value.period
   threshold    = each.value.threshold
+
+  # Dimensions used across all alarms
+  instanceId   = aws_instance.ec2_ebsapps[local.application_data.accounts[local.environment].ebsapps_no_instances - 1].id
+  imageId      = data.aws_ami.oracle_base_prereqs.id
+  instanceType = local.application_data.accounts[local.environment].ec2_oracle_instance_type_ebsapps
+  fileSystem   = "xfs"       # Linux root filesystem
+  rootDevice   = "nvme0n1p1" # This is used by default for root on all the ec2 images
 }

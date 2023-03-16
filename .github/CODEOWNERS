@@ -3,8 +3,11 @@
 
 * @ministryofjustice/modernisation-platform
 /terraform/environments/apex @ministryofjustice/laa-aws-infrastructure @ministryofjustice/modernisation-platform
-/terraform/environments/ccms-ebs @ministryofjustice/laa-ccms-migration-team @ministryofjustice/modernisation-platform
+/terraform/environments/ccms-ebs @ministryofjustice/laa-ccms-migration-team @ministryofjustice/modernisation-platform-security @ministryofjustice/modernisation-platform
+/terraform/environments/cooker @ministryofjustice/modernisation-platform
 /terraform/environments/data-and-insights-wepi @ministryofjustice/data-and-insights-hub @ministryofjustice/modernisation-platform
+/terraform/environments/data-platform @ministryofjustice/data-platform-core-infra @ministryofjustice/modernisation-platform
+/terraform/environments/delius-core @ministryofjustice/hmpps-migration @ministryofjustice/modernisation-platform
 /terraform/environments/delius-iaps @ministryofjustice/hmpps-migration @ministryofjustice/modernisation-platform
 /terraform/environments/delius-jitbit @ministryofjustice/hmpps-migration @ministryofjustice/modernisation-platform
 /terraform/environments/digital-prison-reporting @ministryofjustice/hmpps-digital-prison-reporting @ministryofjustice/modernisation-platform
@@ -15,18 +18,19 @@
 /terraform/environments/maatdb @ministryofjustice/laa-aws-infrastructure @ministryofjustice/modernisation-platform
 /terraform/environments/mlra @ministryofjustice/laa-aws-infrastructure @ministryofjustice/modernisation-platform
 /terraform/environments/nomis-combined-reporting @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
+/terraform/environments/nomis-data-hub @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
 /terraform/environments/nomis @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
 /terraform/environments/oas @ministryofjustice/laa-aws-infrastructure @ministryofjustice/modernisation-platform
 /terraform/environments/oasys @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
 /terraform/environments/performance-hub @ministryofjustice/performance-hub-developers @ministryofjustice/modernisation-platform
-/terraform/environments/ppud @ministryofjustice/modernisation-platform @ministryofjustice/modernisation-platform
-/terraform/environments/ppud @ministryofjustice/ppud-replacement-devs @ministryofjustice/modernisation-platform
-/terraform/environments/refer-monitor @ministryofjustice/hmpps-interventions-dev @ministryofjustice/modernisation-platform
-/terraform/environments/refer-monitor @ministryofjustice/hmpps-interventions-dashboard-access @ministryofjustice/modernisation-platform
+/terraform/environments/portal @ministryofjustice/laa-aws-infrastructure @ministryofjustice/modernisation-platform
+/terraform/environments/ppud @ministryofjustice/modernisation-platform @ministryofjustice/ppud-replacement-devs @ministryofjustice/modernisation-platform
+/terraform/environments/refer-monitor @ministryofjustice/hmpps-interventions-dashboard-access @ministryofjustice/hmpps-interventions-dev @ministryofjustice/modernisation-platform
 /terraform/environments/sprinkler @ministryofjustice/modernisation-platform @ministryofjustice/modernisation-platform
 /terraform/environments/tariff @ministryofjustice/cica @ministryofjustice/modernisation-platform
 /terraform/environments/testing @ministryofjustice/modernisation-platform @ministryofjustice/modernisation-platform
 /terraform/environments/tipstaff @ministryofjustice/dts-heritage-services @ministryofjustice/modernisation-platform
+/terraform/environments/tribunals @ministryofjustice/dts-heritage-services @ministryofjustice/modernisation-platform
 /terraform/environments/xhibit-portal @ministryofjustice/xhibit-portal-dev @ministryofjustice/modernisation-platform
 **/providers.tf @ministryofjustice/modernisation-platform
 **/backend.tf @ministryofjustice/modernisation-platform
