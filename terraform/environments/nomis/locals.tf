@@ -3,6 +3,15 @@ locals {
   region              = "eu-west-2"
   availability_zone_1 = "eu-west-2a"
   availability_zone_2 = "eu-west-2b"
+
+  environment_configs = {
+    development   = local.development_config
+    test          = local.test_config
+    preproduction = local.preproduction_config
+    production    = local.production_config
+  }
+  baseline_environment_config = local.environment_configs[local.environment]
+
   autoscaling_schedules_default = {
     "scale_up" = {
       recurrence = "0 7 * * Mon-Fri"

@@ -132,4 +132,8 @@ locals {
     weblogics       = {}
     ec2_jumpservers = {}
   }
+
+  # baseline config
+  production_config = {
+  }
 }
