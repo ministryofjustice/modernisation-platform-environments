@@ -309,6 +309,7 @@ variable "lbs" {
     internal_lb              = optional(bool, false)
     security_groups          = list(string)
     public_subnets           = list(string)
+    existing_target_groups   = optional(map(any), {})
     tags                     = optional(map(string), {})
     listeners = optional(map(object({
       port             = number
