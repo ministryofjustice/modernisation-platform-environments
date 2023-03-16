@@ -53,14 +53,15 @@ module "lb_listener" {
   business_unit          = var.environment.business_unit
   environment            = var.environment.environment
   load_balancer_arn      = module.lb[each.value.lb_application_name].load_balancer.arn
-  existing_target_groups = local.asg_target_groups
+  existing_target_groups = merge(local.asg_target_groups, var.lbs[each.value.lb_application_name].existing_target_groups)
   port                   = each.value.port
   protocol               = each.value.protocol
   ssl_policy             = each.value.ssl_policy
-  certificate_arns       = each.value.certificate_arns
+  certificate_arns       = [for item in each.value.certificate_names_or_arns : lookup(module.acm_certificate, item, null) != null ? module.acm_certificate[item].arn : item]
   default_action         = each.value.default_action
   rules                  = each.value.rules
   route53_records        = each.value.route53_records
+  replace                = each.value.replace
   tags                   = merge(local.tags, each.value.tags)
 
   depends_on = [

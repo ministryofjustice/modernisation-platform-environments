@@ -194,7 +194,7 @@ resource "aws_lb_listener_rule" "this" {
 }
 
 resource "aws_lb_listener_certificate" "this" {
-  for_each        = toset(try(slice(var.certificate_arns, 1, length(var.certificate_arns) - 1), []))
+  for_each        = toset(var.certificate_arns)
   listener_arn    = aws_lb_listener.this.arn
   certificate_arn = each.value
 }
@@ -228,24 +228,24 @@ resource "aws_route53_record" "self" {
   }
 }
 
-resource "aws_cloudwatch_metric_alarm" "this" {
-  for_each = { for key, value in var.cloudwatch_metric_alarms : key => value if local.target_group_arn.arn_suffix != null }
-
-  alarm_name          = "${var.name}-${each.key}"
-  comparison_operator = each.value.comparison_operator
-  evaluation_periods  = each.value.evaluation_periods
-  metric_name         = each.value.metric_name
-  namespace           = each.value.namespace
-  period              = each.value.period
-  statistic           = each.value.statistic
-  threshold           = each.value.threshold
-  alarm_actions       = each.value.alarm_actions
-  alarm_description   = each.value.alarm_description
-  datapoints_to_alarm = each.value.datapoints_to_alarm
-  treat_missing_data  = each.value.treat_missing_data
-  tags                = {}
-  dimensions = merge(each.value.dimensions, {
-    "LoadBalancer" = data.aws_lb.this.arn_suffix
-    "TargetGroup"  = local.target_group_arn.arn_suffix
-  })
-}
+#resource "aws_cloudwatch_metric_alarm" "this" {
+#  for_each = { for key, value in var.cloudwatch_metric_alarms : key => value if local.target_group_arn.arn_suffix != null }
+#
+#  alarm_name          = "${var.name}-${each.key}"
+#  comparison_operator = each.value.comparison_operator
+#  evaluation_periods  = each.value.evaluation_periods
+#  metric_name         = each.value.metric_name
+#  namespace           = each.value.namespace
+#  period              = each.value.period
+#  statistic           = each.value.statistic
+#  threshold           = each.value.threshold
+#  alarm_actions       = each.value.alarm_actions
+#  alarm_description   = each.value.alarm_description
+#  datapoints_to_alarm = each.value.datapoints_to_alarm
+#  treat_missing_data  = each.value.treat_missing_data
+#  tags                = {}
+#  dimensions = merge(each.value.dimensions, {
+#    "LoadBalancer" = data.aws_lb.this.arn_suffix
+#    "TargetGroup"  = local.target_group_arn.arn_suffix
+#  })
+#}

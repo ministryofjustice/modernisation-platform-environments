@@ -213,11 +213,12 @@ locals {
       #   type = null
       #   snapshot_id = null
       # }
-      # "/dev/sds" = {
-      #   label = "swap"
-      #   type = null
-      #   snapshot_id = null
-      # }
+      "/dev/sds" = {
+        label       = "swap"
+        type        = "gp3"
+        snapshot_id = null
+        size        = 2
+      }
     }
 
     ebs_volume_config = {
@@ -410,11 +411,11 @@ locals {
   lb_listeners = {
 
     development = {
-      oasys-public = merge(
-        local.lb_listener_defaults.https,
-        local.lb_listener_defaults.oasys_public,
-        local.lb_listener_defaults.route53,
-      )
+      # oasys-public = merge(
+      #   local.lb_listener_defaults.https,
+      #   local.lb_listener_defaults.oasys_public,
+      #   local.lb_listener_defaults.route53,
+      # )
     }
 
     test          = {}

@@ -14,13 +14,19 @@ run_ansible() {
   fi
 
   if ! command -v aws > /dev/null; then
-    echo "aws cli must be installed, not installing any ansible" >&2
-    exit 0
+    echo "aws cli must be installed, trying to install.." >&2
+    if ! command -v unzip > /dev/null; then
+      yum install unzip -y
+    fi
+    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "/tmp/awscliv2.zip"
+    unzip /tmp/awscliv2.zip -d /tmp
+    /tmp/aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli --update
+    rm -rf /tmp/awscliv2.zip /tmp/aws
   fi
 
   if ! command -v git > /dev/null; then
-    echo "git must be installed, not installing any ansible" >&2
-    exit 0
+    echo "git must be installed, trying to install.." >&2
+    yum install git -y
   fi
 
   echo "# Retrieving API Token"
@@ -52,8 +58,9 @@ run_ansible() {
   elif [[ $(which python3.6 2> /dev/null) ]]; then
     python=$(which python3.6)
   else
-    echo "Python3.9/3.6 not found"
-    exit 1
+    echo "Python3.9/3.6 not found. Installing 3.9"
+    yum install python39 -y
+    python=$(which python3.9)
   fi
   echo "# Using python: $python"
 
@@ -79,6 +86,7 @@ run_ansible() {
   ansible-galaxy collection install -r requirements.yml
 
   # run ansible (comma after localhost deliberate)
+  # ansible_python_interpreter used unless defined in group_vars
   echo "# Execute ansible"
   ansible-playbook site.yml \
    --connection=local \
@@ -87,8 +95,8 @@ run_ansible() {
    --extra-vars "target=localhost" \
    --extra-vars "@group_vars/environment_name_$environment_name.yml" \
    --extra-vars "@group_vars/server_type_$server_type.yml" \
-   --tags ec2provision \
    --become
+   # --tags ec2provision
 
   echo "# Cleanup"
   deactivate

@@ -38,4 +38,8 @@ locals {
     weblogics       = {}
     ec2_jumpservers = {}
   }
+
+  # baseline config
+  preproduction_config = {
+  }
 }

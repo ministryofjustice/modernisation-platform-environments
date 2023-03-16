@@ -120,7 +120,7 @@ locals {
           oracle-db-name     = "CNOMT1"
           server-type        = "nomis-web"
         }
-        ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-03-13T17-17-03.625Z"
+        ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-03-15T17-18-22.178Z"
 
         autoscaling_group = {
           desired_capacity = 1
@@ -210,6 +210,59 @@ locals {
           min_size = 0
           max_size = 1
         }
+      }
+    }
+  }
+
+  # baseline config
+  test_config = {
+    baseline_lbs = {
+      # AWS doesn't let us call it internal
+      private = {
+        internal_lb              = true
+        enable_delete_protection = false
+        existing_target_groups   = local.existing_target_groups
+        force_destroy_bucket     = true
+        idle_timeout             = 3600
+        public_subnets           = module.environment.subnets["private"].ids
+        security_groups          = [aws_security_group.public.id]
+
+        listeners = {
+          t1-nomis-web-http-7001 = merge(
+            local.lb_weblogic.http-7001, {
+              replace = {
+                target_group_name_replace     = "t1-nomis-web"
+                condition_host_header_replace = "t1-nomis-web"
+              }
+          })
+          t1-nomis-web-http-7777 = merge(
+            local.lb_weblogic.http-7777, {
+              replace = {
+                target_group_name_replace     = "t1-nomis-web"
+                condition_host_header_replace = "t1-nomis-web"
+              }
+            }
+          )
+          t1-nomis-web-https = merge(
+            local.lb_weblogic.https,
+            local.lb_weblogic.route53, {
+              replace = {
+                target_group_name_replace     = "t1-nomis-web"
+                condition_host_header_replace = "t1-nomis-web"
+                route53_record_name_replace   = "t1-nomis-web"
+              }
+          })
+        }
+
+        # public LB not needed right now
+        # public = {
+        #   internal_lb              = false
+        #   enable_delete_protection = false
+        #   force_destroy_bucket     = true
+        #   idle_timeout             = 3600
+        #   public_subnets           = module.environment.subnets["public"].ids
+        #   security_groups          = [aws_security_group.public.id]
+        # }
       }
     }
   }

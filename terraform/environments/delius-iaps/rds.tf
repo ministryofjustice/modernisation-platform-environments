@@ -8,6 +8,8 @@ resource "aws_db_instance" "iaps" {
   username       = local.application_data.accounts[local.environment].db_user
   password       = aws_secretsmanager_secret_version.db_password.secret_string
 
+  snapshot_identifier = try(local.application_data.accounts[local.environment].db_snapshot_identifier, null)
+
   db_subnet_group_name   = aws_db_subnet_group.iaps.id
   vpc_security_group_ids = [aws_security_group.iaps_db.id]
 

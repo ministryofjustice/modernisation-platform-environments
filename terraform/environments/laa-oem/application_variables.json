@@ -1,16 +1,32 @@
 {
   "accounts": {
     "development": {
-      "example_var": "dev-data"
+      "ec2_oem_instance_type_app": "m5.xlarge",
+      "ec2_oem_instance_type_db": "m5.xlarge",
+      "ec2_zone": "eu-west-2b",
+      "env_in_fqdn": "dev",
+      "key_name": "oem-ec2-key-development"
     },
     "test": {
-      "example_var": "test-data"
+      "ec2_oem_instance_type_app": "m5.xlarge",
+      "ec2_oem_instance_type_db": "m5.xlarge",
+      "ec2_zone": "eu-west-2b",
+      "env_in_fqdn": "test",
+      "key_name": "oem-ec2-key-test"
     },
     "preproduction": {
-      "example_var": "preproduction-data"
+      "ec2_oem_instance_type_app": "m5.xlarge",
+      "ec2_oem_instance_type_db": "m5.xlarge",
+      "ec2_zone": "eu-west-2b",
+      "env_in_fqdn": "preprod",
+      "key_name": "oem-ec2-key-preproduction"
     },
     "production": {
-      "example_var": "production-data"
+      "ec2_oem_instance_type_app": "m5.xlarge",
+      "ec2_oem_instance_type_db": "m5.xlarge",
+      "ec2_zone": "eu-west-2b",
+      "env_in_fqdn": "prod",
+      "key_name": "oem-ec2-key-production"
     }
   }
 }
