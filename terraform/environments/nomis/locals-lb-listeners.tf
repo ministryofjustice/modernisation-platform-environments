@@ -40,10 +40,10 @@ locals {
       }
     }
     https = {
-      port             = 443
-      protocol         = "HTTPS"
-      ssl_policy       = "ELBSecurityPolicy-2016-08"
-      certificate_arns = ["application_environment_wildcard_cert"]
+      port                      = 443
+      protocol                  = "HTTPS"
+      ssl_policy                = "ELBSecurityPolicy-2016-08"
+      certificate_names_or_arns = ["application_environment_wildcard_cert"]
       default_action = {
         type = "fixed-response"
         fixed_response = {
