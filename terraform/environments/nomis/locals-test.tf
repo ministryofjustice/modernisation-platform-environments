@@ -222,6 +222,16 @@ locals {
         idle_timeout             = 3600
         public_subnets           = module.environment.subnets["private"].ids
         security_groups          = [aws_security_group.public.id]
+
+        # listeners = {
+        #   t1-nomis-web-http-7001 = merge(
+        #      local.lb_listener_defaults.http-7001, {
+        #       replace = {
+        #         target_group_name_replace     = "t1-nomis-web-internal"
+        #         condition_host_header_replace = "t1-nomis-web-internal"
+        #       }
+        #   })
+        # }
       }
 
       # public LB not needed right now
