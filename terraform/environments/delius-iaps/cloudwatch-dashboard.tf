@@ -20,11 +20,11 @@ locals {
       view    = "timeSeries"
       stacked = false
       region  = data.aws_region.current.name
-      title  = "Iaps EC2 CPU Utilization"
-      period = 60
+      title   = "Iaps EC2 CPU Utilization"
+      period  = 60
       metrics = [
         ["CWAgent", "Processor % Idle Time", "instance", "_Total", "AutoScalingGroupName", module.ec2_iaps_server.autoscaling_group_name, "objectname", "Processor", { color = "#2ca02c", stat = "Minimum" }],
-        [".", "Processor % User Time", ".", ".", ".", ".", ".", ".", { color = "#d62728", stat = "Maximum"}]
+        [".", "Processor % User Time", ".", ".", ".", ".", ".", ".", { color = "#d62728", stat = "Maximum" }]
       ]
     }
   }
