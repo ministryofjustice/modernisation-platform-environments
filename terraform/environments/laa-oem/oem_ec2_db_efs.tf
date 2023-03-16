@@ -1,6 +1,8 @@
 resource "aws_efs_file_system" "oem_db_efs" {
-  encrypted        = true
-  performance_mode = "generalPurpose"
+  availability_zone_name = local.application_data.accounts[local.environment].ec2_zone
+  encrypted              = true
+  kms_key_id             = data.aws_kms_key.ebs_shared.arn
+  performance_mode       = "generalPurpose"
   tags = merge(tomap({
     "Name"                 = "${local.application_name}-db-efs"
     "volume-attach-host"   = "db",
