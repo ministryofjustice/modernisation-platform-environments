@@ -196,7 +196,7 @@ resource "aws_iam_role_policy" "codebuild_role_policy" {
 // Create CodeDeploy app and deployment group
 
 resource "aws_codedeploy_app" "tipstaff_codedeploy" {
-  name     = "tipstaff-codedeploy"
+  name = "tipstaff-codedeploy"
 }
 
 resource "aws_codedeploy_deployment_group" "tipstaff_deployment_group" {
