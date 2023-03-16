@@ -99,24 +99,6 @@ locals {
         }
       }
       rules = {
-        forward-http-7001 = {
-          priority = 100
-          actions = [{
-            type              = "forward"
-            target_group_name = "$(name)-http-7001"
-          }]
-          conditions = [
-            {
-              host_header = {
-                values = ["$(name).nomis.${module.environment.vpc_name}.modernisation-platform.service.justice.gov.uk"]
-              }
-            },
-            {
-              path_pattern = {
-                values = ["/console", "/console/*"]
-              }
-          }]
-        }
         forward-http-7777 = {
           priority = 200
           actions = [{
