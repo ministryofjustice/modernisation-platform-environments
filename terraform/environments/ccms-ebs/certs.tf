@@ -6,7 +6,7 @@ resource "aws_acm_certificate" "external" {
 
   validation_method = "DNS"
   domain_name       = "*.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-#  subject_alternative_names = ["*.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
+  #  subject_alternative_names = ["*.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
 
   tags = merge(local.tags,
     { Environment = local.environment }
@@ -31,7 +31,7 @@ resource "aws_route53_record" "external_validation" {
   depends_on = [
     aws_acm_certificate.external
   ]
-  provider = 	aws.core-vpc
+  provider = aws.core-vpc
   for_each = {
     for dvo in aws_acm_certificate.external[0].domain_validation_options : dvo.domain_name => {
       name   = dvo.resource_record_name
