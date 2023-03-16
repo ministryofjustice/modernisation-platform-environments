@@ -8,8 +8,14 @@ resource "aws_codepipeline" "codepipeline" {
   role_arn = aws_iam_role.codepipeline_role.arn
 
   artifact_store {
-    location = [aws_s3_bucket.pipeline-s3-eu-west-1.bucket, aws_s3_bucket.pipeline-s3-eu-west-2.bucket]
+    location = aws_s3_bucket.pipeline-s3-eu-west-1.bucket
     type     = "S3"
+  }
+
+  artifact_store {
+    location = aws_s3_bucket.pipeline-s3-eu-west-2.bucket
+    type     = "S3"
+    region   = "eu-west-2" 
   }
 
   stage {
