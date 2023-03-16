@@ -80,7 +80,7 @@ resource "aws_ebs_volume" "oem_app_volume_opt_oem_app" {
   depends_on        = [resource.aws_instance.oem_app]
 
   tags = merge(tomap({
-    "Name"                 = "${local.application_name}-app-mnt-oem-app",
+    "Name"                 = "${local.application_name}-app-opt-oem-app",
     "volume-attach-host"   = "app",
     "volume-attach-device" = "/dev/sdc",
     "volume-mount-path"    = "/opt/oem/app"
@@ -110,7 +110,7 @@ resource "aws_ebs_volume" "oem_app_volume_opt_oem_inst" {
   depends_on        = [resource.aws_instance.oem_app]
 
   tags = merge(tomap({
-    "Name"                 = "${local.application_name}-app-mnt-oem-inst",
+    "Name"                 = "${local.application_name}-app-opt-oem-inst",
     "volume-attach-host"   = "app",
     "volume-attach-device" = "/dev/sdd",
     "volume-mount-path"    = "/opt/oem/inst"

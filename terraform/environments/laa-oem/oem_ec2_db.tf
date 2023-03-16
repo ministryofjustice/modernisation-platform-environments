@@ -80,7 +80,7 @@ resource "aws_ebs_volume" "oem_db_volume_opt_oem_app" {
   depends_on        = [resource.aws_instance.oem_db]
 
   tags = merge(tomap({
-    "Name"                 = "${local.application_name}-db-mnt-oem-app",
+    "Name"                 = "${local.application_name}-db-opt-oem-app",
     "volume-attach-host"   = "db",
     "volume-attach-device" = "/dev/sdc",
     "volume-mount-path"    = "/opt/oem/app"
@@ -110,7 +110,7 @@ resource "aws_ebs_volume" "oem_db_volume_opt_oem_inst" {
   depends_on        = [resource.aws_instance.oem_db]
 
   tags = merge(tomap({
-    "Name"                 = "${local.application_name}-db-mnt-oem-inst",
+    "Name"                 = "${local.application_name}-db-opt-oem-inst",
     "volume-attach-host"   = "db",
     "volume-attach-device" = "/dev/sdd",
     "volume-mount-path"    = "/opt/oem/inst"
@@ -140,7 +140,7 @@ resource "aws_ebs_volume" "oem_db_volume_opt_oem_dbf" {
   depends_on        = [resource.aws_instance.oem_db]
 
   tags = merge(tomap({
-    "Name"                 = "${local.application_name}-db-mnt-oem-dbf",
+    "Name"                 = "${local.application_name}-db-opt-oem-dbf",
     "volume-attach-host"   = "db",
     "volume-attach-device" = "/dev/sde",
     "volume-mount-path"    = "/opt/oem/dbf"
@@ -170,7 +170,7 @@ resource "aws_ebs_volume" "oem_db_volume_opt_oem_redo" {
   depends_on        = [resource.aws_instance.oem_db]
 
   tags = merge(tomap({
-    "Name"                 = "${local.application_name}-db-mnt-oem-redo",
+    "Name"                 = "${local.application_name}-db-opt-oem-redo",
     "volume-attach-host"   = "db",
     "volume-attach-device" = "/dev/sdf",
     "volume-mount-path"    = "/opt/oem/redo"
@@ -200,7 +200,7 @@ resource "aws_ebs_volume" "oem_db_volume_opt_oem_arch" {
   depends_on        = [resource.aws_instance.oem_db]
 
   tags = merge(tomap({
-    "Name"                 = "${local.application_name}-db-mnt-oem-arch",
+    "Name"                 = "${local.application_name}-db-opt-oem-arch",
     "volume-attach-host"   = "db",
     "volume-attach-device" = "/dev/sdg",
     "volume-mount-path"    = "/opt/oem/arch"
