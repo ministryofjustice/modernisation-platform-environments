@@ -15,7 +15,7 @@ resource "aws_codepipeline" "codepipeline" {
   artifact_store {
     location = aws_s3_bucket.pipeline-s3-eu-west-2.bucket
     type     = "S3"
-    region   = "eu-west-2" 
+    region   = "eu-west-2"
   }
 
   stage {
