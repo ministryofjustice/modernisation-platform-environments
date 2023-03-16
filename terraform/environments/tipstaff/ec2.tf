@@ -131,8 +131,5 @@ resource "aws_iam_role_policy" "ec2_role_policy" {
 
 resource "aws_iam_instance_profile" "codedeploy_instance_profile" {
   name = "codedeploy-instance-profile"
-
-  roles = [
-    aws_iam_role.ec2_role.name,
-  ]
+  role = aws_iam_role.ec2_role.name
 }
