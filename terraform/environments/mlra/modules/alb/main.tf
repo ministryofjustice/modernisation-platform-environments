@@ -299,7 +299,7 @@ resource "aws_s3_bucket_public_access_block" "cloudfront" {
 #   validation_record_fqdns = [aws_route53_record.aws_route53_record.fqdn]
 # }
 
-resource "aws_cloudfront_distribution" "external_lb" {
+resource "aws_cloudfront_distribution" "external" {
   http_version = "http2"
   origin {
     domain_name              = aws_lb.loadbalancer.dns_name
@@ -548,8 +548,8 @@ resource "aws_route53_record" "cloudfront" {
   type     = "A"
 
   alias {
-    name                   = aws_cloudfront_distribution.external_lb.domain_name
-    zone_id                = aws_cloudfront_distribution.external_lb.hosted_zone_id
+    name                   = aws_cloudfront_distribution.external.domain_name
+    zone_id                = aws_cloudfront_distribution.external.hosted_zone_id
     evaluate_target_health = true
   }
 
