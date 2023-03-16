@@ -27,7 +27,7 @@ resource "aws_security_group_rule" "egress_traffic" {
 }
 
 resource "aws_security_group" "rdp" {
-  name = "rdp ec2 security group"
+  name        = "rdp ec2 security group"
   description = "Allow RDP connection"
   vpc_id      = data.aws_vpc.shared.id
 
@@ -40,7 +40,7 @@ resource "aws_security_group" "rdp" {
 }
 
 resource "aws_security_group" "codedeploy" {
-  name = "CodeDeploy ec2 security group"
+  name        = "CodeDeploy ec2 security group"
   description = "Allow inbound traffic from CodeDeploy service"
   vpc_id      = data.aws_vpc.shared.id
 
