@@ -101,63 +101,63 @@ locals {
     development = {}
 
     test = {
-      nomis-internal-t1-nomis-web-http-7001 = merge(
-        local.lb_listener_defaults.http-7001,
-        local.lb_listener_defaults.nomis_internal, {
-          replace = {
-            target_group_name_replace     = "t1-nomis-web-internal"
-            condition_host_header_replace = "t1-nomis-web-internal"
-          }
-        }
-      )
-      nomis-internal-t1-nomis-web-http-7777 = merge(
-        local.lb_listener_defaults.http-7777,
-        local.lb_listener_defaults.nomis_internal, {
-          replace = {
-            target_group_name_replace     = "t1-nomis-web-internal"
-            condition_host_header_replace = "t1-nomis-web-internal"
-          }
-        }
-      )
-      nomis-internal-t1-nomis-web-https = merge(
-        local.lb_listener_defaults.https,
-        local.lb_listener_defaults.nomis_internal,
-        local.lb_listener_defaults.route53, {
-          replace = {
-            target_group_name_replace     = "t1-nomis-web-internal"
-            condition_host_header_replace = "t1-nomis-web-internal"
-            route53_record_name_replace   = "t1-nomis-web-internal"
-          }
-      })
-
-      nomis-public-t1-nomis-web-http-7001 = merge(
-        local.lb_listener_defaults.http-7001,
-        local.lb_listener_defaults.nomis_public, {
-          replace = {
-            target_group_name_replace     = "t1-nomis-web-public"
-            condition_host_header_replace = "t1-nomis-web"
-          }
-        }
-      )
-      nomis-public-t1-nomis-web-http-7777 = merge(
-        local.lb_listener_defaults.http-7777,
-        local.lb_listener_defaults.nomis_public, {
-          replace = {
-            target_group_name_replace     = "t1-nomis-web-public"
-            condition_host_header_replace = "t1-nomis-web"
-          }
-        }
-      )
-      nomis-public-t1-nomis-web-https = merge(
-        local.lb_listener_defaults.https,
-        local.lb_listener_defaults.nomis_public,
-        local.lb_listener_defaults.route53, {
-          replace = {
-            target_group_name_replace     = "t1-nomis-web-public"
-            condition_host_header_replace = "t1-nomis-web"
-            route53_record_name_replace   = "t1-nomis-web"
-          }
-      })
+      #      nomis-internal-t1-nomis-web-http-7001 = merge(
+      #        local.lb_listener_defaults.http-7001,
+      #        local.lb_listener_defaults.nomis_internal, {
+      #          replace = {
+      #            target_group_name_replace     = "t1-nomis-web-internal"
+      #            condition_host_header_replace = "t1-nomis-web-internal"
+      #          }
+      #        }
+      #      )
+      #      nomis-internal-t1-nomis-web-http-7777 = merge(
+      #        local.lb_listener_defaults.http-7777,
+      #        local.lb_listener_defaults.nomis_internal, {
+      #          replace = {
+      #            target_group_name_replace     = "t1-nomis-web-internal"
+      #            condition_host_header_replace = "t1-nomis-web-internal"
+      #          }
+      #        }
+      #      )
+      #      nomis-internal-t1-nomis-web-https = merge(
+      #        local.lb_listener_defaults.https,
+      #        local.lb_listener_defaults.nomis_internal,
+      #        local.lb_listener_defaults.route53, {
+      #          replace = {
+      #            target_group_name_replace     = "t1-nomis-web-internal"
+      #            condition_host_header_replace = "t1-nomis-web-internal"
+      #            route53_record_name_replace   = "t1-nomis-web-internal"
+      #          }
+      #      })
+      #
+      #      nomis-public-t1-nomis-web-http-7001 = merge(
+      #        local.lb_listener_defaults.http-7001,
+      #        local.lb_listener_defaults.nomis_public, {
+      #          replace = {
+      #            target_group_name_replace     = "t1-nomis-web-public"
+      #            condition_host_header_replace = "t1-nomis-web"
+      #          }
+      #        }
+      #      )
+      #      nomis-public-t1-nomis-web-http-7777 = merge(
+      #        local.lb_listener_defaults.http-7777,
+      #        local.lb_listener_defaults.nomis_public, {
+      #          replace = {
+      #            target_group_name_replace     = "t1-nomis-web-public"
+      #            condition_host_header_replace = "t1-nomis-web"
+      #          }
+      #        }
+      #      )
+      #      nomis-public-t1-nomis-web-https = merge(
+      #        local.lb_listener_defaults.https,
+      #        local.lb_listener_defaults.nomis_public,
+      #        local.lb_listener_defaults.route53, {
+      #          replace = {
+      #            target_group_name_replace     = "t1-nomis-web-public"
+      #            condition_host_header_replace = "t1-nomis-web"
+      #            route53_record_name_replace   = "t1-nomis-web"
+      #          }
+      #      })
     }
 
     preproduction = {}
