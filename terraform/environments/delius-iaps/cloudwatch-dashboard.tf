@@ -37,22 +37,22 @@ locals {
               period = 60
             }
           ],
+          [
+            ".",
+            "Processor % User Time",
+            ".",
+            ".",
+            ".",
+            ".",
+            ".",
+            ".",
+            {
+              color  = "#d62728"
+              stat   = "Maximum"
+              period = 60
+            }
+          ]
         ],
-        [
-          ".",
-          "Processor % User Time",
-          ".",
-          ".",
-          ".",
-          ".",
-          ".",
-          ".",
-          {
-            color  = "#d62728"
-            stat   = "Maximum"
-            period = 60
-          }
-        ]
       ]
     }
   }
