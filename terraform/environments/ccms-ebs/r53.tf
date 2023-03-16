@@ -1,5 +1,4 @@
 ## CERT
-
 resource "aws_route53_record"  "external_validation" {
   depends_on = [
     aws_acm_certificate.external
@@ -19,20 +18,7 @@ resource "aws_route53_record"  "external_validation" {
   type            = each.value.type
   zone_id         = data.aws_route53_zone.network-services.zone_id
 }
-/*
-resource "aws_route53_record" "external_validation" {
-  count    = local.is-production ? 0 : 1
-  provider = aws.core-network-services
 
-  zone_id          = data.aws_route53_zone.network-services.zone_id
-  allow_overwrite  = true
-  name             = "ccms-ebslb"
-  ttl              = "300"
-  type             = "CNAME"
-  records          = [aws_route53_record.external.fqdn]
-
-}
-*/
 
 ## LOADBALANCER
 resource "aws_route53_record" "external" {
