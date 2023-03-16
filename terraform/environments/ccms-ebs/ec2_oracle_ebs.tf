@@ -182,8 +182,7 @@ resource "aws_ebs_volume" "techst" {
 resource "aws_volume_attachment" "techst_att" {
   device_name = "/dev/sdm"
   volume_id   = aws_ebs_volume.techst.id
-  #instance_id = aws_instance.ec2_oracle_ebs.id
-  instance_id = local.environment == "test" ? aws_instance.ec2_ebsapps[0].id : aws_instance.ec2_oracle_ebs.id
+  instance_id = aws_instance.ec2_oracle_ebs.id
 }
 resource "aws_ebs_volume" "backup" {
   lifecycle {
@@ -202,8 +201,7 @@ resource "aws_ebs_volume" "backup" {
 resource "aws_volume_attachment" "backup_att" {
   device_name = "/dev/sdn"
   volume_id   = aws_ebs_volume.backup.id
-  #instance_id = aws_instance.ec2_oracle_ebs.id
-  instance_id = local.environment == "test" ? aws_instance.ec2_ebsapps[0].id : aws_instance.ec2_oracle_ebs.id
+  instance_id = aws_instance.ec2_oracle_ebs.id
 }
 
 
