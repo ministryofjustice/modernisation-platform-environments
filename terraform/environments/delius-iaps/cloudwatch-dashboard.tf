@@ -17,6 +17,9 @@ locals {
     width  = 6
     height = 6
     properties = {
+      view    = "timeSeries"
+      stacked = false
+      region  = data.aws_region.current.name
       metrics = [
         [
           [
