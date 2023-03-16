@@ -113,11 +113,10 @@ locals {
     }
 
     lb_target_groups = {
-      public-http-7001   = local.lb_target_group_http_7001
-      public-http-7777   = local.lb_target_group_http_7777
-      internal-http-7001 = local.lb_target_group_http_7001
-      internal-http-7777 = local.lb_target_group_http_7777
+      http-7001   = local.lb_target_group_http_7001
+      http-7777   = local.lb_target_group_http_7777
     }
+
     cloudwatch_metric_alarms_weblogic = {
       weblogic-node-manager-service = {
         comparison_operator = "GreaterThanOrEqualToThreshold"
