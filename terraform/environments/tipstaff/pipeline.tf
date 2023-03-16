@@ -12,11 +12,6 @@ resource "aws_codepipeline" "codepipeline" {
     type     = "S3"
   }
 
-  artifact_store {
-    location = aws_s3_bucket.pipeline-s3-eu-west-2.bucket
-    type     = "S3"
-  }
-
   stage {
     name = "Source"
 
@@ -57,6 +52,11 @@ resource "aws_codepipeline" "codepipeline" {
 
   stage {
     name = "Deploy"
+
+    artifact_store {
+      location = aws_s3_bucket.pipeline-s3-eu-west-2.bucket
+      type     = "S3"
+    }
 
     action {
       name            = "Deploy"
