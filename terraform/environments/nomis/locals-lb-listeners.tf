@@ -46,9 +46,9 @@ locals {
       }
     }
     https = {
-      port             = 443
-      protocol         = "HTTPS"
-      ssl_policy       = "ELBSecurityPolicy-2016-08"
+      port       = 443
+      protocol   = "HTTPS"
+      ssl_policy = "ELBSecurityPolicy-2016-08"
       # certificate_arns = [module.acm_certificate["star.${module.environment.domains.public.application_environment}"].arn]
       default_action = {
         type = "fixed-response"
