@@ -1,5 +1,5 @@
 ## CERT
-resource "aws_route53_record"  "external_validation" {
+resource "aws_route53_record" "external_validation" {
   depends_on = [
     aws_acm_certificate.external
   ]
