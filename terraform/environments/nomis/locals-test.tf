@@ -212,5 +212,27 @@ locals {
         }
       }
     }
+
+    baseline_lbs = {
+      # AWS doesn't let us call it internal
+      private = {
+        internal_lb              = true
+        enable_delete_protection = false
+        force_destroy_bucket     = true
+        idle_timeout             = 3600
+        public_subnets           = module.environment.subnets["private"].ids
+        security_groups          = [aws_security_group.public.id]
+      }
+
+      # public LB not needed right now
+      # public = {
+      #   internal_lb              = false
+      #   enable_delete_protection = false
+      #   force_destroy_bucket     = true
+      #   idle_timeout             = 3600
+      #   public_subnets           = module.environment.subnets["public"].ids
+      #   security_groups          = [aws_security_group.public.id]
+      # }
+    }
   }
 }
