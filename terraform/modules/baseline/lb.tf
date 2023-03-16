@@ -53,7 +53,7 @@ module "lb_listener" {
   business_unit          = var.environment.business_unit
   environment            = var.environment.environment
   load_balancer_arn      = module.lb[each.value.lb_application_name].load_balancer.arn
-  existing_target_groups = local.asg_target_groups
+  existing_target_groups = merge(local.asg_target_groups, var.lbs[each.value.lb_application_name].existing_target_groups)
   port                   = each.value.port
   protocol               = each.value.protocol
   ssl_policy             = each.value.ssl_policy
@@ -61,6 +61,7 @@ module "lb_listener" {
   default_action         = each.value.default_action
   rules                  = each.value.rules
   route53_records        = each.value.route53_records
+  replace                = each.value.replace
   tags                   = merge(local.tags, each.value.tags)
 
   depends_on = [
