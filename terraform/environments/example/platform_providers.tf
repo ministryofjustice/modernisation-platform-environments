@@ -37,3 +37,11 @@ provider "aws" {
     role_arn = can(regex("modernisation-platform-developer", data.aws_iam_session_context.whoami.issuer_arn)) ? "arn:aws:iam::${local.environment_management.account_ids["core-network-services-production"]}:role/read-dns-records" : "arn:aws:iam::${local.environment_management.account_ids["core-network-services-production"]}:role/modify-dns-records"
   }
 }
+
+provider "aws" {
+  alias  = "us-east-1"
+  region = "us-east-1"
+  assume_role {
+    role_arn = "arn:aws:iam::${local.environment_management.account_ids[local.provider_name]}:role/MemberInfrastructureAccessUSEast"
+  }
+}
