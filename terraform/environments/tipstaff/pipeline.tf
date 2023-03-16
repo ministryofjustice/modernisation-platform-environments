@@ -81,7 +81,7 @@ resource "aws_s3_bucket" "pipeline-s3-eu-west-1" {
 }
 
 resource "aws_s3_bucket" "pipeline-s3-eu-west-2" {
-  bucket   = "pipeline-s3-eu-west-2"
+  bucket = "pipeline-s3-eu-west-2"
 }
 
 // CodePipeline IAM Role & Policy
