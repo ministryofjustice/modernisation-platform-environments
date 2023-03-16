@@ -26,12 +26,12 @@ locals {
     development = {}
 
     test = {
-      nomis-public = {
-        internal_lb = false
-      }
-      nomis-internal = {
-        internal_lb = true
-      }
+      #      nomis-public = {
+      #        internal_lb = false
+      #      }
+      #      nomis-internal = {
+      #        internal_lb = true
+      #      }
     }
 
     preproduction = {}
