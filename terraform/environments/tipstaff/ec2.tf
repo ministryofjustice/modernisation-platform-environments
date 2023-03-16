@@ -44,14 +44,14 @@ resource "aws_security_group" "codedeploy" {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = aws_ip_ranges.eu_codedeploy.cidr_blocks
+    cidr_blocks = data.aws_ip_ranges.eu_codedeploy.cidr_blocks
   }
 
   ingress {
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
-    cidr_blocks = aws_ip_ranges.eu_codedeploy.cidr_blocks
+    cidr_blocks = data.aws_ip_ranges.eu_codedeploy.cidr_blocks
   }
 }
 
