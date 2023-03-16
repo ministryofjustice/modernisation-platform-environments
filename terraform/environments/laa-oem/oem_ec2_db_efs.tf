@@ -1,7 +1,7 @@
 resource "aws_efs_file_system" "oem_db_efs" {
-  encrypted              = true
-  kms_key_id             = data.aws_kms_key.ebs_shared.arn
-  performance_mode       = "generalPurpose"
+  encrypted        = true
+  kms_key_id       = data.aws_kms_key.ebs_shared.arn
+  performance_mode = "generalPurpose"
   tags = merge(tomap({
     "Name"                 = "${local.application_name}-db-efs"
     "volume-attach-host"   = "db",
