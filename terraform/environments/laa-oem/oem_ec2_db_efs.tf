@@ -10,25 +10,9 @@ resource "aws_efs_file_system" "oem_db_efs" {
   }), local.tags)
 }
 
-resource "aws_efs_mount_target" "oem_db_efs_a" {
+resource "aws_efs_mount_target" "oem_db_efs" {
   file_system_id = aws_efs_file_system.oem_db_efs.id
   subnet_id      = data.aws_subnet.data_subnets_a.id
-  security_groups = [
-    aws_security_group.oem_db_efs_sg.id
-  ]
-}
-
-resource "aws_efs_mount_target" "oem_db_efs_b" {
-  file_system_id = aws_efs_file_system.oem_db_efs.id
-  subnet_id      = data.aws_subnet.data_subnets_b.id
-  security_groups = [
-    aws_security_group.oem_db_efs_sg.id
-  ]
-}
-
-resource "aws_efs_mount_target" "oem_db_efs_c" {
-  file_system_id = aws_efs_file_system.oem_db_efs.id
-  subnet_id      = data.aws_subnet.data_subnets_c.id
   security_groups = [
     aws_security_group.oem_db_efs_sg.id
   ]
