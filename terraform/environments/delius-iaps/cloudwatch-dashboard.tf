@@ -34,7 +34,7 @@ locals {
             {
               color  = "#2ca02c"
               stat   = "Minimum"
-              period = 60
+              period = "60"
             }
           ],
           [
@@ -49,7 +49,7 @@ locals {
             {
               color  = "#d62728"
               stat   = "Maximum"
-              period = 60
+              period = "60"
             }
           ]
         ],
