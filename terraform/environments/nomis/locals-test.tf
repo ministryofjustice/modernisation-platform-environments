@@ -120,7 +120,7 @@ locals {
           oracle-db-name     = "CNOMT1"
           server-type        = "nomis-web"
         }
-        ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-03-13T17-17-03.625Z"
+        ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-03-15T17-18-22.178Z"
 
         autoscaling_group = {
           desired_capacity = 1
