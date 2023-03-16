@@ -7,7 +7,7 @@ resource "aws_instance" "oem_db" {
   instance_type               = local.application_data.accounts[local.environment].ec2_oem_instance_type_db
   key_name                    = local.application_data.accounts[local.environment].key_name
   monitoring                  = true
-  subnet_id                   = data.aws_subnet.data_subnets_b.id
+  subnet_id                   = data.aws_subnet.data_subnets_a.id
   user_data_replace_on_change = true
   user_data = base64encode(templatefile("./templates/oem-user-data-db.sh", {
     efs_fqdn = aws_efs_file_system.oem_db_efs.dns_name
