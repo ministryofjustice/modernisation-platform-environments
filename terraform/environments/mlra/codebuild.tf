@@ -1,4 +1,4 @@
-module "mlra-selenium" {
+module "codebuild" {
   count  = local.environment == "development" ? 1 : 0
   source = "./modules/codebuild"
 
