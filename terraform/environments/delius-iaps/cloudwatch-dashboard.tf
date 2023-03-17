@@ -94,7 +94,7 @@ locals {
       region  = data.aws_region.current.name
       title   = "Iaps Error Log"
       period  = local.cloudwatch_period
-      query   = "SOURCE 'IAPS' | fields @timestamp, @message\n| sort @timestamp desc\n| filter @logStream like /i2n-daysummary.log/\n| filter @message like /ERROR/\n| stats count() by bin(1m)"
+      query   = "SOURCE '/iaps/ndinterface/daysummary.log' | fields @timestamp, @message\n| sort @timestamp desc\n| filter @message like /ERROR/\n| stats count() by bin(1m)"
     }
   }
 
