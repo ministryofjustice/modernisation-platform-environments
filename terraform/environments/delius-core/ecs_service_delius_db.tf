@@ -206,29 +206,28 @@ resource "aws_vpc_security_group_ingress_rule" "delius-db-security_group_ingress
   cidr_ipv4   = each.key
 }
 
+resource "aws_ecs_service" "delius-db-service" {
+  cluster         = aws_ecs_cluster.aws_ecs_cluster.id
+  name            = local.fully_qualified_name
+  task_definition = aws_ecs_task_definition.delius_db_task_definition.arn
+  network_configuration {
+    assign_public_ip = false
+    subnets          = data.aws_subnets.shared-data.ids
+    security_groups = [aws_security_group.delius_db_security_group.id]
+  }
+  desired_count                      = 1
+  deployment_minimum_healthy_percent = 100
+  deployment_maximum_percent         = 200
+  enable_execute_command             = true
+  force_new_deployment               = true
+  iam_role                           = aws_iam_role.delius_db_ecs_service.arn
+  launch_type                        = "FARGATE"
+  platform_version                   = "LATEST"
+  propagate_tags                     = "SERVICE"
+  tags                                = local.tags
+  triggers                           = {} # Change this for force redeployment
 
-# resource "aws_ecs_service" "delius-db-service" {
-#   cluster         = aws_ecs_cluster.aws_ecs_cluster.id
-#   name            = local.fully_qualified_name
-#   task_definition = aws_ecs_task_definition.delius_db_task_definition.arn
-#   network_configuration {
-#     assign_public_ip = false
-#     subnets          = data.aws_subnets.shared-data.ids
-#     # security_groups = 
-#   }
-#   desired_count                      = 1
-#   deployment_minimum_healthy_percent = 100
-#   deployment_maximum_percent         = 200
-#   enable_execute_command             = true
-#   force_new_deployment               = true
-#   iam_role                           = aws_iam_role.delius_db_ecs_service.arn
-#   launch_type                        = "FARGATE"
-#   platform_version                   = "LATEST"
-#   propagate_tags                     = "SERVICE"
-#   tag                                = local.tags
-#   triggers                           = [] # Change this for force redeployment
-
-# }
+}
 
 # module "deploy" {
 #   source                    = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=f1ace6467418d0df61fd8ff6beabd1c028798d39"
