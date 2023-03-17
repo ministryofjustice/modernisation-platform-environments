@@ -35,7 +35,7 @@ locals {
       view    = "timeSeries"
       stacked = false
       region  = data.aws_region.current.name
-      title   = "Iaps EC2 CPU Utilization"
+      title   = "EC2 CPU Utilization"
       period  = local.cloudwatch_period
       metrics = [
         ["CWAgent", "Processor % Idle Time", "instance", "_Total", "AutoScalingGroupName", module.ec2_iaps_server.autoscaling_group_name, "objectname", "Processor", { color = "#2ca02c", stat = "Minimum" }],
@@ -54,7 +54,7 @@ locals {
       view    = "timeSeries"
       stacked = false
       region  = data.aws_region.current.name
-      title   = "Iaps EC2 Memory Utilization"
+      title   = "EC2 Memory Utilization"
       period  = local.cloudwatch_period
       metrics = [
         ["CWAgent", "Paging File % Usage", "instance", "\\??\\C:\\pagefile.sys", "AutoScalingGroupName", module.ec2_iaps_server.autoscaling_group_name, "objectname", "Paging File", { color = "#d62728" }],
@@ -73,7 +73,7 @@ locals {
       view    = "timeSeries"
       stacked = false
       region  = data.aws_region.current.name
-      title   = "Iaps EC2 Disk Utilization"
+      title   = "EC2 Disk Utilization"
       period  = local.cloudwatch_period
       metrics = [
         ["CWAgent", "PhysicalDisk % Disk Time", "instance", "0 C:", "AutoScalingGroupName", module.ec2_iaps_server.autoscaling_group_name, "objectname", "PhysicalDisk"],
@@ -92,7 +92,7 @@ locals {
       view    = "timeSeries"
       stacked = false
       region  = data.aws_region.current.name
-      title   = "Iaps Error Log"
+      title   = "Error Log"
       period  = local.cloudwatch_period
       query   = "SOURCE '/iaps/ndinterface/daysummary.log' | fields @timestamp, @message\n| sort @timestamp desc\n| filter @message like /ERROR/\n| stats count() by bin(1m)"
     }
@@ -108,7 +108,7 @@ locals {
       view    = "timeSeries"
       stacked = false
       region  = data.aws_region.current.name
-      title   = "Iaps RDS CPU Utilization"
+      title   = "RDS CPU Utilization"
       period  = local.cloudwatch_period
       metrics = [
         ["AWS/RDS", "CPUUtilization", "DBInstanceIdentifier", aws_db_instance.iaps.identifier],
@@ -128,7 +128,7 @@ locals {
       view    = "timeSeries"
       stacked = false
       region  = data.aws_region.current.name
-      title   = "Iaps RDS Connections"
+      title   = "RDS Connections"
       period  = local.cloudwatch_period
       metrics = [
         ["AWS/RDS", "DatabaseConnections", "DBInstanceIdentifier", aws_db_instance.iaps.identifier]
@@ -146,7 +146,7 @@ locals {
       view    = "timeSeries"
       stacked = false
       region  = data.aws_region.current.name
-      title   = "Iaps RDS Memory Utilization"
+      title   = "RDS Memory Utilization"
       period  = local.cloudwatch_period
       metrics = [
         ["AWS/RDS", "FreeableMemory", "DBInstanceIdentifier", aws_db_instance.iaps.identifier],
@@ -164,7 +164,7 @@ locals {
       view    = "timeSeries"
       stacked = false
       region  = data.aws_region.current.name
-      title   = "Iaps RDS Storage Utilization"
+      title   = "RDS Storage Utilization"
       period  = local.cloudwatch_period
       metrics = [
         ["AWS/RDS", "FreeStorageSpace", "DBInstanceIdentifier", aws_db_instance.iaps.identifier],
@@ -182,7 +182,7 @@ locals {
       view    = "timeSeries"
       stacked = false
       region  = data.aws_region.current.name
-      title   = "Iaps RDS Read Utilization"
+      title   = "RDS Read Utilization"
       period  = local.cloudwatch_period
       metrics = [
         ["AWS/RDS", "ReadIOPS", "DBInstanceIdentifier", aws_db_instance.iaps.identifier],
@@ -202,7 +202,7 @@ locals {
       view    = "timeSeries"
       stacked = false
       region  = data.aws_region.current.name
-      title   = "Iaps RDS Write Utilization"
+      title   = "RDS Write Utilization"
       period  = local.cloudwatch_period
       metrics = [
         ["AWS/RDS", "WriteIOPS", "DBInstanceIdentifier", aws_db_instance.iaps.identifier],
@@ -222,7 +222,7 @@ locals {
       view    = "timeSeries"
       stacked = false
       region  = data.aws_region.current.name
-      title   = "Iaps RDS Network Utilization"
+      title   = "RDS Network Utilization"
       period  = local.cloudwatch_period
       metrics = [
         ["AWS/RDS", "NetworkReceiveThroughput", "DBInstanceIdentifier", aws_db_instance.iaps.identifier],
@@ -241,7 +241,7 @@ locals {
       view    = "timeSeries"
       stacked = false
       region  = data.aws_region.current.name
-      title   = "Iaps RDS CPU Credit Utilization"
+      title   = "RDS CPU Credit Utilization"
       period  = local.cloudwatch_period
       metrics = [
         ["AWS/RDS", "CPUCreditUsage", "DBInstanceIdentifier", aws_db_instance.iaps.identifier],
@@ -260,7 +260,7 @@ locals {
       view    = "timeSeries"
       stacked = false
       region  = data.aws_region.current.name
-      title   = "Iaps System Event Log"
+      title   = "System Event Log"
       period  = local.cloudwatch_period
       query   = "SOURCE '/iaps/system-events' | fields @timestamp, @message\n| sort @timestamp desc\n| stats count() by bin(1m)"
     }
@@ -276,7 +276,7 @@ locals {
       view    = "timeSeries"
       stacked = false
       region  = data.aws_region.current.name
-      title   = "Iaps Total Log Events"
+      title   = "Total Log Events"
       period  = local.cloudwatch_period
       metrics = [
         for log_group in local.cloudwatch_agent_log_group_names : [
