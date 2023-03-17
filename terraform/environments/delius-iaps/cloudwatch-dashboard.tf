@@ -111,7 +111,7 @@ locals {
       title   = "Iaps RDS CPU Utilization"
       period  = local.cloudwatch_period
       metrics = [
-        ["AWS/RDS", "CPUUtilization", "DBInstanceIdentifier", aws_db_instance.iaps.name],
+        ["AWS/RDS", "CPUUtilization", "DBInstanceIdentifier", aws_db_instance.iaps.identifier],
         [".", "CPUCreditUsage", ".", "."],
         [".", "BurstBalance", ".", "."]
       ]
@@ -131,7 +131,7 @@ locals {
       title   = "Iaps RDS Connections"
       period  = local.cloudwatch_period
       metrics = [
-        ["AWS/RDS", "DatabaseConnections", "DBInstanceIdentifier", aws_db_instance.iaps.name]
+        ["AWS/RDS", "DatabaseConnections", "DBInstanceIdentifier", aws_db_instance.iaps.identifier]
       ]
     }
   }
@@ -149,7 +149,7 @@ locals {
       title   = "Iaps RDS Memory Utilization"
       period  = local.cloudwatch_period
       metrics = [
-        ["AWS/RDS", "FreeableMemory", "DBInstanceIdentifier", aws_db_instance.iaps.name],
+        ["AWS/RDS", "FreeableMemory", "DBInstanceIdentifier", aws_db_instance.iaps.identifier],
       ]
     }
   }
@@ -167,7 +167,7 @@ locals {
       title   = "Iaps RDS Storage Utilization"
       period  = local.cloudwatch_period
       metrics = [
-        ["AWS/RDS", "FreeStorageSpace", "DBInstanceIdentifier", aws_db_instance.iaps.name],
+        ["AWS/RDS", "FreeStorageSpace", "DBInstanceIdentifier", aws_db_instance.iaps.identifier],
       ]
     }
   }
@@ -185,7 +185,7 @@ locals {
       title   = "Iaps RDS Read Utilization"
       period  = local.cloudwatch_period
       metrics = [
-        ["AWS/RDS", "ReadIOPS", "DBInstanceIdentifier", aws_db_instance.iaps.name],
+        ["AWS/RDS", "ReadIOPS", "DBInstanceIdentifier", aws_db_instance.iaps.identifier],
         [".", "ReadLatency", ".", "."],
         [".", "ReadThroughput", ".", "."]
       ]
@@ -205,7 +205,7 @@ locals {
       title   = "Iaps RDS Write Utilization"
       period  = local.cloudwatch_period
       metrics = [
-        ["AWS/RDS", "WriteIOPS", "DBInstanceIdentifier", aws_db_instance.iaps.name],
+        ["AWS/RDS", "WriteIOPS", "DBInstanceIdentifier", aws_db_instance.iaps.identifier],
         [".", "WriteLatency", ".", "."],
         [".", "WriteThroughput", ".", "."]
       ]
@@ -225,7 +225,7 @@ locals {
       title   = "Iaps RDS Network Utilization"
       period  = local.cloudwatch_period
       metrics = [
-        ["AWS/RDS", "NetworkReceiveThroughput", "DBInstanceIdentifier", aws_db_instance.iaps.name],
+        ["AWS/RDS", "NetworkReceiveThroughput", "DBInstanceIdentifier", aws_db_instance.iaps.identifier],
         [".", "NetworkTransmitThroughput", ".", "."]
       ]
     }
@@ -244,7 +244,7 @@ locals {
       title   = "Iaps RDS CPU Credit Utilization"
       period  = local.cloudwatch_period
       metrics = [
-        ["AWS/RDS", "CPUCreditUsage", "DBInstanceIdentifier", aws_db_instance.iaps.name],
+        ["AWS/RDS", "CPUCreditUsage", "DBInstanceIdentifier", aws_db_instance.iaps.identifier],
         [".", "CPUCreditBalance", ".", "."]
       ]
     }
