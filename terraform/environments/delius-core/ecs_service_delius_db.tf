@@ -146,9 +146,9 @@ resource "aws_ecs_task_definition" "delius_db_task_definition" {
         logConfiguration = {
           logDriver = "awslogs"
           options = {
-            awslogs-group         = "delius-core-testing-db-ecs"
-            awslogs-region        = "eu-west-2"
-            awslogs-stream-prefix = "delius-core-testing-db"
+            awslogs-group         = local.fully_qualified_name
+            awslogs-region        = data.aws_region.current.name
+            awslogs-stream-prefix = local.fully_qualified_name
           }
         }
         memory      = 4096
@@ -217,6 +217,13 @@ resource "aws_vpc_security_group_egress_rule" "delius_db_security_group_egress_i
   cidr_ipv4         = "0.0.0.0/0"
 }
 
+# Pre-req - CloudWatch log group
+# By default, server-side-encryption is used
+resource "aws_cloudwatch_log_group" "delius_db_log_group" {
+  name = local.fully_qualified_name
+  retention_in_days = 7
+  tags = local.tags
+}
 
 # Create the ECS service
 resource "aws_ecs_service" "delius-db-service" {
