@@ -543,7 +543,7 @@ resource "aws_route53_record" "cloudfront" {
   #   }
   # }
   provider = aws.core-vpc
-  zone_id  = var.services_zone_id
+  zone_id  = var.external_zone_id
   name     = local.domain_name
   type     = "A"
 
@@ -556,6 +556,7 @@ resource "aws_route53_record" "cloudfront" {
   # records  = [each.value.record]
 }
 
+# Use core-network-services provider to validate top-level domain
 resource "aws_route53_record" "external_validation" {
   provider = aws.core-network-services
 
@@ -567,6 +568,7 @@ resource "aws_route53_record" "external_validation" {
   zone_id         = var.services_zone_id
 }
 
+# Use core-vpc provider to validate business-unit domain
 resource "aws_route53_record" "external_validation_subdomain" {
   count    = length(local.domain_name_sub)
   provider = aws.core-vpc
