@@ -185,7 +185,7 @@ resource "aws_ecs_task_definition" "delius_db_task_definition" {
 # module "container" {
 #   source                   = "git::https://github.com/cloudposse/terraform-aws-ecs-container-definition.git?ref=tags/0.58.2"
 #   container_name           = local.fully_qualified_name
-#   container_image          = "374269020027.dkr.ecr.${data.aws_region.current.name}.amazonaws.com/${local.fully_qualified_name}-ecr-repo:${local.image_tag}"
+#   container_image          = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.${data.aws_region.current.name}.amazonaws.com/${local.fully_qualified_name}-ecr-repo:${local.image_tag}"
 #   container_memory         = "4096"
 #   container_cpu            = "1024"
 #   essential                = true
