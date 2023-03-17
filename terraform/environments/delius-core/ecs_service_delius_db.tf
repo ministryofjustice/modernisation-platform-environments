@@ -186,13 +186,15 @@ resource "aws_ecs_task_definition" "delius_db_task_definition" {
 # Pre-req - security groups
 resource "aws_security_group" "delius_db_security_group" {
   name        = "delius weblogic to delius db"
-  description = "Rules to allow the weblogic ecs service to talk to database service"
+  description = "Rules for the delius testing db ecs service"
   vpc_id      = data.aws_vpc.shared.id
   tags        = local.tags
 }
 
-resource "aws_vpc_security_group_ingress_rule" "delius-db-security_group_ingress_private_subnets" {
+# Need to rework this
+resource "aws_vpc_security_group_ingress_rule" "delius_db_security_group_ingress_private_subnets" {
   security_group_id = aws_security_group.delius_db_security_group.id
+  description       = "weblogic to testing db"
   for_each = toset(
     [
       data.aws_subnet.private_subnets_a.cidr_block,
@@ -206,6 +208,17 @@ resource "aws_vpc_security_group_ingress_rule" "delius-db-security_group_ingress
   cidr_ipv4   = each.key
 }
 
+resource "aws_vpc_security_group_egress_rule" "delius_db_security_group_egress_internet" {
+  security_group_id = aws_security_group.delius_db_security_group.id
+  description       = "outbound from the testing db ecs service"
+  from_port         = 0
+  to_port           = 0
+  ip_protocol       = "-1"
+  cidr_ipv4         = "0.0.0.0/0"
+}
+
+
+# Create the ECS service
 resource "aws_ecs_service" "delius-db-service" {
   cluster         = aws_ecs_cluster.aws_ecs_cluster.id
   name            = local.fully_qualified_name
@@ -213,7 +226,7 @@ resource "aws_ecs_service" "delius-db-service" {
   network_configuration {
     assign_public_ip = false
     subnets          = data.aws_subnets.private-public.ids
-    security_groups = [aws_security_group.delius_db_security_group.id]
+    security_groups  = [aws_security_group.delius_db_security_group.id]
   }
   desired_count                      = 1
   deployment_minimum_healthy_percent = 100
@@ -223,7 +236,7 @@ resource "aws_ecs_service" "delius-db-service" {
   launch_type                        = "FARGATE"
   platform_version                   = "LATEST"
   propagate_tags                     = "SERVICE"
-  tags                                = local.tags
+  tags                               = local.tags
   triggers                           = {} # Change this for force redeployment
 
 }
