@@ -211,8 +211,6 @@ resource "aws_vpc_security_group_ingress_rule" "delius_db_security_group_ingress
 resource "aws_vpc_security_group_egress_rule" "delius_db_security_group_egress_internet" {
   security_group_id = aws_security_group.delius_db_security_group.id
   description       = "outbound from the testing db ecs service"
-  from_port         = 0
-  to_port           = 0
   ip_protocol       = "-1"
   cidr_ipv4         = "0.0.0.0/0"
 }
