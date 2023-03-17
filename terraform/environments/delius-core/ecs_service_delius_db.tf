@@ -212,7 +212,7 @@ resource "aws_vpc_security_group_egress_rule" "delius_db_security_group_egress_i
   security_group_id = aws_security_group.delius_db_security_group.id
   description       = "outbound from the testing db ecs service"
   from_port         = 0
-  to_port           = 65535
+  to_port           = 0
   ip_protocol       = "-1"
   cidr_ipv4         = "0.0.0.0/0"
 }
@@ -220,9 +220,9 @@ resource "aws_vpc_security_group_egress_rule" "delius_db_security_group_egress_i
 # Pre-req - CloudWatch log group
 # By default, server-side-encryption is used
 resource "aws_cloudwatch_log_group" "delius_db_log_group" {
-  name = local.fully_qualified_name
+  name              = local.fully_qualified_name
   retention_in_days = 7
-  tags = local.tags
+  tags              = local.tags
 }
 
 # Create the ECS service
