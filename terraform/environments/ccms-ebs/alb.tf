@@ -1,11 +1,11 @@
 resource "aws_lb" "ebsapps_lb" {
   name               = lower(format("lb-%s-%s-ebsapp", local.application_name, local.environment))
-  internal           = false
+  internal           = true
   load_balancer_type = "application"
   security_groups    = [aws_security_group.sg_ebsapps_lb.id]
-  subnets            = data.aws_subnets.shared-public.ids
+  subnets            = data.aws_subnets.private-public.ids
 
-  enable_deletion_protection = false
+  enable_deletion_protection = true
 
   access_logs {
     bucket  = module.s3-bucket-logging.bucket.id
@@ -20,14 +20,14 @@ resource "aws_lb" "ebsapps_lb" {
 
 resource "aws_lb_listener" "ebsapps_listener" {
   depends_on = [
-    aws_acm_certificate_validation.external-mp
+    aws_acm_certificate_validation.external
   ]
 
   load_balancer_arn = aws_lb.ebsapps_lb.arn
   port              = "443"
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = aws_acm_certificate.external-mp[0].arn
+  certificate_arn   = aws_acm_certificate.external[0].arn
 
   default_action {
     type             = "forward"

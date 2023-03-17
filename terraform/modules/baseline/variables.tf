@@ -309,12 +309,13 @@ variable "lbs" {
     internal_lb              = optional(bool, false)
     security_groups          = list(string)
     public_subnets           = list(string)
+    existing_target_groups   = optional(map(any), {})
     tags                     = optional(map(string), {})
     listeners = optional(map(object({
-      port             = number
-      protocol         = string
-      ssl_policy       = optional(string)
-      certificate_arns = optional(list(string), [])
+      port                      = number
+      protocol                  = string
+      ssl_policy                = optional(string)
+      certificate_names_or_arns = optional(list(string), [])
       default_action = object({
         type              = string
         target_group_name = optional(string)

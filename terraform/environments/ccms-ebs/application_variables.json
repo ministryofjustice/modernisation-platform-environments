@@ -337,5 +337,20 @@
       "protocol": "TCP",
       "destination_cidr": "0.0.0.0/0"
     }
+  },
+  "lb_sg_ingress_rules": {
+    "UDP_ALL": {
+      "from_port": 443,
+      "to_port": 443,
+      "protocol": "TCP"
+    }
+  },
+  "lb_sg_egress_rules": {
+    "TCP_80": {
+      "from_port": 0,
+      "to_port": 0,
+      "protocol": "TCP",
+      "destination_cidr": "0.0.0.0/0"
+    }
   }
 }

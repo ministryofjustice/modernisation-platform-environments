@@ -212,37 +212,58 @@ locals {
         }
       }
     }
+  }
 
+  # baseline config
+  test_config = {
     baseline_lbs = {
-      # AWS doesn't let us call it internal
+      # AWS doesn't let us call it internal
       private = {
         internal_lb              = true
         enable_delete_protection = false
+        existing_target_groups   = local.existing_target_groups
         force_destroy_bucket     = true
         idle_timeout             = 3600
         public_subnets           = module.environment.subnets["private"].ids
         security_groups          = [aws_security_group.public.id]
 
-        # listeners = {
-        #   t1-nomis-web-http-7001 = merge(
-        #      local.lb_listener_defaults.http-7001, {
-        #       replace = {
-        #         target_group_name_replace     = "t1-nomis-web-internal"
-        #         condition_host_header_replace = "t1-nomis-web-internal"
-        #       }
-        #   })
+        listeners = {
+          t1-nomis-web-http-7001 = merge(
+            local.lb_weblogic.http-7001, {
+              replace = {
+                target_group_name_replace     = "t1-nomis-web"
+                condition_host_header_replace = "t1-nomis-web"
+              }
+          })
+          t1-nomis-web-http-7777 = merge(
+            local.lb_weblogic.http-7777, {
+              replace = {
+                target_group_name_replace     = "t1-nomis-web"
+                condition_host_header_replace = "t1-nomis-web"
+              }
+            }
+          )
+          t1-nomis-web-https = merge(
+            local.lb_weblogic.https,
+            local.lb_weblogic.route53, {
+              replace = {
+                target_group_name_replace     = "t1-nomis-web"
+                condition_host_header_replace = "t1-nomis-web"
+                route53_record_name_replace   = "t1-nomis-web"
+              }
+          })
+        }
+
+        # public LB not needed right now
+        # public = {
+        #   internal_lb              = false
+        #   enable_delete_protection = false
+        #   force_destroy_bucket     = true
+        #   idle_timeout             = 3600
+        #   public_subnets           = module.environment.subnets["public"].ids
+        #   security_groups          = [aws_security_group.public.id]
         # }
       }
-
-      # public LB not needed right now
-      # public = {
-      #   internal_lb              = false
-      #   enable_delete_protection = false
-      #   force_destroy_bucket     = true
-      #   idle_timeout             = 3600
-      #   public_subnets           = module.environment.subnets["public"].ids
-      #   security_groups          = [aws_security_group.public.id]
-      # }
     }
   }
 }
