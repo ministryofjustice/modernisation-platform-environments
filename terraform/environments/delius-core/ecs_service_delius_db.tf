@@ -220,7 +220,6 @@ resource "aws_ecs_service" "delius-db-service" {
   deployment_maximum_percent         = 200
   enable_execute_command             = true
   force_new_deployment               = true
-  iam_role                           = aws_iam_role.delius_db_ecs_service.arn
   launch_type                        = "FARGATE"
   platform_version                   = "LATEST"
   propagate_tags                     = "SERVICE"
