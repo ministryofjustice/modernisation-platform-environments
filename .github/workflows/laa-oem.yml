@@ -119,6 +119,7 @@ jobs:
         include:
           - environment: development
           - environment: test
+    continue-on-error: true
     name: Terraform destroy plan - ${{ github.workflow }} - ${{  matrix.environment }}
     runs-on: ubuntu-latest
     if: github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'destroy'
@@ -156,6 +157,7 @@ jobs:
         include:
           - environment: development
           - environment: test
+    continue-on-error: true
     name: Terraform destroy apply - ${{ github.workflow }} - ${{  matrix.environment }}
     runs-on: ubuntu-latest
     env:
