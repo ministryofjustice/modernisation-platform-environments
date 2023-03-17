@@ -43,6 +43,36 @@ resource "aws_cloudwatch_metric_alarm" "read_latency_over_threshold" {
   comparison_operator = "GreaterThanThreshold"
 }
 
+resource "aws_cloudwatch_metric_alarm" "write_latency_over_threshold" {
+  alarm_name          = "jitbit-rds-write-latency-threshold"
+  alarm_description   = "Triggers alarm if RDS write latency crosses a threshold"
+  namespace           = "AWS/RDS"
+  metric_name         = "WriteLatency"
+  statistic           = "Average"
+  period              = "60"
+  evaluation_periods  = "5"
+  alarm_actions       = [aws_sns_topic.jitbit_alerting.arn]
+  ok_actions          = [aws_sns_topic.jitbit_alerting.arn]
+  threshold           = "5"
+  treat_missing_data  = "missing"
+  comparison_operator = "GreaterThanThreshold"
+}
+
+resource "aws_cloudwatch_metric_alarm" "db_connections_over_threshold" {
+  alarm_name          = "jitbit-rds-db-connections-threshold"
+  alarm_description   = "Triggers alarm if RDS database connections crosses a threshold"
+  namespace           = "AWS/RDS"
+  metric_name         = "DatabaseConnections"
+  statistic           = "Average"
+  period              = "60"
+  evaluation_periods  = "5"
+  alarm_actions       = [aws_sns_topic.jitbit_alerting.arn]
+  ok_actions          = [aws_sns_topic.jitbit_alerting.arn]
+  threshold           = "100"
+  treat_missing_data  = "missing"
+  comparison_operator = "GreaterThanThreshold"
+}
+
 # SNS topic for monitoring to send alarms to
 resource "aws_sns_topic" "jitbit_alerting" {
   name = "jitbit_alerting"
