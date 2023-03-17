@@ -142,7 +142,7 @@ resource "aws_ecs_task_definition" "delius_db_task_definition" {
       {
         cpu       = 1024
         essential = true
-        image     = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/delius-core-testing-db-ecr-repo:${local.image_tag}"
+        image     = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-testing-db-ecr-repo:${local.image_tag}"
         logConfiguration = {
           logDriver = "awslogs"
           options = {
