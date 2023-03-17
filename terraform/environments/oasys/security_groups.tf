@@ -105,7 +105,7 @@ resource "aws_security_group" "data" {
     protocol    = "TCP"
     cidr_blocks = local.security_group_cidrs.ssh
     security_groups = [
-      module.bastion_linux.bastion_security_group
+      # module.bastion_linux.bastion_security_group
     ]
   }
 
@@ -116,7 +116,7 @@ resource "aws_security_group" "data" {
     protocol    = "TCP"
     cidr_blocks = [module.ip_addresses.moj_cidr.aws_cloud_platform_vpc]
     security_groups = [
-      module.bastion_linux.bastion_security_group
+      # module.bastion_linux.bastion_security_group
     ]
   }
 
@@ -127,7 +127,7 @@ resource "aws_security_group" "data" {
     protocol    = "TCP"
     cidr_blocks = [module.ip_addresses.moj_cidr.aws_cloud_platform_vpc]
     security_groups = [
-      module.bastion_linux.bastion_security_group
+      # module.bastion_linux.bastion_security_group
     ]
   }
 
@@ -138,7 +138,7 @@ resource "aws_security_group" "data" {
     protocol    = "TCP"
     cidr_blocks = local.security_group_cidrs.oracle_db
     security_groups = [
-      module.bastion_linux.bastion_security_group
+      # module.bastion_linux.bastion_security_group
     ]
   }
 
@@ -149,7 +149,7 @@ resource "aws_security_group" "data" {
     protocol    = "TCP"
     cidr_blocks = local.security_group_cidrs.oracle_oem_agent
     security_groups = [
-      module.bastion_linux.bastion_security_group
+      # module.bastion_linux.bastion_security_group
     ]
   }
 
@@ -188,7 +188,7 @@ resource "aws_security_group" "public" {
     protocol    = "TCP"
     cidr_blocks = local.security_group_cidrs.ssh
     security_groups = [
-      module.bastion_linux.bastion_security_group
+      # module.bastion_linux.bastion_security_group
     ]
   }
 
@@ -198,7 +198,7 @@ resource "aws_security_group" "public" {
     to_port     = 443
     protocol    = "tcp"
     security_groups = [
-      module.bastion_linux.bastion_security_group
+      # module.bastion_linux.bastion_security_group
     ]
     cidr_blocks = local.security_group_cidrs.https
   }
@@ -209,7 +209,7 @@ resource "aws_security_group" "public" {
     to_port     = 7001
     protocol    = "tcp"
     security_groups = [
-      module.bastion_linux.bastion_security_group
+      # module.bastion_linux.bastion_security_group
     ]
     cidr_blocks = local.security_group_cidrs.http7xxx
   }
@@ -220,7 +220,7 @@ resource "aws_security_group" "public" {
     to_port     = 7777
     protocol    = "tcp"
     security_groups = [
-      module.bastion_linux.bastion_security_group
+      # module.bastion_linux.bastion_security_group
 
     ]
     cidr_blocks = local.security_group_cidrs.http7xxx
