@@ -148,12 +148,22 @@ resource "aws_cloudwatch_dashboard" "jitbit_rds" {
                         "metricName": "CPUUtilization",
                         "resourceType": "AWS::RDS::DBInstance",
                         "stat": "Average"
+                    },
+                    {
+                        "metricName": "WriteLatency",
+                        "resourceType": "AWS::RDS::DBInstance",
+                        "stat": "Average"
+                    },
+                    {
+                        "metricName": "DatabaseConnections",
+                        "resourceType": "AWS::RDS::DBInstance",
+                        "stat": "Average"
                     }
                 ],
                 "labels": [
                     {
                         "key": "Name",
-                        "value": "delius-jitbit-development-database"
+                        "value": "delius-jitbit-${local.environment}-database"
                     }
                 ],
                 "widgetOptions": {
