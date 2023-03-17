@@ -180,37 +180,56 @@ resource "aws_ecs_task_definition" "delius_db_task_definition" {
   task_role_arn = aws_iam_role.delius_db_ecs_exec.arn
 }
 
-
-
-# module "container" {
-#   source                   = "git::https://github.com/cloudposse/terraform-aws-ecs-container-definition.git?ref=tags/0.58.2"
-#   container_name           = local.fully_qualified_name
-#   container_image          = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.${data.aws_region.current.name}.amazonaws.com/${local.fully_qualified_name}-ecr-repo:${local.image_tag}"
-#   container_memory         = "4096"
-#   container_cpu            = "1024"
-#   essential                = true
-#   readonly_root_filesystem = false
-#   environment              = []
-#   port_mappings = [{
-#     containerPort = local.container_port
-#     hostPort      = local.container_port
-#     protocol      = "tcp"
-#   }]
-#   log_configuration = {
-#     logDriver = "awslogs"
-#     options = {
-#       "awslogs-group"         = "${local.fully_qualified_name}-ecs"
-#       "awslogs-region"        = data.aws_region.current.name
-#       "awslogs-stream-prefix" = local.fully_qualified_name
-#     }
-#   }
-#   secrets = [
-#   ]
-# }
-
 # ##
 # # Service and task deployment
 # ##
+# Pre-req - security groups
+resource "aws_security_group" "delius_db_security_group" {
+  name        = "delius weblogic to delius db"
+  description = "Rules to allow the weblogic ecs service to talk to database service"
+  vpc_id      = data.aws_vpc.shared.id
+  tags        = local.tags
+}
+
+resource "aws_vpc_security_group_ingress_rule" "delius-db-security_group_ingress_private_subnets" {
+  security_group_id = aws_security_group.delius_db_security_group.id
+  for_each = toset(
+    [
+      data.aws_subnet.private_subnets_a.cidr_block,
+      data.aws_subnet.private_subnets_b.cidr_block,
+      data.aws_subnet.private_subnets_c.cidr_block
+    ]
+  )
+  from_port   = local.container_port
+  to_port     = local.container_port
+  ip_protocol = "tcp"
+  cidr_ipv4   = each.key
+}
+
+
+# resource "aws_ecs_service" "delius-db-service" {
+#   cluster         = aws_ecs_cluster.aws_ecs_cluster.id
+#   name            = local.fully_qualified_name
+#   task_definition = aws_ecs_task_definition.delius_db_task_definition.arn
+#   network_configuration {
+#     assign_public_ip = false
+#     subnets          = data.aws_subnets.shared-data.ids
+#     # security_groups = 
+#   }
+#   desired_count                      = 1
+#   deployment_minimum_healthy_percent = 100
+#   deployment_maximum_percent         = 200
+#   enable_execute_command             = true
+#   force_new_deployment               = true
+#   iam_role                           = aws_iam_role.delius_db_ecs_service.arn
+#   launch_type                        = "FARGATE"
+#   platform_version                   = "LATEST"
+#   propagate_tags                     = "SERVICE"
+#   tag                                = local.tags
+#   triggers                           = [] # Change this for force redeployment
+
+# }
+
 # module "deploy" {
 #   source                    = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=f1ace6467418d0df61fd8ff6beabd1c028798d39"
 #   container_definition_json = module.container.json_map_encoded_list
