@@ -262,7 +262,7 @@ locals {
       region  = data.aws_region.current.name
       title   = "Iaps System Event Log"
       period  = local.cloudwatch_period
-      query   = "SOURCE 'IAPS' | fields @timestamp, @message\n| sort @timestamp desc\n| filter @logStream like /system-events/\n| stats count() by bin(1m)"
+      query   = "SOURCE '/iaps/system-events' | fields @timestamp, @message\n| sort @timestamp desc\n| stats count() by bin(1m)"
     }
   }
 
@@ -279,7 +279,9 @@ locals {
       title   = "Iaps Total Log Events"
       period  = local.cloudwatch_period
       metrics = [
-        ["AWS/Logs", "IncomingLogEvents", "LogGroupName", "IAPS"]
+        for log_group in local.cloudwatch_agent_log_group_names : [
+          "AWS/Logs", "IncomingLogEvents", "LogGroupName", "/iaps/${log_group}"
+        ]
       ]
     }
   }
