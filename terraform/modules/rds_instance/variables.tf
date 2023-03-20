@@ -4,6 +4,13 @@ variable "region" {
   default     = "eu-west-2"
 }
 
+variable "availability_zone" {
+  type        = string
+  description = "The availability zone in which to deploy the infrastructure"
+  default     = "eu-west-2a"
+  nullable    = false
+}
+
 variable "tags" {
   type        = map(any)
   description = "Default tags to be applied to resources"
@@ -12,7 +19,17 @@ variable "tags" {
 variable "instance" {
   description = "RDS instance settings, see db_instance documentation"
   type = object({
+    create = optional(bool, true)
+    identifier = optional(string)
     allocated_storage     = number
+    storage_type = optional(string, "gp2")
+    storage_encrypted = optional(bool, false)
+    kms_key_id = optional(string, "")
+    replicate_source_db = optional(string, "")
+    snapshot_identifier = optional(string, "")
+    allow_major_version_upgrade = optional(bool, false)
+    apply_immediately     = optional(bool, false)
+    auto_minor_version_upgrade = optional(bool, false)
     name                  = string
     engine                = string
     engine_version        = string
@@ -30,7 +47,7 @@ variable "db_instance_automated_backups_replication" {
   default = 14
 }
 
-variable "aws_db_option_group" {
+variable "db_option_group" {
   description = "RDS option group settings"
   type = object({
     name                 = string
@@ -47,7 +64,7 @@ variable "aws_db_option_group" {
   })
 }
 
-variable "aws_db_parameter_group" {
+variable "db_parameter_group" {
   description = "RDS parameter group settings"
   type = object({
     name                 = string

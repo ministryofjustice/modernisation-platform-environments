@@ -1,18 +1,57 @@
 #------------------------------------------------------------------------------
-# RDS
+# RDS DB Instance
 #------------------------------------------------------------------------------
 
 resource "aws_db_instance" "this" {
-  allocated_storage     = var.instance.allocated_storage
-  db_name               = var.instance.name
-  engine                = var.instance.engine
-  engine_version        = var.instance.engine_version
-  instance_class        = var.instance.instance_class
-  username              = var.instance.username
-  password              = var.instance.password
-  parameter_group_name  = var.instance.parameter_group_name
-  skip_final_snapshot   = var.instance.skip_final_snapshot
-  max_allocated_storage = var.instance.max_allocated_storage
+  identifier = var.instance.identifier
+
+  engine            = var.instance.engine
+  engine_version    = var.instance.engine_version
+  instance_class    = var.instance.instance_class
+  allocated_storage = var.instance.allocated_storage
+  storage_type      = var.instance.storage_type
+  storage_encrypted = var.instance.storage_encrypted
+  kms_key_id        = var.instance.kms_key_id
+  license_model     = var.instance.license_model
+
+  name                                = var.instance.name
+  username                            = var.instance.username
+  password                            = var.instance.password
+  port                                = var.instance.port
+  iam_database_authentication_enabled = var.instance.iam_database_authentication_enabled
+
+  replicate_source_db = var.instance.replicate_source_db
+
+  snapshot_identifier = var.instance.snapshot_identifier
+
+  vpc_security_group_ids = [var.instance.vpc_security_group_ids]
+  db_subnet_group_name   = var.instance.db_subnet_group_name
+  parameter_group_name   = var.instance.parameter_group_name
+  option_group_name      = var.instance.option_group_name
+
+  availability_zone   = var.instance.availability_zone
+  multi_az            = var.instance.multi_az
+  iops                = var.instance.iops
+  publicly_accessible = var.instance.publicly_accessible
+  monitoring_interval = var.instance.monitoring_interval
+  monitoring_role_arn = var.instance.monitoring_role_arn
+
+  allow_major_version_upgrade = var.instance.allow_major_version_upgrade
+  auto_minor_version_upgrade  = var.instance.auto_minor_version_upgrade
+  apply_immediately           = var.instance.apply_immediately
+  maintenance_window          = var.instance.maintenance_window
+  skip_final_snapshot         = var.instance.skip_final_snapshot
+  copy_tags_to_snapshot       = var.instance.copy_tags_to_snapshot
+  final_snapshot_identifier   = var.instance.final_snapshot_identifier
+
+  backup_retention_period = var.instance.backup_retention_period
+  backup_window           = var.instance.backup_window
+
+  character_set_name = var.instance.character_set_name
+
+  tags = merge(var.tags, map("Name", format("%s", var.identifier)))
+ 
+  enabled_cloudwatch_logs_exports = ["alert", "audit", "listener", "trace"]
 }
 
 resource "aws_db_instance_automated_backups_replication" "this" {
@@ -25,19 +64,19 @@ resource "aws_db_instance_automated_backups_replication" "this" {
 #------------------------------------------------------------------------------
 
 resource "aws_db_option_group" "this" {
-  name                     = var.aws_db_option_group.name
-  option_group_description = var.aws_db_option_group.description
-  engine_name              = var.aws_db_option_group.engine_name
-  major_engine_version     = var.aws_db_option_group.major_engine_version
+  name                     = var.db_option_group.name
+  option_group_description = var.db_option_group.description
+  engine_name              = var.db_option_group.engine_name
+  major_engine_version     = var.db_option_group.major_engine_version
 
   dynamic "option" {
-    for_each = var.aws_db_option_group.options
+    for_each = var.db_option_group.options
 
     content {
-      option_name = aws_db_option_group.options.value["name"]
+      option_name = db_option_group.options.value["name"]
 
       dynamic "option_settings" {
-        for_each = aws_db_option_group.options.value["settings"]
+        for_each = db_option_group.options.value["settings"]
         content {
           name  = settings.value["name"]
           value = settings.value["value"]
@@ -56,7 +95,7 @@ resource "aws_db_parameter_group" "this" {
   family = "mysql5.6"
 
   dynamic "parameter" {
-    for_each = var.aws_db_parameter_group.parameter
+    for_each = var.db_parameter_group.parameter
     content {
       name  = parameter.value["name"]
       value = parameter.value["value"]
