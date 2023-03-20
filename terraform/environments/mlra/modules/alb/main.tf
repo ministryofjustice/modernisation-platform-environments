@@ -5,7 +5,7 @@ locals {
       from_port       = var.security_group_ingress_from_port
       to_port         = var.security_group_ingress_to_port
       protocol        = var.security_group_ingress_protocol
-      cidr_blocks     = [var.moj_vpn_cidr_block]
+      cidr_blocks     = ["0.0.0.0/0"]
       security_groups = []
     },
     # TODO Remove lb_ingress_2 when done testing for HTTP access to the application
@@ -14,7 +14,7 @@ locals {
       from_port       = 80
       to_port         = 80
       protocol        = "tcp"
-      cidr_blocks     = [var.moj_vpn_cidr_block]
+      cidr_blocks     = ["0.0.0.0/0"]
       security_groups = []
     }
   }
