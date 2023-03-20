@@ -3,9 +3,9 @@ data "github_repository" "my_repo" {
 }
 
 resource "aws_codepipeline" "codepipeline" {
-  # depends_on = [
-  #   aws_codedeploy_app.tipstaff_codedeploy
-  # ]
+  depends_on = [
+    aws_codedeploy_app.tipstaff_codedeploy
+  ]
   provider = aws.eu-west-1
   name     = "tf_tipstaff_pipeline"
   role_arn = aws_iam_role.codepipeline_role.arn
@@ -145,130 +145,130 @@ resource "aws_iam_role_policy" "codepipeline_role_policy" {
   })
 }
 
-# # Create CodeBuild project
-# resource "aws_codebuild_project" "my_build_project" {
-#   provider     = aws.eu-west-1
-#   name         = "my-dotnet-build-project"
-#   description  = "Build .NET application"
-#   service_role = aws_iam_role.codebuild_role.arn
-#   artifacts {
-#     type = "CODEPIPELINE"
-#   }
+# Create CodeBuild project
+resource "aws_codebuild_project" "my_build_project" {
+  provider     = aws.eu-west-1
+  name         = "my-dotnet-build-project"
+  description  = "Build .NET application"
+  service_role = aws_iam_role.codebuild_role.arn
+  artifacts {
+    type = "CODEPIPELINE"
+  }
 
-#   environment {
-#     compute_type                = "BUILD_GENERAL1_MEDIUM"
-#     image                       = "mcr.microsoft.com/dotnet/framework/sdk:4.8"
-#     type                        = "WINDOWS_SERVER_2019_CONTAINER"
-#     image_pull_credentials_type = "SERVICE_ROLE"
-#   }
+  environment {
+    compute_type                = "BUILD_GENERAL1_MEDIUM"
+    image                       = "mcr.microsoft.com/dotnet/framework/sdk:4.8"
+    type                        = "WINDOWS_SERVER_2019_CONTAINER"
+    image_pull_credentials_type = "SERVICE_ROLE"
+  }
 
-#   source {
-#     type = "CODEPIPELINE"
-#   }
+  source {
+    type = "CODEPIPELINE"
+  }
 
-#   source_version = "master"
-# }
+  source_version = "master"
+}
 
-# // CodeBuild IAM Role & Policy
+// CodeBuild IAM Role & Policy
 
-# resource "aws_iam_role" "codebuild_role" {
-#   name = "CodeBuildRole"
-#   assume_role_policy = jsonencode({
-#     Version = "2012-10-17"
-#     Statement = [
-#       {
-#         Action = "sts:AssumeRole"
-#         Effect = "Allow"
-#         Principal = {
-#           Service = "codebuild.amazonaws.com"
-#         }
-#       },
-#     ]
-#   })
-# }
+resource "aws_iam_role" "codebuild_role" {
+  name = "CodeBuildRole"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "codebuild.amazonaws.com"
+        }
+      },
+    ]
+  })
+}
 
-# resource "aws_iam_role_policy" "codebuild_role_policy" {
-#   name = "CodeBuildPolicy"
-#   role = aws_iam_role.codebuild_role.id
-#   policy = jsonencode({
-#     Version = "2012-10-17"
-#     Statement = [
-#       {
-#         Action = [
-#           "codebuild:*",
-#           "iam:*",
-#           "logs:*",
-#           "s3:*"
-#         ]
-#         Effect   = "Allow"
-#         Resource = "*"
-#       },
-#     ]
-#   })
-# }
+resource "aws_iam_role_policy" "codebuild_role_policy" {
+  name = "CodeBuildPolicy"
+  role = aws_iam_role.codebuild_role.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "codebuild:*",
+          "iam:*",
+          "logs:*",
+          "s3:*"
+        ]
+        Effect   = "Allow"
+        Resource = "*"
+      },
+    ]
+  })
+}
 
-# // Create CodeDeploy app and deployment group
+// Create CodeDeploy app and deployment group
 
-# resource "aws_codedeploy_app" "tipstaff_codedeploy" {
-#   name = "tipstaff-codedeploy"
-# }
+resource "aws_codedeploy_app" "tipstaff_codedeploy" {
+  name = "tipstaff-codedeploy"
+}
 
-# resource "aws_codedeploy_deployment_group" "tipstaff_deployment_group" {
-#   depends_on = [
-#     aws_codedeploy_app.tipstaff_codedeploy
-#   ]
-#   app_name              = aws_codedeploy_app.tipstaff_codedeploy.name
-#   deployment_group_name = "tipstaff-deployment-group"
-#   service_role_arn      = aws_iam_role.codedeploy_role.arn
+resource "aws_codedeploy_deployment_group" "tipstaff_deployment_group" {
+  depends_on = [
+    aws_codedeploy_app.tipstaff_codedeploy
+  ]
+  app_name              = aws_codedeploy_app.tipstaff_codedeploy.name
+  deployment_group_name = "tipstaff-deployment-group"
+  service_role_arn      = aws_iam_role.codedeploy_role.arn
 
-#   auto_rollback_configuration {
-#     enabled = false
-#     events  = ["DEPLOYMENT_FAILURE"]
-#   }
+  auto_rollback_configuration {
+    enabled = false
+    events  = ["DEPLOYMENT_FAILURE"]
+  }
 
-#   ec2_tag_set {
-#     ec2_tag_filter {
-#       key   = "Name"
-#       type  = "KEY_AND_VALUE"
-#       value = aws_instance.tipstaff_ec2_instance.tags["Name"]
-#     }
-#   }
+  ec2_tag_set {
+    ec2_tag_filter {
+      key   = "Name"
+      type  = "KEY_AND_VALUE"
+      value = aws_instance.tipstaff_ec2_instance.tags["Name"]
+    }
+  }
 
-# }
+}
 
-# resource "aws_iam_role" "codedeploy_role" {
-#   name = "CodeDeployRole"
-#   assume_role_policy = jsonencode({
-#     Version = "2012-10-17"
-#     Statement = [
-#       {
-#         Action = "sts:AssumeRole"
-#         Effect = "Allow"
-#         Principal = {
-#           Service = "codedeploy.amazonaws.com"
-#         }
-#       },
-#     ]
-#   })
-# }
+resource "aws_iam_role" "codedeploy_role" {
+  name = "CodeDeployRole"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "codedeploy.amazonaws.com"
+        }
+      },
+    ]
+  })
+}
 
-# resource "aws_iam_role_policy" "codedeploy_role_policy" {
-#   name = "CodeDeployPolicy"
-#   role = aws_iam_role.codedeploy_role.id
-#   policy = jsonencode({
-#     Version = "2012-10-17"
-#     Statement = [
-#       {
-#         Action = [
-#           "codedeploy:*",
-#           "iam:*",
-#           "logs:*",
-#           "s3:*",
-#           "ec2:*"
-#         ]
-#         Effect   = "Allow"
-#         Resource = "*"
-#       },
-#     ]
-#   })
-# }
+resource "aws_iam_role_policy" "codedeploy_role_policy" {
+  name = "CodeDeployPolicy"
+  role = aws_iam_role.codedeploy_role.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "codedeploy:*",
+          "iam:*",
+          "logs:*",
+          "s3:*",
+          "ec2:*"
+        ]
+        Effect   = "Allow"
+        Resource = "*"
+      },
+    ]
+  })
+}
