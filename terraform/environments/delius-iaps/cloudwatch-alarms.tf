@@ -1,5 +1,5 @@
 # SNS topic for monitoring to send alarms to
-resource "aws_sns_topic" "this" {
+resource "aws_sns_topic" "iaps_alerting" {
   name = "${local.application_name}-alerting"
 }
 
@@ -13,8 +13,8 @@ resource "aws_cloudwatch_metric_alarm" "asg_cpu_utilization_over_threshold" {
   period                    = "120"
   statistic                 = "Average"
   threshold                 = "80"
-  alarm_actions             = [aws_sns_topic.this.arn]
-  ok_actions                = [aws_sns_topic.this.arn]
+  alarm_actions             = [aws_sns_topic.iaps_alerting.arn]
+  ok_actions                = [aws_sns_topic.iaps_alerting.arn]
   alarm_description         = "IAPs ASG CPU Utilization is greater than 80%"
   insufficient_data_actions = []
   tags                      = local.tags
@@ -33,8 +33,8 @@ resource "aws_cloudwatch_metric_alarm" "asg_failed_status_checks" {
   period                    = "300"
   statistic                 = "Average"
   threshold                 = "1"
-  alarm_actions             = [aws_sns_topic.this.arn]
-  ok_actions                = [aws_sns_topic.this.arn]
+  alarm_actions             = [aws_sns_topic.iaps_alerting.arn]
+  ok_actions                = [aws_sns_topic.iaps_alerting.arn]
   alarm_description         = "EC2 StatusCheckFailed for one or more instances in the IAPS ASG"
   insufficient_data_actions = []
   tags                      = local.tags
@@ -53,8 +53,8 @@ resource "aws_cloudwatch_metric_alarm" "in_service_instances_below_threshold" {
   period                    = "300"
   statistic                 = "Average"
   threshold                 = "1"
-  alarm_actions             = [aws_sns_topic.this.arn]
-  ok_actions                = [aws_sns_topic.this.arn]
+  alarm_actions             = [aws_sns_topic.iaps_alerting.arn]
+  ok_actions                = [aws_sns_topic.iaps_alerting.arn]
   alarm_description         = "There is less than 1 instance InService for ec2 IAPS ASG"
   insufficient_data_actions = []
   tags                      = local.tags
@@ -76,8 +76,8 @@ resource "aws_cloudwatch_metric_alarm" "rds_cpu_utilization_over_threshold" {
   statistic           = "Average"
   threshold           = "80"
   alarm_description   = "This metric monitors CPU utilization for the RDS instance"
-  alarm_actions       = [aws_sns_topic.this.arn]
-  ok_actions          = [aws_sns_topic.this.arn]
+  alarm_actions       = [aws_sns_topic.iaps_alerting.arn]
+  ok_actions          = [aws_sns_topic.iaps_alerting.arn]
   dimensions = {
     DBInstanceIdentifier = aws_db_instance.iaps.identifier
   }
@@ -93,8 +93,8 @@ resource "aws_cloudwatch_metric_alarm" "rds_free_storage_space" {
   statistic           = "Minimum"
   threshold           = "104857600" # 100 GB
   alarm_description   = "This metric monitors free storage space for the RDS instance"
-  alarm_actions       = [aws_sns_topic.this.arn]
-  ok_actions          = [aws_sns_topic.this.arn]
+  alarm_actions       = [aws_sns_topic.iaps_alerting.arn]
+  ok_actions          = [aws_sns_topic.iaps_alerting.arn]
   dimensions = {
     DBInstanceIdentifier = aws_db_instance.iaps.identifier
   }
