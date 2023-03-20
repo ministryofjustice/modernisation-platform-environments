@@ -34,10 +34,10 @@ locals {
 
     user_data_cloud_init = {
       args = {
-        branch                 = "main"
-        ansible_repo           = "modernisation-platform-configuration-management"
-        ansible_repo_basedir   = "ansible"
-        ansible_args           = "--tags ec2provision"
+        branch               = "main"
+        ansible_repo         = "modernisation-platform-configuration-management"
+        ansible_repo_basedir = "ansible"
+        ansible_args         = "--tags ec2provision"
       }
       scripts = [
         "ansible-ec2provision.sh.tftpl",
