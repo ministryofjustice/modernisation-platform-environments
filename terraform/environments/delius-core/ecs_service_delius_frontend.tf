@@ -2,10 +2,10 @@
 # Create service and task definitions for delius-testing-frontend
 ##
 locals {
-  service_name         = "testing-frontend"
-  fully_qualified_name = "${local.application_name}-${local.service_name}"
-  image_tag            = "5.7.4"
-  container_port       = 7001
+  frontend_service_name         = "testing-frontend"
+  frontend_fully_qualified_name = "${local.application_name}-${local.front_end_service_name}"
+  front_end_image_tag           = "5.7.4"
+  front_end_container_port      = 7001
 }
 
 ##
@@ -13,7 +13,7 @@ locals {
 ##
 
 data "aws_ssm_parameter" "delius_core_frontend_envs" {
-  name = "${local.application_name}-${local.service_name}-envs"
+  name = "${local.application_name}-${local.front_end_service_name}-envs"
 }
 
 ##
@@ -32,7 +32,7 @@ data "aws_iam_policy_document" "delius_core_frontend_ecs_task" {
 }
 
 resource "aws_iam_role" "delius_core_frontend_ecs_task" {
-  name               = format("%s-task", local.fully_qualified_name)
+  name               = format("%s-task", local.front_end_fully_qualified_name)
   assume_role_policy = data.aws_iam_policy_document.delius_core_frontend_ecs_task.json
   tags               = local.tags
 }
@@ -50,7 +50,7 @@ data "aws_iam_policy_document" "delius_core_frontend_ecs_service" {
 }
 
 resource "aws_iam_role" "delius_core_frontend_ecs_service" {
-  name               = format("%s-service", local.fully_qualified_name)
+  name               = format("%s-service", local.front_end_fully_qualified_name)
   assume_role_policy = data.aws_iam_policy_document.delius_core_frontend_ecs_service.json
   tags               = local.tags
 }
@@ -73,7 +73,7 @@ data "aws_iam_policy_document" "delius_core_frontend_ecs_service_policy" {
 }
 
 resource "aws_iam_role_policy" "delius_core_frontend_ecs_service" {
-  name   = format("%s-service", local.fully_qualified_name)
+  name   = format("%s-service", local.front_end_fully_qualified_name)
   policy = data.aws_iam_policy_document.delius_core_frontend_ecs_service_policy.json
   role   = aws_iam_role.delius_core_frontend_ecs_service.id
 }
@@ -93,7 +93,7 @@ data "aws_iam_policy_document" "delius_core_frontend_ecs_ssm_exec" {
 }
 
 resource "aws_iam_role_policy" "delius_core_frontend_ecs_ssm_exec" {
-  name   = format("%s-service-ssm-exec", local.fully_qualified_name)
+  name   = format("%s-service-ssm-exec", local.front_end_fully_qualified_name)
   policy = data.aws_iam_policy_document.delius_core_frontend_ecs_ssm_exec.json
   role   = aws_iam_role.delius_core_frontend_ecs_task.id
 }
@@ -111,7 +111,7 @@ data "aws_iam_policy_document" "delius_core_frontend_ecs_task_exec" {
 }
 
 resource "aws_iam_role" "delius_core_frontend_ecs_exec" {
-  name               = format("%s-task-exec", local.fully_qualified_name)
+  name               = format("%s-task-exec", local.front_end_fully_qualified_name)
   assume_role_policy = data.aws_iam_policy_document.delius_core_frontend_ecs_task_exec.json
   tags               = local.tags
 }
@@ -135,7 +135,7 @@ data "aws_iam_policy_document" "delius_core_frontend_ecs_exec" {
 }
 
 resource "aws_iam_role_policy" "delius_core_frontend_ecs_exec" {
-  name   = format("%s-task-exec", local.fully_qualified_name)
+  name   = format("%s-task-exec", local.front_end_fully_qualified_name)
   policy = data.aws_iam_policy_document.delius_core_frontend_ecs_exec.json
   role   = aws_iam_role.delius_core_frontend_ecs_exec.id
 }
@@ -150,13 +150,13 @@ resource "aws_ecs_task_definition" "delius_core_frontend_task_definition" {
       {
         cpu       = 1024
         essential = true
-        image     = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-weblogic-ecr-repo:${local.image_tag}"
+        image     = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-weblogic-ecr-repo:${local.front_end_image_tag}"
         logConfiguration = {
           logDriver = "awslogs"
           options = {
-            awslogs-group         = local.fully_qualified_name
+            awslogs-group         = local.front_end_fully_qualified_name
             awslogs-region        = data.aws_region.current.name
-            awslogs-stream-prefix = local.fully_qualified_name
+            awslogs-stream-prefix = local.front_end_fully_qualified_name
           }
         }
         memory      = 4096
@@ -164,8 +164,8 @@ resource "aws_ecs_task_definition" "delius_core_frontend_task_definition" {
         name        = "delius-core-testing-frontend"
         portMappings = [
           {
-            containerPort = local.container_port
-            hostPort      = local.container_port
+            containerPort = local.front_end_container_port
+            hostPort      = local.front_end_container_port
             protocol      = "tcp"
           },
         ]
@@ -179,7 +179,7 @@ resource "aws_ecs_task_definition" "delius_core_frontend_task_definition" {
   #   size_in_gib = 40
   # }
   execution_role_arn = aws_iam_role.delius_core_frontend_ecs_exec.arn
-  family             = local.fully_qualified_name
+  family             = local.front_end_fully_qualified_name
 
   memory       = "4096"
   network_mode = "awsvpc"
@@ -214,8 +214,8 @@ resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_security_gr
       data.aws_subnet.private_subnets_c.cidr_block
     ]
   )
-  from_port   = local.container_port
-  to_port     = local.container_port
+  from_port   = local.front_end_container_port
+  to_port     = local.front_end_container_port
   ip_protocol = "tcp"
   cidr_ipv4   = each.key
 }
@@ -230,7 +230,7 @@ resource "aws_vpc_security_group_egress_rule" "delius_core_frontend_security_gro
 # Pre-req - CloudWatch log group
 # By default, server-side-encryption is used
 resource "aws_cloudwatch_log_group" "delius_core_frontend_log_group" {
-  name              = local.fully_qualified_name
+  name              = local.front_end_fully_qualified_name
   retention_in_days = 7
   tags              = local.tags
 }
@@ -238,7 +238,7 @@ resource "aws_cloudwatch_log_group" "delius_core_frontend_log_group" {
 # Create the ECS service
 resource "aws_ecs_service" "delius-frontend-service" {
   cluster         = aws_ecs_cluster.aws_ecs_cluster.id
-  name            = local.fully_qualified_name
+  name            = local.front_end_fully_qualified_name
   task_definition = aws_ecs_task_definition.delius_core_frontend_task_definition.arn
   network_configuration {
     assign_public_ip = false
@@ -262,7 +262,7 @@ resource "aws_ecs_service" "delius-frontend-service" {
 #   source                    = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=f1ace6467418d0df61fd8ff6beabd1c028798d39"
 #   container_definition_json = module.container.json_map_encoded_list
 #   ecs_cluster_arn           = aws_ecs_cluster.ecs_cluster.arn
-#   name                      = local.fully_qualified_name
+#   name                      = local.front_end_fully_qualified_name
 #   vpc_id                    = data.aws_vpc.shared.id
 
 #   launch_type  = "FARGATE"
@@ -281,8 +281,8 @@ resource "aws_ecs_service" "delius-frontend-service" {
 #   # ecs_load_balancers = [
 #   #   {
 #   #     target_group_arn = data.aws_lb_target_group.service.arn
-#   #     container_name   = local.service_name
-#   #     container_port   = local.container_port
+#   #     container_name   = local.front_end_service_name
+#   #     front_end_container_port   = local.front_end_container_port
 #   #   }
 #   # ]
 
