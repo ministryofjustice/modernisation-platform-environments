@@ -1,21 +1,6 @@
 # checkov:skip=CKV_AWS_226
 # checkov:skip=CKV2_AWS_28
 
-#tfsec:ignore:aws-elb-alb-not-public
-resource "aws_lb" "delius_core_frontend" {
-  # checkov:skip=CKV_AWS_91
-  # checkov:skip=CKV2_AWS_28
-
-  name               = "${local.application_name}-alb"
-  internal           = false
-  load_balancer_type = "application"
-  security_groups    = [aws_security_group.delius_frontend_alb_security_group.id]
-  subnets            = data.aws_subnets.shared-public.ids
-
-  enable_deletion_protection = true
-  drop_invalid_header_fields = true
-}
-
 # Create security group and rules for load balancer
 resource "aws_security_group" "delius_frontend_alb_security_group" {
   name        = "Delius Core Frontend Load Balancer"
@@ -43,18 +28,33 @@ resource "aws_vpc_security_group_egress_rule" "delius_core_frontend_alb_egress_f
   tags                         = local.tags
 }
 
-resource "aws_lb_listener" "listener" {
-  load_balancer_arn = aws_lb.delius_core_frontend.id
-  port              = 443
-  protocol          = "HTTPS"
-  certificate_arn   = aws_acm_certificate.external.arn
-  ssl_policy        = "ELBSecurityPolicy-TLS-1-2-2017-01"
+# #tfsec:ignore:aws-elb-alb-not-public
+# resource "aws_lb" "delius_core_frontend" {
+#   # checkov:skip=CKV_AWS_91
+#   # checkov:skip=CKV2_AWS_28
 
-  default_action {
-    target_group_arn = aws_lb_target_group.delius_core_frontend_target_group.id
-    type             = "forward"
-  }
-}
+#   name               = "${local.application_name}-alb"
+#   internal           = false
+#   load_balancer_type = "application"
+#   security_groups    = [aws_security_group.delius_frontend_alb_security_group.id]
+#   subnets            = data.aws_subnets.shared-public.ids
+
+#   enable_deletion_protection = true
+#   drop_invalid_header_fields = true
+# }
+
+# resource "aws_lb_listener" "listener" {
+#   load_balancer_arn = aws_lb.delius_core_frontend.id
+#   port              = 443
+#   protocol          = "HTTPS"
+#   certificate_arn   = aws_acm_certificate.external.arn
+#   ssl_policy        = "ELBSecurityPolicy-TLS-1-2-2017-01"
+
+#   default_action {
+#     target_group_arn = aws_lb_target_group.delius_core_frontend_target_group.id
+#     type             = "forward"
+#   }
+# }
 
 resource "aws_lb_target_group" "delius_core_frontend_target_group" {
   # checkov:skip=CKV_AWS_261
@@ -82,20 +82,19 @@ resource "aws_lb_target_group" "delius_core_frontend_target_group" {
   }
 }
 
+# resource "aws_route53_record" "external" {
+#   provider = aws.core-vpc
 
-resource "aws_route53_record" "external" {
-  provider = aws.core-vpc
+#   zone_id = data.aws_route53_zone.external.zone_id
+#   name    = local.frontend_url
+#   type    = "A"
 
-  zone_id = data.aws_route53_zone.external.zone_id
-  name    = local.frontend_url
-  type    = "A"
-
-  alias {
-    name                   = aws_lb.delius_core_frontend.dns_name
-    zone_id                = aws_lb.delius_core_frontend.zone_id
-    evaluate_target_health = true
-  }
-}
+#   alias {
+#     name                   = aws_lb.delius_core_frontend.dns_name
+#     zone_id                = aws_lb.delius_core_frontend.zone_id
+#     evaluate_target_health = true
+#   }
+# }
 
 resource "aws_acm_certificate" "external" {
   domain_name               = "modernisation-platform.service.justice.gov.uk"
