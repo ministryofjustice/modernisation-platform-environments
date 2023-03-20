@@ -7,6 +7,14 @@ locals {
       protocol        = var.security_group_ingress_protocol
       cidr_blocks     = [var.moj_vpn_cidr_block]
       security_groups = []
+    },
+    "lb_ingress_2" = {
+      description     = "Loadbalancer ingress rule from MoJ VPN Test 80 - Please remove me."
+      from_port       = 80
+      to_port         = 80
+      protocol        = "HTTP"
+      cidr_blocks     = [var.moj_vpn_cidr_block]
+      security_groups = []
     }
   }
   loadbalancer_egress_rules = {
