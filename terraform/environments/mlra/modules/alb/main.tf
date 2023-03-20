@@ -591,7 +591,6 @@ resource "aws_lb_listener" "alb_listener" {
   port              = var.listener_port
   #checkov:skip=CKV_AWS_2:The ALB protocol is HTTP
   protocol        = var.listener_protocol #tfsec:ignore:aws-elb-http-not-used
-  ssl_policy      = null
   # ssl_policy      = var.listener_protocol == "HTTPS" ? var.alb_ssl_policy : null
   certificate_arn = var.listener_protocol == "HTTPS" ? aws_acm_certificate_validation.external.certificate_arn : null # This needs the ARN of the certificate from Mod Platform
 
