@@ -18,7 +18,7 @@ resource "aws_lb" "delius_core_frontend" {
 
 # Create security group and rules for load balancer
 resource "aws_security_group" "delius_frontend_alb_security_group" {
-  name_prefix = format("%s-alb-security-group", local.frontend_fully_qualified_name)
+  name        = "Delius Core Frontend Load Balancer"
   description = "controls access to and from delius front-end load balancer"
   vpc_id      = data.aws_vpc.shared.id
   tags        = local.tags
@@ -43,134 +43,94 @@ resource "aws_vpc_security_group_egress_rule" "delius_core_frontend_alb_egress_f
   tags                         = local.tags
 }
 
-# resource "aws_lb_listener" "listener" {
-#   load_balancer_arn = aws_lb.delius_core_frontend.id
-#   port              = 443
-#   protocol          = "HTTPS"
-#   certificate_arn   = aws_acm_certificate.external.arn
-#   ssl_policy        = "ELBSecurityPolicy-TLS-1-2-2017-01"
+resource "aws_lb_listener" "listener" {
+  load_balancer_arn = aws_lb.delius_core_frontend.id
+  port              = 443
+  protocol          = "HTTPS"
+  certificate_arn   = aws_acm_certificate.external.arn
+  ssl_policy        = "ELBSecurityPolicy-TLS-1-2-2017-01"
 
-#   default_action {
-#     target_group_arn = aws_lb_target_group.target_group_fargate.id
-#     type             = "forward"
-#   }
-# }
+  default_action {
+    target_group_arn = aws_lb_target_group.delius_core_frontend_target_group.id
+    type             = "forward"
+  }
+}
 
-# resource "aws_lb_target_group" "target_group_fargate" {
-#   # checkov:skip=CKV_AWS_261
+resource "aws_lb_target_group" "delius_core_frontend_target_group" {
+  # checkov:skip=CKV_AWS_261
 
-#   name                 = "${local.application_name}-tg-${local.environment}-new"
-#   port                 = local.application_data.accounts[local.environment].server_port
-#   protocol             = "HTTP"
-#   vpc_id               = data.aws_vpc.shared.id
-#   target_type          = "ip"
-#   deregistration_delay = 30
+  name                 = format("%s-tg", local.frontend_fully_qualified_name)
+  port                 = local.frontend_container_port
+  protocol             = "HTTP"
+  vpc_id               = data.aws_vpc.shared.id
+  target_type          = "ip"
+  deregistration_delay = 30
+  tags                 = local.tags
 
-#   stickiness {
-#     type = "lb_cookie"
-#   }
+  stickiness {
+    type = "lb_cookie"
+  }
 
-#   health_check {
-#     path                = "/User/Login?ReturnUrl=%2f"
-#     healthy_threshold   = "5"
-#     interval            = "120"
-#     protocol            = "HTTP"
-#     unhealthy_threshold = "2"
-#     matcher             = "200-499"
-#     timeout             = "5"
-#   }
+  health_check {
+    # path                = "/NDelius-war/delius/JSP/healthcheck.jsp?ping"
+    healthy_threshold   = "5"
+    interval            = "120"
+    protocol            = "HTTP"
+    unhealthy_threshold = "2"
+    matcher             = "200-499"
+    timeout             = "5"
+  }
+}
 
-#   tags = merge(
-#     local.tags,
-#     {
-#       Name = "${local.application_name}-tg-${local.environment}-new"
-#     }
-#   )
-# }
 
-# resource "aws_lb_target_group" "target_group" {
-#   # checkov:skip=CKV_AWS_261
+resource "aws_route53_record" "external" {
+  provider = aws.core-vpc
 
-#   name                 = "${local.application_name}-tg-${local.environment}"
-#   port                 = local.application_data.accounts[local.environment].server_port
-#   protocol             = "HTTP"
-#   vpc_id               = data.aws_vpc.shared.id
-#   target_type          = "instance"
-#   deregistration_delay = 30
+  zone_id = data.aws_route53_zone.external.zone_id
+  name    = local.frontend_url
+  type    = "A"
 
-#   stickiness {
-#     type = "lb_cookie"
-#   }
+  alias {
+    name                   = aws_lb.delius_core_frontend.dns_name
+    zone_id                = aws_lb.delius_core_frontend.zone_id
+    evaluate_target_health = true
+  }
+}
 
-#   health_check {
-#     path                = "/User/Login?ReturnUrl=%2f"
-#     healthy_threshold   = "5"
-#     interval            = "120"
-#     protocol            = "HTTP"
-#     unhealthy_threshold = "2"
-#     matcher             = "200-499"
-#     timeout             = "5"
-#   }
+resource "aws_acm_certificate" "external" {
+  domain_name               = "modernisation-platform.service.justice.gov.uk"
+  validation_method         = "DNS"
+  subject_alternative_names = [local.frontend_url]
+  tags                      = local.tags
 
-#   tags = merge(
-#     local.tags,
-#     {
-#       Name = "${local.application_name}-tg-${local.environment}"
-#     }
-#   )
-# }
+  lifecycle {
+    create_before_destroy = true
+  }
+}
 
-# resource "aws_route53_record" "external" {
-#   provider = aws.core-vpc
+resource "aws_route53_record" "external_validation" {
+  provider = aws.core-network-services
 
-#   zone_id = data.aws_route53_zone.external.zone_id
-#   name    = local.app_url
-#   type    = "A"
+  allow_overwrite = true
+  name            = local.domain_name_main[0]
+  records         = local.domain_record_main
+  ttl             = 60
+  type            = local.domain_type_main[0]
+  zone_id         = data.aws_route53_zone.network-services.zone_id
+}
 
-#   alias {
-#     name                   = aws_lb.external.dns_name
-#     zone_id                = aws_lb.external.zone_id
-#     evaluate_target_health = true
-#   }
-# }
+resource "aws_route53_record" "external_validation_subdomain" {
+  provider = aws.core-vpc
 
-# resource "aws_acm_certificate" "external" {
-#   domain_name       = "modernisation-platform.service.justice.gov.uk"
-#   validation_method = "DNS"
+  allow_overwrite = true
+  name            = local.domain_name_sub[0]
+  records         = local.domain_record_sub
+  ttl             = 60
+  type            = local.domain_type_sub[0]
+  zone_id         = data.aws_route53_zone.external.zone_id
+}
 
-#   subject_alternative_names = ["${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
-#   tags = {
-#     Environment = local.environment
-#   }
-
-#   lifecycle {
-#     create_before_destroy = true
-#   }
-# }
-
-# resource "aws_route53_record" "external_validation" {
-#   provider = aws.core-network-services
-
-#   allow_overwrite = true
-#   name            = local.domain_name_main[0]
-#   records         = local.domain_record_main
-#   ttl             = 60
-#   type            = local.domain_type_main[0]
-#   zone_id         = data.aws_route53_zone.network-services.zone_id
-# }
-
-# resource "aws_route53_record" "external_validation_subdomain" {
-#   provider = aws.core-vpc
-
-#   allow_overwrite = true
-#   name            = local.domain_name_sub[0]
-#   records         = local.domain_record_sub
-#   ttl             = 60
-#   type            = local.domain_type_sub[0]
-#   zone_id         = data.aws_route53_zone.external.zone_id
-# }
-
-# resource "aws_acm_certificate_validation" "external" {
-#   certificate_arn         = aws_acm_certificate.external.arn
-#   validation_record_fqdns = [local.domain_name_main[0], local.domain_name_sub[0]]
-# }
+resource "aws_acm_certificate_validation" "external" {
+  certificate_arn         = aws_acm_certificate.external.arn
+  validation_record_fqdns = [local.domain_name_main[0], local.domain_name_sub[0]]
+}
