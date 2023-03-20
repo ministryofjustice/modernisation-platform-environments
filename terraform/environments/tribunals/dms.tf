@@ -13,5 +13,5 @@ module "dms" {
   application_name         = "tribunals"
   source_db_name           = "default"
   target_db_name           = "default"
-  environment              = var.environment
+  environment              = "dev"
 }
