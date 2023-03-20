@@ -165,10 +165,10 @@ resource "aws_ecs_task_definition" "delius_db_task_definition" {
         volumesFrom            = []
       }
   ])
-  cpu                = "1024"
+  cpu = "1024"
   ephemeral_storage {
     size_in_gib = 40
-  } 
+  }
   execution_role_arn = aws_iam_role.delius_db_ecs_exec.arn
   family             = local.fully_qualified_name
 
