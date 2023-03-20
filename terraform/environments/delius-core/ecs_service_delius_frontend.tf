@@ -193,13 +193,12 @@ resource "aws_ecs_task_definition" "delius_core_frontend_task_definition" {
 # ##
 # Pre-req - security groups
 resource "aws_security_group" "delius_core_frontend_security_group" {
-  name        = "delius weblogic to delius db"
+  name        = "Delius Core Frontend Weblogic"
   description = "Rules for the delius testing frontend ecs service"
   vpc_id      = data.aws_vpc.shared.id
   tags        = local.tags
 }
 
-# Need to rework this
 resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_security_group_ingress_private_subnets" {
   security_group_id = aws_security_group.delius_core_frontend_security_group.id
   description       = "weblogic to testing frontend"

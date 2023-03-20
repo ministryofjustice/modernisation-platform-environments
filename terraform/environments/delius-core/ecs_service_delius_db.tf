@@ -182,13 +182,12 @@ resource "aws_ecs_task_definition" "delius_db_task_definition" {
 # ##
 # Pre-req - security groups
 resource "aws_security_group" "delius_db_security_group" {
-  name        = "delius weblogic to delius db"
+  name        = "Delius Core DB"
   description = "Rules for the delius testing db ecs service"
   vpc_id      = data.aws_vpc.shared.id
   tags        = local.tags
 }
 
-# Need to rework this
 resource "aws_vpc_security_group_ingress_rule" "delius_db_security_group_ingress_private_subnets" {
   security_group_id            = aws_security_group.delius_db_security_group.id
   description                  = "weblogic to testing db"
