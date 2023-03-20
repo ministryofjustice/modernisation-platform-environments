@@ -28,6 +28,7 @@ module "alb" {
   listener_protocol    = "HTTPS" # TODO This needs changing to HTTPS as part of https://dsdmoj.atlassian.net/browse/LAWS-3076
   listener_port        = 443
   alb_ssl_policy       = "ELBSecurityPolicy-TLS-1-2-2017-01" # TODO This enforces TLSv1.2. For general, use ELBSecurityPolicy-2016-08 instead
+
   services_zone_id     = data.aws_route53_zone.network-services.zone_id
   external_zone_id     = data.aws_route53_zone.external.zone_id
   acm_cert_domain_name = local.application_data.accounts[local.environment].acm_cert_domain_name
