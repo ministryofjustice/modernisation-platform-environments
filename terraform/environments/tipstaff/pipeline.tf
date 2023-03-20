@@ -4,7 +4,7 @@ data "github_repository" "my_repo" {
 
 resource "aws_codepipeline" "codepipeline" {
   depends_on = [
-    aws_codedeploy_app.tipstaff_codedeploy
+    aws_codedeploy_app.tipstaff_codedeploy, aws_codedeploy_deployment_group.tipstaff_deployment_group
   ]
   provider = aws.eu-west-1
   name     = "tf_tipstaff_pipeline"
