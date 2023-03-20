@@ -218,19 +218,21 @@ resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_security_gr
 resource "aws_vpc_security_group_egress_rule" "delius_db_security_group_egress_internet" {
   security_group_id = aws_security_group.delius_db_security_group.id
   description       = "outbound from the testing db ecs service"
-  ip_protocol       = "-1"
+  ip_protocol       = "tcp"
+  to_port           = 443
+  from_port         = 443
   cidr_ipv4         = "0.0.0.0/0"
 }
 
 # Come back to this to investigate only allowing egress to the DB security group
-# resource "aws_vpc_security_group_egress_rule" "delius_core_frontend_security_group_egress_internet" {
-#   security_group_id            = aws_security_group.delius_core_frontend_security_group.id
-#   description                  = "outbound from the testing frontend ecs service"
-#   ip_protocol                  = "-1"
-#   to_port                      = local.db_container_port
-#   from_port                    = local.db_container_port
-#   referenced_security_group_id = aws_security_group.delius_db_security_group.id
-# }
+resource "aws_vpc_security_group_egress_rule" "delius_core_frontend_security_group_egress_internet" {
+  security_group_id            = aws_security_group.delius_core_frontend_security_group.id
+  description                  = "outbound from the testing frontend ecs service"
+  ip_protocol                  = "-1"
+  to_port                      = local.db_container_port
+  from_port                    = local.db_container_port
+  referenced_security_group_id = aws_security_group.delius_db_security_group.id
+}
 
 # Pre-req - CloudWatch log group
 # By default, server-side-encryption is used
