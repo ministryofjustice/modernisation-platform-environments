@@ -80,70 +80,70 @@ resource "aws_codepipeline" "codepipeline" {
   # }
 }
 
-# resource "aws_s3_bucket" "pipeline-s3-eu-west-1" {
-#   provider = aws.eu-west-1
-#   bucket   = "pipeline-s3-eu-west-1"
-# }
+resource "aws_s3_bucket" "pipeline-s3-eu-west-1" {
+  provider = aws.eu-west-1
+  bucket   = "pipeline-s3-eu-west-1"
+}
 
-# resource "aws_s3_bucket" "pipeline-s3-eu-west-2" {
-#   bucket = "pipeline-s3-eu-west-2"
-# }
+resource "aws_s3_bucket" "pipeline-s3-eu-west-2" {
+  bucket = "pipeline-s3-eu-west-2"
+}
 
-# // CodePipeline IAM Role & Policy
+// CodePipeline IAM Role & Policy
 
-# resource "aws_iam_role" "codepipeline_role" {
-#   name = "CodePipelineRole"
-#   assume_role_policy = jsonencode({
-#     Version = "2012-10-17"
-#     Statement = [
-#       {
-#         Action = "sts:AssumeRole"
-#         Effect = "Allow"
-#         Principal = {
-#           Service = "codepipeline.amazonaws.com"
-#         }
-#       },
-#     ]
-#   })
-# }
+resource "aws_iam_role" "codepipeline_role" {
+  name = "CodePipelineRole"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "codepipeline.amazonaws.com"
+        }
+      },
+    ]
+  })
+}
 
-# resource "aws_iam_role_policy" "codepipeline_role_policy" {
-#   name = "CodePipelinePolicy"
-#   role = aws_iam_role.codepipeline_role.id
-#   policy = jsonencode({
-#     Version = "2012-10-17"
-#     Statement = [
-#       {
-#         Action = [
-#           "codepipeline:*",
-#           "iam:*",
-#           "logs:*",
-#           "s3:*",
-#           "codedeploy:CreateDeployment",
-#           "codedeploy:GetApplication",
-#           "codedeploy:GetApplicationRevision",
-#           "codedeploy:GetDeployment",
-#           "codedeploy:GetDeploymentConfig",
-#           "codedeploy:RegisterApplicationRevision",
-#           "ec2:*",
-#           "codebuild:BatchGetBuilds",
-#           "codebuild:StartBuild",
-#           "codebuild:BatchGetBuildBatches",
-#           "codebuild:StartBuildBatch",
-#           "ecr:DescribeImages",
-#           "states:DescribeExecution",
-#           "states:DescribeStateMachine",
-#           "states:StartExecution",
-#           "appconfig:StartDeployment",
-#           "appconfig:StopDeployment",
-#           "appconfig:GetDeployment",
-#         ]
-#         Effect   = "Allow"
-#         Resource = "*"
-#       },
-#     ]
-#   })
-# }
+resource "aws_iam_role_policy" "codepipeline_role_policy" {
+  name = "CodePipelinePolicy"
+  role = aws_iam_role.codepipeline_role.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "codepipeline:*",
+          "iam:*",
+          "logs:*",
+          "s3:*",
+          "codedeploy:CreateDeployment",
+          "codedeploy:GetApplication",
+          "codedeploy:GetApplicationRevision",
+          "codedeploy:GetDeployment",
+          "codedeploy:GetDeploymentConfig",
+          "codedeploy:RegisterApplicationRevision",
+          "ec2:*",
+          "codebuild:BatchGetBuilds",
+          "codebuild:StartBuild",
+          "codebuild:BatchGetBuildBatches",
+          "codebuild:StartBuildBatch",
+          "ecr:DescribeImages",
+          "states:DescribeExecution",
+          "states:DescribeStateMachine",
+          "states:StartExecution",
+          "appconfig:StartDeployment",
+          "appconfig:StopDeployment",
+          "appconfig:GetDeployment",
+        ]
+        Effect   = "Allow"
+        Resource = "*"
+      },
+    ]
+  })
+}
 
 # # Create CodeBuild project
 # resource "aws_codebuild_project" "my_build_project" {
