@@ -8,6 +8,156 @@ resource "aws_lb" "oem_app" {
   tags = local.tags
 }
 
+resource "aws_lb" "oem_app_internal" {
+  name               = "lb-${local.application_name}-app"
+  load_balancer_type = "application"
+  internal           = false
+  security_groups    = [aws_security_group.load_balancer_security_group.id]
+  subnets            = data.aws_subnets.private-public.ids
+
+  tags = local.tags
+}
+
+resource "aws_lb_listener" "oem_app" {
+  load_balancer_arn = aws_lb.oem_app.id
+  port              = 443
+  protocol          = "HTTPS"
+
+  ssl_policy      = "ELBSecurityPolicy-TLS-1-2-2017-01"
+  certificate_arn = aws_acm_certificate.external-mp[0].arn
+
+  default_action {
+    target_group_arn = aws_lb_target_group.oem_app.id
+    type             = "forward"
+  }
+}
+
+resource "aws_lb_listener" "oem_app_3872" {
+  load_balancer_arn = aws_lb.oem_app.id
+  port              = 3872
+  protocol          = "HTTPS"
+
+  ssl_policy      = "ELBSecurityPolicy-TLS-1-2-2017-01"
+  certificate_arn = aws_acm_certificate.external-mp[0].arn
+
+  default_action {
+    target_group_arn = aws_lb_target_group.oem_app_3872.id
+    type             = "forward"
+  }
+}
+
+resource "aws_lb_listener" "oem_app_4903" {
+  load_balancer_arn = aws_lb.oem_app.id
+  port              = 4903
+  protocol          = "HTTPS"
+
+  ssl_policy      = "ELBSecurityPolicy-TLS-1-2-2017-01"
+  certificate_arn = aws_acm_certificate.external-mp[0].arn
+
+  default_action {
+    target_group_arn = aws_lb_target_group.oem_app_4903.id
+    type             = "forward"
+  }
+}
+
+resource "aws_lb_listener" "oem_app_7102" {
+  load_balancer_arn = aws_lb.oem_app.id
+  port              = 7102
+  protocol          = "HTTPS"
+
+  ssl_policy      = "ELBSecurityPolicy-TLS-1-2-2017-01"
+  certificate_arn = aws_acm_certificate.external-mp[0].arn
+
+  default_action {
+    target_group_arn = aws_lb_target_group.oem_app_7102.id
+    type             = "forward"
+  }
+}
+
+resource "aws_lb_listener" "oem_app_7803" {
+  load_balancer_arn = aws_lb.oem_app.id
+  port              = 7803
+  protocol          = "HTTPS"
+
+  ssl_policy      = "ELBSecurityPolicy-TLS-1-2-2017-01"
+  certificate_arn = aws_acm_certificate.external-mp[0].arn
+
+  default_action {
+    target_group_arn = aws_lb_target_group.oem_app_7803.id
+    type             = "forward"
+  }
+}
+
+resource "aws_lb_listener" "oem_app_internal" {
+  load_balancer_arn = aws_lb.oem_app_internal.id
+  port              = 443
+  protocol          = "HTTPS"
+
+  ssl_policy      = "ELBSecurityPolicy-TLS-1-2-2017-01"
+  certificate_arn = aws_acm_certificate.external-mp[0].arn
+
+  default_action {
+    target_group_arn = aws_lb_target_group.oem_app.id
+    type             = "forward"
+  }
+}
+
+resource "aws_lb_listener" "oem_app_internal_3872" {
+  load_balancer_arn = aws_lb.oem_app_internal.id
+  port              = 3872
+  protocol          = "HTTPS"
+
+  ssl_policy      = "ELBSecurityPolicy-TLS-1-2-2017-01"
+  certificate_arn = aws_acm_certificate.external-mp[0].arn
+
+  default_action {
+    target_group_arn = aws_lb_target_group.oem_app_3872.id
+    type             = "forward"
+  }
+}
+
+resource "aws_lb_listener" "oem_app_internal_4903" {
+  load_balancer_arn = aws_lb.oem_app_internal.id
+  port              = 4903
+  protocol          = "HTTPS"
+
+  ssl_policy      = "ELBSecurityPolicy-TLS-1-2-2017-01"
+  certificate_arn = aws_acm_certificate.external-mp[0].arn
+
+  default_action {
+    target_group_arn = aws_lb_target_group.oem_app_4903.id
+    type             = "forward"
+  }
+}
+
+resource "aws_lb_listener" "oem_app_internal_7102" {
+  load_balancer_arn = aws_lb.oem_app_internal.id
+  port              = 7102
+  protocol          = "HTTPS"
+
+  ssl_policy      = "ELBSecurityPolicy-TLS-1-2-2017-01"
+  certificate_arn = aws_acm_certificate.external-mp[0].arn
+
+  default_action {
+    target_group_arn = aws_lb_target_group.oem_app_7102.id
+    type             = "forward"
+  }
+}
+
+resource "aws_lb_listener" "oem_app_internal_7803" {
+  load_balancer_arn = aws_lb.oem_app_internal.id
+  port              = 7803
+  protocol          = "HTTPS"
+
+  ssl_policy      = "ELBSecurityPolicy-TLS-1-2-2017-01"
+  certificate_arn = aws_acm_certificate.external-mp[0].arn
+
+  default_action {
+    target_group_arn = aws_lb_target_group.oem_app_7803.id
+    type             = "forward"
+  }
+}
+
 resource "aws_lb_target_group" "oem_app" {
   name        = "tg-${local.application_name}-app-8000"
   port        = 8000
@@ -156,76 +306,6 @@ resource "aws_lb_target_group_attachment" "oem_app_7803" {
   target_group_arn = aws_lb_target_group.oem_app_7803.arn
   target_id        = aws_instance.oem_app.id
   port             = 7803
-}
-
-resource "aws_lb_listener" "oem_app" {
-  load_balancer_arn = aws_lb.oem_app.id
-  port              = 443
-  protocol          = "HTTPS"
-
-  ssl_policy      = "ELBSecurityPolicy-TLS-1-2-2017-01"
-  certificate_arn = aws_acm_certificate.external-mp[0].arn
-
-  default_action {
-    target_group_arn = aws_lb_target_group.oem_app.id
-    type             = "forward"
-  }
-}
-
-resource "aws_lb_listener" "oem_app_3872" {
-  load_balancer_arn = aws_lb.oem_app.id
-  port              = 3872
-  protocol          = "HTTPS"
-
-  ssl_policy      = "ELBSecurityPolicy-TLS-1-2-2017-01"
-  certificate_arn = aws_acm_certificate.external-mp[0].arn
-
-  default_action {
-    target_group_arn = aws_lb_target_group.oem_app_3872.id
-    type             = "forward"
-  }
-}
-
-resource "aws_lb_listener" "oem_app_4903" {
-  load_balancer_arn = aws_lb.oem_app.id
-  port              = 4903
-  protocol          = "HTTPS"
-
-  ssl_policy      = "ELBSecurityPolicy-TLS-1-2-2017-01"
-  certificate_arn = aws_acm_certificate.external-mp[0].arn
-
-  default_action {
-    target_group_arn = aws_lb_target_group.oem_app_4903.id
-    type             = "forward"
-  }
-}
-
-resource "aws_lb_listener" "oem_app_7102" {
-  load_balancer_arn = aws_lb.oem_app.id
-  port              = 7102
-  protocol          = "HTTPS"
-
-  ssl_policy      = "ELBSecurityPolicy-TLS-1-2-2017-01"
-  certificate_arn = aws_acm_certificate.external-mp[0].arn
-
-  default_action {
-    target_group_arn = aws_lb_target_group.oem_app_7102.id
-    type             = "forward"
-  }
-}
-
-resource "aws_lb_listener" "oem_app_7803" {
-  load_balancer_arn = aws_lb.oem_app.id
-  port              = 7803
-  protocol          = "HTTPS"
-
-  ssl_policy      = "ELBSecurityPolicy-TLS-1-2-2017-01"
-  certificate_arn = aws_acm_certificate.external-mp[0].arn
-
-  default_action {
-    target_group_arn = aws_lb_target_group.oem_app_7803.id
-    type             = "forward"
-  }
 }
 
 resource "aws_security_group" "load_balancer_security_group" {
