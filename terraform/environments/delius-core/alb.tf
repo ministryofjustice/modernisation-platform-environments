@@ -33,19 +33,19 @@ resource "aws_vpc_security_group_egress_rule" "delius_core_frontend_alb_egress_f
 }
 
 #tfsec:ignore:aws-elb-alb-not-public
-resource "aws_lb" "delius_core_frontend" {
-  # checkov:skip=CKV_AWS_91
-  # checkov:skip=CKV2_AWS_28
+# resource "aws_lb" "delius_core_frontend" {
+#   # checkov:skip=CKV_AWS_91
+#   # checkov:skip=CKV2_AWS_28
 
-  name               = "${local.application_name}-alb"
-  internal           = false
-  load_balancer_type = "application"
-  security_groups    = [aws_security_group.delius_frontend_alb_security_group.id]
-  subnets            = data.aws_subnets.shared-public.ids
+#   name               = "${local.application_name}-alb"
+#   internal           = false
+#   load_balancer_type = "application"
+#   security_groups    = [aws_security_group.delius_frontend_alb_security_group.id]
+#   subnets            = data.aws_subnets.shared-public.ids
 
-  enable_deletion_protection = false
-  drop_invalid_header_fields = true
-}
+#   enable_deletion_protection = false
+#   drop_invalid_header_fields = true
+# }
 
 # resource "aws_lb_listener" "listener" {
 #   load_balancer_arn = aws_lb.delius_core_frontend.id
