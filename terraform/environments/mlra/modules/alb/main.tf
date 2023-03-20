@@ -1,12 +1,11 @@
 locals {
   loadbalancer_ingress_rules = {
     "lb_ingress" = {
-      description     = "Loadbalancer ingress rule from MoJ VPN"
+      description     = "Loadbalancer ingress rule from CloudFront"
       from_port       = var.security_group_ingress_from_port
       to_port         = var.security_group_ingress_to_port
       protocol        = var.security_group_ingress_protocol
-      cidr_blocks     = ["0.0.0.0/0"]
-      security_groups = []
+      prefix_list_ids = [data.aws_ec2_managed_prefix_list.cloudfront.id]
     }
   }
   loadbalancer_egress_rules = {
@@ -47,6 +46,12 @@ data "aws_vpc" "shared" {
     "Name" = var.vpc_all
   }
 }
+
+data "aws_ec2_managed_prefix_list" "cloudfront" {
+ name = "com.amazonaws.global.cloudfront.origin-facing"
+}
+
+
 
 # Terraform module which creates S3 Bucket resources for Load Balancer Access Logs on AWS.
 
@@ -203,6 +208,7 @@ resource "aws_security_group" "lb" {
       protocol        = lookup(ingress.value, "protocol", null)
       cidr_blocks     = lookup(ingress.value, "cidr_blocks", null)
       security_groups = lookup(ingress.value, "security_groups", null)
+      prefix_list_ids = lookup(ingress.value, "prefix_list_ids", null)
     }
   }
 
