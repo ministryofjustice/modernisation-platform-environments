@@ -217,12 +217,12 @@ resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_security_gr
 }
 
 resource "aws_vpc_security_group_egress_rule" "delius_core_frontend_security_group_egress_internet" {
-  security_group_id        = aws_security_group.delius_core_frontend_security_group.id
-  description              = "outbound from the testing frontend ecs service"
-  ip_protocol              = "-1"
-  to_port                  = local.db_container_port
-  from_port                = local.db_container_port
-  source_security_group_id = aws_security_group.delius_db_security_group.id
+  security_group_id            = aws_security_group.delius_core_frontend_security_group.id
+  description                  = "outbound from the testing frontend ecs service"
+  ip_protocol                  = "-1"
+  to_port                      = local.db_container_port
+  from_port                    = local.db_container_port
+  referenced_security_group_id = aws_security_group.delius_db_security_group.id
 }
 
 # Pre-req - CloudWatch log group

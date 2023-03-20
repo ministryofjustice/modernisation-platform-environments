@@ -190,12 +190,12 @@ resource "aws_security_group" "delius_db_security_group" {
 
 # Need to rework this
 resource "aws_vpc_security_group_ingress_rule" "delius_db_security_group_ingress_private_subnets" {
-  security_group_id        = aws_security_group.delius_db_security_group.id
-  description              = "weblogic to testing db"
-  from_port                = local.db_container_port
-  to_port                  = local.db_container_port
-  ip_protocol              = "tcp"
-  source_security_group_id = aws_security_group.delius_core_frontend_security_group.id
+  security_group_id            = aws_security_group.delius_db_security_group.id
+  description                  = "weblogic to testing db"
+  from_port                    = local.db_container_port
+  to_port                      = local.db_container_port
+  ip_protocol                  = "tcp"
+  referenced_security_group_id = aws_security_group.delius_core_frontend_security_group.id
 }
 
 resource "aws_vpc_security_group_egress_rule" "delius_db_security_group_egress_internet" {
