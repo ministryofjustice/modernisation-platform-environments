@@ -9,7 +9,7 @@ resource "aws_lb" "oem_app" {
 }
 
 resource "aws_lb" "oem_app_internal" {
-  name               = "lb-${local.application_name}-app"
+  name               = "lb-${local.application_name}-app-internal"
   load_balancer_type = "application"
   internal           = false
   security_groups    = [aws_security_group.load_balancer_security_group.id]
