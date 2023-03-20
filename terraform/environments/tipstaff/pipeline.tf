@@ -60,24 +60,24 @@ resource "aws_codepipeline" "codepipeline" {
     }
   }
 
-  stage {
-    name = "Deploy"
+  # stage {
+  #   name = "Deploy"
 
-    action {
-      name            = "Deploy"
-      category        = "Deploy"
-      owner           = "AWS"
-      provider        = "CodeDeploy"
-      input_artifacts = ["build_output"]
-      version         = "1"
-      region          = "eu-west-2"
+  #   action {
+  #     name            = "Deploy"
+  #     category        = "Deploy"
+  #     owner           = "AWS"
+  #     provider        = "CodeDeploy"
+  #     input_artifacts = ["build_output"]
+  #     version         = "1"
+  #     region          = "eu-west-2"
 
-      configuration = {
-        ApplicationName = "tipstaff-codedeploy"
-        # DeploymentGroupName = "tipstaff-deployment-group"
-      }
-    }
-  }
+  #     configuration = {
+  #       ApplicationName     = "tipstaff-codedeploy"
+  #       DeploymentGroupName = "tipstaff-deployment-group"
+  #     }
+  #   }
+  # }
 }
 
 resource "aws_s3_bucket" "pipeline-s3-eu-west-1" {
@@ -214,6 +214,9 @@ resource "aws_codedeploy_app" "tipstaff_codedeploy" {
 }
 
 # resource "aws_codedeploy_deployment_group" "tipstaff_deployment_group" {
+  # depends_on = [
+  #   aws_codedeploy_app.tipstaff_codedeploy
+  # ]
 #   app_name              = aws_codedeploy_app.tipstaff_codedeploy.name
 #   deployment_group_name = "tipstaff-deployment-group"
 #   service_role_arn      = aws_iam_role.codedeploy_role.arn
