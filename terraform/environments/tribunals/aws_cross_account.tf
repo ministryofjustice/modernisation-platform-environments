@@ -2,11 +2,11 @@ provider "aws" {
   region     = "eu-west-1"
   access_key = jsondecode(data.aws_secretsmanager_secret_version.source-db.secret_string)["dms_source_account_access_key"]
   secret_key = jsondecode(data.aws_secretsmanager_secret_version.source-db.secret_string)["dms_source_account_secret_key"]
-  alias   = "mojdsd"
+  alias      = "mojdsd"
 }
 
 resource "aws_security_group" "dms_access_rule" {
-  name = "mp_dms_access_rule_tribunals"
+  name        = "mp_dms_access_rule_tribunals"
   description = "allow dms access to the database from modernisatoon platform"
 
   ingress {
@@ -26,14 +26,14 @@ resource "aws_security_group" "dms_access_rule" {
 
   provider = aws.mojdsd
 
- }
+}
 
- resource "null_resource" "setup_source_ec2_security_group" {
+resource "null_resource" "setup_source_ec2_security_group" {
   depends_on = [module.dms.dms_replication_instance]
 
   provisioner "local-exec" {
     interpreter = ["bash", "-c"]
-    command = "ifconfig -a; chmod +x ./setup-security-group.sh; ./setup-security-group.sh"   
+    command     = "ifconfig -a; chmod +x ./setup-security-group.sh; ./setup-security-group.sh"
 
     environment = {
       DMS_SECURITY_GROUP            = aws_security_group.dms_access_rule.id
