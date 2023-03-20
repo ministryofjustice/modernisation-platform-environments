@@ -1,3 +1,7 @@
+data "github_repository" "my_repo" {
+  full_name = "ministryofjustice/Tipstaff"
+}
+
 # resource "aws_codepipeline" "codepipeline" {
 #   depends_on = [
 #     aws_codedeploy_app.tipstaff_codedeploy
@@ -210,9 +214,9 @@ resource "aws_codedeploy_app" "tipstaff_codedeploy" {
 }
 
 # resource "aws_codedeploy_deployment_group" "tipstaff_deployment_group" {
-# depends_on = [
-#   aws_codedeploy_app.tipstaff_codedeploy
-# ]
+  # depends_on = [
+  #   aws_codedeploy_app.tipstaff_codedeploy
+  # ]
 #   app_name              = aws_codedeploy_app.tipstaff_codedeploy.name
 #   deployment_group_name = "tipstaff-deployment-group"
 #   service_role_arn      = aws_iam_role.codedeploy_role.arn
