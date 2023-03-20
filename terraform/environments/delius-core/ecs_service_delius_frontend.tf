@@ -171,7 +171,15 @@ resource "aws_ecs_task_definition" "delius_core_frontend_task_definition" {
         ]
         readonlyRootFilesystem = false
         volumesFrom            = []
-        environment            = jsondecode(data.aws_ssm_parameter.delius_core_frontend_envs.value)
+
+        // loop over locals.frontend_envs_json and create a list of environment variables
+        environment = [
+          {
+            for_each = jsondecode(data.aws_ssm_parameter.delius_core_frontend_envs.value)
+            name     = each.key
+            value    = each.value
+          }
+        ]
       }
   ])
   cpu = "1024"
