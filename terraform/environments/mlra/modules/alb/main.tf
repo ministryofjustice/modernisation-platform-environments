@@ -5,7 +5,8 @@ locals {
       from_port       = var.security_group_ingress_from_port
       to_port         = var.security_group_ingress_to_port
       protocol        = var.security_group_ingress_protocol
-      prefix_list_ids = [data.aws_ec2_managed_prefix_list.cloudfront.id]
+      # prefix_list_ids = [data.aws_ec2_managed_prefix_list.cloudfront.id]
+      cidr_blocks     = ["0.0.0.0/0"]
     }
   }
   loadbalancer_egress_rules = {
@@ -635,67 +636,65 @@ resource "aws_lb_listener" "alb_listener" {
   # }
 
   default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.alb_target_group.arn
-    # type = "fixed-response"
-    # fixed_response {
-    #   content_type = "text/plain"
-    #   message_body = "Access Denied - must access via CloudFront"
-    #   status_code  = 403
-    # }
+    type = "fixed-response"
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "Access Denied - must access via CloudFront"
+      status_code  = 403
+    }
   }
 
   tags = var.tags
 
 }
 
-# resource "aws_lb_listener_rule" "alb_listener_rule" {
-#   listener_arn = aws_lb_listener.alb_listener.arn
-#   priority     = 1
-#
-#   # during phase 1 of migration into modernisation platform, an effort
-#   # is being made to retain the current application url in order to
-#   # limit disruption to the application architecture itself. therefore,
-#   # the current laa alb which is performing tls termination is going to
-#   # forward queries on here. this also means that waf and cdn resources
-#   # are retained in laa. the cdn there adds a custom header to the query,
-#   # with the alb there then forwarding those permitted queries on:
-#   #
-#   # Actions:
-#   #   - Type: forward
-#   #     TargetGroupArn: !Ref 'TargetGroup'
-#   # Conditions:
-#   #   - Field: http-header
-#   #     HttpHeaderConfig:
-#   #     HttpHeaderName: X-Custom-Header-LAA-MLRA
-#   #     Values:
-#   #       - '{{resolve:secretsmanager:cloudfront-secret-MLRA}}'
-#   #
-#   # in the meantime, therefore, we are simply forwarding traffic to a
-#   # target group here. However, in another phase of the migration, where
-#   # cdn resources are carried into modernisation platform, the above
-#   # configuration is very likely going to be required.
-#   #
-#   # see: https://docs.google.com/document/d/15BUaNNx6SW2fa6QNzdMUWscWWBQ44YCiFz-e3SOwouQ
-#
-#   action {
-#     type             = "forward"
-#     target_group_arn = aws_lb_target_group.alb_target_group.arn
-#   }
-#
-#   # condition {
-#   #   path_pattern {
-#   #     values = ["/"]
-#   #   }
-#   # }
-#
-#   condition {
-#     http_header {
-#       http_header_name = local.custom_header
-#       values           = [data.aws_secretsmanager_secret_version.cloudfront.secret_string]
-#     }
-#   }
-# }
+resource "aws_lb_listener_rule" "alb_listener_rule" {
+  listener_arn = aws_lb_listener.alb_listener.arn
+  priority     = 1
+
+  # during phase 1 of migration into modernisation platform, an effort
+  # is being made to retain the current application url in order to
+  # limit disruption to the application architecture itself. therefore,
+  # the current laa alb which is performing tls termination is going to
+  # forward queries on here. this also means that waf and cdn resources
+  # are retained in laa. the cdn there adds a custom header to the query,
+  # with the alb there then forwarding those permitted queries on:
+  #
+  # Actions:
+  #   - Type: forward
+  #     TargetGroupArn: !Ref 'TargetGroup'
+  # Conditions:
+  #   - Field: http-header
+  #     HttpHeaderConfig:
+  #     HttpHeaderName: X-Custom-Header-LAA-MLRA
+  #     Values:
+  #       - '{{resolve:secretsmanager:cloudfront-secret-MLRA}}'
+  #
+  # in the meantime, therefore, we are simply forwarding traffic to a
+  # target group here. However, in another phase of the migration, where
+  # cdn resources are carried into modernisation platform, the above
+  # configuration is very likely going to be required.
+  #
+  # see: https://docs.google.com/document/d/15BUaNNx6SW2fa6QNzdMUWscWWBQ44YCiFz-e3SOwouQ
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.alb_target_group.arn
+  }
+
+  # condition {
+  #   path_pattern {
+  #     values = ["/"]
+  #   }
+  # }
+
+  condition {
+    http_header {
+      http_header_name = local.custom_header
+      values           = [data.aws_secretsmanager_secret_version.cloudfront.secret_string]
+    }
+  }
+}
 
 resource "aws_lb_target_group" "alb_target_group" {
   name                 = "${var.application_name}-alb-tg"
