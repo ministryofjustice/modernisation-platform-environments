@@ -1,8 +1,4 @@
 #### This file can be used to store data specific to the member account ####
-data "aws_db_instance" "database" {
-  db_instance_identifier = "tribunals-db-dev"
-}
-
 data "aws_secretsmanager_secret" "rds-secrets" {
   arn = "arn:aws:secretsmanager:eu-west-2:263310006819:secret:tribunals-db-dev-credentials-WIKA7c"
 }
