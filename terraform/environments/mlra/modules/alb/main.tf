@@ -7,15 +7,6 @@ locals {
       protocol        = var.security_group_ingress_protocol
       cidr_blocks     = ["0.0.0.0/0"]
       security_groups = []
-    },
-    # TODO Remove lb_ingress_2 when done testing for HTTP access to the application
-    "lb_ingress_2" = {
-      description     = "Loadbalancer ingress rule from MoJ VPN Test 80 - Please remove me."
-      from_port       = 80
-      to_port         = 80
-      protocol        = "tcp"
-      cidr_blocks     = ["0.0.0.0/0"]
-      security_groups = []
     }
   }
   loadbalancer_egress_rules = {
@@ -594,12 +585,6 @@ resource "aws_route53_record" "external_validation_subdomain" {
 
 ######################
 
-resource "null_resource" "always_run" {
-  triggers = {
-    timestamp = "${timestamp()}"
-  }
-}
-
 resource "aws_lb_listener" "alb_listener" {
 
   load_balancer_arn = aws_lb.loadbalancer.arn
@@ -643,7 +628,7 @@ resource "aws_lb_listener" "alb_listener" {
     #   content_type = "text/plain"
     #   message_body = "Access Denied - must access via CloudFront"
     #   status_code  = 403
-    # }
+    }
   }
 
   tags = var.tags
