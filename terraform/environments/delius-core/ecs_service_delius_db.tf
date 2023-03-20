@@ -1,6 +1,8 @@
 ##
 # Create service and task definitions for delius-testing-db
 ##
+
+# Define re-usable local vars
 locals {
   service_name         = "testing-db"
   fully_qualified_name = "${local.application_name}-${local.service_name}"
