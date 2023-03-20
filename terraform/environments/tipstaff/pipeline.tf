@@ -1,84 +1,80 @@
-data "github_repository" "my_repo" {
-  full_name = "ministryofjustice/Tipstaff"
-}
+# resource "aws_codepipeline" "codepipeline" {
+#   depends_on = [
+#     aws_codedeploy_app.tipstaff_codedeploy
+#   ]
+#   provider = aws.eu-west-1
+#   name     = "tf_tipstaff_pipeline"
+#   role_arn = aws_iam_role.codepipeline_role.arn
 
-resource "aws_codepipeline" "codepipeline" {
-  depends_on = [
-    aws_codedeploy_app.tipstaff_codedeploy
-  ]
-  provider = aws.eu-west-1
-  name     = "tf_tipstaff_pipeline"
-  role_arn = aws_iam_role.codepipeline_role.arn
+#   artifact_store {
+#     location = aws_s3_bucket.pipeline-s3-eu-west-1.bucket
+#     type     = "S3"
+#     region   = "eu-west-1"
+#   }
 
-  artifact_store {
-    location = aws_s3_bucket.pipeline-s3-eu-west-1.bucket
-    type     = "S3"
-    region   = "eu-west-1"
-  }
+#   artifact_store {
+#     location = aws_s3_bucket.pipeline-s3-eu-west-2.bucket
+#     type     = "S3"
+#     region   = "eu-west-2"
+#   }
 
-  artifact_store {
-    location = aws_s3_bucket.pipeline-s3-eu-west-2.bucket
-    type     = "S3"
-    region   = "eu-west-2"
-  }
+#   stage {
+#     name = "Source"
 
-  stage {
-    name = "Source"
+#     action {
+#       name             = "Source"
+#       category         = "Source"
+#       owner            = "ThirdParty"
+#       provider         = "GitHub"
+#       version          = "1"
+#       output_artifacts = ["source_output"]
 
-    action {
-      name             = "Source"
-      category         = "Source"
-      owner            = "ThirdParty"
-      provider         = "GitHub"
-      version          = "1"
-      output_artifacts = ["source_output"]
+#       configuration = {
+#         Owner      = "ministryofjustice"
+#         Repo       = "Tipstaff"
+#         Branch     = "terraform-build"
+#         OAuthToken = jsondecode(data.aws_secretsmanager_secret_version.oauth_token.secret_string)["OAUTH_TOKEN"]
+#       }
+#     }
+#   }
 
-      configuration = {
-        Owner      = "ministryofjustice"
-        Repo       = "Tipstaff"
-        Branch     = "terraform-build"
-        OAuthToken = jsondecode(data.aws_secretsmanager_secret_version.oauth_token.secret_string)["OAUTH_TOKEN"]
-      }
-    }
-  }
+#   stage {
+#     name = "Build"
 
-  stage {
-    name = "Build"
+#     action {
+#       name             = "Build"
+#       category         = "Build"
+#       owner            = "AWS"
+#       provider         = "CodeBuild"
+#       input_artifacts  = ["source_output"]
+#       output_artifacts = ["build_output"]
+#       version          = "1"
 
-    action {
-      name             = "Build"
-      category         = "Build"
-      owner            = "AWS"
-      provider         = "CodeBuild"
-      input_artifacts  = ["source_output"]
-      output_artifacts = ["build_output"]
-      version          = "1"
+#       configuration = {
+#         ProjectName = "my-dotnet-build-project"
+#       }
+#     }
+#   }
 
-      configuration = {
-        ProjectName = "my-dotnet-build-project"
-      }
-    }
-  }
+#   stage {
+#     name = "Deploy"
 
-  # stage {
-  #   name = "Deploy"
+#     action {
+#       name            = "Deploy"
+#       category        = "Deploy"
+#       owner           = "AWS"
+#       provider        = "CodeDeploy"
+#       input_artifacts = ["build_output"]
+#       version         = "1"
+#       region          = "eu-west-2"
 
-  #   action {
-  #     name            = "Deploy"
-  #     category        = "Deploy"
-  #     owner           = "AWS"
-  #     provider        = "CodeDeploy"
-  #     input_artifacts = ["build_output"]
-  #     version         = "1"
-  #     region          = "eu-west-2"
-
-  #     configuration = {
-  #       ApplicationName     = "tipstaff-codedeploy"
-  #       DeploymentGroupName = "tipstaff-deployment-group"
-  #     }
-  #   }
-  # }
-}
+#       configuration = {
+#         ApplicationName     = "tipstaff-codedeploy"
+#         DeploymentGroupName = "tipstaff-deployment-group"
+#       }
+#     }
+#   }
+# }
 
 resource "aws_s3_bucket" "pipeline-s3-eu-west-1" {
   provider = aws.eu-west-1
