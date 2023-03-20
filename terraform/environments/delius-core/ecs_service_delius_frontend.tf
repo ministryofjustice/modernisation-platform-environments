@@ -225,7 +225,7 @@ resource "aws_vpc_security_group_egress_rule" "delius_db_security_group_egress_i
 }
 
 # Come back to this to investigate only allowing egress to the DB security group
-resource "aws_vpc_security_group_egress_rule" "delius_core_frontend_security_group_egress_internet" {
+resource "aws_vpc_security_group_egress_rule" "delius_core_frontend_security_group_egress_db" {
   security_group_id            = aws_security_group.delius_core_frontend_security_group.id
   description                  = "outbound from the testing frontend ecs service"
   ip_protocol                  = "-1"
