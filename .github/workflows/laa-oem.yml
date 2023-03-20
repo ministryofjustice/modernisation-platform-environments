@@ -261,4 +261,3 @@ jobs:
           bash scripts/terraform-init.sh terraform/environments/$GITHUB_WORKFLOW
           terraform -chdir="terraform/environments/${GITHUB_WORKFLOW}" workspace select "${GITHUB_WORKFLOW}-${TF_ENV}"
           bash scripts/terraform-apply.sh terraform/environments/$GITHUB_WORKFLOW 
-
