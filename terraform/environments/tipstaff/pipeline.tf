@@ -56,24 +56,24 @@ resource "aws_codepipeline" "codepipeline" {
     }
   }
 
-  # stage {
-  #   name = "Deploy"
+  stage {
+    name = "Deploy"
 
-  #   action {
-  #     name            = "Deploy"
-  #     category        = "Deploy"
-  #     owner           = "AWS"
-  #     provider        = "CodeDeploy"
-  #     input_artifacts = ["build_output"]
-  #     version         = "1"
-  #     region          = "eu-west-2"
+    action {
+      name            = "Deploy"
+      category        = "Deploy"
+      owner           = "AWS"
+      provider        = "CodeDeploy"
+      input_artifacts = ["build_output"]
+      version         = "1"
+      region          = "eu-west-2"
 
-  #     configuration = {
-  #       ApplicationName     = "tipstaff-codedeploy"
-  #       DeploymentGroupName = "tipstaff-deployment-group"
-  #     }
-  #   }
-  # }
+      configuration = {
+        ApplicationName     = "tipstaff-codedeploy"
+        DeploymentGroupName = "tipstaff-deployment-group"
+      }
+    }
+  }
 }
 
 resource "aws_s3_bucket" "pipeline-s3-eu-west-1" {
