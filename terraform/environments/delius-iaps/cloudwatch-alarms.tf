@@ -92,6 +92,6 @@ resource "aws_cloudwatch_metric_alarm" "rds_free_storage_space" {
   threshold           = "104857600" # 100 GB
   alarm_description   = "This metric monitors free storage space for the RDS instance"
   dimensions = {
-    DBInstanceIdentifier = "your_rds_instance_name"
+    DBInstanceIdentifier = aws_db_instance.iaps.identifier
   }
 }
