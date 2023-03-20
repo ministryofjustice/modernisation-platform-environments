@@ -46,6 +46,85 @@ locals {
     }
   }
 
+  lb_weblogic = {
+    route53 = {
+      route53_records = {
+        "$(name).nomis" = {
+          account                = "core-vpc"
+          zone_id                = module.environment.route53_zones[module.environment.domains.public.business_unit_environment].zone_id
+          evaluate_target_health = true
+        }
+      }
+    }
+
+    http = {
+      port     = 80
+      protocol = "HTTP"
+      default_action = {
+        type = "redirect"
+        redirect = {
+          status_code = "HTTP_301"
+          port        = 443
+          protocol    = "HTTPS"
+        }
+      }
+    }
+    http-7001 = {
+      port     = 7001
+      protocol = "HTTP"
+      default_action = {
+        type              = "forward"
+        target_group_name = "$(name)-http-7001"
+      }
+    }
+    http-7777 = {
+      port     = 7777
+      protocol = "HTTP"
+      default_action = {
+        type              = "forward"
+        target_group_name = "$(name)-http-7777"
+      }
+    }
+    https = {
+      port                      = 443
+      protocol                  = "HTTPS"
+      ssl_policy                = "ELBSecurityPolicy-2016-08"
+      certificate_names_or_arns = ["application_environment_wildcard_cert"]
+      default_action = {
+        type = "fixed-response"
+        fixed_response = {
+          content_type = "text/plain"
+          message_body = "Not implemented"
+          status_code  = "501"
+        }
+      }
+      rules = {
+        forward-http-7777 = {
+          priority = 200
+          actions = [{
+            type              = "forward"
+            target_group_name = "$(name)-http-7777"
+          }]
+          conditions = [{
+            host_header = {
+              values = ["$(name).nomis.${module.environment.vpc_name}.modernisation-platform.service.justice.gov.uk"]
+            }
+          }]
+        }
+      }
+    }
+  }
+
+  # allows an over-ride on where to send alarms (which sns topic) based on environment
+  lb_weblogic_listeners_sns_topic = {
+    development = {}
+    test = {
+      sns_topic = aws_sns_topic.nomis_alarms.arn
+    }
+    preproduction = {}
+    production    = {}
+  }
+
   ec2_weblogic = {
 
     # server-type and nomis-environment auto set by module
@@ -113,11 +192,10 @@ locals {
     }
 
     lb_target_groups = {
-      public-http-7001   = local.lb_target_group_http_7001
-      public-http-7777   = local.lb_target_group_http_7777
-      internal-http-7001 = local.lb_target_group_http_7001
-      internal-http-7777 = local.lb_target_group_http_7777
+      http-7001 = local.lb_target_group_http_7001
+      http-7777 = local.lb_target_group_http_7777
     }
+
     cloudwatch_metric_alarms_weblogic = {
       weblogic-node-manager-service = {
         comparison_operator = "GreaterThanOrEqualToThreshold"
@@ -172,7 +250,7 @@ module "ec2_weblogic_autoscaling_group" {
   tags               = merge(local.tags, local.ec2_weblogic.tags, try(each.value.tags, {}))
   account_ids_lookup = local.environment_management.account_ids
   cloudwatch_metric_alarms = {
-    for key, value in merge(local.ec2_weblogic.cloudwatch_metric_alarms_weblogic, local.cloudwatch_metric_alarms_linux) :
+    for key, value in merge(local.ec2_weblogic.cloudwatch_metric_alarms_weblogic, local.cloudwatch_metric_alarms_linux, lookup(each.value, "cloudwatch_metric_alarms", {})) :
     key => merge(value, {
       alarm_actions = [lookup(each.value, "sns_topic", aws_sns_topic.nomis_nonprod_alarms.arn)]
   }) }

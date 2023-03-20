@@ -209,7 +209,7 @@ module "db_ec2_instance" {
   tags               = merge(local.tags, local.database.tags, try(each.value.tags, {}))
   account_ids_lookup = local.environment_management.account_ids
   cloudwatch_metric_alarms = {
-    for key, value in merge(local.database.cloudwatch_metric_alarms_database, local.cloudwatch_metric_alarms_linux) :
+    for key, value in merge(local.cloudwatch_metric_alarms_linux, local.database.cloudwatch_metric_alarms_database, lookup(each.value, "cloudwatch_metric_alarms", {})) :
     key => merge(value, {
       alarm_actions = [lookup(each.value, "sns_topic", aws_sns_topic.nomis_nonprod_alarms.arn)]
   }) }
