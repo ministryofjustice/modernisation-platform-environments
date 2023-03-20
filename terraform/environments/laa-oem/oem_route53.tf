@@ -11,6 +11,19 @@ resource "aws_route53_record" "route53_record_app_lb" {
   }
 }
 
+resource "aws_route53_record" "route53_record_app_lb_internal" {
+  provider = aws.core-vpc
+  zone_id  = data.aws_route53_zone.external.zone_id
+  name     = "oem-internal.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type     = "A"
+
+  alias {
+    name                   = aws_lb.oem_app_internal.dns_name
+    zone_id                = aws_lb.oem_app_internal.zone_id
+    evaluate_target_health = false
+  }
+}
+
 resource "aws_route53_record" "route53_record_app" {
   provider = aws.core-vpc
   zone_id  = data.aws_route53_zone.external.zone_id
