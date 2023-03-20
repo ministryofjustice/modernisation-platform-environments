@@ -8,11 +8,12 @@ locals {
       cidr_blocks     = [var.moj_vpn_cidr_block]
       security_groups = []
     },
+    # TODO Remove lb_ingress_2 when done testing for HTTP access to the application
     "lb_ingress_2" = {
       description     = "Loadbalancer ingress rule from MoJ VPN Test 80 - Please remove me."
       from_port       = 80
       to_port         = 80
-      protocol        = "HTTP"
+      protocol        = "tcp"
       cidr_blocks     = [var.moj_vpn_cidr_block]
       security_groups = []
     }
