@@ -73,7 +73,7 @@ resource "aws_codepipeline" "codepipeline" {
       region          = "eu-west-2"
 
       configuration = {
-        ApplicationName     = "tipstaff-codedeploy"
+        ApplicationName = "tipstaff-codedeploy"
         # DeploymentGroupName = "tipstaff-deployment-group"
       }
     }
