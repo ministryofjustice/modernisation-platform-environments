@@ -60,31 +60,32 @@ resource "aws_vpc_security_group_egress_rule" "delius_core_frontend_alb_egress_f
 #   }
 # }
 
-# resource "aws_lb_target_group" "delius_core_frontend_target_group" {
-#   # checkov:skip=CKV_AWS_261
+resource "aws_lb_target_group" "delius_core_frontend_target_group" {
+  # checkov:skip=CKV_AWS_261
 
-#   name                 = format("%s-tg", local.frontend_fully_qualified_name)
-#   port                 = local.frontend_container_port
-#   protocol             = "HTTP"
-#   vpc_id               = data.aws_vpc.shared.id
-#   target_type          = "ip"
-#   deregistration_delay = 30
-#   tags                 = local.tags
+  # name                 = format("%s-tg", local.frontend_fully_qualified_name)
+  name                 = local.frontend_fully_qualified_name
+  port                 = local.frontend_container_port
+  protocol             = "HTTP"
+  vpc_id               = data.aws_vpc.shared.id
+  target_type          = "ip"
+  deregistration_delay = 30
+  tags                 = local.tags
 
-#   stickiness {
-#     type = "lb_cookie"
-#   }
+  stickiness {
+    type = "lb_cookie"
+  }
 
-#   health_check {
-#     # path                = "/NDelius-war/delius/JSP/healthcheck.jsp?ping"
-#     healthy_threshold   = "5"
-#     interval            = "120"
-#     protocol            = "HTTP"
-#     unhealthy_threshold = "2"
-#     matcher             = "200-499"
-#     timeout             = "5"
-#   }
-# }
+  health_check {
+    # path                = "/NDelius-war/delius/JSP/healthcheck.jsp?ping"
+    healthy_threshold   = "5"
+    interval            = "120"
+    protocol            = "HTTP"
+    unhealthy_threshold = "2"
+    matcher             = "200-499"
+    timeout             = "5"
+  }
+}
 
 # resource "aws_route53_record" "external" {
 #   provider = aws.core-vpc
