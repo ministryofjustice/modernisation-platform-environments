@@ -585,6 +585,12 @@ resource "aws_route53_record" "external_validation_subdomain" {
 
 ######################
 
+resource "null_resource" "always_run" {
+  triggers = {
+    timestamp = "${timestamp()}"
+  }
+}
+
 # resource "aws_lb_listener" "alb_listener" {
 #
 #   load_balancer_arn = aws_lb.loadbalancer.arn
