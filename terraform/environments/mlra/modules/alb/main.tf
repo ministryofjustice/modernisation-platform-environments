@@ -585,55 +585,67 @@ resource "aws_route53_record" "external_validation_subdomain" {
 
 ######################
 
-# resource "aws_lb_listener" "alb_listener" {
-#
-#   load_balancer_arn = aws_lb.loadbalancer.arn
-#   port              = var.listener_port
-#   #checkov:skip=CKV_AWS_2:The ALB protocol is HTTP
-#   protocol        = var.listener_protocol #tfsec:ignore:aws-elb-http-not-used
-#   ssl_policy      = var.listener_protocol == "HTTPS" ? var.alb_ssl_policy : null
-#   certificate_arn = var.listener_protocol == "HTTPS" ? aws_acm_certificate_validation.external.certificate_arn : null # This needs the ARN of the certificate from Mod Platform
-#
-#   # default_action {
-#   #   type = "forward"
-#   #   # during phase 1 of migration into modernisation platform, an effort
-#   #   # is being made to retain the current application url in order to
-#   #   # limit disruption to the application architecture itself. therefore,
-#   #   # the current laa alb which is performing tls termination is going to
-#   #   # forward queries on here. this also means that waf and cdn resources
-#   #   # are retained in laa. the cdn there adds a custom header to the query,
-#   #   # with the alb there then forwarding those permitted queries on:
-#   #   #
-#   #   # - Type: fixed-response
-#   #   #   FixedResponseConfig:
-#   #   #     ContentType: text/plain
-#   #   #     MessageBody: Access Denied - must access via CloudFront
-#   #   #     StatusCode: '403'
-#   #   #
-#   #   # in the meantime, therefore, we simply forward queries to a target
-#   #   # group. however, in another phase of the migration, where cdn resources
-#   #   # are carried into the modernisation platform, the above configuration
-#   #   # may need to be applied.
-#   #   #
-#   #   # see: https://docs.google.com/document/d/15BUaNNx6SW2fa6QNzdMUWscWWBQ44YCiFz-e3SOwouQ
-#   #
-#   #   target_group_arn = aws_lb_target_group.alb_target_group.arn
-#   # }
-#
-#   default_action {
-#     type             = "forward"
-#     target_group_arn = aws_lb_target_group.alb_target_group.arn
-#     # type = "fixed-response"
-#     # fixed_response {
-#     #   content_type = "text/plain"
-#     #   message_body = "Access Denied - must access via CloudFront"
-#     #   status_code  = 403
-#     # }
-#   }
-#
-#   tags = var.tags
-#
-# }
+resource "null_resource" "always_replace" {
+  triggers = {
+    timestamp = "${timestamp()}"
+  }
+}
+
+resource "aws_lb_listener" "alb_listener" {
+
+  lifecycle {
+    replace_triggered_by = [
+      null_resource.always_replace
+    ]
+  }
+
+  load_balancer_arn = aws_lb.loadbalancer.arn
+  port              = var.listener_port
+  #checkov:skip=CKV_AWS_2:The ALB protocol is HTTP
+  protocol        = var.listener_protocol #tfsec:ignore:aws-elb-http-not-used
+  ssl_policy      = var.listener_protocol == "HTTPS" ? var.alb_ssl_policy : null
+  certificate_arn = var.listener_protocol == "HTTPS" ? aws_acm_certificate_validation.external.certificate_arn : null # This needs the ARN of the certificate from Mod Platform
+
+  # default_action {
+  #   type = "forward"
+  #   # during phase 1 of migration into modernisation platform, an effort
+  #   # is being made to retain the current application url in order to
+  #   # limit disruption to the application architecture itself. therefore,
+  #   # the current laa alb which is performing tls termination is going to
+  #   # forward queries on here. this also means that waf and cdn resources
+  #   # are retained in laa. the cdn there adds a custom header to the query,
+  #   # with the alb there then forwarding those permitted queries on:
+  #   #
+  #   # - Type: fixed-response
+  #   #   FixedResponseConfig:
+  #   #     ContentType: text/plain
+  #   #     MessageBody: Access Denied - must access via CloudFront
+  #   #     StatusCode: '403'
+  #   #
+  #   # in the meantime, therefore, we simply forward queries to a target
+  #   # group. however, in another phase of the migration, where cdn resources
+  #   # are carried into the modernisation platform, the above configuration
+  #   # may need to be applied.
+  #   #
+  #   # see: https://docs.google.com/document/d/15BUaNNx6SW2fa6QNzdMUWscWWBQ44YCiFz-e3SOwouQ
+  #
+  #   target_group_arn = aws_lb_target_group.alb_target_group.arn
+  # }
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.alb_target_group.arn
+    # type = "fixed-response"
+    # fixed_response {
+    #   content_type = "text/plain"
+    #   message_body = "Access Denied - must access via CloudFront"
+    #   status_code  = 403
+    # }
+  }
+
+  tags = var.tags
+
+}
 
 # resource "aws_lb_listener_rule" "alb_listener_rule" {
 #   listener_arn = aws_lb_listener.alb_listener.arn
