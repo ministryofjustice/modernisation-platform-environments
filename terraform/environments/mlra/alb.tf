@@ -25,8 +25,8 @@ module "alb" {
   moj_vpn_cidr_block               = local.application_data.accounts[local.environment].moj_vpn_cidr
   # existing_bucket_name = "" # An s3 bucket name can be provided in the module by adding the `existing_bucket_name` variable and adding the bucket name
 
-  listener_protocol    = "HTTPS" # TODO This needs changing to HTTPS as part of https://dsdmoj.atlassian.net/browse/LAWS-3076
-  listener_port        = 443
+  listener_protocol    = "HTTP" # TODO This needs changing to HTTPS as part of https://dsdmoj.atlassian.net/browse/LAWS-3076
+  listener_port        = 80
   alb_ssl_policy       = "ELBSecurityPolicy-TLS-1-2-2017-01" # TODO This enforces TLSv1.2. For general, use ELBSecurityPolicy-2016-08 instead
   services_zone_id     = data.aws_route53_zone.network-services.zone_id
   external_zone_id     = data.aws_route53_zone.external.zone_id
