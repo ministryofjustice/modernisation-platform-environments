@@ -1,12 +1,7 @@
 ##
 # Create service and task definitions for delius-testing-frontend
 ##
-locals {
-  frontend_service_name         = "testing-frontend"
-  frontend_fully_qualified_name = "${local.application_name}-${local.frontend_service_name}"
-  frontend_image_tag            = "5.7.4"
-  frontend_container_port       = 7001
-}
+
 
 ##
 # SSM Parameter Store for delius-core-frontend
@@ -198,7 +193,7 @@ resource "aws_ecs_task_definition" "delius_core_frontend_task_definition" {
 # ##
 # Pre-req - security groups
 resource "aws_security_group" "delius_core_frontend_security_group" {
-  name        = "delius weblogic to delius frontend"
+  name        = "delius weblogic to delius db"
   description = "Rules for the delius testing frontend ecs service"
   vpc_id      = data.aws_vpc.shared.id
   tags        = local.tags
@@ -222,10 +217,12 @@ resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_security_gr
 }
 
 resource "aws_vpc_security_group_egress_rule" "delius_core_frontend_security_group_egress_internet" {
-  security_group_id = aws_security_group.delius_core_frontend_security_group.id
-  description       = "outbound from the testing frontend ecs service"
-  ip_protocol       = "-1"
-  cidr_ipv4         = "0.0.0.0/0"
+  security_group_id        = aws_security_group.delius_core_frontend_security_group.id
+  description              = "outbound from the testing frontend ecs service"
+  ip_protocol              = "-1"
+  to_port                  = local.db_container_port
+  from_port                = local.db_container_port
+  source_security_group_id = aws_security_group.delius_db_security_group.id
 }
 
 # Pre-req - CloudWatch log group
