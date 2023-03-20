@@ -9,7 +9,7 @@ module "dms" {
   dms_source_db_username   = jsondecode(data.aws_secretsmanager_secret_version.source-db.secret_string)["username"]
   dms_source_db_hostname   = jsondecode(data.aws_secretsmanager_secret_version.source-db.secret_string)["host"]
   dms_replication_instance = module.dms.dms_replication_instance
-  region                   = var.region
+  region                   = "eu-west-2"
   application_name         = "tribunals"
   source_db_name           = "default"
   target_db_name           = "default"
