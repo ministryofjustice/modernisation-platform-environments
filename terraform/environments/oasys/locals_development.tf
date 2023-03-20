@@ -116,6 +116,11 @@ locals {
       #   }
       # }
     }
+
+    baseline_bastion_linux = {
+      public_key_data = jsondecode(file("./files/bastion_linux.json"))
+      tags            = local.tags
+    }
   }
 }
 

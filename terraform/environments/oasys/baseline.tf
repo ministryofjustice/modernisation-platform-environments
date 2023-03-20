@@ -1,12 +1,13 @@
-# module "baseline" {
-#   source = "../../modules/baseline"
+module "baseline" {
+  source = "../../modules/baseline"
 
-#   providers = {
-#     aws                       = aws
-#     aws.core-network-services = aws.core-network-services
-#     aws.core-vpc              = aws.core-vpc
-#   }
+  providers = {
+    aws                       = aws
+    aws.core-network-services = aws.core-network-services
+    aws.core-vpc              = aws.core-vpc
+  }
 
-#   environment            = module.environment
-#   ec2_autoscaling_groups = lookup(local.environment_config, "autoscaling_groups", {})
-# }
+  bastion_linux = lookup(local.environment_config, "baseline_bastion_linux", {})
+  environment   = module.environment
+  # ec2_autoscaling_groups = lookup(local.environment_config, "baseline_ec2_autoscaling_groups", {})
+}
