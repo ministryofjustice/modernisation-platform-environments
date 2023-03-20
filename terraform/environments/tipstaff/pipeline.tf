@@ -3,6 +3,9 @@ data "github_repository" "my_repo" {
 }
 
 resource "aws_codepipeline" "codepipeline" {
+  depends_on = [
+    aws_codedeploy_app.tipstaff_codedeploy
+  ]
   provider = aws.eu-west-1
   name     = "tf_tipstaff_pipeline"
   role_arn = aws_iam_role.codepipeline_role.arn
@@ -210,28 +213,25 @@ resource "aws_codedeploy_app" "tipstaff_codedeploy" {
   name = "tipstaff-codedeploy"
 }
 
-# resource "aws_codedeploy_deployment_group" "tipstaff_deployment_group" {
-#   depends_on = [
-#     aws_codedeploy_app.tipstaff_codedeploy
-#   ]
-#   app_name              = aws_codedeploy_app.tipstaff_codedeploy.name
-#   deployment_group_name = "tipstaff-deployment-group"
-#   service_role_arn      = aws_iam_role.codedeploy_role.arn
+resource "aws_codedeploy_deployment_group" "tipstaff_deployment_group" {
+  app_name              = aws_codedeploy_app.tipstaff_codedeploy.name
+  deployment_group_name = "tipstaff-deployment-group"
+  service_role_arn      = aws_iam_role.codedeploy_role.arn
 
-#   auto_rollback_configuration {
-#     enabled = false
-#     events  = ["DEPLOYMENT_FAILURE"]
-#   }
+  auto_rollback_configuration {
+    enabled = false
+    events  = ["DEPLOYMENT_FAILURE"]
+  }
 
-#   ec2_tag_set {
-#     ec2_tag_filter {
-#       key   = "Name"
-#       type  = "KEY_AND_VALUE"
-#       value = aws_instance.tipstaff_ec2_instance.tags["Name"]
-#     }
-#   }
+  ec2_tag_set {
+    ec2_tag_filter {
+      key   = "Name"
+      type  = "KEY_AND_VALUE"
+      value = aws_instance.tipstaff_ec2_instance.tags["Name"]
+    }
+  }
 
-# }
+}
 
 resource "aws_iam_role" "codedeploy_role" {
   name = "CodeDeployRole"
