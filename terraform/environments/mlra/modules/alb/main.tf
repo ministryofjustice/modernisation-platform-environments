@@ -628,7 +628,7 @@ resource "aws_lb_listener" "alb_listener" {
     #   content_type = "text/plain"
     #   message_body = "Access Denied - must access via CloudFront"
     #   status_code  = 403
-    }
+    # }
   }
 
   tags = var.tags
