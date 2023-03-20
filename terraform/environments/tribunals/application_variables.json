@@ -4,7 +4,7 @@
       "moj_ip": "81.134.202.29/32",
       "allocated_storage": "20",
       "storage_type": "gp2",
-      "identifier": "tf-tribunals-dev",
+      "identifier": "tribunals-db-dev",
       "engine": "sqlserver-se",
       "engine_version": "15.00.4198.2.v1",
       "instance_class": "db.m5.large",
