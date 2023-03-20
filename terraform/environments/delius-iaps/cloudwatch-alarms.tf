@@ -76,6 +76,8 @@ resource "aws_cloudwatch_metric_alarm" "rds_cpu_utilization_over_threshold" {
   statistic           = "Average"
   threshold           = "80"
   alarm_description   = "This metric monitors CPU utilization for the RDS instance"
+  alarm_actions       = [aws_sns_topic.this.arn]
+  ok_actions          = [aws_sns_topic.this.arn]
   dimensions = {
     DBInstanceIdentifier = aws_db_instance.iaps.identifier
   }
@@ -91,6 +93,8 @@ resource "aws_cloudwatch_metric_alarm" "rds_free_storage_space" {
   statistic           = "Minimum"
   threshold           = "104857600" # 100 GB
   alarm_description   = "This metric monitors free storage space for the RDS instance"
+  alarm_actions       = [aws_sns_topic.this.arn]
+  ok_actions          = [aws_sns_topic.this.arn]
   dimensions = {
     DBInstanceIdentifier = aws_db_instance.iaps.identifier
   }
