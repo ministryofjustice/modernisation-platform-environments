@@ -212,7 +212,7 @@ resource "aws_codedeploy_app" "tipstaff_codedeploy" {
 
 resource "aws_codedeploy_deployment_group" "tipstaff_deployment_group" {
   depends_on = [
-    aws_codedeploy_app.tipstaff_codedeploy.name
+    aws_codedeploy_app.tipstaff_codedeploy
   ]
   app_name              = aws_codedeploy_app.tipstaff_codedeploy.name
   deployment_group_name = "tipstaff-deployment-group"
