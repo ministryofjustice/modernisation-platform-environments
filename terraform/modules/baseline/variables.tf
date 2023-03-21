@@ -246,7 +246,7 @@ variable "rds_instances" {
   description = "map of rds instances to create where the map key is the tags.Name.  See rds_instance module for more variable details"
   type = map(object({
     instance = object({
-      identifier = string
+      identifier                          = string
       create                              = optional(bool, true)
       allocated_storage                   = number
       storage_type                        = optional(string, "gp2")
@@ -284,6 +284,43 @@ variable "rds_instances" {
       character_set_name                  = optional(string)
       option_group_name                   = optional(string)
       enabled_cloudwatch_logs_exports     = optional(list(string))
+    })
+    option_group = object({
+      create               = bool
+      name_prefix          = string
+      description          = string
+      engine_name          = string
+      major_engine_version = string
+      options = list(object({
+        name = string
+        settings = list(object({
+          name  = string
+          value = string
+        }))
+      }))
+      tags = optional(list(string))
+    })
+    parameter_group = object({
+      create               = bool
+      name_prefix          = string
+      description          = string
+      family               = string
+      major_engine_version = string
+      parameter = list(object({
+        name = string
+        settings = list(object({
+          name  = string
+          value = string
+        }))
+      }))
+      tags = optional(list(string))
+    })
+    subnet_group = object({
+      create      = bool
+      name_prefix = string
+      description = string
+      subnet_ids  = list(string)
+      tags        = optional(list(string))
     })
     ssm_parameters = optional(map(object({
       random = object({
