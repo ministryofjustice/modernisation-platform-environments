@@ -262,9 +262,9 @@ resource "aws_acm_certificate" "cloudfront" {
   subject_alternative_names = var.environment == "production" ? null : [local.domain_name]
 
   tags = var.tags
-
+  # TODO Set prevent_destroy to true to stop Terraform destroying this resource in the future if required
   lifecycle {
-    prevent_destroy = var.prevent_destroy
+    prevent_destroy = false
   }
 }
 
@@ -279,8 +279,9 @@ resource "aws_s3_bucket" "cloudfront" { # Mirroring laa-cloudfront-logging-devel
       Name = "laa-${var.application_name}-cloudfront-logging-${var.environment}"
     }
   )
+  # TODO Set prevent_destroy to true to stop Terraform destroying this resource in the future if required
   lifecycle {
-    prevent_destroy = var.prevent_destroy
+    prevent_destroy = false
   }
 }
 
@@ -291,8 +292,9 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "cloudfront" {
       sse_algorithm = "AES256"
     }
   }
+  # TODO Set prevent_destroy to true to stop Terraform destroying this resource in the future if required
   lifecycle {
-    prevent_destroy = var.prevent_destroy
+    prevent_destroy = false
   }
 }
 
@@ -303,9 +305,9 @@ resource "aws_s3_bucket_public_access_block" "cloudfront" {
   block_public_policy     = true
   ignore_public_acls      = true
   restrict_public_buckets = true
-
+  # TODO Set prevent_destroy to true to stop Terraform destroying this resource in the future if required
   lifecycle {
-    prevent_destroy = var.prevent_destroy
+    prevent_destroy = false
   }
 }
 
@@ -583,16 +585,19 @@ resource "aws_acm_certificate" "external_lb" {
 
   tags = var.tags
 
+  # TODO Set prevent_destroy to true to stop Terraform destroying this resource in the future if required
   lifecycle {
-    prevent_destroy = var.prevent_destroy
+    prevent_destroy = false
   }
 }
 
 resource "aws_acm_certificate_validation" "external" {
   certificate_arn         = aws_acm_certificate.external_lb.arn
   validation_record_fqdns = [local.domain_name_main[0], local.domain_name_sub[0]]
+
+  # TODO Set prevent_destroy to true to stop Terraform destroying this resource in the future if required
   lifecycle {
-    prevent_destroy = var.prevent_destroy
+    prevent_destroy = false
   }
 }
 
