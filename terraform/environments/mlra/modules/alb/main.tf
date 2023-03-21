@@ -347,8 +347,8 @@ resource "aws_cloudfront_distribution" "external" {
         forward = lookup(var.cloudfront_default_cache_behavior, "forwarded_values_cookies_forward", null)
         whitelisted_names = lookup(var.cloudfront_default_cache_behavior, "forwarded_values_cookies_whitelisted_names", null)
       }
-      viewer_protocol_policy = lookup(var.cloudfront_default_cache_behavior, "viewer_protocol_policy", null)
     }
+    viewer_protocol_policy = lookup(var.cloudfront_default_cache_behavior, "viewer_protocol_policy", null)
   }
   # default_cache_behavior {
   #   target_origin_id = aws_lb.loadbalancer.id
