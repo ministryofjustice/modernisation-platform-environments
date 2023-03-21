@@ -156,7 +156,7 @@ resource "aws_ecs_task_definition" "delius_core_frontend_task_definition" {
         }
         memory      = 4096
         mountPoints = []
-        name        = "delius-core-testing-frontend"
+        name        = "${local.frontend_fully_qualified_name}"
         portMappings = [
           {
             containerPort = local.frontend_container_port
@@ -255,7 +255,7 @@ resource "aws_ecs_service" "delius-frontend-service" {
 
   load_balancer {
     target_group_arn = aws_alb_target_group.delius_core_frontend_target_group.arn
-    container_name   = aws_ecs_task_definition.delius_core_frontend_task_definition.container_definitions[0].name
+    container_name   = local.frontend_fully_qualified_name
     container_port   = local.frontend_container_port
   }
 
