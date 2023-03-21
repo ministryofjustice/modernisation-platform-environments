@@ -191,3 +191,7 @@ variable "waf_default_action" {
   type        = string
   description = "Specifies how you want AWS WAF to respond to requests that don't match the criteria in any of the rules. e.g. ALLOW or BLOCK"
 }
+variable "prevent_destroy" {
+  type        = boolean
+  description = "If true prevent destroy to certain resources defined with the prevent_destroy lifecycle"
+}

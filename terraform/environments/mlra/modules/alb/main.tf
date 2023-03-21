@@ -264,7 +264,7 @@ resource "aws_acm_certificate" "cloudfront" {
   tags = var.tags
 
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = var.prevent_destroy
   }
 }
 
@@ -280,7 +280,7 @@ resource "aws_s3_bucket" "cloudfront" { # Mirroring laa-cloudfront-logging-devel
     }
   )
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = var.prevent_destroy
   }
 }
 
@@ -292,7 +292,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "cloudfront" {
     }
   }
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = var.prevent_destroy
   }
 }
 
@@ -305,7 +305,7 @@ resource "aws_s3_bucket_public_access_block" "cloudfront" {
   restrict_public_buckets = true
 
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = var.prevent_destroy
   }
 }
 
@@ -584,7 +584,7 @@ resource "aws_acm_certificate" "external_lb" {
   tags = var.tags
 
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = var.prevent_destroy
   }
 }
 
@@ -592,7 +592,7 @@ resource "aws_acm_certificate_validation" "external" {
   certificate_arn         = aws_acm_certificate.external_lb.arn
   validation_record_fqdns = [local.domain_name_main[0], local.domain_name_sub[0]]
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = var.prevent_destroy
   }
 }
 
@@ -645,6 +645,11 @@ resource "aws_route53_record" "external_validation_subdomain" {
 }
 
 ######################
+
+# TODO This resource is required because otherwise Error: failed to read schema for module.alb.null_resource.always_run in registry.terraform.io/hashicorp/null: failed to instantiate provider
+# When the whole stack is recreated this can be removed
+resource "null_resource" "always_run" {
+}
 
 resource "aws_lb_listener" "alb_listener" {
 

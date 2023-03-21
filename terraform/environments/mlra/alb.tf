@@ -128,4 +128,7 @@ module "alb" {
   cloudfront_is_ipv6_enabled = true
   waf_default_action = "BLOCK"
 
+  # TODO Mark as true when live to prevent key resources from being destroyed by Terraform
+  prevent_destroy = false
+
 }
