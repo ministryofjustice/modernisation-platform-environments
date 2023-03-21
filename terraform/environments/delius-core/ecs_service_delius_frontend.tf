@@ -254,7 +254,7 @@ resource "aws_ecs_service" "delius-frontend-service" {
   }
 
   load_balancer {
-    target_group_arn = aws_alb_target_group.delius_core_frontend_target_group.arn
+    target_group_arn = aws_lb_target_group.delius_core_frontend_target_group.arn
     container_name   = local.frontend_fully_qualified_name
     container_port   = local.frontend_container_port
   }
