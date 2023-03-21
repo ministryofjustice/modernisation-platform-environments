@@ -13,8 +13,8 @@ module "db_instance" {
     ]
   })
   option_group    = each.value.option_group
-  parameter_group = each.value.option_group
-  subnet_group    = each.value.option_group
+  parameter_group = each.value.parameter_group
+  subnet_group    = each.value.subnet_group
 
   tags = merge(local.tags, each.value.tags)
 }
