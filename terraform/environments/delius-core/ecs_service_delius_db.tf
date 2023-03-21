@@ -257,6 +257,38 @@ resource "aws_ecs_service" "delius-db-service" {
 
 }
 
+##
+# Commenting out remaining sections - we will return to these with a new module
+##
+# ##
+# # Service and task deployment
+# ##
+# module "container" {
+#   source                   = "git::https://github.com/cloudposse/terraform-aws-ecs-container-definition.git?ref=tags/0.58.2"
+#   container_name           = local.fully_qualified_name
+#   container_image          = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.${data.aws_region.current.name}.amazonaws.com/${local.fully_qualified_name}-ecr-repo:${local.image_tag}"
+#   container_memory         = "4096"
+#   container_cpu            = "1024"
+#   essential                = true
+#   readonly_root_filesystem = false
+#   environment              = []
+#   port_mappings = [{
+#     containerPort = local.container_port
+#     hostPort      = local.container_port
+#     protocol      = "tcp"
+#   }]
+#   log_configuration = {
+#     logDriver = "awslogs"
+#     options = {
+#       "awslogs-group"         = "${local.fully_qualified_name}-ecs"
+#       "awslogs-region"        = data.aws_region.current.name
+#       "awslogs-stream-prefix" = local.fully_qualified_name
+#     }
+#   }
+#   secrets = [
+#   ]
+# }
+
 # module "deploy" {
 #   source                    = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=f1ace6467418d0df61fd8ff6beabd1c028798d39"
 #   container_definition_json = module.container.json_map_encoded_list

@@ -271,39 +271,3 @@ resource "aws_ecs_service" "delius-frontend-service" {
   triggers                           = {} # Change this for force redeployment
 
 }
-
-# module "deploy" {
-#   source                    = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=f1ace6467418d0df61fd8ff6beabd1c028798d39"
-#   container_definition_json = module.container.json_map_encoded_list
-#   ecs_cluster_arn           = aws_ecs_cluster.ecs_cluster.arn
-#   name                      = local.frontend_fully_qualified_name
-#   vpc_id                    = data.aws_vpc.shared.id
-
-#   launch_type  = "FARGATE"
-#   network_mode = "awsvpc"
-
-#   task_cpu    = "1024"
-#   task_memory = "4096"
-
-#   desired_count = 1
-
-#   service_role_arn   = aws_iam_role.delius_core_frontend_ecs_service.arn
-#   task_role_arn      = aws_iam_role.delius_core_frontend_ecs_task.arn
-#   task_exec_role_arn = aws_iam_role.delius_core_frontend_ecs_exec.arn
-
-#   environment = local.environment
-#   # ecs_load_balancers = [
-#   #   {
-#   #     target_group_arn = data.aws_lb_target_group.service.arn
-#   #     container_name   = local.frontend_service_name
-#   #     frontend_container_port   = local.frontend_container_port
-#   #   }
-#   # ]
-
-#   # security_group_ids = [var.service_security_group_id]
-
-#   subnet_ids = data.aws_subnets.shared-data.ids
-
-#   ignore_changes_task_definition = false
-
-# }
