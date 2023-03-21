@@ -1,6 +1,8 @@
 module "db_instance" {
   for_each = var.rds_instances
 
+  identifier = each.value.instance.identifier
+
   source = "../../modules/rds_instance"
 
   providers = {
