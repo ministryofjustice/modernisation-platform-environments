@@ -70,7 +70,15 @@ module "s3-bucket" { #tfsec:ignore:aws-s3-enable-versioning
     { Name = lower(format("s3-bucket-%s-%s", local.application_name, local.environment)) }
   )
 }
+resource "aws_s3_bucket_notification" "artefact_bucket_notification" {
+  bucket = module.s3-bucket.bucket.id
 
+  topic {
+    topic_arn     = aws_sns_topic.s3_topic.arn
+    events        = ["s3:ObjectCreated:*"]
+    filter_suffix = ".log"
+  }
+}
 data "aws_iam_policy_document" "artefacts_s3_policy" {
   statement {
     principals {
@@ -156,7 +164,15 @@ module "s3-bucket-logging" {
     { Name = lower(format("s3-%s-%s-logging", local.application_name, local.environment)) }
   )
 }
+resource "aws_s3_bucket_notification" "logging_bucket_notification" {
+  bucket = module.s3-bucket-logging.bucket.id
 
+  topic {
+    topic_arn     = aws_sns_topic.s3_topic.arn
+    events        = ["s3:ObjectCreated:*"]
+    filter_suffix = ".log"
+  }
+}
 data "aws_iam_policy_document" "logging_s3_policy" {
   statement {
     principals {
@@ -239,7 +255,15 @@ module "s3-bucket-dbbackup" {
     { Name = lower(format("s3-%s-%s-dbbackup", local.application_name, local.environment)) }
   )
 }
+resource "aws_s3_bucket_notification" "dbbackup_bucket_notification" {
+  bucket = module.s3-bucket-dbbackup.bucket.id
 
+  topic {
+    topic_arn     = aws_sns_topic.s3_topic.arn
+    events        = ["s3:ObjectCreated:*"]
+    filter_suffix = ".log"
+  }
+}
 data "aws_iam_policy_document" "dbbackup_s3_policy" {
   statement {
     principals {
