@@ -9,6 +9,9 @@ module "s3-bucket" { #tfsec:ignore:aws-s3-enable-versioning
   versioning_enabled = false
   bucket_policy      = [data.aws_iam_policy_document.artefacts_s3_policy.json]
 
+  log_bucket = local.logging_bucket_name
+  log_prefix = "s3access/${local.artefact_bucket_name}"
+
   # Refer to the below section "Replication" before enabling replication
   replication_enabled = false
   # Below three variables and providers configuration are only relevant if 'replication_enabled' is set to true
@@ -92,6 +95,9 @@ module "s3-bucket-logging" {
   versioning_enabled = false
   bucket_policy      = [data.aws_iam_policy_document.logging_s3_policy.json]
 
+  log_bucket = local.logging_bucket_name
+  log_prefix = "s3access/${local.logging_bucket_name}"
+
   # Refer to the below section "Replication" before enabling replication
   replication_enabled = false
   # Below three variables and providers configuration are only relevant if 'replication_enabled' is set to true
@@ -171,6 +177,9 @@ module "s3-bucket-dbbackup" {
   bucket_name        = local.rsync_bucket_name
   versioning_enabled = false
   bucket_policy      = [data.aws_iam_policy_document.dbbackup_s3_policy.json]
+
+  log_bucket = local.logging_bucket_name
+  log_prefix = "s3access/${local.rsync_bucket_name}"
 
   # Refer to the below section "Replication" before enabling replication
   replication_enabled = false
