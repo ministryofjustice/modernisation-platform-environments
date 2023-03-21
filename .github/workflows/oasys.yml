@@ -96,7 +96,7 @@ jobs:
         with:
           terraform_version: "~1"
           terraform_wrapper: false
-      - name: Run Terrform Apply
+      - name: Run Terraform Apply
         run: |
           terraform --version
           echo "Terraform apply - ${TF_ENV}"
@@ -172,7 +172,7 @@ jobs:
         with:
           terraform_version: "~1"
           terraform_wrapper: false
-      - name: Run Terrform Apply
+      - name: Run Terraform Apply
         run: |
           terraform --version
           echo "Terraform apply - ${TF_ENV}"
