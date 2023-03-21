@@ -144,11 +144,11 @@ variable "acm_cert_domain_name" {
   description = "The domain name of the ACM certificate for CloudFront and ALB HTTPS Listener"
 }
 variable "cloudfront_default_cache_behavior" {
-  type        = map(string)
+  type        = any
   description = "Default cache behavior map for the distribution"
 }
 variable "cloudfront_ordered_cache_behavior" {
-  type        = map(string)
+  type        = any
   description = "Ordered cache behavior map for the distribution, in order of precedence"
 }
 variable "cloudfront_origin_protocol_policy" {
