@@ -1,6 +1,6 @@
 locals {
   default_tags = {
-    instance-name = var.instance.db_name
+    identifier = var.identifier
   }
   tags = merge(local.default_tags, var.tags)
 }

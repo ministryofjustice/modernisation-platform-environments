@@ -1,3 +1,26 @@
+variable "business_unit" {
+  type        = string
+  description = "This corresponds to the VPC in which the application resides"
+  default     = "hmpps"
+  nullable    = false
+}
+
+variable "application_name" {
+  type        = string
+  description = "The name of the application.  This will be name of the environment in Modernisation Platform"
+  default     = "nomis"
+  nullable    = false
+  validation {
+    condition     = can(regex("^[A-Za-z0-9][A-Za-z0-9-.]{1,61}[A-Za-z0-9]$", var.application_name))
+    error_message = "Invalid name for application supplied in variable app_name."
+  }
+}
+
+variable "environment" {
+  type        = string
+  description = "Application environment - i.e. the terraform workspace"
+}
+
 variable "identifier" {
   type        = string
   description = "The identifier of the resource"
@@ -78,7 +101,11 @@ variable "option_group" {
     engine_name          = string
     major_engine_version = string
     options = list(object({
-      name = string
+      option_name                    = string
+      port                           = optional(number)
+      version                        = optional(string)
+      db_security_group_memberships  = optional(list(string))
+      vpc_security_group_memberships = optional(list(string))
       settings = list(object({
         name  = string
         value = string
@@ -91,17 +118,14 @@ variable "option_group" {
 variable "parameter_group" {
   description = "RDS instance parameter group settings"
   type = object({
-    create               = bool
-    name_prefix          = string
-    description          = string
-    family               = string
-    major_engine_version = string
-    parameter = list(object({
-      name = string
-      settings = list(object({
-        name  = string
-        value = string
-      }))
+    create      = bool
+    name_prefix = string
+    description = string
+    family      = string
+    parameters = list(object({
+      name         = string
+      value        = string
+      apply_method = optional(string, "immediate")
     }))
     tags = optional(list(string))
   })
@@ -116,4 +140,33 @@ variable "subnet_group" {
     subnet_ids  = list(string)
     tags        = optional(list(string))
   })
+}
+
+variable "iam_resource_names_prefix" {
+  type        = string
+  description = "Prefix IAM resources with this prefix, e.g. rds_instance-blabla"
+  default     = "rds_instance"
+}
+
+variable "instance_profile_policies" {
+  type        = list(string)
+  description = "A list of managed IAM policy document ARNs to be attached to the database instance profile"
+}
+
+variable "ssm_parameters_prefix" {
+  type        = string
+  description = "Optionally prefix ssm parameters with this prefix.  Add a trailing /"
+  default     = ""
+}
+
+variable "ssm_parameters" {
+  description = "A map of SSM parameters to create.  If parameters are manually created, set to {} so IAM role still created"
+  type = map(object({
+    random = object({
+      length  = number
+      special = bool
+    })
+    description = string
+  }))
+  default = null
 }

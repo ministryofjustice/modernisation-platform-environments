@@ -7,6 +7,9 @@ module "db_instance" {
     aws.core-vpc = aws.core-vpc
   }
 
+  application_name = var.environment.application_name
+  environment      = var.environment.environment
+
   identifier = each.value.instance.identifier
 
   instance = merge(each.value.instance, {
@@ -17,6 +20,14 @@ module "db_instance" {
   option_group    = each.value.option_group
   parameter_group = each.value.parameter_group
   subnet_group    = each.value.subnet_group
+
+  ssm_parameters_prefix = each.value.config.ssm_parameters_prefix
+  ssm_parameters        = each.value.ssm_parameters
+
+  instance_profile_policies = [
+    for policy in each.value.config.instance_profile_policies :
+    lookup(aws_iam_policy.this, policy, null) != null ? aws_iam_policy.this[policy].arn : policy
+  ]
 
   tags = merge(local.tags, each.value.tags)
 }

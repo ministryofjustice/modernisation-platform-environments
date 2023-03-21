@@ -14,7 +14,7 @@ resource "aws_db_instance" "this" {
   kms_key_id        = var.instance.kms_key_id
   license_model     = var.instance.license_model
 
-  name                                = var.instance.name
+  db_name                             = var.instance.db_name
   username                            = var.instance.username
   password                            = var.instance.password
   port                                = var.instance.port
@@ -24,12 +24,12 @@ resource "aws_db_instance" "this" {
 
   snapshot_identifier = var.instance.snapshot_identifier
 
-  vpc_security_group_ids = [var.instance.vpc_security_group_ids]
+  vpc_security_group_ids = var.instance.vpc_security_group_ids
   db_subnet_group_name   = var.instance.db_subnet_group_name
   parameter_group_name   = var.instance.parameter_group_name
   option_group_name      = var.instance.option_group_name
 
-  availability_zone   = var.instance.availability_zone
+  availability_zone   = var.availability_zone
   multi_az            = var.instance.multi_az
   iops                = var.instance.iops
   publicly_accessible = var.instance.publicly_accessible
@@ -49,7 +49,9 @@ resource "aws_db_instance" "this" {
 
   character_set_name = var.instance.character_set_name
 
-  tags = merge(var.tags, map("Name", format("%s", var.instance.identifier)))
+  tags = merge(local.tags, {
+    Name = var.identifier
+  })
 
   enabled_cloudwatch_logs_exports = var.instance.enabled_cloudwatch_logs_exports
 }
@@ -70,8 +72,26 @@ resource "aws_db_option_group" "this" {
   option_group_description = var.option_group.description == "" ? format("Option group for %s", var.identifier) : var.option_group.description
   engine_name              = var.option_group.engine_name
   major_engine_version     = var.option_group.major_engine_version
-  option                   = var.option_group.options
-  tags                     = merge(var.option_group.tags, map("Name", format("%s", var.identifier)))
+  dynamic "option" {
+    for_each = var.option_group.options
+    content {
+      option_name                    = option.value.option_name
+      port                           = option.value.port
+      version                        = option.value.version
+      db_security_group_memberships  = option.value.db_security_group_memberships
+      vpc_security_group_memberships = option.value.vpc_security_group_memberships
+      dynamic "option_settings" {
+        for_each = option.value.settings
+        content {
+          name  = option_settings.value.name
+          value = option_settings.value.value
+        }
+      }
+    }
+  }
+  tags = merge(local.tags, {
+    Name = var.option_group.name_prefix
+  })
 }
 
 #------------------------------------------------------------------------------
@@ -85,9 +105,17 @@ resource "aws_db_parameter_group" "this" {
   description = "Database parameter group for ${var.identifier}"
   family      = var.parameter_group.family
 
-  parameter = var.parameter_group.parameters
-
-  tags = merge(var.parameter_group.tags, map("Name", format("%s", var.identifier)))
+  dynamic "parameter" {
+    for_each = var.parameter_group.parameters
+    content {
+      name         = parameter.value.name
+      value        = parameter.value.value
+      apply_method = parameter.value.apply_method
+    }
+  }
+  tags = merge(local.tags, {
+    Name = var.parameter_group.name_prefix
+  })
 
   lifecycle {
     create_before_destroy = true
@@ -101,7 +129,43 @@ resource "aws_db_parameter_group" "this" {
 resource "aws_db_subnet_group" "this" {
   name_prefix = var.subnet_group.name_prefix
   description = "Database subnet group for ${var.identifier}"
-  subnet_ids  = [var.subnet_group.subnet_ids]
+  subnet_ids  = var.subnet_group.subnet_ids
 
-  tags = merge(var.tags, map("Name", format("%s", var.identifier)))
+  tags = merge(local.tags, {
+    Name = var.subnet_group.name_prefix
+  })
 }
+
+#------------------------------------------------------------------------------
+# IAM
+#------------------------------------------------------------------------------
+
+# resource "aws_iam_role" "this" {
+#   name                 = "${var.iam_resource_names_prefix}-role-${var.identifier}"
+#   path                 = "/"
+#   max_session_duration = "3600"
+#   assume_role_policy = jsonencode(
+#     {
+#       "Version" : "2012-10-17",
+#       "Statement" : [
+#         {
+#           "Effect" : "Allow",
+#           "Principal" : {
+#             "Service" : "rds.amazonaws.com"
+#           }
+#           "Action" : "sts:AssumeRole",
+#           "Condition" : {}
+#         }
+#       ]
+#     }
+#   )
+
+#   managed_policy_arns = var.instance_profile_policies
+
+#   tags = merge(
+#     local.tags,
+#     {
+#       Name = "${var.iam_resource_names_prefix}-role-${var.identifier}"
+#     },
+#   )
+# }
