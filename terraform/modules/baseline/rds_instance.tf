@@ -7,6 +7,8 @@ module "db_instance" {
     aws.core-vpc = aws.core-vpc
   }
 
+  identifier = each.value.instance.identifier
+
   instance = merge(each.value.instance, {
     vpc_security_group_ids = [
       for sg in each.value.instance.vpc_security_group_ids : lookup(aws_security_group.this, sg, null) != null ? aws_security_group.this[sg].id : sg
