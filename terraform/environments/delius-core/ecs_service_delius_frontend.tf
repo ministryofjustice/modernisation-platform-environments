@@ -252,6 +252,13 @@ resource "aws_ecs_service" "delius-frontend-service" {
     subnets          = data.aws_subnets.private-public.ids
     security_groups  = [aws_security_group.delius_core_frontend_security_group.id]
   }
+
+  load_balancer {
+    target_group_arn = aws_alb_target_group.delius_core_frontend_target_group.arn
+    container_name   = aws_ecs_task_definition.delius_core_frontend_task_definition.container_definitions[0].name
+    container_port   = local.frontend_container_port
+  }
+
   desired_count                      = 1
   deployment_minimum_healthy_percent = 100
   deployment_maximum_percent         = 200
