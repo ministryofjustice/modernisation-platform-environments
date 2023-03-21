@@ -19,70 +19,6 @@ locals {
       security_groups = []
     }
   }
-
-  cloudfront_ordered_cache_behavior = {
-    "cache_behavior_0" = {
-      target_origin_id = aws_lb.loadbalancer.id
-      smooth_streaming = false
-      path_pattern     = "*.png"
-      min_ttl                = 0
-      allowed_methods  = ["GET", "HEAD"]
-      cached_methods   = ["HEAD", "GET"]
-      forwarded_values_query_string = false
-      forwarded_values_headers      = ["Host", "User-Agent"]
-      forwarded_values_cookies_forward = "none"
-      viewer_protocol_policy = "https-only"
-    },
-    "cache_behavior_1" = {
-      target_origin_id = aws_lb.loadbalancer.id
-      smooth_streaming = false
-      path_pattern     = "*.jpg"
-      min_ttl                = 0
-      allowed_methods  = ["GET", "HEAD"]
-      cached_methods   = ["HEAD", "GET"]
-      forwarded_values_query_string = false
-      forwarded_values_headers      = ["Host", "User-Agent"]
-      forwarded_values_cookies_forward = "none"
-      viewer_protocol_policy = "https-only"
-    },
-    "cache_behavior_2" = {
-      target_origin_id = aws_lb.loadbalancer.id
-      smooth_streaming = false
-      path_pattern     = "*.gif"
-      min_ttl                = 0
-      allowed_methods  = ["GET", "HEAD"]
-      cached_methods   = ["HEAD", "GET"]
-      forwarded_values_query_string = false
-      forwarded_values_headers      = ["Host", "User-Agent"]
-      forwarded_values_cookies_forward = "none"
-      viewer_protocol_policy = "https-only"
-    },
-    "cache_behavior_3" = {
-      target_origin_id = aws_lb.loadbalancer.id
-      smooth_streaming = false
-      path_pattern     = "*.css"
-      min_ttl                = 0
-      allowed_methods  = ["GET", "HEAD"]
-      cached_methods   = ["HEAD", "GET"]
-      forwarded_values_query_string = false
-      forwarded_values_headers      = ["Host", "User-Agent"]
-      forwarded_values_cookies_forward = "none"
-      viewer_protocol_policy = "https-only"
-    },
-    "cache_behavior_4" = {
-      target_origin_id = aws_lb.loadbalancer.id
-      smooth_streaming = false
-      path_pattern     = "*.js"
-      min_ttl                = 0
-      allowed_methods  = ["GET", "HEAD"]
-      cached_methods   = ["HEAD", "GET"]
-      forwarded_values_query_string = false
-      forwarded_values_headers      = ["Host", "User-Agent"]
-      forwarded_values_cookies_forward = "none"
-      viewer_protocol_policy = "https-only"
-    }
-  }
-
   ## Variables used by certificate validation, as part of the cloudfront, cert and route 53 record configuration
   domain_types = { for dvo in aws_acm_certificate.external_lb.domain_validation_options : dvo.domain_name => {
     name   = dvo.resource_record_name
@@ -411,7 +347,8 @@ resource "aws_cloudfront_distribution" "external" {
         forward = lookup(var.cloudfront_default_cache_behavior, "forwarded_values_cookies_forward", null)
         whitelisted_names = lookup(var.cloudfront_default_cache_behavior, "forwarded_values_cookies_whitelisted_names", null)
       }
-    viewer_protocol_policy = lookup(var.cloudfront_default_cache_behavior, "viewer_protocol_policy", null)
+      viewer_protocol_policy = lookup(var.cloudfront_default_cache_behavior, "viewer_protocol_policy", null)
+    }
   }
   # default_cache_behavior {
   #   target_origin_id = aws_lb.loadbalancer.id
