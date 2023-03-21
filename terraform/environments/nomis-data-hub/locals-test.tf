@@ -15,7 +15,7 @@ locals {
         ebs_volumes = {
           "/dev/sda1" = { kms_key_id = data.aws_kms_key.default_ebs.arn }
         }
-        ami_name = "nomis_rhel_7_9_baseimage_2022-11-01T13-43-46.384Z"
+        ami_name = "base_rhel_7_9_2023-03-21T13-46-44.297Z"
       }
       t1-ndh-ems-1 = {
         tags = {
@@ -29,7 +29,7 @@ locals {
         ebs_volumes = {
           "/dev/sda1" = { kms_key_id = data.aws_kms_key.default_ebs.arn }
         }
-        ami_name = "nomis_rhel_7_9_baseimage_2022-11-01T13-43-46.384Z"
+        ami_name = "base_rhel_7_9_2023-03-21T13-46-44.297Z"
       }
     }
     ec2_test_autoscaling_groups = {
@@ -42,7 +42,7 @@ locals {
           component         = "ndh"
           nomis-environment = "t1"
         }
-        ami_name = "nomis_rhel_7_9_baseimage_2022-11-01T13-43-46.384Z"
+        ami_name = "base_rhel_7_9_2023-03-21T13-46-44.297Z"
         autoscaling_group = {
           desired_capacity = 1
         }
@@ -58,7 +58,7 @@ locals {
           component         = "ndh"
           nomis-environment = "t1"
         }
-        ami_name = "nomis_rhel_7_9_baseimage_2022-11-01T13-43-46.384Z"
+        ami_name = "base_rhel_7_9_2023-03-21T13-46-44.297Z"
         autoscaling_group = {
           desired_capacity = 1
         }
