@@ -384,7 +384,7 @@ resource "aws_cloudfront_distribution" "external" {
         headers      = lookup(ordered_cache_behavior.value, "forwarded_values_headers", null)
         cookies {
           forward = lookup(ordered_cache_behavior.value, "forwarded_values_cookies_forward", null)
-          whitelisted_names = lookup(var.cloudfront_default_cache_behavior, "forwarded_values_cookies_whitelisted_names", null)
+          whitelisted_names = lookup(ordered_cache_behavior, "forwarded_values_cookies_whitelisted_names", null)
         }
       }
       viewer_protocol_policy = lookup(ordered_cache_behavior.value, "viewer_protocol_policy", null)
