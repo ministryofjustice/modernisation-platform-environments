@@ -14,6 +14,4 @@ module "db_instance" {
   })
 
   tags = merge(local.tags, each.value.tags)
-
-  enabled_cloudwatch_logs_exports = local.enabled_cloudwatch_logs_exports
 }

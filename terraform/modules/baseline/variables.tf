@@ -246,6 +246,7 @@ variable "rds_instances" {
   description = "map of rds instances to create where the map key is the tags.Name.  See rds_instance module for more variable details"
   type = map(object({
     instance = object({
+      identifier = string
       create                              = optional(bool, true)
       allocated_storage                   = number
       storage_type                        = optional(string, "gp2")
