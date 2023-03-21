@@ -215,20 +215,19 @@ resource "aws_cloudwatch_log_group" "delius_db_log_group" {
 }
 
 # Pre-req - service discovery
-# Commenting out until permissions have been changed to support this resource
-# resource "aws_service_discovery_service" "delius_db_service" {
-#   name = local.db_service_name
-#   tags = local.tags
+resource "aws_service_discovery_service" "delius_db_service" {
+  name = local.db_service_name
+  tags = local.tags
 
-#   dns_config {
-#     namespace_id   = aws_service_discovery_private_dns_namespace.ecs_cluster_namespace.id
-#     routing_policy = "MULTIVALUE"
-#     dns_records {
-#       ttl  = 30
-#       type = "A"
-#     }
-#   }
-# }
+  dns_config {
+    namespace_id   = aws_service_discovery_private_dns_namespace.ecs_cluster_namespace.id
+    routing_policy = "MULTIVALUE"
+    dns_records {
+      ttl  = 30
+      type = "A"
+    }
+  }
+}
 
 # Create the ECS service
 resource "aws_ecs_service" "delius-db-service" {
@@ -240,10 +239,9 @@ resource "aws_ecs_service" "delius-db-service" {
     subnets          = data.aws_subnets.private-public.ids
     security_groups  = [aws_security_group.delius_db_security_group.id]
   }
-  # Commenting out until permissions have been changed to support service discovery
-  # service_registries {
-  #   registry_arn = aws_service_discovery_service.delius_db_service.arn
-  # }
+  service_registries {
+    registry_arn = aws_service_discovery_service.delius_db_service.arn
+  }
   desired_count                      = 1
   deployment_minimum_healthy_percent = 100
   deployment_maximum_percent         = 200
