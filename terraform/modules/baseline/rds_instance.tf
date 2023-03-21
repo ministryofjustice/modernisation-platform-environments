@@ -1,13 +1,13 @@
 module "db_instance" {
   for_each = var.rds_instances
 
-  identifier = each.value.instance.identifier
-
   source = "../../modules/rds_instance"
 
   providers = {
     aws.core-vpc = aws.core-vpc
   }
+
+  identifier = each.value.instance.identifier
 
   instance = merge(each.value.instance, {
     vpc_security_group_ids = [
