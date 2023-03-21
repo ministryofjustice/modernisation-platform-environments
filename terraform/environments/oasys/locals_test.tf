@@ -41,9 +41,9 @@ locals {
     #   }
     # }
 
-    # baseline_bastion_linux = {
-    #   public_key_data = local.public_key_data.keys[local.environment]
-    #   tags            = local.tags
-    # }
+    baseline_bastion_linux = {
+      public_key_data = local.public_key_data.keys[local.environment]
+      tags            = local.tags
+    }
   }
 }
