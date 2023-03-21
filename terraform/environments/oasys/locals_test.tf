@@ -26,9 +26,24 @@ locals {
       patch_day                 = "TUE"
     }
 
-    baseline_bastion_linux = {
-      public_key_data = local.public_key_data.keys[local.environment]
-      tags            = local.tags
-    }
+    # ec2_autoscaling_groups = {
+    #   webserver = {
+    #     config = ""
+    #     instance = ""
+    #     user_data_cloud_init = ""
+    #     ebs_volume_config = ""
+    #     ebs_volumes = ""
+    #     autoscaling_group = ""
+    #     autoscaling_schedules = ""
+    #     ssm_parameters = ""
+    #     lb_target_groups = ""
+    #     tags = ""
+    #   }
+    # }
+
+    # baseline_bastion_linux = {
+    #   public_key_data = local.public_key_data.keys[local.environment]
+    #   tags            = local.tags
+    # }
   }
 }
