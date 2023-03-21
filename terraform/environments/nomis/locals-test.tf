@@ -129,6 +129,12 @@ locals {
         autoscaling_schedules = {}
       }
     }
+
+    ec2_test_instances = {}
+    # Remove data.aws_kms_key from cmk.tf once the NDH servers are removed
+
+    ec2_test_autoscaling_groups = {}
+
     ec2_jumpservers = {
       jumpserver-2022 = {
         ami_name = "nomis_windows_server_2022_jumpserver_release_*"
