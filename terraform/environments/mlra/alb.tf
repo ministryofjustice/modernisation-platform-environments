@@ -48,4 +48,84 @@ module "alb" {
   stickiness_enabled         = true
   stickiness_type            = "lb_cookie"
   stickiness_cookie_duration = 10800
+
+  # CloudFront settings, to be moved to application_variables.json if there are differences between environments
+  cloudfront_default_cache_behavior = {
+    smooth_streaming = false
+    allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
+    cached_methods   = ["HEAD", "GET"]
+    forwarded_values_query_string = true
+    forwarded_values_headers = ["Authorization", "CloudFront-Forwarded-Proto", "CloudFront-Is-Desktop-Viewer", "CloudFront-Is-Mobile-Viewer", "CloudFront-Is-SmartTV-Viewer", "CloudFront-Is-Tablet-Viewer", "CloudFront-Viewer-Country", "Host", "User-Agent"]
+    forwarded_values_cookies_forward = "whitelist"
+    forwarded_values_cookies_whitelisted_names = ["AWSALB", "JSESSIONID"]
+    viewer_protocol_policy = "https-only"
+  }
+  cloudfront_ordered_cache_behavior = {
+    "cache_behavior_0" = {
+      smooth_streaming = false
+      path_pattern     = "*.png"
+      min_ttl                = 0
+      allowed_methods  = ["GET", "HEAD"]
+      cached_methods   = ["HEAD", "GET"]
+      forwarded_values_query_string = false
+      forwarded_values_headers      = ["Host", "User-Agent"]
+      forwarded_values_cookies_forward = "none"
+      viewer_protocol_policy = "https-only"
+    },
+    "cache_behavior_1" = {
+      smooth_streaming = false
+      path_pattern     = "*.jpg"
+      min_ttl                = 0
+      allowed_methods  = ["GET", "HEAD"]
+      cached_methods   = ["HEAD", "GET"]
+      forwarded_values_query_string = false
+      forwarded_values_headers      = ["Host", "User-Agent"]
+      forwarded_values_cookies_forward = "none"
+      viewer_protocol_policy = "https-only"
+    },
+    "cache_behavior_2" = {
+      smooth_streaming = false
+      path_pattern     = "*.gif"
+      min_ttl                = 0
+      allowed_methods  = ["GET", "HEAD"]
+      cached_methods   = ["HEAD", "GET"]
+      forwarded_values_query_string = false
+      forwarded_values_headers      = ["Host", "User-Agent"]
+      forwarded_values_cookies_forward = "none"
+      viewer_protocol_policy = "https-only"
+    },
+    "cache_behavior_3" = {
+      smooth_streaming = false
+      path_pattern     = "*.css"
+      min_ttl                = 0
+      allowed_methods  = ["GET", "HEAD"]
+      cached_methods   = ["HEAD", "GET"]
+      forwarded_values_query_string = false
+      forwarded_values_headers      = ["Host", "User-Agent"]
+      forwarded_values_cookies_forward = "none"
+      viewer_protocol_policy = "https-only"
+    },
+    "cache_behavior_4" = {
+      smooth_streaming = false
+      path_pattern     = "*.js"
+      min_ttl                = 0
+      allowed_methods  = ["GET", "HEAD"]
+      cached_methods   = ["HEAD", "GET"]
+      forwarded_values_query_string = false
+      forwarded_values_headers      = ["Host", "User-Agent"]
+      forwarded_values_cookies_forward = "none"
+      viewer_protocol_policy = "https-only"
+    }
+  }
+  cloudfront_http_version = "http2"
+  cloudfront_enabled = true
+  cloudfront_origin_protocol_policy = "https-only"
+  cloudfront_origin_read_timeout = 60
+  cloudfront_origin_keepalive_timeout = 60
+  cloudfront_price_class = "PriceClass_100"
+  cloudfront_geo_restriction_type = "none"
+  cloudfront_geo_restriction_location = []
+  cloudfront_is_ipv6_enabled = true
+  waf_default_action = "BLOCK"
+
 }

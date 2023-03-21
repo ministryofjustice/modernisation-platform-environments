@@ -20,6 +20,69 @@ locals {
     }
   }
 
+  cloudfront_ordered_cache_behavior = {
+    "cache_behavior_0" = {
+      target_origin_id = aws_lb.loadbalancer.id
+      smooth_streaming = false
+      path_pattern     = "*.png"
+      min_ttl                = 0
+      allowed_methods  = ["GET", "HEAD"]
+      cached_methods   = ["HEAD", "GET"]
+      forwarded_values_query_string = false
+      forwarded_values_headers      = ["Host", "User-Agent"]
+      forwarded_values_cookies_forward = "none"
+      viewer_protocol_policy = "https-only"
+    },
+    "cache_behavior_1" = {
+      target_origin_id = aws_lb.loadbalancer.id
+      smooth_streaming = false
+      path_pattern     = "*.jpg"
+      min_ttl                = 0
+      allowed_methods  = ["GET", "HEAD"]
+      cached_methods   = ["HEAD", "GET"]
+      forwarded_values_query_string = false
+      forwarded_values_headers      = ["Host", "User-Agent"]
+      forwarded_values_cookies_forward = "none"
+      viewer_protocol_policy = "https-only"
+    },
+    "cache_behavior_2" = {
+      target_origin_id = aws_lb.loadbalancer.id
+      smooth_streaming = false
+      path_pattern     = "*.gif"
+      min_ttl                = 0
+      allowed_methods  = ["GET", "HEAD"]
+      cached_methods   = ["HEAD", "GET"]
+      forwarded_values_query_string = false
+      forwarded_values_headers      = ["Host", "User-Agent"]
+      forwarded_values_cookies_forward = "none"
+      viewer_protocol_policy = "https-only"
+    },
+    "cache_behavior_3" = {
+      target_origin_id = aws_lb.loadbalancer.id
+      smooth_streaming = false
+      path_pattern     = "*.css"
+      min_ttl                = 0
+      allowed_methods  = ["GET", "HEAD"]
+      cached_methods   = ["HEAD", "GET"]
+      forwarded_values_query_string = false
+      forwarded_values_headers      = ["Host", "User-Agent"]
+      forwarded_values_cookies_forward = "none"
+      viewer_protocol_policy = "https-only"
+    },
+    "cache_behavior_4" = {
+      target_origin_id = aws_lb.loadbalancer.id
+      smooth_streaming = false
+      path_pattern     = "*.js"
+      min_ttl                = 0
+      allowed_methods  = ["GET", "HEAD"]
+      cached_methods   = ["HEAD", "GET"]
+      forwarded_values_query_string = false
+      forwarded_values_headers      = ["Host", "User-Agent"]
+      forwarded_values_cookies_forward = "none"
+      viewer_protocol_policy = "https-only"
+    }
+  }
+
   ## Variables used by certificate validation, as part of the cloudfront, cert and route 53 record configuration
   domain_types = { for dvo in aws_acm_certificate.external_lb.domain_validation_options : dvo.domain_name => {
     name   = dvo.resource_record_name
@@ -265,7 +328,7 @@ resource "aws_acm_certificate" "cloudfront" {
   tags = var.tags
 
   lifecycle {
-    create_before_destroy = true
+    prevent_destroy = true
   }
 }
 
@@ -280,6 +343,9 @@ resource "aws_s3_bucket" "cloudfront" { # Mirroring laa-cloudfront-logging-devel
       Name = "laa-${var.application_name}-cloudfront-logging-${var.environment}"
     }
   )
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "cloudfront" {
@@ -288,6 +354,9 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "cloudfront" {
     apply_server_side_encryption_by_default {
       sse_algorithm = "AES256"
     }
+  }
+  lifecycle {
+    prevent_destroy = true
   }
 }
 
@@ -298,6 +367,10 @@ resource "aws_s3_bucket_public_access_block" "cloudfront" {
   block_public_policy     = true
   ignore_public_acls      = true
   restrict_public_buckets = true
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 # TODO IS this required for CloudFront cert?
@@ -307,134 +380,175 @@ resource "aws_s3_bucket_public_access_block" "cloudfront" {
 # }
 
 resource "aws_cloudfront_distribution" "external" {
-  http_version = "http2"
+  http_version = var.cloudfront_http_version
   origin {
     domain_name              = aws_lb.loadbalancer.dns_name
     origin_id                = aws_lb.loadbalancer.id
     custom_origin_config {
-      http_port = 80   # TODO confirm the ports since http_port was not defined in CloudFormation
+      http_port = 80   # This port was not defined in CloudFormation, but should not be used anyways, only required by Terraform
       https_port = 443
-      origin_protocol_policy = "https-only"
+      origin_protocol_policy = var.cloudfront_origin_protocol_policy
       origin_ssl_protocols   = ["TLSv1.2"]
-      origin_read_timeout = 60
-      origin_keepalive_timeout = 60
+      origin_read_timeout = var.cloudfront_origin_read_timeout
+      origin_keepalive_timeout = var.cloudfront_origin_keepalive_timeout
     }
     custom_header {
       name = local.custom_header
       value = data.aws_secretsmanager_secret_version.cloudfront.secret_string
     }
   }
-  enabled = true
+  enabled = var.cloudfront_enabled
   aliases = [local.domain_name]
   default_cache_behavior {
     target_origin_id = aws_lb.loadbalancer.id
-    smooth_streaming = false
-    allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
-    cached_methods   = ["HEAD", "GET"]
+    smooth_streaming = lookup(var.cloudfront_default_cache_behavior, "smooth_streaming", null)
+    allowed_methods  = lookup(var.cloudfront_default_cache_behavior, "allowed_methods", null)
+    cached_methods   = lookup(var.cloudfront_default_cache_behavior, "cached_methods", null)
     forwarded_values {
-      query_string = true
+      query_string = lookup(var.cloudfront_default_cache_behavior, "forwarded_values_query_string", null)
+      headers = lookup(var.cloudfront_default_cache_behavior, "forwarded_values_headers", null)
       cookies {
-        forward = "whitelist"
-        whitelisted_names = ["AWSALB", "JSESSIONID"]
+        forward = lookup(var.cloudfront_default_cache_behavior, "forwarded_values_cookies_forward", null)
+        whitelisted_names = lookup(var.cloudfront_default_cache_behavior, "forwarded_values_cookies_whitelisted_names", null)
       }
-      headers = ["Authorization", "CloudFront-Forwarded-Proto", "CloudFront-Is-Desktop-Viewer", "CloudFront-Is-Mobile-Viewer", "CloudFront-Is-SmartTV-Viewer", "CloudFront-Is-Tablet-Viewer", "CloudFront-Viewer-Country", "Host", "User-Agent"]
-    }
-    viewer_protocol_policy = "https-only"
+    viewer_protocol_policy = lookup(var.cloudfront_default_cache_behavior, "viewer_protocol_policy", null)
   }
+  # default_cache_behavior {
+  #   target_origin_id = aws_lb.loadbalancer.id
+  #   smooth_streaming = false
+  #   allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
+  #   cached_methods   = ["HEAD", "GET"]
+  #   forwarded_values {
+  #     query_string = true
+  #     cookies {
+  #       forward = "whitelist"
+  #       whitelisted_names = ["AWSALB", "JSESSIONID"]
+  #     }
+  #     headers = ["Authorization", "CloudFront-Forwarded-Proto", "CloudFront-Is-Desktop-Viewer", "CloudFront-Is-Mobile-Viewer", "CloudFront-Is-SmartTV-Viewer", "CloudFront-Is-Tablet-Viewer", "CloudFront-Viewer-Country", "Host", "User-Agent"]
+  #   }
+  #   viewer_protocol_policy = "https-only"
+  # }
 
   # Other cache behaviors are processed in the order in which they're listed in the CloudFront console or, if you're using the CloudFront API, the order in which they're listed in the DistributionConfig element for the distribution.
 
-  # Cache behavior with precedence 0
-  ordered_cache_behavior {
-    target_origin_id = aws_lb.loadbalancer.id
-    smooth_streaming = false
-    path_pattern     = "*.png"
-    min_ttl                = 0
-    allowed_methods  = ["GET", "HEAD"]
-    cached_methods   = ["HEAD", "GET"]
-    forwarded_values {
-      query_string = false
-      headers      = ["Host", "User-Agent"]
-      cookies {
-        forward = "none"
+  dynamic "ordered_cache_behavior" {
+    for_each = var.cloudfront_ordered_cache_behavior
+    content {
+      target_origin_id     = aws_lb.loadbalancer.id
+      smooth_streaming       = lookup(ordered_cache_behavior.value, "smooth_streaming", null)
+      path_pattern         = lookup(ordered_cache_behavior.value, "path_pattern", null)
+      min_ttl        = lookup(ordered_cache_behavior.value, "min_ttl", null)
+      default_ttl            = lookup(ordered_cache_behavior.value, "default_ttl", null)
+      max_ttl                = lookup(ordered_cache_behavior.value, "max_ttl", null)
+      allowed_methods     = lookup(ordered_cache_behavior.value, "allowed_methods", null)
+      cached_methods = lookup(ordered_cache_behavior.value, "cached_methods", null)
+      forwarded_values {
+        query_string = lookup(ordered_cache_behavior.value, "forwarded_values_query_string", null)
+        headers      = lookup(ordered_cache_behavior.value, "forwarded_values_headers", null)
+        cookies {
+          forward = lookup(ordered_cache_behavior.value, "forwarded_values_cookies_forward", null)
+          whitelisted_names = lookup(var.cloudfront_default_cache_behavior, "forwarded_values_cookies_whitelisted_names", null)
+        }
       }
+      viewer_protocol_policy = lookup(ordered_cache_behavior.value, "viewer_protocol_policy", null)
     }
-    viewer_protocol_policy = "https-only"
   }
-  # Cache behavior with precedence 1
-  ordered_cache_behavior {
-    target_origin_id = aws_lb.loadbalancer.id
-    smooth_streaming = false
-    path_pattern     = "*.jpg"
-    min_ttl                = 0
-    allowed_methods  = ["GET", "HEAD"]
-    cached_methods   = ["HEAD", "GET"]
-    forwarded_values {
-      query_string = false
-      headers      = ["Host", "User-Agent"]
-      cookies {
-        forward = "none"
-      }
-    }
-    viewer_protocol_policy = "https-only"
-  }
-  # Cache behavior with precedence 2
-  ordered_cache_behavior {
-    target_origin_id = aws_lb.loadbalancer.id
-    smooth_streaming = false
-    path_pattern     = "*.gif"
-    min_ttl                = 0
-    allowed_methods  = ["GET", "HEAD"]
-    cached_methods   = ["HEAD", "GET"]
-    forwarded_values {
-      query_string = false
-      headers      = ["Host", "User-Agent"]
-      cookies {
-        forward = "none"
-      }
-    }
-    viewer_protocol_policy = "https-only"
-  }
-  # Cache behavior with precedence 3
-  ordered_cache_behavior {
-    target_origin_id = aws_lb.loadbalancer.id
-    smooth_streaming = false
-    path_pattern     = "*.css"
-    min_ttl                = 0
-    allowed_methods  = ["GET", "HEAD"]
-    cached_methods   = ["HEAD", "GET"]
-    forwarded_values {
-      query_string = false
-      headers      = ["Host", "User-Agent"]
-      cookies {
-        forward = "none"
-      }
-    }
-    viewer_protocol_policy = "https-only"
-  }
-  # Cache behavior with precedence 4
-  ordered_cache_behavior {
-    target_origin_id = aws_lb.loadbalancer.id
-    smooth_streaming = false
-    path_pattern     = "*.js"
-    min_ttl                = 0
-    allowed_methods  = ["GET", "HEAD"]
-    cached_methods   = ["HEAD", "GET"]
-    forwarded_values {
-      query_string = false
-      headers      = ["Host", "User-Agent"]
-      cookies {
-        forward = "none"
-      }
-    }
-    viewer_protocol_policy = "https-only"
-  }
-  price_class = "PriceClass_100"
+
+  # Now defined dynamically
+  # # Cache behavior with precedence 0
+  # ordered_cache_behavior {
+  #   target_origin_id = aws_lb.loadbalancer.id
+  #   smooth_streaming = false
+  #   path_pattern     = "*.png"
+  #   min_ttl                = 0
+  #   allowed_methods  = ["GET", "HEAD"]
+  #   cached_methods   = ["HEAD", "GET"]
+  #   forwarded_values {
+  #     query_string = false
+  #     headers      = ["Host", "User-Agent"]
+  #     cookies {
+  #       forward = "none"
+  #     }
+  #   }
+  #   viewer_protocol_policy = "https-only"
+  # }
+  # # Cache behavior with precedence 1
+  # ordered_cache_behavior {
+  #   target_origin_id = aws_lb.loadbalancer.id
+  #   smooth_streaming = false
+  #   path_pattern     = "*.jpg"
+  #   min_ttl                = 0
+  #   allowed_methods  = ["GET", "HEAD"]
+  #   cached_methods   = ["HEAD", "GET"]
+  #   forwarded_values {
+  #     query_string = false
+  #     headers      = ["Host", "User-Agent"]
+  #     cookies {
+  #       forward = "none"
+  #     }
+  #   }
+  #   viewer_protocol_policy = "https-only"
+  # }
+  # # Cache behavior with precedence 2
+  # ordered_cache_behavior {
+  #   target_origin_id = aws_lb.loadbalancer.id
+  #   smooth_streaming = false
+  #   path_pattern     = "*.gif"
+  #   min_ttl                = 0
+  #   allowed_methods  = ["GET", "HEAD"]
+  #   cached_methods   = ["HEAD", "GET"]
+  #   forwarded_values {
+  #     query_string = false
+  #     headers      = ["Host", "User-Agent"]
+  #     cookies {
+  #       forward = "none"
+  #     }
+  #   }
+  #   viewer_protocol_policy = "https-only"
+  # }
+  # # Cache behavior with precedence 3
+  # ordered_cache_behavior {
+  #   target_origin_id = aws_lb.loadbalancer.id
+  #   smooth_streaming = false
+  #   path_pattern     = "*.css"
+  #   min_ttl                = 0
+  #   allowed_methods  = ["GET", "HEAD"]
+  #   cached_methods   = ["HEAD", "GET"]
+  #   forwarded_values {
+  #     query_string = false
+  #     headers      = ["Host", "User-Agent"]
+  #     cookies {
+  #       forward = "none"
+  #     }
+  #   }
+  #   viewer_protocol_policy = "https-only"
+  # }
+  # # Cache behavior with precedence 4
+  # ordered_cache_behavior {
+  #   target_origin_id = aws_lb.loadbalancer.id
+  #   smooth_streaming = false
+  #   path_pattern     = "*.js"
+  #   min_ttl                = 0
+  #   allowed_methods  = ["GET", "HEAD"]
+  #   cached_methods   = ["HEAD", "GET"]
+  #   forwarded_values {
+  #     query_string = false
+  #     headers      = ["Host", "User-Agent"]
+  #     cookies {
+  #       forward = "none"
+  #     }
+  #   }
+  #   viewer_protocol_policy = "https-only"
+  # }
+
+  price_class = var.cloudfront_price_class
+
   viewer_certificate {
     acm_certificate_arn = aws_acm_certificate.cloudfront.arn
     ssl_support_method = "sni-only"
     minimum_protocol_version = "TLSv1.2_2018"
   }
+
   logging_config {
     include_cookies = false
     bucket          = aws_s3_bucket.cloudfront.bucket_domain_name
@@ -444,12 +558,12 @@ resource "aws_cloudfront_distribution" "external" {
 
   restrictions {
     geo_restriction {
-      restriction_type = "none"
-      locations        = []
+      restriction_type = var.cloudfront_geo_restriction_type
+      locations        = var.cloudfront_geo_restriction_location
     }
   }
 
-  is_ipv6_enabled = true
+  is_ipv6_enabled = var.cloudfront_is_ipv6_enabled
 
   tags = var.tags
 
@@ -502,7 +616,7 @@ resource "aws_waf_web_acl" "waf_acl" {
   name        = "${upper(var.application_name)} Whitelisting Requesters"
   metric_name = "${upper(var.application_name)}WhitelistingRequesters"
   default_action {
-    type = "BLOCK"
+    type = var.waf_default_action
   }
   rules {
     action {
@@ -533,13 +647,16 @@ resource "aws_acm_certificate" "external_lb" {
   tags = var.tags
 
   lifecycle {
-    create_before_destroy = true
+    prevent_destroy = true
   }
 }
 
 resource "aws_acm_certificate_validation" "external" {
   certificate_arn         = aws_acm_certificate.external_lb.arn
   validation_record_fqdns = [local.domain_name_main[0], local.domain_name_sub[0]]
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 ## Route 53 for Cloudfront
