@@ -32,6 +32,7 @@ resource "aws_route53_record" "route53_record_app" {
   ttl      = "300"
   records  = [aws_instance.oem_app.private_ip]
 }
+
 resource "aws_route53_record" "route53_record_db" {
   provider = aws.core-vpc
   zone_id  = data.aws_route53_zone.external.zone_id
