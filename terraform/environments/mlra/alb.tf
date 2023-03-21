@@ -60,6 +60,7 @@ module "alb" {
     forwarded_values_cookies_whitelisted_names = ["AWSALB", "JSESSIONID"]
     viewer_protocol_policy = "https-only"
   }
+  # Other cache behaviors are processed in the order in which they're listed in the CloudFront console or, if you're using the CloudFront API, the order in which they're listed in the DistributionConfig element for the distribution.
   cloudfront_ordered_cache_behavior = {
     "cache_behavior_0" = {
       smooth_streaming = false

@@ -311,12 +311,6 @@ resource "aws_s3_bucket_public_access_block" "cloudfront" {
   }
 }
 
-# TODO IS this required for CloudFront cert?
-# resource "aws_acm_certificate_validation" "cloudfront" {
-#   certificate_arn         = aws_acm_certificate.cloudfront.arn
-#   validation_record_fqdns = [aws_route53_record.aws_route53_record.fqdn]
-# }
-
 resource "aws_cloudfront_distribution" "external" {
   http_version = var.cloudfront_http_version
   origin {
@@ -352,23 +346,6 @@ resource "aws_cloudfront_distribution" "external" {
     }
     viewer_protocol_policy = lookup(var.cloudfront_default_cache_behavior, "viewer_protocol_policy", null)
   }
-  # default_cache_behavior {
-  #   target_origin_id = aws_lb.loadbalancer.id
-  #   smooth_streaming = false
-  #   allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
-  #   cached_methods   = ["HEAD", "GET"]
-  #   forwarded_values {
-  #     query_string = true
-  #     cookies {
-  #       forward = "whitelist"
-  #       whitelisted_names = ["AWSALB", "JSESSIONID"]
-  #     }
-  #     headers = ["Authorization", "CloudFront-Forwarded-Proto", "CloudFront-Is-Desktop-Viewer", "CloudFront-Is-Mobile-Viewer", "CloudFront-Is-SmartTV-Viewer", "CloudFront-Is-Tablet-Viewer", "CloudFront-Viewer-Country", "Host", "User-Agent"]
-  #   }
-  #   viewer_protocol_policy = "https-only"
-  # }
-
-  # Other cache behaviors are processed in the order in which they're listed in the CloudFront console or, if you're using the CloudFront API, the order in which they're listed in the DistributionConfig element for the distribution.
 
   dynamic "ordered_cache_behavior" {
     for_each = var.cloudfront_ordered_cache_behavior
@@ -392,93 +369,6 @@ resource "aws_cloudfront_distribution" "external" {
       viewer_protocol_policy = lookup(ordered_cache_behavior.value, "viewer_protocol_policy", null)
     }
   }
-
-  # Now defined dynamically
-  # # Cache behavior with precedence 0
-  # ordered_cache_behavior {
-  #   target_origin_id = aws_lb.loadbalancer.id
-  #   smooth_streaming = false
-  #   path_pattern     = "*.png"
-  #   min_ttl                = 0
-  #   allowed_methods  = ["GET", "HEAD"]
-  #   cached_methods   = ["HEAD", "GET"]
-  #   forwarded_values {
-  #     query_string = false
-  #     headers      = ["Host", "User-Agent"]
-  #     cookies {
-  #       forward = "none"
-  #     }
-  #   }
-  #   viewer_protocol_policy = "https-only"
-  # }
-  # # Cache behavior with precedence 1
-  # ordered_cache_behavior {
-  #   target_origin_id = aws_lb.loadbalancer.id
-  #   smooth_streaming = false
-  #   path_pattern     = "*.jpg"
-  #   min_ttl                = 0
-  #   allowed_methods  = ["GET", "HEAD"]
-  #   cached_methods   = ["HEAD", "GET"]
-  #   forwarded_values {
-  #     query_string = false
-  #     headers      = ["Host", "User-Agent"]
-  #     cookies {
-  #       forward = "none"
-  #     }
-  #   }
-  #   viewer_protocol_policy = "https-only"
-  # }
-  # # Cache behavior with precedence 2
-  # ordered_cache_behavior {
-  #   target_origin_id = aws_lb.loadbalancer.id
-  #   smooth_streaming = false
-  #   path_pattern     = "*.gif"
-  #   min_ttl                = 0
-  #   allowed_methods  = ["GET", "HEAD"]
-  #   cached_methods   = ["HEAD", "GET"]
-  #   forwarded_values {
-  #     query_string = false
-  #     headers      = ["Host", "User-Agent"]
-  #     cookies {
-  #       forward = "none"
-  #     }
-  #   }
-  #   viewer_protocol_policy = "https-only"
-  # }
-  # # Cache behavior with precedence 3
-  # ordered_cache_behavior {
-  #   target_origin_id = aws_lb.loadbalancer.id
-  #   smooth_streaming = false
-  #   path_pattern     = "*.css"
-  #   min_ttl                = 0
-  #   allowed_methods  = ["GET", "HEAD"]
-  #   cached_methods   = ["HEAD", "GET"]
-  #   forwarded_values {
-  #     query_string = false
-  #     headers      = ["Host", "User-Agent"]
-  #     cookies {
-  #       forward = "none"
-  #     }
-  #   }
-  #   viewer_protocol_policy = "https-only"
-  # }
-  # # Cache behavior with precedence 4
-  # ordered_cache_behavior {
-  #   target_origin_id = aws_lb.loadbalancer.id
-  #   smooth_streaming = false
-  #   path_pattern     = "*.js"
-  #   min_ttl                = 0
-  #   allowed_methods  = ["GET", "HEAD"]
-  #   cached_methods   = ["HEAD", "GET"]
-  #   forwarded_values {
-  #     query_string = false
-  #     headers      = ["Host", "User-Agent"]
-  #     cookies {
-  #       forward = "none"
-  #     }
-  #   }
-  #   viewer_protocol_policy = "https-only"
-  # }
 
   price_class = var.cloudfront_price_class
 
@@ -665,32 +555,6 @@ resource "aws_lb_listener" "alb_listener" {
   ssl_policy      = var.listener_protocol == "HTTPS" ? var.alb_ssl_policy : null
   certificate_arn = var.listener_protocol == "HTTPS" ? aws_acm_certificate_validation.external.certificate_arn : null # This needs the ARN of the certificate from Mod Platform
 
-  # default_action {
-  #   type = "forward"
-  #   # during phase 1 of migration into modernisation platform, an effort
-  #   # is being made to retain the current application url in order to
-  #   # limit disruption to the application architecture itself. therefore,
-  #   # the current laa alb which is performing tls termination is going to
-  #   # forward queries on here. this also means that waf and cdn resources
-  #   # are retained in laa. the cdn there adds a custom header to the query,
-  #   # with the alb there then forwarding those permitted queries on:
-  #   #
-  #   # - Type: fixed-response
-  #   #   FixedResponseConfig:
-  #   #     ContentType: text/plain
-  #   #     MessageBody: Access Denied - must access via CloudFront
-  #   #     StatusCode: '403'
-  #   #
-  #   # in the meantime, therefore, we simply forward queries to a target
-  #   # group. however, in another phase of the migration, where cdn resources
-  #   # are carried into the modernisation platform, the above configuration
-  #   # may need to be applied.
-  #   #
-  #   # see: https://docs.google.com/document/d/15BUaNNx6SW2fa6QNzdMUWscWWBQ44YCiFz-e3SOwouQ
-  #
-  #   target_group_arn = aws_lb_target_group.alb_target_group.arn
-  # }
-
   default_action {
     type = "fixed-response"
     fixed_response {
@@ -707,31 +571,6 @@ resource "aws_lb_listener" "alb_listener" {
 resource "aws_lb_listener_rule" "alb_listener_rule" {
   listener_arn = aws_lb_listener.alb_listener.arn
   priority     = 1
-
-  # during phase 1 of migration into modernisation platform, an effort
-  # is being made to retain the current application url in order to
-  # limit disruption to the application architecture itself. therefore,
-  # the current laa alb which is performing tls termination is going to
-  # forward queries on here. this also means that waf and cdn resources
-  # are retained in laa. the cdn there adds a custom header to the query,
-  # with the alb there then forwarding those permitted queries on:
-  #
-  # Actions:
-  #   - Type: forward
-  #     TargetGroupArn: !Ref 'TargetGroup'
-  # Conditions:
-  #   - Field: http-header
-  #     HttpHeaderConfig:
-  #     HttpHeaderName: X-Custom-Header-LAA-MLRA
-  #     Values:
-  #       - '{{resolve:secretsmanager:cloudfront-secret-MLRA}}'
-  #
-  # in the meantime, therefore, we are simply forwarding traffic to a
-  # target group here. However, in another phase of the migration, where
-  # cdn resources are carried into modernisation platform, the above
-  # configuration is very likely going to be required.
-  #
-  # see: https://docs.google.com/document/d/15BUaNNx6SW2fa6QNzdMUWscWWBQ44YCiFz-e3SOwouQ
 
   action {
     type             = "forward"
