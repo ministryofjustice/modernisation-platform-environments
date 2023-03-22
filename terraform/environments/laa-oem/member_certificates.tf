@@ -2,7 +2,7 @@
 # *.modernisation-platform.service.justice.gov.uk #
 ###################################################
 resource "aws_acm_certificate" "laa_cert" {
-  domain_name       = format("%s.%s-%s.modernisation-platform.service.justice.gov.uk", "oem", var.networking[0].business-unit, local.environment)
+  domain_name       = format("%s.%s-%s.modernisation-platform.service.justice.gov.uk", "*", var.networking[0].business-unit, local.environment)
   validation_method = "DNS"
 
   subject_alternative_names = [
@@ -10,6 +10,7 @@ resource "aws_acm_certificate" "laa_cert" {
     format("%s.%s-%s.modernisation-platform.service.justice.gov.uk", "db", var.networking[0].business-unit, local.environment),
     format("%s.%s-%s.modernisation-platform.service.justice.gov.uk", "laa-oem-app", var.networking[0].business-unit, local.environment),
     format("%s.%s-%s.modernisation-platform.service.justice.gov.uk", "laa-oem-db", var.networking[0].business-unit, local.environment),
+    format("%s.%s-%s.modernisation-platform.service.justice.gov.uk", "oem", var.networking[0].business-unit, local.environment),
     format("%s.%s-%s.modernisation-platform.service.justice.gov.uk", "oem-internal", var.networking[0].business-unit, local.environment)
   ]
 
