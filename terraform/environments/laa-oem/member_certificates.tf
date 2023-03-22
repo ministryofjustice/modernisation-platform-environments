@@ -26,7 +26,7 @@ resource "aws_route53_record" "external-mp" {
   depends_on = [
     aws_acm_certificate.external-mp
   ]
-  provider = aws.core-vpc
+  provider = aws.core-network-services
   for_each = {
     for dvo in aws_acm_certificate.external-mp[0].domain_validation_options : dvo.domain_name => {
       name   = dvo.resource_record_name
