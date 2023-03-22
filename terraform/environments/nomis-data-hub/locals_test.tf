@@ -98,7 +98,7 @@ locals {
 
       t1_ndh_app = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name = "base_rhel_7_9_*"
+          ami_name  = "base_rhel_7_9_*"
           ami_owner = "374269020027"
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
@@ -122,7 +122,7 @@ locals {
 
       t1_ndh_ems = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name = "base_rhel_7_9_*"
+          ami_name  = "base_rhel_7_9_*"
           ami_owner = "374269020027"
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
