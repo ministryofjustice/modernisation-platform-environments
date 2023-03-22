@@ -1068,56 +1068,22 @@ module "kinesis_cdc_domain_stream" {
   cloudwatch_logging_enabled = true
 }
 
-# Dynamo DB for DomainRegistry, DPR-306/DPR-218
+# Dynamo DB for kinesis Reader, DPR-304
 module "dynamo_tab_domain_registry" {
   source              = "./modules/dynamo_tables"
   create_table        = true
   autoscaling_enabled = false
-  name                = "${local.project}-domain-registry-${local.environment}"
+  name                = "${local.project}-kinesis-reader-${local.environment}"
 
-  hash_key    = "primaryId"
-  range_key   = "secondaryId"
+  hash_key    = "leaseKey" # Hash
+  range_key   = "" # Sort
   table_class = "STANDARD"
   ttl_enabled = false
-
-  attributes = [
-    {
-      name = "primaryId"
-      type = "S"
-    },
-    {
-      name = "secondaryId"
-      type = "S"
-    },
-    {
-      name = "type"
-      type = "S"
-    }
-  ]
-
-  global_secondary_indexes = [
-    {
-      name            = "primaryId-Type-Index"
-      hash_key        = "primaryId"
-      range_key       = "type"
-      write_capacity  = 10
-      read_capacity   = 10
-      projection_type = "ALL"
-    },
-    {
-      name            = "secondaryId-Type-Index"
-      hash_key        = "secondaryId"
-      range_key       = "type"
-      write_capacity  = 10
-      read_capacity   = 10
-      projection_type = "ALL"
-    }
-  ]
 
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-domain-registry-${local.environment}"
+      Name          = "${local.project}-kinesis-reader-${local.environment}"
       Resource_Type = "Dynamo Table"
     }
   )
