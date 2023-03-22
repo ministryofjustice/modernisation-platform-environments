@@ -48,7 +48,7 @@ data "aws_vpc" "shared" {
 }
 
 data "aws_ec2_managed_prefix_list" "cloudfront" {
- name = "com.amazonaws.global.cloudfront.origin-facing"
+  name = "com.amazonaws.global.cloudfront.origin-facing"
 }
 
 
@@ -256,7 +256,7 @@ data "aws_secretsmanager_secret_version" "cloudfront" {
 resource "aws_acm_certificate" "cloudfront" {
   domain_name       = var.acm_cert_domain_name
   validation_method = "DNS"
-  provider = aws.us-east-1
+  provider          = aws.us-east-1
 
 
   subject_alternative_names = var.environment == "production" ? null : [local.domain_name]
@@ -314,18 +314,18 @@ resource "aws_s3_bucket_public_access_block" "cloudfront" {
 resource "aws_cloudfront_distribution" "external" {
   http_version = var.cloudfront_http_version
   origin {
-    domain_name              = aws_lb.loadbalancer.dns_name
-    origin_id                = aws_lb.loadbalancer.id
+    domain_name = aws_lb.loadbalancer.dns_name
+    origin_id   = aws_lb.loadbalancer.id
     custom_origin_config {
-      http_port = 80   # This port was not defined in CloudFormation, but should not be used anyways, only required by Terraform
-      https_port = 443
-      origin_protocol_policy = var.cloudfront_origin_protocol_policy
-      origin_ssl_protocols   = ["TLSv1.2"]
-      origin_read_timeout = var.cloudfront_origin_read_timeout
+      http_port                = 80 # This port was not defined in CloudFormation, but should not be used anyways, only required by Terraform
+      https_port               = 443
+      origin_protocol_policy   = var.cloudfront_origin_protocol_policy
+      origin_ssl_protocols     = ["TLSv1.2"]
+      origin_read_timeout      = var.cloudfront_origin_read_timeout
       origin_keepalive_timeout = var.cloudfront_origin_keepalive_timeout
     }
     custom_header {
-      name = local.custom_header
+      name  = local.custom_header
       value = data.aws_secretsmanager_secret_version.cloudfront.secret_string
     }
   }
@@ -338,9 +338,9 @@ resource "aws_cloudfront_distribution" "external" {
     cached_methods   = lookup(var.cloudfront_default_cache_behavior, "cached_methods", null)
     forwarded_values {
       query_string = lookup(var.cloudfront_default_cache_behavior, "forwarded_values_query_string", null)
-      headers = lookup(var.cloudfront_default_cache_behavior, "forwarded_values_headers", null)
+      headers      = lookup(var.cloudfront_default_cache_behavior, "forwarded_values_headers", null)
       cookies {
-        forward = lookup(var.cloudfront_default_cache_behavior, "forwarded_values_cookies_forward", null)
+        forward           = lookup(var.cloudfront_default_cache_behavior, "forwarded_values_cookies_forward", null)
         whitelisted_names = lookup(var.cloudfront_default_cache_behavior, "forwarded_values_cookies_whitelisted_names", null)
       }
     }
@@ -350,19 +350,19 @@ resource "aws_cloudfront_distribution" "external" {
   dynamic "ordered_cache_behavior" {
     for_each = var.cloudfront_ordered_cache_behavior
     content {
-      target_origin_id     = aws_lb.loadbalancer.id
-      smooth_streaming       = lookup(ordered_cache_behavior.value, "smooth_streaming", null)
-      path_pattern         = lookup(ordered_cache_behavior.value, "path_pattern", null)
-      min_ttl        = lookup(ordered_cache_behavior.value, "min_ttl", null)
-      default_ttl            = lookup(ordered_cache_behavior.value, "default_ttl", null)
-      max_ttl                = lookup(ordered_cache_behavior.value, "max_ttl", null)
-      allowed_methods     = lookup(ordered_cache_behavior.value, "allowed_methods", null)
-      cached_methods = lookup(ordered_cache_behavior.value, "cached_methods", null)
+      target_origin_id = aws_lb.loadbalancer.id
+      smooth_streaming = lookup(ordered_cache_behavior.value, "smooth_streaming", null)
+      path_pattern     = lookup(ordered_cache_behavior.value, "path_pattern", null)
+      min_ttl          = lookup(ordered_cache_behavior.value, "min_ttl", null)
+      default_ttl      = lookup(ordered_cache_behavior.value, "default_ttl", null)
+      max_ttl          = lookup(ordered_cache_behavior.value, "max_ttl", null)
+      allowed_methods  = lookup(ordered_cache_behavior.value, "allowed_methods", null)
+      cached_methods   = lookup(ordered_cache_behavior.value, "cached_methods", null)
       forwarded_values {
         query_string = lookup(ordered_cache_behavior.value, "forwarded_values_query_string", null)
         headers      = lookup(ordered_cache_behavior.value, "forwarded_values_headers", null)
         cookies {
-          forward = lookup(ordered_cache_behavior.value, "forwarded_values_cookies_forward", null)
+          forward           = lookup(ordered_cache_behavior.value, "forwarded_values_cookies_forward", null)
           whitelisted_names = lookup(ordered_cache_behavior, "forwarded_values_cookies_whitelisted_names", null)
         }
       }
@@ -373,8 +373,8 @@ resource "aws_cloudfront_distribution" "external" {
   price_class = var.cloudfront_price_class
 
   viewer_certificate {
-    acm_certificate_arn = aws_acm_certificate.cloudfront.arn
-    ssl_support_method = "sni-only"
+    acm_certificate_arn      = aws_acm_certificate.cloudfront.arn
+    ssl_support_method       = "sni-only"
     minimum_protocol_version = "TLSv1.2_2018"
   }
 

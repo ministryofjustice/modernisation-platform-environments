@@ -180,7 +180,7 @@ variable "cloudfront_geo_restriction_type" {
   description = "Method that you want to use to restrict distribution of your content by country: none, whitelist, or blacklist"
 }
 variable "cloudfront_geo_restriction_location" {
-  type        = list
+  type        = list(any)
   description = "ISO 3166-1-alpha-2 codes for which you want CloudFront either to distribute your content (whitelist) or not distribute your content (blacklist)"
 }
 variable "cloudfront_is_ipv6_enabled" {
