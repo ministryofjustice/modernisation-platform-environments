@@ -1,6 +1,6 @@
 locals {
-  cert_opts = local.environment == "production"  ? aws_acm_certificate.external-service[0].domain_validation_options : aws_acm_certificate.external[0].domain_validation_options
-  cert_arn  = local.environment == "production"  ? aws_acm_certificate.external-service[0].arn : aws_acm_certificate.external[0].arn
+  cert_opts = local.environment == "production" ? aws_acm_certificate.external-service[0].domain_validation_options : aws_acm_certificate.external[0].domain_validation_options
+  cert_arn  = local.environment == "production" ? aws_acm_certificate.external-service[0].arn : aws_acm_certificate.external[0].arn
 }
 
 ######################################################################
@@ -23,7 +23,7 @@ resource "aws_acm_certificate" "external" {
   }
 }
 resource "aws_acm_certificate" "external-service" {
-  count             = local.is-production ? 1 : 0
+  count = local.is-production ? 1 : 0
 
   validation_method = "DNS"
   domain_name       = "*.${var.networking[0].business-unit}.service.justice.gov.uk"

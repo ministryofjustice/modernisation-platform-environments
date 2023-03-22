@@ -29,7 +29,7 @@ resource "aws_lb_listener" "ebsapps_listener" {
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
   certificate_arn   = local.environment == "production" ? aws_acm_certificate.external-service[0].arn : aws_acm_certificate.external[0].arn
-  
+
 
   default_action {
     type             = "forward"
