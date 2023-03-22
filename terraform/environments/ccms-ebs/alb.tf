@@ -19,15 +19,17 @@ resource "aws_lb" "ebsapps_lb" {
 }
 
 resource "aws_lb_listener" "ebsapps_listener" {
+  /*
   depends_on = [
     aws_acm_certificate_validation.external
   ]
-
+*/
   load_balancer_arn = aws_lb.ebsapps_lb.arn
   port              = "443"
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = aws_acm_certificate.external[0].arn
+  certificate_arn   = local.environment == "production" ? aws_acm_certificate.external-service[0].arn : aws_acm_certificate.external[0].arn
+  
 
   default_action {
     type             = "forward"
