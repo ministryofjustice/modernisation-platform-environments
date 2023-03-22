@@ -132,9 +132,9 @@ locals {
 
     ec2_test_instances = {
       # Remove data.aws_kms_key from cmk.tf once the NDH servers are removed
-      }
+    }
 
-    ec2_test_autoscaling_groups = { }
+    ec2_test_autoscaling_groups = {}
 
     ec2_jumpservers = {
       jumpserver-2022 = {
