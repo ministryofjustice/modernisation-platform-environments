@@ -2,7 +2,7 @@
 # *.modernisation-platform.service.justice.gov.uk #
 ###################################################
 resource "aws_acm_certificate" "laa_cert" {
-  domain_name       = "oem.modernisation-platform.service.justice.gov.uk"
+  domain_name       = format("%s.%s.%s.%s.modernisation-platform.service.justice.gov.uk", "oem", local.application_name, var.networking[0].business-unit, local.environment)
   validation_method = "DNS"
 
   subject_alternative_names = [
