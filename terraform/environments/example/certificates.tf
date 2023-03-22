@@ -24,7 +24,7 @@ resource "aws_acm_certificate_validation" "example_cert" {
 }
 
 resource "aws_route53_record" "example_cert" {
-  provider = aws.core-network-services
+  provider = aws.core-vpc
   for_each = {
     for dvo in aws_acm_certificate.example_cert.domain_validation_options : dvo.domain_name => {
       name   = dvo.resource_record_name
