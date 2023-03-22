@@ -20,7 +20,7 @@ locals {
     data.aws_subnet.public_subnets_b.id,
     data.aws_subnet.public_subnets_c.id
   ]
-  
-  cert_opts = local.environment == "production"  ? aws_acm_certificate.external-service[0].domain_validation_options : aws_acm_certificate.external[0].domain_validation_options
-  cert_arn  = local.environment == "production"  ? aws_acm_certificate.external-service[0].arn : aws_acm_certificate.external[0].arn
+
+  cert_opts = local.environment == "production" ? aws_acm_certificate.external-service[0].domain_validation_options : aws_acm_certificate.external[0].domain_validation_options
+  cert_arn  = local.environment == "production" ? aws_acm_certificate.external-service[0].arn : aws_acm_certificate.external[0].arn
 }
