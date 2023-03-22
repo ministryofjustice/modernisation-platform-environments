@@ -120,7 +120,7 @@ data "aws_iam_policy_document" "s3_topic_policy" {
     condition {
       test     = "ArnLike"
       variable = "aws:SourceArn"
-      values   = [
+      values = [
         module.s3-bucket.bucket.arn,
         module.s3-bucket-logging.bucket.arn,
         module.s3-bucket-dbbackup.bucket.arn
