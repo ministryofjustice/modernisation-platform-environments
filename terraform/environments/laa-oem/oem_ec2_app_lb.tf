@@ -14,7 +14,7 @@ resource "aws_lb_listener" "oem_app" {
   protocol          = "HTTPS"
 
   ssl_policy      = "ELBSecurityPolicy-TLS-1-2-2017-01"
-  certificate_arn = aws_acm_certificate.external-mp[0].arn
+  certificate_arn = aws_acm_certificate.laa_cert.arn
 
   default_action {
     target_group_arn = aws_lb_target_group.oem_app.id
@@ -28,7 +28,7 @@ resource "aws_lb_listener" "oem_app_3872" {
   protocol          = "HTTPS"
 
   ssl_policy      = "ELBSecurityPolicy-TLS-1-2-2017-01"
-  certificate_arn = aws_acm_certificate.external-mp[0].arn
+  certificate_arn = aws_acm_certificate.laa_cert.arn
 
   default_action {
     target_group_arn = aws_lb_target_group.oem_app_3872.id
@@ -42,7 +42,7 @@ resource "aws_lb_listener" "oem_app_4903" {
   protocol          = "HTTPS"
 
   ssl_policy      = "ELBSecurityPolicy-TLS-1-2-2017-01"
-  certificate_arn = aws_acm_certificate.external-mp[0].arn
+  certificate_arn = aws_acm_certificate.laa_cert.arn
 
   default_action {
     target_group_arn = aws_lb_target_group.oem_app_4903.id
@@ -56,7 +56,7 @@ resource "aws_lb_listener" "oem_app_7102" {
   protocol          = "HTTPS"
 
   ssl_policy      = "ELBSecurityPolicy-TLS-1-2-2017-01"
-  certificate_arn = aws_acm_certificate.external-mp[0].arn
+  certificate_arn = aws_acm_certificate.laa_cert.arn
 
   default_action {
     target_group_arn = aws_lb_target_group.oem_app_7102.id
@@ -70,7 +70,7 @@ resource "aws_lb_listener" "oem_app_7803" {
   protocol          = "HTTPS"
 
   ssl_policy      = "ELBSecurityPolicy-TLS-1-2-2017-01"
-  certificate_arn = aws_acm_certificate.external-mp[0].arn
+  certificate_arn = aws_acm_certificate.laa_cert.arn
 
   default_action {
     target_group_arn = aws_lb_target_group.oem_app_7803.id
