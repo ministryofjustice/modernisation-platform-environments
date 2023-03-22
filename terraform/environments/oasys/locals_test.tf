@@ -26,6 +26,21 @@ locals {
       patch_day                 = "TUE"
     }
 
+    autoscaling_groups = {
+
+      development-oasys-db = merge(local.database, {
+        tags = merge(local.database_tags, {
+          oasys-environment = "test"
+          server-type       = "oasys-db"
+          description       = "Test OASys database"
+          oracle-sids       = "OASPROD BIPINFRA"
+          monitored         = true
+        })
+        ami_name = "oasys_oracle_db_*"
+        # ami_owner = "self" # remove this line next time AMI is updated so core-shared-services-production used instead
+      })
+    }
+
     baseline_bastion_linux = {
       public_key_data = local.public_key_data.keys[local.environment]
       tags            = local.tags
