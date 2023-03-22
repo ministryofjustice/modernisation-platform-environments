@@ -28,7 +28,7 @@ locals {
 
     autoscaling_groups = {
 
-      development-oasys-db = merge(local.database, {
+      test-oasys-db = merge(local.database, {
         tags = merge(local.database_tags, {
           oasys-environment = "test"
           server-type       = "oasys-db"
