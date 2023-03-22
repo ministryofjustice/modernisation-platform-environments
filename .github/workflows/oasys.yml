@@ -42,7 +42,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
+        uses: actions/checkout@24cb9080177205b6e8c946b17badbe402adc938f # v3.4.0
       - name: Set Account Number
         run: echo "ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${GITHUB_WORKFLOW}-${TF_ENV}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)" >> $GITHUB_ENV
       - name: configure aws credentials
@@ -82,7 +82,7 @@ jobs:
       name: ${{ github.workflow }}-${{ matrix.environment }}
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
+        uses: actions/checkout@24cb9080177205b6e8c946b17badbe402adc938f # v3.4.0
       - name: Set Account Number
         run: echo "ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${GITHUB_WORKFLOW}-${TF_ENV}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)" >> $GITHUB_ENV
       - name: configure aws credentials
@@ -96,7 +96,7 @@ jobs:
         with:
           terraform_version: "~1"
           terraform_wrapper: false
-      - name: Run Terrform Apply
+      - name: Run Terraform Apply
         run: |
           terraform --version
           echo "Terraform apply - ${TF_ENV}"
@@ -119,7 +119,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
+        uses: actions/checkout@24cb9080177205b6e8c946b17badbe402adc938f # v3.4.0
       - name: Set Account Number
         run: echo "ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${GITHUB_WORKFLOW}-${TF_ENV}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)" >> $GITHUB_ENV
       - name: configure aws credentials
@@ -158,7 +158,7 @@ jobs:
       name: ${{ github.workflow }}-${{ matrix.environment }}
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
+        uses: actions/checkout@24cb9080177205b6e8c946b17badbe402adc938f # v3.4.0
       - name: Set Account Number
         run: echo "ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${GITHUB_WORKFLOW}-${TF_ENV}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)" >> $GITHUB_ENV
       - name: configure aws credentials
@@ -172,7 +172,7 @@ jobs:
         with:
           terraform_version: "~1"
           terraform_wrapper: false
-      - name: Run Terrform Apply
+      - name: Run Terraform Apply
         run: |
           terraform --version
           echo "Terraform apply - ${TF_ENV}"

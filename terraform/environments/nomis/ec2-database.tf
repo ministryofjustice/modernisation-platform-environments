@@ -34,17 +34,13 @@ locals {
 
     user_data_cloud_init = {
       args = {
-        lifecycle_hook_name    = "ready-hook"
-        branch                 = "main"
-        ansible_repo           = "modernisation-platform-configuration-management"
-        ansible_repo_basedir   = "ansible"
-        ansible_args           = "--tags ec2provision"
-        restored_from_snapshot = false
+        branch               = "main"
+        ansible_repo         = "modernisation-platform-configuration-management"
+        ansible_repo_basedir = "ansible"
+        ansible_args         = "--tags ec2provision"
       }
       scripts = [
         "ansible-ec2provision.sh.tftpl",
-        "oracle_init.sh.tftpl",
-        "ansible-ec2provisiondata.sh.tftpl"
       ]
     }
 

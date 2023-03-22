@@ -134,7 +134,7 @@ resource "aws_ebs_volume" "dbf" {
   availability_zone = "eu-west-2a"
   size              = "8000"
   type              = "io2"
-  iops              = 3000
+  iops              = 12000
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
@@ -224,3 +224,4 @@ module "cw-ebs-ec2" {
   fileSystem   = "xfs"       # Linux root filesystem
   rootDevice   = "nvme0n1p1" # This is used by default for root on all the ec2 images
 }
+

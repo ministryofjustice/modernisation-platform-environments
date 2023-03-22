@@ -74,20 +74,6 @@ locals {
     weblogics          = {}
     ec2_test_instances = {}
     ec2_test_autoscaling_groups = {
-      dev-redhat-rhel610 = {
-        tags = {
-          description = "For testing official RedHat RHEL6.10 image"
-          monitored   = false
-          os-type     = "Linux"
-          component   = "test"
-        }
-        instance = {
-          instance_type                = "t2.medium"
-          metadata_options_http_tokens = "optional"
-        }
-        ami_name  = "RHEL-6.10_HVM-*"
-        ami_owner = "309956199498"
-      }
       dev-redhat-rhel79 = {
         tags = {
           description = "For testing official RedHat RHEL7.9 image"
