@@ -1076,7 +1076,7 @@ module "dynamo_tab_domain_registry" {
   name                = "${local.project}-kinesis-reader-${local.environment}"
 
   hash_key    = "leaseKey" # Hash
-  range_key   = "" # Sort
+  range_key   = ""         # Sort
   table_class = "STANDARD"
   ttl_enabled = false
 
