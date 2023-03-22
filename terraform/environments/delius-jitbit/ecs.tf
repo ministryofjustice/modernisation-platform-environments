@@ -1,4 +1,12 @@
 module "ecs-new" {
+  source      = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//cluster?ref=fe436a8e9e5af0abfce8c84e409c3547439efcf4"
+  environment = local.environment
+  name        = format("%s-new-new", local.application_name)
+
+  tags = local.tags
+}
+
+module "ecs-new-new" {
   source = "github.com/ministryofjustice/terraform-ecs//cluster?ref=3c9a5a0762c7b2dbff6608e606a2784c8a4ef9c4"
 
   environment = local.environment
