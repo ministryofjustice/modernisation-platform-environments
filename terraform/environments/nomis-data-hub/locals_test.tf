@@ -36,8 +36,8 @@ locals {
 
       t1_ndh_app_1 = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name  = "base_rhel_7_9_2023-03-21T13-46-44.297Z"
-          ami_owner = "309956199498"
+          ami_name  = "base_rhel_7_9_*"
+          ami_owner = "374269020027"
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           vpc_security_group_ids = ["private"]
@@ -54,8 +54,8 @@ locals {
 
       t1_ndh_ems_1 = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name  = "base_rhel_7_9_2023-03-21T13-46-44.297Z"
-          ami_owner = "309956199498"
+          ami_name  = "base_rhel_7_9_*"
+          ami_owner = "374269020027"
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           vpc_security_group_ids = ["private"]
@@ -98,7 +98,8 @@ locals {
 
       t1_ndh_app = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name = "base_rhel_7_9_2023-03-21T13-46-44.297Z"
+          ami_name = "base_rhel_7_9_*"
+          ami_owner = "374269020027"
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           vpc_security_group_ids = ["private"]
@@ -121,7 +122,8 @@ locals {
 
       t1_ndh_ems = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name = "base_rhel_7_9_2023-03-21T13-46-44.297Z"
+          ami_name = "base_rhel_7_9_*"
+          ami_owner = "374269020027"
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           vpc_security_group_ids = ["private"]
