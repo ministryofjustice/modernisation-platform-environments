@@ -1,39 +1,39 @@
 ###################################################
 # *.modernisation-platform.service.justice.gov.uk #
 ###################################################
-#resource "aws_acm_certificate" "laa_cert" {
-#  domain_name       = format("*.%s-%s.modernisation-platform.service.justice.gov.uk", "laa", local.environment)
-#  validation_method = "DNS"
-#
-#  # subject_alternative_names = [
-#  #   format("%s.%s.%s.modernisation-platform.service.justice.gov.uk", "app", "oem", local.environment),
-#  #   format("%s.%s.%s.modernisation-platform.service.justice.gov.uk", "db", "oem", local.environment),
-#  #   format("%s.%s.%s.modernisation-platform.service.justice.gov.uk", "laa-oem-app", "oem", local.environment),
-#  #   format("%s.%s.%s.modernisation-platform.service.justice.gov.uk", "laa-oem-db", "oem", local.environment),
-#  #   format("%s.%s.%s.modernisation-platform.service.justice.gov.uk", "oem", "oem", local.environment),
-#  #   format("%s.%s.%s.modernisation-platform.service.justice.gov.uk", "oem-internal", "oem", local.environment)
-#  #   format("%s.%s.%s.modernisation-platform.service.justice.gov.uk", "app", var.networking[0].business-unit, local.environment),
-#  #   format("%s.%s.%s.modernisation-platform.service.justice.gov.uk", "db", var.networking[0].business-unit, local.environment),
-#  #   format("%s.%s.%s.modernisation-platform.service.justice.gov.uk", "laa-oem-app", var.networking[0].business-unit, local.environment),
-#  #   format("%s.%s.%s.modernisation-platform.service.justice.gov.uk", "laa-oem-db", var.networking[0].business-unit, local.environment),
-#  #   format("%s.%s.%s.modernisation-platform.service.justice.gov.uk", "oem", var.networking[0].business-unit, local.environment),
-#  #   format("%s.%s.%s.modernisation-platform.service.justice.gov.uk", "oem-internal", var.networking[0].business-unit, local.environment)
-#  #   format("%s.%s.%s-%s.modernisation-platform.service.justice.gov.uk", "app", local.application_name, var.networking[0].business-unit, local.environment),
-#  #   format("%s.%s.%s-%s.modernisation-platform.service.justice.gov.uk", "db", local.application_name, var.networking[0].business-unit, local.environment),
-#  #   format("%s.%s.%s-%s.modernisation-platform.service.justice.gov.uk", "laa-oem-app", local.application_name, var.networking[0].business-unit, local.environment),
-#  #   format("%s.%s.%s-%s.modernisation-platform.service.justice.gov.uk", "laa-oem-db", local.application_name, var.networking[0].business-unit, local.environment),
-#  #   format("%s.%s.%s-%s.modernisation-platform.service.justice.gov.uk", "oem", local.application_name, var.networking[0].business-unit, local.environment),
-#  #   format("%s.%s.%s-%s.modernisation-platform.service.justice.gov.uk", "oem-internal", local.application_name, var.networking[0].business-unit, local.environment)
-#  # ]
-#
-#  tags = merge(local.tags,
-#    { Name = lower(format("%s-%s-certificate", local.application_name, local.environment)) }
-#  )
-#
-#  lifecycle {
-#    create_before_destroy = true
-#  }
-#}
+resource "aws_acm_certificate" "laa_cert" {
+  domain_name       = format("*.%s-%s.modernisation-platform.service.justice.gov.uk", "laa", local.environment)
+  validation_method = "DNS"
+
+  # subject_alternative_names = [
+  #   format("%s.%s.%s.modernisation-platform.service.justice.gov.uk", "app", "oem", local.environment),
+  #   format("%s.%s.%s.modernisation-platform.service.justice.gov.uk", "db", "oem", local.environment),
+  #   format("%s.%s.%s.modernisation-platform.service.justice.gov.uk", "laa-oem-app", "oem", local.environment),
+  #   format("%s.%s.%s.modernisation-platform.service.justice.gov.uk", "laa-oem-db", "oem", local.environment),
+  #   format("%s.%s.%s.modernisation-platform.service.justice.gov.uk", "oem", "oem", local.environment),
+  #   format("%s.%s.%s.modernisation-platform.service.justice.gov.uk", "oem-internal", "oem", local.environment)
+  #   format("%s.%s.%s.modernisation-platform.service.justice.gov.uk", "app", var.networking[0].business-unit, local.environment),
+  #   format("%s.%s.%s.modernisation-platform.service.justice.gov.uk", "db", var.networking[0].business-unit, local.environment),
+  #   format("%s.%s.%s.modernisation-platform.service.justice.gov.uk", "laa-oem-app", var.networking[0].business-unit, local.environment),
+  #   format("%s.%s.%s.modernisation-platform.service.justice.gov.uk", "laa-oem-db", var.networking[0].business-unit, local.environment),
+  #   format("%s.%s.%s.modernisation-platform.service.justice.gov.uk", "oem", var.networking[0].business-unit, local.environment),
+  #   format("%s.%s.%s.modernisation-platform.service.justice.gov.uk", "oem-internal", var.networking[0].business-unit, local.environment)
+  #   format("%s.%s.%s-%s.modernisation-platform.service.justice.gov.uk", "app", local.application_name, var.networking[0].business-unit, local.environment),
+  #   format("%s.%s.%s-%s.modernisation-platform.service.justice.gov.uk", "db", local.application_name, var.networking[0].business-unit, local.environment),
+  #   format("%s.%s.%s-%s.modernisation-platform.service.justice.gov.uk", "laa-oem-app", local.application_name, var.networking[0].business-unit, local.environment),
+  #   format("%s.%s.%s-%s.modernisation-platform.service.justice.gov.uk", "laa-oem-db", local.application_name, var.networking[0].business-unit, local.environment),
+  #   format("%s.%s.%s-%s.modernisation-platform.service.justice.gov.uk", "oem", local.application_name, var.networking[0].business-unit, local.environment),
+  #   format("%s.%s.%s-%s.modernisation-platform.service.justice.gov.uk", "oem-internal", local.application_name, var.networking[0].business-unit, local.environment)
+  # ]
+
+  tags = merge(local.tags,
+    { Name = lower(format("%s-%s-certificate", local.application_name, local.environment)) }
+  )
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
 
 resource "aws_acm_certificate_validation" "laa_cert" {
   certificate_arn         = aws_acm_certificate.laa_cert.arn
