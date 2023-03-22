@@ -103,8 +103,8 @@ module "glue_cloudplatform_reporting_job" {
   create_job                    = local.create_job
   name                          = "${local.project}-reporting-hub-${local.env}"
   description                   = local.description
-  glue_version					= 4.0
-  command_type					= "gluestreaming"
+  glue_version                  = 4.0
+  command_type                  = "gluestreaming"
   create_security_configuration = local.create_sec_conf
   temp_dir                      = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/tmp/reporting-hub/"
   checkpoint_dir                = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/checkpoint/reporting-hub/"
@@ -117,23 +117,23 @@ module "glue_cloudplatform_reporting_job" {
   additional_policies           = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_admin_arn
   timeout                       = 8
   execution_class               = "STANDARD"
-  
-  class							= "uk.gov.justice.digital.job.DataHubJob"
-  
+
+  class = "uk.gov.justice.digital.job.DataHubJob"
+
   arguments = {
-    "--extra-jars"          		= "s3://${local.project}-artifact-store-${local.environment}/artifacts/cloud-platform/digital-prison-reporting-poc/cloud-platform-vLatest.jar"
-    "--job-bookmark-option" 		= "job-bookmark-disable"
-    "--enable-metrics"				= true
-    "--enable-spark-ui"				= false
-    "--enable-job-insights"			= true
-    
-    "--kinesis.reader.streamName"  			= "local.kinesis_stream_ingestor"
-    "--aws.kinesis.endpointUrl"				= "https://kinesis-${local.region}.amazonaws.com"
-    "--aws.region"							= local.region
-    "--kinesis.reader.batchDurationSeconds"	= 1
-    "--datalake-formats"            		= "delta"
-    "--raw.s3.path"     					= "s3://${module.s3_raw_bucket[0].bucket.id}"
-    "--structured.s3.path"					= "s3://${module.s3_structured_bucket[0].bucket.id}"
+    "--extra-jars"          = "s3://${local.project}-artifact-store-${local.environment}/artifacts/cloud-platform/digital-prison-reporting-poc/cloud-platform-vLatest.jar"
+    "--job-bookmark-option" = "job-bookmark-disable"
+    "--enable-metrics"      = true
+    "--enable-spark-ui"     = false
+    "--enable-job-insights" = true
+
+    "--kinesis.reader.streamName"           = "local.kinesis_stream_ingestor"
+    "--aws.kinesis.endpointUrl"             = "https://kinesis-${local.region}.amazonaws.com"
+    "--aws.region"                          = local.region
+    "--kinesis.reader.batchDurationSeconds" = 1
+    "--datalake-formats"                    = "delta"
+    "--raw.s3.path"                         = "s3://${module.s3_raw_bucket[0].bucket.id}"
+    "--structured.s3.path"                  = "s3://${module.s3_structured_bucket[0].bucket.id}"
   }
 }
 

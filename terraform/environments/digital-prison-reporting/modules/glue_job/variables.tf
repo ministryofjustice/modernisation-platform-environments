@@ -74,7 +74,7 @@ variable "script_location" {
 
 variable "command_type" {
   type        = string
-  default	  = "glueetl"
+  default     = "glueetl"
   description = "(Optional) Specifies the command type. Either glueetl or gluestreaming."
 }
 
