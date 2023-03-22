@@ -61,7 +61,7 @@ resource "aws_security_group_rule" "ingress_traffic_ebsdb" {
   protocol          = each.value.protocol
   from_port         = each.value.from_port
   to_port           = each.value.to_port
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block, local.application_data.accounts[local.environment].mp_aws_subnet_env]
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block, local.application_data.accounts[local.environment].lz_aws_subnet_env, local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_subnet_env, local.application_data.accounts[local.environment].lz_aws_workspace_prod_subnet_env]
 }
 resource "aws_security_group_rule" "egress_traffic_ebsdb_sg" {
   for_each                 = local.application_data.ec2_sg_egress_rules
@@ -101,7 +101,7 @@ resource "aws_security_group_rule" "ingress_traffic_ebsapps" {
   protocol          = each.value.protocol
   from_port         = each.value.from_port
   to_port           = each.value.to_port
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block, local.application_data.accounts[local.environment].mp_aws_subnet_env]
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block, local.application_data.accounts[local.environment].lz_aws_subnet_env, local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_subnet_env, local.application_data.accounts[local.environment].lz_aws_workspace_prod_subnet_env]
 }
 resource "aws_security_group_rule" "egress_traffic_ebsapps_sg" {
   for_each                 = local.application_data.ec2_sg_egress_rules
@@ -141,7 +141,7 @@ resource "aws_security_group_rule" "ingress_traffic_webgate" {
   protocol          = each.value.protocol
   from_port         = each.value.from_port
   to_port           = each.value.to_port
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block, local.application_data.accounts[local.environment].mp_aws_subnet_env]
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block, local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_subnet_env]
 }
 resource "aws_security_group_rule" "egress_traffic_webgate_sg" {
   for_each                 = local.application_data.ec2_sg_egress_rules
@@ -181,7 +181,7 @@ resource "aws_security_group_rule" "ingress_traffic_accessgate" {
   protocol          = each.value.protocol
   from_port         = each.value.from_port
   to_port           = each.value.to_port
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block, local.application_data.accounts[local.environment].mp_aws_subnet_env]
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block, local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_subnet_env]
 }
 resource "aws_security_group_rule" "egress_traffic_accessgate_sg" {
   for_each                 = local.application_data.ec2_sg_egress_rules
@@ -238,7 +238,7 @@ resource "aws_security_group_rule" "ingress_traffic_ebslb" {
   protocol          = each.value.protocol
   from_port         = each.value.from_port
   to_port           = each.value.to_port
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block, local.application_data.accounts[local.environment].mp_aws_subnet_env]
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block, local.application_data.accounts[local.environment].lz_aws_subnet_env, local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_subnet_env, local.application_data.accounts[local.environment].lz_aws_workspace_prod_subnet_env]
 }
 resource "aws_security_group_rule" "egress_traffic_ebslb_sg" {
   for_each                 = local.application_data.lb_sg_egress_rules
