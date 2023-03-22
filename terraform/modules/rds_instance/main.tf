@@ -62,6 +62,32 @@ resource "aws_db_instance_automated_backups_replication" "this" {
 }
 
 #------------------------------------------------------------------------------
+# RDS DB Password
+#------------------------------------------------------------------------------
+resource "random_password" "this" {
+  for_each = var.ssm_parameters != null ? var.ssm_parameters : {}
+
+  length  = each.value.random.length
+  special = lookup(each.value.random, "special", null)
+}
+
+resource "aws_ssm_parameter" "this" {
+  for_each = var.ssm_parameters != null ? var.ssm_parameters : {}
+
+  name        = "/${var.ssm_parameters_prefix}${var.identifier}/${each.key}"
+  description = each.value.description
+  type        = "SecureString"
+  value       = random_password.this[each.key].result
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "${var.identifier}-${each.key}"
+    }
+  )
+}
+
+#------------------------------------------------------------------------------
 # OPTION GROUPS
 #------------------------------------------------------------------------------
 
@@ -69,7 +95,7 @@ resource "aws_db_option_group" "this" {
   count = var.option_group.create ? 1 : 0
 
   name_prefix              = var.option_group.name_prefix
-  option_group_description = var.option_group.description == "" ? format("Option group for %s", var.identifier) : var.option_group.description
+  option_group_description = var.option_group.option_group_description == "" ? format("Option group for %s", var.identifier) : var.option_group.option_group_description
   engine_name              = var.option_group.engine_name
   major_engine_version     = var.option_group.major_engine_version
   dynamic "option" {
@@ -81,7 +107,7 @@ resource "aws_db_option_group" "this" {
       db_security_group_memberships  = option.value.db_security_group_memberships
       vpc_security_group_memberships = option.value.vpc_security_group_memberships
       dynamic "option_settings" {
-        for_each = option.value.settings
+        for_each = option.value.option_settings
         content {
           name  = option_settings.value.name
           value = option_settings.value.value
@@ -140,32 +166,47 @@ resource "aws_db_subnet_group" "this" {
 # IAM
 #------------------------------------------------------------------------------
 
-# resource "aws_iam_role" "this" {
-#   name                 = "${var.iam_resource_names_prefix}-role-${var.identifier}"
-#   path                 = "/"
-#   max_session_duration = "3600"
-#   assume_role_policy = jsonencode(
-#     {
-#       "Version" : "2012-10-17",
-#       "Statement" : [
-#         {
-#           "Effect" : "Allow",
-#           "Principal" : {
-#             "Service" : "rds.amazonaws.com"
-#           }
-#           "Action" : "sts:AssumeRole",
-#           "Condition" : {}
-#         }
-#       ]
-#     }
-#   )
+resource "aws_iam_role" "this" {
+  name                 = "${var.iam_resource_names_prefix}-role-${var.identifier}"
+  path                 = "/"
+  max_session_duration = "3600"
+  assume_role_policy = jsonencode(
+    {
+      "Version" : "2012-10-17",
+      "Statement" : [
+        {
+          "Effect" : "Allow",
+          "Principal" : {
+            "Service" : "rds.amazonaws.com"
+          }
+          "Action" : "sts:AssumeRole",
+          "Condition" : {}
+        }
+      ]
+    }
+  )
 
-#   managed_policy_arns = var.instance_profile_policies
+  managed_policy_arns = var.instance_profile_policies
 
-#   tags = merge(
-#     local.tags,
-#     {
-#       Name = "${var.iam_resource_names_prefix}-role-${var.identifier}"
-#     },
-#   )
-# }
+  tags = merge(
+    local.tags,
+    {
+      Name = "${var.iam_resource_names_prefix}-role-${var.identifier}"
+    },
+  )
+}
+
+#------------------------------------------------------------------------------
+# Route 53 record
+#------------------------------------------------------------------------------
+
+resource "aws_route53_record" "rds_dns_entry" {
+  count    = var.route53_record ? 1 : 0
+  provider = aws.core-vpc
+
+  zone_id = data.aws_route53_zone.rds_dns_entry.zone_id
+  name    = "${var.identifier}.${var.application_name}.${data.aws_route53_zone.rds_dns_entry.name}"
+  type    = "CNAME"
+  ttl     = 300
+  records = [aws_db_instance.this.address]
+}
