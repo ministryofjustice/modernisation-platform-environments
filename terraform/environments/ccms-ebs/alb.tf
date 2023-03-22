@@ -27,7 +27,7 @@ resource "aws_lb_listener" "ebsapps_listener" {
   port              = "443"
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = aws_acm_certificate.external[0].arn
+  certificate_arn   = local.cert_arn
 
   default_action {
     type             = "forward"
