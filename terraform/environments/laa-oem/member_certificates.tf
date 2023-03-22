@@ -2,7 +2,6 @@
 # *.modernisation-platform.service.justice.gov.uk #
 ###################################################
 resource "aws_acm_certificate" "laa_cert" {
-  count             = local.is-production ? 0 : 1
   domain_name       = "modernisation-platform.service.justice.gov.uk"
   validation_method = "DNS"
 
@@ -25,7 +24,6 @@ resource "aws_acm_certificate" "laa_cert" {
 }
 
 resource "aws_acm_certificate_validation" "laa_cert" {
-  count                   = local.is-production ? 0 : 1
   certificate_arn         = aws_acm_certificate.laa_cert.arn
   validation_record_fqdns = [for record in aws_route53_record.laa_cert_validation : record.fqdn]
   timeouts {
