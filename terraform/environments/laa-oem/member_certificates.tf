@@ -6,12 +6,18 @@ resource "aws_acm_certificate" "laa_cert" {
   validation_method = "DNS"
 
   subject_alternative_names = [
-    format("%s.%s.%s-%s.modernisation-platform.service.justice.gov.uk", "app", local.application_name, var.networking[0].business-unit, local.environment),
-    format("%s.%s.%s-%s.modernisation-platform.service.justice.gov.uk", "db", local.application_name, var.networking[0].business-unit, local.environment),
-    format("%s.%s.%s-%s.modernisation-platform.service.justice.gov.uk", "laa-oem-app", local.application_name, var.networking[0].business-unit, local.environment),
-    format("%s.%s.%s-%s.modernisation-platform.service.justice.gov.uk", "laa-oem-db", local.application_name, var.networking[0].business-unit, local.environment),
-    format("%s.%s.%s-%s.modernisation-platform.service.justice.gov.uk", "oem", local.application_name, var.networking[0].business-unit, local.environment),
-    format("%s.%s.%s-%s.modernisation-platform.service.justice.gov.uk", "oem-internal", local.application_name, var.networking[0].business-unit, local.environment)
+    format("%s.%s.%s.modernisation-platform.service.justice.gov.uk", "app", var.networking[0].business-unit, local.environment),
+    format("%s.%s.%s.modernisation-platform.service.justice.gov.uk", "db", var.networking[0].business-unit, local.environment),
+    format("%s.%s.%s.modernisation-platform.service.justice.gov.uk", "laa-oem-app", var.networking[0].business-unit, local.environment),
+    format("%s.%s.%s.modernisation-platform.service.justice.gov.uk", "laa-oem-db", var.networking[0].business-unit, local.environment),
+    format("%s.%s.%s.modernisation-platform.service.justice.gov.uk", "oem", var.networking[0].business-unit, local.environment),
+    format("%s.%s.%s.modernisation-platform.service.justice.gov.uk", "oem-internal", var.networking[0].business-unit, local.environment)
+#   format("%s.%s.%s-%s.modernisation-platform.service.justice.gov.uk", "app", local.application_name, var.networking[0].business-unit, local.environment),
+#   format("%s.%s.%s-%s.modernisation-platform.service.justice.gov.uk", "db", local.application_name, var.networking[0].business-unit, local.environment),
+#   format("%s.%s.%s-%s.modernisation-platform.service.justice.gov.uk", "laa-oem-app", local.application_name, var.networking[0].business-unit, local.environment),
+#   format("%s.%s.%s-%s.modernisation-platform.service.justice.gov.uk", "laa-oem-db", local.application_name, var.networking[0].business-unit, local.environment),
+#   format("%s.%s.%s-%s.modernisation-platform.service.justice.gov.uk", "oem", local.application_name, var.networking[0].business-unit, local.environment),
+#   format("%s.%s.%s-%s.modernisation-platform.service.justice.gov.uk", "oem-internal", local.application_name, var.networking[0].business-unit, local.environment)
   ]
 
   tags = merge(local.tags,
