@@ -44,7 +44,7 @@ resource "aws_acm_certificate_validation" "laa_cert" {
 }
 
 resource "aws_route53_record" "laa_cert_validation" {
-  provider = aws.network-services
+  provider = aws.core-network-services
   for_each = {
     for dvo in aws_acm_certificate.laa_cert.domain_validation_options : dvo.domain_name => {
       name   = dvo.resource_record_name
