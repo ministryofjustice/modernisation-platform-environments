@@ -292,7 +292,7 @@ variable "rds_instances" {
     })
     option_group = object({
       create                   = bool
-      name_prefix              = string
+      name_prefix              = optional(string)
       option_group_description = optional(string)
       engine_name              = string
       major_engine_version     = string
@@ -310,8 +310,7 @@ variable "rds_instances" {
       tags = optional(list(string))
     })
     parameter_group = object({
-      create      = bool
-      name_prefix = string
+      name_prefix = optional(string)
       description = optional(string)
       family      = string
       parameters = optional(list(object({
@@ -322,8 +321,7 @@ variable "rds_instances" {
       tags = optional(list(string))
     })
     subnet_group = object({
-      create      = bool
-      name_prefix = string
+      name_prefix = optional(string)
       description = optional(string)
       subnet_ids  = list(string)
       tags        = optional(list(string))

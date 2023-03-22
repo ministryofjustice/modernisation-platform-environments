@@ -95,8 +95,7 @@ variable "instance_automated_backups_replication" {
 variable "option_group" {
   description = "RDS instance option group settings"
   type = object({
-    create                   = bool
-    name_prefix              = string
+    name_prefix              = optional(string)
     option_group_description = optional(string)
     engine_name              = string
     major_engine_version     = string
@@ -118,8 +117,7 @@ variable "option_group" {
 variable "parameter_group" {
   description = "RDS instance parameter group settings"
   type = object({
-    create      = bool
-    name_prefix = string
+    name_prefix = optional(string)
     description = optional(string)
     family      = string
     parameters = optional(list(object({
@@ -134,7 +132,7 @@ variable "parameter_group" {
 variable "subnet_group" {
   description = "RDS instance subnet group settings"
   type = object({
-    name_prefix = string
+    name_prefix = optional(string)
     description = optional(string)
     subnet_ids  = list(string)
     tags        = optional(list(string))

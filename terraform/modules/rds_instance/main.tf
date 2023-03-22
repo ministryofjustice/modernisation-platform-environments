@@ -94,8 +94,8 @@ resource "aws_ssm_parameter" "this" {
 resource "aws_db_option_group" "this" {
   count = var.option_group.create ? 1 : 0
 
-  name_prefix              = var.option_group.name_prefix
-  option_group_description = var.option_group.option_group_description == "" ? format("Option group for %s", var.identifier) : var.option_group.option_group_description
+  name_prefix              = var.option_group.name_prefix != null ? var.option_group.name_prefix : var.identifier
+  option_group_description = var.option_group.option_group_description != null ? var.option_group.option_group_description : "Database option group for ${var.identifier}"
   engine_name              = var.option_group.engine_name
   major_engine_version     = var.option_group.major_engine_version
   dynamic "option" {
@@ -127,8 +127,8 @@ resource "aws_db_option_group" "this" {
 resource "aws_db_parameter_group" "this" {
   count = var.parameter_group.create ? 1 : 0
 
-  name_prefix = var.parameter_group.name_prefix
-  description = "Database parameter group for ${var.identifier}"
+  name_prefix = var.parameter_group.name_prefix != null ? var.parameter_group.name_prefix : var.identifier
+  description = var.parameter_group.description != null ? var.parameter_group.description : "Database parameter group for ${var.identifier}"
   family      = var.parameter_group.family
 
   dynamic "parameter" {
@@ -153,8 +153,8 @@ resource "aws_db_parameter_group" "this" {
 #------------------------------------------------------------------------------
 
 resource "aws_db_subnet_group" "this" {
-  name_prefix = var.subnet_group.name_prefix
-  description = "Database subnet group for ${var.identifier}"
+  name_prefix = var.subnet_group.name_prefix != null ? var.subnet_group.name_prefix : var.identifier
+  description = var.subnet_group.description != null ? var.subnet_group.descriptio : "Database subnet group for ${var.identifier}"
   subnet_ids  = var.subnet_group.subnet_ids
 
   tags = merge(local.tags, {
