@@ -245,6 +245,11 @@ variable "ec2_instances" {
 variable "rds_instances" {
   description = "map of rds instances to create where the map key is the tags.Name.  See rds_instance module for more variable details"
   type = map(object({
+    config = object({
+      iam_resource_names_prefix = optional(string, "rds_db")
+      instance_profile_policies = list(string)
+      ssm_parameters_prefix     = optional(string, "")
+    })
     instance = object({
       identifier                          = string
       create                              = optional(bool, true)
@@ -292,7 +297,11 @@ variable "rds_instances" {
       engine_name          = string
       major_engine_version = string
       options = list(object({
-        name = string
+        option_name                    = string
+        port                           = optional(number)
+        version                        = optional(string)
+        db_security_group_memberships  = optional(list(string))
+        vpc_security_group_memberships = optional(list(string))
         settings = list(object({
           name  = string
           value = string
@@ -306,12 +315,10 @@ variable "rds_instances" {
       description          = string
       family               = string
       major_engine_version = string
-      parameter = list(object({
-        name = string
-        settings = list(object({
-          name  = string
-          value = string
-        }))
+      parameters = list(object({
+        name         = string
+        value        = string
+        apply_method = optional(string, "immediate")
       }))
       tags = optional(list(string))
     })
