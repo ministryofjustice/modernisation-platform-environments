@@ -17,14 +17,14 @@ resource "aws_acm_certificate" "example_cert" {
 
 resource "aws_acm_certificate_validation" "example_cert" {
   certificate_arn         = aws_acm_certificate.example_cert.arn
-  validation_record_fqdns = [for record in aws_route53_record.example_cert : record.fqdn]
+  validation_record_fqdns = [for record in aws_route53_record.example_cert_validation : record.fqdn]
   timeouts {
     create = "10m"
   }
 }
 
-resource "aws_route53_record" "example_cert" {
-  provider = aws.core-vpc
+resource "aws_route53_record" "example_cert_validation" {
+  provider = aws.core-network-services
   for_each = {
     for dvo in aws_acm_certificate.example_cert.domain_validation_options : dvo.domain_name => {
       name   = dvo.resource_record_name
