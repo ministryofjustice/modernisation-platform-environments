@@ -15,7 +15,7 @@ variable "acm_certificates" {
 variable "bastion_linux" {
   description = "set this if you want a bastion linux created"
   type = object({
-    public_key_data         = map(any)
+    public_key_data         = map(string)
     allow_ssh_commands      = optional(bool, true)
     bucket_name             = optional(string, "bastion")
     bucket_versioning       = optional(bool, true)
