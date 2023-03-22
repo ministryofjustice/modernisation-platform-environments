@@ -285,12 +285,12 @@ resource "aws_autoscaling_policy" "ec2-mem-scaling-target" {
     target_value     = var.ec2_scaling_mem_threshold
     disable_scale_in = false
     customized_metric_specification {
-      metric_name = "MemoryUtilization"
-      namespace   = "AWS/ECS"
+      metric_name = "mem_used_percent"
+      namespace   = "CWAgent"
       statistic   = "Average"
       metric_dimension {
-        name  = "ClusterName"
-        value = var.app_name
+        name  = "InstanceId"
+        value = "${var.app_name}-cluster-scaling-group"
       }
     }
   }
