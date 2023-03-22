@@ -25,5 +25,10 @@ locals {
       patch_approval_delay_days = 7
       patch_day                 = "THU"
     }
+
+    baseline_bastion_linux = {
+      public_key_data = local.public_key_data.keys[local.environment]
+      tags            = local.tags
+    }
   }
 }
