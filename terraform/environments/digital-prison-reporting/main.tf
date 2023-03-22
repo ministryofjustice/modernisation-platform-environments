@@ -97,36 +97,43 @@ module "glue_demo_table" {
   glue_table_depends_on = [module.glue_database.db_name]
 }
 
-# Glue Cloud Platform ETL JOB
+# Glue Cloud Platform Ingestion Job (Load, Reload, CDC)
 module "glue_cloudplatform_reporting_job" {
   source                        = "./modules/glue_job"
   create_job                    = local.create_job
   name                          = "${local.project}-reporting-hub-${local.env}"
   description                   = local.description
+  glue_version					= 4.0
+  command_type					= "gluestreaming"
   create_security_configuration = local.create_sec_conf
-  job_language                  = "scala"
   temp_dir                      = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/tmp/reporting-hub/"
   checkpoint_dir                = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/checkpoint/reporting-hub/"
   spark_event_logs              = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/spark-logs/reporting-hub/"
   tags                          = local.all_tags
-  script_location               = "s3://${local.project}-artifact-store-${local.environment}/artifacts/cloud-platform/digital-prison-reporting-poc/cloud-platform-reporting-hub-vLatest.scala"
   enable_continuous_log_filter  = false
   project_id                    = local.project
   aws_kms_key                   = local.s3_kms_arn
   create_kinesis_ingester       = local.create_kinesis # If True, Kinesis Policies are applied
   additional_policies           = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_admin_arn
-  timeout                       = 120
-  execution_class               = "FLEX"
+  timeout                       = 8
+  execution_class               = "STANDARD"
+  
+  class							= "uk.gov.justice.digital.job.DataHubJob"
+  
   arguments = {
-    "--extra-jars"          = "s3://${local.project}-artifact-store-${local.environment}/artifacts/cloud-platform/digital-prison-reporting-poc/cloud-platform-vLatest.jar"
-    "--curated.path"        = "s3://${module.s3_curated_bucket[0].bucket.id}"
-    "--raw.path"            = "s3://${module.s3_raw_bucket[0].bucket.id}"
-    "--structured.path"     = "s3://${module.s3_structured_bucket[0].bucket.id}"
-    "--sink.stream"         = local.kinesis_stream_data_domain
-    "--sink.region"         = local.account_region
-    "--source.queue"        = "nomis-cdc-event-notification" ## Should be Dynamic SQS Name reference
-    "--source.region"       = local.account_region
-    "--job-bookmark-option" = "job-bookmark-enable"
+    "--extra-jars"          		= "s3://${local.project}-artifact-store-${local.environment}/artifacts/cloud-platform/digital-prison-reporting-poc/cloud-platform-vLatest.jar"
+    "--job-bookmark-option" 		= "job-bookmark-disable"
+    "--enable-metrics"				= true
+    "--enable-spark-ui"				= false
+    "--enable-job-insights"			= true
+    
+    "--kinesis.reader.streamName"  			= "local.kinesis_stream_ingestor"
+    "--aws.kinesis.endpointUrl"				= "https://kinesis-${local.region}.amazonaws.com"
+    "--aws.region"							= local.region
+    "--kinesis.reader.batchDurationSeconds"	= 1
+    "--datalake-formats"            		= "delta"
+    "--raw.s3.path"     					= "s3://${module.s3_raw_bucket[0].bucket.id}"
+    "--structured.s3.path"					= "s3://${module.s3_structured_bucket[0].bucket.id}"
   }
 }
 

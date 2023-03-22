@@ -69,7 +69,13 @@ variable "tags" {
 
 variable "script_location" {
   type        = string
-  description = "(Required) Specifies the S3 path to a script that executes a job."
+  description = "(Optional) Specifies the S3 path to a script that executes a job."
+}
+
+variable "command_type" {
+  type        = string
+  default	  = "glueetl"
+  description = "(Optional) Specifies the command type. Either glueetl or gluestreaming."
 }
 
 variable "python_version" {
@@ -109,7 +115,7 @@ variable "max_concurrent_runs" {
 
 variable "glue_version" {
   type        = string
-  default     = "3.0"
+  default     = "4.0"
   description = "(Optional) The version of glue to use."
 }
 
@@ -156,7 +162,7 @@ variable "timeout" {
 }
 
 variable "execution_class" {
-  default     = "FLEX"
+  default     = "STANDARD"
   description = "Execution CLass Standard or FLex"
 }
 

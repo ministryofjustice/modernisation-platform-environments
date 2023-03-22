@@ -1,8 +1,6 @@
 locals {
   default_arguments = {
-    "--job-language"                     = "${var.job_language}"
-    "--class"                            = "GlueApp"
-    "--job-bookmark-option"              = "${lookup(var.bookmark_options, var.bookmark)}"
+   "--job-bookmark-option"              = "${lookup(var.bookmark_options, var.bookmark)}"
     "--TempDir"                          = "${var.temp_dir}"
     "--checkpoint.location"              = "${var.checkpoint_dir}"
     "--spark-event-logs-path"            = "${var.spark_event_logs}"
@@ -12,7 +10,6 @@ locals {
     "--enable-glue-datacatalog"          = "true"
     "--enable-job-insights"              = "true"
     "--continuous-log-logStreamPrefix"   = var.continuous_log_stream_prefix
-    "--extra-py-files"                   = length(var.extra_py_files) > 0 ? join(",", var.extra_py_files) : null
     "--enable-continuous-log-filter"     = var.enable_continuous_log_filter
   }
 
@@ -28,9 +25,9 @@ locals {
 resource "aws_glue_job" "glue_job" {
   count = var.create_job ? 1 : 0
 
-  name        = var.name
-  role_arn    = var.create_role ? join("", aws_iam_role.glue-service-role.*.arn) : var.role_arn
-  connections = var.connections
+  name        			 = var.name
+  role_arn    			 = var.create_role ? join("", aws_iam_role.glue-service-role.*.arn) : var.role_arn
+  connections 			 = var.connections
   # max_capacity         = var.dpu
   description            = var.description
   glue_version           = var.glue_version
@@ -44,6 +41,7 @@ resource "aws_glue_job" "glue_job" {
 
   command {
     script_location = var.script_location
+    name  			= var.command_type
   }
 
   # https://docs.aws.amazon.com/glue/latest/dg/aws-glue-programming-etl-glue-arguments.html
