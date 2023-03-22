@@ -39,7 +39,7 @@ resource "aws_acm_certificate_validation" "laa_cert" {
   certificate_arn         = aws_acm_certificate.laa_cert.arn
   validation_record_fqdns = [for record in aws_route53_record.laa_cert_validation : record.fqdn]
   timeouts {
-    create = "10m"
+    create = "16m"
   }
 }
 
