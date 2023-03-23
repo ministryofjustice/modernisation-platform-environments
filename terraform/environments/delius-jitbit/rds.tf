@@ -34,12 +34,6 @@ resource "aws_db_subnet_group" "jitbit" {
 }
 
 resource "aws_db_instance" "jitbit" {
-  lifecycle {
-    ignore_changes = [
-      snapshot_identifier,
-    ]
-  }
-
   engine         = "sqlserver-se"
   license_model  = "license-included"
   engine_version = local.application_data.accounts[local.environment].db_engine_version
