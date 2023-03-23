@@ -1,8 +1,8 @@
-module "ecs-new" {
+module "ecs" {
   source = "github.com/ministryofjustice/terraform-ecs//cluster?ref=3c9a5a0762c7b2dbff6608e606a2784c8a4ef9c4"
 
   environment = local.environment
-  name        = format("%s-new", local.application_name)
+  name        = local.application_name
 
   tags = local.tags
 }
