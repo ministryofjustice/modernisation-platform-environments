@@ -78,7 +78,7 @@ resource "aws_cloudwatch_dashboard" "jitbit_ecs_dashboard" {
         "height" : 6,
         "properties" : {
           "metrics" : [
-            ["AWS/ECS", "CPUUtilization", "ClusterName", "${aws_ecs_cluster.jitbit.name}", { "stat" : "Average", "period" : 60 }],
+            ["AWS/ECS", "CPUUtilization", "ClusterName", "${module.ecs-new.name}", { "stat" : "Average", "period" : 60 }],
           ],
           "view" : "timeSeries",
           "stacked" : false,
@@ -94,7 +94,7 @@ resource "aws_cloudwatch_dashboard" "jitbit_ecs_dashboard" {
         "height" : 6,
         "properties" : {
           "metrics" : [
-            ["AWS/ECS", "MemoryUtilization", "ClusterName", "${aws_ecs_cluster.jitbit.name}", { "stat" : "Average", "period" : 60 }],
+            ["AWS/ECS", "MemoryUtilization", "ClusterName", "${module.ecs-new.name}", { "stat" : "Average", "period" : 60 }],
           ],
           "view" : "timeSeries",
           "stacked" : false,
@@ -110,7 +110,7 @@ resource "aws_cloudwatch_dashboard" "jitbit_ecs_dashboard" {
         "height" : 6,
         "properties" : {
           "metrics" : [
-            ["AWS/ECS", "DiskUtilization", "ClusterName", "${aws_ecs_cluster.jitbit.name}", { "stat" : "Average", "period" : 60 }],
+            ["AWS/ECS", "DiskUtilization", "ClusterName", "${module.ecs-new.name}", { "stat" : "Average", "period" : 60 }],
           ],
           "view" : "timeSeries",
           "stacked" : false,
@@ -126,7 +126,7 @@ resource "aws_cloudwatch_dashboard" "jitbit_ecs_dashboard" {
         "height" : 6,
         "properties" : {
           "metrics" : [
-            ["AWS/ECS", "NetworkIn", "ClusterName", "${aws_ecs_cluster.jitbit.name}", { "stat" : "Sum", "period" : 60 }],
+            ["AWS/ECS", "NetworkIn", "ClusterName", "${module.ecs-new.name}", { "stat" : "Sum", "period" : 60 }],
           ],
           "view" : "timeSeries",
           "stacked" : false,
