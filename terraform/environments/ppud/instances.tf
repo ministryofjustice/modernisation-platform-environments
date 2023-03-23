@@ -249,7 +249,7 @@ resource "aws_instance" "s618358rgvw019" {
   vpc_security_group_ids = [aws_security_group.PPUD-WEB-Portal.id]
   subnet_id              = data.aws_subnet.private_subnets_b.id
   tags = {
-    Name   = "s618358rgvw019"
+    Name          = "s618358rgvw019"
     is-production = true
   }
 }
@@ -263,7 +263,7 @@ resource "aws_instance" "s618358rgvw020" {
   vpc_security_group_ids = [aws_security_group.PPUD-WEB-Portal.id]
   subnet_id              = data.aws_subnet.private_subnets_c.id
   tags = {
-    Name   = "s618358rgvw020"
+    Name          = "s618358rgvw020"
     is-production = true
   }
 }
@@ -277,7 +277,7 @@ resource "aws_instance" "s618358rgvw021" {
   vpc_security_group_ids = [aws_security_group.PPUD-PROD-Database[0].id]
   subnet_id              = data.aws_subnet.data_subnets_a.id
   tags = {
-    Name   = "s618358rgvw021"
+    Name          = "s618358rgvw021"
     is-production = true
   }
 }
@@ -291,7 +291,7 @@ resource "aws_instance" "s618358rgvw022" {
   vpc_security_group_ids = [aws_security_group.Primary-DOC-Server[0].id]
   subnet_id              = data.aws_subnet.private_subnets_b.id
   tags = {
-    Name   = "s618358rgvw022"
+    Name          = "s618358rgvw022"
     is-production = true
   }
 }
@@ -305,7 +305,7 @@ resource "aws_instance" "s618358rgvw027" {
   vpc_security_group_ids = [aws_security_group.Secondary-DOC-Server[0].id]
   subnet_id              = data.aws_subnet.private_subnets_c.id
   tags = {
-    Name   = "s618358rgvw027"
+    Name          = "s618358rgvw027"
     is-production = true
   }
 }
@@ -319,7 +319,7 @@ resource "aws_instance" "s618358rgvw204" {
   vpc_security_group_ids = [aws_security_group.PPUD-WEB-Portal.id]
   subnet_id              = data.aws_subnet.private_subnets_a.id
   tags = {
-    Name   = "s618358rgvw204"
+    Name          = "s618358rgvw204"
     is-production = true
   }
 }
@@ -333,7 +333,7 @@ resource "aws_instance" "S618358RGVW205" {
   vpc_security_group_ids = [aws_security_group.Bridge-Server[0].id]
   subnet_id              = data.aws_subnet.private_subnets_a.id
   tags = {
-    Name   = "S618358RGVW205"
+    Name          = "S618358RGVW205"
     is-production = true
   }
 }
