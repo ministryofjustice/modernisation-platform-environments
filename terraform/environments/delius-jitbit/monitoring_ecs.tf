@@ -69,71 +69,73 @@ resource "aws_cloudwatch_metric_alarm" "jitbit_ecs_network_over_threshold" {
 resource "aws_cloudwatch_dashboard" "jitbit_ecs_dashboard" {
   dashboard_name = "jitbit-ecs-dashboard"
   dashboard_body = <<EOF
-    "widgets" : [
-      {
-        "type" : "metric",
-        "x" : 0,
-        "y" : 0,
-        "width" : 12,
-        "height" : 6,
-        "properties" : {
-          "metrics" : [
-            ["AWS/ECS", "CPUUtilization", "ClusterName", "${local.application_name}", { "stat" : "Average", "period" : 60 }],
-          ],
-          "view" : "timeSeries",
-          "stacked" : false,
-          "region" : "${data.aws_region.current.name}",
-          "title" : "CPU Utilization"
+    {
+      "widgets" : [
+        {
+          "type" : "metric",
+          "x" : 0,
+          "y" : 0,
+          "width" : 12,
+          "height" : 6,
+          "properties" : {
+            "metrics" : [
+              ["AWS/ECS", "CPUUtilization", "ClusterName", "${local.application_name}", { "stat" : "Average", "period" : 60 }],
+            ],
+            "view" : "timeSeries",
+            "stacked" : false,
+            "region" : "${data.aws_region.current.name}",
+            "title" : "CPU Utilization"
+          }
+        },
+        {
+          "type" : "metric",
+          "x" : 12,
+          "y" : 0,
+          "width" : 12,
+          "height" : 6,
+          "properties" : {
+            "metrics" : [
+              ["AWS/ECS", "MemoryUtilization", "ClusterName", "${local.application_name}", { "stat" : "Average", "period" : 60 }],
+            ],
+            "view" : "timeSeries",
+            "stacked" : false,
+            "region" : "${data.aws_region.current.name}",
+            "title" : "Memory Utilization"
+          }
+        },
+        {
+          "type" : "metric",
+          "x" : 0,
+          "y" : 6,
+          "width" : 12,
+          "height" : 6,
+          "properties" : {
+            "metrics" : [
+              ["AWS/ECS", "DiskUtilization", "ClusterName", "${local.application_name}", { "stat" : "Average", "period" : 60 }],
+            ],
+            "view" : "timeSeries",
+            "stacked" : false,
+            "region" : "${data.aws_region.current.name}",
+            "title" : "Disk Utilization"
+          }
+        },
+        {
+          "type" : "metric",
+          "x" : 12,
+          "y" : 6,
+          "width" : 12,
+          "height" : 6,
+          "properties" : {
+            "metrics" : [
+              ["AWS/ECS", "NetworkIn", "ClusterName", "${local.application_name}", { "stat" : "Sum", "period" : 60 }],
+            ],
+            "view" : "timeSeries",
+            "stacked" : false,
+            "region" : "${data.aws_region.current.name}",
+            "title" : "Network In"
+          }
         }
-      },
-      {
-        "type" : "metric",
-        "x" : 12,
-        "y" : 0,
-        "width" : 12,
-        "height" : 6,
-        "properties" : {
-          "metrics" : [
-            ["AWS/ECS", "MemoryUtilization", "ClusterName", "${local.application_name}", { "stat" : "Average", "period" : 60 }],
-          ],
-          "view" : "timeSeries",
-          "stacked" : false,
-          "region" : "${data.aws_region.current.name}",
-          "title" : "Memory Utilization"
-        }
-      },
-      {
-        "type" : "metric",
-        "x" : 0,
-        "y" : 6,
-        "width" : 12,
-        "height" : 6,
-        "properties" : {
-          "metrics" : [
-            ["AWS/ECS", "DiskUtilization", "ClusterName", "${local.application_name}", { "stat" : "Average", "period" : 60 }],
-          ],
-          "view" : "timeSeries",
-          "stacked" : false,
-          "region" : "${data.aws_region.current.name}",
-          "title" : "Disk Utilization"
-        }
-      },
-      {
-        "type" : "metric",
-        "x" : 12,
-        "y" : 6,
-        "width" : 12,
-        "height" : 6,
-        "properties" : {
-          "metrics" : [
-            ["AWS/ECS", "NetworkIn", "ClusterName", "${local.application_name}", { "stat" : "Sum", "period" : 60 }],
-          ],
-          "view" : "timeSeries",
-          "stacked" : false,
-          "region" : "${data.aws_region.current.name}",
-          "title" : "Network In"
-        }
-      }
-    ]
+      ]
+    }
   EOF
 }
