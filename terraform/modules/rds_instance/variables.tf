@@ -1,7 +1,42 @@
+variable "business_unit" {
+  type        = string
+  description = "This corresponds to the VPC in which the application resides"
+  default     = "hmpps"
+  nullable    = false
+}
+
+variable "application_name" {
+  type        = string
+  description = "The name of the application.  This will be name of the environment in Modernisation Platform"
+  default     = "nomis"
+  nullable    = false
+  validation {
+    condition     = can(regex("^[A-Za-z0-9][A-Za-z0-9-.]{1,61}[A-Za-z0-9]$", var.application_name))
+    error_message = "Invalid name for application supplied in variable app_name."
+  }
+}
+
+variable "environment" {
+  type        = string
+  description = "Application environment - i.e. the terraform workspace"
+}
+
+variable "identifier" {
+  type        = string
+  description = "The identifier of the resource"
+}
+
 variable "region" {
   type        = string
   description = "Destination AWS Region for the infrastructure"
   default     = "eu-west-2"
+}
+
+variable "availability_zone" {
+  type        = string
+  description = "The availability zone in which to deploy the infrastructure"
+  default     = "eu-west-2a"
+  nullable    = false
 }
 
 variable "tags" {
@@ -12,89 +47,126 @@ variable "tags" {
 variable "instance" {
   description = "RDS instance settings, see db_instance documentation"
   type = object({
-    allocated_storage     = number
-    name                  = string
-    engine                = string
-    engine_version        = string
-    instance_class        = string
-    username              = string
-    password              = string
-    parameter_group_name  = string
-    skip_final_snapshot   = bool
-    max_allocated_storage = number
+    create                              = optional(bool, true)
+    allocated_storage                   = number
+    storage_type                        = optional(string, "gp2")
+    storage_encrypted                   = optional(bool, false)
+    kms_key_id                          = optional(string)
+    replicate_source_db                 = optional(string)
+    snapshot_identifier                 = optional(string)
+    allow_major_version_upgrade         = optional(bool, false)
+    apply_immediately                   = optional(bool, false)
+    auto_minor_version_upgrade          = optional(bool, false)
+    license_model                       = optional(string)
+    iam_database_authentication_enabled = optional(bool, false)
+    db_name                             = optional(string)
+    engine                              = string
+    engine_version                      = optional(string)
+    instance_class                      = string
+    username                            = string
+    password                            = string
+    parameter_group_name                = optional(string)
+    skip_final_snapshot                 = optional(bool, false)
+    max_allocated_storage               = optional(number)
+    port                                = optional(string)
+    final_snapshot_identifier           = optional(bool, false)
+    vpc_security_group_ids              = optional(list(string))
+    db_subnet_group_name                = optional(string)
+    multi_az                            = optional(bool, false)
+    iops                                = optional(number, 0)
+    publicly_accessible                 = optional(bool, false)
+    monitoring_interval                 = optional(number, 0)
+    monitoring_role_arn                 = optional(string)
+    maintenance_window                  = optional(string)
+    copy_tags_to_snapshot               = optional(bool, false)
+    backup_retention_period             = optional(number, 1)
+    backup_window                       = optional(string)
+    character_set_name                  = optional(string)
+    option_group_name                   = optional(string)
+    enabled_cloudwatch_logs_exports     = optional(list(string))
   })
 }
 
-variable "db_instance_automated_backups_replication" {
+variable "instance_automated_backups_replication" {
   type    = number
   default = 14
 }
 
-variable "aws_db_option_group" {
-  description = "RDS option group settings"
+variable "option_group" {
+  description = "RDS instance option group settings"
   type = object({
-    name                 = string
+    create               = bool
+    name_prefix          = string
     description          = string
     engine_name          = string
     major_engine_version = string
     options = list(object({
-      name = string
+      option_name                    = string
+      port                           = optional(number)
+      version                        = optional(string)
+      db_security_group_memberships  = optional(list(string))
+      vpc_security_group_memberships = optional(list(string))
       settings = list(object({
         name  = string
         value = string
       }))
     }))
+    tags = optional(list(string))
   })
 }
 
-variable "aws_db_parameter_group" {
-  description = "RDS parameter group settings"
+variable "parameter_group" {
+  description = "RDS instance parameter group settings"
   type = object({
-    name                 = string
-    description          = string
-    engine_name          = string
-    major_engine_version = string
-    options = list(object({
-      name = string
-      settings = list(object({
-        name  = string
-        value = string
-      }))
+    create      = bool
+    name_prefix = string
+    description = string
+    family      = string
+    parameters = list(object({
+      name         = string
+      value        = string
+      apply_method = optional(string, "immediate")
     }))
+    tags = optional(list(string))
   })
 }
 
-variable "db_proxy" {
-  description = "RDS proxy settings"
+variable "subnet_group" {
+  description = "RDS instance subnet group settings"
   type = object({
-    name                   = string
-    debug_logging          = bool
-    engine_family          = string
-    idle_client_timeout    = number
-    require_tls            = bool
-    role_arn               = string
-    vpc_security_group_ids = list(string)
-    vpc_subnet_ids         = list(string)
-
-    auth = object({
-      auth_scheme = string
-      description = string
-      iam_auth    = string
-      secret_arn  = string
-    })
+    create      = bool
+    name_prefix = string
+    description = string
+    subnet_ids  = list(string)
+    tags        = optional(list(string))
   })
 }
 
-variable "db_proxy_default_target_group" {
-  description = "RDS proxy default target group settings"
-  type = object({
-    db_proxy_name = string
-    connection_pool_config = object({
-      connection_borrow_timeout    = number
-      init_query                   = string
-      max_connections_percent      = number
-      max_idle_connections_percent = number
-      session_pinning_filters      = list(string)
+variable "iam_resource_names_prefix" {
+  type        = string
+  description = "Prefix IAM resources with this prefix, e.g. rds_instance-blabla"
+  default     = "rds_instance"
+}
+
+variable "instance_profile_policies" {
+  type        = list(string)
+  description = "A list of managed IAM policy document ARNs to be attached to the database instance profile"
+}
+
+variable "ssm_parameters_prefix" {
+  type        = string
+  description = "Optionally prefix ssm parameters with this prefix.  Add a trailing /"
+  default     = ""
+}
+
+variable "ssm_parameters" {
+  description = "A map of SSM parameters to create.  If parameters are manually created, set to {} so IAM role still created"
+  type = map(object({
+    random = object({
+      length  = number
+      special = bool
     })
-  })
+    description = string
+  }))
+  default = null
 }

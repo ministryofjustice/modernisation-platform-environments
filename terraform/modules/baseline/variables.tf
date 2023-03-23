@@ -242,6 +242,112 @@ variable "ec2_instances" {
   default = {}
 }
 
+variable "rds_instances" {
+  description = "map of rds instances to create where the map key is the tags.Name.  See rds_instance module for more variable details"
+  type = map(object({
+    config = object({
+      iam_resource_names_prefix = optional(string, "rds_db")
+      instance_profile_policies = list(string)
+      ssm_parameters_prefix     = optional(string, "")
+    })
+    instance = object({
+      identifier                          = string
+      create                              = optional(bool, true)
+      allocated_storage                   = number
+      storage_type                        = optional(string, "gp2")
+      storage_encrypted                   = optional(bool, false)
+      kms_key_id                          = optional(string)
+      replicate_source_db                 = optional(string)
+      snapshot_identifier                 = optional(string)
+      allow_major_version_upgrade         = optional(bool, false)
+      apply_immediately                   = optional(bool, false)
+      auto_minor_version_upgrade          = optional(bool, false)
+      license_model                       = optional(string)
+      iam_database_authentication_enabled = optional(bool, false)
+      db_name                             = optional(string)
+      engine                              = string
+      engine_version                      = optional(string)
+      instance_class                      = string
+      username                            = string
+      password                            = string
+      parameter_group_name                = optional(string)
+      skip_final_snapshot                 = optional(bool, false)
+      max_allocated_storage               = optional(number)
+      port                                = optional(string)
+      final_snapshot_identifier           = optional(bool, false)
+      vpc_security_group_ids              = optional(list(string))
+      db_subnet_group_name                = optional(string)
+      multi_az                            = optional(bool, false)
+      iops                                = optional(number, 0)
+      publicly_accessible                 = optional(bool, false)
+      monitoring_interval                 = optional(number, 0)
+      monitoring_role_arn                 = optional(string)
+      maintenance_window                  = optional(string)
+      copy_tags_to_snapshot               = optional(bool, false)
+      backup_retention_period             = optional(number, 1)
+      backup_window                       = optional(string)
+      character_set_name                  = optional(string)
+      option_group_name                   = optional(string)
+      enabled_cloudwatch_logs_exports     = optional(list(string))
+    })
+    option_group = object({
+      create               = bool
+      name_prefix          = string
+      description          = string
+      engine_name          = string
+      major_engine_version = string
+      options = list(object({
+        option_name                    = string
+        port                           = optional(number)
+        version                        = optional(string)
+        db_security_group_memberships  = optional(list(string))
+        vpc_security_group_memberships = optional(list(string))
+        settings = list(object({
+          name  = string
+          value = string
+        }))
+      }))
+      tags = optional(list(string))
+    })
+    parameter_group = object({
+      create               = bool
+      name_prefix          = string
+      description          = string
+      family               = string
+      major_engine_version = string
+      parameters = list(object({
+        name         = string
+        value        = string
+        apply_method = optional(string, "immediate")
+      }))
+      tags = optional(list(string))
+    })
+    subnet_group = object({
+      create      = bool
+      name_prefix = string
+      description = string
+      subnet_ids  = list(string)
+      tags        = optional(list(string))
+    })
+    ssm_parameters = optional(map(object({
+      random = object({
+        length  = number
+        special = bool
+      })
+      description = string
+    })))
+    route53_records = optional(object({
+      create_internal_record = bool
+      create_external_record = bool
+      }), {
+      create_internal_record = true
+      create_external_record = false
+    })
+    tags = optional(map(string), {})
+  }))
+  default = {}
+}
+
 variable "environment" {
   description = "Standard environmental data resources from the environment module"
 }
