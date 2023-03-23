@@ -2,7 +2,6 @@
 # Local vars for ec2
 ##
 locals {
-
   ec2_tags = merge(local.tags, {
     Name = lower(format("%s-%s", local.application_name, local.environment))
   })
@@ -77,25 +76,8 @@ locals {
       aws_iam_policy.ssm_least_privilege_policy.arn,
       "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy" # Managed policy for cloudwatch agent to talk to CloudWatch
     ]
-
   }
-
 }
-
-##
-# Data
-## 
-# Can use aws ec2 describe-images --filters "Name=owner-id,Values=374269020027" --filters "Name=description,Values='Delius IAPS server'" --query 'reverse(sort_by(Images, &CreationDate))[0].[Name,ImageId]' to test
-# data "aws_ami" "delius_iaps_server" {
-#   most_recent = true
-
-#   filter {
-#     name   = "name"
-#     values = ["${local.application_data.accounts}*"]
-#   }
-
-#   owners = [local.environment_management.account_ids["core-shared-services-production"]]
-# }
 
 ##
 # Resources - Dependencies for ASG and launch template
@@ -237,28 +219,6 @@ resource "aws_iam_policy" "ssm_least_privilege_policy" {
     },
   )
 }
-# resource "aws_iam_role" "iaps_ec2_role" {
-#   name                = "iaps_ec2_role"
-#   assume_role_policy  = data.aws_iam_policy_document.iaps_ec2_assume_role_policy.json
-#   managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"]
-#   inline_policy {
-#     name   = "IapsEc2Policy"
-#     policy = data.aws_iam_policy_document.iaps_ec2_policy.json
-#   }
-#   tags = merge(
-#     local.ec2_tags,
-#     {
-#       Name = "iaps_ec2_role"
-#     },
-#   )
-# }
-
-# resource "aws_iam_instance_profile" "iaps_ec2_profile" {
-#   name = "iaps_ec2_profile"
-#   role = aws_iam_role.iaps_ec2_role.name
-# }
-
-
 
 ##
 # Resources - Create ASG and launch template using module
@@ -282,17 +242,6 @@ module "ec2_iaps_server" {
   ssm_parameters                = null
   autoscaling_group             = local.iaps_server.autoscaling_group
   autoscaling_schedules         = {}
-  # NOMIS example 
-  # autoscaling_schedules = coalesce(lookup(each.value, "autoscaling_schedules", null), {
-  #   # if sizes not set, use the values defined in autoscaling_group
-  #   "scale_up" = {
-  #     recurrence = "0 7 * * Mon-Fri"
-  #   }
-  #   "scale_down" = {
-  #     desired_capacity = lookup(each.value, "offpeak_desired_capacity", 0)
-  #     recurrence       = "0 19 * * Mon-Fri"
-  #   }
-  # })
 
   instance_profile_policies = local.iaps_server.iam_policies
   application_name          = local.application_name
