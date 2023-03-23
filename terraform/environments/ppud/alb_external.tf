@@ -76,7 +76,7 @@ resource "aws_lb_target_group_attachment" "PPUD-PORTAL-1" {
 # WAM Internet Facing ALB
 
 resource "aws_lb" "WAM-ALB" {
-  name               = local.application_data.accounts[local.environment].DEV_WAM_ALB
+  name               = local.application_data.accounts[local.environment].WAM_ALB
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.WAM-ALB.id]
@@ -136,5 +136,12 @@ resource "aws_lb_target_group_attachment" "WAM-Portal-preproduction" {
   count            = local.is-preproduction == true ? 1 : 0
   target_group_arn = aws_lb_target_group.WAM-Target-Group.arn
   target_id        = aws_instance.s618358rgvw201[0].id
+  port             = 80
+}
+
+resource "aws_lb_target_group_attachment" "WAM-Portal-production" {
+  count            = local.is-production == true ? 1 : 0
+  target_group_arn = aws_lb_target_group.WAM-Target-Group.arn
+  target_id        = aws_instance.s618358rgvw204[0].id
   port             = 80
 }
