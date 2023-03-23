@@ -74,10 +74,10 @@ resource "aws_cloudwatch_dashboard" "jitbit_ecs_dashboard" {
   "widgets": [
     {
       "type": "metric",
-      "x": 0,
+      "height": 8,
+      "width": 11,
       "y": 0,
-      "width": 6,
-      "height": 3,
+      "x": 11,
       "properties": {
         "metrics": [
           [
@@ -97,10 +97,10 @@ resource "aws_cloudwatch_dashboard" "jitbit_ecs_dashboard" {
     },
     {
       "type": "metric",
-      "x": 6,
+      "height": 8,
+      "width": 11,
       "y": 0,
-      "width": 6,
-      "height": 3,
+      "x": 11,
       "properties": {
         "metrics": [
           [
@@ -116,52 +116,6 @@ resource "aws_cloudwatch_dashboard" "jitbit_ecs_dashboard" {
         "stat": "Average",
         "region": "eu-west-2",
         "title": "Memory Utilization"
-      }
-    },
-    {
-      "type": "metric",
-      "x": 0,
-      "y": 3,
-      "width": 6,
-      "height": 3,
-      "properties": {
-        "metrics": [
-          [
-            "AWS/ECS",
-            "DiskUtilization",
-            "ClusterName",
-            "${format("hmpps-%s-%s", local.environment, local.application_name)}",
-            "ServiceName",
-            "${format("hmpps-%s-%s", local.environment, local.application_name)}"
-          ]
-        ],
-        "period": 60,
-        "stat": "Average",
-        "region": "eu-west-2",
-        "title": "Disk Utilization"
-      }
-    },
-    {
-      "type": "metric",
-      "x": 6,
-      "y": 3,
-      "width": 6,
-      "height": 3,
-      "properties": {
-        "metrics": [
-          [
-            "AWS/ECS",
-            "NetworkIn",
-            "ClusterName",
-            "${format("hmpps-%s-%s", local.environment, local.application_name)}",
-            "ServiceName",
-            "${format("hmpps-%s-%s", local.environment, local.application_name)}"
-          ]
-        ],
-        "period": 60,
-        "stat": "Sum",
-        "region": "eu-west-2",
-        "title": "Network In"
       }
     }
   ]
