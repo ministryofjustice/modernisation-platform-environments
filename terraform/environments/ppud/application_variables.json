@@ -18,7 +18,7 @@
     "production": {
       "directory_service_name": "PPUD.PROD",
       "WAM_ALB": "WAM-ALB-PROD",
-      "PPUD_Internal_ALB":"PPUD-ALB",
+      "PPUD_Internal_ALB": "PPUD-ALB",
       "PPUD_Target": "PPUD"
     }
   }

@@ -108,7 +108,7 @@ resource "aws_ssm_association" "ad_join_domain_association_preprod" {
 # Associate Policy to UAT Instance
 resource "aws_ssm_association" "ad_join_domain_association_prod" {
   count      = local.is-production == true ? 1 : 0
-  depends_on = [aws_instance.s618358rgvw019, aws_instance.s618358rgvw020, aws_instance.s618358rgvw021, aws_instance.s618358rgvw022, aws_instance.s618358rgvw027,aws_instance.s618358rgvw204,aws_instance.s618358rgvw205]
+  depends_on = [aws_instance.s618358rgvw019, aws_instance.s618358rgvw020, aws_instance.s618358rgvw021, aws_instance.s618358rgvw022, aws_instance.s618358rgvw027, aws_instance.s618358rgvw204, aws_instance.s618358rgvw205]
   name       = aws_ssm_document.api_ad_join_domain.name
   targets {
     key    = "InstanceIds"
