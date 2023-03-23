@@ -84,9 +84,9 @@ resource "aws_cloudwatch_dashboard" "jitbit_ecs_dashboard" {
             "AWS/ECS",
             "CPUUtilization",
             "ClusterName",
-            "jitbit-ecs-cluster",
+            "${format("hmpps-%s-%s", local.environment, local.application_name)}",
             "ServiceName",
-            "jitbit-ecs-service"
+            "${local.service_name}"
           ]
         ],
         "period": 60,
@@ -107,9 +107,9 @@ resource "aws_cloudwatch_dashboard" "jitbit_ecs_dashboard" {
             "AWS/ECS",
             "MemoryUtilization",
             "ClusterName",
-            "jitbit-ecs-cluster",
+            "${format("hmpps-%s-%s", local.environment, local.application_name)}",
             "ServiceName",
-            "jitbit-ecs-service"
+            "${local.service_name}"
           ]
         ],
         "period": 60,
@@ -130,9 +130,9 @@ resource "aws_cloudwatch_dashboard" "jitbit_ecs_dashboard" {
             "AWS/ECS",
             "DiskUtilization",
             "ClusterName",
-            "jitbit-ecs-cluster",
+            "${format("hmpps-%s-%s", local.environment, local.application_name)}",
             "ServiceName",
-            "jitbit-ecs-service"
+            "${local.application_name}"
           ]
         ],
         "period": 60,
@@ -153,9 +153,9 @@ resource "aws_cloudwatch_dashboard" "jitbit_ecs_dashboard" {
             "AWS/ECS",
             "NetworkIn",
             "ClusterName",
-            "jitbit-ecs-cluster",
+            "${format("hmpps-%s-%s", local.environment, local.application_name)}",
             "ServiceName",
-            "jitbit-ecs-service"
+            "${local.service_name}"
           ]
         ],
         "period": 60,
