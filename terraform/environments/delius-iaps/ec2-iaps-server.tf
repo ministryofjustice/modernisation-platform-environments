@@ -231,8 +231,11 @@ module "ec2_iaps_server" {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
   }
 
-  name                          = local.application_data.ec2_iaps_instance_label
-  ami_name                      = local.application_data.ec2_iaps_instance_ami_name
+  name = local.application_data.ec2_iaps_instance_label
+  ami_name = try(
+    local.application_data.accounts[local.environment].ec2_iaps_instance_ami_name,
+    "delius_iaps_server_*"
+  )
   ami_owner                     = local.application_data.ec2_iaps_instance_ami_owner
   instance                      = local.iaps_server.instance
   user_data_raw                 = local.iaps_server.user_data_raw
