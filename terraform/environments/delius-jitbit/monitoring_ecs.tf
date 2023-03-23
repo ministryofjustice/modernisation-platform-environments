@@ -86,7 +86,7 @@ resource "aws_cloudwatch_dashboard" "jitbit_ecs_dashboard" {
             "ClusterName",
             "${format("hmpps-%s-%s", local.environment, local.application_name)}",
             "ServiceName",
-            "${local.application_name}"
+            "${format("hmpps-%s-%s", local.environment, local.application_name)}"
           ]
         ],
         "period": 60,
@@ -109,7 +109,7 @@ resource "aws_cloudwatch_dashboard" "jitbit_ecs_dashboard" {
             "ClusterName",
             "${format("hmpps-%s-%s", local.environment, local.application_name)}",
             "ServiceName",
-            "${local.application_name}"
+            "${format("hmpps-%s-%s", local.environment, local.application_name)}"
           ]
         ],
         "period": 60,
@@ -132,7 +132,7 @@ resource "aws_cloudwatch_dashboard" "jitbit_ecs_dashboard" {
             "ClusterName",
             "${format("hmpps-%s-%s", local.environment, local.application_name)}",
             "ServiceName",
-            "${local.application_name}"
+            "${format("hmpps-%s-%s", local.environment, local.application_name)}"
           ]
         ],
         "period": 60,
@@ -155,7 +155,7 @@ resource "aws_cloudwatch_dashboard" "jitbit_ecs_dashboard" {
             "ClusterName",
             "${format("hmpps-%s-%s", local.environment, local.application_name)}",
             "ServiceName",
-            "${local.application_name}"
+            "${format("hmpps-%s-%s", local.environment, local.application_name)}"
           ]
         ],
         "period": 60,
