@@ -72,11 +72,11 @@ resource "aws_cloudwatch_dashboard" "jitbit_ecs_dashboard" {
     {
       "widgets" : [
         {
-          "type" : "metric",
-          "x" : 0,
-          "y" : 0,
-          "width" : 12,
-          "height" : 6,
+          "type": "explorer",
+          "x": 0,
+          "y": 0,
+          "width": 24,
+          "height": 15,
           "properties" : {
             "metrics" : [
               ["AWS/ECS", "CPUUtilization", "ClusterName", "${local.application_name}", { "stat" : "Average", "period" : 60 }],
