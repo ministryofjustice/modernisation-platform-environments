@@ -68,74 +68,103 @@ resource "aws_cloudwatch_metric_alarm" "jitbit_ecs_network_over_threshold" {
 
 resource "aws_cloudwatch_dashboard" "jitbit_ecs_dashboard" {
   dashboard_name = "jitbit-ecs-dashboard"
+
   dashboard_body = <<EOF
+  {
+  "widgets": [
     {
-      "widgets" : [
-        {
-          "type": "explorer",
-          "x": 0,
-          "y": 0,
-          "width": 24,
-          "height": 15,
-          "properties" : {
-            "metrics" : [
-              ["AWS/ECS", "CPUUtilization", "ClusterName", "${local.application_name}", { "stat" : "Average", "period" : 60 }],
-            ],
-            "view" : "timeSeries",
-            "stacked" : false,
-            "region" : "${data.aws_region.current.name}",
-            "title" : "CPU Utilization"
-          }
-        },
-        {
-          "type" : "metric",
-          "x" : 12,
-          "y" : 0,
-          "width" : 12,
-          "height" : 6,
-          "properties" : {
-            "metrics" : [
-              ["AWS/ECS", "MemoryUtilization", "ClusterName", "${local.application_name}", { "stat" : "Average", "period" : 60 }],
-            ],
-            "view" : "timeSeries",
-            "stacked" : false,
-            "region" : "${data.aws_region.current.name}",
-            "title" : "Memory Utilization"
-          }
-        },
-        {
-          "type" : "metric",
-          "x" : 0,
-          "y" : 6,
-          "width" : 12,
-          "height" : 6,
-          "properties" : {
-            "metrics" : [
-              ["AWS/ECS", "DiskUtilization", "ClusterName", "${local.application_name}", { "stat" : "Average", "period" : 60 }],
-            ],
-            "view" : "timeSeries",
-            "stacked" : false,
-            "region" : "${data.aws_region.current.name}",
-            "title" : "Disk Utilization"
-          }
-        },
-        {
-          "type" : "metric",
-          "x" : 12,
-          "y" : 6,
-          "width" : 12,
-          "height" : 6,
-          "properties" : {
-            "metrics" : [
-              ["AWS/ECS", "NetworkIn", "ClusterName", "${local.application_name}", { "stat" : "Sum", "period" : 60 }],
-            ],
-            "view" : "timeSeries",
-            "stacked" : false,
-            "region" : "${data.aws_region.current.name}",
-            "title" : "Network In"
-          }
-        }
-      ]
+      "type": "metric",
+      "x": 0,
+      "y": 0,
+      "width": 6,
+      "height": 3,
+      "properties": {
+        "metrics": [
+          [
+            "AWS/ECS",
+            "CPUUtilization",
+            "ClusterName",
+            "jitbit-ecs-cluster",
+            "ServiceName",
+            "jitbit-ecs-service"
+          ]
+        ],
+        "period": 60,
+        "stat": "Average",
+        "region": "eu-west-2",
+        "title": "CPU Utilization"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 6,
+      "y": 0,
+      "width": 6,
+      "height": 3,
+      "properties": {
+        "metrics": [
+          [
+            "AWS/ECS",
+            "MemoryUtilization",
+            "ClusterName",
+            "jitbit-ecs-cluster",
+            "ServiceName",
+            "jitbit-ecs-service"
+          ]
+        ],
+        "period": 60,
+        "stat": "Average",
+        "region": "eu-west-2",
+        "title": "Memory Utilization"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 3,
+      "width": 6,
+      "height": 3,
+      "properties": {
+        "metrics": [
+          [
+            "AWS/ECS",
+            "DiskUtilization",
+            "ClusterName",
+            "jitbit-ecs-cluster",
+            "ServiceName",
+            "jitbit-ecs-service"
+          ]
+        ],
+        "period": 60,
+        "stat": "Average",
+        "region": "eu-west-2",
+        "title": "Disk Utilization"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 6,
+      "y": 3,
+      "width": 6,
+      "height": 3,
+      "properties": {
+        "metrics": [
+          [
+            "AWS/ECS",
+            "NetworkIn",
+            "ClusterName",
+            "jitbit-ecs-cluster",
+            "ServiceName",
+            "jitbit-ecs-service"
+          ]
+        ],
+        "period": 60,
+        "stat": "Sum",
+        "region": "eu-west-2",
+        "title": "Network In"
+      }
     }
-  EOF
+  ]
+}
+EOF
 }
