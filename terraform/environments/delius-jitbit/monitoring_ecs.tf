@@ -68,7 +68,7 @@ resource "aws_cloudwatch_metric_alarm" "jitbit_ecs_network_over_threshold" {
 
 resource "aws_cloudwatch_dashboard" "jitbit_ecs_dashboard" {
   dashboard_name = "jitbit-ecs-dashboard"
-  dashboard_body = jsonencode({
+  dashboard_body = <<EOF
     "widgets" : [
       {
         "type" : "metric",
@@ -78,7 +78,7 @@ resource "aws_cloudwatch_dashboard" "jitbit_ecs_dashboard" {
         "height" : 6,
         "properties" : {
           "metrics" : [
-            [ "AWS/ECS", "CPUUtilization", "ClusterName", "${aws_ecs_cluster.jitbit.name}", { "stat" : "Average", "period" : 60 } ],
+            ["AWS/ECS", "CPUUtilization", "ClusterName", "${aws_ecs_cluster.jitbit.name}", { "stat" : "Average", "period" : 60 }],
           ],
           "view" : "timeSeries",
           "stacked" : false,
@@ -94,7 +94,7 @@ resource "aws_cloudwatch_dashboard" "jitbit_ecs_dashboard" {
         "height" : 6,
         "properties" : {
           "metrics" : [
-            [ "AWS/ECS", "MemoryUtilization", "ClusterName", "${aws_ecs_cluster.jitbit.name}", { "stat" : "Average", "period" : 60 } ],
+            ["AWS/ECS", "MemoryUtilization", "ClusterName", "${aws_ecs_cluster.jitbit.name}", { "stat" : "Average", "period" : 60 }],
           ],
           "view" : "timeSeries",
           "stacked" : false,
@@ -110,7 +110,7 @@ resource "aws_cloudwatch_dashboard" "jitbit_ecs_dashboard" {
         "height" : 6,
         "properties" : {
           "metrics" : [
-            [ "AWS/ECS", "DiskUtilization", "ClusterName", "${aws_ecs_cluster.jitbit.name}", { "stat" : "Average", "period" : 60 } ],
+            ["AWS/ECS", "DiskUtilization", "ClusterName", "${aws_ecs_cluster.jitbit.name}", { "stat" : "Average", "period" : 60 }],
           ],
           "view" : "timeSeries",
           "stacked" : false,
@@ -123,4 +123,17 @@ resource "aws_cloudwatch_dashboard" "jitbit_ecs_dashboard" {
         "x" : 12,
         "y" : 6,
         "width" : 12,
-        "height
+        "height" : 6,
+        "properties" : {
+          "metrics" : [
+            ["AWS/ECS", "NetworkIn", "ClusterName", "${aws_ecs_cluster.jitbit.name}", { "stat" : "Sum", "period" : 60 }],
+          ],
+          "view" : "timeSeries",
+          "stacked" : false,
+          "region" : "${data.aws_region.current.name}",
+          "title" : "Network In"
+        }
+      }
+    ]
+  EOF
+}
