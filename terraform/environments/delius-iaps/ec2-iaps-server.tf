@@ -19,7 +19,6 @@ locals {
   ]
 
   iaps_server = {
-
     instance = {
       disable_api_termination      = false
       instance_type                = local.application_data.accounts[local.environment].ec2_iaps_instance_type
@@ -28,6 +27,14 @@ locals {
       metadata_options_http_tokens = "required"
       vpc_security_group_ids       = [aws_security_group.iaps.id]
     }
+
+    // If the ami name is present in the environment specific config, it will be named something
+    // like this "delius_iaps_server_2021-06-01T11:00:00Z". The : in the name results in data lookups
+    // returning no images. So we replace the : with a * to allow the lookup to work.
+    ami_name = replace(try(
+      local.application_data.accounts[local.environment].ec2_iaps_instance_ami_name,
+      "delius_iaps_server_*"
+    ), ":", "*")
 
     # the ami has got unwanted ephemeral devices so don't copy these
     ebs_volumes_copy_all_from_ami = false
@@ -231,11 +238,8 @@ module "ec2_iaps_server" {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
   }
 
-  name = local.application_data.ec2_iaps_instance_label
-  ami_name = try(
-    local.application_data.accounts[local.environment].ec2_iaps_instance_ami_name,
-    "delius_iaps_server_*"
-  )
+  name                          = local.application_data.ec2_iaps_instance_label
+  ami_name                      = local.iaps_server.ami_name
   ami_owner                     = local.application_data.ec2_iaps_instance_ami_owner
   instance                      = local.iaps_server.instance
   user_data_raw                 = local.iaps_server.user_data_raw
