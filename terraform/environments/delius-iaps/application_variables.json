@@ -22,7 +22,8 @@
       "cloudwatch_agent_log_group_retention_period": "7",
       "iaps_ndelius_interface_url": "placeholder.nd.address",
       "iaps_im_interface_url": "placeholder.im.address",
-      "iaps_im_db_url": "placeholder.db.address"
+      "iaps_im_db_url": "placeholder.db.address",
+      "ec2_iaps_instance_ami_name": "delius_iaps_server_patch_2023-03-14T14:36:37.053Z"
     },
     "preproduction": {
       "short_environment_name": "preprod",
@@ -57,7 +58,6 @@
     }
   },
   "ec2_iaps_instance_label": "iaps-server",
-  "ec2_iaps_instance_ami_name": "delius_iaps_server_*",
   "ec2_iaps_instance_ami_owner": "core-shared-services-production",
   "ec2_iaps_instance_subnet_name": "private",
 
