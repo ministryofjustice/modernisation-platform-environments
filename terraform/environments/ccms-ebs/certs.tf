@@ -4,7 +4,7 @@ resource "aws_acm_certificate" "external" {
 
   validation_method = "DNS"
   #domain_name       = "*.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-  domain_name       = "modernisation-platform.service.justice.gov.uk"
+  domain_name = "modernisation-platform.service.justice.gov.uk"
   subject_alternative_names = [
     "*.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   ]
