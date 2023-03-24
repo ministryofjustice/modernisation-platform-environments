@@ -1,6 +1,6 @@
 #  Build EC2 
 resource "aws_instance" "ec2_oracle_ebs" {
-  instance_type               = local.application_data.accounts[local.environment].ec2_oracle_instance_type_ebsdb
+  instance_type = local.application_data.accounts[local.environment].ec2_oracle_instance_type_ebsdb
   #ami                         = data.aws_ami.oracle_db.id
   ami                         = local.environment == "development" ? local.application_data.accounts[local.environment].restored_db_image : local.application_data.accounts[local.environment].key_name
   key_name                    = local.application_data.accounts[local.environment].key_name
