@@ -4,6 +4,7 @@ resource "aws_ses_domain_identity" "ppud" {
 }
 
 resource "aws_ses_domain_identity_verification" "ppud_verification" {
+  count  = local.is-production == false ? 1 : 0
   domain = aws_ses_domain_identity.ppud[0].id
 
 
@@ -20,12 +21,14 @@ resource "aws_ses_domain_identity" "DKIM-Identity" {
 }
 
 resource "aws_ses_domain_dkim" "Domain-DKIM" {
+  count  = local.is-production == false ? 1 : 0
   domain = aws_ses_domain_identity.DKIM-Identity[0].domain
 }
 
 #Domain Identity MAIL FROM
 
 resource "aws_ses_domain_mail_from" "ppud" {
+  count            = local.is-production == false ? 1 : 0
   domain           = aws_ses_domain_identity.ppud[0].domain
   mail_from_domain = "noreply.${aws_ses_domain_identity.ppud[0].domain}"
 }
