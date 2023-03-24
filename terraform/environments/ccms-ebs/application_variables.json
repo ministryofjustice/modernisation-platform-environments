@@ -38,7 +38,7 @@
     "test": {
       "short_env": "tst",
       "dns": "laa-test",
-      "instance-scheduling": "skip-auto-start",
+      "instance-scheduling": "skip-scheduling",
       "ec2_oracle_instance_type_ebsdb": "m5d.4xlarge",
       "ec2_oracle_instance_type_ebsapps": "m5d.2xlarge",
       "ec2_oracle_instance_type_webgate": "m5d.large",
