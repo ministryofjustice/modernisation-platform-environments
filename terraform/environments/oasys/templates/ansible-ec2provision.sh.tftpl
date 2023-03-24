@@ -105,9 +105,9 @@ run_ansible() {
   ansible-playbook site.yml $ansible_group_vars \
    --connection=local \
    --inventory localhost, \
-   --extra-vars "ansible_python_interpreter=$python" \
    --extra-vars "target=localhost" \
    --become
+   # --extra-vars "ansible_python_interpreter=$python" # this should be defined in group vars
    # --tags ec2provision
 
   echo "# Cleanup"

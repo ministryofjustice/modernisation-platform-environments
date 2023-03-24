@@ -423,6 +423,37 @@ locals {
     production    = {}
   }
 
+  existing_target_groups_list = [
+    for asg_key, asg_value in module.autoscaling_groups : [
+      for tg_key, tg_value in asg_value.lb_target_groups : {
+        key   = "${asg_key}-${tg_key}"
+        value = tg_value
+      }
+    ]
+  ]
+  existing_target_groups = { for item in flatten(local.existing_target_groups_list) : item.key => item.value }
+
+  lb_web = {
+    route53 = {
+      route53_records = {
+        "$(name).oasys" = {
+          account                = "core-vpc"
+          zone_id                = module.environment.route53_zones[module.environment.domains.public.business_unit_environment].zone_id
+          evaluate_target_health = true
+        }
+      }
+    }
+
+    http = {
+      port     = 8080
+      protocol = "HTTP"
+      default_action = {
+        type              = "forward"
+        target_group_name = "$(name)-http-8080"
+      }
+    }
+  }
+
   acm_certificates = {
 
     # Certificates common to all environments
