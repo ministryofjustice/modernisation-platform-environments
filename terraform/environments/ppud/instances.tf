@@ -4,7 +4,7 @@
 
 resource "aws_instance" "s609693lo6vw109" {
   count                  = local.is-development == true ? 1 : 0
-  ami                    = "ami-0ca7365d53b8b8028"
+  ami                    = "ami-013198324453e6dc3"
   instance_type          = "m5.large"
   vpc_security_group_ids = [aws_security_group.SCR-Team-Foundation-Server[0].id]
   source_dest_check      = false
@@ -242,7 +242,7 @@ resource "aws_instance" "s618358rgvw023" {
 
 resource "aws_instance" "s618358rgvw019" {
   count                  = local.is-production == true ? 1 : 0
-  ami                    = "ami-053a1bdfccde5a440"
+  ami                    = "ami-0eccca367d5cb093d"
   instance_type          = "c5.xlarge"
   source_dest_check      = false
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
@@ -256,7 +256,7 @@ resource "aws_instance" "s618358rgvw019" {
 
 resource "aws_instance" "s618358rgvw020" {
   count                  = local.is-production == true ? 1 : 0
-  ami                    = "ami-0f40fd8eeb25ed216"
+  ami                    = "ami-0cd0c96a5812bb89c"
   instance_type          = "c5.xlarge"
   source_dest_check      = false
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
@@ -270,7 +270,7 @@ resource "aws_instance" "s618358rgvw020" {
 
 resource "aws_instance" "s618358rgvw021" {
   count                  = local.is-production == true ? 1 : 0
-  ami                    = "ami-06f04ef58ddbec1fb"
+  ami                    = "ami-052685eb60dbb24e9"
   instance_type          = "m5.2xlarge"
   source_dest_check      = false
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
@@ -284,7 +284,7 @@ resource "aws_instance" "s618358rgvw021" {
 
 resource "aws_instance" "s618358rgvw022" {
   count                  = local.is-production == true ? 1 : 0
-  ami                    = "ami-099e1bff1ed376c3c"
+  ami                    = "ami-02dfb693f670d0eab"
   instance_type          = "m5.xlarge"
   source_dest_check      = false
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
@@ -298,7 +298,7 @@ resource "aws_instance" "s618358rgvw022" {
 
 resource "aws_instance" "s618358rgvw027" {
   count                  = local.is-production == true ? 1 : 0
-  ami                    = "ami-0d47d882709bccb38"
+  ami                    = "ami-063a7b8df5fff4d91"
   instance_type          = "m5.xlarge"
   source_dest_check      = false
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
@@ -312,7 +312,7 @@ resource "aws_instance" "s618358rgvw027" {
 
 resource "aws_instance" "s618358rgvw204" {
   count                  = local.is-production == true ? 1 : 0
-  ami                    = "ami-0e570893d0761b36d"
+  ami                    = "ami-017f92274d668b744"
   instance_type          = "c5.xlarge"
   source_dest_check      = false
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
@@ -326,7 +326,7 @@ resource "aws_instance" "s618358rgvw204" {
 
 resource "aws_instance" "s618358rgvw205" {
   count                  = local.is-production == true ? 1 : 0
-  ami                    = "ami-0e863bfbce3cfe8eb"
+  ami                    = "ami-07c77cc15216ae1e6"
   instance_type          = "c5.large"
   source_dest_check      = false
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
