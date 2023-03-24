@@ -27,7 +27,7 @@
     },
     "preproduction": {
       "short_environment_name": "preprod",
-      "db_snapshot_identifier": "iaps-test-migration-to-mp-local",
+      "db_snapshot_identifier": "iaps-post-refresh-local",
       "db_auto_minor_version_upgrade": "true",
       "db_allow_major_version_upgrade": "false",
       "db_apply_immediately": "false",
