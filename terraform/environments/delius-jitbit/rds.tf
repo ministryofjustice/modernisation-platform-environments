@@ -41,6 +41,9 @@ resource "aws_db_instance" "jitbit" {
   identifier     = "${local.application_name}-${local.environment}-database"
   username       = local.application_data.accounts[local.environment].db_user
   password       = aws_secretsmanager_secret_version.db_admin_password.secret_string
+
+  snapshot_identifier = try(local.application_data.accounts[local.environment].db_snapshot_identifier, null)
+
   # tflint-ignore: aws_db_instance_default_parameter_group
   parameter_group_name        = "default.sqlserver-se-15.0"
   deletion_protection         = true
