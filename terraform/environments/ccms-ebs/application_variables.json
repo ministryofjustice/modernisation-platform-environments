@@ -52,7 +52,7 @@
       "accessgate_ami_name": "ebs-accessgate-v1_2",
       "key_name": "",
       "lz_aws_account_id_env": "140455166311",
-      "lz_aws_subnet_env": "10.206.0.0/20",
+      "lz_aws_subnet_env": "10.204.0.0/14",
       "lz_aws_workspace_nonprod_subnet_env": "10.200.0.0/20",
       "lz_aws_workspace_prod_subnet_env": "10.200.16.0/20",
       "lz_ftp_bucket_environment": "uat",
