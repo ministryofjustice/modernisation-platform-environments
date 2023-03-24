@@ -29,7 +29,8 @@ resource "aws_instance" "oem_db" {
     "Name"                 = "${local.application_name}-db-root",
     "volume-attach-host"   = "db",
     "volume-attach-device" = "/dev/sda1",
-    "volume-mount-path"    = "/"
+    "volume-mount-path"    = "/",
+    "volume-backup"        = true
   }), local.tags)
 
   tags = merge(tomap({
@@ -59,7 +60,8 @@ resource "aws_ebs_volume" "oem_db_volume_swap" {
     "Name"                 = "${local.application_name}-db-swap",
     "volume-attach-host"   = "db",
     "volume-attach-device" = "/dev/sdb",
-    "volume-mount-path"    = "swap"
+    "volume-mount-path"    = "swap",
+    "volume-backup"        = true
   }), local.tags)
 }
 
@@ -83,7 +85,8 @@ resource "aws_ebs_volume" "oem_db_volume_opt_oem_app" {
     "Name"                 = "${local.application_name}-db-opt-oem-app",
     "volume-attach-host"   = "db",
     "volume-attach-device" = "/dev/sdc",
-    "volume-mount-path"    = "/opt/oem/app"
+    "volume-mount-path"    = "/opt/oem/app",
+    "volume-backup"        = true
   }), local.tags)
 
   lifecycle {
@@ -113,7 +116,8 @@ resource "aws_ebs_volume" "oem_db_volume_opt_oem_inst" {
     "Name"                 = "${local.application_name}-db-opt-oem-inst",
     "volume-attach-host"   = "db",
     "volume-attach-device" = "/dev/sdd",
-    "volume-mount-path"    = "/opt/oem/inst"
+    "volume-mount-path"    = "/opt/oem/inst",
+    "volume-backup"        = true
   }), local.tags)
 
   lifecycle {
@@ -143,7 +147,8 @@ resource "aws_ebs_volume" "oem_db_volume_opt_oem_dbf" {
     "Name"                 = "${local.application_name}-db-opt-oem-dbf",
     "volume-attach-host"   = "db",
     "volume-attach-device" = "/dev/sde",
-    "volume-mount-path"    = "/opt/oem/dbf"
+    "volume-mount-path"    = "/opt/oem/dbf",
+    "volume-backup"        = true
   }), local.tags)
 
   lifecycle {
@@ -173,7 +178,8 @@ resource "aws_ebs_volume" "oem_db_volume_opt_oem_redo" {
     "Name"                 = "${local.application_name}-db-opt-oem-redo",
     "volume-attach-host"   = "db",
     "volume-attach-device" = "/dev/sdf",
-    "volume-mount-path"    = "/opt/oem/redo"
+    "volume-mount-path"    = "/opt/oem/redo",
+    "volume-backup"        = true
   }), local.tags)
 
   lifecycle {
@@ -203,7 +209,8 @@ resource "aws_ebs_volume" "oem_db_volume_opt_oem_arch" {
     "Name"                 = "${local.application_name}-db-opt-oem-arch",
     "volume-attach-host"   = "db",
     "volume-attach-device" = "/dev/sdg",
-    "volume-mount-path"    = "/opt/oem/arch"
+    "volume-mount-path"    = "/opt/oem/arch",
+    "volume-backup"        = true
   }), local.tags)
 
   lifecycle {

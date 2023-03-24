@@ -29,7 +29,8 @@ resource "aws_instance" "oem_app" {
     "Name"                 = "${local.application_name}-app-root",
     "volume-attach-host"   = "app",
     "volume-attach-device" = "/dev/sda1",
-    "volume-mount-path"    = "/"
+    "volume-mount-path"    = "/",
+    "volume-backup"        = true
   }), local.tags)
 
   tags = merge(tomap({
@@ -59,7 +60,8 @@ resource "aws_ebs_volume" "oem_app_volume_swap" {
     "Name"                 = "${local.application_name}-app-swap",
     "volume-attach-host"   = "app",
     "volume-attach-device" = "/dev/sdb",
-    "volume-mount-path"    = "swap"
+    "volume-mount-path"    = "swap",
+    "volume-backup"        = true
   }), local.tags)
 }
 
@@ -83,7 +85,8 @@ resource "aws_ebs_volume" "oem_app_volume_opt_oem_app" {
     "Name"                 = "${local.application_name}-app-opt-oem-app",
     "volume-attach-host"   = "app",
     "volume-attach-device" = "/dev/sdc",
-    "volume-mount-path"    = "/opt/oem/app"
+    "volume-mount-path"    = "/opt/oem/app",
+    "volume-backup"        = true
   }), local.tags)
 
   lifecycle {
@@ -113,7 +116,8 @@ resource "aws_ebs_volume" "oem_app_volume_opt_oem_inst" {
     "Name"                 = "${local.application_name}-app-opt-oem-inst",
     "volume-attach-host"   = "app",
     "volume-attach-device" = "/dev/sdd",
-    "volume-mount-path"    = "/opt/oem/inst"
+    "volume-mount-path"    = "/opt/oem/inst",
+    "volume-backup"        = true
   }), local.tags)
 
   lifecycle {
