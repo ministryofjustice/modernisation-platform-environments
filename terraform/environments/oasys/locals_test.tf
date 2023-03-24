@@ -26,20 +26,20 @@ locals {
       patch_day                 = "TUE"
     }
 
-    autoscaling_groups = {
-
-      test-oasys-db = merge(local.database, {
-        tags = merge(local.database_tags, {
-          oasys-environment = "test"
-          server-type       = "oasys-db"
-          description       = "Test OASys database"
-          oracle-sids       = "OASPROD BIPINFRA"
-          monitored         = true
-        })
-        ami_name = "oasys_oracle_db_*"
-        # ami_owner = "self" # remove this line next time AMI is updated so core-shared-services-production used instead
-      })
-    }
+    # ec2_autoscaling_groups = {
+    #   webserver = {
+    #     config = ""
+    #     instance = ""
+    #     user_data_cloud_init = ""
+    #     ebs_volume_config = ""
+    #     ebs_volumes = ""
+    #     autoscaling_group = ""
+    #     autoscaling_schedules = ""
+    #     ssm_parameters = ""
+    #     lb_target_groups = ""
+    #     tags = ""
+    #   }
+    # }
 
     baseline_bastion_linux = {
       public_key_data = local.public_key_data.keys[local.environment]
