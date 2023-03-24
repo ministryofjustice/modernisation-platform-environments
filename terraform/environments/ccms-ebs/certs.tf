@@ -23,7 +23,13 @@ resource "aws_acm_certificate" "external-service" {
   count = local.is-production ? 1 : 0
 
   validation_method = "DNS"
-  domain_name       = "*.${var.networking[0].business-unit}.service.justice.gov.uk"
+  #domain_name       = "*.${var.networking[0].business-unit}.service.justice.gov.uk"
+  domain_name = "modernisation-platform.service.justice.gov.uk"
+  subject_alternative_names = [
+    "*.${var.networking[0].business-unit}.service.justice.gov.uk"
+  ]
+
+
 
   tags = merge(local.tags,
     { Environment = local.environment }
@@ -34,10 +40,9 @@ resource "aws_acm_certificate" "external-service" {
   }
 }
 
-/*
 resource "aws_route53_record" "external_validation" {
-  provider = aws.core-vpc
-  #provider = aws.core-network-services
+#  provider = aws.core-vpc
+  provider = aws.core-network-services
   for_each = {
     for dvo in local.cert_opts : dvo.domain_name => {
       name   = dvo.resource_record_name
@@ -50,11 +55,10 @@ resource "aws_route53_record" "external_validation" {
   records         = [each.value.record]
   ttl             = 60
   type            = each.value.type
-  zone_id         = data.aws_route53_zone.external.zone_id
-  #zone_id         = data.aws_route53_zone.network-services.zone_id
+#  zone_id         = data.aws_route53_zone.external.zone_id
+  zone_id         = data.aws_route53_zone.network-services.zone_id
 }
-*/
-/*
+
 resource "aws_acm_certificate_validation" "external" {
   depends_on = [
     aws_route53_record.external_validation
@@ -62,4 +66,3 @@ resource "aws_acm_certificate_validation" "external" {
   certificate_arn         = local.cert_arn
   validation_record_fqdns = [for record in aws_route53_record.external_validation : record.fqdn]
 }
-*/
