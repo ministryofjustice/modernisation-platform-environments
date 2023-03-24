@@ -64,6 +64,6 @@ module "windows-new-ecs" {
 
 moved {
   from = module.windows-ecs
-  to = module.windows-new-ecs
+  to   = module.windows-new-ecs
 
 }
