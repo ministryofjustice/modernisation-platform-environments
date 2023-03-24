@@ -62,8 +62,8 @@ module "windows-new-ecs" {
   depends_on = [aws_lb_listener.listener]
 }
 
-# moved {
-#   from = module.windows-ecs
-#   to = module.windows-new-ecs
+moved {
+  from = module.windows-ecs
+  to = module.windows-new-ecs
 
-# }
+}
