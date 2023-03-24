@@ -10,7 +10,7 @@ resource "aws_acm_certificate" "laa_cert" {
     format("%s.%s.%s.modernisation-platform.service.justice.gov.uk", "db", var.networking[0].business-unit, local.environment),
     format("%s.%s.%s.modernisation-platform.service.justice.gov.uk", "laa-oem-app", var.networking[0].business-unit, local.environment),
     format("%s.%s.%s.modernisation-platform.service.justice.gov.uk", "laa-oem-db", var.networking[0].business-unit, local.environment),
-    format("%s.%s.%s.modernisation-platform.service.justice.gov.uk", "oem", var.networking[0].business-unit, local.environment)
+    format("%s.%s.%s.modernisation-platform.service.justice.gov.uk", "oem", var.networking[0].business-unit, local.environment),
     format("%s.%s.%s.modernisation-platform.service.justice.gov.uk", "oem-ext", var.networking[0].business-unit, local.environment)
   ]
 
