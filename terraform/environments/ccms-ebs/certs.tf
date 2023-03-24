@@ -3,8 +3,10 @@ resource "aws_acm_certificate" "external" {
   count = local.is-production ? 0 : 1
 
   validation_method = "DNS"
-  domain_name       = "*.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-
+  domain_name       = "modernisation-platform.service.justice.gov.uk"
+  subject_alternative_names = [
+    "*.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  ]
 
   tags = merge(local.tags,
     { Environment = local.environment }
@@ -33,7 +35,7 @@ resource "aws_acm_certificate" "external-service" {
 
 
 resource "aws_route53_record" "external_validation" {
-  provider = aws.core-vpc
+  provider = aws.core-network-services
   for_each = {
     for dvo in local.cert_opts : dvo.domain_name => {
       name   = dvo.resource_record_name
