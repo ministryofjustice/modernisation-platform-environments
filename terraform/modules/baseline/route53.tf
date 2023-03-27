@@ -62,9 +62,10 @@ resource "aws_route53_resolver_endpoint" "this" {
     }
   }
 
-  tags = merge(local.tags, {
-    Name = each.key
-  })
+  # No tags as member-delegation roles don't currently have route53resolver:TagResource permission
+  # tags = merge(local.tags, {
+  #   Name = each.key
+  # })
 }
 
 resource "aws_route53_resolver_rule" "this" {
