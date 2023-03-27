@@ -518,7 +518,7 @@ variable "route53_resolvers" {
   description = "map of resolver endpoints and associated rules to configure"
   type = map(object({
     direction    = optional(string, "OUTBOUND")
-    subnet_names = optional(list(string), ["data", "private", "public"])
+    subnet_names = optional(list(string), ["data", "private"]) # NOTE: there's a quota of 6 cidrs / resolver
     security_group_rules = optional(map(object({
       type        = string
       description = optional(string)
