@@ -49,10 +49,9 @@ resource "aws_security_group" "route53_resolver" {
   description = "Route53 resolver security group for ${var.environment.application_name}"
   vpc_id      = var.environment.vpc.id
 
-  # No tags as member-delegation roles don't currently have required permission
-  #  tags = merge(local.tags, {
-  #    Name = "${each.key}-route53-resolver"
-  #  })
+  tags = merge(local.tags, {
+    Name = "${each.key}-route53-resolver"
+  })
 }
 
 resource "aws_security_group_rule" "route53_resolver" {
