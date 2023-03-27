@@ -17,7 +17,7 @@ locals {
     production    = local.oasys_production
   }
 
-  account_id                  = local.environment_management.account_ids[terraform.workspace]
+  account_id = local.environment_management.account_ids[terraform.workspace]
 
   environment_configs = {
     development   = local.development_config
