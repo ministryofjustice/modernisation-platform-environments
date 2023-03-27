@@ -214,7 +214,7 @@ resource "aws_iam_policy" "ec2_instance_policy" { #tfsec:ignore:aws-iam-no-polic
                 "ecs:StartTelemetrySession",
                 "ecs:UpdateContainerInstancesState",
                 "ecs:Submit*",
-		 "ecs:TagResource",
+                "ecs:TagResource",
                 "ecr:GetAuthorizationToken",
                 "ecr:BatchCheckLayerAvailability",
                 "ecr:GetDownloadUrlForLayer",
