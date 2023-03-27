@@ -20,7 +20,6 @@ locals {
   }
 
   environment_config          = local.environment_configs[local.environment]
-  baseline_environment_config = local.environment_configs[local.environment]
 
   region            = "eu-west-2"
   availability_zone = "eu-west-2a"
