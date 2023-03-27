@@ -91,8 +91,8 @@ data "aws_iam_policy_document" "bucket_policy" {
   statement {
     sid       = "DenyNonSecureTransport"
     effect    = "Deny"
-    actions   = ["s3:PutObject"]
-    resources = ["${module.s3-bucket.bucket.arn}/*"]
+    actions   = ["s3:*"]
+    resources = [module.s3-bucket.bucket.arn, "${module.s3-bucket.bucket.arn}/*"]
     condition {
       test     = "Bool"
       variable = "aws:SecureTransport"
