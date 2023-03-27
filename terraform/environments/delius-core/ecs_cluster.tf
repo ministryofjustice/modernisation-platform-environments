@@ -9,12 +9,13 @@
 # }
 
 # Create service discovery namespace for services in this cluster
-resource "aws_service_discovery_private_dns_namespace" "ecs_cluster_namespace" {
-  name        = "${local.application_name}.ecs.cluster"
-  description = "Private CloudMap DNS namespace for this delius core ECS cluster service tasks"
-  vpc         = data.aws_vpc.shared.id
-  tags        = local.tags
-}
+# Removed until we're clear on the implementation of service discovery on mod platform
+# resource "aws_service_discovery_private_dns_namespace" "ecs_cluster_namespace" {
+#   name        = "${local.application_name}.ecs.cluster"
+#   description = "Private CloudMap DNS namespace for this delius core ECS cluster service tasks"
+#   vpc         = data.aws_vpc.shared.id
+#   tags        = local.tags
+# }
 
 # Create capacity provider and cluster
 resource "aws_ecs_cluster_capacity_providers" "ecs_cluser_capacity_providers" {

@@ -215,19 +215,21 @@ resource "aws_cloudwatch_log_group" "delius_db_log_group" {
 }
 
 # Pre-req - service discovery
-resource "aws_service_discovery_service" "delius_db_service" {
-  name = local.db_service_name
-  tags = local.tags
+# Removed until we're clear on the implementation of service discovery on mod platform
 
-  dns_config {
-    namespace_id   = aws_service_discovery_private_dns_namespace.ecs_cluster_namespace.id
-    routing_policy = "MULTIVALUE"
-    dns_records {
-      ttl  = 30
-      type = "A"
-    }
-  }
-}
+# resource "aws_service_discovery_service" "delius_db_service" {
+#   name = local.db_service_name
+#   tags = local.tags
+
+#   dns_config {
+#     namespace_id   = aws_service_discovery_private_dns_namespace.ecs_cluster_namespace.id
+#     routing_policy = "MULTIVALUE"
+#     dns_records {
+#       ttl  = 30
+#       type = "A"
+#     }
+#   }
+# }
 
 # Create the ECS service
 resource "aws_ecs_service" "delius-db-service" {
@@ -239,9 +241,10 @@ resource "aws_ecs_service" "delius-db-service" {
     subnets          = data.aws_subnets.private-public.ids
     security_groups  = [aws_security_group.delius_db_security_group.id]
   }
-  service_registries {
-    registry_arn = aws_service_discovery_service.delius_db_service.arn
-  }
+  # Removed until we're clear on the implementation of service discovery on mod platform
+  # service_registries {
+  #   registry_arn = aws_service_discovery_service.delius_db_service.arn
+  # }
   desired_count                      = 1
   deployment_minimum_healthy_percent = 100
   deployment_maximum_percent         = 200
