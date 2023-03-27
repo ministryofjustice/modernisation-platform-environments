@@ -18,6 +18,14 @@ locals {
   }
 
   account_id                  = local.environment_management.account_ids[terraform.workspace]
+
+  environment_configs = {
+    development   = local.development_config
+    test          = local.test_config
+    preproduction = local.preproduction_config
+    production    = local.production_config
+  }
+
   environment_config          = local.accounts[local.environment]
   baseline_environment_config = local.environment_configs[local.environment]
 
