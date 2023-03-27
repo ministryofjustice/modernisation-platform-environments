@@ -6,7 +6,7 @@ locals {
       from_port   = 53
       to_port     = 53
       protocol    = "tcp"
-      cidr_blocks = [var.environment.vpc.cidr_block]
+      cidr_blocks = ["0.0.0.0/0"]
     }
     dns-udp = {
       type        = "egress"
@@ -14,7 +14,7 @@ locals {
       from_port   = 53
       to_port     = 53
       protocol    = "udp"
-      cidr_blocks = [var.environment.vpc.cidr_block]
+      cidr_blocks = ["0.0.0.0/0"]
     }
   }
 
