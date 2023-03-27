@@ -10,14 +10,6 @@ locals {
   business_unit  = "hmpps"
   networking_set = "general"
 
-  accounts = {
-    development   = local.development_config
-    test          = local.test_config
-    preproduction = local.preproduction_config
-    production    = local.production_config
-  }
-
-
   account_id = local.environment_management.account_ids[terraform.workspace]
 
   environment_configs = {
