@@ -27,7 +27,7 @@ locals {
     production    = local.production_config
   }
 
-  environment_config          = local.accounts[local.environment]
+  environment_config          = local.environment_configs[local.environment]
   baseline_environment_config = local.environment_configs[local.environment]
 
   region            = "eu-west-2"
