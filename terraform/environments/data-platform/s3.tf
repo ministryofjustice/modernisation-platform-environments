@@ -1,9 +1,9 @@
 module "s3-bucket" { #tfsec:ignore:aws-s3-enable-versioning
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.3.0"
 
-  bucket_prefix      = "data-platform-landing"
+  bucket_prefix = "data-platform-landing"
   # Refer to the below section "Replication" before enabling replication
-  replication_enabled                      = false
+  replication_enabled = false
 
   providers = {
     # Here we use the default provider Region for replication. Destination buckets can be within the same Region as the
@@ -53,7 +53,7 @@ module "s3-bucket" { #tfsec:ignore:aws-s3-enable-versioning
     }
   ]
 
-  tags                 = local.tags
+  tags = local.tags
 }
 
 
