@@ -519,6 +519,14 @@ variable "route53_resolvers" {
   type = map(object({
     direction    = optional(string, "OUTBOUND")
     subnet_names = optional(list(string), ["data", "private", "public"])
+    security_group_rules = optional(map(object({
+      type        = string
+      description = optional(string)
+      from_port   = number
+      to_port     = number
+      protocol    = string
+      cidr_blocks = optional(list(string))
+    })), {})
     forward = optional(map(object({
       target_ips = list(string) # domain_name is key to the map
     })), {})
