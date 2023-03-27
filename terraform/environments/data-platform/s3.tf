@@ -11,7 +11,7 @@ module "s3-bucket" { #tfsec:ignore:aws-s3-enable-versioning
 
 data "aws_iam_policy_document" "bucket_policy" {
   statement {
-    sid = "AllowPutFromCiUser"
+    sid    = "AllowPutFromCiUser"
     effect = "Allow"
 
     principals {
@@ -25,9 +25,9 @@ data "aws_iam_policy_document" "bucket_policy" {
   }
 
   statement {
-    sid = "DenyNonFullControlObjects"
-    effect = "Deny"
-    actions = ["s3:PutObject"]
+    sid       = "DenyNonFullControlObjects"
+    effect    = "Deny"
+    actions   = ["s3:PutObject"]
     resources = ["${module.s3-bucket.bucket.arn}/*"]
 
     condition {
@@ -41,15 +41,15 @@ data "aws_iam_policy_document" "bucket_policy" {
   }
 
   statement {
-    sid = "DenyNonSecureTransport"
-    effect = "Deny"
-    actions = ["s3:PutObject"]
+    sid       = "DenyNonSecureTransport"
+    effect    = "Deny"
+    actions   = ["s3:PutObject"]
     resources = ["${module.s3-bucket.bucket.arn}/*"]
     condition {
-        test     = "Bool"
-        variable = "aws:SecureTransport"
+      test     = "Bool"
+      variable = "aws:SecureTransport"
 
-        values   = ["false"]
-      }
+      values = ["false"]
+    }
   }
 }
