@@ -19,6 +19,7 @@ locals {
 
   account_id         = local.environment_management.account_ids[terraform.workspace]
   environment_config = local.accounts[local.environment]
+  baseline_environment_config = local.environment_configs[local.environment]
 
   region            = "eu-west-2"
   availability_zone = "eu-west-2a"
