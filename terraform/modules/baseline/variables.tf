@@ -518,7 +518,7 @@ variable "route53_resolvers" {
   description = "map of resolver endpoints and associated rules to configure"
   type = map(object({
     direction    = optional(string, "OUTBOUND")
-    subnet_names = optional(list(string), ["data", "private"])
+    subnet_names = optional(list(string), ["data", "private", "public"])
     forward = optional(map(object({
       target_ips = list(string) # domain_name is key to the map
     })), {})
