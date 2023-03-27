@@ -29,7 +29,7 @@ module "baseline" {
   bastion_linux = lookup(local.environment_config, "baseline_bastion_linux", null)
   environment   = module.environment
   # ec2_autoscaling_groups = lookup(local.environment_config, "baseline_ec2_autoscaling_groups", {})
-  lbs = lookup(local.baseline_environment_config, "baseline_lbs", {})
+  lbs = lookup(local.environment_config, "baseline_lbs", {})
 }
 
 
