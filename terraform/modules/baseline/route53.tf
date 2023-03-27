@@ -61,9 +61,9 @@ resource "aws_security_group" "route53_resolver" {
   description = "${each.key} route53 resolver security group"
   vpc_id      = var.environment.vpc.id
 
-  tags = merge(local.tags, {
-    Name = "${each.key}-route53-resolver"
-  })
+  #  tags = merge(local.tags, {
+  #    Name = "${each.key}-route53-resolver"
+  #  })
 }
 
 resource "aws_security_group_rule" "route53_resolver" {
