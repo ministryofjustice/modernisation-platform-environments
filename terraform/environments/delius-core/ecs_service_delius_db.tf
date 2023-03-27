@@ -150,8 +150,8 @@ resource "aws_ecs_task_definition" "delius_db_task_definition" {
         name        = "delius-core-testing-db"
         portMappings = [
           {
-            containerPort = local.db_container_port
-            hostPort      = local.db_container_port
+            containerPort = local.db_port
+            hostPort      = local.db_port
             protocol      = "tcp"
           },
         ]
@@ -191,8 +191,8 @@ resource "aws_security_group" "delius_db_security_group" {
 resource "aws_vpc_security_group_ingress_rule" "delius_db_security_group_ingress_private_subnets" {
   security_group_id            = aws_security_group.delius_db_security_group.id
   description                  = "weblogic to testing db"
-  from_port                    = local.db_container_port
-  to_port                      = local.db_container_port
+  from_port                    = local.db_port
+  to_port                      = local.db_port
   ip_protocol                  = "tcp"
   referenced_security_group_id = aws_security_group.delius_core_frontend_security_group.id
 }
@@ -314,7 +314,7 @@ resource "aws_ecs_service" "delius-db-service" {
 #   #   {
 #   #     target_group_arn = data.aws_lb_target_group.service.arn
 #   #     container_name   = local.db_service_name
-#   #     db_container_port   = local.db_container_port
+#   #     db_port   = local.db_port
 #   #   }
 #   # ]
 

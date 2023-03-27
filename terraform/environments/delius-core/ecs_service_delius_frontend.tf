@@ -229,8 +229,8 @@ resource "aws_vpc_security_group_egress_rule" "delius_core_frontend_security_gro
   security_group_id            = aws_security_group.delius_core_frontend_security_group.id
   description                  = "outbound from the testing frontend ecs service"
   ip_protocol                  = "tcp"
-  to_port                      = local.db_container_port
-  from_port                    = local.db_container_port
+  to_port                      = local.db_port
+  from_port                    = local.db_port
   referenced_security_group_id = aws_security_group.delius_db_security_group.id
 }
 
