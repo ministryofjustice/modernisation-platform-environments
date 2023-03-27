@@ -158,7 +158,7 @@ locals {
   # baseline config
   test_config = {
     baseline_route53_resolvers = {
-      outbound = {
+      nomis-outbound = {
         forward = {
           "azure.noms.root" = {
             target_ips = module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers
