@@ -1,6 +1,6 @@
 # oasys-preproduction environment settings
 locals {
-  oasys_preproduction = {
+  preproduction_config = {
     # db_enabled                             = false
     # db_auto_minor_version_upgrade          = true
     # db_allow_major_version_upgrade         = false

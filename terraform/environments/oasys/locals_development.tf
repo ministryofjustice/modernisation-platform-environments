@@ -1,6 +1,6 @@
 # oasys-development environment specific settings
 locals {
-  oasys_development = {
+  development_config = {
 
     # cloud watch log groups
     log_groups = {
