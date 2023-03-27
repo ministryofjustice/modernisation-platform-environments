@@ -130,3 +130,12 @@ resource "aws_route53_resolver_rule" "this" {
   #   Name = each.value.name
   # })
 }
+
+resource "aws_route53_resolver_rule_association" "this" {
+  for_each = local.route53_resolver_rules
+
+  provider = aws.core-vpc
+
+  resolver_rule_id = aws_route53_resolver_rule.this[each.key].id
+  vpc_id           = var.environment.vpc.id
+}
