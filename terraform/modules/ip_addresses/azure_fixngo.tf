@@ -1,5 +1,36 @@
 locals {
 
+  azure_fixngo_ip = {
+    # Prod Domain Controllers
+    PCMCW0011 = "10.40.128.196"
+    PCMCW0012 = "10.40.0.133"
+    pcmcw1011 = "10.40.144.196"
+    pcmcw1012 = "10.40.64.133"
+
+    # DevTest Domain Controllers
+    MGMCW0002    = "10.102.0.196"
+    tc_mgt_dc_01 = "10.102.0.199"
+    tc_mgt_dc_02 = "10.102.0.200"
+  }
+
+  azure_fixngo_ips = {
+    devtest = {
+      domain_controllers = [
+        local.azure_fixngo_ip.MGMCW0002,
+        local.azure_fixngo_ip.tc_mgt_dc_01,
+        local.azure_fixngo_ip.tc_mgt_dc_02,
+      ]
+    }
+    prod = {
+      domain_controllers = [
+        local.azure_fixngo_ip.PCMCW0011,
+        local.azure_fixngo_ip.PCMCW0012,
+        local.azure_fixngo_ip.pcmcw1011,
+        local.azure_fixngo_ip.pcmcw1012,
+      ]
+    }
+  }
+
   azure_fixngo_cidr = {
     noms_live_vnet            = "10.40.0.0/18"
     noms_live_dr_vnet         = "10.40.64.0/18"
