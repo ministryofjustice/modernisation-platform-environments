@@ -41,6 +41,27 @@ locals {
     #   }
     # }
 
+    baseline_ec2_instances = {
+      # Example instance using RedHat image with ansible provisioning
+      test-redhat-rhel79-1 = {
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name  = "RHEL-7.9_HVM-*"
+          ami_owner = "309956199498"
+        })
+        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+          vpc_security_group_ids = ["private"]
+        })
+        user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
+        tags = {
+          description = "For testing with official RedHat RHEL7.9 image"
+          os-type     = "Linux"
+          component   = "test"
+          server-type = "oasys-db"
+          monitored   = false
+        }
+      }
+    }
+
     baseline_bastion_linux = {
       public_key_data = local.public_key_data.keys[local.environment]
       tags            = local.tags
