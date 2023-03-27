@@ -17,8 +17,8 @@ locals {
     production    = local.oasys_production
   }
 
-  account_id         = local.environment_management.account_ids[terraform.workspace]
-  environment_config = local.accounts[local.environment]
+  account_id                  = local.environment_management.account_ids[terraform.workspace]
+  environment_config          = local.accounts[local.environment]
   baseline_environment_config = local.environment_configs[local.environment]
 
   region            = "eu-west-2"
