@@ -1,5 +1,6 @@
 locals {
-  default_route53_resolver_security_groups_rules = {
+
+  route53_resolver_security_group_rules = {
     dns-tcp = {
       type        = "egress"
       description = "Allow tcp/53 egress"
@@ -16,21 +17,6 @@ locals {
       protocol    = "udp"
       cidr_blocks = ["0.0.0.0/0"]
     }
-  }
-
-  route53_resolver_security_groups_list = flatten([
-    for resolver_key, resolver_value in var.route53_resolvers : [
-      for sg_rule_key, sg_rule_value in merge(local.default_route53_resolver_security_groups_rules, resolver_value.security_group_rules) : [{
-        key = "${resolver_key}-${sg_rule_key}"
-        value = merge({
-          resolver_name = resolver_key
-        }, sg_rule_value)
-      }]
-    ]
-  ])
-
-  route53_resolver_security_group_rules = { for item in local.route53_resolver_security_groups_list :
-    item.key => item.value
   }
 
   route53_resolver_rules_list = flatten([
@@ -52,13 +38,15 @@ locals {
   }
 }
 
+# create a single security group for all route53 resolvers.  Include the 
+# application in the name since this is being created in the shared VPC account
 resource "aws_security_group" "route53_resolver" {
-  for_each = var.route53_resolvers
+  count = length(var.route53_resolvers) != 0 ? 1 : 0
 
   provider = aws.core-vpc
 
-  name        = "${each.key}-route53-resolver"
-  description = "${each.key} route53 resolver security group"
+  name        = "${var.environment.application_name}-route53-resolver"
+  description = "Route53 resolver security group for ${var.environment.application_name}"
   vpc_id      = var.environment.vpc.id
 
   # No tags as member-delegation roles don't currently have required permission
@@ -68,7 +56,7 @@ resource "aws_security_group" "route53_resolver" {
 }
 
 resource "aws_security_group_rule" "route53_resolver" {
-  for_each = local.route53_resolver_security_group_rules
+  for_each = length(var.route53_resolvers) != 0 ? local.route53_resolver_security_group_rules : {}
 
   provider = aws.core-vpc
 
@@ -78,7 +66,7 @@ resource "aws_security_group_rule" "route53_resolver" {
   to_port           = each.value.to_port
   protocol          = each.value.protocol
   cidr_blocks       = each.value.cidr_blocks
-  security_group_id = aws_security_group.route53_resolver[each.value.resolver_name].id
+  security_group_id = aws_security_group.route53_resolver[0].id
 }
 
 resource "aws_route53_resolver_endpoint" "this" {
@@ -89,7 +77,7 @@ resource "aws_route53_resolver_endpoint" "this" {
   name      = each.key
   direction = each.value.direction
 
-  security_group_ids = [aws_security_group.route53_resolver[each.key].id]
+  security_group_ids = [aws_security_group.route53_resolver[0].id]
 
   dynamic "ip_address" {
     for_each = flatten([for subnet_name in each.value.subnet_names :
@@ -101,10 +89,9 @@ resource "aws_route53_resolver_endpoint" "this" {
     }
   }
 
-  # No tags as member-delegation roles don't currently have route53resolver:TagResource permission
-  # tags = merge(local.tags, {
-  #   Name = each.key
-  # })
+  tags = merge(local.tags, {
+    Name = each.key
+  })
 }
 
 resource "aws_route53_resolver_rule" "this" {
@@ -125,10 +112,9 @@ resource "aws_route53_resolver_rule" "this" {
     }
   }
 
-  # No tags as member-delegation roles don't currently have route53resolver:TagResource permission
-  # tags = merge(local.tags, {
-  #   Name = each.value.name
-  # })
+  tags = merge(local.tags, {
+    Name = each.value.name
+  })
 }
 
 resource "aws_route53_resolver_rule_association" "this" {
