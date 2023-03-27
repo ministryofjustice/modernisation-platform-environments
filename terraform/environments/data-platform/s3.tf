@@ -16,7 +16,7 @@ data "aws_iam_policy_document" "bucket_policy" {
 
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::013433889002:user/cicd-member-user"]
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/cicd-member-user"]
     }
 
     actions = ["s3:PutObject", "s3:ListBucket"]
