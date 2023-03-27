@@ -18,8 +18,8 @@ module "baseline" {
   # s3_buckets               = merge(local.baseline_s3_buckets, lookup(local.environment_config, "baseline_s3_buckets", {}))
 
   bastion_linux = lookup(local.environment_config, "baseline_bastion_linux", null)
-  
-  environment   = module.environment
+
+  environment = module.environment
 
   ec2_instances = lookup(local.environment_config, "baseline_ec2_instances", {})
   # ec2_autoscaling_groups = lookup(local.environment_config, "baseline_ec2_autoscaling_groups", {})
