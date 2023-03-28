@@ -110,53 +110,6 @@ module "ec2_instance" {
   account_ids_lookup = local.environment_management.account_ids
 }
 
-module "loadbalancer" {
-  for_each = merge(local.lbs.common, local.lbs[local.environment])
-
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer.git?ref=v2.1.2"
-  providers = {
-    aws.bucket-replication = aws
-  }
-
-  account_number             = local.environment_management.account_ids[terraform.workspace]
-  application_name           = each.key
-  enable_deletion_protection = coalesce(lookup(each.value, "enable_delete_protection", null), local.lb_defaults.enable_delete_protection)
-  force_destroy_bucket       = coalesce(lookup(each.value, "force_destroy_bucket", null), local.lb_defaults.force_destroy_bucket)
-  idle_timeout               = coalesce(lookup(each.value, "idle_timeout", null), local.lb_defaults.idle_timeout)
-  internal_lb                = coalesce(lookup(each.value, "internal_lb", null), local.lb_defaults.internal_lb)
-  security_groups            = coalesce(lookup(each.value, "security_groups", null), local.lb_defaults.security_groups)
-  public_subnets             = coalesce(lookup(each.value, "public_subnets", null), local.lb_defaults.public_subnets)
-  region                     = local.region
-  vpc_all                    = module.environment.vpc_name
-  tags                       = coalesce(lookup(each.value, "tags", null), local.lb_defaults.tags)
-}
-
-module "lb_listener" {
-  for_each = local.lb_listeners[local.environment]
-
-  source = "../../modules/lb_listener"
-
-  providers = {
-    aws.core-vpc = aws.core-vpc
-  }
-
-  name                   = each.key
-  business_unit          = local.business_unit
-  environment            = local.environment
-  load_balancer_arn      = module.loadbalancer[each.value.lb_application_name].load_balancer.arn
-  target_groups          = try(each.value.target_groups, {})
-  existing_target_groups = module.autoscaling_groups[each.value.asg_instance].lb_target_groups
-  port                   = each.value.port
-  protocol               = each.value.protocol
-  ssl_policy             = try(each.value.ssl_policy, null)
-  certificate_arns       = try(each.value.certificate_arns, [])
-  default_action         = each.value.default_action
-  rules                  = try(each.value.rules, {})
-  route53_records        = try(each.value.route53_records, {})
-  replace                = try(each.value.replace, {})
-  tags                   = try(each.value.tags, local.tags)
-}
-
 module "acm_certificate" {
   for_each = merge(local.acm_certificates.common, local.acm_certificates[local.environment])
 
