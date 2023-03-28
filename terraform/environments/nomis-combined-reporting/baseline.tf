@@ -17,6 +17,7 @@ module "baseline" {
   iam_service_linked_roles = module.baseline_presets.iam_service_linked_roles
   key_pairs                = module.baseline_presets.key_pairs
   kms_grants               = module.baseline_presets.kms_grants
+  route53_resolvers        = module.baseline_presets.route53_resolvers
   s3_buckets               = merge(local.baseline_s3_buckets, lookup(local.environment_config, "baseline_s3_buckets", {}))
 
   ec2_instances          = lookup(local.environment_config, "baseline_ec2_instances", {})

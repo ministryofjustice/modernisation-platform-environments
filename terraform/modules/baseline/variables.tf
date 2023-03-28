@@ -514,6 +514,20 @@ variable "kms_grants" {
   default = {}
 }
 
+variable "route53_resolvers" {
+  description = "map of resolver endpoints and associated rules to configure, where map keys are the names of the resources.  The application name is automatically added as a prefix to the resource names"
+  type = map(object({
+    direction    = optional(string, "OUTBOUND")
+    subnet_names = optional(list(string), ["data", "private"]) # NOTE: there's a quota of 6 cidrs / resolver
+    rules = optional(map(object({
+      domain_name = string
+      rule_type   = optional(string, "FORWARD")
+      target_ips  = list(string)
+    })), {})
+  }))
+  default = {}
+}
+
 variable "s3_buckets" {
   description = "map of s3 buckets to create where the map key is the bucket prefix.  See s3_bucket module for more variable details.  Use iam_policies to automatically create a iam policies for the bucket where the key is the name of the policy"
   type = map(object({
