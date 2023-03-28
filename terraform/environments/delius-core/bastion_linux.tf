@@ -1,3 +1,6 @@
+##
+# Create bastion server from module
+##
 locals {
   public_key_data = jsondecode(file("./bastion_linux.json"))
 }
