@@ -17,7 +17,8 @@ resource "aws_security_group" "rds_security_group" {
     from_port   = local.db_port
     to_port     = local.db_port
     security_groups = [
-      aws_security_group.delius_core_frontend_security_group.id
+      aws_security_group.delius_core_frontend_security_group.id,
+      module.bastion_linux.bastion_security_group
     ]
   }
 
