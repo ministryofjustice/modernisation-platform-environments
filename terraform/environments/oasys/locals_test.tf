@@ -18,7 +18,6 @@ locals {
     # db_performance_insights_enabled        = false
     # db_skip_final_snapshot                 = true
 
-
     log_groups = {}
 
     ec2_common = {
@@ -26,24 +25,29 @@ locals {
       patch_day                 = "TUE"
     }
 
-    # ec2_autoscaling_groups = {
-    #   webserver = {
-    #     config = ""
-    #     instance = ""
-    #     user_data_cloud_init = ""
-    #     ebs_volume_config = ""
-    #     ebs_volumes = ""
-    #     autoscaling_group = ""
-    #     autoscaling_schedules = ""
-    #     ssm_parameters = ""
-    #     lb_target_groups = ""
-    #     tags = ""
-    #   }
-    # }
-
-    baseline_bastion_linux = {
-      public_key_data = local.public_key_data.keys[local.environment]
-      tags            = local.tags
+    baseline_ec2_autoscaling_groups = {
+      webserver = {
+        autoscaling_group = {
+          desired_capacity    = 1
+          max_size            = 2
+          vpc_zone_identifier = module.environment.subnets["private"].ids
+        }
+        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name = "base_rhel_8_5_*"
+        })
+        ebs_volume_config = null
+        ebs_volumes       = null
+        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+          vpc_security_group_ids = ["private"]
+        })
+        lb_target_groups = null
+        ssm_parameters   = null
+        tags = {
+          os-type = "Linux"
+        }
+        user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
+      }
     }
   }
 }
