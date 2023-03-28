@@ -177,9 +177,9 @@ locals {
           server-type       = "oasys-web"
           os-version        = "RHEL 7.9"
         }
-      
-      # Example target group setup below
-      
+
+        # Example target group setup below
+
         lb_target_groups = {
           http-8080 = {
             port                 = 8080
