@@ -68,6 +68,16 @@ output "kms_grants" {
   }
 }
 
+output "route53_resolver_rules" {
+  description = "Map of route53 resolver rules depending on options provided"
+  value       = local.route53_resolver_rules
+}
+
+output "route53_resolvers" {
+  description = "Map of route53 resolvers to create depending on options provided"
+  value       = local.route53_resolvers
+}
+
 output "s3_bucket_policies" {
   description = "Map of common bucket policies to use on s3_buckets"
 
