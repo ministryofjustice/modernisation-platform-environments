@@ -83,7 +83,7 @@ resource "aws_ssm_document" "api_ad_join_domain" {
   )
 }
 
-# Associate Policy to Devlopment Instance
+# Associate Policy to Development Instance
 resource "aws_ssm_association" "ad_join_domain_association_dev" {
   count      = local.is-development == true ? 1 : 0
   depends_on = [aws_instance.s609693lo6vw109, aws_instance.s609693lo6vw105, aws_instance.s609693lo6vw104, aws_instance.s609693lo6vw100, aws_instance.s609693lo6vw101, aws_instance.s609693lo6vw103, aws_instance.s609693lo6vw106, aws_instance.s609693lo6vw107, aws_instance.PPUDWEBSERVER2, aws_instance.s609693lo6vw102, aws_instance.s609693lo6vw108, aws_instance.PPUD-DEV-AWS-AD]
@@ -105,7 +105,7 @@ resource "aws_ssm_association" "ad_join_domain_association_preprod" {
   }
 }
 
-# Associate Policy to UAT Instance
+# Associate Policy to PROD Instance
 resource "aws_ssm_association" "ad_join_domain_association_prod" {
   count      = local.is-production == true ? 1 : 0
   depends_on = [aws_instance.s618358rgvw019, aws_instance.s618358rgvw020, aws_instance.s618358rgvw021, aws_instance.s618358rgvw022, aws_instance.s618358rgvw027,aws_instance.s618358rgvw204,aws_instance.s618358rgvw205]

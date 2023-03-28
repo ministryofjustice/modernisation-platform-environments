@@ -270,7 +270,7 @@ resource "aws_instance" "s618358rgvw020" {
 
 resource "aws_instance" "s618358rgvw021" {
   count                  = local.is-production == true ? 1 : 0
-  ami                    = "ami-052685eb60dbb24e9"
+  ami                    = "ami-0d089b6f6f97b4499"
   instance_type          = "m5.2xlarge"
   source_dest_check      = false
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
@@ -284,7 +284,7 @@ resource "aws_instance" "s618358rgvw021" {
 
 resource "aws_instance" "s618358rgvw022" {
   count                  = local.is-production == true ? 1 : 0
-  ami                    = "ami-02dfb693f670d0eab"
+  ami                    = "ami-03884b85ddac5116d"
   instance_type          = "m5.xlarge"
   source_dest_check      = false
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
