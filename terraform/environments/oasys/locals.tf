@@ -350,74 +350,74 @@ locals {
     production = {}
   }
 
-  lb_listener_defaults = {
+  # lb_listener_defaults = {
 
-    oasys_public = {
-      lb_application_name = "oasys-public"
-      asg_instance        = "webservers"
-    }
+  #   oasys_public = {
+  #     lb_application_name = "oasys-public"
+  #     asg_instance        = "webservers"
+  #   }
 
-    route53 = {
-      route53_records = {
-        "web.oasys" = {
-          account                = "core-vpc"
-          zone_id                = module.environment.route53_zones[module.environment.domains.public.business_unit_environment].zone_id
-          evaluate_target_health = true
-        }
-      }
-    }
+  #   route53 = {
+  #     route53_records = {
+  #       "web.oasys" = {
+  #         account                = "core-vpc"
+  #         zone_id                = module.environment.route53_zones[module.environment.domains.public.business_unit_environment].zone_id
+  #         evaluate_target_health = true
+  #       }
+  #     }
+  #   }
 
-    https = {
-      port             = 443
-      protocol         = "HTTPS"
-      ssl_policy       = "ELBSecurityPolicy-2016-08"
-      certificate_arns = [module.acm_certificate["star.${module.environment.domains.public.application_environment}"].arn]
-      default_action = {
-        type = "fixed-response"
-        fixed_response = {
-          content_type = "text/plain"
-          message_body = "Not implemented"
-          status_code  = "501"
-        }
-      }
+  #   https = {
+  #     port             = 443
+  #     protocol         = "HTTPS"
+  #     ssl_policy       = "ELBSecurityPolicy-2016-08"
+  #     certificate_arns = [module.acm_certificate["star.${module.environment.domains.public.application_environment}"].arn]
+  #     default_action = {
+  #       type = "fixed-response"
+  #       fixed_response = {
+  #         content_type = "text/plain"
+  #         message_body = "Not implemented"
+  #         status_code  = "501"
+  #       }
+  #     }
 
-      rules = {
-        forward-http-8080 = {
-          priority = 100
-          actions = [{
-            type              = "forward"
-            target_group_name = "http-8080"
-          }]
-          conditions = [
-            {
-              host_header = {
-                values = ["web.oasys.${module.environment.vpc_name}.modernisation-platform.service.justice.gov.uk"]
-              }
-            },
-            {
-              path_pattern = {
-                values = ["/"]
-              }
-          }]
-        }
-      }
-    }
-  }
+  #     rules = {
+  #       forward-http-8080 = {
+  #         priority = 100
+  #         actions = [{
+  #           type              = "forward"
+  #           target_group_name = "http-8080"
+  #         }]
+  #         conditions = [
+  #           {
+  #             host_header = {
+  #               values = ["web.oasys.${module.environment.vpc_name}.modernisation-platform.service.justice.gov.uk"]
+  #             }
+  #           },
+  #           {
+  #             path_pattern = {
+  #               values = ["/"]
+  #             }
+  #         }]
+  #       }
+  #     }
+  #   }
+  # }
 
-  lb_listeners = {
+  # lb_listeners = {
 
-    development = {
-      # oasys-public = merge(
-      #   local.lb_listener_defaults.https,
-      #   local.lb_listener_defaults.oasys_public,
-      #   local.lb_listener_defaults.route53,
-      # )
-    }
+  #   development = {
+  #     # oasys-public = merge(
+  #     #   local.lb_listener_defaults.https,
+  #     #   local.lb_listener_defaults.oasys_public,
+  #     #   local.lb_listener_defaults.route53,
+  #     # )
+  #   }
 
-    test          = {}
-    preproduction = {}
-    production    = {}
-  }
+  #   test          = {}
+  #   preproduction = {}
+  #   production    = {}
+  # }
 
   acm_certificates = {
 
