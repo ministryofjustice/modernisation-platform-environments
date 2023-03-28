@@ -24,7 +24,7 @@ locals {
     }
 
     autoscaling_groups = {
-      
+
 
       # development-oasys-db = merge(local.database, {
       #   tags = merge(local.database_tags, {
