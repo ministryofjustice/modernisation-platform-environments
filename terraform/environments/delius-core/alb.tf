@@ -59,7 +59,6 @@ resource "aws_lb_listener" "listener" {
 resource "aws_lb_target_group" "delius_core_frontend_target_group" {
   # checkov:skip=CKV_AWS_261
 
-  # name                 = format("%s-tg", local.frontend_fully_qualified_name)
   name                 = local.frontend_fully_qualified_name
   port                 = local.frontend_container_port
   protocol             = "HTTP"
@@ -73,7 +72,7 @@ resource "aws_lb_target_group" "delius_core_frontend_target_group" {
   }
 
   health_check {
-    # path                = "/NDelius-war/delius/JSP/healthcheck.jsp?ping"
+    path                = "/NDelius-war/delius/JSP/healthcheck.jsp?ping"
     healthy_threshold   = "5"
     interval            = "120"
     protocol            = "HTTP"
