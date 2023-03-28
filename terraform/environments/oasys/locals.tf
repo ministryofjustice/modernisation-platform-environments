@@ -11,10 +11,10 @@ locals {
   networking_set = "general"
 
   accounts = {
-    development   = local.oasys_development
-    test          = local.oasys_test
-    preproduction = local.oasys_preproduction
-    production    = local.oasys_production
+    development   = local.development_config
+    test          = local.test_config
+    preproduction = local.preproduction_config
+    production    = local.production_config
   }
 
   account_id         = local.environment_management.account_ids[terraform.workspace]
