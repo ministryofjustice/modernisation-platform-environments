@@ -73,39 +73,6 @@ module "baseline_presets" {
 
 
 
-#------------------------------------------------------------------------------
-# autoscaling group stuff
-#------------------------------------------------------------------------------
-
-module "autoscaling_groups" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-autoscaling-group"
-
-  providers = {
-    aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
-  }
-
-  for_each = try(local.environment_config.autoscaling_groups, {})
-
-  name                      = each.key
-  ami_name                  = each.value.ami_name
-  instance                  = each.value.instance
-  user_data_cloud_init      = lookup(each.value, "user_data_cloud_init", null)
-  ebs_volume_config         = lookup(each.value, "ebs_volume_config", {})
-  ebs_volumes               = lookup(each.value, "ebs_volumes", {})
-  ssm_parameters_prefix     = lookup(each.value, "ssm_parameters_prefix", "")
-  ssm_parameters            = {}
-  autoscaling_group         = each.value.autoscaling_group
-  autoscaling_schedules     = lookup(each.value, "autoscaling_schedules", local.autoscaling_schedules_default)
-  iam_resource_names_prefix = each.value.iam_resource_names_prefix
-  instance_profile_policies = local.ec2_common_managed_policies
-  application_name          = local.application_name
-  subnet_ids                = data.aws_subnets.shared-private.ids
-  tags                      = merge(local.tags, try(each.value.tags, {}))
-  account_ids_lookup        = local.environment_management.account_ids
-  lb_target_groups          = lookup(each.value, "lb_target_groups", {})
-  vpc_id                    = module.environment.vpc.id
-}
-
 module "ec2_instance" {
   #checkov:skip=CKV_AWS_79:Oracle cannot accommodate a token
   source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v1.0.0"
