@@ -91,6 +91,7 @@ resource "aws_db_instance" "delius-core" {
   engine_version              = format("%s.%s", local.application_data.accounts[local.environment].rds_engine_major_version, local.application_data.accounts[local.environment].rds_engine_minor_version)
   instance_class              = local.application_data.accounts[local.environment].rds_instance_class
   identifier                  = format("%s-%s-database", local.application_name, local.environment)
+  db_name                     = local.application_data.accounts[local.environment].rds_db_name
   username                    = local.application_data.accounts[local.environment].rds_user
   password                    = aws_secretsmanager_secret_version.rds_admin_password.secret_string
   parameter_group_name        = aws_db_parameter_group.rds_parameter_group.name
