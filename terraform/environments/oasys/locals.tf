@@ -47,10 +47,6 @@ locals {
     cloud_platform = "172.20.0.0/16"
   }
 
-  ec2_common_managed_policies = [
-    aws_iam_policy.ec2_common_policy.arn
-  ]
-
   autoscaling_schedules_default = {
     "scale_up" = {
       recurrence = "0 7 * * Mon-Fri"
@@ -64,204 +60,204 @@ locals {
   ###
   ### env independent webserver vars
   ###
-  webserver = {
-    ami_name = "oasys_webserver_*"
-    # branch   = var.BRANCH_NAME # comment in if testing ansible
-    # server-type and oasys-environment auto set by module
-    autoscaling_schedules = {}
-    subnet_name           = "webserver"
+  # webserver = {
+  #   ami_name = "oasys_webserver_*"
+  #   # branch   = var.BRANCH_NAME # comment in if testing ansible
+  #   # server-type and oasys-environment auto set by module
+  #   autoscaling_schedules = {}
+  #   subnet_name           = "webserver"
 
-    instance = {
-      disable_api_termination      = false
-      instance_type                = "t3.large"
-      key_name                     = aws_key_pair.ec2-user.key_name
-      monitoring                   = true
-      metadata_options_http_tokens = "optional"
-      vpc_security_group_ids       = [aws_security_group.webserver.id]
-    }
+  #   instance = {
+  #     disable_api_termination      = false
+  #     instance_type                = "t3.large"
+  #     key_name                     = aws_key_pair.ec2-user.key_name
+  #     monitoring                   = true
+  #     metadata_options_http_tokens = "optional"
+  #     vpc_security_group_ids       = [aws_security_group.webserver.id]
+  #   }
 
-    user_data_cloud_init = {
-      args = {
-        lifecycle_hook_name  = "ready-hook"
-        branch               = "main" # if you want to use a branch of ansible
-        ansible_repo         = "modernisation-platform-configuration-management"
-        ansible_repo_basedir = "ansible"
-        # ansible_args           = "--tags ec2provision"
-      }
-      scripts = [ # it would make sense to have these templates in a common area 
-        "ansible-ec2provision.sh.tftpl",
-        "post-ec2provision.sh.tftpl"
-      ]
-      write_files = {}
-    }
+  #   user_data_cloud_init = {
+  #     args = {
+  #       lifecycle_hook_name  = "ready-hook"
+  #       branch               = "main" # if you want to use a branch of ansible
+  #       ansible_repo         = "modernisation-platform-configuration-management"
+  #       ansible_repo_basedir = "ansible"
+  #       # ansible_args           = "--tags ec2provision"
+  #     }
+  #     scripts = [ # it would make sense to have these templates in a common area 
+  #       "ansible-ec2provision.sh.tftpl",
+  #       "post-ec2provision.sh.tftpl"
+  #     ]
+  #     write_files = {}
+  #   }
 
-    # ssm_parameters_prefix     = "webserver/"
-    iam_resource_names_prefix = "webserver-asg"
+  #   # ssm_parameters_prefix     = "webserver/"
+  #   iam_resource_names_prefix = "webserver-asg"
 
-    autoscaling_group = {
-      desired_capacity = 1
-      max_size         = 2
-      min_size         = 0
+  #   autoscaling_group = {
+  #     desired_capacity = 1
+  #     max_size         = 2
+  #     min_size         = 0
 
-      # health_check_grace_period = 300
-      # health_check_type         = "ELB"
-      # force_delete              = true
-      # termination_policies      = ["OldestInstance"]
-      # target_group_arns         = [] # TODO
-      # vpc_zone_identifier       = data.aws_subnets.private.ids
-      # wait_for_capacity_timeout = 0
+  #     # health_check_grace_period = 300
+  #     # health_check_type         = "ELB"
+  #     # force_delete              = true
+  #     # termination_policies      = ["OldestInstance"]
+  #     # target_group_arns         = [] # TODO
+  #     # vpc_zone_identifier       = data.aws_subnets.private.ids
+  #     # wait_for_capacity_timeout = 0
 
-      # this hook is triggered by the post-ec2provision.sh
-      # initial_lifecycle_hooks = {
-      #   "ready-hook" = {
-      #     default_result       = "ABANDON"
-      #     heartbeat_timeout    = 7200 # on a good day it takes 30 mins, but can be much longer
-      #     lifecycle_transition = "autoscaling:EC2_INSTANCE_LAUNCHING"
-      #   }
-      # }
-      # warm_pool = {
-      #   reuse_on_scale_in           = true
-      #   max_group_prepared_capacity = 1
-      # }
-    }
-  }
-  webserver_tags = {
-    description = "oasys webserver"
-    component   = "web"
-    server-type = "oasys-web"
-    os-version  = "RHEL 8.5"
-  }
+  #     # this hook is triggered by the post-ec2provision.sh
+  #     # initial_lifecycle_hooks = {
+  #     #   "ready-hook" = {
+  #     #     default_result       = "ABANDON"
+  #     #     heartbeat_timeout    = 7200 # on a good day it takes 30 mins, but can be much longer
+  #     #     lifecycle_transition = "autoscaling:EC2_INSTANCE_LAUNCHING"
+  #     #   }
+  #     # }
+  #     # warm_pool = {
+  #     #   reuse_on_scale_in           = true
+  #     #   max_group_prepared_capacity = 1
+  #     # }
+  #   }
+  # }
+  # webserver_tags = {
+  #   description = "oasys webserver"
+  #   component   = "web"
+  #   server-type = "oasys-web"
+  #   os-version  = "RHEL 8.5"
+  # }
 
-  database = {
+  # database = {
 
-    instance = {
-      disable_api_termination      = false
-      instance_type                = "r6i.xlarge"
-      key_name                     = aws_key_pair.ec2-user.key_name
-      metadata_options_http_tokens = "optional" # the Oracle installer cannot accommodate a token
-      monitoring                   = true
-      vpc_security_group_ids       = [aws_security_group.data.id]
-    }
-    autoscaling_schedules = {}
-    autoscaling_group = {
-      desired_capacity = 1
-      max_size         = 2
-      min_size         = 0
-    }
+  #   instance = {
+  #     disable_api_termination      = false
+  #     instance_type                = "r6i.xlarge"
+  #     key_name                     = aws_key_pair.ec2-user.key_name
+  #     metadata_options_http_tokens = "optional" # the Oracle installer cannot accommodate a token
+  #     monitoring                   = true
+  #     vpc_security_group_ids       = [aws_security_group.data.id]
+  #   }
+  #   autoscaling_schedules = {}
+  #   autoscaling_group = {
+  #     desired_capacity = 1
+  #     max_size         = 2
+  #     min_size         = 0
+  #   }
 
-    user_data_cloud_init = {
-      args = {
-        lifecycle_hook_name  = "ready-hook"
-        branch               = "main"
-        ansible_repo         = "modernisation-platform-configuration-management"
-        ansible_repo_basedir = "ansible"
-        # ansible_tags           = "ec2provisiondata"
-        restored_from_snapshot = false
-      }
-      scripts = [
-        "ansible-ec2provision.sh.tftpl",
-      ]
-    }
+  #   user_data_cloud_init = {
+  #     args = {
+  #       lifecycle_hook_name  = "ready-hook"
+  #       branch               = "main"
+  #       ansible_repo         = "modernisation-platform-configuration-management"
+  #       ansible_repo_basedir = "ansible"
+  #       # ansible_tags           = "ec2provisiondata"
+  #       restored_from_snapshot = false
+  #     }
+  #     scripts = [
+  #       "ansible-ec2provision.sh.tftpl",
+  #     ]
+  #   }
 
-    ebs_volumes = {
-      "/dev/sdb" = { # /u01
-        size        = 100
-        label       = "app"
-        type        = "gp3"
-        snapshot_id = null
-      }
-      "/dev/sdc" = { # /u02
-        size        = 500
-        label       = "app"
-        type        = "gp3"
-        snapshot_id = null
-      }
-      "/dev/sde" = { # DATA01
-        label       = "data"
-        size        = 200
-        type        = "gp3"
-        snapshot_id = null
-      }
-      # "/dev/sdf" = {  # DATA02
-      #   label = "data"
-      #   type = null
-      #   snapshot_id = null
-      # }
-      # "/dev/sdg" = {  # DATA03
-      #   label = "data"
-      #   type = null
-      #   snapshot_id = null
-      # }
-      # "/dev/sdh" = {  # DATA04
-      #   label = "data"
-      #   type = null
-      #   snapshot_id = null
-      # }
-      # "/dev/sdi" = {  # DATA05
-      #   label = "data"
-      #   type = null
-      #   snapshot_id = null
-      # }
-      "/dev/sdj" = { # FLASH01
-        label       = "flash"
-        type        = "gp3"
-        snapshot_id = null
-        size        = 50
-      }
-      # "/dev/sdk" = { # FLASH02
-      #   label = "flash"
-      #   type = null
-      #   snapshot_id = null
-      # }
-      "/dev/sds" = {
-        label       = "swap"
-        type        = "gp3"
-        snapshot_id = null
-        size        = 2
-      }
-    }
+  #   ebs_volumes = {
+  #     "/dev/sdb" = { # /u01
+  #       size        = 100
+  #       label       = "app"
+  #       type        = "gp3"
+  #       snapshot_id = null
+  #     }
+  #     "/dev/sdc" = { # /u02
+  #       size        = 500
+  #       label       = "app"
+  #       type        = "gp3"
+  #       snapshot_id = null
+  #     }
+  #     "/dev/sde" = { # DATA01
+  #       label       = "data"
+  #       size        = 200
+  #       type        = "gp3"
+  #       snapshot_id = null
+  #     }
+  #     # "/dev/sdf" = {  # DATA02
+  #     #   label = "data"
+  #     #   type = null
+  #     #   snapshot_id = null
+  #     # }
+  #     # "/dev/sdg" = {  # DATA03
+  #     #   label = "data"
+  #     #   type = null
+  #     #   snapshot_id = null
+  #     # }
+  #     # "/dev/sdh" = {  # DATA04
+  #     #   label = "data"
+  #     #   type = null
+  #     #   snapshot_id = null
+  #     # }
+  #     # "/dev/sdi" = {  # DATA05
+  #     #   label = "data"
+  #     #   type = null
+  #     #   snapshot_id = null
+  #     # }
+  #     "/dev/sdj" = { # FLASH01
+  #       label       = "flash"
+  #       type        = "gp3"
+  #       snapshot_id = null
+  #       size        = 50
+  #     }
+  #     # "/dev/sdk" = { # FLASH02
+  #     #   label = "flash"
+  #     #   type = null
+  #     #   snapshot_id = null
+  #     # }
+  #     "/dev/sds" = {
+  #       label       = "swap"
+  #       type        = "gp3"
+  #       snapshot_id = null
+  #       size        = 2
+  #     }
+  #   }
 
-    ebs_volume_config = {
-      data = {
-        iops       = 3000
-        type       = "gp3"
-        throughput = 125
-        total_size = 200
-      }
-      flash = {
-        iops       = 3000
-        type       = "gp3"
-        throughput = 125
-        total_size = 50
-      }
-    }
+  #   ebs_volume_config = {
+  #     data = {
+  #       iops       = 3000
+  #       type       = "gp3"
+  #       throughput = 125
+  #       total_size = 200
+  #     }
+  #     flash = {
+  #       iops       = 3000
+  #       type       = "gp3"
+  #       throughput = 125
+  #       total_size = 50
+  #     }
+  #   }
 
-    route53_records = {
-      create_internal_record = true
-      create_external_record = true
-    }
+  #   route53_records = {
+  #     create_internal_record = true
+  #     create_external_record = true
+  #   }
 
-    ssm_parameters = {
-      ASMSYS = {
-        random = {
-          length  = 30
-          special = false
-        }
-        description = "ASMSYS password"
-      }
-      ASMSNMP = {
-        random = {
-          length  = 30
-          special = false
-        }
-        description = "ASMSNMP password"
-      }
-    }
-    ssm_parameters_prefix     = "database/"
-    iam_resource_names_prefix = "ec2-database"
-    subnet_id                 = module.environment.subnet["data"][local.availability_zone].id # for ec2_instance
-    subnet_ids                = module.environment.subnet["data"][local.availability_zone].id # for ASG
-  }
+  #   ssm_parameters = {
+  #     ASMSYS = {
+  #       random = {
+  #         length  = 30
+  #         special = false
+  #       }
+  #       description = "ASMSYS password"
+  #     }
+  #     ASMSNMP = {
+  #       random = {
+  #         length  = 30
+  #         special = false
+  #       }
+  #       description = "ASMSNMP password"
+  #     }
+  #   }
+  #   ssm_parameters_prefix     = "database/"
+  #   iam_resource_names_prefix = "ec2-database"
+  #   subnet_id                 = module.environment.subnet["data"][local.availability_zone].id # for ec2_instance
+  #   subnet_ids                = module.environment.subnet["data"][local.availability_zone].id # for ASG
+  # }
   database_tags = {
     component            = "data"
     os-type              = "Linux"
