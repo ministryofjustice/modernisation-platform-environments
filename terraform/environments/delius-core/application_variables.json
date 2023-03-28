@@ -1,7 +1,28 @@
 {
   "accounts": {
     "development": {
-      "example_var": "dev-data"
+      "rds_instance_class": "db.t3.large",
+      "rds_user": "admin",
+      "rds_allocated_storage": "30",
+      "rds_max_allocated_storage": "50",
+      "rds_engine": "oracle-ee",
+      "rds_engine_major_version": "19",
+      "rds_engine_minor_version": "0.0.0.ru-2023-01.rur-2023-01.r1",
+      "rds_auto_minor_version_upgrade": "true",
+      "rds_allow_major_version_upgrade": "false",
+      "rds_backup_window": "03:00-06:00",
+      "rds_retention_period": "7",
+      "rds_maintenance_window": "mon:00:00-mon:03:00",
+      "rds_multi_az": "false",
+      "rds_iam_database_authentication_enabled": "false",
+      "rds_monitoring_interval": "0",
+      "rds_enabled_cloudwatch_logs_exports": [
+        "alert",
+        "audit"
+      ],
+      "rds_performance_insights_enabled": "false",
+      "rds_skip_final_snapshot": "true",
+      "rds_apply_immediately": "true"
     },
     "test": {
       "example_var": "test-data"
