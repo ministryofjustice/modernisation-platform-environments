@@ -77,7 +77,7 @@ resource "aws_db_option_group" "rds_option_group" {
   engine_name              = local.application_data.accounts[local.environment].rds_engine
   major_engine_version     = local.application_data.accounts[local.environment].rds_engine_major_version
   option {
-    option_name = "JVM"
+    option_name = "JVM" # Options needed for full environment include OEM_AGENT and STATSPACK but not added at this PoC point yet.
   }
 
 }
