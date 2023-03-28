@@ -45,8 +45,8 @@ module "baseline" {
 
   environment = module.environment
 
-  ec2_instances = lookup(local.environment_config, "baseline_ec2_instances", {})
-  # ec2_autoscaling_groups = lookup(local.environment_config, "baseline_ec2_autoscaling_groups", {})
+  ec2_instances          = lookup(local.environment_config, "baseline_ec2_instances", {})
+  ec2_autoscaling_groups = lookup(local.environment_config, "baseline_ec2_autoscaling_groups", {})
 }
 
 module "baseline_presets" {
