@@ -22,4 +22,5 @@ module "baseline" {
   ec2_instances          = lookup(local.environment_config, "baseline_ec2_instances", {})
   ec2_autoscaling_groups = lookup(local.environment_config, "baseline_ec2_autoscaling_groups", {})
   lbs                    = lookup(local.environment_config, "baseline_lbs", {})
+  rds_instances          = lookup(local.environment_config, "baseline_rds_instances", {})
 }

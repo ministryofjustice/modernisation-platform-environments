@@ -16,7 +16,7 @@ resource "aws_db_instance" "this" {
 
   db_name                             = var.instance.db_name
   username                            = var.instance.username
-  password                            = var.instance.password
+  password                            = aws_ssm_parameter.db_password.value
   port                                = var.instance.port
   iam_database_authentication_enabled = var.instance.iam_database_authentication_enabled
 
@@ -61,30 +61,19 @@ resource "aws_db_instance_automated_backups_replication" "this" {
   retention_period       = var.instance_automated_backups_replication
 }
 
-#------------------------------------------------------------------------------
-# RDS DB Password
-#------------------------------------------------------------------------------
-resource "random_password" "this" {
-  for_each = var.ssm_parameters != null ? var.ssm_parameters : {}
-
-  length  = each.value.random.length
-  special = lookup(each.value.random, "special", null)
+#-------------------------------------------------------------
+## Getting the rds db password
+#-------------------------------------------------------------
+resource "random_password" "rds_admin_password" {
+  length  = 16
+  special = false
 }
 
-resource "aws_ssm_parameter" "this" {
-  for_each = var.ssm_parameters != null ? var.ssm_parameters : {}
-
-  name        = "/${var.ssm_parameters_prefix}${var.identifier}/${each.key}"
-  description = each.value.description
+resource "aws_ssm_parameter" "db_password" {
+  name        = "/${var.ssm_parameters_prefix}${var.identifier}/rds_admin_password"
+  description = "RDS Admin Password"
   type        = "SecureString"
-  value       = random_password.this[each.key].result
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "${var.identifier}-${each.key}"
-    }
-  )
+  value       = random_password.rds_admin_password.result
 }
 
 #------------------------------------------------------------------------------
@@ -153,6 +142,8 @@ resource "aws_db_parameter_group" "this" {
 #------------------------------------------------------------------------------
 
 resource "aws_db_subnet_group" "this" {
+  count = var.subnet_group.create ? 1 : 0
+
   name_prefix = var.subnet_group.name_prefix != null ? var.subnet_group.name_prefix : var.identifier
   description = var.subnet_group.description != null ? var.subnet_group.descriptio : "Database subnet group for ${var.identifier}"
   subnet_ids  = var.subnet_group.subnet_ids
