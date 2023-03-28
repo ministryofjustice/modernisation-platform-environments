@@ -515,12 +515,14 @@ variable "kms_grants" {
 }
 
 variable "route53_resolvers" {
-  description = "map of resolver endpoints and associated rules to configure"
+  description = "map of resolver endpoints and associated rules to configure, where map keys are the names of the resources.  The application name is automatically added as a prefix to the resource names"
   type = map(object({
     direction    = optional(string, "OUTBOUND")
     subnet_names = optional(list(string), ["data", "private"]) # NOTE: there's a quota of 6 cidrs / resolver
-    forward = optional(map(object({
-      target_ips = list(string) # domain_name is key to the map
+    rules = optional(map(object({
+      domain_name = string
+      rule_type   = optional(string, "FORWARD")
+      target_ips  = list(string)
     })), {})
   }))
   default = {}

@@ -21,13 +21,11 @@ locals {
 
   route53_resolver_rules_list = flatten([
     for resolver_key, resolver_value in var.route53_resolvers : [
-      for rule_key, rule_value in resolver_value.forward : [{
+      for rule_key, rule_value in resolver_value.rules : [{
         key = "${resolver_key}-${rule_key}"
         value = merge({
           resolver_name = resolver_key
-          name          = replace(rule_key, ".", "-")
-          domain_name   = rule_key
-          rule_type     = "FORWARD"
+          name          = "${var.environment.application_name}-${resolver_key}-${rule_key}"
         }, rule_value)
       }]
     ]
@@ -38,8 +36,8 @@ locals {
   }
 }
 
-# create a single security group for all route53 resolvers.  Include the 
-# application in the name since this is being created in the shared VPC account
+# Create single security group to cover all resolvers
+# Prefix the name with application since this is created in VPC account
 resource "aws_security_group" "route53_resolver" {
   count = length(var.route53_resolvers) != 0 ? 1 : 0
 
@@ -49,9 +47,10 @@ resource "aws_security_group" "route53_resolver" {
   description = "Route53 resolver security group for ${var.environment.application_name}"
   vpc_id      = var.environment.vpc.id
 
-  tags = merge(local.tags, {
-    Name = "${var.environment.application_name}-route53-resolver"
-  })
+  # member delegation roles can create the security group but can't currently tag it due to missing permissions
+  # tags = merge(local.tags, {
+  #   Name = "${var.environment.application_name}-route53-resolver"
+  # })
 }
 
 resource "aws_security_group_rule" "route53_resolver" {
@@ -68,12 +67,13 @@ resource "aws_security_group_rule" "route53_resolver" {
   security_group_id = aws_security_group.route53_resolver[0].id
 }
 
+# Prefix the name with application since this is created in VPC account
 resource "aws_route53_resolver_endpoint" "this" {
   for_each = var.route53_resolvers
 
   provider = aws.core-vpc
 
-  name      = each.key
+  name      = "${var.environment.application_name}-${each.key}"
   direction = each.value.direction
 
   security_group_ids = [aws_security_group.route53_resolver[0].id]
@@ -89,7 +89,7 @@ resource "aws_route53_resolver_endpoint" "this" {
   }
 
   tags = merge(local.tags, {
-    Name = each.key
+    Name = "${var.environment.application_name}-${each.key}"
   })
 }
 
