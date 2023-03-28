@@ -38,6 +38,7 @@ module "baseline" {
   iam_service_linked_roles = module.baseline_presets.iam_service_linked_roles
   key_pairs                = module.baseline_presets.key_pairs
   kms_grants               = module.baseline_presets.kms_grants
+  route53_resolvers        = module.baseline_presets.route53_resolvers
   # s3_buckets               = merge(local.baseline_s3_buckets, lookup(local.environment_config, "baseline_s3_buckets", {}))
 
   bastion_linux = lookup(local.environment_config, "baseline_bastion_linux", null)
@@ -51,7 +52,8 @@ module "baseline" {
 module "baseline_presets" {
   source = "../../modules/baseline_presets"
 
-  environment = module.environment
+  environment  = module.environment
+  ip_addresses = module.ip_addresses
 
   options = {
     enable_application_environment_wildcard_cert = true
@@ -61,6 +63,11 @@ module "baseline_presets" {
     enable_ec2_self_provision                    = true
     s3_iam_policies                              = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
   }
+
+  # comment this in if you need to resolve FixNGo hostnames
+  # route53_resolver_rules = {
+  #   outbound-data-and-private-subnets = ["azure-fixngo-domain"]
+  # }
 }
 
 
