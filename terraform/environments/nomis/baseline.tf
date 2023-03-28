@@ -20,6 +20,6 @@ module "baseline" {
   # s3_buckets               = merge(local.baseline_s3_buckets, lookup(local.baseline_environment_config, "baseline_s3_buckets", {}))
   # ec2_instances          = lookup(local.baseline_environment_config, "baseline_ec2_instances", {})
   # ec2_autoscaling_groups = lookup(local.baseline_environment_config, "baseline_ec2_autoscaling_groups", {})
-  route53_resolvers = lookup(local.baseline_environment_config, "baseline_route53_resolvers", {})
+  route53_resolvers = module.baseline_presets.route53_resolvers
   lbs               = lookup(local.baseline_environment_config, "baseline_lbs", {})
 }

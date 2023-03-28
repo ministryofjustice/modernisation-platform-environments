@@ -157,15 +157,6 @@ locals {
 
   # baseline config
   test_config = {
-    baseline_route53_resolvers = {
-      nomis-outbound = {
-        forward = {
-          "azure.noms.root" = {
-            target_ips = module.ip_addresses.azure_fixngo_ips.devtest.domain_controllers
-          }
-        }
-      }
-    }
 
     baseline_lbs = {
       # AWS doesn't let us call it internal
