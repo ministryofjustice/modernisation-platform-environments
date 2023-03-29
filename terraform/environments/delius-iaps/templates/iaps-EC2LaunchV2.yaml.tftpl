@@ -65,6 +65,12 @@ tasks:
 %{endif}
   - frequency: once
     type: powershell
+    runAs: admin
+    content: |-
+      $tnsNamesOraPath = "C:\app\client\Administrator\product\12.1.0\client_1\network\admin\tnsnames.ora"
+      (Get-Content $tnsNamesOraPath).replace('iaps-db', '${delius_iaps_rds_db_address}') | Set-Content $tnsNamesOraPath
+  - frequency: once
+    type: powershell
     runAs: localSystem
     content: |-
       $ConfirmPreference="none"
