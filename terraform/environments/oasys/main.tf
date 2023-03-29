@@ -41,7 +41,7 @@ module "baseline" {
   route53_resolvers = module.baseline_presets.route53_resolvers
   s3_buckets        = merge(local.baseline_s3_buckets, lookup(local.environment_config, "baseline_s3_buckets", {}))
 
-  bastion_linux = lookup(local.environment_config, "baseline_bastion_linux", null)
+  #bastion_linux = lookup(local.environment_config, "baseline_bastion_linux", null)
 
   environment = module.environment
 
