@@ -42,8 +42,11 @@ tasks:
         keepalive_timeout    65;
 
         server {
-          listen 80;
+          listen 443 ssl;
           server_name localhost;
+          ssl_certificate     C:\ssl\server.crt;
+          ssl_certificate_key C:\ssl\server.key;
+          ssl_cipher_suite    !aNULL:!EXPORT56:RC4+RSA:+HIGH:+MEDIUM:+LOW:+SSLv2:+EXP;
 
           allow 127.0.0.1;
           deny  all;
