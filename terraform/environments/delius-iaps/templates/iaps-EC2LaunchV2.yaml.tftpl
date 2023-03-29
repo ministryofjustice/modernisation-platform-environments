@@ -1,5 +1,26 @@
 version: 1.0
 tasks:
+- task: executeScript
+  inputs:
+  - frequency: once
+    type: powershell
+    runAs: admin
+    content: |-
+      # Generate a private key for the CA
+      openssl genrsa -aes256 -out ca.key 4096
+
+      # Generate a self-signed certificate for the CA
+      openssl req -x509 -new -nodes -key ca.key -sha256 -days 36500 -subj "/CN=localhost" -out ca.crt
+
+      # Generate a private key for the server
+      openssl genrsa -out C:\ssl\server.key 4096
+
+      # Generate a CSR for the server
+      openssl req -new -key server.key -subj "/CN=localhost" -out server.csr
+
+      # Generate a self-signed certificate for the server
+      openssl x509 -req -in server.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out C:\ssl\server.crt -days 18250 -sha256
+
 - task: writeFile
   inputs:
   - frequency: always
