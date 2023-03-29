@@ -211,7 +211,7 @@ locals {
         internal_lb              = true
         enable_delete_protection = false
         existing_target_groups   = {
-          development-oasys-web-http-8080 = local.baseline_ec2_autoscaling_groups.development-oasys-web.lb_target_groups.http-8080
+          development-oasys-web-http-8080 = local.environment_config.baseline_ec2_autoscaling_groups.development-oasys-web.lb_target_groups.http-8080
         }
         force_destroy_bucket     = true
         idle_timeout             = 3600
