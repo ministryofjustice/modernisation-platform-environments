@@ -142,126 +142,105 @@ locals {
 
       # Example ASG using base image with ansible provisioning
       # Include the autoscale-trigger-hook ansible role when using hooks
-      # development-oasys-web = {
-      #   config = merge(module.baseline_presets.ec2_instance.config.default, {
-      #     ami_name = "oasys_webserver_*"
-      #   })
-      #   instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-      #     vpc_security_group_ids = ["private"]
-      #   })
-      #   user_data_cloud_init = {
-      #     args = {
-      #       lifecycle_hook_name  = "ready-hook"
-      #       branch               = "main"
-      #       ansible_repo         = "modernisation-platform-configuration-management"
-      #       ansible_repo_basedir = "ansible"
-      #       ansible_args         = ""
-      #     }
-      #     scripts = [
-      #       "install-ssm-agent.sh.tftpl",
-      #       "ansible-ec2provision.sh.tftpl",
-      #       "post-ec2provision.sh.tftpl"
-      #     ]
-      #   }
-      #   autoscaling_group = {
-      #     desired_capacity    = 1
-      #     max_size            = 2
-      #     vpc_zone_identifier = module.environment.subnets["private"].ids
-      #   }
-      #   autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
-      #   tags = {
-      #     os-type           = "Linux"
-      #     oasys-environment = "t1"
-      #     description       = "oasys webserver"
-      #     component         = "web"
-      #     server-type       = "oasys-web"
-      #     os-version        = "RHEL 7.9"
-      #   }
+      development-oasys-web = {
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name = "oasys_webserver_*"
+        })
+        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+          vpc_security_group_ids = ["private"]
+        })
+        user_data_cloud_init = {
+          args = {
+            lifecycle_hook_name  = "ready-hook"
+            branch               = "main"
+            ansible_repo         = "modernisation-platform-configuration-management"
+            ansible_repo_basedir = "ansible"
+            ansible_args         = ""
+          }
+          scripts = [
+            "install-ssm-agent.sh.tftpl",
+            "ansible-ec2provision.sh.tftpl",
+            "post-ec2provision.sh.tftpl"
+          ]
+        }
+        autoscaling_group = {
+          desired_capacity    = 1
+          max_size            = 2
+          vpc_zone_identifier = module.environment.subnets["private"].ids
+        }
+        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
+        tags = {
+          os-type           = "Linux"
+          oasys-environment = "t1"
+          description       = "oasys webserver"
+          component         = "web"
+          server-type       = "oasys-web"
+          os-version        = "RHEL 7.9"
+        }
 
-      #   # Example target group setup below
+        # Example target group setup below
 
-      #   lb_target_groups = {
-      #     http-8080 = {
-      #       port                 = 8080
-      #       protocol             = "HTTP"
-      #       target_type          = "instance"
-      #       deregistration_delay = 30
-      #       health_check = {
-      #         enabled             = true
-      #         interval            = 30
-      #         healthy_threshold   = 3
-      #         matcher             = "200-399"
-      #         path                = "/"
-      #         port                = 8080
-      #         timeout             = 5
-      #         unhealthy_threshold = 5
-      #       }
-      #       stickiness = {
-      #         enabled = true
-      #         type    = "lb_cookie"
-      #       }
-      #     }
-      #   }
-      # }
+        lb_target_groups = {
+          http-8080 = {
+            port                 = 8080
+            protocol             = "HTTP"
+            target_type          = "instance"
+            deregistration_delay = 30
+            health_check = {
+              enabled             = true
+              interval            = 30
+              healthy_threshold   = 3
+              matcher             = "200-399"
+              path                = "/"
+              port                = 8080
+              timeout             = 5
+              unhealthy_threshold = 5
+            }
+            stickiness = {
+              enabled = true
+              type    = "lb_cookie"
+            }
+          }
+        }
+      }
     }
 
     baseline_lbs = {
-      #
-      # Below is an example of a baseline load balancer setup
-      #
-      #   rhel85-test = {
-      #     enable_delete_protection = false
-      #     idle_timeout             = "60"
-      #     public_subnets           = module.environment.subnets["public"].ids
-      #     force_destroy_bucket     = true
-      #     internal_lb              = true
-      #     tags                     = local.tags
-      #     security_groups          = [module.baseline.security_groups["public"].id]
-      #     listeners = {
-      #       https = {
-      #         port             = 443
-      #         protocol         = "HTTPS"
-      #         ssl_policy       = "ELBSecurityPolicy-2016-08"
-      #         certificate_arns = [module.acm_certificate["star.${module.environment.domains.public.application_environment}"].arn]
-      #         default_action = {
-      #           type = "fixed-response"
-      #           fixed_response = {
-      #             content_type = "text/plain"
-      #             message_body = "Not implemented"
-      #             status_code  = "501"
-      #           }
-      #         }
+      # AWS doesn't let us call it internal
+      private = {
+        internal_lb              = true
+        enable_delete_protection = false
+        existing_target_groups   = {
+          development-oasys-web-http-8080 = local.baseline_ec2_autoscaling_groups.development-oasys-web.lb_target_groups.http-8080
+        }
+        force_destroy_bucket     = true
+        idle_timeout             = 3600
+        public_subnets           = module.environment.subnets["private"].ids
+        security_groups          = [aws_security_group.public.id]
 
-      #         rules = {
-      #           forward-http-8080 = {
-      #             priority = 100
-      #             actions = [{
-      #               type              = "forward"
-      #               target_group_name = "http-8080"
-      #             }]
-      #             conditions = [
-      #               {
-      #                 host_header = {
-      #                   values = ["web.oasys.${module.environment.vpc_name}.modernisation-platform.service.justice.gov.uk"]
-      #                 }
-      #               },
-      #               {
-      #                 path_pattern = {
-      #                   values = ["/"]
-      #                 }
-      #             }]
-      #           }
-      #         }
-      #       }
-      #       route53_records = {
-      #         "web.oasys" = {
-      #           account                = "core-vpc"
-      #           zone_id                = module.environment.route53_zones[module.environment.domains.public.business_unit_environment].zone_id
-      #           evaluate_target_health = true
-      #         }
-      #       }
-      #     }
-      #   }
+        listeners = {
+          development-oasys-web-http-8080 = {
+            port     = 8080
+            protocol = "HTTP"
+            default_action = {
+              type              = "forward"
+              target_group_name = "development-oasys-web-http-8080"
+            }
+          }
+        }
+
+        # public LB not needed right now
+        # public = {
+        #   internal_lb              = false
+        #   enable_delete_protection = false
+        #   force_destroy_bucket     = true
+        #   idle_timeout             = 3600
+        #   public_subnets           = module.environment.subnets["public"].ids
+        #   security_groups          = [aws_security_group.public.id]
+        # }
+      }
     }
   }
 }
+
+
