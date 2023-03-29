@@ -38,9 +38,9 @@ locals {
         })
         ebs_volume_config = null
         ebs_volumes       = null
-        instance = module.baseline_presets.ec2_instance.instance.default
-        lb_target_groups = null
-        ssm_parameters   = null
+        instance          = module.baseline_presets.ec2_instance.instance.default
+        lb_target_groups  = null
+        ssm_parameters    = null
         tags = {
           os-type = "Linux"
         }
