@@ -5,12 +5,12 @@ resource "aws_ecs_cluster" "tipstaff_cluster" {
 
 # Create a task definition for the Windows container
 resource "aws_ecs_task_definition" "tipstaff_ecs_task" {
-  family                   = "tipstaff_ecs_task"
-  execution_role_arn       = aws_iam_role.app_execution.arn
-  task_role_arn            = aws_iam_role.app_task.arn
-  cpu                      = 256
-  memory                   = 1024
-  container_definitions    = <<TASK_DEFINITION
+  family                = "tipstaff_ecs_task"
+  execution_role_arn    = aws_iam_role.app_execution.arn
+  task_role_arn         = aws_iam_role.app_task.arn
+  cpu                   = 256
+  memory                = 1024
+  container_definitions = <<TASK_DEFINITION
   [
     {
       "name": "tipstaff",
