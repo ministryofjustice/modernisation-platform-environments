@@ -38,9 +38,7 @@ locals {
         })
         ebs_volume_config = null
         ebs_volumes       = null
-        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-          vpc_security_group_ids = ["private"]
-        })
+        instance = module.baseline_presets.ec2_instance.instance.default
         lb_target_groups = null
         ssm_parameters   = null
         tags = {
