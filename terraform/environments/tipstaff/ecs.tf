@@ -45,11 +45,11 @@ resource "aws_ecs_task_definition" "tipstaff_ecs_task" {
       "secrets": [
         {
           "name" : "DB_USER",
-          "valueFrom" : "${aws_secretsmanager_secret_version.db_username.arn}"
+          "valueFrom" : "${data.aws_secretsmanager_secret_version.db_username.arn}"
         },
         {
           "name": "DB_PASSWORD",
-          "valueFrom": "${aws_secretsmanager_secret_version.db_password.arn}"
+          "valueFrom": "${data.aws_secretsmanager_secret_version.db_password.arn}"
         }
       ]
     }
@@ -200,6 +200,16 @@ resource "aws_iam_role_policy" "app_task" {
    ]
   }
   EOF
+}
+
+resource "aws_lb" "tipstaff_dev_lb" {
+  name                       = "tipstaff-dev-load-balancer"
+  load_balancer_type         = "application"
+  security_groups            = [aws_security_group.tipstaff_dev_lb_sc.id]
+  subnets                    = data.aws_subnets.shared-public.ids
+  enable_deletion_protection = false
+  internal                   = false
+  depends_on                 = [aws_security_group.tipstaff_dev_lb_sc]
 }
 
 resource "aws_lb_target_group" "tipstaff_dev_target_group" {
