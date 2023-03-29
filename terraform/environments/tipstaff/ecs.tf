@@ -57,6 +57,7 @@ resource "aws_ecs_task_definition" "tipstaff_ecs_task" {
   TASK_DEFINITION
 
   requires_compatibilities = ["FARGATE"]
+  network_mode             = "awsvpc"
 }
 
 # Create a Fargate service to run the Windows container task

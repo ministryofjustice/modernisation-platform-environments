@@ -41,7 +41,7 @@ resource "aws_lb_target_group" "tipstaff_dev_target_group" {
   port                 = local.application_data.accounts[local.environment].server_port_1
   protocol             = "HTTP"
   vpc_id               = data.aws_vpc.shared.id
-  target_type          = "instance"
+  target_type          = "ip"
   deregistration_delay = 30
 
   stickiness {
