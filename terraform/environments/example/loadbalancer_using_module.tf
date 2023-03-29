@@ -32,18 +32,21 @@ locals {
 }
 
 # Load balancer build using the module
-module "lb_access_logs_enabled" { #tfsec:ignore:aws-ec2-no-public-egress-sgr
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer?ref=v2.1.1"
+module "lb_access_logs_enabled" {
+  #tfsec:ignore:aws-ec2-no-public-egress-sgr
+  source    = "github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer?ref=v2.1.1"
   providers = {
     # Here we use the default provider for the S3 bucket module, buck replication is disabled but we still
     # Need to pass the provider to the S3 bucket module
     aws.bucket-replication = aws
   }
-  vpc_all = "${local.vpc_name}-${local.environment}"
+  vpc_all                    = "${local.vpc_name}-${local.environment}"
   #existing_bucket_name               = "my-bucket-name"
   force_destroy_bucket       = true # enables destruction of logging bucket
   application_name           = local.application_name
-  public_subnets             = [data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id]
+  public_subnets             = [
+    data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id
+  ]
   loadbalancer_ingress_rules = local.loadbalancer_ingress_rules
   loadbalancer_egress_rules  = local.loadbalancer_egress_rules
   tags                       = local.tags
@@ -54,9 +57,9 @@ module "lb_access_logs_enabled" { #tfsec:ignore:aws-ec2-no-public-egress-sgr
 }
 
 # Create the target group
-resource "aws_lb_target_group" "target_group_module" {
-  name                 = "${local.application_name}-tg-mlb-${local.environment}"
-  port                 = local.application_data.accounts[local.environment].server_port
+resource "aws_lb_target_group" "target_group_module_example" {
+  name                 = "${local.application_name}-tg-module"
+  port                 = 443
   protocol             = "HTTP"
   vpc_id               = data.aws_vpc.shared.id
   target_type          = "instance"
@@ -74,4 +77,18 @@ resource "aws_lb_target_group" "target_group_module" {
     matcher             = "200-499"
     timeout             = "5"
   }
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-tg-${local.environment}"
+    }
+  )
+}
+
+# Link target group to the EC2 instance on port 443
+resource "aws_lb_target_group_attachment" "example_module_group_attachment" {
+  target_group_arn = aws_lb_target_group.target_group_module_example.arn
+  target_id        = aws_instance.develop.id
+  port             = 443
 }
