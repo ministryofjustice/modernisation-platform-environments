@@ -78,3 +78,39 @@ data "aws_iam_policy_document" "shared_image_builder_cmk_policy" {
 }
 
 data "aws_kms_key" "ebs_hmpps" { key_id = "arn:aws:kms:${local.region}:${local.environment_management.account_ids["core-shared-services-production"]}:alias/ebs-${local.business_unit}" }
+
+data "aws_iam_policy_document" "ssm_ec2_start_stop_kms" {
+  statement {
+    sid    = "manageSharedAMIsEncryptedEBSVolumes"
+    effect = "Allow"
+    #tfsec:ignore:aws-iam-no-policy-wildcards
+    actions = [
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:ReEncrypt*",
+      "kms:ReEncryptFrom",
+      "kms:GenerateDataKey*",
+      "kms:DescribeKey",
+      "kms:CreateGrant",
+      "kms:ListGrants",
+      "kms:RevokeGrant"
+    ]
+    # we have a legacy CMK that's used in production that will be retired but in the meantime requires permissions
+    resources = [data.aws_kms_key.ebs_hmpps.arn]
+  }
+
+  statement {
+    sid    = "modifyAautoscalingGroupProcesses"
+    effect = "Allow"
+
+    actions = [
+      "autoscaling:SuspendProcesses",
+      "autoscaling:ResumeProcesses",
+      "autoscaling:DescribeAutoScalingGroups",
+    ]
+    #this role manages all the autoscaling groups in an account
+    #checkov:skip=CKV_AWS_111: "Ensure IAM policies does not allow write access without constraints"
+    #checkov:skip=CKV_AWS_109: "Ensure IAM policies does not allow permissions management / resource exposure without constraints"
+    resources = ["*"] #tfsec:ignore:aws-iam-no-policy-wildcards
+  }
+}
