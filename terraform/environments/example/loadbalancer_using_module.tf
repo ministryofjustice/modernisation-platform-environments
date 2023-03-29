@@ -34,17 +34,17 @@ locals {
 # Load balancer build using the module
 module "lb_access_logs_enabled" {
   #tfsec:ignore:aws-ec2-no-public-egress-sgr
-  source    = "github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer?ref=v2.1.1"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer?ref=v2.1.1"
   providers = {
     # Here we use the default provider for the S3 bucket module, buck replication is disabled but we still
     # Need to pass the provider to the S3 bucket module
     aws.bucket-replication = aws
   }
-  vpc_all                    = "${local.vpc_name}-${local.environment}"
+  vpc_all = "${local.vpc_name}-${local.environment}"
   #existing_bucket_name               = "my-bucket-name"
-  force_destroy_bucket       = true # enables destruction of logging bucket
-  application_name           = local.application_name
-  public_subnets             = [
+  force_destroy_bucket = true # enables destruction of logging bucket
+  application_name     = local.application_name
+  public_subnets = [
     data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id
   ]
   loadbalancer_ingress_rules = local.loadbalancer_ingress_rules
