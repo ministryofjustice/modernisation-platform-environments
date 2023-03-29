@@ -75,7 +75,7 @@ resource "aws_ecs_service" "tipstaff_ecs_service" {
 
   network_configuration {
     subnets          = data.aws_subnets.private-public.ids
-    security_groups  = [aws_security_group.app.id]
+    security_groups  = [aws_security_group.tipstaff_dev_lb_sc.id]
     assign_public_ip = true
   }
 
@@ -200,43 +200,4 @@ resource "aws_iam_role_policy" "app_task" {
    ]
   }
   EOF
-}
-
-resource "aws_lb" "tipstaff_dev_lb" {
-  name                       = "tipstaff-dev-load-balancer"
-  load_balancer_type         = "application"
-  security_groups            = [aws_security_group.tipstaff_dev_lb_sc.id]
-  subnets                    = data.aws_subnets.shared-public.ids
-  enable_deletion_protection = false
-  internal                   = false
-  depends_on                 = [aws_security_group.tipstaff_dev_lb_sc]
-}
-
-resource "aws_lb_target_group" "tipstaff_dev_target_group" {
-  name                 = "tipstaff-dev-target-group"
-  port                 = local.application_data.accounts[local.environment].server_port_1
-  protocol             = "HTTP"
-  vpc_id               = data.aws_vpc.shared.id
-  target_type          = "instance"
-  deregistration_delay = 30
-
-  stickiness {
-    type = "lb_cookie"
-  }
-
-  health_check {
-    healthy_threshold   = "2"
-    interval            = "120"
-    protocol            = "HTTP"
-    unhealthy_threshold = "2"
-    matcher             = "200-499"
-    timeout             = "5"
-  }
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "${local.application_name}-tg-${local.environment}"
-    }
-  )
 }
