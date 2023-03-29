@@ -16,7 +16,7 @@ resource "aws_db_instance" "this" {
 
   db_name                             = var.instance.db_name
   username                            = var.instance.username
-  password                            = var.instance.password
+  password                            = aws_ssm_parameter.db_password.value
   port                                = var.instance.port
   iam_database_authentication_enabled = var.instance.iam_database_authentication_enabled
 
@@ -61,6 +61,21 @@ resource "aws_db_instance_automated_backups_replication" "this" {
   retention_period       = var.instance_automated_backups_replication
 }
 
+#-------------------------------------------------------------
+## Getting the rds db password
+#-------------------------------------------------------------
+resource "random_password" "rds_admin_password" {
+  length  = 16
+  special = false
+}
+
+resource "aws_ssm_parameter" "db_password" {
+  name        = "/${var.ssm_parameters_prefix}${var.identifier}/rds_admin_password"
+  description = "RDS Admin Password"
+  type        = "SecureString"
+  value       = random_password.rds_admin_password.result
+}
+
 #------------------------------------------------------------------------------
 # OPTION GROUPS
 #------------------------------------------------------------------------------
@@ -68,8 +83,8 @@ resource "aws_db_instance_automated_backups_replication" "this" {
 resource "aws_db_option_group" "this" {
   count = var.option_group.create ? 1 : 0
 
-  name_prefix              = var.option_group.name_prefix
-  option_group_description = var.option_group.description == "" ? format("Option group for %s", var.identifier) : var.option_group.description
+  name_prefix              = var.option_group.name_prefix != null ? var.option_group.name_prefix : var.identifier
+  option_group_description = var.option_group.option_group_description != null ? var.option_group.option_group_description : "Database option group for ${var.identifier}"
   engine_name              = var.option_group.engine_name
   major_engine_version     = var.option_group.major_engine_version
   dynamic "option" {
@@ -81,7 +96,7 @@ resource "aws_db_option_group" "this" {
       db_security_group_memberships  = option.value.db_security_group_memberships
       vpc_security_group_memberships = option.value.vpc_security_group_memberships
       dynamic "option_settings" {
-        for_each = option.value.settings
+        for_each = option.value.option_settings
         content {
           name  = option_settings.value.name
           value = option_settings.value.value
@@ -101,8 +116,8 @@ resource "aws_db_option_group" "this" {
 resource "aws_db_parameter_group" "this" {
   count = var.parameter_group.create ? 1 : 0
 
-  name_prefix = var.parameter_group.name_prefix
-  description = "Database parameter group for ${var.identifier}"
+  name_prefix = var.parameter_group.name_prefix != null ? var.parameter_group.name_prefix : var.identifier
+  description = var.parameter_group.description != null ? var.parameter_group.description : "Database parameter group for ${var.identifier}"
   family      = var.parameter_group.family
 
   dynamic "parameter" {
@@ -127,8 +142,10 @@ resource "aws_db_parameter_group" "this" {
 #------------------------------------------------------------------------------
 
 resource "aws_db_subnet_group" "this" {
-  name_prefix = var.subnet_group.name_prefix
-  description = "Database subnet group for ${var.identifier}"
+  count = var.subnet_group.create ? 1 : 0
+
+  name_prefix = var.subnet_group.name_prefix != null ? var.subnet_group.name_prefix : var.identifier
+  description = var.subnet_group.description != null ? var.subnet_group.descriptio : "Database subnet group for ${var.identifier}"
   subnet_ids  = var.subnet_group.subnet_ids
 
   tags = merge(local.tags, {
@@ -140,32 +157,47 @@ resource "aws_db_subnet_group" "this" {
 # IAM
 #------------------------------------------------------------------------------
 
-# resource "aws_iam_role" "this" {
-#   name                 = "${var.iam_resource_names_prefix}-role-${var.identifier}"
-#   path                 = "/"
-#   max_session_duration = "3600"
-#   assume_role_policy = jsonencode(
-#     {
-#       "Version" : "2012-10-17",
-#       "Statement" : [
-#         {
-#           "Effect" : "Allow",
-#           "Principal" : {
-#             "Service" : "rds.amazonaws.com"
-#           }
-#           "Action" : "sts:AssumeRole",
-#           "Condition" : {}
-#         }
-#       ]
-#     }
-#   )
+resource "aws_iam_role" "this" {
+  name                 = "${var.iam_resource_names_prefix}-role-${var.identifier}"
+  path                 = "/"
+  max_session_duration = "3600"
+  assume_role_policy = jsonencode(
+    {
+      "Version" : "2012-10-17",
+      "Statement" : [
+        {
+          "Effect" : "Allow",
+          "Principal" : {
+            "Service" : "rds.amazonaws.com"
+          }
+          "Action" : "sts:AssumeRole",
+          "Condition" : {}
+        }
+      ]
+    }
+  )
 
-#   managed_policy_arns = var.instance_profile_policies
+  managed_policy_arns = var.instance_profile_policies
 
-#   tags = merge(
-#     local.tags,
-#     {
-#       Name = "${var.iam_resource_names_prefix}-role-${var.identifier}"
-#     },
-#   )
-# }
+  tags = merge(
+    local.tags,
+    {
+      Name = "${var.iam_resource_names_prefix}-role-${var.identifier}"
+    },
+  )
+}
+
+#------------------------------------------------------------------------------
+# Route 53 record
+#------------------------------------------------------------------------------
+
+resource "aws_route53_record" "rds_dns_entry" {
+  count    = var.route53_record ? 1 : 0
+  provider = aws.core-vpc
+
+  zone_id = data.aws_route53_zone.rds_dns_entry.zone_id
+  name    = "${var.identifier}.${var.application_name}.${data.aws_route53_zone.rds_dns_entry.name}"
+  type    = "CNAME"
+  ttl     = 300
+  records = [aws_db_instance.this.address]
+}

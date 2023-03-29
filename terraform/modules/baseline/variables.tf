@@ -251,81 +251,78 @@ variable "rds_instances" {
       ssm_parameters_prefix     = optional(string, "")
     })
     instance = object({
-      identifier                          = string
-      create                              = optional(bool, true)
       allocated_storage                   = number
-      storage_type                        = optional(string, "gp2")
-      storage_encrypted                   = optional(bool, false)
-      kms_key_id                          = optional(string)
-      replicate_source_db                 = optional(string)
-      snapshot_identifier                 = optional(string)
       allow_major_version_upgrade         = optional(bool, false)
       apply_immediately                   = optional(bool, false)
       auto_minor_version_upgrade          = optional(bool, false)
-      license_model                       = optional(string)
-      iam_database_authentication_enabled = optional(bool, false)
-      db_name                             = optional(string)
-      engine                              = string
-      engine_version                      = optional(string)
-      instance_class                      = string
-      username                            = string
-      password                            = string
-      parameter_group_name                = optional(string)
-      skip_final_snapshot                 = optional(bool, false)
-      max_allocated_storage               = optional(number)
-      port                                = optional(string)
-      final_snapshot_identifier           = optional(bool, false)
-      vpc_security_group_ids              = optional(list(string))
-      db_subnet_group_name                = optional(string)
-      multi_az                            = optional(bool, false)
-      iops                                = optional(number, 0)
-      publicly_accessible                 = optional(bool, false)
-      monitoring_interval                 = optional(number, 0)
-      monitoring_role_arn                 = optional(string)
-      maintenance_window                  = optional(string)
-      copy_tags_to_snapshot               = optional(bool, false)
       backup_retention_period             = optional(number, 1)
       backup_window                       = optional(string)
       character_set_name                  = optional(string)
-      option_group_name                   = optional(string)
+      copy_tags_to_snapshot               = optional(bool, false)
+      create                              = optional(bool, true)
+      db_name                             = optional(string)
+      db_subnet_group_name                = optional(string)
       enabled_cloudwatch_logs_exports     = optional(list(string))
+      engine                              = string
+      engine_version                      = optional(string)
+      final_snapshot_identifier           = optional(bool, false)
+      iam_database_authentication_enabled = optional(bool, false)
+      identifier                          = string
+      instance_class                      = string
+      iops                                = optional(number, 0)
+      kms_key_id                          = optional(string)
+      license_model                       = optional(string)
+      maintenance_window                  = optional(string)
+      max_allocated_storage               = optional(number)
+      monitoring_interval                 = optional(number, 0)
+      monitoring_role_arn                 = optional(string)
+      multi_az                            = optional(bool, false)
+      option_group_name                   = optional(string)
+      parameter_group_name                = optional(string)
+      password                            = string
+      port                                = optional(string)
+      publicly_accessible                 = optional(bool, false)
+      replicate_source_db                 = optional(string)
+      skip_final_snapshot                 = optional(bool, false)
+      snapshot_identifier                 = optional(string)
+      storage_encrypted                   = optional(bool, false)
+      storage_type                        = optional(string, "gp2")
+      username                            = string
+      vpc_security_group_ids              = optional(list(string))
     })
     option_group = object({
-      create               = bool
-      name_prefix          = string
-      description          = string
-      engine_name          = string
-      major_engine_version = string
-      options = list(object({
+      create                   = bool
+      name_prefix              = optional(string)
+      option_group_description = optional(string)
+      engine_name              = string
+      major_engine_version     = string
+      options = optional(list(object({
         option_name                    = string
         port                           = optional(number)
         version                        = optional(string)
         db_security_group_memberships  = optional(list(string))
         vpc_security_group_memberships = optional(list(string))
-        settings = list(object({
-          name  = string
-          value = string
-        }))
-      }))
+        option_settings = optional(list(object({
+          name  = optional(string)
+          value = optional(string)
+        })))
+      })))
       tags = optional(list(string))
     })
     parameter_group = object({
-      create               = bool
-      name_prefix          = string
-      description          = string
-      family               = string
-      major_engine_version = string
-      parameters = list(object({
+      name_prefix = optional(string)
+      description = optional(string)
+      family      = string
+      parameters = optional(list(object({
         name         = string
         value        = string
         apply_method = optional(string, "immediate")
-      }))
+      })))
       tags = optional(list(string))
     })
     subnet_group = object({
-      create      = bool
-      name_prefix = string
-      description = string
+      name_prefix = optional(string)
+      description = optional(string)
       subnet_ids  = list(string)
       tags        = optional(list(string))
     })
@@ -336,14 +333,8 @@ variable "rds_instances" {
       })
       description = string
     })))
-    route53_records = optional(object({
-      create_internal_record = bool
-      create_external_record = bool
-      }), {
-      create_internal_record = true
-      create_external_record = false
-    })
-    tags = optional(map(string), {})
+    route53_record = optional(bool, true)
+    tags           = optional(map(string), {})
   }))
   default = {}
 }
