@@ -43,11 +43,11 @@ resource "aws_ecs_task_definition" "tipstaff_ecs_task" {
         },
         {
           "name" : "DB_USER",
-          "value" : "${data.aws_secretsmanager_secret_version.db_username.secret_string["LOCAL_DB_USERNAME"]}"
+          "value" : "${jsondecode(data.aws_secretsmanager_secret_version.db_username.secret_string)["LOCAL_DB_USERNAME"]}"
         },
         {
           "name": "DB_PASSWORD",
-          "valueFrom": "${data.aws_secretsmanager_secret_version.db_username.secret_string["LOCAL_DB_PASSWORD"]}"
+          "value": "${jsondecode(data.aws_secretsmanager_secret_version.db_password.secret_string)["LOCAL_DB_PASSWORD"]}"
         }
       ]
     }
