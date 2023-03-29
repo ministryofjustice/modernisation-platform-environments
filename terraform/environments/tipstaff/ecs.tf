@@ -81,7 +81,7 @@ resource "aws_ecs_service" "tipstaff_ecs_service" {
 
   load_balancer {
     target_group_arn = aws_lb_target_group.tipstaff_dev_target_group.arn
-    container_name   = "${var.networking[0].application}"
+    container_name   = var.networking[0].application
     container_port   = 80
   }
 
