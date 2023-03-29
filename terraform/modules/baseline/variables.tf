@@ -242,6 +242,103 @@ variable "ec2_instances" {
   default = {}
 }
 
+variable "rds_instances" {
+  description = "map of rds instances to create where the map key is the tags.Name.  See rds_instance module for more variable details"
+  type = map(object({
+    config = object({
+      iam_resource_names_prefix = optional(string, "rds_db")
+      instance_profile_policies = list(string)
+      ssm_parameters_prefix     = optional(string, "")
+    })
+    instance = object({
+      allocated_storage                   = number
+      allow_major_version_upgrade         = optional(bool, false)
+      apply_immediately                   = optional(bool, false)
+      auto_minor_version_upgrade          = optional(bool, false)
+      backup_retention_period             = optional(number, 1)
+      backup_window                       = optional(string)
+      character_set_name                  = optional(string)
+      copy_tags_to_snapshot               = optional(bool, false)
+      create                              = optional(bool, true)
+      db_name                             = optional(string)
+      db_subnet_group_name                = optional(string)
+      enabled_cloudwatch_logs_exports     = optional(list(string))
+      engine                              = string
+      engine_version                      = optional(string)
+      final_snapshot_identifier           = optional(bool, false)
+      iam_database_authentication_enabled = optional(bool, false)
+      identifier                          = string
+      instance_class                      = string
+      iops                                = optional(number, 0)
+      kms_key_id                          = optional(string)
+      license_model                       = optional(string)
+      maintenance_window                  = optional(string)
+      max_allocated_storage               = optional(number)
+      monitoring_interval                 = optional(number, 0)
+      monitoring_role_arn                 = optional(string)
+      multi_az                            = optional(bool, false)
+      option_group_name                   = optional(string)
+      parameter_group_name                = optional(string)
+      password                            = string
+      port                                = optional(string)
+      publicly_accessible                 = optional(bool, false)
+      replicate_source_db                 = optional(string)
+      skip_final_snapshot                 = optional(bool, false)
+      snapshot_identifier                 = optional(string)
+      storage_encrypted                   = optional(bool, false)
+      storage_type                        = optional(string, "gp2")
+      username                            = string
+      vpc_security_group_ids              = optional(list(string))
+    })
+    option_group = object({
+      create                   = bool
+      name_prefix              = optional(string)
+      option_group_description = optional(string)
+      engine_name              = string
+      major_engine_version     = string
+      options = optional(list(object({
+        option_name                    = string
+        port                           = optional(number)
+        version                        = optional(string)
+        db_security_group_memberships  = optional(list(string))
+        vpc_security_group_memberships = optional(list(string))
+        option_settings = optional(list(object({
+          name  = optional(string)
+          value = optional(string)
+        })))
+      })))
+      tags = optional(list(string))
+    })
+    parameter_group = object({
+      name_prefix = optional(string)
+      description = optional(string)
+      family      = string
+      parameters = optional(list(object({
+        name         = string
+        value        = string
+        apply_method = optional(string, "immediate")
+      })))
+      tags = optional(list(string))
+    })
+    subnet_group = object({
+      name_prefix = optional(string)
+      description = optional(string)
+      subnet_ids  = list(string)
+      tags        = optional(list(string))
+    })
+    ssm_parameters = optional(map(object({
+      random = object({
+        length  = number
+        special = bool
+      })
+      description = string
+    })))
+    route53_record = optional(bool, true)
+    tags           = optional(map(string), {})
+  }))
+  default = {}
+}
+
 variable "environment" {
   description = "Standard environmental data resources from the environment module"
 }
@@ -404,6 +501,20 @@ variable "kms_grants" {
     key_id            = string
     grantee_principal = string
     operations        = list(string)
+  }))
+  default = {}
+}
+
+variable "route53_resolvers" {
+  description = "map of resolver endpoints and associated rules to configure, where map keys are the names of the resources.  The application name is automatically added as a prefix to the resource names"
+  type = map(object({
+    direction    = optional(string, "OUTBOUND")
+    subnet_names = optional(list(string), ["data", "private"]) # NOTE: there's a quota of 6 cidrs / resolver
+    rules = optional(map(object({
+      domain_name = string
+      rule_type   = optional(string, "FORWARD")
+      target_ips  = list(string)
+    })), {})
   }))
   default = {}
 }

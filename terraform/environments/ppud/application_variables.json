@@ -3,8 +3,7 @@
     "development": {
       "directory_service_name": "UKGOV.DEV",
       "SES_domain": "internaltest.ppud.justice.gov.uk",
-      "DEV_WAM_ALB": "WAM-ALB",
-      "PPUD_Internal_ALB": "PPUD-ALB"
+      "WAM_ALB": "WAM-ALB-DEV"
     },
     "test": {
       "example_var": "test-data"
@@ -12,12 +11,15 @@
     "preproduction": {
       "directory_service_name": "PPUD.UAT",
       "SES_domain": "uat.ppud.justice.gov.uk",
-      "DEV_WAM_ALB": "WAM-ALB",
+      "WAM_ALB": "WAM-ALB-UAT",
       "PPUD_Internal_ALB": "PPUD-ALB",
       "PPUD_Target": "PPUD"
     },
     "production": {
-      "example_var": "production-data"
+      "directory_service_name": "PPUD.PROD",
+      "WAM_ALB": "WAM-ALB-PROD",
+      "PPUD_Internal_ALB": "PPUD-ALB",
+      "PPUD_Target": "PPUD"
     }
   }
 }

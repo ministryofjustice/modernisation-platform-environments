@@ -8,20 +8,19 @@
       "ami_image_id": "ami-0a7fe1d4be64d0d0f",
       "instance_type": "m5.large",
       "key_name": "",
-      "ecr_url": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/mlra-ecr-repo",
       "docker_image_tag": "latest",
       "maat_api_end_point": "http://maat-cd-api.aws.dev.legalservices.gov.uk/maatApi/laaStatus",
       "maat_db_url": "rds.maat.aws.dev.legalservices.gov.uk:1521:MAATDB",
       "maat_db_password": "APP_MAATDB_DBPASSWORD_MLA1",
       "maat_libra_wsdl_url": "http://infox.aws.dev.legalservices.gov.uk/infoX/gateway",
-      "ec2_desired_capacity": 1,
+      "ec2_desired_capacity": 2,
       "ec2_max_size": 6,
-      "ec2_min_size": 1,
+      "ec2_min_size": 2,
       "task_definition_volume": "upload_volume",
       "network_mode": "bridge",
       "server_port": 8080,
-      "app_count": 1,
-      "appscaling_min_capacity": 1,
+      "app_count": 2,
+      "appscaling_min_capacity": 2,
       "appscaling_max_capacity": 6,
       "ec2_scaling_cpu_threshold": 75,
       "ec2_scaling_mem_threshold": 61,
@@ -29,7 +28,8 @@
       "ecs_scaling_mem_threshold": 80,
       "moj_vpn_cidr": "81.134.202.29/32",
       "nlb_prevent_deletion": false,
-      "pagerduty_integration_key_name": "laa_mlra_nonprod_alarms"
+      "pagerduty_integration_key_name": "laa_mlra_nonprod_alarms",
+      "acm_cert_domain_name": "modernisation-platform.service.justice.gov.uk"
     },
     "test": {
       "example_var": "test-data",
@@ -39,7 +39,6 @@
       "ami_image_id": "ami-0631049bf050d0d46",
       "instance_type": "m5.large",
       "key_name": "",
-      "ecr_url": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/mlra-ecr-repo",
       "docker_image_tag": "latest",
       "maat_api_end_point": "http://maat-cd-api.aws.test.legalservices.gov.uk/maatApi/laaStatus",
       "maat_db_url": "terraform-20221116155914397600000001.cfxq8vgqqxpp.eu-west-2.rds.amazonaws.com:1521:MAATDB",
@@ -60,7 +59,8 @@
       "ecs_scaling_mem_threshold": 80,
       "moj_vpn_cidr": "81.134.202.29/32",
       "nlb_prevent_deletion": false,
-      "pagerduty_integration_key_name": "laa_mlra_nonprod_alarms"
+      "pagerduty_integration_key_name": "laa_mlra_nonprod_alarms",
+      "acm_cert_domain_name": "modernisation-platform.service.justice.gov.uk"
     },
     "preproduction": {
       "example_var": "preproduction-data",
@@ -70,7 +70,6 @@
       "ami_image_id": "ami-0631049bf050d0d46",
       "instance_type": "m5.large",
       "key_name": "",
-      "ecr_url": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/mlra-ecr-repo",
       "docker_image_tag": "latest",
       "maat_api_end_point": "http://maat-cd-api.aws.preprod.legalservices.gov.uk/maatApi/laaStatus",
       "maat_db_url": "terraform-20221116155914397600000001.cfxq8vgqqxpp.eu-west-2.rds.amazonaws.com:1521:MAATDB",
@@ -91,7 +90,8 @@
       "ecs_scaling_mem_threshold": 80,
       "moj_vpn_cidr": "81.134.202.29/32",
       "nlb_prevent_deletion": true,
-      "pagerduty_integration_key_name": "laa_mlra_nonprod_alarms"
+      "pagerduty_integration_key_name": "laa_mlra_nonprod_alarms",
+      "acm_cert_domain_name": "modernisation-platform.service.justice.gov.uk"
     },
     "production": {
       "example_var": "production-data",
@@ -101,10 +101,9 @@
       "ami_image_id": "ami-0631049bf050d0d46",
       "instance_type": "m5.large",
       "key_name": "",
-      "ecr_url": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/mlra-ecr-repo",
       "docker_image_tag": "latest",
       "maat_api_end_point": "http://maat-cd-api.aws.prod.legalservices.gov.uk/maatApi/laaStatus",
-      "maat_db_url": "terraform-20221116155914397600000001.cfxq8vgqqxpp.eu-west-2.rds.amazonaws.com:1521:MAATDB",
+      "maat_db_url": "rds.maat.aws.dev.legalservices.gov.uk:1521:MAATDB",
       "maat_db_password": "APP_MAATDB_DBPASSWORD_MLA1",
       "maat_libra_wsdl_url": "http://infox.aws.prod.legalservices.gov.uk/infoX/gateway",
       "ec2_desired_capacity": 2,
@@ -122,7 +121,8 @@
       "ecs_scaling_mem_threshold": 80,
       "moj_vpn_cidr": "81.134.202.29/32",
       "nlb_prevent_deletion": true,
-      "pagerduty_integration_key_name": "laa_mlra_prod_alarms"
+      "pagerduty_integration_key_name": "laa_mlra_prod_alarms",
+      "acm_cert_domain_name": "mlra.service.justice.gov.uk - TBD"
     }
   }
 }

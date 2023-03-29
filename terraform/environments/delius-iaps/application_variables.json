@@ -26,7 +26,7 @@
     },
     "preproduction": {
       "short_environment_name": "preprod",
-      "db_snapshot_identifier": "iaps-test-migration-to-mp-local",
+      "db_snapshot_identifier": "iaps-post-refresh-local",
       "db_auto_minor_version_upgrade": "true",
       "db_allow_major_version_upgrade": "false",
       "db_apply_immediately": "false",
@@ -44,6 +44,7 @@
       "db_performance_insights_enabled": "false",
       "db_skip_final_snapshot": "true",
       "ec2_iaps_instance_type": "t3.medium",
+      "ec2_iaps_instance_ami_name": "delius_iaps_server_patch_2023-03-28T14-45-58.934Z",
       "cloudwatch_agent_log_group_retention_period": "365",
       "iaps_ndelius_interface_url": "interface.stage.probation.service.justice.gov.uk",
       "iaps_im_interface_url": "preprod-im-data.i2ncloud.com",
@@ -57,7 +58,6 @@
     }
   },
   "ec2_iaps_instance_label": "iaps-server",
-  "ec2_iaps_instance_ami_name": "delius_iaps_server_*",
   "ec2_iaps_instance_ami_owner": "core-shared-services-production",
   "ec2_iaps_instance_subnet_name": "private",
 
@@ -88,6 +88,12 @@
     "TCP_443": {
       "from_port": 443,
       "to_port": 443,
+      "protocol": "TCP",
+      "destination_cidr": "0.0.0.0/0"
+    },
+    "TCP_1433": {
+      "from_port": 1433,
+      "to_port": 1433,
       "protocol": "TCP",
       "destination_cidr": "0.0.0.0/0"
     },

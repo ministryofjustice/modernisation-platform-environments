@@ -49,6 +49,22 @@ output "lbs" {
   }
 }
 
+output "route53_resolvers_security_group" {
+  description = "security group used for route53 resolvers"
+  value       = length(aws_security_group.route53_resolver) != 0 ? aws_security_group.route53_resolver[0] : null
+}
+
+output "route53_resolvers" {
+  description = "map of route53 resolvers and rules corresponding to var.route53_resolvers"
+  value = {
+    for resolver_key, resolver_value in var.route53_resolvers : resolver_key => merge(aws_route53_resolver_endpoint.this[resolver_key], {
+      rules = {
+        for rule_key, rule_value in resolver_value.rules : rule_key => aws_route53_resolver_rule.this["${resolver_key}-${rule_key}"]
+      }
+    })
+  }
+}
+
 output "s3_buckets" {
   description = "map of s3_bucket outputs cooresponding to var.s3_buckets. Policies can be found in iam_policies output"
   value       = module.s3_bucket

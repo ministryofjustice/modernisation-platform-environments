@@ -2,14 +2,6 @@
 # Create service and task definitions for delius-testing-db
 ##
 
-# Define re-usable local vars
-locals {
-  service_name         = "testing-db"
-  fully_qualified_name = "${local.application_name}-${local.service_name}"
-  image_tag            = "5.7.4"
-  container_port       = 1521
-}
-
 ##
 # IAM for ECS services and tasks
 ##
@@ -26,7 +18,7 @@ data "aws_iam_policy_document" "delius_db_ecs_task" {
 }
 
 resource "aws_iam_role" "delius_db_ecs_task" {
-  name               = format("%s-task", local.fully_qualified_name)
+  name               = format("%s-task", local.db_fully_qualified_name)
   assume_role_policy = data.aws_iam_policy_document.delius_db_ecs_task.json
   tags               = local.tags
 }
@@ -44,7 +36,7 @@ data "aws_iam_policy_document" "delius_db_ecs_service" {
 }
 
 resource "aws_iam_role" "delius_db_ecs_service" {
-  name               = format("%s-service", local.fully_qualified_name)
+  name               = format("%s-service", local.db_fully_qualified_name)
   assume_role_policy = data.aws_iam_policy_document.delius_db_ecs_service.json
   tags               = local.tags
 }
@@ -67,7 +59,7 @@ data "aws_iam_policy_document" "delius_db_ecs_service_policy" {
 }
 
 resource "aws_iam_role_policy" "delius_db_ecs_service" {
-  name   = format("%s-service", local.fully_qualified_name)
+  name   = format("%s-service", local.db_fully_qualified_name)
   policy = data.aws_iam_policy_document.delius_db_ecs_service_policy.json
   role   = aws_iam_role.delius_db_ecs_service.id
 }
@@ -87,7 +79,7 @@ data "aws_iam_policy_document" "delius_db_ecs_ssm_exec" {
 }
 
 resource "aws_iam_role_policy" "delius_db_ecs_ssm_exec" {
-  name   = format("%s-service-ssm-exec", local.fully_qualified_name)
+  name   = format("%s-service-ssm-exec", local.db_fully_qualified_name)
   policy = data.aws_iam_policy_document.delius_db_ecs_ssm_exec.json
   role   = aws_iam_role.delius_db_ecs_task.id
 }
@@ -105,7 +97,7 @@ data "aws_iam_policy_document" "delius_db_ecs_task_exec" {
 }
 
 resource "aws_iam_role" "delius_db_ecs_exec" {
-  name               = format("%s-task-exec", local.fully_qualified_name)
+  name               = format("%s-task-exec", local.db_fully_qualified_name)
   assume_role_policy = data.aws_iam_policy_document.delius_db_ecs_task_exec.json
   tags               = local.tags
 }
@@ -129,7 +121,7 @@ data "aws_iam_policy_document" "delius_db_ecs_exec" {
 }
 
 resource "aws_iam_role_policy" "delius_db_ecs_exec" {
-  name   = format("%s-task-exec", local.fully_qualified_name)
+  name   = format("%s-task-exec", local.db_fully_qualified_name)
   policy = data.aws_iam_policy_document.delius_db_ecs_exec.json
   role   = aws_iam_role.delius_db_ecs_exec.id
 }
@@ -144,13 +136,13 @@ resource "aws_ecs_task_definition" "delius_db_task_definition" {
       {
         cpu       = 1024
         essential = true
-        image     = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-testing-db-ecr-repo:${local.image_tag}"
+        image     = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-testing-db-ecr-repo:${local.db_image_tag}"
         logConfiguration = {
           logDriver = "awslogs"
           options = {
-            awslogs-group         = local.fully_qualified_name
+            awslogs-group         = local.db_fully_qualified_name
             awslogs-region        = data.aws_region.current.name
-            awslogs-stream-prefix = local.fully_qualified_name
+            awslogs-stream-prefix = local.db_fully_qualified_name
           }
         }
         memory      = 4096
@@ -158,8 +150,8 @@ resource "aws_ecs_task_definition" "delius_db_task_definition" {
         name        = "delius-core-testing-db"
         portMappings = [
           {
-            containerPort = local.container_port
-            hostPort      = local.container_port
+            containerPort = local.db_port
+            hostPort      = local.db_port
             protocol      = "tcp"
           },
         ]
@@ -172,7 +164,7 @@ resource "aws_ecs_task_definition" "delius_db_task_definition" {
     size_in_gib = 40
   }
   execution_role_arn = aws_iam_role.delius_db_ecs_exec.arn
-  family             = local.fully_qualified_name
+  family             = local.db_fully_qualified_name
 
   memory       = "4096"
   network_mode = "awsvpc"
@@ -190,54 +182,69 @@ resource "aws_ecs_task_definition" "delius_db_task_definition" {
 # ##
 # Pre-req - security groups
 resource "aws_security_group" "delius_db_security_group" {
-  name        = "delius weblogic to delius db"
+  name        = "Delius Core DB"
   description = "Rules for the delius testing db ecs service"
   vpc_id      = data.aws_vpc.shared.id
   tags        = local.tags
 }
 
-# Need to rework this
 resource "aws_vpc_security_group_ingress_rule" "delius_db_security_group_ingress_private_subnets" {
-  security_group_id = aws_security_group.delius_db_security_group.id
-  description       = "weblogic to testing db"
-  for_each = toset(
-    [
-      data.aws_subnet.private_subnets_a.cidr_block,
-      data.aws_subnet.private_subnets_b.cidr_block,
-      data.aws_subnet.private_subnets_c.cidr_block
-    ]
-  )
-  from_port   = local.container_port
-  to_port     = local.container_port
-  ip_protocol = "tcp"
-  cidr_ipv4   = each.key
+  security_group_id            = aws_security_group.delius_db_security_group.id
+  description                  = "weblogic to testing db"
+  from_port                    = local.db_port
+  to_port                      = local.db_port
+  ip_protocol                  = "tcp"
+  referenced_security_group_id = aws_security_group.delius_core_frontend_security_group.id
 }
 
 resource "aws_vpc_security_group_egress_rule" "delius_db_security_group_egress_internet" {
   security_group_id = aws_security_group.delius_db_security_group.id
   description       = "outbound from the testing db ecs service"
-  ip_protocol       = "-1"
+  ip_protocol       = "tcp"
+  to_port           = 443
+  from_port         = 443
   cidr_ipv4         = "0.0.0.0/0"
 }
 
 # Pre-req - CloudWatch log group
 # By default, server-side-encryption is used
 resource "aws_cloudwatch_log_group" "delius_db_log_group" {
-  name              = local.fully_qualified_name
+  name              = local.db_fully_qualified_name
   retention_in_days = 7
   tags              = local.tags
 }
 
+# Pre-req - service discovery
+# Removed until we're clear on the implementation of service discovery on mod platform
+
+# resource "aws_service_discovery_service" "delius_db_service" {
+#   name = local.db_service_name
+#   tags = local.tags
+
+#   dns_config {
+#     namespace_id   = aws_service_discovery_private_dns_namespace.ecs_cluster_namespace.id
+#     routing_policy = "MULTIVALUE"
+#     dns_records {
+#       ttl  = 30
+#       type = "A"
+#     }
+#   }
+# }
+
 # Create the ECS service
 resource "aws_ecs_service" "delius-db-service" {
   cluster         = aws_ecs_cluster.aws_ecs_cluster.id
-  name            = local.fully_qualified_name
+  name            = local.db_fully_qualified_name
   task_definition = aws_ecs_task_definition.delius_db_task_definition.arn
   network_configuration {
     assign_public_ip = false
     subnets          = data.aws_subnets.private-public.ids
     security_groups  = [aws_security_group.delius_db_security_group.id]
   }
+  # Removed until we're clear on the implementation of service discovery on mod platform
+  # service_registries {
+  #   registry_arn = aws_service_discovery_service.delius_db_service.arn
+  # }
   desired_count                      = 1
   deployment_minimum_healthy_percent = 100
   deployment_maximum_percent         = 200
@@ -251,11 +258,43 @@ resource "aws_ecs_service" "delius-db-service" {
 
 }
 
+##
+# Commenting out remaining sections - we will return to these with a new module
+##
+# ##
+# # Service and task deployment
+# ##
+# module "container" {
+#   source                   = "git::https://github.com/cloudposse/terraform-aws-ecs-container-definition.git?ref=tags/0.58.2"
+#   container_name           = local.fully_qualified_name
+#   container_image          = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.${data.aws_region.current.name}.amazonaws.com/${local.fully_qualified_name}-ecr-repo:${local.image_tag}"
+#   container_memory         = "4096"
+#   container_cpu            = "1024"
+#   essential                = true
+#   readonly_root_filesystem = false
+#   environment              = []
+#   port_mappings = [{
+#     containerPort = local.container_port
+#     hostPort      = local.container_port
+#     protocol      = "tcp"
+#   }]
+#   log_configuration = {
+#     logDriver = "awslogs"
+#     options = {
+#       "awslogs-group"         = "${local.fully_qualified_name}-ecs"
+#       "awslogs-region"        = data.aws_region.current.name
+#       "awslogs-stream-prefix" = local.fully_qualified_name
+#     }
+#   }
+#   secrets = [
+#   ]
+# }
+
 # module "deploy" {
 #   source                    = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=f1ace6467418d0df61fd8ff6beabd1c028798d39"
 #   container_definition_json = module.container.json_map_encoded_list
 #   ecs_cluster_arn           = aws_ecs_cluster.ecs_cluster.arn
-#   name                      = local.fully_qualified_name
+#   name                      = local.db_fully_qualified_name
 #   vpc_id                    = data.aws_vpc.shared.id
 
 #   launch_type  = "FARGATE"
@@ -274,8 +313,8 @@ resource "aws_ecs_service" "delius-db-service" {
 #   # ecs_load_balancers = [
 #   #   {
 #   #     target_group_arn = data.aws_lb_target_group.service.arn
-#   #     container_name   = local.service_name
-#   #     container_port   = local.container_port
+#   #     container_name   = local.db_service_name
+#   #     db_port   = local.db_port
 #   #   }
 #   # ]
 

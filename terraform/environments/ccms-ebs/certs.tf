@@ -1,12 +1,10 @@
-######################################################################
 #   *.laa-development.modernisation-platform.service.justice.gov.uk
-######################################################################
 resource "aws_acm_certificate" "external" {
   count = local.is-production ? 0 : 1
 
   validation_method = "DNS"
   domain_name       = "*.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-  #subject_alternative_names = ["*.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
+
 
   tags = merge(local.tags,
     { Environment = local.environment }
@@ -17,23 +15,27 @@ resource "aws_acm_certificate" "external" {
   }
 }
 
-resource "aws_acm_certificate_validation" "external" {
-  count = local.is-production ? 0 : 1
-  depends_on = [
-    aws_route53_record.external_validation
-  ]
-  certificate_arn         = aws_acm_certificate.external[0].arn
-  validation_record_fqdns = [for record in aws_route53_record.external_validation : record.fqdn]
+#   *.service.justice.gov.uk
+resource "aws_acm_certificate" "external-service" {
+  count = local.is-production ? 1 : 0
+
+  validation_method = "DNS"
+  domain_name       = "*.${var.networking[0].business-unit}.service.justice.gov.uk"
+
+  tags = merge(local.tags,
+    { Environment = local.environment }
+  )
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
-resource "aws_route53_record" "external_validation" {
 
-  depends_on = [
-    aws_acm_certificate.external
-  ]
+resource "aws_route53_record" "external_validation" {
   provider = aws.core-vpc
   for_each = {
-    for dvo in aws_acm_certificate.external[0].domain_validation_options : dvo.domain_name => {
+    for dvo in local.cert_opts : dvo.domain_name => {
       name   = dvo.resource_record_name
       record = dvo.resource_record_value
       type   = dvo.resource_record_type
@@ -47,52 +49,10 @@ resource "aws_route53_record" "external_validation" {
   zone_id         = data.aws_route53_zone.external.zone_id
 }
 
-/*
-################################################################
-#   *.service.justice.gov.uk
-################################################################
-
-resource "aws_acm_certificate" "external-service" {
-  count             = local.is-production ? 1 : 0
-  domain_name       = "*.service.justice.gov.uk"
-  validation_method = "DNS"
-  #subject_alternative_names = ["${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
-
-  tags = merge(local.tags,
-    { Environment = local.environment }
-  )
-
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
-resource "aws_route53_record" "external-service-validation" {
+resource "aws_acm_certificate_validation" "external" {
   depends_on = [
-    aws_acm_certificate.external-service
+    aws_route53_record.external_validation
   ]
-  provider = aws.core-network-services
-  for_each = {
-    for dvo in aws_acm_certificate.external-service[0].domain_validation_options : dvo.domain_name => {
-      name   = dvo.resource_record_name
-      record = dvo.resource_record_value
-      type   = dvo.resource_record_type
-    }
-  }
-  allow_overwrite = true
-  name            = each.value.name
-  records         = [each.value.record]
-  ttl             = 60
-  type            = each.value.type
-  #zone_id         = data.aws_route53_zone.external.zone_id
-  zone_id         = data.aws_route53_zone.network-services.zone_id
+  certificate_arn         = local.cert_arn
+  validation_record_fqdns = [for record in aws_route53_record.external_validation : record.fqdn]
 }
-
-resource "aws_acm_certificate_validation" "external-servvice-validation" {
-  depends_on = [
-    aws_route53_record.external-service-validation
-  ]
-  certificate_arn         = aws_acm_certificate.external-service[0].arn
-  validation_record_fqdns = [for record in aws_route53_record.external-service-validation : record.fqdn]
-}
-*/
