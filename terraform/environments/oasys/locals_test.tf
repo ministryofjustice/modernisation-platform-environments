@@ -1,7 +1,7 @@
 # oasys-test environment settings
 locals {
   test_config = {
-    
+
     # db_enabled                             = true
     # db_auto_minor_version_upgrade          = true
     # db_allow_major_version_upgrade         = false
