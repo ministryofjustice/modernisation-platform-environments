@@ -30,7 +30,7 @@ module "baseline" {
     aws.core-vpc              = aws.core-vpc
   }
 
-  # security_groups          = local.baseline_security_groups
+  # security_groups       = local.baseline_security_groups
   acm_certificates      = module.baseline_presets.acm_certificates
   cloudwatch_log_groups = module.baseline_presets.cloudwatch_log_groups
   iam_policies          = module.baseline_presets.iam_policies
