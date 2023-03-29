@@ -126,7 +126,16 @@ locals {
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           vpc_security_group_ids = ["private"]
         })
-        user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
+        #        user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
+        user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible, {
+          args = {
+            lifecycle_hook_name  = "ready-hook"
+            branch               = "feature/DSOS-1506/test_ami"
+            ansible_repo         = "modernisation-platform-configuration-management"
+            ansible_repo_basedir = "ansible"
+            ansible_args         = "--tags ec2provision"
+          }
+        })
         autoscaling_group = {
           desired_capacity    = 1
           max_size            = 2
@@ -149,7 +158,16 @@ locals {
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           vpc_security_group_ids = ["private"]
         })
-        user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
+        #        user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
+        user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible, {
+          args = {
+            lifecycle_hook_name  = "ready-hook"
+            branch               = "feature/DSOS-1506/test_ami"
+            ansible_repo         = "modernisation-platform-configuration-management"
+            ansible_repo_basedir = "ansible"
+            ansible_args         = "--tags ec2provision"
+          }
+        })
         autoscaling_group = {
           desired_capacity    = 1
           max_size            = 2
