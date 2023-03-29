@@ -723,7 +723,7 @@ resource "aws_security_group" "PPUD-Mail-Server-2" {
   }
 }
 
-resource "aws_security_group_rule" "PPUD-Mail-Server-Ingress" {
+resource "aws_security_group_rule" "PPUD-Mail-Server-2-Ingress" {
   count             = local.is-production == true ? 1 : 0
   type              = "ingress"
   from_port         = 25
@@ -733,7 +733,7 @@ resource "aws_security_group_rule" "PPUD-Mail-Server-Ingress" {
   security_group_id = aws_security_group.PPUD-Mail-Server-2[0].id
 }
 
-resource "aws_security_group_rule" "PPUD-Mail-Server-Ingress-1" {
+resource "aws_security_group_rule" "PPUD-Mail-Server-2-Ingress-1" {
   count             = local.is-production == true ? 1 : 0
   type              = "ingress"
   from_port         = 587
@@ -743,7 +743,7 @@ resource "aws_security_group_rule" "PPUD-Mail-Server-Ingress-1" {
   security_group_id = aws_security_group.PPUD-Mail-Server-2[0].id
 }
 
-resource "aws_security_group_rule" "PPUD-Mail-Server-Egress" {
+resource "aws_security_group_rule" "PPUD-Mail-Server-2-Egress" {
   count             = local.is-production == true ? 1 : 0
   type              = "egress"
   from_port         = 443
