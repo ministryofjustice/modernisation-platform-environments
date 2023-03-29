@@ -40,16 +40,14 @@ resource "aws_ecs_task_definition" "tipstaff_ecs_task" {
         {
           "name" : "DB_PORT",
           "value" : "5432"
-        }
-      ],
-      "secrets": [
+        },
         {
           "name" : "DB_USER",
-          "valueFrom" : "${data.aws_secretsmanager_secret_version.db_username.arn}"
+          "value" : "${data.aws_secretsmanager_secret_version.db_username.secret_string["LOCAL_DB_USERNAME"]}"
         },
         {
           "name": "DB_PASSWORD",
-          "valueFrom": "${data.aws_secretsmanager_secret_version.db_password.arn}"
+          "valueFrom": "${data.aws_secretsmanager_secret_version.db_username.secret_string["LOCAL_DB_PASSWORD"]}"
         }
       ]
     }
