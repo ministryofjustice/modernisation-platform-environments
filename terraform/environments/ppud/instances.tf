@@ -337,3 +337,74 @@ resource "aws_instance" "s618358rgvw205" {
     is-production = true
   }
 }
+
+resource "aws_instance" "s618358rgsw025p" {
+  count                  = local.is-production == true ? 1 : 0
+  ami                    = "ami-0f1f2959cba8dbefc"
+  instance_type          = "c5.4xlarge"
+  source_dest_check      = false
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.WAM-Data-Access-Server.id]
+  subnet_id              = data.aws_subnet.private_subnets_a.id
+  tags = {
+    Name   = "s618358rgsw025"
+    backup = true
+  }
+}
+
+resource "aws_instance" "s266316rgsl200" {
+  count                  = local.is-production == true ? 1 : 0
+  ami                    = "ami-0f43890c2b4907c29"
+  instance_type          = "m5.large"
+  source_dest_check      = false
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.PPUD-Mail-Server[0].id]
+  subnet_id              = data.aws_subnet.private_subnets_b.id
+  tags = {
+    Name          = "s266316rgsl200"
+    is-production = true
+  }
+}
+
+resource "aws_instance" "s266316rgsl201" {
+  count                  = local.is-production == true ? 1 : 0
+  ami                    = "ami-0f43890c2b4907c29"
+  instance_type          = "m5.large"
+  source_dest_check      = false
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.PPUD-Mail-Server[0].id]
+  subnet_id              = data.aws_subnet.private_subnets_c.id
+  tags = {
+    Name          = "s266316rgsl201"
+    is-production = true
+  }
+}
+
+
+resource "aws_instance" "s265903rgsl400" {
+  count                  = local.is-production == true ? 1 : 0
+  ami                    = "ami-0f43890c2b4907c29"
+  instance_type          = "m5.large"
+  source_dest_check      = false
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.PPUD-Mail-Server-2[0].id]
+  subnet_id              = data.aws_subnet.private_subnets_b.id
+  tags = {
+    Name          = "s265903rgsl400"
+    is-production = true
+  }
+}
+
+resource "aws_instance" "s265903rgsl401" {
+  count                  = local.is-production == true ? 1 : 0
+  ami                    = "ami-0f43890c2b4907c29"
+  instance_type          = "m5.large"
+  source_dest_check      = false
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.Bridge-ServerPPUD-Mail-Server-2[0].id]
+  subnet_id              = data.aws_subnet.private_subnets_c.id
+  tags = {
+    Name          = "s265903rgsl401"
+    is-production = true
+  }
+}
