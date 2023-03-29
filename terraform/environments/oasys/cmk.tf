@@ -6,9 +6,11 @@
 #------------------------------------------------------------------------------
 
 
+data "aws_kms_key" "ebs_hmpps" { key_id = "arn:aws:kms:${local.region}:${local.environment_management.account_ids["core-shared-services-production"]}:alias/ebs-${local.business_unit}" }
+
 resource "aws_kms_grant" "image-builder-shared-cmk-grant" {
   name              = "image-builder-shared-cmk-grant"
-  key_id            = module.environment.kms_keys["ebs"].arn
+  key_id            = data.aws_kms_key.ebs_hmpps.arn
   grantee_principal = "arn:aws:iam::${local.account_id}:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling"
   operations = [
     "Encrypt",
@@ -25,7 +27,7 @@ resource "aws_kms_grant" "image-builder-shared-cmk-grant" {
 resource "aws_kms_grant" "ssm-start-stop-shared-cmk-grant" {
   count             = local.environment == "test" ? 1 : 0
   name              = "image-builder-shared-cmk-grant"
-  key_id            = module.environment.kms_keys["ebs"].arn
+  key_id            = data.aws_kms_key.ebs_hmpps.arn
   grantee_principal = aws_iam_role.ssm_ec2_start_stop.arn
   operations = [
     "Encrypt",
@@ -37,3 +39,4 @@ resource "aws_kms_grant" "ssm-start-stop-shared-cmk-grant" {
     "CreateGrant"
   ]
 }
+

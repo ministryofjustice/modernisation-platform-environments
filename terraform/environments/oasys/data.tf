@@ -76,3 +76,5 @@ data "aws_iam_policy_document" "shared_image_builder_cmk_policy" {
     }
   }
 }
+
+data "aws_kms_key" "ebs_hmpps" { key_id = "arn:aws:kms:${local.region}:${local.environment_management.account_ids["core-shared-services-production"]}:alias/ebs-${local.business_unit}" }
