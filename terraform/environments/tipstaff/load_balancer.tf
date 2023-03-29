@@ -73,30 +73,30 @@ resource "aws_lb_target_group" "tipstaff_dev_target_group" {
 #   port             = 80
 # }
 
-# resource "aws_lb_listener" "tipstaff_dev_lb_1" {
-#   load_balancer_arn = aws_lb.tipstaff_dev_lb.arn
-#   port              = local.application_data.accounts[local.environment].server_port_1
-#   protocol          = local.application_data.accounts[local.environment].lb_listener_protocol_1
-#   ssl_policy        = local.application_data.accounts[local.environment].lb_listener_protocol_1 == "HTTP" ? "" : "ELBSecurityPolicy-2016-08"
+resource "aws_lb_listener" "tipstaff_dev_lb_1" {
+  load_balancer_arn = aws_lb.tipstaff_dev_lb.arn
+  port              = local.application_data.accounts[local.environment].server_port_1
+  protocol          = local.application_data.accounts[local.environment].lb_listener_protocol_1
+  ssl_policy        = local.application_data.accounts[local.environment].lb_listener_protocol_1 == "HTTP" ? "" : "ELBSecurityPolicy-2016-08"
 
-#   default_action {
-#     type             = "forward"
-#     target_group_arn = aws_lb_target_group.tipstaff_dev_target_group.arn
-#   }
-# }
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.tipstaff_dev_target_group.arn
+  }
+}
 
-# resource "aws_lb_listener" "tipstaff_dev_lb_2" {
-#   depends_on = [
-#     aws_acm_certificate.external
-#   ]
-#   certificate_arn   = aws_acm_certificate.external.arn
-#   load_balancer_arn = aws_lb.tipstaff_dev_lb.arn
-#   port              = local.application_data.accounts[local.environment].server_port_2
-#   protocol          = local.application_data.accounts[local.environment].lb_listener_protocol_2
-#   ssl_policy        = local.application_data.accounts[local.environment].lb_listener_protocol_2 == "HTTP" ? "" : "ELBSecurityPolicy-2016-08"
+resource "aws_lb_listener" "tipstaff_dev_lb_2" {
+  depends_on = [
+    aws_acm_certificate.external
+  ]
+  certificate_arn   = aws_acm_certificate.external.arn
+  load_balancer_arn = aws_lb.tipstaff_dev_lb.arn
+  port              = local.application_data.accounts[local.environment].server_port_2
+  protocol          = local.application_data.accounts[local.environment].lb_listener_protocol_2
+  ssl_policy        = local.application_data.accounts[local.environment].lb_listener_protocol_2 == "HTTP" ? "" : "ELBSecurityPolicy-2016-08"
 
-#   default_action {
-#     type             = "forward"
-#     target_group_arn = aws_lb_target_group.tipstaff_dev_target_group.arn
-#   }
-# }
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.tipstaff_dev_target_group.arn
+  }
+}
