@@ -1,6 +1,10 @@
 # Create ECS cluster
 resource "aws_ecs_cluster" "tipstaff_cluster" {
   name = "tipstaff_cluster"
+  setting {
+    name  = "containerInsights"
+    value = "enabled"
+  }
 }
 
 # Create a task definition for the Windows container
