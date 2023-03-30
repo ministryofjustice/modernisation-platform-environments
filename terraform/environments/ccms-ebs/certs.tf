@@ -1,3 +1,4 @@
+## Certs
 #   *.laa-development.modernisation-platform.service.justice.gov.uk
 resource "aws_acm_certificate" "external" {
   count = local.is-production ? 0 : 1
@@ -36,18 +37,11 @@ resource "aws_acm_certificate" "external-service" {
   }
 }
 
+
+## Validation 
 resource "aws_route53_record" "external_validation" {
 
-  # WORKS IN DEV
   provider  = aws.core-network-services
-  zone_id   = data.aws_route53_zone.network-services.zone_id
-
-  
-  # WORKS IN TEST
-  #provider  = aws.core-vpc
-  #zone_id   = data.aws_route53_zone.external.zone_id
-
-
 
   for_each = {
     for dvo in local.cert_opts : dvo.domain_name => {
@@ -61,6 +55,7 @@ resource "aws_route53_record" "external_validation" {
   records         = [each.value.record]
   ttl             = 60
   type            = each.value.type
+  zone_id   = data.aws_route53_zone.network-services.zone_id
 }
 
 resource "aws_acm_certificate_validation" "external" {
@@ -69,7 +64,4 @@ resource "aws_acm_certificate_validation" "external" {
   ]
   certificate_arn         = local.cert_arn
   validation_record_fqdns = [for record in aws_route53_record.external_validation : record.fqdn]
-  #timeouts {
-  #  create = "15m"
-  #}
 }
