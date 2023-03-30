@@ -519,6 +519,19 @@ variable "route53_resolvers" {
   default = {}
 }
 
+variable "route53_zones" {
+  description = "map of route53 zones and associated records, where the map key is the name of the zone and the value object contains the records.  Zone is created if it doesn't already exist"
+  type = map(object({
+    records = optional(list(object({
+      name    = string
+      type    = string
+      ttl     = number
+      records = list(string)
+    })), [])
+  }))
+  default = {}
+}
+
 variable "s3_buckets" {
   description = "map of s3 buckets to create where the map key is the bucket prefix.  See s3_bucket module for more variable details.  Use iam_policies to automatically create a iam policies for the bucket where the key is the name of the policy"
   type = map(object({

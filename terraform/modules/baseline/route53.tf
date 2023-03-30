@@ -1,5 +1,32 @@
 locals {
 
+  # exclude any zones that already exist
+  route53_zones = { for zone_name, zone_value in var.route53_zones :
+    zone_name => zone_value if !contains(keys(var.environment.route53_zones), zone_name)
+  }
+
+  route53_records_list = flatten([
+    for zone_name, zone_value in var.route53_zones : [
+      for record in zone_value.records : [{
+        key = "${record.name}.${zone_name}-${record.type}"
+        value = merge(record, {
+          zone_key = zone_name
+          provider = try(var.environment.route53_zones[zone_name].provider, "self")
+        })
+      }]
+    ]
+  ])
+
+  route53_records_self = { for item in local.route53_records_list :
+    item.key => item.value if item.value.provider == "self"
+  }
+  route53_records_core_vpc = { for item in local.route53_records_list :
+    item.key => item.value if item.value.provider == "core-vpc"
+  }
+  route53_records_core_network_services = { for item in local.route53_records_list :
+    item.key => item.value if item.value.provider == "core-network-services"
+  }
+
   route53_resolver_security_group_rules = {
     dns-tcp = {
       type        = "egress"
@@ -34,6 +61,49 @@ locals {
   route53_resolver_rules = { for item in local.route53_resolver_rules_list :
     item.key => item.value
   }
+}
+
+resource "aws_route53_zone" "this" {
+  for_each = local.route53_zones
+
+  name = each.key
+  tags = merge(local.tags, {
+    Name = each.key
+  })
+}
+
+resource "aws_route53_record" "self" {
+  for_each = local.route53_records_self
+
+  zone_id = aws_route53_zone.this[each.value.zone_key].zone_id
+  name    = each.value.name
+  type    = each.value.type
+  ttl     = each.value.ttl
+  records = each.value.records
+}
+
+resource "aws_route53_record" "core_vpc" {
+  for_each = local.route53_records_core_vpc
+
+  provider = aws.core-vpc
+
+  zone_id = var.environment.route53_zones[each.value.zone_key].zone_id
+  name    = each.value.name
+  type    = each.value.type
+  ttl     = each.value.ttl
+  records = each.value.records
+}
+
+resource "aws_route53_record" "core_network_services" {
+  for_each = local.route53_records_core_network_services
+
+  provider = aws.core-network-services
+
+  zone_id = var.environment.route53_zones[each.value.zone_key].zone_id
+  name    = each.value.name
+  type    = each.value.type
+  ttl     = each.value.ttl
+  records = each.value.records
 }
 
 # Create single security group to cover all resolvers
