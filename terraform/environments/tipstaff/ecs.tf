@@ -18,6 +18,13 @@ resource "aws_ecs_task_definition" "tipstaff_ecs_task" {
       "cpu": 256,
       "memory": 1024,
       "essential": true,
+      "command": [
+        "New-Item -Path C:\\inetpub\\wwwroot\\index.html -Type file -Value '<html> <head> <title>Amazon ECS Sample App</title> <style>body {margin-top: 40px; background-color: #333;} </style> </head><body> <div style=color:white;text-align:center> <h1>Amazon ECS Sample App</h1> <h2>Congratulations!</h2> <p>Your application is now running on a container in Amazon ECS.</p>'; C:\\ServiceMonitor.exe w3svc"
+      ],
+      "entryPoint": [
+        "powershell",
+        "-Command"
+      ],
       "portMappings": [
         {
           "containerPort": 80,
@@ -25,6 +32,9 @@ resource "aws_ecs_task_definition" "tipstaff_ecs_task" {
           "hostPort": 80
         }
       ],
+      "runtimePlatform": {
+        "operatingSystemFamily": "WINDOWS_SERVER_2019_CORE"
+      },
       "LogConfiguration": {
         "LogDriver": "awslogs",
         "Options": {
