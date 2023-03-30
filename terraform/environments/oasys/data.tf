@@ -13,9 +13,7 @@ data "aws_iam_policy_document" "user-s3-access" {
     module.s3-bucket.bucket.arn, ]
     principals {
       type = "AWS"
-      identifiers = sort([ # sort to avoid plan changes
-        "*"
-      ])
+      identifiers = "*"
     }
   }
 }
