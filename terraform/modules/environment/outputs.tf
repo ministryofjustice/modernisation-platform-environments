@@ -98,8 +98,11 @@ output "domains" {
 }
 
 output "route53_zones" {
-  description = "a map of aws_route53_zone data objects where the key is the domain name"
-  value       = merge(data.aws_route53_zone.core_network_services, data.aws_route53_zone.core_vpc)
+  description = "a map of aws_route53_zone data objects where the key is the domain name.  The data objects have extra provider field so you know which account they are in"
+  value = merge(
+    { for key, value in data.aws_route53_zone.core_network_services : key => merge(value, { provider = "core-network-services" }) },
+    { for key, value in data.aws_route53_zone.core_vpc : key => merge(value, { provider = "core-vpc" })
+  })
 }
 
 output "kms_keys" {

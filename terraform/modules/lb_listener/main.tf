@@ -218,7 +218,7 @@ resource "aws_route53_record" "self" {
   for_each = { for key, value in var.route53_records : key => value if value.account == "self" }
 
   zone_id = each.value.zone_id
-  name    = replace(each.value.key, var.replace.route53_record_name_match, var.replace.route53_record_name_replace)
+  name    = replace(each.key, var.replace.route53_record_name_match, var.replace.route53_record_name_replace)
   type    = "A"
 
   alias {

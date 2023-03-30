@@ -1,5 +1,98 @@
 locals {
 
+  # exclude any zones that already exist
+  route53_zones_to_create = { for zone_name, zone_value in var.route53_zones :
+    zone_name => zone_value if !contains(keys(var.environment.route53_zones), zone_name)
+  }
+
+  # combine route53 zones into single map
+  route53_zones = merge(var.environment.route53_zones, {
+    for key, value in aws_route53_zone.this : key => merge(value, { provider = "self" })
+  })
+
+  route53_records_list = flatten([
+    for zone_name, zone_value in var.route53_zones : [
+      for record in zone_value.records : [{
+        key = "${record.name}.${zone_name}-${record.type}"
+        value = merge(record, {
+          zone_key = zone_name
+          provider = local.route53_zones[zone_name].provider
+          alias    = null
+        })
+      }]
+    ]
+  ])
+
+  route53_ns_records_list = flatten([
+    for zone_name, zone_value in var.route53_zones : [
+      for record in zone_value.ns_records : [{
+        key = "${record.name}.${zone_name}-${record.type}"
+        value = merge(record, {
+          zone_key = zone_name
+          provider = local.route53_zones[zone_name].provider
+          type     = "NS"
+          records  = local.route53_zones[zone_name].name_servers
+          alias    = null
+        })
+      }]
+    ]
+  ])
+
+  route53_lb_alias_records_list = flatten([
+    for zone_name, zone_value in var.route53_zones : [
+      for record in zone_value.lb_alias_records : [{
+        key = "${record.name}.${zone_name}-${record.type}"
+        value = merge(record, {
+          zone_key = zone_name
+          provider = local.route53_zones[zone_name].provider
+          ttl      = null
+          records  = null
+          alias = {
+            name                   = module.lb[record.lbs_map_key].load_balancer.dns_name
+            zone_id                = module.lb[record.lbs_map_key].load_balancer.zone_id
+            evaluate_target_health = record.evaluate_target_health
+          }
+        })
+      }]
+    ]
+  ])
+
+  route53_s3_alias_records_list = flatten([
+    for zone_name, zone_value in var.route53_zones : [
+      for record in zone_value.s3_alias_records : [{
+        key = "${record.name}.${zone_name}-${record.type}"
+        value = merge(record, {
+          zone_key = zone_name
+          provider = local.route53_zones[zone_name].provider
+          ttl      = null
+          records  = null
+          alias = {
+            name                   = module.s3_bucket[record.s3_bucket_map_key].bucket.bucket_domain_name
+            zone_id                = module.s3_bucket[record.s3_bucket_map_key].bucket.hosted_zone_id
+            evaluate_target_health = record.evaluate_target_health
+          }
+        })
+      }]
+    ]
+  ])
+
+  route53_records_all = concat(
+    local.route53_records_list,
+    local.route53_ns_records_list,
+    local.route53_lb_alias_records_list,
+    local.route53_s3_alias_records_list
+  )
+
+  route53_records_self = { for item in local.route53_records_all :
+    item.key => item.value if item.value.provider == "self"
+  }
+  route53_records_core_vpc = { for item in local.route53_records_all :
+    item.key => item.value if item.value.provider == "core-vpc"
+  }
+  route53_records_core_network_services = { for item in local.route53_records_all :
+    item.key => item.value if item.value.provider == "core-network-services"
+  }
+
   route53_resolver_security_group_rules = {
     dns-tcp = {
       type        = "egress"
@@ -33,6 +126,76 @@ locals {
 
   route53_resolver_rules = { for item in local.route53_resolver_rules_list :
     item.key => item.value
+  }
+}
+
+resource "aws_route53_zone" "this" {
+  for_each = local.route53_zones_to_create
+
+  name = each.key
+  tags = merge(local.tags, {
+    Name = each.key
+  })
+}
+
+resource "aws_route53_record" "self" {
+  for_each = local.route53_records_self
+
+  zone_id = local.route53_zones[each.value.zone_key].zone_id
+  name    = each.value.name
+  type    = each.value.type
+  ttl     = each.value.ttl
+  records = each.value.records
+
+  dynamic "alias" {
+    for_each = each.value.alias != null ? [each.value.alias] : []
+    content {
+      name                   = alias.value.name
+      zone_id                = alias.value.zone_id
+      evaluate_target_health = alias.value.evaluate_target_health
+    }
+  }
+}
+
+resource "aws_route53_record" "core_vpc" {
+  for_each = local.route53_records_core_vpc
+
+  provider = aws.core-vpc
+
+  zone_id = local.route53_zones[each.value.zone_key].zone_id
+  name    = each.value.name
+  type    = each.value.type
+  ttl     = each.value.ttl
+  records = each.value.records
+
+  dynamic "alias" {
+    for_each = each.value.alias != null ? [each.value.alias] : []
+    content {
+      name                   = alias.value.name
+      zone_id                = alias.value.zone_id
+      evaluate_target_health = alias.value.evaluate_target_health
+    }
+  }
+}
+
+resource "aws_route53_record" "core_network_services" {
+  for_each = local.route53_records_core_network_services
+
+  provider = aws.core-network-services
+
+  zone_id = local.route53_zones[each.value.zone_key].zone_id
+  name    = each.value.name
+  type    = each.value.type
+  ttl     = each.value.ttl
+  records = each.value.records
+
+  dynamic "alias" {
+    for_each = each.value.alias != null ? [each.value.alias] : []
+    content {
+      name                   = alias.value.name
+      zone_id                = alias.value.zone_id
+      evaluate_target_health = alias.value.evaluate_target_health
+    }
   }
 }
 
