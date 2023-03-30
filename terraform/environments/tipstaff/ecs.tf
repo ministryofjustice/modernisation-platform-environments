@@ -37,14 +37,6 @@ resource "aws_ecs_task_definition" "tipstaff_task_definition" {
       runtimePlatform = {
         operatingSystemFamily = "WINDOWS_SERVER_2019_CORE"
       }
-      logConfiguration = {
-        logDriver = "awslogs"
-        options   = {
-          "awslogs-group"         = "tipstaff-container-logs"
-          "awslogs-region"        = "eu-west-2"
-          "awslogs-stream-prefix" = "tipstaff-container"
-        }
-      }
       environment = [
         {
           name  = "DB_HOST"
