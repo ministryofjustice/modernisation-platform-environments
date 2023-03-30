@@ -14,8 +14,7 @@ data "aws_iam_policy_document" "user-s3-access" {
     principals {
       type = "AWS"
       identifiers = sort([ # sort to avoid plan changes
-        "arn:aws:iam::${local.account_id}:root",
-        "arn:aws:iam::${local.environment_management.account_ids["core-shared-services-production"]}:root"
+        "*"
       ])
     }
   }
