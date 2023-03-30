@@ -46,6 +46,23 @@ locals {
         }
       }
     }
+
+    # baseline_rds_instances = {
+    #   test-rds-instance = {
+    #     config = {
+    #       ssm_parameters_prefix     = "rds_instance/"
+    #       iam_resource_names_prefix = "rds-instance"
+    #     }
+    #     instance = {
+    #       identifier        = "rds-instance"
+    #       allocated_storage = 10
+    #       db_name           = "rds-instance"
+    #       engine            = "mysql"
+    #       instance_class    = "db.t3.micro"
+    #       username          = "example"
+    #     }
+    #   }
+    # }
     # baseline_lbs = {
     #   rhel85-test = {
     #     enable_delete_protection = false

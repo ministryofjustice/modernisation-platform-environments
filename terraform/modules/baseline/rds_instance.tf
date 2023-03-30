@@ -23,6 +23,7 @@ module "db_instance" {
 
   ssm_parameters_prefix = each.value.config.ssm_parameters_prefix
   ssm_parameters        = each.value.ssm_parameters
+  route53_record        = each.value.route53_record
 
   instance_profile_policies = [
     for policy in each.value.config.instance_profile_policies :

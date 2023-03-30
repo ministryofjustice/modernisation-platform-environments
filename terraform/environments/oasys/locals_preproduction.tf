@@ -1,6 +1,6 @@
 # oasys-preproduction environment settings
 locals {
-  oasys_preproduction = {
+  preproduction_config = {
     # db_enabled                             = false
     # db_auto_minor_version_upgrade          = true
     # db_allow_major_version_upgrade         = false
@@ -25,6 +25,28 @@ locals {
       patch_approval_delay_days = 3
       patch_day                 = "TUE"
     }
+
+    baseline_ec2_instances = {
+      # Example instance using RedHat image with ansible provisioning
+      t3-redhat-rhel79-1 = {
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name  = "RHEL-7.9_HVM-*"
+          ami_owner = "309956199498"
+        })
+        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+          vpc_security_group_ids = [aws_security_group.data.arn]
+        })
+        user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
+        tags = {
+          description = "For testing with official RedHat RHEL7.9 image"
+          os-type     = "Linux"
+          component   = "test"
+          server-type = "oasys-db"
+          monitored   = false
+        }
+      }
+    }
+
     baseline_bastion_linux = {
       public_key_data = local.public_key_data.keys[local.environment]
       tags            = local.tags
