@@ -10,16 +10,18 @@ resource "aws_ecs_cluster" "tipstaff_cluster" {
 # Create a task definition for the Windows container
 resource "aws_ecs_task_definition" "tipstaff_task_definition" {
   family                = "tipstaff-task"
+  requires_compatibilities = ["FARGATE"]
+  network_mode             = "awsvpc"
   execution_role_arn    = aws_iam_role.app_execution.arn
   task_role_arn         = aws_iam_role.app_task.arn
-  cpu       = 256
-  memory    = 1024
+  cpu       = 1024
+  memory    = 2048
   container_definitions = jsonencode([
     {
       name      = "tipstaff-container"
-      image     = "public.ecr.aws/docker/library/httpd:latest"
-      cpu       = 256
-      memory    = 1024
+      image     = "mcr.microsoft.com/windows/servercore/iis"
+      cpu       = 1024
+      memory    = 2048
       essential = true
       portMappings = [
         {
@@ -27,13 +29,6 @@ resource "aws_ecs_task_definition" "tipstaff_task_definition" {
           protocol      = "tcp"
           hostPort      = 80
         }
-      ]
-      "entryPoint": [
-        "sh",
-        "-c"
-      ],
-      "command": [
-        "/bin/sh -c \"echo '<html> <head> <title>Amazon ECS Sample App</title> <style>body {margin-top: 40px; background-color: #333;} </style> </head><body> <div style=color:white;text-align:center> <h1>Amazon ECS Sample App</h1> <h2>Congratulations!</h2> <p>Your application is now running on a container in Amazon ECS.</p> </div></body></html>' >  /usr/local/apache2/htdocs/index.html && httpd-foreground\""
       ]
       environment = [
         {
@@ -55,8 +50,10 @@ resource "aws_ecs_task_definition" "tipstaff_task_definition" {
       ]
     }
   ])
-  requires_compatibilities = ["FARGATE"]
-  network_mode             = "awsvpc"
+  runtime_platform {
+    operating_system_family = "WINDOWS_SERVER_2019_CORE"
+    cpu_architecture        = "X86_64"
+  }
 }
 
 # Create a Fargate service to run the Windows container task
