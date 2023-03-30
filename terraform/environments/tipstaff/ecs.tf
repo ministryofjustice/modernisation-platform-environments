@@ -17,7 +17,7 @@ resource "aws_ecs_task_definition" "tipstaff_task_definition" {
   container_definitions = jsonencode([
     {
       name      = "tipstaff-container"
-      image     = "mcr.microsoft.com/windows/servercore:ltsc2019"
+      image     = "mcr.microsoft.com/windows/servercore/iis:windowsservercore-ltsc2019"
       cpu       = 256
       memory    = 1024
       essential = true
