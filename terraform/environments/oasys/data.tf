@@ -11,10 +11,6 @@ data "aws_iam_policy_document" "user-s3-access" {
     ]
     resources = ["${module.s3-bucket.bucket.arn}/*",
     module.s3-bucket.bucket.arn, ]
-    principals {
-      type = "AWS"
-      identifiers = "*"
-    }
   }
 }
 
