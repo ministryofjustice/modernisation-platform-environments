@@ -35,7 +35,7 @@ resource "aws_acm_certificate" "external-service" {
     create_before_destroy = true
   }
 }
-
+/*
 resource "aws_route53_record" "external_validation" {
 
   # WORKS IN DEV
@@ -74,4 +74,4 @@ resource "aws_acm_certificate_validation" "external" {
   #  create = "15m"
   #}
 }
-
+*/
