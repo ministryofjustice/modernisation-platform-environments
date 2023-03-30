@@ -21,5 +21,6 @@ module "baseline" {
   # ec2_instances          = lookup(local.baseline_environment_config, "baseline_ec2_instances", {})
   # ec2_autoscaling_groups = lookup(local.baseline_environment_config, "baseline_ec2_autoscaling_groups", {})
   route53_resolvers = module.baseline_presets.route53_resolvers
+  route53_zones     = merge(local.baseline_route53_zones, lookup(local.baseline_environment_config, "baseline_route53_zones", {}))
   lbs               = lookup(local.baseline_environment_config, "baseline_lbs", {})
 }

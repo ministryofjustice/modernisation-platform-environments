@@ -477,9 +477,8 @@ variable "lbs" {
         }))
       })), {})
       route53_records = optional(map(object({
-        account                = string # account to create the record in.  set to core-vpc or self
-        zone_id                = string # id of zone to create the record in
-        evaluate_target_health = bool
+        zone_name              = string
+        evaluate_target_health = optional(bool, false)
       })), {})
       replace = optional(object({
         target_group_name_match       = optional(string, "$(name)")
@@ -515,6 +514,36 @@ variable "route53_resolvers" {
       rule_type   = optional(string, "FORWARD")
       target_ips  = list(string)
     })), {})
+  }))
+  default = {}
+}
+
+variable "route53_zones" {
+  description = "map of route53 zones and associated records, where the map key is the name of the zone and the value object contains the records.  Zone is created if it doesn't already exist"
+  type = map(object({
+    records = optional(list(object({
+      name    = string
+      type    = string
+      ttl     = number
+      records = list(string)
+    })), [])
+    ns_records = optional(list(object({
+      name      = string
+      ttl       = number
+      zone_name = string
+    })), [])
+    lb_alias_records = optional(list(object({
+      name                   = string
+      type                   = string
+      lbs_map_key            = string
+      evaluate_target_health = optional(bool, false)
+    })), [])
+    s3_alias_records = optional(list(object({
+      name                   = string
+      type                   = string
+      s3_bucket_map_key      = string
+      evaluate_target_health = optional(bool, false)
+    })), [])
   }))
   default = {}
 }
