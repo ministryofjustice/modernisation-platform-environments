@@ -68,7 +68,7 @@ resource "aws_ecs_service" "tipstaff_ecs_service" {
     type = "ECS"
   }
   cluster                           = aws_ecs_cluster.tipstaff_cluster.id
-  task_definition                   = aws_ecs_task_definition.tipstaff_ecs_task.arn
+  task_definition                   = aws_ecs_task_definition.tipstaff_task_definition.arn
   launch_type                       = "FARGATE"
   enable_execute_command            = true
   desired_count                     = 1
