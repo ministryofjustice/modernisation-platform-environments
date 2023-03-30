@@ -62,12 +62,12 @@ tasks:
 
 - task: executeScript
   inputs:
-  - frequency: once
+  - frequency: always
     type: powershell
     runAs: admin
     content: |-
       # Move previously templated config file to correct location
-      Move-Item -Path 'C:\tools\nginx.conf' -Destination (Resolve-Path 'C:\tools\nginx-*\conf\nginx.conf').Path -Force
+      Copy-Item -Path 'C:\tools\nginx.conf' -Destination (Resolve-Path 'C:\tools\nginx-*\conf\nginx.conf').Path -Force
 %{ if environment == "development" ~}
       Restart-Service -Name nginx
 %{ endif ~}
