@@ -53,16 +53,6 @@ tasks:
     type: powershell
     runAs: admin
     content: |-
-      $connectionsXMLPath = "C:\Users\Public\Desktop\connections.xml"
-      (Get-Content $connectionsXMLPath).replace('[DELIUS_IAPS_RDS_DB_ADDRESS]', '${delius_iaps_rds_db_address}') | Set-Content $connectionsXMLPath
-      (Get-Content $connectionsXMLPath).replace('[IM_DB_URL]', '${im_db_url}') | Set-Content $connectionsXMLPath
-
-- task: executeScript
-  inputs:
-  - frequency: always
-    type: powershell
-    runAs: admin
-    content: |-
       # Move previously templated config file to correct location
       Move-Item -Path 'C:\tools\nginx.conf' -Destination (Resolve-Path 'C:\tools\nginx-*\conf\nginx.conf').Path -Force
 %{if environment == "development"}
@@ -73,6 +63,12 @@ tasks:
       Stop-Service -Name nginx
       Set-Service -Name nginx -StartupType Disabled
 %{endif}
+  - frequency: once
+    type: powershell
+    runAs: admin
+    content: |-
+      $tnsNamesOraPath = "C:\app\client\Administrator\product\12.1.0\client_1\network\admin\tnsnames.ora"
+      (Get-Content $tnsNamesOraPath).replace('iaps-db', '${delius_iaps_rds_db_address}') | Set-Content $tnsNamesOraPath
   - frequency: once
     type: powershell
     runAs: localSystem

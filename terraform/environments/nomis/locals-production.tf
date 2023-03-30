@@ -99,6 +99,23 @@ locals {
           flash = { total_size = 1000 }
         }
         sns_topic = aws_sns_topic.nomis_alarms.arn
+
+        cloudwatch_metric_alarms = {
+          fixngo-connection = {
+            comparison_operator = "GreaterThanOrEqualToThreshold"
+            evaluation_periods  = "3"
+            namespace           = "CWAgent"
+            metric_name         = "collectd_exec_value"
+            period              = "60"
+            statistic           = "Average"
+            threshold           = "1"
+            alarm_description   = "this EC2 instance no longer has a connection to the Oracle Enterprise Manager in FixNGo of the connection-target machine"
+            alarm_actions       = [aws_sns_topic.nomis_alarms.arn]
+            dimensions = {
+              instance = "fixngo_connected" # required dimension value for this metric
+            }
+          }
+        }
       }
 
       prod-nomis-db-3 = {

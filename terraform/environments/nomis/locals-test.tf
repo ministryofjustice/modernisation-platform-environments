@@ -157,6 +157,7 @@ locals {
 
   # baseline config
   test_config = {
+
     baseline_lbs = {
       # AWS doesn't let us call it internal
       private = {
