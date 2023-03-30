@@ -10,7 +10,6 @@ tasks:
       # Install certificate to Trust store
       Import-Certificate -FilePath C:\tools\nginx-1.23.4\conf\server.crt -CertStoreLocation Cert:\LocalMachine\Root
 
-
 - task: writeFile
   inputs:
   - frequency: always
@@ -68,14 +67,14 @@ tasks:
     content: |-
       # Move previously templated config file to correct location
       Move-Item -Path 'C:\tools\nginx.conf' -Destination (Resolve-Path 'C:\tools\nginx-*\conf\nginx.conf').Path -Force
-%{if environment == "development"}
+%{ if environment == "development" ~}
       Restart-Service -Name nginx
-%{endif}
-%{if environment != "development"}
+%{ endif ~}
+%{ if environment != "development" ~}
       # TODO: remove or edit if statement once migration gets a green light
       Stop-Service -Name nginx
       Set-Service -Name nginx -StartupType Disabled
-%{endif}
+%{ endif ~}
   - frequency: once
     type: powershell
     runAs: admin
@@ -138,7 +137,7 @@ tasks:
       $configXML.DLLDEF.SOAPSERVER.ODBC = "DSN=$${SOAPServerODBCdsn};Server=$${SOAPServerODBCserver};Database=$${SOAPServerODBCdatabase};uid=$${SOAPServerODBCuid};pwd=$${SOAPServerODBCpwd}"
       $configXML.save($IMConfigFile)
 
-%{if environment == "development"}
+%{ if environment == "development" ~}
       $service = Restart-Service -Name IMIapsInterfaceWinService -Force -PassThru
       if ($service.Status -match "Running") {
           Write-Host('Restart of IMIapsInterfaceWinService successful')
@@ -146,12 +145,12 @@ tasks:
           Write-Host('Error - Failed to restart IMIapsInterfaceWinService - see logs')
           Exit 1
       }
-%{endif}
-%{if environment != "development"}
+%{ endif ~}
+%{ if environment != "development" ~}
       # TODO: remove or edit if statement once migration gets a green light
       Stop-Service -Name IMIapsInterfaceWinService -Force
       Set-Service -Name IMIapsInterfaceWinService -StartupType Disabled
-%{endif}
+%{ endif ~}
 
   - frequency: once
     type: powershell
@@ -188,7 +187,7 @@ tasks:
       $configXML.DLLDEF.EMAIL.FROMADDRESS = (Get-SSMParameter -Name "/NDeliusInterface/Email/fromaddress" -WithDecryption $true).Value
       $configXML.save($NDeliusConfigFile)
 
-%{if environment == "development"}
+%{ if environment == "development" ~}
       $service = Restart-Service -Name NDeliusInterfaceIapsWinService -Force -PassThru
       if ($service.Status -match "Running") {
           Write-Host('Restart of NDeliusInterfaceIapsWinService successful')
@@ -196,9 +195,9 @@ tasks:
           Write-Host('Error - Failed to restart NDeliusInterfaceIapsWinService - see logs')
           Exit 1
       }
-%{endif}
-%{if environment != "development"}
+%{ endif ~}
+%{ if environment != "development" ~}
       # TODO: remove or edit if statement once migration gets a green light
       Stop-Service -Name NDeliusInterfaceIapsWinService -Force
       Set-Service -Name NDeliusInterfaceIapsWinService -StartupType Disabled
-%{endif}
+%{ endif ~}
