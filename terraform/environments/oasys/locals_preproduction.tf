@@ -33,9 +33,6 @@ locals {
           ami_name  = "RHEL-7.9_HVM-*"
           ami_owner = "309956199498"
         })
-        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-          vpc_security_group_ids = [aws_security_group.data.arn]
-        })
         user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
         tags = {
           description = "For testing with official RedHat RHEL7.9 image"
