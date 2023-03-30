@@ -10,7 +10,8 @@ tasks:
       Invoke-Expression 'openssl req -new -newkey rsa:4096 -days 36500 -nodes -x509 -subj "/C=GB/ST=London/L=London/O=HMPPS/OU=HMPPS Digital and Technology/CN=localhost" -keyout "$${nginxConfPath}\server.key" -out "$${nginxConfPath}\server.crt"' 2>&1
       Import-Certificate -FilePath $${nginxConfPath}\server.crt -CertStoreLocation Cert:\LocalMachine\Root
 
-      $nginxConfContents = @"worker_processes auto;
+      $nginxConfContents = @"
+      worker_processes auto;
 
       error_log  logs/error.log;
 
