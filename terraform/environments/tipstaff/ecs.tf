@@ -17,7 +17,7 @@ resource "aws_ecs_task_definition" "tipstaff_task_definition" {
   container_definitions = jsonencode([
     {
       name      = "tipstaff-container"
-      image     = "mcr.microsoft.com/windows/servercore/iis:windowsservercore-ltsc2019"
+      image     = "public.ecr.aws/docker/library/httpd:latest"
       cpu       = 256
       memory    = 1024
       essential = true
@@ -28,15 +28,13 @@ resource "aws_ecs_task_definition" "tipstaff_task_definition" {
           hostPort      = 80
         }
       ]
-      command = [
-        "cmd.exe", "/C", "echo 'Hello World' > C:\\inetpub\\wwwroot\\index.html"
+      "entryPoint": [
+        "sh",
+        "-c"
+      ],
+      "command": [
+        "/bin/sh -c \"echo '<html> <head> <title>Amazon ECS Sample App</title> <style>body {margin-top: 40px; background-color: #333;} </style> </head><body> <div style=color:white;text-align:center> <h1>Amazon ECS Sample App</h1> <h2>Congratulations!</h2> <p>Your application is now running on a container in Amazon ECS.</p> </div></body></html>' >  /usr/local/apache2/htdocs/index.html && httpd-foreground\""
       ]
-      entryPoint = [
-        "powershell.exe", "-Command"
-      ]
-      runtimePlatform = {
-        operatingSystemFamily = "WINDOWS_SERVER_2019_CORE"
-      }
       environment = [
         {
           name  = "DB_HOST"
