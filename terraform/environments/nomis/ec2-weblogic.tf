@@ -50,10 +50,10 @@ locals {
     route53 = {
       route53_records = {
         "$(name).nomis" = {
-          zone_name              = module.environment.domains.public.business_unit_environment
+          zone_name = module.environment.domains.public.business_unit_environment
         }
         "$(name)" = {
-          zone_name              = "${local.environment}.nomis.az.justice.gov.uk"
+          zone_name = "${local.environment}.nomis.az.justice.gov.uk"
         }
       }
     }
@@ -108,7 +108,10 @@ locals {
           }]
           conditions = [{
             host_header = {
-              values = ["$(name).nomis.${module.environment.vpc_name}.modernisation-platform.service.justice.gov.uk"]
+              values = [
+                "$(name).nomis.${module.environment.domains.public.business_unit_environment}",
+                "$(name).${local.environment}.nomis.az.justice.gov.uk"
+              ]
             }
           }]
         }
