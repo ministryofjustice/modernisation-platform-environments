@@ -21,7 +21,8 @@ resource "aws_ecs_task_definition" "tipstaff_ecs_task" {
       "portMappings": [
         {
           "containerPort": 80,
-          "protocol": "tcp"
+          "protocol": "tcp",
+          "hostPort": 80
         }
       ],
       "LogConfiguration": {
