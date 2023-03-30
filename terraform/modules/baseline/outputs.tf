@@ -65,6 +65,11 @@ output "route53_resolvers" {
   }
 }
 
+output "route53_zones" {
+  description = "map of any created route53 zones"
+  value       = aws_route53_zone.this
+}
+
 output "s3_buckets" {
   description = "map of s3_bucket outputs cooresponding to var.s3_buckets. Policies can be found in iam_policies output"
   value       = module.s3_bucket

@@ -60,9 +60,16 @@ module "lb_listener" {
   certificate_arns       = [for item in each.value.certificate_names_or_arns : lookup(module.acm_certificate, item, null) != null ? module.acm_certificate[item].arn : item]
   default_action         = each.value.default_action
   rules                  = each.value.rules
-  route53_records        = each.value.route53_records
-  replace                = each.value.replace
-  tags                   = merge(local.tags, each.value.tags)
+
+  route53_records = {
+    for key, value in each.value.route53_records : key => merge(value, {
+      account = local.route53_zones[value.zone_name].provider
+      zone_id = local.route53_zones[value.zone_name].zone_id
+    })
+  }
+
+  replace = each.value.replace
+  tags    = merge(local.tags, each.value.tags)
 
   depends_on = [
     module.acm_certificate,       # ensure certs are created first

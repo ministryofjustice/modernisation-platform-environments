@@ -477,9 +477,8 @@ variable "lbs" {
         }))
       })), {})
       route53_records = optional(map(object({
-        account                = string # account to create the record in.  set to core-vpc or self
-        zone_id                = string # id of zone to create the record in
-        evaluate_target_health = bool
+        zone_name              = string
+        evaluate_target_health = optional(bool, false)
       })), {})
       replace = optional(object({
         target_group_name_match       = optional(string, "$(name)")
