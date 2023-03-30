@@ -14,14 +14,14 @@ resource "aws_ecs_task_definition" "tipstaff_task_definition" {
   network_mode             = "awsvpc"
   execution_role_arn    = aws_iam_role.app_execution.arn
   task_role_arn         = aws_iam_role.app_task.arn
-  cpu       = 256
-  memory    = 1024
+  cpu       = 1024
+  memory    = 2048
   container_definitions = jsonencode([
     {
       name      = "tipstaff-container"
       image     = "mcr.microsoft.com/windows/servercore/iis"
-      cpu       = 256
-      memory    = 1024
+      cpu       = 1024
+      memory    = 2048
       essential = true
       portMappings = [
         {
