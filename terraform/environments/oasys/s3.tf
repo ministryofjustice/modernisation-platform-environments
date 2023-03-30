@@ -10,11 +10,12 @@ module "s3-bucket" { # need to backup files , then baseline this, then upload fi
 
   bucket_policy = [data.aws_iam_policy_document.user-s3-access.json]
 
+  versioning_enabled = false
 
   lifecycle_rule = [
     {
       id      = "main"
-      enabled = "Enabled"
+      enabled = "Disabled"
       prefix  = ""
 
       tags = {
@@ -32,16 +33,6 @@ module "s3-bucket" { # need to backup files , then baseline this, then upload fi
       expiration = {
         days = 730
       }
-
-      noncurrent_version_transition = [
-        {
-          days          = 90
-          storage_class = "STANDARD_IA"
-          }, {
-          days          = 365
-          storage_class = "GLACIER"
-        }
-      ]
 
       noncurrent_version_expiration = {
         days = 730
