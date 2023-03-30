@@ -50,9 +50,10 @@ locals {
     route53 = {
       route53_records = {
         "$(name).nomis" = {
-          account                = "core-vpc"
-          zone_id                = module.environment.route53_zones[module.environment.domains.public.business_unit_environment].zone_id
-          evaluate_target_health = true
+          zone_name              = module.environment.domains.public.business_unit_environment
+        }
+        "$(name)" = {
+          zone_name              = "${local.environment}.nomis.az.justice.gov.uk"
         }
       }
     }

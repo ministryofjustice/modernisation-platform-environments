@@ -158,14 +158,6 @@ locals {
   # baseline config
   test_config = {
 
-    baseline_route53_zones = {
-      "${local.environment}.nomis.az.justice.gov.uk" = {
-        lb_alias_records = [
-          { name = "t1-nomis-web", type = "A", lbs_map_key = "private" }
-        ]
-      }
-    }
-
     baseline_lbs = {
       # AWS doesn't let us call it internal
       private = {
