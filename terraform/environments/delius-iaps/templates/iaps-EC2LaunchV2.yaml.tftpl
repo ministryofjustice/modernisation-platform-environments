@@ -6,13 +6,10 @@ tasks:
     type: powershell
     runAs: admin
     content: |-
-      openssl req `
-        -new -newkey rsa:4096 -days 36500 -nodes -x509 `
-        -subj "/C=GB/ST=London/L=London/O=HMPPS/OU=HMPPS Digital and Technology/CN=localhost" `
-        -keyout C:\ssl\server.key -out C:\ssl\server.crt
+      openssl req -new -newkey rsa:4096 -days 36500 -nodes -x509 -subj "/C=GB/ST=London/L=London/O=HMPPS/OU=HMPPS Digital and Technology/CN=localhost" -keyout C:\ssl\server.key -out C:\ssl\server.crt
 
-        # Install certificate to Trust store
-        Import-Certificate -FilePath C:\ssl\server.crt -CertStoreLocation Cert:\LocalMachine\Root
+      # Install certificate to Trust store
+      Import-Certificate -FilePath C:\ssl\server.crt -CertStoreLocation Cert:\LocalMachine\Root
 
 
 - task: writeFile
