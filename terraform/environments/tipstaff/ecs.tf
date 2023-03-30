@@ -4,67 +4,59 @@ resource "aws_ecs_cluster" "tipstaff_cluster" {
 }
 
 # Create a task definition for the Windows container
-resource "aws_ecs_task_definition" "tipstaff_ecs_task" {
-  family                = "tipstaff_ecs_task"
-  execution_role_arn    = aws_iam_role.app_execution.arn
-  task_role_arn         = aws_iam_role.app_task.arn
-  cpu                   = 256
-  memory                = 1024
-  container_definitions = <<TASK_DEFINITION
-  [
+resource "aws_ecs_task_definition" "tipstaff_task_definition" {
+  family                = "tipstaff-task"
+  container_definitions = jsonencode([
     {
-      "name": "${var.networking[0].application}",
-      "image": "mcr.microsoft.com/windows:ltsc2019",
-      "cpu": 256,
-      "memory": 1024,
-      "essential": true,
-      "command": [
-        "New-Item -Path C:\\inetpub\\wwwroot\\index.html -Type file -Value '<html> <head> <title>Amazon ECS Sample App</title> <style>body {margin-top: 40px; background-color: #333;} </style> </head><body> <div style=color:white;text-align:center> <h1>Amazon ECS Sample App</h1> <h2>Congratulations!</h2> <p>Your application is now running on a container in Amazon ECS.</p>'; C:\\ServiceMonitor.exe w3svc"
-      ],
-      "entryPoint": [
-        "powershell",
-        "-Command"
-      ],
-      "portMappings": [
+      name      = "tipstaff-container"
+      image     = "mcr.microsoft.com/windows/servercore:ltsc2019"
+      cpu       = 256
+      memory    = 1024
+      essential = true
+      portMappings = [
         {
-          "containerPort": 80,
-          "protocol": "tcp",
-          "hostPort": 80
+          containerPort = 80
+          protocol      = "tcp"
+          hostPort      = 80
         }
-      ],
-      "runtimePlatform": {
-        "operatingSystemFamily": "WINDOWS_SERVER_2019_CORE"
-      },
-      "LogConfiguration": {
-        "LogDriver": "awslogs",
-        "Options": {
-          "awslogs-group": "${var.networking[0].application}",
-          "awslogs-region": "eu-west-2",
-          "awslogs-stream-prefix": "${var.networking[0].application}"
+      ]
+      command = [
+        "cmd.exe", "/C", "echo 'Hello World' > C:\\inetpub\\wwwroot\\index.html"
+      ]
+      entryPoint = [
+        "powershell.exe", "-Command"
+      ]
+      runtimePlatform = {
+        operatingSystemFamily = "WINDOWS_SERVER_2019_CORE"
+      }
+      logConfiguration = {
+        logDriver = "awslogs"
+        options   = {
+          "awslogs-group"         = "tipstaff-container-logs"
+          "awslogs-region"        = "eu-west-2"
+          "awslogs-stream-prefix" = "tipstaff-container"
         }
-      },
-      "environment" : [
+      }
+      environment = [
         {
-          "name" : "DB_HOST",
-          "value" : "${aws_db_instance.tipstaffdbdev.address}"
+          name  = "DB_HOST"
+          value = "${aws_db_instance.tipstaffdbdev.address}"
         },
         {
-          "name" : "DB_PORT",
-          "value" : "5432"
+          name  = "DB_PORT"
+          value = "5432"
         },
         {
-          "name" : "DB_USER",
-          "value" : "${jsondecode(data.aws_secretsmanager_secret_version.db_username.secret_string)["LOCAL_DB_USERNAME"]}"
+          name  = "DB_USER"
+          value = "${jsondecode(data.aws_secretsmanager_secret_version.db_username.secret_string)["LOCAL_DB_USERNAME"]}"
         },
         {
-          "name": "DB_PASSWORD",
-          "value": "${jsondecode(data.aws_secretsmanager_secret_version.db_password.secret_string)["LOCAL_DB_PASSWORD"]}"
+          name  = "DB_PASSWORD"
+          value = "${jsondecode(data.aws_secretsmanager_secret_version.db_password.secret_string)["LOCAL_DB_PASSWORD"]}"
         }
       ]
     }
-  ]
-  TASK_DEFINITION
-
+  ])
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
 }
