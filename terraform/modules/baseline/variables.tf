@@ -528,6 +528,23 @@ variable "route53_zones" {
       ttl     = number
       records = list(string)
     })), [])
+    ns_records = optional(list(object({
+      name      = string
+      ttl       = number
+      zone_name = string
+    })), [])
+    lb_alias_records = optional(list(object({
+      name                   = string
+      type                   = string
+      lbs_map_key            = string
+      evaluate_target_health = optional(bool, false)
+    })), [])
+    s3_alias_records = optional(list(object({
+      name                   = string
+      type                   = string
+      s3_bucket_map_key      = string
+      evaluate_target_health = optional(bool, false)
+    })), [])
   }))
   default = {}
 }
