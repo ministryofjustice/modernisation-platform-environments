@@ -14,7 +14,7 @@ resource "aws_ecs_task_definition" "tipstaff_ecs_task" {
   [
     {
       "name": "${var.networking[0].application}",
-      "image": "mcr.microsoft.com/windows/servercore/iis:windowsservercore-ltsc2019",
+      "image": "mcr.microsoft.com/windows:ltsc2019",
       "cpu": 256,
       "memory": 1024,
       "essential": true,
