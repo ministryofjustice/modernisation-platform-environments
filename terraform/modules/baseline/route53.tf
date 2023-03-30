@@ -167,6 +167,15 @@ resource "aws_route53_record" "core_vpc" {
   type    = each.value.type
   ttl     = each.value.ttl
   records = each.value.records
+
+  dynamic "alias" {
+    for_each = each.value.alias != null ? [each.value.alias] : []
+    content {
+      name                   = alias.value.name
+      zone_id                = alias.value.zone_id
+      evaluate_target_health = alias.value.evaluate_target_health
+    }
+  }
 }
 
 resource "aws_route53_record" "core_network_services" {
@@ -179,6 +188,15 @@ resource "aws_route53_record" "core_network_services" {
   type    = each.value.type
   ttl     = each.value.ttl
   records = each.value.records
+
+  dynamic "alias" {
+    for_each = each.value.alias != null ? [each.value.alias] : []
+    content {
+      name                   = alias.value.name
+      zone_id                = alias.value.zone_id
+      evaluate_target_health = alias.value.evaluate_target_health
+    }
+  }
 }
 
 # Create single security group to cover all resolvers
