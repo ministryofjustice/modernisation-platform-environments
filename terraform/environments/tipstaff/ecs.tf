@@ -142,9 +142,18 @@ resource "aws_iam_role_policy" "app_execution" {
       },
       {
             "Action": [
+              "ecr:GetAuthorizationToken",
               "ecr:BatchCheckLayerAvailability",
               "ecr:GetDownloadUrlForLayer",
-              "ecr:BatchGetImage"
+              "ecr:GetRepositoryPolicy",
+              "ecr:DescribeRepositories",
+              "ecr:ListImages",
+              "ecr:DescribeImages",
+              "ecr:BatchGetImage",
+              "ecr:GetLifecyclePolicy",
+              "ecr:GetLifecyclePolicyPreview",
+              "ecr:ListTagsForResource",
+              "ecr:DescribeImageScanFindings"
             ],
               "Resource": "*",
             "Effect": "Allow"
