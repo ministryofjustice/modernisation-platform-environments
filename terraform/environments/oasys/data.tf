@@ -1,18 +1,22 @@
 
-data "aws_iam_policy_document" "user-s3-access" {
-  statement {
-    sid = "user-s3-access"
-    actions = [
-      # "s3:GetObject",
-      # "s3:PutObject",
-      # "s3:PutObjectAcl",
-      # "s3:ListBucket"
-      "s3:*"
-    ]
-    resources = ["${module.s3-bucket.bucket.arn}/*",
-    module.s3-bucket.bucket.arn, ]
-  }
-}
+# data "aws_iam_policy_document" "user-s3-access" {
+#   statement {
+#     sid = "user-s3-access"
+#     actions = [
+#       # "s3:GetObject",
+#       # "s3:PutObject",
+#       # "s3:PutObjectAcl",
+#       # "s3:ListBucket"
+#       "s3:*"
+#     ]
+#     resources = ["${module.s3-bucket.bucket.arn}/*",
+#     module.s3-bucket.bucket.arn, ]
+#     principals {
+#       type = "AWS"
+#       identifiers = "*"
+#     }
+#   }
+# }
 
 
 data "aws_iam_policy_document" "shared_image_builder_cmk_policy" {
