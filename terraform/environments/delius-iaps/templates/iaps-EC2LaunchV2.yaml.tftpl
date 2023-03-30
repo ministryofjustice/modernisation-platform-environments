@@ -6,11 +6,10 @@ tasks:
     type: powershell
     runAs: admin
     content: |-
-      mkdir C:\ssl
-      openssl req -new -newkey rsa:4096 -days 36500 -nodes -x509 -subj "/C=GB/ST=London/L=London/O=HMPPS/OU=HMPPS Digital and Technology/CN=localhost" -keyout C:\ssl\server.key -out C:\ssl\server.crt
+      openssl req -new -newkey rsa:4096 -days 36500 -nodes -x509 -subj "/C=GB/ST=London/L=London/O=HMPPS/OU=HMPPS Digital and Technology/CN=localhost" -keyout C:\tools\nginx-1.23.4\conf\server.key -out C:\tools\nginx-1.23.4\conf\server.crt
 
       # Install certificate to Trust store
-      Import-Certificate -FilePath C:\ssl\server.crt -CertStoreLocation Cert:\LocalMachine\Root
+      Import-Certificate -FilePath C:\tools\nginx-1.23.4\conf\server.crt -CertStoreLocation Cert:\LocalMachine\Root
 
 
 - task: writeFile
@@ -36,8 +35,8 @@ tasks:
         server {
           listen 443 ssl;
           server_name localhost;
-          ssl_certificate     C:\ssl\server.crt;
-          ssl_certificate_key C:\ssl\server.key;
+          ssl_certificate     server.crt;
+          ssl_certificate_key server.key;
 
           allow 127.0.0.1;
           deny  all;
