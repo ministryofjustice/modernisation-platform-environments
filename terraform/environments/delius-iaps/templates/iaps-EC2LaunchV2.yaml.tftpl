@@ -8,8 +8,7 @@ tasks:
     content: |-
       $nginxConfPath = (Resolve-Path 'C:\tools\nginx-*\conf').Path
       Invoke-Expression 'openssl req -new -newkey rsa:4096 -days 36500 -nodes -x509 -subj "/C=GB/ST=London/L=London/O=HMPPS/OU=HMPPS Digital and Technology/CN=localhost" -keyout "$${nginxConfPath}\server.key" -out "$${nginxConfPath}\server.crt"' 2>&1
-      # Install certificate to Trust store
-      Import-Certificate -FilePath C:\tools\nginx-1.23.4\conf\server.crt -CertStoreLocation Cert:\LocalMachine\Root
+      Import-Certificate -FilePath $${nginxConfPath}\server.crt -CertStoreLocation Cert:\LocalMachine\Root
 - task: writeFile
   inputs:
   - frequency: always
@@ -64,7 +63,6 @@ tasks:
     type: powershell
     runAs: admin
     content: |-
-      # Move previously templated config file to correct location
       Copy-Item -Path 'C:\tools\nginx.conf' -Destination (Resolve-Path 'C:\tools\nginx-*\conf\nginx.conf').Path -Force
       Stop-Service -Name nginx
       Set-Service -Name nginx -StartupType Disabled
