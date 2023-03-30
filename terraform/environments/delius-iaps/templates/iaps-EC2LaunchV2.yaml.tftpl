@@ -9,11 +9,8 @@ tasks:
       $nginxConfPath = (Resolve-Path 'C:\tools\nginx-*\conf').Path
       Invoke-Expression 'openssl req -new -newkey rsa:4096 -days 36500 -nodes -x509 -subj "/C=GB/ST=London/L=London/O=HMPPS/OU=HMPPS Digital and Technology/CN=localhost" -keyout "$${nginxConfPath}\server.key" -out "$${nginxConfPath}\server.crt"' 2>&1
       Import-Certificate -FilePath $${nginxConfPath}\server.crt -CertStoreLocation Cert:\LocalMachine\Root
-- task: writeFile
-  inputs:
-  - frequency: always
-    destination: C:\tools\nginx.conf
-    content: |-
+
+      @"
       worker_processes auto;
 
       error_log  logs/error.log;
@@ -57,13 +54,6 @@ tasks:
           }
         }
       }
-- task: executeScript
-  inputs:
-  - frequency: always
-    type: powershell
-    runAs: admin
-    content: |-
-      Copy-Item -Path 'C:\tools\nginx.conf' -Destination (Resolve-Path 'C:\tools\nginx-*\conf\nginx.conf').Path -Force
+      "@ | Out-File $$nginxConfPath\nginx.conf
       Stop-Service -Name nginx
       Set-Service -Name nginx -StartupType Disabled
-
