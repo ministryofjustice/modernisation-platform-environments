@@ -18,7 +18,6 @@ resource "aws_lb" "ebsapps_lb" {
   )
 }
 
-/*
 resource "aws_lb_listener" "ebsapps_listener" {
   depends_on = [
     aws_acm_certificate_validation.external
@@ -35,7 +34,6 @@ resource "aws_lb_listener" "ebsapps_listener" {
     target_group_arn = aws_lb_target_group.ebsapp_tg.id
   }
 }
-*/
 
 resource "aws_lb_target_group" "ebsapp_tg" {
   name     = lower(format("tg-%s-%s-ebsapp", local.application_name, local.environment))
