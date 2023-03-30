@@ -6,8 +6,7 @@ tasks:
     type: powershell
     runAs: admin
     content: |-
-      openssl req -new -newkey rsa:4096 -days 36500 -nodes -x509 -subj "/C=GB/ST=London/L=London/O=HMPPS/OU=HMPPS Digital and Technology/CN=localhost" -keyout C:\tools\nginx-1.23.4\conf\server.key -out C:\tools\nginx-1.23.4\conf\server.crt
-
+      Invoke-Expression 'openssl req -new -newkey rsa:4096 -days 36500 -nodes -x509 -subj "/C=GB/ST=London/L=London/O=HMPPS/OU=HMPPS Digital and Technology/CN=localhost" -keyout C:\tools\nginx-1.23.4\conf\server.key -out C:\tools\nginx-1.23.4\conf\server.crt' 2>&1
       # Install certificate to Trust store
       Import-Certificate -FilePath C:\tools\nginx-1.23.4\conf\server.crt -CertStoreLocation Cert:\LocalMachine\Root
 
