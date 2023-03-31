@@ -1,9 +1,10 @@
-# AWS provider for the workspace you're working in (every resource will default to using this, unless otherwise specified)
+# AWS provider for the original session which you connect with
 provider "aws" {
   alias  = "original-session"
   region = "eu-west-2"
 }
 
+# AWS provider for the workspace you're working in (every resource will default to using this, unless otherwise specified)
 provider "aws" {
   region = "eu-west-2"
   assume_role {
@@ -20,7 +21,7 @@ provider "aws" {
   }
 }
 
-# AWS provider for core-vpc-<environment>, to share VPCs into this account
+# AWS provider for core-vpc-<environment>, to access resources in the core-vpc accounts
 provider "aws" {
   alias  = "core-vpc"
   region = "eu-west-2"
@@ -38,6 +39,7 @@ provider "aws" {
   }
 }
 
+# Provider for creating resources in us-east-1, eg ACM resources for CloudFront
 provider "aws" {
   alias  = "us-east-1"
   region = "us-east-1"
