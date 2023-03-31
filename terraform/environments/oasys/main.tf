@@ -75,3 +75,17 @@ module "baseline_presets" {
 resource "aws_resourceexplorer2_index" "this" {
   type = "LOCAL"
 }
+
+resource "aws_resourceexplorer2_view" "example" {
+  name = "test-view"
+
+  filters {
+    filter_string = "resourcetype:ec2:instance"
+  }
+
+  included_property {
+    name = "tags"
+  }
+
+  depends_on = [aws_resourceexplorer2_index.this]
+}
