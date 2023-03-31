@@ -19,6 +19,7 @@ resource "aws_security_group" "rds_security_group" {
     security_groups = [
       aws_security_group.delius_core_frontend_security_group.id,
       module.bastion_linux.bastion_security_group
+      # Placeholder for security group associated with DMS RI
     ]
   }
 
@@ -99,7 +100,8 @@ resource "aws_db_instance" "delius-core" {
   option_group_name           = aws_db_option_group.rds_option_group.name
   deletion_protection         = false # This is just a poc
   apply_immediately           = local.application_data.accounts[local.environment].rds_apply_immediately
-  skip_final_snapshot         = local.application_data.accounts[local.environment].rds_skip_final_snapshot
+  skip_final_snapshot         = true
+  snapshot_identifier         = "delius-core-development-database-vanilla"
   allocated_storage           = local.application_data.accounts[local.environment].rds_allocated_storage
   max_allocated_storage       = local.application_data.accounts[local.environment].rds_max_allocated_storage
   maintenance_window          = local.application_data.accounts[local.environment].rds_maintenance_window
