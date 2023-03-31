@@ -22,7 +22,7 @@ resource "aws_security_group" "tipstaff_dev_lb_sc" {
     description       = "allow access for container using https"
     from_port         = 3000
     to_port           = 3000
-    protocol          = "https"
+    protocol          = "ip"
     cidr_blocks       = [local.application_data.accounts[local.environment].moj_ip]
   }
 
