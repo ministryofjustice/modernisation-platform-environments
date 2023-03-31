@@ -28,7 +28,7 @@ locals {
 
     baseline_ec2_instances = {
       # Example instance using RedHat image with ansible provisioning
-      
+
     }
 
     baseline_bastion_linux = {
