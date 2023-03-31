@@ -181,18 +181,18 @@ tasks:
       $configXML.save($NDeliusConfigFile)
 
 %{if environment == "development"}
-      $service = Restart-Service -Name NDeliusInterfaceIapsWinService -Force -PassThru
+      $service = Restart-Service -Name IapsNDeliusInterfaceWinService -Force -PassThru
       if ($service.Status -match "Running") {
-          Write-Host('Restart of NDeliusInterfaceIapsWinService successful')
+          Write-Host('Restart of IapsNDeliusInterfaceWinService successful')
           "NDelius Interface configured" | Out-File -FilePath C:\ndelius_interface_config_log.txt
       } else {
-          Write-Host('Error - Failed to restart NDeliusInterfaceIapsWinService - see logs')
-          "Error - Failed to restart NDeliusInterfaceIapsWinService - see logs" | Out-File -FilePath C:\ndelius_interface_config_log.txt
+          Write-Host('Error - Failed to restart IapsNDeliusInterfaceWinService - see logs')
+          "Error - Failed to restart IapsNDeliusInterfaceWinService - see logs" | Out-File -FilePath C:\ndelius_interface_config_log.txt
           Exit 1
       }
 %{endif}
 %{if environment != "development"}
       # TODO: remove or edit if statement once migration gets a green light
-      Stop-Service -Name NDeliusInterfaceIapsWinService -Force
-      Set-Service -Name NDeliusInterfaceIapsWinService -StartupType Disabled
+      Stop-Service -Name IapsNDeliusInterfaceWinService -Force
+      Set-Service -Name IapsNDeliusInterfaceWinService -StartupType Disabled
 %{endif}
