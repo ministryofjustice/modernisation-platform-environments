@@ -62,12 +62,12 @@ tasks:
       [System.IO.File]::WriteAllLines("$${nginxConfPath}\nginx.conf", $nginxConfContents, $Utf8NoBomEncoding)
 %{ if environment == "development" ~}
       Restart-Service -Name nginx
-%{ endif ~}
+%{ endif }
 %{ if environment != "development" ~}
       # TODO: remove or edit if statement once migration gets a green light
       Stop-Service -Name nginx
       Set-Service -Name nginx -StartupType Disabled
-%{ endif ~}
+%{ endif }
 - task: executeScript
   inputs:
   - frequency: once
@@ -134,12 +134,12 @@ tasks:
           Write-Host('Error - Failed to restart IMIapsInterfaceWinService - see logs')
           Exit 1
       }
-%{ endif ~}
+%{ endif }
 %{ if environment != "development" ~}
       # TODO: remove or edit if statement once migration gets a green light
       Stop-Service -Name IMIapsInterfaceWinService -Force
       Set-Service -Name IMIapsInterfaceWinService -StartupType Disabled
-%{ endif ~}
+%{ endif }
   - frequency: once
     type: powershell
     runAs: admin
