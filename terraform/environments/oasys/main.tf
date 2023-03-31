@@ -78,15 +78,6 @@ resource "aws_resourceexplorer2_index" "this" {
 }
 
 resource "aws_resourceexplorer2_view" "example" {
-  name = "test-view"
-
-  filters {
-    filter_string = "resourcetype:*"
-  }
-
-  included_property {
-    name = "tags"
-  }
-
+  name       = "test-view"
   depends_on = [aws_resourceexplorer2_index.this]
 }
