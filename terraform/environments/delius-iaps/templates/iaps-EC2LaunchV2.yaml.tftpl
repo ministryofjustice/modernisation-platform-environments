@@ -1,4 +1,4 @@
-version: 1.1
+version: 1.0
 tasks:
 - task: executeScript
   inputs:
@@ -6,6 +6,9 @@ tasks:
     type: powershell
     runAs: admin
     content: |-
+      $tnsNamesOraPath = "C:\app\client\Administrator\product\12.1.0\client_1\network\admin\tnsnames.ora"
+      (Get-Content $tnsNamesOraPath).replace('iaps-db', '${delius_iaps_rds_db_address}') | Set-Content $tnsNamesOraPath
+
       $nginxConfPath = (Resolve-Path 'C:\tools\nginx-*\conf').Path
       Invoke-Expression 'openssl req -new -newkey rsa:4096 -days 36500 -nodes -x509 -subj "/C=GB/ST=London/L=London/O=HMPPS/OU=HMPPS Digital and Technology/CN=localhost" -keyout "$${nginxConfPath}\server.key" -out "$${nginxConfPath}\server.crt"' 2>&1
       Import-Certificate -FilePath $${nginxConfPath}\server.crt -CertStoreLocation Cert:\LocalMachine\Root
@@ -67,12 +70,6 @@ tasks:
 %{ endif ~}
 - task: executeScript
   inputs:
-  - frequency: once
-    type: powershell
-    runAs: admin
-    content: |-
-      $tnsNamesOraPath = "C:\app\client\Administrator\product\12.1.0\client_1\network\admin\tnsnames.ora"
-      (Get-Content $tnsNamesOraPath).replace('iaps-db', '${delius_iaps_rds_db_address}') | Set-Content $tnsNamesOraPath
   - frequency: once
     type: powershell
     runAs: localSystem
