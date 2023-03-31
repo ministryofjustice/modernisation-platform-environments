@@ -45,7 +45,7 @@ resource "aws_security_group" "tipstaff_dev_lb_sc" {
     description       = "allow all outbound traffic for port 3000"
     from_port         = 3000
     to_port           = 3000
-    protocol          = "https"
+    protocol          = "ip"
     cidr_blocks       = ["0.0.0.0/0"]
   }
 }
