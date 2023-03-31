@@ -7,10 +7,10 @@ resource "aws_security_group" "tipstaff_dev_lb_sc" {
 resource "aws_security_group_rule" "ingress_traffic_lb" {
   for_each          = local.application_data.ec2_sg_rules
   description       = format("Traffic for %s %d", each.value.protocol, each.value.from_port)
-  from_port         = each.value.from_port
-  protocol          = each.value.protocol
+  from_port         = 3000
+  protocol          = "tcp"
   security_group_id = aws_security_group.tipstaff_dev_lb_sc.id
-  to_port           = each.value.to_port
+  to_port           = 3000
   type              = "ingress"
   cidr_blocks       = [local.application_data.accounts[local.environment].moj_ip]
 }
