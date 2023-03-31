@@ -26,6 +26,19 @@ locals {
       patch_day                 = "TUE"
     }
 
+    baseline_s3_buckets = {
+
+      # the shared image builder bucket is just created in test
+      # oasys-devtest = {
+      #   custom_kms_key = module.environment.kms_keys["general"].arn
+      #   bucket_policy_v2 = [
+      #     module.baseline_presets.s3_bucket_policies.ImageBuilderWriteAccessBucketPolicy,
+      #     module.baseline_presets.s3_bucket_policies.DevTestEnvironmentsWriteAccessBucketPolicy ###### need to make this. need to change environments module as part of it
+      #   ]
+      #   iam_policies = module.baseline_presets.s3_iam_policies
+      # }
+    }
+
     baseline_ec2_autoscaling_groups = {
       # webserver = {
       #   autoscaling_group = {
