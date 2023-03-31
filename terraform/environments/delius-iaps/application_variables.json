@@ -22,7 +22,7 @@
       "cloudwatch_agent_log_group_retention_period": "7",
       "iaps_ndelius_interface_url": "placeholder.nd.address",
       "iaps_im_interface_url": "placeholder.im.address",
-      "iaps_im_db_url": "placeholder.db.address",
+      "iaps_im_db_url": "placeholder.db.address"
     },
     "preproduction": {
       "short_environment_name": "preprod",
