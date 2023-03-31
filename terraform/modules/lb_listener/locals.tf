@@ -1,4 +1,6 @@
 locals {
+  aws_lb = var.load_balancer_arn != null ? data.aws_lb.this[0] : var.load_balancer
+
   target_group_attachments = flatten([
     for target_group_name, target_group_value in var.target_groups : [
       for attachment_value in target_group_value.attachments : {

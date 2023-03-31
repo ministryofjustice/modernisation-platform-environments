@@ -6,7 +6,7 @@ variable "acm_certificates" {
     validation = optional(map(object({
       account   = optional(string, "self")
       zone_name = string
-    })),{})
+    })), {})
     tags = map(string)
   }))
   default = {}
