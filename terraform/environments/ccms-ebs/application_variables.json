@@ -191,9 +191,24 @@
       "to_port": 22,
       "protocol": "TCP"
     },
-    "TCP_8000": {
+    "TCP_5101": {
+      "from_port": 5101,
+      "to_port": 5101,
+      "protocol": "TCP"
+    },
+    "TCP_5401": {
+      "from_port": 5401,
+      "to_port": 5401,
+      "protocol": "TCP"
+    },
+    "TCP_10401": {
+      "from_port": 10401,
+      "to_port": 10401,
+      "protocol": "TCP"
+    },
+    "TCP_800x": {
       "from_port": 8000,
-      "to_port": 8000,
+      "to_port": 8001,
       "protocol": "TCP",
       "destination_cidr": "10.200.0.0/20"
     },
@@ -223,17 +238,35 @@
       "protocol": "TCP",
       "destination_cidr": "0.0.0.0/0"
     },
-    "TCP_8000": {
-      "from_port": 8000,
-      "to_port": 8000,
+    "TCP_5101": {
+      "from_port": 5101,
+      "to_port": 5101,
       "protocol": "TCP",
-      "destination_cidr": "10.200.0.0/20"
+      "destination_cidr": "0.0.0.0/0"
+    },
+    "TCP_5401": {
+      "from_port": 5401,
+      "to_port": 5401,
+      "protocol": "TCP",
+      "destination_cidr": "0.0.0.0/0"
+    },
+    "TCP_10401": {
+      "from_port": 10401,
+      "to_port": 10401,
+      "protocol": "TCP",
+      "destination_cidr": "0.0.0.0/0"
+    },
+    "TCP_800x": {
+      "from_port": 8000,
+      "to_port": 8001,
+      "protocol": "TCP",
+      "destination_cidr": "0.0.0.0/0"
     },
     "TCP_444x": {
       "from_port": 4443,
       "to_port": 4444,
       "protocol": "TCP",
-      "destination_cidr": "10.200.0.0/20"
+      "destination_cidr": "0.0.0.0/0"
     }
   },
   "ec2_sg_ftp_ingress_rules": {
