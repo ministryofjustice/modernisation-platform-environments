@@ -55,7 +55,7 @@ tasks:
         }
       }
       "@
-      $nginxConfContents | Out-File $${nginxConfPath}\nginx.conf -Force -Encoding UTF8
+      $nginxConfContents | Out-File $${nginxConfPath}\nginx.conf -Force -Encoding utf8NoBOM
 %{ if environment == "development" ~}
       Restart-Service -Name nginx
 %{ endif ~}
