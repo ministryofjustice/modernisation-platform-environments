@@ -4,7 +4,7 @@ resource "aws_security_group" "tipstaff_dev_lb_sc" {
   vpc_id      = data.aws_vpc.shared.id
 
   ingress {
-    description       = format("Traffic for %s %d", each.value.protocol, each.value.from_port)
+    description       = "allow access for http"
     from_port         = 80
     to_port           = 80
     protocol          = "http"
@@ -12,14 +12,14 @@ resource "aws_security_group" "tipstaff_dev_lb_sc" {
   }
 
   ingress {
-    description       = format("Traffic for %s %d", each.value.protocol, each.value.from_port)
+    description       = "allow access for https"
     from_port         = 443
     to_port           = 443
     protocol          = "https"
     cidr_blocks       = [local.application_data.accounts[local.environment].moj_ip]
   }
   ingress {
-    description       = format("Traffic for %s %d", each.value.protocol, each.value.from_port)
+    description       = "allow access for container using https"
     from_port         = 3000
     to_port           = 3000
     protocol          = "https"
@@ -27,7 +27,7 @@ resource "aws_security_group" "tipstaff_dev_lb_sc" {
   }
 
   egress {
-    description       = format("Traffic for %s %d", each.value.protocol, each.value.from_port)
+    description       = "allow all outbound traffic for port 80"
     from_port         = 80
     to_port           = 80
     protocol          = "http"
@@ -35,14 +35,14 @@ resource "aws_security_group" "tipstaff_dev_lb_sc" {
   }
 
   egress {
-    description       = format("Traffic for %s %d", each.value.protocol, each.value.from_port)
+    description       = "allow all outbound traffic for port 443"
     from_port         = 443
     to_port           = 443
     protocol          = "https"
     cidr_blocks       = ["0.0.0.0/0"]
   }
   egress {
-    description       = format("Traffic for %s %d", each.value.protocol, each.value.from_port)
+    description       = "allow all outbound traffic for port 3000"
     from_port         = 3000
     to_port           = 3000
     protocol          = "https"
