@@ -14,12 +14,18 @@ variable "subject_alternate_names" {
   default     = []
 }
 
+variable "route53_zones" {
+  description = "Provide a map of existing route53_zones that can be used for validation, e.g. from environment module route53_zones output.  Key is zone name and value must include zone_id and provider"
+  default     = {}
+}
+
 variable "validation" {
   type = map(object({
     account   = optional(string, "self")
     zone_name = string
   }))
-  description = "Provider a list of zones to use for DNS validation where the key is the cert domain.  Set account to self, core-vpc or core-network-services"
+  description = "Provide a list of zones to use for DNS validation where the key is the cert domain.  Set account to self, core-vpc or core-network-services.  Only required if zones are not included in route53_zones variable"
+  default     = {}
 }
 
 variable "tags" {
