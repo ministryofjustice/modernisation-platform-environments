@@ -1,5 +1,6 @@
 data "aws_lb" "this" {
-  arn = var.load_balancer_arn
+  count = var.load_balancer_arn != null ? 1 : 0
+  arn   = var.load_balancer_arn
 }
 
 data "aws_vpc" "this" {

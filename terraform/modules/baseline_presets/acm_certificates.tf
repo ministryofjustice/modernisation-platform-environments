@@ -14,16 +14,6 @@ locals {
       domain_name             = var.environment.domains.public.modernisation_platform
       subject_alternate_names = ["*.${var.environment.domains.public.application_environment}"]
 
-      validation = {
-        "${var.environment.domains.public.modernisation_platform}" = {
-          account   = "core-network-services"
-          zone_name = "${var.environment.domains.public.modernisation_platform}."
-        }
-        "*.${var.environment.domains.public.application_environment}" = {
-          account   = "core-vpc"
-          zone_name = "${var.environment.domains.public.business_unit_environment}."
-        }
-      }
       tags = {
         description = "wildcard cert for ${var.environment.domains.public.application_environment} domain"
       }
