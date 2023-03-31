@@ -3,10 +3,10 @@ variable "acm_certificates" {
   type = map(object({
     domain_name             = string
     subject_alternate_names = optional(list(string), [])
-    validation = map(object({
+    validation = optional(map(object({
       account   = optional(string, "self")
       zone_name = string
-    }))
+    })),{})
     tags = map(string)
   }))
   default = {}
