@@ -81,7 +81,7 @@ resource "aws_resourceexplorer2_view" "example" {
   name = "test-view"
 
   filters {
-    filter_string = "resourcetype:ec2:instance"
+    filter_string = "resourcetype:*"
   }
 
   included_property {
