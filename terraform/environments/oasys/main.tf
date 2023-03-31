@@ -78,6 +78,7 @@ resource "aws_resourceexplorer2_index" "this" {
 }
 
 resource "aws_resourceexplorer2_view" "example" {
-  name       = "test-view"
-  depends_on = [aws_resourceexplorer2_index.this]
+  name         = "all-resources"
+  default_view = true
+  depends_on   = [aws_resourceexplorer2_index.this]
 }
