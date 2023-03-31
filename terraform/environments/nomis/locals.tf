@@ -16,6 +16,21 @@ locals {
     "${local.environment}.nomis.az.justice.gov.uk" = {}
   }
 
+  baseline_acm_certificates = {
+    nomis_wildcard_cert = {
+      # domain_name limited to 64 chars so use modernisation platform domain for this
+      # and put the wildcard in the san
+      domain_name = module.environment.domains.public.modernisation_platform
+      subject_alternate_names = [
+        "*.${module.environment.domains.public.application_environment}",
+        "*.${local.environment}.nomis.az.justice.gov.uk"
+      ]
+      tags = {
+        description = "wildcard cert for ${module.environment.domains.public.application_environment} and ${local.environment}.nomis.az.justice.gov.uk domain"
+      }
+    }
+  }
+
   autoscaling_schedules_default = {
     "scale_up" = {
       recurrence = "0 7 * * Mon-Fri"
