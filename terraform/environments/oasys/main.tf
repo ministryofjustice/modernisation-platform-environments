@@ -6,8 +6,9 @@ module "environment" {
   source = "../../modules/environment"
 
   providers = {
-    aws.core-network-services = aws.core-network-services
-    aws.core-vpc              = aws.core-vpc
+    aws.modernisation-platform = aws.modernisation-platform
+    aws.core-network-services  = aws.core-network-services
+    aws.core-vpc               = aws.core-vpc
   }
 
   environment_management = local.environment_management
