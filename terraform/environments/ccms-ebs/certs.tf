@@ -23,7 +23,7 @@ resource "aws_acm_certificate" "external-service" {
   count = local.is-production ? 1 : 0
 
   validation_method = "DNS"
-  domain_name       = "modernisation-platform.service.justice.gov.uk"
+  domain_name       = "service.justice.gov.uk"
   subject_alternative_names = [
     "*.${var.networking[0].business-unit}.service.justice.gov.uk"
   ]
@@ -64,4 +64,8 @@ resource "aws_acm_certificate_validation" "external" {
   ]
   certificate_arn         = local.cert_arn
   validation_record_fqdns = [for record in aws_route53_record.external_validation : record.fqdn]
+
+  timeouts {
+    create = "10m"
+  }
 }
