@@ -71,3 +71,7 @@ module "baseline_presets" {
     # }
   }
 }
+
+resource "aws_resourceexplorer2_index" "this" {
+  type = "LOCAL"
+}
