@@ -184,8 +184,10 @@ tasks:
       $service = Restart-Service -Name NDeliusInterfaceIapsWinService -Force -PassThru
       if ($service.Status -match "Running") {
           Write-Host('Restart of NDeliusInterfaceIapsWinService successful')
+          "NDelius Interface configured" | Out-File -FilePath C:\ndelius_interface_config_log.txt
       } else {
           Write-Host('Error - Failed to restart NDeliusInterfaceIapsWinService - see logs')
+          "Error - Failed to restart NDeliusInterfaceIapsWinService - see logs" | Out-File -FilePath C:\ndelius_interface_config_log.txt
           Exit 1
       }
 %{endif}
@@ -194,4 +196,3 @@ tasks:
       Stop-Service -Name NDeliusInterfaceIapsWinService -Force
       Set-Service -Name NDeliusInterfaceIapsWinService -StartupType Disabled
 %{endif}
-      "NDelius Interface configured" | Out-File -FilePath C:\ndelius_interface_config_log.txt
