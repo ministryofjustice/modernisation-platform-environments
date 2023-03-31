@@ -109,3 +109,9 @@ output "kms_keys" {
   description = "a map of business unit customer-managed keys where the map key is the prefix name, e.g. general, ebs, rds"
   value       = data.aws_kms_key.this
 }
+
+output "pagerduty_integration_keys" {
+  description = "pagerduty integration keys managed by modernisation platform"
+  value       = jsondecode(data.aws_secretsmanager_secret_version.pagerduty_integration_keys.secret_string)
+  sensitive   = true
+}
