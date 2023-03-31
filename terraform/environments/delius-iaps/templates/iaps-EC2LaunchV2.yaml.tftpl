@@ -60,14 +60,8 @@ tasks:
       "@
       $Utf8NoBomEncoding = New-Object System.Text.UTF8Encoding $False
       [System.IO.File]::WriteAllLines("$${nginxConfPath}\nginx.conf", $nginxConfContents, $Utf8NoBomEncoding)
-%{ if environment == "development" ~}
-      Restart-Service -Name nginx
-%{ endif }
-%{ if environment != "development" ~}
-      # TODO: remove or edit if statement once migration gets a green light
       Stop-Service -Name nginx
       Set-Service -Name nginx -StartupType Disabled
-%{ endif }
 - task: executeScript
   inputs:
   - frequency: once
@@ -126,20 +120,8 @@ tasks:
       $configXML.DLLDEF.SOAPSERVER.ODBC = "DSN=$${SOAPServerODBCdsn};Server=$${SOAPServerODBCserver};Database=$${SOAPServerODBCdatabase};uid=$${SOAPServerODBCuid};pwd=$${SOAPServerODBCpwd}"
       $configXML.save($IMConfigFile)
 
-%{ if environment == "development" ~}
-      $service = Restart-Service -Name IMIapsInterfaceWinService -Force -PassThru
-      if ($service.Status -match "Running") {
-          Write-Host('Restart of IMIapsInterfaceWinService successful')
-      } else {
-          Write-Host('Error - Failed to restart IMIapsInterfaceWinService - see logs')
-          Exit 1
-      }
-%{ endif }
-%{ if environment != "development" ~}
-      # TODO: remove or edit if statement once migration gets a green light
       Stop-Service -Name IMIapsInterfaceWinService -Force
       Set-Service -Name IMIapsInterfaceWinService -StartupType Disabled
-%{ endif }
   - frequency: once
     type: powershell
     runAs: admin
@@ -175,17 +157,5 @@ tasks:
       $configXML.DLLDEF.EMAIL.FROMADDRESS = (Get-SSMParameter -Name "/NDeliusInterface/Email/fromaddress" -WithDecryption $true).Value
       $configXML.save($NDeliusConfigFile)
 
-%{ if environment == "development" ~}
-      $service = Restart-Service -Name NDeliusInterfaceIapsWinService -Force -PassThru
-      if ($service.Status -match "Running") {
-          Write-Host('Restart of NDeliusInterfaceIapsWinService successful')
-      } else {
-          Write-Host('Error - Failed to restart NDeliusInterfaceIapsWinService - see logs')
-          Exit 1
-      }
-%{ endif ~}
-%{ if environment != "development" ~}
-      # TODO: remove or edit if statement once migration gets a green light
       Stop-Service -Name NDeliusInterfaceIapsWinService -Force
       Set-Service -Name NDeliusInterfaceIapsWinService -StartupType Disabled
-%{ endif ~}
