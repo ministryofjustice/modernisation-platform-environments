@@ -23,7 +23,6 @@
       "iaps_ndelius_interface_url": "placeholder.nd.address",
       "iaps_im_interface_url": "placeholder.im.address",
       "iaps_im_db_url": "placeholder.db.address",
-      "ec2_iaps_instance_ami_name": "delius_iaps_server_patch_2023-03-29T18-54-12.024Z"
     },
     "preproduction": {
       "short_environment_name": "preprod",
