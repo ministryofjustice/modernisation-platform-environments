@@ -1,0 +1,138 @@
+----------------------------------------------------------------------------------------------------
+------------------------------------ MegaLinter, by OX Security ------------------------------------
+----------------------------------------------------------------------------------------------------
+ - Image Creation Date: 2023-03-26T14:24:15Z
+ - Image Revision: 66108018d9c2160896d8cf34d56f341592d23ffd
+ - Image Version: 66108018d9c2160896d8cf34d56f341592d23ffd
+----------------------------------------------------------------------------------------------------
+The MegaLinter documentation can be found at:
+ - https://megalinter.io/66108018d9c2160896d8cf34d56f341592d23ffd
+----------------------------------------------------------------------------------------------------
+::group::MegaLinter initialization (expand for details)
+GITHUB_REPOSITORY: ministryofjustice/modernisation-platform-environments
+GITHUB_REF: refs/heads/main
+GITHUB_RUN_ID: 4571657663
+
+
+MARKDOWN_REMARK_LINT has been temporary disabled in MegaLinter, please use a previous MegaLinter version or wait for the next one !
+Skipped linters: ACTION_ACTIONLINT, ANSIBLE_ANSIBLE_LINT, ARM_ARM_TTK, BASH_EXEC, BASH_SHELLCHECK, BASH_SHFMT, BICEP_BICEP_LINTER, CLOJURE_CLJ_KONDO, CLOUDFORMATION_CFN_LINT, COFFEE_COFFEELINT, COPYPASTE_JSCPD, CPP_CPPLINT, CSHARP_CSHARPIER, CSHARP_DOTNET_FORMAT, CSS_SCSS_LINT, CSS_STYLELINT, C_CPPLINT, DART_DARTANALYZER, DOCKERFILE_HADOLINT, EDITORCONFIG_EDITORCONFIG_CHECKER, ENV_DOTENV_LINTER, GHERKIN_GHERKIN_LINT, GO_GOLANGCI_LINT, GO_REVIVE, GRAPHQL_GRAPHQL_SCHEMA_LINTER, GROOVY_NPM_GROOVY_LINT, HTML_DJLINT, HTML_HTMLHINT, JAVASCRIPT_ES, JAVASCRIPT_PRETTIER, JAVASCRIPT_STANDARD, JAVA_CHECKSTYLE, JAVA_PMD, JSON_ESLINT_PLUGIN_JSONC, JSON_JSONLINT, JSON_NPM_PACKAGE_JSON_LINT, JSON_V8R, JSX_ESLINT, KOTLIN_KTLINT, KUBERNETES_HELM, KUBERNETES_KUBECONFORM, KUBERNETES_KUBEVAL, LATEX_CHKTEX, LUA_LUACHECK, MAKEFILE_CHECKMAKE, MARKDOWN_MARKDOWN_LINK_CHECK, MARKDOWN_MARKDOWN_TABLE_FORMATTER, MARKDOWN_REMARK_LINT, OPENAPI_SPECTRAL, PERL_PERLCRITIC, PHP_PHPCS, PHP_PHPLINT, PHP_PHPSTAN, PHP_PSALM, POWERSHELL_POWERSHELL, POWERSHELL_POWERSHELL_FORMATTER, PROTOBUF_PROTOLINT, PUPPET_PUPPET_LINT, PYTHON_BANDIT, PYTHON_BLACK, PYTHON_FLAKE8, PYTHON_ISORT, PYTHON_MYPY, PYTHON_PYLINT, PYTHON_PYRIGHT, RAKU_RAKU, REPOSITORY_CHECKOV, REPOSITORY_DEVSKIM, REPOSITORY_DUSTILOCK, REPOSITORY_GITLEAKS, REPOSITORY_GIT_DIFF, REPOSITORY_GOODCHECK, REPOSITORY_SECRETLINT, REPOSITORY_SEMGREP, REPOSITORY_SYFT, REPOSITORY_TRIVY, RST_RSTCHECK, RST_RSTFMT, RST_RST_LINT, RUBY_RUBOCOP, RUST_CLIPPY, R_LINTR, SALESFORCE_SFDX_SCANNER_APEX, SALESFORCE_SFDX_SCANNER_AURA, SALESFORCE_SFDX_SCANNER_LWC, SCALA_SCALAFIX, SNAKEMAKE_LINT, SNAKEMAKE_SNAKEFMT, SPELL_CSPELL, SPELL_MISSPELL, SPELL_PROSELINT, SQL_SQLFLUFF, SQL_SQL_LINT, SQL_TSQLLINT, SWIFT_SWIFTLINT, TEKTON_TEKTON_LINT, TERRAFORM_CHECKOV, TERRAFORM_KICS, TERRAFORM_TERRAGRUNT, TERRAFORM_TERRASCAN, TERRAFORM_TFLINT, TSX_ESLINT, TYPESCRIPT_ES, TYPESCRIPT_PRETTIER, TYPESCRIPT_STANDARD, VBDOTNET_DOTNET_FORMAT, XML_XMLLINT, YAML_V8R, YAML_YAMLLINT
+::endgroup::
+::group::MegaLinter now collects the files to analyse (expand for details)
+Listing all files in directory [/github/workspace], then filter with:
+- File extensions: .json, .md, .tf, .yaml, .yml
+- Excluding .gitignored files [1]: /github/workspace/terraform/environments/xhibit-portal/scripts/perf/package-lock.json
+Kept [847] files on [957] found files
+
++----MATCHING LINTERS--------+------------+----------------+------------+
+| Descriptor | Linter        | Criteria   | Matching files | Format/Fix |
++------------+---------------+------------+----------------+------------+
+| JSON       | prettier      | .json      | 87             | yes        |
+| MARKDOWN   | markdownlint  | .md        | 51             | yes        |
+| TERRAFORM  | terraform-fmt | .tf        | 656            | yes        |
+| YAML       | prettier      | .yml|.yaml | 11             | yes        |
++------------+---------------+------------+----------------+------------+
+::endgroup::
+::group::[33m✅ Linted [MARKDOWN] files with [markdownlint]: Found 66 non blocking error(s) - (1.05s)[0m (expand for details)
+- Using [markdownlint v0.33.0] https://megalinter.io/66108018d9c2160896d8cf34d56f341592d23ffd/descriptors/markdown_markdownlint
+- MegaLinter key: [MARKDOWN_MARKDOWNLINT]
+- Rules config: [.markdownlint.json]
+- Number of files analyzed: [51]
+--Error detail:
+/github/workspace/README.md:3:401 MD013/line-length Line length [Expected: 400; Actual: 481]
+/github/workspace/scripts/minimise-comments/README.md:1 MD041/first-line-heading/first-line-h1 First line in a file should be a top-level heading [Context: "Script for hiding comments in ..."]
+/github/workspace/scripts/minimise-comments/README.md:5 MD040/fenced-code-language Fenced code blocks should have a language specified [Context: "```"]
+/github/workspace/scripts/minimise-comments/README.md:14 MD040/fenced-code-language Fenced code blocks should have a language specified [Context: "```"]
+/github/workspace/terraform/environments/delius-iaps/.ssh/README.md:1 MD041/first-line-heading/first-line-h1 First line in a file should be a top-level heading [Context: "Each environment has its own p..."]
+/github/workspace/terraform/environments/delius-iaps/.ssh/README.md:6 MD040/fenced-code-language Fenced code blocks should have a language specified [Context: "```"]
+/github/workspace/terraform/environments/mlra/modules/alb/README.md:1 MD041/first-line-heading/first-line-h1 First line in a file should be a top-level heading [Context: "This `alb` local Terraform mod..."]
+/github/workspace/terraform/environments/mlra/modules/alb/README.md:5:401 MD013/line-length Line length [Expected: 400; Actual: 501]
+/github/workspace/terraform/environments/mlra/modules/alb/README.md:13 MD040/fenced-code-language Fenced code blocks should have a language specified [Context: "```"]
+/github/workspace/terraform/environments/mlra/modules/alb/README.md:128:401 MD013/line-length Line length [Expected: 400; Actual: 419]
+/github/workspace/terraform/environments/mlra/modules/alb/README.md:129:401 MD013/line-length Line length [Expected: 400; Actual: 423]
+/github/workspace/terraform/environments/mlra/modules/alb/README.md:149 MD024/no-duplicate-heading/no-duplicate-header Multiple headings with the same content [Context: "## Requirements"]
+/github/workspace/terraform/environments/mlra/modules/alb/README.md:156 MD024/no-duplicate-heading/no-duplicate-header Multiple headings with the same content [Context: "## Providers"]
+/github/workspace/terraform/environments/mlra/modules/alb/README.md:162 MD024/no-duplicate-heading/no-duplicate-header Multiple headings with the same content [Context: "## Modules"]
+/github/workspace/terraform/environments/mlra/modules/alb/README.md:168 MD024/no-duplicate-heading/no-duplicate-header Multiple headings with the same content [Context: "## Resources"]
+/github/workspace/terraform/environments/mlra/modules/alb/README.md:181 MD024/no-duplicate-heading/no-duplicate-header Multiple headings with the same content [Context: "## Inputs"]
+/github/workspace/terraform/environments/mlra/modules/alb/README.md:192:401 MD013/line-length Line length [Expected: 400; Actual: 419]
+/github/workspace/terraform/environments/mlra/modules/alb/README.md:193:401 MD013/line-length Line length [Expected: 400; Actual: 423]
+/github/workspace/terraform/environments/mlra/modules/alb/README.md:199 MD024/no-duplicate-heading/no-duplicate-header Multiple headings with the same content [Context: "## Outputs"]
+/github/workspace/terraform/environments/mlra/modules/ecs/README.md:1 MD041/first-line-heading/first-line-h1 First line in a file should be a top-level heading [Context: "This `ecs` local Terraform mod..."]
+/github/workspace/terraform/environments/mlra/modules/ecs/README.md:5:401 MD013/line-length Line length [Expected: 400; Actual: 483]
+/github/workspace/terraform/environments/mlra/modules/ecs/README.md:96:401 MD013/line-length Line length [Expected: 400; Actual: 431]
+/github/workspace/terraform/environments/mlra/modules/ecs/README.md:97:401 MD013/line-length Line length [Expected: 400; Actual: 431]
+/github/workspace/terraform/environments/mlra/modules/ecs/README.md:98:401 MD013/line-length Line length [Expected: 400; Actual: 431]
+/github/workspace/terraform/environments/mlra/modules/ecs/README.md:99:401 MD013/line-length Line length [Expected: 400; Actual: 431]
+/github/workspace/terraform/environments/mlra/modules/ecs/README.md:100:401 MD013/line-length Line length [Expected: 400; Actual: 431]
+/github/workspace/terraform/environments/mlra/modules/ecs/README.md:101:401 MD013/line-length Line length [Expected: 400; Actual: 431]
+/github/workspace/terraform/environments/mlra/modules/ecs/README.md:102:401 MD013/line-length Line length [Expected: 400; Actual: 431]
+/github/workspace/terraform/environments/mlra/modules/ecs/README.md:103:401 MD013/line-length Line length [Expected: 400; Actual: 431]
+/github/workspace/terraform/environments/mlra/modules/ecs/README.md:104:401 MD013/line-length Line length [Expected: 400; Actual: 431]
+/github/workspace/terraform/environments/mlra/modules/ecs/README.md:105:401 MD013/line-length Line length [Expected: 400; Actual: 431]
+/github/workspace/terraform/environments/mlra/modules/ecs/README.md:106:401 MD013/line-length Line length [Expected: 400; Actual: 431]
+/github/workspace/terraform/environments/mlra/modules/ecs/README.md:107:401 MD013/line-length Line length [Expected: 400; Actual: 431]
+/github/workspace/terraform/environments/mlra/modules/ecs/README.md:108:401 MD013/line-length Line length [Expected: 400; Actual: 431]
+/github/workspace/terraform/environments/mlra/modules/ecs/README.md:109:401 MD013/line-length Line length [Expected: 400; Actual: 431]
+/github/workspace/terraform/environments/mlra/modules/ecs/README.md:110:401 MD013/line-length Line length [Expected: 400; Actual: 431]
+/github/workspace/terraform/environments/mlra/modules/ecs/README.md:111:401 MD013/line-length Line length [Expected: 400; Actual: 431]
+/github/workspace/terraform/environments/mlra/modules/ecs/README.md:112:401 MD013/line-length Line length [Expected: 400; Actual: 431]
+/github/workspace/terraform/environments/mlra/modules/ecs/README.md:113:401 MD013/line-length Line length [Expected: 400; Actual: 431]
+/github/workspace/terraform/environments/mlra/modules/ecs/README.md:114:401 MD013/line-length Line length [Expected: 400; Actual: 431]
+/github/workspace/terraform/environments/mlra/modules/ecs/README.md:115:401 MD013/line-length Line length [Expected: 400; Actual: 431]
+/github/workspace/terraform/environments/mlra/modules/ecs/README.md:116:401 MD013/line-length Line length [Expected: 400; Actual: 431]
+/github/workspace/terraform/environments/mlra/modules/ecs/README.md:117:401 MD013/line-length Line length [Expected: 400; Actual: 431]
+/github/workspace/terraform/environments/mlra/modules/ecs/README.md:118:401 MD013/line-length Line length [Expected: 400; Actual: 431]
+/github/workspace/terraform/environments/mlra/modules/ecs/README.md:119:401 MD013/line-length Line length [Expected: 400; Actual: 431]
+/github/workspace/terraform/environments/mlra/modules/ecs/README.md:120:401 MD013/line-length Line length [Expected: 400; Actual: 431]
+/github/workspace/terraform/environments/mlra/modules/ecs/README.md:121:401 MD013/line-length Line length [Expected: 400; Actual: 431]
+/github/workspace/terraform/environments/nomis-combined-reporting/.ssh/README.md:1 MD041/first-line-heading/first-line-h1 First line in a file should be a top-level heading [Context: "Each environment has its own p..."]
+/github/workspace/terraform/environments/nomis-combined-reporting/.ssh/README.md:6 MD040/fenced-code-language Fenced code blocks should have a language specified [Context: "```"]
+/github/workspace/terraform/environments/nomis-data-hub/.ssh/README.md:1 MD041/first-line-heading/first-line-h1 First line in a file should be a top-level heading [Context: "Each environment has its own p..."]
+/github/workspace/terraform/environments/nomis-data-hub/.ssh/README.md:6 MD040/fenced-code-language Fenced code blocks should have a language specified [Context: "```"]
+/github/workspace/terraform/environments/nomis/.ssh/README.md:1 MD041/first-line-heading/first-line-h1 First line in a file should be a top-level heading [Context: "Each environment has its own p..."]
+/github/workspace/terraform/environments/nomis/.ssh/README.md:6 MD040/fenced-code-language Fenced code blocks should have a language specified [Context: "```"]
+/github/workspace/terraform/environments/nomis/README.md:42 MD025/single-title/single-h1 Multiple top-level headings in the same document [Context: "# ask-digital-studio-ops"]
+/github/workspace/terraform/environments/nomis/README.md:48 MD001/heading-increment/header-increment Heading levels should only increment by one level at a time [Expected: h2; Actual: h3]
+/github/workspace/terraform/environments/oasys/.ssh/README.md:1 MD041/first-line-heading/first-line-h1 First line in a file should be a top-level heading [Context: "Each environment has its own p..."]
+/github/workspace/terraform/environments/oasys/.ssh/README.md:6 MD040/fenced-code-language Fenced code blocks should have a language specified [Context: "```"]
+/github/workspace/terraform/modules/acm_certificate/README.md:1 MD041/first-line-heading/first-line-h1 First line in a file should be a top-level heading [Context: "Create an AWS ACM certificate ..."]
+/github/workspace/terraform/modules/acm_certificate/README.md:8 MD040/fenced-code-language Fenced code blocks should have a language specified [Context: "```"]
+/github/workspace/terraform/modules/baseline_presets/README.md:1 MD041/first-line-heading/first-line-h1 First line in a file should be a top-level heading [Context: "Preset configuration that can ..."]
+/github/workspace/terraform/modules/ec2_instance/README.md:13 MD040/fenced-code-language Fenced code blocks should have a language specified [Context: "```"]
+/github/workspace/terraform/modules/ec2_instance/README.md:24 MD040/fenced-code-language Fenced code blocks should have a language specified [Context: "```"]
+/github/workspace/terraform/modules/ec2_instance/README.md:38 MD040/fenced-code-language Fenced code blocks should have a language specified [Context: "```"]
+/github/workspace/terraform/modules/environment/README.md:22 MD040/fenced-code-language Fenced code blocks should have a language specified [Context: "```"]
+/github/workspace/terraform/modules/lb_listener/README.md:1 MD041/first-line-heading/first-line-h1 First line in a file should be a top-level heading [Context: "Create an `aws_lb_listener` wi..."]
+/github/workspace/terraform/modules/lb_listener/README.md:17 MD040/fenced-code-language Fenced code blocks should have a language specified [Context: "```"]
+
+::endgroup::
+::group::[32m✅ Linted [JSON] files with [prettier] successfully - (1.71s)[0m (expand for details)
+- Using [prettier v2.8.7] https://megalinter.io/66108018d9c2160896d8cf34d56f341592d23ffd/descriptors/json_prettier
+- MegaLinter key: [JSON_PRETTIER]
+- Rules config: identified by [prettier]
+- Number of files analyzed: [87]
+::endgroup::
+::group::[32m✅ Linted [YAML] files with [prettier] successfully - (0.69s)[0m (expand for details)
+- Using [prettier v2.8.7] https://megalinter.io/66108018d9c2160896d8cf34d56f341592d23ffd/descriptors/yaml_prettier
+- MegaLinter key: [YAML_PRETTIER]
+- Rules config: identified by [prettier]
+- Number of files analyzed: [11]
+::endgroup::
+::group::[32m✅ Linted [TERRAFORM] files with [terraform-fmt] successfully - (43.51s)[0m (expand for details)
+- Using [terraform-fmt v1.4.2] https://megalinter.io/66108018d9c2160896d8cf34d56f341592d23ffd/descriptors/terraform_terraform_fmt
+- MegaLinter key: [TERRAFORM_TERRAFORM_FMT]
+- Rules config: identified by [terraform-fmt]
+- Number of files analyzed: [656]
+::endgroup::
+
++----SUMMARY---+---------------+---------------+-------+-------+--------+--------------+
+| Descriptor   | Linter        | Mode          | Files | Fixed | Errors | Elapsed time |
++--------------+---------------+---------------+-------+-------+--------+--------------+
+| ✅ JSON      | prettier      | list_of_files |    87 |     8 |      0 |        1.71s |
+| ◬ MARKDOWN   | markdownlint  | list_of_files |    51 |     5 |     66 |        1.05s |
+| ✅ TERRAFORM | terraform-fmt | file          |   656 |     2 |      0 |       43.51s |
+| ✅ YAML      | prettier      | list_of_files |    11 |     2 |      0 |        0.69s |
++--------------+---------------+---------------+-------+-------+--------+--------------+
+
+[Updated Sources Reporter] copied 17 fixed source files in folder /github/workspace/megalinter-reports/updated_sources.
+Download it from artifacts then copy-paste it in your local repo to apply linters updates
