@@ -19,7 +19,7 @@ resource "aws_security_group" "tipstaff_dev_lb_sc" {
     cidr_blocks       = [local.application_data.accounts[local.environment].moj_ip]
   }
   ingress {
-    description       = "allow access for container using https"
+    description       = "allow access for container using IP"
     from_port         = 3000
     to_port           = 3000
     protocol          = "ip"
@@ -42,7 +42,7 @@ resource "aws_security_group" "tipstaff_dev_lb_sc" {
     cidr_blocks       = ["0.0.0.0/0"]
   }
   egress {
-    description       = "allow all outbound traffic for port 3000"
+    description       = "allow all outbound traffic for IP port 3000"
     from_port         = 3000
     to_port           = 3000
     protocol          = "ip"
