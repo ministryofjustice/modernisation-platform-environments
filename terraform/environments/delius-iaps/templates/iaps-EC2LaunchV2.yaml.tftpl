@@ -55,7 +55,8 @@ tasks:
         }
       }
       "@
-      $nginxConfContents | Out-File $${nginxConfPath}\nginx.conf -Force -Encoding utf8NoBOM
+      $Utf8NoBomEncoding = New-Object System.Text.UTF8Encoding $False
+      [System.IO.File]::WriteAllLines($${nginxConfPath}\nginx.conf, $nginxConfContents, $Utf8NoBomEncoding)
 %{ if environment == "development" ~}
       Restart-Service -Name nginx
 %{ endif ~}
