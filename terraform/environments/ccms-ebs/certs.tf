@@ -23,7 +23,7 @@ resource "aws_acm_certificate" "external-service" {
   count = local.is-production ? 1 : 0
 
   validation_method = "DNS"
-  domain_name       = "modernisation-platform.service.justice.gov.uk"
+  domain_name       = "service.justice.gov.uk"
   subject_alternative_names = [
     "*.${var.networking[0].business-unit}.service.justice.gov.uk"
   ]
