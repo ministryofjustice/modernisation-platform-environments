@@ -60,8 +60,15 @@ tasks:
       "@
       $Utf8NoBomEncoding = New-Object System.Text.UTF8Encoding $False
       [System.IO.File]::WriteAllLines("$${nginxConfPath}\nginx.conf", $nginxConfContents, $Utf8NoBomEncoding)
+%{if environment == "development"}
+      Restart-Service -Name nginx
+%{endif}
+%{if environment != "development"}
+      # TODO: remove or edit if statement once migration gets a green light
       Stop-Service -Name nginx
       Set-Service -Name nginx -StartupType Disabled
+%{endif}
+      "nginx config written" | Out-File -FilePath C:\nginx_config_log.txt
 - task: executeScript
   inputs:
   - frequency: once
@@ -74,6 +81,8 @@ tasks:
       Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force # Needed for PS module installs
       Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
       Install-Module -Name AWSPowerShell -MinimumVersion 4.1.196 # Current latest version as of 3/1/23 is 4.1.196
+
+      "AWS PowerShell modules installed" | Out-File -FilePath C:\aws_powershell_modules_log.txt
   - frequency: always
     type: powershell
     runAs: admin
@@ -96,6 +105,7 @@ tasks:
         # Allow Domain Users to connect via RDP and give them local admin rights
         Add-LocalGroupMember -Group "Administrators" -Member "Domain Users@${delius_iaps_ad_domain_name}"
 
+        "Domain joined" | Out-File -FilePath C:\domain_join_log.txt
         exit 3010 # Reboot instance, see https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2launch-v2-settings.html#ec2launch-v2-exit-codes-reboots
       }
   - frequency: once
@@ -120,8 +130,21 @@ tasks:
       $configXML.DLLDEF.SOAPSERVER.ODBC = "DSN=$${SOAPServerODBCdsn};Server=$${SOAPServerODBCserver};Database=$${SOAPServerODBCdatabase};uid=$${SOAPServerODBCuid};pwd=$${SOAPServerODBCpwd}"
       $configXML.save($IMConfigFile)
 
+%{if environment == "development"}
+      $service = Restart-Service -Name IMIapsInterfaceWinService -Force -PassThru
+      if ($service.Status -match "Running") {
+          Write-Host('Restart of IMIapsInterfaceWinService successful')
+      } else {
+          Write-Host('Error - Failed to restart IMIapsInterfaceWinService - see logs')
+          Exit 1
+      }
+%{endif}
+%{if environment != "development"}
+      # TODO: remove or edit if statement once migration gets a green light
       Stop-Service -Name IMIapsInterfaceWinService -Force
       Set-Service -Name IMIapsInterfaceWinService -StartupType Disabled
+%{endif}
+      "IM Interface configured" | Out-File -FilePath C:\im_interface_config_log.txt
   - frequency: once
     type: powershell
     runAs: admin
@@ -157,5 +180,18 @@ tasks:
       $configXML.DLLDEF.EMAIL.FROMADDRESS = (Get-SSMParameter -Name "/NDeliusInterface/Email/fromaddress" -WithDecryption $true).Value
       $configXML.save($NDeliusConfigFile)
 
+%{if environment == "development"}
+      $service = Restart-Service -Name NDeliusInterfaceIapsWinService -Force -PassThru
+      if ($service.Status -match "Running") {
+          Write-Host('Restart of NDeliusInterfaceIapsWinService successful')
+      } else {
+          Write-Host('Error - Failed to restart NDeliusInterfaceIapsWinService - see logs')
+          Exit 1
+      }
+%{endif}
+%{if environment != "development"}
+      # TODO: remove or edit if statement once migration gets a green light
       Stop-Service -Name NDeliusInterfaceIapsWinService -Force
       Set-Service -Name NDeliusInterfaceIapsWinService -StartupType Disabled
+%{endif}
+      "NDelius Interface configured" | Out-File -FilePath C:\ndelius_interface_config_log.txt
