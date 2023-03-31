@@ -15,11 +15,7 @@ resource "aws_acm_certificate" "this" {
 resource "aws_route53_record" "validation_core_network_services" {
   provider = aws.core-network-services
   for_each = {
-    for dvo in aws_acm_certificate.this.domain_validation_options : dvo.domain_name => {
-      name   = dvo.resource_record_name
-      record = dvo.resource_record_value
-      type   = dvo.resource_record_type
-    } if var.validation[dvo.domain_name].account == "core-network-services"
+    for key, value in local.validation_records : key => value if value.zone.provider == "core-network-services"
   }
 
   allow_overwrite = true
@@ -27,7 +23,11 @@ resource "aws_route53_record" "validation_core_network_services" {
   records         = [each.value.record]
   ttl             = 60
   type            = each.value.type
-  zone_id         = data.aws_route53_zone.core_network_services[each.key].zone_id
+
+  # NOTE: value.zone is null indicates the validation zone could not be found
+  # Ensure route53_zones variable contains the given validation zone or
+  # explicitly provide the zone details in the validation variable.
+  zone_id = each.value.zone.zone_id
 
   depends_on = [
     aws_acm_certificate.this
@@ -38,11 +38,7 @@ resource "aws_route53_record" "validation_core_network_services" {
 resource "aws_route53_record" "validation_core_vpc" {
   provider = aws.core-vpc
   for_each = {
-    for dvo in aws_acm_certificate.this.domain_validation_options : dvo.domain_name => {
-      name   = dvo.resource_record_name
-      record = dvo.resource_record_value
-      type   = dvo.resource_record_type
-    } if var.validation[dvo.domain_name].account == "core-vpc"
+    for key, value in local.validation_records : key => value if value.zone.provider == "core-vpc"
   }
 
   allow_overwrite = true
@@ -50,7 +46,7 @@ resource "aws_route53_record" "validation_core_vpc" {
   records         = [each.value.record]
   ttl             = 60
   type            = each.value.type
-  zone_id         = data.aws_route53_zone.core_vpc[each.key].zone_id
+  zone_id         = each.value.zone.zone_id
 
   depends_on = [
     aws_acm_certificate.this
@@ -60,11 +56,7 @@ resource "aws_route53_record" "validation_core_vpc" {
 # assume any other domains are defined in the current workspace
 resource "aws_route53_record" "validation_self" {
   for_each = {
-    for dvo in aws_acm_certificate.this.domain_validation_options : dvo.domain_name => {
-      name   = dvo.resource_record_name
-      record = dvo.resource_record_value
-      type   = dvo.resource_record_type
-    } if var.validation[dvo.domain_name].account == "self"
+    for key, value in local.validation_records : key => value if value.zone.provider == "self"
   }
 
   allow_overwrite = true
@@ -72,7 +64,7 @@ resource "aws_route53_record" "validation_self" {
   records         = [each.value.record]
   ttl             = 60
   type            = each.value.type
-  zone_id         = data.aws_route53_zone.self[each.key].zone_id
+  zone_id         = each.value.zone.zone_id
 
   depends_on = [
     aws_acm_certificate.this

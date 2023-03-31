@@ -48,11 +48,11 @@ resource "aws_lb_target_group_attachment" "this" {
 }
 
 resource "aws_lb_listener" "this" {
-  load_balancer_arn = var.load_balancer_arn
+  load_balancer_arn = local.aws_lb.arn
   port              = var.port
   protocol          = var.protocol
   ssl_policy        = var.ssl_policy
-  certificate_arn   = try(var.certificate_arns[0], null)
+  certificate_arn   = length(var.certificate_names_or_arns) != 0 ? lookup(var.certificate_arn_lookup, var.certificate_names_or_arns[0], var.certificate_names_or_arns[0]) : null
 
   dynamic "default_action" {
     for_each = [var.default_action]
@@ -194,9 +194,9 @@ resource "aws_lb_listener_rule" "this" {
 }
 
 resource "aws_lb_listener_certificate" "this" {
-  for_each        = toset(var.certificate_arns)
+  for_each        = toset(var.certificate_names_or_arns)
   listener_arn    = aws_lb_listener.this.arn
-  certificate_arn = each.value
+  certificate_arn = lookup(var.certificate_arn_lookup, each.value, each.value)
 }
 
 resource "aws_route53_record" "core_vpc" {
@@ -208,8 +208,8 @@ resource "aws_route53_record" "core_vpc" {
   type    = "A"
 
   alias {
-    name                   = data.aws_lb.this.dns_name
-    zone_id                = data.aws_lb.this.zone_id
+    name                   = local.aws_lb.dns_name
+    zone_id                = local.aws_lb.zone_id
     evaluate_target_health = each.value.evaluate_target_health
   }
 }
@@ -222,8 +222,8 @@ resource "aws_route53_record" "self" {
   type    = "A"
 
   alias {
-    name                   = data.aws_lb.this.dns_name
-    zone_id                = data.aws_lb.this.zone_id
+    name                   = local.aws_lb.dns_name
+    zone_id                = local.aws_lb.zone_id
     evaluate_target_health = each.value.evaluate_target_health
   }
 }
