@@ -38,7 +38,7 @@ resource "aws_lb" "tipstaff_dev_lb" {
 
 resource "aws_lb_target_group" "tipstaff_dev_target_group" {
   name                 = "tipstaff-dev-target-group"
-  port                 = local.application_data.accounts[local.environment].server_port_1
+  port                 = local.application_data.accounts[local.environment].container_port_1
   protocol             = "HTTP"
   vpc_id               = data.aws_vpc.shared.id
   target_type          = "ip"
@@ -52,7 +52,7 @@ resource "aws_lb_target_group" "tipstaff_dev_target_group" {
     healthy_threshold   = "2"
     interval            = "120"
     protocol            = "HTTP"
-    port                = "80"
+    port                = "3000"
     unhealthy_threshold = "2"
     matcher             = "200-499"
     timeout             = "5"

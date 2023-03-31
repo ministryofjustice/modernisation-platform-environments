@@ -12,6 +12,7 @@
       "instance_class": "db.t3.micro",
       "subdomain_name": "tipstaff.legacy-dev",
       "server_port_1": "80",
+      "container_port_1": "3000",
       "lb_listener_protocol_1": "HTTP",
       "server_port_2": "443",
       "lb_listener_protocol_2": "HTTPS",
@@ -37,6 +38,11 @@
       "from_port": 443,
       "to_port": 443,
       "protocol": "TCP"
+    },
+    "CONTAINER_PORT_3000": {
+      "from_port": 3000,
+      "to_port": 3000,
+      "protocol": "CONTAINER_PORT"
     }
   }
 }
