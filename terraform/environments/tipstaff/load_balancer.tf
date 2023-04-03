@@ -70,7 +70,7 @@ resource "aws_lb_target_group" "tipstaff_dev_target_group" {
 
   # Use service discovery for target registration
   dynamic "service_discovery" {
-    for_each = aws_service_discovery_private_dns_namespace.service_discovery.services
+    for_each = aws_service_discovery_private_dns_namespace.service_discovery.*.id
     content {
       namespace_id = aws_service_discovery_private_dns_namespace.service_discovery.id
       service_name = service_discovery.value.name
