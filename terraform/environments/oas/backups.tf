@@ -13,7 +13,7 @@ resource "aws_backup_plan" "non_production_oas" {
 
   rule {
     rule_name         = "backup-daily-cold-storage-monthly-retain-30-days"
-    target_vault_name = aws_backup_vault.default.name
+    target_vault_name = aws_backup_vault.default_oas.name
 
     # Backup every day at 00:30am
     schedule = "cron(30 0 * * ? *)"
@@ -42,7 +42,7 @@ resource "aws_backup_plan" "non_production_oas" {
 resource "aws_backup_selection" "non_production_oas" {
   name         = "non-production-backup"
   iam_role_arn = var.iam_role_arn
-  plan_id      = aws_backup_plan.non_production.id
+  plan_id      = aws_backup_plan.non_production_oas.id
   resources    = ["*"]
 
   condition {
