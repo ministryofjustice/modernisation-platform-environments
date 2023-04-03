@@ -26,29 +26,36 @@ locals {
       patch_day                 = "TUE"
     }
 
+    baseline_s3_buckets = {
+
+      # the shared devtest bucket is just created in test
+      oasys-devtest = {
+        custom_kms_key = module.environment.kms_keys["general"].arn
+        bucket_policy_v2 = [
+          module.baseline_presets.s3_bucket_policies.ImageBuilderWriteAccessBucketPolicy,
+          module.baseline_presets.s3_bucket_policies.DevTestEnvironmentsWriteAndDeleteAccessBucketPolicy
+        ]
+        iam_policies = module.baseline_presets.s3_iam_policies
+      }
+    }
+
     baseline_ec2_autoscaling_groups = {
-      # webserver = {
-      #   autoscaling_group = {
-      #     desired_capacity    = 1
-      #     max_size            = 2
-      #     vpc_zone_identifier = module.environment.subnets["private"].ids
-      #   }
-      #   autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
-      #   config = merge(module.baseline_presets.ec2_instance.config.default, {
-      #     ami_name = "base_rhel_8_5_*"
-      #   })
-      #   ebs_volume_config = null
-      #   ebs_volumes       = null
-      #   instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-      #     vpc_security_group_ids = ["private"]
-      #   })
-      #   lb_target_groups = null
-      #   ssm_parameters   = null
-      #   tags = {
-      #     os-type = "Linux"
-      #   }
-      #   user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
-      # }
+      oasys-test-web = {
+        autoscaling_group     = module.baseline_presets.ec2_autoscaling_group
+        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name = "base_rhel_8_5_*"
+        })
+        ebs_volume_config = null
+        ebs_volumes       = null
+        instance          = module.baseline_presets.ec2_instance.instance.default
+        lb_target_groups  = null
+        ssm_parameters    = null
+        tags = {
+          os-type = "Linux"
+        }
+        user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
+      }
     }
 
     # baseline_lbs = {
