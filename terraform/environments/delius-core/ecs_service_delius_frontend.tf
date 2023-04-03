@@ -257,7 +257,7 @@ resource "aws_ecs_task_definition" "delius_core_frontend_task_definition" {
 
   skip_destroy  = false
   tags          = local.tags
-  task_role_arn = aws_iam_role.delius_core_frontend_ecs_exec.arn
+  task_role_arn = aws_iam_role.delius_core_frontend_ecs_task.arn
 }
 
 # ##
@@ -290,7 +290,7 @@ resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_security_gr
 
 resource "aws_vpc_security_group_egress_rule" "delius_core_frontend_security_group_egress_internet" {
   security_group_id = aws_security_group.delius_core_frontend_security_group.id
-  description       = "outbound from the testing db ecs service"
+  description       = "outbound from weblogic to any secure endpoint"
   ip_protocol       = "tcp"
   to_port           = 443
   from_port         = 443
