@@ -15,6 +15,12 @@ locals {
     ]
   ])
 
+  devtest_account_names = flatten([
+    for name in local.account_names : [
+      endswith(name,"-development") || endswith(name,"-test") ? [name] : []
+    ]
+  ])
+
   subnet_names = {
     general = ["data", "private", "public"]
   }
