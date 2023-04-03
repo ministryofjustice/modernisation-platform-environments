@@ -273,18 +273,19 @@ resource "aws_security_group" "delius_core_frontend_security_group" {
 
 resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_security_group_ingress_private_subnets" {
   security_group_id = aws_security_group.delius_core_frontend_security_group.id
-  description       = "weblogic to testing frontend"
-  for_each = toset(
-    [
-      data.aws_subnet.private_subnets_a.cidr_block,
-      data.aws_subnet.private_subnets_b.cidr_block,
-      data.aws_subnet.private_subnets_c.cidr_block
-    ]
-  )
-  from_port   = local.frontend_container_port
-  to_port     = local.frontend_container_port
-  ip_protocol = "tcp"
-  cidr_ipv4   = each.key
+  description       = "load balancer to weblogic frontend"
+  # for_each = toset(
+  #   [
+  #     data.aws_subnet.private_subnets_a.cidr_block,
+  #     data.aws_subnet.private_subnets_b.cidr_block,
+  #     data.aws_subnet.private_subnets_c.cidr_block
+  #   ]
+  # )
+  # cidr_ipv4   = each.key
+  from_port                    = local.frontend_container_port
+  to_port                      = local.frontend_container_port
+  ip_protocol                  = "tcp"
+  referenced_security_group_id = aws_security_group.delius_frontend_alb_security_group.id
 }
 
 resource "aws_vpc_security_group_egress_rule" "delius_core_frontend_security_group_egress_internet" {
