@@ -68,44 +68,6 @@ resource "aws_lb_target_group" "tipstaff_dev_target_group" {
     timeout             = "5"
   }
 
-  # Use service discovery for target registration
-  dynamic "service_discovery" {
-    for_each = aws_service_discovery_private_dns_namespace.service_discovery.*.id
-    content {
-      namespace_id = aws_service_discovery_private_dns_namespace.service_discovery.id
-      service_name = service_discovery.value.name
-    }
-  }
-}
-
-resource "aws_lb_service_discovery" "example_lb_service_discovery" {
-  name = "example-lb-service-discovery"
-  namespace_id = aws_service_discovery_private_dns_namespace.service_discovery.id
-
-  # Map the target group to the service discovery instance
-  dynamic "service" {
-    for_each = aws_service_discovery_private_dns_namespace.service_discovery.*.id
-    content {
-      name = service.value.name
-      dns_config {
-        namespace_id = aws_service_discovery_private_dns_namespace.service_discovery.id
-        dns_records {
-          ttl = 60
-          type = "A"
-        }
-      }
-      # Associate the target group with the service
-      health_check_custom_config {
-        failure_threshold = 5
-      }
-      health_check_grace_period_seconds = 60
-      health_check_interval_seconds = 10
-      health_check_path = "/health"
-      health_check_port = "traffic-port"
-      health_check_protocol = "HTTP"
-    }
-  }
-
 }
 
 # resource "aws_lb_target_group_attachment" "attach_target_group" {
