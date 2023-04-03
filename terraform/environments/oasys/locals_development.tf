@@ -92,12 +92,22 @@ locals {
     }
 
     baseline_bastion_linux = {
-      public_key_data = local.public_key_data.keys[local.environment]
-      tags            = local.tags
+      # public_key_data = local.public_key_data.keys[local.environment]
+      # tags            = local.tags
     }
 
 
     baseline_s3_buckets = {
+
+      # the shared image builder bucket is just created in development
+      oasys-software = {
+        custom_kms_key = module.environment.kms_keys["general"].arn
+        bucket_policy_v2 = [
+          module.baseline_presets.s3_bucket_policies.ImageBuilderWriteAccessBucketPolicy,
+          module.baseline_presets.s3_bucket_policies.AllEnvironmentsWriteAccessBucketPolicy
+        ]
+        iam_policies = module.baseline_presets.s3_iam_policies
+      }
     }
 
     baseline_ec2_instances = {
@@ -180,88 +190,46 @@ locals {
 
       #   # Example target group setup below
 
-      #   lb_target_groups = {
-      #     http-8080 = {
-      #       port                 = 8080
-      #       protocol             = "HTTP"
-      #       target_type          = "instance"
-      #       deregistration_delay = 30
-      #       health_check = {
-      #         enabled             = true
-      #         interval            = 30
-      #         healthy_threshold   = 3
-      #         matcher             = "200-399"
-      #         path                = "/"
-      #         port                = 8080
-      #         timeout             = 5
-      #         unhealthy_threshold = 5
-      #       }
-      #       stickiness = {
-      #         enabled = true
-      #         type    = "lb_cookie"
-      #       }
-      #     }
-      #   }
+      #   # lb_target_groups = local.lb_target_groups
       # }
     }
 
     baseline_lbs = {
-      #
-      # Below is an example of a baseline load balancer setup
-      #
-      #   rhel85-test = {
-      #     enable_delete_protection = false
-      #     idle_timeout             = "60"
-      #     public_subnets           = module.environment.subnets["public"].ids
-      #     force_destroy_bucket     = true
+      # AWS doesn't let us call it internal
+      #   private = {
       #     internal_lb              = true
-      #     tags                     = local.tags
-      #     security_groups          = [module.baseline.security_groups["public"].id]
-      #     listeners = {
-      #       https = {
-      #         port             = 443
-      #         protocol         = "HTTPS"
-      #         ssl_policy       = "ELBSecurityPolicy-2016-08"
-      #         certificate_arns = [module.acm_certificate["star.${module.environment.domains.public.application_environment}"].arn]
-      #         default_action = {
-      #           type = "fixed-response"
-      #           fixed_response = {
-      #             content_type = "text/plain"
-      #             message_body = "Not implemented"
-      #             status_code  = "501"
-      #           }
-      #         }
+      #     enable_delete_protection = false
+      #     existing_target_groups   = {
+      #       development-oasys-web-http-8080 = local.lb_target_groups.http-8080
+      #     }
+      #     force_destroy_bucket     = true
+      #     idle_timeout             = 3600
+      #     public_subnets           = module.environment.subnets["private"].ids
+      #     security_groups          = [aws_security_group.public.id]
 
-      #         rules = {
-      #           forward-http-8080 = {
-      #             priority = 100
-      #             actions = [{
-      #               type              = "forward"
-      #               target_group_name = "http-8080"
-      #             }]
-      #             conditions = [
-      #               {
-      #                 host_header = {
-      #                   values = ["web.oasys.${module.environment.vpc_name}.modernisation-platform.service.justice.gov.uk"]
-      #                 }
-      #               },
-      #               {
-      #                 path_pattern = {
-      #                   values = ["/"]
-      #                 }
-      #             }]
-      #           }
-      #         }
-      #       }
-      #       route53_records = {
-      #         "web.oasys" = {
-      #           account                = "core-vpc"
-      #           zone_id                = module.environment.route53_zones[module.environment.domains.public.business_unit_environment].zone_id
-      #           evaluate_target_health = true
+      #     listeners = {
+      #       development-oasys-web-http-8080 = {
+      #         port     = 8080
+      #         protocol = "HTTP"
+      #         default_action = {
+      #           type              = "forward"
+      #           target_group_name = "development-oasys-web-http-8080"
       #         }
       #       }
       #     }
+
+      #     # public LB not needed right now
+      #     # public = {
+      #     #   internal_lb              = false
+      #     #   enable_delete_protection = false
+      #     #   force_destroy_bucket     = true
+      #     #   idle_timeout             = 3600
+      #     #   public_subnets           = module.environment.subnets["public"].ids
+      #     #   security_groups          = [aws_security_group.public.id]
+      #     # }
       #   }
     }
   }
 }
+
+

@@ -1,10 +1,19 @@
 version: 1.0
 tasks:
-- task: writeFile
+- task: executeScript
   inputs:
-  - frequency: always
-    destination: C:\tools\nginx.conf
+  - frequency: once
+    type: powershell
+    runAs: admin
     content: |-
+      $tnsNamesOraPath = "C:\app\client\Administrator\product\12.1.0\client_1\network\admin\tnsnames.ora"
+      (Get-Content $tnsNamesOraPath).replace('iaps-db', '${delius_iaps_rds_db_address}') | Set-Content $tnsNamesOraPath
+
+      $nginxConfPath = (Resolve-Path 'C:\tools\nginx-*\conf').Path
+      Invoke-Expression 'openssl req -new -newkey rsa:4096 -days 36500 -nodes -x509 -subj "/C=GB/ST=London/L=London/O=HMPPS/OU=HMPPS Digital and Technology/CN=localhost" -keyout "$${nginxConfPath}\server.key" -out "$${nginxConfPath}\server.crt"' 2>&1
+      Import-Certificate -FilePath $${nginxConfPath}\server.crt -CertStoreLocation Cert:\LocalMachine\Root
+
+      $nginxConfContents = @"
       worker_processes auto;
 
       error_log  logs/error.log;
@@ -21,8 +30,10 @@ tasks:
         keepalive_timeout    65;
 
         server {
-          listen 80;
+          listen 443 ssl;
           server_name localhost;
+          ssl_certificate     server.crt;
+          ssl_certificate_key server.key;
 
           allow 127.0.0.1;
           deny  all;
@@ -46,15 +57,9 @@ tasks:
           }
         }
       }
-
-- task: executeScript
-  inputs:
-  - frequency: once
-    type: powershell
-    runAs: admin
-    content: |-
-      # Move previously templated config file to correct location
-      Move-Item -Path 'C:\tools\nginx.conf' -Destination (Resolve-Path 'C:\tools\nginx-*\conf\nginx.conf').Path -Force
+      "@
+      $Utf8NoBomEncoding = New-Object System.Text.UTF8Encoding $False
+      [System.IO.File]::WriteAllLines("$${nginxConfPath}\nginx.conf", $nginxConfContents, $Utf8NoBomEncoding)
 %{if environment == "development"}
       Restart-Service -Name nginx
 %{endif}
@@ -63,15 +68,12 @@ tasks:
       Stop-Service -Name nginx
       Set-Service -Name nginx -StartupType Disabled
 %{endif}
+      "nginx config written" | Out-File -FilePath C:\nginx_config_log.txt
+- task: executeScript
+  inputs:
   - frequency: once
     type: powershell
     runAs: admin
-    content: |-
-      $tnsNamesOraPath = "C:\app\client\Administrator\product\12.1.0\client_1\network\admin\tnsnames.ora"
-      (Get-Content $tnsNamesOraPath).replace('iaps-db', '${delius_iaps_rds_db_address}') | Set-Content $tnsNamesOraPath
-  - frequency: once
-    type: powershell
-    runAs: localSystem
     content: |-
       $ConfirmPreference="none"
       $ErrorActionPreference="Stop"
@@ -79,6 +81,8 @@ tasks:
       Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force # Needed for PS module installs
       Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
       Install-Module -Name AWSPowerShell -MinimumVersion 4.1.196 # Current latest version as of 3/1/23 is 4.1.196
+
+      "AWS PowerShell modules installed" | Out-File -FilePath C:\aws_powershell_modules_log.txt
   - frequency: always
     type: powershell
     runAs: admin
@@ -101,6 +105,7 @@ tasks:
         # Allow Domain Users to connect via RDP and give them local admin rights
         Add-LocalGroupMember -Group "Administrators" -Member "Domain Users@${delius_iaps_ad_domain_name}"
 
+        "Domain joined" | Out-File -FilePath C:\domain_join_log.txt
         exit 3010 # Reboot instance, see https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2launch-v2-settings.html#ec2launch-v2-exit-codes-reboots
       }
   - frequency: once
@@ -139,7 +144,7 @@ tasks:
       Stop-Service -Name IMIapsInterfaceWinService -Force
       Set-Service -Name IMIapsInterfaceWinService -StartupType Disabled
 %{endif}
-
+      "IM Interface configured" | Out-File -FilePath C:\im_interface_config_log.txt
   - frequency: once
     type: powershell
     runAs: admin
@@ -176,16 +181,18 @@ tasks:
       $configXML.save($NDeliusConfigFile)
 
 %{if environment == "development"}
-      $service = Restart-Service -Name NDeliusInterfaceIapsWinService -Force -PassThru
+      $service = Restart-Service -Name IapsNDeliusInterfaceWinService -Force -PassThru
       if ($service.Status -match "Running") {
-          Write-Host('Restart of NDeliusInterfaceIapsWinService successful')
+          Write-Host('Restart of IapsNDeliusInterfaceWinService successful')
+          "NDelius Interface configured" | Out-File -FilePath C:\ndelius_interface_config_log.txt
       } else {
-          Write-Host('Error - Failed to restart NDeliusInterfaceIapsWinService - see logs')
+          Write-Host('Error - Failed to restart IapsNDeliusInterfaceWinService - see logs')
+          "Error - Failed to restart IapsNDeliusInterfaceWinService - see logs" | Out-File -FilePath C:\ndelius_interface_config_log.txt
           Exit 1
       }
 %{endif}
 %{if environment != "development"}
       # TODO: remove or edit if statement once migration gets a green light
-      Stop-Service -Name NDeliusInterfaceIapsWinService -Force
-      Set-Service -Name NDeliusInterfaceIapsWinService -StartupType Disabled
+      Stop-Service -Name IapsNDeliusInterfaceWinService -Force
+      Set-Service -Name IapsNDeliusInterfaceWinService -StartupType Disabled
 %{endif}

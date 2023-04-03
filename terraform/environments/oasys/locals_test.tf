@@ -1,6 +1,7 @@
 # oasys-test environment settings
 locals {
   test_config = {
+
     # db_enabled                             = true
     # db_auto_minor_version_upgrade          = true
     # db_allow_major_version_upgrade         = false
@@ -23,6 +24,19 @@ locals {
     ec2_common = {
       patch_approval_delay_days = 3
       patch_day                 = "TUE"
+    }
+
+    baseline_s3_buckets = {
+
+      # the shared image builder bucket is just created in test
+      # oasys-devtest = {
+      #   custom_kms_key = module.environment.kms_keys["general"].arn
+      #   bucket_policy_v2 = [
+      #     module.baseline_presets.s3_bucket_policies.ImageBuilderWriteAccessBucketPolicy,
+      #     module.baseline_presets.s3_bucket_policies.DevTestEnvironmentsWriteAccessBucketPolicy ###### need to make this. need to change environments module as part of it
+      #   ]
+      #   iam_policies = module.baseline_presets.s3_iam_policies
+      # }
     }
 
     baseline_ec2_autoscaling_groups = {

@@ -13,9 +13,15 @@ variable "environment" {
   description = "Modernisation platform environment, e.g. development"
 }
 
+variable "load_balancer" {
+  description = "Provide aws_lb resource or data resource"
+  default     = null
+}
+
 variable "load_balancer_arn" {
   type        = string
-  description = "ARN of the load balancer"
+  description = "As alternative to using load_balancer variable, use ARN of the load balancer"
+  default     = null
 }
 
 variable "target_groups" {
@@ -71,9 +77,15 @@ variable "ssl_policy" {
   default     = null
 }
 
-variable "certificate_arns" {
+variable "certificate_arn_lookup" {
+  type        = map(string)
+  description = "Map of certficate name to ARN.  Use this if certificate not yet created to avoid for_each determined error"
+  default     = {}
+}
+
+variable "certificate_names_or_arns" {
   type        = list(string)
-  description = "List of SSL certificage ARNs to associate with the listener"
+  description = "List of SSL certificate names or ARNs to associate with the listener.  If names, ensure certificate_lookup variable is used.  The first certificate provided is the default"
   default     = []
 }
 

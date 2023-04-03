@@ -19,19 +19,9 @@ resource "aws_sns_topic" "nomis_nonprod_alarms" {
 
 ## Pager duty integration
 
-# Get the map of pagerduty integration keys from the modernisation platform account
-data "aws_secretsmanager_secret" "pagerduty_integration_keys" {
-  provider = aws.modernisation-platform
-  name     = "pagerduty_integration_keys"
-}
-data "aws_secretsmanager_secret_version" "pagerduty_integration_keys" {
-  provider  = aws.modernisation-platform
-  secret_id = data.aws_secretsmanager_secret.pagerduty_integration_keys.id
-}
-
 # Add a local to get the keys
 locals {
-  pagerduty_integration_keys = jsondecode(data.aws_secretsmanager_secret_version.pagerduty_integration_keys.secret_string)
+  pagerduty_integration_keys = module.environment.pagerduty_integration_keys
 }
 
 # link the sns topic to the service

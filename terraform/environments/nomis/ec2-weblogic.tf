@@ -50,9 +50,10 @@ locals {
     route53 = {
       route53_records = {
         "$(name).nomis" = {
-          account                = "core-vpc"
-          zone_id                = module.environment.route53_zones[module.environment.domains.public.business_unit_environment].zone_id
-          evaluate_target_health = true
+          zone_name = module.environment.domains.public.business_unit_environment
+        }
+        "$(name)" = {
+          zone_name = "${local.environment}.nomis.az.justice.gov.uk"
         }
       }
     }
@@ -89,7 +90,7 @@ locals {
       port                      = 443
       protocol                  = "HTTPS"
       ssl_policy                = "ELBSecurityPolicy-2016-08"
-      certificate_names_or_arns = ["application_environment_wildcard_cert"]
+      certificate_names_or_arns = ["nomis_wildcard_cert"]
       default_action = {
         type = "fixed-response"
         fixed_response = {
@@ -107,7 +108,10 @@ locals {
           }]
           conditions = [{
             host_header = {
-              values = ["$(name).nomis.${module.environment.vpc_name}.modernisation-platform.service.justice.gov.uk"]
+              values = [
+                "$(name).nomis.${module.environment.domains.public.business_unit_environment}",
+                "$(name).${local.environment}.nomis.az.justice.gov.uk"
+              ]
             }
           }]
         }
