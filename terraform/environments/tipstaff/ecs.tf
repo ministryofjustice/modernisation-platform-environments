@@ -48,6 +48,9 @@ resource "aws_ecs_task_definition" "tipstaff_task_definition" {
           value = "${jsondecode(data.aws_secretsmanager_secret_version.db_password.secret_string)["LOCAL_DB_PASSWORD"]}"
         }
       ]
+      dnsSearchDomains = [
+        "${aws_db_instance.tipstaffdbdev.address}"
+      ]
     }
   ])
   runtime_platform {
@@ -87,6 +90,19 @@ resource "aws_ecs_service" "tipstaff_ecs_service" {
     container_port   = 80
   }
 
+  # Define the service registry for service discovery
+  service_registries {
+    registry_arn = aws_service_discovery_private_dns_namespace.service_discovery.arn
+    container_name = "tipstaff-container"
+    container_port = 80
+  }
+
+}
+
+resource "aws_service_discovery_private_dns_namespace" "service_discovery" {
+  name = "service-discovery"
+  description = "Private DNS namespace for service discovery"
+  vpc = data.aws_vpc.shared.id
 }
 
 resource "aws_iam_role" "app_execution" {
