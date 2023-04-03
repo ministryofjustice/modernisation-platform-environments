@@ -185,7 +185,7 @@ resource "aws_ecs_task_definition" "delius_core_frontend_task_definition" {
 
   skip_destroy  = false
   tags          = local.tags
-  task_role_arn = aws_iam_role.delius_core_frontend_ecs_exec.arn
+  task_role_arn = aws_iam_role.delius_core_frontend_ecs_task.arn
 }
 
 # ##
