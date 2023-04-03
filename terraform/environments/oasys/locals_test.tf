@@ -29,7 +29,7 @@ locals {
     baseline_s3_buckets = {
 
       # the shared devtest bucket is just created in test
-      oasys-devtest = {
+      devtest-oasys = {
         custom_kms_key = module.environment.kms_keys["general"].arn
         bucket_policy_v2 = [
           module.baseline_presets.s3_bucket_policies.ImageBuilderWriteAccessBucketPolicy,
@@ -40,7 +40,7 @@ locals {
     }
 
     baseline_ec2_autoscaling_groups = {
-      oasys-test-web = {
+      test-oasys-web = {
         autoscaling_group     = module.baseline_presets.ec2_autoscaling_group
         autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
         config = merge(module.baseline_presets.ec2_instance.config.default, {

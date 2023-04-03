@@ -104,6 +104,7 @@ locals {
         "s3:PutObject",
         "s3:PutObjectAcl",
         "s3:DeleteObject",
+        "s3:DeleteObjectVersion",
       ]
       principals = {
         type = "AWS"

@@ -265,11 +265,13 @@ locals {
   # }
   database_tags = {
     component            = "data"
+    oracle-sids          = "OASPROD BIPINFRA"
     os-type              = "Linux"
     os-major-version     = 8
     os-version           = "RHEL 8.5"
     licence-requirements = "Oracle Database"
     "Patch Group"        = "RHEL"
+    server-type          = "oasys-db"
   }
 
 
