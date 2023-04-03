@@ -7,7 +7,7 @@ resource "aws_security_group" "tipstaff_dev_lb_sc" {
     description       = "allow access for http"
     from_port         = 80
     to_port           = 80
-    protocol          = "http"
+    protocol          = "tcp"
     cidr_blocks       = [local.application_data.accounts[local.environment].moj_ip]
   }
 
@@ -15,7 +15,7 @@ resource "aws_security_group" "tipstaff_dev_lb_sc" {
     description       = "allow access for https"
     from_port         = 443
     to_port           = 443
-    protocol          = "https"
+    protocol          = "tcp"
     cidr_blocks       = [local.application_data.accounts[local.environment].moj_ip]
   }
 
@@ -31,7 +31,7 @@ resource "aws_security_group" "tipstaff_dev_lb_sc" {
     description       = "allow all outbound traffic for port 80"
     from_port         = 80
     to_port           = 80
-    protocol          = "http"
+    protocol          = "tcp"
     cidr_blocks       = ["0.0.0.0/0"]
   }
 
@@ -39,7 +39,7 @@ resource "aws_security_group" "tipstaff_dev_lb_sc" {
     description       = "allow all outbound traffic for port 443"
     from_port         = 443
     to_port           = 443
-    protocol          = "https"
+    protocol          = "tcp"
     cidr_blocks       = ["0.0.0.0/0"]
   }
 
