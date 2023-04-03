@@ -103,8 +103,8 @@ locals {
         "s3:ListBucket",
         "s3:PutObject",
         "s3:PutObjectAcl",
-        "s3:Delete*"
-        #"s3:DeleteObjectVersion"
+        "s3:DeleteObject",
+        "s3:DeleteObjectVersion",
       ]
       principals = {
         type = "AWS"
