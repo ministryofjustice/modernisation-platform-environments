@@ -1,8 +1,9 @@
 locals {
 
   ec2_autoscaling_group = {
-    desired_capacity = 1
-    max_size         = 2
+    desired_capacity    = 1
+    max_size            = 2
+    vpc_zone_identifier = var.environment.subnets["private"].ids
   }
 
   ec2_autoscaling_schedules = {

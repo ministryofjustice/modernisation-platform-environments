@@ -41,9 +41,7 @@ locals {
 
     baseline_ec2_autoscaling_groups = {
       oasys-test-web = {
-        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group, {
-          vpc_zone_identifier = module.environment.subnets["private"].ids
-        })
+        autoscaling_group     = module.baseline_presets.ec2_autoscaling_group
         autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name = "base_rhel_8_5_*"
