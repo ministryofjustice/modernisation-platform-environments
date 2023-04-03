@@ -81,6 +81,21 @@ locals {
           "post-ec2provision.sh.tftpl"
         ]
       }
+
+      ssm_agent_ansible_no_tags = {
+        args = {
+          lifecycle_hook_name  = "ready-hook"
+          branch               = "main"
+          ansible_repo         = "modernisation-platform-configuration-management"
+          ansible_repo_basedir = "ansible"
+          ansible_args         = ""
+        }
+        scripts = [
+          "install-ssm-agent.sh.tftpl",
+          "ansible-ec2provision.sh.tftpl",
+          "post-ec2provision.sh.tftpl"
+        ]
+      }
     }
 
     route53_records = {

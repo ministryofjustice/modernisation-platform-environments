@@ -23,22 +23,6 @@ locals {
       patch_day                 = "TUE"
     }
 
-    autoscaling_groups = { # currently this does nothing - add to baseline
-
-
-      # development-oasys-db = merge(local.database, {
-      #   tags = merge(local.database_tags, {
-      #     oasys-environment = "development"
-      #     server-type       = "oasys-db"
-      #     description       = "Development OASys database"
-      #     oracle-sids       = "OASPROD BIPINFRA"
-      #     monitored         = true
-      #   })
-      #   ami_name = "oasys_oracle_db_*"
-      #   # ami_owner = "self" # remove this line next time AMI is updated so core-shared-services-production used instead
-      # })
-    }
-
     # Add database instances here. They will be created using ec2-database.tf
     databases = { # currently this does nothing - add to baseline
       # development-oasys-db-1 = {
@@ -141,48 +125,23 @@ locals {
 
     baseline_ec2_autoscaling_groups = {
 
-      # Example ASG using base image with ansible provisioning
-      # Include the autoscale-trigger-hook ansible role when using hooks
-      # development-oasys-web = {
-      #   config = merge(module.baseline_presets.ec2_instance.config.default, {
-      #     ami_name = "oasys_webserver_*"
-      #   })
-      #   instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-      #     vpc_security_group_ids = ["private"]
-      #   })
-      #   user_data_cloud_init = {
-      #     args = {
-      #       lifecycle_hook_name  = "ready-hook"
-      #       branch               = "main"
-      #       ansible_repo         = "modernisation-platform-configuration-management"
-      #       ansible_repo_basedir = "ansible"
-      #       ansible_args         = ""
-      #     }
-      #     scripts = [
-      #       "install-ssm-agent.sh.tftpl",
-      #       "ansible-ec2provision.sh.tftpl",
-      #       "post-ec2provision.sh.tftpl"
-      #     ]
-      #   }
-      #   autoscaling_group = {
-      #     desired_capacity    = 1
-      #     max_size            = 2
-      #     vpc_zone_identifier = module.environment.subnets["private"].ids
-      #   }
-      #   autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
-      #   tags = {
-      #     os-type           = "Linux"
-      #     oasys-environment = "t1"
-      #     description       = "oasys webserver"
-      #     component         = "web"
-      #     server-type       = "oasys-web"
-      #     os-version        = "RHEL 7.9"
-      #   }
+      development-oasys-db = {
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name = "oasys_oracle_db_*"
+        })
+        instance = module.baseline_presets.ec2_instance.instance.default
+        user_data_cloud_init  = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags
+        autoscaling_group     = module.baseline_presets.ec2_autoscaling_group
+        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
+        tags = merge(local.database_tags, {
+          description       = "Development OASys database"
+          monitored         = true
+          oasys-environment = "development"
+        })
 
-      #   # Example target group setup below
-
-      #   # lb_target_groups = local.lb_target_groups
-      # }
+        # Example target group setup below
+        lb_target_groups = local.lb_target_groups
+      }
     }
 
     baseline_lbs = {
