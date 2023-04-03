@@ -13,10 +13,10 @@ resource "aws_backup_vault" "default_oas" {
 # Non production backups
 resource "aws_backup_plan" "non_production_oas" {
 
-  name = "${local.application_name}-backup-daily-cold-storage-monthly-retain-30-days"
+  name = "${local.application_name}-backup-daily-retain-30-days"
 
   rule {
-    rule_name         = "${local.application_name}-backup-daily-cold-storage-monthly-retain-30-days"
+    rule_name         = "${local.application_name}-backup-daily-retain-30-days"
     target_vault_name = aws_backup_vault.default_oas.name
 
     # Backup every day at 00:30am
