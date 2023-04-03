@@ -51,7 +51,7 @@ resource "aws_lb_target_group" "tipstaff_dev_target_group" {
   port                 = 80
   protocol             = "HTTP"
   vpc_id               = data.aws_vpc.shared.id
-  target_type          = "alb"
+  target_type          = "ip"
   deregistration_delay = 30
 
   stickiness {
@@ -69,11 +69,11 @@ resource "aws_lb_target_group" "tipstaff_dev_target_group" {
   }
 }
 
-resource "aws_lb_target_group_attachment" "attach_target_group" {
-  target_group_arn = aws_lb_target_group.tipstaff_dev_target_group.arn
-  target_id        = aws_ecs_service.tipstaff_ecs_service.id
-  port             = 80
-}
+# resource "aws_lb_target_group_attachment" "attach_target_group" {
+#   target_group_arn = aws_lb_target_group.tipstaff_dev_target_group.arn
+#   target_id        = aws_ecs_service.tipstaff_ecs_service.id
+#   port             = 80
+# }
 
 resource "aws_lb_listener" "tipstaff_dev_lb_1" {
   load_balancer_arn = aws_lb.tipstaff_dev_lb.arn
