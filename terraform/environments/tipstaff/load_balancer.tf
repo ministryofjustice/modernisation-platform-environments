@@ -106,6 +106,8 @@ resource "aws_lb_service_discovery" "example_lb_service_discovery" {
     }
   }
 
+}
+
 # resource "aws_lb_target_group_attachment" "attach_target_group" {
 #   target_group_arn = aws_lb_target_group.tipstaff_dev_target_group.arn
 #   target_id        = aws_ecs_service.tipstaff_ecs_service.id
