@@ -105,6 +105,12 @@ resource "aws_service_discovery_private_dns_namespace" "service_discovery" {
   vpc = data.aws_vpc.shared.id
 }
 
+resource "aws_service_discovery_service" "example_service" {
+  count = 1
+  name = "example-service-${count.index}"
+  namespace_id = aws_service_discovery_private_dns_namespace.service_discovery.id
+}
+
 resource "aws_iam_role" "app_execution" {
   name = "execution-${var.networking[0].application}"
 

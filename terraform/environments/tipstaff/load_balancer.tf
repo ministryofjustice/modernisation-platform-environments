@@ -84,7 +84,7 @@ resource "aws_lb_service_discovery" "example_lb_service_discovery" {
 
   # Map the target group to the service discovery instance
   dynamic "service" {
-    for_each = aws_service_discovery_private_dns_namespace.service_discovery.services
+    for_each = aws_service_discovery_private_dns_namespace.service_discovery.*.id
     content {
       name = service.value.name
       dns_config {
