@@ -29,7 +29,7 @@ locals {
     baseline_s3_buckets = {
 
       # the shared devtest bucket is just created in test
-      devtest-oasys = {
+      oasys-devtest = { #devtest-oasys = {
         custom_kms_key = module.environment.kms_keys["general"].arn
         bucket_policy_v2 = [
           module.baseline_presets.s3_bucket_policies.ImageBuilderWriteAccessBucketPolicy,
