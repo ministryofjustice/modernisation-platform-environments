@@ -74,7 +74,7 @@ resource "aws_lb_target_group" "delius_core_frontend_target_group" {
   health_check {
     path                = "/NDelius-war/delius/JSP/healthcheck.jsp?ping"
     healthy_threshold   = "5"
-    interval            = "120"
+    interval            = "300"
     protocol            = "HTTP"
     unhealthy_threshold = "2"
     matcher             = "200-499"
