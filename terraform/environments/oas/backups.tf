@@ -48,7 +48,7 @@ resource "aws_backup_plan" "non_production_oas" {
 
 resource "aws_backup_selection" "non_production_oas" {
   name         = "${local.application_name}-non-production-backup"
-  iam_role_arn = [local.application_data.accounts[local.environment].iam_role_arn]
+  iam_role_arn = local.application_data.accounts[local.environment].iam_role_arn
   plan_id      = aws_backup_plan.non_production_oas.id
   resources    = ["*"]
 
