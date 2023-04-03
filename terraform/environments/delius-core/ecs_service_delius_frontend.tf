@@ -11,6 +11,56 @@ data "aws_ssm_parameter" "delius_core_frontend_envs" {
   name = "${local.application_name}-${local.frontend_service_name}-envs"
 }
 
+resource "aws_ssm_parameter" "delius_core_frontend_env_var_jdbc_url" {
+  name  = format("/%s/JCBC_URL", local.application_name)
+  type  = "SecureString"
+  value = format("jdbc:oracle:thin:@//%s:%s/%s", aws_db_instance.delius-core.address, aws_db_instance.delius-core.port, local.db_name)
+  tags  = local.tags
+}
+
+resource "aws_ssm_parameter" "delius_core_frontend_env_var_jdbc_password" {
+  name  = format("/%s/JCBC_PASSWORD", local.application_name)
+  type  = "SecureString"
+  value = "INITIAL_VALUE_OVERRIDDEN"
+  tags  = local.tags
+  lifecycle {
+    ignore_changes = [
+      value
+    ]
+  }
+}
+
+resource "aws_ssm_parameter" "delius_core_frontend_env_var_test_mode" {
+  name  = format("/%s/TEST_MODE", local.application_name)
+  type  = "String"
+  value = "true"
+  tags  = local.tags
+}
+
+resource "aws_ssm_parameter" "delius_core_frontend_env_var_dev_username" {
+  name  = format("/%s/DEV_USERNAME", local.application_name)
+  type  = "SecureString"
+  value = "INITIAL_VALUE_OVERRIDDEN"
+  lifecycle {
+    ignore_changes = [
+      value
+    ]
+  }
+  tags = local.tags
+}
+
+resource "aws_ssm_parameter" "delius_core_frontend_env_var_jdbc_dev_password" {
+  name  = format("/%s/DEV_PASSWORD", local.application_name)
+  type  = "SecureString"
+  value = "INITIAL_VALUE_OVERRIDDEN"
+  lifecycle {
+    ignore_changes = [
+      value
+    ]
+  }
+  tags = local.tags
+}
+
 ##
 # IAM for ECS services and tasks
 ##
