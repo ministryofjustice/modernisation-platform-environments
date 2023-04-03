@@ -222,3 +222,4 @@ resource "aws_iam_role_policy" "app_task" {
   }
   EOF
 }
+
