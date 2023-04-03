@@ -48,9 +48,6 @@ resource "aws_ecs_task_definition" "tipstaff_task_definition" {
           value = "${jsondecode(data.aws_secretsmanager_secret_version.db_password.secret_string)["LOCAL_DB_PASSWORD"]}"
         }
       ]
-      dnsSearchDomains = [
-        "${aws_db_instance.tipstaffdbdev.address}"
-      ]
     }
   ])
   runtime_platform {
