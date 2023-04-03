@@ -14,8 +14,18 @@ output "account_name" {
 }
 
 output "account_names" {
-  description = "list of all accounts for ghte given application, e.g. ['nomis-development', 'nomis-test', 'nomis-preproduction', 'nomis-production']"
+  description = "list of all accounts for the given application, e.g. ['nomis-development', 'nomis-test', 'nomis-preproduction', 'nomis-production']"
   value       = local.account_names
+}
+
+output "devtest_account_names" {
+  description = "list of all devtest accounts for the given application, e.g. ['nomis-development', 'nomis-test']"
+  value       = local.devtest_account_names
+}
+
+output "prodpreprod_account_names" {
+  description = "list of all prod and preprod accounts for the given application, e.g. ['nomis-preproduction', 'nomis-production']"
+  value       = local.prodpreprod_account_names
 }
 
 output "modernisation_platform_account_id" {
