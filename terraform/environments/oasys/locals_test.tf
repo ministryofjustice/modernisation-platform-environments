@@ -40,12 +40,8 @@ locals {
     }
 
     baseline_ec2_autoscaling_groups = {
-      webserver = {
-        autoscaling_group = {
-          desired_capacity    = 1
-          max_size            = 2
-          vpc_zone_identifier = module.environment.subnets["private"].ids
-        }
+      oasys-test-web = {
+        autoscaling_group     = module.baseline_presets.ec2_autoscaling_group
         autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name = "base_rhel_8_5_*"
