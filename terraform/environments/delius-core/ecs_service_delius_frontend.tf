@@ -49,7 +49,7 @@ resource "aws_ssm_parameter" "delius_core_frontend_env_var_dev_username" {
   tags = local.tags
 }
 
-resource "aws_ssm_parameter" "delius_core_frontend_env_var_jdbc_dev_password" {
+resource "aws_ssm_parameter" "delius_core_frontend_env_var_dev_password" {
   name  = format("/%s/DEV_PASSWORD", local.application_name)
   type  = "SecureString"
   value = "INITIAL_VALUE_OVERRIDDEN"
@@ -217,7 +217,29 @@ resource "aws_ecs_task_definition" "delius_core_frontend_task_definition" {
         readonlyRootFilesystem = false
         volumesFrom            = []
 
-        environment = [for key, value in jsondecode(data.aws_ssm_parameter.delius_core_frontend_envs.value) : { name = key, value = value }]
+        # secrets = [for key, value in jsondecode(data.aws_ssm_parameter.delius_core_frontend_envs.value) : { name = key, value = value }]
+        secrets = [
+          {
+            name      = "JDBC_URL"
+            valueFrom = aws_ssm_parameter.delius_core_frontend_env_var_jdbc_url.arn
+          },
+          {
+            name      = "JDBC_PASSWORD"
+            valueFrom = aws_ssm_parameter.delius_core_frontend_env_var_jdbc_password.arn
+          },
+          {
+            name      = "DEV_USERNAME"
+            valueFrom = aws_ssm_parameter.delius_core_frontend_env_var_dev_username.arn
+          },
+          {
+            name      = "DEV_PASSWORD"
+            valueFrom = aws_ssm_parameter.delius_core_frontend_env_var_dev_password.arn
+          },
+          {
+            name      = "TEST_MODE"
+            valueFrom = aws_ssm_parameter.delius_core_frontend_env_var_test_mode.arn
+          }
+        ]
       }
   ])
   cpu = "1024"
