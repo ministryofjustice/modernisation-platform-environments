@@ -17,13 +17,13 @@ locals {
 
   devtest_account_names = flatten([
     for name in local.account_names : [
-      endswith(name,"-development") || endswith(name,"-test") ? [name] : []
+      endswith(name, "-development") || endswith(name, "-test") ? [name] : []
     ]
   ])
 
   prodpreprod_account_names = flatten([
     for name in local.account_names : [
-      endswith(name,"-production") || endswith(name,"-preproduction") ? [name] : []
+      endswith(name, "-production") || endswith(name, "-preproduction") ? [name] : []
     ]
   ])
 

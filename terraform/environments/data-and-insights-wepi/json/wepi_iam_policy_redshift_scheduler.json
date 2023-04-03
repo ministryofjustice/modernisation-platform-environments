@@ -4,7 +4,11 @@
     {
       "Sid": "",
       "Effect": "Allow",
-      "Action": ["redshift:PauseCluster", "redshift:ResumeCluster", "redshift:ResizeCluster"],
+      "Action": [
+        "redshift:PauseCluster",
+        "redshift:ResumeCluster",
+        "redshift:ResizeCluster"
+      ],
       "Resource": "${redshift_cluster}"
     }
   ]
