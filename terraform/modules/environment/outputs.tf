@@ -23,6 +23,11 @@ output "devtest_account_names" {
   value       = local.devtest_account_names
 }
 
+output "prodpreprod_account_names" {
+  description = "list of all prod and preprod accounts for the given application, e.g. ['nomis-preproduction', 'nomis-production']"
+  value       = local.prodpreprod_account_names
+}
+
 output "modernisation_platform_account_id" {
   description = "id of the modernisation platform account retrieved from local ssm parameter"
   value       = data.aws_ssm_parameter.modernisation_platform_account_id.value

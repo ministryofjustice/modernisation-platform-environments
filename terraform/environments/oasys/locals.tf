@@ -4,7 +4,7 @@
 locals {
 
   baseline_s3_buckets = {
-    module.environment.account_name = {
+    terraform.workspace = {
       iam_policies = module.baseline_presets.s3_iam_policies
     }
   }
