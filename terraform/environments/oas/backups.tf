@@ -3,16 +3,20 @@ locals {
 }
 
 resource "aws_backup_vault" "default_oas" {
-  name = "everything"
-  tags = var.tags
+  name =  "${local.application_name} Backup Vault"
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name} Backup Vault" },
+  )
 }
 
 # Non production backups
 resource "aws_backup_plan" "non_production_oas" {
-  name = "backup-daily-cold-storage-monthly-retain-30-days"
+
+  name = "${local.application_name} backup-daily-cold-storage-monthly-retain-30-days"
 
   rule {
-    rule_name         = "backup-daily-cold-storage-monthly-retain-30-days"
+    rule_name         = "${local.application_name} backup-daily-cold-storage-monthly-retain-30-days"
     target_vault_name = aws_backup_vault.default_oas.name
 
     # Backup every day at 00:30am
@@ -36,12 +40,15 @@ resource "aws_backup_plan" "non_production_oas" {
     resource_type = "EC2"
   }
 
-  tags = var.tags
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name} Backup Plan" },
+  )
 }
 
 resource "aws_backup_selection" "non_production_oas" {
-  name         = "non-production-backup"
-  iam_role_arn = var.iam_role_arn
+  name         = "${local.application_name} non-production-backup"
+  iam_role_arn = [local.application_data.accounts[local.environment].iam_role_arn]
   plan_id      = aws_backup_plan.non_production_oas.id
   resources    = ["*"]
 
