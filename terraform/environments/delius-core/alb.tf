@@ -56,6 +56,22 @@ resource "aws_lb_listener" "listener" {
   }
 }
 
+resource "aws_lb_listener" "redirect" {
+  load_balancer_arn = aws_lb.delius_core_frontend.id
+  port              = "80"
+  protocol          = "HTTP"
+
+  default_action {
+    type = "redirect"
+
+    redirect {
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+    }
+  }
+}
+
 resource "aws_lb_target_group" "delius_core_frontend_target_group" {
   # checkov:skip=CKV_AWS_261
 
