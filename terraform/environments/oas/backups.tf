@@ -2,13 +2,13 @@ locals {
   cold_storage_after = 30
 }
 
-resource "aws_backup_vault" "default" {
+resource "aws_backup_vault" "default_oas" {
   name = "everything"
   tags = var.tags
 }
 
 # Non production backups
-resource "aws_backup_plan" "non_production" {
+resource "aws_backup_plan" "non_production_oas" {
   name = "backup-daily-cold-storage-monthly-retain-30-days"
 
   rule {
@@ -39,7 +39,7 @@ resource "aws_backup_plan" "non_production" {
   tags = var.tags
 }
 
-resource "aws_backup_selection" "non_production" {
+resource "aws_backup_selection" "non_production_oas" {
   name         = "non-production-backup"
   iam_role_arn = var.iam_role_arn
   plan_id      = aws_backup_plan.non_production.id

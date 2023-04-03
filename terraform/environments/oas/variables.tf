@@ -1,5 +1,5 @@
 variable "iam_role_arn" {
-  type        = string
+  type        = "arn:aws:iam::711138931639:role/AWSBackup"
   description = "IAM role ARN for the AWS Backup service role"
 }
 
