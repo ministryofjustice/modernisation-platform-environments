@@ -63,6 +63,22 @@ locals {
       }
     }
 
+    ProdPreprodEnvironmentsWriteAccessBucketPolicy = {
+      effect = "Allow"
+      actions = [
+        "s3:GetObject",
+        "s3:ListBucket",
+        "s3:PutObject",
+        "s3:PutObjectAcl",
+      ]
+      principals = {
+        type = "AWS"
+        identifiers = [for account_name in var.environment.prodpreprod_account_names :
+          var.environment.account_root_arns[account_name]
+        ]
+      }
+    }
+
     AllEnvironmentsWriteAndDeleteAccessBucketPolicy = {
       effect = "Allow"
       actions = [
@@ -75,6 +91,23 @@ locals {
       principals = {
         type = "AWS"
         identifiers = [for account_name in var.environment.account_names :
+          var.environment.account_root_arns[account_name]
+        ]
+      }
+    }
+
+    DevTestEnvironmentsWriteAndDeleteAccessBucketPolicy = {
+      effect = "Allow"
+      actions = [
+        "s3:GetObject",
+        "s3:ListBucket",
+        "s3:PutObject",
+        "s3:PutObjectAcl",
+        "s3:DeleteObject",
+      ]
+      principals = {
+        type = "AWS"
+        identifiers = [for account_name in var.environment.devtest_account_names :
           var.environment.account_root_arns[account_name]
         ]
       }
