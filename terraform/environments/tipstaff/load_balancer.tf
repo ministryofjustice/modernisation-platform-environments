@@ -19,14 +19,6 @@ resource "aws_security_group" "tipstaff_dev_lb_sc" {
     cidr_blocks       = [local.application_data.accounts[local.environment].moj_ip]
   }
 
-  # ingress {
-  #   description       = "allow access for container using IP"
-  #   from_port         = 3000
-  #   to_port           = 3000
-  #   protocol          = "ip"
-  #   cidr_blocks       = [local.application_data.accounts[local.environment].moj_ip]
-  # }
-
   egress {
     description       = "allow all outbound traffic for port 80"
     from_port         = 80
@@ -42,14 +34,6 @@ resource "aws_security_group" "tipstaff_dev_lb_sc" {
     protocol          = "tcp"
     cidr_blocks       = ["0.0.0.0/0"]
   }
-
-  # egress {
-  #   description       = "allow all outbound traffic for IP port 3000"
-  #   from_port         = 3000
-  #   to_port           = 3000
-  #   protocol          = "ip"
-  #   cidr_blocks       = ["0.0.0.0/0"]
-  # }
 }
 
 resource "aws_lb" "tipstaff_dev_lb" {
@@ -64,7 +48,7 @@ resource "aws_lb" "tipstaff_dev_lb" {
 
 resource "aws_lb_target_group" "tipstaff_dev_target_group" {
   name                 = "tipstaff-dev-target-group"
-  port                 = local.application_data.accounts[local.environment].container_port_1
+  port                 = 80
   protocol             = "HTTP"
   vpc_id               = data.aws_vpc.shared.id
   target_type          = "ip"
@@ -78,18 +62,17 @@ resource "aws_lb_target_group" "tipstaff_dev_target_group" {
     healthy_threshold   = "2"
     interval            = "120"
     protocol            = "HTTP"
-    port                = "3000"
+    port                = "80"
     unhealthy_threshold = "2"
     matcher             = "200-499"
     timeout             = "5"
   }
+}
 
-  tags = merge(
-    local.tags,
-    {
-      Name = "${local.application_name}-tg-${local.environment}"
-    }
-  )
+resource "aws_lb_target_group_attachment" "attach_target_group" {
+  target_group_arn = aws_lb_target_group.tipstaff_dev_target_group.arn
+  target_id        = aws_ecs_service.tipstaff_ecs_service.id
+  port             = 80
 }
 
 resource "aws_lb_listener" "tipstaff_dev_lb_1" {

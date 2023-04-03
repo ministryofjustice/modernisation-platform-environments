@@ -25,9 +25,9 @@ resource "aws_ecs_task_definition" "tipstaff_task_definition" {
       essential = true
       portMappings = [
         {
-          containerPort = 3000
+          containerPort = 80
           protocol      = "tcp"
-          hostPort      = 3000
+          hostPort      = 80
         }
       ]
       environment = [
@@ -77,7 +77,7 @@ resource "aws_ecs_service" "tipstaff_ecs_service" {
 
   network_configuration {
     subnets          = data.aws_subnets.shared-public.ids
-    security_groups  = [aws_security_group.tipstaff_dev_lb_sc.id]
+    security_groups  = [aws_security_group.ecs_service.id]
     assign_public_ip = true
   }
 
@@ -223,3 +223,22 @@ resource "aws_iam_role_policy" "app_task" {
   EOF
 }
 
+# Create a security group for the ECS Service
+resource "aws_security_group" "ecs_service" {
+  name_prefix = "ecs-service-sg-"
+  vpc_id      = data.aws_vpc.shared.id
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
