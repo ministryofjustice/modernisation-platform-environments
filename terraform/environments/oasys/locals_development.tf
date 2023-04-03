@@ -125,7 +125,7 @@ locals {
 
     baseline_ec2_autoscaling_groups = {
 
-      oasys-development-db = {
+      dev-oasys-db = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name = "oasys_oracle_db_*"
         })
