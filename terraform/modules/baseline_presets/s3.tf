@@ -113,9 +113,8 @@ locals {
         ]
       }
     }
-  }
 
-  DevTestAccountsWriteAndDeleteAccessBucketPolicy = {
+    DevTestAccountsWriteAndDeleteAccessBucketPolicy = {
       effect = "Allow"
       actions = [
         "s3:GetObject",
