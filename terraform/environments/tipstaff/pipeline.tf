@@ -125,26 +125,22 @@ resource "aws_iam_role_policy" "codepipeline_role_policy" {
           "iam:*",
           "logs:*",
           "s3:*",
+          "ecr:*",
+          "ecs:*",
+          "ec2:*",
+          "codebuild:*",
           "codedeploy:CreateDeployment",
           "codedeploy:GetApplication",
           "codedeploy:GetApplicationRevision",
           "codedeploy:GetDeployment",
           "codedeploy:GetDeploymentConfig",
           "codedeploy:RegisterApplicationRevision",
-          "ec2:*",
-          "codebuild:BatchGetBuilds",
-          "codebuild:StartBuild",
-          "codebuild:BatchGetBuildBatches",
-          "codebuild:StartBuildBatch",
-          "ecr:DescribeImages",
           "states:DescribeExecution",
           "states:DescribeStateMachine",
           "states:StartExecution",
           "appconfig:StartDeployment",
           "appconfig:StopDeployment",
-          "appconfig:GetDeployment",
-          "ecr:*",
-          "ecs:*"
+          "appconfig:GetDeployment"
         ]
         Effect   = "Allow"
         Resource = "*"
