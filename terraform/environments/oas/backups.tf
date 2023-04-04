@@ -1,5 +1,5 @@
 locals {
-  cold_storage_after = 30
+  cold_storage_after = 7
 }
 
 resource "aws_backup_vault" "default_oas" {
@@ -13,14 +13,14 @@ resource "aws_backup_vault" "default_oas" {
 # Non production backups
 resource "aws_backup_plan" "non_production_oas" {
 
-  name = "${local.application_name}-backup-daily-retain-30-days"
+  name = "${local.application_name}-backup-daily-retain-7-days"
 
   rule {
-    rule_name         = "${local.application_name}-backup-daily-retain-30-days"
+    rule_name         = "${local.application_name}-backup-daily-retain-7-days"
     target_vault_name = aws_backup_vault.default_oas.name
 
-    # Backup every day at 00:30am
-    schedule = "cron(30 0 * * ? *)"
+    # Backup every day at 01:30am
+    schedule = "cron(30 1 * * ? *)"
 
     # The amount of time in minutes to start and finish a backup
     ## Start the backup within 1 hour of the schedule
@@ -29,7 +29,7 @@ resource "aws_backup_plan" "non_production_oas" {
     completion_window = (6 * 60)
 
     lifecycle {
-      delete_after = 30
+      delete_after = 7
     }
   }
 
