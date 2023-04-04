@@ -44,5 +44,24 @@ locals {
         listeners                = {}
       }
     }
+
+    baseline_ec2_autoscaling_groups = {
+      prod-oasys-training = {
+        autoscaling_group     = module.baseline_presets.ec2_autoscaling_group
+        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name  = "base_rhel_8_5_*"
+        })
+        ebs_volume_config = null
+        ebs_volumes       = null
+        instance          = module.baseline_presets.ec2_instance.instance.default
+        lb_target_groups  = null
+        ssm_parameters    = null
+        tags = {
+          os-type = "Linux"
+        }
+        user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
+      }
+    }
   }
 }
