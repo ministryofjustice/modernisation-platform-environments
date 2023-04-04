@@ -18,7 +18,6 @@ resource "aws_security_group" "importmachine" {
     to_port          = 0
     protocol         = "-1"
     security_groups = [aws_security_group.prtg_lb.id]
-
   }
 
   egress {
