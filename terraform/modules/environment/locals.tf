@@ -27,11 +27,6 @@ locals {
     ]
   ])
 
-  account_ids = {
-    for name in local.account_names :
-      name => var.environment_management.account_ids[name]
-  }
-
   subnet_names = {
     general = ["data", "private", "public"]
   }
