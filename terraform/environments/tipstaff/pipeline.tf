@@ -155,16 +155,6 @@ resource "aws_codebuild_project" "my_build_project" {
     image                       = "mcr.microsoft.com/dotnet/framework/sdk:4.8"
     type                        = "WINDOWS_CONTAINER"
     image_pull_credentials_type = "SERVICE_ROLE"
-    environment_variables       = [
-      {
-        name  = "IMAGE_REPO_NAME"
-        value = "<your-ECR-repository-name>"
-      },
-      {
-        name  = "IMAGE_TAG"
-        value = "<your-image-tag>"
-      }
-    ]
   }
 
   source {
