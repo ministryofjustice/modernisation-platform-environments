@@ -68,18 +68,6 @@ tasks:
       "nginx config written" | Out-File -FilePath C:\nginx_config_log.txt
 - task: executeScript
   inputs:
-  - frequency: once
-    type: powershell
-    runAs: admin
-    content: |-
-      $ConfirmPreference="none"
-      $ErrorActionPreference="Stop"
-      $VerbosePreference="Continue"
-      Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force # Needed for PS module installs
-      Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
-      Install-Module -Name AWSPowerShell -MinimumVersion 4.1.196 # Current latest version as of 3/1/23 is 4.1.196
-
-      "AWS PowerShell modules installed" | Out-File -FilePath C:\aws_powershell_modules_log.txt
   - frequency: always
     type: powershell
     runAs: admin
