@@ -98,7 +98,7 @@ tasks:
       "nginx config written" | Out-File -FilePath C:\nginx_config_log.txt
 - task: executeScript
   inputs:
-  - frequency: always
+  - frequency: once
     type: powershell
     runAs: admin
     content: |-
