@@ -153,7 +153,7 @@ resource "aws_codebuild_project" "my_build_project" {
   environment {
     compute_type                = "BUILD_GENERAL1_MEDIUM"
     image                       = "mcr.microsoft.com/dotnet/framework/sdk:4.8"
-    type                        = "WINDOWS_CONTAINER"
+    type                        = "WINDOWS_SERVER_2019_CONTAINER"
     image_pull_credentials_type = "SERVICE_ROLE"
   }
 
@@ -207,6 +207,7 @@ resource "aws_iam_role_policy" "codebuild_role_policy" {
 // Create CodeDeploy app and deployment group
 
 resource "aws_codedeploy_app" "tipstaff_codedeploy" {
+  compute_platform = "ECS"
   name = "tipstaff-codedeploy"
 }
 
@@ -218,11 +219,6 @@ resource "aws_codedeploy_deployment_group" "tipstaff_deployment_group" {
   deployment_config_name  = "CodeDeployDefault.ECSAllAtOnce"
   deployment_group_name   = "tipstaff-deployment-group"
   service_role_arn        = aws_iam_role.codedeploy_role.arn
-
-  auto_rollback_configuration {
-    enabled = false
-    events  = ["DEPLOYMENT_FAILURE"]
-  }
 
   ecs_service {
     cluster_name = aws_ecs_cluster.tipstaff_cluster.name
