@@ -238,3 +238,8 @@ resource "aws_security_group" "ecs_service" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
+
+#Create ECR Repository
+resource "aws_ecr_repository" "tipstaff-ecr-repo" {
+  name = "tipstaff-ecr-repo"
+}
