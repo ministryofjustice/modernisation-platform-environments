@@ -8,12 +8,12 @@ parameter:
     name: /NDeliusInterface/IAPSCMSIF/Interface/password
     type: "SecureString"
     value: "dev-placeholder-ndelius-interface-iapscmsif-interface-password"
-    overwrite: true
+    overwrite: false
   ndelius-interface-iapscmsif-interface-passwordcoded:
     name: /NDeliusInterface/IAPSCMSIF/Interface/passwordcoded
     type: "SecureString"
     value: "dev-placeholder-ndelius-interface-iapscmsif-interface-passwordcoded"
-    overwrite: true
+    overwrite: false
   ndelius-interface-user:
     name: /NDeliusInterface/Interface/user
     type: "String"
