@@ -17,14 +17,17 @@ resource "aws_security_group" "rds_security_group" {
     from_port   = local.db_port
     to_port     = local.db_port
     security_groups = [
-      aws_security_group.delius_core_frontend_security_group.id
+      aws_security_group.delius_core_frontend_security_group.id,
+      module.bastion_linux.bastion_security_group
+      # Placeholder for security group associated with DMS RI as part of migration PoC
+      # Placeholder for security group associated with Source DB as part of migration PoC, e.g. from ECS testing DB SG
     ]
   }
 
   tags = merge(
     local.tags,
     {
-      Name = "${local.application_name}-database_security_group-security-group"
+      Name = "${local.application_name}-database-security-group"
     }
   )
 }
@@ -91,13 +94,15 @@ resource "aws_db_instance" "delius-core" {
   engine_version              = format("%s.%s", local.application_data.accounts[local.environment].rds_engine_major_version, local.application_data.accounts[local.environment].rds_engine_minor_version)
   instance_class              = local.application_data.accounts[local.environment].rds_instance_class
   identifier                  = format("%s-%s-database", local.application_name, local.environment)
+  db_name                     = local.application_data.accounts[local.environment].rds_db_name
   username                    = local.application_data.accounts[local.environment].rds_user
   password                    = aws_secretsmanager_secret_version.rds_admin_password.secret_string
   parameter_group_name        = aws_db_parameter_group.rds_parameter_group.name
   option_group_name           = aws_db_option_group.rds_option_group.name
   deletion_protection         = false # This is just a poc
   apply_immediately           = local.application_data.accounts[local.environment].rds_apply_immediately
-  skip_final_snapshot         = local.application_data.accounts[local.environment].rds_skip_final_snapshot
+  skip_final_snapshot         = true
+  snapshot_identifier         = "delius-core-development-database-vanilla"
   allocated_storage           = local.application_data.accounts[local.environment].rds_allocated_storage
   max_allocated_storage       = local.application_data.accounts[local.environment].rds_max_allocated_storage
   maintenance_window          = local.application_data.accounts[local.environment].rds_maintenance_window

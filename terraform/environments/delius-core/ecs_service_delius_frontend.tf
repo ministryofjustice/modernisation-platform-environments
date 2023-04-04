@@ -7,8 +7,54 @@
 # SSM Parameter Store for delius-core-frontend
 ##
 
-data "aws_ssm_parameter" "delius_core_frontend_envs" {
-  name = "${local.application_name}-${local.frontend_service_name}-envs"
+resource "aws_ssm_parameter" "delius_core_frontend_env_var_jdbc_url" {
+  name  = format("/%s/JCBC_URL", local.application_name)
+  type  = "SecureString"
+  value = format("jdbc:oracle:thin:@//%s:%s/%s", aws_db_instance.delius-core.address, aws_db_instance.delius-core.port, local.db_name)
+  tags  = local.tags
+}
+
+resource "aws_ssm_parameter" "delius_core_frontend_env_var_jdbc_password" {
+  name  = format("/%s/JCBC_PASSWORD", local.application_name)
+  type  = "SecureString"
+  value = "INITIAL_VALUE_OVERRIDDEN"
+  tags  = local.tags
+  lifecycle {
+    ignore_changes = [
+      value
+    ]
+  }
+}
+
+resource "aws_ssm_parameter" "delius_core_frontend_env_var_test_mode" {
+  name  = format("/%s/TEST_MODE", local.application_name)
+  type  = "String"
+  value = "true"
+  tags  = local.tags
+}
+
+resource "aws_ssm_parameter" "delius_core_frontend_env_var_dev_username" {
+  name  = format("/%s/DEV_USERNAME", local.application_name)
+  type  = "SecureString"
+  value = "INITIAL_VALUE_OVERRIDDEN"
+  lifecycle {
+    ignore_changes = [
+      value
+    ]
+  }
+  tags = local.tags
+}
+
+resource "aws_ssm_parameter" "delius_core_frontend_env_var_dev_password" {
+  name  = format("/%s/DEV_PASSWORD", local.application_name)
+  type  = "SecureString"
+  value = "INITIAL_VALUE_OVERRIDDEN"
+  lifecycle {
+    ignore_changes = [
+      value
+    ]
+  }
+  tags = local.tags
 }
 
 ##
@@ -166,14 +212,31 @@ resource "aws_ecs_task_definition" "delius_core_frontend_task_definition" {
         ]
         readonlyRootFilesystem = false
         volumesFrom            = []
-
-        environment = [for key, value in jsondecode(data.aws_ssm_parameter.delius_core_frontend_envs.value) : { name = key, value = value }]
+        secrets = [
+          {
+            name      = "JDBC_URL"
+            valueFrom = aws_ssm_parameter.delius_core_frontend_env_var_jdbc_url.arn
+          },
+          {
+            name      = "JDBC_PASSWORD"
+            valueFrom = aws_ssm_parameter.delius_core_frontend_env_var_jdbc_password.arn
+          },
+          {
+            name      = "DEV_USERNAME"
+            valueFrom = aws_ssm_parameter.delius_core_frontend_env_var_dev_username.arn
+          },
+          {
+            name      = "DEV_PASSWORD"
+            valueFrom = aws_ssm_parameter.delius_core_frontend_env_var_dev_password.arn
+          },
+          {
+            name      = "TEST_MODE"
+            valueFrom = aws_ssm_parameter.delius_core_frontend_env_var_test_mode.arn
+          }
+        ]
       }
   ])
-  cpu = "1024"
-  # ephemeral_storage {
-  #   size_in_gib = 40
-  # }
+  cpu                = "1024"
   execution_role_arn = aws_iam_role.delius_core_frontend_ecs_exec.arn
   family             = local.frontend_fully_qualified_name
 
@@ -185,7 +248,7 @@ resource "aws_ecs_task_definition" "delius_core_frontend_task_definition" {
 
   skip_destroy  = false
   tags          = local.tags
-  task_role_arn = aws_iam_role.delius_core_frontend_ecs_exec.arn
+  task_role_arn = aws_iam_role.delius_core_frontend_ecs_task.arn
 }
 
 # ##
@@ -200,31 +263,23 @@ resource "aws_security_group" "delius_core_frontend_security_group" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_security_group_ingress_private_subnets" {
-  security_group_id = aws_security_group.delius_core_frontend_security_group.id
-  description       = "weblogic to testing frontend"
-  for_each = toset(
-    [
-      data.aws_subnet.private_subnets_a.cidr_block,
-      data.aws_subnet.private_subnets_b.cidr_block,
-      data.aws_subnet.private_subnets_c.cidr_block
-    ]
-  )
-  from_port   = local.frontend_container_port
-  to_port     = local.frontend_container_port
-  ip_protocol = "tcp"
-  cidr_ipv4   = each.key
+  security_group_id            = aws_security_group.delius_core_frontend_security_group.id
+  description                  = "load balancer to weblogic frontend"
+  from_port                    = local.frontend_container_port
+  to_port                      = local.frontend_container_port
+  ip_protocol                  = "tcp"
+  referenced_security_group_id = aws_security_group.delius_frontend_alb_security_group.id
 }
 
 resource "aws_vpc_security_group_egress_rule" "delius_core_frontend_security_group_egress_internet" {
   security_group_id = aws_security_group.delius_core_frontend_security_group.id
-  description       = "outbound from the testing db ecs service"
+  description       = "outbound from weblogic to any secure endpoint"
   ip_protocol       = "tcp"
   to_port           = 443
   from_port         = 443
   cidr_ipv4         = "0.0.0.0/0"
 }
 
-# Come back to this to investigate only allowing egress to the DB security group
 resource "aws_vpc_security_group_egress_rule" "delius_core_frontend_security_group_egress_db" {
   security_group_id            = aws_security_group.delius_core_frontend_security_group.id
   description                  = "outbound from the testing frontend ecs service"

@@ -197,6 +197,15 @@ resource "aws_vpc_security_group_ingress_rule" "delius_db_security_group_ingress
   referenced_security_group_id = aws_security_group.delius_core_frontend_security_group.id
 }
 
+resource "aws_vpc_security_group_ingress_rule" "delius_db_security_group_ingress_bastion" {
+  security_group_id            = aws_security_group.delius_db_security_group.id
+  description                  = "bastion to testing db"
+  from_port                    = local.db_port
+  to_port                      = local.db_port
+  ip_protocol                  = "tcp"
+  referenced_security_group_id = module.bastion_linux.bastion_security_group
+}
+
 resource "aws_vpc_security_group_egress_rule" "delius_db_security_group_egress_internet" {
   security_group_id = aws_security_group.delius_db_security_group.id
   description       = "outbound from the testing db ecs service"
