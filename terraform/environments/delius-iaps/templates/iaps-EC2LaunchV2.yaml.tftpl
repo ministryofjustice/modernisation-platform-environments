@@ -49,9 +49,6 @@ tasks:
           # Proxy all other requests IM servers
           location / {
             proxy_pass                    https://${im_interface_url};
-            proxy_ssl_verify_depth        2;
-            proxy_ssl_verify              on;
-            proxy_ssl_server_name         on;
             proxy_ssl_protocols           TLSv1.3;
             proxy_ssl_ciphers             EECDH+CHACHA20:EECDH+AESGCM:EECDH+AES;
             proxy_http_version            1.1;
