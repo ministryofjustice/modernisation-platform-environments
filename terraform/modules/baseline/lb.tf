@@ -69,6 +69,14 @@ module "lb_listener" {
     })
   }
 
+  cloudwatch_metric_alarms = {
+    for key, value in each.value.cloudwatch_metric_alarms : key => merge(value, {
+      alarm_actions = [
+        for item in value.alarm_actions : try(aws_sns_topic.this[item].arn, item)
+      ]
+    })
+  }
+
   replace = each.value.replace
   tags    = merge(local.tags, each.value.tags)
 
