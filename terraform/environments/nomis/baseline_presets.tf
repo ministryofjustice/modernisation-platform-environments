@@ -1,4 +1,12 @@
 locals {
+
+  application_alarms = {
+    weblogic          = local.ec2_weblogic.cloudwatch_metric_alarms
+    database          = local.database.cloudwatch_metric_alarms
+    fixngo_connection = local.database.cloudwatch_metric_alarms_fixngo_connection
+  }
+
+
   baseline_presets_options = {
     enable_application_environment_wildcard_cert = false
     enable_business_unit_kms_cmks                = true
@@ -7,18 +15,12 @@ locals {
     enable_ec2_self_provision                    = true
     cloudwatch_metric_alarms = {
       nomis_alarms = {
-        alarm_actions = [aws_sns_topic.nomis_alarms.arn]
-        application_alarms = {
-          weblogic = local.ec2_weblogic.cloudwatch_metric_alarms
-          database = local.database.cloudwatch_metric_alarms
-        }
+        alarm_actions      = [aws_sns_topic.nomis_alarms.arn]
+        application_alarms = local.application_alarms
       }
       nomis_nonprod_alarms = {
-        alarm_actions = [aws_sns_topic.nomis_nonprod_alarms.arn]
-        application_alarms = {
-          weblogic = local.ec2_weblogic.cloudwatch_metric_alarms
-          database = local.database.cloudwatch_metric_alarms
-        }
+        alarm_actions      = [aws_sns_topic.nomis_nonprod_alarms.arn]
+        application_alarms = local.application_alarms
       }
     }
     route53_resolver_rules = {

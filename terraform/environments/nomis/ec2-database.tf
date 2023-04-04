@@ -161,6 +161,21 @@ locals {
         }
       }
     }
+    cloudwatch_metric_alarms_fixngo_connection = {
+      fixngo-connection = {
+        comparison_operator = "GreaterThanOrEqualToThreshold"
+        evaluation_periods  = "3"
+        namespace           = "CWAgent"
+        metric_name         = "collectd_exec_value"
+        period              = "60"
+        statistic           = "Average"
+        threshold           = "1"
+        alarm_description   = "this EC2 instance no longer has a connection to the Oracle Enterprise Manager in FixNGo of the connection-target machine"
+        dimensions = {
+          instance = "fixngo_connected" # required dimension value for this metric
+        }
+      }
+    }
   }
 }
 
@@ -203,7 +218,8 @@ module "db_ec2_instance" {
     module.baseline_presets.cloudwatch_metric_alarms[lookup(each.value, "sns_topic", "nomis_nonprod_alarms")].ec2,
     module.baseline_presets.cloudwatch_metric_alarms[lookup(each.value, "sns_topic", "nomis_nonprod_alarms")].ec2_cwagent_linux,
     module.baseline_presets.cloudwatch_metric_alarms[lookup(each.value, "sns_topic", "nomis_nonprod_alarms")].ec2_cwagent_collectd,
-    module.baseline_presets.cloudwatch_metric_alarms[lookup(each.value, "sns_topic", "nomis_nonprod_alarms")].database
+    module.baseline_presets.cloudwatch_metric_alarms[lookup(each.value, "sns_topic", "nomis_nonprod_alarms")].database,
+    lookup(each.value, "cloudwatch_metric_alarms", {})
   )
 }
 

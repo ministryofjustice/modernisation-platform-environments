@@ -257,6 +257,7 @@ module "ec2_weblogic_autoscaling_group" {
     module.baseline_presets.cloudwatch_metric_alarms[lookup(each.value, "sns_topic", "nomis_nonprod_alarms")].ec2,
     module.baseline_presets.cloudwatch_metric_alarms[lookup(each.value, "sns_topic", "nomis_nonprod_alarms")].ec2_cwagent_linux,
     module.baseline_presets.cloudwatch_metric_alarms[lookup(each.value, "sns_topic", "nomis_nonprod_alarms")].ec2_cwagent_collectd,
-    module.baseline_presets.cloudwatch_metric_alarms[lookup(each.value, "sns_topic", "nomis_nonprod_alarms")].weblogic
+    module.baseline_presets.cloudwatch_metric_alarms[lookup(each.value, "sns_topic", "nomis_nonprod_alarms")].weblogic,
+    lookup(each.value, "cloudwatch_metric_alarms", {})
   )
 }
