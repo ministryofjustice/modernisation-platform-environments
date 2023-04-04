@@ -85,7 +85,10 @@ tasks:
 
       # create schedule powershell task to purge nginx logs
       $taskName = "Purge Nginx Logs"
+      $taskTrigger = New-ScheduledTaskTrigger -Daily -At 3am
       $taskAction = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-File $nginxPath\log-rotate-helper.ps1"
+      $taskPrincipal = New-ScheduledTaskPrincipal -UserId "SYSTEM" -LogonType ServiceAccount -RunLevel Highest
+      Register-ScheduledTask -TaskName $taskName -Trigger $taskTrigger -Action $taskAction -Principal $taskPrincipal
 
 %{if environment == "development"}
       Restart-Service -Name nginx
