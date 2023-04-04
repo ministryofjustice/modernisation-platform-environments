@@ -45,7 +45,7 @@ resource "aws_codepipeline" "codepipeline" {
 
       configuration = {
         ProjectName = "my-dotnet-build-project"
-        EnvironmentVariables: [
+        EnvironmentVariables = jsonencode([
           {
             name: "IMAGE_REPO_NAME"
             value: "${aws_ecr_repository.tipstaff-ecr-repo.name}"
@@ -54,7 +54,7 @@ resource "aws_codepipeline" "codepipeline" {
             name: "IMAGE_TAG"
             value: "tipstaff-image-001"
           }
-        ]
+        ])
       }
     }
   }
