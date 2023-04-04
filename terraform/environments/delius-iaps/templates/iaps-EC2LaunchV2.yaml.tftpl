@@ -10,6 +10,8 @@ tasks:
       (Get-Content $tnsNamesOraPath).replace('iaps-db', '${delius_iaps_rds_db_address}') | Set-Content $tnsNamesOraPath
 
       $nginxConfPath = (Resolve-Path 'C:\tools\nginx-*\conf').Path
+      $nginxLogPath = (Resolve-Path 'C:\tools\nginx-*\logs').Path
+      $nginxPath = (Resolve-Path 'C:\tools\nginx-*\').Path
       Invoke-Expression 'openssl req -new -newkey rsa:4096 -days 36500 -nodes -x509 -subj "/C=GB/ST=London/L=London/O=HMPPS/OU=HMPPS Digital and Technology/CN=localhost" -keyout "$${nginxConfPath}\server.key" -out "$${nginxConfPath}\server.crt"' 2>&1
       Import-Certificate -FilePath $${nginxConfPath}\server.crt -CertStoreLocation Cert:\LocalMachine\Root
 
@@ -60,6 +62,34 @@ tasks:
       "@
       $Utf8NoBomEncoding = New-Object System.Text.UTF8Encoding $False
       [System.IO.File]::WriteAllLines("$${nginxConfPath}\nginx.conf", $nginxConfContents, $Utf8NoBomEncoding)
+
+      # Configure log rotation using NSSM service that is pre-configured by choco install of nginx
+      nssm set "nginx" AppStdout $nginxLogPath\access.log
+      nssm set "nginx" AppStderr $nginxLogPath\error.log
+      nssm set "nginx" AppRotateFiles 1
+      nssm set "nginx" AppRotateOnline 1
+      nssm set "nginx" AppTimestampLog 1
+      nssm set "nginx" AppRotateSeconds 86400
+      nssm set "nginx" AppRotateBytes 1048576
+
+      $nginxRotateLogsScript = @"
+      $nginxLogPath = (Resolve-Path 'C:\tools\nginx-*\logs').Path
+      # compress
+      Get-ChildItem '$${nginxLogPath}\*.log' | Where {$_.lastwritetime -lt (Get-Date).AddDays(-1)} | write-zip
+
+      # purge yesterday zip
+      Get-ChildItem '$${nginxLogPath}\*.zip' | Where {$_.lastwritetime -lt (Get-Date).AddDays(-2)} | Remove-Item -Force
+      "@
+      $Utf8NoBomEncoding = New-Object System.Text.UTF8Encoding $False
+      [System.IO.File]::WriteAllLines("$${nginxPath}\log-rotate-helper.ps1", $nginxRotateLogsScript, $Utf8NoBomEncoding)
+
+      # create schedule powershell task to purge nginx logs
+      $taskName = "Purge Nginx Logs"
+      $taskTrigger = New-ScheduledTaskTrigger -Daily -At 3am
+      $taskAction = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-File $nginxPath\log-rotate-helper.ps1"
+      $taskPrincipal = New-ScheduledTaskPrincipal -UserId "SYSTEM" -LogonType ServiceAccount -RunLevel Highest
+      Register-ScheduledTask -TaskName $taskName -Trigger $taskTrigger -Action $taskAction -Principal $taskPrincipal
+
 %{if environment == "development"}
       Restart-Service -Name nginx
 %{endif}
