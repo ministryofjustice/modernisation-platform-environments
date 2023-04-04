@@ -157,6 +157,7 @@ tasks:
       $NDeliusIAPSCMSConfigXML = [xml](Get-Content $NDeliusIAPSCMSConfigFile)
 
       $NDeliusIAPSCMSConfigXML.DLLDEF.INTERFACES.INTERFACE.USER = (Get-SSMParameter -Name "/NDeliusInterface/IAPSCMSIF/Interface/user" -WithDecryption $true).Value
+      $NDeliusIAPSCMSConfigXML.DLLDEF.INTERFACES.INTERFACE.PASSWORD = (Get-SSMParameter -Name "/NDeliusInterface/IAPSCMSIF/Interface/password" -WithDecryption $true).Value
       $NDeliusIAPSCMSConfigXML.DLLDEF.INTERFACES.INTERFACE.PASSWORDCODED = (Get-SSMParameter -Name "/NDeliusInterface/IAPSCMSIF/Interface/passwordcoded" -WithDecryption $true).Value
 
       $NDeliusIAPSCMSConfigXML.save($NDeliusIAPSCMSConfigFile)
