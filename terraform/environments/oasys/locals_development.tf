@@ -129,7 +129,7 @@ locals {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name = "oasys_oracle_db_*"
         })
-        instance = module.baseline_presets.ec2_instance.instance.default
+        instance              = module.baseline_presets.ec2_instance.instance.default
         user_data_cloud_init  = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags
         autoscaling_group     = module.baseline_presets.ec2_autoscaling_group
         autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
