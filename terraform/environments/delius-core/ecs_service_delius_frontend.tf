@@ -7,10 +7,6 @@
 # SSM Parameter Store for delius-core-frontend
 ##
 
-data "aws_ssm_parameter" "delius_core_frontend_envs" {
-  name = "${local.application_name}-${local.frontend_service_name}-envs"
-}
-
 resource "aws_ssm_parameter" "delius_core_frontend_env_var_jdbc_url" {
   name  = format("/%s/JCBC_URL", local.application_name)
   type  = "SecureString"
@@ -216,8 +212,6 @@ resource "aws_ecs_task_definition" "delius_core_frontend_task_definition" {
         ]
         readonlyRootFilesystem = false
         volumesFrom            = []
-
-        # secrets = [for key, value in jsondecode(data.aws_ssm_parameter.delius_core_frontend_envs.value) : { name = key, value = value }]
         secrets = [
           {
             name      = "JDBC_URL"
@@ -242,10 +236,7 @@ resource "aws_ecs_task_definition" "delius_core_frontend_task_definition" {
         ]
       }
   ])
-  cpu = "1024"
-  # ephemeral_storage {
-  #   size_in_gib = 40
-  # }
+  cpu                = "1024"
   execution_role_arn = aws_iam_role.delius_core_frontend_ecs_exec.arn
   family             = local.frontend_fully_qualified_name
 
@@ -272,16 +263,8 @@ resource "aws_security_group" "delius_core_frontend_security_group" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_security_group_ingress_private_subnets" {
-  security_group_id = aws_security_group.delius_core_frontend_security_group.id
-  description       = "load balancer to weblogic frontend"
-  # for_each = toset(
-  #   [
-  #     data.aws_subnet.private_subnets_a.cidr_block,
-  #     data.aws_subnet.private_subnets_b.cidr_block,
-  #     data.aws_subnet.private_subnets_c.cidr_block
-  #   ]
-  # )
-  # cidr_ipv4   = each.key
+  security_group_id            = aws_security_group.delius_core_frontend_security_group.id
+  description                  = "load balancer to weblogic frontend"
   from_port                    = local.frontend_container_port
   to_port                      = local.frontend_container_port
   ip_protocol                  = "tcp"
@@ -297,7 +280,6 @@ resource "aws_vpc_security_group_egress_rule" "delius_core_frontend_security_gro
   cidr_ipv4         = "0.0.0.0/0"
 }
 
-# Come back to this to investigate only allowing egress to the DB security group
 resource "aws_vpc_security_group_egress_rule" "delius_core_frontend_security_group_egress_db" {
   security_group_id            = aws_security_group.delius_core_frontend_security_group.id
   description                  = "outbound from the testing frontend ecs service"

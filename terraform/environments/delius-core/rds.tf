@@ -19,8 +19,8 @@ resource "aws_security_group" "rds_security_group" {
     security_groups = [
       aws_security_group.delius_core_frontend_security_group.id,
       module.bastion_linux.bastion_security_group
-      # Placeholder for security group associated with DMS RI
-      # Placeholder for security group associated with Source DB in a migration, e.g. from ECS testing DB SG
+      # Placeholder for security group associated with DMS RI as part of migration PoC
+      # Placeholder for security group associated with Source DB as part of migration PoC, e.g. from ECS testing DB SG
     ]
   }
 
