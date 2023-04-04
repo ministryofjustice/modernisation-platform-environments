@@ -38,9 +38,9 @@ jobs:
         run: | 
           echo '{"include":[' > matrix.out
           if [[ "${{ github.ref }}" != "refs/heads/main" ]]; then
-            curl -X GET 'https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/"${{ inputs.application }}".json' | jq -r '.environments[]' | jq '.name' | jq 'if contains("production") then {"target": ., "action":"plan"} else {"target": ., "action":"plan_apply"} end' -j | sed s"/}{/},{/g" >> matrix.out
+            curl -X GET 'https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/${{ inputs.application }}.json' | jq -r '.environments[]' | jq '.name' | jq 'if contains("production") then {"target": ., "action":"plan"} else {"target": ., "action":"plan_apply"} end' -j | sed s"/}{/},{/g" >> matrix.out
           else
-            curl -X GET 'https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/"${{ inputs.application }}".json' | jq  -r '.environments[] | {"target" : .name, "action" : "plan_apply"}' -j | sed s"/}{/},{/g" >> matrix.out
+            curl -X GET 'https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/${{ inputs.application }}.json' | jq  -r '.environments[] | {"target" : .name, "action" : "plan_apply"}' -j | sed s"/}{/},{/g" >> matrix.out
           fi
           echo ']}' >> matrix.out
           matrix=$(cat matrix.out | jq -r)
