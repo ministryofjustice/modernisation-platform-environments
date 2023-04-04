@@ -1,4 +1,3 @@
-# Create ECS cluster
 resource "aws_ecs_cluster" "tipstaff_cluster" {
   name = "tipstaff_cluster"
   setting {
@@ -7,7 +6,6 @@ resource "aws_ecs_cluster" "tipstaff_cluster" {
   }
 }
 
-# Create a task definition for the Windows container
 resource "aws_ecs_task_definition" "tipstaff_task_definition" {
   family                = "tipstaff-task"
   requires_compatibilities = ["FARGATE"]
@@ -56,7 +54,6 @@ resource "aws_ecs_task_definition" "tipstaff_task_definition" {
   }
 }
 
-# Create a Fargate service to run the Windows container task
 resource "aws_ecs_service" "tipstaff_ecs_service" {
   depends_on = [
     aws_lb_target_group.tipstaff_dev_target_group,
@@ -87,26 +84,7 @@ resource "aws_ecs_service" "tipstaff_ecs_service" {
     container_port   = 80
   }
 
-  # # Define the service registry for service discovery
-  # service_registries {
-  #   registry_arn = aws_service_discovery_private_dns_namespace.service_discovery.arn
-  #   container_name = "tipstaff-container"
-  #   container_port = 80
-  # }
-
 }
-
-# resource "aws_service_discovery_private_dns_namespace" "service_discovery" {
-#   name = "service-discovery"
-#   description = "Private DNS namespace for service discovery"
-#   vpc = data.aws_vpc.shared.id
-# }
-
-# resource "aws_service_discovery_service" "example_service" {
-#   count = 1
-#   name = "example-service-${count.index}"
-#   namespace_id = aws_service_discovery_private_dns_namespace.service_discovery.id
-# }
 
 resource "aws_iam_role" "app_execution" {
   name = "execution-${var.networking[0].application}"
@@ -242,7 +220,6 @@ resource "aws_iam_role_policy" "app_task" {
   EOF
 }
 
-# Create a security group for the ECS Service
 resource "aws_security_group" "ecs_service" {
   name_prefix = "ecs-service-sg-"
   vpc_id      = data.aws_vpc.shared.id
