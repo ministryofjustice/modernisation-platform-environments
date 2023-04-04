@@ -18,3 +18,11 @@ data "aws_secretsmanager_secret_version" "db_username" {
 data "aws_secretsmanager_secret_version" "db_password" {
   secret_id = data.aws_secretsmanager_secret.tipstaff-dev-db-secrets.id
 }
+
+data "aws_secretsmanager_secret" "github_oauth_token" {
+  arn = "arn:aws:secretsmanager:eu-west-2:913862848426:secret:Github_Oauth_Token-kApArG"
+}
+
+data "aws_secretsmanager_secret_version" "oauth_token" {
+  secret_id = data.aws_secretsmanager_secret.github_oauth_token.id
+}
