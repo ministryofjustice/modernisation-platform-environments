@@ -318,5 +318,7 @@ resource "aws_cloudwatch_metric_alarm" "this" {
   dimensions = merge(each.value.dimensions, {
     "AutoScalingGroupName" = aws_autoscaling_group.this.name
   })
-  tags = {}
+  tags = merge(var.tags, {
+    Name = "${aws_autoscaling_group.this.name}-${each.key}"
+  })
 }

@@ -105,5 +105,7 @@ resource "aws_cloudwatch_metric_alarm" "this" {
   dimensions = merge(each.value.dimensions, {
     "CertificateArn" = aws_acm_certificate.this.arn
   })
-  tags = {}
+  tags = merge(var.tags, {
+    Name = "${var.name}-${each.key}"
+  })
 }

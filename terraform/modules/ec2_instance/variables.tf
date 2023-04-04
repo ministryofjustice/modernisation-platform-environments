@@ -181,7 +181,7 @@ variable "ssm_parameters" {
 }
 
 variable "cloudwatch_metric_alarms" {
-  description = "Map of cloudwatch metric alarms."
+  description = "Map of cloudwatch metric alarms.  The alarm name is set to the ec2 instance name plus the map key."
   type = map(object({
     comparison_operator = string
     evaluation_periods  = number
@@ -196,7 +196,6 @@ variable "cloudwatch_metric_alarms" {
     datapoints_to_alarm = optional(number)
     treat_missing_data  = optional(string, "missing")
     dimensions          = optional(map(string), {})
-    tags                = optional(map(string))
   }))
   default = {}
 }
