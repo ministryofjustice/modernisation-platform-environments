@@ -234,6 +234,11 @@ resource "aws_codedeploy_deployment_group" "tipstaff_deployment_group" {
     service_name = aws_ecs_service.tipstaff_ecs_service.name
   }
 
+  load_balancer_info {
+    target_group_info {
+      name = "${aws_lb_target_group.tipstaff_dev_target_group.name}"
+    }
+  }
 }
 
 resource "aws_iam_role" "codedeploy_role" {
