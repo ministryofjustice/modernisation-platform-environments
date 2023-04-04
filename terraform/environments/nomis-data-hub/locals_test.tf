@@ -121,7 +121,8 @@ locals {
 
       t1_ndh_app = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name = "nomis_data_hub_rhel_7_9_app*"
+          #          ami_name = "nomis_data_hub_rhel_7_9_app*"
+          ami_name = "base_rhel_7_9_*"
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           vpc_security_group_ids = ["private"]
@@ -153,7 +154,8 @@ locals {
 
       t1_ndh_ems = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name = "nomis_data_hub_rhel_7_9_ems*"
+          #         ami_name = "nomis_data_hub_rhel_7_9_ems*"
+          ami_name = "base_rhel_7_9_*"
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           vpc_security_group_ids = ["private"]
