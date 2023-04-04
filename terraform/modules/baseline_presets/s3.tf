@@ -126,8 +126,9 @@ locals {
       ]
       principals = {
         type = "AWS"
-        identifiers = [ for account_name in var.environment.devtest_account_names :
-          var.environment.account_ids[account_name]
+        identifiers = [ #for account_name in var.environment.devtest_account_names :
+          #var.environment.account_ids[account_name]
+          "003430027717", "546088120047"
         ]
       }
     }
