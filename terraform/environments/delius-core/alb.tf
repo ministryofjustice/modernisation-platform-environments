@@ -9,11 +9,20 @@ resource "aws_security_group" "delius_frontend_alb_security_group" {
   tags        = local.tags
 }
 
-resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_alb_ingress_allowlist" {
+resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_alb_ingress_https_allowlist" {
   security_group_id = aws_security_group.delius_frontend_alb_security_group.id
-  description       = "access into delius core frontend alb"
+  description       = "access into delius core frontend alb over https"
   from_port         = "443"
   to_port           = "443"
+  ip_protocol       = "tcp"
+  cidr_ipv4         = "81.134.202.29/32" # MoJ Digital VPN
+}
+
+resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_alb_ingress_http_allowlist" {
+  security_group_id = aws_security_group.delius_frontend_alb_security_group.id
+  description       = "access into delius core frontend alb over http (will redirect)"
+  from_port         = "80"
+  to_port           = "80"
   ip_protocol       = "tcp"
   cidr_ipv4         = "81.134.202.29/32" # MoJ Digital VPN
 }
@@ -56,6 +65,22 @@ resource "aws_lb_listener" "listener" {
   }
 }
 
+resource "aws_lb_listener" "listener_http" {
+  load_balancer_arn = aws_lb.delius_core_frontend.id
+  port              = "80"
+  protocol          = "HTTP"
+
+  default_action {
+    type = "redirect"
+
+    redirect {
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+    }
+  }
+}
+
 resource "aws_lb_target_group" "delius_core_frontend_target_group" {
   # checkov:skip=CKV_AWS_261
 
@@ -74,7 +99,7 @@ resource "aws_lb_target_group" "delius_core_frontend_target_group" {
   health_check {
     path                = "/NDelius-war/delius/JSP/healthcheck.jsp?ping"
     healthy_threshold   = "5"
-    interval            = "120"
+    interval            = "300"
     protocol            = "HTTP"
     unhealthy_threshold = "2"
     matcher             = "200-499"
