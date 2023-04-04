@@ -17,10 +17,10 @@ name: terraform strategy
 on:
   workflow_call:
     inputs:
-      strategy_type:
+      application:
         type: string
         required: true
-        description: "Set to the a string representing the desired workflow strategy, e.g. standard_four_accounts, see comments for more info"
+        description: "Application name for which this strategy matrix pipeline should run. This is later used to identify environments from the JSON environments files in the MP repo: https://github.com/ministryofjustice/modernisation-platform/tree/main/environments."
     outputs:
       matrix:
         description: "Matrix json string to feed that can be used as strategy in separate terraform job"
@@ -35,52 +35,16 @@ jobs:
     steps:
       - name: Set Strategy Matrix
         id: strategy
-        run: |
-          if [[ "${{ inputs.strategy_type }}" == "standard_four_accounts" ]]; then
-            if [[ "${{ github.ref }}" != "refs/heads/main" ]]; then
-              matrix=$(cat << EOF
-              {
-                "include": [{
-                  "target": "development",
-                  "action": "plan_apply"
-                }, {
-                  "target": "test",
-                  "action": "plan_apply"
-                }, {
-                  "target": "preproduction",
-                  "action": "plan"
-                }, {
-                  "target": "production",
-                  "action": "plan"
-                }]
-              }
-          EOF
-          )
-            else
-              matrix=$(cat << EOF
-              {
-                "include": [{
-                  "target": "development",
-                  "action": "plan_apply"
-                }, {
-                  "target": "test",
-                  "action": "plan_apply"
-                }, {
-                  "target": "preproduction",
-                  "action": "plan_apply"
-                }, {
-                  "target": "production",
-                  "action": "plan_apply"
-                }]
-              }
-          EOF
-          )
-            fi
+        run: | 
+          echo '{"include":[' > matrix.out
+          if [[ "${{ github.ref }}" != "refs/heads/main" ]]; then
+            curl -X GET 'https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/"${{ inputs.application }}".json' | jq -r '.environments[]' | jq '.name' | jq 'if contains("production") then {"target": ., "action":"plan"} else {"target": ., "action":"plan_apply"} end' -j | sed s"/}{/},{/g" >> matrix.out
           else
-            echo "Unexpected value for inputs.strategy_type [${{ inputs.strategy_type }}]"
-            exit 1
+            curl -X GET 'https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/"${{ inputs.application }}".json' | jq  -r '.environments[] | {"target" : .name, "action" : "plan_apply"}' -j | sed s"/}{/},{/g" >> matrix.out
           fi
-          echo 'matrix<<EOF' >> $GITHUB_OUTPUT
-          echo "${matrix}" >> $GITHUB_OUTPUT
+          echo ']}' >> matrix.out
+          matrix=$(cat matrix.out)
+          echo '$matrix | jq -r'
+          echo '${matrix} | jq -r' >> $GITHUB_OUTPUT
           echo 'EOF' >> $GITHUB_OUTPUT
           echo "${matrix}"
