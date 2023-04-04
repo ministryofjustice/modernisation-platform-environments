@@ -43,8 +43,8 @@ jobs:
             curl -X GET 'https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/"${{ inputs.application }}".json' | jq  -r '.environments[] | {"target" : .name, "action" : "plan_apply"}' -j | sed s"/}{/},{/g" >> matrix.out
           fi
           echo ']}' >> matrix.out
-          matrix=$(cat matrix.out)
-          echo '$matrix | jq -r'
-          echo '${matrix} | jq -r' >> $GITHUB_OUTPUT
+          matrix=$(cat matrix.out | jq -r)
+          echo $matrix
+          echo '${matrix}' >> $GITHUB_OUTPUT
           echo 'EOF' >> $GITHUB_OUTPUT
           echo "${matrix}"
