@@ -2,8 +2,15 @@ resource "aws_codepipeline" "codepipeline" {
   depends_on = [
     aws_codedeploy_app.tipstaff_codedeploy
   ]
+  provider = aws.eu-west-1
   name     = "tf_tipstaff_pipeline"
   role_arn = aws_iam_role.codepipeline_role.arn
+
+  artifact_store {
+    location = aws_s3_bucket.pipeline-s3-eu-west-1.bucket
+    type     = "S3"
+    region   = "eu-west-1"
+  }
 
   artifact_store {
     location = aws_s3_bucket.pipeline-s3-eu-west-2.bucket
@@ -79,6 +86,11 @@ resource "aws_codepipeline" "codepipeline" {
   }
 }
 
+resource "aws_s3_bucket" "pipeline-s3-eu-west-1" {
+  provider = aws.eu-west-1
+  bucket   = "pipeline-s3-eu-west-1"
+}
+
 resource "aws_s3_bucket" "pipeline-s3-eu-west-2" {
   bucket = "pipeline-s3-eu-west-2"
 }
@@ -143,6 +155,7 @@ resource "aws_iam_role_policy" "codepipeline_role_policy" {
 
 # Create CodeBuild project
 resource "aws_codebuild_project" "my_build_project" {
+  provider     = aws.eu-west-1
   name         = "my-dotnet-build-project"
   description  = "Builds and packages .NET application"
   service_role = aws_iam_role.codebuild_role.arn
