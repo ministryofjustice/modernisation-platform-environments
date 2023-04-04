@@ -45,6 +45,7 @@ jobs:
           echo ']}' >> matrix.out
           matrix=$(cat matrix.out | jq -r)
           echo $matrix
-          echo '${matrix}' >> $GITHUB_OUTPUT
+          echo 'matrix<<EOF' >> $GITHUB_OUTPUT
+          echo "${matrix}" >> $GITHUB_OUTPUT
           echo 'EOF' >> $GITHUB_OUTPUT
           echo "${matrix}"
