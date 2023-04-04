@@ -96,8 +96,6 @@ tasks:
       Set-Service -Name nginx -StartupType Disabled
 %{endif}
       "nginx config written" | Out-File -FilePath C:\nginx_config_log.txt
-- task: executeScript
-  inputs:
   - frequency: once
     type: powershell
     runAs: admin
