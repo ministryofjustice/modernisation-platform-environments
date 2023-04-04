@@ -108,9 +108,13 @@ locals {
       ]
       principals = {
         type = "AWS"
-        identifiers = [for account_name in var.environment.devtest_account_names :
+        identifiers = concat([
+          for account_name in var.environment.devtest_account_names :
           var.environment.account_root_arns[account_name]
-        ]
+        ], [
+          for account_name in var.environment.devtest_account_names :
+          var.environment.account_ids[account_name]
+        ])
       }
     }
   }

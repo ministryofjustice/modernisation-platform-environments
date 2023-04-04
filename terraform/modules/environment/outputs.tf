@@ -18,6 +18,11 @@ output "account_names" {
   value       = local.account_names
 }
 
+output "account_ids" {
+  description = "map of all account ids for the given application, e.g. ['nomis-development', 'nomis-test', 'nomis-preproduction', 'nomis-production']"
+  value       = local.account_ids
+}
+
 output "devtest_account_names" {
   description = "list of all devtest accounts for the given application, e.g. ['nomis-development', 'nomis-test']"
   value       = local.devtest_account_names
