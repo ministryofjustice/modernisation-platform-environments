@@ -27,6 +27,20 @@ locals {
           "EC2S3BucketWriteAndDeleteAccessPolicy",
         ])
       }
+
+      db = {
+        availability_zone             = "eu-west-2a"
+        subnet_name                   = "data"
+        ebs_volumes_copy_all_from_ami = true
+        user_data_raw                 = null
+        ssm_parameters_prefix         = "database/"
+        iam_resource_names_prefix     = "ec2-database"
+        instance_profile_policies = flatten([
+          "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+          local.iam_policies_ec2_default,
+          "EC2S3BucketWriteAndDeleteAccessPolicy",
+        ])
+      }
     }
 
     instance = {
@@ -48,6 +62,15 @@ locals {
         metadata_options_http_tokens = "optional"
         monitoring                   = false
         vpc_security_group_ids       = ["private"]
+      }
+      # assumes there is a 'data' security group created
+      default_db = {
+        disable_api_termination      = false
+        instance_type                = "r6i.xlarge"
+        key_name                     = "ec2-user"
+        metadata_options_http_tokens = "optional" # the Oracle installer cannot accommodate a token
+        monitoring                   = true
+        vpc_security_group_ids       = ["data"]
       }
     }
 
