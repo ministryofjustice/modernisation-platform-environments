@@ -33,7 +33,7 @@ locals {
         bucket_policy_v2 = [
           module.baseline_presets.s3_bucket_policies.ImageBuilderWriteAccessBucketPolicy,
           module.baseline_presets.s3_bucket_policies.DevTestEnvironmentsWriteAndDeleteAccessBucketPolicy,
-          module.baseline_presets.s3_bucket_policies.DevTestAccountsWriteAndDeleteAccessBucketPolicy
+          module.baseline_presets.s3_bucket_policies.DevTestAccountsWriteAndDeleteAccessBucketPolicy2
         ]
         iam_policies = module.baseline_presets.s3_iam_policies
       }
