@@ -98,7 +98,8 @@ locals {
             protocol = "HTTP"
             default_action = {
               type              = "forward"
-              target_group_name = "development-oasys-web-http-8080"
+              target_group_name_replace     = "development-oasys-web"
+              condition_host_header_replace = "development-oasys-web"
             }
           }
         }
