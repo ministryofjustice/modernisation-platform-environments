@@ -233,7 +233,7 @@ locals {
       }
     }
     # Example target group setup below
-    # lb_target_groups = local.lb_target_groups # This won't be correct for db, will correct later
+    lb_target_groups = local.lb_target_groups # This won't be correct for db, will correct later
   }
   database_tags = {
     component            = "data"
