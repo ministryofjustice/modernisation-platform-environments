@@ -103,7 +103,6 @@ module "glue_cloudplatform_reporting_job" {
   create_job                    = local.create_job
   name                          = "${local.project}-reporting-hub-${local.env}"
   description                   = local.description
-  glue_version                  = 4.0
   command_type                  = "gluestreaming"
   create_security_configuration = local.create_sec_conf
   temp_dir                      = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/tmp/reporting-hub/"
