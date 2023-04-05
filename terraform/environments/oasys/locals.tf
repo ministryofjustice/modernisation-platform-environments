@@ -137,10 +137,10 @@ locals {
     config = merge(module.baseline_presets.ec2_instance.config.db, {
       ami_name = "oasys_oracle_db_*"
     })
-    instance = module.baseline_presets.ec2_instance.instance.default_db
+    instance              = module.baseline_presets.ec2_instance.instance.default_db
     autoscaling_schedules = {}
-    autoscaling_group = module.baseline_presets.ec2_autoscaling_group
-    user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags
+    autoscaling_group     = module.baseline_presets.ec2_autoscaling_group
+    user_data_cloud_init  = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags
     ebs_volumes = {
       "/dev/sdb" = { # /u01
         size        = 100

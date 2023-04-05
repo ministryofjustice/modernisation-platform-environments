@@ -75,7 +75,7 @@ locals {
 
       dev-oasys-db = merge(local.database, {
         autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
-        tags = local.database_tags
+        tags                  = local.database_tags
       })
     }
 
