@@ -233,7 +233,26 @@ locals {
       }
     }
     # Example target group setup below
-    lb_target_group = local.lb_target_groups.http-8080 # This won't be correct for db, will correct later
+    lb_target_group = {
+      port                 = 8080
+      protocol             = "HTTP"
+      target_type          = "instance"
+      deregistration_delay = 30
+      health_check = {
+        enabled             = true
+        interval            = 30
+        healthy_threshold   = 3
+        matcher             = "200-399"
+        path                = "/"
+        port                = 8080
+        timeout             = 5
+        unhealthy_threshold = 5
+      }
+      stickiness = {
+        enabled = true
+        type    = "lb_cookie"
+      }
+    }# This won't be correct for db, will correct later
   }
   database_tags = {
     component            = "data"
