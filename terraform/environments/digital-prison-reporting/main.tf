@@ -117,6 +117,7 @@ module "glue_cloudplatform_reporting_job" {
   additional_policies           = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_admin_arn
   timeout                       = 8
   execution_class               = "STANDARD"
+  script_location               = ""
 
   class = "uk.gov.justice.digital.job.DataHubJob"
 
@@ -128,8 +129,8 @@ module "glue_cloudplatform_reporting_job" {
     "--enable-job-insights" = true
 
     "--kinesis.reader.streamName"           = "local.kinesis_stream_ingestor"
-    "--aws.kinesis.endpointUrl"             = "https://kinesis-${local.region}.amazonaws.com"
-    "--aws.region"                          = local.region
+    "--aws.kinesis.endpointUrl"             = "https://kinesis-${local.account_region}.amazonaws.com"
+    "--aws.region"                          = local.account_region
     "--kinesis.reader.batchDurationSeconds" = 1
     "--datalake-formats"                    = "delta"
     "--raw.s3.path"                         = "s3://${module.s3_raw_bucket[0].bucket.id}"
