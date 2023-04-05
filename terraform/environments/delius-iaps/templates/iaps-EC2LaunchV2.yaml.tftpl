@@ -70,12 +70,12 @@ tasks:
       nssm set "nginx" AppRotateBytes 1048576
 
       $nginxRotateLogsScript = @"
-      $nginxLogPath = (Resolve-Path 'C:\tools\nginx-*\logs').Path
+      `$nginxLogPath = (Resolve-Path "C:\tools\nginx-*\logs").Path
       # compress
-      Get-ChildItem '$${nginxLogPath}\*.log' | Where {$_.lastwritetime -lt (Get-Date).AddDays(-1)} | write-zip
+      Get-ChildItem "$nginxLogPath\*.log" | Where {$_.lastwritetime -lt (Get-Date).AddDays(-1)} | write-zip
 
       # purge yesterday zip
-      Get-ChildItem '$${nginxLogPath}\*.zip' | Where {$_.lastwritetime -lt (Get-Date).AddDays(-2)} | Remove-Item -Force
+      Get-ChildItem "`${nginxLogPath}\*.zip" | Where {$_.lastwritetime -lt (Get-Date).AddDays(-2)} | Remove-Item -Force
       "@
       $Utf8NoBomEncoding = New-Object System.Text.UTF8Encoding $False
       [System.IO.File]::WriteAllLines("$${nginxPath}\log-rotate-helper.ps1", $nginxRotateLogsScript, $Utf8NoBomEncoding)
