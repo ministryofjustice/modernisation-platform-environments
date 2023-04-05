@@ -58,6 +58,14 @@ module "ec2_autoscaling_group" {
   autoscaling_schedules = each.value.autoscaling_schedules
   lb_target_groups      = each.value.lb_target_groups
 
+  cloudwatch_metric_alarms = {
+    for key, value in each.value.cloudwatch_metric_alarms : key => merge(value, {
+      alarm_actions = [
+        for item in value.alarm_actions : try(aws_sns_topic.this[item].arn, item)
+      ]
+    })
+  }
+
   tags = each.value.tags
 
   # ensure service linked role is created first if defined in code

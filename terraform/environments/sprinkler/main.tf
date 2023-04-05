@@ -812,3 +812,11 @@ resource "aws_cloudwatch_log_group" "app" {
     },
   )
 }
+
+resource "aws_acm_certificate" "us_east_1_test" {
+  domain_name       = "test.platforms-development.modernisation-platform.service.justice.gov.uk"
+  validation_method = "DNS"
+  provider          = aws.us-east-1
+
+  tags = local.tags
+}

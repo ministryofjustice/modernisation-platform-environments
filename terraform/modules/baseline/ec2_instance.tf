@@ -45,5 +45,13 @@ module "ec2_instance" {
     lookup(aws_iam_policy.this, policy, null) != null ? aws_iam_policy.this[policy].arn : policy
   ]
 
+  cloudwatch_metric_alarms = {
+    for key, value in each.value.cloudwatch_metric_alarms : key => merge(value, {
+      alarm_actions = [
+        for item in value.alarm_actions : try(aws_sns_topic.this[item].arn, item)
+      ]
+    })
+  }
+
   tags = merge(local.tags, each.value.tags)
 }

@@ -27,34 +27,35 @@ locals {
     }
 
     baseline_s3_buckets = {
-
       # the shared devtest bucket is just created in test
-      oasys-devtest = {
+      devtest-oasys = {
         custom_kms_key = module.environment.kms_keys["general"].arn
         bucket_policy_v2 = [
           module.baseline_presets.s3_bucket_policies.ImageBuilderWriteAccessBucketPolicy,
-          module.baseline_presets.s3_bucket_policies.DevTestEnvironmentsWriteAndDeleteAccessBucketPolicy
+          module.baseline_presets.s3_bucket_policies.DevTestEnvironmentsWriteAndDeleteAccessBucketPolicy,
+          module.baseline_presets.s3_bucket_policies.DevTestAccountsWriteAndDeleteAccessBucketPolicy
         ]
         iam_policies = module.baseline_presets.s3_iam_policies
       }
     }
 
     baseline_ec2_autoscaling_groups = {
-      oasys-test-web = {
-        autoscaling_group     = module.baseline_presets.ec2_autoscaling_group
-        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
+      test-oasys-web = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name = "base_rhel_8_5_*"
         })
-        ebs_volume_config = null
-        ebs_volumes       = null
-        instance          = module.baseline_presets.ec2_instance.instance.default
-        lb_target_groups  = null
-        ssm_parameters    = null
+        instance                 = module.baseline_presets.ec2_instance.instance.default
+        user_data_cloud_init     = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
+        ebs_volume_config        = null
+        ebs_volumes              = null
+        autoscaling_group        = module.baseline_presets.ec2_autoscaling_group
+        autoscaling_schedules    = module.baseline_presets.ec2_autoscaling_schedules.working_hours
+        ssm_parameters           = null
+        lb_target_groups         = {}
+        cloudwatch_metric_alarms = {}
         tags = {
           os-type = "Linux"
         }
-        user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
       }
     }
 
