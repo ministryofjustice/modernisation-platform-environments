@@ -36,7 +36,7 @@ jobs:
     uses: ./.github/workflows/reusable_terraform_strategy.yml
     if: inputs.action != 'destroy'
     with:
-      strategy_type: "standard_four_accounts"  # allow apply to dev/test from branch
+      application: "${{ github.workflow }}"
 
   terraform:
     needs: strategy
