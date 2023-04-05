@@ -360,22 +360,9 @@ resource "aws_instance" "s266316rgsl200" {
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.PPUD-Mail-Server[0].id]
   subnet_id              = data.aws_subnet.private_subnets_b.id
+  key_name               = aws_key_pair.cjms_instance.key_name
   tags = {
     Name          = "s266316rgsl200"
-    is-production = true
-  }
-}
-
-resource "aws_instance" "s266316rgsl201" {
-  count                  = local.is-production == true ? 1 : 0
-  ami                    = "ami-0f43890c2b4907c29"
-  instance_type          = "m5.large"
-  source_dest_check      = false
-  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.PPUD-Mail-Server[0].id]
-  subnet_id              = data.aws_subnet.private_subnets_c.id
-  tags = {
-    Name          = "s266316rgsl201"
     is-production = true
   }
 }
@@ -389,6 +376,7 @@ resource "aws_instance" "s265903rgsl400" {
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.PPUD-Mail-Server-2[0].id]
   subnet_id              = data.aws_subnet.private_subnets_b.id
+  key_name               = aws_key_pair.cjms_instance.key_name
   tags = {
     Name          = "s265903rgsl400"
     is-production = true
@@ -403,8 +391,39 @@ resource "aws_instance" "s265903rgsl401" {
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.PPUD-Mail-Server-2[0].id]
   subnet_id              = data.aws_subnet.private_subnets_c.id
+  key_name               = aws_key_pair.cjms_instance.key_name
   tags = {
     Name          = "s265903rgsl401"
     is-production = true
   }
+}
+
+  resource "aws_key_pair" "cjms_instance" {
+  count      = local.is-production == true ? 1 : 0
+  key_name   = "linuxcjms"
+  public_key = file("~/.ssh/linuxkey.pub")
+}
+
+# resource block for eip
+resource "aws_eip" "s265903rgsl400-eip" {
+  count = local.is-production == true ? 1 : 0
+  vpc = true
+}
+
+resource "aws_eip" "s265903rgsl401-eip" {
+  count = local.is-production == true ? 1 : 0
+  vpc = true
+}
+
+#Associate EIP with EC2 Instance
+resource "aws_eip_association" "s265903rgsl400-eip-association" {
+  count         = local.is-production == true ? 1 : 0
+  instance_id   = aws_instance.s265903rgsl400.id
+  allocation_id = aws_eip.s265903rgsl400-eip.id
+}
+
+resource "aws_eip_association" "s265903rgsl401-eip-association" {
+  count         = local.is-production == true ? 1 : 0
+  instance_id   = aws_instance.s265903rgsl401.id
+  allocation_id = aws_eip.s265903rgsl401-eip.id
 }
