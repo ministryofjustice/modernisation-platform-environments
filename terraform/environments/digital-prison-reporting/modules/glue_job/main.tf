@@ -1,7 +1,5 @@
 locals {
   default_arguments = {
-    "--job-language"                     = "${var.job_language}"
-    "--class"                            = "GlueApp"
     "--job-bookmark-option"              = "${lookup(var.bookmark_options, var.bookmark)}"
     "--TempDir"                          = "${var.temp_dir}"
     "--checkpoint.location"              = "${var.checkpoint_dir}"
@@ -12,7 +10,6 @@ locals {
     "--enable-glue-datacatalog"          = "true"
     "--enable-job-insights"              = "true"
     "--continuous-log-logStreamPrefix"   = var.continuous_log_stream_prefix
-    "--extra-py-files"                   = length(var.extra_py_files) > 0 ? join(",", var.extra_py_files) : null
     "--enable-continuous-log-filter"     = var.enable_continuous_log_filter
   }
 
@@ -44,6 +41,7 @@ resource "aws_glue_job" "glue_job" {
 
   command {
     script_location = var.script_location
+    name            = var.command_type
   }
 
   # https://docs.aws.amazon.com/glue/latest/dg/aws-glue-programming-etl-glue-arguments.html
