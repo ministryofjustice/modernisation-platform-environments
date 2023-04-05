@@ -419,12 +419,12 @@ resource "aws_eip" "s265903rgsl401-eip" {
 #Associate EIP with EC2 Instance
 resource "aws_eip_association" "s265903rgsl400-eip-association" {
   count         = local.is-production == true ? 1 : 0
-  instance_id   = aws_instance.s265903rgsl400.id
-  allocation_id = aws_eip.s265903rgsl400-eip.id
+  instance_id   = aws_instance.s265903rgsl400[0].id
+  allocation_id = aws_eip.s265903rgsl400-eip[0].id
 }
 
 resource "aws_eip_association" "s265903rgsl401-eip-association" {
   count         = local.is-production == true ? 1 : 0
-  instance_id   = aws_instance.s265903rgsl401.id
-  allocation_id = aws_eip.s265903rgsl401-eip.id
+  instance_id   = aws_instance.s265903rgsl401[0].id
+  allocation_id = aws_eip.s265903rgsl401-eip[0].id
 }
