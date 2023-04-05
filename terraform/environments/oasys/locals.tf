@@ -139,9 +139,7 @@ locals {
     })
     instance              = module.baseline_presets.ec2_instance.instance.default_db
     autoscaling_schedules = {}
-    autoscaling_group     = merge(module.baseline_presets.ec2_autoscaling_group, { 
-      lb_target_groups = local.lb_target_groups # This won't be correct for db, will correct later)
-    })
+    autoscaling_group     = module.baseline_presets.ec2_autoscaling_group
     user_data_cloud_init  = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags
     ebs_volumes = {
       "/dev/sdb" = { # /u01
@@ -233,7 +231,9 @@ locals {
         }
         description = "ASMSNMP password"
       }
-    }    
+    }
+    # Example target group setup below
+    # lb_target_groups = local.lb_target_groups # This won't be correct for db, will correct later
   }
   database_tags = {
     component            = "data"
