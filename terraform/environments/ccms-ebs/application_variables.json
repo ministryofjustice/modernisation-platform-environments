@@ -223,9 +223,9 @@
       "to_port": 22,
       "protocol": "TCP"
     },
-    "TCP_1521": {
+    "TCP_152x": {
       "from_port": 1521,
-      "to_port": 1521,
+      "to_port": 1522,
       "protocol": "TCP"
     },
     "TCP_5101": {
@@ -275,9 +275,9 @@
       "protocol": "TCP",
       "destination_cidr": "0.0.0.0/0"
     },
-    "TCP_1521": {
+    "TCP_152x": {
       "from_port": 1521,
-      "to_port": 1521,
+      "to_port": 1522,
       "protocol": "TCP",
       "destination_cidr": "0.0.0.0/0"
     },
