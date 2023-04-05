@@ -267,6 +267,16 @@ resource "aws_ecs_service" "delius-db-service" {
 
 }
 
+# Create route 53 record representing above DB endpoint
+resource "aws_route53_record" "delius-core-db" {
+  provider = aws.core-vpc
+  zone_id  = data.aws_route53_zone.inner.zone_id
+  name     = "${local.db_service_name}-${local.application_name}.${data.aws_route53_zone.inner.name}"
+  type     = "A"
+  ttl      = 300
+  records  = ["10.26.26.165"]
+}
+
 ##
 # Commenting out remaining sections - we will return to these with a new module
 ##
