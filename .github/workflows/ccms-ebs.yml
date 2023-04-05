@@ -195,7 +195,7 @@ jobs:
       matrix:
         include:
           - environment: preproduction
-#          - environment: production
+          - environment: production
     name: Plan - ${{  matrix.environment }}
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
