@@ -47,7 +47,7 @@ resource "aws_lb" "tipstaff_dev_lb" {
 }
 
 resource "aws_lb_target_group" "blue" {
-  name                 = "tipstaff-dev-target-group"
+  name                 = "tipstaff-dev-target-group-blue"
   port                 = 80
   protocol             = "HTTP"
   vpc_id               = data.aws_vpc.shared.id
@@ -99,7 +99,7 @@ resource "aws_lb_listener" "tipstaff_dev_lb_2" {
 }
 
 resource "aws_lb_target_group" "green" {
-  name                 = "tipstaff-dev-target-group_green"
+  name                 = "tipstaff-dev-target-group-green"
   port                 = 80
   protocol             = "HTTP"
   vpc_id               = data.aws_vpc.shared.id
