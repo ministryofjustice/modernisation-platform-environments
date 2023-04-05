@@ -183,6 +183,7 @@ locals {
       chronyd-stopped = {
         comparison_operator = "GreaterThanOrEqualToThreshold"
         evaluation_periods  = "3"
+        datapoints_to_alarm = "3"
         namespace           = "CWAgent"
         metric_name         = "collectd_exec_value"
         period              = "60"
@@ -196,6 +197,7 @@ locals {
       sshd-stopped = {
         comparison_operator = "GreaterThanOrEqualToThreshold"
         evaluation_periods  = "3"
+        datapoints_to_alarm = "3"
         namespace           = "CWAgent"
         metric_name         = "collectd_exec_value"
         period              = "60"
@@ -209,6 +211,7 @@ locals {
       cloudwatch-agent-stopped = {
         comparison_operator = "GreaterThanOrEqualToThreshold"
         evaluation_periods  = "3"
+        datapoints_to_alarm = "3"
         namespace           = "CWAgent"
         metric_name         = "collectd_exec_value"
         period              = "60"
@@ -222,6 +225,7 @@ locals {
       ssm-agent-stopped = {
         comparison_operator = "GreaterThanOrEqualToThreshold"
         evaluation_periods  = "3"
+        datapoints_to_alarm = "3"
         namespace           = "CWAgent"
         metric_name         = "collectd_exec_value"
         period              = "60"
