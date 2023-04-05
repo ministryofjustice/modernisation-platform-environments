@@ -13,10 +13,10 @@ resource "aws_security_group" "importmachine" {
 
   ingress {
 
-    description      = "from all"
-    from_port        = 0
-    to_port          = 0
-    protocol         = "-1"
+    description     = "from all"
+    from_port       = 0
+    to_port         = 0
+    protocol        = "-1"
     security_groups = [aws_security_group.prtg_lb.id]
   }
 
