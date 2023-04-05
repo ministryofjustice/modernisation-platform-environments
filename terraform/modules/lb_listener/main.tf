@@ -243,7 +243,9 @@ resource "aws_route53_record" "self" {
 #  alarm_description   = each.value.alarm_description
 #  datapoints_to_alarm = each.value.datapoints_to_alarm
 #  treat_missing_data  = each.value.treat_missing_data
-#  tags                = {}
+#  tags                = merge(var.tags, {
+#    Name = "${var.name}-${each.key}"
+#  })
 #  dimensions = merge(each.value.dimensions, {
 #    "LoadBalancer" = data.aws_lb.this.arn_suffix
 #    "TargetGroup"  = local.target_group_arn.arn_suffix

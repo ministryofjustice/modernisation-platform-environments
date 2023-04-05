@@ -23,58 +23,6 @@ locals {
       patch_day                 = "TUE"
     }
 
-    # Add database instances here. They will be created using ec2-database.tf
-    databases = { # currently this does nothing - add to baseline
-      # development-oasys-db-1 = {
-      #   tags = {
-      #     oasys-environment = "development"
-      #     server-type       = "oasys-db"
-      #     description       = "Development OASys database"
-      #     oracle-sids       = "OASPROD BIPINFRA"
-      #     monitored         = true
-      #   }
-      #   ami_name = "oasys_oracle_db_*"
-      #   # ami_owner = "self" # remove this line next time AMI is updated so core-shared-services-production used instead
-      #   instance = {
-      #     instance_type             = "r6i.2xlarge"
-      #     disable_api_termination   = true
-      #     metadata_endpoint_enabled = "enabled"
-      #   }
-      #   # ebs_volumes = {
-      #   #   "/dev/sdb" = { size = 100 }
-      #   #   "/dev/sdc" = { size = 100 }
-      #   # }
-      #   # ebs_volume_config = {
-      #   #   data  = { total_size = 200 }
-      #   #   flash = { total_size = 50 }
-      #   # }
-      # }
-
-      # dev-onr-db-1 = {
-      #   tags = {
-      #     oasys-environment = "development"
-      #     server-type       = "onr-db"
-      #     description       = "Development ONR database"
-      #     oracle-sids       = "onrbods ONRAUD ONRSYS MISTRANS OASYSREP"
-      #     monitored         = true
-      #   }
-      #   ami_name = "onr_oracle_db_*"
-      #   instance = {
-      #     instance_type             = "r6i.xlarge"
-      #     disable_api_termination   = true
-      #     metadata_endpoint_enabled = "enabled"
-      #   }
-      #   ebs_volumes = {
-      #     "/dev/sdb" = { size = 100 }
-      #     "/dev/sdc" = { size = 5120 }
-      #   }
-      #   ebs_volume_config = {
-      #     data  = { total_size = 4000 }
-      #     flash = { total_size = 1000 }
-      #   }
-      # }
-    }
-
     baseline_bastion_linux = {
       # public_key_data = local.public_key_data.keys[local.environment]
       # tags            = local.tags
@@ -125,23 +73,10 @@ locals {
 
     baseline_ec2_autoscaling_groups = {
 
-      dev-oasys-db = {
-        config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name = "oasys_oracle_db_*"
-        })
-        instance = module.baseline_presets.ec2_instance.instance.default
-        user_data_cloud_init  = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags
-        autoscaling_group     = module.baseline_presets.ec2_autoscaling_group
+      dev-oasys-db = merge(local.database, {
         autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
-        tags = merge(local.database_tags, {
-          description       = "Development OASys database"
-          monitored         = true
-          oasys-environment = "development"
-        })
-
-        # Example target group setup below
-        lb_target_groups = local.lb_target_groups
-      }
+        tags                  = local.database_tags
+      })
     }
 
     baseline_lbs = {
