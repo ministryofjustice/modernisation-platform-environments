@@ -52,6 +52,9 @@ resource "aws_ecs_task_definition" "tipstaff_task_definition" {
     operating_system_family = "WINDOWS_SERVER_2019_CORE"
     cpu_architecture        = "X86_64"
   }
+  deployment_controller {
+    type = "CODE_DEPLOY"
+  }
 }
 
 resource "aws_ecs_service" "tipstaff_ecs_service" {
