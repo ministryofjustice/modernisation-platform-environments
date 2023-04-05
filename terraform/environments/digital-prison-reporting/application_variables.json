@@ -19,7 +19,22 @@
       "setup_redshift": true
     },
     "test": {
-      "example_var": "test-data"
+      "project_short_id": "dpr",
+      "create_database": false,
+      "db_description": "DPR Data Catalog",
+      "glue_db_name": "glue-catalog-test",
+      "glue_db_data_domain": "glue-catalog-data-domain-store",
+      "create_job": true,
+      "glue_job_name": "glue-job-ingester",
+      "create_security_conf": true,
+      "setup_buckets": true,
+      "create_kinesis_streams": true,
+      "create_glue_registries": false,
+      "setup_s3_buckets": true,
+      "create_glue_connections": false,
+      "ec2_instance_type": "t3.small",
+      "ami_image_id": "ami-00cc4c3fee6bb6c22",
+      "setup_redshift": true
     },
     "preproduction": {
       "example_var": "preproduction-data"

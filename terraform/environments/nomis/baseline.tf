@@ -23,4 +23,5 @@ module "baseline" {
   route53_resolvers = module.baseline_presets.route53_resolvers
   route53_zones     = merge(local.baseline_route53_zones, lookup(local.baseline_environment_config, "baseline_route53_zones", {}))
   lbs               = lookup(local.baseline_environment_config, "baseline_lbs", {})
+  sns_topics        = module.baseline_presets.sns_topics
 }
