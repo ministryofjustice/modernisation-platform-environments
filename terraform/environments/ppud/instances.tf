@@ -401,7 +401,7 @@ resource "aws_instance" "s265903rgsl401" {
   resource "aws_key_pair" "cjms_instance" {
   count      = local.is-production == true ? 1 : 0
   key_name   = "linuxcjms"
-  public_key = file("~/.ssh/linuxkey.pub")
+  public_key = file(".ssh/${terraform.workspace}/linuxkey.pub")
 }
 
 # resource block for eip
