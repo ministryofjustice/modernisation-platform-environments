@@ -7,7 +7,22 @@ variable "acm_certificates" {
       account   = optional(string, "self")
       zone_name = string
     })), {})
-    tags = map(string)
+    cloudwatch_metric_alarms = optional(map(object({
+      comparison_operator = string
+      evaluation_periods  = number
+      metric_name         = string
+      namespace           = string
+      period              = number
+      statistic           = string
+      threshold           = number
+      alarm_actions       = list(string)
+      actions_enabled     = optional(bool, false)
+      alarm_description   = optional(string)
+      datapoints_to_alarm = optional(number)
+      treat_missing_data  = optional(string, "missing")
+      dimensions          = optional(map(string), {})
+    })), {})
+    tags = optional(map(string), {})
   }))
   default = {}
 }
@@ -164,6 +179,21 @@ variable "ec2_autoscaling_groups" {
         availability_zone = optional(string)
       })), [])
     })), {})
+    cloudwatch_metric_alarms = optional(map(object({
+      comparison_operator = string
+      evaluation_periods  = number
+      metric_name         = string
+      namespace           = string
+      period              = number
+      statistic           = string
+      threshold           = number
+      alarm_actions       = list(string)
+      actions_enabled     = optional(bool, false)
+      alarm_description   = optional(string)
+      datapoints_to_alarm = optional(number)
+      treat_missing_data  = optional(string, "missing")
+      dimensions          = optional(map(string), {})
+    })), {})
     tags = optional(map(string), {})
   }))
   default = {}
@@ -237,6 +267,21 @@ variable "ec2_instances" {
       create_internal_record = true
       create_external_record = false
     })
+    cloudwatch_metric_alarms = optional(map(object({
+      comparison_operator = string
+      evaluation_periods  = number
+      metric_name         = string
+      namespace           = string
+      period              = number
+      statistic           = string
+      threshold           = number
+      alarm_actions       = list(string)
+      actions_enabled     = optional(bool, false)
+      alarm_description   = optional(string)
+      datapoints_to_alarm = optional(number)
+      treat_missing_data  = optional(string, "missing")
+      dimensions          = optional(map(string), {})
+    })), {})
     tags = optional(map(string), {})
   }))
   default = {}
@@ -480,6 +525,21 @@ variable "lbs" {
         zone_name              = string
         evaluate_target_health = optional(bool, false)
       })), {})
+      cloudwatch_metric_alarms = optional(map(object({
+        comparison_operator = string
+        evaluation_periods  = number
+        metric_name         = string
+        namespace           = string
+        period              = number
+        statistic           = string
+        threshold           = number
+        alarm_actions       = list(string)
+        actions_enabled     = optional(bool, false)
+        alarm_description   = optional(string)
+        datapoints_to_alarm = optional(number)
+        treat_missing_data  = optional(string, "missing")
+        dimensions          = optional(map(string), {})
+      })), {})
       replace = optional(object({
         target_group_name_match       = optional(string, "$(name)")
         target_group_name_replace     = optional(string, "")
@@ -652,6 +712,23 @@ variable "security_groups" {
       prefix_list_ids = optional(list(string))
     }))
     tags = optional(map(string), {})
+  }))
+  default = {}
+}
+
+variable "sns_topics" {
+  description = "map of sns topics and associated subscriptions where map key is the name of the topic"
+  type = map(object({
+    display_name      = optional(string)
+    kms_master_key_id = optional(string)  # id or business unit key name, e.g. 'general'
+    subscriptions = optional(map(object({ # map key isn't used
+      protocol      = string
+      endpoint      = string
+      filter_policy = optional(string)
+    })), {})
+    subscriptions_pagerduty = optional(map(object({ # map key is the name of the pagerduty integration key
+      filter_policy = optional(string)
+    })), {})
   }))
   default = {}
 }
