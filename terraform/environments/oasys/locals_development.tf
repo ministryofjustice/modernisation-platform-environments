@@ -90,7 +90,7 @@ locals {
         force_destroy_bucket     = true
         idle_timeout             = 3600
         public_subnets           = module.environment.subnets["private"].ids
-        security_groups          = [aws_security_group.public.id]
+        security_groups          = [module.baseline.security_groups["public"].id]
 
         listeners = {
           development-oasys-web-http-8080 = {
