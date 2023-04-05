@@ -360,7 +360,7 @@ resource "aws_instance" "s266316rgsl200" {
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.PPUD-Mail-Server[0].id]
   subnet_id              = data.aws_subnet.private_subnets_b.id
-  key_name               = aws_key_pair.cjms_instance.key_name
+  key_name               = aws_key_pair.cjms_instance[0].key_name
   tags = {
     Name          = "s266316rgsl200"
     is-production = true
@@ -376,7 +376,7 @@ resource "aws_instance" "s265903rgsl400" {
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.PPUD-Mail-Server-2[0].id]
   subnet_id              = data.aws_subnet.private_subnets_b.id
-  key_name               = aws_key_pair.cjms_instance.key_name
+  key_name               = aws_key_pair.cjms_instance[0].key_name
   tags = {
     Name          = "s265903rgsl400"
     is-production = true
@@ -391,7 +391,7 @@ resource "aws_instance" "s265903rgsl401" {
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.PPUD-Mail-Server-2[0].id]
   subnet_id              = data.aws_subnet.private_subnets_c.id
-  key_name               = aws_key_pair.cjms_instance.key_name
+  key_name               = aws_key_pair.cjms_instance[0].key_name
   tags = {
     Name          = "s265903rgsl401"
     is-production = true
