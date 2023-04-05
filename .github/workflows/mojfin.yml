@@ -189,7 +189,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - environment: preproduction
+          # - environment: preproduction
           - environment: production
     name: Plan - ${{  matrix.environment }}
     runs-on: ubuntu-latest
@@ -226,7 +226,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - environment: preproduction
+          # - environment: preproduction
           - environment: production
     name: Apply - ${{  matrix.environment }}
     runs-on: ubuntu-latest
