@@ -52,9 +52,6 @@ resource "aws_ecs_task_definition" "tipstaff_task_definition" {
     operating_system_family = "WINDOWS_SERVER_2019_CORE"
     cpu_architecture        = "X86_64"
   }
-  deployment_controller {
-    type = "CODE_DEPLOY"
-  }
 }
 
 resource "aws_ecs_service" "tipstaff_ecs_service" {
@@ -66,7 +63,7 @@ resource "aws_ecs_service" "tipstaff_ecs_service" {
 
   name = var.networking[0].application
   deployment_controller {
-    type = "ECS"
+    type = "CODE_DEPLOY"
   }
   cluster                           = aws_ecs_cluster.tipstaff_cluster.id
   task_definition                   = aws_ecs_task_definition.tipstaff_task_definition.arn
@@ -86,7 +83,6 @@ resource "aws_ecs_service" "tipstaff_ecs_service" {
     container_name   = "tipstaff-container"
     container_port   = 80
   }
-
 }
 
 resource "aws_iam_role" "app_execution" {
