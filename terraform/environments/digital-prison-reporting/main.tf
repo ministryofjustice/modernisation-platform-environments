@@ -116,7 +116,8 @@ module "glue_cloudplatform_reporting_job" {
   additional_policies           = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_admin_arn
   timeout                       = 8
   execution_class               = "STANDARD"
-  script_location               = ""
+  # Placeholder Script Location
+  script_location               = "s3://${local.project}-artifact-store-${local.environment}/artifacts/domain-platform/digital-prison-reporting-poc/place-holder-vLatest.scala"
 
   class = "uk.gov.justice.digital.job.DataHubJob"
 
