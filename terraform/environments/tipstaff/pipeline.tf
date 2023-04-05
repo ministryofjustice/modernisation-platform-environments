@@ -258,7 +258,7 @@ resource "aws_codedeploy_deployment_group" "tipstaff_deployment_group" {
   load_balancer_info {
     target_group_pair_info {
       prod_traffic_route {
-        listener_arns = [aws_lb_listener.tipstaff_dev_lb_1.arn, aws_lb_listener.tipstaff_dev_lb_2.arn]
+        listener_arns = [aws_lb_listener.tipstaff_dev_lb_2.arn]
       }
 
       target_group {
