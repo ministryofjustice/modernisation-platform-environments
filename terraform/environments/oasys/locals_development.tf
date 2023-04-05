@@ -81,28 +81,28 @@ locals {
 
     baseline_lbs = {
       # AWS doesn't let us call it internal
-      private = {
-        internal_lb              = true
-        enable_delete_protection = false
-        existing_target_groups   = {
-          development-oasys-web-http-8080 = local.lb_target_groups.http-8080
-        }
-        force_destroy_bucket     = true
-        idle_timeout             = 3600
-        public_subnets           = module.environment.subnets["private"].ids
-        security_groups          = [module.baseline.security_groups["public"].id]
+      # private = {
+      #   internal_lb              = true
+      #   enable_delete_protection = false
+      #   existing_target_groups   = {
+      #     development-oasys-web-http-8080 = local.lb_target_groups.http-8080
+      #   }
+      #   force_destroy_bucket     = true
+      #   idle_timeout             = 3600
+      #   public_subnets           = module.environment.subnets["private"].ids
+      #   security_groups          = [module.baseline.security_groups["public"].id]
 
-        listeners = {
-          development-oasys-web-http-8080 = {
-            port     = 8080
-            protocol = "HTTP"
-            default_action = {
-              type              = "forward"
-              target_group_name_replace     = "development-oasys-web"
-              condition_host_header_replace = "development-oasys-web"
-            }
-          }
-        }
+      #   listeners = {
+      #     development-oasys-web-http-8080 = {
+      #       port     = 8080
+      #       protocol = "HTTP"
+      #       default_action = {
+      #         type              = "forward"
+      #         target_group_name_replace     = "development-oasys-web"
+      #         condition_host_header_replace = "development-oasys-web"
+      #       }
+      #     }
+      #   }
 
         # public LB not needed right now
         # public = {
