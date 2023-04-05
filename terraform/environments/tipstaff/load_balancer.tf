@@ -46,7 +46,7 @@ resource "aws_lb" "tipstaff_dev_lb" {
   depends_on                 = [aws_security_group.tipstaff_dev_lb_sc]
 }
 
-resource "aws_lb_target_group" "tipstaff_dev_target_group" {
+resource "aws_lb_target_group" "blue" {
   name                 = "tipstaff-dev-target-group"
   port                 = 80
   protocol             = "HTTP"
@@ -78,7 +78,7 @@ resource "aws_lb_listener" "tipstaff_dev_lb_1" {
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.tipstaff_dev_target_group.arn
+    target_group_arn = aws_lb_target_group.blue.arn
   }
 }
 
@@ -94,6 +94,30 @@ resource "aws_lb_listener" "tipstaff_dev_lb_2" {
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.tipstaff_dev_target_group.arn
+    target_group_arn = aws_lb_target_group.blue.arn
   }
+}
+
+resource "aws_lb_target_group" "green" {
+  name                 = "tipstaff-dev-target-group_green"
+  port                 = 80
+  protocol             = "HTTP"
+  vpc_id               = data.aws_vpc.shared.id
+  target_type          = "ip"
+  deregistration_delay = 30
+
+  stickiness {
+    type = "lb_cookie"
+  }
+
+  health_check {
+    healthy_threshold   = "2"
+    interval            = "120"
+    protocol            = "HTTP"
+    port                = "80"
+    unhealthy_threshold = "2"
+    matcher             = "200-499"
+    timeout             = "5"
+  }
+
 }

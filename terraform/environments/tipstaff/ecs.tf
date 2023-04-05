@@ -56,7 +56,6 @@ resource "aws_ecs_task_definition" "tipstaff_task_definition" {
 
 resource "aws_ecs_service" "tipstaff_ecs_service" {
   depends_on = [
-    aws_lb_target_group.tipstaff_dev_target_group,
     aws_lb_listener.tipstaff_dev_lb_1,
     aws_lb_listener.tipstaff_dev_lb_2
   ]
@@ -79,7 +78,7 @@ resource "aws_ecs_service" "tipstaff_ecs_service" {
   }
 
   load_balancer {
-    target_group_arn = aws_lb_target_group.tipstaff_dev_target_group.arn
+    target_group_arn = aws_lb_target_group.blue.arn
     container_name   = "tipstaff-container"
     container_port   = 80
   }

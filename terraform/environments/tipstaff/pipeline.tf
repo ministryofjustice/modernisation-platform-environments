@@ -256,10 +256,20 @@ resource "aws_codedeploy_deployment_group" "tipstaff_deployment_group" {
   }
 
   load_balancer_info {
-    target_group_info {
-      name = "${aws_lb_target_group.tipstaff_dev_target_group.name}"
+    target_group_pair_info {
+      prod_traffic_route {
+        listener_arns = [aws_lb_listener.tipstaff_dev_lb_1.arn, aws_lb_listener.tipstaff_dev_lb_2.arn]
+      }
+
+      target_group {
+        name = aws_lb_target_group.blue.name
+      }
+
+      target_group {
+        name = aws_lb_target_group.green.name
+      }
     }
-  }
+  } 
 }
 
 resource "aws_iam_role" "codedeploy_role" {
