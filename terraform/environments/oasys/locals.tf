@@ -247,6 +247,7 @@ locals {
     description          = "${local.environment} OASys database"
     monitored            = true
     oasys-environment    = local.environment
+    environment-name     = terraform.workspace # used in provisioning script to select group vars
   }
 
 
