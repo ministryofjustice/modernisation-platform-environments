@@ -54,7 +54,6 @@ EOF
       { Name = "root-block" }
     )
   }
-
   ebs_block_device {
     device_name = "/dev/sdf"
     volume_type = "gp3"
