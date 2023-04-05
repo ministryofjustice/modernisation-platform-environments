@@ -113,7 +113,7 @@ locals {
         #   public_subnets           = module.environment.subnets["public"].ids
         #   security_groups          = [aws_security_group.public.id]
         # }
-      }
+      # }
     }
   }
 }
