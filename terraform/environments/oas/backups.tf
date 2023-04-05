@@ -19,8 +19,8 @@ resource "aws_backup_plan" "non_production_oas" {
     rule_name         = "${local.application_name}-backup-daily-retain-7-days"
     target_vault_name = aws_backup_vault.default_oas.name
 
-    # Backup every day at 01:30am
-    schedule = "cron(30 1 * * ? *)"
+    # Backup every day at 12:00am
+    schedule = "cron(0 0 * * ? *)"
 
     # The amount of time in minutes to start and finish a backup
     ## Start the backup within 1 hour of the schedule
@@ -54,8 +54,8 @@ resource "aws_backup_selection" "non_production_oas" {
 
   condition {
     string_equals {
-      key   = "aws:ResourceTag/backup"
-      value = "true"
+      key   = "aws:ResourceTag/snapshot-with-daily-7-day-retention"
+      value = "yes"
     }
     string_not_equals {
       key   = "aws:ResourceTag/is-production"
