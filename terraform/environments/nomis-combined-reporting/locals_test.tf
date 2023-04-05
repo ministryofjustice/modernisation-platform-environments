@@ -1,6 +1,19 @@
 locals {
   test_config = {
 
+    baseline_s3_buckets = {
+
+      # the shared image builder bucket is just created in test
+      nomis-combined-reporting-software = {
+        custom_kms_key = module.environment.kms_keys["general"].arn
+        bucket_policy_v2 = [
+          module.baseline_presets.s3_bucket_policies.ImageBuilderWriteAccessBucketPolicy,
+          module.baseline_presets.s3_bucket_policies.AllEnvironmentsWriteAccessBucketPolicy
+        ]
+        iam_policies = module.baseline_presets.s3_iam_policies
+      }
+    }
+
     baseline_ec2_autoscaling_groups = {
 
       test-base-rhel85 = {
@@ -46,6 +59,23 @@ locals {
         }
       }
     }
+
+    # baseline_rds_instances = {
+    #   test-rds-instance = {
+    #     config = {
+    #       ssm_parameters_prefix     = "rds_instance/"
+    #       iam_resource_names_prefix = "rds-instance"
+    #     }
+    #     instance = {
+    #       identifier        = "rds-instance"
+    #       allocated_storage = 10
+    #       db_name           = "rds-instance"
+    #       engine            = "mysql"
+    #       instance_class    = "db.t3.micro"
+    #       username          = "example"
+    #     }
+    #   }
+    # }
     # baseline_lbs = {
     #   rhel85-test = {
     #     enable_delete_protection = false

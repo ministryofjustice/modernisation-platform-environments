@@ -13,16 +13,6 @@ locals {
       "star.${local.application_name}.${local.vpc_name}-${local.environment}.modernisation-platform.service.justice.gov.uk" = {
         domain_name             = "modernisation-platform.service.justice.gov.uk"
         subject_alternate_names = ["*.${local.application_name}.${local.vpc_name}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
-        validation = {
-          "modernisation-platform.service.justice.gov.uk" = {
-            account   = "core-network-services"
-            zone_name = "modernisation-platform.service.justice.gov.uk."
-          }
-          "*.${local.application_name}.${local.vpc_name}-${local.environment}.modernisation-platform.service.justice.gov.uk" = {
-            account   = "core-vpc"
-            zone_name = "${local.vpc_name}-${local.environment}.modernisation-platform.service.justice.gov.uk."
-          }
-        }
         tags = {
           description = "wildcard cert for ${local.application_name} ${local.environment} modernisation platform domain"
         }
@@ -50,7 +40,8 @@ module "acm_certificate" {
   name                    = each.key
   domain_name             = each.value.domain_name
   subject_alternate_names = each.value.subject_alternate_names
-  validation              = each.value.validation
+  route53_zones           = module.environment.route53_zones  # a map of all created zones for use in validation
+  validation              = each.value.validation             # or use this to explicitly define validation
   tags                    = merge(local.tags, lookup(each.value, "tags", {}))
   cloudwatch_metric_alarms = {
     for key, value in local.acm_certificates.cloudwatch_metric_alarms_acm :
@@ -59,6 +50,23 @@ module "acm_certificate" {
     })
   }
 }
+```
+
+Validation records are created in the relevant zone. The zone is looked up from the `route53_zones`
+variable using the domain name as the key to the map. Alternatively, use the `validation` option
+to explicitly define the mapping between `domain_name` and `zone`, e.g.
+
+```
+        validation = {
+          "modernisation-platform.service.justice.gov.uk" = {
+            account   = "core-network-services"
+            zone_name = "modernisation-platform.service.justice.gov.uk."
+          }
+          "*.${local.application_name}.${local.vpc_name}-${local.environment}.modernisation-platform.service.justice.gov.uk" = {
+            account   = "core-vpc"
+            zone_name = "${local.vpc_name}-${local.environment}.modernisation-platform.service.justice.gov.uk."
+          }
+        }
 ```
 
 With the alarm settings - don't forget to set your own aws_sns_topic values.

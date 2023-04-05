@@ -50,9 +50,10 @@ locals {
     route53 = {
       route53_records = {
         "$(name).nomis" = {
-          account                = "core-vpc"
-          zone_id                = module.environment.route53_zones[module.environment.domains.public.business_unit_environment].zone_id
-          evaluate_target_health = true
+          zone_name = module.environment.domains.public.business_unit_environment
+        }
+        "$(name)" = {
+          zone_name = "${local.environment}.nomis.az.justice.gov.uk"
         }
       }
     }
@@ -89,7 +90,7 @@ locals {
       port                      = 443
       protocol                  = "HTTPS"
       ssl_policy                = "ELBSecurityPolicy-2016-08"
-      certificate_names_or_arns = ["application_environment_wildcard_cert"]
+      certificate_names_or_arns = ["nomis_wildcard_cert"]
       default_action = {
         type = "fixed-response"
         fixed_response = {
@@ -107,7 +108,10 @@ locals {
           }]
           conditions = [{
             host_header = {
-              values = ["$(name).nomis.${module.environment.vpc_name}.modernisation-platform.service.justice.gov.uk"]
+              values = [
+                "$(name).nomis.${module.environment.domains.public.business_unit_environment}",
+                "$(name).${local.environment}.nomis.az.justice.gov.uk"
+              ]
             }
           }]
         }
@@ -196,7 +200,7 @@ locals {
       http-7777 = local.lb_target_group_http_7777
     }
 
-    cloudwatch_metric_alarms_weblogic = {
+    cloudwatch_metric_alarms = {
       weblogic-node-manager-service = {
         comparison_operator = "GreaterThanOrEqualToThreshold"
         evaluation_periods  = "3"
@@ -206,7 +210,6 @@ locals {
         statistic           = "Average"
         threshold           = "1"
         alarm_description   = "weblogic-node-manager service has stopped"
-        alarm_actions       = [aws_sns_topic.nomis_nonprod_alarms.arn]
         dimensions = {
           instance = "weblogic_node_manager"
         }
@@ -249,9 +252,12 @@ module "ec2_weblogic_autoscaling_group" {
   subnet_ids         = module.environment.subnets["private"].ids
   tags               = merge(local.tags, local.ec2_weblogic.tags, try(each.value.tags, {}))
   account_ids_lookup = local.environment_management.account_ids
-  cloudwatch_metric_alarms = {
-    for key, value in merge(local.ec2_weblogic.cloudwatch_metric_alarms_weblogic, local.cloudwatch_metric_alarms_linux, lookup(each.value, "cloudwatch_metric_alarms", {})) :
-    key => merge(value, {
-      alarm_actions = [lookup(each.value, "sns_topic", aws_sns_topic.nomis_nonprod_alarms.arn)]
-  }) }
+
+  cloudwatch_metric_alarms = merge(
+    module.baseline_presets.cloudwatch_metric_alarms[lookup(each.value, "sns_topic", "nomis_nonprod_alarms")].ec2,
+    module.baseline_presets.cloudwatch_metric_alarms[lookup(each.value, "sns_topic", "nomis_nonprod_alarms")].ec2_cwagent_linux,
+    module.baseline_presets.cloudwatch_metric_alarms[lookup(each.value, "sns_topic", "nomis_nonprod_alarms")].ec2_cwagent_collectd,
+    module.baseline_presets.cloudwatch_metric_alarms[lookup(each.value, "sns_topic", "nomis_nonprod_alarms")].weblogic,
+    lookup(each.value, "cloudwatch_metric_alarms", {})
+  )
 }

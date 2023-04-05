@@ -1,4 +1,4 @@
-This `alb` local Terraform module is taken from the MP provided module - https://github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer, and subsequently we have developed from the code there. Below is the README.md taken form the MP module.
+This `alb` local Terraform module is taken from the MP provided module - <https://github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer>, and subsequently we have developed from the code there. Below is the README.md taken form the MP module.
 
 # Modernisation Platform Terraform Loadbalancer Module with Access Logs enabled
 
@@ -47,7 +47,7 @@ locals {
 Loadbalancer target groups and listeners need to be created separately.
 
 To run queries in Athena do the following:
-Go to the Athena console and click on Saved Queries https://console.aws.amazon.com/athena/saved-queries/home
+Go to the Athena console and click on Saved Queries <https://console.aws.amazon.com/athena/saved-queries/home>
 
 Click the new saved query that is named `<custom_name>`-create-table and Run it. You only have to do it once.
 

@@ -1,10 +1,10 @@
-########################################
-#           Development Instances       #
-########################################
+#################################
+#   Development Instances       #
+#################################
 
 resource "aws_instance" "s609693lo6vw109" {
   count                  = local.is-development == true ? 1 : 0
-  ami                    = "ami-0401c99f36918962f"
+  ami                    = "ami-013198324453e6dc3"
   instance_type          = "m5.large"
   vpc_security_group_ids = [aws_security_group.SCR-Team-Foundation-Server[0].id]
   source_dest_check      = false
@@ -161,9 +161,9 @@ resource "aws_instance" "PPUD-DEV-AWS-AD" {
   }
 }
 
-#########################
-#     UAT Instances     #
-#########################
+#################################
+# Pre-Production (UAT Instances) #
+#################################
 
 
 resource "aws_instance" "s618358rgvw201" {
@@ -211,7 +211,7 @@ resource "aws_instance" "s618358rgsw025" {
 resource "aws_instance" "s618358rgvw024" {
   count                  = local.is-preproduction == true ? 1 : 0
   ami                    = "ami-0d3d8251678e13330"
-  instance_type          = "m6i.xlarge"
+  instance_type          = "m6i.2xlarge"
   source_dest_check      = false
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.UAT-Document-Service[0].id]
@@ -233,5 +233,178 @@ resource "aws_instance" "s618358rgvw023" {
   tags = {
     Name   = "s618358rgvw023"
     backup = true
+  }
+}
+
+#########################
+# Production Instances  #
+#########################
+
+resource "aws_instance" "s618358rgvw019" {
+  count                  = local.is-production == true ? 1 : 0
+  ami                    = "ami-0eccca367d5cb093d"
+  instance_type          = "c5.xlarge"
+  source_dest_check      = false
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.PPUD-WEB-Portal.id]
+  subnet_id              = data.aws_subnet.private_subnets_b.id
+  tags = {
+    Name          = "s618358rgvw019"
+    is-production = true
+  }
+}
+
+resource "aws_instance" "s618358rgvw020" {
+  count                  = local.is-production == true ? 1 : 0
+  ami                    = "ami-0cd0c96a5812bb89c"
+  instance_type          = "c5.xlarge"
+  source_dest_check      = false
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.PPUD-WEB-Portal.id]
+  subnet_id              = data.aws_subnet.private_subnets_c.id
+  tags = {
+    Name          = "s618358rgvw020"
+    is-production = true
+  }
+}
+
+resource "aws_instance" "s618358rgvw021" {
+  count                  = local.is-production == true ? 1 : 0
+  ami                    = "ami-0d089b6f6f97b4499"
+  instance_type          = "m5.2xlarge"
+  source_dest_check      = false
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.PPUD-PROD-Database[0].id]
+  subnet_id              = data.aws_subnet.data_subnets_a.id
+  tags = {
+    Name          = "s618358rgvw021"
+    is-production = true
+  }
+}
+
+resource "aws_instance" "s618358rgvw022" {
+  count                  = local.is-production == true ? 1 : 0
+  ami                    = "ami-03884b85ddac5116d"
+  instance_type          = "m5.xlarge"
+  source_dest_check      = false
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.Primary-DOC-Server[0].id]
+  subnet_id              = data.aws_subnet.private_subnets_b.id
+  tags = {
+    Name          = "s618358rgvw022"
+    is-production = true
+  }
+}
+
+resource "aws_instance" "s618358rgvw027" {
+  count                  = local.is-production == true ? 1 : 0
+  ami                    = "ami-063a7b8df5fff4d91"
+  instance_type          = "m5.xlarge"
+  source_dest_check      = false
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.Secondary-DOC-Server[0].id]
+  subnet_id              = data.aws_subnet.private_subnets_c.id
+  tags = {
+    Name          = "s618358rgvw027"
+    is-production = true
+  }
+}
+
+resource "aws_instance" "s618358rgvw204" {
+  count                  = local.is-production == true ? 1 : 0
+  ami                    = "ami-017f92274d668b744"
+  instance_type          = "c5.xlarge"
+  source_dest_check      = false
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.PPUD-WEB-Portal.id]
+  subnet_id              = data.aws_subnet.private_subnets_a.id
+  tags = {
+    Name          = "s618358rgvw204"
+    is-production = true
+  }
+}
+
+resource "aws_instance" "s618358rgvw205" {
+  count                  = local.is-production == true ? 1 : 0
+  ami                    = "ami-07c77cc15216ae1e6"
+  instance_type          = "c5.large"
+  source_dest_check      = false
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.Bridge-Server[0].id]
+  subnet_id              = data.aws_subnet.private_subnets_a.id
+  tags = {
+    Name          = "s618358rgvw205"
+    is-production = true
+  }
+}
+
+resource "aws_instance" "s618358rgsw025p" {
+  count                  = local.is-production == true ? 1 : 0
+  ami                    = "ami-0f1f2959cba8dbefc"
+  instance_type          = "c5.4xlarge"
+  source_dest_check      = false
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.WAM-Data-Access-Server.id]
+  subnet_id              = data.aws_subnet.private_subnets_a.id
+  tags = {
+    Name   = "s618358rgsw025"
+    backup = true
+  }
+}
+
+resource "aws_instance" "s266316rgsl200" {
+  count                  = local.is-production == true ? 1 : 0
+  ami                    = "ami-0f43890c2b4907c29"
+  instance_type          = "m5.large"
+  source_dest_check      = false
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.PPUD-Mail-Server[0].id]
+  subnet_id              = data.aws_subnet.private_subnets_b.id
+  tags = {
+    Name          = "s266316rgsl200"
+    is-production = true
+  }
+}
+
+resource "aws_instance" "s266316rgsl201" {
+  count                  = local.is-production == true ? 1 : 0
+  ami                    = "ami-0f43890c2b4907c29"
+  instance_type          = "m5.large"
+  source_dest_check      = false
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.PPUD-Mail-Server[0].id]
+  subnet_id              = data.aws_subnet.private_subnets_c.id
+  tags = {
+    Name          = "s266316rgsl201"
+    is-production = true
+  }
+}
+
+
+resource "aws_instance" "s265903rgsl400" {
+  count                  = local.is-production == true ? 1 : 0
+  ami                    = "ami-0f43890c2b4907c29"
+  instance_type          = "m5.large"
+  source_dest_check      = false
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.PPUD-Mail-Server-2[0].id]
+  subnet_id              = data.aws_subnet.private_subnets_b.id
+  tags = {
+    Name          = "s265903rgsl400"
+    is-production = true
+  }
+}
+
+resource "aws_instance" "s265903rgsl401" {
+  count                  = local.is-production == true ? 1 : 0
+  ami                    = "ami-0f43890c2b4907c29"
+  instance_type          = "m5.large"
+  source_dest_check      = false
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.PPUD-Mail-Server-2[0].id]
+  subnet_id              = data.aws_subnet.private_subnets_c.id
+  tags = {
+    Name          = "s265903rgsl401"
+    is-production = true
   }
 }

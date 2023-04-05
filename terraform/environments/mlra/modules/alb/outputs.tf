@@ -8,9 +8,9 @@ output "target_group_arn" {
   value       = aws_lb_target_group.alb_target_group.arn
 }
 
-output "loab_balancer_listener" {
-  value = aws_lb_listener.alb_listener
-}
+# output "loab_balancer_listener" {
+#   value = aws_lb_listener.alb_listener
+# }
 
 output "athena_db" {
   value = aws_athena_database.lb-access-logs

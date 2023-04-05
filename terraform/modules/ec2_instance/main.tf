@@ -126,10 +126,10 @@ resource "aws_ebs_volume" "this" {
   iops              = try(each.value.iops > 0, false) ? each.value.iops : null
   throughput        = try(each.value.throughput > 0, false) ? each.value.throughput : null
   size              = each.value.size
-  type              = each.value.type
+  type              = lookup(each.value, "type", null)
 
   # you may run into a permission issue if the AMI is not in self account
-  snapshot_id = each.value.snapshot_id
+  snapshot_id = lookup(each.value, "snapshot_id", null)
 
   tags = merge(
     local.tags,
@@ -297,5 +297,7 @@ resource "aws_cloudwatch_metric_alarm" "this" {
   dimensions = merge(each.value.dimensions, {
     "InstanceId" = aws_instance.this.id
   })
-  tags = {}
+  tags = merge(local.tags, {
+    Name = "${var.name}-${each.key}"
+  })
 }

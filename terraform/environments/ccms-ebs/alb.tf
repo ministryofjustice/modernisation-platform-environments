@@ -27,7 +27,7 @@ resource "aws_lb_listener" "ebsapps_listener" {
   port              = "443"
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = aws_acm_certificate.external[0].arn
+  certificate_arn   = local.cert_arn
 
   default_action {
     type             = "forward"
@@ -37,11 +37,11 @@ resource "aws_lb_listener" "ebsapps_listener" {
 
 resource "aws_lb_target_group" "ebsapp_tg" {
   name     = lower(format("tg-%s-%s-ebsapp", local.application_name, local.environment))
-  port     = 80
+  port     = 8001
   protocol = "HTTP"
   vpc_id   = data.aws_vpc.shared.id
   health_check {
-    port     = 80
+    port     = 8001
     protocol = "HTTP"
   }
 }
@@ -50,5 +50,5 @@ resource "aws_lb_target_group_attachment" "ebsapps" {
   count            = local.application_data.accounts[local.environment].accessgate_no_instances
   target_group_arn = aws_lb_target_group.ebsapp_tg.arn
   target_id        = element(aws_instance.ec2_ebsapps.*.id, count.index)
-  port             = 80
+  port             = 8001
 }

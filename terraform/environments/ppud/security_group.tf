@@ -1,7 +1,7 @@
 resource "aws_security_group" "PPUD-WEB-Portal" {
   vpc_id      = data.aws_vpc.shared.id
   name        = "PPUD-WEB-Portal"
-  description = "PPUD-WEB-Portal for Dev and UAT"
+  description = "PPUD-WEB-Portal for Dev, UAT & PROD"
 
   tags = {
     Name = "${var.networking[0].business-unit}-${local.environment}"
@@ -38,7 +38,7 @@ resource "aws_security_group_rule" "PPUD-WEB-Portal-egress-1" {
 resource "aws_security_group" "WAM-Portal" {
   vpc_id      = data.aws_vpc.shared.id
   name        = "WAM-Portal"
-  description = "WAM-Portal for Dev and UAT"
+  description = "WAM-Portal for Dev, UAT & PROD"
 
   tags = {
     Name = "${var.networking[0].business-unit}-${local.environment}"
@@ -76,7 +76,7 @@ resource "aws_security_group_rule" "WAM-Portal-egress-1" {
 resource "aws_security_group" "WAM-Data-Access-Server" {
   vpc_id      = data.aws_vpc.shared.id
   name        = "WAM-Data-Access-Server"
-  description = "WAM-Data-Access-Server for Dev and UAT"
+  description = "WAM-Data-Access-Server for Dev & UAT"
 
   tags = {
     Name = "${var.networking[0].business-unit}-${local.environment}"
@@ -306,7 +306,7 @@ resource "aws_security_group" "Primary-DOC-Server" {
   count       = local.is-preproduction == false ? 1 : 0
   vpc_id      = data.aws_vpc.shared.id
   name        = "Primary-DOC-Server"
-  description = "Primary-DOC-Server for development and production"
+  description = "Primary-DOC-Server for DEV & PROD"
 
   tags = {
     Name = "${var.networking[0].business-unit}-${local.environment}"
@@ -357,7 +357,7 @@ resource "aws_security_group" "Secondary-DOC-Server" {
   count       = local.is-preproduction == false ? 1 : 0
   vpc_id      = data.aws_vpc.shared.id
   name        = "Secondary-DOC-Server"
-  description = "Secondary-DOC-Server for development and production"
+  description = "Secondary-DOC-Server for DEV & PROD"
 
   tags = {
     Name = "${var.networking[0].business-unit}-${local.environment}"
@@ -553,7 +553,7 @@ resource "aws_security_group" "Bridge-Server" {
   count       = local.is-development == false ? 1 : 0
   vpc_id      = data.aws_vpc.shared.id
   name        = "UAT-Bridge-Server"
-  description = "Bridge-Server for UAT and production"
+  description = "Bridge-Server for UAT & PROD"
 
   tags = {
     Name = "${var.networking[0].business-unit}-${local.environment}"
@@ -638,4 +638,117 @@ resource "aws_security_group_rule" "UAT-Document-Service-Egress-1" {
   protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.UAT-Document-Service[0].id
+}
+
+resource "aws_security_group" "PPUD-PROD-Database" {
+  count       = local.is-production == true ? 1 : 0
+  vpc_id      = data.aws_vpc.shared.id
+  name        = "s618358rgvw021"
+  description = "PPUD-PROD-Database"
+
+  tags = {
+    Name = "${var.networking[0].business-unit}-${local.environment}"
+  }
+}
+
+resource "aws_security_group_rule" "PPUD-PROD-Database-Ingress" {
+  count             = local.is-production == true ? 1 : 0
+  type              = "ingress"
+  from_port         = 3180
+  to_port           = 3180
+  protocol          = "tcp"
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+  security_group_id = aws_security_group.PPUD-PROD-Database[0].id
+}
+
+resource "aws_security_group_rule" "PPUD-PROD-Database-Egress" {
+  count             = local.is-production == true ? 1 : 0
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "all"
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+  security_group_id = aws_security_group.PPUD-PROD-Database[0].id
+}
+
+resource "aws_security_group_rule" "PPUD-Database-Egress-1" {
+  count             = local.is-production == true ? 1 : 0
+  type              = "egress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.PPUD-PROD-Database[0].id
+}
+
+resource "aws_security_group" "PPUD-Mail-Server" {
+  count       = local.is-production == true ? 1 : 0
+  vpc_id      = data.aws_vpc.shared.id
+  name        = "PPUD-Mail-Server-Frontend"
+  description = "PPUD-Mail-Server-Frontend"
+
+  tags = {
+    Name = "${var.networking[0].business-unit}-${local.environment}"
+  }
+}
+
+resource "aws_security_group_rule" "PPUD-Mail-Server-Ingress" {
+  count             = local.is-production == true ? 1 : 0
+  type              = "ingress"
+  from_port         = 25
+  to_port           = 25
+  protocol          = "tcp"
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+  security_group_id = aws_security_group.PPUD-Mail-Server[0].id
+}
+
+resource "aws_security_group_rule" "PPUD-Mail-Server-Egress" {
+  count             = local.is-production == true ? 1 : 0
+  type              = "egress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.PPUD-Mail-Server[0].id
+}
+
+resource "aws_security_group" "PPUD-Mail-Server-2" {
+  count       = local.is-production == true ? 1 : 0
+  vpc_id      = data.aws_vpc.shared.id
+  name        = "PPUD-Mail-Server-Backend"
+  description = "PPUD-Mail-Server-Backend"
+
+  tags = {
+    Name = "${var.networking[0].business-unit}-${local.environment}"
+  }
+}
+
+resource "aws_security_group_rule" "PPUD-Mail-Server-2-Ingress" {
+  count             = local.is-production == true ? 1 : 0
+  type              = "ingress"
+  from_port         = 25
+  to_port           = 25
+  protocol          = "tcp"
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+  security_group_id = aws_security_group.PPUD-Mail-Server-2[0].id
+}
+
+resource "aws_security_group_rule" "PPUD-Mail-Server-2-Ingress-1" {
+  count             = local.is-production == true ? 1 : 0
+  type              = "ingress"
+  from_port         = 587
+  to_port           = 587
+  protocol          = "tcp"
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+  security_group_id = aws_security_group.PPUD-Mail-Server-2[0].id
+}
+
+resource "aws_security_group_rule" "PPUD-Mail-Server-2-Egress" {
+  count             = local.is-production == true ? 1 : 0
+  type              = "egress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.PPUD-Mail-Server-2[0].id
 }

@@ -1,6 +1,6 @@
 # oasys-production environment settings
 locals {
-  oasys_production = {
+  production_config = {
     # db_enabled                             = false
     # db_auto_minor_version_upgrade          = true
     # db_allow_major_version_upgrade         = false
@@ -24,6 +24,25 @@ locals {
     ec2_common = {
       patch_approval_delay_days = 7
       patch_day                 = "THU"
+    }
+
+    baseline_bastion_linux = {
+      public_key_data = local.public_key_data.keys[local.environment]
+      tags            = local.tags
+    }
+
+    baseline_lbs = {
+      prod-oasys-internal = {
+        enable_delete_protection = false
+        force_destroy_bucket     = false
+        idle_timeout             = "60"
+        internal_lb              = true
+        security_groups          = [module.baseline.security_groups["private"].id]
+        public_subnets           = module.environment.subnets["public"].ids
+        existing_target_groups   = {}
+        tags                     = local.tags
+        listeners                = {}
+      }
     }
   }
 }

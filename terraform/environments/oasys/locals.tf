@@ -3,6 +3,11 @@
 
 locals {
 
+  baseline_s3_buckets = {
+    "${terraform.workspace}" = {
+      iam_policies = module.baseline_presets.s3_iam_policies
+    }
+  }
   ###
   ### env independent common vars
   ###
@@ -11,10 +16,10 @@ locals {
   networking_set = "general"
 
   accounts = {
-    development   = local.oasys_development
-    test          = local.oasys_test
-    preproduction = local.oasys_preproduction
-    production    = local.oasys_production
+    development   = local.development_config
+    test          = local.test_config
+    preproduction = local.preproduction_config
+    production    = local.production_config
   }
 
   account_id         = local.environment_management.account_ids[terraform.workspace]
@@ -47,10 +52,6 @@ locals {
     cloud_platform = "172.20.0.0/16"
   }
 
-  ec2_common_managed_policies = [
-    aws_iam_policy.ec2_common_policy.arn
-  ]
-
   autoscaling_schedules_default = {
     "scale_up" = {
       recurrence = "0 7 * * Mon-Fri"
@@ -64,105 +65,82 @@ locals {
   ###
   ### env independent webserver vars
   ###
-  webserver = {
-    ami_name = "oasys_webserver_*"
-    # branch   = var.BRANCH_NAME # comment in if testing ansible
-    # server-type and oasys-environment auto set by module
-    autoscaling_schedules = {}
-    subnet_name           = "webserver"
+  # webserver = {
+  #   ami_name = "oasys_webserver_*"
+  #   # branch   = var.BRANCH_NAME # comment in if testing ansible
+  #   # server-type and oasys-environment auto set by module
+  #   autoscaling_schedules = {}
+  #   subnet_name           = "webserver"
 
-    instance = {
-      disable_api_termination      = false
-      instance_type                = "t3.large"
-      key_name                     = aws_key_pair.ec2-user.key_name
-      monitoring                   = true
-      metadata_options_http_tokens = "optional"
-      vpc_security_group_ids       = [aws_security_group.webserver.id]
-    }
+  #   instance = {
+  #     disable_api_termination      = false
+  #     instance_type                = "t3.large"
+  #     key_name                     = aws_key_pair.ec2-user.key_name
+  #     monitoring                   = true
+  #     metadata_options_http_tokens = "optional"
+  #     vpc_security_group_ids       = [aws_security_group.webserver.id]
+  #   }
 
-    user_data_cloud_init = {
-      args = {
-        lifecycle_hook_name  = "ready-hook"
-        branch               = "main" # if you want to use a branch of ansible
-        ansible_repo         = "modernisation-platform-configuration-management"
-        ansible_repo_basedir = "ansible"
-        # ansible_args           = "--tags ec2provision"
-      }
-      scripts = [ # it would make sense to have these templates in a common area 
-        "ansible-ec2provision.sh.tftpl",
-        "post-ec2provision.sh.tftpl"
-      ]
-      write_files = {}
-    }
+  #   user_data_cloud_init = {
+  #     args = {
+  #       lifecycle_hook_name  = "ready-hook"
+  #       branch               = "main" # if you want to use a branch of ansible
+  #       ansible_repo         = "modernisation-platform-configuration-management"
+  #       ansible_repo_basedir = "ansible"
+  #       # ansible_args           = "--tags ec2provision"
+  #     }
+  #     scripts = [ # it would make sense to have these templates in a common area 
+  #       "ansible-ec2provision.sh.tftpl",
+  #       "post-ec2provision.sh.tftpl"
+  #     ]
+  #     write_files = {}
+  #   }
 
-    # ssm_parameters_prefix     = "webserver/"
-    iam_resource_names_prefix = "webserver-asg"
+  #   # ssm_parameters_prefix     = "webserver/"
+  #   iam_resource_names_prefix = "webserver-asg"
 
-    autoscaling_group = {
-      desired_capacity = 1
-      max_size         = 2
-      min_size         = 0
+  #   autoscaling_group = {
+  #     desired_capacity = 1
+  #     max_size         = 2
+  #     min_size         = 0
 
-      # health_check_grace_period = 300
-      # health_check_type         = "ELB"
-      # force_delete              = true
-      # termination_policies      = ["OldestInstance"]
-      # target_group_arns         = [] # TODO
-      # vpc_zone_identifier       = data.aws_subnets.private.ids
-      # wait_for_capacity_timeout = 0
+  #     # health_check_grace_period = 300
+  #     # health_check_type         = "ELB"
+  #     # force_delete              = true
+  #     # termination_policies      = ["OldestInstance"]
+  #     # target_group_arns         = [] # TODO
+  #     # vpc_zone_identifier       = data.aws_subnets.private.ids
+  #     # wait_for_capacity_timeout = 0
 
-      # this hook is triggered by the post-ec2provision.sh
-      # initial_lifecycle_hooks = {
-      #   "ready-hook" = {
-      #     default_result       = "ABANDON"
-      #     heartbeat_timeout    = 7200 # on a good day it takes 30 mins, but can be much longer
-      #     lifecycle_transition = "autoscaling:EC2_INSTANCE_LAUNCHING"
-      #   }
-      # }
-      # warm_pool = {
-      #   reuse_on_scale_in           = true
-      #   max_group_prepared_capacity = 1
-      # }
-    }
-  }
-  webserver_tags = {
-    description = "oasys webserver"
-    component   = "web"
-    server-type = "oasys-web"
-    os-version  = "RHEL 8.5"
-  }
+  #     # this hook is triggered by the post-ec2provision.sh
+  #     # initial_lifecycle_hooks = {
+  #     #   "ready-hook" = {
+  #     #     default_result       = "ABANDON"
+  #     #     heartbeat_timeout    = 7200 # on a good day it takes 30 mins, but can be much longer
+  #     #     lifecycle_transition = "autoscaling:EC2_INSTANCE_LAUNCHING"
+  #     #   }
+  #     # }
+  #     # warm_pool = {
+  #     #   reuse_on_scale_in           = true
+  #     #   max_group_prepared_capacity = 1
+  #     # }
+  #   }
+  # }
+  # webserver_tags = {
+  #   description = "oasys webserver"
+  #   component   = "web"
+  #   server-type = "oasys-web"
+  #   os-version  = "RHEL 8.5"
+  # }
 
   database = {
-
-    instance = {
-      disable_api_termination      = false
-      instance_type                = "r6i.xlarge"
-      key_name                     = aws_key_pair.ec2-user.key_name
-      metadata_options_http_tokens = "optional" # the Oracle installer cannot accommodate a token
-      monitoring                   = true
-      vpc_security_group_ids       = [aws_security_group.data.id]
-    }
+    config = merge(module.baseline_presets.ec2_instance.config.db, {
+      ami_name = "oasys_oracle_db_*"
+    })
+    instance = module.baseline_presets.ec2_instance.instance.default_db
     autoscaling_schedules = {}
-    autoscaling_group = {
-      desired_capacity = 1
-      max_size         = 2
-      min_size         = 0
-    }
-
-    user_data_cloud_init = {
-      args = {
-        lifecycle_hook_name  = "ready-hook"
-        branch               = "main"
-        ansible_repo         = "modernisation-platform-configuration-management"
-        ansible_repo_basedir = "ansible"
-        # ansible_tags           = "ec2provisiondata"
-        restored_from_snapshot = false
-      }
-      scripts = [
-        "ansible-ec2provision.sh.tftpl",
-      ]
-    }
-
+    autoscaling_group = module.baseline_presets.ec2_autoscaling_group
+    user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags
     ebs_volumes = {
       "/dev/sdb" = { # /u01
         size        = 100
@@ -236,10 +214,7 @@ locals {
       }
     }
 
-    route53_records = {
-      create_internal_record = true
-      create_external_record = true
-    }
+    route53_records = module.baseline_presets.ec2_instance.route53_records.internal_only
 
     ssm_parameters = {
       ASMSYS = {
@@ -257,171 +232,92 @@ locals {
         description = "ASMSNMP password"
       }
     }
-    ssm_parameters_prefix     = "database/"
-    iam_resource_names_prefix = "ec2-database"
-    subnet_id                 = module.environment.subnet["data"][local.availability_zone].id # for ec2_instance
-    subnet_ids                = module.environment.subnet["data"][local.availability_zone].id # for ASG
+    # Example target group setup below
+    lb_target_groups = local.lb_target_groups # This won't be correct for db, will correct later
   }
   database_tags = {
     component            = "data"
+    oracle-sids          = "OASPROD BIPINFRA"
     os-type              = "Linux"
     os-major-version     = 8
     os-version           = "RHEL 8.5"
     licence-requirements = "Oracle Database"
     "Patch Group"        = "RHEL"
+    server-type          = "oasys-db"
+    description          = "${local.environment} OASys database"
+    monitored            = true
+    oasys-environment    = local.environment
   }
 
-  security_group_cidrs_devtest = {
-    ssh = module.ip_addresses.azure_fixngo_cidrs.devtest
-    https = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.devtest,
-      module.ip_addresses.azure_fixngo_cidrs.internet_egress,
-      module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
-      module.ip_addresses.moj_cidrs.trusted_moj_enduser_internal,
-    ])
-    http7xxx = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.devtest,
-      module.ip_addresses.azure_fixngo_cidrs.internet_egress,
-    ])
-    oracle_db = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.devtest,
-      module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
-      module.ip_addresses.moj_cidr.aws_analytical_platform_aggregate,
-      module.ip_addresses.azure_studio_hosting_cidrs.devtest,
-      module.ip_addresses.azure_nomisapi_cidrs.devtest,
-    ])
-    oracle_oem_agent = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.devtest,
-    ])
-  }
 
-  security_group_cidrs_preprod_prod = {
-    ssh = module.ip_addresses.azure_fixngo_cidrs.prod
-    https = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.prod,
-      module.ip_addresses.azure_fixngo_cidrs.internet_egress,
-      module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
-      module.ip_addresses.moj_cidrs.trusted_moj_enduser_internal,
-    ])
-    http7xxx = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.prod,
-      module.ip_addresses.azure_fixngo_cidrs.internet_egress,
-    ])
-    oracle_db = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.prod,
-      module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
-      module.ip_addresses.moj_cidr.aws_analytical_platform_aggregate,
-      module.ip_addresses.azure_studio_hosting_cidrs.prod,
-      module.ip_addresses.azure_nomisapi_cidrs.prod,
-    ])
-    oracle_oem_agent = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.prod,
-    ])
-  }
+  # lb_listener_defaults = {
 
-  security_group_cidrs_by_environment = {
-    development   = local.security_group_cidrs_devtest
-    test          = local.security_group_cidrs_devtest
-    preproduction = local.security_group_cidrs_preprod_prod
-    production    = local.security_group_cidrs_preprod_prod
-  }
+  #   oasys_public = {
+  #     lb_application_name = "oasys-public"
+  #     asg_instance        = "webservers"
+  #   }
 
-  security_group_cidrs = local.security_group_cidrs_by_environment[local.environment]
+  #   route53 = {
+  #     route53_records = {
+  #       "web.oasys" = {
+  #         account                = "core-vpc"
+  #         zone_id                = module.environment.route53_zones[module.environment.domains.public.business_unit_environment].zone_id
+  #         evaluate_target_health = true
+  #       }
+  #     }
+  #   }
 
-  lb_defaults = {
-    enable_delete_protection = false
-    idle_timeout             = "60"
-    public_subnets           = module.environment.subnets["public"].ids
-    force_destroy_bucket     = true
-    internal_lb              = true
-    tags                     = local.tags
-    security_groups          = [aws_security_group.public.id]
-  }
+  #   https = {
+  #     port             = 443
+  #     protocol         = "HTTPS"
+  #     ssl_policy       = "ELBSecurityPolicy-2016-08"
+  #     certificate_arns = [module.acm_certificate["star.${module.environment.domains.public.application_environment}"].arn]
+  #     default_action = {
+  #       type = "fixed-response"
+  #       fixed_response = {
+  #         content_type = "text/plain"
+  #         message_body = "Not implemented"
+  #         status_code  = "501"
+  #       }
+  #     }
 
-  lbs = {
-    common = {}
+  #     rules = {
+  #       forward-http-8080 = {
+  #         priority = 100
+  #         actions = [{
+  #           type              = "forward"
+  #           target_group_name = "http-8080"
+  #         }]
+  #         conditions = [
+  #           {
+  #             host_header = {
+  #               values = ["web.oasys.${module.environment.vpc_name}.modernisation-platform.service.justice.gov.uk"]
+  #             }
+  #           },
+  #           {
+  #             path_pattern = {
+  #               values = ["/"]
+  #             }
+  #         }]
+  #       }
+  #     }
+  #   }
+  # }
 
-    development = {
-      oasys-public = {
-        internal_lb = false
-      }
-    }
+  # lb_listeners = {
 
-    test = {}
+  #   development = {
+  #     # oasys-public = merge(
+  #     #   local.lb_listener_defaults.https,
+  #     #   local.lb_listener_defaults.oasys_public,
+  #     #   local.lb_listener_defaults.route53,
+  #     # )
+  #   }
 
-    preproduction = {}
-
-    production = {}
-  }
-
-  lb_listener_defaults = {
-
-    oasys_public = {
-      lb_application_name = "oasys-public"
-      asg_instance        = "webservers"
-    }
-
-    route53 = {
-      route53_records = {
-        "web.oasys" = {
-          account                = "core-vpc"
-          zone_id                = module.environment.route53_zones[module.environment.domains.public.business_unit_environment].zone_id
-          evaluate_target_health = true
-        }
-      }
-    }
-
-    https = {
-      port             = 443
-      protocol         = "HTTPS"
-      ssl_policy       = "ELBSecurityPolicy-2016-08"
-      certificate_arns = [module.acm_certificate["star.${module.environment.domains.public.application_environment}"].arn]
-      default_action = {
-        type = "fixed-response"
-        fixed_response = {
-          content_type = "text/plain"
-          message_body = "Not implemented"
-          status_code  = "501"
-        }
-      }
-
-      rules = {
-        forward-http-8080 = {
-          priority = 100
-          actions = [{
-            type              = "forward"
-            target_group_name = "http-8080"
-          }]
-          conditions = [
-            {
-              host_header = {
-                values = ["web.oasys.${module.environment.vpc_name}.modernisation-platform.service.justice.gov.uk"]
-              }
-            },
-            {
-              path_pattern = {
-                values = ["/"]
-              }
-          }]
-        }
-      }
-    }
-  }
-
-  lb_listeners = {
-
-    development = {
-      # oasys-public = merge(
-      #   local.lb_listener_defaults.https,
-      #   local.lb_listener_defaults.oasys_public,
-      #   local.lb_listener_defaults.route53,
-      # )
-    }
-
-    test          = {}
-    preproduction = {}
-    production    = {}
-  }
+  #   test          = {}
+  #   preproduction = {}
+  #   production    = {}
+  # }
 
   acm_certificates = {
 
@@ -455,5 +351,30 @@ locals {
     test          = {}
     preproduction = {}
     production    = {}
+  }
+
+  public_key_data = jsondecode(file("./files/bastion_linux.json"))
+
+  lb_target_groups = {
+    http-8080 = {
+      port                 = 8080
+      protocol             = "HTTP"
+      target_type          = "instance"
+      deregistration_delay = 30
+      health_check = {
+        enabled             = true
+        interval            = 30
+        healthy_threshold   = 3
+        matcher             = "200-399"
+        path                = "/"
+        port                = 8080
+        timeout             = 5
+        unhealthy_threshold = 5
+      }
+      stickiness = {
+        enabled = true
+        type    = "lb_cookie"
+      }
+    }
   }
 }
