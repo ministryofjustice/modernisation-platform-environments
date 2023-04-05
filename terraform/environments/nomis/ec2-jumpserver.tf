@@ -85,9 +85,7 @@ module "ec2_jumpserver" {
   subnet_ids                    = module.environment.subnets["private"].ids
   tags                          = merge(local.tags, local.ec2_jumpserver.tags, try(each.value.tags, {}))
   account_ids_lookup            = local.environment_management.account_ids
-  cloudwatch_metric_alarms = merge(
-    module.baseline_presets.cloudwatch_metric_alarms[lookup(each.value, "sns_topic", "nomis_nonprod_alarms")].ec2,
-    module.baseline_presets.cloudwatch_metric_alarms[lookup(each.value, "sns_topic", "nomis_nonprod_alarms")].ec2_cwagent_windows,
+  cloudwatch_metric_alarms = merge(module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso"].ec2_windows_default,
     lookup(each.value, "cloudwatch_metric_alarms", {})
   )
 }

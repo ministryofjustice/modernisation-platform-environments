@@ -1,11 +1,6 @@
 locals {
 
-  application_alarms = {
-    weblogic          = local.ec2_weblogic.cloudwatch_metric_alarms
-    database          = local.database.cloudwatch_metric_alarms
-    fixngo_connection = local.database.cloudwatch_metric_alarms_fixngo_connection
-  }
-
+  dso_sns_topic_arn = contains(["development", "test"], local.environment) ? aws_sns_topic.nomis_nonprod_alarms.arn : aws_sns_topic.nomis_alarms.arn
 
   baseline_presets_options = {
     enable_application_environment_wildcard_cert = false
@@ -14,14 +9,15 @@ locals {
     enable_ec2_cloud_watch_agent                 = true
     enable_ec2_self_provision                    = true
     cloudwatch_metric_alarms = {
-      nomis_alarms = {
-        alarm_actions      = [aws_sns_topic.nomis_alarms.arn]
-        application_alarms = local.application_alarms
-      }
-      nomis_nonprod_alarms = {
-        alarm_actions      = [aws_sns_topic.nomis_nonprod_alarms.arn]
-        application_alarms = local.application_alarms
-      }
+      weblogic = local.ec2_weblogic.cloudwatch_metric_alarms
+      database = local.database.cloudwatch_metric_alarms
+    }
+    cloudwatch_metric_alarms_lists = merge(
+      local.ec2_weblogic.cloudwatch_metric_alarms_lists,
+      local.database.cloudwatch_metric_alarms_lists
+    )
+    cloudwatch_metric_alarms_lists_with_actions = {
+      dso = [local.dso_sns_topic_arn]
     }
     route53_resolver_rules = {
       outbound-data-and-private-subnets = ["azure-fixngo-domain"]

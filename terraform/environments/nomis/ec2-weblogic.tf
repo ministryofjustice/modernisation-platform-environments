@@ -215,6 +215,18 @@ locals {
         }
       }
     }
+    cloudwatch_metric_alarms_lists = {
+      weblogic = {
+        parent_keys = [
+          "ec2_default",
+          "ec2_linux_default",
+          "ec2_linux_with_collectd_default"
+        ]
+        alarms_list = [
+          { key = "weblogic", name = "weblogic-node-manager-service" }
+        ]
+      }
+    }
   }
 }
 
@@ -253,11 +265,7 @@ module "ec2_weblogic_autoscaling_group" {
   tags               = merge(local.tags, local.ec2_weblogic.tags, try(each.value.tags, {}))
   account_ids_lookup = local.environment_management.account_ids
 
-  cloudwatch_metric_alarms = merge(
-    module.baseline_presets.cloudwatch_metric_alarms[lookup(each.value, "sns_topic", "nomis_nonprod_alarms")].ec2,
-    module.baseline_presets.cloudwatch_metric_alarms[lookup(each.value, "sns_topic", "nomis_nonprod_alarms")].ec2_cwagent_linux,
-    module.baseline_presets.cloudwatch_metric_alarms[lookup(each.value, "sns_topic", "nomis_nonprod_alarms")].ec2_cwagent_collectd,
-    module.baseline_presets.cloudwatch_metric_alarms[lookup(each.value, "sns_topic", "nomis_nonprod_alarms")].weblogic,
+  cloudwatch_metric_alarms = merge(module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso"].weblogic,
     lookup(each.value, "cloudwatch_metric_alarms", {})
   )
 }
