@@ -232,7 +232,6 @@ locals {
         description = "ASMSNMP password"
       }
     }
-    lb_target_groups = {}
     # Example target group setup below
     # lb_target_groups = local.lb_target_groups # This won't be correct for db, will correct later
   }

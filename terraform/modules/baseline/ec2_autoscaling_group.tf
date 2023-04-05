@@ -56,7 +56,7 @@ module "ec2_autoscaling_group" {
 
   autoscaling_group     = each.value.autoscaling_group
   autoscaling_schedules = each.value.autoscaling_schedules
-  lb_target_groups      = each.value.lb_target_group
+  lb_target_groups      = lookup(each.value, "lb_target_group", null)
 
   cloudwatch_metric_alarms = {
     for key, value in each.value.cloudwatch_metric_alarms : key => merge(value, {
