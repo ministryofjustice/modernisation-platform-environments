@@ -67,7 +67,7 @@ module "ec2_autoscaling_group" {
     })
   }
 
-  tags = each.value.tags
+  tags = merge(local.tags, each.value.tags)
 
   # ensure service linked role is created first if defined in code
   depends_on = [
