@@ -40,7 +40,9 @@ run_ansible() {
   echo "# Cloning ${ansible_repo} into $ansible_dir using branch=${branch}"
   cd $ansible_dir
   git clone "https://github.com/ministryofjustice/${ansible_repo}.git"
+  cd $ansible_dir/${ansible_repo}
   git checkout "${branch}"
+  cd $ansible_dir
 
   # find the group_var yaml files
   ansible_group_vars=
