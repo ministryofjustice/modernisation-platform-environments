@@ -452,6 +452,7 @@ variable "lbs" {
     existing_target_groups   = optional(map(any), {})
     tags                     = optional(map(string), {})
     listeners = optional(map(object({
+      alarm_target_group_names  = optional(list(string), [])
       port                      = number
       protocol                  = string
       ssl_policy                = optional(string)

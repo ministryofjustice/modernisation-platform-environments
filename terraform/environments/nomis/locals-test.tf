@@ -204,6 +204,7 @@ locals {
                 condition_host_header_replace = "t1-nomis-web"
                 route53_record_name_replace   = "t1-nomis-web"
               }
+              alarm_target_group_names = ["t1-nomis-web-http-7777", "t1-nomis-web-http-7001"]
           })
         }
 
