@@ -194,10 +194,13 @@ locals {
     })
     user_data_cloud_init = merge(local.ec2_weblogic_default.user_data_cloud_init, {
       args = merge(local.ec2_weblogic_default.user_data_cloud_init.args, {
-        branch = "nomis/DSOS-1843/new-weblogic-asgs"
+        branch = "main"
+        #        branch = "nomis/DSOS-1843/new-weblogic-asgs"
       })
     })
-    warm_pool = null
+    autoscaling_group = merge(local.ec2_weblogic_default.autoscaling_group, {
+      warm_pool = null
+    })
   })
   ec2_weblogic_zone_b = merge(local.ec2_weblogic_default, {
     config = merge(local.ec2_weblogic_default.config, {
