@@ -16,8 +16,7 @@ locals {
   tags = merge(
     var.tags,
     {
-      Name          = "${var.name}-s3-kms"
-      Resource_Type = "Glue Job"
+      Dept = "DPR"
     }
   )
 }
