@@ -12,6 +12,11 @@ resource "aws_ssm_parameter" "delius_core_frontend_env_var_jdbc_url" {
   type  = "SecureString"
   value = format("jdbc:oracle:thin:@//%s:%s/%s", aws_db_instance.delius-core.address, aws_db_instance.delius-core.port, local.db_name)
   tags  = local.tags
+  lifecycle {
+    ignore_changes = [
+      value
+    ]
+  }
 }
 
 resource "aws_ssm_parameter" "delius_core_frontend_env_var_jdbc_password" {
