@@ -36,7 +36,7 @@ module "baseline" {
   cloudwatch_log_groups = module.baseline_presets.cloudwatch_log_groups
   iam_policies          = module.baseline_presets.iam_policies
   iam_roles             = module.baseline_presets.iam_roles
-  iam_service_linked_roles = module.baseline_presets.iam_service_linked_roles
+  # iam_service_linked_roles = module.baseline_presets.iam_service_linked_roles
   key_pairs         = module.baseline_presets.key_pairs
   kms_grants        = module.baseline_presets.kms_grants
   route53_resolvers = module.baseline_presets.route53_resolvers
