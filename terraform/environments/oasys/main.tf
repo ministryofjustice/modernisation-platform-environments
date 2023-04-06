@@ -67,7 +67,7 @@ module "baseline_presets" {
     enable_image_builder                         = true
     enable_ec2_cloud_watch_agent                 = true
     enable_ec2_self_provision                    = true
-    s3_iam_policies                              = ["EC2S3BucketWriteAndDeleteAccessPolicy", "Ec2AccessDevTestS3Policy"]
+    s3_iam_policies                              = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
 
     # comment this in if you need to resolve FixNGo hostnames
     # route53_resolver_rules = {
