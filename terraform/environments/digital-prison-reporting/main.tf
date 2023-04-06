@@ -180,7 +180,7 @@ module "glue_kinesis_reader_job" {
     "--aws.kinesis.endpointUrl"             = "https://kinesis-${local.account_region}.amazonaws.com"
     "--aws.region"                          = local.account_region
     "--kinesis.reader.batchDurationSeconds" = 1
-    "--class"                               = "uk.gov.justice.digital.job.KinesisTestJob"
+    "--class"                               = "uk.gov.justice.digital.job.KinesisReaderJob"
   }
 }
 

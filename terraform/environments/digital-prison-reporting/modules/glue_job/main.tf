@@ -16,7 +16,7 @@ locals {
   tags = merge(
     var.tags,
     {
-      Dept = "DPR"
+      Dept = "Digital-Prison-Reporting"
     }
   )
 }
