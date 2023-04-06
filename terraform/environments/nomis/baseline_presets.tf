@@ -24,7 +24,7 @@ locals {
     }
     s3_iam_policies = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
     # sns_topics_pagerduty_integrations = {
-    #   nomis_alarms         = "nomis_alarms"
+    #   nomis_alarms         = "nomis_alarms"
     #   nomis_nonprod_alarms = "nomis_nonprod_alarms"
     # }
   }
