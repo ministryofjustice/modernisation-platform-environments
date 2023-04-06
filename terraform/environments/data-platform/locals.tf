@@ -1,6 +1,6 @@
 #### This file can be used to store locals specific to the member account ####
 locals {
-    
+
   ##
   # Variables code_extractor lambda
   ##
