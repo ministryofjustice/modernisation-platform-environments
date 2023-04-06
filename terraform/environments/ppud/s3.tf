@@ -136,7 +136,7 @@ data "aws_iam_policy_document" "s3-access-policy" {
     actions = [
       "sts:AssumeRole",
     ]
-    Principal = {
+    principals {
       AWS = [
       "arn:aws:iam::075585660276:role/developer",
       "arn:aws:iam::075585660276:role/sandbox",
