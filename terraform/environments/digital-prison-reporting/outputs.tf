@@ -157,3 +157,24 @@ output "dms_subnets" {
   description = "DMS Subnet IDs"
   value       = module.dms_nomis_t3.dms_subnet_ids
 }
+
+## Dynamo Domain Registry DB table
+output "dynamodb_table_arn" {
+  description = "ARN of the DynamoDB table"
+  value       = module.dynamo_tab_domain_registry.dynamodb_table_arn
+}
+
+output "dynamodb_table_id" {
+  description = "ID of the DynamoDB table"
+  value       = module.dynamo_tab_domain_registry.dynamodb_table_id
+}
+
+output "dynamodb_table_stream_arn" {
+  description = "The ARN of the Table Stream. Only available when var.stream_enabled is true"
+  value       = module.dynamo_tab_domain_registry.dynamodb_table_stream_arn
+}
+
+output "dynamodb_table_stream_label" {
+  description = "A timestamp, in ISO 8601 format of the Table Stream. Only available when var.stream_enabled is true"
+  value       = module.dynamo_tab_domain_registry.dynamodb_table_stream_label
+}
