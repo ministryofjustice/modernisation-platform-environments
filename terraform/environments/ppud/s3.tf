@@ -116,16 +116,17 @@ resource "aws_iam_policy" "PPUD_s3_policy" {
 EOF
 }
 
+
 resource "aws_iam_role" "PPUD_s3_role" {
   count  = local.is-production == true ? 1 : 0
-   policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Principal": {
-        "AWS": [
+  name   = "${local.application_name}-PPUD_s3_role"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          AWS = [
           "arn:aws:iam::075585660276:role/developer",
           "arn:aws:iam::075585660276:role/sandbox",
           "arn:aws:iam::172753231260:role/migration",
@@ -133,13 +134,13 @@ resource "aws_iam_role" "PPUD_s3_role" {
           "arn:aws:iam::817985104434:role/migration",
           "arn:aws:iam::817985104434:role/developer"
           ]
-      },
-      "Action": "sts:AssumeRole"
-    }
-  ]
+        },
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
 }
-EOF
-}
+
 
 /*
 resource "aws_iam_role" "PPUD_s3_role" {
