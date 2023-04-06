@@ -126,12 +126,12 @@ locals {
       ]
       principals = {
         type = "AWS"
-        identifiers = [ for account_name in var.environment.devtest_account_names :
+        identifiers = [for account_name in var.environment.devtest_account_names :
           var.environment.account_ids[account_name]
         ]
       }
     }
-  }  
+  }
 
   s3_iam_policies = {
     EC2S3BucketReadOnlyAccessPolicy = [
