@@ -130,6 +130,53 @@ locals {
     production    = {}
   }
 
+  ec2_weblogic_default = {
+    config = merge(module.baseline_presets.ec2_instance.config.default, {
+      ami_name                  = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-03-15T17-18-22.178Z"
+      ssm_parameters_prefix     = "weblogic/"
+      iam_resource_names_prefix = "ec2-weblogic"
+      instance_profile_policies = local.ec2_common_managed_policies
+    })
+    instance = merge(module.baseline_presets.ec2_instance.instance.default_rhel6, {
+      instance_type = "t2.large"
+      monitoring    = true
+    })
+    user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
+    autoscaling_group = {
+      desired_capacity = 1
+      max_size         = 2
+      vpc_zone_identifier = [
+        module.environment.subnets["private"].ids
+      ]
+      warm_pool = {
+        reuse_on_scale_in           = true
+        max_group_prepared_capacity = 1
+      }
+    }
+    cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso"].weblogic
+    tags = {
+      ami         = "nomis_rhel_6_10_weblogic_appserver_10_3"
+      description = "nomis weblogic appserver 10.3"
+      os-type     = "Linux"
+      server-type = "nomis-web"
+      component   = "web"
+    }
+  }
+  ec2_weblogic_eu_west_2a = merge(local.ec2_weblogic_default, {
+    autoscaling_group = merge(local.ec2_weblogic_default.autoscaling_group, {
+      vpc_zone_identifier = [
+        module.environment.subnet["private"]["eu-west-2a"].id
+      ]
+    })
+  })
+  ec2_weblogic_eu_west_2b = merge(local.ec2_weblogic_default, {
+    autoscaling_group = merge(local.ec2_weblogic_default.autoscaling_group, {
+      vpc_zone_identifier = [
+        module.environment.subnet["private"]["eu-west-2b"].id
+      ]
+    })
+  })
+
   ec2_weblogic = {
 
     # server-type and nomis-environment auto set by module

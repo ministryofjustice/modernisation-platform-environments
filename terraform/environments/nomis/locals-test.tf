@@ -1,4 +1,4 @@
-# nomis-test environment settings
+#se nomis-test environment settings
 locals {
   nomis_test = {
     # vars common across ec2 instances
@@ -157,6 +157,17 @@ locals {
 
   # baseline config
   test_config = {
+
+    baseline_ec2_autoscaling_groups = {
+      t1-nomis-web-a = merge(local.ec2_weblogic_eu_west_2a, {
+        tags = merge(local.ec2_weblogic_eu_west_2a.tags, {
+          oracle-db-hostname = "t1-nomis-db-1"
+          nomis-environment  = "t1"
+          oracle-db-name     = "CNOMT1"
+        })
+        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
+      })
+    }
 
     baseline_lbs = {
       # AWS doesn't let us call it internal

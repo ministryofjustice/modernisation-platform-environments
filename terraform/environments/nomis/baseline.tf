@@ -19,9 +19,9 @@ module "baseline" {
   # kms_grants               = module.baseline_presets.kms_grants
   # s3_buckets               = merge(local.baseline_s3_buckets, lookup(local.baseline_environment_config, "baseline_s3_buckets", {}))
   # ec2_instances          = lookup(local.baseline_environment_config, "baseline_ec2_instances", {})
-  # ec2_autoscaling_groups = lookup(local.baseline_environment_config, "baseline_ec2_autoscaling_groups", {})
-  route53_resolvers = module.baseline_presets.route53_resolvers
-  route53_zones     = merge(local.baseline_route53_zones, lookup(local.baseline_environment_config, "baseline_route53_zones", {}))
-  lbs               = lookup(local.baseline_environment_config, "baseline_lbs", {})
-  sns_topics        = module.baseline_presets.sns_topics
+  ec2_autoscaling_groups = lookup(local.baseline_environment_config, "baseline_ec2_autoscaling_groups", {})
+  route53_resolvers      = module.baseline_presets.route53_resolvers
+  route53_zones          = merge(local.baseline_route53_zones, lookup(local.baseline_environment_config, "baseline_route53_zones", {}))
+  lbs                    = lookup(local.baseline_environment_config, "baseline_lbs", {})
+  sns_topics             = module.baseline_presets.sns_topics
 }
