@@ -1151,7 +1151,7 @@ module "dynamo_tab_domain_registry" {
 }
 
 # kinesis Reader Table,
-module "dynamo_tab_domain_registry" {
+module "dynamo_tab_kinesis_reader" {
   source              = "./modules/dynamo_tables"
   create_table        = true
   autoscaling_enabled = false
