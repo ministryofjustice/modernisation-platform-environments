@@ -15,7 +15,7 @@ module "environment" {
   application_name       = local.application_name
   environment            = local.environment
   subnet_set             = local.subnet_set
-  shared_s3_bucket       = lookup(local, "shared_s3_bucket", null) # This lives in one account and tf data s3 sources can't do filtering etc, the only way is to hardcode the bucket name. 
+  shared_s3_bucket       = try(local.shared_s3_bucket, "") # This lives in one account and tf data s3 sources can't do filtering etc, the only way is to hardcode the bucket name. 
 }
 
 # #------------------------------------------------------------------------------
