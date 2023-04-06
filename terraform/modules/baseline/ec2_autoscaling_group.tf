@@ -13,7 +13,7 @@ locals {
 module "ec2_autoscaling_group" {
   for_each = var.ec2_autoscaling_groups
 
-  source = "../../modules/ec2_autoscaling_group"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-autoscaling-group?ref=v1.1.0"
 
   providers = {
     aws.core-vpc = aws.core-vpc
