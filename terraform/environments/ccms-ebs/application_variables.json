@@ -223,6 +223,11 @@
       "to_port": 22,
       "protocol": "TCP"
     },
+    "TCP_1389": {
+      "from_port": 1389,
+      "to_port": 1389,
+      "protocol": "TCP"
+    },
     "TCP_152x": {
       "from_port": 1521,
       "to_port": 1522,
@@ -236,6 +241,11 @@
     "TCP_5401": {
       "from_port": 5401,
       "to_port": 5401,
+      "protocol": "TCP"
+    },
+    "TCP_1636": {
+      "from_port": 1636,
+      "to_port": 1636,
       "protocol": "TCP"
     },
     "TCP_10401": {
@@ -275,6 +285,12 @@
       "protocol": "TCP",
       "destination_cidr": "0.0.0.0/0"
     },
+    "TCP_1389": {
+      "from_port": 1389,
+      "to_port": 1389,
+      "protocol": "TCP",
+      "destination_cidr": "0.0.0.0/0"
+    },
     "TCP_152x": {
       "from_port": 1521,
       "to_port": 1522,
@@ -290,6 +306,12 @@
     "TCP_5401": {
       "from_port": 5401,
       "to_port": 5401,
+      "protocol": "TCP",
+      "destination_cidr": "0.0.0.0/0"
+    },
+    "TCP_1636": {
+      "from_port": 1636,
+      "to_port": 1636,
       "protocol": "TCP",
       "destination_cidr": "0.0.0.0/0"
     },
