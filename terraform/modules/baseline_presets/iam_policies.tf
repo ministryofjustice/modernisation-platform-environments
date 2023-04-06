@@ -5,6 +5,7 @@ locals {
     var.options.enable_image_builder ? ["ImageBuilderLaunchTemplatePolicy"] : [],
     var.options.enable_ec2_cloud_watch_agent ? ["CloudWatchAgentServerReducedPolicy"] : [],
     var.options.enable_ec2_self_provision ? ["Ec2SelfProvisionPolicy"] : [],
+    ["Ec2AccessDevTestS3Policy"]
   ])
 
   iam_policies_ec2_default = flatten([
