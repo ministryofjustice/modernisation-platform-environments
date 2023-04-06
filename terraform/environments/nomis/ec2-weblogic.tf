@@ -192,6 +192,11 @@ locals {
     config = merge(local.ec2_weblogic_default.config, {
       availability_zone = "${local.region}a"
     })
+    user_data_cloud_init = merge(local.ec2_weblogic_default.user_data_cloud_init, {
+      args = merge(local.ec2_weblogic_default.user_data_cloud_init.args, {
+        branch = "b7cf97d15687c1fe653ea139a728db642f783a2d" # 2023-04-06
+      })
+    })
   })
   ec2_weblogic_zone_b = merge(local.ec2_weblogic_default, {
     config = merge(local.ec2_weblogic_default.config, {
