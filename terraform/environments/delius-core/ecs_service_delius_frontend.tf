@@ -10,7 +10,7 @@
 resource "aws_ssm_parameter" "delius_core_frontend_env_var_jdbc_url" {
   name  = format("/%s/JCBC_URL", local.application_name)
   type  = "SecureString"
-  value = format("jdbc:oracle:thin:@//%s:%s/%s", aws_db_instance.delius-core.address, aws_db_instance.delius-core.port, local.db_name)
+  value = format("jdbc:oracle:thin:@//INITIAL_HOSTNAME_OVERRIDEN:INITIAL_PORT_OVERRIDEN/%s", local.db_name)
   tags  = local.tags
   lifecycle {
     ignore_changes = [
