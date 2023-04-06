@@ -1,9 +1,3 @@
-variable "env_name" {
-  description = "Environment name"
-  default     = "dev"
-}
-
-
 data "archive_file" "zip" {
   type        = "zip"
   source_dir  = local.function_source_dir
@@ -12,7 +6,7 @@ data "archive_file" "zip" {
 
 
 resource "aws_lambda_function" "function" {
-  function_name    = "${local.function_name}-${var.env_name}"
+  function_name    = "${local.function_name}-${local.environment}"
   description      = "Lambda to extract code and store in another location"
   handler          = local.function_handler
   runtime          = local.function_runtime
@@ -24,14 +18,14 @@ resource "aws_lambda_function" "function" {
   depends_on       = [aws_iam_role_policy_attachment.attach_iam_policy_to_iam_role]
   environment {
     variables = {
-      ENVIRONMENT = var.env_name
+      ENVIRONMENT = local.environment
     }
   }
 }
 
 
 resource "aws_iam_role" "lambda_role" {
-  name               = "${local.function_name}-role-${var.env_name}"
+  name               = "${local.function_name}-role-${local.environment}"
   assume_role_policy = data.aws_iam_policy_document.iam_role_policy_for_lambda.json
 }
 
@@ -48,7 +42,7 @@ data "aws_iam_policy_document" "iam_role_policy_for_lambda" {
 }
 
 resource "aws_iam_policy" "iam_policy_for_lambda" {
-  name        = "${local.function_name}-policy-${var.env_name}"
+  name        = "${local.function_name}-policy-${local.environment}"
   path        = "/"
   description = "AWS IAM Policy for managing aws lambda role"
   policy      = data.aws_iam_policy_document.iam_policy_document_for_lambda.json
