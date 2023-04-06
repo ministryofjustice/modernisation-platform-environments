@@ -1095,7 +1095,62 @@ module "s3_violation_bucket" {
 }
 
 # Dynamo DB Tables
-# kinesis Reader Table, DPR-306
+# Dynamo DB for DomainRegistry, DPR-306/DPR-218
+module "dynamo_tab_domain_registry" {
+  source              = "./modules/dynamo_tables"
+  create_table        = true
+  autoscaling_enabled = false
+  name                = "${local.project}-domain-registry-${local.environment}"
+
+  hash_key    = "primaryId"
+  range_key   = "secondaryId"
+  table_class = "STANDARD"
+  ttl_enabled = false
+
+  attributes = [
+    {
+      name = "primaryId"
+      type = "S"
+    },
+    {
+      name = "secondaryId"
+      type = "S"
+    },
+    {
+      name = "type"
+      type = "S"
+    }
+  ]
+
+  global_secondary_indexes = [
+    {
+      name            = "primaryId-Type-Index"
+      hash_key        = "primaryId"
+      range_key       = "type"
+      write_capacity  = 10
+      read_capacity   = 10
+      projection_type = "ALL"
+    },
+    {
+      name            = "secondaryId-Type-Index"
+      hash_key        = "secondaryId"
+      range_key       = "type"
+      write_capacity  = 10
+      read_capacity   = 10
+      projection_type = "ALL"
+    }
+  ]
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-domain-registry-${local.environment}"
+      Resource_Type = "Dynamo Table"
+    }
+  )
+}
+
+# kinesis Reader Table,
 module "dynamo_tab_domain_registry" {
   source              = "./modules/dynamo_tables"
   create_table        = true
