@@ -56,7 +56,7 @@ locals {
 }
 
 module "ec2_jumpserver" {
-  source = "../../modules/ec2_autoscaling_group"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-autoscaling-group?ref=v1.1.0"
 
 
   providers = {
