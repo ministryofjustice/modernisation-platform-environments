@@ -36,7 +36,7 @@ module "ec2_autoscaling_group" {
   })
 
   availability_zone             = each.value.config.availability_zone
-  subnet_ids                    = each.value.config.availability_zone != null ? var.environment.subnets[each.value.config.subnet_name].ids : [var.environment.subnets[each.value.config.subnet_name][each.value.config.availability_zone].id]
+  subnet_ids                    = each.value.config.availability_zone == null ? var.environment.subnets[each.value.config.subnet_name].ids : [var.environment.subnets[each.value.config.subnet_name][each.value.config.availability_zone].id]
   ebs_volumes_copy_all_from_ami = each.value.config.ebs_volumes_copy_all_from_ami
   ebs_kms_key_id                = coalesce(each.value.config.ebs_kms_key_id, var.environment.kms_keys["ebs"].arn)
   ebs_volume_config             = each.value.ebs_volume_config
