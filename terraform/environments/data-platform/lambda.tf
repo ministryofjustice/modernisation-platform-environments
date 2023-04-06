@@ -1,6 +1,6 @@
 variable "env_name" {
   description = "Environment name"
-  default="dev"
+  default     = "dev"
 }
 
 
@@ -75,64 +75,34 @@ resource "aws_iam_role_policy_attachment" "attach_iam_policy_to_iam_role" {
   policy_arn = aws_iam_policy.iam_policy_for_lambda.arn
 }
 
-resource "aws_cloudwatch_event_rule" "put_code_to_landing_directory" {
-    name = "put_to_landing_directory"
+resource "aws_cloudwatch_event_rule" "put_to_code_directory" {
+  name = "put_to_code_directory"
 
-    event_pattern = jsonencode({
-        "source": ["aws.s3"],
-        "detail-type": ["AWS API Call via CloudTrail"],
-        "detail": {
-            "eventSource": ["s3.amazonaws.com"],
-            "eventName": ["PutObject"],
-            "requestParameters": {
-                "bucketName": [module.s3-bucket.bucket.id],
-                "key": [{"prefix": "code/"}]
-            }
-        }
-    })
+  event_pattern = jsonencode({
+    "source" : ["aws.s3"],
+    "detail-type" : ["AWS API Call via CloudTrail"],
+    "detail" : {
+      "eventSource" : ["s3.amazonaws.com"],
+      "eventName" : ["PutObject"],
+      "requestParameters" : {
+        "bucketName" : [module.s3-bucket.bucket.id],
+        "key" : [{ "prefix" : "code/" }]
+      }
+    }
+  })
 }
 
-# resource "aws_cloudwatch_event_rule" "put_data_to_landing_directory" {
-#     name = "put_to_landing_directory"
-
-#     event_pattern = jsonencode({
-#         "source": ["aws.s3"],
-#         "detail-type": ["AWS API Call via CloudTrail"],
-#         "detail": {
-#             "eventSource": ["s3.amazonaws.com"],
-#             "eventName": ["PutObject"],
-#             "requestParameters": {
-#                 "bucketName": [module.s3-bucket.bucket.id],
-#                 "key": [{"prefix": "data/"}]
-#             }
-#         }
-#     })
-# }
-
-resource "aws_cloudwatch_event_target" "check_code_landing_every_five_minutes" {
-    rule = aws_cloudwatch_event_rule.put_code_to_landing_directory.name
-    target_id = "code"
-    arn = aws_lambda_function.function.arn
+resource "aws_cloudwatch_event_target" "code_directory_lambda_trigger" {
+  rule      = aws_cloudwatch_event_rule.put_to_code_directory.name
+  target_id = "code"
+  arn       = aws_lambda_function.function.arn
 }
 
-# resource "aws_cloudwatch_event_target" "check_data_landing_every_five_minutes" {
-#     rule = aws_cloudwatch_event_rule.put_data_to_landing_directory.name
-#     target_id = "data"
-#     arn = aws_lambda_function.check_foo_data.arn
-# }
 
 resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda" {
-    statement_id = "AllowExecutionFromCloudWatch"
-    action = "lambda:InvokeFunction"
-    function_name = aws_lambda_function.function.function_name
-    principal = "events.amazonaws.com"
-    source_arn = aws_cloudwatch_event_rule.put_code_to_landing_directory.arn
+  statement_id  = "AllowExecutionFromCloudWatch"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.function.function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.put_to_code_directory.arn
 }
-
-# resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda" {
-#     statement_id = "AllowExecutionFromCloudWatch"
-#     action = "lambda:InvokeFunction"
-#     function_name = aws_lambda_function.check_foo_data.function_name
-#     principal = "events.amazonaws.com"
-#     source_arn = aws_cloudwatch_event_rule.put_data_to_landing_directory.arn
-# }
