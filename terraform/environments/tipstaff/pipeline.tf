@@ -59,7 +59,7 @@ resource "aws_codepipeline" "codepipeline" {
           },
           {
             name: "IMAGE_TAG"
-            value: "tipstaff-image-001"
+            value: "latest"
           }
         ])
       }
