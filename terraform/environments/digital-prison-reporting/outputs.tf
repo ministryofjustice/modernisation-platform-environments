@@ -157,14 +157,3 @@ output "dms_subnets" {
   description = "DMS Subnet IDs"
   value       = module.dms_nomis_t3.dms_subnet_ids
 }
-
-## S3 Bucket Outputs
-output "s3_bucket_id" {
-  description = "S3 Nomis Oracle Notification Bucket ID"
-  value       = module.s3_nomis_oracle_sqs.bucket_id
-}
-
-output "s3_bucket_arn" {
-  description = "S3 Nomis Oracle Notification Bucket ARN"
-  value       = module.s3_nomis_oracle_sqs.bucket_arn
-}
