@@ -159,7 +159,7 @@ module "glue_kinesis_reader_job" {
   # Placeholder Script Location
   script_location               = "s3://${local.project}-artifact-store-${local.environment}/artifacts/cloud-platform/digital-prison-reporting-jobs/scripts/${local.project}-kinesis-reader-vLatest.scala"
 
-  class = "uk.gov.justice.digital.job.KinesisReaderJob"
+  class                         = "uk.gov.justice.digital.job.DataHubJob"
 
   tags = merge(
     local.all_tags,
@@ -174,13 +174,13 @@ module "glue_kinesis_reader_job" {
     "--extra-jars"          = "s3://${local.project}-artifact-store-${local.environment}/artifacts/cloud-platform/digital-prison-reporting-jobs/jars/digital-prison-reporting-jobs-vLatest.jar"
     "--job-bookmark-option" = "job-bookmark-disable"
     "--enable-metrics"      = true
-    "--enable-spark-ui"     = true
+    "--enable-spark-ui"     = false
     "--enable-job-insights" = true
     "--kinesis.reader.streamName"           = "${local.project}-kinesis-reader-${local.env}-stream"
     "--aws.kinesis.endpointUrl"             = "https://kinesis-${local.account_region}.amazonaws.com"
     "--aws.region"                          = local.account_region
     "--kinesis.reader.batchDurationSeconds" = 1
-    "--class"                               = "uk.gov.justice.digital.job.KinesisReaderJob"
+    "--class"                               = "uk.gov.justice.digital.job.DataHubJob"
   }
 }
 
