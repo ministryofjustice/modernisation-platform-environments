@@ -60,7 +60,16 @@ locals {
         lb_target_groups         = {}
         cloudwatch_metric_alarms = {}
         tags = {
-          os-type = "Linux"
+          component         = "web"
+          os-type           = "Linux"
+          os-major-version  = 7
+          os-version        = "RHEL 7.9"
+          "Patch Group"     = "RHEL"
+          server-type       = "oasys-web-training"
+          description       = "${local.environment} OASys web training"
+          monitored         = true
+          oasys-environment = local.environment
+          environment-name  = terraform.workspace
         }
       }
     }
