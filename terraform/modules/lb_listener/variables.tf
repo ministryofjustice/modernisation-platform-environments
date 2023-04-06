@@ -207,3 +207,9 @@ variable "cloudwatch_metric_alarms" {
   }))
   default = {}
 }
+
+variable "alarm_target_group_names" {
+  description = "List of target groups names that should have load-balancer (lb) alarms for them"
+  type        = list(string)
+  default     = []
+}
