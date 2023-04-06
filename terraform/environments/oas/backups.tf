@@ -1,7 +1,3 @@
-locals {
-  cold_storage_after = 7
-}
-
 resource "aws_backup_vault" "default_oas" {
   name =  "${local.application_name}-backup-vault"
   tags = merge(
