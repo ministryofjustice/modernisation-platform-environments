@@ -14,10 +14,6 @@ run_ansible() {
     exit 0
   fi
 
-  if [[ ${branch} != "main" ]]; then
-    set -x
-  fi
-
   if ! command -v aws > /dev/null; then
     echo "aws cli must be installed, not installing any ansible" >&2
     exit 0
@@ -41,9 +37,12 @@ run_ansible() {
 
   # clone ansible roles and playbook
   ansible_dir=$(mktemp -d)
-  echo "# Cloning ${ansible_repo} into $ansible_dir using branch=${branch} if it exists"
+  echo "# Cloning ${ansible_repo} into $ansible_dir using branch=${branch}"
   cd $ansible_dir
-  git clone -b ${branch} "https://github.com/ministryofjustice/${ansible_repo}.git" || git clone "https://github.com/ministryofjustice/${ansible_repo}.git"
+  git clone "https://github.com/ministryofjustice/${ansible_repo}.git"
+  cd $ansible_dir/${ansible_repo}
+  git checkout "${branch}"
+  cd $ansible_dir
 
   # find the group_var yaml files
   ansible_group_vars=
