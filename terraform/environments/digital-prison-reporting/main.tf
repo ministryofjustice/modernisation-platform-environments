@@ -127,7 +127,6 @@ module "glue_cloudplatform_reporting_job" {
     "--enable-metrics"      = true
     "--enable-spark-ui"     = false
     "--enable-job-insights" = true
-
     "--kinesis.reader.streamName"           = "local.kinesis_stream_ingestor"
     "--aws.kinesis.endpointUrl"             = "https://kinesis-${local.account_region}.amazonaws.com"
     "--aws.region"                          = local.account_region
@@ -135,6 +134,53 @@ module "glue_cloudplatform_reporting_job" {
     "--datalake-formats"                    = "delta"
     "--raw.s3.path"                         = "s3://${module.s3_raw_bucket[0].bucket.id}"
     "--structured.s3.path"                  = "s3://${module.s3_structured_bucket[0].bucket.id}"
+  }
+}
+
+# Glue Kinesis Reader Job (DPR-340)
+module "glue_kinesis_reader_job" {
+  source                        = "./modules/glue_job"
+  create_job                    = local.create_job
+  name                          = "${local.project}-kinesis-reader-${local.env}"
+  description                   = "kinesis Reader Job"
+  job_language                  = "scala"
+  command_type                  = "gluestreaming"
+  create_security_configuration = local.create_sec_conf
+  temp_dir                      = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/tmp/reporting-hub/"
+  checkpoint_dir                = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/checkpoint/reporting-hub/"
+  spark_event_logs              = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/spark-logs/reporting-hub/"
+  enable_continuous_log_filter  = false
+  project_id                    = local.project
+  aws_kms_key                   = local.s3_kms_arn
+  create_kinesis_ingester       = local.create_kinesis # If True, Kinesis Policies are applied - Defaults to True
+  additional_policies           = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_admin_arn
+  timeout                       = 2880 # This is in Mins
+  execution_class               = "STANDARD"
+  # Placeholder Script Location
+  script_location               = "s3://${local.project}-artifact-store-${local.environment}/artifacts/cloud-platform/digital-prison-reporting-jobs/scripts/${local.project}-kinesis-reader-vLatest.scala"
+
+  class                         = "uk.gov.justice.digital.job.DataHubJob"
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-kinesis-reader-${local.env}"
+      Resource_Type = "Glue Job"
+      Ticket        = "DPR-340"
+    }
+  )
+
+  arguments = {
+    "--extra-jars"          = "s3://${local.project}-artifact-store-${local.environment}/artifacts/cloud-platform/digital-prison-reporting-jobs/jars/digital-prison-reporting-jobs-vLatest.jar"
+    "--job-bookmark-option" = "job-bookmark-disable"
+    "--enable-metrics"      = true
+    "--enable-spark-ui"     = false
+    "--enable-job-insights" = true
+    "--kinesis.reader.streamName"           = "${local.project}-kinesis-reader-${local.env}-stream"
+    "--aws.kinesis.endpointUrl"             = "https://kinesis-${local.account_region}.amazonaws.com"
+    "--aws.region"                          = local.account_region
+    "--kinesis.reader.batchDurationSeconds" = 1
+    "--class"                               = "uk.gov.justice.digital.job.DataHubJob"
   }
 }
 
