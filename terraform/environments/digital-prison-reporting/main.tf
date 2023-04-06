@@ -1093,6 +1093,29 @@ module "s3_violation_bucket" {
     }
   )
 }
+
+# Dynamo DB Tables
+# kinesis Reader Table, DPR-306
+module "dynamo_tab_domain_registry" {
+  source              = "./modules/dynamo_tables"
+  create_table        = true
+  autoscaling_enabled = false
+  name                = "${local.project}-kinesis-reader-${local.environment}"
+
+  hash_key    = "leaseKey" # Hash
+  range_key   = ""         # Sort
+  table_class = "STANDARD"
+  ttl_enabled = false
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-kinesis-reader-${local.environment}"
+      Resource_Type = "Dynamo Table"
+    }
+  )
+}
+
 ##########################
 # Application Backend TF # 
 ##########################
