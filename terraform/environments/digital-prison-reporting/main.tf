@@ -1088,7 +1088,7 @@ module "s3_violation_bucket" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-nomis-cdc-event-${local.environment}"
+      Name          = "${local.project}-violation-${local.environment}"
       Resource_Type = "S3 Bucket"
     }
   )
