@@ -1,4 +1,4 @@
-#se nomis-test environment settings
+# nomis-test environment settings
 locals {
   nomis_test = {
     # vars common across ec2 instances
