@@ -5,7 +5,7 @@
 
 resource "aws_s3_bucket" "PPUD" {
   count  = local.is-production == true ? 1 : 0
-  bucket = "${local.application_name}-PPUD-Files-${local.environment}"
+  bucket = "${local.application_name}-ppud-files-${local.environment}"
 
   lifecycle {
     prevent_destroy = true
