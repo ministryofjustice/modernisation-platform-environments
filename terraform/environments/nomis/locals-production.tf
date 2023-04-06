@@ -99,7 +99,7 @@ locals {
           flash = { total_size = 1000 }
         }
         sns_topic                = "nomis_alarms"
-        cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso"].fixngo_connection,
+        cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso"].fixngo_connection
       }
 
       prod-nomis-db-3 = {
