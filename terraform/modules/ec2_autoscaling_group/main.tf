@@ -53,6 +53,14 @@ resource "aws_launch_template" "this" {
     delete_on_termination       = true
   }
 
+  dynamic "placement" {
+    for_each = var.availability_zone != null ? [var.availability_zone] : []
+
+    content {
+      availability_zone = placement.value
+    }
+  }
+
   dynamic "private_dns_name_options" {
     for_each = var.instance.private_dns_name_options != null ? [var.instance.private_dns_name_options] : []
     content {

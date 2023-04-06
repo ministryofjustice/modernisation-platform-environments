@@ -53,6 +53,12 @@ variable "name" {
   description = "Provide a unique name for the auto scale group"
 }
 
+variable "availability_zone" {
+  type        = string
+  description = "Optionally associated the ASG with a single availability zone"
+  default     = null
+}
+
 variable "instance" {
   description = "EC2 launch template / instance settings, see aws_instance documentation"
   type = object({

@@ -68,10 +68,8 @@ variable "ec2_autoscaling_groups" {
       iam_resource_names_prefix     = optional(string, "ec2")
       instance_profile_policies     = list(string)
       ssm_parameters_prefix         = optional(string, "")
-
-      # below are unused but are defined so same object can be used with ec2_instance
-      subnet_name       = optional(string)
-      availability_zone = optional(string)
+      subnet_name                   = optional(string)
+      availability_zone             = optional(string)
     })
     instance = object({
       disable_api_termination      = bool
