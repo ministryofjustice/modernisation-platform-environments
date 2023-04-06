@@ -267,6 +267,22 @@ resource "aws_ecs_service" "delius-db-service" {
 
 }
 
+# Create route 53 record representing above DB endpoint
+# This is a _tactical_ and _temporary_ record designed to
+# - simulate service discovery, albeit a lesser version of
+# - give us a way to see the ECS front end connecting to the ECS backend
+# - which gives us an accessible and testable front end app
+# At the time of writing, this will be replaced in time with a record pointing to an EC2 Oracle instance
+# It assumes that the ECS task for the DB will be long lived (and hence the IP will not get recycled)
+resource "aws_route53_record" "delius-core-db" {
+  provider = aws.core-vpc
+  zone_id  = data.aws_route53_zone.inner.zone_id
+  name     = "${local.db_service_name}-${local.application_name}.${data.aws_route53_zone.inner.name}"
+  type     = "A"
+  ttl      = 300
+  records  = ["10.26.26.165"]
+}
+
 ##
 # Commenting out remaining sections - we will return to these with a new module
 ##
