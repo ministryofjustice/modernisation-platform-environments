@@ -2,6 +2,8 @@
 locals {
   test_config = {
 
+    shared_s3_bucket = "devtest-oasys20230403154135527100000001" # this lives in oasys-test, if you can find a way to make finding it dynamic, please do
+
     # db_enabled                             = true
     # db_auto_minor_version_upgrade          = true
     # db_allow_major_version_upgrade         = false

@@ -2,6 +2,8 @@
 locals {
   development_config = {
 
+    shared_s3_bucket = "devtest-oasys20230403154135527100000001" # this lives in oasys-test, if you can find a way to make finding it dynamic, please do
+
     # cloud watch log groups
     log_groups = {
       session-manager-logs = {

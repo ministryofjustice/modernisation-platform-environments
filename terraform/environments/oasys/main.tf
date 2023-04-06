@@ -10,12 +10,12 @@ module "environment" {
     aws.core-network-services  = aws.core-network-services
     aws.core-vpc               = aws.core-vpc
   }
-
   environment_management = local.environment_management
   business_unit          = local.business_unit
   application_name       = local.application_name
   environment            = local.environment
   subnet_set             = local.subnet_set
+  shared_s3_bucket       = lookup(local, "shared_s3_bucket", null) # This lives in one account and tf data s3 sources can't do filtering etc, the only way is to hardcode the bucket name. 
 }
 
 # #------------------------------------------------------------------------------
@@ -67,6 +67,7 @@ module "baseline_presets" {
     enable_image_builder                         = true
     enable_ec2_cloud_watch_agent                 = true
     enable_ec2_self_provision                    = true
+    enable_shared_s3                             = true
     s3_iam_policies                              = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
 
     # comment this in if you need to resolve FixNGo hostnames

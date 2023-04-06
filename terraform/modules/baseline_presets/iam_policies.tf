@@ -5,14 +5,14 @@ locals {
     var.options.enable_image_builder ? ["ImageBuilderLaunchTemplatePolicy"] : [],
     var.options.enable_ec2_cloud_watch_agent ? ["CloudWatchAgentServerReducedPolicy"] : [],
     var.options.enable_ec2_self_provision ? ["Ec2SelfProvisionPolicy"] : [],
-    ["Ec2AccessDevTestS3Policy"]
+    var.options.enable_shared_s3 ? ["Ec2AccessSharedS3Policy"] : [],
   ])
 
   iam_policies_ec2_default = flatten([
     var.options.enable_business_unit_kms_cmks ? ["BusinessUnitKmsCmkPolicy"] : [],
     var.options.enable_ec2_cloud_watch_agent ? ["CloudWatchAgentServerReducedPolicy"] : [],
     var.options.enable_ec2_self_provision ? ["Ec2SelfProvisionPolicy"] : [],
-    ["Ec2AccessDevTestS3Policy"]
+    var.options.enable_shared_s3 ? ["Ec2AccessSharedS3Policy"] : [],
   ])
 
   iam_policies = {
@@ -110,8 +110,8 @@ locals {
       }]
     }
 
-    Ec2AccessDevTestS3Policy = {
-      description = "Permissions to allow EC2 to access devtest s3 bucket"
+    Ec2AccessSharedS3Policy = {
+      description = "Permissions to allow EC2 to access shared s3 bucket"
       statements = [{
         effect = "Allow"
         actions = [
@@ -121,8 +121,8 @@ locals {
           "s3:PutObjectAcl",
         ]
         resources = [
-          "arn:aws:s3:::devtest-oasys20230403154135527100000001/*",
-          "arn:aws:s3:::devtest-oasys20230403154135527100000001"
+          "arn:aws:s3:::${var.environment.shared_s3_bucket}/*",
+          "arn:aws:s3:::${var.environment.shared_s3_bucket}"
         ]
       }]
     }
