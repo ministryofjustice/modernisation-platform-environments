@@ -1162,6 +1162,13 @@ module "dynamo_tab_kinesis_reader" {
   table_class = "STANDARD"
   ttl_enabled = false
 
+  attributes = [
+    {
+      name = "leaseKey"
+      type = "S"
+    }
+  ]
+  
   tags = merge(
     local.all_tags,
     {
