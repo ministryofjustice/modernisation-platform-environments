@@ -66,7 +66,7 @@ locals {
           os-version        = "RHEL 7.9"
           "Patch Group"     = "RHEL"
           server-type       = "oasys-web-training"
-          description       = "${local.environment} OASys web"
+          description       = "${local.environment} OASys web training"
           monitored         = true
           oasys-environment = local.environment
           environment-name  = terraform.workspace
