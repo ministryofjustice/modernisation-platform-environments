@@ -39,6 +39,7 @@ locals {
           "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
           local.iam_policies_ec2_default,
           "EC2S3BucketWriteAndDeleteAccessPolicy",
+          "Ec2AccessDevTestS3Policy",
         ])
       }
     }

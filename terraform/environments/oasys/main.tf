@@ -86,3 +86,12 @@ resource "aws_resourceexplorer2_view" "all_resources" {
   default_view = true
   depends_on   = [aws_resourceexplorer2_index.this]
 }
+
+
+
+# count             = local.environment == "test" ? 1 : 0
+
+
+# count             = local.environment == "development" ? 1 : 0
+
+# arn:aws:s3:::devtest-oasys20230403154135527100000001/*

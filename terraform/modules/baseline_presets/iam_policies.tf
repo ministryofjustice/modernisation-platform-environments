@@ -107,6 +107,24 @@ locals {
         resources = ["*"]
       }]
     }
+
+    Ec2AccessDevTestS3Policy = {
+      description = "Permissions to allow EC2 to access devtest s3 bucket"
+      statements = [{
+        effect = "Allow"
+        actions = [
+          "s3:GetObject",
+          "s3:ListBucket",
+          "s3:PutObject",
+          "s3:PutObjectAcl",
+        ]
+        resources = [
+          "arn:aws:s3:::devtest-oasys20230403154135527100000001/*",
+          "arn:aws:s3:::devtest-oasys20230403154135527100000001"
+        ]
+      }]
+    }
+
   }
 
 }
