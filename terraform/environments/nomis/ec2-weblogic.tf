@@ -91,6 +91,7 @@ locals {
       protocol                  = "HTTPS"
       ssl_policy                = "ELBSecurityPolicy-2016-08"
       certificate_names_or_arns = ["nomis_wildcard_cert"]
+      cloudwatch_metric_alarms  = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso"].lb_default
       default_action = {
         type = "fixed-response"
         fixed_response = {
