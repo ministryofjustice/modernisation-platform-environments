@@ -159,8 +159,8 @@ locals {
   test_config = {
 
     baseline_ec2_autoscaling_groups = {
-      t1-nomis-web-a = merge(local.ec2_weblogic_eu_west_2a, {
-        tags = merge(local.ec2_weblogic_eu_west_2a.tags, {
+      t1-nomis-web-a = merge(local.ec2_weblogic_zone_a, {
+        tags = merge(local.ec2_weblogic_zone_a.tags, {
           oracle-db-hostname = "t1-nomis-db-1"
           nomis-environment  = "t1"
           oracle-db-name     = "CNOMT1"

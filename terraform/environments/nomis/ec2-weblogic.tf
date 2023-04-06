@@ -153,15 +153,10 @@ locals {
       vpc_zone_identifier = [
         module.environment.subnets["private"].ids
       ]
-      warm_pool = {
-        reuse_on_scale_in           = true
-        max_group_prepared_capacity = 1
-      }
       health_check_grace_period = 300
       health_check_type         = "EC2"
       force_delete              = true
       termination_policies      = ["OldestInstance"]
-      target_group_arns         = []
       wait_for_capacity_timeout = 0
 
       # this hook is triggered by the post-ec2provision.sh
@@ -178,6 +173,11 @@ locals {
         min_healthy_percentage = 90 # seems that instances in the warm pool are included in the % health count so this needs to be set fairly high
         instance_warmup        = 300
       }
+
+      warm_pool = {
+        reuse_on_scale_in           = true
+        max_group_prepared_capacity = 1
+      }
     }
 
     tags = {
@@ -188,18 +188,14 @@ locals {
       component   = "web"
     }
   }
-  ec2_weblogic_eu_west_2a = merge(local.ec2_weblogic_default, {
-    autoscaling_group = merge(local.ec2_weblogic_default.autoscaling_group, {
-      vpc_zone_identifier = [
-        module.environment.subnet["private"]["eu-west-2a"].id
-      ]
+  ec2_weblogic_zone_a = merge(local.ec2_weblogic_default, {
+    config = merge(local.ec2_weblogic_default.config, {
+      availability_zone = "${local.region}a"
     })
   })
-  ec2_weblogic_eu_west_2b = merge(local.ec2_weblogic_default, {
-    autoscaling_group = merge(local.ec2_weblogic_default.autoscaling_group, {
-      vpc_zone_identifier = [
-        module.environment.subnet["private"]["eu-west-2b"].id
-      ]
+  ec2_weblogic_zone_b = merge(local.ec2_weblogic_default, {
+    config = merge(local.ec2_weblogic_default.config, {
+      availability_zone = "${local.region}b"
     })
   })
 
