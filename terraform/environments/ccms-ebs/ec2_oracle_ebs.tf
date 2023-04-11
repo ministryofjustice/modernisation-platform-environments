@@ -2,7 +2,7 @@
 resource "aws_instance" "ec2_oracle_ebs" {
   instance_type = local.application_data.accounts[local.environment].ec2_oracle_instance_type_ebsdb
   #ami                         = data.aws_ami.oracle_db.id
-  ami                         = local.environment == "development" ? local.application_data.accounts[local.environment].restored_db_image : local.application_data.accounts[local.environment].key_name
+  ami                         = local.environment == "development" ? local.application_data.accounts[local.environment].restored_db_image : data.aws_ami.oracle_db.id
   key_name                    = local.application_data.accounts[local.environment].key_name
   vpc_security_group_ids      = [aws_security_group.ec2_sg_ebsdb.id]
   subnet_id                   = data.aws_subnet.data_subnets_a.id
@@ -10,6 +10,9 @@ resource "aws_instance" "ec2_oracle_ebs" {
   ebs_optimized               = false
   associate_public_ip_address = false
   iam_instance_profile        = aws_iam_instance_profile.iam_instace_profile_ccms_base.name
+
+  cpu_core_count       = local.application_data.accounts[local.environment].ec2_oracle_instance_cores_ebsdb
+  cpu_threads_per_core = local.application_data.accounts[local.environment].ec2_oracle_instance_threads_ebsdb
 
   # Due to a bug in terraform wanting to rebuild the ec2 if more than 1 ebs block is attached, we need the lifecycle clause below
   #lifecycle {
@@ -51,7 +54,6 @@ EOF
       { Name = "root-block" }
     )
   }
-
   ebs_block_device {
     device_name = "/dev/sdf"
     volume_type = "gp3"

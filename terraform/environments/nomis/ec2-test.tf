@@ -52,7 +52,7 @@ locals {
 
 module "ec2_test_instance" {
   #checkov:skip=CKV_AWS_126:This is a test instance
-  source = "../../modules/ec2_instance"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v1.0.1"
 
   providers = {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
@@ -89,7 +89,7 @@ module "ec2_test_instance" {
 }
 
 module "ec2_test_autoscaling_group" {
-  source = "../../modules/ec2_autoscaling_group"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-autoscaling-group?ref=v1.1.0"
 
   providers = {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts

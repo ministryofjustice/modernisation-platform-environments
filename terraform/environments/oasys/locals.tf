@@ -4,7 +4,7 @@
 locals {
 
   baseline_s3_buckets = {
-    s3-bucket = {
+    "${terraform.workspace}" = {
       iam_policies = module.baseline_presets.s3_iam_policies
     }
   }
@@ -133,227 +133,123 @@ locals {
   #   os-version  = "RHEL 8.5"
   # }
 
-  # database = {
+  database = {
+    config = merge(module.baseline_presets.ec2_instance.config.db, {
+      ami_name = "oasys_oracle_db_*"
+    })
+    instance              = module.baseline_presets.ec2_instance.instance.default_db
+    autoscaling_schedules = {}
+    autoscaling_group     = module.baseline_presets.ec2_autoscaling_group
+    user_data_cloud_init  = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags
+    ebs_volumes = {
+      "/dev/sdb" = { # /u01
+        size        = 100
+        label       = "app"
+        type        = "gp3"
+        snapshot_id = null
+      }
+      "/dev/sdc" = { # /u02
+        size        = 500
+        label       = "app"
+        type        = "gp3"
+        snapshot_id = null
+      }
+      "/dev/sde" = { # DATA01
+        label       = "data"
+        size        = 200
+        type        = "gp3"
+        snapshot_id = null
+      }
+      # "/dev/sdf" = {  # DATA02
+      #   label = "data"
+      #   type = null
+      #   snapshot_id = null
+      # }
+      # "/dev/sdg" = {  # DATA03
+      #   label = "data"
+      #   type = null
+      #   snapshot_id = null
+      # }
+      # "/dev/sdh" = {  # DATA04
+      #   label = "data"
+      #   type = null
+      #   snapshot_id = null
+      # }
+      # "/dev/sdi" = {  # DATA05
+      #   label = "data"
+      #   type = null
+      #   snapshot_id = null
+      # }
+      "/dev/sdj" = { # FLASH01
+        label       = "flash"
+        type        = "gp3"
+        snapshot_id = null
+        size        = 50
+      }
+      # "/dev/sdk" = { # FLASH02
+      #   label = "flash"
+      #   type = null
+      #   snapshot_id = null
+      # }
+      "/dev/sds" = {
+        label       = "swap"
+        type        = "gp3"
+        snapshot_id = null
+        size        = 2
+      }
+    }
 
-  #   instance = {
-  #     disable_api_termination      = false
-  #     instance_type                = "r6i.xlarge"
-  #     key_name                     = aws_key_pair.ec2-user.key_name
-  #     metadata_options_http_tokens = "optional" # the Oracle installer cannot accommodate a token
-  #     monitoring                   = true
-  #     vpc_security_group_ids       = [aws_security_group.data.id]
-  #   }
-  #   autoscaling_schedules = {}
-  #   autoscaling_group = {
-  #     desired_capacity = 1
-  #     max_size         = 2
-  #     min_size         = 0
-  #   }
+    ebs_volume_config = {
+      data = {
+        iops       = 3000
+        type       = "gp3"
+        throughput = 125
+        total_size = 200
+      }
+      flash = {
+        iops       = 3000
+        type       = "gp3"
+        throughput = 125
+        total_size = 50
+      }
+    }
 
-  #   user_data_cloud_init = {
-  #     args = {
-  #       lifecycle_hook_name  = "ready-hook"
-  #       branch               = "main"
-  #       ansible_repo         = "modernisation-platform-configuration-management"
-  #       ansible_repo_basedir = "ansible"
-  #       # ansible_tags           = "ec2provisiondata"
-  #       restored_from_snapshot = false
-  #     }
-  #     scripts = [
-  #       "ansible-ec2provision.sh.tftpl",
-  #     ]
-  #   }
+    route53_records = module.baseline_presets.ec2_instance.route53_records.internal_only
 
-  #   ebs_volumes = {
-  #     "/dev/sdb" = { # /u01
-  #       size        = 100
-  #       label       = "app"
-  #       type        = "gp3"
-  #       snapshot_id = null
-  #     }
-  #     "/dev/sdc" = { # /u02
-  #       size        = 500
-  #       label       = "app"
-  #       type        = "gp3"
-  #       snapshot_id = null
-  #     }
-  #     "/dev/sde" = { # DATA01
-  #       label       = "data"
-  #       size        = 200
-  #       type        = "gp3"
-  #       snapshot_id = null
-  #     }
-  #     # "/dev/sdf" = {  # DATA02
-  #     #   label = "data"
-  #     #   type = null
-  #     #   snapshot_id = null
-  #     # }
-  #     # "/dev/sdg" = {  # DATA03
-  #     #   label = "data"
-  #     #   type = null
-  #     #   snapshot_id = null
-  #     # }
-  #     # "/dev/sdh" = {  # DATA04
-  #     #   label = "data"
-  #     #   type = null
-  #     #   snapshot_id = null
-  #     # }
-  #     # "/dev/sdi" = {  # DATA05
-  #     #   label = "data"
-  #     #   type = null
-  #     #   snapshot_id = null
-  #     # }
-  #     "/dev/sdj" = { # FLASH01
-  #       label       = "flash"
-  #       type        = "gp3"
-  #       snapshot_id = null
-  #       size        = 50
-  #     }
-  #     # "/dev/sdk" = { # FLASH02
-  #     #   label = "flash"
-  #     #   type = null
-  #     #   snapshot_id = null
-  #     # }
-  #     "/dev/sds" = {
-  #       label       = "swap"
-  #       type        = "gp3"
-  #       snapshot_id = null
-  #       size        = 2
-  #     }
-  #   }
-
-  #   ebs_volume_config = {
-  #     data = {
-  #       iops       = 3000
-  #       type       = "gp3"
-  #       throughput = 125
-  #       total_size = 200
-  #     }
-  #     flash = {
-  #       iops       = 3000
-  #       type       = "gp3"
-  #       throughput = 125
-  #       total_size = 50
-  #     }
-  #   }
-
-  #   route53_records = {
-  #     create_internal_record = true
-  #     create_external_record = true
-  #   }
-
-  #   ssm_parameters = {
-  #     ASMSYS = {
-  #       random = {
-  #         length  = 30
-  #         special = false
-  #       }
-  #       description = "ASMSYS password"
-  #     }
-  #     ASMSNMP = {
-  #       random = {
-  #         length  = 30
-  #         special = false
-  #       }
-  #       description = "ASMSNMP password"
-  #     }
-  #   }
-  #   ssm_parameters_prefix     = "database/"
-  #   iam_resource_names_prefix = "ec2-database"
-  #   subnet_id                 = module.environment.subnet["data"][local.availability_zone].id # for ec2_instance
-  #   subnet_ids                = module.environment.subnet["data"][local.availability_zone].id # for ASG
-  # }
+    ssm_parameters = {
+      ASMSYS = {
+        random = {
+          length  = 30
+          special = false
+        }
+        description = "ASMSYS password"
+      }
+      ASMSNMP = {
+        random = {
+          length  = 30
+          special = false
+        }
+        description = "ASMSNMP password"
+      }
+    }
+    # Example target group setup below
+    lb_target_groups = local.lb_target_groups # This won't be correct for db, will correct later
+  }
   database_tags = {
     component            = "data"
+    oracle-sids          = "OASPROD BIPINFRA"
     os-type              = "Linux"
     os-major-version     = 8
     os-version           = "RHEL 8.5"
     licence-requirements = "Oracle Database"
     "Patch Group"        = "RHEL"
+    server-type          = "oasys-db"
+    description          = "${local.environment} OASys database"
+    monitored            = true
+    oasys-environment    = local.environment
+    environment-name     = terraform.workspace # used in provisioning script to select group vars
   }
 
-  security_group_cidrs_devtest = {
-    ssh = module.ip_addresses.azure_fixngo_cidrs.devtest
-    https = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.devtest,
-      module.ip_addresses.azure_fixngo_cidrs.internet_egress,
-      module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
-      module.ip_addresses.moj_cidrs.trusted_moj_enduser_internal,
-    ])
-    http7xxx = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.devtest,
-      module.ip_addresses.azure_fixngo_cidrs.internet_egress,
-    ])
-    oracle_db = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.devtest,
-      module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
-      module.ip_addresses.moj_cidr.aws_analytical_platform_aggregate,
-      module.ip_addresses.azure_studio_hosting_cidrs.devtest,
-      module.ip_addresses.azure_nomisapi_cidrs.devtest,
-    ])
-    oracle_oem_agent = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.devtest,
-    ])
-  }
-
-  security_group_cidrs_preprod_prod = {
-    ssh = module.ip_addresses.azure_fixngo_cidrs.prod
-    https = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.prod,
-      module.ip_addresses.azure_fixngo_cidrs.internet_egress,
-      module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
-      module.ip_addresses.moj_cidrs.trusted_moj_enduser_internal,
-    ])
-    http7xxx = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.prod,
-      module.ip_addresses.azure_fixngo_cidrs.internet_egress,
-    ])
-    oracle_db = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.prod,
-      module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
-      module.ip_addresses.moj_cidr.aws_analytical_platform_aggregate,
-      module.ip_addresses.azure_studio_hosting_cidrs.prod,
-      module.ip_addresses.azure_nomisapi_cidrs.prod,
-    ])
-    oracle_oem_agent = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.prod,
-    ])
-  }
-
-  security_group_cidrs_by_environment = {
-    development   = local.security_group_cidrs_devtest
-    test          = local.security_group_cidrs_devtest
-    preproduction = local.security_group_cidrs_preprod_prod
-    production    = local.security_group_cidrs_preprod_prod
-  }
-
-  security_group_cidrs = local.security_group_cidrs_by_environment[local.environment]
-
-  lb_defaults = {
-    enable_delete_protection = false
-    idle_timeout             = "60"
-    public_subnets           = module.environment.subnets["public"].ids
-    force_destroy_bucket     = true
-    internal_lb              = true
-    tags                     = local.tags
-    security_groups          = [aws_security_group.public.id]
-  }
-
-  lbs = {
-    common = {}
-
-    development = {
-      oasys-public = {
-        internal_lb = false
-      }
-    }
-
-    test = {}
-
-    preproduction = {}
-
-    production = {}
-  }
 
   # lb_listener_defaults = {
 
@@ -459,4 +355,27 @@ locals {
   }
 
   public_key_data = jsondecode(file("./files/bastion_linux.json"))
+
+  lb_target_groups = {
+    http-8080 = {
+      port                 = 8080
+      protocol             = "HTTP"
+      target_type          = "instance"
+      deregistration_delay = 30
+      health_check = {
+        enabled             = true
+        interval            = 30
+        healthy_threshold   = 3
+        matcher             = "200-399"
+        path                = "/"
+        port                = 8080
+        timeout             = 5
+        unhealthy_threshold = 5
+      }
+      stickiness = {
+        enabled = true
+        type    = "lb_cookie"
+      }
+    }
+  }
 }

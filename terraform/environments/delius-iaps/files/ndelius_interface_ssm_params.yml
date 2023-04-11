@@ -4,9 +4,14 @@ parameter:
     type: "String"
     value: "dev-placeholder-ndelius-interface-iapscmsif-interface-user"
     overwrite: false
+  ndelius-interface-iapscmsif-interface-password:
+    name: /NDeliusInterface/IAPSCMSIF/Interface/password
+    type: "SecureString"
+    value: "dev-placeholder-ndelius-interface-iapscmsif-interface-password"
+    overwrite: false
   ndelius-interface-iapscmsif-interface-passwordcoded:
     name: /NDeliusInterface/IAPSCMSIF/Interface/passwordcoded
-    type: "String"
+    type: "SecureString"
     value: "dev-placeholder-ndelius-interface-iapscmsif-interface-passwordcoded"
     overwrite: false
   ndelius-interface-user:

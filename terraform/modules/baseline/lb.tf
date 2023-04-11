@@ -49,23 +49,41 @@ module "lb_listener" {
     aws.core-vpc = aws.core-vpc
   }
 
-  name                   = each.key
-  business_unit          = var.environment.business_unit
-  environment            = var.environment.environment
-  load_balancer_arn      = module.lb[each.value.lb_application_name].load_balancer.arn
-  existing_target_groups = merge(local.asg_target_groups, var.lbs[each.value.lb_application_name].existing_target_groups)
-  port                   = each.value.port
-  protocol               = each.value.protocol
-  ssl_policy             = each.value.ssl_policy
-  certificate_arns       = [for item in each.value.certificate_names_or_arns : lookup(module.acm_certificate, item, null) != null ? module.acm_certificate[item].arn : item]
-  default_action         = each.value.default_action
-  rules                  = each.value.rules
-  route53_records        = each.value.route53_records
-  replace                = each.value.replace
-  tags                   = merge(local.tags, each.value.tags)
+  name                      = each.key
+  business_unit             = var.environment.business_unit
+  environment               = var.environment.environment
+  load_balancer             = module.lb[each.value.lb_application_name].load_balancer
+  existing_target_groups    = merge(local.asg_target_groups, var.lbs[each.value.lb_application_name].existing_target_groups)
+  port                      = each.value.port
+  protocol                  = each.value.protocol
+  ssl_policy                = each.value.ssl_policy
+  certificate_arn_lookup    = { for key, value in module.acm_certificate : key => value.arn }
+  certificate_names_or_arns = each.value.certificate_names_or_arns
+  default_action            = each.value.default_action
+  rules                     = each.value.rules
+
+  route53_records = {
+    for key, value in each.value.route53_records : key => merge(value, {
+      account = local.route53_zones[value.zone_name].provider
+      zone_id = local.route53_zones[value.zone_name].zone_id
+    })
+  }
+
+  cloudwatch_metric_alarms = {
+    for key, value in each.value.cloudwatch_metric_alarms : key => merge(value, {
+      alarm_actions = [
+        for item in value.alarm_actions : try(aws_sns_topic.this[item].arn, item)
+      ]
+    })
+  }
+
+  replace = each.value.replace
+  tags    = merge(local.tags, each.value.tags)
 
   depends_on = [
     module.acm_certificate,       # ensure certs are created first
     module.ec2_autoscaling_group, # ensure ASG target groups are created first
   ]
+
+  alarm_target_group_names = each.value.alarm_target_group_names
 }

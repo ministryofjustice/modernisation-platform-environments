@@ -14,6 +14,21 @@ output "cloudwatch_log_groups" {
   } : local.cloudwatch_log_groups
 }
 
+output "cloudwatch_metric_alarms" {
+  description = "Map of common cloudwatch metric alarms grouped by namespace deep merged with var.options.cloudwatch_metric_alarms.  See cloudwatch_metric_alarms.tf for more detail"
+  value       = local.cloudwatch_metric_alarms
+}
+
+output "cloudwatch_metric_alarms_lists" {
+  description = "Map of cloudwatch metric alarms for use in AWS resources.  See cloudwatch_metric_alarms_lists.tf for more detail"
+  value       = local.cloudwatch_metric_alarms_lists
+}
+
+output "cloudwatch_metric_alarms_lists_with_actions" {
+  description = "A map of the cloudwatch_metric_alarms_lists output merged with the given alarm_actions list defined in var.options.cloudwatch_metric_alarms_lists_with_actions"
+  value       = local.cloudwatch_metric_alarms_lists_with_actions
+}
+
 output "ec2_autoscaling_group" {
   description = "Common EC2 autoscaling group configuration for ec2_autoscaling_group module"
 
@@ -90,4 +105,31 @@ output "s3_iam_policies" {
   value = var.options.s3_iam_policies != null ? {
     for key, value in local.s3_iam_policies : key => value if contains(var.options.s3_iam_policies, key)
   } : local.s3_iam_policies
+}
+
+output "s3_buckets" {
+  description = "Map of s3_buckets"
+  value = local.s3_buckets
+}
+
+# Use var.options.sns_topics_pagerduty_integrations to control, where
+# the map key is the sns_topic name and value is the index to use in
+# the modernisation platform managed pagerduty_integration_keys
+# secret,  e.g.
+# var.options.sns_topics_pagerduty_integrations = {
+#   critical     = nomis_alarms
+#   non-critical = nomis_nonprod_alarms
+# }
+output "sns_topics" {
+  description = "Map of sns_topics to create depending on options provided"
+
+  value = {
+    for key, value in var.options.sns_topics_pagerduty_integrations : key => {
+      display_name      = "Pager duty integration for ${value}"
+      kms_master_key_id = "general"
+      subscriptions_pagerduty = {
+        value = {}
+      }
+    }
+  }
 }

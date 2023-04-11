@@ -5,9 +5,17 @@
       "dns": "laa-development",
       "instance-scheduling": "skip-scheduling",
       "ec2_oracle_instance_type_ebsdb": "m5d.4xlarge",
+      "ec2_oracle_instance_cores_ebsdb": "8",
+      "ec2_oracle_instance_threads_ebsdb": "2",
       "ec2_oracle_instance_type_ebsapps": "m5d.2xlarge",
+      "ec2_oracle_instance_cores_ebsapps": "4",
+      "ec2_oracle_instance_threads_ebsapps": "2",
       "ec2_oracle_instance_type_webgate": "m5d.large",
+      "ec2_oracle_instance_cores_webgate": "1",
+      "ec2_oracle_instance_threads_webgate": "2",
       "ec2_oracle_instance_type_accessgate": "m5d.xlarge",
+      "ec2_oracle_instance_cores_accessgate": "2",
+      "ec2_oracle_instance_threads_accessgate": "2",
       "ami_owner": "self",
       "ec2_instance_type_ftp": "c5d.large",
       "ftp_ami_id": "ami-08cd358d745620807",
@@ -40,9 +48,17 @@
       "dns": "laa-test",
       "instance-scheduling": "skip-scheduling",
       "ec2_oracle_instance_type_ebsdb": "m5d.4xlarge",
+      "ec2_oracle_instance_cores_ebsdb": "8",
+      "ec2_oracle_instance_threads_ebsdb": "2",
       "ec2_oracle_instance_type_ebsapps": "m5d.2xlarge",
+      "ec2_oracle_instance_cores_ebsapps": "4",
+      "ec2_oracle_instance_threads_ebsapps": "2",
       "ec2_oracle_instance_type_webgate": "m5d.large",
+      "ec2_oracle_instance_cores_webgate": "1",
+      "ec2_oracle_instance_threads_webgate": "2",
       "ec2_oracle_instance_type_accessgate": "m5d.xlarge",
+      "ec2_oracle_instance_cores_accessgate": "2",
+      "ec2_oracle_instance_threads_accessgate": "2",
       "ami_owner": "767123802783",
       "ec2_instance_type_ftp": "c5d.large",
       "ftp_ami_id": "ami-08cd358d745620807",
@@ -74,9 +90,17 @@
       "dns": "laa-preproduction",
       "instance-scheduling": "skip-auto-start",
       "ec2_oracle_instance_type_ebsdb": "x2iedn.4xlarge",
+      "ec2_oracle_instance_cores_ebsdb": "8",
+      "ec2_oracle_instance_threads_ebsdb": "2",
       "ec2_oracle_instance_type_ebsapps": "m5d.16xlarge",
+      "ec2_oracle_instance_cores_ebsapps": "4",
+      "ec2_oracle_instance_threads_ebsapps": "2",
       "ec2_oracle_instance_type_webgate": "c5d.2xlarge",
+      "ec2_oracle_instance_cores_webgate": "2",
+      "ec2_oracle_instance_threads_webgate": "2",
       "ec2_oracle_instance_type_accessgate": "c5d.2xlarge",
+      "ec2_oracle_instance_cores_accessgate": "2",
+      "ec2_oracle_instance_threads_accessgate": "2",
       "ami_owner": "767123802783",
       "ec2_instance_type_ftp": "c5d.large",
       "ftp_ami_id": "ami-08cd358d745620807",
@@ -108,9 +132,17 @@
       "dns": "laa",
       "instance-scheduling": "skip-auto-start",
       "ec2_oracle_instance_type_ebsdb": "x2iedn.4xlarge",
+      "ec2_oracle_instance_cores_ebsdb": "8",
+      "ec2_oracle_instance_threads_ebsdb": "2",
       "ec2_oracle_instance_type_ebsapps": "m5d.16xlarge",
+      "ec2_oracle_instance_cores_ebsapps": "4",
+      "ec2_oracle_instance_threads_ebsapps": "2",
       "ec2_oracle_instance_type_webgate": "c5d.2xlarge",
+      "ec2_oracle_instance_cores_webgate": "2",
+      "ec2_oracle_instance_threads_webgate": "2",
       "ec2_oracle_instance_type_accessgate": "c5d.2xlarge",
+      "ec2_oracle_instance_cores_accessgate": "2",
+      "ec2_oracle_instance_threads_accessgate": "2",
       "ami_owner": "767123802783",
       "ec2_instance_type_ftp": "c5d.large",
       "ftp_ami_id": "ami-08cd358d745620807",
@@ -191,9 +223,44 @@
       "to_port": 22,
       "protocol": "TCP"
     },
-    "TCP_8000": {
+    "TCP_1389": {
+      "from_port": 1389,
+      "to_port": 1389,
+      "protocol": "TCP"
+    },
+    "TCP_152x": {
+      "from_port": 1521,
+      "to_port": 1522,
+      "protocol": "TCP"
+    },
+    "TCP_5101": {
+      "from_port": 5101,
+      "to_port": 5101,
+      "protocol": "TCP"
+    },
+    "TCP_5401": {
+      "from_port": 5401,
+      "to_port": 5401,
+      "protocol": "TCP"
+    },
+    "TCP_5575": {
+      "from_port": 5575,
+      "to_port": 5575,
+      "protocol": "TCP"
+    },
+    "TCP_1636": {
+      "from_port": 1636,
+      "to_port": 1636,
+      "protocol": "TCP"
+    },
+    "TCP_10401": {
+      "from_port": 10401,
+      "to_port": 10401,
+      "protocol": "TCP"
+    },
+    "TCP_800x": {
       "from_port": 8000,
-      "to_port": 8000,
+      "to_port": 8001,
       "protocol": "TCP",
       "destination_cidr": "10.200.0.0/20"
     },
@@ -223,17 +290,59 @@
       "protocol": "TCP",
       "destination_cidr": "0.0.0.0/0"
     },
-    "TCP_8000": {
-      "from_port": 8000,
-      "to_port": 8000,
+    "TCP_1389": {
+      "from_port": 1389,
+      "to_port": 1389,
       "protocol": "TCP",
-      "destination_cidr": "10.200.0.0/20"
+      "destination_cidr": "0.0.0.0/0"
+    },
+    "TCP_152x": {
+      "from_port": 1521,
+      "to_port": 1522,
+      "protocol": "TCP",
+      "destination_cidr": "0.0.0.0/0"
+    },
+    "TCP_5101": {
+      "from_port": 5101,
+      "to_port": 5101,
+      "protocol": "TCP",
+      "destination_cidr": "0.0.0.0/0"
+    },
+    "TCP_5401": {
+      "from_port": 5401,
+      "to_port": 5401,
+      "protocol": "TCP",
+      "destination_cidr": "0.0.0.0/0"
+    },
+    "TCP_5575": {
+      "from_port": 5575,
+      "to_port": 5575,
+      "protocol": "TCP",
+      "destination_cidr": "0.0.0.0/0"
+    },
+    "TCP_1636": {
+      "from_port": 1636,
+      "to_port": 1636,
+      "protocol": "TCP",
+      "destination_cidr": "0.0.0.0/0"
+    },
+    "TCP_10401": {
+      "from_port": 10401,
+      "to_port": 10401,
+      "protocol": "TCP",
+      "destination_cidr": "0.0.0.0/0"
+    },
+    "TCP_800x": {
+      "from_port": 8000,
+      "to_port": 8001,
+      "protocol": "TCP",
+      "destination_cidr": "0.0.0.0/0"
     },
     "TCP_444x": {
       "from_port": 4443,
       "to_port": 4444,
       "protocol": "TCP",
-      "destination_cidr": "10.200.0.0/20"
+      "destination_cidr": "0.0.0.0/0"
     }
   },
   "ec2_sg_ftp_ingress_rules": {

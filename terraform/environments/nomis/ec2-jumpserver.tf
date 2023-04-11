@@ -56,7 +56,7 @@ locals {
 }
 
 module "ec2_jumpserver" {
-  source = "../../modules/ec2_autoscaling_group"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-autoscaling-group?ref=v1.1.0"
 
 
   providers = {
@@ -85,11 +85,9 @@ module "ec2_jumpserver" {
   subnet_ids                    = module.environment.subnets["private"].ids
   tags                          = merge(local.tags, local.ec2_jumpserver.tags, try(each.value.tags, {}))
   account_ids_lookup            = local.environment_management.account_ids
-  cloudwatch_metric_alarms = {
-    for key, value in merge(local.cloudwatch_metric_alarms_windows, lookup(each.value, "cloudwatch_metric_alarms", {})) :
-    key => merge(value, {
-      alarm_actions = [lookup(each.value, "sns_topic", aws_sns_topic.nomis_nonprod_alarms.arn)]
-  }) }
+  cloudwatch_metric_alarms = merge(module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso"].ec2_windows_default,
+    lookup(each.value, "cloudwatch_metric_alarms", {})
+  )
 }
 
 #------

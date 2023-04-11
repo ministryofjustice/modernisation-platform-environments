@@ -4,7 +4,7 @@ name: 'Format Code: ensure code formatting guidelines are met'
 on:
   workflow_dispatch: null
   schedule:
-    - cron: 45 4 * * 1-5
+    - cron: 45 4 * * 1
 
 permissions:
   contents: write
@@ -38,7 +38,7 @@ jobs:
         id: ml
         # You can override MegaLinter flavor used to have faster performances
         # More info at https://megalinter.io/flavors/
-        uses: oxsecurity/megalinter/flavors/terraform@c364436149b0ef3578bd24fa38ed9aa23af884db #v6.21.0
+        uses: oxsecurity/megalinter/flavors/terraform@93700f8c21c59ea784a32abe23896e49e54463b8 #v6.22.2
         env:
           # All available variables are described in documentation
           # https://megalinter.io/configuration/#shared-variables
@@ -52,6 +52,7 @@ jobs:
           GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
           VALIDATE_ALL_CODEBASE: true
           YAML_PRETTIER_FILTER_REGEX_EXCLUDE: (.github/*)
+          REPORT_OUTPUT_FOLDER: none
 
       - name: Check for changes
         run: |
