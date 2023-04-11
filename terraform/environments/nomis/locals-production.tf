@@ -145,5 +145,30 @@ locals {
         })
       })
     }
+
+    baseline_lbs = {
+      private = {
+        internal_lb              = true
+        enable_delete_protection = false
+        existing_target_groups   = local.existing_target_groups
+        force_destroy_bucket     = true
+        idle_timeout             = 3600
+        public_subnets           = module.environment.subnets["private"].ids
+        security_groups          = [aws_security_group.public.id]
+
+        listeners = {
+          prod-nomis-web-https = merge(
+            local.lb_weblogic.https,
+            local.lb_weblogic.route53, {
+              replace = {
+                target_group_name_replace     = "prod-nomis-web-a"
+                condition_host_header_replace = "prod-nomis-web-a"
+                route53_record_name_replace   = "prod-nomis-web-a"
+              }
+              # alarm_target_group_names = ["prod-nomis-web-a-http-7777""]
+          })
+        }
+      }
+    }
   }
 }
