@@ -180,6 +180,10 @@ locals {
       # }
     }
 
+    lb_target_groups = {
+      http-7777 = local.lb_target_group_http_7777
+    }
+
     tags = {
       ami         = "nomis_rhel_6_10_weblogic_appserver_10_3"
       description = "nomis weblogic appserver 10.3"
