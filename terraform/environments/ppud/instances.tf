@@ -316,7 +316,7 @@ resource "aws_instance" "s618358rgvw204" {
   instance_type          = "c5.xlarge"
   source_dest_check      = false
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.PPUD-WEB-Portal.id]
+  vpc_security_group_ids = [aws_security_group.WAM-Portal.id]
   subnet_id              = data.aws_subnet.private_subnets_a.id
   tags = {
     Name          = "s618358rgvw204"
