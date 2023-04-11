@@ -14,7 +14,7 @@ locals {
         local.s3_bucket_policies.DevTestEnvironmentsWriteAndDeleteAccessBucketPolicy
       ]
       iam_policies = local.s3_iam_policies
-    }
+    } : {}
   })
 
   s3_bucket_policies = {
