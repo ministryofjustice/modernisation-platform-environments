@@ -2,22 +2,6 @@
 locals {
   development_config = {
 
-    # cloud watch log groups
-    log_groups = {
-      session-manager-logs = {
-        retention_days = 90
-      }
-      cwagent-var-log-messages = {
-        retention_days = 30
-      }
-      cwagent-var-log-secure = {
-        retention_days = 90
-      }
-      cwagent-oasys-autologoff = {
-        retention_days = 90
-      }
-    }
-
     ec2_common = {
       patch_approval_delay_days = 3
       patch_day                 = "TUE"

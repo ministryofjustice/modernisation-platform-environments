@@ -5,12 +5,14 @@ locals {
     var.options.enable_image_builder ? ["ImageBuilderLaunchTemplatePolicy"] : [],
     var.options.enable_ec2_cloud_watch_agent ? ["CloudWatchAgentServerReducedPolicy"] : [],
     var.options.enable_ec2_self_provision ? ["Ec2SelfProvisionPolicy"] : [],
+    var.options.enable_shared_s3 ? ["Ec2AccessSharedS3Policy"] : [],
   ])
 
   iam_policies_ec2_default = flatten([
     var.options.enable_business_unit_kms_cmks ? ["BusinessUnitKmsCmkPolicy"] : [],
     var.options.enable_ec2_cloud_watch_agent ? ["CloudWatchAgentServerReducedPolicy"] : [],
     var.options.enable_ec2_self_provision ? ["Ec2SelfProvisionPolicy"] : [],
+    var.options.enable_shared_s3 ? ["Ec2AccessSharedS3Policy"] : [],
   ])
 
   iam_policies = {
@@ -107,6 +109,27 @@ locals {
         resources = ["*"]
       }]
     }
+
+    Ec2AccessSharedS3Policy = {
+      description = "Permissions to allow EC2 to access shared s3 bucket"
+      statements = [{
+        effect = "Allow"
+        actions = [
+          "s3:GetObject",
+          "s3:ListBucket",
+          "s3:PutObject",
+          "s3:PutObjectAcl",
+        ]
+        resources = var.environment == "production" || var.environment == "preproduction" ? [
+          "arn:aws:s3:::prodpreprod-${var.environment.application_name}-*/*",
+          "arn:aws:s3:::prodpreprod-${var.environment.application_name}-*"
+        ] : [
+          "arn:aws:s3:::devtest-${var.environment.application_name}-*/*",
+          "arn:aws:s3:::devtest-${var.environment.application_name}-*"
+        ]
+      }]
+    }
+
   }
 
 }
