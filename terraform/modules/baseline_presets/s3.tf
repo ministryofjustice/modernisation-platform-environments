@@ -113,24 +113,6 @@ locals {
         ]
       }
     }
-
-    DevTestAccountsWriteAndDeleteAccessBucketPolicy = {
-      effect = "Allow"
-      actions = [
-        "s3:GetObject",
-        "s3:ListBucket",
-        "s3:PutObject",
-        "s3:PutObjectAcl",
-        "s3:DeleteObject",
-        "s3:DeleteObjectVersion",
-      ]
-      principals = {
-        type = "AWS"
-        identifiers = [for account_name in var.environment.devtest_account_names :
-          var.environment.account_ids[account_name]
-        ]
-      }
-    }
   }
 
   s3_iam_policies = {

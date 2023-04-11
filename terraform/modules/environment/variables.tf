@@ -28,9 +28,3 @@ variable "subnet_set" {
   type        = string
   default     = "general"
 }
-
-variable "shared_s3_bucket" {
-  description = "cross-account shared s3 bucket, e.g. bucket in oasys-test, used by oasys-development and oasys-test"
-  type        = string
-  default     = ""
-}

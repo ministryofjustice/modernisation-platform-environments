@@ -15,12 +15,30 @@ module "environment" {
   application_name       = local.application_name
   environment            = local.environment
   subnet_set             = local.subnet_set
-  shared_s3_bucket       = lookup(local.environment_config, "shared_s3_bucket", "") # This lives in one account and tf data s3 sources can't do filtering etc, the only way is to hardcode the bucket name. 
 }
 
-# #------------------------------------------------------------------------------
-# # baseline module ec2 instance
-# #------------------------------------------------------------------------------
+module "baseline_presets" {
+  source = "../../modules/baseline_presets"
+
+  environment  = module.environment
+  ip_addresses = module.ip_addresses
+
+  options = {
+    cloudwatch_log_groups                        = null
+    enable_application_environment_wildcard_cert = true
+    enable_business_unit_kms_cmks                = true
+    enable_image_builder                         = true
+    enable_ec2_cloud_watch_agent                 = true
+    enable_ec2_self_provision                    = true
+    enable_shared_s3                             = true
+    s3_iam_policies                              = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
+
+    # comment this in if you need to resolve FixNGo hostnames
+    # route53_resolver_rules = {
+    #   outbound-data-and-private-subnets = ["azure-fixngo-domain"]
+    # }
+  }
+}
 
 module "baseline" {
   source = "../../modules/baseline"
@@ -52,29 +70,6 @@ module "baseline" {
   ec2_instances          = lookup(local.environment_config, "baseline_ec2_instances", {})
   ec2_autoscaling_groups = lookup(local.environment_config, "baseline_ec2_autoscaling_groups", {})
   lbs                    = lookup(local.environment_config, "baseline_lbs", {})
-}
-
-module "baseline_presets" {
-  source = "../../modules/baseline_presets"
-
-  environment  = module.environment
-  ip_addresses = module.ip_addresses
-
-  options = {
-    cloudwatch_log_groups                        = null
-    enable_application_environment_wildcard_cert = true
-    enable_business_unit_kms_cmks                = true
-    enable_image_builder                         = true
-    enable_ec2_cloud_watch_agent                 = true
-    enable_ec2_self_provision                    = true
-    enable_shared_s3                             = true
-    s3_iam_policies                              = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
-
-    # comment this in if you need to resolve FixNGo hostnames
-    # route53_resolver_rules = {
-    #   outbound-data-and-private-subnets = ["azure-fixngo-domain"]
-    # }
-  }
 }
 
 # --- AWS Resource Explorer ---

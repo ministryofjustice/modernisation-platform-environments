@@ -125,8 +125,3 @@ output "pagerduty_integration_keys" {
   value       = jsondecode(data.aws_secretsmanager_secret_version.pagerduty_integration_keys.secret_string)
   sensitive   = true
 }
-
-output "shared_s3_bucket" {
-  description = "cross-account shared s3 bucket, e.g. bucket in oasys-test, used by oasys-development and oasys-test"
-  value       = var.shared_s3_bucket
-}

@@ -2,8 +2,6 @@
 locals {
   test_config = {
 
-    shared_s3_bucket = "devtest-oasys20230403154135527100000001" # this lives in oasys-test, if you can find a way to make finding it dynamic, please do
-
     # db_enabled                             = true
     # db_auto_minor_version_upgrade          = true
     # db_allow_major_version_upgrade         = false
@@ -21,8 +19,6 @@ locals {
     # db_performance_insights_enabled        = false
     # db_skip_final_snapshot                 = true
 
-    log_groups = {}
-
     ec2_common = {
       patch_approval_delay_days = 3
       patch_day                 = "TUE"
@@ -34,8 +30,7 @@ locals {
         custom_kms_key = module.environment.kms_keys["general"].arn
         bucket_policy_v2 = [
           module.baseline_presets.s3_bucket_policies.ImageBuilderWriteAccessBucketPolicy,
-          module.baseline_presets.s3_bucket_policies.DevTestEnvironmentsWriteAndDeleteAccessBucketPolicy,
-          module.baseline_presets.s3_bucket_policies.DevTestAccountsWriteAndDeleteAccessBucketPolicy
+          module.baseline_presets.s3_bucket_policies.DevTestEnvironmentsWriteAndDeleteAccessBucketPolicy
         ]
         iam_policies = module.baseline_presets.s3_iam_policies
       }
