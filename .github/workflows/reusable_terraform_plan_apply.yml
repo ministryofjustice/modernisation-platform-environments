@@ -142,7 +142,7 @@ jobs:
         run: |
           set -o pipefail
           exitcode=0
-          tf_args="-detailed-exitcode ${{ inputs.init_plan_apply_tfargs }} ${{ inputs.plan_apply_tfargs }} -refresh=false"
+          tf_args="-detailed-exitcode ${{ inputs.init_plan_apply_tfargs }} ${{ inputs.plan_apply_tfargs }}"
           [[ ${POST_PLAN_TO_PR} == 'true' ]] && tf_args="${tf_args} -no-color"
           [[ ${{ inputs.do_state_refresh_on_plan }} == 'true' ]] && tf_args="${tf_args} -refresh=false"
           echo "terraform plan ${tf_args}"
@@ -238,7 +238,7 @@ jobs:
         working-directory: "terraform/environments/${{ inputs.application }}"
         run: |
           set -o pipefail
-          tf_args="-out x.tfplan ${{ inputs.init_plan_apply_tfargs }} ${{ inputs.plan_apply_tfargs }} -refresh=false"
+          tf_args="-out x.tfplan ${{ inputs.init_plan_apply_tfargs }} ${{ inputs.plan_apply_tfargs }}"
           echo "terraform plan ${tf_args}"
           terraform plan ${tf_args} | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh
 
