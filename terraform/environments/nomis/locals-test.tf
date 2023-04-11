@@ -219,5 +219,12 @@ locals {
         # }
       }
     }
+    baseline_route53_zones = {
+      "${local.environment}.nomis.az.justice.gov.uk" = {
+        records = [
+          { name = "cnomt1", type = "A", ttl = "300", records = ["10.101.3.132"] }
+        ]
+      }
+    }
   }
 }
