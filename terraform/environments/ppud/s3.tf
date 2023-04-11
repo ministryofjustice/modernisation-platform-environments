@@ -91,29 +91,27 @@ resource "aws_s3_bucket_policy" "PPUD" {
 resource "aws_iam_policy" "PPUD_s3_policy" {
   count  = local.is-production == true ? 1 : 0
   name   = "${local.application_name}-PPUD_s3_policy"
-  policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
+  policy = jsonencode ({
+    Version = "2012-10-17"
+   Statement: [
      {
-      "Effect": "Allow",
-      "Action": [
+      Effect = "Allow"
+      Action = [
         "s3:ListBucket",
-        "s3:GetBucketLocation"
+        "s3:GetBucketLocation",
         "s3:GetObjectMetaData",
         "s3:GetObject",
         "s3:PutObject",
         "s3:DeleteObject",
         "s3:ListMultipartUploadParts",
         "s3:AbortMultipartUpload"
-      ],
-    "Resource": [
+      ]
+     Resource = [
         "${aws_s3_bucket.PPUD[0].arn}/*"
       ]
     }
   ]
-}
-EOF
+})
 }
 
 
