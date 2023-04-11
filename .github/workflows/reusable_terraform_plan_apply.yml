@@ -129,8 +129,8 @@ jobs:
         working-directory: "terraform/environments/${{ inputs.application }}"
         run: |
           if [[ ${{ inputs.application }} == "nomis" && ${{ inputs.environment }} == "test" ]]; then
-            echo terraform state import 'module.baseline.module.lb_listener["private-t1-nomis-web-https"].aws_lb_listener_rule.this["forward-http-7777"]'
-            terraform state import 'module.baseline.module.lb_listener["private-t1-nomis-web-https"].aws_lb_listener_rule.this["forward-http-7777"]' 'arn:aws:elasticloadbalancing:eu-west-2:612659970365:listener/app/private-lb/b25fe967864e4a14/c4c0715c4253256c'
+            echo terraform import 'module.baseline.module.lb_listener["private-t1-nomis-web-https"].aws_lb_listener_rule.this["forward-http-7777"]'
+            terraform import 'module.baseline.module.lb_listener["private-t1-nomis-web-https"].aws_lb_listener_rule.this["forward-http-7777"]' 'arn:aws:elasticloadbalancing:eu-west-2:612659970365:listener/app/private-lb/b25fe967864e4a14/c4c0715c4253256c'
           fi
 
       - name: Terraform State Refresh (Optional)
