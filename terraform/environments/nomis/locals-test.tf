@@ -171,53 +171,53 @@ locals {
 
     baseline_lbs = {
       # AWS doesn't let us call it internal
-      #      private = {
-      #        internal_lb              = true
-      #        enable_delete_protection = false
-      #        existing_target_groups   = local.existing_target_groups
-      #        force_destroy_bucket     = true
-      #        idle_timeout             = 3600
-      #        public_subnets           = module.environment.subnets["private"].ids
-      #        security_groups          = [aws_security_group.public.id]
-      #
-      #        listeners = {
-      #          https = merge(
-      #            local.lb_weblogic.https, {
-      #              rules = {
-      #                t1-nomis-web-http-7777 = {
-      #                  priority = 200
-      #                  actions = [{
-      #                    type              = "forward"
-      #                    target_group_name = "t1-nomis-web-http-7777"
-      #                  }]
-      #                  conditions = [{
-      #                    host_header = {
-      #                      values = [
-      #                        "t1-nomis-web.${module.environment.domains.public.application_environment}",
-      #                        "t1-nomis-web.test.nomis.az.justice.gov.uk",
-      #                      ]
-      #                    }
-      #                  }]
-      #                }
-      #                t1-nomis-web-a-http-7777 = {
-      #                  priority = 300
-      #                  actions = [{
-      #                    type              = "forward"
-      #                    target_group_name = "t1-nomis-web-a-http-7777"
-      #                  }]
-      #                  conditions = [{
-      #                    host_header = {
-      #                      values = [
-      #                        "t1-nomis-web-a.${module.environment.domains.public.application_environment}",
-      #                        "t1-nomis-web-a.test.nomis.az.justice.gov.uk",
-      #                      ]
-      #                    }
-      #                  }]
-      #                }
-      #              }
-      #          })
-      #        }
-      #      }
+      private = {
+        internal_lb              = true
+        enable_delete_protection = false
+        existing_target_groups   = local.existing_target_groups
+        force_destroy_bucket     = true
+        idle_timeout             = 3600
+        public_subnets           = module.environment.subnets["private"].ids
+        security_groups          = [aws_security_group.public.id]
+
+        listeners = {
+          https = merge(
+            local.lb_weblogic.https, {
+              rules = {
+                t1-nomis-web-http-7777 = {
+                  priority = 200
+                  actions = [{
+                    type              = "forward"
+                    target_group_name = "t1-nomis-web-http-7777"
+                  }]
+                  conditions = [{
+                    host_header = {
+                      values = [
+                        "t1-nomis-web.${module.environment.domains.public.application_environment}",
+                        "t1-nomis-web.test.nomis.az.justice.gov.uk",
+                      ]
+                    }
+                  }]
+                }
+                t1-nomis-web-a-http-7777 = {
+                  priority = 300
+                  actions = [{
+                    type              = "forward"
+                    target_group_name = "t1-nomis-web-a-http-7777"
+                  }]
+                  conditions = [{
+                    host_header = {
+                      values = [
+                        "t1-nomis-web-a.${module.environment.domains.public.application_environment}",
+                        "t1-nomis-web-a.test.nomis.az.justice.gov.uk",
+                      ]
+                    }
+                  }]
+                }
+              }
+          })
+        }
+      }
 
       # public LB not needed right now
       # public = {
