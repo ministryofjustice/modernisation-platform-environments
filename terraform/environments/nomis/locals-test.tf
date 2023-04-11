@@ -230,9 +230,19 @@ locals {
       # }
     }
     baseline_route53_zones = {
+      "${module.environment.domains.public.business_unit_environment}" = {
+        lb_alias_records = [
+          { name = "t1-nomis-web", type = "A", lbs_map_key = "private" },
+          { name = "t1-nomis-web-a", type = "A", lbs_map_key = "private" }
+        ]
+      }
       "test.nomis.az.justice.gov.uk" = {
         records = [
           { name = "cnomt1", type = "A", ttl = "300", records = ["10.101.3.132"] }
+        ]
+        lb_alias_records = [
+          { name = "t1-nomis-web", type = "A", lbs_map_key = "private" },
+          { name = "t1-nomis-web-a", type = "A", lbs_map_key = "private" }
         ]
       }
     }
