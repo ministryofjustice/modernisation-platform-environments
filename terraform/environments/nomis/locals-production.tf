@@ -145,5 +145,57 @@ locals {
         })
       })
     }
+
+    baseline_lbs = {
+      private = {
+        internal_lb              = true
+        enable_delete_protection = false
+        existing_target_groups   = local.existing_target_groups
+        force_destroy_bucket     = true
+        idle_timeout             = 3600
+        public_subnets           = module.environment.subnets["private"].ids
+        security_groups          = [aws_security_group.public.id]
+
+        listeners = {
+          https = merge(
+            local.lb_weblogic.https, {
+              rules = {
+                prod-nomis-web-a-http-7777 = {
+                  priority = 200
+                  actions = [{
+                    type              = "forward"
+                    target_group_name = "prod-nomis-web-a-http-7777"
+                  }]
+                  conditions = [{
+                    host_header = {
+                      values = [
+                        "prod-nomis-web.${module.environment.domains.public.application_environment}",
+                        "prod-nomis-web.production.nomis.az.justice.gov.uk",
+                        "prod-nomis-web-a.${module.environment.domains.public.application_environment}",
+                        "prod-nomis-web-a.production.nomis.az.justice.gov.uk",
+                      ]
+                    }
+                  }]
+                }
+              }
+          })
+        }
+      }
+    }
+
+    baseline_route53_zones = {
+      "${module.environment.domains.public.business_unit_environment}" = {
+        lb_alias_records = [
+          { name = "prod-nomis-web", type = "A", lbs_map_key = "private" },
+          { name = "prod-nomis-web-a", type = "A", lbs_map_key = "private" }
+        ]
+      }
+      "production.nomis.az.justice.gov.uk" = {
+        lb_alias_records = [
+          { name = "prod-nomis-web", type = "A", lbs_map_key = "private" },
+          { name = "prod-nomis-web-a", type = "A", lbs_map_key = "private" }
+        ]
+      }
+    }
   }
 }
