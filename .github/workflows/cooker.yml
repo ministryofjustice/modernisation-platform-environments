@@ -1,20 +1,20 @@
 ---
-name: example
+name: cooker
 on:
   push:
     branches:
       - main
     paths:
-      - 'terraform/environments/example/**'
-      - '.github/workflows/example.yml'
+      - 'terraform/environments/cooker/**'
+      - '.github/workflows/cooker.yml'
 
   pull_request:
     branches:
       - main
     types: [opened, edited, reopened, synchronize]
     paths:
-      - 'terraform/environments/example/**'
-      - '.github/workflows/example.yml'
+      - 'terraform/environments/cooker/**'
+      - '.github/workflows/cooker.yml'
 
   workflow_dispatch:
     inputs:
