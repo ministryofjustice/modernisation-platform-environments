@@ -30,7 +30,7 @@ module "baseline_presets" {
     enable_image_builder                         = true
     enable_ec2_cloud_watch_agent                 = true
     enable_ec2_self_provision                    = true
-    enable_shared_s3                             = true
+    enable_shared_s3                             = true # adds permissions to ec2s to interact with devtest or prodpreprod buckets
     s3_iam_policies                              = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
 
     # comment this in if you need to resolve FixNGo hostnames
@@ -59,6 +59,7 @@ module "baseline" {
   kms_grants        = module.baseline_presets.kms_grants
   route53_resolvers = module.baseline_presets.route53_resolvers
   #route53_zones
+  shared_s3_buckets = module.baseline_presets.shared_s3_buckets
   s3_buckets        = merge(local.baseline_s3_buckets, lookup(local.environment_config, "baseline_s3_buckets", {}))
   # rds_instances
   #sns_topics
@@ -82,12 +83,3 @@ resource "aws_resourceexplorer2_view" "all_resources" {
   default_view = true
   depends_on   = [aws_resourceexplorer2_index.this]
 }
-
-
-
-# count             = local.environment == "test" ? 1 : 0
-
-
-# count             = local.environment == "development" ? 1 : 0
-
-# arn:aws:s3:::devtest-oasys20230403154135527100000001/*

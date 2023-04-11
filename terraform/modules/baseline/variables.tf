@@ -686,6 +686,85 @@ variable "s3_buckets" {
   default = {}
 }
 
+variable "shared_s3_buckets" {
+  description = "map of shared s3 buckets"
+  type = map(object({
+    acl                 = optional(string, "private")
+    versioning_enabled  = optional(bool, true)
+    replication_enabled = optional(bool, false)
+    replication_region  = optional(string)
+    bucket_policy       = optional(list(string), ["{}"])
+    bucket_policy_v2 = optional(list(object({
+      effect  = string
+      actions = list(string)
+      principals = optional(object({
+        type        = string
+        identifiers = list(string)
+      }))
+      conditions = optional(list(object({
+        test     = string
+        variable = string
+        values   = list(string)
+      })), [])
+    })), [])
+    custom_kms_key             = optional(string)
+    custom_replication_kms_key = optional(string)
+    lifecycle_rule = optional(any, [{
+      id      = "main"
+      enabled = "Enabled"
+      prefix  = ""
+      tags = {
+        rule      = "log"
+        autoclean = "true"
+      }
+      transition = [
+        {
+          days          = 90
+          storage_class = "STANDARD_IA"
+          }, {
+          days          = 365
+          storage_class = "GLACIER"
+        }
+      ]
+      expiration = {
+        days = 730
+      }
+      noncurrent_version_transition = [
+        {
+          days          = 90
+          storage_class = "STANDARD_IA"
+          }, {
+          days          = 365
+          storage_class = "GLACIER"
+        }
+      ]
+      noncurrent_version_expiration = {
+        days = 730
+      }
+    }])
+    log_bucket           = optional(string, "")
+    log_prefix           = optional(string, "")
+    replication_role_arn = optional(string, "")
+    force_destroy        = optional(bool, false)
+    sse_algorithm        = optional(string, "aws:kms")
+    iam_policies = optional(map(list(object({
+      effect  = string
+      actions = list(string)
+      principals = optional(object({
+        type        = string
+        identifiers = list(string)
+      }))
+      conditions = optional(list(object({
+        test     = string
+        variable = string
+        values   = list(string)
+      })), [])
+    }))), {})
+    tags = optional(map(string), {})
+  }))
+  default = {}
+}
+
 variable "security_groups" {
   description = "map of security groups and associated rules to create where key is the name of the group"
   type = map(object({
