@@ -19,24 +19,12 @@ locals {
     # db_performance_insights_enabled        = false
     # db_skip_final_snapshot                 = true
 
-    log_groups = {}
-
     ec2_common = {
       patch_approval_delay_days = 3
       patch_day                 = "TUE"
     }
 
     baseline_s3_buckets = {
-      # the shared devtest bucket is just created in test
-      devtest-oasys = {
-        custom_kms_key = module.environment.kms_keys["general"].arn
-        bucket_policy_v2 = [
-          module.baseline_presets.s3_bucket_policies.ImageBuilderWriteAccessBucketPolicy,
-          module.baseline_presets.s3_bucket_policies.DevTestEnvironmentsWriteAndDeleteAccessBucketPolicy,
-          module.baseline_presets.s3_bucket_policies.DevTestAccountsWriteAndDeleteAccessBucketPolicy
-        ]
-        iam_policies = module.baseline_presets.s3_iam_policies
-      }
     }
 
     baseline_ec2_autoscaling_groups = {

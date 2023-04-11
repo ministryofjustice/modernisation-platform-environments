@@ -41,6 +41,7 @@ variable "options" {
     enable_image_builder                         = optional(bool, false)
     enable_ec2_cloud_watch_agent                 = optional(bool, false)
     enable_ec2_self_provision                    = optional(bool, false)
+    enable_shared_s3                             = optional(bool, false)
     route53_resolver_rules                       = optional(map(list(string)), {})
     s3_iam_policies                              = optional(list(string))
     sns_topics_pagerduty_integrations            = optional(map(string), {})

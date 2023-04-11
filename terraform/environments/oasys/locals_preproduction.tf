@@ -18,8 +18,6 @@ locals {
     # db_performance_insights_enabled        = false
     # db_skip_final_snapshot                 = true
 
-    log_groups = {}
-
 
     ec2_common = {
       patch_approval_delay_days = 3
