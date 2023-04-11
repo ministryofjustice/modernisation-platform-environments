@@ -57,7 +57,28 @@ locals {
         autoscaling_group        = module.baseline_presets.ec2_autoscaling_group
         autoscaling_schedules    = module.baseline_presets.ec2_autoscaling_schedules.working_hours
         ssm_parameters           = null
-        lb_target_groups         = {}
+        lb_target_groups = {
+          http-8080 = {
+            port                 = 8080
+            protocol             = "HTTP"
+            target_type          = "instance"
+            deregistration_delay = 30
+            health_check = {
+              enabled             = true
+              interval            = 30
+              healthy_threshold   = 3
+              matcher             = "200-399"
+              path                = "/"
+              port                = 8080
+              timeout             = 5
+              unhealthy_threshold = 5
+            }
+            stickiness = {
+              enabled = true
+              type    = "lb_cookie"
+            }
+          }
+        }
         cloudwatch_metric_alarms = {}
         tags = {
           component         = "web"
