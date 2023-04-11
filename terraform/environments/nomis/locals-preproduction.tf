@@ -41,5 +41,14 @@ locals {
 
   # baseline config
   preproduction_config = {
+    baseline_ec2_autoscaling_groups = {
+      preprod-nomis-web-a = merge(local.ec2_weblogic_zone_a, {
+        tags = merge(local.ec2_weblogic_zone_a.tags, {
+          oracle-db-hostname = "PPPDL00016.azure.hmpp.root"
+          nomis-environment  = "preprod"
+          oracle-db-name     = "CNOMPP"
+        })
+      })
+    }
   }
 }

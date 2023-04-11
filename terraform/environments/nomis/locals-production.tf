@@ -136,5 +136,14 @@ locals {
 
   # baseline config
   production_config = {
+    baseline_ec2_autoscaling_groups = {
+      prod-nomis-web-a = merge(local.ec2_weblogic_zone_a, {
+        tags = merge(local.ec2_weblogic_zone_a.tags, {
+          oracle-db-hostname = "PDPDL00035.azure.hmpp.root"
+          nomis-environment  = "prod"
+          oracle-db-name     = "CNOMP"
+        })
+      })
+    }
   }
 }
