@@ -243,6 +243,11 @@
       "to_port": 5401,
       "protocol": "TCP"
     },
+    "TCP_5575": {
+      "from_port": 5575,
+      "to_port": 5575,
+      "protocol": "TCP"
+    },
     "TCP_1636": {
       "from_port": 1636,
       "to_port": 1636,
@@ -306,6 +311,12 @@
     "TCP_5401": {
       "from_port": 5401,
       "to_port": 5401,
+      "protocol": "TCP",
+      "destination_cidr": "0.0.0.0/0"
+    },
+    "TCP_5575": {
+      "from_port": 5575,
+      "to_port": 5575,
       "protocol": "TCP",
       "destination_cidr": "0.0.0.0/0"
     },
