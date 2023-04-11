@@ -38,8 +38,7 @@ locals {
         instance_profile_policies = flatten([
           "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
           local.iam_policies_ec2_default,
-          "EC2S3BucketWriteAndDeleteAccessPolicy",
-          "Ec2AccessSharedS3Policy",
+          "EC2S3BucketWriteAndDeleteAccessPolicy"
         ])
       }
     }
