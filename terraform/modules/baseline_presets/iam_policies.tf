@@ -121,11 +121,11 @@ locals {
           "s3:PutObjectAcl",
         ]
         resources = var.environment == "production" || var.environment == "preproduction" ? [
-          "arn:aws:s3:::prodpreprod-${var.environment.application_name}*/*",
-          "arn:aws:s3:::prodpreprod-${var.environment.application_name}*"
+          "arn:aws:s3:::prodpreprod-${var.environment.application_name}-*/*",
+          "arn:aws:s3:::prodpreprod-${var.environment.application_name}-*"
         ] : [
-          "arn:aws:s3:::devtest-${var.environment.application_name}*/*",
-          "arn:aws:s3:::devtest-${var.environment.application_name}*"
+          "arn:aws:s3:::devtest-${var.environment.application_name}-*/*",
+          "arn:aws:s3:::devtest-${var.environment.application_name}-*"
         ]
       }]
     }

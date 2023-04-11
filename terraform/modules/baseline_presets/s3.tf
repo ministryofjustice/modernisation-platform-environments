@@ -1,6 +1,6 @@
 locals {
 
-  shared_s3_buckets = merge(
+  s3_buckets = merge(
     var.environment.environment == "production" ? { "prodpreprod-${var.environment.application_name}-" = {
       bucket_policy_v2 = [
         local.s3_bucket_policies.ImageBuilderWriteAccessBucketPolicy,

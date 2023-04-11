@@ -107,9 +107,9 @@ output "s3_iam_policies" {
   } : local.s3_iam_policies
 }
 
-output "shared_s3_buckets" {
-  description = "Map of shared s3_buckets"
-  value = local.shared_s3_buckets
+output "s3_buckets" {
+  description = "Map of s3_buckets"
+  value = local.s3_buckets
 }
 
 # Use var.options.sns_topics_pagerduty_integrations to control, where
