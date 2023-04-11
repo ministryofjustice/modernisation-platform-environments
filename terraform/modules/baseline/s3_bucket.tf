@@ -27,7 +27,7 @@ locals {
 }
 
 module "s3_bucket" {
-  for_each = merge(var.s3_buckets, var.shared_s3_buckets)
+  for_each = var.s3_buckets
 
   source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.3.0"
 
