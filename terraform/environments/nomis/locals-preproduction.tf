@@ -62,17 +62,44 @@ locals {
         security_groups          = [aws_security_group.public.id]
 
         listeners = {
-          preprod-nomis-web-https = merge(
-            local.lb_weblogic.https,
-            local.lb_weblogic.route53, {
-              replace = {
-                target_group_name_replace     = "preprod-nomis-web-a"
-                condition_host_header_replace = "preprod-nomis-web-a"
-                route53_record_name_replace   = "preprod-nomis-web-a"
+          https = merge(
+            local.lb_weblogic.https, {
+              rules = {
+                preprod-nomis-web-a-http-7777 = {
+                  priority = 200
+                  actions = [{
+                    type              = "forward"
+                    target_group_name = "preprod-nomis-web-a-http-7777"
+                  }]
+                  conditions = [{
+                    host_header = {
+                      values = [
+                        "preprod-nomis-web.${module.environment.domains.public.application_environment}",
+                        "preprod-nomis-web.preproduction.nomis.az.justice.gov.uk",
+                        "preprod-nomis-web-a.${module.environment.domains.public.application_environment}",
+                        "preprod-nomis-web-a.preproduction.nomis.az.justice.gov.uk",
+                      ]
+                    }
+                  }]
+                }
               }
-              # alarm_target_group_names = ["preprod-nomis-web-a-http-7777"]
           })
         }
+      }
+    }
+
+    baseline_route53_zones = {
+      "${module.environment.domains.public.business_unit_environment}" = {
+        lb_alias_records = [
+          { name = "preprod-nomis-web", type = "A", lbs_map_key = "private" },
+          { name = "preprod-nomis-web-a", type = "A", lbs_map_key = "private" }
+        ]
+      }
+      "preproduction.nomis.az.justice.gov.uk" = {
+        lb_alias_records = [
+          { name = "preprod-nomis-web", type = "A", lbs_map_key = "private" },
+          { name = "preprod-nomis-web-a", type = "A", lbs_map_key = "private" }
+        ]
       }
     }
   }

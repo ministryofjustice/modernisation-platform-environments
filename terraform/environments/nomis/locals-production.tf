@@ -157,17 +157,44 @@ locals {
         security_groups          = [aws_security_group.public.id]
 
         listeners = {
-          prod-nomis-web-https = merge(
-            local.lb_weblogic.https,
-            local.lb_weblogic.route53, {
-              replace = {
-                target_group_name_replace     = "prod-nomis-web-a"
-                condition_host_header_replace = "prod-nomis-web-a"
-                route53_record_name_replace   = "prod-nomis-web-a"
+          https = merge(
+            local.lb_weblogic.https, {
+              rules = {
+                prod-nomis-web-a-http-7777 = {
+                  priority = 200
+                  actions = [{
+                    type              = "forward"
+                    target_group_name = "prod-nomis-web-a-http-7777"
+                  }]
+                  conditions = [{
+                    host_header = {
+                      values = [
+                        "prod-nomis-web.${module.environment.domains.public.application_environment}",
+                        "prod-nomis-web.production.nomis.az.justice.gov.uk",
+                        "prod-nomis-web-a.${module.environment.domains.public.application_environment}",
+                        "prod-nomis-web-a.production.nomis.az.justice.gov.uk",
+                      ]
+                    }
+                  }]
+                }
               }
-              # alarm_target_group_names = ["prod-nomis-web-a-http-7777""]
           })
         }
+      }
+    }
+
+    baseline_route53_zones = {
+      "${module.environment.domains.public.business_unit_environment}" = {
+        lb_alias_records = [
+          { name = "prod-nomis-web", type = "A", lbs_map_key = "private" },
+          { name = "prod-nomis-web-a", type = "A", lbs_map_key = "private" }
+        ]
+      }
+      "production.nomis.az.justice.gov.uk" = {
+        lb_alias_records = [
+          { name = "prod-nomis-web", type = "A", lbs_map_key = "private" },
+          { name = "prod-nomis-web-a", type = "A", lbs_map_key = "private" }
+        ]
       }
     }
   }

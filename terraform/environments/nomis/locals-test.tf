@@ -181,30 +181,40 @@ locals {
         security_groups          = [aws_security_group.public.id]
 
         listeners = {
-          t1-nomis-web-http-7001 = merge(
-            local.lb_weblogic.http-7001, {
-              replace = {
-                target_group_name_replace     = "t1-nomis-web"
-                condition_host_header_replace = "t1-nomis-web"
+          https = merge(
+            local.lb_weblogic.https, {
+              rules = {
+                t1-nomis-web-http-7777 = {
+                  priority = 200
+                  actions = [{
+                    type              = "forward"
+                    target_group_name = "t1-nomis-web-http-7777"
+                  }]
+                  conditions = [{
+                    host_header = {
+                      values = [
+                        "t1-nomis-web.${module.environment.domains.public.application_environment}",
+                        "t1-nomis-web.test.nomis.az.justice.gov.uk",
+                      ]
+                    }
+                  }]
+                }
+                t1-nomis-web-a-http-7777 = {
+                  priority = 300
+                  actions = [{
+                    type              = "forward"
+                    target_group_name = "t1-nomis-web-a-http-7777"
+                  }]
+                  conditions = [{
+                    host_header = {
+                      values = [
+                        "t1-nomis-web-a.${module.environment.domains.public.application_environment}",
+                        "t1-nomis-web-a.test.nomis.az.justice.gov.uk",
+                      ]
+                    }
+                  }]
+                }
               }
-          })
-          t1-nomis-web-http-7777 = merge(
-            local.lb_weblogic.http-7777, {
-              replace = {
-                target_group_name_replace     = "t1-nomis-web"
-                condition_host_header_replace = "t1-nomis-web"
-              }
-            }
-          )
-          t1-nomis-web-https = merge(
-            local.lb_weblogic.https,
-            local.lb_weblogic.route53, {
-              replace = {
-                target_group_name_replace     = "t1-nomis-web"
-                condition_host_header_replace = "t1-nomis-web"
-                route53_record_name_replace   = "t1-nomis-web"
-              }
-              alarm_target_group_names = ["t1-nomis-web-http-7777", "t1-nomis-web-http-7001"]
           })
         }
 
@@ -220,7 +230,7 @@ locals {
       }
     }
     baseline_route53_zones = {
-      "${local.environment}.nomis.az.justice.gov.uk" = {
+      "test.nomis.az.justice.gov.uk" = {
         records = [
           { name = "cnomt1", type = "A", ttl = "300", records = ["10.101.3.132"] }
         ]
