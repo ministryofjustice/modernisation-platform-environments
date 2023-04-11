@@ -125,6 +125,14 @@ jobs:
         run: |
           terraform workspace select "${WORKSPACE_NAME}"
 
+      - name: Terraform State remove
+        working-directory: "terraform/environments/${{ inputs.application }}"
+        run: |
+          if [[ ${{ inputs.application }} == "nomis" && ${{ inputs.environment }} == "test" ]]; then
+            echo terraform state rm 'module.baseline.module.lb_listener["private-t1-nomis-web-https"].aws_lb_listener_rule.this["forward-http-7777"]'
+            terraform state rm 'module.baseline.module.lb_listener["private-t1-nomis-web-https"].aws_lb_listener_rule.this["forward-http-7777"]'
+          fi
+
       - name: Terraform State Refresh (Optional)
         if: inputs.do_state_refresh_on_plan == true
         working-directory: "terraform/environments/${{ inputs.application }}"
