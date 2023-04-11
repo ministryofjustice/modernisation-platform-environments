@@ -41,7 +41,22 @@ locals {
         public_subnets           = module.environment.subnets["public"].ids
         existing_target_groups   = {}
         tags                     = local.tags
-        listeners                = {}
+        listeners = {
+          https = {
+            port             = 443
+            protocol         = "HTTPS"
+            ssl_policy       = "ELBSecurityPolicy-2016-08"
+            certificate_arns = [module.acm_certificate["star.${module.environment.domains.public.application_environment}"].arn]
+            default_action = {
+              type = "fixed-response"
+              fixed_response = {
+                content_type = "text/plain"
+                message_body = "Not implemented"
+                status_code  = "501"
+              }
+            }
+          }
+        }
       }
     }
 
@@ -50,13 +65,13 @@ locals {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name = "oasys_webserver_release_*"
         })
-        instance                 = module.baseline_presets.ec2_instance.instance.default
-        user_data_cloud_init     = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
-        ebs_volume_config        = null
-        ebs_volumes              = null
-        autoscaling_group        = module.baseline_presets.ec2_autoscaling_group
-        autoscaling_schedules    = module.baseline_presets.ec2_autoscaling_schedules.working_hours
-        ssm_parameters           = null
+        instance              = module.baseline_presets.ec2_instance.instance.default
+        user_data_cloud_init  = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
+        ebs_volume_config     = null
+        ebs_volumes           = null
+        autoscaling_group     = module.baseline_presets.ec2_autoscaling_group
+        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
+        ssm_parameters        = null
         lb_target_groups = {
           http-8080 = {
             port                 = 8080
