@@ -239,6 +239,5 @@ resource "aws_security_group" "ecs_service" {
 
 #Create ECR Repository
 resource "aws_ecr_repository" "tipstaff-ecr-repo" {
-  provider = aws.eu-west-1
   name = "tipstaff-ecr-repo"
 }
