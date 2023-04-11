@@ -39,7 +39,6 @@ resource "aws_acm_certificate" "external-service" {
   }
 }
 
-
 ## Validation 
 resource "aws_route53_record" "external_validation" {
   depends_on = [
