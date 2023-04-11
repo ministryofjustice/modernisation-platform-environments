@@ -206,16 +206,6 @@ locals {
               }
               alarm_target_group_names = ["t1-nomis-web-http-7777", "t1-nomis-web-http-7001"]
           })
-          t1-nomis-web-a-https = merge(
-            local.lb_weblogic.https,
-            local.lb_weblogic.route53, {
-              replace = {
-                target_group_name_replace     = "t1-nomis-web-a"
-                condition_host_header_replace = "t1-nomis-web-a"
-                route53_record_name_replace   = "t1-nomis-web-a"
-              }
-              # alarm_target_group_names = ["t1-nomis-web-a-http-7777"]
-          })
         }
 
         # public LB not needed right now
