@@ -39,3 +39,8 @@ variable "filter_prefix" {
   description = "S3 Notification Filter Prefix"
   default     = null
 }
+
+variable "enable_lifecycle" {
+  description = "Enabled Lifecycle for S3 Storage, Default is False"
+  default     = false
+}

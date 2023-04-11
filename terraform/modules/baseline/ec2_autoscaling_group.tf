@@ -13,7 +13,7 @@ locals {
 module "ec2_autoscaling_group" {
   for_each = var.ec2_autoscaling_groups
 
-  source = "../../modules/ec2_autoscaling_group"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-autoscaling-group?ref=v1.1.0"
 
   providers = {
     aws.core-vpc = aws.core-vpc
@@ -35,7 +35,8 @@ module "ec2_autoscaling_group" {
     ]
   })
 
-  subnet_ids                    = var.environment.subnets[each.value.config.subnet_name].ids
+  availability_zone             = each.value.config.availability_zone
+  subnet_ids                    = each.value.config.availability_zone == null ? var.environment.subnets[each.value.config.subnet_name].ids : [var.environment.subnet[each.value.config.subnet_name][each.value.config.availability_zone].id]
   ebs_volumes_copy_all_from_ami = each.value.config.ebs_volumes_copy_all_from_ami
   ebs_kms_key_id                = coalesce(each.value.config.ebs_kms_key_id, var.environment.kms_keys["ebs"].arn)
   ebs_volume_config             = each.value.ebs_volume_config
@@ -56,7 +57,7 @@ module "ec2_autoscaling_group" {
 
   autoscaling_group     = each.value.autoscaling_group
   autoscaling_schedules = each.value.autoscaling_schedules
-  lb_target_groups      = each.value.lb_target_group
+  lb_target_groups      = each.value.lb_target_groups
 
   cloudwatch_metric_alarms = {
     for key, value in each.value.cloudwatch_metric_alarms : key => merge(value, {
@@ -66,7 +67,7 @@ module "ec2_autoscaling_group" {
     })
   }
 
-  tags = each.value.tags
+  tags = merge(local.tags, each.value.tags)
 
   # ensure service linked role is created first if defined in code
   depends_on = [

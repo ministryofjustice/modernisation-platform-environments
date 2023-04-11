@@ -1,11 +1,18 @@
 ##
 # RDS-related resources
 ##
+# The creation of RDS-related resources is dependent on local.application_data.accounts[local.environment].rds_create
+# Context: work was done to experiment with RDS in dev as a suitable backend (nit-593)
+# At the time of writing, EC2 seems more viable for a a realistically, completable migration.
+# Leaving this code here at this time, with a create switch that can be used to bring the rds instance if need be
+# Note, the RDS will be created from the manual snapshot created before the RDS instance was removed.
+# Remove this switch and ALL things RDS when this is definitely no longer needed.
 
 ##
 # Networking pre-reqs
 ##
 resource "aws_security_group" "rds_security_group" {
+  count       = local.application_data.accounts[local.environment].rds_create == "true" ? 1 : 0
   name        = "${local.application_name}-rds-database-security-group"
   description = "controls access to rds db instance"
   vpc_id      = data.aws_vpc.shared.id
@@ -33,6 +40,7 @@ resource "aws_security_group" "rds_security_group" {
 }
 
 resource "aws_db_subnet_group" "rds_subnet_group" {
+  count      = local.application_data.accounts[local.environment].rds_create == "true" ? 1 : 0
   name       = "data-subnet-set"
   subnet_ids = data.aws_subnets.shared-data.ids
   tags       = local.tags
@@ -42,6 +50,7 @@ resource "aws_db_subnet_group" "rds_subnet_group" {
 # Secret related pre-reqs
 ##
 resource "random_password" "rds_admin_password" {
+  count   = local.application_data.accounts[local.environment].rds_create == "true" ? 1 : 0
   length  = 30
   lower   = true
   upper   = true
@@ -51,6 +60,7 @@ resource "random_password" "rds_admin_password" {
 #tfsec:ignore:aws-ssm-secret-use-customer-key
 resource "aws_secretsmanager_secret" "rds_admin_password" {
   #checkov:skip=CKV_AWS_149
+  count                   = local.application_data.accounts[local.environment].rds_create == "true" ? 1 : 0
   name                    = "${var.networking[0].application}-rds-admin-password"
   recovery_window_in_days = 0
   tags = merge(
@@ -62,18 +72,21 @@ resource "aws_secretsmanager_secret" "rds_admin_password" {
 }
 
 resource "aws_secretsmanager_secret_version" "rds_admin_password" {
-  secret_id     = aws_secretsmanager_secret.rds_admin_password.id
-  secret_string = random_password.rds_admin_password.result
+  count         = local.application_data.accounts[local.environment].rds_create == "true" ? 1 : 0
+  secret_id     = aws_secretsmanager_secret.rds_admin_password[0].id
+  secret_string = random_password.rds_admin_password[0].result
 }
 
 ##
 # RDS-related pre-reqs
 ##
+# Always create - do not depend on local.application_data.accounts[local.environment].rds_create due to existing rds snapshot dependencies
 resource "aws_db_parameter_group" "rds_parameter_group" {
   name   = format("%s-rds-parameter-group", local.application_name)
   family = format("%s-%s", local.application_data.accounts[local.environment].rds_engine, local.application_data.accounts[local.environment].rds_engine_major_version)
 }
 
+# Always create - do not depend on local.application_data.accounts[local.environment].rds_create due to existing rds snapshot dependencies
 resource "aws_db_option_group" "rds_option_group" {
   name                     = format("%s-rds-option-group", local.application_name)
   option_group_description = format("%s-rds-option-group", local.application_name)
@@ -89,6 +102,7 @@ resource "aws_db_option_group" "rds_option_group" {
 # RDS instance
 ##
 resource "aws_db_instance" "delius-core" {
+  count                       = local.application_data.accounts[local.environment].rds_create == "true" ? 1 : 0
   engine                      = local.application_data.accounts[local.environment].rds_engine
   license_model               = "bring-your-own-license"
   engine_version              = format("%s.%s", local.application_data.accounts[local.environment].rds_engine_major_version, local.application_data.accounts[local.environment].rds_engine_minor_version)
@@ -96,13 +110,13 @@ resource "aws_db_instance" "delius-core" {
   identifier                  = format("%s-%s-database", local.application_name, local.environment)
   db_name                     = local.application_data.accounts[local.environment].rds_db_name
   username                    = local.application_data.accounts[local.environment].rds_user
-  password                    = aws_secretsmanager_secret_version.rds_admin_password.secret_string
+  password                    = aws_secretsmanager_secret_version.rds_admin_password[0].secret_string
   parameter_group_name        = aws_db_parameter_group.rds_parameter_group.name
   option_group_name           = aws_db_option_group.rds_option_group.name
   deletion_protection         = false # This is just a poc
   apply_immediately           = local.application_data.accounts[local.environment].rds_apply_immediately
   skip_final_snapshot         = true
-  snapshot_identifier         = "delius-core-development-database-vanilla"
+  snapshot_identifier         = "delius-core-development-database-after-nit593-datapump"
   allocated_storage           = local.application_data.accounts[local.environment].rds_allocated_storage
   max_allocated_storage       = local.application_data.accounts[local.environment].rds_max_allocated_storage
   maintenance_window          = local.application_data.accounts[local.environment].rds_maintenance_window
@@ -113,8 +127,8 @@ resource "aws_db_instance" "delius-core" {
   #checkov:skip=CKV_AWS_133: "backup_retention enabled, can be edited it application_variables.json"
   iam_database_authentication_enabled = local.application_data.accounts[local.environment].rds_iam_database_authentication_enabled
   #checkov:skip=CKV_AWS_161: "iam auth enabled, but optional"
-  db_subnet_group_name   = aws_db_subnet_group.rds_subnet_group.id
-  vpc_security_group_ids = [aws_security_group.rds_security_group.id]
+  db_subnet_group_name   = aws_db_subnet_group.rds_subnet_group[0].id
+  vpc_security_group_ids = [aws_security_group.rds_security_group[0].id]
   multi_az               = local.application_data.accounts[local.environment].rds_multi_az
   #checkov:skip=CKV_AWS_157: "multi-az enabled, but optional"
   monitoring_interval = local.application_data.accounts[local.environment].rds_monitoring_interval

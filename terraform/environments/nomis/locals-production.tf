@@ -98,9 +98,8 @@ locals {
           data  = { total_size = 4000 }
           flash = { total_size = 1000 }
         }
-        sns_topic = "nomis_alarms"
-
-        cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms["nomis_alarms"].fixngo_connection
+        sns_topic                = "nomis_alarms"
+        cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso"].fixngo_connection
       }
 
       prod-nomis-db-3 = {
@@ -137,5 +136,14 @@ locals {
 
   # baseline config
   production_config = {
+    baseline_ec2_autoscaling_groups = {
+      prod-nomis-web-a = merge(local.ec2_weblogic_zone_a, {
+        tags = merge(local.ec2_weblogic_zone_a.tags, {
+          oracle-db-hostname = "PDPDL00035.azure.hmpp.root"
+          nomis-environment  = "prod"
+          oracle-db-name     = "CNOMP"
+        })
+      })
+    }
   }
 }

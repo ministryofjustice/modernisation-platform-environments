@@ -34,6 +34,8 @@ resource "aws_instance" "oas_app_instance" {
   tags = merge(
     local.tags,
     { "Name" = "${local.application_name} Apps Server" },
+    { "instance-scheduling" = "skip-scheduling" },
+    { "snapshot-with-daily-7-day-retention" = "yes" }
   )
 }
 

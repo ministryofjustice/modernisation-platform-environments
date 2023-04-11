@@ -2,53 +2,7 @@
 # alarms useful for EC2 instances, autoscaling groups, load balancers etc.
 # grouped by namespace.
 #
-# The desired alarm_actions are passed in as a parameter to the module and
-# appended to the alarms in the output.  The alarms can also be optionally
-# filtered in the output
-#
-# For example:
-#
-# options.cloudwatch_metric_alarms = {
-#   alarms_without_actions = {}
-#   standard_alarms = {
-#     alarm_actions = ["sns_topic_name1", "sns_topic_name2"]
-#     alarms_to_exclude = [
-#       "instance-health-check-failed",
-#     ]
-#   }
-#   critical_alarms = {
-#     alarm_actions = ["sns_topic_name3"]
-#     alarms_to_include = [
-#       "instance-health-check-failed",
-#     ]
-#   }
-# }
-#
-# output.cloudwatch_metric_alarms = {
-#   alarms_without_actions = local.cloudwatch_metric_alarms  # as is, no actions defined
-#   standard_alarms = {
-#     acm = {
-#       cert-expires-in-less-than-30-days = {
-#         alarm_actions       = ["sns_topic_name1", "sns_topic_name2"]
-#         comparison_operator = "LessThanThreshold"
-#         ....
-#       }
-#       ...
-#     }
-#     ...
-#   }
-#   critical_alarms =  {
-#     ec2 = {
-#       instance-health-check-failed = {
-#         alarm_actions = ["sns_topic_name3"]
-#         ...
-#       }
-#     }
-#   }
-# }
-#
-# Add application specific alarms using exactly the same structure
-# as local.cloudwatch_:etric_alarms using the application_alarms option.
+# Also see cloudwatch_metric_alarms_lists.tf
 #
 # Example alarm definition with comment.  The statistic may be applied over
 # several instances in the case of auto scaling groups.
@@ -66,7 +20,28 @@
 
 locals {
 
+  cloudwatch_metric_alarms_application = var.options.cloudwatch_metric_alarms
+
+  cloudwatch_metric_alarms_keys = keys(merge(
+    local.cloudwatch_metric_alarms_application,
+    local.cloudwatch_metric_alarms_baseline
+  ))
+
+  # deep merge application specific alarms with the baseline alarms
   cloudwatch_metric_alarms = {
+    for key in local.cloudwatch_metric_alarms_keys : key => {
+      for alarm_name in keys(merge(
+        try(local.cloudwatch_metric_alarms_baseline[key], {}),
+        try(local.cloudwatch_metric_alarms_application[key], {})
+        )) : alarm_name => merge(
+        try(local.cloudwatch_metric_alarms_baseline[key][alarm_name], {}),
+        try(local.cloudwatch_metric_alarms_application[key][alarm_name], {})
+      )
+    }
+  }
+
+  # add common alarms here, grouped by namespace
+  cloudwatch_metric_alarms_baseline = {
 
     acm = {
       cert-expires-in-less-than-14-days = {
@@ -248,6 +223,17 @@ locals {
         statistic           = "Average"
         threshold           = "1"
         alarm_description   = "Triggers if the number of unhealthy hosts in the target table group is at least one for 3 minutes"
+      }
+      unhealthy-hosts-atleast-two = {
+        comparison_operator = "GreaterThanOrEqualToThreshold"
+        evaluation_periods  = "3"
+        datapoints_to_alarm = "3"
+        metric_name         = "UnHealthyHostCount"
+        namespace           = "AWS/ApplicationELB"
+        period              = "60"
+        statistic           = "Average"
+        threshold           = "2"
+        alarm_description   = "Triggers if the number of unhealthy hosts in the target table group is at least two for 3 minutes"
       }
     }
   }

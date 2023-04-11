@@ -97,36 +97,90 @@ module "glue_demo_table" {
   glue_table_depends_on = [module.glue_database.db_name]
 }
 
-# Glue Cloud Platform ETL JOB
+# Glue Cloud Platform Ingestion Job (Load, Reload, CDC)
 module "glue_cloudplatform_reporting_job" {
   source                        = "./modules/glue_job"
   create_job                    = local.create_job
   name                          = "${local.project}-reporting-hub-${local.env}"
   description                   = local.description
+  command_type                  = "gluestreaming"
   create_security_configuration = local.create_sec_conf
-  job_language                  = "scala"
   temp_dir                      = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/tmp/reporting-hub/"
   checkpoint_dir                = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/checkpoint/reporting-hub/"
   spark_event_logs              = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/spark-logs/reporting-hub/"
   tags                          = local.all_tags
-  script_location               = "s3://${local.project}-artifact-store-${local.environment}/artifacts/cloud-platform/digital-prison-reporting-poc/cloud-platform-reporting-hub-vLatest.scala"
   enable_continuous_log_filter  = false
   project_id                    = local.project
   aws_kms_key                   = local.s3_kms_arn
   create_kinesis_ingester       = local.create_kinesis # If True, Kinesis Policies are applied
   additional_policies           = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_admin_arn
-  timeout                       = 120
-  execution_class               = "FLEX"
+  timeout                       = 8
+  execution_class               = "STANDARD"
+  # Placeholder Script Location
+  script_location               = "s3://${local.project}-artifact-store-${local.environment}/artifacts/domain-platform/digital-prison-reporting-poc/place-holder-vLatest.scala"
+
+  class = "uk.gov.justice.digital.job.DataHubJob"
+
   arguments = {
     "--extra-jars"          = "s3://${local.project}-artifact-store-${local.environment}/artifacts/cloud-platform/digital-prison-reporting-poc/cloud-platform-vLatest.jar"
-    "--curated.path"        = "s3://${module.s3_curated_bucket[0].bucket.id}"
-    "--raw.path"            = "s3://${module.s3_raw_bucket[0].bucket.id}"
-    "--structured.path"     = "s3://${module.s3_structured_bucket[0].bucket.id}"
-    "--sink.stream"         = local.kinesis_stream_data_domain
-    "--sink.region"         = local.account_region
-    "--source.queue"        = "nomis-cdc-event-notification" ## Should be Dynamic SQS Name reference
-    "--source.region"       = local.account_region
-    "--job-bookmark-option" = "job-bookmark-enable"
+    "--job-bookmark-option" = "job-bookmark-disable"
+    "--enable-metrics"      = true
+    "--enable-spark-ui"     = false
+    "--enable-job-insights" = true
+    "--kinesis.reader.streamName"           = "local.kinesis_stream_ingestor"
+    "--aws.kinesis.endpointUrl"             = "https://kinesis-${local.account_region}.amazonaws.com"
+    "--aws.region"                          = local.account_region
+    "--kinesis.reader.batchDurationSeconds" = 1
+    "--datalake-formats"                    = "delta"
+    "--raw.s3.path"                         = "s3://${module.s3_raw_bucket[0].bucket.id}"
+    "--structured.s3.path"                  = "s3://${module.s3_structured_bucket[0].bucket.id}"
+  }
+}
+
+# Glue Kinesis Reader Job (DPR-340)
+module "glue_kinesis_reader_job" {
+  source                        = "./modules/glue_job"
+  create_job                    = local.create_job
+  name                          = "${local.project}-kinesis-reader-${local.env}"
+  description                   = "kinesis Reader Job"
+  job_language                  = "scala"
+  command_type                  = "gluestreaming"
+  create_security_configuration = local.create_sec_conf
+  temp_dir                      = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/tmp/reporting-hub/"
+  checkpoint_dir                = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/checkpoint/reporting-hub/"
+  spark_event_logs              = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/spark-logs/reporting-hub/"
+  enable_continuous_log_filter  = false
+  project_id                    = local.project
+  aws_kms_key                   = local.s3_kms_arn
+  create_kinesis_ingester       = local.create_kinesis # If True, Kinesis Policies are applied - Defaults to True
+  additional_policies           = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_admin_arn
+  timeout                       = 2880 # This is in Mins
+  execution_class               = "STANDARD"
+  # Placeholder Script Location
+  script_location               = "s3://${local.project}-artifact-store-${local.environment}/artifacts/cloud-platform/digital-prison-reporting-jobs/scripts/${local.project}-kinesis-reader-vLatest.scala"
+
+  class                         = "uk.gov.justice.digital.job.DataHubJob"
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-kinesis-reader-${local.env}"
+      Resource_Type = "Glue Job"
+      Ticket        = "DPR-340"
+    }
+  )
+
+  arguments = {
+    "--extra-jars"          = "s3://${local.project}-artifact-store-${local.environment}/artifacts/cloud-platform/digital-prison-reporting-jobs/jars/digital-prison-reporting-jobs-vLatest.jar"
+    "--job-bookmark-option" = "job-bookmark-disable"
+    "--enable-metrics"      = true
+    "--enable-spark-ui"     = false
+    "--enable-job-insights" = true
+    "--kinesis.reader.streamName"           = "${local.project}-kinesis-reader-${local.env}-stream"
+    "--aws.kinesis.endpointUrl"             = "https://kinesis-${local.account_region}.amazonaws.com"
+    "--aws.region"                          = local.account_region
+    "--kinesis.reader.batchDurationSeconds" = 1
+    "--class"                               = "uk.gov.justice.digital.job.DataHubJob"
   }
 }
 
@@ -156,7 +210,7 @@ module "glue_domainplatform_change_monitor_job" {
     "--cloud.platform.path" = "s3://${module.s3_curated_bucket[0].bucket.id}"
     "--domain.files.path"   = "s3://${module.s3_domain_config_bucket[0].bucket.id}/"
     "--domain.repo.path"    = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/domain-repo/" ## Added /
-    "--source.queue"        = "domain-cdc-event-notification"                                ## Should be Dynamic SQS Name reference
+    "--source.queue"        = "domain-cdc-event-notification"                                ## DPR-287, needs right source - TBC
     "--source.region"       = local.account_region
     "--target.path"         = "s3://${module.s3_domain_bucket[0].bucket.id}/" # Added /
     "--checkpoint.location" = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/checkpoint/change-monitor/"
@@ -875,7 +929,7 @@ module "datamart" {
     pause = {
       name          = "${local.redshift_cluster_name}-pause"
       description   = "Pause cluster every night"
-      schedule      = "cron(0 20 * * ? *)"
+      schedule      = "cron(30 20 * * ? *)"
       pause_cluster = true
     }
     resume = {
@@ -992,80 +1046,182 @@ module "dms_use_of_force" {
   )
 }
 
-# S3 Oracle to Nomis SQS Notification 
-module "s3_nomis_oracle_sqs" {
+# S3 Oracle to Nomis SQS Notification # Disabled DPR-287 - TBC
+# module "s3_nomis_oracle_sqs" {
+#  source                    = "./modules/s3_bucket"
+#  create_s3                 = local.setup_buckets
+#  name                      = "${local.project}-nomis-cdc-event-${local.environment}"
+#  custom_kms_key            = local.s3_kms_arn
+#  create_notification_queue = true
+#  filter_prefix             = "cdc/"
+#  s3_notification_name      = "nomis-cdc-event-notification"
+#  sqs_msg_retention_seconds = 1209600
+
+#  tags = merge(
+#    local.all_tags,
+#    {
+#      Name          = "${local.project}-nomis-cdc-event-${local.environment}"
+#      Resource_Type = "S3 Bucket"
+#    }
+#  )
+#}
+
+# S3 - CDC Domain Events SQS Notification (DPR-116) # Disabled DPR-287 - TBC
+# module "s3_domain_cdc_sqs" {
+#  source                    = "./modules/s3_bucket"
+#  create_s3                 = local.setup_buckets
+#  name                      = "${local.project}-domain-cdc-event-${local.environment}"
+#  custom_kms_key            = local.s3_kms_arn
+#  create_notification_queue = true
+#  filter_prefix             = "cdc/"
+#  s3_notification_name      = "domain-cdc-event-notification"
+#  sqs_msg_retention_seconds = 1209600
+
+#  tags = merge(
+#    local.all_tags,
+#    {
+#      Name          = "${local.project}-domain-cdc-event-${local.environment}"
+#      Resource_Type = "S3 Bucket"
+#    }
+#  )
+#}
+
+# Kinesis Nomis Stream # Commented DPR-287 - TBC
+# module "kinesis_nomis_stream" {
+#  source                     = "./modules/kinesis_firehose"
+#  name                       = "${local.project}-nomis-target-stream-${local.env}"
+#  kinesis_source_stream_arn  = module.kinesis_stream_ingestor.kinesis_stream_arn  # KDS Cloud Platform
+#  kinesis_source_stream_name = module.kinesis_stream_ingestor.kinesis_stream_name # KDS Cloud Platform
+#  target_s3_id               = module.s3_nomis_oracle_sqs.bucket_id
+#  target_s3_arn              = module.s3_nomis_oracle_sqs.bucket_arn
+#  target_s3_kms              = local.s3_kms_arn
+#  target_s3_prefix           = "cdc/year=!{timestamp:yyyy}/month=!{timestamp:MM}/day=!{timestamp:dd}/hour=!{timestamp:HH}/"
+#  target_s3_error_prefix     = "cdc-error/type=!{firehose:error-output-type}/"
+#  aws_account_id             = local.account_id
+#  aws_region                 = local.account_region
+#  cloudwatch_log_group_name  = "/aws/kinesisfirehose/nomis-target-stream"
+#  cloudwatch_log_stream_name = "NomisTargetStream"
+#  cloudwatch_logging_enabled = true
+#}
+
+# Kinesis cdc domain Stream (DPR-116) # Commented DPR-287 - TBC
+# module "kinesis_cdc_domain_stream" {
+#  source                     = "./modules/kinesis_firehose"
+#  name                       = "${local.project}-cdc-domain-stream-${local.env}"
+#  kinesis_source_stream_arn  = module.kinesis_stream_domain_data.kinesis_stream_arn  # KDS Domain Platform
+#  kinesis_source_stream_name = module.kinesis_stream_domain_data.kinesis_stream_name # KDS Domain Platform
+#  target_s3_id               = module.s3_domain_cdc_sqs.bucket_id
+#  target_s3_arn              = module.s3_domain_cdc_sqs.bucket_arn
+#  target_s3_kms              = local.s3_kms_arn
+#  target_s3_prefix           = "cdc/year=!{timestamp:yyyy}/month=!{timestamp:MM}/day=!{timestamp:dd}/hour=!{timestamp:HH}/"
+#  target_s3_error_prefix     = "cdc-error/type=!{firehose:error-output-type}/"
+#  aws_account_id             = local.account_id
+#  aws_region                 = local.account_region
+#  cloudwatch_log_group_name  = "/aws/kinesisfirehose/cdc-domain-stream"
+#  cloudwatch_log_stream_name = "CdcDomainStream"
+#  cloudwatch_logging_enabled = true
+#}
+
+# S3 Violation Zone Bucket, DPR-318/DPR-301
+module "s3_violation_bucket" {
   source                    = "./modules/s3_bucket"
   create_s3                 = local.setup_buckets
-  name                      = "${local.project}-nomis-cdc-event-${local.environment}"
+  name                      = "${local.project}-violation-${local.environment}"
   custom_kms_key            = local.s3_kms_arn
-  create_notification_queue = true
-  filter_prefix             = "cdc/"
-  s3_notification_name      = "nomis-cdc-event-notification"
-  sqs_msg_retention_seconds = 1209600
+  create_notification_queue = false # For SQS Queue
+  enable_lifecycle          = true
 
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-nomis-cdc-event-${local.environment}"
+      Name          = "${local.project}-violation-${local.environment}"
       Resource_Type = "S3 Bucket"
     }
   )
 }
 
-# S3 - CDC Domain Events SQS Notification (DPR-116)
-module "s3_domain_cdc_sqs" {
-  source                    = "./modules/s3_bucket"
-  create_s3                 = local.setup_buckets
-  name                      = "${local.project}-domain-cdc-event-${local.environment}"
-  custom_kms_key            = local.s3_kms_arn
-  create_notification_queue = true
-  filter_prefix             = "cdc/"
-  s3_notification_name      = "domain-cdc-event-notification"
-  sqs_msg_retention_seconds = 1209600
+# Dynamo DB Tables
+# Dynamo DB for DomainRegistry, DPR-306/DPR-218
+module "dynamo_tab_domain_registry" {
+  source              = "./modules/dynamo_tables"
+  create_table        = true
+  autoscaling_enabled = false
+  name                = "${local.project}-domain-registry-${local.environment}"
+
+  hash_key    = "primaryId"
+  range_key   = "secondaryId"
+  table_class = "STANDARD"
+  ttl_enabled = false
+
+  attributes = [
+    {
+      name = "primaryId"
+      type = "S"
+    },
+    {
+      name = "secondaryId"
+      type = "S"
+    },
+    {
+      name = "type"
+      type = "S"
+    }
+  ]
+
+  global_secondary_indexes = [
+    {
+      name            = "primaryId-Type-Index"
+      hash_key        = "primaryId"
+      range_key       = "type"
+      write_capacity  = 10
+      read_capacity   = 10
+      projection_type = "ALL"
+    },
+    {
+      name            = "secondaryId-Type-Index"
+      hash_key        = "secondaryId"
+      range_key       = "type"
+      write_capacity  = 10
+      read_capacity   = 10
+      projection_type = "ALL"
+    }
+  ]
 
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-domain-cdc-event-${local.environment}"
-      Resource_Type = "S3 Bucket"
+      Name          = "${local.project}-domain-registry-${local.environment}"
+      Resource_Type = "Dynamo Table"
     }
   )
 }
 
-# Kinesis Nomis Stream
-module "kinesis_nomis_stream" {
-  source                     = "./modules/kinesis_firehose"
-  name                       = "${local.project}-nomis-target-stream-${local.env}"
-  kinesis_source_stream_arn  = module.kinesis_stream_ingestor.kinesis_stream_arn  # KDS Cloud Platform
-  kinesis_source_stream_name = module.kinesis_stream_ingestor.kinesis_stream_name # KDS Cloud Platform
-  target_s3_id               = module.s3_nomis_oracle_sqs.bucket_id
-  target_s3_arn              = module.s3_nomis_oracle_sqs.bucket_arn
-  target_s3_kms              = local.s3_kms_arn
-  target_s3_prefix           = "cdc/year=!{timestamp:yyyy}/month=!{timestamp:MM}/day=!{timestamp:dd}/hour=!{timestamp:HH}/"
-  target_s3_error_prefix     = "cdc-error/type=!{firehose:error-output-type}/"
-  aws_account_id             = local.account_id
-  aws_region                 = local.account_region
-  cloudwatch_log_group_name  = "/aws/kinesisfirehose/nomis-target-stream"
-  cloudwatch_log_stream_name = "NomisTargetStream"
-  cloudwatch_logging_enabled = true
-}
+# kinesis Reader Table,
+module "dynamo_tab_kinesis_reader" {
+  source              = "./modules/dynamo_tables"
+  create_table        = true
+  autoscaling_enabled = false
+  name                = "${local.project}-kinesis-reader-${local.environment}"
 
-# Kinesis cdc domain Stream (DPR-116)
-module "kinesis_cdc_domain_stream" {
-  source                     = "./modules/kinesis_firehose"
-  name                       = "${local.project}-cdc-domain-stream-${local.env}"
-  kinesis_source_stream_arn  = module.kinesis_stream_domain_data.kinesis_stream_arn  # KDS Domain Platform
-  kinesis_source_stream_name = module.kinesis_stream_domain_data.kinesis_stream_name # KDS Domain Platform
-  target_s3_id               = module.s3_domain_cdc_sqs.bucket_id
-  target_s3_arn              = module.s3_domain_cdc_sqs.bucket_arn
-  target_s3_kms              = local.s3_kms_arn
-  target_s3_prefix           = "cdc/year=!{timestamp:yyyy}/month=!{timestamp:MM}/day=!{timestamp:dd}/hour=!{timestamp:HH}/"
-  target_s3_error_prefix     = "cdc-error/type=!{firehose:error-output-type}/"
-  aws_account_id             = local.account_id
-  aws_region                 = local.account_region
-  cloudwatch_log_group_name  = "/aws/kinesisfirehose/cdc-domain-stream"
-  cloudwatch_log_stream_name = "CdcDomainStream"
-  cloudwatch_logging_enabled = true
+  hash_key    = "leaseKey" # Hash
+  range_key   = ""         # Sort
+  table_class = "STANDARD"
+  ttl_enabled = false
+
+  attributes = [
+    {
+      name = "leaseKey"
+      type = "S"
+    }
+  ]
+  
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-kinesis-reader-${local.environment}"
+      Resource_Type = "Dynamo Table"
+    }
+  )
 }
 
 ##########################

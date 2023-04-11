@@ -44,5 +44,34 @@ locals {
         listeners                = {}
       }
     }
+
+    baseline_ec2_autoscaling_groups = {
+      prod-oasys-training = {
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name = "oasys_webserver_release_*"
+        })
+        instance                 = module.baseline_presets.ec2_instance.instance.default
+        user_data_cloud_init     = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
+        ebs_volume_config        = null
+        ebs_volumes              = null
+        autoscaling_group        = module.baseline_presets.ec2_autoscaling_group
+        autoscaling_schedules    = module.baseline_presets.ec2_autoscaling_schedules.working_hours
+        ssm_parameters           = null
+        lb_target_groups         = {}
+        cloudwatch_metric_alarms = {}
+        tags = {
+          component         = "web"
+          os-type           = "Linux"
+          os-major-version  = 7
+          os-version        = "RHEL 7.9"
+          "Patch Group"     = "RHEL"
+          server-type       = "oasys-web-training"
+          description       = "${local.environment} OASys web training"
+          monitored         = true
+          oasys-environment = local.environment
+          environment-name  = terraform.workspace
+        }
+      }
+    }
   }
 }

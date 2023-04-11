@@ -160,8 +160,6 @@ locals {
           instance = "oracle_ohasd"
         }
       }
-    }
-    cloudwatch_metric_alarms_fixngo_connection = {
       fixngo-connection = {
         comparison_operator = "GreaterThanOrEqualToThreshold"
         evaluation_periods  = "3"
@@ -176,12 +174,34 @@ locals {
         }
       }
     }
+    cloudwatch_metric_alarms_lists = {
+      database = {
+        parent_keys = [
+          "ec2_default",
+          "ec2_linux_default",
+          "ec2_linux_with_collectd_default"
+        ]
+        alarms_list = [
+          { key = "database", name = "oracle-db-disconnected" },
+          { key = "database", name = "oracle-batch-failure" },
+          { key = "database", name = "oracle-long-running-batch" },
+          { key = "database", name = "oracleasm-service" },
+          { key = "database", name = "oracle-ohasd-service" },
+        ]
+      }
+      fixngo_connection = {
+        parent_keys = []
+        alarms_list = [
+          { key = "database", name = "fixngo-connection" },
+        ]
+      }
+    }
   }
 }
 
 module "db_ec2_instance" {
   #checkov:skip=CKV_AWS_79:Oracle cannot accommodate a token
-  source = "../../modules/ec2_instance"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v1.0.1"
 
   providers = {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
@@ -214,11 +234,8 @@ module "db_ec2_instance" {
   subnet_id          = module.environment.subnet["data"][local.availability_zone_1].id
   tags               = merge(local.tags, local.database.tags, try(each.value.tags, {}))
   account_ids_lookup = local.environment_management.account_ids
-  cloudwatch_metric_alarms = merge(
-    module.baseline_presets.cloudwatch_metric_alarms[lookup(each.value, "sns_topic", "nomis_nonprod_alarms")].ec2,
-    module.baseline_presets.cloudwatch_metric_alarms[lookup(each.value, "sns_topic", "nomis_nonprod_alarms")].ec2_cwagent_linux,
-    module.baseline_presets.cloudwatch_metric_alarms[lookup(each.value, "sns_topic", "nomis_nonprod_alarms")].ec2_cwagent_collectd,
-    module.baseline_presets.cloudwatch_metric_alarms[lookup(each.value, "sns_topic", "nomis_nonprod_alarms")].database,
+
+  cloudwatch_metric_alarms = merge(module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso"].database,
     lookup(each.value, "cloudwatch_metric_alarms", {})
   )
 }

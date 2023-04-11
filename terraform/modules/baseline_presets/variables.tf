@@ -10,25 +10,32 @@ variable "options" {
   description = "Map of options controlling what resources to return"
   type = object({
     cloudwatch_log_groups = optional(list(string))
-    cloudwatch_metric_alarms = optional(map(object({
-      application_alarms = optional(map(map(object({
-        comparison_operator = string
-        evaluation_periods  = number
-        metric_name         = string
-        namespace           = string
-        period              = number
-        statistic           = string
-        threshold           = number
-        actions_enabled     = optional(bool, false)
-        alarm_description   = optional(string)
-        datapoints_to_alarm = optional(number)
-        treat_missing_data  = optional(string, "missing")
-        dimensions          = optional(map(string), {})
-      }))), {})
-      alarm_actions     = optional(list(string))
-      alarms_to_include = optional(list(string)) # null = all
-      alarms_to_exclude = optional(list(string), [])
+    cloudwatch_metric_alarms = optional(map(map(object({
+      comparison_operator = string
+      evaluation_periods  = number
+      metric_name         = string
+      namespace           = string
+      period              = number
+      statistic           = string
+      threshold           = number
+      actions_enabled     = optional(bool, false)
+      alarm_description   = optional(string)
+      datapoints_to_alarm = optional(number)
+      treat_missing_data  = optional(string, "missing")
+      dimensions          = optional(map(string), {})
+    }))), {})
+    cloudwatch_metric_alarms_lists = optional(map(object({
+      parent_keys = optional(list(string), [])
+      alarms_list = list(object({
+        key  = string
+        name = string
+      }))
     })), {})
+    cloudwatch_metric_alarms_lists_with_actions = optional(map(list(string)), {})
+    baseline_acm_certificates_alarm_configuration = optional(object({
+      alarms_list_key = optional(string, "acm_default")
+      actions_key     = string
+    }))
     enable_application_environment_wildcard_cert = optional(bool, false)
     enable_business_unit_kms_cmks                = optional(bool, false)
     enable_image_builder                         = optional(bool, false)
