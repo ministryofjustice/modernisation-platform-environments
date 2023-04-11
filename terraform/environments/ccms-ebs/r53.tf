@@ -98,8 +98,10 @@ resource "aws_route53_record" "ebswgate" {
 
 ## EBSACCESSGATE
 resource "aws_route53_record" "ebsagate" {
+  
   provider = aws.core-vpc
-  count    = local.application_data.accounts[local.environment].accessgate_no_instances
+  count    = (local.environment == "preproduction" || local.environment == "production") ? 1 : local.application_data.accounts[local.environment].accessgate_no_instances
+  #count    = local.application_data.accounts[local.environment].accessgate_no_instances
 
   zone_id = data.aws_route53_zone.external.zone_id
   name    = "agate${local.application_data.accounts[local.environment].short_env}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"

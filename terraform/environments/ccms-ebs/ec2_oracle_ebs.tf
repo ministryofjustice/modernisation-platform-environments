@@ -2,7 +2,7 @@
 resource "aws_instance" "ec2_oracle_ebs" {
   instance_type = local.application_data.accounts[local.environment].ec2_oracle_instance_type_ebsdb
   #ami                         = data.aws_ami.oracle_db.id
-  ami                         = local.environment == "development" ? local.application_data.accounts[local.environment].restored_db_image : local.application_data.accounts[local.environment].key_name
+  ami                         = local.environment == "development" ? local.application_data.accounts[local.environment].restored_db_image : data.aws_ami.oracle_db.id
   key_name                    = local.application_data.accounts[local.environment].key_name
   vpc_security_group_ids      = [aws_security_group.ec2_sg_ebsdb.id]
   subnet_id                   = data.aws_subnet.data_subnets_a.id
