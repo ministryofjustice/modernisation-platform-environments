@@ -335,3 +335,36 @@ resource "aws_security_group_rule" "all_internal_egress_traffic" {
     data.aws_subnet.private_subnets_c.cidr_block
   ]
 }
+
+
+# Security Group for WEBGATE ELB
+resource "aws_security_group" "sg_webgate_lb" {
+  name        = "sg_webgate_lb"
+  description = "Inbound traffic control for WebGate loadbalancer"
+  vpc_id      = data.aws_vpc.shared.id
+
+  tags = merge(local.tags,
+    { Name = lower(format("sg-%s-%s-webgate-loadbalancer", local.application_name, local.environment)) }
+  )
+}
+resource "aws_security_group_rule" "ingress_traffic_webgatelb" {
+  for_each          = local.application_data.lb_sg_ingress_rules
+  security_group_id = aws_security_group.sg_webgate_lb.id
+  type              = "ingress"
+  description       = format("Traffic for %s %d", each.value.protocol, each.value.from_port)
+  protocol          = each.value.protocol
+  from_port         = each.value.from_port
+  to_port           = each.value.to_port
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block, local.application_data.accounts[local.environment].lz_aws_subnet_env, local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_subnet_env, local.application_data.accounts[local.environment].lz_aws_workspace_prod_subnet_env]
+}
+
+resource "aws_security_group_rule" "egress_traffic_webgatelb_cidr" {
+  for_each          = local.application_data.lb_sg_egress_rules
+  security_group_id = aws_security_group.sg_webgate_lb.id
+  type              = "egress"
+  description       = format("Outbound traffic for %s %d", each.value.protocol, each.value.from_port)
+  protocol          = each.value.protocol
+  from_port         = each.value.from_port
+  to_port           = each.value.to_port
+  cidr_blocks       = [each.value.destination_cidr]
+}
