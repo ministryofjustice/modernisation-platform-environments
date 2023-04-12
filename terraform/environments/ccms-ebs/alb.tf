@@ -53,7 +53,7 @@ resource "aws_lb_target_group_attachment" "ebsapps" {
   port             = local.application_data.accounts[local.environment].tg_apps_port
 }
 
-
+/*
 # WEBGATE
 resource "aws_lb" "webgate_lb" {
   name               = lower(format("lb-%s-%s-wgate", local.application_name, local.environment))
@@ -74,7 +74,7 @@ resource "aws_lb" "webgate_lb" {
     { Name = lower(format("lb-%s-%s-wgate", local.application_name, local.environment)) }
   )
 }
-/*
+
 resource "aws_lb_listener" "webgate_listener" {
   depends_on = [
     aws_acm_certificate_validation.external
