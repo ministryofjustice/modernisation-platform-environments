@@ -80,7 +80,6 @@ resource "aws_route53_record" "ebswgate" {
   name    = "portal-ag${local.application_data.accounts[local.environment].short_env}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   #name    = "wgate${local.application_data.accounts[local.environment].short_env}${count.index + 1}.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   type    = "A"
-  ttl     = 300
   alias {
     name                   = aws_lb.webgate_lb.dns_name
     zone_id                = aws_lb.webgate_lb.zone_id
