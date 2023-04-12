@@ -358,6 +358,17 @@ resource "aws_security_group_rule" "ingress_traffic_webgatelb" {
   cidr_blocks       = [data.aws_vpc.shared.cidr_block, local.application_data.accounts[local.environment].lz_aws_subnet_env, local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_subnet_env, local.application_data.accounts[local.environment].lz_aws_workspace_prod_subnet_env]
 }
 
+resource "aws_security_group_rule" "egress_traffic_webgatelb_sg" {
+  for_each                 = local.application_data.lb_sg_egress_rules
+  security_group_id        = aws_security_group.sg_webgate_lb.id
+  type                     = "egress"
+  description              = format("Outbound traffic for %s %d", each.value.protocol, each.value.from_port)
+  protocol                 = each.value.protocol
+  from_port                = each.value.from_port
+  to_port                  = each.value.to_port
+  source_security_group_id = aws_security_group.ec2_sg_webgate.id
+}
+
 resource "aws_security_group_rule" "egress_traffic_webgatelb_cidr" {
   for_each          = local.application_data.lb_sg_egress_rules
   security_group_id = aws_security_group.sg_webgate_lb.id
