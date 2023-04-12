@@ -77,7 +77,7 @@ resource "aws_route53_record" "ebswgate" {
   provider = aws.core-vpc
   zone_id  = data.aws_route53_zone.external.zone_id
 //  count    = local.application_data.accounts[local.environment].webgate_no_instances
-  name    = "portal-ag${local.application_data.accounts[local.environment].short_env}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  name    = "portal-ag.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   #name    = "wgate${local.application_data.accounts[local.environment].short_env}${count.index + 1}.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   type    = "A"
   alias {
