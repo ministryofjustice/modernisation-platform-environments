@@ -74,7 +74,7 @@ resource "aws_lb" "webgate_lb" {
     { Name = lower(format("lb-%s-%s-wgate", local.application_name, local.environment)) }
   )
 }
-
+/*
 resource "aws_lb_listener" "webgate_listener" {
   depends_on = [
     aws_acm_certificate_validation.external
@@ -109,3 +109,4 @@ resource "aws_lb_target_group_attachment" "webgate" {
   target_id        = element(aws_instance.ec2_webgate.*.id, count.index)
   port             = 5401
 }
+*/
