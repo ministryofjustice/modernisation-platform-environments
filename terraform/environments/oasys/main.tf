@@ -58,7 +58,7 @@ module "baseline" {
   key_pairs         = module.baseline_presets.key_pairs
   kms_grants        = module.baseline_presets.kms_grants
   route53_resolvers = module.baseline_presets.route53_resolvers
-  #route53_zones
+  route53_zones     = lookup(local.environment_config, "baseline_route53_zones", {})
   s3_buckets        = merge(local.baseline_s3_buckets, module.baseline_presets.s3_buckets, lookup(local.environment_config, "baseline_s3_buckets", {}))
   # rds_instances
   #sns_topics
