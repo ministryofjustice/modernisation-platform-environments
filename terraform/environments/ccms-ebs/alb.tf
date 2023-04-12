@@ -56,7 +56,7 @@ resource "aws_lb_target_group_attachment" "ebsapps" {
 
 # WEBGATE
 resource "aws_lb" "webgate_lb" {
-  name               = lower(format("lb-%s-%s-webgate", local.application_name, local.environment))
+  name               = lower(format("lb-%s-%s-wgate", local.application_name, local.environment))
   internal           = true
   load_balancer_type = "application"
   security_groups    = [aws_security_group.sg_webgate_lb.id]
@@ -71,7 +71,7 @@ resource "aws_lb" "webgate_lb" {
   # }
 
   tags = merge(local.tags,
-    { Name = lower(format("lb-%s-%s-webgate", local.application_name, local.environment)) }
+    { Name = lower(format("lb-%s-%s-wgate", local.application_name, local.environment)) }
   )
 }
 
@@ -93,7 +93,7 @@ resource "aws_lb_listener" "webgate_listener" {
 }
 
 resource "aws_lb_target_group" "webgate_tg" {
-  name     = lower(format("tg-%s-%s-webgate", local.application_name, local.environment))
+  name     = lower(format("tg-%s-%s-wgate", local.application_name, local.environment))
   port     = 5401
   protocol = "HTTP"
   vpc_id   = data.aws_vpc.shared.id
