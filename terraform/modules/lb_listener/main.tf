@@ -1,52 +1,3 @@
-resource "aws_lb_target_group" "this" {
-  for_each = var.target_groups
-
-  name                 = "${var.name}-${each.key}"
-  port                 = each.value.port
-  protocol             = each.value.protocol
-  target_type          = each.value.target_type
-  deregistration_delay = each.value.deregistration_delay
-  vpc_id               = data.aws_vpc.this.id
-
-  dynamic "health_check" {
-    for_each = each.value.health_check != null ? [each.value.health_check] : []
-    content {
-      enabled             = health_check.value.enabled
-      interval            = health_check.value.interval
-      healthy_threshold   = health_check.value.healthy_threshold
-      matcher             = health_check.value.matcher
-      path                = health_check.value.path
-      port                = health_check.value.port
-      timeout             = health_check.value.timeout
-      unhealthy_threshold = health_check.value.unhealthy_threshold
-    }
-  }
-  dynamic "stickiness" {
-    for_each = each.value.stickiness != null ? [each.value.stickiness] : []
-    content {
-      enabled         = stickiness.value.enabled
-      type            = stickiness.value.type
-      cookie_duration = stickiness.value.cookie_duration
-      cookie_name     = stickiness.value.cookie_name
-    }
-  }
-
-  tags = merge(var.tags, {
-    Name = "${var.name}-${each.key}"
-  })
-}
-
-resource "aws_lb_target_group_attachment" "this" {
-  for_each = {
-    for item in local.target_group_attachments : "${item.name}-${item.attachment.target_id}" => item
-  }
-
-  target_group_arn  = aws_lb_target_group.this[each.value.name].arn
-  target_id         = each.value.attachment.target_id
-  port              = each.value.attachment.port
-  availability_zone = each.value.attachment.availability_zone
-}
-
 resource "aws_lb_listener" "this" {
   load_balancer_arn = local.aws_lb.arn
   port              = var.port
@@ -104,10 +55,6 @@ resource "aws_lb_listener" "this" {
   tags = merge(var.tags, {
     Name = var.name
   })
-
-  depends_on = [
-    aws_lb_target_group.this
-  ]
 }
 
 resource "aws_lb_listener_rule" "this" {
@@ -187,10 +134,6 @@ resource "aws_lb_listener_rule" "this" {
   tags = merge(var.tags, {
     Name = "${var.name}-${each.key}"
   })
-
-  depends_on = [
-    aws_lb_target_group.this
-  ]
 }
 
 resource "aws_lb_listener_certificate" "this" {
