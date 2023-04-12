@@ -41,7 +41,8 @@
       "ebsapps_default_iops": 3000,
       "ebsapps_exhome_size": 60,
       "ebsapps_u01_size": 10,
-      "ebsapps_u03_size": 50
+      "ebsapps_u03_size": 50,
+      "tg_apps_port": 8000
     },
     "test": {
       "short_env": "tst",
@@ -83,7 +84,8 @@
       "ebsapps_default_iops": 3000,
       "ebsapps_exhome_size": 60,
       "ebsapps_u01_size": 10,
-      "ebsapps_u03_size": 50
+      "ebsapps_u03_size": 50,
+      "tg_apps_port": 8001
     },
     "preproduction": {
       "short_env": "prep",
@@ -125,7 +127,8 @@
       "ebsapps_default_iops": 3000,
       "ebsapps_exhome_size": 60,
       "ebsapps_u01_size": 10,
-      "ebsapps_u03_size": 50
+      "ebsapps_u03_size": 50,
+      "tg_apps_port": 8000
     },
     "production": {
       "short_env": "prod",
@@ -167,7 +170,8 @@
       "ebsapps_default_iops": 3000,
       "ebsapps_exhome_size": 60,
       "ebsapps_u01_size": 10,
-      "ebsapps_u03_size": 50
+      "ebsapps_u03_size": 50,
+      "tg_apps_port": 8000
     }
   },
   "ec2_sg_base_ingress_rules": {
@@ -457,7 +461,7 @@
     }
   },
   "lb_sg_ingress_rules": {
-    "UDP_ALL": {
+    "TCP_443": {
       "from_port": 443,
       "to_port": 443,
       "protocol": "TCP"
