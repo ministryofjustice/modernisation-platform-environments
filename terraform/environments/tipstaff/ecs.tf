@@ -197,6 +197,7 @@ resource "aws_iam_role_policy" "app_task" {
        "Effect": "Allow",
         "Action": [
           "ecr:GetAuthorizationToken",
+          "ecr:CreateRepository",
           "ecr:BatchCheckLayerAvailability",
           "ecr:GetDownloadUrlForLayer",
           "ecr:GetRepositoryPolicy",
