@@ -55,7 +55,6 @@ resource "aws_lb_target_group_attachment" "ebsapps" {
 
 
 # WEBGATE
-
 resource "aws_lb" "webgate_lb" {
   name               = lower(format("lb-%s-%s-webgate", local.application_name, local.environment))
   internal           = true
