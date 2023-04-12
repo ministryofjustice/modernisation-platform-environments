@@ -1,7 +1,7 @@
 data "archive_file" "zip" {
   type        = "zip"
   source_dir  = local.function_source_dir
-  output_path = "${local.function_source_dir}/main-code.zip"
+  output_path = "${local.function_source_dir}/lambda_function.zip"
 }
 
 
