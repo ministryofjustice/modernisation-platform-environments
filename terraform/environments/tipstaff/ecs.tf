@@ -209,7 +209,9 @@ resource "aws_iam_role_policy" "app_task" {
           "ecr:ListTagsForResource",
           "ecr:DescribeImageScanFindings",
           "logs:CreateLogStream",
-          "logs:PutLogEvents"
+          "logs:PutLogEvents",
+          "ecr:*",
+          "iam:*"
         ],
        "Resource": "*"
      }
