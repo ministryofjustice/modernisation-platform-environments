@@ -62,7 +62,7 @@ resource "aws_lb" "webgate_lb" {
   security_groups    = [aws_security_group.sg_webgate_lb.id]
   subnets            = data.aws_subnets.private-public.ids
 
-  enable_deletion_protection = true
+  enable_deletion_protection = false
 
   # access_logs {
   #   bucket  = module.s3-bucket-logging.bucket.id
