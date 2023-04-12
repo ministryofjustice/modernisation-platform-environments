@@ -181,42 +181,61 @@ locals {
         security_groups          = [aws_security_group.public.id]
 
         listeners = {
-          t1-nomis-web-http-7001 = merge(
-            local.lb_weblogic.http-7001, {
-              replace = {
-                target_group_name_replace     = "t1-nomis-web"
-                condition_host_header_replace = "t1-nomis-web"
+          https = merge(
+            local.lb_weblogic.https, {
+              rules = {
+                t1-nomis-web-http-7777 = {
+                  priority = 200
+                  actions = [{
+                    type              = "forward"
+                    target_group_name = "t1-nomis-web-http-7777"
+                  }]
+                  conditions = [{
+                    host_header = {
+                      values = [
+                        "t1-nomis-web.nomis.${module.environment.domains.public.business_unit_environment}",
+                        "t1-nomis-web.test.nomis.az.justice.gov.uk",
+                        "c-t1.test.nomis.az.justice.gov.uk",
+                      ]
+                    }
+                  }]
+                }
+                t1-nomis-web-a-http-7777 = {
+                  priority = 300
+                  actions = [{
+                    type              = "forward"
+                    target_group_name = "t1-nomis-web-a-http-7777"
+                  }]
+                  conditions = [{
+                    host_header = {
+                      values = [
+                        "t1-nomis-web-a.nomis.${module.environment.domains.public.business_unit_environment}",
+                        "t1-nomis-web-a.test.nomis.az.justice.gov.uk",
+                      ]
+                    }
+                  }]
+                }
               }
-          })
-          t1-nomis-web-http-7777 = merge(
-            local.lb_weblogic.http-7777, {
-              replace = {
-                target_group_name_replace     = "t1-nomis-web"
-                condition_host_header_replace = "t1-nomis-web"
-              }
-            }
-          )
-          t1-nomis-web-https = merge(
-            local.lb_weblogic.https,
-            local.lb_weblogic.route53, {
-              replace = {
-                target_group_name_replace     = "t1-nomis-web"
-                condition_host_header_replace = "t1-nomis-web"
-                route53_record_name_replace   = "t1-nomis-web"
-              }
-              alarm_target_group_names = ["t1-nomis-web-http-7777", "t1-nomis-web-http-7001"]
           })
         }
-
-        # public LB not needed right now
-        # public = {
-        #   internal_lb              = false
-        #   enable_delete_protection = false
-        #   force_destroy_bucket     = true
-        #   idle_timeout             = 3600
-        #   public_subnets           = module.environment.subnets["public"].ids
-        #   security_groups          = [aws_security_group.public.id]
-        # }
+      }
+    }
+    baseline_route53_zones = {
+      "${module.environment.domains.public.business_unit_environment}" = {
+        lb_alias_records = [
+          { name = "t1-nomis-web.nomis", type = "A", lbs_map_key = "private" },
+          { name = "t1-nomis-web-a.nomis", type = "A", lbs_map_key = "private" },
+        ]
+      }
+      "test.nomis.az.justice.gov.uk" = {
+        records = [
+          { name = "cnomt1", type = "A", ttl = "300", records = ["10.101.3.132"] },
+        ]
+        lb_alias_records = [
+          { name = "t1-nomis-web", type = "A", lbs_map_key = "private" },
+          { name = "t1-nomis-web-a", type = "A", lbs_map_key = "private" },
+          { name = "c-t1", type = "A", lbs_map_key = "private" },
+        ]
       }
     }
   }

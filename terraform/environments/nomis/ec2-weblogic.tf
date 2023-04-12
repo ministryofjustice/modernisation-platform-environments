@@ -47,45 +47,6 @@ locals {
   }
 
   lb_weblogic = {
-    route53 = {
-      route53_records = {
-        "$(name).nomis" = {
-          zone_name = module.environment.domains.public.business_unit_environment
-        }
-        "$(name)" = {
-          zone_name = "${local.environment}.nomis.az.justice.gov.uk"
-        }
-      }
-    }
-
-    http = {
-      port     = 80
-      protocol = "HTTP"
-      default_action = {
-        type = "redirect"
-        redirect = {
-          status_code = "HTTP_301"
-          port        = 443
-          protocol    = "HTTPS"
-        }
-      }
-    }
-    http-7001 = {
-      port     = 7001
-      protocol = "HTTP"
-      default_action = {
-        type              = "forward"
-        target_group_name = "$(name)-http-7001"
-      }
-    }
-    http-7777 = {
-      port     = 7777
-      protocol = "HTTP"
-      default_action = {
-        type              = "forward"
-        target_group_name = "$(name)-http-7777"
-      }
-    }
     https = {
       port                      = 443
       protocol                  = "HTTPS"
@@ -98,23 +59,6 @@ locals {
           content_type = "text/plain"
           message_body = "Not implemented"
           status_code  = "501"
-        }
-      }
-      rules = {
-        forward-http-7777 = {
-          priority = 200
-          actions = [{
-            type              = "forward"
-            target_group_name = "$(name)-http-7777"
-          }]
-          conditions = [{
-            host_header = {
-              values = [
-                "$(name).nomis.${module.environment.domains.public.business_unit_environment}",
-                "$(name).${local.environment}.nomis.az.justice.gov.uk"
-              ]
-            }
-          }]
         }
       }
     }
@@ -178,6 +122,10 @@ locals {
       #   reuse_on_scale_in           = true
       #   max_group_prepared_capacity = 1
       # }
+    }
+
+    lb_target_groups = {
+      http-7777 = local.lb_target_group_http_7777
     }
 
     tags = {
