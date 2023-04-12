@@ -520,10 +520,6 @@ variable "lbs" {
           }))
         }))
       })), {})
-      route53_records = optional(map(object({
-        zone_name              = string
-        evaluate_target_health = optional(bool, false)
-      })), {})
       cloudwatch_metric_alarms = optional(map(object({
         comparison_operator = string
         evaluation_periods  = number
@@ -539,14 +535,6 @@ variable "lbs" {
         treat_missing_data  = optional(string, "missing")
         dimensions          = optional(map(string), {})
       })), {})
-      replace = optional(object({
-        target_group_name_match       = optional(string, "$(name)")
-        target_group_name_replace     = optional(string, "")
-        condition_host_header_match   = optional(string, "$(name)")
-        condition_host_header_replace = optional(string, "")
-        route53_record_name_match     = optional(string, "$(name)")
-        route53_record_name_replace   = optional(string, "")
-      }), {})
       tags = optional(map(string), {})
     })), {})
   }))
