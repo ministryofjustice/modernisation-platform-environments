@@ -193,8 +193,9 @@ locals {
                   conditions = [{
                     host_header = {
                       values = [
-                        "t1-nomis-web.${module.environment.domains.public.application_environment}",
+                        "t1-nomis-web.nomis.${module.environment.domains.public.business_unit_environment}",
                         "t1-nomis-web.test.nomis.az.justice.gov.uk",
+                        "c-t1.test.nomis.az.justice.gov.uk",
                       ]
                     }
                   }]
@@ -208,7 +209,7 @@ locals {
                   conditions = [{
                     host_header = {
                       values = [
-                        "t1-nomis-web-a.${module.environment.domains.public.application_environment}",
+                        "t1-nomis-web-a.nomis.${module.environment.domains.public.business_unit_environment}",
                         "t1-nomis-web-a.test.nomis.az.justice.gov.uk",
                       ]
                     }
@@ -218,31 +219,22 @@ locals {
           })
         }
       }
-
-      # public LB not needed right now
-      # public = {
-      #   internal_lb              = false
-      #   enable_delete_protection = false
-      #   force_destroy_bucket     = true
-      #   idle_timeout             = 3600
-      #   public_subnets           = module.environment.subnets["public"].ids
-      #   security_groups          = [aws_security_group.public.id]
-      # }
     }
     baseline_route53_zones = {
       "${module.environment.domains.public.business_unit_environment}" = {
         lb_alias_records = [
           { name = "t1-nomis-web.nomis", type = "A", lbs_map_key = "private" },
-          { name = "t1-nomis-web-a.nomis", type = "A", lbs_map_key = "private" }
+          { name = "t1-nomis-web-a.nomis", type = "A", lbs_map_key = "private" },
         ]
       }
       "test.nomis.az.justice.gov.uk" = {
         records = [
-          { name = "cnomt1", type = "A", ttl = "300", records = ["10.101.3.132"] }
+          { name = "cnomt1", type = "A", ttl = "300", records = ["10.101.3.132"] },
         ]
         lb_alias_records = [
           { name = "t1-nomis-web", type = "A", lbs_map_key = "private" },
-          { name = "t1-nomis-web-a", type = "A", lbs_map_key = "private" }
+          { name = "t1-nomis-web-a", type = "A", lbs_map_key = "private" },
+          { name = "c-t1", type = "A", lbs_map_key = "private" },
         ]
       }
     }
