@@ -461,7 +461,7 @@
     }
   },
   "lb_sg_ingress_rules": {
-    "UDP_ALL": {
+    "TCP_443": {
       "from_port": 443,
       "to_port": 443,
       "protocol": "TCP"
