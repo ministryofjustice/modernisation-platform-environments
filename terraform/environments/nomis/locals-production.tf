@@ -186,8 +186,8 @@ locals {
     baseline_route53_zones = {
       "${module.environment.domains.public.business_unit_environment}" = {
         lb_alias_records = [
-          { name = "prod-nomis-web", type = "A", lbs_map_key = "private" },
-          { name = "prod-nomis-web-a", type = "A", lbs_map_key = "private" }
+          { name = "prod-nomis-web.nomis", type = "A", lbs_map_key = "private" },
+          { name = "prod-nomis-web-a.nomis", type = "A", lbs_map_key = "private" }
         ]
       }
       "production.nomis.az.justice.gov.uk" = {
