@@ -42,7 +42,7 @@ jobs:
       matrix:
         include:
           - environment: development
-          - environment: test
+          # - environment: test
     name: Plan - ${{  matrix.environment }}
     runs-on: ubuntu-latest
     if: github.ref != 'refs/heads/main' || github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'deploy'
@@ -80,7 +80,7 @@ jobs:
       matrix:
         include:
           - environment: development
-          - environment: test
+          # - environment: test
     name: Apply - ${{  matrix.environment }}
     runs-on: ubuntu-latest
     env:
@@ -116,7 +116,7 @@ jobs:
       matrix:
         include:
           - environment: development
-          - environment: test
+          # - environment: test
     name: Terraform destroy plan - ${{ github.workflow }} - ${{  matrix.environment }}
     runs-on: ubuntu-latest
     if: github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'destroy'
@@ -153,7 +153,7 @@ jobs:
       matrix:
         include:
           - environment: development
-          - environment: test
+          # - environment: test
     name: Terraform destroy apply - ${{ github.workflow }} - ${{  matrix.environment }}
     runs-on: ubuntu-latest
     env:
@@ -189,7 +189,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - environment: preproduction
+          # - environment: preproduction
           - environment: production
     name: Plan - ${{  matrix.environment }}
     runs-on: ubuntu-latest
@@ -226,7 +226,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - environment: preproduction
+          # - environment: preproduction
           - environment: production
     name: Apply - ${{  matrix.environment }}
     runs-on: ubuntu-latest
