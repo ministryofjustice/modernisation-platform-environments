@@ -53,8 +53,36 @@ locals {
                 status_code  = "501"
               }
             }
+            rules = {
+              forward-http-8080 = {
+                priority = 100
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "prod-oasys-training-http-8080"
+                }]
+                conditions = [
+                  {
+                    host_header = {
+                      values = ["training.oasys.${module.environment.vpc_name}.modernisation-platform.service.justice.gov.uk"]
+                    }
+                  },
+                  {
+                    path_pattern = {
+                      values = ["/"]
+                    }
+                }]
+              }
+            }
           }
         }
+      }
+    }
+
+    baseline_route53_zones = {
+      "${module.environment.domains.public.business_unit_environment}" = {
+        lb_alias_records = [
+          { name = "training.oasys", type = "A", lbs_map_key = "prod-oasys-internal" },
+        ]
       }
     }
 

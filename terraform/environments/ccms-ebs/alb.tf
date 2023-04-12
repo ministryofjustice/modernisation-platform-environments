@@ -37,11 +37,11 @@ resource "aws_lb_listener" "ebsapps_listener" {
 
 resource "aws_lb_target_group" "ebsapp_tg" {
   name     = lower(format("tg-%s-%s-ebsapp", local.application_name, local.environment))
-  port     = 8001
+  port     = local.application_data.accounts[local.environment].tg_apps_port
   protocol = "HTTP"
   vpc_id   = data.aws_vpc.shared.id
   health_check {
-    port     = 8001
+    port     = local.application_data.accounts[local.environment].tg_apps_port
     protocol = "HTTP"
   }
 }
@@ -50,12 +50,11 @@ resource "aws_lb_target_group_attachment" "ebsapps" {
   count            = local.application_data.accounts[local.environment].accessgate_no_instances
   target_group_arn = aws_lb_target_group.ebsapp_tg.arn
   target_id        = element(aws_instance.ec2_ebsapps.*.id, count.index)
-  port             = 8001
+  port             = local.application_data.accounts[local.environment].tg_apps_port
 }
 
 
 # WEBGATE
-
 resource "aws_lb" "webgate_lb" {
   name               = lower(format("lb-%s-%s-webgate", local.application_name, local.environment))
   internal           = true

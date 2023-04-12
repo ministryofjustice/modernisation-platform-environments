@@ -45,10 +45,6 @@ module "lb_listener" {
 
   source = "../../modules/lb_listener"
 
-  providers = {
-    aws.core-vpc = aws.core-vpc
-  }
-
   name                      = each.key
   business_unit             = var.environment.business_unit
   environment               = var.environment.environment
@@ -62,13 +58,6 @@ module "lb_listener" {
   default_action            = each.value.default_action
   rules                     = each.value.rules
 
-  route53_records = {
-    for key, value in each.value.route53_records : key => merge(value, {
-      account = local.route53_zones[value.zone_name].provider
-      zone_id = local.route53_zones[value.zone_name].zone_id
-    })
-  }
-
   cloudwatch_metric_alarms = {
     for key, value in each.value.cloudwatch_metric_alarms : key => merge(value, {
       alarm_actions = [
@@ -77,8 +66,7 @@ module "lb_listener" {
     })
   }
 
-  replace = each.value.replace
-  tags    = merge(local.tags, each.value.tags)
+  tags = merge(local.tags, each.value.tags)
 
   depends_on = [
     module.acm_certificate,       # ensure certs are created first
