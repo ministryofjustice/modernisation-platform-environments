@@ -58,12 +58,12 @@ locals {
                 priority = 100
                 actions = [{
                   type              = "forward"
-                  target_group_name = "http-8080"
+                  target_group_name = "prod-oasys-training-http-8080"
                 }]
                 conditions = [
                   {
                     host_header = {
-                      values = ["web.oasys.${module.environment.vpc_name}.modernisation-platform.service.justice.gov.uk"]
+                      values = ["training.oasys.${module.environment.vpc_name}.modernisation-platform.service.justice.gov.uk"]
                     }
                   },
                   {
@@ -74,14 +74,15 @@ locals {
               }
             }
           }
-          route53_records = {
-            "web.oasys" = {
-              account                = "core-vpc"
-              zone_id                = module.environment.route53_zones[module.environment.domains.public.business_unit_environment].zone_id
-              evaluate_target_health = true
-            }
-          }
         }
+      }
+    }
+
+    baseline_route53_zones = {
+      "${module.environment.domains.public.business_unit_environment}" = {
+        lb_alias_records = [
+          { name = "training.oasys", type = "A", lbs_map_key = "prod-oasys-internal" },
+        ]
       }
     }
 
