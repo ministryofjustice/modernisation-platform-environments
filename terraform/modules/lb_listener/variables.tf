@@ -24,38 +24,6 @@ variable "load_balancer_arn" {
   default     = null
 }
 
-variable "target_groups" {
-  description = "Map of target groups, where key is the name"
-  type = map(object({
-    port                 = optional(number)
-    protocol             = optional(string)
-    target_type          = string
-    deregistration_delay = optional(number)
-    health_check = optional(object({
-      enabled             = optional(bool)
-      interval            = optional(number)
-      healthy_threshold   = optional(number)
-      matcher             = optional(string)
-      path                = optional(string)
-      port                = optional(number)
-      timeout             = optional(number)
-      unhealthy_threshold = optional(number)
-    }))
-    stickiness = optional(object({
-      enabled         = optional(bool)
-      type            = string
-      cookie_duration = optional(number)
-      cookie_name     = optional(string)
-    }))
-    attachments = optional(list(object({
-      target_id         = string
-      port              = optional(number)
-      availability_zone = optional(string)
-    })), [])
-  }))
-  default = {}
-}
-
 variable "existing_target_groups" {
   description = "Map of existing aws_lb_target_groups, if looking up target group by name (map key)"
   default     = {}
@@ -158,29 +126,6 @@ variable "rules" {
       }))
     }))
   }))
-}
-
-variable "route53_records" {
-  description = "Map of route53 records to associate with load balancer, where key is the DNS name"
-  type = map(object({
-    account                = string # account to create the record in.  set to core-vpc or self
-    zone_id                = string # id of zone to create the record in
-    evaluate_target_health = bool
-  }))
-  default = {}
-}
-
-variable "replace" {
-  description = "A bit of a bodge to make definition of rules and default_action reusable.  Does a search/replace on the target_group_name field in rules/default_action contains with target_group_name_match/target_group_name_replace.  Likewise with the condition host header.  Useful when you have multiple environments with same config"
-  type = object({
-    target_group_name_match       = optional(string, "$(name)")
-    target_group_name_replace     = optional(string, "")
-    condition_host_header_match   = optional(string, "$(name)")
-    condition_host_header_replace = optional(string, "")
-    route53_record_name_match     = optional(string, "$(name)")
-    route53_record_name_replace   = optional(string, "")
-  })
-  default = {}
 }
 
 variable "tags" {
