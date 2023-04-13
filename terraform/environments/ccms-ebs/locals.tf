@@ -3,7 +3,8 @@ locals {
   artefact_bucket_name = "${local.application_name}-${local.environment}-artefacts"
   logging_bucket_name  = "${local.application_name}-${local.environment}-logging"
   rsync_bucket_name    = "${local.application_name}-${local.environment}-dbbackup"
-  lb_log_prefix        = "ebsapps-lb"
+  lb_log_prefix_ebsapp = "ebsapps-lb"
+  lb_log_prefix_wgate  = "wgate-lb"
 
   data_subnets = [
     data.aws_subnet.data_subnets_a.id,
