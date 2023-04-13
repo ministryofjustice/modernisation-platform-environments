@@ -68,12 +68,12 @@ resource "aws_s3_bucket_policy" "PPUD" {
         Effect = "Allow"
         Principal = {
           AWS = [
-          "arn:aws:iam::075585660276:role/developer",
-          "arn:aws:iam::075585660276:role/sandbox",
-          "arn:aws:iam::172753231260:role/migration",
-          "arn:aws:iam::172753231260:role/developer",
-          "arn:aws:iam::817985104434:role/migration",
-          "arn:aws:iam::817985104434:role/developer"
+            "arn:aws:iam::075585660276:role/developer",
+            "arn:aws:iam::075585660276:role/sandbox",
+            "arn:aws:iam::172753231260:role/migration",
+            "arn:aws:iam::172753231260:role/developer",
+            "arn:aws:iam::817985104434:role/migration",
+            "arn:aws:iam::817985104434:role/developer"
           ]
         }
         Action = [
@@ -116,8 +116,8 @@ resource "aws_iam_policy" "PPUD_s3_policy" {
 
 
 resource "aws_iam_role" "PPUD_s3_role" {
-  count  = local.is-production == true ? 1 : 0
-  name   = "${local.application_name}-PPUD_s3_role"
+  count = local.is-production == true ? 1 : 0
+  name  = "${local.application_name}-PPUD_s3_role"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -125,12 +125,12 @@ resource "aws_iam_role" "PPUD_s3_role" {
         Effect = "Allow"
         Principal = {
           AWS = [
-          "arn:aws:iam::075585660276:role/developer",
-          "arn:aws:iam::075585660276:role/sandbox",
-          "arn:aws:iam::172753231260:role/migration",
-          "arn:aws:iam::172753231260:role/developer",
-          "arn:aws:iam::817985104434:role/migration",
-          "arn:aws:iam::817985104434:role/developer"
+            "arn:aws:iam::075585660276:role/developer",
+            "arn:aws:iam::075585660276:role/sandbox",
+            "arn:aws:iam::172753231260:role/migration",
+            "arn:aws:iam::172753231260:role/developer",
+            "arn:aws:iam::817985104434:role/migration",
+            "arn:aws:iam::817985104434:role/developer"
           ]
         },
         Action = "sts:AssumeRole"

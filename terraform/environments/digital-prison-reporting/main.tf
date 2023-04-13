@@ -117,16 +117,16 @@ module "glue_cloudplatform_reporting_job" {
   timeout                       = 8
   execution_class               = "STANDARD"
   # Placeholder Script Location
-  script_location               = "s3://${local.project}-artifact-store-${local.environment}/artifacts/domain-platform/digital-prison-reporting-poc/place-holder-vLatest.scala"
+  script_location = "s3://${local.project}-artifact-store-${local.environment}/artifacts/domain-platform/digital-prison-reporting-poc/place-holder-vLatest.scala"
 
   class = "uk.gov.justice.digital.job.DataHubJob"
 
   arguments = {
-    "--extra-jars"          = "s3://${local.project}-artifact-store-${local.environment}/artifacts/cloud-platform/digital-prison-reporting-poc/cloud-platform-vLatest.jar"
-    "--job-bookmark-option" = "job-bookmark-disable"
-    "--enable-metrics"      = true
-    "--enable-spark-ui"     = false
-    "--enable-job-insights" = true
+    "--extra-jars"                          = "s3://${local.project}-artifact-store-${local.environment}/artifacts/cloud-platform/digital-prison-reporting-poc/cloud-platform-vLatest.jar"
+    "--job-bookmark-option"                 = "job-bookmark-disable"
+    "--enable-metrics"                      = true
+    "--enable-spark-ui"                     = false
+    "--enable-job-insights"                 = true
     "--kinesis.reader.streamName"           = "local.kinesis_stream_ingestor"
     "--aws.kinesis.endpointUrl"             = "https://kinesis-${local.account_region}.amazonaws.com"
     "--aws.region"                          = local.account_region
@@ -157,9 +157,9 @@ module "glue_kinesis_reader_job" {
   timeout                       = 2880 # This is in Mins
   execution_class               = "STANDARD"
   # Placeholder Script Location
-  script_location               = "s3://${local.project}-artifact-store-${local.environment}/artifacts/cloud-platform/digital-prison-reporting-jobs/scripts/${local.project}-kinesis-reader-vLatest.scala"
+  script_location = "s3://${local.project}-artifact-store-${local.environment}/artifacts/cloud-platform/digital-prison-reporting-jobs/scripts/${local.project}-kinesis-reader-vLatest.scala"
 
-  class                         = "uk.gov.justice.digital.job.DataHubJob"
+  class = "uk.gov.justice.digital.job.DataHubJob"
 
   tags = merge(
     local.all_tags,
@@ -171,11 +171,11 @@ module "glue_kinesis_reader_job" {
   )
 
   arguments = {
-    "--extra-jars"          = "s3://${local.project}-artifact-store-${local.environment}/artifacts/cloud-platform/digital-prison-reporting-jobs/jars/digital-prison-reporting-jobs-vLatest.jar"
-    "--job-bookmark-option" = "job-bookmark-disable"
-    "--enable-metrics"      = true
-    "--enable-spark-ui"     = false
-    "--enable-job-insights" = true
+    "--extra-jars"                          = "s3://${local.project}-artifact-store-${local.environment}/artifacts/cloud-platform/digital-prison-reporting-jobs/jars/digital-prison-reporting-jobs-vLatest.jar"
+    "--job-bookmark-option"                 = "job-bookmark-disable"
+    "--enable-metrics"                      = true
+    "--enable-spark-ui"                     = false
+    "--enable-job-insights"                 = true
     "--kinesis.reader.streamName"           = "${local.project}-kinesis-reader-${local.env}-stream"
     "--aws.kinesis.endpointUrl"             = "https://kinesis-${local.account_region}.amazonaws.com"
     "--aws.region"                          = local.account_region
@@ -1214,7 +1214,7 @@ module "dynamo_tab_kinesis_reader" {
       type = "S"
     }
   ]
-  
+
   tags = merge(
     local.all_tags,
     {
