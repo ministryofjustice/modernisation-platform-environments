@@ -42,7 +42,7 @@ jobs:
     if: github.ref != 'refs/heads/main' || github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'deploy' # job only runs for pull requests
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
+        uses: actions/checkout@83b7061638ee4956cf7545a6f7efe594e5ad0247 # v3.5.1
       - name: Set Account Number
         run: echo "ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${GITHUB_WORKFLOW}-${TF_ENV}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)" >> $GITHUB_ENV
       - name: configure aws credentials
@@ -74,7 +74,7 @@ jobs:
     if: github.ref != 'refs/heads/main' || github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'deploy'
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
+        uses: actions/checkout@83b7061638ee4956cf7545a6f7efe594e5ad0247 # v3.5.1
       - name: Set Account Number
         run: echo "ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${GITHUB_WORKFLOW}-${TF_ENV}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)" >> $GITHUB_ENV
       - name: configure aws credentials
@@ -111,7 +111,7 @@ jobs:
       TF_ENV: ${{ matrix.environment }}
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
+        uses: actions/checkout@83b7061638ee4956cf7545a6f7efe594e5ad0247 # v3.5.1
       - name: Set Account Number
         run: echo "ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${GITHUB_WORKFLOW}-${TF_ENV}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)" >> $GITHUB_ENV
       - name: configure aws credentials
@@ -149,7 +149,7 @@ jobs:
       name: ${{ github.workflow }}-${{ matrix.environment }}
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
+        uses: actions/checkout@83b7061638ee4956cf7545a6f7efe594e5ad0247 # v3.5.1
       - name: Set Account Number
         run: echo "ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${GITHUB_WORKFLOW}-${TF_ENV}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)" >> $GITHUB_ENV
       - name: configure aws credentials
@@ -177,7 +177,7 @@ jobs:
     if: github.ref == 'refs/heads/main' # job only runs for merges in the main branch
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
+        uses: actions/checkout@83b7061638ee4956cf7545a6f7efe594e5ad0247 # v3.5.1
       - name: Set Account Number
         run: echo "ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${GITHUB_WORKFLOW}-${TF_ENV}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)" >> $GITHUB_ENV
       - name: configure aws credentials
@@ -208,7 +208,7 @@ jobs:
     if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
+        uses: actions/checkout@83b7061638ee4956cf7545a6f7efe594e5ad0247 # v3.5.1
       - name: Set Account Number
         run: echo "ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${GITHUB_WORKFLOW}-${TF_ENV}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)" >> $GITHUB_ENV
       - name: configure aws credentials
@@ -238,7 +238,7 @@ jobs:
     if: github.ref == 'refs/heads/main' # job only runs for merges to the main branch
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
+        uses: actions/checkout@83b7061638ee4956cf7545a6f7efe594e5ad0247 # v3.5.1
       - name: Set Account Number
         run: echo "ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${GITHUB_WORKFLOW}-${TF_ENV}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)" >> $GITHUB_ENV
       - name: configure aws credentials
@@ -271,7 +271,7 @@ jobs:
       name: xhibit-portal-production        # put this in if you want to click-to-deploy with a review button in the Github Actions tab
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
+        uses: actions/checkout@83b7061638ee4956cf7545a6f7efe594e5ad0247 # v3.5.1
       - name: Set Account Number
         run: echo "ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${GITHUB_WORKFLOW}-${TF_ENV}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)" >> $GITHUB_ENV
       - name: configure aws credentials
