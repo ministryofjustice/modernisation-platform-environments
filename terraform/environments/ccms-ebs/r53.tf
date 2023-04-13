@@ -74,6 +74,7 @@ resource "aws_route53_record" "ebsapps" {
 
 ## EBSWEBGATE
 resource "aws_route53_record" "ebswgate" {
+  count    = (local.environment == "development" || local.environment == "test") ? 1 : 0
   provider = aws.core-vpc
   zone_id  = data.aws_route53_zone.external.zone_id
 //  count    = local.application_data.accounts[local.environment].webgate_no_instances
@@ -81,8 +82,8 @@ resource "aws_route53_record" "ebswgate" {
   #name    = "wgate${local.application_data.accounts[local.environment].short_env}${count.index + 1}.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   type    = "A"
   alias {
-    name                   = aws_lb.webgate_lb.dns_name
-    zone_id                = aws_lb.webgate_lb.zone_id
+    name                   = aws_lb.webgate_lb[count.index].dns_name
+    zone_id                = aws_lb.webgate_lb[count.index].zone_id
     evaluate_target_health = false
   }
 }
