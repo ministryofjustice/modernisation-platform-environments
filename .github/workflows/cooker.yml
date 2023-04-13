@@ -52,7 +52,7 @@ jobs:
       post_plan_to_pr: true
     secrets:
       modernisation_platform_environments: "${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}"
-      pipeline_github_token: "${{ secrets.MODERNISATION_PLATFORM_CI_USER_ENVIRONMENTS_REPO_PAT }}"
+      pipeline_github_token: "${{ secrets.DSO_GITHUB_AUTOMATION_PAT }}"
 
   destroy-development:
     if: inputs.action == 'destroy'
