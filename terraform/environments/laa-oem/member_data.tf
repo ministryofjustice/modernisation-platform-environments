@@ -1,5 +1,6 @@
 data "aws_ami" "ec2_laa_oem_development_app" {
   most_recent = true
+  owners      = ["957302878571", "552461967032", "937685963760", "187373622398"]
   filter {
     name   = "state"
     values = ["available"]
@@ -12,6 +13,7 @@ data "aws_ami" "ec2_laa_oem_development_app" {
 
 data "aws_ami" "ec2_laa_oem_development_db" {
   most_recent = true
+  owners      = ["957302878571", "552461967032", "937685963760", "187373622398"]
   filter {
     name   = "state"
     values = ["available"]
