@@ -61,9 +61,6 @@ resource "aws_ecs_service" "tipstaff_ecs_service" {
   ]
 
   name = var.networking[0].application
-  deployment_controller {
-    type = "CODE_DEPLOY"
-  }
   cluster                           = aws_ecs_cluster.tipstaff_cluster.id
   task_definition                   = aws_ecs_task_definition.tipstaff_task_definition.arn
   launch_type                       = "FARGATE"
