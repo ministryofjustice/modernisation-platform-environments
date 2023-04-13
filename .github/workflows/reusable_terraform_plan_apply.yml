@@ -152,7 +152,7 @@ jobs:
           (( exitcode == 1 )) && exit 1 || exit 0
 
       - name: Create Plan PR message (Optional)
-        #if: github.event_name == 'pull_request' && steps.plan.outputs.exitcode == '2' && inputs.post_plan_to_pr == true
+        if: github.event_name == 'pull_request' && steps.plan.outputs.exitcode == '2' && inputs.post_plan_to_pr == true
         working-directory: "terraform/environments/${{ inputs.application }}"
         run: |
           comment() {
@@ -173,7 +173,7 @@ jobs:
           echo 'EOF' >> $GITHUB_ENV
 
       - name: Hide Previous PR comment (Optional)
-        #if: ${{ github.event_name == 'pull_request' }}
+        if: ${{ github.event_name == 'pull_request' }}
         working-directory: "scripts/minimise-comments"
         env:
           COMMENT_BODY_CONTAINS: "**`${{ env.WORKSPACE_NAME }}`**"
@@ -183,7 +183,7 @@ jobs:
           ./minimise-comments
 
       - name: Post Plan to PR (Optional)
-        #if: github.event_name == 'pull_request' && steps.plan.outputs.exitcode == '2' && inputs.post_plan_to_pr == true
+        if: github.event_name == 'pull_request' && steps.plan.outputs.exitcode == '2' && inputs.post_plan_to_pr == true
         env:
           message: "${{ env.TF_PLAN_OUT }}"
         run: |
