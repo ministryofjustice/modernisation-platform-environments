@@ -111,23 +111,6 @@ locals {
 
     # Add weblogic instances here
     weblogic_autoscaling_groups = {
-      t1-nomis-web = {
-        tags = {
-          ami                = "nomis_rhel_6_10_weblogic_appserver_10_3"
-          description        = "T1 nomis weblogic 10.3"
-          oracle-db-hostname = "t1-nomis-db-1"
-          nomis-environment  = "t1"
-          oracle-db-name     = "CNOMT1"
-          server-type        = "nomis-web"
-        }
-        ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-03-15T17-18-22.178Z"
-
-        autoscaling_group = {
-          desired_capacity = 1
-          warm_pool        = null
-        }
-        autoscaling_schedules = {}
-      }
     }
 
     ec2_test_instances = {
@@ -137,21 +120,6 @@ locals {
     ec2_test_autoscaling_groups = {}
 
     ec2_jumpservers = {
-      jumpserver-2022 = {
-        ami_name = "nomis_windows_server_2022_jumpserver_release_*"
-        tags = {
-          server-type       = "jumpserver"
-          description       = "Windows Server 2022 Jumpserver for NOMIS"
-          monitored         = false
-          os-type           = "Windows"
-          component         = "jumpserver"
-          nomis-environment = "dev"
-        }
-        autoscaling_group = {
-          min_size = 0
-          max_size = 1
-        }
-      }
     }
   }
 
@@ -184,22 +152,6 @@ locals {
           https = merge(
             local.lb_weblogic.https, {
               rules = {
-                t1-nomis-web-http-7777 = {
-                  priority = 200
-                  actions = [{
-                    type              = "forward"
-                    target_group_name = "t1-nomis-web-http-7777"
-                  }]
-                  conditions = [{
-                    host_header = {
-                      values = [
-                        "t1-nomis-web.nomis.${module.environment.domains.public.business_unit_environment}",
-                        "t1-nomis-web.test.nomis.az.justice.gov.uk",
-                        "c-t1.test.nomis.az.justice.gov.uk",
-                      ]
-                    }
-                  }]
-                }
                 t1-nomis-web-a-http-7777 = {
                   priority = 300
                   actions = [{
@@ -211,6 +163,9 @@ locals {
                       values = [
                         "t1-nomis-web-a.nomis.${module.environment.domains.public.business_unit_environment}",
                         "t1-nomis-web-a.test.nomis.az.justice.gov.uk",
+                        "t1-nomis-web.nomis.${module.environment.domains.public.business_unit_environment}",
+                        "t1-nomis-web.test.nomis.az.justice.gov.uk",
+                        "c-t1.test.nomis.az.justice.gov.uk",
                       ]
                     }
                   }]
