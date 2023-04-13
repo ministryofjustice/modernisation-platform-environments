@@ -74,7 +74,8 @@ resource "aws_route53_record" "ebsapps" {
 
 ## EBSWEBGATE
 resource "aws_route53_record" "ebswgate" {
-  count    = (local.environment == "development" || local.environment == "test") ? 1 : 0
+  #count    = (local.environment == "development" || local.environment == "test") ? 1 : 0
+  count    = local.is-production ? 0 : 1
   provider = aws.core-vpc
   zone_id  = data.aws_route53_zone.external.zone_id
 //  count    = local.application_data.accounts[local.environment].webgate_no_instances
