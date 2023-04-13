@@ -56,7 +56,7 @@ resource "aws_lb_target_group_attachment" "ebsapps" {
 
 # WEBGATE
 resource "aws_lb" "webgate_lb" {
-  name               = lower(format("lb-%s-%s-webgate", local.application_name, local.environment))
+  name               = lower(format("lb-%s-%s-wgate", local.application_name, local.environment))
   internal           = true
   load_balancer_type = "application"
   security_groups    = [aws_security_group.sg_webgate_lb.id]
@@ -71,10 +71,10 @@ resource "aws_lb" "webgate_lb" {
   # }
 
   tags = merge(local.tags,
-    { Name = lower(format("lb-%s-%s-webgate", local.application_name, local.environment)) }
+    { Name = lower(format("lb-%s-%s-wgate", local.application_name, local.environment)) }
   )
 }
-/*
+
 resource "aws_lb_listener" "webgate_listener" {
   depends_on = [
     aws_acm_certificate_validation.external
@@ -109,4 +109,3 @@ resource "aws_lb_target_group_attachment" "webgate" {
   target_id        = element(aws_instance.ec2_webgate.*.id, count.index)
   port             = 5401
 }
-*/
