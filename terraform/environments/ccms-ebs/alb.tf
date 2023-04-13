@@ -57,15 +57,14 @@ resource "aws_lb_target_group_attachment" "ebsapps" {
 
 # WEBGATE
 resource "aws_lb" "webgate_lb" {
-  #count              = (local.environment == "development" || local.environment == "test") ? 1 : 0
-  count              = local.is-production ? 0 : 1
+  count              = local.is-production ? 1 : 1
   name               = lower(format("lb-%s-%s-wgate", local.application_name, local.environment))
   internal           = true
   load_balancer_type = "application"
   security_groups    = [aws_security_group.sg_webgate_lb.id]
   subnets            = data.aws_subnets.private-public.ids
 
-  enable_deletion_protection = false
+  enable_deletion_protection = true
 
   access_logs {
     bucket  = module.s3-bucket-logging.bucket.id
@@ -79,7 +78,6 @@ resource "aws_lb" "webgate_lb" {
 }
 
 resource "aws_lb_listener" "webgate_listener" {
-  #count    = (local.environment == "development" || local.environment == "test") ? 1 : 0
   count      = local.is-production ? 0 : 1
   depends_on = [
     aws_acm_certificate_validation.external
@@ -98,8 +96,7 @@ resource "aws_lb_listener" "webgate_listener" {
 }
 
 resource "aws_lb_target_group" "webgate_tg" {
-  #count    = (local.environment == "development" || local.environment == "test") ? 1 : 0
-  count    = local.is-production ? 0 : 1
+  count    = local.is-production ? 1 : 1
   name     = lower(format("tg-%s-%s-wgate", local.application_name, local.environment))
   port     = 5401
   protocol = "HTTP"
@@ -111,9 +108,7 @@ resource "aws_lb_target_group" "webgate_tg" {
 }
 
 resource "aws_lb_target_group_attachment" "webgate" {
-  #count            = (local.environment == "development" || local.environment == "test") ? 1 : 0
-  #count            = local.application_data.accounts[local.environment].webgate_no_instances
-  count            = local.is-production ? 0 : local.application_data.accounts[local.environment].webgate_no_instances
+  count            = local.is-production ? 1 : 1 #local.application_data.accounts[local.environment].webgate_no_instances
   target_group_arn = aws_lb_target_group.webgate_tg[count.index].arn
   target_id        = element(aws_instance.ec2_webgate.*.id, count.index)
   port             = 5401
