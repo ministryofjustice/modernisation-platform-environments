@@ -1,6 +1,6 @@
 data "aws_ami" "ec2_laa_oem_development_app" {
-  most_recent = true
-  owners      = ["957302878571", "552461967032", "937685963760", "187373622398"]
+  most_recent      = true
+  executable_users = ["957302878571", "552461967032", "937685963760", "187373622398"]
   filter {
     name   = "state"
     values = ["available"]
@@ -12,8 +12,8 @@ data "aws_ami" "ec2_laa_oem_development_app" {
 }
 
 data "aws_ami" "ec2_laa_oem_development_db" {
-  most_recent = true
-  owners      = ["957302878571", "552461967032", "937685963760", "187373622398"]
+  most_recent      = true
+  executable_users = ["957302878571", "552461967032", "937685963760", "187373622398"]
   filter {
     name   = "state"
     values = ["available"]
@@ -25,8 +25,8 @@ data "aws_ami" "ec2_laa_oem_development_db" {
 }
 
 data "aws_ebs_snapshot" "oem_app_volume_opt_oem_app" {
-  most_recent = true
-  owners      = ["957302878571", "552461967032", "937685963760", "187373622398"]
+  most_recent      = true
+  executable_users = ["957302878571", "552461967032", "937685963760", "187373622398"]
   filter {
     name   = "status"
     values = ["completed"]
@@ -38,8 +38,8 @@ data "aws_ebs_snapshot" "oem_app_volume_opt_oem_app" {
 }
 
 data "aws_ebs_snapshot" "oem_app_volume_opt_oem_inst" {
-  most_recent = true
-  owners      = ["957302878571", "552461967032", "937685963760", "187373622398"]
+  most_recent      = true
+  executable_users = ["957302878571", "552461967032", "937685963760", "187373622398"]
   filter {
     name   = "status"
     values = ["completed"]
@@ -51,8 +51,8 @@ data "aws_ebs_snapshot" "oem_app_volume_opt_oem_inst" {
 }
 
 data "aws_ebs_snapshot" "oem_db_volume_opt_oem_app" {
-  most_recent = true
-  owners      = ["957302878571", "552461967032", "937685963760", "187373622398"]
+  most_recent      = true
+  executable_users = ["957302878571", "552461967032", "937685963760", "187373622398"]
   filter {
     name   = "status"
     values = ["completed"]
@@ -64,8 +64,8 @@ data "aws_ebs_snapshot" "oem_db_volume_opt_oem_app" {
 }
 
 data "aws_ebs_snapshot" "oem_db_volume_opt_oem_inst" {
-  most_recent = true
-  owners      = ["957302878571", "552461967032", "937685963760", "187373622398"]
+  most_recent      = true
+  executable_users = ["957302878571", "552461967032", "937685963760", "187373622398"]
   filter {
     name   = "status"
     values = ["completed"]
@@ -77,8 +77,8 @@ data "aws_ebs_snapshot" "oem_db_volume_opt_oem_inst" {
 }
 
 data "aws_ebs_snapshot" "oem_db_volume_opt_oem_dbf" {
-  most_recent = true
-  owners      = ["957302878571", "552461967032", "937685963760", "187373622398"]
+  most_recent      = true
+  executable_users = ["957302878571", "552461967032", "937685963760", "187373622398"]
   filter {
     name   = "status"
     values = ["completed"]
@@ -90,8 +90,8 @@ data "aws_ebs_snapshot" "oem_db_volume_opt_oem_dbf" {
 }
 
 data "aws_ebs_snapshot" "oem_db_volume_opt_oem_redo" {
-  most_recent = true
-  owners      = ["957302878571", "552461967032", "937685963760", "187373622398"]
+  most_recent      = true
+  executable_users = ["957302878571", "552461967032", "937685963760", "187373622398"]
   filter {
     name   = "status"
     values = ["completed"]
@@ -103,8 +103,8 @@ data "aws_ebs_snapshot" "oem_db_volume_opt_oem_redo" {
 }
 
 data "aws_ebs_snapshot" "oem_db_volume_opt_oem_arch" {
-  most_recent = true
-  owners      = ["957302878571", "552461967032", "937685963760", "187373622398"]
+  most_recent      = true
+  executable_users = ["957302878571", "552461967032", "937685963760", "187373622398"]
   filter {
     name   = "status"
     values = ["completed"]
