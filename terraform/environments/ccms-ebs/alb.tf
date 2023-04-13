@@ -56,6 +56,8 @@ resource "aws_lb_target_group_attachment" "ebsapps" {
 
 # WEBGATE
 resource "aws_lb" "webgate_lb" {
+  count    = (local.environment == "development" || local.environment == "test") ? 1 : 0
+
   name               = lower(format("lb-%s-%s-wgate", local.application_name, local.environment))
   internal           = true
   load_balancer_type = "application"
@@ -76,11 +78,12 @@ resource "aws_lb" "webgate_lb" {
 }
 
 resource "aws_lb_listener" "webgate_listener" {
+  count    = (local.environment == "development" || local.environment == "test") ? 1 : 0
   depends_on = [
     aws_acm_certificate_validation.external
   ]
 
-  load_balancer_arn = aws_lb.webgate_lb.arn
+  load_balancer_arn = aws_lb.webgate_lb[count.index].arn
   port              = "443"
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
@@ -88,11 +91,12 @@ resource "aws_lb_listener" "webgate_listener" {
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.webgate_tg.id
+    target_group_arn = aws_lb_target_group.webgate_tg[count.index].id
   }
 }
 
 resource "aws_lb_target_group" "webgate_tg" {
+  count    = (local.environment == "development" || local.environment == "test") ? 1 : 0
   name     = lower(format("tg-%s-%s-wgate", local.application_name, local.environment))
   port     = 5401
   protocol = "HTTP"
@@ -104,8 +108,9 @@ resource "aws_lb_target_group" "webgate_tg" {
 }
 
 resource "aws_lb_target_group_attachment" "webgate" {
-  count            = local.application_data.accounts[local.environment].webgate_no_instances
-  target_group_arn = aws_lb_target_group.webgate_tg.arn
+  count            = (local.environment == "development" || local.environment == "test") ? 1 : 0
+  #count            = local.application_data.accounts[local.environment].webgate_no_instances
+  target_group_arn = aws_lb_target_group.webgate_tg[count.index].arn
   target_id        = element(aws_instance.ec2_webgate.*.id, count.index)
   port             = 5401
 }
