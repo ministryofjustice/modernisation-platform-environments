@@ -5,7 +5,7 @@ resource "aws_cloudwatch_log_group" "app_logs" {
   tags = local.tags
 }
 
-// log metric filter for error logs in container that contain the word error or exception
+// log metric filter for error logs in container that contain the phrase "Error in Helpdesk"
 resource "aws_cloudwatch_log_metric_filter" "error" {
   name           = "jitbit-application-error"
   pattern        = "Error in Helpdesk"
@@ -28,7 +28,7 @@ resource "aws_cloudwatch_metric_alarm" "jitbit_high_error_volume" {
   evaluation_periods  = "1"
   alarm_actions       = [aws_sns_topic.jitbit_alerting.arn]
   ok_actions          = [aws_sns_topic.jitbit_alerting.arn]
-  threshold           = "5"
+  threshold           = "10"
   treat_missing_data  = "missing"
   comparison_operator = "GreaterThanThreshold"
 }
