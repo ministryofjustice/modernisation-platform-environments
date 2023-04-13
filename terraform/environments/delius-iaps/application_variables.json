@@ -50,7 +50,7 @@
       "db_performance_insights_enabled": "false",
       "db_skip_final_snapshot": "true",
       "ec2_iaps_instance_type": "t3.medium",
-      "ec2_iaps_instance_ami_name": "delius_iaps_server_patch_2023-04-04T13-02-39.833Z",
+      "ec2_iaps_instance_ami_name": "delius_iaps_server_patch_2023-04-13T10-13-38.727Z",
       "cloudwatch_agent_log_group_retention_period": "365",
       "iaps_ndelius_interface_url": "interface.stage.probation.service.justice.gov.uk",
       "iaps_im_interface_url": "preprod-im-data.i2ncloud.com",

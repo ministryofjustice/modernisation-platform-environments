@@ -19,7 +19,8 @@ resource "aws_lb" "ebsapps_lb" {
 }
 
 resource "aws_lb_listener" "ebsapps_listener" {
-  depends_on = [
+  count       = local.is-production ? 0 : 1
+  depends_on  = [
     aws_acm_certificate_validation.external
   ]
 

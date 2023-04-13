@@ -725,3 +725,9 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "resource_explorer" {
+  description = "Enables AWS Resource Explorer"
+  type        = bool
+  default     = false
+}
