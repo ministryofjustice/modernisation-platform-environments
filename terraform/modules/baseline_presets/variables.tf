@@ -43,6 +43,8 @@ variable "options" {
     enable_ec2_self_provision                    = optional(bool, false)
     enable_shared_s3                             = optional(bool, false)
     route53_resolver_rules                       = optional(map(list(string)), {})
+    iam_policies_filter                          = optional(list(string), [])
+    iam_policies_ec2_default                     = optional(list(string), [])
     s3_iam_policies                              = optional(list(string))
     sns_topics_pagerduty_integrations            = optional(map(string), {})
   })
