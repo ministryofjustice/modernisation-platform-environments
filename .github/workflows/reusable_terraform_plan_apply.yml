@@ -152,7 +152,7 @@ jobs:
           (( exitcode == 1 )) && exit 1 || exit 0
 
       - name: Create Plan PR message (Optional)
-        if: github.event_name == 'pull_request' && steps.plan.outputs.exitcode == '1' && inputs.post_plan_to_pr == true
+        if: github.event_name == 'pull_request' && steps.plan.outputs.exitcode == '0' && inputs.post_plan_to_pr == true
         working-directory: "terraform/environments/${{ inputs.application }}"
         run: |
           comment() {
