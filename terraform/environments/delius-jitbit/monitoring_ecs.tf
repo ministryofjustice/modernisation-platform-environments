@@ -37,7 +37,7 @@ resource "aws_cloudwatch_dashboard" "jitbit_ecs_dashboard" {
   dashboard_name = "jitbit-ecs-dashboard"
 
   dashboard_body = <<EOF
-  {
+{
     "widgets": [
         {
             "height": 8,
@@ -78,16 +78,18 @@ resource "aws_cloudwatch_dashboard" "jitbit_ecs_dashboard" {
             "width": 6,
             "height": 6,
             "properties": {
+                "metrics": [
+                    [ "JitbitMetrics", "ErrorCount", { "region": "eu-west-2", "color": "#d62728" } ]
+                ],
                 "view": "timeSeries",
                 "stacked": false,
-                "metrics": [
-                    [ "JitbitMetrics", "ErrorCount" ]
-                ],
                 "region": "eu-west-2",
-                "title": "Jitbit Application Error Count"
+                "title": "Jitbit Application Error Count",
+                "period": 300,
+                "stat": "Average"
             }
         }
     ]
-  }
+}
 EOF
 }
