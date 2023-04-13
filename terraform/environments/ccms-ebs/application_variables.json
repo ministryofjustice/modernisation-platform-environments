@@ -128,7 +128,7 @@
       "ebsapps_exhome_size": 60,
       "ebsapps_u01_size": 10,
       "ebsapps_u03_size": 50,
-      "tg_apps_port": 8000
+      "tg_apps_port": 8001
     },
     "production": {
       "short_env": "prod",
