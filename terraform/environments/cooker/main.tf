@@ -549,7 +549,7 @@ resource "aws_lb" "inner" {
 
   name                       = "inner-${var.networking[0].application}"
   internal                   = true
-  load_balancer_type         = "application"
+  load_balancer_type         = "applications"
   security_groups            = [aws_security_group.inner_lb.id]
   subnets                    = data.aws_subnets.private-public.ids
   enable_deletion_protection = false
