@@ -68,12 +68,12 @@ resource "aws_s3_bucket_policy" "PPUD" {
         Effect = "Allow"
         Principal = {
           AWS = [
-            "arn:aws:iam::075585660276:role/developer",
-            "arn:aws:iam::075585660276:role/sandbox",
-            "arn:aws:iam::172753231260:role/migration",
-            "arn:aws:iam::172753231260:role/developer",
-            "arn:aws:iam::817985104434:role/migration",
-            "arn:aws:iam::817985104434:role/developer"
+          "arn:aws:iam::${local.environment_management.account_ids["ppud-development"]}:role/developer",
+          "arn:aws:iam::${local.environment_management.account_ids["ppud-development"]}:role/sandbox",
+          "arn:aws:iam::${local.environment_management.account_ids["ppud-preproduction"]}:role/developer",
+          "arn:aws:iam::${local.environment_management.account_ids["ppud-preproduction"]}:role/migration",
+          "arn:aws:iam::${local.environment_management.account_ids["ppud-production"]}:role/developer",
+          "arn:aws:iam::${local.environment_management.account_ids["ppud-production"]}:role/migration"
           ]
         }
         Action = [
@@ -84,99 +84,4 @@ resource "aws_s3_bucket_policy" "PPUD" {
       }
     ]
   })
-}
-
-
-#S3 bucket IAM policy
-resource "aws_iam_policy" "PPUD_s3_policy" {
-  count  = local.is-production == true ? 1 : 0
-  name   = "${local.application_name}-PPUD_s3_policy"
-  policy = jsonencode ({
-    Version = "2012-10-17"
-   Statement: [
-     {
-      Effect = "Allow"
-      Action = [
-        "s3:ListBucket",
-        "s3:GetBucketLocation",
-        "s3:GetObjectMetaData",
-        "s3:GetObject",
-        "s3:PutObject",
-        "s3:DeleteObject",
-        "s3:ListMultipartUploadParts",
-        "s3:AbortMultipartUpload"
-      ]
-     Resource = [
-        "${aws_s3_bucket.PPUD[0].arn}/*"
-      ]
-    }
-  ]
-})
-}
-
-
-resource "aws_iam_role" "PPUD_s3_role" {
-  count = local.is-production == true ? 1 : 0
-  name  = "${local.application_name}-PPUD_s3_role"
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Principal = {
-          AWS = [
-            "arn:aws:iam::075585660276:role/developer",
-            "arn:aws:iam::075585660276:role/sandbox",
-            "arn:aws:iam::172753231260:role/migration",
-            "arn:aws:iam::172753231260:role/developer",
-            "arn:aws:iam::817985104434:role/migration",
-            "arn:aws:iam::817985104434:role/developer"
-          ]
-        },
-        Action = "sts:AssumeRole"
-      }
-    ]
-  })
-}
-
-
-/*
-resource "aws_iam_role" "PPUD_s3_role" {
-  count  = local.is-production == true ? 1 : 0
-  name               = "${local.application_name}-PPUD_s3_role"
-  assume_role_policy = data.aws_iam_policy_document.s3-access-policy.json
-  tags = merge(
-    local.tags,
-    {
-      Name = "${local.application_name}-PPUD_s3_role"
-    }
-  )
-}
-
-
-data "aws_iam_policy_document" "s3-access-policy" {
-  version = "2012-10-17"
-  statement {
-    effect = "Allow"
-    actions = [
-      "sts:AssumeRole",
-    ]
-    principals {
-      AWS = [
-      "arn:aws:iam::075585660276:role/developer",
-      "arn:aws:iam::075585660276:role/sandbox",
-      "arn:aws:iam::172753231260:role/migration",
-      "arn:aws:iam::172753231260:role/developer",
-      "arn:aws:iam::817985104434:role/migration",
-      "arn:aws:iam::817985104434:role/developer"
-    ]
-  }
- }
-}
-*/
-
-resource "aws_iam_role_policy_attachment" "PPUD_s3_attachment" {
-  count      = local.is-production == true ? 1 : 0
-  role       = aws_iam_role.PPUD_s3_role[0].name
-  policy_arn = aws_iam_policy.PPUD_s3_policy[0].arn
 }
