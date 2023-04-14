@@ -14,7 +14,7 @@ resource "aws_instance" "oem_db" {
   ebs_optimized               = true
   iam_instance_profile        = aws_iam_instance_profile.iam_instace_profile_oem_base.name
   instance_type               = local.application_data.accounts[local.environment].ec2_oem_instance_type_db
-  key_name                    = local.application_data.accounts[local.environment].key_name
+  key_name                    = aws_key_pair.key_pair_db.id
   monitoring                  = true
   subnet_id                   = data.aws_subnet.data_subnets_a.id
   user_data_replace_on_change = true
