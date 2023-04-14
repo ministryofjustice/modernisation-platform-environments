@@ -120,13 +120,13 @@ locals {
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           vpc_security_group_ids = ["private-jumpserver"]
         })
-        ebs_volumes_copy_all_from_ami = false # ami has unwanted ephemeral devices
-        ebs_volumes = {
-          "/dev/sda1" = {
-            type = "gp3"
-            size = "100"
-          }
-        }
+        # ebs_volumes_copy_all_from_ami = false # ami has unwanted ephemeral devices
+        # ebs_volumes = {
+        #   "/dev/sda1" = {
+        #     type = "gp3"
+        #     size = "100"
+        #   }
+        # }
         user_data_raw = base64encode(templatefile("./templates/jumpserver-user-data.yaml", { S3_BUCKET = module.s3-bucket.bucket.id }))
         autoscaling_group = {
           desired_capacity    = 0
