@@ -31,7 +31,7 @@ locals {
 
     baseline_lbs = {
       prod-oasys-internal = {
-        enable_delete_protection = false
+        enable_delete_protection = false # change to true before we actually use
         force_destroy_bucket     = false
         idle_timeout             = "60"
         internal_lb              = true
