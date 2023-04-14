@@ -1,3 +1,12 @@
+resource "aws_key_pair" "key_pair_app" {
+  key_name = lower(format("oem-ec2-key-app-%s", local.environment))
+  public_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJB1m1MUEKtff5y6RLEAm2f1v9g7TmqAyrk4svTBeqpK"
+
+  tags = merge(tomap({
+    "Name"     = lower(format("ec2-%s-%s-app", local.application_name, local.environment))
+  }), local.tags)
+}
+
 resource "aws_instance" "oem_app" {
   ami                         = data.aws_ami.ec2_laa_oem_development_app.id
   associate_public_ip_address = false
@@ -5,7 +14,7 @@ resource "aws_instance" "oem_app" {
   ebs_optimized               = true
   iam_instance_profile        = aws_iam_instance_profile.iam_instace_profile_oem_base.name
   instance_type               = local.application_data.accounts[local.environment].ec2_oem_instance_type_app
-  key_name                    = local.application_data.accounts[local.environment].key_name
+  key_name                    = aws_key_pair.key_pair_app.id
   monitoring                  = true
   subnet_id                   = data.aws_subnet.data_subnets_a.id
   user_data_replace_on_change = true
