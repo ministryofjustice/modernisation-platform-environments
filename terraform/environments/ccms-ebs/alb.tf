@@ -104,6 +104,8 @@ resource "aws_lb_target_group" "webgate_tg" {
   health_check {
     port     = 5401
     protocol = "HTTP"
+    matcher  = 302
+    timeout  = 10
   }
 }
 
