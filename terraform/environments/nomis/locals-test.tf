@@ -157,7 +157,7 @@ locals {
           nomis-environment  = "t1"
           oracle-db-name     = "CNOMT1"
         })
-        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
+        # autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
       })
     }
 
@@ -170,7 +170,7 @@ locals {
         idle_timeout             = 3600
         public_subnets           = module.environment.subnets["private"].ids
         security_groups = [
-          aws_security_group.public.id, # TODO: remove once weblogic servers refreshed
+          aws_security_group.public.id, # TODO: remove once weblogic servers refreshed
           "private-lb",
         ]
 
