@@ -9,7 +9,7 @@ module "baseline" {
 
   environment = module.environment
 
-  # security_groups          = local.baseline_security_groups
+  security_groups  = merge(local.baseline_security_groups, lookup(local.baseline_environment_config, "baseline_security_groups", {}))
   acm_certificates = merge(module.baseline_presets.acm_certificates, local.baseline_acm_certificates)
   # cloudwatch_log_groups    = module.baseline_presets.cloudwatch_log_groups
   # iam_policies             = module.baseline_presets.iam_policies
