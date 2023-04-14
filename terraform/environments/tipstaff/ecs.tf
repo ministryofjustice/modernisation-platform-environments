@@ -6,6 +6,10 @@ resource "aws_ecs_cluster" "tipstaff_cluster" {
   }
 }
 
+resource "aws_cloudwatch_log_group" "tipstaffFamily_logs" {
+  name = "/ecs/tipstaffFamily"
+}
+
 resource "aws_ecs_task_definition" "tipstaff_task_definition" {
   family                = "tipstaffFamily"
   requires_compatibilities = ["FARGATE"]
@@ -28,6 +32,14 @@ resource "aws_ecs_task_definition" "tipstaff_task_definition" {
           hostPort      = 80
         }
       ]
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          awslogs-group         =  "${aws_cloudwatch_log_group.tipstaffFamily_logs.name}"
+          awslogs-region        = "eu-west-2"
+          awslogs-stream-prefix = "ecs"
+        }
+      }
       environment = [
         {
           name  = "DB_HOST"
