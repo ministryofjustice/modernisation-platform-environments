@@ -10,11 +10,11 @@ locals {
     enable_ec2_self_provision                    = true
     cloudwatch_metric_alarms = {
       weblogic = local.ec2_weblogic_cloudwatch_metric_alarms
-      database = local.database.cloudwatch_metric_alarms
+      database = local.database_cloudwatch_metric_alarms
     }
     cloudwatch_metric_alarms_lists = merge(
       local.ec2_weblogic_cloudwatch_metric_alarms_lists,
-      local.database.cloudwatch_metric_alarms_lists
+      local.database_cloudwatch_metric_alarms_lists
     )
     cloudwatch_metric_alarms_lists_with_actions = {
       dso = [local.dso_sns_topic_arn]
