@@ -31,7 +31,7 @@ locals {
 
     baseline_lbs = {
       prod-oasys-internal = {
-        enable_delete_protection = false
+        enable_delete_protection = false # change to true before we actually use
         force_destroy_bucket     = false
         idle_timeout             = "60"
         internal_lb              = true
@@ -58,12 +58,12 @@ locals {
                 priority = 100
                 actions = [{
                   type              = "forward"
-                  target_group_name = "prod-oasys-training-http-8080"
+                  target_group_name = "prod-oasys-web-trn-http-8080"
                 }]
                 conditions = [
                   {
                     host_header = {
-                      values = ["training.oasys.${module.environment.vpc_name}.modernisation-platform.service.justice.gov.uk"]
+                      values = ["trn.oasys.${module.environment.domains.public.business_unit_environment}"]
                     }
                   },
                   {
@@ -81,13 +81,13 @@ locals {
     baseline_route53_zones = {
       "${module.environment.domains.public.business_unit_environment}" = {
         lb_alias_records = [
-          { name = "training.oasys", type = "A", lbs_map_key = "prod-oasys-internal" },
+          { name = "trn.oasys", type = "A", lbs_map_key = "prod-oasys-internal" },
         ]
       }
     }
 
     baseline_ec2_autoscaling_groups = {
-      prod-oasys-training = {
+      prod-oasys-web-trn = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name = "oasys_webserver_release_*"
         })
