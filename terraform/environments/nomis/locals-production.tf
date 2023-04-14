@@ -154,7 +154,7 @@ locals {
         idle_timeout             = 3600
         public_subnets           = module.environment.subnets["private"].ids
         security_groups = [
-          aws_security_group.public.id, # TODO: remove once weblogic servers refreshed
+          aws_security_group.public.id, # TODO: remove once weblogic servers refreshed
           "private-lb"
         ]
 

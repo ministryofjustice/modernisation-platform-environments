@@ -137,7 +137,7 @@ locals {
       metadata_options_http_tokens = "optional" # the Oracle installer cannot accommodate a token
       monitoring                   = true
       vpc_security_group_ids = [
-        aws_security_group.data.id, # TODO: remove once weblogic servers refreshed
+        aws_security_group.data.id, # TODO: remove once weblogic servers refreshed
         module.baseline.security_groups["data-db"].id,
       ]
     }
