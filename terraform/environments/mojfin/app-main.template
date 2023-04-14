@@ -1,0 +1,292 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Description: mojfinance
+
+Parameters:
+  pAppFQDN:
+    Type: String
+    Description: DNS name
+
+  pAppName:
+    Type: String
+    Description: Application name
+
+  pDeletionProtection:
+    Type: String
+    Default: false
+    Description: Whether to turn on deletion protection
+
+  pEnvManagementCIDR:
+    Type: String
+    Description: Ip Range of the Shared Services VPC - environment specific (prod/non-prod)
+
+  pEnvironment:
+    Type: String
+    Description: Env name
+
+  pKmsKeyId:
+    Type: String
+    Description: KMS key
+
+  pLambdaBucket:
+    Type: String
+    Description: The S3 Bucket which holds the lambda files
+
+  pOBIEEInboundCIDR:
+    Type: String
+    Description: Ip Range of the OBIEE 6DG (environment specific)
+
+  pSnapshotArn:
+    Type: String
+    Default: ""
+    Description: The snapshot the RDS instance will be created from
+
+  pSnsTopicArn:
+    Type: String
+    Description: ARN alert topic
+
+  pStorageSize:
+    Type: String
+    Description: Size of the storage allocated to the RDS instance
+
+  pVPCCidr:
+    Type: String
+    Description: Ip Range of the Environment VPC
+
+  pAutoScalingLimitSize:
+    Type: String
+    Description: The limit of the RDS storage scaling
+
+  pRDSInstanceSize:
+    Type: String
+    Description: The size of the RDS instance. Added so that different envs can have different size accounts.
+
+  pCPVPCCidr:
+    Type: String
+    Description: Ip Range of the Cloud Platform Environment VPC - for connectivity from Analytics Platform.
+  
+  pMPVPCCIDR:
+    Type: String
+    Description: Mod Platform VPC cidr range 
+
+
+Resources:
+  MOJFinanceDbSubnetGroup:
+    Type: "AWS::RDS::DBSubnetGroup"
+    Properties:
+      DBSubnetGroupDescription: All subnets for VPC
+      SubnetIds:
+        - "Fn::ImportValue": env-DBPrivateSubnetA
+        - "Fn::ImportValue": env-DBPrivateSubnetB
+        - "Fn::ImportValue": env-DBPrivateSubnetC
+      Tags:
+        - Key: Keep
+          Value: "true"
+
+  DBParameterGroup:
+    Type: "AWS::RDS::DBParameterGroup"
+    Properties:
+      Description: !Sub ${pAppName} DB Parameter Group
+      Family: oracle-se2-19
+      Parameters:
+        sqlnetora.sqlnet.allowed_logon_version_server: 8
+
+  DbSecret:
+    Type: "AWS::SecretsManager::Secret"
+    Properties:
+      Description: This secret has a dynamically generated password.
+      GenerateSecretString:
+        ExcludePunctuation: true
+        GenerateStringKey: password
+        PasswordLength: 16
+        SecretStringTemplate: "{\"username\": \"sysdba\"}"
+      Name: !Sub ${pAppName}/app/db-master-password
+
+  MOJFinanceDbSecurityGroup:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      GroupDescription: MOJ Finance DB Security Group
+      GroupName: !Sub ${pAppName}-security-group
+      VpcId: !ImportValue env-VpcId
+
+  rdsKey:
+    Type: "AWS::KMS::Key"
+    Properties:
+      KeyPolicy:
+        Id: key-rds
+        Statement:
+          - Sid: Enable IAM User Permissions
+            Effect: Allow
+            Principal:
+              AWS: !Join
+                - ""
+                - - "arn:aws:iam::"
+                  - Ref: "AWS::AccountId"
+                  - ":root"
+            Action: "kms:*"
+            Resource: "*"
+        Version: "2012-10-17"
+
+  DbSecurityGroupIrelandMgmtInbound:
+    Type: "AWS::EC2::SecurityGroupIngress"
+    Properties:
+      CidrIp: "10.200.96.0/19"
+      Description: Ireland Shared Services Inbound - Workspaces etc
+      FromPort: 1521
+      GroupId: !Ref MOJFinanceDbSecurityGroup
+      IpProtocol: tcp
+      ToPort: 1521
+
+  DbSecurityGroupVPN6DGInbound:
+    Type: "AWS::EC2::SecurityGroupIngress"
+    Properties:
+      CidrIp: "10.225.60.0/24"
+      Description: "6 Degrees VPN Inbound"
+      FromPort: 1521
+      GroupId: !Ref MOJFinanceDbSecurityGroup
+      IpProtocol: tcp
+      ToPort: 1521
+
+  MonitoringStack:
+    Type: "AWS::CloudFormation::Stack"
+    Properties:
+      Parameters:
+        Environment: !Ref pEnvironment
+        SnsTopic: !Ref pSnsTopicArn
+      TemplateURL: monitoring.template
+
+  rdsAlias:
+    Type: "AWS::KMS::Alias"
+    Properties:
+      AliasName: alias/rds
+      TargetKeyId: !Ref rdsKey
+
+  DbSecurityGroupOBIEEInbound:
+    Type: "AWS::EC2::SecurityGroupIngress"
+    Properties:
+      CidrIp: !Ref pOBIEEInboundCIDR
+      Description: "6 Degrees OBIEE Inbound"
+      FromPort: 1521
+      GroupId: !Ref MOJFinanceDbSecurityGroup
+      IpProtocol: tcp
+      ToPort: 1521
+
+  DbSecurityGroupSharedServicesMgmtInbound:
+    Type: "AWS::EC2::SecurityGroupIngress"
+    Properties:
+      CidrIp: !Ref pEnvManagementCIDR
+      Description: SharedServices Inbound - Workspaces etc
+      FromPort: 1521
+      GroupId: !Ref MOJFinanceDbSecurityGroup
+      IpProtocol: tcp
+      ToPort: 1521
+
+  DbSecurityGroupVPCTrafficInbound:
+    Type: "AWS::EC2::SecurityGroupIngress"
+    Properties:
+      CidrIp: !Ref pVPCCidr
+      Description: VPC Internal Traffic inbound
+      FromPort: 1521
+      GroupId: !Ref MOJFinanceDbSecurityGroup
+      IpProtocol: tcp
+      ToPort: 1521
+
+  DbSecurityGroupCPVPCTrafficInbound:
+    Type: "AWS::EC2::SecurityGroupIngress"
+    Properties:
+      CidrIp: !Ref pCPVPCCidr
+      Description: Cloud Platform VPC Internal Traffic inbound
+      FromPort: 1521
+      GroupId: !Ref MOJFinanceDbSecurityGroup
+      IpProtocol: tcp
+      ToPort: 1521
+
+  DbSecurityGroupAnalyticPlatformInbound:
+    Type: "AWS::EC2::SecurityGroupIngress"
+    Properties:
+      CidrIp: "10.201.0.0/16"
+      Description: "Connectivity Analytic Platform use of Transit Gateway to MoJFin PROD"
+      FromPort: 1521
+      GroupId: !Ref MOJFinanceDbSecurityGroup
+      IpProtocol: tcp
+      ToPort: 1521
+
+  DbSecurityGroupMPInbound:
+    Type: "AWS::EC2::SecurityGroupIngress"
+    Properties:
+      CidrIp: !Ref pMPVPCCIDR
+      Description: "Mod Platform VPC traffic inbound"
+      FromPort: 1521
+      GroupId: !Ref MOJFinanceDbSecurityGroup
+      IpProtocol: tcp
+      ToPort: 1521
+
+  MojFinanceDB:
+    Type: "AWS::RDS::DBInstance"
+    DeletionPolicy: Snapshot
+    Properties:
+      AllocatedStorage: !Ref pStorageSize
+      AutoMinorVersionUpgrade: false
+      BackupRetentionPeriod: "35"
+      CharacterSetName: WE8MSWIN1252
+      CopyTagsToSnapshot: true
+      DBInstanceClass: !Ref pRDSInstanceSize
+      DBInstanceIdentifier: !Ref pAppName
+      DBName: !Ref pAppName
+      DBParameterGroupName: !Ref DBParameterGroup
+      DBSnapshotIdentifier: !Ref pSnapshotArn
+      DBSubnetGroupName: !Ref MOJFinanceDbSubnetGroup
+      DeletionProtection: !Ref pDeletionProtection
+      EnableCloudwatchLogsExports:
+        - alert
+        - audit
+      EnablePerformanceInsights: true
+      Engine: oracle-se2
+      EngineVersion: "19.0.0.0.ru-2020-04.rur-2020-04.r1"
+      KmsKeyId: !Ref pKmsKeyId
+      LicenseModel: license-included
+      MasterUserPassword: !Join
+        - ""
+        - - "{{resolve:secretsmanager:"
+          - Ref: DbSecret
+          - ":SecretString:password}}"
+      MasterUsername: sysdba
+      MaxAllocatedStorage: !Ref pAutoScalingLimitSize
+      PreferredBackupWindow: "22:00-01:00"
+      PreferredMaintenanceWindow: "Mon:01:15-Mon:06:00"
+      StorageEncrypted: true
+      StorageType: gp2
+      Tags:
+        - Key: Keep
+          Value: "true"
+      VPCSecurityGroups:
+        - Ref: MOJFinanceDbSecurityGroup
+    UpdateReplacePolicy: Snapshot
+
+  PublicDbDnsRecord:
+    Type: "AWS::Route53::RecordSet"
+    Properties:
+      Comment: !Sub Public DNS alias for ${pAppName} database
+      HostedZoneId: !ImportValue dns-AwsHostedZoneId
+      Name: !Join
+        - .
+        - - rds
+          - Ref: pAppName
+          - "Fn::ImportValue": dns-AwsHostedZoneDomainName
+      ResourceRecords:
+        - "Fn::GetAtt":
+            - MojFinanceDB
+            - Endpoint.Address
+      TTL: "60"
+      Type: CNAME
+
+  DbLinkLambdaStack:
+    Type: "AWS::CloudFormation::Stack"
+    Properties:
+      Parameters:
+        DatabaseIdentifier: !Ref MojFinanceDB
+        RDSSecurityGroup: !Ref MOJFinanceDbSecurityGroup
+        pAppName: !Ref pAppName
+        pEnvironment: !Ref pEnvironment
+        pLambdaBucket: !Ref pLambdaBucket
+      TemplateURL: db-link-lambda.template
