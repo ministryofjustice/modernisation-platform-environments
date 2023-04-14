@@ -12,3 +12,9 @@ data "aws_acm_certificate" "WAM_internaltest_cert" {
   domain   = "waminternaltest.ppud.justice.gov.uk"
   statuses = ["ISSUED"]
 }
+
+# ACM certificate for PPUD / WAM ALB for UAT and PROD
+data "aws_acm_certificate" "internaltest_cert" {
+  domain   = "internaltest.aws.gov.uk"
+  statuses = ["ISSUED"]
+}
