@@ -110,53 +110,52 @@ locals {
     }
 
     baseline_lbs = {
-      # AWS doesn't let us call it internal
-      t2-oasys-internal = {
-        internal_lb              = true
-        enable_delete_protection = false
-        existing_target_groups   = {}
-        idle_timeout             = 60 # 60 is deafult
-        security_groups          = [module.baseline.security_groups["public"].id]
-        public_subnets           = module.environment.subnets["public"].ids
-        tags                     = local.tags
+      # t2-oasys-internal = {
+      #   internal_lb              = true
+      #   enable_delete_protection = false
+      #   existing_target_groups   = {}
+      #   idle_timeout             = 60 # 60 is deafult
+      #   security_groups          = [module.baseline.security_groups["public"].id]
+      #   public_subnets           = module.environment.subnets["public"].ids
+      #   tags                     = local.tags
 
-        listeners = {
-          https = {
-            port                      = 443
-            protocol                  = "HTTPS"
-            ssl_policy                = "ELBSecurityPolicy-2016-08"
-            certificate_names_or_arns = ["application_environment_wildcard_cert"]
-            default_action = {
-              type = "fixed-response"
-              fixed_response = {
-                content_type = "text/plain"
-                message_body = "Not implemented"
-                status_code  = "501"
-              }
-            }
-            rules = {
-              forward-http-8080 = {
-                priority = 100
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "prod-oasys-training-http-8080"
-                }]
-                conditions = [
-                  {
-                    host_header = {
-                      values = ["training.oasys.${module.environment.vpc_name}.modernisation-platform.service.justice.gov.uk"]
-                    }
-                  },
-                  {
-                    path_pattern = {
-                      values = ["/"]
-                    }
-                }]
-              }
-            }
-          }
-        }
-      }
+      #   listeners = {
+      #     https = {
+      #       port                      = 443
+      #       protocol                  = "HTTPS"
+      #       ssl_policy                = "ELBSecurityPolicy-2016-08"
+      #       certificate_names_or_arns = ["application_environment_wildcard_cert"]
+      #       default_action = {
+      #         type = "fixed-response"
+      #         fixed_response = {
+      #           content_type = "text/plain"
+      #           message_body = "Not implemented"
+      #           status_code  = "501"
+      #         }
+      #       }
+      #       rules = {
+      #         forward-http-8080 = {
+      #           priority = 100
+      #           actions = [{
+      #             type              = "forward"
+      #             target_group_name = "prod-oasys-training-http-8080"
+      #           }]
+      #           conditions = [
+      #             {
+      #               host_header = {
+      #                 values = ["training.oasys.${module.environment.vpc_name}.modernisation-platform.service.justice.gov.uk"]
+      #               }
+      #             },
+      #             {
+      #               path_pattern = {
+      #                 values = ["/"]
+      #               }
+      #           }]
+      #         }
+      #       }
+      #     }
+      #   }
+      # }
 
     }
     baseline_route53_zones = {
