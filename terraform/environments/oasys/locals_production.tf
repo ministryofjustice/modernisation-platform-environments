@@ -58,7 +58,7 @@ locals {
                 priority = 100
                 actions = [{
                   type              = "forward"
-                  target_group_name = "prod-oasys-training-http-8080"
+                  target_group_name = "prod-oasys-web-training-http-8080"
                 }]
                 conditions = [
                   {
@@ -87,7 +87,7 @@ locals {
     }
 
     baseline_ec2_autoscaling_groups = {
-      prod-oasys-training = {
+      prod-oasys-web-training = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name = "oasys_webserver_release_*"
         })

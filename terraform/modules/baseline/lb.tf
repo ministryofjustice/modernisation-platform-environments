@@ -38,6 +38,10 @@ module "lb" {
   region         = var.environment.region
   vpc_all        = var.environment.vpc_name
   tags           = merge(local.tags, each.value.tags)
+
+  depends_on = [
+    module.ec2_autoscaling_group, # ensure ASG target groups are created first
+  ]
 }
 
 module "lb_listener" {
