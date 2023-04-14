@@ -166,11 +166,13 @@ locals {
       private = {
         internal_lb              = true
         enable_delete_protection = false
-        existing_target_groups   = local.existing_target_groups
         force_destroy_bucket     = true
         idle_timeout             = 3600
         public_subnets           = module.environment.subnets["private"].ids
-        security_groups          = [aws_security_group.public.id]
+        security_groups = [
+          aws_security_group.public.id, # TODO: remove once weblogic servers refreshed
+          "private-lb",
+        ]
 
         listeners = {
           https = merge(
