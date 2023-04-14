@@ -157,7 +157,7 @@ locals {
           nomis-environment  = "t1"
           oracle-db-name     = "CNOMT1"
         })
-        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
+        # autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
       })
     }
 

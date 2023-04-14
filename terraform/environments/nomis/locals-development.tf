@@ -59,6 +59,7 @@ locals {
           max_size            = 2
           vpc_zone_identifier = module.environment.subnets["private"].ids
         }
+        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
         tags = {
           description = "For testing official RedHat RHEL7.9 image"
           os-type     = "Linux"
@@ -80,6 +81,7 @@ locals {
           max_size            = 2
           vpc_zone_identifier = module.environment.subnets["private"].ids
         }
+        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
         tags = {
           description = "For testing our base RHEL7.9 base image"
           ami         = "base_rhel_7_9"
@@ -103,6 +105,7 @@ locals {
           max_size            = 2
           vpc_zone_identifier = module.environment.subnets["private"].ids
         }
+        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
         tags = {
           description = "For testing our base RHEL6.10 base image"
           ami         = "base_rhel_6_10"
@@ -131,6 +134,7 @@ locals {
           max_size            = 2
           vpc_zone_identifier = module.environment.subnets["private"].ids
         }
+        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
         tags = {
           description = "Windows Server 2022 Jumpserver for NOMIS"
           os-type     = "Windows"
