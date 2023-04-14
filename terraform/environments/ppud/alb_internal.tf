@@ -23,7 +23,7 @@ resource "aws_lb_listener" "PPUD-Front-End" {
   port              = "443"
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = data.aws_acm_certificate.internaltest_cert.arn
+  certificate_arn   = data.aws_acm_certificate.internaltest_cert[0].arn
 
   default_action {
     type             = "forward"
