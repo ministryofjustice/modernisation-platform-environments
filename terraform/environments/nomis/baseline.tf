@@ -15,8 +15,8 @@ module "baseline" {
   iam_policies             = module.baseline_presets.iam_policies
   iam_roles                = module.baseline_presets.iam_roles
   iam_service_linked_roles = module.baseline_presets.iam_service_linked_roles
-  key_pairs                = module.baseline_presets.key_pairs
-  kms_grants               = module.baseline_presets.kms_grants
+  # key_pairs                = module.baseline_presets.key_pairs
+  kms_grants = module.baseline_presets.kms_grants
   # s3_buckets               = merge(local.baseline_s3_buckets, lookup(local.baseline_environment_config, "baseline_s3_buckets", {}))
   # ec2_instances          = lookup(local.baseline_environment_config, "baseline_ec2_instances", {})
   ec2_autoscaling_groups = lookup(local.baseline_environment_config, "baseline_ec2_autoscaling_groups", {})

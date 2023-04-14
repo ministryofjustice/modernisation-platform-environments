@@ -46,8 +46,9 @@ locals {
 
       dev-redhat-rhel79 = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name  = "RHEL-7.9_HVM-*"
-          ami_owner = "309956199498"
+          ami_name                  = "RHEL-7.9_HVM-*"
+          ami_owner                 = "309956199498"
+          instance_profile_policies = local.ec2_common_managed_policies
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           vpc_security_group_ids = ["private-web"]
@@ -67,7 +68,8 @@ locals {
 
       dev-base-rhel79 = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name = "base_rhel_7_9_*"
+          ami_name                  = "base_rhel_7_9_*"
+          instance_profile_policies = local.ec2_common_managed_policies
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           vpc_security_group_ids = ["private-web"]
@@ -89,7 +91,8 @@ locals {
 
       dev-base-rhel610 = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name = "base_rhel_6_10*"
+          ami_name                  = "base_rhel_6_10*"
+          instance_profile_policies = local.ec2_common_managed_policies
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default_rhel6, {
           vpc_security_group_ids = ["private-web"]
@@ -111,7 +114,8 @@ locals {
 
       dev-jumpserver-2022 = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name = "nomis_windows_server_2022_jumpserver_release_*"
+          ami_name                  = "nomis_windows_server_2022_jumpserver_release_*"
+          instance_profile_policies = local.ec2_common_managed_policies
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           vpc_security_group_ids = ["private-jumpserver"]
