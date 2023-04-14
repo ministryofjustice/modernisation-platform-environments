@@ -43,7 +43,8 @@ resource "aws_ecs_task_definition" "tipstaff_task_definition" {
       environment = [
         {
           name  = "DB_HOST"
-          value = "${aws_db_instance.tipstaffdbdev.address}"
+          # value = "${aws_db_instance.tipstaffdbdev.address}"
+          value = "postgresql-dev.cutundmgf1ze.eu-west-2.rds.amazonaws.com"
         },
         {
           name  = "DB_PORT"
