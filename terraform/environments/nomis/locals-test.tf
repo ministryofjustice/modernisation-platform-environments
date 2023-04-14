@@ -60,6 +60,30 @@ locals {
         }
       }
 
+      t1-nomis-db-1-a = {
+        tags = {
+          nomis-environment   = "t1"
+          server-type         = "nomis-db"
+          description         = "T1 NOMIS database"
+          oracle-sids         = "CNOMT1"
+          monitored           = true
+          instance-scheduling = "skip-scheduling"
+        }
+        ami_name  = "nomis_rhel_7_9_oracledb_11_2_release_2023-04-02T00-00-40.059Z"
+        ami_owner = "self"
+        instance = {
+          disable_api_termination = true
+        }
+        ebs_volumes = {
+          "/dev/sdb" = { size = 100 }
+          "/dev/sdc" = { size = 100 }
+        }
+        ebs_volume_config = {
+          data  = { total_size = 100 }
+          flash = { total_size = 50 }
+        }
+      }
+
       t1-nomis-db-2 = {
         tags = {
           nomis-environment   = "t1"
