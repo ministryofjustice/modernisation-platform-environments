@@ -63,7 +63,7 @@ locals {
                 conditions = [
                   {
                     host_header = {
-                      values = ["trn.oasys.${module.environment.vpc_name}.modernisation-platform.service.justice.gov.uk"]
+                      values = ["trn.oasys.${module.environment.domains.public.business_unit_environment}"]
                     }
                   },
                   {
