@@ -7,7 +7,7 @@ resource "aws_ecs_cluster" "tipstaff_cluster" {
 }
 
 resource "aws_ecs_task_definition" "tipstaff_task_definition" {
-  family                = "tipstaff-task"
+  family                = "tipstaffFamily"
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
   execution_role_arn    = aws_iam_role.app_execution.arn
