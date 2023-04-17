@@ -3,7 +3,7 @@ locals {
     secret1 = {
       name          = "APP_MOJFIN_APPS_RO"
       description   = "APPS_RO password for mojfin db link"
-      secret_value         = random_password.apps_ro_password
+      secret_value         = random_password.apps_ro_password.result
     },
     secret2 = {
       name          = "APP_MOJFIN_DEVELOPER"
