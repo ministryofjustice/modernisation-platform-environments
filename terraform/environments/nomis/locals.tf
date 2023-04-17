@@ -12,7 +12,6 @@ locals {
   }
   baseline_environment_config = local.environment_configs[local.environment]
 
-  # TODO: delete az zone once we have the new certificates in place
   baseline_route53_zones = {
     "${local.environment}.nomis.az.justice.gov.uk"      = {}
     "${local.environment}.nomis.service.justice.gov.uk" = {}

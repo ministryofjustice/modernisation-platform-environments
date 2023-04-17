@@ -187,7 +187,9 @@ locals {
                   conditions = [{
                     host_header = {
                       values = [
+                        "t1-nomis-web-a.test.nomis.az.justice.gov.uk",
                         "t1-nomis-web-a.test.nomis.service.justice.gov.uk",
+                        "c-t1.test.nomis.az.justice.gov.uk",
                         "c-t1.test.nomis.service.justice.gov.uk",
                         "t1-cn.hmpp-azdt.justice.gov.uk",
                       ]
@@ -200,6 +202,12 @@ locals {
       }
     }
     baseline_route53_zones = {
+      "test.nomis.az.justice.gov.uk" = {
+        lb_alias_records = [
+          { name = "t1-nomis-web-a", type = "A", lbs_map_key = "private" },
+          { name = "c-t1", type = "A", lbs_map_key = "private" },
+        ]
+      }
       "test.nomis.service.justice.gov.uk" = {
         records = [
           { name = "t1cnom-a", type = "A", ttl = "300", records = ["10.101.3.132"] },

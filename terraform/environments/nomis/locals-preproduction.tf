@@ -76,8 +76,9 @@ locals {
                   conditions = [{
                     host_header = {
                       values = [
-                        "preprod-nomis-web-a.nomis.${module.environment.domains.public.business_unit_environment}",
+                        "preprod-nomis-web-a.preproduction.nomis.az.justice.gov.uk",
                         "preprod-nomis-web-a.preproduction.nomis.service.justice.gov.uk",
+                        "c.preproduction.nomis.az.justice.gov.uk",
                         "c.preproduction.nomis.service.justice.gov.uk",
                         "c.pp-nomis.service.justice.gov.uk",
                       ]
@@ -91,12 +92,13 @@ locals {
     }
 
     baseline_route53_zones = {
-      "${module.environment.domains.public.business_unit_environment}" = {
+      "preproduction.nomis.az.justice.gov.uk" = {
         lb_alias_records = [
-          { name = "preprod-nomis-web-a.nomis", type = "A", lbs_map_key = "private" },
+          { name = "preprod-nomis-web-a", type = "A", lbs_map_key = "private" },
+          { name = "c", type = "A", lbs_map_key = "private" },
         ]
       }
-      "preproduction.service.justice.gov.uk" = {
+      "preproduction.nomis.service.justice.gov.uk" = {
         lb_alias_records = [
           { name = "preprod-nomis-web-a", type = "A", lbs_map_key = "private" },
           { name = "c", type = "A", lbs_map_key = "private" },
