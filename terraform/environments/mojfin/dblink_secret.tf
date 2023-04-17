@@ -35,7 +35,7 @@ locals {
       description   = "Query user for CCMT db link"
       value = "query1"
     }
-
+  }
 }
 
 resource "random_password" "apps_ro_password" {
