@@ -196,29 +196,29 @@ locals {
         ]
 
         listeners = {
-          #          https = merge(
-          #            local.lb_weblogic.https, {
-          #              rules = {
-          #                t1-nomis-web-a-http-7777 = {
-          #                  priority = 300
-          #                  actions = [{
-          #                    type              = "forward"
-          #                    target_group_name = "t1-nomis-web-a-http-7777"
-          #                  }]
-          #                  conditions = [{
-          #                    host_header = {
-          #                      values = [
-          #                        "t1-nomis-web-a.test.nomis.az.justice.gov.uk",
-          #                        "t1-nomis-web-a.test.nomis.service.justice.gov.uk",
-          #                        "c-t1.test.nomis.az.justice.gov.uk",
-          #                        "c-t1.test.nomis.service.justice.gov.uk",
-          #                        "t1-cn.hmpp-azdt.justice.gov.uk",
-          #                      ]
-          #                    }
-          #                  }]
-          #                }
-          #              }
-          #          })
+          https = merge(
+            local.lb_weblogic.https, {
+              rules = {
+                t1-nomis-web-a-http-7777 = {
+                  priority = 300
+                  actions = [{
+                    type              = "forward"
+                    target_group_name = "t1-nomis-web-a-http-7777"
+                  }]
+                  conditions = [{
+                    host_header = {
+                      values = [
+                        "t1-nomis-web-a.test.nomis.az.justice.gov.uk",
+                        "t1-nomis-web-a.test.nomis.service.justice.gov.uk",
+                        "c-t1.test.nomis.az.justice.gov.uk",
+                        "c-t1.test.nomis.service.justice.gov.uk",
+                        "t1-cn.hmpp-azdt.justice.gov.uk",
+                      ]
+                    }
+                  }]
+                }
+              }
+          })
         }
       }
     }
@@ -231,8 +231,12 @@ locals {
       }
       "test.nomis.service.justice.gov.uk" = {
         records = [
-          { name = "t1cnom-a", type = "A", ttl = "300", records = ["10.101.3.132"] },
-          { name = "t1cnom-b", type = "A", ttl = "300", records = ["10.101.3.132"] },
+          { name = "t1nomis-a", type = "A", ttl = "300", records = ["10.101.3.132"] },
+          { name = "t1nomis-b", type = "A", ttl = "300", records = ["10.101.3.132"] },
+          { name = "t1ndh-a", type = "A", ttl = "300", records = ["10.101.3.132"] },
+          { name = "t1ndh-b", type = "A", ttl = "300", records = ["10.101.3.132"] },
+          { name = "t1or-a", type = "A", ttl = "300", records = ["10.101.3.132"] },
+          { name = "t1or-b", type = "A", ttl = "300", records = ["10.101.3.132"] },
         ]
         lb_alias_records = [
           { name = "t1-nomis-web-a", type = "A", lbs_map_key = "private" },
