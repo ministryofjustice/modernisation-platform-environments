@@ -47,5 +47,5 @@ module "pagerduty_core_alerts" {
   ]
   source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v1.0.0"
   sns_topics                = [aws_sns_topic.sprinkler_high_priority.name]
-  pagerduty_integration_key = local.pagerduty_integration_keys["high_priority_alarms"]
+  pagerduty_integration_key = local.pagerduty_integration_keys["ddos_cloudwatch"]
 }
