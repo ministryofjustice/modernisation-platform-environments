@@ -42,21 +42,37 @@ resource "aws_ecs_task_definition" "tipstaff_task_definition" {
       }
       environment = [
         {
-          name  = "DB_HOST"
+          name  = "RDS_HOSTNAME"
           # value = "${aws_db_instance.tipstaffdbdev.address}"
           value = "postgresql-dev.cutundmgf1ze.eu-west-2.rds.amazonaws.com"
         },
         {
-          name  = "DB_PORT"
+          name  = "RDS_PORT"
           value = "5432"
         },
         {
-          name  = "DB_USER"
+          name  = "RDS_USERNAME"
           value = "${jsondecode(data.aws_secretsmanager_secret_version.db_username.secret_string)["LOCAL_DB_USERNAME"]}"
         },
         {
-          name  = "DB_PASSWORD"
+          name  = "RDS_PASSWORD"
           value = "${jsondecode(data.aws_secretsmanager_secret_version.db_password.secret_string)["LOCAL_DB_PASSWORD"]}"
+        },
+        {
+          name  = "DB_NAME"
+          value = "tipstaff_dev2"
+        },
+        {
+          name  = "supportEmail"
+          value = "dts-legacy-apps-support-team@hmcts.net"
+        },
+        {
+          name  = "supportTeam"
+          value = "DTS Legacy Apps Support Team"
+        },
+        {
+          name  = "CurServer"
+          value = "DEVELOPMENT"
         }
       ]
     }
