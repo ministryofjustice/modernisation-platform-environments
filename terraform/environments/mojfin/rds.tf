@@ -36,3 +36,59 @@ resource "aws_db_parameter_group" "default" {
     {"Keep" = "true"}
  )
 }
+
+resource "aws_security_group" "laalz-secgroup" {
+  name        = "laalz-secgroup"
+  description = "RDS access with the LAA Landing Zone"
+  vpc_id      = data.aws_vpc.shared.id
+
+  ingress {
+    description = "Sql Net on 1521"
+    from_port   = 1521
+    to_port     = 1521
+    protocol    = "tcp"
+    cidr_blocks = [local.application_data.accounts[local.environment].lz_vpc_cidr]
+  }
+
+  egress {
+    description = "Sql Net on 1521"
+    from_port   = 1521
+    to_port     = 1521
+    protocol    = "tcp"
+    cidr_blocks = [var.lz_vpc_cidr]
+  }
+
+  tags = {
+    Name = "${var.application_name}-${var.environment}-laalz-secgroup"
+  }
+}
+
+resource "aws_security_group" "vpc-secgroup" {
+  name        = "vpc-secgroup"
+  description = "RDS Access with the shared vpc"
+  vpc_id      = data.aws_vpc.shared.id
+
+  ingress {
+    description = "Sql Net on 1521"
+    from_port   = 1521
+    to_port     = 1521
+    protocol    = "tcp"
+    cidr_blocks = [data.aws_vpc.shared.cidr_block]
+  }
+
+  egress {
+    description = "Sql Net on 1521"
+    from_port   = 1521
+    to_port     = 1521
+    protocol    = "tcp"
+    cidr_blocks = [data.aws_vpc.shared.cidr_block]
+  }
+
+  tags = {
+    Name = "${var.application_name}-${var.environment}-vpc-secgroup"
+  }
+}
+
+output "rds_endpoint" {
+  value = aws_db_instance.appdb1.address
+}
