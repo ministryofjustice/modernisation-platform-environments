@@ -47,11 +47,12 @@ locals {
       }
 
       t2-oasys-web = merge(local.webserver, {
-        config = merge(local.webserver.config, {
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name                  = "oasys_webserver_release_*"
           ssm_parameters_prefix     = "ec2-web-t2/"
           iam_resource_names_prefix = "ec2-web-t2"
         })
-        tags = merge(local.webserver.config, {
+        tags = merge(local.webserver.tags, {
           description        = "t2 OASys web"
           oasys-environment  = "t2"
           oracle-db-hostname = "T2ODL0009"

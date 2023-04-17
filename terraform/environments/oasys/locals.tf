@@ -66,11 +66,7 @@ locals {
   ### env independent webserver vars
   ###
   webserver = {
-    config = merge(module.baseline_presets.ec2_instance.config.default, {
-      ami_name                  = "oasys_webserver_release_*"
-      ssm_parameters_prefix     = "ec2-web/"
-      iam_resource_names_prefix = "ec2-web"
-    })
+    config = module.baseline_presets.ec2_instance.config.default
     instance = merge(module.baseline_presets.ec2_instance.instance.default, {
       monitoring             = true
     })
