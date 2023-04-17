@@ -50,7 +50,6 @@ locals {
         config = merge(local.webserver.config, {
           ssm_parameters_prefix     = "ec2-web-t2/"
           iam_resource_names_prefix = "ec2-web-t2"
-          # instance_profile_policies = local.ec2_common_managed_policies # need to check the preset policies are enough
         })
         tags = merge(local.webserver.config, {
           description        = "t2 OASys web"
