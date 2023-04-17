@@ -55,13 +55,13 @@ locals {
         })
 
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-          monitoring             = true
+          monitoring = true
           #instance_type          = "t3.medium"
         })
 
         cloudwatch_metric_alarms = {}
 
-        user_data_cloud_init     = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
+        user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
           args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
             branch = "ccfe2d0becae50d1ff706442b52a6c9fe01d5a7c" # 2023-04-12
           })
@@ -93,20 +93,20 @@ locals {
           }
         }
         tags = {
-          component         = "web"
-          os-type           = "Linux"
-          os-major-version  = 7
-          os-version        = "RHEL 7.9"
-          "Patch Group"     = "RHEL"
-          server-type       = "oasys-web"
-          description       = "t2 OASys web"
-          monitored         = true
-          oasys-environment = "t2"
-          environment-name  = terraform.workspace
+          component          = "web"
+          os-type            = "Linux"
+          os-major-version   = 7
+          os-version         = "RHEL 7.9"
+          "Patch Group"      = "RHEL"
+          server-type        = "oasys-web"
+          description        = "t2 OASys web"
+          monitored          = true
+          oasys-environment  = "t2"
+          environment-name   = terraform.workspace
           oracle-db-hostname = "T2ODL0009"
           oracle-db-name     = "OASPROD"
         }
-      } 
+      }
     }
 
     baseline_lbs = {
@@ -159,7 +159,7 @@ locals {
 
     }
     baseline_route53_zones = {
-      "${module.environment.domains.public.business_unit_environment}" = {  # "hmpps-test.modernisation-platform.service.justice.gov.uk"
+      "${module.environment.domains.public.business_unit_environment}" = { # "hmpps-test.modernisation-platform.service.justice.gov.uk"
         records = [
           { name = "t2.oasys.db", type = "A", ttl = "300", records = ["10.101.36.132"] }, # "t2.oasys.db.hmpps-test.modernisation-platform.service.justice.gov.uk" currently pointing to azure db
         ]

@@ -65,9 +65,9 @@ resource "aws_route53_record" "external_validation" {
 }
 
 resource "aws_acm_certificate_validation" "external" {
-  
+
   count = local.is-production ? 0 : 1
-  
+
   depends_on = [
     aws_route53_record.external_validation
   ]
