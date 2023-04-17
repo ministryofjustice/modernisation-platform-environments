@@ -35,7 +35,7 @@ locals {
         force_destroy_bucket     = false
         idle_timeout             = "60"
         internal_lb              = true
-        security_groups          = [module.baseline.security_groups["private"].id]
+        security_groups          = ["private"]
         public_subnets           = module.environment.subnets["public"].ids
         existing_target_groups   = {}
         tags                     = local.tags

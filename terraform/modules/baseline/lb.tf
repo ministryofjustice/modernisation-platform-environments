@@ -74,7 +74,6 @@ module "lb_listener" {
 
   depends_on = [
     module.acm_certificate,       # ensure certs are created first
-    module.ec2_autoscaling_group, # ensure ASG target groups are created first
   ]
 
   alarm_target_group_names = each.value.alarm_target_group_names
