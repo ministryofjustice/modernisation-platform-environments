@@ -89,13 +89,13 @@ resource "aws_ecs_service" "tipstaff_ecs_service" {
     aws_lb_listener.tipstaff_dev_lb_2
   ]
 
-  name = var.networking[0].application
+  name                              = var.networking[0].application
   cluster                           = aws_ecs_cluster.tipstaff_cluster.id
   task_definition                   = aws_ecs_task_definition.tipstaff_task_definition.arn
   launch_type                       = "FARGATE"
   enable_execute_command            = true
   desired_count                     = 1
-  health_check_grace_period_seconds = 120
+  health_check_grace_period_seconds = 360
 
   network_configuration {
     subnets          = data.aws_subnets.shared-public.ids
@@ -108,6 +108,13 @@ resource "aws_ecs_service" "tipstaff_ecs_service" {
     container_name   = "tipstaff-container"
     container_port   = 80
   }
+
+  deployment_controller {
+    type = "ECS"
+  }
+
+  deployment_maximum_percent         = 200
+  deployment_minimum_healthy_percent = 100
 }
 
 resource "aws_iam_role" "app_execution" {
