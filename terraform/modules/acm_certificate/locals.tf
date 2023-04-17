@@ -43,7 +43,7 @@ locals {
           lookup(
             local.route53_zones,
             replace(dvo.domain_name, "/^[^.]*.[^.]*./", ""),
-            null
+            { provider = "external" }
       )))
     }
   }
