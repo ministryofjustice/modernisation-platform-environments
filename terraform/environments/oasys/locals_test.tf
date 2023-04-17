@@ -115,7 +115,7 @@ locals {
         enable_delete_protection = false
         existing_target_groups   = {}
         idle_timeout             = 60 # 60 is deafult
-        security_groups          = [module.baseline.security_groups["public"].id]
+        security_groups          = ["public"]
         public_subnets           = module.environment.subnets["public"].ids
         tags                     = local.tags
 
