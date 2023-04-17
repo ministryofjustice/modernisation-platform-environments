@@ -172,8 +172,9 @@ locals {
                     host_header = {
                       values = [
                         "prod-nomis-web-a.${module.environment.domains.public.business_unit_environment}",
-                        "prod-nomis-web-a.production.nomis.az.justice.gov.uk",
-                        "c.production.nomis.az.justice.gov.uk",
+                        "prod-nomis-web-a.production.nomis.service.justice.gov.uk",
+                        "c.production.nomis.service.justice.gov.uk",
+                        "c.nomis.az.justice.gov.uk",
                       ]
                     }
                   }]
@@ -190,7 +191,9 @@ locals {
           { name = "prod-nomis-web-a.nomis", type = "A", lbs_map_key = "private" },
         ]
       }
-      "production.nomis.az.justice.gov.uk" = {
+      "nomis.service.justice.gov.uk" = {
+      }
+      "production.service.justice.gov.uk" = {
         lb_alias_records = [
           { name = "c", type = "A", lbs_map_key = "private" },
           { name = "prod-nomis-web-a", type = "A", lbs_map_key = "private" },
