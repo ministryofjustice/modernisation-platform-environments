@@ -51,7 +51,7 @@ resource "aws_ssm_parameter" "secret" {
   value       = each.value.value
 
   tags = merge(
-    var.tags,
+    local.tags,
     { "Name" = each.value.name }
   )
 }
