@@ -171,7 +171,6 @@ locals {
                   conditions = [{
                     host_header = {
                       values = [
-                        "prod-nomis-web-a.${module.environment.domains.public.business_unit_environment}",
                         "prod-nomis-web-a.production.nomis.service.justice.gov.uk",
                         "c.production.nomis.service.justice.gov.uk",
                         "c.nomis.az.justice.gov.uk",
@@ -186,11 +185,6 @@ locals {
     }
 
     baseline_route53_zones = {
-      "${module.environment.domains.public.business_unit_environment}" = {
-        lb_alias_records = [
-          { name = "prod-nomis-web-a.nomis", type = "A", lbs_map_key = "private" },
-        ]
-      }
       "nomis.service.justice.gov.uk" = {
       }
       "production.service.justice.gov.uk" = {
