@@ -54,24 +54,24 @@ locals {
               }
             }
             rules = {
-              # forward-http-8080 = {
-              #   priority = 100
-              #   actions = [{
-              #     type              = "forward"
-              #     target_group_name = "prod-oasys-web-trn-http-8080"
-              #   }]
-              #   conditions = [
-              #     {
-              #       host_header = {
-              #         values = ["trn.oasys.${module.environment.domains.public.business_unit_environment}"]
-              #       }
-              #     },
-              #     {
-              #       path_pattern = {
-              #         values = ["/"]
-              #       }
-              #   }]
-              # }
+              forward-http-8080 = {
+                priority = 100
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "prod-oasys-web-trn-http-8080"
+                }]
+                conditions = [
+                  {
+                    host_header = {
+                      values = ["trn.oasys.${module.environment.domains.public.business_unit_environment}"]
+                    }
+                  },
+                  {
+                    path_pattern = {
+                      values = ["/"]
+                    }
+                }]
+              }
             }
           }
         }
