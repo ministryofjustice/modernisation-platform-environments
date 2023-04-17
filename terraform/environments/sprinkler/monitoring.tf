@@ -11,15 +11,15 @@ resource "aws_cloudwatch_metric_alarm" "ddos_attack_external" {
   threshold           = "0"
   alarm_description   = "Triggers when AWS Shield Advanced detects a DDoS attack"
   treat_missing_data  = "notBreaching"
-  alarm_actions       = [aws_sns_topic.sprinkler_high_priority.arn]
+  alarm_actions       = [aws_sns_topic.sprinkler_ddos_alarm.arn]
   dimensions = {
     ResourceArn = aws_lb.external.arn
   }
 }
 
 # SNS topic for monitoring to send alarms to
-resource "aws_sns_topic" "sprinkler_high_priority" {
-  name              = "sprinkler_high_priority"
+resource "aws_sns_topic" "sprinkler_ddos_alarm" {
+  name              = "sprinkler_ddos_alarm"
   kms_master_key_id = data.aws_kms_key.sns.id
 }
 
@@ -43,9 +43,9 @@ locals {
 # link the sns topic to the service
 module "pagerduty_core_alerts" {
   depends_on = [
-    aws_sns_topic.sprinkler_high_priority
+    aws_sns_topic.sprinkler_ddos_alarm
   ]
   source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v1.0.0"
-  sns_topics                = [aws_sns_topic.sprinkler_high_priority.name]
+  sns_topics                = [aws_sns_topic.sprinkler_ddos_alarm.name]
   pagerduty_integration_key = local.pagerduty_integration_keys["ddos_cloudwatch"]
 }

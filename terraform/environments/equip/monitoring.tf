@@ -11,7 +11,7 @@ resource "aws_cloudwatch_metric_alarm" "ddos_attack_external" {
   threshold           = "0"
   alarm_description   = "Triggers when AWS Shield Advanced detects a DDoS attack"
   treat_missing_data  = "notBreaching"
-  alarm_actions       = [aws_sns_topic.high_priority.arn]
+  alarm_actions       = [aws_sns_topic.ddos_alarm.arn]
   dimensions = {
     ResourceArn = aws_lb.citrix_alb.arn
   }
@@ -19,8 +19,8 @@ resource "aws_cloudwatch_metric_alarm" "ddos_attack_external" {
 
 # SNS topic for monitoring to send alarms to
 #tfsec:ignore:aws-sns-topic-encryption-use-cmk
-resource "aws_sns_topic" "high_priority" {
-  name              = format("%s_high_priority", local.application_name)
+resource "aws_sns_topic" "ddos_alarm" {
+  name              = format("%s_ddos_alarm", local.application_name)
   kms_master_key_id = "alias/aws/sns"
 }
 
@@ -44,9 +44,9 @@ locals {
 # link the sns topic to the service
 module "pagerduty_core_alerts" {
   depends_on = [
-    aws_sns_topic.high_priority
+    aws_sns_topic.ddos_alarm
   ]
   source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v1.0.0"
-  sns_topics                = [aws_sns_topic.high_priority.name]
+  sns_topics                = [aws_sns_topic.ddos_alarm.name]
   pagerduty_integration_key = local.pagerduty_integration_keys["ddos_cloudwatch"]
 }
