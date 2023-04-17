@@ -13,7 +13,8 @@ locals {
   baseline_environment_config = local.environment_configs[local.environment]
 
   baseline_route53_zones = {
-    "${local.environment}.nomis.az.justice.gov.uk" = {}
+    "${local.environment}.nomis.az.justice.gov.uk"      = {}
+    "${local.environment}.nomis.service.justice.gov.uk" = {}
   }
 
   baseline_acm_certificates = {
