@@ -15,7 +15,7 @@ on:
     paths:
       - 'terraform/environments/oasys/**'
       - '.github/workflows/oasys.yml'
-  
+
   workflow_dispatch:
     inputs:
       action:
@@ -28,8 +28,8 @@ on:
           - destroy
 
 permissions:
-  id-token: write # This is required for requesting the JWT
-  contents: read # This is required for actions/checkout
+  id-token: write  # This is required for requesting the JWT
+  contents: read  # This is required for actions/checkout
 
 jobs:
   strategy:
@@ -51,7 +51,7 @@ jobs:
       action: "${{ matrix.action }}"
     secrets:
       modernisation_platform_environments: "${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}"
-      pipeline_github_token: "${{ secrets.DSO_GITHUB_AUTOMATION_PAT }}"
+      pipeline_github_token: "${{ secrets.MODERNISATION_PLATFORM_CI_USER_ENVIRONMENTS_REPO_PAT }}"
 
   destroy-development:
     if: inputs.action == 'destroy'
@@ -63,4 +63,4 @@ jobs:
       plan_apply_tfargs: "-destroy"
     secrets:
       modernisation_platform_environments: "${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}"
-      pipeline_github_token: "${{ secrets.DSO_GITHUB_AUTOMATION_PAT }}"
+      pipeline_github_token: "${{ secrets.MODERNISATION_PLATFORM_CI_USER_ENVIRONMENTS_REPO_PAT }}"

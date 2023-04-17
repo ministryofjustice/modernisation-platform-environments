@@ -1,12 +1,13 @@
 ---
 name: xhibit-portal
-on:                                          # Put ALL the triggers for any part of the workflow here.
-  push: # triggers on 'push' or 'merge'      # The whole workflow will run each time these events happen
-    branches:                                # and they're skipped according to the 'if' conditions below
+on:
+  push:
+    branches:
       - main
     paths:
       - 'terraform/environments/xhibit-portal/**'
       - '.github/workflows/xhibit-portal.yml'
+
   pull_request:
     branches:
       - main
@@ -14,6 +15,7 @@ on:                                          # Put ALL the triggers for any part
     paths:
       - 'terraform/environments/xhibit-portal/**'
       - '.github/workflows/xhibit-portal.yml'
+
   workflow_dispatch:
     inputs:
       action:
@@ -22,275 +24,43 @@ on:                                          # Put ALL the triggers for any part
         required: true
         type: string
         options:
-        - deploy
-        - destroy
-env:
-  TF_IN_AUTOMATION: true
-  AWS_REGION: "eu-west-2"
-  ENVIRONMENT_MANAGEMENT: ${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}
+          - deploy
+          - destroy
+
 permissions:
-  id-token: write # This is required for requesting the JWT
-  contents: read # This is required for actions/checkout
-defaults:
-  run:
-    shell: bash
+  id-token: write  # This is required for requesting the JWT
+  contents: read  # This is required for actions/checkout
 
 jobs:
-  plan-development:
-    name: Plan Development - xhibit-portal
-    runs-on: ubuntu-latest
-    if: github.ref != 'refs/heads/main' || github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'deploy' # job only runs for pull requests
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v3.5.2
-      - name: Set Account Number
-        run: echo "ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${GITHUB_WORKFLOW}-${TF_ENV}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)" >> $GITHUB_ENV
-      - name: configure aws credentials
-        uses: aws-actions/configure-aws-credentials@e1e17a757e536f70e52b5a12b2e8d1d1c60e04ef # v2.0.0
-        with:
-          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
-          role-session-name: githubactionsrolesession
-          aws-region: ${{ env.AWS_REGION }}
-      - name: Load and Configure Terraform
-        uses: hashicorp/setup-terraform@633666f66e0061ca3b725c73b2ec20cd13a8fdd1 # v2.0.3
-        with:
-          terraform_version: "~1"
-          terraform_wrapper: false
-      - name: Terraform plan - development
-        run: |
-          terraform --version
-          echo "Terraform plan - ${TF_ENV}"
-          bash scripts/terraform-init.sh terraform/environments/xhibit-portal
-          terraform -chdir="terraform/environments/xhibit-portal" workspace list
-          terraform -chdir="terraform/environments/xhibit-portal" workspace select "xhibit-portal-${TF_ENV}"
-          bash scripts/terraform-plan.sh terraform/environments/xhibit-portal
-    env:
-      TF_ENV: development
+  strategy:
+    uses: ./.github/workflows/reusable_terraform_strategy.yml
+    if: inputs.action != 'destroy'
+    with:
+      application: "${{ github.workflow }}"
 
-  deploy-development:
-    needs: plan-development # job only runs if plan-development runs successfully
-    name: Deploy Development - xhibit-portal
-    runs-on: ubuntu-latest
-    if: github.ref != 'refs/heads/main' || github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'deploy'
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v3.5.2
-      - name: Set Account Number
-        run: echo "ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${GITHUB_WORKFLOW}-${TF_ENV}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)" >> $GITHUB_ENV
-      - name: configure aws credentials
-        uses: aws-actions/configure-aws-credentials@e1e17a757e536f70e52b5a12b2e8d1d1c60e04ef # v2.0.0
-        with:
-          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
-          role-session-name: githubactionsrolesession
-          aws-region: ${{ env.AWS_REGION }}
-      - name: Load and Configure Terraform
-        uses: hashicorp/setup-terraform@633666f66e0061ca3b725c73b2ec20cd13a8fdd1 # v2.0.3
-        with:
-          terraform_version: "~1"
-          terraform_wrapper: false
-      - name: Terraform apply - development
-        run: |
-          terraform --version
-          echo "Terraform apply - ${TF_ENV}"
-          bash scripts/terraform-init.sh terraform/environments/xhibit-portal
-          terraform -chdir="terraform/environments/xhibit-portal" workspace select "xhibit-portal-${TF_ENV}"
-          bash scripts/terraform-apply.sh terraform/environments/xhibit-portal
-    env:
-      TF_ENV: development
-
-  destroy-plan-dev-test:
+  terraform:
+    needs: strategy
+    if: inputs.action != 'destroy'
     strategy:
-      matrix:
-        include:
-          - environment: development
-          # - environment: test
-    name: Terraform destroy plan - ${{ github.workflow }} - ${{  matrix.environment }}
-    runs-on: ubuntu-latest
-    if: github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'destroy'
-    env:
-      TF_ENV: ${{ matrix.environment }}
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v3.5.2
-      - name: Set Account Number
-        run: echo "ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${GITHUB_WORKFLOW}-${TF_ENV}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)" >> $GITHUB_ENV
-      - name: configure aws credentials
-        uses: aws-actions/configure-aws-credentials@e1e17a757e536f70e52b5a12b2e8d1d1c60e04ef # v2.0.0
-        with:
-          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
-          role-session-name: githubactionsrolesession
-          aws-region: ${{ env.AWS_REGION }}
-      - name: Load and Configure Terraform
-        uses: hashicorp/setup-terraform@633666f66e0061ca3b725c73b2ec20cd13a8fdd1 # v2.0.3
-        with:
-          terraform_version: "~1"
-          terraform_wrapper: false
-      - name: Terraform destroy plan - ${{ github.workflow }} - ${{ matrix.environment }}
-        run: |
-          terraform --version
-          echo "Terraform destroy plan - ${TF_ENV}"
-          bash scripts/terraform-init.sh terraform/environments/$GITHUB_WORKFLOW
-          terraform -chdir="terraform/environments/${GITHUB_WORKFLOW}" workspace select "${GITHUB_WORKFLOW}-${TF_ENV}"
-          bash scripts/terraform-plan.sh terraform/environments/$GITHUB_WORKFLOW -destroy
+      fail-fast: false
+      matrix: ${{ fromJson(needs.strategy.outputs.matrix) }}
+    uses: ./.github/workflows/reusable_terraform_plan_apply.yml
+    with:
+      application: "${{ github.workflow }}"
+      environment: "${{ matrix.target }}"
+      action: "${{ matrix.action }}"
+    secrets:
+      modernisation_platform_environments: "${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}"
+      pipeline_github_token: "${{ secrets.MODERNISATION_PLATFORM_CI_USER_ENVIRONMENTS_REPO_PAT }}"
 
-  destroy-apply-dev-test:
-    needs: destroy-plan-dev-test
-    if: success()
-    strategy:
-      matrix:
-        include:
-          - environment: development
-          # - environment: test
-    name: Terraform destroy apply - ${{ github.workflow }} - ${{  matrix.environment }}
-    runs-on: ubuntu-latest
-    env:
-      TF_ENV: ${{ matrix.environment }}
-    environment:
-      name: ${{ github.workflow }}-${{ matrix.environment }}
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v3.5.2
-      - name: Set Account Number
-        run: echo "ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${GITHUB_WORKFLOW}-${TF_ENV}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)" >> $GITHUB_ENV
-      - name: configure aws credentials
-        uses: aws-actions/configure-aws-credentials@e1e17a757e536f70e52b5a12b2e8d1d1c60e04ef # v2.0.0
-        with:
-          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
-          role-session-name: githubactionsrolesession
-          aws-region: ${{ env.AWS_REGION }}
-      - name: Load and Configure Terraform
-        uses: hashicorp/setup-terraform@633666f66e0061ca3b725c73b2ec20cd13a8fdd1 # v2.0.3
-        with:
-          terraform_version: "~1"
-          terraform_wrapper: false
-      - name: Terraform destroy apply - ${{ github.workflow }} - ${{ matrix.environment }}
-        run: |
-          terraform --version
-          echo "Terraform destroy apply - ${TF_ENV}"
-          bash scripts/terraform-init.sh terraform/environments/$GITHUB_WORKFLOW
-          terraform -chdir="terraform/environments/${GITHUB_WORKFLOW}" workspace select "${GITHUB_WORKFLOW}-${TF_ENV}"
-          bash scripts/terraform-apply.sh terraform/environments/$GITHUB_WORKFLOW -destroy
-
-  plan-preproduction:
-    name: Plan Pre-Production - xhibit-portal
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' # job only runs for merges in the main branch
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v3.5.2
-      - name: Set Account Number
-        run: echo "ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${GITHUB_WORKFLOW}-${TF_ENV}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)" >> $GITHUB_ENV
-      - name: configure aws credentials
-        uses: aws-actions/configure-aws-credentials@e1e17a757e536f70e52b5a12b2e8d1d1c60e04ef # v2.0.0
-        with:
-          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
-          role-session-name: githubactionsrolesession
-          aws-region: ${{ env.AWS_REGION }}
-      - name: Load and Configure Terraform
-        uses: hashicorp/setup-terraform@633666f66e0061ca3b725c73b2ec20cd13a8fdd1 # v2.0.3
-        with:
-          terraform_version: "~1"
-          terraform_wrapper: false
-      - name: Terraform plan - preproduction
-        run: |
-          terraform --version
-          echo "Terraform plan - ${TF_ENV}"
-          bash scripts/terraform-init.sh terraform/environments/xhibit-portal
-          terraform -chdir="terraform/environments/xhibit-portal" workspace select "xhibit-portal-${TF_ENV}"
-          bash scripts/terraform-plan.sh terraform/environments/xhibit-portal
-    env:
-      TF_ENV: preproduction
-
-  deploy-preproduction:
-    needs: plan-preproduction # job only runs if plan-production runs successfully
-    name: Deploy Pre-Production - xhibit-portal
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v3.5.2
-      - name: Set Account Number
-        run: echo "ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${GITHUB_WORKFLOW}-${TF_ENV}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)" >> $GITHUB_ENV
-      - name: configure aws credentials
-        uses: aws-actions/configure-aws-credentials@e1e17a757e536f70e52b5a12b2e8d1d1c60e04ef # v2.0.0
-        with:
-          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
-          role-session-name: githubactionsrolesession
-          aws-region: ${{ env.AWS_REGION }}
-      - name: Load and Configure Terraform
-        uses: hashicorp/setup-terraform@633666f66e0061ca3b725c73b2ec20cd13a8fdd1 # v2.0.3
-        with:
-          terraform_version: "~1"
-          terraform_wrapper: false
-      - name: Terraform apply - preproduction
-        run: |
-          terraform --version
-          echo "Terraform apply - ${TF_ENV}"
-          bash scripts/terraform-init.sh terraform/environments/xhibit-portal
-          terraform -chdir="terraform/environments/xhibit-portal" workspace select "xhibit-portal-${TF_ENV}"
-          bash scripts/terraform-apply.sh terraform/environments/xhibit-portal
-    env:
-      TF_ENV: preproduction
-
-  plan-production:
-    name: Plan Production - xhibit-portal
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' # job only runs for merges to the main branch
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v3.5.2
-      - name: Set Account Number
-        run: echo "ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${GITHUB_WORKFLOW}-${TF_ENV}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)" >> $GITHUB_ENV
-      - name: configure aws credentials
-        uses: aws-actions/configure-aws-credentials@e1e17a757e536f70e52b5a12b2e8d1d1c60e04ef # v2.0.0
-        with:
-          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
-          role-session-name: githubactionsrolesession
-          aws-region: ${{ env.AWS_REGION }}
-      - name: Load and Configure Terraform
-        uses: hashicorp/setup-terraform@633666f66e0061ca3b725c73b2ec20cd13a8fdd1 # v2.0.3
-        with:
-          terraform_version: "~1"
-          terraform_wrapper: false
-      - name: Terraform plan - production
-        run: |
-          terraform --version
-          echo "Terraform plan - ${TF_ENV}"
-          bash scripts/terraform-init.sh terraform/environments/xhibit-portal
-          terraform -chdir="terraform/environments/xhibit-portal" workspace select "xhibit-portal-${TF_ENV}"
-          bash scripts/terraform-plan.sh terraform/environments/xhibit-portal
-    env:
-      TF_ENV: production
-
-  deploy-production:
-    needs: plan-production # job only runs if plan-production runs successfully
-    name: Deploy Production - xhibit-portal
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' # job only runs for merges to the main branch, which can only be done after PR review approval
-    environment:
-      name: xhibit-portal-production        # put this in if you want to click-to-deploy with a review button in the Github Actions tab
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v3.5.2
-      - name: Set Account Number
-        run: echo "ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${GITHUB_WORKFLOW}-${TF_ENV}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)" >> $GITHUB_ENV
-      - name: configure aws credentials
-        uses: aws-actions/configure-aws-credentials@e1e17a757e536f70e52b5a12b2e8d1d1c60e04ef # v2.0.0
-        with:
-          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
-          role-session-name: githubactionsrolesession
-          aws-region: ${{ env.AWS_REGION }}
-      - name: Load and Configure Terraform
-        uses: hashicorp/setup-terraform@633666f66e0061ca3b725c73b2ec20cd13a8fdd1 # v2.0.3
-        with:
-          terraform_version: "~1"
-          terraform_wrapper: false
-      - name: Terraform apply - production
-        run: |
-          terraform --version
-          echo "Terraform apply - ${TF_ENV}"
-          bash scripts/terraform-init.sh terraform/environments/xhibit-portal
-          terraform -chdir="terraform/environments/xhibit-portal" workspace select "xhibit-portal-${TF_ENV}"
-          bash scripts/terraform-apply.sh terraform/environments/xhibit-portal
-    env:
-      TF_ENV: production
+  destroy-development:
+    if: inputs.action == 'destroy'
+    uses: ./.github/workflows/reusable_terraform_plan_apply.yml
+    with:
+      application: "${{ github.workflow }}"
+      environment: "development"
+      action: "plan_apply"
+      plan_apply_tfargs: "-destroy"
+    secrets:
+      modernisation_platform_environments: "${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}"
+      pipeline_github_token: "${{ secrets.MODERNISATION_PLATFORM_CI_USER_ENVIRONMENTS_REPO_PAT }}"
