@@ -195,29 +195,29 @@ locals {
         ]
 
         listeners = {
-          https = merge(
-            local.lb_weblogic.https, {
-              rules = {
-                t1-nomis-web-a-http-7777 = {
-                  priority = 300
-                  actions = [{
-                    type              = "forward"
-                    target_group_name = "t1-nomis-web-a-http-7777"
-                  }]
-                  conditions = [{
-                    host_header = {
-                      values = [
-                        "t1-nomis-web-a.test.nomis.az.justice.gov.uk",
-                        "t1-nomis-web-a.test.nomis.service.justice.gov.uk",
-                        "c-t1.test.nomis.az.justice.gov.uk",
-                        "c-t1.test.nomis.service.justice.gov.uk",
-                        "t1-cn.hmpp-azdt.justice.gov.uk",
-                      ]
-                    }
-                  }]
-                }
-              }
-          })
+          #          https = merge(
+          #            local.lb_weblogic.https, {
+          #              rules = {
+          #                t1-nomis-web-a-http-7777 = {
+          #                  priority = 300
+          #                  actions = [{
+          #                    type              = "forward"
+          #                    target_group_name = "t1-nomis-web-a-http-7777"
+          #                  }]
+          #                  conditions = [{
+          #                    host_header = {
+          #                      values = [
+          #                        "t1-nomis-web-a.test.nomis.az.justice.gov.uk",
+          #                        "t1-nomis-web-a.test.nomis.service.justice.gov.uk",
+          #                        "c-t1.test.nomis.az.justice.gov.uk",
+          #                        "c-t1.test.nomis.service.justice.gov.uk",
+          #                        "t1-cn.hmpp-azdt.justice.gov.uk",
+          #                      ]
+          #                    }
+          #                  }]
+          #                }
+          #              }
+          #          })
         }
       }
     }
