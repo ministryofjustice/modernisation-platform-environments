@@ -30,60 +30,60 @@ locals {
     }
 
     baseline_lbs = {
-      # prod-oasys-internal = {
-      #   enable_delete_protection = false # change to true before we actually use
-      #   force_destroy_bucket     = false
-      #   idle_timeout             = "60"
-      #   internal_lb              = true
-      #   security_groups          = ["private"]
-      #   public_subnets           = module.environment.subnets["public"].ids
-      #   existing_target_groups   = {}
-      #   tags                     = local.tags
-      #   listeners = {
-      #     https = {
-      #       port                      = 443
-      #       protocol                  = "HTTPS"
-      #       ssl_policy                = "ELBSecurityPolicy-2016-08"
-      #       certificate_names_or_arns = ["application_environment_wildcard_cert"]
-      #       default_action = {
-      #         type = "fixed-response"
-      #         fixed_response = {
-      #           content_type = "text/plain"
-      #           message_body = "Not implemented"
-      #           status_code  = "501"
-      #         }
-      #       }
-      #       rules = {
-      #         forward-http-8080 = {
-      #           priority = 100
-      #           actions = [{
-      #             type              = "forward"
-      #             target_group_name = "prod-oasys-web-trn-http-8080"
-      #           }]
-      #           conditions = [
-      #             {
-      #               host_header = {
-      #                 values = ["trn.oasys.${module.environment.domains.public.business_unit_environment}"]
-      #               }
-      #             },
-      #             {
-      #               path_pattern = {
-      #                 values = ["/"]
-      #               }
-      #           }]
-      #         }
-      #       }
-      #     }
-      #   }
-      # }
+      prod-oasys-internal = {
+        enable_delete_protection = false # change to true before we actually use
+        force_destroy_bucket     = false
+        idle_timeout             = "60"
+        internal_lb              = true
+        security_groups          = ["private"]
+        public_subnets           = module.environment.subnets["public"].ids
+        existing_target_groups   = {}
+        tags                     = local.tags
+        listeners = {
+          https = {
+            port                      = 443
+            protocol                  = "HTTPS"
+            ssl_policy                = "ELBSecurityPolicy-2016-08"
+            certificate_names_or_arns = ["application_environment_wildcard_cert"]
+            default_action = {
+              type = "fixed-response"
+              fixed_response = {
+                content_type = "text/plain"
+                message_body = "Not implemented"
+                status_code  = "501"
+              }
+            }
+            rules = {
+              # forward-http-8080 = {
+              #   priority = 100
+              #   actions = [{
+              #     type              = "forward"
+              #     target_group_name = "prod-oasys-web-trn-http-8080"
+              #   }]
+              #   conditions = [
+              #     {
+              #       host_header = {
+              #         values = ["trn.oasys.${module.environment.domains.public.business_unit_environment}"]
+              #       }
+              #     },
+              #     {
+              #       path_pattern = {
+              #         values = ["/"]
+              #       }
+              #   }]
+              # }
+            }
+          }
+        }
+      }
     }
 
     baseline_route53_zones = {
-      # "${module.environment.domains.public.business_unit_environment}" = {
-      #   lb_alias_records = [
-      #     { name = "trn.oasys", type = "A", lbs_map_key = "prod-oasys-internal" },
-      #   ]
-      # }
+      "${module.environment.domains.public.business_unit_environment}" = {
+        lb_alias_records = [
+          { name = "trn.oasys", type = "A", lbs_map_key = "prod-oasys-internal" },
+        ]
+      }
     }
 
     baseline_ec2_autoscaling_groups = {
