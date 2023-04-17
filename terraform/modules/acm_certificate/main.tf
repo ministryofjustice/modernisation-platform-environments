@@ -72,7 +72,7 @@ resource "aws_route53_record" "validation_self" {
 }
 
 resource "aws_acm_certificate_validation" "this" {
-  count           = 0
+  count           = (length(local.validation_records_external) == 0 || var.external_validation_records_created) ? 1 : 0
   certificate_arn = aws_acm_certificate.this.arn
   validation_record_fqdns = [
     for record in merge(

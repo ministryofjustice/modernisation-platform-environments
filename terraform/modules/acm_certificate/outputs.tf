@@ -9,12 +9,6 @@ output "arn" {
 }
 
 output "validation_records_external" {
-  value = {
-    for key, value in local.validation_records : key => {
-      name   = value.name
-      record = value.record
-      type   = value.type
-    } if value.zone.provider == "external"
-  }
+  value       = local.validation_records_external
   description = "Any DNS validation records that could not be created by the module"
 }
