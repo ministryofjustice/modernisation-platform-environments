@@ -46,67 +46,18 @@ locals {
         }
       }
 
-      t2-oasys-web = {
-        config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name                  = "base_rhel_8_5_*"
+      t2-oasys-web = merge(local.webserver, {
+        config = merge(local.webserver.config, {
           ssm_parameters_prefix     = "ec2-web-t2/"
           iam_resource_names_prefix = "ec2-web-t2"
           # instance_profile_policies = local.ec2_common_managed_policies # need to check the preset policies are enough
         })
-
-        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-          monitoring             = true
-          #instance_type          = "t3.medium"
-        })
-
-        cloudwatch_metric_alarms = {}
-
-        user_data_cloud_init     = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
-          args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
-            branch = "ccfe2d0becae50d1ff706442b52a6c9fe01d5a7c" # 2023-04-12
-          })
-        })
-        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
-
-        autoscaling_group = module.baseline_presets.ec2_autoscaling_group
-
-        lb_target_groups = {
-          http-8080 = {
-            port                 = 8080
-            protocol             = "HTTP"
-            target_type          = "instance"
-            deregistration_delay = 30
-            health_check = {
-              enabled             = true
-              interval            = 30
-              healthy_threshold   = 3
-              matcher             = "200-399"
-              path                = "/"
-              port                = 8080
-              timeout             = 5
-              unhealthy_threshold = 5
-            }
-            stickiness = {
-              enabled = true
-              type    = "lb_cookie"
-            }
-          }
-        }
-        tags = {
-          component         = "web"
-          os-type           = "Linux"
-          os-major-version  = 7
-          os-version        = "RHEL 7.9"
-          "Patch Group"     = "RHEL"
-          server-type       = "oasys-web"
-          description       = "t2 OASys web"
-          monitored         = true
-          oasys-environment = "t2"
-          environment-name  = terraform.workspace
+        tags = merge(local.webserver.config, {
+          description        = "t2 OASys web"
+          oasys-environment  = "t2"
           oracle-db-hostname = "T2ODL0009"
-          oracle-db-name     = "OASPROD"
-        }
-      } 
+        })
+      })
     }
 
     baseline_lbs = {
