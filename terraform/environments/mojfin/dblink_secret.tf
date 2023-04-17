@@ -3,37 +3,37 @@ locals {
     secret1 = {
       name          = "APP_MOJFIN_APPS_RO"
       description   = "APPS_RO password for mojfin db link"
-      value         = random_password.apps_ro_password
+      secret_value         = random_password.apps_ro_password
     },
     secret2 = {
       name          = "APP_MOJFIN_DEVELOPER"
       description   = "DEVELOPER user for TAD and TAD_TEST db link"
-      value = "laa_developer"
+      secret_value = "laa_developer"
     },
     secret3 = {
       name          = "APP_MOJFIN_FEDUSER"
       description   = "FEDUSER user for EDW005"
-      value = "fed1ser"
+      secret_value = "fed1ser"
     },
     secret4 = {
       name          = "APP_MOJFIN_FINACC"
       description   = "FINACC user for CISRO db link"
-      value = "Greenland"
+      secret_value = "Greenland"
     },
     secret5 = {
       name          = "APP_MOJFIN_MI_TEAM"
       description   = "ID for OBIEE connection to MOJFIN"
-      value = "MI_TEAM1"
+      secret_value = "MI_TEAM1"
     },
     secret6 = {
       name          = "APP_MOJFIN_MORA-W"
       description   = "MORA-W user for CISPROD db link"
-      value = "palace"
+      secret_value = "palace"
     },
     secret7 = {
       name          = "APP_MOJFIN_QUERY"
       description   = "Query user for CCMT db link"
-      value = "query1"
+      secret_value = "query1"
     }
   }
 }
@@ -48,7 +48,7 @@ resource "aws_ssm_parameter" "secret" {
   name        = each.value.name
   description = each.value.description
   type        = "SecureString"
-  value       = each.value.value
+  value       = each.value.secret_value
 
   tags = merge(
     local.tags,
