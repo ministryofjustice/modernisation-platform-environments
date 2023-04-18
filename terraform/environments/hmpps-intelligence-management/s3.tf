@@ -25,27 +25,27 @@ module "s3-bucket" { #tfsec:ignore:aws-s3-enable-versioning
   tags = merge(local.tags,
     { Name = lower(format("s3-bucket-%s-%s-example", local.application_name, local.environment)) }
   )
+}
 
-  data "aws_iam_policy_document" "bucket_policy" {
+data "aws_iam_policy_document" "bucket_policy" {
 
-    statement {
-      principals {
-        type        = "AWS"
-        identifiers = [
-          "arn:aws:iam::720459241262:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-developer_58965ce32623df8d"
-        ]
-      }
-
-      actions = [
-        "s3:GetObject",
-        "s3.PutObject",
-        "s3.ListBucket",
-      ]
-
-      resources = [
-        module.s3-bucket.bucket.arn,
-        "${module.s3-bucket.bucket.arn}/*",
+  statement {
+    principals {
+      type        = "AWS"
+      identifiers = [
+        "arn:aws:iam::720459241262:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-developer_58965ce32623df8d"
       ]
     }
+
+    actions = [
+      "s3:GetObject",
+      "s3.PutObject",
+      "s3.ListBucket",
+    ]
+
+    resources = [
+      module.s3-bucket.bucket.arn,
+      "${module.s3-bucket.bucket.arn}/*",
+    ]
   }
 }
