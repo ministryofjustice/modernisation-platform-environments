@@ -96,10 +96,9 @@ locals {
         tags = merge(local.webserver.tags, {
           description       = "${local.environment} training OASys web"
           oasys-environment = "trn"
-          # oracle-db-hostname = "T2ODL0009"
           oracle-db-name     = "OASTRN"
         }
-      }
+      })
     }
   }
 }
