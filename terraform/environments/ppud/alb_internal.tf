@@ -55,7 +55,7 @@ resource "aws_lb_listener" "PPUD-Front-End-Training" {
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.PPUD-internal-Traning-Target-Group[0].arn
+    target_group_arn = aws_lb_target_group.PPUD-internal-Training-Target-Group[0].arn
   }
 }
 
