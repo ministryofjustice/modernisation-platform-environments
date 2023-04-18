@@ -97,7 +97,7 @@ locals {
           description       = "${local.environment} training OASys web"
           oasys-environment = "trn"
           oracle-db-name     = "OASTRN"
-        }
+        })
       })
     }
   }
