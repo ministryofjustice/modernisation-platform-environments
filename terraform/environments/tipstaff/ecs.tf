@@ -112,9 +112,6 @@ resource "aws_ecs_service" "tipstaff_ecs_service" {
   deployment_controller {
     type = "ECS"
   }
-
-  deployment_maximum_percent         = 200
-  deployment_minimum_healthy_percent = 100
 }
 
 resource "aws_iam_role" "app_execution" {
