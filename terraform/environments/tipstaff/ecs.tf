@@ -73,6 +73,10 @@ resource "aws_ecs_task_definition" "tipstaff_task_definition" {
         {
           name  = "CurServer"
           value = "DEVELOPMENT"
+        },
+        {
+          name  = "ida:ClientId"
+          value = "09730739-d16b-47e6-a8c6-007ad48bed2d"
         }
       ]
     }
