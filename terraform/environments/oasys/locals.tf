@@ -117,7 +117,7 @@ locals {
       oasys-environment = local.environment
       environment-name  = terraform.workspace
       #oracle-db-hostname = "T2ODL0009"
-      oracle-db-name     = "OASPROD"
+      oracle-db-sid     = "OASPROD"
     }
   } 
 
