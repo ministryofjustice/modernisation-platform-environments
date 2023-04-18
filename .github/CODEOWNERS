@@ -4,7 +4,7 @@
 * @ministryofjustice/modernisation-platform
 /terraform/environments/apex @ministryofjustice/laa-aws-infrastructure @ministryofjustice/modernisation-platform
 /terraform/environments/ccms-ebs @ministryofjustice/laa-ccms-migration-team @ministryofjustice/modernisation-platform-security @ministryofjustice/modernisation-platform
-/terraform/environments/cooker @ministryofjustice/modernisation-platform
+/terraform/environments/cooker @ministryofjustice/modernisation-platform @ministryofjustice/modernisation-platform
 /terraform/environments/data-and-insights-wepi @ministryofjustice/data-and-insights-hub @ministryofjustice/modernisation-platform
 /terraform/environments/data-platform @ministryofjustice/data-platform-core-infra @ministryofjustice/data-platform-labs @ministryofjustice/data-platform-security-and-auditors @ministryofjustice/data-tech-archs @ministryofjustice/modernisation-platform
 /terraform/environments/delius-core @ministryofjustice/hmpps-migration @ministryofjustice/modernisation-platform
