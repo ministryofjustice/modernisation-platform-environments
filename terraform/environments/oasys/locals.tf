@@ -76,9 +76,7 @@ locals {
     })
     cloudwatch_metric_alarms = {}
     user_data_cloud_init     = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
-      args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
-        branch = "ccfe2d0becae50d1ff706442b52a6c9fe01d5a7c" # 2023-04-12
-      })
+      args = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args
     })
     autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
     autoscaling_group = module.baseline_presets.ec2_autoscaling_group
