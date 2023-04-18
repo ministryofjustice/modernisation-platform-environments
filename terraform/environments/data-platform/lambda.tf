@@ -138,8 +138,7 @@ resource "aws_cloudwatch_event_rule" "put_to_code_directory" {
       "requestParameters" : {
         "bucketName" : [module.s3-bucket.bucket.id],
         "key" : [
-          { "prefix" : "code/" },
-          { "suffix": ".zip" }
+          { "prefix" : "code_zips/" }
         ]
       }
     }
@@ -158,8 +157,7 @@ resource "aws_cloudwatch_event_rule" "put_to_data_directory" {
       "requestParameters" : {
         "bucketName" : [module.s3-bucket.bucket.id],
         "key" : [
-          { "prefix" : "data/" },
-          { "suffix" : ".csv" }
+          { "prefix" : "raw_data/" }
         ]
       }
     }
