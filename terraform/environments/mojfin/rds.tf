@@ -7,7 +7,6 @@ locals {
   pVPCCidr=           "10.205.0.0/20"
   pCPVPCCidr=         "172.20.0.0/20"
   transit_gw_to_mojfinprod=             "10.201.0.0/16"
-  vpc_id = "vpc-06febffe7b87ab37f"
 
 }
 
@@ -50,7 +49,7 @@ resource "aws_db_parameter_group" "default" {
 resource "aws_security_group" "laalz-secgroup" {
   name        = "laalz-secgroup"
   description = "RDS access with the LAA Landing Zone"
-  vpc_id      = local.vpc_id
+  vpc_id      = data.aws_vpc.shared.id
 
   ingress {
     description = "Ireland Shared Services Inbound - Workspaces etc"
@@ -109,14 +108,6 @@ resource "aws_security_group" "laalz-secgroup" {
   
   }
 
-   ingress {
-    description = "6 Degrees VPN Inbound"
-    from_port   = 1521
-    to_port     = 1521
-    protocol    = "tcp"
-    cidr_blocks = [local.cidr_six_degrees]
-  }
-
 
 
   tags = {
@@ -125,3 +116,36 @@ resource "aws_security_group" "laalz-secgroup" {
 }
 
 
+
+resource "aws_security_group" "vpc-secgroup" {
+  name        = "vpc-secgroup"
+  description = "RDS Access with the shared vpc"
+  vpc_id      = data.aws_vpc.shared.id
+
+  ingress {
+    description = "Sql Net on 1521"
+    from_port   = 1521
+    to_port     = 1521
+    protocol    = "tcp"
+    cidr_blocks = [data.aws_vpc.shared.cidr_block]
+  }
+  ingress {
+    description = "6 Degrees VPN Inbound"
+    from_port   = 1521
+    to_port     = 1521
+    protocol    = "tcp"
+    cidr_blocks = [local.cidr_six_degrees]
+  }
+
+  egress {
+    description = "Sql Net on 1521"
+    from_port   = 1521
+    to_port     = 1521
+    protocol    = "tcp"
+    cidr_blocks = [data.aws_vpc.shared.cidr_block]
+  }
+
+  tags = {
+    Name = "${local.application_name}-${local.environment}-vpc-secgroup"
+  }
+}
