@@ -408,11 +408,17 @@ resource "aws_key_pair" "cjms_instance" {
 resource "aws_eip" "s265903rgsl400-eip" {
   count = local.is-production == true ? 1 : 0
   vpc   = true
+  tags = {
+    Name   = "s265903rgsl400"
+  }
 }
 
 resource "aws_eip" "s265903rgsl401-eip" {
   count = local.is-production == true ? 1 : 0
   vpc   = true
+  tags = {
+    Name   = "s265903rgsl401"
+  }
 }
 
 #Associate EIP with EC2 Instance
