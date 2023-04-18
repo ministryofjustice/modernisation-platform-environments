@@ -1,5 +1,15 @@
 
+locals {
+  cidr_ire_workspace ="10.200.96.0/19"
+  cidr_six_degrees=   "10.225.60.0/24"
+  pOBIEEInboundCIDR=  "10.225.40.0/24"
+  pEnvManagementCIDR= "10.200.16.0/20"
+  pVPCCidr=           "10.205.0.0/20"
+  pCPVPCCidr=         "172.20.0.0/20"
+  transit_gw_to_mojfinprod=             "10.201.0.0/16"
+  vpc_id = "vpc-06febffe7b87ab37f"
 
+}
 
 
 resource "aws_db_subnet_group" "appdbsubnetgroup" {
@@ -40,55 +50,78 @@ resource "aws_db_parameter_group" "default" {
 resource "aws_security_group" "laalz-secgroup" {
   name        = "laalz-secgroup"
   description = "RDS access with the LAA Landing Zone"
-  vpc_id      = data.aws_vpc.shared.id
+  vpc_id      = local.vpc_id
 
   ingress {
-    description = "Sql Net on 1521"
+    description = "Ireland Shared Services Inbound - Workspaces etc"
     from_port   = 1521
     to_port     = 1521
     protocol    = "tcp"
-    cidr_blocks = [local.application_data.accounts[local.environment].lz_vpc_cidr]
+    cidr_blocks = [local.cidr_ire_workspace ]
+  
   }
-
-  egress {
-    description = "Sql Net on 1521"
-    from_port   = 1521
-    to_port     = 1521
-    protocol    = "tcp"
-    cidr_blocks = [var.lz_vpc_cidr]
-  }
-
-  tags = {
-    Name = "${var.application_name}-${var.environment}-laalz-secgroup"
-  }
-}
-
-resource "aws_security_group" "vpc-secgroup" {
-  name        = "vpc-secgroup"
-  description = "RDS Access with the shared vpc"
-  vpc_id      = data.aws_vpc.shared.id
-
   ingress {
-    description = "Sql Net on 1521"
+    description = "6 Degrees VPN Inbound"
     from_port   = 1521
     to_port     = 1521
     protocol    = "tcp"
-    cidr_blocks = [data.aws_vpc.shared.cidr_block]
+    cidr_blocks = [local.cidr_six_degrees]
+  
+  }
+ ingress {
+    description ="6 Degrees OBIEE Inbound"
+    from_port   = 1521
+    to_port     = 1521
+    protocol    = "tcp"
+    cidr_blocks = [local.pOBIEEInboundCIDR]
+  
+  }
+   ingress {
+    description ="SharedServices Inbound - Workspaces etc"
+    from_port   = 1521
+    to_port     = 1521
+    protocol    = "tcp"
+    cidr_blocks = [local.pEnvManagementCIDR]
+  
+  }
+   ingress {
+    description ="VPC Internal Traffic inbound"
+    from_port   = 1521
+    to_port     = 1521
+    protocol    = "tcp"
+    cidr_blocks = [local.pVPCCidr]
+  
+  }
+  ingress {
+    description ="Cloud Platform VPC Internal Traffic inbound"
+    from_port   = 1521
+    to_port     = 1521
+    protocol    = "tcp"
+    cidr_blocks = [local.pCPVPCCidr]
+  
+  }
+  ingress {
+    description ="Connectivity Analytic Platform use of Transit Gateway to MoJFin PROD"
+    from_port   = 1521
+    to_port     = 1521
+    protocol    = "tcp"
+    cidr_blocks = [local.transit_gw_to_mojfinprod]
+  
   }
 
-  egress {
-    description = "Sql Net on 1521"
+   ingress {
+    description = "6 Degrees VPN Inbound"
     from_port   = 1521
     to_port     = 1521
     protocol    = "tcp"
-    cidr_blocks = [data.aws_vpc.shared.cidr_block]
+    cidr_blocks = [local.cidr_six_degrees]
   }
+
+
 
   tags = {
-    Name = "${var.application_name}-${var.environment}-vpc-secgroup"
+    Name = "${local.application_name}-${local.environment}-laalz-secgroup"
   }
 }
 
-output "rds_endpoint" {
-  value = aws_db_instance.appdb1.address
-}
+
