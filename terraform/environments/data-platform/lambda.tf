@@ -137,9 +137,7 @@ resource "aws_cloudwatch_event_rule" "put_to_code_directory" {
       "eventName" : ["PutObject"],
       "requestParameters" : {
         "bucketName" : [module.s3-bucket.bucket.id],
-        "key" : [
-          { "prefix" : "code_zips/" }
-        ]
+        "key" : [{ "prefix" : "code_zips/" }]
       }
     }
   })
@@ -156,9 +154,7 @@ resource "aws_cloudwatch_event_rule" "put_to_data_directory" {
       "eventName" : ["PutObject"],
       "requestParameters" : {
         "bucketName" : [module.s3-bucket.bucket.id],
-        "key" : [
-          { "prefix" : "raw_data/" }
-        ]
+        "key" : [{ "prefix" : "raw_data/" }]
       }
     }
   })
