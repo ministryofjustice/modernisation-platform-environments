@@ -16,6 +16,7 @@ def handler(event, context):
     # specify the bucket name and the key of the zip file
     bucket_name = event["detail"]["requestParameters"]["bucketName"]
     zip_key = event["detail"]["requestParameters"]["key"]
+
     logging.info(f"bucketname: {bucket_name}")
     logging.info(f"Key: {zip_key}")
 
