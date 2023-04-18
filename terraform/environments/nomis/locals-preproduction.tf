@@ -85,29 +85,29 @@ locals {
         ]
 
         listeners = {
-          #          https = merge(
-          #            local.lb_weblogic.https, {
-          #              rules = {
-          #                preprod-nomis-web-a-http-7777 = {
-          #                  priority = 200
-          #                  actions = [{
-          #                    type              = "forward"
-          #                    target_group_name = "preprod-nomis-web-a-http-7777"
-          #                  }]
-          #                  conditions = [{
-          #                    host_header = {
-          #                      values = [
-          #                        "preprod-nomis-web-a.preproduction.nomis.az.justice.gov.uk",
-          #                        "preprod-nomis-web-a.preproduction.nomis.service.justice.gov.uk",
-          #                        "c.preproduction.nomis.az.justice.gov.uk",
-          #                        "c.preproduction.nomis.service.justice.gov.uk",
-          #                        "c.pp-nomis.service.justice.gov.uk",
-          #                      ]
-          #                    }
-          #                  }]
-          #                }
-          #              }
-          #          })
+          https = merge(
+            local.lb_weblogic.https, {
+              rules = {
+                preprod-nomis-web-a-http-7777 = {
+                  priority = 200
+                  actions = [{
+                    type              = "forward"
+                    target_group_name = "preprod-nomis-web-a-http-7777"
+                  }]
+                  conditions = [{
+                    host_header = {
+                      values = [
+                        "preprod-nomis-web-a.preproduction.nomis.az.justice.gov.uk",
+                        "preprod-nomis-web-a.preproduction.nomis.service.justice.gov.uk",
+                        "c.preproduction.nomis.az.justice.gov.uk",
+                        "c.preproduction.nomis.service.justice.gov.uk",
+                        "c.pp-nomis.service.justice.gov.uk",
+                      ]
+                    }
+                  }]
+                }
+              }
+          })
         }
       }
     }
