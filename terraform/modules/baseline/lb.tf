@@ -73,7 +73,7 @@ module "lb_listener" {
   tags = merge(local.tags, each.value.tags)
 
   depends_on = [
-    module.acm_certificate,       # ensure certs are created first
+    module.acm_certificate, # ensure certs are created first
   ]
 
   alarm_target_group_names = each.value.alarm_target_group_names
