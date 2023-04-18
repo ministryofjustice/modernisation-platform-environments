@@ -66,7 +66,11 @@ locals {
   ### env independent webserver vars
   ###
   webserver = {
-    config = module.baseline_presets.ec2_instance.config.default
+    config = merge(module.baseline_presets.ec2_instance.config.default, {
+      ami_name = "oasys_webserver_release_*"
+      ssm_parameters_prefix     = "ec2-web/"
+      iam_resource_names_prefix = "ec2-web"
+    })
     instance = merge(module.baseline_presets.ec2_instance.instance.default, {
       monitoring             = true
     })
@@ -102,6 +106,7 @@ locals {
     }
     tags = {
       component         = "web"
+      description       = "${local.environment} OASys web"
       os-type           = "Linux"
       os-major-version  = 7
       os-version        = "RHEL 7.9"
