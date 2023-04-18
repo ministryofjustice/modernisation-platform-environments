@@ -137,7 +137,10 @@ resource "aws_cloudwatch_event_rule" "put_to_code_directory" {
       "eventName" : ["PutObject"],
       "requestParameters" : {
         "bucketName" : [module.s3-bucket.bucket.id],
-        "key" : [{ "prefix" : "code/" }]
+        "key" : [
+          { "prefix" : "code/" },
+          { "suffix": ".zip" }
+        ]
       }
     }
   })
@@ -154,7 +157,10 @@ resource "aws_cloudwatch_event_rule" "put_to_data_directory" {
       "eventName" : ["PutObject"],
       "requestParameters" : {
         "bucketName" : [module.s3-bucket.bucket.id],
-        "key" : [{ "prefix" : "data/" }]
+        "key" : [
+          { "prefix" : "data/" },
+          { "suffix" : ".csv" }
+        ]
       }
     }
   })
