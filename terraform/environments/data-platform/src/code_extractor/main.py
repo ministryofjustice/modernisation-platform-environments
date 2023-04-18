@@ -3,6 +3,7 @@ import zipfile
 import io
 import os
 import logging
+from pathlib import Path
 
 logging.getLogger().setLevel(logging.INFO)
 s3 = boto3.client("s3")
@@ -28,8 +29,8 @@ def handler(event, context):
 
     # specify the output bucket name and prefix for the unzipped files
     output_bucket_name = bucket_name
-    # eg s3://BUCKET_NAME/code_zips/_example_2/timestamp/file.zip
-    project_and_timestamp = zip_key.split("/")[4:6]
+    # eg code_zips/_example_2/timestamp/file.zip
+    project_and_timestamp = Path(zip_key).parts[1:3]
     output_prefix = os.path.join("code", *project_and_timestamp, "extracted")
     logging.info(f"output_prefix: {output_prefix}")
 
