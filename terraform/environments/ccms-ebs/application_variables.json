@@ -64,7 +64,7 @@
     },
     "preproduction": {
       "dns": "laa-preproduction",
-      "instance-scheduling": "skip-auto-start",
+      "instance-scheduling": "skip-scheduling",
       "ec2_oracle_instance_type_ebsdb": "x2iedn.4xlarge",
       "ec2_oracle_instance_type_ebsapps": "m5d.16xlarge",
       "ec2_oracle_instance_type_webgate": "c5d.2xlarge",
@@ -95,7 +95,7 @@
     },
     "production": {
       "dns": "laa",
-      "instance-scheduling": "skip-auto-start",
+      "instance-scheduling": "skip-scheduling",
       "ec2_oracle_instance_type_ebsdb": "x2iedn.4xlarge",
       "ec2_oracle_instance_type_ebsapps": "m5d.16xlarge",
       "ec2_oracle_instance_type_webgate": "c5d.2xlarge",
