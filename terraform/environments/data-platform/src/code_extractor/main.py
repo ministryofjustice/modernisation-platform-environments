@@ -29,9 +29,9 @@ def handler(event, context):
 
     # specify the output bucket name and prefix for the unzipped files
     output_bucket_name = bucket_name
-    # eg code_zips/_example_2/timestamp/file.zip
-    project_and_timestamp = Path(zip_key).parts[1:3]
-    output_prefix = os.path.join("code", *project_and_timestamp, "extracted")
+    # eg code_zips/example_2/file.zip
+    project = Path(zip_key).parts[1]
+    output_prefix = os.path.join("code", project, "extracted")
     logging.info(f"output_prefix: {output_prefix}")
 
     # iterate through each file in the zip file
