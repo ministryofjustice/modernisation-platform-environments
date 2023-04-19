@@ -8,7 +8,7 @@ logging.getLogger().setLevel(logging.INFO)
 glue = boto3.client("glue")
 
 
-def lambda_handler(event, context):
+def handler(event, context):
     logging.info("Event detail:")
     logging.info(event)
     gluejobname = os.environ.get("GLUE_JOB_NAME")
@@ -20,8 +20,15 @@ def lambda_handler(event, context):
         logging.info(f"File key: {file_key}")
         project = Path(file_key).parts[1]
         transform_file_path = os.path.join(
-            "code", project, "extracted", "application", "transform.py"
+            "s3://",
+            bucket_name,
+            "code",
+            project,
+            "extracted",
+            "application",
+            "transform.py",
         )
+        logging.info("Transform filepath: ", transform_file_path)
 
         args = {
             "--bucketName": bucket_name,
