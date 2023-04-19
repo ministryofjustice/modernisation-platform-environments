@@ -28,7 +28,7 @@ resource "aws_glue_job" "glue_job" {
   tags                   = local.tags
 
   command {
-    script_location = "s3://${module.s3-bucket.bucket.name}/glue_script/glue_transform_script.py"
+    script_location = "s3://${module.s3-bucket.bucket.id}/glue_script/glue_transform_script.py"
     name            = "glueetl"
   }
 
