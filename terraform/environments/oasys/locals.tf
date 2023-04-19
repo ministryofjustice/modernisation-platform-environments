@@ -75,11 +75,7 @@ locals {
       monitoring             = true
     })
     cloudwatch_metric_alarms = {}
-    user_data_cloud_init     = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
-      args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
-        branch = "ccfe2d0becae50d1ff706442b52a6c9fe01d5a7c" # 2023-04-12
-      })
-    })
+    user_data_cloud_init     = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags
     ebs_volumes = {
       "/dev/sdb" = { # /u01
         size        = 100
