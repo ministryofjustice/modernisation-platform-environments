@@ -3,9 +3,6 @@ locals {
   default_arguments = {
     "--continuous-log-logGroup" = aws_cloudwatch_log_group.log_group.name
   }
-tags = {
-  Dept = "Data-Platform-Product"
-}
 }
 
 
