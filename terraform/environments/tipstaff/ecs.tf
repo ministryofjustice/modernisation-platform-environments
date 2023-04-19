@@ -43,8 +43,7 @@ resource "aws_ecs_task_definition" "tipstaff_task_definition" {
       environment = [
         {
           name  = "RDS_HOSTNAME"
-          # value = "${aws_db_instance.tipstaffdbdev.address}"
-          value = "postgresql-dev.cutundmgf1ze.eu-west-2.rds.amazonaws.com"
+          value = "${aws_db_instance.tipstaffdbdev.address}"
         },
         {
           name  = "RDS_PORT"
@@ -52,15 +51,15 @@ resource "aws_ecs_task_definition" "tipstaff_task_definition" {
         },
         {
           name  = "RDS_USERNAME"
-          value = "${jsondecode(data.aws_secretsmanager_secret_version.db_username.secret_string)["LOCAL_DB_USERNAME"]}"
+          value = "${aws_db_instance.tipstaffdbdev.username}"
         },
         {
           name  = "RDS_PASSWORD"
-          value = "${jsondecode(data.aws_secretsmanager_secret_version.db_password.secret_string)["LOCAL_DB_PASSWORD"]}"
+          value = "${aws_db_instance.tipstaffdbdev.password}"
         },
         {
           name  = "DB_NAME"
-          value = "tipstaff_dev2"
+          value = "${aws_db_instance.tipstaffdbdev.db_name}"
         },
         {
           name  = "supportEmail"
