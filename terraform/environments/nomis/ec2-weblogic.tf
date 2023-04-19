@@ -74,6 +74,34 @@ locals {
     production    = {}
   }
 
+  ec2_weblogic_cloudwatch_metric_alarms = {
+    weblogic-node-manager-service = {
+      comparison_operator = "GreaterThanOrEqualToThreshold"
+      evaluation_periods  = "3"
+      namespace           = "CWAgent"
+      metric_name         = "collectd_exec_value"
+      period              = "60"
+      statistic           = "Average"
+      threshold           = "1"
+      alarm_description   = "weblogic-node-manager service has stopped"
+      dimensions = {
+        instance = "weblogic_node_manager"
+      }
+    }
+  }
+  ec2_weblogic_cloudwatch_metric_alarms_lists = {
+    weblogic = {
+      parent_keys = [
+        "ec2_default",
+        "ec2_linux_default",
+        "ec2_linux_with_collectd_default"
+      ]
+      alarms_list = [
+        { key = "weblogic", name = "weblogic-node-manager-service" }
+      ]
+    }
+  }
+
   ec2_weblogic_default = {
 
     config = merge(module.baseline_presets.ec2_instance.config.default, {
@@ -85,7 +113,7 @@ locals {
 
     instance = merge(module.baseline_presets.ec2_instance.instance.default_rhel6, {
       instance_type          = "t2.large"
-      vpc_security_group_ids = [aws_security_group.private.id]
+      vpc_security_group_ids = ["private-web"]
     })
 
     cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso"].weblogic
@@ -151,144 +179,4 @@ locals {
       availability_zone = "${local.region}b"
     })
   })
-
-  ec2_weblogic = {
-
-    # server-type and nomis-environment auto set by module
-    tags = {
-      description = "nomis weblogic appserver 10.3"
-      os-type     = "Linux"
-      component   = "web"
-    }
-
-    instance = {
-      disable_api_termination      = false
-      instance_type                = "t2.large"
-      key_name                     = aws_key_pair.ec2-user.key_name
-      monitoring                   = true
-      metadata_options_http_tokens = "optional"
-      vpc_security_group_ids       = [aws_security_group.private.id]
-    }
-
-    user_data_cloud_init = {
-      args = {
-        lifecycle_hook_name  = "ready-hook"
-        branch               = "main"
-        ansible_repo         = "modernisation-platform-configuration-management"
-        ansible_repo_basedir = "ansible"
-        ansible_args         = "--tags ec2provision"
-      }
-      scripts = [
-        "ansible-ec2provision.sh.tftpl",
-        "post-ec2provision.sh.tftpl"
-      ]
-    }
-
-    autoscaling_group = {
-      desired_capacity = 1
-      max_size         = 2
-      min_size         = 0
-
-      health_check_grace_period = 300
-      # health_check_type         = "ELB"
-      health_check_type         = "EC2" # using EC2 for now while we test, otherwise server is killed if weblogic stopped
-      force_delete              = true
-      termination_policies      = ["OldestInstance"]
-      target_group_arns         = []
-      vpc_zone_identifier       = module.environment.subnets["private"].ids
-      wait_for_capacity_timeout = 0
-
-      # this hook is triggered by the post-ec2provision.sh
-      initial_lifecycle_hooks = {
-        "ready-hook" = {
-          default_result       = "ABANDON"
-          heartbeat_timeout    = 7200 # on a good day it takes 30 mins, but can be much longer
-          lifecycle_transition = "autoscaling:EC2_INSTANCE_LAUNCHING"
-        }
-      }
-      warm_pool = {
-        reuse_on_scale_in           = true
-        max_group_prepared_capacity = 1
-      }
-
-      instance_refresh = {
-        strategy               = "Rolling"
-        min_healthy_percentage = 90 # seems that instances in the warm pool are included in the % health count so this needs to be set fairly high
-        instance_warmup        = 300
-      }
-    }
-
-    lb_target_groups = {
-      http-7001 = local.lb_target_group_http_7001
-      http-7777 = local.lb_target_group_http_7777
-    }
-
-    cloudwatch_metric_alarms = {
-      weblogic-node-manager-service = {
-        comparison_operator = "GreaterThanOrEqualToThreshold"
-        evaluation_periods  = "3"
-        namespace           = "CWAgent"
-        metric_name         = "collectd_exec_value"
-        period              = "60"
-        statistic           = "Average"
-        threshold           = "1"
-        alarm_description   = "weblogic-node-manager service has stopped"
-        dimensions = {
-          instance = "weblogic_node_manager"
-        }
-      }
-    }
-    cloudwatch_metric_alarms_lists = {
-      weblogic = {
-        parent_keys = [
-          "ec2_default",
-          "ec2_linux_default",
-          "ec2_linux_with_collectd_default"
-        ]
-        alarms_list = [
-          { key = "weblogic", name = "weblogic-node-manager-service" }
-        ]
-      }
-    }
-  }
-}
-
-module "ec2_weblogic_autoscaling_group" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-autoscaling-group?ref=v1.1.0"
-
-  providers = {
-    aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
-  }
-
-  for_each = try(local.environment_config.weblogic_autoscaling_groups, {})
-
-  name = each.key
-
-  ami_name                      = each.value.ami_name
-  ami_owner                     = try(each.value.ami_owner, "core-shared-services-production")
-  instance                      = merge(local.ec2_weblogic.instance, lookup(each.value, "instance", {}))
-  user_data_cloud_init          = merge(local.ec2_weblogic.user_data_cloud_init, lookup(each.value, "user_data_cloud_init", {}))
-  ebs_volumes_copy_all_from_ami = try(each.value.ebs_volumes_copy_all_from_ami, true)
-  ebs_kms_key_id                = module.environment.kms_keys["ebs"].arn
-  ebs_volume_config             = lookup(each.value, "ebs_volume_config", {})
-  ebs_volumes                   = lookup(each.value, "ebs_volumes", {})
-  ssm_parameters_prefix         = "weblogic/"
-  ssm_parameters                = {}
-  autoscaling_group             = merge(local.ec2_weblogic.autoscaling_group, lookup(each.value, "autoscaling_group", {}))
-  autoscaling_schedules         = lookup(each.value, "autoscaling_schedules", local.autoscaling_schedules_default)
-  lb_target_groups              = merge(local.ec2_weblogic.lb_target_groups, lookup(each.value, "lb_target_groups", {}))
-  vpc_id                        = module.environment.vpc.id
-
-  iam_resource_names_prefix = "ec2-weblogic-asg"
-  instance_profile_policies = local.ec2_common_managed_policies
-
-  application_name   = local.application_name
-  region             = local.region
-  subnet_ids         = module.environment.subnets["private"].ids
-  tags               = merge(local.tags, local.ec2_weblogic.tags, try(each.value.tags, {}))
-  account_ids_lookup = local.environment_management.account_ids
-
-  cloudwatch_metric_alarms = merge(module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso"].weblogic,
-    lookup(each.value, "cloudwatch_metric_alarms", {})
-  )
 }

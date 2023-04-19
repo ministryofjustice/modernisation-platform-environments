@@ -136,6 +136,27 @@ locals {
 
   # baseline config
   production_config = {
+
+    baseline_acm_certificates = {
+      nomis_wildcard_cert = {
+        # domain_name limited to 64 chars so use modernisation platform domain for this
+        # and put the wildcard in the san
+        domain_name = module.environment.domains.public.modernisation_platform
+        subject_alternate_names = [
+          "*.${module.environment.domains.public.application_environment}",
+          "*.${local.environment}.nomis.service.justice.gov.uk",
+          "*.${local.environment}.nomis.az.justice.gov.uk",
+          "*.nomis.service.justice.gov.uk",
+          "*.nomis.az.justice.gov.uk",
+        ]
+        external_validation_records_created = true
+        cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso"].acm_default
+        tags = {
+          description = "wildcard cert for nomis ${local.environment} domains"
+        }
+      }
+    }
+
     baseline_ec2_autoscaling_groups = {
       prod-nomis-web-a = merge(local.ec2_weblogic_zone_a, {
         tags = merge(local.ec2_weblogic_zone_a.tags, {
@@ -150,11 +171,13 @@ locals {
       private = {
         internal_lb              = true
         enable_delete_protection = false
-        existing_target_groups   = local.existing_target_groups
         force_destroy_bucket     = true
         idle_timeout             = 3600
         public_subnets           = module.environment.subnets["private"].ids
-        security_groups          = [aws_security_group.public.id]
+        security_groups = [
+          aws_security_group.public.id, # TODO: remove once weblogic servers refreshed
+          "private-lb"
+        ]
 
         listeners = {
           https = merge(
@@ -169,9 +192,11 @@ locals {
                   conditions = [{
                     host_header = {
                       values = [
-                        "prod-nomis-web-a.${module.environment.domains.public.business_unit_environment}",
                         "prod-nomis-web-a.production.nomis.az.justice.gov.uk",
+                        "prod-nomis-web-a.production.nomis.service.justice.gov.uk",
                         "c.production.nomis.az.justice.gov.uk",
+                        "c.production.nomis.service.justice.gov.uk",
+                        "c.nomis.az.justice.gov.uk",
                       ]
                     }
                   }]
@@ -183,15 +208,18 @@ locals {
     }
 
     baseline_route53_zones = {
-      "${module.environment.domains.public.business_unit_environment}" = {
-        lb_alias_records = [
-          { name = "prod-nomis-web-a.nomis", type = "A", lbs_map_key = "private" },
-        ]
+      "nomis.service.justice.gov.uk" = {
       }
       "production.nomis.az.justice.gov.uk" = {
         lb_alias_records = [
-          { name = "c", type = "A", lbs_map_key = "private" },
           { name = "prod-nomis-web-a", type = "A", lbs_map_key = "private" },
+          { name = "c", type = "A", lbs_map_key = "private" },
+        ]
+      }
+      "production.nomis.service.justice.gov.uk" = {
+        lb_alias_records = [
+          { name = "prod-nomis-web-a", type = "A", lbs_map_key = "private" },
+          { name = "c", type = "A", lbs_map_key = "private" },
         ]
       }
     }

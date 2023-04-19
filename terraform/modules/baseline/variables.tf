@@ -7,6 +7,7 @@ variable "acm_certificates" {
       account   = optional(string, "self")
       zone_name = string
     })), {})
+    external_validation_records_created = optional(bool, false)
     cloudwatch_metric_alarms = optional(map(object({
       comparison_operator = string
       evaluation_periods  = number

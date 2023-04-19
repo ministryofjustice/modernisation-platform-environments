@@ -31,11 +31,11 @@ locals {
 
     baseline_lbs = {
       prod-oasys-internal = {
-        enable_delete_protection = false
+        enable_delete_protection = false # change to true before we actually use
         force_destroy_bucket     = false
         idle_timeout             = "60"
         internal_lb              = true
-        security_groups          = [module.baseline.security_groups["private"].id]
+        security_groups          = ["private"]
         public_subnets           = module.environment.subnets["public"].ids
         existing_target_groups   = {}
         tags                     = local.tags
@@ -58,12 +58,12 @@ locals {
                 priority = 100
                 actions = [{
                   type              = "forward"
-                  target_group_name = "prod-oasys-training-http-8080"
+                  target_group_name = "prod-oasys-web-trn-http-8080"
                 }]
                 conditions = [
                   {
                     host_header = {
-                      values = ["training.oasys.${module.environment.vpc_name}.modernisation-platform.service.justice.gov.uk"]
+                      values = ["trn.oasys.${module.environment.domains.public.business_unit_environment}"]
                     }
                   },
                   {
@@ -81,59 +81,24 @@ locals {
     baseline_route53_zones = {
       "${module.environment.domains.public.business_unit_environment}" = {
         lb_alias_records = [
-          { name = "training.oasys", type = "A", lbs_map_key = "prod-oasys-internal" },
+          { name = "trn.oasys", type = "A", lbs_map_key = "prod-oasys-internal" },
         ]
       }
     }
 
     baseline_ec2_autoscaling_groups = {
-      prod-oasys-training = {
+      prod-oasys-web-trn = merge(local.webserver, {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name = "oasys_webserver_release_*"
+          ami_name                  = "oasys_webserver_release_*"
+          ssm_parameters_prefix     = "ec2-web-trn/"
+          iam_resource_names_prefix = "ec2-web-trn"
         })
-        instance              = module.baseline_presets.ec2_instance.instance.default
-        user_data_cloud_init  = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
-        ebs_volume_config     = null
-        ebs_volumes           = null
-        autoscaling_group     = module.baseline_presets.ec2_autoscaling_group
-        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
-        ssm_parameters        = null
-        lb_target_groups = {
-          http-8080 = {
-            port                 = 8080
-            protocol             = "HTTP"
-            target_type          = "instance"
-            deregistration_delay = 30
-            health_check = {
-              enabled             = true
-              interval            = 30
-              healthy_threshold   = 3
-              matcher             = "200-399"
-              path                = "/"
-              port                = 8080
-              timeout             = 5
-              unhealthy_threshold = 5
-            }
-            stickiness = {
-              enabled = true
-              type    = "lb_cookie"
-            }
-          }
-        }
-        cloudwatch_metric_alarms = {}
-        tags = {
-          component         = "web"
-          os-type           = "Linux"
-          os-major-version  = 7
-          os-version        = "RHEL 7.9"
-          "Patch Group"     = "RHEL"
-          server-type       = "oasys-web-training"
-          description       = "${local.environment} OASys web training"
-          monitored         = true
-          oasys-environment = local.environment
-          environment-name  = terraform.workspace
-        }
-      }
+        tags = merge(local.webserver.tags, {
+          description       = "${local.environment} training OASys web"
+          oasys-environment = "trn"
+          oracle-db-sid     = "OASTRN"
+        })
+      })
     }
   }
 }

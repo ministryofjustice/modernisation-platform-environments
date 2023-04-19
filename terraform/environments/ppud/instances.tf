@@ -401,7 +401,6 @@ resource "aws_instance" "s265903rgsl401" {
 resource "aws_key_pair" "cjms_instance" {
   count    = local.is-production == true ? 1 : 0
   key_name = "linuxcjms"
-  # public_key = file(".ssh/${terraform.workspace}/linuxkey.pub")
   public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDH6T6qfPg3nUtc+A0KiWra+Alg5MyBu31FYTDvaYUY9r8ySG1+Aiz+FlV6bGQGHFaKia2GNKc/OEQ9fIs0mDDRQRoc5jtli4wwP9VtLPd7c+VdywoVvPaqAgW8KzpqTdcH8RUC1w0+12UmVlPp/RQg1b8vSVOqI0aXOVm9Faitd+YDERtJGbxdgMjaCpoJcRMjmX3omFJFU1egjOePzagOp6RZOonvGOARYat2v0yB01m7PIMwxcmP6bClx/ME9EZ6uTWYI9+wEyBwWdRYM8MV+DRe3BcepPUI/uQVJ/CDtS1f3snSKE9GKJFnUAhBp263ezZyBlidDL4L3mPzpSHV ctl\\ac97864@GBR-5CG9525GMX"
 }
 
@@ -409,11 +408,17 @@ resource "aws_key_pair" "cjms_instance" {
 resource "aws_eip" "s265903rgsl400-eip" {
   count = local.is-production == true ? 1 : 0
   vpc   = true
+  tags = {
+    Name   = "s265903rgsl400"
+  }
 }
 
 resource "aws_eip" "s265903rgsl401-eip" {
   count = local.is-production == true ? 1 : 0
   vpc   = true
+  tags = {
+    Name   = "s265903rgsl401"
+  }
 }
 
 #Associate EIP with EC2 Instance

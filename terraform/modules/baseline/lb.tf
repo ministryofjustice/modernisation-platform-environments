@@ -38,6 +38,10 @@ module "lb" {
   region         = var.environment.region
   vpc_all        = var.environment.vpc_name
   tags           = merge(local.tags, each.value.tags)
+
+  depends_on = [
+    module.ec2_autoscaling_group, # ensure ASG target groups are created first
+  ]
 }
 
 module "lb_listener" {
@@ -69,8 +73,7 @@ module "lb_listener" {
   tags = merge(local.tags, each.value.tags)
 
   depends_on = [
-    module.acm_certificate,       # ensure certs are created first
-    module.ec2_autoscaling_group, # ensure ASG target groups are created first
+    module.acm_certificate, # ensure certs are created first
   ]
 
   alarm_target_group_names = each.value.alarm_target_group_names

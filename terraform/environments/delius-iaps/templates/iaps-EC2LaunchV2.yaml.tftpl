@@ -167,32 +167,19 @@ tasks:
       $VerbosePreference = "Continue"
 
       $NDeliusIAPSCMSConfigFile = "C:\Program Files (x86)\I2N\IapsNDeliusInterface\Config\IAPSCMSIF.xml"
-      $NDeliusIAPSCMSConfigXML = [xml](Get-Content $NDeliusIAPSCMSConfigFile)
-
-      $NDeliusIAPSCMSConfigXML.DLLDEF.INTERFACES.INTERFACE.USER = (Get-SSMParameter -Name "/NDeliusInterface/IAPSCMSIF/Interface/user" -WithDecryption $true).Value
-      $NDeliusIAPSCMSConfigXML.DLLDEF.INTERFACES.INTERFACE.PASSWORD = (Get-SSMParameter -Name "/NDeliusInterface/IAPSCMSIF/Interface/password" -WithDecryption $true).Value
-      $NDeliusIAPSCMSConfigXML.DLLDEF.INTERFACES.INTERFACE.PASSWORDCODED = (Get-SSMParameter -Name "/NDeliusInterface/IAPSCMSIF/Interface/passwordcoded" -WithDecryption $true).Value
-
-      $NDeliusIAPSCMSConfigXML.save($NDeliusIAPSCMSConfigFile)
+      (Get-Content $NDeliusIAPSCMSConfigFile).replace('[ND_IAPS_CMSIF_DB_USER]', (Get-SSMParameter -Name "/NDeliusInterface/IAPSCMSIF/Interface/user" -WithDecryption $true).Value) | Set-Content $NDeliusIAPSCMSConfigFile
+      (Get-Content $NDeliusIAPSCMSConfigFile).replace('[ND_IAPS_CMSIF_DB_PASSWORDCODED]', (Get-SSMParameter -Name "/NDeliusInterface/IAPSCMSIF/Interface/passwordcoded" -WithDecryption $true).Value) | Set-Content $NDeliusIAPSCMSConfigFile
 
       $NDeliusConfigFile = "C:\Program Files (x86)\I2N\IapsNDeliusInterface\Config\NDELIUSIF.xml"
-      $configXML = [xml](Get-Content $NDeliusConfigFile)
-      $configXML.DLLDEF.INTERFACES.INTERFACE.USER = (Get-SSMParameter -Name "/NDeliusInterface/Interface/user" -WithDecryption $true).Value
-      $configXML.DLLDEF.INTERFACES.INTERFACE.PASSWORD = (Get-SSMParameter -Name "/NDeliusInterface/Interface/password" -WithDecryption $true).Value
-      $configXML.DLLDEF.INTERFACES.INTERFACE.REPLICAPASSWORDCODED = (Get-SSMParameter -Name "/NDeliusInterface/Interface/replicapwdcoded" -WithDecryption $true).Value
-      $configXML.DLLDEF.INTERFACES.INTERFACE.SOAPPASSCODED = (Get-SSMParameter -Name "/NDeliusInterface/Interface/soappwdcoded" -WithDecryption $true).Value
-      $configXML.DLLDEF.INTERFACES.INTERFACE.PASSWORDCODED = (Get-SSMParameter -Name "/NDeliusInterface/Interface/pwdcoded" -WithDecryption $true).Value
+      (Get-Content $NDeliusConfigFile).replace('[ND_IF_DB_USER]', (Get-SSMParameter -Name "/NDeliusInterface/Interface/dbuser" -WithDecryption $true).Value) | Set-Content $NDeliusConfigFile
+      (Get-Content $NDeliusConfigFile).replace('[ND_IF_DB_PASSWORDCODED]', (Get-SSMParameter -Name "/NDeliusInterface/Interface/dbpwdcoded" -WithDecryption $true).Value) | Set-Content $NDeliusConfigFile
 
-      $InterfaceODBCdsn = (Get-SSMParameter -Name "/NDeliusInterface/Interface/ODBC/dsn" -WithDecryption $true).Value
-      $InterfaceODBCuid = (Get-SSMParameter -Name "/NDeliusInterface/Interface/ODBC/uid" -WithDecryption $true).Value
-      $InterfaceODBCpwd = (Get-SSMParameter -Name "/NDeliusInterface/Interface/ODBC/pwd" -WithDecryption $true).Value
-      $configXML.DLLDEF.INTERFACES.INTERFACE.ODBC = "DSN=$${InterfaceODBCdsn};uid=$${InterfaceODBCuid};pwd=$${InterfaceODBCpwd}"
+      (Get-Content $NDeliusConfigFile).replace('[ND_SOAP_USER]', (Get-SSMParameter -Name "/NDeliusInterface/Interface/soapuser" -WithDecryption $true).Value) | Set-Content $NDeliusConfigFile
+      (Get-Content $NDeliusConfigFile).replace('[ND_SOAP_PASSWORDCODED]', (Get-SSMParameter -Name "/NDeliusInterface/Interface/soappwdcoded" -WithDecryption $true).Value) | Set-Content $NDeliusConfigFile
 
-      $configXML.DLLDEF.EMAIL.SMTPUSER = (Get-SSMParameter -Name "/NDeliusInterface/Email/smtpuser" -WithDecryption $true).Value
-      $configXML.DLLDEF.EMAIL.PASSWORD = (Get-SSMParameter -Name "/NDeliusInterface/Email/password" -WithDecryption $true).Value
-      $configXML.DLLDEF.EMAIL.PASSWORDCODED = (Get-SSMParameter -Name "/NDeliusInterface/Email/passwordcoded" -WithDecryption $true).Value
-      $configXML.DLLDEF.EMAIL.FROMADDRESS = (Get-SSMParameter -Name "/NDeliusInterface/Email/fromaddress" -WithDecryption $true).Value
-      $configXML.save($NDeliusConfigFile)
+      (Get-Content $NDeliusConfigFile).replace('[SMTP_USER]', (Get-SSMParameter -Name "/NDeliusInterface/Email/smtpuser" -WithDecryption $true).Value) | Set-Content $NDeliusConfigFile
+      (Get-Content $NDeliusConfigFile).replace('[SMTP_PASSWORDCODED]', (Get-SSMParameter -Name "/NDeliusInterface/Email/passwordcoded" -WithDecryption $true).Value) | Set-Content $NDeliusConfigFile
+      (Get-Content $NDeliusConfigFile).replace('[SMTP_FROMADDRESS]', (Get-SSMParameter -Name "/NDeliusInterface/Email/fromaddress" -WithDecryption $true).Value) | Set-Content $NDeliusConfigFile
 
 %{if environment == "development"}
       $service = Restart-Service -Name IapsNDeliusInterfaceWinService -Force -PassThru

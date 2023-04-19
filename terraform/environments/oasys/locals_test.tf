@@ -28,79 +28,80 @@ locals {
     }
 
     baseline_ec2_autoscaling_groups = {
-      test-oasys-web = {
+      test-oasys-web = local.webserver
+
+      t2-oasys-web = merge(local.webserver, {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name = "base_rhel_8_5_*"
+          ami_name                  = "oasys_webserver_release_*"
+          ssm_parameters_prefix     = "ec2-web-t2/"
+          iam_resource_names_prefix = "ec2-web-t2"
         })
-        instance                 = module.baseline_presets.ec2_instance.instance.default
-        user_data_cloud_init     = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
-        ebs_volume_config        = null
-        ebs_volumes              = null
-        autoscaling_group        = module.baseline_presets.ec2_autoscaling_group
-        autoscaling_schedules    = module.baseline_presets.ec2_autoscaling_schedules.working_hours
-        ssm_parameters           = null
-        lb_target_groups         = {}
-        cloudwatch_metric_alarms = {}
-        tags = {
-          os-type = "Linux"
-        }
-      }
+        tags = merge(local.webserver.tags, {
+          description        = "t2 OASys web"
+          oasys-environment  = "t2"
+          oracle-db-hostname = "T2ODL0009"
+        })
+      })
     }
 
-    # baseline_lbs = {
-    #   rhel85-test = {
-    #     enable_delete_protection = false
-    #     idle_timeout             = "60"
-    #     public_subnets           = module.environment.subnets["public"].ids
-    #     force_destroy_bucket     = true
-    #     internal_lb              = true
-    #     tags                     = local.tags
-    #     security_groups          = [module.baseline.security_groups["public"].id]
-    #     listeners = {
-    #       https = {
-    #         port             = 443
-    #         protocol         = "HTTPS"
-    #         ssl_policy       = "ELBSecurityPolicy-2016-08"
-    #         certificate_arns = [module.acm_certificate["star.${module.environment.domains.public.application_environment}"].arn]
-    #         default_action = {
-    #           type = "fixed-response"
-    #           fixed_response = {
-    #             content_type = "text/plain"
-    #             message_body = "Not implemented"
-    #             status_code  = "501"
-    #           }
-    #         }
+    baseline_lbs = {
+      t2-oasys-internal = {
+        internal_lb              = true
+        enable_delete_protection = false
+        existing_target_groups   = {}
+        idle_timeout             = 60 # 60 is deafult
+        security_groups          = ["public"]
+        public_subnets           = module.environment.subnets["public"].ids
+        tags                     = local.tags
 
-    #         rules = {
-    #           forward-http-8080 = {
-    #             priority = 100
-    #             actions = [{
-    #               type              = "forward"
-    #               target_group_name = "http-8080"
-    #             }]
-    #             conditions = [
-    #               {
-    #                 host_header = {
-    #                   values = ["web.oasys.${module.environment.vpc_name}.modernisation-platform.service.justice.gov.uk"]
-    #                 }
-    #               },
-    #               {
-    #                 path_pattern = {
-    #                   values = ["/"]
-    #                 }
-    #             }]
-    #           }
-    #         }
-    #       }
-    #       route53_records = {
-    #         "web.oasys" = {
-    #           account                = "core-vpc"
-    #           zone_id                = module.environment.route53_zones[module.environment.domains.public.business_unit_environment].zone_id
-    #           evaluate_target_health = true
-    #         }
-    #       }
-    #     }
-    #   }
-    # }
+        listeners = {
+          https = {
+            port                      = 443
+            protocol                  = "HTTPS"
+            ssl_policy                = "ELBSecurityPolicy-2016-08"
+            certificate_names_or_arns = ["application_environment_wildcard_cert"]
+            default_action = {
+              type = "fixed-response"
+              fixed_response = {
+                content_type = "text/plain"
+                message_body = "Not implemented"
+                status_code  = "501"
+              }
+            }
+            rules = {
+              forward-http-8080 = {
+                priority = 100
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t2-oasys-web-http-8080"
+                }]
+                conditions = [
+                  {
+                    host_header = {
+                      values = ["t2.oasys.${module.environment.domains.public.business_unit_environment}"]
+                    }
+                  },
+                  {
+                    path_pattern = {
+                      values = ["/"]
+                    }
+                }]
+              }
+            }
+          }
+        }
+      }
+
+    }
+    baseline_route53_zones = {
+      "${module.environment.domains.public.business_unit_environment}" = {  # "hmpps-test.modernisation-platform.service.justice.gov.uk"
+        records = [
+          { name = "t2.oasys.db", type = "A", ttl = "300", records = ["10.101.36.132"] }, # "t2.oasys.db.hmpps-test.modernisation-platform.service.justice.gov.uk" currently pointing to azure db
+        ]
+        lb_alias_records = [
+          { name = "t2.oasys", type = "A", lbs_map_key = "t2-oasys-internal" }, # "t2.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk"
+        ]
+      }
+    }
   }
 }

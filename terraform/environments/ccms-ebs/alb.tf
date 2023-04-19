@@ -19,7 +19,7 @@ resource "aws_lb" "ebsapps_lb" {
 }
 
 resource "aws_lb_listener" "ebsapps_listener" {
-  count       = local.is-production ? 0 : 1
+  count       = local.is-production ? 1 : 1
   depends_on  = [
     aws_acm_certificate_validation.external
   ]
@@ -104,6 +104,8 @@ resource "aws_lb_target_group" "webgate_tg" {
   health_check {
     port     = 5401
     protocol = "HTTP"
+    matcher  = 302
+    timeout  = 10
   }
 }
 

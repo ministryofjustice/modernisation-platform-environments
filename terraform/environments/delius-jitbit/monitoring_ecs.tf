@@ -37,55 +37,59 @@ resource "aws_cloudwatch_dashboard" "jitbit_ecs_dashboard" {
   dashboard_name = "jitbit-ecs-dashboard"
 
   dashboard_body = <<EOF
-  {
-  "widgets": [
-    {
-      "type": "metric",
-      "height": 8,
-      "width": 11,
-      "y": 0,
-      "x": 11,
-      "properties": {
-        "metrics": [
-          [
-            "AWS/ECS",
-            "CPUUtilization",
-            "ClusterName",
-            "${format("hmpps-%s-%s", local.environment, local.application_name)}",
-            "ServiceName",
-            "${format("hmpps-%s-%s", local.environment, local.application_name)}"
-          ]
-        ],
-        "period": 60,
-        "stat": "Average",
-        "region": "eu-west-2",
-        "title": "CPU Utilization"
-      }
-    },
-    {
-      "type": "metric",
-      "height": 8,
-      "width": 11,
-      "y": 0,
-      "x": 11,
-      "properties": {
-        "metrics": [
-          [
-            "AWS/ECS",
-            "MemoryUtilization",
-            "ClusterName",
-            "${format("hmpps-%s-%s", local.environment, local.application_name)}",
-            "ServiceName",
-            "${format("hmpps-%s-%s", local.environment, local.application_name)}"
-          ]
-        ],
-        "period": 60,
-        "stat": "Average",
-        "region": "eu-west-2",
-        "title": "Memory Utilization"
-      }
-    }
-  ]
+{
+    "widgets": [
+        {
+            "height": 8,
+            "width": 11,
+            "y": 0,
+            "x": 11,
+            "type": "metric",
+            "properties": {
+                "metrics": [
+                    [ "AWS/ECS", "CPUUtilization", "ClusterName", "hmpps-development-delius-jitbit", "ServiceName", "hmpps-development-delius-jitbit" ]
+                ],
+                "period": 60,
+                "stat": "Average",
+                "region": "eu-west-2",
+                "title": "CPU Utilization"
+            }
+        },
+        {
+            "height": 8,
+            "width": 11,
+            "y": 8,
+            "x": 11,
+            "type": "metric",
+            "properties": {
+                "metrics": [
+                    [ "AWS/ECS", "MemoryUtilization", "ClusterName", "hmpps-development-delius-jitbit", "ServiceName", "hmpps-development-delius-jitbit" ]
+                ],
+                "period": 60,
+                "stat": "Average",
+                "region": "eu-west-2",
+                "title": "Memory Utilization"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 5,
+            "y": 0,
+            "width": 6,
+            "height": 6,
+            "properties": {
+                "metrics": [
+                    [ "JitbitMetrics", "ErrorCount", { "region": "eu-west-2", "color": "#d62728" } ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "eu-west-2",
+                "title": "Jitbit Application Error Count",
+                "period": 300,
+                "stat": "Average"
+            }
+        }
+    ]
 }
 EOF
 }

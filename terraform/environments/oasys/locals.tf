@@ -65,73 +65,61 @@ locals {
   ###
   ### env independent webserver vars
   ###
-  # webserver = {
-  #   ami_name = "oasys_webserver_*"
-  #   # branch   = var.BRANCH_NAME # comment in if testing ansible
-  #   # server-type and oasys-environment auto set by module
-  #   autoscaling_schedules = {}
-  #   subnet_name           = "webserver"
-
-  #   instance = {
-  #     disable_api_termination      = false
-  #     instance_type                = "t3.large"
-  #     key_name                     = aws_key_pair.ec2-user.key_name
-  #     monitoring                   = true
-  #     metadata_options_http_tokens = "optional"
-  #     vpc_security_group_ids       = [aws_security_group.webserver.id]
-  #   }
-
-  #   user_data_cloud_init = {
-  #     args = {
-  #       lifecycle_hook_name  = "ready-hook"
-  #       branch               = "main" # if you want to use a branch of ansible
-  #       ansible_repo         = "modernisation-platform-configuration-management"
-  #       ansible_repo_basedir = "ansible"
-  #       # ansible_args           = "--tags ec2provision"
-  #     }
-  #     scripts = [ # it would make sense to have these templates in a common area 
-  #       "ansible-ec2provision.sh.tftpl",
-  #       "post-ec2provision.sh.tftpl"
-  #     ]
-  #     write_files = {}
-  #   }
-
-  #   # ssm_parameters_prefix     = "webserver/"
-  #   iam_resource_names_prefix = "webserver-asg"
-
-  #   autoscaling_group = {
-  #     desired_capacity = 1
-  #     max_size         = 2
-  #     min_size         = 0
-
-  #     # health_check_grace_period = 300
-  #     # health_check_type         = "ELB"
-  #     # force_delete              = true
-  #     # termination_policies      = ["OldestInstance"]
-  #     # target_group_arns         = [] # TODO
-  #     # vpc_zone_identifier       = data.aws_subnets.private.ids
-  #     # wait_for_capacity_timeout = 0
-
-  #     # this hook is triggered by the post-ec2provision.sh
-  #     # initial_lifecycle_hooks = {
-  #     #   "ready-hook" = {
-  #     #     default_result       = "ABANDON"
-  #     #     heartbeat_timeout    = 7200 # on a good day it takes 30 mins, but can be much longer
-  #     #     lifecycle_transition = "autoscaling:EC2_INSTANCE_LAUNCHING"
-  #     #   }
-  #     # }
-  #     # warm_pool = {
-  #     #   reuse_on_scale_in           = true
-  #     #   max_group_prepared_capacity = 1
-  #     # }
-  #   }
-  # }
-  # webserver_tags = {
-  #   description = "oasys webserver"
-  #   component   = "web"
-  #   server-type = "oasys-web"
-  #   os-version  = "RHEL 8.5"
-  # }
+  webserver = {
+    config = merge(module.baseline_presets.ec2_instance.config.default, {
+      ami_name = "oasys_webserver_release_*"
+      ssm_parameters_prefix     = "ec2-web/"
+      iam_resource_names_prefix = "ec2-web"
+    })
+    instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+      monitoring             = true
+    })
+    cloudwatch_metric_alarms = {}
+    user_data_cloud_init     = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
+      args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
+        branch = "ccfe2d0becae50d1ff706442b52a6c9fe01d5a7c" # 2023-04-12
+      })
+    })
+    autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
+    autoscaling_group = module.baseline_presets.ec2_autoscaling_group
+    lb_target_groups = {
+      http-8080 = {
+        port                 = 8080
+        protocol             = "HTTP"
+        target_type          = "instance"
+        deregistration_delay = 30
+        health_check = {
+          enabled             = true
+          interval            = 30
+          healthy_threshold   = 3
+          matcher             = "200-399"
+          path                = "/"
+          port                = 8080
+          timeout             = 5
+          unhealthy_threshold = 5
+        }
+        stickiness = {
+          enabled = true
+          type    = "lb_cookie"
+        }
+      }
+    }
+    tags = {
+      component         = "web"
+      description       = "${local.environment} OASys web"
+      os-type           = "Linux"
+      os-major-version  = 7
+      os-version        = "RHEL 7.9"
+      "Patch Group"     = "RHEL"
+      server-type       = "oasys-web"
+      description       = "OASys web"
+      monitored         = true
+      oasys-environment = local.environment
+      environment-name  = terraform.workspace
+      #oracle-db-hostname = "T2ODL0009"
+      oracle-db-sid     = "OASPROD"
+    }
+  } 
 
   database = {
     config = merge(module.baseline_presets.ec2_instance.config.db, {

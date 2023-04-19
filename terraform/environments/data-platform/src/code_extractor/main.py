@@ -8,12 +8,12 @@ s3 = boto3.resource("s3")
 def handler(event, context):
 
     print("event", event)
-    print("bucketname:", event["detail"]["bucket"]["name"])
-    print("Key:", event["detail"]["object"]["key"])
 
     # specify the bucket name and the key of the zip file
-    bucket_name = event["detail"]["bucket"]["name"]
-    zip_key = event["detail"]["object"]["key"]
+    bucket_name = event["detail"]["requestParameters"]["bucketName"]
+    zip_key = event["detail"]["requestParameters"]["key"]
+    print("bucketname:", bucket_name)
+    print("Key:", zip_key)
 
     # get the zip file object from S3
     zip_obj = s3.Object(bucket_name, zip_key)

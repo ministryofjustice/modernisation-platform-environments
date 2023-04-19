@@ -60,6 +60,30 @@ locals {
         }
       }
 
+      t1-nomis-db-1-a = {
+        tags = {
+          nomis-environment   = "t1"
+          server-type         = "nomis-db"
+          description         = "T1 NOMIS database"
+          oracle-sids         = "CNOMT1"
+          monitored           = true
+          instance-scheduling = "skip-scheduling"
+        }
+        ami_name  = "nomis_rhel_7_9_oracledb_11_2_release_2023-04-02T00-00-40.059Z"
+        ami_owner = "self"
+        instance = {
+          disable_api_termination = true
+        }
+        ebs_volumes = {
+          "/dev/sdb" = { size = 100 }
+          "/dev/sdc" = { size = 100 }
+        }
+        ebs_volume_config = {
+          data  = { total_size = 100 }
+          flash = { total_size = 50 }
+        }
+      }
+
       t1-nomis-db-2 = {
         tags = {
           nomis-environment   = "t1"
@@ -126,6 +150,27 @@ locals {
   # baseline config
   test_config = {
 
+
+    baseline_acm_certificates = {
+      nomis_wildcard_cert = {
+        # domain_name limited to 64 chars so use modernisation platform domain for this
+        # and put the wildcard in the san
+        domain_name = module.environment.domains.public.modernisation_platform
+        subject_alternate_names = [
+          "*.${module.environment.domains.public.application_environment}",
+          "*.${local.environment}.nomis.service.justice.gov.uk",
+          "*.${local.environment}.nomis.az.justice.gov.uk",
+          "*.hmpp-azdt.justice.gov.uk",
+        ]
+        external_validation_records_created = true
+        cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso"].acm_default
+        tags = {
+          description = "wildcard cert for nomis ${local.environment} domains"
+        }
+      }
+    }
+
+
     baseline_ec2_autoscaling_groups = {
       t1-nomis-web-a = merge(local.ec2_weblogic_zone_a, {
         tags = merge(local.ec2_weblogic_zone_a.tags, {
@@ -133,7 +178,7 @@ locals {
           nomis-environment  = "t1"
           oracle-db-name     = "CNOMT1"
         })
-        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
+        # autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
       })
     }
 
@@ -142,11 +187,13 @@ locals {
       private = {
         internal_lb              = true
         enable_delete_protection = false
-        existing_target_groups   = local.existing_target_groups
         force_destroy_bucket     = true
         idle_timeout             = 3600
         public_subnets           = module.environment.subnets["private"].ids
-        security_groups          = [aws_security_group.public.id]
+        security_groups = [
+          aws_security_group.public.id, # TODO: remove once weblogic servers refreshed
+          "private-lb",
+        ]
 
         listeners = {
           https = merge(
@@ -161,11 +208,11 @@ locals {
                   conditions = [{
                     host_header = {
                       values = [
-                        "t1-nomis-web-a.nomis.${module.environment.domains.public.business_unit_environment}",
                         "t1-nomis-web-a.test.nomis.az.justice.gov.uk",
-                        "t1-nomis-web.nomis.${module.environment.domains.public.business_unit_environment}",
-                        "t1-nomis-web.test.nomis.az.justice.gov.uk",
+                        "t1-nomis-web-a.test.nomis.service.justice.gov.uk",
                         "c-t1.test.nomis.az.justice.gov.uk",
+                        "c-t1.test.nomis.service.justice.gov.uk",
+                        "t1-cn.hmpp-azdt.justice.gov.uk",
                       ]
                     }
                   }]
@@ -176,18 +223,22 @@ locals {
       }
     }
     baseline_route53_zones = {
-      "${module.environment.domains.public.business_unit_environment}" = {
+      "test.nomis.az.justice.gov.uk" = {
         lb_alias_records = [
-          { name = "t1-nomis-web.nomis", type = "A", lbs_map_key = "private" },
-          { name = "t1-nomis-web-a.nomis", type = "A", lbs_map_key = "private" },
+          { name = "t1-nomis-web-a", type = "A", lbs_map_key = "private" },
+          { name = "c-t1", type = "A", lbs_map_key = "private" },
         ]
       }
-      "test.nomis.az.justice.gov.uk" = {
+      "test.nomis.service.justice.gov.uk" = {
         records = [
-          { name = "cnomt1", type = "A", ttl = "300", records = ["10.101.3.132"] },
+          { name = "t1nomis-a", type = "A", ttl = "300", records = ["10.101.3.132"] },
+          { name = "t1nomis-b", type = "A", ttl = "300", records = ["10.101.3.132"] },
+          { name = "t1ndh-a", type = "A", ttl = "300", records = ["10.101.3.132"] },
+          { name = "t1ndh-b", type = "A", ttl = "300", records = ["10.101.3.132"] },
+          { name = "t1or-a", type = "A", ttl = "300", records = ["10.101.3.132"] },
+          { name = "t1or-b", type = "A", ttl = "300", records = ["10.101.3.132"] },
         ]
         lb_alias_records = [
-          { name = "t1-nomis-web", type = "A", lbs_map_key = "private" },
           { name = "t1-nomis-web-a", type = "A", lbs_map_key = "private" },
           { name = "c-t1", type = "A", lbs_map_key = "private" },
         ]
