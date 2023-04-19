@@ -76,20 +76,6 @@ locals {
     })
     cloudwatch_metric_alarms = {}
     user_data_cloud_init     = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags
-    ebs_volumes = {
-      "/dev/sdb" = { # /u01
-        size        = 128
-        label       = "app"
-        type        = "gp3"
-        snapshot_id = null
-      }
-      "/dev/sdc" = { # /u02
-        size        = 128
-        label       = "app"
-        type        = "gp3"
-        snapshot_id = null
-      }
-    }
     autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
     autoscaling_group = module.baseline_presets.ec2_autoscaling_group
     lb_target_groups = {
