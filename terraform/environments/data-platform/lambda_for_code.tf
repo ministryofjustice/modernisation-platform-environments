@@ -22,7 +22,11 @@ resource "aws_lambda_function" "code_extractor" {
   }
 }
 
+<<<<<<< HEAD
 data "aws_iam_policy_document" "code_lambda_trust_policy_doc" {
+=======
+data "aws_iam_policy_document" "lambda_trust_policy_doc" {
+>>>>>>> 05d411426 (Split lambdas into files, refactor locals)
   statement {
     sid     = "LambdaAssumeRole"
     effect  = "Allow"
@@ -35,8 +39,13 @@ data "aws_iam_policy_document" "code_lambda_trust_policy_doc" {
 }
 
 resource "aws_iam_role" "code_lambda_role" {
+<<<<<<< HEAD
   name               = "code_extractor_${local.environment}_role_${local.environment}"
   assume_role_policy = data.aws_iam_policy_document.code_lambda_trust_policy_doc.json
+=======
+  name               = "${local.code_function_name}-role-${local.environment}"
+  assume_role_policy = data.aws_iam_policy_document.lambda_trust_policy_doc.json
+>>>>>>> 05d411426 (Split lambdas into files, refactor locals)
 }
 
 data "aws_iam_policy_document" "iam_policy_document_for_code_lambda" {
@@ -55,7 +64,11 @@ data "aws_iam_policy_document" "iam_policy_document_for_code_lambda" {
 }
 
 resource "aws_iam_policy" "code_lambda_policy" {
+<<<<<<< HEAD
   name        = "code_extractor_${local.environment}_policy_${local.environment}"
+=======
+  name        = "${local.code_function_name}-policy-${local.environment}"
+>>>>>>> 05d411426 (Split lambdas into files, refactor locals)
   path        = "/"
   description = "AWS IAM Policy for managing aws lambda role"
   policy      = data.aws_iam_policy_document.iam_policy_document_for_code_lambda.json
