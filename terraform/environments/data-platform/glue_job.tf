@@ -8,7 +8,7 @@ locals {
 
 # load the glue script to bucket as bucket object
 resource "aws_s3_object" "object" {
-  bucket=module.s3-bucket.bucket.name
+  bucket=module.s3-bucket.bucket.id
   key    = "glue_script/glue_transform_script.py"
   source = "glue_script/glue_transform_script.py"
   etag = filemd5("glue_script/glue_transform_script.py")
