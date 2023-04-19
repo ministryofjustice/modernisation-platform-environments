@@ -3,11 +3,27 @@ variable "acm_certificates" {
   type = map(object({
     domain_name             = string
     subject_alternate_names = optional(list(string), [])
-    validation = map(object({
+    validation = optional(map(object({
       account   = optional(string, "self")
       zone_name = string
-    }))
-    tags = map(string)
+    })), {})
+    external_validation_records_created = optional(bool, false)
+    cloudwatch_metric_alarms = optional(map(object({
+      comparison_operator = string
+      evaluation_periods  = number
+      metric_name         = string
+      namespace           = string
+      period              = number
+      statistic           = string
+      threshold           = number
+      alarm_actions       = list(string)
+      actions_enabled     = optional(bool, false)
+      alarm_description   = optional(string)
+      datapoints_to_alarm = optional(number)
+      treat_missing_data  = optional(string, "missing")
+      dimensions          = optional(map(string), {})
+    })), {})
+    tags = optional(map(string), {})
   }))
   default = {}
 }
@@ -53,10 +69,8 @@ variable "ec2_autoscaling_groups" {
       iam_resource_names_prefix     = optional(string, "ec2")
       instance_profile_policies     = list(string)
       ssm_parameters_prefix         = optional(string, "")
-
-      # below are unused but are defined so same object can be used with ec2_instance
-      subnet_name       = optional(string)
-      availability_zone = optional(string)
+      subnet_name                   = optional(string)
+      availability_zone             = optional(string)
     })
     instance = object({
       disable_api_termination      = bool
@@ -164,6 +178,21 @@ variable "ec2_autoscaling_groups" {
         availability_zone = optional(string)
       })), [])
     })), {})
+    cloudwatch_metric_alarms = optional(map(object({
+      comparison_operator = string
+      evaluation_periods  = number
+      metric_name         = string
+      namespace           = string
+      period              = number
+      statistic           = string
+      threshold           = number
+      alarm_actions       = list(string)
+      actions_enabled     = optional(bool, false)
+      alarm_description   = optional(string)
+      datapoints_to_alarm = optional(number)
+      treat_missing_data  = optional(string, "missing")
+      dimensions          = optional(map(string), {})
+    })), {})
     tags = optional(map(string), {})
   }))
   default = {}
@@ -237,7 +266,119 @@ variable "ec2_instances" {
       create_internal_record = true
       create_external_record = false
     })
+    cloudwatch_metric_alarms = optional(map(object({
+      comparison_operator = string
+      evaluation_periods  = number
+      metric_name         = string
+      namespace           = string
+      period              = number
+      statistic           = string
+      threshold           = number
+      alarm_actions       = list(string)
+      actions_enabled     = optional(bool, false)
+      alarm_description   = optional(string)
+      datapoints_to_alarm = optional(number)
+      treat_missing_data  = optional(string, "missing")
+      dimensions          = optional(map(string), {})
+    })), {})
     tags = optional(map(string), {})
+  }))
+  default = {}
+}
+
+variable "rds_instances" {
+  description = "map of rds instances to create where the map key is the tags.Name.  See rds_instance module for more variable details"
+  type = map(object({
+    config = object({
+      iam_resource_names_prefix = optional(string, "rds_db")
+      instance_profile_policies = list(string)
+      ssm_parameters_prefix     = optional(string, "")
+    })
+    instance = object({
+      allocated_storage                   = number
+      allow_major_version_upgrade         = optional(bool, false)
+      apply_immediately                   = optional(bool, false)
+      auto_minor_version_upgrade          = optional(bool, false)
+      backup_retention_period             = optional(number, 1)
+      backup_window                       = optional(string)
+      character_set_name                  = optional(string)
+      copy_tags_to_snapshot               = optional(bool, false)
+      create                              = optional(bool, true)
+      db_name                             = optional(string)
+      db_subnet_group_name                = optional(string)
+      enabled_cloudwatch_logs_exports     = optional(list(string))
+      engine                              = string
+      engine_version                      = optional(string)
+      final_snapshot_identifier           = optional(bool, false)
+      iam_database_authentication_enabled = optional(bool, false)
+      identifier                          = string
+      instance_class                      = string
+      iops                                = optional(number, 0)
+      kms_key_id                          = optional(string)
+      license_model                       = optional(string)
+      maintenance_window                  = optional(string)
+      max_allocated_storage               = optional(number)
+      monitoring_interval                 = optional(number, 0)
+      monitoring_role_arn                 = optional(string)
+      multi_az                            = optional(bool, false)
+      option_group_name                   = optional(string)
+      parameter_group_name                = optional(string)
+      password                            = string
+      port                                = optional(string)
+      publicly_accessible                 = optional(bool, false)
+      replicate_source_db                 = optional(string)
+      skip_final_snapshot                 = optional(bool, false)
+      snapshot_identifier                 = optional(string)
+      storage_encrypted                   = optional(bool, false)
+      storage_type                        = optional(string, "gp2")
+      username                            = string
+      vpc_security_group_ids              = optional(list(string))
+    })
+    option_group = object({
+      create                   = bool
+      name_prefix              = optional(string)
+      option_group_description = optional(string)
+      engine_name              = string
+      major_engine_version     = string
+      options = optional(list(object({
+        option_name                    = string
+        port                           = optional(number)
+        version                        = optional(string)
+        db_security_group_memberships  = optional(list(string))
+        vpc_security_group_memberships = optional(list(string))
+        option_settings = optional(list(object({
+          name  = optional(string)
+          value = optional(string)
+        })))
+      })))
+      tags = optional(list(string))
+    })
+    parameter_group = object({
+      name_prefix = optional(string)
+      description = optional(string)
+      family      = string
+      parameters = optional(list(object({
+        name         = string
+        value        = string
+        apply_method = optional(string, "immediate")
+      })))
+      tags = optional(list(string))
+    })
+    subnet_group = object({
+      name_prefix = optional(string)
+      description = optional(string)
+      subnet_ids  = list(string)
+      tags        = optional(list(string))
+    })
+    ssm_parameters = optional(map(object({
+      random = object({
+        length  = number
+        special = bool
+      })
+      description = string
+    })))
+    route53_record = optional(bool, true)
+    tags           = optional(map(string), {})
   }))
   default = {}
 }
@@ -309,12 +450,14 @@ variable "lbs" {
     internal_lb              = optional(bool, false)
     security_groups          = list(string)
     public_subnets           = list(string)
+    existing_target_groups   = optional(map(any), {})
     tags                     = optional(map(string), {})
     listeners = optional(map(object({
-      port             = number
-      protocol         = string
-      ssl_policy       = optional(string)
-      certificate_arns = optional(list(string), [])
+      alarm_target_group_names  = optional(list(string), [])
+      port                      = number
+      protocol                  = string
+      ssl_policy                = optional(string)
+      certificate_names_or_arns = optional(list(string), [])
       default_action = object({
         type              = string
         target_group_name = optional(string)
@@ -378,19 +521,21 @@ variable "lbs" {
           }))
         }))
       })), {})
-      route53_records = optional(map(object({
-        account                = string # account to create the record in.  set to core-vpc or self
-        zone_id                = string # id of zone to create the record in
-        evaluate_target_health = bool
+      cloudwatch_metric_alarms = optional(map(object({
+        comparison_operator = string
+        evaluation_periods  = number
+        metric_name         = string
+        namespace           = string
+        period              = number
+        statistic           = string
+        threshold           = number
+        alarm_actions       = list(string)
+        actions_enabled     = optional(bool, false)
+        alarm_description   = optional(string)
+        datapoints_to_alarm = optional(number)
+        treat_missing_data  = optional(string, "missing")
+        dimensions          = optional(map(string), {})
       })), {})
-      replace = optional(object({
-        target_group_name_match       = optional(string, "$(name)")
-        target_group_name_replace     = optional(string, "")
-        condition_host_header_match   = optional(string, "$(name)")
-        condition_host_header_replace = optional(string, "")
-        route53_record_name_match     = optional(string, "$(name)")
-        route53_record_name_replace   = optional(string, "")
-      }), {})
       tags = optional(map(string), {})
     })), {})
   }))
@@ -403,6 +548,50 @@ variable "kms_grants" {
     key_id            = string
     grantee_principal = string
     operations        = list(string)
+  }))
+  default = {}
+}
+
+variable "route53_resolvers" {
+  description = "map of resolver endpoints and associated rules to configure, where map keys are the names of the resources.  The application name is automatically added as a prefix to the resource names"
+  type = map(object({
+    direction    = optional(string, "OUTBOUND")
+    subnet_names = optional(list(string), ["data", "private"]) # NOTE: there's a quota of 6 cidrs / resolver
+    rules = optional(map(object({
+      domain_name = string
+      rule_type   = optional(string, "FORWARD")
+      target_ips  = list(string)
+    })), {})
+  }))
+  default = {}
+}
+
+variable "route53_zones" {
+  description = "map of route53 zones and associated records, where the map key is the name of the zone and the value object contains the records.  Zone is created if it doesn't already exist"
+  type = map(object({
+    records = optional(list(object({
+      name    = string
+      type    = string
+      ttl     = number
+      records = list(string)
+    })), [])
+    ns_records = optional(list(object({
+      name      = string
+      ttl       = number
+      zone_name = string
+    })), [])
+    lb_alias_records = optional(list(object({
+      name                   = string
+      type                   = string
+      lbs_map_key            = string
+      evaluate_target_health = optional(bool, false)
+    })), [])
+    s3_alias_records = optional(list(object({
+      name                   = string
+      type                   = string
+      s3_bucket_map_key      = string
+      evaluate_target_health = optional(bool, false)
+    })), [])
   }))
   default = {}
 }
@@ -515,8 +704,31 @@ variable "security_groups" {
   default = {}
 }
 
+variable "sns_topics" {
+  description = "map of sns topics and associated subscriptions where map key is the name of the topic"
+  type = map(object({
+    display_name      = optional(string)
+    kms_master_key_id = optional(string)  # id or business unit key name, e.g. 'general'
+    subscriptions = optional(map(object({ # map key isn't used
+      protocol      = string
+      endpoint      = string
+      filter_policy = optional(string)
+    })), {})
+    subscriptions_pagerduty = optional(map(object({ # map key is the name of the pagerduty integration key
+      filter_policy = optional(string)
+    })), {})
+  }))
+  default = {}
+}
+
 variable "tags" {
   description = "Any additional tags to apply to all resources, in addition to those provided by environment module"
   type        = map(string)
   default     = {}
+}
+
+variable "resource_explorer" {
+  description = "Enables AWS Resource Explorer"
+  type        = bool
+  default     = false
 }

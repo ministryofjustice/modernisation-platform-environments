@@ -9,6 +9,113 @@
 # https://github.com/ministryofjustice/modernisation-platform-configuration-management/tree/main/ansible/roles/oracle-db-monitoring
 
 locals {
+  database_cloudwatch_metric_alarms = {
+    oracle-db-disconnected = {
+      comparison_operator = "GreaterThanOrEqualToThreshold"
+      evaluation_periods  = "5"
+      datapoints_to_alarm = "5"
+      metric_name         = "collectd_exec_value"
+      namespace           = "CWAgent"
+      period              = "60"
+      statistic           = "Average"
+      threshold           = "1"
+      alarm_description   = "Oracle db connection to a particular SID is not working. See: https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4294246698/Oracle+db+connection+alarm for remediation steps."
+      dimensions = {
+        instance = "db_connected"
+      }
+    }
+    oracle-batch-failure = {
+      comparison_operator = "GreaterThanOrEqualToThreshold"
+      evaluation_periods  = "5"
+      datapoints_to_alarm = "5"
+      metric_name         = "collectd_exec_value"
+      namespace           = "CWAgent"
+      period              = "60"
+      statistic           = "Average"
+      threshold           = "1"
+      treat_missing_data  = "notBreaching"
+      alarm_description   = "Oracle db has recorded a failed batch status. See: https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4295000327/Batch+Failure for remediation steps."
+      dimensions = {
+        instance = "nomis_batch_failure_status"
+      }
+    }
+    oracle-long-running-batch = {
+      comparison_operator = "GreaterThanOrEqualToThreshold"
+      evaluation_periods  = "5"
+      datapoints_to_alarm = "5"
+      metric_name         = "collectd_exec_value"
+      namespace           = "CWAgent"
+      period              = "60"
+      statistic           = "Average"
+      threshold           = "1"
+      treat_missing_data  = "notBreaching"
+      alarm_description   = "Oracle db has recorded a long-running batch status. See: https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4325966186/Long+Running+Batch for remediation steps."
+      dimensions = {
+        instance = "nomis_long_running_batch"
+      }
+    }
+    oracleasm-service = {
+      comparison_operator = "GreaterThanOrEqualToThreshold"
+      evaluation_periods  = "3"
+      namespace           = "CWAgent"
+      metric_name         = "collectd_exec_value"
+      period              = "60"
+      statistic           = "Average"
+      threshold           = "1"
+      alarm_description   = "oracleasm service has stopped"
+      dimensions = {
+        instance = "oracleasm"
+      }
+    }
+    oracle-ohasd-service = {
+      comparison_operator = "GreaterThanOrEqualToThreshold"
+      evaluation_periods  = "3"
+      namespace           = "CWAgent"
+      metric_name         = "collectd_exec_value"
+      period              = "60"
+      statistic           = "Average"
+      threshold           = "1"
+      alarm_description   = "oracleasm service has stopped"
+      dimensions = {
+        instance = "oracle_ohasd"
+      }
+    }
+    fixngo-connection = {
+      comparison_operator = "GreaterThanOrEqualToThreshold"
+      evaluation_periods  = "3"
+      namespace           = "CWAgent"
+      metric_name         = "collectd_exec_value"
+      period              = "60"
+      statistic           = "Average"
+      threshold           = "1"
+      alarm_description   = "this EC2 instance no longer has a connection to the Oracle Enterprise Manager in FixNGo of the connection-target machine"
+      dimensions = {
+        instance = "fixngo_connected" # required dimension value for this metric
+      }
+    }
+  }
+  database_cloudwatch_metric_alarms_lists = {
+    database = {
+      parent_keys = [
+        "ec2_default",
+        "ec2_linux_default",
+        "ec2_linux_with_collectd_default"
+      ]
+      alarms_list = [
+        { key = "database", name = "oracle-db-disconnected" },
+        { key = "database", name = "oracle-batch-failure" },
+        { key = "database", name = "oracle-long-running-batch" },
+        { key = "database", name = "oracleasm-service" },
+        { key = "database", name = "oracle-ohasd-service" },
+      ]
+    }
+    fixngo_connection = {
+      parent_keys = []
+      alarms_list = [
+        { key = "database", name = "fixngo-connection" },
+      ]
+    }
+  }
 
   database = {
 
@@ -29,22 +136,21 @@ locals {
       key_name                     = aws_key_pair.ec2-user.key_name
       metadata_options_http_tokens = "optional" # the Oracle installer cannot accommodate a token
       monitoring                   = true
-      vpc_security_group_ids       = [aws_security_group.data.id]
+      vpc_security_group_ids = [
+        aws_security_group.data.id, # TODO: remove once weblogic servers refreshed
+        module.baseline.security_groups["data-db"].id,
+      ]
     }
 
     user_data_cloud_init = {
       args = {
-        lifecycle_hook_name    = "ready-hook"
-        branch                 = "main"
-        ansible_repo           = "modernisation-platform-configuration-management"
-        ansible_repo_basedir   = "ansible"
-        ansible_args           = "--tags ec2provision"
-        restored_from_snapshot = false
+        branch               = "main"
+        ansible_repo         = "modernisation-platform-configuration-management"
+        ansible_repo_basedir = "ansible"
+        ansible_args         = "--tags ec2provision"
       }
       scripts = [
         "ansible-ec2provision.sh.tftpl",
-        "oracle_init.sh.tftpl",
-        "ansible-ec2provisiondata.sh.tftpl"
       ]
     }
 
@@ -93,89 +199,12 @@ locals {
         description = "ASMSNMP password"
       }
     }
-    cloudwatch_metric_alarms_database = {
-      oracle-db-disconnected = {
-        comparison_operator = "GreaterThanOrEqualToThreshold"
-        evaluation_periods  = "5"
-        datapoints_to_alarm = "5"
-        metric_name         = "collectd_exec_value"
-        namespace           = "CWAgent"
-        period              = "60"
-        statistic           = "Average"
-        threshold           = "1"
-        alarm_description   = "Oracle db connection to a particular SID is not working. See: https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4294246698/Oracle+db+connection+alarm for remediation steps."
-        alarm_actions       = [aws_sns_topic.nomis_nonprod_alarms.arn]
-        dimensions = {
-          instance = "db_connected"
-        }
-      }
-      oracle-batch-failure = {
-        comparison_operator = "GreaterThanOrEqualToThreshold"
-        evaluation_periods  = "5"
-        datapoints_to_alarm = "5"
-        metric_name         = "collectd_exec_value"
-        namespace           = "CWAgent"
-        period              = "60"
-        statistic           = "Average"
-        threshold           = "1"
-        treat_missing_data  = "notBreaching"
-        alarm_description   = "Oracle db has recorded a failed batch status. See: https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4295000327/Batch+Failure for remediation steps."
-        alarm_actions       = [aws_sns_topic.nomis_nonprod_alarms.arn]
-        dimensions = {
-          instance = "nomis_batch_failure_status"
-        }
-      }
-      oracle-long-running-batch = {
-        comparison_operator = "GreaterThanOrEqualToThreshold"
-        evaluation_periods  = "5"
-        datapoints_to_alarm = "5"
-        metric_name         = "collectd_exec_value"
-        namespace           = "CWAgent"
-        period              = "60"
-        statistic           = "Average"
-        threshold           = "1"
-        treat_missing_data  = "notBreaching"
-        alarm_description   = "Oracle db has recorded a long-running batch status. See: https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4325966186/Long+Running+Batch for remediation steps."
-        alarm_actions       = [aws_sns_topic.nomis_nonprod_alarms.arn]
-        dimensions = {
-          instance = "nomis_long_running_batch"
-        }
-      }
-      oracleasm-service = {
-        comparison_operator = "GreaterThanOrEqualToThreshold"
-        evaluation_periods  = "3"
-        namespace           = "CWAgent"
-        metric_name         = "collectd_exec_value"
-        period              = "60"
-        statistic           = "Average"
-        threshold           = "1"
-        alarm_description   = "oracleasm service has stopped"
-        alarm_actions       = [aws_sns_topic.nomis_nonprod_alarms.arn]
-        dimensions = {
-          instance = "oracleasm"
-        }
-      }
-      oracle-ohasd-service = {
-        comparison_operator = "GreaterThanOrEqualToThreshold"
-        evaluation_periods  = "3"
-        namespace           = "CWAgent"
-        metric_name         = "collectd_exec_value"
-        period              = "60"
-        statistic           = "Average"
-        threshold           = "1"
-        alarm_description   = "oracleasm service has stopped"
-        alarm_actions       = [aws_sns_topic.nomis_nonprod_alarms.arn]
-        dimensions = {
-          instance = "oracle_ohasd"
-        }
-      }
-    }
   }
 }
 
 module "db_ec2_instance" {
   #checkov:skip=CKV_AWS_79:Oracle cannot accommodate a token
-  source = "../../modules/ec2_instance"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v1.0.1"
 
   providers = {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
@@ -208,11 +237,10 @@ module "db_ec2_instance" {
   subnet_id          = module.environment.subnet["data"][local.availability_zone_1].id
   tags               = merge(local.tags, local.database.tags, try(each.value.tags, {}))
   account_ids_lookup = local.environment_management.account_ids
-  cloudwatch_metric_alarms = {
-    for key, value in merge(local.database.cloudwatch_metric_alarms_database, local.cloudwatch_metric_alarms_linux) :
-    key => merge(value, {
-      alarm_actions = [lookup(each.value, "sns_topic", aws_sns_topic.nomis_nonprod_alarms.arn)]
-  }) }
+
+  cloudwatch_metric_alarms = merge(module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso"].database,
+    lookup(each.value, "cloudwatch_metric_alarms", {})
+  )
 }
 
 #------------------------------------------------------------------------------

@@ -1,6 +1,19 @@
 locals {
   test_config = {
 
+    baseline_s3_buckets = {
+
+      # the shared image builder bucket is just created in test
+      nomis-combined-reporting-software = {
+        custom_kms_key = module.environment.kms_keys["general"].arn
+        bucket_policy_v2 = [
+          module.baseline_presets.s3_bucket_policies.ImageBuilderWriteAccessBucketPolicy,
+          module.baseline_presets.s3_bucket_policies.AllEnvironmentsWriteAccessBucketPolicy
+        ]
+        iam_policies = module.baseline_presets.s3_iam_policies
+      }
+    }
+
     baseline_ec2_autoscaling_groups = {
 
       test-base-rhel85 = {
@@ -46,7 +59,77 @@ locals {
         }
       }
     }
-    baseline_lbs = {
-    }
+
+    # baseline_rds_instances = {
+    #   test-rds-instance = {
+    #     config = {
+    #       ssm_parameters_prefix     = "rds_instance/"
+    #       iam_resource_names_prefix = "rds-instance"
+    #     }
+    #     instance = {
+    #       identifier        = "rds-instance"
+    #       allocated_storage = 10
+    #       db_name           = "rds-instance"
+    #       engine            = "mysql"
+    #       instance_class    = "db.t3.micro"
+    #       username          = "example"
+    #     }
+    #   }
+    # }
+    # baseline_lbs = {
+    #   rhel85-test = {
+    #     enable_delete_protection = false
+    #     idle_timeout             = "60"
+    #     public_subnets           = module.environment.subnets["public"].ids
+    #     force_destroy_bucket     = true
+    #     internal_lb              = true
+    #     tags                     = local.tags
+    #     security_groups          = [module.baseline.security_groups["public"].id]
+    #     listeners = {
+    #       https = {
+    #         port             = 443
+    #         protocol         = "HTTPS"
+    #         ssl_policy       = "ELBSecurityPolicy-2016-08"
+    #         certificate_arns = [module.acm_certificate["star.${module.environment.domains.public.application_environment}"].arn]
+    #         default_action = {
+    #           type = "fixed-response"
+    #           fixed_response = {
+    #             content_type = "text/plain"
+    #             message_body = "Not implemented"
+    #             status_code  = "501"
+    #           }
+    #         }
+
+    #         rules = {
+    #           forward-http-8080 = {
+    #             priority = 100
+    #             actions = [{
+    #               type              = "forward"
+    #               target_group_name = "http-8080"
+    #             }]
+    #             conditions = [
+    #               {
+    #                 host_header = {
+    #                   values = ["web.oasys.${module.environment.vpc_name}.modernisation-platform.service.justice.gov.uk"]
+    #                 }
+    #               },
+    #               {
+    #                 path_pattern = {
+    #                   values = ["/"]
+    #                 }
+    #             }]
+    #           }
+    #         }
+    #       }
+    #       route53_records = {
+    #         "web.oasys" = {
+    #           account                = "core-vpc"
+    #           zone_id                = module.environment.route53_zones[module.environment.domains.public.business_unit_environment].zone_id
+    #           evaluate_target_health = true
+    #         }
+    #       }
+    #     }
+    #   }
+    # }
   }
 }

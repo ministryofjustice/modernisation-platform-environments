@@ -1,5 +1,24 @@
 locals {
 
+  s3_buckets = merge(
+    var.environment.environment == "production" ? { "prodpreprod-${var.environment.application_name}-" = {
+      bucket_policy_v2 = [
+        local.s3_bucket_policies.ImageBuilderWriteAccessBucketPolicy,
+        local.s3_bucket_policies.ProdPreprodEnvironmentsWriteAccessBucketPolicy
+      ]
+      iam_policies = local.s3_iam_policies
+    }} : {},
+    var.environment.environment == "test" ? {"devtest-${var.environment.application_name}-" = {
+      bucket_policy_v2 = [
+        local.s3_bucket_policies.ImageBuilderWriteAccessBucketPolicy,
+        local.s3_bucket_policies.DevTestEnvironmentsWriteAndDeleteAccessBucketPolicy
+      ]
+      iam_policies = local.s3_iam_policies
+    }} : {}
+  )
+
+  
+
   s3_bucket_policies = {
 
     ImageBuilderReadOnlyAccessBucketPolicy = {
@@ -63,6 +82,22 @@ locals {
       }
     }
 
+    ProdPreprodEnvironmentsWriteAccessBucketPolicy = {
+      effect = "Allow"
+      actions = [
+        "s3:GetObject",
+        "s3:ListBucket",
+        "s3:PutObject",
+        "s3:PutObjectAcl",
+      ]
+      principals = {
+        type = "AWS"
+        identifiers = [for account_name in var.environment.prodpreprod_account_names :
+          var.environment.account_root_arns[account_name]
+        ]
+      }
+    }
+
     AllEnvironmentsWriteAndDeleteAccessBucketPolicy = {
       effect = "Allow"
       actions = [
@@ -75,6 +110,24 @@ locals {
       principals = {
         type = "AWS"
         identifiers = [for account_name in var.environment.account_names :
+          var.environment.account_root_arns[account_name]
+        ]
+      }
+    }
+
+    DevTestEnvironmentsWriteAndDeleteAccessBucketPolicy = {
+      effect = "Allow"
+      actions = [
+        "s3:GetObject",
+        "s3:ListBucket",
+        "s3:PutObject",
+        "s3:PutObjectAcl",
+        "s3:DeleteObject",
+        "s3:DeleteObjectVersion",
+      ]
+      principals = {
+        type = "AWS"
+        identifiers = [for account_name in var.environment.devtest_account_names :
           var.environment.account_root_arns[account_name]
         ]
       }

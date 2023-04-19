@@ -2,7 +2,6 @@
 # Local vars for ec2
 ##
 locals {
-
   ec2_tags = merge(local.tags, {
     Name = lower(format("%s-%s", local.application_name, local.environment))
   })
@@ -20,7 +19,6 @@ locals {
   ]
 
   iaps_server = {
-
     instance = {
       disable_api_termination      = false
       instance_type                = local.application_data.accounts[local.environment].ec2_iaps_instance_type
@@ -30,6 +28,14 @@ locals {
       vpc_security_group_ids       = [aws_security_group.iaps.id]
     }
 
+    // If the ami name is present in the environment specific config, it will be named something
+    // like this "delius_iaps_server_2021-06-01T11:00:00Z". The : in the name results in data lookups
+    // returning no images. So we replace the : with a * to allow the lookup to work.
+    ami_name = replace(try(
+      local.application_data.accounts[local.environment].ec2_iaps_instance_ami_name,
+      "delius_iaps_server_*"
+    ), ":", "*")
+
     # the ami has got unwanted ephemeral devices so don't copy these
     ebs_volumes_copy_all_from_ami = false
 
@@ -38,9 +44,32 @@ locals {
         type = "gp3"
         size = "50"
       }
+
+      // unmount volume from parent AMI
+      // that was used to enable windows features
+      // without needing to go out to the internet.
+      "/dev/xvdf" = {
+        no_device = true
+      }
     }
 
-    user_data_raw = base64encode(data.template_file.iaps_ec2_config.rendered)
+    user_data_raw = base64encode(
+      templatefile(
+        "${path.module}/templates/iaps-EC2LaunchV2.yaml.tftpl",
+        {
+          delius_iaps_ad_password_secret_name = aws_secretsmanager_secret.ad_password.name
+          delius_iaps_ad_domain_name          = aws_directory_service_directory.active_directory.name
+          delius_iaps_rds_db_address          = aws_db_instance.iaps.address
+          ndelius_interface_url               = local.application_data.accounts[local.environment].iaps_ndelius_interface_url
+          im_interface_url                    = local.application_data.accounts[local.environment].iaps_im_interface_url
+          im_db_url                           = local.application_data.accounts[local.environment].iaps_im_db_url
+
+          # TODO: remove environment variable and related conditional statements
+          # temporarily needed to ensure no connections to delius and im are attempted
+          environment = local.environment
+        }
+      )
+    )
 
     autoscaling_group = {
       desired_capacity = 1
@@ -54,25 +83,8 @@ locals {
       aws_iam_policy.ssm_least_privilege_policy.arn,
       "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy" # Managed policy for cloudwatch agent to talk to CloudWatch
     ]
-
   }
-
 }
-
-##
-# Data
-## 
-# Can use aws ec2 describe-images --filters "Name=owner-id,Values=374269020027" --filters "Name=description,Values='Delius IAPS server'" --query 'reverse(sort_by(Images, &CreationDate))[0].[Name,ImageId]' to test
-# data "aws_ami" "delius_iaps_server" {
-#   most_recent = true
-
-#   filter {
-#     name   = "name"
-#     values = ["${local.application_data.accounts}*"]
-#   }
-
-#   owners = [local.environment_management.account_ids["core-shared-services-production"]]
-# }
 
 ##
 # Resources - Dependencies for ASG and launch template
@@ -214,40 +226,6 @@ resource "aws_iam_policy" "ssm_least_privilege_policy" {
     },
   )
 }
-# resource "aws_iam_role" "iaps_ec2_role" {
-#   name                = "iaps_ec2_role"
-#   assume_role_policy  = data.aws_iam_policy_document.iaps_ec2_assume_role_policy.json
-#   managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"]
-#   inline_policy {
-#     name   = "IapsEc2Policy"
-#     policy = data.aws_iam_policy_document.iaps_ec2_policy.json
-#   }
-#   tags = merge(
-#     local.ec2_tags,
-#     {
-#       Name = "iaps_ec2_role"
-#     },
-#   )
-# }
-
-# resource "aws_iam_instance_profile" "iaps_ec2_profile" {
-#   name = "iaps_ec2_profile"
-#   role = aws_iam_role.iaps_ec2_role.name
-# }
-
-data "template_file" "iaps_ec2_config" {
-  template = file("${path.module}/templates/iaps-EC2LaunchV2.yaml.tftpl")
-  vars = {
-    delius_iaps_ad_password_secret_name = aws_secretsmanager_secret.ad_password.name
-    delius_iaps_ad_domain_name          = aws_directory_service_directory.active_directory.name
-    ndelius_interface_url               = local.application_data.accounts[local.environment].iaps_ndelius_interface_url
-    im_interface_url                    = local.application_data.accounts[local.environment].iaps_im_interface_url
-
-    # TODO: remove environment variable and related conditional statements
-    # temporarily needed to ensure no connections to delius and im are attempted
-    environment = local.environment
-  }
-}
 
 ##
 # Resources - Create ASG and launch template using module
@@ -261,7 +239,7 @@ module "ec2_iaps_server" {
   }
 
   name                          = local.application_data.ec2_iaps_instance_label
-  ami_name                      = local.application_data.ec2_iaps_instance_ami_name
+  ami_name                      = local.iaps_server.ami_name
   ami_owner                     = local.application_data.ec2_iaps_instance_ami_owner
   instance                      = local.iaps_server.instance
   user_data_raw                 = local.iaps_server.user_data_raw
@@ -271,17 +249,6 @@ module "ec2_iaps_server" {
   ssm_parameters                = null
   autoscaling_group             = local.iaps_server.autoscaling_group
   autoscaling_schedules         = {}
-  # NOMIS example 
-  # autoscaling_schedules = coalesce(lookup(each.value, "autoscaling_schedules", null), {
-  #   # if sizes not set, use the values defined in autoscaling_group
-  #   "scale_up" = {
-  #     recurrence = "0 7 * * Mon-Fri"
-  #   }
-  #   "scale_down" = {
-  #     desired_capacity = lookup(each.value, "offpeak_desired_capacity", 0)
-  #     recurrence       = "0 19 * * Mon-Fri"
-  #   }
-  # })
 
   instance_profile_policies = local.iaps_server.iam_policies
   application_name          = local.application_name

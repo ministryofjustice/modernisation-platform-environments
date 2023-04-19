@@ -4,6 +4,7 @@
       "short_environment_name": "dev",
       "db_auto_minor_version_upgrade": "true",
       "db_allow_major_version_upgrade": "false",
+      "db_apply_immediately": "true",
       "db_backup_window": "03:00-06:00",
       "db_backup_retention_period": "7",
       "db_maintenance_window": "mon:00:00-mon:03:00",
@@ -20,12 +21,15 @@
       "ec2_iaps_instance_type": "t3.medium",
       "cloudwatch_agent_log_group_retention_period": "7",
       "iaps_ndelius_interface_url": "placeholder.nd.address",
-      "iaps_im_interface_url": "placeholder.im.address"
+      "iaps_im_interface_url": "placeholder.im.address",
+      "iaps_im_db_url": "placeholder.db.address"
     },
     "preproduction": {
       "short_environment_name": "preprod",
+      "db_snapshot_identifier": "iaps-post-refresh-local",
       "db_auto_minor_version_upgrade": "true",
       "db_allow_major_version_upgrade": "false",
+      "db_apply_immediately": "false",
       "db_backup_window": "03:00-06:00",
       "db_backup_retention_period": "14",
       "db_maintenance_window": "mon:00:00-mon:03:00",
@@ -36,13 +40,21 @@
       "db_multi_az": "false",
       "db_iam_database_authentication_enabled": "false",
       "db_monitoring_interval": "5",
-      "db_enabled_cloudwatch_logs_exports": ["trace", "audit", "alert", "listener", "oemagent"],
+      "db_enabled_cloudwatch_logs_exports": [
+        "trace",
+        "audit",
+        "alert",
+        "listener",
+        "oemagent"
+      ],
       "db_performance_insights_enabled": "false",
       "db_skip_final_snapshot": "true",
       "ec2_iaps_instance_type": "t3.medium",
+      "ec2_iaps_instance_ami_name": "delius_iaps_server_patch_2023-04-17T15-40-43.990Z",
       "cloudwatch_agent_log_group_retention_period": "365",
       "iaps_ndelius_interface_url": "interface.stage.probation.service.justice.gov.uk",
-      "iaps_im_interface_url": "preprod-im-data.i2ncloud.com"
+      "iaps_im_interface_url": "preprod-im-data.i2ncloud.com",
+      "iaps_im_db_url": "imnledb01.nle.im.i2ncloud.com"
     },
     "production": {
       "short_environment_name": "prod",
@@ -52,7 +64,6 @@
     }
   },
   "ec2_iaps_instance_label": "iaps-server",
-  "ec2_iaps_instance_ami_name": "delius_iaps_server_*",
   "ec2_iaps_instance_ami_owner": "core-shared-services-production",
   "ec2_iaps_instance_subnet_name": "private",
 
@@ -83,6 +94,18 @@
     "TCP_443": {
       "from_port": 443,
       "to_port": 443,
+      "protocol": "TCP",
+      "destination_cidr": "0.0.0.0/0"
+    },
+    "TCP_1433": {
+      "from_port": 1433,
+      "to_port": 1433,
+      "protocol": "TCP",
+      "destination_cidr": "0.0.0.0/0"
+    },
+    "TCP_1521": {
+      "from_port": 1521,
+      "to_port": 1521,
       "protocol": "TCP",
       "destination_cidr": "0.0.0.0/0"
     }
@@ -221,5 +244,9 @@
       "protocol": "UDP"
     }
   },
-  "launch_template_tag_resource_types": ["instance", "volume", "network-interface"]
+  "launch_template_tag_resource_types": [
+    "instance",
+    "volume",
+    "network-interface"
+  ]
 }

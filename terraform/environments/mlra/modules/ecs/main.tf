@@ -214,6 +214,7 @@ resource "aws_iam_policy" "ec2_instance_policy" { #tfsec:ignore:aws-iam-no-polic
                 "ecs:StartTelemetrySession",
                 "ecs:UpdateContainerInstancesState",
                 "ecs:Submit*",
+                "ecs:TagResource",
                 "ecr:GetAuthorizationToken",
                 "ecr:BatchCheckLayerAvailability",
                 "ecr:GetDownloadUrlForLayer",
@@ -285,12 +286,12 @@ resource "aws_autoscaling_policy" "ec2-mem-scaling-target" {
     target_value     = var.ec2_scaling_mem_threshold
     disable_scale_in = false
     customized_metric_specification {
-      metric_name = "MemoryUtilization"
-      namespace   = "AWS/ECS"
+      metric_name = "mem_used_percent"
+      namespace   = "CWAgent"
       statistic   = "Average"
       metric_dimension {
-        name  = "ClusterName"
-        value = var.app_name
+        name  = "InstanceId"
+        value = "${var.app_name}-cluster-scaling-group"
       }
     }
   }
@@ -313,11 +314,6 @@ resource "aws_ecs_cluster" "ecs_cluster" {
       Name = var.app_name
     }
   )
-}
-
-resource "aws_ecs_cluster_capacity_providers" "ecs_cluster" {
-  cluster_name = aws_ecs_cluster.ecs_cluster.name
-  # capacity_providers = [aws_ecs_capacity_provider.capacity_provider.name]
 }
 
 resource "aws_ecs_task_definition" "windows_ecs_task_definition" {
@@ -398,20 +394,6 @@ resource "aws_ecs_service" "ecs_service" {
   )
 }
 
-resource "aws_ecs_capacity_provider" "capacity_provider" {
-  name = "${var.app_name}-capacity-provider"
-
-  auto_scaling_group_provider {
-    auto_scaling_group_arn = aws_autoscaling_group.cluster-scaling-group.arn
-  }
-
-  tags = merge(
-    var.tags_common,
-    {
-      Name = "${var.app_name}-capacity-provider"
-    }
-  )
-}
 # ECS task execution role data
 # https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_execution_IAM_role.html
 data "aws_iam_policy_document" "ecs_task_execution_role" {

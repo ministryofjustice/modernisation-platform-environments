@@ -1,6 +1,6 @@
 # oasys-preproduction environment settings
 locals {
-  oasys_preproduction = {
+  preproduction_config = {
     # db_enabled                             = false
     # db_auto_minor_version_upgrade          = true
     # db_allow_major_version_upgrade         = false
@@ -18,12 +18,21 @@ locals {
     # db_performance_insights_enabled        = false
     # db_skip_final_snapshot                 = true
 
-    log_groups = {}
-
 
     ec2_common = {
       patch_approval_delay_days = 3
       patch_day                 = "TUE"
     }
+
+    baseline_ec2_instances = {
+      # Example instance using RedHat image with ansible provisioning
+
+    }
+
+    baseline_bastion_linux = {
+      public_key_data = local.public_key_data.keys[local.environment]
+      tags            = local.tags
+    }
   }
 }
+

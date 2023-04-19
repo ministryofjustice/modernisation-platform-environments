@@ -9,18 +9,25 @@ run_ansible() {
   echo "ansible_repo_basedir: ${ansible_repo_basedir}"
   echo "branch:               ${branch}"
 
-  if [[ ${branch} != "main" ]]; then
-    set -x
+  if [[ -z ${ansible_repo} ]]; then
+    echo "ansible_repo not defined, not installing any ansible" >&2
+    exit 0
   fi
 
   if ! command -v aws > /dev/null; then
-    echo "aws cli must be installed, not installing any ansible" >&2
-    exit 0
+    echo "aws cli must be installed, trying to install.." >&2
+    if ! command -v unzip > /dev/null; then
+      yum install unzip -y
+    fi
+    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "/tmp/awscliv2.zip"
+    unzip /tmp/awscliv2.zip -d /tmp 1> /dev/null
+    /tmp/aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli --update
+    rm -rf /tmp/awscliv2.zip /tmp/aws
   fi
 
   if ! command -v git > /dev/null; then
-    echo "git must be installed, not installing any ansible" >&2
-    exit 0
+    echo "git must be installed, trying to install.." >&2
+    yum install git -y
   fi
 
   echo "# Retrieving API Token"
@@ -29,22 +36,34 @@ run_ansible() {
   echo "# Retrieving Instance ID"
   instance_id=$(curl -sS -H "X-aws-ec2-metadata-token: $token" -v http://169.254.169.254/latest/meta-data/instance-id)
 
-  echo "# Retrieving tag server-type value using aws cli"
-  server_type=$(aws ec2 describe-tags --filters "Name=resource-id,Values=$instance_id" "Name=key,Values=server-type" --output=text | cut -f5 | sed 's/-/_/g')
-
-  echo "# Retrieving tag environment-name value using aws cli"
-  environment_name=$(aws ec2 describe-tags --filters "Name=resource-id,Values=$instance_id" "Name=key,Values=environment-name" --output=text | cut -f5 | sed 's/-/_/g')
-
-  if [[ -z $server_type || -z $environment_name || -z ${ansible_repo} ]]; then
-    echo "server-type or environment-name or ansible_repo not defined, not installing any ansible" >&2
-    exit 0
-  fi
+  echo "# Retrieving tags using aws cli"
+  IFS=$'\n'
+  tags=($(aws ec2 describe-tags --filters "Name=resource-id,Values=$instance_id" "Name=key,Values=os-type,ami,server-type,environment-name" --output=text))
+  unset IFS
 
   # clone ansible roles and playbook
   ansible_dir=$(mktemp -d)
-  echo "# Cloning ${ansible_repo} into $ansible_dir using branch=${branch} if it exists"
+  echo "# Cloning ${ansible_repo} into $ansible_dir using branch=${branch}"
   cd $ansible_dir
-  git clone -b ${branch} "https://github.com/ministryofjustice/${ansible_repo}.git" || git clone "https://github.com/ministryofjustice/${ansible_repo}.git"
+  git clone "https://github.com/ministryofjustice/${ansible_repo}.git"
+  cd $ansible_dir/${ansible_repo}
+  git checkout "${branch}"
+  cd $ansible_dir
+
+  # find the group_var yaml files
+  ansible_group_vars=
+  for ((i=0; i<$${#tags[@]}; i++)); do
+    tag=($${tags[i]})
+    group=$(echo "$${tag[1]}_$${tag[4]}" | tr [:upper:] [:lower:] | sed "s/-/_/g")
+    if [[ -e $ansible_dir/${ansible_repo}/${ansible_repo_basedir}/group_vars/$group.yml ]]; then
+      ansible_group_vars="$ansible_group_vars --extra-vars @group_vars/$group.yml"
+    elif [[ -e $ansible_dir/${ansible_repo}/${ansible_repo_basedir}/group_vars/$group/ansible.yml ]]; then
+      ansible_group_vars="$ansible_group_vars --extra-vars @group_vars/$group/ansible.yml"
+    else
+      echo "Could not find group_vars $group yml"
+      exit 1
+    fi
+  done
 
   # set python version
   if [[ $(which python3.9 2> /dev/null) ]]; then
@@ -52,8 +71,9 @@ run_ansible() {
   elif [[ $(which python3.6 2> /dev/null) ]]; then
     python=$(which python3.6)
   else
-    echo "Python3.9/3.6 not found"
-    exit 1
+    echo "Python3.9/3.6 not found. Installing 3.9"
+    yum install python39 -y 1> /dev/null
+    python=$(which python3.9)
   fi
   echo "# Using python: $python"
 
@@ -61,34 +81,33 @@ run_ansible() {
   mkdir $ansible_dir/python-venv && cd "$_"
   $python -m venv ansible
   source ansible/bin/activate
-  $python -m pip install --upgrade pip
+  $python -m pip install --upgrade pip 1> /dev/null
   if [[ "$python" =~ 3.6 ]]; then
     $python -m pip install wheel
     $python -m pip install cryptography==2.3
     export LC_ALL=en_US.UTF-8
     $python -m pip install ansible-core==2.11.12
   else
-    $python -m pip install ansible==6.0.0
+    $python -m pip install ansible==6.0.0 1> /dev/null
   fi
 
   # install requirements in virtual env
   echo "# Installing ansible requirements"
   cd $ansible_dir/${ansible_repo}/${ansible_repo_basedir}
-  $python -m pip install -r requirements.txt
-  ansible-galaxy role install -r requirements.yml
-  ansible-galaxy collection install -r requirements.yml
+  $python -m pip install -r requirements.txt 1> /dev/null
+  ansible-galaxy role install -r requirements.yml 1> /dev/null
+  ansible-galaxy collection install -r requirements.yml 1> /dev/null
 
   # run ansible (comma after localhost deliberate)
-  echo "# Execute ansible"
-  ansible-playbook site.yml \
+  # ansible_python_interpreter used unless defined in group_vars
+  echo "# Execute ansible site.yml $ansible_group_vars ..."
+  ansible-playbook site.yml $ansible_group_vars \
    --connection=local \
    --inventory localhost, \
    --extra-vars "ansible_python_interpreter=$python" \
    --extra-vars "target=localhost" \
-   --extra-vars "@group_vars/environment_name_$environment_name.yml" \
-   --extra-vars "@group_vars/server_type_$server_type.yml" \
-   --tags ec2provision \
    --become
+   # --tags ec2provision
 
   echo "# Cleanup"
   deactivate

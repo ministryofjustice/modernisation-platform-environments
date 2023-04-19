@@ -1,7 +1,8 @@
 #  Build EC2 
 resource "aws_instance" "ec2_oracle_ebs" {
-  instance_type               = local.application_data.accounts[local.environment].ec2_oracle_instance_type_ebsdb
-  ami                         = data.aws_ami.oracle_db.id
+  instance_type = local.application_data.accounts[local.environment].ec2_oracle_instance_type_ebsdb
+  #ami                         = data.aws_ami.oracle_db.id
+  ami                         = local.environment == "development" ? local.application_data.accounts[local.environment].restored_db_image : data.aws_ami.oracle_db.id
   key_name                    = local.application_data.accounts[local.environment].key_name
   vpc_security_group_ids      = [aws_security_group.ec2_sg_ebsdb.id]
   subnet_id                   = data.aws_subnet.data_subnets_a.id
@@ -9,6 +10,9 @@ resource "aws_instance" "ec2_oracle_ebs" {
   ebs_optimized               = false
   associate_public_ip_address = false
   iam_instance_profile        = aws_iam_instance_profile.iam_instace_profile_ccms_base.name
+
+  cpu_core_count       = local.application_data.accounts[local.environment].ec2_oracle_instance_cores_ebsdb
+  cpu_threads_per_core = local.application_data.accounts[local.environment].ec2_oracle_instance_threads_ebsdb
 
   # Due to a bug in terraform wanting to rebuild the ec2 if more than 1 ebs block is attached, we need the lifecycle clause below
   #lifecycle {
@@ -50,7 +54,6 @@ EOF
       { Name = "root-block" }
     )
   }
-
   ebs_block_device {
     device_name = "/dev/sdf"
     volume_type = "gp3"
@@ -134,7 +137,7 @@ resource "aws_ebs_volume" "dbf" {
   availability_zone = "eu-west-2a"
   size              = "8000"
   type              = "io2"
-  iops              = 3000
+  iops              = local.application_data.accounts[local.environment].ebs_default_iops
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
@@ -219,8 +222,9 @@ module "cw-ebs-ec2" {
 
   # Dimensions used across all alarms
   instanceId   = aws_instance.ec2_oracle_ebs.id
-  imageId      = data.aws_ami.oracle_db.id
+  imageId      = local.environment == "development" ? local.application_data.accounts[local.environment].restored_db_image : data.aws_ami.oracle_db.id
   instanceType = local.application_data.accounts[local.environment].ec2_oracle_instance_type_ebsdb
   fileSystem   = "xfs"       # Linux root filesystem
   rootDevice   = "nvme0n1p1" # This is used by default for root on all the ec2 images
 }
+

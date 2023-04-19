@@ -1,7 +1,8 @@
 module "baseline_presets" {
   source = "../../modules/baseline_presets"
 
-  environment = module.environment
+  environment  = module.environment
+  ip_addresses = module.ip_addresses
 
   options = {
     enable_application_environment_wildcard_cert = true
@@ -9,6 +10,13 @@ module "baseline_presets" {
     enable_image_builder                         = true
     enable_ec2_cloud_watch_agent                 = true
     enable_ec2_self_provision                    = true
+    iam_policies_filter                          = ["ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
+    iam_policies_ec2_default                     = ["EC2S3BucketWriteAndDeleteAccessPolicy", "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
     s3_iam_policies                              = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
+
+    # comment this in if you need to resolve FixNGo hostnames
+    # route53_resolver_rules = {
+    #   outbound-data-and-private-subnets = ["azure-fixngo-domain"]
+    # }
   }
 }
