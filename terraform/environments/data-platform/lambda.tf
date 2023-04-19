@@ -81,7 +81,7 @@ data "aws_iam_policy_document" "iam_policy_document_for_code_lambda" {
     sid       = "GETPUTBucketAccess"
     effect    = "Allow"
     actions   = ["s3:GetObject*", "s3:PutObject*"]
-    resources = ["${module.s3-bucket.bucket.arn}/code/*"]
+    resources = ["${module.s3-bucket.bucket.arn}/code_zips/*"]
   }
 }
 
@@ -96,7 +96,7 @@ data "aws_iam_policy_document" "iam_policy_document_for_data_lambda" {
     sid       = "GETPUTBucketAccess"
     effect    = "Allow"
     actions   = ["s3:GetObject*", "s3:PutObject*"]
-    resources = ["${module.s3-bucket.bucket.arn}/data/*"]
+    resources = ["${module.s3-bucket.bucket.arn}/raw_data/*"]
   }
 }
 
