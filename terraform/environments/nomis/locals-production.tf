@@ -180,29 +180,29 @@ locals {
         ]
 
         listeners = {
-          #          https = merge(
-          #            local.lb_weblogic.https, {
-          #              rules = {
-          #                prod-nomis-web-a-http-7777 = {
-          #                  priority = 200
-          #                  actions = [{
-          #                    type              = "forward"
-          #                    target_group_name = "prod-nomis-web-a-http-7777"
-          #                  }]
-          #                  conditions = [{
-          #                    host_header = {
-          #                      values = [
-          #                        "prod-nomis-web-a.production.nomis.az.justice.gov.uk",
-          #                        "prod-nomis-web-a.production.nomis.service.justice.gov.uk",
-          #                        "c.production.nomis.az.justice.gov.uk",
-          #                        "c.production.nomis.service.justice.gov.uk",
-          #                        "c.nomis.az.justice.gov.uk",
-          #                      ]
-          #                    }
-          #                  }]
-          #                }
-          #              }
-          #          })
+          https = merge(
+            local.lb_weblogic.https, {
+              rules = {
+                prod-nomis-web-a-http-7777 = {
+                  priority = 200
+                  actions = [{
+                    type              = "forward"
+                    target_group_name = "prod-nomis-web-a-http-7777"
+                  }]
+                  conditions = [{
+                    host_header = {
+                      values = [
+                        "prod-nomis-web-a.production.nomis.az.justice.gov.uk",
+                        "prod-nomis-web-a.production.nomis.service.justice.gov.uk",
+                        "c.production.nomis.az.justice.gov.uk",
+                        "c.production.nomis.service.justice.gov.uk",
+                        "c.nomis.az.justice.gov.uk",
+                      ]
+                    }
+                  }]
+                }
+              }
+          })
         }
       }
     }
