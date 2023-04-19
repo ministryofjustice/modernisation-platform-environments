@@ -23,7 +23,7 @@ resource "aws_lambda_function" "data_extractor" {
   }
 }
 
-data "aws_iam_policy_document" "lambda_trust_policy_doc" {
+data "aws_iam_policy_document" "data_lambda_trust_policy_doc" {
   statement {
     sid     = "LambdaAssumeRole"
     effect  = "Allow"
@@ -36,8 +36,8 @@ data "aws_iam_policy_document" "lambda_trust_policy_doc" {
 }
 
 resource "aws_iam_role" "data_lambda_role" {
-  name               = "${local.data_function_name}-role-${local.environment}"
-  assume_role_policy = data.aws_iam_policy_document.lambda_trust_policy_doc.json
+  name               = "data_extractor_${local.environment}-role-${local.environment}"
+  assume_role_policy = data.aws_iam_policy_document.data_lambda_trust_policy_doc.json
 }
 
 data "aws_iam_policy_document" "iam_policy_document_for_data_lambda" {
@@ -56,7 +56,7 @@ data "aws_iam_policy_document" "iam_policy_document_for_data_lambda" {
 }
 
 resource "aws_iam_policy" "data_lambda_policy" {
-  name        = "${local.data_function_name}-policy-${local.environment}"
+  name        = "data_extractor_${local.environment}-policy-${local.environment}"
   path        = "/"
   description = "AWS IAM Policy for managing aws lambda role"
   policy      = data.aws_iam_policy_document.iam_policy_document_for_data_lambda.json
