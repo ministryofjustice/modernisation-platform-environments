@@ -80,6 +80,34 @@ locals {
         branch = "ccfe2d0becae50d1ff706442b52a6c9fe01d5a7c" # 2023-04-12
       })
     })
+    ebs_volumes = {
+      "/dev/sdb" = { # /u01
+        size        = 100
+        label       = "app"
+        type        = "gp3"
+        snapshot_id = null
+      }
+      "/dev/sdc" = { # /u02
+        size        = 500
+        label       = "app"
+        type        = "gp3"
+        snapshot_id = null
+      }
+    }
+    ebs_volume_config = {
+      data = {
+        iops       = 3000
+        type       = "gp3"
+        throughput = 125
+        total_size = 200
+      }
+      flash = {
+        iops       = 3000
+        type       = "gp3"
+        throughput = 125
+        total_size = 50
+      }
+    }
     autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
     autoscaling_group = module.baseline_presets.ec2_autoscaling_group
     lb_target_groups = {
