@@ -1014,7 +1014,7 @@ module "dms_use_of_force" {
   source_engine_name    = "postgres"
   source_db_name        = "use_of_force"
   source_app_username   = "postgres"
-  source_app_password   = "postgres!password123"
+  source_app_password   = ""
   source_address        = "dpr-development-use-of-force-rds.cja8lnnvvipo.eu-west-2.rds.amazonaws.com"
   source_db_port        = 5432
   vpc                   = data.aws_vpc.shared.id
