@@ -5,21 +5,25 @@ resource "aws_security_group" "ec2_sg_oracle_base" {
   description = "Baseline image of Oracle Linux 7.9"
   vpc_id      = data.aws_vpc.shared.id
   tags = merge(local.tags,
-    { Name = lower(format("sg-%s-%s-OracleBaseImage", local.application_name, local.environment)) }
+    { Name = lower(format("sg-%s-%s-ec2", local.application_name, local.environment)) }
   )
 }
+
 resource "aws_security_group_rule" "ingress_traffic_oracle_base" {
-  for_each          = local.application_data.ec2_sg_ingress_rules
+  for_each          = local.application_data.ec2_sg_base_ingress_rules
   security_group_id = aws_security_group.ec2_sg_oracle_base.id
   type              = "ingress"
   description       = format("Traffic for %s %d", each.value.protocol, each.value.from_port)
   protocol          = each.value.protocol
   from_port         = each.value.from_port
   to_port           = each.value.to_port
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block, "0.0.0.0/0"]
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+
 }
+
 resource "aws_security_group_rule" "egress_traffic_oracle_base_sg" {
-  for_each                 = local.application_data.ec2_sg_egress_rules
+  for_each = local.application_data.ec2_sg_base_egress_rules
+  #for_each          = local.application_data.ec2_sg_egress_rules
   security_group_id        = aws_security_group.ec2_sg_oracle_base.id
   type                     = "egress"
   description              = format("Outbound traffic for %s %d", each.value.protocol, each.value.from_port)
@@ -29,7 +33,8 @@ resource "aws_security_group_rule" "egress_traffic_oracle_base_sg" {
   source_security_group_id = aws_security_group.ec2_sg_oracle_base.id
 }
 resource "aws_security_group_rule" "egress_traffic_oracle_base_cidr" {
-  for_each          = local.application_data.ec2_sg_egress_rules
+  for_each = local.application_data.ec2_sg_base_egress_rules
+  #for_each          = local.application_data.ec2_sg_egress_rules
   security_group_id = aws_security_group.ec2_sg_oracle_base.id
   type              = "egress"
   description       = format("Outbound traffic for %s %d", each.value.protocol, each.value.from_port)
@@ -45,7 +50,7 @@ resource "aws_security_group" "ec2_sg_ebsdb" {
   description = "SG traffic control for EBSDB"
   vpc_id      = data.aws_vpc.shared.id
   tags = merge(local.tags,
-    { Name = lower(format("sg-%s-%s-OracleBaseImage", local.application_name, local.environment)) }
+    { Name = lower(format("sg-%s-%s-ebsdb", local.application_name, local.environment)) }
   )
 }
 resource "aws_security_group_rule" "ingress_traffic_ebsdb" {
@@ -56,7 +61,7 @@ resource "aws_security_group_rule" "ingress_traffic_ebsdb" {
   protocol          = each.value.protocol
   from_port         = each.value.from_port
   to_port           = each.value.to_port
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block, "0.0.0.0/0", local.application_data.accounts[local.environment].mp_aws_subnet_env]
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block, local.application_data.accounts[local.environment].lz_aws_subnet_env, local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_subnet_env, local.application_data.accounts[local.environment].lz_aws_workspace_prod_subnet_env]
 }
 resource "aws_security_group_rule" "egress_traffic_ebsdb_sg" {
   for_each                 = local.application_data.ec2_sg_egress_rules
@@ -85,7 +90,7 @@ resource "aws_security_group" "ec2_sg_ebsapps" {
   description = "SG traffic control for EBSAPPS"
   vpc_id      = data.aws_vpc.shared.id
   tags = merge(local.tags,
-    { Name = lower(format("sg-%s-%s-OracleBaseImage", local.application_name, local.environment)) }
+    { Name = lower(format("sg-%s-%s-ebsapps", local.application_name, local.environment)) }
   )
 }
 resource "aws_security_group_rule" "ingress_traffic_ebsapps" {
@@ -96,7 +101,7 @@ resource "aws_security_group_rule" "ingress_traffic_ebsapps" {
   protocol          = each.value.protocol
   from_port         = each.value.from_port
   to_port           = each.value.to_port
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block, "0.0.0.0/0", local.application_data.accounts[local.environment].mp_aws_subnet_env]
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block, local.application_data.accounts[local.environment].lz_aws_subnet_env, local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_subnet_env, local.application_data.accounts[local.environment].lz_aws_workspace_prod_subnet_env]
 }
 resource "aws_security_group_rule" "egress_traffic_ebsapps_sg" {
   for_each                 = local.application_data.ec2_sg_egress_rules
@@ -125,7 +130,7 @@ resource "aws_security_group" "ec2_sg_webgate" {
   description = "SG traffic control for WebGate"
   vpc_id      = data.aws_vpc.shared.id
   tags = merge(local.tags,
-    { Name = lower(format("sg-%s-%s-OracleBaseImage", local.application_name, local.environment)) }
+    { Name = lower(format("sg-%s-%s-webgate", local.application_name, local.environment)) }
   )
 }
 resource "aws_security_group_rule" "ingress_traffic_webgate" {
@@ -136,7 +141,7 @@ resource "aws_security_group_rule" "ingress_traffic_webgate" {
   protocol          = each.value.protocol
   from_port         = each.value.from_port
   to_port           = each.value.to_port
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block, "0.0.0.0/0", local.application_data.accounts[local.environment].mp_aws_subnet_env]
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block, local.application_data.accounts[local.environment].lz_aws_subnet_env, local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_subnet_env, local.application_data.accounts[local.environment].lz_aws_workspace_prod_subnet_env]
 }
 resource "aws_security_group_rule" "egress_traffic_webgate_sg" {
   for_each                 = local.application_data.ec2_sg_egress_rules
@@ -165,7 +170,7 @@ resource "aws_security_group" "ec2_sg_accessgate" {
   description = "SG traffic control for AccessGate"
   vpc_id      = data.aws_vpc.shared.id
   tags = merge(local.tags,
-    { Name = lower(format("sg-%s-%s-OracleBaseImage", local.application_name, local.environment)) }
+    { Name = lower(format("sg-%s-%s-accessgate", local.application_name, local.environment)) }
   )
 }
 resource "aws_security_group_rule" "ingress_traffic_accessgate" {
@@ -176,7 +181,7 @@ resource "aws_security_group_rule" "ingress_traffic_accessgate" {
   protocol          = each.value.protocol
   from_port         = each.value.from_port
   to_port           = each.value.to_port
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block, "0.0.0.0/0", local.application_data.accounts[local.environment].mp_aws_subnet_env]
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block, local.application_data.accounts[local.environment].lz_aws_subnet_env, local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_subnet_env, local.application_data.accounts[local.environment].lz_aws_workspace_prod_subnet_env]
 }
 resource "aws_security_group_rule" "egress_traffic_accessgate_sg" {
   for_each                 = local.application_data.ec2_sg_egress_rules
@@ -206,6 +211,7 @@ resource "aws_security_group" "sg_ebsapps_lb" {
   description = "Inbound traffic control for EBSAPPS loadbalancer"
   vpc_id      = data.aws_vpc.shared.id
 
+  /*
   ingress {
     from_port   = 443
     to_port     = 443
@@ -219,14 +225,44 @@ resource "aws_security_group" "sg_ebsapps_lb" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
-
+*/
   tags = merge(local.tags,
-    { Name = lower(format("sg-%s-%s-OracleBaseImage", local.application_name, local.environment)) }
+    { Name = lower(format("sg-%s-%s-loadbalancer", local.application_name, local.environment)) }
   )
 }
+resource "aws_security_group_rule" "ingress_traffic_ebslb" {
+  for_each          = local.application_data.lb_sg_ingress_rules
+  security_group_id = aws_security_group.sg_ebsapps_lb.id
+  type              = "ingress"
+  description       = format("Traffic for %s %d", each.value.protocol, each.value.from_port)
+  protocol          = each.value.protocol
+  from_port         = each.value.from_port
+  to_port           = each.value.to_port
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block, local.application_data.accounts[local.environment].lz_aws_subnet_env, local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_subnet_env, local.application_data.accounts[local.environment].lz_aws_workspace_prod_subnet_env]
+}
+resource "aws_security_group_rule" "egress_traffic_ebslb_sg" {
+  for_each                 = local.application_data.lb_sg_egress_rules
+  security_group_id        = aws_security_group.sg_ebsapps_lb.id
+  type                     = "egress"
+  description              = format("Outbound traffic for %s %d", each.value.protocol, each.value.from_port)
+  protocol                 = each.value.protocol
+  from_port                = each.value.from_port
+  to_port                  = each.value.to_port
+  source_security_group_id = aws_security_group.ec2_sg_ebsdb.id
+}
+resource "aws_security_group_rule" "egress_traffic_ebslb_cidr" {
+  for_each          = local.application_data.lb_sg_egress_rules
+  security_group_id = aws_security_group.sg_ebsapps_lb.id
+  type              = "egress"
+  description       = format("Outbound traffic for %s %d", each.value.protocol, each.value.from_port)
+  protocol          = each.value.protocol
+  from_port         = each.value.from_port
+  to_port           = each.value.to_port
+  cidr_blocks       = [each.value.destination_cidr]
+}
+
 
 # Security Group for FTP Server
-
 resource "aws_security_group" "ec2_sg_ftp" {
   name        = "ec2_sg_ftp"
   description = "Security Group for FTP Server"
@@ -260,35 +296,86 @@ resource "aws_security_group_rule" "egress_traffic_ftp" {
   cidr_blocks       = [each.value.destination_cidr]
   //  source_security_group_id = aws_security_group.ec2_sg_ftp.id
 }
-/*
-resource "aws_security_group_rule" "ingress_traffic_ebsapps_lb" {
-  for_each          = local.application_data.ec2_sg_ingress_rules
-  security_group_id = aws_security_group.sg_ebsapps_lb.id
+
+
+# Rule for all ingress/egress within the environment
+resource "aws_security_group_rule" "all_internal_ingress_traffic" {
+  for_each          = { for sub in data.aws_security_groups.all_security_groups.ids : sub => sub }
+  security_group_id = each.value
+  type              = "ingress"
+  description       = "Ingress for all internal traffic"
+  protocol          = "all"
+  from_port         = 0
+  to_port           = 0
+  cidr_blocks = [
+    data.aws_subnet.data_subnets_a.cidr_block,
+    data.aws_subnet.data_subnets_b.cidr_block,
+    data.aws_subnet.data_subnets_c.cidr_block,
+    data.aws_subnet.private_subnets_a.cidr_block,
+    data.aws_subnet.private_subnets_b.cidr_block,
+    data.aws_subnet.private_subnets_c.cidr_block
+  ]
+}
+
+resource "aws_security_group_rule" "all_internal_egress_traffic" {
+  for_each          = { for sub in data.aws_security_groups.all_security_groups.ids : sub => sub }
+  security_group_id = each.value
+  #security_group_id = aws_security_group.ec2_sg_oracle_base.id
+  type        = "egress"
+  description = "Egress for all internal traffic"
+  protocol    = "all"
+  from_port   = 0
+  to_port     = 0
+  cidr_blocks = [
+    data.aws_subnet.data_subnets_a.cidr_block,
+    data.aws_subnet.data_subnets_b.cidr_block,
+    data.aws_subnet.data_subnets_c.cidr_block,
+    data.aws_subnet.private_subnets_a.cidr_block,
+    data.aws_subnet.private_subnets_b.cidr_block,
+    data.aws_subnet.private_subnets_c.cidr_block
+  ]
+}
+
+
+# Security Group for WEBGATE ELB
+resource "aws_security_group" "sg_webgate_lb" {
+  name        = "sg_webgate_lb"
+  description = "Inbound traffic control for WebGate loadbalancer"
+  vpc_id      = data.aws_vpc.shared.id
+
+  tags = merge(local.tags,
+    { Name = lower(format("sg-%s-%s-webgate-loadbalancer", local.application_name, local.environment)) }
+  )
+}
+resource "aws_security_group_rule" "ingress_traffic_webgatelb" {
+  for_each          = local.application_data.lb_sg_ingress_rules
+  security_group_id = aws_security_group.sg_webgate_lb.id
   type              = "ingress"
   description       = format("Traffic for %s %d", each.value.protocol, each.value.from_port)
   protocol          = each.value.protocol
   from_port         = each.value.from_port
   to_port           = each.value.to_port
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block, "0.0.0.0/0"]
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block, local.application_data.accounts[local.environment].lz_aws_subnet_env, local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_subnet_env, local.application_data.accounts[local.environment].lz_aws_workspace_prod_subnet_env]
 }
-resource "aws_security_group_rule" "egress_traffic_ebsapps_lb_sg" {
-  for_each                  = local.application_data.ec2_sg_egress_rules
-  security_group_id         = aws_security_group.sg_ebsapps_lb.id
-  type                      = "egress"
-  description               = format("Outbound traffic for %s %d", each.value.protocol, each.value.from_port)
-  protocol                  = each.value.protocol
-  from_port                 = each.value.from_port
-  to_port                   = each.value.to_port
-  source_security_group_id  = aws_security_group.sg_ebsapps_lb.id
+
+resource "aws_security_group_rule" "egress_traffic_webgatelb_sg" {
+  for_each                 = local.application_data.lb_sg_egress_rules
+  security_group_id        = aws_security_group.sg_webgate_lb.id
+  type                     = "egress"
+  description              = format("Outbound traffic for %s %d", each.value.protocol, each.value.from_port)
+  protocol                 = each.value.protocol
+  from_port                = each.value.from_port
+  to_port                  = each.value.to_port
+  source_security_group_id = aws_security_group.ec2_sg_webgate.id
 }
-resource "aws_security_group_rule" "egress_traffic_ebsapps_lb_cidr" {
-  for_each                  = local.application_data.ec2_sg_egress_rules
-  security_group_id         = aws_security_group.sg_ebsapps_lb.id
-  type                      = "egress"
-  description               = format("Outbound traffic for %s %d", each.value.protocol, each.value.from_port)
-  protocol                  = each.value.protocol
-  from_port                 = each.value.from_port
-  to_port                   = each.value.to_port
-  cidr_blocks               = [each.value.destination_cidr]
+
+resource "aws_security_group_rule" "egress_traffic_webgatelb_cidr" {
+  for_each          = local.application_data.lb_sg_egress_rules
+  security_group_id = aws_security_group.sg_webgate_lb.id
+  type              = "egress"
+  description       = format("Outbound traffic for %s %d", each.value.protocol, each.value.from_port)
+  protocol          = each.value.protocol
+  from_port         = each.value.from_port
+  to_port           = each.value.to_port
+  cidr_blocks       = [each.value.destination_cidr]
 }
-*/

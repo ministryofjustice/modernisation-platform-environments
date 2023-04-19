@@ -30,86 +30,116 @@ locals {
     }
 
     databases = {
-      # Naming
-      # *-nomis-db-1: NOMIS, NDH, TRDATA
-      # *-nomis-db-2: MIS, AUDIT
-      # *-nomis-db-3: HA
-
-      # add databases here as needed
     }
     weblogics          = {}
     ec2_test_instances = {}
     ec2_test_autoscaling_groups = {
-      dev-redhat-rhel610 = {
-        tags = {
-          description = "For testing official RedHat RHEL6.10 image"
-          monitored   = false
-          os-type     = "Linux"
-          component   = "test"
-        }
-        instance = {
-          instance_type                = "t2.medium"
-          metadata_options_http_tokens = "optional"
-        }
-        ami_name  = "RHEL-6.10_HVM-*"
-        ami_owner = "309956199498"
-      }
-      dev-redhat-rhel79 = {
-        tags = {
-          description = "For testing official RedHat RHEL7.9 image"
-          monitored   = false
-          os-type     = "Linux"
-          component   = "test"
-        }
-        ami_name  = "RHEL-7.9_HVM-*"
-        ami_owner = "309956199498"
-      }
-      dev-base-rhel79 = {
-        tags = {
-          ami               = "base_rhel_7_9"
-          description       = "For testing our base RHEL7.9 base image"
-          monitored         = false
-          os-type           = "Linux"
-          component         = "test"
-          nomis-environment = "dev"
-          server-type       = "base-rhel79"
-        }
-        ami_name = "base_rhel_7_9_*"
-        autoscaling_group = {
-          desired_capacity = 1
-        }
-      }
-      dev-base-rhel610 = {
-        tags = {
-          ami               = "base_rhel_6_10"
-          description       = "For testing our base RHEL6.10 base image"
-          monitored         = false
-          os-type           = "Linux"
-          component         = "test"
-          nomis-environment = "dev"
-          server-type       = "base-rhel610"
-        }
-        instance = {
-          instance_type                = "t2.medium"
-          metadata_options_http_tokens = "optional"
-        }
-        ami_name = "base_rhel_6_10*"
-      }
     }
     ec2_jumpservers = {
-      jumpserver-2022 = {
-        ami_name = "nomis_windows_server_2022_jumpserver_release_*"
+    }
+  }
+
+  # baseline config
+  development_config = {
+
+    baseline_ec2_autoscaling_groups = {
+
+      dev-redhat-rhel79 = {
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name                  = "RHEL-7.9_HVM-*"
+          ami_owner                 = "309956199498"
+          instance_profile_policies = local.ec2_common_managed_policies
+        })
+        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+          vpc_security_group_ids = ["private-web"]
+        })
+        user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
+        autoscaling_group = {
+          desired_capacity    = 0
+          max_size            = 2
+          vpc_zone_identifier = module.environment.subnets["private"].ids
+        }
+        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
         tags = {
-          server-type       = "jumpserver"
-          description       = "Windows Server 2022 Jumpserver for NOMIS"
-          monitored         = false
-          os-type           = "Windows"
-          component         = "jumpserver"
-          nomis-environment = "dev"
+          description = "For testing official RedHat RHEL7.9 image"
+          os-type     = "Linux"
+          component   = "test"
+        }
+      }
+
+      dev-base-rhel79 = {
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name                  = "base_rhel_7_9_*"
+          instance_profile_policies = local.ec2_common_managed_policies
+        })
+        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+          vpc_security_group_ids = ["private-web"]
+        })
+        user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
+        autoscaling_group = {
+          desired_capacity    = 0
+          max_size            = 2
+          vpc_zone_identifier = module.environment.subnets["private"].ids
+        }
+        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
+        tags = {
+          description = "For testing our base RHEL7.9 base image"
+          ami         = "base_rhel_7_9"
+          os-type     = "Linux"
+          component   = "test"
+          server-type = "base-rhel79"
+        }
+      }
+
+      dev-base-rhel610 = {
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name                  = "base_rhel_6_10*"
+          instance_profile_policies = local.ec2_common_managed_policies
+        })
+        instance = merge(module.baseline_presets.ec2_instance.instance.default_rhel6, {
+          vpc_security_group_ids = ["private-web"]
+        })
+        user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
+        autoscaling_group = {
+          desired_capacity    = 0
+          max_size            = 2
+          vpc_zone_identifier = module.environment.subnets["private"].ids
+        }
+        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
+        tags = {
+          description = "For testing our base RHEL6.10 base image"
+          ami         = "base_rhel_6_10"
+          os-type     = "Linux"
+          component   = "test"
+          server-type = "base-rhel610"
+        }
+      }
+
+      dev-jumpserver-2022 = {
+        # ami has unwanted ephemeral device, don't copy all the ebs_volumess
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name                      = "nomis_windows_server_2022_jumpserver_release_*"
+          instance_profile_policies     = local.ec2_common_managed_policies
+          ebs_volumes_copy_all_from_ami = false
+          user_data_raw                 = base64encode(templatefile("./templates/jumpserver-user-data.yaml", { S3_BUCKET = module.s3-bucket.bucket.id }))
+        })
+        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+          vpc_security_group_ids = ["private-jumpserver"]
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 100 }
         }
         autoscaling_group = {
-          min_size = 0
-          max_size = 1
+          desired_capacity    = 0
+          max_size            = 2
+          vpc_zone_identifier = module.environment.subnets["private"].ids
+        }
+        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
+        tags = {
+          description = "Windows Server 2022 Jumpserver for NOMIS"
+          os-type     = "Windows"
+          component   = "jumpserver"
+          server-type = "nomis-jumpserver"
         }
       }
     }

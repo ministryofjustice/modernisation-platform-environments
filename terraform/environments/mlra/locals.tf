@@ -5,36 +5,12 @@ locals {
 
   # ECS local variables for ecs.tf
   ec2_ingress_rules = {
-    "cluster_ec2_lb_ingress" = {
-      description     = "Cluster EC2 ingress rule"
-      from_port       = 22
-      to_port         = 22
-      protocol        = "tcp"
-      cidr_blocks     = [data.aws_vpc.shared.cidr_block]
-      security_groups = []
-    }
-    "cluster_ec2_lb_ingress_2" = {
-      description     = "Cluster EC2 ingress rule 2"
-      from_port       = 8080
-      to_port         = 8080
-      protocol        = "tcp"
-      cidr_blocks     = [data.aws_vpc.shared.cidr_block]
-      security_groups = []
-    }
     "cluster_ec2_lb_ingress_3" = {
       description     = "Cluster EC2 ingress rule 3"
       from_port       = 32768
       to_port         = 61000
       protocol        = "tcp"
-      cidr_blocks     = [data.aws_vpc.shared.cidr_block]
-      security_groups = [module.alb.security_group.id]
-    }
-    "cluster_ec2_lb_ingress_4" = {
-      description     = "Cluster EC2 ingress rule 4"
-      from_port       = 1521
-      to_port         = 1521
-      protocol        = "tcp"
-      cidr_blocks     = [data.aws_vpc.shared.cidr_block]
+      cidr_blocks     = []
       security_groups = [module.alb.security_group.id]
     }
   }
@@ -55,7 +31,7 @@ locals {
 
   task_definition = templatefile("task_definition.json", {
     app_name            = local.application_name
-    ecr_url             = local.application_data.accounts[local.environment].ecr_url
+    ecr_url             = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/mlra-ecr-repo"
     docker_image_tag    = local.application_data.accounts[local.environment].docker_image_tag
     region              = local.application_data.accounts[local.environment].region
     maat_api_end_point  = local.application_data.accounts[local.environment].maat_api_end_point

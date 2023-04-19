@@ -60,6 +60,30 @@ locals {
         }
       }
 
+      t1-nomis-db-1-a = {
+        tags = {
+          nomis-environment   = "t1"
+          server-type         = "nomis-db"
+          description         = "T1 NOMIS database"
+          oracle-sids         = "CNOMT1"
+          monitored           = true
+          instance-scheduling = "skip-scheduling"
+        }
+        ami_name  = "nomis_rhel_7_9_oracledb_11_2_release_2023-04-02T00-00-40.059Z"
+        ami_owner = "self"
+        instance = {
+          disable_api_termination = true
+        }
+        ebs_volumes = {
+          "/dev/sdb" = { size = 100 }
+          "/dev/sdc" = { size = 100 }
+        }
+        ebs_volume_config = {
+          data  = { total_size = 100 }
+          flash = { total_size = 50 }
+        }
+      }
+
       t1-nomis-db-2 = {
         tags = {
           nomis-environment   = "t1"
@@ -111,138 +135,113 @@ locals {
 
     # Add weblogic instances here
     weblogic_autoscaling_groups = {
-      t1-nomis-web = {
-        tags = {
-          ami                = "nomis_rhel_6_10_weblogic_appserver_10_3"
-          description        = "T1 nomis weblogic 10.3"
-          oracle-db-hostname = "t1-nomis-db-1"
-          nomis-environment  = "t1"
-          oracle-db-name     = "CNOMT1"
-          server-type        = "nomis-web"
-        }
-        ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-01-03T17-01-12.128Z"
-
-        autoscaling_group = {
-          desired_capacity = 1
-          warm_pool        = null
-        }
-        autoscaling_schedules = {}
-      }
-
-      t1a-nomis-web = {
-        tags = {
-          ami                = "nomis_rhel_6_10_weblogic_appserver_10_3"
-          description        = "T1 nomis weblogic 10.3 additional test scaling group"
-          oracle-db-hostname = "t1-nomis-db-1"
-          nomis-environment  = "t1"
-          oracle-db-name     = "CNOMT1"
-          server-type        = "nomis-web"
-        }
-        # ami_name = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-01-03T17-01-12.128Z"
-        ami_name = "base_rhel_6_10_test_2022-12-30T16-10-33.253Z"
-        user_data_cloud_init = {
-          args = {
-            lifecycle_hook_name  = "ready-hook"
-            branch               = "nomis/weblogic-test-for-sandhya"
-            ansible_repo         = "modernisation-platform-configuration-management"
-            ansible_repo_basedir = "ansible"
-            ansible_args         = "--tags ec2provision"
-          }
-        }
-        autoscaling_group = {
-          desired_capacity = 1
-          warm_pool        = null
-        }
-        autoscaling_schedules = {}
-        ebs_volumes = {
-          "/dev/sdb" = {
-            type = "gp3"
-            size = 150
-          }
-        }
-      }
     }
 
     ec2_test_instances = {
       # Remove data.aws_kms_key from cmk.tf once the NDH servers are removed
-      t1-ndh-app-1 = {
-        tags = {
-          server-type       = "ndh-app"
-          description       = "Standalone EC2 for testing RHEL7.9 NDH App"
-          monitored         = false
-          os-type           = "Linux"
-          component         = "ndh"
-          nomis-environment = "t1"
-        }
-        ebs_volumes = {
-          "/dev/sda1" = { kms_key_id = data.aws_kms_key.default_ebs.arn }
-        }
-        ami_name = "nomis_rhel_7_9_baseimage_2022-11-01T13-43-46.384Z"
-      }
-      t1-ndh-ems-1 = {
-        tags = {
-          server-type       = "ndh-ems"
-          description       = "Standalone EC2 for testing RHEL7.9 NDH EMS"
-          monitored         = false
-          os-type           = "Linux"
-          component         = "ndh"
-          nomis-environment = "t1"
-        }
-        ebs_volumes = {
-          "/dev/sda1" = { kms_key_id = data.aws_kms_key.default_ebs.arn }
-        }
-        ami_name = "nomis_rhel_7_9_baseimage_2022-11-01T13-43-46.384Z"
-      }
     }
-    ec2_test_autoscaling_groups = {
-      t1-ndh-app = {
-        tags = {
-          server-type       = "ndh-app"
-          description       = "Standalone EC2 for testing RHEL7.9 NDH App"
-          monitored         = false
-          os-type           = "Linux"
-          component         = "ndh"
-          nomis-environment = "t1"
-        }
-        ami_name = "nomis_rhel_7_9_baseimage_2022-11-01T13-43-46.384Z"
-        autoscaling_group = {
-          desired_capacity = 1
-        }
-        autoscaling_schedules = {}
-        subnet_name           = "data"
-      }
-      t1-ndh-ems = {
-        tags = {
-          server-type       = "ndh-ems"
-          description       = "Standalone EC2 for testing RHEL7.9 NDH EMS"
-          monitored         = false
-          os-type           = "Linux"
-          component         = "ndh"
-          nomis-environment = "t1"
-        }
-        ami_name = "nomis_rhel_7_9_baseimage_2022-11-01T13-43-46.384Z"
-        autoscaling_group = {
-          desired_capacity = 1
-        }
-        autoscaling_schedules = {}
-        subnet_name           = "data"
-      }
-    }
+
+    ec2_test_autoscaling_groups = {}
+
     ec2_jumpservers = {
-      jumpserver-2022 = {
-        ami_name = "nomis_windows_server_2022_jumpserver_release_*"
+    }
+  }
+
+  # baseline config
+  test_config = {
+
+
+    baseline_acm_certificates = {
+      nomis_wildcard_cert = {
+        # domain_name limited to 64 chars so use modernisation platform domain for this
+        # and put the wildcard in the san
+        domain_name = module.environment.domains.public.modernisation_platform
+        subject_alternate_names = [
+          "*.${module.environment.domains.public.application_environment}",
+          "*.${local.environment}.nomis.service.justice.gov.uk",
+          "*.${local.environment}.nomis.az.justice.gov.uk",
+          "*.hmpp-azdt.justice.gov.uk",
+        ]
+        external_validation_records_created = true
+        cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso"].acm_default
         tags = {
-          server-type       = "jumpserver"
-          description       = "Windows Server 2022 Jumpserver for NOMIS"
-          monitored         = false
-          os-type           = "Windows"
-          component         = "jumpserver"
-          nomis-environment = "dev"
+          description = "wildcard cert for nomis ${local.environment} domains"
         }
-        autoscaling_group = {
-          min_size = 0
-          max_size = 1
+      }
+    }
+
+
+    baseline_ec2_autoscaling_groups = {
+      t1-nomis-web-a = merge(local.ec2_weblogic_zone_a, {
+        tags = merge(local.ec2_weblogic_zone_a.tags, {
+          oracle-db-hostname = "t1-nomis-db-1"
+          nomis-environment  = "t1"
+          oracle-db-name     = "CNOMT1"
+        })
+        # autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
+      })
+    }
+
+    baseline_lbs = {
+      # AWS doesn't let us call it internal
+      private = {
+        internal_lb              = true
+        enable_delete_protection = false
+        force_destroy_bucket     = true
+        idle_timeout             = 3600
+        public_subnets           = module.environment.subnets["private"].ids
+        security_groups = [
+          aws_security_group.public.id, # TODO: remove once weblogic servers refreshed
+          "private-lb",
+        ]
+
+        listeners = {
+          https = merge(
+            local.lb_weblogic.https, {
+              rules = {
+                t1-nomis-web-a-http-7777 = {
+                  priority = 300
+                  actions = [{
+                    type              = "forward"
+                    target_group_name = "t1-nomis-web-a-http-7777"
+                  }]
+                  conditions = [{
+                    host_header = {
+                      values = [
+                        "t1-nomis-web-a.test.nomis.az.justice.gov.uk",
+                        "t1-nomis-web-a.test.nomis.service.justice.gov.uk",
+                        "c-t1.test.nomis.az.justice.gov.uk",
+                        "c-t1.test.nomis.service.justice.gov.uk",
+                        "t1-cn.hmpp-azdt.justice.gov.uk",
+                      ]
+                    }
+                  }]
+                }
+              }
+          })
         }
+      }
+    }
+    baseline_route53_zones = {
+      "test.nomis.az.justice.gov.uk" = {
+        lb_alias_records = [
+          { name = "t1-nomis-web-a", type = "A", lbs_map_key = "private" },
+          { name = "c-t1", type = "A", lbs_map_key = "private" },
+        ]
+      }
+      "test.nomis.service.justice.gov.uk" = {
+        records = [
+          { name = "t1nomis-a", type = "A", ttl = "300", records = ["10.101.3.132"] },
+          { name = "t1nomis-b", type = "A", ttl = "300", records = ["10.101.3.132"] },
+          { name = "t1ndh-a", type = "A", ttl = "300", records = ["10.101.3.132"] },
+          { name = "t1ndh-b", type = "A", ttl = "300", records = ["10.101.3.132"] },
+          { name = "t1or-a", type = "A", ttl = "300", records = ["10.101.3.132"] },
+          { name = "t1or-b", type = "A", ttl = "300", records = ["10.101.3.132"] },
+        ]
+        lb_alias_records = [
+          { name = "t1-nomis-web-a", type = "A", lbs_map_key = "private" },
+          { name = "c-t1", type = "A", lbs_map_key = "private" },
+        ]
       }
     }
   }

@@ -15,15 +15,19 @@ resource "aws_launch_template" "this" {
       device_name  = block_device_mappings.key
       no_device    = lookup(block_device_mappings.value, "no_device", null)
       virtual_name = lookup(block_device_mappings.value, "virtual_name", null)
-      ebs {
-        delete_on_termination = block_device_mappings.value.type != null ? true : null
-        encrypted             = block_device_mappings.value.type != null ? true : null
 
-        kms_key_id  = try(block_device_mappings.value.kms_key_id, var.ebs_kms_key_id)
-        iops        = try(block_device_mappings.value.iops > 0, false) ? block_device_mappings.value.iops : null
-        throughput  = try(block_device_mappings.value.throughput > 0, false) ? block_device_mappings.value.throughput : null
-        volume_size = block_device_mappings.value.size
-        volume_type = block_device_mappings.value.type
+      dynamic "ebs" {
+        for_each = lookup(block_device_mappings.value, "no_device", null) != true ? [block_device_mappings.value] : []
+        content {
+          delete_on_termination = ebs.value.type != null ? true : null
+          encrypted             = ebs.value.type != null ? true : null
+
+          kms_key_id  = try(ebs.value.kms_key_id, var.ebs_kms_key_id)
+          iops        = try(ebs.value.iops > 0, false) ? ebs.value.iops : null
+          throughput  = try(ebs.value.throughput > 0, false) ? ebs.value.throughput : null
+          volume_size = ebs.value.size
+          volume_type = ebs.value.type
+        }
       }
     }
   }
@@ -47,6 +51,14 @@ resource "aws_launch_template" "this" {
     associate_public_ip_address = false
     security_groups             = var.instance.vpc_security_group_ids
     delete_on_termination       = true
+  }
+
+  dynamic "placement" {
+    for_each = var.availability_zone != null ? [var.availability_zone] : []
+
+    content {
+      availability_zone = placement.value
+    }
   }
 
   dynamic "private_dns_name_options" {
@@ -314,5 +326,7 @@ resource "aws_cloudwatch_metric_alarm" "this" {
   dimensions = merge(each.value.dimensions, {
     "AutoScalingGroupName" = aws_autoscaling_group.this.name
   })
-  tags = {}
+  tags = merge(var.tags, {
+    Name = "${aws_autoscaling_group.this.name}-${each.key}"
+  })
 }

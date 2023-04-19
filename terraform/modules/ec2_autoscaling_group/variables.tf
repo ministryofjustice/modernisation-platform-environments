@@ -53,6 +53,12 @@ variable "name" {
   description = "Provide a unique name for the auto scale group"
 }
 
+variable "availability_zone" {
+  type        = string
+  description = "Optionally associated the ASG with a single availability zone"
+  default     = null
+}
+
 variable "instance" {
   description = "EC2 launch template / instance settings, see aws_instance documentation"
   type = object({
@@ -124,6 +130,7 @@ variable "ebs_volumes" {
     size        = optional(number)
     type        = optional(string)
     kms_key_id  = optional(string)
+    no_device   = optional(bool)
   }))
 }
 
@@ -230,7 +237,7 @@ variable "lb_target_groups" {
 }
 
 variable "cloudwatch_metric_alarms" {
-  description = "Map of cloudwatch metric alarms."
+  description = "Map of cloudwatch metric alarms.  The alarm name is set to the autoscaling group name plus the map key."
   type = map(object({
     comparison_operator = string
     evaluation_periods  = number
@@ -245,7 +252,6 @@ variable "cloudwatch_metric_alarms" {
     datapoints_to_alarm = optional(number)
     treat_missing_data  = optional(string, "missing")
     dimensions          = optional(map(string), {})
-    tags                = optional(map(string))
   }))
   default = {}
 }

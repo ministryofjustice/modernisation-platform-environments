@@ -9,8 +9,9 @@ run_ansible() {
   echo "ansible_repo_basedir: ${ansible_repo_basedir}"
   echo "branch:               ${branch}"
 
-  if [[ ${branch} != "main" ]]; then
-    set -x
+  if [[ -z ${ansible_repo} ]]; then
+    echo "ansible_repo not defined, not installing any ansible" >&2
+    exit 0
   fi
 
   if ! command -v aws > /dev/null; then
@@ -29,22 +30,34 @@ run_ansible() {
   echo "# Retrieving Instance ID"
   instance_id=$(curl -sS -H "X-aws-ec2-metadata-token: $token" -v http://169.254.169.254/latest/meta-data/instance-id)
 
-  echo "# Retrieving tag server-type value using aws cli"
-  server_type=$(aws ec2 describe-tags --filters "Name=resource-id,Values=$instance_id" "Name=key,Values=server-type" --output=text | cut -f5 | sed 's/-/_/g')
-
-  echo "# Retrieving tag environment-name value using aws cli"
-  environment_name=$(aws ec2 describe-tags --filters "Name=resource-id,Values=$instance_id" "Name=key,Values=environment-name" --output=text | cut -f5 | sed 's/-/_/g')
-
-  if [[ -z $server_type || -z $environment_name || -z ${ansible_repo} ]]; then
-    echo "server-type or environment-name or ansible_repo not defined, not installing any ansible" >&2
-    exit 0
-  fi
+  echo "# Retrieving tags using aws cli"
+  IFS=$'\n'
+  tags=($(aws ec2 describe-tags --filters "Name=resource-id,Values=$instance_id" "Name=key,Values=os-type,ami,server-type,environment-name" --output=text))
+  unset IFS
 
   # clone ansible roles and playbook
   ansible_dir=$(mktemp -d)
-  echo "# Cloning ${ansible_repo} into $ansible_dir using branch=${branch} if it exists"
+  echo "# Cloning ${ansible_repo} into $ansible_dir using branch=${branch}"
   cd $ansible_dir
-  git clone -b ${branch} "https://github.com/ministryofjustice/${ansible_repo}.git" || git clone "https://github.com/ministryofjustice/${ansible_repo}.git"
+  git clone "https://github.com/ministryofjustice/${ansible_repo}.git"
+  cd $ansible_dir/${ansible_repo}
+  git checkout "${branch}"
+  cd $ansible_dir
+
+  # find the group_var yaml files
+  ansible_group_vars=
+  for ((i=0; i<$${#tags[@]}; i++)); do
+    tag=($${tags[i]})
+    group=$(echo "$${tag[1]}_$${tag[4]}" | tr [:upper:] [:lower:] | sed "s/-/_/g")
+    if [[ -e $ansible_dir/${ansible_repo}/${ansible_repo_basedir}/group_vars/$group.yml ]]; then
+      ansible_group_vars="$ansible_group_vars --extra-vars @group_vars/$group.yml"
+    elif [[ -e $ansible_dir/${ansible_repo}/${ansible_repo_basedir}/group_vars/$group/ansible.yml ]]; then
+      ansible_group_vars="$ansible_group_vars --extra-vars @group_vars/$group/ansible.yml"
+    else
+      echo "Could not find group_vars $group yml"
+      exit 1
+    fi
+  done
 
   # set python version
   if [[ $(which python3.9 2> /dev/null) ]]; then
@@ -79,14 +92,12 @@ run_ansible() {
   ansible-galaxy collection install -r requirements.yml
 
   # run ansible (comma after localhost deliberate)
-  echo "# Execute ansible"
-  ansible-playbook site.yml \
+  echo "# Execute ansible site.yml $ansible_group_vars ..."
+  ansible-playbook site.yml $ansible_group_vars \
    --connection=local \
    --inventory localhost, \
    --extra-vars "ansible_python_interpreter=$python" \
    --extra-vars "target=localhost" \
-   --extra-vars "@group_vars/environment_name_$environment_name.yml" \
-   --extra-vars "@group_vars/server_type_$server_type.yml" \
    --tags ec2provision \
    --become
 

@@ -13,41 +13,15 @@ variable "environment" {
   description = "Modernisation platform environment, e.g. development"
 }
 
-variable "load_balancer_arn" {
-  type        = string
-  description = "ARN of the load balancer"
+variable "load_balancer" {
+  description = "Provide aws_lb resource or data resource"
+  default     = null
 }
 
-variable "target_groups" {
-  description = "Map of target groups, where key is the name"
-  type = map(object({
-    port                 = optional(number)
-    protocol             = optional(string)
-    target_type          = string
-    deregistration_delay = optional(number)
-    health_check = optional(object({
-      enabled             = optional(bool)
-      interval            = optional(number)
-      healthy_threshold   = optional(number)
-      matcher             = optional(string)
-      path                = optional(string)
-      port                = optional(number)
-      timeout             = optional(number)
-      unhealthy_threshold = optional(number)
-    }))
-    stickiness = optional(object({
-      enabled         = optional(bool)
-      type            = string
-      cookie_duration = optional(number)
-      cookie_name     = optional(string)
-    }))
-    attachments = optional(list(object({
-      target_id         = string
-      port              = optional(number)
-      availability_zone = optional(string)
-    })), [])
-  }))
-  default = {}
+variable "load_balancer_arn" {
+  type        = string
+  description = "As alternative to using load_balancer variable, use ARN of the load balancer"
+  default     = null
 }
 
 variable "existing_target_groups" {
@@ -71,9 +45,15 @@ variable "ssl_policy" {
   default     = null
 }
 
-variable "certificate_arns" {
+variable "certificate_arn_lookup" {
+  type        = map(string)
+  description = "Map of certficate name to ARN.  Use this if certificate not yet created to avoid for_each determined error"
+  default     = {}
+}
+
+variable "certificate_names_or_arns" {
   type        = list(string)
-  description = "List of SSL certificage ARNs to associate with the listener"
+  description = "List of SSL certificate names or ARNs to associate with the listener.  If names, ensure certificate_lookup variable is used.  The first certificate provided is the default"
   default     = []
 }
 
@@ -148,36 +128,13 @@ variable "rules" {
   }))
 }
 
-variable "route53_records" {
-  description = "Map of route53 records to associate with load balancer, where key is the DNS name"
-  type = map(object({
-    account                = string # account to create the record in.  set to core-vpc or self
-    zone_id                = string # id of zone to create the record in
-    evaluate_target_health = bool
-  }))
-  default = {}
-}
-
-variable "replace" {
-  description = "A bit of a bodge to make definition of rules and default_action reusable.  Does a search/replace on the target_group_name field in rules/default_action contains with target_group_name_match/target_group_name_replace.  Likewise with the condition host header.  Useful when you have multiple environments with same config"
-  type = object({
-    target_group_name_match       = optional(string, "$(name)")
-    target_group_name_replace     = optional(string, "")
-    condition_host_header_match   = optional(string, "$(name)")
-    condition_host_header_replace = optional(string, "")
-    route53_record_name_match     = optional(string, "$(name)")
-    route53_record_name_replace   = optional(string, "")
-  })
-  default = {}
-}
-
 variable "tags" {
   type        = map(any)
   description = "Default tags to be applied to resources"
 }
 
 variable "cloudwatch_metric_alarms" {
-  description = "Map of cloudwatch metric alarms."
+  description = "Map of cloudwatch metric alarms.  The alarm name is set to the target group name plus the map key."
   type = map(object({
     comparison_operator = string
     evaluation_periods  = number
@@ -192,7 +149,12 @@ variable "cloudwatch_metric_alarms" {
     datapoints_to_alarm = optional(number)
     treat_missing_data  = optional(string, "missing")
     dimensions          = optional(map(string), {})
-    tags                = optional(map(string))
   }))
   default = {}
+}
+
+variable "alarm_target_group_names" {
+  description = "List of target groups names that should have load-balancer (lb) alarms for them"
+  type        = list(string)
+  default     = []
 }

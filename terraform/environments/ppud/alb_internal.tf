@@ -1,4 +1,6 @@
+#########################
 # PPUD Internal ALB
+#########################
 
 resource "aws_lb" "PPUD-internal-ALB" {
   count              = local.is-development == false ? 1 : 0
@@ -15,13 +17,13 @@ resource "aws_lb" "PPUD-internal-ALB" {
   }
 }
 
-resource "aws_lb_listener" "PPUD-Front-End" {
-  count             = local.is-development == false ? 1 : 0
+resource "aws_lb_listener" "PPUD-Front-End-Preprod" {
+  count             = local.is-preproduction == true ? 1 : 0
   load_balancer_arn = aws_lb.PPUD-internal-ALB[0].arn
   port              = "443"
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = data.aws_acm_certificate.internaltest_cert.arn
+  certificate_arn   = data.aws_acm_certificate.internaltest_cert[0].arn
 
   default_action {
     type             = "forward"
@@ -29,9 +31,36 @@ resource "aws_lb_listener" "PPUD-Front-End" {
   }
 }
 
+resource "aws_lb_listener" "PPUD-Front-End-Prod" {
+  count             = local.is-production == true ? 1 : 0
+  load_balancer_arn = aws_lb.PPUD-internal-ALB[0].arn
+  port              = "443"
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  certificate_arn   = data.aws_acm_certificate.internaltest_cert[0].arn
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.PPUD-internal-Target-Group[0].arn
+  }
+}
+
+resource "aws_lb_listener" "PPUD-Front-End-Training" {
+  count             = local.is-preproduction == true ? 1 : 0
+  load_balancer_arn = aws_lb.PPUD-internal-ALB[0].arn
+  port              = "9001"
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  certificate_arn   = data.aws_acm_certificate.internaltest_cert[0].arn
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.PPUD-internal-Training-Target-Group[0].arn
+  }
+}
+
 resource "aws_lb_target_group" "PPUD-internal-Target-Group" {
-  count = local.is-development == false ? 1 : 0
-  # name     = "PPUD"
+  count    = local.is-development == false ? 1 : 0
   name     = local.application_data.accounts[local.environment].PPUD_Target
   port     = 443
   protocol = "HTTPS"
@@ -56,29 +85,55 @@ resource "aws_lb_target_group" "PPUD-internal-Target-Group" {
   tags = {
     Name = "${var.networking[0].business-unit}-${local.environment}"
   }
-
 }
 
-/*
-resource "aws_lb_target_group_attachment" "PPUD-PORTAL" {
-  target_group_arn = aws_lb_target_group.PPUD-Target-Group.arn
-  target_id        = aws_instance.s609693lo6vw101[0].id
-  port             = 443
-}
-*/
+resource "aws_lb_target_group" "PPUD-internal-Training-Target-Group" {
+  count    = local.is-preproduction == true ? 1 : 0
+  name     = "PPUD-Training-Target-Group"
+  port     = 9001
+  protocol = "HTTPS"
+  vpc_id   = data.aws_vpc.shared.id
 
-resource "aws_lb_target_group_attachment" "PPUD-PORTAL-internal-development" {
+  health_check {
+    enabled             = true
+    path                = "/"
+    interval            = 30
+    protocol            = "HTTPS"
+    port                = 9001
+    timeout             = 5
+    healthy_threshold   = 5
+    unhealthy_threshold = 2
+    matcher             = "302"
+  }
+  tags = {
+    Name = "${var.networking[0].business-unit}-${local.environment}"
+  }
+}
+
+resource "aws_lb_target_group_attachment" "PPUD-PORTAL-internal-preproduction" {
   count            = local.is-preproduction == true ? 1 : 0
   target_group_arn = aws_lb_target_group.PPUD-internal-Target-Group[0].arn
   target_id        = aws_instance.s618358rgvw023[0].id
-  # target_id = local.application_data.accounts[local.environment].alb_intances_ppud
-  port = 443
+  port             = 443
 }
 
-/*
-resource "aws_lb_target_group_attachment" "target_group_attachment_1" {
-  count            = length(var.instance_ids_ppud_internal_alb[terraform.workspace])
-  target_group_arn = aws_lb_target_group.PPUD-Target-Group.arn
-  target_id        = var.instance_ids_ppud_internal_alb[terraform.workspace][count.index]
- }
- */
+resource "aws_lb_target_group_attachment" "PPUD-PORTAL-internal-Training" {
+  count            = local.is-preproduction == true ? 1 : 0
+  target_group_arn = aws_lb_target_group.PPUD-internal-Training-Target-Group[0].arn
+  target_id        = aws_instance.s618358rgvw023[0].id
+  port             = 9001
+}
+
+resource "aws_lb_target_group_attachment" "PPUD-PORTAL-internal-production" {
+  count            = local.is-production == true ? 1 : 0
+  target_group_arn = aws_lb_target_group.PPUD-internal-Target-Group[0].arn
+  target_id        = aws_instance.s618358rgvw019[0].id
+  port             = 443
+}
+
+resource "aws_lb_target_group_attachment" "PPUD-PORTAL-internal-production-1" {
+  count            = local.is-production == true ? 1 : 0
+  target_group_arn = aws_lb_target_group.PPUD-internal-Target-Group[0].arn
+  target_id        = aws_instance.s618358rgvw020[0].id
+  port             = 443
+}

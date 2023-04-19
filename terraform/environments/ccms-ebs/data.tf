@@ -57,22 +57,7 @@ data "aws_ami" "accessgate" {
   }
 }
 
-/*
-data "aws_ami" "oracle_base_prereqs_verify" {
-  most_recent = true
-  owners      = [local.application_data.accounts[local.environment].ami_owner]
-
-  filter {
-    name   = "name"
-    values = [local.application_data.accounts[local.environment].orace_base_prereqs_ami_name_verify]
-  }
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
-}
-*/
-
+## IAM
 data "aws_iam_policy_document" "sns_topic_policy" {
   policy_id = "SnsTopicId"
   statement {
@@ -96,6 +81,7 @@ data "aws_iam_policy_document" "sns_topic_policy" {
   }
 }
 
+## SECRETS
 data "aws_secretsmanager_secret" "support_email_account" {
   name = "support_email_account"
   depends_on = [
@@ -108,4 +94,45 @@ data "aws_secretsmanager_secret_version" "support_email_account" {
   depends_on = [
     aws_secretsmanager_secret_version.support_email_account
   ]
+}
+
+## SECURITY GROUPS
+data "aws_security_groups" "all_security_groups" {
+  filter {
+    name   = "tag:Name"
+    values = ["*ccms*"]
+  }
+}
+
+## S3 NOTIFICATIONS
+data "aws_iam_policy_document" "s3_topic_policy" {
+  statement {
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["s3.amazonaws.com"]
+    }
+
+    actions   = ["SNS:Publish"]
+    resources = ["arn:aws:sns:*:*:s3-event-notification-topic"]
+
+    condition {
+      test     = "ArnLike"
+      variable = "aws:SourceArn"
+      values = [
+        module.s3-bucket.bucket.arn,
+        module.s3-bucket-logging.bucket.arn,
+        module.s3-bucket-dbbackup.bucket.arn
+      ]
+    }
+  }
+}
+
+## PROD CERT
+data "aws_route53_zone" "application-zone" {
+  provider = aws.core-network-services
+
+  name         = "ccms-ebs.service.justice.gov.uk."
+  private_zone = false
 }

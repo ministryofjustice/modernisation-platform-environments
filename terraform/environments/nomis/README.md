@@ -39,7 +39,7 @@ Email hmpps-nomis-mis-load@moj-digital-tools.pagerduty.com for database and appl
 
 ### **Service team contact:**
 
-#ask-digital-studio-ops
+# ask-digital-studio-ops
 
 digital-studio-operations-team@digital.justice.gov.uk
 

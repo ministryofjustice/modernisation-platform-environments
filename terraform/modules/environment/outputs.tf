@@ -14,8 +14,18 @@ output "account_name" {
 }
 
 output "account_names" {
-  description = "list of all accounts for ghte given application, e.g. ['nomis-development', 'nomis-test', 'nomis-preproduction', 'nomis-production']"
+  description = "list of all accounts for the given application, e.g. ['nomis-development', 'nomis-test', 'nomis-preproduction', 'nomis-production']"
   value       = local.account_names
+}
+
+output "devtest_account_names" {
+  description = "list of all devtest accounts for the given application, e.g. ['nomis-development', 'nomis-test']"
+  value       = local.devtest_account_names
+}
+
+output "prodpreprod_account_names" {
+  description = "list of all prod and preprod accounts for the given application, e.g. ['nomis-preproduction', 'nomis-production']"
+  value       = local.prodpreprod_account_names
 }
 
 output "modernisation_platform_account_id" {
@@ -98,11 +108,20 @@ output "domains" {
 }
 
 output "route53_zones" {
-  description = "a map of aws_route53_zone data objects where the key is the domain name"
-  value       = merge(data.aws_route53_zone.core_network_services, data.aws_route53_zone.core_vpc)
+  description = "a map of aws_route53_zone data objects where the key is the domain name.  The data objects have extra provider field so you know which account they are in"
+  value = merge(
+    { for key, value in data.aws_route53_zone.core_network_services : key => merge(value, { provider = "core-network-services" }) },
+    { for key, value in data.aws_route53_zone.core_vpc : key => merge(value, { provider = "core-vpc" })
+  })
 }
 
 output "kms_keys" {
   description = "a map of business unit customer-managed keys where the map key is the prefix name, e.g. general, ebs, rds"
   value       = data.aws_kms_key.this
+}
+
+output "pagerduty_integration_keys" {
+  description = "pagerduty integration keys managed by modernisation platform"
+  value       = jsondecode(data.aws_secretsmanager_secret_version.pagerduty_integration_keys.secret_string)
+  sensitive   = true
 }

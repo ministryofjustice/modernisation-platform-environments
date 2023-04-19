@@ -1,65 +1,16 @@
-resource "aws_lb_target_group" "this" {
-  for_each = var.target_groups
-
-  name                 = "${var.name}-${each.key}"
-  port                 = each.value.port
-  protocol             = each.value.protocol
-  target_type          = each.value.target_type
-  deregistration_delay = each.value.deregistration_delay
-  vpc_id               = data.aws_vpc.this.id
-
-  dynamic "health_check" {
-    for_each = each.value.health_check != null ? [each.value.health_check] : []
-    content {
-      enabled             = health_check.value.enabled
-      interval            = health_check.value.interval
-      healthy_threshold   = health_check.value.healthy_threshold
-      matcher             = health_check.value.matcher
-      path                = health_check.value.path
-      port                = health_check.value.port
-      timeout             = health_check.value.timeout
-      unhealthy_threshold = health_check.value.unhealthy_threshold
-    }
-  }
-  dynamic "stickiness" {
-    for_each = each.value.stickiness != null ? [each.value.stickiness] : []
-    content {
-      enabled         = stickiness.value.enabled
-      type            = stickiness.value.type
-      cookie_duration = stickiness.value.cookie_duration
-      cookie_name     = stickiness.value.cookie_name
-    }
-  }
-
-  tags = merge(var.tags, {
-    Name = "${var.name}-${each.key}"
-  })
-}
-
-resource "aws_lb_target_group_attachment" "this" {
-  for_each = {
-    for item in local.target_group_attachments : "${item.name}-${item.attachment.target_id}" => item
-  }
-
-  target_group_arn  = aws_lb_target_group.this[each.value.name].arn
-  target_id         = each.value.attachment.target_id
-  port              = each.value.attachment.port
-  availability_zone = each.value.attachment.availability_zone
-}
-
 resource "aws_lb_listener" "this" {
-  load_balancer_arn = var.load_balancer_arn
+  load_balancer_arn = local.aws_lb.arn
   port              = var.port
   protocol          = var.protocol
   ssl_policy        = var.ssl_policy
-  certificate_arn   = try(var.certificate_arns[0], null)
+  certificate_arn   = length(var.certificate_names_or_arns) != 0 ? lookup(var.certificate_arn_lookup, var.certificate_names_or_arns[0], var.certificate_names_or_arns[0]) : null
 
   dynamic "default_action" {
     for_each = [var.default_action]
 
     content {
       type             = default_action.value.type
-      target_group_arn = default_action.value.target_group_name != null ? local.target_groups[replace(default_action.value.target_group_name, var.replace.target_group_name_match, var.replace.target_group_name_replace)].arn : default_action.value.target_group_arn
+      target_group_arn = default_action.value.target_group_name != null ? local.target_groups[default_action.value.target_group_name].arn : default_action.value.target_group_arn
 
       dynamic "fixed_response" {
         for_each = default_action.value.fixed_response != null ? [default_action.value.fixed_response] : []
@@ -104,10 +55,6 @@ resource "aws_lb_listener" "this" {
   tags = merge(var.tags, {
     Name = var.name
   })
-
-  depends_on = [
-    aws_lb_target_group.this
-  ]
 }
 
 resource "aws_lb_listener_rule" "this" {
@@ -121,7 +68,7 @@ resource "aws_lb_listener_rule" "this" {
 
     content {
       type             = action.value.type
-      target_group_arn = action.value.target_group_name != null ? local.target_groups[replace(action.value.target_group_name, var.replace.target_group_name_match, var.replace.target_group_name_replace)].arn : action.value.target_group_arn
+      target_group_arn = action.value.target_group_name != null ? local.target_groups[action.value.target_group_name].arn : action.value.target_group_arn
 
       dynamic "fixed_response" {
         for_each = action.value.fixed_response != null ? [action.value.fixed_response] : []
@@ -169,10 +116,7 @@ resource "aws_lb_listener_rule" "this" {
       dynamic "host_header" {
         for_each = condition.value.host_header != null ? [condition.value.host_header] : []
         content {
-          values = [
-            for value in host_header.value.values :
-            replace(value, var.replace.condition_host_header_match, var.replace.condition_host_header_replace)
-          ]
+          values = host_header.value.values
         }
       }
       dynamic "path_pattern" {
@@ -187,49 +131,16 @@ resource "aws_lb_listener_rule" "this" {
   tags = merge(var.tags, {
     Name = "${var.name}-${each.key}"
   })
-
-  depends_on = [
-    aws_lb_target_group.this
-  ]
 }
 
 resource "aws_lb_listener_certificate" "this" {
-  for_each        = toset(try(slice(var.certificate_arns, 1, length(var.certificate_arns) - 1), []))
+  for_each        = toset(var.certificate_names_or_arns)
   listener_arn    = aws_lb_listener.this.arn
-  certificate_arn = each.value
-}
-
-resource "aws_route53_record" "core_vpc" {
-  for_each = { for key, value in var.route53_records : key => value if value.account == "core-vpc" }
-  provider = aws.core-vpc
-
-  zone_id = each.value.zone_id
-  name    = replace(each.key, var.replace.route53_record_name_match, var.replace.route53_record_name_replace)
-  type    = "A"
-
-  alias {
-    name                   = data.aws_lb.this.dns_name
-    zone_id                = data.aws_lb.this.zone_id
-    evaluate_target_health = each.value.evaluate_target_health
-  }
-}
-
-resource "aws_route53_record" "self" {
-  for_each = { for key, value in var.route53_records : key => value if value.account == "self" }
-
-  zone_id = each.value.zone_id
-  name    = replace(each.value.key, var.replace.route53_record_name_match, var.replace.route53_record_name_replace)
-  type    = "A"
-
-  alias {
-    name                   = data.aws_lb.this.dns_name
-    zone_id                = data.aws_lb.this.zone_id
-    evaluate_target_health = each.value.evaluate_target_health
-  }
+  certificate_arn = lookup(var.certificate_arn_lookup, each.value, each.value)
 }
 
 resource "aws_cloudwatch_metric_alarm" "this" {
-  for_each = { for key, value in var.cloudwatch_metric_alarms : key => value if local.target_group_arn.arn_suffix != null }
+  for_each = local.cloudwatch_metric_alarms
 
   alarm_name          = "${var.name}-${each.key}"
   comparison_operator = each.value.comparison_operator
@@ -243,9 +154,11 @@ resource "aws_cloudwatch_metric_alarm" "this" {
   alarm_description   = each.value.alarm_description
   datapoints_to_alarm = each.value.datapoints_to_alarm
   treat_missing_data  = each.value.treat_missing_data
-  tags                = {}
   dimensions = merge(each.value.dimensions, {
-    "LoadBalancer" = data.aws_lb.this.arn_suffix
-    "TargetGroup"  = local.target_group_arn.arn_suffix
+    "LoadBalancer" = local.aws_lb.arn_suffix
+    "TargetGroup"  = each.value.target_group_arn_suffix
+  })
+  tags = merge(var.tags, {
+    Name = "${var.name}-${each.key}"
   })
 }
