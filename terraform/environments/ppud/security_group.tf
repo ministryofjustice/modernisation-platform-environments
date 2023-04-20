@@ -8,15 +8,6 @@ resource "aws_security_group" "PPUD-WEB-Portal" {
   }
 }
 
-resource "aws_security_group_rule" "PPUD-WEB-Portal-ingress" {
-  type                     = "ingress"
-  from_port                = 443
-  to_port                  = 443
-  protocol                 = "tcp"
-  source_security_group_id = aws_security_group.PPUD-ALB.id
-  security_group_id        = aws_security_group.PPUD-WEB-Portal.id
-}
-
 resource "aws_security_group_rule" "PPUD-WEB-Portal-ingress-1" {
   type                     = "ingress"
   from_port                = 80
@@ -24,16 +15,6 @@ resource "aws_security_group_rule" "PPUD-WEB-Portal-ingress-1" {
   protocol                 = "tcp"
   cidr_blocks              = [data.aws_vpc.shared.cidr_block]
   security_group_id        = aws_security_group.PPUD-WEB-Portal.id
-}
-
-resource "aws_security_group_rule" "PPUD-Training-Ingress-2" {
-  count               = local.is-preproduction == true ? 1 : 0
-  type                = "ingress"
-  from_port           = 9001
-  to_port             = 9001
-  protocol            = "tcp"
-  cidr_blocks         = ["0.0.0.0/0"]
-  security_group_id   = aws_security_group.PPUD-WEB-Portal.id
 }
 
 resource "aws_security_group_rule" "PPUD-WEB-Portal-egress" {
@@ -523,20 +504,19 @@ resource "aws_security_group_rule" "PPUD-ALB-Ingress" {
   security_group_id = aws_security_group.PPUD-ALB.id
 }
 
-resource "aws_security_group_rule" "PPUD-ALB-Ingress-1" {
-  count             = local.is-preproduction == true ? 1 : 0
-  type              = "ingress"
-  from_port         = 9001
-  to_port           = 9001
-  protocol          = "tcp"
-  cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = aws_security_group.PPUD-ALB.id
-}
-
 resource "aws_security_group_rule" "PPUD-ALB-Egress" {
   type              = "egress"
   from_port         = 443
   to_port           = 443
+  protocol          = "tcp"
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+  security_group_id = aws_security_group.PPUD-ALB.id
+}
+
+resource "aws_security_group_rule" "PPUD-ALB-Egress-1" {
+  type              = "egress"
+  from_port         = 80
+  to_port           = 80
   protocol          = "tcp"
   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
   security_group_id = aws_security_group.PPUD-ALB.id
