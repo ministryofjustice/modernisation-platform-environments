@@ -119,7 +119,7 @@ locals {
 
   database_cloudwatch_log_groups = {
     cwagent-nomis-autologoff = {
-      retention_days = 90
+      retention_in_days = 90
     }
   }
 

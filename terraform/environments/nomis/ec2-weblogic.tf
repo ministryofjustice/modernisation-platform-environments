@@ -103,7 +103,7 @@ locals {
   }
   weblogic_cloudwatch_log_groups = {
     cwagent-weblogic-logs = {
-      retention_days = 30
+      retention_in_days = 30
     }
   }
 
