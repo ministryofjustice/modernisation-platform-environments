@@ -1,28 +1,9 @@
 #### This file can be used to store locals specific to the member account ####
 locals {
+  lambda_runtime            = "python3.9"
+  lambda_timeout_in_seconds = 15
 
-  ##
-  # Variables code_extractor lambda
-  ##
-  function_name               = "code_extractor"
-  function_handler            = "main.handler"
-  function_runtime            = "python3.9"
-  function_timeout_in_seconds = 15
-
-  function_source_dir = "${path.module}/src/${local.function_name}"
-
-  ##
-  # Variables for glue job
-  ##
-  glue_default_arguments = {
-    "--job-bookmark-option"              = "job-bookmark-disable"
-    "--enable-continuous-cloudwatch-log" = "true"
-    "--enable-continuous-log-filter"     = "true"
-    "--enable-glue-datacatalog"          = "true"
-    "--enable-job-insights"              = "true"
-    "--enable-continuous-log-filter"     = "true"
-  }
-
+ # Glue
   name                             = "data-platform-product"
   glue_version                     = "4.0"
   max_retries                      = 0
