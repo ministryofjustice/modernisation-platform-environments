@@ -7,28 +7,6 @@ locals {
       patch_day                 = "TUE"
     }
 
-    # cloud watch log groups
-    log_groups = {
-      session-manager-logs = {
-        retention_days = 90
-      }
-      cwagent-var-log-messages = {
-        retention_days = 30
-      }
-      cwagent-var-log-secure = {
-        retention_days = 90
-      }
-      cwagent-nomis-autologoff = {
-        retention_days = 90
-      }
-      cwagent-weblogic-logs = {
-        retention_days = 30
-      }
-      cwagent-windows-system = {
-        retention_days = 30
-      }
-    }
-
     databases = {
     }
     weblogics          = {}
@@ -41,6 +19,21 @@ locals {
 
   # baseline config
   development_config = {
+    baseline_acm_certificates = {
+      nomis_wildcard_cert = {
+        # domain_name limited to 64 chars so use modernisation platform domain for this
+        # and put the wildcard in the san
+        domain_name = module.environment.domains.public.modernisation_platform
+        subject_alternate_names = [
+          "*.${module.environment.domains.public.application_environment}",
+          "*.${local.environment}.nomis.az.justice.gov.uk",
+        ]
+        cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso"].acm_default
+        tags = {
+          description = "wildcard cert for ${module.environment.domains.public.application_environment} and ${local.environment}.nomis.az.justice.gov.uk domain"
+        }
+      }
+    }
 
     baseline_ec2_autoscaling_groups = {
 

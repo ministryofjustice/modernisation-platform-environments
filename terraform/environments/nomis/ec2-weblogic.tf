@@ -101,6 +101,11 @@ locals {
       ]
     }
   }
+  weblogic_cloudwatch_log_groups = {
+    cwagent-weblogic-logs = {
+      retention_days = 30
+    }
+  }
 
   ec2_weblogic_default = {
 

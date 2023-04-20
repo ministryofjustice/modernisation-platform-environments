@@ -117,6 +117,12 @@ locals {
     }
   }
 
+  database_cloudwatch_log_groups = {
+    cwagent-nomis-autologoff = {
+      retention_days = 90
+    }
+  }
+
   database = {
 
     # server-type and nomis-environment auto set by module
