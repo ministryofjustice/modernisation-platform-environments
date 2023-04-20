@@ -8,15 +8,15 @@ locals {
 
 # load the glue script to bucket as bucket object
 resource "aws_s3_object" "object" {
-  bucket=module.s3-bucket.bucket.id
+  bucket = module.s3-bucket.bucket.id
   key    = "glue_script/glue_transform_script.py"
   source = "glue_script/glue_transform_script.py"
-  etag = filemd5("glue_script/glue_transform_script.py")
+  etag   = filemd5("glue_script/glue_transform_script.py")
 }
 
 resource "aws_glue_job" "glue_job" {
-  name        = "${local.name}-glue-job-${local.environment}"
-  role_arn    = aws_iam_role.glue-service-role.arn
+  name                   = "${local.name}-glue-job-${local.environment}"
+  role_arn               = aws_iam_role.glue-service-role.arn
   description            = "Glue job to transform and load data products to the glue catalog"
   glue_version           = local.glue_version
   max_retries            = local.max_retries
@@ -41,9 +41,9 @@ resource "aws_glue_job" "glue_job" {
 
 ### Glue Job Service Role
 resource "aws_iam_role" "glue-service-role" {
-  name  = "${local.name}-glue-role-${local.environment}"
-  tags  = local.tags
-  path  = "/"
+  name               = "${local.name}-glue-role-${local.environment}"
+  tags               = local.tags
+  path               = "/"
   assume_role_policy = data.aws_iam_policy_document.glue_role_trust_policy.json
 }
 
@@ -100,7 +100,7 @@ resource "aws_cloudwatch_log_group" "log_group" {
 }
 
 resource "aws_glue_security_configuration" "sec_cfg" {
-  name  = "${local.name}-sec-config-${local.environment}"
+  name = "${local.name}-sec-config-${local.environment}"
 
   encryption_configuration {
     cloudwatch_encryption {
