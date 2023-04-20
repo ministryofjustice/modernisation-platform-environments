@@ -51,8 +51,8 @@ data "aws_iam_policy_document" "iam_policy_document_for_data_lambda" {
   statement {
     sid       = "StartGlueJobRun"
     effect    = "Allow"
-    actions   = "glue:StartJobRun"
-    resources = aws_glue_job.glue_job.arn
+    action   = "glue:StartJobRun"
+    resource = aws_glue_job.glue_job.arn
   }
 }
 
