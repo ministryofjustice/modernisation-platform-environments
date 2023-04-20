@@ -17,7 +17,7 @@ resource "aws_lambda_function" "data_extractor" {
   depends_on       = [aws_iam_role_policy_attachment.attach_data_lambda_policy_to_iam_role]
   environment {
     variables = {
-      ENVIRONMENT = local.environment
+      ENVIRONMENT   = local.environment
       GLUE_JOB_NAME = "placeholder"
     }
   }
