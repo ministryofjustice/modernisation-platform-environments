@@ -7,7 +7,21 @@ locals {
   pVPCCidr=           "10.205.0.0/20"
   pCPVPCCidr=         "172.20.0.0/20"
   transit_gw_to_mojfinprod=             "10.201.0.0/16"
-
+  pStorageSize = "2500"
+  pAppName= "mojfin"
+  auto_minor_version_upgrade = false
+  backup_retention_period= "35"
+  character_set_name = "WE8MSWIN1252"
+  instance_class= "db.m5.large"
+  engine= "oracle-se2"
+  engine_version = "19.0.0.0.ru-2020-04.rur-2020-04.r1"
+  username= "sysdba"
+  max_allocated_storage=  "3500"
+  backup_window = "22:00-01:00"
+  maintenance_window = "Mon:01:15-Mon:06:00"
+  storage_type = "gp2"
+  application_name = "mojfin"
+  rds_snapshot_name= "laws3169-mojfin-migration-v1"
 }
 
 
@@ -149,3 +163,80 @@ resource "aws_security_group" "vpc-secgroup" {
     Name = "${local.application_name}-${local.environment}-vpc-secgroup"
   }
 }
+
+resource "random_password" "rds_password" {
+  length  = 16
+  special = false
+}
+
+
+resource "aws_secretsmanager_secret" "rds_password_secret" {
+  name        = "${local.application_name}/app/db-master-password-tmp2" # TODO This name needs changing back to without -tmp2 to be compatible with hardcoded OAS installation
+  description = "This secret has a dynamically generated password."
+  tags = merge(
+    var.tags,
+    { "Name" = "${local.application_name}/app/db-master-password-tmp2" }, # TODO This name needs changing back to without -tmp2 to be compatible with hardcoded OAS installation
+  )
+}
+
+
+resource "aws_secretsmanager_secret_version" "rds_password_secret_version" {
+  secret_id = aws_secretsmanager_secret.rds_password_secret.id
+  secret_string = jsonencode(
+    {
+      username = local.username
+      password = random_password.rds_password.result
+    }
+  )
+}
+
+
+
+
+
+
+
+resource "aws_db_instance" "appdb1" {
+  allocated_storage           = local.pStorageSize
+  db_name                     = upper(local.pAppName)
+  identifier                  = local.pAppName
+  engine                      = local.engine
+  engine_version              = local.engine_version
+  enabled_cloudwatch_logs_exports = ["alert", "audit"]
+  performance_insights_enabled = true
+  instance_class              = local.instance_class
+  auto_minor_version_upgrade  = local.auto_minor_version_upgrade
+  storage_type                = local.storage_type
+  backup_retention_period     = local.backup_retention_period
+  backup_window               = local.backup_window
+  character_set_name          = local.character_set_name
+  max_allocated_storage       = local.max_allocated_storage
+  username                    = local.username
+  password                    = random_password.rds_password.result
+  vpc_security_group_ids      = [aws_security_group.laalz-secgroup.id, aws_security_group.vpc-secgroup.id]
+  skip_final_snapshot         = false
+  final_snapshot_identifier   = "${local.application_name}-${formatdate("DDMMMYYYYhhmm", timestamp())}-finalsnapshot"
+  parameter_group_name        = "rds-oracle"
+  db_subnet_group_name        = "${local.application_name}-${local.environment}-subnetgrp"
+  license_model               = "license-included"
+  deletion_protection         = true
+  copy_tags_to_snapshot       = true
+  storage_encrypted           = true
+  apply_immediately           = true
+  snapshot_identifier         = format("arn:aws:rds:eu-west-2:%s:snapshot:%s", data.aws_caller_identity.local.modernisation_platform_account_id, local.application_data.accounts[local.environment].rds_snapshot_name)
+  kms_key_id                  = data.aws_kms_key.rds_shared.arn
+  
+
+  timeouts {
+    create = "60m"
+    delete = "2h"
+  }
+
+  tags = merge(
+    local.tags, 
+   { "Name" = "mojfin"},
+    {"Keep" = "true"}
+ )
+
+}
+
