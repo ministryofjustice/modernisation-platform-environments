@@ -150,7 +150,6 @@ locals {
   # baseline config
   test_config = {
 
-
     baseline_acm_certificates = {
       nomis_wildcard_cert = {
         # domain_name limited to 64 chars so use modernisation platform domain for this
@@ -169,7 +168,6 @@ locals {
         }
       }
     }
-
 
     baseline_ec2_autoscaling_groups = {
       t1-nomis-web-a = merge(local.ec2_weblogic_zone_a, {
