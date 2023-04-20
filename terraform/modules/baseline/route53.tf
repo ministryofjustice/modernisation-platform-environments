@@ -132,6 +132,11 @@ locals {
 resource "aws_route53_zone" "this" {
   for_each = local.route53_zones_to_create
 
+  #checkov:skip=CKV2_AWS_38:skip "Ensure Domain Name System Security Extensions (DNSSEC) signing is enabled for Amazon Route 53 public hosted zones"
+  #checkov:skip=CKV2_AWS_39:skip "Ensure Domain Name System (DNS) query logging is enabled for Amazon Route 53 hosted zones"
+  #CKV2_AWS_38: enable in https://dsdmoj.atlassian.net/browse/DSOS-1495
+  #CKV2_AWS_39: enable in https://dsdmoj.atlassian.net/browse/DSOS-1866
+
   name = each.key
   tags = merge(local.tags, {
     Name = each.key
