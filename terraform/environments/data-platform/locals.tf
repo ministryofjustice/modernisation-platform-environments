@@ -4,7 +4,7 @@ locals {
   lambda_timeout_in_seconds = 15
 
   # Glue
-    glue_default_arguments = {
+  glue_default_arguments = {
     "--job-bookmark-option"              = "job-bookmark-disable"
     "--enable-continuous-cloudwatch-log" = "true"
     "--enable-continuous-log-filter"     = "true"
