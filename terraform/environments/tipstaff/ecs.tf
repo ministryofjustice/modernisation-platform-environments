@@ -59,7 +59,7 @@ resource "aws_ecs_task_definition" "tipstaff_task_definition" {
         },
         {
           name  = "DB_NAME"
-          value = "${aws_db_instance.tipstaffdbdev.db_name}"
+          value = "tipstaff-db-dev"
         },
         {
           name  = "supportEmail"
