@@ -48,7 +48,7 @@ resource "aws_route53_record" "external_validation" {
     aws_instance.ec2_webgate,
     aws_instance.ec2_accessgate
   ]
-
+  
   provider = aws.core-network-services
 
   for_each = {
@@ -64,16 +64,15 @@ resource "aws_route53_record" "external_validation" {
   ttl             = 60
   type            = each.value.type
   zone_id         = local.cert_zone_id
-  #zone_id         = data.aws_route53_zone.network-services.zone_id
 }
 
 resource "aws_acm_certificate_validation" "external" {
-  
   count = local.is-production ? 1 : 1
   
   depends_on = [
     aws_route53_record.external_validation
   ]
+ 
   certificate_arn         = local.cert_arn
   validation_record_fqdns = [for record in aws_route53_record.external_validation : record.fqdn]
 
