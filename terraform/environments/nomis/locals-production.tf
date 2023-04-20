@@ -107,9 +107,6 @@ locals {
           oracle-sids              = "CNMAUD"
           fixngo-connection-target = "10.40.0.136"
         })
-        config = merge(local.database_zone_a.config, {
-          ami_name = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-03T12-51-25.032Z"
-        })
         instance = merge(local.database_zone_a.instance, {
           instance_type = "r6i.2xlarge"
         })
@@ -121,14 +118,16 @@ locals {
           data  = { total_size = 4000 }
           flash = { total_size = 1000 }
         })
-        cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso"].fixngo_connection
+        cloudwatch_metric_alarms = merge(
+          local.database_zone_a.cloudwatch_metric_alarms,
+          module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso"].fixngo_connection
+        )
       })
 
       prod-nomis-db-3 = merge(local.database_zone_a, {
         tags = merge(local.database_zone_a.tags, {
           nomis-environment = "prod"
           description       = "Production NOMIS HA database to replace Azure PDPDL00062"
-          monitored         = true
           oracle-sids       = "PCNOMHA"
         })
         instance = merge(local.database_zone_a.instance, {
