@@ -18,7 +18,7 @@ resource "aws_lambda_function" "data_extractor" {
   environment {
     variables = {
       ENVIRONMENT = local.environment
-      GLUE_JOB_NAME = "placeholder"
+      GLUE_JOB_NAME = resource.aws_glue_job.glue_job.name
     }
   }
 }
