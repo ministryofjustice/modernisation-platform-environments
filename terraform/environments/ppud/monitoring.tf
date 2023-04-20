@@ -43,9 +43,9 @@ locals {
 # link the sns topic to the service
 module "pagerduty_core_alerts" {
   depends_on = [
-    aws_sns_topic.sprinkler_ddos_alarm
+    aws_sns_topic.ppud_ddos_alarm
   ]
   source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v1.0.0"
-  sns_topics                = [aws_sns_topic.sprinkler_ddos_alarm.name]
+  sns_topics                = [aws_sns_topic.ppud_ddos_alarm.name]
   pagerduty_integration_key = local.pagerduty_integration_keys["ddos_cloudwatch"]
 }
