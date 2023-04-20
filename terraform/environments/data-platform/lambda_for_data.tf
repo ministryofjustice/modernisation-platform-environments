@@ -47,6 +47,13 @@ data "aws_iam_policy_document" "iam_policy_document_for_data_lambda" {
     actions   = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"]
     resources = ["arn:aws:logs:*:*:*"]
   }
+
+  statement {
+    sid       = "StartGlueJobRun"
+    effect    = "Allow"
+    actions   = "glue:StartJobRun"
+    resources = aws_glue_job.glue_job.arn
+  }
 }
 
 resource "aws_iam_policy" "data_lambda_policy" {
