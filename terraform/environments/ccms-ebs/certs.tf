@@ -41,12 +41,14 @@ resource "aws_acm_certificate" "external-service" {
 
 ## Validation 
 resource "aws_route53_record" "external_validation" {
+
   depends_on = [
     aws_instance.ec2_oracle_ebs,
     aws_instance.ec2_ebsapps,
     aws_instance.ec2_webgate,
     aws_instance.ec2_accessgate
   ]
+  
   provider = aws.core-network-services
 
   for_each = {
