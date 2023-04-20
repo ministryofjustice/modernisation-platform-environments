@@ -173,7 +173,7 @@ resource "aws_secretsmanager_secret" "rds_password_secret" {
   name        = "${local.application_name}/app/db-master-password-tmp2" # TODO This name needs changing back to without -tmp2 to be compatible with hardcoded OAS installation
   description = "This secret has a dynamically generated password."
   tags = merge(
-    var.tags,
+    local.tags, 
     { "Name" = "${local.application_name}/app/db-master-password-tmp2" }, # TODO This name needs changing back to without -tmp2 to be compatible with hardcoded OAS installation
   )
 }
@@ -222,7 +222,7 @@ resource "aws_db_instance" "appdb1" {
   copy_tags_to_snapshot       = true
   storage_encrypted           = true
   apply_immediately           = true
-  snapshot_identifier         = format("arn:aws:rds:eu-west-2:%s:snapshot:%s", data.aws_caller_identity.local.modernisation_platform_account_id, local.application_data.accounts[local.environment].rds_snapshot_name)
+  snapshot_identifier         = format("arn:aws:rds:eu-west-2:%s:snapshot:%s", data.aws_caller_identity.current.account_id, local.application_data.accounts[local.environment].rds_snapshot_name)
   kms_key_id                  = data.aws_kms_key.rds_shared.arn
   
 
