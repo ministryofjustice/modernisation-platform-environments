@@ -3,6 +3,9 @@
 #------------------------------------------------------------------------------
 
 resource "aws_db_instance" "this" {
+  #checkov:skip=CKV_AWS_293:skip "Ensure that AWS database instances have deletion protection enabled"
+  #CKV_AWS_293: enable in https://dsdmoj.atlassian.net/browse/DSOS-1867
+
   identifier = var.identifier
 
   engine            = var.instance.engine
@@ -57,6 +60,9 @@ resource "aws_db_instance" "this" {
 }
 
 resource "aws_db_instance_automated_backups_replication" "this" {
+  #checkov:skip=CKV_AWS_245:skip "Ensure replicated backups are encrypted at rest using KMS CMKs"
+  #CKV_AWS_245: enable in https://dsdmoj.atlassian.net/browse/DSOS-1867
+
   source_db_instance_arn = aws_db_instance.this.arn
   retention_period       = var.instance_automated_backups_replication
 }
