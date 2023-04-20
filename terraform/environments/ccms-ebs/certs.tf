@@ -41,14 +41,12 @@ resource "aws_acm_certificate" "external-service" {
 
 ## Validation 
 resource "aws_route53_record" "external_validation" {
-
   depends_on = [
     aws_instance.ec2_oracle_ebs,
     aws_instance.ec2_ebsapps,
     aws_instance.ec2_webgate,
     aws_instance.ec2_accessgate
   ]
-
   provider = aws.core-network-services
 
   for_each = {
@@ -64,7 +62,6 @@ resource "aws_route53_record" "external_validation" {
   ttl             = 60
   type            = each.value.type
   zone_id         = local.cert_zone_id
-  #zone_id         = data.aws_route53_zone.network-services.zone_id
 }
 
 resource "aws_acm_certificate_validation" "external" {
@@ -74,6 +71,7 @@ resource "aws_acm_certificate_validation" "external" {
   depends_on = [
     aws_route53_record.external_validation
   ]
+  #certificate_arn         = aws_acm_certificate.external-service[0].arn  # prod cert
   certificate_arn         = local.cert_arn
   validation_record_fqdns = [for record in aws_route53_record.external_validation : record.fqdn]
 
@@ -81,3 +79,42 @@ resource "aws_acm_certificate_validation" "external" {
     create = "10m"
   }
 }
+
+/*
+resource "aws_route53_record" "prod_external_validation" {
+  count     = local.is-production ? 1 : 0
+  provider  = aws.core-network-services
+
+  type            = "A"
+  zone_id         = local.cert_zone_id
+
+########### zone_id equates to this ##########
+#data "aws_route53_zone" "application-zone" {
+#  provider = aws.core-network-services
+#  name         = "ccms-ebs.service.justice.gov.uk."
+#  private_zone = false
+#}
+##############################################
+
+  #name            = "ccms-ebs"
+  name            = each.value.name
+
+}
+
+resource "aws_acm_certificate_validation" "prod_external" {
+  
+  count = local.is-production ? 1 : 0
+  
+  depends_on = [
+    aws_route53_record.prod_external_validation
+  ]
+  #certificate_arn         = local.cert_arn
+  certificate_arn         = aws_acm_certificate.external-service[0].arn
+  validation_record_fqdns = [for record in aws_route53_record.external_validation : record.fqdn]
+
+  timeouts {
+    create = "10m"
+  }
+}
+
+*/
