@@ -135,6 +135,29 @@ locals {
       }
     }
 
+    baseline_cloudwatch_log_groups = {
+      cloudwatch_log_groups = {
+        session-manager-logs = {
+          retention_in_days = 400
+        }
+        cwagent-var-log-messages = {
+          retention_in_days = 90
+        }
+        cwagent-var-log-secure = {
+          retention_in_days = 400
+        }
+        cwagent-windows-system = {
+          retention_in_days = 90
+        }
+        cwagent-nomis-autologoff = {
+          retention_in_days = 400
+        }
+        cwagent-weblogic-logs = {
+          retention_in_days = 90
+        }
+      }
+    }
+
     baseline_ec2_autoscaling_groups = {
       prod-nomis-web-a = merge(local.ec2_weblogic_zone_a, {
         tags = merge(local.ec2_weblogic_zone_a.tags, {
