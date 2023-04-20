@@ -3,7 +3,7 @@ locals {
   lambda_runtime            = "python3.9"
   lambda_timeout_in_seconds = 15
 
- # Glue
+  # Glue
   name                             = "data-platform-product"
   glue_version                     = "4.0"
   max_retries                      = 0
