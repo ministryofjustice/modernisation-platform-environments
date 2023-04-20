@@ -38,7 +38,7 @@ module "ec2_instance" {
   route53_records               = each.value.route53_records
 
   # either reference policies created by this module by using the name, e.g.
-  # "BusinessUnitKmsCmkPolicy", or pass in policy ARNs from outside module 
+  # "BusinessUnitKmsCmkPolicy", or pass in policy ARNs from outside module
   # directly.
   instance_profile_policies = [
     for policy in each.value.config.instance_profile_policies :

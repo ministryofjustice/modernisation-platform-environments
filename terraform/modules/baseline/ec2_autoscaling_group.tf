@@ -48,7 +48,7 @@ module "ec2_autoscaling_group" {
   iam_resource_names_prefix     = each.value.config.iam_resource_names_prefix
 
   # either reference policies created by this module by using the name, e.g.
-  # "BusinessUnitKmsCmkPolicy", or pass in policy ARNs from outside module 
+  # "BusinessUnitKmsCmkPolicy", or pass in policy ARNs from outside module
   # directly.
   instance_profile_policies = [
     for policy in each.value.config.instance_profile_policies :
