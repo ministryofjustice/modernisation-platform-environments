@@ -4,6 +4,14 @@ locals {
   lambda_timeout_in_seconds = 15
 
   # Glue
+    glue_default_arguments = {
+    "--job-bookmark-option"              = "job-bookmark-disable"
+    "--enable-continuous-cloudwatch-log" = "true"
+    "--enable-continuous-log-filter"     = "true"
+    "--enable-glue-datacatalog"          = "true"
+    "--enable-job-insights"              = "true"
+    "--enable-continuous-log-filter"     = "true"
+  }
   name                             = "data-platform-product"
   glue_version                     = "4.0"
   max_retries                      = 0
