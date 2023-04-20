@@ -26,7 +26,7 @@ main() {
     fi
   done  
 
-  echo "# terraform state list" >&2
+  echo "> terraform state list" >&2
   statelist=$(terraform state list)
 
   for (( i=0; i<num_config_lines; i++ )); do
@@ -35,8 +35,8 @@ main() {
     unset IFS
     IDS=$(echo "${statelist}" | grep "^${items[0]}" || true)
     for ID in $IDS; do
-      echo "$1: terraform state mv '$ID' '${ID/${items[0]}/${items[1]}}'"
-      echo terraform state mv "$ID" "${ID/${items[0]}/${items[1]}}"
+      echo "> terraform state mv '$ID' '${ID/${items[0]}/${items[1]}}'"
+      terraform state mv "$ID" "${ID/${items[0]}/${items[1]}}"
     done
   done
 }

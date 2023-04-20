@@ -137,8 +137,12 @@ jobs:
       - name: Terraform State Move
         working-directory: "terraform/environments/${{ inputs.application }}"
         run: |
-          [[ -e scripts/terraform-state-mv.conf ]] && scripts/terraform-state-mv.sh scripts/terraform-state-mv.conf
-          [[ -e scripts/terraform-state-mv.${{ inputs.environment }}.conf ]] && scripts/terraform-state-mv.sh scripts/terraform-state-mv.${{ inputs.environment }}.conf
+          if [[ -e scripts/terraform-state-mv.conf ]]; then
+            scripts/terraform-state-mv.sh scripts/terraform-state-mv.conf
+          fi
+          if [[ -e scripts/terraform-state-mv.${{ inputs.environment }}.conf ]]; then
+            scripts/terraform-state-mv.sh scripts/terraform-state-mv.${{ inputs.environment }}.conf
+          fi
 
       - name: Terraform Plan
         id: plan
