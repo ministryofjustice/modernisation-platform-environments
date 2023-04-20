@@ -8,108 +8,6 @@ locals {
     }
 
     # Add database instances here. They will be created using ec2-database.tf
-    databases = {
-      # Naming
-      # *-nomis-db-1: NOMIS, NDH, TRDATA
-      # *-nomis-db-2: MIS, AUDIT
-      # *-nomis-db-3: HA
-      t1-nomis-db-1 = {
-        tags = {
-          nomis-environment   = "t1"
-          server-type         = "nomis-db"
-          description         = "T1 NOMIS database"
-          oracle-sids         = "CNOMT1"
-          s3-db-restore-dir   = "CNOMT1_20230125"
-          monitored           = true
-          instance-scheduling = "skip-scheduling"
-        }
-        ami_name  = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-07T12-48-08.562Z"
-        ami_owner = "self" # remove this line next time AMI is updated so core-shared-services-production used instead
-        instance = {
-          disable_api_termination = true
-        }
-        ebs_volumes = {
-          "/dev/sdb" = { size = 100 }
-          "/dev/sdc" = { size = 100 }
-        }
-        ebs_volume_config = {
-          data  = { total_size = 100 }
-          flash = { total_size = 50 }
-        }
-      }
-
-      t1-nomis-db-1-a = {
-        tags = {
-          nomis-environment   = "t1"
-          server-type         = "nomis-db"
-          description         = "T1 NOMIS database"
-          oracle-sids         = "CNOMT1"
-          monitored           = true
-          instance-scheduling = "skip-scheduling"
-        }
-        ami_name  = "nomis_rhel_7_9_oracledb_11_2_release_2023-04-02T00-00-40.059Z"
-        ami_owner = "self"
-        instance = {
-          disable_api_termination = true
-        }
-        ebs_volumes = {
-          "/dev/sdb" = { size = 100 }
-          "/dev/sdc" = { size = 100 }
-        }
-        ebs_volume_config = {
-          data  = { total_size = 100 }
-          flash = { total_size = 50 }
-        }
-      }
-
-      t1-nomis-db-2 = {
-        tags = {
-          nomis-environment   = "t1"
-          server-type         = "nomis-db"
-          description         = "T1 NOMIS Audit database to replace Azure T1PDL0010"
-          oracle-sids         = "T1CNMAUD"
-          monitored           = true
-          instance-scheduling = "skip-scheduling"
-        }
-        ami_name  = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-07T12-48-08.562Z"
-        ami_owner = "self" # remove this line next time AMI is updated so core-shared-services-production used instead
-        instance = {
-          disable_api_termination = true
-        }
-        ebs_volumes = {
-          "/dev/sdb" = { size = 100 }
-          "/dev/sdc" = { size = 100 }
-        }
-        ebs_volume_config = {
-          data  = { total_size = 200 }
-          flash = { total_size = 2 }
-        }
-      }
-
-      t3-nomis-db-1 = {
-        tags = {
-          nomis-environment   = "t3"
-          server-type         = "nomis-db"
-          description         = "T3 NOMIS database to replace Azure T3PDL0070"
-          oracle-sids         = "T3CNOM"
-          monitored           = true
-          instance-scheduling = "skip-scheduling"
-        }
-        ami_name  = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-07T12-48-08.562Z"
-        ami_owner = "self" # remove this line next time AMI is updated so core-shared-services-production used instead
-        instance = {
-          disable_api_termination = true
-        }
-        ebs_volumes = {
-          "/dev/sdb" = { size = 100 }
-          "/dev/sdc" = { size = 500 }
-        }
-        ebs_volume_config = {
-          data  = { total_size = 2000 }
-          flash = { total_size = 500 }
-        }
-      }
-    }
 
     # Add weblogic instances here
     weblogic_autoscaling_groups = {
@@ -155,6 +53,80 @@ locals {
           oracle-db-name     = "CNOMT1"
         })
         # autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
+      })
+    }
+
+    baseline_ec2_instances = {
+      t1-nomis-db-1 = merge(local.database_zone_a, {
+        tags = merge(local.database_zone_a.tags, {
+          nomis-environment   = "t1"
+          description         = "T1 NOMIS database"
+          oracle-sids         = "CNOMT1"
+          s3-db-restore-dir   = "CNOMT1_20230125"
+          instance-scheduling = "skip-scheduling"
+        })
+        ebs_volumes = merge(local.database_zone_a.ebs_volumes, {
+          "/dev/sdb" = { label = "app", size = 100 }
+          "/dev/sdc" = { label = "app", size = 100 }
+        })
+        ebs_volume_config = merge(local.database_zone_a.ebs_volume_config, {
+          data  = { total_size = 100 }
+          flash = { total_size = 50 }
+        })
+      })
+
+      t1-nomis-db-1-a = merge(local.database_zone_a, {
+        tags = merge(local.database_zone_a.tags, {
+          nomis-environment   = "t1"
+          description         = "T1 NOMIS database"
+          oracle-sids         = "CNOMT1"
+          instance-scheduling = "skip-scheduling"
+        })
+        config = merge(local.database_zone_a.config, {
+          ami_name = "nomis_rhel_7_9_oracledb_11_2_release_2023-04-02T00-00-40.059Z"
+        })
+        ebs_volumes = merge(local.database_zone_a.ebs_volumes, {
+          "/dev/sdb" = { label = "app", size = 100 }
+          "/dev/sdc" = { label = "app", size = 100 }
+        })
+        ebs_volume_config = merge(local.database_zone_a.ebs_volume_config, {
+          data  = { total_size = 100 }
+          flash = { total_size = 50 }
+        })
+      })
+
+      t1-nomis-db-2 = merge(local.database_zone_a, {
+        tags = merge(local.database_zone_a.tags, {
+          nomis-environment   = "t1"
+          description         = "T1 NOMIS Audit database to replace Azure T1PDL0010"
+          oracle-sids         = "T1CNMAUD"
+          instance-scheduling = "skip-scheduling"
+        })
+        ebs_volumes = merge(local.database_zone_a.ebs_volumes, {
+          "/dev/sdb" = { label = "app", size = 100 }
+          "/dev/sdc" = { label = "app", size = 100 }
+        })
+        ebs_volume_config = merge(local.database_zone_a.ebs_volume_config, {
+          data  = { total_size = 200 }
+          flash = { total_size = 2 }
+        })
+      })
+
+      t3-nomis-db-1 = merge(local.database_zone_a, {
+        tags = merge(local.database_zone_a.tags, {
+          nomis-environment   = "t3"
+          description         = "T3 NOMIS database to replace Azure T3PDL0070"
+          oracle-sids         = "T3CNOM"
+          instance-scheduling = "skip-scheduling"
+        })
+        ebs_volumes = merge(local.database_zone_a.ebs_volumes, {
+          "/dev/sdb" = { label = "app", size = 100 }
+          "/dev/sdc" = { label = "app", size = 500 }
+        })
+        ebs_volume_config = merge(local.database_zone_a.ebs_volume_config, {
+          data  = { total_size = 2000 }
+          flash = { total_size = 500 }
+        })
       })
     }
 
