@@ -47,10 +47,16 @@ data "aws_iam_policy_document" "iam_policy_document_for_code_lambda" {
     resources = ["arn:aws:logs:*:*:*"]
   }
   statement {
-    sid       = "GETPUTBucketAccess"
+    sid       = "GetZipFile"
     effect    = "Allow"
-    actions   = ["s3:GetObject*", "s3:PutObject*"]
+    actions   = ["s3:GetObject*"]
     resources = ["${module.s3-bucket.bucket.arn}/code_zips/*"]
+  }
+  statement {
+    sid       = "PutExtractedFiles"
+    effect    = "Allow"
+    actions   = ["s3:PutObject*"]
+    resources = ["${module.s3-bucket.bucket.arn}/code/*"]
   }
 }
 
