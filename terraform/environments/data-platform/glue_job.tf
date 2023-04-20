@@ -44,22 +44,19 @@ resource "aws_iam_role" "glue-service-role" {
   name  = "${local.name}-glue-role-${local.environment}"
   tags  = local.tags
   path  = "/"
-
-  assume_role_policy = <<EOF
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Action": "sts:AssumeRole",
-            "Principal": {
-               "Service": "glue.amazonaws.com"
-            },
-            "Effect": "Allow",
-            "Sid": ""
-        }
-    ]
+  assume_role_policy = data.aws_iam_policy_document.glue_role_trust_policy.json
 }
-EOF
+
+data "aws_iam_policy_document" "glue_role_trust_policy" {
+  statement {
+    sid     = "GlueAssumeRole"
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+    principals {
+      type        = "Service"
+      identifiers = ["glue.amazonaws.com"]
+    }
+  }
 }
 
 resource "aws_iam_policy_attachment" "glue-service-policy" {
@@ -70,11 +67,10 @@ resource "aws_iam_policy_attachment" "glue-service-policy" {
 
 data "aws_iam_policy_document" "s3-access" {
   statement {
-    sid = "GetPutAccess"
+    sid = "GETPUTBucketAccess"
     actions = [
       "s3:GetObject*",
       "s3:PutObject*",
-      "s3:DeleteObject*",
       "s3:ListBucket*",
     ]
     resources = [
