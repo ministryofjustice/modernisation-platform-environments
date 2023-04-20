@@ -20,7 +20,6 @@ locals {
   backup_window = "22:00-01:00"
   maintenance_window = "Mon:01:15-Mon:06:00"
   storage_type = "gp2"
-  application_name = "mojfin"
   rds_snapshot_name= "laws3169-mojfin-migration-v1"
 }
 
