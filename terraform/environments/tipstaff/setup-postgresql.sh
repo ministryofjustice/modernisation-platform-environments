@@ -8,6 +8,6 @@ echo "Schema = $SCHEMA"
 if [ "$SCHEMA" == "dbo" ]; then 
     echo "The Schema dbo is already present in the database"
 else 
-    psql -h ${DB_HOSTNAME} -p 5432 -U $LOCAL_DB_USERNAME -d $DB_NAME -c "\i tipstaffdb_backup_dummydata.sql;";
+    psql -h ${DB_HOSTNAME} -p 5432 -U $LOCAL_DB_USERNAME -d $DB_NAME -c "\i tipstaffdb_dummydata.sql;";
 fi
 
