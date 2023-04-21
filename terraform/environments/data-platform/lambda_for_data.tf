@@ -1,6 +1,6 @@
 data "archive_file" "data_extractor_zip" {
   type        = "zip"
-  source_dir  = "${path.module}/src/data_extractor_${local.environment}"
+  source_dir  = "${path.module}/src/data_extractor"
   output_path = "${path.module}/src/data_extractor_${local.environment}/data_extractor_lambda.zip"
 }
 
