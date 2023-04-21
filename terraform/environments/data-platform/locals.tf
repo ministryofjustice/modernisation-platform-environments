@@ -1,19 +1,11 @@
 #### This file can be used to store locals specific to the member account ####
 locals {
+  lambda_runtime            = "python3.9"
+  lambda_timeout_in_seconds = 15
+  region                    = "eu-west-2"
+  account_id                = local.environment_management.account_ids[terraform.workspace]
 
-  ##
-  # Variables code_extractor lambda
-  ##
-  function_name               = "code_extractor"
-  function_handler            = "main.handler"
-  function_runtime            = "python3.9"
-  function_timeout_in_seconds = 15
-
-  function_source_dir = "${path.module}/src/${local.function_name}"
-
-  ##
-  # Variables for glue job
-  ##
+  # Glue
   glue_default_arguments = {
     "--job-bookmark-option"              = "job-bookmark-disable"
     "--enable-continuous-cloudwatch-log" = "true"
@@ -22,7 +14,6 @@ locals {
     "--enable-job-insights"              = "true"
     "--enable-continuous-log-filter"     = "true"
   }
-
   name                             = "data-platform-product"
   glue_version                     = "4.0"
   max_retries                      = 0
