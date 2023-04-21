@@ -2,6 +2,8 @@
 locals {
   lambda_runtime            = "python3.9"
   lambda_timeout_in_seconds = 15
+  region                    = "eu-west-2"
+  account_id                = local.environment_management.account_ids[terraform.workspace]
 
   # Glue
   glue_default_arguments = {

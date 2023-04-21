@@ -13,7 +13,7 @@ resource "aws_lambda_function" "code_extractor" {
   filename         = data.archive_file.code_extractor_zip.output_path
   source_code_hash = data.archive_file.code_extractor_zip.output_base64sha256
   publish          = true
-  role             = aws_iam_role.code_lambda_role.arn
+  role             = aws_iam_role.code_extractor_lambda_role.arn
   depends_on       = [aws_iam_role_policy_attachment.attach_code_lambda_policy_to_iam_role]
   environment {
     variables = {
@@ -22,21 +22,9 @@ resource "aws_lambda_function" "code_extractor" {
   }
 }
 
-data "aws_iam_policy_document" "code_lambda_trust_policy_doc" {
-  statement {
-    sid     = "LambdaAssumeRole"
-    effect  = "Allow"
-    actions = ["sts:AssumeRole"]
-    principals {
-      type        = "Service"
-      identifiers = ["lambda.amazonaws.com"]
-    }
-  }
-}
-
-resource "aws_iam_role" "code_lambda_role" {
+resource "aws_iam_role" "code_extractor_lambda_role" {
   name               = "code_extractor_${local.environment}-role-${local.environment}"
-  assume_role_policy = data.aws_iam_policy_document.code_lambda_trust_policy_doc.json
+  assume_role_policy = data.aws_iam_policy_document.lambda_trust_policy_doc.json
 }
 
 data "aws_iam_policy_document" "iam_policy_document_for_code_lambda" {
@@ -44,7 +32,7 @@ data "aws_iam_policy_document" "iam_policy_document_for_code_lambda" {
     sid       = "LambdaLogGroup"
     effect    = "Allow"
     actions   = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"]
-    resources = ["arn:aws:logs:*:*:*"]
+    resources = ["arn:aws:logs:${local.region}:${local.account_id}:log-group:/aws/lambda/*"]
   }
   statement {
     sid       = "GetZipFile"
@@ -60,17 +48,17 @@ data "aws_iam_policy_document" "iam_policy_document_for_code_lambda" {
   }
 }
 
-resource "aws_iam_policy" "code_lambda_policy" {
+resource "aws_iam_policy" "code_extractor_lambda_policy" {
   name        = "code_extractor_${local.environment}-policy-${local.environment}"
   path        = "/"
-  description = "AWS IAM Policy for managing aws lambda role"
+  description = "AWS IAM Policy for managing code_extractor lambda role"
   policy      = data.aws_iam_policy_document.iam_policy_document_for_code_lambda.json
 
 }
 
 resource "aws_iam_role_policy_attachment" "attach_code_lambda_policy_to_iam_role" {
-  role       = aws_iam_role.code_lambda_role.name
-  policy_arn = aws_iam_policy.code_lambda_policy.arn
+  role       = aws_iam_role.code_extractor_lambda_role.name
+  policy_arn = aws_iam_policy.code_extractor_lambda_policy.arn
 }
 
 resource "aws_cloudwatch_event_rule" "put_to_code_directory" {

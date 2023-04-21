@@ -6,14 +6,14 @@ data "archive_file" "data_extractor_zip" {
 
 resource "aws_lambda_function" "data_extractor" {
   function_name    = "data_extractor_${local.environment}"
-  description      = "Lambda to extract code and store in another location"
+  description      = "Lambda to extract data and store in another location"
   handler          = "main.handler"
   runtime          = local.lambda_runtime
   timeout          = local.lambda_timeout_in_seconds
   filename         = data.archive_file.data_extractor_zip.output_path
   source_code_hash = data.archive_file.data_extractor_zip.output_base64sha256
   publish          = true
-  role             = aws_iam_role.data_lambda_role.arn
+  role             = aws_iam_role.data_extractor_lambda_role.arn
   depends_on       = [aws_iam_role_policy_attachment.attach_data_lambda_policy_to_iam_role]
   environment {
     variables = {
@@ -23,7 +23,7 @@ resource "aws_lambda_function" "data_extractor" {
   }
 }
 
-data "aws_iam_policy_document" "data_lambda_trust_policy_doc" {
+data "aws_iam_policy_document" "lambda_trust_policy_doc" {
   statement {
     sid     = "LambdaAssumeRole"
     effect  = "Allow"
@@ -35,9 +35,9 @@ data "aws_iam_policy_document" "data_lambda_trust_policy_doc" {
   }
 }
 
-resource "aws_iam_role" "data_lambda_role" {
+resource "aws_iam_role" "data_extractor_lambda_role" {
   name               = "data_extractor_${local.environment}-role-${local.environment}"
-  assume_role_policy = data.aws_iam_policy_document.data_lambda_trust_policy_doc.json
+  assume_role_policy = data.aws_iam_policy_document.lambda_trust_policy_doc.json
 }
 
 data "aws_iam_policy_document" "iam_policy_document_for_data_lambda" {
@@ -45,7 +45,7 @@ data "aws_iam_policy_document" "iam_policy_document_for_data_lambda" {
     sid       = "LambdaLogGroup"
     effect    = "Allow"
     actions   = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"]
-    resources = ["arn:aws:logs:*:*:*"]
+    resources = ["arn:aws:logs:${local.region}:${local.account_id}:log-group:/aws/lambda/*"]
   }
 
   statement {
@@ -56,17 +56,17 @@ data "aws_iam_policy_document" "iam_policy_document_for_data_lambda" {
   }
 }
 
-resource "aws_iam_policy" "data_lambda_policy" {
+resource "aws_iam_policy" "data_extractor_lambda_policy" {
   name        = "data_extractor_${local.environment}-policy-${local.environment}"
   path        = "/"
-  description = "AWS IAM Policy for managing aws lambda role"
+  description = "AWS IAM Policy for managing data_extractor lambda role"
   policy      = data.aws_iam_policy_document.iam_policy_document_for_data_lambda.json
 
 }
 
 resource "aws_iam_role_policy_attachment" "attach_data_lambda_policy_to_iam_role" {
-  role       = aws_iam_role.code_lambda_role.name
-  policy_arn = aws_iam_policy.data_lambda_policy.arn
+  role       = aws_iam_role.code_extractor_lambda_role.name
+  policy_arn = aws_iam_policy.data_extractor_lambda_policy.arn
 }
 
 resource "aws_cloudwatch_event_rule" "put_to_data_directory" {
