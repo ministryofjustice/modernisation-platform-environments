@@ -145,8 +145,10 @@ data "aws_iam_policy_document" "s3_bucket_access" {
       "s3:ListBucket",
       "s3:DeleteObject"
     ]
-    resources = [module.s3-bucket.bucket.arn,
-    "${module.s3-bucket.bucket.arn}/*"]
+    resources = [
+      "arn:aws:s3:::s3-bucket*",
+      "arn:aws:s3:::s3-bucket*/*"
+    ]
   }
 
   statement {
@@ -159,8 +161,8 @@ data "aws_iam_policy_document" "s3_bucket_access" {
       "s3:ListBucket"
     ]
     resources = [
-      module.nomis-audit-archives.bucket.arn,
-      "${module.nomis-audit-archives.bucket.arn}/*"
+      "arn:aws:s3:::nomis-audit-archives*",
+      "arn:aws:s3:::nomis-audit-archives*/*"
     ]
   }
 
