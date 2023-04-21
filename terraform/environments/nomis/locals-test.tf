@@ -46,12 +46,22 @@ locals {
     }
 
     baseline_ec2_autoscaling_groups = {
-      t1-nomis-web-a = merge(local.ec2_weblogic_zone_a, {
-        tags = merge(local.ec2_weblogic_zone_a.tags, {
+      t1-nomis-web-a = merge(local.ec2_weblogic_blue, {
+        tags = merge(local.ec2_weblogic_blue.tags, {
           oracle-db-hostname = "t1-nomis-db-1"
           nomis-environment  = "t1"
           oracle-db-name     = "CNOMT1"
         })
+        # autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
+      })
+
+      t1-nomis-web-green = merge(local.ec2_weblogic_green, {
+        tags = merge(local.ec2_weblogic_green.tags, {
+          oracle-db-hostname = "t1-nomis-db-1"
+          nomis-environment  = "t1"
+          oracle-db-name     = "CNOMT1"
+        })
+        cloudwatch_metric_alarms = {}
         # autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
       })
     }
@@ -165,6 +175,21 @@ locals {
                     }
                   }]
                 }
+                t1-nomis-web-green-http-7777 = {
+                  priority = 400
+                  actions = [{
+                    type              = "forward"
+                    target_group_name = "t1-nomis-web-green-http-7777"
+                  }]
+                  conditions = [{
+                    host_header = {
+                      values = [
+                        "t1-nomis-web-green.test.nomis.az.justice.gov.uk",
+                        "t1-nomis-web-green.test.nomis.service.justice.gov.uk",
+                      ]
+                    }
+                  }]
+                }
               }
           })
         }
@@ -174,20 +199,25 @@ locals {
       "test.nomis.az.justice.gov.uk" = {
         lb_alias_records = [
           { name = "t1-nomis-web-a", type = "A", lbs_map_key = "private" },
+          { name = "t1-nomis-web-green", type = "A", lbs_map_key = "private" },
           { name = "c-t1", type = "A", lbs_map_key = "private" },
         ]
       }
       "test.nomis.service.justice.gov.uk" = {
         records = [
+          { name = "t1nomis", type = "A", ttl = "300", records = ["10.101.3.132"] },
           { name = "t1nomis-a", type = "A", ttl = "300", records = ["10.101.3.132"] },
           { name = "t1nomis-b", type = "A", ttl = "300", records = ["10.101.3.132"] },
+          { name = "t1ndh", type = "A", ttl = "300", records = ["10.101.3.132"] },
           { name = "t1ndh-a", type = "A", ttl = "300", records = ["10.101.3.132"] },
           { name = "t1ndh-b", type = "A", ttl = "300", records = ["10.101.3.132"] },
+          { name = "t1or", type = "A", ttl = "300", records = ["10.101.3.132"] },
           { name = "t1or-a", type = "A", ttl = "300", records = ["10.101.3.132"] },
           { name = "t1or-b", type = "A", ttl = "300", records = ["10.101.3.132"] },
         ]
         lb_alias_records = [
           { name = "t1-nomis-web-a", type = "A", lbs_map_key = "private" },
+          { name = "t1-nomis-web-green", type = "A", lbs_map_key = "private" },
           { name = "c-t1", type = "A", lbs_map_key = "private" },
         ]
       }
