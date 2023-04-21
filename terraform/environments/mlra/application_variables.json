@@ -39,7 +39,7 @@
       "ami_image_id": "ami-0631049bf050d0d46",
       "instance_type": "m5.large",
       "key_name": "",
-      "docker_image_tag": "latest",
+      "docker_image_tag": "test",
       "maat_api_end_point": "http://maat-cd-api.aws.uat.legalservices.gov.uk/maatApi/laaStatus",
       "maat_db_url": "rds.maat.aws.uat.legalservices.gov.uk:1521:MAATDB",
       "maat_db_password": "APP_MAATDB_DBPASSWORD_MLA1",
