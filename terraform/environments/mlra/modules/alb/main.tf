@@ -57,11 +57,12 @@ data "aws_ec2_managed_prefix_list" "cloudfront" {
 
 module "s3-bucket" {
   count  = var.existing_bucket_name == "" ? 1 : 0
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.2.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.3.0"
 
   providers = {
     aws.bucket-replication = aws.bucket-replication
   }
+
   bucket_prefix       = "${var.application_name}-lb-access-logs"
   bucket_policy       = [data.aws_iam_policy_document.bucket_policy.json]
   replication_enabled = false
@@ -291,16 +292,6 @@ resource "aws_s3_bucket_ownership_controls" "cloudfront" {
     object_ownership = "BucketOwnerPreferred"
   }
 }
-
-# resource "aws_s3_bucket_acl" "cloudfront_acl" {
-#   depends_on = [
-#     aws_s3_bucket_public_access_block.cloudfront,
-#     aws_s3_bucket_ownership_controls.cloudfront
-#   ]
-
-#   bucket = aws_s3_bucket.cloudfront.id
-#   acl    = "private"
-# }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "cloudfront" {
   bucket = aws_s3_bucket.cloudfront.id
