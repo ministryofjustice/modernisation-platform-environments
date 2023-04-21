@@ -47,7 +47,7 @@ resource "aws_ecs_task_definition" "tipstaff_task_definition" {
         },
         {
           name  = "RDS_PORT"
-          value = "5432"
+          value = "${local.application_data.accounts[local.environment].rds_port}"
         },
         {
           name  = "RDS_USERNAME"
@@ -63,19 +63,19 @@ resource "aws_ecs_task_definition" "tipstaff_task_definition" {
         },
         {
           name  = "supportEmail"
-          value = "dts-legacy-apps-support-team@hmcts.net"
+          value = "${local.application_data.accounts[local.environment].support_email}"
         },
         {
           name  = "supportTeam"
-          value = "DTS Legacy Apps Support Team"
+          value = "${local.application_data.accounts[local.environment].support_team}"
         },
         {
           name  = "CurServer"
-          value = "DEVELOPMENT"
+          value = "${local.application_data.accounts[local.environment].curserver}"
         },
         {
           name  = "ida:ClientId"
-          value = "09730739-d16b-47e6-a8c6-007ad48bed2d"
+          value = "${local.application_data.accounts[local.environment].client_id}"
         }
       ]
     }

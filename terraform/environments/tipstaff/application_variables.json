@@ -11,7 +11,12 @@
       "server_port_1": "80",
       "lb_listener_protocol_1": "HTTP",
       "server_port_2": "443",
-      "lb_listener_protocol_2": "HTTPS"
+      "lb_listener_protocol_2": "HTTPS",
+      "client_id": "09730739-d16b-47e6-a8c6-007ad48bed2d",
+      "curserver": "DEVELOPMENT",
+      "support_team": "DTS Legacy Apps Support Team",
+      "suport_email": "dts-legacy-apps-support-team@hmcts.net",
+      "rds_port": "5432"
     },
     "test": {
       "example_var": "test-data"
