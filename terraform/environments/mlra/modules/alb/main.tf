@@ -295,7 +295,7 @@ resource "aws_s3_bucket_ownership_controls" "cloudfront_ownership" {
 resource "aws_s3_bucket_acl" "cloudfront_acl" {
   depends_on = [
     aws_s3_bucket.cloudfront,
-    aws_s3_bucket_ownership_controls.cloudfront_ownership.id
+    aws_s3_bucket_ownership_controls.cloudfront_ownership
   ]
 
   bucket = aws_s3_bucket.cloudfront
