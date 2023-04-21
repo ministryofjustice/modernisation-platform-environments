@@ -285,7 +285,7 @@ resource "aws_s3_bucket" "cloudfront" { # Mirroring laa-cloudfront-logging-devel
   }
 }
 
-resource "aws_s3_bucket_ownership_controls" "cloudfront_ownership" {
+resource "aws_s3_bucket_ownership_controls" "cloudfront" {
   bucket = aws_s3_bucket.cloudfront.id
   rule {
     object_ownership = "BucketOwnerPreferred"
@@ -294,8 +294,8 @@ resource "aws_s3_bucket_ownership_controls" "cloudfront_ownership" {
 
 resource "aws_s3_bucket_acl" "cloudfront_acl" {
   depends_on = [
-    aws_s3_bucket.cloudfront,
-    aws_s3_bucket_ownership_controls.cloudfront_ownership
+    aws_s3_bucket_public_access_block.cloudfront,
+    aws_s3_bucket_ownership_controls.cloudfront
   ]
 
   bucket = aws_s3_bucket.cloudfront
