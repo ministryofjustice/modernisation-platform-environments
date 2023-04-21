@@ -1,4 +1,4 @@
-resource "aws_db_instance" "tipstaffdbdev" {
+resource "aws_db_instance" "tipstaff_db" {
   allocated_storage      = local.application_data.accounts[local.environment].allocated_storage
   db_name                = local.application_data.accounts[local.environment].db_name
   storage_type           = local.application_data.accounts[local.environment].storage_type
@@ -48,15 +48,15 @@ resource "aws_security_group" "postgresql_db_sc" {
 }
 
 resource "null_resource" "setup_db" {
-  depends_on = [aws_db_instance.tipstaffdbdev]
+  depends_on = [aws_db_instance.tipstaff_db]
 
   provisioner "local-exec" {
     interpreter = ["bash", "-c"]
     command     = "chmod +x ./setup-postgresql.sh; ./setup-postgresql.sh"
 
     environment = {
-      DB_HOSTNAME       = aws_db_instance.tipstaffdbdev.address
-      DB_NAME           = aws_db_instance.tipstaffdbdev.db_name
+      DB_HOSTNAME       = aws_db_instance.tipstaff_db.address
+      DB_NAME           = aws_db_instance.tipstaff_db.db_name
       LOCAL_DB_USERNAME = jsondecode(data.aws_secretsmanager_secret_version.db_username.secret_string)["LOCAL_DB_USERNAME"]
       LOCAL_DB_PASSWORD = jsondecode(data.aws_secretsmanager_secret_version.db_password.secret_string)["LOCAL_DB_PASSWORD"]
     }
