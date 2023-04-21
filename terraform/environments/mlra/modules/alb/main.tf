@@ -57,12 +57,12 @@ data "aws_ec2_managed_prefix_list" "cloudfront" {
 
 module "s3-bucket" {
   count  = var.existing_bucket_name == "" ? 1 : 0
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.2.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.3.0"
 
   providers = {
     aws.bucket-replication = aws.bucket-replication
   }
-  acl = "private"
+
   bucket_prefix       = "${var.application_name}-lb-access-logs"
   bucket_policy       = [data.aws_iam_policy_document.bucket_policy.json]
   replication_enabled = false
@@ -283,6 +283,13 @@ resource "aws_s3_bucket" "cloudfront" { # Mirroring laa-cloudfront-logging-devel
   # TODO Set prevent_destroy to true to stop Terraform destroying this resource in the future if required
   lifecycle {
     prevent_destroy = false
+  }
+}
+
+resource "aws_s3_bucket_ownership_controls" "cloudfront" {
+  bucket = aws_s3_bucket.cloudfront.id
+  rule {
+    object_ownership = "BucketOwnerPreferred"
   }
 }
 
