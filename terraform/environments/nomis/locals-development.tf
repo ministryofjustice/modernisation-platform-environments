@@ -123,7 +123,7 @@ locals {
           "/dev/sda1" = { type = "gp3", size = 100 }
         }
         autoscaling_group = {
-          desired_capacity    = 0
+          desired_capacity    = 1
           max_size            = 2
           vpc_zone_identifier = module.environment.subnets["private"].ids
         }
