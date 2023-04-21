@@ -38,7 +38,7 @@ locals {
           "*.nomis.az.justice.gov.uk",
         ]
         external_validation_records_created = true
-        cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso"].acm_default
+        # cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso"].acm_default
         tags = {
           description = "wildcard cert for nomis ${local.environment} domains"
         }
@@ -126,10 +126,10 @@ locals {
           data  = { total_size = 4000 }
           flash = { total_size = 1000 }
         })
-        cloudwatch_metric_alarms = merge(
-          local.database_zone_a.cloudwatch_metric_alarms,
-          module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso"].fixngo_connection
-        )
+        # cloudwatch_metric_alarms = merge(
+        #   local.database_zone_a.cloudwatch_metric_alarms,
+        #   module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso"].fixngo_connection
+        # )
       })
 
       prod-nomis-db-3 = merge(local.database_zone_a, {

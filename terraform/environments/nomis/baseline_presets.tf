@@ -16,9 +16,9 @@ locals {
       local.ec2_weblogic_cloudwatch_metric_alarms_lists,
       local.database_cloudwatch_metric_alarms_lists
     )
-    cloudwatch_metric_alarms_lists_with_actions = {
-      dso = [local.dso_sns_topic_arn]
-    }
+    # cloudwatch_metric_alarms_lists_with_actions = {
+    #   dso = [local.dso_sns_topic_arn]
+    # }
     route53_resolver_rules = {
       outbound-data-and-private-subnets = ["azure-fixngo-domain"]
     }
