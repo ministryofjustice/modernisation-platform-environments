@@ -28,7 +28,7 @@ locals {
           "*.${module.environment.domains.public.application_environment}",
           "*.${local.environment}.nomis.az.justice.gov.uk",
         ]
-        cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso"].acm_default
+        # cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso"].acm_default
         tags = {
           description = "wildcard cert for ${module.environment.domains.public.application_environment} and ${local.environment}.nomis.az.justice.gov.uk domain"
         }
@@ -123,7 +123,7 @@ locals {
           "/dev/sda1" = { type = "gp3", size = 100 }
         }
         autoscaling_group = {
-          desired_capacity    = 0
+          desired_capacity    = 1
           max_size            = 2
           vpc_zone_identifier = module.environment.subnets["private"].ids
         }
