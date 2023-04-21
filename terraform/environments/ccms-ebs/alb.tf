@@ -78,7 +78,7 @@ resource "aws_lb" "webgate_lb" {
 }
 
 resource "aws_lb_listener" "webgate_listener" {
-  count      = local.is-production ? 0 : 1
+  count      = local.is-production ? 1 : 1
   depends_on = [
     aws_acm_certificate_validation.external
   ]
