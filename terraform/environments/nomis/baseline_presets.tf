@@ -1,6 +1,6 @@
 locals {
 
-  dso_sns_topic_arn = contains(["development", "test"], local.environment) ? aws_sns_topic.nomis_nonprod_alarms.arn : aws_sns_topic.nomis_alarms.arn
+  # dso_sns_topic_arn = contains(["development", "test"], local.environment) ? aws_sns_topic.nomis_nonprod_alarms.arn : aws_sns_topic.nomis_alarms.arn
 
   baseline_presets_options = {
     enable_application_environment_wildcard_cert = false

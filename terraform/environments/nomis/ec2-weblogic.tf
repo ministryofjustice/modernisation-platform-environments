@@ -64,16 +64,6 @@ locals {
     }
   }
 
-  # allows an over-ride on where to send alarms (which sns topic) based on environment
-  lb_weblogic_listeners_sns_topic = {
-    development = {}
-    test = {
-      sns_topic = aws_sns_topic.nomis_alarms.arn
-    }
-    preproduction = {}
-    production    = {}
-  }
-
   ec2_weblogic_cloudwatch_metric_alarms = {
     weblogic-node-manager-service = {
       comparison_operator = "GreaterThanOrEqualToThreshold"
