@@ -292,15 +292,15 @@ resource "aws_s3_bucket_ownership_controls" "cloudfront" {
   }
 }
 
-resource "aws_s3_bucket_acl" "cloudfront_acl" {
-  depends_on = [
-    aws_s3_bucket_public_access_block.cloudfront,
-    aws_s3_bucket_ownership_controls.cloudfront
-  ]
+# resource "aws_s3_bucket_acl" "cloudfront_acl" {
+#   depends_on = [
+#     aws_s3_bucket_public_access_block.cloudfront,
+#     aws_s3_bucket_ownership_controls.cloudfront
+#   ]
 
-  bucket = aws_s3_bucket.cloudfront.id
-  acl    = "private"
-}
+#   bucket = aws_s3_bucket.cloudfront.id
+#   acl    = "private"
+# }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "cloudfront" {
   bucket = aws_s3_bucket.cloudfront.id
