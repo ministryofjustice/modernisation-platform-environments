@@ -285,11 +285,11 @@ resource "aws_ssm_document" "session_manager_settings" {
       sessionType   = "Standard_Stream",
       inputs = {
         cloudWatchLogGroupName      = "session-manager-logs"
-        cloudWatchEncryptionEnabled = true
+        cloudWatchEncryptionEnabled = false
         cloudWatchStreamingEnabled  = true
         s3BucketName                = ""
         s3KeyPrefix                 = ""
-        s3EncryptionEnabled         = true
+        s3EncryptionEnabled         = false
         idleSessionTimeout          = "20"
         kmsKeyId                    = "" # aws_kms_key.session_manager.arn
         runAsEnabled                = false
