@@ -298,7 +298,7 @@ resource "aws_s3_bucket_acl" "cloudfront_acl" {
     aws_s3_bucket_ownership_controls.cloudfront
   ]
 
-  bucket = aws_s3_bucket.cloudfront
+  bucket = aws_s3_bucket.cloudfront.id
   acl    = "private"
 }
 
