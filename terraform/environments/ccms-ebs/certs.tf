@@ -25,9 +25,9 @@ resource "aws_acm_certificate" "external-service" {
   count = local.is-production ? 1 : 0
 
   validation_method = "DNS"
-  domain_name       = "service.justice.gov.uk"
+  domain_name       = "ccms-ebs.service.justice.gov.uk"
   subject_alternative_names = [
-    "*.service.justice.gov.uk"
+    "*.ccms-ebs.service.justice.gov.uk"
   ]
 
   tags = merge(local.tags,
