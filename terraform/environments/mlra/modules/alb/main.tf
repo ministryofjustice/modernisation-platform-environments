@@ -62,6 +62,7 @@ module "s3-bucket" {
   providers = {
     aws.bucket-replication = aws.bucket-replication
   }
+  acl = "private"
   bucket_prefix       = "${var.application_name}-lb-access-logs"
   bucket_policy       = [data.aws_iam_policy_document.bucket_policy.json]
   replication_enabled = false
