@@ -73,6 +73,9 @@ locals {
           nomis-environment  = "prod"
           oracle-db-name     = "CNOMP"
         })
+        autoscaling_group = merge(local.ec2_weblogic_a.autoscaling_group, {
+          desired_capacity = 0
+        })
       })
       prod-nomis-web-b = merge(local.ec2_weblogic_b, {
         tags = merge(local.ec2_weblogic_b.tags, {
@@ -179,9 +182,6 @@ locals {
                       values = [
                         "prod-nomis-web-a.production.nomis.az.justice.gov.uk",
                         "prod-nomis-web-a.production.nomis.service.justice.gov.uk",
-                        "c.production.nomis.az.justice.gov.uk",
-                        "c.production.nomis.service.justice.gov.uk",
-                        "c.nomis.az.justice.gov.uk",
                       ]
                     }
                   }]
@@ -197,6 +197,9 @@ locals {
                       values = [
                         "prod-nomis-web-b.production.nomis.az.justice.gov.uk",
                         "prod-nomis-web-b.production.nomis.service.justice.gov.uk",
+                        "c.production.nomis.az.justice.gov.uk",
+                        "c.production.nomis.service.justice.gov.uk",
+                        "c.nomis.az.justice.gov.uk",
                       ]
                     }
                   }]

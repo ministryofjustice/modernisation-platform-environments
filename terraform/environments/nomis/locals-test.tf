@@ -52,7 +52,9 @@ locals {
           nomis-environment  = "t1"
           oracle-db-name     = "CNOMT1"
         })
-        # autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
+        autoscaling_group = merge(local.ec2_weblogic_a.autoscaling_group, {
+          desired_capacity = 0
+        })
       })
 
       t1-nomis-web-b = merge(local.ec2_weblogic_b, {
@@ -168,9 +170,6 @@ locals {
                       values = [
                         "t1-nomis-web-a.test.nomis.az.justice.gov.uk",
                         "t1-nomis-web-a.test.nomis.service.justice.gov.uk",
-                        "c-t1.test.nomis.az.justice.gov.uk",
-                        "c-t1.test.nomis.service.justice.gov.uk",
-                        "t1-cn.hmpp-azdt.justice.gov.uk",
                       ]
                     }
                   }]
@@ -186,6 +185,9 @@ locals {
                       values = [
                         "t1-nomis-web-b.test.nomis.az.justice.gov.uk",
                         "t1-nomis-web-b.test.nomis.service.justice.gov.uk",
+                        "c-t1.test.nomis.az.justice.gov.uk",
+                        "c-t1.test.nomis.service.justice.gov.uk",
+                        "t1-cn.hmpp-azdt.justice.gov.uk",
                       ]
                     }
                   }]
