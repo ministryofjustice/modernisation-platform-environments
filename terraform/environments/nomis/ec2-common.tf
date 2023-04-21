@@ -289,7 +289,7 @@ resource "aws_ssm_document" "session_manager_settings" {
         cloudWatchStreamingEnabled  = true
         s3BucketName                = ""
         s3KeyPrefix                 = ""
-        s3EncryptionEnabled         = false
+        s3EncryptionEnabled         = true
         idleSessionTimeout          = "20"
         kmsKeyId                    = "" # aws_kms_key.session_manager.arn
         runAsEnabled                = false
