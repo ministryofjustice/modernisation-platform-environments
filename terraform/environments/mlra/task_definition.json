@@ -17,7 +17,7 @@
       "options": {
         "awslogs-region": "${region}",
         "awslogs-stream-prefix": "${app_name}-app",
-        "awslogs-group": "${app_name}-ecs-log-group"
+        "awslogs-group": "${app_name}-ecs-app-log-group"
       }
     }
   },
@@ -38,7 +38,7 @@
       "options": {
         "awslogs-region": "${region}",
         "awslogs-stream-prefix": "${app_name}-app",
-        "awslogs-group": "${app_name}-ecs-log-group"
+        "awslogs-group": "${app_name}-ecs-app-log-group"
       }
     },
     "environment": [
