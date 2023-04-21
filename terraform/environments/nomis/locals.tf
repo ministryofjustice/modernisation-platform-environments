@@ -12,24 +12,50 @@ locals {
   }
   baseline_environment_config = local.environment_configs[local.environment]
 
+  baseline_acm_certificates = {}
+
+  baseline_cloudwatch_log_groups = merge(
+    local.weblogic_cloudwatch_log_groups,
+    local.database_cloudwatch_log_groups,
+  )
+
+  baseline_ec2_autoscaling_groups   = {}
+  baseline_ec2_instances            = {}
+  baseline_iam_policies             = {}
+  baseline_iam_roles                = {}
+  baseline_iam_service_linked_roles = {}
+  baseline_key_pairs                = {}
+  baseline_kms_grants               = {}
+  baseline_lbs                      = {}
+  baseline_route53_resolvers        = {}
+
   baseline_route53_zones = {
     "${local.environment}.nomis.az.justice.gov.uk"      = {}
     "${local.environment}.nomis.service.justice.gov.uk" = {}
   }
 
-  baseline_acm_certificates = {
-    nomis_wildcard_cert = {
-      # domain_name limited to 64 chars so use modernisation platform domain for this
-      # and put the wildcard in the san
-      domain_name = module.environment.domains.public.modernisation_platform
-      subject_alternate_names = [
-        "*.${module.environment.domains.public.application_environment}",
-        "*.${local.environment}.nomis.az.justice.gov.uk",
+  baseline_s3_buckets = {
+    s3-bucket = {
+      iam_policies = module.baseline_presets.s3_iam_policies
+    }
+    ec2-image-builder-nomis = {
+      custom_kms_key = module.environment.kms_keys["general"].arn
+      bucket_policy_v2 = [
+        module.baseline_presets.s3_bucket_policies.ImageBuilderWriteAccessBucketPolicy,
+        module.baseline_presets.s3_bucket_policies.AllEnvironmentsWriteAccessBucketPolicy,
       ]
-      cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso"].acm_default
-      tags = {
-        description = "wildcard cert for ${module.environment.domains.public.application_environment} and ${local.environment}.nomis.az.justice.gov.uk domain"
-      }
+      iam_policies = module.baseline_presets.s3_iam_policies
+    }
+    nomis-db-backup-bucket = {
+      custom_kms_key = module.environment.kms_keys["general"].arn
+      iam_policies   = module.baseline_presets.s3_iam_policies
+    }
+    nomis-audit-archives = {
+      custom_kms_key = module.environment.kms_keys["general"].arn
+      bucket_policy_v2 = [
+        module.baseline_presets.s3_bucket_policies.AllEnvironmentsWriteAccessBucketPolicy,
+      ]
+      iam_policies = module.baseline_presets.s3_iam_policies
     }
   }
 
@@ -233,6 +259,8 @@ locals {
       }
     }
   }
+
+  baseline_sns_topics = {}
 
   autoscaling_schedules_default = {
     "scale_up" = {

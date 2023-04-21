@@ -52,7 +52,7 @@ locals {
       protocol                  = "HTTPS"
       ssl_policy                = "ELBSecurityPolicy-2016-08"
       certificate_names_or_arns = ["nomis_wildcard_cert"]
-      cloudwatch_metric_alarms  = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso"].lb_default
+      # cloudwatch_metric_alarms  = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso"].lb_default
       default_action = {
         type = "fixed-response"
         fixed_response = {
@@ -62,16 +62,6 @@ locals {
         }
       }
     }
-  }
-
-  # allows an over-ride on where to send alarms (which sns topic) based on environment
-  lb_weblogic_listeners_sns_topic = {
-    development = {}
-    test = {
-      sns_topic = aws_sns_topic.nomis_alarms.arn
-    }
-    preproduction = {}
-    production    = {}
   }
 
   ec2_weblogic_cloudwatch_metric_alarms = {
@@ -101,6 +91,11 @@ locals {
       ]
     }
   }
+  weblogic_cloudwatch_log_groups = {
+    cwagent-weblogic-logs = {
+      retention_in_days = 30
+    }
+  }
 
   ec2_weblogic_default = {
 
@@ -108,7 +103,6 @@ locals {
       ami_name                  = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-03-15T17-18-22.178Z"
       ssm_parameters_prefix     = "weblogic/"
       iam_resource_names_prefix = "ec2-weblogic"
-      instance_profile_policies = local.ec2_common_managed_policies
     })
 
     instance = merge(module.baseline_presets.ec2_instance.instance.default_rhel6, {
@@ -116,8 +110,8 @@ locals {
       vpc_security_group_ids = ["private-web"]
     })
 
-    cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso"].weblogic
-    user_data_cloud_init     = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
+    # cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso"].weblogic
+    user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
 
     autoscaling_group = {
       desired_capacity = 1
@@ -164,9 +158,10 @@ locals {
       component   = "web"
     }
   }
-  ec2_weblogic_zone_a = merge(local.ec2_weblogic_default, {
+  ec2_weblogic_a = merge(local.ec2_weblogic_default, {
     config = merge(local.ec2_weblogic_default.config, {
-      availability_zone = "${local.region}a"
+      availability_zone         = "${local.region}a"
+      instance_profile_policies = local.ec2_common_managed_policies
     })
     user_data_cloud_init = merge(local.ec2_weblogic_default.user_data_cloud_init, {
       args = merge(local.ec2_weblogic_default.user_data_cloud_init.args, {
@@ -174,9 +169,14 @@ locals {
       })
     })
   })
-  ec2_weblogic_zone_b = merge(local.ec2_weblogic_default, {
+  ec2_weblogic_b = merge(local.ec2_weblogic_default, {
     config = merge(local.ec2_weblogic_default.config, {
-      availability_zone = "${local.region}b"
+      availability_zone = "${local.region}a"
+    })
+    user_data_cloud_init = merge(local.ec2_weblogic_default.user_data_cloud_init, {
+      args = merge(local.ec2_weblogic_default.user_data_cloud_init.args, {
+        branch = "b7cf97d15687c1fe653ea139a728db642f783a2d" # 2023-04-06
+      })
     })
   })
 }

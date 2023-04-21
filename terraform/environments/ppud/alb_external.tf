@@ -46,8 +46,8 @@ resource "aws_lb_target_group" "PPUD-Target-Group" {
     enabled             = true
     path                = "/"
     interval            = 30
-    protocol            = "HTTP"
-    port                = 80
+    protocol            = "HTTPS"
+    port                = 443
     timeout             = 5
     healthy_threshold   = 5
     unhealthy_threshold = 2

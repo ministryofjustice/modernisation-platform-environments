@@ -145,8 +145,10 @@ data "aws_iam_policy_document" "s3_bucket_access" {
       "s3:ListBucket",
       "s3:DeleteObject"
     ]
-    resources = [module.s3-bucket.bucket.arn,
-    "${module.s3-bucket.bucket.arn}/*"]
+    resources = [
+      "arn:aws:s3:::s3-bucket*",
+      "arn:aws:s3:::s3-bucket*/*"
+    ]
   }
 
   statement {
@@ -159,8 +161,8 @@ data "aws_iam_policy_document" "s3_bucket_access" {
       "s3:ListBucket"
     ]
     resources = [
-      module.nomis-audit-archives.bucket.arn,
-      "${module.nomis-audit-archives.bucket.arn}/*"
+      "arn:aws:s3:::nomis-audit-archives*",
+      "arn:aws:s3:::nomis-audit-archives*/*"
     ]
   }
 
@@ -256,20 +258,6 @@ locals {
 }
 
 #------------------------------------------------------------------------------
-# Keypair for ec2-user
-#------------------------------------------------------------------------------
-resource "aws_key_pair" "ec2-user" {
-  key_name   = "ec2-user"
-  public_key = file(".ssh/${terraform.workspace}/ec2-user.pub")
-  tags = merge(
-    local.tags,
-    {
-      Name = "ec2-user"
-    },
-  )
-}
-
-#------------------------------------------------------------------------------
 # Session Manager Logging and Settings
 #------------------------------------------------------------------------------
 
@@ -319,27 +307,6 @@ resource "aws_ssm_document" "session_manager_settings" {
 #   name          = "alias/session_manager_key"
 #   target_key_id = aws_kms_key.session_manager.arn
 # }
-
-#------------------------------------------------------------------------------
-# Cloud Watch Log Groups
-#------------------------------------------------------------------------------
-
-# Ignore warnings regarding log groups not encrypted using customer-managed
-# KMS keys - note they are still encrypted with default KMS key
-#tfsec:ignore:AWS089
-resource "aws_cloudwatch_log_group" "groups" {
-  #checkov:skip=CKV_AWS_158:skip KMS CMK encryption check while logging solution is being determined
-  for_each          = local.environment_config.log_groups
-  name              = each.key
-  retention_in_days = each.value.retention_days
-
-  tags = merge(
-    local.tags,
-    {
-      Name = each.key
-    },
-  )
-}
 
 #------------------------------------------------------------------------------
 # Cloud Watch Agent

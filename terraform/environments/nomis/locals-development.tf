@@ -7,28 +7,6 @@ locals {
       patch_day                 = "TUE"
     }
 
-    # cloud watch log groups
-    log_groups = {
-      session-manager-logs = {
-        retention_days = 90
-      }
-      cwagent-var-log-messages = {
-        retention_days = 30
-      }
-      cwagent-var-log-secure = {
-        retention_days = 90
-      }
-      cwagent-nomis-autologoff = {
-        retention_days = 90
-      }
-      cwagent-weblogic-logs = {
-        retention_days = 30
-      }
-      cwagent-windows-system = {
-        retention_days = 30
-      }
-    }
-
     databases = {
     }
     weblogics          = {}
@@ -41,6 +19,21 @@ locals {
 
   # baseline config
   development_config = {
+    baseline_acm_certificates = {
+      nomis_wildcard_cert = {
+        # domain_name limited to 64 chars so use modernisation platform domain for this
+        # and put the wildcard in the san
+        domain_name = module.environment.domains.public.modernisation_platform
+        subject_alternate_names = [
+          "*.${module.environment.domains.public.application_environment}",
+          "*.${local.environment}.nomis.az.justice.gov.uk",
+        ]
+        # cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso"].acm_default
+        tags = {
+          description = "wildcard cert for ${module.environment.domains.public.application_environment} and ${local.environment}.nomis.az.justice.gov.uk domain"
+        }
+      }
+    }
 
     baseline_ec2_autoscaling_groups = {
 
@@ -121,7 +114,7 @@ locals {
           ami_name                      = "nomis_windows_server_2022_jumpserver_release_*"
           instance_profile_policies     = local.ec2_common_managed_policies
           ebs_volumes_copy_all_from_ami = false
-          user_data_raw                 = base64encode(templatefile("./templates/jumpserver-user-data.yaml", { S3_BUCKET = module.s3-bucket.bucket.id }))
+          user_data_raw                 = base64encode(file("./templates/jumpserver-user-data.yaml"))
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           vpc_security_group_ids = ["private-jumpserver"]
@@ -130,7 +123,7 @@ locals {
           "/dev/sda1" = { type = "gp3", size = 100 }
         }
         autoscaling_group = {
-          desired_capacity    = 0
+          desired_capacity    = 1
           max_size            = 2
           vpc_zone_identifier = module.environment.subnets["private"].ids
         }

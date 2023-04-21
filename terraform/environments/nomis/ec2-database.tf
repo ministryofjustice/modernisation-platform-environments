@@ -117,30 +117,35 @@ locals {
     }
   }
 
-  database = {
-
-    # server-type and nomis-environment auto set by module
-    tags = {
-      component            = "data"
-      os-type              = "Linux"
-      os-major-version     = 7
-      os-version           = "RHEL 7.9"
-      licence-requirements = "Oracle Database"
-      ami                  = "nomis_rhel_7_9_oracledb_11_2"
-      "Patch Group"        = "RHEL"
+  database_cloudwatch_log_groups = {
+    cwagent-nomis-autologoff = {
+      retention_in_days = 90
     }
+  }
 
-    instance = {
-      disable_api_termination      = false
+  database_default = {
+
+    config = merge(module.baseline_presets.ec2_instance.config.db, {
+      ami_name  = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-07T12-48-08.562Z"
+      ami_owner = "self"
+      instance_profile_policies = flatten([
+        local.ec2_common_managed_policies,
+        aws_iam_policy.s3_db_backup_bucket_access.arn
+      ])
+    })
+
+    instance = merge(module.baseline_presets.ec2_instance.instance.default, {
       instance_type                = "r6i.xlarge"
-      key_name                     = aws_key_pair.ec2-user.key_name
+      disable_api_termination      = true
       metadata_options_http_tokens = "optional" # the Oracle installer cannot accommodate a token
       monitoring                   = true
       vpc_security_group_ids = [
         aws_security_group.data.id, # TODO: remove once weblogic servers refreshed
-        module.baseline.security_groups["data-db"].id,
+        "data-db"
       ]
-    }
+    })
+
+    # cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso"].database
 
     user_data_cloud_init = {
       args = {
@@ -199,48 +204,30 @@ locals {
         description = "ASMSNMP password"
       }
     }
+
+    tags = {
+      ami                  = "nomis_rhel_7_9_oracledb_11_2"
+      component            = "data"
+      server-type          = "nomis-db"
+      os-type              = "Linux"
+      os-major-version     = 7
+      os-version           = "RHEL 7.9"
+      licence-requirements = "Oracle Database"
+      "Patch Group"        = "RHEL"
+      monitored            = "true"
+    }
   }
-}
 
-module "db_ec2_instance" {
-  #checkov:skip=CKV_AWS_79:Oracle cannot accommodate a token
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v1.0.1"
-
-  providers = {
-    aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
-  }
-
-  for_each = local.environment_config.databases
-
-  name = each.key
-
-  ami_name                      = each.value.ami_name
-  ami_owner                     = try(each.value.ami_owner, "core-shared-services-production")
-  instance                      = merge(local.database.instance, lookup(each.value, "instance", {}))
-  user_data_cloud_init          = merge(local.database.user_data_cloud_init, lookup(each.value, "user_data_cloud_init", {}))
-  ebs_volumes_copy_all_from_ami = try(each.value.ebs_volumes_copy_all_from_ami, true)
-  ebs_kms_key_id                = module.environment.kms_keys["ebs"].arn
-  ebs_volume_config             = merge(local.database.ebs_volume_config, lookup(each.value, "ebs_volume_config", {}))
-  ebs_volumes                   = { for k, v in local.database.ebs_volumes : k => merge(v, try(each.value.ebs_volumes[k], {})) }
-  ssm_parameters_prefix         = "database/"
-  ssm_parameters                = merge(local.database.ssm_parameters, lookup(each.value, "ssm_parameters", {}))
-  route53_records               = merge(local.database.route53_records, lookup(each.value, "route53_records", {}))
-
-  iam_resource_names_prefix = "ec2-database"
-  instance_profile_policies = concat(local.ec2_common_managed_policies, [aws_iam_policy.s3_db_backup_bucket_access.arn])
-
-  business_unit      = local.business_unit
-  application_name   = local.application_name
-  environment        = local.environment
-  region             = local.region
-  availability_zone  = local.availability_zone_1
-  subnet_id          = module.environment.subnet["data"][local.availability_zone_1].id
-  tags               = merge(local.tags, local.database.tags, try(each.value.tags, {}))
-  account_ids_lookup = local.environment_management.account_ids
-
-  cloudwatch_metric_alarms = merge(module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso"].database,
-    lookup(each.value, "cloudwatch_metric_alarms", {})
-  )
+  database_zone_a = merge(local.database_default, {
+    config = merge(local.database_default.config, {
+      availability_zone = "${local.region}a"
+    })
+  })
+  database_zone_b = merge(local.database_default, {
+    config = merge(local.database_default.config, {
+      availability_zone = "${local.region}b"
+    })
+  })
 }
 
 #------------------------------------------------------------------------------
@@ -256,8 +243,10 @@ data "aws_iam_policy_document" "s3_db_backup_bucket_access" {
       "s3:ListBucket",
       "s3:GetObject"
     ]
-    resources = [module.nomis-db-backup-bucket.bucket.arn,
-    "${module.nomis-db-backup-bucket.bucket.arn}/*"]
+    resources = [
+      "arn:aws:s3:::nomis-db-backup-bucket*",
+      "arn:aws:s3:::nomis-db-backup-bucket*/*"
+    ]
   }
 }
 
@@ -282,7 +271,7 @@ resource "aws_ssm_document" "audit_s3_upload" {
   name            = "UploadAuditArchivesToS3"
   document_type   = "Command"
   document_format = "YAML"
-  content         = templatefile("${path.module}/ssm-documents/templates/s3auditupload.yaml.tftmpl", { bucket = module.nomis-audit-archives.bucket.id, branch = "main" })
+  content         = templatefile("${path.module}/ssm-documents/templates/s3auditupload.yaml.tftmpl", { bucket = module.baseline.s3_buckets["nomis-audit-archives"].bucket.id, branch = "main" })
   target_type     = "/AWS::EC2::Instance"
 
   tags = merge(

@@ -1,4 +1,7 @@
 resource "aws_lb_listener" "this" {
+  #checkov:skip=CKV_AWS_2:skip "Ensure ALB protocol is HTTPS"
+  #Allow http listener to be configured, e.g. for auto redirection to https
+
   load_balancer_arn = local.aws_lb.arn
   port              = var.port
   protocol          = var.protocol

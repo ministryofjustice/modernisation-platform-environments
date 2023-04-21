@@ -7,28 +7,6 @@ locals {
       patch_day                 = "TUE"
     }
 
-    # cloud watch log groups
-    log_groups = {
-      session-manager-logs = {
-        retention_days = 90
-      }
-      cwagent-var-log-messages = {
-        retention_days = 30
-      }
-      cwagent-var-log-secure = {
-        retention_days = 90
-      }
-      cwagent-nomis-autologoff = {
-        retention_days = 90
-      }
-      cwagent-weblogic-logs = {
-        retention_days = 30
-      }
-      cwagent-windows-system = {
-        retention_days = 30
-      }
-    }
-
     databases = {
       # Naming
       # *-nomis-db-1: NOMIS, NDH, TRDATA
@@ -55,7 +33,7 @@ locals {
           "*.lsast-nomis.az.justice.gov.uk",
         ]
         external_validation_records_created = true
-        cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso"].acm_default
+        # cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso"].acm_default
         tags = {
           description = "wildcard cert for nomis ${local.environment} domains"
         }
@@ -63,12 +41,20 @@ locals {
     }
 
     baseline_ec2_autoscaling_groups = {
-      preprod-nomis-web-a = merge(local.ec2_weblogic_zone_a, {
-        tags = merge(local.ec2_weblogic_zone_a.tags, {
+      preprod-nomis-web-a = merge(local.ec2_weblogic_a, {
+        tags = merge(local.ec2_weblogic_a.tags, {
           oracle-db-hostname = "PPPDL00016.azure.hmpp.root"
           nomis-environment  = "preprod"
           oracle-db-name     = "CNOMPP"
         })
+      })
+      preprod-nomis-web-b = merge(local.ec2_weblogic_b, {
+        tags = merge(local.ec2_weblogic_b.tags, {
+          oracle-db-hostname = "PPPDL00016.azure.hmpp.root"
+          nomis-environment  = "preprod"
+          oracle-db-name     = "CNOMPP"
+        })
+        cloudwatch_metric_alarms = {}
       })
     }
 
@@ -106,6 +92,21 @@ locals {
                     }
                   }]
                 }
+                preprod-nomis-web-b-http-7777 = {
+                  priority = 400
+                  actions = [{
+                    type              = "forward"
+                    target_group_name = "preprod-nomis-web-b-http-7777"
+                  }]
+                  conditions = [{
+                    host_header = {
+                      values = [
+                        "preprod-nomis-web-b.preproduction.nomis.az.justice.gov.uk",
+                        "preprod-nomis-web-b.preproduction.nomis.service.justice.gov.uk",
+                      ]
+                    }
+                  }]
+                }
               }
           })
         }
@@ -116,12 +117,14 @@ locals {
       "preproduction.nomis.az.justice.gov.uk" = {
         lb_alias_records = [
           { name = "preprod-nomis-web-a", type = "A", lbs_map_key = "private" },
+          { name = "preprod-nomis-web-b", type = "A", lbs_map_key = "private" },
           { name = "c", type = "A", lbs_map_key = "private" },
         ]
       }
       "preproduction.nomis.service.justice.gov.uk" = {
         lb_alias_records = [
           { name = "preprod-nomis-web-a", type = "A", lbs_map_key = "private" },
+          { name = "preprod-nomis-web-b", type = "A", lbs_map_key = "private" },
           { name = "c", type = "A", lbs_map_key = "private" },
         ]
       }
