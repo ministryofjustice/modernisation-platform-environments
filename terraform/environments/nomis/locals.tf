@@ -48,16 +48,11 @@ locals {
     }
     nomis-db-backup-bucket = {
       custom_kms_key = module.environment.kms_keys["general"].arn
-      bucket_policy_v2 = [
-        module.baseline_presets.s3_bucket_policies.ImageBuilderWriteAccessBucketPolicy,
-        module.baseline_presets.s3_bucket_policies.AllEnvironmentsWriteAccessBucketPolicy,
-      ]
-      iam_policies = module.baseline_presets.s3_iam_policies
+      iam_policies   = module.baseline_presets.s3_iam_policies
     }
     nomis-audit-archives = {
       custom_kms_key = module.environment.kms_keys["general"].arn
       bucket_policy_v2 = [
-        module.baseline_presets.s3_bucket_policies.ImageBuilderWriteAccessBucketPolicy,
         module.baseline_presets.s3_bucket_policies.AllEnvironmentsWriteAccessBucketPolicy,
       ]
       iam_policies = module.baseline_presets.s3_iam_policies
