@@ -49,6 +49,8 @@ module "service" {
   ]
 
   ignore_changes_task_definition = false
+
+  tags = local.tags
 }
 
 resource "aws_security_group" "cluster_ec2" {
