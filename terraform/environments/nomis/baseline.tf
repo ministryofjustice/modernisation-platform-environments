@@ -43,17 +43,17 @@ module "baseline" {
     lookup(local.baseline_environment_config, "baseline_iam_roles", {})
   )
 
-  # iam_service_linked_roles = merge(
-  #   module.baseline_presets.iam_service_linked_roles,
-  #   local.baseline_iam_service_linked_roles,
-  #   lookup(local.baseline_environment_config, "baseline_iam_service_linked_roles", {})
-  # )
+  iam_service_linked_roles = merge(
+    module.baseline_presets.iam_service_linked_roles,
+    local.baseline_iam_service_linked_roles,
+    lookup(local.baseline_environment_config, "baseline_iam_service_linked_roles", {})
+  )
 
-  # key_pairs = merge(
-  #   module.baseline_presets.key_pairs,
-  #   local.baseline_key_pairs,
-  #   lookup(local.baseline_environment_config, "baseline_key_pairs", {})
-  # )
+  key_pairs = merge(
+    module.baseline_presets.key_pairs,
+    local.baseline_key_pairs,
+    lookup(local.baseline_environment_config, "baseline_key_pairs", {})
+  )
 
   kms_grants = merge(
     module.baseline_presets.kms_grants,
