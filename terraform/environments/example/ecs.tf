@@ -42,9 +42,6 @@ module "service" {
     }
   ]
 
-  #security_group_ids    = [aws_security_group.cluster_ec2.id]
-  #alb_security_group_id = "sg-xxxxxxxxxxxxxx"
-
   subnet_ids = [
     data.aws_subnet.private_subnets_a.id,
     data.aws_subnet.private_subnets_b.id,
