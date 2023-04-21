@@ -11,13 +11,13 @@ resource "aws_cloudwatch_log_group" "tipstaffFamily_logs" {
 }
 
 resource "aws_ecs_task_definition" "tipstaff_task_definition" {
-  family                = "tipstaffFamily"
+  family                   = "tipstaffFamily"
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
-  execution_role_arn    = aws_iam_role.app_execution.arn
-  task_role_arn         = aws_iam_role.app_task.arn
-  cpu       = 1024
-  memory    = 2048
+  execution_role_arn       = aws_iam_role.app_execution.arn
+  task_role_arn            = aws_iam_role.app_task.arn
+  cpu                      = 1024
+  memory                   = 2048
   container_definitions = jsonencode([
     {
       name      = "tipstaff-container"
@@ -35,7 +35,7 @@ resource "aws_ecs_task_definition" "tipstaff_task_definition" {
       logConfiguration = {
         logDriver = "awslogs"
         options = {
-          awslogs-group         =  "${aws_cloudwatch_log_group.tipstaffFamily_logs.name}"
+          awslogs-group         = "${aws_cloudwatch_log_group.tipstaffFamily_logs.name}"
           awslogs-region        = "eu-west-2"
           awslogs-stream-prefix = "ecs"
         }
@@ -98,7 +98,7 @@ resource "aws_ecs_service" "tipstaff_ecs_service" {
   launch_type                       = "FARGATE"
   enable_execute_command            = true
   desired_count                     = 1
-  health_check_grace_period_seconds = 360
+  health_check_grace_period_seconds = 90
 
   network_configuration {
     subnets          = data.aws_subnets.shared-public.ids
@@ -107,7 +107,7 @@ resource "aws_ecs_service" "tipstaff_ecs_service" {
   }
 
   load_balancer {
-    target_group_arn = aws_lb_target_group.blue.arn
+    target_group_arn = aws_lb_target_group.tipstaff-dev-target-group.arn
     container_name   = "tipstaff-container"
     container_port   = 80
   }
@@ -154,37 +154,13 @@ resource "aws_iam_role_policy" "app_execution" {
     "Statement": [
       {
            "Action": [
-               "logs:CreateLogStream",
-               "logs:PutLogEvents",
-               "ecr:GetAuthorizationToken"
+              "ecr:*",
+              "logs:CreateLogStream",
+              "logs:PutLogEvents",
+              "secretsmanager:GetSecretValue"
            ],
            "Resource": "*",
            "Effect": "Allow"
-      },
-      {
-            "Action": [
-              "ecr:GetAuthorizationToken",
-              "ecr:BatchCheckLayerAvailability",
-              "ecr:GetDownloadUrlForLayer",
-              "ecr:GetRepositoryPolicy",
-              "ecr:DescribeRepositories",
-              "ecr:ListImages",
-              "ecr:DescribeImages",
-              "ecr:BatchGetImage",
-              "ecr:GetLifecyclePolicy",
-              "ecr:GetLifecyclePolicyPreview",
-              "ecr:ListTagsForResource",
-              "ecr:DescribeImageScanFindings"
-            ],
-              "Resource": "*",
-            "Effect": "Allow"
-      },
-      {
-          "Action": [
-               "secretsmanager:GetSecretValue"
-           ],
-          "Resource": "*",
-          "Effect": "Allow"
       }
     ]
   }
@@ -229,19 +205,6 @@ resource "aws_iam_role_policy" "app_task" {
      {
        "Effect": "Allow",
         "Action": [
-          "ecr:GetAuthorizationToken",
-          "ecr:CreateRepository",
-          "ecr:BatchCheckLayerAvailability",
-          "ecr:GetDownloadUrlForLayer",
-          "ecr:GetRepositoryPolicy",
-          "ecr:DescribeRepositories",
-          "ecr:ListImages",
-          "ecr:DescribeImages",
-          "ecr:BatchGetImage",
-          "ecr:GetLifecyclePolicy",
-          "ecr:GetLifecyclePolicyPreview",
-          "ecr:ListTagsForResource",
-          "ecr:DescribeImageScanFindings",
           "logs:CreateLogStream",
           "logs:PutLogEvents",
           "ecr:*",
@@ -274,7 +237,6 @@ resource "aws_security_group" "ecs_service" {
   }
 }
 
-#Create ECR Repository
 resource "aws_ecr_repository" "tipstaff-ecr-repo" {
   name = "tipstaff-ecr-repo"
 }

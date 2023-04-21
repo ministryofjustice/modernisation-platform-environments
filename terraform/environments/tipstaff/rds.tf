@@ -23,9 +23,10 @@ resource "aws_security_group" "postgresql_db_sc" {
   name        = "postgres_security_group"
   description = "control access to the database"
   vpc_id      = data.aws_vpc.shared.id
+
   ingress {
-    from_port   = 0
-    to_port     = 65535
+    from_port   = 5432
+    to_port     = 5432
     protocol    = "tcp"
     description = "MOJ Digital VPN access"
     cidr_blocks = [local.application_data.accounts[local.environment].moj_ip]
@@ -34,8 +35,8 @@ resource "aws_security_group" "postgresql_db_sc" {
     from_port   = 5432
     to_port     = 5432
     protocol    = "tcp"
-    description = "Allows codebuild access to RDS"
-    cidr_blocks = ["0.0.0.0/0"]
+    description = "Allows ECS service to access RDS"
+    security_groups = [aws_security_group.ecs_service.id]
   }
   egress {
     description = "allow all outbound traffic"
@@ -44,6 +45,7 @@ resource "aws_security_group" "postgresql_db_sc" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
 }
 
 resource "null_resource" "setup_db" {

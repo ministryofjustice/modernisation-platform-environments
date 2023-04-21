@@ -46,8 +46,8 @@ resource "aws_lb" "tipstaff_dev_lb" {
   depends_on                 = [aws_security_group.tipstaff_dev_lb_sc]
 }
 
-resource "aws_lb_target_group" "blue" {
-  name                 = "tipstaff-dev-target-group-blue"
+resource "aws_lb_target_group" "tipstaff-dev-target-group" {
+  name                 = "tipstaff-dev-target-group"
   port                 = 80
   protocol             = "HTTP"
   vpc_id               = data.aws_vpc.shared.id
@@ -64,7 +64,7 @@ resource "aws_lb_target_group" "blue" {
     protocol            = "HTTP"
     port                = "80"
     unhealthy_threshold = "3"
-    matcher             = "200-499"
+    matcher             = "200-302"
     timeout             = "5"
   }
 
@@ -78,7 +78,7 @@ resource "aws_lb_listener" "tipstaff_dev_lb_1" {
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.blue.arn
+    target_group_arn = aws_lb_target_group.tipstaff-dev-target-group.arn
   }
 }
 
@@ -94,6 +94,6 @@ resource "aws_lb_listener" "tipstaff_dev_lb_2" {
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.blue.arn
+    target_group_arn = aws_lb_target_group.tipstaff-dev-target-group.arn
   }
 }
