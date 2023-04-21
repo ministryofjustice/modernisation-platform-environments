@@ -243,8 +243,10 @@ data "aws_iam_policy_document" "s3_db_backup_bucket_access" {
       "s3:ListBucket",
       "s3:GetObject"
     ]
-    resources = [module.nomis-db-backup-bucket.bucket.arn,
-    "${module.nomis-db-backup-bucket.bucket.arn}/*"]
+    resources = [
+      "arn:aws:s3:::nomis-db-backup-bucket*",
+      "arn:aws:s3:::nomis-db-backup-bucket*/*"
+    ]
   }
 }
 
@@ -269,7 +271,7 @@ resource "aws_ssm_document" "audit_s3_upload" {
   name            = "UploadAuditArchivesToS3"
   document_type   = "Command"
   document_format = "YAML"
-  content         = templatefile("${path.module}/ssm-documents/templates/s3auditupload.yaml.tftmpl", { bucket = module.nomis-audit-archives.bucket.id, branch = "main" })
+  content         = templatefile("${path.module}/ssm-documents/templates/s3auditupload.yaml.tftmpl", { bucket = module.baseline.s3_buckets["nomis-audit-archives"].bucket.id, branch = "main" })
   target_type     = "/AWS::EC2::Instance"
 
   tags = merge(
