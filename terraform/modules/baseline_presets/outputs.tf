@@ -109,7 +109,7 @@ output "s3_iam_policies" {
 
 output "s3_buckets" {
   description = "Map of s3_buckets"
-  value = local.s3_buckets
+  value       = local.s3_buckets
 }
 
 # Use var.options.sns_topics_pagerduty_integrations to control, where
@@ -127,8 +127,11 @@ output "sns_topics" {
     for key, value in var.options.sns_topics_pagerduty_integrations : key => {
       display_name      = "Pager duty integration for ${value}"
       kms_master_key_id = "general"
-      subscriptions_pagerduty = {
-        value = {}
+      subscriptions = {
+        "${key}" = {
+          protocol = "https"
+          endpoint = "https://events.pagerduty.com/integration/${var.environment.pagerduty_integration_keys[value]}/enqueue"
+        }
       }
     }
   }
