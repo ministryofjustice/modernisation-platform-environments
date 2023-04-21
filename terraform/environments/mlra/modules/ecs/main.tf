@@ -488,7 +488,7 @@ resource "aws_cloudwatch_log_group" "cloudwatch_group" {
   tags = merge(
     var.tags_common,
     {
-      Name = "${var.app_name}-ecs-app-log-group"
+      Name = "${var.app_name}-ecs-log-group"
     }
   )
 }
