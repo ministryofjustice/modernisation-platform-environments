@@ -24,7 +24,7 @@ resource "aws_lb" "external" {
 }
 
 resource "aws_security_group" "load_balancer_security_group" {
-  name_prefix = "${local.application_name}-lb"
+  name_prefix = "${local.application_name}-loadbalancer-security-group"
   description = "controls access to lb"
   vpc_id      = data.aws_vpc.shared.id
 
@@ -47,7 +47,7 @@ resource "aws_security_group" "load_balancer_security_group" {
   tags = merge(
     local.tags,
     {
-      Name = "${local.application_name}-lb"
+      Name = "${local.application_name}-loadbalancer-security-group"
     }
   )
 }
