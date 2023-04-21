@@ -15,7 +15,7 @@
       "client_id": "09730739-d16b-47e6-a8c6-007ad48bed2d",
       "curserver": "DEVELOPMENT",
       "support_team": "DTS Legacy Apps Support Team",
-      "suport_email": "dts-legacy-apps-support-team@hmcts.net",
+      "support_email": "dts-legacy-apps-support-team@hmcts.net",
       "rds_port": "5432"
     },
     "test": {
