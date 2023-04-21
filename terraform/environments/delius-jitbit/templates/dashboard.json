@@ -1,0 +1,281 @@
+{
+  "widgets": [
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 1,
+      "width": 12,
+      "height": 6,
+      "properties": {
+        "metrics": [
+          [
+            "ECS/ContainerInsights",
+            "CpuUtilized",
+            "ServiceName",
+            "hmpps-${environment}-${app_name}",
+            "ClusterName",
+            "hmpps-${environment}-${app_name}",
+            {
+              "label": "${app_name}-service"
+            }
+          ],
+          [
+            ".",
+            ".",
+            "ClusterName",
+            ".",
+            {
+              "label": "${app_name}-cluster"
+            }
+          ]
+        ],
+        "view": "timeSeries",
+        "stacked": true,
+        "region": "eu-west-2",
+        "title": "CPU Utilization",
+        "stat": "Average",
+        "period": 300
+      }
+    },
+    {
+      "type": "metric",
+      "x": 12,
+      "y": 1,
+      "width": 12,
+      "height": 6,
+      "properties": {
+        "metrics": [
+          [
+            "ECS/ContainerInsights",
+            "MemoryUtilized",
+            "ServiceName",
+            "hmpps-${environment}-${app_name}",
+            "ClusterName",
+            "hmpps-${environment}-${app_name}",
+            {
+              "label": "${app_name}-service"
+            }
+          ],
+          [
+            ".",
+            ".",
+            "ClusterName",
+            ".",
+            {
+              "label": "${app_name}-cluster"
+            }
+          ]
+        ],
+        "view": "timeSeries",
+        "stacked": true,
+        "region": "eu-west-2",
+        "title": "Memory Utilization",
+        "stat": "Average",
+        "period": 300
+      }
+    },
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 7,
+      "width": 12,
+      "height": 6,
+      "properties": {
+        "metrics": [
+          [
+            "JitbitMetrics",
+            "ErrorCount",
+            {
+              "color": "#d62728"
+            }
+          ]
+        ],
+        "view": "timeSeries",
+        "stacked": true,
+        "region": "eu-west-2",
+        "stat": "Average",
+        "period": 300,
+        "title": "Jitbit Application Errors"
+      }
+    },
+    {
+      "type": "log",
+      "x": 12,
+      "y": 7,
+      "width": 12,
+      "height": 6,
+      "properties": {
+        "query": "SOURCE 'delius-jitbit-app' | fields @timestamp, @message, @logStream, @log\n| filter @message like /Error in Helpdesk/\n| sort @timestamp desc\n| limit 20",
+        "region": "eu-west-2",
+        "stacked": false,
+        "view": "table",
+        "title": "Jitbit Error Logs"
+      }
+    },
+    {
+      "type": "text",
+      "x": 0,
+      "y": 0,
+      "width": 24,
+      "height": 1,
+      "properties": {
+        "markdown": "App Metrics"
+      }
+    },
+    {
+      "type": "text",
+      "x": 0,
+      "y": 13,
+      "width": 24,
+      "height": 1,
+      "properties": {
+        "markdown": "LB Metrics"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 0,
+      "y": 14,
+      "width": 8,
+      "height": 6,
+      "properties": {
+        "view": "timeSeries",
+        "stacked": true,
+        "metrics": [
+          [
+            "AWS/ApplicationELB",
+            "HTTPCode_Target_4XX_Count",
+            "TargetGroup",
+            "${target_group_arn}",
+            "LoadBalancer",
+            "${load_balancer_arn}"
+          ]
+        ],
+        "region": "eu-west-2"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 8,
+      "y": 14,
+      "width": 8,
+      "height": 6,
+      "properties": {
+        "view": "timeSeries",
+        "stacked": false,
+        "metrics": [
+          [
+            "AWS/ApplicationELB",
+            "TargetResponseTime",
+            "TargetGroup",
+            "${target_group_arn}",
+            "LoadBalancer",
+            "${load_balancer_arn}"
+          ]
+        ],
+        "region": "eu-west-2"
+      }
+    },
+    {
+      "type": "metric",
+      "x": 16,
+      "y": 14,
+      "width": 8,
+      "height": 6,
+      "properties": {
+        "view": "timeSeries",
+        "stacked": true,
+        "metrics": [
+          [
+            "AWS/ApplicationELB",
+            "HealthyHostCount",
+            "TargetGroup",
+            "${target_group_arn}",
+            "LoadBalancer",
+            "${load_balancer_arn}"
+          ]
+        ],
+        "region": "eu-west-2"
+      }
+    },
+    {
+      "type": "explorer",
+      "x": 0,
+      "y": 20,
+      "width": 24,
+      "height": 15,
+      "properties": {
+        "metrics": [
+          {
+            "metricName": "CPUUtilization",
+            "resourceType": "AWS::RDS::DBInstance",
+            "stat": "Average"
+          },
+          {
+            "metricName": "DatabaseConnections",
+            "resourceType": "AWS::RDS::DBInstance",
+            "stat": "Sum"
+          },
+          {
+            "metricName": "FreeStorageSpace",
+            "resourceType": "AWS::RDS::DBInstance",
+            "stat": "Average"
+          },
+          {
+            "metricName": "FreeableMemory",
+            "resourceType": "AWS::RDS::DBInstance",
+            "stat": "Average"
+          },
+          {
+            "metricName": "ReadLatency",
+            "resourceType": "AWS::RDS::DBInstance",
+            "stat": "Average"
+          },
+          {
+            "metricName": "ReadThroughput",
+            "resourceType": "AWS::RDS::DBInstance",
+            "stat": "Average"
+          },
+          {
+            "metricName": "ReadIOPS",
+            "resourceType": "AWS::RDS::DBInstance",
+            "stat": "Average"
+          },
+          {
+            "metricName": "WriteLatency",
+            "resourceType": "AWS::RDS::DBInstance",
+            "stat": "Average"
+          },
+          {
+            "metricName": "WriteThroughput",
+            "resourceType": "AWS::RDS::DBInstance",
+            "stat": "Average"
+          },
+          {
+            "metricName": "WriteIOPS",
+            "resourceType": "AWS::RDS::DBInstance",
+            "stat": "Average"
+          }
+        ],
+        "labels": [
+          {
+            "key": "Name",
+            "value": "${app_name}-${environment}-database"
+          }
+        ],
+        "widgetOptions": {
+          "legend": {
+            "position": "bottom"
+          },
+          "view": "timeSeries",
+          "stacked": false,
+          "rowsPerPage": 50,
+          "widgetsPerRow": 2
+        },
+        "period": 300,
+        "splitBy": "",
+        "region": "eu-west-2"
+      }
+    }
+  ]
+}
