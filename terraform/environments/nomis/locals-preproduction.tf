@@ -41,15 +41,15 @@ locals {
     }
 
     baseline_ec2_autoscaling_groups = {
-      preprod-nomis-web-a = merge(local.ec2_weblogic_blue, {
-        tags = merge(local.ec2_weblogic_blue.tags, {
+      preprod-nomis-web-a = merge(local.ec2_weblogic_a, {
+        tags = merge(local.ec2_weblogic_a.tags, {
           oracle-db-hostname = "PPPDL00016.azure.hmpp.root"
           nomis-environment  = "preprod"
           oracle-db-name     = "CNOMPP"
         })
       })
-      preprod-nomis-web-green = merge(local.ec2_weblogic_green, {
-        tags = merge(local.ec2_weblogic_green.tags, {
+      preprod-nomis-web-b = merge(local.ec2_weblogic_b, {
+        tags = merge(local.ec2_weblogic_b.tags, {
           oracle-db-hostname = "PPPDL00016.azure.hmpp.root"
           nomis-environment  = "preprod"
           oracle-db-name     = "CNOMPP"
@@ -92,17 +92,17 @@ locals {
                     }
                   }]
                 }
-                preprod-nomis-web-green-http-7777 = {
+                preprod-nomis-web-b-http-7777 = {
                   priority = 400
                   actions = [{
                     type              = "forward"
-                    target_group_name = "preprod-nomis-web-green-http-7777"
+                    target_group_name = "preprod-nomis-web-b-http-7777"
                   }]
                   conditions = [{
                     host_header = {
                       values = [
-                        "preprod-nomis-web-green.preproduction.nomis.az.justice.gov.uk",
-                        "preprod-nomis-web-green.preproduction.nomis.service.justice.gov.uk",
+                        "preprod-nomis-web-b.preproduction.nomis.az.justice.gov.uk",
+                        "preprod-nomis-web-b.preproduction.nomis.service.justice.gov.uk",
                       ]
                     }
                   }]
@@ -117,14 +117,14 @@ locals {
       "preproduction.nomis.az.justice.gov.uk" = {
         lb_alias_records = [
           { name = "preprod-nomis-web-a", type = "A", lbs_map_key = "private" },
-          { name = "preprod-nomis-web-green", type = "A", lbs_map_key = "private" },
+          { name = "preprod-nomis-web-b", type = "A", lbs_map_key = "private" },
           { name = "c", type = "A", lbs_map_key = "private" },
         ]
       }
       "preproduction.nomis.service.justice.gov.uk" = {
         lb_alias_records = [
           { name = "preprod-nomis-web-a", type = "A", lbs_map_key = "private" },
-          { name = "preprod-nomis-web-green", type = "A", lbs_map_key = "private" },
+          { name = "preprod-nomis-web-b", type = "A", lbs_map_key = "private" },
           { name = "c", type = "A", lbs_map_key = "private" },
         ]
       }

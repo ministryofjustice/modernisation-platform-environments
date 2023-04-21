@@ -46,8 +46,8 @@ locals {
     }
 
     baseline_ec2_autoscaling_groups = {
-      t1-nomis-web-a = merge(local.ec2_weblogic_blue, {
-        tags = merge(local.ec2_weblogic_blue.tags, {
+      t1-nomis-web-a = merge(local.ec2_weblogic_a, {
+        tags = merge(local.ec2_weblogic_a.tags, {
           oracle-db-hostname = "t1-nomis-db-1"
           nomis-environment  = "t1"
           oracle-db-name     = "CNOMT1"
@@ -55,8 +55,8 @@ locals {
         # autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
       })
 
-      t1-nomis-web-green = merge(local.ec2_weblogic_green, {
-        tags = merge(local.ec2_weblogic_green.tags, {
+      t1-nomis-web-b = merge(local.ec2_weblogic_b, {
+        tags = merge(local.ec2_weblogic_b.tags, {
           oracle-db-hostname = "t1-nomis-db-1"
           nomis-environment  = "t1"
           oracle-db-name     = "CNOMT1"
@@ -175,17 +175,17 @@ locals {
                     }
                   }]
                 }
-                t1-nomis-web-green-http-7777 = {
+                t1-nomis-web-b-http-7777 = {
                   priority = 400
                   actions = [{
                     type              = "forward"
-                    target_group_name = "t1-nomis-web-green-http-7777"
+                    target_group_name = "t1-nomis-web-b-http-7777"
                   }]
                   conditions = [{
                     host_header = {
                       values = [
-                        "t1-nomis-web-green.test.nomis.az.justice.gov.uk",
-                        "t1-nomis-web-green.test.nomis.service.justice.gov.uk",
+                        "t1-nomis-web-b.test.nomis.az.justice.gov.uk",
+                        "t1-nomis-web-b.test.nomis.service.justice.gov.uk",
                       ]
                     }
                   }]
@@ -199,7 +199,7 @@ locals {
       "test.nomis.az.justice.gov.uk" = {
         lb_alias_records = [
           { name = "t1-nomis-web-a", type = "A", lbs_map_key = "private" },
-          { name = "t1-nomis-web-green", type = "A", lbs_map_key = "private" },
+          { name = "t1-nomis-web-b", type = "A", lbs_map_key = "private" },
           { name = "c-t1", type = "A", lbs_map_key = "private" },
         ]
       }
@@ -217,7 +217,7 @@ locals {
         ]
         lb_alias_records = [
           { name = "t1-nomis-web-a", type = "A", lbs_map_key = "private" },
-          { name = "t1-nomis-web-green", type = "A", lbs_map_key = "private" },
+          { name = "t1-nomis-web-b", type = "A", lbs_map_key = "private" },
           { name = "c-t1", type = "A", lbs_map_key = "private" },
         ]
       }

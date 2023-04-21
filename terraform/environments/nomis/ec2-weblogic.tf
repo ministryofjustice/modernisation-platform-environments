@@ -168,7 +168,7 @@ locals {
       component   = "web"
     }
   }
-  ec2_weblogic_blue = merge(local.ec2_weblogic_default, {
+  ec2_weblogic_a = merge(local.ec2_weblogic_default, {
     config = merge(local.ec2_weblogic_default.config, {
       availability_zone         = "${local.region}a"
       instance_profile_policies = local.ec2_common_managed_policies
@@ -179,7 +179,7 @@ locals {
       })
     })
   })
-  ec2_weblogic_green = merge(local.ec2_weblogic_default, {
+  ec2_weblogic_b = merge(local.ec2_weblogic_default, {
     config = merge(local.ec2_weblogic_default.config, {
       availability_zone = "${local.region}a"
     })
