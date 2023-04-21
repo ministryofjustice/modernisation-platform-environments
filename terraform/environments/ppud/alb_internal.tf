@@ -48,8 +48,8 @@ resource "aws_lb_listener" "PPUD-Front-End-Prod" {
 resource "aws_lb_target_group" "PPUD-internal-Target-Group" {
   count    = local.is-development == false ? 1 : 0
   name     = local.application_data.accounts[local.environment].PPUD_Target
-  port     = 80
-  protocol = "HTTP"
+  port     = 443
+  protocol = "HTTPS"
   vpc_id   = data.aws_vpc.shared.id
   stickiness {
     cookie_duration = 86400
@@ -61,8 +61,8 @@ resource "aws_lb_target_group" "PPUD-internal-Target-Group" {
     enabled             = true
     path                = "/"
     interval            = 30
-    protocol            = "HTTP"
-    port                = 80
+    protocol            = "HTTPS"
+    port                = 443
     timeout             = 5
     healthy_threshold   = 5
     unhealthy_threshold = 2
@@ -77,19 +77,19 @@ resource "aws_lb_target_group_attachment" "PPUD-PORTAL-internal-preproduction" {
   count            = local.is-preproduction == true ? 1 : 0
   target_group_arn = aws_lb_target_group.PPUD-internal-Target-Group[0].arn
   target_id        = aws_instance.s618358rgvw023[0].id
-  port             = 80
+  port             = 443
 }
 
 resource "aws_lb_target_group_attachment" "PPUD-PORTAL-internal-production" {
   count            = local.is-production == true ? 1 : 0
   target_group_arn = aws_lb_target_group.PPUD-internal-Target-Group[0].arn
   target_id        = aws_instance.s618358rgvw019[0].id
-  port             = 80
+  port             = 443
 }
 
 resource "aws_lb_target_group_attachment" "PPUD-PORTAL-internal-production-1" {
   count            = local.is-production == true ? 1 : 0
   target_group_arn = aws_lb_target_group.PPUD-internal-Target-Group[0].arn
   target_id        = aws_instance.s618358rgvw020[0].id
-  port             = 80
+  port             = 443
 }
