@@ -113,7 +113,6 @@ locals {
       ami_name                  = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-03-15T17-18-22.178Z"
       ssm_parameters_prefix     = "weblogic/"
       iam_resource_names_prefix = "ec2-weblogic"
-      instance_profile_policies = local.ec2_common_managed_policies
     })
 
     instance = merge(module.baseline_presets.ec2_instance.instance.default_rhel6, {
@@ -169,9 +168,10 @@ locals {
       component   = "web"
     }
   }
-  ec2_weblogic_zone_a = merge(local.ec2_weblogic_default, {
+  ec2_weblogic_a = merge(local.ec2_weblogic_default, {
     config = merge(local.ec2_weblogic_default.config, {
-      availability_zone = "${local.region}a"
+      availability_zone         = "${local.region}a"
+      instance_profile_policies = local.ec2_common_managed_policies
     })
     user_data_cloud_init = merge(local.ec2_weblogic_default.user_data_cloud_init, {
       args = merge(local.ec2_weblogic_default.user_data_cloud_init.args, {
@@ -179,9 +179,14 @@ locals {
       })
     })
   })
-  ec2_weblogic_zone_b = merge(local.ec2_weblogic_default, {
+  ec2_weblogic_b = merge(local.ec2_weblogic_default, {
     config = merge(local.ec2_weblogic_default.config, {
-      availability_zone = "${local.region}b"
+      availability_zone = "${local.region}a"
+    })
+    user_data_cloud_init = merge(local.ec2_weblogic_default.user_data_cloud_init, {
+      args = merge(local.ec2_weblogic_default.user_data_cloud_init.args, {
+        branch = "b7cf97d15687c1fe653ea139a728db642f783a2d" # 2023-04-06
+      })
     })
   })
 }
