@@ -62,7 +62,6 @@ module "s3-bucket" {
   providers = {
     aws.bucket-replication = aws.bucket-replication
   }
-  acl = "private"
   bucket_prefix       = "${var.application_name}-lb-access-logs"
   bucket_policy       = [data.aws_iam_policy_document.bucket_policy.json]
   replication_enabled = false
@@ -284,6 +283,23 @@ resource "aws_s3_bucket" "cloudfront" { # Mirroring laa-cloudfront-logging-devel
   lifecycle {
     prevent_destroy = false
   }
+}
+
+resource "aws_s3_bucket_ownership_controls" "cloudfront_ownership" {
+  bucket = aws_s3_bucket.cloudfront.id
+  rule {
+    object_ownership = "BucketOwnerPreferred"
+  }
+}
+
+resource "aws_s3_bucket_acl" "cloudfront_acl" {
+  depends_on = [
+    aws_s3_bucket.cloudfront,
+    aws_s3_bucket_ownership_controls.cloudfront_ownership.id
+  ]
+
+  bucket = aws_s3_bucket.cloudfront
+  acl    = "private"
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "cloudfront" {
