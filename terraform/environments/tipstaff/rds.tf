@@ -5,8 +5,8 @@ resource "aws_db_instance" "tipstaff_db" {
   engine                 = local.application_data.accounts[local.environment].engine
   engine_version         = local.application_data.accounts[local.environment].engine_version
   instance_class         = local.application_data.accounts[local.environment].instance_class
-  username               = jsondecode(data.aws_secretsmanager_secret_version.db_username.secret_string)["LOCAL_DB_USERNAME"]
-  password               = jsondecode(data.aws_secretsmanager_secret_version.db_password.secret_string)["LOCAL_DB_PASSWORD"]
+  username               = jsondecode(data.aws_secretsmanager_secret_version.db_username.secret_string)["TIPSTAFF_DB_USERNAME_DEV"]
+  password               = jsondecode(data.aws_secretsmanager_secret_version.db_password.secret_string)["TIPSTAFF_DB_PASSWORD_DEV"]
   skip_final_snapshot    = true
   publicly_accessible    = true
   vpc_security_group_ids = [aws_security_group.postgresql_db_sc.id]
@@ -64,8 +64,8 @@ resource "null_resource" "setup_db" {
     environment = {
       DB_HOSTNAME       = aws_db_instance.tipstaff_db.address
       DB_NAME           = aws_db_instance.tipstaff_db.db_name
-      LOCAL_DB_USERNAME = jsondecode(data.aws_secretsmanager_secret_version.db_username.secret_string)["LOCAL_DB_USERNAME"]
-      LOCAL_DB_PASSWORD = jsondecode(data.aws_secretsmanager_secret_version.db_password.secret_string)["LOCAL_DB_PASSWORD"]
+      TIPSTAFF_DB_USERNAME_DEV = jsondecode(data.aws_secretsmanager_secret_version.db_username.secret_string)["TIPSTAFF_DB_USERNAME_DEV"]
+      TIPSTAFF_DB_PASSWORD_DEV = jsondecode(data.aws_secretsmanager_secret_version.db_password.secret_string)["TIPSTAFF_DB_PASSWORD_DEV"]
     }
   }
   triggers = {
