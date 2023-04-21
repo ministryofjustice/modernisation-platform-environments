@@ -1,14 +1,14 @@
 locals {
 
   s3_buckets = merge(
-    var.environment.environment == "production" ? { "prodpreprod-${var.environment.application_name}-" = {
+    var.options.enable_shared_s3 && var.environment.environment == "production" ? { "prodpreprod-${var.environment.application_name}-" = {
       bucket_policy_v2 = [
         local.s3_bucket_policies.ImageBuilderWriteAccessBucketPolicy,
         local.s3_bucket_policies.ProdPreprodEnvironmentsWriteAccessBucketPolicy
       ]
       iam_policies = local.s3_iam_policies
     }} : {},
-    var.environment.environment == "test" ? {"devtest-${var.environment.application_name}-" = {
+    var.options.enable_shared_s3 && var.environment.environment == "test" ? {"devtest-${var.environment.application_name}-" = {
       bucket_policy_v2 = [
         local.s3_bucket_policies.ImageBuilderWriteAccessBucketPolicy,
         local.s3_bucket_policies.DevTestEnvironmentsWriteAndDeleteAccessBucketPolicy
@@ -16,8 +16,6 @@ locals {
       iam_policies = local.s3_iam_policies
     }} : {}
   )
-
-  
 
   s3_bucket_policies = {
 
