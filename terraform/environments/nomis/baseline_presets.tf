@@ -7,34 +7,15 @@ locals {
     enable_ec2_cloud_watch_agent = true
     enable_ec2_self_provision    = true
     cloudwatch_metric_alarms = {
-      acm = {
-        cert-expiry-alarm-test = {
-          comparison_operator = "LessThanThreshold"
-          evaluation_periods  = "1"
-          datapoints_to_alarm = "1"
-          metric_name         = "DaysToExpiry"
-          namespace           = "AWS/CertificateManager"
-          period              = "86400"
-          statistic           = "Minimum"
-          threshold           = "5"
-          alarm_description   = "Test alarm for ACM Cert"
-        }
-      }
       weblogic = local.ec2_weblogic_cloudwatch_metric_alarms
       database = local.database_cloudwatch_metric_alarms
     }
-    cloudwatch_metric_alarms_lists = merge({
-      acm_default = {
-        parent_keys = []
-        alarms_list = [
-          { key = "acm", name = "cert-expiry-alarm-test" }
-        ]
-      } },
+    cloudwatch_metric_alarms_lists = merge(
       local.ec2_weblogic_cloudwatch_metric_alarms_lists,
       local.database_cloudwatch_metric_alarms_lists
     )
     cloudwatch_metric_alarms_lists_with_actions = {
-      nomis_alarm = ["nomis_pagerduty", "nomis_email"]
+      nomis_pagerduty = ["nomis_pagerduty"]
     }
     route53_resolver_rules = {
       outbound-data-and-private-subnets = ["azure-fixngo-domain"]
@@ -45,9 +26,6 @@ locals {
     sns_topics = {
       pagerduty_integrations = {
         nomis_pagerduty = contains(["development", "test"], local.environment) ? "nomis_nonprod_alarms" : "nomis_alarms"
-      }
-      emails = {
-        nomis_email = "/monitoring/test"
       }
     }
   }
