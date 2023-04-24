@@ -43,7 +43,7 @@ resource "aws_security_group" "postgresql_db_sc" {
     to_port     = 5432
     protocol    = "tcp"
     description = "Allows Github Actions to access RDS"
-    cidr_blocks = data.github_ip_ranges.github_actions_ips.actions_ipv4
+    cidr_blocks = [local.pipeline_ip]
   }
   egress {
     description = "allow all outbound traffic"
@@ -55,7 +55,14 @@ resource "aws_security_group" "postgresql_db_sc" {
 
 }
 
-data "github_ip_ranges" "github_actions_ips" {}
+//Get the IP address of the pipeline that is running the terraform
+data "external" "pipeline_ip" {
+  program = ["bash", "-c", "curl -s 'https://api.ipify.org?format=json'"]
+}
+
+output "pipeline_ip" {
+  value = join("", data.external.pipeline_ip.result.ip, "/32")
+}
 
 resource "null_resource" "setup_db" {
   depends_on = [aws_db_instance.tipstaff_db]
