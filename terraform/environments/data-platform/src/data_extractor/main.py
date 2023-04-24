@@ -38,7 +38,8 @@ def handler(event, context):
         runId = glue.start_job_run(JobName=gluejobname, Arguments=args)
 
         status = glue.get_job_run(JobName=gluejobname, RunId=runId["JobRunId"])
-        logging.info("Job Status : ", status["JobRun"]["JobRunState"])
+        status_for_log = status["JobRun"]["JobRunState"]
+        logging.info(f"Job Status : {status_for_log}")
 
     except Exception as e:
         logging.info(e)
