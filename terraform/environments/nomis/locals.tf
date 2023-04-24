@@ -260,7 +260,16 @@ locals {
     }
   }
 
-  baseline_sns_topics = {}
+  baseline_sns_topics = {
+    "dba_slack_pagerduty" = {
+      display_name      = "Pager duty integration for dba_slack"
+      kms_master_key_id = "general"
+    }
+    "dba_callout_pagerduty" = {
+      display_name      = "Pager duty integration for dba_callout"
+      kms_master_key_id = "general"
+    }
+  }
 
   autoscaling_schedules_default = {
     "scale_up" = {

@@ -14,9 +14,9 @@ locals {
       local.ec2_weblogic_cloudwatch_metric_alarms_lists,
       local.database_cloudwatch_metric_alarms_lists
     )
-    # cloudwatch_metric_alarms_lists_with_actions = {
-    #   dso = [local.dso_sns_topic_arn]
-    # }
+    cloudwatch_metric_alarms_lists_with_actions = {
+      nomis_pagerduty = ["nomis_pagerduty"]
+    }
     route53_resolver_rules = {
       outbound-data-and-private-subnets = ["azure-fixngo-domain"]
     }
@@ -24,7 +24,7 @@ locals {
     iam_policies_ec2_default = ["EC2S3BucketWriteAndDeleteAccessPolicy", "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
     s3_iam_policies          = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
     sns_topics_pagerduty_integrations = {
-      pagerduty = contains(["development", "test"], local.environment) ? "nomis_nonprod_alarms" : "nomis_alarms"
+      nomis_pagerduty = contains(["development", "test"], local.environment) ? "nomis_nonprod_alarms" : "nomis_alarms"
     }
   }
 }
