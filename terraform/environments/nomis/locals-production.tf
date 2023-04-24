@@ -130,7 +130,10 @@ locals {
           data  = { total_size = 4000 }
           flash = { total_size = 1000 }
         })
-        cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["nomis_pagerduty"].database
+        cloudwatch_metric_alarms = merge(
+          module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["nomis_pagerduty"].database,
+          module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["nomis_pagerduty"].fixngo_connection
+        )
       })
 
       prod-nomis-db-3 = merge(local.database_zone_a, {
