@@ -71,8 +71,8 @@ resource "aws_cloudwatch_metric_alarm" "lb_high_unhealthy_host_count" {
   ok_actions                = [aws_sns_topic.jitbit_alerting.arn]
   treat_missing_data        = "missing"
   dimensions = {
-    LoadBalancer = aws_lb.external.arn
-    TargetGroup  = aws_lb_target_group.target_group_fargate.arn
+    LoadBalancer = aws_lb.external.arn_suffix
+    TargetGroup  = aws_lb_target_group.target_group_fargate.arn_suffix
   }
 }
 
@@ -90,8 +90,8 @@ resource "aws_cloudwatch_metric_alarm" "target_group_high_4XX_error_rate" {
   ok_actions          = [aws_sns_topic.jitbit_alerting.arn]
   treat_missing_data  = "missing"
   dimensions = {
-    LoadBalancer   = aws_lb.external.arn
-    TargetGroupArn = aws_lb_target_group.target_group_fargate.arn
+    LoadBalancer   = aws_lb.external.arn_suffix
+    TargetGroupArn = aws_lb_target_group.target_group_fargate.arn_suffix
   }
 }
 
