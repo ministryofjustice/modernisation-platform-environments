@@ -49,9 +49,9 @@ data "aws_iam_policy_document" "iam_policy_document_for_data_lambda" {
   }
 
   statement {
-    sid       = "StartGlueJobRun"
+    sid       = "StartGetGlueJobRun"
     effect    = "Allow"
-    actions   = ["glue:StartJobRun"]
+    actions   = ["glue:StartJobRun", "glue:GetJobRun"]
     resources = [aws_glue_job.glue_job.arn]
   }
 }
