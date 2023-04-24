@@ -6,8 +6,8 @@ resource "aws_db_instance" "tipstaff_db" {
   identifier             = local.application_data.accounts[local.environment].identifier
   engine_version         = local.application_data.accounts[local.environment].engine_version
   instance_class         = local.application_data.accounts[local.environment].instance_class
-  username               = jsondecode(data.aws_secretsmanager_secret_version.db_username.secret_string)["TIPSTAFF_DB_USERNAME_DEV"]
-  password               = jsondecode(data.aws_secretsmanager_secret_version.db_password.secret_string)["TIPSTAFF_DB_PASSWORD_DEV"]
+  username               = jsondecode(data.aws_secretsmanager_secret_version.db_credentials.secret_string)["TIPSTAFF_DB_USERNAME_DEV"]
+  password               = jsondecode(data.aws_secretsmanager_secret_version.db_credentials.secret_string)["TIPSTAFF_DB_PASSWORD_DEV"]
   skip_final_snapshot    = true
   publicly_accessible    = true
   vpc_security_group_ids = [aws_security_group.postgresql_db_sc.id]
