@@ -32,10 +32,10 @@ resource "aws_security_group" "postgresql_db_sc" {
     cidr_blocks = [local.application_data.accounts[local.environment].moj_ip]
   }
   ingress {
-    from_port   = 5432
-    to_port     = 5432
-    protocol    = "tcp"
-    description = "Allows ECS service to access RDS"
+    from_port       = 5432
+    to_port         = 5432
+    protocol        = "tcp"
+    description     = "Allows ECS service to access RDS"
     security_groups = [aws_security_group.ecs_service.id]
   }
   ingress {
@@ -43,7 +43,7 @@ resource "aws_security_group" "postgresql_db_sc" {
     to_port     = 5432
     protocol    = "tcp"
     description = "Allows Github Actions to access RDS"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [github_ip_ranges.github_actions_ips.actions_ipv4]
   }
   egress {
     description = "allow all outbound traffic"
@@ -55,6 +55,8 @@ resource "aws_security_group" "postgresql_db_sc" {
 
 }
 
+data "github_ip_ranges" "github_actions_ips" {}
+
 resource "null_resource" "setup_db" {
   depends_on = [aws_db_instance.tipstaff_db]
 
@@ -63,8 +65,8 @@ resource "null_resource" "setup_db" {
     command     = "chmod +x ./setup-postgresql.sh; ./setup-postgresql.sh"
 
     environment = {
-      DB_HOSTNAME       = aws_db_instance.tipstaff_db.address
-      DB_NAME           = aws_db_instance.tipstaff_db.db_name
+      DB_HOSTNAME              = aws_db_instance.tipstaff_db.address
+      DB_NAME                  = aws_db_instance.tipstaff_db.db_name
       TIPSTAFF_DB_USERNAME_DEV = jsondecode(data.aws_secretsmanager_secret_version.db_username.secret_string)["TIPSTAFF_DB_USERNAME_DEV"]
       TIPSTAFF_DB_PASSWORD_DEV = jsondecode(data.aws_secretsmanager_secret_version.db_password.secret_string)["TIPSTAFF_DB_PASSWORD_DEV"]
     }
