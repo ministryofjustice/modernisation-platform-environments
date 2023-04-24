@@ -27,10 +27,14 @@
       "db_multi_az": "false",
       "db_iam_database_authentication_enabled": "false",
       "db_monitoring_interval": "5",
-      "db_enabled_cloudwatch_logs_exports": ["agent", "error"],
+      "db_enabled_cloudwatch_logs_exports": [
+        "agent",
+        "error"
+      ],
       "db_performance_insights_enabled": "false",
+      "db_deletion_protection": "false",
       "db_skip_final_snapshot": "true",
-      "db_snapshot_identifier": "jitbit-migration-dev"
+      "db_snapshot_identifier": "cr-jitbit-dev-db-snapshot-for-testing-migration-to-mp-copy"
     }
   }
 }
