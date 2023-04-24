@@ -16,7 +16,7 @@ locals {
           namespace           = "AWS/CertificateManager"
           period              = "86400"
           statistic           = "Minimum"
-          threshold           = "5"
+          threshold           = "500"
           alarm_description   = "Test alarm for ACM Cert"
         }
       }
