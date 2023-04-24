@@ -57,7 +57,8 @@ resource "aws_security_group" "postgresql_db_sc" {
 
 //Get the IP address of the pipeline that is running the terraform
 data "external" "pipeline_ip" {
-  program = ["bash", "-c", "curl -s 'https://api.ipify.org?format=json'"]
+  provider = github.github-provider
+  program  = ["bash", "-c", "curl -s 'https://api.ipify.org?format=json'"]
 }
 
 output "pipeline_ip" {
