@@ -11,37 +11,37 @@ locals {
     }
 
     baseline_ec2_autoscaling_groups = {
-      # "test-${application_name}-web" = local.webserver
+      # "test-${local.application_name}-web" = local.webserver
 
-      # "t1-${application_name}-web" = merge(local.webserver, {
+      # "t1-${local.application_name}-web" = merge(local.webserver, {
       #   config = merge(module.baseline_presets.ec2_instance.config.default, {
-      #     ami_name                  = "${application_name}_webserver_release_*"
+      #     ami_name                  = "${local.application_name}_webserver_release_*"
       #     ssm_parameters_prefix     = "ec2-web-t1/"
       #     iam_resource_names_prefix = "ec2-web-t1"
       #   })
       #   tags = merge(local.webserver.tags, {
-      #     description                        = "t1 ${application_name} web"
-      #     "${application_name}-environment"  = "t1"
+      #     description                        = "t1 ${local.application_name} web"
+      #     "${local.application_name}-environment"  = "t1"
       #     oracle-db-hostname                 = "T1ODL0007"
       #   })
       # })
 
-      "t2-${application_name}-web" = merge(local.webserver, {
+      "t2-${local.application_name}-web" = merge(local.webserver, {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name                  = "oasys_webserver_release_*"
           ssm_parameters_prefix     = "ec2-web-t2/"
           iam_resource_names_prefix = "ec2-web-t2"
         })
         tags = merge(local.webserver.tags, {
-          description                        = "t2 ${application_name} web"
-          "${application_name}-environment"  = "t2"
+          description                        = "t2 ${local.application_name} web"
+          "${local.application_name}-environment"  = "t2"
           oracle-db-hostname                 = "T2ODL0009"
         })
       })
     }
 
     baseline_acm_certificates = {
-      "${application_name}_wildcard_cert" = {
+      "${local.application_name}_wildcard_cert" = {
         # domain_name limited to 64 chars so use modernisation platform domain for this
         # and put the wildcard in the san
         domain_name = module.environment.domains.public.modernisation_platform
@@ -50,14 +50,14 @@ locals {
           "*.${local.environment}.${module.environment.domains.public.short_name}", # "test.oasys.service.justice.gov.uk"
           "*.t1.${module.environment.domains.public.short_name}", # "t1.oasys.service.justice.gov.uk"
           "*.t2.${module.environment.domains.public.short_name}", # "t2.oasys.service.justice.gov.uk"
-          "*.${local.environment}.${application_name}.az.justice.gov.uk",
-          "*.t1.${application_name}.az.justice.gov.uk",
-          "*.t2.${application_name}.az.justice.gov.uk",
+          "*.${local.environment}.${local.application_name}.az.justice.gov.uk",
+          "*.t1.${local.application_name}.az.justice.gov.uk",
+          "*.t2.${local.application_name}.az.justice.gov.uk",
         ]
         external_validation_records_created = true
         cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso"].acm_default
         tags = {
-          description = "wildcard cert for ${application_name} ${local.environment} domains"
+          description = "wildcard cert for ${local.application_name} ${local.environment} domains"
         }
       }
     }
@@ -91,7 +91,7 @@ locals {
               #   priority = 100
               #   actions = [{
               #     type              = "forward"
-              #     target_group_name = "t1-${application_name}-web-http-8080"
+              #     target_group_name = "t1-${local.application_name}-web-http-8080"
               #   }]
               #   conditions = [
               #     {
@@ -110,7 +110,7 @@ locals {
                 priority = 100
                 actions = [{
                   type              = "forward"
-                  target_group_name = "t2-${application_name}-web-http-8080"
+                  target_group_name = "t2-${local.application_name}-web-http-8080"
                 }]
                 conditions = [
                   {

@@ -13,22 +13,22 @@ locals {
     }
 
     baseline_ec2_autoscaling_groups = {
-      "prod-${application_name}-web-trn" = merge(local.webserver, {
+      "prod-${local.application_name}-web-trn" = merge(local.webserver, {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name                  = "${application_name}_webserver_release_*"
+          ami_name                  = "${local.application_name}_webserver_release_*"
           ssm_parameters_prefix     = "ec2-web-trn/"
           iam_resource_names_prefix = "ec2-web-trn"
         })
         tags = merge(local.webserver.tags, {
-          description                       = "${local.environment} training ${application_name} web"
-          "${application_name}-environment" = "trn"
+          description                       = "${local.environment} training ${local.application_name} web"
+          "${local.application_name}-environment" = "trn"
           oracle-db-sid                     = "OASTRN"
         })
       })
     }
 
     baseline_acm_certificates = {
-      "${application_name}_wildcard_cert" = {
+      "${local.application_name}_wildcard_cert" = {
         # domain_name limited to 64 chars so use modernisation platform domain for this
         # and put the wildcard in the san
         domain_name = module.environment.domains.public.modernisation_platform
@@ -37,14 +37,14 @@ locals {
           "*.${module.environment.domains.public.short_name}",     #     "oasys.service.justice.gov.uk"
           "*.trn.${module.environment.domains.public.short_name}", # "trn.oasys.service.justice.gov.uk"
           "*.ptc.${module.environment.domains.public.short_name}", # "ptc.oasys.service.justice.gov.uk"
-          "*.${application_name}.az.justice.gov.uk",
-          "*.trn.${application_name}.az.justice.gov.uk",
-          "*.ptc.${application_name}.az.justice.gov.uk",
+          "*.${local.application_name}.az.justice.gov.uk",
+          "*.trn.${local.application_name}.az.justice.gov.uk",
+          "*.ptc.${local.application_name}.az.justice.gov.uk",
         ]
         external_validation_records_created = true
         cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso"].acm_default
         tags = {
-          description = "wildcard cert for ${application_name} ${local.environment} domains"
+          description = "wildcard cert for ${local.application_name} ${local.environment} domains"
         }
       }
     }
@@ -78,7 +78,7 @@ locals {
               #   priority = 100
               #   actions = [{
               #     type              = "forward"
-              #     target_group_name = "prod-${application_name}-web-http-8080"
+              #     target_group_name = "prod-${local.application_name}-web-http-8080"
               #   }]
               #   conditions = [
               #     {
@@ -97,7 +97,7 @@ locals {
                 priority = 100
                 actions = [{
                   type              = "forward"
-                  target_group_name = "prod-${application_name}-web-trn-http-8080"
+                  target_group_name = "prod-${local.application_name}-web-trn-http-8080"
                 }]
                 conditions = [
                   {
@@ -116,7 +116,7 @@ locals {
               #   priority = 100
               #   actions = [{
               #     type              = "forward"
-              #     target_group_name = "prod-${application_name}-web-ptc-http-8080"
+              #     target_group_name = "prod-${local.application_name}-web-ptc-http-8080"
               #   }]
               #   conditions = [
               #     {
