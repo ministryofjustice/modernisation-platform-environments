@@ -42,8 +42,8 @@ resource "aws_security_group" "postgresql_db_sc" {
     from_port   = 5432
     to_port     = 5432
     protocol    = "tcp"
-    description = "Allows Github Actions to access RDS"
-    cidr_blocks = ["${data.local_file.pipeline_ip.content}/32"]
+    description = "Allows access to RDS from any IP"
+    cidr_blocks = ["0.0.0.0/0"]
   }
   egress {
     description = "allow all outbound traffic"
@@ -55,25 +55,8 @@ resource "aws_security_group" "postgresql_db_sc" {
 
 }
 
-//Get the IP address of the pipeline that is running the terraform
-resource "null_resource" "get_pipeline_ip" {
-  depends_on = [aws_db_instance.tipstaff_db]
-
-  provisioner "local-exec" {
-    interpreter = ["bash", "-c"]
-    command     = "curl -s http://ipinfo.io/json | jq '.ip' > ip.txt"
-  }
-  triggers = {
-    always_run = "${timestamp()}"
-  }
-}
-
-data "local_file" "pipeline_ip" {
-  filename = "ip.txt"
-}
-
 resource "null_resource" "setup_db" {
-  depends_on = [aws_db_instance.tipstaff_db, data.local_file.pipeline_ip]
+  depends_on = [aws_db_instance.tipstaff_db]
 
   provisioner "local-exec" {
     interpreter = ["bash", "-c"]
