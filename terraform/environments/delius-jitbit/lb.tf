@@ -14,6 +14,13 @@ resource "aws_lb" "external" {
 
   enable_deletion_protection = true
   drop_invalid_header_fields = true
+
+  tags = merge(
+    local.tags,
+    {
+      Name = local.application_name
+    }
+  )
 }
 
 resource "aws_security_group" "load_balancer_security_group" {
@@ -56,12 +63,19 @@ resource "aws_lb_listener" "listener" {
     target_group_arn = aws_lb_target_group.target_group_fargate.id
     type             = "forward"
   }
+
+  tags = merge(
+    local.tags,
+    {
+      Name = local.application_name
+    }
+  )
 }
 
 resource "aws_lb_target_group" "target_group_fargate" {
   # checkov:skip=CKV_AWS_261
 
-  name                 = "${local.application_name}-tg-${local.environment}-new"
+  name                 = local.application_name
   port                 = local.application_data.accounts[local.environment].server_port
   protocol             = "HTTP"
   vpc_id               = data.aws_vpc.shared.id
@@ -85,39 +99,7 @@ resource "aws_lb_target_group" "target_group_fargate" {
   tags = merge(
     local.tags,
     {
-      Name = "${local.application_name}-tg-${local.environment}-new"
-    }
-  )
-}
-
-resource "aws_lb_target_group" "target_group" {
-  # checkov:skip=CKV_AWS_261
-
-  name                 = "${local.application_name}-tg-${local.environment}"
-  port                 = local.application_data.accounts[local.environment].server_port
-  protocol             = "HTTP"
-  vpc_id               = data.aws_vpc.shared.id
-  target_type          = "instance"
-  deregistration_delay = 30
-
-  stickiness {
-    type = "lb_cookie"
-  }
-
-  health_check {
-    path                = "/User/Login?ReturnUrl=%2f"
-    healthy_threshold   = "5"
-    interval            = "120"
-    protocol            = "HTTP"
-    unhealthy_threshold = "2"
-    matcher             = "200-499"
-    timeout             = "5"
-  }
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "${local.application_name}-tg-${local.environment}"
+      Name = local.application_name
     }
   )
 }
