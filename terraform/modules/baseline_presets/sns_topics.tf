@@ -19,8 +19,8 @@ data "aws_ssm_parameter" "sns_topics_email" {
 locals {
   sns_topics_pagerduty_integrations = {
     for key, value in var.options.sns_topics.pagerduty_integrations : key => {
-      display_name      = "Pager duty integration for ${value}"
-      kms_master_key_id = "general"
+      display_name = "Pager duty integration for ${value}"
+      # kms_master_key_id = "general"  # cloudwatch doesn't have access to the key yet
       subscriptions = {
         "${key}" = {
           protocol = "https"
@@ -32,8 +32,8 @@ locals {
 
   sns_topics_emails = {
     for key, value in var.options.sns_topics.emails : key => {
-      display_name      = "Email integration for ${value}"
-      kms_master_key_id = "general"
+      display_name = "Email integration for ${value}"
+      # kms_master_key_id = "general"  # cloudwatch doesn't have access to the key yet
       subscriptions = {
         "email" = {
           protocol = "email"
