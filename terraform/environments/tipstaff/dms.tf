@@ -40,7 +40,7 @@ resource "aws_dms_replication_instance" "tipstaff_replication_instance" {
   publicly_accessible        = true
   auto_minor_version_upgrade = true
   replication_instance_class = "dms.t3.large"
-  replication_instance_id    = "tipstaff_replication_instance"
+  replication_instance_id    = "tipstaff-replication-instance"
 }
 
 resource "aws_dms_replication_task" "tipstaff_migration_task" {
