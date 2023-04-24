@@ -1,7 +1,5 @@
 locals {
 
-  # dso_sns_topic_arn = contains(["development", "test"], local.environment) ? aws_sns_topic.nomis_nonprod_alarms.arn : aws_sns_topic.nomis_alarms.arn
-
   baseline_presets_options = {
     enable_application_environment_wildcard_cert = false
     enable_business_unit_kms_cmks                = true
@@ -26,8 +24,7 @@ locals {
     iam_policies_ec2_default = ["EC2S3BucketWriteAndDeleteAccessPolicy", "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
     s3_iam_policies          = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
     sns_topics_pagerduty_integrations = {
-      nomis_alarms         = "nomis_alarms"
-      nomis_nonprod_alarms = "nomis_nonprod_alarms"
+      pagerduty = contains(["development", "test"], local.environment) ? "nomis_nonprod_alarms" : "nomis_alarms"
     }
   }
 }
