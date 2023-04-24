@@ -28,7 +28,7 @@ def handler(event, context):
             "application",
             "transform.py",
         )
-        logging.info("Transform filepath: ", transform_file_path)
+        logging.info(f"Transform filepath: {transform_file_path}")
 
         args = {
             "--bucketName": bucket_name,
