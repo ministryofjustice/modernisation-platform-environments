@@ -128,7 +128,7 @@ locals {
           ] : [
           "arn:aws:s3:::devtest-${var.environment.application_name}-*/*",
           "arn:aws:s3:::devtest-${var.environment.application_name}-*"
-        ], [
+          ], [
           "arn:aws:s3:::ec2-image-builder-*/*",
           "arn:aws:s3:::ec2-image-builder-*",
           "arn:aws:s3:::*-software*/*",
