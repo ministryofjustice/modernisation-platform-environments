@@ -1,15 +1,24 @@
-# Use var.options.sns_topics_pagerduty_integrations to control, where
-# the map key is the sns_topic name and value is the index to use in
-# the modernisation platform managed pagerduty_integration_keys
-# secret,  e.g.
-# var.options.sns_topics_pagerduty_integrations = {
-#   prod_alarms    = nomis_alarms
-#   nonprod_alarms = nomis_nonprod_alarms
-# }
+# Preset Pager Duty and Email SNS topics for use with baseline
+# module
+#
+# var.options.sns_topics.pagerduty_integrations:
+# - map key is sns topic name
+# - map value is the key to use when looking up pager duty integration key
+#   from the modernisation platform managed pagerduty_integration_keys
+#
+# var.options.sns_topics.email
+# - map key is sns topic name
+# - map value is the SSM parameter containining the email address
+
+data "aws_ssm_parameter" "sns_topics_email" {
+  for_each = var.options.sns_topics.emails
+
+  name = each.value
+}
 
 locals {
-  sns_topic_pagerduty_integrations = {
-    for key, value in var.options.sns_topics_pagerduty_integrations : key => {
+  sns_topics_pagerduty_integrations = {
+    for key, value in var.options.sns_topics.pagerduty_integrations : key => {
       display_name      = "Pager duty integration for ${value}"
       kms_master_key_id = "general"
       subscriptions = {
@@ -20,4 +29,22 @@ locals {
       }
     }
   }
+
+  sns_topics_emails = {
+    for key, value in var.options.sns_topics.emails : key => {
+      display_name      = "Email integration for ${value}"
+      kms_master_key_id = "general"
+      subscriptions = {
+        "email" = {
+          protocol = "email"
+          endpoint = data.aws_ssm_parameter.sns_topics_email[key].value
+        }
+      }
+    }
+  }
+
+  sns_topics = merge(
+    local.sns_topics_pagerduty_integrations,
+    local.sns_topics_emails
+  )
 }

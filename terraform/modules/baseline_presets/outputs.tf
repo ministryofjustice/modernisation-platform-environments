@@ -114,5 +114,5 @@ output "s3_buckets" {
 
 output "sns_topics" {
   description = "Map of sns_topics to create depending on options provided"
-  value       = local.sns_topic_pagerduty_integrations
+  value       = local.sns_topics
 }

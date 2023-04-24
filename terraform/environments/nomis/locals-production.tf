@@ -38,7 +38,7 @@ locals {
           "*.nomis.az.justice.gov.uk",
         ]
         external_validation_records_created = true
-        # cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["nomis_pagerduty"].acm_default
+        # cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["nomis_alarm"].acm_default
         tags = {
           description = "wildcard cert for nomis ${local.environment} domains"
         }
@@ -83,7 +83,7 @@ locals {
           nomis-environment  = "prod"
           oracle-db-name     = "CNOMP"
         })
-        # cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["nomis_pagerduty"].weblogic
+        # cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["nomis_alarm"].weblogic
       })
     }
 
@@ -109,7 +109,7 @@ locals {
           data  = { total_size = 4000 }
           flash = { total_size = 1000 }
         })
-        # cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["nomis_pagerduty"].database
+        # cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["nomis_alarm"].database
       })
 
       prod-nomis-db-2 = merge(local.database_zone_a, {
@@ -130,7 +130,7 @@ locals {
           data  = { total_size = 4000 }
           flash = { total_size = 1000 }
         })
-        # cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["nomis_pagerduty"].database
+        # cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["nomis_alarm"].database
       })
 
       prod-nomis-db-3 = merge(local.database_zone_a, {
@@ -150,7 +150,7 @@ locals {
           data  = { total_size = 3000, iops = 3750, throughput = 750 }
           flash = { total_size = 500 }
         })
-        # cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["nomis_pagerduty"].database
+        # cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["nomis_alarm"].database
       })
     }
 
@@ -170,7 +170,7 @@ locals {
           https = merge(
             local.lb_weblogic.https, {
               # alarm_target_group_names = ["prod-nomis-web-b-http-7777"]
-              # cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["nomis_pagerduty"].lb_default
+              # cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["nomis_alarm"].lb_default
               rules = {
                 prod-nomis-web-a-http-7777 = {
                   priority = 200

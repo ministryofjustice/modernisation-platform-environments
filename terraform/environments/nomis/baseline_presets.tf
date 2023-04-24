@@ -16,7 +16,7 @@ locals {
           namespace           = "AWS/CertificateManager"
           period              = "86400"
           statistic           = "Minimum"
-          threshold           = "500"
+          threshold           = "5"
           alarm_description   = "Test alarm for ACM Cert"
         }
       }
@@ -34,7 +34,7 @@ locals {
       local.database_cloudwatch_metric_alarms_lists
     )
     cloudwatch_metric_alarms_lists_with_actions = {
-      nomis_pagerduty = ["nomis_pagerduty"]
+      nomis_alarm = ["nomis_pagerduty", "nomis_email"]
     }
     route53_resolver_rules = {
       outbound-data-and-private-subnets = ["azure-fixngo-domain"]
@@ -42,8 +42,13 @@ locals {
     iam_policies_filter      = ["ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
     iam_policies_ec2_default = ["EC2S3BucketWriteAndDeleteAccessPolicy", "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
     s3_iam_policies          = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
-    sns_topics_pagerduty_integrations = {
-      nomis_pagerduty = contains(["development", "test"], local.environment) ? "nomis_nonprod_alarms" : "nomis_alarms"
+    sns_topics = {
+      pagerduty_integrations = {
+        nomis_pagerduty = contains(["development", "test"], local.environment) ? "nomis_nonprod_alarms" : "nomis_alarms"
+      }
+      emails = {
+        nomis_email = "/monitoring/test"
+      }
     }
   }
 }
