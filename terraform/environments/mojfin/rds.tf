@@ -21,7 +21,7 @@ locals {
   maintenance_window = "Mon:01:15-Mon:06:00"
   storage_type = "gp2"
   rds_snapshot_name= "laws3169-mojfin-migration-v1"
-  arn= "arn:aws:rds:eu-west-2::db:"
+  arn= "arn:aws:rds:eu-west-2:db:"
 }
 
 
