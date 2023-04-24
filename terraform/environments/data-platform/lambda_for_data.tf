@@ -65,7 +65,7 @@ resource "aws_iam_policy" "data_extractor_lambda_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "attach_data_lambda_policy_to_iam_role" {
-  role       = aws_iam_role.code_extractor_lambda_role.name
+  role       = aws_iam_role.data_extractor_lambda_role.name
   policy_arn = aws_iam_policy.data_extractor_lambda_policy.arn
 }
 
