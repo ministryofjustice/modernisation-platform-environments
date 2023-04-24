@@ -128,7 +128,7 @@ locals {
           ] : [
           "arn:aws:s3:::devtest-${var.environment.application_name}-*/*",
           "arn:aws:s3:::devtest-${var.environment.application_name}-*"
-        ], [
+          ], [
           "arn:aws:s3:::ec2-image-builder-*/*",
           "arn:aws:s3:::ec2-image-builder-*",
           "arn:aws:s3:::*-software*/*",
@@ -141,7 +141,7 @@ locals {
       }]
     }
 
-    # see corresponding policy in core-shared-services-production
+    # see corresponding policy in core-shared-services-production
     # https://github.com/ministryofjustice/modernisation-platform-ami-builds/blob/main/modernisation-platform/iam.tf
     ImageBuilderS3BucketReadOnlyAccessPolicy = {
       description = "Permissions to access shared ImageBuilder bucket read-only"

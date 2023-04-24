@@ -46,6 +46,12 @@ variable "options" {
     iam_policies_filter                          = optional(list(string), [])
     iam_policies_ec2_default                     = optional(list(string), [])
     s3_iam_policies                              = optional(list(string))
-    sns_topics_pagerduty_integrations            = optional(map(string), {})
+    sns_topics = optional(object({
+      pagerduty_integrations = optional(map(string), {})
+      emails                 = optional(map(string), {})
+      }), {
+      pagerduty_integrations = {}
+      emails                 = {}
+    })
   })
 }

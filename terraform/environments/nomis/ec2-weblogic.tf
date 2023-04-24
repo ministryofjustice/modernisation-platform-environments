@@ -52,7 +52,6 @@ locals {
       protocol                  = "HTTPS"
       ssl_policy                = "ELBSecurityPolicy-2016-08"
       certificate_names_or_arns = ["nomis_wildcard_cert"]
-      # cloudwatch_metric_alarms  = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso"].lb_default
       default_action = {
         type = "fixed-response"
         fixed_response = {
@@ -110,7 +109,6 @@ locals {
       vpc_security_group_ids = ["private-web"]
     })
 
-    # cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso"].weblogic
     user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
 
     autoscaling_group = {

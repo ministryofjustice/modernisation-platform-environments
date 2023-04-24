@@ -145,8 +145,6 @@ locals {
       ]
     })
 
-    # cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso"].database
-
     user_data_cloud_init = {
       args = {
         branch               = "main"

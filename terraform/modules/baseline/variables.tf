@@ -714,9 +714,6 @@ variable "sns_topics" {
       endpoint      = string
       filter_policy = optional(string)
     })), {})
-    subscriptions_pagerduty = optional(map(object({ # map key is the name of the pagerduty integration key
-      filter_policy = optional(string)
-    })), {})
   }))
   default = {}
 }
