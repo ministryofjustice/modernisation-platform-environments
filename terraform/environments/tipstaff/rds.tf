@@ -3,7 +3,7 @@ resource "aws_db_instance" "tipstaff_db" {
   db_name                = local.application_data.accounts[local.environment].db_name
   storage_type           = local.application_data.accounts[local.environment].storage_type
   engine                 = local.application_data.accounts[local.environment].engine
-  identifier             = local.application_data.accounts[local.environment].db_name
+  identifier             = local.application_data.accounts[local.environment].identifier
   engine_version         = local.application_data.accounts[local.environment].engine_version
   instance_class         = local.application_data.accounts[local.environment].instance_class
   username               = jsondecode(data.aws_secretsmanager_secret_version.db_username.secret_string)["TIPSTAFF_DB_USERNAME_DEV"]

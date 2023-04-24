@@ -3,6 +3,7 @@
     "development": {
       "moj_ip": "81.134.202.29/32",
       "db_name": "tipstaff_db_dev",
+      "identifier": "tipstaff-db-dev",
       "allocated_storage": "20",
       "storage_type": "gp2",
       "engine": "postgres",
