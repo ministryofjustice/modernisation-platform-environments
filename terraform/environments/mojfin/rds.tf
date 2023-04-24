@@ -30,7 +30,7 @@ resource "aws_db_subnet_group" "appdbsubnetgroup" {
   subnet_ids = [data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id]
 
  tags = merge(
-    local.tags, 
+    local.tags,
    { "Name" = "${local.application_name}-${local.environment}-subnetgrp"},
     {"Keep" = "true"}
 
@@ -54,7 +54,7 @@ resource "aws_db_parameter_group" "default" {
   }
 
   tags = merge(
-    local.tags, 
+    local.tags,
    { "Name" = "mojfinsubnetgrp"},
     {"Keep" = "true"}
  )
@@ -71,7 +71,7 @@ resource "aws_security_group" "laalz-secgroup" {
     to_port     = 1521
     protocol    = "tcp"
     cidr_blocks = [local.cidr_ire_workspace ]
-  
+
   }
   ingress {
     description = "6 Degrees VPN Inbound"
@@ -79,7 +79,7 @@ resource "aws_security_group" "laalz-secgroup" {
     to_port     = 1521
     protocol    = "tcp"
     cidr_blocks = [local.cidr_six_degrees]
-  
+
   }
  ingress {
     description ="6 Degrees OBIEE Inbound"
@@ -87,7 +87,7 @@ resource "aws_security_group" "laalz-secgroup" {
     to_port     = 1521
     protocol    = "tcp"
     cidr_blocks = [local.pOBIEEInboundCIDR]
-  
+
   }
    ingress {
     description ="SharedServices Inbound - Workspaces etc"
@@ -95,7 +95,7 @@ resource "aws_security_group" "laalz-secgroup" {
     to_port     = 1521
     protocol    = "tcp"
     cidr_blocks = [local.pEnvManagementCIDR]
-  
+
   }
    ingress {
     description ="VPC Internal Traffic inbound"
@@ -103,7 +103,7 @@ resource "aws_security_group" "laalz-secgroup" {
     to_port     = 1521
     protocol    = "tcp"
     cidr_blocks = [local.pVPCCidr]
-  
+
   }
   ingress {
     description ="Cloud Platform VPC Internal Traffic inbound"
@@ -111,7 +111,7 @@ resource "aws_security_group" "laalz-secgroup" {
     to_port     = 1521
     protocol    = "tcp"
     cidr_blocks = [local.pCPVPCCidr]
-  
+
   }
   ingress {
     description ="Connectivity Analytic Platform use of Transit Gateway to MoJFin PROD"
@@ -119,7 +119,7 @@ resource "aws_security_group" "laalz-secgroup" {
     to_port     = 1521
     protocol    = "tcp"
     cidr_blocks = [local.transit_gw_to_mojfinprod]
-  
+
   }
 
 
@@ -174,7 +174,7 @@ resource "aws_secretsmanager_secret" "rds_password_secret" {
   name        = "${local.application_name}/app/db-master-password-tmp2" # TODO This name needs changing back to without -tmp2 to be compatible with hardcoded OAS installation
   description = "This secret has a dynamically generated password."
   tags = merge(
-    local.tags, 
+    local.tags,
     { "Name" = "${local.application_name}/app/db-master-password-tmp2" }, # TODO This name needs changing back to without -tmp2 to be compatible with hardcoded OAS installation
   )
 }
@@ -225,7 +225,7 @@ resource "aws_db_instance" "appdb1" {
   apply_immediately           = true
   snapshot_identifier         = format("arn:aws:rds:eu-west-2:%s:snapshot:%s", data.aws_caller_identity.current.account_id,local.rds_snapshot_name)
   kms_key_id                  = data.aws_kms_key.rds_shared.arn
-  
+
 
   timeouts {
     create = "60m"
@@ -233,8 +233,8 @@ resource "aws_db_instance" "appdb1" {
   }
 
   tags = merge(
-    local.tags, 
-   { "Name" = "mojfin"},
+    local.tags,
+   { "Name" = "${local.application_name}"},
     {"Keep" = "true"}
  )
 
@@ -248,6 +248,5 @@ resource "aws_route53_record" "mojfin-rds" {
   type     = "CNAME"
   ttl      = 60
   records = [aws_db_instance.appdb1.address]
- # records  = [format("arn:aws:rds:eu-west-2:db:", local.environment_management.account_ids,local.application_name)]
-
+ 
 }
