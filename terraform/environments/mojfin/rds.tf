@@ -21,6 +21,7 @@ locals {
   maintenance_window = "Mon:01:15-Mon:06:00"
   storage_type = "gp2"
   rds_snapshot_name= "laws3169-mojfin-migration-v1"
+  arn= "arn:aws:rds:eu-west-2::db:"
 }
 
 
@@ -246,5 +247,5 @@ resource "aws_route53_record" "mojfin-rds" {
   name     = "rds.${local.application_name}.${data.aws_route53_zone.inner.name}"
   type     = "CNAME"
   ttl      = 60
-  records  = [format("arn:aws:rds:eu-west-2:%s:db:%s", local.environment_management.account_ids,local.application_name)]
+  records  = [local.arn,local.environment_management.account_ids,local.application_name]
 }
