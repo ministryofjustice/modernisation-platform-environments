@@ -246,5 +246,5 @@ resource "aws_route53_record" "mojfin-rds" {
   name     = "rds.${local.application_name}.${data.aws_route53_zone.inner.name}"
   type     = "CNAME"
   ttl      = 60
-  records  = [format("arn:aws:rds:eu-west-2:%s:db:%s", local.environment_management.account_ids,local.application_name.arn)]
+  records  = [format("arn:aws:rds:eu-west-2:%s:db:%s", local.environment_management.account_ids,local.application_name)]
 }
