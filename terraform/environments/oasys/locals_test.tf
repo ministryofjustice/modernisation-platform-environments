@@ -1,23 +1,6 @@
-# oasys-test environment settings
+# environment specific settings
 locals {
   test_config = {
-
-    # db_enabled                             = true
-    # db_auto_minor_version_upgrade          = true
-    # db_allow_major_version_upgrade         = false
-    # db_backup_window                       = "03:00-06:00"
-    # db_retention_period                    = "15"
-    # db_maintenance_window                  = "mon:00:00-mon:03:00"
-    # db_instance_class                      = "db.t3.small"
-    # db_user                                = "eor"
-    # db_allocated_storage                   = "500"
-    # db_max_allocated_storage               = "0"
-    # db_multi_az                            = false
-    # db_iam_database_authentication_enabled = false
-    # db_monitoring_interval                 = "5"
-    # db_enabled_cloudwatch_logs_exports     = ["audit", "audit", "listener", "trace"]
-    # db_performance_insights_enabled        = false
-    # db_skip_final_snapshot                 = true
 
     ec2_common = {
       patch_approval_delay_days = 3
@@ -28,90 +11,65 @@ locals {
     }
 
     baseline_ec2_autoscaling_groups = {
-      test-oasys-web = local.webserver
+      # "test-${application_name}-web" = local.webserver
 
-      t1-oasys-web = merge(local.webserver, {
-        config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name                  = "oasys_webserver_release_*"
-          ssm_parameters_prefix     = "ec2-web-t1/"
-          iam_resource_names_prefix = "ec2-web-t1"
-        })
-        tags = merge(local.webserver.tags, {
-          description        = "t1 OASys web"
-          oasys-environment  = "t1"
-          oracle-db-hostname = "T1ODL0007"
-        })
-      })
+      # "t1-${application_name}-web" = merge(local.webserver, {
+      #   config = merge(module.baseline_presets.ec2_instance.config.default, {
+      #     ami_name                  = "${application_name}_webserver_release_*"
+      #     ssm_parameters_prefix     = "ec2-web-t1/"
+      #     iam_resource_names_prefix = "ec2-web-t1"
+      #   })
+      #   tags = merge(local.webserver.tags, {
+      #     description                        = "t1 ${application_name} web"
+      #     "${application_name}-environment"  = "t1"
+      #     oracle-db-hostname                 = "T1ODL0007"
+      #   })
+      # })
 
-      t2-oasys-web = merge(local.webserver, {
+      "t2-${application_name}-web" = merge(local.webserver, {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name                  = "oasys_webserver_release_*"
           ssm_parameters_prefix     = "ec2-web-t2/"
           iam_resource_names_prefix = "ec2-web-t2"
         })
         tags = merge(local.webserver.tags, {
-          description        = "t2 OASys web"
-          oasys-environment  = "t2"
-          oracle-db-hostname = "T2ODL0009"
+          description                        = "t2 ${application_name} web"
+          "${application_name}-environment"  = "t2"
+          oracle-db-hostname                 = "T2ODL0009"
         })
       })
     }
 
-    baseline_lbs = {
-      t2-oasys-internal = {
-        internal_lb              = true
-        enable_delete_protection = false
-        existing_target_groups   = {}
-        idle_timeout             = 60 # 60 is deafult
-        security_groups          = ["public"]
-        public_subnets           = module.environment.subnets["public"].ids
-        tags                     = local.tags
-
-        listeners = {
-          https = {
-            port                      = 443
-            protocol                  = "HTTPS"
-            ssl_policy                = "ELBSecurityPolicy-2016-08"
-            certificate_names_or_arns = ["application_environment_wildcard_cert"]
-            default_action = {
-              type = "fixed-response"
-              fixed_response = {
-                content_type = "text/plain"
-                message_body = "Not implemented"
-                status_code  = "501"
-              }
-            }
-            rules = {
-              forward-http-8080 = {
-                priority = 100
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "t2-oasys-web-http-8080"
-                }]
-                conditions = [
-                  {
-                    host_header = {
-                      values = ["t2.oasys.${module.environment.domains.public.business_unit_environment}"]
-                    }
-                  },
-                  {
-                    path_pattern = {
-                      values = ["/"]
-                    }
-                }]
-              }
-            }
-          }
+    baseline_acm_certificates = {
+      "${application_name}_wildcard_cert" = {
+        # domain_name limited to 64 chars so use modernisation platform domain for this
+        # and put the wildcard in the san
+        domain_name = module.environment.domains.public.modernisation_platform
+        subject_alternate_names = [
+          "*.${module.environment.domains.public.application_environment}",
+          "*.${local.environment}.${module.environment.domains.public.short_name}", # "test.oasys.service.justice.gov.uk"
+          "*.t1.${module.environment.domains.public.short_name}", # "t1.oasys.service.justice.gov.uk"
+          "*.t2.${module.environment.domains.public.short_name}", # "t2.oasys.service.justice.gov.uk"
+          "*.${local.environment}.${application_name}.az.justice.gov.uk",
+          "*.t1.${application_name}.az.justice.gov.uk",
+          "*.t2.${application_name}.az.justice.gov.uk",
+        ]
+        external_validation_records_created = true
+        cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso"].acm_default
+        tags = {
+          description = "wildcard cert for ${application_name} ${local.environment} domains"
         }
       }
+    }
 
-      t1-oasys-internal = {
+    baseline_lbs = {
+      private = {
         internal_lb              = true
         enable_delete_protection = false
         existing_target_groups   = {}
         idle_timeout             = 60 # 60 is deafult
-        security_groups          = ["public"]
-        public_subnets           = module.environment.subnets["public"].ids
+        security_groups          = ["private"]
+        public_subnets           = module.environment.subnets["private"].ids
         tags                     = local.tags
 
         listeners = {
@@ -129,23 +87,43 @@ locals {
               }
             }
             rules = {
-              forward-http-8080 = {
+              # t1-web-http-8080 = {
+              #   priority = 100
+              #   actions = [{
+              #     type              = "forward"
+              #     target_group_name = "t1-${application_name}-web-http-8080"
+              #   }]
+              #   conditions = [
+              #     {
+              #       host_header = {
+              #         values = ["t1.${module.environment.domains.public.short_name}"]
+              #       }
+              #     },
+              #     {
+              #       path_pattern = {
+              #         values = ["/"]
+              #       }
+              #     }
+              #   ]
+              # }
+              t2-web-http-8080 = {
                 priority = 100
                 actions = [{
                   type              = "forward"
-                  target_group_name = "t1-oasys-web-http-8080"
+                  target_group_name = "t2-${application_name}-web-http-8080"
                 }]
                 conditions = [
                   {
                     host_header = {
-                      values = ["t1.oasys.${module.environment.domains.public.business_unit_environment}"]
+                      values = ["t2.${module.environment.domains.public.short_name}"]
                     }
                   },
                   {
                     path_pattern = {
                       values = ["/"]
                     }
-                }]
+                  }
+                ]
               }
             }
           }
@@ -154,14 +132,22 @@ locals {
 
     }
     baseline_route53_zones = {
-      "${module.environment.domains.public.business_unit_environment}" = { # "hmpps-test.modernisation-platform.service.justice.gov.uk"
+      # "${local.environment}.${module.environment.domains.public.short_name}" = {  # "test.oasys.service.justice.gov.uk"
+      # }
+      "t1.${module.environment.domains.public.short_name}" = {  # "t1.oasys.service.justice.gov.uk"
         records = [
-          { name = "t1.oasys.db", type = "A", ttl = "300", records = ["10.101.6.132"] }, # "t1.oasys.db.hmpps-test.modernisation-platform.service.justice.gov.uk" currently pointing to azure db
-          { name = "t2.oasys.db", type = "A", ttl = "300", records = ["10.101.36.132"] }, # "t2.oasys.db.hmpps-test.modernisation-platform.service.justice.gov.uk" currently pointing to azure db
+          { name = "db", type = "A", ttl = "300", records = ["10.101.6.132"] }, # "db.t1.oasys.service.justice.gov.uk" currently pointing to azure db T1ODL0007
         ]
         lb_alias_records = [
-          { name = "t1.oasys", type = "A", lbs_map_key = "t1-oasys-internal" }, # "t1.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk"
-          { name = "t2.oasys", type = "A", lbs_map_key = "t2-oasys-internal" }, # "t2.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk"
+          { name = "t1", type = "A", lbs_map_key = "private" }, # "t1.test.oasys.service.justice.gov.uk"
+        ]
+      }
+      "t2.${module.environment.domains.public.short_name}" = {  # "t2.oasys.service.justice.gov.uk"
+        records = [
+          { name = "db", type = "A", ttl = "300", records = ["10.101.36.132"] }, # "db.t1.test.oasys.service.justice.gov.uk" currently pointing to azure db T2ODL0009
+        ]
+        lb_alias_records = [
+          { name = "t2", type = "A", lbs_map_key = "private" }, # "t2.test.oasys.service.justice.gov.uk"
         ]
       }
     }

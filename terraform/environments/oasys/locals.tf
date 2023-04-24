@@ -102,13 +102,13 @@ locals {
     }
     tags = {
       component         = "web"
-      description       = "${local.environment} OASys web"
+      description       = "${local.environment} ${application_name} web"
       os-type           = "Linux"
       os-major-version  = 7
       os-version        = "RHEL 7.9"
       "Patch Group"     = "RHEL"
-      server-type       = "oasys-web"
-      description       = "OASys web"
+      server-type       = "${application_name}-web"
+      description       = "${application_name} web"
       monitored         = true
       oasys-environment = local.environment
       environment-name  = terraform.workspace
@@ -224,18 +224,18 @@ locals {
     lb_target_groups = local.lb_target_groups # This won't be correct for db, will correct later
   }
   database_tags = {
-    component            = "data"
-    oracle-sids          = "OASPROD BIPINFRA"
-    os-type              = "Linux"
-    os-major-version     = 8
-    os-version           = "RHEL 8.5"
-    licence-requirements = "Oracle Database"
-    "Patch Group"        = "RHEL"
-    server-type          = "oasys-db"
-    description          = "${local.environment} OASys database"
-    monitored            = true
-    oasys-environment    = local.environment
-    environment-name     = terraform.workspace # used in provisioning script to select group vars
+    component                            = "data"
+    oracle-sids                          = "OASPROD BIPINFRA"
+    os-type                              = "Linux"
+    os-major-version                     = 8
+    os-version                           = "RHEL 8.5"
+    licence-requirements                 = "Oracle Database"
+    "Patch Group"                        = "RHEL"
+    server-type                          = "${application_name}-db"
+    description                          = "${local.environment} ${application_name} database"
+    monitored                            = true
+    "${application_name}-environment"    = local.environment
+    environment-name                     = terraform.workspace # used in provisioning script to select group vars
   }
 
 
