@@ -127,7 +127,7 @@ resource "aws_cloudwatch_metric_alarm" "rds_read_latency" {
   )
 }
 
-resource "aws_cloudwatch_dashboard" "mlradash" {
+resource "aws_cloudwatch_dashboard" "mojfin" {
   dashboard_name = "${local.application_name}-${local.environment}-dashboard"
   depends_on = [
     aws_cloudwatch_metric_alarm.rds_cpu,
@@ -237,7 +237,7 @@ resource "aws_cloudwatch_dashboard" "mlradash" {
                 "view": "timeSeries",
                 "stacked": false,
                 "metrics": [
-                    [ "AWS/RDS", "DatabaseConnections", "DBInstanceIdentifier", "${aws_rds_instance.mojfin.db_name}" ]
+                    [ "AWS/RDS", "DatabaseConnections", "DBInstanceIdentifier", "${aws_db_instance.appdb1.db_name}" ]
                 ],
                 "region": "${local.region}"
             }
