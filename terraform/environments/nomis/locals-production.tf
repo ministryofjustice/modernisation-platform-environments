@@ -154,7 +154,7 @@ locals {
         idle_timeout             = 3600
         public_subnets           = module.environment.subnets["private"].ids
         security_groups = [
-          aws_security_group.public.id, # TODO: remove once weblogic servers refreshed
+          aws_security_group.public.id, # TODO: remove once weblogic servers refreshed
           "private-lb"
         ]
 
@@ -171,9 +171,11 @@ locals {
                   conditions = [{
                     host_header = {
                       values = [
-                        "prod-nomis-web-a.${module.environment.domains.public.business_unit_environment}",
                         "prod-nomis-web-a.production.nomis.az.justice.gov.uk",
+                        "prod-nomis-web-a.production.nomis.service.justice.gov.uk",
                         "c.production.nomis.az.justice.gov.uk",
+                        "c.production.nomis.service.justice.gov.uk",
+                        "c.nomis.az.justice.gov.uk",
                       ]
                     }
                   }]
@@ -185,15 +187,18 @@ locals {
     }
 
     baseline_route53_zones = {
-      "${module.environment.domains.public.business_unit_environment}" = {
-        lb_alias_records = [
-          { name = "prod-nomis-web-a.nomis", type = "A", lbs_map_key = "private" },
-        ]
+      "nomis.service.justice.gov.uk" = {
       }
       "production.nomis.az.justice.gov.uk" = {
         lb_alias_records = [
-          { name = "c", type = "A", lbs_map_key = "private" },
           { name = "prod-nomis-web-a", type = "A", lbs_map_key = "private" },
+          { name = "c", type = "A", lbs_map_key = "private" },
+        ]
+      }
+      "production.nomis.service.justice.gov.uk" = {
+        lb_alias_records = [
+          { name = "prod-nomis-web-a", type = "A", lbs_map_key = "private" },
+          { name = "c", type = "A", lbs_map_key = "private" },
         ]
       }
     }

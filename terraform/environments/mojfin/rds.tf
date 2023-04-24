@@ -2,13 +2,12 @@
 locals {
   cidr_ire_workspace ="10.200.96.0/19"
   cidr_six_degrees=   "10.225.60.0/24"
-  pOBIEEInboundCIDR=  "10.225.40.0/24"
-  pEnvManagementCIDR= "10.200.16.0/20"
+  obiee_inbound_cidr=  "10.225.40.0/24"
+  workspaces_cidr= "10.200.16.0/20"
   pVPCCidr=           "10.205.0.0/20"
-  pCPVPCCidr=         "172.20.0.0/20"
+  cp_vpc_cidr=         "172.20.0.0/20"
   transit_gw_to_mojfinprod=             "10.201.0.0/16"
-  pStorageSize = "2500"
-  pAppName= "mojfin"
+  storage_size = "2500"
   auto_minor_version_upgrade = false
   backup_retention_period= "35"
   character_set_name = "WE8MSWIN1252"
@@ -86,7 +85,7 @@ resource "aws_security_group" "laalz-secgroup" {
     from_port   = 1521
     to_port     = 1521
     protocol    = "tcp"
-    cidr_blocks = [local.pOBIEEInboundCIDR]
+    cidr_blocks = [local.obiee_inbound_cidr]
 
   }
    ingress {
@@ -94,7 +93,7 @@ resource "aws_security_group" "laalz-secgroup" {
     from_port   = 1521
     to_port     = 1521
     protocol    = "tcp"
-    cidr_blocks = [local.pEnvManagementCIDR]
+    cidr_blocks = [local.workspaces_cidr]
 
   }
    ingress {
@@ -110,7 +109,7 @@ resource "aws_security_group" "laalz-secgroup" {
     from_port   = 1521
     to_port     = 1521
     protocol    = "tcp"
-    cidr_blocks = [local.pCPVPCCidr]
+    cidr_blocks = [local.cp_vpc_cidr]
 
   }
   ingress {
@@ -197,9 +196,9 @@ resource "aws_secretsmanager_secret_version" "rds_password_secret_version" {
 
 
 resource "aws_db_instance" "appdb1" {
-  allocated_storage           = local.pStorageSize
-  db_name                     = upper(local.pAppName)
-  identifier                  = local.pAppName
+  allocated_storage           = local.storage_size
+  db_name                     = upper(local.application_name)
+  identifier                  = local.application_name
   engine                      = local.engine
   engine_version              = local.engine_version
   enabled_cloudwatch_logs_exports = ["alert", "audit"]
@@ -248,5 +247,4 @@ resource "aws_route53_record" "mojfin-rds" {
   type     = "CNAME"
   ttl      = 60
   records = [aws_db_instance.appdb1.address]
- 
 }
