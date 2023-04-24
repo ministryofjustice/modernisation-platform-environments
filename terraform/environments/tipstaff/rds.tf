@@ -43,7 +43,7 @@ resource "aws_security_group" "postgresql_db_sc" {
     to_port     = 5432
     protocol    = "tcp"
     description = "Allows Github Actions to access RDS"
-    cidr_blocks = [local.pipeline_ip]
+    cidr_blocks = ["${data.external.current_ip.result.ip}/32"]
   }
   egress {
     description = "allow all outbound traffic"
@@ -61,7 +61,7 @@ data "external" "pipeline_ip" {
 }
 
 output "pipeline_ip" {
-  value = join("", data.external.pipeline_ip.result.ip, "/32")
+  value = data.external.pipeline_ip.result.ip
 }
 
 resource "null_resource" "setup_db" {
