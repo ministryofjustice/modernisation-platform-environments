@@ -280,7 +280,7 @@ EOF
 resource "aws_sns_topic" "mojfin_alerting_topic" {
   name = local.sns_topic_name
   tags = merge(
-    var.tags,
+    local.tags,
     {
       Name = local.sns_topic_name
     }
