@@ -244,8 +244,10 @@ resource "aws_db_instance" "appdb1" {
 resource "aws_route53_record" "mojfin-rds" {
   provider = aws.core-vpc
   zone_id  = data.aws_route53_zone.external.zone_id
-  name     = "rds.${local.application_name}.${data.aws_route53_zone.inner.name}"
+  name     = "rds.${local.application_name}.${data.aws_route53_zone.external.name}"
   type     = "CNAME"
   ttl      = 60
-  records  = [format("arn:aws:rds:eu-west-2:db:", local.environment_management.account_ids,local.application_name)]
+  records = [aws_db_instance.appdb1.address]
+ # records  = [format("arn:aws:rds:eu-west-2:db:", local.environment_management.account_ids,local.application_name)]
+
 }
