@@ -121,3 +121,23 @@ data "aws_iam_policy_document" "bucket_policy" {
     ]
   }
 }
+
+data "aws_iam_policy_document" "s3-access-policy" {
+  version = "2012-10-17"
+  statement {
+    sid    = ""
+    effect = "Allow"
+    actions = [
+      "sts:AssumeRole",
+    ]
+    principals {
+      type = "Service"
+      identifiers = [
+        "rds.amazonaws.com",
+        "ec2.amazonaws.com",
+      ]
+    }
+  }
+}
+
+data "aws_elb_service_account" "default" {}
