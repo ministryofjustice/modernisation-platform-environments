@@ -44,7 +44,7 @@ resource "aws_cloudwatch_metric_alarm" "rds_cpu" {
   threshold          = local.cpu_threshold
   treat_missing_data = "breaching"
   dimensions = {
-    DBInstanceIdentifier = aws_db_instance.appdb1.db_name
+    DBInstanceIdentifier = aws_db_instance.appdb1.identifier
   }
   comparison_operator = "GreaterThanOrEqualToThreshold"
   tags = merge(
@@ -68,7 +68,7 @@ resource "aws_cloudwatch_metric_alarm" "rds_memory" {
   threshold          = local.memory_threshold
   treat_missing_data = "breaching"
   dimensions = {
-    DBInstanceIdentifier = aws_db_instance.appdb1.db_name
+    DBInstanceIdentifier = aws_db_instance.appdb1.identifier
   }
   comparison_operator = "LessThanOrEqualToThreshold"
   tags = merge(
@@ -92,7 +92,7 @@ resource "aws_cloudwatch_metric_alarm" "rds_diskspace" {
   threshold          = local.disk_free_space_threshold
   treat_missing_data = "breaching"
   dimensions = {
-    DBInstanceIdentifier = aws_db_instance.appdb1.db_name
+    DBInstanceIdentifier = aws_db_instance.appdb1.identifier
   }
   comparison_operator = "LessThanOrEqualToThreshold"
   tags = merge(
@@ -116,7 +116,7 @@ resource "aws_cloudwatch_metric_alarm" "rds_read_latency" {
   threshold          = local.read_latency_threshold
   treat_missing_data = "breaching"
   dimensions = {
-    DBInstanceIdentifier = aws_db_instance.appdb1.db_name
+    DBInstanceIdentifier = aws_db_instance.appdb1.identifier
   }
   comparison_operator = "GreaterThanOrEqualToThreshold"
   tags = merge(
@@ -237,7 +237,7 @@ resource "aws_cloudwatch_dashboard" "mojfin" {
                 "view": "timeSeries",
                 "stacked": false,
                 "metrics": [
-                    [ "AWS/RDS", "DatabaseConnections", "DBInstanceIdentifier", "${aws_db_instance.appdb1.db_name}" ]
+                    [ "AWS/RDS", "DatabaseConnections", "DBInstanceIdentifier", "${aws_db_instance.appdb1.identifier}" ]
                 ],
                 "region": "${local.region}"
             }
