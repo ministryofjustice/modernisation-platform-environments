@@ -4,7 +4,6 @@ locals {
   cidr_six_degrees=   "10.225.60.0/24"
   obiee_inbound_cidr=  "10.225.40.0/24"
   workspaces_cidr= "10.200.16.0/20"
-  pVPCCidr=           "10.205.0.0/20"
   cp_vpc_cidr=         "172.20.0.0/20"
   transit_gw_to_mojfinprod=             "10.201.0.0/16"
   storage_size = "2500"
@@ -20,7 +19,6 @@ locals {
   maintenance_window = "Mon:01:15-Mon:06:00"
   storage_type = "gp2"
   rds_snapshot_name= "laws3169-mojfin-migration-v1"
-  arn= "arn:aws:rds:eu-west-2::db:"
 }
 
 
@@ -72,14 +70,7 @@ resource "aws_security_group" "laalz-secgroup" {
     cidr_blocks = [local.cidr_ire_workspace ]
 
   }
-  ingress {
-    description = "6 Degrees VPN Inbound"
-    from_port   = 1521
-    to_port     = 1521
-    protocol    = "tcp"
-    cidr_blocks = [local.cidr_six_degrees]
-
-  }
+  
  ingress {
     description ="6 Degrees OBIEE Inbound"
     from_port   = 1521
@@ -96,14 +87,7 @@ resource "aws_security_group" "laalz-secgroup" {
     cidr_blocks = [local.workspaces_cidr]
 
   }
-   ingress {
-    description ="VPC Internal Traffic inbound"
-    from_port   = 1521
-    to_port     = 1521
-    protocol    = "tcp"
-    cidr_blocks = [local.pVPCCidr]
-
-  }
+ 
   ingress {
     description ="Cloud Platform VPC Internal Traffic inbound"
     from_port   = 1521
@@ -121,21 +105,7 @@ resource "aws_security_group" "laalz-secgroup" {
 
   }
 
-
-
-  tags = {
-    Name = "${local.application_name}-${local.environment}-laalz-secgroup"
-  }
-}
-
-
-
-resource "aws_security_group" "vpc-secgroup" {
-  name        = "vpc-secgroup"
-  description = "RDS Access with the shared vpc"
-  vpc_id      = data.aws_vpc.shared.id
-
-  ingress {
+   ingress {
     description = "Sql Net on 1521"
     from_port   = 1521
     to_port     = 1521
@@ -150,18 +120,14 @@ resource "aws_security_group" "vpc-secgroup" {
     cidr_blocks = [local.cidr_six_degrees]
   }
 
-  egress {
-    description = "Sql Net on 1521"
-    from_port   = 1521
-    to_port     = 1521
-    protocol    = "tcp"
-    cidr_blocks = [data.aws_vpc.shared.cidr_block]
-  }
+
 
   tags = {
-    Name = "${local.application_name}-${local.environment}-vpc-secgroup"
+    Name = "${local.application_name}-${local.environment}-laalz-secgroup"
   }
 }
+
+
 
 resource "random_password" "rds_password" {
   length  = 16
