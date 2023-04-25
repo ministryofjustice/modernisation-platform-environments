@@ -107,10 +107,11 @@ data "aws_iam_policy_document" "bucket_policy" {
 module "s3_athena_query_results_bucket" { #tfsec:ignore:aws-s3-enable-versioning
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.3.0"
 
-  bucket_prefix      = "athena-query-results-${data.aws_caller_identity.current.account_id}"
-  versioning_enabled = true
+  bucket_prefix       = "athena-query-results-${data.aws_caller_identity.current.account_id}"
+  versioning_enabled  = false
   # Refer to the below section "Replication" before enabling replication
   replication_enabled = false
+  force_destroy       = true
 
   providers = {
     # Here we use the default provider Region for replication. Destination buckets can be within the same Region as the
