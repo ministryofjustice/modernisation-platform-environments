@@ -218,7 +218,7 @@ resource "aws_db_instance" "appdb1" {
   parameter_group_name        = "rds-oracle"
   db_subnet_group_name        = "${local.application_name}-${local.environment}-subnetgrp"
   license_model               = "license-included"
-  deletion_protection         = true
+  deletion_protection         = false
   copy_tags_to_snapshot       = true
   storage_encrypted           = true
   apply_immediately           = true
