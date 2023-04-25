@@ -17,6 +17,21 @@ resource "aws_kms_grant" "hmpps_ebs_kms_key_for_autoscaling" {
   ]
 }
 
+resource "aws_kms_grant" "ssm-start-stop-shared-cmk-grant" {
+  count             = local.environment == "test" ? 1 : 0
+  name              = "image-builder-shared-cmk-grant"
+  key_id            = module.environment.kms_keys["ebs"].arn
+  grantee_principal = aws_iam_role.ssm_ec2_start_stop.arn
+  operations = [
+    "Encrypt",
+    "Decrypt",
+    "ReEncryptFrom",
+    "GenerateDataKey",
+    "GenerateDataKeyWithoutPlaintext",
+    "DescribeKey",
+    "CreateGrant"
+  ]
+}
 
 #------------------------------------------------------------------------------
 # Session Manager Logging and Settings
