@@ -219,10 +219,6 @@ locals {
       "nomis.service.justice.gov.uk" = {
       }
       "production.nomis.az.justice.gov.uk" = {
-        records = [
-          { name = "pnomis-a", type = "A", ttl = "300", records = ["10.40.3.132"] },
-          { name = "pnomis-b", type = "A", ttl = "300", records = ["10.40.67.132"] },
-        ]
         lb_alias_records = [
           { name = "prod-nomis-web-a", type = "A", lbs_map_key = "private" },
           { name = "prod-nomis-web-b", type = "A", lbs_map_key = "private" },
@@ -230,6 +226,11 @@ locals {
         ]
       }
       "production.nomis.service.justice.gov.uk" = {
+        records = [
+          { name = "pnomis", type = "A", ttl = "300", records = ["10.40.3.132"] },
+          { name = "pnomis-a", type = "A", ttl = "300", records = ["10.40.3.132"] },
+          { name = "pnomis-b", type = "A", ttl = "300", records = ["10.40.67.132"] },
+        ]
         lb_alias_records = [
           { name = "prod-nomis-web-a", type = "A", lbs_map_key = "private" },
           { name = "prod-nomis-web-b", type = "A", lbs_map_key = "private" },

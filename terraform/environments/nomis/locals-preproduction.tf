@@ -121,10 +121,6 @@ locals {
 
     baseline_route53_zones = {
       "preproduction.nomis.az.justice.gov.uk" = {
-        records = [
-          { name = "ppnomis-a", type = "A", ttl = "300", records = ["10.40.37.132"] },
-          { name = "ppnomis-b", type = "A", ttl = "300", records = ["10.40.37.132"] },
-        ]
         lb_alias_records = [
           { name = "preprod-nomis-web-a", type = "A", lbs_map_key = "private" },
           { name = "preprod-nomis-web-b", type = "A", lbs_map_key = "private" },
@@ -132,6 +128,11 @@ locals {
         ]
       }
       "preproduction.nomis.service.justice.gov.uk" = {
+        records = [
+          { name = "ppnomis", type = "A", ttl = "300", records = ["10.40.37.132"] },
+          { name = "ppnomis-a", type = "A", ttl = "300", records = ["10.40.37.132"] },
+          { name = "ppnomis-b", type = "A", ttl = "300", records = ["10.40.37.132"] },
+        ]
         lb_alias_records = [
           { name = "preprod-nomis-web-a", type = "A", lbs_map_key = "private" },
           { name = "preprod-nomis-web-b", type = "A", lbs_map_key = "private" },
