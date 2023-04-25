@@ -134,6 +134,26 @@ jobs:
           echo "terraform apply -refresh-only -auto-approve ${tf_args}"
           terraform apply -refresh-only -auto-approve ${tf_args} | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh
 
+      - name: Terraform State Update
+        working-directory: "terraform/environments/${{ inputs.application }}"
+        run: |
+          if [[ -e scripts/manual.sh ]]; then
+            scripts/manual.sh
+          fi
+          if [[ -e scripts/manual-${{ inputs.environment }}.sh ]]; then
+            scripts/manual-${{ inputs.environment }}.sh
+          fi
+
+      - name: Terraform State Move
+        working-directory: "terraform/environments/${{ inputs.application }}"
+        run: |
+          if [[ -e scripts/terraform-state-mv.conf ]]; then
+            scripts/terraform-state-mv.sh scripts/terraform-state-mv.conf
+          fi
+          if [[ -e scripts/terraform-state-mv.${{ inputs.environment }}.conf ]]; then
+            scripts/terraform-state-mv.sh scripts/terraform-state-mv.${{ inputs.environment }}.conf
+          fi
+
       - name: Terraform Plan
         id: plan
         env:

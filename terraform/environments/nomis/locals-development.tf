@@ -6,15 +6,6 @@ locals {
       patch_approval_delay_days = 3
       patch_day                 = "TUE"
     }
-
-    databases = {
-    }
-    weblogics          = {}
-    ec2_test_instances = {}
-    ec2_test_autoscaling_groups = {
-    }
-    ec2_jumpservers = {
-    }
   }
 
   # baseline config

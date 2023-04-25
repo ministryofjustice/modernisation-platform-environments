@@ -159,18 +159,3 @@ resource "aws_iam_role_policy_attachment" "launch-template-reader-policy-attach"
 
 }
 
-# this can be zapped at some point as the correct definition is in ec2-common
-resource "aws_kms_grant" "image-builder-shared-cmk-grant" {
-  name              = "image-builder-shared-cmk-grant"
-  key_id            = module.environment.kms_keys["ebs"].arn
-  grantee_principal = "arn:aws:iam::${local.account_id}:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling"
-  operations = [
-    "Encrypt",
-    "Decrypt",
-    "ReEncryptFrom",
-    "GenerateDataKey",
-    "GenerateDataKeyWithoutPlaintext",
-    "DescribeKey",
-    "CreateGrant"
-  ]
-}

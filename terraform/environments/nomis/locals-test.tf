@@ -1,27 +1,5 @@
 # nomis-test environment settings
 locals {
-  nomis_test = {
-    # vars common across ec2 instances
-    ec2_common = {
-      patch_approval_delay_days = 3
-      patch_day                 = "TUE"
-    }
-
-    # Add database instances here. They will be created using ec2-database.tf
-
-    # Add weblogic instances here
-    weblogic_autoscaling_groups = {
-    }
-
-    ec2_test_instances = {
-      # Remove data.aws_kms_key from cmk.tf once the NDH servers are removed
-    }
-
-    ec2_test_autoscaling_groups = {}
-
-    ec2_jumpservers = {
-    }
-  }
 
   # baseline config
   test_config = {

@@ -1,21 +1,5 @@
 # nomis-preproduction environment settings
 locals {
-  nomis_preproduction = {
-    # vars common across ec2 instances
-    ec2_common = {
-      patch_approval_delay_days = 3
-      patch_day                 = "TUE"
-    }
-
-    databases = {
-      # Naming
-      # *-nomis-db-1: NOMIS, NDH, TRDATA
-      # *-nomis-db-2: MIS, AUDIT
-      # *-nomis-db-3: HA
-    }
-    weblogics       = {}
-    ec2_jumpservers = {}
-  }
 
   # baseline config
   preproduction_config = {
