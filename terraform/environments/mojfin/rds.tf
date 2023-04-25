@@ -1,5 +1,3 @@
-
-
 resource "aws_db_subnet_group" "mojfin" {
   name       = "${local.application_name}-${local.environment}-subnetgrp"
   subnet_ids = [data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id]
@@ -18,7 +16,7 @@ resource "aws_db_parameter_group" "mojfin" {
   family = "oracle-se2-19"
   description = "${local.application_name}-${local.environment}-parametergroup"
 
- 
+
   parameter {
     name  = "sqlnetora.sqlnet.allowed_logon_version_server"
     value = "8"
@@ -44,7 +42,7 @@ resource "aws_security_group" "mojfin" {
     cidr_blocks = [local.cidr_ire_workspace ]
 
   }
-  
+
  ingress {
     description ="6 Degrees OBIEE Inbound"
     from_port   = 1521
@@ -61,7 +59,7 @@ resource "aws_security_group" "mojfin" {
     cidr_blocks = [local.workspaces_cidr]
 
   }
- 
+
   ingress {
     description ="Cloud Platform VPC Internal Traffic inbound"
     from_port   = 1521
@@ -111,7 +109,7 @@ resource "random_password" "rds_password" {
 
 
 resource "aws_secretsmanager_secret" "rds_password_secret" {
-  name        = "${local.application_name}/app/db-master-password" 
+  name        = "${local.application_name}/app/db-master-password"
   description = "This secret has a dynamically generated password."
   tags = merge(
     local.tags,

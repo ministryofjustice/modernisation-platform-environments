@@ -1,26 +1,3 @@
-locals {
-  # General
-  region = "eu-west-2"
-  # CloudWatch Alarms
-  cpu_threshold = "90"
-  cpu_alert_period = "60"
-  cpu_evaluation_period = "30"
-  memory_threshold = "1000000000"
-  memory_alert_period = "60"
-  memory_evaluation_period = "5"
-  disk_free_space_threshold = "50000000000"
-  disk_free_space_alert_period = "60"
-  disk_free_space_evaluation_period = "1"
-  read_latency_threshold = "0.5"
-  read_latency_alert_period = "60"
-  read_latency_evaluation_period = "5"
-
-  #PagerDuty Integration
-  sns_topic_name = "${local.application_name}-${local.environment}-alerting-topic"
-  pagerduty_integration_keys = jsondecode(data.aws_secretsmanager_secret_version.pagerduty_integration_keys.secret_string)
-  pagerduty_integration_key_name = "laa_mojfin_prod_alarms"
-}
-
 data "aws_secretsmanager_secret" "pagerduty_integration_keys" {
   provider = aws.modernisation-platform
   name     = "pagerduty_integration_keys"
