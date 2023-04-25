@@ -10,7 +10,7 @@ module "ecs" {
 # Create s3 bucket for deployment state
 module "s3_bucket_app_deployment" {
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=1e0cd0a1c645921943a66a1fcb6641f6c1d12f97"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=e89e2e7e9a6dba9131d38c86341341ae5ed8b3e3"
 
   providers = {
     aws.bucket-replication = aws
