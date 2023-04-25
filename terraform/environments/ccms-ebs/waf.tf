@@ -55,4 +55,10 @@ resource "aws_wafv2_web_acl" "ebs_web_acl" {
   tags = merge(local.tags,
     { Name = lower(format("lb-%s-%s-ebsapp-web-acl", local.application_name, local.environment)) }
   )
+
+  visibility_config {
+    cloudwatch_metrics_enabled = true
+    metric_name                = "ebs_waf_metrics"
+    sampled_requests_enabled   = true
+  }
 }
