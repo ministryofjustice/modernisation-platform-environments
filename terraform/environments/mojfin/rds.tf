@@ -1,28 +1,6 @@
 
-locals {
-  cidr_ire_workspace ="10.200.96.0/19"
-  cidr_six_degrees=   "10.225.60.0/24"
-  obiee_inbound_cidr=  "10.225.40.0/24"
-  workspaces_cidr= "10.200.16.0/20"
-  cp_vpc_cidr=         "172.20.0.0/20"
-  transit_gw_to_mojfinprod=             "10.201.0.0/16"
-  storage_size = "2500"
-  auto_minor_version_upgrade = false
-  backup_retention_period= "35"
-  character_set_name = "WE8MSWIN1252"
-  instance_class= "db.m5.large"
-  engine= "oracle-se2"
-  engine_version = "19.0.0.0.ru-2020-04.rur-2020-04.r1"
-  username= "sysdba"
-  max_allocated_storage=  "3500"
-  backup_window = "22:00-01:00"
-  maintenance_window = "Mon:01:15-Mon:06:00"
-  storage_type = "gp2"
-  rds_snapshot_name= "laws3169-mojfin-migration-v1"
-}
 
-
-resource "aws_db_subnet_group" "appdbsubnetgroup" {
+resource "aws_db_subnet_group" "mojfin" {
   name       = "${local.application_name}-${local.environment}-subnetgrp"
   subnet_ids = [data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id]
 
@@ -35,30 +13,26 @@ resource "aws_db_subnet_group" "appdbsubnetgroup" {
 
 }
 
-resource "aws_db_parameter_group" "default" {
-  name   = "rds-oracle"
+resource "aws_db_parameter_group" "mojfin" {
+  name   = "${local.application_name}-${local.environment}-parametergroup"
   family = "oracle-se2-19"
   description = "${local.application_name}-${local.environment}-parametergroup"
 
-  parameter {
-    name  = "remote_dependencies_mode"
-    value = "SIGNATURE"
-  }
-
+ 
   parameter {
     name  = "sqlnetora.sqlnet.allowed_logon_version_server"
-    value = "10"
+    value = "8"
   }
 
   tags = merge(
     local.tags,
-   { "Name" = "mojfinsubnetgrp"},
+   { "Name" = "${local.application_name}-${local.environment}-parametergroup"},
     {"Keep" = "true"}
  )
 }
 
-resource "aws_security_group" "laalz-secgroup" {
-  name        = "laalz-secgroup"
+resource "aws_security_group" "mojfin" {
+  name        =  "${local.application_name}-${local.environment}-secgroup"
   description = "RDS access with the LAA Landing Zone"
   vpc_id      = data.aws_vpc.shared.id
 
@@ -122,9 +96,10 @@ resource "aws_security_group" "laalz-secgroup" {
 
 
 
-  tags = {
-    Name = "${local.application_name}-${local.environment}-laalz-secgroup"
-  }
+  tags = merge(
+    local.tags,
+    {"Name" = "${local.application_name}-${local.environment}-mojfin"}
+  )
 }
 
 
@@ -136,11 +111,11 @@ resource "random_password" "rds_password" {
 
 
 resource "aws_secretsmanager_secret" "rds_password_secret" {
-  name        = "${local.application_name}/app/db-master-password-tmp2" # TODO This name needs changing back to without -tmp2 to be compatible with hardcoded OAS installation
+  name        = "${local.application_name}/app/db-master-password" 
   description = "This secret has a dynamically generated password."
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_name}/app/db-master-password-tmp2" }, # TODO This name needs changing back to without -tmp2 to be compatible with hardcoded OAS installation
+    { "Name" = "${local.application_name}/app/db-master-password" },
   )
 }
 
@@ -178,17 +153,18 @@ resource "aws_db_instance" "appdb1" {
   max_allocated_storage       = local.max_allocated_storage
   username                    = local.username
   password                    = random_password.rds_password.result
-  vpc_security_group_ids      = [aws_security_group.laalz-secgroup.id]
+  vpc_security_group_ids      = [aws_security_group.mojfin.id]
   skip_final_snapshot         = false
   final_snapshot_identifier   = "${local.application_name}-${formatdate("DDMMMYYYYhhmm", timestamp())}-finalsnapshot"
-  parameter_group_name        = "rds-oracle"
-  db_subnet_group_name        = "${local.application_name}-${local.environment}-subnetgrp"
+  parameter_group_name        =  aws_db_parameter_group.mojfin.name
+  db_subnet_group_name        = aws_db_subnet_group.mojfin.name
+  maintenance_window          = local.maintenance_window
   license_model               = "license-included"
   deletion_protection         = true
   copy_tags_to_snapshot       = true
   storage_encrypted           = true
   apply_immediately           = true
-  snapshot_identifier         = format("arn:aws:rds:eu-west-2:%s:snapshot:%s", data.aws_caller_identity.current.account_id,local.rds_snapshot_name)
+  #snapshot_identifier         = format("arn:aws:rds:eu-west-2:%s:snapshot:%s", data.aws_caller_identity.current.account_id,local.rds_snapshot_name)
   kms_key_id                  = data.aws_kms_key.rds_shared.arn
 
 
