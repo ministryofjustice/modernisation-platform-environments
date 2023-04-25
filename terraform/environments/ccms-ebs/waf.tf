@@ -33,7 +33,7 @@ resource "aws_wafv2_web_acl" "ebs_web_acl" {
 
   visibility_config {
     cloudwatch_metrics_enabled = true
-    metric_name                 = "ebs_waf_metrics"
+    metric_name                = "ebs_waf_metrics"
     sampled_requests_enabled   = true
   }
 
