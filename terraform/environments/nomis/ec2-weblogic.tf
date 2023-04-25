@@ -158,8 +158,7 @@ locals {
   }
   ec2_weblogic_a = merge(local.ec2_weblogic_default, {
     config = merge(local.ec2_weblogic_default.config, {
-      availability_zone         = "${local.region}a"
-      instance_profile_policies = local.ec2_common_managed_policies
+      availability_zone = "${local.region}a"
     })
     user_data_cloud_init = merge(local.ec2_weblogic_default.user_data_cloud_init, {
       args = merge(local.ec2_weblogic_default.user_data_cloud_init.args, {

@@ -39,9 +39,8 @@ locals {
 
       dev-redhat-rhel79 = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name                  = "RHEL-7.9_HVM-*"
-          ami_owner                 = "309956199498"
-          instance_profile_policies = local.ec2_common_managed_policies
+          ami_name  = "RHEL-7.9_HVM-*"
+          ami_owner = "309956199498"
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           vpc_security_group_ids = ["private-web"]
@@ -62,8 +61,7 @@ locals {
 
       dev-base-rhel79 = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name                  = "base_rhel_7_9_*"
-          instance_profile_policies = local.ec2_common_managed_policies
+          ami_name = "base_rhel_7_9_*"
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           vpc_security_group_ids = ["private-web"]
@@ -86,8 +84,7 @@ locals {
 
       dev-base-rhel610 = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name                  = "base_rhel_6_10*"
-          instance_profile_policies = local.ec2_common_managed_policies
+          ami_name = "base_rhel_6_10*"
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default_rhel6, {
           vpc_security_group_ids = ["private-web"]
@@ -112,7 +109,6 @@ locals {
         # ami has unwanted ephemeral device, don't copy all the ebs_volumess
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name                      = "nomis_windows_server_2022_jumpserver_release_*"
-          instance_profile_policies     = local.ec2_common_managed_policies
           ebs_volumes_copy_all_from_ami = false
           user_data_raw                 = base64encode(file("./templates/jumpserver-user-data.yaml"))
         })
