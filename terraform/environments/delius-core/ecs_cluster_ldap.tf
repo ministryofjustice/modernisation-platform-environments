@@ -7,7 +7,7 @@ module "ecs" {
   tags = local.tags
 }
 
-Create s3 bucket for deployment state
+# Create s3 bucket for deployment state
 module "s3_bucket_app_deployment" {
 
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=1e0cd0a1c645921943a66a1fcb6641f6c1d12f97"
