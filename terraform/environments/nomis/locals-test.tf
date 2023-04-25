@@ -127,6 +127,30 @@ locals {
         cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["nomis_pagerduty"].database
       })
 
+      t1-nomis-db-2-a = merge(local.database_zone_a, {
+        tags = merge(local.database_zone_a.tags, {
+          nomis-environment   = "t1"
+          description         = "T1 NOMIS Audit database for testing"
+          oracle-sids         = "T1CNMAUD"
+          instance-scheduling = "skip-scheduling"
+        })
+        config = merge(local.database_zone_a.config, {
+          instance_profile_policies = flatten([
+            module.baseline_presets.ec2_instance.config.db.instance_profile_policies,
+            "EC2S3BucketWriteAndDeleteAccessPolicy"
+          ])
+        })
+        ebs_volumes = merge(local.database_zone_a.ebs_volumes, {
+          "/dev/sdb" = { label = "app", size = 100 }
+          "/dev/sdc" = { label = "app", size = 100 }
+        })
+        ebs_volume_config = merge(local.database_zone_a.ebs_volume_config, {
+          data  = { total_size = 200 }
+          flash = { total_size = 2 }
+        })
+        # cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["nomis_pagerduty"].database
+      })
+
       t3-nomis-db-1 = merge(local.database_zone_a, {
         tags = merge(local.database_zone_a.tags, {
           nomis-environment   = "t3"
