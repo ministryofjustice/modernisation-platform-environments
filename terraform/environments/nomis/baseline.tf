@@ -15,6 +15,11 @@ module "baseline" {
     lookup(local.baseline_environment_config, "baseline_acm_certificates", {})
   )
 
+  bastion_linux = merge(
+    local.baseline_bastion_linux,
+    lookup(local.baseline_environment_config, "baseline_bastion_linux", {})
+  )
+
   cloudwatch_log_groups = merge(
     module.baseline_presets.cloudwatch_log_groups,
     local.baseline_cloudwatch_log_groups,

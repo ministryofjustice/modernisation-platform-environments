@@ -66,57 +66,39 @@ locals {
     }
 
     ssh_ingress = {
-      description = "Allow ssh ingress"
-      from_port   = "22"
-      to_port     = "22"
-      protocol    = "TCP"
-      cidr_blocks = local.security_group_cidrs.ssh
-      security_groups = [
-        module.bastion_linux.bastion_security_group
-      ]
-    }
-
-    rdp_ingress = {
-      description = "Allow rdp ingress"
-      from_port   = "3389"
-      to_port     = "3389"
-      protocol    = "TCP"
-      security_groups = [
-        module.bastion_linux.bastion_security_group
-      ]
+      description     = "Allow ssh ingress"
+      from_port       = "22"
+      to_port         = "22"
+      protocol        = "TCP"
+      cidr_blocks     = local.security_group_cidrs.ssh
+      security_groups = []
     }
 
     prometheus_node_exporter_ingress = {
-      description = "Allow prometheus node exporter ingress"
-      from_port   = "9100"
-      to_port     = "9100"
-      protocol    = "TCP"
-      cidr_blocks = [module.ip_addresses.moj_cidr.aws_cloud_platform_vpc]
-      security_groups = [
-        module.bastion_linux.bastion_security_group
-      ]
+      description     = "Allow prometheus node exporter ingress"
+      from_port       = "9100"
+      to_port         = "9100"
+      protocol        = "TCP"
+      cidr_blocks     = [module.ip_addresses.moj_cidr.aws_cloud_platform_vpc]
+      security_groups = []
     }
 
     prometheus_script_exporter_ingress = {
-      description = "Allow prometheus script exporter ingress"
-      from_port   = "9172"
-      to_port     = "9172"
-      protocol    = "TCP"
-      cidr_blocks = [module.ip_addresses.moj_cidr.aws_cloud_platform_vpc]
-      security_groups = [
-        module.bastion_linux.bastion_security_group
-      ]
+      description     = "Allow prometheus script exporter ingress"
+      from_port       = "9172"
+      to_port         = "9172"
+      protocol        = "TCP"
+      cidr_blocks     = [module.ip_addresses.moj_cidr.aws_cloud_platform_vpc]
+      security_groups = []
     }
 
     prometheus_wmi_exporter_ingress = {
-      description = "Allow prometheus wmi exporter ingress"
-      from_port   = "9182"
-      to_port     = "9182"
-      protocol    = "TCP"
-      cidr_blocks = [module.ip_addresses.moj_cidr.aws_cloud_platform_vpc]
-      security_groups = [
-        module.bastion_linux.bastion_security_group
-      ]
+      description     = "Allow prometheus wmi exporter ingress"
+      from_port       = "9182"
+      to_port         = "9182"
+      protocol        = "TCP"
+      cidr_blocks     = [module.ip_addresses.moj_cidr.aws_cloud_platform_vpc]
+      security_groups = []
     }
 
     all_egress = {
@@ -132,7 +114,6 @@ locals {
   security_group_jumpserver = {
     ingress = [
       local.security_group_common.self_ingress,
-      local.security_group_common.rdp_ingress,
       local.security_group_common.prometheus_node_exporter_ingress,
       local.security_group_common.prometheus_wmi_exporter_ingress,
     ]
@@ -153,7 +134,6 @@ locals {
         protocol    = "tcp"
         security_groups = [
           aws_security_group.jumpserver.id,
-          module.bastion_linux.bastion_security_group
         ]
         cidr_blocks = local.security_group_cidrs.https
       },
@@ -164,7 +144,6 @@ locals {
         protocol    = "tcp"
         security_groups = [
           aws_security_group.jumpserver.id,
-          module.bastion_linux.bastion_security_group
         ]
         cidr_blocks = local.security_group_cidrs.http7xxx
       },
@@ -175,7 +154,6 @@ locals {
         protocol    = "tcp"
         security_groups = [
           aws_security_group.jumpserver.id,
-          module.bastion_linux.bastion_security_group
 
         ]
         cidr_blocks = local.security_group_cidrs.http7xxx
@@ -200,7 +178,6 @@ locals {
         security_groups = [
           aws_security_group.jumpserver.id,
           aws_security_group.public.id,
-          module.bastion_linux.bastion_security_group
         ]
         cidr_blocks = local.security_group_cidrs.http7xxx
       },
@@ -212,7 +189,6 @@ locals {
         security_groups = [
           aws_security_group.jumpserver.id,
           aws_security_group.public.id,
-          module.bastion_linux.bastion_security_group
         ]
         cidr_blocks = local.security_group_cidrs.http7xxx
       },
@@ -239,7 +215,6 @@ locals {
         security_groups = [
           aws_security_group.jumpserver.id,
           aws_security_group.private.id,
-          module.bastion_linux.bastion_security_group
         ]
       },
 
@@ -252,7 +227,6 @@ locals {
         security_groups = [
           aws_security_group.jumpserver.id,
           aws_security_group.private.id,
-          module.bastion_linux.bastion_security_group
         ]
       },
     ]
