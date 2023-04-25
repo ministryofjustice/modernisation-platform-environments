@@ -1,9 +1,10 @@
 # WAF FOR EBS APP
 
 resource "aws_wafv2_ip_set" "ebs_waf_ip_set" {
-  name        = "ebs_waf_ip_set"
-  scope       = "REGIONAL"
-  description = "List of trusted IP Addresses allowing access via WAF"
+  name                = "ebs_waf_ip_set"
+  scope               = "REGIONAL"
+  ip_address_version  = "IPV4"
+  description         = "List of trusted IP Addresses allowing access via WAF"
 
   addresses = [
     "51.149.249.32/27",
@@ -30,7 +31,13 @@ resource "aws_wafv2_web_acl" "ebs_web_acl" {
     block {}
   }
 
-  rules {
+  visibility_config {
+    cloudwatch_metrics_enabled = true
+    metric_name                 = "ebs_waf_metrics"
+    sampled_requests_enabled   = true
+  }
+
+  rule {
     name = "ebs-trusted-rule"
 
     priority          = 1
