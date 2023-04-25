@@ -15,8 +15,9 @@ module "s3_bucket_app_deployment" {
   providers = {
     aws.bucket-replication = aws
   }
-  bucket_name        = "${local.application_name}-${local.environment}-ldap-deployment"
+  bucket_name        = "${local.application_name}-${local.environment}-openldap-deployment"
   versioning_enabled = true
+  use_private_acl    = false
 
   lifecycle_rule = [
     {
