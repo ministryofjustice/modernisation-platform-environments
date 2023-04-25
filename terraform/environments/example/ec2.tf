@@ -1,3 +1,7 @@
+###########################################################################################
+#------------------------Comment out file if not required----------------------------------
+###########################################################################################
+
 locals {
   public_key_data = jsondecode(file("./bastion_linux.json"))
 }
@@ -10,7 +14,6 @@ module "bastion_linux" {
     aws.share-host   = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
     aws.share-tenant = aws          # The default provider (unaliased, `aws`) is the tenant
   }
-
   # s3 - used for logs and user ssh public keys
   bucket_name          = "bastion-example"
   bucket_versioning    = true
@@ -24,7 +27,6 @@ module "bastion_linux" {
   log_expiry_days      = 180 # days before log expiration
   # bastion
   allow_ssh_commands = false
-
   app_name      = var.networking[0].application
   business_unit = local.vpc_name
   subnet_set    = local.subnet_set
@@ -274,11 +276,8 @@ module "ec2_test_instance" {
   providers = {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
   }
-
   for_each = try(local.ec2_test.ec2_test_instances, {})
-
   name = each.key
-
   ami_name                      = each.value.ami_name
   ami_owner                     = try(each.value.ami_owner, "core-shared-services-production")
   instance                      = merge(local.ec2_test.instance, lookup(each.value, "instance", {}))

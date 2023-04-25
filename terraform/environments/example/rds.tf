@@ -1,3 +1,7 @@
+###########################################################################################
+#------------------------Comment out file if not required----------------------------------
+###########################################################################################
+
 # Example code to build an RDS database - based on mysql but could be :
 # Amazon Aurora, PostgreSQL, MariaDB, Oracle, MicroSoft SQL Server. These will require the correct version
 # The local.application_data is picked from local but set up in application_variables.json

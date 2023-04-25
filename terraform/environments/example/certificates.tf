@@ -1,3 +1,7 @@
+###########################################################################################
+#------------------------Comment out file if not required----------------------------------
+###########################################################################################
+
 resource "aws_acm_certificate" "example_cert" {
   domain_name       = "modernisation-platform.service.justice.gov.uk"
   validation_method = "DNS"
