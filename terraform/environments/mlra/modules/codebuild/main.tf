@@ -214,7 +214,7 @@ resource "aws_codebuild_project" "app-build" {
 
     environment_variable {
       name  = "AWS_ACCOUNT_ID"
-      value = local.environment_management.account_ids[terraform.workspace]
+      value = var.account_id
     }
 
     environment_variable {
