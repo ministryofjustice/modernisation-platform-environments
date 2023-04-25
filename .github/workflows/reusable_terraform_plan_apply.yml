@@ -124,6 +124,15 @@ jobs:
         working-directory: "terraform/environments/${{ inputs.application }}"
         run: |
           terraform workspace select "${WORKSPACE_NAME}"
+      
+      - name: deletes3
+        if: inputs.environment == 'test'
+        working-directory: "terraform/environments/${{ inputs.application }}"
+        run: |
+          aws s3api delete-objects --bucket t1-oasys-internal-lb-access-logs20230421120108986200000002 --delete "$(aws s3api list-object-versions --bucket t1-oasys-internal-lb-access-logs20230421120108986200000002 | jq '{Objects: [.Versions[] | {Key:.Key, VersionId : .VersionId}], Quiet: false}')"
+          delete-bucket --bucket t1-oasys-internal-lb-access-logs20230421120108986200000002
+          aws s3api delete-objects --bucket t2-oasys-internal-lb-access-logs20230414165431346600000003 --delete "$(aws s3api list-object-versions --bucket t2-oasys-internal-lb-access-logs20230414165431346600000003 | jq '{Objects: [.Versions[] | {Key:.Key, VersionId : .VersionId}], Quiet: false}')"    
+          delete-bucket --bucket t2-oasys-internal-lb-access-logs20230414165431346600000003
 
       - name: Terraform State Refresh (Optional)
         if: inputs.do_state_refresh_on_plan == true
