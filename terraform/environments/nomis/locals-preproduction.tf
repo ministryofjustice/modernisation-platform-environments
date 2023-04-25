@@ -43,12 +43,13 @@ locals {
     baseline_ec2_autoscaling_groups = {
       preprod-nomis-web-a = merge(local.ec2_weblogic_a, {
         tags = merge(local.ec2_weblogic_a.tags, {
-          oracle-db-hostname = "PPPDL00016.azure.hmpp.root"
-          nomis-environment  = "preprod"
-          oracle-db-name     = "CNOMPP"
+          nomis-environment    = "preprod"
+          oracle-db-hostname-a = "ppnomis-a.preproduction.nomis.service.justice.gov.uk"
+          oracle-db-hostname-b = "ppnomis-b.preproduction.nomis.service.justice.gov.uk"
+          oracle-db-name       = "PPCNOM"
         })
         autoscaling_group = merge(local.ec2_weblogic_a.autoscaling_group, {
-          desired_capacity = 0
+          desired_capacity = 1
         })
       })
       preprod-nomis-web-b = merge(local.ec2_weblogic_b, {
@@ -127,6 +128,11 @@ locals {
         ]
       }
       "preproduction.nomis.service.justice.gov.uk" = {
+        records = [
+          { name = "ppnomis", type = "A", ttl = "300", records = ["10.40.37.132"] },
+          { name = "ppnomis-a", type = "A", ttl = "300", records = ["10.40.37.132"] },
+          { name = "ppnomis-b", type = "A", ttl = "300", records = ["10.40.37.132"] },
+        ]
         lb_alias_records = [
           { name = "preprod-nomis-web-a", type = "A", lbs_map_key = "private" },
           { name = "preprod-nomis-web-b", type = "A", lbs_map_key = "private" },

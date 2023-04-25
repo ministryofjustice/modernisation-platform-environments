@@ -69,12 +69,13 @@ locals {
     baseline_ec2_autoscaling_groups = {
       prod-nomis-web-a = merge(local.ec2_weblogic_a, {
         tags = merge(local.ec2_weblogic_a.tags, {
-          oracle-db-hostname = "PDPDL00035.azure.hmpp.root"
-          nomis-environment  = "prod"
-          oracle-db-name     = "CNOMP"
+          nomis-environment    = "prod"
+          oracle-db-hostname-a = "pnomis-a.production.nomis.service.justice.gov.uk"
+          oracle-db-hostname-b = "pnomis-b.production.nomis.service.justice.gov.uk"
+          oracle-db-name       = "PCNOM"
         })
         autoscaling_group = merge(local.ec2_weblogic_a.autoscaling_group, {
-          desired_capacity = 0
+          desired_capacity = 1
         })
       })
       prod-nomis-web-b = merge(local.ec2_weblogic_b, {
@@ -225,6 +226,11 @@ locals {
         ]
       }
       "production.nomis.service.justice.gov.uk" = {
+        records = [
+          { name = "pnomis", type = "A", ttl = "300", records = ["10.40.3.132"] },
+          { name = "pnomis-a", type = "A", ttl = "300", records = ["10.40.3.132"] },
+          { name = "pnomis-b", type = "A", ttl = "300", records = ["10.40.67.132"] },
+        ]
         lb_alias_records = [
           { name = "prod-nomis-web-a", type = "A", lbs_map_key = "private" },
           { name = "prod-nomis-web-b", type = "A", lbs_map_key = "private" },

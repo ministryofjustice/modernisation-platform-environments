@@ -48,12 +48,13 @@ locals {
     baseline_ec2_autoscaling_groups = {
       t1-nomis-web-a = merge(local.ec2_weblogic_a, {
         tags = merge(local.ec2_weblogic_a.tags, {
-          oracle-db-hostname = "t1-nomis-db-1"
-          nomis-environment  = "t1"
-          oracle-db-name     = "CNOMT1"
+          nomis-environment    = "t1"
+          oracle-db-hostname-a = "t1nomis-a.test.nomis.service.justice.gov.uk"
+          oracle-db-hostname-b = "t1nomis-b.test.nomis.service.justice.gov.uk"
+          oracle-db-name       = "T1CNOM"
         })
         autoscaling_group = merge(local.ec2_weblogic_a.autoscaling_group, {
-          desired_capacity = 0
+          desired_capacity = 1
         })
       })
 
