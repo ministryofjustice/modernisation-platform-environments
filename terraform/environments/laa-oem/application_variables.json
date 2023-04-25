@@ -3,6 +3,7 @@
     "development": {
       "ec2_oem_instance_type_app": "m5.xlarge",
       "ec2_oem_instance_type_db": "c5.2xlarge",
+      "ec2_oem_instance_type_wl": "m5.xlarge",
       "ec2_zone": "eu-west-2a",
       "env_in_fqdn": "dev",
       "key_name": "oem-ec2-key-development"
@@ -10,6 +11,7 @@
     "test": {
       "ec2_oem_instance_type_app": "m5.xlarge",
       "ec2_oem_instance_type_db": "c5.2xlarge",
+      "ec2_oem_instance_type_wl": "m5.xlarge",
       "ec2_zone": "eu-west-2a",
       "env_in_fqdn": "test",
       "key_name": "oem-ec2-key-test"
