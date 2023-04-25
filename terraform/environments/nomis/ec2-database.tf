@@ -139,10 +139,7 @@ locals {
       disable_api_termination      = true
       metadata_options_http_tokens = "optional" # the Oracle installer cannot accommodate a token
       monitoring                   = true
-      vpc_security_group_ids = [
-        aws_security_group.data.id, # TODO: remove once weblogic servers refreshed
-        "data-db"
-      ]
+      vpc_security_group_ids       = ["data-db"]
     })
 
     user_data_cloud_init = {
