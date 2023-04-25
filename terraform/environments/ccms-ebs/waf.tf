@@ -31,12 +31,6 @@ resource "aws_wafv2_web_acl" "ebs_web_acl" {
     block {}
   }
 
-  visibility_config {
-    cloudwatch_metrics_enabled = true
-    metric_name                = "ebs_waf_metrics"
-    sampled_requests_enabled   = true
-  }
-
   rule {
     name = "ebs-trusted-rule"
 
@@ -49,6 +43,12 @@ resource "aws_wafv2_web_acl" "ebs_web_acl" {
       ip_set_reference_statement {
         arn = aws_wafv2_ip_set.ebs_waf_ip_set.arn
       }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "ebs_waf_metrics"
+      sampled_requests_enabled   = true
     }
   }
 
