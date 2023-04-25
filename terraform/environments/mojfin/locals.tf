@@ -4,9 +4,8 @@ locals {
   region = "eu-west-2"
 
   # RDS
+  appstream_cidr = "10.200.32.0/19"
   cidr_ire_workspace ="10.200.96.0/19"
-  cidr_six_degrees=   "10.225.60.0/24"
-  obiee_inbound_cidr=  "10.225.40.0/24"
   workspaces_cidr= "10.200.16.0/20"
   cp_vpc_cidr=         "172.20.0.0/20"
   transit_gw_to_mojfinprod=             "10.201.0.0/16"

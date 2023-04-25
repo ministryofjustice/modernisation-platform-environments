@@ -35,6 +35,15 @@ resource "aws_security_group" "mojfin" {
   vpc_id      = data.aws_vpc.shared.id
 
   ingress {
+   description ="AppStream Inbound"
+   from_port   = 1521
+   to_port     = 1521
+   protocol    = "tcp"
+   cidr_blocks = [local.appstream_cidr]
+
+  }
+
+  ingress {
     description = "Ireland Shared Services Inbound - Workspaces etc"
     from_port   = 1521
     to_port     = 1521
@@ -43,14 +52,6 @@ resource "aws_security_group" "mojfin" {
 
   }
 
- ingress {
-    description ="6 Degrees OBIEE Inbound"
-    from_port   = 1521
-    to_port     = 1521
-    protocol    = "tcp"
-    cidr_blocks = [local.obiee_inbound_cidr]
-
-  }
    ingress {
     description ="SharedServices Inbound - Workspaces etc"
     from_port   = 1521
@@ -78,18 +79,11 @@ resource "aws_security_group" "mojfin" {
   }
 
    ingress {
-    description = "Sql Net on 1521"
+    description = "Connectivity from MP Environment VPC"
     from_port   = 1521
     to_port     = 1521
     protocol    = "tcp"
     cidr_blocks = [data.aws_vpc.shared.cidr_block]
-  }
-  ingress {
-    description = "6 Degrees VPN Inbound"
-    from_port   = 1521
-    to_port     = 1521
-    protocol    = "tcp"
-    cidr_blocks = [local.cidr_six_degrees]
   }
   egress {
     from_port   = 0
@@ -146,7 +140,7 @@ resource "aws_db_instance" "appdb1" {
   identifier                  = local.application_name
   engine                      = local.engine
   engine_version              = local.engine_version
-  enabled_cloudwatch_logs_exports = ["alert", "audit"]
+  enabled_cloudwatch_logs_exports = ["alert", "audit", "listener", "trace"]
   performance_insights_enabled = true
   instance_class              = local.instance_class
   auto_minor_version_upgrade  = local.auto_minor_version_upgrade
