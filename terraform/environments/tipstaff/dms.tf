@@ -88,9 +88,9 @@ resource "null_resource" "setup_target_rds_security_group" {
 
     environment = {
       DMS_SECURITY_GROUP            = aws_security_group.dms_access_rule.id
-      DMS_TARGET_ACCOUNT_ACCESS_KEY = aws.tacticalproducts.access_key
-      DMS_TARGET_ACCOUNT_SECRET_KEY = aws.tacticalproducts.secret_key
-      DMS_TARGET_ACCOUNT_REGION     = aws.tacticalproducts.region
+      DMS_TARGET_ACCOUNT_ACCESS_KEY = jsondecode(data.aws_secretsmanager_secret_version.dms_source_credentials.secret_string)["ACCESS_KEY"]
+      DMS_TARGET_ACCOUNT_SECRET_KEY = jsondecode(data.aws_secretsmanager_secret_version.dms_source_credentials.secret_string)["SECRET_KEY"]
+      DMS_TARGET_ACCOUNT_REGION     = "eu-west-2"
     }
   }
   triggers = {
