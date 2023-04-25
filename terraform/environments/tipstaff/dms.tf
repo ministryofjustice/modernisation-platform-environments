@@ -24,11 +24,11 @@ resource "aws_dms_endpoint" "target" {
   endpoint_id   = "tipstaff-target"
   endpoint_type = "target"
   engine_name   = "postgres"
+  username      = jsondecode(data.aws_secretsmanager_secret_version.db_credentials.secret_string)["TIPSTAFF_DB_USERNAME_DEV"]
   password      = jsondecode(data.aws_secretsmanager_secret_version.db_credentials.secret_string)["TIPSTAFF_DB_PASSWORD_DEV"]
   port          = 5432
   server_name   = aws_db_instance.tipstaff_db.address
   ssl_mode      = "none"
-  username      = jsondecode(data.aws_secretsmanager_secret_version.db_credentials.secret_string)["TIPSTAFF_DB_USERNAME_DEV"]
 }
 
 resource "aws_dms_replication_instance" "tipstaff_replication_instance" {
@@ -42,6 +42,142 @@ resource "aws_dms_replication_instance" "tipstaff_replication_instance" {
   replication_instance_class = "dms.t3.large"
   replication_instance_id    = "tipstaff-replication-instance"
 }
+
+// Create DMS Endpoint Access Role
+resource "aws_iam_role" "dms_access_for_endpoint" {
+  name = "dms-access-for-endpoint"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "1"
+        Effect = "Allow"
+        Principal = {
+          Service = "dms.amazonaws.com"
+        }
+        Action = "sts:AssumeRole"
+      },
+      {
+        Sid    = "2"
+        Effect = "Allow"
+        Principal = {
+          Service = "rds.amazonaws.com"
+        }
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy" "dms_access_for_endpoint_policy" {
+  name = "dms-access-for-endpoint-policy"
+  role = aws_iam_role.dms-access-for-endpoint.name
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "rds:*",
+          "dms:*"
+        ]
+        Resource = "*"
+        Effect   = "Allow"
+      }
+    ]
+  })
+}
+
+// Create CloudWatch Logs Role
+resource "aws_iam_role" "dms_cloudwatch_logs_role" {
+  name = "dms-cloudwatch-logs-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "dms.amazonaws.com"
+        }
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy" "dms_cloudwatch_logs_policy" {
+  name = "dms-cloudwatch-logs-policy"
+  role = aws_iam_role.dms-cloudwatch-logs-role.name
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:DescribeLogStreams",
+          "logs:PutLogEvents"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+// Create DMS VPC Role
+resource "aws_iam_role" "dms_vpc_role" {
+  name = "dms-vpc-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "dms.amazonaws.com"
+        }
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy" "dms_vpc_management_policy" {
+  name = "dms-vpc-management-policy"
+  role = aws_iam_role.dms-vpc-role.name
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "ec2:CreateNetworkInterface",
+          "ec2:CreateNetworkInterfacePermission",
+          "ec2:DeleteNetworkInterface",
+          "ec2:DeleteNetworkInterfacePermission",
+          "ec2:DescribeAccountAttributes",
+          "ec2:DescribeAvailabilityZones",
+          "ec2:DescribeInternetGateways",
+          "ec2:DescribeSecurityGroups",
+          "ec2:DescribeSubnets",
+          "ec2:DescribeVpcs",
+          "ec2:DescribeVpcAttribute",
+          "ec2:DescribeVpcClassicLink",
+          "ec2:DescribeVpcClassicLinkDnsSupport",
+          "ec2:ModifyNetworkInterfaceAttribute",
+          "ec2:ResetNetworkInterfaceAttribute"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}
+
 
 resource "aws_dms_replication_task" "tipstaff_migration_task" {
   depends_on = [null_resource.setup_target_rds_security_group, aws_db_instance.tipstaff_db, aws_dms_endpoint.target, aws_dms_endpoint.source, aws_dms_replication_instance.tipstaff_replication_instance]
