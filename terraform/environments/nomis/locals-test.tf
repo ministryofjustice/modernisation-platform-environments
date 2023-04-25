@@ -145,8 +145,8 @@ locals {
           "/dev/sdc" = { label = "app", size = 100 }
         })
         ebs_volume_config = merge(local.database_zone_a.ebs_volume_config, {
-          data  = { total_size = 200 }
-          flash = { total_size = 2 }
+          data  = { total_size = 100 }
+          flash = { total_size = 50 }
         })
         # cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["nomis_pagerduty"].database
       })
