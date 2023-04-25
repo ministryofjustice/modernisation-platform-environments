@@ -48,7 +48,7 @@ resource "aws_dms_replication_task" "tipstaff_migration_task" {
 
   migration_type            = "full-load-and-cdc"
   replication_instance_arn  = aws_dms_replication_instance.tipstaff_replication_instance.replication_instance_arn
-  replication_task_id       = "tipstaff_migration_task"
+  replication_task_id       = "tipstaff-migration-task"
   replication_task_settings = "{\"FullLoadSettings\": {\"TargetTablePrepMode\": \"TRUNCATE_BEFORE_LOAD\"}}"
   source_endpoint_arn       = aws_dms_endpoint.source.endpoint_arn
   table_mappings            = "{\"rules\":[{\"rule-type\":\"selection\",\"rule-id\":\"1\",\"rule-name\":\"1\",\"object-locator\":{\"schema-name\":\"dbo\",\"table-name\":\"%\"},\"rule-action\":\"include\"}]}"
