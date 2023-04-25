@@ -1,9 +1,6 @@
-#### This file can be used to store locals specific to the member account ####
+# EC2 vars
 locals {
   business_unit = var.networking[0].business-unit
-}
-
-locals {
   region              = "eu-west-2"
   availability_zone_1 = "eu-west-2a"
   availability_zone_2 = "eu-west-2b"
@@ -106,7 +103,7 @@ data "aws_kms_key" "default_ebs" {
   key_id = "alias/aws/ebs"
 }
 
-# Build ingress and egress rules
+# Loadbalancer vars
 locals {
   loadbalancer_ingress_rules = {
     "cluster_ec2_lb_ingress" = {
