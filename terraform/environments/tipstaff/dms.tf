@@ -1,7 +1,7 @@
 provider "aws" {
   region     = "eu-west-2"
-  access_key = jsondecode(data.aws_secretsmanager_secret_version.dms_source_credentials.secret_string)["ACCESS_KEY"]
-  secret_key = jsondecode(data.aws_secretsmanager_secret_version.dms_source_credentials.secret_string)["SECRET_KEY"]
+  access_key = jsondecode(data.aws_secretsmanager_secret_version.dms_source_credentials.secret_string)["ACCESS_KEY_NEW"]
+  secret_key = jsondecode(data.aws_secretsmanager_secret_version.dms_source_credentials.secret_string)["SECRET_KEY_NEW"]
   alias      = "tacticalproducts"
 }
 
@@ -99,7 +99,6 @@ resource "aws_iam_role_policy" "dms_vpc_management_policy" {
   })
 }
 
-
 resource "aws_dms_replication_task" "tipstaff_migration_task" {
   depends_on = [null_resource.setup_target_rds_security_group, aws_db_instance.tipstaff_db, aws_dms_endpoint.target, aws_dms_endpoint.source, aws_dms_replication_instance.tipstaff_replication_instance]
 
@@ -143,8 +142,8 @@ resource "null_resource" "setup_target_rds_security_group" {
 
     environment = {
       DMS_SECURITY_GROUP            = aws_security_group.modernisation_dms_access_rule.id
-      DMS_TARGET_ACCOUNT_ACCESS_KEY = jsondecode(data.aws_secretsmanager_secret_version.dms_source_credentials.secret_string)["ACCESS_KEY"]
-      DMS_TARGET_ACCOUNT_SECRET_KEY = jsondecode(data.aws_secretsmanager_secret_version.dms_source_credentials.secret_string)["SECRET_KEY"]
+      DMS_TARGET_ACCOUNT_ACCESS_KEY = jsondecode(data.aws_secretsmanager_secret_version.dms_source_credentials.secret_string)["ACCESS_KEY_NEW"]
+      DMS_TARGET_ACCOUNT_SECRET_KEY = jsondecode(data.aws_secretsmanager_secret_version.dms_source_credentials.secret_string)["SECRET_KEY_NEW"]
       DMS_TARGET_ACCOUNT_REGION     = "eu-west-2"
     }
   }
