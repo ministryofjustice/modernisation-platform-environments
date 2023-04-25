@@ -124,7 +124,7 @@ jobs:
         working-directory: "terraform/environments/${{ inputs.application }}"
         run: |
           terraform workspace select "${WORKSPACE_NAME}"
-      
+
       - name: Terraform State Refresh (Optional)
         if: inputs.do_state_refresh_on_plan == true
         working-directory: "terraform/environments/${{ inputs.application }}"
