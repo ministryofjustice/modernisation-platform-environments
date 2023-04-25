@@ -5,7 +5,7 @@ resource "aws_lb" "ebsapps_lb" {
   security_groups    = [aws_security_group.sg_ebsapps_lb.id]
   subnets            = data.aws_subnets.shared-public.ids
 
-  enable_deletion_protection = false
+  enable_deletion_protection = true
 
   access_logs {
     bucket  = module.s3-bucket-logging.bucket.id
