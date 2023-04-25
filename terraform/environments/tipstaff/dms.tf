@@ -198,9 +198,10 @@ resource "aws_dms_replication_task" "tipstaff_migration_task" {
   start_replication_task    = true
 }
 
-resource "aws_security_group" "dms_access_rule" {
-  name        = "dms_access_rule"
-  description = "allow dms access to the database"
+resource "aws_security_group" "modernisation_dms_access_rule" {
+  provider    = aws.tacticalproducts
+  name        = "modernisation_dms_access_rule"
+  description = "allow dms access to the database for the modernisation platform"
 
   ingress {
     from_port   = 5432
@@ -216,9 +217,6 @@ resource "aws_security_group" "dms_access_rule" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
-
-  provider = aws.tacticalproducts
-
 }
 
 resource "null_resource" "setup_target_rds_security_group" {
@@ -229,7 +227,7 @@ resource "null_resource" "setup_target_rds_security_group" {
     command     = "chmod +x ./setup-security-group.sh; ./setup-security-group.sh"
 
     environment = {
-      DMS_SECURITY_GROUP            = aws_security_group.dms_access_rule.id
+      DMS_SECURITY_GROUP            = aws_security_group.modernisation_dms_access_rule.id
       DMS_TARGET_ACCOUNT_ACCESS_KEY = jsondecode(data.aws_secretsmanager_secret_version.dms_source_credentials.secret_string)["ACCESS_KEY"]
       DMS_TARGET_ACCOUNT_SECRET_KEY = jsondecode(data.aws_secretsmanager_secret_version.dms_source_credentials.secret_string)["SECRET_KEY"]
       DMS_TARGET_ACCOUNT_REGION     = "eu-west-2"
