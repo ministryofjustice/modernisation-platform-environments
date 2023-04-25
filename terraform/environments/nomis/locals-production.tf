@@ -1,26 +1,5 @@
 # nomis-production environment settings
 locals {
-  nomis_production = {
-    # production SNS channel for alarms
-    sns_topic = "nomis_alarms"
-    # Details of OMS Manager in FixNGo (only needs defining if databases in the environment are managed)
-    database_oracle_manager = {
-      oms_ip_address = "10.40.0.136"
-      oms_hostname   = "oem"
-    }
-    # vars common across ec2 instances
-    ec2_common = {
-      patch_approval_delay_days = 7
-      patch_day                 = "THU"
-    }
-
-    # Add database instances here. They will be created using ec2-database.tf
-    databases = {}
-
-    # Add weblogic instances here.  They will be created using the weblogic module
-    weblogics       = {}
-    ec2_jumpservers = {}
-  }
 
   # baseline config
   production_config = {
@@ -213,6 +192,12 @@ locals {
     }
 
     baseline_route53_zones = {
+
+      "hmpps-production.modernisation-platform.internal" = {
+        records = [
+          { name = "oem.nomis", type = "A", ttl = "3600", records = ["10.40.0.136"] },
+        ]
+      }
       "nomis.service.justice.gov.uk" = {
       }
       "production.nomis.az.justice.gov.uk" = {

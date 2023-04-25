@@ -99,20 +99,20 @@ resource "aws_ssm_parameter" "cloud_watch_config_windows" {
 # SSM Agent - update Systems Manager Agent
 #------------------------------------------------------------------------------
 
-resource "aws_ssm_association" "update_ssm_agent" {
-  name             = "AWS-UpdateSSMAgent" # this is an AWS provided document
-  association_name = "update-ssm-agent"
-  parameters = {
-    allowDowngrade = "false"
-  }
-  targets {
-    # we could just target all instances, but this would also include the bastion, which gets rebuilt everyday
-    key    = "tag:os_type"
-    values = ["Linux", "Windows"]
-  }
-  apply_only_at_cron_interval = false
-  schedule_expression         = "cron(30 7 ? * TUE *)"
-}
+#resource "aws_ssm_association" "update_ssm_agent" {
+#  name             = "AWS-UpdateSSMAgent" # this is an AWS provided document
+#  association_name = "update-ssm-agent"
+#  parameters = {
+#    allowDowngrade = "false"
+#  }
+#  targets {
+#    # we could just target all instances, but this would also include the bastion, which gets rebuilt everyday
+#    key    = "tag:os_type"
+#    values = ["Linux", "Windows"]
+#  }
+#  apply_only_at_cron_interval = false
+#  schedule_expression         = "cron(30 7 ? * TUE *)"
+#}
 
 #------------------------------------------------------------------------------
 # Patch Management - Run Ansible Roles manually from SSM document
@@ -139,205 +139,205 @@ resource "aws_ssm_document" "run_ansible_patches" {
 #------------------------------------------------------------------------------
 
 # Define a Maintenance Window, 2am on patch_day, 180 minutes
-resource "aws_ssm_maintenance_window" "maintenance" {
-  name                       = "weekly-patching"
-  description                = "Maintenance window for applying OS patches"
-  schedule                   = "cron(0 2 ? * ${local.environment_config.ec2_common.patch_day} *)"
-  duration                   = 3
-  cutoff                     = 1
-  enabled                    = true
-  allow_unassociated_targets = true
-  tags = merge(
-    local.tags,
-    {
-      Name = "weekly-patching"
-    },
-  )
-}
+#resource "aws_ssm_maintenance_window" "maintenance" {
+#  name                       = "weekly-patching"
+#  description                = "Maintenance window for applying OS patches"
+#  schedule                   = "cron(0 2 ? * ${local.environment_config.ec2_common.patch_day} *)"
+#  duration                   = 3
+#  cutoff                     = 1
+#  enabled                    = true
+#  allow_unassociated_targets = true
+#  tags = merge(
+#    local.tags,
+#    {
+#      Name = "weekly-patching"
+#    },
+#  )
+#}
 
 # Maintenance window task to apply RHEL patches
-resource "aws_ssm_maintenance_window_target" "rhel_patching" {
-  window_id     = aws_ssm_maintenance_window.maintenance.id
-  name          = "rhel-patching"
-  description   = "Target group for RHEL patching"
-  resource_type = "INSTANCE"
+#resource "aws_ssm_maintenance_window_target" "rhel_patching" {
+#  window_id     = aws_ssm_maintenance_window.maintenance.id
+#  name          = "rhel-patching"
+#  description   = "Target group for RHEL patching"
+#  resource_type = "INSTANCE"
+#
+#  targets {
+#    key    = "tag:Patch Group"
+#    values = [aws_ssm_patch_group.rhel.patch_group]
+#  }
+#}
 
-  targets {
-    key    = "tag:Patch Group"
-    values = [aws_ssm_patch_group.rhel.patch_group]
-  }
-}
-
-resource "aws_ssm_maintenance_window_task" "rhel_patching" {
-  name            = "RHEL-security-patching"
-  description     = "Applies AWS default patch baseline for RHEL instances"
-  max_concurrency = "100%"
-  max_errors      = "50%"
-  cutoff_behavior = "CANCEL_TASK"
-  priority        = 2
-  task_arn        = "AWS-RunPatchBaseline"
-  task_type       = "RUN_COMMAND"
-  window_id       = aws_ssm_maintenance_window.maintenance.id
-
-  targets {
-    key    = "WindowTargetIds"
-    values = [aws_ssm_maintenance_window_target.rhel_patching.id]
-  }
-
-  task_invocation_parameters {
-    run_command_parameters {
-      parameter {
-        name   = "Operation"
-        values = ["Install"]
-      }
-      parameter {
-        name   = "RebootOption"
-        values = ["NoReboot"]
-      }
-    }
-  }
-}
+#resource "aws_ssm_maintenance_window_task" "rhel_patching" {
+#  name            = "RHEL-security-patching"
+#  description     = "Applies AWS default patch baseline for RHEL instances"
+#  max_concurrency = "100%"
+#  max_errors      = "50%"
+#  cutoff_behavior = "CANCEL_TASK"
+#  priority        = 2
+#  task_arn        = "AWS-RunPatchBaseline"
+#  task_type       = "RUN_COMMAND"
+#  window_id       = aws_ssm_maintenance_window.maintenance.id
+#
+#  targets {
+#    key    = "WindowTargetIds"
+#    values = [aws_ssm_maintenance_window_target.rhel_patching.id]
+#  }
+#
+#  task_invocation_parameters {
+#    run_command_parameters {
+#      parameter {
+#        name   = "Operation"
+#        values = ["Install"]
+#      }
+#      parameter {
+#        name   = "RebootOption"
+#        values = ["NoReboot"]
+#      }
+#    }
+#  }
+#}
 
 # Maintenance window task to apply Windows patches
-resource "aws_ssm_maintenance_window_target" "windows_patching" {
-  window_id     = aws_ssm_maintenance_window.maintenance.id
-  name          = "windows-patching"
-  description   = "Target group for Windows patching"
-  resource_type = "INSTANCE"
+#resource "aws_ssm_maintenance_window_target" "windows_patching" {
+#  window_id     = aws_ssm_maintenance_window.maintenance.id
+#  name          = "windows-patching"
+#  description   = "Target group for Windows patching"
+#  resource_type = "INSTANCE"
+#
+#  targets {
+#    key    = "tag:Patch Group"
+#    values = [aws_ssm_patch_group.windows.patch_group]
+#  }
+#}
 
-  targets {
-    key    = "tag:Patch Group"
-    values = [aws_ssm_patch_group.windows.patch_group]
-  }
-}
-
-resource "aws_ssm_maintenance_window_task" "windows_patching" {
-  name            = "Windows-security-patching"
-  description     = "Applies AWS default patch baseline for Windows instances"
-  max_concurrency = "100%"
-  max_errors      = "50%"
-  cutoff_behavior = "CANCEL_TASK"
-  priority        = 2
-  task_arn        = "AWS-RunPatchBaseline"
-  task_type       = "RUN_COMMAND"
-  window_id       = aws_ssm_maintenance_window.maintenance.id
-
-  targets {
-    key    = "WindowTargetIds"
-    values = [aws_ssm_maintenance_window_target.windows_patching.id]
-  }
-
-  task_invocation_parameters {
-    run_command_parameters {
-      parameter {
-        name   = "Operation"
-        values = ["Install"]
-      }
-      parameter {
-        name   = "RebootOption"
-        values = ["RebootIfNeeded"]
-      }
-    }
-  }
-}
+#resource "aws_ssm_maintenance_window_task" "windows_patching" {
+#  name            = "Windows-security-patching"
+#  description     = "Applies AWS default patch baseline for Windows instances"
+#  max_concurrency = "100%"
+#  max_errors      = "50%"
+#  cutoff_behavior = "CANCEL_TASK"
+#  priority        = 2
+#  task_arn        = "AWS-RunPatchBaseline"
+#  task_type       = "RUN_COMMAND"
+#  window_id       = aws_ssm_maintenance_window.maintenance.id
+#
+#  targets {
+#    key    = "WindowTargetIds"
+#    values = [aws_ssm_maintenance_window_target.windows_patching.id]
+#  }
+#
+#  task_invocation_parameters {
+#    run_command_parameters {
+#      parameter {
+#        name   = "Operation"
+#        values = ["Install"]
+#      }
+#      parameter {
+#        name   = "RebootOption"
+#        values = ["RebootIfNeeded"]
+#      }
+#    }
+#  }
+#}
 
 # Patch Baselines
-resource "aws_ssm_patch_baseline" "rhel" {
-  name             = "USER-RedHatPatchBaseline"
-  description      = "Approves all RHEL operating system patches that are classified as Security and Bugfix and that have a severity of Critical or Important."
-  operating_system = "REDHAT_ENTERPRISE_LINUX"
+#resource "aws_ssm_patch_baseline" "rhel" {
+#  name             = "USER-RedHatPatchBaseline"
+#  description      = "Approves all RHEL operating system patches that are classified as Security and Bugfix and that have a severity of Critical or Important."
+#  operating_system = "REDHAT_ENTERPRISE_LINUX"
+#
+#  approval_rule {
+#    approve_after_days = local.environment_config.ec2_common.patch_approval_delay_days
+#    compliance_level   = "CRITICAL"
+#    patch_filter {
+#      key    = "CLASSIFICATION"
+#      values = ["Security"]
+#    }
+#    patch_filter {
+#      key    = "SEVERITY"
+#      values = ["Critical"]
+#    }
+#  }
+#
+#  approval_rule {
+#    approve_after_days = local.environment_config.ec2_common.patch_approval_delay_days
+#    compliance_level   = "HIGH"
+#    patch_filter {
+#      key    = "CLASSIFICATION"
+#      values = ["Security"]
+#    }
+#    patch_filter {
+#      key    = "SEVERITY"
+#      values = ["Important"]
+#    }
+#  }
+#
+#  approval_rule {
+#    approve_after_days = local.environment_config.ec2_common.patch_approval_delay_days
+#    compliance_level   = "MEDIUM"
+#    patch_filter {
+#      key    = "CLASSIFICATION"
+#      values = ["Bugfix"]
+#    }
+#  }
+#  tags = merge(
+#    local.tags,
+#    {
+#      Name = "rhel-patch-baseline"
+#    },
+#  )
+#}
 
-  approval_rule {
-    approve_after_days = local.environment_config.ec2_common.patch_approval_delay_days
-    compliance_level   = "CRITICAL"
-    patch_filter {
-      key    = "CLASSIFICATION"
-      values = ["Security"]
-    }
-    patch_filter {
-      key    = "SEVERITY"
-      values = ["Critical"]
-    }
-  }
-
-  approval_rule {
-    approve_after_days = local.environment_config.ec2_common.patch_approval_delay_days
-    compliance_level   = "HIGH"
-    patch_filter {
-      key    = "CLASSIFICATION"
-      values = ["Security"]
-    }
-    patch_filter {
-      key    = "SEVERITY"
-      values = ["Important"]
-    }
-  }
-
-  approval_rule {
-    approve_after_days = local.environment_config.ec2_common.patch_approval_delay_days
-    compliance_level   = "MEDIUM"
-    patch_filter {
-      key    = "CLASSIFICATION"
-      values = ["Bugfix"]
-    }
-  }
-  tags = merge(
-    local.tags,
-    {
-      Name = "rhel-patch-baseline"
-    },
-  )
-}
-
-resource "aws_ssm_patch_baseline" "windows" {
-  name             = "USER-WindowsPatchBaseline-OS"
-  description      = "Approves all Windows Server operating system patches that are classified as CriticalUpdates or SecurityUpdates and that have an MSRC severity of Critical or Important."
-  operating_system = "WINDOWS"
-
-  approval_rule {
-    approve_after_days = local.environment_config.ec2_common.patch_approval_delay_days
-    compliance_level   = "CRITICAL"
-    patch_filter {
-      key    = "CLASSIFICATION"
-      values = ["CriticalUpdates", "SecurityUpdates"]
-    }
-    patch_filter {
-      key    = "MSRC_SEVERITY"
-      values = ["Critical"]
-    }
-  }
-
-  approval_rule {
-    approve_after_days = local.environment_config.ec2_common.patch_approval_delay_days
-    compliance_level   = "HIGH"
-    patch_filter {
-      key    = "CLASSIFICATION"
-      values = ["CriticalUpdates", "SecurityUpdates"]
-    }
-    patch_filter {
-      key    = "MSRC_SEVERITY"
-      values = ["Important"]
-    }
-  }
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "windows-patch-baseline"
-    },
-  )
-}
+#resource "aws_ssm_patch_baseline" "windows" {
+#  name             = "USER-WindowsPatchBaseline-OS"
+#  description      = "Approves all Windows Server operating system patches that are classified as CriticalUpdates or SecurityUpdates and that have an MSRC severity of Critical or Important."
+#  operating_system = "WINDOWS"
+#
+#  approval_rule {
+#    approve_after_days = local.environment_config.ec2_common.patch_approval_delay_days
+#    compliance_level   = "CRITICAL"
+#    patch_filter {
+#      key    = "CLASSIFICATION"
+#      values = ["CriticalUpdates", "SecurityUpdates"]
+#    }
+#    patch_filter {
+#      key    = "MSRC_SEVERITY"
+#      values = ["Critical"]
+#    }
+#  }
+#
+#  approval_rule {
+#    approve_after_days = local.environment_config.ec2_common.patch_approval_delay_days
+#    compliance_level   = "HIGH"
+#    patch_filter {
+#      key    = "CLASSIFICATION"
+#      values = ["CriticalUpdates", "SecurityUpdates"]
+#    }
+#    patch_filter {
+#      key    = "MSRC_SEVERITY"
+#      values = ["Important"]
+#    }
+#  }
+#
+#  tags = merge(
+#    local.tags,
+#    {
+#      Name = "windows-patch-baseline"
+#    },
+#  )
+#}
 
 # Patch Groups
-resource "aws_ssm_patch_group" "rhel" {
-  baseline_id = aws_ssm_patch_baseline.rhel.id
-  patch_group = "RHEL"
-}
+#resource "aws_ssm_patch_group" "rhel" {
+#  baseline_id = aws_ssm_patch_baseline.rhel.id
+#  patch_group = "RHEL"
+#}
 
-resource "aws_ssm_patch_group" "windows" {
-  baseline_id = aws_ssm_patch_baseline.windows.id
-  patch_group = "Windows"
-}
+#resource "aws_ssm_patch_group" "windows" {
+#  baseline_id = aws_ssm_patch_baseline.windows.id
+#  patch_group = "Windows"
+#}
 # CloudWatch Monitoring Role and Policies
 
 data "aws_iam_policy_document" "cloud-platform-monitoring-assume-role" {
