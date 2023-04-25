@@ -178,7 +178,7 @@ resource "aws_db_instance" "appdb1" {
   max_allocated_storage       = local.max_allocated_storage
   username                    = local.username
   password                    = random_password.rds_password.result
-  vpc_security_group_ids      = [aws_security_group.laalz-secgroup.id, aws_security_group.vpc-secgroup.id]
+  vpc_security_group_ids      = [aws_security_group.laalz-secgroup.id]
   skip_final_snapshot         = false
   final_snapshot_identifier   = "${local.application_name}-${formatdate("DDMMMYYYYhhmm", timestamp())}-finalsnapshot"
   parameter_group_name        = "rds-oracle"
