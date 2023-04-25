@@ -10,12 +10,12 @@ module "ecs" {
 # Create s3 bucket for deployment state
 module "s3_bucket_app_deployment" {
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=d2195ea6c28c44c83540978d71648c0a49497f38"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=32d7d294104bd17cbcf3d1dd2ec5377812183820"
 
   providers = {
     aws.bucket-replication = aws
   }
-  bucket_name        = "${local.application_name}-${local.environment}-openldap-deployment"
+  bucket_name        = "${local.application_name}-${local.environment}-ldap-deployment"
   versioning_enabled = true
 
   lifecycle_rule = [
