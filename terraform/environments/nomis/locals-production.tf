@@ -56,6 +56,7 @@ locals {
         autoscaling_group = merge(local.ec2_weblogic_a.autoscaling_group, {
           desired_capacity = 1
         })
+        cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["nomis_pagerduty"].weblogic
       })
       prod-nomis-web-b = merge(local.ec2_weblogic_b, {
         tags = merge(local.ec2_weblogic_b.tags, {
@@ -63,7 +64,10 @@ locals {
           nomis-environment  = "prod"
           oracle-db-name     = "CNOMP"
         })
-        cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["nomis_pagerduty"].weblogic
+        autoscaling_group = merge(local.ec2_weblogic_a.autoscaling_group, {
+          desired_capacity = 0
+        })
+        # cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["nomis_pagerduty"].weblogic
       })
     }
 
@@ -163,6 +167,9 @@ locals {
                       values = [
                         "prod-nomis-web-a.production.nomis.az.justice.gov.uk",
                         "prod-nomis-web-a.production.nomis.service.justice.gov.uk",
+                        "c.production.nomis.az.justice.gov.uk",
+                        "c.production.nomis.service.justice.gov.uk",
+                        "c.nomis.az.justice.gov.uk",
                       ]
                     }
                   }]
@@ -178,9 +185,6 @@ locals {
                       values = [
                         "prod-nomis-web-b.production.nomis.az.justice.gov.uk",
                         "prod-nomis-web-b.production.nomis.service.justice.gov.uk",
-                        "c.production.nomis.az.justice.gov.uk",
-                        "c.production.nomis.service.justice.gov.uk",
-                        "c.nomis.az.justice.gov.uk",
                       ]
                     }
                   }]
