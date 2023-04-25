@@ -10,7 +10,7 @@ module "ecs" {
 # Create s3 bucket for deployment state
 module "s3_bucket_app_deployment" {
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=e89e2e7e9a6dba9131d38c86341341ae5ed8b3e3"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.2.0"
 
   providers = {
     aws.bucket-replication = aws
@@ -46,6 +46,12 @@ module "s3_bucket_app_deployment" {
   ]
 
   tags = local.tags
+}
+resource "aws_s3_bucket_ownership_controls" "openldap" {
+  bucket = module.s3_bucket_app_deployment.bucket.id
+  rule {
+    object_ownership = "BucketOwnerEnforced"
+  }
 }
 
 resource "aws_security_group" "openldap" {
