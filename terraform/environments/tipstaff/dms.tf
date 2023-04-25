@@ -72,7 +72,7 @@ resource "aws_iam_role" "dms_access_for_endpoint" {
 
 resource "aws_iam_role_policy" "dms_access_for_endpoint_policy" {
   name = "dms-access-for-endpoint-policy"
-  role = aws_iam_role.dms-access-for-endpoint.name
+  role = aws_iam_role.dms_access_for_endpoint.name
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -109,7 +109,7 @@ resource "aws_iam_role" "dms_cloudwatch_logs_role" {
 
 resource "aws_iam_role_policy" "dms_cloudwatch_logs_policy" {
   name = "dms-cloudwatch-logs-policy"
-  role = aws_iam_role.dms-cloudwatch-logs-role.name
+  role = aws_iam_role.dms_cloudwatch_logs_role.name
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -148,7 +148,7 @@ resource "aws_iam_role" "dms_vpc_role" {
 
 resource "aws_iam_role_policy" "dms_vpc_management_policy" {
   name = "dms-vpc-management-policy"
-  role = aws_iam_role.dms-vpc-role.name
+  role = aws_iam_role.dms_vpc_role.name
 
   policy = jsonencode({
     Version = "2012-10-17"
