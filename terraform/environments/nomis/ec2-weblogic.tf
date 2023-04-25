@@ -162,7 +162,7 @@ locals {
     })
     user_data_cloud_init = merge(local.ec2_weblogic_default.user_data_cloud_init, {
       args = merge(local.ec2_weblogic_default.user_data_cloud_init.args, {
-        branch = "nomis/DSOS-1815/update-weblogic-tns"
+        branch = "a5c69245a3e30ca8d44ab269062479e1768e2f5c" # 2023-04-25
       })
     })
   })
@@ -172,7 +172,7 @@ locals {
     })
     user_data_cloud_init = merge(local.ec2_weblogic_default.user_data_cloud_init, {
       args = merge(local.ec2_weblogic_default.user_data_cloud_init.args, {
-        branch = "b7cf97d15687c1fe653ea139a728db642f783a2d" # 2023-04-06
+        branch = "a5c69245a3e30ca8d44ab269062479e1768e2f5c" # 2023-04-25
       })
     })
   })
