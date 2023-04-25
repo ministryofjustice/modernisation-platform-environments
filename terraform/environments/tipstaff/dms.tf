@@ -44,89 +44,89 @@ resource "aws_dms_replication_instance" "tipstaff_replication_instance" {
 }
 
 // Create DMS Endpoint Access Role
-resource "aws_iam_role" "dms_access_for_endpoint" {
-  name = "dms-access-for-endpoint"
+# resource "aws_iam_role" "dms_access_for_endpoint" {
+#   name = "dms-access-for-endpoint"
 
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Sid    = "1"
-        Effect = "Allow"
-        Principal = {
-          Service = "dms.amazonaws.com"
-        }
-        Action = "sts:AssumeRole"
-      },
-      {
-        Sid    = "2"
-        Effect = "Allow"
-        Principal = {
-          Service = "rds.amazonaws.com"
-        }
-        Action = "sts:AssumeRole"
-      }
-    ]
-  })
-}
+#   assume_role_policy = jsonencode({
+#     Version = "2012-10-17"
+#     Statement = [
+#       {
+#         Sid    = "1"
+#         Effect = "Allow"
+#         Principal = {
+#           Service = "dms.amazonaws.com"
+#         }
+#         Action = "sts:AssumeRole"
+#       },
+#       {
+#         Sid    = "2"
+#         Effect = "Allow"
+#         Principal = {
+#           Service = "rds.amazonaws.com"
+#         }
+#         Action = "sts:AssumeRole"
+#       }
+#     ]
+#   })
+# }
 
-resource "aws_iam_role_policy" "dms_access_for_endpoint_policy" {
-  name = "dms-access-for-endpoint-policy"
-  role = aws_iam_role.dms_access_for_endpoint.name
+# resource "aws_iam_role_policy" "dms_access_for_endpoint_policy" {
+#   name = "dms-access-for-endpoint-policy"
+#   role = aws_iam_role.dms_access_for_endpoint.name
 
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action = [
-          "rds:*",
-          "dms:*"
-        ]
-        Resource = "*"
-        Effect   = "Allow"
-      }
-    ]
-  })
-}
+#   policy = jsonencode({
+#     Version = "2012-10-17"
+#     Statement = [
+#       {
+#         Action = [
+#           "rds:*",
+#           "dms:*"
+#         ]
+#         Resource = "*"
+#         Effect   = "Allow"
+#       }
+#     ]
+#   })
+# }
 
-// Create CloudWatch Logs Role
-resource "aws_iam_role" "dms_cloudwatch_logs_role" {
-  name = "dms-cloudwatch-logs-role"
+# // Create CloudWatch Logs Role
+# resource "aws_iam_role" "dms_cloudwatch_logs_role" {
+#   name = "dms-cloudwatch-logs-role"
 
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Principal = {
-          Service = "dms.amazonaws.com"
-        }
-        Action = "sts:AssumeRole"
-      }
-    ]
-  })
-}
+#   assume_role_policy = jsonencode({
+#     Version = "2012-10-17"
+#     Statement = [
+#       {
+#         Effect = "Allow"
+#         Principal = {
+#           Service = "dms.amazonaws.com"
+#         }
+#         Action = "sts:AssumeRole"
+#       }
+#     ]
+#   })
+# }
 
-resource "aws_iam_role_policy" "dms_cloudwatch_logs_policy" {
-  name = "dms-cloudwatch-logs-policy"
-  role = aws_iam_role.dms_cloudwatch_logs_role.name
+# resource "aws_iam_role_policy" "dms_cloudwatch_logs_policy" {
+#   name = "dms-cloudwatch-logs-policy"
+#   role = aws_iam_role.dms_cloudwatch_logs_role.name
 
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "logs:CreateLogGroup",
-          "logs:CreateLogStream",
-          "logs:DescribeLogStreams",
-          "logs:PutLogEvents"
-        ]
-        Resource = "*"
-      }
-    ]
-  })
-}
+#   policy = jsonencode({
+#     Version = "2012-10-17"
+#     Statement = [
+#       {
+#         Effect = "Allow"
+#         Action = [
+#           "logs:CreateLogGroup",
+#           "logs:CreateLogStream",
+#           "logs:DescribeLogStreams",
+#           "logs:PutLogEvents"
+#         ]
+#         Resource = "*"
+#       }
+#     ]
+#   })
+# }
 
 // Create DMS VPC Role
 resource "aws_iam_role" "dms_vpc_role" {
@@ -170,7 +170,13 @@ resource "aws_iam_role_policy" "dms_vpc_management_policy" {
           "ec2:DescribeVpcClassicLink",
           "ec2:DescribeVpcClassicLinkDnsSupport",
           "ec2:ModifyNetworkInterfaceAttribute",
-          "ec2:ResetNetworkInterfaceAttribute"
+          "ec2:ResetNetworkInterfaceAttribute",
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:DescribeLogStreams",
+          "logs:PutLogEvents",
+          "rds:*",
+          "dms:*"
         ]
         Resource = "*"
       }
