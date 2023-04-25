@@ -128,10 +128,6 @@ locals {
     config = merge(module.baseline_presets.ec2_instance.config.db, {
       ami_name  = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-07T12-48-08.562Z"
       ami_owner = "self"
-      instance_profile_policies = flatten([
-        local.ec2_common_managed_policies,
-        aws_iam_policy.s3_db_backup_bucket_access.arn
-      ])
     })
 
     instance = merge(module.baseline_presets.ec2_instance.instance.default, {
