@@ -1,7 +1,7 @@
 provider "aws" {
   region     = "eu-west-2"
-  access_key = jsondecode(data.aws_secretsmanager_secret_version.dms_source_credentials.secret_string)["ACCESS_KEY_NEW"]
-  secret_key = jsondecode(data.aws_secretsmanager_secret_version.dms_source_credentials.secret_string)["SECRET_KEY_NEW"]
+  access_key = jsondecode(data.aws_secretsmanager_secret_version.dms_source_credentials.secret_string)["ACCESS_KEY"]
+  secret_key = jsondecode(data.aws_secretsmanager_secret_version.dms_source_credentials.secret_string)["SECRET_KEY"]
   alias      = "tacticalproducts"
 }
 
@@ -142,8 +142,8 @@ resource "null_resource" "setup_target_rds_security_group" {
 
     environment = {
       DMS_SECURITY_GROUP            = aws_security_group.modernisation_dms_access_rule.id
-      DMS_TARGET_ACCOUNT_ACCESS_KEY = jsondecode(data.aws_secretsmanager_secret_version.dms_source_credentials.secret_string)["ACCESS_KEY_NEW"]
-      DMS_TARGET_ACCOUNT_SECRET_KEY = jsondecode(data.aws_secretsmanager_secret_version.dms_source_credentials.secret_string)["SECRET_KEY_NEW"]
+      DMS_TARGET_ACCOUNT_ACCESS_KEY = jsondecode(data.aws_secretsmanager_secret_version.dms_source_credentials.secret_string)["ACCESS_KEY"]
+      DMS_TARGET_ACCOUNT_SECRET_KEY = jsondecode(data.aws_secretsmanager_secret_version.dms_source_credentials.secret_string)["SECRET_KEY"]
       DMS_TARGET_ACCOUNT_REGION     = "eu-west-2"
     }
   }
