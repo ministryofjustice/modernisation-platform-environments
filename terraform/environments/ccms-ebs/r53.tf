@@ -7,8 +7,8 @@ resource "aws_route53_record" "external" {
   type    = "A"
 
   alias {
-    name                   = "ebsnlb-587d0375218cc053.elb.eu-west-2.amazonaws.com"
-    zone_id                = "ZD4D7Y8KGAS4G"
+    name                   = aws_lb.ebsapps_lb.dns_name
+    zone_id                = aws_lb.ebsapps_lb.zone_id
     evaluate_target_health = true
   }
 }
