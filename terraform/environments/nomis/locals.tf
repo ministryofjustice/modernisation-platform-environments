@@ -14,6 +14,19 @@ locals {
 
   baseline_acm_certificates = {}
 
+  baseline_bastion_linux = {
+    public_key_data = merge(
+      jsondecode(file(".ssh/user-keys.json"))["all-environments"],
+      jsondecode(file(".ssh/user-keys.json"))[local.environment]
+    )
+    allow_ssh_commands = false
+    extra_user_data_content = templatefile("templates/bastion-user-data.sh.tftpl", {
+      region                                  = local.region
+      application_environment_internal_domain = module.environment.domains.internal.application_environment
+      X11Forwarding                           = "no"
+    })
+  }
+
   baseline_cloudwatch_log_groups = merge(
     local.weblogic_cloudwatch_log_groups,
     local.database_cloudwatch_log_groups,
@@ -77,7 +90,7 @@ locals {
           protocol    = "tcp"
           security_groups = [
             "private-jumpserver",
-            module.bastion_linux.bastion_security_group
+            "bastion-linux",
           ]
           cidr_blocks = local.security_group_cidrs.https
         }
@@ -88,7 +101,7 @@ locals {
           protocol    = "tcp"
           security_groups = [
             "private-jumpserver",
-            module.bastion_linux.bastion_security_group
+            "bastion-linux",
           ]
           cidr_blocks = local.security_group_cidrs.http7xxx
         }
@@ -99,7 +112,7 @@ locals {
           protocol    = "tcp"
           security_groups = [
             "private-jumpserver",
-            module.bastion_linux.bastion_security_group
+            "bastion-linux",
           ]
           cidr_blocks = local.security_group_cidrs.http7xxx
         }
@@ -132,7 +145,7 @@ locals {
           protocol    = "TCP"
           cidr_blocks = local.security_group_cidrs.ssh
           security_groups = [
-            module.bastion_linux.bastion_security_group
+            "bastion-linux",
           ]
         }
         http7001 = {
@@ -143,7 +156,7 @@ locals {
           security_groups = [
             "private-jumpserver",
             "private-lb",
-            module.bastion_linux.bastion_security_group
+            "bastion-linux",
           ]
           cidr_blocks = local.security_group_cidrs.http7xxx
         },
@@ -155,7 +168,7 @@ locals {
           security_groups = [
             "private-jumpserver",
             "private-lb",
-            module.bastion_linux.bastion_security_group
+            "bastion-linux",
           ]
           cidr_blocks = local.security_group_cidrs.http7xxx
         },
@@ -187,7 +200,7 @@ locals {
           to_port     = "3389"
           protocol    = "TCP"
           security_groups = [
-            module.bastion_linux.bastion_security_group
+            "bastion-linux",
           ]
         }
       }
@@ -219,7 +232,7 @@ locals {
           protocol    = "TCP"
           cidr_blocks = local.security_group_cidrs.ssh
           security_groups = [
-            module.bastion_linux.bastion_security_group
+            "bastion-linux",
           ]
         }
         oracle1521 = {
@@ -231,7 +244,7 @@ locals {
           security_groups = [
             "private-jumpserver",
             "private-web",
-            module.bastion_linux.bastion_security_group
+            "bastion-linux",
           ]
         }
         oracle3872 = {
@@ -243,7 +256,7 @@ locals {
           security_groups = [
             "private-jumpserver",
             "private-web",
-            module.bastion_linux.bastion_security_group
+            "bastion-linux",
           ]
         }
       }
