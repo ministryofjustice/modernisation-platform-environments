@@ -113,14 +113,31 @@ resource "aws_iam_role_policy" "dms_vpc_management_policy" {
 resource "aws_dms_replication_task" "tipstaff_migration_task" {
   depends_on = [null_resource.setup_target_rds_security_group, aws_db_instance.tipstaff_db, aws_dms_endpoint.target, aws_dms_endpoint.source, aws_dms_replication_instance.tipstaff_replication_instance]
 
-  migration_type            = "full-load-and-cdc"
-  replication_instance_arn  = aws_dms_replication_instance.tipstaff_replication_instance.replication_instance_arn
-  replication_task_id       = "tipstaff-migration-task"
-  replication_task_settings = "{\"FullLoadSettings\": {\"TargetTablePrepMode\": \"TRUNCATE_BEFORE_LOAD\"}}"
-  source_endpoint_arn       = aws_dms_endpoint.source.endpoint_arn
-  table_mappings            = "{\"rules\":[{\"rule-type\":\"selection\",\"rule-id\":\"1\",\"rule-name\":\"1\",\"object-locator\":{\"schema-name\":\"dbo\",\"table-name\":\"%\"},\"rule-action\":\"include\"}]}"
-  target_endpoint_arn       = aws_dms_endpoint.target.endpoint_arn
-  start_replication_task    = true
+  migration_type           = "full-load-and-cdc"
+  replication_instance_arn = aws_dms_replication_instance.tipstaff_replication_instance.replication_instance_arn
+  replication_task_id      = "tipstaff-migration-task"
+  source_endpoint_arn      = aws_dms_endpoint.source.endpoint_arn
+  target_endpoint_arn      = aws_dms_endpoint.target.endpoint_arn
+  start_replication_task   = false
+  replication_task_settings = jsonencode({
+    FullLoadSettings = {
+      TargetTablePrepMode = "TRUNCATE_BEFORE_LOAD"
+    }
+  })
+  table_mappings = jsonencode({
+    rules = [
+      {
+        "rule-type" = "selection"
+        "rule-id"   = "1"
+        "rule-name" = "1"
+        "object-locator" = {
+          "schema-name" = "dbo"
+          "table-name"  = "%"
+        }
+        "rule-action" = "include"
+      }
+    ]
+  })
 }
 
 resource "aws_security_group" "modernisation_dms_access" {
