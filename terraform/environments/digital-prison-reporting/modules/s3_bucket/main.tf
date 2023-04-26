@@ -17,14 +17,6 @@ resource "aws_s3_bucket" "storage" { # TBC "application_tf_state" should be gene
   tags = var.tags
 }
 
-resource "aws_s3_bucket_ownership_controls" "storage" {
-  bucket = aws_s3_bucket.storage[0].id
-
-  rule {
-    object_ownership = "BucketOwnerPreferred"
-  }
-}
-
 resource "aws_s3_bucket_acl" "acl" {
   bucket = aws_s3_bucket.storage[0].id
   acl    = "private"
