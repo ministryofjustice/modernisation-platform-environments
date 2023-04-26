@@ -42,6 +42,29 @@ resource "aws_dms_replication_instance" "tipstaff_replication_instance" {
   auto_minor_version_upgrade = true
   replication_instance_class = "dms.t3.large"
   replication_instance_id    = "tipstaff-replication-instance"
+  vpc_security_group_ids     = [aws_security_group.vpc_dms_replication_instance_group.id]
+}
+
+resource "aws_security_group" "vpc_dms_replication_instance_group" {
+  vpc_id      = data.aws_vpc.shared.id
+  name        = "vpc-dms-replication-instance-group"
+  description = "allow dms replication instance access to the shared vpc on the modernisation platform"
+
+  ingress {
+    from_port   = 5432
+    to_port     = 5432
+    protocol    = "tcp"
+    description = "Allow all inbound traffic"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    description = "Allow all outbound traffic"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 }
 
 // Create DMS VPC Role
