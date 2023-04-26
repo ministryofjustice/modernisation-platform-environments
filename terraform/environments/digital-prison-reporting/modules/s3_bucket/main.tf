@@ -96,9 +96,11 @@ resource "aws_s3_bucket_notification" "bucket_notification" {
 }
 
 resource "aws_s3_bucket_versioning" "version" {
+  count  = var.enable_s3_versioning ? 1 : 0
+
   bucket = aws_s3_bucket.storage[0].id
   versioning_configuration {
-    status = var.enable_versioning
+    status = var.enable_versioning_config
   }
 }
 
