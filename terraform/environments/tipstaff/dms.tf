@@ -26,16 +26,22 @@ resource "aws_dms_endpoint" "target" {
 }
 
 resource "aws_dms_replication_instance" "tipstaff_replication_instance" {
-  allocated_storage          = 100
-  apply_immediately          = true
-  availability_zone          = "eu-west-2a"
-  engine_version             = "3.4.7"
-  multi_az                   = false
-  publicly_accessible        = true
-  auto_minor_version_upgrade = true
-  replication_instance_class = "dms.t3.large"
-  replication_instance_id    = "tipstaff-replication-instance"
-  vpc_security_group_ids     = [aws_security_group.vpc_dms_replication_instance_group.id]
+  allocated_storage           = 100
+  apply_immediately           = true
+  availability_zone           = "eu-west-2a"
+  engine_version              = "3.4.7"
+  multi_az                    = false
+  publicly_accessible         = true
+  auto_minor_version_upgrade  = true
+  replication_instance_class  = "dms.t3.large"
+  replication_instance_id     = "tipstaff-replication-instance"
+  vpc_security_group_ids      = [aws_security_group.vpc_dms_replication_instance_group.id]
+  replication_subnet_group_id = aws_dms_replication_subnet_group.dms_replication_subnet_group.id
+}
+
+resource "aws_dms_replication_subnet_group" "dms_replication_subnet_group" {
+  subnet_ids                           = data.aws_subnets.shared-public.ids
+  replication_subnet_group_description = "DMS replication subnet group"
 }
 
 resource "aws_security_group" "vpc_dms_replication_instance_group" {
