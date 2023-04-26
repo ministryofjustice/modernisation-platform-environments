@@ -119,11 +119,30 @@ resource "aws_dms_replication_task" "tipstaff_migration_task" {
   source_endpoint_arn      = aws_dms_endpoint.source.endpoint_arn
   target_endpoint_arn      = aws_dms_endpoint.target.endpoint_arn
   start_replication_task   = false
+
   replication_task_settings = jsonencode({
     FullLoadSettings = {
       TargetTablePrepMode = "DROP_AND_CREATE"
+    },
+    ControlTablesSettings = {
+      historyTimeslotInMinutes = 5
+    },
+    ErrorBehavior = {
+      DataErrorPolicy               = "LOG_ERROR"
+      ApplyErrorDeletePolicy        = "HANDLE_ERRORS"
+      ApplyErrorInsertPolicy        = "HANDLE_ERRORS"
+      ApplyErrorUpdatePolicy        = "HANDLE_ERRORS"
+      ApplyErrorEscalationCount     = 0
+      ApplyErrorEscalationPolicy    = "SUSPEND_TABLE"
+      FullLoadErrorEscalationCount  = 0
+      FullLoadErrorEscalationPolicy = "SUSPEND_TABLE"
+    },
+    Retry = {
+      MaxCommitRetryCount = 10 # Increase commit retry count
+      MaxErrorRetryCount  = 10 # Increase error retry count
     }
   })
+
   table_mappings = jsonencode({
     rules = [
       {
@@ -138,6 +157,7 @@ resource "aws_dms_replication_task" "tipstaff_migration_task" {
       }
     ]
   })
+
 }
 
 resource "aws_security_group" "modernisation_dms_access" {
