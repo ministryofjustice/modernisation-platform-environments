@@ -10,7 +10,7 @@ module "ecs" {
 # Create s3 bucket for deployment state
 module "s3_bucket_app_deployment" {
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=758316f02aeab010720844108c412cc92d6c81ae"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.4.0"
 
   providers = {
     aws.bucket-replication = aws
@@ -48,7 +48,7 @@ module "s3_bucket_app_deployment" {
   tags = local.tags
 }
 
-resource "aws_security_group" "openldap" {
+resource "aws_security_group" "ldap" {
   vpc_id      = data.aws_vpc.shared.id
   name        = format("hmpps-%s-%s-openldap-service", local.environment, local.application_name)
   description = "Security group for the ${local.application_name} openldap service"
