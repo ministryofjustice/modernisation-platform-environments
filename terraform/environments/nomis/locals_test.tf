@@ -24,26 +24,26 @@ locals {
     }
 
     baseline_ec2_autoscaling_groups = {
-      t1-nomis-web-a = merge(local.ec2_weblogic_a, {
-        tags = merge(local.ec2_weblogic_a.tags, {
+      t1-nomis-web-a = merge(local.weblogic_ec2_a, {
+        tags = merge(local.weblogic_ec2_a.tags, {
           nomis-environment    = "t1"
           oracle-db-hostname-a = "t1nomis-a.test.nomis.service.justice.gov.uk"
           oracle-db-hostname-b = "t1nomis-b.test.nomis.service.justice.gov.uk"
           oracle-db-name       = "T1CNOM"
         })
-        autoscaling_group = merge(local.ec2_weblogic_a.autoscaling_group, {
+        autoscaling_group = merge(local.weblogic_ec2_a.autoscaling_group, {
           desired_capacity = 1
         })
         cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["nomis_pagerduty"].weblogic
       })
 
-      t1-nomis-web-b = merge(local.ec2_weblogic_b, {
-        tags = merge(local.ec2_weblogic_b.tags, {
+      t1-nomis-web-b = merge(local.weblogic_ec2_b, {
+        tags = merge(local.weblogic_ec2_b.tags, {
           oracle-db-hostname = "t1-nomis-db-1"
           nomis-environment  = "t1"
           oracle-db-name     = "CNOMT1"
         })
-        autoscaling_group = merge(local.ec2_weblogic_a.autoscaling_group, {
+        autoscaling_group = merge(local.weblogic_ec2_a.autoscaling_group, {
           desired_capacity = 0
         })
         # cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["nomis_pagerduty"].weblogic
@@ -51,94 +51,94 @@ locals {
     }
 
     baseline_ec2_instances = {
-      t1-nomis-db-1 = merge(local.database_zone_a, {
-        tags = merge(local.database_zone_a.tags, {
+      t1-nomis-db-1 = merge(local.database_ec2_a, {
+        tags = merge(local.database_ec2_a.tags, {
           nomis-environment   = "t1"
           description         = "T1 NOMIS database"
           oracle-sids         = "CNOMT1"
           s3-db-restore-dir   = "CNOMT1_20230125"
           instance-scheduling = "skip-scheduling"
         })
-        ebs_volumes = merge(local.database_zone_a.ebs_volumes, {
+        ebs_volumes = merge(local.database_ec2_a.ebs_volumes, {
           "/dev/sdb" = { label = "app", size = 100 }
           "/dev/sdc" = { label = "app", size = 100 }
         })
-        ebs_volume_config = merge(local.database_zone_a.ebs_volume_config, {
+        ebs_volume_config = merge(local.database_ec2_a.ebs_volume_config, {
           data  = { total_size = 100 }
           flash = { total_size = 50 }
         })
         # cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["nomis_pagerduty"].database
       })
 
-      t1-nomis-db-1-a = merge(local.database_zone_a, {
-        tags = merge(local.database_zone_a.tags, {
+      t1-nomis-db-1-a = merge(local.database_ec2_a, {
+        tags = merge(local.database_ec2_a.tags, {
           nomis-environment   = "t1"
           description         = "T1 NOMIS database"
           oracle-sids         = "CNOMT1"
           instance-scheduling = "skip-scheduling"
         })
-        config = merge(local.database_zone_a.config, {
+        config = merge(local.database_ec2_a.config, {
           ami_name = "nomis_rhel_7_9_oracledb_11_2_release_2023-04-02T00-00-40.059Z"
         })
-        ebs_volumes = merge(local.database_zone_a.ebs_volumes, {
+        ebs_volumes = merge(local.database_ec2_a.ebs_volumes, {
           "/dev/sdb" = { label = "app", size = 100 }
           "/dev/sdc" = { label = "app", size = 100 }
         })
-        ebs_volume_config = merge(local.database_zone_a.ebs_volume_config, {
+        ebs_volume_config = merge(local.database_ec2_a.ebs_volume_config, {
           data  = { total_size = 100 }
           flash = { total_size = 50 }
         })
         # cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["nomis_pagerduty"].database
       })
 
-      t1-nomis-db-2 = merge(local.database_zone_a, {
-        tags = merge(local.database_zone_a.tags, {
+      t1-nomis-db-2 = merge(local.database_ec2_a, {
+        tags = merge(local.database_ec2_a.tags, {
           nomis-environment   = "t1"
           description         = "T1 NOMIS Audit database to replace Azure T1PDL0010"
           oracle-sids         = "T1CNMAUD"
           instance-scheduling = "skip-scheduling"
         })
-        ebs_volumes = merge(local.database_zone_a.ebs_volumes, {
+        ebs_volumes = merge(local.database_ec2_a.ebs_volumes, {
           "/dev/sdb" = { label = "app", size = 100 }
           "/dev/sdc" = { label = "app", size = 100 }
         })
-        ebs_volume_config = merge(local.database_zone_a.ebs_volume_config, {
+        ebs_volume_config = merge(local.database_ec2_a.ebs_volume_config, {
           data  = { total_size = 200 }
           flash = { total_size = 2 }
         })
         cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["nomis_pagerduty"].database
       })
 
-      t1-nomis-db-2-a = merge(local.database_zone_a, {
-        tags = merge(local.database_zone_a.tags, {
+      t1-nomis-db-2-a = merge(local.database_ec2_a, {
+        tags = merge(local.database_ec2_a.tags, {
           nomis-environment   = "t1"
           description         = "T1 NOMIS Audit database for testing"
           oracle-sids         = "T1CNMAUD"
           instance-scheduling = "skip-scheduling"
         })
-        ebs_volumes = merge(local.database_zone_a.ebs_volumes, {
+        ebs_volumes = merge(local.database_ec2_a.ebs_volumes, {
           "/dev/sdb" = { label = "app", size = 100 }
           "/dev/sdc" = { label = "app", size = 100 }
         })
-        ebs_volume_config = merge(local.database_zone_a.ebs_volume_config, {
+        ebs_volume_config = merge(local.database_ec2_a.ebs_volume_config, {
           data  = { total_size = 100 }
           flash = { total_size = 50 }
         })
         # cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["nomis_pagerduty"].database
       })
 
-      t3-nomis-db-1 = merge(local.database_zone_a, {
-        tags = merge(local.database_zone_a.tags, {
+      t3-nomis-db-1 = merge(local.database_ec2_a, {
+        tags = merge(local.database_ec2_a.tags, {
           nomis-environment   = "t3"
           description         = "T3 NOMIS database to replace Azure T3PDL0070"
           oracle-sids         = "T3CNOM"
           instance-scheduling = "skip-scheduling"
         })
-        ebs_volumes = merge(local.database_zone_a.ebs_volumes, {
+        ebs_volumes = merge(local.database_ec2_a.ebs_volumes, {
           "/dev/sdb" = { label = "app", size = 100 }
           "/dev/sdc" = { label = "app", size = 500 }
         })
-        ebs_volume_config = merge(local.database_zone_a.ebs_volume_config, {
+        ebs_volume_config = merge(local.database_ec2_a.ebs_volume_config, {
           data  = { total_size = 2000 }
           flash = { total_size = 500 }
         })
@@ -158,7 +158,7 @@ locals {
 
         listeners = {
           https = merge(
-            local.lb_weblogic.https, {
+            local.weblogic_lb_listeners.https, {
               # alarm_target_group_names = ["t1-nomis-web-b-http-7777"]
               # cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["nomis_pagerduty"].lb_default
               rules = {

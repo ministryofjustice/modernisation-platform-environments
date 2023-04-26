@@ -1,14 +1,11 @@
-#------------------------------------------------------------------------------
-# Database
-#------------------------------------------------------------------------------
-
 # Use `s3-db-restore-dir` tag to trigger a restore from backup. See
 # https://github.com/ministryofjustice/modernisation-platform-configuration-management/blob/main/ansible/roles/db-restore
 #
-# Use `fixngo-connection-target` to monitor connectivity to a target in FixNGo.  See
+# Use `fixngo-connection-target` tag to monitor connectivity to a target in FixNGo.  See
 # https://github.com/ministryofjustice/modernisation-platform-configuration-management/tree/main/ansible/roles/oracle-db-monitoring
 
 locals {
+
   database_cloudwatch_metric_alarms = {
     oracle-db-disconnected = {
       comparison_operator = "GreaterThanOrEqualToThreshold"
@@ -94,6 +91,7 @@ locals {
       }
     }
   }
+
   database_cloudwatch_metric_alarms_lists = {
     database = {
       parent_keys = [
@@ -123,7 +121,7 @@ locals {
     }
   }
 
-  database_default = {
+  database_ec2_default = {
 
     config = merge(module.baseline_presets.ec2_instance.config.db, {
       ami_name  = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-07T12-48-08.562Z"
@@ -209,66 +207,14 @@ locals {
     }
   }
 
-  database_zone_a = merge(local.database_default, {
-    config = merge(local.database_default.config, {
+  database_ec2_a = merge(local.database_ec2_default, {
+    config = merge(local.database_ec2_default.config, {
       availability_zone = "${local.region}a"
     })
   })
-  database_zone_b = merge(local.database_default, {
-    config = merge(local.database_default.config, {
+  database_ec2_b = merge(local.database_ec2_default, {
+    config = merge(local.database_ec2_default.config, {
       availability_zone = "${local.region}b"
     })
   })
-}
-
-#------------------------------------------------------------------------------
-# Policy for PUT, GET, LIST access to database backups
-#------------------------------------------------------------------------------
-
-data "aws_iam_policy_document" "s3_db_backup_bucket_access" {
-  #tfsec:ignore:aws-iam-no-policy-wildcards:need to be able to write database backups to specific bucket
-  statement {
-    effect = "Allow"
-    actions = [
-      "s3:PutObject",
-      "s3:ListBucket",
-      "s3:GetObject"
-    ]
-    resources = [
-      "arn:aws:s3:::nomis-db-backup-bucket*",
-      "arn:aws:s3:::nomis-db-backup-bucket*/*"
-    ]
-  }
-}
-
-resource "aws_iam_policy" "s3_db_backup_bucket_access" {
-  name        = "s3-db-backup-bucket-access"
-  path        = "/"
-  description = "Policy for access to database backup bucket"
-  policy      = data.aws_iam_policy_document.s3_db_backup_bucket_access.json
-  tags = merge(
-    local.tags,
-    {
-      Name = "s3-db-backup-bucket-access"
-    },
-  )
-}
-
-#------------------------------------------------------------------------------
-# Upload audit archive dumps to s3
-#------------------------------------------------------------------------------
-
-resource "aws_ssm_document" "audit_s3_upload" {
-  name            = "UploadAuditArchivesToS3"
-  document_type   = "Command"
-  document_format = "YAML"
-  content         = templatefile("${path.module}/ssm-documents/templates/s3auditupload.yaml.tftmpl", { bucket = module.baseline.s3_buckets["nomis-audit-archives"].bucket.id, branch = "main" })
-  target_type     = "/AWS::EC2::Instance"
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "Upload Audit Archives to S3"
-    },
-  )
 }
