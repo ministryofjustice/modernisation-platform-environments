@@ -72,45 +72,45 @@ locals {
     }
 
     baseline_ec2_instances = {
-      preprod-nomis-db-2 = merge(local.database_zone_a, {
-        tags = merge(local.database_zone_a.tags, {
+      preprod-nomis-db-2 = merge(local.database_ec2_a, {
+        tags = merge(local.database_ec2_a.tags, {
           nomis-environment = "preprod"
           description       = "PreProduction NOMIS MIS and Audit database to replace Azure PPPDL00017"
           oracle-sids       = "PPCNMAUD"
         })
-        config = merge(local.database_zone_a.config, {
+        config = merge(local.database_ec2_a.config, {
           ami_name = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-03T12-51-25.032Z"
         })
-        instance = merge(local.database_zone_a.instance, {
+        instance = merge(local.database_ec2_a.instance, {
           instance_type = "r6i.2xlarge"
         })
-        ebs_volumes = merge(local.database_zone_a.ebs_volumes, {
+        ebs_volumes = merge(local.database_ec2_a.ebs_volumes, {
           # reduce sdc to 1000 when we move into preprod subscription
           "/dev/sdb" = { label = "app", size = 100 }
           "/dev/sdc" = { label = "app", size = 5120 }
         })
-        ebs_volume_config = merge(local.database_zone_a.ebs_volume_config, {
+        ebs_volume_config = merge(local.database_ec2_a.ebs_volume_config, {
           data  = { total_size = 4000 }
           flash = { total_size = 1000 }
         })
         cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["nomis_pagerduty"].database
       })
 
-      prod-nomis-db-2 = merge(local.database_zone_a, {
-        tags = merge(local.database_zone_a.tags, {
+      prod-nomis-db-2 = merge(local.database_ec2_a, {
+        tags = merge(local.database_ec2_a.tags, {
           nomis-environment        = "prod"
           description              = "Production NOMIS MIS and Audit database to replace Azure PDPDL00036 and PDPDL00038"
           oracle-sids              = "CNMAUD"
           fixngo-connection-target = "10.40.0.136"
         })
-        instance = merge(local.database_zone_a.instance, {
+        instance = merge(local.database_ec2_a.instance, {
           instance_type = "r6i.2xlarge"
         })
-        ebs_volumes = merge(local.database_zone_a.ebs_volumes, {
+        ebs_volumes = merge(local.database_ec2_a.ebs_volumes, {
           "/dev/sdb" = { label = "app", size = 100 }
           "/dev/sdc" = { label = "app", size = 3000, iops = 9000 }
         })
-        ebs_volume_config = merge(local.database_zone_a.ebs_volume_config, {
+        ebs_volume_config = merge(local.database_ec2_a.ebs_volume_config, {
           data  = { total_size = 4000 }
           flash = { total_size = 1000 }
         })
@@ -120,20 +120,20 @@ locals {
         )
       })
 
-      prod-nomis-db-3 = merge(local.database_zone_a, {
-        tags = merge(local.database_zone_a.tags, {
+      prod-nomis-db-3 = merge(local.database_ec2_a, {
+        tags = merge(local.database_ec2_a.tags, {
           nomis-environment = "prod"
           description       = "Production NOMIS HA database to replace Azure PDPDL00062"
           oracle-sids       = "PCNOMHA"
         })
-        instance = merge(local.database_zone_a.instance, {
+        instance = merge(local.database_ec2_a.instance, {
           instance_type = "r6i.4xlarge"
         })
-        ebs_volumes = merge(local.database_zone_a.ebs_volumes, {
+        ebs_volumes = merge(local.database_ec2_a.ebs_volumes, {
           "/dev/sdb" = { label = "app", size = 100 }
           "/dev/sdc" = { label = "app", size = 1000 }
         })
-        ebs_volume_config = merge(local.database_zone_a.ebs_volume_config, {
+        ebs_volume_config = merge(local.database_ec2_a.ebs_volume_config, {
           data  = { total_size = 3000, iops = 3750, throughput = 750 }
           flash = { total_size = 500 }
         })

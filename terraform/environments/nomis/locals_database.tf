@@ -1,14 +1,11 @@
-#------------------------------------------------------------------------------
-# Database
-#------------------------------------------------------------------------------
-
 # Use `s3-db-restore-dir` tag to trigger a restore from backup. See
 # https://github.com/ministryofjustice/modernisation-platform-configuration-management/blob/main/ansible/roles/db-restore
 #
-# Use `fixngo-connection-target` to monitor connectivity to a target in FixNGo.  See
+# Use `fixngo-connection-target` tag to monitor connectivity to a target in FixNGo.  See
 # https://github.com/ministryofjustice/modernisation-platform-configuration-management/tree/main/ansible/roles/oracle-db-monitoring
 
 locals {
+
   database_cloudwatch_metric_alarms = {
     oracle-db-disconnected = {
       comparison_operator = "GreaterThanOrEqualToThreshold"
@@ -94,6 +91,7 @@ locals {
       }
     }
   }
+
   database_cloudwatch_metric_alarms_lists = {
     database = {
       parent_keys = [
@@ -123,7 +121,7 @@ locals {
     }
   }
 
-  database_default = {
+  database_ec2_default = {
 
     config = merge(module.baseline_presets.ec2_instance.config.db, {
       ami_name  = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-07T12-48-08.562Z"
@@ -209,13 +207,13 @@ locals {
     }
   }
 
-  database_zone_a = merge(local.database_default, {
-    config = merge(local.database_default.config, {
+  database_ec2_a = merge(local.database_ec2_default, {
+    config = merge(local.database_ec2_default.config, {
       availability_zone = "${local.region}a"
     })
   })
-  database_zone_b = merge(local.database_default, {
-    config = merge(local.database_default.config, {
+  database_ec2_b = merge(local.database_ec2_default, {
+    config = merge(local.database_ec2_default.config, {
       availability_zone = "${local.region}b"
     })
   })
