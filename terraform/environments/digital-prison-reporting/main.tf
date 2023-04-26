@@ -98,7 +98,7 @@ module "glue_demo_table" {
 }
 
 # Glue Cloud Platform Ingestion Job (Load, Reload, CDC)
-module "glue_cloudplatform_reporting_job" {
+module "glue_reporting_hub_job" {
   source                        = "./modules/glue_job"
   create_job                    = local.create_job
   name                          = "${local.project}-reporting-hub-${local.env}"
@@ -220,10 +220,10 @@ module "glue_cloudplatform_reporting_job" {
 #}
 
 # Glue Domain Platform Refresh Job
-module "glue_domainplatform_refresh_job" {
+module "glue_domain_refresh_job" {
   source                        = "./modules/glue_job"
   create_job                    = local.create_job
-  name                          = "${local.project}-domain-platform-refresh-${local.env}"
+  name                          = "${local.project}-domain-refresh-${local.env}"
   description                   = "Monitors the reporting hub for table changes and applies them to domains"
   create_security_configuration = local.create_sec_conf
   job_language                  = "scala"
@@ -1202,12 +1202,12 @@ module "dynamo_tab_domain_registry" {
   )
 }
 
-# kinesis Reader Table,
-module "dynamo_tab_kinesis_reader" {
+# Dynamo Reporting HUB (DPR-340, DPR-378)
+module "dynamo_tab_reporting_hub" {
   source              = "./modules/dynamo_tables"
   create_table        = true
   autoscaling_enabled = false
-  name                = "${local.project}-kinesis-reader-${local.environment}"
+  name                = "${local.project}-reporting-hub-${local.environment}"
 
   hash_key    = "leaseKey" # Hash
   range_key   = ""         # Sort
@@ -1224,7 +1224,7 @@ module "dynamo_tab_kinesis_reader" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-kinesis-reader-${local.environment}"
+      Name          = "${local.project}-reporting-hub-${local.environment}"
       Resource_Type = "Dynamo Table"
     }
   )
