@@ -17,11 +17,6 @@ resource "aws_s3_bucket" "storage" { # TBC "application_tf_state" should be gene
   tags = var.tags
 }
 
-resource "aws_s3_bucket_acl" "acl" {
-  bucket = aws_s3_bucket.storage[0].id
-  acl    = "private"
-}
-
 resource "aws_s3_bucket_public_access_block" "storage" {
   bucket = aws_s3_bucket.storage[0].id
 
