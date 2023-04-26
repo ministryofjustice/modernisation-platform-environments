@@ -170,7 +170,7 @@ locals {
     })
     user_data_cloud_init = merge(local.weblogic_ec2_default.user_data_cloud_init, {
       args = merge(local.weblogic_ec2_default.user_data_cloud_init.args, {
-        branch = "a5c69245a3e30ca8d44ab269062479e1768e2f5c" # 2023-04-25
+        branch = "nomis/DSOS-1874/reporting-fix"
       })
     })
   })

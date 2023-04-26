@@ -44,7 +44,7 @@ locals {
           oracle-db-name     = "CNOMT1"
         })
         autoscaling_group = merge(local.weblogic_ec2_a.autoscaling_group, {
-          desired_capacity = 0
+          desired_capacity = 1
         })
         # cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["nomis_pagerduty"].weblogic
       })
