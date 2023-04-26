@@ -7,13 +7,27 @@ resource "aws_wafv2_ip_set" "ebs_waf_ip_set" {
   description         = "List of trusted IP Addresses allowing access via WAF"
 
   addresses = [
-    "51.149.249.32/27",
-    "81.134.202.29/32",
-    "35.177.145.193/32",
-    "35.176.127.232/32",
-    "18.130.39.94/32",
-    "51.149.249.0/27",
-    "51.149.250.0/24"
+    "81.134.202.29/32",  // MoJ Digital Wifi
+    "35.177.125.252/32", // MoJ VPN Gateway Proxies
+    "35.177.137.160/32", // MoJ VPN Gateway Proxies
+    "35.176.127.232/32", // Management DMZ Subnet A - London Non-Prod NAT Gateway
+    "35.177.145.193/32", // Management DMZ Subnet B - London Non-Prod NAT Gateway
+    "18.130.39.94/32",   // Management DMC Subnet C - London Non-Prod NAT Gateway
+    "52.56.212.11/32",   // Management DMZ Subnet A - London Prod NAT Gateway
+    "35.176.254.38/32",  // Management DMZ Subnet B - London Prod NAT Gateway
+    "35.177.173.197/32", // Management DMC Subnet C - London Prod NAT Gateway
+    "195.59.75.0/24",    // ARK Data Center External Internet access addresses - NPS and HMCTS users transitioned under TTP
+    "194.33.192.0/25",   // ARK Data Center External Internet access addresses - NPS and HMCTS users transitioned under TTP
+    "194.33.193.0/25",   // ARK Data Center External Internet access addresses - NPS and HMCTS users transitioned under TTP
+    "194.33.196.0/25",   // ARK Data Center External Internet access addresses - NPS and HMCTS users transitioned under TTP
+    "194.33.197.0/25",   // ARK Data Center External Internet access addresses - NPS and HMCTS users transitioned under TTP
+    "51.149.250.0/24",   // MoJO Production Account BYOIP CIDR range  
+    "51.149.249.0/27",   // ARK Corsham Internet Egress Exponential-E
+    "51.149.249.32/27",  // ARK Corsham Internet Egress Exponential-E
+    "194.33.249.0/27",   // ARK Corsham Internet Egress Vodafone
+    "194.33.248.0/27",   // ARK Corsham Internet Egress Vodafone
+    "20.49.214.199/32",  // Azure Landing Zone Egress
+    "20.49.214.228/32"   // Azure Landing Zone Egress
   ]
 
   tags = merge(local.tags,
