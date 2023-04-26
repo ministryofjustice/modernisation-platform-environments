@@ -44,3 +44,8 @@ variable "enable_lifecycle" {
   description = "Enabled Lifecycle for S3 Storage, Default is False"
   default     = false
 }
+
+variable "enable_versioning" {
+  description = "Enabled Lifecycle for S3 Storage, Default is False"
+  default     = "Disabled"
+}

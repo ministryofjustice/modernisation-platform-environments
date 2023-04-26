@@ -105,9 +105,9 @@ module "glue_reporting_hub_job" {
   description                   = local.description
   command_type                  = "gluestreaming"
   create_security_configuration = local.create_sec_conf
-  temp_dir                      = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/tmp/reporting-hub/"
-  checkpoint_dir                = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/checkpoint/reporting-hub/"
-  spark_event_logs              = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/spark-logs/reporting-hub/"
+  temp_dir                      = "s3://${module.s3_glue_jobs_bucket.bucket_id}/tmp/reporting-hub/"
+  checkpoint_dir                = "s3://${module.s3_glue_jobs_bucket.bucket_id}/checkpoint/reporting-hub/"
+  spark_event_logs              = "s3://${module.s3_glue_jobs_bucket.bucket_id}/spark-logs/reporting-hub/"
   tags                          = local.all_tags
   enable_continuous_log_filter  = false
   project_id                    = local.project
@@ -147,9 +147,9 @@ module "glue_reporting_hub_job" {
 #  job_language                  = "scala"
 #  command_type                  = "gluestreaming"
 #  create_security_configuration = local.create_sec_conf
-#  temp_dir                      = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/tmp/reporting-hub/"
-#  checkpoint_dir                = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/checkpoint/reporting-hub/"
-#  spark_event_logs              = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/spark-logs/reporting-hub/"
+#  temp_dir                      = "s3://${module.s3_glue_jobs_bucket.bucket_id}/tmp/reporting-hub/"
+#  checkpoint_dir                = "s3://${module.s3_glue_jobs_bucket.bucket_id}/checkpoint/reporting-hub/"
+#  spark_event_logs              = "s3://${module.s3_glue_jobs_bucket.bucket_id}/spark-logs/reporting-hub/"
 #  enable_continuous_log_filter  = false
 #  project_id                    = local.project
 #  aws_kms_key                   = local.s3_kms_arn
@@ -194,9 +194,9 @@ module "glue_reporting_hub_job" {
 #  description                   = "Monitors the reporting hub for table changes and applies them to domains"
 #  create_security_configuration = local.create_sec_conf
 #  job_language                  = "scala"
-#  temp_dir                      = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/tmp/change-monitor/"
-#  checkpoint_dir                = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/checkpoint/change-monitor/"
-#  spark_event_logs              = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/spark-logs/change-monitor/"
+#  temp_dir                      = "s3://${module.s3_glue_jobs_bucket.bucket_id}/tmp/change-monitor/"
+#  checkpoint_dir                = "s3://${module.s3_glue_jobs_bucket.bucket_id}/checkpoint/change-monitor/"
+#  spark_event_logs              = "s3://${module.s3_glue_jobs_bucket.bucket_id}/spark-logs/change-monitor/"
 #  tags                          = local.all_tags
 #  script_location               = "s3://${local.project}-artifact-store-${local.environment}/artifacts/domain-platform/digital-prison-reporting-poc/domain-platform-table-change-monitor-vLatest.scala"
 #  enable_continuous_log_filter  = false
@@ -211,11 +211,11 @@ module "glue_reporting_hub_job" {
 #    "--class"               = "GlueApp"
 #    "--cloud.platform.path" = "s3://${module.s3_curated_bucket[0].bucket.id}"
 #    "--domain.files.path"   = "s3://${module.s3_domain_config_bucket[0].bucket.id}/"
-#    "--domain.repo.path"    = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/domain-repo/" ## Added /
+#    "--domain.repo.path"    = "s3://${module.s3_glue_jobs_bucket.bucket_id}/domain-repo/" ## Added /
 #    "--source.queue"        = "domain-cdc-event-notification"                                ## DPR-287, needs right source - TBC
 #    "--source.region"       = local.account_region
 #    "--target.path"         = "s3://${module.s3_domain_bucket[0].bucket.id}/" # Added /
-#    "--checkpoint.location" = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/checkpoint/change-monitor/"
+#    "--checkpoint.location" = "s3://${module.s3_glue_jobs_bucket.bucket_id}/checkpoint/change-monitor/"
 #  }
 #}
 
@@ -227,9 +227,9 @@ module "glue_domain_refresh_job" {
   description                   = "Monitors the reporting hub for table changes and applies them to domains"
   create_security_configuration = local.create_sec_conf
   job_language                  = "scala"
-  temp_dir                      = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/tmp/platform-refresh/"
-  checkpoint_dir                = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/checkpoint/platform-refresh/"
-  spark_event_logs              = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/spark-logs/platform-refresh/"
+  temp_dir                      = "s3://${module.s3_glue_jobs_bucket.bucket_id}/tmp/platform-refresh/"
+  checkpoint_dir                = "s3://${module.s3_glue_jobs_bucket.bucket_id}/checkpoint/platform-refresh/"
+  spark_event_logs              = "s3://${module.s3_glue_jobs_bucket.bucket_id}/spark-logs/platform-refresh/"
   tags                          = local.all_tags
   script_location               = "s3://${local.project}-artifact-store-${local.environment}/artifacts/domain-platform/digital-prison-reporting-poc/domain-platform-refresh-vLatest.scala"
   enable_continuous_log_filter  = false
@@ -244,9 +244,9 @@ module "glue_domain_refresh_job" {
     "--class"               = "GlueApp"
     "--cloud.platform.path" = "s3://${module.s3_curated_bucket[0].bucket.id}"
     "--domain.files.path"   = "s3://${module.s3_domain_config_bucket[0].bucket.id}/"         # Added /
-    "--domain.repo.path"    = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/domain-repo/" # Added /
+    "--domain.repo.path"    = "s3://${module.s3_glue_jobs_bucket.bucket_id}/domain-repo/" # Added /
     "--target.path"         = "s3://${module.s3_domain_bucket[0].bucket.id}/"                # Added /
-    "--checkpoint.location" = "s3://${module.s3_glue_jobs_bucket[0].bucket.id}/checkpoint/platform-refresh/"
+    "--checkpoint.location" = "s3://${module.s3_glue_jobs_bucket.bucket_id}/checkpoint/platform-refresh/"
   }
 }
 

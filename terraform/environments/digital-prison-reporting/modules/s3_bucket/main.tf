@@ -95,12 +95,12 @@ resource "aws_s3_bucket_notification" "bucket_notification" {
   }
 }
 
-#resource "aws_s3_bucket_versioning" "version" {
-#  bucket = aws_s3_bucket.storage.id
-#  versioning_configuration {
-#    status = "Disabled"
-#  }
-#}
+resource "aws_s3_bucket_versioning" "version" {
+  bucket = aws_s3_bucket.storage[0].id
+  versioning_configuration {
+    status = var.enable_versioning
+  }
+}
 
 #S3 bucket access policy
 #resource "aws_iam_policy" "application_tf_state_policy" {
