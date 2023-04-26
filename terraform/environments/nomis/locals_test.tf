@@ -24,26 +24,26 @@ locals {
     }
 
     baseline_ec2_autoscaling_groups = {
-      t1-nomis-web-a = merge(local.ec2_weblogic_a, {
-        tags = merge(local.ec2_weblogic_a.tags, {
+      t1-nomis-web-a = merge(local.weblogic_ec2_a, {
+        tags = merge(local.weblogic_ec2_a.tags, {
           nomis-environment    = "t1"
           oracle-db-hostname-a = "t1nomis-a.test.nomis.service.justice.gov.uk"
           oracle-db-hostname-b = "t1nomis-b.test.nomis.service.justice.gov.uk"
           oracle-db-name       = "T1CNOM"
         })
-        autoscaling_group = merge(local.ec2_weblogic_a.autoscaling_group, {
+        autoscaling_group = merge(local.weblogic_ec2_a.autoscaling_group, {
           desired_capacity = 1
         })
         cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["nomis_pagerduty"].weblogic
       })
 
-      t1-nomis-web-b = merge(local.ec2_weblogic_b, {
-        tags = merge(local.ec2_weblogic_b.tags, {
+      t1-nomis-web-b = merge(local.weblogic_ec2_b, {
+        tags = merge(local.weblogic_ec2_b.tags, {
           oracle-db-hostname = "t1-nomis-db-1"
           nomis-environment  = "t1"
           oracle-db-name     = "CNOMT1"
         })
-        autoscaling_group = merge(local.ec2_weblogic_a.autoscaling_group, {
+        autoscaling_group = merge(local.weblogic_ec2_a.autoscaling_group, {
           desired_capacity = 0
         })
         # cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["nomis_pagerduty"].weblogic
@@ -158,7 +158,7 @@ locals {
 
         listeners = {
           https = merge(
-            local.lb_weblogic.https, {
+            local.weblogic_lb_listeners.https, {
               # alarm_target_group_names = ["t1-nomis-web-b-http-7777"]
               # cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["nomis_pagerduty"].lb_default
               rules = {

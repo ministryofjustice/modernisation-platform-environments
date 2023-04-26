@@ -4,7 +4,7 @@
 
 locals {
 
-  lb_target_group_http_7001 = {
+  weblogic_target_group_http_7001 = {
     port                 = 7001
     protocol             = "HTTP"
     target_type          = "instance"
@@ -25,7 +25,7 @@ locals {
     }
   }
 
-  lb_target_group_http_7777 = {
+  weblogic_target_group_http_7777 = {
     port                 = 7777
     protocol             = "HTTP"
     target_type          = "instance"
@@ -46,7 +46,7 @@ locals {
     }
   }
 
-  lb_weblogic = {
+  weblogic_lb_listeners = {
     https = {
       port                      = 443
       protocol                  = "HTTPS"
@@ -63,7 +63,7 @@ locals {
     }
   }
 
-  ec2_weblogic_cloudwatch_metric_alarms = {
+  weblogic_cloudwatch_metric_alarms = {
     weblogic-node-manager-service = {
       comparison_operator = "GreaterThanOrEqualToThreshold"
       evaluation_periods  = "3"
@@ -78,7 +78,8 @@ locals {
       }
     }
   }
-  ec2_weblogic_cloudwatch_metric_alarms_lists = {
+
+  weblogic_cloudwatch_metric_alarms_lists = {
     weblogic = {
       parent_keys = [
         "ec2_default",
@@ -90,13 +91,14 @@ locals {
       ]
     }
   }
+
   weblogic_cloudwatch_log_groups = {
     cwagent-weblogic-logs = {
       retention_in_days = 30
     }
   }
 
-  ec2_weblogic_default = {
+  weblogic_ec2_default = {
 
     config = merge(module.baseline_presets.ec2_instance.config.default, {
       ami_name                  = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-03-15T17-18-22.178Z"
@@ -145,7 +147,7 @@ locals {
     }
 
     lb_target_groups = {
-      http-7777 = local.lb_target_group_http_7777
+      http-7777 = local.weblogic_target_group_http_7777
     }
 
     tags = {
@@ -156,22 +158,22 @@ locals {
       component   = "web"
     }
   }
-  ec2_weblogic_a = merge(local.ec2_weblogic_default, {
-    config = merge(local.ec2_weblogic_default.config, {
+  weblogic_ec2_a = merge(local.weblogic_ec2_default, {
+    config = merge(local.weblogic_ec2_default.config, {
       availability_zone = "${local.region}a"
     })
-    user_data_cloud_init = merge(local.ec2_weblogic_default.user_data_cloud_init, {
-      args = merge(local.ec2_weblogic_default.user_data_cloud_init.args, {
+    user_data_cloud_init = merge(local.weblogic_ec2_default.user_data_cloud_init, {
+      args = merge(local.weblogic_ec2_default.user_data_cloud_init.args, {
         branch = "a5c69245a3e30ca8d44ab269062479e1768e2f5c" # 2023-04-25
       })
     })
   })
-  ec2_weblogic_b = merge(local.ec2_weblogic_default, {
-    config = merge(local.ec2_weblogic_default.config, {
+  weblogic_ec2_b = merge(local.weblogic_ec2_default, {
+    config = merge(local.weblogic_ec2_default.config, {
       availability_zone = "${local.region}a"
     })
-    user_data_cloud_init = merge(local.ec2_weblogic_default.user_data_cloud_init, {
-      args = merge(local.ec2_weblogic_default.user_data_cloud_init.args, {
+    user_data_cloud_init = merge(local.weblogic_ec2_default.user_data_cloud_init, {
+      args = merge(local.weblogic_ec2_default.user_data_cloud_init.args, {
         branch = "a5c69245a3e30ca8d44ab269062479e1768e2f5c" # 2023-04-25
       })
     })
