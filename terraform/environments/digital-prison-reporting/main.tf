@@ -423,63 +423,20 @@ module "s3_demo_bucket" {
 
 # S3 Glue Jobs
 module "s3_glue_jobs_bucket" {
-  count  = local.create_bucket ? 1 : 0
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.2.0"
-
-  providers = {
-    aws.bucket-replication = aws
-  }
-
-  bucket_prefix = "${local.project}-glue-jobs-${local.env}-"
-
-  replication_enabled = false
-  custom_kms_key      = local.s3_kms_arn
-  lifecycle_rule = [
-    {
-      id      = "main"
-      enabled = "Enabled"
-      prefix  = ""
-
-      tags = {
-        rule      = "log"
-        autoclean = "true"
-      }
-
-      transition = [
-        {
-          days          = 90
-          storage_class = "STANDARD_IA"
-        }
-      ]
-
-      expiration = {
-        days = 730
-      }
-
-      noncurrent_version_transition = [
-        {
-          days          = 90
-          storage_class = "STANDARD_IA"
-          }, {
-          days          = 365
-          storage_class = "GLACIER"
-        }
-      ]
-
-      noncurrent_version_expiration = {
-        days = 730
-      }
-    }
-  ]
+  source                    = "./modules/s3_bucket"
+  create_s3                 = local.setup_buckets
+  name                      = "${local.project}-glue-jobs-${local.environment}"
+  custom_kms_key            = local.s3_kms_arn
+  create_notification_queue = false # For SQS Queue
+  enable_lifecycle          = true
 
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-glue-jobs-${local.env}-s3"
+      Name          = "${local.project}-violation-${local.environment}"
       Resource_Type = "S3 Bucket"
     }
   )
-
 }
 
 # S3 Landing
