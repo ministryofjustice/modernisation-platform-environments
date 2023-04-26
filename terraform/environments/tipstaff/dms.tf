@@ -114,6 +114,7 @@ resource "aws_dms_replication_task" "tipstaff_migration_task" {
 }
 
 resource "aws_security_group" "modernisation_dms_access_rule" {
+  vpc_id      = data.aws_vpc.shared.id
   provider    = aws.tacticalproducts
   name        = "modernisation_dms_access_rule"
   description = "allow dms access to the database for the modernisation platform"
