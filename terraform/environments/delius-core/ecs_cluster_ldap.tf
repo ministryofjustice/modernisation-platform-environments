@@ -68,15 +68,15 @@ resource "aws_security_group_rule" "allow_all_egress" {
   security_group_id = aws_security_group.ldap.id
 }
 
-# resource "aws_security_group_rule" "alb" {
-#   description              = "Allow inbound traffic from ALB"
-#   type                     = "ingress"
-#   from_port                = local.openldap_port
-#   to_port                  = local.openldap_port
-#   protocol                 = "tcp"
-#   source_security_group_id = aws_security_group.load_balancer_security_group.id
-#   security_group_id        = aws_security_group.openldap.id
-# }
+resource "aws_security_group_rule" "alb" {
+  description              = "Allow inbound traffic from ALB"
+  type                     = "ingress"
+  from_port                = local.openldap_port
+  to_port                  = local.openldap_port
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.load_balancer_security_group.id
+  security_group_id        = aws_security_group.openldap.id
+}
 
 resource "aws_cloudwatch_log_group" "openldap" {
   name              = format("%s-openldap-ecs", local.application_name)
