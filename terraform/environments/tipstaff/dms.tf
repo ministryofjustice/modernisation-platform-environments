@@ -1,9 +1,9 @@
-# provider "aws" {
-#   region     = "eu-west-2"
-#   access_key = jsondecode(data.aws_secretsmanager_secret_version.dms_source_credentials.secret_string)["ACCESS_KEY"]
-#   secret_key = jsondecode(data.aws_secretsmanager_secret_version.dms_source_credentials.secret_string)["SECRET_KEY"]
-#   alias      = "tacticalproducts"
-# }
+provider "aws" {
+  region     = "eu-west-2"
+  access_key = jsondecode(data.aws_secretsmanager_secret_version.dms_source_credentials.secret_string)["ACCESS_KEY"]
+  secret_key = jsondecode(data.aws_secretsmanager_secret_version.dms_source_credentials.secret_string)["SECRET_KEY"]
+  alias      = "tacticalproducts"
+}
 
 # resource "aws_dms_endpoint" "source" {
 #   depends_on    = [null_resource.setup_target_rds_security_group, aws_db_instance.tipstaff_db, aws_dms_endpoint.target, aws_dms_replication_instance.tipstaff_replication_instance]
