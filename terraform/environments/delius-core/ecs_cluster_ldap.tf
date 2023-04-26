@@ -7,27 +7,6 @@ module "ecs" {
   tags = local.tags
 }
 
-resource "aws_lb" "ldap_external" {
-  # checkov:skip=CKV_AWS_91
-  # checkov:skip=CKV2_AWS_28
-
-  name               = "${local.application_name}-ldap-lb"
-  internal           = false
-  load_balancer_type = "application"
-  security_groups    = []
-  subnets            = data.aws_subnets.shared-public.ids
-
-  enable_deletion_protection = false
-  drop_invalid_header_fields = true
-
-  tags = merge(
-    local.tags,
-    {
-      Name = local.application_name
-    }
-  )
-}
-
 # Create s3 bucket for deployment state
 module "s3_bucket_app_deployment" {
 
