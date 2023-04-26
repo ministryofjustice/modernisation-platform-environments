@@ -379,7 +379,7 @@ module "s3_glue_job_bucket" {
 module "s3_landing_bucket" {
   source                    = "./modules/s3_bucket"
   create_s3                 = local.setup_buckets
-  name                      = "${local.project}-landing-${local.env}
+  name                      = "${local.project}-landing-${local.env}"
   custom_kms_key            = local.s3_kms_arn
   create_notification_queue = false # For SQS Queue
   enable_lifecycle          = true
