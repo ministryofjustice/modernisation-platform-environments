@@ -1,10 +1,3 @@
-provider "aws" {
-  region     = "eu-west-2"
-  access_key = jsondecode(data.aws_secretsmanager_secret_version.dms_source_credentials.secret_string)["ACCESS_KEY"]
-  secret_key = jsondecode(data.aws_secretsmanager_secret_version.dms_source_credentials.secret_string)["SECRET_KEY"]
-  alias      = "tacticalproducts"
-}
-
 # resource "aws_dms_endpoint" "source" {
 #   depends_on    = [null_resource.setup_target_rds_security_group, aws_db_instance.tipstaff_db, aws_dms_endpoint.target, aws_dms_replication_instance.tipstaff_replication_instance]
 #   database_name = "tipstaff_staging"
@@ -136,9 +129,9 @@ provider "aws" {
 #   start_replication_task    = true
 # }
 
-# resource "aws_security_group" "modernisation_dms_access_rule" {
+# resource "aws_security_group" "modernisation_dms_access" {
 #   provider    = aws.tacticalproducts
-#   name        = "modernisation_dms_access_rule"
+#   name        = "modernisation_dms_access"
 #   description = "allow dms access to the database for the modernisation platform"
 
 #   ingress {
@@ -165,7 +158,7 @@ provider "aws" {
 #     command     = "chmod +x ./setup-security-group.sh; ./setup-security-group.sh"
 
 #     environment = {
-#       DMS_SECURITY_GROUP            = aws_security_group.modernisation_dms_access_rule.id
+#       DMS_SECURITY_GROUP            = aws_security_group.modernisation_dms_access.id
 #       DMS_TARGET_ACCOUNT_ACCESS_KEY = jsondecode(data.aws_secretsmanager_secret_version.dms_source_credentials.secret_string)["ACCESS_KEY"]
 #       DMS_TARGET_ACCOUNT_SECRET_KEY = jsondecode(data.aws_secretsmanager_secret_version.dms_source_credentials.secret_string)["SECRET_KEY"]
 #       DMS_TARGET_ACCOUNT_REGION     = "eu-west-2"
