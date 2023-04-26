@@ -40,6 +40,7 @@ resource "aws_dms_replication_instance" "tipstaff_replication_instance" {
 }
 
 resource "aws_dms_replication_subnet_group" "dms_replication_subnet_group" {
+  replication_subnet_group_id          = "dms-replication-subnet-group"
   subnet_ids                           = data.aws_subnets.shared-public.ids
   replication_subnet_group_description = "DMS replication subnet group"
 }
