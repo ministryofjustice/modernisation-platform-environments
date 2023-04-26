@@ -1,14 +1,15 @@
 resource "aws_dms_endpoint" "source" {
-  depends_on    = [null_resource.setup_target_rds_security_group, aws_db_instance.tipstaff_db, aws_dms_endpoint.target, aws_dms_replication_instance.tipstaff_replication_instance]
-  database_name = "tipstaff_staging"
-  endpoint_id   = "tipstaff-source"
-  endpoint_type = "source"
-  engine_name   = "postgres"
-  username      = jsondecode(data.aws_secretsmanager_secret_version.dms_source_credentials.secret_string)["DTS-STAGING-DB-MASTER-USER"]
-  password      = jsondecode(data.aws_secretsmanager_secret_version.dms_source_credentials.secret_string)["DTS-STAGING-DB-MASTER-PASSWORD"]
-  port          = 5432
-  server_name   = jsondecode(data.aws_secretsmanager_secret_version.dms_source_credentials.secret_string)["DTS-STAGING-DB-HOSTNAME"]
-  ssl_mode      = "none"
+  depends_on                  = [null_resource.setup_target_rds_security_group, aws_db_instance.tipstaff_db, aws_dms_endpoint.target, aws_dms_replication_instance.tipstaff_replication_instance]
+  database_name               = "tipstaff_staging"
+  endpoint_id                 = "tipstaff-source"
+  endpoint_type               = "source"
+  engine_name                 = "postgres"
+  username                    = jsondecode(data.aws_secretsmanager_secret_version.dms_source_credentials.secret_string)["DTS-STAGING-DB-MASTER-USER"]
+  password                    = jsondecode(data.aws_secretsmanager_secret_version.dms_source_credentials.secret_string)["DTS-STAGING-DB-MASTER-PASSWORD"]
+  port                        = 5432
+  server_name                 = jsondecode(data.aws_secretsmanager_secret_version.dms_source_credentials.secret_string)["DTS-STAGING-DB-HOSTNAME"]
+  ssl_mode                    = "none"
+  extra_connection_attributes = "heartbeatEnable=Y;"
 }
 
 resource "aws_dms_endpoint" "target" {
