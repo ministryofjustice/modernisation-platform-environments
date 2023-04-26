@@ -109,16 +109,7 @@ locals {
     data-db            = local.security_groups.data_db
   }
 
-  baseline_sns_topics = {
-    "dba_slack_pagerduty" = {
-      display_name      = "Pager duty integration for dba_slack"
-      kms_master_key_id = "general"
-    }
-    "dba_callout_pagerduty" = {
-      display_name      = "Pager duty integration for dba_callout"
-      kms_master_key_id = "general"
-    }
-  }
+  baseline_sns_topics = {}
 
   autoscaling_schedules_default = {
     "scale_up" = {
