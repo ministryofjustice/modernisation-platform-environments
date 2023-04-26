@@ -121,7 +121,7 @@ resource "aws_dms_replication_task" "tipstaff_migration_task" {
   start_replication_task   = false
   replication_task_settings = jsonencode({
     FullLoadSettings = {
-      TargetTablePrepMode = "TRUNCATE_BEFORE_LOAD"
+      TargetTablePrepMode = "DROP_AND_CREATE"
     }
   })
   table_mappings = jsonencode({
