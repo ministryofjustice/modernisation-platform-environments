@@ -27,7 +27,7 @@ resource "aws_dms_endpoint" "target" {
 }
 
 resource "aws_dms_replication_instance" "tipstaff_replication_instance" {
-  allocated_storage           = 100
+  allocated_storage           = 300
   apply_immediately           = true
   availability_zone           = "eu-west-2a"
   engine_version              = "3.4.7"
