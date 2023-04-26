@@ -136,10 +136,6 @@ resource "aws_dms_replication_task" "tipstaff_migration_task" {
       ApplyErrorEscalationPolicy    = "SUSPEND_TABLE"
       FullLoadErrorEscalationCount  = 0
       FullLoadErrorEscalationPolicy = "SUSPEND_TABLE"
-    },
-    Retry = {
-      MaxCommitRetryCount = 10 # Increase commit retry count
-      MaxErrorRetryCount  = 10 # Increase error retry count
     }
   })
 
