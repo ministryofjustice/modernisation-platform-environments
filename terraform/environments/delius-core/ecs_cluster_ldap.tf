@@ -14,7 +14,7 @@ resource "aws_lb" "ldap_external" {
   name               = "${local.application_name}-ldap-lb"
   internal           = false
   load_balancer_type = "application"
-  security_groups    = [aws_security_group.ldap_load_balancer_security_group.id]
+  security_groups    = []
   subnets            = data.aws_subnets.shared-public.ids
 
   enable_deletion_protection = false
