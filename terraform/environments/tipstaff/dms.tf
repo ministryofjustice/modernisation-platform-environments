@@ -128,14 +128,12 @@ resource "aws_dms_replication_task" "tipstaff_migration_task" {
       historyTimeslotInMinutes = 5
     },
     ErrorBehavior = {
-      DataErrorPolicy               = "LOG_ERROR"
-      ApplyErrorDeletePolicy        = "HANDLE_ERRORS"
-      ApplyErrorInsertPolicy        = "HANDLE_ERRORS"
-      ApplyErrorUpdatePolicy        = "HANDLE_ERRORS"
-      ApplyErrorEscalationCount     = 0
-      ApplyErrorEscalationPolicy    = "SUSPEND_TABLE"
-      FullLoadErrorEscalationCount  = 0
-      FullLoadErrorEscalationPolicy = "SUSPEND_TABLE"
+      DataErrorPolicy            = "LOG_ERROR"
+      ApplyErrorDeletePolicy     = "LOG_ERROR"
+      ApplyErrorInsertPolicy     = "LOG_ERROR"
+      ApplyErrorUpdatePolicy     = "LOG_ERROR"
+      ApplyErrorEscalationCount  = 0
+      ApplyErrorEscalationPolicy = "LOG_ERROR"
     }
   })
 
