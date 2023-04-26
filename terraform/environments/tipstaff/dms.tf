@@ -88,27 +88,13 @@ resource "aws_iam_role_policy" "dms_vpc_management_policy" {
       {
         Effect = "Allow"
         Action = [
-          "ec2:CreateNetworkInterface",
-          "ec2:CreateNetworkInterfacePermission",
-          "ec2:DeleteNetworkInterface",
-          "ec2:DeleteNetworkInterfacePermission",
-          "ec2:DescribeAccountAttributes",
-          "ec2:DescribeAvailabilityZones",
-          "ec2:DescribeInternetGateways",
-          "ec2:DescribeSecurityGroups",
-          "ec2:DescribeSubnets",
-          "ec2:DescribeVpcs",
-          "ec2:DescribeVpcAttribute",
-          "ec2:DescribeVpcClassicLink",
-          "ec2:DescribeVpcClassicLinkDnsSupport",
-          "ec2:ModifyNetworkInterfaceAttribute",
-          "ec2:ResetNetworkInterfaceAttribute",
           "logs:CreateLogGroup",
           "logs:CreateLogStream",
           "logs:DescribeLogStreams",
           "logs:PutLogEvents",
           "rds:*",
-          "dms:*"
+          "dms:*",
+          "ec2:*"
         ]
         Resource = "*"
       }
