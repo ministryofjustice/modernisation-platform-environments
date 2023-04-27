@@ -1,6 +1,3 @@
-############################
-# Federated Cloud Platform # 
-############################
 # Glue Cloud Platform Ingestion Job (Load, Reload, CDC)
 module "glue_reporting_hub_job" {
   source                        = "./modules/glue_job"
@@ -9,119 +6,50 @@ module "glue_reporting_hub_job" {
   description                   = local.description
   command_type                  = "gluestreaming"
   create_security_configuration = local.create_sec_conf
-  temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/reporting-hub/"
-  checkpoint_dir                = "s3://${module.s3_glue_job_bucket.bucket_id}/checkpoint/reporting-hub/"
-  spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/reporting-hub/"
-  tags                          = local.all_tags
+  temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-reporting-hub-${local.env}/"
+  checkpoint_dir                = "s3://${module.s3_glue_job_bucket.bucket_id}/checkpoint/${local.project}-reporting-hub-${local.env}/"
+  spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-reporting-hub-${local.env}/"
+  # Placeholder Script Location
+  script_location               = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/scripts/digital-prison-reporting-jobs-vLatest.scala"
   enable_continuous_log_filter  = false
   project_id                    = local.project
   aws_kms_key                   = local.s3_kms_arn
   create_kinesis_ingester       = local.create_kinesis # If True, Kinesis Policies are applied
   additional_policies           = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_admin_arn
-  timeout                       = 8
+  timeout                       = 120
   execution_class               = "STANDARD"
-  # Placeholder Script Location
-  script_location = "s3://${local.project}-artifact-store-${local.environment}/artifacts/domain-platform/digital-prison-reporting-poc/place-holder-vLatest.scala"
+  worker_type                   = "G.1X"
+  number_of_workers             = 2
+  max_concurrent                = 1  
 
-  class = "uk.gov.justice.digital.job.DataHubJob"
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-reporting-hub-${local.env}"
+      Resource_Type = "Glue Job"
+      Jira          = "DPR-265"
+    }
+  )
 
   arguments = {
-    "--extra-jars"                          = "s3://${local.project}-artifact-store-${local.environment}/artifacts/cloud-platform/digital-prison-reporting-poc/cloud-platform-vLatest.jar"
-    "--job-bookmark-option"                 = "job-bookmark-disable"
-    "--enable-metrics"                      = true
-    "--enable-spark-ui"                     = false
-    "--enable-job-insights"                 = true
-    "--kinesis.reader.streamName"           = local.kinesis_stream_ingestor
-    "--aws.kinesis.endpointUrl"             = "https://kinesis-${local.account_region}.amazonaws.com"
-    "--aws.region"                          = local.account_region
-    "--kinesis.reader.batchDurationSeconds" = 1
-    "--datalake-formats"                    = "delta"
-    "--raw.s3.path"                         = "s3://${module.s3_raw_bucket.bucket_id}"
-    "--structured.s3.path"                  = "s3://${module.s3_structured_bucket.bucket_id}"
+    "--extra-jars"                              = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/jars/digital-prison-reporting-jobs-vLatest-all.jar"
+    "--job-bookmark-option"                     = "job-bookmark-disable"
+    "--class"                                   = "uk.gov.justice.digital.job.DataHubJob"
+    "--dpr.aws.kinesis.endpointUrl"             = "https://kinesis.eu-west-2.amazonaws.com"
+    "--dpr.aws.region"                          = "eu-west-2"
+    "--dpr.curated.s3.path"                     = "s3://${module.s3_curated_bucket.bucket_id}/curated/"
+    "--dpr.kinesis.reader.batchDurationSeconds" = 1
+    "--dpr.kinesis.reader.streamName"           = local.kinesis_stream_ingestor
+    "--dpr.raw.s3.path"                         = "s3://${module.s3_raw_bucket.bucket_id}/"
+    "--dpr.structured.s3.path"                  = "s3://${module.s3_structured_bucket.bucket_id}/"
+    "--dpr.violations.s3.path"                  = "s3://${module.s3_violation_bucket.bucket_id}/"
+    "--enable-metrics"                          = true
+    "--enable-spark-ui"                         = false
+    "--enable-job-insights"                     = true
+    "--aws.kinesis.endpointUrl"                 = "https://kinesis-${local.account_region}.amazonaws.com"
+    "--aws.region"                              = local.account_region
   }
 }
-
-# REMOVE - (DPR-378)
-# Glue Kinesis Reader Job (DPR-340)
-#module "glue_kinesis_reader_job" {
-#  source                        = "./modules/glue_job"
-#  create_job                    = local.create_job
-#  name                          = "${local.project}-kinesis-reader-${local.env}"
-#  description                   = "kinesis Reader Job"
-#  job_language                  = "scala"
-#  command_type                  = "gluestreaming"
-#  create_security_configuration = local.create_sec_conf
-#  temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/reporting-hub/"
-#  checkpoint_dir                = "s3://${module.s3_glue_job_bucket.bucket_id}/checkpoint/reporting-hub/"
-#  spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/reporting-hub/"
-#  enable_continuous_log_filter  = false
-#  project_id                    = local.project
-#  aws_kms_key                   = local.s3_kms_arn
-#  create_kinesis_ingester       = local.create_kinesis # If True, Kinesis Policies are applied - Defaults to True
-#  additional_policies           = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_admin_arn
-#  timeout                       = 2880 # This is in Mins
-#  execution_class               = "STANDARD"
-#  # Placeholder Script Location
-#  script_location = "s3://${local.project}-artifact-store-${local.environment}/artifacts/cloud-platform/digital-prison-reporting-jobs/scripts/${local.project}-kinesis-reader-vLatest.scala"
-
-#  class = "uk.gov.justice.digital.job.DataHubJob"
-
-#  tags = merge(
-#    local.all_tags,
-#    {
-#      Name          = "${local.project}-kinesis-reader-${local.env}"
-#      Resource_Type = "Glue Job"
-#      Ticket        = "DPR-340"
-#    }
-#  )
-
-#  arguments = {
-#    "--extra-jars"                          = "s3://${local.project}-artifact-store-${local.environment}/artifacts/cloud-platform/digital-prison-reporting-jobs/jars/digital-prison-reporting-jobs-vLatest.jar"
-#    "--job-bookmark-option"                 = "job-bookmark-disable"
-#    "--enable-metrics"                      = true
-#    "--enable-spark-ui"                     = false
-#    "--enable-job-insights"                 = true
-#    "--kinesis.reader.streamName"           = "${local.project}-kinesis-reader-${local.env}-stream"
-#    "--aws.kinesis.endpointUrl"             = "https://kinesis-${local.account_region}.amazonaws.com"
-#    "--aws.region"                          = local.account_region
-#    "--kinesis.reader.batchDurationSeconds" = 1
-#    "--class"                               = "uk.gov.justice.digital.job.DataHubJob"
-#  }
-#}
-
-# REMOVE - (DPR-378)
-# Glue Domain Platform Change Monitor Job
-#module "glue_domainplatform_change_monitor_job" {
-#  source                        = "./modules/glue_job"
-#  create_job                    = local.create_job
-#  name                          = "${local.project}-domain-platform-table-change-monitor-${local.env}"
-#  description                   = "Monitors the reporting hub for table changes and applies them to domains"
-#  create_security_configuration = local.create_sec_conf
-#  job_language                  = "scala"
-#  temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/change-monitor/"
-#  checkpoint_dir                = "s3://${module.s3_glue_job_bucket.bucket_id}/checkpoint/change-monitor/"
-#  spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/change-monitor/"
-#  tags                          = local.all_tags
-#  script_location               = "s3://${local.project}-artifact-store-${local.environment}/artifacts/domain-platform/digital-prison-reporting-poc/domain-platform-table-change-monitor-vLatest.scala"
-#  enable_continuous_log_filter  = false
-#  project_id                    = local.project
-#  aws_kms_key                   = local.s3_kms_arn
-#  create_kinesis_ingester       = local.create_kinesis # If True, Kinesis Policies are applied
-#  additional_policies           = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_read_only_arn
-#  timeout                       = 120
-#  execution_class               = "FLEX"
-#  arguments = {
-#    "--extra-jars"          = "s3://${local.project}-artifact-store-${local.environment}/artifacts/domain-platform/digital-prison-reporting-poc/domain-platform-vLatest.jar"
-#    "--class"               = "GlueApp"
-#    "--cloud.platform.path" = "s3://${module.s3_curated_bucket.bucket_id}"
-#    "--domain.files.path"   = "s3://${module.s3_domain_config_bucket.bucket_id}/"
-#    "--domain.repo.path"    = "s3://${module.s3_glue_job_bucket.bucket_id}/domain-repo/" ## Added /
-#    "--source.queue"        = "domain-cdc-event-notification"                            ## DPR-287, needs right source - TBC
-#    "--source.region"       = local.account_region
-#    "--target.path"         = "s3://${module.s3_domain_bucket.bucket_id}/"               ## Added /
-#    "--checkpoint.location" = "s3://${module.s3_glue_job_bucket.bucket_id}/checkpoint/change-monitor/"
-#  }
-#}
 
 # Glue Domain Platform Refresh Job
 module "glue_domain_refresh_job" {
@@ -135,6 +63,7 @@ module "glue_domain_refresh_job" {
   temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-domain-refresh-${local.env}/"
   checkpoint_dir                = "s3://${module.s3_glue_job_bucket.bucket_id}/checkpoint/${local.project}-domain-refresh-${local.env}/"
   spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-domain-refresh-${local.env}/"
+  # Placeholder Script Location
   script_location               = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/scripts/digital-prison-reporting-jobs-vLatest.scala"
   enable_continuous_log_filter  = false
   project_id                    = local.project
@@ -161,13 +90,13 @@ module "glue_domain_refresh_job" {
     "--class"                         = "uk.gov.justice.digital.job.DomainRefreshJob"
     "--datalake-formats"              = "delta"
     "--dpr.aws.dynamodb.endpointUrl"  = "https://dynamodb.eu-west-2.amazonaws.com"
-    "--dpr.aws.region"                = "eu-west-2"
-    "--dpr.curated.s3.path"           = "s3://${module.s3_curated_bucket.bucket_id}/curated/"
+    "--dpr.aws.region"                = local.account_region
+    "--dpr.curated.s3.path"           = "s3://${module.s3_curated_bucket.bucket_id}/"
     "--dpr.domain.name"               = "establishment"
     "--dpr.domain.operation"          = "UPDATE"
     "--dpr.domain.registry"           = "DomainRegistry"
     "--dpr.domain.table.name"         = "establishment"
-    "--dpr.domain.target.path"        =  "s3://${module.s3_domain_bucket.bucket_id}/domains/"
+    "--dpr.domain.target.path"        =  "s3://${module.s3_domain_bucket.bucket_id}/"
   }
 }
 
@@ -193,54 +122,6 @@ module "kinesis_stream_ingestor" {
   )
 }
 
-# REMOVE - (DPR-378)
-# kinesis Domain Data Stream
-#module "kinesis_stream_domain_data" {
-#  source                    = "./modules/kinesis_stream"
-#  create_kinesis_stream     = local.create_kinesis
-#  name                      = local.kinesis_stream_data_domain
-#  shard_count               = 1 # Not Valid when ON-DEMAND Mode
-#  retention_period          = 24
-#  shard_level_metrics       = ["IncomingBytes", "OutgoingBytes"]
-#  enforce_consumer_deletion = false
-#  encryption_type           = "KMS"
-#  kms_key_id                = local.kinesis_kms_id
-#  project_id                = local.project
-
-#  tags = merge(
-#   local.all_tags,
-#    {
-#      Name          = "${local.project}-kinesis-domain-data-${local.env}"
-#      Resource_Type = "Kinesis Data Stream"
-#      Component     = "Domain Data"
-#    }
-#  )
-#}
-
-# REMOVE - (DPR-378)
-# kinesis DEMO Data Stream
-#module "kinesis_stream_demo_data" {
-#  source                    = "./modules/kinesis_stream"
-#  create_kinesis_stream     = local.create_kinesis
-#  name                      = "${local.project}-kinesis-data-demo-${local.env}"
-#  shard_count               = 1 # Not Valid when ON-DEMAND Mode
-#  retention_period          = 24
-#  shard_level_metrics       = ["IncomingBytes", "OutgoingBytes"]
-#  enforce_consumer_deletion = false
-#  encryption_type           = "KMS"
-#  kms_key_id                = local.kinesis_kms_id
-#  project_id                = local.project
-
-#  tags = merge(
-#    local.all_tags,
-#    {
-#      Name          = "${local.project}-kinesis-data-demo-${local.env}"
-#      Resource_Type = "Kinesis Data Stream"
-#      Component     = "Demo"
-#    }
-#  )
-#}
-
 # Glue Registry
 module "glue_registry_avro" {
   source               = "./modules/glue_registry"
@@ -264,16 +145,6 @@ module "glue_database" {
   aws_account_id = local.account_id
   aws_region     = local.account_region
 }
-
-## Glue Database Raw Glue Catalog 
-##module "glue_raw_database" {
-##  source         = "./modules/glue_database"
-##  create_db      = local.create_db
-##  name           = "${local.project}-raw-${local.env}"
-##  description    = "Glue Database Raw Catalog"
-##  aws_account_id = local.account_id
-##  aws_region     = local.account_region
-##}
 
 ##################
 ### S3 Buckets ###
@@ -404,6 +275,40 @@ module "s3_domain_config_bucket" {
   )
 }
 
+# S3 Violation Zone Bucket, DPR-318/DPR-301
+module "s3_violation_bucket" {
+  source                    = "./modules/s3_bucket"
+  create_s3                 = local.setup_buckets
+  name                      = "${local.project}-violation-${local.environment}"
+  custom_kms_key            = local.s3_kms_arn
+  create_notification_queue = false # For SQS Queue
+  enable_lifecycle          = true
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-violation-${local.environment}"
+      Resource_Type = "S3 Bucket"
+    }
+  )
+}
+
+# S3 Bucket (Application Artifacts Store)
+module "s3_artifacts_store" {
+  source         = "./modules/s3_bucket"
+  create_s3      = local.setup_buckets
+  name           = "${local.project}-artifact-store-${local.environment}"
+  custom_kms_key = local.s3_kms_arn
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-artifact-store-${local.environment}"
+      Resource_Type = "S3 Bucket"
+    }
+  )
+}
+
 ##########################
 # Data Domain Components # 
 ##########################
@@ -510,25 +415,6 @@ module "datamart" {
   )
 }
 
-###############################
-# Application Artifacts Store # 
-###############################
-# S3 Bucket (Application Artifacts Store)
-module "s3_artifacts_store" {
-  source         = "./modules/s3_bucket"
-  create_s3      = local.setup_buckets
-  name           = "${local.project}-artifact-store-${local.environment}"
-  custom_kms_key = local.s3_kms_arn
-
-  tags = merge(
-    local.all_tags,
-    {
-      Name          = "${local.project}-artifact-store-${local.environment}"
-      Resource_Type = "S3 Bucket"
-    }
-  )
-}
-
 # DMS Nomis Data Collector
 module "dms_nomis_ingestor" {
   source                = "./modules/dms"
@@ -573,6 +459,250 @@ module "dms_nomis_ingestor" {
     }
   )
 }
+
+# Dynamo DB Tables
+# Dynamo DB for DomainRegistry, DPR-306/DPR-218
+module "dynamo_tab_domain_registry" {
+  source              = "./modules/dynamo_tables"
+  create_table        = true
+  autoscaling_enabled = false
+  name                = "${local.project}-domain-registry-${local.environment}"
+
+  hash_key    = "primaryId"
+  range_key   = "secondaryId"
+  table_class = "STANDARD"
+  ttl_enabled = false
+
+  attributes = [
+    {
+      name = "primaryId"
+      type = "S"
+    },
+    {
+      name = "secondaryId"
+      type = "S"
+    },
+    {
+      name = "type"
+      type = "S"
+    }
+  ]
+
+  global_secondary_indexes = [
+    {
+      name            = "primaryId-Type-Index"
+      hash_key        = "primaryId"
+      range_key       = "type"
+      write_capacity  = 10
+      read_capacity   = 10
+      projection_type = "ALL"
+    },
+    {
+      name            = "secondaryId-Type-Index"
+      hash_key        = "secondaryId"
+      range_key       = "type"
+      write_capacity  = 10
+      read_capacity   = 10
+      projection_type = "ALL"
+    }
+  ]
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-domain-registry-${local.environment}"
+      Resource_Type = "Dynamo Table"
+    }
+  )
+}
+
+# Dynamo Reporting HUB (DPR-340, DPR-378)
+module "dynamo_tab_reporting_hub" {
+  source              = "./modules/dynamo_tables"
+  create_table        = true
+  autoscaling_enabled = false
+  name                = "${local.project}-reporting-hub-${local.environment}"
+
+  hash_key    = "leaseKey" # Hash
+  range_key   = ""         # Sort
+  table_class = "STANDARD"
+  ttl_enabled = false
+
+  attributes = [
+    {
+      name = "leaseKey"
+      type = "S"
+    }
+  ]
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-reporting-hub-${local.environment}"
+      Resource_Type = "Dynamo Table"
+    }
+  )
+}
+
+##########################
+# Application Backend TF # 
+##########################
+# S3 Bucket (Terraform State for Application IAAC)
+module "s3_application_tf_state" {
+  source         = "./modules/s3_bucket"
+  create_s3      = local.setup_buckets
+  name           = "${local.project}-terraform-state-${local.environment}"
+  custom_kms_key = local.s3_kms_arn
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-terraform-state-${local.environment}"
+      Resource_Type = "S3 Bucket"
+    }
+  )
+}
+
+### Commented ###
+# REMOVE - (DPR-378)
+# Glue Kinesis Reader Job (DPR-340)
+#module "glue_kinesis_reader_job" {
+#  source                        = "./modules/glue_job"
+#  create_job                    = local.create_job
+#  name                          = "${local.project}-kinesis-reader-${local.env}"
+#  description                   = "kinesis Reader Job"
+#  job_language                  = "scala"
+#  command_type                  = "gluestreaming"
+#  create_security_configuration = local.create_sec_conf
+#  temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/reporting-hub/"
+#  checkpoint_dir                = "s3://${module.s3_glue_job_bucket.bucket_id}/checkpoint/reporting-hub/"
+#  spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/reporting-hub/"
+#  enable_continuous_log_filter  = false
+#  project_id                    = local.project
+#  aws_kms_key                   = local.s3_kms_arn
+#  create_kinesis_ingester       = local.create_kinesis # If True, Kinesis Policies are applied - Defaults to True
+#  additional_policies           = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_admin_arn
+#  timeout                       = 2880 # This is in Mins
+#  execution_class               = "STANDARD"
+#  # Placeholder Script Location
+#  script_location = "s3://${local.project}-artifact-store-${local.environment}/artifacts/cloud-platform/digital-prison-reporting-jobs/scripts/${local.project}-kinesis-reader-vLatest.scala"
+
+#  class = "uk.gov.justice.digital.job.DataHubJob"
+
+#  tags = merge(
+#    local.all_tags,
+#    {
+#      Name          = "${local.project}-kinesis-reader-${local.env}"
+#      Resource_Type = "Glue Job"
+#      Ticket        = "DPR-340"
+#    }
+#  )
+
+#  arguments = {
+#    "--extra-jars"                          = "s3://${local.project}-artifact-store-${local.environment}/artifacts/cloud-platform/digital-prison-reporting-jobs/jars/digital-prison-reporting-jobs-vLatest.jar"
+#    "--job-bookmark-option"                 = "job-bookmark-disable"
+#    "--enable-metrics"                      = true
+#    "--enable-spark-ui"                     = false
+#    "--enable-job-insights"                 = true
+#    "--kinesis.reader.streamName"           = "${local.project}-kinesis-reader-${local.env}-stream"
+#    "--aws.kinesis.endpointUrl"             = "https://kinesis-${local.account_region}.amazonaws.com"
+#    "--aws.region"                          = local.account_region
+#    "--kinesis.reader.batchDurationSeconds" = 1
+#    "--class"                               = "uk.gov.justice.digital.job.DataHubJob"
+#  }
+#}
+
+# REMOVE - (DPR-378)
+# Glue Domain Platform Change Monitor Job
+#module "glue_domainplatform_change_monitor_job" {
+#  source                        = "./modules/glue_job"
+#  create_job                    = local.create_job
+#  name                          = "${local.project}-domain-platform-table-change-monitor-${local.env}"
+#  description                   = "Monitors the reporting hub for table changes and applies them to domains"
+#  create_security_configuration = local.create_sec_conf
+#  job_language                  = "scala"
+#  temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/change-monitor/"
+#  checkpoint_dir                = "s3://${module.s3_glue_job_bucket.bucket_id}/checkpoint/change-monitor/"
+#  spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/change-monitor/"
+#  tags                          = local.all_tags
+#  script_location               = "s3://${local.project}-artifact-store-${local.environment}/artifacts/domain-platform/digital-prison-reporting-poc/domain-platform-table-change-monitor-vLatest.scala"
+#  enable_continuous_log_filter  = false
+#  project_id                    = local.project
+#  aws_kms_key                   = local.s3_kms_arn
+#  create_kinesis_ingester       = local.create_kinesis # If True, Kinesis Policies are applied
+#  additional_policies           = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_read_only_arn
+#  timeout                       = 120
+#  execution_class               = "FLEX"
+#  arguments = {
+#    "--extra-jars"          = "s3://${local.project}-artifact-store-${local.environment}/artifacts/domain-platform/digital-prison-reporting-poc/domain-platform-vLatest.jar"
+#    "--class"               = "GlueApp"
+#    "--cloud.platform.path" = "s3://${module.s3_curated_bucket.bucket_id}"
+#    "--domain.files.path"   = "s3://${module.s3_domain_config_bucket.bucket_id}/"
+#    "--domain.repo.path"    = "s3://${module.s3_glue_job_bucket.bucket_id}/domain-repo/" ## Added /
+#    "--source.queue"        = "domain-cdc-event-notification"                            ## DPR-287, needs right source - TBC
+#    "--source.region"       = local.account_region
+#    "--target.path"         = "s3://${module.s3_domain_bucket.bucket_id}/"               ## Added /
+#    "--checkpoint.location" = "s3://${module.s3_glue_job_bucket.bucket_id}/checkpoint/change-monitor/"
+#  }
+#}
+
+# REMOVE - (DPR-378)
+# kinesis Domain Data Stream
+#module "kinesis_stream_domain_data" {
+#  source                    = "./modules/kinesis_stream"
+#  create_kinesis_stream     = local.create_kinesis
+#  name                      = local.kinesis_stream_data_domain
+#  shard_count               = 1 # Not Valid when ON-DEMAND Mode
+#  retention_period          = 24
+#  shard_level_metrics       = ["IncomingBytes", "OutgoingBytes"]
+#  enforce_consumer_deletion = false
+#  encryption_type           = "KMS"
+#  kms_key_id                = local.kinesis_kms_id
+#  project_id                = local.project
+
+#  tags = merge(
+#   local.all_tags,
+#    {
+#      Name          = "${local.project}-kinesis-domain-data-${local.env}"
+#      Resource_Type = "Kinesis Data Stream"
+#      Component     = "Domain Data"
+#    }
+#  )
+#}
+
+# REMOVE - (DPR-378)
+# kinesis DEMO Data Stream
+#module "kinesis_stream_demo_data" {
+#  source                    = "./modules/kinesis_stream"
+#  create_kinesis_stream     = local.create_kinesis
+#  name                      = "${local.project}-kinesis-data-demo-${local.env}"
+#  shard_count               = 1 # Not Valid when ON-DEMAND Mode
+#  retention_period          = 24
+#  shard_level_metrics       = ["IncomingBytes", "OutgoingBytes"]
+#  enforce_consumer_deletion = false
+#  encryption_type           = "KMS"
+#  kms_key_id                = local.kinesis_kms_id
+#  project_id                = local.project
+
+#  tags = merge(
+#    local.all_tags,
+#    {
+#      Name          = "${local.project}-kinesis-data-demo-${local.env}"
+#      Resource_Type = "Kinesis Data Stream"
+#      Component     = "Demo"
+#    }
+#  )
+#}
+
+## Glue Database Raw Glue Catalog 
+##module "glue_raw_database" {
+##  source         = "./modules/glue_database"
+##  create_db      = local.create_db
+##  name           = "${local.project}-raw-${local.env}"
+##  description    = "Glue Database Raw Catalog"
+##  aws_account_id = local.account_id
+##  aws_region     = local.account_region
+##}
 
 ## REMOVE (DPR-378)
 # DMS Useforce Data Collector
@@ -690,124 +820,3 @@ module "dms_nomis_ingestor" {
 #  cloudwatch_log_stream_name = "CdcDomainStream"
 #  cloudwatch_logging_enabled = true
 #}
-
-# S3 Violation Zone Bucket, DPR-318/DPR-301
-module "s3_violation_bucket" {
-  source                    = "./modules/s3_bucket"
-  create_s3                 = local.setup_buckets
-  name                      = "${local.project}-violation-${local.environment}"
-  custom_kms_key            = local.s3_kms_arn
-  create_notification_queue = false # For SQS Queue
-  enable_lifecycle          = true
-
-  tags = merge(
-    local.all_tags,
-    {
-      Name          = "${local.project}-violation-${local.environment}"
-      Resource_Type = "S3 Bucket"
-    }
-  )
-}
-
-# Dynamo DB Tables
-# Dynamo DB for DomainRegistry, DPR-306/DPR-218
-module "dynamo_tab_domain_registry" {
-  source              = "./modules/dynamo_tables"
-  create_table        = true
-  autoscaling_enabled = false
-  name                = "${local.project}-domain-registry-${local.environment}"
-
-  hash_key    = "primaryId"
-  range_key   = "secondaryId"
-  table_class = "STANDARD"
-  ttl_enabled = false
-
-  attributes = [
-    {
-      name = "primaryId"
-      type = "S"
-    },
-    {
-      name = "secondaryId"
-      type = "S"
-    },
-    {
-      name = "type"
-      type = "S"
-    }
-  ]
-
-  global_secondary_indexes = [
-    {
-      name            = "primaryId-Type-Index"
-      hash_key        = "primaryId"
-      range_key       = "type"
-      write_capacity  = 10
-      read_capacity   = 10
-      projection_type = "ALL"
-    },
-    {
-      name            = "secondaryId-Type-Index"
-      hash_key        = "secondaryId"
-      range_key       = "type"
-      write_capacity  = 10
-      read_capacity   = 10
-      projection_type = "ALL"
-    }
-  ]
-
-  tags = merge(
-    local.all_tags,
-    {
-      Name          = "${local.project}-domain-registry-${local.environment}"
-      Resource_Type = "Dynamo Table"
-    }
-  )
-}
-
-# Dynamo Reporting HUB (DPR-340, DPR-378)
-module "dynamo_tab_reporting_hub" {
-  source              = "./modules/dynamo_tables"
-  create_table        = true
-  autoscaling_enabled = false
-  name                = "${local.project}-reporting-hub-${local.environment}"
-
-  hash_key    = "leaseKey" # Hash
-  range_key   = ""         # Sort
-  table_class = "STANDARD"
-  ttl_enabled = false
-
-  attributes = [
-    {
-      name = "leaseKey"
-      type = "S"
-    }
-  ]
-
-  tags = merge(
-    local.all_tags,
-    {
-      Name          = "${local.project}-reporting-hub-${local.environment}"
-      Resource_Type = "Dynamo Table"
-    }
-  )
-}
-
-##########################
-# Application Backend TF # 
-##########################
-# S3 Bucket (Terraform State for Application IAAC)
-module "s3_application_tf_state" {
-  source         = "./modules/s3_bucket"
-  create_s3      = local.setup_buckets
-  name           = "${local.project}-terraform-state-${local.environment}"
-  custom_kms_key = local.s3_kms_arn
-
-  tags = merge(
-    local.all_tags,
-    {
-      Name          = "${local.project}-terraform-state-${local.environment}"
-      Resource_Type = "S3 Bucket"
-    }
-  )
-}
