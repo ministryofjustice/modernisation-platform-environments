@@ -72,8 +72,8 @@ module "glue_reporting_hub_job" {
     "--aws.region"                          = local.account_region
     "--kinesis.reader.batchDurationSeconds" = 1
     "--datalake-formats"                    = "delta"
-    "--raw.s3.path"                         = "s3://${module.s3_raw_bucket[0].bucket.id}"
-    "--structured.s3.path"                  = "s3://${module.s3_structured_bucket[0].bucket.id}"
+    "--raw.s3.path"                         = "s3://${module.s3_raw_events_bucket.bucket_id}"
+    "--structured.s3.path"                  = "s3://${module.s3_structured_bucket.bucket_id}"
   }
 }
 
@@ -149,7 +149,7 @@ module "glue_reporting_hub_job" {
 #  arguments = {
 #    "--extra-jars"          = "s3://${local.project}-artifact-store-${local.environment}/artifacts/domain-platform/digital-prison-reporting-poc/domain-platform-vLatest.jar"
 #    "--class"               = "GlueApp"
-#    "--cloud.platform.path" = "s3://${module.s3_curated_bucket[0].bucket.id}"
+#    "--cloud.platform.path" = "s3://${module.s3_curated_bucket.bucket_id}"
 #    "--domain.files.path"   = "s3://${module.s3_domain_config_bucket[0].bucket.id}/"
 #    "--domain.repo.path"    = "s3://${module.s3_glue_job_bucket.bucket_id}/domain-repo/" ## Added /
 #    "--source.queue"        = "domain-cdc-event-notification"                                ## DPR-287, needs right source - TBC
@@ -182,7 +182,7 @@ module "glue_domain_refresh_job" {
   arguments = {
     "--extra-jars"          = "s3://${local.project}-artifact-store-${local.environment}/artifacts/domain-platform/digital-prison-reporting-poc/domain-platform-vLatest.jar"
     "--class"               = "GlueApp"
-    "--cloud.platform.path" = "s3://${module.s3_curated_bucket[0].bucket.id}"
+    "--cloud.platform.path" = "s3://${module.s3_curated_bucket.bucket_id}"
     "--domain.files.path"   = "s3://${module.s3_domain_config_bucket[0].bucket.id}/"         # Added /
     "--domain.repo.path"    = "s3://${module.s3_glue_job_bucket.bucket_id}/domain-repo/" # Added /
     "--target.path"         = "s3://${module.s3_domain_bucket[0].bucket.id}/"                # Added /
@@ -335,181 +335,53 @@ module "s3_landing_bucket" {
 
 # S3 RAW
 module "s3_raw_bucket" {
-  count  = local.create_bucket ? 1 : 0
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.2.0"
-
-  providers = {
-    aws.bucket-replication = aws
-  }
-
-  bucket_prefix = "${local.project}-raw-${local.env}-"
-
-  replication_enabled = false
-  custom_kms_key      = local.s3_kms_arn
-  lifecycle_rule = [
-    {
-      id      = "main"
-      enabled = "Enabled"
-      prefix  = ""
-
-      tags = {
-        rule      = "log"
-        autoclean = "true"
-      }
-
-      transition = [
-        {
-          days          = 90
-          storage_class = "STANDARD_IA"
-        }
-      ]
-
-      expiration = {
-        days = 730
-      }
-
-      noncurrent_version_transition = [
-        {
-          days          = 90
-          storage_class = "STANDARD_IA"
-          }, {
-          days          = 365
-          storage_class = "GLACIER"
-        }
-      ]
-
-      noncurrent_version_expiration = {
-        days = 730
-      }
-    }
-  ]
+  source                    = "./modules/s3_bucket"
+  create_s3                 = local.setup_buckets
+  name                      = "${local.project}-raw-events-${local.env}"
+  custom_kms_key            = local.s3_kms_arn
+  create_notification_queue = false # For SQS Queue
+  enable_lifecycle          = true
 
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-raw-${local.env}-s3"
+      Name          = "${local.project}-raw-events-${local.env}"
       Resource_Type = "S3 Bucket"
     }
   )
-
 }
 
 # S3 Structured
 module "s3_structured_bucket" {
-  count  = local.create_bucket ? 1 : 0
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.2.0"
-
-  providers = {
-    aws.bucket-replication = aws
-  }
-
-  bucket_prefix = "${local.project}-structured-${local.env}-"
-
-  replication_enabled = false
-  custom_kms_key      = local.s3_kms_arn
-  lifecycle_rule = [
-    {
-      id      = "main"
-      enabled = "Enabled"
-      prefix  = ""
-
-      tags = {
-        rule      = "log"
-        autoclean = "true"
-      }
-
-      transition = [
-        {
-          days          = 90
-          storage_class = "STANDARD_IA"
-        }
-      ]
-
-      expiration = {
-        days = 730
-      }
-
-      noncurrent_version_transition = [
-        {
-          days          = 90
-          storage_class = "STANDARD_IA"
-          }, {
-          days          = 365
-          storage_class = "GLACIER"
-        }
-      ]
-
-      noncurrent_version_expiration = {
-        days = 730
-      }
-    }
-  ]
+  source                    = "./modules/s3_bucket"
+  create_s3                 = local.setup_buckets
+  name                      = "${local.project}-structured-data-${local.env}"
+  custom_kms_key            = local.s3_kms_arn
+  create_notification_queue = false # For SQS Queue
+  enable_lifecycle          = true
 
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-structured-${local.env}-s3"
+      Name          = "${local.project}-structured-data-${local.env}"
       Resource_Type = "S3 Bucket"
     }
   )
-
 }
 
 # S3 Curated
 module "s3_curated_bucket" {
-  count  = local.create_bucket ? 1 : 0
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.2.0"
-
-  providers = {
-    aws.bucket-replication = aws
-  }
-
-  bucket_prefix = "${local.project}-curated-${local.env}-"
-
-  replication_enabled = false
-  custom_kms_key      = local.s3_kms_arn
-  lifecycle_rule = [
-    {
-      id      = "main"
-      enabled = "Enabled"
-      prefix  = ""
-
-      tags = {
-        rule      = "log"
-        autoclean = "true"
-      }
-
-      transition = [
-        {
-          days          = 90
-          storage_class = "STANDARD_IA"
-        }
-      ]
-
-      expiration = {
-        days = 730
-      }
-
-      noncurrent_version_transition = [
-        {
-          days          = 90
-          storage_class = "STANDARD_IA"
-          }, {
-          days          = 365
-          storage_class = "GLACIER"
-        }
-      ]
-
-      noncurrent_version_expiration = {
-        days = 730
-      }
-    }
-  ]
+  source                    = "./modules/s3_bucket"
+  create_s3                 = local.setup_buckets
+  name                      = "${local.project}-curated-data-${local.env}"
+  custom_kms_key            = local.s3_kms_arn
+  create_notification_queue = false # For SQS Queue
+  enable_lifecycle          = true
 
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-curated-${local.env}-s3"
+      Name          = "${local.project}-curated-data-${local.env}"
       Resource_Type = "S3 Bucket"
     }
   )
