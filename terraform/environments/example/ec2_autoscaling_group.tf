@@ -79,7 +79,7 @@ data "aws_iam_policy_document" "ec2_autoscale_policy" {
 
 # EC2 Sec Group
 resource "aws_security_group" "example_ec2_autoscale_sg" {
-  name        = "example_ec2_sg"
+  name        = "example_ec2_autoscale_sg"
   description = "Controls access to EC2"
   vpc_id      = data.aws_vpc.shared.id
   tags = merge(local.tags,
