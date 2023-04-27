@@ -6,6 +6,7 @@ locals {
     var.options.enable_ec2_cloud_watch_agent ? ["CloudWatchAgentServerReducedPolicy"] : [],
     var.options.enable_ec2_self_provision ? ["Ec2SelfProvisionPolicy"] : [],
     var.options.enable_shared_s3 ? ["Ec2AccessSharedS3Policy"] : [],
+    var.options.enable_oracle_secure_web ? ["S3ListAllBucketsAndGetLocationPolicy"] : [],
     var.options.iam_policies_filter,
   ])
 
@@ -14,6 +15,7 @@ locals {
     var.options.enable_ec2_cloud_watch_agent ? ["CloudWatchAgentServerReducedPolicy"] : [],
     var.options.enable_ec2_self_provision ? ["Ec2SelfProvisionPolicy"] : [],
     var.options.enable_shared_s3 ? ["Ec2AccessSharedS3Policy"] : [],
+    var.options.enable_oracle_secure_web ? ["S3ListAllBucketsAndGetLocationPolicy"] : [],
     var.options.iam_policies_ec2_default,
   ])
 
@@ -128,7 +130,7 @@ locals {
           ] : [
           "arn:aws:s3:::devtest-${var.environment.application_name}-*/*",
           "arn:aws:s3:::devtest-${var.environment.application_name}-*"
-        ], [
+          ], [
           "arn:aws:s3:::ec2-image-builder-*/*",
           "arn:aws:s3:::ec2-image-builder-*",
           "arn:aws:s3:::*-software*/*",
@@ -141,7 +143,7 @@ locals {
       }]
     }
 
-    # see corresponding policy in core-shared-services-production
+    # see corresponding policy in core-shared-services-production
     # https://github.com/ministryofjustice/modernisation-platform-ami-builds/blob/main/modernisation-platform/iam.tf
     ImageBuilderS3BucketReadOnlyAccessPolicy = {
       description = "Permissions to access shared ImageBuilder bucket read-only"
@@ -205,6 +207,20 @@ locals {
           "arn:aws:s3:::mod-platform-image-artefact-bucket*",
           "arn:aws:s3:::modernisation-platform-software*/*",
           "arn:aws:s3:::modernisation-platform-software*"
+        ]
+      }]
+    }
+
+    S3ListAllBucketsAndGetLocationPolicy = {
+      description = "Permissions to list all S3 buckets and get location.  Required for OracleSecureWeb"
+      statements = [{
+        effect = "Allow"
+        actions = [
+          "s3:ListAllMyBuckets",
+          "s3:GetBucketLocation",
+        ]
+        resources = [
+          "arn:aws:s3:::*"
         ]
       }]
     }

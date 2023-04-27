@@ -33,8 +33,8 @@ resource "aws_lb_listener" "PPUD-external-Front-End" {
 resource "aws_lb_target_group" "PPUD-Target-Group" {
   count    = local.is-development == true ? 1 : 0
   name     = "PPUD"
-  port     = 80
-  protocol = "HTTP"
+  port     = 443
+  protocol = "HTTPS"
   vpc_id   = data.aws_vpc.shared.id
   stickiness {
     cookie_duration = 86400
@@ -46,8 +46,8 @@ resource "aws_lb_target_group" "PPUD-Target-Group" {
     enabled             = true
     path                = "/"
     interval            = 30
-    protocol            = "HTTP"
-    port                = 80
+    protocol            = "HTTPS"
+    port                = 443
     timeout             = 5
     healthy_threshold   = 5
     unhealthy_threshold = 2
@@ -63,14 +63,14 @@ resource "aws_lb_target_group_attachment" "PPUD-PORTAL" {
   count            = local.is-development == true ? 1 : 0
   target_group_arn = aws_lb_target_group.PPUD-Target-Group[0].arn
   target_id        = aws_instance.s609693lo6vw101[0].id
-  port             = 80
+  port             = 443
 }
 
 resource "aws_lb_target_group_attachment" "PPUD-PORTAL-1" {
   count            = local.is-development == true ? 1 : 0
   target_group_arn = aws_lb_target_group.PPUD-Target-Group[0].arn
   target_id        = aws_instance.PPUDWEBSERVER2[0].id
-  port             = 80
+  port             = 443
 }
 
 # WAM Internet Facing ALB

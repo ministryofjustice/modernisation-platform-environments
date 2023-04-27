@@ -6,15 +6,6 @@ locals {
       patch_approval_delay_days = 3
       patch_day                 = "TUE"
     }
-
-    databases = {
-    }
-    weblogics          = {}
-    ec2_test_instances = {}
-    ec2_test_autoscaling_groups = {
-    }
-    ec2_jumpservers = {
-    }
   }
 
   # baseline config
@@ -28,7 +19,7 @@ locals {
           "*.${module.environment.domains.public.application_environment}",
           "*.${local.environment}.nomis.az.justice.gov.uk",
         ]
-        cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso"].acm_default
+        # cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["nomis_pagerduty"].acm_default
         tags = {
           description = "wildcard cert for ${module.environment.domains.public.application_environment} and ${local.environment}.nomis.az.justice.gov.uk domain"
         }
@@ -39,9 +30,8 @@ locals {
 
       dev-redhat-rhel79 = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name                  = "RHEL-7.9_HVM-*"
-          ami_owner                 = "309956199498"
-          instance_profile_policies = local.ec2_common_managed_policies
+          ami_name  = "RHEL-7.9_HVM-*"
+          ami_owner = "309956199498"
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           vpc_security_group_ids = ["private-web"]
@@ -62,8 +52,7 @@ locals {
 
       dev-base-rhel79 = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name                  = "base_rhel_7_9_*"
-          instance_profile_policies = local.ec2_common_managed_policies
+          ami_name = "base_rhel_7_9_*"
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           vpc_security_group_ids = ["private-web"]
@@ -86,8 +75,7 @@ locals {
 
       dev-base-rhel610 = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name                  = "base_rhel_6_10*"
-          instance_profile_policies = local.ec2_common_managed_policies
+          ami_name = "base_rhel_6_10*"
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default_rhel6, {
           vpc_security_group_ids = ["private-web"]
@@ -112,9 +100,8 @@ locals {
         # ami has unwanted ephemeral device, don't copy all the ebs_volumess
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name                      = "nomis_windows_server_2022_jumpserver_release_*"
-          instance_profile_policies     = local.ec2_common_managed_policies
           ebs_volumes_copy_all_from_ami = false
-          user_data_raw                 = base64encode(templatefile("./templates/jumpserver-user-data.yaml", { S3_BUCKET = module.s3-bucket.bucket.id }))
+          user_data_raw                 = base64encode(file("./templates/jumpserver-user-data.yaml"))
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           vpc_security_group_ids = ["private-jumpserver"]
@@ -123,7 +110,7 @@ locals {
           "/dev/sda1" = { type = "gp3", size = 100 }
         }
         autoscaling_group = {
-          desired_capacity    = 0
+          desired_capacity    = 1
           max_size            = 2
           vpc_zone_identifier = module.environment.subnets["private"].ids
         }

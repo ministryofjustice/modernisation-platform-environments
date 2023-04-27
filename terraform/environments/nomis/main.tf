@@ -1,3 +1,35 @@
+# Majority of resources created by baseline module.
+# See common settings in locals.tf and environment specific settings in 
+# locals_development.tf, locals_test.tf etc.
+
+module "ip_addresses" {
+  source = "../../modules/ip_addresses"
+}
+
+module "environment" {
+  source = "../../modules/environment"
+
+  providers = {
+    aws.modernisation-platform = aws.modernisation-platform
+    aws.core-network-services  = aws.core-network-services
+    aws.core-vpc               = aws.core-vpc
+  }
+
+  environment_management = local.environment_management
+  business_unit          = local.business_unit
+  application_name       = local.application_name
+  environment            = local.environment
+  subnet_set             = local.subnet_set
+}
+
+module "baseline_presets" {
+  source = "../../modules/baseline_presets"
+
+  environment  = module.environment
+  ip_addresses = module.ip_addresses
+  options      = local.baseline_presets_options
+}
+
 module "baseline" {
   source = "../../modules/baseline"
 
@@ -13,6 +45,11 @@ module "baseline" {
     module.baseline_presets.acm_certificates,
     local.baseline_acm_certificates,
     lookup(local.baseline_environment_config, "baseline_acm_certificates", {})
+  )
+
+  bastion_linux = merge(
+    local.baseline_bastion_linux,
+    lookup(local.baseline_environment_config, "baseline_bastion_linux", {})
   )
 
   cloudwatch_log_groups = merge(
@@ -43,17 +80,17 @@ module "baseline" {
     lookup(local.baseline_environment_config, "baseline_iam_roles", {})
   )
 
-  # iam_service_linked_roles = merge(
-  #   module.baseline_presets.iam_service_linked_roles,
-  #   local.baseline_iam_service_linked_roles,
-  #   lookup(local.baseline_environment_config, "baseline_iam_service_linked_roles", {})
-  # )
+  iam_service_linked_roles = merge(
+    module.baseline_presets.iam_service_linked_roles,
+    local.baseline_iam_service_linked_roles,
+    lookup(local.baseline_environment_config, "baseline_iam_service_linked_roles", {})
+  )
 
-  # key_pairs = merge(
-  #   module.baseline_presets.key_pairs,
-  #   local.baseline_key_pairs,
-  #   lookup(local.baseline_environment_config, "baseline_key_pairs", {})
-  # )
+  key_pairs = merge(
+    module.baseline_presets.key_pairs,
+    local.baseline_key_pairs,
+    lookup(local.baseline_environment_config, "baseline_key_pairs", {})
+  )
 
   kms_grants = merge(
     module.baseline_presets.kms_grants,
@@ -77,12 +114,11 @@ module "baseline" {
     lookup(local.baseline_environment_config, "baseline_route53_zones", {})
   )
 
-  # s3_buckets = merge(
-  #   module.baseline_presets.s3_buckets,
-  #   local.baseline_s3_buckets,
-  #   lookup(local.baseline_environment_config, "baseline_s3_buckets", {})
-  # )
-  #
+  s3_buckets = merge(
+    module.baseline_presets.s3_buckets,
+    local.baseline_s3_buckets,
+    lookup(local.baseline_environment_config, "baseline_s3_buckets", {})
+  )
 
   security_groups = merge(
     local.baseline_security_groups,
