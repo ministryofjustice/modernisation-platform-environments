@@ -128,14 +128,14 @@ module "glue_domain_refresh_job" {
   source                        = "./modules/glue_job"
   create_job                    = local.create_job
   name                          = "${local.project}-domain-refresh-${local.env}"
+  command_type                  = "glueetl"
   description                   = "Monitors the reporting hub for table changes and applies them to domains"
   create_security_configuration = local.create_sec_conf
   job_language                  = "scala"
-  temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/platform-refresh/"
-  checkpoint_dir                = "s3://${module.s3_glue_job_bucket.bucket_id}/checkpoint/platform-refresh/"
-  spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/platform-refresh/"
-  tags                          = local.all_tags
-  script_location               = "s3://${local.project}-artifact-store-${local.environment}/artifacts/domain-platform/digital-prison-reporting-poc/domain-platform-refresh-vLatest.scala"
+  temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-domain-refresh-${local.env}/"
+  checkpoint_dir                = "s3://${module.s3_glue_job_bucket.bucket_id}/checkpoint/${local.project}-domain-refresh-${local.env}/"
+  spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-domain-refresh-${local.env}/"
+  script_location               = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/scripts/digital-prison-reporting-jobs-vLatest.scala"
   enable_continuous_log_filter  = false
   project_id                    = local.project
   aws_kms_key                   = local.s3_kms_arn
@@ -143,14 +143,31 @@ module "glue_domain_refresh_job" {
   additional_policies           = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_admin_arn
   timeout                       = 120
   execution_class               = "FLEX"
+  worker_type                   = "G.1X"
+  number_of_workers             = 2
+  max_concurrent                = 1
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-domain-refresh-${local.env}"
+      Resource_Type = "Glue Job"
+      Jira          = "DPR-265"
+    }
+  )
+
   arguments = {
-    "--extra-jars"          = "s3://${local.project}-artifact-store-${local.environment}/artifacts/domain-platform/digital-prison-reporting-poc/domain-platform-vLatest.jar"
-    "--class"               = "GlueApp"
-    "--cloud.platform.path" = "s3://${module.s3_curated_bucket.bucket_id}"
-    "--domain.files.path"   = "s3://${module.s3_domain_config_bucket.bucket_id}/"         # Added /
-    "--domain.repo.path"    = "s3://${module.s3_glue_job_bucket.bucket_id}/domain-repo/" # Added /
-    "--target.path"         = "s3://${module.s3_domain_bucket.bucket_id}/"                # Added /
-    "--checkpoint.location" = "s3://${module.s3_glue_job_bucket.bucket_id}/checkpoint/platform-refresh/"
+    "--extra-jars"                    = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/digital-prison-reporting-jobs-vLatest-all.jar"
+    "--class"                         = "uk.gov.justice.digital.job.DomainRefreshJob"
+    "--datalake-formats"              = "delta"
+    "--dpr.aws.dynamodb.endpointUrl"  = "https://dynamodb.eu-west-2.amazonaws.com"
+    "--dpr.aws.region"                = "eu-west-2"
+    "--dpr.curated.s3.path"           = "s3://${module.s3_curated_bucket.bucket_id}/curated/"
+    "--dpr.domain.name"               = "establishment"
+    "--dpr.domain.operation"          = "UPDATE"
+    "--dpr.domain.registry"           = "DomainRegistry"
+    "--dpr.domain.table.name"         = "establishment"
+    "--dpr.domain.target.path"        =  "s3://${module.s3_domain_bucket.bucket_id}/domains/"
   }
 }
 
@@ -537,10 +554,10 @@ module "dms_nomis_ingestor" {
   cloudwatch_role_dependency = [aws_iam_role.dms_cloudwatch_logs_role]
 
   kinesis_settings = {
-    "IncludeNullAndEmpty" = "true"
-    "partition_include_schema_table" = "true"
-    "include_partition_value" = "true"
-    "kinesis_target_stream" = "arn:aws:kinesis:eu-west-2:${data.aws_caller_identity.current.account_id}:stream/${local.kinesis_stream_ingestor}"
+    "include_null_and_empty"          = "true"
+    "partition_include_schema_table"  = "true"
+    "include_partition_value"         = "true"
+    "kinesis_target_stream"           = "arn:aws:kinesis:eu-west-2:${data.aws_caller_identity.current.account_id}:stream/${local.kinesis_stream_ingestor}"
   }
 
   availability_zones = {
