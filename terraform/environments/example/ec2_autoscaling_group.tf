@@ -4,11 +4,8 @@ module "ec2_test_autoscaling_group" {
   providers = {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
   }
-
   for_each = try(local.ec2_test.ec2_test_autoscaling_groups, {})
-
   name = each.key
-
   ami_name                      = each.value.ami_name
   ami_owner                     = try(each.value.ami_owner, "core-shared-services-production")
   instance                      = merge(local.autoscale_instance, lookup(each.value, "instance", {}))

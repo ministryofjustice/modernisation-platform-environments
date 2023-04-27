@@ -28,7 +28,6 @@ module "ecs" {
   ec2_egress_rules        = local.ec2_egress_rules
   lb_tg_name              = aws_lb_target_group.ecs_target_group.name
   tags_common             = local.tags
-
   depends_on = [aws_lb_listener.ecs-example]
 }
 
@@ -215,9 +214,32 @@ resource "aws_lb_listener" "ecs-example" { #tfsec:ignore:aws-elb-http-not-used L
 
 # ECS Security Group for ecs-cluster module
 resource "aws_security_group" "cluster_ec2" {
+  #checkov:skip=CKV_AWS_23
   name        = "cluster_ec2"
-  description = "Controls access to EC2"
+  description = "controls access to the cluster ec2 instance"
   vpc_id      = data.aws_vpc.shared.id
+  dynamic "ingress" {
+    for_each = local.ec2_ingress_rules
+    content {
+      description     = lookup(ingress.value, "description", null)
+      from_port       = lookup(ingress.value, "from_port", null)
+      to_port         = lookup(ingress.value, "to_port", null)
+      protocol        = lookup(ingress.value, "protocol", null)
+      cidr_blocks     = lookup(ingress.value, "cidr_blocks", null)
+      security_groups = lookup(ingress.value, "security_groups", null)
+    }
+  }
+  dynamic "egress" {
+    for_each = local.ec2_egress_rules
+    content {
+      description     = lookup(egress.value, "description", null)
+      from_port       = lookup(egress.value, "from_port", null)
+      to_port         = lookup(egress.value, "to_port", null)
+      protocol        = lookup(egress.value, "protocol", null)
+      cidr_blocks     = lookup(egress.value, "cidr_blocks", null)
+      security_groups = lookup(egress.value, "security_groups", null)
+    }
+  }
   tags = merge(local.tags,
     { Name = lower(format("sg-%s-%s-example", local.application_name, local.environment)) }
   )
