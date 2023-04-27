@@ -157,7 +157,7 @@ module "glue_domain_refresh_job" {
   )
 
   arguments = {
-    "--extra-jars"                    = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/digital-prison-reporting-jobs-vLatest-all.jar"
+    "--extra-jars"                    = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/jars/digital-prison-reporting-jobs-vLatest-all.jar"
     "--class"                         = "uk.gov.justice.digital.job.DomainRefreshJob"
     "--datalake-formats"              = "delta"
     "--dpr.aws.dynamodb.endpointUrl"  = "https://dynamodb.eu-west-2.amazonaws.com"
