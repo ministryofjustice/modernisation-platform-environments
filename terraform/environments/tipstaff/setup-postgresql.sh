@@ -8,6 +8,6 @@ echo "Schema = $SCHEMA"
 if [ "$SCHEMA" == "dbo" ]; then 
     echo "The Schema dbo is already present in the database"
 else 
-    psql -h ${DB_HOSTNAME} -p 5432 -U $TIPSTAFF_DB_USERNAME_DEV -d $DB_NAME -c "\i tipstaffdb_dummydata.sql;";
+    psql -h ${DB_HOSTNAME} -p 5432 -U $TIPSTAFF_DB_USERNAME_DEV -d $DB_NAME -c "\i tipstaffdb_nodata.sql;";
 fi
 
