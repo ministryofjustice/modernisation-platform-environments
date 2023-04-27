@@ -122,7 +122,7 @@ resource "aws_dms_replication_task" "tipstaff_migration_task" {
 
   replication_task_settings = jsonencode({
     FullLoadSettings = {
-      TargetTablePrepMode = "DO_NOTHING"
+      TargetTablePrepMode = "TRUNCATE_BEFORE_LOAD"
     },
     ControlTablesSettings = {
       historyTimeslotInMinutes = 5
