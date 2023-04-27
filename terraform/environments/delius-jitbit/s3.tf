@@ -9,6 +9,7 @@ module "s3_bucket" {
 
   bucket_prefix      = "${local.application_name}-${local.environment}-"
   versioning_enabled = true
+  sse_algorithm      = "AES256"
   # Useful guide - https://aws.amazon.com/blogs/storage/how-to-use-aws-datasync-to-migrate-data-between-amazon-s3-buckets/
   bucket_policy_v2 = [{
     effect = "Allow"
