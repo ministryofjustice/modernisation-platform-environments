@@ -155,7 +155,7 @@ output "ec2_private_key" {
 # DMS Subnet ids
 output "dms_subnets" {
   description = "DMS Subnet IDs"
-  value       = module.dms_nomis_t3.dms_subnet_ids
+  value       = module.dms_nomis_ingestor.dms_subnet_ids
 }
 
 ## Dynamo Domain Registry DB table

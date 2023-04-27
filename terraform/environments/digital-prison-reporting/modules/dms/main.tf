@@ -71,12 +71,12 @@ resource "aws_dms_endpoint" "target" {
   endpoint_type = "target"
   engine_name   = var.target_engine
 
-  kinesis_settings {
-    service_access_role_arn        = aws_iam_role.dms-kinesis-role.arn
-    stream_arn                     = var.kinesis_target_stream
-    partition_include_schema_table = true
-    include_partition_value        = true
-  }
+  #kinesis_settings {
+  #  service_access_role_arn        = aws_iam_role.dms-kinesis-role.arn
+  #  stream_arn                     = var.kinesis_target_stream
+  #  partition_include_schema_table = true
+  #  include_partition_value        = true
+  #}
 
   dynamic "kinesis_settings" {
     for_each = var.kinesis_settings != null ? [true] : []
