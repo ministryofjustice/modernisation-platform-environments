@@ -32,6 +32,60 @@ module "ecs" {
   depends_on = [aws_lb_listener.ecs-example]
 }
 
+module "ecs-cluster" {
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//cluster"
+
+  ec2_capacity_instance_type = local.application_data.accounts[local.environment].container_instance_type
+  ec2_capacity_max_size = local.application_data.accounts[local.environment].ec2_max_size
+  ec2_capacity_min_size = local.application_data.accounts[local.environment].ec2_min_size
+  ec2_capacity_security_group_id = aws_security_group.cluster_ec2.id
+  ec2_subnet_ids = [
+    data.aws_subnet.private_subnets_a.id,
+    data.aws_subnet.private_subnets_b.id,
+    data.aws_subnet.private_subnets_c.id
+  ]
+  environment = local.environment
+  name        = local.ecs_application_name
+
+  tags = local.tags
+}
+
+module "service" {
+  source                    = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service"
+
+  container_definition_json = templatefile("${path.module}/templates/task_definition.json.tftpl", {})
+  ecs_cluster_arn           = module.ecs-cluster.ecs_cluster_arn
+  name                      = "${local.ecs_application_name}-task_definition_volume"
+  vpc_id                    = local.vpc_all
+
+  launch_type  = local.application_data.accounts[local.environment].launch_type
+  network_mode = local.application_data.accounts[local.environment].network_mode
+
+  task_cpu    = local.application_data.accounts[local.environment].container_cpu
+  task_memory = local.application_data.accounts[local.environment].container_memory
+
+  task_exec_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${local.ecs_application_name}-ecs-task-execution-role"
+
+  environment = local.environment
+  ecs_load_balancers = [
+    {
+      target_group_arn = aws_lb_target_group.ecs_target_group.arn
+      container_name   = local.ecs_application_name
+      container_port   = 80
+    }
+  ]
+
+  subnet_ids = [
+    data.aws_subnet.private_subnets_a.id,
+    data.aws_subnet.private_subnets_b.id,
+    data.aws_subnet.private_subnets_c.id
+  ]
+
+  ignore_changes_task_definition = false
+
+  tags = local.tags
+}
+
 locals {
   ecs_application_name = "example-app"
   # Build EC2 ingress and egress rules
@@ -156,4 +210,15 @@ resource "aws_lb_listener" "ecs-example" { #tfsec:ignore:aws-elb-http-not-used L
   port = local.application_data.accounts[local.environment].server_port
 
   depends_on = [aws_lb_target_group.ecs_target_group]
+}
+
+
+# ECS Security Group for ecs-cluster module
+resource "aws_security_group" "cluster_ec2" {
+  name        = "cluster_ec2"
+  description = "Controls access to EC2"
+  vpc_id      = data.aws_vpc.shared.id
+  tags = merge(local.tags,
+    { Name = lower(format("sg-%s-%s-example", local.application_name, local.environment)) }
+  )
 }
