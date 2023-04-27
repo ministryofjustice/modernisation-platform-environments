@@ -66,6 +66,17 @@ locals {
           protocol    = -1
           self        = true
         }
+        http = {
+          description = "Allow http ingress"
+          from_port   = 80
+          to_port     = 80
+          protocol    = "tcp"
+          security_groups = [
+            "private-jumpserver",
+            "bastion-linux",
+          ]
+          cidr_blocks = local.security_group_cidrs.https
+        }
         https = {
           description = "Allow https ingress"
           from_port   = 443

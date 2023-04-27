@@ -43,6 +43,33 @@ locals {
   }
 
   weblogic_lb_listeners = {
+
+    http = {
+      port     = 80
+      protocol = "HTTP"
+      default_action = {
+        type = "redirect"
+        redirect = {
+          port        = 443
+          protocol    = "HTTPS"
+          status_code = "HTTP_301"
+        }
+      }
+    }
+
+    http7777 = {
+      port     = 7777
+      protocol = "HTTP"
+      default_action = {
+        type = "fixed-response"
+        fixed_response = {
+          content_type = "text/plain"
+          message_body = "Not implemented"
+          status_code  = "501"
+        }
+      }
+    }
+
     https = {
       port                      = 443
       protocol                  = "HTTPS"
@@ -57,6 +84,7 @@ locals {
         }
       }
     }
+
   }
 
   weblogic_cloudwatch_metric_alarms = {
@@ -170,7 +198,7 @@ locals {
     })
     user_data_cloud_init = merge(local.weblogic_ec2_default.user_data_cloud_init, {
       args = merge(local.weblogic_ec2_default.user_data_cloud_init.args, {
-        branch = "a5c69245a3e30ca8d44ab269062479e1768e2f5c" # 2023-04-25
+        branch = "f8ece8fc507d42c638878ede0f9030455669bb74" # 2023-04-27 reporting fix
       })
     })
   })
