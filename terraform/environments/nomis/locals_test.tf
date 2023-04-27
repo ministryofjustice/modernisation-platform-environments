@@ -158,45 +158,86 @@ locals {
         security_groups          = ["private-lb"]
 
         listeners = {
-          https = merge(
-            local.weblogic_lb_listeners.https, {
-              # alarm_target_group_names = ["t1-nomis-web-b-http-7777"]
-              # cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["nomis_pagerduty"].lb_default
-              rules = {
-                t1-nomis-web-a-http-7777 = {
-                  priority = 300
-                  actions = [{
-                    type              = "forward"
-                    target_group_name = "t1-nomis-web-a-http-7777"
-                  }]
-                  conditions = [{
-                    host_header = {
-                      values = [
-                        "t1-nomis-web-a.test.nomis.az.justice.gov.uk",
-                        "t1-nomis-web-a.test.nomis.service.justice.gov.uk",
-                        "c-t1.test.nomis.az.justice.gov.uk",
-                        "c-t1.test.nomis.service.justice.gov.uk",
-                        "t1-cn.hmpp-azdt.justice.gov.uk",
-                      ]
-                    }
-                  }]
-                }
-                t1-nomis-web-b-http-7777 = {
-                  priority = 400
-                  actions = [{
-                    type              = "forward"
-                    target_group_name = "t1-nomis-web-b-http-7777"
-                  }]
-                  conditions = [{
-                    host_header = {
-                      values = [
-                        "t1-nomis-web-b.test.nomis.az.justice.gov.uk",
-                        "t1-nomis-web-b.test.nomis.service.justice.gov.uk",
-                      ]
-                    }
-                  }]
-                }
+
+          http7777 = merge(local.weblogic_lb_listeners.http7777, {
+            rules = {
+              # T1 users in Azure accessed server directly on http 7777
+              # so support this in Mod Platform as well to minimise
+              # disruption.  This isn't needed for other environments.
+              t1-nomis-web-a = {
+                priority = 300
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t1-nomis-web-a-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "t1-nomis-web-a.test.nomis.az.justice.gov.uk",
+                      "t1-nomis-web-a.test.nomis.service.justice.gov.uk",
+                      "c-t1.test.nomis.az.justice.gov.uk",
+                      "c-t1.test.nomis.service.justice.gov.uk",
+                      "t1-cn.hmpp-azdt.justice.gov.uk",
+                    ]
+                  }
+                }]
               }
+              t1-nomis-web-b = {
+                priority = 400
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t1-nomis-web-b-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "t1-nomis-web-b.test.nomis.az.justice.gov.uk",
+                      "t1-nomis-web-b.test.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+            }
+          })
+
+          https = merge(local.weblogic_lb_listeners.https, {
+            # alarm_target_group_names = ["t1-nomis-web-b-http-7777"]
+            # cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["nomis_pagerduty"].lb_default
+            rules = {
+              t1-nomis-web-a-http-7777 = {
+                priority = 300
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t1-nomis-web-a-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "t1-nomis-web-a.test.nomis.az.justice.gov.uk",
+                      "t1-nomis-web-a.test.nomis.service.justice.gov.uk",
+                      "c-t1.test.nomis.az.justice.gov.uk",
+                      "c-t1.test.nomis.service.justice.gov.uk",
+                      "t1-cn.hmpp-azdt.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              t1-nomis-web-b-http-7777 = {
+                priority = 400
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t1-nomis-web-b-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "t1-nomis-web-b.test.nomis.az.justice.gov.uk",
+                      "t1-nomis-web-b.test.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+            }
           })
         }
       }

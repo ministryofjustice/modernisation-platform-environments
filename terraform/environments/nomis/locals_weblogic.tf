@@ -43,6 +43,19 @@ locals {
   }
 
   weblogic_lb_listeners = {
+    http7777 = {
+      port     = 7777
+      protocol = "HTTP"
+      default_action = {
+        type = "fixed-response"
+        fixed_response = {
+          content_type = "text/plain"
+          message_body = "Not implemented"
+          status_code  = "501"
+        }
+      }
+    }
+
     https = {
       port                      = 443
       protocol                  = "HTTPS"
