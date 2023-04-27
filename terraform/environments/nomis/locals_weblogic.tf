@@ -43,6 +43,20 @@ locals {
   }
 
   weblogic_lb_listeners = {
+
+    http = {
+      port     = 80
+      protocol = "HTTP"
+      default_action = {
+        type = "redirect"
+        redirect = {
+          port        = 443
+          protocol    = "HTTPS"
+          status_code = "HTTP_301"
+        }
+      }
+    }
+
     http7777 = {
       port     = 7777
       protocol = "HTTP"
@@ -70,6 +84,7 @@ locals {
         }
       }
     }
+
   }
 
   weblogic_cloudwatch_metric_alarms = {

@@ -159,6 +159,8 @@ locals {
 
         listeners = {
 
+          http = local.weblogic_lb_listeners.http
+
           http7777 = merge(local.weblogic_lb_listeners.http7777, {
             rules = {
               # T1 users in Azure accessed server directly on http 7777
