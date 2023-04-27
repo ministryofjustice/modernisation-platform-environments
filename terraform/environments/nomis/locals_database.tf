@@ -72,7 +72,7 @@ locals {
       period              = "60"
       statistic           = "Average"
       threshold           = "1"
-      alarm_description   = "oracleasm service has stopped"
+      alarm_description   = "oracle ohasd service has stopped"
       dimensions = {
         instance = "oracle_ohasd"
       }
