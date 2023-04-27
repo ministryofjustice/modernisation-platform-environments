@@ -150,11 +150,11 @@ module "glue_reporting_hub_job" {
 #    "--extra-jars"          = "s3://${local.project}-artifact-store-${local.environment}/artifacts/domain-platform/digital-prison-reporting-poc/domain-platform-vLatest.jar"
 #    "--class"               = "GlueApp"
 #    "--cloud.platform.path" = "s3://${module.s3_curated_bucket.bucket_id}"
-#    "--domain.files.path"   = "s3://${module.s3_domain_config_bucket[0].bucket.id}/"
+#    "--domain.files.path"   = "s3://${module.s3_domain_config_bucket.bucket_id}/"
 #    "--domain.repo.path"    = "s3://${module.s3_glue_job_bucket.bucket_id}/domain-repo/" ## Added /
-#    "--source.queue"        = "domain-cdc-event-notification"                                ## DPR-287, needs right source - TBC
+#    "--source.queue"        = "domain-cdc-event-notification"                            ## DPR-287, needs right source - TBC
 #    "--source.region"       = local.account_region
-#    "--target.path"         = "s3://${module.s3_domain_bucket[0].bucket.id}/" # Added /
+#    "--target.path"         = "s3://${module.s3_domain_bucket.bucket_id}/"               ## Added /
 #    "--checkpoint.location" = "s3://${module.s3_glue_job_bucket.bucket_id}/checkpoint/change-monitor/"
 #  }
 #}
@@ -183,9 +183,9 @@ module "glue_domain_refresh_job" {
     "--extra-jars"          = "s3://${local.project}-artifact-store-${local.environment}/artifacts/domain-platform/digital-prison-reporting-poc/domain-platform-vLatest.jar"
     "--class"               = "GlueApp"
     "--cloud.platform.path" = "s3://${module.s3_curated_bucket.bucket_id}"
-    "--domain.files.path"   = "s3://${module.s3_domain_config_bucket[0].bucket.id}/"         # Added /
+    "--domain.files.path"   = "s3://${module.s3_domain_config_bucket.bucket_id}/"         # Added /
     "--domain.repo.path"    = "s3://${module.s3_glue_job_bucket.bucket_id}/domain-repo/" # Added /
-    "--target.path"         = "s3://${module.s3_domain_bucket[0].bucket.id}/"                # Added /
+    "--target.path"         = "s3://${module.s3_domain_bucket.bucket_id}/"                # Added /
     "--checkpoint.location" = "s3://${module.s3_glue_job_bucket.bucket_id}/checkpoint/platform-refresh/"
   }
 }
@@ -387,6 +387,42 @@ module "s3_curated_bucket" {
   )
 }
 
+# Data Domain Bucket
+module "s3_domain_bucket" {
+  source                    = "./modules/s3_bucket"
+  create_s3                 = local.setup_buckets
+  name                      = "${local.project}-domain-${local.env}"
+  custom_kms_key            = local.s3_kms_arn
+  create_notification_queue = false # For SQS Queue
+  enable_lifecycle          = true
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-domain-${local.env}"
+      Resource_Type = "S3 Bucket"
+    }
+  )
+}
+
+# Data Domain Configuration Bucket
+module "s3_domain_config_bucket" {
+  source                    = "./modules/s3_bucket"
+  create_s3                 = local.setup_buckets
+  name                      = "${local.project}-domain-config-${local.env}"
+  custom_kms_key            = local.s3_kms_arn
+  create_notification_queue = false # For SQS Queue
+  enable_lifecycle          = true
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-domain-config-${local.env}"
+      Resource_Type = "S3 Bucket"
+    }
+  )
+}
+
 ##########################
 # Data Domain Components # 
 ##########################
@@ -399,128 +435,6 @@ module "glue_data_domain_database" {
   description    = "Glue Data Catalog for Data Domain Platform"
   aws_account_id = local.account_id
   aws_region     = local.account_region
-}
-
-# Data Domain Bucket
-module "s3_domain_bucket" {
-  count  = local.create_bucket ? 1 : 0
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.2.0"
-
-  providers = {
-    aws.bucket-replication = aws
-  }
-
-  bucket_prefix = "${local.project}-domain-${local.env}-"
-
-  replication_enabled = false
-  custom_kms_key      = local.s3_kms_arn
-  lifecycle_rule = [
-    {
-      id      = "main"
-      enabled = "Enabled"
-      prefix  = ""
-
-      tags = {
-        rule      = "log"
-        autoclean = "true"
-      }
-
-      transition = [
-        {
-          days          = 90
-          storage_class = "STANDARD_IA"
-        }
-      ]
-
-      expiration = {
-        days = 730
-      }
-
-      noncurrent_version_transition = [
-        {
-          days          = 90
-          storage_class = "STANDARD_IA"
-          }, {
-          days          = 365
-          storage_class = "GLACIER"
-        }
-      ]
-
-      noncurrent_version_expiration = {
-        days = 730
-      }
-    }
-  ]
-
-  tags = merge(
-    local.all_tags,
-    {
-      Name          = "${local.project}-domain-${local.env}-s3"
-      Resource_Type = "S3 Bucket"
-      Component     = "Data Domain"
-    }
-  )
-}
-
-# Data Domain Configuration Bucket
-module "s3_domain_config_bucket" {
-  count  = local.create_bucket ? 1 : 0
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.2.0"
-
-  providers = {
-    aws.bucket-replication = aws
-  }
-
-  bucket_prefix = "${local.project}-domain-config-${local.env}-"
-
-  replication_enabled = false
-  custom_kms_key      = local.s3_kms_arn
-  lifecycle_rule = [
-    {
-      id      = "main"
-      enabled = "Enabled"
-      prefix  = ""
-
-      tags = {
-        rule      = "log"
-        autoclean = "true"
-      }
-
-      transition = [
-        {
-          days          = 90
-          storage_class = "STANDARD_IA"
-        }
-      ]
-
-      expiration = {
-        days = 730
-      }
-
-      noncurrent_version_transition = [
-        {
-          days          = 90
-          storage_class = "STANDARD_IA"
-          }, {
-          days          = 365
-          storage_class = "GLACIER"
-        }
-      ]
-
-      noncurrent_version_expiration = {
-        days = 730
-      }
-    }
-  ]
-
-  tags = merge(
-    local.all_tags,
-    {
-      Name          = "${local.project}-domain-config-${local.env}-s3"
-      Resource_Type = "S3 Bucket"
-      Component     = "Data Domain"
-    }
-  )
 }
 
 # Data Domain Glue Connection (RedShift)
