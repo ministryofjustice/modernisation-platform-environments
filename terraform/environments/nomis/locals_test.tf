@@ -24,6 +24,7 @@ locals {
     }
 
     baseline_ec2_autoscaling_groups = {
+      # blue deployment
       t1-nomis-web-a = merge(local.weblogic_ec2_a, {
         tags = merge(local.weblogic_ec2_a.tags, {
           nomis-environment    = "t1"
@@ -37,6 +38,7 @@ locals {
         cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["nomis_pagerduty"].weblogic
       })
 
+      # green deployment
       t1-nomis-web-b = merge(local.weblogic_ec2_b, {
         tags = merge(local.weblogic_ec2_b.tags, {
           nomis-environment    = "t1"
@@ -162,9 +164,9 @@ locals {
 
           http7777 = merge(local.weblogic_lb_listeners.http7777, {
             rules = {
-              # T1 users in Azure accessed server directly on http 7777
-              # so support this in Mod Platform as well to minimise
-              # disruption.  This isn't needed for other environments.
+              # T1 users in Azure accessed server directly on http 7777
+              # so support this in Mod Platform as well to minimise
+              # disruption.  This isn't needed for other environments.
               t1-nomis-web-a = {
                 priority = 300
                 actions = [{

@@ -25,6 +25,7 @@ locals {
     }
 
     baseline_ec2_autoscaling_groups = {
+      # blue deployment
       preprod-nomis-web-a = merge(local.weblogic_ec2_a, {
         tags = merge(local.weblogic_ec2_a.tags, {
           nomis-environment    = "preprod"
@@ -37,6 +38,8 @@ locals {
         })
         cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["nomis_pagerduty"].weblogic
       })
+
+      # green deployment
       preprod-nomis-web-b = merge(local.weblogic_ec2_b, {
         tags = merge(local.weblogic_ec2_b.tags, {
           nomis-environment    = "preprod"
