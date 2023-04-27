@@ -60,12 +60,13 @@ locals {
       })
       prod-nomis-web-b = merge(local.weblogic_ec2_b, {
         tags = merge(local.weblogic_ec2_b.tags, {
-          oracle-db-hostname = "PDPDL00035.azure.hmpp.root"
-          nomis-environment  = "prod"
-          oracle-db-name     = "CNOMP"
+          nomis-environment    = "prod"
+          oracle-db-hostname-a = "pnomis-a.production.nomis.service.justice.gov.uk"
+          oracle-db-hostname-b = "pnomis-b.production.nomis.service.justice.gov.uk"
+          oracle-db-name       = "PCNOM"
         })
         autoscaling_group = merge(local.weblogic_ec2_a.autoscaling_group, {
-          desired_capacity = 0
+          desired_capacity = 1
         })
         # cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["nomis_pagerduty"].weblogic
       })
@@ -151,6 +152,8 @@ locals {
         security_groups          = ["private-lb"]
 
         listeners = {
+          http = local.weblogic_lb_listeners.http
+
           https = merge(
             local.weblogic_lb_listeners.https, {
               alarm_target_group_names = ["prod-nomis-web-b-http-7777"]

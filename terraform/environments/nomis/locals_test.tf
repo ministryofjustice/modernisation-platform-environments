@@ -158,7 +158,6 @@ locals {
         security_groups          = ["private-lb"]
 
         listeners = {
-
           http = local.weblogic_lb_listeners.http
 
           http7777 = merge(local.weblogic_lb_listeners.http7777, {
