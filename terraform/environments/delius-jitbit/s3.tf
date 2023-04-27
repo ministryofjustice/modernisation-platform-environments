@@ -25,15 +25,19 @@ module "s3_bucket" {
       "s3:PutObjectTagging"
     ]
     principals = {
-      type        = "AWS"
-      identifiers = ["arn:aws:iam::377957503799:role/cr-jitbit-dev-datasync-transfer-to-s3"]
+      type = "AWS"
+      identifiers = [
+        "arn:aws:iam::${local.application_data.accounts[local.environment].migration_source_account_id}:role/cr-jitbit-dev-datasync-transfer-to-s3"
+      ]
     }
     }, {
     effect  = "Allow"
     actions = ["s3:ListBucket"]
     principals = {
-      type        = "AWS"
-      identifiers = ["arn:aws:iam::377957503799:role/admin"]
+      type = "AWS"
+      identifiers = [
+        "arn:aws:iam::${local.application_data.accounts[local.environment].migration_source_account_id}:role/admin"
+      ]
     }
   }]
 
