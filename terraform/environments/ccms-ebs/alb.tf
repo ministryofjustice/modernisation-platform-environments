@@ -1,9 +1,9 @@
 resource "aws_lb" "ebsapps_lb" {
   name               = lower(format("lb-%s-%s-ebsapp", local.application_name, local.environment))
-  internal           = true
+  internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.sg_ebsapps_lb.id]
-  subnets            = data.aws_subnets.private-public.ids
+  subnets            = data.aws_subnets.shared-public.ids
 
   enable_deletion_protection = true
 
@@ -52,6 +52,11 @@ resource "aws_lb_target_group_attachment" "ebsapps" {
   target_group_arn = aws_lb_target_group.ebsapp_tg.arn
   target_id        = element(aws_instance.ec2_ebsapps.*.id, count.index)
   port             = local.application_data.accounts[local.environment].tg_apps_port
+}
+
+resource "aws_wafv2_web_acl_association" "ebs_waf_association" {
+  resource_arn = aws_lb.ebsapps_lb.arn
+  web_acl_arn  = aws_wafv2_web_acl.ebs_web_acl.arn
 }
 
 
