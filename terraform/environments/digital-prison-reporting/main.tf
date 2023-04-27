@@ -1,38 +1,5 @@
-locals {
-  project                    = local.application_data.accounts[local.environment].project_short_id
-  glue_db                    = local.application_data.accounts[local.environment].glue_db_name
-  glue_db_data_domain        = local.application_data.accounts[local.environment].glue_db_data_domain
-  description                = local.application_data.accounts[local.environment].db_description
-  create_db                  = local.application_data.accounts[local.environment].create_database
-  glue_job                   = local.application_data.accounts[local.environment].glue_job_name
-  create_job                 = local.application_data.accounts[local.environment].create_job
-  create_sec_conf            = local.application_data.accounts[local.environment].create_security_conf
-  env                        = local.environment
-  s3_kms_arn                 = aws_kms_key.s3.arn
-  kinesis_kms_arn            = aws_kms_key.kinesis-kms-key.arn
-  kinesis_kms_id             = data.aws_kms_key.kinesis_kms_key.key_id
-  create_bucket              = local.application_data.accounts[local.environment].setup_buckets
-  account_id                 = data.aws_caller_identity.current.account_id
-  account_region             = data.aws_region.current.name
-  create_kinesis             = local.application_data.accounts[local.environment].create_kinesis_streams
-  enable_glue_registry       = local.application_data.accounts[local.environment].create_glue_registries
-  setup_buckets              = local.application_data.accounts[local.environment].setup_s3_buckets
-  create_glue_connection     = local.application_data.accounts[local.environment].create_glue_connections
-  image_id                   = local.application_data.accounts[local.environment].ami_image_id
-  instance_type              = local.application_data.accounts[local.environment].ec2_instance_type
-  create_datamart            = local.application_data.accounts[local.environment].setup_redshift
-  redshift_cluster_name      = "${local.application_data.accounts[local.environment].project_short_id}-redshift-${local.environment}"
-  kinesis_stream_ingestor    = "${local.application_data.accounts[local.environment].project_short_id}-kinesis-ingestor-${local.environment}"
-# DPR-378 #  kinesis_stream_data_domain = "${local.application_data.accounts[local.environment].project_short_id}-kinesis-data-domain-${local.environment}"
-  kinesis_endpoint           = "https://kinesis.eu-west-2.amazonaws.com"
-
-  all_tags = merge(
-    local.tags,
-    {
-      Name = "${local.application_name}"
-    }
-  )
-}
+#locals {
+#}
 
 ############################
 # Federated Cloud Platform # 
@@ -67,7 +34,7 @@ module "glue_reporting_hub_job" {
     "--enable-metrics"                      = true
     "--enable-spark-ui"                     = false
     "--enable-job-insights"                 = true
-    "--kinesis.reader.streamName"           = "local.kinesis_stream_ingestor"
+    "--kinesis.reader.streamName"           = local.kinesis_stream_ingestor
     "--aws.kinesis.endpointUrl"             = "https://kinesis-${local.account_region}.amazonaws.com"
     "--aws.region"                          = local.account_region
     "--kinesis.reader.batchDurationSeconds" = 1
@@ -206,7 +173,7 @@ module "kinesis_stream_ingestor" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-kinesis-ingestor-${local.env}"
+      Name          = local.kinesis_stream_ingestor
       Resource_Type = "Kinesis Data Stream"
     }
   )
@@ -549,7 +516,7 @@ module "s3_artifacts_store" {
 }
 
 # DMS Nomis Data Collector
-module "dms_nomis_t3" {
+module "dms_nomis_ingestor" {
   source                = "./modules/dms"
   name                  = "${local.project}-dms-nomis-ingestor-${local.env}"
   vpc_cidr              = [data.aws_vpc.shared.cidr_block]
@@ -560,7 +527,6 @@ module "dms_nomis_t3" {
   source_address        = "10.101.63.135"
   source_db_port        = 1521
   vpc                   = data.aws_vpc.shared.id
-  kinesis_target_stream = "arn:aws:kinesis:eu-west-2:${data.aws_caller_identity.current.account_id}:stream/dpr-kinesis-ingestor-${local.env}"
   kinesis_stream_policy = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_admin_arn
   project_id            = local.project
   env                   = local.environment
@@ -572,6 +538,13 @@ module "dms_nomis_t3" {
 
   vpc_role_dependency        = [aws_iam_role.dmsvpcrole]
   cloudwatch_role_dependency = [aws_iam_role.dms_cloudwatch_logs_role]
+
+  kinesis_settings = {
+    "IncludeNullAndEmpty" = "true"
+    "partition_include_schema_table" = "true"
+    "include_partition_value" = "true"
+    "kinesis_target_stream" = "arn:aws:kinesis:eu-west-2:${data.aws_caller_identity.current.account_id}:stream/${local.kinesis_stream_ingestor}"
+  }
 
   availability_zones = {
     0 = "eu-west-2a"

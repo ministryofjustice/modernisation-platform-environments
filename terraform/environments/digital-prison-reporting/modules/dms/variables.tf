@@ -61,7 +61,7 @@ variable "source_address" {}
 
 variable "vpc" {}
 
-variable "kinesis_target_stream" {}
+# variable "kinesis_target_stream" {}
 
 variable "kinesis_stream_policy" {}
 
@@ -172,6 +172,11 @@ variable "target_storage_encrypted" {
 #  description = "Username to access the target database"
 #}
 
+variable "kinesis_settings" {
+  type        = map(any)
+  description = "Configuration block for Kinesis settings"
+  default     = null
+}
 #--------------------------------------------------------------
 # DMS source config
 #--------------------------------------------------------------
