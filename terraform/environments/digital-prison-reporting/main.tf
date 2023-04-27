@@ -72,7 +72,7 @@ module "glue_reporting_hub_job" {
     "--aws.region"                          = local.account_region
     "--kinesis.reader.batchDurationSeconds" = 1
     "--datalake-formats"                    = "delta"
-    "--raw.s3.path"                         = "s3://${module.s3_raw_events_bucket.bucket_id}"
+    "--raw.s3.path"                         = "s3://${module.s3_raw_bucket.bucket_id}"
     "--structured.s3.path"                  = "s3://${module.s3_structured_bucket.bucket_id}"
   }
 }
@@ -337,7 +337,7 @@ module "s3_landing_bucket" {
 module "s3_raw_bucket" {
   source                    = "./modules/s3_bucket"
   create_s3                 = local.setup_buckets
-  name                      = "${local.project}-raw-events-${local.env}"
+  name                      = "${local.project}-raw-zone-${local.env}"
   custom_kms_key            = local.s3_kms_arn
   create_notification_queue = false # For SQS Queue
   enable_lifecycle          = true
@@ -345,7 +345,7 @@ module "s3_raw_bucket" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-raw-events-${local.env}"
+      Name          = "${local.project}-raw-zone-${local.env}"
       Resource_Type = "S3 Bucket"
     }
   )
@@ -355,7 +355,7 @@ module "s3_raw_bucket" {
 module "s3_structured_bucket" {
   source                    = "./modules/s3_bucket"
   create_s3                 = local.setup_buckets
-  name                      = "${local.project}-structured-data-${local.env}"
+  name                      = "${local.project}-structured-zone-${local.env}"
   custom_kms_key            = local.s3_kms_arn
   create_notification_queue = false # For SQS Queue
   enable_lifecycle          = true
@@ -363,7 +363,7 @@ module "s3_structured_bucket" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-structured-data-${local.env}"
+      Name          = "${local.project}-structured-zone-${local.env}"
       Resource_Type = "S3 Bucket"
     }
   )
@@ -373,7 +373,7 @@ module "s3_structured_bucket" {
 module "s3_curated_bucket" {
   source                    = "./modules/s3_bucket"
   create_s3                 = local.setup_buckets
-  name                      = "${local.project}-curated-data-${local.env}"
+  name                      = "${local.project}-curated-zone-${local.env}"
   custom_kms_key            = local.s3_kms_arn
   create_notification_queue = false # For SQS Queue
   enable_lifecycle          = true
@@ -381,7 +381,7 @@ module "s3_curated_bucket" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-curated-data-${local.env}"
+      Name          = "${local.project}-curated-zone-${local.env}"
       Resource_Type = "S3 Bucket"
     }
   )
