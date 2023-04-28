@@ -121,6 +121,10 @@ resource "aws_dms_replication_task" "tipstaff_migration_task" {
   start_replication_task   = false
 
   replication_task_settings = jsonencode({
+    TargetMetadata = {
+      FullLobMode  = true,
+      LobChunkSize = 64
+    },
     FullLoadSettings = {
       TargetTablePrepMode = "DO_NOTHING"
     },
