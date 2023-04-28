@@ -1,4 +1,4 @@
-SELECT SETVAL('dbo.passports_seq', COALESCE(MAX("passportID"), 1) ) FROM dbo."Passports";
+SELECT SETVAL('dbo.passports_passportid_seq', COALESCE(MAX("passportID"), 1) ) FROM dbo."Passports";
 SELECT SETVAL('dbo.addresses_seq', COALESCE(MAX("addressID"), 1) ) FROM dbo."Addresses";
 SELECT SETVAL('dbo.applicants_seq', COALESCE(MAX("ApplicantID"), 1) ) FROM dbo."Applicants";
 SELECT SETVAL('dbo.attendancenotecodes_seq', COALESCE(MAX("AttendanceNoteCodeID"), 1) ) FROM dbo."AttendanceNoteCodes";
