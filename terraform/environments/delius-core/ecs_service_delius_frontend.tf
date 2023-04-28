@@ -205,7 +205,7 @@ resource "aws_ecs_task_definition" "delius_core_frontend_task_definition" {
             awslogs-stream-prefix = local.frontend_fully_qualified_name
           }
         }
-        memory      = 2048
+        memory      = 4096
         mountPoints = []
         name        = "${local.frontend_fully_qualified_name}"
         portMappings = [
@@ -245,7 +245,7 @@ resource "aws_ecs_task_definition" "delius_core_frontend_task_definition" {
   execution_role_arn = aws_iam_role.delius_core_frontend_ecs_exec.arn
   family             = local.frontend_fully_qualified_name
 
-  memory       = "2048"
+  memory       = "4096"
   network_mode = "awsvpc"
   requires_compatibilities = [
     "FARGATE",
