@@ -327,3 +327,8 @@ tasks:
         $connectionXMLLocation = "$${connectionXMLDirectory}\connections.xml"
         $connectionXMLContents | Out-File -FilePath $connectionXMLLocation
         '@ | Out-File -FilePath C:\scripts\login.ps1
+
+        @'
+        Powershell -Command "Set-ExecutionPolicy Unrestricted CurrentUser" >> "%TEMP%\StartupLog.txt" 2>&1
+        Powershell C:\scripts\login.ps1 >> "%TEMP%\StartupLog.txt" 2>&1
+        @' | Out-File -FilePath "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\StartUp\login.cmd"
