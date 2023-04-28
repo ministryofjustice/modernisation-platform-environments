@@ -20,7 +20,7 @@ resource "aws_cloudwatch_metric_alarm" "asg_cpu_utilization_over_threshold" {
   tags                      = local.tags
 
   dimensions = {
-    AutoScalingGroupName = module.ec2_iaps_server.autoscaling_group_name
+    AutoScalingGroupName = module.ec2_iaps_server.autoscaling_group.name
   }
 }
 
@@ -40,7 +40,7 @@ resource "aws_cloudwatch_metric_alarm" "asg_failed_status_checks" {
   tags                      = local.tags
 
   dimensions = {
-    AutoScalingGroupName = module.ec2_iaps_server.autoscaling_group_name
+    AutoScalingGroupName = module.ec2_iaps_server.autoscaling_group.name
   }
 }
 
@@ -60,7 +60,7 @@ resource "aws_cloudwatch_metric_alarm" "in_service_instances_below_threshold" {
   tags                      = local.tags
 
   dimensions = {
-    AutoScalingGroupName = module.ec2_iaps_server.autoscaling_group_name
+    AutoScalingGroupName = module.ec2_iaps_server.autoscaling_group.name
   }
 }
 
