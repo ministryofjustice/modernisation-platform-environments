@@ -548,3 +548,83 @@ CREATE SEQUENCE dbo.Passports_passportID_seq
 
 
 ALTER TABLE dbo.Passports_passportID_seq OWNER TO dbadmin;
+
+--
+-- Set default values for primary key columns
+--
+
+ALTER TABLE ONLY dbo."Addresses" ALTER COLUMN "addressID" SET DEFAULT nextval('dbo.addresses_seq'::regclass);
+
+ALTER TABLE ONLY dbo."Applicants" ALTER COLUMN "ApplicantID" SET DEFAULT nextval('dbo.addresses_seq'::regclass);
+
+ALTER TABLE ONLY dbo."AttendanceNoteCodes" ALTER COLUMN "AttendanceNoteCodeID" SET DEFAULT nextval('dbo.attendancenotecodes_seq'::regclass);
+
+ALTER TABLE ONLY dbo."AttendanceNotes" ALTER COLUMN "AttendanceNoteID" SET DEFAULT nextval('dbo.attendancenotes_seq'::regclass);
+
+ALTER TABLE ONLY dbo."AuditEventDataRows" ALTER COLUMN "idAuditData" SET DEFAULT nextval('dbo.auditeventdatarows_seq'::regclass);
+
+ALTER TABLE ONLY dbo."AuditEventDescriptions" ALTER COLUMN "idAuditEventDescription" SET DEFAULT nextval('dbo.auditeventdescriptions_seq'::regclass);
+
+ALTER TABLE ONLY dbo."AuditEvents" ALTER COLUMN "idAuditEvent" SET DEFAULT nextval('dbo.auditevents_seq'::regclass);
+
+ALTER TABLE ONLY dbo."CAOrderTypes" ALTER COLUMN "caOrderTypeID" SET DEFAULT nextval('dbo.caordertypes_seq'::regclass);
+
+ALTER TABLE ONLY dbo."CaseReviewStatus" ALTER COLUMN "caseReviewStatusID" SET DEFAULT nextval('dbo.casereviewstatus_seq'::regclass);
+
+ALTER TABLE ONLY dbo."CaseReviews" ALTER COLUMN "caseReviewID" SET DEFAULT nextval('dbo.casereviews_seq'::regclass);
+
+ALTER TABLE ONLY dbo."CaseStatus" ALTER COLUMN "caseStatusID" SET DEFAULT nextval('dbo.casestatus_seq'::regclass);
+
+ALTER TABLE ONLY dbo."ChildRelationships" ALTER COLUMN "childRelationshipID" SET DEFAULT nextval('dbo.childrelationship_seq'::regclass);
+
+ALTER TABLE ONLY dbo."Children" ALTER COLUMN "childID" SET DEFAULT nextval('dbo.children_seq'::regclass);
+
+ALTER TABLE ONLY dbo."ContactTypes" ALTER COLUMN "contactTypeID" SET DEFAULT nextval('dbo.contacttypes_seq'::regclass);
+
+ALTER TABLE ONLY dbo."Contacts" ALTER COLUMN "contactID" SET DEFAULT nextval('dbo.contacts_seq'::regclass);
+
+ALTER TABLE ONLY dbo."Countries" ALTER COLUMN "countryID" SET DEFAULT nextval('dbo.countries_seq'::regclass);
+
+ALTER TABLE ONLY dbo."DeletedReasons" ALTER COLUMN "deletedReasonID" SET DEFAULT nextval('dbo.deletedreasons_seq'::regclass);
+
+ALTER TABLE ONLY dbo."Divisions" ALTER COLUMN "divisionID" SET DEFAULT nextval('dbo.divisions_seq'::regclass);
+
+ALTER TABLE ONLY dbo."DocumentStatus" ALTER COLUMN "DocumentStatusID" SET DEFAULT nextval('dbo.documentstatus_seq'::regclass);
+
+ALTER TABLE ONLY dbo."DocumentTypes" ALTER COLUMN "documentTypeID" SET DEFAULT nextval('dbo.documenttypes_seq'::regclass);
+
+ALTER TABLE ONLY dbo."Documents" ALTER COLUMN "documentID" SET DEFAULT nextval('dbo.documents_seq'::regclass);
+
+ALTER TABLE ONLY dbo."FAQs" ALTER COLUMN "faqID" SET DEFAULT nextval('dbo.faqs_seq'::regclass);
+
+ALTER TABLE ONLY dbo."FaxCodes" ALTER COLUMN "faxCodeID" SET DEFAULT nextval('dbo.faxcodes_seq'::regclass);
+
+ALTER TABLE ONLY dbo."Genders" ALTER COLUMN "genderID" SET DEFAULT nextval('dbo.genders_seq'::regclass);
+
+ALTER TABLE ONLY dbo."Nationalities" ALTER COLUMN "nationalityID" SET DEFAULT nextval('dbo.nationalities_seq'::regclass);
+
+ALTER TABLE ONLY dbo."Passports" ALTER COLUMN "passportID" SET DEFAULT nextval('dbo.passports_passportid_seq'::regclass);
+
+ALTER TABLE ONLY dbo."PoliceForces" ALTER COLUMN "policeForceID" SET DEFAULT nextval('dbo.policeforces_seq'::regclass);
+
+ALTER TABLE ONLY dbo."ProtectiveMarkings" ALTER COLUMN "protectiveMarkingID" SET DEFAULT nextval('dbo.policeforces_seq'::regclass);
+
+ALTER TABLE ONLY dbo."Respondents" ALTER COLUMN "respondentID" SET DEFAULT nextval('dbo.respondents_seq'::regclass);
+
+ALTER TABLE ONLY dbo."Results" ALTER COLUMN "resultID" SET DEFAULT nextval('dbo.results_seq'::regclass);
+
+ALTER TABLE ONLY dbo."Salutations" ALTER COLUMN "salutationID" SET DEFAULT nextval('dbo.salutations_seq'::regclass);
+
+ALTER TABLE ONLY dbo."SkinColours" ALTER COLUMN "skinColourID" SET DEFAULT nextval('dbo.skincolours_seq'::regclass);
+
+ALTER TABLE ONLY dbo."SolicitorFirms" ALTER COLUMN "solicitorFirmID" SET DEFAULT nextval('dbo.solicitorfirms_seq'::regclass);
+
+ALTER TABLE ONLY dbo."Solicitors" ALTER COLUMN "solicitorID" SET DEFAULT nextval('dbo.solicitors_seq'::regclass);
+
+ALTER TABLE ONLY dbo."Templates" ALTER COLUMN "templateID" SET DEFAULT nextval('dbo.templates_seq'::regclass);
+
+ALTER TABLE ONLY dbo."TipstaffPoliceForces" ALTER COLUMN "tipstaffRecordPoliceForceID" SET DEFAULT nextval('dbo.tipstaffpoliceforces_seq'::regclass);
+
+ALTER TABLE ONLY dbo."TipstaffRecords" ALTER COLUMN "tipstaffRecordID" SET DEFAULT nextval('dbo.tipstaffrecords_seq'::regclass);
+
+ALTER TABLE ONLY dbo."Users" ALTER COLUMN "UserID" SET DEFAULT nextval('dbo.users_seq'::regclass);
