@@ -182,6 +182,14 @@ locals {
       component   = "web"
     }
   }
+
+  # blue/green deployment
+  # - only set cloudwatch_metric_alarms on the active deployment
+  # - set desired_capacity = 0 on the dormant deployment unless testing
+  # - use user_data_cloud_init.args.branch to set the ansible code for given deployment
+  # - use load balancer rules defined in the environment specific locals file to switch between deployments
+
+  # blue deployment
   weblogic_ec2_a = merge(local.weblogic_ec2_default, {
     config = merge(local.weblogic_ec2_default.config, {
       availability_zone = "${local.region}a"
@@ -191,7 +199,16 @@ locals {
         branch = "a5c69245a3e30ca8d44ab269062479e1768e2f5c" # 2023-04-25
       })
     })
+    autoscaling_group = merge(local.weblogic_ec2_default.autoscaling_group, {
+      desired_capacity = 0
+    })
+    # cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["nomis_pagerduty"].weblogic
+    tags = merge(local.weblogic_ec2_default.tags, {
+      deployment = "blue"
+    })
   })
+
+  # green deployment
   weblogic_ec2_b = merge(local.weblogic_ec2_default, {
     config = merge(local.weblogic_ec2_default.config, {
       availability_zone = "${local.region}a"
@@ -200,6 +217,13 @@ locals {
       args = merge(local.weblogic_ec2_default.user_data_cloud_init.args, {
         branch = "f8ece8fc507d42c638878ede0f9030455669bb74" # 2023-04-27 reporting fix
       })
+    })
+    # autoscaling_group = merge(local.weblogic_ec2_default.autoscaling_group, {
+    #   desired_capacity = 0
+    # })
+    cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["nomis_pagerduty"].weblogic
+    tags = merge(local.weblogic_ec2_default.tags, {
+      deployment = "green"
     })
   })
 }
