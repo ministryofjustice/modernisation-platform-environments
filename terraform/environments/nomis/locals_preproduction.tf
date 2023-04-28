@@ -33,10 +33,6 @@ locals {
           oracle-db-hostname-b = "ppnomis-b.preproduction.nomis.service.justice.gov.uk"
           oracle-db-name       = "PPCNOM"
         })
-        autoscaling_group = merge(local.weblogic_ec2_a.autoscaling_group, {
-          desired_capacity = 1
-        })
-        cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["nomis_pagerduty"].weblogic
       })
 
       # green deployment
@@ -47,10 +43,6 @@ locals {
           oracle-db-hostname-b = "ppnomis-b.preproduction.nomis.service.justice.gov.uk"
           oracle-db-name       = "PPCNOM"
         })
-        autoscaling_group = merge(local.weblogic_ec2_a.autoscaling_group, {
-          desired_capacity = 1
-        })
-        # cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["nomis_pagerduty"].weblogic
       })
     }
 
@@ -82,9 +74,6 @@ locals {
                       values = [
                         "preprod-nomis-web-a.preproduction.nomis.az.justice.gov.uk",
                         "preprod-nomis-web-a.preproduction.nomis.service.justice.gov.uk",
-                        "c.preproduction.nomis.az.justice.gov.uk",
-                        "c.preproduction.nomis.service.justice.gov.uk",
-                        "c.pp-nomis.service.justice.gov.uk",
                       ]
                     }
                   }]
@@ -100,6 +89,9 @@ locals {
                       values = [
                         "preprod-nomis-web-b.preproduction.nomis.az.justice.gov.uk",
                         "preprod-nomis-web-b.preproduction.nomis.service.justice.gov.uk",
+                        "c.preproduction.nomis.az.justice.gov.uk",
+                        "c.preproduction.nomis.service.justice.gov.uk",
+                        "c.pp-nomis.service.justice.gov.uk",
                       ]
                     }
                   }]

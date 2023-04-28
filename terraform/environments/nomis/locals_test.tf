@@ -32,10 +32,6 @@ locals {
           oracle-db-hostname-b = "t1nomis-b.test.nomis.service.justice.gov.uk"
           oracle-db-name       = "T1CNOM"
         })
-        autoscaling_group = merge(local.weblogic_ec2_a.autoscaling_group, {
-          desired_capacity = 1
-        })
-        cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["nomis_pagerduty"].weblogic
       })
 
       # green deployment
@@ -46,10 +42,6 @@ locals {
           oracle-db-hostname-b = "t1nomis-b.test.nomis.service.justice.gov.uk"
           oracle-db-name       = "T1CNOM"
         })
-        autoscaling_group = merge(local.weblogic_ec2_a.autoscaling_group, {
-          desired_capacity = 1
-        })
-        # cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["nomis_pagerduty"].weblogic
       })
     }
 
@@ -178,9 +170,6 @@ locals {
                     values = [
                       "t1-nomis-web-a.test.nomis.az.justice.gov.uk",
                       "t1-nomis-web-a.test.nomis.service.justice.gov.uk",
-                      "c-t1.test.nomis.az.justice.gov.uk",
-                      "c-t1.test.nomis.service.justice.gov.uk",
-                      "t1-cn.hmpp-azdt.justice.gov.uk",
                     ]
                   }
                 }]
@@ -196,6 +185,9 @@ locals {
                     values = [
                       "t1-nomis-web-b.test.nomis.az.justice.gov.uk",
                       "t1-nomis-web-b.test.nomis.service.justice.gov.uk",
+                      "c-t1.test.nomis.az.justice.gov.uk",
+                      "c-t1.test.nomis.service.justice.gov.uk",
+                      "t1-cn.hmpp-azdt.justice.gov.uk",
                     ]
                   }
                 }]
@@ -218,9 +210,6 @@ locals {
                     values = [
                       "t1-nomis-web-a.test.nomis.az.justice.gov.uk",
                       "t1-nomis-web-a.test.nomis.service.justice.gov.uk",
-                      "c-t1.test.nomis.az.justice.gov.uk",
-                      "c-t1.test.nomis.service.justice.gov.uk",
-                      "t1-cn.hmpp-azdt.justice.gov.uk",
                     ]
                   }
                 }]
@@ -236,6 +225,9 @@ locals {
                     values = [
                       "t1-nomis-web-b.test.nomis.az.justice.gov.uk",
                       "t1-nomis-web-b.test.nomis.service.justice.gov.uk",
+                      "c-t1.test.nomis.az.justice.gov.uk",
+                      "c-t1.test.nomis.service.justice.gov.uk",
+                      "t1-cn.hmpp-azdt.justice.gov.uk",
                     ]
                   }
                 }]
