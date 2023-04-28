@@ -407,13 +407,13 @@
       "from_port": 3310,
       "to_port": 3310,
       "protocol": "TCP",
-      "destination_cidr": "10.200.0.0/13"
+      "destination_cidr": "0.0.0.0/0"
     },
     "SSH_22": {
       "from_port": 22,
       "to_port": 22,
       "protocol": "TCP",
-      "destination_cidr": "10.200.0.0/13"
+      "destination_cidr": "0.0.0.0/0"
     }
   },
   "webgate_ebs": {
