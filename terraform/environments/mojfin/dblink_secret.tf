@@ -4,7 +4,7 @@ resource "random_password" "apps_ro_password" {
 }
 
 resource "aws_ssm_parameter" "secret" {
-  for_each = local.dblink_secrets
+  for_each    = local.dblink_secrets
   name        = each.value.name
   description = each.value.description
   type        = "SecureString"

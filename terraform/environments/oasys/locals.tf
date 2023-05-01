@@ -67,17 +67,17 @@ locals {
   ###
   webserver = {
     config = merge(module.baseline_presets.ec2_instance.config.default, {
-      ami_name = "oasys_webserver_release_*"
+      ami_name                  = "oasys_webserver_release_*"
       ssm_parameters_prefix     = "ec2-web/"
       iam_resource_names_prefix = "ec2-web"
     })
     instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-      monitoring             = true
+      monitoring = true
     })
     cloudwatch_metric_alarms = {}
     user_data_cloud_init     = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags
-    autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
-    autoscaling_group = module.baseline_presets.ec2_autoscaling_group
+    autoscaling_schedules    = module.baseline_presets.ec2_autoscaling_schedules.working_hours
+    autoscaling_group        = module.baseline_presets.ec2_autoscaling_group
     lb_target_groups = {
       http-8080 = {
         port                 = 8080
@@ -113,9 +113,9 @@ locals {
       oasys-environment = local.environment
       environment-name  = terraform.workspace
       #oracle-db-hostname = "T2ODL0009"
-      oracle-db-sid     = "OASPROD"
+      oracle-db-sid = "OASPROD"
     }
-  } 
+  }
 
   database = {
     config = merge(module.baseline_presets.ec2_instance.config.db, {

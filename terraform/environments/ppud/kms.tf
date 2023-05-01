@@ -9,7 +9,7 @@ data "aws_kms_key" "sns" {
 }
 
 data "aws_iam_policy_document" "sprinkler_ebs_encryption_policy_doc" {
-# Allow root users full management access to key
+  # Allow root users full management access to key
   statement {
     effect = "Allow"
     actions = [
@@ -19,14 +19,14 @@ data "aws_iam_policy_document" "sprinkler_ebs_encryption_policy_doc" {
     resources = ["*"] # Represents the key to which this policy is attached
 
     # AWS should add the AWS account by default but adding here for visibility
-     principals {
+    principals {
       type        = "AWS"
       identifiers = [data.aws_caller_identity.current.account_id] #
     }
   }
 
   # Allow all mod platform account to use this key so that they can launch ec2 instances based on AMIs backed by encrypted snapshots
-   statement {
+  statement {
     effect = "Allow"
     actions = [
       "kms:DescribeKey",

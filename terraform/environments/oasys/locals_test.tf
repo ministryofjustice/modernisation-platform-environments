@@ -94,7 +94,7 @@ locals {
 
     }
     baseline_route53_zones = {
-      "${module.environment.domains.public.business_unit_environment}" = {  # "hmpps-test.modernisation-platform.service.justice.gov.uk"
+      "${module.environment.domains.public.business_unit_environment}" = { # "hmpps-test.modernisation-platform.service.justice.gov.uk"
         records = [
           { name = "t2.oasys.db", type = "A", ttl = "300", records = ["10.101.36.132"] }, # "t2.oasys.db.hmpps-test.modernisation-platform.service.justice.gov.uk" currently pointing to azure db
         ]

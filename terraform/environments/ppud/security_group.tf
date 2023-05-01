@@ -18,12 +18,12 @@ resource "aws_security_group_rule" "PPUD-WEB-Portal-ingress" {
 }
 
 resource "aws_security_group_rule" "PPUD-WEB-Portal-ingress-1" {
-  type                     = "ingress"
-  from_port                = 80
-  to_port                  = 80
-  protocol                 = "tcp"
-  cidr_blocks              = [data.aws_vpc.shared.cidr_block]
-  security_group_id        = aws_security_group.PPUD-WEB-Portal.id
+  type              = "ingress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+  security_group_id = aws_security_group.PPUD-WEB-Portal.id
 }
 
 resource "aws_security_group_rule" "PPUD-WEB-Portal-egress" {
