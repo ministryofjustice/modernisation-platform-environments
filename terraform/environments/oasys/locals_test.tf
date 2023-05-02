@@ -132,22 +132,22 @@ locals {
 
     }
     baseline_route53_zones = {
-      # "${local.environment}.${module.environment.domains.public.short_name}" = {  # "test.oasys.service.justice.gov.uk"
+      # "${local.environment}.${module.environment.domains.public.short_name}" = {  # test.oasys.service.justice.gov.uk
       # }
-      "t1.${module.environment.domains.public.short_name}" = {  # "t1.oasys.service.justice.gov.uk"
+      "t1.${module.environment.domains.public.short_name}" = {  # t1.oasys.service.justice.gov.uk
         records = [
-          { name = "db", type = "A", ttl = "300", records = ["10.101.6.132"] }, # "db.t1.oasys.service.justice.gov.uk" currently pointing to azure db T1ODL0007
+          { name = "db", type = "A", ttl = "300", records = ["10.101.6.132"] }, # db.t1.oasys.service.justice.gov.uk currently pointing to azure db T1ODL0007
         ]
         lb_alias_records = [
-          { name = "web", type = "A", lbs_map_key = "private" }, # "t1.test.oasys.service.justice.gov.uk"
+          { name = "web", type = "A", lbs_map_key = "private" }, # web.t1.test.oasys.service.justice.gov.uk
         ]
       }
-      "t2.${module.environment.domains.public.short_name}" = {  # "t2.oasys.service.justice.gov.uk"
+      "t2.${module.environment.domains.public.short_name}" = {  # t2.oasys.service.justice.gov.uk
         records = [
-          { name = "db", type = "A", ttl = "300", records = ["10.101.36.132"] }, # "db.t1.test.oasys.service.justice.gov.uk" currently pointing to azure db T2ODL0009
+          { name = "db", type = "A", ttl = "300", records = ["10.101.36.132"] }, # db.t1.test.oasys.service.justice.gov.uk currently pointing to azure db T2ODL0009
         ]
         lb_alias_records = [
-          { name = "web", type = "A", lbs_map_key = "private" }, # "t2.test.oasys.service.justice.gov.uk"
+          { name = "web", type = "A", lbs_map_key = "private" }, # web.t2.oasys.service.justice.gov.uk
         ]
       }
     }
