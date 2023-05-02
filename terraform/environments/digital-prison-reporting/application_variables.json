@@ -20,7 +20,7 @@
     },
     "test": {
       "project_short_id": "dpr",
-      "create_database": false,
+      "create_database": true,
       "db_description": "DPR Data Catalog",
       "glue_db_name": "glue-catalog-test",
       "glue_db_data_domain": "glue-catalog-data-domain-store",

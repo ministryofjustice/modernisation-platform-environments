@@ -316,7 +316,7 @@ module "s3_artifacts_store" {
 # Glue Database Catalog for Data Domain
 module "glue_data_domain_database" {
   source         = "./modules/glue_database"
-  create_db      = true
+  create_db      = local.create_db
   name           = "${local.project}-${local.glue_db_data_domain}-${local.env}"
   description    = "Glue Data Catalog for Data Domain Platform "
   aws_account_id = local.account_id
