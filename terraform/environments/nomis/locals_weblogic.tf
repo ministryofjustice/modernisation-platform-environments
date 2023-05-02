@@ -1,10 +1,6 @@
-#------------------------------------------------------------------------------
-# Weblogic
-#------------------------------------------------------------------------------
-
 locals {
 
-  lb_target_group_http_7001 = {
+  weblogic_target_group_http_7001 = {
     port                 = 7001
     protocol             = "HTTP"
     target_type          = "instance"
@@ -25,7 +21,7 @@ locals {
     }
   }
 
-  lb_target_group_http_7777 = {
+  weblogic_target_group_http_7777 = {
     port                 = 7777
     protocol             = "HTTP"
     target_type          = "instance"
@@ -46,7 +42,34 @@ locals {
     }
   }
 
-  lb_weblogic = {
+  weblogic_lb_listeners = {
+
+    http = {
+      port     = 80
+      protocol = "HTTP"
+      default_action = {
+        type = "redirect"
+        redirect = {
+          port        = 443
+          protocol    = "HTTPS"
+          status_code = "HTTP_301"
+        }
+      }
+    }
+
+    http7777 = {
+      port     = 7777
+      protocol = "HTTP"
+      default_action = {
+        type = "fixed-response"
+        fixed_response = {
+          content_type = "text/plain"
+          message_body = "Not implemented"
+          status_code  = "501"
+        }
+      }
+    }
+
     https = {
       port                      = 443
       protocol                  = "HTTPS"
@@ -61,9 +84,10 @@ locals {
         }
       }
     }
+
   }
 
-  ec2_weblogic_cloudwatch_metric_alarms = {
+  weblogic_cloudwatch_metric_alarms = {
     weblogic-node-manager-service = {
       comparison_operator = "GreaterThanOrEqualToThreshold"
       evaluation_periods  = "3"
@@ -78,7 +102,8 @@ locals {
       }
     }
   }
-  ec2_weblogic_cloudwatch_metric_alarms_lists = {
+
+  weblogic_cloudwatch_metric_alarms_lists = {
     weblogic = {
       parent_keys = [
         "ec2_default",
@@ -90,13 +115,14 @@ locals {
       ]
     }
   }
+
   weblogic_cloudwatch_log_groups = {
     cwagent-weblogic-logs = {
       retention_in_days = 30
     }
   }
 
-  ec2_weblogic_default = {
+  weblogic_ec2_default = {
 
     config = merge(module.baseline_presets.ec2_instance.config.default, {
       ami_name                  = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-03-15T17-18-22.178Z"
@@ -145,7 +171,7 @@ locals {
     }
 
     lb_target_groups = {
-      http-7777 = local.lb_target_group_http_7777
+      http-7777 = local.weblogic_target_group_http_7777
     }
 
     tags = {
@@ -156,25 +182,48 @@ locals {
       component   = "web"
     }
   }
-  ec2_weblogic_a = merge(local.ec2_weblogic_default, {
-    config = merge(local.ec2_weblogic_default.config, {
-      availability_zone         = "${local.region}a"
-      instance_profile_policies = local.ec2_common_managed_policies
-    })
-    user_data_cloud_init = merge(local.ec2_weblogic_default.user_data_cloud_init, {
-      args = merge(local.ec2_weblogic_default.user_data_cloud_init.args, {
-        branch = "b7cf97d15687c1fe653ea139a728db642f783a2d" # 2023-04-06
-      })
-    })
-  })
-  ec2_weblogic_b = merge(local.ec2_weblogic_default, {
-    config = merge(local.ec2_weblogic_default.config, {
+
+  # blue/green deployment
+  # - only set cloudwatch_metric_alarms on the active deployment
+  # - set desired_capacity = 0 on the dormant deployment unless testing
+  # - use user_data_cloud_init.args.branch to set the ansible code for given deployment
+  # - use load balancer rules defined in the environment specific locals file to switch between deployments
+
+  # blue deployment
+  weblogic_ec2_a = merge(local.weblogic_ec2_default, {
+    config = merge(local.weblogic_ec2_default.config, {
       availability_zone = "${local.region}a"
     })
-    user_data_cloud_init = merge(local.ec2_weblogic_default.user_data_cloud_init, {
-      args = merge(local.ec2_weblogic_default.user_data_cloud_init.args, {
-        branch = "b7cf97d15687c1fe653ea139a728db642f783a2d" # 2023-04-06
+    user_data_cloud_init = merge(local.weblogic_ec2_default.user_data_cloud_init, {
+      args = merge(local.weblogic_ec2_default.user_data_cloud_init.args, {
+        branch = "a5c69245a3e30ca8d44ab269062479e1768e2f5c" # 2023-04-25
       })
+    })
+    autoscaling_group = merge(local.weblogic_ec2_default.autoscaling_group, {
+      desired_capacity = 0
+    })
+    # cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["nomis_pagerduty"].weblogic
+    tags = merge(local.weblogic_ec2_default.tags, {
+      deployment = "blue"
+    })
+  })
+
+  # green deployment
+  weblogic_ec2_b = merge(local.weblogic_ec2_default, {
+    config = merge(local.weblogic_ec2_default.config, {
+      availability_zone = "${local.region}a"
+    })
+    user_data_cloud_init = merge(local.weblogic_ec2_default.user_data_cloud_init, {
+      args = merge(local.weblogic_ec2_default.user_data_cloud_init.args, {
+        branch = "f8ece8fc507d42c638878ede0f9030455669bb74" # 2023-04-27 reporting fix
+      })
+    })
+    # autoscaling_group = merge(local.weblogic_ec2_default.autoscaling_group, {
+    #   desired_capacity = 0
+    # })
+    cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["nomis_pagerduty"].weblogic
+    tags = merge(local.weblogic_ec2_default.tags, {
+      deployment = "green"
     })
   })
 }

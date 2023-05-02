@@ -1,23 +1,6 @@
-# oasys-production environment settings
+# environment specific settings
 locals {
   production_config = {
-    # db_enabled                             = false
-    # db_auto_minor_version_upgrade          = true
-    # db_allow_major_version_upgrade         = false
-    # db_backup_window                       = "03:00-06:00"
-    # db_retention_period                    = "15"
-    # db_maintenance_window                  = "mon:00:00-mon:03:00"
-    # db_instance_class                      = "db.t3.small"
-    # db_user                                = "eor"
-    # db_allocated_storage                   = "500"
-    # db_max_allocated_storage               = "0"
-    # db_multi_az                            = false
-    # db_iam_database_authentication_enabled = false
-    # db_monitoring_interval                 = "0"
-    # db_enabled_cloudwatch_logs_exports     = ["audit", "audit", "listener", "trace"]
-    # db_performance_insights_enabled        = false
-    # db_skip_final_snapshot                 = true
-
 
     ec2_common = {
       patch_approval_delay_days = 7
@@ -29,14 +12,51 @@ locals {
       tags            = local.tags
     }
 
+    baseline_ec2_autoscaling_groups = {
+      "prod-${local.application_name}-web-trn" = merge(local.webserver, {
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name                  = "${local.application_name}_webserver_release_*"
+          ssm_parameters_prefix     = "ec2-web-trn/"
+          iam_resource_names_prefix = "ec2-web-trn"
+        })
+        tags = merge(local.webserver.tags, {
+          description                       = "${local.environment} training ${local.application_name} web"
+          "${local.application_name}-environment" = "trn"
+          oracle-db-sid                     = "OASTRN"
+        })
+      })
+    }
+
+    baseline_acm_certificates = {
+      "${local.application_name}_wildcard_cert" = {
+        # domain_name limited to 64 chars so use modernisation platform domain for this
+        # and put the wildcard in the san
+        domain_name = module.environment.domains.public.modernisation_platform
+        subject_alternate_names = [
+          "*.${module.environment.domains.public.application_environment}",
+          "*.${module.environment.domains.public.short_name}",     #     "oasys.service.justice.gov.uk"
+          "*.trn.${module.environment.domains.public.short_name}", # "trn.oasys.service.justice.gov.uk"
+          "*.ptc.${module.environment.domains.public.short_name}", # "ptc.oasys.service.justice.gov.uk"
+          "*.${local.application_name}.az.justice.gov.uk",
+          "*.trn.${local.application_name}.az.justice.gov.uk",
+          "*.ptc.${local.application_name}.az.justice.gov.uk",
+        ]
+        external_validation_records_created = true
+        cloudwatch_metric_alarms            = {} #module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso"].acm_default
+        tags = {
+          description = "wildcard cert for ${local.application_name} ${local.environment} domains"
+        }
+      }
+    }
+
     baseline_lbs = {
-      prod-oasys-internal = {
+      private = {
         enable_delete_protection = false # change to true before we actually use
         force_destroy_bucket     = false
         idle_timeout             = "60"
         internal_lb              = true
         security_groups          = ["private"]
-        public_subnets           = module.environment.subnets["public"].ids
+        public_subnets           = module.environment.subnets["private"].ids
         existing_target_groups   = {}
         tags                     = local.tags
         listeners = {
@@ -54,24 +74,63 @@ locals {
               }
             }
             rules = {
-              forward-http-8080 = {
+              # web-http-8080 = {
+              #   priority = 100
+              #   actions = [{
+              #     type              = "forward"
+              #     target_group_name = "prod-${local.application_name}-web-http-8080"
+              #   }]
+              #   conditions = [
+              #     {
+              #       host_header = {
+              #         values = ["${module.environment.domains.public.short_name}"]
+              #       }
+              #     },
+              #     {
+              #       path_pattern = {
+              #         values = ["/"]
+              #       }
+              #     }
+              #   ]
+              # }
+              trn-web-http-8080 = {
                 priority = 100
                 actions = [{
                   type              = "forward"
-                  target_group_name = "prod-oasys-web-trn-http-8080"
+                  target_group_name = "prod-${local.application_name}-web-trn-http-8080"
                 }]
                 conditions = [
                   {
                     host_header = {
-                      values = ["trn.oasys.${module.environment.domains.public.business_unit_environment}"]
+                      values = ["trn.${module.environment.domains.public.short_name}"]
                     }
                   },
                   {
                     path_pattern = {
                       values = ["/"]
                     }
-                }]
+                  }
+                ]
               }
+              # ptc-web-http-8080 = {
+              #   priority = 100
+              #   actions = [{
+              #     type              = "forward"
+              #     target_group_name = "prod-${local.application_name}-web-ptc-http-8080"
+              #   }]
+              #   conditions = [
+              #     {
+              #       host_header = {
+              #         values = ["ptc.${module.environment.domains.public.short_name}"]
+              #       }
+              #     },
+              #     {
+              #       path_pattern = {
+              #         values = ["/"]
+              #       }
+              #     }
+              #   ]
+              # }
             }
           }
         }
@@ -79,26 +138,18 @@ locals {
     }
 
     baseline_route53_zones = {
-      "${module.environment.domains.public.business_unit_environment}" = {
+      "${module.environment.domains.public.short_name}" = {  # "oasys.service.justice.gov.uk"
+        records = [
+          { name = "db",     type = "A", ttl = "300", records = ["10.40.6.133"] }, #     "db.oasys.service.justice.gov.uk" currently pointing to azure db PDODL00011
+          { name = "trn.db", type = "A", ttl = "300", records = ["10.40.6.138"] }, # "trn.db.oasys.service.justice.gov.uk" currently pointing to azure db PDODL00019
+          { name = "ptc.db", type = "A", ttl = "300", records = ["10.40.6.138"] }, # "ptc.db.oasys.service.justice.gov.uk" currently pointing to azure db PDODL00019
+        ]
         lb_alias_records = [
-          { name = "trn.oasys", type = "A", lbs_map_key = "prod-oasys-internal" },
+          { name = "web",     type = "A", lbs_map_key = "private" }, #     web.oasys.service.justice.gov.uk
+          { name = "trn.web", type = "A", lbs_map_key = "private" }, # trn.web.oasys.service.justice.gov.uk
+          { name = "ptc.web", type = "A", lbs_map_key = "private" }, # ptc.web.oasys.service.justice.gov.uk
         ]
       }
-    }
-
-    baseline_ec2_autoscaling_groups = {
-      prod-oasys-web-trn = merge(local.webserver, {
-        config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name                  = "oasys_webserver_release_*"
-          ssm_parameters_prefix     = "ec2-web-trn/"
-          iam_resource_names_prefix = "ec2-web-trn"
-        })
-        tags = merge(local.webserver.tags, {
-          description       = "${local.environment} training OASys web"
-          oasys-environment = "trn"
-          oracle-db-sid     = "OASTRN"
-        })
-      })
     }
   }
 }

@@ -9,7 +9,7 @@
 /terraform/environments/data-platform @ministryofjustice/data-platform-core-infra @ministryofjustice/data-platform-labs @ministryofjustice/data-platform-security-and-auditors @ministryofjustice/data-tech-archs @ministryofjustice/modernisation-platform
 /terraform/environments/delius-core @ministryofjustice/hmpps-migration @ministryofjustice/modernisation-platform
 /terraform/environments/delius-iaps @ministryofjustice/hmpps-migration @ministryofjustice/modernisation-platform
-/terraform/environments/delius-jitbit @ministryofjustice/hmpps-migration @ministryofjustice/modernisation-platform
+/terraform/environments/delius-jitbit @ministryofjustice/hmpps-delius-jitbit-devs @ministryofjustice/hmpps-migration @ministryofjustice/modernisation-platform
 /terraform/environments/digital-prison-reporting @ministryofjustice/hmpps-digital-prison-reporting @ministryofjustice/modernisation-platform
 /terraform/environments/equip @ministryofjustice/modernisation-platform-engineers @ministryofjustice/modernisation-platform
 /terraform/environments/example @ministryofjustice/modernisation-platform @ministryofjustice/modernisation-platform

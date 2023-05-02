@@ -90,7 +90,7 @@ resource "aws_lb" "WAM-ALB" {
 }
 
 resource "aws_lb_listener" "WAM-Front-End-DEV" {
-  count            = local.is-development == true ? 1 : 0
+  count             = local.is-development == true ? 1 : 0
   load_balancer_arn = aws_lb.WAM-ALB.arn
   port              = "443"
   protocol          = "HTTPS"
@@ -104,7 +104,7 @@ resource "aws_lb_listener" "WAM-Front-End-DEV" {
 }
 
 resource "aws_lb_listener" "WAM-Front-End-Preprod" {
-  count            = local.is-preproduction == true ? 1 : 0
+  count             = local.is-preproduction == true ? 1 : 0
   load_balancer_arn = aws_lb.WAM-ALB.arn
   port              = "443"
   protocol          = "HTTPS"
@@ -118,7 +118,7 @@ resource "aws_lb_listener" "WAM-Front-End-Preprod" {
 }
 
 resource "aws_lb_listener" "WAM-Front-End-Prod" {
-  count            = local.is-production == true ? 1 : 0
+  count             = local.is-production == true ? 1 : 0
   load_balancer_arn = aws_lb.WAM-ALB.arn
   port              = "443"
   protocol          = "HTTPS"

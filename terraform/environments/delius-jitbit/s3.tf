@@ -1,7 +1,7 @@
 module "s3_bucket" {
   count = local.environment == "development" ? 1 : 0
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.2.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.4.0"
 
   providers = {
     aws.bucket-replication = aws
@@ -9,6 +9,40 @@ module "s3_bucket" {
 
   bucket_prefix      = "${local.application_name}-${local.environment}-"
   versioning_enabled = true
+  sse_algorithm      = "AES256"
+  # Useful guide - https://aws.amazon.com/blogs/storage/how-to-use-aws-datasync-to-migrate-data-between-amazon-s3-buckets/
+  bucket_policy_v2 = [{
+    effect = "Allow"
+    actions = [
+      "s3:GetBucketLocation",
+      "s3:ListBucket",
+      "s3:ListBucketMultipartUploads",
+      "s3:AbortMultipartUpload",
+      "s3:DeleteObject",
+      "s3:GetObject",
+      "s3:ListMultipartUploadParts",
+      "s3:PutObject",
+      "s3:GetObjectTagging",
+      "s3:PutObjectTagging"
+    ]
+    principals = {
+      type = "AWS"
+      identifiers = [
+        "arn:aws:iam::${local.application_data.accounts[local.environment].migration_source_account_id}:role/cr-jitbit-dev-datasync-transfer-to-s3"
+      ]
+    }
+    }, {
+    effect  = "Allow"
+    actions = ["s3:ListBucket"]
+    principals = {
+      type = "AWS"
+      identifiers = [
+        "arn:aws:iam::${local.application_data.accounts[local.environment].migration_source_account_id}:role/admin"
+      ]
+    }
+  }]
+
+  ownership_controls = "BucketOwnerEnforced" # Disable all S3 bucket ACL
 
   lifecycle_rule = [
     {

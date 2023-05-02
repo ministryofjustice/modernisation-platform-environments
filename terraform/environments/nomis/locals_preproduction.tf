@@ -1,21 +1,5 @@
 # nomis-preproduction environment settings
 locals {
-  nomis_preproduction = {
-    # vars common across ec2 instances
-    ec2_common = {
-      patch_approval_delay_days = 3
-      patch_day                 = "TUE"
-    }
-
-    databases = {
-      # Naming
-      # *-nomis-db-1: NOMIS, NDH, TRDATA
-      # *-nomis-db-2: MIS, AUDIT
-      # *-nomis-db-3: HA
-    }
-    weblogics       = {}
-    ec2_jumpservers = {}
-  }
 
   # baseline config
   preproduction_config = {
@@ -41,23 +25,24 @@ locals {
     }
 
     baseline_ec2_autoscaling_groups = {
-      preprod-nomis-web-a = merge(local.ec2_weblogic_a, {
-        tags = merge(local.ec2_weblogic_a.tags, {
-          oracle-db-hostname = "PPPDL00016.azure.hmpp.root"
-          nomis-environment  = "preprod"
-          oracle-db-name     = "CNOMPP"
-        })
-        autoscaling_group = merge(local.ec2_weblogic_a.autoscaling_group, {
-          desired_capacity = 0
+      # blue deployment
+      preprod-nomis-web-a = merge(local.weblogic_ec2_a, {
+        tags = merge(local.weblogic_ec2_a.tags, {
+          nomis-environment    = "preprod"
+          oracle-db-hostname-a = "ppnomis-a.preproduction.nomis.service.justice.gov.uk"
+          oracle-db-hostname-b = "ppnomis-b.preproduction.nomis.service.justice.gov.uk"
+          oracle-db-name       = "PPCNOM"
         })
       })
-      preprod-nomis-web-b = merge(local.ec2_weblogic_b, {
-        tags = merge(local.ec2_weblogic_b.tags, {
-          oracle-db-hostname = "PPPDL00016.azure.hmpp.root"
-          nomis-environment  = "preprod"
-          oracle-db-name     = "CNOMPP"
+
+      # green deployment
+      preprod-nomis-web-b = merge(local.weblogic_ec2_b, {
+        tags = merge(local.weblogic_ec2_b.tags, {
+          nomis-environment    = "preprod"
+          oracle-db-hostname-a = "ppnomis-a.preproduction.nomis.service.justice.gov.uk"
+          oracle-db-hostname-b = "ppnomis-b.preproduction.nomis.service.justice.gov.uk"
+          oracle-db-name       = "PPCNOM"
         })
-        cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["nomis_pagerduty"].weblogic
       })
     }
 
@@ -68,14 +53,13 @@ locals {
         force_destroy_bucket     = true
         idle_timeout             = 3600
         public_subnets           = module.environment.subnets["private"].ids
-        security_groups = [
-          aws_security_group.public.id, # TODO: remove once weblogic servers refreshed
-          "private-lb"
-        ]
+        security_groups          = ["private-lb"]
 
         listeners = {
+          http = local.weblogic_lb_listeners.http
+
           https = merge(
-            local.lb_weblogic.https, {
+            local.weblogic_lb_listeners.https, {
               alarm_target_group_names = ["preprod-nomis-web-b-http-7777"]
               cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["nomis_pagerduty"].lb_default
               rules = {
@@ -127,6 +111,11 @@ locals {
         ]
       }
       "preproduction.nomis.service.justice.gov.uk" = {
+        records = [
+          { name = "ppnomis", type = "A", ttl = "300", records = ["10.40.37.132"] },
+          { name = "ppnomis-a", type = "A", ttl = "300", records = ["10.40.37.132"] },
+          { name = "ppnomis-b", type = "A", ttl = "300", records = ["10.40.37.132"] },
+        ]
         lb_alias_records = [
           { name = "preprod-nomis-web-a", type = "A", lbs_map_key = "private" },
           { name = "preprod-nomis-web-b", type = "A", lbs_map_key = "private" },

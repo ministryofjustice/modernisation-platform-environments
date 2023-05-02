@@ -1,26 +1,5 @@
 # nomis-production environment settings
 locals {
-  nomis_production = {
-    # production SNS channel for alarms
-    sns_topic = "nomis_alarms"
-    # Details of OMS Manager in FixNGo (only needs defining if databases in the environment are managed)
-    database_oracle_manager = {
-      oms_ip_address = "10.40.0.136"
-      oms_hostname   = "oem"
-    }
-    # vars common across ec2 instances
-    ec2_common = {
-      patch_approval_delay_days = 7
-      patch_day                 = "THU"
-    }
-
-    # Add database instances here. They will be created using ec2-database.tf
-    databases = {}
-
-    # Add weblogic instances here.  They will be created using the weblogic module
-    weblogics       = {}
-    ec2_jumpservers = {}
-  }
 
   # baseline config
   production_config = {
@@ -67,66 +46,67 @@ locals {
     }
 
     baseline_ec2_autoscaling_groups = {
-      prod-nomis-web-a = merge(local.ec2_weblogic_a, {
-        tags = merge(local.ec2_weblogic_a.tags, {
-          oracle-db-hostname = "PDPDL00035.azure.hmpp.root"
-          nomis-environment  = "prod"
-          oracle-db-name     = "CNOMP"
-        })
-        autoscaling_group = merge(local.ec2_weblogic_a.autoscaling_group, {
-          desired_capacity = 0
+      # blue deployment
+      prod-nomis-web-a = merge(local.weblogic_ec2_a, {
+        tags = merge(local.weblogic_ec2_a.tags, {
+          nomis-environment    = "prod"
+          oracle-db-hostname-a = "pnomis-a.production.nomis.service.justice.gov.uk"
+          oracle-db-hostname-b = "pnomis-b.production.nomis.service.justice.gov.uk"
+          oracle-db-name       = "PCNOM"
         })
       })
-      prod-nomis-web-b = merge(local.ec2_weblogic_b, {
-        tags = merge(local.ec2_weblogic_b.tags, {
-          oracle-db-hostname = "PDPDL00035.azure.hmpp.root"
-          nomis-environment  = "prod"
-          oracle-db-name     = "CNOMP"
+
+      # green deployment
+      prod-nomis-web-b = merge(local.weblogic_ec2_b, {
+        tags = merge(local.weblogic_ec2_b.tags, {
+          nomis-environment    = "prod"
+          oracle-db-hostname-a = "pnomis-a.production.nomis.service.justice.gov.uk"
+          oracle-db-hostname-b = "pnomis-b.production.nomis.service.justice.gov.uk"
+          oracle-db-name       = "PCNOM"
         })
-        cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["nomis_pagerduty"].weblogic
       })
     }
 
     baseline_ec2_instances = {
-      preprod-nomis-db-2 = merge(local.database_zone_a, {
-        tags = merge(local.database_zone_a.tags, {
+      preprod-nomis-db-2 = merge(local.database_ec2_a, {
+        tags = merge(local.database_ec2_a.tags, {
           nomis-environment = "preprod"
           description       = "PreProduction NOMIS MIS and Audit database to replace Azure PPPDL00017"
           oracle-sids       = "PPCNMAUD"
         })
-        config = merge(local.database_zone_a.config, {
+        config = merge(local.database_ec2_a.config, {
           ami_name = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-03T12-51-25.032Z"
         })
-        instance = merge(local.database_zone_a.instance, {
+        instance = merge(local.database_ec2_a.instance, {
           instance_type = "r6i.2xlarge"
         })
-        ebs_volumes = merge(local.database_zone_a.ebs_volumes, {
+        ebs_volumes = merge(local.database_ec2_a.ebs_volumes, {
           # reduce sdc to 1000 when we move into preprod subscription
           "/dev/sdb" = { label = "app", size = 100 }
           "/dev/sdc" = { label = "app", size = 5120 }
         })
-        ebs_volume_config = merge(local.database_zone_a.ebs_volume_config, {
+        ebs_volume_config = merge(local.database_ec2_a.ebs_volume_config, {
           data  = { total_size = 4000 }
           flash = { total_size = 1000 }
         })
         cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["nomis_pagerduty"].database
       })
 
-      prod-nomis-db-2 = merge(local.database_zone_a, {
-        tags = merge(local.database_zone_a.tags, {
+      prod-nomis-db-2 = merge(local.database_ec2_a, {
+        tags = merge(local.database_ec2_a.tags, {
           nomis-environment        = "prod"
           description              = "Production NOMIS MIS and Audit database to replace Azure PDPDL00036 and PDPDL00038"
           oracle-sids              = "CNMAUD"
           fixngo-connection-target = "10.40.0.136"
         })
-        instance = merge(local.database_zone_a.instance, {
+        instance = merge(local.database_ec2_a.instance, {
           instance_type = "r6i.2xlarge"
         })
-        ebs_volumes = merge(local.database_zone_a.ebs_volumes, {
+        ebs_volumes = merge(local.database_ec2_a.ebs_volumes, {
           "/dev/sdb" = { label = "app", size = 100 }
           "/dev/sdc" = { label = "app", size = 3000, iops = 9000 }
         })
-        ebs_volume_config = merge(local.database_zone_a.ebs_volume_config, {
+        ebs_volume_config = merge(local.database_ec2_a.ebs_volume_config, {
           data  = { total_size = 4000 }
           flash = { total_size = 1000 }
         })
@@ -136,20 +116,20 @@ locals {
         )
       })
 
-      prod-nomis-db-3 = merge(local.database_zone_a, {
-        tags = merge(local.database_zone_a.tags, {
+      prod-nomis-db-3 = merge(local.database_ec2_a, {
+        tags = merge(local.database_ec2_a.tags, {
           nomis-environment = "prod"
           description       = "Production NOMIS HA database to replace Azure PDPDL00062"
           oracle-sids       = "PCNOMHA"
         })
-        instance = merge(local.database_zone_a.instance, {
+        instance = merge(local.database_ec2_a.instance, {
           instance_type = "r6i.4xlarge"
         })
-        ebs_volumes = merge(local.database_zone_a.ebs_volumes, {
+        ebs_volumes = merge(local.database_ec2_a.ebs_volumes, {
           "/dev/sdb" = { label = "app", size = 100 }
           "/dev/sdc" = { label = "app", size = 1000 }
         })
-        ebs_volume_config = merge(local.database_zone_a.ebs_volume_config, {
+        ebs_volume_config = merge(local.database_ec2_a.ebs_volume_config, {
           data  = { total_size = 3000, iops = 3750, throughput = 750 }
           flash = { total_size = 500 }
         })
@@ -164,14 +144,13 @@ locals {
         force_destroy_bucket     = true
         idle_timeout             = 3600
         public_subnets           = module.environment.subnets["private"].ids
-        security_groups = [
-          aws_security_group.public.id, # TODO: remove once weblogic servers refreshed
-          "private-lb"
-        ]
+        security_groups          = ["private-lb"]
 
         listeners = {
+          http = local.weblogic_lb_listeners.http
+
           https = merge(
-            local.lb_weblogic.https, {
+            local.weblogic_lb_listeners.https, {
               alarm_target_group_names = ["prod-nomis-web-b-http-7777"]
               cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["nomis_pagerduty"].lb_default
               rules = {
@@ -215,6 +194,12 @@ locals {
     }
 
     baseline_route53_zones = {
+
+      "hmpps-production.modernisation-platform.internal" = {
+        records = [
+          { name = "oem.nomis", type = "A", ttl = "3600", records = ["10.40.0.136"] },
+        ]
+      }
       "nomis.service.justice.gov.uk" = {
       }
       "production.nomis.az.justice.gov.uk" = {
@@ -225,6 +210,11 @@ locals {
         ]
       }
       "production.nomis.service.justice.gov.uk" = {
+        records = [
+          { name = "pnomis", type = "A", ttl = "300", records = ["10.40.3.132"] },
+          { name = "pnomis-a", type = "A", ttl = "300", records = ["10.40.3.132"] },
+          { name = "pnomis-b", type = "A", ttl = "300", records = ["10.40.67.132"] },
+        ]
         lb_alias_records = [
           { name = "prod-nomis-web-a", type = "A", lbs_map_key = "private" },
           { name = "prod-nomis-web-b", type = "A", lbs_map_key = "private" },

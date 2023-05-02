@@ -1,31 +1,86 @@
-module "ecs" {
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs?ref=v2.1.3"
+module "ecs-cluster" {
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//cluster"
 
-  subnet_set_name         = local.subnet_set_name
-  vpc_all                 = local.vpc_all
-  app_name                = local.ecs_application_name
-  container_instance_type = local.application_data.accounts[local.environment].container_os_type
-  ami_image_id            = local.application_data.accounts[local.environment].container_ami_image_id
-  instance_type           = local.application_data.accounts[local.environment].container_instance_type
-  user_data               = base64encode(templatefile("${path.module}/templates/user_data.sh.tftpl", {}))
-  key_name                = local.application_data.accounts[local.environment].ecs_key_name
-  task_definition         = templatefile("${path.module}/templates/task_definition.json.tftpl", {})
-  ec2_desired_capacity    = local.application_data.accounts[local.environment].ec2_desired_capacity
-  ec2_max_size            = local.application_data.accounts[local.environment].ec2_max_size
-  ec2_min_size            = local.application_data.accounts[local.environment].ec2_min_size
-  container_cpu           = local.application_data.accounts[local.environment].container_cpu
-  container_memory        = local.application_data.accounts[local.environment].container_memory
-  task_definition_volume  = local.application_data.accounts[local.environment].task_definition_volume
-  network_mode            = local.application_data.accounts[local.environment].network_mode
-  server_port             = local.application_data.accounts[local.environment].server_port
-  app_count               = local.application_data.accounts[local.environment].app_count
-  ec2_ingress_rules       = local.ec2_ingress_rules
-  ec2_egress_rules        = local.ec2_egress_rules
-  lb_tg_name              = aws_lb_target_group.ecs_target_group.name
-  tags_common             = local.tags
+  ec2_capacity_instance_type     = local.application_data.accounts[local.environment].container_instance_type
+  ec2_capacity_max_size          = local.application_data.accounts[local.environment].ec2_max_size
+  ec2_capacity_min_size          = local.application_data.accounts[local.environment].ec2_min_size
+  ec2_capacity_security_group_id = aws_security_group.cluster_ec2.id
+  ec2_subnet_ids = [
+    data.aws_subnet.private_subnets_a.id,
+    data.aws_subnet.private_subnets_b.id,
+    data.aws_subnet.private_subnets_c.id
+  ]
+  environment = local.environment
+  name        = local.ecs_application_name
 
-  depends_on = [aws_lb_listener.ecs-example]
+  tags = local.tags
+}
+
+module "service" {
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service"
+
+  container_definition_json = templatefile("${path.module}/templates/task_definition.json.tftpl", {})
+  ecs_cluster_arn           = module.ecs-cluster.ecs_cluster_arn
+  name                      = "${local.ecs_application_name}-task_definition_volume"
+  vpc_id                    = local.vpc_all
+
+  launch_type  = local.application_data.accounts[local.environment].launch_type
+  network_mode = local.application_data.accounts[local.environment].network_mode
+
+  task_cpu    = local.application_data.accounts[local.environment].container_cpu
+  task_memory = local.application_data.accounts[local.environment].container_memory
+
+  task_exec_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${local.ecs_application_name}-ecs-task-execution-role"
+
+  environment = local.environment
+  ecs_load_balancers = [
+    {
+      target_group_arn = aws_lb_target_group.ecs_target_group.arn
+      container_name   = local.ecs_application_name
+      container_port   = 80
+    }
+  ]
+
+  subnet_ids = [
+    data.aws_subnet.private_subnets_a.id,
+    data.aws_subnet.private_subnets_b.id,
+    data.aws_subnet.private_subnets_c.id
+  ]
+
+  ignore_changes_task_definition = false
+
+  tags = local.tags
+}
+
+resource "aws_security_group" "cluster_ec2" {
+  #checkov:skip=CKV_AWS_23
+  name        = "example.cluster-ec2-security-group"
+  description = "controls access to the cluster ec2 instance"
+  vpc_id      = data.aws_vpc.shared.id
+
+  dynamic "ingress" {
+    for_each = local.ec2_ingress_rules
+    content {
+      description     = lookup(ingress.value, "description", null)
+      from_port       = lookup(ingress.value, "from_port", null)
+      to_port         = lookup(ingress.value, "to_port", null)
+      protocol        = lookup(ingress.value, "protocol", null)
+      cidr_blocks     = lookup(ingress.value, "cidr_blocks", null)
+      security_groups = lookup(ingress.value, "security_groups", null)
+    }
+  }
+  dynamic "egress" {
+    for_each = local.ec2_egress_rules
+    content {
+      description     = lookup(egress.value, "description", null)
+      from_port       = lookup(egress.value, "from_port", null)
+      to_port         = lookup(egress.value, "to_port", null)
+      protocol        = lookup(egress.value, "protocol", null)
+      cidr_blocks     = lookup(egress.value, "cidr_blocks", null)
+      security_groups = lookup(egress.value, "security_groups", null)
+    }
+  }
 }
 
 locals {

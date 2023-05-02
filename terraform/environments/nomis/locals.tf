@@ -12,7 +12,51 @@ locals {
   }
   baseline_environment_config = local.environment_configs[local.environment]
 
+  baseline_presets_options = {
+    enable_application_environment_wildcard_cert = false
+    enable_business_unit_kms_cmks                = true
+    enable_image_builder                         = true
+    enable_ec2_cloud_watch_agent                 = true
+    enable_ec2_self_provision                    = true
+    enable_oracle_secure_web                     = true
+    cloudwatch_metric_alarms = {
+      weblogic = local.weblogic_cloudwatch_metric_alarms
+      database = local.database_cloudwatch_metric_alarms
+    }
+    cloudwatch_metric_alarms_lists = merge(
+      local.weblogic_cloudwatch_metric_alarms_lists,
+      local.database_cloudwatch_metric_alarms_lists
+    )
+    cloudwatch_metric_alarms_lists_with_actions = {
+      nomis_pagerduty = ["nomis_pagerduty"]
+    }
+    route53_resolver_rules = {
+      outbound-data-and-private-subnets = ["azure-fixngo-domain"]
+    }
+    iam_policies_filter      = ["ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
+    iam_policies_ec2_default = ["EC2S3BucketWriteAndDeleteAccessPolicy", "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"]
+    s3_iam_policies          = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
+    sns_topics = {
+      pagerduty_integrations = {
+        nomis_pagerduty = contains(["development", "test"], local.environment) ? "nomis_nonprod_alarms" : "nomis_alarms"
+      }
+    }
+  }
+
   baseline_acm_certificates = {}
+
+  baseline_bastion_linux = {
+    public_key_data = merge(
+      jsondecode(file(".ssh/user-keys.json"))["all-environments"],
+      jsondecode(file(".ssh/user-keys.json"))[local.environment]
+    )
+    allow_ssh_commands = false
+    extra_user_data_content = templatefile("templates/bastion-user-data.sh.tftpl", {
+      region                                  = local.region
+      application_environment_internal_domain = module.environment.domains.internal.application_environment
+      X11Forwarding                           = "no"
+    })
+  }
 
   baseline_cloudwatch_log_groups = merge(
     local.weblogic_cloudwatch_log_groups,
@@ -60,216 +104,13 @@ locals {
   }
 
   baseline_security_groups = {
-    private-lb = {
-      description = "Security group for internal load balancer"
-      ingress = {
-        all-from-self = {
-          description = "Allow all ingress to self"
-          from_port   = 0
-          to_port     = 0
-          protocol    = -1
-          self        = true
-        }
-        https = {
-          description = "Allow https ingress"
-          from_port   = 443
-          to_port     = 443
-          protocol    = "tcp"
-          security_groups = [
-            "private-jumpserver",
-            module.bastion_linux.bastion_security_group
-          ]
-          cidr_blocks = local.security_group_cidrs.https
-        }
-        http7001 = {
-          description = "Allow http7001 ingress"
-          from_port   = 7001
-          to_port     = 7001
-          protocol    = "tcp"
-          security_groups = [
-            "private-jumpserver",
-            module.bastion_linux.bastion_security_group
-          ]
-          cidr_blocks = local.security_group_cidrs.http7xxx
-        }
-        http7777 = {
-          description = "Allow http7777 ingress"
-          from_port   = 7777
-          to_port     = 7777
-          protocol    = "tcp"
-          security_groups = [
-            "private-jumpserver",
-            module.bastion_linux.bastion_security_group
-          ]
-          cidr_blocks = local.security_group_cidrs.http7xxx
-        }
-      }
-      egress = {
-        all = {
-          description     = "Allow all egress"
-          from_port       = 0
-          to_port         = 0
-          protocol        = "-1"
-          cidr_blocks     = ["0.0.0.0/0"]
-          security_groups = []
-        }
-      }
-    }
-    private-web = {
-      description = "Security group for web servers"
-      ingress = {
-        all-from-self = {
-          description = "Allow all ingress to self"
-          from_port   = 0
-          to_port     = 0
-          protocol    = -1
-          self        = true
-        }
-        ssh = {
-          description = "Allow ssh ingress"
-          from_port   = "22"
-          to_port     = "22"
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.ssh
-          security_groups = [
-            module.bastion_linux.bastion_security_group
-          ]
-        }
-        http7001 = {
-          description = "Allow http7001 ingress"
-          from_port   = 7001
-          to_port     = 7001
-          protocol    = "tcp"
-          security_groups = [
-            "private-jumpserver",
-            "private-lb",
-            module.bastion_linux.bastion_security_group
-          ]
-          cidr_blocks = local.security_group_cidrs.http7xxx
-        },
-        http7777 = {
-          description = "Allow http7777 ingress"
-          from_port   = 7777
-          to_port     = 7777
-          protocol    = "tcp"
-          security_groups = [
-            "private-jumpserver",
-            "private-lb",
-            module.bastion_linux.bastion_security_group
-          ]
-          cidr_blocks = local.security_group_cidrs.http7xxx
-        },
-      }
-      egress = {
-        all = {
-          description     = "Allow all egress"
-          from_port       = 0
-          to_port         = 0
-          protocol        = "-1"
-          cidr_blocks     = ["0.0.0.0/0"]
-          security_groups = []
-        }
-      }
-    }
-    private-jumpserver = {
-      description = "Security group for jumpservers"
-      ingress = {
-        all-from-self = {
-          description = "Allow all ingress to self"
-          from_port   = 0
-          to_port     = 0
-          protocol    = -1
-          self        = true
-        }
-        rdp = {
-          description = "Allow rdp ingress"
-          from_port   = "3389"
-          to_port     = "3389"
-          protocol    = "TCP"
-          security_groups = [
-            module.bastion_linux.bastion_security_group
-          ]
-        }
-      }
-      egress = {
-        all = {
-          description     = "Allow all egress"
-          from_port       = 0
-          to_port         = 0
-          protocol        = "-1"
-          cidr_blocks     = ["0.0.0.0/0"]
-          security_groups = []
-        }
-      }
-    }
-    data-db = {
-      description = "Security group for databases"
-      ingress = {
-        all-from-self = {
-          description = "Allow all ingress to self"
-          from_port   = 0
-          to_port     = 0
-          protocol    = -1
-          self        = true
-        }
-        ssh = {
-          description = "Allow ssh ingress"
-          from_port   = "22"
-          to_port     = "22"
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.ssh
-          security_groups = [
-            module.bastion_linux.bastion_security_group
-          ]
-        }
-        oracle1521 = {
-          description = "Allow oracle database 1521 ingress"
-          from_port   = "1521"
-          to_port     = "1521"
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.oracle_db
-          security_groups = [
-            "private-jumpserver",
-            "private-web",
-            module.bastion_linux.bastion_security_group
-          ]
-        }
-        oracle3872 = {
-          description = "Allow oem agent ingress"
-          from_port   = "3872"
-          to_port     = "3872"
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.oracle_oem_agent
-          security_groups = [
-            "private-jumpserver",
-            "private-web",
-            module.bastion_linux.bastion_security_group
-          ]
-        }
-      }
-      egress = {
-        all = {
-          description     = "Allow all egress"
-          from_port       = 0
-          to_port         = 0
-          protocol        = "-1"
-          cidr_blocks     = ["0.0.0.0/0"]
-          security_groups = []
-        }
-      }
-    }
+    private-lb         = local.security_groups.private_lb
+    private-web        = local.security_groups.private_web
+    private-jumpserver = local.security_groups.private_jumpserver
+    data-db            = local.security_groups.data_db
   }
 
-  baseline_sns_topics = {
-    "dba_slack_pagerduty" = {
-      display_name      = "Pager duty integration for dba_slack"
-      kms_master_key_id = "general"
-    }
-    "dba_callout_pagerduty" = {
-      display_name      = "Pager duty integration for dba_callout"
-      kms_master_key_id = "general"
-    }
-  }
+  baseline_sns_topics = {}
 
   autoscaling_schedules_default = {
     "scale_up" = {

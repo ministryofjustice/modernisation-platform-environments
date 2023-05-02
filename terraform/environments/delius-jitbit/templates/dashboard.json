@@ -180,12 +180,7 @@
             "DBInstanceIdentifier",
             "${app_name}-${environment}-database"
           ],
-          [
-            ".",
-            "WriteIOPS",
-            ".",
-            "."
-          ]
+          [".", "WriteIOPS", ".", "."]
         ],
         "region": "eu-west-2",
         "title": "IOPS"
@@ -270,12 +265,7 @@
             "DBInstanceIdentifier",
             "${app_name}-${environment}-database"
           ],
-          [
-            ".",
-            "WriteLatency",
-            ".",
-            "."
-          ]
+          [".", "WriteLatency", ".", "."]
         ],
         "region": "eu-west-2",
         "title": "Latency"
@@ -297,12 +287,7 @@
             "DBInstanceIdentifier",
             "${app_name}-${environment}-database"
           ],
-          [
-            ".",
-            "NetworkReceiveThroughput",
-            ".",
-            "."
-          ]
+          [".", "NetworkReceiveThroughput", ".", "."]
         ],
         "region": "eu-west-2",
         "title": "Network Throughput"
