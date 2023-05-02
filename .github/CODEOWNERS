@@ -14,7 +14,7 @@
 /terraform/environments/equip @ministryofjustice/modernisation-platform-engineers @ministryofjustice/modernisation-platform
 /terraform/environments/example @ministryofjustice/modernisation-platform @ministryofjustice/modernisation-platform
 /terraform/environments/hmpps-intelligence-management @ministryofjustice/dps-ims-tech @ministryofjustice/modernisation-platform
-/terraform/environments/laa-ccms-infra-azure-ad-sso @ministryofjustice/laa-ccms-devs @ministryofjustice/modernisation-platform-security @ministryofjustice/modernisation-platform
+/terraform/environments/laa-ccms-infra-azure-ad-sso @ministryofjustice/laa-ccms-webops @ministryofjustice/modernisation-platform-security @ministryofjustice/modernisation-platform
 /terraform/environments/laa-oem @ministryofjustice/laa-ccms-migration-team @ministryofjustice/modernisation-platform
 /terraform/environments/long-term-storage @ministryofjustice/modernisation-platform @ministryofjustice/modernisation-platform
 /terraform/environments/maatdb @ministryofjustice/laa-aws-infrastructure @ministryofjustice/modernisation-platform
