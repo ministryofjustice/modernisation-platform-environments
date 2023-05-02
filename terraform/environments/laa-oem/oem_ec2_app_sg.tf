@@ -24,6 +24,13 @@ resource "aws_security_group" "oem_app_security_group_1" {
   }
 
   ingress {
+    protocol    = "icmp"
+    from_port   = -1
+    to_port     = -1
+    cidr_blocks = [data.aws_vpc.shared.cidr_block, local.cidr_lz_workspaces]
+  }
+
+  ingress {
     protocol        = "tcp"
     from_port       = 1159
     to_port         = 1159
