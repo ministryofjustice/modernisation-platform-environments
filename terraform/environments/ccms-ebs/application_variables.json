@@ -414,6 +414,12 @@
       "to_port": 22,
       "protocol": "TCP",
       "destination_cidr": "0.0.0.0/0"
+    },
+    "TCP_443": {
+      "from_port": 443,
+      "to_port": 443,
+      "protocol": "TCP",
+      "destination_cidr": "0.0.0.0/0"
     }
   },
   "webgate_ebs": {
