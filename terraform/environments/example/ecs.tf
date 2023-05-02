@@ -2,9 +2,9 @@
 module "ecs-cluster" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//cluster"
 
-  ec2_capacity_instance_type = local.application_data.accounts[local.environment].container_instance_type
-  ec2_capacity_max_size = local.application_data.accounts[local.environment].ec2_max_size
-  ec2_capacity_min_size = local.application_data.accounts[local.environment].ec2_min_size
+  ec2_capacity_instance_type     = local.application_data.accounts[local.environment].container_instance_type
+  ec2_capacity_max_size          = local.application_data.accounts[local.environment].ec2_max_size
+  ec2_capacity_min_size          = local.application_data.accounts[local.environment].ec2_min_size
   ec2_capacity_security_group_id = aws_security_group.cluster_ec2.id
   ec2_subnet_ids = [
     data.aws_subnet.private_subnets_a.id,
@@ -18,8 +18,8 @@ module "ecs-cluster" {
 }
 
 module "service" {
-  source                    = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service"
-  
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service"
+
   container_definition_json = templatefile("${path.module}/templates/task_definition.json.tftpl", {})
   ecs_cluster_arn           = module.ecs-cluster.ecs_cluster_arn
   name                      = "${local.ecs_application_name}-task_definition_volume"
