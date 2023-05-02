@@ -48,7 +48,7 @@ locals {
 
     ec2_test_instances = {
       # Remove data.aws_kms_key from cmk.tf once the NDH servers are removed
-      example-test-instance-1 = {
+      example-test-1 = {
         tags = {
           server-type = "private"
           description = "Standalone EC2 for testing RHEL7.9 NDH App"
@@ -63,7 +63,7 @@ locals {
         ami_name  = "RHEL-7.9_HVM-*"
         ami_owner = "309956199498"
       }
-      example-test-instance-2 = {
+      example-test-2 = {
         tags = {
           server-type = "private"
           description = "Standalone EC2 for testing RHEL7.9 NDH EMS"
