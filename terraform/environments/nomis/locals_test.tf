@@ -274,6 +274,9 @@ locals {
         ]
         iam_policies = module.baseline_presets.s3_iam_policies
       }
+      int-nomis-lb-access-logs = {
+        iam_policies = module.baseline_presets.s3_iam_policies
+      }
     }
   }
 }
