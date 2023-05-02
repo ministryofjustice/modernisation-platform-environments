@@ -53,7 +53,9 @@ locals {
       effect = "Allow"
       actions = [
         "s3:GetObject",
-        "s3:ListBucket"
+        "s3:GetObjectVersion",
+        "s3:ListBucket",
+        "s3:ListObjectVersions",
       ]
       principals = {
         type = "AWS"
@@ -68,7 +70,9 @@ locals {
       effect = "Allow"
       actions = [
         "s3:GetObject",
+        "s3:GetObjectVersion",
         "s3:ListBucket",
+        "s3:ListObjectVersions",
         "s3:PutObject",
         "s3:PutObjectAcl",
       ]
@@ -84,7 +88,9 @@ locals {
       effect = "Allow"
       actions = [
         "s3:GetObject",
+        "s3:GetObjectVersion",
         "s3:ListBucket",
+        "s3:ListObjectVersions",
         "s3:PutObject",
         "s3:PutObjectAcl",
       ]
@@ -100,10 +106,13 @@ locals {
       effect = "Allow"
       actions = [
         "s3:GetObject",
+        "s3:GetObjectVersion",
         "s3:ListBucket",
+        "s3:ListObjectVersions",
         "s3:PutObject",
         "s3:PutObjectAcl",
         "s3:DeleteObject",
+        "s3:DeleteObjectVersion",
       ]
       principals = {
         type = "AWS"
@@ -117,7 +126,9 @@ locals {
       effect = "Allow"
       actions = [
         "s3:GetObject",
+        "s3:GetObjectVersion",
         "s3:ListBucket",
+        "s3:ListObjectVersions",
         "s3:PutObject",
         "s3:PutObjectAcl",
         "s3:DeleteObject",
@@ -138,7 +149,9 @@ locals {
         effect = "Allow"
         actions = [
           "s3:GetObject",
+          "s3:GetObjectVersion",
           "s3:ListBucket",
+          "s3:ListObjectVersions",
         ]
       }
     ]
@@ -147,7 +160,9 @@ locals {
         effect = "Allow"
         actions = [
           "s3:GetObject",
+          "s3:GetObjectVersion",
           "s3:ListBucket",
+          "s3:ListObjectVersions",
           "s3:PutObject",
           "s3:PutObjectAcl",
         ]
@@ -158,10 +173,13 @@ locals {
         effect = "Allow"
         actions = [
           "s3:GetObject",
+          "s3:GetObjectVersion",
           "s3:ListBucket",
+          "s3:ListObjectVersions",
           "s3:PutObject",
           "s3:PutObjectAcl",
           "s3:DeleteObject",
+          "s3:DeleteObjectVersion",
         ]
       }
     ]
