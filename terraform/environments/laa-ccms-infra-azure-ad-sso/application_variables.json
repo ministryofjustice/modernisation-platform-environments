@@ -1,16 +1,75 @@
 {
   "accounts": {
     "development": {
-      "example_var": "dev-data"
+      "instance-scheduling": "skip-scheduling",
+      "ec2_oracle_vision_instance_type_ebsdb": "t2.xlarge",
+      "imported_ebsdb_image_id": "ami-0726313862a774616",
+      "imported_ebsdb_image_name": "import-ami-01083a42970b00366",
+      "ami_owner": "636100868237"
+    }
+  },
+  "ec2_ebs_vision_db_ingress_rules": {
+    "TCP_80": {
+      "from_port": 80,
+      "to_port": 80,
+      "protocol": "TCP"
     },
-    "test": {
-      "example_var": "test-data"
+    "TCP_443": {
+      "from_port": 443,
+      "to_port": 443,
+      "protocol": "TCP"
     },
-    "preproduction": {
-      "example_var": "preproduction-data"
+    "TCP_22": {
+      "from_port": 22,
+      "to_port": 22,
+      "protocol": "TCP"
+    }
+  },
+  "ec2_ebs_vision_db_egress_rules": {
+    "TCP_80": {
+      "from_port": 80,
+      "to_port": 80,
+      "protocol": "TCP",
+      "destination_cidr": "0.0.0.0/0"
     },
-    "production": {
-      "example_var": "production-data"
+    "TCP_443": {
+      "from_port": 443,
+      "to_port": 443,
+      "protocol": "TCP",
+      "destination_cidr": "0.0.0.0/0"
+    },
+    "SSH_22": {
+      "from_port": 22,
+      "to_port": 22,
+      "protocol": "TCP",
+      "destination_cidr": "0.0.0.0/0"
+    }
+  },
+  "lb_sg_ingress_rules": {
+    "TCP_ALL": {
+      "from_port": 443,
+      "to_port": 443,
+      "protocol": "TCP"
+    }
+  },
+  "lb_sg_egress_rules": {
+    "TCP_00": {
+      "from_port": 0,
+      "to_port": 0,
+      "protocol": "TCP",
+      "destination_cidr": "0.0.0.0/0"
+    },
+    "TCP_8000": {
+      "from_port": 8000,
+      "to_port": 8000,
+      "protocol": "TCP",
+      "destination_cidr": "0.0.0.0/0"
+    },
+    "TCP_443": {
+      "from_port": 443,
+      "to_port": 443,
+      "protocol": "TCP",
+      "destination_cidr": "0.0.0.0/0"
     }
   }
 }
