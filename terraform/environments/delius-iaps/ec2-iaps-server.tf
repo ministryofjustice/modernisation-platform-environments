@@ -253,7 +253,7 @@ module "ec2_iaps_server" {
   instance_profile_policies = local.iaps_server.iam_policies
   application_name          = local.application_name
   region                    = data.aws_region.current.name
-  subnet_ids                = data.aws_subnets.private-public.ids
+  subnet_ids                = data.aws_subnets.shared-private.ids
   tags                      = local.ec2_tags
   account_ids_lookup        = local.environment_management.account_ids
 }
