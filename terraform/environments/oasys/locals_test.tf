@@ -87,44 +87,6 @@ locals {
               }
             }
             rules = {
-              # t1-web-http-8080 = {
-              #   priority = 100
-              #   actions = [{
-              #     type              = "forward"
-              #     target_group_name = "t1-${local.application_name}-web-http-8080"
-              #   }]
-              #   conditions = [
-              #     {
-              #       host_header = {
-              #         values = ["t1.${module.environment.domains.public.short_name}"]
-              #       }
-              #     },
-              #     {
-              #       path_pattern = {
-              #         values = ["/"]
-              #       }
-              #     }
-              #   ]
-              # }
-              t2-web-http-8080 = {
-                priority = 100
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "t2-${local.application_name}-web-http-8080"
-                }]
-                conditions = [
-                  {
-                    host_header = {
-                      values = ["t2.${module.environment.domains.public.short_name}"]
-                    }
-                  },
-                  {
-                    path_pattern = {
-                      values = ["/"]
-                    }
-                  }
-                ]
-              }
             }
           }
         }
