@@ -70,11 +70,11 @@
       "ami_image_id": "ami-0631049bf050d0d46",
       "instance_type": "m5.large",
       "key_name": "",
-      "docker_image_tag": "latest",
-      "maat_api_end_point": "http://maat-cd-api.aws.preprod.legalservices.gov.uk/maatApi/laaStatus",
-      "maat_db_url": "terraform-20221116155914397600000001.cfxq8vgqqxpp.eu-west-2.rds.amazonaws.com:1521:MAATDB",
+      "docker_image_tag": "preproduction",
+      "maat_api_end_point": "http://maat-cd-api.aws.stg.legalservices.gov.uk/maatApi/laaStatus",
+      "maat_db_url": "rds.maat.aws.stg.legalservices.gov.uk:1521:MAATDB",
       "maat_db_password": "APP_MAATDB_DBPASSWORD_MLA1",
-      "maat_libra_wsdl_url": "http://infox.aws.preprod.legalservices.gov.uk/infoX/gateway",
+      "maat_libra_wsdl_url": "http://infox.aws.stg.legalservices.gov.uk/infoX/gateway",
       "ec2_desired_capacity": 2,
       "ec2_max_size": 6,
       "ec2_min_size": 2,
@@ -101,11 +101,11 @@
       "ami_image_id": "ami-0631049bf050d0d46",
       "instance_type": "m5.large",
       "key_name": "",
-      "docker_image_tag": "latest",
-      "maat_api_end_point": "http://maat-cd-api.aws.prod.legalservices.gov.uk/maatApi/laaStatus",
-      "maat_db_url": "rds.maat.aws.dev.legalservices.gov.uk:1521:MAATDB",
+      "docker_image_tag": "production",
+      "maat_api_end_point": "http://maat-cd-api.aws.prd.legalservices.gov.uk/maatApi/laaStatus",
+      "maat_db_url": "donotworkrds.maat.aws.prd.legalservices.gov.uk:1521:MAATDB",
       "maat_db_password": "APP_MAATDB_DBPASSWORD_MLA1",
-      "maat_libra_wsdl_url": "http://infox.aws.prod.legalservices.gov.uk/infoX/gateway",
+      "maat_libra_wsdl_url": "http://infox.aws.prd.legalservices.gov.uk/infoX/gateway",
       "ec2_desired_capacity": 2,
       "ec2_max_size": 6,
       "ec2_min_size": 2,
@@ -122,7 +122,7 @@
       "moj_vpn_cidr": "81.134.202.29/32",
       "nlb_prevent_deletion": true,
       "pagerduty_integration_key_name": "laa_mlra_prod_alarms",
-      "acm_cert_domain_name": "mlra.service.justice.gov.uk - TBD"
+      "acm_cert_domain_name": "service.justice.gov.uk"
     }
   }
 }
