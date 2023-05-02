@@ -67,9 +67,75 @@ locals {
         internal_lb              = true
         enable_delete_protection = false
         existing_target_groups   = {}
-        idle_timeout             = 60 # 60 is deafult
+        idle_timeout             = 60 # 60 is default
         security_groups          = ["private"]
         public_subnets           = module.environment.subnets["private"].ids
+        tags                     = local.tags
+
+        listeners = {
+          https = {
+            port                      = 443
+            protocol                  = "HTTPS"
+            ssl_policy                = "ELBSecurityPolicy-2016-08"
+            certificate_names_or_arns = ["application_environment_wildcard_cert"]
+            default_action = {
+              type = "fixed-response"
+              fixed_response = {
+                content_type = "text/plain"
+                message_body = "Not implemented"
+                status_code  = "501"
+              }
+            }
+            rules = {
+              # t1-web-http-8080 = {
+              #   priority = 100
+              #   actions = [{
+              #     type              = "forward"
+              #     target_group_name = "t1-${local.application_name}-web-http-8080"
+              #   }]
+              #   conditions = [
+              #     {
+              #       host_header = {
+              #         values = ["t1.${module.environment.domains.public.short_name}"]
+              #       }
+              #     },
+              #     {
+              #       path_pattern = {
+              #         values = ["/"]
+              #       }
+              #     }
+              #   ]
+              # }
+              t2-web-http-8080 = {
+                priority = 100
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t2-${local.application_name}-web-http-8080"
+                }]
+                conditions = [
+                  {
+                    host_header = {
+                      values = ["t2.${module.environment.domains.public.short_name}"]
+                    }
+                  },
+                  {
+                    path_pattern = {
+                      values = ["/"]
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+      public = {
+        internal_lb              = false
+        enable_delete_protection = false
+        existing_target_groups   = {}
+        idle_timeout             = 60 # 60 is default
+        security_groups          = ["public"]
+        public_subnets           = module.environment.subnets["public"].ids
         tags                     = local.tags
 
         listeners = {
@@ -139,7 +205,7 @@ locals {
           { name = "db", type = "A", ttl = "300", records = ["10.101.6.132"] }, # db.t1.oasys.service.justice.gov.uk currently pointing to azure db T1ODL0007
         ]
         lb_alias_records = [
-          { name = "web", type = "A", lbs_map_key = "private" }, # web.t1.oasys.service.justice.gov.uk
+          { name = "web", type = "A", lbs_map_key = "public" }, # web.t1.oasys.service.justice.gov.uk
         ]
       }
       "t2.${module.environment.domains.public.short_name}" = {  # t2.oasys.service.justice.gov.uk
@@ -147,7 +213,7 @@ locals {
           { name = "db", type = "A", ttl = "300", records = ["10.101.36.132"] }, # db.t2.oasys.service.justice.gov.uk currently pointing to azure db T2ODL0009
         ]
         lb_alias_records = [
-          { name = "web", type = "A", lbs_map_key = "private" }, # web.t2.oasys.service.justice.gov.uk
+          { name = "web", type = "A", lbs_map_key = "public" }, # web.t2.oasys.service.justice.gov.uk
         ]
       }
     }
