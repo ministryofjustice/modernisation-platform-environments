@@ -503,7 +503,7 @@ resource "aws_acm_certificate" "external_lb" {
 
 resource "aws_acm_certificate_validation" "external" {
   certificate_arn         = aws_acm_certificate.external_lb.arn
-  validation_record_fqdns = [local.domain_name_main[0], local.domain_name_sub[0]]
+  validation_record_fqdns = var.environment != "production" ? [local.domain_name_main[0], local.domain_name_sub[0]] : [local.domain_name_main[0]]
 
   # TODO Set prevent_destroy to true to stop Terraform destroying this resource in the future if required
   lifecycle {
