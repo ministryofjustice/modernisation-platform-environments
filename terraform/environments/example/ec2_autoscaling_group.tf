@@ -112,7 +112,7 @@ resource "aws_key_pair" "ec2-autoscale-user" {
   tags = merge(
     local.tags,
     {
-      Name = "ec2-user"
+      Name = "ec2-autoscale-user"
     },
   )
 }

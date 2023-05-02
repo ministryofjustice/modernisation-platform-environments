@@ -80,7 +80,7 @@ locals {
       }
     }
     ec2_test_autoscaling_groups = {
-      dev-redhat-rhel79 = {
+      dev-rh-rhel79 = {
         tags = {
           description = "For testing official RedHat RHEL7.9 image"
           monitored   = false

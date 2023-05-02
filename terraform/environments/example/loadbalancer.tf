@@ -192,7 +192,7 @@ resource "aws_wafv2_web_acl_association" "web_acl_association_my_lb" {
 ######################### S3 Bucket required for logs  ##########################
 #################################################################################
 module "s3-bucket-lb" { #tfsec:ignore:aws-s3-enable-versioning
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.3.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.4.0"
 
   bucket_prefix      = "s3-bucket-example-lb"
   versioning_enabled = false

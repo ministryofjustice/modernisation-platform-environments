@@ -50,7 +50,7 @@ resource "aws_route53_record" "example_cert_validation" {
 resource "aws_route53_record" "example_core_vpc" {
   provider = aws.core-vpc
   zone_id = data.aws_route53_zone.external.zone_id
-  name    = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform-core-vpc.service.justice.gov.uk"
+  name    = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform-example-core-vpc.service.justice.gov.uk"
   type    = "A"
 
   alias {
