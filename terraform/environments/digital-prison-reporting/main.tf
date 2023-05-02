@@ -137,14 +137,14 @@ module "glue_registry_avro" {
 }
 
 # Glue Database Catalog 
-module "glue_database" {
-  source         = "./modules/glue_database"
-  create_db      = local.create_db
-  name           = "${local.project}-${local.glue_db}-${local.env}"
-  description    = local.description
-  aws_account_id = local.account_id
-  aws_region     = local.account_region
-}
+# module "glue_database" {
+#  source         = "./modules/glue_database"
+#  create_db      = local.create_db
+#  name           = "${local.project}-${local.glue_db}-${local.env}"
+#  description    = local.description
+#  aws_account_id = local.account_id
+#  aws_region     = local.account_region
+#}
 
 ##################
 ### S3 Buckets ###
@@ -317,8 +317,8 @@ module "s3_artifacts_store" {
 module "glue_data_domain_database" {
   source         = "./modules/glue_database"
   create_db      = local.create_db
-  name           = "${local.project}-${local.glue_db_data_domain}-${local.env}"
-  description    = "Glue Data Catalog for Data Domain Platform "
+  name           = "${local.project}-domain-data-store-${local.env}"
+  description    = "Glue Data Catalog for Domain Data Platform "
   aws_account_id = local.account_id
   aws_region     = local.account_region
 }

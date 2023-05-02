@@ -2,8 +2,8 @@
 #### DPR Specific ####
 locals {
     project                    = local.application_data.accounts[local.environment].project_short_id
-    glue_db                    = local.application_data.accounts[local.environment].glue_db_name
-    glue_db_data_domain        = local.application_data.accounts[local.environment].glue_db_data_domain
+    # glue_db                    = local.application_data.accounts[local.environment].glue_db_name
+    # glue_db_data_domain        = local.application_data.accounts[local.environment].glue_db_data_domain
     description                = local.application_data.accounts[local.environment].db_description
     create_db                  = local.application_data.accounts[local.environment].create_database
     glue_job                   = local.application_data.accounts[local.environment].glue_job_name
