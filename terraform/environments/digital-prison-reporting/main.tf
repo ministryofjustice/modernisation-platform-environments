@@ -318,7 +318,7 @@ module "glue_data_domain_database" {
   source         = "./modules/glue_database"
   create_db      = local.create_db
   name           = "${local.project}-domain-data-store-${local.env}"
-  description    = "Glue Data Catalog for Domain Data Platform "
+  description    = "Glue Data Catalog for Domain Data Platform"
   aws_account_id = local.account_id
   aws_region     = local.account_region
 }
