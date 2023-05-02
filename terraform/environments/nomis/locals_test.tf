@@ -275,6 +275,9 @@ locals {
         iam_policies = module.baseline_presets.s3_iam_policies
       }
       int-nomis-lb-access-logs = {
+        bucket_policy_v2 = [
+          module.baseline_presets.s3_bucket_policies.AllEnvironmentsWriteAndDeleteAccessBucketPolicy
+        ]
         iam_policies = module.baseline_presets.s3_iam_policies
       }
     }
