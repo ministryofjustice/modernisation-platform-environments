@@ -4,3 +4,5 @@ provider "aws" {
   secret_key = jsondecode(data.aws_secretsmanager_secret_version.dms_source_credentials.secret_string)["SECRET_KEY"]
   alias      = "tacticalproducts"
 }
+
+data "github_ip_ranges" "github_actions_ips" {}
