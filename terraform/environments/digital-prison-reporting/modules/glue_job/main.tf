@@ -134,12 +134,14 @@ resource "aws_iam_policy" "additional-policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "local_policy" {
+  count      = var.create_job ? 1 : 0
+
   role       = var.create_role ? join("", aws_iam_role.glue-service-role.*.name) : var.role_name
   policy_arn = aws_iam_policy.additional-policy.arn
 }
 
 resource "aws_iam_role_policy_attachment" "additional_policies" {
-  count = var.create_kinesis_ingester ? 1 : 0
+  count = var.create_kinesis_ingester && var.create_job ? 1 : 0
 
   role       = var.create_role ? join("", aws_iam_role.glue-service-role.*.name) : var.role_name
   policy_arn = var.additional_policies
