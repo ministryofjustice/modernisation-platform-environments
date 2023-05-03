@@ -106,6 +106,14 @@ data "aws_iam_policy_document" "dms" {
       "iam:AttachRolePolicy",
     ]
     resources = ["*"]
+    condition {
+      test     = "StringLike"
+      variable = "iam:PassedToService"
+
+      values = [
+        "dms.amazonaws.com"
+      ]
+    }    
   } 
 }
 
