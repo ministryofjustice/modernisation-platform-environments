@@ -93,18 +93,38 @@ locals {
   }
 
   database_cloudwatch_metric_alarms_lists = {
-    database = {
-      parent_keys = [
-        "ec2_default",
-        "ec2_linux_default",
-        "ec2_linux_with_collectd_default"
-      ]
+    database_dso = {
+      parent_keys = []
       alarms_list = [
+        { key = "ec2", name = "instance-status-check-failed-in-last-hour" },
+        { key = "ec2", name = "system-status-check-failed-in-last-hour" },
+        { key = "ec2_cwagent_linux", name = "free-disk-space-low-1hour" },
+        { key = "ec2_cwagent_collectd", name = "chronyd-stopped" },
+        { key = "ec2_cwagent_collectd", name = "sshd-stopped" },
+        { key = "ec2_cwagent_collectd", name = "cloudwatch-agent-stopped" },
+        { key = "ec2_cwagent_collectd", name = "ssm-agent-stopped" },
+      ]
+    }
+    database_dba = {
+      parent_keys = []
+      alarms_list = [
+        { key = "ec2", name = "cpu-utilization-high-15mins" },
+        { key = "ec2", name = "instance-status-check-failed-in-last-hour" },
+        { key = "ec2", name = "system-status-check-failed-in-last-hour" },
+        { key = "ec2_cwagent_linux", name = "free-disk-space-low-1hour" },
+        { key = "ec2_cwagent_linux", name = "high-memory-usage-15mins" },
+        { key = "ec2_cwagent_linux", name = "cpu-iowait-high-3hour" },
         { key = "database", name = "oracle-db-disconnected" },
         { key = "database", name = "oracle-batch-failure" },
         { key = "database", name = "oracle-long-running-batch" },
         { key = "database", name = "oracleasm-service" },
         { key = "database", name = "oracle-ohasd-service" },
+      ]
+    }
+    database_dba_high_priority = {
+      parent_keys = []
+      alarms_list = [
+        { key = "database", name = "oracle-db-disconnected" },
       ]
     }
     fixngo_connection = {
@@ -122,6 +142,11 @@ locals {
   }
 
   database_ec2_default = {
+
+    cloudwatch_metric_alarms = merge(
+      module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso_pagerduty"].database_dso,
+      module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dba_pagerduty"].database_dba
+    )
 
     config = merge(module.baseline_presets.ec2_instance.config.db, {
       ami_name  = "nomis_rhel_7_9_oracledb_11_2_release_2022-10-07T12-48-08.562Z"
