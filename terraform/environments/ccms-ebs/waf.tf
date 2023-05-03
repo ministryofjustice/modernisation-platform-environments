@@ -27,7 +27,8 @@ resource "aws_wafv2_ip_set" "ebs_waf_ip_set" {
     "194.33.249.0/27",   // ARK Corsham Internet Egress Vodafone
     "194.33.248.0/27",   // ARK Corsham Internet Egress Vodafone
     "20.49.214.199/32",  // Azure Landing Zone Egress
-    "20.49.214.228/32"   // Azure Landing Zone Egress
+    "20.49.214.228/32",  // Azure Landing Zone Egress
+    "51.155.225.100/32", // Jide Personal Access Temporarily
   ]
 
   tags = merge(local.tags,

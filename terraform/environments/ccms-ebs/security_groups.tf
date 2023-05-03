@@ -298,6 +298,41 @@ resource "aws_security_group_rule" "egress_traffic_ftp" {
 }
 
 
+# Security Group for ClamAV Server
+resource "aws_security_group" "ec2_sg_clamav" {
+  name        = "ec2_sg_clamav"
+  description = "Security Group for ClamAV Server"
+  vpc_id      = data.aws_vpc.shared.id
+  tags = merge(local.tags,
+    { Name = lower(format("sg-%s-%s-ClamAV", local.application_name, local.environment)) }
+  )
+}
+
+# Ingress Traffic ClamAV
+resource "aws_security_group_rule" "ingress_traffic_clamav" {
+  for_each          = local.application_data.ec2_sg_clamav_ingress_rules
+  security_group_id = aws_security_group.ec2_sg_clamav.id
+  type              = "ingress"
+  description       = format("Traffic for %s %d", each.value.protocol, each.value.from_port)
+  protocol          = each.value.protocol
+  from_port         = each.value.from_port
+  to_port           = each.value.to_port
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block, local.application_data.accounts[local.environment].lz_aws_subnet_env]
+}
+
+# Egress Traffic ClamAV
+resource "aws_security_group_rule" "egress_traffic_clamav" {
+  for_each          = local.application_data.ec2_sg_clamav_egress_rules
+  security_group_id = aws_security_group.ec2_sg_clamav.id
+  type              = "egress"
+  description       = format("Outbound traffic for %s %d", each.value.protocol, each.value.from_port)
+  protocol          = each.value.protocol
+  from_port         = each.value.from_port
+  to_port           = each.value.to_port
+  cidr_blocks       = [each.value.destination_cidr]
+}
+
+
 # Rule for all ingress/egress within the environment
 resource "aws_security_group_rule" "all_internal_ingress_traffic" {
   for_each          = { for sub in data.aws_security_groups.all_security_groups.ids : sub => sub }

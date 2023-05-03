@@ -390,6 +390,38 @@
       "destination_cidr": "0.0.0.0/0"
     }
   },
+  "ec2_sg_clamav_ingress_rules": {
+    "TCP_3310": {
+      "from_port": 3310,
+      "to_port": 3310,
+      "protocol": "TCP"
+    },
+    "SSH_22": {
+      "from_port": 22,
+      "to_port": 22,
+      "protocol": "TCP"
+    }
+  },
+  "ec2_sg_clamav_egress_rules": {
+    "TCP_3310": {
+      "from_port": 3310,
+      "to_port": 3310,
+      "protocol": "TCP",
+      "destination_cidr": "0.0.0.0/0"
+    },
+    "SSH_22": {
+      "from_port": 22,
+      "to_port": 22,
+      "protocol": "TCP",
+      "destination_cidr": "0.0.0.0/0"
+    },
+    "TCP_443": {
+      "from_port": 443,
+      "to_port": 443,
+      "protocol": "TCP",
+      "destination_cidr": "0.0.0.0/0"
+    }
+  },
   "webgate_ebs": {
     "u01": {
       "mapping": "u01",
