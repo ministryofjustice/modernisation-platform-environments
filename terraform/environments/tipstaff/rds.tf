@@ -43,7 +43,7 @@ resource "aws_security_group" "postgresql_db_sc" {
     to_port     = 5432
     protocol    = "tcp"
     description = "Allows Github Actions to access RDS"
-    cidr_blocks = ["${data.http.myip.response_body}/32"]
+    cidr_blocks = jsondecode(data.http.myip.response_body)["ip"]
   }
   egress {
     description = "allow all outbound traffic"
@@ -58,7 +58,7 @@ resource "aws_security_group" "postgresql_db_sc" {
 data "github_ip_ranges" "github_actions_ips" {}
 
 data "http" "myip" {
-  url = "http://ipv4.icanhazip.com"
+  url = "http://ipinfo.io/json"
 }
 
 resource "null_resource" "setup_db" {
