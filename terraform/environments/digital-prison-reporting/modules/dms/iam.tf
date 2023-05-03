@@ -101,7 +101,8 @@ resource "aws_iam_role_policy" "dmsoperatorpolicy" {
                 "s3:GetBucketLocation"
             ],
             "Resource": [
-                "*"
+                "arn:aws:s3::*:dpr-*/*",
+                "arn:aws:s3::*:dpr-*"
             ]
         },
         {
@@ -114,14 +115,7 @@ resource "aws_iam_role_policy" "dmsoperatorpolicy" {
                 "s3:ListObjects"          
             ],
             "Resource": "*"
-        },
-        {
-            "Effect": "Allow",
-            "Action": [
-                "iam:PassRole"
-            ],
-            "Resource": "*"          
-        }      
+        }
     ]
 }
 EOF

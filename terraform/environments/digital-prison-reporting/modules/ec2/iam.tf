@@ -100,12 +100,36 @@ data "aws_iam_policy_document" "dms" {
       "dms:DescribeEndpointSettings",
       "dms:RebootReplicationInstance",
       "athena:*",
-      "s3:*",   
     ]
     resources = [
       "*"
     ]
   }
+
+  statement {
+    actions = [
+      "s3:*Object*",
+      "s3:PutObjectTagging",
+      "s3:GetBucketLocation",
+    ]
+    resources = [
+      "arn:aws:s3:::dpr-*/*",
+      "arn:aws:s3:::dpr-*"
+    ]
+  }
+
+  statement {
+    actions = [
+      "s3:ListBucket",
+      "s3:ListAllMyBuckets",
+      "s3:ListAccessPoints",
+      "s3:ListJobs",
+      "s3:ListObjects",  
+    ]
+    resources = [
+      "*"
+    ]
+  } 
 
   statement {
     actions = [
