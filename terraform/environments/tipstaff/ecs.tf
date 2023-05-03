@@ -223,10 +223,11 @@ resource "aws_security_group" "ecs_service" {
   vpc_id      = data.aws_vpc.shared.id
 
   ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    from_port       = 0
+    to_port         = 0
+    protocol        = "-1"
+    description     = "Allow all traffic from load balancer"
+    security_groups = [aws_security_group.tipstaff_dev_lb_sc.id]
   }
 
   egress {

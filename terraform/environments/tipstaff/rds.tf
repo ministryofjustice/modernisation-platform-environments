@@ -55,8 +55,6 @@ resource "aws_security_group" "postgresql_db_sc" {
 
 }
 
-data "github_ip_ranges" "github_actions_ips" {}
-
 data "http" "myip" {
   url = "http://ipinfo.io/json"
 }
