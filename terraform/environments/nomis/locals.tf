@@ -22,35 +22,15 @@ locals {
     cloudwatch_metric_alarms = {
       weblogic = local.weblogic_cloudwatch_metric_alarms
       database = local.database_cloudwatch_metric_alarms
-      acm = {
-        test3 = {
-          comparison_operator = "LessThanThreshold"
-          evaluation_periods  = "1"
-          datapoints_to_alarm = "1"
-          metric_name         = "DaysToExpiry"
-          namespace           = "AWS/CertificateManager"
-          period              = "86400"
-          statistic           = "Minimum"
-          threshold           = "400"
-          alarm_description   = "Test"
-        }
-      }
     }
     cloudwatch_metric_alarms_lists = merge(
       local.weblogic_cloudwatch_metric_alarms_lists,
-      local.database_cloudwatch_metric_alarms_lists, {
-        acm_test = {
-          parent_keys = []
-          alarms_list = [
-            { key = "acm", name = "test3" },
-          ]
-        }
-    })
+      local.database_cloudwatch_metric_alarms_lists
+    )
     cloudwatch_metric_alarms_lists_with_actions = {
       dso_pagerduty               = ["dso_pagerduty"]
       dba_pagerduty               = ["dba_pagerduty"]
       dba_high_priority_pagerduty = ["dba_high_priority_pagerduty"]
-      dba_test                    = ["dba_test"]
     }
     route53_resolver_rules = {
       outbound-data-and-private-subnets = ["azure-fixngo-domain"]
@@ -63,7 +43,6 @@ locals {
         dso_pagerduty               = contains(["development", "test"], local.environment) ? "nomis_nonprod_alarms" : "nomis_alarms"
         dba_pagerduty               = contains(["development", "test"], local.environment) ? "hmpps_shef_dba_non_prod" : "hmpps_shef_dba_low_priority"
         dba_high_priority_pagerduty = contains(["development", "test"], local.environment) ? "hmpps_shef_dba_non_prod" : "hmpps_shef_dba_high_priority"
-        dba_test                    = "hmpps_shef_dba_high_priority"
       }
     }
   }
