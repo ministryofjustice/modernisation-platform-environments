@@ -42,8 +42,8 @@ resource "aws_security_group" "postgresql_db_sc" {
     from_port   = 5432
     to_port     = 5432
     protocol    = "tcp"
-    description = "Allows access to RDS from any IP"
-    cidr_blocks = ["0.0.0.0/0"]
+    description = "Allows Github Actions to access RDS"
+    cidr_blocks = data.github_ip_ranges.github_actions_ips.actions_ipv4
   }
   egress {
     description = "allow all outbound traffic"
@@ -54,6 +54,8 @@ resource "aws_security_group" "postgresql_db_sc" {
   }
 
 }
+
+data "github_ip_ranges" "github_actions_ips" {}
 
 resource "null_resource" "setup_db" {
   depends_on = [aws_db_instance.tipstaff_db]
