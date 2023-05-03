@@ -77,7 +77,7 @@ resource "aws_iam_policy" "dms" {
   description = "DMS Service Access Policy"
   path        = "/"
 
-  policy = data.aws_iam_policy_document.kinesis-cloudwatch-kms.json
+  policy = data.aws_iam_policy_document.dms.json
 }
 
 data "aws_iam_policy_document" "dms" {
