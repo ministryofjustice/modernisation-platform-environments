@@ -35,26 +35,25 @@ module "glue_reporting_hub_job" {
     "--extra-jars"                              = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/jars/digital-prison-reporting-jobs-vLatest-all.jar"
     "--job-bookmark-option"                     = "job-bookmark-disable"
     "--class"                                   = "uk.gov.justice.digital.job.DataHubJob"
-    "--dpr.aws.kinesis.endpointUrl"             = "https://kinesis.eu-west-2.amazonaws.com"
-    "--dpr.aws.region"                          = "eu-west-2"
+    "--dpr.aws.kinesis.endpointUrl"             = "https://kinesis.${local.account_region}.amazonaws.com"
+    "--dpr.aws.region"                          = local.account_region
     "--dpr.curated.s3.path"                     = "s3://${module.s3_curated_bucket.bucket_id}/curated/"
     "--dpr.kinesis.reader.batchDurationSeconds" = 1
     "--dpr.kinesis.reader.streamName"           = local.kinesis_stream_ingestor
-    "--dpr.raw.s3.path"                         = "s3://${module.s3_raw_bucket.bucket_id}/"
-    "--dpr.structured.s3.path"                  = "s3://${module.s3_structured_bucket.bucket_id}/"
-    "--dpr.violations.s3.path"                  = "s3://${module.s3_violation_bucket.bucket_id}/"
+    "--dpr.raw.s3.path"                         = "s3://${module.s3_raw_bucket.bucket_id}/raw/"
+    "--dpr.structured.s3.path"                  = "s3://${module.s3_structured_bucket.bucket_id}/structured/structured/"
+    "--dpr.violations.s3.path"                  = "s3://${module.s3_violation_bucket.bucket_id}/violations/"
     "--enable-metrics"                          = true
     "--enable-spark-ui"                         = false
     "--enable-job-insights"                     = true
-    "--aws.kinesis.endpointUrl"                 = "https://kinesis-${local.account_region}.amazonaws.com"
-    "--aws.region"                              = local.account_region
+    "--dpr.aws.kinesis.endpointUrl"             = "https://kinesis.${local.account_region}.amazonaws.com"
   }
 }
 
 # Glue Domain Platform Refresh Job
 module "glue_domain_refresh_job" {
   source                        = "./modules/glue_job"
-  create_job                    = local.create_job
+  create_job                    = false
   name                          = "${local.project}-domain-refresh-${local.env}"
   command_type                  = "glueetl"
   description                   = "Monitors the reporting hub for table changes and applies them to domains"
@@ -89,7 +88,8 @@ module "glue_domain_refresh_job" {
     "--extra-jars"                    = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/jars/digital-prison-reporting-jobs-vLatest-all.jar"
     "--class"                         = "uk.gov.justice.digital.job.DomainRefreshJob"
     "--datalake-formats"              = "delta"
-    "--dpr.aws.dynamodb.endpointUrl"  = "https://dynamodb.eu-west-2.amazonaws.com"
+    "--dpr.aws.dynamodb.endpointUrl"  = "https://dynamodb.${local.account_region}.amazonaws.com"
+    "--dpr.aws.kinesis.endpointUrl"   = "https://kinesis.${local.account_region}.amazonaws.com"
     "--dpr.aws.region"                = local.account_region
     "--dpr.curated.s3.path"           = "s3://${module.s3_curated_bucket.bucket_id}/"
     "--dpr.domain.name"               = "establishment"
