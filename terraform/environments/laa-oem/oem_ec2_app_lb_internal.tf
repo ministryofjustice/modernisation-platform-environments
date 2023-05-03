@@ -1,15 +1,15 @@
-resource "aws_lb" "oem_app" {
-  name               = "lb-${local.application_name}-app"
+resource "aws_lb" "oem_app_internal" {
+  name               = "lb-${local.application_name}-app-internal"
   load_balancer_type = "application"
-  internal           = false
-  security_groups    = [aws_security_group.load_balancer_security_group.id]
-  subnets            = data.aws_subnets.shared-public.ids
+  internal           = true
+  security_groups    = [aws_security_group.load_balancer_internal.id]
+  subnets            = data.aws_subnets.private-public.ids
 
   tags = local.tags
 }
 
-resource "aws_lb_listener" "oem_app" {
-  load_balancer_arn = aws_lb.oem_app.id
+resource "aws_lb_listener" "oem_app_internal" {
+  load_balancer_arn = aws_lb.oem_app_internal.id
   port              = 443
   protocol          = "HTTPS"
 
@@ -17,13 +17,13 @@ resource "aws_lb_listener" "oem_app" {
   certificate_arn = aws_acm_certificate.laa_cert.arn
 
   default_action {
-    target_group_arn = aws_lb_target_group.oem_app.id
+    target_group_arn = aws_lb_target_group.oem_app_internal.id
     type             = "forward"
   }
 }
 
-resource "aws_lb_listener" "oem_app_3872" {
-  load_balancer_arn = aws_lb.oem_app.id
+resource "aws_lb_listener" "oem_app_3872_internal" {
+  load_balancer_arn = aws_lb.oem_app_internal.id
   port              = 3872
   protocol          = "HTTPS"
 
@@ -31,13 +31,13 @@ resource "aws_lb_listener" "oem_app_3872" {
   certificate_arn = aws_acm_certificate.laa_cert.arn
 
   default_action {
-    target_group_arn = aws_lb_target_group.oem_app_3872.id
+    target_group_arn = aws_lb_target_group.oem_app_3872_internal.id
     type             = "forward"
   }
 }
 
-resource "aws_lb_listener" "oem_app_4903" {
-  load_balancer_arn = aws_lb.oem_app.id
+resource "aws_lb_listener" "oem_app_4903_internal" {
+  load_balancer_arn = aws_lb.oem_app_internal.id
   port              = 4903
   protocol          = "HTTPS"
 
@@ -45,13 +45,13 @@ resource "aws_lb_listener" "oem_app_4903" {
   certificate_arn = aws_acm_certificate.laa_cert.arn
 
   default_action {
-    target_group_arn = aws_lb_target_group.oem_app_4903.id
+    target_group_arn = aws_lb_target_group.oem_app_4903_internal.id
     type             = "forward"
   }
 }
 
-resource "aws_lb_listener" "oem_app_7102" {
-  load_balancer_arn = aws_lb.oem_app.id
+resource "aws_lb_listener" "oem_app_7102_internal" {
+  load_balancer_arn = aws_lb.oem_app_internal.id
   port              = 7102
   protocol          = "HTTPS"
 
@@ -59,13 +59,13 @@ resource "aws_lb_listener" "oem_app_7102" {
   certificate_arn = aws_acm_certificate.laa_cert.arn
 
   default_action {
-    target_group_arn = aws_lb_target_group.oem_app_7102.id
+    target_group_arn = aws_lb_target_group.oem_app_7102_internal.id
     type             = "forward"
   }
 }
 
-resource "aws_lb_listener" "oem_app_7803" {
-  load_balancer_arn = aws_lb.oem_app.id
+resource "aws_lb_listener" "oem_app_7803_internal" {
+  load_balancer_arn = aws_lb.oem_app_internal.id
   port              = 7803
   protocol          = "HTTPS"
 
@@ -73,13 +73,13 @@ resource "aws_lb_listener" "oem_app_7803" {
   certificate_arn = aws_acm_certificate.laa_cert.arn
 
   default_action {
-    target_group_arn = aws_lb_target_group.oem_app_7803.id
+    target_group_arn = aws_lb_target_group.oem_app_7803_internal.id
     type             = "forward"
   }
 }
 
-resource "aws_lb_target_group" "oem_app" {
-  name        = "tg-${local.application_name}-app-8000"
+resource "aws_lb_target_group" "oem_app_internal" {
+  name        = "tg-${local.application_name}-app-8000-internal"
   port        = 8000
   protocol    = "HTTP"
   vpc_id      = data.aws_vpc.shared.id
@@ -102,8 +102,8 @@ resource "aws_lb_target_group" "oem_app" {
   }
 }
 
-resource "aws_lb_target_group" "oem_app_3872" {
-  name        = "tg-${local.application_name}-app-3872"
+resource "aws_lb_target_group" "oem_app_3872_internal" {
+  name        = "tg-${local.application_name}-app-3872-internal"
   port        = 3872
   protocol    = "HTTPS"
   vpc_id      = data.aws_vpc.shared.id
@@ -126,8 +126,8 @@ resource "aws_lb_target_group" "oem_app_3872" {
   }
 }
 
-resource "aws_lb_target_group" "oem_app_4903" {
-  name        = "tg-${local.application_name}-app-4903"
+resource "aws_lb_target_group" "oem_app_4903_internal" {
+  name        = "tg-${local.application_name}-app-4903-internal"
   port        = 4903
   protocol    = "HTTPS"
   vpc_id      = data.aws_vpc.shared.id
@@ -150,8 +150,8 @@ resource "aws_lb_target_group" "oem_app_4903" {
   }
 }
 
-resource "aws_lb_target_group" "oem_app_7102" {
-  name        = "tg-${local.application_name}-app-7102"
+resource "aws_lb_target_group" "oem_app_7102_internal" {
+  name        = "tg-${local.application_name}-app-7102-internal"
   port        = 7102
   protocol    = "HTTPS"
   vpc_id      = data.aws_vpc.shared.id
@@ -174,8 +174,8 @@ resource "aws_lb_target_group" "oem_app_7102" {
   }
 }
 
-resource "aws_lb_target_group" "oem_app_7803" {
-  name        = "tg-${local.application_name}-app-7803"
+resource "aws_lb_target_group" "oem_app_7803_internal" {
+  name        = "tg-${local.application_name}-app-7803-internal"
   port        = 7803
   protocol    = "HTTPS"
   vpc_id      = data.aws_vpc.shared.id
@@ -198,38 +198,38 @@ resource "aws_lb_target_group" "oem_app_7803" {
   }
 }
 
-resource "aws_lb_target_group_attachment" "oem_app" {
-  target_group_arn = aws_lb_target_group.oem_app.arn
+resource "aws_lb_target_group_attachment" "oem_app_internal" {
+  target_group_arn = aws_lb_target_group.oem_app_internal.arn
   target_id        = aws_instance.oem_app.id
   port             = 8000
 }
 
-resource "aws_lb_target_group_attachment" "oem_app_3872" {
-  target_group_arn = aws_lb_target_group.oem_app_3872.arn
+resource "aws_lb_target_group_attachment" "oem_app_3872_internal" {
+  target_group_arn = aws_lb_target_group.oem_app_3872_internal.arn
   target_id        = aws_instance.oem_app.id
   port             = 3872
 }
 
-resource "aws_lb_target_group_attachment" "oem_app_4903" {
-  target_group_arn = aws_lb_target_group.oem_app_4903.arn
+resource "aws_lb_target_group_attachment" "oem_app_4903_internal" {
+  target_group_arn = aws_lb_target_group.oem_app_4903_internal.arn
   target_id        = aws_instance.oem_app.id
   port             = 4903
 }
 
-resource "aws_lb_target_group_attachment" "oem_app_7102" {
-  target_group_arn = aws_lb_target_group.oem_app_7102.arn
+resource "aws_lb_target_group_attachment" "oem_app_7102_internal" {
+  target_group_arn = aws_lb_target_group.oem_app_7102_internal.arn
   target_id        = aws_instance.oem_app.id
   port             = 7102
 }
 
-resource "aws_lb_target_group_attachment" "oem_app_7803" {
-  target_group_arn = aws_lb_target_group.oem_app_7803.arn
+resource "aws_lb_target_group_attachment" "oem_app_7803_internal" {
+  target_group_arn = aws_lb_target_group.oem_app_7803_internal.arn
   target_id        = aws_instance.oem_app.id
   port             = 7803
 }
 
-resource "aws_security_group" "load_balancer_security_group" {
-  name_prefix = "${local.application_name}-load-balancer-sg-"
+resource "aws_security_group" "load_balancer_internal" {
+  name_prefix = "${local.application_name}-lb-sg-int-"
   description = "Access to the EBS App server"
   vpc_id      = data.aws_vpc.shared.id
 

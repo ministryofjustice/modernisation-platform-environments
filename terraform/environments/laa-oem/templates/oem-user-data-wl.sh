@@ -81,10 +81,6 @@ chown -R oracle:dba $${MOUNT_DIR}
 FS_DIR=$${MOUNT_DIR}/oem/backups
 mkdir -p $${FS_DIR}
 chmod go+rw $${FS_DIR}
-grep -v '/opt/oem/backups' $${EFSTAB} > $${EFSTAB}.new
-echo "${efs_fqdn}:/ $${FS_DIR} nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport 0 0" >> $${EFSTAB}.new
-mv $${EFSTAB}.new $${EFSTAB}
-mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport ${efs_fqdn}:/ $${FS_DIR}
 
 hostnamectl set-hostname ${hostname}
 
