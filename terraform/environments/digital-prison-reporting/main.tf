@@ -317,12 +317,43 @@ module "s3_artifacts_store" {
 module "glue_data_domain_database" {
   source         = "./modules/glue_database"
   create_db      = local.create_db
-  name           = "${local.project}-domain-data-store-${local.env}"
-  description    = "Glue Data Catalog for Domain Data Platform"
+  name           = "domain"
+  description    = "Glue Data Catalog - Domain Data"
   aws_account_id = local.account_id
   aws_region     = local.account_region
 }
 
+# Glue Database Catalog for Data Domain
+module "glue_raw_zone_database" {
+  source         = "./modules/glue_database"
+  create_db      = local.create_db
+  name           = "raw"
+  description    = "Glue Data Catalog - Raw Zone"
+  aws_account_id = local.account_id
+  aws_region     = local.account_region
+}
+
+# Glue Database Catalog for Data Domain
+module "glue_structured_zone_database" {
+  source         = "./modules/glue_database"
+  create_db      = local.create_db
+  name           = "structured"
+  description    = "Glue Data Catalog - Structured Zone"
+  aws_account_id = local.account_id
+  aws_region     = local.account_region
+}
+
+# Glue Database Catalog for Data Domain
+module "glue_curated_zone_database" {
+  source         = "./modules/glue_database"
+  create_db      = local.create_db
+  name           = "curated"
+  description    = "Glue Data Catalog - Curated Zone"
+  aws_account_id = local.account_id
+  aws_region     = local.account_region
+}
+
+#########################################
 # Data Domain Glue Connection (RedShift)
 module "glue_connection_redshift" {
   source            = "./modules/glue_connection"
