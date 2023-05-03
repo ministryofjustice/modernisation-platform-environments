@@ -112,7 +112,8 @@ data "aws_iam_policy_document" "dms" {
 
       values = [
         "dms.amazonaws.com",
-        "ec2.amazonaws.com"
+        "ec2.amazonaws.com",
+        "iam.amazonaws.com"
       ]
     }    
   } 
