@@ -96,8 +96,8 @@ resource "aws_iam_role_policy" "dmsoperatorpolicy" {
         {
             "Effect": "Allow",
             "Action": [
-                "s3:*Object"
-                "s3:PutObjectTagging"
+                "s3:*Object",
+                "s3:PutObjectTagging",
                 "s3:GetBucketLocation"
             ],
             "Resource": [
@@ -108,11 +108,11 @@ resource "aws_iam_role_policy" "dmsoperatorpolicy" {
         {
             "Effect": "Allow",
             "Action": [
-                "s3:ListBucket"
-                "s3:ListAllMyBuckets"
-                "s3:ListAccessPoints"
-                "s3:ListJobs"
-                "s3:ListObjects"                
+                "s3:ListBucket",
+                "s3:ListAllMyBuckets",
+                "s3:ListAccessPoints",
+                "s3:ListJobs",
+                "s3:ListObjects"          
             ],
             "Resource": "*"
         }             
