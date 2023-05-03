@@ -64,6 +64,26 @@ data "aws_iam_policy_document" "kinesis-cloudwatch-kms" {
     actions = [
       "cloudwatch:PutMetricData",
       "kms:*",
+    ]
+    resources = [
+      "*"
+    ]
+  }
+}
+
+## DMS Policy
+resource "aws_iam_policy" "dms" {
+  name        = "${var.name}-dms-service-access"
+  description = "DMS Service Access Policy"
+  path        = "/"
+
+  policy = data.aws_iam_policy_document.kinesis-cloudwatch-kms.json
+}
+
+data "aws_iam_policy_document" "dms" {
+  statement {
+    actions = [
+      "kms:*",
       "dms:StartReplicationTask",
       "dms:StopReplicationTask",
       "dms:TestConnection",
@@ -78,6 +98,26 @@ data "aws_iam_policy_document" "kinesis-cloudwatch-kms" {
       "*"
     ]
   }
+
+  statement {
+    actions = [
+      "iam:GetRole",
+      "iam:PassRole",
+      "iam:CreateRole",
+      "iam:AttachRolePolicy",
+    ]
+    resources = [
+      "arn:aws:iam::*:role/${aws_iam_role.kinesis-agent-instance-role.name}"
+    ]
+    condition {
+      test     = "StringLike"
+      variable = "iam:PassedToService"
+
+      values = [
+        "dms.amazonaws.com"
+      ]
+    }
+  }  
 }
 
 ## Glue Access Policy
@@ -153,6 +193,11 @@ resource "aws_iam_role_policy_attachment" "glue-access" {
 resource "aws_iam_role_policy_attachment" "cloudwatch-kms" {
   role       = aws_iam_role.kinesis-agent-instance-role.name
   policy_arn = aws_iam_policy.kinesis-cw-kms-developer.arn
+}
+
+resource "aws_iam_role_policy_attachment" "dms" {
+  role       = aws_iam_role.kinesis-agent-instance-role.name
+  policy_arn = aws_iam_policy.dms.arn
 }
 
 data "aws_iam_policy" "RedshiftAdmin" {
