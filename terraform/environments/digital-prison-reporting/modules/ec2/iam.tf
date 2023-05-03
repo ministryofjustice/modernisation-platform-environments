@@ -83,7 +83,6 @@ resource "aws_iam_policy" "dms" {
 data "aws_iam_policy_document" "dms" {
   statement {
     actions = [
-      "kms:*",
       "dms:StartReplicationTask",
       "dms:StopReplicationTask",
       "dms:TestConnection",
