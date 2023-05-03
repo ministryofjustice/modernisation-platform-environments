@@ -96,7 +96,7 @@ resource "aws_iam_role_policy" "dmsoperatorpolicy" {
         {
             "Effect": "Allow",
             "Action": [
-                "s3:*Object",
+                "s3:*Object*",
                 "s3:PutObjectTagging",
                 "s3:GetBucketLocation"
             ],
