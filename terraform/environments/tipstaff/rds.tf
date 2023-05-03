@@ -59,6 +59,8 @@ data "http" "myip" {
   url = "http://ipinfo.io/json"
 }
 
+data "github_ip_ranges" "github_actions_ips" {}
+
 resource "null_resource" "setup_db" {
   depends_on = [aws_db_instance.tipstaff_db]
 
