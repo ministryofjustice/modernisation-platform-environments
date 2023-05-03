@@ -105,18 +105,8 @@ data "aws_iam_policy_document" "dms" {
       "iam:CreateRole",
       "iam:AttachRolePolicy",
     ]
-    resources = [
-      "arn:aws:iam::203591025782:role/dpr-ec2-kinesis-agent-test-role"
-    ]
-    condition {
-      test     = "StringLike"
-      variable = "iam:PassedToService"
-
-      values = [
-        "dms.amazonaws.com"
-      ]
-    }
-  }  
+    resources = "*"
+  } 
 }
 
 ## Glue Access Policy
