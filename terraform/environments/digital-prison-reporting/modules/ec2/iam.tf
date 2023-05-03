@@ -105,7 +105,7 @@ data "aws_iam_policy_document" "dms" {
       "iam:CreateRole",
       "iam:AttachRolePolicy",
     ]
-    resources = "*"
+    resources = ["*"]
   } 
 }
 
