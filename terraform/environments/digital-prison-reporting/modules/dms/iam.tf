@@ -80,7 +80,6 @@ resource "aws_iam_role_policy" "dmsoperatorpolicy" {
         {
             "Effect": "Allow",
             "Action": [
-                "s3:*",
                 "kms:*",
                 "cloudwatch:*",
                 "ec2:CreateNetworkInterface",
@@ -93,7 +92,21 @@ resource "aws_iam_role_policy" "dmsoperatorpolicy" {
                 "ec2:ModifyNetworkInterfaceAttribute"
             ],
             "Resource": "*"
-        }
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "s3:*Object"
+            ],
+            "Resource": "arn:aws:s3:::dpr-*/*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "s3:ListBucket"
+            ],
+            "Resource": "arn:aws:s3:::dpr-*"
+        }             
     ]
 }
 EOF
