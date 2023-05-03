@@ -1,39 +1,6 @@
-# Build ingress and egress rules
-locals {
-  loadbalancer_ingress_rules = {
-    "cluster_ec2_lb_ingress" = {
-      description     = "Cluster EC2 loadbalancer ingress rule"
-      from_port       = 80
-      to_port         = 80
-      protocol        = "tcp"
-      cidr_blocks     = [data.aws_vpc.shared.cidr_block]
-      security_groups = []
-    },
-    "cluster_ec2_bastion_ingress" = {
-      description     = "Cluster EC2 bastion ingress rule"
-      from_port       = 3389
-      to_port         = 3389
-      protocol        = "tcp"
-      cidr_blocks     = [data.aws_vpc.shared.cidr_block]
-      security_groups = []
-    }
-  }
-
-  loadbalancer_egress_rules = {
-    "cluster_ec2_lb_egress" = {
-      description     = "Cluster EC2 loadbalancer egress rule"
-      from_port       = 443
-      to_port         = 443
-      protocol        = "tcp"
-      cidr_blocks     = ["0.0.0.0/0"]
-      security_groups = []
-    }
-  }
-}
-
 # Load balancer build using the module
 module "lb_access_logs_enabled" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer?ref=v2.1.1"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer?ref=v2.1.3"
   providers = {
     # Here we use the default provider for the S3 bucket module, buck replication is disabled but we still
     # Need to pass the provider to the S3 bucket module
