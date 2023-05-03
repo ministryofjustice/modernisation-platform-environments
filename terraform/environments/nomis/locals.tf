@@ -22,33 +22,15 @@ locals {
     cloudwatch_metric_alarms = {
       weblogic = local.weblogic_cloudwatch_metric_alarms
       database = local.database_cloudwatch_metric_alarms
-      acm = {
-        test-alarm = {
-          comparison_operator = "LessThanThreshold"
-          evaluation_periods  = "1"
-          datapoints_to_alarm = "1"
-          metric_name         = "DaysToExpiry"
-          namespace           = "AWS/CertificateManager"
-          period              = "86400"
-          statistic           = "Minimum"
-          threshold           = "400"
-          alarm_description   = "TEST"
-        }
-      }
     }
     cloudwatch_metric_alarms_lists = merge(
       local.weblogic_cloudwatch_metric_alarms_lists,
-      local.database_cloudwatch_metric_alarms_lists, {
-        acm_default = {
-          parent_keys = []
-          alarms_list = [
-            { key = "acm", name = "cert-expires-in-less-than-14-days" },
-            { key = "acm", name = "test-alarm" },
-          ]
-        }
-    })
+      local.database_cloudwatch_metric_alarms_lists
+    )
     cloudwatch_metric_alarms_lists_with_actions = {
-      nomis_pagerduty = ["nomis_pagerduty"]
+      dso_pagerduty               = ["dso_pagerduty"]
+      dba_pagerduty               = ["dba_pagerduty"]
+      dba_high_priority_pagerduty = ["dba_high_priority_pagerduty"]
     }
     route53_resolver_rules = {
       outbound-data-and-private-subnets = ["azure-fixngo-domain"]
@@ -58,7 +40,9 @@ locals {
     s3_iam_policies          = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
     sns_topics = {
       pagerduty_integrations = {
-        nomis_pagerduty = contains(["development", "test"], local.environment) ? "nomis_nonprod_alarms" : "nomis_alarms"
+        dso_pagerduty               = contains(["development", "test"], local.environment) ? "nomis_nonprod_alarms" : "nomis_alarms"
+        dba_pagerduty               = contains(["development", "test"], local.environment) ? "hmpps_shef_dba_non_prod" : "hmpps_shef_dba_low_priority"
+        dba_high_priority_pagerduty = contains(["development", "test"], local.environment) ? "hmpps_shef_dba_non_prod" : "hmpps_shef_dba_high_priority"
       }
     }
   }

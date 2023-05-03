@@ -19,7 +19,7 @@ locals {
           "*.${module.environment.domains.public.application_environment}",
           "*.${local.environment}.nomis.az.justice.gov.uk",
         ]
-        # cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["nomis_pagerduty"].acm_default
+        # cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso_pagerduty"].acm_default
         tags = {
           description = "wildcard cert for ${module.environment.domains.public.application_environment} and ${local.environment}.nomis.az.justice.gov.uk domain"
         }
