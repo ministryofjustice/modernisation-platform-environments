@@ -106,7 +106,7 @@ data "aws_iam_policy_document" "dms" {
       "iam:AttachRolePolicy",
     ]
     resources = [
-      "arn:aws:iam::*:role/*"
+      "arn:aws:iam::203591025782:role/dpr-ec2-kinesis-agent-test-role"
     ]
     condition {
       test     = "StringLike"
