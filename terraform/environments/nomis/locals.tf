@@ -22,11 +22,31 @@ locals {
     cloudwatch_metric_alarms = {
       weblogic = local.weblogic_cloudwatch_metric_alarms
       database = local.database_cloudwatch_metric_alarms
+      acm = {
+        test-alarm = {
+          comparison_operator = "LessThanThreshold"
+          evaluation_periods  = "1"
+          datapoints_to_alarm = "1"
+          metric_name         = "DaysToExpiry"
+          namespace           = "AWS/CertificateManager"
+          period              = "86400"
+          statistic           = "Minimum"
+          threshold           = "400"
+          alarm_description   = "TEST"
+        }
+      }
     }
     cloudwatch_metric_alarms_lists = merge(
       local.weblogic_cloudwatch_metric_alarms_lists,
-      local.database_cloudwatch_metric_alarms_lists
-    )
+      local.database_cloudwatch_metric_alarms_lists, {
+        acm_default = {
+          parent_keys = []
+          alarms_list = [
+            { key = "acm", name = "cert-expires-in-less-than-14-days" },
+            { key = "acm", name = "test-alarm" },
+          ]
+        }
+    })
     cloudwatch_metric_alarms_lists_with_actions = {
       nomis_pagerduty = ["nomis_pagerduty"]
     }
