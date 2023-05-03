@@ -1,9 +1,9 @@
 resource "aws_key_pair" "key_pair_db" {
-  key_name = lower(format("oem-ec2-key-db-%s", local.environment))
+  key_name   = lower(format("oem-ec2-key-db-%s", local.environment))
   public_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJB1m1MUEKtff5y6RLEAm2f1v9g7TmqAyrk4svTBeqpK"
 
   tags = merge(tomap({
-    "Name"     = lower(format("ec2-%s-%s-db", local.application_name, local.environment))
+    "Name" = lower(format("ec2-%s-%s-db", local.application_name, local.environment))
   }), local.tags)
 }
 

@@ -1,9 +1,9 @@
 resource "aws_key_pair" "key_pair_wl" {
-  key_name = lower(format("oem-ec2-key-wl-%s", local.environment))
+  key_name   = lower(format("oem-ec2-key-wl-%s", local.environment))
   public_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJB1m1MUEKtff5y6RLEAm2f1v9g7TmqAyrk4svTBeqpK"
 
   tags = merge(tomap({
-    "Name"     = lower(format("ec2-%s-%s-wl", local.application_name, local.environment))
+    "Name" = lower(format("ec2-%s-%s-wl", local.application_name, local.environment))
   }), local.tags)
 }
 
@@ -85,9 +85,9 @@ resource "aws_ebs_volume" "oem_wl_volume_opt_oem_app" {
   iops              = 3000
   kms_key_id        = data.aws_kms_key.ebs_shared.arn
   size              = 50
-# snapshot_id       = data.aws_ebs_snapshot.oem_wl_volume_opt_oem_app.id
-  type              = "gp3"
-  depends_on        = [resource.aws_instance.oem_wl]
+  # snapshot_id       = data.aws_ebs_snapshot.oem_wl_volume_opt_oem_app.id
+  type       = "gp3"
+  depends_on = [resource.aws_instance.oem_wl]
 
   tags = merge(tomap({
     "Name"                 = "${local.application_name}-wl-opt-oem-app",
@@ -116,9 +116,9 @@ resource "aws_ebs_volume" "oem_wl_volume_opt_oem_inst" {
   iops              = 3000
   kms_key_id        = data.aws_kms_key.ebs_shared.arn
   size              = 50
-# snapshot_id       = data.aws_ebs_snapshot.oem_wl_volume_opt_oem_inst.id
-  type              = "gp3"
-  depends_on        = [resource.aws_instance.oem_wl]
+  # snapshot_id       = data.aws_ebs_snapshot.oem_wl_volume_opt_oem_inst.id
+  type       = "gp3"
+  depends_on = [resource.aws_instance.oem_wl]
 
   tags = merge(tomap({
     "Name"                 = "${local.application_name}-wl-opt-oem-inst",
