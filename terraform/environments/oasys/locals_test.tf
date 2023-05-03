@@ -143,7 +143,7 @@ locals {
                 conditions = [
                   {
                     host_header = {
-                      values = ["t2.${module.environment.domains.public.short_name}"]
+                      values = ["t2.${module.environment.domains.public.application_environment}"]
                     }
                   },
                   {
