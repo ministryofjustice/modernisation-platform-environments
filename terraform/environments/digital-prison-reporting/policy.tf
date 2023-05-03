@@ -50,7 +50,9 @@ resource "aws_iam_policy" "read_s3_read_access_policy" {
           module.s3_glue_job_bucket.bucket_arn,
           "${module.s3_glue_job_bucket.bucket_arn}/*",
           module.s3_landing_bucket.bucket_arn,
-          "${module.s3_landing_bucket.bucket_arn}/*"          
+          "${module.s3_landing_bucket.bucket_arn}/*",
+          module.s3_working_bucket.bucket_arn,
+          "${module.s3_working_bucket.bucket_arn}/*"                 
         ]
       }
     ]
