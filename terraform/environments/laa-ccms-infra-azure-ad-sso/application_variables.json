@@ -37,6 +37,12 @@
       "protocol": "TCP",
       "destination_cidr": "0.0.0.0/0"
     },
+    "TCP_8000": {
+      "from_port": 8000,
+      "to_port": 8000,
+      "protocol": "TCP",
+      "destination_cidr": "0.0.0.0/0"
+    },
     "TCP_443": {
       "from_port": 443,
       "to_port": 443,
