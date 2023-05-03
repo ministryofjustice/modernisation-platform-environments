@@ -8,6 +8,76 @@ resource "aws_lb" "oem_app" {
   tags = local.tags
 }
 
+resource "aws_lb_listener" "oem_app" {
+  load_balancer_arn = aws_lb.oem_app.id
+  port              = 443
+  protocol          = "HTTPS"
+
+  ssl_policy      = "ELBSecurityPolicy-TLS-1-2-2017-01"
+  certificate_arn = aws_acm_certificate.laa_cert.arn
+
+  default_action {
+    target_group_arn = aws_lb_target_group.oem_app.id
+    type             = "forward"
+  }
+}
+
+resource "aws_lb_listener" "oem_app_3872" {
+  load_balancer_arn = aws_lb.oem_app.id
+  port              = 3872
+  protocol          = "HTTPS"
+
+  ssl_policy      = "ELBSecurityPolicy-TLS-1-2-2017-01"
+  certificate_arn = aws_acm_certificate.laa_cert.arn
+
+  default_action {
+    target_group_arn = aws_lb_target_group.oem_app_3872.id
+    type             = "forward"
+  }
+}
+
+resource "aws_lb_listener" "oem_app_4903" {
+  load_balancer_arn = aws_lb.oem_app.id
+  port              = 4903
+  protocol          = "HTTPS"
+
+  ssl_policy      = "ELBSecurityPolicy-TLS-1-2-2017-01"
+  certificate_arn = aws_acm_certificate.laa_cert.arn
+
+  default_action {
+    target_group_arn = aws_lb_target_group.oem_app_4903.id
+    type             = "forward"
+  }
+}
+
+resource "aws_lb_listener" "oem_app_7102" {
+  load_balancer_arn = aws_lb.oem_app.id
+  port              = 7102
+  protocol          = "HTTPS"
+
+  ssl_policy      = "ELBSecurityPolicy-TLS-1-2-2017-01"
+  certificate_arn = aws_acm_certificate.laa_cert.arn
+
+  default_action {
+    target_group_arn = aws_lb_target_group.oem_app_7102.id
+    type             = "forward"
+  }
+}
+
+resource "aws_lb_listener" "oem_app_7803" {
+  load_balancer_arn = aws_lb.oem_app.id
+  port              = 7803
+  protocol          = "HTTPS"
+
+  ssl_policy      = "ELBSecurityPolicy-TLS-1-2-2017-01"
+  certificate_arn = aws_acm_certificate.laa_cert.arn
+
+  default_action {
+    target_group_arn = aws_lb_target_group.oem_app_7803.id
+    type             = "forward"
+  }
+}
+
 resource "aws_lb_target_group" "oem_app" {
   name        = "tg-${local.application_name}-app-8000"
   port        = 8000
@@ -22,6 +92,54 @@ resource "aws_lb_target_group" "oem_app" {
     protocol            = "HTTP"
     unhealthy_threshold = "2"
     matcher             = "302"
+    timeout             = "5"
+  }
+
+  tags = local.tags
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_lb_target_group" "oem_app_3872" {
+  name        = "tg-${local.application_name}-app-3872"
+  port        = 3872
+  protocol    = "HTTPS"
+  vpc_id      = data.aws_vpc.shared.id
+  target_type = "instance"
+
+  health_check {
+    path                = "/emd/main"
+    healthy_threshold   = "5"
+    interval            = "60"
+    protocol            = "HTTPS"
+    unhealthy_threshold = "2"
+    matcher             = "200"
+    timeout             = "5"
+  }
+
+  tags = local.tags
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_lb_target_group" "oem_app_4903" {
+  name        = "tg-${local.application_name}-app-4903"
+  port        = 4903
+  protocol    = "HTTPS"
+  vpc_id      = data.aws_vpc.shared.id
+  target_type = "instance"
+
+  health_check {
+    path                = "/empbs/upload"
+    healthy_threshold   = "5"
+    interval            = "60"
+    protocol            = "HTTPS"
+    unhealthy_threshold = "2"
+    matcher             = "200"
     timeout             = "5"
   }
 
@@ -86,6 +204,18 @@ resource "aws_lb_target_group_attachment" "oem_app" {
   port             = 8000
 }
 
+resource "aws_lb_target_group_attachment" "oem_app_3872" {
+  target_group_arn = aws_lb_target_group.oem_app_3872.arn
+  target_id        = aws_instance.oem_app.id
+  port             = 3872
+}
+
+resource "aws_lb_target_group_attachment" "oem_app_4903" {
+  target_group_arn = aws_lb_target_group.oem_app_4903.arn
+  target_id        = aws_instance.oem_app.id
+  port             = 4903
+}
+
 resource "aws_lb_target_group_attachment" "oem_app_7102" {
   target_group_arn = aws_lb_target_group.oem_app_7102.arn
   target_id        = aws_instance.oem_app.id
@@ -96,48 +226,6 @@ resource "aws_lb_target_group_attachment" "oem_app_7803" {
   target_group_arn = aws_lb_target_group.oem_app_7803.arn
   target_id        = aws_instance.oem_app.id
   port             = 7803
-}
-
-resource "aws_lb_listener" "oem_app" {
-  load_balancer_arn = aws_lb.oem_app.id
-  port              = 443
-  protocol          = "HTTPS"
-
-  ssl_policy      = "ELBSecurityPolicy-TLS-1-2-2017-01"
-  certificate_arn = aws_acm_certificate.external-mp[0].arn
-
-  default_action {
-    target_group_arn = aws_lb_target_group.oem_app.id
-    type             = "forward"
-  }
-}
-
-resource "aws_lb_listener" "oem_app_7102" {
-  load_balancer_arn = aws_lb.oem_app.id
-  port              = 7102
-  protocol          = "HTTPS"
-
-  ssl_policy      = "ELBSecurityPolicy-TLS-1-2-2017-01"
-  certificate_arn = aws_acm_certificate.external-mp[0].arn
-
-  default_action {
-    target_group_arn = aws_lb_target_group.oem_app_7102.id
-    type             = "forward"
-  }
-}
-
-resource "aws_lb_listener" "oem_app_7803" {
-  load_balancer_arn = aws_lb.oem_app.id
-  port              = 7803
-  protocol          = "HTTPS"
-
-  ssl_policy      = "ELBSecurityPolicy-TLS-1-2-2017-01"
-  certificate_arn = aws_acm_certificate.external-mp[0].arn
-
-  default_action {
-    target_group_arn = aws_lb_target_group.oem_app_7803.id
-    type             = "forward"
-  }
 }
 
 resource "aws_security_group" "load_balancer_security_group" {
@@ -158,6 +246,34 @@ resource "aws_security_group" "load_balancer_security_group" {
 
   ingress {
     protocol    = "tcp"
+    from_port   = 3872
+    to_port     = 3872
+    cidr_blocks = [data.aws_vpc.shared.cidr_block, local.cidr_lz_workspaces]
+  }
+
+  ingress {
+    protocol    = "tcp"
+    from_port   = 3872
+    to_port     = 3872
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    protocol    = "tcp"
+    from_port   = 4903
+    to_port     = 4903
+    cidr_blocks = [data.aws_vpc.shared.cidr_block, local.cidr_lz_workspaces]
+  }
+
+  ingress {
+    protocol    = "tcp"
+    from_port   = 4903
+    to_port     = 4903
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    protocol    = "tcp"
     from_port   = 7102
     to_port     = 7102
     cidr_blocks = [data.aws_vpc.shared.cidr_block, local.cidr_lz_workspaces]
@@ -168,6 +284,13 @@ resource "aws_security_group" "load_balancer_security_group" {
     from_port   = 7803
     to_port     = 7803
     cidr_blocks = [data.aws_vpc.shared.cidr_block, local.cidr_lz_workspaces]
+  }
+
+  ingress {
+    protocol    = "tcp"
+    from_port   = 7803
+    to_port     = 7803
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {

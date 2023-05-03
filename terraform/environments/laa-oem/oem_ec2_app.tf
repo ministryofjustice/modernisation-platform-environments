@@ -1,3 +1,12 @@
+resource "aws_key_pair" "key_pair_app" {
+  key_name   = lower(format("oem-ec2-key-app-%s", local.environment))
+  public_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJB1m1MUEKtff5y6RLEAm2f1v9g7TmqAyrk4svTBeqpK"
+
+  tags = merge(tomap({
+    "Name" = lower(format("ec2-%s-%s-app", local.application_name, local.environment))
+  }), local.tags)
+}
+
 resource "aws_instance" "oem_app" {
   ami                         = data.aws_ami.ec2_laa_oem_development_app.id
   associate_public_ip_address = false
@@ -5,12 +14,12 @@ resource "aws_instance" "oem_app" {
   ebs_optimized               = true
   iam_instance_profile        = aws_iam_instance_profile.iam_instace_profile_oem_base.name
   instance_type               = local.application_data.accounts[local.environment].ec2_oem_instance_type_app
-  key_name                    = local.application_data.accounts[local.environment].key_name
+  key_name                    = aws_key_pair.key_pair_app.id
   monitoring                  = true
-  subnet_id                   = data.aws_subnet.data_subnets_b.id
+  subnet_id                   = data.aws_subnet.data_subnets_a.id
   user_data_replace_on_change = true
   user_data = base64encode(templatefile("./templates/oem-user-data-app.sh", {
-    efs_id   = aws_efs_file_system.oem-app-efs.id
+    efs_fqdn = aws_efs_file_system.oem_app_efs.dns_name
     env_fqdn = "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
     hostname = "laa-oem-app"
   }))
@@ -20,6 +29,7 @@ resource "aws_instance" "oem_app" {
     delete_on_termination = true
     encrypted             = true
     iops                  = 3100
+    kms_key_id            = data.aws_kms_key.ebs_shared.arn
     volume_size           = 12
     volume_type           = "gp3"
   }
@@ -28,7 +38,8 @@ resource "aws_instance" "oem_app" {
     "Name"                 = "${local.application_name}-app-root",
     "volume-attach-host"   = "app",
     "volume-attach-device" = "/dev/sda1",
-    "volume-mount-path"    = "/"
+    "volume-mount-path"    = "/",
+    "volume-backup"        = true
   }), local.tags)
 
   tags = merge(tomap({
@@ -49,6 +60,7 @@ resource "aws_ebs_volume" "oem_app_volume_swap" {
   availability_zone = local.application_data.accounts[local.environment].ec2_zone
   encrypted         = true
   iops              = 3000
+  kms_key_id        = data.aws_kms_key.ebs_shared.arn
   size              = 32
   type              = "gp3"
   depends_on        = [resource.aws_instance.oem_app]
@@ -57,7 +69,8 @@ resource "aws_ebs_volume" "oem_app_volume_swap" {
     "Name"                 = "${local.application_name}-app-swap",
     "volume-attach-host"   = "app",
     "volume-attach-device" = "/dev/sdb",
-    "volume-mount-path"    = "swap"
+    "volume-mount-path"    = "swap",
+    "volume-backup"        = true
   }), local.tags)
 }
 
@@ -71,16 +84,18 @@ resource "aws_ebs_volume" "oem_app_volume_opt_oem_app" {
   availability_zone = local.application_data.accounts[local.environment].ec2_zone
   encrypted         = true
   iops              = 3000
+  kms_key_id        = data.aws_kms_key.ebs_shared.arn
   size              = 50
   snapshot_id       = data.aws_ebs_snapshot.oem_app_volume_opt_oem_app.id
   type              = "gp3"
   depends_on        = [resource.aws_instance.oem_app]
 
   tags = merge(tomap({
-    "Name"                 = "${local.application_name}-app-mnt-oem-app",
+    "Name"                 = "${local.application_name}-app-opt-oem-app",
     "volume-attach-host"   = "app",
     "volume-attach-device" = "/dev/sdc",
-    "volume-mount-path"    = "/opt/oem/app"
+    "volume-mount-path"    = "/opt/oem/app",
+    "volume-backup"        = true
   }), local.tags)
 
   lifecycle {
@@ -100,16 +115,18 @@ resource "aws_ebs_volume" "oem_app_volume_opt_oem_inst" {
   availability_zone = local.application_data.accounts[local.environment].ec2_zone
   encrypted         = true
   iops              = 3000
+  kms_key_id        = data.aws_kms_key.ebs_shared.arn
   size              = 50
   snapshot_id       = data.aws_ebs_snapshot.oem_app_volume_opt_oem_inst.id
   type              = "gp3"
   depends_on        = [resource.aws_instance.oem_app]
 
   tags = merge(tomap({
-    "Name"                 = "${local.application_name}-app-mnt-oem-inst",
+    "Name"                 = "${local.application_name}-app-opt-oem-inst",
     "volume-attach-host"   = "app",
     "volume-attach-device" = "/dev/sdd",
-    "volume-mount-path"    = "/opt/oem/inst"
+    "volume-mount-path"    = "/opt/oem/inst",
+    "volume-backup"        = true
   }), local.tags)
 
   lifecycle {

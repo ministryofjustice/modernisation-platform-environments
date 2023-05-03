@@ -9,12 +9,12 @@
 /terraform/environments/data-platform @ministryofjustice/data-platform-core-infra @ministryofjustice/data-platform-labs @ministryofjustice/data-platform-security-and-auditors @ministryofjustice/data-tech-archs @ministryofjustice/modernisation-platform
 /terraform/environments/delius-core @ministryofjustice/hmpps-migration @ministryofjustice/modernisation-platform
 /terraform/environments/delius-iaps @ministryofjustice/hmpps-migration @ministryofjustice/modernisation-platform
-/terraform/environments/delius-jitbit @ministryofjustice/hmpps-migration @ministryofjustice/modernisation-platform
+/terraform/environments/delius-jitbit @ministryofjustice/hmpps-delius-jitbit-devs @ministryofjustice/hmpps-migration @ministryofjustice/modernisation-platform
 /terraform/environments/digital-prison-reporting @ministryofjustice/hmpps-digital-prison-reporting @ministryofjustice/modernisation-platform
 /terraform/environments/equip @ministryofjustice/modernisation-platform-engineers @ministryofjustice/modernisation-platform
 /terraform/environments/example @ministryofjustice/modernisation-platform @ministryofjustice/modernisation-platform
 /terraform/environments/hmpps-intelligence-management @ministryofjustice/dps-ims-tech @ministryofjustice/modernisation-platform
-/terraform/environments/laa-ccms-infra-azure-ad-sso @ministryofjustice/laa-ccms-devs @ministryofjustice/modernisation-platform-security @ministryofjustice/modernisation-platform
+/terraform/environments/laa-ccms-infra-azure-ad-sso @ministryofjustice/laa-ccms-webops @ministryofjustice/modernisation-platform-security @ministryofjustice/modernisation-platform
 /terraform/environments/laa-oem @ministryofjustice/laa-ccms-migration-team @ministryofjustice/modernisation-platform
 /terraform/environments/long-term-storage @ministryofjustice/modernisation-platform @ministryofjustice/modernisation-platform
 /terraform/environments/maatdb @ministryofjustice/laa-aws-infrastructure @ministryofjustice/modernisation-platform

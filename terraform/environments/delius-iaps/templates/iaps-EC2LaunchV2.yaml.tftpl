@@ -197,3 +197,10 @@ tasks:
       Stop-Service -Name IapsNDeliusInterfaceWinService -Force
       Set-Service -Name IapsNDeliusInterfaceWinService -StartupType Disabled
 %{endif}
+
+  - frequency: once
+    type: powershell
+    runAs: admin
+    content: |-
+        $connectionsXMLTemplateFile = "C:\scripts\connections.xml"
+        (Get-Content $connectionsXMLTemplateFile).replace('[DB_HOST_PLACEHOLDER]', '${delius_iaps_rds_db_address}') | Set-Content $connectionsXMLTemplateFile

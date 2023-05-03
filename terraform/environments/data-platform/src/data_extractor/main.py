@@ -28,7 +28,7 @@ def handler(event, context):
             "application",
             "transform.py",
         )
-        logging.info("Transform filepath: ", transform_file_path)
+        logging.info(f"Transform filepath: {transform_file_path}")
 
         args = {
             "--bucketName": bucket_name,
@@ -38,7 +38,8 @@ def handler(event, context):
         runId = glue.start_job_run(JobName=gluejobname, Arguments=args)
 
         status = glue.get_job_run(JobName=gluejobname, RunId=runId["JobRunId"])
-        logging.info("Job Status : ", status["JobRun"]["JobRunState"])
+        status_for_log = status["JobRun"]["JobRunState"]
+        logging.info(f"Job Status : {status_for_log}")
 
     except Exception as e:
         logging.info(e)

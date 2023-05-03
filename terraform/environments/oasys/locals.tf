@@ -67,17 +67,17 @@ locals {
   ###
   webserver = {
     config = merge(module.baseline_presets.ec2_instance.config.default, {
-      ami_name = "oasys_webserver_release_*"
+      ami_name                  = "oasys_webserver_release_*"
       ssm_parameters_prefix     = "ec2-web/"
       iam_resource_names_prefix = "ec2-web"
     })
     instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-      monitoring             = true
+      monitoring = true
     })
     cloudwatch_metric_alarms = {}
     user_data_cloud_init     = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags
-    autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
-    autoscaling_group = module.baseline_presets.ec2_autoscaling_group
+    autoscaling_schedules    = module.baseline_presets.ec2_autoscaling_schedules.working_hours
+    autoscaling_group        = module.baseline_presets.ec2_autoscaling_group
     lb_target_groups = {
       http-8080 = {
         port                 = 8080
@@ -102,20 +102,20 @@ locals {
     }
     tags = {
       component         = "web"
-      description       = "${local.environment} OASys web"
+      description       = "${local.environment} ${local.application_name} web"
       os-type           = "Linux"
       os-major-version  = 7
       os-version        = "RHEL 7.9"
       "Patch Group"     = "RHEL"
-      server-type       = "oasys-web"
-      description       = "OASys web"
+      server-type       = "${local.application_name}-web"
+      description       = "${local.application_name} web"
       monitored         = true
       oasys-environment = local.environment
       environment-name  = terraform.workspace
       #oracle-db-hostname = "T2ODL0009"
-      oracle-db-sid     = "OASPROD"
+      oracle-db-sid = "OASPROD"
     }
-  } 
+  }
 
   database = {
     config = merge(module.baseline_presets.ec2_instance.config.db, {
@@ -224,18 +224,18 @@ locals {
     lb_target_groups = local.lb_target_groups # This won't be correct for db, will correct later
   }
   database_tags = {
-    component            = "data"
-    oracle-sids          = "OASPROD BIPINFRA"
-    os-type              = "Linux"
-    os-major-version     = 8
-    os-version           = "RHEL 8.5"
-    licence-requirements = "Oracle Database"
-    "Patch Group"        = "RHEL"
-    server-type          = "oasys-db"
-    description          = "${local.environment} OASys database"
-    monitored            = true
-    oasys-environment    = local.environment
-    environment-name     = terraform.workspace # used in provisioning script to select group vars
+    component                               = "data"
+    oracle-sids                             = "OASPROD BIPINFRA"
+    os-type                                 = "Linux"
+    os-major-version                        = 8
+    os-version                              = "RHEL 8.5"
+    licence-requirements                    = "Oracle Database"
+    "Patch Group"                           = "RHEL"
+    server-type                             = "${local.application_name}-db"
+    description                             = "${local.environment} ${local.application_name} database"
+    monitored                               = true
+    "${local.application_name}-environment" = local.environment
+    environment-name                        = terraform.workspace # used in provisioning script to select group vars
   }
 
 

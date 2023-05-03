@@ -9,23 +9,8 @@ locals {
     }]
   ])
 
-  sns_topic_subscriptions_pagerduty_list = flatten([
-    for sns_key, sns_value in var.sns_topics : [
-      for subscription_key, subscription_value in sns_value.subscriptions : {
-        key = "${sns_key}-pagerduty-${subscription_key}"
-        value = merge(subscription_value, {
-          sns_topic_name = sns_key
-          protocol       = "https"
-          endpoint       = "https://events.pagerduty.com/integration/${var.environment.pagerduty_integration_keys[subscription_value]}/enqueue"
-        })
-    }]
-  ])
-
   sns_topic_subscriptions = {
-    for item in concat(
-      local.sns_topic_subscriptions_list,
-      local.sns_topic_subscriptions_pagerduty_list
-    ) : item.key => item.value
+    for item in local.sns_topic_subscriptions_list : item.key => item.value
   }
 }
 

@@ -31,7 +31,7 @@ data "aws_iam_policy_document" "bucket_policy" {
 
   statement {
     principals {
-      type        = "AWS"
+      type = "AWS"
       identifiers = [
         "arn:aws:iam::720459241262:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-developer_58965ce32623df8d"
       ]

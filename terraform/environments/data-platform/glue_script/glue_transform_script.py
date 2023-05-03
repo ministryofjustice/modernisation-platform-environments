@@ -39,7 +39,7 @@ def get_database_name() -> str:
     returns database name from the key of the raw data product
     """
     # database name is the data product name pulled from the key
-    m = re.match("^(raw-data)\/(.*)\/(extraction_timestamp=[0-9]{1,14})\/(.*)$", raw_key)
+    m = re.match("^(raw_data)\/(.*)\/(extraction_timestamp=[0-9]{1,14})\/(.*)$", raw_key)
     if m:
         return m.group(2)
     else:
@@ -65,7 +65,7 @@ def get_curated_path(db_name, table_name) -> str:
     creates path for curated data product
     """
     key_list = os.path.join(
-        "s3://", bucket, raw_key.replace("raw-data", "curated-data")
+        "s3://", bucket, raw_key.replace("raw_data", "curated_data")
     ).split("/")
     out_path = "/".join(key_list[:-2])
     out_path = out_path.replace(db_name, f"database_name={db_name}")
@@ -85,7 +85,7 @@ def does_extraction_timestamp_exist(db_name, table_name, timestamp) -> bool:
     paginator = client.get_paginator("list_objects_v2")
     page_iterator = paginator.paginate(
         Bucket=bucket,
-        Prefix=os.path.join("curated-data", db_path, table_path)
+        Prefix=os.path.join("curated_data", db_path, table_path)
     )
     response = []
     try:
