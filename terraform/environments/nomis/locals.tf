@@ -23,7 +23,7 @@ locals {
       weblogic = local.weblogic_cloudwatch_metric_alarms
       database = local.database_cloudwatch_metric_alarms
       acm = {
-        test2 = {
+        test3 = {
           comparison_operator = "LessThanThreshold"
           evaluation_periods  = "1"
           datapoints_to_alarm = "1"
@@ -42,7 +42,7 @@ locals {
         acm_test = {
           parent_keys = []
           alarms_list = [
-            { key = "acm", name = "test2" },
+            { key = "acm", name = "test3" },
           ]
         }
     })
@@ -63,7 +63,7 @@ locals {
         dso_pagerduty               = contains(["development", "test"], local.environment) ? "nomis_nonprod_alarms" : "nomis_alarms"
         dba_pagerduty               = contains(["development", "test"], local.environment) ? "hmpps_shef_dba_non_prod" : "hmpps_shef_dba_low_priority"
         dba_high_priority_pagerduty = contains(["development", "test"], local.environment) ? "hmpps_shef_dba_non_prod" : "hmpps_shef_dba_high_priority"
-        dba_test                    = "hmpps_shef_dba_low_priority"
+        dba_test                    = "hmpps_shef_dba_high_priority"
       }
     }
   }
