@@ -1,3 +1,7 @@
+###########################################################################################
+#------------------------Comment out file if not required----------------------------------
+###########################################################################################
+
 # Example code to build an RDS database - based on mysql but could be :
 # Amazon Aurora, PostgreSQL, MariaDB, Oracle, MicroSoft SQL Server. These will require the correct version
 # The local.application_data is picked from local but set up in application_variables.json
@@ -66,4 +70,27 @@ data "aws_iam_policy_document" "rds_enhanced_monitoring" {
       identifiers = ["monitoring.rds.amazonaws.com"]
     }
   }
+}
+#
+#tfsec:ignore:aws-ssm-secret-use-customer-key
+resource "aws_secretsmanager_secret" "db_password" {
+  #checkov:skip=CKV_AWS_149
+  name                    = "${var.networking[0].application}-db-password"
+  recovery_window_in_days = 0
+  tags = merge(
+    local.tags,
+    {
+      Name = "${var.networking[0].application}-db-password"
+    },
+  )
+}
+
+resource "aws_secretsmanager_secret_version" "db_password" {
+  secret_id     = aws_secretsmanager_secret.db_password.id
+  secret_string = random_password.random_password.result
+}
+
+resource "random_password" "random_password" {
+  length  = 32
+  special = false
 }
