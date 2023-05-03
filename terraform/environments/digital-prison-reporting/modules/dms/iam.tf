@@ -114,7 +114,7 @@ resource "aws_iam_role_policy" "dmsoperatorpolicy" {
                 "s3:ListObjects"          
             ],
             "Resource": "*"
-        }
+        },
         {
             "Effect": "Allow",
             "Action": [
