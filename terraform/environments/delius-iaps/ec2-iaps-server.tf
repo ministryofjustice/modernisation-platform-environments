@@ -62,7 +62,6 @@ locals {
           delius_iaps_rds_db_address          = aws_db_instance.iaps.address
           ndelius_interface_url               = local.application_data.accounts[local.environment].iaps_ndelius_interface_url
           im_interface_url                    = local.application_data.accounts[local.environment].iaps_im_interface_url
-          im_db_url                           = local.application_data.accounts[local.environment].iaps_im_db_url
 
           # TODO: remove environment variable and related conditional statements
           # temporarily needed to ensure no connections to delius and im are attempted
