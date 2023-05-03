@@ -243,8 +243,9 @@ resource "aws_iam_policy_attachment" "ec2-role-for-ssm" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM"
 }
 
-resource "aws_iam_policy_attachment" "read_list_s3_access_attachment" {
-  name       = "read_list_s3_access_attachment"
-  roles      = [aws_iam_role.kinesis-agent-instance-role.name]
-  policy_arn = var.s3_policy_arn
-}
+# TBC
+#resource "aws_iam_policy_attachment" "read_list_s3_access_attachment" {
+#  name       = "read_list_s3_access_attachment"
+#  roles      = [aws_iam_role.kinesis-agent-instance-role.name]
+#  policy_arn = var.s3_policy_arn
+#}

@@ -28,36 +28,37 @@ data "aws_iam_policy_document" "glue-policy-data" {
   }
 }
 
+# Resuse for all S3 read Only -- TBC
 # S3 Read Only Policy
-resource "aws_iam_policy" "read_s3_read_access_policy" {
-  name = "dpr_s3_read_policy"
-  policy = jsonencode({
-    "Version" : "2012-10-17",
-    "Statement" : [
-      {
-        "Sid" : "AllowUserToSeeBucketListInTheConsole",
-        "Action" : ["s3:ListAllMyBuckets", "s3:GetBucketLocation"],
-        "Effect" : "Allow",
-        "Resource" : ["arn:aws:s3:::*"]
-      },
-      {
-        "Effect" : "Allow",
-        "Action" : [
-          "s3:Get*",
-          "s3:List*"
-        ],
-        "Resource" : [
-          module.s3_glue_job_bucket.bucket_arn,
-          "${module.s3_glue_job_bucket.bucket_arn}/*",
-          module.s3_landing_bucket.bucket_arn,
-          "${module.s3_landing_bucket.bucket_arn}/*",
-          module.s3_working_bucket.bucket_arn,
-          "${module.s3_working_bucket.bucket_arn}/*"                 
-        ]
-      }
-    ]
-  })
-}
+#resource "aws_iam_policy" "read_s3_read_access_policy" {
+#  name = "dpr_s3_read_policy"
+#  policy = jsonencode({
+#    "Version" : "2012-10-17",
+#    "Statement" : [
+#      {
+#        "Sid" : "AllowUserToSeeBucketListInTheConsole",
+#        "Action" : ["s3:ListAllMyBuckets", "s3:GetBucketLocation"],
+#        "Effect" : "Allow",
+#        "Resource" : ["arn:aws:s3:::*"]
+#      },
+#      {
+#        "Effect" : "Allow",
+#        "Action" : [
+#          "s3:List*"
+#          "s3:Get*",
+#        ],
+#        "Resource" : [
+#          module.s3_glue_job_bucket.bucket_arn,
+#          "${module.s3_glue_job_bucket.bucket_arn}/*",
+#          module.s3_landing_bucket.bucket_arn,
+#          "${module.s3_landing_bucket.bucket_arn}/*",
+#          module.s3_working_bucket.bucket_arn,
+#          "${module.s3_working_bucket.bucket_arn}/*"                 
+#        ]
+#      }
+#    ]
+#  })
+#}
 
 ### Iam Role for AWS Redshift
 # Amazon Redshift supports only identity-based policies (IAM policies).

@@ -5,12 +5,13 @@ module "glue_reporting_hub_job" {
   name                          = "${local.project}-reporting-hub-${local.env}"
   description                   = local.description
   command_type                  = "gluestreaming"
+  job_language                  = "scala"
   create_security_configuration = local.create_sec_conf
   temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-reporting-hub-${local.env}/"
   checkpoint_dir                = "s3://${module.s3_glue_job_bucket.bucket_id}/checkpoint/${local.project}-reporting-hub-${local.env}/"
   spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-reporting-hub-${local.env}/"
   # Placeholder Script Location
-  script_location               = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/scripts/digital-prison-reporting-jobs-vLatest.py"
+  script_location               = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/scripts/digital-prison-reporting-jobs-vLatest.scala"
   enable_continuous_log_filter  = false
   project_id                    = local.project
   aws_kms_key                   = local.s3_kms_arn
@@ -63,7 +64,7 @@ module "glue_domain_refresh_job" {
   checkpoint_dir                = "s3://${module.s3_glue_job_bucket.bucket_id}/checkpoint/${local.project}-domain-refresh-${local.env}/"
   spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-domain-refresh-${local.env}/"
   # Placeholder Script Location
-  script_location               = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/scripts/digital-prison-reporting-jobs-vLatest.py"
+  script_location               = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/scripts/digital-prison-reporting-jobs-vLatest.scala"
   enable_continuous_log_filter  = false
   project_id                    = local.project
   aws_kms_key                   = local.s3_kms_arn
