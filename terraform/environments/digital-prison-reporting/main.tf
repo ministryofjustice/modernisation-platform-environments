@@ -1,7 +1,7 @@
 # Glue Cloud Platform Ingestion Job (Load, Reload, CDC)
 module "glue_reporting_hub_job" {
   source                        = "./modules/glue_job"
-  create_job                    = false
+  create_job                    = local.create_job
   name                          = "${local.project}-reporting-hub-${local.env}"
   description                   = local.description
   command_type                  = "gluestreaming"
@@ -53,7 +53,7 @@ module "glue_reporting_hub_job" {
 # Glue Domain Platform Refresh Job
 module "glue_domain_refresh_job" {
   source                        = "./modules/glue_job"
-  create_job                    = false
+  create_job                    = local.create_job
   name                          = "${local.project}-domain-refresh-${local.env}"
   command_type                  = "glueetl"
   description                   = "Monitors the reporting hub for table changes and applies them to domains"
