@@ -19,28 +19,6 @@ resource "aws_iam_role" "kinesis-agent-instance-role" {
 EOF
 }
 
-# DMS
-resource "aws_iam_role" "dms-instance-role" {
-  name = "${var.name}-dms-role"
-  path = "/"
-
-  assume_role_policy = <<EOF
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Action": "sts:AssumeRole",
-            "Principal": {
-               "Service": "ec2.amazonaws.com"
-            },
-            "Effect": "Allow",
-            "Sid": ""
-        }
-    ]
-}
-EOF
-}
-
 ## Kines Data Stream Developer Policy
 resource "aws_iam_policy" "kinesis-data-stream-developer" {
   name        = "${var.name}-developer"
@@ -86,25 +64,6 @@ data "aws_iam_policy_document" "kinesis-cloudwatch-kms" {
     actions = [
       "cloudwatch:PutMetricData",
       "kms:*",
-    ]
-    resources = [
-      "*"
-    ]
-  }
-}
-
-## DMS Policy
-resource "aws_iam_policy" "dms" {
-  name        = "${var.name}-dms-manager"
-  description = "DMS Manager Policy"
-  path        = "/"
-
-  policy = data.aws_iam_policy_document.dms.json
-}
-
-data "aws_iam_policy_document" "dms" {
-  statement {
-    actions = [
       "dms:StartReplicationTask",
       "dms:StopReplicationTask",
       "dms:TestConnection",
@@ -113,7 +72,7 @@ data "aws_iam_policy_document" "dms" {
       "dms:DescribeEndpoints",
       "dms:DescribeEndpointSettings",
       "dms:RebootReplicationInstance",
-      "athena:*",
+      "athena:*",      
     ]
     resources = [
       "*"
@@ -181,11 +140,6 @@ resource "aws_iam_instance_profile" "kinesis-agent-instance-profile" {
   role = aws_iam_role.kinesis-agent-instance-role.name
 }
 
-resource "aws_iam_instance_profile" "dms-instance-profile" {
-  name = "${var.name}-profile"
-  role = aws_iam_role.dms-instance-role.name
-}
-
 resource "aws_iam_role_policy_attachment" "this" {
   role       = aws_iam_role.kinesis-agent-instance-role.name
   policy_arn = aws_iam_policy.kinesis-data-stream-developer.arn
@@ -199,11 +153,6 @@ resource "aws_iam_role_policy_attachment" "glue-access" {
 resource "aws_iam_role_policy_attachment" "cloudwatch-kms" {
   role       = aws_iam_role.kinesis-agent-instance-role.name
   policy_arn = aws_iam_policy.kinesis-cw-kms-developer.arn
-}
-
-resource "aws_iam_role_policy_attachment" "dms" {
-  role       = aws_iam_role.dms-instance-role.name
-  policy_arn = aws_iam_policy.dms.arn
 }
 
 data "aws_iam_policy" "RedshiftAdmin" {
