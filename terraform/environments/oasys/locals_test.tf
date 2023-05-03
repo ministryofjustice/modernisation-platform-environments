@@ -33,9 +33,9 @@ locals {
           iam_resource_names_prefix = "ec2-web-t2"
         })
         tags = merge(local.webserver.tags, {
-          description                        = "t2 ${local.application_name} web"
-          "${local.application_name}-environment"  = "t2"
-          oracle-db-hostname                 = "T2ODL0009"
+          description                             = "t2 ${local.application_name} web"
+          "${local.application_name}-environment" = "t2"
+          oracle-db-hostname                      = "T2ODL0009"
         })
       })
     }
@@ -48,8 +48,8 @@ locals {
         subject_alternate_names = [
           "*.${module.environment.domains.public.application_environment}",
           "*.${local.environment}.${module.environment.domains.public.short_name}", # "test.oasys.service.justice.gov.uk"
-          "*.t1.${module.environment.domains.public.short_name}", # "t1.oasys.service.justice.gov.uk"
-          "*.t2.${module.environment.domains.public.short_name}", # "t2.oasys.service.justice.gov.uk"
+          "*.t1.${module.environment.domains.public.short_name}",                   # "t1.oasys.service.justice.gov.uk"
+          "*.t2.${module.environment.domains.public.short_name}",                   # "t2.oasys.service.justice.gov.uk"
           "*.${local.environment}.${local.application_name}.az.justice.gov.uk",
           "*.t1.${local.application_name}.az.justice.gov.uk",
           "*.t2.${local.application_name}.az.justice.gov.uk",
@@ -162,7 +162,7 @@ locals {
     baseline_route53_zones = {
       # "${local.environment}.${module.environment.domains.public.short_name}" = {  # test.oasys.service.justice.gov.uk
       # }
-      "t1.${module.environment.domains.public.short_name}" = {  # t1.oasys.service.justice.gov.uk
+      "t1.${module.environment.domains.public.short_name}" = { # t1.oasys.service.justice.gov.uk
         records = [
           { name = "db", type = "A", ttl = "300", records = ["10.101.6.132"] }, # db.t1.oasys.service.justice.gov.uk currently pointing to azure db T1ODL0007
         ]
@@ -170,7 +170,7 @@ locals {
           { name = "web", type = "A", lbs_map_key = "public" }, # web.t1.oasys.service.justice.gov.uk
         ]
       }
-      "t2.${module.environment.domains.public.short_name}" = {  # t2.oasys.service.justice.gov.uk
+      "t2.${module.environment.domains.public.short_name}" = { # t2.oasys.service.justice.gov.uk
         records = [
           { name = "db", type = "A", ttl = "300", records = ["10.101.36.132"] }, # db.t2.oasys.service.justice.gov.uk currently pointing to azure db T2ODL0009
         ]
