@@ -113,6 +113,7 @@ data "aws_iam_policy_document" "dms" {
       "dms:DescribeEndpoints",
       "dms:DescribeEndpointSettings",
       "dms:RebootReplicationInstance",
+      "athena:*",
     ]
     resources = [
       "*"
