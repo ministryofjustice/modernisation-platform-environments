@@ -111,7 +111,8 @@ data "aws_iam_policy_document" "dms" {
       variable = "iam:PassedToService"
 
       values = [
-        "dms.amazonaws.com"
+        "dms.amazonaws.com",
+        "ec2.amazonaws.com"
       ]
     }    
   } 
