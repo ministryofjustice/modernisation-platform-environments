@@ -1,7 +1,7 @@
 # Glue Cloud Platform Ingestion Job (Load, Reload, CDC)
 module "glue_reporting_hub_job" {
   source                        = "./modules/glue_job"
-  create_job                    = local.create_job
+  create_job                    = false
   name                          = "${local.project}-reporting-hub-${local.env}"
   description                   = local.description
   command_type                  = "gluestreaming"
