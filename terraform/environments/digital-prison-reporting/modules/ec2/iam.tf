@@ -13,7 +13,15 @@ resource "aws_iam_role" "kinesis-agent-instance-role" {
             },
             "Effect": "Allow",
             "Sid": ""
-        }
+        },
+        {
+            "Action": "sts:AssumeRole",
+            "Principal": {
+               "Service": "dms.amazonaws.com"
+            },
+            "Effect": "Allow",
+            "Sid": ""
+        }        
     ]
 }
 EOF
