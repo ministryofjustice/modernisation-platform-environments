@@ -43,7 +43,7 @@ resource "aws_security_group" "postgresql_db_sc" {
     to_port     = 5432
     protocol    = "tcp"
     description = "Allows Github Actions to access RDS"
-    cidr_blocks = ["${data.http.myip}/32"]
+    cidr_blocks = ["${data.http.myip.response_body}/32"]
   }
   egress {
     description = "allow all outbound traffic"
