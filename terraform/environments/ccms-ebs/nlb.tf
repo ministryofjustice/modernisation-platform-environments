@@ -16,15 +16,9 @@ resource "aws_lb" "ebsapps_nlb" {
   name               = lower(format("nlb-%s-%s-ebs", local.application_name, local.environment))
   internal           = false
   load_balancer_type = "network"
-  
+
   enable_deletion_protection        = true
   enable_cross_zone_load_balancing  = true
-
-  access_logs {
-    bucket  = module.s3-bucket-logging.bucket.id
-    prefix  = local.nlb_log_prefix_ebsapp
-    enabled = true
-  }
 
   subnet_mapping {
     subnet_id     = data.aws_subnets.shared-public.ids[0]
@@ -61,7 +55,7 @@ resource "aws_lb_target_group" "ebsnlb_tg" {
   name        = lower(format("tg-%s-%s-ebsnlb", local.application_name, local.environment))
   target_type = "alb"
   port        = "443"
-  protocol    = "HTTPS"
+  protocol    = "TCP"
   vpc_id      = data.aws_vpc.shared.id
   health_check {
     port     = "443"

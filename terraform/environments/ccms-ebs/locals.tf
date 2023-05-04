@@ -4,7 +4,6 @@ locals {
   logging_bucket_name   = "${local.application_name}-${local.environment}-logging"
   rsync_bucket_name     = "${local.application_name}-${local.environment}-dbbackup"
   lb_log_prefix_ebsapp  = "ebsapps-lb"
-  nlb_log_prefix_ebsapp = "ebsapps-nlb"
   lb_log_prefix_wgate   = "wgate-lb"
 
 
