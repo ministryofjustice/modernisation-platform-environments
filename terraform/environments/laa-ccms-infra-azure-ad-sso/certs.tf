@@ -3,7 +3,7 @@ resource "aws_acm_certificate" "ebs_vision_db_lb_cert" {
   domain_name       = "modernisation-platform.service.justice.gov.uk"
   validation_method = "DNS"
   subject_alternative_names = [
-    format("ebs-vision-db-lb.%s.%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment),
+    format("ebs-vision-db-lb.%s-%s.modernisation-platform.service.justice.gov.uk", var.networking[0].business-unit, local.environment),
   ]
 
   tags = merge(local.tags,
