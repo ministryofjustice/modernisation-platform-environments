@@ -271,6 +271,9 @@ resource "aws_acm_certificate" "cloudfront" {
   validation_method = "DNS"
   provider          = aws.us-east-1
 
+  timeouts {
+    create = "15m"
+  }
 
   subject_alternative_names = var.environment == "production" ? null : [local.domain_name]
 
@@ -491,6 +494,9 @@ resource "aws_acm_certificate" "external_lb" {
   domain_name       = var.acm_cert_domain_name
   validation_method = "DNS"
 
+  timeouts {
+    create = "15m"
+  }
   subject_alternative_names = var.environment == "production" ? null : [local.domain_name]
 
   tags = var.tags
