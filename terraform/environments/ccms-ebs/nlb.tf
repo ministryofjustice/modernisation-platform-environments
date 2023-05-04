@@ -13,12 +13,13 @@ resource "aws_eip" "ebs_eip" {
 # NLB for EBS
 
 resource "aws_lb" "ebsapps_nlb" {
-  name               = lower(format("nlb-%s-%s-ebsapp", local.application_name, local.environment))
+  name               = lower(format("nlb-%s-%s-ebs", local.application_name, local.environment))
   internal           = false
   load_balancer_type = "network"
   subnets            = data.aws_subnets.shared-public.ids
 
-  enable_deletion_protection = true
+  enable_deletion_protection        = true
+  enable_cross_zone_load_balancing  = true
 
   access_logs {
     bucket  = module.s3-bucket-logging.bucket.id
