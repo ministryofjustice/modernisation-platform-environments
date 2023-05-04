@@ -271,10 +271,6 @@ resource "aws_acm_certificate" "cloudfront" {
   validation_method = "DNS"
   provider          = aws.us-east-1
 
-  timeouts {
-    create = "15m"
-  }
-
   subject_alternative_names = var.environment == "production" ? null : [local.domain_name]
 
   tags = var.tags
@@ -494,9 +490,6 @@ resource "aws_acm_certificate" "external_lb" {
   domain_name       = var.acm_cert_domain_name
   validation_method = "DNS"
 
-  timeouts {
-    create = "15m"
-  }
   subject_alternative_names = var.environment == "production" ? null : [local.domain_name]
 
   tags = var.tags
@@ -510,6 +503,10 @@ resource "aws_acm_certificate" "external_lb" {
 resource "aws_acm_certificate_validation" "external" {
   certificate_arn         = aws_acm_certificate.external_lb.arn
   validation_record_fqdns = var.environment != "production" ? [local.domain_name_main[0], local.domain_name_sub[0]] : [local.domain_name_main[0]]
+
+  timeouts {
+    create = "10m"
+  }
 
   # TODO Set prevent_destroy to true to stop Terraform destroying this resource in the future if required
   lifecycle {
