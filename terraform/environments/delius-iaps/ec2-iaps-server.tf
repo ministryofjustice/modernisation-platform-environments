@@ -233,7 +233,6 @@ resource "aws_iam_policy" "ssm_least_privilege_policy" {
 module "ec2_iaps_server" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-autoscaling-group?ref=v1.2.1"
 
-
   providers = {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
   }
@@ -256,6 +255,8 @@ module "ec2_iaps_server" {
   subnet_ids                = data.aws_subnets.shared-private.ids
   tags                      = local.ec2_tags
   account_ids_lookup        = local.environment_management.account_ids
+
+  depends_on = [aws_kms_grant.image-builder-shared-hmpps-ebs-cmk-grant]
 }
 
 ##
