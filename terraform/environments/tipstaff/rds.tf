@@ -45,6 +45,13 @@ resource "aws_security_group" "postgresql_db_sc" {
     description = "Allows Github Actions to access RDS"
     cidr_blocks = ["${jsondecode(data.http.myip.response_body)["ip"]}/32"]
   }
+  ingress {
+    from_port       = 5432
+    to_port         = 5432
+    protocol        = "tcp"
+    description     = "Allows DMS to access RDS"
+    security_groups = [aws_security_group.modernisation_dms_access.id]
+  }
   egress {
     description = "allow all outbound traffic"
     from_port   = 0
