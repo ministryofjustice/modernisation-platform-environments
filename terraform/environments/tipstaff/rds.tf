@@ -50,7 +50,7 @@ resource "aws_security_group" "postgresql_db_sc" {
     to_port         = 5432
     protocol        = "tcp"
     description     = "Allows DMS to access RDS"
-    security_groups = [aws_security_group.modernisation_dms_access.id]
+    security_groups = [aws_security_group.vpc_dms_replication_instance_group.id]
   }
   egress {
     description = "allow all outbound traffic"
