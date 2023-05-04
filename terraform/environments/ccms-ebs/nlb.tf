@@ -1,12 +1,16 @@
 # Elastic IPs for NLB
 
 resource "aws_eip" "ebs_eip" {
-  count    = 3
+  count    = local.is-production ? 6 : 3 
   vpc      = true
+
+  lifecycle {
+    prevent_destroy = true
+  }
 
   tags = merge(local.tags,
     { Name = lower(format("lb-%s-%s-eip-${count.index+1}", local.application_name, local.environment)) }
-  )  
+  )
 }
 
 
