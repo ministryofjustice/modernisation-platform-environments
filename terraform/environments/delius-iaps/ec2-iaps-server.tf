@@ -75,6 +75,7 @@ locals {
       max_size         = 1
       min_size         = 1
       force_delete     = true
+      wait_for_capacity_timeout = "15m"
     }
 
     iam_policies = [
@@ -230,7 +231,7 @@ resource "aws_iam_policy" "ssm_least_privilege_policy" {
 # Resources - Create ASG and launch template using module
 ##
 module "ec2_iaps_server" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-autoscaling-group?ref=v1.2.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-autoscaling-group?ref=v1.2.1"
 
 
   providers = {
