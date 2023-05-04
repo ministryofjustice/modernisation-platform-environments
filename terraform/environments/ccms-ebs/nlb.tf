@@ -16,8 +16,7 @@ resource "aws_lb" "ebsapps_nlb" {
   name               = lower(format("nlb-%s-%s-ebs", local.application_name, local.environment))
   internal           = false
   load_balancer_type = "network"
-  subnets            = data.aws_subnets.shared-public.ids
-
+  
   enable_deletion_protection        = true
   enable_cross_zone_load_balancing  = true
 
@@ -54,15 +53,16 @@ resource "aws_lb_listener" "ebsnlb_listener" {
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.ebsnlb_tg.id
+    target_group_arn = aws_lb_target_group.ebsnlb_tg.arn
   }
 }
 
 resource "aws_lb_target_group" "ebsnlb_tg" {
-  name     = lower(format("tg-%s-%s-ebsnlb", local.application_name, local.environment))
-  port     = "443"
-  protocol = "HTTPS"
-  vpc_id   = data.aws_vpc.shared.id
+  name        = lower(format("tg-%s-%s-ebsnlb", local.application_name, local.environment))
+  target_type = "alb"
+  port        = "443"
+  protocol    = "HTTPS"
+  vpc_id      = data.aws_vpc.shared.id
   health_check {
     port     = "443"
     protocol = "HTTPS"
@@ -71,7 +71,7 @@ resource "aws_lb_target_group" "ebsnlb_tg" {
 
 resource "aws_lb_target_group_attachment" "ebsnlb" {
   target_group_arn = aws_lb_target_group.ebsnlb_tg.arn
-  target_id        = aws_lb.ebsapps_lb.arn
+  target_id        = aws_lb.ebsapps_lb.id
   port             = "443"
 }
 
