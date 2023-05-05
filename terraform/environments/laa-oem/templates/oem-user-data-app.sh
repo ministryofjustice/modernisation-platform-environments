@@ -17,16 +17,9 @@ useradd -g oinstall applmgr
 # /opt/oem/inst       50    gp3 3000 /dev/sdd
 # /opt/oem/backups    EFS
 
-# 2023-03-08 - snapshots of volumes:
-# vol_snap_app_app  = "snap-0345307239f01c8ab"
-# vol_snap_app_inst = "snap-09f32d294decca5ca"
-# vol_snap_db_app   = "snap-0abed8d20d4ad01d4"
-# vol_snap_db_inst  = "snap-0bc2bc6b4d11534aa"
-# vol_snap_db_dbf   = "snap-0611d48ac056efe54"
-# vol_snap_db_redo  = "snap-0cf269973426fa7c0"
-# vol_snap_db_arch  = "snap-02b71be8ef196aebc"
-
-FSTAB=/etc/fstab
+EFSTAB=/etc/fstab
+EHOSTS=/etc/hosts
+ERCONF=/etc/resolv.conf
 MOUNT_DIR=/opt
 
 declare -A MOUNTS=(
@@ -65,13 +58,13 @@ for M in $${!MOUNTS[@]}; do
             swapoff -a
             mkswap -L $${L} $${M}
             swapon -L $${L}
-            echo "LABEL=$${L} swap swap defaults 0 0" >> $${FSTAB}
+#           echo "LABEL=$${L} swap swap defaults 0 0" >> $${EFSTAB}
         else
             FS_DIR=$${MOUNT_DIR}/oem/$${L,,}
             if [[ ! $(mount -t ext4,xfs |grep "$${FS_DIR}") ]]; then
                 mkdir -p $${FS_DIR}
 #               yes |mkfs.ext4 -qL $${L} $${M} # We are using snapshots now, so don't erase the volume.
-                echo "LABEL=$${L} $${FS_DIR} ext4 defaults 0 0" >> $${FSTAB}
+                echo "LABEL=$${L} $${FS_DIR} ext4 defaults 0 0" >> $${EFSTAB}
                 mount -L $${L}
             else
                 echo "$${FS_DIR} is already mounted:"
@@ -88,12 +81,17 @@ chown -R oracle:dba $${MOUNT_DIR}
 FS_DIR=$${MOUNT_DIR}/oem/backups
 mkdir -p $${FS_DIR}
 chmod go+rw $${FS_DIR}
-mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport ${efs_id}.efs.eu-west-2.amazonaws.com:/ $${FS_DIR}
-echo "${efs_id}.efs.eu-west-2.amazonaws.com:/ $${FS_DIR} nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport 0 0" >> $${FSTAB}
+grep -v '/opt/oem/backups' $${EFSTAB} > $${EFSTAB}.new
+echo "${efs_fqdn}:/ $${FS_DIR} nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport 0 0" >> $${EFSTAB}.new
+mv $${EFSTAB}.new $${EFSTAB}
+mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport ${efs_fqdn}:/ $${FS_DIR}
 
-# Set hostname
 hostnamectl set-hostname ${hostname}
 
-# Update /etc/hosts
 H=$(curl -s 'http://169.254.169.254/latest/meta-data/local-ipv4')
-echo "$${H} ${hostname} ${hostname}.${env_fqdn}" >> /etc/hosts
+echo "127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+::1         localhost localhost.localdomain localhost6 localhost6.localdomain6" > $${EHOSTS}.new
+echo "$${H} ${hostname} ${hostname}.${env_fqdn}" >> $${EHOSTS}.new
+mv $${EHOSTS}.new $${EHOSTS}
+
+sed -i "s/^search .*/search ${env_fqdn}/" $${ERCONF}

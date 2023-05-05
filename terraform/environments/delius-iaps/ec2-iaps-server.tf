@@ -62,7 +62,6 @@ locals {
           delius_iaps_rds_db_address          = aws_db_instance.iaps.address
           ndelius_interface_url               = local.application_data.accounts[local.environment].iaps_ndelius_interface_url
           im_interface_url                    = local.application_data.accounts[local.environment].iaps_im_interface_url
-          im_db_url                           = local.application_data.accounts[local.environment].iaps_im_db_url
 
           # TODO: remove environment variable and related conditional statements
           # temporarily needed to ensure no connections to delius and im are attempted
@@ -76,6 +75,7 @@ locals {
       max_size         = 1
       min_size         = 1
       force_delete     = true
+      wait_for_capacity_timeout = "15m"
     }
 
     iam_policies = [
@@ -231,8 +231,7 @@ resource "aws_iam_policy" "ssm_least_privilege_policy" {
 # Resources - Create ASG and launch template using module
 ##
 module "ec2_iaps_server" {
-  source = "../../modules/ec2_autoscaling_group"
-
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-autoscaling-group?ref=v1.2.1"
 
   providers = {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
@@ -253,9 +252,11 @@ module "ec2_iaps_server" {
   instance_profile_policies = local.iaps_server.iam_policies
   application_name          = local.application_name
   region                    = data.aws_region.current.name
-  subnet_ids                = data.aws_subnets.private-public.ids
+  subnet_ids                = data.aws_subnets.shared-private.ids
   tags                      = local.ec2_tags
   account_ids_lookup        = local.environment_management.account_ids
+
+  depends_on = [aws_kms_grant.image-builder-shared-hmpps-ebs-cmk-grant]
 }
 
 ##

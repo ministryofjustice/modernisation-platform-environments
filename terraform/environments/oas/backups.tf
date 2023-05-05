@@ -1,5 +1,5 @@
 resource "aws_backup_vault" "default_oas" {
-  name =  "${local.application_name}-backup-vault"
+  name = "${local.application_name}-backup-vault"
   tags = merge(
     local.tags,
     { "Name" = "${local.application_name}-backup-vault" },

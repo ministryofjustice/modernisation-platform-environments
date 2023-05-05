@@ -128,3 +128,11 @@ data "aws_iam_policy_document" "s3_topic_policy" {
     }
   }
 }
+
+## PROD CERT
+data "aws_route53_zone" "application-zone" {
+  provider = aws.core-network-services
+
+  name         = "ccms-ebs.service.justice.gov.uk."
+  private_zone = false
+}

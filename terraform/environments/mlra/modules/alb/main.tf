@@ -27,14 +27,26 @@ locals {
     }
   }
 
-  domain_name_main   = [for k, v in local.domain_types : v.name if k == "modernisation-platform.service.justice.gov.uk"]
-  domain_name_sub    = [for k, v in local.domain_types : v.name if k != "modernisation-platform.service.justice.gov.uk"]
-  domain_record_main = [for k, v in local.domain_types : v.record if k == "modernisation-platform.service.justice.gov.uk"]
-  domain_record_sub  = [for k, v in local.domain_types : v.record if k != "modernisation-platform.service.justice.gov.uk"]
-  domain_type_main   = [for k, v in local.domain_types : v.type if k == "modernisation-platform.service.justice.gov.uk"]
-  domain_type_sub    = [for k, v in local.domain_types : v.type if k != "modernisation-platform.service.justice.gov.uk"]
+  # domain_name_main   = [for k, v in local.domain_types : v.name if k == "modernisation-platform.service.justice.gov.uk"]
+  # domain_name_sub    = [for k, v in local.domain_types : v.name if k != "modernisation-platform.service.justice.gov.uk"]
+  # domain_record_main = [for k, v in local.domain_types : v.record if k == "modernisation-platform.service.justice.gov.uk"]
+  # domain_record_sub  = [for k, v in local.domain_types : v.record if k != "modernisation-platform.service.justice.gov.uk"]
+  # domain_type_main   = [for k, v in local.domain_types : v.type if k == "modernisation-platform.service.justice.gov.uk"]
+  # domain_type_sub    = [for k, v in local.domain_types : v.type if k != "modernisation-platform.service.justice.gov.uk"]
 
-  domain_name   = "${var.application_name}.${var.business_unit}-${var.environment}.modernisation-platform.service.justice.gov.uk"
+
+
+  domain_name_main   = [for k, v in local.domain_types : v.name if k == var.acm_cert_domain_name]
+  domain_name_sub    = [for k, v in local.domain_types : v.name if k != var.acm_cert_domain_name]
+  domain_record_main = [for k, v in local.domain_types : v.record if k == var.acm_cert_domain_name]
+  domain_record_sub  = [for k, v in local.domain_types : v.record if k != var.acm_cert_domain_name]
+  domain_type_main   = [for k, v in local.domain_types : v.type if k == var.acm_cert_domain_name]
+  domain_type_sub    = [for k, v in local.domain_types : v.type if k != var.acm_cert_domain_name]
+
+  domain_name   = var.environment != "production" ? "${var.application_name}.${var.business_unit}-${var.environment}.${var.acm_cert_domain_name}" : "${var.application_name}.${var.acm_cert_domain_name}"
+
+  # domain_name   = "${var.application_name}.${var.business_unit}-${var.environment}.modernisation-platform.service.justice.gov.uk"
+ 
   ip_set_list   = [for ip in split("\n", chomp(file("${path.module}/waf_ip_set.txt"))) : ip]
   custom_header = "X-Custom-Header-LAA-${upper(var.application_name)}"
 
@@ -57,11 +69,12 @@ data "aws_ec2_managed_prefix_list" "cloudfront" {
 
 module "s3-bucket" {
   count  = var.existing_bucket_name == "" ? 1 : 0
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.2.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.4.0"
 
   providers = {
     aws.bucket-replication = aws.bucket-replication
   }
+
   bucket_prefix       = "${var.application_name}-lb-access-logs"
   bucket_policy       = [data.aws_iam_policy_document.bucket_policy.json]
   replication_enabled = false
@@ -258,7 +271,6 @@ resource "aws_acm_certificate" "cloudfront" {
   validation_method = "DNS"
   provider          = aws.us-east-1
 
-
   subject_alternative_names = var.environment == "production" ? null : [local.domain_name]
 
   tags = var.tags
@@ -282,6 +294,13 @@ resource "aws_s3_bucket" "cloudfront" { # Mirroring laa-cloudfront-logging-devel
   # TODO Set prevent_destroy to true to stop Terraform destroying this resource in the future if required
   lifecycle {
     prevent_destroy = false
+  }
+}
+
+resource "aws_s3_bucket_ownership_controls" "cloudfront" {
+  bucket = aws_s3_bucket.cloudfront.id
+  rule {
+    object_ownership = "BucketOwnerPreferred"
   }
 }
 
@@ -483,7 +502,11 @@ resource "aws_acm_certificate" "external_lb" {
 
 resource "aws_acm_certificate_validation" "external" {
   certificate_arn         = aws_acm_certificate.external_lb.arn
-  validation_record_fqdns = [local.domain_name_main[0], local.domain_name_sub[0]]
+  validation_record_fqdns = var.environment != "production" ? [local.domain_name_main[0], local.domain_name_sub[0]] : [local.domain_name_main[0]]
+
+  timeouts {
+    create = "10m"
+  }
 
   # TODO Set prevent_destroy to true to stop Terraform destroying this resource in the future if required
   lifecycle {

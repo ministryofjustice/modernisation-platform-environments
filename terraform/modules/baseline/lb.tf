@@ -17,7 +17,7 @@ locals {
 module "lb" {
   for_each = var.lbs
 
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer.git?ref=v2.1.2"
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer.git?ref=v2.1.3"
 
   providers = {
     aws.bucket-replication = aws
@@ -38,16 +38,16 @@ module "lb" {
   region         = var.environment.region
   vpc_all        = var.environment.vpc_name
   tags           = merge(local.tags, each.value.tags)
+
+  depends_on = [
+    module.ec2_autoscaling_group, # ensure ASG target groups are created first
+  ]
 }
 
 module "lb_listener" {
   for_each = local.lb_listeners
 
   source = "../../modules/lb_listener"
-
-  providers = {
-    aws.core-vpc = aws.core-vpc
-  }
 
   name                      = each.key
   business_unit             = var.environment.business_unit
@@ -62,13 +62,6 @@ module "lb_listener" {
   default_action            = each.value.default_action
   rules                     = each.value.rules
 
-  route53_records = {
-    for key, value in each.value.route53_records : key => merge(value, {
-      account = local.route53_zones[value.zone_name].provider
-      zone_id = local.route53_zones[value.zone_name].zone_id
-    })
-  }
-
   cloudwatch_metric_alarms = {
     for key, value in each.value.cloudwatch_metric_alarms : key => merge(value, {
       alarm_actions = [
@@ -77,12 +70,10 @@ module "lb_listener" {
     })
   }
 
-  replace = each.value.replace
-  tags    = merge(local.tags, each.value.tags)
+  tags = merge(local.tags, each.value.tags)
 
   depends_on = [
-    module.acm_certificate,       # ensure certs are created first
-    module.ec2_autoscaling_group, # ensure ASG target groups are created first
+    module.acm_certificate, # ensure certs are created first
   ]
 
   alarm_target_group_names = each.value.alarm_target_group_names

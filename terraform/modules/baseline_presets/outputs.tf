@@ -109,27 +109,10 @@ output "s3_iam_policies" {
 
 output "s3_buckets" {
   description = "Map of s3_buckets"
-  value = local.s3_buckets
+  value       = local.s3_buckets
 }
 
-# Use var.options.sns_topics_pagerduty_integrations to control, where
-# the map key is the sns_topic name and value is the index to use in
-# the modernisation platform managed pagerduty_integration_keys
-# secret,  e.g.
-# var.options.sns_topics_pagerduty_integrations = {
-#   critical     = nomis_alarms
-#   non-critical = nomis_nonprod_alarms
-# }
 output "sns_topics" {
   description = "Map of sns_topics to create depending on options provided"
-
-  value = {
-    for key, value in var.options.sns_topics_pagerduty_integrations : key => {
-      display_name      = "Pager duty integration for ${value}"
-      kms_master_key_id = "general"
-      subscriptions_pagerduty = {
-        value = {}
-      }
-    }
-  }
+  value       = local.sns_topics
 }

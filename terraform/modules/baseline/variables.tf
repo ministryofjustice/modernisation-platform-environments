@@ -7,6 +7,7 @@ variable "acm_certificates" {
       account   = optional(string, "self")
       zone_name = string
     })), {})
+    external_validation_records_created = optional(bool, false)
     cloudwatch_metric_alarms = optional(map(object({
       comparison_operator = string
       evaluation_periods  = number
@@ -520,10 +521,6 @@ variable "lbs" {
           }))
         }))
       })), {})
-      route53_records = optional(map(object({
-        zone_name              = string
-        evaluate_target_health = optional(bool, false)
-      })), {})
       cloudwatch_metric_alarms = optional(map(object({
         comparison_operator = string
         evaluation_periods  = number
@@ -539,14 +536,6 @@ variable "lbs" {
         treat_missing_data  = optional(string, "missing")
         dimensions          = optional(map(string), {})
       })), {})
-      replace = optional(object({
-        target_group_name_match       = optional(string, "$(name)")
-        target_group_name_replace     = optional(string, "")
-        condition_host_header_match   = optional(string, "$(name)")
-        condition_host_header_replace = optional(string, "")
-        route53_record_name_match     = optional(string, "$(name)")
-        route53_record_name_replace   = optional(string, "")
-      }), {})
       tags = optional(map(string), {})
     })), {})
   }))
@@ -725,9 +714,6 @@ variable "sns_topics" {
       endpoint      = string
       filter_policy = optional(string)
     })), {})
-    subscriptions_pagerduty = optional(map(object({ # map key is the name of the pagerduty integration key
-      filter_policy = optional(string)
-    })), {})
   }))
   default = {}
 }
@@ -736,4 +722,10 @@ variable "tags" {
   description = "Any additional tags to apply to all resources, in addition to those provided by environment module"
   type        = map(string)
   default     = {}
+}
+
+variable "resource_explorer" {
+  description = "Enables AWS Resource Explorer"
+  type        = bool
+  default     = false
 }

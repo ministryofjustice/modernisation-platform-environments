@@ -1,7 +1,7 @@
 #### This file can be used to store locals specific to the member account ####
 
 locals {
-  application_test_url = "https://mlra.dev.legalservices.gov.uk"
+  application_test_url = "https://mlra.laa-development.modernisation-platform.service.justice.gov.uk/mlra/"
 
   # ECS local variables for ecs.tf
   ec2_ingress_rules = {

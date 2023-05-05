@@ -1,10 +1,10 @@
 locals {
 
   # The security group rules variable matches the inline syntax for rules, see
-  # aws_security_group terraform documentation.  We create individual rules here 
+  # aws_security_group terraform documentation.  We create individual rules here
   # for more flexibility, e.g. so we can define dependencies between security
   # groups, and additional rules can be added elsewhere.
-  # Unfortunately, the individual aws_security_group_rule doesn't allow combined 
+  # Unfortunately, the individual aws_security_group_rule doesn't allow combined
   # self/cidr/security_groups to we split them out here.
 
   # flatten security group rules
@@ -84,6 +84,8 @@ locals {
 
 resource "aws_security_group" "this" {
   for_each = var.security_groups
+
+  #checkov:skip=CKV2_AWS_5:skip "Ensure that Security Groups are attached to another resource" since they are attached elsewhere
 
   name        = each.key
   description = each.value.description

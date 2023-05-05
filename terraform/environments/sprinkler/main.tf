@@ -156,7 +156,7 @@ resource "aws_ecs_service" "app" {
   desired_count                     = "1"
   health_check_grace_period_seconds = "120"
   network_configuration {
-    subnets          = data.aws_subnets.private-public.ids
+    subnets          = data.aws_subnets.shared-private.ids
     security_groups  = [aws_security_group.app.id]
     assign_public_ip = false
   }
@@ -583,7 +583,7 @@ resource "aws_lb" "inner" {
   internal                   = true
   load_balancer_type         = "application"
   security_groups            = [aws_security_group.inner_lb.id]
-  subnets                    = data.aws_subnets.private-public.ids
+  subnets                    = data.aws_subnets.shared-private.ids
   enable_deletion_protection = false
 
   tags = merge(
@@ -814,7 +814,7 @@ resource "aws_cloudwatch_log_group" "app" {
 }
 
 resource "aws_acm_certificate" "us_east_1_test" {
-  domain_name       = "test.platforms-development.modernisation-platform.service.justice.gov.uk"
+  domain_name       = "test.modernisation-platform.service.justice.gov.uk"
   validation_method = "DNS"
   provider          = aws.us-east-1
 

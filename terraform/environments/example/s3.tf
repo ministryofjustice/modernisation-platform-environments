@@ -1,13 +1,16 @@
+###########################################################################################
+#------------------------Comment out file if not required----------------------------------
+###########################################################################################
+
 #------------------------------------------------------------------------------
 # S3 Bucket
 #------------------------------------------------------------------------------
 module "s3-bucket" { #tfsec:ignore:aws-s3-enable-versioning
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.3.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.4.0"
 
   bucket_prefix      = "s3-bucket-example"
   versioning_enabled = false
   bucket_policy      = [data.aws_iam_policy_document.bucket_policy.json]
-
   # Enable bucket to be destroyed when not empty
   force_destroy = true
   # Refer to the below section "Replication" before enabling replication
@@ -121,3 +124,23 @@ data "aws_iam_policy_document" "bucket_policy" {
     ]
   }
 }
+
+data "aws_iam_policy_document" "s3-access-policy" {
+  version = "2012-10-17"
+  statement {
+    sid    = ""
+    effect = "Allow"
+    actions = [
+      "sts:AssumeRole",
+    ]
+    principals {
+      type = "Service"
+      identifiers = [
+        "rds.amazonaws.com",
+        "ec2.amazonaws.com",
+      ]
+    }
+  }
+}
+
+data "aws_elb_service_account" "default" {}
