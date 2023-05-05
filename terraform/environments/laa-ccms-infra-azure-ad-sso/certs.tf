@@ -14,26 +14,6 @@ resource "aws_acm_certificate" "ebs_vision_db_lb_cert" {
   }
 }
 
-# Route 53 Certificate Validation Record
-resource "aws_route53_record" "ebs_vision_db_lb_cert_validation_record" {
-
-  provider        = aws.core-network-services
-  allow_overwrite = true
-
-  for_each = {
-    for dvo in aws_acm_certificate.ebs_vision_db_lb_cert.domain_validation_options : dvo.domain_name => {
-      name   = dvo.resource_record_name
-      record = dvo.resource_record_value
-      type   = dvo.resource_record_type
-    }
-  }
-  name    = each.value.name
-  records = [each.value.record]
-  ttl     = 60
-  zone_id = data.aws_route53_zone.external.zone_id
-  type    = each.value.type
-}
-
 # Certificate Validation
 resource "aws_acm_certificate_validation" "ebs_vision_db_lb_cert_validation" {
   certificate_arn         = aws_acm_certificate.ebs_vision_db_lb_cert.arn
@@ -43,6 +23,28 @@ resource "aws_acm_certificate_validation" "ebs_vision_db_lb_cert_validation" {
     create = "15m"
   }
 }
+
+# Route 53 Certificate Validation Record
+resource "aws_route53_record" "ebs_vision_db_lb_cert_validation_record" {
+
+
+
+  for_each = {
+    for dvo in aws_acm_certificate.ebs_vision_db_lb_cert.domain_validation_options : dvo.domain_name => {
+      name   = dvo.resource_record_name
+      record = dvo.resource_record_value
+      type   = dvo.resource_record_type
+    }
+  }
+  allow_overwrite = true
+  name            = each.value.name
+  records         = [each.value.record]
+  ttl             = 60
+  zone_id         = data.aws_route53_zone.network-services.zone_id
+  type            = each.value.type
+}
+
+
 
 
 # Route53 DNS data
