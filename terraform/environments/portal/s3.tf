@@ -3,7 +3,7 @@ module "s3_bucket_archive" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.4.0"
 
   providers = {
-    aws.bucket-replication = aws.bucket-replication
+    aws.bucket-replication = aws
   }
 
   bucket_name         = "laa-${local.application_name}-${local.environment}-archive-mp" # Added suffix -mp to the name as it must be unique from the existing bucket in LZ
