@@ -442,7 +442,7 @@
       "protocol": "TCP"
     }
   },
-  "ec2_sg_ftp_egress_rules": {
+  "ec2_sg_mailrelay_egress_rules": {
     "SSH_22": {
       "from_port": 22,
       "to_port": 22,
