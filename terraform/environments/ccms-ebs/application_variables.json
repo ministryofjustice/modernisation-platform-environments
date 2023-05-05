@@ -268,7 +268,7 @@
     },
     "TCP_800x": {
       "from_port": 8000,
-      "to_port": 8001,
+      "to_port": 8005,
       "protocol": "TCP",
       "destination_cidr": "10.200.0.0/20"
     },
@@ -342,7 +342,7 @@
     },
     "TCP_800x": {
       "from_port": 8000,
-      "to_port": 8001,
+      "to_port": 8005,
       "protocol": "TCP",
       "destination_cidr": "0.0.0.0/0"
     },
