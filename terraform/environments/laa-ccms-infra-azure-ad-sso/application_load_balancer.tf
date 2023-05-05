@@ -6,7 +6,7 @@ resource "aws_lb" "ebs_vision_db_lb" {
   internal           = true
   load_balancer_type = "application"
   security_groups    = [aws_security_group.sg_ebs_vision_db_lb.id]
-  subnets            = data.aws_subnets.private-public.ids
+  subnets            = data.aws_subnets.shared-private.ids
 
   enable_deletion_protection = false
 
