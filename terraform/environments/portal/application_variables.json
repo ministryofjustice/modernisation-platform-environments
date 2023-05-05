@@ -1,7 +1,8 @@
 {
   "accounts": {
     "development": {
-      "example_var": "dev-data"
+      "example_var": "dev-data",
+      "existing_archive_bucket_name": ""
     },
     "test": {
       "example_var": "test-data"
