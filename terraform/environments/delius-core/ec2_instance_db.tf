@@ -34,7 +34,7 @@ resource "aws_iam_role" "base_ami_test_instance_iam_role" {
   )
 }
 
-resource "aws_iam_role_policy_attachment" "base_ami_test_instance_AmazonSSMMaagedInstanceCore" {
+resource "aws_iam_role_policy_attachment" "base_ami_test_instance_amazonssmmanagedinstancecore" {
   role       = aws_iam_role.base_ami_test_instance_iam_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
