@@ -126,14 +126,16 @@ data "aws_iam_policy_document" "extra-policy-document" {
   }
   statement {
     actions = [
-      "kms:Decrypt",
-      "kms:GenerateDataKey*",
-      "kms:DescribeKey"    
+    "kms:Encrypt",
+    "kms:Decrypt",
+    "kms:ReEncrypt*",
+    "kms:GenerateDataKey*",
+    "kms:DescribeKey"  
     ]
   resources = [
-      "arn:aws:kms:${var.region}:${var.account}:alias/dpr-*"
+      "arn:aws:kms:*:${var.account}:alias/dpr-*" # Region to Wild card
     ]
-  }  
+  }
   statement {
     actions = [
       "dynamodb:BatchGet*",
