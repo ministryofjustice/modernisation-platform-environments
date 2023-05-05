@@ -126,10 +126,14 @@ data "aws_iam_policy_document" "extra-policy-document" {
   }
   statement {
     actions = [
-      "kms:*"
+    "kms:Encrypt*",
+    "kms:Decrypt*",
+    "kms:ReEncrypt*",
+    "kms:GenerateDataKey*",
+    "kms:DescribeKey"  
     ]
   resources = [
-      "*"
+      "arn:aws:kms:*:${var.account}:key/*"
     ]
   }
   statement {
