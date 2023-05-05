@@ -59,25 +59,25 @@ resource "aws_iam_instance_profile" "base_ami_test_instance_profile" {
 resource "aws_instance" "base_ami_test_instance" {
   #checkov:skip=CKV2_AWS_41:"IAM role is not implemented for this example EC2. SSH/AWS keys are not used either."
   # Specify the instance type and ami to be used (this is the Amazon free tier option)
-  instance_type               = "t2.micro"
+  instance_type               = "t2.small"
   ami                         = "ami-04074b470fd99b34e"
   vpc_security_group_ids      = [aws_security_group.base_ami_test_instance_sg.id]
   subnet_id                   = data.aws_subnet.private_subnets_a.id
   iam_instance_profile        = aws_iam_instance_profile.base_ami_test_instance_profile.name
   associate_public_ip_address = false
   monitoring                  = false
-  ebs_optimized               = true
+  ebs_optimized               = false
 
   metadata_options {
     http_endpoint = "enabled"
     http_tokens   = "required"
   }
   # Increase the volume size of the root volume
-  root_block_device {
-    volume_type = "gp3"
-    volume_size = 30
-    encrypted   = true
-  }
+  # root_block_device {
+  #   volume_type = "gp3"
+  #   volume_size = 30
+  #   encrypted   = true
+  # }
   tags = merge(local.tags,
     { Name = lower(format("ec2-%s-%s-base-ami-test-instance", local.application_name, local.environment)) }
   )
