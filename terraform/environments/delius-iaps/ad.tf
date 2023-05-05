@@ -23,7 +23,7 @@ resource "aws_directory_service_directory" "active_directory" {
 
   vpc_settings {
     vpc_id     = data.aws_vpc.shared.id
-    subnet_ids = slice(data.aws_subnets.private-public.ids, 0, 2) # Retrieve the first 2 subnet ids - must be 2 because 2 DCs are created
+    subnet_ids = slice(data.aws_subnets.shared-private.ids, 0, 2) # Retrieve the first 2 subnet ids - must be 2 because 2 DCs are created
   }
 
   tags = merge(
@@ -113,7 +113,7 @@ resource "aws_route53_resolver_endpoint" "resolve_local_entries_using_ad_dns" {
     aws_security_group.iaps_ad_dns_resolver_security_group.id
   ]
   dynamic "ip_address" {
-    for_each = data.aws_subnets.private-public.ids
+    for_each = data.aws_subnets.shared-private.ids
     content {
       subnet_id = ip_address.value
     }
