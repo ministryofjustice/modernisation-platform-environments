@@ -30,7 +30,7 @@ resource "aws_route53_record" "ebs_vision_db_lb_cert_validation_record" {
   name    = each.value.name
   records = [each.value.record]
   ttl     = 60
-  zone_id = data.aws_route53_zone.network-services.zone_id
+  zone_id = data.aws_route53_zone.external.zone_id
   type    = each.value.type
 }
 
@@ -43,6 +43,33 @@ resource "aws_acm_certificate_validation" "ebs_vision_db_lb_cert_validation" {
     create = "15m"
   }
 }
+
+
+# Route53 DNS data
+#data "aws_route53_zone" "external" {
+#  provider = aws.core-vpc
+#
+#  name         = "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk."
+#  private_zone = false
+#}
+#
+#data "aws_route53_zone" "inner" {
+#  provider = aws.core-vpc
+#
+#  name         = "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.internal."
+#  private_zone = true
+#}
+#
+#data "aws_route53_zone" "network-services" {
+#  provider = aws.core-network-services
+#
+#  name         = "modernisation-platform.service.justice.gov.uk."
+#  private_zone = false
+#}
+
+
+
+
 
 resource "aws_lb_listener" "ebs_vision_db_listener_https" {
   depends_on = [
