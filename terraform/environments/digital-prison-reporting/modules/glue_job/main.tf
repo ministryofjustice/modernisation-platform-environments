@@ -131,7 +131,7 @@ data "aws_iam_policy_document" "extra-policy-document" {
       "kms:DescribeKey"    
     ]
   resources = [
-      "arn:aws:kms:${var.region}:${var.account}:key/dpr-*"
+      "arn:aws:kms:${var.region}:${var.account}:alias/dpr-*"
     ]
   }  
   statement {
