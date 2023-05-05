@@ -183,9 +183,9 @@ resource "aws_db_instance" "appdb1" {
 
 
 resource "aws_route53_record" "mojfin-rds" {
-  provider = aws.core-vpc
-  zone_id  = data.aws_route53_zone.external.zone_id
-  name     = "rds.${local.application_name}.${data.aws_route53_zone.external.name}"
+  provider = aws.core-network-services
+  zone_id  =  local.environment == "production" ? local.prod_domain_name : data.aws_route53_zone.external.zone_id
+  name     = local.environment == "production" ?  "rds.${local.prod_domain_name}"  : "rds.${local.application_name}.${data.aws_route53_zone.external.name}"
   type     = "CNAME"
   ttl      = 60
   records = [aws_db_instance.appdb1.address]
