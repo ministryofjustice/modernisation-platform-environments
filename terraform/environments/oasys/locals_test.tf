@@ -178,6 +178,11 @@ locals {
           { name = "web", type = "A", lbs_map_key = "public" }, # web.t2.oasys.service.justice.gov.uk
         ]
       }
+      "t2.oasys.${module.environment.domains.public.business_unit_environment}" = { # t2.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk
+        lb_alias_records = [
+          { name = "web", type = "A", lbs_map_key = "public" }, # web.t2.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk
+        ]
+      }
     }
   }
 }
