@@ -15,7 +15,7 @@ resource "aws_instance" "ec2_mailrelay" {
   lifecycle {
     ignore_changes = [ebs_block_device, root_block_device]
   }
-  user_data_replace_on_change = false
+  user_data_replace_on_change = true
   user_data                   = <<EOF
 #!/bin/bash
 
