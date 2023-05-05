@@ -2,20 +2,27 @@
 # S3 Bucket - Logging
 #------------------------------------------------------------------------------
 module "s3-bucket-logging" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.2.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.4.0"
 
-  bucket_name        = local.logging_bucket_name
+  bucket_name      = local.logging_bucket_name
   versioning_enabled = false
-  bucket_policy      = [data.aws_iam_policy_document.logging_s3_policy.json]
-  log_bucket         = local.logging_bucket_name
-  log_prefix         = "s3access/${local.logging_bucket_name}"
+  bucket_policy_v2 = [{
+    effect    = "Allow"
+    actions   = ["s3:PutObject"]
+    resources = ["${module.s3-bucket-logging.bucket.arn}/*"]
+    principals = {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::652711504416:root"]
+    }
+  }]
 
-  # Refer to the below section "Replication" before enabling replication
-  replication_enabled = false
-  # Below three variables and providers configuration are only relevant if 'replication_enabled' is set to true
-  replication_region                       = "eu-west-2"
-  versioning_enabled_on_replication_bucket = false
-  # replication_role_arn                     = module.s3-bucket-replication-role.role.arn
+  ownership_controls = "BucketOwnerEnforced" # Disable all S3 bucket ACL
+
+
+  log_bucket = local.logging_bucket_name
+  log_prefix = "s3access/${local.logging_bucket_name}"
+
+
   providers = {
     # Here we use the default provider Region for replication. Destination buckets can be within the same Region as the
     # source bucket. On the other hand, if you need to enable cross-region replication, please contact the Modernisation
@@ -69,17 +76,17 @@ module "s3-bucket-logging" {
   )
 }
 
-resource "aws_s3_bucket_acl" "ebs-vision-db-logging-bucket" {
-  bucket = local.logging_bucket_name
-  acl    = "private"
-}
-
-resource "aws_s3_bucket_ownership_controls" "ebs-vision-db-logging-bucket-ownership" {
-  bucket = local.logging_bucket_name
-  rule {
-    object_ownership = "BucketOwnerEnforced"
-  }
-}
+#resource "aws_s3_bucket_acl" "ebs-vision-db-logging-bucket" {
+#  bucket = local.logging_bucket_name
+#  acl    = "private"
+#}
+#
+#resource "aws_s3_bucket_ownership_controls" "ebs-vision-db-logging-bucket-ownership" {
+#  bucket = local.logging_bucket_name
+#  rule {
+#    object_ownership = "BucketOwnerEnforced"
+#  }
+#}
 resource "aws_s3_bucket_notification" "logging_bucket_notification" {
   bucket = module.s3-bucket-logging.bucket.id
 
@@ -89,13 +96,4 @@ resource "aws_s3_bucket_notification" "logging_bucket_notification" {
     filter_suffix = ".log"
   }
 }
-data "aws_iam_policy_document" "logging_s3_policy" {
-  statement {
-    principals {
-      type        = "AWS"
-      identifiers = ["arn:aws:iam::652711504416:root"]
-    }
-    actions   = ["s3:PutObject"]
-    resources = ["${module.s3-bucket-logging.bucket.arn}/*"]
-  }
-}
+
