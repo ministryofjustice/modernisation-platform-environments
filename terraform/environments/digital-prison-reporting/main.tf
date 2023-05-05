@@ -40,12 +40,12 @@ module "glue_reporting_hub_job" {
     "--class"                                   = "uk.gov.justice.digital.job.DataHubJob"
     "--dpr.aws.kinesis.endpointUrl"             = "https://kinesis.${local.account_region}.amazonaws.com"
     "--dpr.aws.region"                          = local.account_region
-    "--dpr.curated.s3.path"                     = "s3://${module.s3_curated_bucket.bucket_id}/curated/"
+    "--dpr.curated.s3.path"                     = "s3://${module.s3_curated_bucket.bucket_id}/"
     "--dpr.kinesis.reader.batchDurationSeconds" = 1
     "--dpr.kinesis.reader.streamName"           = local.kinesis_stream_ingestor
-    "--dpr.raw.s3.path"                         = "s3://${module.s3_raw_bucket.bucket_id}/raw/"
-    "--dpr.structured.s3.path"                  = "s3://${module.s3_structured_bucket.bucket_id}/structured/structured/"
-    "--dpr.violations.s3.path"                  = "s3://${module.s3_violation_bucket.bucket_id}/violations/"
+    "--dpr.raw.s3.path"                         = "s3://${module.s3_raw_bucket.bucket_id}/"
+    "--dpr.structured.s3.path"                  = "s3://${module.s3_structured_bucket.bucket_id}/"
+    "--dpr.violations.s3.path"                  = "s3://${module.s3_violation_bucket.bucket_id}/"
     "--enable-metrics"                          = true
     "--enable-spark-ui"                         = false
     "--enable-job-insights"                     = true
