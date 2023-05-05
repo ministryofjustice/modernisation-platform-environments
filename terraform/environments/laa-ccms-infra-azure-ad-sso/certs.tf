@@ -2,7 +2,7 @@
 resource "aws_acm_certificate" "ebs_vision_db_lb_cert" {
   domain_name       = "modernisation-platform.service.justice.gov.uk"
   validation_method = "DNS"
-  subject_alternative_names = [ "*.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk",
+  subject_alternative_names = ["*.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk",
   ]
 
   tags = merge(local.tags,
@@ -28,7 +28,7 @@ resource "aws_acm_certificate_validation" "ebs_vision_db_lb_cert_validation" {
 resource "aws_route53_record" "ebs_vision_db_lb_cert_validation_record" {
 
 
-
+  provider = aws.core-network-services
   for_each = {
     for dvo in aws_acm_certificate.ebs_vision_db_lb_cert.domain_validation_options : dvo.domain_name => {
       name   = dvo.resource_record_name

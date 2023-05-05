@@ -4,7 +4,7 @@
 module "s3-bucket-logging" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.4.0"
 
-  bucket_name      = local.logging_bucket_name
+  bucket_name        = local.logging_bucket_name
   versioning_enabled = false
   bucket_policy_v2 = [{
     effect    = "Allow"
