@@ -129,7 +129,7 @@ data "aws_iam_policy_document" "extra-policy-document" {
       "kms:*"
     ]
   resources = [
-      "arn:aws:kms:*:${var.account}:alias/dpr-*" # Region to Wild card
+      "*"
     ]
   }
   statement {
