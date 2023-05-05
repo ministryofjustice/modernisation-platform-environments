@@ -297,6 +297,40 @@ resource "aws_security_group_rule" "egress_traffic_ftp" {
   //  source_security_group_id = aws_security_group.ec2_sg_ftp.id
 }
 
+# Security Group for Mailrelay Server
+resource "aws_security_group" "ec2_sg_mailrelay" {
+  name        = "ec2_sg_mailrelay"
+  description = "Security Group for Mailrelay Server"
+  vpc_id      = data.aws_vpc.shared.id
+  tags = merge(local.tags,
+    { Name = lower(format("sg-%s-%s-mailrelay", local.application_name, local.environment)) }
+  )
+}
+
+# Ingress Traffic Mailrelay
+resource "aws_security_group_rule" "ingress_traffic_mailrelay" {
+  for_each          = local.application_data.ec2_sg_mailrelay_ingress_rules
+  security_group_id = aws_security_group.ec2_sg_mailrelay.id
+  type              = "ingress"
+  description       = format("Traffic for %s %d", each.value.protocol, each.value.from_port)
+  protocol          = each.value.protocol
+  from_port         = each.value.from_port
+  to_port           = each.value.to_port
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block, local.application_data.accounts[local.environment].lz_aws_subnet_env]
+}
+
+# Egress Traffic Mailrelay
+resource "aws_security_group_rule" "egress_traffic_mailrelay" {
+  for_each          = local.application_data.ec2_sg_mailrelay_egress_rules
+  security_group_id = aws_security_group.ec2_sg_mailrelay.id
+  type              = "egress"
+  description       = format("Outbound traffic for %s %d", each.value.protocol, each.value.from_port)
+  protocol          = each.value.protocol
+  from_port         = each.value.from_port
+  to_port           = each.value.to_port
+  cidr_blocks       = [each.value.destination_cidr]
+  //  source_security_group_id = aws_security_group.ec2_sg_mailrelay.id
+}
 
 # Security Group for ClamAV Server
 resource "aws_security_group" "ec2_sg_clamav" {
