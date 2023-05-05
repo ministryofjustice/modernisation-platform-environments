@@ -17,7 +17,7 @@ resource "aws_instance" "ec2_mailrelay" {
   }
 
   user_data_replace_on_change = true
-  user_data = base64encode(templatefile("./templates/oem-user-data-wl.sh"), {})
+  user_data = base64encode(templatefile("./templates/oem-user-data-wl.sh", {}))
 
   metadata_options {
     http_endpoint = "enabled"
