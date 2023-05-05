@@ -47,6 +47,7 @@ locals {
     http = {
       port     = 80
       protocol = "HTTP"
+
       default_action = {
         type = "redirect"
         redirect = {
@@ -60,6 +61,7 @@ locals {
     http7777 = {
       port     = 7777
       protocol = "HTTP"
+
       default_action = {
         type = "fixed-response"
         fixed_response = {
@@ -75,6 +77,8 @@ locals {
       protocol                  = "HTTPS"
       ssl_policy                = "ELBSecurityPolicy-2016-08"
       certificate_names_or_arns = ["nomis_wildcard_cert"]
+      cloudwatch_metric_alarms  = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso_pagerduty"].lb_default
+
       default_action = {
         type = "fixed-response"
         fixed_response = {
@@ -123,6 +127,8 @@ locals {
   }
 
   weblogic_ec2_default = {
+
+    cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso_pagerduty"].weblogic
 
     config = merge(module.baseline_presets.ec2_instance.config.default, {
       ami_name                  = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-03-15T17-18-22.178Z"
@@ -184,7 +190,7 @@ locals {
   }
 
   # blue/green deployment
-  # - only set cloudwatch_metric_alarms on the active deployment
+  # - set cloudwatch_metric_alarms = {} on the dormant deployment
   # - set desired_capacity = 0 on the dormant deployment unless testing
   # - use user_data_cloud_init.args.branch to set the ansible code for given deployment
   # - use load balancer rules defined in the environment specific locals file to switch between deployments
@@ -202,7 +208,7 @@ locals {
     autoscaling_group = merge(local.weblogic_ec2_default.autoscaling_group, {
       desired_capacity = 0
     })
-    # cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["nomis_pagerduty"].weblogic
+    cloudwatch_metric_alarms = {}
     tags = merge(local.weblogic_ec2_default.tags, {
       deployment = "blue"
     })
@@ -221,7 +227,7 @@ locals {
     # autoscaling_group = merge(local.weblogic_ec2_default.autoscaling_group, {
     #   desired_capacity = 0
     # })
-    cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["nomis_pagerduty"].weblogic
+    # cloudwatch_metric_alarms = {}
     tags = merge(local.weblogic_ec2_default.tags, {
       deployment = "green"
     })

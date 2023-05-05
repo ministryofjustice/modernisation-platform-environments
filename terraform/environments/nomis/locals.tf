@@ -28,7 +28,9 @@ locals {
       local.database_cloudwatch_metric_alarms_lists
     )
     cloudwatch_metric_alarms_lists_with_actions = {
-      nomis_pagerduty = ["nomis_pagerduty"]
+      dso_pagerduty               = ["dso_pagerduty"]
+      dba_pagerduty               = ["dba_pagerduty"]
+      dba_high_priority_pagerduty = ["dba_high_priority_pagerduty"]
     }
     route53_resolver_rules = {
       outbound-data-and-private-subnets = ["azure-fixngo-domain"]
@@ -38,7 +40,9 @@ locals {
     s3_iam_policies          = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
     sns_topics = {
       pagerduty_integrations = {
-        nomis_pagerduty = contains(["development", "test"], local.environment) ? "nomis_nonprod_alarms" : "nomis_alarms"
+        dso_pagerduty               = contains(["development", "test"], local.environment) ? "nomis_nonprod_alarms" : "nomis_alarms"
+        dba_pagerduty               = contains(["development", "test"], local.environment) ? "hmpps_shef_dba_non_prod" : "hmpps_shef_dba_low_priority"
+        dba_high_priority_pagerduty = contains(["development", "test"], local.environment) ? "hmpps_shef_dba_non_prod" : "hmpps_shef_dba_high_priority"
       }
     }
   }
@@ -103,15 +107,5 @@ locals {
   }
 
   baseline_sns_topics = {}
-
-  autoscaling_schedules_default = {
-    "scale_up" = {
-      recurrence = "0 7 * * Mon-Fri"
-    }
-    "scale_down" = {
-      desired_capacity = 0
-      recurrence       = "0 19 * * Mon-Fri"
-    }
-  }
 }
 

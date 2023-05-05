@@ -67,7 +67,7 @@ resource "aws_lb" "webgate_lb" {
   internal           = true
   load_balancer_type = "application"
   security_groups    = [aws_security_group.sg_webgate_lb.id]
-  subnets            = data.aws_subnets.private-public.ids
+  subnets            = data.aws_subnets.shared-private.ids
 
   enable_deletion_protection = true
 

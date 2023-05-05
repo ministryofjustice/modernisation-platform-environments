@@ -9,9 +9,9 @@ locals {
 # load the glue script to bucket as bucket object
 resource "aws_s3_object" "object" {
   bucket = module.s3-bucket.bucket.id
-  key    = "glue_script/glue_transform_script.py"
-  source = "glue_script/glue_transform_script.py"
-  etag   = filemd5("glue_script/glue_transform_script.py")
+  key    = "glue_script/glue_spark_transform_script.py"
+  source = "glue_script/glue_spark_transform_script.py"
+  etag   = filemd5("glue_script/glue_spark_transform_script.py")
 }
 
 resource "aws_glue_job" "glue_job" {
@@ -28,7 +28,7 @@ resource "aws_glue_job" "glue_job" {
   tags                   = local.tags
 
   command {
-    script_location = "s3://${module.s3-bucket.bucket.id}/glue_script/glue_transform_script.py"
+    script_location = "s3://${module.s3-bucket.bucket.id}/glue_script/glue_spark_transform_script.py"
     name            = "glueetl"
   }
 

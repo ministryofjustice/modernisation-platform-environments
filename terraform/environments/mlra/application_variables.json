@@ -122,7 +122,7 @@
       "moj_vpn_cidr": "81.134.202.29/32",
       "nlb_prevent_deletion": true,
       "pagerduty_integration_key_name": "laa_mlra_prod_alarms",
-      "acm_cert_domain_name": "service.justice.gov.uk"
+      "acm_cert_domain_name": "mlra.service.justice.gov.uk"
     }
   }
 }

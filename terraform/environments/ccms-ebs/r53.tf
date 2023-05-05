@@ -7,8 +7,8 @@ resource "aws_route53_record" "external" {
   type    = "A"
 
   alias {
-    name                   = aws_lb.ebsapps_lb.dns_name
-    zone_id                = aws_lb.ebsapps_lb.zone_id
+    name                   = aws_lb.ebsapps_nlb.dns_name
+    zone_id                = aws_lb.ebsapps_nlb.zone_id
     evaluate_target_health = true
   }
 }

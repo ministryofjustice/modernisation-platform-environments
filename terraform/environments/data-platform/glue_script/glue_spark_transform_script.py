@@ -4,6 +4,7 @@ import re
 import sys
 
 import boto3
+from pathlib import Path
 from awsglue.context import GlueContext
 from awsglue.dynamicframe import DynamicFrame
 from awsglue.job import Job
@@ -13,7 +14,7 @@ from pyspark.context import SparkContext
 from pyspark.sql import SparkSession
 from pyspark.sql import functions as F
 from pyspark.sql.functions import lit
-from transform import generate_report, report_name
+from transform import generate_report, get_tables
 
 
 logging.getLogger().setLevel(logging.INFO)
@@ -39,7 +40,7 @@ def get_database_name() -> str:
     returns database name from the key of the raw data product
     """
     # database name is the data product name pulled from the key
-    m = re.match("^(raw_data)\/(.*)\/(extraction_timestamp=[0-9]{1,14})\/(.*)$", raw_key)
+    m = re.match("^(raw_data)\/(.*)\/(.*)\/(extraction_timestamp=[0-9]{1,14})\/(.*)$", raw_key)
     if m:
         return m.group(2)
     else:
@@ -64,12 +65,13 @@ def get_curated_path(db_name, table_name) -> str:
     """
     creates path for curated data product
     """
-    key_list = os.path.join(
-        "s3://", bucket, raw_key.replace("raw_data", "curated_data")
-    ).split("/")
-    out_path = "/".join(key_list[:-2])
-    out_path = out_path.replace(db_name, f"database_name={db_name}")
-    out_path = os.path.join(out_path, f"table_name={table_name}")
+    out_path = os.path.join(
+        "s3://",
+        bucket,
+        "curated_data",
+        f"database_name={db_name}",
+        f"table_name={table_name}"
+    )
     return out_path
 
 
@@ -121,20 +123,38 @@ def does_database_exist(client, database_name):
 
 
 database_name = get_database_name()
-table_name = report_name
+# get table names produced for this source data
+source_data = Path(raw_key).parts[2]
+table_names = get_tables(bucket, raw_key, source_data)[database_name]
+
+logging.info(f"table names: {table_names}")
+
 timestamp = get_extraction_timestamp()
+create_curated_data = {}
+for table_name in table_names:
+    logging.info(
+        "checking if partition already exists for "
+        f"{database_name}.{table_name} where extraction_timestamp={timestamp}"
+    )
 
+    if does_extraction_timestamp_exist(database_name, table_name, timestamp):
+        create_curated_data[table_name] = False
+    else:
+        create_curated_data[table_name] = True
+        # load transformed data to pandas dataframe and get db and table name
 
-logging.info(
-    "checking if partition already exists for "
-    f"{database_name}.{table_name} where extraction_timestamp={timestamp}"
-)
+database_dict = generate_report(bucket, raw_key)
 
-if not does_extraction_timestamp_exist(database_name, table_name, timestamp):
-    # load transformed data to pandas dataframe and get db and table name
-    pd_df = generate_report(bucket, raw_key)
+tables_to_process = [
+    (database_name, table)
+    for database_name in database_dict.keys()
+    for table in database_dict[database_name].keys()
+    if create_curated_data[table_name]
+]
 
+for database_name, table_name in tables_to_process:
     # convert dataframe into pyspark create_dynamic_frame.
+    pd_df = database_dict[database_name][table_name]
     spark_df = spark.createDataFrame(pd_df)
 
     # replace spaces and brackets with underscores in column names
@@ -180,3 +200,5 @@ if not does_extraction_timestamp_exist(database_name, table_name, timestamp):
         logging.error(e)
 else:
     logging.info("Partition for timestamp already exists")
+    # but we want to make sure the table does exists even if we don't
+    # make curated version of the data table

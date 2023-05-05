@@ -21,6 +21,4 @@ resource "aws_kms_grant" "image-builder-shared-hmpps-ebs-cmk-grant" {
     "DescribeKey",
     "CreateGrant"
   ]
-
-  depends_on = [module.ec2_iaps_server]
 }

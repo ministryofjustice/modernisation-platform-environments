@@ -17,7 +17,7 @@ locals {
           "*.lsast-nomis.az.justice.gov.uk",
         ]
         external_validation_records_created = true
-        cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["nomis_pagerduty"].acm_default
+        cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso_pagerduty"].acm_default
         tags = {
           description = "wildcard cert for nomis ${local.environment} domains"
         }
@@ -61,7 +61,6 @@ locals {
           https = merge(
             local.weblogic_lb_listeners.https, {
               alarm_target_group_names = ["preprod-nomis-web-b-http-7777"]
-              cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["nomis_pagerduty"].lb_default
               rules = {
                 preprod-nomis-web-a-http-7777 = {
                   priority = 200
