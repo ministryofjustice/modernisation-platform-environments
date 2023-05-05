@@ -1,4 +1,9 @@
-# Glue Cloud Platform Ingestion Job (Load, Reload, CDC)
+###############################################
+# Glue Jobs, Reusable Module: /modules/glue_job
+###############################################
+
+## Glue Job, Reporting Hub
+## Glue Cloud Platform Ingestion Job (Load, Reload, CDC)
 module "glue_reporting_hub_job" {
   source                        = "./modules/glue_job"
   create_job                    = local.create_job
@@ -53,7 +58,7 @@ module "glue_reporting_hub_job" {
   }
 }
 
-# Glue Domain Platform Refresh Job
+# Glue Job, Domain Refresh
 module "glue_domain_refresh_job" {
   source                        = "./modules/glue_job"
   create_job                    = local.create_job
@@ -141,15 +146,74 @@ module "glue_registry_avro" {
   )
 }
 
-# Glue Database Catalog 
-# module "glue_database" {
-#  source         = "./modules/glue_database"
-#  create_db      = local.create_db
-#  name           = "${local.project}-${local.glue_db}-${local.env}"
-#  description    = local.description
-#  aws_account_id = local.account_id
-#  aws_region     = local.account_region
-#}
+###################################################
+# Glue Tables, Reusable Module: /modules/glue_table
+###################################################
+
+## Glue Table, RAW
+module "glue_raw_table" {
+  source = "./modules/glue_table"
+  enable_glue_catalog_table       = true
+  name   = "raw"
+
+  # AWS Glue catalog DB
+  glue_catalog_database_name       = module.glue_raw_zone_database.db_name
+  glue_catalog_database_parameters = null
+
+  # AWS Glue catalog table
+  glue_catalog_table_description = "Glue Table for raw data, managed by Terraform."
+  glue_catalog_table_table_type  = "EXTERNAL_TABLE"
+  glue_catalog_table_parameters = {
+    EXTERNAL              = "TRUE"
+    "parquet.compression" = "SNAPPY"
+    "classification"      = "parquet"
+  }
+  glue_catalog_table_storage_descriptor = {
+    location      = "s3://${module.s3_raw_bucket.bucket_id}/"
+    input_format  = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat"
+    output_format = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat"
+
+    columns = [
+      {
+        columns_name    = "partitionkey"
+        columns_type    = "string"
+        columns_comment = "Partition Key"
+      },
+      {
+        columns_name    = "sequencenumber"
+        columns_type    = "string"
+        columns_comment = "Sequence Number"
+      },
+      {
+        columns_name    = "approximatearrivaltimestamp"
+        columns_type    = "timestamp"
+        columns_comment = "Arrival Timestamp"
+      },
+      {
+        columns_name    = "data"
+        columns_type    = "string"
+        columns_comment = "Data Column"
+      },      
+    ]
+
+    ser_de_info = [
+      {
+        name                  = "raw"
+        serialization_library = "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe"
+
+        parameters = {
+          "serialization.format" = 1
+        }
+      }
+    ]
+
+    skewed_info = []
+
+    sort_columns = []
+  }
+  glue_table_depends_on = [module.glue_raw_zone_database.db_name]
+}
+
 
 ##################
 ### S3 Buckets ###
