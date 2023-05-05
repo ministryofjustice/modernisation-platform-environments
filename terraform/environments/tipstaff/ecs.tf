@@ -88,8 +88,8 @@ resource "aws_ecs_task_definition" "tipstaff_task_definition" {
 
 resource "aws_ecs_service" "tipstaff_ecs_service" {
   depends_on = [
-    aws_lb_listener.tipstaff_dev_lb_1,
-    aws_lb_listener.tipstaff_dev_lb_2
+    aws_lb_listener.tipstaff_lb_1,
+    aws_lb_listener.tipstaff_lb_2
   ]
 
   name                              = var.networking[0].application
@@ -107,7 +107,7 @@ resource "aws_ecs_service" "tipstaff_ecs_service" {
   }
 
   load_balancer {
-    target_group_arn = aws_lb_target_group.tipstaff-dev-target-group.arn
+    target_group_arn = aws_lb_target_group.tipstaff_target_group.arn
     container_name   = "tipstaff-container"
     container_port   = 80
   }
@@ -227,7 +227,7 @@ resource "aws_security_group" "ecs_service" {
     to_port         = 0
     protocol        = "-1"
     description     = "Allow all traffic from load balancer"
-    security_groups = [aws_security_group.tipstaff_dev_lb_sc.id]
+    security_groups = [aws_security_group.tipstaff_lb_sc.id]
   }
 
   egress {

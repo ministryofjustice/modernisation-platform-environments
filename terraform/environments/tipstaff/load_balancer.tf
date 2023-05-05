@@ -1,4 +1,4 @@
-resource "aws_security_group" "tipstaff_dev_lb_sc" {
+resource "aws_security_group" "tipstaff_lb_sc" {
   name        = "load balancer security group"
   description = "control access to the load balancer"
   vpc_id      = data.aws_vpc.shared.id
@@ -36,18 +36,18 @@ resource "aws_security_group" "tipstaff_dev_lb_sc" {
   }
 }
 
-resource "aws_lb" "tipstaff_dev_lb" {
-  name                       = "tipstaff-dev-load-balancer"
+resource "aws_lb" "tipstaff_lb" {
+  name                       = "tipstaff-load-balancer"
   load_balancer_type         = "application"
-  security_groups            = [aws_security_group.tipstaff_dev_lb_sc.id]
+  security_groups            = [aws_security_group.tipstaff_lb_sc.id]
   subnets                    = data.aws_subnets.shared-public.ids
   enable_deletion_protection = false
   internal                   = false
-  depends_on                 = [aws_security_group.tipstaff_dev_lb_sc]
+  depends_on                 = [aws_security_group.tipstaff_lb_sc]
 }
 
-resource "aws_lb_target_group" "tipstaff-dev-target-group" {
-  name                 = "tipstaff-dev-target-group"
+resource "aws_lb_target_group" "tipstaff_target_group" {
+  name                 = "tipstaff-target-group"
   port                 = 80
   protocol             = "HTTP"
   vpc_id               = data.aws_vpc.shared.id
@@ -70,30 +70,30 @@ resource "aws_lb_target_group" "tipstaff-dev-target-group" {
 
 }
 
-resource "aws_lb_listener" "tipstaff_dev_lb_1" {
-  load_balancer_arn = aws_lb.tipstaff_dev_lb.arn
+resource "aws_lb_listener" "tipstaff_lb_1" {
+  load_balancer_arn = aws_lb.tipstaff_lb.arn
   port              = local.application_data.accounts[local.environment].server_port_1
   protocol          = local.application_data.accounts[local.environment].lb_listener_protocol_1
   ssl_policy        = local.application_data.accounts[local.environment].lb_listener_protocol_1 == "HTTP" ? "" : "ELBSecurityPolicy-2016-08"
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.tipstaff-dev-target-group.arn
+    target_group_arn = aws_lb_target_group.tipstaff_target_group.arn
   }
 }
 
-resource "aws_lb_listener" "tipstaff_dev_lb_2" {
+resource "aws_lb_listener" "tipstaff_lb_2" {
   depends_on = [
     aws_acm_certificate.external
   ]
   certificate_arn   = aws_acm_certificate.external.arn
-  load_balancer_arn = aws_lb.tipstaff_dev_lb.arn
+  load_balancer_arn = aws_lb.tipstaff_lb.arn
   port              = local.application_data.accounts[local.environment].server_port_2
   protocol          = local.application_data.accounts[local.environment].lb_listener_protocol_2
   ssl_policy        = local.application_data.accounts[local.environment].lb_listener_protocol_2 == "HTTP" ? "" : "ELBSecurityPolicy-2016-08"
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.tipstaff-dev-target-group.arn
+    target_group_arn = aws_lb_target_group.tipstaff_target_group.arn
   }
 }
