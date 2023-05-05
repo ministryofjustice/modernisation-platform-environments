@@ -126,11 +126,7 @@ data "aws_iam_policy_document" "extra-policy-document" {
   }
   statement {
     actions = [
-    "kms:Encrypt",
-    "kms:Decrypt",
-    "kms:ReEncrypt*",
-    "kms:GenerateDataKey*",
-    "kms:DescribeKey"  
+      "kms:*"
     ]
   resources = [
       "arn:aws:kms:*:${var.account}:alias/dpr-*" # Region to Wild card
