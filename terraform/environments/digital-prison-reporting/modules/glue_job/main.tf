@@ -108,7 +108,7 @@ data "aws_iam_policy_document" "extra-policy-document" {
       "logs:AssociateKmsKey"
     ]
     resources = [
-      "arn:aws:logs:*:*:/aws-glue/*"
+      "arn:aws:logs:${var.region}:${var.account}:/aws-glue/*"
     ]
   }
   statement {
@@ -118,14 +118,40 @@ data "aws_iam_policy_document" "extra-policy-document" {
       "iam:GetRole",
       "iam:GetRolePolicy",
       "cloudwatch:PutMetricData",
-      "kms:*",
-      "sqs:*",
-      "s3:*" # Not sure if this is required
+      "sqs:*"  # Needs Fixing
     ]
     resources = [
       "*"
     ]
   }
+  statement {
+    actions = [
+      "kms:Decrypt",
+      "kms:GenerateDataKey*",
+      "kms:DescribeKey"    
+    ]
+  resources = [
+      "arn:aws:kms:${var.region}:${var.account}:key/dpr-*"
+    ]
+  }  
+  statement {
+    actions = [
+      "dynamodb:BatchGet*",
+      "dynamodb:DescribeStream",
+      "dynamodb:DescribeTable",
+      "dynamodb:Get*",
+      "dynamodb:Query",
+      "dynamodb:Scan",
+      "dynamodb:BatchWrite*",
+      "dynamodb:CreateTable",
+      "dynamodb:Delete*",
+      "dynamodb:Update*",
+      "dynamodb:PutItem"       
+    ]
+    resources = [
+      "arn:aws:dynamodb:${var.region}:${var.account}:table/dpr-*"
+    ]
+  }  
 }
 
 resource "aws_iam_policy" "additional-policy" {

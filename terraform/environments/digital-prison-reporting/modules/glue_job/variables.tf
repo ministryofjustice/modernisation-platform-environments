@@ -327,3 +327,13 @@ variable "create_kinesis_ingester" {
   default     = false
   description = "Whether to create Kinesis Stream"
 }
+
+variable "region" {
+  description = "Current AWS Region."
+  default     = "eu-west-2"
+}
+
+variable "account" {
+  description = "AWS Account ID."
+  default     = ""
+}

@@ -21,7 +21,9 @@ module "glue_reporting_hub_job" {
   execution_class               = "STANDARD"
   worker_type                   = "G.1X"
   number_of_workers             = 2
-  max_concurrent                = 1  
+  max_concurrent                = 1
+  region                        = local.account_region
+  account                       = local.account_id
 
   tags = merge(
     local.all_tags,
@@ -75,6 +77,8 @@ module "glue_domain_refresh_job" {
   worker_type                   = "G.1X"
   number_of_workers             = 2
   max_concurrent                = 1
+  region                        = local.account_region
+  account                       = local.account_id  
 
   tags = merge(
     local.all_tags,
