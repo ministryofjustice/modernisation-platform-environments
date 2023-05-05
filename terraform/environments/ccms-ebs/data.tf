@@ -136,3 +136,10 @@ data "aws_route53_zone" "application-zone" {
   name         = "ccms-ebs.service.justice.gov.uk."
   private_zone = false
 }
+
+
+
+data "aws_acm_certificate" "dev_issued" {
+  domain   = "*.dev.legalservices.gov.uk"
+  statuses = ["ISSUED"]
+}

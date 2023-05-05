@@ -20,9 +20,9 @@ resource "aws_lb" "ebsapps_lb" {
 
 resource "aws_lb_listener" "ebsapps_listener" {
   count = local.is-production ? 0 : 1
-  depends_on = [
-    aws_acm_certificate_validation.external
-  ]
+  #depends_on = [
+  #  aws_acm_certificate_validation.external
+  #]
 
   load_balancer_arn = aws_lb.ebsapps_lb.arn
   port              = "443"

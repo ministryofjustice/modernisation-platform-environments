@@ -49,6 +49,7 @@ resource "aws_route53_record" "external_validation" {
     aws_instance.ec2_accessgate
   ]
 
+  ####provider = local.cert_prov
   provider = aws.core-network-services
 
   for_each = {
