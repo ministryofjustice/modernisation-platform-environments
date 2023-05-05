@@ -15,24 +15,9 @@ resource "aws_instance" "ec2_mailrelay" {
   lifecycle {
     ignore_changes = [ebs_block_device, root_block_device]
   }
+
   user_data_replace_on_change = true
-  user_data                   = <<EOF
-#!/usr/bin/env bash
-
-exec > /tmp/userdata.log 2>&1
-
-amazon-linux-extras install -y epel
-yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
-yum install -y https://s3.amazonaws.com/amazoncloudwatch-agent/oracle_linux/amd64/latest/amazon-cloudwatch-agent.rpm
-yum install -y awscli jq telnet unzip wget
-
-systemctl stop amazon-ssm-agent
-rm -rf /var/lib/amazon/ssm/ipc/
-systemctl start amazon-ssm-agent
-
-/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c ssm:cloud-watch-config
-
-EOF
+  user_data = base64encode(templatefile("./templates/oem-user-data-wl.sh"))
 
   metadata_options {
     http_endpoint = "enabled"
