@@ -33,24 +33,24 @@ module "s3_bucket" {
     }
     },
     {
-        effect  = "Allow"
-        actions = ["s3:ListBucket"]
-        principals = {
-          type = "AWS"
-          identifiers = [
-            "arn:aws:iam::${local.application_data.accounts[local.environment].migration_source_account_id}:role/terraform"
-          ]
-        }
+      effect  = "Allow"
+      actions = ["s3:ListBucket"]
+      principals = {
+        type = "AWS"
+        identifiers = [
+          "arn:aws:iam::${local.application_data.accounts[local.environment].migration_source_account_id}:role/terraform"
+        ]
+      }
     },
     {
-        effect  = "Allow"
-        actions = ["s3:ListBucket"]
-        principals = {
-          type = "AWS"
-          identifiers = [
-            "arn:aws:iam::${local.application_data.accounts[local.environment].migration_source_account_id}:role/admin"
-          ]
-        }
+      effect  = "Allow"
+      actions = ["s3:ListBucket"]
+      principals = {
+        type = "AWS"
+        identifiers = [
+          "arn:aws:iam::${local.application_data.accounts[local.environment].migration_source_account_id}:role/admin"
+        ]
+      }
   }]
 
   ownership_controls = "BucketOwnerEnforced" # Disable all S3 bucket ACL

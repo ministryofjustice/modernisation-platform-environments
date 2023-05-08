@@ -9,8 +9,8 @@ module "ec2_test_instance" {
   providers = {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
   }
-  for_each = try(local.ec2_test.ec2_test_instances, {})
-  name = each.key
+  for_each                      = try(local.ec2_test.ec2_test_instances, {})
+  name                          = each.key
   ami_name                      = each.value.ami_name
   ami_owner                     = try(each.value.ami_owner, "core-shared-services-production")
   instance                      = merge(local.instance, lookup(each.value, "instance", {}))
@@ -121,14 +121,14 @@ locals {
   ec2_common_managed_policies = [
     aws_iam_policy.ec2_common_policy.arn
   ]
-    instance = {
-      disable_api_termination      = false
-      instance_type                = "t3.medium"
-      key_name                     = try(aws_key_pair.ec2-user.key_name)
-      monitoring                   = false
-      metadata_options_http_tokens = "required"
-      vpc_security_group_ids       = try([aws_security_group.example_ec2_sg.id])
-    }
+  instance = {
+    disable_api_termination      = false
+    instance_type                = "t3.medium"
+    key_name                     = try(aws_key_pair.ec2-user.key_name)
+    monitoring                   = false
+    metadata_options_http_tokens = "required"
+    vpc_security_group_ids       = try([aws_security_group.example_ec2_sg.id])
+  }
 }
 
 # custom policy for SSM as managed policy AmazonSSMManagedInstanceCore is too permissive
