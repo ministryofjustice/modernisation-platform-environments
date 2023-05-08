@@ -80,4 +80,6 @@ locals {
       secret_value = "query1"
     }
   }
+
+  prod_domain_name = "laa-finance-data.service.justice.gov.uk"
 }
