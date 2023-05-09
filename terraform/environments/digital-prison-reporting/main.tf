@@ -495,7 +495,7 @@ module "datamart" {
   master_password         = "Datamartpass2022" ## Needs to pull from Secrets Manager, #TD
   create_random_password  = false
   encrypted               = true
-  publicly_accessible     = true # Required for Terraform to manage Redshift Schemas and Tables
+  publicly_accessible     = false # Required for Terraform to manage Redshift Schemas and Tables
   create_subnet_group     = true
   kms_key_arn             = aws_kms_key.redshift-kms-key.arn
   enhanced_vpc_routing    = false
