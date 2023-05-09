@@ -23,7 +23,20 @@
       "example_var": "test-data"
     },
     "preproduction": {
-      "moj_ip": "81.134.202.29/32"
+      "moj_ip": "81.134.202.29/32",
+      "db_name": "tipstaff_db_pre_prod",
+      "identifier": "tipstaff-db-pre-prod",
+      "allocated_storage": "20",
+      "storage_type": "gp2",
+      "engine": "postgres",
+      "engine_version": "10.21",
+      "instance_class": "db.t3.micro",
+      "server_port_1": "80",
+      "lb_listener_protocol_1": "HTTP",
+      "server_port_2": "443",
+      "lb_listener_protocol_2": "HTTPS",
+
+      "rds_port": "5432"
     },
     "production": {
       "example_var": "production-data"
