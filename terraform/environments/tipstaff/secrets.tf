@@ -9,7 +9,7 @@ data "aws_secretsmanager_secret_version" "dms_source_credentials" {
 }
 
 data "aws_iam_session_context" "member_infrastructure_access" {
-  arn = "arn:aws:iam::${data.aws_caller_identity.original_session.id}:role/MemberInfrastructureAccess"
+  arn = "arn:aws:iam::842764906196:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-developer_8f3fb941aaa4158d"
 }
 
 resource "aws_iam_role_policy" "add_secrets_manager_policy" {
@@ -21,11 +21,11 @@ resource "aws_iam_role_policy" "add_secrets_manager_policy" {
     "Version": "2012-10-17",
     "Statement": [
       {
-           "Action": [
-              "secretsmanager:*"
-           ],
-           "Resource": "*",
-           "Effect": "Allow"
+        "Action": [
+          "secretsmanager:*"
+        ],
+        "Resource": "*",
+        "Effect": "Allow"
       }
     ]
   }

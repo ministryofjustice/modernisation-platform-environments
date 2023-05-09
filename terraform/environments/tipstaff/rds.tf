@@ -74,10 +74,10 @@ resource "null_resource" "setup_db" {
     command     = "chmod +x ./setup-postgresql.sh; ./setup-postgresql.sh"
 
     environment = {
-      DB_HOSTNAME              = aws_db_instance.tipstaff_db.address
-      DB_NAME                  = aws_db_instance.tipstaff_db.db_name
-      TIPSTAFF_DB_USERNAME_DEV = random_string.username.result
-      TIPSTAFF_DB_PASSWORD_DEV = random_password.password.result
+      DB_HOSTNAME          = aws_db_instance.tipstaff_db.address
+      DB_NAME              = aws_db_instance.tipstaff_db.db_name
+      TIPSTAFF_DB_USERNAME = random_string.username.result
+      TIPSTAFF_DB_PASSWORD = random_password.password.result
     }
   }
   triggers = {
