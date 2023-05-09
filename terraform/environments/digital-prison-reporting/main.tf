@@ -519,7 +519,7 @@ module "datamart" {
     resume = {
       name           = "${local.redshift_cluster_name}-resume"
       description    = "Resume cluster every morning"
-      schedule       = "cron(30 22 * * ? *)"
+      schedule       = "cron(45 22 * * ? *)"
       resume_cluster = true
     }
   }
@@ -537,7 +537,7 @@ module "datamart" {
 # Domain Schema, DPR-267
 module "redshift_schema_domain" {
   source                  = "./modules/redshift_schema"
-  enable_redshift_schema  = true
+  enable_redshift_schema  = false
   glue_catalog_ext        = true
   schema                  = "domain"
   catalog_db_name         = "domain"
