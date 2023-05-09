@@ -483,7 +483,7 @@ module "ec2_kinesis_agent" {
   )
 }
 
-# DataMart
+# Redhsift Cluster, DataMart
 module "datamart" {
   source                  = "./modules/redshift"
   create_redshift_cluster = local.create_datamart
@@ -531,6 +531,18 @@ module "datamart" {
     }
   )
 }
+
+# Redshift Schemas
+# Domain Schema, DPR-267
+module "redshift_schema_domain" {
+  source                  = "./modules/redshift_schema"
+  enable_redshift_schema  = true
+  glue_catalog_ext        = true
+  schema                  = "domain"
+  catalog_db_name         = "domain"
+  master_username         = "dpruser"
+}
+
 
 # DMS Nomis Data Collector
 module "dms_nomis_ingestor" {
