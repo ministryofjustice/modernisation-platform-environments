@@ -1,4 +1,4 @@
-data "aws_ami" "ec2_laa_oem_development_app" {
+data "aws_ami" "ec2_laa_oem_app" {
   most_recent = true
   executable_users = [local.environment_management.account_ids["laa-oem-development"],
     local.environment_management.account_ids["laa-oem-test"],
@@ -15,7 +15,7 @@ data "aws_ami" "ec2_laa_oem_development_app" {
   }
 }
 
-data "aws_ami" "ec2_laa_oem_development_db" {
+data "aws_ami" "ec2_laa_oem_db" {
   most_recent = true
   executable_users = [local.environment_management.account_ids["laa-oem-development"],
     local.environment_management.account_ids["laa-oem-test"],
