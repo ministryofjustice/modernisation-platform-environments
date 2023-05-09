@@ -9,7 +9,7 @@ terraform {
 
 # Provide Configuration
 provider redshift {
-  "url" = "dpr-redshift-test.ctrlffniiwwc.eu-west-2.redshift.amazonaws.com:5439/datamart",
+  url = "dpr-redshift-test.ctrlffniiwwc.eu-west-2.redshift.amazonaws.com:5439/datamart",
   user = var.master_username,
   password = "Datamartpass2022",
   database = "datamart"
