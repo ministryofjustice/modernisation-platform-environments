@@ -38,7 +38,7 @@ locals {
       title   = "EC2 CPU Utilization"
       period  = local.cloudwatch_period
       metrics = [
-        ["CWAgent", "Processor % Idle Time", "instance", "_Total", "AutoScalingGroupName", module.ec2_iaps_server.autoscaling_group_name, "objectname", "Processor", { color = "#2ca02c", stat = "Minimum" }],
+        ["CWAgent", "Processor % Idle Time", "instance", "_Total", "AutoScalingGroupName", module.ec2_iaps_server.autoscaling_group.name, "objectname", "Processor", { color = "#2ca02c", stat = "Minimum" }],
         [".", "Processor % User Time", ".", ".", ".", ".", ".", ".", { color = "#d62728", stat = "Maximum" }]
       ]
     }
@@ -57,8 +57,8 @@ locals {
       title   = "EC2 Memory Utilization"
       period  = local.cloudwatch_period
       metrics = [
-        ["CWAgent", "Paging File % Usage", "instance", "\\??\\C:\\pagefile.sys", "AutoScalingGroupName", module.ec2_iaps_server.autoscaling_group_name, "objectname", "Paging File", { color = "#d62728" }],
-        [".", "Memory % Committed Bytes In Use", "AutoScalingGroupName", module.ec2_iaps_server.autoscaling_group_name, "objectname", "Memory", { label = "Memory % Committed Bytes In Use", color = "#2ca02c" }]
+        ["CWAgent", "Paging File % Usage", "instance", "\\??\\C:\\pagefile.sys", "AutoScalingGroupName", module.ec2_iaps_server.autoscaling_group.name, "objectname", "Paging File", { color = "#d62728" }],
+        [".", "Memory % Committed Bytes In Use", "AutoScalingGroupName", module.ec2_iaps_server.autoscaling_group.name, "objectname", "Memory", { label = "Memory % Committed Bytes In Use", color = "#2ca02c" }]
       ]
     }
   }
@@ -76,7 +76,7 @@ locals {
       title   = "EC2 Disk Utilization"
       period  = local.cloudwatch_period
       metrics = [
-        ["CWAgent", "PhysicalDisk % Disk Time", "instance", "0 C:", "AutoScalingGroupName", module.ec2_iaps_server.autoscaling_group_name, "objectname", "PhysicalDisk"],
+        ["CWAgent", "PhysicalDisk % Disk Time", "instance", "0 C:", "AutoScalingGroupName", module.ec2_iaps_server.autoscaling_group.name, "objectname", "PhysicalDisk"],
         [".", "LogicalDisk % Free Space", ".", "C:", ".", ".", ".", "LogicalDisk"]
       ]
     }

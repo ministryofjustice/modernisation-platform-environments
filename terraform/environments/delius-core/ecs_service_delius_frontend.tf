@@ -309,7 +309,7 @@ resource "aws_ecs_service" "delius-frontend-service" {
   task_definition = aws_ecs_task_definition.delius_core_frontend_task_definition.arn
   network_configuration {
     assign_public_ip = false
-    subnets          = data.aws_subnets.private-public.ids
+    subnets          = data.aws_subnets.shared-private.ids
     security_groups  = [aws_security_group.delius_core_frontend_security_group.id]
   }
 

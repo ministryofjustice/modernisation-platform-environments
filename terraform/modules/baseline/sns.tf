@@ -20,6 +20,10 @@ resource "aws_sns_topic" "this" {
   name              = each.key
   display_name      = each.value.display_name
   kms_master_key_id = try(var.environment.kms_keys[each.value.kms_master_key_id].arn, each.value.kms_master_key_id)
+
+  tags = merge(local.tags, {
+    Name = each.key
+  })
 }
 
 resource "aws_sns_topic_subscription" "this" {

@@ -1,5 +1,6 @@
-resource "aws_efs_file_system" "oem-app-efs" {
+resource "aws_efs_file_system" "oem_app_efs" {
   encrypted        = true
+  kms_key_id       = data.aws_kms_key.ebs_shared.arn
   performance_mode = "generalPurpose"
   tags = merge(tomap({
     "Name"                 = "${local.application_name}-app-efs"
@@ -9,15 +10,15 @@ resource "aws_efs_file_system" "oem-app-efs" {
   }), local.tags)
 }
 
-resource "aws_efs_mount_target" "oem-app-efs" {
-  file_system_id = aws_efs_file_system.oem-app-efs.id
+resource "aws_efs_mount_target" "oem_app_efs" {
+  file_system_id = aws_efs_file_system.oem_app_efs.id
   subnet_id      = data.aws_subnet.data_subnets_a.id
   security_groups = [
-    aws_security_group.oem-app-efs-sg.id
+    aws_security_group.oem_app_efs_sg.id
   ]
 }
 
-resource "aws_security_group" "oem-app-efs-sg" {
+resource "aws_security_group" "oem_app_efs_sg" {
   name_prefix = "${local.application_name}-app-efs-sg-"
   description = "Allow inbound access from instances"
   vpc_id      = data.aws_vpc.shared.id

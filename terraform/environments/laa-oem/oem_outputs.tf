@@ -48,6 +48,11 @@ output "route53_record_app_lb" {
   value       = aws_route53_record.route53_record_app_lb.fqdn
 }
 
+output "route53_record_app_lb_internal" {
+  description = "App internal LB Route53 record"
+  value       = aws_route53_record.route53_record_app_lb_internal.fqdn
+}
+
 output "route53_record_app_ec2" {
   description = "App Route53 record"
   value       = aws_route53_record.route53_record_app.fqdn

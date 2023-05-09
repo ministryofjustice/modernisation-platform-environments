@@ -1,9 +1,9 @@
 resource "aws_lb" "ebsapps_lb" {
   name               = lower(format("lb-%s-%s-ebsapp", local.application_name, local.environment))
-  internal           = true
+  internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.sg_ebsapps_lb.id]
-  subnets            = data.aws_subnets.private-public.ids
+  subnets            = data.aws_subnets.shared-public.ids
 
   enable_deletion_protection = true
 
@@ -19,8 +19,8 @@ resource "aws_lb" "ebsapps_lb" {
 }
 
 resource "aws_lb_listener" "ebsapps_listener" {
-  count       = local.is-production ? 0 : 1
-  depends_on  = [
+  count = local.is-production ? 0 : 1
+  depends_on = [
     aws_acm_certificate_validation.external
   ]
 
@@ -54,6 +54,11 @@ resource "aws_lb_target_group_attachment" "ebsapps" {
   port             = local.application_data.accounts[local.environment].tg_apps_port
 }
 
+resource "aws_wafv2_web_acl_association" "ebs_waf_association" {
+  resource_arn = aws_lb.ebsapps_lb.arn
+  web_acl_arn  = aws_wafv2_web_acl.ebs_web_acl.arn
+}
+
 
 # WEBGATE
 resource "aws_lb" "webgate_lb" {
@@ -62,7 +67,7 @@ resource "aws_lb" "webgate_lb" {
   internal           = true
   load_balancer_type = "application"
   security_groups    = [aws_security_group.sg_webgate_lb.id]
-  subnets            = data.aws_subnets.private-public.ids
+  subnets            = data.aws_subnets.shared-private.ids
 
   enable_deletion_protection = true
 
@@ -78,7 +83,7 @@ resource "aws_lb" "webgate_lb" {
 }
 
 resource "aws_lb_listener" "webgate_listener" {
-  count      = local.is-production ? 1 : 1
+  count = local.is-production ? 1 : 1
   depends_on = [
     aws_acm_certificate_validation.external
   ]
