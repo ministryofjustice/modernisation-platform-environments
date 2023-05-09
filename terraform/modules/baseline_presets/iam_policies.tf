@@ -109,6 +109,7 @@ locals {
           "ec2:DescribeVolumes",
           "ec2:DescribeTags",
           "ec2:DescribeInstances",
+          "autoscaling:CompleteLifecycleAction"
         ]
         resources = ["*"]
       }]
