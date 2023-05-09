@@ -19,13 +19,13 @@ variable "catalog_db_name" {
 variable "enable_redshift_schema" {
   description = "Enable Schema, Set to True if to Terraform the resource"
   type        = bool
-  default     = false    
+  default     = null    
 }
 
 variable "glue_catalog_ext" {
   description = "Enable if it is Glue Catalog Source"
   type        = bool
-  default     = false    
+  default     = null    
 }
 
 variable "region" {

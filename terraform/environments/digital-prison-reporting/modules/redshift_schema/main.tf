@@ -9,7 +9,7 @@ terraform {
 
 # External schema using AWS Glue Data Catalog
 resource "redshift_schema" "external_from_glue_data_catalog" {
-  count = var.enable_redshift_schema && var.glue_catalog_ext
+  count = var.enable_redshift_schema && var.glue_catalog_ext ? 1 : 0
 
   name = var.schema
   owner = var.master_username
