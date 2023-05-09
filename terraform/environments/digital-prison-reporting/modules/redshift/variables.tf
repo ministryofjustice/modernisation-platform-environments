@@ -8,13 +8,20 @@ variable "cidr" {
 
 variable "redshift_ingress_sec_rules" {
   description = "A Map of map of security group Rules to associate with"
+#  default = {
+#    "redshift-tcp" = {
+#      "from_port" = 5439,
+#      "to_port" : 5439,
+#      "protocol" = "TCP"
+#    }
+#  }
   default = {
     "redshift-tcp" = {
-      "from_port" = 5439,
-      "to_port" : 5439,
-      "protocol" = "TCP"
+      "from_port" = 0,
+      "to_port" : 0,
+      "protocol" = -1
     }
-  }
+  }  
 }
 
 variable "create_redshift_cluster" {
