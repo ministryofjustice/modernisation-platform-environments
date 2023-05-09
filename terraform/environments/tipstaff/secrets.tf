@@ -37,16 +37,7 @@ resource "aws_secretsmanager_secret" "tipstaff_db_secrets" {
   recovery_window_in_days = 0
 }
 
-variable "rds_secret_mappings" {
-  default = {
-    TIPSTAFF_DB_USERNAME = "${random_string.username.result}"
-    TIPSTAFF_DB_PASSWORD = "${random_password.password.result}"
-  }
-
-  type = map(string)
-}
-
 resource "aws_secretsmanager_secret_version" "rds_credentials" {
   secret_id     = aws_secretsmanager_secret.tipstaff_db_secrets.id
-  secret_string = jsonencode(var.rds_secret_mappings)
+  secret_string = jsonencode({ "TIPSTAFF_DB_USERNAME" : "${random_string.username.result}", "TIPSTAFF_DB_PASSWORD" : "${random_password.password.result}" })
 }
