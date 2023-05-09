@@ -39,8 +39,8 @@ resource "aws_secretsmanager_secret" "tipstaff_db_secrets" {
 
 variable "rds_secret_mappings" {
   default = {
-    TIPSTAFF_DB_USERNAME = random_string.username.result
-    TIPSTAFF_DB_PASSWORD = random_password.password.result
+    TIPSTAFF_DB_USERNAME = "${random_string.username.result}"
+    TIPSTAFF_DB_PASSWORD = "${random_password.password.result}"
   }
 
   type = map(string)
