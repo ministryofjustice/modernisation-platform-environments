@@ -495,6 +495,7 @@ module "datamart" {
   master_password         = "Datamartpass2022" ## Needs to pull from Secrets Manager, #TD
   create_random_password  = false
   encrypted               = true
+  publicly_accessible     = true # Required for Terraform to manage Redshift Schemas and Tables
   create_subnet_group     = true
   kms_key_arn             = aws_kms_key.redshift-kms-key.arn
   enhanced_vpc_routing    = false
@@ -518,7 +519,7 @@ module "datamart" {
     resume = {
       name           = "${local.redshift_cluster_name}-resume"
       description    = "Resume cluster every morning"
-      schedule       = "cron(30 07 * * ? *)"
+      schedule       = "cron(30 22 * * ? *)"
       resume_cluster = true
     }
   }
