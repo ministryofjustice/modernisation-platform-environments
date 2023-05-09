@@ -1,3 +1,12 @@
+terraform {
+  required_providers {
+    redshift = {
+      source = "brainly/redshift"
+      version = "1.1.0"
+    }
+  }
+}
+
 # External schema using AWS Glue Data Catalog
 resource "redshift_schema" "external_from_glue_data_catalog" {
   count = var.enable_redshift_schema && var.glue_catalog_ext
