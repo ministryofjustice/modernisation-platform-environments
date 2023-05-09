@@ -38,11 +38,13 @@ rm -rf /var/lib/amazon/ssm/ipc/
 systemctl start amazon-ssm-agent
 mount -a
 
-mkdir /mnt/efs
-mount -t nfs4 ${aws_efs_file_system.rman_fs.dns_name}:/ /mnt/efs
-echo '${aws_efs_file_system.rman_fs.dns_name}:/ /mnt/efs nfs4 defaults,_netdev 0 0' | sudo tee -a /etc/fstab
+yum install -y automake fuse fuse-devel gcc-c++ git libcurl-devel libxml2-devel make openssl-devel
 
 EOF
+
+#mkdir /mnt/efs
+#mount -t nfs4 ${aws_efs_file_system.rman_fs.dns_name}:/ /mnt/efs
+#echo '${aws_efs_file_system.rman_fs.dns_name}:/ /mnt/efs nfs4 defaults,_netdev 0 0' | sudo tee -a /etc/fstab
 
   tags = merge(local.tags,
     { Name = lower(format("ec2-%s-%s-rmantest", local.application_name, local.environment)) },
@@ -51,7 +53,7 @@ EOF
   )
 
 }
-
+/*
 resource "aws_efs_file_system" "rman_fs" {
   performance_mode = "generalPurpose"
 }
@@ -91,4 +93,4 @@ resource "aws_security_group_rule" "rman_sgr" {
 
   source_security_group_id = aws_security_group.rman.id
 }
-
+*/
