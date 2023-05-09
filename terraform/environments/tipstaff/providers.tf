@@ -1,7 +1,7 @@
 provider "aws" {
   region     = "eu-west-2"
-  access_key = jsondecode(data.aws_secretsmanager_secret_version.tactical_products_rds_credentials.secret_string)["ACCESS_KEY"]
-  secret_key = jsondecode(data.aws_secretsmanager_secret_version.tactical_products_rds_credentials.secret_string)["SECRET_KEY"]
+  access_key = jsondecode(data.aws_secretsmanager_secret_version.dms_source_credentials[count.index].secret_string)["ACCESS_KEY"]
+  secret_key = jsondecode(data.aws_secretsmanager_secret_version.dms_source_credentials[count.index].secret_string)["SECRET_KEY"]
   alias      = "tacticalproducts"
 }
 
