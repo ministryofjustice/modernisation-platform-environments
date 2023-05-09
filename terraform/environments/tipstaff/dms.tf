@@ -1,5 +1,5 @@
 resource "aws_dms_endpoint" "source" {
-  depends_on                  = [null_resource.setup_target_rds_security_group, aws_db_instance.tipstaff_db, aws_dms_endpoint.target, aws_dms_replication_instance.tipstaff_replication_instance]
+  # depends_on                  = [null_resource.setup_target_rds_security_group, aws_db_instance.tipstaff_db, aws_dms_endpoint.target, aws_dms_replication_instance.tipstaff_replication_instance]
   database_name               = "tipstaff_staging"
   endpoint_id                 = "tipstaff-source"
   endpoint_type               = "source"
