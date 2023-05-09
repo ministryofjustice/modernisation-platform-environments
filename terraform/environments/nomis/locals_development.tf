@@ -30,11 +30,11 @@ locals {
 
       dev-redhat-rhel79 = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name  = "RHEL-7.9_HVM-*"
-          ami_owner = "309956199498"
+          ami_name          = "RHEL-7.9_HVM-*"
+          ami_owner         = "309956199498"
+          availability_zone = null
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-          availability_zone      = null
           vpc_security_group_ids = ["private-web"]
         })
         user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
@@ -53,10 +53,10 @@ locals {
 
       dev-base-rhel85 = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name = "base_rhel_8_5_*"
+          ami_name          = "base_rhel_8_5_*"
+          availability_zone = null
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-          availability_zone      = null
           vpc_security_group_ids = ["private-web"]
         })
         user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
@@ -77,10 +77,10 @@ locals {
 
       dev-base-rhel79 = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name = "base_rhel_7_9_*"
+          ami_name          = "base_rhel_7_9_*"
+          availability_zone = null
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-          availability_zone      = null
           vpc_security_group_ids = ["private-web"]
         })
         user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
@@ -101,10 +101,10 @@ locals {
 
       dev-base-rhel610 = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name = "base_rhel_6_10*"
+          ami_name          = "base_rhel_6_10*"
+          availability_zone = null
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default_rhel6, {
-          availability_zone      = null
           vpc_security_group_ids = ["private-web"]
         })
         user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
@@ -127,11 +127,11 @@ locals {
         # ami has unwanted ephemeral device, don't copy all the ebs_volumess
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name                      = "nomis_windows_server_2022_jumpserver_release_*"
+          availability_zone             = null
           ebs_volumes_copy_all_from_ami = false
           user_data_raw                 = base64encode(file("./templates/jumpserver-user-data.yaml"))
         })
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-          availability_zone      = null
           vpc_security_group_ids = ["private-jumpserver"]
         })
         ebs_volumes = {
