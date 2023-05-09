@@ -495,7 +495,7 @@ module "datamart" {
   master_password         = "Datamartpass2022" ## Needs to pull from Secrets Manager, #TD
   create_random_password  = false
   encrypted               = true
-  publicly_accessible     = false # Required for Terraform to manage Redshift Schemas and Tables
+  publicly_accessible     = true # Required for Terraform to manage Redshift Schemas and Tables
   create_subnet_group     = true
   kms_key_arn             = aws_kms_key.redshift-kms-key.arn
   enhanced_vpc_routing    = false
@@ -519,7 +519,7 @@ module "datamart" {
     resume = {
       name           = "${local.redshift_cluster_name}-resume"
       description    = "Resume cluster every morning"
-      schedule       = "cron(40 23 * * ? *)"
+      schedule       = "cron(30 07 * * ? *)"
       resume_cluster = true
     }
   }
@@ -537,7 +537,7 @@ module "datamart" {
 # Domain Schema, DPR-267
 module "redshift_schema_domain" {
   source                  = "./modules/redshift_schema"
-  enable_redshift_schema  = false
+  enable_redshift_schema  = true
   glue_catalog_ext        = true
   schema                  = "domain"
   catalog_db_name         = "domain"
