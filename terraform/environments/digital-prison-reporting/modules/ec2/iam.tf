@@ -222,13 +222,13 @@ resource "aws_iam_role_policy_attachment" "dms" {
   policy_arn = aws_iam_policy.dms.arn
 }
 
-data "aws_iam_policy" "RedshiftAdmin" {
-  arn = "arn:aws:iam::aws:policy/AmazonRedshiftFullAccess"
+data "aws_iam_policy" "RedshiftQueryEditor" {
+  arn = "arn:aws:iam::aws:policy/AmazonRedshiftQueryEditorV2FullAccess"
 }
 
 resource "aws_iam_role_policy_attachment" "redshift" {
   role       = aws_iam_role.kinesis-agent-instance-role.name
-  policy_arn = data.aws_iam_policy.RedshiftAdmin.arn
+  policy_arn = data.aws_iam_policy.RedshiftQueryEditor.arn
 }
 
 resource "aws_iam_policy_attachment" "this" {
