@@ -8,7 +8,6 @@ module "alb" {
   }
 
   vpc_all                          = local.vpc_all
-  service_name                     = local.application_data.accounts[local.environment].service_name
   application_name                 = local.application_name
   business_unit                    = var.networking[0].business-unit
   public_subnets                   = [data.aws_subnet.public_subnets_a.id, data.aws_subnet.public_subnets_b.id, data.aws_subnet.public_subnets_c.id]

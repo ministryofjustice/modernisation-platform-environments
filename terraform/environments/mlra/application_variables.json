@@ -2,7 +2,6 @@
   "accounts": {
     "development": {
       "example_var": "dev-data",
-      "service_name": "mlra",
       "region": "eu-west-2",
       "alb_target_group_path": "/mlra/",
       "container_instance_type": "linux",
@@ -35,7 +34,6 @@
     },
     "test": {
       "example_var": "test-data",
-      "service_name": "mlra",
       "region": "eu-west-2",
       "alb_target_group_path": "/mlra/",
       "container_instance_type": "linux",
@@ -67,7 +65,6 @@
     },
     "preproduction": {
       "example_var": "preproduction-data",
-      "service_name": "mlra",
       "region": "eu-west-2",
       "alb_target_group_path": "/mlra/",
       "container_instance_type": "linux",
@@ -99,7 +96,6 @@
     },
     "production": {
       "example_var": "production-data",
-      "service_name": "mlra",
       "region": "eu-west-2",
       "alb_target_group_path": "/mlra/",
       "container_instance_type": "linux",
@@ -127,7 +123,7 @@
       "moj_vpn_cidr": "81.134.202.29/32",
       "nlb_prevent_deletion": true,
       "pagerduty_integration_key_name": "laa_mlra_prod_alarms",
-      "acm_cert_domain_name": "mlra.service.justice.gov.uk"
+      "acm_cert_domain_name": "maat-libra-administration-tool.service.justice.gov.uk"
     }
   }
 }
