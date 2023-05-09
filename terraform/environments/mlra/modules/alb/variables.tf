@@ -9,6 +9,11 @@ variable "tags" {
 
 variable "environment" {}
 
+variable "service_name" {
+  type        = string
+  description = "The name of the application to be used in any fully qualified domain name."
+}
+
 variable "application_name" {
   type        = string
   description = "Name of application"

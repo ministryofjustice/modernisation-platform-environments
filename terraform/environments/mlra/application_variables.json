@@ -2,6 +2,7 @@
   "accounts": {
     "development": {
       "example_var": "dev-data",
+      "service_name": "mlra",
       "region": "eu-west-2",
       "alb_target_group_path": "/mlra/",
       "container_instance_type": "linux",
@@ -30,9 +31,11 @@
       "nlb_prevent_deletion": false,
       "pagerduty_integration_key_name": "laa_mlra_nonprod_alarms",
       "acm_cert_domain_name": "modernisation-platform.service.justice.gov.uk"
+
     },
     "test": {
       "example_var": "test-data",
+      "service_name": "mlra",
       "region": "eu-west-2",
       "alb_target_group_path": "/mlra/",
       "container_instance_type": "linux",
@@ -64,6 +67,7 @@
     },
     "preproduction": {
       "example_var": "preproduction-data",
+      "service_name": "mlra",
       "region": "eu-west-2",
       "alb_target_group_path": "/mlra/",
       "container_instance_type": "linux",
@@ -95,6 +99,7 @@
     },
     "production": {
       "example_var": "production-data",
+      "service_name": "mlra",
       "region": "eu-west-2",
       "alb_target_group_path": "/mlra/",
       "container_instance_type": "linux",

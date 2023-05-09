@@ -35,7 +35,6 @@ locals {
   # domain_type_sub    = [for k, v in local.domain_types : v.type if k != "modernisation-platform.service.justice.gov.uk"]
 
 
-
   domain_name_main   = [for k, v in local.domain_types : v.name if k == var.acm_cert_domain_name]
   domain_name_sub    = [for k, v in local.domain_types : v.name if k != var.acm_cert_domain_name]
   domain_record_main = [for k, v in local.domain_types : v.record if k == var.acm_cert_domain_name]
@@ -43,7 +42,7 @@ locals {
   domain_type_main   = [for k, v in local.domain_types : v.type if k == var.acm_cert_domain_name]
   domain_type_sub    = [for k, v in local.domain_types : v.type if k != var.acm_cert_domain_name]
 
-  domain_name   = var.environment != "production" ? "${var.application_name}.${var.business_unit}-${var.environment}.${var.acm_cert_domain_name}" : "${var.application_name}.${var.acm_cert_domain_name}"
+  domain_name   = var.environment != "production" ? "${var.service_name}.${var.business_unit}-${var.environment}.${var.acm_cert_domain_name}" : "${var.service_name}.${var.acm_cert_domain_name}"
 
   # domain_name   = "${var.application_name}.${var.business_unit}-${var.environment}.modernisation-platform.service.justice.gov.uk"
  
@@ -267,7 +266,7 @@ data "aws_secretsmanager_secret_version" "cloudfront" {
 }
 
 resource "aws_acm_certificate" "cloudfront" {
-  domain_name       = var.acm_cert_domain_name
+  domain_name       =  var.environment != "production" ? var.acm_cert_domain_name : "${var.service_name}.${var.acm_cert_domain_name}"
   validation_method = "DNS"
   provider          = aws.us-east-1
 
@@ -487,7 +486,9 @@ resource "aws_waf_web_acl" "waf_acl" {
 ## ALB Listener
 
 resource "aws_acm_certificate" "external_lb" {
-  domain_name       = var.acm_cert_domain_name
+
+  domain_name   = var.environment != "production" ? var.acm_cert_domain_name : "${var.service_name}.${var.acm_cert_domain_name}"
+
   validation_method = "DNS"
 
   subject_alternative_names = var.environment == "production" ? null : [local.domain_name]
