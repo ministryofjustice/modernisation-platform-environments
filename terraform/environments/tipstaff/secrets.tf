@@ -8,31 +8,6 @@ data "aws_secretsmanager_secret_version" "dms_source_credentials" {
   secret_id = data.aws_secretsmanager_secret.tactical_products_db_secrets.id
 }
 
-data "aws_iam_session_context" "member_infrastructure_access" {
-  arn = "arn:aws:iam::842764906196:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-developer_8f3fb941aaa4158d"
-}
-
-resource "aws_iam_role_policy" "add_secrets_manager_policy" {
-  name = "execution-${var.networking[0].application}"
-  role = data.aws_iam_session_context.member_infrastructure_access.issuer_name
-
-  policy = <<-EOF
-  {
-    "Version": "2012-10-17",
-    "Statement": [
-      {
-        "Action": [
-          "secretsmanager:*"
-        ],
-        "Resource": "*",
-        "Effect": "Allow"
-      }
-    ]
-  }
-  EOF
-}
-
-# Cannot create a secret using the console in pre-production, so trying a different approach
 resource "random_string" "username" {
   length  = 16
   lower   = true
@@ -57,4 +32,14 @@ resource "aws_secretsmanager_secret" "tipstaff_db_secrets" {
 resource "aws_secretsmanager_secret_version" "rds_credentials" {
   secret_id     = aws_secretsmanager_secret.tipstaff_db_secrets.id
   secret_string = jsonencode({ "TIPSTAFF_DB_USERNAME" : "${random_string.username.result}", "TIPSTAFF_DB_PASSWORD" : "${random_password.password.result}" })
+}
+
+resource "aws_secretsmanager_secret" "tactical_products_db_secrets" {
+  name                    = "tipstaff-tactical-products-db-secrets"
+  recovery_window_in_days = 0
+}
+
+resource "aws_secretsmanager_secret_version" "tactical_products_rds_credentials" {
+  secret_id     = aws_secretsmanager_secret.tactical_products_db_secrets.id
+  secret_string = jsonencode({ "" : "", "" : "" })
 }
