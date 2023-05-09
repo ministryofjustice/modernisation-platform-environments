@@ -86,13 +86,6 @@ resource "aws_security_group" "mojfin" {
     cidr_blocks = [data.aws_vpc.shared.cidr_block]
   }
 
-  ingress {
-    description = "Connectivity from MP Environment VPC"
-    from_port   = 1521
-    to_port     = 1521
-    protocol    = "tcp"
-    cidr_blocks = [data.aws_vpc.shared.cidr_block]
-  }
 
   ingress {
     description = "Temp rule for DBlinks, remove rule once the other DBs have been migrated to MP"
