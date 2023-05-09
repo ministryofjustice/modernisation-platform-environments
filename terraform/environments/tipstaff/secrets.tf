@@ -7,7 +7,7 @@ data "aws_secretsmanager_secret" "tactical_products_db_secrets" {
 
 data "aws_secretsmanager_secret_version" "dms_source_credentials" {
   count     = local.is-development ? 1 : 0
-  secret_id = data.aws_secretsmanager_secret.tactical_products_db_secrets[count.index].id
+  secret_id = data.aws_secretsmanager_secret.tactical_products_db_secrets.id
 }
 
 resource "random_string" "username" {
