@@ -158,42 +158,42 @@ resource "aws_dms_replication_task" "tipstaff_migration_task" {
 
 }
 
-resource "aws_security_group" "modernisation_dms_access" {
-  provider    = aws.tacticalproducts
-  name        = "modernisation_dms_access"
-  description = "allow dms access to the database for the modernisation platform"
+# resource "aws_security_group" "modernisation_dms_access" {
+#   provider    = aws.tacticalproducts
+#   name        = "modernisation_dms_access"
+#   description = "allow dms access to the database for the modernisation platform"
 
-  ingress {
-    from_port   = 5432
-    to_port     = 5432
-    protocol    = "tcp"
-    description = "Allow DMS to connect to source database"
-    cidr_blocks = ["${aws_dms_replication_instance.tipstaff_replication_instance.replication_instance_public_ips[0]}/32"]
-  }
+#   ingress {
+#     from_port   = 5432
+#     to_port     = 5432
+#     protocol    = "tcp"
+#     description = "Allow DMS to connect to source database"
+#     cidr_blocks = ["${aws_dms_replication_instance.tipstaff_replication_instance.replication_instance_public_ips[0]}/32"]
+#   }
 
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
+#   egress {
+#     from_port   = 0
+#     to_port     = 0
+#     protocol    = "-1"
+#     cidr_blocks = ["0.0.0.0/0"]
+#   }
+# }
 
-resource "null_resource" "setup_target_rds_security_group" {
-  depends_on = [aws_dms_replication_instance.tipstaff_replication_instance]
+# resource "null_resource" "setup_target_rds_security_group" {
+#   depends_on = [aws_dms_replication_instance.tipstaff_replication_instance]
 
-  provisioner "local-exec" {
-    interpreter = ["bash", "-c"]
-    command     = "chmod +x ./setup-security-group.sh; ./setup-security-group.sh"
+#   provisioner "local-exec" {
+#     interpreter = ["bash", "-c"]
+#     command     = "chmod +x ./setup-security-group.sh; ./setup-security-group.sh"
 
-    environment = {
-      DMS_SECURITY_GROUP            = aws_security_group.modernisation_dms_access.id
-      DMS_TARGET_ACCOUNT_ACCESS_KEY = jsondecode(data.aws_secretsmanager_secret_version.dms_source_credentials[0].secret_string)["ACCESS_KEY"]
-      DMS_TARGET_ACCOUNT_SECRET_KEY = jsondecode(data.aws_secretsmanager_secret_version.dms_source_credentials[0].secret_string)["SECRET_KEY"]
-      DMS_TARGET_ACCOUNT_REGION     = "eu-west-2"
-    }
-  }
-  triggers = {
-    always_run = "${timestamp()}"
-  }
-}
+#     environment = {
+#       DMS_SECURITY_GROUP            = aws_security_group.modernisation_dms_access.id
+#       DMS_TARGET_ACCOUNT_ACCESS_KEY = jsondecode(data.aws_secretsmanager_secret_version.dms_source_credentials[0].secret_string)["ACCESS_KEY"]
+#       DMS_TARGET_ACCOUNT_SECRET_KEY = jsondecode(data.aws_secretsmanager_secret_version.dms_source_credentials[0].secret_string)["SECRET_KEY"]
+#       DMS_TARGET_ACCOUNT_REGION     = "eu-west-2"
+#     }
+#   }
+#   triggers = {
+#     always_run = "${timestamp()}"
+#   }
+# }
