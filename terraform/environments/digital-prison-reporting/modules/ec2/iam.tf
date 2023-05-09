@@ -231,6 +231,15 @@ resource "aws_iam_role_policy_attachment" "redshift" {
   policy_arn = data.aws_iam_policy.RedshiftQueryEditor.arn
 }
 
+data "aws_iam_policy" "AmazonRedshiftFullAccess" {
+  arn = "arn:aws:iam::aws:policy/AmazonRedshiftFullAccess"
+}
+
+resource "aws_iam_role_policy_attachment" "redshift" {
+  role       = aws_iam_role.kinesis-agent-instance-role.name
+  policy_arn = data.aws_iam_policy.AmazonRedshiftFullAccess.arn
+}
+
 resource "aws_iam_policy_attachment" "this" {
   name       = "ssm_managed_instance_core"
   roles      = [aws_iam_role.kinesis-agent-instance-role.name]
