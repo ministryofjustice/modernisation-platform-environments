@@ -20,8 +20,8 @@ resource "random_string" "username" {
   length  = 16
   lower   = true
   upper   = true
-  numeric = true
-  special = true
+  numeric = false
+  special = false
 }
 
 resource "random_password" "password" {
