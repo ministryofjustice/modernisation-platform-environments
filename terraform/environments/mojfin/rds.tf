@@ -85,6 +85,15 @@ resource "aws_security_group" "mojfin" {
     protocol    = "tcp"
     cidr_blocks = [data.aws_vpc.shared.cidr_block]
   }
+
+
+  ingress {
+    description = "Temp rule for DBlinks, remove rule once the other DBs have been migrated to MP"
+    from_port   = 1521
+    to_port     = 1521
+    protocol    = "tcp"
+    cidr_blocks = [local.lzprd-vpc]
+  }
   egress {
     from_port   = 0
     to_port     = 0
