@@ -22,6 +22,7 @@ locals {
   maintenance_window         = "Mon:01:15-Mon:06:00"
   storage_type               = "gp2"
   rds_snapshot_name          = "laws3169-mojfin-migration-v1"
+  lzprd-vpc                  = "10.205.0.0/20"
 
   # CloudWatch Alarms
   cpu_threshold                     = "90"
@@ -80,4 +81,6 @@ locals {
       secret_value = "query1"
     }
   }
+
+  prod_domain_name = "laa-finance-data.service.justice.gov.uk"
 }

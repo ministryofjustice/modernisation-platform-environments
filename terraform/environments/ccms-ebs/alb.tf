@@ -45,6 +45,12 @@ resource "aws_lb_target_group" "ebsapp_tg" {
     port     = local.application_data.accounts[local.environment].tg_apps_port
     protocol = "HTTP"
   }
+
+  stickiness {
+    enabled       = true
+    type          = "lb_cookie"
+    cookie_duration = 3600
+  }
 }
 
 resource "aws_lb_target_group_attachment" "ebsapps" {
