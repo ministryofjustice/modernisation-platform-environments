@@ -509,20 +509,20 @@ module "datamart" {
 
   # Scheduled actions
   create_scheduled_action_iam_role = true
-  scheduled_actions = {
-    pause = {
-      name          = "${local.redshift_cluster_name}-pause"
-      description   = "Pause cluster every night"
-      schedule      = "cron(30 20 * * ? *)"
-      pause_cluster = false
-    }
-    resume = {
-      name           = "${local.redshift_cluster_name}-resume"
-      description    = "Resume cluster every morning"
-      schedule       = "cron(45 22 * * ? *)"
-      resume_cluster = false
-    }
-  }
+  #scheduled_actions = {
+  #  pause = {
+  #    name          = "${local.redshift_cluster_name}-pause"
+  #    description   = "Pause cluster every night"
+  #    schedule      = "cron(30 20 * * ? *)"
+  #    pause_cluster = false
+  #  }
+  #  resume = {
+  #    name           = "${local.redshift_cluster_name}-resume"
+  #    description    = "Resume cluster every morning"
+  #    schedule       = "cron(45 22 * * ? *)"
+  #    resume_cluster = false
+  #  }
+  #}
 
   tags = merge(
     local.all_tags,
