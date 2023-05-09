@@ -99,7 +99,7 @@ resource "aws_security_group" "mojfin" {
     from_port   = 1521
     to_port     = 1521
     protocol    = "tcp"
-    cidr_blocks = [loca.local.lzprd-vpc]
+    cidr_blocks = [local.lzprd-vpc]
   }
   egress {
     from_port   = 0
