@@ -5,19 +5,13 @@ variable "master_username" {
 }
 
 variable "schema" {
-  description = "Username for the master DB user (Required unless a `snapshot_identifier` is provided). Defaults to `awsuser`"
+  description = "Redshift Schema to be Setup, Name"
   type        = string
   default     = ""
 }
 
 variable "catalog_db_name" {
-  description = "Username for the master DB user (Required unless a `snapshot_identifier` is provided). Defaults to `awsuser`"
-  type        = string
-  default     = ""
-}
-
-variable "master_username" {
-  description = "Username for the master DB user (Required unless a `snapshot_identifier` is provided). Defaults to `awsuser`"
+  description = "Glue catalog DB Name"
   type        = string
   default     = ""
 }
