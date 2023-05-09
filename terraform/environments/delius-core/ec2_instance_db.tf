@@ -68,7 +68,7 @@ resource "aws_instance" "base_ami_test_instance" {
   #checkov:skip=CKV2_AWS_41:"IAM role is not implemented for this example EC2. SSH/AWS keys are not used either."
   # Specify the instance type and ami to be used (this is the Amazon free tier option)
   instance_type               = "t2.small"
-  ami                         = "ami-0e3dd4f4b84ef84f5" # AL2 amzn2-ami-hvm-2.0.20230418.0-x86_64-gp2 # data.aws_ami.aws_ami_base_ol.id
+  ami                         = data.aws_ami.aws_ami_base_ol.id # "ami-0e3dd4f4b84ef84f5" # AL2 amzn2-ami-hvm-2.0.20230418.0-x86_64-gp2
   vpc_security_group_ids      = [aws_security_group.base_ami_test_instance_sg.id]
   subnet_id                   = data.aws_subnet.private_subnets_a.id
   iam_instance_profile        = aws_iam_instance_profile.base_ami_test_instance_profile.name
