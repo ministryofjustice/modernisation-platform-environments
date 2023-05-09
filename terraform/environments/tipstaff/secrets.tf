@@ -38,11 +38,11 @@ resource "aws_secretsmanager_secret" "tipstaff_db_secrets" {
 }
 
 resource "aws_secretsmanager_secret_version" "rds_username" {
-  secret_id     = aws_secretsmanager_secret.tipstaff_pre_prod_db_secrets.id
+  secret_id     = aws_secretsmanager_secret.tipstaff_db_secrets.id
   secret_string = random_string.username.result
 }
 
 resource "aws_secretsmanager_secret_version" "rds_password" {
-  secret_id     = aws_secretsmanager_secret.tipstaff_pre_prod_db_secrets.id
+  secret_id     = aws_secretsmanager_secret.tipstaff_db_secrets.id
   secret_string = random_password.password.result
 }
