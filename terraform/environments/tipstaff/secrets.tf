@@ -44,13 +44,13 @@ resource "aws_secretsmanager_secret" "tipstaff_pre_prod_db_secrets" {
   recovery_window_in_days = 0
 }
 
-resource "aws_secretsmanager_secret_version" "secrets_version" {
+resource "aws_secretsmanager_secret_version" "secrets_version_username" {
   count         = local.application_data.accounts[local.environment] == "preproduction" ? 1 : 0
   secret_id     = aws_secretsmanager_secret.tipstaff_pre_prod_db_secrets.id
   secret_string = random_string.username.result
 }
 
-resource "aws_secretsmanager_secret_version" "secrets_version" {
+resource "aws_secretsmanager_secret_version" "secrets_version_password" {
   count         = local.application_data.accounts[local.environment] == "preproduction" ? 1 : 0
   secret_id     = aws_secretsmanager_secret.tipstaff_pre_prod_db_secrets.id
   secret_string = random_password.password.result
