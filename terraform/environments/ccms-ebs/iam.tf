@@ -140,13 +140,13 @@ resource "aws_iam_policy" "rman_to_s3" {
       "Statement" : [
         {
           "Effect" : "Allow",
-          "Action": [
+          "Action" : [
             "s3:PutObject",
             "s3:GetObject",
             "s3:ListBucket",
             "s3:DeleteObject"
           ],
-          "Resource": [
+          "Resource" : [
             "arn:aws:s3:::ccms-ebs-*-dbbackup",
             "arn:aws:s3:::ccms-ebs-*-dbbackup/*"
           ]
