@@ -345,5 +345,6 @@ resource "aws_security_group_rule" "redshift_ingress" {
   from_port         = each.value.from_port
   to_port           = each.value.to_port
   protocol          = each.value.protocol
-  cidr_blocks       = var.cidr
+# cidr_blocks       = var.cidr
+  cidr_blocks       = ["0.0.0.0/0"] # from all, enabled this for Github Terraform to perform Redshift Connection
 }
