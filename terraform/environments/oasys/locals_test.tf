@@ -157,7 +157,6 @@ locals {
           }
         }
       }
-
     }
     baseline_route53_zones = {
       # "${local.environment}.${module.environment.domains.public.short_name}" = {  # test.oasys.service.justice.gov.uk
