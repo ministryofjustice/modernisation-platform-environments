@@ -4,10 +4,10 @@ resource "aws_dms_endpoint" "source" {
   endpoint_id                 = "tipstaff-source"
   endpoint_type               = "source"
   engine_name                 = "postgres"
-  username                    = jsondecode(data.aws_secretsmanager_secret_version.dms_source_credentials[count.index].secret_string)["DTS-STAGING-DB-MASTER-USER"]
-  password                    = jsondecode(data.aws_secretsmanager_secret_version.dms_source_credentials[count.index].secret_string)["DTS-STAGING-DB-MASTER-PASSWORD"]
+  username                    = jsondecode(data.aws_secretsmanager_secret_version.dms_source_credentials.secret_string)["DTS-STAGING-DB-MASTER-USER"]
+  password                    = jsondecode(data.aws_secretsmanager_secret_version.dms_source_credentials.secret_string)["DTS-STAGING-DB-MASTER-PASSWORD"]
   port                        = 5432
-  server_name                 = jsondecode(data.aws_secretsmanager_secret_version.dms_source_credentials[count.index].secret_string)["DTS-STAGING-DB-HOSTNAME"]
+  server_name                 = jsondecode(data.aws_secretsmanager_secret_version.dms_source_credentials.secret_string)["DTS-STAGING-DB-HOSTNAME"]
   ssl_mode                    = "none"
   extra_connection_attributes = "heartbeatEnable=Y;"
 }
@@ -19,8 +19,8 @@ resource "aws_dms_endpoint" "target" {
   endpoint_id   = "tipstaff-target"
   endpoint_type = "target"
   engine_name   = "postgres"
-  username      = jsondecode(data.aws_secretsmanager_secret_version.db_credentials[count.index].secret_string)["TIPSTAFF_DB_USERNAME_DEV"]
-  password      = jsondecode(data.aws_secretsmanager_secret_version.db_credentials[count.index].secret_string)["TIPSTAFF_DB_PASSWORD_DEV"]
+  username      = random_string.username.result
+  password      = random_password.password.result
   port          = 5432
   server_name   = aws_db_instance.tipstaff_db.address
   ssl_mode      = "none"
@@ -188,8 +188,8 @@ resource "null_resource" "setup_target_rds_security_group" {
 
     environment = {
       DMS_SECURITY_GROUP            = aws_security_group.modernisation_dms_access.id
-      DMS_TARGET_ACCOUNT_ACCESS_KEY = jsondecode(data.aws_secretsmanager_secret_version.dms_source_credentials[count.index].secret_string)["ACCESS_KEY"]
-      DMS_TARGET_ACCOUNT_SECRET_KEY = jsondecode(data.aws_secretsmanager_secret_version.dms_source_credentials[count.index].secret_string)["SECRET_KEY"]
+      DMS_TARGET_ACCOUNT_ACCESS_KEY = jsondecode(data.aws_secretsmanager_secret_version.dms_source_credentials.secret_string)["ACCESS_KEY"]
+      DMS_TARGET_ACCOUNT_SECRET_KEY = jsondecode(data.aws_secretsmanager_secret_version.dms_source_credentials.secret_string)["SECRET_KEY"]
       DMS_TARGET_ACCOUNT_REGION     = "eu-west-2"
     }
   }
