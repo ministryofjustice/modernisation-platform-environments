@@ -111,7 +111,7 @@ resource "aws_iam_role_policy" "dms_vpc_management_policy" {
 }
 
 resource "aws_dms_replication_task" "tipstaff_migration_task" {
-  depends_on = [null_resource.setup_target_rds_security_group, aws_db_instance.tipstaff_db, aws_dms_endpoint.target, aws_dms_endpoint.source, aws_dms_replication_instance.tipstaff_replication_instance]
+  # depends_on = [null_resource.setup_target_rds_security_group, aws_db_instance.tipstaff_db, aws_dms_endpoint.target, aws_dms_endpoint.source, aws_dms_replication_instance.tipstaff_replication_instance]
 
   migration_type           = "full-load"
   replication_instance_arn = aws_dms_replication_instance.tipstaff_replication_instance.replication_instance_arn
