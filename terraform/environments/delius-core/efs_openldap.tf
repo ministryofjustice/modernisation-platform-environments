@@ -2,7 +2,7 @@ resource "aws_efs_file_system" "openldap" {
   creation_token = format("%s-openldap", local.application_name)
 }
 
-module "s3_bucket_app_deployment" {
+module "s3_bucket_openldap_migration" {
 
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.4.0"
 
