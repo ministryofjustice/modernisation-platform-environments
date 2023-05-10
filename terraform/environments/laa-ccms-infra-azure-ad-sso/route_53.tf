@@ -21,8 +21,8 @@ resource "aws_route53_record" "ebs_vision_db_lb_cname" {
   name    = "ebs-vision-db-lb"
   ttl     = "300"
   type    = "CNAME"
-#  records = [aws_route53_record.sg_ebs_vision_db_a_record.fqdn]
-  records = [aws_lb.ebs_vision_db_lb.dns_name]
+  records = [aws_route53_record.sg_ebs_vision_db_a_record.fqdn]
+  #records = [aws_lb.ebs_vision_db_lb.dns_name]
 }
 
 ## EBS VISION DB
