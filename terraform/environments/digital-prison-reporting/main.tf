@@ -545,7 +545,7 @@ module "datamart" {
 # Domain Schema, DPR-267
 module "redshift_schema_domain" {
   source                  = "./modules/redshift_schema"
-  enable_redshift_schema  = false
+  enable_redshift_schema  = true
   glue_catalog_ext        = true
   master_username         = "dpruser"  
   master_pass             = module.datamart.redshift_master_password
