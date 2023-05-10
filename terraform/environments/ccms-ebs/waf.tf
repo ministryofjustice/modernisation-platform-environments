@@ -1,10 +1,5 @@
 # WAF FOR EBS APP
 
-
-resource "aws_cloudwatch_log_group" "ebs_waf_logs" {
-  name = "/aws/wafv2/ebs_waf_logs"
-  retention_in_days = 30
-}
 resource "aws_wafv2_ip_set" "ebs_waf_ip_set" {
   name               = "ebs_waf_ip_set"
   scope              = "REGIONAL"
@@ -72,13 +67,6 @@ resource "aws_wafv2_web_acl" "ebs_web_acl" {
     }
   }
 
-  logging_configuration {
-    log_destination_configs {
-      log_destination_arn = aws_cloudwatch_log_group.ebs_waf_logs.arn
-      log_type            = "ALL"
-    }
-  }
-
   tags = merge(local.tags,
     { Name = lower(format("lb-%s-%s-ebsapp-web-acl", local.application_name, local.environment)) }
   )
@@ -88,4 +76,15 @@ resource "aws_wafv2_web_acl" "ebs_web_acl" {
     metric_name                = "ebs_waf_metrics"
     sampled_requests_enabled   = true
   }
+}
+
+resource "aws_cloudwatch_log_group" "ebs_waf_logs" {
+  name = "/aws/wafv2/ebs_waf_logs"
+  retention_in_days = 30
+}
+
+resource "aws_wafv2_web_acl_logging_configuration" "ebs_waf_logging" {
+  log_destination_configs = [aws_cloudwatch_log_group.ebs_waf_logs.arn]
+  resource_arn            = aws_wafv2_web_acl.ebs_web_acl.arn
+
 }
