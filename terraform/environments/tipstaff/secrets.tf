@@ -35,3 +35,14 @@ resource "aws_secretsmanager_secret_version" "tactical_products_rds_credentials"
   secret_id     = aws_secretsmanager_secret.tactical_products_db_secrets.id
   secret_string = jsonencode({ "" : "", "" : "" })
 }
+
+data "aws_secretsmanager_secret" "secrets" {
+  depends_on = [aws_secretsmanager_secret_version.tactical_products_rds_credentials]
+  arn        = aws_secretsmanager_secret_version.tactical_products_rds_credentials.arn
+}
+
+data "aws_secretsmanager_secret_version" "current" {
+  depends_on = [aws_secretsmanager_secret_version.tactical_products_rds_credentials]
+  secret_id  = data.aws_secretsmanager_secret.secrets.id
+}
+
