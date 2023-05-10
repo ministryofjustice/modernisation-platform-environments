@@ -27,7 +27,7 @@ resource "aws_secretsmanager_secret_version" "redshift_connection" {
     password            = aws_redshift_cluster.this[0].master_password
     engine              = "redshift"
     host                = aws_redshift_cluster.this[0].endpoint
-    port                = var.port
+    port                = "5439"
     dbClusterIdentifier = aws_redshift_cluster.this[0].cluster_identifier
   })
 }

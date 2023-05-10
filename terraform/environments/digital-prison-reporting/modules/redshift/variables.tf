@@ -169,7 +169,7 @@ variable "master_password" {
 variable "create_random_password" {
   description = "Determines whether to create random password for cluster `master_password`"
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "random_password_length" {

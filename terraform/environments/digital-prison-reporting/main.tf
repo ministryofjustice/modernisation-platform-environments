@@ -496,7 +496,6 @@ module "datamart" {
   master_username         = "dpruser"
   create_random_password  = true
   random_password_length  = 16
-# master_password         = "Datamartpass2022" ## Needs to pull from Secrets Manager, #TD
   encrypted               = true
   publicly_accessible     = true # Required for Terraform to manage Redshift Schemas and Tables
   create_subnet_group     = true
