@@ -23,11 +23,11 @@ resource "aws_secretsmanager_secret" "redshift_connection" {
 resource "aws_secretsmanager_secret_version" "redshift_connection" {
   secret_id = aws_secretsmanager_secret.redshift_connection.id
   secret_string = jsonencode({
-    username            = aws_redshift_cluster.this.master_username
-    password            = aws_redshift_cluster.this.master_password
+    username            = aws_redshift_cluster.this[0].master_username
+    password            = aws_redshift_cluster.this[0].master_password
     engine              = "redshift"
-    host                = aws_redshift_cluster.this.endpoint
-    port                = "5439"
-    dbClusterIdentifier = aws_redshift_cluster.this.cluster_identifier
+    host                = aws_redshift_cluster.this[0].endpoint
+    port                = var.port
+    dbClusterIdentifier = aws_redshift_cluster.this[0].cluster_identifier
   })
 }
