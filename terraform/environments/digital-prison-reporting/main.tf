@@ -497,7 +497,7 @@ module "datamart" {
   create_random_password  = true
   random_password_length  = 16
   encrypted               = true
-  publicly_accessible     = true # Required for Terraform to manage Redshift Schemas and Tables
+  publicly_accessible     = false
   create_subnet_group     = true
   kms_key_arn             = aws_kms_key.redshift-kms-key.arn
   enhanced_vpc_routing    = false
