@@ -6,8 +6,8 @@ resource "aws_route53_record" "external" {
   type    = "A"
 
   alias {
-    name                   = aws_lb.tipstaff_dev_lb.dns_name
-    zone_id                = aws_lb.tipstaff_dev_lb.zone_id
+    name                   = aws_lb.tipstaff_lb.dns_name
+    zone_id                = aws_lb.tipstaff_lb.zone_id
     evaluate_target_health = true
   }
 }
