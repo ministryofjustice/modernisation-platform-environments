@@ -526,6 +526,12 @@ module "datamart" {
     }
   }
 
+  logging = {
+    enable = true
+    log_destination_type = "cloudwatch"
+    log_exports = "useractivitylog"
+  }  
+
   tags = merge(
     local.all_tags,
     {
