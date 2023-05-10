@@ -78,9 +78,9 @@ resource "aws_redshift_cluster" "this" {
     delete = try(var.cluster_timeouts.delete, null)
   }
 
-  lifecycle {
-    ignore_changes = [master_password]
-  }
+  #lifecycle {
+  #  ignore_changes = [master_password]
+  #}
 }
 
 ################################################################################
