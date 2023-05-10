@@ -11,7 +11,7 @@ terraform {
 provider "redshift" {
   host       = "dpr-redshift-test.ctrlffniiwwc.eu-west-2.redshift.amazonaws.com"
   username   = var.master_username
-  password   = "Datamartpass2022"
+  password   = var.master_pass
 }
 
 # External schema using AWS Glue Data Catalog

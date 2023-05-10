@@ -547,9 +547,10 @@ module "redshift_schema_domain" {
   source                  = "./modules/redshift_schema"
   enable_redshift_schema  = false
   glue_catalog_ext        = true
+  master_username         = "dpruser"  
+  master_pass             = module.datamart.redshift_master_password
   schema                  = "domain"
   catalog_db_name         = "domain"
-  master_username         = "dpruser"
 }
 
 

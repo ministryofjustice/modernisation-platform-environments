@@ -214,3 +214,9 @@ output "authentication_profiles" {
   description = "Map of authentication profiles created and their associated attributes"
   value       = aws_redshift_authentication_profile.this
 }
+
+#################################################################################
+output "redshift_master_password" {
+  description = "Master Password"
+  value       = aws_redshift_cluster.this[0].master_password
+}

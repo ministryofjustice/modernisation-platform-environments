@@ -37,3 +37,5 @@ variable "account" {
   description = "AWS Account ID."
   default     = ""
 }
+
+variable "master_pass" {}
