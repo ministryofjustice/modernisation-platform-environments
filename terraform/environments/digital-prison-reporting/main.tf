@@ -493,7 +493,6 @@ module "datamart" {
   node_type               = "ra3.xlplus"
   number_of_nodes         = 1
   database_name           = "datamart"
-  project_id              = local.project
   master_username         = "dpruser"
   create_random_password  = true
   random_password_length  = 16
