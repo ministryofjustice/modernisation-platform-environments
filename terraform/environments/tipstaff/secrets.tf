@@ -23,7 +23,7 @@ resource "random_password" "password" {
   lower   = true
   upper   = true
   numeric = true
-  special = true
+  special = false
 }
 
 resource "aws_secretsmanager_secret" "tipstaff_db_secrets" {
