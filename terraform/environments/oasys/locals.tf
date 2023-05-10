@@ -234,7 +234,6 @@ locals {
     environment-name                        = terraform.workspace # used in provisioning script to select group vars
   }
 
-
   # lb_listener_defaults = {
 
   #   oasys_public = {
