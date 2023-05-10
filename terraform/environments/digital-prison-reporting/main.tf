@@ -486,6 +486,8 @@ module "ec2_kinesis_agent" {
 # Redhsift Cluster, DataMart
 module "datamart" {
   source                  = "./modules/redshift"
+  project_id              = local.project
+  env                     = local.environment  
   create_redshift_cluster = local.create_datamart
   name                    = local.redshift_cluster_name
   node_type               = "ra3.xlplus"
