@@ -529,7 +529,7 @@ module "datamart" {
   logging = {
     enable = true
     log_destination_type = "cloudwatch"
-    log_exports = "useractivitylog"
+    log_exports = ["useractivitylog", "userlog", "connectionlog"]
   }  
 
   tags = merge(
