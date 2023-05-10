@@ -1,5 +1,15 @@
 variable "vpc" {}
 
+variable project_id {
+  type        = string
+  description = "Project ID"  
+}
+
+variable "env" {
+  type        = string
+  description = "Env Type"
+}
+
 variable "cidr" {
   description = "A list of security group IDs to associate with"
   type        = list(string)

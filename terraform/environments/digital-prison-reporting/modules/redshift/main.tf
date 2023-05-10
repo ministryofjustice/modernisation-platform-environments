@@ -6,17 +6,6 @@ locals {
 
 data "aws_partition" "current" {}
 
-resource "random_password" "master_password" {
-  count = var.create_redshift_cluster && var.create_random_password ? 1 : 0
-
-  length      = var.random_password_length
-  min_lower   = 1
-  min_numeric = 1
-  min_special = 1
-  min_upper   = 1
-  special     = false
-}
-
 ################################################################################
 # Cluster
 ################################################################################

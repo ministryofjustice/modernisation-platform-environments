@@ -491,9 +491,11 @@ module "datamart" {
   node_type               = "ra3.xlplus"
   number_of_nodes         = 1
   database_name           = "datamart"
+  project_id              = local.project
   master_username         = "dpruser"
-  master_password         = "Datamartpass2022" ## Needs to pull from Secrets Manager, #TD
-  create_random_password  = false
+  create_random_password  = true
+  random_password_length  = 16
+# master_password         = "Datamartpass2022" ## Needs to pull from Secrets Manager, #TD
   encrypted               = true
   publicly_accessible     = true # Required for Terraform to manage Redshift Schemas and Tables
   create_subnet_group     = true
@@ -537,7 +539,7 @@ module "datamart" {
 # Domain Schema, DPR-267
 module "redshift_schema_domain" {
   source                  = "./modules/redshift_schema"
-  enable_redshift_schema  = true
+  enable_redshift_schema  = false
   glue_catalog_ext        = true
   schema                  = "domain"
   catalog_db_name         = "domain"
