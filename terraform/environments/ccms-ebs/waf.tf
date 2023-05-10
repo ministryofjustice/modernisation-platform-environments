@@ -79,7 +79,7 @@ resource "aws_wafv2_web_acl" "ebs_web_acl" {
 }
 
 resource "aws_cloudwatch_log_group" "ebs_waf_logs" {
-  name = "/aws/wafv2/ebs_waf_logs"
+  name = "ebs_waf_logs"
   retention_in_days = 30
 }
 
