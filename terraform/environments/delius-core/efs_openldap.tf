@@ -1,5 +1,8 @@
 resource "aws_efs_file_system" "openldap" {
   creation_token = format("%s-openldap", local.application_name)
+  tags = {
+    Name = format("%s-openldap", local.application_name)
+  }
 }
 
 module "s3_bucket_openldap_migration" {
