@@ -1,4 +1,4 @@
-resource "aws_efs_file_system" "foo" {
+resource "aws_efs_file_system" "openldap" {
   creation_token = format("%s-openldap", local.application_name)
 }
 
