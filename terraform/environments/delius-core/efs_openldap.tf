@@ -8,7 +8,7 @@ resource "aws_efs_file_system" "openldap" {
 resource "aws_security_group" "efs" {
   name        = format("%s-openldap-efs", local.application_name)
   description = format("%s-openldap-efs", local.application_name)
-  vpc_id      = var.vpc_id
+  vpc_id      = data.aws_vpc.shared.id
   tags        = local.tags
 }
 
