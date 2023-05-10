@@ -156,6 +156,7 @@ data "aws_iam_policy_document" "glue-access" {
   statement {
     actions = [
       "glue:*",
+      "secretsmanager:GetSecretValue",
     ]
     resources = [
       "*"
