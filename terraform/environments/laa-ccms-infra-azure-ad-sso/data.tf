@@ -58,3 +58,12 @@ data "aws_iam_policy_document" "sns_topic_policy" {
     resources = [aws_sns_topic.cw_alerts.arn]
   }
 }
+
+## SECURITY GROUPS
+data "aws_security_groups" "all_security_groups" {
+  filter {
+    name   = "tag:Name"
+    values = ["*azure-ad*"]
+  }
+}
+
