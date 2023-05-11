@@ -2,6 +2,8 @@
   "accounts": {
     "development": {
       "short_environment_name": "dev",
+      "db_migration_snapshot_arn": "arn:aws:rds:eu-west-2:205048117103:snapshot:iaps-post-refresh",
+      "db_migration_snapshot_kms_key_arn": "arn:aws:kms:eu-west-2:205048117103:key/458a1557-aed8-4c94-942d-8c2c42abd98d",
       "db_auto_minor_version_upgrade": "false",
       "db_allow_major_version_upgrade": "false",
       "db_apply_immediately": "true",
@@ -29,6 +31,8 @@
     },
     "preproduction": {
       "short_environment_name": "preprod",
+      "db_migration_snapshot_arn": "",
+      "db_migration_snapshot_kms_key_arn": "",
       "db_snapshot_identifier": "iaps-post-refresh-local",
       "db_auto_minor_version_upgrade": "false",
       "db_allow_major_version_upgrade": "false",
@@ -60,6 +64,8 @@
     },
     "production": {
       "short_environment_name": "prod",
+      "db_migration_snapshot_arn": "",
+      "db_migration_snapshot_kms_key_arn": "",
       "db_auto_minor_version_upgrade": "false",
       "db_allow_major_version_upgrade": "false",
       "db_apply_immediately": "false",
