@@ -65,6 +65,7 @@ resource "aws_iam_role" "glue-service-role" {
   count = var.create_role && var.create_job ? 1 : 0
   name  = "${var.name}-glue-role"
   tags  = local.tags
+  managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"]
   path  = "/"
 
   assume_role_policy = <<EOF
@@ -84,11 +85,11 @@ resource "aws_iam_role" "glue-service-role" {
 EOF
 }
 
-resource "aws_iam_policy_attachment" "glue-service-policy" {
-  name       = "${var.name}-role-attach"
-  roles      = aws_iam_role.glue-service-role[*].name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"
-}
+#resource "aws_iam_policy_attachment" "glue-service-policy" {
+#  name       = "${var.name}-role-attach"
+#  roles      = aws_iam_role.glue-service-role[*].name
+#  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"
+#}
 
 data "aws_iam_policy_document" "extra-policy-document" {
   statement {
@@ -98,17 +99,6 @@ data "aws_iam_policy_document" "extra-policy-document" {
     resources = [
       "arn:aws:s3:::${var.project_id}-*/*",
       "arn:aws:s3:::${var.project_id}-*"
-    ]
-  }
-  statement {
-    actions = [
-      "logs:CreateLogGroup",
-      "logs:CreateLogStream",
-      "logs:PutLogEvents",
-      "logs:AssociateKmsKey"
-    ]
-    resources = [
-      "arn:aws:logs:${var.region}:${var.account}:/aws-glue/*"
     ]
   }
   statement {
