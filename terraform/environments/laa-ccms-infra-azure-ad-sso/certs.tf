@@ -96,9 +96,9 @@ resource "aws_route53_record" "ebs_vision_db_cert_validation_subdomain" {
 
 resource "aws_lb_listener" "ebs_vision_db_listener_https" {
   depends_on = [
-    aws_acm_certificate.ebs_vision_db_lb_cert,
+    /*aws_acm_certificate.ebs_vision_db_lb_cert,
     aws_route53_record.ebs_vision_db_cert_validation,
-    aws_route53_record.ebs_vision_db_cert_validation_subdomain,
+    aws_route53_record.ebs_vision_db_cert_validation_subdomain,*/
     aws_acm_certificate_validation.ebs_vision_db_lb_cert_validation
   ]
 

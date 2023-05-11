@@ -1,7 +1,4 @@
 resource "aws_lb" "ebs_vision_db_lb" {
-  depends_on = [
-    aws_security_group.sg_ebs_vision_db_lb
-  ]
   name               = lower(format("lb-%s-%s", substr(local.application_name, 0, 23), substr(local.environment, 0, 3)))
   internal           = true
   load_balancer_type = "application"
@@ -23,7 +20,7 @@ resource "aws_lb" "ebs_vision_db_lb" {
 
 #
 resource "aws_lb_target_group" "ebs_vision_db_tg_http" {
-  depends_on = [aws_lb.ebs_vision_db_lb]
+  /*depends_on = [aws_lb.ebs_vision_db_lb]*/
   name       = lower(format("tg-%s-%s", substr(local.application_name, 0, 23), substr(local.environment, 0, 3)))
   # not sure if this is the right port for the lb
   port     = 8000
