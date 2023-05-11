@@ -5,6 +5,7 @@
       "ec2_oracle_vision_instance_type_ebsdb": "t2.xlarge",
       "imported_ebsdb_image_id": "ami-0726313862a774616",
       "imported_ebsdb_image_name": "import-ami-01083a42970b00366",
+      "lz_aws_workspace_nonprod_subnet_env": "10.200.0.0/20",
       "ami_owner": "636100868237"
     }
   },
@@ -60,7 +61,8 @@
     "TCP_ALL": {
       "from_port": 443,
       "to_port": 443,
-      "protocol": "TCP"
+      "protocol": "TCP",
+      "destination_cidr": "10.200.0.20/20"
     }
   },
   "lb_sg_egress_rules": {

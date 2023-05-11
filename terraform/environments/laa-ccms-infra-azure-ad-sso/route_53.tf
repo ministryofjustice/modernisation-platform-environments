@@ -22,35 +22,7 @@ resource "aws_route53_record" "ebs_vision_db_lb_cname" {
   ttl     = "300"
   type    = "CNAME"
   records = [aws_route53_record.sg_ebs_vision_db_a_record.fqdn]
-  #records = [aws_lb.ebs_vision_db_lb.dns_name]
-}
-
-## EBS VISION DB
-resource "aws_route53_record" "ebs_vision_db" {
-  provider = aws.core-vpc
-
-  zone_id = data.aws_route53_zone.external.zone_id
-  #name    = "ccms-ebs-db.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-  name    = "ebs-vision-db.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-  type    = "A"
-  ttl     = 300
-  records = [aws_instance.ec2_oracle_vision_ebs.private_ip]
 }
 
 
-# networking[0].application = laa-ccms-infra-azure-ad-sso
-# networking[0].business-unit = laa
-# Workspace: laa-ccms-infra-azure-ad-sso-development
-# trimprefix(terraform.workspace, "${var.networking[0].application}-")
-# local.environment = trim-prefix(laa-ccms-infra-azure-ad-sso-development, laa-ccms-infra-azure-ad-sso) = development
-# ${local.dns_name} =modernisation-platform.service.justice.gov.uk
 
-# laa-ccms-infra-azure-ad-sso.laa.development.modernisation-platform.service.justice.gov.uk
-
-#
-#
-
-#
-# fqdn - laa-ccms-infra-azure-ad-sso.laa.development.modernisation-platform.service.justice.gov.uk.laa-development.modernisation-platform.service.justice.gov.uk
-#
-#
