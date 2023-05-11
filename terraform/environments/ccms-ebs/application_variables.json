@@ -455,6 +455,12 @@
       "protocol": "TCP",
       "destination_cidr": "10.200.0.0/13"
     },
+    "HTTP_80": {
+      "from_port": 80,
+      "to_port": 80,
+      "protocol": "TCP",
+      "destination_cidr": "0.0.0.0/0"
+    },
     "HTTPS_443": {
       "from_port": 443,
       "to_port": 443,
