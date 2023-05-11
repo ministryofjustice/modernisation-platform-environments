@@ -102,11 +102,9 @@ module "glue_domain_refresh_job" {
     "--dpr.aws.kinesis.endpointUrl"   = "https://kinesis.${local.account_region}.amazonaws.com"
     "--dpr.aws.region"                = local.account_region
     "--dpr.curated.s3.path"           = "s3://${module.s3_curated_bucket.bucket_id}/"
-    "--dpr.domain.name"               = "establishment"
-    "--dpr.domain.operation"          = "UPDATE"
     "--dpr.domain.registry"           = "${local.project}-domain-registry-${local.environment}"
-    "--dpr.domain.table.name"         = "establishment"
     "--dpr.domain.target.path"        =  "s3://${module.s3_domain_bucket.bucket_id}/"
+    "--dpr.domain.catalog.db"         = module.glue_data_domain_database.db_name
   }
 }
 
