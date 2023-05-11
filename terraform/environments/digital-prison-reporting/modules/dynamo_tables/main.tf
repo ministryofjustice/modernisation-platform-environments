@@ -82,6 +82,10 @@ resource "aws_dynamodb_table" "this" {
     delete = lookup(var.timeouts, "delete", null)
     update = lookup(var.timeouts, "update", null)
   }
+
+  lifecycle {
+    ignore_changes = [read_capacity, write_capacity, global_secondary_index] # To Prevent Terraform Reporting Changes to Indexes always
+  }  
 }
 
 resource "aws_dynamodb_table" "autoscaled" {
