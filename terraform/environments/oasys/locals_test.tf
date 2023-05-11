@@ -143,7 +143,7 @@ locals {
                 conditions = [
                   {
                     host_header = {
-                      values = ["t2.${module.environment.domains.public.application_environment}"]
+                      values = ["web.t2.${module.environment.domains.public.application_environment}"] # web.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk
                     }
                   }
                 ]
@@ -173,7 +173,7 @@ locals {
           { name = "web", type = "A", lbs_map_key = "public" }, # web.t2.oasys.service.justice.gov.uk
         ]
       }
-      "t2.oasys.${module.environment.domains.public.business_unit_environment}" = { # t2.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk
+      "t2.${module.environment.domains.public.application_environment}" = { # t2.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk
         lb_alias_records = [
           { name = "web", type = "A", lbs_map_key = "public" }, # web.t2.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk
         ]
