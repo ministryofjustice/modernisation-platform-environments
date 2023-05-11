@@ -7,7 +7,7 @@ resource "aws_acm_certificate" "example_cert" {
   validation_method = "DNS"
 
   subject_alternative_names = [
-    format("%s.%s.%s.modernisation-platform.service.justice.gov.uk", local.application_name, var.networking[0].business-unit, local.environment),
+    format("%s.%s-%s.modernisation-platform.service.justice.gov.uk", local.application_name, var.networking[0].business-unit, local.environment),
   ]
 
   tags = merge(local.tags,

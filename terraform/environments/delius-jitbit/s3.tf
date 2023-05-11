@@ -28,18 +28,29 @@ module "s3_bucket" {
     principals = {
       type = "AWS"
       identifiers = [
-        "arn:aws:iam::${local.application_data.accounts[local.environment].migration_source_account_id}:role/cr-jitbit-dev-datasync-transfer-to-s3"
+        "arn:aws:iam::${local.application_data.accounts[local.environment].migration_source_account_id}:role/jitbit-datasync-transfer-to-s3"
       ]
     }
-    }, {
-    effect  = "Allow"
-    actions = ["s3:ListBucket"]
-    principals = {
-      type = "AWS"
-      identifiers = [
-        "arn:aws:iam::${local.application_data.accounts[local.environment].migration_source_account_id}:role/admin"
-      ]
-    }
+    },
+    {
+        effect  = "Allow"
+        actions = ["s3:ListBucket"]
+        principals = {
+          type = "AWS"
+          identifiers = [
+            "arn:aws:iam::${local.application_data.accounts[local.environment].migration_source_account_id}:role/terraform"
+          ]
+        }
+    },
+    {
+        effect  = "Allow"
+        actions = ["s3:ListBucket"]
+        principals = {
+          type = "AWS"
+          identifiers = [
+            "arn:aws:iam::${local.application_data.accounts[local.environment].migration_source_account_id}:role/admin"
+          ]
+        }
   }]
 
   ownership_controls = "BucketOwnerEnforced" # Disable all S3 bucket ACL
