@@ -83,9 +83,7 @@ resource "aws_glue_catalog_table" "glue_catalog_table" {
 
   lifecycle {
     create_before_destroy = true
-    ignore_changes        = [ # To PRevent Terraform Reporting Changes to Indexes always
-      global_secondary_index   
-    ]
+    ignore_changes        = []
   }
 
   depends_on = [var.glue_table_depends_on]
