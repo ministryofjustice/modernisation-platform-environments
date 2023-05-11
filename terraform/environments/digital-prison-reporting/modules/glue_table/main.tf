@@ -87,4 +87,12 @@ resource "aws_glue_catalog_table" "glue_catalog_table" {
   }
 
   depends_on = [var.glue_table_depends_on]
+
+  lifecycle {   # Testing
+    ignore_changes = [
+      "global_secondary_index",
+      "read_capacity",
+      "write_capacity",
+    ]
+  }
 }

@@ -107,6 +107,16 @@ variable "ebs_delete_on_termination" {
   default     = true
 }
 
+variable "region" {
+  description = "Current AWS Region."
+  default     = "eu-west-2"
+}
+
+variable "account" {
+  description = "AWS Account ID."
+  default     = ""
+}
+
 #variable "s3_policy_arn" {
 #  description = "S3 policy ARN, to be attached to Ec2 Instance Profile"
 #}

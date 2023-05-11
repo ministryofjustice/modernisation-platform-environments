@@ -198,6 +198,52 @@ data "aws_iam_policy_document" "glue-access" {
   }
 }
 
+## Dynamo Access Policy
+resource "aws_iam_policy" "dynamodb-access" {
+  name        = "${var.name}-dynamodb-access"
+  description = "Dynamo DB Access Policy"
+  path        = "/"
+
+  policy = data.aws_iam_policy_document.dynamo-access.json
+}
+
+## DynamoDB Access Policy Document
+data "aws_iam_policy_document" "dynamo-access" {
+  statement {
+    sid = "DynamoDBTableAccess"
+    actions = [
+      "dynamodb:BatchGetItem",
+      "dynamodb:BatchWriteItem",
+      "dynamodb:ConditionCheckItem",
+      "dynamodb:PutItem",
+      "dynamodb:DescribeTable",
+      "dynamodb:DeleteItem",
+      "dynamodb:GetItem",
+      "dynamodb:Scan",
+      "dynamodb:Query",
+      "dynamodb:UpdateItem"
+    ]
+    resources = [
+      "arn:aws:dynamodb:${var.region}:${var.account}:table/*"
+    ]
+  }
+
+  statement {
+    sid = "DynamoDBIndexAndStreamAccess"
+    actions = [
+      "dynamodb:GetShardIterator",
+      "dynamodb:Scan",
+      "dynamodb:Query",
+      "dynamodb:DescribeStream",
+      "dynamodb:GetRecords",
+      "dynamodb:ListStreams"
+    ]
+    resources = [
+      "arn:aws:dynamodb:${var.region}:${var.account}:table/*/index/*",
+      "arn:aws:dynamodb:${var.region}:${var.account}:table/*/stream/*"    ]
+  }
+}
+
 resource "aws_iam_instance_profile" "kinesis-agent-instance-profile" {
   name = "${var.name}-profile"
   role = aws_iam_role.kinesis-agent-instance-role.name
@@ -211,6 +257,11 @@ resource "aws_iam_role_policy_attachment" "this" {
 resource "aws_iam_role_policy_attachment" "glue-access" {
   role       = aws_iam_role.kinesis-agent-instance-role.name
   policy_arn = aws_iam_policy.glue-full-access.arn
+}
+
+resource "aws_iam_role_policy_attachment" "dynamo-access" {
+  role       = aws_iam_role.kinesis-agent-instance-role.name
+  policy_arn = aws_iam_policy.dynamodb-access.arn
 }
 
 resource "aws_iam_role_policy_attachment" "cloudwatch-kms" {
