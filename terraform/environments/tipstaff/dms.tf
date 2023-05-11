@@ -158,6 +158,7 @@ resource "aws_dms_replication_task" "tipstaff_migration_task" {
 }
 
 resource "aws_security_group" "modernisation_dms_access" {
+  count       = local.is-preproduction ? 1 : 0
   provider    = aws.tacticalproducts
   name        = "modernisation_dms_access"
   description = "allow dms access to the database for the modernisation platform"
@@ -179,6 +180,7 @@ resource "aws_security_group" "modernisation_dms_access" {
 }
 
 resource "null_resource" "setup_target_rds_security_group" {
+  count       = local.is-preproduction ? 1 : 0
   depends_on = [aws_dms_replication_instance.tipstaff_replication_instance]
 
   provisioner "local-exec" {
