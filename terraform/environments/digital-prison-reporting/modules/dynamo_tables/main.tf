@@ -170,6 +170,6 @@ resource "aws_dynamodb_table" "autoscaled" {
   }
 
   lifecycle {
-    ignore_changes = [read_capacity, write_capacity]
+    ignore_changes = [read_capacity, write_capacity, global_secondary_index]
   }
 }
