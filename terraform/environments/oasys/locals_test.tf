@@ -145,11 +145,6 @@ locals {
                     host_header = {
                       values = ["t2.${module.environment.domains.public.application_environment}"]
                     }
-                  },
-                  {
-                    path_pattern = {
-                      values = ["/"]
-                    }
                   }
                 ]
               }
