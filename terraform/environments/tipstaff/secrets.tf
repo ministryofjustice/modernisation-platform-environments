@@ -1,15 +1,5 @@
 #### This file can be used to store secrets specific to the member account ####
 
-data "aws_secretsmanager_secret" "tactical_products_db_secrets" {
-  count = local.is-development ? 1 : 0
-  arn   = "arn:aws:secretsmanager:eu-west-2:913862848426:secret:tactical-products-db-secrets-ox3sNi"
-}
-
-data "aws_secretsmanager_secret_version" "dms_source_credentials" {
-  count     = local.is-development ? 1 : 0
-  secret_id = data.aws_secretsmanager_secret.tactical_products_db_secrets[0].id
-}
-
 resource "random_string" "username" {
   length  = 16
   lower   = true
@@ -23,7 +13,7 @@ resource "random_password" "password" {
   lower   = true
   upper   = true
   numeric = true
-  special = true
+  special = false
 }
 
 resource "aws_secretsmanager_secret" "tipstaff_db_secrets" {
@@ -45,3 +35,14 @@ resource "aws_secretsmanager_secret_version" "tactical_products_rds_credentials"
   secret_id     = aws_secretsmanager_secret.tactical_products_db_secrets.id
   secret_string = jsonencode({ "" : "", "" : "" })
 }
+
+data "aws_secretsmanager_secret" "secrets" {
+  depends_on = [aws_secretsmanager_secret_version.tactical_products_rds_credentials]
+  arn        = aws_secretsmanager_secret_version.tactical_products_rds_credentials.arn
+}
+
+data "aws_secretsmanager_secret_version" "current" {
+  depends_on = [aws_secretsmanager_secret_version.tactical_products_rds_credentials]
+  secret_id  = data.aws_secretsmanager_secret.secrets.id
+}
+
