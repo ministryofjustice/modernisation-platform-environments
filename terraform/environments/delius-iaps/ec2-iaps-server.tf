@@ -119,6 +119,17 @@ resource "aws_security_group_rule" "ingress_traffic_vpc" {
   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
 }
 
+resource "aws_security_group_rule" "egress_traffic_vpc" {
+  for_each          = local.application_data.iaps_sg_egress_rules_vpc
+  description       = format("Traffic for %s %d", each.value.protocol, each.value.from_port)
+  from_port         = each.value.from_port
+  protocol          = each.value.protocol
+  security_group_id = aws_security_group.iaps.id
+  to_port           = each.value.to_port
+  type              = "egress"
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+}
+
 #tfsec:ignore:aws-ec2-no-public-egress-sgr
 resource "aws_security_group_rule" "egress_traffic_cidr" {
   for_each          = local.application_data.iaps_sg_egress_rules_cidr

@@ -1,42 +1,64 @@
 {
   "accounts": {
     "development": {
-      "instance_type": "t2.micro",
       "moj_ip": "81.134.202.29/32",
-      "db_name": "tipstaffdbdev",
+      "db_name": "tipstaff_db_dev",
+      "identifier": "tipstaff-db-dev",
       "allocated_storage": "20",
       "storage_type": "gp2",
-      "identifier": "tipstaff-db-dev",
       "engine": "postgres",
       "engine_version": "10.21",
       "instance_class": "db.t3.micro",
-      "subdomain_name": "tipstaff.legacy-dev",
       "server_port_1": "80",
       "lb_listener_protocol_1": "HTTP",
       "server_port_2": "443",
       "lb_listener_protocol_2": "HTTPS",
-      "ami_image_id": "ami-00d0096b223242201"
+      "client_id": "09730739-d16b-47e6-a8c6-007ad48bed2d",
+      "curserver": "DEVELOPMENT",
+      "support_team": "DTS Legacy Apps Support Team",
+      "support_email": "dts-legacy-apps-support-team@hmcts.net",
+      "rds_port": "5432"
     },
     "test": {
       "example_var": "test-data"
     },
     "preproduction": {
-      "example_var": "preproduction-data"
+      "moj_ip": "81.134.202.29/32",
+      "db_name": "tipstaff_db_pre_prod",
+      "identifier": "tipstaff-db-pre-prod",
+      "allocated_storage": "20",
+      "storage_type": "gp2",
+      "engine": "postgres",
+      "engine_version": "10.21",
+      "instance_class": "db.t3.micro",
+      "server_port_1": "80",
+      "lb_listener_protocol_1": "HTTP",
+      "server_port_2": "443",
+      "lb_listener_protocol_2": "HTTPS",
+      "client_id": "ed4cc64a-d12d-4564-a7a9-3abeb844b903",
+      "curserver": "PREPRODUCTION",
+      "support_team": "DTS Legacy Apps Support Team",
+      "support_email": "dts-legacy-apps-support-team@hmcts.net",
+      "rds_port": "5432"
     },
     "production": {
-      "example_var": "production-data"
-    }
-  },
-  "ec2_sg_rules": {
-    "TCP_80": {
-      "from_port": 80,
-      "to_port": 80,
-      "protocol": "TCP"
-    },
-    "TCP_443": {
-      "from_port": 443,
-      "to_port": 443,
-      "protocol": "TCP"
+      "moj_ip": "81.134.202.29/32",
+      "db_name": "tipstaff_db_prod",
+      "identifier": "tipstaff-db-prod",
+      "allocated_storage": "20",
+      "storage_type": "gp2",
+      "engine": "postgres",
+      "engine_version": "10.21",
+      "instance_class": "db.t3.micro",
+      "server_port_1": "80",
+      "lb_listener_protocol_1": "HTTP",
+      "server_port_2": "443",
+      "lb_listener_protocol_2": "HTTPS",
+      "client_id": "2229496b-0b45-4ec7-8d64-d00d5019bc67",
+      "curserver": "PRODUCTION",
+      "support_team": "DTS Legacy Apps Support Team",
+      "support_email": "dts-legacy-apps-support-team@hmcts.net",
+      "rds_port": "5432"
     }
   }
 }
