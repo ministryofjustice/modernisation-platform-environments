@@ -24,6 +24,8 @@
       "orace_db_ami_name": "Oracle79-prereqs-v1_7",
       "webgate_ami_name": "ebs-webgate-v1_1",
       "accessgate_ami_name": "ebs-accessgate-v1_1",
+      "ec2_instance_type_mailrelay": "c4.large",
+      "mailrelay_ami_id": "ami-09744628bed84e434",
       "key_name": "oracle-base-dev",
       "lz_aws_account_id_env": "411213865113",
       "lz_aws_subnet_env": "10.202.0.0/20",
@@ -68,6 +70,8 @@
       "orace_db_ami_name": "Oracle79-prereqs-v1_7",
       "webgate_ami_name": "ebs-webgate-v1_2",
       "accessgate_ami_name": "ebs-accessgate-v1_2",
+      "ec2_instance_type_mailrelay": "c4.large",
+      "mailrelay_ami_id": "ami-09744628bed84e434",
       "key_name": "",
       "lz_aws_account_id_env": "140455166311",
       "lz_aws_subnet_env": "10.204.0.0/14",
@@ -112,6 +116,8 @@
       "orace_db_ami_name": "Oracle79-prereqs-v1_8",
       "webgate_ami_name": "ebs-webgate-v1_3",
       "accessgate_ami_name": "ebs-accessgate-v1_3",
+      "ec2_instance_type_mailrelay": "c4.large",
+      "mailrelay_ami_id": "ami-09744628bed84e434",
       "key_name": "",
       "lz_aws_account_id_env": "484221692666",
       "lz_aws_subnet_env": "10.204.0.0/20",
@@ -156,6 +162,8 @@
       "orace_db_ami_name": "Oracle79-prereqs-v1_8",
       "webgate_ami_name": "ebs-webgate-v1_3",
       "accessgate_ami_name": "ebs-accessgate-v1_3",
+      "ec2_instance_type_mailrelay": "c4.large",
+      "mailrelay_ami_id": "ami-09744628bed84e434",
       "key_name": "",
       "lz_aws_account_id_env": "842522700642",
       "lz_aws_subnet_env": "10.205.0.0/20",
@@ -420,6 +428,32 @@
       "to_port": 443,
       "protocol": "TCP",
       "destination_cidr": "0.0.0.0/0"
+    }
+  },
+  "ec2_sg_mailrelay_ingress_rules": {
+    "SSH_22": {
+      "from_port": 22,
+      "to_port": 22,
+      "protocol": "TCP"
+    },
+    "SMTP_25": {
+      "from_port": 25,
+      "to_port": 25,
+      "protocol": "TCP"
+    }
+  },
+  "ec2_sg_mailrelay_egress_rules": {
+    "SSH_22": {
+      "from_port": 22,
+      "to_port": 22,
+      "protocol": "TCP",
+      "destination_cidr": "10.200.0.0/13"
+    },
+    "SMTP_25": {
+      "from_port": 25,
+      "to_port": 25,
+      "protocol": "TCP",
+      "destination_cidr": "10.200.0.0/13"
     }
   },
   "webgate_ebs": {

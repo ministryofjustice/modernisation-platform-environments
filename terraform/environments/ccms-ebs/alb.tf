@@ -47,8 +47,8 @@ resource "aws_lb_target_group" "ebsapp_tg" {
   }
 
   stickiness {
-    enabled       = true
-    type          = "lb_cookie"
+    enabled         = true
+    type            = "lb_cookie"
     cookie_duration = 3600
   }
 }
