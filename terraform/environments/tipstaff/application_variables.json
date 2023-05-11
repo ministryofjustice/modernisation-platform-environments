@@ -54,7 +54,7 @@
       "lb_listener_protocol_1": "HTTP",
       "server_port_2": "443",
       "lb_listener_protocol_2": "HTTPS",
-      "client_id": "",
+      "client_id": "2229496b-0b45-4ec7-8d64-d00d5019bc67",
       "curserver": "PRODUCTION",
       "support_team": "DTS Legacy Apps Support Team",
       "support_email": "dts-legacy-apps-support-team@hmcts.net",
