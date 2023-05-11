@@ -187,6 +187,3 @@ locals {
     }
   }
 }
-
-
-public-lb-12....com 
