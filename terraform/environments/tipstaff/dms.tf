@@ -188,7 +188,7 @@ resource "null_resource" "setup_target_rds_security_group" {
     command     = "chmod +x ./setup-security-group.sh; ./setup-security-group.sh"
 
     environment = {
-      DMS_SECURITY_GROUP            = aws_security_group.modernisation_dms_access.id
+      DMS_SECURITY_GROUP            = aws_security_group.modernisation_dms_access[0].id
       DMS_TARGET_ACCOUNT_ACCESS_KEY = jsondecode(data.aws_secretsmanager_secret_version.current.secret_string)["ACCESS_KEY"]
       DMS_TARGET_ACCOUNT_SECRET_KEY = jsondecode(data.aws_secretsmanager_secret_version.current.secret_string)["SECRET_KEY"]
       DMS_TARGET_ACCOUNT_REGION     = "eu-west-2"
