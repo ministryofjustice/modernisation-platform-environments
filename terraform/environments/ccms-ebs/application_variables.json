@@ -454,6 +454,12 @@
       "to_port": 25,
       "protocol": "TCP",
       "destination_cidr": "10.200.0.0/13"
+    },
+    "HTTPS_443": {
+      "from_port": 443,
+      "to_port": 443,
+      "protocol": "TCP",
+      "destination_cidr": "0.0.0.0/0"
     }
   },
   "webgate_ebs": {
