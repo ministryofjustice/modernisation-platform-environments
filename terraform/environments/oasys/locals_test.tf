@@ -144,7 +144,10 @@ locals {
                 conditions = [
                   {
                     host_header = {
-                      values = ["web.t2.${module.environment.domains.public.application_environment}"] # web.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk
+                      values = [
+                        "web.t2.${module.environment.domains.public.application_environment}",
+                        "t2.${module.environment.domains.public.application_environment}"
+                      ] # web.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk
                     }
                   }
                 ]
@@ -156,32 +159,16 @@ locals {
 
     }
     baseline_route53_zones = {
-      # "${local.environment}.${module.environment.domains.public.short_name}" = {  # test.oasys.service.justice.gov.uk
-      # }
-      "t1.${module.environment.domains.public.short_name}" = { # t1.oasys.service.justice.gov.uk
+      "${module.environment.domains.public.application_environment}" # oasys.hmpps-test.modernisation-platform.service.justice.gov.uk
+        lb_alias_records = [
+          { name = "t2",     type = "A", lbs_map_key = "public" },
+          { name = "web.t2", type = "A", lbs_map_key = "public" },
+          { name = "t1",     type = "A", lbs_map_key = "public" },
+          { name = "web.t1", type = "A", lbs_map_key = "public" }, 
+        ]
         records = [
-          { name = "db", type = "A", ttl = "300", records = ["10.101.6.132"] }, # db.t1.oasys.service.justice.gov.uk currently pointing to azure db T1ODL0007
-        ]
-        lb_alias_records = [
-          { name = "web", type = "A", lbs_map_key = "public" }, # web.t1.oasys.service.justice.gov.uk
-        ]
-      }
-      "t2.${module.environment.domains.public.short_name}" = { # t2.oasys.service.justice.gov.uk
-        records = [
-          { name = "db", type = "A", ttl = "300", records = ["10.101.36.132"] }, # db.t2.oasys.service.justice.gov.uk currently pointing to azure db T2ODL0009
-        ]
-        lb_alias_records = [
-          { name = "web", type = "A", lbs_map_key = "public" }, # web.t2.oasys.service.justice.gov.uk
-        ]
-      }
-      "t2.${module.environment.domains.public.application_environment}" = { # t2.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk
-        lb_alias_records = [
-          { name = "web", type = "A", lbs_map_key = "public" }, # web.t2.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk
-        ]
-      }
-      "hmpps-test.modernisation-platform.service.justice.gov.uk" = {
-        lb_alias_records = [
-          { name = "t2.oasys", type = "A", lbs_map_key = "public" },
+          { name = "db.t2", type = "A", ttl = "300", records = ["10.101.36.132"] }, # db.t2.oasys.service.justice.gov.uk currently pointing to azure db T2ODL0009
+          { name = "db.t1", type = "A", ttl = "300", records = ["10.101.6.132"]  },  # db.t1.oasys.service.justice.gov.uk currently pointing to azure db T1ODL0007
         ]
       }
     }
