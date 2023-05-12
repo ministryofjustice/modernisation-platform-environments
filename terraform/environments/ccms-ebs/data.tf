@@ -136,3 +136,10 @@ data "aws_route53_zone" "application-zone" {
   name         = "ccms-ebs.service.justice.gov.uk."
   private_zone = false
 }
+
+## GANDI CERT
+
+data "aws_acm_certificate" "gandi_cert" {
+  domain   = local.application_data.accounts[local.environment].lz_domain_name
+  statuses = ["ISSUED"]
+}
