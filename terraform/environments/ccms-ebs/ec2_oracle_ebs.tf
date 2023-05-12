@@ -244,4 +244,3 @@ module "cw-ebs-ec2" {
   fileSystem   = "xfs"       # Linux root filesystem
   rootDevice   = "nvme0n1p1" # This is used by default for root on all the ec2 images
 }
-
