@@ -164,6 +164,11 @@ variable "ssm_parameters_prefix" {
   description = "Optionally prefix ssm parameters with this prefix.  Add a trailing /"
   default     = ""
 }
+variable "ssm_kms_key_id" {
+  type        = string
+  description = "Optionally specify a KMS key ID to encrypt SSM parameters"
+  default     = null
+}
 
 variable "ssm_parameters" {
   description = "A map of SSM parameters to create.  If parameters are manually created, set to {} so IAM role still created"
@@ -173,7 +178,6 @@ variable "ssm_parameters" {
       special = bool
     })
     description = string
-    kms_key_id  = optional(string)
   }))
   default = null
 }
