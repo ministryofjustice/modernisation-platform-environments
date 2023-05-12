@@ -38,11 +38,9 @@ locals {
           vpc_security_group_ids = ["private-web"]
         })
         user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
-        autoscaling_group = {
-          desired_capacity    = 0
-          max_size            = 2
-          vpc_zone_identifier = module.environment.subnets["private"].ids
-        }
+        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
+          desired_capacity = 0
+        })
         autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
         tags = {
           description = "For testing official RedHat RHEL7.9 image"
@@ -59,12 +57,14 @@ locals {
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           vpc_security_group_ids = ["private-web"]
         })
-        user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
-        autoscaling_group = {
-          desired_capacity    = 0
-          max_size            = 2
-          vpc_zone_identifier = module.environment.subnets["private"].ids
-        }
+        user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible, {
+          args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible.args, {
+            branch = "nomis/DSOS-1893/re-enable-warm-pools"
+          })
+        })
+        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default_with_ready_hook, {
+          desired_capacity = 0
+        })
         autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
         tags = {
           description = "For testing our base RHEL8.5 base image"
@@ -83,12 +83,14 @@ locals {
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           vpc_security_group_ids = ["private-web"]
         })
-        user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
-        autoscaling_group = {
-          desired_capacity    = 0
-          max_size            = 2
-          vpc_zone_identifier = module.environment.subnets["private"].ids
-        }
+        user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible, {
+          args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible.args, {
+            branch = "nomis/DSOS-1893/re-enable-warm-pools"
+          })
+        })
+        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default_with_ready_hook, {
+          desired_capacity = 0
+        })
         autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
         tags = {
           description = "For testing our base RHEL7.9 base image"
@@ -107,12 +109,14 @@ locals {
         instance = merge(module.baseline_presets.ec2_instance.instance.default_rhel6, {
           vpc_security_group_ids = ["private-web"]
         })
-        user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
-        autoscaling_group = {
-          desired_capacity    = 0
-          max_size            = 2
-          vpc_zone_identifier = module.environment.subnets["private"].ids
-        }
+        user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible, {
+          args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible.args, {
+            branch = "nomis/DSOS-1893/re-enable-warm-pools"
+          })
+        })
+        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default_with_ready_hook, {
+          desired_capacity = 0
+        })
         autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
         tags = {
           description = "For testing our base RHEL6.10 base image"
@@ -137,11 +141,8 @@ locals {
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 100 }
         }
-        autoscaling_group = {
-          desired_capacity    = 1
-          max_size            = 2
-          vpc_zone_identifier = module.environment.subnets["private"].ids
-        }
+        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
+        })
         autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
         tags = {
           description = "Windows Server 2022 Jumpserver for NOMIS"

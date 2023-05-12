@@ -142,39 +142,7 @@ locals {
     })
 
     user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
-
-    autoscaling_group = {
-      desired_capacity = 1
-      max_size         = 2
-      vpc_zone_identifier = [
-        module.environment.subnets["private"].ids
-      ]
-      health_check_grace_period = 300
-      health_check_type         = "EC2"
-      force_delete              = true
-      termination_policies      = ["OldestInstance"]
-      wait_for_capacity_timeout = 0
-
-      # this hook is triggered by the post-ec2provision.sh
-      initial_lifecycle_hooks = {
-        "ready-hook" = {
-          default_result       = "ABANDON"
-          heartbeat_timeout    = 7200
-          lifecycle_transition = "autoscaling:EC2_INSTANCE_LAUNCHING"
-        }
-      }
-
-      instance_refresh = {
-        strategy               = "Rolling"
-        min_healthy_percentage = 90 # seems that instances in the warm pool are included in the % health count so this needs to be set fairly high
-        instance_warmup        = 300
-      }
-
-      # warm_pool = {
-      #   reuse_on_scale_in           = true
-      #   max_group_prepared_capacity = 1
-      # }
-    }
+    autoscaling_group    = module.baseline_presets.ec2_autoscaling_group.default_with_ready_hook
 
     lb_target_groups = {
       http-7777 = local.weblogic_target_group_http_7777
