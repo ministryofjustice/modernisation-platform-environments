@@ -92,15 +92,35 @@ EOF
 #}
 
 data "aws_iam_policy_document" "extra-policy-document" {
+#  statement {
+#    actions = [
+#      "s3:*"
+#    ]
+#    resources = [
+#      "arn:aws:s3:::${var.project_id}-*/*",
+#      "arn:aws:s3:::${var.project_id}-*"
+#    ]
+#  }
+## Test
   statement {
     actions = [
       "s3:*"
     ]
     resources = [
-      "arn:aws:s3:::${var.project_id}-*/*",
-      "arn:aws:s3:::${var.project_id}-*"
+      "*"
     ]
   }
+  statement {
+    actions = [
+      "logs:CreateLogGroup",
+      "logs:CreateLogStream",
+      "logs:PutLogEvents" 
+    ]
+    resources = [
+      "*"
+    ]
+  }
+## Test    
   statement {
     actions = [
       "glue:*",
