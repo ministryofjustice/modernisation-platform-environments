@@ -8,7 +8,7 @@ locals {
     }
   )
 
-  openldap_protocol = "tcp"
+  openldap_protocol = "TCP"
 }
 resource "aws_lb" "ldap" {
   name                       = local.openldap_alb_name
