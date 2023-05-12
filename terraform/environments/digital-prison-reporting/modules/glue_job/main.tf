@@ -136,6 +136,11 @@ data "aws_iam_policy_document" "extra-policy-document" {
   }
   statement {
     actions = [
+      "kinesis:DescribeLimits",
+      "kinesis:DescribeStream",
+      "kinesis:GetRecords",
+      "kinesis:GetShardIterator",
+      "kinesis:SubscribeToShard",
       "kinesis:ListShards"
     ]
     resources = [
