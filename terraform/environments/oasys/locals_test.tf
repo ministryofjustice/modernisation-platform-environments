@@ -203,6 +203,16 @@ locals {
           { name = "db.t2.oasys", type = "A", lbs_map_key = "public" }, 
         ]
       }
+      "${module.environment.domains.internal.business_unit_environment}" = { # hmpps-test.modernisation-platform.internal
+        vpc = { # this makes it a private hosted zone
+          id = module.environment.vpc.id
+        }
+        lb_alias_records = [
+          { name = "t2.oasys", type = "A", lbs_map_key = "public" },
+          { name = "web.t2.oasys", type = "A", lbs_map_key = "public" },
+          { name = "db.t2.oasys", type = "A", lbs_map_key = "public" }, 
+        ]
+      }
     }
   }
 }
