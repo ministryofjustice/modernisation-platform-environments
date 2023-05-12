@@ -71,10 +71,10 @@ locals {
     )
 
     autoscaling_group = {
-      desired_capacity = 1
-      max_size         = 1
-      min_size         = 1
-      force_delete     = true
+      desired_capacity          = 1
+      max_size                  = 1
+      min_size                  = 1
+      force_delete              = true
       wait_for_capacity_timeout = "15m"
     }
 
