@@ -198,7 +198,8 @@ data "aws_iam_policy_document" "ecs_exec" {
       "ecr:BatchGetImage",
       "logs:CreateLogGroup",
       "logs:CreateLogStream",
-      "logs:PutLogEvents"
+      "logs:PutLogEvents",
+      "secretsmanager:GetSecretValue"
     ]
   }
 }

@@ -15,8 +15,13 @@ resource "aws_instance" "ec2_accessgate" {
   cpu_threads_per_core = local.application_data.accounts[local.environment].ec2_oracle_instance_threads_accessgate
 
   # Due to a bug in terraform wanting to rebuild the ec2 if more than 1 ebs block is attached, we need the lifecycle clause below
+  # Also includes ebs_optimized and cpu_core_count due to changing instance family from c5d.2xlarge to m5d.large
   lifecycle {
-    ignore_changes = [ebs_block_device]
+    ignore_changes = [
+      ebs_block_device, 
+      ebs_optimized,
+      cpu_core_count
+    ]
   }
   user_data_replace_on_change = false
   user_data                   = <<EOF

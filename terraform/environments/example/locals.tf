@@ -1,6 +1,6 @@
 # EC2 vars
 locals {
-  business_unit = var.networking[0].business-unit
+  business_unit       = var.networking[0].business-unit
   region              = "eu-west-2"
   availability_zone_1 = "eu-west-2a"
   availability_zone_2 = "eu-west-2b"

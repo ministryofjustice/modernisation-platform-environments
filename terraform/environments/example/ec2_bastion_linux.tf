@@ -19,11 +19,11 @@ module "bastion_linux" {
   log_expiry_days      = 180 # days before log expiration
   # bastion
   allow_ssh_commands = false
-  app_name      = var.networking[0].application
-  business_unit = local.vpc_name
-  subnet_set    = local.subnet_set
-  environment   = local.environment
-  region        = "eu-west-2"
+  app_name           = var.networking[0].application
+  business_unit      = local.vpc_name
+  subnet_set         = local.subnet_set
+  environment        = local.environment
+  region             = "eu-west-2"
 
   # Tags
   tags_common = local.tags
