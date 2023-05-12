@@ -69,13 +69,13 @@ resource "aws_security_group_rule" "allow_all_egress" {
 }
 
 resource "aws_security_group_rule" "ldap_nlb" {
-  description       = "Allow inbound traffic from NLB"
+  description       = "Allow inbound traffic from VPC"
   type              = "ingress"
   from_port         = local.openldap_port
   to_port           = local.openldap_port
   protocol          = "TCP"
   security_group_id = aws_security_group.ldap.id
-  cidr_blocks       = ["0.0.0.0/0"]
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
 }
 
 resource "aws_cloudwatch_log_group" "openldap" {
