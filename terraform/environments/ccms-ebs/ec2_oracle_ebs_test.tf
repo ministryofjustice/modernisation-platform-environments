@@ -52,8 +52,8 @@ make
 make install
 cd /
 mkdir /rman
-s3fs -o iam_role="role_stsassume_oracle_base" -o url="https://s3.eu-west-2.amazonaws.com" -o endpoint=eu-west-2 -o dbglevel=info -o curldbg -o allow_other -o use_cache=/tmp ccms-ebs-development-dbbackup /rman
-echo "ccms-ebs-development-dbbackup /rman fuse.s3fs _netdev,allow_other,url=https://s3.eu-west-2.amazonaws.com,iam_role=role_stsassume_oracle_base 0 0" >> /etc/fstab
+s3fs -o iam_role="role_stsassume_oracle_base" -o url="https://s3.eu-west-2.amazonaws.com" -o endpoint=eu-west-2 -o dbglevel=info -o curldbg -o allow_other -o use_cache=/tmp ccms-ebs-${local.environment}-dbbackup /rman
+echo "ccms-ebs-${local.environment}-dbbackup /rman fuse.s3fs _netdev,allow_other,url=https://s3.eu-west-2.amazonaws.com,iam_role=role_stsassume_oracle_base 0 0" >> /etc/fstab
 
 EOF
 
