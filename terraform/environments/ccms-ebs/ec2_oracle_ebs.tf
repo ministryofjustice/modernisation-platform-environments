@@ -18,6 +18,9 @@ resource "aws_instance" "ec2_oracle_ebs" {
   #lifecycle {
   #  ignore_changes = [ebs_block_device]
   #}
+  lifecycle {
+    ignore_changes = [user_data_replace_on_change,user_data]
+  }
   user_data_replace_on_change = false
   user_data                   = <<EOF
 #!/bin/bash
@@ -49,8 +52,8 @@ make
 make install
 cd /
 mkdir /rman
-s3fs -o iam_role="role_stsassume_oracle_base" -o url="https://s3.eu-west-2.amazonaws.com" -o endpoint=eu-west-2 -o dbglevel=info -o curldbg -o allow_other -o use_cache=/tmp ccms-ebs-development-dbbackup /rman
-echo "ccms-ebs-development-dbbackup /rman fuse.s3fs _netdev,allow_other,url=https://s3.eu-west-2.amazonaws.com,iam_role=role_stsassume_oracle_base 0 0" >> /etc/fstab
+s3fs -o iam_role="role_stsassume_oracle_base" -o url="https://s3.eu-west-2.amazonaws.com" -o endpoint=eu-west-2 -o dbglevel=info -o curldbg -o allow_other -o use_cache=/tmp ccms-ebs-${local.environment}-dbbackup /rman
+echo "ccms-ebs-${local.environment}-dbbackup /rman fuse.s3fs _netdev,allow_other,url=https://s3.eu-west-2.amazonaws.com,iam_role=role_stsassume_oracle_base 0 0" >> /etc/fstab
 
 EOF
 
@@ -241,4 +244,3 @@ module "cw-ebs-ec2" {
   fileSystem   = "xfs"       # Linux root filesystem
   rootDevice   = "nvme0n1p1" # This is used by default for root on all the ec2 images
 }
-
