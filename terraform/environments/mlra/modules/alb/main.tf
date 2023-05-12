@@ -497,7 +497,7 @@ resource "aws_acm_certificate" "external_lb" {
 
 resource "aws_acm_certificate_validation" "external" {
   certificate_arn         = aws_acm_certificate.external_lb.arn
-  validation_record_fqdns = var.environment != "production" ? [local.domain_name_main[0], local.domain_name_sub[0]] : [local.domain_name_main[0]]
+  validation_record_fqdns = var.environment != "production" ? [local.domain_name_main[0], local.domain_name_sub[0]] : var.acm_cert_domain_name
 
   timeouts {
     create = "10m"
@@ -513,11 +513,20 @@ resource "aws_acm_certificate_validation" "external" {
 resource "aws_route53_record" "external_validation" {
   provider = aws.core-network-services
 
+  for_each = {
+    for dvo in aws_acm_certificate.external_lb.domain_validation_options : dvo.domain_name => {
+      name   = dvo.resource_record_name
+      record = dvo.resource_record_value
+      type   = dvo.resource_record_type
+    }
+  }
+
   allow_overwrite = true
-  name            = local.domain_name_main[0]
-  records         = local.domain_record_main
+  
+  name            = each.value.name
+  records         = [each.value.record]
   ttl             = 60
-  type            = local.domain_type_main[0]
+  type            = [each.value.type]
   zone_id         = var.services_zone_id
 }
 
