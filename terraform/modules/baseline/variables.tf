@@ -150,6 +150,7 @@ variable "ec2_autoscaling_groups" {
         special = bool
       })
       description = string
+      kms_key_id  = optional(string)
     })))
     lb_target_groups = optional(map(object({
       port                 = optional(number)
@@ -376,6 +377,7 @@ variable "rds_instances" {
         special = bool
       })
       description = string
+      kms_key_id  = optional(string)
     })))
     route53_record = optional(bool, true)
     tags           = optional(map(string), {})

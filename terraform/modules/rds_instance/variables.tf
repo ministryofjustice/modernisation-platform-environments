@@ -173,6 +173,7 @@ variable "ssm_parameters" {
       special = bool
     })
     description = string
+    key_id      = optional(string)
   }))
   default = null
 }
