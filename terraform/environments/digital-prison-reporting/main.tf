@@ -603,7 +603,7 @@ module "dms_nomis_ingestor" {
 # Dynamo DB for DomainRegistry, DPR-306/DPR-218
 module "dynamo_tab_domain_registry" {
   source              = "./modules/dynamo_tables"
-  create_table        = true
+  create_table        = false
   autoscaling_enabled = false
   name                = "${local.project}-domain-registry-${local.environment}"
 
