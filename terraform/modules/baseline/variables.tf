@@ -150,7 +150,6 @@ variable "ec2_autoscaling_groups" {
         special = bool
       })
       description = string
-      kms_key_id  = optional(string)
     })))
     lb_target_groups = optional(map(object({
       port                 = optional(number)
