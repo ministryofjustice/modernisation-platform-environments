@@ -6,7 +6,7 @@ resource "aws_db_instance" "tipstaff_db" {
   identifier             = local.application_data.accounts[local.environment].identifier
   engine_version         = local.application_data.accounts[local.environment].engine_version
   instance_class         = local.application_data.accounts[local.environment].instance_class
-  username               = jsondecode(data.aws_secretsmanager_secret_version.rds_credentials.secret_string)["TIPSTAFF_DB_USERNAME"]
+  username               = jsondecode(data.aws_secretsmanager_secret_version.get_rds_credentials.secret_string)["TIPSTAFF_DB_USERNAME"]
   password               = random_password.password.result
   skip_final_snapshot    = true
   publicly_accessible    = true
@@ -76,7 +76,7 @@ resource "null_resource" "setup_db" {
     environment = {
       DB_HOSTNAME          = aws_db_instance.tipstaff_db.address
       DB_NAME              = aws_db_instance.tipstaff_db.db_name
-      TIPSTAFF_DB_USERNAME = jsondecode(data.aws_secretsmanager_secret_version.rds_credentials.secret_string)["TIPSTAFF_DB_USERNAME"]
+      TIPSTAFF_DB_USERNAME = jsondecode(data.aws_secretsmanager_secret_version.get_rds_credentials.secret_string)["TIPSTAFF_DB_USERNAME"]
       TIPSTAFF_DB_PASSWORD = random_password.password.result
     }
   }
