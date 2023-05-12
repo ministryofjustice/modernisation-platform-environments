@@ -19,7 +19,7 @@ resource "aws_dms_endpoint" "target" {
   endpoint_id   = "tipstaff-target"
   endpoint_type = "target"
   engine_name   = "postgres"
-  username      = random_string.username.result
+  username      = jsondecode(data.aws_secretsmanager_secret_version.rds_credentials.secret_string)["TIPSTAFF_DB_USERNAME"]
   password      = random_password.password.result
   port          = 5432
   server_name   = aws_db_instance.tipstaff_db.address

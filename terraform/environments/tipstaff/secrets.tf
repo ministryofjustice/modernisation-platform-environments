@@ -1,13 +1,5 @@
 #### This file can be used to store secrets specific to the member account ####
 
-resource "random_string" "username" {
-  length  = 16
-  lower   = true
-  upper   = true
-  numeric = false
-  special = false
-}
-
 resource "random_password" "password" {
   length  = 16
   lower   = true
@@ -23,7 +15,7 @@ resource "aws_secretsmanager_secret" "tipstaff_db_secrets" {
 
 resource "aws_secretsmanager_secret_version" "rds_credentials" {
   secret_id     = aws_secretsmanager_secret.tipstaff_db_secrets.id
-  secret_string = jsonencode({ "TIPSTAFF_DB_USERNAME" : "${random_string.username.result}", "TIPSTAFF_DB_PASSWORD" : "${random_password.password.result}" })
+  secret_string = jsonencode({ "TIPSTAFF_DB_PASSWORD" : "${random_password.password.result}" })
 }
 
 resource "aws_secretsmanager_secret" "tactical_products_db_secrets" {
