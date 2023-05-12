@@ -116,6 +116,23 @@ data "aws_iam_policy_document" "extra-policy-document" {
   }
   statement {
     actions = [
+      "kinesis:ListShards"
+    ]
+    resources = [
+      "arn:aws:kinesis:${var.region}:${var.account}:stream/${var.project_id}-*"
+    ]
+  }
+  # https://docs.aws.amazon.com/glue/latest/dg/monitor-continuous-logging-enable.html#monitor-continuous-logging-encrypt-log-data
+  statement {
+    actions = [
+      "logs:AssociateKmsKey"
+    ]
+    resources = [
+      "arn:aws:logs:*:*:/aws-glue/*"
+    ]
+  }  
+  statement {
+    actions = [
     "kms:Encrypt*",
     "kms:Decrypt*",
     "kms:ReEncrypt*",
@@ -172,7 +189,7 @@ resource "aws_iam_role_policy_attachment" "glue_policies" {
 #}
 
 resource "aws_cloudwatch_log_group" "log_group" {
-  name              = "/aws-glue/jobs/${var.name}"
+  name              = "/aws-glue/jobs/${var.name}-sec-config"
   retention_in_days = var.log_group_retention_in_days
   tags              = var.tags
 }
