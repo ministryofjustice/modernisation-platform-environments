@@ -159,7 +159,7 @@ locals {
 
     }
     baseline_route53_zones = {
-      "${module.environment.domains.public.application_environment}" # oasys.hmpps-test.modernisation-platform.service.justice.gov.uk
+      "${module.environment.domains.public.application_environment}" = { # oasys.hmpps-test.modernisation-platform.service.justice.gov.uk
         lb_alias_records = [
           { name = "t2",     type = "A", lbs_map_key = "public" },
           { name = "web.t2", type = "A", lbs_map_key = "public" },
