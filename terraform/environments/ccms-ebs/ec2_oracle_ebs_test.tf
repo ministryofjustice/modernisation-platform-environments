@@ -18,6 +18,9 @@ resource "aws_instance" "ec2_oracle_ebs2" {
   #lifecycle {
   #  ignore_changes = [ebs_block_device]
   #}
+  lifecycle {
+    ignore_changes = [user_data_replace_on_change,user_data]
+  }
   user_data_replace_on_change = false
   user_data                   = <<EOF
 #!/bin/bash
@@ -60,7 +63,7 @@ EOF
   }
 
   tags = merge(local.tags,
-    { Name = lower(format("ec2-%s-%s-ebsdb", local.application_name, local.environment)) },
+    { Name = "testbox"},
     { instance-scheduling = local.application_data.accounts[local.environment].instance-scheduling },
     { backup = "true" }
   )
