@@ -37,7 +37,6 @@ locals {
           "${local.application_name}-environment" = "t2"
           oracle-db-hostname                      = "T2ODL0009"
         })
-        cloudwatch_metric_alarms = {} # TODO
       })
     }
 
