@@ -85,6 +85,15 @@ resource "aws_security_group" "mojfin" {
     protocol    = "tcp"
     cidr_blocks = [data.aws_vpc.shared.cidr_block]
   }
+
+
+  ingress {
+    description = "Temp rule for DBlinks, remove rule once the other DBs have been migrated to MP"
+    from_port   = 1521
+    to_port     = 1521
+    protocol    = "tcp"
+    cidr_blocks = [local.lzprd-vpc]
+  }
   egress {
     from_port   = 0
     to_port     = 0
@@ -180,7 +189,18 @@ resource "aws_db_instance" "appdb1" {
 }
 
 
-resource "aws_route53_record" "mojfin-rds" {
+resource "aws_route53_record" "prd-mojfin-rds" {
+  count    = local.environment == "production" ? 1 : 0
+  provider = aws.core-network-services
+  zone_id  = data.aws_route53_zone.laa-finance.zone_id
+  name     = "rds.${local.prod_domain_name}"
+  type     = "CNAME"
+  ttl      = 60
+  records  = [aws_db_instance.appdb1.address]
+}
+
+resource "aws_route53_record" "nonprd-mojfin-rds" {
+  count    = local.environment != "production" ? 1 : 0
   provider = aws.core-vpc
   zone_id  = data.aws_route53_zone.external.zone_id
   name     = "rds.${local.application_name}.${data.aws_route53_zone.external.name}"

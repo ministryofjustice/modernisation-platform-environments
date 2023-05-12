@@ -77,3 +77,18 @@ resource "aws_wafv2_web_acl" "ebs_web_acl" {
     sampled_requests_enabled   = true
   }
 }
+
+resource "aws_cloudwatch_log_group" "ebs_waf_logs" {
+  name = "aws-waf-logs-ebs/ebs-waf-logs"
+  retention_in_days = 30
+
+  tags = merge(local.tags,
+    { Name = lower(format("lb-%s-%s-ebs-waf-logs", local.application_name, local.environment)) }
+  )
+}
+
+resource "aws_wafv2_web_acl_logging_configuration" "ebs_waf_logging" {
+  log_destination_configs = [aws_cloudwatch_log_group.ebs_waf_logs.arn]
+  resource_arn            = aws_wafv2_web_acl.ebs_web_acl.arn
+
+}

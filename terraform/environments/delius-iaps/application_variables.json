@@ -2,7 +2,9 @@
   "accounts": {
     "development": {
       "short_environment_name": "dev",
-      "db_auto_minor_version_upgrade": "true",
+      "db_migration_snapshot_arn": "arn:aws:rds:eu-west-2:205048117103:snapshot:iaps-post-refresh",
+      "db_migration_snapshot_kms_key_arn": "arn:aws:kms:eu-west-2:205048117103:key/458a1557-aed8-4c94-942d-8c2c42abd98d",
+      "db_auto_minor_version_upgrade": "false",
       "db_allow_major_version_upgrade": "false",
       "db_apply_immediately": "true",
       "db_backup_window": "03:00-06:00",
@@ -26,8 +28,10 @@
     },
     "preproduction": {
       "short_environment_name": "preprod",
+      "db_migration_snapshot_arn": "",
+      "db_migration_snapshot_kms_key_arn": "",
       "db_snapshot_identifier": "iaps-post-refresh-local",
-      "db_auto_minor_version_upgrade": "true",
+      "db_auto_minor_version_upgrade": "false",
       "db_allow_major_version_upgrade": "false",
       "db_apply_immediately": "false",
       "db_backup_window": "03:00-06:00",
@@ -50,14 +54,39 @@
       "db_performance_insights_enabled": "false",
       "db_skip_final_snapshot": "true",
       "ec2_iaps_instance_type": "t3.medium",
-      "ec2_iaps_instance_ami_name": "delius_iaps_server_patch_2023-04-17T15-40-43.990Z",
+      "ec2_iaps_instance_ami_name": "delius_iaps_server_patch_2023-05-03T08-43-16.039Z",
       "cloudwatch_agent_log_group_retention_period": "365",
       "iaps_ndelius_interface_url": "interface.stage.probation.service.justice.gov.uk",
-      "iaps_im_interface_url": "preprod-im-data.i2ncloud.com",
-      "iaps_im_db_url": "imnledb01.nle.im.i2ncloud.com"
+      "iaps_im_interface_url": "preprod-im-data.i2ncloud.com"
     },
     "production": {
       "short_environment_name": "prod",
+      "db_migration_snapshot_arn": "",
+      "db_migration_snapshot_kms_key_arn": "",
+      "db_auto_minor_version_upgrade": "false",
+      "db_allow_major_version_upgrade": "false",
+      "db_apply_immediately": "false",
+      "db_backup_window": "03:00-06:00",
+      "db_backup_retention_period": "14",
+      "db_maintenance_window": "mon:00:00-mon:03:00",
+      "db_instance_class": "db.t3.small",
+      "db_user": "iaps",
+      "db_allocated_storage": "500",
+      "db_max_allocated_storage": "0",
+      "db_multi_az": "false",
+      "db_iam_database_authentication_enabled": "false",
+      "db_monitoring_interval": "5",
+      "db_enabled_cloudwatch_logs_exports": [
+        "trace",
+        "audit",
+        "alert",
+        "listener",
+        "oemagent"
+      ],
+      "db_performance_insights_enabled": "false",
+      "db_skip_final_snapshot": "true",
+      "ec2_iaps_instance_type": "t3.medium",
+      "ec2_iaps_instance_ami_name": "delius_iaps_server_patch_2023-05-03T08-43-16.039Z",
       "cloudwatch_agent_log_group_retention_period": "365",
       "iaps_ndelius_interface_url": "interface.probation.service.justice.gov.uk",
       "iaps_im_interface_url": "im-data.i2ncloud.com"
@@ -66,7 +95,6 @@
   "ec2_iaps_instance_label": "iaps-server",
   "ec2_iaps_instance_ami_owner": "core-shared-services-production",
   "ec2_iaps_instance_subnet_name": "private",
-
   "iaps_sg_ingress_rules_vpc": {
     "TCP_80": {
       "from_port": 80,
@@ -84,6 +112,13 @@
       "protocol": "TCP"
     }
   },
+  "iaps_sg_egress_rules_vpc": {
+    "TCP_1521": {
+      "from_port": 1521,
+      "to_port": 1521,
+      "protocol": "TCP"
+    }
+  },
   "iaps_sg_egress_rules_cidr": {
     "TCP_80": {
       "from_port": 80,
@@ -94,18 +129,6 @@
     "TCP_443": {
       "from_port": 443,
       "to_port": 443,
-      "protocol": "TCP",
-      "destination_cidr": "0.0.0.0/0"
-    },
-    "TCP_1433": {
-      "from_port": 1433,
-      "to_port": 1433,
-      "protocol": "TCP",
-      "destination_cidr": "0.0.0.0/0"
-    },
-    "TCP_1521": {
-      "from_port": 1521,
-      "to_port": 1521,
       "protocol": "TCP",
       "destination_cidr": "0.0.0.0/0"
     }

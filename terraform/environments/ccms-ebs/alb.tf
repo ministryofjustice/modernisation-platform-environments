@@ -45,6 +45,12 @@ resource "aws_lb_target_group" "ebsapp_tg" {
     port     = local.application_data.accounts[local.environment].tg_apps_port
     protocol = "HTTP"
   }
+
+  stickiness {
+    enabled         = true
+    type            = "lb_cookie"
+    cookie_duration = 3600
+  }
 }
 
 resource "aws_lb_target_group_attachment" "ebsapps" {
@@ -67,7 +73,7 @@ resource "aws_lb" "webgate_lb" {
   internal           = true
   load_balancer_type = "application"
   security_groups    = [aws_security_group.sg_webgate_lb.id]
-  subnets            = data.aws_subnets.private-public.ids
+  subnets            = data.aws_subnets.shared-private.ids
 
   enable_deletion_protection = true
 

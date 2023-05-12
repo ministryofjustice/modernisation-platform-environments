@@ -62,7 +62,6 @@ locals {
           delius_iaps_rds_db_address          = aws_db_instance.iaps.address
           ndelius_interface_url               = local.application_data.accounts[local.environment].iaps_ndelius_interface_url
           im_interface_url                    = local.application_data.accounts[local.environment].iaps_im_interface_url
-          im_db_url                           = local.application_data.accounts[local.environment].iaps_im_db_url
 
           # TODO: remove environment variable and related conditional statements
           # temporarily needed to ensure no connections to delius and im are attempted
@@ -72,10 +71,11 @@ locals {
     )
 
     autoscaling_group = {
-      desired_capacity = 1
-      max_size         = 1
-      min_size         = 1
-      force_delete     = true
+      desired_capacity          = 1
+      max_size                  = 1
+      min_size                  = 1
+      force_delete              = true
+      wait_for_capacity_timeout = "15m"
     }
 
     iam_policies = [
@@ -116,6 +116,17 @@ resource "aws_security_group_rule" "ingress_traffic_vpc" {
   security_group_id = aws_security_group.iaps.id
   to_port           = each.value.to_port
   type              = "ingress"
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+}
+
+resource "aws_security_group_rule" "egress_traffic_vpc" {
+  for_each          = local.application_data.iaps_sg_egress_rules_vpc
+  description       = format("Traffic for %s %d", each.value.protocol, each.value.from_port)
+  from_port         = each.value.from_port
+  protocol          = each.value.protocol
+  security_group_id = aws_security_group.iaps.id
+  to_port           = each.value.to_port
+  type              = "egress"
   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
 }
 
@@ -231,8 +242,7 @@ resource "aws_iam_policy" "ssm_least_privilege_policy" {
 # Resources - Create ASG and launch template using module
 ##
 module "ec2_iaps_server" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-autoscaling-group?ref=v1.2.0"
-
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-autoscaling-group?ref=v1.2.1"
 
   providers = {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
@@ -253,9 +263,11 @@ module "ec2_iaps_server" {
   instance_profile_policies = local.iaps_server.iam_policies
   application_name          = local.application_name
   region                    = data.aws_region.current.name
-  subnet_ids                = data.aws_subnets.private-public.ids
+  subnet_ids                = data.aws_subnets.shared-private.ids
   tags                      = local.ec2_tags
   account_ids_lookup        = local.environment_management.account_ids
+
+  depends_on = [aws_kms_grant.image-builder-shared-hmpps-ebs-cmk-grant]
 }
 
 ##

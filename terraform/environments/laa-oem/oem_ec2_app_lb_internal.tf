@@ -3,7 +3,7 @@ resource "aws_lb" "oem_app_internal" {
   load_balancer_type = "application"
   internal           = true
   security_groups    = [aws_security_group.load_balancer_internal.id]
-  subnets            = data.aws_subnets.private-public.ids
+  subnets            = data.aws_subnets.shared-private.ids
 
   tags = local.tags
 }

@@ -1,3 +1,13 @@
+# Temporary tf resource to speed up migration
+# to be deleted once prod migration is completed
+resource "aws_db_snapshot_copy" "local" {
+  count = local.application_data.accounts[local.environment].db_migration_snapshot_arn == "" ? 0 : 1
+
+  source_db_snapshot_identifier = local.application_data.accounts[local.environment].db_migration_snapshot_arn
+  kms_key_id                    = local.application_data.accounts[local.environment].db_migration_snapshot_kms_key_arn
+  target_db_snapshot_identifier = "local-migration-snapshot-copy"
+}
+
 resource "aws_db_instance" "iaps" {
   engine         = "oracle-ee"
   engine_version = "19"
@@ -8,7 +18,8 @@ resource "aws_db_instance" "iaps" {
   username       = local.application_data.accounts[local.environment].db_user
   password       = aws_secretsmanager_secret_version.db_password.secret_string
 
-  snapshot_identifier = try(local.application_data.accounts[local.environment].db_snapshot_identifier, null)
+  # temporary 2-layer try function, to conditionally allow a build from a snapshot originating in an external account
+  snapshot_identifier = try(aws_db_snapshot_copy.local[0].id, try(local.application_data.accounts[local.environment].db_snapshot_identifier, null))
 
   db_subnet_group_name   = aws_db_subnet_group.iaps.id
   vpc_security_group_ids = [aws_security_group.iaps_db.id]

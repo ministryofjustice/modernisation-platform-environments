@@ -6,6 +6,7 @@ locals {
   lb_log_prefix_ebsapp = "ebsapps-lb"
   lb_log_prefix_wgate  = "wgate-lb"
 
+
   data_subnets = [
     data.aws_subnet.data_subnets_a.id,
     data.aws_subnet.data_subnets_b.id,
