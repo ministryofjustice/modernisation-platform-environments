@@ -603,7 +603,7 @@ module "dms_nomis_ingestor" {
 # Dynamo DB for DomainRegistry, DPR-306/DPR-218
 module "dynamo_tab_domain_registry" {
   source              = "./modules/dynamo_tables"
-  create_table        = false
+  create_table        = true
   autoscaling_enabled = false
   name                = "${local.project}-domain-registry-${local.environment}"
 
@@ -629,7 +629,7 @@ module "dynamo_tab_domain_registry" {
 
   global_secondary_indexes = [
     {
-      name            = "test1"
+      name            = "primaryId-type-index"
       hash_key        = "primaryId"
       range_key       = "type"
       write_capacity  = 10
@@ -637,7 +637,7 @@ module "dynamo_tab_domain_registry" {
       projection_type = "ALL"
     },
     {
-      name            = "test2"
+      name            = "secondaryId-type-index"
       hash_key        = "secondaryId"
       range_key       = "type"
       write_capacity  = 10
