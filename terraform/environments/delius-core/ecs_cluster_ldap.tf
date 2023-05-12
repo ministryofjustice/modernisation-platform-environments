@@ -68,22 +68,22 @@ resource "aws_security_group_rule" "allow_all_egress" {
   security_group_id = aws_security_group.ldap.id
 }
 
-# resource "aws_security_group_rule" "alb" {
-#   description              = "Allow inbound traffic from ALB"
-#   type                     = "ingress"
-#   from_port                = local.openldap_port
-#   to_port                  = local.openldap_port
-#   protocol                 = "tcp"
-#   source_security_group_id = aws_security_group.load_balancer_security_group.id
-#   security_group_id        = aws_security_group.openldap.id
-# }
+resource "aws_security_group_rule" "ldap_nlb" {
+  description              = "Allow inbound traffic from NLB"
+  type                     = "ingress"
+  from_port                = local.openldap_port
+  to_port                  = local.openldap_port
+  protocol                 = "TCP" 
+  security_group_id        = aws_security_group.ldap.id
+  cidr_blocks = ["0.0.0.0/0"]
+ }
 
 resource "aws_cloudwatch_log_group" "openldap" {
   name              = format("%s-openldap-ecs", local.application_name)
   retention_in_days = 30
 }
 
-output "s3_bucket_app_deployment_name" {
+output "s3_bucket_app_deployment_name" {s
   value = module.s3_bucket_app_deployment.bucket.id
 }
 
