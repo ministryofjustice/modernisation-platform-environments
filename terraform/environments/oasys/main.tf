@@ -33,6 +33,13 @@ module "baseline_presets" {
     enable_shared_s3                             = true # adds permissions to ec2s to interact with devtest or prodpreprod buckets
     iam_policies_ec2_default                     = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
     s3_iam_policies                              = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
+    # cloudwatch_metric_alarms = {}
+    # cloudwatch_metric_alarms_lists = {}
+    cloudwatch_metric_alarms_lists_with_actions = {
+      dso_pagerduty               = ["dso_pagerduty"]
+      # dba_pagerduty               = ["dba_pagerduty"]
+      # dba_high_priority_pagerduty = ["dba_high_priority_pagerduty"]
+    }
 
     # comment this in if you need to resolve FixNGo hostnames
     # route53_resolver_rules = {
