@@ -35,7 +35,7 @@ locals {
         tags = merge(local.webserver.tags, {
           description                             = "t2 ${local.application_name} web"
           "${local.application_name}-environment" = "t2"
-          oracle-db-hostname                      = "T2ODL0009"
+          oracle-db-hostname                      = "T2ODL0009.azure.noms.root"
         })
       })
     }
@@ -168,7 +168,7 @@ locals {
         ]
         records = [
           { name = "db.t2", type = "A", ttl = "300", records = ["10.101.36.132"] }, # db.t2.oasys.service.justice.gov.uk currently pointing to azure db T2ODL0009
-          { name = "db.t1", type = "A", ttl = "300", records = ["10.101.6.132"]  },  # db.t1.oasys.service.justice.gov.uk currently pointing to azure db T1ODL0007
+          { name = "db.t1", type = "A", ttl = "300", records = ["10.101.6.132"]  }, # db.t1.oasys.service.justice.gov.uk currently pointing to azure db T1ODL0007
         ]
       }
     }
