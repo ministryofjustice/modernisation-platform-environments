@@ -526,7 +526,7 @@ resource "aws_route53_record" "external_validation" {
   name            = each.value.name
   records         = [each.value.record]
   ttl             = 60
-  type            = [each.value.type]
+  type            = each.value.type
   zone_id         = var.services_zone_id
 }
 
