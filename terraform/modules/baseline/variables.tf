@@ -376,6 +376,7 @@ variable "rds_instances" {
         special = bool
       })
       description = string
+      kms_key_id  = optional(string)
     })))
     route53_record = optional(bool, true)
     tags           = optional(map(string), {})

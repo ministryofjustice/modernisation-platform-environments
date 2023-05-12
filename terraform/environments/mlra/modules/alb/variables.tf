@@ -141,7 +141,7 @@ variable "existing_bucket_name" {
 }
 variable "acm_cert_domain_name" {
   type        = string
-  description = "The domain name of the ACM certificate for CloudFront and ALB HTTPS Listener"
+  description = "The domain name of the ACM certificate for CloudFront and ALB HTTPS Listener. Note that for production this is the FULLY QUALIFIED domain name"
 }
 variable "cloudfront_default_cache_behavior" {
   type        = any
