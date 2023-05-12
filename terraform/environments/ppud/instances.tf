@@ -95,6 +95,7 @@ resource "aws_instance" "s609693lo6vw106" {
   }
 }
 
+/*
 resource "aws_instance" "s609693lo6vw107" {
   count                  = local.is-development == true ? 1 : 0
   ami                    = "ami-04682227c9aa18702"
@@ -107,6 +108,7 @@ resource "aws_instance" "s609693lo6vw107" {
     Name = "s609693lo6vw107"
   }
 }
+*/
 
 resource "aws_instance" "PPUDWEBSERVER2" {
   count                  = local.is-development == true ? 1 : 0
