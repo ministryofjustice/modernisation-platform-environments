@@ -80,8 +80,7 @@ resource "aws_ssm_parameter" "db_password" {
   description = "RDS Admin Password"
   type        = "SecureString"
   value       = random_password.rds_admin_password.result
-  key_id      = var.ssm_parameters.kms_key_id != null ? var.ssm_parameters.kms_key_id : null
-
+  key_id      = var.ssm_kms_key_id != null ? var.ssm_kms_key_id : null
 }
 
 #------------------------------------------------------------------------------
