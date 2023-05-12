@@ -497,7 +497,7 @@ resource "aws_acm_certificate" "external_lb" {
 
 resource "aws_acm_certificate_validation" "external" {
   certificate_arn         = aws_acm_certificate.external_lb.arn
-  validation_record_fqdns = var.environment != "production" ? [local.domain_name_main[0], local.domain_name_sub[0]] : var.acm_cert_domain_name
+  validation_record_fqdns = [for record in aws_route53_record.external_validation : record.fqdn]
 
   timeouts {
     create = "10m"
