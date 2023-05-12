@@ -140,7 +140,7 @@ resource "aws_route53_zone" "this" {
   name = each.key
   
   dynamic "vpc" {
-    for_each = each.value.vpc != null ? [each.value.vpc] : []
+    for_each = try(each.value.vpc, false) ? [each.value.vpc] : []
     content {
       vpc_id = vpc.id
       vpc_region = vpc.region
