@@ -1,15 +1,15 @@
 # Elastic IPs for NLB
 
 resource "aws_eip" "ebs_eip" {
-  count    = local.is-production ? 6 : 3
-  vpc      = true
+  count = local.is-production ? 6 : 3
+  vpc   = true
 
   lifecycle {
     prevent_destroy = true
   }
 
   tags = merge(local.tags,
-    { Name = lower(format("lb-%s-%s-eip-${count.index+1}", local.application_name, local.environment)) }
+    { Name = lower(format("lb-%s-%s-eip-${count.index + 1}", local.application_name, local.environment)) }
   )
 }
 
@@ -21,8 +21,8 @@ resource "aws_lb" "ebsapps_nlb" {
   internal           = false
   load_balancer_type = "network"
 
-  enable_deletion_protection        = true
-  enable_cross_zone_load_balancing  = true
+  enable_deletion_protection       = true
+  enable_cross_zone_load_balancing = true
 
   subnet_mapping {
     subnet_id     = data.aws_subnets.shared-public.ids[0]

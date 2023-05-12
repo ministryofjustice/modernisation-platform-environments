@@ -43,10 +43,10 @@ locals {
   domain_type_main   = [for k, v in local.domain_types : v.type if k == var.acm_cert_domain_name]
   domain_type_sub    = [for k, v in local.domain_types : v.type if k != var.acm_cert_domain_name]
 
-  domain_name   = var.environment != "production" ? "${var.application_name}.${var.business_unit}-${var.environment}.${var.acm_cert_domain_name}" : "${var.application_name}.${var.acm_cert_domain_name}"
+  domain_name = var.environment != "production" ? "${var.application_name}.${var.business_unit}-${var.environment}.${var.acm_cert_domain_name}" : "${var.application_name}.${var.acm_cert_domain_name}"
 
   # domain_name   = "${var.application_name}.${var.business_unit}-${var.environment}.modernisation-platform.service.justice.gov.uk"
- 
+
   ip_set_list   = [for ip in split("\n", chomp(file("${path.module}/waf_ip_set.txt"))) : ip]
   custom_header = "X-Custom-Header-LAA-${upper(var.application_name)}"
 

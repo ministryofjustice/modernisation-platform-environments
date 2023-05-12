@@ -1,11 +1,11 @@
 #  Build EC2 for ClamAV
 
 resource "aws_instance" "ec2_clamav" {
-  instance_type          = "t2.medium"
-  ami                    = "ami-03e88be9ecff64781"
-  key_name               = local.application_data.accounts[local.environment].key_name
-  vpc_security_group_ids = [aws_security_group.ec2_sg_clamav.id]
-  subnet_id              = local.environment == "development" ? data.aws_subnet.data_subnets_a.id : data.aws_subnet.private_subnets_a.id
+  instance_type               = "t2.medium"
+  ami                         = "ami-03e88be9ecff64781"
+  key_name                    = local.application_data.accounts[local.environment].key_name
+  vpc_security_group_ids      = [aws_security_group.ec2_sg_clamav.id]
+  subnet_id                   = local.environment == "development" ? data.aws_subnet.data_subnets_a.id : data.aws_subnet.private_subnets_a.id
   monitoring                  = true
   ebs_optimized               = false
   associate_public_ip_address = false
