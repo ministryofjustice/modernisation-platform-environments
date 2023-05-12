@@ -12,19 +12,19 @@ resource "aws_dms_endpoint" "source" {
   extra_connection_attributes = "heartbeatEnable=Y;"
 }
 
-# resource "aws_dms_endpoint" "target" {
-#   depends_on = [aws_db_instance.tipstaff_db]
+resource "aws_dms_endpoint" "target" {
+  depends_on = [aws_db_instance.tipstaff_db]
 
-#   database_name = local.application_data.accounts[local.environment].db_name
-#   endpoint_id   = "tipstaff-target"
-#   endpoint_type = "target"
-#   engine_name   = "postgres"
-#   username      = jsondecode(data.aws_secretsmanager_secret_version.get_rds_credentials.secret_string)["TIPSTAFF_DB_USERNAME"]
-#   password      = random_password.password.result
-#   port          = 5432
-#   server_name   = aws_db_instance.tipstaff_db.address
-#   ssl_mode      = "none"
-# }
+  database_name = local.application_data.accounts[local.environment].db_name
+  endpoint_id   = "tipstaff-target"
+  endpoint_type = "target"
+  engine_name   = "postgres"
+  username      = jsondecode(data.aws_secretsmanager_secret_version.get_rds_credentials.secret_string)["TIPSTAFF_DB_USERNAME"]
+  password      = random_password.password.result
+  port          = 5432
+  server_name   = aws_db_instance.tipstaff_db.address
+  ssl_mode      = "none"
+}
 
 resource "aws_dms_replication_instance" "tipstaff_replication_instance" {
   allocated_storage           = 300
@@ -110,52 +110,52 @@ resource "aws_iam_role_policy" "dms_vpc_management_policy" {
   })
 }
 
-# resource "aws_dms_replication_task" "tipstaff_migration_task" {
-#   depends_on               = [null_resource.setup_target_rds_security_group, aws_db_instance.tipstaff_db, aws_dms_endpoint.target, aws_dms_endpoint.source, aws_dms_replication_instance.tipstaff_replication_instance]
-#   migration_type           = "full-load"
-#   replication_instance_arn = aws_dms_replication_instance.tipstaff_replication_instance.replication_instance_arn
-#   replication_task_id      = "tipstaff-migration-task"
-#   source_endpoint_arn      = aws_dms_endpoint.source.endpoint_arn
-#   target_endpoint_arn      = aws_dms_endpoint.target.endpoint_arn
-#   start_replication_task   = false
+resource "aws_dms_replication_task" "tipstaff_migration_task" {
+  depends_on               = [null_resource.setup_target_rds_security_group, aws_db_instance.tipstaff_db, aws_dms_endpoint.target, aws_dms_endpoint.source, aws_dms_replication_instance.tipstaff_replication_instance]
+  migration_type           = "full-load"
+  replication_instance_arn = aws_dms_replication_instance.tipstaff_replication_instance.replication_instance_arn
+  replication_task_id      = "tipstaff-migration-task"
+  source_endpoint_arn      = aws_dms_endpoint.source.endpoint_arn
+  target_endpoint_arn      = aws_dms_endpoint.target.endpoint_arn
+  start_replication_task   = false
 
-#   replication_task_settings = jsonencode({
-#     TargetMetadata = {
-#       FullLobMode  = true,
-#       LobChunkSize = 64
-#     },
-#     FullLoadSettings = {
-#       TargetTablePrepMode = "DO_NOTHING"
-#     },
-#     ControlTablesSettings = {
-#       historyTimeslotInMinutes = 5
-#     },
-#     ErrorBehavior = {
-#       DataErrorPolicy            = "LOG_ERROR"
-#       ApplyErrorDeletePolicy     = "LOG_ERROR"
-#       ApplyErrorInsertPolicy     = "LOG_ERROR"
-#       ApplyErrorUpdatePolicy     = "LOG_ERROR"
-#       ApplyErrorEscalationCount  = 0
-#       ApplyErrorEscalationPolicy = "LOG_ERROR"
-#     }
-#   })
+  replication_task_settings = jsonencode({
+    TargetMetadata = {
+      FullLobMode  = true,
+      LobChunkSize = 64
+    },
+    FullLoadSettings = {
+      TargetTablePrepMode = "DO_NOTHING"
+    },
+    ControlTablesSettings = {
+      historyTimeslotInMinutes = 5
+    },
+    ErrorBehavior = {
+      DataErrorPolicy            = "LOG_ERROR"
+      ApplyErrorDeletePolicy     = "LOG_ERROR"
+      ApplyErrorInsertPolicy     = "LOG_ERROR"
+      ApplyErrorUpdatePolicy     = "LOG_ERROR"
+      ApplyErrorEscalationCount  = 0
+      ApplyErrorEscalationPolicy = "LOG_ERROR"
+    }
+  })
 
-#   table_mappings = jsonencode({
-#     rules = [
-#       {
-#         "rule-type" = "selection"
-#         "rule-id"   = "1"
-#         "rule-name" = "1"
-#         "object-locator" = {
-#           "schema-name" = "dbo"
-#           "table-name"  = "%"
-#         }
-#         "rule-action" = "include"
-#       }
-#     ]
-#   })
+  table_mappings = jsonencode({
+    rules = [
+      {
+        "rule-type" = "selection"
+        "rule-id"   = "1"
+        "rule-name" = "1"
+        "object-locator" = {
+          "schema-name" = "dbo"
+          "table-name"  = "%"
+        }
+        "rule-action" = "include"
+      }
+    ]
+  })
 
-# }
+}
 
 resource "aws_security_group" "modernisation_dms_access" {
   count       = local.is-preproduction ? 1 : 0
