@@ -207,10 +207,13 @@ locals {
         vpc = { # this makes it a private hosted zone
           id = module.environment.vpc.id
         }
+        records = [
+          { name = "db.t2.oasys", type = "A", ttl = "300", records = ["10.101.36.132"] }, # db.t2.oasys.service.justice.gov.uk currently pointing to azure db T2ODL0009
+          { name = "db.t1.oasys", type = "A", ttl = "300", records = ["10.101.6.132"]  }, # db.t1.oasys.service.justice.gov.uk currently pointing to azure db T1ODL0007
+        ]
         lb_alias_records = [
           { name = "t2.oasys", type = "A", lbs_map_key = "public" },
           { name = "web.t2.oasys", type = "A", lbs_map_key = "public" },
-          { name = "db.t2.oasys", type = "A", lbs_map_key = "public" }, 
         ]
       }
     }
