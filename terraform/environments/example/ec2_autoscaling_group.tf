@@ -4,8 +4,8 @@ module "ec2_test_autoscaling_group" {
   providers = {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
   }
-  for_each = try(local.ec2_test.ec2_test_autoscaling_groups, {})
-  name = each.key
+  for_each                      = try(local.ec2_test.ec2_test_autoscaling_groups, {})
+  name                          = each.key
   ami_name                      = each.value.ami_name
   ami_owner                     = try(each.value.ami_owner, "core-shared-services-production")
   instance                      = merge(local.autoscale_instance, lookup(each.value, "instance", {}))
@@ -32,14 +32,14 @@ locals {
   ec2_autoscale_common_managed_policies = [
     aws_iam_policy.ec2_autoscale_policy.arn
   ]
-    autoscale_instance = {
-      disable_api_termination      = false
-      instance_type                = "t3.medium"
-      key_name                     = aws_key_pair.ec2-autoscale-user.key_name
-      monitoring                   = false
-      metadata_options_http_tokens = "required"
-      vpc_security_group_ids       = try([aws_security_group.example_ec2_autoscale_sg.id])
-    }
+  autoscale_instance = {
+    disable_api_termination      = false
+    instance_type                = "t3.medium"
+    key_name                     = aws_key_pair.ec2-autoscale-user.key_name
+    monitoring                   = false
+    metadata_options_http_tokens = "required"
+    vpc_security_group_ids       = try([aws_security_group.example_ec2_autoscale_sg.id])
+  }
 }
 
 # create single managed policy
