@@ -72,7 +72,7 @@ resource "aws_iam_policy" "kms_read_access_policy" {
           "kms:DescribeKey",
         ],
         "Resource" : [
-          "arn:aws:kms:*:${var.account}:key/*"              
+          "arn:aws:kms:*:${local.account_id}:key/*"              
         ]
       }
     ]
