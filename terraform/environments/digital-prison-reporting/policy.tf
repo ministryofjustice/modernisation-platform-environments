@@ -83,7 +83,7 @@ resource "aws_iam_policy" "kms_read_access_policy" {
 # Amazon Redshift supports only identity-based policies (IAM policies).
 
 resource "aws_iam_role" "redshift-role" {
-  count = local.setup_datamart ? 1 : 0
+#  count = local.setup_datamart ? 1 : 0
   name  = "${local.project}-redshift-cluster-role"
 
   assume_role_policy = jsonencode({
@@ -160,7 +160,7 @@ resource "aws_iam_policy" "additional-policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "redshift" {
-  role       = aws_iam_role.redshift-role[0].name
+  role       = aws_iam_role.redshift-role.name
   policy_arn = aws_iam_policy.additional-policy.arn
 }
 
