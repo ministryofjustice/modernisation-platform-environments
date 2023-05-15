@@ -48,8 +48,8 @@ resource "aws_iam_policy" "s3_read_access_policy" {
           "s3:Get*",
         ],
         "Resource" : [
-          "arn:aws:s3:::${var.project_id}-*/*",
-          "arn:aws:s3:::${var.project_id}-*"              
+          "arn:aws:s3:::${local.project}-*/*",
+          "arn:aws:s3:::${local.project}-*"              
         ]
       }
     ]
