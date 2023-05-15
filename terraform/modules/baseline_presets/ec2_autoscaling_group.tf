@@ -4,13 +4,13 @@ locals {
 
     default = {
       desired_capacity    = 1
-      max_size            = 2
+      max_size            = 1
       vpc_zone_identifier = var.environment.subnets["private"].ids
     }
 
     default_with_ready_hook = {
       desired_capacity    = 1
-      max_size            = 2
+      max_size            = 1
       vpc_zone_identifier = var.environment.subnets["private"].ids
 
       initial_lifecycle_hooks = {
@@ -24,7 +24,7 @@ locals {
 
     default_with_ready_hook_and_warm_pool = {
       desired_capacity    = 1
-      max_size            = 2
+      max_size            = 1
       vpc_zone_identifier = var.environment.subnets["private"].ids
 
       initial_lifecycle_hooks = {
