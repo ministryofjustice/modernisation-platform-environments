@@ -218,7 +218,7 @@ resource "aws_dms_endpoint" "source_prod" {
 
 resource "aws_dms_replication_task" "tipstaff_migration_task_prod" {
   count                    = local.is-production ? 1 : 0
-  depends_on               = [null_resource.modernisation_dms_access_prod[0], aws_db_instance.tipstaff_db, aws_dms_endpoint.target, aws_dms_endpoint.source_prod[0], aws_dms_replication_instance.tipstaff_replication_instance]
+  depends_on               = [null_resource.setup_target_rds_security_group_prod[0], aws_db_instance.tipstaff_db, aws_dms_endpoint.target, aws_dms_endpoint.source_prod[0], aws_dms_replication_instance.tipstaff_replication_instance]
   migration_type           = "full-load"
   replication_instance_arn = aws_dms_replication_instance.tipstaff_replication_instance.replication_instance_arn
   replication_task_id      = "tipstaff-migration-task"
