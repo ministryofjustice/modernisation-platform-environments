@@ -62,7 +62,7 @@ locals {
             branch = "nomis/DSOS-1893/re-enable-warm-pools"
           })
         })
-        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default_with_ready_hook, {
+        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
           desired_capacity = 0
         })
         autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
