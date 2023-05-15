@@ -49,7 +49,7 @@ data "aws_iam_policy_document" "iam_policy_document_for_code_lambda" {
 }
 
 resource "aws_iam_policy" "code_extractor_lambda_policy" {
-  name        = "code_extractor_${local.environment}_policy_${local.environment}"
+  name        = "code_extractor_policy_${local.environment}"
   path        = "/"
   description = "AWS IAM Policy for managing code_extractor lambda role"
   policy      = data.aws_iam_policy_document.iam_policy_document_for_code_lambda.json
