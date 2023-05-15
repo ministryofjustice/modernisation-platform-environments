@@ -93,6 +93,7 @@ locals {
         tags = merge(local.database_ec2_b.tags, {
           nomis-environment   = "t1"
           description         = "T1 NOMIS database"
+          oracle-sids         = "T1TRDS1"
           instance-scheduling = "skip-scheduling"
         })
         config = merge(local.database_ec2_b.config, {
