@@ -11,7 +11,6 @@ resource "aws_s3_object" "object" {
   bucket      = module.s3-bucket.bucket.id
   key         = "glue_script/glue_spark_transform_script.py"
   source      = "glue_script/glue_spark_transform_script.py"
-  source_hash = filemd5("glue_script/glue_spark_transform_script.py")
 }
 
 resource "aws_glue_job" "glue_job" {
@@ -85,7 +84,7 @@ resource "aws_iam_policy" "s3_policy_for_gluejob" {
   path        = "/"
   description = "AWS IAM Policy for managing aws lambda role"
   policy      = data.aws_iam_policy_document.s3-access.json
-
+  tags = local.tags
 }
 
 resource "aws_iam_role_policy_attachment" "s3_access_for_glue_job" {

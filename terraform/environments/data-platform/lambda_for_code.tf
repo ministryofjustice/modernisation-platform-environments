@@ -20,11 +20,13 @@ resource "aws_lambda_function" "code_extractor" {
       ENVIRONMENT = local.environment
     }
   }
+  tags = local.tags
 }
 
 resource "aws_iam_role" "code_extractor_lambda_role" {
   name               = "code_extractor_${local.environment}_role_${local.environment}"
   assume_role_policy = data.aws_iam_policy_document.lambda_trust_policy_doc.json
+  tags = local.tags
 }
 
 data "aws_iam_policy_document" "iam_policy_document_for_code_lambda" {
@@ -53,7 +55,7 @@ resource "aws_iam_policy" "code_extractor_lambda_policy" {
   path        = "/"
   description = "AWS IAM Policy for managing code_extractor lambda role"
   policy      = data.aws_iam_policy_document.iam_policy_document_for_code_lambda.json
-
+  tags = local.tags
 }
 
 resource "aws_iam_role_policy_attachment" "attach_code_lambda_policy_to_iam_role" {
@@ -63,7 +65,7 @@ resource "aws_iam_role_policy_attachment" "attach_code_lambda_policy_to_iam_role
 
 resource "aws_cloudwatch_event_rule" "put_to_code_directory" {
   name = "put_to_code_directory"
-
+  tags = local.tags
   event_pattern = jsonencode({
     "source" : ["aws.s3"],
     "detail-type" : ["AWS API Call via CloudTrail"],
@@ -83,6 +85,7 @@ resource "aws_cloudwatch_event_target" "code_directory_lambda_trigger" {
   rule      = aws_cloudwatch_event_rule.put_to_code_directory.name
   target_id = "code"
   arn       = aws_lambda_function.code_extractor.arn
+  tags = local.tags
 }
 
 
@@ -92,4 +95,5 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_code_lambda" {
   function_name = aws_lambda_function.code_extractor.function_name
   principal     = "events.amazonaws.com"
   source_arn    = aws_cloudwatch_event_rule.put_to_code_directory.arn
+  tags = local.tags
 }
