@@ -271,7 +271,7 @@ resource "aws_iam_role" "redshift-spectrum-role" {
   )
 }
 
-data "aws_iam_policy_document" "extra_policy_document" {   
+data "aws_iam_policy_document" "redshift_spectrum" {   
   statement {
     actions = [
 				"glue:BatchCreatePartition",
@@ -300,17 +300,17 @@ data "aws_iam_policy_document" "extra_policy_document" {
   }
 }
 
-resource "aws_iam_policy" "redshift_extra_policy" {
+resource "aws_iam_policy" "redshift_spectrum_policy" {
   name        = "${local.project}-redshift-spectrum-policy"
   description = "Extra Policy for AWS Redshift Spectrum"
-  policy      = data.aws_iam_policy_document.extra_policy_document.json
+  policy      = data.aws_iam_policy_document.redshift_spectrum.json
 }
 
 resource "aws_iam_role_policy_attachment" "redshift_spectrum" {
   for_each = toset([
     aws_iam_policy.s3_read_access_policy.arn,
     aws_iam_policy.kms_read_access_policy.arn,
-    aws_iam_policy.redshift_extra_policy.arn
+    aws_iam_policy.redshift_spectrum_policy.arn
   ])
 
   role = aws_iam_role.redshift-spectrum-role.name
