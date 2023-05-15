@@ -35,7 +35,7 @@ locals {
         domain_name = module.environment.domains.public.modernisation_platform
         subject_alternate_names = [
           "*.${module.environment.domains.public.application_environment}", # *.oasys.hmpps-development.modernisation-platform.service.justice.gov.uk
-          "*.dev.${module.environment.domains.public.short_name}", # "dev.oasys.service.justice.gov.uk"
+          "*.dev.${module.environment.domains.public.short_name}",          # "dev.oasys.service.justice.gov.uk"
           "*.dev.${local.application_name}.az.justice.gov.uk",
         ]
         external_validation_records_created = true
