@@ -18,7 +18,7 @@ resource "aws_instance" "ec2_webgate" {
   # Also includes ebs_optimized and cpu_core_count due to changing instance family from c5d.2xlarge to m5d.large
   lifecycle {
     ignore_changes = [
-      ebs_block_device, 
+      ebs_block_device,
       ebs_optimized,
       cpu_core_count
     ]

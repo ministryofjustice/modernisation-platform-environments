@@ -21,7 +21,7 @@ resource "aws_lambda_function" "authoriser" {
   environment {
     variables = {
       authorisationToken = "placeholder"
-      api_resource_arn = "placeholder"
+      api_resource_arn   = "placeholder"
     }
   }
 }

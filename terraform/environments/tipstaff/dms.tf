@@ -180,7 +180,7 @@ resource "aws_security_group" "modernisation_dms_access" {
 }
 
 resource "null_resource" "setup_target_rds_security_group" {
-  count       = local.is-preproduction ? 1 : 0
+  count      = local.is-preproduction ? 1 : 0
   depends_on = [aws_dms_replication_instance.tipstaff_replication_instance]
 
   provisioner "local-exec" {
