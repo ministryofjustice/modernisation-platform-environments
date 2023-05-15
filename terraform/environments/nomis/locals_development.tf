@@ -62,7 +62,7 @@ locals {
             branch = "nomis/DSOS-1893/re-enable-warm-pools"
           })
         })
-        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
+        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default_with_ready_hook_and_warm_pool, {
           desired_capacity = 0
         })
         autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
@@ -88,8 +88,13 @@ locals {
             branch = "nomis/DSOS-1893/re-enable-warm-pools"
           })
         })
-        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default_with_ready_hook, {
+        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default_with_ready_hook_and_warm_pool, {
           desired_capacity = 0
+          warm_pool = {
+            reuse_on_scale_in           = true
+            min_size                    = 1
+            max_group_prepared_capacity = 2
+          }
         })
         autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
         tags = {
@@ -114,8 +119,12 @@ locals {
             branch = "nomis/DSOS-1893/re-enable-warm-pools"
           })
         })
-        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default_with_ready_hook, {
+        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default_with_ready_hook_and_warm_pool, {
           desired_capacity = 0
+          warm_pool = {
+            reuse_on_scale_in           = true
+            max_group_prepared_capacity = 2
+          }
         })
         autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
         tags = {
