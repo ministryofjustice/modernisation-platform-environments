@@ -85,7 +85,6 @@ resource "aws_cloudwatch_event_target" "code_directory_lambda_trigger" {
   rule      = aws_cloudwatch_event_rule.put_to_code_directory.name
   target_id = "code"
   arn       = aws_lambda_function.code_extractor.arn
-  tags = local.tags
 }
 
 
@@ -95,5 +94,4 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_code_lambda" {
   function_name = aws_lambda_function.code_extractor.function_name
   principal     = "events.amazonaws.com"
   source_arn    = aws_cloudwatch_event_rule.put_to_code_directory.arn
-  tags = local.tags
 }

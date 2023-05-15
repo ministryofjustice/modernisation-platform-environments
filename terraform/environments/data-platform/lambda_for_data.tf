@@ -69,7 +69,6 @@ resource "aws_iam_policy" "data_extractor_lambda_policy" {
 resource "aws_iam_role_policy_attachment" "attach_data_lambda_policy_to_iam_role" {
   role       = aws_iam_role.data_extractor_lambda_role.name
   policy_arn = aws_iam_policy.data_extractor_lambda_policy.arn
-  tags = local.tags
 }
 
 resource "aws_cloudwatch_event_rule" "put_to_data_directory" {
@@ -93,7 +92,6 @@ resource "aws_cloudwatch_event_target" "data_directory_lambda_trigger" {
   rule      = aws_cloudwatch_event_rule.put_to_data_directory.name
   target_id = "data"
   arn       = aws_lambda_function.data_extractor.arn
-  tags = local.tags
 }
 
 resource "aws_lambda_permission" "allow_cloudwatch_to_call_data_lambda" {
@@ -102,6 +100,5 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_data_lambda" {
   function_name = aws_lambda_function.data_extractor.function_name
   principal     = "events.amazonaws.com"
   source_arn    = aws_cloudwatch_event_rule.put_to_data_directory.arn
-  tags = local.tags
 }
 
