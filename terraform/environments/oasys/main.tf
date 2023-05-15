@@ -33,17 +33,10 @@ module "baseline_presets" {
     enable_shared_s3                             = true # adds permissions to ec2s to interact with devtest or prodpreprod buckets
     iam_policies_ec2_default                     = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
     s3_iam_policies                              = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
-    # cloudwatch_metric_alarms = {}
-    # cloudwatch_metric_alarms_lists = {}
+
     cloudwatch_metric_alarms_lists_with_actions = {
       dso_pagerduty = ["dso_pagerduty"]
     }
-    sns_topics = {
-      pagerduty_integrations = {
-        dso_pagerduty = contains(["development", "test"], local.environment) ? "oasys_nonprod_alarms" : "oasys_alarms"
-      }
-    }
-
 
     sns_topics = {
       pagerduty_integrations = {
