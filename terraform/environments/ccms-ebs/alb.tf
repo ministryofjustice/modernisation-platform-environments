@@ -60,10 +60,10 @@ resource "aws_lb_target_group_attachment" "ebsapps" {
   port             = local.application_data.accounts[local.environment].tg_apps_port
 }
 
-# resource "aws_wafv2_web_acl_association" "ebs_waf_association" {
-#   resource_arn = aws_lb.ebsapps_lb.arn
-#   web_acl_arn  = aws_wafv2_web_acl.ebs_web_acl.arn
-# }
+resource "aws_wafv2_web_acl_association" "ebs_waf_association" {
+  resource_arn = aws_lb.ebsapps_lb.arn
+  web_acl_arn  = aws_wafv2_web_acl.ebs_web_acl.arn
+}
 
 
 # WEBGATE
