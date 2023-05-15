@@ -89,25 +89,25 @@ locals {
         cloudwatch_metric_alarms = {} # disabled until migration
       })
 
-      t1-nomis-db-1-b = merge(local.database_ec2_b, {
-        tags = merge(local.database_ec2_b.tags, {
-          nomis-environment   = "t1"
-          description         = "T1 NOMIS database"
-          instance-scheduling = "skip-scheduling"
-        })
-        config = merge(local.database_ec2_b.config, {
-          ami_name = "nomis_rhel_7_9_oracledb_11_2_release_2023-04-02T00-00-40.059Z"
-        })
-        ebs_volumes = merge(local.database_ec2_b.ebs_volumes, {
-          "/dev/sdb" = { label = "app", size = 100 }
-          "/dev/sdc" = { label = "app", size = 100 }
-        })
-        ebs_volume_config = merge(local.database_ec2_b.ebs_volume_config, {
-          data  = { total_size = 100 }
-          flash = { total_size = 50 }
-        })
-        cloudwatch_metric_alarms = {} # disabled until migration
-      })
+#      t1-nomis-db-1-b = merge(local.database_ec2_b, {
+#        tags = merge(local.database_ec2_b.tags, {
+#          nomis-environment   = "t1"
+#          description         = "T1 NOMIS database"
+#          instance-scheduling = "skip-scheduling"
+#        })
+#        config = merge(local.database_ec2_b.config, {
+#          ami_name = "nomis_rhel_7_9_oracledb_11_2_release_2023-04-02T00-00-40.059Z"
+#        })
+#        ebs_volumes = merge(local.database_ec2_b.ebs_volumes, {
+#          "/dev/sdb" = { label = "app", size = 100 }
+#          "/dev/sdc" = { label = "app", size = 100 }
+#        })
+#        ebs_volume_config = merge(local.database_ec2_b.ebs_volume_config, {
+#          data  = { total_size = 100 }
+#          flash = { total_size = 50 }
+#        })
+#        cloudwatch_metric_alarms = {} # disabled until migration
+#      })
 
       t1-nomis-db-2 = merge(local.database_ec2_a, {
         tags = merge(local.database_ec2_a.tags, {
