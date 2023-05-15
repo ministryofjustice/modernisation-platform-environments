@@ -45,6 +45,12 @@ module "baseline_presets" {
     }
 
 
+    sns_topics = {
+      pagerduty_integrations = {
+        dso_pagerduty = contains(["development", "test"], local.environment) ? "oasys_nonprod_alarms" : "oasys_alarms"
+      }
+    }
+
     # comment this in if you need to resolve FixNGo hostnames
     # route53_resolver_rules = {
     #   outbound-data-and-private-subnets = ["azure-fixngo-domain"]
