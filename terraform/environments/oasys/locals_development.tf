@@ -34,12 +34,12 @@ locals {
         # and put the wildcard in the san
         domain_name = module.environment.domains.public.modernisation_platform
         subject_alternate_names = [
-          "*.${module.environment.domains.public.application_environment}",
+          "*.${module.environment.domains.public.application_environment}", # *.oasys.hmpps-development.modernisation-platform.service.justice.gov.uk
           "*.dev.${module.environment.domains.public.short_name}", # "dev.oasys.service.justice.gov.uk"
           "*.dev.${local.application_name}.az.justice.gov.uk",
         ]
         external_validation_records_created = true
-        cloudwatch_metric_alarms            = {} # module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso"].acm_default
+        cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso_pagerduty"].acm_default
         tags = {
           description = "wildcard cert for ${local.application_name} ${local.environment} domains"
         }
