@@ -26,7 +26,7 @@ locals {
     baseline_ec2_autoscaling_groups = {
       # blue deployment
       t1-nomis-web-a = merge(local.weblogic_ec2_a, {
-        autoscaling_group = merge(local.weblogic_ec2_a.ec2_autoscaling_group, {
+        autoscaling_group = merge(local.weblogic_ec2_a.autoscaling_group, {
           desired_capacity = 1
         })
         tags = merge(local.weblogic_ec2_a.tags, {
