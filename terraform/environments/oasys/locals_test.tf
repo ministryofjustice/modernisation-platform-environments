@@ -47,7 +47,7 @@ locals {
         domain_name = module.environment.domains.public.modernisation_platform
         subject_alternate_names = [
           "*.${module.environment.domains.public.application_environment}",   # *.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk
-          "*.t2.${module.environment.domains.public.application_environment}" # *.t2.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk
+          "*.t2.${module.environment.domains.public.application_environment}", # *.t2.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk
           "*.${local.environment}.${module.environment.domains.public.short_name}", # "test.oasys.service.justice.gov.uk"
           "*.t1.${module.environment.domains.public.short_name}",                   # "t1.oasys.service.justice.gov.uk"
           "*.t2.${module.environment.domains.public.short_name}",                   # "t2.oasys.service.justice.gov.uk"
