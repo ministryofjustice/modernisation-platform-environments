@@ -94,11 +94,6 @@ locals {
             certificate_names_or_arns = ["application_environment_wildcard_cert"]
             default_action = {
               type = "forward"
-              # fixed_response = {
-              #   content_type = "text/plain"
-              #   message_body = "Not implemented"
-              #   status_code  = "501"
-              # }
               target_group_name = "t2-${local.application_name}-web-http-8080"
             }
             rules = {
