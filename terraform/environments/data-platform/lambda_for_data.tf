@@ -57,7 +57,7 @@ data "aws_iam_policy_document" "iam_policy_document_for_data_lambda" {
 }
 
 resource "aws_iam_policy" "data_extractor_lambda_policy" {
-  name        = "data_extractor_${local.environment}_policy_${local.environment}"
+  name        = "data_extractor_policy_${local.environment}"
   path        = "/"
   description = "AWS IAM Policy for managing data_extractor lambda role"
   policy      = data.aws_iam_policy_document.iam_policy_document_for_data_lambda.json
