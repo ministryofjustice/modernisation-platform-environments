@@ -61,8 +61,8 @@
     },
     "production": {
       "short_environment_name": "prod",
-      "db_migration_snapshot_arn": "",
-      "db_migration_snapshot_kms_key_arn": "",
+      "db_migration_snapshot_arn": "arn:aws:rds:eu-west-2:050243167760:snapshot:iaps-mp-migration",
+      "db_migration_snapshot_kms_key_arn": "arn:aws:kms:eu-west-2:050243167760:key/acf1a93f-8081-4ea9-a3e2-59368fef223a",
       "db_auto_minor_version_upgrade": "false",
       "db_allow_major_version_upgrade": "false",
       "db_apply_immediately": "false",
