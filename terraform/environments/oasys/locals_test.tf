@@ -11,21 +11,6 @@ locals {
     }
 
     baseline_ec2_autoscaling_groups = {
-      # "test-${local.application_name}-web" = local.webserver
-
-      # "t1-${local.application_name}-web" = merge(local.webserver, {
-      #   config = merge(module.baseline_presets.ec2_instance.config.default, {
-      #     ami_name                  = "${local.application_name}_webserver_release_*"
-      #     ssm_parameters_prefix     = "ec2-web-t1/"
-      #     iam_resource_names_prefix = "ec2-web-t1"
-      #   })
-      #   tags = merge(local.webserver.tags, {
-      #     description                        = "t1 ${local.application_name} web"
-      #     "${local.application_name}-environment"  = "t1"
-      #     oracle-db-hostname                 = "db.t1.oasys.hmpps-test.modernisation-platform.internal" # "T1ODL0007.azure.noms.root"
-      #   })
-      # })
-
       "t2-${local.application_name}-web" = merge(local.webserver, {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name                  = "oasys_webserver_release_*"
@@ -46,14 +31,14 @@ locals {
         # and put the wildcard in the san
         domain_name = module.environment.domains.public.modernisation_platform
         subject_alternate_names = [
-          "*.${module.environment.domains.public.application_environment}",         # *.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk
-          "*.t2.${module.environment.domains.public.application_environment}",      # *.t2.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk
-          "*.${local.environment}.${module.environment.domains.public.short_name}", # "test.oasys.service.justice.gov.uk"
-          "*.t1.${module.environment.domains.public.short_name}",                   # "t1.oasys.service.justice.gov.uk"
-          "*.t2.${module.environment.domains.public.short_name}",                   # "t2.oasys.service.justice.gov.uk"
-          "*.${local.environment}.${local.application_name}.az.justice.gov.uk",
-          "*.t1.${local.application_name}.az.justice.gov.uk",
-          "*.t2.${local.application_name}.az.justice.gov.uk",
+          "*.${module.environment.domains.public.application_environment}",    #    *.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk
+          "*.t2.${module.environment.domains.public.application_environment}", # *.t2.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk
+          "*.${local.environment}.${module.environment.domains.public.short_name}", # *.test.oasys.service.justice.gov.uk"
+          "*.t1.${module.environment.domains.public.short_name}",                   #   *.t1.oasys.service.justice.gov.uk"
+          "*.t2.${module.environment.domains.public.short_name}",                   #   *.t2.oasys.service.justice.gov.uk"
+          "*.${local.environment}.${local.application_name}.az.justice.gov.uk", # *.test.oasys.az.justice.gov.uk
+          "*.t1.${local.application_name}.az.justice.gov.uk",                   #   *.t1.oasys.az.justice.gov.uk
+          "*.t2.${local.application_name}.az.justice.gov.uk",                   #   *.t2.oasys.az.justice.gov.uk
         ]
         external_validation_records_created = true
         cloudwatch_metric_alarms            = {} # module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso"].acm_default
@@ -117,25 +102,6 @@ locals {
               target_group_name = "t2-${local.application_name}-web-http-8080"
             }
             rules = {
-              # t1-web-http-8080 = {
-              #   priority = 100
-              #   actions = [{
-              #     type              = "forward"
-              #     target_group_name = "t1-${local.application_name}-web-http-8080"
-              #   }]
-              #   conditions = [
-              #     {
-              #       host_header = {
-              #         values = ["t1.${module.environment.domains.public.short_name}"]
-              #       }
-              #     },
-              #     {
-              #       path_pattern = {
-              #         values = ["/"]
-              #       }
-              #     }
-              #   ]
-              # }
               t2-web-http-8080 = {
                 priority = 100
                 actions = [{
@@ -146,9 +112,9 @@ locals {
                   {
                     host_header = {
                       values = [
-                        "web.t2.${module.environment.domains.public.application_environment}",
-                        "t2.${module.environment.domains.public.application_environment}"
-                      ] # web.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk
+                        "web.t2.${module.environment.domains.public.application_environment}", # web.t2.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk
+                        "t2.${module.environment.domains.public.application_environment}",     #    web.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk
+                      ]
                     }
                   }
                 ]
@@ -159,43 +125,15 @@ locals {
       }
 
     }
-    # baseline_route53_zones = { # not sure why this doesn't work
-    #   "${module.environment.domains.public.application_environment}" = { # oasys.hmpps-test.modernisation-platform.service.justice.gov.uk
-    #     lb_alias_records = [
-    #       { name = "t2",     type = "A", lbs_map_key = "public" },
-    #       { name = "web.t2", type = "A", lbs_map_key = "public" },
-    #       { name = "t1",     type = "A", lbs_map_key = "public" },
-    #       { name = "web.t1", type = "A", lbs_map_key = "public" }, 
-    #     ]
-    #     records = [
-    #       { name = "db.t2", type = "A", ttl = "300", records = ["10.101.36.132"] }, # db.t2.oasys.service.justice.gov.uk currently pointing to azure db T2ODL0009
-    #       { name = "db.t1", type = "A", ttl = "300", records = ["10.101.6.132"]  }, # db.t1.oasys.service.justice.gov.uk currently pointing to azure db T1ODL0007
-    #     ]
-    #   }
-    # }
+
     baseline_route53_zones = {
       #
       # public
       #
-      "t1.${module.environment.domains.public.short_name}" = { # t1.oasys.service.justice.gov.uk
-        records = [
-          { name = "db", type = "A", ttl = "300", records = ["10.101.6.132"] }, # db.t1.oasys.service.justice.gov.uk currently pointing to azure db T1ODL0007
-        ]
+      "service.justice.gov.uk" = {
         lb_alias_records = [
-          { name = "web", type = "A", lbs_map_key = "public" }, # web.t1.oasys.service.justice.gov.uk
-        ]
-      }
-      "t2.${module.environment.domains.public.short_name}" = { # t2.oasys.service.justice.gov.uk
-        records = [
-          { name = "db", type = "A", ttl = "300", records = ["10.101.36.132"] }, # db.t2.oasys.service.justice.gov.uk currently pointing to azure db T2ODL0009
-        ]
-        lb_alias_records = [
-          { name = "web", type = "A", lbs_map_key = "public" }, # web.t2.oasys.service.justice.gov.uk
-        ]
-      }
-      "t2.${module.environment.domains.public.application_environment}" = { # t2.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk
-        lb_alias_records = [
-          { name = "web", type = "A", lbs_map_key = "public" }, # web.t2.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk
+          { name = "t2.${local.application_name}", type = "A", lbs_map_key = "public" },     #     t2.oasys.service.justice.gov.uk
+          { name = "web.t2.${local.application_name}", type = "A", lbs_map_key = "public" }, # web.t2.oasys.service.justice.gov.uk
         ]
       }
       "${module.environment.domains.public.business_unit_environment}" = { # hmpps-test.modernisation-platform.service.justice.gov.uk
