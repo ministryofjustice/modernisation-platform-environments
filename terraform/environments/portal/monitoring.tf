@@ -1,5 +1,5 @@
 locals {
-  dashboard_name                 = "${local.application_name}-${local.environment}-Appication-Dashboard"
+  dashboard_name                 = "${local.application_name}-${local.environment}-application-Dashboard"
 
   cpu_alarms_1 = {
     oam_instance_1 = {
@@ -52,10 +52,18 @@ locals {
   memory_alarms_1 = {
     oam_instance_1 = {
       service_name          = "oam_1"
-      memory_alarm_threshold = 80
+      memory_alarm_threshold = 70
       dimensions = {
         InstanceId = "bob"
         # InstanceId = aws_instance.oam_app_instance_1.id # TODO This needs updating when the OAM EC2 instance is built
+      }
+    },
+    oim_instance_1 = {
+      service_name          = "oim_1"
+      memory_alarm_threshold = 70
+      dimensions = {
+        InstanceId = "charlie"
+        # InstanceId = aws_instance.oim_app_instance_1.id # TODO This needs updating when the OAM EC2 instance is built
       }
     }
   }
@@ -349,8 +357,8 @@ data "template_file" "dashboard_nonprod" {
     # igdb_cpu_alarm_arn              = aws_cloudwatch_metric_alarm.RDS2CPUoverThreshold.arn
     # igdb_read_latency_alarm_arn     = aws_cloudwatch_metric_alarm.RDS2ReadLataencyOverThreshold.arn
     # igdb_write_latency_alarm_arn    = aws_cloudwatch_metric_alarm.RDS2WriteLataencyOverThreshold.arn
-    # oim1_cpu_alarm_arn              = aws_cloudwatch_metric_alarm.cpu_alarm["oim_instance_1"].arn
-    # oim1_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["oim_instance_1"].arn
+    oim1_cpu_alarm_arn              = aws_cloudwatch_metric_alarm.cpu_alarm["oim_instance_1"].arn
+    oim1_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["oim_instance_1"].arn
     oam1_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["oam_instance_1"].arn
     # idm1_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["idm_instance_1"].arn
     # ohs1_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["ohs_instance_1"].arn
