@@ -64,7 +64,8 @@ module "baseline" {
   # iam_service_linked_roles = module.baseline_presets.iam_service_linked_roles
   # rds_instances
   sns_topics             = module.baseline_presets.sns_topics
-  acm_certificates       = merge(module.baseline_presets.acm_certificates, lookup(local.environment_config, "baseline_acm_certificates", {}))
+  acm_certificates       = module.baseline_presets.acm_certificates
+  # acm_certificates       = merge(module.baseline_presets.acm_certificates, lookup(local.environment_config, "baseline_acm_certificates", {}))
   cloudwatch_log_groups  = module.baseline_presets.cloudwatch_log_groups
   ec2_autoscaling_groups = lookup(local.environment_config, "baseline_ec2_autoscaling_groups", {})
   ec2_instances          = lookup(local.environment_config, "baseline_ec2_instances", {})
