@@ -827,6 +827,7 @@ resource "aws_route53_record" "cloudfront_validation_self" {
 
 resource "aws_acm_certificate_validation" "cloudfront_certificate_validation" {
   count           = (length(local.validation_records_cloudfront) == 0 || var.external_validation_records_created) ? 1 : 0
+  provider        = aws.us-east-1
   certificate_arn = aws_acm_certificate.cloudfront.arn
   validation_record_fqdns = [
     for key, value in local.validation_records_cloudfront : replace(value.name, "/\\.$/", "")
