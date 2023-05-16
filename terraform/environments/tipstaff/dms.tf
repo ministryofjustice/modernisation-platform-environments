@@ -32,27 +32,27 @@
 #   replication_subnet_group_description = "DMS replication subnet group"
 # }
 
-# resource "aws_security_group" "vpc_dms_replication_instance_group" {
-#   vpc_id      = data.aws_vpc.shared.id
-#   name        = "vpc-dms-replication-instance-group"
-#   description = "allow dms replication instance access to the shared vpc on the modernisation platform"
+resource "aws_security_group" "vpc_dms_replication_instance_group" {
+  vpc_id      = data.aws_vpc.shared.id
+  name        = "vpc-dms-replication-instance-group"
+  description = "allow dms replication instance access to the shared vpc on the modernisation platform"
 
-#   ingress {
-#     from_port   = 5432
-#     to_port     = 5432
-#     protocol    = "tcp"
-#     description = "Allow all inbound traffic"
-#     cidr_blocks = ["0.0.0.0/0"]
-#   }
+  ingress {
+    from_port   = 5432
+    to_port     = 5432
+    protocol    = "tcp"
+    description = "Allow all inbound traffic"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
-#   egress {
-#     from_port   = 0
-#     to_port     = 0
-#     protocol    = "-1"
-#     description = "Allow all outbound traffic"
-#     cidr_blocks = ["0.0.0.0/0"]
-#   }
-# }
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    description = "Allow all outbound traffic"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
 
 # resource "aws_iam_role" "dms_vpc_role" {
 #   name = "dms-vpc-role"
