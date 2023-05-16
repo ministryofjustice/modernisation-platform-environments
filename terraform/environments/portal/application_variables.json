@@ -2,7 +2,9 @@
   "accounts": {
     "development": {
       "example_var": "dev-data",
-      "existing_archive_bucket_name": ""
+      "existing_archive_bucket_name": "",
+      "pagerduty_integration_key_name": "laa_portal_nonprod_alarms",
+      "pagerduty_integration_key_name_ga": "get_access_improvement_alarms"
     },
     "test": {
       "example_var": "test-data"
@@ -11,7 +13,8 @@
       "example_var": "preproduction-data"
     },
     "production": {
-      "example_var": "production-data"
+      "example_var": "production-data",
+      "existing_archive_bucket_name": ""
     }
   }
 }
