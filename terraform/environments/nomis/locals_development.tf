@@ -57,11 +57,7 @@ locals {
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           vpc_security_group_ids = ["private-web"]
         })
-        user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible, {
-          args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible.args, {
-            branch = "main"
-          })
-        })
+        user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
         autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
           desired_capacity = 0
         })
@@ -83,11 +79,7 @@ locals {
         instance = merge(module.baseline_presets.ec2_instance.instance.default, {
           vpc_security_group_ids = ["private-web"]
         })
-        user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible, {
-          args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible.args, {
-            branch = "main"
-          })
-        })
+        user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
         autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
           desired_capacity = 0
         })
@@ -109,11 +101,7 @@ locals {
         instance = merge(module.baseline_presets.ec2_instance.instance.default_rhel6, {
           vpc_security_group_ids = ["private-web"]
         })
-        user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible, {
-          args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible.args, {
-            branch = "main"
-          })
-        })
+        user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
         autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
           desired_capacity = 0
         })
@@ -141,8 +129,7 @@ locals {
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 100 }
         }
-        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
-        })
+        autoscaling_group     = module.baseline_presets.ec2_autoscaling_group.default
         autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
         tags = {
           description = "Windows Server 2022 Jumpserver for NOMIS"
