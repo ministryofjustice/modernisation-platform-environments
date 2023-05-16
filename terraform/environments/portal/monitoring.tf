@@ -303,12 +303,42 @@ resource "aws_cloudwatch_metric_alarm" "aserver_alarm" {
 
 
 
-data "template_file" "dashboard" {
-  template = file("${path.module}/dashboard.tpl")
+data "template_file" "dashboard_prod" {
+  count = local.environment == "production" ? 1 : 0
+  template = file("${path.module}/dashboard_prod.tpl")
 
   # TODO Update the local variables to reference the correct alarms once they are created
   vars = {
-    # dashboard_widget_refresh_period = local.dashboard_widget_refresh_period
+    aws_region                      = local.aws_region
+    # elb_5xx_alarm_arn               = aws_cloudwatch_metric_alarm.ApplicationELB5xxError.arn
+    # elb_4xx_alarm_arn               = aws_cloudwatch_metric_alarm.ApplicationELB4xxError.arn
+    # elb_response_time_alarm_arn     = aws_cloudwatch_metric_alarm.TargetResponseTime.arn
+    # iadb_cpu_alarm_arn              = aws_cloudwatch_metric_alarm.RDS1CPUoverThreshold.arn
+    # iadb_read_latency_alarm_arn     = aws_cloudwatch_metric_alarm.RDS1ReadLataencyOverThreshold.arn
+    # iadb_write_latency_alarm_arn    = aws_cloudwatch_metric_alarm.RDS1WriteLataencyOverThreshold.arn
+    # igdb_cpu_alarm_arn              = aws_cloudwatch_metric_alarm.RDS2CPUoverThreshold.arn
+    # igdb_read_latency_alarm_arn     = aws_cloudwatch_metric_alarm.RDS2ReadLataencyOverThreshold.arn
+    # igdb_write_latency_alarm_arn    = aws_cloudwatch_metric_alarm.RDS2WriteLataencyOverThreshold.arn
+    oim1_cpu_alarm_arn              = aws_cloudwatch_metric_alarm.cpu_alarm["oim_instance_1"].arn
+    oim1_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["oim_instance_1"].arn
+    oim2_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["oim_instance_2"].arn
+    oam1_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["oam_instance_1"].arn
+    oam2_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["oam_instance_2"].arn
+    idm1_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["idm_instance_1"].arn
+    idm2_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["idm_instance_2"].arn
+    ohs1_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["ohs_instance_1"].arn
+    ohs2_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["ohs_instance_2"].arn
+    oim2_diskspace_alarm_arn        = aws_cloudwatch_metric_alarm.diskspace_alarm["oim_instance_2"].arn
+    oim2_swapspace_alarm_arn        = aws_cloudwatch_metric_alarm.swapspace_alarm["oim_instance_2"].arn
+  }
+}
+
+data "template_file" "dashboard_nonprod" {
+  count = local.environment != "production" ? 1 : 0
+  template = file("${path.module}/dashboard_nonprod_temp.tpl") # TODO Update this to dashboard_nonprod.tpl once all relevant resources are created
+
+  # TODO Update the local variables to reference the correct alarms once they are created
+  vars = {
     aws_region                      = local.aws_region
     # elb_5xx_alarm_arn               = aws_cloudwatch_metric_alarm.ApplicationELB5xxError.arn
     # elb_4xx_alarm_arn               = aws_cloudwatch_metric_alarm.ApplicationELB4xxError.arn
@@ -321,41 +351,13 @@ data "template_file" "dashboard" {
     # igdb_write_latency_alarm_arn    = aws_cloudwatch_metric_alarm.RDS2WriteLataencyOverThreshold.arn
     # oim1_cpu_alarm_arn              = aws_cloudwatch_metric_alarm.cpu_alarm["oim_instance_1"].arn
     # oim1_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["oim_instance_1"].arn
-    # oim2_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["oim_instance_2"].arn
-    # oam1_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["oam_instance_1"].arn
-    # oam2_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["oam_instance_2"].arn
-    # idm1_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["idm_instance_1"].arn
-    # idm2_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["idm_instance_2"].arn
-    # ohs1_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["ohs_instance_1"].arn
-    # ohs2_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["ohs_instance_2"].arn
-    # oim2_diskspace_alarm_arn        = aws_cloudwatch_metric_alarm.diskspace_alarm["oim_instance_2"].arn
-    # oim2_swapspace_alarm_arn        = aws_cloudwatch_metric_alarm.swapspace_alarm["oim_instance_2"].arn
-
-    elb_5xx_alarm_arn               = null
-    elb_4xx_alarm_arn               = null
-    elb_response_time_alarm_arn     = null
-    iadb_cpu_alarm_arn              = null
-    iadb_read_latency_alarm_arn     = null
-    iadb_write_latency_alarm_arn    = null
-    igdb_cpu_alarm_arn              = null
-    igdb_read_latency_alarm_arn     = null
-    igdb_write_latency_alarm_arn    = null
-    oim1_cpu_alarm_arn              = null
-    oim1_memory_alarm_arn           = null
-    oim2_memory_alarm_arn           = null
     oam1_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["oam_instance_1"].arn
-    oam2_memory_alarm_arn           = null
-    idm1_memory_alarm_arn           = null
-    idm2_memory_alarm_arn           = null
-    ohs1_memory_alarm_arn           = null
-    ohs2_memory_alarm_arn           = null
-    oim2_diskspace_alarm_arn        = null
-    oim2_swapspace_alarm_arn        = null
-
+    # idm1_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["idm_instance_1"].arn
+    # ohs1_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["ohs_instance_1"].arn
   }
 }
 
 resource "aws_cloudwatch_dashboard" "dashboard" {
   dashboard_name = local.dashboard_name
-  dashboard_body = data.template_file.dashboard.rendered
+  dashboard_body = local.environment == "production" ? data.template_file.dashboard_prod[0].rendered : data.template_file.dashboard_nonprod[0].rendered
 }
