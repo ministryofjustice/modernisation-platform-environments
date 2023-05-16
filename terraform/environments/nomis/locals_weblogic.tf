@@ -142,7 +142,7 @@ locals {
     })
 
     user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
-    autoscaling_group    = module.baseline_presets.ec2_autoscaling_group.default_with_ready_hook
+    autoscaling_group    = module.baseline_presets.ec2_autoscaling_group.default_with_ready_hook_and_warm_pool
 
     lb_target_groups = {
       http-7777 = local.weblogic_target_group_http_7777
@@ -170,10 +170,10 @@ locals {
     })
     user_data_cloud_init = merge(local.weblogic_ec2_default.user_data_cloud_init, {
       args = merge(local.weblogic_ec2_default.user_data_cloud_init.args, {
-        branch = "nomis/DSOS-1893/re-enable-warm-pools"
+        branch = "main"
       })
     })
-    autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default_with_ready_hook_and_warm_pool, {
+    autoscaling_group = merge(local.weblogic_ec2_default.autoscaling_group, {
       desired_capacity = 0
     })
     cloudwatch_metric_alarms = {}
