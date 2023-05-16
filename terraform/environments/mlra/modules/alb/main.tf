@@ -795,6 +795,18 @@ resource "aws_route53_record" "cloudfront_validation_core_vpc" {
   ]
 }
 
+resource "aws_route53_record" "cloudfront" {
+  provider = aws.core-vpc
+  zone_id  = var.external_zone_id
+  name     = var.fqdn
+  type     = "A"
+  alias {
+    name                   = aws_cloudfront_distribution.external.domain_name
+    zone_id                = aws_cloudfront_distribution.external.hosted_zone_id
+    evaluate_target_health = true
+  }
+}
+
 # assume any other domains are defined in the current workspace
 resource "aws_route53_record" "cloudfront_validation_self" {
   for_each = {
