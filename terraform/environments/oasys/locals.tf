@@ -77,7 +77,7 @@ locals {
     cloudwatch_metric_alarms = {}
     user_data_cloud_init     = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags
     autoscaling_schedules    = module.baseline_presets.ec2_autoscaling_schedules.working_hours
-    autoscaling_group        = module.baseline_presets.ec2_autoscaling_group
+    autoscaling_group        = module.baseline_presets.ec2_autoscaling_group.default
     lb_target_groups = {
       http-8080 = {
         port                 = 8080
@@ -123,7 +123,7 @@ locals {
     })
     instance              = module.baseline_presets.ec2_instance.instance.default_db
     autoscaling_schedules = {}
-    autoscaling_group     = module.baseline_presets.ec2_autoscaling_group
+    autoscaling_group     = module.baseline_presets.ec2_autoscaling_group.default
     user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags, {
       args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags.args, {
         branch = "05c85c8f1ef86637e1f65347c2af10741cec0578"
