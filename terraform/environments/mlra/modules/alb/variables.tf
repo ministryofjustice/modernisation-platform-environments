@@ -191,3 +191,24 @@ variable "waf_default_action" {
   type        = string
   description = "Specifies how you want AWS WAF to respond to requests that don't match the criteria in any of the rules. e.g. ALLOW or BLOCK"
 }
+
+variable "fqdn" {
+  type = string
+  description = "The fully qualified domain name for the environment in question."
+}
+
+variable "validation" {
+  type = map(object({
+    account   = optional(string, "self")
+    zone_name = string
+  }))
+  description = "Provide a list of zones to use for DNS validation where the key is the cert domain.  Set account to self, core-vpc or core-network-services.  Only required if zones are not included in route53_zones variable"
+  default     = {}
+}
+
+variable "external_validation_records_created" {
+  description = "Only needed if there are external validation records.  Set it to true when they've been created.  See README.md"
+  type        = bool
+  default     = false
+}
+

@@ -1,4 +1,5 @@
 locals {
+
   loadbalancer_ingress_rules = {
     "lb_ingress" = {
       description     = "Loadbalancer ingress rule from CloudFront"
@@ -9,6 +10,7 @@ locals {
       # cidr_blocks     = ["0.0.0.0/0"]
     }
   }
+
   loadbalancer_egress_rules = {
     "lb_egress" = {
       description     = "Loadbalancer egress rule"
@@ -19,31 +21,90 @@ locals {
       security_groups = []
     }
   }
-  ## Variables used by certificate validation, as part of the cloudfront, cert and route 53 record configuration
-  domain_types = { for dvo in aws_acm_certificate.external_lb.domain_validation_options : dvo.domain_name => {
-    name   = dvo.resource_record_name
-    record = dvo.resource_record_value
-    type   = dvo.resource_record_type
-    }
-  }
-
-  domain_name_main   = [for k, v in local.domain_types : v.name if k == var.acm_cert_domain_name]
-  domain_name_sub    = [for k, v in local.domain_types : v.name if k != var.acm_cert_domain_name]
-  domain_record_main = [for k, v in local.domain_types : v.record if k == var.acm_cert_domain_name]
-  domain_record_sub  = [for k, v in local.domain_types : v.record if k != var.acm_cert_domain_name]
-  domain_type_main   = [for k, v in local.domain_types : v.type if k == var.acm_cert_domain_name]
-  domain_type_sub    = [for k, v in local.domain_types : v.type if k != var.acm_cert_domain_name]
-
-
-  domain_name   = var.environment != "production" ? "${var.application_name}.${var.business_unit}-${var.environment}.${var.acm_cert_domain_name}" : var.acm_cert_domain_name
-
-
-  # domain_name   = "${var.application_name}.${var.business_unit}-${var.environment}.modernisation-platform.service.justice.gov.uk"
 
   ip_set_list   = [for ip in split("\n", chomp(file("${path.module}/waf_ip_set.txt"))) : ip]
   custom_header = "X-Custom-Header-LAA-${upper(var.application_name)}"
 
+  cloudfront_validation_records = {
+    for dvo in aws_acm_certificate.cloudfront.domain_validation_options : dvo.domain_name => {
+      name   = dvo.resource_record_name
+      record = dvo.resource_record_value
+      type   = dvo.resource_record_type
+      zone = lookup(
+        local.route53_zones,
+        dvo.domain_name,
+        lookup(
+          local.route53_zones,
+          replace(dvo.domain_name, "/^[^.]*./", ""),
+          lookup(
+            local.route53_zones,
+            replace(dvo.domain_name, "/^[^.]*.[^.]*./", ""),
+            { provider = "external" }
+      )))
+    }
+  }
+
+  external_lb_validation_records = {
+    for dvo in aws_acm_certificate.external_lb.domain_validation_options : dvo.domain_name => {
+      name   = dvo.resource_record_name
+      record = dvo.resource_record_value
+      type   = dvo.resource_record_type
+      zone = lookup(
+        local.route53_zones,
+        dvo.domain_name,
+        lookup(
+          local.route53_zones,
+          replace(dvo.domain_name, "/^[^.]*./", ""),
+          lookup(
+            local.route53_zones,
+            replace(dvo.domain_name, "/^[^.]*.[^.]*./", ""),
+            { provider = "external" }
+      )))
+    }
+  }
+
+  validation_records_external_lb = {
+    for key, value in local.external_lb_validation_records : key => {
+      name   = value.name
+      record = value.record
+      type   = value.type
+    } if value.zone.provider == "external"
+  }
+
+  validation_records_cloudfront = {
+    for key, value in local.cloudfront_validation_records : key => {
+      name   = value.name
+      record = value.record
+      type   = value.type
+    } if value.zone.provider == "external"
+  }
+
+  core_network_services_domains = {
+    for domain, value in var.validation : domain => value if value.account == "core-network-services"
+  }
+  core_vpc_domains = {
+    for domain, value in var.validation : domain => value if value.account == "core-vpc"
+  }
+  self_domains = {
+    for domain, value in var.validation : domain => value if value.account == "self"
+  }
+
+  route53_zones = merge( {
+    for key, value in data.aws_route53_zone.core_network_services : key => merge(value, {
+      provider = "core-network-services"
+    })
+    }, {
+    for key, value in data.aws_route53_zone.core_vpc : key => merge(value, {
+      provider = "core-vpc"
+    })
+    }, {
+    for key, value in data.aws_route53_zone.self : key => merge(value, {
+      provider = "self"
+    })
+  })
+
 }
+
 
 
 data "aws_vpc" "shared" {
@@ -259,20 +320,6 @@ data "aws_secretsmanager_secret_version" "cloudfront" {
   secret_id = data.aws_secretsmanager_secret.cloudfront.arn
 }
 
-resource "aws_acm_certificate" "cloudfront" {
-  domain_name       =  var.acm_cert_domain_name
-  validation_method = "DNS"
-  provider          = aws.us-east-1
-
-  subject_alternative_names = var.environment == "production" ? null : [local.domain_name]
-
-  tags = var.tags
-  # TODO Set prevent_destroy to true to stop Terraform destroying this resource in the future if required
-  lifecycle {
-    prevent_destroy = false
-  }
-}
-
 # TODO This was a centralised bucket in LAA Landing Zone - do we want one for each application/env account in MP? Yes for now
 
 resource "aws_s3_bucket" "cloudfront" { # Mirroring laa-cloudfront-logging-development in laa-dev
@@ -342,7 +389,7 @@ resource "aws_cloudfront_distribution" "external" {
     }
   }
   enabled = var.cloudfront_enabled
-  aliases = [local.domain_name]
+  aliases = [var.fqdn]
   default_cache_behavior {
     target_origin_id = aws_lb.loadbalancer.id
     smooth_streaming = lookup(var.cloudfront_default_cache_behavior, "smooth_streaming", null)
@@ -479,95 +526,6 @@ resource "aws_waf_web_acl" "waf_acl" {
 
 ## ALB Listener
 
-resource "aws_acm_certificate" "external_lb" {
-
-  domain_name   = var.acm_cert_domain_name
-
-  validation_method = "DNS"
-
-  subject_alternative_names = var.environment == "production" ? null : [local.domain_name]
-
-  tags = var.tags
-
-  # TODO Set prevent_destroy to true to stop Terraform destroying this resource in the future if required
-  lifecycle {
-    prevent_destroy = false
-  }
-}
-
-resource "aws_acm_certificate_validation" "external" {
-  certificate_arn         = aws_acm_certificate.external_lb.arn
-  validation_record_fqdns = [for record in aws_route53_record.external_validation : record.fqdn]
-
-  timeouts {
-    create = "10m"
-  }
-
-  # TODO Set prevent_destroy to true to stop Terraform destroying this resource in the future if required
-  lifecycle {
-    prevent_destroy = false
-  }
-}
-
-# Use core-network-services provider to validate top-level domain
-resource "aws_route53_record" "external_validation" {
-  provider = aws.core-network-services
-
-  for_each = {
-    for dvo in aws_acm_certificate.external_lb.domain_validation_options : dvo.domain_name => {
-      name   = dvo.resource_record_name
-      record = dvo.resource_record_value
-      type   = dvo.resource_record_type
-    }
-  }
-
-  allow_overwrite = true
-  
-  name            = each.value.name
-  records         = [each.value.record]
-  ttl             = 60
-  type            = each.value.type
-  zone_id         = var.services_zone_id
-}
-
-## Route 53 for Cloudfront
-resource "aws_route53_record" "cloudfront" {
-  # for_each = {
-  #   for dvo in aws_acm_certificate.external_lb.domain_validation_options : dvo.domain_name => {
-  #     name   = dvo.resource_record_name
-  #     record = dvo.resource_record_value
-  #     type   = dvo.resource_record_type
-  #   }
-  # }
-  provider = aws.core-vpc
-  zone_id  = var.external_zone_id
-  name     = local.domain_name
-  type     = "A"
-
-  alias {
-    name                   = aws_cloudfront_distribution.external.domain_name
-    zone_id                = aws_cloudfront_distribution.external.hosted_zone_id
-    evaluate_target_health = true
-  }
-
-  # records  = [each.value.record]
-}
-
-# Use core-vpc provider to validate business-unit domain
-resource "aws_route53_record" "external_validation_subdomain" {
-  count    = length(local.domain_name_sub)
-  provider = aws.core-vpc
-
-  allow_overwrite = true
-  name            = local.domain_name_sub[count.index]
-  records         = [local.domain_record_sub[count.index]]
-  ttl             = 60
-  type            = local.domain_type_sub[count.index]
-  zone_id         = var.external_zone_id
-}
-
-######################
-
 # TODO This resource is required because otherwise Error: failed to read schema for module.alb.null_resource.always_run in registry.terraform.io/hashicorp/null: failed to instantiate provider
 # When the whole stack is recreated this can be removed
 resource "null_resource" "always_run" {
@@ -580,7 +538,7 @@ resource "aws_lb_listener" "alb_listener" {
   #checkov:skip=CKV_AWS_2:The ALB protocol is HTTP
   protocol        = var.listener_protocol #tfsec:ignore:aws-elb-http-not-used
   ssl_policy      = var.listener_protocol == "HTTPS" ? var.alb_ssl_policy : null
-  certificate_arn = var.listener_protocol == "HTTPS" ? aws_acm_certificate_validation.external.certificate_arn : null # This needs the ARN of the certificate from Mod Platform
+  certificate_arn = var.listener_protocol == "HTTPS" ? aws_acm_certificate_validation.external_lb_certificate_validation[0].certificate_arn : null # This needs the ARN of the certificate from Mod Platform
 
   default_action {
     type = "fixed-response"
@@ -684,4 +642,199 @@ resource "aws_athena_workgroup" "lb-access-logs" {
     }
   )
 
+}
+
+
+
+####### Certificates, Cert Validations & Route53 #######
+
+
+## External LB Cert
+
+resource "aws_acm_certificate" "external_lb" {
+
+  domain_name   = var.acm_cert_domain_name
+  validation_method = "DNS"
+  subject_alternative_names = var.environment == "production" ? null : ["${var.application_name}.${var.business_unit}-${var.environment}.${var.acm_cert_domain_name}"]
+  tags = var.tags
+  # TODO Set prevent_destroy to true to stop Terraform destroying this resource in the future if required
+  lifecycle {
+    prevent_destroy = false
+  }
+}
+
+
+resource "aws_route53_record" "external_lb_validation_core_network_services" {
+  provider = aws.core-network-services
+  for_each = {
+    for key, value in local.external_lb_validation_records : key => value if value.zone.provider == "core-network-services"
+  }
+
+  allow_overwrite = true
+  name            = each.value.name
+  records         = [each.value.record]
+  ttl             = 60
+  type            = each.value.type
+
+  # NOTE: value.zone is null indicates the validation zone could not be found
+  # Ensure route53_zones variable contains the given validation zone or
+  # explicitly provide the zone details in the validation variable.
+  zone_id = each.value.zone.zone_id
+
+  depends_on = [
+    aws_acm_certificate.external_lb
+  ]
+}
+
+# use core-vpc provider to validate business-unit domain
+resource "aws_route53_record" "external_lb_validation_core_vpc" {
+  provider = aws.core-vpc
+  for_each = {
+    for key, value in local.external_lb_validation_records : key => value if value.zone.provider == "core-vpc"
+  }
+
+  allow_overwrite = true
+  name            = each.value.name
+  records         = [each.value.record]
+  ttl             = 60
+  type            = each.value.type
+  zone_id         = each.value.zone.zone_id
+
+  depends_on = [
+    aws_acm_certificate.external_lb
+  ]
+}
+
+# assume any other domains are defined in the current workspace
+resource "aws_route53_record" "external_lb_validation_self" {
+  for_each = {
+    for key, value in local.external_lb_validation_records : key => value if value.zone.provider == "self"
+  }
+
+  allow_overwrite = true
+  name            = each.value.name
+  records         = [each.value.record]
+  ttl             = 60
+  type            = each.value.type
+  zone_id         = each.value.zone.zone_id
+
+  depends_on = [
+    aws_acm_certificate.external_lb
+  ]
+}
+
+resource "aws_acm_certificate_validation" "external_lb_certificate_validation" {
+  count           = (length(local.validation_records_external_lb) == 0 || var.external_validation_records_created) ? 1 : 0
+  certificate_arn = aws_acm_certificate.external_lb.arn
+  validation_record_fqdns = [
+    for key, value in local.validation_records_external_lb : replace(value.name, "/\\.$/", "")
+  ]
+  depends_on = [
+    aws_route53_record.external_lb_validation_core_network_services,
+    aws_route53_record.external_lb_validation_core_vpc,
+    aws_route53_record.external_lb_validation_self
+  ]
+}
+
+
+
+######## Cloudfront Cert
+
+
+resource "aws_acm_certificate" "cloudfront" {
+  domain_name       =  var.acm_cert_domain_name
+  validation_method = "DNS"
+  provider          = aws.us-east-1
+  subject_alternative_names = var.environment == "production" ? null : ["${var.application_name}.${var.business_unit}-${var.environment}.${var.acm_cert_domain_name}"]
+  tags = var.tags
+  # TODO Set prevent_destroy to true to stop Terraform destroying this resource in the future if required
+  lifecycle {
+    prevent_destroy = false
+  }
+}
+
+
+resource "aws_route53_record" "cloudfront_validation_core_network_services" {
+  provider = aws.core-network-services
+  for_each = {
+    for key, value in local.cloudfront_validation_records : key => value if value.zone.provider == "core-network-services"
+  }
+
+  allow_overwrite = true
+  name            = each.value.name
+  records         = [each.value.record]
+  ttl             = 60
+  type            = each.value.type
+
+  # NOTE: value.zone is null indicates the validation zone could not be found
+  # Ensure route53_zones variable contains the given validation zone or
+  # explicitly provide the zone details in the validation variable.
+  zone_id = each.value.zone.zone_id
+
+  depends_on = [
+    aws_acm_certificate.cloudfront
+  ]
+}
+
+# use core-vpc provider to validate business-unit domain
+resource "aws_route53_record" "cloudfront_validation_core_vpc" {
+  provider = aws.core-vpc
+  for_each = {
+    for key, value in local.cloudfront_validation_records : key => value if value.zone.provider == "core-vpc"
+  }
+
+  allow_overwrite = true
+  name            = each.value.name
+  records         = [each.value.record]
+  ttl             = 60
+  type            = each.value.type
+  zone_id         = each.value.zone.zone_id
+
+  depends_on = [
+    aws_acm_certificate.cloudfront
+  ]
+}
+
+resource "aws_route53_record" "cloudfront" {
+  provider = aws.core-vpc
+  zone_id  = var.external_zone_id
+  name     = var.fqdn
+  type     = "A"
+  alias {
+    name                   = aws_cloudfront_distribution.external.domain_name
+    zone_id                = aws_cloudfront_distribution.external.hosted_zone_id
+    evaluate_target_health = true
+  }
+}
+
+# assume any other domains are defined in the current workspace
+resource "aws_route53_record" "cloudfront_validation_self" {
+  for_each = {
+    for key, value in local.cloudfront_validation_records : key => value if value.zone.provider == "self"
+  }
+
+  allow_overwrite = true
+  name            = each.value.name
+  records         = [each.value.record]
+  ttl             = 60
+  type            = each.value.type
+  zone_id         = each.value.zone.zone_id
+
+  depends_on = [
+    aws_acm_certificate.cloudfront
+  ]
+}
+
+resource "aws_acm_certificate_validation" "cloudfront_certificate_validation" {
+  count           = (length(local.validation_records_cloudfront) == 0 || var.external_validation_records_created) ? 1 : 0
+  provider        = aws.us-east-1
+  certificate_arn = aws_acm_certificate.cloudfront.arn
+  validation_record_fqdns = [
+    for key, value in local.validation_records_cloudfront : replace(value.name, "/\\.$/", "")
+  ]
+  depends_on = [
+    aws_route53_record.cloudfront_validation_core_network_services,
+    aws_route53_record.cloudfront_validation_core_vpc,
+    aws_route53_record.cloudfront_validation_self
+  ]
 }
