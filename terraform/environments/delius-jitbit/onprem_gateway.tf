@@ -1,5 +1,5 @@
 resource "aws_instance" "onprem_gateway" {
-  ami           = "ami-0b5df39fc7bebda08" 
+  ami           = "ami-070921018feda40c6"
   instance_type = "t3.medium"
 #  iam_instance_profile = aws_iam_instance_profile.onprem_gateway.name  
 
