@@ -131,6 +131,8 @@ jobs:
         run: |
           set -o pipefail
           tf_args="${{ inputs.init_plan_apply_tfargs }} ${{ inputs.plan_apply_tfargs }}"
+          terraform import 'module.baseline.aws_route53_record.core_vpc["db.t1.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk-A"]' Z086810415JEMACFQC5ZF_db.t1.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk_A
+          terraform import 'module.baseline.aws_route53_record.core_vpc["db.t2.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk-A"]' Z086810415JEMACFQC5ZF_db.t2.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk_A
           echo "terraform apply -refresh-only -auto-approve ${tf_args}"
           terraform apply -refresh-only -auto-approve ${tf_args} | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh
 
