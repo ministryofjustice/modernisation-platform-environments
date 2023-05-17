@@ -120,7 +120,6 @@ resource "aws_ebs_volume" "stage" {
     ignore_changes = [kms_key_id]
   }
   availability_zone = "eu-west-2a"
-  #size              = "75"
   size              = local.application_data.accounts[local.environment].ebsapps_stage_size
   type              = "io2"
   iops              = 3000

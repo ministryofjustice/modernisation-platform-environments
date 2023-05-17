@@ -94,7 +94,6 @@ resource "aws_ebs_volume" "export_home" {
     ignore_changes = [kms_key_id]
   }
   availability_zone = "eu-west-2a"
-  #size              = "60"
   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_exhome
   type              = "io2"
   iops              = 3000
@@ -115,7 +114,6 @@ resource "aws_ebs_volume" "u01" {
     ignore_changes = [kms_key_id]
   }
   availability_zone = "eu-west-2a"
-  #size              = "75"
   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_u01
   type              = "io2"
   iops              = 3000
@@ -135,7 +133,6 @@ resource "aws_ebs_volume" "arch" {
     ignore_changes = [kms_key_id]
   }
   availability_zone = "eu-west-2a"
-  #size              = "50"
   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_arch
   type              = "io2"
   iops              = 3000
@@ -155,7 +152,6 @@ resource "aws_ebs_volume" "dbf" {
     ignore_changes = [kms_key_id]
   }
   availability_zone = "eu-west-2a"
-  #size              = "8000"
   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_dbf
   type              = "io2"
   iops              = local.application_data.accounts[local.environment].ebs_default_iops
@@ -175,7 +171,6 @@ resource "aws_ebs_volume" "redoA" {
     ignore_changes = [kms_key_id]
   }
   availability_zone = "eu-west-2a"
-  #size              = "100"
   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_redoA
   type              = "io2"
   iops              = 3000
@@ -195,7 +190,6 @@ resource "aws_ebs_volume" "techst" {
     ignore_changes = [kms_key_id]
   }
   availability_zone = "eu-west-2a"
-  #size              = "50"
   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_techst
   type              = "io2"
   iops              = 3000
@@ -215,7 +209,6 @@ resource "aws_ebs_volume" "backup" {
     ignore_changes = [kms_key_id]
   }
   availability_zone = "eu-west-2a"
-  #size              = "8000"
   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_backup
   type              = "io2"
   iops              = 3000
@@ -236,7 +229,6 @@ resource "aws_ebs_volume" "redoB" {
     ignore_changes = [kms_key_id]
   }
   availability_zone = "eu-west-2a"
-  #size              = "75"
   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_redoB
   type              = "io2"
   iops              = 3000
@@ -261,7 +253,6 @@ resource "aws_ebs_volume" "diag" {
     ignore_changes = [kms_key_id]
   }
   availability_zone = "eu-west-2a"
-  #size              = "75"
   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_diag
   type              = "io2"
   iops              = 3000
