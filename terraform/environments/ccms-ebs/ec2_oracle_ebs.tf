@@ -94,7 +94,8 @@ resource "aws_ebs_volume" "export_home" {
     ignore_changes = [kms_key_id]
   }
   availability_zone = "eu-west-2a"
-  size              = "60"
+  #size              = "60"
+  size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_exhome
   type              = "io2"
   iops              = 3000
   encrypted         = true
@@ -114,7 +115,8 @@ resource "aws_ebs_volume" "u01" {
     ignore_changes = [kms_key_id]
   }
   availability_zone = "eu-west-2a"
-  size              = "75"
+  #size              = "75"
+  size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_u01
   type              = "io2"
   iops              = 3000
   encrypted         = true
@@ -133,7 +135,8 @@ resource "aws_ebs_volume" "arch" {
     ignore_changes = [kms_key_id]
   }
   availability_zone = "eu-west-2a"
-  size              = "50"
+  #size              = "50"
+  size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_arch
   type              = "io2"
   iops              = 3000
   encrypted         = true
@@ -152,7 +155,8 @@ resource "aws_ebs_volume" "dbf" {
     ignore_changes = [kms_key_id]
   }
   availability_zone = "eu-west-2a"
-  size              = "8000"
+  #size              = "8000"
+  size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_dbf
   type              = "io2"
   iops              = local.application_data.accounts[local.environment].ebs_default_iops
   encrypted         = true
@@ -171,7 +175,8 @@ resource "aws_ebs_volume" "redoA" {
     ignore_changes = [kms_key_id]
   }
   availability_zone = "eu-west-2a"
-  size              = "100"
+  #size              = "100"
+  size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_redoA
   type              = "io2"
   iops              = 3000
   encrypted         = true
@@ -190,7 +195,8 @@ resource "aws_ebs_volume" "techst" {
     ignore_changes = [kms_key_id]
   }
   availability_zone = "eu-west-2a"
-  size              = "50"
+  #size              = "50"
+  size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_techst
   type              = "io2"
   iops              = 3000
   encrypted         = true
@@ -209,7 +215,8 @@ resource "aws_ebs_volume" "backup" {
     ignore_changes = [kms_key_id]
   }
   availability_zone = "eu-west-2a"
-  size              = "8000"
+  #size              = "8000"
+  size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_backup
   type              = "io2"
   iops              = 3000
   encrypted         = true
@@ -223,7 +230,56 @@ resource "aws_volume_attachment" "backup_att" {
   volume_id   = aws_ebs_volume.backup.id
   instance_id = aws_instance.ec2_oracle_ebs.id
 }
-
+resource "aws_ebs_volume" "redoB" {
+  count = local.is-production ? 1 : 0
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
+  availability_zone = "eu-west-2a"
+  #size              = "75"
+  size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_redoB
+  type              = "io2"
+  iops              = 3000
+  encrypted         = true
+  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  tags = merge(local.tags,
+    { Name = "redoB" }
+  )
+}
+resource "aws_volume_attachment" "redoB_att" {
+  count = local.is-production ? 1 : 0
+  depends_on = [
+    aws_ebs_volume.redoB
+  ]
+  device_name = "/dev/sdo"
+  volume_id   = aws_ebs_volume.redoB[0].id
+  instance_id = aws_instance.ec2_oracle_ebs.id
+}
+resource "aws_ebs_volume" "diag" {
+  count = local.is-production ? 1 : 0
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
+  availability_zone = "eu-west-2a"
+  #size              = "75"
+  size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_diag
+  type              = "io2"
+  iops              = 3000
+  encrypted         = true
+  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  tags = merge(local.tags,
+    { Name = "diag" }
+  )
+}
+resource "aws_volume_attachment" "diag_att" {
+  count = local.is-production ? 1 : 0
+  depends_on = [
+    aws_ebs_volume.diag
+  ]
+  device_name = "/dev/sdp"
+  volume_id   = aws_ebs_volume.diag[0].id
+  instance_id = aws_instance.ec2_oracle_ebs.id
+}
 
 module "cw-ebs-ec2" {
   source = "./modules/cw-ec2"
