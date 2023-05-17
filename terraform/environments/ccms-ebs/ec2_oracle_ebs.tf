@@ -19,7 +19,7 @@ resource "aws_instance" "ec2_oracle_ebs" {
   #  ignore_changes = [ebs_block_device]
   #}
   lifecycle {
-    ignore_changes = [user_data_replace_on_change, user_data]
+    ignore_changes = [ebs_block_device, user_data_replace_on_change, user_data]
   }
   user_data_replace_on_change = false
   user_data                   = <<EOF
@@ -72,15 +72,16 @@ EOF
     )
   }
   ebs_block_device {
-    device_name = "/dev/sdf"
+    device_name = "/dev/sdc"
     volume_type = "gp3"
-    volume_size = 200
+    volume_size = local.application_data.accounts[local.environment].ebs_size_ebsdb_temp
     encrypted   = true
     tags = merge(local.tags,
-      { Name = "ebs-block1" }
+      { Name = "temp" }
     )
   }
-  */
+  */  
+
   tags = merge(local.tags,
     { Name = lower(format("ec2-%s-%s-ebsdb", local.application_name, local.environment)) },
     { instance-scheduling = local.application_data.accounts[local.environment].instance-scheduling },
@@ -108,7 +109,6 @@ resource "aws_volume_attachment" "export_home_att" {
   volume_id   = aws_ebs_volume.export_home.id
   instance_id = aws_instance.ec2_oracle_ebs.id
 }
-
 resource "aws_ebs_volume" "u01" {
   lifecycle {
     ignore_changes = [kms_key_id]

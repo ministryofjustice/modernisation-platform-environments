@@ -97,7 +97,7 @@
       "ebsapps_u01_size": 10,
       "ebsapps_u03_size": 50,
       "tg_apps_port": 8001,
-      "ebs_size_ebsdb_exhome": 60,
+       "ebs_size_ebsdb_exhome": 60,
       "ebs_size_ebsdb_u01": 75,
       "ebs_size_ebsdb_arch": 50,
       "ebs_size_ebsdb_dbf": 8000,
