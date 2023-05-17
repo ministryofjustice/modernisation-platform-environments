@@ -34,12 +34,12 @@ resource "aws_security_group" "load_balancer_security_group" {
     from_port   = 443
     to_port     = 443
     cidr_blocks = [
-        "81.134.202.29/32", # MoJ Digital VPN
-        "195.59.75.0/24", # ARK internet (DOM1)
-        "194.33.192.0/25", # ARK internet (DOM1)
-        "194.33.193.0/25", # ARK internet (DOM1)
-        "194.33.196.0/25", # ARK internet (DOM1)
-        "194.33.197.0/25" # ARK internet (DOM1)
+      "81.134.202.29/32", # MoJ Digital VPN
+      "195.59.75.0/24",   # ARK internet (DOM1)
+      "194.33.192.0/25",  # ARK internet (DOM1)
+      "194.33.193.0/25",  # ARK internet (DOM1)
+      "194.33.196.0/25",  # ARK internet (DOM1)
+      "194.33.197.0/25"   # ARK internet (DOM1)
     ]
   }
 
