@@ -29,6 +29,16 @@ resource "aws_wafv2_ip_set" "ebs_waf_ip_set" {
     "20.49.214.199/32",  // Azure Landing Zone Egress
     "20.49.214.228/32",  // Azure Landing Zone Egress
     "51.155.225.100/32", // Jide Personal Access Temporarily
+    "82.12.34.69/32",    // Jide Personal Access Temporarily
+    "10.26.59.0/25",     // DEV NLB Subnet eu-west-2a
+    "10.26.59.128/25",   // DEV NLB Subnet eu-west-2b
+    "10.26.60.0/25",     // DEV NLB Subnet eu-west-2c
+    "10.26.99.0/25",     // TEST NLB Subnet eu-west-2a
+    "10.26.99.128/25",   // TEST NLB Subnet eu-west-2b
+    "10.26.100.0/25",    // TEST NLB Subnet eu-west-2c
+    "10.27.75.0/25",     // PREPROD NLB Subnet eu-west-2a
+    "10.27.75.128/25",   // PREPROD NLB Subnet eu-west-2b
+    "10.27.76.0/25",     // PREPROD NLB Subnet eu-west-2c
   ]
 
   tags = merge(local.tags,
