@@ -21,7 +21,7 @@ data "aws_iam_policy_document" "ses_identity_policy" {
 resource "aws_ses_identity_policy" "identity_policy" {
   identity = aws_ses_domain_identity.domain_identity.arn
   name     = "example"
-  policy   = data.aws_iam_policy_document.domain_identity.json
+  policy   = data.aws_iam_policy_document.ses_identity_policy.json
 }
 
 resource "aws_ses_configuration_set" "default_configuration_set" {
@@ -31,7 +31,7 @@ resource "aws_ses_configuration_set" "default_configuration_set" {
     tls_policy = "Optional"
   }
   reputation_metrics_enabled = true
-  sending_enabled = true
+  sending_enabled            = true
 }
 
 # TO DO: Kinesis configuration (including S3 bucket, IAM role and policy, ...).
@@ -51,10 +51,10 @@ resource "aws_ses_configuration_set" "default_configuration_set" {
 
 output "ses_verification_token" {
   description = "SES verification token"
-  value = aws_ses_domain_identity.domain_identity.verification_token
+  value       = aws_ses_domain_identity.domain_identity.verification_token
 }
 
 output "ses_domain_dkim" {
   description = "SES domain DKIM"
-  value = aws_ses_domain_dkim.domain_identity.dkim_tokens
+  value       = aws_ses_domain_dkim.domain_identity.dkim_tokens
 }

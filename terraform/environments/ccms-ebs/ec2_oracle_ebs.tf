@@ -19,7 +19,7 @@ resource "aws_instance" "ec2_oracle_ebs" {
   #  ignore_changes = [ebs_block_device]
   #}
   lifecycle {
-    ignore_changes = [user_data_replace_on_change,user_data]
+    ignore_changes = [user_data_replace_on_change, user_data]
   }
   user_data_replace_on_change = false
   user_data                   = <<EOF
