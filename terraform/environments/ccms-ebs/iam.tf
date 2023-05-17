@@ -139,16 +139,16 @@ resource "aws_iam_policy" "rman_to_s3" {
       "Version" : "2012-10-17",
       "Statement" : [
         {
-          "Effect": "Allow",
-          "Action": [
+          "Effect" : "Allow",
+          "Action" : [
             "s3:GetBucketLocation",
             "s3:ListAllMyBuckets"
           ],
-          "Resource": "arn:aws:s3:::*"
+          "Resource" : "arn:aws:s3:::*"
         },
         {
-          "Effect": "Allow",
-          "Action": ["s3:ListBucket"],
+          "Effect" : "Allow",
+          "Action" : ["s3:ListBucket"],
           "Resource" : [
             "arn:aws:s3:::ccms-ebs-*-dbbackup",
             "arn:aws:s3:::ccms-ebs-*-dbbackup/*"
