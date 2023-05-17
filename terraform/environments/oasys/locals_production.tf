@@ -138,7 +138,7 @@ locals {
     }
 
     baseline_route53_zones = {
-      "${module.environment.domains.public.short_name}" = { # "oasys.service.justice.gov.uk"
+      (module.environment.domains.public.short_name) = { # "oasys.service.justice.gov.uk"
         records = [
           { name = "db", type = "A", ttl = "300", records = ["10.40.6.133"] },     #     "db.oasys.service.justice.gov.uk" currently pointing to azure db PDODL00011
           { name = "trn.db", type = "A", ttl = "300", records = ["10.40.6.138"] }, # "trn.db.oasys.service.justice.gov.uk" currently pointing to azure db PDODL00019

@@ -4,7 +4,7 @@
 locals {
 
   baseline_s3_buckets = {
-    "${terraform.workspace}" = {
+    (terraform.workspace) = {
       iam_policies = module.baseline_presets.s3_iam_policies
     }
   }
@@ -314,7 +314,7 @@ locals {
         domain_name             = module.environment.domains.public.modernisation_platform
         subject_alternate_names = ["*.${module.environment.domains.public.application_environment}"]
         validation = {
-          "${module.environment.domains.public.modernisation_platform}" = {
+          (module.environment.domains.public.modernisation_platform) = {
             account   = "core-network-services"
             zone_name = "${module.environment.domains.public.modernisation_platform}."
           }
