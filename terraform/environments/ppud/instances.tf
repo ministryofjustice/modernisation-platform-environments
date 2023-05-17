@@ -240,6 +240,7 @@ resource "aws_instance" "s618358rgvw023" {
 # Production Instances  #
 #########################
 
+/*
 resource "aws_instance" "s618358rgvw019" {
   count                  = local.is-production == true ? 1 : 0
   ami                    = "ami-0eccca367d5cb093d"
@@ -351,6 +352,7 @@ resource "aws_instance" "s618358rgsw025p" {
     backup = true
   }
 }
+*/
 
 resource "aws_instance" "s266316rgsl200" {
   count                  = local.is-production == true ? 1 : 0
