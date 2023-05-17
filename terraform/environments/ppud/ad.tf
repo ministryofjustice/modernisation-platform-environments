@@ -105,6 +105,7 @@ resource "aws_ssm_association" "ad_join_domain_association_preprod" {
   }
 }
 
+/*
 # Associate Policy to PROD Instance
 resource "aws_ssm_association" "ad_join_domain_association_prod" {
   count      = local.is-production == true ? 1 : 0
@@ -115,3 +116,4 @@ resource "aws_ssm_association" "ad_join_domain_association_prod" {
     values = [aws_instance.s618358rgvw019[0].id, aws_instance.s618358rgvw020[0].id, aws_instance.s618358rgvw021[0].id, aws_instance.s618358rgvw022[0].id, aws_instance.s618358rgvw027[0].id, aws_instance.s618358rgvw204[0].id, aws_instance.s618358rgvw205[0].id, aws_instance.s618358rgsw025p[0].id]
   }
 }
+*/
