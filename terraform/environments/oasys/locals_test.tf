@@ -139,7 +139,7 @@ locals {
           { name = "db", type = "A", lbs_map_key = "public" },
         ]
       }
-      "${module.environment.domains.public.business_unit_environment}" = { # hmpps-test.modernisation-platform.service.justice.gov.uk
+      (module.environment.domains.public.business_unit_environment) = { # hmpps-test.modernisation-platform.service.justice.gov.uk
         lb_alias_records = [
           { name = "t2.${local.application_name}", type = "A", lbs_map_key = "public" },     # t2.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk
           { name = "web.t2.${local.application_name}", type = "A", lbs_map_key = "public" }, # web.t2.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk
@@ -150,7 +150,7 @@ locals {
       #
       # internal/private
       #
-      "${module.environment.domains.internal.business_unit_environment}" = { # hmpps-test.modernisation-platform.internal
+      (module.environment.domains.internal.business_unit_environment) = { # hmpps-test.modernisation-platform.internal
         vpc = {                                                              # this makes it a private hosted zone
           id = module.environment.vpc.id
         }
