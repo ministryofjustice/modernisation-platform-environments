@@ -5,14 +5,14 @@
 resource "aws_db_instance" "this" {
   identifier = var.identifier
 
-  engine            = var.instance.engine
-  engine_version    = var.instance.engine_version
-  instance_class    = var.instance.instance_class
-  allocated_storage = var.instance.allocated_storage
-  storage_type      = var.instance.storage_type
-  storage_encrypted = var.instance.storage_encrypted
-  kms_key_id        = var.instance.kms_key_id
-  license_model     = var.instance.license_model
+  engine              = var.instance.engine
+  engine_version      = var.instance.engine_version
+  instance_class      = var.instance.instance_class
+  allocated_storage   = var.instance.allocated_storage
+  storage_type        = var.instance.storage_type
+  storage_encrypted   = var.instance.storage_encrypted
+  kms_key_id          = var.instance.kms_key_id
+  license_model       = var.instance.license_model
   deletion_protection = var.instance.deletion_protection
 
   db_name                             = var.instance.db_name
