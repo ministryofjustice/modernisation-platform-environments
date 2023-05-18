@@ -25,7 +25,6 @@ locals {
     create_datamart            = local.application_data.accounts[local.environment].setup_redshift
     redshift_cluster_name      = "${local.application_data.accounts[local.environment].project_short_id}-redshift-${local.environment}"
     kinesis_stream_ingestor    = "${local.application_data.accounts[local.environment].project_short_id}-kinesis-ingestor-${local.environment}"
-    # DPR-378 #  kinesis_stream_data_domain = "${local.application_data.accounts[local.environment].project_short_id}-kinesis-data-domain-${local.environment}"
     kinesis_endpoint           = "https://kinesis.eu-west-2.amazonaws.com"
 
     all_tags = merge(

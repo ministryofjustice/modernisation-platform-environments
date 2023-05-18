@@ -61,8 +61,6 @@ variable "source_address" {}
 
 variable "vpc" {}
 
-# variable "kinesis_target_stream" {}
-
 variable "kinesis_stream_policy" {}
 
 variable "availability_zone" {
@@ -245,10 +243,6 @@ variable "source_rds_is_multi_az" {
   description = "Create backup database in separate availability zone"
   default     = "false"
 }
-
-#variable "source_snapshot" {
-#  description = "Snapshot ID"
-#}
 
 variable "source_storage" {
   default     = "10"

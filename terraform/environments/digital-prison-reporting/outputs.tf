@@ -28,11 +28,6 @@ output "kinesis_stream_iam_policy_write_only_arn" {
   value       = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_write_only_arn
 }
 
-#output "kinesis_stream_iam_policy_admin_arn" {
-#  description = "The IAM Policy (ARN) admin of the Stream"
-#  value       = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_admin_arn
-#}
-
 ### datamart
 
 output "cluster_arn" {
@@ -94,11 +89,6 @@ output "cluster_encrypted" {
   description = "Whether the data in the cluster is encrypted"
   value       = module.datamart.cluster_encrypted
 }
-
-#output "cluster_security_groups" {
-#  description = "The security groups associated with the cluster"
-#  value       = module.datamart.cluster_security_groups
-#}
 
 output "cluster_vpc_security_group_ids" {
   description = "The VPC security group ids associated with the cluster"

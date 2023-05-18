@@ -65,7 +65,6 @@ resource "aws_iam_role" "glue-service-role" {
   count = var.create_role && var.create_job ? 1 : 0
   name  = "${var.name}-glue-role"
   tags  = local.tags
-#  managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"]
   path  = "/"
 
   assume_role_policy = <<EOF
@@ -179,8 +178,6 @@ resource "aws_iam_role_policy_attachment" "glue_policies" {
 
   role = var.create_role ? join("", aws_iam_role.glue-service-role.*.name) : var.role_name
   policy_arn = each.value
-
-#  policy_arn = aws_iam_policy.additional-policy.arn
 }
 
 resource "aws_cloudwatch_log_group" "log_group" {
