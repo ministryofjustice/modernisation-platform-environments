@@ -1,7 +1,7 @@
 # Temporary tf resource to speed up migration
 # to be deleted once prod migration is completed
 resource "aws_db_snapshot_copy" "local" {
-  for_each                      = var.rds_refresh_snapshot_id != "" ? [var.rds_refresh_snapshot_id] : []
+  for_each                      = var.rds_refresh_snapshot_id != "" ? toset([var.rds_refresh_snapshot_id]) : []
   source_db_snapshot_identifier = each.value
   kms_key_id                    = data.aws_kms_key.rds_shared.id
   target_db_snapshot_identifier = "data-refresh-snapshot"
