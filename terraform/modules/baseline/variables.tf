@@ -455,6 +455,7 @@ variable "lbs" {
     public_subnets           = list(string)
     existing_target_groups   = optional(map(any), {})
     tags                     = optional(map(string), {})
+    lb_target_groups         = optional(map(any), {})
     listeners = optional(map(object({
       alarm_target_group_names  = optional(list(string), [])
       port                      = number
