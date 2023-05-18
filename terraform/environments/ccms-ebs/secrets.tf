@@ -1,4 +1,4 @@
-#### This file can be used to store secrets specific to the member account ####
+### This file can be used to store secrets specific to the member account. ###
 
 resource "aws_secretsmanager_secret" "secret_ftp_s3" {
   name        = "ftp-s3-${local.environment}-aws-key"
