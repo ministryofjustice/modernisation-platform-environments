@@ -23,7 +23,7 @@ def handler(event, context):
         "Content-MD5": md5,
         "Content-Type": "binary/octet-stream",
     }
-    # File upload is capped at 5GB per single upload
+    # File upload is capped at 5GB per single upload so content-length-range is 5GB
     conditions = [
         {"x-amz-server-side-encryption": "AES256"},
         {"x-amz-acl": "bucket-owner-full-control"},
