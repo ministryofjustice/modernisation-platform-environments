@@ -92,35 +92,36 @@ EOF
 #}
 
 data "aws_iam_policy_document" "extra-policy-document" {
-#  statement {
-#    actions = [
-#      "s3:*"
-#    ]
-#    resources = [
-#      "arn:aws:s3:::${var.project_id}-*/*",
-#      "arn:aws:s3:::${var.project_id}-*"
-#    ]
-#  }
-## Test
   statement {
     actions = [
       "s3:*"
     ]
     resources = [
-      "*"
+      "arn:aws:s3:::${var.project_id}-*/*",
+      "arn:aws:s3:::${var.project_id}-*"
     ]
   }
+## Test
+#  statement {
+#    actions = [
+#      "s3:*"
+#    ]
+#    resources = [
+#      "*"
+#    ]
+#  }
+  # https://docs.aws.amazon.com/glue/latest/dg/monitor-continuous-logging-enable.html#monitor-continuous-logging-encrypt-log-data
   statement {
     actions = [
       "logs:CreateLogGroup",
       "logs:CreateLogStream",
-      "logs:PutLogEvents" 
+      "logs:PutLogEvents",
+      "logs:AssociateKmsKey"
     ]
     resources = [
-      "*"
+      "arn:aws:logs:*:*:/aws-glue/*"
     ]
-  }
-## Test    
+  }   
   statement {
     actions = [
       "glue:*",
@@ -148,14 +149,14 @@ data "aws_iam_policy_document" "extra-policy-document" {
     ]
   }
   # https://docs.aws.amazon.com/glue/latest/dg/monitor-continuous-logging-enable.html#monitor-continuous-logging-encrypt-log-data
-  statement {
-    actions = [
-      "logs:AssociateKmsKey"
-    ]
-    resources = [
-      "arn:aws:logs:*:*:/aws-glue/*"
-    ]
-  }  
+#  statement {
+#    actions = [
+#      "logs:AssociateKmsKey"
+#    ]
+#    resources = [
+#      "arn:aws:logs:*:*:/aws-glue/*"
+#    ]
+#  }  
   statement {
     actions = [
     "kms:Encrypt*",
@@ -205,13 +206,6 @@ resource "aws_iam_role_policy_attachment" "glue_policies" {
 
 #  policy_arn = aws_iam_policy.additional-policy.arn
 }
-
-#resource "aws_iam_role_policy_attachment" "additional_policies" {
-#  count = var.create_kinesis_ingester && var.create_job ? 1 : 0
-
-#  role       = var.create_role ? join("", aws_iam_role.glue-service-role.*.name) : var.role_name
-#  policy_arn = var.additional_policies
-#}
 
 resource "aws_cloudwatch_log_group" "log_group" {
   name              = "/aws-glue/jobs/${var.name}-sec-config"
