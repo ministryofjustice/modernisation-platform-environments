@@ -29,7 +29,7 @@ def handler(event, context):
         {"x-amz-date": amz_date},
         {"Content-MD5": md5},
         ["starts-with", "$Content-MD5", ""],
-        ["starts-with", "$Content-MD5", ""],
+        ["starts-with", "$Content-Type", ""],
         ["starts-with", "$key", "data/"],
         ["content-length-range", 0, 5e9],
     ]
