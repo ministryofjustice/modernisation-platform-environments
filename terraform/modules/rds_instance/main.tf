@@ -3,9 +3,6 @@
 #------------------------------------------------------------------------------
 
 resource "aws_db_instance" "this" {
-  #checkov:skip=CKV_AWS_293:skip "Ensure that AWS database instances have deletion protection enabled"
-  #CKV_AWS_293: enable in https://dsdmoj.atlassian.net/browse/DSOS-1867
-
   identifier = var.identifier
 
   engine            = var.instance.engine
@@ -16,6 +13,7 @@ resource "aws_db_instance" "this" {
   storage_encrypted = var.instance.storage_encrypted
   kms_key_id        = var.instance.kms_key_id
   license_model     = var.instance.license_model
+  deletion_protection = var.instance.deletion_protection
 
   db_name                             = var.instance.db_name
   username                            = var.instance.username

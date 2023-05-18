@@ -58,6 +58,7 @@ variable "instance" {
     create                              = optional(bool, true)
     db_name                             = optional(string)
     db_subnet_group_name                = optional(string)
+    deletion_protection                 = optional(bool, true)
     enabled_cloudwatch_logs_exports     = optional(list(string))
     engine                              = string
     engine_version                      = optional(string)
