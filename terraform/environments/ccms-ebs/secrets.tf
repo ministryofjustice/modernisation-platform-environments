@@ -8,3 +8,12 @@ resource "aws_secretsmanager_secret" "secret_ftp_s3" {
     { Name = "ftp-s3-${local.environment}-aws-key" }
   )
 }
+
+resource "aws_secretsmanager_secret" "secret_ses_smtp_credentials" {
+  name        = "ses-smtp-credentials-${local.environment}"
+  description = "SMTP credentials for Postfix to send messages through SES."
+
+  tags = merge(local.tags,
+    { Name = "ses-smtp-credentials-${local.environment}" }
+  )
+}
