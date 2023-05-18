@@ -120,7 +120,7 @@ locals {
         enable_delete_protection = false
         existing_target_groups   = {}
         idle_timeout             = 60 # 60 is default
-        security_groups          = ["public"]
+        #security_groups          = ["public"] Security groups are not supported for load balancers with type 'network'
         public_subnets           = module.environment.subnets["public"].ids
         tags                     = local.tags
 
