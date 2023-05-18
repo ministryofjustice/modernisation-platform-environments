@@ -1,0 +1,62 @@
+---
+name: delius-data-refresh
+on:
+  workflow_dispatch:
+    inputs: {}
+jobs:
+  take-snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: install aws-cli
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-pip
+          sudo pip3 install awscli
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@e1e17a757e536f70e52b5a12b2e8d1d1c60e04ef  # v2.0.0
+        with:
+          role-to-assume: "arn:aws:iam::${{ input.SOURCE_ACCOUNT_ID }}:role/github-actions"
+          role-session-name: githubactionsrolesession
+          aws-region: "eu-west-2"
+      - name: Create RDS snapshot
+        run: |
+          aws rds create-db-snapshot \
+            --db-instance-identifier "${{input.SOURCE_DB_NAME}}" \
+            --db-snapshot-identifier "${{input.SOURCE_DB_NAME}}-snapshot-$(date +%Y-%m-%d)"
+      - name: Wait for RDS Snapshot to be ready
+        run: |
+          aws rds wait db-snapshot-completed \
+            --db-snapshot-identifier "${{input.SOURCE_DB_NAME}}-snapshot-$(date +%Y-%m-%d)"
+      - name: Share RDS snapshot with Pre-Prod
+        run: |
+            aws rds modify-db-snapshot-attribute \
+                --db-snapshot-identifier "${{input.SOURCE_DB_NAME}}-snapshot-$(date +%Y-%m-%d)" \
+                --attribute-name restore \
+                --values-to-add "${{ input.DESTINATION_ACCOUNT_ID }}"
+#    restore-preprod-db-from-snapshot:
+#      runs-on: ubuntu-latest
+#      steps:
+#        - name: Checkout code
+#          uses: actions/checkout@v2
+#        - name: Configure AWS Credentials
+#          uses: aws-actions/configure-aws-credentials@e1e17a757e536f70e52b5a12b2e8d1d1c60e04ef  # v2.0.0
+#          with:
+#            role-to-assume: "arn:aws:iam::${{ secret.IAPS_PREPROD_ACCOUNT_ID }}:role/github-actions"
+#            role-session-name: githubactionsrolesession
+#            aws-region: "eu-west-2"
+#        - name: Setup Terraform
+#          uses: hashicorp/setup-terraform@633666f66e0061ca3b725c73b2ec20cd13a8fdd1  # v2.0.3
+#          with:
+#            terraform_version: "${{ inputs.terraform_version }}"
+#            terraform_wrapper: false
+#        - name: Terraform Init
+#          working-directory: "terraform/environments/${{ inputs.application }}"
+#          run: |
+#            terraform --version
+#            echo "terraform init ${{ inputs.init_plan_apply_tfargs }}"
+#            terraform init ${{ inputs.init_plan_apply_tfargs }}
+#
+#        - name: Terraform Workspace Select
+#          working-directory: "terraform/environments/${{ inputs.application }}"
+#          run: |
+#            terraform workspace select "${WORKSPACE_NAME}"
