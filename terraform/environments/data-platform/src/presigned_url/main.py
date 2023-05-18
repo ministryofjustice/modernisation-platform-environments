@@ -11,7 +11,8 @@ s3 = boto3.client("s3")
 
 
 def handler(event, context):
-    bucket_name = os.environ["bucketname"]
+    bucket_name = os.environ["BUCKET_NAME"]
+    data_product = event["queryStringParameters"]["data-product"]
     amz_date = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
     md5 = str(event["queryStringParameters"]["Content-MD5"])
     file_name = uuid.uuid4()
@@ -30,7 +31,7 @@ def handler(event, context):
         {"Content-MD5": md5},
         ["starts-with", "$Content-MD5", ""],
         ["starts-with", "$Content-Type", ""],
-        ["starts-with", "$key", "data/"],
+        ["starts-with", "$key", f"{data_product}/"],
         ["content-length-range", 0, 5e9],
     ]
 
