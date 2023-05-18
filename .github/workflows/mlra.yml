@@ -19,13 +19,14 @@ on:
   workflow_dispatch:
     inputs:
       action:
-        description: 'Set either [deploy|destroy].'
+        description: 'Set either [deploy|destroy-dev|destroy-test].'
         default: 'deploy'
         required: true
         type: string
         options:
           - deploy
-          - destroy
+          - destroy-dev
+          - destroy-test
 
 permissions:
   id-token: write  # This is required for requesting the JWT
@@ -54,11 +55,23 @@ jobs:
       pipeline_github_token: "${{ secrets.MODERNISATION_PLATFORM_CI_USER_ENVIRONMENTS_REPO_PAT }}"
 
   destroy-development:
-    if: inputs.action == 'destroy'
+    if: inputs.action == 'destroy-dev'
     uses: ./.github/workflows/reusable_terraform_plan_apply.yml
     with:
       application: "${{ github.workflow }}"
       environment: "development"
+      action: "plan_apply"
+      plan_apply_tfargs: "-destroy"
+    secrets:
+      modernisation_platform_environments: "${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}"
+      pipeline_github_token: "${{ secrets.MODERNISATION_PLATFORM_CI_USER_ENVIRONMENTS_REPO_PAT }}"
+
+  destroy-test:
+    if: inputs.action == 'destroy-test'
+    uses: ./.github/workflows/reusable_terraform_plan_apply.yml
+    with:
+      application: "${{ github.workflow }}"
+      environment: "test"
       action: "plan_apply"
       plan_apply_tfargs: "-destroy"
     secrets:
