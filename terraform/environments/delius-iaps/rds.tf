@@ -18,8 +18,7 @@ resource "aws_db_instance" "iaps" {
   password       = aws_secretsmanager_secret_version.db_password.secret_string
 
   # temporary 2-layer try function, to conditionally allow a build from a snapshot originating in an external account
-  snapshot_identifier = try(aws_db_snapshot_copy.local[0].id, try(local.application_data.accounts[local.environment].db_snapshot_identifier, null))
-
+  snapshot_identifier = try(local.application_data.accounts[local.environment].db_snapshot_identifier, try(aws_db_snapshot_copy.local[0].id, null))
   db_subnet_group_name   = aws_db_subnet_group.iaps.id
   vpc_security_group_ids = [aws_security_group.iaps_db.id]
 
