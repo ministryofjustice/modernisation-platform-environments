@@ -6,6 +6,8 @@ tasks:
     type: powershell
     runAs: admin
     content: |-
+      Set-TimeZone 'GMT Standard Time'
+
       $tnsNamesOraPath = "C:\app\client\Administrator\product\12.1.0\client_1\network\admin\tnsnames.ora"
       (Get-Content $tnsNamesOraPath).replace('iaps-db', '${delius_iaps_rds_db_address}') | Set-Content $tnsNamesOraPath
 
@@ -87,14 +89,8 @@ tasks:
       $taskPrincipal = New-ScheduledTaskPrincipal -UserId "SYSTEM" -LogonType ServiceAccount -RunLevel Highest
       Register-ScheduledTask -TaskName $taskName -Trigger $taskTrigger -Action $taskAction -Principal $taskPrincipal
 
-%{if environment != "production"}
       Restart-Service -Name nginx
-%{endif}
-%{if environment == "production"}
-      # TODO: remove or edit if statement once migration gets a green light
-      Stop-Service -Name nginx
-      Set-Service -Name nginx -StartupType Disabled
-%{endif}
+      Set-Service -Name nginx -StartupType Automatic
       "nginx config written" | Out-File -FilePath C:\nginx_config_log.txt
   - frequency: once
     type: powershell
@@ -143,21 +139,16 @@ tasks:
       $configXML.DLLDEF.SOAPSERVER.ODBC = "DSN=$${SOAPServerODBCdsn};Server=$${SOAPServerODBCserver};Database=$${SOAPServerODBCdatabase};uid=$${SOAPServerODBCuid};pwd=$${SOAPServerODBCpwd}"
       $configXML.save($IMConfigFile)
 
-%{if environment != "production"}
       $service = Restart-Service -Name IMIapsInterfaceWinService -Force -PassThru
       if ($service.Status -match "Running") {
           Write-Host('Restart of IMIapsInterfaceWinService successful')
+          Set-Service -Name IMIapsInterfaceWinService -StartupType Automatic
+          "IM Interface configured" | Out-File -FilePath C:\im_interface_config_log.txt
       } else {
           Write-Host('Error - Failed to restart IMIapsInterfaceWinService - see logs')
+          "Error - Failed to restart IMIapsInterfaceWinService - see logs" | Out-File -FilePath C:\im_interface_config_log.txt
           Exit 1
       }
-%{endif}
-%{if environment == "production"}
-      # TODO: remove or edit if statement once migration gets a green light
-      Stop-Service -Name IMIapsInterfaceWinService -Force
-      Set-Service -Name IMIapsInterfaceWinService -StartupType Disabled
-%{endif}
-      "IM Interface configured" | Out-File -FilePath C:\im_interface_config_log.txt
   - frequency: once
     type: powershell
     runAs: admin
@@ -181,23 +172,16 @@ tasks:
       (Get-Content $NDeliusConfigFile).replace('[SMTP_PASSWORDCODED]', (Get-SSMParameter -Name "/NDeliusInterface/Email/passwordcoded" -WithDecryption $true).Value) | Set-Content $NDeliusConfigFile
       (Get-Content $NDeliusConfigFile).replace('[SMTP_FROMADDRESS]', (Get-SSMParameter -Name "/NDeliusInterface/Email/fromaddress" -WithDecryption $true).Value) | Set-Content $NDeliusConfigFile
 
-%{if environment != "production"}
       $service = Restart-Service -Name IapsNDeliusInterfaceWinService -Force -PassThru
       if ($service.Status -match "Running") {
           Write-Host('Restart of IapsNDeliusInterfaceWinService successful')
+          Set-Service -Name IapsNDeliusInterfaceWinService -StartupType Automatic
           "NDelius Interface configured" | Out-File -FilePath C:\ndelius_interface_config_log.txt
       } else {
           Write-Host('Error - Failed to restart IapsNDeliusInterfaceWinService - see logs')
           "Error - Failed to restart IapsNDeliusInterfaceWinService - see logs" | Out-File -FilePath C:\ndelius_interface_config_log.txt
           Exit 1
       }
-%{endif}
-%{if environment == "production"}
-      # TODO: remove or edit if statement once migration gets a green light
-      Stop-Service -Name IapsNDeliusInterfaceWinService -Force
-      Set-Service -Name IapsNDeliusInterfaceWinService -StartupType Disabled
-%{endif}
-
   - frequency: once
     type: powershell
     runAs: admin

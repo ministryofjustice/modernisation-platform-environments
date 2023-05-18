@@ -34,6 +34,16 @@ module "baseline_presets" {
     iam_policies_ec2_default                     = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
     s3_iam_policies                              = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
 
+    cloudwatch_metric_alarms_lists_with_actions = {
+      dso_pagerduty = ["dso_pagerduty"]
+    }
+
+    sns_topics = {
+      pagerduty_integrations = {
+        dso_pagerduty = contains(["development", "test"], local.environment) ? "oasys_nonprod_alarms" : "oasys_alarms"
+      }
+    }
+
     # comment this in if you need to resolve FixNGo hostnames
     # route53_resolver_rules = {
     #   outbound-data-and-private-subnets = ["azure-fixngo-domain"]
@@ -53,7 +63,8 @@ module "baseline" {
   # bastion_linux = lookup(local.environment_config, "baseline_bastion_linux", null)
   # iam_service_linked_roles = module.baseline_presets.iam_service_linked_roles
   # rds_instances
-  # sns_topics
+  sns_topics             = module.baseline_presets.sns_topics
+  #acm_certificates       = merge(module.baseline_presets.acm_certificates, lookup(local.environment_config, "baseline_acm_certificates", {}))
   acm_certificates       = module.baseline_presets.acm_certificates
   cloudwatch_log_groups  = module.baseline_presets.cloudwatch_log_groups
   ec2_autoscaling_groups = lookup(local.environment_config, "baseline_ec2_autoscaling_groups", {})

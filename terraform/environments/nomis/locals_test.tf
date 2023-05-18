@@ -26,6 +26,9 @@ locals {
     baseline_ec2_autoscaling_groups = {
       # blue deployment
       t1-nomis-web-a = merge(local.weblogic_ec2_a, {
+        autoscaling_group = merge(local.weblogic_ec2_a.autoscaling_group, {
+          desired_capacity = 0
+        })
         tags = merge(local.weblogic_ec2_a.tags, {
           nomis-environment    = "t1"
           oracle-db-hostname-a = "t1nomis-a.test.nomis.service.justice.gov.uk"
@@ -43,43 +46,50 @@ locals {
           oracle-db-name       = "T1CNOM"
         })
       })
+
+      dev-jumpserver-2022 = {
+        # ami has unwanted ephemeral device, don't copy all the ebs_volumess
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name                      = "nomis_windows_server_2022_jumpserver_release_*"
+          availability_zone             = null
+          ebs_volumes_copy_all_from_ami = false
+          user_data_raw                 = base64encode(file("./templates/jumpserver-user-data.yaml"))
+        })
+        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+          vpc_security_group_ids = ["private-jumpserver"]
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 100 }
+        }
+        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
+          desired_capacity = 0 # set to 0 while testing
+        })
+        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
+        tags = {
+          description = "Windows Server 2022 Jumpserver for NOMIS"
+          os-type     = "Windows"
+          component   = "jumpserver"
+          server-type = "nomis-jumpserver"
+        }
+      }
     }
 
     baseline_ec2_instances = {
-      t1-nomis-db-1 = merge(local.database_ec2_a, {
-        tags = merge(local.database_ec2_a.tags, {
+      t1-nomis-db-1-b = merge(local.database_ec2_b, {
+        tags = merge(local.database_ec2_b.tags, {
           nomis-environment   = "t1"
           description         = "T1 NOMIS database"
-          oracle-sids         = "CNOMT1"
-          s3-db-restore-dir   = "CNOMT1_20230125"
+          oracle-sids         = "T1TRDS1"
           instance-scheduling = "skip-scheduling"
         })
-        ebs_volumes = merge(local.database_ec2_a.ebs_volumes, {
-          "/dev/sdb" = { label = "app", size = 100 }
-          "/dev/sdc" = { label = "app", size = 100 }
-        })
-        ebs_volume_config = merge(local.database_ec2_a.ebs_volume_config, {
-          data  = { total_size = 100 }
-          flash = { total_size = 50 }
-        })
-        cloudwatch_metric_alarms = {} # disabled until migration
-      })
-
-      t1-nomis-db-1-a = merge(local.database_ec2_a, {
-        tags = merge(local.database_ec2_a.tags, {
-          nomis-environment   = "t1"
-          description         = "T1 NOMIS database"
-          oracle-sids         = "CNOMT1"
-          instance-scheduling = "skip-scheduling"
-        })
-        config = merge(local.database_ec2_a.config, {
+        config = merge(local.database_ec2_b.config, {
           ami_name = "nomis_rhel_7_9_oracledb_11_2_release_2023-04-02T00-00-40.059Z"
         })
-        ebs_volumes = merge(local.database_ec2_a.ebs_volumes, {
+        ebs_volumes = merge(local.database_ec2_b.ebs_volumes, {
           "/dev/sdb" = { label = "app", size = 100 }
           "/dev/sdc" = { label = "app", size = 100 }
         })
-        ebs_volume_config = merge(local.database_ec2_a.ebs_volume_config, {
+        ebs_volume_config = merge(local.database_ec2_b.ebs_volume_config, {
           data  = { total_size = 100 }
           flash = { total_size = 50 }
         })
@@ -103,24 +113,6 @@ locals {
         })
       })
 
-      t1-nomis-db-2-a = merge(local.database_ec2_a, {
-        tags = merge(local.database_ec2_a.tags, {
-          nomis-environment   = "t1"
-          description         = "T1 NOMIS Audit database for testing"
-          oracle-sids         = "T1CNMAUD"
-          instance-scheduling = "skip-scheduling"
-        })
-        ebs_volumes = merge(local.database_ec2_a.ebs_volumes, {
-          "/dev/sdb" = { label = "app", size = 100 }
-          "/dev/sdc" = { label = "app", size = 100 }
-        })
-        ebs_volume_config = merge(local.database_ec2_a.ebs_volume_config, {
-          data  = { total_size = 100 }
-          flash = { total_size = 50 }
-        })
-        cloudwatch_metric_alarms = {} # disabled until migration
-      })
-
       t3-nomis-db-1 = merge(local.database_ec2_a, {
         tags = merge(local.database_ec2_a.tags, {
           nomis-environment   = "t3"
@@ -138,6 +130,8 @@ locals {
         })
         cloudwatch_metric_alarms = {} # disabled until migration
       })
+
+
     }
 
     baseline_lbs = {
@@ -248,6 +242,7 @@ locals {
           { name = "t1nomis", type = "A", ttl = "300", records = ["10.101.3.132"] },
           { name = "t1nomis-a", type = "A", ttl = "300", records = ["10.101.3.132"] },
           { name = "t1nomis-b", type = "A", ttl = "300", records = ["10.101.3.132"] },
+          { name = "t1-nomis-db-1-b", type = "CNAME", ttl = "3600", records = ["t1-nomis-db-1-b.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
           { name = "t1ndh", type = "A", ttl = "300", records = ["10.101.3.132"] },
           { name = "t1ndh-a", type = "A", ttl = "300", records = ["10.101.3.132"] },
           { name = "t1ndh-b", type = "A", ttl = "300", records = ["10.101.3.132"] },

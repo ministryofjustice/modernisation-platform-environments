@@ -80,6 +80,7 @@ resource "aws_lb_target_group_attachment" "PPUD-PORTAL-internal-preproduction" {
   port             = 443
 }
 
+
 resource "aws_lb_target_group_attachment" "PPUD-PORTAL-internal-production" {
   count            = local.is-production == true ? 1 : 0
   target_group_arn = aws_lb_target_group.PPUD-internal-Target-Group[0].arn

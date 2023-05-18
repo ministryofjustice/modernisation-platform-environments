@@ -105,6 +105,7 @@ resource "aws_ssm_association" "ad_join_domain_association_preprod" {
   }
 }
 
+
 # Associate Policy to PROD Instance
 resource "aws_ssm_association" "ad_join_domain_association_prod" {
   count      = local.is-production == true ? 1 : 0
