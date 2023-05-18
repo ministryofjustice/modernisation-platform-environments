@@ -445,106 +445,130 @@ variable "key_pairs" {
 
 variable "lbs" {
   description = "map of load balancers and associated resources using loadbalancer and lb_listener modules"
-  type = map(any)
-    
-  #   object({
-  #   enable_delete_protection = optional(bool, false)
-  #   force_destroy_bucket     = optional(bool, false)
-  #   idle_timeout             = string
-  #   internal_lb              = optional(bool, false)
-  #   load_balancer_type       = optional(string, "application")
-  #   security_groups          = list(string)
-  #   public_subnets           = list(string)
-  #   existing_target_groups   = optional(map(any), {})
-  #   tags                     = optional(map(string), {})
-  #   lb_target_groups         = optional(map(any), {})
-  #   listeners = optional(map(object({
-  #     alarm_target_group_names  = optional(list(string), [])
-  #     port                      = number
-  #     protocol                  = string
-  #     ssl_policy                = optional(string)
-  #     certificate_names_or_arns = optional(list(string), [])
-  #     default_action = object({
-  #       type              = string
-  #       target_group_name = optional(string)
-  #       target_group_arn  = optional(string)
-  #       fixed_response = optional(object({
-  #         content_type = string
-  #         message_body = optional(string)
-  #         status_code  = optional(string)
-  #       }))
-  #       forward = optional(object({
-  #         target_group = list(object({
-  #           name       = optional(string)
-  #           arn        = optional(string)
-  #           stickiness = optional(number)
-  #         }))
-  #         stickiness = optional(object({
-  #           duration = optional(number)
-  #           enabled  = bool
-  #         }))
-  #       }))
-  #       redirect = optional(object({
-  #         status_code = string
-  #         port        = optional(number)
-  #         protocol    = optional(string)
-  #       }))
-  #     })
-  #     rules = optional(map(object({
-  #       priority = optional(number)
-  #       actions = list(object({
-  #         type              = string
-  #         target_group_name = optional(string, null)
-  #         target_group_arn  = optional(string, null) # use this if target group defined elsewhere
-  #         fixed_response = optional(object({
-  #           content_type = string
-  #           message_body = optional(string)
-  #           status_code  = optional(string)
-  #         }))
-  #         forward = optional(object({
-  #           target_group = list(object({
-  #             name       = optional(string)
-  #             arn        = optional(string) # use this if target group defined elsewhere
-  #             stickiness = optional(number)
-  #           }))
-  #           stickiness = optional(object({
-  #             duration = optional(number)
-  #             enabled  = bool
-  #           }))
-  #         }))
-  #         redirect = optional(object({
-  #           status_code = string
-  #           port        = optional(number)
-  #           protocol    = optional(string)
-  #         }))
-  #       }))
-  #       conditions = list(object({
-  #         host_header = optional(object({
-  #           values = list(string)
-  #         }))
-  #         path_pattern = optional(object({
-  #           values = list(string)
-  #         }))
-  #       }))
-  #     })), {})
-  #     cloudwatch_metric_alarms = optional(map(object({
-  #       comparison_operator = string
-  #       evaluation_periods  = number
-  #       metric_name         = string
-  #       namespace           = string
-  #       period              = number
-  #       statistic           = string
-  #       threshold           = number
-  #       alarm_actions       = list(string)
-  #       actions_enabled     = optional(bool, false)
-  #       alarm_description   = optional(string)
-  #       datapoints_to_alarm = optional(number)
-  #       treat_missing_data  = optional(string, "missing")
-  #       dimensions          = optional(map(string), {})
-  #     })), {})
-  #     tags = optional(map(string), {})
-  #   })), {})
-  # }))
+  type = map(object({
+    enable_delete_protection = optional(bool, false)
+    force_destroy_bucket     = optional(bool, false)
+    idle_timeout             = string
+    internal_lb              = optional(bool, false)
+    load_balancer_type       = optional(string, "application")
+    security_groups          = list(string)
+    public_subnets           = list(string)
+    existing_target_groups   = optional(map(any), {})
+    tags                     = optional(map(string), {})
+    lb_target_groups = optional(map(object({
+      port                 = optional(number)
+      protocol             = optional(string)
+      target_type          = string
+      deregistration_delay = optional(number)
+      health_check = optional(object({
+        enabled             = optional(bool)
+        interval            = optional(number)
+        healthy_threshold   = optional(number)
+        matcher             = optional(string)
+        path                = optional(string)
+        port                = optional(number)
+        timeout             = optional(number)
+        unhealthy_threshold = optional(number)
+      }))
+      stickiness = optional(object({
+        enabled         = optional(bool)
+        type            = string
+        cookie_duration = optional(number)
+        cookie_name     = optional(string)
+      }))
+      attachments = optional(list(object({
+        target_id         = string
+        port              = optional(number)
+        availability_zone = optional(string)
+      })), [])
+    })), {})
+    listeners = optional(map(object({
+      alarm_target_group_names  = optional(list(string), [])
+      port                      = number
+      protocol                  = string
+      ssl_policy                = optional(string)
+      certificate_names_or_arns = optional(list(string), [])
+      default_action = object({
+        type              = string
+        target_group_name = optional(string)
+        target_group_arn  = optional(string)
+        fixed_response = optional(object({
+          content_type = string
+          message_body = optional(string)
+          status_code  = optional(string)
+        }))
+        forward = optional(object({
+          target_group = list(object({
+            name       = optional(string)
+            arn        = optional(string)
+            stickiness = optional(number)
+          }))
+          stickiness = optional(object({
+            duration = optional(number)
+            enabled  = bool
+          }))
+        }))
+        redirect = optional(object({
+          status_code = string
+          port        = optional(number)
+          protocol    = optional(string)
+        }))
+      })
+      rules = optional(map(object({
+        priority = optional(number)
+        actions = list(object({
+          type              = string
+          target_group_name = optional(string, null)
+          target_group_arn  = optional(string, null) # use this if target group defined elsewhere
+          fixed_response = optional(object({
+            content_type = string
+            message_body = optional(string)
+            status_code  = optional(string)
+          }))
+          forward = optional(object({
+            target_group = list(object({
+              name       = optional(string)
+              arn        = optional(string) # use this if target group defined elsewhere
+              stickiness = optional(number)
+            }))
+            stickiness = optional(object({
+              duration = optional(number)
+              enabled  = bool
+            }))
+          }))
+          redirect = optional(object({
+            status_code = string
+            port        = optional(number)
+            protocol    = optional(string)
+          }))
+        }))
+        conditions = list(object({
+          host_header = optional(object({
+            values = list(string)
+          }))
+          path_pattern = optional(object({
+            values = list(string)
+          }))
+        }))
+      })), {})
+      cloudwatch_metric_alarms = optional(map(object({
+        comparison_operator = string
+        evaluation_periods  = number
+        metric_name         = string
+        namespace           = string
+        period              = number
+        statistic           = string
+        threshold           = number
+        alarm_actions       = list(string)
+        actions_enabled     = optional(bool, false)
+        alarm_description   = optional(string)
+        datapoints_to_alarm = optional(number)
+        treat_missing_data  = optional(string, "missing")
+        dimensions          = optional(map(string), {})
+      })), {})
+      tags = optional(map(string), {})
+    })), {})
+  }))
   default = {}
 }
 
