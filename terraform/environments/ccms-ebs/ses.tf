@@ -20,7 +20,7 @@ data "aws_iam_policy_document" "ses_identity_policy" {
 
 resource "aws_ses_identity_policy" "identity_policy" {
   identity = aws_ses_domain_identity.domain_identity.arn
-  name     = "example"
+  name     = "default-policy"
   policy   = data.aws_iam_policy_document.ses_identity_policy.json
 }
 
