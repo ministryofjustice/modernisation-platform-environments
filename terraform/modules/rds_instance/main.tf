@@ -11,7 +11,7 @@ resource "aws_db_instance" "this" {
   allocated_storage   = var.instance.allocated_storage
   storage_type        = var.instance.storage_type
   storage_encrypted   = var.instance.storage_encrypted
-  kms_key_id          = var.instance.kms_key_id
+  kms_key_id          = var.instance.kms_key_id != null ? var.instance.kms_key_id : null
   license_model       = var.instance.license_model
   deletion_protection = var.instance.deletion_protection
 
@@ -58,11 +58,9 @@ resource "aws_db_instance" "this" {
 }
 
 resource "aws_db_instance_automated_backups_replication" "this" {
-  #checkov:skip=CKV_AWS_245:skip "Ensure replicated backups are encrypted at rest using KMS CMKs"
-  #CKV_AWS_245: enable in https://dsdmoj.atlassian.net/browse/DSOS-1867
-
   source_db_instance_arn = aws_db_instance.this.arn
   retention_period       = var.instance_automated_backups_replication
+  kms_key_id  = var.instance.kms_key_id != null ? var.instance.kms_key_id : null
 }
 
 #-------------------------------------------------------------
