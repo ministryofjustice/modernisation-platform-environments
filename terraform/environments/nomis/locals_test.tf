@@ -90,7 +90,7 @@ locals {
           "/dev/sdc" = { label = "app", size = 100 }
         })
         ebs_volume_config = merge(local.database_ec2_b.ebs_volume_config, {
-          data  = { total_size = 100 }
+          data  = { total_size = 500 }
           flash = { total_size = 50 }
         })
         cloudwatch_metric_alarms = {} # disabled until migration
