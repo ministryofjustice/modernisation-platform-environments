@@ -17,7 +17,7 @@ locals {
 module "lb" {
   for_each = var.lbs
 
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer.git?ref=v2.1.3"
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer.git?ref=add-optional-target-group"
 
   providers = {
     aws.bucket-replication = aws
@@ -29,6 +29,8 @@ module "lb" {
   force_destroy_bucket       = each.value.force_destroy_bucket
   idle_timeout               = each.value.idle_timeout
   internal_lb                = each.value.internal_lb
+  load_balancer_type         = each.value.load_balancer_type
+  lb_target_groups           = each.value.lb_target_groups
 
   security_groups = [
     for sg in each.value.security_groups : lookup(aws_security_group.this, sg, null) != null ? aws_security_group.this[sg].id : sg
