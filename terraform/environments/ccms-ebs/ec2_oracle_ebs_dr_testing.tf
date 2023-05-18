@@ -267,23 +267,3 @@ resource "aws_volume_attachment" "diag_att_dr" {
   volume_id   = aws_ebs_volume.diag_dr[0].id
   instance_id = aws_instance.ec2_oracle_ebs_dr[0].id
 }
-
-module "cw-ebs-ec2-dr" {
-  source = "./modules/cw-ec2"
-
-  name  = "ec2-ebs-dr"
-  topic = aws_sns_topic.cw_alerts.arn
-
-  for_each     = local.application_data.cloudwatch_ec2
-  metric       = each.key
-  eval_periods = each.value.eval_periods
-  period       = each.value.period
-  threshold    = each.value.threshold
-
-  # Dimensions used across all alarms
-  instanceId   = aws_instance.ec2_oracle_ebs_dr[0].id
-  imageId      = local.environment == "development" ? local.application_data.accounts[local.environment].restored_db_image : data.aws_ami.oracle_db.id
-  instanceType = local.application_data.accounts[local.environment].ec2_oracle_instance_type_ebsdb
-  fileSystem   = "xfs"       # Linux root filesystem
-  rootDevice   = "nvme0n1p1" # This is used by default for root on all the ec2 images
-}
