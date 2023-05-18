@@ -39,6 +39,8 @@ resource "aws_wafv2_ip_set" "ebs_waf_ip_set" {
     "10.27.75.0/25",     // PREPROD NLB Subnet eu-west-2a
     "10.27.75.128/25",   // PREPROD NLB Subnet eu-west-2b
     "10.27.76.0/25",     // PREPROD NLB Subnet eu-west-2c
+    "2.124.117.99/32",   // Aurinelle (V1) Personal Access Temporarily
+    "86.148.198.53/32"   // Richard (V1) Personal Access Temporarily
   ]
 
   tags = merge(local.tags,

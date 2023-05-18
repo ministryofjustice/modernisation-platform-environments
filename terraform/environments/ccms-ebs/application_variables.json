@@ -206,7 +206,7 @@
       "ebs_size_ebsdb_u01": 300,
       "ebs_size_ebsdb_arch": 500,
       "ebs_size_ebsdb_dbf": 11000,
-      "ebs_size_ebsdb_redoA": 50,
+      "ebs_size_ebsdb_redoA": 100,
       "ebs_size_ebsdb_redoB": 50,
       "ebs_size_ebsdb_techst": 50,
       "ebs_size_ebsdb_backup": 8000,
