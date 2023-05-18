@@ -1,11 +1,10 @@
 # Temporary tf resource to speed up migration
 # to be deleted once prod migration is completed
 resource "aws_db_snapshot_copy" "local" {
-  count = local.application_data.accounts[local.environment].db_migration_snapshot_arn == "" ? 0 : 1
-
-  source_db_snapshot_identifier = local.application_data.accounts[local.environment].db_migration_snapshot_arn
-  kms_key_id                    = local.application_data.accounts[local.environment].db_migration_snapshot_kms_key_arn
-  target_db_snapshot_identifier = "local-migration-snapshot-copy"
+  for_each                      = var.rds_refresh_snapshot_id != "" ? [var.rds_refresh_snapshot_id] : []
+  source_db_snapshot_identifier = each.value
+  kms_key_id                    = data.aws_kms_key.rds_shared.id
+  target_db_snapshot_identifier = "data-refresh-snapshot"
 }
 
 resource "aws_db_instance" "iaps" {
