@@ -60,6 +60,7 @@ module "alb" {
   listener_port     = 443
   alb_ssl_policy    = "ELBSecurityPolicy-TLS-1-2-2017-01" # TODO This enforces TLSv1.2. For general, use ELBSecurityPolicy-2016-08 instead 
 
+  production_zone_id   = data.aws_route53_zone.production-network-services.zone_id
   services_zone_id     = data.aws_route53_zone.network-services.zone_id
   external_zone_id     = data.aws_route53_zone.external.zone_id
   acm_cert_domain_name = local.application_data.accounts[local.environment].acm_cert_domain_name
