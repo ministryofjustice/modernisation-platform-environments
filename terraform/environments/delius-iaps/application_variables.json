@@ -32,7 +32,7 @@
       "db_backup_window": "03:00-06:00",
       "db_backup_retention_period": "14",
       "db_maintenance_window": "mon:00:00-mon:03:00",
-      "db_instance_class": "db.t3.large",
+      "db_instance_class": "db.t3.small",
       "db_user": "iaps",
       "db_allocated_storage": "500",
       "db_max_allocated_storage": "0",
