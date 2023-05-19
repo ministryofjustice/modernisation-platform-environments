@@ -1,5 +1,5 @@
 resource "aws_iam_role" "ci_data_refresher" {
-  count              = local.environment == "production" ? 1 : 0
+  count              = local.is-production ? 1 : 0
   name               = "ci-data-refresher"
   assume_role_policy = data.aws_iam_policy_document.ci_assume_role.json
   tags               = local.tags
