@@ -115,11 +115,11 @@ EOF
 }
 
 resource "aws_ebs_volume" "stage" {
-  count = local.is-production ? 1 : 0
+  count = local.is-production ? local.application_data.accounts[local.environment].ebsapps_no_instances : 0
   lifecycle {
     ignore_changes = [kms_key_id]
   }
-  availability_zone = "eu-west-2a"
+  availability_zone = aws_instance.ec2_ebsapps[count.index].availability_zone
   size              = local.application_data.accounts[local.environment].ebsapps_stage_size
   type              = "io2"
   iops              = 3000
@@ -130,13 +130,13 @@ resource "aws_ebs_volume" "stage" {
   )
 }
 resource "aws_volume_attachment" "stage_att" {
-  count = local.is-production ? 1 : 0
+  count = local.is-production ? local.application_data.accounts[local.environment].ebsapps_no_instances : 0
   depends_on = [
     aws_ebs_volume.stage
   ]
   device_name = "/dev/sdk"
-  volume_id   = aws_ebs_volume.stage[0].id
-  instance_id = aws_instance.ec2_oracle_ebs.id
+  volume_id   = aws_ebs_volume.stage[count.index].id
+  instance_id = aws_instance.ec2_ebsapps[count.index].id
 }
 
 module "cw-ebsapps-ec2" {
