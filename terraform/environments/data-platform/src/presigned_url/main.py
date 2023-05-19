@@ -12,10 +12,18 @@ s3 = boto3.client("s3")
 
 def handler(event, context):
     bucket_name = os.environ["BUCKET_NAME"]
-    data_product = event["queryStringParameters"]["data-product"]
+    database = event["queryStringParameters"]["database"]
+    table = event["queryStringParameters"]["table"]
     amz_date = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
     md5 = str(event["queryStringParameters"]["Content-MD5"])
-    file_name = uuid.uuid4()
+    uuid_string = str(uuid.uuid4())
+    file_name = os.path.join(
+        "curated_data",
+        f"database_name={database}",
+        f"table_name={table}",
+        f"extraction_timestamp={amz_date}",
+        uuid_string,
+    )
     fields = {
         "x-amz-server-side-encryption": "AES256",
         "x-amz-acl": "bucket-owner-full-control",
@@ -31,8 +39,8 @@ def handler(event, context):
         {"Content-MD5": md5},
         ["starts-with", "$Content-MD5", ""],
         ["starts-with", "$Content-Type", ""],
-        ["starts-with", "$key", f"{data_product}/"],
-        ["content-length-range", 0, 5e9],
+        ["starts-with", "$key", file_name],
+        ["content-length-range", 0, 5000000000],
     ]
 
     root_logger.info(f"s3 key: {file_name}")
