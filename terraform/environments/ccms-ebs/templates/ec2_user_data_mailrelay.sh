@@ -8,10 +8,10 @@ hostnamectl set-hostname mailrelay
 H=$(ec2-metadata --local-ipv4 |cut -d' ' -f2)
 echo "127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
 ::1         localhost localhost.localdomain localhost6 localhost6.localdomain6" > $${EHOSTS}.new
-echo "$${H} ${hostname} ${hostname}.${smtp_fqdn}" >> $${EHOSTS}.new
+echo "$${H} ${hostname} ${hostname}.${mp_fqdn}" ${hostname}.${smtp_fqdn}" >> $${EHOSTS}.new
 mv $${EHOSTS}.new $${EHOSTS}
 
-sed -i "s/^search .*/search ${smtp_fqdn}/" $${ERCONF}
+sed -i "s/^search .*/search ${mp_fqdn} ${smtp_fqdn}/" $${ERCONF}
 
 yum install -y amazon-cloudwatch-agent cyrus-sasl-plain jq nc postfix telnet
 
