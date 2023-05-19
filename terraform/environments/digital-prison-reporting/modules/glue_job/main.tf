@@ -35,7 +35,6 @@ resource "aws_glue_job" "glue_job" {
   security_configuration = var.create_security_configuration ? join("", aws_glue_security_configuration.sec_cfg.*.id) : var.security_configuration
   worker_type            = var.worker_type
   number_of_workers      = var.number_of_workers
-  timeout                = var.timeout
   execution_class        = var.execution_class
   tags                   = local.tags
 
