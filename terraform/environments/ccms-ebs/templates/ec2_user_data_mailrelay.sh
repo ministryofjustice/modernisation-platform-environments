@@ -5,7 +5,7 @@ ERCONF=/etc/resolv.conf
 
 hostnamectl set-hostname mailrelay
 
-yum install -y amazon-cloudwatch-agent cyrus-sasl-plain curl jq nc postfix telnet
+yum install -y amazon-cloudwatch-agent cyrus-sasl-plain jq nc postfix telnet
 amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c ssm:cloud-watch-config
 
 H=$(ec2-metadata --local-ipv4 |cut -d' ' -f2)
