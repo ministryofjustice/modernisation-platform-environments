@@ -19,6 +19,7 @@ on:
   workflow_dispatch:
     inputs:
       action:
+        description: 'Set either [deploy|destroy-dev].'
         default: 'deploy'
         required: true
         type: string
