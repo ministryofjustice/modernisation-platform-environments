@@ -306,6 +306,7 @@ variable "rds_instances" {
       create                              = optional(bool, true)
       db_name                             = optional(string)
       db_subnet_group_name                = optional(string)
+      deletion_protection                 = optional(bool, true)
       enabled_cloudwatch_logs_exports     = optional(list(string))
       engine                              = string
       engine_version                      = optional(string)
@@ -314,7 +315,7 @@ variable "rds_instances" {
       identifier                          = string
       instance_class                      = string
       iops                                = optional(number, 0)
-      kms_key_id                          = optional(string)
+      kms_key_id                          = string
       license_model                       = optional(string)
       maintenance_window                  = optional(string)
       max_allocated_storage               = optional(number)
