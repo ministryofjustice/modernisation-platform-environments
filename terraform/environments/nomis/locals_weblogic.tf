@@ -133,6 +133,7 @@ locals {
     # Note: use any avaiability zone since DB latency does not appear to be an issue
     config = merge(module.baseline_presets.ec2_instance.config.default, {
       ami_name                  = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-03-15T17-18-22.178Z"
+      availability_zone         = null
       ssm_parameters_prefix     = "weblogic/"
       iam_resource_names_prefix = "ec2-weblogic"
     })
