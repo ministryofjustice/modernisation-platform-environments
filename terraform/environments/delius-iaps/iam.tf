@@ -52,12 +52,14 @@ data "aws_iam_policy_document" "snapshot_sharer" {
 }
 
 resource "aws_iam_policy" "snapshot_sharer" {
+  count = local.is-production ? 1 : 0
   name        = "snapshot_sharer"
   description = "Allows sharing of RDS snapshots"
   policy      = data.aws_iam_policy_document.snapshot_sharer.json
 }
 
 resource "aws_iam_role_policy_attachment" "ci_data_refresher" {
-  policy_arn = aws_iam_policy.snapshot_sharer.arn
-  role       = aws_iam_role.ci_data_refresher.name
+  count      = local.is-production ? 1 : 0
+  policy_arn = aws_iam_policy.snapshot_sharer.*.arn
+  role       = aws_iam_role.ci_data_refresher.*.name
 }
