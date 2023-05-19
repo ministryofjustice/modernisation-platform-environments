@@ -130,6 +130,7 @@ locals {
 
     cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso_pagerduty"].weblogic
 
+    # Note: use any avaiability zone since DB latency does not appear to be an issue
     config = merge(module.baseline_presets.ec2_instance.config.default, {
       ami_name                  = "nomis_rhel_6_10_weblogic_appserver_10_3_release_2023-03-15T17-18-22.178Z"
       ssm_parameters_prefix     = "weblogic/"
@@ -166,16 +167,15 @@ locals {
   # blue deployment
   weblogic_ec2_a = merge(local.weblogic_ec2_default, {
     config = merge(local.weblogic_ec2_default.config, {
-      availability_zone = "${local.region}a"
     })
     user_data_cloud_init = merge(local.weblogic_ec2_default.user_data_cloud_init, {
       args = merge(local.weblogic_ec2_default.user_data_cloud_init.args, {
-        branch = "nomis/DSOS-1820/weblogic-init-script-improvements"
+        branch = "1e1aa98bfcb55bff5c3b0f595fca3e40efd6081c"
       })
     })
-    # autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default_with_ready_hook, {
-    autoscaling_group = merge(local.weblogic_ec2_default.autoscaling_group, {
-      desired_capacity = 1
+    # autoscaling_group = merge(local.weblogic_ec2_default.autoscaling_group, {
+    autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default_with_ready_hook, {
+      desired_capacity = 0
     })
     cloudwatch_metric_alarms = {}
     tags = merge(local.weblogic_ec2_default.tags, {
