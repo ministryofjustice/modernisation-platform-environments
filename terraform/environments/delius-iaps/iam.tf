@@ -60,6 +60,6 @@ resource "aws_iam_policy" "snapshot_sharer" {
 
 resource "aws_iam_role_policy_attachment" "ci_data_refresher" {
   count      = local.is-production ? 1 : 0
-  policy_arn = aws_iam_policy.snapshot_sharer.*.arn
-  role       = aws_iam_role.ci_data_refresher.*.name
+  policy_arn = aws_iam_policy.snapshot_sharer[0].arn
+  role       = aws_iam_role.ci_data_refresher[0].name
 }
