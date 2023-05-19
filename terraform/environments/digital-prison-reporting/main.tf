@@ -74,7 +74,7 @@ module "glue_domain_refresh_job" {
   project_id                    = local.project
   aws_kms_key                   = local.s3_kms_arn
   additional_policies           = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_admin_arn
-  timeout                       = 1440
+  # timeout                       = 1440
   execution_class               = "FLEX"
   worker_type                   = "G.1X"
   number_of_workers             = 2

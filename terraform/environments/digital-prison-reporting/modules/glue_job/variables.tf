@@ -155,11 +155,11 @@ variable "create_role" {
   description = "(Optional) Create AWS IAM role associated with the job."
 }
 
-variable "timeout" {
-  type        = number
-  default     = null
-  description = "(Optional) The job timeout in minutes."
-}
+#variable "timeout" {
+#  type        = number
+#  default     = null
+#  description = "(Optional) The job timeout in minutes."
+#}
 
 variable "execution_class" {
   default     = "STANDARD"
