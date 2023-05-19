@@ -137,7 +137,8 @@ resource "aws_route53_zone" "this" {
   #CKV2_AWS_38: enable in https://dsdmoj.atlassian.net/browse/DSOS-1495
   #CKV2_AWS_39: enable in https://dsdmoj.atlassian.net/browse/DSOS-1866
 
-  name = each.key
+  name          = each.key
+  force_destroy = true
 
   dynamic "vpc" {
     for_each = try(each.value.vpc, false) ? [each.value.vpc] : []
@@ -150,6 +151,27 @@ resource "aws_route53_zone" "this" {
   tags = merge(local.tags, {
     Name = each.key
   })
+}
+
+resource "aws_cloudwatch_log_group" "route53" {
+  for_each = local.route53_zones_to_create
+
+  name              = "route53/${each.key}"
+  kms_key_id        = var.environment.kms_keys["general"].arn
+  retention_in_days = 30
+
+  tags = merge(local.tags, {
+    Name = "route53/${each.key}"
+  })
+}
+
+resource "aws_route53_query_log" "this" {
+  for_each = local.route53_zones_to_create
+
+  cloudwatch_log_group_arn = aws_cloudwatch_log_group.route53[each.key].arn
+  zone_id                  = aws_route53_zone.this[each.key].zone_id
+
+  depends_on = [aws_iam_policy.this]
 }
 
 resource "aws_route53_record" "self" {
