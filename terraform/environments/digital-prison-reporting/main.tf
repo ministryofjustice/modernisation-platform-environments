@@ -2,60 +2,6 @@
 # Glue Jobs, Reusable Module: /modules/glue_job
 ###############################################
 
-## Glue Job, Reporting Hub
-## Glue Cloud Platform Ingestion Job (Load, Reload, CDC)
-module "glue_reporting_hub_job" {
-  source                        = "./modules/glue_job"
-  create_job                    = local.create_job
-  name                          = "${local.project}-reporting-hub-${local.env}"
-  description                   = local.description
-  command_type                  = "gluestreaming"
-  job_language                  = "scala"
-  create_security_configuration = local.create_sec_conf
-  temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-reporting-hub-${local.env}/"
-  checkpoint_dir                = "s3://${module.s3_glue_job_bucket.bucket_id}/checkpoint/${local.project}-reporting-hub-${local.env}/"
-  spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-reporting-hub-${local.env}/"
-  # Placeholder Script Location
-  script_location               = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/scripts/digital-prison-reporting-jobs-vLatest.scala"
-  enable_continuous_log_filter  = false
-  project_id                    = local.project
-  aws_kms_key                   = local.s3_kms_arn
-  additional_policies           = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_admin_arn
-  execution_class               = "STANDARD"
-  worker_type                   = "G.1X"
-  number_of_workers             = 2
-  max_concurrent                = 1
-  region                        = local.account_region
-  account                       = local.account_id
-
-  tags = merge(
-    local.all_tags,
-    {
-      Name          = "${local.project}-reporting-hub-${local.env}"
-      Resource_Type = "Glue Job"
-      Jira          = "DPR-265"
-    }
-  )
-
-  arguments = {
-    "--extra-jars"                              = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/jars/digital-prison-reporting-jobs-vLatest-all.jar"
-    "--job-bookmark-option"                     = "job-bookmark-disable"
-    "--class"                                   = "uk.gov.justice.digital.job.DataHubJob"
-    "--dpr.aws.kinesis.endpointUrl"             = "https://kinesis.${local.account_region}.amazonaws.com"
-    "--dpr.aws.region"                          = local.account_region
-    "--dpr.curated.s3.path"                     = "s3://${module.s3_curated_bucket.bucket_id}/"
-    "--dpr.kinesis.reader.batchDurationSeconds" = 1
-    "--dpr.kinesis.reader.streamName"           = local.kinesis_stream_ingestor
-    "--dpr.raw.s3.path"                         = "s3://${module.s3_raw_bucket.bucket_id}/"
-    "--dpr.structured.s3.path"                  = "s3://${module.s3_structured_bucket.bucket_id}/"
-    "--dpr.violations.s3.path"                  = "s3://${module.s3_violation_bucket.bucket_id}/"
-    "--enable-metrics"                          = true
-    "--enable-spark-ui"                         = false
-    "--enable-job-insights"                     = true
-    "--dpr.aws.kinesis.endpointUrl"             = "https://kinesis.${local.account_region}.amazonaws.com"
-  }
-}
-
 # Glue Job, Domain Refresh
 module "glue_domain_refresh_job" {
   source                        = "./modules/glue_job"
