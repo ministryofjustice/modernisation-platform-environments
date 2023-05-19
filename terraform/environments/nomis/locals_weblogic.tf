@@ -171,7 +171,7 @@ locals {
     })
     user_data_cloud_init = merge(local.weblogic_ec2_default.user_data_cloud_init, {
       args = merge(local.weblogic_ec2_default.user_data_cloud_init.args, {
-        branch = "1e1aa98bfcb55bff5c3b0f595fca3e40efd6081c"
+        branch = "nomis/DSOS-1820/weblogic-init-tweak-v2"
       })
     })
     # autoscaling_group = merge(local.weblogic_ec2_default.autoscaling_group, {
