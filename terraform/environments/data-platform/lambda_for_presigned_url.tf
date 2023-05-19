@@ -12,10 +12,10 @@ resource "aws_iam_role" "presigned_url_lambda_role" {
 
 data "aws_iam_policy_document" "iam_policy_document_for_presigned_url_lambda" {
   statement {
-    sid       = "GetDataObject"
+    sid       = "GetPutDataObject"
     effect    = "Allow"
-    actions   = ["s3:GetObject"]
-    resources = ["${module.s3-bucket.bucket.arn}/data/*"]
+    actions   = ["s3:GetObject", "s3:PutObject"]
+    resources = ["${module.s3-bucket.bucket.arn}/curated_data/*"]
   }
 }
 
