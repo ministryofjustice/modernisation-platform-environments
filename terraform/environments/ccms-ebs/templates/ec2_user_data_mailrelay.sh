@@ -5,9 +5,6 @@ ERCONF=/etc/resolv.conf
 
 hostnamectl set-hostname mailrelay
 
-yum install -y amazon-cloudwatch-agent cyrus-sasl-plain jq nc postfix telnet
-amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c ssm:cloud-watch-config
-
 H=$(ec2-metadata --local-ipv4 |cut -d' ' -f2)
 echo "127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
 ::1         localhost localhost.localdomain localhost6 localhost6.localdomain6" > $${EHOSTS}.new
@@ -15,6 +12,8 @@ echo "$${H} ${hostname} ${hostname}.${smtp_fqdn}" >> $${EHOSTS}.new
 mv $${EHOSTS}.new $${EHOSTS}
 
 sed -i "s/^search .*/search ${smtp_fqdn}/" $${ERCONF}
+
+yum install -y amazon-cloudwatch-agent cyrus-sasl-plain jq nc postfix telnet
 
 S=$(aws secretsmanager get-secret-value --secret-id ses-smtp-credentials --region eu-west-2 |jq '.SecretString')
 U=$(cut -d'"' -f 3 <<< $${S} |tr -d \\134)
@@ -37,3 +36,5 @@ postconf -e \
 
 systemctl enable postfix
 systemctl restart postfix
+
+amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c ssm:cloud-watch-config
