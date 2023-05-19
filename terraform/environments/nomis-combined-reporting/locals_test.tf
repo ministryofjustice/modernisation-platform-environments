@@ -73,6 +73,7 @@ locals {
     #       engine            = "mysql"
     #       instance_class    = "db.t3.micro"
     #       username          = "example"
+    #       kms_key_id        = module.environment.kms_keys["rds"].arn
     #     }
     #   }
     # }

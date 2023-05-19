@@ -1,3 +1,4 @@
+
 locals {
 
   loadbalancer_ingress_rules = {
@@ -301,7 +302,7 @@ resource "random_password" "cloudfront" {
 }
 
 resource "aws_secretsmanager_secret" "cloudfront" {
-  name        = "cloudfront-v1-secret-${var.application_name}"
+  name        = "cloudfront-v1-secret-${var.application_name}-${formatdate("DDMMMYYYYhhmm", timestamp())}"
   description = "Simple secret created by AWS CloudFormation to be shared between ALB and CloudFront"
 }
 
@@ -525,6 +526,14 @@ resource "aws_waf_web_acl" "waf_acl" {
 # TODO Do we need an S3 bucket for store WAF logs? There is currently no logging_configuration.
 
 ## ALB Listener
+
+
+# TODO This resource is required because otherwise Error: failed to read schema for module.alb.null_resource.always_run in registry.terraform.io/hashicorp/null: failed to instantiate provider
+# When the whole stack is recreated this can be removed
+resource "null_resource" "always_run" {
+}
+
+
 
 resource "aws_lb_listener" "alb_listener" {
 
@@ -790,9 +799,23 @@ resource "aws_route53_record" "cloudfront_validation_core_vpc" {
   ]
 }
 
-resource "aws_route53_record" "cloudfront" {
+resource "aws_route53_record" "cloudfront-non-prod" {
+  count = var.environment != "production" ? 1 : 0
   provider = aws.core-vpc
   zone_id  = var.external_zone_id
+  name     = var.fqdn
+  type     = "A"
+  alias {
+    name                   = aws_cloudfront_distribution.external.domain_name
+    zone_id                = aws_cloudfront_distribution.external.hosted_zone_id
+    evaluate_target_health = true
+  }
+}
+
+resource "aws_route53_record" "cloudfront-prod" {
+  count = var.environment == "production" ? 1 : 0
+  provider = aws.core-network-services
+  zone_id  = var.production_zone_id
   name     = var.fqdn
   type     = "A"
   alias {

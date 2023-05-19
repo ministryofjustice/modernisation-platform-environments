@@ -114,6 +114,30 @@ EOF
 
 }
 
+resource "aws_ebs_volume" "stage" {
+  count = local.is-production ? local.application_data.accounts[local.environment].ebsapps_no_instances : 0
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
+  availability_zone = aws_instance.ec2_ebsapps[count.index].availability_zone
+  size              = local.application_data.accounts[local.environment].ebsapps_stage_size
+  type              = "io2"
+  iops              = 3000
+  encrypted         = true
+  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  tags = merge(local.tags,
+    { Name = "stage" }
+  )
+}
+resource "aws_volume_attachment" "stage_att" {
+  count = local.is-production ? local.application_data.accounts[local.environment].ebsapps_no_instances : 0
+  depends_on = [
+    aws_ebs_volume.stage
+  ]
+  device_name = "/dev/sdk"
+  volume_id   = aws_ebs_volume.stage[count.index].id
+  instance_id = aws_instance.ec2_ebsapps[count.index].id
+}
 
 module "cw-ebsapps-ec2" {
   source = "./modules/cw-ec2"
