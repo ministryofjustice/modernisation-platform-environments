@@ -29,23 +29,23 @@ data "aws_iam_policy_document" "ci_assume_role" {
 
 data "aws_iam_policy_document" "snapshot_sharer" {
   statement {
-    Sid    = "ListSnapshots"
-    Effect = "Allow"
-    Action = [
+    sid    = "ListSnapshots"
+    effect = "Allow"
+    actions = [
       "rds:DescribeDBSnapshots"
     ]
-    Resource = [
+    resources = [
       aws_db_instance.iaps.arn
     ]
   }
 
   statement {
-    Sid    = "ShareSnapshots"
-    Effect = "Allow"
-    Action = [
+    sid    = "ShareSnapshots"
+    effect = "Allow"
+    actions = [
       "rds:ModifyDBSnapshotAttribute"
     ]
-    Resource = [
+    resources = [
       "arn:aws:rds:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:snapshot:rds:${aws_db_instance.iaps.id}-*"
     ]
   }
