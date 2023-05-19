@@ -212,3 +212,8 @@ variable "external_validation_records_created" {
   default     = false
 }
 
+variable "production_zone_id" {
+  description = "Only used for the Route53 A record in production"
+  type        = string
+}
+
