@@ -157,6 +157,7 @@ variable "create_role" {
 
 variable "timeout" {
   type        = number
+  timeout     = null
   description = "(Optional) The job timeout in minutes."
 }
 
