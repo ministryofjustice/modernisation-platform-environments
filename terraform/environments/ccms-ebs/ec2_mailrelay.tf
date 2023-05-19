@@ -17,8 +17,8 @@ resource "aws_instance" "ec2_mailrelay" {
   }
 
   user_data_replace_on_change = true
-  user_data                   = base64encode(templatefile("./templates/ec2_user_data_mailrelay.sh", {
-    smtp_fqdn = local.application_data.accounts[local.environment].ses_domain_identity
+  user_data = base64encode(templatefile("./templates/ec2_user_data_mailrelay.sh", {
+    smtp_fqdn = "${local.application_data.accounts[local.environment].ses_domain_identity}"
   }))
 
   metadata_options {
