@@ -63,6 +63,7 @@ module "lb_listener" {
   certificate_names_or_arns = each.value.certificate_names_or_arns
   default_action            = each.value.default_action
   rules                     = each.value.rules
+  alarm_target_group_names  = each.value.alarm_target_group_names
 
   cloudwatch_metric_alarms = {
     for key, value in each.value.cloudwatch_metric_alarms : key => merge(value, {
@@ -72,11 +73,8 @@ module "lb_listener" {
     })
   }
 
-  tags = merge(local.tags, each.value.tags)
-
   depends_on = [
     module.acm_certificate, # ensure certs are created first
   ]
-
-  alarm_target_group_names = each.value.alarm_target_group_names
+  tags = merge(local.tags, each.value.tags)
 }
