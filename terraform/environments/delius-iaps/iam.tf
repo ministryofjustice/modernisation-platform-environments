@@ -1,5 +1,5 @@
 resource "aws_iam_role" "ci_data_refresher" {
-  count = local.environment == "production" ? 1 : 0
+  count              = local.environment == "production" ? 1 : 0
   name               = "ci-data-refresher"
   assume_role_policy = data.aws_iam_policy_document.ci_assume_role.json
   tags               = local.tags
@@ -25,4 +25,39 @@ data "aws_iam_policy_document" "ci_assume_role" {
       variable = "token.actions.githubusercontent.com:sub"
     }
   }
+}
+
+data "aws_iam_policy_document" "snapshot_sharer" {
+  statement {
+    Sid    = "ListSnapshots"
+    Effect = "Allow"
+    Action = [
+      "rds:DescribeDBSnapshots"
+    ]
+    Resource = [
+      aws_db_instance.iaps.arn
+    ]
+  }
+
+  statement {
+    Sid    = "ShareSnapshots"
+    Effect = "Allow"
+    Action = [
+      "rds:ModifyDBSnapshotAttribute"
+    ]
+    Resource = [
+      "arn:aws:rds:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:snapshot:rds:${aws_db_instance.iaps.id}-*"
+    ]
+  }
+}
+
+resource "aws_iam_policy" "snapshot_sharer" {
+  name        = "snapshot_sharer"
+  description = "Allows sharing of RDS snapshots"
+  policy      = data.aws_iam_policy_document.snapshot_sharer.json
+}
+
+resource "aws_iam_role_policy_attachment" "ci_data_refresher" {
+  policy_arn = aws_iam_policy.snapshot_sharer.arn
+  role       = aws_iam_role.ci_data_refresher.name
 }
