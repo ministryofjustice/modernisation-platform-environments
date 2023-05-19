@@ -8,7 +8,7 @@ hostnamectl set-hostname mailrelay
 yum install -y amazon-cloudwatch-agent cyrus-sasl-plain curl jq nc postfix telnet
 amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c ssm:cloud-watch-config
 
-H=$(curl -s 'http://169.254.169.254/latest/meta-data/local-ipv4')
+H=$(ec2-metadata --local-ipv4 |cut -d' ' -f2)
 echo "127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
 ::1         localhost localhost.localdomain localhost6 localhost6.localdomain6" > $${EHOSTS}.new
 echo "$${H} ${hostname} ${hostname}.${smtp_fqdn}" >> $${EHOSTS}.new
