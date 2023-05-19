@@ -27,6 +27,10 @@ data "aws_iam_policy_document" "ci_assume_role" {
   }
 }
 
+locals {
+  iaps_rds_snapshot_arn_prefix = "arn:aws:rds:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:snapshot:rds:${aws_db_instance.iaps.id}-*"
+}
+
 data "aws_iam_policy_document" "snapshot_sharer" {
   statement {
     sid    = "ListSnapshots"
@@ -35,6 +39,7 @@ data "aws_iam_policy_document" "snapshot_sharer" {
       "rds:DescribeDBSnapshots"
     ]
     resources = [
+      local.iaps_rds_snapshot_arn_prefix,
       aws_db_instance.iaps.arn
     ]
   }
@@ -46,13 +51,13 @@ data "aws_iam_policy_document" "snapshot_sharer" {
       "rds:ModifyDBSnapshotAttribute"
     ]
     resources = [
-      "arn:aws:rds:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:snapshot:rds:${aws_db_instance.iaps.id}-*"
+      local.iaps_rds_snapshot_arn_prefix
     ]
   }
 }
 
 resource "aws_iam_policy" "snapshot_sharer" {
-  count = local.is-production ? 1 : 0
+  count       = local.is-production ? 1 : 0
   name        = "snapshot_sharer"
   description = "Allows sharing of RDS snapshots"
   policy      = data.aws_iam_policy_document.snapshot_sharer.json
