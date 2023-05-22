@@ -27,7 +27,7 @@ locals {
       # blue deployment
       t1-nomis-web-a = merge(local.weblogic_ec2_a, {
         autoscaling_group = merge(local.weblogic_ec2_a.autoscaling_group, {
-          desired_capacity = 0
+          desired_capacity = 1
         })
         tags = merge(local.weblogic_ec2_a.tags, {
           nomis-environment    = "t1"
@@ -62,7 +62,7 @@ locals {
           "/dev/sda1" = { type = "gp3", size = 100 }
         }
         autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
-          desired_capacity = 0 # set to 0 while testing
+          desired_capacity = 1 # set to 0 while testing
         })
         autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
         tags = {
@@ -90,7 +90,7 @@ locals {
           "/dev/sdc" = { label = "app", size = 100 }
         })
         ebs_volume_config = merge(local.database_ec2_b.ebs_volume_config, {
-          data  = { total_size = 100 }
+          data  = { total_size = 500 }
           flash = { total_size = 50 }
         })
         cloudwatch_metric_alarms = {} # disabled until migration
@@ -241,11 +241,11 @@ locals {
         records = [
           { name = "t1nomis", type = "A", ttl = "300", records = ["10.101.3.132"] },
           { name = "t1nomis-a", type = "A", ttl = "300", records = ["10.101.3.132"] },
-          { name = "t1nomis-b", type = "A", ttl = "300", records = ["10.101.3.132"] },
+          { name = "t1nomis-b", type = "CNAME", ttl = "300", records = ["t1-nomis-db-1-b.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
           { name = "t1-nomis-db-1-b", type = "CNAME", ttl = "3600", records = ["t1-nomis-db-1-b.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
           { name = "t1ndh", type = "A", ttl = "300", records = ["10.101.3.132"] },
           { name = "t1ndh-a", type = "A", ttl = "300", records = ["10.101.3.132"] },
-          { name = "t1ndh-b", type = "A", ttl = "300", records = ["10.101.3.132"] },
+          { name = "t1ndh-b", type = "CNAME", ttl = "300", records = ["t1-nomis-db-1-b.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
           { name = "t1or", type = "A", ttl = "300", records = ["10.101.3.132"] },
           { name = "t1or-a", type = "A", ttl = "300", records = ["10.101.3.132"] },
           { name = "t1or-b", type = "A", ttl = "300", records = ["10.101.3.132"] },
