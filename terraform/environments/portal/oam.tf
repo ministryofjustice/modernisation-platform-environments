@@ -12,7 +12,7 @@ locals {
 # echo "UUID=50a9826b-3a50-44d0-ad12-28f2056e9927 /                       xfs     defaults        0 0
 # /swapfile1   none    swap    sw    0   0" > /etc/fstab
 
-echo "/dev/xvdb /IDAM/product/fmw ext4 defaults 0 0" >> /etc/fstab
+# echo "/dev/xvdb /IDAM/product/fmw ext4 defaults 0 0" >> /etc/fstab
 # echo "/dev/xvdc /IDAM/product/runtime/Domain/aserver ext4 defaults 0 0" >> /etc/fstab
 # echo "/dev/xvdd /IDAM/product/runtime/Domain/config ext4 defaults 0 0" >> /etc/fstab
 # echo "/dev/xvde /IDAM/product/runtime/Domain/mserver ext4 defaults 0 0" >> /etc/fstab
