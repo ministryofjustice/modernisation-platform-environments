@@ -90,7 +90,7 @@ locals {
     for domain, value in var.validation : domain => value if value.account == "self"
   }
 
-  route53_zones = merge( {
+  route53_zones = merge({
     for key, value in data.aws_route53_zone.core_network_services : key => merge(value, {
       provider = "core-network-services"
     })
@@ -657,10 +657,10 @@ resource "aws_athena_workgroup" "lb-access-logs" {
 
 resource "aws_acm_certificate" "external_lb" {
 
-  domain_name   = var.acm_cert_domain_name
-  validation_method = "DNS"
+  domain_name               = var.acm_cert_domain_name
+  validation_method         = "DNS"
   subject_alternative_names = var.environment == "production" ? null : ["${var.application_name}.${var.business_unit}-${var.environment}.${var.acm_cert_domain_name}"]
-  tags = var.tags
+  tags                      = var.tags
   # TODO Set prevent_destroy to true to stop Terraform destroying this resource in the future if required
   lifecycle {
     prevent_destroy = false
@@ -746,11 +746,11 @@ resource "aws_acm_certificate_validation" "external_lb_certificate_validation" {
 
 
 resource "aws_acm_certificate" "cloudfront" {
-  domain_name       =  var.acm_cert_domain_name
-  validation_method = "DNS"
-  provider          = aws.us-east-1
+  domain_name               = var.acm_cert_domain_name
+  validation_method         = "DNS"
+  provider                  = aws.us-east-1
   subject_alternative_names = var.environment == "production" ? null : ["${var.application_name}.${var.business_unit}-${var.environment}.${var.acm_cert_domain_name}"]
-  tags = var.tags
+  tags                      = var.tags
   # TODO Set prevent_destroy to true to stop Terraform destroying this resource in the future if required
   lifecycle {
     prevent_destroy = false
@@ -800,7 +800,7 @@ resource "aws_route53_record" "cloudfront_validation_core_vpc" {
 }
 
 resource "aws_route53_record" "cloudfront-non-prod" {
-  count = var.environment != "production" ? 1 : 0
+  count    = var.environment != "production" ? 1 : 0
   provider = aws.core-vpc
   zone_id  = var.external_zone_id
   name     = var.fqdn
@@ -813,7 +813,7 @@ resource "aws_route53_record" "cloudfront-non-prod" {
 }
 
 resource "aws_route53_record" "cloudfront-prod" {
-  count = var.environment == "production" ? 1 : 0
+  count    = var.environment == "production" ? 1 : 0
   provider = aws.core-network-services
   zone_id  = var.production_zone_id
   name     = var.fqdn

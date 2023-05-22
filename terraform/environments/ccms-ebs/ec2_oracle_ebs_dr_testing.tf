@@ -1,6 +1,6 @@
 #  Build EC2 
 resource "aws_instance" "ec2_oracle_ebs_dr" {
-  count     = local.environment == "development" ? 1 : 0
+  count = local.environment == "development" ? 1 : 0
 
   instance_type               = local.application_data.accounts[local.environment].ec2_oracle_instance_type_ebsdb
   ami                         = data.aws_ami.oracle_db.id
@@ -62,7 +62,7 @@ EOF
     http_endpoint = "enabled"
     http_tokens   = "required"
   }
- 
+
 
   tags = merge(local.tags,
     { Name = lower(format("ec2-%s-%s-ebsdb-dr-test", local.application_name, local.environment)) },
@@ -72,7 +72,7 @@ EOF
 }
 
 resource "aws_ebs_volume" "export_home_dr" {
-  count     = local.environment == "development" ? 1 : 0
+  count = local.environment == "development" ? 1 : 0
   lifecycle {
     ignore_changes = [kms_key_id]
   }
@@ -87,13 +87,13 @@ resource "aws_ebs_volume" "export_home_dr" {
   )
 }
 resource "aws_volume_attachment" "export_home_att_dr" {
-  count     = local.environment == "development" ? 1 : 0
+  count       = local.environment == "development" ? 1 : 0
   device_name = "/dev/sdh"
   volume_id   = aws_ebs_volume.export_home_dr[0].id
   instance_id = aws_instance.ec2_oracle_ebs_dr[0].id
 }
 resource "aws_ebs_volume" "u01_dr" {
-  count     = local.environment == "development" ? 1 : 0
+  count = local.environment == "development" ? 1 : 0
   lifecycle {
     ignore_changes = [kms_key_id]
   }
@@ -108,13 +108,13 @@ resource "aws_ebs_volume" "u01_dr" {
   )
 }
 resource "aws_volume_attachment" "u01_att_dr" {
-  count     = local.environment == "development" ? 1 : 0
+  count       = local.environment == "development" ? 1 : 0
   device_name = "/dev/sdi"
   volume_id   = aws_ebs_volume.u01_dr[0].id
   instance_id = aws_instance.ec2_oracle_ebs_dr[0].id
 }
 resource "aws_ebs_volume" "arch_dr" {
-  count     = local.environment == "development" ? 1 : 0
+  count = local.environment == "development" ? 1 : 0
   lifecycle {
     ignore_changes = [kms_key_id]
   }
@@ -129,13 +129,13 @@ resource "aws_ebs_volume" "arch_dr" {
   )
 }
 resource "aws_volume_attachment" "arch_att_dr" {
-  count     = local.environment == "development" ? 1 : 0
+  count       = local.environment == "development" ? 1 : 0
   device_name = "/dev/sdj"
   volume_id   = aws_ebs_volume.arch_dr[0].id
   instance_id = aws_instance.ec2_oracle_ebs_dr[0].id
 }
 resource "aws_ebs_volume" "dbf_dr" {
-  count     = local.environment == "development" ? 1 : 0
+  count = local.environment == "development" ? 1 : 0
   lifecycle {
     ignore_changes = [kms_key_id]
   }
@@ -150,13 +150,13 @@ resource "aws_ebs_volume" "dbf_dr" {
   )
 }
 resource "aws_volume_attachment" "dbf_att_dr" {
-  count     = local.environment == "development" ? 1 : 0
+  count       = local.environment == "development" ? 1 : 0
   device_name = "/dev/sdk"
   volume_id   = aws_ebs_volume.dbf_dr[0].id
   instance_id = aws_instance.ec2_oracle_ebs_dr[0].id
 }
 resource "aws_ebs_volume" "redoA_dr" {
-  count     = local.environment == "development" ? 1 : 0
+  count = local.environment == "development" ? 1 : 0
   lifecycle {
     ignore_changes = [kms_key_id]
   }
@@ -171,13 +171,13 @@ resource "aws_ebs_volume" "redoA_dr" {
   )
 }
 resource "aws_volume_attachment" "redoA_att_dr" {
-  count     = local.environment == "development" ? 1 : 0
+  count       = local.environment == "development" ? 1 : 0
   device_name = "/dev/sdl"
   volume_id   = aws_ebs_volume.redoA_dr[0].id
   instance_id = aws_instance.ec2_oracle_ebs_dr[0].id
 }
 resource "aws_ebs_volume" "techst_dr" {
-  count     = local.environment == "development" ? 1 : 0
+  count = local.environment == "development" ? 1 : 0
   lifecycle {
     ignore_changes = [kms_key_id]
   }
@@ -192,13 +192,13 @@ resource "aws_ebs_volume" "techst_dr" {
   )
 }
 resource "aws_volume_attachment" "techst_att_dr" {
-  count     = local.environment == "development" ? 1 : 0
+  count       = local.environment == "development" ? 1 : 0
   device_name = "/dev/sdm"
   volume_id   = aws_ebs_volume.techst_dr[0].id
   instance_id = aws_instance.ec2_oracle_ebs_dr[0].id
 }
 resource "aws_ebs_volume" "backup_dr" {
-  count     = local.environment == "development" ? 1 : 0
+  count = local.environment == "development" ? 1 : 0
   lifecycle {
     ignore_changes = [kms_key_id]
   }
@@ -213,7 +213,7 @@ resource "aws_ebs_volume" "backup_dr" {
   )
 }
 resource "aws_volume_attachment" "backup_att_dr" {
-  count     = local.environment == "development" ? 1 : 0
+  count       = local.environment == "development" ? 1 : 0
   device_name = "/dev/sdn"
   volume_id   = aws_ebs_volume.backup_dr[0].id
   instance_id = aws_instance.ec2_oracle_ebs_dr[0].id

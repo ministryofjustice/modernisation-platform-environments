@@ -1,6 +1,6 @@
 locals {
 
- # from the MP cert module's readme....
+  # from the MP cert module's readme....
 
   non_prod_validation = {
     "modernisation-platform.service.justice.gov.uk" = {
@@ -14,9 +14,9 @@ locals {
   }
 
   prod_validation = {
-  "${local.application_data.accounts[local.environment].acm_cert_domain_name}" = {
-    account   = "core-network-services"
-    zone_name = "${local.application_data.accounts[local.environment].acm_cert_domain_name}"
+    "${local.application_data.accounts[local.environment].acm_cert_domain_name}" = {
+      account   = "core-network-services"
+      zone_name = "${local.application_data.accounts[local.environment].acm_cert_domain_name}"
     }
   }
 
