@@ -43,7 +43,7 @@ resource "aws_lb_target_group_attachment" "ebs_vision_db_attachment" {
 
 #
 resource "aws_lb_target_group" "ebs_vision_db_tg_jdbc" {
-  name       = lower(format("tg-%s-%s", substr(local.application_name, 0, 23), substr(local.environment, 0, 3)))
+  name       = lower(format("tgd-%s-%s", substr(local.application_name, 0, 23), substr(local.environment, 0, 3)))
   port     = 1521
   protocol = "TCP"
   vpc_id   = data.aws_vpc.shared.id
