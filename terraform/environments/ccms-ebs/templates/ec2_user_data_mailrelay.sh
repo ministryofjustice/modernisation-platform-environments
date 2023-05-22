@@ -24,18 +24,19 @@ hostname_setup() {
 }
 
 postfix_setup() {
+    R=$(ec2-metadata --local-hostname |cut -d'.' -f2)
     S=$(aws secretsmanager get-secret-value --secret-id ses-smtp-credentials --region eu-west-2 |jq '.SecretString')
     U=$(cut -d'"' -f 3 <<< $${S} |tr -d \\134)
     P=$(cut -d'"' -f 5 <<< $${S} |tr -d \\134)
 
     if [[ $${#U} -eq 20 ]] && [[ $${#P} -eq 44 ]]; then
-        echo "Setting up credentials in /etc/postfix/sasl_passwd"
-        echo "[email-smtp.us-west-2.amazonaws.com]:587 $${U}:$${P}" > /etc/postfix/sasl_passwd
+        echo "${FUNCNAME[0]}: Setting up credentials in /etc/postfix/sasl_passwd"
+        echo "[email-smtp.$${R}.amazonaws.com]:587 $${U}:$${P}" > /etc/postfix/sasl_passwd
         postmap hash:/etc/postfix/sasl_passwd
         chmod 600 /etc/postfix/sasl_passwd /etc/postfix/sasl_passwd.db
         echo -e "\n# Configuration for SES:\n" >> /etc/postfix/main.cf
 
-        echo "Running postconf with additional options."
+        echo "${FUNCNAME[0]}: Running postconf with additional options."
         postconf -e \
             "myhostname = mailrelay.${smtp_fqdn}" \
             "relayhost = [email-smtp.us-west-2.amazonaws.com]:587" \
@@ -46,9 +47,9 @@ postfix_setup() {
             "smtp_tls_note_starttls_offer = yes" \
             "smtp_use_tls = yes"
 
-        echo "Enabling the Postfix service."
+        echo "${FUNCNAME[0]}: Enabling the Postfix service."
         systemctl enable postfix
-        echo "Starting the Postfix service."
+        echo "${FUNCNAME[0]}: Starting the Postfix service."
         systemctl restart postfix
     else
       echo "Error: incorrect length of credentials. Please investigate."
