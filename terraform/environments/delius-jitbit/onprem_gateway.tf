@@ -31,7 +31,7 @@ module "onprem_gateway" {
   iam_resource_names_prefix = ""
   instance_profile_policies = local.ec2_common_managed_policies
 
-  business_unit            = ${var.networking[0].business-unit}
+  business_unit            = var.networking[0].business-unit
   application_name         = local.application_name
   environment              = local.environment
   region                   = local.region
