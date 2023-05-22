@@ -100,7 +100,7 @@ data "aws_iam_policy_document" "glue-athena-access" {
       "athena:StartQueryExecution",
     ]
     resources = [
-       "arn:aws:athena:*:${data.aws_caller_identity.current.account_id}:workgroup/*"
+      "arn:aws:athena:*:${data.aws_caller_identity.current.account_id}:workgroup/*"
     ]
   }
 }
