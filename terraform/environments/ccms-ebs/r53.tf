@@ -122,19 +122,19 @@ resource "aws_route53_record" "webgate_ec2" {
 }*/
 
 ## EBSACCESSGATE
-resource "aws_route53_record" "ebsagate" {
+# resource "aws_route53_record" "ebsagate" {
 
-  provider = aws.core-vpc
-  count    = (local.environment == "preproduction" || local.environment == "production") ? 1 : local.application_data.accounts[local.environment].accessgate_no_instances
-  #count    = local.application_data.accounts[local.environment].accessgate_no_instances
+#   provider = aws.core-vpc
+#   count    = (local.environment == "preproduction" || local.environment == "production") ? 1 : local.application_data.accounts[local.environment].accessgate_no_instances
+#   #count    = local.application_data.accounts[local.environment].accessgate_no_instances
 
-  zone_id = data.aws_route53_zone.external.zone_id
-  name    = "agate${local.application_data.accounts[local.environment].short_env}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-  #name    = "agate${local.application_data.accounts[local.environment].short_env}${count.index + 1}.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-  type    = "A"
-  ttl     = 300
-  records = [aws_instance.ec2_accessgate[count.index].private_ip]
-}
+#   zone_id = data.aws_route53_zone.external.zone_id
+#   name    = "agate${local.application_data.accounts[local.environment].short_env}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+#   #name    = "agate${local.application_data.accounts[local.environment].short_env}${count.index + 1}.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+#   type    = "A"
+#   ttl     = 300
+#   records = [aws_instance.ec2_accessgate[count.index].private_ip]
+# }
 
 resource "aws_route53_record" "accessgate_ec2" {
   provider = aws.core-vpc
