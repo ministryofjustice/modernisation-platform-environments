@@ -105,7 +105,7 @@ resource "tls_private_key" "ec2-user" {
 }
 
 resource "aws_key_pair" "ec2-user" {
-  key_name   = "${var.name}-keypair"
+  key_name   = "onpremgw-keypair"
   public_key = tls_private_key.ec2-user.public_key_openssh
 }
 
