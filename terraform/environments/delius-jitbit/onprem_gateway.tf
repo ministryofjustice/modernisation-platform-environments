@@ -91,3 +91,9 @@ data "aws_iam_policy_document" "ec2_policy" {
     resources = ["*"] #tfsec:ignore:aws-iam-no-policy-wildcards
   }
 }
+
+data "aws_subnet" "private_az_a" {
+  tags = {
+    Name = "${local.vpc_name}-${local.environment}-${local.subnet_set}-private-${local.region}a"
+  }
+}
