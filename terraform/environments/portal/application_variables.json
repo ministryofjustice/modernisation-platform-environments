@@ -10,7 +10,7 @@
       "oam_instance_type": "t3a.large",
       "oam_repo_home_snapshot": "",
       "oam_config_snapshot": "",
-      "oam_fmw_snapshot": "",
+      "oam_fmw_snapshot": "snap-0e8a2073e266692eb",
       "oam_aserver_snapshot": "",
       "oam_mserver_snapshot": ""
 

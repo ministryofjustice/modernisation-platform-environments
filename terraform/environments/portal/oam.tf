@@ -13,10 +13,13 @@ locals {
 # /swapfile1   none    swap    sw    0   0" > /etc/fstab
 
 echo "/dev/xvdb /IDAM/product/fmw ext4 defaults 0 0" >> /etc/fstab
-echo "/dev/xvdc /IDAM/product/runtime/Domain/aserver ext4 defaults 0 0" >> /etc/fstab
-echo "/dev/xvdd /IDAM/product/runtime/Domain/config ext4 defaults 0 0" >> /etc/fstab
-echo "/dev/xvde /IDAM/product/runtime/Domain/mserver ext4 defaults 0 0" >> /etc/fstab
+# echo "/dev/xvdc /IDAM/product/runtime/Domain/aserver ext4 defaults 0 0" >> /etc/fstab
+# echo "/dev/xvdd /IDAM/product/runtime/Domain/config ext4 defaults 0 0" >> /etc/fstab
+# echo "/dev/xvde /IDAM/product/runtime/Domain/mserver ext4 defaults 0 0" >> /etc/fstab
 # echo "/dev/sdf /IDMLCM/repo_home ext4 defaults 0 0" >> /etc/fstab
+
+# mount /dev/sdf /IDMLCM/repo_home
+
 
 EOF
   oam_2_userdata = <<EOF
