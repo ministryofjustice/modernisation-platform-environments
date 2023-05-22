@@ -171,7 +171,7 @@ resource "aws_iam_policy" "additional-policy" {
 
 resource "aws_iam_role_policy_attachment" "glue_policies" {
   for_each = toset([
-    "arn:aws:iam::203591025782:policy/${aws_iam_policy.additional-policy.name}",
+    "arn:aws:iam::203591025782:policy/${var.name}-policy",
     "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"
   ])
 
