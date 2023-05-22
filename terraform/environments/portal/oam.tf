@@ -8,9 +8,9 @@ locals {
   oam_1_userdata = <<EOF
 #!/bin/bash
 
-cp /etc/fstab /etc/fstab_backup
-echo "UUID=50a9826b-3a50-44d0-ad12-28f2056e9927 /                       xfs     defaults        0 0
-/swapfile1   none    swap    sw    0   0" > /etc/fstab
+# cp /etc/fstab /etc/fstab_backup
+# echo "UUID=50a9826b-3a50-44d0-ad12-28f2056e9927 /                       xfs     defaults        0 0
+# /swapfile1   none    swap    sw    0   0" > /etc/fstab
 
 EOF
   oam_2_userdata = <<EOF
@@ -203,6 +203,126 @@ resource "aws_instance" "oam_instance_2" {
     { "Name" = "${local.application_name} OAM Instance 2" },
     { "snapshot-with-daily-35-day-retention" = "yes" }    # TODO the Backup rule needs setting up first
   )
+}
+
+
+###############################
+# OAM EBS Volumes
+###############################
+
+resource "aws_ebs_volume" "repo_home" {
+  availability_zone = "eu-west-2a"
+  size              = 150
+  type              = "gp2"
+  encrypted         = true
+  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  # snapshot_id       = local.application_data.accounts[local.environment].repo_home_snapshot
+
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
+
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}-OAM-repo-home" },
+  )
+}
+resource "aws_volume_attachment" "repo_home" {
+  device_name = "/dev/sdf"
+  volume_id   = aws_ebs_volume.repo_home.id
+  instance_id = aws_instance.oam_instance_1.id
+}
+
+resource "aws_ebs_volume" "config" {
+  availability_zone = "eu-west-2a"
+  size              = 15
+  type              = "gp2"
+  encrypted         = true
+  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  # snapshot_id       = local.application_data.accounts[local.environment].repo_home_snapshot
+
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
+
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}-OAM-config" },
+  )
+}
+resource "aws_volume_attachment" "config" {
+  device_name = "/dev/xvdd"
+  volume_id   = aws_ebs_volume.config.id
+  instance_id = aws_instance.oam_instance_1.id
+}
+
+resource "aws_ebs_volume" "fmw" {
+  availability_zone = "eu-west-2a"
+  size              = 30
+  type              = "gp2"
+  encrypted         = true
+  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  # snapshot_id       = local.application_data.accounts[local.environment].repo_home_snapshot
+
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
+
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}-OAM-fmw" },
+  )
+}
+resource "aws_volume_attachment" "fmw" {
+  device_name = "/dev/xvdb"
+  volume_id   = aws_ebs_volume.fmw.id
+  instance_id = aws_instance.oam_instance_1.id
+}
+
+resource "aws_ebs_volume" "aserver" {
+  availability_zone = "eu-west-2a"
+  size              = 15
+  type              = "gp2"
+  encrypted         = true
+  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  # snapshot_id       = local.application_data.accounts[local.environment].repo_home_snapshot
+
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
+
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}-OAM-aserver" },
+  )
+}
+resource "aws_volume_attachment" "aserver" {
+  device_name = "/dev/xvdc"
+  volume_id   = aws_ebs_volume.aserver.id
+  instance_id = aws_instance.oam_instance_1.id
+}
+
+resource "aws_ebs_volume" "mserver" {
+  availability_zone = "eu-west-2a"
+  size              = 40
+  type              = "gp2"
+  encrypted         = true
+  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  # snapshot_id       = local.application_data.accounts[local.environment].repo_home_snapshot
+
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
+
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}-OAM-mserver" },
+  )
+}
+resource "aws_volume_attachment" "mserver" {
+  device_name = "/dev/xvde"
+  volume_id   = aws_ebs_volume.mserver.id
+  instance_id = aws_instance.oam_instance_1.id
 }
 
 # Route 53 records
