@@ -156,6 +156,8 @@ resource "aws_route53_zone" "this" {
 resource "aws_cloudwatch_log_group" "route53" {
   for_each = local.route53_zones_to_create
 
+  provider = aws.us-east-1
+
   name              = "route53/${each.key}"
   retention_in_days = 30
 
@@ -171,7 +173,6 @@ resource "aws_route53_query_log" "this" {
   zone_id                  = aws_route53_zone.this[each.key].zone_id
 
   depends_on = [
-    aws_cloudwatch_log_group.route53,
     aws_iam_policy.this,
   ]
 }
