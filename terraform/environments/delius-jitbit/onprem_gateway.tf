@@ -16,7 +16,7 @@ module "onprem_gateway" {
   ebs_volumes                   = {}
   ssm_parameters_prefix         = null
   ssm_parameters                = null
-  route53_records               = {}
+  route53_records               = local.route53_records
 
   iam_resource_names_prefix = ""
   instance_profile_policies = local.ec2_common_managed_policies
@@ -26,7 +26,7 @@ module "onprem_gateway" {
   environment              = local.environment
   region                   = local.region
   availability_zone        = local.availability_zone_1
-  subnet_id                = module.environment.subnet["private"][local.availability_zone_1].id
+  subnet_id                = data.aws_subnet.private_az_a.id
   tags                     = {}
   account_ids_lookup       = local.environment_management.account_ids
   cloudwatch_metric_alarms = {}
@@ -44,37 +44,50 @@ locals {
     metadata_options_http_tokens = "required"
     vpc_security_group_ids       = try([aws_security_group.example_ec2_sg.id])
   }
+
+  route53_records = {
+      create_internal_record = false
+      create_external_record = false
+  }
+
+  ec2_common_managed_policies = [
+    aws_iam_policy.ec2_common_policy.arn
+  ]
+
+  region = "eu-west-2"
+  availability_zone_1 = "eu-west-2a"
+
 }
 
 # create single managed policy
-# resource "aws_iam_policy" "ec2_common_policy" {
-#   name        = "ec2-common-policy"
-#   path        = "/"
-#   description = "Common policy for all ec2 instances"
-#   policy      = data.aws_iam_policy_document.ec2_common_combined.json
-#   tags = merge(
-#     local.tags,
-#     {
-#       Name = "ec2-common-policy"
-#     },
-#   )
-# }
+resource "aws_iam_policy" "ec2_common_policy" {
+  name        = "ec2-common-policy"
+  path        = "/"
+  description = "Common policy for all ec2 instances"
+  policy      = data.aws_iam_policy_document.ec2_common_combined.json
+  tags = merge(
+    local.tags,
+    {
+      Name = "ec2-common-policy"
+    },
+  )
+}
 
 # # combine ec2-common policy documents
-# data "aws_iam_policy_document" "ec2_common_combined" {
-#   source_policy_documents = [
-#     data.aws_iam_policy_document.ec2_policy.json,
-#   ]
-# }
+data "aws_iam_policy_document" "ec2_common_combined" {
+  source_policy_documents = [
+    data.aws_iam_policy_document.ec2_policy.json,
+  ]
+}
 
 # # custom policy for SSM as managed policy AmazonSSMManagedInstanceCore is too permissive
-# data "aws_iam_policy_document" "ec2_policy" {
-#   statement {
-#     sid    = "CustomEc2Policy"
-#     effect = "Allow"
-#     actions = [
-#       "ec2:*"
-#     ]
-#     resources = ["*"] #tfsec:ignore:aws-iam-no-policy-wildcards
-#   }
-# }
+data "aws_iam_policy_document" "ec2_policy" {
+  statement {
+    sid    = "CustomEc2Policy"
+    effect = "Allow"
+    actions = [
+      "ec2:*"
+    ]
+    resources = ["*"] #tfsec:ignore:aws-iam-no-policy-wildcards
+  }
+}
