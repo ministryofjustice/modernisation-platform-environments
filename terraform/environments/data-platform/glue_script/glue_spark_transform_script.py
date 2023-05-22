@@ -4,6 +4,7 @@ import re
 import sys
 
 import boto3
+from botocore.exceptions import ClientError
 from pathlib import Path
 from awsglue.context import GlueContext
 from awsglue.dynamicframe import DynamicFrame
@@ -57,7 +58,7 @@ def get_extraction_timestamp() -> str:
         return m.group(3)
     else:
         raise ValueError(
-            "Table partition extratction_timestamp is not in the expected format"
+            "Table partition extraction_timestamp is not in the expected format"
         )
 
 
@@ -111,7 +112,7 @@ def replace_space_in_string(name: str) -> str:
     return replaced_name
 
 
-def does_database_exist(client, database_name):
+def does_database_exist(client, database_name) -> bool:
     """Determine if this database exists in the Data Catalog
     The Glue client will raise an exception if it does not exist.
     """
@@ -120,6 +121,64 @@ def does_database_exist(client, database_name):
         return True
     except client.exceptions.EntityNotFoundException:
         return False
+
+
+def create_table_if_curated_data_exists(
+    database_name, table_name, glue_client
+) -> None:
+
+    table_path = get_curated_path(database_name, table_name)
+
+    # get dynamic frame from s3 and get schema
+    ddf = glue_context.create_dynamic_frame_from_options(
+        "s3",
+        {"paths": [table_path]},
+        format="parquet")
+
+    schema = ddf.schema()
+
+    # types are ok for glue catalog unless long, which needs converting
+    column_list = [
+        {"Name": col["name"], "Type": col["container"]["dataType"]}
+        if not col["container"]["dataType"] == "long"
+        else {"Name": col["name"], "Type": "bigint"}
+        for col in schema.jsonValue()["fields"]
+    ]
+
+    glue_client.create_table(
+        DatabaseName=database_name,
+        TableInput={
+            'Name': table_name,
+            'StorageDescriptor': {
+                'Columns': column_list,
+                'Location': table_path,
+                "InputFormat": "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat",
+                "OutputFormat": "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat",
+                "SerdeInfo": {
+                "SerializationLibrary": "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe",
+                "Parameters": {}
+                }
+            },
+            'PartitionKeys': [
+                {
+                    'Name': 'extraction_timestamp',
+                    'Type': 'string',
+                },
+            ],
+            "TableType": "EXTERNAL_TABLE"
+        }
+    )
+    sts_client = boto3.client("sts")
+    account_id = sts_client.get_caller_identity()["Account"]
+    athena_client = boto3.client("athena")
+
+    # need to refresh partitions
+    athena_client.start_query_execution(
+        QueryString=f"MSCK REPAIR TABLE {database_name}.{table_name}",
+        ResultConfiguration={
+            'OutputLocation': f"athena-data-product-query-results-{account_id}"
+        }
+    )
 
 
 database_name = get_database_name()
@@ -152,6 +211,38 @@ tables_to_process = [
     if create_curated_data[table_name]
 ]
 
+tables_to_check_exist = [
+    (database_name, table)
+    for database_name in database_dict.keys()
+    for table in database_dict[database_name].keys()
+    if not create_curated_data[table_name]
+]
+
+glue_client = boto3.client("glue")
+
+for database_name, table_name in tables_to_check_exist:
+    try:
+        glue_client.get_table(
+            DatabaseName=database_name,
+            Name=table_name
+        )
+    except ClientError as e:
+        if e.response['Error']['Code'] == 'EntityNotFoundException':
+            if e.response['Message'].startswith('Database'):
+                glue_client.create_database(
+                    DatabaseInput={
+                        "Name": database_name,
+                        "Description": "just a test for now"
+                    }
+                )
+                create_table_if_curated_data_exists(
+                    database_name, table_name, glue_client
+                )
+            elif e.response['Message'].startswith('Table'):
+                create_table_if_curated_data_exists(
+                    database_name, table_name, glue_client
+                )
+
 for database_name, table_name in tables_to_process:
     # convert dataframe into pyspark create_dynamic_frame.
     pd_df = database_dict[database_name][table_name]
@@ -167,8 +258,6 @@ for database_name, table_name in tables_to_process:
     renamed_df = renamed_df.withColumn("extraction_timestamp", lit(timestamp))
 
     dynamic_frame = DynamicFrame.fromDF(renamed_df, glue_context, "dynamic_frame")
-
-    glue_client = boto3.client("glue")
 
     if not does_database_exist(glue_client, database_name):
         logging.info("creating database")
