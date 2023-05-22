@@ -325,6 +325,101 @@ resource "aws_ebs_volume" "mserver" {
 #   instance_id = aws_instance.oam_instance_1.id
 # }
 
+###############################
+# EC2 Instance Profile
+###############################
+
+# IAM Role, policy and instance profile (to attach the role to the EC2)
+
+resource "aws_iam_instance_profile" "portal" {
+  name = "${local.application_name}-ec2-instance-profile"
+  role = aws_iam_role.portal.name
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-ec2-instance-profile"
+    }
+  )
+}
+
+resource "aws_iam_role" "portal" {
+  name = "${local.application_name}-ec2-instance-role"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-ec2-instance-role"
+    }
+  )
+  assume_role_policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": "sts:AssumeRole",
+            "Principal": {
+               "Service": "ec2.amazonaws.com"
+            },
+            "Effect": "Allow",
+            "Sid": ""
+        }
+    ]
+}
+EOF
+}
+
+resource "aws_iam_policy" "portal" { #tfsec:ignore:aws-iam-no-policy-wildcards
+  name = "${local.application_name}-ec2-instance-policy"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-ec2-instance-policy"
+    }
+  )
+  policy = <<EOF
+{
+    "Statement": [
+        {
+            "Action": [
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:PutLogEvents",
+                "logs:DescribeLogStreams",
+                "logs:DescribeLogGroups",
+                "cloudwatch:PutMetricData",
+                "cloudwatch:GetMetricStatistics",
+                "cloudwatch:ListMetrics",
+                "ec2:*",
+                "ec2messages:*",
+                "s3:*",
+                "ssm:*"
+            ],
+            "Resource": "*",
+            "Effect": "Allow"
+        },
+        {
+            "Action": "kms:Decrypt",
+            "Resource": [
+                "arn:aws:kms:eu-west-2:411213865113:key/f3b83cc5-29df-4cc6-95ce-0171f75caeb7",
+                "arn:aws:kms:eu-west-2:902837325998:key/2ea3df23-7b82-41b2-8cce-bbce2eaff185"
+            ],
+            "Effect": "Allow"
+        }
+    ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "ssm" {
+  role       = aws_iam_role.portal.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
+resource "aws_iam_role_policy_attachment" "portal" {
+  role       = aws_iam_role.portal.name
+  policy_arn = aws_iam_policy.portal.arn
+}
+
+
 # Route 53 records
 # resource "aws_route53_record" "oam1_nonprod" {
 #   count    = local.environment != "production" ? 1 : 0
