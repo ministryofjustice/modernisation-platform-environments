@@ -47,11 +47,45 @@ locals {
     }
 
     baseline_lbs = {
+
+      private = {
+        internal_lb              = true
+        enable_delete_protection = false
+        existing_target_groups   = {}
+        idle_timeout             = 60 # 60 is default
+        security_groups          = ["private"]
+        public_subnets           = module.environment.subnets["private"].ids
+        tags                     = local.tags
+
+        listeners = {
+          https = {
+            port                      = 443
+            protocol                  = "HTTPS"
+            ssl_policy                = "ELBSecurityPolicy-2016-08"
+            certificate_names_or_arns = ["application_environment_wildcard_cert"]
+            default_action = {
+              type = "fixed-response"
+              fixed_response = {
+                content_type = "text/plain"
+                message_body = "Not implemented"
+                status_code  = "501"
+              }
+            }
+            rules = {
+            }
+          }
+        }
+      }
     }
 
     baseline_route53_zones = {
+
+      # hmpps-development.modernisation-platform.service.justice.gov.uk
+      # (module.environment.domains.public.business_unit_environment) = {
+      #   lb_alias_records = [
+      #     { name = "oasys", type = "A", lbs_map_key = "public" },
+      #   ]
+      # }
     }
   }
 }
-
-
