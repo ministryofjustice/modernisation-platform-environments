@@ -247,7 +247,7 @@ resource "aws_ebs_volume" "config" {
   size              = 15
   type              = "gp2"
   encrypted         = true
-  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  kms_key_id        = data.aws_kms_key.ebs_shared.key_id  # TODO This key is not being used by Terraform and is pointing to the AWS default one in the local account
   snapshot_id       = local.application_data.accounts[local.environment].oam_config_snapshot
 
   lifecycle {
