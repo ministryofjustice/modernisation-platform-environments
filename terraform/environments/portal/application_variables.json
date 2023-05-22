@@ -2,7 +2,9 @@
   "accounts": {
     "development": {
       "example_var": "dev-data",
-      "existing_archive_bucket_name": ""
+      "existing_archive_bucket_name": "",
+      "oam_ami_id": "ami-0f2453da6e7f4896e",
+      "oam_instance_type": "t3a.large"
     },
     "test": {
       "example_var": "test-data"
