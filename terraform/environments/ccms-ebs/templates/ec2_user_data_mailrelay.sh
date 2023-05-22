@@ -38,6 +38,8 @@ postfix_setup() {
 
         echo "$${FUNCNAME[0]}: Running postconf with additional options."
         postconf -e \
+            "inet_interfaces = all" \
+            "inet_protocols = ipv4" \
             "myhostname = mailrelay.${smtp_fqdn}" \
             "relayhost = [email-smtp.us-west-2.amazonaws.com]:587" \
             "smtp_sasl_auth_enable = yes" \
