@@ -25,7 +25,7 @@ unzip awscliv2.zip
 
 systemctl stop amazon-ssm-agent
 systemctl start amazon-ssm-agent
-
+timedatectl set-timezone Europe/London
 EOF
   metadata_options {
     http_endpoint = "enabled"

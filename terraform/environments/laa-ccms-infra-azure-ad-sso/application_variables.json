@@ -6,6 +6,7 @@
       "imported_ebsdb_image_id": "ami-0350f7487fd84aeca",
       "imported_ebsdb_image_name": "vision-ebs-load-balanced-config",
       "lz_aws_workspace_nonprod_subnet_env": "10.200.0.0/20",
+      "cp_dev_cidr_range": "172.20.0.0/16",
       "ami_owner": "636100868237"
     }
   },
@@ -16,7 +17,7 @@
       "protocol": "TCP"
     },
     "TCP_700X": {
-      "from_port": 7002,
+      "from_port": 7001,
       "to_port": 7003,
       "protocol": "TCP"
     },
@@ -49,7 +50,7 @@
       "destination_cidr": "0.0.0.0/0"
     },
     "TCP_700X": {
-      "from_port": 7002,
+      "from_port": 7001,
       "to_port": 7003,
       "protocol": "TCP",
       "destination_cidr": "0.0.0.0/0"
@@ -85,6 +86,11 @@
       "to_port": 443,
       "protocol": "TCP",
       "destination_cidr": "10.200.0.20/20"
+    },
+    "JDCB_1521": {
+      "from_port": 1521,
+      "to_port": 1521,
+      "protocol": "TCP"
     }
   },
   "lb_sg_egress_rules": {
