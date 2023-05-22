@@ -31,14 +31,14 @@ locals {
         # and put the wildcard in the san
         domain_name = module.environment.domains.public.modernisation_platform
         subject_alternate_names = [
-          "*.${module.environment.domains.public.application_environment}",    #    *.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk
-          "*.t2.${module.environment.domains.public.application_environment}", # *.t2.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk
+          "*.${module.environment.domains.public.application_environment}",         #    *.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk
+          "*.t2.${module.environment.domains.public.application_environment}",      # *.t2.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk
           "*.${local.environment}.${module.environment.domains.public.short_name}", # *.test.oasys.service.justice.gov.uk"
           "*.t1.${module.environment.domains.public.short_name}",                   #   *.t1.oasys.service.justice.gov.uk"
           "*.t2.${module.environment.domains.public.short_name}",                   #   *.t2.oasys.service.justice.gov.uk"
-          "*.${local.environment}.${local.application_name}.az.justice.gov.uk", # *.test.oasys.az.justice.gov.uk
-          "*.t1.${local.application_name}.az.justice.gov.uk",                   #   *.t1.oasys.az.justice.gov.uk
-          "*.t2.${local.application_name}.az.justice.gov.uk",                   #   *.t2.oasys.az.justice.gov.uk
+          "*.${local.environment}.${local.application_name}.az.justice.gov.uk",     # *.test.oasys.az.justice.gov.uk
+          "*.t1.${local.application_name}.az.justice.gov.uk",                       #   *.t1.oasys.az.justice.gov.uk
+          "*.t2.${local.application_name}.az.justice.gov.uk",                       #   *.t2.oasys.az.justice.gov.uk
         ]
         external_validation_records_created = true
         cloudwatch_metric_alarms            = {} # module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso"].acm_default
@@ -93,7 +93,7 @@ locals {
             ssl_policy                = "ELBSecurityPolicy-2016-08"
             certificate_names_or_arns = ["application_environment_wildcard_cert"]
             default_action = {
-              type = "forward"
+              type              = "forward"
               target_group_name = "t2-${local.application_name}-web-http-8080"
             }
             rules = {
@@ -130,7 +130,7 @@ locals {
       "t2.${local.application_name}.service.justice.gov.uk" = {
         lb_alias_records = [
           { name = "web", type = "A", lbs_map_key = "public" }, # web.t2.oasys.service.justice.gov.uk # need to add an ns record to oasys.service.justice.gov.uk -> t2, 
-          { name = "db", type = "A", lbs_map_key = "public" }, # db.t2.oasys.service.justice.gov.uk currently pointing to azure db T2ODL0009
+          { name = "db", type = "A", lbs_map_key = "public" },  # db.t2.oasys.service.justice.gov.uk currently pointing to azure db T2ODL0009
         ]
       }
       "t1.${local.application_name}.service.justice.gov.uk" = {
@@ -151,7 +151,7 @@ locals {
       # internal/private
       #
       (module.environment.domains.internal.business_unit_environment) = { # hmpps-test.modernisation-platform.internal
-        vpc = {                                                              # this makes it a private hosted zone
+        vpc = {                                                           # this makes it a private hosted zone
           id = module.environment.vpc.id
         }
         records = [

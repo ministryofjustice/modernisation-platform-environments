@@ -193,7 +193,7 @@ variable "waf_default_action" {
 }
 
 variable "fqdn" {
-  type = string
+  type        = string
   description = "The fully qualified domain name for the environment in question."
 }
 

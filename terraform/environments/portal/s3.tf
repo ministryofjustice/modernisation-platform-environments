@@ -6,7 +6,7 @@ module "s3_bucket_archive" {
     aws.bucket-replication = aws
   }
 
-  bucket_name         = "laa-${local.application_name}-${local.environment}-archive-mp" # Added suffix -mp to the name as it must be unique from the existing bucket in LZ
+  bucket_name = "laa-${local.application_name}-${local.environment}-archive-mp" # Added suffix -mp to the name as it must be unique from the existing bucket in LZ
   # bucket_prefix not used in case bucket name get referenced as part of EC2 AMIs
   replication_enabled = false
   versioning_enabled  = false
@@ -26,7 +26,7 @@ module "s3_bucket_archive" {
   ]
 
   tags = merge(
-            local.tags,
-            { Name = "laa-${local.application_name}-${local.environment}-archive" }
-          )
+    local.tags,
+    { Name = "laa-${local.application_name}-${local.environment}-archive" }
+  )
 }
