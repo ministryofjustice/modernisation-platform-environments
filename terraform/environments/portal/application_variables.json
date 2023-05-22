@@ -8,11 +8,11 @@
       "management_cidr": "",
       "oam_ami_id": "ami-0264fa729e2a8a47f",
       "oam_instance_type": "t3a.large",
-      "oam_repo_home_snapshot": "",
-      "oam_config_snapshot": "",
-      "oam_fmw_snapshot": "snap-0e8a2073e266692eb",
-      "oam_aserver_snapshot": "",
-      "oam_mserver_snapshot": ""
+      "oam_fmw_snapshot": "snap-0dba4e0341c3a3241",
+      "oam_aserver_snapshot": "snap-0371f356f5555c5df",
+      "oam_config_snapshot": "snap-092e6168dca44c40e",
+      "oam_mserver_snapshot": "snap-0db8a2c01be9128e8",
+      "oam_repo_home_snapshot": "snap-04ed65da750df338c"
 
     },
     "test": {
