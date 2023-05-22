@@ -177,7 +177,7 @@ resource "aws_instance" "oam_instance_1" {
   vpc_security_group_ids      = [aws_security_group.oam_instance.id]
   monitoring                  = true
   subnet_id                   = data.aws_subnet.private_subnets_a.id
-  # iam_instance_profile        = aws_iam_instance_profile.portal_instance_profile.id # TODO to be updated once merging with OHS work
+  iam_instance_profile        = aws_iam_instance_profile.portal.id
   user_data_base64            = base64encode(local.oam_1_userdata)
 
   tags = merge(
