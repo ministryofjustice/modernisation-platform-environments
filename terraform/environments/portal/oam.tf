@@ -12,6 +12,12 @@ locals {
 # echo "UUID=50a9826b-3a50-44d0-ad12-28f2056e9927 /                       xfs     defaults        0 0
 # /swapfile1   none    swap    sw    0   0" > /etc/fstab
 
+echo "/dev/xvdb /IDAM/product/fmw ext4 defaults 0 0" >> /etc/fstab
+echo "/dev/xvdc /IDAM/product/runtime/Domain/aserver ext4 defaults 0 0" >> /etc/fstab
+echo "/dev/xvdd /IDAM/product/runtime/Domain/config ext4 defaults 0 0" >> /etc/fstab
+echo "/dev/xvde /IDAM/product/runtime/Domain/mserver ext4 defaults 0 0" >> /etc/fstab
+# echo "/dev/sdf /IDMLCM/repo_home ext4 defaults 0 0" >> /etc/fstab
+
 EOF
   oam_2_userdata = <<EOF
 #!/bin/bash
@@ -227,11 +233,11 @@ resource "aws_ebs_volume" "repo_home" {
     { "Name" = "${local.application_name}-OAM-repo-home" },
   )
 }
-# resource "aws_volume_attachment" "repo_home" {
-#   device_name = "/dev/sdf"
-#   volume_id   = aws_ebs_volume.repo_home.id
-#   instance_id = aws_instance.oam_instance_1.id
-# }
+resource "aws_volume_attachment" "repo_home" {
+  device_name = "/dev/sdf"
+  volume_id   = aws_ebs_volume.repo_home.id
+  instance_id = aws_instance.oam_instance_1.id
+}
 
 resource "aws_ebs_volume" "config" {
   availability_zone = "eu-west-2a"
@@ -250,11 +256,11 @@ resource "aws_ebs_volume" "config" {
     { "Name" = "${local.application_name}-OAM-config" },
   )
 }
-# resource "aws_volume_attachment" "config" {
-#   device_name = "/dev/xvdd"
-#   volume_id   = aws_ebs_volume.config.id
-#   instance_id = aws_instance.oam_instance_1.id
-# }
+resource "aws_volume_attachment" "config" {
+  device_name = "/dev/xvdd"
+  volume_id   = aws_ebs_volume.config.id
+  instance_id = aws_instance.oam_instance_1.id
+}
 
 resource "aws_ebs_volume" "fmw" {
   availability_zone = "eu-west-2a"
@@ -273,11 +279,11 @@ resource "aws_ebs_volume" "fmw" {
     { "Name" = "${local.application_name}-OAM-fmw" },
   )
 }
-# resource "aws_volume_attachment" "fmw" {
-#   device_name = "/dev/xvdb"
-#   volume_id   = aws_ebs_volume.fmw.id
-#   instance_id = aws_instance.oam_instance_1.id
-# }
+resource "aws_volume_attachment" "fmw" {
+  device_name = "/dev/xvdb"
+  volume_id   = aws_ebs_volume.fmw.id
+  instance_id = aws_instance.oam_instance_1.id
+}
 
 resource "aws_ebs_volume" "aserver" {
   availability_zone = "eu-west-2a"
@@ -296,11 +302,11 @@ resource "aws_ebs_volume" "aserver" {
     { "Name" = "${local.application_name}-OAM-aserver" },
   )
 }
-# resource "aws_volume_attachment" "aserver" {
-#   device_name = "/dev/xvdc"
-#   volume_id   = aws_ebs_volume.aserver.id
-#   instance_id = aws_instance.oam_instance_1.id
-# }
+resource "aws_volume_attachment" "aserver" {
+  device_name = "/dev/xvdc"
+  volume_id   = aws_ebs_volume.aserver.id
+  instance_id = aws_instance.oam_instance_1.id
+}
 
 resource "aws_ebs_volume" "mserver" {
   availability_zone = "eu-west-2a"
@@ -319,11 +325,11 @@ resource "aws_ebs_volume" "mserver" {
     { "Name" = "${local.application_name}-OAM-mserver" },
   )
 }
-# resource "aws_volume_attachment" "mserver" {
-#   device_name = "/dev/xvde"
-#   volume_id   = aws_ebs_volume.mserver.id
-#   instance_id = aws_instance.oam_instance_1.id
-# }
+resource "aws_volume_attachment" "mserver" {
+  device_name = "/dev/xvde"
+  volume_id   = aws_ebs_volume.mserver.id
+  instance_id = aws_instance.oam_instance_1.id
+}
 
 ###############################
 # EC2 Instance Profile
