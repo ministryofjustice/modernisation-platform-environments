@@ -126,7 +126,10 @@ def does_database_exist(client, database_name) -> bool:
 def create_table_if_curated_data_exists(
     database_name, table_name, glue_client
 ) -> None:
-
+    """
+    creates a glue catalog table using boto3 for when curated data
+    already exists but table does not.
+    """
     table_path = get_curated_path(database_name, table_name)
 
     # get dynamic frame from s3 and get schema
@@ -238,10 +241,12 @@ for database_name, table_name in tables_to_check_exist:
                 create_table_if_curated_data_exists(
                     database_name, table_name, glue_client
                 )
+                logging.info(f"database and table {database_name}.{table_name} didn't exist where curated did and have been created")
             elif e.response['Message'].startswith('Table'):
                 create_table_if_curated_data_exists(
                     database_name, table_name, glue_client
                 )
+                logging.info(f"table {database_name}.{table_name} didn't exist where curated did and has been created")
 
 for database_name, table_name in tables_to_process:
     # convert dataframe into pyspark create_dynamic_frame.
