@@ -174,9 +174,9 @@ locals {
         branch = "nomis/DSOS-1820/weblogic-init-tweak-v2"
       })
     })
-    # autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default_with_ready_hook, {
-    autoscaling_group = merge(local.weblogic_ec2_default.autoscaling_group, {
-      desired_capacity = 1
+    # autoscaling_group = merge(local.weblogic_ec2_default.autoscaling_group, {
+    autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default_with_ready_hook, {
+      desired_capacity = 0
     })
     cloudwatch_metric_alarms = {}
     tags = merge(local.weblogic_ec2_default.tags, {
