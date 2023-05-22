@@ -28,7 +28,7 @@ postfix_setup() {
     U=$(cut -d'"' -f 3 <<< $${S} |tr -d \\134)
     P=$(cut -d'"' -f 5 <<< $${S} |tr -d \\134)
 
-    if [[ ${#U} -eq 20 ]] && [[ ${#P} -eq 44 ]]; then
+    if [[ $${#U} -eq 20 ]] && [[ $${#P} -eq 44 ]]; then
         echo "Setting up credentials in /etc/postfix/sasl_passwd"
         echo "[email-smtp.us-west-2.amazonaws.com]:587 $${U}:$${P}" > /etc/postfix/sasl_passwd
         postmap hash:/etc/postfix/sasl_passwd
