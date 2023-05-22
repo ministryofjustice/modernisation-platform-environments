@@ -537,19 +537,6 @@ module "datamart" {
   )
 }
 
-# Redshift Schemas
-# Domain Schema, DPR-267
-module "redshift_schema_domain" {
-  source                  = "./modules/redshift_schema"
-  enable_redshift_schema  = false
-  glue_catalog_ext        = true
-  master_username         = "dpruser"  
-  master_pass             = module.datamart.redshift_master_password
-  schema                  = "domain"
-  catalog_db_name         = "domain"
-}
-
-
 # DMS Nomis Data Collector
 module "dms_nomis_ingestor" {
   source                = "./modules/dms"
