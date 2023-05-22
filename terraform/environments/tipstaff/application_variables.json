@@ -18,7 +18,8 @@
       "curserver": "DEVELOPMENT",
       "support_team": "DTS Legacy Apps Support Team",
       "support_email": "dts-legacy-apps-support-team@hmcts.net",
-      "rds_port": "5432"
+      "rds_port": "5432",
+      "domain_name": "modernisation-platform.service.justice.gov.uk"
     },
     "test": {
       "example_var": "test-data"
@@ -41,7 +42,8 @@
       "curserver": "PREPRODUCTION",
       "support_team": "DTS Legacy Apps Support Team",
       "support_email": "dts-legacy-apps-support-team@hmcts.net",
-      "rds_port": "5432"
+      "rds_port": "5432",
+      "domain_name": "modernisation-platform.service.justice.gov.uk"
     },
     "production": {
       "moj_ip": "81.134.202.29/32",
@@ -61,7 +63,8 @@
       "curserver": "PRODUCTION",
       "support_team": "DTS Legacy Apps Support Team",
       "support_email": "dts-legacy-apps-support-team@hmcts.net",
-      "rds_port": "5432"
+      "rds_port": "5432",
+      "domain_name": "modernisation-platform.service.justice.gov.uk"
     }
   }
 }
