@@ -6,8 +6,14 @@
       "pagerduty_integration_key_name": "laa_portal_nonprod_alarms",
       "pagerduty_integration_key_name_ga": "get_access_improvement_alarms",
       "management_cidr": "",
-      "oam_ami_id": "ami-0f2453da6e7f4896e",
-      "oam_instance_type": "t3a.large"
+      "oam_ami_id": "ami-0d083b497ca9b2835",
+      "oam_instance_type": "t3a.large",
+      "oam_repo_home_snapshot": "",
+      "oam_config_snapshot": "",
+      "oam_fmw_snapshot": "",
+      "oam_aserver_snapshot": "",
+      "oam_mserver_snapshot": ""
+
     },
     "test": {
       "example_var": "test-data"

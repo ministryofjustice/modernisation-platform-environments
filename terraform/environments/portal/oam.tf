@@ -216,7 +216,7 @@ resource "aws_ebs_volume" "repo_home" {
   type              = "gp2"
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  # snapshot_id       = local.application_data.accounts[local.environment].repo_home_snapshot
+  snapshot_id       = local.application_data.accounts[local.environment].oam_repo_home_snapshot
 
   lifecycle {
     ignore_changes = [kms_key_id]
@@ -227,11 +227,11 @@ resource "aws_ebs_volume" "repo_home" {
     { "Name" = "${local.application_name}-OAM-repo-home" },
   )
 }
-resource "aws_volume_attachment" "repo_home" {
-  device_name = "/dev/sdf"
-  volume_id   = aws_ebs_volume.repo_home.id
-  instance_id = aws_instance.oam_instance_1.id
-}
+# resource "aws_volume_attachment" "repo_home" {
+#   device_name = "/dev/sdf"
+#   volume_id   = aws_ebs_volume.repo_home.id
+#   instance_id = aws_instance.oam_instance_1.id
+# }
 
 resource "aws_ebs_volume" "config" {
   availability_zone = "eu-west-2a"
@@ -239,7 +239,7 @@ resource "aws_ebs_volume" "config" {
   type              = "gp2"
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  # snapshot_id       = local.application_data.accounts[local.environment].repo_home_snapshot
+  snapshot_id       = local.application_data.accounts[local.environment].oam_config_snapshot
 
   lifecycle {
     ignore_changes = [kms_key_id]
@@ -250,11 +250,11 @@ resource "aws_ebs_volume" "config" {
     { "Name" = "${local.application_name}-OAM-config" },
   )
 }
-resource "aws_volume_attachment" "config" {
-  device_name = "/dev/xvdd"
-  volume_id   = aws_ebs_volume.config.id
-  instance_id = aws_instance.oam_instance_1.id
-}
+# resource "aws_volume_attachment" "config" {
+#   device_name = "/dev/xvdd"
+#   volume_id   = aws_ebs_volume.config.id
+#   instance_id = aws_instance.oam_instance_1.id
+# }
 
 resource "aws_ebs_volume" "fmw" {
   availability_zone = "eu-west-2a"
@@ -262,7 +262,7 @@ resource "aws_ebs_volume" "fmw" {
   type              = "gp2"
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  # snapshot_id       = local.application_data.accounts[local.environment].repo_home_snapshot
+  snapshot_id       = local.application_data.accounts[local.environment].oam_fmw_snapshot
 
   lifecycle {
     ignore_changes = [kms_key_id]
@@ -273,11 +273,11 @@ resource "aws_ebs_volume" "fmw" {
     { "Name" = "${local.application_name}-OAM-fmw" },
   )
 }
-resource "aws_volume_attachment" "fmw" {
-  device_name = "/dev/xvdb"
-  volume_id   = aws_ebs_volume.fmw.id
-  instance_id = aws_instance.oam_instance_1.id
-}
+# resource "aws_volume_attachment" "fmw" {
+#   device_name = "/dev/xvdb"
+#   volume_id   = aws_ebs_volume.fmw.id
+#   instance_id = aws_instance.oam_instance_1.id
+# }
 
 resource "aws_ebs_volume" "aserver" {
   availability_zone = "eu-west-2a"
@@ -285,7 +285,7 @@ resource "aws_ebs_volume" "aserver" {
   type              = "gp2"
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  # snapshot_id       = local.application_data.accounts[local.environment].repo_home_snapshot
+  snapshot_id       = local.application_data.accounts[local.environment].oam_aserver_snapshot
 
   lifecycle {
     ignore_changes = [kms_key_id]
@@ -296,11 +296,11 @@ resource "aws_ebs_volume" "aserver" {
     { "Name" = "${local.application_name}-OAM-aserver" },
   )
 }
-resource "aws_volume_attachment" "aserver" {
-  device_name = "/dev/xvdc"
-  volume_id   = aws_ebs_volume.aserver.id
-  instance_id = aws_instance.oam_instance_1.id
-}
+# resource "aws_volume_attachment" "aserver" {
+#   device_name = "/dev/xvdc"
+#   volume_id   = aws_ebs_volume.aserver.id
+#   instance_id = aws_instance.oam_instance_1.id
+# }
 
 resource "aws_ebs_volume" "mserver" {
   availability_zone = "eu-west-2a"
@@ -308,7 +308,7 @@ resource "aws_ebs_volume" "mserver" {
   type              = "gp2"
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  # snapshot_id       = local.application_data.accounts[local.environment].repo_home_snapshot
+  snapshot_id       = local.application_data.accounts[local.environment].oam_mserver_snapshot
 
   lifecycle {
     ignore_changes = [kms_key_id]
@@ -319,11 +319,11 @@ resource "aws_ebs_volume" "mserver" {
     { "Name" = "${local.application_name}-OAM-mserver" },
   )
 }
-resource "aws_volume_attachment" "mserver" {
-  device_name = "/dev/xvde"
-  volume_id   = aws_ebs_volume.mserver.id
-  instance_id = aws_instance.oam_instance_1.id
-}
+# resource "aws_volume_attachment" "mserver" {
+#   device_name = "/dev/xvde"
+#   volume_id   = aws_ebs_volume.mserver.id
+#   instance_id = aws_instance.oam_instance_1.id
+# }
 
 # Route 53 records
 # resource "aws_route53_record" "oam1_nonprod" {
