@@ -102,11 +102,12 @@ resource "aws_route53_record" "webgate_ec2" {
 
 resource "aws_route53_record" "webgate_ec2_single" {
   provider = aws.core-vpc
+  count    = local.application_data.accounts[local.environment].webgate_no_instances
   zone_id = data.aws_route53_zone.external.zone_id
   name    = "${local.application_data.accounts[local.environment].webgate_dns_prefix}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   type    = "A"
   ttl     = 300
-  records = [aws_instance.ec2_webgate.private_ip]
+  records = [aws_instance.ec2_webgate[0].private_ip]
 }
 
 /*resource "aws_route53_record" "ebswgate_cname" {
@@ -149,11 +150,12 @@ resource "aws_route53_record" "accessgate_ec2" {
 
 resource "aws_route53_record" "accessgate_ec2_single" {
   provider = aws.core-vpc
+  count    = local.application_data.accounts[local.environment].accessgate_no_instances
   zone_id = data.aws_route53_zone.external.zone_id
   name    = "${local.application_data.accounts[local.environment].accessgate_dns_prefix}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   type    = "A"
   ttl     = 300
-  records = [aws_instance.ec2_accessgate.private_ip]
+  records = [aws_instance.ec2_accessgate[0].private_ip]
 }
 
 /*resource "aws_route53_record" "ebsagate_cname" {
