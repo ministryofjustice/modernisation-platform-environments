@@ -28,12 +28,12 @@ data "aws_iam_policy_document" "ci_assume_role" {
 }
 
 locals {
-  iaps_rds_snapshot_arn_prefix = "arn:aws:rds:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:snapshot:rds:${aws_db_instance.iaps.id}-*"
+  iaps_rds_snapshot_arn_pattern = "arn:aws:rds:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:snapshot:*${aws_db_instance.iaps.id}-*"
 }
 
 data "aws_iam_policy_document" "snapshot_sharer" {
   statement {
-    sid = "CopyAndShareSnapshots"
+    sid    = "CopyAndShareSnapshots"
     effect = "Allow"
     actions = [
       "rds:CopyDBSnapshot",
@@ -41,7 +41,7 @@ data "aws_iam_policy_document" "snapshot_sharer" {
       "rds:ModifyDBSnapshotAttribute"
     ]
     resources = [
-      local.iaps_rds_snapshot_arn_prefix,
+      local.iaps_rds_snapshot_arn_pattern,
       aws_db_instance.iaps.arn
     ]
   }
