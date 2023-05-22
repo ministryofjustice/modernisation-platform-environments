@@ -42,7 +42,7 @@ locals {
     key_name                     = try(aws_key_pair.ec2-user.key_name)
     monitoring                   = false
     metadata_options_http_tokens = "required"
-    vpc_security_group_ids       = try([aws_security_group.example_ec2_sg.id])
+    vpc_security_group_ids       = try([aws_security_group.onprem_gateway.id])
   }
 
   route53_records = {
@@ -96,4 +96,21 @@ data "aws_subnet" "private_az_a" {
   tags = {
     Name = "${local.vpc_name}-${local.environment}-${local.subnet_set}-private-${local.region}a"
   }
+}
+
+# Keypair for ec2-user
+resource "tls_private_key" "ec2-user" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
+resource "aws_key_pair" "ec2-user" {
+  key_name   = "${var.name}-keypair"
+  public_key = tls_private_key.ec2-user.public_key_openssh
+}
+
+resource "aws_security_group" "onprem_gateway" {
+  name        = "${local.application_name}-${local.environment}-onprem-gateway"
+  description = "onprem gateway sg"
+  vpc_id      = data.aws_vpc.shared.id
 }
