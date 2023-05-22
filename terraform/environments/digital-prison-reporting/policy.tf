@@ -308,9 +308,9 @@ resource "aws_iam_policy" "redshift_spectrum_policy" {
 
 resource "aws_iam_role_policy_attachment" "redshift_spectrum" {
   for_each = toset([
-    "arn:aws:iam::203591025782:policy/${aws_iam_policy.s3_read_access_policy.name}",
-    "arn:aws:iam::203591025782:policy/${aws_iam_policy.kms_read_access_policy.name}",
-    "arn:aws:iam::203591025782:policy/${aws_iam_policy.redshift_spectrum_policy.name}"
+    "arn:aws:iam::${var.account}:policy/${aws_iam_policy.s3_read_access_policy.name}",
+    "arn:aws:iam::${var.account}:policy/${aws_iam_policy.kms_read_access_policy.name}",
+    "arn:aws:iam::${var.account}:policy/${aws_iam_policy.redshift_spectrum_policy.name}"
   ])
 
   role = aws_iam_role.redshift-spectrum-role.name
