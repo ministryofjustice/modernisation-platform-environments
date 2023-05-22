@@ -26,6 +26,15 @@ locals {
         autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
         tags                  = local.database_tags
       })
+
+      "${local.application_name}-web" = merge(local.webserver, {
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name = "oasys_webserver_release_*"
+        })
+        tags = merge(local.webserver.tags, {
+          description = "${local.application_name} web"
+        })
+      })
     }
 
     baseline_acm_certificates = {
@@ -47,11 +56,57 @@ locals {
     }
 
     baseline_lbs = {
+
+      # private = {
+      #   internal_lb              = true
+      #   enable_delete_protection = false
+      #   existing_target_groups   = {}
+      #   idle_timeout             = 60 # 60 is default
+      #   security_groups          = ["private"]
+      #   public_subnets           = module.environment.subnets["private"].ids
+      #   tags                     = local.tags
+
+      #   listeners = {
+      #     https = {
+      #       port                      = 443
+      #       protocol                  = "HTTPS"
+      #       ssl_policy                = "ELBSecurityPolicy-2016-08"
+      #       certificate_names_or_arns = ["application_environment_wildcard_cert"]
+      #       default_action = {
+      #         type              = "forward"
+      #         target_group_name = "${local.application_name}-web-http-8080"
+      #       }
+      #       rules = {
+      #         web-http-8080 = {
+      #           priority = 100
+      #           actions = [{
+      #             type              = "forward"
+      #             target_group_name = "${local.application_name}-web-http-8080"
+      #           }]
+      #           conditions = [
+      #             {
+      #               host_header = {
+      #                 values = [
+      #                   "web.${module.environment.domains.public.application_environment}", # web.oasys.hmpps-development.modernisation-platform.service.justice.gov.uk
+      #                 ]
+      #               }
+      #             }
+      #           ]
+      #         }
+      #       }
+      #     }
+      #   }
+      # }
     }
 
     baseline_route53_zones = {
+
+      # hmpps-development.modernisation-platform.service.justice.gov.uk
+      # (module.environment.domains.public.business_unit_environment) = {
+      #   lb_alias_records = [
+      #     { name = "web.${local.application_name}", type = "A", lbs_map_key = "public" },
+      #   ]
+      # }
     }
   }
 }
-
-
