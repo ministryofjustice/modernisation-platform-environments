@@ -8,6 +8,10 @@ locals {
   oam_1_userdata = <<EOF
 #!/bin/bash
 
+cp /etc/fstab /etc/fstab_backup
+echo "UUID=50a9826b-3a50-44d0-ad12-28f2056e9927 /                       xfs     defaults        0 0
+/swapfile1   none    swap    sw    0   0" > /etc/fstab
+
 EOF
   oam_2_userdata = <<EOF
 #!/bin/bash
