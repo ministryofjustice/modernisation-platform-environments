@@ -1,3 +1,4 @@
+
 locals {
 
   loadbalancer_ingress_rules = {
@@ -89,7 +90,7 @@ locals {
     for domain, value in var.validation : domain => value if value.account == "self"
   }
 
-  route53_zones = merge( {
+  route53_zones = merge({
     for key, value in data.aws_route53_zone.core_network_services : key => merge(value, {
       provider = "core-network-services"
     })
@@ -301,7 +302,7 @@ resource "random_password" "cloudfront" {
 }
 
 resource "aws_secretsmanager_secret" "cloudfront" {
-  name        = "cloudfront-v1-secret-${var.application_name}"
+  name        = "cloudfront-v1-secret-${var.application_name}-${formatdate("DDMMMYYYYhhmm", timestamp())}"
   description = "Simple secret created by AWS CloudFormation to be shared between ALB and CloudFront"
 }
 
@@ -526,6 +527,14 @@ resource "aws_waf_web_acl" "waf_acl" {
 
 ## ALB Listener
 
+
+# TODO This resource is required because otherwise Error: failed to read schema for module.alb.null_resource.always_run in registry.terraform.io/hashicorp/null: failed to instantiate provider
+# When the whole stack is recreated this can be removed
+resource "null_resource" "always_run" {
+}
+
+
+
 resource "aws_lb_listener" "alb_listener" {
 
   load_balancer_arn = aws_lb.loadbalancer.arn
@@ -648,10 +657,10 @@ resource "aws_athena_workgroup" "lb-access-logs" {
 
 resource "aws_acm_certificate" "external_lb" {
 
-  domain_name   = var.acm_cert_domain_name
-  validation_method = "DNS"
+  domain_name               = var.acm_cert_domain_name
+  validation_method         = "DNS"
   subject_alternative_names = var.environment == "production" ? null : ["${var.application_name}.${var.business_unit}-${var.environment}.${var.acm_cert_domain_name}"]
-  tags = var.tags
+  tags                      = var.tags
   # TODO Set prevent_destroy to true to stop Terraform destroying this resource in the future if required
   lifecycle {
     prevent_destroy = false
@@ -737,11 +746,11 @@ resource "aws_acm_certificate_validation" "external_lb_certificate_validation" {
 
 
 resource "aws_acm_certificate" "cloudfront" {
-  domain_name       =  var.acm_cert_domain_name
-  validation_method = "DNS"
-  provider          = aws.us-east-1
+  domain_name               = var.acm_cert_domain_name
+  validation_method         = "DNS"
+  provider                  = aws.us-east-1
   subject_alternative_names = var.environment == "production" ? null : ["${var.application_name}.${var.business_unit}-${var.environment}.${var.acm_cert_domain_name}"]
-  tags = var.tags
+  tags                      = var.tags
   # TODO Set prevent_destroy to true to stop Terraform destroying this resource in the future if required
   lifecycle {
     prevent_destroy = false
@@ -790,9 +799,23 @@ resource "aws_route53_record" "cloudfront_validation_core_vpc" {
   ]
 }
 
-resource "aws_route53_record" "cloudfront" {
+resource "aws_route53_record" "cloudfront-non-prod" {
+  count    = var.environment != "production" ? 1 : 0
   provider = aws.core-vpc
   zone_id  = var.external_zone_id
+  name     = var.fqdn
+  type     = "A"
+  alias {
+    name                   = aws_cloudfront_distribution.external.domain_name
+    zone_id                = aws_cloudfront_distribution.external.hosted_zone_id
+    evaluate_target_health = true
+  }
+}
+
+resource "aws_route53_record" "cloudfront-prod" {
+  count    = var.environment == "production" ? 1 : 0
+  provider = aws.core-network-services
+  zone_id  = var.production_zone_id
   name     = var.fqdn
   type     = "A"
   alias {

@@ -193,7 +193,7 @@ variable "waf_default_action" {
 }
 
 variable "fqdn" {
-  type = string
+  type        = string
   description = "The fully qualified domain name for the environment in question."
 }
 
@@ -210,5 +210,10 @@ variable "external_validation_records_created" {
   description = "Only needed if there are external validation records.  Set it to true when they've been created.  See README.md"
   type        = bool
   default     = false
+}
+
+variable "production_zone_id" {
+  description = "Only used for the Route53 A record in production"
+  type        = string
 }
 

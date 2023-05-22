@@ -1,8 +1,9 @@
 #  Build EC2 
-resource "aws_instance" "ec2_oracle_ebs" {
-  instance_type = local.application_data.accounts[local.environment].ec2_oracle_instance_type_ebsdb
-  #ami                         = data.aws_ami.oracle_db.id
-  ami                         = local.environment == "development" ? local.application_data.accounts[local.environment].restored_db_image : data.aws_ami.oracle_db.id
+resource "aws_instance" "ec2_oracle_ebs_dr" {
+  count = local.environment == "development" ? 1 : 0
+
+  instance_type               = local.application_data.accounts[local.environment].ec2_oracle_instance_type_ebsdb
+  ami                         = data.aws_ami.oracle_db.id
   key_name                    = local.application_data.accounts[local.environment].key_name
   vpc_security_group_ids      = [aws_security_group.ec2_sg_ebsdb.id]
   subnet_id                   = data.aws_subnet.data_subnets_a.id
@@ -61,36 +62,17 @@ EOF
     http_endpoint = "enabled"
     http_tokens   = "required"
   }
-  /*
-  # Increase the volume size of the root volume
-  root_block_device {
-    volume_type = "gp3"
-    volume_size = 50
-    encrypted   = true
-    tags = merge(local.tags,
-      { Name = "root-block" }
-    )
-  }
-  ebs_block_device {
-    device_name = "/dev/sdc"
-    volume_type = "gp3"
-    volume_size = local.application_data.accounts[local.environment].ebs_size_ebsdb_temp
-    encrypted   = true
-    tags = merge(local.tags,
-      { Name = "temp" }
-    )
-  }
-  */
+
 
   tags = merge(local.tags,
-    { Name = lower(format("ec2-%s-%s-ebsdb", local.application_name, local.environment)) },
-    { instance-scheduling = local.application_data.accounts[local.environment].instance-scheduling },
-    { backup = "true" }
+    { Name = lower(format("ec2-%s-%s-ebsdb-dr-test", local.application_name, local.environment)) },
+    { instance-scheduling = local.application_data.accounts[local.environment].instance-scheduling }
   )
   depends_on = [aws_security_group.ec2_sg_ebsdb]
 }
 
-resource "aws_ebs_volume" "export_home" {
+resource "aws_ebs_volume" "export_home_dr" {
+  count = local.environment == "development" ? 1 : 0
   lifecycle {
     ignore_changes = [kms_key_id]
   }
@@ -101,15 +83,17 @@ resource "aws_ebs_volume" "export_home" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-    { Name = "export/home" }
+    { Name = "export/home_dr" }
   )
 }
-resource "aws_volume_attachment" "export_home_att" {
+resource "aws_volume_attachment" "export_home_att_dr" {
+  count       = local.environment == "development" ? 1 : 0
   device_name = "/dev/sdh"
-  volume_id   = aws_ebs_volume.export_home.id
-  instance_id = aws_instance.ec2_oracle_ebs.id
+  volume_id   = aws_ebs_volume.export_home_dr[0].id
+  instance_id = aws_instance.ec2_oracle_ebs_dr[0].id
 }
-resource "aws_ebs_volume" "u01" {
+resource "aws_ebs_volume" "u01_dr" {
+  count = local.environment == "development" ? 1 : 0
   lifecycle {
     ignore_changes = [kms_key_id]
   }
@@ -120,15 +104,17 @@ resource "aws_ebs_volume" "u01" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-    { Name = "u01" }
+    { Name = "u01_dr" }
   )
 }
-resource "aws_volume_attachment" "u01_att" {
+resource "aws_volume_attachment" "u01_att_dr" {
+  count       = local.environment == "development" ? 1 : 0
   device_name = "/dev/sdi"
-  volume_id   = aws_ebs_volume.u01.id
-  instance_id = aws_instance.ec2_oracle_ebs.id
+  volume_id   = aws_ebs_volume.u01_dr[0].id
+  instance_id = aws_instance.ec2_oracle_ebs_dr[0].id
 }
-resource "aws_ebs_volume" "arch" {
+resource "aws_ebs_volume" "arch_dr" {
+  count = local.environment == "development" ? 1 : 0
   lifecycle {
     ignore_changes = [kms_key_id]
   }
@@ -139,15 +125,17 @@ resource "aws_ebs_volume" "arch" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-    { Name = "arch" }
+    { Name = "arch_dr" }
   )
 }
-resource "aws_volume_attachment" "arch_att" {
+resource "aws_volume_attachment" "arch_att_dr" {
+  count       = local.environment == "development" ? 1 : 0
   device_name = "/dev/sdj"
-  volume_id   = aws_ebs_volume.arch.id
-  instance_id = aws_instance.ec2_oracle_ebs.id
+  volume_id   = aws_ebs_volume.arch_dr[0].id
+  instance_id = aws_instance.ec2_oracle_ebs_dr[0].id
 }
-resource "aws_ebs_volume" "dbf" {
+resource "aws_ebs_volume" "dbf_dr" {
+  count = local.environment == "development" ? 1 : 0
   lifecycle {
     ignore_changes = [kms_key_id]
   }
@@ -158,15 +146,17 @@ resource "aws_ebs_volume" "dbf" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-    { Name = "dbf" }
+    { Name = "dbf_dr" }
   )
 }
-resource "aws_volume_attachment" "dbf_att" {
+resource "aws_volume_attachment" "dbf_att_dr" {
+  count       = local.environment == "development" ? 1 : 0
   device_name = "/dev/sdk"
-  volume_id   = aws_ebs_volume.dbf.id
-  instance_id = aws_instance.ec2_oracle_ebs.id
+  volume_id   = aws_ebs_volume.dbf_dr[0].id
+  instance_id = aws_instance.ec2_oracle_ebs_dr[0].id
 }
-resource "aws_ebs_volume" "redoA" {
+resource "aws_ebs_volume" "redoA_dr" {
+  count = local.environment == "development" ? 1 : 0
   lifecycle {
     ignore_changes = [kms_key_id]
   }
@@ -177,15 +167,17 @@ resource "aws_ebs_volume" "redoA" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-    { Name = "redoA" }
+    { Name = "redoA_dr" }
   )
 }
-resource "aws_volume_attachment" "redoA_att" {
+resource "aws_volume_attachment" "redoA_att_dr" {
+  count       = local.environment == "development" ? 1 : 0
   device_name = "/dev/sdl"
-  volume_id   = aws_ebs_volume.redoA.id
-  instance_id = aws_instance.ec2_oracle_ebs.id
+  volume_id   = aws_ebs_volume.redoA_dr[0].id
+  instance_id = aws_instance.ec2_oracle_ebs_dr[0].id
 }
-resource "aws_ebs_volume" "techst" {
+resource "aws_ebs_volume" "techst_dr" {
+  count = local.environment == "development" ? 1 : 0
   lifecycle {
     ignore_changes = [kms_key_id]
   }
@@ -196,15 +188,17 @@ resource "aws_ebs_volume" "techst" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-    { Name = "techst" }
+    { Name = "techst_dr" }
   )
 }
-resource "aws_volume_attachment" "techst_att" {
+resource "aws_volume_attachment" "techst_att_dr" {
+  count       = local.environment == "development" ? 1 : 0
   device_name = "/dev/sdm"
-  volume_id   = aws_ebs_volume.techst.id
-  instance_id = aws_instance.ec2_oracle_ebs.id
+  volume_id   = aws_ebs_volume.techst_dr[0].id
+  instance_id = aws_instance.ec2_oracle_ebs_dr[0].id
 }
-resource "aws_ebs_volume" "backup" {
+resource "aws_ebs_volume" "backup_dr" {
+  count = local.environment == "development" ? 1 : 0
   lifecycle {
     ignore_changes = [kms_key_id]
   }
@@ -215,79 +209,12 @@ resource "aws_ebs_volume" "backup" {
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
-    { Name = "backup" }
+    { Name = "backup_dr" }
   )
 }
-resource "aws_volume_attachment" "backup_att" {
+resource "aws_volume_attachment" "backup_att_dr" {
+  count       = local.environment == "development" ? 1 : 0
   device_name = "/dev/sdn"
-  volume_id   = aws_ebs_volume.backup.id
-  instance_id = aws_instance.ec2_oracle_ebs.id
-}
-resource "aws_ebs_volume" "redoB" {
-  count = local.is-production ? 1 : 0
-  lifecycle {
-    ignore_changes = [kms_key_id]
-  }
-  availability_zone = "eu-west-2a"
-  size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_redoB
-  type              = "io2"
-  iops              = 3000
-  encrypted         = true
-  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  tags = merge(local.tags,
-    { Name = "redoB" }
-  )
-}
-resource "aws_volume_attachment" "redoB_att" {
-  count = local.is-production ? 1 : 0
-  depends_on = [
-    aws_ebs_volume.redoB
-  ]
-  device_name = "/dev/sdo"
-  volume_id   = aws_ebs_volume.redoB[0].id
-  instance_id = aws_instance.ec2_oracle_ebs.id
-}
-resource "aws_ebs_volume" "diag" {
-  count = local.is-production ? 1 : 0
-  lifecycle {
-    ignore_changes = [kms_key_id]
-  }
-  availability_zone = "eu-west-2a"
-  size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_diag
-  type              = "io2"
-  iops              = 3000
-  encrypted         = true
-  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  tags = merge(local.tags,
-    { Name = "diag" }
-  )
-}
-resource "aws_volume_attachment" "diag_att" {
-  count = local.is-production ? 1 : 0
-  depends_on = [
-    aws_ebs_volume.diag
-  ]
-  device_name = "/dev/sdp"
-  volume_id   = aws_ebs_volume.diag[0].id
-  instance_id = aws_instance.ec2_oracle_ebs.id
-}
-
-module "cw-ebs-ec2" {
-  source = "./modules/cw-ec2"
-
-  name  = "ec2-ebs"
-  topic = aws_sns_topic.cw_alerts.arn
-
-  for_each     = local.application_data.cloudwatch_ec2
-  metric       = each.key
-  eval_periods = each.value.eval_periods
-  period       = each.value.period
-  threshold    = each.value.threshold
-
-  # Dimensions used across all alarms
-  instanceId   = aws_instance.ec2_oracle_ebs.id
-  imageId      = local.environment == "development" ? local.application_data.accounts[local.environment].restored_db_image : data.aws_ami.oracle_db.id
-  instanceType = local.application_data.accounts[local.environment].ec2_oracle_instance_type_ebsdb
-  fileSystem   = "xfs"       # Linux root filesystem
-  rootDevice   = "nvme0n1p1" # This is used by default for root on all the ec2 images
+  volume_id   = aws_ebs_volume.backup_dr[0].id
+  instance_id = aws_instance.ec2_oracle_ebs_dr[0].id
 }

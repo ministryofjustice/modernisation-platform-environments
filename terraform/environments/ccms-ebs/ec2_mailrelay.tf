@@ -17,7 +17,11 @@ resource "aws_instance" "ec2_mailrelay" {
   }
 
   user_data_replace_on_change = true
-  user_data                   = base64encode(templatefile("./templates/ec2_user_data_mailrelay.sh", {}))
+  user_data = base64encode(templatefile("./templates/ec2_user_data_mailrelay.sh", {
+    hostname  = "mailrelay"
+    mp_fqdn   = "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+    smtp_fqdn = "${local.application_data.accounts[local.environment].ses_domain_identity}"
+  }))
 
   metadata_options {
     http_endpoint = "enabled"
@@ -95,4 +99,23 @@ module "cw-mailrelay-ec2" {
   instanceType = local.application_data.accounts[local.environment].ec2_instance_type_mailrelay
   fileSystem   = "xfs"       # Linux root filesystem
   rootDevice   = "nvme0n1p1" # This is used by default for root on all the ec2 images
+}
+
+resource "aws_route53_record" "route53_record_mailrelay" {
+  provider = aws.core-vpc
+  zone_id  = data.aws_route53_zone.external.zone_id
+  name     = "mailrelay.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type     = "A"
+  ttl      = "300"
+  records  = [aws_instance.ec2_mailrelay.private_ip]
+}
+
+output "route53_record_mailrelay" {
+  description = "Mailrelay Route53 record"
+  value       = aws_route53_record.route53_record_mailrelay.fqdn
+}
+
+output "ec2_private_ip_mailrelay" {
+  description = "Mailrelay Private IP"
+  value       = aws_instance.ec2_mailrelay.private_ip
 }

@@ -3,7 +3,7 @@
 module "s3-log-archive-bucket" { #tfsec:ignore:aws-s3-enable-versioning
   count = local.environment == "production" ? 1 : 0
 
-  source    = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.4.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v6.4.0"
   providers = {
     aws.bucket-replication = aws
   }
@@ -29,7 +29,7 @@ module "s3-log-archive-bucket" { #tfsec:ignore:aws-s3-enable-versioning
         {
           days          = 90
           storage_class = "STANDARD_IA"
-          }
+        }
       ]
 
       expiration = {
@@ -40,7 +40,7 @@ module "s3-log-archive-bucket" { #tfsec:ignore:aws-s3-enable-versioning
         {
           days          = 90
           storage_class = "STANDARD_IA"
-          }
+        }
       ]
 
       noncurrent_version_expiration = {
