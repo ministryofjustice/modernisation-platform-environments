@@ -44,6 +44,10 @@ resource "aws_lb" "tipstaff_lb" {
   enable_deletion_protection = false
   internal                   = false
   depends_on                 = [aws_security_group.tipstaff_lb_sc]
+  stickiness {
+    type         = "lb_cookie"
+    cookie_expiration_period = 1800
+  }
 }
 
 resource "aws_lb_target_group" "tipstaff_target_group" {
