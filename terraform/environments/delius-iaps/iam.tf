@@ -33,25 +33,15 @@ locals {
 
 data "aws_iam_policy_document" "snapshot_sharer" {
   statement {
-    sid    = "ListSnapshots"
+    sid = "CopyAndShareSnapshots"
     effect = "Allow"
     actions = [
-      "rds:DescribeDBSnapshots"
-    ]
-    resources = [
-      local.iaps_rds_snapshot_arn_prefix,
-      aws_db_instance.iaps.arn
-    ]
-  }
-
-  statement {
-    sid    = "ShareSnapshots"
-    effect = "Allow"
-    actions = [
+      "rds:CopyDBSnapshot",
+      "rds:DescribeDBSnapshots",
       "rds:ModifyDBSnapshotAttribute"
     ]
     resources = [
-      local.iaps_rds_snapshot_arn_prefix
+      local.iaps_rds_snapshot_arn_prefix,
     ]
   }
 }
