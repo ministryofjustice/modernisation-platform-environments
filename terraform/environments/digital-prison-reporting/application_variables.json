@@ -2,7 +2,7 @@
   "accounts": {
     "development": {
       "project_short_id": "dpr",
-      "create_database": false,
+      "create_database": true,
       "db_description": "DPR Data Catalog",
       "create_job": true,
       "glue_job_name": "glue-job-ingester",
