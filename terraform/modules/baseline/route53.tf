@@ -153,18 +153,18 @@ resource "aws_route53_zone" "this" {
   })
 }
 
-#resource "aws_cloudwatch_log_group" "route53" {
-#  for_each = local.route53_zones_to_create
-#
-#  provider = aws.us-east-1
-#
-#  name              = "route53/${each.key}"
-#  retention_in_days = 30
-#
-#  tags = merge(local.tags, {
-#    Name = "route53/${each.key}"
-#  })
-#}
+resource "aws_cloudwatch_log_group" "route53" {
+  for_each = local.route53_zones_to_create
+
+  provider = aws.us-east-1
+
+  name              = "route53/${each.key}"
+  retention_in_days = 30
+
+  tags = merge(local.tags, {
+    Name = "route53/${each.key}"
+  })
+}
 
 #resource "aws_route53_query_log" "this" {
 #  for_each = local.route53_zones_to_create
