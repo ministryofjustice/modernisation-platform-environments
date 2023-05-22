@@ -157,7 +157,6 @@ resource "aws_cloudwatch_log_group" "route53" {
   for_each = local.route53_zones_to_create
 
   name              = "route53/${each.key}"
-  kms_key_id        = var.environment.kms_keys["general"].arn
   retention_in_days = 30
 
   tags = merge(local.tags, {
