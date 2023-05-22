@@ -9,7 +9,7 @@ module "onprem_gateway" {
 
   ami_name                      = "374269020027/mp_WindowsServer2022_2023-04-01T00-00-17.453Z"
   ami_owner                     = "core-shared-services-production"
-  instance                      = "t3.medium"
+  instance                      = {}
   ebs_volumes_copy_all_from_ami = true
   ebs_kms_key_id                = data.aws_kms_key.ebs_shared.arn
   ebs_volume_config             = {}
