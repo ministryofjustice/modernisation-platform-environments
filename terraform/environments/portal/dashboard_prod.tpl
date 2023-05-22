@@ -200,6 +200,24 @@
             },
             {
               "type" : "metric",
+              "x" : 16,
+              "y" : 12,
+              "width" : 8,
+              "height" : 6,
+              "properties" : {
+                  "title" : "OIM2 Memory usage",
+                  "annotations": {
+                    "alarms": [
+                      "${oim2_memory_alarm_arn}"
+                    ]
+                  },
+                  "view": "timeSeries",
+                  "region": "${aws_region}",
+                  "stacked": false
+              }
+            },
+            {
+              "type" : "metric",
               "x" : 0,
               "y" : 12,
               "width" : 8,
@@ -209,6 +227,24 @@
                   "annotations": {
                     "alarms": [
                       "${oam1_memory_alarm_arn}"
+                    ]
+                  },
+                  "view": "timeSeries",
+                  "region": "${aws_region}",
+                  "stacked": false
+              }
+            },
+            {
+              "type" : "metric",
+              "x" : 8,
+              "y" : 12,
+              "width" : 8,
+              "height" : 6,
+              "properties" : {
+                  "title" : "OAM2 Memory usage",
+                  "annotations": {
+                    "alarms": [
+                      "${oam2_memory_alarm_arn}"
                     ]
                   },
                   "view": "timeSeries",
@@ -236,6 +272,24 @@
             },
             {
               "type" : "metric",
+              "x" : 0,
+              "y" : 12,
+              "width" : 8,
+              "height" : 6,
+              "properties" : {
+                  "title" : "IDM2 Memory usage",
+                  "annotations": {
+                    "alarms": [
+                      "${idm2_memory_alarm_arn}"
+                    ]
+                  },
+                  "view": "timeSeries",
+                  "region": "${aws_region}",
+                  "stacked": false
+              }
+            },
+            {
+              "type" : "metric",
               "x" : 8,
               "y" : 12,
               "width" : 8,
@@ -251,7 +305,60 @@
                   "region": "${aws_region}",
                   "stacked": false
               }
+            },
+            {
+              "type" : "metric",
+              "x" : 16,
+              "y" : 12,
+              "width" : 8,
+              "height" : 6,
+              "properties" : {
+                  "title" : "OHS2 Memory usage",
+                  "annotations": {
+                    "alarms": [
+                      "${ohs2_memory_alarm_arn}"
+                    ]
+                  },
+                  "view": "timeSeries",
+                  "region": "${aws_region}",
+                  "stacked": false
+              }
+            },
+            {
+              "type" : "metric",
+              "x" : 0,
+              "y" : 12,
+              "width" : 8,
+              "height" : 6,
+              "properties" : {
+                  "title" : "OIM2 Root FS Disk Space",
+                  "annotations": {
+                    "alarms": [
+                      "${oim2_diskspace_alarm_arn}"
+                    ]
+                  },
+                  "view": "timeSeries",
+                  "region": "${aws_region}",
+                  "stacked": false
+              }
+            },
+            {
+              "type" : "metric",
+              "x" : 8,
+              "y" : 12,
+              "width" : 8,
+              "height" : 6,
+              "properties" : {
+                  "title" : "OIM2 Swap Space",
+                  "annotations": {
+                    "alarms": [
+                      "${oim2_swapspace_alarm_arn}"
+                    ]
+                  },
+                  "view": "timeSeries",
+                  "region": "${aws_region}",
+                  "stacked": false
+              }
             }
-
           ]
 }
