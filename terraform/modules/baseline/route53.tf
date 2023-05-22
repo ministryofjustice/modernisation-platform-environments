@@ -153,29 +153,29 @@ resource "aws_route53_zone" "this" {
   })
 }
 
-resource "aws_cloudwatch_log_group" "route53" {
-  for_each = local.route53_zones_to_create
+#resource "aws_cloudwatch_log_group" "route53" {
+#  for_each = local.route53_zones_to_create
+#
+#  provider = aws.us-east-1
+#
+#  name              = "route53/${each.key}"
+#  retention_in_days = 30
+#
+#  tags = merge(local.tags, {
+#    Name = "route53/${each.key}"
+#  })
+#}
 
-  provider = aws.us-east-1
-
-  name              = "route53/${each.key}"
-  retention_in_days = 30
-
-  tags = merge(local.tags, {
-    Name = "route53/${each.key}"
-  })
-}
-
-resource "aws_route53_query_log" "this" {
-  for_each = local.route53_zones_to_create
-
-  cloudwatch_log_group_arn = aws_cloudwatch_log_group.route53[each.key].arn
-  zone_id                  = aws_route53_zone.this[each.key].zone_id
-
-  depends_on = [
-    aws_iam_policy.this,
-  ]
-}
+#resource "aws_route53_query_log" "this" {
+#  for_each = local.route53_zones_to_create
+#
+#  cloudwatch_log_group_arn = aws_cloudwatch_log_group.route53[each.key].arn
+#  zone_id                  = aws_route53_zone.this[each.key].zone_id
+#
+#  depends_on = [
+#    aws_iam_policy.this,
+#  ]
+#}
 
 resource "aws_route53_record" "self" {
   for_each = local.route53_records_self
