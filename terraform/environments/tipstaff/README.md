@@ -11,13 +11,13 @@ _If you have any questions surrounding this page please post in the `#team-name`
 
 <!-- Adding the last date this page was reviewed, with any accompanying information -->
 
-19/05/23
+22/05/23
 
 ### **Description:**
 
 <!-- A short (less than 50 word) description of what your service does, and who it’s for.-->
 
-Terraform Infrastructure as code that creates 3 AWS environments for the Tipstaff application: Development, PreProduction, and Production.
+Terraform Infrastructure as code that creates 3 AWS environments for the Tipstaff application: Development, PreProduction, and Production, including an RDS Postgresql database, and a DMS Database Migration Service for 
 
 ### **Service URLs:**
 
