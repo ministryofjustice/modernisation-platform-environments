@@ -31,3 +31,50 @@ module "onprem_gateway" {
   account_ids_lookup       = local.environment_management.account_ids
   cloudwatch_metric_alarms = {}
 }
+
+locals {
+  # ec2_common_managed_policies = [
+  #   aws_iam_policy.ec2_common_policy.arn
+  # ]
+  instance = {
+    disable_api_termination      = false
+    instance_type                = "t3.medium"
+    key_name                     = try(aws_key_pair.ec2-user.key_name)
+    monitoring                   = false
+    metadata_options_http_tokens = "required"
+    vpc_security_group_ids       = try([aws_security_group.example_ec2_sg.id])
+  }
+}
+
+# create single managed policy
+# resource "aws_iam_policy" "ec2_common_policy" {
+#   name        = "ec2-common-policy"
+#   path        = "/"
+#   description = "Common policy for all ec2 instances"
+#   policy      = data.aws_iam_policy_document.ec2_common_combined.json
+#   tags = merge(
+#     local.tags,
+#     {
+#       Name = "ec2-common-policy"
+#     },
+#   )
+# }
+
+# # combine ec2-common policy documents
+# data "aws_iam_policy_document" "ec2_common_combined" {
+#   source_policy_documents = [
+#     data.aws_iam_policy_document.ec2_policy.json,
+#   ]
+# }
+
+# # custom policy for SSM as managed policy AmazonSSMManagedInstanceCore is too permissive
+# data "aws_iam_policy_document" "ec2_policy" {
+#   statement {
+#     sid    = "CustomEc2Policy"
+#     effect = "Allow"
+#     actions = [
+#       "ec2:*"
+#     ]
+#     resources = ["*"] #tfsec:ignore:aws-iam-no-policy-wildcards
+#   }
+# }
