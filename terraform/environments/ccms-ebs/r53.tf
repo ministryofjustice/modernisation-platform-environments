@@ -102,7 +102,7 @@ resource "aws_route53_record" "webgate_ec2" {
 
 resource "aws_route53_record" "webgate_ec2_single" {
   provider = aws.core-vpc
-  count    = local.is_production || local.is_preproduction ? 0 : local.application_data.accounts[local.environment].webgate_no_instances
+  count    = local.is-production || local.is-preproduction ? 0 : local.application_data.accounts[local.environment].webgate_no_instances
   zone_id = data.aws_route53_zone.external.zone_id
   name    = "${local.application_data.accounts[local.environment].webgate_dns_prefix}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   type    = "A"
@@ -150,7 +150,7 @@ resource "aws_route53_record" "accessgate_ec2" {
 
 resource "aws_route53_record" "accessgate_ec2_single" {
   provider = aws.core-vpc
-  count    = local.is_production || local.is_preproduction ? 0 : local.application_data.accounts[local.environment].accessgate_no_instances
+  count    = local.is-production || local.is-preproduction ? 0 : local.application_data.accounts[local.environment].accessgate_no_instances
   zone_id = data.aws_route53_zone.external.zone_id
   name    = "${local.application_data.accounts[local.environment].accessgate_dns_prefix}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   type    = "A"
