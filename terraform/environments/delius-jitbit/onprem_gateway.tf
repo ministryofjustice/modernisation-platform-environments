@@ -13,7 +13,7 @@ module "onprem_gateway" {
   ebs_volumes_copy_all_from_ami = true
   ebs_kms_key_id                = data.aws_kms_key.ebs_shared.arn
   ebs_volume_config             = {}
-  ebs_volumes                   = {}
+  ebs_volumes                   = local.ebs_volumes
   ssm_parameters_prefix         = null
   ssm_parameters                = null
   route53_records               = local.route53_records
@@ -56,6 +56,10 @@ locals {
 
   region = "eu-west-2"
   availability_zone_1 = "eu-west-2a"
+
+  ebs_volumes = {
+    "/dev/sda1" = { kms_key_id = data.aws_kms_key.default_ebs.arn }
+  }
 
 }
 
@@ -113,4 +117,9 @@ resource "aws_security_group" "onprem_gateway" {
   name        = "${local.application_name}-${local.environment}-onprem-gateway"
   description = "onprem gateway sg"
   vpc_id      = data.aws_vpc.shared.id
+}
+
+# Has to be in the locals else
+data "aws_kms_key" "default_ebs" {
+  key_id = "alias/aws/ebs"
 }
