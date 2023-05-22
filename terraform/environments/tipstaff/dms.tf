@@ -1,3 +1,7 @@
+// These resources setup and configure AWS DMS (Database Migration Service) to migrate data from the existing RDS instance in the Tactical Products AWS account to the new RDS instance in the Modernisation Platform.
+// Split into 3 sections: Shared resources (resources that are the same in both Pre-Prod and Prod environments), and then Pre-Prod and Prod specific resources, as each will have different target endpoints.
+// DMS is not used in the Dev environment.
+
 //Shared resources:
 resource "aws_dms_endpoint" "target" {
   depends_on    = [aws_db_instance.tipstaff_db]
@@ -180,6 +184,7 @@ resource "aws_security_group" "modernisation_dms_access_pre_prod" {
   }
 }
 
+// executes a local script to set up the security group for the target RDS instance in the pre-production environment.
 resource "null_resource" "setup_target_rds_security_group_pre_prod" {
   count      = local.is-preproduction ? 1 : 0
   depends_on = [aws_dms_replication_instance.tipstaff_replication_instance]
@@ -285,6 +290,7 @@ resource "aws_security_group" "modernisation_dms_access_prod" {
   }
 }
 
+// executes a local script to set up the security group for the target RDS instance in the production environment.
 resource "null_resource" "setup_target_rds_security_group_prod" {
   count      = local.is-production ? 1 : 0
   depends_on = [aws_dms_replication_instance.tipstaff_replication_instance]
