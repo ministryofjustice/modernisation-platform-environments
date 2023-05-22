@@ -47,7 +47,7 @@ locals {
         })
       })
 
-      dev-jumpserver-2022 = {
+      test-jumpserver-2022 = {
         # ami has unwanted ephemeral device, don't copy all the ebs_volumess
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name                      = "nomis_windows_server_2022_jumpserver_release_*"
