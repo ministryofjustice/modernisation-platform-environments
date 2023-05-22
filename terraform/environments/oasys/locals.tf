@@ -329,7 +329,7 @@ locals {
       }
     }
     # Alarms for certificates
-    cloudwatch_metric_alarms_acm = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso_pagerduty"].acm_default
+    cloudwatch_metric_alarms_acm = {} # module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso_pagerduty"].acm_default
 
     # Environment specific certificates
     development   = {}
