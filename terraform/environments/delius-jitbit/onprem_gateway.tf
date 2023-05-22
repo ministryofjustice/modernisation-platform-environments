@@ -1,13 +1,3 @@
-resource "aws_instance" "onprem_gateway" {
-  ami           = "ami-070921018feda40c6"
-  instance_type = "t3.medium"
-#  iam_instance_profile = aws_iam_instance_profile.onprem_gateway.name  
-  kms_key_id            = data.aws_kms_key.ebs_shared.arn
-  tags = {
-    Name = "test"
-  }
-}
-
 module "onprem_gateway" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance"
 
