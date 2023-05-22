@@ -149,7 +149,7 @@ locals {
         namespace           = "CWAgent"
         period              = "60"
         statistic           = "Maximum"
-        threshold           = "30"
+        threshold           = "40"
         alarm_description   = "Triggers if the amount of CPU time spent waiting for I/O to complete is continually high for 3 hours"
       }
     }

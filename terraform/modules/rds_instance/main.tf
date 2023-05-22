@@ -60,7 +60,7 @@ resource "aws_db_instance" "this" {
 resource "aws_db_instance_automated_backups_replication" "this" {
   source_db_instance_arn = aws_db_instance.this.arn
   retention_period       = var.instance_automated_backups_replication
-  kms_key_id  = var.instance.kms_key_id != null ? var.instance.kms_key_id : null
+  kms_key_id             = var.instance.kms_key_id != null ? var.instance.kms_key_id : null
 }
 
 #-------------------------------------------------------------

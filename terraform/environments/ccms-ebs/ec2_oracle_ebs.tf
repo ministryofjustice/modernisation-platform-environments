@@ -80,7 +80,7 @@ EOF
       { Name = "temp" }
     )
   }
-  */  
+  */
 
   tags = merge(local.tags,
     { Name = lower(format("ec2-%s-%s-ebsdb", local.application_name, local.environment)) },
