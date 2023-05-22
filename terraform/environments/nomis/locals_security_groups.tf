@@ -7,10 +7,14 @@ locals {
       module.ip_addresses.azure_fixngo_cidrs.internet_egress,
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
       module.ip_addresses.moj_cidrs.trusted_moj_enduser_internal,
+      module.ip_addresses.mp_cidr.hmpps-development,
+      module.ip_addresses.mp_cidr.hmpps-test,
     ])
     http7xxx = flatten([
       module.ip_addresses.azure_fixngo_cidrs.devtest,
       module.ip_addresses.azure_fixngo_cidrs.internet_egress,
+      module.ip_addresses.mp_cidr.hmpps-development,
+      module.ip_addresses.mp_cidr.hmpps-test,
     ])
     oracle_db = flatten([
       module.ip_addresses.azure_fixngo_cidrs.devtest,
@@ -21,6 +25,8 @@ locals {
     ])
     oracle_oem_agent = flatten([
       module.ip_addresses.azure_fixngo_cidrs.devtest,
+      module.ip_addresses.mp_cidr.hmpps-development,
+      module.ip_addresses.mp_cidr.hmpps-test,
     ])
   }
   security_group_cidrs_preprod_prod = {
@@ -30,10 +36,14 @@ locals {
       module.ip_addresses.azure_fixngo_cidrs.internet_egress,
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
       module.ip_addresses.moj_cidrs.trusted_moj_enduser_internal,
+      module.ip_addresses.mp_cidr.hmpps-preproduction,
+      module.ip_addresses.mp_cidr.hmpps-production,
     ])
     http7xxx = flatten([
       module.ip_addresses.azure_fixngo_cidrs.prod,
       module.ip_addresses.azure_fixngo_cidrs.internet_egress,
+      module.ip_addresses.mp_cidr.hmpps-preproduction,
+      module.ip_addresses.mp_cidr.hmpps-production,
     ])
     oracle_db = flatten([
       module.ip_addresses.azure_fixngo_cidrs.prod,
@@ -44,6 +54,8 @@ locals {
     ])
     oracle_oem_agent = flatten([
       module.ip_addresses.azure_fixngo_cidrs.prod,
+      module.ip_addresses.mp_cidr.hmpps-preproduction,
+      module.ip_addresses.mp_cidr.hmpps-production,
     ])
   }
 
