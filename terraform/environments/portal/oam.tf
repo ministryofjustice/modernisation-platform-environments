@@ -206,7 +206,7 @@ resource "aws_instance" "oam_instance_2" {
 # OAM EBS Volumes
 ###############################
 
-resource "aws_ebs_volume" "repo_home" {
+resource "aws_ebs_volume" "oam_repo_home" {
   availability_zone = "eu-west-2a"
   size              = 150
   type              = "gp2"
@@ -223,13 +223,13 @@ resource "aws_ebs_volume" "repo_home" {
     { "Name" = "${local.application_name}-OAM-repo-home" },
   )
 }
-resource "aws_volume_attachment" "repo_home" {
+resource "aws_volume_attachment" "oam_repo_home" {
   device_name = "/dev/sdf"
-  volume_id   = aws_ebs_volume.repo_home.id
+  volume_id   = aws_ebs_volume.oam_repo_home.id
   instance_id = aws_instance.oam_instance_1.id
 }
 
-resource "aws_ebs_volume" "config" {
+resource "aws_ebs_volume" "oam_config" {
   availability_zone = "eu-west-2a"
   size              = 15
   type              = "gp2"
@@ -246,13 +246,13 @@ resource "aws_ebs_volume" "config" {
     { "Name" = "${local.application_name}-OAM-config" },
   )
 }
-resource "aws_volume_attachment" "config" {
+resource "aws_volume_attachment" "oam_onfig" {
   device_name = "/dev/xvdd"
-  volume_id   = aws_ebs_volume.config.id
+  volume_id   = aws_ebs_volume.oam_config.id
   instance_id = aws_instance.oam_instance_1.id
 }
 
-resource "aws_ebs_volume" "fmw" {
+resource "aws_ebs_volume" "oam_fmw" {
   availability_zone = "eu-west-2a"
   size              = 30
   type              = "gp2"
@@ -269,13 +269,13 @@ resource "aws_ebs_volume" "fmw" {
     { "Name" = "${local.application_name}-OAM-fmw" },
   )
 }
-resource "aws_volume_attachment" "fmw" {
+resource "aws_volume_attachment" "oam_fmw" {
   device_name = "/dev/xvdb"
-  volume_id   = aws_ebs_volume.fmw.id
+  volume_id   = aws_ebs_volume.oam_fmw.id
   instance_id = aws_instance.oam_instance_1.id
 }
 
-resource "aws_ebs_volume" "aserver" {
+resource "aws_ebs_volume" "oam_aserver" {
   availability_zone = "eu-west-2a"
   size              = 15
   type              = "gp2"
@@ -292,13 +292,13 @@ resource "aws_ebs_volume" "aserver" {
     { "Name" = "${local.application_name}-OAM-aserver" },
   )
 }
-resource "aws_volume_attachment" "aserver" {
+resource "aws_volume_attachment" "oam_aserver" {
   device_name = "/dev/xvdc"
-  volume_id   = aws_ebs_volume.aserver.id
+  volume_id   = aws_ebs_volume.oam_aserver.id
   instance_id = aws_instance.oam_instance_1.id
 }
 
-resource "aws_ebs_volume" "mserver" {
+resource "aws_ebs_volume" "oam_mserver" {
   availability_zone = "eu-west-2a"
   size              = 40
   type              = "gp2"
@@ -315,9 +315,9 @@ resource "aws_ebs_volume" "mserver" {
     { "Name" = "${local.application_name}-OAM-mserver" },
   )
 }
-resource "aws_volume_attachment" "mserver" {
+resource "aws_volume_attachment" "oam_mserver" {
   device_name = "/dev/xvde"
-  volume_id   = aws_ebs_volume.mserver.id
+  volume_id   = aws_ebs_volume.oam_mserver.id
   instance_id = aws_instance.oam_instance_1.id
 }
 
