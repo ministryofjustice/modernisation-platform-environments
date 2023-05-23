@@ -47,6 +47,36 @@ locals {
         })
       })
 
+      t1-nomix-xtag-a = {
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name          = "base_rhel_7_9_*"
+          availability_zone = null
+        })
+        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+          vpc_security_group_ids = ["private-web"]
+        })
+        user_data_cloud_init = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible, {
+          args = merge(module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible, {
+            branch = "nomis/xtag_weblogic_setup"
+          })
+        })
+        autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
+          desired_capacity = 0
+        })
+        # autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
+        tags = {
+          description          = "For testing XTAG image"
+          ami                  = "base_rhel_7_9"
+          os-type              = "Linux"
+          component            = "test"
+          server-type          = "nomis-xtag"
+          nomis-environment    = "t1"
+          oracle-db-hostname-a = "t1nomis-a.test.nomis.service.justice.gov.uk"
+          oracle-db-hostname-b = "t1nomis-b.test.nomis.service.justice.gov.uk"
+          oracle-db-name       = "T1CNOM"
+        }
+      }
+
       test-jumpserver-2022 = {
         # ami has unwanted ephemeral device, don't copy all the ebs_volumess
         config = merge(module.baseline_presets.ec2_instance.config.default, {
