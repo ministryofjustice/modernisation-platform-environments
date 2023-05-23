@@ -429,15 +429,15 @@ resource "aws_route53_record" "oam1_nonprod" {
   records  = [aws_instance.oam_instance_1.private_ip]
 }
 
-resource "aws_route53_record" "oam1_prod" {
-  count    = local.environment == "production" ? 1 : 0
-  provider = aws.core-network-services
-  zone_id  = data.aws_route53_zone.portal-oam.zone_id # TODO This hosted zone name to be determined
-  name     = "${local.application_name}-oam1.${data.aws_route53_zone.portal-oam.zone_id}" # TODO Record name to be determined
-  type     = "A"
-  ttl      = 60
-  records  = [aws_instance.oam_instance_1.private_ip]
-}
+# resource "aws_route53_record" "oam1_prod" {
+#   count    = local.environment == "production" ? 1 : 0
+#   provider = aws.core-network-services
+#   zone_id  = data.aws_route53_zone.portal-oam.zone_id # TODO This hosted zone name to be determined
+#   name     = "${local.application_name}-oam1.${data.aws_route53_zone.portal-oam.zone_id}" # TODO Record name to be determined
+#   type     = "A"
+#   ttl      = 60
+#   records  = [aws_instance.oam_instance_1.private_ip]
+# }
 
 # resource "aws_route53_record" "oam2_prod" {
 #   count    = local.environment == "production" ? 1 : 0
