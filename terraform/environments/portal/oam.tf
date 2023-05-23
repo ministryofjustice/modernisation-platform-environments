@@ -7,13 +7,23 @@ locals {
   # EC2 User data
   oam_1_userdata = <<EOF
 #!/bin/bash
+echo "/dev/xvdb /IDAM/product/fmw ext4 defaults 0 0" >> /etc/fstab
+echo "/dev/xvdc /IDAM/product/runtime/Domain/aserver ext4 defaults 0 0" >> /etc/fstab
+echo "/dev/xvdd /IDAM/product/runtime/Domain/config ext4 defaults 0 0" >> /etc/fstab
+echo "/dev/xvde /IDAM/product/runtime/Domain/mserver ext4 defaults 0 0" >> /etc/fstab
 echo "/dev/sdf /IDMLCM/repo_home ext4 defaults 0 0" >> /etc/fstab
 mount -a
 hostnamectl set-hostname ${local.application_name}-oam1-ms.${data.aws_route53_zone.external.name}
 EOF
   oam_2_userdata = <<EOF
 #!/bin/bash
-
+echo "/dev/xvde /IDAM/product/runtime/Domain/mserver ext4 defaults 0 0" >> /etc/fstab
+echo "${local.application_name}-oam1-ms.${data.aws_route53_zone.external.name}:/IDAM/product/fmw /IDAM/product/fmw nfs nolock 0 0" >> /etc/fstab
+echo "${local.application_name}-oam1-ms.${data.aws_route53_zone.external.name}:/IDAM/product/runtime/Domain/config /IDAM/product/runtime/Domain/config nfs nolock 0 0" >> /etc/fstab
+echo "${local.application_name}-oam1-ms.${data.aws_route53_zone.external.name}:/IDAM/product/runtime/Domain/aserver /IDAM/product/runtime/Domain/aserver nfs nolock 0 0" >> /etc/fstab
+echo "${local.application_name}-oam1-ms.${data.aws_route53_zone.external.name}:/IDMLCM/repo_home /IDMLCM/repo_home nfs nolock 0 0" >> /etc/fstab
+mount -a
+hostnamectl set-hostname ${local.application_name}-oam2-ms.${data.aws_route53_zone.external.name}
 EOF
 }
 
