@@ -52,13 +52,15 @@ resource "aws_iam_instance_profile" "onprem_gateway_profile" {
   role = aws_iam_role.onprem_gateway_iam_role.name
 }
 
-# Pre-req - Derive latest AMI
+# Get latest Windows Server 2019 AMI
 data "aws_ami" "onprem_gateway_windows" {
   most_recent = true
-  owners      = [local.environment_management.account_ids["core-shared-services-production"]]
-  name_regex  = "^Windows_Server-2022-English-Full-Base*" # base ami for now
+  owners      = ["amazon"]
+  filter {
+    name   = "name"
+    values = ["Windows_Server-2019-English-Full-Base*"]
+  }
 }
-
 
 resource "aws_instance" "onprem_gateway" {
   #checkov:skip=CKV2_AWS_41:"IAM role is not implemented for this example EC2. SSH/AWS keys are not used either."
