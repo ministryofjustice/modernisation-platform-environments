@@ -7,8 +7,8 @@ locals {
   # EC2 User data
   oam_1_userdata = <<EOF
 #!/bin/bash
-# echo "" >> /etc/fstab
-# mount -a
+echo "/dev/sdf /IDMLCM/repo_home ext4 defaults 0 0" >> /etc/fstab
+mount -a
 hostnamectl set-hostname ${local.application_name}-oam1-ms.${data.aws_route53_zone.external.name}
 EOF
   oam_2_userdata = <<EOF
