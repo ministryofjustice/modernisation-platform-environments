@@ -2,7 +2,10 @@
   "accounts": {
     "development": {
       "example_var": "dev-data",
-      "existing_archive_bucket_name": ""
+      "existing_archive_bucket_name": "",
+      "ohssnapshot1" : "snap-09be6356ad9f3ae14",
+      "ohssnapshot2" : "snap-08c74940e74f5403d"
+
     },
     "test": {
       "example_var": "test-data"
