@@ -72,7 +72,7 @@ locals {
             port                      = 443
             protocol                  = "HTTPS"
             ssl_policy                = "ELBSecurityPolicy-2016-08"
-            certificate_names_or_arns = ["application_environment_wildcard_cert"]
+            certificate_names_or_arns = ["${local.application_name}_wildcard_cert_02"]
             # cloudwatch_metric_alarms  = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso_pagerduty"].lb_default
 
             default_action = {
