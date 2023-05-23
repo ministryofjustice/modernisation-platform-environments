@@ -179,160 +179,160 @@ resource "aws_vpc_security_group_ingress_rule" "atos" {
   to_port     = 5575
 }
 
-# resource "aws_instance" "oam_instance_1" {
-#   ami                         = local.application_data.accounts[local.environment].oam_ami_id
-#   availability_zone           = "eu-west-2a"
-#   instance_type               = local.application_data.accounts[local.environment].oam_instance_type
-#   vpc_security_group_ids      = [aws_security_group.oam_instance.id]
-#   monitoring                  = true
-#   subnet_id                   = data.aws_subnet.private_subnets_a.id
-#   iam_instance_profile        = aws_iam_instance_profile.portal.id
-#   user_data_base64            = base64encode(local.oam_1_userdata)
-#
-#   tags = merge(
-#     local.tags,
-#     { "Name" = "${local.application_name} OAM Instance 1" },
-#     { "snapshot-with-daily-35-day-retention" = "yes" }    # TODO the Backup rule needs setting up first
-#   )
-# }
-#
-# resource "aws_instance" "oam_instance_2" {
-#   count = local.environment == "production" ? 1 : 0
-#   ami                         = local.application_data.accounts[local.environment].oam_ami_id
-#   availability_zone           = "eu-west-2b"
-#   instance_type               = local.application_data.accounts[local.environment].oam_instance_type
-#   vpc_security_group_ids      = [aws_security_group.oam_instance.id]
-#   monitoring                  = true
-#   subnet_id                   = data.aws_subnet.private_subnets_b.id
-#   # iam_instance_profile        = aws_iam_instance_profile.portal_instance_profile.id # TODO to be updated once merging with OHS work
-#   user_data_base64            = base64encode(local.oam_2_userdata)
-#
-#   tags = merge(
-#     local.tags,
-#     { "Name" = "${local.application_name} OAM Instance 2" },
-#     { "snapshot-with-daily-35-day-retention" = "yes" }    # TODO the Backup rule needs setting up first
-#   )
-# }
+resource "aws_instance" "oam_instance_1" {
+  ami                         = local.application_data.accounts[local.environment].oam_ami_id
+  availability_zone           = "eu-west-2a"
+  instance_type               = local.application_data.accounts[local.environment].oam_instance_type
+  vpc_security_group_ids      = [aws_security_group.oam_instance.id]
+  monitoring                  = true
+  subnet_id                   = data.aws_subnet.private_subnets_a.id
+  iam_instance_profile        = aws_iam_instance_profile.portal.id
+  user_data_base64            = base64encode(local.oam_1_userdata)
+
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name} OAM Instance 1" },
+    { "snapshot-with-daily-35-day-retention" = "yes" }    # TODO the Backup rule needs setting up first
+  )
+}
+
+resource "aws_instance" "oam_instance_2" {
+  count = local.environment == "production" ? 1 : 0
+  ami                         = local.application_data.accounts[local.environment].oam_ami_id
+  availability_zone           = "eu-west-2b"
+  instance_type               = local.application_data.accounts[local.environment].oam_instance_type
+  vpc_security_group_ids      = [aws_security_group.oam_instance.id]
+  monitoring                  = true
+  subnet_id                   = data.aws_subnet.private_subnets_b.id
+  # iam_instance_profile        = aws_iam_instance_profile.portal_instance_profile.id # TODO to be updated once merging with OHS work
+  user_data_base64            = base64encode(local.oam_2_userdata)
+
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name} OAM Instance 2" },
+    { "snapshot-with-daily-35-day-retention" = "yes" }    # TODO the Backup rule needs setting up first
+  )
+}
 
 
 ###############################
 # OAM EBS Volumes
 ###############################
 
-# resource "aws_ebs_volume" "repo_home" {
-#   availability_zone = "eu-west-2a"
-#   size              = 150
-#   type              = "gp2"
-#   encrypted         = true
-#   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-#   snapshot_id       = local.application_data.accounts[local.environment].oam_repo_home_snapshot
-#
-#   lifecycle {
-#     ignore_changes = [kms_key_id]
-#   }
-#
-#   tags = merge(
-#     local.tags,
-#     { "Name" = "${local.application_name}-OAM-repo-home" },
-#   )
-# }
-# resource "aws_volume_attachment" "repo_home" {
-#   device_name = "/dev/sdf"
-#   volume_id   = aws_ebs_volume.repo_home.id
-#   instance_id = aws_instance.oam_instance_1.id
-# }
-#
-# resource "aws_ebs_volume" "config" {
-#   availability_zone = "eu-west-2a"
-#   size              = 15
-#   type              = "gp2"
-#   encrypted         = true
-#   kms_key_id        = data.aws_kms_key.ebs_shared.key_id  # TODO This key is not being used by Terraform and is pointing to the AWS default one in the local account
-#   snapshot_id       = local.application_data.accounts[local.environment].oam_config_snapshot
-#
-#   lifecycle {
-#     ignore_changes = [kms_key_id]
-#   }
-#
-#   tags = merge(
-#     local.tags,
-#     { "Name" = "${local.application_name}-OAM-config" },
-#   )
-# }
-# resource "aws_volume_attachment" "config" {
-#   device_name = "/dev/xvdd"
-#   volume_id   = aws_ebs_volume.config.id
-#   instance_id = aws_instance.oam_instance_1.id
-# }
-#
-# resource "aws_ebs_volume" "fmw" {
-#   availability_zone = "eu-west-2a"
-#   size              = 30
-#   type              = "gp2"
-#   encrypted         = true
-#   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-#   snapshot_id       = local.application_data.accounts[local.environment].oam_fmw_snapshot
-#
-#   lifecycle {
-#     ignore_changes = [kms_key_id]
-#   }
-#
-#   tags = merge(
-#     local.tags,
-#     { "Name" = "${local.application_name}-OAM-fmw" },
-#   )
-# }
-# resource "aws_volume_attachment" "fmw" {
-#   device_name = "/dev/xvdb"
-#   volume_id   = aws_ebs_volume.fmw.id
-#   instance_id = aws_instance.oam_instance_1.id
-# }
-#
-# resource "aws_ebs_volume" "aserver" {
-#   availability_zone = "eu-west-2a"
-#   size              = 15
-#   type              = "gp2"
-#   encrypted         = true
-#   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-#   snapshot_id       = local.application_data.accounts[local.environment].oam_aserver_snapshot
-#
-#   lifecycle {
-#     ignore_changes = [kms_key_id]
-#   }
-#
-#   tags = merge(
-#     local.tags,
-#     { "Name" = "${local.application_name}-OAM-aserver" },
-#   )
-# }
-# resource "aws_volume_attachment" "aserver" {
-#   device_name = "/dev/xvdc"
-#   volume_id   = aws_ebs_volume.aserver.id
-#   instance_id = aws_instance.oam_instance_1.id
-# }
-#
-# resource "aws_ebs_volume" "mserver" {
-#   availability_zone = "eu-west-2a"
-#   size              = 40
-#   type              = "gp2"
-#   encrypted         = true
-#   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-#   snapshot_id       = local.application_data.accounts[local.environment].oam_mserver_snapshot
-#
-#   lifecycle {
-#     ignore_changes = [kms_key_id]
-#   }
-#
-#   tags = merge(
-#     local.tags,
-#     { "Name" = "${local.application_name}-OAM-mserver" },
-#   )
-# }
-# resource "aws_volume_attachment" "mserver" {
-#   device_name = "/dev/xvde"
-#   volume_id   = aws_ebs_volume.mserver.id
-#   instance_id = aws_instance.oam_instance_1.id
-# }
+resource "aws_ebs_volume" "repo_home" {
+  availability_zone = "eu-west-2a"
+  size              = 150
+  type              = "gp2"
+  encrypted         = true
+  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  snapshot_id       = local.application_data.accounts[local.environment].oam_repo_home_snapshot
+
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
+
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}-OAM-repo-home" },
+  )
+}
+resource "aws_volume_attachment" "repo_home" {
+  device_name = "/dev/sdf"
+  volume_id   = aws_ebs_volume.repo_home.id
+  instance_id = aws_instance.oam_instance_1.id
+}
+
+resource "aws_ebs_volume" "config" {
+  availability_zone = "eu-west-2a"
+  size              = 15
+  type              = "gp2"
+  encrypted         = true
+  kms_key_id        = data.aws_kms_key.ebs_shared.key_id  # TODO This key is not being used by Terraform and is pointing to the AWS default one in the local account
+  snapshot_id       = local.application_data.accounts[local.environment].oam_config_snapshot
+
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
+
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}-OAM-config" },
+  )
+}
+resource "aws_volume_attachment" "config" {
+  device_name = "/dev/xvdd"
+  volume_id   = aws_ebs_volume.config.id
+  instance_id = aws_instance.oam_instance_1.id
+}
+
+resource "aws_ebs_volume" "fmw" {
+  availability_zone = "eu-west-2a"
+  size              = 30
+  type              = "gp2"
+  encrypted         = true
+  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  snapshot_id       = local.application_data.accounts[local.environment].oam_fmw_snapshot
+
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
+
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}-OAM-fmw" },
+  )
+}
+resource "aws_volume_attachment" "fmw" {
+  device_name = "/dev/xvdb"
+  volume_id   = aws_ebs_volume.fmw.id
+  instance_id = aws_instance.oam_instance_1.id
+}
+
+resource "aws_ebs_volume" "aserver" {
+  availability_zone = "eu-west-2a"
+  size              = 15
+  type              = "gp2"
+  encrypted         = true
+  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  snapshot_id       = local.application_data.accounts[local.environment].oam_aserver_snapshot
+
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
+
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}-OAM-aserver" },
+  )
+}
+resource "aws_volume_attachment" "aserver" {
+  device_name = "/dev/xvdc"
+  volume_id   = aws_ebs_volume.aserver.id
+  instance_id = aws_instance.oam_instance_1.id
+}
+
+resource "aws_ebs_volume" "mserver" {
+  availability_zone = "eu-west-2a"
+  size              = 40
+  type              = "gp2"
+  encrypted         = true
+  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  snapshot_id       = local.application_data.accounts[local.environment].oam_mserver_snapshot
+
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
+
+  tags = merge(
+    local.tags,
+    { "Name" = "${local.application_name}-OAM-mserver" },
+  )
+}
+resource "aws_volume_attachment" "mserver" {
+  device_name = "/dev/xvde"
+  volume_id   = aws_ebs_volume.mserver.id
+  instance_id = aws_instance.oam_instance_1.id
+}
 
 ###############################
 # EC2 Instance Profile
