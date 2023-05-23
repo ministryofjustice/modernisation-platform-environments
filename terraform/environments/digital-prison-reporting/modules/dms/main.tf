@@ -2,7 +2,7 @@
 resource "aws_dms_replication_instance" "dms" {
   allocated_storage            = var.replication_instance_storage
   apply_immediately            = true
-  auto_minor_version_upgrade   = true
+  auto_minor_version_upgrade   = false
   availability_zone            = var.availability_zone
   engine_version               = var.replication_instance_version
   multi_az                     = true
@@ -71,12 +71,27 @@ resource "aws_dms_endpoint" "target" {
   endpoint_type = "target"
   engine_name   = var.target_engine
 
-  kinesis_settings {
-    service_access_role_arn        = aws_iam_role.dms-kinesis-role.arn
-    stream_arn                     = var.kinesis_target_stream
-    partition_include_schema_table = true
-    include_partition_value        = true
-  }
+  #kinesis_settings {
+  #  service_access_role_arn        = aws_iam_role.dms-kinesis-role.arn
+  #  stream_arn                     = var.kinesis_target_stream
+  #  partition_include_schema_table = true
+  #  include_partition_value        = true
+  #}
+
+  dynamic "kinesis_settings" {
+    for_each = var.kinesis_settings != null ? [true] : []
+    content {
+      include_control_details        = lookup(var.kinesis_settings, "include_control_details", null)
+      include_null_and_empty         = lookup(var.kinesis_settings, "include_null_and_empty", null)
+      include_partition_value        = lookup(var.kinesis_settings, "include_partition_value", null)
+      include_table_alter_operations = lookup(var.kinesis_settings, "include_table_alter_operations", null)
+      include_transaction_details    = lookup(var.kinesis_settings, "include_transaction_details", null)
+      message_format                 = lookup(var.kinesis_settings, "message_format", null)
+      partition_include_schema_table = lookup(var.kinesis_settings, "partition_include_schema_table", null)
+      service_access_role_arn        = aws_iam_role.dms-kinesis-role.arn
+      stream_arn                     = lookup(var.kinesis_settings, "kinesis_target_stream", null)
+    }
+  }  
 
   tags = var.tags
 }

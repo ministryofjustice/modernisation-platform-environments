@@ -593,7 +593,8 @@
     "TCP_443": {
       "from_port": 443,
       "to_port": 443,
-      "protocol": "TCP"
+      "protocol": "TCP",
+      "destination_cidr": "0.0.0.0/0"
     }
   },
   "lb_sg_egress_rules": {

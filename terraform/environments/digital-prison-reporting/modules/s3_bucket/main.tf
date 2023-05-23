@@ -17,9 +17,13 @@ resource "aws_s3_bucket" "storage" { # TBC "application_tf_state" should be gene
   tags = var.tags
 }
 
-resource "aws_s3_bucket_acl" "acl" {
+resource "aws_s3_bucket_public_access_block" "storage" {
   bucket = aws_s3_bucket.storage[0].id
-  acl    = "private"
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "lifecycle" {
@@ -95,12 +99,14 @@ resource "aws_s3_bucket_notification" "bucket_notification" {
   }
 }
 
-#resource "aws_s3_bucket_versioning" "version" {
-#  bucket = aws_s3_bucket.storage.id
-#  versioning_configuration {
-#    status = "Disabled"
-#  }
-#}
+resource "aws_s3_bucket_versioning" "version" {
+  count  = var.enable_s3_versioning ? 1 : 0
+
+  bucket = aws_s3_bucket.storage[0].id
+  versioning_configuration {
+    status = var.enable_versioning_config
+  }
+}
 
 #S3 bucket access policy
 #resource "aws_iam_policy" "application_tf_state_policy" {
