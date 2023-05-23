@@ -10,6 +10,7 @@ resource "aws_api_gateway_resource" "upload_data" {
 
 resource "aws_api_gateway_method" "upload_data_get" {
   authorization = "CUSTOM"
+  authorizer_id = aws_api_gateway_authorizer.authorizer.id
   http_method   = "GET"
   resource_id   = aws_api_gateway_resource.upload_data.id
   rest_api_id   = aws_api_gateway_rest_api.data_platform.id
