@@ -7,7 +7,7 @@ locals {
   # EC2 User data
   oam_1_userdata = <<EOF
 #!/bin/bash
-hostnamectl set-hostname ${aws_route53_record.oam1_nonprod.name}
+hostnamectl set-hostname ${local.application_name}-oam1-ms.${data.aws_route53_zone.external.name}
 EOF
   oam_2_userdata = <<EOF
 #!/bin/bash
