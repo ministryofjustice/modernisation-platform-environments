@@ -61,8 +61,6 @@ variable "source_address" {}
 
 variable "vpc" {}
 
-variable "kinesis_target_stream" {}
-
 variable "kinesis_stream_policy" {}
 
 variable "availability_zone" {
@@ -172,6 +170,11 @@ variable "target_storage_encrypted" {
 #  description = "Username to access the target database"
 #}
 
+variable "kinesis_settings" {
+  type        = map(any)
+  description = "Configuration block for Kinesis settings"
+  default     = null
+}
 #--------------------------------------------------------------
 # DMS source config
 #--------------------------------------------------------------
@@ -240,10 +243,6 @@ variable "source_rds_is_multi_az" {
   description = "Create backup database in separate availability zone"
   default     = "false"
 }
-
-#variable "source_snapshot" {
-#  description = "Snapshot ID"
-#}
 
 variable "source_storage" {
   default     = "10"

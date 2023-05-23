@@ -1,5 +1,15 @@
 variable "vpc" {}
 
+variable project_id {
+  type        = string
+  description = "Project ID"  
+}
+
+variable "env" {
+  type        = string
+  description = "Env Type"
+}
+
 variable "cidr" {
   description = "A list of security group IDs to associate with"
   type        = list(string)
@@ -152,7 +162,7 @@ variable "master_password" {
 variable "create_random_password" {
   description = "Determines whether to create random password for cluster `master_password`"
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "random_password_length" {
