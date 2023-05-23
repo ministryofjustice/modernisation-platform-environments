@@ -7,20 +7,7 @@ locals {
   # EC2 User data
   oam_1_userdata = <<EOF
 #!/bin/bash
-
-# cp /etc/fstab /etc/fstab_backup
-# echo "UUID=50a9826b-3a50-44d0-ad12-28f2056e9927 /                       xfs     defaults        0 0
-# /swapfile1   none    swap    sw    0   0" > /etc/fstab
-
-# echo "/dev/xvdb /IDAM/product/fmw ext4 defaults 0 0" >> /etc/fstab
-# echo "/dev/xvdc /IDAM/product/runtime/Domain/aserver ext4 defaults 0 0" >> /etc/fstab
-# echo "/dev/xvdd /IDAM/product/runtime/Domain/config ext4 defaults 0 0" >> /etc/fstab
-# echo "/dev/xvde /IDAM/product/runtime/Domain/mserver ext4 defaults 0 0" >> /etc/fstab
-# echo "/dev/sdf /IDMLCM/repo_home ext4 defaults 0 0" >> /etc/fstab
-
-# mount /dev/sdf /IDMLCM/repo_home
-
-
+hostnamectl set-hostname ${aws_route53_record.oam1_nonprod.name}
 EOF
   oam_2_userdata = <<EOF
 #!/bin/bash
@@ -376,6 +363,8 @@ resource "aws_iam_role" "portal" {
 EOF
 }
 
+# TODO What exactly do the instance role require kms:Decrypt for?
+
 resource "aws_iam_policy" "portal" { #tfsec:ignore:aws-iam-no-policy-wildcards
   name = "${local.application_name}-ec2-instance-policy"
   tags = merge(
@@ -409,8 +398,7 @@ resource "aws_iam_policy" "portal" { #tfsec:ignore:aws-iam-no-policy-wildcards
         {
             "Action": "kms:Decrypt",
             "Resource": [
-                "arn:aws:kms:eu-west-2:411213865113:key/f3b83cc5-29df-4cc6-95ce-0171f75caeb7",
-                "arn:aws:kms:eu-west-2:902837325998:key/2ea3df23-7b82-41b2-8cce-bbce2eaff185"
+                "arn:aws:kms:eu-west-2:${data.aws_caller_identity.current.account_id}:alias/aws/ssm"
             ],
             "Effect": "Allow"
         }
@@ -431,26 +419,26 @@ resource "aws_iam_role_policy_attachment" "portal" {
 
 
 # Route 53 records
-# resource "aws_route53_record" "oam1_nonprod" {
-#   count    = local.environment != "production" ? 1 : 0
-#   provider = aws.core-vpc
-#   zone_id  = data.aws_route53_zone.external.zone_id
-#   name     = "${local.application_name}.${data.aws_route53_zone.external.name}"
-#   type     = "A"
-#   ttl      = 60
-#   records  = [aws_instance.oam_instance_1.private_ip]
-# }
-#
-# resource "aws_route53_record" "oam1_prod" {
-#   count    = local.environment == "production" ? 1 : 0
-#   provider = aws.core-network-services
-#   zone_id  = data.aws_route53_zone.portal-oam.zone_id # TODO This hosted zone name to be determined
-#   name     = "${local.application_name}-oam1.${data.aws_route53_zone.portal-oam.zone_id}" # TODO Record name to be determined
-#   type     = "A"
-#   ttl      = 60
-#   records  = [aws_instance.oam_instance_1.private_ip]
-# }
-#
+resource "aws_route53_record" "oam1_nonprod" {
+  count    = local.environment != "production" ? 1 : 0
+  provider = aws.core-vpc
+  zone_id  = data.aws_route53_zone.external.zone_id
+  name     = "${local.application_name}-oam1-ms.${data.aws_route53_zone.external.name}" # Correspond to portal-oam1-ms.aws.dev.legalservices.gov.uk
+  type     = "A"
+  ttl      = 60
+  records  = [aws_instance.oam_instance_1.private_ip]
+}
+
+resource "aws_route53_record" "oam1_prod" {
+  count    = local.environment == "production" ? 1 : 0
+  provider = aws.core-network-services
+  zone_id  = data.aws_route53_zone.portal-oam.zone_id # TODO This hosted zone name to be determined
+  name     = "${local.application_name}-oam1.${data.aws_route53_zone.portal-oam.zone_id}" # TODO Record name to be determined
+  type     = "A"
+  ttl      = 60
+  records  = [aws_instance.oam_instance_1.private_ip]
+}
+
 # resource "aws_route53_record" "oam2_prod" {
 #   count    = local.environment == "production" ? 1 : 0
 #   provider = aws.core-vpc
