@@ -55,5 +55,5 @@ resource "aws_lambda_permission" "api_gw" {
   function_name = aws_lambda_function.presigned_url.function_name
   principal     = "apigateway.amazonaws.com"
 
-  source_arn = "${aws_api_gateway_rest_api.example.execution_arn}/*/*"
+  source_arn = "${aws_api_gateway_rest_api.data_platform.execution_arn}/*/${aws_api_gateway_method.upload_data_get.http_method}${aws_api_gateway_resource.upload_data.path}"
 }

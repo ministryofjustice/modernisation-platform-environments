@@ -16,14 +16,16 @@ resource "aws_api_gateway_method" "upload_data_get" {
   rest_api_id   = aws_api_gateway_rest_api.data_platform.id
 }
 
-resource "aws_api_gateway_integration" "example" {
-  http_method = aws_api_gateway_method.upload_data_get.http_method
-  resource_id = aws_api_gateway_resource.upload_data.id
-  rest_api_id = aws_api_gateway_rest_api.data_platform.id
-  type        = "MOCK"
+resource "aws_api_gateway_integration" "integration" {
+  http_method             = aws_api_gateway_method.upload_data_get.http_method
+  resource_id             = aws_api_gateway_resource.upload_data.id
+  rest_api_id             = aws_api_gateway_rest_api.data_platform.id
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = aws_lambda_function.authoriser.invoke_arn
 }
 
-resource "aws_api_gateway_deployment" "example" {
+resource "aws_api_gateway_deployment" "deployment" {
   rest_api_id = aws_api_gateway_rest_api.data_platform.id
 
   triggers = {
@@ -35,9 +37,9 @@ resource "aws_api_gateway_deployment" "example" {
     #       resources will show a difference after the initial implementation.
     #       It will stabilize to only change when resources change afterwards.
     redeployment = sha1(jsonencode([
-      aws_api_gateway_resource.example.id,
-      aws_api_gateway_method.example.id,
-      aws_api_gateway_integration.example.id,
+      aws_api_gateway_resource.upload_data.id,
+      aws_api_gateway_method.upload_data_get.id,
+      aws_api_gateway_integration.integration.id,
     ]))
   }
 
@@ -46,10 +48,10 @@ resource "aws_api_gateway_deployment" "example" {
   }
 }
 
-resource "aws_api_gateway_stage" "example" {
-  deployment_id = aws_api_gateway_deployment.example.id
+resource "aws_api_gateway_stage" "sandbox" {
+  deployment_id = aws_api_gateway_deployment.deployment.id
   rest_api_id   = aws_api_gateway_rest_api.data_platform.id
-  stage_name    = "example"
+  stage_name    = "sandbox"
 }
 
 resource "aws_api_gateway_authorizer" "authorizer" {
