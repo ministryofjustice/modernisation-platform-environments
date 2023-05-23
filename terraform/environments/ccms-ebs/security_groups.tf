@@ -1,3 +1,5 @@
+###  Removing this SG for now for security testing
+/*
 # Security Group for the baseline EC2
 resource "aws_security_group" "ec2_sg_oracle_base" {
   name = "ec2_sg_oracle_base"
@@ -8,7 +10,6 @@ resource "aws_security_group" "ec2_sg_oracle_base" {
     { Name = lower(format("sg-%s-%s-ec2", local.application_name, local.environment)) }
   )
 }
-
 resource "aws_security_group_rule" "ingress_traffic_oracle_base" {
   for_each          = local.application_data.ec2_sg_base_ingress_rules
   security_group_id = aws_security_group.ec2_sg_oracle_base.id
@@ -20,7 +21,6 @@ resource "aws_security_group_rule" "ingress_traffic_oracle_base" {
   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
 
 }
-
 resource "aws_security_group_rule" "egress_traffic_oracle_base_sg" {
   for_each = local.application_data.ec2_sg_base_egress_rules
   #for_each          = local.application_data.ec2_sg_egress_rules
@@ -43,6 +43,8 @@ resource "aws_security_group_rule" "egress_traffic_oracle_base_cidr" {
   to_port           = each.value.to_port
   cidr_blocks       = [each.value.destination_cidr]
 }
+*/
+
 
 # Security Group for EBSDB
 resource "aws_security_group" "ec2_sg_ebsdb" {

@@ -283,7 +283,7 @@ resource "aws_security_group" "load_balancer_security_group" {
     protocol    = "tcp"
     from_port   = 7803
     to_port     = 7803
-    cidr_blocks = [data.aws_vpc.shared.cidr_block, local.cidr_lz_workspaces]
+    cidr_blocks = [data.aws_vpc.shared.cidr_block, local.cidr_lz_workspaces_nonp, local.cidr_lz_workspaces_prod]
   }
 
   ingress {
