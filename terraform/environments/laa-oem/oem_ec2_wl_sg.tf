@@ -5,6 +5,7 @@
 # Oracle WebLogic Server Listen Port for Managed Server 8001
 
 resource "aws_security_group" "oem_wl_security_group_1" {
+  count    = local.is-production ? 0 : 1
   name_prefix = "${local.application_name}-wl-server-sg-1-"
   description = "Access to the Weblogic server"
   vpc_id      = data.aws_vpc.shared.id
