@@ -188,7 +188,7 @@ resource "aws_lb_target_group_attachment" "webgate_public" {
   port             = 5401
 }
 
-# resource "aws_wafv2_web_acl_association" "webgate_waf_association" {
-#   resource_arn = aws_lb.webgate_public_lb.arn
-#   web_acl_arn  = aws_wafv2_web_acl.ebs_web_acl.arn
-# }
+resource "aws_wafv2_web_acl_association" "webgate_waf_association" {
+  resource_arn = aws_lb.webgate_public_lb.arn
+  web_acl_arn  = aws_wafv2_web_acl.ebs_web_acl.arn
+}
