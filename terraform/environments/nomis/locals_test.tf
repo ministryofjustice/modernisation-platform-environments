@@ -273,12 +273,15 @@ locals {
           { name = "t1nomis-a", type = "A", ttl = "300", records = ["10.101.3.132"] },
           { name = "t1nomis-b", type = "CNAME", ttl = "300", records = ["t1-nomis-db-1-b.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
           { name = "t1-nomis-db-1-b", type = "CNAME", ttl = "3600", records = ["t1-nomis-db-1-b.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
-          { name = "t1ndh", type = "A", ttl = "300", records = ["10.101.3.132"] },
+          { name = "t1ndh", type = "CNAME", ttl = "300", records = ["t1-nomis-db-1-b.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
           { name = "t1ndh-a", type = "A", ttl = "300", records = ["10.101.3.132"] },
           { name = "t1ndh-b", type = "CNAME", ttl = "300", records = ["t1-nomis-db-1-b.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
           { name = "t1or", type = "A", ttl = "300", records = ["10.101.3.132"] },
           { name = "t1or-a", type = "A", ttl = "300", records = ["10.101.3.132"] },
-          { name = "t1or-b", type = "A", ttl = "300", records = ["10.101.3.132"] },
+          { name = "t1or-b", type = "CNAME", ttl = "300", records = ["t1-nomis-db-1-b.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
+          { name = "t1trdat", type = "A", ttl = "300", records = ["10.101.3.132"] },
+          { name = "t1trdat-a", type = "A", ttl = "300", records = ["10.101.3.132"] },
+          { name = "t1trdat-b", type = "CNAME", ttl = "300", records = ["t1-nomis-db-1-b.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
         ]
         lb_alias_records = [
           { name = "t1-nomis-web-a", type = "A", lbs_map_key = "private" },
