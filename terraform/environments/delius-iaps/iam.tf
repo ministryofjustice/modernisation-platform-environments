@@ -41,7 +41,7 @@ data "aws_iam_policy_document" "snapshot_sharer" {
       "rds:ModifyDBSnapshotAttribute"
     ]
     resources = [
-      local.iaps_rds_snapshot_arn_pattern,
+      local.iaps_rds_snapshot_arn_prefix,
       aws_db_instance.iaps.arn
     ]
     statement {
