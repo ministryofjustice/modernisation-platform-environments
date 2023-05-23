@@ -148,6 +148,6 @@ resource "aws_lb_target_group" "webgatenlb_tg" {
 
 resource "aws_lb_target_group_attachment" "webgatenlb" {
   target_group_arn = aws_lb_target_group.webgatenlb_tg.arn
-  target_id        = aws_lb.webgate_nlb.id
+  target_id        = aws_lb.webgate_public_lb.id
   port             = "443"
 }
