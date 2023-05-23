@@ -96,7 +96,7 @@ resource "aws_instance" "ohs1" {
   monitoring                  = true
   vpc_security_group_ids      = [aws_security_group.portalsg.id]
   subnet_id                   = data.aws_subnet.data_subnets_a.id
-  iam_instance_profile        = "portal-ec2-instance-role"
+  iam_instance_profile        = aws_iam_instance_profile.portal.id
 
   # root_block_device {
   #   delete_on_termination      = false
@@ -118,12 +118,12 @@ resource "aws_instance" "ohs1" {
 
 
 resource "aws_instance" "ohs2" {
-  count = local.environment == "prodcution" ? 1 : 0
+  count = local.environment == "production" ? 1 : 0
   ami                            = local.ami-id
   instance_type                  = local.instance_type
   vpc_security_group_ids         = [aws_security_group.portalsg.id]
   subnet_id                      = data.aws_subnet.data_subnets_b.id
-  iam_instance_profile           = "portal-ec2-instance-role"
+  iam_instance_profile           = aws_iam_instance_profile.portal.id
 
   #   # root_block_device {
   #   # delete_on_termination     = false
@@ -192,66 +192,3 @@ resource "aws_volume_attachment" "ohs_EC2ServerVolume02" {
   volume_id   = aws_ebs_volume.ohsvolume2.id
   instance_id = aws_instance.ohs1.id
 }
-
-
-# resource "aws_iam_instance_profile" "ec2_instance_profile" {
-#   name = "${local.application_name}-ec2-profile"
-#   role = aws_iam_role.ec2_instance_role.name
-# }
-
-# resource "aws_iam_role" "ec2_instance_role" {
-#   name                = "${local.application_name}-role"
-#   assume_role_policy  = <<EOF
-# {
-#     "Version": "2012-10-17",
-#     "Statement": [
-#         {
-#             "Effect": "Allow",
-#             "Principal": {
-#                 "Service": "ec2.amazonaws.com"
-#             },
-#             "Action": "sts:AssumeRole"
-#         }
-#     ]
-# }
-# EOF
-# }
-
-# resource "aws_iam_role_policy" "ec2_instance_policy" {
-#   #tfsec:ignore:aws-iam-no-policy-wildcards
-#   name = "${local.application_name}-ec2-service"
-#   role = aws_iam_role.ec2_instance_role.id
-
-#   # Terraform's "jsonencode" function converts a
-#   # Terraform expression result to valid JSON syntax.
-#   policy = jsonencode({
-#     Version = "2012-10-17"
-#     Statement = [
-#        {
-#             "Action": [
-#                 "logs:CreateLogGroup",
-#                 "logs:CreateLogStream",
-#                 "logs:PutLogEvents",
-#                 "logs:DescribeLogStreams",
-#                 "logs:DescribeLogGroups",
-#                 "cloudwatch:PutMetricData",
-#                 "cloudwatch:GetMetricStatistics",
-#                 "cloudwatch:ListMetrics",
-#                 "ec2:*",
-#                 "ec2messages:*",
-#                 "s3:*",
-#                 "ssm:*"
-#             ],
-#             "Resource": "*",
-#             "Effect": "Allow"
-#         },
-#      {
-#             "Action": "kms:Decrypt",
-#             "Resource": [
-#                 "arn:aws:kms:${data.aws_region.current.name}:${local.environment_management.account_ids["core-shared-services-production"]}:alias/aws/ssm"
-#             ],
-#             "Effect": "Allow"
-#         }
-#     ]
-#   })
-# }
