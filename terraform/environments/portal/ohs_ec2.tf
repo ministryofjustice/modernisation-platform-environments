@@ -94,7 +94,7 @@ resource "aws_instance" "ohs1" {
   ami                         = local.ami-id
   instance_type               = local.instance_type
   monitoring                  = true
-  vpc_security_group_ids      = [aws_security_group.portal.id]
+  vpc_security_group_ids      = [aws_security_group.portalsg.id]
   subnet_id                   = data.aws_subnet.data_subnets_a.id
   iam_instance_profile        = "portal-ec2-instance-role"
 
@@ -121,7 +121,7 @@ resource "aws_instance" "ohs2" {
   count = local.environment == "prodcution" ? 1 : 0
   ami                            = local.ami-id
   instance_type                  = local.instance_type
-  vpc_security_group_ids         = [aws_security_group.portal.id]
+  vpc_security_group_ids         = [aws_security_group.portalsg.id]
   subnet_id                      = data.aws_subnet.data_subnets_b.id
   iam_instance_profile           = "portal-ec2-instance-role"
 
