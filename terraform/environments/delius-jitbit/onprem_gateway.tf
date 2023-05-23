@@ -56,7 +56,7 @@ resource "aws_iam_instance_profile" "onprem_gateway_profile" {
 data "aws_ami" "onprem_gateway_windows" {
   most_recent = true
   owners      = [local.environment_management.account_ids["core-shared-services-production"]]
-  name_regex  = "^mp_WindowsServer2022_2023*"
+  name_regex  = "^mp_WindowsServer2022_s3*"
 }
 
 
