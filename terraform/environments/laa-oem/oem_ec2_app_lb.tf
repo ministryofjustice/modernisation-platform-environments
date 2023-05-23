@@ -241,14 +241,14 @@ resource "aws_security_group" "load_balancer_security_group" {
     protocol    = "tcp"
     from_port   = 443
     to_port     = 443
-    cidr_blocks = [data.aws_vpc.shared.cidr_block, local.cidr_lz_workspaces]
+    cidr_blocks = [data.aws_vpc.shared.cidr_block, local.cidr_lz_workspaces_nonp, local.cidr_lz_workspaces_prod]
   }
 
   ingress {
     protocol    = "tcp"
     from_port   = 3872
     to_port     = 3872
-    cidr_blocks = [data.aws_vpc.shared.cidr_block, local.cidr_lz_workspaces]
+    cidr_blocks = [data.aws_vpc.shared.cidr_block, local.cidr_lz_workspaces_nonp, local.cidr_lz_workspaces_prod]
   }
 
   ingress {
@@ -262,7 +262,7 @@ resource "aws_security_group" "load_balancer_security_group" {
     protocol    = "tcp"
     from_port   = 4903
     to_port     = 4903
-    cidr_blocks = [data.aws_vpc.shared.cidr_block, local.cidr_lz_workspaces]
+    cidr_blocks = [data.aws_vpc.shared.cidr_block, local.cidr_lz_workspaces_nonp, local.cidr_lz_workspaces_prod]
   }
 
   ingress {
@@ -276,7 +276,7 @@ resource "aws_security_group" "load_balancer_security_group" {
     protocol    = "tcp"
     from_port   = 7102
     to_port     = 7102
-    cidr_blocks = [data.aws_vpc.shared.cidr_block, local.cidr_lz_workspaces]
+    cidr_blocks = [data.aws_vpc.shared.cidr_block, local.cidr_lz_workspaces_nonp, local.cidr_lz_workspaces_prod]
   }
 
   ingress {

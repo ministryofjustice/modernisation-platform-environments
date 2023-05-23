@@ -28,8 +28,9 @@ data "aws_iam_policy_document" "glue-policy-data" {
   }
 }
 
+# Resuse for all S3 read Only
 # S3 Read Only Policy
-resource "aws_iam_policy" "read_s3_read_access_policy" {
+resource "aws_iam_policy" "s3_read_access_policy" {
   name = "dpr_s3_read_policy"
   policy = jsonencode({
     "Version" : "2012-10-17",
@@ -43,12 +44,35 @@ resource "aws_iam_policy" "read_s3_read_access_policy" {
       {
         "Effect" : "Allow",
         "Action" : [
+          "s3:List*",
           "s3:Get*",
-          "s3:List*"
         ],
         "Resource" : [
-          module.s3_demo_bucket[0].bucket.arn,
-          "${module.s3_demo_bucket[0].bucket.arn}/*"
+          "arn:aws:s3:::${local.project}-*/*",
+          "arn:aws:s3:::${local.project}-*"              
+        ]
+      }
+    ]
+  })
+}
+
+# KMS Read/Decrypt Policy
+resource "aws_iam_policy" "kms_read_access_policy" {
+  name = "dpr_kms_read_policy"
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "kms:Encrypt*",
+          "kms:Decrypt*",
+          "kms:ReEncrypt*",
+          "kms:GenerateDataKey*",
+          "kms:DescribeKey",
+        ],
+        "Resource" : [
+          "arn:aws:kms:*:${local.account_id}:key/*"              
         ]
       }
     ]
@@ -59,8 +83,8 @@ resource "aws_iam_policy" "read_s3_read_access_policy" {
 # Amazon Redshift supports only identity-based policies (IAM policies).
 
 resource "aws_iam_role" "redshift-role" {
-  count = local.setup_datamart ? 1 : 0
-  name  = "dpr-redshift-cluster-role"
+#  count = local.setup_datamart ? 1 : 0
+  name  = "${local.project}-redshift-cluster-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -136,7 +160,7 @@ resource "aws_iam_policy" "additional-policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "redshift" {
-  role       = aws_iam_role.redshift-role[0].name
+  role       = aws_iam_role.redshift-role.name
   policy_arn = aws_iam_policy.additional-policy.arn
 }
 
@@ -217,4 +241,78 @@ resource "aws_iam_role_policy" "dmsvpcpolicy" {
     ]
 }
 EOF
+}
+
+### Iam User Role for AWS Redshift Spectrum, 
+resource "aws_iam_role" "redshift-spectrum-role" {
+  name  = "${local.project}-redshift-spectrum-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "sts:AssumeRole"
+        ]
+        Principal = {
+          "Service" = "redshift.amazonaws.com"
+        }
+      }
+    ]
+  })
+
+  tags = merge(
+    local.tags,
+    {
+      name    = "redshift-spectrum-role"
+      project = "dpr"
+    }
+  )
+}
+
+data "aws_iam_policy_document" "redshift_spectrum" {   
+  statement {
+    actions = [
+				"glue:BatchCreatePartition",
+				"glue:UpdateDatabase",
+				"glue:CreateTable",
+				"glue:DeleteDatabase",
+				"glue:GetTables",
+				"glue:GetPartitions",
+				"glue:BatchDeletePartition",
+				"glue:UpdateTable",
+				"glue:BatchGetPartition",
+				"glue:DeleteTable",
+				"glue:GetDatabases",
+				"glue:GetTable",
+				"glue:GetDatabase",
+				"glue:GetPartition",
+				"glue:CreateDatabase",
+				"glue:BatchDeleteTable",
+				"glue:CreatePartition",
+				"glue:DeletePartition",
+				"glue:UpdatePartition"
+    ]
+    resources = [
+      "*"
+    ]
+  }
+}
+
+resource "aws_iam_policy" "redshift_spectrum_policy" {
+  name        = "${local.project}-redshift-spectrum-policy"
+  description = "Extra Policy for AWS Redshift Spectrum"
+  policy      = data.aws_iam_policy_document.redshift_spectrum.json
+}
+
+resource "aws_iam_role_policy_attachment" "redshift_spectrum" {
+  for_each = toset([
+    "arn:aws:iam::${local.account_id}:policy/${aws_iam_policy.s3_read_access_policy.name}",
+    "arn:aws:iam::${local.account_id}:policy/${aws_iam_policy.kms_read_access_policy.name}",
+    "arn:aws:iam::${local.account_id}:policy/${aws_iam_policy.redshift_spectrum_policy.name}"
+  ])
+
+  role = aws_iam_role.redshift-spectrum-role.name
+  policy_arn = each.value
 }

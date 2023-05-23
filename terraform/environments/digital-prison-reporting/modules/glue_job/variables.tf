@@ -155,11 +155,11 @@ variable "create_role" {
   description = "(Optional) Create AWS IAM role associated with the job."
 }
 
-variable "timeout" {
-  type        = number
-  default     = 120
-  description = "(Optional) The job timeout in minutes."
-}
+#variable "timeout" {
+#  type        = number
+#  default     = null
+#  description = "(Optional) The job timeout in minutes."
+#}
 
 variable "execution_class" {
   default     = "STANDARD"
@@ -322,8 +322,12 @@ variable "continuous_log_stream_prefix" {
   description = "(Optional) Specifies a custom CloudWatch log stream prefix for a job enabled for continuous logging."
 }
 
-variable "create_kinesis_ingester" {
-  type        = bool
-  default     = false
-  description = "Whether to create Kinesis Stream"
+variable "region" {
+  description = "Current AWS Region."
+  default     = "eu-west-2"
+}
+
+variable "account" {
+  description = "AWS Account ID."
+  default     = ""
 }

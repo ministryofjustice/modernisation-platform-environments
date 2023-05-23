@@ -6,17 +6,6 @@ locals {
 
 data "aws_partition" "current" {}
 
-resource "random_password" "master_password" {
-  count = var.create_redshift_cluster && var.create_random_password ? 1 : 0
-
-  length      = var.random_password_length
-  min_lower   = 1
-  min_numeric = 1
-  min_special = 1
-  min_upper   = 1
-  special     = false
-}
-
 ################################################################################
 # Cluster
 ################################################################################
@@ -89,9 +78,9 @@ resource "aws_redshift_cluster" "this" {
     delete = try(var.cluster_timeouts.delete, null)
   }
 
-  lifecycle {
-    ignore_changes = [master_password]
-  }
+  #lifecycle {
+  #  ignore_changes = [master_password]
+  #}
 }
 
 ################################################################################
@@ -346,4 +335,5 @@ resource "aws_security_group_rule" "redshift_ingress" {
   to_port           = each.value.to_port
   protocol          = each.value.protocol
   cidr_blocks       = var.cidr
+# cidr_blocks       = ["0.0.0.0/0"] # from all, enabled this for Github Terraform to perform Redshift Connection
 }

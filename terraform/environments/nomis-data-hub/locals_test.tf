@@ -34,41 +34,41 @@ locals {
       # }
 
 
-      t1_ndh_app_1 = {
-        config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name  = "base_rhel_7_9_*"
-          ami_owner = "374269020027"
-        })
-        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-          vpc_security_group_ids = ["private"]
-        })
-        user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
-        tags = {
-          description = "Standalone EC2 for testing RHEL7.9 NDH App"
-          os-type     = "Linux"
-          component   = "ndh"
-          server-type = "ndh-app"
-          monitored   = false
-        }
-      }
-
-      t1_ndh_ems_1 = {
-        config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name  = "base_rhel_7_9_*"
-          ami_owner = "374269020027"
-        })
-        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-          vpc_security_group_ids = ["private"]
-        })
-        user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
-        tags = {
-          description = "Standalone EC2 for testing RHEL7.9 NDH App"
-          os-type     = "Linux"
-          component   = "ndh"
-          server-type = "ndh-ems"
-          monitored   = false
-        }
-      }
+      #      t1_ndh_app_1 = {
+      #        config = merge(module.baseline_presets.ec2_instance.config.default, {
+      #          ami_name  = "base_rhel_7_9_*"
+      #          ami_owner = "374269020027"
+      #        })
+      #        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+      #          vpc_security_group_ids = ["private"]
+      #        })
+      #        user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
+      #        tags = {
+      #          description = "Standalone EC2 for testing RHEL7.9 NDH App"
+      #          os-type     = "Linux"
+      #          component   = "ndh"
+      #          server-type = "ndh-app"
+      #          monitored   = false
+      #        }
+      #      }
+      #
+      #      t1_ndh_ems_1 = {
+      #        config = merge(module.baseline_presets.ec2_instance.config.default, {
+      #          ami_name  = "base_rhel_7_9_*"
+      #          ami_owner = "374269020027"
+      #        })
+      #        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+      #          vpc_security_group_ids = ["private"]
+      #        })
+      #        user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
+      #        tags = {
+      #          description = "Standalone EC2 for testing RHEL7.9 NDH App"
+      #         os-type     = "Linux"
+      #          component   = "ndh"
+      #          server-type = "ndh-ems"
+      #          monitored   = false
+      #        }
+      #      }
     }
     baseline_ec2_autoscaling_group = {
 
@@ -121,53 +121,53 @@ locals {
       #   }
       # }
 
-      t1_ndh_app = {
-        config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name  = "base_rhel_7_9_*"
-          ami_owner = "374269020027"
-        })
-        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-          vpc_security_group_ids = ["private"]
-        })
-        user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
-        autoscaling_group = {
-          desired_capacity    = 1
-          max_size            = 2
-          vpc_zone_identifier = module.environment.subnets["private"].ids
-        }
-        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
-        tags = {
-          description = "Standalone EC2 for testing RHEL7.9 NDH App"
-          os-type     = "Linux"
-          component   = "ndh"
-          server-type = "ndh-app"
-          monitored   = false
-        }
-      }
-
-      t1_ndh_ems = {
-        config = merge(module.baseline_presets.ec2_instance.config.default, {
-          ami_name  = "base_rhel_7_9_*"
-          ami_owner = "374269020027"
-        })
-        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-          vpc_security_group_ids = ["private"]
-        })
-        user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
-        autoscaling_group = {
-          desired_capacity    = 1
-          max_size            = 2
-          vpc_zone_identifier = module.environment.subnets["private"].ids
-        }
-        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
-        tags = {
-          description = "Standalone EC2 for testing RHEL7.9 NDH ems"
-          os-type     = "Linux"
-          component   = "ndh"
-          server-type = "ndh-ems"
-          monitored   = false
-        }
-      }
+      #      t1_ndh_app = {
+      #      config = merge(module.baseline_presets.ec2_instance.config.default, {
+      #        ami_name  = "base_rhel_7_9_*"
+      #          ami_owner = "374269020027"
+      #        })
+      #        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+      #          vpc_security_group_ids = ["private"]
+      #        })
+      #        user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
+      #        autoscaling_group = {
+      #          desired_capacity    = 1
+      #          max_size            = 2
+      #          vpc_zone_identifier = module.environment.subnets["private"].ids
+      #        }
+      #        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
+      #        tags = {
+      #          description = "Standalone EC2 for testing RHEL7.9 NDH App"
+      #          os-type     = "Linux"
+      #          component   = "ndh"
+      #          server-type = "ndh-app"
+      #          monitored   = false
+      #        }
+      #      }
+      #
+      #      t1_ndh_ems = {
+      #        config = merge(module.baseline_presets.ec2_instance.config.default, {
+      #          ami_name  = "base_rhel_7_9_*"
+      #          ami_owner = "374269020027"
+      #        })
+      #        instance = merge(module.baseline_presets.ec2_instance.instance.default, {
+      #          vpc_security_group_ids = ["private"]
+      #        })
+      #        user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
+      #        autoscaling_group = {
+      #          desired_capacity    = 1
+      #          max_size            = 2
+      #          vpc_zone_identifier = module.environment.subnets["private"].ids
+      #        }
+      #        autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
+      #        tags = {
+      #          description = "Standalone EC2 for testing RHEL7.9 NDH ems"
+      #          os-type     = "Linux"
+      #          component   = "ndh"
+      #          server-type = "ndh-ems"
+      #          monitored   = false
+      #        }
+      #      }
 
       lb_target_groups = {
         http-7777 = {
