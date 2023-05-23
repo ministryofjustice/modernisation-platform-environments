@@ -390,7 +390,7 @@ resource "aws_security_group_rule" "ingress_traffic_webgatelb" {
   protocol          = each.value.protocol
   from_port         = each.value.from_port
   to_port           = each.value.to_port
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block, local.application_data.accounts[local.environment].lz_aws_subnet_env, local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_subnet_env, local.application_data.accounts[local.environment].lz_aws_workspace_prod_subnet_env]
+  cidr_blocks       = [each.value.destination_cidr, data.aws_vpc.shared.cidr_block, local.application_data.accounts[local.environment].lz_aws_subnet_env, local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_subnet_env, local.application_data.accounts[local.environment].lz_aws_workspace_prod_subnet_env]
 }
 
 resource "aws_security_group_rule" "egress_traffic_webgatelb_sg" {
