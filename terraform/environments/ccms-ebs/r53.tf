@@ -7,8 +7,8 @@ resource "aws_route53_record" "external" {
   type    = "A"
 
   alias {
-    name                   = aws_lb.ebsapps_lb.dns_name
-    zone_id                = aws_lb.ebsapps_lb.zone_id
+    name                   = aws_lb.ebsapps_nlb.dns_name
+    zone_id                = aws_lb.ebsapps_nlb.zone_id
     evaluate_target_health = true
   }
 }
@@ -58,7 +58,6 @@ resource "aws_route53_record" "ebsapps" {
   type    = "A"
   ttl     = 300
   records = [aws_instance.ec2_ebsapps[count.index].private_ip]
-
 }
 
 /*resource "aws_route53_record" "ebsapps_cname" {
@@ -89,6 +88,18 @@ resource "aws_route53_record" "ebswgate" {
   }
 }
 
+resource "aws_route53_record" "webgate_ec2" {
+  provider = aws.core-vpc
+  count    = local.application_data.accounts[local.environment].webgate_no_instances
+
+  zone_id = data.aws_route53_zone.external.zone_id
+  name    = "wgateappr${count.index + 1}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  #name    = "ccms-ebs-app${count.index + 1}.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type    = "A"
+  ttl     = 300
+  records = [aws_instance.ec2_webgate[count.index].private_ip]
+}
+
 /*resource "aws_route53_record" "ebswgate_cname" {
   provider = aws.core-vpc
   count    = local.application_data.accounts[local.environment].webgate_no_instances
@@ -113,7 +124,18 @@ resource "aws_route53_record" "ebsagate" {
   type    = "A"
   ttl     = 300
   records = [aws_instance.ec2_accessgate[count.index].private_ip]
+}
 
+resource "aws_route53_record" "accessgate_ec2" {
+  provider = aws.core-vpc
+  count    = local.application_data.accounts[local.environment].accessgate_no_instances
+
+  zone_id = data.aws_route53_zone.external.zone_id
+  name    = "agateappr${count.index + 1}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  #name    = "ccms-ebs-app${count.index + 1}.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type    = "A"
+  ttl     = 300
+  records = [aws_instance.ec2_accessgate[count.index].private_ip]
 }
 /*resource "aws_route53_record" "ebsagate_cname" {
   provider = aws.core-vpc
@@ -129,11 +151,11 @@ resource "aws_route53_record" "ebsagate" {
 
 ## ClamAV
 resource "aws_route53_record" "clamav" {
-  
+
   provider = aws.core-vpc
-  zone_id = data.aws_route53_zone.external.zone_id
-  name    = "clamav.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-  type    = "A"
-  ttl     = 300
-  records = [aws_instance.ec2_clamav.private_ip]
+  zone_id  = data.aws_route53_zone.external.zone_id
+  name     = "clamav.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type     = "A"
+  ttl      = 300
+  records  = [aws_instance.ec2_clamav.private_ip]
 }

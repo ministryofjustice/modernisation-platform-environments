@@ -62,19 +62,15 @@ locals {
           delius_iaps_rds_db_address          = aws_db_instance.iaps.address
           ndelius_interface_url               = local.application_data.accounts[local.environment].iaps_ndelius_interface_url
           im_interface_url                    = local.application_data.accounts[local.environment].iaps_im_interface_url
-
-          # TODO: remove environment variable and related conditional statements
-          # temporarily needed to ensure no connections to delius and im are attempted
-          environment = local.environment
         }
       )
     )
 
     autoscaling_group = {
-      desired_capacity = 1
-      max_size         = 1
-      min_size         = 1
-      force_delete     = true
+      desired_capacity          = 1
+      max_size                  = 1
+      min_size                  = 1
+      force_delete              = true
       wait_for_capacity_timeout = "15m"
     }
 
@@ -116,6 +112,17 @@ resource "aws_security_group_rule" "ingress_traffic_vpc" {
   security_group_id = aws_security_group.iaps.id
   to_port           = each.value.to_port
   type              = "ingress"
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+}
+
+resource "aws_security_group_rule" "egress_traffic_vpc" {
+  for_each          = local.application_data.iaps_sg_egress_rules_vpc
+  description       = format("Traffic for %s %d", each.value.protocol, each.value.from_port)
+  from_port         = each.value.from_port
+  protocol          = each.value.protocol
+  security_group_id = aws_security_group.iaps.id
+  to_port           = each.value.to_port
+  type              = "egress"
   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
 }
 

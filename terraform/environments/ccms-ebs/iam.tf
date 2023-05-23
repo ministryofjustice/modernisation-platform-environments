@@ -128,3 +128,50 @@ resource "aws_iam_role_policy_attachment" "cw_logging_policy" {
   role       = aws_iam_role.role_stsassume_oracle_base.name
   policy_arn = aws_iam_policy.cw_logging_policy.arn
 }
+
+# RMAN policy
+resource "aws_iam_policy" "rman_to_s3" {
+  name        = "ec2_to_s3_policy-${local.environment}"
+  description = "allows EC2 to write to S3"
+
+  policy = jsonencode(
+    {
+      "Version" : "2012-10-17",
+      "Statement" : [
+        {
+          "Effect": "Allow",
+          "Action": [
+            "s3:GetBucketLocation",
+            "s3:ListAllMyBuckets"
+          ],
+          "Resource": "arn:aws:s3:::*"
+        },
+        {
+          "Effect": "Allow",
+          "Action": ["s3:ListBucket"],
+          "Resource" : [
+            "arn:aws:s3:::ccms-ebs-*-dbbackup",
+            "arn:aws:s3:::ccms-ebs-*-dbbackup/*"
+          ]
+        },
+        {
+          "Effect" : "Allow",
+          "Action" : [
+            "s3:PutObject",
+            "s3:GetObject",
+            "s3:ListBucket",
+            "s3:DeleteObject"
+          ],
+          "Resource" : [
+            "arn:aws:s3:::ccms-ebs-*-dbbackup",
+            "arn:aws:s3:::ccms-ebs-*-dbbackup/*"
+          ]
+        }
+      ]
+    }
+  )
+}
+resource "aws_iam_role_policy_attachment" "rman_to_s3_policy" {
+  role       = aws_iam_role.role_stsassume_oracle_base.name
+  policy_arn = aws_iam_policy.rman_to_s3.arn
+}

@@ -4,7 +4,17 @@
       "example_var": "dev-data",
       "existing_archive_bucket_name": "",
       "ohssnapshot1" : "snap-09be6356ad9f3ae14",
-      "ohssnapshot2" : "snap-08c74940e74f5403d"
+      "ohssnapshot2" : "snap-08c74940e74f5403d",
+      "pagerduty_integration_key_name": "laa_portal_nonprod_alarms",
+      "pagerduty_integration_key_name_ga": "get_access_improvement_alarms",
+      "management_cidr": "",
+      "oam_ami_id": "ami-04220eb9ced81987f",
+      "oam_instance_type": "t3a.large",
+      "oam_fmw_snapshot": "snap-0dba4e0341c3a3241",
+      "oam_aserver_snapshot": "snap-0371f356f5555c5df",
+      "oam_config_snapshot": "snap-092e6168dca44c40e",
+      "oam_mserver_snapshot": "snap-0db8a2c01be9128e8",
+      "oam_repo_home_snapshot": "snap-04ed65da750df338c"
 
     },
     "test": {
@@ -14,7 +24,8 @@
       "example_var": "preproduction-data"
     },
     "production": {
-      "example_var": "production-data"
+      "example_var": "production-data",
+      "existing_archive_bucket_name": ""
     }
   }
 }

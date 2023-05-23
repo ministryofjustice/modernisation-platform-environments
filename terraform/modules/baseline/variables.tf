@@ -370,6 +370,7 @@ variable "rds_instances" {
       subnet_ids  = list(string)
       tags        = optional(list(string))
     })
+    ssm_kms_key_id = optional(string)
     ssm_parameters = optional(map(object({
       random = object({
         length  = number

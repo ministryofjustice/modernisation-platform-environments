@@ -5,6 +5,8 @@ locals {
   firstohs-cidr = "10.202.0.0/20"
   secondohs-cidr= "10.200.0.0/20"
   prd-cidr= "10.200.16.0/20"
-
+  aws_region = "eu-west-2"
 
 }
+  
+

@@ -28,7 +28,7 @@ resource "aws_lb_listener" "ebsapps_listener" {
   port              = "443"
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = local.cert_arn
+  certificate_arn   = data.aws_acm_certificate.gandi_cert.arn
 
   default_action {
     type             = "forward"
@@ -44,6 +44,12 @@ resource "aws_lb_target_group" "ebsapp_tg" {
   health_check {
     port     = local.application_data.accounts[local.environment].tg_apps_port
     protocol = "HTTP"
+  }
+
+  stickiness {
+    enabled         = true
+    type            = "lb_cookie"
+    cookie_duration = 3600
   }
 }
 
