@@ -29,24 +29,13 @@ data "aws_secretsmanager_secret_version" "get_rds_credentials" {
   secret_id  = data.aws_secretsmanager_secret.get_tipstaff_db_secrets.id
 }
 
-// Secrets for the tactical products database
-resource "aws_secretsmanager_secret" "tactical_products_db_secrets" {
-  name                    = "tipstaff-tactical-products-db-secrets"
-  recovery_window_in_days = 0
-}
-
-resource "aws_secretsmanager_secret_version" "tactical_products_rds_credentials" {
-  secret_id     = aws_secretsmanager_secret.tactical_products_db_secrets.id
-  secret_string = jsonencode({ "" : "", "" : "" })
-}
+// retrieve secrets for the tactical products database
 
 data "aws_secretsmanager_secret" "get_tactical_products_db_secrets" {
-  depends_on = [aws_secretsmanager_secret_version.tactical_products_rds_credentials]
-  arn        = aws_secretsmanager_secret_version.tactical_products_rds_credentials.arn
+  arn = "arn:aws:secretsmanager:eu-west-2:017977998587:secret:tactical-products-db-secrets-EDIqYI"
 }
 
 data "aws_secretsmanager_secret_version" "get_tactical_products_rds_credentials" {
-  depends_on = [aws_secretsmanager_secret_version.tactical_products_rds_credentials]
   secret_id  = data.aws_secretsmanager_secret.get_tactical_products_db_secrets.id
 }
 
