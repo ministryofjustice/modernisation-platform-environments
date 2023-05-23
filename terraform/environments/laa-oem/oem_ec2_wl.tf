@@ -16,7 +16,7 @@ resource "aws_instance" "oem_wl" {
   ebs_optimized               = true
   iam_instance_profile        = aws_iam_instance_profile.iam_instace_profile_oem_base.name
   instance_type               = local.application_data.accounts[local.environment].ec2_oem_instance_type_wl
-  key_name                    = aws_key_pair.key_pair_wl.id
+  key_name                    = aws_key_pair.key_pair_wl[count.index].id
   monitoring                  = true
   subnet_id                   = data.aws_subnet.data_subnets_a.id
   user_data_replace_on_change = true
@@ -24,7 +24,7 @@ resource "aws_instance" "oem_wl" {
     env_fqdn = "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
     hostname = "laa-oem-wl"
   }))
-  vpc_security_group_ids = [aws_security_group.oem_wl_security_group_1.id]
+  vpc_security_group_ids = [aws_security_group.oem_wl_security_group_1[count.index].id]
 
   root_block_device {
     delete_on_termination = true
@@ -65,7 +65,7 @@ resource "aws_ebs_volume" "oem_wl_volume_swap" {
   kms_key_id        = data.aws_kms_key.ebs_shared.arn
   size              = 32
   type              = "gp3"
-  depends_on        = [resource.aws_instance.oem_wl]
+  depends_on        = [resource.aws_instance.oem_wl[count.index]]
 
   tags = merge(tomap({
     "Name"                 = "${local.application_name}-wl-swap",
@@ -78,8 +78,8 @@ resource "aws_ebs_volume" "oem_wl_volume_swap" {
 
 resource "aws_volume_attachment" "oem_wl_volume_swap" {
   count    = local.is-production ? 0 : 1
-  instance_id = aws_instance.oem_wl.id
-  volume_id   = aws_ebs_volume.oem_wl_volume_swap.id
+  instance_id = aws_instance.oem_wl[count.index].id
+  volume_id   = aws_ebs_volume.oem_wl_volume_swap[count.index].id
   device_name = "/dev/sdb"
 }
 
@@ -92,7 +92,7 @@ resource "aws_ebs_volume" "oem_wl_volume_opt_oem_app" {
   size              = 50
   # snapshot_id       = data.aws_ebs_snapshot.oem_wl_volume_opt_oem_app.id
   type       = "gp3"
-  depends_on = [resource.aws_instance.oem_wl]
+  depends_on = [resource.aws_instance.oem_wl[count.index]]
 
   tags = merge(tomap({
     "Name"                 = "${local.application_name}-wl-opt-oem-app",
@@ -111,8 +111,8 @@ resource "aws_ebs_volume" "oem_wl_volume_opt_oem_app" {
 
 resource "aws_volume_attachment" "oem_wl_volume_opt_oem_app" {
   count    = local.is-production ? 0 : 1
-  instance_id = aws_instance.oem_wl.id
-  volume_id   = aws_ebs_volume.oem_wl_volume_opt_oem_app.id
+  instance_id = aws_instance.oem_wl[count.index].id
+  volume_id   = aws_ebs_volume.oem_wl_volume_opt_oem_app[count.index].id
   device_name = "/dev/sdc"
 }
 
@@ -125,7 +125,7 @@ resource "aws_ebs_volume" "oem_wl_volume_opt_oem_inst" {
   size              = 50
   # snapshot_id       = data.aws_ebs_snapshot.oem_wl_volume_opt_oem_inst.id
   type       = "gp3"
-  depends_on = [resource.aws_instance.oem_wl]
+  depends_on = [resource.aws_instance.oem_wl[count.index]]
 
   tags = merge(tomap({
     "Name"                 = "${local.application_name}-wl-opt-oem-inst",
@@ -144,7 +144,7 @@ resource "aws_ebs_volume" "oem_wl_volume_opt_oem_inst" {
 
 resource "aws_volume_attachment" "oem_wl_volume_opt_oem_inst" {
   count    = local.is-production ? 0 : 1
-  instance_id = aws_instance.oem_wl.id
-  volume_id   = aws_ebs_volume.oem_wl_volume_opt_oem_inst.id
+  instance_id = aws_instance.oem_wl[count.index].id
+  volume_id   = aws_ebs_volume.oem_wl_volume_opt_oem_inst[count.index].id
   device_name = "/dev/sdd"
 }
