@@ -92,7 +92,7 @@ resource "aws_security_group" "portalsg" {
 
 resource "aws_instance" "ohs1" {
   ami                         = local.ami-id
-  instance_type               = local.instance_type
+  instance_type               = local.application_data.accounts[local.environment].ohs_instance_type
   monitoring                  = true
   vpc_security_group_ids      = [aws_security_group.portalsg.id]
   subnet_id                   = data.aws_subnet.data_subnets_a.id
@@ -120,7 +120,7 @@ resource "aws_instance" "ohs1" {
 resource "aws_instance" "ohs2" {
   count = local.environment == "production" ? 1 : 0
   ami                            = local.ami-id
-  instance_type                  = local.instance_type
+  instance_type                  = local.application_data.accounts[local.environment].ohs_instance_type
   vpc_security_group_ids         = [aws_security_group.portalsg.id]
   subnet_id                      = data.aws_subnet.data_subnets_b.id
   iam_instance_profile           = aws_iam_instance_profile.portal.id

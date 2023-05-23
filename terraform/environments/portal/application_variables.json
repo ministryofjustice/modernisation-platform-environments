@@ -14,7 +14,8 @@
       "oam_aserver_snapshot": "snap-0371f356f5555c5df",
       "oam_config_snapshot": "snap-092e6168dca44c40e",
       "oam_mserver_snapshot": "snap-0db8a2c01be9128e8",
-      "oam_repo_home_snapshot": "snap-04ed65da750df338c"
+      "oam_repo_home_snapshot": "snap-04ed65da750df338c",
+      "ohs_instance_type": "t3a.medium"
 
     },
     "test": {
@@ -25,7 +26,8 @@
     },
     "production": {
       "example_var": "production-data",
-      "existing_archive_bucket_name": ""
+      "existing_archive_bucket_name": "",
+      "ohs_instance_type": "m5.xlarge"
     }
   }
 }
