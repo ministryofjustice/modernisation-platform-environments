@@ -7,6 +7,8 @@ locals {
   # EC2 User data
   oam_1_userdata = <<EOF
 #!/bin/bash
+# echo "" >> /etc/fstab
+# mount -a
 hostnamectl set-hostname ${local.application_name}-oam1-ms.${data.aws_route53_zone.external.name}
 EOF
   oam_2_userdata = <<EOF
@@ -25,168 +27,168 @@ resource "aws_security_group" "oam_instance" {
   vpc_id      = data.aws_vpc.shared.id
 }
 
-resource "aws_vpc_security_group_egress_rule" "outbound" {
-  security_group_id = aws_security_group.oam_instance.id
-  cidr_ipv4   = "0.0.0.0/0"
-  from_port   = 0
-  ip_protocol = "-1"
-  to_port     = 0
-}
-
-# TODO some rules will need adding referencing Landing Zone environments (e.g. VPC) for other dependent applications not migrated to MP yet but needs talking to Portal.
-# At the moment we are unsure what rules form LZ is required so leaving out those rules for now, to be added when dependencies identified in future tickets or testing.
-# Some rules may need updating or removing as we migrate more applications across to MP.
-
-resource "aws_vpc_security_group_ingress_rule" "oam_inbound" {
-  security_group_id = aws_security_group.oam_instance.id
-  description = "OAM Inbound"
-  cidr_ipv4   = data.aws_vpc.shared.cidr_block #!ImportValue env-VpcCidr
-  from_port   = 14100
-  ip_protocol = "tcp"
-  to_port     = 14100
-}
-
-resource "aws_vpc_security_group_ingress_rule" "oam_proxy" {
-  security_group_id = aws_security_group.oam_instance.id
-  description = "OAM Proxy Inbound"
-  cidr_ipv4   = data.aws_vpc.shared.cidr_block #!ImportValue env-VpcCidr
-  from_port   = 5575
-  ip_protocol = "tcp"
-  to_port     = 5575
-}
-
-resource "aws_vpc_security_group_ingress_rule" "oam_nodemanager" {
-  security_group_id = aws_security_group.oam_instance.id
-  description = "OAM NodeManager Port"
-  cidr_ipv4   = data.aws_vpc.shared.cidr_block #!ImportValue env-VpcCidr
-  from_port   = 5556
-  ip_protocol = "tcp"
-  to_port     = 5556
-}
-
-resource "aws_vpc_security_group_ingress_rule" "oracle_access_gate" {
-  security_group_id = aws_security_group.oam_instance.id
-  description = "Oracle Access Gate"
-  cidr_ipv4   = data.aws_vpc.shared.cidr_block #!ImportValue env-VpcCidr
-  from_port   = 9002
-  ip_protocol = "tcp"
-  to_port     = 9002
-}
-
-resource "aws_vpc_security_group_ingress_rule" "oracle_admin" {
-  security_group_id = aws_security_group.oam_instance.id
-  description = "OAM Admin Server"
-  cidr_ipv4   = data.aws_vpc.shared.cidr_block #!ImportValue env-VpcCidr
-  from_port   = 7001
-  ip_protocol = "tcp"
-  to_port     = 7001
-}
-
-resource "aws_vpc_security_group_ingress_rule" "oracle_admin_prod" {
-  security_group_id = aws_security_group.oam_instance.id
-  description = "OAM Admin Server from Prod Shared Svs"
-  cidr_ipv4   = local.prod_workspaces_cidr
-  from_port   = 7001
-  ip_protocol = "tcp"
-  to_port     = 7001
-}
-
-resource "aws_vpc_security_group_ingress_rule" "ping" {
-  security_group_id = aws_security_group.oam_instance.id
-  description = "Allow ping response"
-  cidr_ipv4   = data.aws_vpc.shared.cidr_block #!ImportValue env-VpcCidr
-  from_port   = 8
-  ip_protocol = "icmp"
-  to_port     = -1
-}
-
-resource "aws_vpc_security_group_ingress_rule" "oam_coherence_tcp" {
-  security_group_id = aws_security_group.oam_instance.id
-  description = "OAM coherence communication"
-  cidr_ipv4   = data.aws_vpc.shared.cidr_block #!ImportValue env-VpcCidr
-  from_port   = 0
-  ip_protocol = "tcp"
-  to_port     = 65535
-}
-
-resource "aws_vpc_security_group_ingress_rule" "oam_coherence_icmp" {
-  security_group_id = aws_security_group.oam_instance.id
-  description = "OAM coherence communication"
-  cidr_ipv4   = data.aws_vpc.shared.cidr_block #!ImportValue env-VpcCidr
-  from_port   = -1
-  ip_protocol = "icmp"
-  to_port     = -1
-}
-
-resource "aws_vpc_security_group_ingress_rule" "nfs_oam_to_oam" {
-  security_group_id = aws_security_group.oam_instance.id
-  description = "Inbound NFS from other OAM instances"
-  referenced_security_group_id = aws_security_group.oam_instance.id
-  from_port   = 2049
-  ip_protocol = "tcp"
-  to_port     = 2049
-}
-
-# TODO enable when IDM resources are created
-
-# resource "aws_vpc_security_group_ingress_rule" "nfs_idm_to+oam" {
+# resource "aws_vpc_security_group_egress_rule" "outbound" {
 #   security_group_id = aws_security_group.oam_instance.id
-#   description = "Inbound NFS from IDM Instances"
-#   referenced_security_group_id = aws_security_group.idm_instance.id
+#   cidr_ipv4   = "0.0.0.0/0"
+#   from_port   = 0
+#   ip_protocol = "-1"
+#   to_port     = 0
+# }
+#
+# # TODO some rules will need adding referencing Landing Zone environments (e.g. VPC) for other dependent applications not migrated to MP yet but needs talking to Portal.
+# # At the moment we are unsure what rules form LZ is required so leaving out those rules for now, to be added when dependencies identified in future tickets or testing.
+# # Some rules may need updating or removing as we migrate more applications across to MP.
+#
+# resource "aws_vpc_security_group_ingress_rule" "oam_inbound" {
+#   security_group_id = aws_security_group.oam_instance.id
+#   description = "OAM Inbound"
+#   cidr_ipv4   = data.aws_vpc.shared.cidr_block #!ImportValue env-VpcCidr
+#   from_port   = 14100
+#   ip_protocol = "tcp"
+#   to_port     = 14100
+# }
+#
+# resource "aws_vpc_security_group_ingress_rule" "oam_proxy" {
+#   security_group_id = aws_security_group.oam_instance.id
+#   description = "OAM Proxy Inbound"
+#   cidr_ipv4   = data.aws_vpc.shared.cidr_block #!ImportValue env-VpcCidr
+#   from_port   = 5575
+#   ip_protocol = "tcp"
+#   to_port     = 5575
+# }
+#
+# resource "aws_vpc_security_group_ingress_rule" "oam_nodemanager" {
+#   security_group_id = aws_security_group.oam_instance.id
+#   description = "OAM NodeManager Port"
+#   cidr_ipv4   = data.aws_vpc.shared.cidr_block #!ImportValue env-VpcCidr
+#   from_port   = 5556
+#   ip_protocol = "tcp"
+#   to_port     = 5556
+# }
+#
+# resource "aws_vpc_security_group_ingress_rule" "oracle_access_gate" {
+#   security_group_id = aws_security_group.oam_instance.id
+#   description = "Oracle Access Gate"
+#   cidr_ipv4   = data.aws_vpc.shared.cidr_block #!ImportValue env-VpcCidr
+#   from_port   = 9002
+#   ip_protocol = "tcp"
+#   to_port     = 9002
+# }
+#
+# resource "aws_vpc_security_group_ingress_rule" "oracle_admin" {
+#   security_group_id = aws_security_group.oam_instance.id
+#   description = "OAM Admin Server"
+#   cidr_ipv4   = data.aws_vpc.shared.cidr_block #!ImportValue env-VpcCidr
+#   from_port   = 7001
+#   ip_protocol = "tcp"
+#   to_port     = 7001
+# }
+#
+# resource "aws_vpc_security_group_ingress_rule" "oracle_admin_prod" {
+#   security_group_id = aws_security_group.oam_instance.id
+#   description = "OAM Admin Server from Prod Shared Svs"
+#   cidr_ipv4   = local.prod_workspaces_cidr
+#   from_port   = 7001
+#   ip_protocol = "tcp"
+#   to_port     = 7001
+# }
+#
+# resource "aws_vpc_security_group_ingress_rule" "ping" {
+#   security_group_id = aws_security_group.oam_instance.id
+#   description = "Allow ping response"
+#   cidr_ipv4   = data.aws_vpc.shared.cidr_block #!ImportValue env-VpcCidr
+#   from_port   = 8
+#   ip_protocol = "icmp"
+#   to_port     = -1
+# }
+#
+# resource "aws_vpc_security_group_ingress_rule" "oam_coherence_tcp" {
+#   security_group_id = aws_security_group.oam_instance.id
+#   description = "OAM coherence communication"
+#   cidr_ipv4   = data.aws_vpc.shared.cidr_block #!ImportValue env-VpcCidr
+#   from_port   = 0
+#   ip_protocol = "tcp"
+#   to_port     = 65535
+# }
+#
+# resource "aws_vpc_security_group_ingress_rule" "oam_coherence_icmp" {
+#   security_group_id = aws_security_group.oam_instance.id
+#   description = "OAM coherence communication"
+#   cidr_ipv4   = data.aws_vpc.shared.cidr_block #!ImportValue env-VpcCidr
+#   from_port   = -1
+#   ip_protocol = "icmp"
+#   to_port     = -1
+# }
+#
+# resource "aws_vpc_security_group_ingress_rule" "nfs_oam_to_oam" {
+#   security_group_id = aws_security_group.oam_instance.id
+#   description = "Inbound NFS from other OAM instances"
+#   referenced_security_group_id = aws_security_group.oam_instance.id
 #   from_port   = 2049
 #   ip_protocol = "tcp"
 #   to_port     = 2049
 # }
-
-# TODO enable when OHS resources are created
-
-# resource "aws_vpc_security_group_ingress_rule" "nfs_ohs_to_oam" {
+#
+# # TODO enable when IDM resources are created
+#
+# # resource "aws_vpc_security_group_ingress_rule" "nfs_idm_to+oam" {
+# #   security_group_id = aws_security_group.oam_instance.id
+# #   description = "Inbound NFS from IDM Instances"
+# #   referenced_security_group_id = aws_security_group.idm_instance.id
+# #   from_port   = 2049
+# #   ip_protocol = "tcp"
+# #   to_port     = 2049
+# # }
+#
+# # TODO enable when OHS resources are created
+#
+# # resource "aws_vpc_security_group_ingress_rule" "nfs_ohs_to_oam" {
+# #   security_group_id = aws_security_group.oam_instance.id
+# #   description = "Inbound NFS from OHS Instances"
+# #   referenced_security_group_id = aws_security_group.ohs_instance.id
+# #   from_port   = 2049
+# #   ip_protocol = "tcp"
+# #   to_port     = 2049
+# # }
+#
+# # TODO enable when OIM resources are created
+#
+# # resource "aws_vpc_security_group_ingress_rule" "nfs_oim_to_oam" {
+# #   security_group_id = aws_security_group.oam_instance.id
+# #   description = "Inbound NFS from OIM Instances"
+# #   referenced_security_group_id = aws_security_group.oim_instance.id
+# #   from_port   = 2049
+# #   ip_protocol = "tcp"
+# #   to_port     = 2049
+# # }
+#
+# resource "aws_vpc_security_group_ingress_rule" "nonprod_workspaces" {
+#   count = contains(["development", "testing"], local.environment) ? 1 : 0
 #   security_group_id = aws_security_group.oam_instance.id
-#   description = "Inbound NFS from OHS Instances"
-#   referenced_security_group_id = aws_security_group.ohs_instance.id
-#   from_port   = 2049
+#   description = "OAM Admin Server from Shared Svs"
+#   cidr_ipv4   = local.nonprod_workspaces_cidr # env-BastionSSHCIDR
+#   from_port   = 7001
 #   ip_protocol = "tcp"
-#   to_port     = 2049
+#   to_port     = 7001
 # }
-
-# TODO enable when OIM resources are created
-
-# resource "aws_vpc_security_group_ingress_rule" "nfs_oim_to_oam" {
+#
+# resource "aws_vpc_security_group_ingress_rule" "redc" {
+#   count = contains(["development", "testing"], local.environment) ? 1 : 0
 #   security_group_id = aws_security_group.oam_instance.id
-#   description = "Inbound NFS from OIM Instances"
-#   referenced_security_group_id = aws_security_group.oim_instance.id
-#   from_port   = 2049
+#   cidr_ipv4   = local.redc_cidr
+#   from_port   = 5575
 #   ip_protocol = "tcp"
-#   to_port     = 2049
+#   to_port     = 5575
 # }
-
-resource "aws_vpc_security_group_ingress_rule" "nonprod_workspaces" {
-  count = contains(["development", "testing"], local.environment) ? 1 : 0
-  security_group_id = aws_security_group.oam_instance.id
-  description = "OAM Admin Server from Shared Svs"
-  cidr_ipv4   = local.nonprod_workspaces_cidr # env-BastionSSHCIDR
-  from_port   = 7001
-  ip_protocol = "tcp"
-  to_port     = 7001
-}
-
-resource "aws_vpc_security_group_ingress_rule" "redc" {
-  count = contains(["development", "testing"], local.environment) ? 1 : 0
-  security_group_id = aws_security_group.oam_instance.id
-  cidr_ipv4   = local.redc_cidr
-  from_port   = 5575
-  ip_protocol = "tcp"
-  to_port     = 5575
-}
-
-resource "aws_vpc_security_group_ingress_rule" "atos" {
-  count = contains(["preproduction", "production"], local.environment) ? 1 : 0
-  security_group_id = aws_security_group.oam_instance.id
-  cidr_ipv4   = local.atos_cidr
-  from_port   = 5575
-  ip_protocol = "tcp"
-  to_port     = 5575
-}
+#
+# resource "aws_vpc_security_group_ingress_rule" "atos" {
+#   count = contains(["preproduction", "production"], local.environment) ? 1 : 0
+#   security_group_id = aws_security_group.oam_instance.id
+#   cidr_ipv4   = local.atos_cidr
+#   from_port   = 5575
+#   ip_protocol = "tcp"
+#   to_port     = 5575
+# }
 
 ######################################
 # OAM Instance
