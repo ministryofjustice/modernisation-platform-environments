@@ -182,7 +182,7 @@ resource "aws_lb_target_group" "webgate_tg_public" {
 }
 
 resource "aws_lb_target_group_attachment" "webgate_public" {
-  count            = local.is-production ? 1 : 1
+  count            = local.application_data.accounts[local.environment].webgate_no_instances
   target_group_arn = aws_lb_target_group.webgate_tg_public.arn
   target_id        = element(aws_instance.ec2_webgate.*.id, count.index)
   port             = 5401
