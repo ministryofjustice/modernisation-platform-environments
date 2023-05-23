@@ -1,125 +1,89 @@
-module "onprem_gateway" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance"
-
-  providers = {
-    aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
-  }
-
-  name = "onprem_gateway"
-
-  ami_name                      = "mp_WindowsServer2022_2023*"
-  ami_owner                     = "core-shared-services-production"
-  instance                      = local.instance
-  ebs_volumes_copy_all_from_ami = true
-  ebs_kms_key_id                = data.aws_kms_key.ebs_shared.arn
-  ebs_volume_config             = {}
-  ebs_volumes                   = local.ebs_volumes
-  ssm_parameters_prefix         = null
-  ssm_parameters                = null
-  route53_records               = local.route53_records
-
-  iam_resource_names_prefix = ""
-  instance_profile_policies = local.ec2_common_managed_policies
-
-  business_unit            = var.networking[0].business-unit
-  application_name         = local.application_name
-  environment              = local.environment
-  region                   = local.region
-  availability_zone        = local.availability_zone_1
-  subnet_id                = data.aws_subnet.private_az_a.id
-  tags                     = {}
-  account_ids_lookup       = local.environment_management.account_ids
-  cloudwatch_metric_alarms = {}
-}
-
-locals {
-  # ec2_common_managed_policies = [
-  #   aws_iam_policy.ec2_common_policy.arn
-  # ]
-  instance = {
-    disable_api_termination      = false
-    instance_type                = "t3.medium"
-    key_name                     = try(aws_key_pair.ec2-user.key_name)
-    monitoring                   = false
-    metadata_options_http_tokens = "required"
-    vpc_security_group_ids       = try([aws_security_group.onprem_gateway.id])
-  }
-
-  route53_records = {
-      create_internal_record = false
-      create_external_record = false
-  }
-
-  ec2_common_managed_policies = [
-    aws_iam_policy.ec2_common_policy.arn
-  ]
-
-  region = "eu-west-2"
-  availability_zone_1 = "eu-west-2a"
-
-  ebs_volumes = {
-    "/dev/sda1" = { kms_key_id = data.aws_kms_key.default_ebs.arn }
-  }
-
-}
-
-# create single managed policy
-resource "aws_iam_policy" "ec2_common_policy" {
-  name        = "ec2-common-policy"
-  path        = "/"
-  description = "Common policy for all ec2 instances"
-  policy      = data.aws_iam_policy_document.ec2_common_combined.json
-  tags = merge(
-    local.tags,
-    {
-      Name = "ec2-common-policy"
-    },
+# Pre-req - security group
+resource "aws_security_group" "onprem_gateway_sg" {
+  name        = "onprem-gateway-sg"
+  description = "Controls access onprem gateway instance"
+  vpc_id      = data.aws_vpc.shared.id
+  tags = merge(local.tags,
+    { Name = lower(format("sg-%s-%s-onprem-gateway", local.application_name, local.environment)) }
   )
 }
 
-# # combine ec2-common policy documents
-data "aws_iam_policy_document" "ec2_common_combined" {
-  source_policy_documents = [
-    data.aws_iam_policy_document.ec2_policy.json,
-  ]
+resource "aws_vpc_security_group_egress_rule" "onprem_gateway_https_out" {
+  security_group_id = aws_security_group.onprem_gateway_sg.id
+  cidr_ipv4         = "0.0.0.0/0"
+  from_port         = 443
+  to_port           = 443
+  ip_protocol       = "tcp"
+  description       = "Allow communication out on port 443, e.g. for SSM"
+  tags = merge(local.tags,
+    { Name = lower(format("sg-%s-%s-onprem-gateway", local.application_name, local.environment)) }
+  )
 }
 
-# # custom policy for SSM as managed policy AmazonSSMManagedInstanceCore is too permissive
-data "aws_iam_policy_document" "ec2_policy" {
+# Pre-req - IAM role, attachment for SSM usage and instance profile
+data "aws_iam_policy_document" "onprem_gateway_iam_assume_policy" {
   statement {
-    sid    = "CustomEc2Policy"
     effect = "Allow"
     actions = [
-      "ec2:*"
+      "sts:AssumeRole"
     ]
-    resources = ["*"] #tfsec:ignore:aws-iam-no-policy-wildcards
+    principals {
+      type        = "Service"
+      identifiers = ["ec2.amazonaws.com"]
+    }
   }
 }
 
-data "aws_subnet" "private_az_a" {
-  tags = {
-    Name = "${local.vpc_name}-${local.environment}-${local.subnet_set}-private-${local.region}a"
+resource "aws_iam_role" "onprem_gateway_iam_role" {
+  name               = "onprem_gateway_iam_role"
+  assume_role_policy = data.aws_iam_policy_document.onprem_gateway_iam_assume_policy.json
+  tags = merge(local.tags,
+    { Name = lower(format("sg-%s-%s-onprem-gateway", local.application_name, local.environment)) }
+  )
+}
+
+resource "aws_iam_role_policy_attachment" "onprem_gateway_amazonssmmanagedinstancecore" {
+  role       = aws_iam_role.onprem_gateway_iam_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
+resource "aws_iam_instance_profile" "onprem_gateway_profile" {
+  name = "onprem_gateway_iam_role"
+  role = aws_iam_role.onprem_gateway_iam_role.name
+}
+
+# Pre-req - Derive latest AMI
+data "aws_ami" "onprem_gateway_windows" {
+  most_recent = true
+  owners      = [local.environment_management.account_ids["core-shared-services-production"]]
+  name_regex  = "^mp_WindowsServer2022_2023*"
+}
+
+
+resource "aws_instance" "onprem_gateway" {
+  #checkov:skip=CKV2_AWS_41:"IAM role is not implemented for this example EC2. SSH/AWS keys are not used either."
+  # Specify the instance type and ami to be used (this is the Amazon free tier option)
+  instance_type               = "t3.small"
+  ami                         = data.aws_ami.onprem_gateway_windows.id # 374269020027/mp_WindowsServer2022_2023-04-01T00-00-17.453Z
+  vpc_security_group_ids      = [aws_security_group.onprem_gateway_sg.id]
+  subnet_id                   = data.aws_subnet.private_subnets_a.id
+  iam_instance_profile        = aws_iam_instance_profile.onprem_gateway_profile.name
+  associate_public_ip_address = false
+  monitoring                  = false
+  ebs_optimized               = false
+
+  metadata_options {
+    http_endpoint = "enabled"
+    http_tokens   = "required"
   }
+  # Increase the volume size of the root volume
+  # root_block_device {
+  #   volume_type = "gp3"
+  #   volume_size = 30
+  #   encrypted   = true
+  # }
+  tags = merge(local.tags,
+    { Name = lower(format("ec2-%s-%s-onprem-gateway", local.application_name, local.environment)) }
+  )
 }
 
-# Keypair for ec2-user
-resource "tls_private_key" "ec2-user" {
-  algorithm = "RSA"
-  rsa_bits  = 4096
-}
-
-resource "aws_key_pair" "ec2-user" {
-  key_name   = "onpremgw-keypair"
-  public_key = tls_private_key.ec2-user.public_key_openssh
-}
-
-resource "aws_security_group" "onprem_gateway" {
-  name        = "${local.application_name}-${local.environment}-onprem-gateway"
-  description = "onprem gateway sg"
-  vpc_id      = data.aws_vpc.shared.id
-}
-
-# Has to be in the locals else
-data "aws_kms_key" "default_ebs" {
-  key_id = "alias/aws/ebs"
-}
