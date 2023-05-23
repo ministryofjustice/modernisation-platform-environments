@@ -56,7 +56,7 @@ resource "aws_iam_instance_profile" "onprem_gateway_profile" {
 data "aws_ami" "onprem_gateway_windows" {
   most_recent = true
   owners      = [local.environment_management.account_ids["core-shared-services-production"]]
-  name_regex  = "^mp_WindowsServer2022_s3*"
+  name_regex  = "^Windows_Server-2022-English-Full-Base*" # base ami for now
 }
 
 
@@ -64,7 +64,7 @@ resource "aws_instance" "onprem_gateway" {
   #checkov:skip=CKV2_AWS_41:"IAM role is not implemented for this example EC2. SSH/AWS keys are not used either."
   # Specify the instance type and ami to be used (this is the Amazon free tier option)
   instance_type               = "t3.small"
-  ami                         = data.aws_ami.onprem_gateway_windows.id # 374269020027/mp_WindowsServer2022_2023-04-01T00-00-17.453Z
+  ami                         = data.aws_ami.onprem_gateway_windows.id
   vpc_security_group_ids      = [aws_security_group.onprem_gateway_sg.id]
   subnet_id                   = data.aws_subnet.private_subnets_a.id
   iam_instance_profile        = aws_iam_instance_profile.onprem_gateway_profile.name
