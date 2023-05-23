@@ -112,7 +112,7 @@ locals {
       # hmpps-development.modernisation-platform.service.justice.gov.uk
       (module.environment.domains.public.business_unit_environment) = {
         lb_alias_records = [
-          { name = "web-${local.application_name}", type = "A", lbs_map_key = "private" },
+          { name = "web.${local.application_name}", type = "A", lbs_map_key = "private" },
         ]
       }
     }
