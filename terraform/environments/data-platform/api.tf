@@ -14,6 +14,13 @@ resource "aws_api_gateway_method" "upload_data_get" {
   http_method   = "GET"
   resource_id   = aws_api_gateway_resource.upload_data.id
   rest_api_id   = aws_api_gateway_rest_api.data_platform.id
+
+  request_parameters = {
+    "method.request.header.authorisationToken" = true
+    "method.request.querystring.database": true,
+    "method.request.querystring.table": true,
+    "method.request.querystring.contentMD5": true,
+  }
 }
 
 resource "aws_api_gateway_integration" "integration" {
@@ -23,6 +30,12 @@ resource "aws_api_gateway_integration" "integration" {
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
   uri                     = aws_lambda_function.authoriser.invoke_arn
+
+  request_parameters = {
+    "integration.request.querystring.database" = "method.request.querystring.database",
+    "integration.request.querystring.table" = "method.request.querystring.table",
+    "integration.request.querystring.contentMD5" = "method.request.querystring.contentMD5"
+  }
 }
 
 resource "aws_api_gateway_deployment" "deployment" {

@@ -15,7 +15,7 @@ def handler(event, context):
     database = event["queryStringParameters"]["database"]
     table = event["queryStringParameters"]["table"]
     amz_date = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
-    md5 = str(event["queryStringParameters"]["Content-MD5"])
+    md5 = str(event["queryStringParameters"]["contentMD5"])
     uuid_string = str(uuid.uuid4())
     file_name = os.path.join(
         "curated_data",
