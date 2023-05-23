@@ -19,6 +19,7 @@ resource "aws_instance" "ec2_mailrelay" {
   user_data_replace_on_change = true
   user_data = base64encode(templatefile("./templates/ec2_user_data_mailrelay.sh", {
     hostname  = "mailrelay"
+    mp_fqdn   = "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
     smtp_fqdn = "${local.application_data.accounts[local.environment].ses_domain_identity}"
   }))
 
@@ -100,6 +101,9 @@ module "cw-mailrelay-ec2" {
   rootDevice   = "nvme0n1p1" # This is used by default for root on all the ec2 images
 }
 
+# This should be added only after the initial cutover is done - so EBS will not
+# start send messages without an explicit configuration in its /etc/hosts
+/*
 resource "aws_route53_record" "route53_record_mailrelay" {
   provider = aws.core-vpc
   zone_id  = data.aws_route53_zone.external.zone_id
@@ -107,4 +111,15 @@ resource "aws_route53_record" "route53_record_mailrelay" {
   type     = "A"
   ttl      = "300"
   records  = [aws_instance.ec2_mailrelay.private_ip]
+}
+
+output "route53_record_mailrelay" {
+  description = "Mailrelay Route53 record"
+  value       = aws_route53_record.route53_record_mailrelay.fqdn
+}
+*/
+
+output "ec2_private_ip_mailrelay" {
+  description = "Mailrelay Private IP"
+  value       = aws_instance.ec2_mailrelay.private_ip
 }

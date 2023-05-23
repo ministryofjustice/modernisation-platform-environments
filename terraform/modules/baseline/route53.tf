@@ -138,11 +138,11 @@ resource "aws_route53_zone" "this" {
   #CKV2_AWS_39: enable in https://dsdmoj.atlassian.net/browse/DSOS-1866
 
   name = each.key
-  
+
   dynamic "vpc" {
     for_each = try(each.value.vpc, false) ? [each.value.vpc] : []
     content {
-      vpc_id = vpc.id
+      vpc_id     = vpc.id
       vpc_region = vpc.region
     }
   }

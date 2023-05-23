@@ -1,11 +1,10 @@
 # Temporary tf resource to speed up migration
 # to be deleted once prod migration is completed
 resource "aws_db_snapshot_copy" "local" {
-  count = local.application_data.accounts[local.environment].db_migration_snapshot_arn == "" ? 0 : 1
-
-  source_db_snapshot_identifier = local.application_data.accounts[local.environment].db_migration_snapshot_arn
-  kms_key_id                    = local.application_data.accounts[local.environment].db_migration_snapshot_kms_key_arn
-  target_db_snapshot_identifier = "local-migration-snapshot-copy"
+  for_each                      = var.rds_refresh_snapshot_id != "" ? toset([var.rds_refresh_snapshot_id]) : []
+  source_db_snapshot_identifier = each.value
+  kms_key_id                    = data.aws_kms_key.rds_shared.id
+  target_db_snapshot_identifier = "data-refresh-snapshot"
 }
 
 resource "aws_db_instance" "iaps" {
@@ -19,8 +18,7 @@ resource "aws_db_instance" "iaps" {
   password       = aws_secretsmanager_secret_version.db_password.secret_string
 
   # temporary 2-layer try function, to conditionally allow a build from a snapshot originating in an external account
-  snapshot_identifier = try(aws_db_snapshot_copy.local[0].id, try(local.application_data.accounts[local.environment].db_snapshot_identifier, null))
-
+  snapshot_identifier    = try(local.application_data.accounts[local.environment].db_snapshot_identifier, try(aws_db_snapshot_copy.local[0].id, null))
   db_subnet_group_name   = aws_db_subnet_group.iaps.id
   vpc_security_group_ids = [aws_security_group.iaps_db.id]
 
