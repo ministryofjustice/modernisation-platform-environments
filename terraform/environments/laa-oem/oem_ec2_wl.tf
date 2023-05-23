@@ -65,7 +65,7 @@ resource "aws_ebs_volume" "oem_wl_volume_swap" {
   kms_key_id        = data.aws_kms_key.ebs_shared.arn
   size              = 32
   type              = "gp3"
-  depends_on        = [resource.aws_instance.oem_wl[count.index]]
+  depends_on        = [resource.aws_instance.oem_wl]
 
   tags = merge(tomap({
     "Name"                 = "${local.application_name}-wl-swap",
@@ -92,7 +92,7 @@ resource "aws_ebs_volume" "oem_wl_volume_opt_oem_app" {
   size              = 50
   # snapshot_id       = data.aws_ebs_snapshot.oem_wl_volume_opt_oem_app.id
   type       = "gp3"
-  depends_on = [resource.aws_instance.oem_wl[count.index]]
+  depends_on = [resource.aws_instance.oem_wl]
 
   tags = merge(tomap({
     "Name"                 = "${local.application_name}-wl-opt-oem-app",
@@ -125,7 +125,7 @@ resource "aws_ebs_volume" "oem_wl_volume_opt_oem_inst" {
   size              = 50
   # snapshot_id       = data.aws_ebs_snapshot.oem_wl_volume_opt_oem_inst.id
   type       = "gp3"
-  depends_on = [resource.aws_instance.oem_wl[count.index]]
+  depends_on = [resource.aws_instance.oem_wl]
 
   tags = merge(tomap({
     "Name"                 = "${local.application_name}-wl-opt-oem-inst",
