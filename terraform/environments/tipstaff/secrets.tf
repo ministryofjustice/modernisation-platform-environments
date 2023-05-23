@@ -38,14 +38,3 @@ data "aws_secretsmanager_secret" "get_tactical_products_db_secrets" {
 data "aws_secretsmanager_secret_version" "get_tactical_products_rds_credentials" {
   secret_id  = data.aws_secretsmanager_secret.get_tactical_products_db_secrets.id
 }
-
-// Create secret in which the CICD user credentials can be stored. These are used in the deployment pipeline in Azure DevOps.
-resource "aws_secretsmanager_secret" "cicd_user_credentials" {
-  name                    = "cicd-user-credentials"
-  recovery_window_in_days = 0
-}
-
-resource "aws_secretsmanager_secret_version" "cicd_user_credentials_version" {
-  secret_id     = aws_secretsmanager_secret.cicd_user_credentials.id
-  secret_string = jsonencode({ "" : "", "" : "" })
-}
