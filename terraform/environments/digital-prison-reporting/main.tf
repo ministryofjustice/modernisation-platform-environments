@@ -686,3 +686,31 @@ module "s3_application_tf_state" {
     }
   )
 }
+
+# Dynamo Tab for Application TF State
+module "dynamo_tab_application_tf_state" {
+  source              = "./modules/dynamo_tables"
+  create_table        = true
+  autoscaling_enabled = false
+  name                = "${local.project}-terraform-state-${local.environment}"
+
+  hash_key    = "LockID"   # Hash
+  range_key   = ""         # Sort
+  table_class = "STANDARD"
+  ttl_enabled = false
+
+  attributes = [
+    {
+      name = "LockID"
+      type = "S"
+    }
+  ]
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-terraform-state-${local.environment}"
+      Resource_Type = "Dynamo Table"
+    }
+  )
+}
