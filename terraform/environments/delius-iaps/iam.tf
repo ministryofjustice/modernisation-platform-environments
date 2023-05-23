@@ -41,21 +41,21 @@ data "aws_iam_policy_document" "snapshot_sharer" {
       "rds:ModifyDBSnapshotAttribute"
     ]
     resources = [
-      local.iaps_rds_snapshot_arn_prefix,
+      local.iaps_rds_snapshot_arn_pattern,
       aws_db_instance.iaps.arn
     ]
-    statement {
-      sid    = "AllowKMSUsage"
-      effect = "Allow"
-      actions = [
-        "kms:DescribeKey",
-        "kms:Decrypt",
-        "kms:GenerateDataKey"
-      ]
-      resources = [
-        "*"
-      ]
-    }
+  }
+  statement {
+    sid    = "AllowKMSUsage"
+    effect = "Allow"
+    actions = [
+      "kms:DescribeKey",
+      "kms:Decrypt",
+      "kms:GenerateDataKey"
+    ]
+    resources = [
+      "*"
+    ]
   }
 }
 
