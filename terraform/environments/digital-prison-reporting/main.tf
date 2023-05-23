@@ -557,6 +557,7 @@ module "dms_nomis_ingestor" {
   short_name            = "nomis"
   migration_type        = "full-load-and-cdc"
   replication_instance_version  = "3.4.6"
+  replication_instance_class = "dms.t3.medium"
   subnet_ids            = [data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id]
 
   vpc_role_dependency        = [aws_iam_role.dmsvpcrole]
