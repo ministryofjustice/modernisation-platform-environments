@@ -21,6 +21,7 @@ resource "aws_lambda_function" "data_extractor" {
       GLUE_JOB_NAME = aws_glue_job.glue_job.name
     }
   }
+  tags = local.tags
 }
 
 data "aws_iam_policy_document" "lambda_trust_policy_doc" {
@@ -38,6 +39,7 @@ data "aws_iam_policy_document" "lambda_trust_policy_doc" {
 resource "aws_iam_role" "data_extractor_lambda_role" {
   name               = "data_extractor_${local.environment}_role_${local.environment}"
   assume_role_policy = data.aws_iam_policy_document.lambda_trust_policy_doc.json
+  tags = local.tags
 }
 
 data "aws_iam_policy_document" "iam_policy_document_for_data_lambda" {
@@ -57,11 +59,11 @@ data "aws_iam_policy_document" "iam_policy_document_for_data_lambda" {
 }
 
 resource "aws_iam_policy" "data_extractor_lambda_policy" {
-  name        = "data_extractor_${local.environment}_policy_${local.environment}"
+  name        = "data_extractor_policy_${local.environment}"
   path        = "/"
   description = "AWS IAM Policy for managing data_extractor lambda role"
   policy      = data.aws_iam_policy_document.iam_policy_document_for_data_lambda.json
-
+  tags = local.tags
 }
 
 resource "aws_iam_role_policy_attachment" "attach_data_lambda_policy_to_iam_role" {
@@ -71,7 +73,7 @@ resource "aws_iam_role_policy_attachment" "attach_data_lambda_policy_to_iam_role
 
 resource "aws_cloudwatch_event_rule" "put_to_data_directory" {
   name = "put_to_data_directory"
-
+  tags = local.tags
   event_pattern = jsonencode({
     "source" : ["aws.s3"],
     "detail-type" : ["AWS API Call via CloudTrail"],
