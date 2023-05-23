@@ -80,7 +80,6 @@ resource "aws_iam_role_policy" "dmsoperatorpolicy" {
         {
             "Effect": "Allow",
             "Action": [
-                "s3:*",
                 "kms:*",
                 "cloudwatch:*",
                 "ec2:CreateNetworkInterface",
@@ -91,6 +90,29 @@ resource "aws_iam_role_policy" "dmsoperatorpolicy" {
                 "ec2:DescribeVpcs",
                 "ec2:DeleteNetworkInterface",
                 "ec2:ModifyNetworkInterfaceAttribute"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "s3:*Object*",
+                "s3:PutObjectTagging",
+                "s3:GetBucketLocation"
+            ],
+            "Resource": [
+                "arn:aws:s3::*:dpr-*/*",
+                "arn:aws:s3::*:dpr-*"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "s3:ListBucket",
+                "s3:ListAllMyBuckets",
+                "s3:ListAccessPoints",
+                "s3:ListJobs",
+                "s3:ListObjects"          
             ],
             "Resource": "*"
         }

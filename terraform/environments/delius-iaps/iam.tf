@@ -45,6 +45,18 @@ data "aws_iam_policy_document" "snapshot_sharer" {
       aws_db_instance.iaps.arn
     ]
   }
+  statement {
+    sid    = "AllowKMSUsage"
+    effect = "Allow"
+    actions = [
+      "kms:DescribeKey",
+      "kms:Decrypt",
+      "kms:GenerateDataKey"
+    ]
+    resources = [
+      "*"
+    ]
+  }
 }
 
 resource "aws_iam_policy" "snapshot_sharer" {

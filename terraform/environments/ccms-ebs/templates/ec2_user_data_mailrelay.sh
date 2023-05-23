@@ -41,7 +41,8 @@ postfix_setup() {
             "inet_interfaces = all" \
             "inet_protocols = ipv4" \
             "myhostname = mailrelay.${smtp_fqdn}" \
-            "relayhost = [email-smtp.us-west-2.amazonaws.com]:587" \
+            "mynetworks_style = subnet" \
+            "relayhost = [email-smtp.$${R}.amazonaws.com]:587" \
             "smtp_sasl_auth_enable = yes" \
             "smtp_sasl_security_options = noanonymous" \
             "smtp_sasl_password_maps = hash:/etc/postfix/sasl_passwd" \
