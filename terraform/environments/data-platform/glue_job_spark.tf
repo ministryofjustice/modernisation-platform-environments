@@ -83,7 +83,7 @@ data "aws_iam_policy_document" "s3-access" {
 resource "aws_iam_policy" "s3_policy_for_gluejob" {
   name        = "${local.name}-s3-policy-${local.environment}"
   path        = "/"
-  description = "AWS IAM Policy for managing aws lambda role"
+  description = "s3 permissions for data product transform glue job"
   policy      = data.aws_iam_policy_document.s3-access.json
   tags = local.tags
 }
@@ -91,6 +91,31 @@ resource "aws_iam_policy" "s3_policy_for_gluejob" {
 resource "aws_iam_role_policy_attachment" "s3_access_for_glue_job" {
   role       = aws_iam_role.glue-service-role.name
   policy_arn = aws_iam_policy.s3_policy_for_gluejob.arn
+}
+
+data "aws_iam_policy_document" "glue_athena_access" {
+  statement {
+    sid = "QueryAccess"
+    actions = [
+      "athena:StartQueryExecution",
+    ]
+    resources = [
+      "arn:aws:athena:*:${data.aws_caller_identity.current.account_id}:workgroup/*"
+    ]
+  }
+}
+
+resource "aws_iam_policy" "athena_policy_for_gluejob" {
+  name        = "${local.name}-athena-policy-${local.environment}"
+  path        = "/"
+  description = "Athena permissions for data product transform glue job"
+  policy      = data.aws_iam_policy_document.glue_athena_access.json
+
+}
+
+resource "aws_iam_role_policy_attachment" "athena_access_for_glue_job" {
+  role       = aws_iam_role.glue-service-role.name
+  policy_arn = aws_iam_policy.athena_policy_for_gluejob.arn
 }
 
 resource "aws_cloudwatch_log_group" "log_group" {

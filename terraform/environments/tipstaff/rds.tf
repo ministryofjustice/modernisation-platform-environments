@@ -1,17 +1,18 @@
 resource "aws_db_instance" "tipstaff_db" {
-  allocated_storage      = local.application_data.accounts[local.environment].allocated_storage
-  db_name                = local.application_data.accounts[local.environment].db_name
-  storage_type           = local.application_data.accounts[local.environment].storage_type
-  engine                 = local.application_data.accounts[local.environment].engine
-  identifier             = local.application_data.accounts[local.environment].identifier
-  engine_version         = local.application_data.accounts[local.environment].engine_version
-  instance_class         = local.application_data.accounts[local.environment].instance_class
-  username               = jsondecode(data.aws_secretsmanager_secret_version.get_rds_credentials.secret_string)["TIPSTAFF_DB_USERNAME"]
-  password               = random_password.password.result
-  skip_final_snapshot    = true
-  publicly_accessible    = true
-  vpc_security_group_ids = [aws_security_group.postgresql_db_sc.id]
-  db_subnet_group_name   = aws_db_subnet_group.dbsubnetgroup.name
+  allocated_storage           = local.application_data.accounts[local.environment].allocated_storage
+  db_name                     = local.application_data.accounts[local.environment].db_name
+  storage_type                = local.application_data.accounts[local.environment].storage_type
+  engine                      = local.application_data.accounts[local.environment].engine
+  identifier                  = local.application_data.accounts[local.environment].identifier
+  engine_version              = local.application_data.accounts[local.environment].engine_version
+  instance_class              = local.application_data.accounts[local.environment].instance_class
+  username                    = local.application_data.accounts[local.environment].db_username
+  password                    = random_password.password.result
+  skip_final_snapshot         = true
+  publicly_accessible         = true
+  vpc_security_group_ids      = [aws_security_group.postgresql_db_sc.id]
+  db_subnet_group_name        = aws_db_subnet_group.dbsubnetgroup.name
+  allow_major_version_upgrade = true
 }
 
 resource "aws_db_subnet_group" "dbsubnetgroup" {
@@ -76,7 +77,7 @@ resource "null_resource" "setup_db" {
     environment = {
       DB_HOSTNAME          = aws_db_instance.tipstaff_db.address
       DB_NAME              = aws_db_instance.tipstaff_db.db_name
-      TIPSTAFF_DB_USERNAME = jsondecode(data.aws_secretsmanager_secret_version.get_rds_credentials.secret_string)["TIPSTAFF_DB_USERNAME"]
+      TIPSTAFF_DB_USERNAME = aws_db_instance.tipstaff_db.username
       TIPSTAFF_DB_PASSWORD = random_password.password.result
     }
   }
