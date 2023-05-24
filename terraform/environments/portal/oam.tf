@@ -8,7 +8,7 @@ locals {
 
   # EC2 User data
   # TODO The hostname is too long as the domain itself is 62 characters long... If this hostname is required, a new domain is required
-  
+
   oam_1_userdata = <<EOF
 #!/bin/bash
 echo "/dev/xvdb /IDAM/product/fmw ext4 defaults 0 0" >> /etc/fstab
@@ -44,9 +44,7 @@ resource "aws_security_group" "oam_instance" {
 resource "aws_vpc_security_group_egress_rule" "outbound" {
   security_group_id = aws_security_group.oam_instance.id
   cidr_ipv4   = "0.0.0.0/0"
-  from_port   = 0
   ip_protocol = "-1"
-  to_port     = 0
 }
 
 # TODO some rules will need adding referencing Landing Zone environments (e.g. VPC) for other dependent applications not migrated to MP yet but needs talking to Portal.
