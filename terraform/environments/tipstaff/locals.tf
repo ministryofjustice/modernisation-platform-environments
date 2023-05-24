@@ -15,4 +15,18 @@ locals {
   domain_type_main   = local.is-production ? [for k, v in local.domain_types : v.type if k == "tipstaff.service.justice.gov.uk"] : [for k, v in local.domain_types : v.type if k == "modernisation-platform.service.justice.gov.uk"]
   domain_type_sub    = local.is-production ? [for k, v in local.domain_types : v.type if k != "tipstaff.service.justice.gov.uk"] : [for k, v in local.domain_types : v.type if k != "modernisation-platform.service.justice.gov.uk"]
 
+  domain_types_prod = local.is-production ? { for dvo in aws_acm_certificate.external_prod.domain_validation_options : dvo.domain_name => {
+      name   = dvo.resource_record_name
+      record = dvo.resource_record_value
+      type   = dvo.resource_record_type
+      }
+    } : {}
+
+    domain_name_main_prod   = local.is-production ? [for k, v in local.domain_types : v.name if k == "tipstaff.service.justice.gov.uk"] : ""
+    domain_name_sub_prod    = local.is-production ? [for k, v in local.domain_types : v.name if k != "tipstaff.service.justice.gov.uk"] : ""
+    domain_record_main_prod = local.is-production ? [for k, v in local.domain_types : v.record if k == "tipstaff.service.justice.gov.uk"] : ""
+    domain_record_sub_prod  = local.is-production ? [for k, v in local.domain_types : v.record if k != "tipstaff.service.justice.gov.uk"] : ""
+    domain_type_main_prod   = local.is-production ? [for k, v in local.domain_types : v.type if k == "tipstaff.service.justice.gov.uk"] : ""
+    domain_type_sub_prod    = local.is-production ? [for k, v in local.domain_types : v.type if k != "tipstaff.service.justice.gov.uk"] : ""
+
 }
