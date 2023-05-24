@@ -8,12 +8,20 @@ resource "aws_ses_domain_dkim" "domain_identity" {
 
 data "aws_iam_policy_document" "ses_identity_policy" {
   statement {
-    actions   = ["SES:SendEmail", "SES:SendRawEmail"]
-    resources = [aws_ses_domain_identity.domain_identity.arn]
-
+    sid = "2023052401"
     principals {
       identifiers = ["*"]
       type        = "AWS"
+    }
+    actions   = ["SES:SendEmail", "SES:SendRawEmail"]
+    resources = [aws_ses_domain_identity.domain_identity.arn]
+    condition {
+      test    = "StringLike"
+      variable = "ses:Recipients"
+      values = [
+        "ashok.turamari@digital.justice.gov.uk",
+        "maciej.matysiak@digital.justice.gov.uk"
+      ]
     }
   }
 }
