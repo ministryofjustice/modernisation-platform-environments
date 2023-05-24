@@ -116,3 +116,53 @@ resource "aws_ssm_association" "ad_join_domain_association_prod" {
     values = [aws_instance.s618358rgvw019[0].id, aws_instance.s618358rgvw020[0].id, aws_instance.s618358rgvw021[0].id, aws_instance.s618358rgvw022[0].id, aws_instance.s618358rgvw027[0].id, aws_instance.s618358rgvw204[0].id, aws_instance.s618358rgvw205[0].id, aws_instance.s618358rgsw025p[0].id]
   }
 }
+
+
+/*
+resource "aws_route53_resolver_endpoint" "ppud-domain" {
+  provider = aws.core-vpc
+
+  name      = local.application_data.accounts[local.environment].r53_resolver
+  direction = "OUTBOUND"
+
+  security_group_ids = [
+    aws_security_group.outbound_dns_resolver.id
+  ]
+
+  ip_address {
+    subnet_id = data.aws_subnet.public_subnets_a.id
+  }
+
+  ip_address {
+    subnet_id = data.aws_subnet.public_subnets_b.id
+  }
+
+  tags = {
+    Name = "ppud-ad-local-${local.application_name}-${local.environment}"
+  }
+}
+
+resource "aws_route53_resolver_rule" "fwd" {
+  provider = aws.core-vpc
+
+  domain_name          = local.application_data.accounts[local.environment].directory_service_name
+  name                 = local.application_data.accounts[local.environment].directory_service_name
+  rule_type            = "FORWARD"
+  resolver_endpoint_id = aws_route53_resolver_endpoint.ppud-domain.id
+
+  target_ip {
+    ip = aws_instance.infra1.private_ip
+  }
+
+  target_ip {
+    ip = aws_instance.infra2.private_ip
+  }
+}
+
+resource "aws_route53_resolver_rule_association" "ppud-domain" {
+  provider = aws.core-vpc
+
+  resolver_rule_id = aws_route53_resolver_rule.fwd.id
+  vpc_id           = data.aws_vpc.shared.id
+}
+*/

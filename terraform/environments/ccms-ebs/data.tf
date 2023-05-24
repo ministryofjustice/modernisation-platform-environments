@@ -157,3 +157,13 @@ data "aws_acm_certificate" "gandi_cert" {
   domain   = local.application_data.accounts[local.environment].lz_domain_name
   statuses = ["ISSUED"]
 }
+
+
+## PROD DNS
+
+data "aws_route53_zone" "prod-network-services" {
+  provider = aws.core-network-services
+
+  name         = "ccms-ebs.service.justice.gov.uk."
+  private_zone = false
+}

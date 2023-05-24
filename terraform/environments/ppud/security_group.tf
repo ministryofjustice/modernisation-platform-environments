@@ -790,3 +790,104 @@ resource "aws_security_group_rule" "PPUD-Mail-Server-2-Egress-1" {
   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
   security_group_id = aws_security_group.PPUD-Mail-Server-2[0].id
 }
+
+/*
+resource "aws_security_group" "outbound_dns_resolver" {
+  provider = aws.core-vpc
+  description = "DNS traffic only"
+  name        = "outbound-dns-resolver-${local.application_name}"
+  vpc_id      = data.aws_vpc.shared.id
+}
+
+resource "aws_security_group_rule" "res1_egress" {
+  depends_on               = [aws_security_group.outbound_dns_resolver]
+  security_group_id        = aws_security_group.outbound_dns_resolver.id
+  provider                 = aws.core-vpc
+  type                     = "egress"
+  description              = "allow DNS"
+  from_port                = 0
+  to_port                  = 53
+  protocol                 = "TCP"
+  source_security_group_id = aws_security_group.app_servers.id
+}
+
+resource "aws_security_group_rule" "res2_egress" {
+  depends_on               = [aws_security_group.outbound_dns_resolver]
+  security_group_id        = aws_security_group.outbound_dns_resolver.id
+  provider                 = aws.core-vpc
+  type                     = "egress"
+  description              = "allow DNS"
+  from_port                = 0
+  to_port                  = 53
+  protocol                 = "UDP"
+  source_security_group_id = aws_security_group.app_servers.id
+}
+
+resource "aws_security_group_rule" "res1_ingress" {
+  depends_on               = [aws_security_group.outbound_dns_resolver]
+  security_group_id        = aws_security_group.outbound_dns_resolver.id
+  provider                 = aws.core-vpc
+  type                     = "ingress"
+  description              = "allow DNS"
+  from_port                = 0
+  to_port                  = 53
+  protocol                 = "TCP"
+  source_security_group_id = aws_security_group.app_servers.id
+}
+
+resource "aws_security_group_rule" "res2_ingress" {
+  depends_on               = [aws_security_group.outbound_dns_resolver]
+  security_group_id        = aws_security_group.outbound_dns_resolver.id
+  provider                 = aws.core-vpc
+  type                     = "ingress"
+  description              = "allow DNS"
+  from_port                = 0
+  to_port                  = 53
+  protocol                 = "UDP"
+  source_security_group_id = aws_security_group.app_servers.id
+}
+
+resource "aws_security_group_rule" "res1_from_app" {
+  depends_on               = [aws_security_group.outbound_dns_resolver]
+  security_group_id        = aws_security_group.app_servers.id
+  type                     = "egress"
+  description              = "allow DNS"
+  from_port                = 0
+  to_port                  = 53
+  protocol                 = "TCP"
+  source_security_group_id = aws_security_group.outbound_dns_resolver.id
+}
+
+resource "aws_security_group_rule" "res2_from_app" {
+  depends_on               = [aws_security_group.outbound_dns_resolver]
+  security_group_id        = aws_security_group.app_servers.id
+  type                     = "egress"
+  description              = "allow DNS"
+  from_port                = 0
+  to_port                  = 53
+  protocol                 = "UDP"
+  source_security_group_id = aws_security_group.outbound_dns_resolver.id
+}
+
+resource "aws_security_group_rule" "res1_to_app" {
+  depends_on               = [aws_security_group.outbound_dns_resolver]
+  security_group_id        = aws_security_group.app_servers.id
+  type                     = "ingress"
+  description              = "allow DNS"
+  from_port                = 0
+  to_port                  = 53
+  protocol                 = "TCP"
+  source_security_group_id = aws_security_group.outbound_dns_resolver.id
+}
+
+resource "aws_security_group_rule" "res2_to_app" {
+  depends_on               = [aws_security_group.outbound_dns_resolver]
+  security_group_id        = aws_security_group.app_servers.id
+  type                     = "ingress"
+  description              = "allow DNS"
+  from_port                = 0
+  to_port                  = 53
+  protocol                 = "UDP"
+  source_security_group_id = aws_security_group.outbound_dns_resolver.id
+}
+*/
