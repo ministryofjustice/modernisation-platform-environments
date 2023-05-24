@@ -109,7 +109,7 @@ resource "aws_iam_policy" "athena_policy_for_gluejob" {
   name        = "${local.name}-athena-policy-${local.environment}"
   path        = "/"
   description = "Athena permissions for data product transform glue job"
-  policy      = data.aws_iam_policy_document.glue-athena-access.json
+  policy      = data.aws_iam_policy_document.glue_athena_access.json
 
 }
 
