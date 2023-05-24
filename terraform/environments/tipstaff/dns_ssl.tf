@@ -24,10 +24,26 @@ resource "aws_route53_record" "external_validation" {
 }
 
 resource "aws_route53_record" "external" {
-  provider = local.is-production ? aws.core-network-services : aws.core-vpc
+  count    = local.is-production ? 0 : 1
+  provider = aws.core-vpc
 
   zone_id = data.aws_route53_zone.external.zone_id
-  name    = local.is-production ? "${var.networking[0].application}.${local.application_data.accounts[local.environment].domain_name}" : "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.${local.application_data.accounts[local.environment].domain_name}"
+  name    = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.${local.application_data.accounts[local.environment].domain_name}"
+  type    = "A"
+
+  alias {
+    name                   = aws_lb.tipstaff_lb.dns_name
+    zone_id                = aws_lb.tipstaff_lb.zone_id
+    evaluate_target_health = true
+  }
+}
+
+resource "aws_route53_record" "external_prod" {
+  count    = local.is-production ? 1 : 0
+  provider = aws.core-network-services
+
+  zone_id = data.aws_route53_zone.external.zone_id
+  name    = "${var.networking[0].application}.${local.application_data.accounts[local.environment].domain_name}"
   type    = "A"
 
   alias {
