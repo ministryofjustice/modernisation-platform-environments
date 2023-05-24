@@ -1,8 +1,8 @@
 resource "aws_backup_vault" "portal" {
-  name = "${local.application_name}backup-vault"
+  name = "${local.application_name}-backup-vault"
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_name}backup-vault" },
+    { "Name" = "${local.application_name}-backup-vault" },
   )
 }
 
