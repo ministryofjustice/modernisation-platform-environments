@@ -4,14 +4,14 @@ locals {
   cpu_alarms_1 = {
     oam_instance_1 = {
       service_name          = "oam_1"
-      cpu_alarm_threshold = 70
+      cpu_alarm_threshold = 85
       dimensions = {
         InstanceId = aws_instance.oam_instance_1.id
       }
     },
     ohs_instance_1 = {
       service_name          = "ohs_1"
-      cpu_alarm_threshold = 70
+      cpu_alarm_threshold = 85
       dimensions = {
         InstanceId = aws_instance.ohs1.id
       }
@@ -20,7 +20,7 @@ locals {
   cpu_alarms_2 = {
     oam_instance_2 = {
       service_name          = "oam_2"
-      cpu_alarm_threshold = 70
+      cpu_alarm_threshold = 85
       dimensions = {
         InstanceId = "alice"
         # InstanceId = aws_instance.oam_app_instance_2.id # TODO This needs updating when the OAM EC2 instance is built
@@ -28,7 +28,7 @@ locals {
     },
     ohs_instance_2 = {
       service_name          = "oim_2"
-      cpu_alarm_threshold = 70
+      cpu_alarm_threshold = 85
       dimensions = {
         InstanceId = "bob"
         # InstanceId = aws_instance.ohs1.id # TODO This needs updating when the OAM EC2 instance is built
@@ -64,14 +64,14 @@ locals {
   memory_alarms_1 = {
     oam_instance_1 = {
       service_name          = "oam_1"
-      memory_alarm_threshold = 70
+      memory_alarm_threshold = 80
       dimensions = {
         InstanceId = aws_instance.oam_instance_1.id
       }
     },
     ohs_instance_1 = {
       service_name          = "ohs_1"
-      memory_alarm_threshold = 70
+      memory_alarm_threshold = 80
       dimensions = {
         InstanceId = aws_instance.ohs1.id
       }
@@ -88,7 +88,7 @@ locals {
     },
     ohs_instance_2 = {
       service_name          = "ohs_2"
-      memory_alarm_threshold = 70
+      memory_alarm_threshold = 80
       dimensions = {
         InstanceId = "bob"
         # InstanceId = aws_instance.ohs2.id # TODO This needs updating when the OAM EC2 instance is built
@@ -252,6 +252,12 @@ resource "aws_cloudwatch_metric_alarm" "cpu_alarm" {
   alarm_actions       = [aws_sns_topic.alerting_topic.arn]
   ok_actions          = [aws_sns_topic.alerting_topic.arn]
   treat_missing_data  = "breaching"
+  tags = merge(
+    var.tags,
+    {
+      Name = "${local.application_name}-${local.environment}-${each.value.service_name}-CPU-high-threshold-alarm"
+    }
+  )
 }
 
 resource "aws_cloudwatch_metric_alarm" "status_alarm" {
@@ -272,6 +278,12 @@ resource "aws_cloudwatch_metric_alarm" "status_alarm" {
   alarm_actions       = [aws_sns_topic.alerting_topic.arn]
   ok_actions          = [aws_sns_topic.alerting_topic.arn]
   treat_missing_data  = "breaching"
+  tags = merge(
+    var.tags,
+    {
+      Name = "${local.application_name}-${local.environment}-${each.value.service_name}-status-check-failure-alarm"
+    }
+  )
 }
 
 resource "aws_cloudwatch_metric_alarm" "memory_alarm" {
@@ -292,6 +304,12 @@ resource "aws_cloudwatch_metric_alarm" "memory_alarm" {
   alarm_actions       = [aws_sns_topic.alerting_topic.arn]
   ok_actions          = [aws_sns_topic.alerting_topic.arn]
   treat_missing_data  = "breaching"
+  tags = merge(
+    var.tags,
+    {
+      Name = "${local.application_name}-${local.environment}-${each.value.service_name}-memory-usage-alarm"
+    }
+  )
 }
 
 resource "aws_cloudwatch_metric_alarm" "swapspace_alarm" {
@@ -312,6 +330,12 @@ resource "aws_cloudwatch_metric_alarm" "swapspace_alarm" {
   alarm_actions       = [aws_sns_topic.alerting_topic.arn]
   ok_actions          = [aws_sns_topic.alerting_topic.arn]
   treat_missing_data  = "breaching"
+  tags = merge(
+    var.tags,
+    {
+      Name = "${local.application_name}-${local.environment}-${each.value.service_name}-swap-usage-alarm"
+    }
+  )
 }
 
 resource "aws_cloudwatch_metric_alarm" "diskspace_alarm" {
@@ -332,6 +356,12 @@ resource "aws_cloudwatch_metric_alarm" "diskspace_alarm" {
   alarm_actions       = [aws_sns_topic.alerting_topic.arn]
   ok_actions          = [aws_sns_topic.alerting_topic.arn]
   treat_missing_data  = "breaching"
+  tags = merge(
+    var.tags,
+    {
+      Name = "${local.application_name}-${local.environment}-${each.value.service_name}-root-vol-disk-usage-alarm"
+    }
+  )
 }
 
 resource "aws_cloudwatch_metric_alarm" "mserver_alarm" {
@@ -352,6 +382,12 @@ resource "aws_cloudwatch_metric_alarm" "mserver_alarm" {
   alarm_actions       = [aws_sns_topic.alerting_topic.arn]
   ok_actions          = [aws_sns_topic.alerting_topic.arn]
   treat_missing_data  = "breaching"
+  tags = merge(
+    var.tags,
+    {
+      Name = "${local.application_name}-${local.environment}-${each.value.service_name}-mserver-disk-usage-alarm"
+    }
+  )
 }
 
 resource "aws_cloudwatch_metric_alarm" "aserver_alarm" {
@@ -372,6 +408,12 @@ resource "aws_cloudwatch_metric_alarm" "aserver_alarm" {
   alarm_actions       = [aws_sns_topic.alerting_topic.arn]
   ok_actions          = [aws_sns_topic.alerting_topic.arn]
   treat_missing_data  = "breaching"
+  tags = merge(
+    var.tags,
+    {
+      Name = "${local.application_name}-${local.environment}-${each.value.service_name}-aserver-disk-usage-alarm"
+    }
+  )
 }
 
 
