@@ -1,20 +1,22 @@
 resource "aws_route53_record" "external" {
-  provider = aws.core-vpc
+  count                     = local.is-production ? 0 : 1
+  provider                  = aws.core-vpc
 
-  zone_id = data.aws_route53_zone.external.zone_id
-  name    = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.${local.application_data.accounts[local.environment].domain_name}"
-  type    = "A"
+  zone_id                   = data.aws_route53_zone.external.zone_id
+  name                      = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.${local.application_data.accounts[local.environment].domain_name}"
+  type                      = "A"
 
   alias {
-    name                   = aws_lb.tipstaff_lb.dns_name
-    zone_id                = aws_lb.tipstaff_lb.zone_id
-    evaluate_target_health = true
+    name                    = aws_lb.tipstaff_lb.dns_name
+    zone_id                 = aws_lb.tipstaff_lb.zone_id
+    evaluate_target_health  = true
   }
 }
 
 resource "aws_acm_certificate" "external" {
-  domain_name       = local.application_data.accounts[local.environment].domain_name
-  validation_method = "DNS"
+  count                     = local.is-production ? 0 : 1
+  domain_name               = local.application_data.accounts[local.environment].domain_name
+  validation_method         = "DNS"
 
   subject_alternative_names = ["${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.${local.application_data.accounts[local.environment].domain_name}"]
   tags = {
@@ -27,7 +29,8 @@ resource "aws_acm_certificate" "external" {
 }
 
 resource "aws_route53_record" "external_validation" {
-  provider = aws.core-network-services
+  count           = local.is-production ? 0 : 1
+  provider        = aws.core-network-services
 
   allow_overwrite = true
   name            = local.domain_name_main[0]
@@ -38,7 +41,8 @@ resource "aws_route53_record" "external_validation" {
 }
 
 resource "aws_route53_record" "external_validation_subdomain" {
-  provider = aws.core-vpc
+  count           = local.is-production ? 0 : 1
+  provider        = aws.core-vpc
 
   allow_overwrite = true
   name            = local.domain_name_sub[0]
@@ -49,6 +53,69 @@ resource "aws_route53_record" "external_validation_subdomain" {
 }
 
 resource "aws_acm_certificate_validation" "external" {
+  count                   = local.is-production ? 0 : 1
   certificate_arn         = aws_acm_certificate.external.arn
   validation_record_fqdns = [local.domain_name_main[0], local.domain_name_sub[0]]
+}
+
+// Production DNS Configuration
+
+resource "aws_route53_record" "external_prod_route53_record" {
+  count                     = local.is-production ? 1 : 0
+  provider                  = aws.core-network-services
+
+  zone_id                   = data.aws_route53_zone.external.zone_id
+  name                      = "${var.networking[0].application}.${domain_name}"
+  type                      = "A"
+
+  alias {
+    name                    = aws_lb.tipstaff_lb.dns_name
+    zone_id                 = aws_lb.tipstaff_lb.zone_id
+    evaluate_target_health  = true
+  }
+}
+
+resource "aws_acm_certificate" "external_prod" {
+  count                     = local.is-production ? 1 : 0
+  domain_name               = local.application_data.accounts[local.environment].domain_name
+  validation_method         = "DNS"
+
+  subject_alternative_names = ["${var.networking[0].application}.${domain_name}"]
+  tags = {
+    Environment = local.environment
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_route53_record" "external_validation_prod" {
+  count           = local.is-production ? 1 : 0
+  provider        = aws.core-network-services
+
+  allow_overwrite = true
+  name            = local.domain_name_main_prod[0]
+  records         = local.domain_record_main_prod
+  ttl             = 60
+  type            = local.domain_type_main_prod[0]
+  zone_id         = data.aws_route53_zone.network-services.zone_id
+}
+
+resource "aws_route53_record" "external_validation_subdomain_prod" {
+  count           = local.is-production ? 1 : 0
+  provider        = aws.core-network-services
+
+  allow_overwrite = true
+  name            = local.domain_name_sub_prod[0]
+  records         = local.domain_record_sub_prod
+  ttl             = 60
+  type            = local.domain_type_sub_prod[0]
+  zone_id         = data.aws_route53_zone.external.zone_id
+}
+
+resource "aws_acm_certificate_validation" "external_validation_certificate_prod" {
+  count                   = local.is-production ? 1 : 0
+  certificate_arn         = aws_acm_certificate.external_prod.arn
+  validation_record_fqdns = [local.domain_name_main_prod[0], local.domain_name_sub_prod[0]]
 }
