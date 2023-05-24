@@ -127,18 +127,18 @@ locals {
       #
       # public
       #
-      "t2.${local.application_name}.service.justice.gov.uk" = {
-        lb_alias_records = [
-          { name = "web", type = "A", lbs_map_key = "public" }, # web.t2.oasys.service.justice.gov.uk # need to add an ns record to oasys.service.justice.gov.uk -> t2, 
-          { name = "db", type = "A", lbs_map_key = "public" },  # db.t2.oasys.service.justice.gov.uk currently pointing to azure db T2ODL0009
-        ]
-      }
-      "t1.${local.application_name}.service.justice.gov.uk" = {
-        lb_alias_records = [
-          { name = "web", type = "A", lbs_map_key = "public" }, # web.t1.oasys.service.justice.gov.uk # need to add an ns record to oasys.service.justice.gov.uk -> t1, 
-          { name = "db", type = "A", lbs_map_key = "public" },
-        ]
-      }
+      # "t2.${local.application_name}.service.justice.gov.uk" = {
+      #   lb_alias_records = [
+      #     { name = "web", type = "A", lbs_map_key = "public" }, # web.t2.oasys.service.justice.gov.uk # need to add an ns record to oasys.service.justice.gov.uk -> t2, 
+      #     { name = "db", type = "A", lbs_map_key = "public" },  # db.t2.oasys.service.justice.gov.uk currently pointing to azure db T2ODL0009
+      #   ]
+      # }
+      # "t1.${local.application_name}.service.justice.gov.uk" = {
+      #   lb_alias_records = [
+      #     { name = "web", type = "A", lbs_map_key = "public" }, # web.t1.oasys.service.justice.gov.uk # need to add an ns record to oasys.service.justice.gov.uk -> t1, 
+      #     { name = "db", type = "A", lbs_map_key = "public" },
+      #   ]
+      # }
       (module.environment.domains.public.business_unit_environment) = { # hmpps-test.modernisation-platform.service.justice.gov.uk
         lb_alias_records = [
           { name = "t2.${local.application_name}", type = "A", lbs_map_key = "public" },     # t2.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk
