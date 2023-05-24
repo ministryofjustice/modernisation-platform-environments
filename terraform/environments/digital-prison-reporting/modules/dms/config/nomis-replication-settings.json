@@ -122,7 +122,7 @@
     "StopTaskCachedChangesApplied": false,
     "StopTaskCachedChangesNotApplied": false,
     "MaxFullLoadSubTasks": 8,
-    "TransactionConsistencyTimeout": 601,
+    "TransactionConsistencyTimeout": 600,
     "CreatePkAfterFullLoad": false,
     "TargetTablePrepMode": "DO_NOTHING"
   },
