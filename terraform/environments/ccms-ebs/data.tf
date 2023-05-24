@@ -57,6 +57,20 @@ data "aws_ami" "accessgate" {
   }
 }
 
+data "aws_ami" "oracle_db_dr" {
+  most_recent = true
+  owners      = [local.application_data.accounts[local.environment].ami_owner]
+
+  filter {
+    name   = "name"
+    values = [local.application_data.accounts[local.environment].orace_db_dr_ami_name]
+  }
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+}
+
 ## IAM
 data "aws_iam_policy_document" "sns_topic_policy" {
   policy_id = "SnsTopicId"
