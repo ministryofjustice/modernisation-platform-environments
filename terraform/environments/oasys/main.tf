@@ -40,8 +40,7 @@ module "baseline_presets" {
 
     sns_topics = {
       pagerduty_integrations = {
-        # dso_pagerduty = contains(["development", "test"], local.environment) ? "oasys_nonprod_alarms" : "oasys_alarms"
-        dso_pagerduty = "oasys_alarms"
+        dso_pagerduty = contains(["development", "test"], local.environment) ? "oasys_nonprod_alarms" : "oasys_alarms"
       }
     }
 
