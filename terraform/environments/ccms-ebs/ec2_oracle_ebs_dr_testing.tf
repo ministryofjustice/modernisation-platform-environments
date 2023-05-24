@@ -71,6 +71,7 @@ EOF
   depends_on = [aws_security_group.ec2_sg_ebsdb]
 }
 
+
 resource "aws_ebs_volume" "export_home_dr" {
   count = local.environment == "development" ? 1 : 0
   lifecycle {
@@ -86,12 +87,12 @@ resource "aws_ebs_volume" "export_home_dr" {
     { Name = "export/home_dr" }
   )
 }
-resource "aws_volume_attachment" "export_home_att_dr" {
-  count       = local.environment == "development" ? 1 : 0
-  device_name = "/dev/sdh"
-  volume_id   = aws_ebs_volume.export_home_dr[0].id
-  instance_id = aws_instance.ec2_oracle_ebs_dr[0].id
-}
+#resource "aws_volume_attachment" "export_home_att_dr" {
+#  count       = local.environment == "development" ? 1 : 0
+#  device_name = "/dev/sdh"
+#  volume_id   = aws_ebs_volume.export_home_dr[0].id
+#  instance_id = aws_instance.ec2_oracle_ebs_dr[0].id
+#}
 resource "aws_ebs_volume" "u01_dr" {
   count = local.environment == "development" ? 1 : 0
   lifecycle {
@@ -107,12 +108,12 @@ resource "aws_ebs_volume" "u01_dr" {
     { Name = "u01_dr" }
   )
 }
-resource "aws_volume_attachment" "u01_att_dr" {
-  count       = local.environment == "development" ? 1 : 0
-  device_name = "/dev/sdi"
-  volume_id   = aws_ebs_volume.u01_dr[0].id
-  instance_id = aws_instance.ec2_oracle_ebs_dr[0].id
-}
+#resource "aws_volume_attachment" "u01_att_dr" {
+#  count       = local.environment == "development" ? 1 : 0
+#  device_name = "/dev/sdi"
+#  volume_id   = aws_ebs_volume.u01_dr[0].id
+#  instance_id = aws_instance.ec2_oracle_ebs_dr[0].id
+#}
 resource "aws_ebs_volume" "arch_dr" {
   count = local.environment == "development" ? 1 : 0
   lifecycle {
@@ -128,12 +129,13 @@ resource "aws_ebs_volume" "arch_dr" {
     { Name = "arch_dr" }
   )
 }
-resource "aws_volume_attachment" "arch_att_dr" {
-  count       = local.environment == "development" ? 1 : 0
-  device_name = "/dev/sdj"
-  volume_id   = aws_ebs_volume.arch_dr[0].id
-  instance_id = aws_instance.ec2_oracle_ebs_dr[0].id
-}
+#resource "aws_volume_attachment" "arch_att_dr" {
+#  count       = local.environment == "development" ? 1 : 0
+#  device_name = "/dev/sdj"
+#  volume_id   = aws_ebs_volume.arch_dr[0].id
+#  instance_id = aws_instance.ec2_oracle_ebs_dr[0].id
+#}
+
 resource "aws_ebs_volume" "dbf_dr" {
   count = local.environment == "development" ? 1 : 0
   lifecycle {
@@ -155,6 +157,7 @@ resource "aws_volume_attachment" "dbf_att_dr" {
   volume_id   = aws_ebs_volume.dbf_dr[0].id
   instance_id = aws_instance.ec2_oracle_ebs_dr[0].id
 }
+
 resource "aws_ebs_volume" "redoA_dr" {
   count = local.environment == "development" ? 1 : 0
   lifecycle {
@@ -170,12 +173,12 @@ resource "aws_ebs_volume" "redoA_dr" {
     { Name = "redoA_dr" }
   )
 }
-resource "aws_volume_attachment" "redoA_att_dr" {
-  count       = local.environment == "development" ? 1 : 0
-  device_name = "/dev/sdl"
-  volume_id   = aws_ebs_volume.redoA_dr[0].id
-  instance_id = aws_instance.ec2_oracle_ebs_dr[0].id
-}
+#resource "aws_volume_attachment" "redoA_att_dr" {
+#  count       = local.environment == "development" ? 1 : 0
+#  device_name = "/dev/sdl"
+#  volume_id   = aws_ebs_volume.redoA_dr[0].id
+#  instance_id = aws_instance.ec2_oracle_ebs_dr[0].id
+#}
 resource "aws_ebs_volume" "techst_dr" {
   count = local.environment == "development" ? 1 : 0
   lifecycle {
@@ -191,12 +194,13 @@ resource "aws_ebs_volume" "techst_dr" {
     { Name = "techst_dr" }
   )
 }
-resource "aws_volume_attachment" "techst_att_dr" {
-  count       = local.environment == "development" ? 1 : 0
-  device_name = "/dev/sdm"
-  volume_id   = aws_ebs_volume.techst_dr[0].id
-  instance_id = aws_instance.ec2_oracle_ebs_dr[0].id
-}
+#resource "aws_volume_attachment" "techst_att_dr" {
+#  count       = local.environment == "development" ? 1 : 0
+#  device_name = "/dev/sdm"
+#  volume_id   = aws_ebs_volume.techst_dr[0].id
+#  instance_id = aws_instance.ec2_oracle_ebs_dr[0].id
+#}
+
 resource "aws_ebs_volume" "backup_dr" {
   count = local.environment == "development" ? 1 : 0
   lifecycle {
