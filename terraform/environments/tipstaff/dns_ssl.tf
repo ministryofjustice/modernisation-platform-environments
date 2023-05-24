@@ -54,7 +54,7 @@ resource "aws_route53_record" "external_validation_subdomain" {
 
 resource "aws_acm_certificate_validation" "external" {
   count                   = local.is-production ? 0 : 1
-  certificate_arn         = aws_acm_certificate.external.arn
+  certificate_arn         = aws_acm_certificate.external[0].arn
   validation_record_fqdns = [local.domain_name_main[0], local.domain_name_sub[0]]
 }
 
@@ -116,6 +116,6 @@ resource "aws_route53_record" "external_validation_subdomain_prod" {
 
 resource "aws_acm_certificate_validation" "external_prod" {
   count                   = local.is-production ? 1 : 0
-  certificate_arn         = aws_acm_certificate.external_prod.arn
+  certificate_arn         = aws_acm_certificate.external_prod[0].arn
   validation_record_fqdns = [local.domain_name_main[0], local.domain_name_sub[0]]
 }

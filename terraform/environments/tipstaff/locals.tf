@@ -8,12 +8,12 @@ locals {
     }
   }
 
-  domain_name_main   = local.is-production ? [for k, v in local.domain_types : v.name if k == "tipstaff.service.justice.gov.uk"] : [for k, v in local.domain_types : v.name if k == "modernisation-platform.service.justice.gov.uk"]
-  domain_name_sub    = local.is-production ? [for k, v in local.domain_types : v.name if k != "tipstaff.service.justice.gov.uk"] : [for k, v in local.domain_types : v.name if k != "modernisation-platform.service.justice.gov.uk"]
-  domain_record_main = local.is-production ? [for k, v in local.domain_types : v.record if k == "tipstaff.service.justice.gov.uk"] : [for k, v in local.domain_types : v.record if k == "modernisation-platform.service.justice.gov.uk"]
-  domain_record_sub  = local.is-production ? [for k, v in local.domain_types : v.record if k != "tipstaff.service.justice.gov.uk"] : [for k, v in local.domain_types : v.record if k != "modernisation-platform.service.justice.gov.uk"]
-  domain_type_main   = local.is-production ? [for k, v in local.domain_types : v.type if k == "tipstaff.service.justice.gov.uk"] : [for k, v in local.domain_types : v.type if k == "modernisation-platform.service.justice.gov.uk"]
-  domain_type_sub    = local.is-production ? [for k, v in local.domain_types : v.type if k != "tipstaff.service.justice.gov.uk"] : [for k, v in local.domain_types : v.type if k != "modernisation-platform.service.justice.gov.uk"]
+  domain_name_main   = [for k, v in local.domain_types : v.name if k == "modernisation-platform.service.justice.gov.uk"]
+  domain_name_sub    = [for k, v in local.domain_types : v.name if k != "modernisation-platform.service.justice.gov.uk"]
+  domain_record_main = [for k, v in local.domain_types : v.record if k == "modernisation-platform.service.justice.gov.uk"]
+  domain_record_sub  = [for k, v in local.domain_types : v.record if k != "modernisation-platform.service.justice.gov.uk"]
+  domain_type_main   = [for k, v in local.domain_types : v.type if k == "modernisation-platform.service.justice.gov.uk"]
+  domain_type_sub    = [for k, v in local.domain_types : v.type if k != "modernisation-platform.service.justice.gov.uk"]
 
   domain_types_prod = local.is-production ? { for dvo in aws_acm_certificate.external_prod[0].domain_validation_options : dvo.domain_name => {
     name   = dvo.resource_record_name
