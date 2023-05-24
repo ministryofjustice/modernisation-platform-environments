@@ -15,9 +15,9 @@ resource "aws_instance" "ec2_ebsapps" {
   cpu_threads_per_core = local.application_data.accounts[local.environment].ec2_oracle_instance_threads_ebsapps
 
   # Due to a bug in terraform wanting to rebuild the ec2 if more than 1 ebs block is attached, we need the lifecycle clause below
-  lifecycle {
-    ignore_changes = [ebs_block_device]
-  }
+  #lifecycle {
+  #  ignore_changes = [ebs_block_device]
+  #}
   user_data_replace_on_change = false
   user_data                   = <<EOF
 #!/bin/bash
