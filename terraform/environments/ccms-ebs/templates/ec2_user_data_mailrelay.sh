@@ -41,7 +41,7 @@ postfix_setup() {
             "inet_interfaces = all" \
             "inet_protocols = ipv4" \
             "myhostname = mailrelay.${smtp_fqdn}" \
-            "mynetworks_style = subnet" \
+            "mynetworks_style = class" \
             "relayhost = [email-smtp.$${R}.amazonaws.com]:587" \
             "smtp_sasl_auth_enable = yes" \
             "smtp_sasl_security_options = noanonymous" \
