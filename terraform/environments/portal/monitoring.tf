@@ -177,7 +177,7 @@ locals {
       mserver_alarm_threshold = 80
       dimensions = {
         MountPath = "/IDAM/product/runtime/Domain/mserver"
-        Filesystem = "/dev/nvme4n1"
+        # Filesystem = "/dev/nvme4n1"
         InstanceId = aws_instance.oam_instance_1.id
       }
     },
@@ -186,7 +186,7 @@ locals {
       mserver_alarm_threshold = 80
       dimensions = {
         MountPath = "/IDAM/product/runtime/Domain/mserver"
-        Filesystem = "/dev/nvme4n1"
+        # Filesystem = "/dev/nvme4n1"
         InstanceId = aws_instance.ohs1.id
       }
     }
