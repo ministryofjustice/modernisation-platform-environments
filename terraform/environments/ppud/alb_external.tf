@@ -109,7 +109,7 @@ resource "aws_lb_listener" "WAM-Front-End-Preprod" {
   port              = "443"
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = data.aws_acm_certificate.internaltest_cert[0].arn
+  certificate_arn   = data.aws_acm_certificate.WAM_UAT_ALB[0].arn
 
   default_action {
     type             = "forward"
@@ -123,7 +123,7 @@ resource "aws_lb_listener" "WAM-Front-End-Prod" {
   port              = "443"
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = data.aws_acm_certificate.internaltest_cert[0].arn
+  certificate_arn   = data.aws_acm_certificate.WAM_PROD_ALB[0].arn
 
   default_action {
     type             = "forward"
