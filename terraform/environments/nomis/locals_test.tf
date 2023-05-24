@@ -61,7 +61,7 @@ locals {
           })
         })
         autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
-          desired_capacity = 0
+          desired_capacity = 1
         })
         # autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
         tags = {
@@ -91,7 +91,7 @@ locals {
           })
         })
         autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
-          desired_capacity = 0
+          desired_capacity = 1
         })
         # autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
         tags = {
