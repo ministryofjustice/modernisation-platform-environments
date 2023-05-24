@@ -1,8 +1,8 @@
 resource "aws_backup_vault" "default_ohs" {
-  name = "${local.application_name}OHS-backup-vault"
+  name = "${local.application_name}backup-vault"
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_name}OHS-backup-vault" },
+    { "Name" = "${local.application_name}backup-vault" },
   )
 }
 
@@ -38,12 +38,12 @@ resource "aws_backup_plan" "non_production_ohs" {
 
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_name}OHS-backup-plan" },
+    { "Name" = "${local.application_name}backup-plan" },
   )
 }
 
 resource "aws_backup_selection" "non_production_ohs" {
-  name         = "${local.application_name}OHS-non-production-backup"
+  name         = "${local.application_name}non-production-backup"
   iam_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/AWSBackup"
   plan_id      = aws_backup_plan.non_production_ohs.id
   resources    = ["*"]
