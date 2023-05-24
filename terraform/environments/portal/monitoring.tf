@@ -253,7 +253,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu_alarm" {
   ok_actions          = [aws_sns_topic.alerting_topic.arn]
   treat_missing_data  = "breaching"
   tags = merge(
-    var.tags,
+    local.tags,
     {
       Name = "${local.application_name}-${local.environment}-${each.value.service_name}-CPU-high-threshold-alarm"
     }
@@ -279,7 +279,7 @@ resource "aws_cloudwatch_metric_alarm" "status_alarm" {
   ok_actions          = [aws_sns_topic.alerting_topic.arn]
   treat_missing_data  = "breaching"
   tags = merge(
-    var.tags,
+    local.tags,
     {
       Name = "${local.application_name}-${local.environment}-${each.value.service_name}-status-check-failure-alarm"
     }
@@ -305,7 +305,7 @@ resource "aws_cloudwatch_metric_alarm" "memory_alarm" {
   ok_actions          = [aws_sns_topic.alerting_topic.arn]
   treat_missing_data  = "breaching"
   tags = merge(
-    var.tags,
+    local.tags,
     {
       Name = "${local.application_name}-${local.environment}-${each.value.service_name}-memory-usage-alarm"
     }
@@ -331,7 +331,7 @@ resource "aws_cloudwatch_metric_alarm" "swapspace_alarm" {
   ok_actions          = [aws_sns_topic.alerting_topic.arn]
   treat_missing_data  = "breaching"
   tags = merge(
-    var.tags,
+    local.tags,
     {
       Name = "${local.application_name}-${local.environment}-${each.value.service_name}-swap-usage-alarm"
     }
@@ -357,7 +357,7 @@ resource "aws_cloudwatch_metric_alarm" "diskspace_alarm" {
   ok_actions          = [aws_sns_topic.alerting_topic.arn]
   treat_missing_data  = "breaching"
   tags = merge(
-    var.tags,
+    local.tags,
     {
       Name = "${local.application_name}-${local.environment}-${each.value.service_name}-root-vol-disk-usage-alarm"
     }
@@ -383,7 +383,7 @@ resource "aws_cloudwatch_metric_alarm" "mserver_alarm" {
   ok_actions          = [aws_sns_topic.alerting_topic.arn]
   treat_missing_data  = "breaching"
   tags = merge(
-    var.tags,
+    local.tags,
     {
       Name = "${local.application_name}-${local.environment}-${each.value.service_name}-mserver-disk-usage-alarm"
     }
@@ -409,7 +409,7 @@ resource "aws_cloudwatch_metric_alarm" "aserver_alarm" {
   ok_actions          = [aws_sns_topic.alerting_topic.arn]
   treat_missing_data  = "breaching"
   tags = merge(
-    var.tags,
+    local.tags,
     {
       Name = "${local.application_name}-${local.environment}-${each.value.service_name}-aserver-disk-usage-alarm"
     }
