@@ -343,6 +343,10 @@ locals {
           { name = "t2trdat", type = "A", ttl = "300", records = ["10.101.33.132"] },
           { name = "t2trdat-a", type = "A", ttl = "300", records = ["10.101.33.132"] },
           { name = "t2trdat-b", type = "CNAME", ttl = "300", records = ["t2-nomis-db-1-b.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
+          # TEST
+          { name = "test1", type = "CNAME", ttl = "300", records = ["t2-nomis-db-1-b.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
+          { name = "test2", type = "CNAME", ttl = "300", records = ["t2-nomis-db-1-b.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk."] },
+          { name = "test3", type = "CNAME", ttl = "300", records = ["t2nomis"] },
         ]
         lb_alias_records = [
           { name = "t1-nomis-web-a", type = "A", lbs_map_key = "private" },
