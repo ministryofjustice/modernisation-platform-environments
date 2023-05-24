@@ -1,17 +1,3 @@
-resource "aws_route53_record" "external" {
-  provider = aws.core-vpc
-
-  zone_id = data.aws_route53_zone.external.zone_id
-  name    = local.is-production ? "${var.networking[0].application}.${local.application_data.accounts[local.environment].domain_name}" : "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.${local.application_data.accounts[local.environment].domain_name}"
-  type    = "A"
-
-  alias {
-    name                   = aws_lb.tipstaff_lb.dns_name
-    zone_id                = aws_lb.tipstaff_lb.zone_id
-    evaluate_target_health = true
-  }
-}
-
 resource "aws_acm_certificate" "external" {
   domain_name       = local.is-production ? "${var.networking[0].application}.${local.application_data.accounts[local.environment].domain_name}" : local.application_data.accounts[local.environment].domain_name
   validation_method = "DNS"
@@ -35,6 +21,20 @@ resource "aws_route53_record" "external_validation" {
   ttl             = 60
   type            = local.domain_type_main[0]
   zone_id         = data.aws_route53_zone.network-services.zone_id
+}
+
+resource "aws_route53_record" "external" {
+  provider = local.is-production ? aws.core-network-services : aws.core-vpc
+
+  zone_id = data.aws_route53_zone.external.zone_id
+  name    = local.is-production ? "${var.networking[0].application}.${local.application_data.accounts[local.environment].domain_name}" : "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.${local.application_data.accounts[local.environment].domain_name}"
+  type    = "A"
+
+  alias {
+    name                   = aws_lb.tipstaff_lb.dns_name
+    zone_id                = aws_lb.tipstaff_lb.zone_id
+    evaluate_target_health = true
+  }
 }
 
 resource "aws_route53_record" "external_validation_subdomain" {
