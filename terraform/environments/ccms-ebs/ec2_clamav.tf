@@ -82,25 +82,6 @@ EOF
   depends_on = [aws_security_group.ec2_sg_clamav]
 }
 
-module "cw-clamav-ec2" {
-  source = "./modules/cw-ec2"
-
-  name  = "ec2-clamav"
-  topic = aws_sns_topic.cw_alerts.arn
-
-  for_each     = local.application_data.cloudwatch_ec2
-  metric       = each.key
-  eval_periods = each.value.eval_periods
-  period       = each.value.period
-  threshold    = each.value.threshold
-
-  # Dimensions used across all alarms
-  instanceId   = aws_instance.ec2_clamav.id
-  imageId      = "ami-03e88be9ecff64781"
-  instanceType = "t2.medium"
-  fileSystem   = "xfs"       # Linux root filesystem
-  rootDevice   = "nvme0n1p1" # This is used by default for root on all the ec2 images
-}
 
 module "cw-clamav-ec2" {
   source = "./modules/cw-ec2"
