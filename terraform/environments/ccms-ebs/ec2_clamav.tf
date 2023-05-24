@@ -102,7 +102,7 @@ module "cw-clamav-ec2" {
   rootDevice   = "nvme0n1p1" # This is used by default for root on all the ec2 images
 }
 
-module "cw-ftp-ec2" {
+module "cw-clamav-ec2" {
   source = "./modules/cw-ec2"
 
   name          = "ec2-clamav"
