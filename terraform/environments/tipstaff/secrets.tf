@@ -1,12 +1,12 @@
 # #### This file can be used to store secrets specific to the member account ####
 
-# resource "random_password" "password" {
-#   length  = 16
-#   lower   = true
-#   upper   = true
-#   numeric = true
-#   special = false
-# }
+resource "random_password" "password" {
+  length  = 16
+  lower   = true
+  upper   = true
+  numeric = true
+  special = false
+}
 
 # // Secrets for the tipstaff database on the modernisation platform
 # resource "aws_secretsmanager_secret" "tipstaff_db_secrets" {
