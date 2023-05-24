@@ -13,7 +13,7 @@ resource "aws_route53_record" "external" {
 }
 
 resource "aws_acm_certificate" "external" {
-  domain_name       = local.application_data.accounts[local.environment].domain_name
+  domain_name       = local.is-production ? "${var.networking[0].application}.${local.application_data.accounts[local.environment].domain_name}" : local.application_data.accounts[local.environment].domain_name
   validation_method = "DNS"
 
   subject_alternative_names = local.is-production ? ["${var.networking[0].application}.${local.application_data.accounts[local.environment].domain_name}"] : ["${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.${local.application_data.accounts[local.environment].domain_name}"]
