@@ -17,7 +17,7 @@ resource "aws_security_group_rule" "ingress_traffic_ebs_vision_db" {
   from_port         = each.value.from_port
   to_port           = each.value.to_port
   # do we add ingress for cloud platform as well
-  cidr_blocks = [data.aws_vpc.shared.cidr_block]
+  cidr_blocks = [data.aws_vpc.shared.cidr_block, local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_subnet_env, local.application_data.accounts[local.environment].cp_dev_cidr_range]
 }
 
 resource "aws_security_group_rule" "egress_traffic_ebs_vision_db_sg" {
