@@ -8,14 +8,14 @@ locals {
       dimensions = {
         InstanceId = aws_instance.oam_instance_1.id
       }
+    },
+    ohs_instance_1 = {
+      service_name          = "ohs_1"
+      cpu_alarm_threshold = 70
+      dimensions = {
+        InstanceId = aws_instance.ohs1.id
+      }
     }
-    # ohs_instance_1 = {
-    #   service_name          = "ohs_1"
-    #   cpu_alarm_threshold = 70
-    #   dimensions = {
-    #     InstanceId = aws_instance.ohs1.id
-    #   }
-    # }
   }
   cpu_alarms_2 = {
     oam_instance_2 = {
@@ -40,7 +40,14 @@ locals {
       service_name          = "oam_1"
       status_alarm_threshold = 1
       dimensions = {
-        InstanceId = aws_instance.oam_instance_1.id # TODO This needs updating when the OAM EC2 instance is built
+        InstanceId = aws_instance.oam_instance_1.id 
+      }
+    },
+    ohs_instance_1 = {
+      service_name          = "ohs_1"
+      status_alarm_threshold = 1
+      dimensions = {
+        InstanceId = aws_instance.ohs1.id
       }
     }
   }
@@ -59,15 +66,14 @@ locals {
       service_name          = "oam_1"
       memory_alarm_threshold = 70
       dimensions = {
-        InstanceId = "bob"
-        # InstanceId = aws_instance.oam_instance_1.id # TODO This needs updating when the OAM EC2 instance is built
+        InstanceId = aws_instance.oam_instance_1.id
       }
     },
     ohs_instance_1 = {
       service_name          = "ohs_1"
       memory_alarm_threshold = 70
       dimensions = {
-        InstanceId = aws_instance.ohs1.id # TODO This needs updating when the OAM EC2 instance is built
+        InstanceId = aws_instance.ohs1.id
       }
     }
   }

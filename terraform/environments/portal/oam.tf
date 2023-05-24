@@ -3,8 +3,12 @@ locals {
   prod_workspaces_cidr            = "10.200.16.0/20"
   redc_cidr                       = "172.16.0.0/20"
   atos_cidr                       = "10.0.0.0/8"
+  portal_hosted_zone              = data.aws_route53_zone.external.name # TODO This needs a logic for a TBC Hosted Zone for production
+
 
   # EC2 User data
+  # TODO The hostname is too long as the domain itself is 62 characters long... If this hostname is required, a new domain is required
+  
   oam_1_userdata = <<EOF
 #!/bin/bash
 echo "/dev/xvdb /IDAM/product/fmw ext4 defaults 0 0" >> /etc/fstab
@@ -13,7 +17,7 @@ echo "/dev/xvdd /IDAM/product/runtime/Domain/config ext4 defaults 0 0" >> /etc/f
 echo "/dev/xvde /IDAM/product/runtime/Domain/mserver ext4 defaults 0 0" >> /etc/fstab
 echo "/dev/sdf /IDMLCM/repo_home ext4 defaults 0 0" >> /etc/fstab
 mount -a
-hostnamectl set-hostname ${local.application_name}-oam1-ms.${data.aws_route53_zone.external.name}
+hostnamectl set-hostname ${local.application_name}-oam1-ms.${local.portal_hosted_zone}
 EOF
   oam_2_userdata = <<EOF
 #!/bin/bash
@@ -23,7 +27,7 @@ echo "${local.application_name}-oam1-ms.${data.aws_route53_zone.external.name}:/
 echo "${local.application_name}-oam1-ms.${data.aws_route53_zone.external.name}:/IDAM/product/runtime/Domain/aserver /IDAM/product/runtime/Domain/aserver nfs nolock 0 0" >> /etc/fstab
 echo "${local.application_name}-oam1-ms.${data.aws_route53_zone.external.name}:/IDMLCM/repo_home /IDMLCM/repo_home nfs nolock 0 0" >> /etc/fstab
 mount -a
-hostnamectl set-hostname ${local.application_name}-oam2-ms.${data.aws_route53_zone.external.name}
+hostnamectl set-hostname ${local.application_name}-oam2-ms.${local.portal_hosted_zone}
 EOF
 }
 
