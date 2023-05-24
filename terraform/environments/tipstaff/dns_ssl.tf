@@ -60,12 +60,12 @@ resource "aws_acm_certificate_validation" "external" {
 
 // Production DNS Configuration
 
-resource "aws_route53_record" "external_prod_route53_record" {
+resource "aws_route53_record" "external" {
   count                     = local.is-production ? 1 : 0
   provider                  = aws.core-network-services
 
   zone_id                   = data.aws_route53_zone.external.zone_id
-  name                      = "${var.networking[0].application}.${domain_name}"
+  name                      = "${var.networking[0].application}.${local.application_data.accounts[local.environment].domain_name}"
   type                      = "A"
 
   alias {
@@ -75,12 +75,12 @@ resource "aws_route53_record" "external_prod_route53_record" {
   }
 }
 
-resource "aws_acm_certificate" "external_prod" {
+resource "aws_acm_certificate" "external" {
   count                     = local.is-production ? 1 : 0
   domain_name               = local.application_data.accounts[local.environment].domain_name
   validation_method         = "DNS"
 
-  subject_alternative_names = ["${var.networking[0].application}.${domain_name}"]
+  subject_alternative_names = ["${var.networking[0].application}.${local.application_data.accounts[local.environment].domain_name}"]
   tags = {
     Environment = local.environment
   }
@@ -90,7 +90,7 @@ resource "aws_acm_certificate" "external_prod" {
   }
 }
 
-resource "aws_route53_record" "external_validation_prod" {
+resource "aws_route53_record" "external_validation" {
   count           = local.is-production ? 1 : 0
   provider        = aws.core-network-services
 
@@ -102,7 +102,7 @@ resource "aws_route53_record" "external_validation_prod" {
   zone_id         = data.aws_route53_zone.network-services.zone_id
 }
 
-resource "aws_route53_record" "external_validation_subdomain_prod" {
+resource "aws_route53_record" "external_validation_subdomain" {
   count           = local.is-production ? 1 : 0
   provider        = aws.core-network-services
 
@@ -114,8 +114,8 @@ resource "aws_route53_record" "external_validation_subdomain_prod" {
   zone_id         = data.aws_route53_zone.external.zone_id
 }
 
-resource "aws_acm_certificate_validation" "external_validation_certificate_prod" {
+resource "aws_acm_certificate_validation" "external" {
   count                   = local.is-production ? 1 : 0
-  certificate_arn         = aws_acm_certificate.external_prod.arn
+  certificate_arn         = aws_acm_certificate.external
   validation_record_fqdns = [local.domain_name_main_prod[0], local.domain_name_sub_prod[0]]
 }
