@@ -2,7 +2,7 @@ resource "aws_route53_record" "external" {
   provider = aws.core-vpc
 
   zone_id = data.aws_route53_zone.external.zone_id
-  name    = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  name    = local.is-production ? "${var.networking[0].application}.${local.application_data.accounts[local.environment].domain_name}" : "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.${local.application_data.accounts[local.environment].domain_name}"
   type    = "A"
 
   alias {
@@ -13,10 +13,10 @@ resource "aws_route53_record" "external" {
 }
 
 resource "aws_acm_certificate" "external" {
-  domain_name       = "modernisation-platform.service.justice.gov.uk"
+  domain_name       = local.application_data.accounts[local.environment].domain_name
   validation_method = "DNS"
 
-  subject_alternative_names = ["${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
+  subject_alternative_names = local.is-production ? ["${var.networking[0].application}.${local.application_data.accounts[local.environment].domain_name}"] : ["${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.${local.application_data.accounts[local.environment].domain_name}"]
   tags = {
     Environment = local.environment
   }
