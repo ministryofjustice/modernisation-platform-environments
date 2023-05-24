@@ -61,7 +61,7 @@ resource "aws_security_group_rule" "ingress_traffic_lb" {
   protocol          = each.value.protocol
   from_port         = each.value.from_port
   to_port           = each.value.to_port
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block,local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_subnet_env, local.application_data.accounts[local.environment].cp_dev_cidr_range]
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block, local.application_data.accounts[local.environment].lz_aws_workspace_nonprod_subnet_env, local.application_data.accounts[local.environment].cp_dev_cidr_range]
 }
 
 resource "aws_security_group_rule" "ingress_traffic_lb_to_ebs" {
@@ -118,11 +118,11 @@ resource "aws_security_group_rule" "all_internal_ingress_traffic" {
 resource "aws_security_group_rule" "all_internal_egress_traffic" {
   for_each          = { for sub in data.aws_security_groups.all_security_groups.ids : sub => sub }
   security_group_id = each.value
-  type        = "egress"
-  description = "Egress for all internal traffic"
-  protocol    = "all"
-  from_port   = 0
-  to_port     = 0
+  type              = "egress"
+  description       = "Egress for all internal traffic"
+  protocol          = "all"
+  from_port         = 0
+  to_port           = 0
   cidr_blocks = [
     data.aws_subnet.data_subnets_a.cidr_block,
     data.aws_subnet.data_subnets_b.cidr_block,

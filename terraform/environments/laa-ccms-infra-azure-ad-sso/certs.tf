@@ -1,7 +1,7 @@
 # Certificate
 
 locals {
-  
+
   domain_types = { for dvo in aws_acm_certificate.ebs_vision_db_lb_cert.domain_validation_options : dvo.domain_name => {
     name   = dvo.resource_record_name
     record = dvo.resource_record_value

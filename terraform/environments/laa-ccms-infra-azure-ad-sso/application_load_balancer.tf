@@ -20,7 +20,7 @@ resource "aws_lb" "ebs_vision_db_lb" {
 
 #
 resource "aws_lb_target_group" "ebs_vision_db_tg_http" {
-  name       = lower(format("tg-%s-%s", substr(local.application_name, 0, 23), substr(local.environment, 0, 3)))
+  name     = lower(format("tg-%s-%s", substr(local.application_name, 0, 23), substr(local.environment, 0, 3)))
   port     = 8000
   protocol = "HTTP"
   vpc_id   = data.aws_vpc.shared.id

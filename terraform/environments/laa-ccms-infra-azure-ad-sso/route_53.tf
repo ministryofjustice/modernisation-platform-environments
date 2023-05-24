@@ -24,5 +24,18 @@ resource "aws_route53_record" "ebs_vision_db_lb_cname" {
   records = [aws_route53_record.sg_ebs_vision_db_a_record.fqdn]
 }
 
+## EBSDB
+resource "aws_route53_record" "ebs_db_a_record" {
+  provider = aws.core-vpc
+
+  zone_id = data.aws_route53_zone.external.zone_id
+  name    = "azure-ad-ebs-db.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type    = "A"
+  ttl     = 300
+  records = [aws_instance.ec2_oracle_vision_ebs.private_ip]
+
+}
+
+
 
 
