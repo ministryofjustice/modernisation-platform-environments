@@ -687,7 +687,7 @@ module "s3_application_tf_state" {
   )
 }
 
-# Dynamo Tab for Application TF State
+# Dynamo Tab for Application TF State 
 module "dynamo_tab_application_tf_state" {
   source              = "./modules/dynamo_tables"
   create_table        = true
