@@ -32,7 +32,7 @@ EOF
 #################################
 
 resource "aws_security_group" "oam_instance" {
-  name        = local.application_name
+  name        = "${local.application_name}-${local.environment}-oam-security-group"
   description = "Portal App OAM Security Group"
   vpc_id      = data.aws_vpc.shared.id
 }
@@ -152,14 +152,14 @@ resource "aws_vpc_security_group_ingress_rule" "nfs_oam_to_oam" {
 
 # TODO enable when OHS resources are created
 
-# resource "aws_vpc_security_group_ingress_rule" "nfs_ohs_to_oam" {
-#   security_group_id = aws_security_group.oam_instance.id
-#   description = "Inbound NFS from OHS Instances"
-#   referenced_security_group_id = aws_security_group.ohs_instance.id
-#   from_port   = 2049
-#   ip_protocol = "tcp"
-#   to_port     = 2049
-# }
+resource "aws_vpc_security_group_ingress_rule" "nfs_ohs_to_oam" {
+  security_group_id = aws_security_group.oam_instance.id
+  description = "Inbound NFS from OHS Instances"
+  referenced_security_group_id = aws_security_group.ohs_instance.id
+  from_port   = 2049
+  ip_protocol = "tcp"
+  to_port     = 2049
+}
 
 # TODO enable when OIM resources are created
 
