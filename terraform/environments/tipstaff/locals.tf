@@ -22,11 +22,11 @@ locals {
     }
   } : {}
 
-  domain_name_main_prod   = local.is-production ? [for k, v in local.domain_types : v.name if k == "tipstaff.service.justice.gov.uk"] : ()
-  domain_name_sub_prod    = local.is-production ? [for k, v in local.domain_types : v.name if k != "tipstaff.service.justice.gov.uk"] : ()
-  domain_record_main_prod = local.is-production ? [for k, v in local.domain_types : v.record if k == "tipstaff.service.justice.gov.uk"] : ()
-  domain_record_sub_prod  = local.is-production ? [for k, v in local.domain_types : v.record if k != "tipstaff.service.justice.gov.uk"] : ()
-  domain_type_main_prod   = local.is-production ? [for k, v in local.domain_types : v.type if k == "tipstaff.service.justice.gov.uk"] : ()
-  domain_type_sub_prod    = local.is-production ? [for k, v in local.domain_types : v.type if k != "tipstaff.service.justice.gov.uk"] : ()
+  domain_name_main_prod   = local.is-production ? [for k, v in local.domain_types : v.name if k == "tipstaff.service.justice.gov.uk"] : []
+  domain_name_sub_prod    = local.is-production ? [for k, v in local.domain_types : v.name if k != "tipstaff.service.justice.gov.uk"] : []
+  domain_record_main_prod = local.is-production ? [for k, v in local.domain_types : v.record if k == "tipstaff.service.justice.gov.uk"] : []
+  domain_record_sub_prod  = local.is-production ? [for k, v in local.domain_types : v.record if k != "tipstaff.service.justice.gov.uk"] : []
+  domain_type_main_prod   = local.is-production ? [for k, v in local.domain_types : v.type if k == "tipstaff.service.justice.gov.uk"] : []
+  domain_type_sub_prod    = local.is-production ? [for k, v in local.domain_types : v.type if k != "tipstaff.service.justice.gov.uk"] : []
 
 }
