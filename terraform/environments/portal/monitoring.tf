@@ -40,7 +40,7 @@ locals {
       service_name          = "oam_1"
       status_alarm_threshold = 1
       dimensions = {
-        InstanceId = aws_instance.oam_instance_1.id 
+        InstanceId = aws_instance.oam_instance_1.id
       }
     },
     ohs_instance_1 = {
@@ -178,7 +178,7 @@ locals {
       dimensions = {
         MountPath = "/IDAM/product/runtime/Domain/mserver"
         Filesystem = "/dev/nvme4n1"
-        InstanceId = aws_instance.oam_instance_1.id # TODO This needs updating when the OAM EC2 instance is built
+        InstanceId = aws_instance.oam_instance_1.id
       }
     },
     ohs_instance_1 = {
@@ -187,7 +187,7 @@ locals {
       dimensions = {
         MountPath = "/IDAM/product/runtime/Domain/mserver"
         Filesystem = "/dev/nvme4n1"
-        InstanceId = aws_instance.ohs1.id # TODO This needs updating when the OAM EC2 instance is built
+        InstanceId = aws_instance.ohs1.id
       }
     }
   }
