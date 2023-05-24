@@ -228,145 +228,145 @@ locals {
 
 }
 
-resource "aws_cloudwatch_metric_alarm" "cpu_alarm" {
-  for_each = {
-    for k, v in local.cpu_alarms_list : k => v
-  }
-
-  alarm_name          = "${local.application_name}-${local.environment}-${each.value.service_name}-CPU-high-threshold-alarm"
-  alarm_description   = "If the CPU exceeds the predefined threshold, this alarm will trigger. Please investigate."
-  comparison_operator = "GreaterThanThreshold"
-  dimensions          = each.value.dimensions
-  evaluation_periods  = "5"
-  metric_name         = "CPUUtilization"
-  namespace           = "AWS/EC2"
-  period              = "60"
-  statistic           = "Average"
-  threshold           = each.value.cpu_alarm_threshold
-  alarm_actions       = [aws_sns_topic.alerting_topic.arn]
-  ok_actions          = [aws_sns_topic.alerting_topic.arn]
-  treat_missing_data  = "breaching"
-}
-
-resource "aws_cloudwatch_metric_alarm" "status_alarm" {
-  for_each = {
-    for k, v in local.status_alarms_list : k => v
-  }
-
-  alarm_name          = "${local.application_name}-${local.environment}-${each.value.service_name}-status-check-failure-alarm"
-  alarm_description   = "If a status check failure occurs on an instance, please investigate. http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/monitoring-system-instance-status-check.html"
-  comparison_operator = "GreaterThanThreshold"
-  dimensions          = each.value.dimensions
-  evaluation_periods  = "5"
-  metric_name         = "StatusCheckFailed"
-  namespace           = "AWS/EC2"
-  period              = "60"
-  statistic           = "Average"
-  threshold           = each.value.status_alarm_threshold
-  alarm_actions       = [aws_sns_topic.alerting_topic.arn]
-  ok_actions          = [aws_sns_topic.alerting_topic.arn]
-  treat_missing_data  = "breaching"
-}
-
-resource "aws_cloudwatch_metric_alarm" "memory_alarm" {
-  for_each = {
-    for k, v in local.memory_alarms_list : k => v
-  }
-
-  alarm_name          = "${local.application_name}-${local.environment}-${each.value.service_name}-memory-usage-alarm"
-  alarm_description   = "If the memory use exceeds the predefined threshold, this alarm will trigger. Please investigate."
-  comparison_operator = "GreaterThanThreshold"
-  dimensions          = each.value.dimensions
-  evaluation_periods  = "5"
-  metric_name         = "MemoryUtilization"
-  namespace           = "System/Linux"
-  period              = "60"
-  statistic           = "Average"
-  threshold           = each.value.memory_alarm_threshold
-  alarm_actions       = [aws_sns_topic.alerting_topic.arn]
-  ok_actions          = [aws_sns_topic.alerting_topic.arn]
-  treat_missing_data  = "breaching"
-}
-
-resource "aws_cloudwatch_metric_alarm" "swapspace_alarm" {
-  for_each = {
-    for k, v in local.swapspace_alarms_list : k => v
-  }
-
-  alarm_name          = "${local.application_name}-${local.environment}-${each.value.service_name}-swap-usage-alarm"
-  alarm_description   = "If the memory use exceeds the predefined threshold, this alarm will trigger. Please investigate."
-  comparison_operator = "GreaterThanThreshold"
-  dimensions          = each.value.dimensions
-  evaluation_periods  = "5"
-  metric_name         = "SwapUsed"
-  namespace           = "System/Linux"
-  period              = "60"
-  statistic           = "Average"
-  threshold           = each.value.swapspace_alarm_threshold
-  alarm_actions       = [aws_sns_topic.alerting_topic.arn]
-  ok_actions          = [aws_sns_topic.alerting_topic.arn]
-  treat_missing_data  = "breaching"
-}
-
-resource "aws_cloudwatch_metric_alarm" "diskspace_alarm" {
-  for_each = {
-    for k, v in local.diskspace_alarms_list : k => v
-  }
-
-  alarm_name          = "${local.application_name}-${local.environment}-${each.value.service_name}-root-vol-disk-usage-alarm"
-  alarm_description   = "If the disk space use exceeds the predefined threshold, this alarm will trigger. Please investigate."
-  comparison_operator = "GreaterThanThreshold"
-  dimensions          = each.value.dimensions
-  evaluation_periods  = "5"
-  metric_name         = "DiskSpaceUtilization"
-  namespace           = "System/Linux"
-  period              = "60"
-  statistic           = "Average"
-  threshold           = each.value.diskspace_alarm_threshold
-  alarm_actions       = [aws_sns_topic.alerting_topic.arn]
-  ok_actions          = [aws_sns_topic.alerting_topic.arn]
-  treat_missing_data  = "breaching"
-}
-
-resource "aws_cloudwatch_metric_alarm" "mserver_alarm" {
-  for_each = {
-    for k, v in local.mserver_alarms_list : k => v
-  }
-
-  alarm_name          = "${local.application_name}-${local.environment}-${each.value.service_name}-mserver-disk-usage-alarm"
-  alarm_description   = "If the disk space use exceeds the predefined threshold, this alarm will trigger. Please investigate."
-  comparison_operator = "GreaterThanThreshold"
-  dimensions          = each.value.dimensions
-  evaluation_periods  = "5"
-  metric_name         = "DiskSpaceUtilization"
-  namespace           = "System/Linux"
-  period              = "60"
-  statistic           = "Average"
-  threshold           = each.value.mserver_alarm_threshold
-  alarm_actions       = [aws_sns_topic.alerting_topic.arn]
-  ok_actions          = [aws_sns_topic.alerting_topic.arn]
-  treat_missing_data  = "breaching"
-}
-
-resource "aws_cloudwatch_metric_alarm" "aserver_alarm" {
-  for_each = {
-    for k, v in local.aserver_alarms_1 : k => v
-  }
-
-  alarm_name          = "${local.application_name}-${local.environment}-${each.value.service_name}-aserver-disk-usage-alarm"
-  alarm_description   = "If the disk space use exceeds the predefined threshold, this alarm will trigger. Please investigate."
-  comparison_operator = "GreaterThanThreshold"
-  dimensions          = each.value.dimensions
-  evaluation_periods  = "5"
-  metric_name         = "DiskSpaceUtilization"
-  namespace           = "System/Linux"
-  period              = "60"
-  statistic           = "Average"
-  threshold           = each.value.aserver_alarm_threshold
-  alarm_actions       = [aws_sns_topic.alerting_topic.arn]
-  ok_actions          = [aws_sns_topic.alerting_topic.arn]
-  treat_missing_data  = "breaching"
-}
+# resource "aws_cloudwatch_metric_alarm" "cpu_alarm" {
+#   for_each = {
+#     for k, v in local.cpu_alarms_list : k => v
+#   }
+#
+#   alarm_name          = "${local.application_name}-${local.environment}-${each.value.service_name}-CPU-high-threshold-alarm"
+#   alarm_description   = "If the CPU exceeds the predefined threshold, this alarm will trigger. Please investigate."
+#   comparison_operator = "GreaterThanThreshold"
+#   dimensions          = each.value.dimensions
+#   evaluation_periods  = "5"
+#   metric_name         = "CPUUtilization"
+#   namespace           = "AWS/EC2"
+#   period              = "60"
+#   statistic           = "Average"
+#   threshold           = each.value.cpu_alarm_threshold
+#   alarm_actions       = [aws_sns_topic.alerting_topic.arn]
+#   ok_actions          = [aws_sns_topic.alerting_topic.arn]
+#   treat_missing_data  = "breaching"
+# }
+#
+# resource "aws_cloudwatch_metric_alarm" "status_alarm" {
+#   for_each = {
+#     for k, v in local.status_alarms_list : k => v
+#   }
+#
+#   alarm_name          = "${local.application_name}-${local.environment}-${each.value.service_name}-status-check-failure-alarm"
+#   alarm_description   = "If a status check failure occurs on an instance, please investigate. http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/monitoring-system-instance-status-check.html"
+#   comparison_operator = "GreaterThanThreshold"
+#   dimensions          = each.value.dimensions
+#   evaluation_periods  = "5"
+#   metric_name         = "StatusCheckFailed"
+#   namespace           = "AWS/EC2"
+#   period              = "60"
+#   statistic           = "Average"
+#   threshold           = each.value.status_alarm_threshold
+#   alarm_actions       = [aws_sns_topic.alerting_topic.arn]
+#   ok_actions          = [aws_sns_topic.alerting_topic.arn]
+#   treat_missing_data  = "breaching"
+# }
+#
+# resource "aws_cloudwatch_metric_alarm" "memory_alarm" {
+#   for_each = {
+#     for k, v in local.memory_alarms_list : k => v
+#   }
+#
+#   alarm_name          = "${local.application_name}-${local.environment}-${each.value.service_name}-memory-usage-alarm"
+#   alarm_description   = "If the memory use exceeds the predefined threshold, this alarm will trigger. Please investigate."
+#   comparison_operator = "GreaterThanThreshold"
+#   dimensions          = each.value.dimensions
+#   evaluation_periods  = "5"
+#   metric_name         = "MemoryUtilization"
+#   namespace           = "System/Linux"
+#   period              = "60"
+#   statistic           = "Average"
+#   threshold           = each.value.memory_alarm_threshold
+#   alarm_actions       = [aws_sns_topic.alerting_topic.arn]
+#   ok_actions          = [aws_sns_topic.alerting_topic.arn]
+#   treat_missing_data  = "breaching"
+# }
+#
+# resource "aws_cloudwatch_metric_alarm" "swapspace_alarm" {
+#   for_each = {
+#     for k, v in local.swapspace_alarms_list : k => v
+#   }
+#
+#   alarm_name          = "${local.application_name}-${local.environment}-${each.value.service_name}-swap-usage-alarm"
+#   alarm_description   = "If the memory use exceeds the predefined threshold, this alarm will trigger. Please investigate."
+#   comparison_operator = "GreaterThanThreshold"
+#   dimensions          = each.value.dimensions
+#   evaluation_periods  = "5"
+#   metric_name         = "SwapUsed"
+#   namespace           = "System/Linux"
+#   period              = "60"
+#   statistic           = "Average"
+#   threshold           = each.value.swapspace_alarm_threshold
+#   alarm_actions       = [aws_sns_topic.alerting_topic.arn]
+#   ok_actions          = [aws_sns_topic.alerting_topic.arn]
+#   treat_missing_data  = "breaching"
+# }
+#
+# resource "aws_cloudwatch_metric_alarm" "diskspace_alarm" {
+#   for_each = {
+#     for k, v in local.diskspace_alarms_list : k => v
+#   }
+#
+#   alarm_name          = "${local.application_name}-${local.environment}-${each.value.service_name}-root-vol-disk-usage-alarm"
+#   alarm_description   = "If the disk space use exceeds the predefined threshold, this alarm will trigger. Please investigate."
+#   comparison_operator = "GreaterThanThreshold"
+#   dimensions          = each.value.dimensions
+#   evaluation_periods  = "5"
+#   metric_name         = "DiskSpaceUtilization"
+#   namespace           = "System/Linux"
+#   period              = "60"
+#   statistic           = "Average"
+#   threshold           = each.value.diskspace_alarm_threshold
+#   alarm_actions       = [aws_sns_topic.alerting_topic.arn]
+#   ok_actions          = [aws_sns_topic.alerting_topic.arn]
+#   treat_missing_data  = "breaching"
+# }
+#
+# resource "aws_cloudwatch_metric_alarm" "mserver_alarm" {
+#   for_each = {
+#     for k, v in local.mserver_alarms_list : k => v
+#   }
+#
+#   alarm_name          = "${local.application_name}-${local.environment}-${each.value.service_name}-mserver-disk-usage-alarm"
+#   alarm_description   = "If the disk space use exceeds the predefined threshold, this alarm will trigger. Please investigate."
+#   comparison_operator = "GreaterThanThreshold"
+#   dimensions          = each.value.dimensions
+#   evaluation_periods  = "5"
+#   metric_name         = "DiskSpaceUtilization"
+#   namespace           = "System/Linux"
+#   period              = "60"
+#   statistic           = "Average"
+#   threshold           = each.value.mserver_alarm_threshold
+#   alarm_actions       = [aws_sns_topic.alerting_topic.arn]
+#   ok_actions          = [aws_sns_topic.alerting_topic.arn]
+#   treat_missing_data  = "breaching"
+# }
+#
+# resource "aws_cloudwatch_metric_alarm" "aserver_alarm" {
+#   for_each = {
+#     for k, v in local.aserver_alarms_1 : k => v
+#   }
+#
+#   alarm_name          = "${local.application_name}-${local.environment}-${each.value.service_name}-aserver-disk-usage-alarm"
+#   alarm_description   = "If the disk space use exceeds the predefined threshold, this alarm will trigger. Please investigate."
+#   comparison_operator = "GreaterThanThreshold"
+#   dimensions          = each.value.dimensions
+#   evaluation_periods  = "5"
+#   metric_name         = "DiskSpaceUtilization"
+#   namespace           = "System/Linux"
+#   period              = "60"
+#   statistic           = "Average"
+#   threshold           = each.value.aserver_alarm_threshold
+#   alarm_actions       = [aws_sns_topic.alerting_topic.arn]
+#   ok_actions          = [aws_sns_topic.alerting_topic.arn]
+#   treat_missing_data  = "breaching"
+# }
 
 
 
