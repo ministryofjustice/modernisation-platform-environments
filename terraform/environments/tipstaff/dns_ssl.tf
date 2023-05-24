@@ -77,7 +77,7 @@ resource "aws_route53_record" "external_prod" {
 
 resource "aws_acm_certificate" "external_prod" {
   count             = local.is-production ? 1 : 0
-  domain_name       = local.application_data.accounts[local.environment].domain_name
+  domain_name       = "service.justice.gov.uk"
   validation_method = "DNS"
 
   subject_alternative_names = ["tipstaff.service.justice.gov.uk"]
@@ -117,5 +117,5 @@ resource "aws_route53_record" "external_validation_subdomain_prod" {
 resource "aws_acm_certificate_validation" "external_prod" {
   count                   = local.is-production ? 1 : 0
   certificate_arn         = aws_acm_certificate.external_prod[0].arn
-  validation_record_fqdns = [local.domain_name_main[0], local.domain_name_sub[0]]
+  validation_record_fqdns = [local.domain_name_main_prod[0], local.domain_name_sub_prod[0]]
 }
