@@ -144,13 +144,13 @@ module "cw-ebsapps-ec2" {
   source = "./modules/cw-ec2"
   count  = local.application_data.accounts[local.environment].ebsapps_no_instances
 
-  name  = "ec2-ebsapps-${count.index + 1}"
-  topic = aws_sns_topic.cw_alerts.arn
-  instanceId   = aws_instance.ec2_ebsapps[count.index].id
-  imageId      = data.aws_ami.oracle_base_prereqs.id
-  instanceType = local.application_data.accounts[local.environment].ec2_oracle_instance_type_ebsapps
-  fileSystem   = "xfs"       # Linux root filesystem
-  rootDevice   = "nvme0n1p1" # This is used by default for root on all the ec2 images
+  name          = "ec2-ebsapps-${count.index + 1}"
+  topic         = aws_sns_topic.cw_alerts.arn
+  instanceId    = aws_instance.ec2_ebsapps[count.index].id
+  imageId       = data.aws_ami.oracle_base_prereqs.id
+  instanceType  = local.application_data.accounts[local.environment].ec2_oracle_instance_type_ebsapps
+  fileSystem    = "xfs"       # Linux root filesystem
+  rootDevice    = "nvme0n1p1" # This is used by default for root on all the ec2 images
 
   cpu_eval_periods  = local.application_data.cloudwatch_ec2.cpu.eval_periods
   cpu_datapoints    = local.application_data.cloudwatch_ec2.cpu.eval_periods
