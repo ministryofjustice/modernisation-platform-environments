@@ -46,6 +46,51 @@ resource "aws_iam_role" "base_ami_test_instance_iam_role" {
   )
 }
 
+data "aws_iam_policy_document" "business_unit_kms_key_access" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*",
+      "kms:DescribeKey",
+      "kms:CreateGrant",
+      "kms:ListGrants",
+      "kms:RevokeGrant"
+    ]
+    resources = [
+      data.aws_kms_key.general_shared.arn
+    ]
+  }
+}
+
+data "aws_iam_policy_document" "core_shared_services_bucket_access" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "s3:ListBucket",
+      "s3:GetObject"
+    ]
+    resources = [
+      "arn:aws:s3:::mod-platform-image-artefact-bucket*/*",
+      "arn:aws:s3:::mod-platform-image-artefact-bucket*"
+    ]
+  }
+}
+
+resource "aws_iam_role_policy" "business_unit_kms_key_access" {
+  name   = "business_unit_kms_key_access"
+  role   = aws_iam_role.base_ami_test_instance_iam_role.name
+  policy = data.aws_iam_policy_document.business_unit_kms_key_access.json
+}
+
+resource "aws_iam_role_policy" "core_shared_services_bucket_access" {
+  name   = "core_shared_services_bucket_access"
+  role   = aws_iam_role.base_ami_test_instance_iam_role.name
+  policy = data.aws_iam_policy_document.core_shared_services_bucket_access.json
+}
+
 resource "aws_iam_role_policy_attachment" "base_ami_test_instance_amazonssmmanagedinstancecore" {
   role       = aws_iam_role.base_ami_test_instance_iam_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
