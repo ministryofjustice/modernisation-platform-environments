@@ -93,7 +93,7 @@ resource "aws_iam_role_policy_attachment" "s3_access_for_glue_job" {
   policy_arn = aws_iam_policy.s3_policy_for_gluejob.arn
 }
 
-data "aws_iam_policy_document" "glue-athena-access" {
+data "aws_iam_policy_document" "glue_athena_access" {
   statement {
     sid = "QueryAccess"
     actions = [
