@@ -22,7 +22,7 @@ resource "aws_lambda_function" "authoriser" {
   environment {
     variables = {
       authorisationToken = "placeholder"
-      api_resource_arn   = aws_api_gateway_resource.upload_data.id
+      api_resource_arn   = "${aws_api_gateway_rest_api.data_platform.arn}/*/*"
     }
   }
   tags = local.tags
