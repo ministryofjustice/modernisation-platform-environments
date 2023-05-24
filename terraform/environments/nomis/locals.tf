@@ -1,6 +1,6 @@
 locals {
-  business_unit       = var.networking[0].business-unit
-  region              = "eu-west-2"
+  business_unit = var.networking[0].business-unit
+  region        = "eu-west-2"
 
   environment_configs = {
     development   = local.development_config
