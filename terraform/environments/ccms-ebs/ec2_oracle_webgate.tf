@@ -102,30 +102,9 @@ EOF
 
 }
 
-/*
+
 module "cw-webgate-ec2" {
   source = "./modules/cw-ec2"
-
-  name  = "ec2-webgate"
-  topic = aws_sns_topic.cw_alerts.arn
-
-  for_each     = local.application_data.cloudwatch_ec2
-  metric       = each.key
-  eval_periods = each.value.eval_periods
-  period       = each.value.period
-  threshold    = each.value.threshold
-
-  # Dimensions used across all alarms
-  instanceId   = aws_instance.ec2_webgate[local.application_data.accounts[local.environment].webgate_no_instances - 1].id
-  imageId      = data.aws_ami.webgate.id
-  instanceType = local.application_data.accounts[local.environment].ec2_oracle_instance_type_webgate
-  fileSystem   = "xfs"       # Linux root filesystem
-  rootDevice   = "nvme0n1p1" # This is used by default for root on all the ec2 images
-}
-*/
-
-module "cw-webgate-ec2" {
-  source = "./modules/cw-ec2b"
   count  = local.application_data.accounts[local.environment].webgate_no_instances
 
   name  = "ec2-webgate-${count.index + 1}"

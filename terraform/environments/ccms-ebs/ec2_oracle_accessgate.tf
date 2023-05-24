@@ -104,7 +104,7 @@ EOF
 
 
 module "cw-accgate-ec2" {
-  source = "./modules/cw-ec2b"
+  source = "./modules/cw-ec2"
   count  = local.application_data.accounts[local.environment].accessgate_no_instances
 
   name  = "ec2-accgate-${count.index + 1}"
