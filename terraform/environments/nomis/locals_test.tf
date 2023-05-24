@@ -93,13 +93,13 @@ locals {
         autoscaling_group = merge(module.baseline_presets.ec2_autoscaling_group.default, {
           desired_capacity = 1
         })
-        # autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
+        # autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
         tags = {
-          description          = "For testing Oracle Enterprise Manager image"
-          ami                  = "base_ol_8_5"
-          os-type              = "Linux"
-          component            = "test"
-          server-type          = "base_rhel85"
+          description = "For testing Oracle Enterprise Manager image"
+          ami         = "base_ol_8_5"
+          os-type     = "Linux"
+          component   = "test"
+          server-type = "base_rhel85"
         }
       }
 
@@ -343,10 +343,6 @@ locals {
           { name = "t2trdat", type = "A", ttl = "300", records = ["10.101.33.132"] },
           { name = "t2trdat-a", type = "A", ttl = "300", records = ["10.101.33.132"] },
           { name = "t2trdat-b", type = "CNAME", ttl = "300", records = ["t2-nomis-db-1-b.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
-          # TEST
-          { name = "test1", type = "CNAME", ttl = "300", records = ["t2-nomis-db-1-b.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
-          { name = "test2", type = "CNAME", ttl = "300", records = ["t2-nomis-db-1-b.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk."] },
-          { name = "test3", type = "CNAME", ttl = "300", records = ["t2nomis"] },
         ]
         lb_alias_records = [
           { name = "t1-nomis-web-a", type = "A", lbs_map_key = "private" },
