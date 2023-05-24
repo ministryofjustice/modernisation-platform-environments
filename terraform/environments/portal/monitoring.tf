@@ -392,13 +392,13 @@ data "template_file" "dashboard_prod" {
     # oim1_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["oim_instance_1"].arn
     # oim2_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["oim_instance_2"].arn
     # oam1_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["oam_instance_1"].arn
-    oam2_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["oam_instance_2"].arn
+    # oam2_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["oam_instance_2"].arn
     # idm1_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["idm_instance_1"].arn
     # idm2_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["idm_instance_2"].arn
-    ohs1_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["ohs_instance_1"].arn
-    ohs2_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["ohs_instance_2"].arn
-    oim2_diskspace_alarm_arn        = aws_cloudwatch_metric_alarm.diskspace_alarm["oim_instance_2"].arn
-    oim2_swapspace_alarm_arn        = aws_cloudwatch_metric_alarm.swapspace_alarm["oim_instance_2"].arn
+    # ohs1_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["ohs_instance_1"].arn
+    # ohs2_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["ohs_instance_2"].arn
+    # oim2_diskspace_alarm_arn        = aws_cloudwatch_metric_alarm.diskspace_alarm["oim_instance_2"].arn
+    # oim2_swapspace_alarm_arn        = aws_cloudwatch_metric_alarm.swapspace_alarm["oim_instance_2"].arn
   }
 }
 
@@ -420,9 +420,9 @@ data "template_file" "dashboard_nonprod" {
     # igdb_write_latency_alarm_arn    = aws_cloudwatch_metric_alarm.RDS2WriteLataencyOverThreshold.arn
     # oim1_cpu_alarm_arn              = aws_cloudwatch_metric_alarm.cpu_alarm["oim_instance_1"].arn
     # oim1_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["oim_instance_1"].arn
-    # oam1_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["oam_instance_1"].arn
+    oam1_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["oam_instance_1"].arn
     # idm1_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["idm_instance_1"].arn
-    # ohs1_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["ohs_instance_1"].arn
+    ohs1_memory_alarm_arn           = aws_cloudwatch_metric_alarm.memory_alarm["ohs_instance_1"].arn
   }
 }
 
