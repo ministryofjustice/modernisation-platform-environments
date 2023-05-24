@@ -1,4 +1,4 @@
-resource "aws_backup_vault" "default_ohs" {
+resource "aws_backup_vault" "portal" {
   name = "${local.application_name}backup-vault"
   tags = merge(
     local.tags,
@@ -7,13 +7,13 @@ resource "aws_backup_vault" "default_ohs" {
 }
 
 # Non production backups
-resource "aws_backup_plan" "non_production_ohs" {
+resource "aws_backup_plan" "non_prod_portal" {
 
   name = "${local.application_name}-backup-daily-retain-35-days"
 
   rule {
     rule_name         = "${local.application_name}-backup-daily-retain-35-days"
-    target_vault_name = aws_backup_vault.default_ohs.name
+    target_vault_name = aws_backup_vault.portal.name
 
     # Backup every day at 12:00am
     schedule = "cron(0 0 * * ? *)"
@@ -42,10 +42,10 @@ resource "aws_backup_plan" "non_production_ohs" {
   )
 }
 
-resource "aws_backup_selection" "non_production_ohs" {
+resource "aws_backup_selection" "non_prod_portal" {
   name         = "${local.application_name}non-production-backup"
   iam_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/AWSBackup"
-  plan_id      = aws_backup_plan.non_production_ohs.id
+  plan_id      = aws_backup_plan.non_prod_portal.id
   resources    = ["*"]
 
   condition {
