@@ -226,14 +226,14 @@ resource "aws_ecs_task_definition" "delius_core_frontend_task_definition" {
             name      = "JDBC_PASSWORD"
             valueFrom = aws_ssm_parameter.delius_core_frontend_env_var_jdbc_password.arn
           },
-          {
-            name      = "DEV_USERNAME"
-            valueFrom = aws_ssm_parameter.delius_core_frontend_env_var_dev_username.arn
-          },
-          {
-            name      = "DEV_PASSWORD"
-            valueFrom = aws_ssm_parameter.delius_core_frontend_env_var_dev_password.arn
-          },
+          # {
+          #   name      = "DEV_USERNAME"
+          #   valueFrom = aws_ssm_parameter.delius_core_frontend_env_var_dev_username.arn
+          # },
+          # {
+          #   name      = "DEV_PASSWORD"
+          #   valueFrom = aws_ssm_parameter.delius_core_frontend_env_var_dev_password.arn
+          # },
           {
             name      = "TEST_MODE"
             valueFrom = aws_ssm_parameter.delius_core_frontend_env_var_test_mode.arn
