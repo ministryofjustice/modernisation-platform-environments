@@ -60,7 +60,7 @@ resource "aws_acm_certificate_validation" "external" {
 
 // PROD DNS
 resource "aws_route53_record" "external_prod" {
-  count    = local.is-production ? 1 : 0
+  # count    = local.is-production ? 1 : 0
   provider = aws.core-network-services
   zone_id  = data.aws_route53_zone.prod_network_services.zone_id
   name     = "tipstaff.service.justice.gov.uk"
@@ -74,7 +74,7 @@ resource "aws_route53_record" "external_prod" {
 }
 
 resource "aws_acm_certificate" "external_prod" {
-  count             = local.is-production ? 1 : 0
+  # count             = local.is-production ? 1 : 0
   domain_name       = "tipstaff.service.justice.gov.uk"
   validation_method = "DNS"
   subject_alternative_names = [
@@ -88,7 +88,7 @@ resource "aws_acm_certificate" "external_prod" {
 
 ## Validation 
 resource "aws_route53_record" "external_validation_prod" {
-  count    = local.is-production ? 1 : 0
+  # count    = local.is-production ? 1 : 0
   provider = aws.core-network-services
 
   for_each = {
@@ -108,7 +108,7 @@ resource "aws_route53_record" "external_validation_prod" {
 }
 
 resource "aws_acm_certificate_validation" "external_prod" {
-  count = local.is-production ? 1 : 0
+  # count = local.is-production ? 1 : 0
   depends_on = [
     aws_route53_record.external_validation_prod
   ]
