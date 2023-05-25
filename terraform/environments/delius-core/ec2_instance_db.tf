@@ -46,6 +46,51 @@ resource "aws_iam_role" "base_ami_test_instance_iam_role" {
   )
 }
 
+data "aws_iam_policy_document" "business_unit_kms_key_access" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*",
+      "kms:DescribeKey",
+      "kms:CreateGrant",
+      "kms:ListGrants",
+      "kms:RevokeGrant"
+    ]
+    resources = [
+      data.aws_kms_key.general_shared.arn
+    ]
+  }
+}
+
+data "aws_iam_policy_document" "core_shared_services_bucket_access" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "s3:ListBucket",
+      "s3:GetObject"
+    ]
+    resources = [
+      "arn:aws:s3:::mod-platform-image-artefact-bucket*/*",
+      "arn:aws:s3:::mod-platform-image-artefact-bucket*"
+    ]
+  }
+}
+
+resource "aws_iam_role_policy" "business_unit_kms_key_access" {
+  name   = "business_unit_kms_key_access"
+  role   = aws_iam_role.base_ami_test_instance_iam_role.name
+  policy = data.aws_iam_policy_document.business_unit_kms_key_access.json
+}
+
+resource "aws_iam_role_policy" "core_shared_services_bucket_access" {
+  name   = "core_shared_services_bucket_access"
+  role   = aws_iam_role.base_ami_test_instance_iam_role.name
+  policy = data.aws_iam_policy_document.core_shared_services_bucket_access.json
+}
+
 resource "aws_iam_role_policy_attachment" "base_ami_test_instance_amazonssmmanagedinstancecore" {
   role       = aws_iam_role.base_ami_test_instance_iam_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
@@ -60,15 +105,15 @@ resource "aws_iam_instance_profile" "base_ami_test_instance_profile" {
 data "aws_ami" "aws_ami_base_ol" {
   most_recent = true
   owners      = [local.environment_management.account_ids["core-shared-services-production"]]
-  name_regex  = "^base_ol_8_5_"
+  name_regex  = "^delius_oracle_db_"
 }
-
 
 resource "aws_instance" "base_ami_test_instance" {
   #checkov:skip=CKV2_AWS_41:"IAM role is not implemented for this example EC2. SSH/AWS keys are not used either."
   # Specify the instance type and ami to be used (this is the Amazon free tier option)
-  instance_type               = "t2.small"
-  ami                         = data.aws_ami.aws_ami_base_ol.id # "ami-0e3dd4f4b84ef84f5" # AL2 amzn2-ami-hvm-2.0.20230418.0-x86_64-gp2
+  instance_type = "t2.small"
+  ami           = data.aws_ami.aws_ami_base_ol.id
+  # ami = "ami-0e3dd4f4b84ef84f5" # AL2 amzn2-ami-hvm-2.0.20230418.0-x86_64-gp2
   vpc_security_group_ids      = [aws_security_group.base_ami_test_instance_sg.id]
   subnet_id                   = data.aws_subnet.private_subnets_a.id
   iam_instance_profile        = aws_iam_instance_profile.base_ami_test_instance_profile.name
