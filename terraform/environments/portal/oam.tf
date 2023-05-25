@@ -3,8 +3,12 @@ locals {
   prod_workspaces_cidr            = "10.200.16.0/20"
   redc_cidr                       = "172.16.0.0/20"
   atos_cidr                       = "10.0.0.0/8"
+  portal_hosted_zone              = data.aws_route53_zone.external.name # TODO This needs a logic for a TBC Hosted Zone for production
+
 
   # EC2 User data
+  # TODO The hostname is too long as the domain itself is 62 characters long... If this hostname is required, a new domain is required
+
   oam_1_userdata = <<EOF
 #!/bin/bash
 echo "/dev/xvdb /IDAM/product/fmw ext4 defaults 0 0" >> /etc/fstab
@@ -13,7 +17,7 @@ echo "/dev/xvdd /IDAM/product/runtime/Domain/config ext4 defaults 0 0" >> /etc/f
 echo "/dev/xvde /IDAM/product/runtime/Domain/mserver ext4 defaults 0 0" >> /etc/fstab
 echo "/dev/sdf /IDMLCM/repo_home ext4 defaults 0 0" >> /etc/fstab
 mount -a
-hostnamectl set-hostname ${local.application_name}-oam1-ms.${data.aws_route53_zone.external.name}
+hostnamectl set-hostname ${local.application_name}-oam1-ms.${local.portal_hosted_zone}
 EOF
   oam_2_userdata = <<EOF
 #!/bin/bash
@@ -23,7 +27,7 @@ echo "${local.application_name}-oam1-ms.${data.aws_route53_zone.external.name}:/
 echo "${local.application_name}-oam1-ms.${data.aws_route53_zone.external.name}:/IDAM/product/runtime/Domain/aserver /IDAM/product/runtime/Domain/aserver nfs nolock 0 0" >> /etc/fstab
 echo "${local.application_name}-oam1-ms.${data.aws_route53_zone.external.name}:/IDMLCM/repo_home /IDMLCM/repo_home nfs nolock 0 0" >> /etc/fstab
 mount -a
-hostnamectl set-hostname ${local.application_name}-oam2-ms.${data.aws_route53_zone.external.name}
+hostnamectl set-hostname ${local.application_name}-oam2-ms.${local.portal_hosted_zone}
 EOF
 }
 
@@ -32,7 +36,7 @@ EOF
 #################################
 
 resource "aws_security_group" "oam_instance" {
-  name        = local.application_name
+  name        = "${local.application_name}-${local.environment}-oam-security-group"
   description = "Portal App OAM Security Group"
   vpc_id      = data.aws_vpc.shared.id
 }
@@ -40,9 +44,7 @@ resource "aws_security_group" "oam_instance" {
 resource "aws_vpc_security_group_egress_rule" "outbound" {
   security_group_id = aws_security_group.oam_instance.id
   cidr_ipv4   = "0.0.0.0/0"
-  from_port   = 0
   ip_protocol = "-1"
-  to_port     = 0
 }
 
 # TODO some rules will need adding referencing Landing Zone environments (e.g. VPC) for other dependent applications not migrated to MP yet but needs talking to Portal.
@@ -152,14 +154,14 @@ resource "aws_vpc_security_group_ingress_rule" "nfs_oam_to_oam" {
 
 # TODO enable when OHS resources are created
 
-# resource "aws_vpc_security_group_ingress_rule" "nfs_ohs_to_oam" {
-#   security_group_id = aws_security_group.oam_instance.id
-#   description = "Inbound NFS from OHS Instances"
-#   referenced_security_group_id = aws_security_group.ohs_instance.id
-#   from_port   = 2049
-#   ip_protocol = "tcp"
-#   to_port     = 2049
-# }
+resource "aws_vpc_security_group_ingress_rule" "nfs_ohs_to_oam" {
+  security_group_id = aws_security_group.oam_instance.id
+  description = "Inbound NFS from OHS Instances"
+  referenced_security_group_id = aws_security_group.ohs_instance.id
+  from_port   = 2049
+  ip_protocol = "tcp"
+  to_port     = 2049
+}
 
 # TODO enable when OIM resources are created
 
