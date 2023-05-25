@@ -1,17 +1,4 @@
-resource "aws_route53_record" "external" {
-  provider = aws.core-vpc
-
-  zone_id = data.aws_route53_zone.external.zone_id
-  name    = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-  type    = "A"
-
-  alias {
-    name                   = aws_lb.tipstaff_lb.dns_name
-    zone_id                = aws_lb.tipstaff_lb.zone_id
-    evaluate_target_health = true
-  }
-}
-
+// ACM Public Certificate
 resource "aws_acm_certificate" "external" {
   domain_name       = "modernisation-platform.service.justice.gov.uk"
   validation_method = "DNS"
@@ -26,6 +13,22 @@ resource "aws_acm_certificate" "external" {
   }
 }
 
+// Route53 DNS record for directing traffic to the service 
+resource "aws_route53_record" "external" {
+  provider = aws.core-vpc
+
+  zone_id = data.aws_route53_zone.external.zone_id
+  name    = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type    = "A"
+
+  alias {
+    name                   = aws_lb.tipstaff_lb.dns_name
+    zone_id                = aws_lb.tipstaff_lb.zone_id
+    evaluate_target_health = true
+  }
+}
+
+// Route53 DNS record for certificate validation
 resource "aws_route53_record" "external_validation" {
   provider = aws.core-network-services
 
@@ -54,6 +57,22 @@ resource "aws_acm_certificate_validation" "external" {
 }
 
 // PROD DNS
+
+// ACM Public Certificate
+resource "aws_acm_certificate" "external_prod" {
+  # count             = local.is-production ? 1 : 0
+  domain_name       = "tipstaff.service.justice.gov.uk"
+  validation_method = "DNS"
+  subject_alternative_names = [
+    "*.tipstaff.service.justice.gov.uk"
+  ]
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+// Route53 DNS record for directing traffic to the service
 resource "aws_route53_record" "external_prod" {
   # count    = local.is-production ? 1 : 0
   provider = aws.core-network-services
@@ -68,20 +87,7 @@ resource "aws_route53_record" "external_prod" {
   }
 }
 
-resource "aws_acm_certificate" "external_prod" {
-  # count             = local.is-production ? 1 : 0
-  domain_name       = "tipstaff.service.justice.gov.uk"
-  validation_method = "DNS"
-  subject_alternative_names = [
-    "*.tipstaff.service.justice.gov.uk"
-  ]
-
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
-## Validation 
+// Route53 DNS record for certificate validation
 resource "aws_route53_record" "external_validation_prod" {
   # count    = local.is-production ? 1 : 0
   provider = aws.core-network-services
