@@ -20,6 +20,30 @@ resource "aws_vpc_security_group_egress_rule" "onprem_gateway_https_out" {
   )
 }
 
+resource "aws_vpc_security_group_egress_rule" "onprem_gateway_http_out" {
+  security_group_id = aws_security_group.onprem_gateway_sg.id
+  cidr_ipv4         = "0.0.0.0/0"
+  from_port         = 80
+  to_port           = 80
+  ip_protocol       = "tcp"
+  description       = "Allow communication out on port 80"
+  tags = merge(local.tags,
+    { Name = lower(format("sg-%s-%s-onprem-gateway", local.application_name, local.environment)) }
+  )
+}
+
+resource "aws_vpc_security_group_egress_rule" "onprem_gateway_rds_out" {
+  security_group_id = aws_security_group.onprem_gateway_sg.id
+  cidr_ipv4         = "0.0.0.0/0"
+  from_port         = 1433
+  to_port           = 1433
+  ip_protocol       = "tcp"
+  description       = "Allow communication out to RDS"
+  tags = merge(local.tags,
+    { Name = lower(format("sg-%s-%s-onprem-gateway", local.application_name, local.environment)) }
+  )
+}
+
 # Pre-req - IAM role, attachment for SSM usage and instance profile
 data "aws_iam_policy_document" "onprem_gateway_iam_assume_policy" {
   statement {
@@ -65,7 +89,7 @@ data "aws_ami" "onprem_gateway_windows" {
 resource "aws_instance" "onprem_gateway" {
   #checkov:skip=CKV2_AWS_41:"IAM role is not implemented for this example EC2. SSH/AWS keys are not used either."
   # Specify the instance type and ami to be used (this is the Amazon free tier option)
-  instance_type               = "t3.medium"
+  instance_type               = "t3.small"
   ami                         = data.aws_ami.onprem_gateway_windows.id
   vpc_security_group_ids      = [aws_security_group.onprem_gateway_sg.id]
   subnet_id                   = data.aws_subnet.private_subnets_a.id
