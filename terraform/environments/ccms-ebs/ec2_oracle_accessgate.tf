@@ -105,20 +105,37 @@ EOF
 
 module "cw-accgate-ec2" {
   source = "./modules/cw-ec2"
+  count  = local.application_data.accounts[local.environment].accessgate_no_instances
 
-  name  = "ec2-accgate"
-  topic = aws_sns_topic.cw_alerts.arn
+  name          = "ec2-accgate-${count.index + 1}"
+  topic         = aws_sns_topic.cw_alerts.arn
+  instanceId    = aws_instance.ec2_accessgate[count.index].id
+  imageId       = data.aws_ami.accessgate.id
+  instanceType  = local.application_data.accounts[local.environment].ec2_oracle_instance_type_accessgate
+  fileSystem    = "xfs"       # Linux root filesystem
+  rootDevice    = "nvme0n1p1" # This is used by default for root on all the ec2 images
 
-  for_each     = local.application_data.cloudwatch_ec2
-  metric       = each.key
-  eval_periods = each.value.eval_periods
-  period       = each.value.period
-  threshold    = each.value.threshold
+  cpu_eval_periods  = local.application_data.cloudwatch_ec2.cpu.eval_periods
+  cpu_datapoints    = local.application_data.cloudwatch_ec2.cpu.eval_periods
+  cpu_period        = local.application_data.cloudwatch_ec2.cpu.period
+  cpu_threshold     = local.application_data.cloudwatch_ec2.cpu.threshold
 
-  # Dimensions used across all alarms
-  instanceId   = aws_instance.ec2_accessgate[local.application_data.accounts[local.environment].accessgate_no_instances - 1].id
-  imageId      = data.aws_ami.accessgate.id
-  instanceType = local.application_data.accounts[local.environment].ec2_oracle_instance_type_accessgate
-  fileSystem   = "xfs"       # Linux root filesystem
-  rootDevice   = "nvme0n1p1" # This is used by default for root on all the ec2 images
+  mem_eval_periods  = local.application_data.cloudwatch_ec2.mem.eval_periods
+  mem_datapoints    = local.application_data.cloudwatch_ec2.mem.eval_periods
+  mem_period        = local.application_data.cloudwatch_ec2.mem.period
+  mem_threshold     = local.application_data.cloudwatch_ec2.mem.threshold
+
+  disk_eval_periods  = local.application_data.cloudwatch_ec2.disk.eval_periods
+  disk_datapoints    = local.application_data.cloudwatch_ec2.disk.eval_periods
+  disk_period        = local.application_data.cloudwatch_ec2.disk.period
+  disk_threshold     = local.application_data.cloudwatch_ec2.disk.threshold
+
+  insthc_eval_periods  = local.application_data.cloudwatch_ec2.insthc.eval_periods
+  insthc_period        = local.application_data.cloudwatch_ec2.insthc.period
+  insthc_threshold     = local.application_data.cloudwatch_ec2.insthc.threshold
+
+  syshc_eval_periods  = local.application_data.cloudwatch_ec2.syshc.eval_periods
+  syshc_period        = local.application_data.cloudwatch_ec2.syshc.period
+  syshc_threshold     = local.application_data.cloudwatch_ec2.syshc.threshold
+
 }

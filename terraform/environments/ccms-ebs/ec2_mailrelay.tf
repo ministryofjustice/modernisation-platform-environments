@@ -81,25 +81,44 @@ resource "aws_security_group_rule" "egress_traffic_mailrelay" {
   //  source_security_group_id = aws_security_group.ec2_sg_mailrelay.id
 }
 
+
 module "cw-mailrelay-ec2" {
   source = "./modules/cw-ec2"
 
-  name  = "ec2-mailrelay"
-  topic = aws_sns_topic.cw_alerts.arn
-
-  for_each     = local.application_data.cloudwatch_ec2
-  metric       = each.key
-  eval_periods = each.value.eval_periods
-  period       = each.value.period
-  threshold    = each.value.threshold
-
-  # Dimensions used across all alarms
+  name         = "ec2-mailrelay"
+  topic        = aws_sns_topic.cw_alerts.arn
   instanceId   = aws_instance.ec2_mailrelay.id
   imageId      = local.application_data.accounts[local.environment].mailrelay_ami_id
   instanceType = local.application_data.accounts[local.environment].ec2_instance_type_mailrelay
   fileSystem   = "xfs"       # Linux root filesystem
   rootDevice   = "nvme0n1p1" # This is used by default for root on all the ec2 images
+
+  cpu_eval_periods  = local.application_data.cloudwatch_ec2.cpu.eval_periods
+  cpu_datapoints    = local.application_data.cloudwatch_ec2.cpu.eval_periods
+  cpu_period        = local.application_data.cloudwatch_ec2.cpu.period
+  cpu_threshold     = local.application_data.cloudwatch_ec2.cpu.threshold
+
+  mem_eval_periods  = local.application_data.cloudwatch_ec2.mem.eval_periods
+  mem_datapoints    = local.application_data.cloudwatch_ec2.mem.eval_periods
+  mem_period        = local.application_data.cloudwatch_ec2.mem.period
+  mem_threshold     = local.application_data.cloudwatch_ec2.mem.threshold
+
+  disk_eval_periods  = local.application_data.cloudwatch_ec2.disk.eval_periods
+  disk_datapoints    = local.application_data.cloudwatch_ec2.disk.eval_periods
+  disk_period        = local.application_data.cloudwatch_ec2.disk.period
+  disk_threshold     = local.application_data.cloudwatch_ec2.disk.threshold
+
+  insthc_eval_periods  = local.application_data.cloudwatch_ec2.insthc.eval_periods
+  insthc_period        = local.application_data.cloudwatch_ec2.insthc.period
+  insthc_threshold     = local.application_data.cloudwatch_ec2.insthc.threshold
+
+  syshc_eval_periods  = local.application_data.cloudwatch_ec2.syshc.eval_periods
+  syshc_period        = local.application_data.cloudwatch_ec2.syshc.period
+  syshc_threshold     = local.application_data.cloudwatch_ec2.syshc.threshold
+
 }
+
+
 
 # This should be added only after the initial cutover is done - so EBS will not
 # start send messages without an explicit configuration in its /etc/hosts
