@@ -142,7 +142,7 @@ resource "aws_cloudwatch_metric_alarm" "system_health_check" {
 
 resource "aws_cloudwatch_metric_alarm" "ec2_stop_alarm" {
   alarm_name          = "${local.name}-ec2-stopped"
-  comparison_operator = "GreaterThanThreshold"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = 1
   metric_name         = "StatusCheckFailed"
   namespace           = "AWS/EC2"
