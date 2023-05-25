@@ -6,7 +6,7 @@ data "archive_file" "presigned_url_zip" {
 
 resource "aws_iam_role" "presigned_url_lambda_role" {
   name               = "presigned_url_role_${local.environment}"
-  assume_role_policy = data.aws_iam_policy_document.lambda_trust_policy_doc.json
+  assume_role_policy = data.aws_iam_policy_document.apigateway_trust_policy.json
   tags               = local.tags
 }
 

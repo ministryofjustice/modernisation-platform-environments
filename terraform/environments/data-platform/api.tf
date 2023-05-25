@@ -16,10 +16,10 @@ resource "aws_api_gateway_method" "upload_data_get" {
   rest_api_id   = aws_api_gateway_rest_api.data_platform.id
 
   request_parameters = {
-    "method.request.header.authorisationToken" = true
-    "method.request.querystring.database"      = true,
-    "method.request.querystring.table"         = true,
-    "method.request.querystring.contentMD5"    = true,
+    "method.request.header.Authorization"   = true
+    "method.request.querystring.database"   = true,
+    "method.request.querystring.table"      = true,
+    "method.request.querystring.contentMD5" = true,
   }
 }
 
