@@ -92,7 +92,7 @@ resource "aws_route53_record" "external_validation_prod" {
   provider = aws.core-network-services
 
   for_each = {
-    for dvo in aws_acm_certificate.external_prod[0].domain_validation_options : dvo.domain_name => {
+    for dvo in aws_acm_certificate.external_prod.domain_validation_options : dvo.domain_name => {
       name   = dvo.resource_record_name
       record = dvo.resource_record_value
       type   = dvo.resource_record_type
@@ -112,7 +112,7 @@ resource "aws_acm_certificate_validation" "external_prod" {
   depends_on = [
     aws_route53_record.external_validation_prod
   ]
-  certificate_arn         = aws_acm_certificate.external_prod[0].arn
+  certificate_arn         = aws_acm_certificate.external_prod.arn
   validation_record_fqdns = [for record in aws_route53_record.external_validation_prod : record.fqdn]
   timeouts {
     create = "10m"
