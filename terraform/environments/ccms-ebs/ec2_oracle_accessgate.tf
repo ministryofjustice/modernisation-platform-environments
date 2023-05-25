@@ -107,6 +107,7 @@ module "cw-accgate-ec2" {
   source = "./modules/cw-ec2"
   count  = local.application_data.accounts[local.environment].accessgate_no_instances
 
+  short_env     = local.application_data.accounts[local.environment].short_env
   name          = "ec2-accgate-${count.index + 1}"
   topic         = aws_sns_topic.cw_alerts.arn
   instanceId    = aws_instance.ec2_accessgate[count.index].id
