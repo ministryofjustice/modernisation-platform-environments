@@ -6,15 +6,12 @@ import logging
 def handler(event, context):
     logging.info(f"event: {event}")
 
-    authorizationToken = json.dumps(event["multiValueHeaders"]["authorisationToken"])
+    Authorization = json.dumps(event["multiValueHeaders"]["Authorization"])
     characters_to_remove = '"[]"'
     for character in characters_to_remove:
-        authorizationToken = authorizationToken.replace(character, "")
+        Authorization = Authorization.replace(character, "")
 
-    if authorizationToken == os.environ["authorisationToken"]:
-        auth = "Allow"
-    else:
-        auth = "Deny"
+    auth = "Allow" if Authorization == os.environ["Authorization"] else "Deny"
 
     authResponse = {
         "principalId": "abc123",
