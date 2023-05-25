@@ -51,30 +51,12 @@ data "aws_ssm_parameter" "delius_core_frontend_env_var_ldap_host" {
 }
 
 
-resource "aws_ssm_parameter" "delius_core_frontend_env_var_ldap_port" {
-  name      = format("/%s/LDAP_PORT", local.application_name)
-  type      = "SecureString"
-  value     = "INITIAL_VALUE_OVERRIDDEN"
-  overwrite = false
-  lifecycle {
-    ignore_changes = [
-      value
-    ]
-  }
-  tags = local.tags
+data "aws_ssm_parameter" "delius_core_frontend_env_var_ldap_port" {
+  name = format("/%s/LDAP_PORT", local.application_name)
 }
 
-resource "aws_ssm_parameter" "delius_core_frontend_env_var_ldap_principal" {
-  name      = format("/%s/LDAP_PRINCIPAL", local.application_name)
-  type      = "SecureString"
-  value     = "INITIAL_VALUE_OVERRIDDEN"
-  overwrite = false
-  lifecycle {
-    ignore_changes = [
-      value
-    ]
-  }
-  tags = local.tags
+data "aws_ssm_parameter" "delius_core_frontend_env_var_ldap_principal" {
+  name = format("/%s/LDAP_PRINCIPAL", local.application_name)
 }
 
 ##
