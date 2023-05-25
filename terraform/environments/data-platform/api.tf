@@ -17,9 +17,9 @@ resource "aws_api_gateway_method" "upload_data_get" {
 
   request_parameters = {
     "method.request.header.authorisationToken" = true
-    "method.request.querystring.database": true,
-    "method.request.querystring.table": true,
-    "method.request.querystring.contentMD5": true,
+    "method.request.querystring.database"      = true,
+    "method.request.querystring.table"         = true,
+    "method.request.querystring.contentMD5"    = true,
   }
 }
 
@@ -32,8 +32,8 @@ resource "aws_api_gateway_integration" "integration" {
   uri                     = aws_lambda_function.authoriser.invoke_arn
 
   request_parameters = {
-    "integration.request.querystring.database" = "method.request.querystring.database",
-    "integration.request.querystring.table" = "method.request.querystring.table",
+    "integration.request.querystring.database"   = "method.request.querystring.database",
+    "integration.request.querystring.table"      = "method.request.querystring.table",
     "integration.request.querystring.contentMD5" = "method.request.querystring.contentMD5"
   }
 }

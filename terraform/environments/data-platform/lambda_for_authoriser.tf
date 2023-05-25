@@ -7,7 +7,7 @@ data "archive_file" "authoriser_zip" {
 resource "aws_iam_role" "authoriser_lambda_role" {
   name               = "authoriser_role_${local.environment}"
   assume_role_policy = data.aws_iam_policy_document.lambda_trust_policy_doc.json
-  tags = local.tags
+  tags               = local.tags
 }
 
 resource "aws_lambda_function" "authoriser" {
@@ -21,8 +21,8 @@ resource "aws_lambda_function" "authoriser" {
   depends_on       = [aws_iam_role_policy_attachment.attach_code_lambda_policy_to_iam_role]
   environment {
     variables = {
-      authorisationToken = "placeholder"
-      api_resource_arn   = "${aws_api_gateway_rest_api.data_platform.arn}/*/*"
+      Authorization    = "placeholder"
+      api_resource_arn = "${aws_api_gateway_rest_api.data_platform.arn}/*/*"
     }
   }
   tags = local.tags

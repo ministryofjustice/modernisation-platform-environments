@@ -7,7 +7,7 @@ data "archive_file" "presigned_url_zip" {
 resource "aws_iam_role" "presigned_url_lambda_role" {
   name               = "presigned_url_role_${local.environment}"
   assume_role_policy = data.aws_iam_policy_document.lambda_trust_policy_doc.json
-  tags = local.tags
+  tags               = local.tags
 }
 
 data "aws_iam_policy_document" "iam_policy_document_for_presigned_url_lambda" {
@@ -24,7 +24,7 @@ resource "aws_iam_policy" "presigned_url_lambda_policy" {
   path        = "/"
   description = "AWS IAM Policy for managing presigned_url lambda role"
   policy      = data.aws_iam_policy_document.iam_policy_document_for_presigned_url_lambda.json
-  tags = local.tags
+  tags        = local.tags
 }
 
 resource "aws_iam_role_policy_attachment" "attach_presigned_url_lambda_policy_to_iam_role" {

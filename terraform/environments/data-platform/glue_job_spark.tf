@@ -85,7 +85,7 @@ resource "aws_iam_policy" "s3_policy_for_gluejob" {
   path        = "/"
   description = "s3 permissions for data product transform glue job"
   policy      = data.aws_iam_policy_document.s3-access.json
-  tags = local.tags
+  tags        = local.tags
 }
 
 resource "aws_iam_role_policy_attachment" "s3_access_for_glue_job" {

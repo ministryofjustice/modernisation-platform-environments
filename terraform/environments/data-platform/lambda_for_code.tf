@@ -26,7 +26,7 @@ resource "aws_lambda_function" "code_extractor" {
 resource "aws_iam_role" "code_extractor_lambda_role" {
   name               = "code_extractor_${local.environment}_role_${local.environment}"
   assume_role_policy = data.aws_iam_policy_document.lambda_trust_policy_doc.json
-  tags = local.tags
+  tags               = local.tags
 }
 
 data "aws_iam_policy_document" "iam_policy_document_for_code_lambda" {
@@ -55,7 +55,7 @@ resource "aws_iam_policy" "code_extractor_lambda_policy" {
   path        = "/"
   description = "AWS IAM Policy for managing code_extractor lambda role"
   policy      = data.aws_iam_policy_document.iam_policy_document_for_code_lambda.json
-  tags = local.tags
+  tags        = local.tags
 }
 
 resource "aws_iam_role_policy_attachment" "attach_code_lambda_policy_to_iam_role" {
