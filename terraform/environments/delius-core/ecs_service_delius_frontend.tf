@@ -62,6 +62,43 @@ resource "aws_ssm_parameter" "delius_core_frontend_env_var_dev_password" {
   tags = local.tags
 }
 
+resource "aws_ssm_parameter" "delius_core_frontend_env_var_ldap_host" {
+  name  = format("/%s/LDAP_HOST", local.application_name)
+  type  = "SecureString"
+  value = "INITIAL_VALUE_OVERRIDDEN"
+  lifecycle {
+    ignore_changes = [
+      value
+    ]
+  }
+  tags = local.tags
+}
+
+
+resource "aws_ssm_parameter" "delius_core_frontend_env_var_ldap_port" {
+  name  = format("/%s/LDAP_PORT", local.application_name)
+  type  = "SecureString"
+  value = "INITIAL_VALUE_OVERRIDDEN"
+  lifecycle {
+    ignore_changes = [
+      value
+    ]
+  }
+  tags = local.tags
+}
+
+resource "aws_ssm_parameter" "delius_core_frontend_env_var_ldap_principal" {
+  name  = format("/%s/LDAP_PRINCIPAL", local.application_name)
+  type  = "SecureString"
+  value = "INITIAL_VALUE_OVERRIDDEN"
+  lifecycle {
+    ignore_changes = [
+      value
+    ]
+  }
+  tags = local.tags
+}
+
 ##
 # IAM for ECS services and tasks
 ##
