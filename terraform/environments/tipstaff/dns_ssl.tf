@@ -138,7 +138,7 @@ resource "aws_route53_record" "external_validation_subdomain_prod" {
 #   }
 # }
 
-resource "aws_acm_certificate_validation" "external" {
+resource "aws_acm_certificate_validation" "external_prod" {
   certificate_arn         = aws_acm_certificate.external_prod.arn
   validation_record_fqdns = [local.domain_name_main_prod[0], local.domain_name_sub_prod[0]]
 }
