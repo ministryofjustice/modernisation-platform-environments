@@ -77,13 +77,8 @@ resource "aws_route53_record" "external_prod" {
 
 resource "aws_acm_certificate" "external_prod" {
   count             = local.is-production ? 1 : 0
-  domain_name       = "service.justice.gov.uk"
+  domain_name       = "tipstaff.service.justice.gov.uk"
   validation_method = "DNS"
-
-  subject_alternative_names = ["tipstaff.service.justice.gov.uk"]
-  tags = {
-    Environment = local.environment
-  }
 
   lifecycle {
     create_before_destroy = true
