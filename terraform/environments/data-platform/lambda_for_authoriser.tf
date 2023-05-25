@@ -45,7 +45,7 @@ resource "aws_iam_role_policy_attachment" "attach_allow_invoke_authoriser_lambda
 
 resource "aws_iam_role" "authoriser_lambda_role" {
   name               = "authoriser_lambda_role_${local.environment}"
-  assume_role_policy = data.aws_iam_policy_document.lambda_trust_policy.json
+  assume_role_policy = data.aws_iam_policy_document.lambda_trust_policy_doc.json
   tags               = local.tags
 }
 
