@@ -9,13 +9,13 @@ resource "random_password" "password" {
 }
 
 // Secrets for the tipstaff database on the modernisation platform
-resource "aws_secretsmanager_secret" "tipstaff_db_secrets" {
-  name                    = "tipstaff-db-secrets"
+resource "aws_secretsmanager_secret" "rds_db_credentials" {
+  name                    = "rds-db-credentials"
   recovery_window_in_days = 0
 }
 
 resource "aws_secretsmanager_secret_version" "rds_credentials" {
-  secret_id     = aws_secretsmanager_secret.tipstaff_db_secrets.id
+  secret_id     = aws_secretsmanager_secret.rds_db_credentials.id
   secret_string = jsonencode({ "TIPSTAFF_DB_PASSWORD" : "${random_password.password.result}" })
 }
 
@@ -36,5 +36,5 @@ data "aws_secretsmanager_secret" "get_tactical_products_db_secrets" {
 }
 
 data "aws_secretsmanager_secret_version" "get_tactical_products_rds_credentials" {
-  secret_id  = data.aws_secretsmanager_secret.get_tactical_products_db_secrets.id
+  secret_id = data.aws_secretsmanager_secret.get_tactical_products_db_secrets.id
 }
