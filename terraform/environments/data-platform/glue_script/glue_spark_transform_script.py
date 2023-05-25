@@ -151,24 +151,25 @@ def create_table_if_curated_data_exists(
     glue_client.create_table(
         DatabaseName=database_name,
         TableInput={
-            'Name': table_name,
-            'StorageDescriptor': {
-                'Columns': column_list,
-                'Location': table_path,
+            "Name": table_name,
+            "StorageDescriptor": {
+                "Columns": column_list,
+                "Location": table_path,
                 "InputFormat": "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat",
                 "OutputFormat": "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat",
                 "SerdeInfo": {
                 "SerializationLibrary": "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe",
-                "Parameters": {}
+                "Parameters": {"classification": "parquet"}
                 }
             },
-            'PartitionKeys': [
+            "PartitionKeys": [
                 {
-                    'Name': 'extraction_timestamp',
-                    'Type': 'string',
+                    "Name": "extraction_timestamp",
+                    "Type": "string",
                 },
             ],
-            "TableType": "EXTERNAL_TABLE"
+            "TableType": "EXTERNAL_TABLE",
+            "Parameters": {"classification": "parquet"}
         }
     )
     sts_client = boto3.client("sts")
@@ -179,7 +180,7 @@ def create_table_if_curated_data_exists(
     athena_client.start_query_execution(
         QueryString=f"MSCK REPAIR TABLE {database_name}.{table_name}",
         ResultConfiguration={
-            'OutputLocation': f"athena-data-product-query-results-{account_id}"
+            "OutputLocation": f"s3://athena-data-product-query-results-{account_id}"
         }
     )
 
@@ -230,8 +231,8 @@ for database_name, table_name in tables_to_check_exist:
             Name=table_name
         )
     except ClientError as e:
-        if e.response['Error']['Code'] == 'EntityNotFoundException':
-            if e.response['Message'].startswith('Database'):
+        if e.response["Error"]["Code"] == "EntityNotFoundException":
+            if e.response["Message"].startswith("Database"):
                 glue_client.create_database(
                     DatabaseInput={
                         "Name": database_name,
@@ -242,7 +243,7 @@ for database_name, table_name in tables_to_check_exist:
                     database_name, table_name, glue_client
                 )
                 logging.info(f"database and table {database_name}.{table_name} didn't exist where curated did and have been created")
-            elif e.response['Message'].startswith('Table'):
+            elif e.response["Message"].startswith("Table"):
                 create_table_if_curated_data_exists(
                     database_name, table_name, glue_client
                 )
