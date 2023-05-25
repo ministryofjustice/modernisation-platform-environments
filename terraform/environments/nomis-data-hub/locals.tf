@@ -10,4 +10,8 @@ locals {
     production    = local.production_config
   }
   environment_config = local.environment_configs[local.environment]
+  ndh_secrets = [
+    "adminUser",
+    "adminPass",
+  ]
 }
