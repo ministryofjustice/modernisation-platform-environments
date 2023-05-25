@@ -26,26 +26,19 @@ locals {
     }
 
     baseline_acm_certificates = {
-      # "${local.application_name}_wildcard_cert" = {
-      #   # domain_name limited to 64 chars so use modernisation platform domain for this
-      #   # and put the wildcard in the san
-      #   domain_name = module.environment.domains.public.modernisation_platform
-      #   subject_alternate_names = [
-      #     "*.${module.environment.domains.public.application_environment}",         #    *.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk
-      #     "*.t2.${module.environment.domains.public.application_environment}",      # *.t2.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk
-      #     "*.${local.environment}.${module.environment.domains.public.short_name}", # *.test.oasys.service.justice.gov.uk"
-      #     "*.t1.${module.environment.domains.public.short_name}",                   #   *.t1.oasys.service.justice.gov.uk"
-      #     "*.t2.${module.environment.domains.public.short_name}",                   #   *.t2.oasys.service.justice.gov.uk"
-      #     "*.${local.environment}.${local.application_name}.az.justice.gov.uk",     # *.test.oasys.az.justice.gov.uk
-      #     "*.t1.${local.application_name}.az.justice.gov.uk",                       #   *.t1.oasys.az.justice.gov.uk
-      #     "*.t2.${local.application_name}.az.justice.gov.uk",                       #   *.t2.oasys.az.justice.gov.uk
-      #   ]
-      #   external_validation_records_created = true
-      #   cloudwatch_metric_alarms            = {} # module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso"].acm_default
-      #   tags = {
-      #     description = "wildcard cert for ${local.application_name} ${local.environment} domains"
-      #   }
-      # }
+      "t2_${local.application_name}_cert" = {
+        # domain_name limited to 64 chars so use modernisation platform domain for this
+        # and put the wildcard in the san
+        domain_name = "t2.oasys.service.justice.gov.uk"
+        subject_alternate_names = [
+          "t2-oasys.hmpp-azdt.justice.gov.uk",
+        ]
+        external_validation_records_created = false
+        cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso_pagerduty"].acm_default
+        tags = {
+          description = "cert for t2 ${local.application_name} ${local.environment} domains"
+        }
+      }
     }
 
     baseline_lbs = {
