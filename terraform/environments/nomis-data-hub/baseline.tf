@@ -24,3 +24,15 @@ module "baseline" {
   ec2_autoscaling_groups = lookup(local.environment_config, "baseline_ec2_autoscaling_groups", {})
   lbs                    = lookup(local.environment_config, "baseline_lbs", {})
 }
+#create secret store for ndh values
+resource "aws_ssm_parameter" "ndh_secrets" {
+  for_each = toset(local.ndh_secrets)
+  name     = each.value
+  type     = "SecureString"
+  value    = ""
+  lifecycle {
+    ignore_changes = [
+      value,
+    ]
+  }
+}
