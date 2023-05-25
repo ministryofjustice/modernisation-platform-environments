@@ -65,7 +65,7 @@ data "aws_ami" "onprem_gateway_windows" {
 resource "aws_instance" "onprem_gateway" {
   #checkov:skip=CKV2_AWS_41:"IAM role is not implemented for this example EC2. SSH/AWS keys are not used either."
   # Specify the instance type and ami to be used (this is the Amazon free tier option)
-  instance_type               = "t3.small"
+  instance_type               = "t3.medium"
   ami                         = data.aws_ami.onprem_gateway_windows.id
   vpc_security_group_ids      = [aws_security_group.onprem_gateway_sg.id]
   subnet_id                   = data.aws_subnet.private_subnets_a.id
