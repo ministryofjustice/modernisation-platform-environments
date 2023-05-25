@@ -1,7 +1,7 @@
 #### This file can be used to store locals specific to the member account ####
 locals {
   # create name, record,type for monitoring lb aka tipstaff_lb
-  domain_types = { for dvo in aws_acm_certificate.external[0].domain_validation_options : dvo.domain_name => {
+  domain_types = { for dvo in aws_acm_certificate.external.domain_validation_options : dvo.domain_name => {
     name   = dvo.resource_record_name
     record = dvo.resource_record_value
     type   = dvo.resource_record_type
