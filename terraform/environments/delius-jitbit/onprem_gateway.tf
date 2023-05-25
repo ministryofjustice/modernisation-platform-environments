@@ -111,5 +111,16 @@ resource "aws_instance" "onprem_gateway" {
   tags = merge(local.tags,
     { Name = lower(format("ec2-%s-%s-onprem-gateway", local.application_name, local.environment)) }
   )
+
+  root_block_device {
+    delete_on_termination = true
+    encrypted             = true
+    kms_key_id            = aws_kms_key.ebs_encryption_cmk.id
+    volume_size           = 30
+    volume_type           = "gp2"
+  }
 }
 
+data "aws_kms_key" "ebs_encryption_cmk" {
+  key_id = "arn:aws:kms:eu-west-2:${local.environment_management.account_ids["core-shared-services-production"]}:alias/ebs-encryption-key"
+}
