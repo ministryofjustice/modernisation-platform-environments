@@ -91,11 +91,7 @@ data "aws_iam_policy_document" "sns_topic_policy" {
       "SNS:Publish",
       "SNS:Receive"
     ]
-    resources = [
-      aws_sns_topic.cw_alerts.arn,
-      aws_sns_topic.s3_topic.arn,
-      aws_sns_topic.ddos_alarm.arn
-    ]
+    resources = [ "arn:aws:sns:eu-west-2::*" ]
   }
 }
 
