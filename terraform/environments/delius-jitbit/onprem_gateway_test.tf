@@ -20,6 +20,30 @@ resource "aws_vpc_security_group_egress_rule" "onprem_gateway_test_https_out" {
   )
 }
 
+resource "aws_vpc_security_group_egress_rule" "onprem_gateway_test_http_out" {
+  security_group_id = aws_security_group.onprem_gateway_test_sg.id
+  cidr_ipv4         = "0.0.0.0/0"
+  from_port         = 80
+  to_port           = 80
+  ip_protocol       = "tcp"
+  description       = "Allow communication out on port 80"
+  tags = merge(local.tags,
+    { Name = lower(format("sg-%s-%s-onprem-gateway", local.application_name, local.environment)) }
+  )
+}
+
+resource "aws_vpc_security_group_egress_rule" "onprem_gateway_test_rds_out" {
+  security_group_id = aws_security_group.onprem_gateway_test_sg.id
+  cidr_ipv4         = "0.0.0.0/0"
+  from_port         = 1433
+  to_port           = 1433
+  ip_protocol       = "tcp"
+  description       = "Allow communication out to RDS"
+  tags = merge(local.tags,
+    { Name = lower(format("sg-%s-%s-onprem-gateway", local.application_name, local.environment)) }
+  )
+}
+
 # Pre-req - IAM role, attachment for SSM usage and instance profile
 data "aws_iam_policy_document" "onprem_gateway_test_iam_assume_policy" {
   statement {
