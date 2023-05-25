@@ -2,8 +2,8 @@
 
 
 
-resource "aws_security_group" "portalsg" {
-  name        = "${local.application_name}-${local.environment}-secgroup"
+resource "aws_security_group" "ohs_instance" {
+  name        = "${local.application_name}-${local.environment}-ohs-security-group"
   description = "RDS access with the LAA Landing Zone"
   vpc_id      = data.aws_vpc.shared.id
 
@@ -89,18 +89,19 @@ resource "aws_security_group" "portalsg" {
 }
 
 
+# TODO Depending on outcome of how EBS/EFS is used, this resource may depend on aws_instance.oam_instance_1
 
 resource "aws_instance" "ohs1" {
   ami                         = local.ami-id
   instance_type               = local.application_data.accounts[local.environment].ohs_instance_type
   monitoring                  = true
-  vpc_security_group_ids      = [aws_security_group.portalsg.id]
+  vpc_security_group_ids      = [aws_security_group.ohs_instance.id]
   subnet_id                   = data.aws_subnet.data_subnets_a.id
   iam_instance_profile        = aws_iam_instance_profile.portal.id
 
   # root_block_device {
   #   delete_on_termination      = false
-  #   encrypted                  = true 
+  #   encrypted                  = true
   #   volume_size                = 60
   #   volume_type                = "gp2"
   #   tags = merge(
@@ -121,13 +122,13 @@ resource "aws_instance" "ohs2" {
   count = local.environment == "production" ? 1 : 0
   ami                            = local.ami-id
   instance_type                  = local.application_data.accounts[local.environment].ohs_instance_type
-  vpc_security_group_ids         = [aws_security_group.portalsg.id]
+  vpc_security_group_ids         = [aws_security_group.ohs_instance.id]
   subnet_id                      = data.aws_subnet.data_subnets_b.id
   iam_instance_profile           = aws_iam_instance_profile.portal.id
 
   #   # root_block_device {
   #   # delete_on_termination     = false
-  #   # encrypted                 = true 
+  #   # encrypted                 = true
   #   # volume_size               = 60
   #   # volume_type               = "gp2"
   #   # tags = merge(
