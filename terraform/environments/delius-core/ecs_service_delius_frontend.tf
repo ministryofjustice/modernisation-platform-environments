@@ -63,9 +63,10 @@ resource "aws_ssm_parameter" "delius_core_frontend_env_var_dev_password" {
 }
 
 resource "aws_ssm_parameter" "delius_core_frontend_env_var_ldap_host" {
-  name  = format("/%s/LDAP_HOST", local.application_name)
-  type  = "SecureString"
-  value = "INITIAL_VALUE_OVERRIDDEN"
+  name      = format("/%s/LDAP_HOST", local.application_name)
+  type      = "SecureString"
+  value     = "INITIAL_VALUE_OVERRIDDEN"
+  overwrite = false
   lifecycle {
     ignore_changes = [
       value
@@ -76,9 +77,10 @@ resource "aws_ssm_parameter" "delius_core_frontend_env_var_ldap_host" {
 
 
 resource "aws_ssm_parameter" "delius_core_frontend_env_var_ldap_port" {
-  name  = format("/%s/LDAP_PORT", local.application_name)
-  type  = "SecureString"
-  value = "INITIAL_VALUE_OVERRIDDEN"
+  name      = format("/%s/LDAP_PORT", local.application_name)
+  type      = "SecureString"
+  value     = "INITIAL_VALUE_OVERRIDDEN"
+  overwrite = false
   lifecycle {
     ignore_changes = [
       value
@@ -88,9 +90,10 @@ resource "aws_ssm_parameter" "delius_core_frontend_env_var_ldap_port" {
 }
 
 resource "aws_ssm_parameter" "delius_core_frontend_env_var_ldap_principal" {
-  name  = format("/%s/LDAP_PRINCIPAL", local.application_name)
-  type  = "SecureString"
-  value = "INITIAL_VALUE_OVERRIDDEN"
+  name      = format("/%s/LDAP_PRINCIPAL", local.application_name)
+  type      = "SecureString"
+  value     = "INITIAL_VALUE_OVERRIDDEN"
+  overwrite = false
   lifecycle {
     ignore_changes = [
       value
