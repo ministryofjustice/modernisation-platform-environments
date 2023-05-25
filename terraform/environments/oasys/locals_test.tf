@@ -31,9 +31,10 @@ locals {
         # and put the wildcard in the san
         domain_name = "t2.oasys.service.justice.gov.uk"
         subject_alternate_names = [
+          "*.t2.oasys.service.justice.gov.uk",
           "t2-oasys.hmpp-azdt.justice.gov.uk",
         ]
-        external_validation_records_created = true
+        external_validation_records_created = false
         cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso_pagerduty"].acm_default
         tags = {
           description = "cert for t2 ${local.application_name} ${local.environment} domains"
