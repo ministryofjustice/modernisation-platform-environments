@@ -115,7 +115,7 @@ resource "aws_instance" "onprem_gateway" {
   root_block_device {
     delete_on_termination = true
     encrypted             = true
-    kms_key_id            = aws_kms_key.ebs_encryption_cmk.id
+    kms_key_id            = data.aws_kms_key.ebs_encryption_cmk.id
     volume_size           = 30
     volume_type           = "gp2"
   }
