@@ -64,3 +64,4 @@ resource "aws_sns_topic_policy" "ddos_policy" {
 #  protocol  = "email"
 #  endpoint  = aws_secretsmanager_secret_version.support_email_account.secret_string
 #}
+
