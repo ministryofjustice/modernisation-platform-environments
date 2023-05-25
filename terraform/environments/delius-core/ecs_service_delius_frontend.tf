@@ -38,41 +38,16 @@ resource "aws_ssm_parameter" "delius_core_frontend_env_var_test_mode" {
   tags  = local.tags
 }
 
-resource "aws_ssm_parameter" "delius_core_frontend_env_var_dev_username" {
-  name  = format("/%s/DEV_USERNAME", local.application_name)
-  type  = "SecureString"
-  value = "INITIAL_VALUE_OVERRIDDEN"
-  lifecycle {
-    ignore_changes = [
-      value
-    ]
-  }
-  tags = local.tags
+data "aws_ssm_parameter" "delius_core_frontend_env_var_dev_username" {
+  name = format("/%s/DEV_USERNAME", local.application_name)
 }
 
-resource "aws_ssm_parameter" "delius_core_frontend_env_var_dev_password" {
-  name  = format("/%s/DEV_PASSWORD", local.application_name)
-  type  = "SecureString"
-  value = "INITIAL_VALUE_OVERRIDDEN"
-  lifecycle {
-    ignore_changes = [
-      value
-    ]
-  }
-  tags = local.tags
+data "aws_ssm_parameter" "delius_core_frontend_env_var_dev_password" {
+  name = format("/%s/DEV_PASSWORD", local.application_name)
 }
 
-resource "aws_ssm_parameter" "delius_core_frontend_env_var_ldap_host" {
-  name      = format("/%s/LDAP_HOST", local.application_name)
-  type      = "SecureString"
-  value     = "INITIAL_VALUE_OVERRIDDEN"
-  overwrite = false
-  lifecycle {
-    ignore_changes = [
-      value
-    ]
-  }
-  tags = local.tags
+data "aws_ssm_parameter" "delius_core_frontend_env_var_ldap_host" {
+  name = format("/%s/LDAP_HOST", local.application_name)
 }
 
 
