@@ -58,15 +58,13 @@ resource "aws_acm_certificate_validation" "external" {
   validation_record_fqdns = [local.domain_name_main[0], local.domain_name_sub[0]]
 }
 
-// prod dns
-
+// PROD DNS
 resource "aws_route53_record" "external_prod" {
   count    = local.is-production ? 1 : 0
-  provider = aws.core-vpc
-
-  zone_id = data.aws_route53_zone.external.zone_id
-  name    = "tipstaff.service.justice.gov.uk"
-  type    = "A"
+  provider = aws.core-network-services
+  zone_id  = data.aws_route53_zone.prod_network_services.zone_id
+  name     = "tipstaff.service.justice.gov.uk"
+  type     = "A"
 
   alias {
     name                   = aws_lb.tipstaff_lb.dns_name
@@ -79,38 +77,44 @@ resource "aws_acm_certificate" "external_prod" {
   count             = local.is-production ? 1 : 0
   domain_name       = "tipstaff.service.justice.gov.uk"
   validation_method = "DNS"
+  subject_alternative_names = [
+    "*.tipstaff.service.justice.gov.uk"
+  ]
 
   lifecycle {
     create_before_destroy = true
   }
 }
 
+## Validation 
 resource "aws_route53_record" "external_validation_prod" {
   count    = local.is-production ? 1 : 0
   provider = aws.core-network-services
 
-  allow_overwrite = true
-  name            = local.domain_name_main[0]
-  records         = local.domain_record_main
-  ttl             = 60
-  type            = local.domain_type_main[0]
-  zone_id         = data.aws_route53_zone.prod-network-services.zone_id
-}
-
-resource "aws_route53_record" "external_validation_subdomain_prod" {
-  count    = local.is-production ? 1 : 0
-  provider = aws.core-network-services
+  for_each = {
+    for dvo in aws_acm_certificate.external_prod[0].domain_validation_options : dvo.domain_name => {
+      name   = dvo.resource_record_name
+      record = dvo.resource_record_value
+      type   = dvo.resource_record_type
+    }
+  }
 
   allow_overwrite = true
-  name            = local.domain_name_sub[0]
-  records         = local.domain_record_sub
+  name            = each.value.name
+  records         = [each.value.record]
   ttl             = 60
-  type            = local.domain_type_sub[0]
-  zone_id         = data.aws_route53_zone.prod-network-services.zone_id
+  type            = each.value.type
+  zone_id         = data.aws_route53_zone.application_zone.zone_id
 }
 
 resource "aws_acm_certificate_validation" "external_prod" {
-  count                   = local.is-production ? 1 : 0
+  count = local.is-production ? 1 : 0
+  depends_on = [
+    aws_route53_record.external_validation_prod
+  ]
   certificate_arn         = aws_acm_certificate.external_prod[0].arn
-  validation_record_fqdns = [local.domain_name_main_prod[0], local.domain_name_sub_prod[0]]
+  validation_record_fqdns = [for record in aws_route53_record.external_validation_prod : record.fqdn]
+  timeouts {
+    create = "10m"
+  }
 }
