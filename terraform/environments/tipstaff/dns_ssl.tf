@@ -32,30 +32,46 @@ resource "aws_route53_record" "external_validation" {
   # count    = local.is-production ? 0 : 1
   provider = aws.core-network-services
 
+
+  for_each = {
+    for dvo in aws_acm_certificate.external.domain_validation_options : dvo.domain_name => {
+      name   = dvo.resource_record_name
+      record = dvo.resource_record_value
+      type   = dvo.resource_record_type
+    }
+  }
+
   allow_overwrite = true
-  name            = local.domain_name_main[0]
-  records         = local.domain_record_main
+  name            = each.value.name
+  records         = [each.value.record]
   ttl             = 60
-  type            = local.domain_type_main[0]
+  type            = each.value.type
   zone_id         = data.aws_route53_zone.network-services.zone_id
+  # allow_overwrite = true
+  # name            = local.domain_name_main[0]
+  # records         = local.domain_record_main
+  # ttl             = 60
+  # type            = local.domain_type_main[0]
+  # zone_id         = data.aws_route53_zone.network-services.zone_id
 }
 
-resource "aws_route53_record" "external_validation_subdomain" {
-  # count    = local.is-production ? 0 : 1
-  provider = aws.core-vpc
+# resource "aws_route53_record" "external_validation_subdomain" {
+#   # count    = local.is-production ? 0 : 1
+#   provider = aws.core-vpc
 
-  allow_overwrite = true
-  name            = local.domain_name_sub[0]
-  records         = local.domain_record_sub
-  ttl             = 60
-  type            = local.domain_type_sub[0]
-  zone_id         = data.aws_route53_zone.external.zone_id
-}
+#   allow_overwrite = true
+#   name            = local.domain_name_sub[0]
+#   records         = local.domain_record_sub
+#   ttl             = 60
+#   type            = local.domain_type_sub[0]
+#   zone_id         = data.aws_route53_zone.external.zone_id
+# }
 
 resource "aws_acm_certificate_validation" "external" {
   # count                   = local.is-production ? 0 : 1
-  certificate_arn         = aws_acm_certificate.external.arn
-  validation_record_fqdns = [local.domain_name_main[0], local.domain_name_sub[0]]
+  certificate_arn = aws_acm_certificate.external.arn
+  # validation_record_fqdns = [local.domain_name_main[0], local.domain_name_sub[0]]
+  validation_record_fqdns = [for record in aws_route53_record.external_validation : record.fqdn]
 }
 
 // PROD DNS
