@@ -17,7 +17,7 @@ resource "aws_secretsmanager_secret_version" "support_email_account" {
 #### CW ####
 resource "aws_sns_topic" "cw_alerts" {
   name = "ccms-ebs-ec2-alerts"
-  kms_master_key_id = "alias/aws/sns"
+  #kms_master_key_id = "alias/aws/sns"
 }
 resource "aws_sns_topic_policy" "sns_policy" {
   arn    = aws_sns_topic.cw_alerts.arn
@@ -49,7 +49,7 @@ resource "aws_sns_topic_subscription" "s3_subscription" {
 #### DDoS ####
 resource "aws_sns_topic" "ddos_alarm" {
   name              = format("%s_ddos_alarm", local.application_name)
-  kms_master_key_id = "alias/aws/sns"
+  #kms_master_key_id = "alias/aws/sns"
 }
 resource "aws_sns_topic_policy" "ddos_policy" {
   arn    = aws_sns_topic.ddos_alarm.arn
