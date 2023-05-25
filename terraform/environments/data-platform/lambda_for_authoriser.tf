@@ -17,7 +17,7 @@ data "aws_iam_policy_document" "apigateway_trust_policy" {
   }
 }
 
-resource "aws_iam_role" "authoriser_lambda_role" {
+resource "aws_iam_role" "authoriser_role" {
   name               = "authoriser_role_${local.environment}"
   assume_role_policy = data.aws_iam_policy_document.apigateway_trust_policy.json
   tags               = local.tags
@@ -39,8 +39,14 @@ resource "aws_iam_policy" "allow_invoke_authoriser_lambda" {
 }
 
 resource "aws_iam_role_policy_attachment" "attach_allow_invoke_authoriser_lambda" {
-  role       = aws_iam_role.authoriser_lambda_role.name
+  role       = aws_iam_role.authoriser_role.name
   policy_arn = aws_iam_policy.allow_invoke_authoriser_lambda.arn
+}
+
+resource "aws_iam_role" "authoriser_lambda_role" {
+  name               = "authoriser_lambda_role_${local.environment}"
+  assume_role_policy = data.aws_iam_policy_document.lambda_trust_policy.json
+  tags               = local.tags
 }
 
 resource "aws_lambda_function" "authoriser" {
