@@ -110,7 +110,8 @@ data "aws_iam_policy_document" "delius_core_frontend_ecs_service_policy" {
       "ec2:Describe*",
       "ec2:AuthorizeSecurityGroupIngress",
       "elasticloafrontendalancing:RegisterTargets",
-      "elasticloafrontendalancing:DeregisterTargets"
+      "elasticloafrontendalancing:DeregisterTargets",
+      "secretsmanager:GetSecretValue"
     ]
   }
 }
@@ -172,7 +173,8 @@ data "aws_iam_policy_document" "delius_core_frontend_ecs_exec" {
       "ecr:BatchGetImage",
       "logs:CreateLogGroup",
       "logs:CreateLogStream",
-      "logs:PutLogEvents"
+      "logs:PutLogEvents",
+      "secretsmanager:GetSecretValue"
     ]
   }
 }
