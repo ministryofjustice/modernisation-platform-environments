@@ -27,15 +27,11 @@ resource "aws_sns_topic_policy" "sns_policy" {
   arn    = aws_sns_topic.cw_alerts.arn
   policy = data.aws_iam_policy_document.sns_topic_policy.json
 }
-resource "aws_sns_topic_subscription" "cw_subscription" {
-  #count     = local.is-production ? 0 : 1
-  topic_arn = aws_sns_topic.cw_alerts.arn
-  protocol  = "email"
-  endpoint  = aws_secretsmanager_secret_version.support_email_account.secret_string
-  #depends_on = [
-  #  aws_secretsmanager_secret_version.support_email_account
-  #]
-}
+#resource "aws_sns_topic_subscription" "cw_subscription" {
+#  topic_arn = aws_sns_topic.cw_alerts.arn
+#  protocol  = "email"
+#  endpoint  = aws_secretsmanager_secret_version.support_email_account.secret_string
+#}
 
 
 #### S3 ####
@@ -47,15 +43,11 @@ resource "aws_sns_topic_policy" "s3_policy" {
   arn    = aws_sns_topic.s3_topic.arn
   policy = data.aws_iam_policy_document.s3_topic_policy.json
 }
-resource "aws_sns_topic_subscription" "s3_subscription" {
-  #count     = local.is-production ? 0 : 1
-  topic_arn = aws_sns_topic.s3_topic.arn
-  protocol  = "email"
-  endpoint  = aws_secretsmanager_secret_version.support_email_account.secret_string
-  depends_on = [
-    aws_secretsmanager_secret_version.support_email_account
-  ]
-}
+#resource "aws_sns_topic_subscription" "s3_subscription" {
+#  topic_arn = aws_sns_topic.s3_topic.arn
+#  protocol  = "email"
+#  endpoint  = aws_secretsmanager_secret_version.support_email_account.secret_string
+#}
 
 
 #### DDoS ####
@@ -67,8 +59,8 @@ resource "aws_sns_topic_policy" "ddos_policy" {
   arn    = aws_sns_topic.ddos_alarm.arn
   policy = data.aws_iam_policy_document.sns_topic_policy.json
 }
-resource "aws_sns_topic_subscription" "ddos_subscription" {
-  topic_arn = aws_sns_topic.ddos_alarm.arn
-  protocol  = "email"
-  endpoint  = aws_secretsmanager_secret_version.support_email_account.secret_string
-}
+#resource "aws_sns_topic_subscription" "ddos_subscription" {
+#  topic_arn = aws_sns_topic.ddos_alarm.arn
+#  protocol  = "email"
+#  endpoint  = aws_secretsmanager_secret_version.support_email_account.secret_string
+#}
