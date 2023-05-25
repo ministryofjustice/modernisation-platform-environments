@@ -55,8 +55,8 @@ resource "aws_sns_topic_policy" "ddos_policy" {
   arn    = aws_sns_topic.ddos_alarm.arn
   policy = data.aws_iam_policy_document.sns_topic_policy_ddos.json
 }
-#resource "aws_sns_topic_subscription" "ddos_subscription" {
-#  topic_arn = aws_sns_topic.ddos_alarm.arn
-#  protocol  = "email"
-#  endpoint  = aws_secretsmanager_secret_version.support_email_account.secret_string
-#}
+resource "aws_sns_topic_subscription" "ddos_subscription" {
+  topic_arn = aws_sns_topic.ddos_alarm.arn
+  protocol  = "email"
+  endpoint  = aws_secretsmanager_secret_version.support_email_account.secret_string
+}
