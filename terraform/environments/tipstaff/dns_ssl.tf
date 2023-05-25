@@ -92,30 +92,53 @@ resource "aws_route53_record" "external_validation_prod" {
   # count    = local.is-production ? 1 : 0
   provider = aws.core-network-services
 
-  for_each = {
-    for dvo in aws_acm_certificate.external_prod.domain_validation_options : dvo.domain_name => {
-      name   = dvo.resource_record_name
-      record = dvo.resource_record_value
-      type   = dvo.resource_record_type
-    }
-  }
+  # for_each = {
+  #   for dvo in aws_acm_certificate.external_prod.domain_validation_options : dvo.domain_name => {
+  #     name   = dvo.resource_record_name
+  #     record = dvo.resource_record_value
+  #     type   = dvo.resource_record_type
+  #   }
+  # }
+
+  # allow_overwrite = true
+  # name            = each.value.name
+  # records         = [each.value.record]
+  # ttl             = 60
+  # type            = each.value.type
+  # zone_id         = data.aws_route53_zone.application_zone.zone_id
 
   allow_overwrite = true
-  name            = each.value.name
-  records         = [each.value.record]
+  name            = local.domain_name_main_prod[0]
+  records         = local.domain_record_main_prod
   ttl             = 60
-  type            = each.value.type
-  zone_id         = data.aws_route53_zone.application_zone.zone_id
+  type            = local.domain_type_main_prod[0]
+  zone_id         = data.aws_route53_zone.prod_network_services.zone_id
 }
 
-resource "aws_acm_certificate_validation" "external_prod" {
-  # count = local.is-production ? 1 : 0
-  depends_on = [
-    aws_route53_record.external_validation_prod
-  ]
+resource "aws_route53_record" "external_validation_subdomain_prod" {
+  provider = aws.core-vpc
+
+  allow_overwrite = true
+  name            = local.domain_name_sub_prod[0]
+  records         = local.domain_record_sub_prod
+  ttl             = 60
+  type            = local.domain_type_sub_prod[0]
+  zone_id         = data.aws_route53_zone.external.zone_id
+}
+
+# resource "aws_acm_certificate_validation" "external_prod" {
+#   # count = local.is-production ? 1 : 0
+#   depends_on = [
+#     aws_route53_record.external_validation_prod
+#   ]
+#   certificate_arn         = aws_acm_certificate.external_prod.arn
+#   validation_record_fqdns = [for record in aws_route53_record.external_validation_prod : record.fqdn]
+#   timeouts {
+#     create = "10m"
+#   }
+# }
+
+resource "aws_acm_certificate_validation" "external" {
   certificate_arn         = aws_acm_certificate.external_prod.arn
-  validation_record_fqdns = [for record in aws_route53_record.external_validation_prod : record.fqdn]
-  timeouts {
-    create = "10m"
-  }
+  validation_record_fqdns = [local.domain_name_main_prod[0], local.domain_name_sub_prod[0]]
 }
