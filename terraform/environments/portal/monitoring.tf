@@ -100,7 +100,7 @@ locals {
       service_name          = "oam_1"
       swapspace_alarm_threshold = 50
       dimensions = {
-        InstanceId = aws_instance.oam_instance_1.id # TODO This needs updating when the OAM EC2 instance is built
+        InstanceId = aws_instance.oam_instance_1.id
       }
     },
     ohs_instance_1 = {
@@ -134,9 +134,9 @@ locals {
       service_name          = "oam_1"
       diskspace_alarm_threshold = 80
       dimensions = {
-        MountPath = "/"
-        Filesystem = "/dev/nvme0n1p2"
+        path = "/"
         InstanceId = aws_instance.oam_instance_1.id
+        fstype = "xfs"
       }
     },
     ohs_instance_1 = {
@@ -219,9 +219,9 @@ locals {
       service_name          = "oam_1"
       aserver_alarm_threshold = 80
       dimensions = {
-        MountPath = "/IDAM/product/runtime/Domain/aserver"
-        Filesystem = "/dev/nvme1n1"
-        InstanceId = aws_instance.oam_instance_1.id # TODO This needs updating when the OAM EC2 instance is built
+        path = "/IDAM/product/runtime/Domain/aserver"
+        InstanceId = aws_instance.oam_instance_1.id
+        fstype = "ext4"
       }
     }
   }
@@ -297,8 +297,8 @@ resource "aws_cloudwatch_metric_alarm" "memory_alarm" {
   comparison_operator = "GreaterThanThreshold"
   dimensions          = each.value.dimensions
   evaluation_periods  = "5"
-  metric_name         = "MemoryUtilization"
-  namespace           = "System/Linux"
+  metric_name         = "mem_used_percent"
+  namespace           = "CWAgent"
   period              = "60"
   statistic           = "Average"
   threshold           = each.value.memory_alarm_threshold
@@ -323,8 +323,8 @@ resource "aws_cloudwatch_metric_alarm" "swapspace_alarm" {
   comparison_operator = "GreaterThanThreshold"
   dimensions          = each.value.dimensions
   evaluation_periods  = "5"
-  metric_name         = "SwapUsed"
-  namespace           = "System/Linux"
+  metric_name         = "swap_used"
+  namespace           = "CWAgent"
   period              = "60"
   statistic           = "Average"
   threshold           = each.value.swapspace_alarm_threshold
@@ -349,8 +349,8 @@ resource "aws_cloudwatch_metric_alarm" "diskspace_alarm" {
   comparison_operator = "GreaterThanThreshold"
   dimensions          = each.value.dimensions
   evaluation_periods  = "5"
-  metric_name         = "DiskSpaceUtilization"
-  namespace           = "System/Linux"
+  metric_name         = "disk_used_percent"
+  namespace           = "CWAgent"
   period              = "60"
   statistic           = "Average"
   threshold           = each.value.diskspace_alarm_threshold
@@ -401,8 +401,8 @@ resource "aws_cloudwatch_metric_alarm" "aserver_alarm" {
   comparison_operator = "GreaterThanThreshold"
   dimensions          = each.value.dimensions
   evaluation_periods  = "5"
-  metric_name         = "DiskSpaceUtilization"
-  namespace           = "System/Linux"
+  metric_name         = "disk_used_percent"
+  namespace           = "CWAgent"
   period              = "60"
   statistic           = "Average"
   threshold           = each.value.aserver_alarm_threshold
