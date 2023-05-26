@@ -78,6 +78,15 @@ locals {
         }
       }
 
+      t2-nomis-web-b = merge(local.weblogic_ec2_b, {
+        tags = merge(local.weblogic_ec2_b.tags, {
+          nomis-environment    = "t2"
+          oracle-db-hostname-a = "t2nomis-a.test.nomis.service.justice.gov.uk"
+          oracle-db-hostname-b = "t2nomis-b.test.nomis.service.justice.gov.uk"
+          oracle-db-name       = "T2CNOM"
+        })
+      })
+
       test-oem = {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name          = "base_ol_8_5_*"
@@ -301,6 +310,24 @@ locals {
                   }
                 }]
               }
+              t2-nomis-web-b-http-7777 = {
+                priority = 400
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t2-nomis-web-b-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "t2-nomis-web-b.test.nomis.az.justice.gov.uk",
+                      "t2-nomis-web-b.test.nomis.service.justice.gov.uk",
+                      "c-t2.test.nomis.az.justice.gov.uk",
+                      "c-t2.test.nomis.service.justice.gov.uk",
+                      "t2-cn.hmpp-azdt.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
             }
           })
         }
@@ -309,9 +336,14 @@ locals {
     baseline_route53_zones = {
       "test.nomis.az.justice.gov.uk" = {
         lb_alias_records = [
+          # T1
           { name = "t1-nomis-web-a", type = "A", lbs_map_key = "private" },
           { name = "t1-nomis-web-b", type = "A", lbs_map_key = "private" },
           { name = "c-t1", type = "A", lbs_map_key = "private" },
+          # T2
+          { name = "t2-nomis-web-a", type = "A", lbs_map_key = "private" },
+          { name = "t2-nomis-web-b", type = "A", lbs_map_key = "private" },
+          { name = "c-t2", type = "A", lbs_map_key = "private" },
         ]
       }
       "test.nomis.service.justice.gov.uk" = {
@@ -338,9 +370,14 @@ locals {
           { name = "t2trdat-b", type = "CNAME", ttl = "86400", records = ["t2-nomis-db-1-b.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
         ]
         lb_alias_records = [
+          # T1
           { name = "t1-nomis-web-a", type = "A", lbs_map_key = "private" },
           { name = "t1-nomis-web-b", type = "A", lbs_map_key = "private" },
           { name = "c-t1", type = "A", lbs_map_key = "private" },
+          # T2
+          { name = "t2-nomis-web-a", type = "A", lbs_map_key = "private" },
+          { name = "t2-nomis-web-b", type = "A", lbs_map_key = "private" },
+          { name = "c-t2", type = "A", lbs_map_key = "private" },
         ]
       }
     }
