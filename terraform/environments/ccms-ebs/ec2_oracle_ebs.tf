@@ -332,8 +332,7 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_dbf" {
     imageId      = aws_instance.ec2_oracle_ebs.ami
     InstanceType = aws_instance.ec2_oracle_ebs.instance_type
     path         = "/CCMS/EBS/dbf"
-    device       = "nvme"
-    #device       = local.application_data.accounts[local.environment].dbf_device
+    device       = local.application_data.accounts[local.environment].dbf_device
     fstype       = "ext4"
   }
 }

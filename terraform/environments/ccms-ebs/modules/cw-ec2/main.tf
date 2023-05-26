@@ -72,6 +72,31 @@ resource "aws_cloudwatch_metric_alarm" "disk_free" {
   }
 }
 
+# Disk Free Alarm (percentage)
+resource "aws_cloudwatch_metric_alarm" "disk_used" {
+  alarm_name                = "${var.short_env}-${local.name}-disk_used_root"
+  alarm_description         = "This metric monitors the amount of used disk space on the instance. If the amount of free disk space on root exceeds 80% for 2 minutes, the alarm will trigger"
+  comparison_operator       = "GreaterThanOrEqualToThreshold"
+  metric_name               = "disk_used_percent"
+  namespace                 = "CWAgent"
+  statistic                 = "Average"
+  insufficient_data_actions = []
+
+  evaluation_periods  = var.disk_eval_periods
+  datapoints_to_alarm = var.disk_datapoints
+  period              = var.disk_period
+  threshold           = var.disk_threshold
+  alarm_actions       = [var.topic]
+  dimensions = {
+    InstanceId   = var.instanceId
+    ImageId      = var.imageId
+    InstanceType = var.instanceType
+    path         = "/"
+    device       = var.rootDevice
+    fstype       = var.fileSystem
+  }
+}
+
 /*
 # High CPU IOwait Alarm
 resource "aws_cloudwatch_metric_alarm" "cpu_usage_iowait" {

@@ -552,7 +552,7 @@
     "disk": {
       "eval_periods": 2,
       "period": 60,
-      "threshold": 15,
+      "threshold": 80,
       "threshold_dbf": 90
     },
     "iowait": {
