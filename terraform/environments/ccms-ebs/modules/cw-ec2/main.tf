@@ -139,3 +139,21 @@ resource "aws_cloudwatch_metric_alarm" "system_health_check" {
     InstanceId = var.instanceId
   }
 }
+
+resource "aws_cloudwatch_metric_alarm" "ec2_stop_alarm" {
+  alarm_name          = "${local.name}-ec2-stopped"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1
+  metric_name         = "StatusCheckFailed"
+  namespace           = "AWS/EC2"
+  period              = 60
+  statistic           = "SampleCount"
+  threshold           = 1
+
+  dimensions = {
+    InstanceId = var.instanceId  
+  }
+
+  alarm_description = "This alarm will trigger when the EC2 instance stops."
+  alarm_actions     = [var.topic]
+}
