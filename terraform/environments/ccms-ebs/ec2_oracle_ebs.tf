@@ -310,28 +310,20 @@ module "cw-ebs-ec2" {
 
 }
 
-
-# Disk Free Alarm for EBSDB /dbf mount
-resource "aws_cloudwatch_metric_alarm" "disk_free_dbf" {
-  alarm_name                = "${local.application_data.accounts[local.environment].short_env}-EBSDB-disk_free_DBF"
-  alarm_description         = "This metric monitors the amount of free disk space on dbf mount. If the amount of free disk space on root falls below 15% for 2 minutes, the alarm will trigger"
-  comparison_operator       = "LessThanOrEqualToThreshold"
-  metric_name               = "disk_free"
-  namespace                 = "CWAgent"
-  statistic                 = "Average"
-  insufficient_data_actions = []
-
-  evaluation_periods  = local.application_data.cloudwatch_ec2.disk.eval_periods
-  datapoints_to_alarm = local.application_data.cloudwatch_ec2.disk.eval_periods
-  period              = local.application_data.cloudwatch_ec2.disk.period
-  threshold           = local.application_data.cloudwatch_ec2.disk.threshold
+# Disk Free Alarm for EBS DBF mount
+resource "aws_cloudwatch_metric_alarm" "ebs_volume_dbf" {
+  alarm_name          = "${local.application_data.accounts[local.environment].short_env}-EBSDB-disk_free_DBF"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = "1"
+  metric_name         = "VolumeUsedPercentage"
+  namespace           = "AWS/EBS"
+  period              = "300"
+  statistic           = "Average"
+  threshold           = "80"
+  alarm_description   = "Triggered when EBS volume is 80% full"
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
+
   dimensions = {
-    InstanceId   = aws_instance.ec2_oracle_ebs.id
-    imageId       = local.environment == "development" ? local.application_data.accounts[local.environment].restored_db_image : data.aws_ami.oracle_db.id
-    InstanceType = local.application_data.accounts[local.environment].ec2_oracle_instance_type_ebsdb
-    path         = "/"
-    device       = "nvme7n1"
-    fstype       = "ext4"
+    VolumeId = aws_ebs_volume.dbf.id  
   }
 }
