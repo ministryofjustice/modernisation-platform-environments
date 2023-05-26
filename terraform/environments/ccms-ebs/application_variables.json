@@ -62,8 +62,6 @@
       "ebs_size_ebsdb_backup": 8000,
       "dbf_device": "nvme5n1",
       "dbf_path": "/CCMS/EBS/dbf"
-      "dbf_device": "nvme5n1",
-      "dbf_path": "/CCMS/EBS/dbf"
     },
     "test": {
       "short_env": "tst",
