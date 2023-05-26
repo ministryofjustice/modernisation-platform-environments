@@ -112,23 +112,23 @@ locals {
               }
             }
             rules = {
-              t2-web-http-8080 = {
-                priority = 100
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "t2-${local.application_name}-web-http-8080"
-                }]
-                conditions = [
-                  {
-                    host_header = {
-                      values = [
-                        "web.t2.${module.environment.domains.public.application_environment}", # web.t2.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk
-                        "t2.${module.environment.domains.public.application_environment}",     #    web.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk
-                      ]
-                    }
-                  }
-                ]
-              }
+              # t2-web-http-8080 = {
+              #   priority = 100
+              #   actions = [{
+              #     type              = "forward"
+              #     target_group_name = "t2-${local.application_name}-web-http-8080"
+              #   }]
+              #   conditions = [
+              #     {
+              #       host_header = {
+              #         values = [
+              #           "web.t2.${module.environment.domains.public.application_environment}", # web.t2.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk
+              #           "t2.${module.environment.domains.public.application_environment}",     #    web.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk
+              #         ]
+              #       }
+              #     }
+              #   ]
+              # }
             }
           }
         }
