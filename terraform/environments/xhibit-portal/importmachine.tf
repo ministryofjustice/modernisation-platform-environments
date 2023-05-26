@@ -19,6 +19,7 @@ resource "aws_security_group" "importmachine" {
     protocol        = "-1"
     security_groups = [aws_security_group.prtg_lb.id]
   }
+# test
 
   egress {
     description      = "allow all"
