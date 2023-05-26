@@ -46,7 +46,7 @@ resource "aws_cloudwatch_metric_alarm" "low_available_memory" {
     InstanceType = var.instanceType
   }
 }
-
+/*
 # Disk Free Alarm
 resource "aws_cloudwatch_metric_alarm" "disk_free" {
   alarm_name                = "${var.short_env}-${local.name}-disk_free_root"
@@ -71,8 +71,9 @@ resource "aws_cloudwatch_metric_alarm" "disk_free" {
     fstype       = var.fileSystem
   }
 }
+*/
 
-# Disk Free Alarm (percentage)
+# Disk Used % Alarm (more adapable than the Disk Free alarm, due to percentage instead of bytes)
 resource "aws_cloudwatch_metric_alarm" "disk_used" {
   alarm_name                = "${var.short_env}-${local.name}-disk_used_root"
   alarm_description         = "This metric monitors the amount of used disk space on the instance. If the amount of free disk space on root exceeds 80% for 2 minutes, the alarm will trigger"
