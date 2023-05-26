@@ -69,7 +69,6 @@ resource "aws_cloudwatch_metric_alarm" "disk_free" {
     path         = "/"
     device       = var.rootDevice
     fstype       = var.fileSystem
-
   }
 }
 
@@ -142,7 +141,7 @@ resource "aws_cloudwatch_metric_alarm" "system_health_check" {
 
 resource "aws_cloudwatch_metric_alarm" "ec2_stop_alarm" {
   alarm_name          = "${var.short_env}-${local.name}-ec2-stopped-${var.short_env}"
-  comparison_operator = "GreaterThanOrEqualToThreshold"
+  comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 1
   metric_name         = "StatusCheckFailed"
   namespace           = "AWS/EC2"

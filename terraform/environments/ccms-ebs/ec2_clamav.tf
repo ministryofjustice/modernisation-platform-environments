@@ -1,8 +1,8 @@
 #  Build EC2 for ClamAV
 
 resource "aws_instance" "ec2_clamav" {
-  instance_type               = "t2.medium"
-  ami                         = "ami-03e88be9ecff64781"
+  instance_type               = local.application_data.accounts[local.environment].ec2_instance_type_clamav
+  ami                         = local.application_data.accounts[local.environment].clamav_ami_id
   key_name                    = local.application_data.accounts[local.environment].key_name
   vpc_security_group_ids      = [aws_security_group.ec2_sg_clamav.id]
   subnet_id                   = local.environment == "development" ? data.aws_subnet.data_subnets_a.id : data.aws_subnet.private_subnets_a.id
@@ -90,10 +90,10 @@ module "cw-clamav-ec2" {
   name          = "ec2-clamav"
   topic         = aws_sns_topic.cw_alerts.arn
   instanceId    = aws_instance.ec2_clamav.id
-  imageId       = "ami-03e88be9ecff64781"
-  instanceType  = "t2.medium"
+  imageId       = local.application_data.accounts[local.environment].clamav_ami_id
+  instanceType  = local.application_data.accounts[local.environment].ec2_instance_type_clamav
   fileSystem    = "xfs"       # Linux root filesystem
-  rootDevice    = "nvme0n1p1" # This is used by default for root on all the ec2 images
+  rootDevice    = "xvda"      # ClamAV uses different instance family
 
   cpu_eval_periods  = local.application_data.cloudwatch_ec2.cpu.eval_periods
   cpu_datapoints    = local.application_data.cloudwatch_ec2.cpu.eval_periods
