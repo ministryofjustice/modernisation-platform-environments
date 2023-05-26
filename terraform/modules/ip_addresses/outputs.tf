@@ -8,6 +8,11 @@ output "moj_cidrs" {
   description = "MoJ Infrastructure aggregate cidrs: map(list(string))"
 }
 
+output "mp_cidr" {
+  value       = local.mp_cidr
+  description = "Modernisation Platform cidrs"
+}
+
 output "azure_fixngo_ip" {
   value       = local.azure_fixngo_ip
   description = "Azure FixNGo ips: map(string)"

@@ -203,13 +203,18 @@ resource "aws_codebuild_project" "app-build" {
 
   environment {
     compute_type    = "BUILD_GENERAL1_SMALL"
-    image           = "aws/codebuild/docker:1.12.1"
+    image           = "aws/codebuild/standard:5.0"
     type            = "LINUX_CONTAINER"
     privileged_mode = true
 
     environment_variable {
       name  = "AWS_DEFAULT_REGION"
       value = "eu-west-2"
+    }
+
+    environment_variable {
+      name  = "AWS_ACCOUNT_ID"
+      value = var.account_id
     }
 
     environment_variable {

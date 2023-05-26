@@ -52,6 +52,13 @@ locals {
           protocol    = "tcp"
           cidr_blocks = local.security_group_cidrs.https
         }
+        http8080 = {
+          description = "Allow http8080 ingress"
+          from_port   = 8080
+          to_port     = 8080
+          protocol    = "tcp"
+          cidr_blocks = local.security_group_cidrs.https
+        }
       }
       egress = {
         all = {
@@ -75,10 +82,13 @@ locals {
           self        = true
         }
         http8080 = {
-          description     = "Allow http8080 ingress"
-          from_port       = 8080
-          to_port         = 8080
-          protocol        = "tcp"
+          description = "Allow http8080 ingress"
+          from_port   = 8080
+          to_port     = 8080
+          protocol    = "tcp"
+          cidr_blocks = [
+            "10.102.0.0/16", # NOMS-Mgmt
+          ]
           security_groups = ["public"]
         }
       }

@@ -3,13 +3,13 @@
     "sandbox": {
       "ecs_type": "FARGATE",
       "rds_storage": 5,
-      "rds_postgresql_version": "12.8",
+      "rds_postgresql_version": "12.11",
       "rds_instance_class": "db.t3.micro"
     },
     "production": {
       "ecs_type": "FARGATE",
       "rds_storage": 5,
-      "rds_postgresql_version": "12.8",
+      "rds_postgresql_version": "12.11",
       "rds_instance_class": "db.t3.micro"
     }
   }

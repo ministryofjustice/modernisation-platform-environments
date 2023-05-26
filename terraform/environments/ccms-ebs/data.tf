@@ -57,6 +57,20 @@ data "aws_ami" "accessgate" {
   }
 }
 
+data "aws_ami" "oracle_db_dr" {
+  most_recent = true
+  owners      = [local.application_data.accounts[local.environment].ami_owner]
+
+  filter {
+    name   = "name"
+    values = [local.application_data.accounts[local.environment].orace_db_dr_ami_name]
+  }
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+}
+
 ## IAM
 data "aws_iam_policy_document" "sns_topic_policy" {
   policy_id = "SnsTopicId"
@@ -127,4 +141,29 @@ data "aws_iam_policy_document" "s3_topic_policy" {
       ]
     }
   }
+}
+
+## PROD CERT
+data "aws_route53_zone" "application-zone" {
+  provider = aws.core-network-services
+
+  name         = "ccms-ebs.service.justice.gov.uk."
+  private_zone = false
+}
+
+## GANDI CERT
+
+data "aws_acm_certificate" "gandi_cert" {
+  domain   = local.application_data.accounts[local.environment].lz_domain_name
+  statuses = ["ISSUED"]
+}
+
+
+## PROD DNS
+
+data "aws_route53_zone" "prod-network-services" {
+  provider = aws.core-network-services
+
+  name         = "ccms-ebs.service.justice.gov.uk."
+  private_zone = false
 }

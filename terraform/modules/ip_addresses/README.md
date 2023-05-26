@@ -4,7 +4,7 @@ Put MoJ common IP addresses here to save duplication between environments.
 
 Please see [MoJ Security Guidance](https://security-guidance.service.justice.gov.uk/ip-dns-diagram-handling/#ip-addresses-dns-information--architecture-documentation)
 
-Please see internal repo https://github.com/ministryofjustice/moj-ip-addresses
+Please see internal repo <https://github.com/ministryofjustice/moj-ip-addresses>
 
 ## Suggested Naming Convention
 

@@ -1,5 +1,5 @@
 module "ecs" {
-  source = "github.com/ministryofjustice/terraform-ecs//cluster?ref=3c9a5a0762c7b2dbff6608e606a2784c8a4ef9c4"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//cluster?ref=v1.0.0"
 
   environment = local.environment
   name        = local.application_name

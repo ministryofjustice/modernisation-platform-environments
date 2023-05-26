@@ -3,11 +3,27 @@ variable "acm_certificates" {
   type = map(object({
     domain_name             = string
     subject_alternate_names = optional(list(string), [])
-    validation = map(object({
+    validation = optional(map(object({
       account   = optional(string, "self")
       zone_name = string
-    }))
-    tags = map(string)
+    })), {})
+    external_validation_records_created = optional(bool, false)
+    cloudwatch_metric_alarms = optional(map(object({
+      comparison_operator = string
+      evaluation_periods  = number
+      metric_name         = string
+      namespace           = string
+      period              = number
+      statistic           = string
+      threshold           = number
+      alarm_actions       = list(string)
+      actions_enabled     = optional(bool, false)
+      alarm_description   = optional(string)
+      datapoints_to_alarm = optional(number)
+      treat_missing_data  = optional(string, "missing")
+      dimensions          = optional(map(string), {})
+    })), {})
+    tags = optional(map(string), {})
   }))
   default = {}
 }
@@ -53,10 +69,8 @@ variable "ec2_autoscaling_groups" {
       iam_resource_names_prefix     = optional(string, "ec2")
       instance_profile_policies     = list(string)
       ssm_parameters_prefix         = optional(string, "")
-
-      # below are unused but are defined so same object can be used with ec2_instance
-      subnet_name       = optional(string)
-      availability_zone = optional(string)
+      subnet_name                   = optional(string)
+      availability_zone             = optional(string)
     })
     instance = object({
       disable_api_termination      = bool
@@ -164,6 +178,21 @@ variable "ec2_autoscaling_groups" {
         availability_zone = optional(string)
       })), [])
     })), {})
+    cloudwatch_metric_alarms = optional(map(object({
+      comparison_operator = string
+      evaluation_periods  = number
+      metric_name         = string
+      namespace           = string
+      period              = number
+      statistic           = string
+      threshold           = number
+      alarm_actions       = list(string)
+      actions_enabled     = optional(bool, false)
+      alarm_description   = optional(string)
+      datapoints_to_alarm = optional(number)
+      treat_missing_data  = optional(string, "missing")
+      dimensions          = optional(map(string), {})
+    })), {})
     tags = optional(map(string), {})
   }))
   default = {}
@@ -237,6 +266,21 @@ variable "ec2_instances" {
       create_internal_record = true
       create_external_record = false
     })
+    cloudwatch_metric_alarms = optional(map(object({
+      comparison_operator = string
+      evaluation_periods  = number
+      metric_name         = string
+      namespace           = string
+      period              = number
+      statistic           = string
+      threshold           = number
+      alarm_actions       = list(string)
+      actions_enabled     = optional(bool, false)
+      alarm_description   = optional(string)
+      datapoints_to_alarm = optional(number)
+      treat_missing_data  = optional(string, "missing")
+      dimensions          = optional(map(string), {})
+    })), {})
     tags = optional(map(string), {})
   }))
   default = {}
@@ -262,6 +306,7 @@ variable "rds_instances" {
       create                              = optional(bool, true)
       db_name                             = optional(string)
       db_subnet_group_name                = optional(string)
+      deletion_protection                 = optional(bool, true)
       enabled_cloudwatch_logs_exports     = optional(list(string))
       engine                              = string
       engine_version                      = optional(string)
@@ -270,7 +315,7 @@ variable "rds_instances" {
       identifier                          = string
       instance_class                      = string
       iops                                = optional(number, 0)
-      kms_key_id                          = optional(string)
+      kms_key_id                          = string
       license_model                       = optional(string)
       maintenance_window                  = optional(string)
       max_allocated_storage               = optional(number)
@@ -326,6 +371,7 @@ variable "rds_instances" {
       subnet_ids  = list(string)
       tags        = optional(list(string))
     })
+    ssm_kms_key_id = optional(string)
     ssm_parameters = optional(map(object({
       random = object({
         length  = number
@@ -409,6 +455,7 @@ variable "lbs" {
     existing_target_groups   = optional(map(any), {})
     tags                     = optional(map(string), {})
     listeners = optional(map(object({
+      alarm_target_group_names  = optional(list(string), [])
       port                      = number
       protocol                  = string
       ssl_policy                = optional(string)
@@ -476,18 +523,21 @@ variable "lbs" {
           }))
         }))
       })), {})
-      route53_records = optional(map(object({
-        zone_name              = string
-        evaluate_target_health = optional(bool, false)
+      cloudwatch_metric_alarms = optional(map(object({
+        comparison_operator = string
+        evaluation_periods  = number
+        metric_name         = string
+        namespace           = string
+        period              = number
+        statistic           = string
+        threshold           = number
+        alarm_actions       = list(string)
+        actions_enabled     = optional(bool, false)
+        alarm_description   = optional(string)
+        datapoints_to_alarm = optional(number)
+        treat_missing_data  = optional(string, "missing")
+        dimensions          = optional(map(string), {})
       })), {})
-      replace = optional(object({
-        target_group_name_match       = optional(string, "$(name)")
-        target_group_name_replace     = optional(string, "")
-        condition_host_header_match   = optional(string, "$(name)")
-        condition_host_header_replace = optional(string, "")
-        route53_record_name_match     = optional(string, "$(name)")
-        route53_record_name_replace   = optional(string, "")
-      }), {})
       tags = optional(map(string), {})
     })), {})
   }))
@@ -656,8 +706,28 @@ variable "security_groups" {
   default = {}
 }
 
+variable "sns_topics" {
+  description = "map of sns topics and associated subscriptions where map key is the name of the topic"
+  type = map(object({
+    display_name      = optional(string)
+    kms_master_key_id = optional(string)  # id or business unit key name, e.g. 'general'
+    subscriptions = optional(map(object({ # map key isn't used
+      protocol      = string
+      endpoint      = string
+      filter_policy = optional(string)
+    })), {})
+  }))
+  default = {}
+}
+
 variable "tags" {
   description = "Any additional tags to apply to all resources, in addition to those provided by environment module"
   type        = map(string)
   default     = {}
+}
+
+variable "resource_explorer" {
+  description = "Enables AWS Resource Explorer"
+  type        = bool
+  default     = false
 }

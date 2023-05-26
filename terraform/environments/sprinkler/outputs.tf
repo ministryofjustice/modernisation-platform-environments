@@ -17,3 +17,7 @@ output "provider_core_network_services" {
 output "provider_modernisation_platform" {
   value = data.aws_caller_identity.modernisation_platform
 }
+
+output "provider_us_east_1" {
+  value = data.aws_caller_identity.us_east_1
+}

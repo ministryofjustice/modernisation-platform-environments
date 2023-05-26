@@ -33,6 +33,11 @@ _If you have any questions surrounding this page please post in the `#team-name`
 
 ### **Hosting environment:**
 
+### **Migration RunBook:**
+
+https://dsdmoj.atlassian.net/wiki/spaces/~635fb1501db4d2ebcf649a1c/pages/4411392032/EBS+Migration+Runbook+-+Prod
+
+
 Modernisation Platform
 
 <!-- If your service is hosted on another MOJ team’s infrastructure, link to their runbook. If your service has another arrangement or runs its own infrastructure, you should list the supplier of that infrastructure (ideally linking to your account’s login page) and describe, simply and briefly, how to raise an issue with them. -->

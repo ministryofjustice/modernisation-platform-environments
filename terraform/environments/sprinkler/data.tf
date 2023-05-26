@@ -7,3 +7,7 @@ data "aws_caller_identity" "core_vpc" {
 data "aws_caller_identity" "core_network_services" {
   provider = aws.core-network-services
 }
+
+data "aws_caller_identity" "us_east_1" {
+  provider = aws.us-east-1
+}

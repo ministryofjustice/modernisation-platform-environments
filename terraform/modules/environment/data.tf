@@ -87,3 +87,17 @@ data "aws_kms_key" "this" {
   key_id   = "arn:aws:kms:eu-west-2:${var.environment_management.account_ids["core-shared-services-production"]}:alias/${each.key}-${var.business_unit}"
 }
 
+#------------------------------------------------------------------------------
+# Pager Duty
+#------------------------------------------------------------------------------
+
+# Get the map of pagerduty integration keys from the modernisation platform account
+data "aws_secretsmanager_secret" "pagerduty_integration_keys" {
+  provider = aws.modernisation-platform
+  name     = "pagerduty_integration_keys"
+}
+
+data "aws_secretsmanager_secret_version" "pagerduty_integration_keys" {
+  provider  = aws.modernisation-platform
+  secret_id = data.aws_secretsmanager_secret.pagerduty_integration_keys.id
+}

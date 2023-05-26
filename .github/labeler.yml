@@ -6,3 +6,7 @@ dependencies:
 
 github-workflow:
   - "github/workflows/**"
+
+environments-repository:
+  - "**/*.*"
+  - "**/*"

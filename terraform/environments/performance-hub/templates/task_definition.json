@@ -1,109 +1,111 @@
-[{
-  "name": "performance-hub",
-  "image": "${ecr_url}:${container_version}",
-  "cpu": 1536,
-  "portMappings": [
-    {
-      "containerPort": 80,
-      "hostPort": 8080
-    }
-  ],
-  "memory": 3072,
-  "logConfiguration": {
-    "logDriver": "awslogs",
-    "options": {
+[
+  {
+    "name": "performance-hub",
+    "image": "${ecr_url}:${container_version}",
+    "cpu": 1536,
+    "portMappings": [
+      {
+        "containerPort": 80,
+        "hostPort": 8080
+      }
+    ],
+    "memory": 3072,
+    "logConfiguration": {
+      "logDriver": "awslogs",
+      "options": {
         "awslogs-group": "performance-hub-ecs",
         "awslogs-region": "eu-west-2",
         "awslogs-stream-prefix": "perf-hub"
-     }
+      }
     },
-  "environment" : [
-    {
-      "name" : "DB_HOST",
-      "value" : "${db_host}"
-    },
-    {
-      "name" : "DB_SCHEMA",
-      "value": "${app_name}"
-    },
-    {
-      "name" : "DB_USER",
-      "value" : "${db_user}"
-    },
-    {
-      "name" : "DB_PORT",
-      "value" : "5432"
-    },
-    {
-      "name" : "ENVIRONMENT_NAME",
-      "value" : "${env_name}"
-    },
-    {
-      "name" : "SYSTEM_USER_ACCOUNT_ID",
-      "value" : "${system_account_id}"
-    },
-    {
-      "name" : "HUB_STORAGE_BUCKET",
-      "value" : "${storage_bucket}"
-    },
-    {
-      "name" : "FRIENDLY_NAME",
-      "value" : "${friendly_name}"
-    },
-    {
-      "name" : "ECR_URL",
-      "value" : "${ecr_url}"
-    },
-    {
-      "name" : "HUB_WWW_ROOT",
-      "value" : "${hub_wwwroot}"
-    }
-  ],
-  "secrets": [
-    {
-      "name": "DB_PASSWORD",
-      "valueFrom": "${db_password}"
-    },
-    {
-      "name": "MojHub_CnnStr",
-      "valueFrom": "${mojhub_cnnstr}"
-    },
-    {
-      "name": "MojHub_Membership",
-      "valueFrom": "${mojhub_membership}"
-    },
-    {
-      "name": "GOVUK_NOTIFY_API_KEY",
-      "valueFrom": "${govuk_notify_api_key}"
-    },
-    {
-      "name": "OS_VTS_API_KEY",
-      "valueFrom": "${os_vts_api_key}"
-    },
-    {
-      "name": "PECS_BASM_PROD_ACCESS_KEY_ID",
-      "valueFrom": "${pecs_basm_prod_access_key_id}"
-    },
-    {
-      "name": "PECS_BASM_PROD_SECRET_ACCESS_KEY",
-      "valueFrom": "${pecs_basm_prod_secret_access_key}"
-    },
-    {
-      "name": "AP_IMPORT_ACCESS_KEY_ID",
-      "valueFrom": "${ap_import_access_key_id}"
-    },
-    {
-      "name": "AP_IMPORT_SECRET_ACCESS_KEY",
-      "valueFrom": "${ap_import_secret_access_key}"
-    },
-    {
-      "name": "AP_EXPORT_ACCESS_KEY_ID",
-      "valueFrom": "${ap_export_access_key_id}"
-    },
-    {
-      "name": "AP_EXPORT_SECRET_ACCESS_KEY",
-      "valueFrom": "${ap_export_secret_access_key}"
-    }
-  ],
-  "essential": true
-}]
+    "environment": [
+      {
+        "name": "DB_HOST",
+        "value": "${db_host}"
+      },
+      {
+        "name": "DB_SCHEMA",
+        "value": "${app_name}"
+      },
+      {
+        "name": "DB_USER",
+        "value": "${db_user}"
+      },
+      {
+        "name": "DB_PORT",
+        "value": "5432"
+      },
+      {
+        "name": "ENVIRONMENT_NAME",
+        "value": "${env_name}"
+      },
+      {
+        "name": "SYSTEM_USER_ACCOUNT_ID",
+        "value": "${system_account_id}"
+      },
+      {
+        "name": "HUB_STORAGE_BUCKET",
+        "value": "${storage_bucket}"
+      },
+      {
+        "name": "FRIENDLY_NAME",
+        "value": "${friendly_name}"
+      },
+      {
+        "name": "ECR_URL",
+        "value": "${ecr_url}"
+      },
+      {
+        "name": "HUB_WWW_ROOT",
+        "value": "${hub_wwwroot}"
+      }
+    ],
+    "secrets": [
+      {
+        "name": "DB_PASSWORD",
+        "valueFrom": "${db_password}"
+      },
+      {
+        "name": "MojHub_CnnStr",
+        "valueFrom": "${mojhub_cnnstr}"
+      },
+      {
+        "name": "MojHub_Membership",
+        "valueFrom": "${mojhub_membership}"
+      },
+      {
+        "name": "GOVUK_NOTIFY_API_KEY",
+        "valueFrom": "${govuk_notify_api_key}"
+      },
+      {
+        "name": "OS_VTS_API_KEY",
+        "valueFrom": "${os_vts_api_key}"
+      },
+      {
+        "name": "PECS_BASM_PROD_ACCESS_KEY_ID",
+        "valueFrom": "${pecs_basm_prod_access_key_id}"
+      },
+      {
+        "name": "PECS_BASM_PROD_SECRET_ACCESS_KEY",
+        "valueFrom": "${pecs_basm_prod_secret_access_key}"
+      },
+      {
+        "name": "AP_IMPORT_ACCESS_KEY_ID",
+        "valueFrom": "${ap_import_access_key_id}"
+      },
+      {
+        "name": "AP_IMPORT_SECRET_ACCESS_KEY",
+        "valueFrom": "${ap_import_secret_access_key}"
+      },
+      {
+        "name": "AP_EXPORT_ACCESS_KEY_ID",
+        "valueFrom": "${ap_export_access_key_id}"
+      },
+      {
+        "name": "AP_EXPORT_SECRET_ACCESS_KEY",
+        "valueFrom": "${ap_export_secret_access_key}"
+      }
+    ],
+    "essential": true
+  }
+]

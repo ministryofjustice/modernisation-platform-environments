@@ -53,7 +53,7 @@
       "friendly_name": "HMPPS Test Hub",
       "app_db_name": "NomsPMU_Staging",
       "memebership_db_name": "Membership_Staging",
-      "cert_arn": "28a9aefd-4f6c-4850-afdb-ea2910614f74",
+      "cert_arn": "cbfd501a-d043-43b9-adc2-7a234eb36a03",
       "hub_wwwroot": "C:/inetpub/wwwroot"
     },
     "production": {
@@ -81,7 +81,7 @@
       "friendly_name": "HMPPS Performance Hub",
       "app_db_name": "NomsPMU_Live",
       "memebership_db_name": "Membership_Live",
-      "cert_arn": "cfd47546-c13e-4870-8d03-e2accaa11382",
+      "cert_arn": "d260a7e3-6960-446f-b309-793f44b0fa23",
       "hub_wwwroot": "C:/inetpub/wwwroot"
     }
   }

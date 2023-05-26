@@ -19,7 +19,7 @@ _If you have any questions surrounding this page please post in the `#team-name`
 
 <!--  The URL(s) of the service’s production environment, and test environments if possible--> End users: https://equip-portal.equip.service.justice.gov.uk/
 
-Nimbus (editable version available only to EQuiP team: https://gateway.equip.service.justice.gov.uk/
+Nimbus (editable version available only to EQuiP team: <https://gateway.equip.service.justice.gov.uk/>
 
 ### **Incident response hours:**
 

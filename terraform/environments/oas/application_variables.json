@@ -33,7 +33,8 @@
       "deletion_protection": "false",
       "dashboard_widget_period": 60,
       "pagerduty_integration_key_name": "laa_oas_nonprod_alarms",
-      "rotate_secret_lambda_retention": 180
+      "rotate_secret_lambda_retention": 180,
+      "iam_role_arn": "arn:aws:iam::711138931639:role/AWSBackup"
     },
     "test": {
       "example_var": "test-data"

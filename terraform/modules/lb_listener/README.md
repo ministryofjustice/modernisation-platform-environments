@@ -1,16 +1,18 @@
 Create an `aws_lb_listener` with associated resources such as:
 
-- `aws_lb_target_group`
-- `aws_lb_target_group_attachment`
 - `aws_lb_listener_rule`
 - `aws_lb_listener_certificate`
-- `aws_route53_record`
 
-Note that only one listener is allowed for each protocol/port.  Add
+Note that only one listener is allowed for each protocol/port. Add
 multiple target groups and listener rules as required.
 
-If associating with an `aws_autoscaling_group`, be sure to create the
-load balancer resource first before populating `target_group_arns`.
+Target groups should be created outside of this module. Either
+reference the target group ARN in rules, or pass in a map of target
+group resources and reference by name.
+
+Optionally create a set of cloudwatch alarms for each target group
+using `cloudwatch_metric_alarms` and `alarm_target_group_names`
+variables.
 
 Example usage:
 
@@ -36,11 +38,6 @@ locals {
       enabled = true
       type    = "lb_cookie"
     }
-  }
-  lb_dns_zone = {
-    account                = "core-vpc"
-    zone_id                = data.aws_route53_zone.external-environment.zone_id
-    evaluate_target_health = true
   }
   lb_listeners = {
     http = {
@@ -70,19 +67,6 @@ locals {
           status_code  = "501"
         }
       }
-      target_groups = {
-        http-7777-asg = local.lb_http_7777_rule
-        http-7777-instance = merge(local.lb_http_7777_rule, {
-          attachments = [
-            {
-              target_id = local.my_instance_id_1
-            },
-            {
-              target_id = local.my_instance_id_2
-            }
-          ]
-        })
-      }
       rules = {
         http-7777-asg = {
           actions = [{
@@ -95,21 +79,6 @@ locals {
             }
           }]
         }
-        http-7777-instance = {
-          actions = [{
-            type              = "forward"
-            target_group_name = "http-7777-instance"
-          }]
-          conditions = [{
-            host_header = {
-              values = ["*-instance.*"]
-            }
-          }]
-        }
-      }
-      route53_records = {
-        "my-asg"      = local.lb_dns_zone
-        "my-instance" = local.lb_dns_zone
       }
     }
   }
@@ -120,24 +89,17 @@ module "lb_listener" {
 
   source = "../../modules/lb_listener"
 
-  providers = {
-    aws.core-vpc = aws.core-vpc
-  }
-
   name              = each.key
   business_unit     = local.vpc_name
   environment       = local.environment
   load_balancer_arn = module.loadbalancer[each.value.lb_application_name].load_balancer.arn
-  target_groups     = try(each.value.target_groups, {})
+  target_groups     = local.target_groups
   port              = each.value.port
   protocol          = each.value.protocol
   ssl_policy        = try(each.value.ssl_policy, null)
   certificate_arns  = try(each.value.certificate_arns, [])
   default_action    = each.value.default_action
   rules             = try(each.value.rules, {})
-  route53_records   = try(each.value.route53_records, {})
   tags              = try(each.value.tags, local.tags)
 }
 ```
-
-Alarms are being configured in this module. You can specify the alarm actions in the local.lb_listeners_sns_topic[local.environment] "sns_topic" value.

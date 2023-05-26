@@ -1,11 +1,11 @@
-output "ami_ec2_laa_oem_development_app" {
+output "ami_ec2_laa_oem_app" {
   description = "AMI App"
-  value       = data.aws_ami.ec2_laa_oem_development_app.id
+  value       = data.aws_ami.ec2_laa_oem_app.id
 }
 
-output "ami_ec2_laa_oem_development_db" {
+output "ami_ec2_laa_oem_db" {
   description = "AMI DB"
-  value       = data.aws_ami.ec2_laa_oem_development_db.id
+  value       = data.aws_ami.ec2_laa_oem_db.id
 }
 
 output "ebs_snapshot_oem_app_volume_opt_oem_app" {
@@ -46,6 +46,11 @@ output "ebs_snapshot_oem_db_volume_opt_oem_arch" {
 output "route53_record_app_lb" {
   description = "App LB Route53 record"
   value       = aws_route53_record.route53_record_app_lb.fqdn
+}
+
+output "route53_record_app_lb_internal" {
+  description = "App internal LB Route53 record"
+  value       = aws_route53_record.route53_record_app_lb_internal.fqdn
 }
 
 output "route53_record_app_ec2" {
