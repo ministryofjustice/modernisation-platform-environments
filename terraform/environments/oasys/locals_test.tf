@@ -67,6 +67,23 @@ locals {
               }
             }
             rules = {
+              t2-web-http-8080 = {
+                priority = 100
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t2-${local.application_name}-web-http-8080"
+                }]
+                conditions = [
+                  {
+                    host_header = {
+                      values = [
+                        "t2.oasys.service.justice.gov.uk",
+                        "t2-oasys.hmpp-azdt.justice.gov.uk",
+                      ]
+                    }
+                  }
+                ]
+              }
             }
           }
         }
@@ -116,8 +133,8 @@ locals {
           }
         }
       }
-
     }
+
     # The following zones can be found on azure:
     # az.justice.gov.uk
     # oasys.service.justice.gov.uk
