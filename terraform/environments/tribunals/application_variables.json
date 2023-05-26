@@ -14,10 +14,24 @@
       "example_var": "test-data"
     },
     "preproduction": {
-      "example_var": "preproduction-data"
+      "moj_ip": "81.134.202.29/32",
+      "allocated_storage": "20",
+      "storage_type": "gp2",
+      "identifier": "tribunals-db-preproduction",
+      "engine": "sqlserver-se",
+      "engine_version": "15.00.4198.2.v1",
+      "instance_class": "db.m5.large",
+      "username": "admin"
     },
     "production": {
-      "example_var": "production-data"
+      "moj_ip": "81.134.202.29/32",
+      "allocated_storage": "20",
+      "storage_type": "gp2",
+      "identifier": "tribunals-db",
+      "engine": "sqlserver-se",
+      "engine_version": "15.00.4198.2.v1",
+      "instance_class": "db.m5.large",
+      "username": "admin"
     }
   },
   "ec2_sg_rules": {
