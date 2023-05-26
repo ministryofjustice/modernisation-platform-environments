@@ -29,7 +29,7 @@ resource "aws_api_gateway_integration" "integration" {
   rest_api_id             = aws_api_gateway_rest_api.data_platform.id
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
-  uri                     = aws_lambda_function.authoriser.invoke_arn
+  uri                     = aws_lambda_function.presigned_url.invoke_arn
 
   request_parameters = {
     "integration.request.querystring.database"   = "method.request.querystring.database",
