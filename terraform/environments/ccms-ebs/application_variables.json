@@ -59,7 +59,8 @@
       "ebs_size_ebsdb_dbf": 8000,
       "ebs_size_ebsdb_redoA": 100,
       "ebs_size_ebsdb_techst": 50,
-      "ebs_size_ebsdb_backup": 8000
+      "ebs_size_ebsdb_backup": 8000,
+      "dbf_device": "nvme5n1"
     },
     "test": {
       "short_env": "tst",
@@ -119,7 +120,8 @@
       "ebs_size_ebsdb_dbf": 8000,
       "ebs_size_ebsdb_redoA": 100,
       "ebs_size_ebsdb_techst": 50,
-      "ebs_size_ebsdb_backup": 8000
+      "ebs_size_ebsdb_backup": 8000,
+      "dbf_device": "nvme5n1"
     },
     "preproduction": {
       "short_env": "prep",
@@ -179,7 +181,8 @@
       "ebs_size_ebsdb_dbf": 8000,
       "ebs_size_ebsdb_redoA": 100,
       "ebs_size_ebsdb_techst": 50,
-      "ebs_size_ebsdb_backup": 8000
+      "ebs_size_ebsdb_backup": 8000,
+      "dbf_device": "nvme7n1"
     },
     "production": {
       "short_env": "prod",
@@ -242,7 +245,8 @@
       "ebs_size_ebsdb_redoB": 50,
       "ebs_size_ebsdb_techst": 50,
       "ebs_size_ebsdb_backup": 8000,
-      "ebs_size_ebsdb_diag": 50
+      "ebs_size_ebsdb_diag": 50,
+      "dbf_device": "nvme7n1"
     }
   },
   "ec2_sg_base_ingress_rules": {
