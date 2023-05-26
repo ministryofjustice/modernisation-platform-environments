@@ -72,5 +72,5 @@ resource "aws_api_gateway_authorizer" "authorizer" {
   rest_api_id            = aws_api_gateway_rest_api.data_platform.id
   authorizer_uri         = aws_lambda_function.authoriser.invoke_arn
   authorizer_credentials = aws_iam_role.authoriser_role.arn
-  identity_source        = "method.request.header.authorisationToken"
+  identity_source        = "method.request.header.authorizationToken"
 }

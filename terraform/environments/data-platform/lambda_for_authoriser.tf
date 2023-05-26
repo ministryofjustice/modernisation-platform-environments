@@ -60,7 +60,7 @@ resource "aws_lambda_function" "authoriser" {
   depends_on       = [aws_iam_role_policy_attachment.attach_code_lambda_policy_to_iam_role]
   environment {
     variables = {
-      authorisationToken = "placeholder"
+      authorizationToken = "placeholder"
       api_resource_arn   = "${aws_api_gateway_rest_api.data_platform.arn}/*/*"
     }
   }
