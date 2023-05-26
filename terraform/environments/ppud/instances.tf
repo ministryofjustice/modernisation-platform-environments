@@ -147,6 +147,7 @@ resource "aws_instance" "s609693lo6vw108" {
   }
 }
 
+/*
 resource "aws_instance" "PPUD-DEV-AWS-AD" {
   count                  = local.is-development == true ? 1 : 0
   ami                    = "ami-04a9f465215b89a4b"
@@ -160,6 +161,7 @@ resource "aws_instance" "PPUD-DEV-AWS-AD" {
     backup = true
   }
 }
+*/
 
 #################################
 # Pre-Production (UAT Instances) #

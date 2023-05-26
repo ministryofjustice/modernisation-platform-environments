@@ -83,8 +83,18 @@ locals {
         }
         http8080 = {
           description = "Allow http8080 ingress"
-          from_port   = 8080
+          from_port   = 0
           to_port     = 8080
+          protocol    = "tcp"
+          cidr_blocks = [
+            "10.102.0.0/16", # NOMS-Mgmt
+          ]
+          security_groups = ["public"]
+        }
+        https = {
+          description = "Allow HTTPS ingress"
+          from_port   = 0
+          to_port     = 443
           protocol    = "tcp"
           cidr_blocks = [
             "10.102.0.0/16", # NOMS-Mgmt

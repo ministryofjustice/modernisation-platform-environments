@@ -86,11 +86,11 @@ resource "aws_ssm_document" "api_ad_join_domain" {
 # Associate Policy to Development Instance
 resource "aws_ssm_association" "ad_join_domain_association_dev" {
   count      = local.is-development == true ? 1 : 0
-  depends_on = [aws_instance.s609693lo6vw109, aws_instance.s609693lo6vw105, aws_instance.s609693lo6vw104, aws_instance.s609693lo6vw100, aws_instance.s609693lo6vw101, aws_instance.s609693lo6vw103, aws_instance.s609693lo6vw106, aws_instance.s609693lo6vw107, aws_instance.PPUDWEBSERVER2, aws_instance.s609693lo6vw102, aws_instance.s609693lo6vw108, aws_instance.PPUD-DEV-AWS-AD]
+  depends_on = [aws_instance.s609693lo6vw109, aws_instance.s609693lo6vw105, aws_instance.s609693lo6vw104, aws_instance.s609693lo6vw100, aws_instance.s609693lo6vw101, aws_instance.s609693lo6vw103, aws_instance.s609693lo6vw106, aws_instance.s609693lo6vw107, aws_instance.PPUDWEBSERVER2, aws_instance.s609693lo6vw102, aws_instance.s609693lo6vw108]
   name       = aws_ssm_document.api_ad_join_domain.name
   targets {
     key    = "InstanceIds"
-    values = [aws_instance.s609693lo6vw109[0].id, aws_instance.s609693lo6vw105[0].id, aws_instance.s609693lo6vw104[0].id, aws_instance.s609693lo6vw100[0].id, aws_instance.s609693lo6vw101[0].id, aws_instance.s609693lo6vw103[0].id, aws_instance.s609693lo6vw106[0].id, aws_instance.s609693lo6vw107[0].id, aws_instance.PPUDWEBSERVER2[0].id, aws_instance.s609693lo6vw102[0].id, aws_instance.s609693lo6vw108[0].id, aws_instance.PPUD-DEV-AWS-AD[0].id]
+    values = [aws_instance.s609693lo6vw109[0].id, aws_instance.s609693lo6vw105[0].id, aws_instance.s609693lo6vw104[0].id, aws_instance.s609693lo6vw100[0].id, aws_instance.s609693lo6vw101[0].id, aws_instance.s609693lo6vw103[0].id, aws_instance.s609693lo6vw106[0].id, aws_instance.s609693lo6vw107[0].id, aws_instance.PPUDWEBSERVER2[0].id, aws_instance.s609693lo6vw102[0].id, aws_instance.s609693lo6vw108[0].id]
   }
 }
 
@@ -116,53 +116,3 @@ resource "aws_ssm_association" "ad_join_domain_association_prod" {
     values = [aws_instance.s618358rgvw019[0].id, aws_instance.s618358rgvw020[0].id, aws_instance.s618358rgvw021[0].id, aws_instance.s618358rgvw022[0].id, aws_instance.s618358rgvw027[0].id, aws_instance.s618358rgvw204[0].id, aws_instance.s618358rgvw205[0].id, aws_instance.s618358rgsw025p[0].id]
   }
 }
-
-
-/*
-resource "aws_route53_resolver_endpoint" "ppud-domain" {
-  provider = aws.core-vpc
-
-  name      = local.application_data.accounts[local.environment].r53_resolver
-  direction = "OUTBOUND"
-
-  security_group_ids = [
-    aws_security_group.outbound_dns_resolver.id
-  ]
-
-  ip_address {
-    subnet_id = data.aws_subnet.public_subnets_a.id
-  }
-
-  ip_address {
-    subnet_id = data.aws_subnet.public_subnets_b.id
-  }
-
-  tags = {
-    Name = "ppud-ad-local-${local.application_name}-${local.environment}"
-  }
-}
-
-resource "aws_route53_resolver_rule" "fwd" {
-  provider = aws.core-vpc
-
-  domain_name          = local.application_data.accounts[local.environment].directory_service_name
-  name                 = local.application_data.accounts[local.environment].directory_service_name
-  rule_type            = "FORWARD"
-  resolver_endpoint_id = aws_route53_resolver_endpoint.ppud-domain.id
-
-  target_ip {
-    ip = aws_instance.infra1.private_ip
-  }
-
-  target_ip {
-    ip = aws_instance.infra2.private_ip
-  }
-}
-
-resource "aws_route53_resolver_rule_association" "ppud-domain" {
-  provider = aws.core-vpc
-
-  resolver_rule_id = aws_route53_resolver_rule.fwd.id
-  vpc_id           = data.aws_vpc.shared.id
-}
-*/

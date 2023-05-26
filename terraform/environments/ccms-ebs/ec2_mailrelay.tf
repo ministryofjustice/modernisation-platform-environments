@@ -92,7 +92,7 @@ module "cw-mailrelay-ec2" {
   imageId      = local.application_data.accounts[local.environment].mailrelay_ami_id
   instanceType = local.application_data.accounts[local.environment].ec2_instance_type_mailrelay
   fileSystem   = "xfs"       # Linux root filesystem
-  rootDevice   = "nvme0n1p1" # This is used by default for root on all the ec2 images
+  rootDevice   = "xvda1"     # MailRelay uses different instance family
 
   cpu_eval_periods  = local.application_data.cloudwatch_ec2.cpu.eval_periods
   cpu_datapoints    = local.application_data.cloudwatch_ec2.cpu.eval_periods
