@@ -336,3 +336,4 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_dbf" {
     device       = local.application_data.accounts[local.environment].dbf_device
   }
 }
+
