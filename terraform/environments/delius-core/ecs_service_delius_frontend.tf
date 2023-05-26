@@ -31,8 +31,8 @@ resource "aws_ssm_parameter" "delius_core_frontend_env_var_jdbc_password" {
   }
 }
 
-resource "aws_ssm_parameter" "delius_core_frontend_env_var_dev_password" {
-  name  = format("/%s/DEV_PASSWORD", local.application_name)
+resource "aws_ssm_parameter" "delius_core_frontend_env_var_dev_username" {
+  name  = format("/%s/DEV_USERNAME", local.application_name)
   type  = "SecureString"
   value = "INITIAL_VALUE_OVERRIDDEN"
   lifecycle {
@@ -42,8 +42,9 @@ resource "aws_ssm_parameter" "delius_core_frontend_env_var_dev_password" {
   }
   tags = local.tags
 }
-resource "aws_ssm_parameter" "delius_core_frontend_env_var_dev_username" {
-  name  = format("/%s/DEV_USERNAME", local.application_name)
+
+resource "aws_ssm_parameter" "delius_core_frontend_env_var_dev_password" {
+  name  = format("/%s/DEV_PASSWORD", local.application_name)
   type  = "SecureString"
   value = "INITIAL_VALUE_OVERRIDDEN"
   lifecycle {
