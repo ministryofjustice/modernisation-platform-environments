@@ -49,7 +49,7 @@ ingress {
     from_port   = 14000
     to_port     = 14000
     protocol    = "TCP"
-    cidr_blocks = [local.firstoim-cidr]
+    cidr_blocks = [local.first-cidr]
 
   }
 
@@ -58,7 +58,7 @@ ingress {
     from_port   = 9704
     to_port     = 9704
     protocol    = "TCP"
-    cidr_blocks = [local.firstoim-cidr]
+    cidr_blocks = [local.first-cidr]
 
   }
 
@@ -67,7 +67,7 @@ ingress {
     from_port   = 8
     to_port     = 1
     protocol    = "ICMP"
-    cidr_blocks = [local.firstoim-cidr]
+    cidr_blocks = [local.first-cidr]
 
   }
 
@@ -95,7 +95,7 @@ ingress {
   #   from_port   = 22
   #   to_port     = 22
   #   protocol    = "TCP"
-  #   cidr_blocks = [local.firstoim-cidr]
+  #   cidr_blocks = [local.first-cidr]
 
   # }
  
