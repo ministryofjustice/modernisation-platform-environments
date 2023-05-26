@@ -26,6 +26,10 @@ variable "fileSystem" {
   type        = string
   description = "the fileSystem for the alarm"
 }
+variable "short_env"{
+  type        = string
+  description = "Shortened environment name"
+}
 ###################
 variable "cpu_eval_periods"{
   type        = string
