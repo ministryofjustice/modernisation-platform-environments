@@ -179,8 +179,7 @@ locals {
         path = "/IDAM/product/runtime/Domain/mserver"
         # Filesystem = "/dev/nvme4n1"
         InstanceId = aws_instance.oam_instance_1.id
-        ImageId = aws_instance.oam_instance_1.ami
-        InstanceType = aws_instance.oam_instance_1.instance_type
+        fstype = "ext4"
       }
     }
     # ohs_instance_1 = {
