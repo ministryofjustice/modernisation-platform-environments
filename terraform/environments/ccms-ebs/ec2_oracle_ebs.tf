@@ -328,11 +328,12 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_dbf" {
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
 
   dimensions = {
-    InstanceId   = aws_instance.ec2_oracle_ebs.id
-    imageId      = aws_instance.ec2_oracle_ebs.ami
+    ImageId      = aws_instance.ec2_oracle_ebs.ami
+    path         = local.application_data.accounts[local.environment].dbf_path
     InstanceType = aws_instance.ec2_oracle_ebs.instance_type
-    path         = "/CCMS/EBS/dbf"
-    device       = local.application_data.accounts[local.environment].dbf_device
+    InstanceId   = aws_instance.ec2_oracle_ebs.id
     fstype       = "ext4"
+    device       = local.application_data.accounts[local.environment].dbf_device
   }
 }
+
