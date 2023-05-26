@@ -11,9 +11,17 @@ resource "aws_instance" "ec2_webgate" {
   associate_public_ip_address = false
   iam_instance_profile        = aws_iam_instance_profile.iam_instace_profile_ccms_base.name
 
+  cpu_core_count       = local.application_data.accounts[local.environment].ec2_oracle_instance_cores_webgate
+  cpu_threads_per_core = local.application_data.accounts[local.environment].ec2_oracle_instance_threads_webgate
+
   # Due to a bug in terraform wanting to rebuild the ec2 if more than 1 ebs block is attached, we need the lifecycle clause below
+  # Also includes ebs_optimized and cpu_core_count due to changing instance family from c5d.2xlarge to m5d.large
   lifecycle {
-    ignore_changes = [ebs_block_device]
+    ignore_changes = [
+      ebs_block_device,
+      ebs_optimized,
+      cpu_core_count
+    ]
   }
   user_data_replace_on_change = false
   user_data                   = <<EOF
@@ -97,20 +105,38 @@ EOF
 
 module "cw-webgate-ec2" {
   source = "./modules/cw-ec2"
+  count  = local.application_data.accounts[local.environment].webgate_no_instances
+  
+  short_env     = local.application_data.accounts[local.environment].short_env
+  name          = "ec2-webgate-${count.index + 1}"
+  topic         = aws_sns_topic.cw_alerts.arn
+  instanceId    = aws_instance.ec2_webgate[count.index].id
+  imageId       = data.aws_ami.webgate.id
+  instanceType  = local.application_data.accounts[local.environment].ec2_oracle_instance_type_webgate
+  fileSystem    = "xfs"       # Linux root filesystem
+  rootDevice    = "nvme0n1p1" # This is used by default for root on all the ec2 images
 
-  name  = "ec2-webgate"
-  topic = aws_sns_topic.cw_alerts.arn
+  cpu_eval_periods  = local.application_data.cloudwatch_ec2.cpu.eval_periods
+  cpu_datapoints    = local.application_data.cloudwatch_ec2.cpu.eval_periods
+  cpu_period        = local.application_data.cloudwatch_ec2.cpu.period
+  cpu_threshold     = local.application_data.cloudwatch_ec2.cpu.threshold
 
-  for_each     = local.application_data.cloudwatch_ec2
-  metric       = each.key
-  eval_periods = each.value.eval_periods
-  period       = each.value.period
-  threshold    = each.value.threshold
+  mem_eval_periods  = local.application_data.cloudwatch_ec2.mem.eval_periods
+  mem_datapoints    = local.application_data.cloudwatch_ec2.mem.eval_periods
+  mem_period        = local.application_data.cloudwatch_ec2.mem.period
+  mem_threshold     = local.application_data.cloudwatch_ec2.mem.threshold
 
-  # Dimensions used across all alarms
-  instanceId   = aws_instance.ec2_webgate[local.application_data.accounts[local.environment].webgate_no_instances - 1].id
-  imageId      = data.aws_ami.webgate.id
-  instanceType = local.application_data.accounts[local.environment].ec2_oracle_instance_type_webgate
-  fileSystem   = "xfs"       # Linux root filesystem
-  rootDevice   = "nvme0n1p1" # This is used by default for root on all the ec2 images
+  disk_eval_periods  = local.application_data.cloudwatch_ec2.disk.eval_periods
+  disk_datapoints    = local.application_data.cloudwatch_ec2.disk.eval_periods
+  disk_period        = local.application_data.cloudwatch_ec2.disk.period
+  disk_threshold     = local.application_data.cloudwatch_ec2.disk.threshold
+
+  insthc_eval_periods  = local.application_data.cloudwatch_ec2.insthc.eval_periods
+  insthc_period        = local.application_data.cloudwatch_ec2.insthc.period
+  insthc_threshold     = local.application_data.cloudwatch_ec2.insthc.threshold
+
+  syshc_eval_periods  = local.application_data.cloudwatch_ec2.syshc.eval_periods
+  syshc_period        = local.application_data.cloudwatch_ec2.syshc.period
+  syshc_threshold     = local.application_data.cloudwatch_ec2.syshc.threshold
+
 }

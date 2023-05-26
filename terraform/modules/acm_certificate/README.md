@@ -3,6 +3,14 @@ account, core-vpc account or core-network-shared-services account. Ensure
 the validation map contains entries for both the `domain_name` and all
 entries within `subject_alternate_names`.
 
+If there are DNS zones where validation records cannot be created by the
+module, the certificate is created in a 2 step process.
+
+Step 1: Create the certificate. Create any external DNS entries given
+in the `validation_records_external` output.
+Step 2: Set the `external_validation_records_created` variable to true
+to validate the certificate.
+
 Example usage:
 
 ```
@@ -19,17 +27,22 @@ locals {
       }
     }
     cloudwatch_metric_alarms_acm = {
-      name-of-alarm-here = {
-        See alarm examples in nomis/locals-acm-certificates.tf
-        NOTE: This can be an empty map if no alarms are required
+      renewal-alert = {
+        comparison_operator = "LessThanThreshold"
+        evaluation_periods  = "1"
+        datapoints_to_alarm = "1"
+        metric_name         = "DaysToExpiry"
+        namespace           = "AWS/CertificateManager"
+        period              = "86400"
+        statistic           = "Minimum"
+        threshold           = "14"
+        alarm_description   = "Triggers if an ACM certificate has not automatically renewed and is expiring soon. Automatic renewal should happen 60 days prior to expiration."
       }
     }
   }
 }
 
 module "acm_certificate" {
-  for_each = local.acm_certificates
-
   source = "./modules/acm_certificate"
 
   providers = {
@@ -37,17 +50,32 @@ module "acm_certificate" {
     aws.core-network-services = aws.core-network-services
   }
 
-  name                    = each.key
-  domain_name             = each.value.domain_name
-  subject_alternate_names = each.value.subject_alternate_names
-  route53_zones           = module.environment.route53_zones  # a map of all created zones for use in validation
-  validation              = each.value.validation             # or use this to explicitly define validation
-  tags                    = merge(local.tags, lookup(each.value, "tags", {}))
-  cloudwatch_metric_alarms = {
-    for key, value in local.acm_certificates.cloudwatch_metric_alarms_acm :
-    key => merge(value, {
-      alarm_actions = [lookup(local.environment_config, "sns_topic", aws_sns_topic.nomis_nonprod_alarms.arn)]
-    })
+  name                    = "wildcard environment cert"
+  domain_name             = "modernisation-platform.service.justice.gov.uk"
+  subject_alternate_names = ["*.${local.application_name}.${local.vpc_name}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
+  validation = {
+    "modernisation-platform.service.justice.gov.uk" = {
+      account   = "core-network-services"
+      zone_name = "modernisation-platform.service.justice.gov.uk."
+    }
+    "*.${local.application_name}.${local.vpc_name}-${local.environment}.modernisation-platform.service.justice.gov.uk" = {
+      account   = "core-vpc"
+      zone_name = "${local.vpc_name}-${local.environment}.modernisation-platform.service.justice.gov.uk."
+    }
+  }
+
+  cloudwatch_metric_alarms_acm = {
+    renewal-alert = {
+      comparison_operator = "LessThanThreshold"
+      evaluation_periods  = "1"
+      datapoints_to_alarm = "1"
+      metric_name         = "DaysToExpiry"
+      namespace           = "AWS/CertificateManager"
+      period              = "86400"
+      statistic           = "Minimum"
+      threshold           = "14"
+      alarm_description   = "Triggers if an ACM certificate has not automatically renewed and is expiring soon. Automatic renewal should happen 60 days prior to expiration."
+    }
   }
 }
 ```
@@ -69,6 +97,4 @@ to explicitly define the mapping between `domain_name` and `zone`, e.g.
         }
 ```
 
-With the alarm settings - don't forget to set your own aws_sns_topic values.
-
-If you want to use a channel specifically for say, <environment>-producation then you can do that by adding the following to that environment's locals-<environment>.tf file: `sns_topic = aws_sns_topic.<sns_topic>.arn`
+With the alarm settings - don't forget to set your own `aws_sns_topic` values.

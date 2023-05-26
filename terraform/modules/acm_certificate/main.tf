@@ -72,13 +72,10 @@ resource "aws_route53_record" "validation_self" {
 }
 
 resource "aws_acm_certificate_validation" "this" {
+  count           = (length(local.validation_records_external) == 0 || var.external_validation_records_created) ? 1 : 0
   certificate_arn = aws_acm_certificate.this.arn
   validation_record_fqdns = [
-    for record in merge(
-      aws_route53_record.validation_core_network_services,
-      aws_route53_record.validation_core_vpc,
-      aws_route53_record.validation_self
-    ) : record.fqdn
+    for key, value in local.validation_records : replace(value.name, "/\\.$/", "")
   ]
   depends_on = [
     aws_route53_record.validation_core_network_services,

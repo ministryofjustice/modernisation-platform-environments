@@ -1,3 +1,30 @@
+locals {
+
+  # from the MP cert module's readme....
+
+  non_prod_validation = {
+    "modernisation-platform.service.justice.gov.uk" = {
+      account   = "core-network-services"
+      zone_name = "modernisation-platform.service.justice.gov.uk."
+    }
+    "${local.application_name}.${var.networking[0].business-unit}-${local.environment}.${local.application_data.accounts[local.environment].acm_cert_domain_name}" = {
+      account   = "core-vpc"
+      zone_name = "${local.vpc_name}-${local.environment}.modernisation-platform.service.justice.gov.uk."
+    }
+  }
+
+  prod_validation = {
+    "${local.application_data.accounts[local.environment].acm_cert_domain_name}" = {
+      account   = "core-network-services"
+      zone_name = "${local.application_data.accounts[local.environment].acm_cert_domain_name}"
+    }
+  }
+
+
+}
+
+
+
 module "alb" {
   source = "./modules/alb"
   providers = {
@@ -8,6 +35,7 @@ module "alb" {
   }
 
   vpc_all                          = local.vpc_all
+  fqdn                             = local.environment == "production" ? local.application_data.accounts[local.environment].acm_cert_domain_name : "${local.application_name}.${var.networking[0].business-unit}-${local.environment}.${local.application_data.accounts[local.environment].acm_cert_domain_name}"
   application_name                 = local.application_name
   business_unit                    = var.networking[0].business-unit
   public_subnets                   = [data.aws_subnet.public_subnets_a.id, data.aws_subnet.public_subnets_b.id, data.aws_subnet.public_subnets_c.id]
@@ -25,10 +53,14 @@ module "alb" {
   moj_vpn_cidr_block               = local.application_data.accounts[local.environment].moj_vpn_cidr
   # existing_bucket_name = "" # An s3 bucket name can be provided in the module by adding the `existing_bucket_name` variable and adding the bucket name
 
+  validation = local.environment == "production" ? local.prod_validation : local.non_prod_validation
+
+
   listener_protocol = "HTTPS"
   listener_port     = 443
   alb_ssl_policy    = "ELBSecurityPolicy-TLS-1-2-2017-01" # TODO This enforces TLSv1.2. For general, use ELBSecurityPolicy-2016-08 instead 
 
+  production_zone_id   = data.aws_route53_zone.production-network-services.zone_id
   services_zone_id     = data.aws_route53_zone.network-services.zone_id
   external_zone_id     = data.aws_route53_zone.external.zone_id
   acm_cert_domain_name = local.application_data.accounts[local.environment].acm_cert_domain_name

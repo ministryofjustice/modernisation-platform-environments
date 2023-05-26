@@ -69,7 +69,13 @@ variable "tags" {
 
 variable "script_location" {
   type        = string
-  description = "(Required) Specifies the S3 path to a script that executes a job."
+  description = "(Optional) Specifies the S3 path to a script that executes a job."
+}
+
+variable "command_type" {
+  type        = string
+  default     = "glueetl"
+  description = "(Optional) Specifies the command type. Either glueetl or gluestreaming."
 }
 
 variable "python_version" {
@@ -109,7 +115,7 @@ variable "max_concurrent_runs" {
 
 variable "glue_version" {
   type        = string
-  default     = "3.0"
+  default     = "4.0"
   description = "(Optional) The version of glue to use."
 }
 
@@ -149,14 +155,14 @@ variable "create_role" {
   description = "(Optional) Create AWS IAM role associated with the job."
 }
 
-variable "timeout" {
-  type        = number
-  default     = 120
-  description = "(Optional) The job timeout in minutes."
-}
+#variable "timeout" {
+#  type        = number
+#  default     = null
+#  description = "(Optional) The job timeout in minutes."
+#}
 
 variable "execution_class" {
-  default     = "FLEX"
+  default     = "STANDARD"
   description = "Execution CLass Standard or FLex"
 }
 
@@ -316,8 +322,12 @@ variable "continuous_log_stream_prefix" {
   description = "(Optional) Specifies a custom CloudWatch log stream prefix for a job enabled for continuous logging."
 }
 
-variable "create_kinesis_ingester" {
-  type        = bool
-  default     = false
-  description = "Whether to create Kinesis Stream"
+variable "region" {
+  description = "Current AWS Region."
+  default     = "eu-west-2"
+}
+
+variable "account" {
+  description = "AWS Account ID."
+  default     = ""
 }

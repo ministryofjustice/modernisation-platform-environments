@@ -57,8 +57,22 @@ data "aws_ami" "accessgate" {
   }
 }
 
-## IAM
-data "aws_iam_policy_document" "sns_topic_policy" {
+data "aws_ami" "oracle_db_dr" {
+  most_recent = true
+  owners      = [local.application_data.accounts[local.environment].ami_owner]
+
+  filter {
+    name   = "name"
+    values = [local.application_data.accounts[local.environment].orace_db_dr_ami_name]
+  }
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+}
+
+## SNS IAM Policies
+data "aws_iam_policy_document" "sns_topic_policy_ec2cw" {
   policy_id = "SnsTopicId"
   statement {
     sid = "statement1"
@@ -77,7 +91,59 @@ data "aws_iam_policy_document" "sns_topic_policy" {
       "SNS:Publish",
       "SNS:Receive"
     ]
-    resources = [aws_sns_topic.cw_alerts.arn]
+    resources = [
+      aws_sns_topic.cw_alerts.arn
+    ]
+  }
+}
+
+data "aws_iam_policy_document" "sns_topic_policy_s3" {
+  policy_id = "SnsTopicId"
+  statement {
+    sid = "statement1"
+    principals {
+      type        = "AWS"
+      identifiers = ["*"]
+    }
+    effect = "Allow"
+    actions = [
+      "SNS:GetTopicAttributes",
+      "SNS:SetTopicAttributes",
+      "SNS:AddPermission",
+      "SNS:DeleteTopic",
+      "SNS:Subscribe",
+      "SNS:ListSubscriptionsByTopic",
+      "SNS:Publish",
+      "SNS:Receive"
+    ]
+    resources = [
+      aws_sns_topic.s3_topic.arn
+    ]
+  }
+}
+
+data "aws_iam_policy_document" "sns_topic_policy_ddos" {
+  policy_id = "SnsTopicId"
+  statement {
+    sid = "statement1"
+    principals {
+      type        = "AWS"
+      identifiers = ["*"]
+    }
+    effect = "Allow"
+    actions = [
+      "SNS:GetTopicAttributes",
+      "SNS:SetTopicAttributes",
+      "SNS:AddPermission",
+      "SNS:DeleteTopic",
+      "SNS:Subscribe",
+      "SNS:ListSubscriptionsByTopic",
+      "SNS:Publish",
+      "SNS:Receive"
+    ]
+    resources = [
+      aws_sns_topic.ddos_alarm.arn
+    ]
   }
 }
 
@@ -127,4 +193,29 @@ data "aws_iam_policy_document" "s3_topic_policy" {
       ]
     }
   }
+}
+
+## PROD CERT
+data "aws_route53_zone" "application-zone" {
+  provider = aws.core-network-services
+
+  name         = "ccms-ebs.service.justice.gov.uk."
+  private_zone = false
+}
+
+## GANDI CERT
+
+data "aws_acm_certificate" "gandi_cert" {
+  domain   = local.application_data.accounts[local.environment].lz_domain_name
+  statuses = ["ISSUED"]
+}
+
+
+## PROD DNS
+
+data "aws_route53_zone" "prod-network-services" {
+  provider = aws.core-network-services
+
+  name         = "ccms-ebs.service.justice.gov.uk."
+  private_zone = false
 }

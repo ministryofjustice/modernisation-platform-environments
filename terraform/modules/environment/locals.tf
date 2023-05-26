@@ -36,6 +36,7 @@ locals {
       modernisation_platform    = "modernisation-platform.service.justice.gov.uk"
       business_unit_environment = "${var.business_unit}-${var.environment}.modernisation-platform.service.justice.gov.uk"
       application_environment   = "${var.application_name}.${var.business_unit}-${var.environment}.modernisation-platform.service.justice.gov.uk"
+      short_name                = "${var.application_name}.service.justice.gov.uk"
     }
     internal = {
       modernisation_platform    = "modernisation-platform.internal"

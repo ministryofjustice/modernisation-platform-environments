@@ -147,6 +147,7 @@ resource "aws_instance" "s609693lo6vw108" {
   }
 }
 
+/*
 resource "aws_instance" "PPUD-DEV-AWS-AD" {
   count                  = local.is-development == true ? 1 : 0
   ami                    = "ami-04a9f465215b89a4b"
@@ -160,6 +161,7 @@ resource "aws_instance" "PPUD-DEV-AWS-AD" {
     backup = true
   }
 }
+*/
 
 #################################
 # Pre-Production (UAT Instances) #
@@ -240,9 +242,10 @@ resource "aws_instance" "s618358rgvw023" {
 # Production Instances  #
 #########################
 
+
 resource "aws_instance" "s618358rgvw019" {
   count                  = local.is-production == true ? 1 : 0
-  ami                    = "ami-0eccca367d5cb093d"
+  ami                    = "ami-01d04f2e4f8cea4dd"
   instance_type          = "c5.xlarge"
   source_dest_check      = false
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
@@ -256,7 +259,7 @@ resource "aws_instance" "s618358rgvw019" {
 
 resource "aws_instance" "s618358rgvw020" {
   count                  = local.is-production == true ? 1 : 0
-  ami                    = "ami-0cd0c96a5812bb89c"
+  ami                    = "ami-0e49fc9838fdf33c4"
   instance_type          = "c5.xlarge"
   source_dest_check      = false
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
@@ -270,7 +273,7 @@ resource "aws_instance" "s618358rgvw020" {
 
 resource "aws_instance" "s618358rgvw021" {
   count                  = local.is-production == true ? 1 : 0
-  ami                    = "ami-0d089b6f6f97b4499"
+  ami                    = "ami-031ef868c45661b8e"
   instance_type          = "m5.2xlarge"
   source_dest_check      = false
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
@@ -284,7 +287,7 @@ resource "aws_instance" "s618358rgvw021" {
 
 resource "aws_instance" "s618358rgvw022" {
   count                  = local.is-production == true ? 1 : 0
-  ami                    = "ami-03884b85ddac5116d"
+  ami                    = "ami-0ea8a11d51f242c52"
   instance_type          = "m5.xlarge"
   source_dest_check      = false
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
@@ -298,7 +301,7 @@ resource "aws_instance" "s618358rgvw022" {
 
 resource "aws_instance" "s618358rgvw027" {
   count                  = local.is-production == true ? 1 : 0
-  ami                    = "ami-063a7b8df5fff4d91"
+  ami                    = "ami-0280b58742d303104"
   instance_type          = "m5.xlarge"
   source_dest_check      = false
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
@@ -312,11 +315,11 @@ resource "aws_instance" "s618358rgvw027" {
 
 resource "aws_instance" "s618358rgvw204" {
   count                  = local.is-production == true ? 1 : 0
-  ami                    = "ami-017f92274d668b744"
+  ami                    = "ami-0e8380f304bd2caab"
   instance_type          = "c5.xlarge"
   source_dest_check      = false
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.PPUD-WEB-Portal.id]
+  vpc_security_group_ids = [aws_security_group.WAM-Portal.id]
   subnet_id              = data.aws_subnet.private_subnets_a.id
   tags = {
     Name          = "s618358rgvw204"
@@ -326,7 +329,7 @@ resource "aws_instance" "s618358rgvw204" {
 
 resource "aws_instance" "s618358rgvw205" {
   count                  = local.is-production == true ? 1 : 0
-  ami                    = "ami-07c77cc15216ae1e6"
+  ami                    = "ami-0b6b39448c2d727c3"
   instance_type          = "c5.large"
   source_dest_check      = false
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
@@ -340,7 +343,7 @@ resource "aws_instance" "s618358rgvw205" {
 
 resource "aws_instance" "s618358rgsw025p" {
   count                  = local.is-production == true ? 1 : 0
-  ami                    = "ami-0f1f2959cba8dbefc"
+  ami                    = "ami-0b8f6843db88aa8a6"
   instance_type          = "c5.4xlarge"
   source_dest_check      = false
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
@@ -360,22 +363,9 @@ resource "aws_instance" "s266316rgsl200" {
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.PPUD-Mail-Server[0].id]
   subnet_id              = data.aws_subnet.private_subnets_b.id
+  key_name               = aws_key_pair.cjms_instance[0].key_name
   tags = {
     Name          = "s266316rgsl200"
-    is-production = true
-  }
-}
-
-resource "aws_instance" "s266316rgsl201" {
-  count                  = local.is-production == true ? 1 : 0
-  ami                    = "ami-0f43890c2b4907c29"
-  instance_type          = "m5.large"
-  source_dest_check      = false
-  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.PPUD-Mail-Server[0].id]
-  subnet_id              = data.aws_subnet.private_subnets_c.id
-  tags = {
-    Name          = "s266316rgsl201"
     is-production = true
   }
 }
@@ -389,6 +379,7 @@ resource "aws_instance" "s265903rgsl400" {
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.PPUD-Mail-Server-2[0].id]
   subnet_id              = data.aws_subnet.private_subnets_b.id
+  key_name               = aws_key_pair.cjms_instance[0].key_name
   tags = {
     Name          = "s265903rgsl400"
     is-production = true
@@ -403,8 +394,45 @@ resource "aws_instance" "s265903rgsl401" {
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
   vpc_security_group_ids = [aws_security_group.PPUD-Mail-Server-2[0].id]
   subnet_id              = data.aws_subnet.private_subnets_c.id
+  key_name               = aws_key_pair.cjms_instance[0].key_name
   tags = {
     Name          = "s265903rgsl401"
     is-production = true
   }
+}
+
+resource "aws_key_pair" "cjms_instance" {
+  count      = local.is-production == true ? 1 : 0
+  key_name   = "linuxcjms"
+  public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDH6T6qfPg3nUtc+A0KiWra+Alg5MyBu31FYTDvaYUY9r8ySG1+Aiz+FlV6bGQGHFaKia2GNKc/OEQ9fIs0mDDRQRoc5jtli4wwP9VtLPd7c+VdywoVvPaqAgW8KzpqTdcH8RUC1w0+12UmVlPp/RQg1b8vSVOqI0aXOVm9Faitd+YDERtJGbxdgMjaCpoJcRMjmX3omFJFU1egjOePzagOp6RZOonvGOARYat2v0yB01m7PIMwxcmP6bClx/ME9EZ6uTWYI9+wEyBwWdRYM8MV+DRe3BcepPUI/uQVJ/CDtS1f3snSKE9GKJFnUAhBp263ezZyBlidDL4L3mPzpSHV ctl\\ac97864@GBR-5CG9525GMX"
+}
+
+# resource block for eip
+resource "aws_eip" "s265903rgsl400-eip" {
+  count = local.is-production == true ? 1 : 0
+  vpc   = true
+  tags = {
+    Name = "s265903rgsl400"
+  }
+}
+
+resource "aws_eip" "s265903rgsl401-eip" {
+  count = local.is-production == true ? 1 : 0
+  vpc   = true
+  tags = {
+    Name = "s265903rgsl401"
+  }
+}
+
+#Associate EIP with EC2 Instance
+resource "aws_eip_association" "s265903rgsl400-eip-association" {
+  count         = local.is-production == true ? 1 : 0
+  instance_id   = aws_instance.s265903rgsl400[0].id
+  allocation_id = aws_eip.s265903rgsl400-eip[0].id
+}
+
+resource "aws_eip_association" "s265903rgsl401-eip-association" {
+  count         = local.is-production == true ? 1 : 0
+  instance_id   = aws_instance.s265903rgsl401[0].id
+  allocation_id = aws_eip.s265903rgsl401-eip[0].id
 }

@@ -28,11 +28,6 @@ output "kinesis_stream_iam_policy_write_only_arn" {
   value       = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_write_only_arn
 }
 
-#output "kinesis_stream_iam_policy_admin_arn" {
-#  description = "The IAM Policy (ARN) admin of the Stream"
-#  value       = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_admin_arn
-#}
-
 ### datamart
 
 output "cluster_arn" {
@@ -95,11 +90,6 @@ output "cluster_encrypted" {
   value       = module.datamart.cluster_encrypted
 }
 
-output "cluster_security_groups" {
-  description = "The security groups associated with the cluster"
-  value       = module.datamart.cluster_security_groups
-}
-
 output "cluster_vpc_security_group_ids" {
   description = "The VPC security group ids associated with the cluster"
   value       = module.datamart.cluster_vpc_security_group_ids
@@ -155,16 +145,26 @@ output "ec2_private_key" {
 # DMS Subnet ids
 output "dms_subnets" {
   description = "DMS Subnet IDs"
-  value       = module.dms_nomis_t3.dms_subnet_ids
+  value       = module.dms_nomis_ingestor.dms_subnet_ids
 }
 
-## S3 Bucket Outputs
-output "s3_bucket_id" {
-  description = "S3 Nomis Oracle Notification Bucket ID"
-  value       = module.s3_nomis_oracle_sqs.bucket_id
+## Dynamo Domain Registry DB table
+output "dynamodb_table_arn" {
+  description = "ARN of the DynamoDB table"
+  value       = module.dynamo_tab_domain_registry.dynamodb_table_arn
 }
 
-output "s3_bucket_arn" {
-  description = "S3 Nomis Oracle Notification Bucket ARN"
-  value       = module.s3_nomis_oracle_sqs.bucket_arn
+output "dynamodb_table_id" {
+  description = "ID of the DynamoDB table"
+  value       = module.dynamo_tab_domain_registry.dynamodb_table_id
+}
+
+output "dynamodb_table_stream_arn" {
+  description = "The ARN of the Table Stream. Only available when var.stream_enabled is true"
+  value       = module.dynamo_tab_domain_registry.dynamodb_table_stream_arn
+}
+
+output "dynamodb_table_stream_label" {
+  description = "A timestamp, in ISO 8601 format of the Table Stream. Only available when var.stream_enabled is true"
+  value       = module.dynamo_tab_domain_registry.dynamodb_table_stream_label
 }

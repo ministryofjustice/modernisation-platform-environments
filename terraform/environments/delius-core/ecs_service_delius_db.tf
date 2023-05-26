@@ -247,7 +247,7 @@ resource "aws_ecs_service" "delius-db-service" {
   task_definition = aws_ecs_task_definition.delius_db_task_definition.arn
   network_configuration {
     assign_public_ip = false
-    subnets          = data.aws_subnets.private-public.ids
+    subnets          = data.aws_subnets.shared-private.ids
     security_groups  = [aws_security_group.delius_db_security_group.id]
   }
   # Removed until we're clear on the implementation of service discovery on mod platform
@@ -265,6 +265,22 @@ resource "aws_ecs_service" "delius-db-service" {
   tags                               = local.tags
   triggers                           = {} # Change this for force redeployment
 
+}
+
+# Create route 53 record representing above DB endpoint
+# This is a _tactical_ and _temporary_ record designed to
+# - simulate service discovery, albeit a lesser version of
+# - give us a way to see the ECS front end connecting to the ECS backend
+# - which gives us an accessible and testable front end app
+# At the time of writing, this will be replaced in time with a record pointing to an EC2 Oracle instance
+# It assumes that the ECS task for the DB will be long lived (and hence the IP will not get recycled)
+resource "aws_route53_record" "delius-core-db" {
+  provider = aws.core-vpc
+  zone_id  = data.aws_route53_zone.inner.zone_id
+  name     = "${local.db_service_name}-${local.application_name}.${data.aws_route53_zone.inner.name}"
+  type     = "A"
+  ttl      = 300
+  records  = ["10.26.26.165"]
 }
 
 ##

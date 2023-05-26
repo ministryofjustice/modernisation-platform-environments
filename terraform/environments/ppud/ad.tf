@@ -86,11 +86,11 @@ resource "aws_ssm_document" "api_ad_join_domain" {
 # Associate Policy to Development Instance
 resource "aws_ssm_association" "ad_join_domain_association_dev" {
   count      = local.is-development == true ? 1 : 0
-  depends_on = [aws_instance.s609693lo6vw109, aws_instance.s609693lo6vw105, aws_instance.s609693lo6vw104, aws_instance.s609693lo6vw100, aws_instance.s609693lo6vw101, aws_instance.s609693lo6vw103, aws_instance.s609693lo6vw106, aws_instance.s609693lo6vw107, aws_instance.PPUDWEBSERVER2, aws_instance.s609693lo6vw102, aws_instance.s609693lo6vw108, aws_instance.PPUD-DEV-AWS-AD]
+  depends_on = [aws_instance.s609693lo6vw109, aws_instance.s609693lo6vw105, aws_instance.s609693lo6vw104, aws_instance.s609693lo6vw100, aws_instance.s609693lo6vw101, aws_instance.s609693lo6vw103, aws_instance.s609693lo6vw106, aws_instance.s609693lo6vw107, aws_instance.PPUDWEBSERVER2, aws_instance.s609693lo6vw102, aws_instance.s609693lo6vw108]
   name       = aws_ssm_document.api_ad_join_domain.name
   targets {
     key    = "InstanceIds"
-    values = [aws_instance.s609693lo6vw109[0].id, aws_instance.s609693lo6vw105[0].id, aws_instance.s609693lo6vw104[0].id, aws_instance.s609693lo6vw100[0].id, aws_instance.s609693lo6vw101[0].id, aws_instance.s609693lo6vw103[0].id, aws_instance.s609693lo6vw106[0].id, aws_instance.s609693lo6vw107[0].id, aws_instance.PPUDWEBSERVER2[0].id, aws_instance.s609693lo6vw102[0].id, aws_instance.s609693lo6vw108[0].id, aws_instance.PPUD-DEV-AWS-AD[0].id]
+    values = [aws_instance.s609693lo6vw109[0].id, aws_instance.s609693lo6vw105[0].id, aws_instance.s609693lo6vw104[0].id, aws_instance.s609693lo6vw100[0].id, aws_instance.s609693lo6vw101[0].id, aws_instance.s609693lo6vw103[0].id, aws_instance.s609693lo6vw106[0].id, aws_instance.s609693lo6vw107[0].id, aws_instance.PPUDWEBSERVER2[0].id, aws_instance.s609693lo6vw102[0].id, aws_instance.s609693lo6vw108[0].id]
   }
 }
 
@@ -104,6 +104,7 @@ resource "aws_ssm_association" "ad_join_domain_association_preprod" {
     values = [aws_instance.s618358rgvw201[0].id, aws_instance.S618358RGVW202[0].id, aws_instance.s618358rgsw025[0].id, aws_instance.s618358rgvw024[0].id, aws_instance.s618358rgvw023[0].id]
   }
 }
+
 
 # Associate Policy to PROD Instance
 resource "aws_ssm_association" "ad_join_domain_association_prod" {

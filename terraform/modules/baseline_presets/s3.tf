@@ -1,5 +1,22 @@
 locals {
 
+  s3_buckets = merge(
+    var.options.enable_shared_s3 && var.environment.environment == "production" ? { "prodpreprod-${var.environment.application_name}-" = {
+      bucket_policy_v2 = [
+        local.s3_bucket_policies.ImageBuilderWriteAccessBucketPolicy,
+        local.s3_bucket_policies.ProdPreprodEnvironmentsWriteAccessBucketPolicy
+      ]
+      iam_policies = local.s3_iam_policies
+    } } : {},
+    var.options.enable_shared_s3 && var.environment.environment == "test" ? { "devtest-${var.environment.application_name}-" = {
+      bucket_policy_v2 = [
+        local.s3_bucket_policies.ImageBuilderWriteAccessBucketPolicy,
+        local.s3_bucket_policies.DevTestEnvironmentsWriteAndDeleteAccessBucketPolicy
+      ]
+      iam_policies = local.s3_iam_policies
+    } } : {}
+  )
+
   s3_bucket_policies = {
 
     ImageBuilderReadOnlyAccessBucketPolicy = {

@@ -1,20 +1,12 @@
 # ssm-documents
 
-This directory contains the Terraform code to create the SSM Command documents used by the Nomis service.
+Note that our EC2 instances are primarily managed and provisioned by ansible in.
 
-These are uploaded into each nomis-\* environment when ec2-common.tf runs or if they're only specified in a particular ec2-<instance_type>.tf then they will only be uploaded to the environment where that instance type is deployed.
+Ansible can be run manually or via the SSM document provided here.
 
 SSM Command documents are basically "scripts" that can be run against EC2 instances or other targets. Starting point for understanding these and their capabilities is the [AWS documentation](https://docs.aws.amazon.com/systems-manager/latest/userguide/execute-remote-commands.html)
 
 While there are a LOT of pre-built AWS official ones they are all comprised of the same building blocks: [AWS Systems Manager Run Command document plugin reference](https://docs.aws.amazon.com/systems-manager/latest/userguide/ssm-plugins.html)
-
-## individual-ssm-documents
-
-### s3auditupload.yaml.tftmpl
-
-Calls a specific ansible playbook directly from the [modernisation-platform-configuration-management](https://github.com/ministryofjustice/modernisation-platform-configuration-management) repository.
-
-Note that this particular ssm document runs using Python3.9 so cannot be run on the weblogic/rhel6-10 AMI based machines which only have Python3.6 installed.
 
 ## generic run-ansible-patches ssm document
 

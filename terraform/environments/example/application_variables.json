@@ -1,6 +1,8 @@
 {
   "accounts": {
     "development": {
+      "app_name": "example",
+      "launch_type": "EC2",
       "allow_major_version_upgrade": "false",
       "ami_image_id": "ami-0d729d2846a86a9e7",
       "backup_window": "16:00-17:00",

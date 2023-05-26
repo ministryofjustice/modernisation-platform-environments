@@ -5,14 +5,15 @@
 resource "aws_db_instance" "this" {
   identifier = var.identifier
 
-  engine            = var.instance.engine
-  engine_version    = var.instance.engine_version
-  instance_class    = var.instance.instance_class
-  allocated_storage = var.instance.allocated_storage
-  storage_type      = var.instance.storage_type
-  storage_encrypted = var.instance.storage_encrypted
-  kms_key_id        = var.instance.kms_key_id
-  license_model     = var.instance.license_model
+  engine              = var.instance.engine
+  engine_version      = var.instance.engine_version
+  instance_class      = var.instance.instance_class
+  allocated_storage   = var.instance.allocated_storage
+  storage_type        = var.instance.storage_type
+  storage_encrypted   = var.instance.storage_encrypted
+  kms_key_id          = var.instance.kms_key_id != null ? var.instance.kms_key_id : null
+  license_model       = var.instance.license_model
+  deletion_protection = var.instance.deletion_protection
 
   db_name                             = var.instance.db_name
   username                            = var.instance.username
@@ -59,6 +60,7 @@ resource "aws_db_instance" "this" {
 resource "aws_db_instance_automated_backups_replication" "this" {
   source_db_instance_arn = aws_db_instance.this.arn
   retention_period       = var.instance_automated_backups_replication
+  kms_key_id             = var.instance.kms_key_id != null ? var.instance.kms_key_id : null
 }
 
 #-------------------------------------------------------------
@@ -74,6 +76,7 @@ resource "aws_ssm_parameter" "db_password" {
   description = "RDS Admin Password"
   type        = "SecureString"
   value       = random_password.rds_admin_password.result
+  key_id      = var.ssm_kms_key_id != null ? var.ssm_kms_key_id : null
 }
 
 #------------------------------------------------------------------------------

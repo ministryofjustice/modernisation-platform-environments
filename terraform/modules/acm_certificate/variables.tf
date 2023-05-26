@@ -28,6 +28,12 @@ variable "validation" {
   default     = {}
 }
 
+variable "external_validation_records_created" {
+  description = "Only needed if there are external validation records.  Set it to true when they've been created.  See README.md"
+  type        = bool
+  default     = false
+}
+
 variable "tags" {
   type        = map(any)
   description = "Default tags to be applied to resources"

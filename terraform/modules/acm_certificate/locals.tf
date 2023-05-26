@@ -43,8 +43,16 @@ locals {
           lookup(
             local.route53_zones,
             replace(dvo.domain_name, "/^[^.]*.[^.]*./", ""),
-            null
+            { provider = "external" }
       )))
     }
+  }
+
+  validation_records_external = {
+    for key, value in local.validation_records : key => {
+      name   = value.name
+      record = value.record
+      type   = value.type
+    } if value.zone.provider == "external"
   }
 }

@@ -1,6 +1,7 @@
 {
   "accounts": {
     "development": {
+      "migration_source_account_id": "377957503799",
       "network_mode": "bridge",
       "app_count": "1",
       "server_port": "5000",
@@ -29,8 +30,9 @@
       "db_monitoring_interval": "5",
       "db_enabled_cloudwatch_logs_exports": ["agent", "error"],
       "db_performance_insights_enabled": "false",
+      "db_deletion_protection": "false",
       "db_skip_final_snapshot": "true",
-      "db_snapshot_identifier": "jitbit-migration-dev"
+      "db_snapshot_identifier": "cr-jitbit-dev-db-snapshot-for-testing-migration-to-mp-copy"
     }
   }
 }

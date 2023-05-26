@@ -1,22 +1,6 @@
-# oasys-development environment specific settings
+# environment specific settings
 locals {
   development_config = {
-
-    # cloud watch log groups
-    log_groups = {
-      session-manager-logs = {
-        retention_days = 90
-      }
-      cwagent-var-log-messages = {
-        retention_days = 30
-      }
-      cwagent-var-log-secure = {
-        retention_days = 90
-      }
-      cwagent-oasys-autologoff = {
-        retention_days = 90
-      }
-    }
 
     ec2_common = {
       patch_approval_delay_days = 3
@@ -34,87 +18,103 @@ locals {
     }
 
     baseline_ec2_instances = {
-
-      # Example instance using RedHat image with ansible provisioning
-      # dev-redhat-rhel79-1 = {
-      #   config = merge(module.baseline_presets.ec2_instance.config.default, {
-      #     ami_name  = "RHEL-7.9_HVM-*"
-      #     ami_owner = "309956199498"
-      #   })
-      #   instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-      #     vpc_security_group_ids = ["private"]
-      #   })
-      #   user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
-      #   tags = {
-      #     description = "For testing with official RedHat RHEL7.9 image"
-      #     os-type     = "Linux"
-      #     component   = "test"
-      #     server-type = "set me to the ansible server type group vars"
-      #   }
-      # }
-
-      # Example instance using base image with ansible provisioning
-      # dev-base-rhel79-1 = {
-      #   config = merge(module.baseline_presets.ec2_instance.config.default, {
-      #     ami_name = "base_rhel_7_9_*"
-      #   })
-      #   instance = merge(module.baseline_presets.ec2_instance.instance.default, {
-      #     vpc_security_group_ids = ["private"]
-      #   })
-      #   user_data_cloud_init = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_and_ansible
-      #   tags = {
-      #     description = "For testing with official RedHat RHEL7.9 image"
-      #     os-type     = "Linux"
-      #     component   = "test"
-      #     server-type = "set me to the ansible server type group vars"
-      #   }
-      # }
     }
 
     baseline_ec2_autoscaling_groups = {
 
-      dev-oasys-db = merge(local.database, {
+      "dev-${local.application_name}-db" = merge(local.database, {
         autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
-        tags = local.database_tags
+        tags                  = local.database_tags
+      })
+
+      "${local.application_name}-web" = merge(local.webserver, {
+        config = merge(module.baseline_presets.ec2_instance.config.default, {
+          ami_name = "oasys_webserver_release_*"
+        })
+        tags = merge(local.webserver.tags, {
+          description = "${local.application_name} web"
+        })
       })
     }
 
+    baseline_acm_certificates = {
+      "${local.application_name}_wildcard_cert_02" = {
+        # Domain_name limited to 64 chars so use modernisation platform domain
+        # for this and put the wildcard in the san.
+        domain_name = module.environment.domains.public.modernisation_platform
+        subject_alternate_names = [
+          # *.oasys.hmpps-development.modernisation-platform.service.justice.gov.uk
+          "*.${module.environment.domains.public.application_environment}",
+          # web.oasys.hmpps-development.modernisation-platform.service.justice.gov.uk
+          "web.${module.environment.domains.public.application_environment}",
+        ]
+        external_validation_records_created = true
+        cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso_pagerduty"].acm_default
+        tags = {
+          description = "Web cert for ${local.application_name} ${local.environment} domains"
+        }
+      }
+    }
+
     baseline_lbs = {
-      # AWS doesn't let us call it internal
-      #   private = {
-      #     internal_lb              = true
-      #     enable_delete_protection = false
-      #     existing_target_groups   = {
-      #       development-oasys-web-http-8080 = local.lb_target_groups.http-8080
-      #     }
-      #     force_destroy_bucket     = true
-      #     idle_timeout             = 3600
-      #     public_subnets           = module.environment.subnets["private"].ids
-      #     security_groups          = [aws_security_group.public.id]
 
-      #     listeners = {
-      #       development-oasys-web-http-8080 = {
-      #         port     = 8080
-      #         protocol = "HTTP"
-      #         default_action = {
-      #           type              = "forward"
-      #           target_group_name = "development-oasys-web-http-8080"
-      #         }
-      #       }
-      #     }
+      private = {
+        internal_lb              = true
+        enable_delete_protection = false
+        existing_target_groups   = {}
+        idle_timeout             = 60 # 60 is default
+        security_groups          = ["private"]
+        public_subnets           = module.environment.subnets["private"].ids
+        tags                     = local.tags
 
-      #     # public LB not needed right now
-      #     # public = {
-      #     #   internal_lb              = false
-      #     #   enable_delete_protection = false
-      #     #   force_destroy_bucket     = true
-      #     #   idle_timeout             = 3600
-      #     #   public_subnets           = module.environment.subnets["public"].ids
-      #     #   security_groups          = [aws_security_group.public.id]
-      #     # }
-      #   }
+        listeners = {
+          https = {
+            port                      = 443
+            protocol                  = "HTTPS"
+            ssl_policy                = "ELBSecurityPolicy-2016-08"
+            certificate_names_or_arns = ["${local.application_name}_wildcard_cert_02"]
+            # cloudwatch_metric_alarms  = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso_pagerduty"].lb_default
+
+            default_action = {
+              type = "fixed-response"
+              fixed_response = {
+                content_type = "text/plain"
+                message_body = "Not implemented"
+                status_code  = "501"
+              }
+            }
+            rules = {
+              web-http-8080 = {
+                priority = 100
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "${local.application_name}-web-http-8080"
+                }]
+                conditions = [
+                  {
+                    host_header = {
+                      values = [
+                        # web-oasys.hmpps-development.modernisation-platform.service.justice.gov.uk
+                        "web-${module.environment.domains.public.application_environment}",
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+
+    baseline_route53_zones = {
+
+      # hmpps-development.modernisation-platform.service.justice.gov.uk
+      (module.environment.domains.public.business_unit_environment) = {
+        lb_alias_records = [
+          { name = "web.${local.application_name}", type = "A", lbs_map_key = "private" },
+        ]
+      }
     }
   }
 }
-
-
