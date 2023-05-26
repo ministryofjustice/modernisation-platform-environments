@@ -31,6 +31,13 @@ resource "aws_ssm_parameter" "delius_core_frontend_env_var_jdbc_password" {
   }
 }
 
+resource "aws_ssm_parameter" "delius_core_frontend_env_var_test_mode" {
+  name  = format("/%s/TEST_MODE", local.application_name)
+  type  = "String"
+  value = "true"
+  tags  = local.tags
+}
+
 resource "aws_ssm_parameter" "delius_core_frontend_env_var_dev_username" {
   name  = format("/%s/DEV_USERNAME", local.application_name)
   type  = "SecureString"
@@ -53,13 +60,6 @@ resource "aws_ssm_parameter" "delius_core_frontend_env_var_dev_password" {
     ]
   }
   tags = local.tags
-}
-
-resource "aws_ssm_parameter" "delius_core_frontend_env_var_test_mode" {
-  name  = format("/%s/TEST_MODE", local.application_name)
-  type  = "String"
-  value = "true"
-  tags  = local.tags
 }
 
 data "aws_ssm_parameter" "delius_core_frontend_env_var_ldap_host" {
