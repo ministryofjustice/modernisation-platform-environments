@@ -223,7 +223,7 @@ resource "aws_ecs_task_definition" "delius_core_frontend_task_definition" {
             awslogs-stream-prefix = local.frontend_fully_qualified_name
           }
         }
-        memory      = 2048
+        memory      = 4096
         mountPoints = []
         name        = "${local.frontend_fully_qualified_name}"
         portMappings = [
