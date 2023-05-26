@@ -553,7 +553,7 @@
       "eval_periods": 2,
       "period": 60,
       "threshold": 15,
-      "threshold_dbf": 20
+      "threshold_dbf": 80
     },
     "iowait": {
       "eval_periods": 6,
