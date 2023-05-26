@@ -111,12 +111,12 @@ locals {
       #   ]
       # }
       (module.environment.domains.public.business_unit_environment) = { # hmpps-test.modernisation-platform.service.justice.gov.uk
-        lb_alias_records = [
-          { name = "t2.${local.application_name}", type = "A", lbs_map_key = "public" },     # t2.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk
-          { name = "web.t2.${local.application_name}", type = "A", lbs_map_key = "public" }, # web.t2.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk
-          { name = "db.t2.${local.application_name}", type = "A", lbs_map_key = "public" },
-          { name = "db.t1.${local.application_name}", type = "A", lbs_map_key = "public" },
-        ]
+        # lb_alias_records = [
+        #   { name = "t2.${local.application_name}", type = "A", lbs_map_key = "public" },     # t2.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk
+        #   { name = "web.t2.${local.application_name}", type = "A", lbs_map_key = "public" }, # web.t2.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk
+        #   { name = "db.t2.${local.application_name}", type = "A", lbs_map_key = "public" },
+        #   { name = "db.t1.${local.application_name}", type = "A", lbs_map_key = "public" },
+        # ]
       }
       #
       # internal/private
@@ -130,10 +130,10 @@ locals {
           { name = "db.t1.${local.application_name}", type = "A", ttl = "300", records = ["10.101.6.132"] },  # db.t1.oasys.hmpps-test.modernisation-platform.internal currently pointing to azure db T1ODL0007
         ]
         lb_alias_records = [
-          { name = "t2.${local.application_name}", type = "A", lbs_map_key = "public" },
-          { name = "web.t2.${local.application_name}", type = "A", lbs_map_key = "public" },
-          { name = "t1.${local.application_name}", type = "A", lbs_map_key = "public" },
-          { name = "web.t1.${local.application_name}", type = "A", lbs_map_key = "public" },
+          # { name = "t2.${local.application_name}", type = "A", lbs_map_key = "public" },
+          # { name = "web.t2.${local.application_name}", type = "A", lbs_map_key = "public" },
+          # { name = "t1.${local.application_name}", type = "A", lbs_map_key = "public" },
+          # { name = "web.t1.${local.application_name}", type = "A", lbs_map_key = "public" },
         ]
       }
     }
