@@ -85,13 +85,14 @@ resource "aws_security_group_rule" "egress_traffic_mailrelay" {
 module "cw-mailrelay-ec2" {
   source = "./modules/cw-ec2"
 
+  short_env     = local.application_data.accounts[local.environment].short_env
   name         = "ec2-mailrelay"
   topic        = aws_sns_topic.cw_alerts.arn
   instanceId   = aws_instance.ec2_mailrelay.id
   imageId      = local.application_data.accounts[local.environment].mailrelay_ami_id
   instanceType = local.application_data.accounts[local.environment].ec2_instance_type_mailrelay
   fileSystem   = "xfs"       # Linux root filesystem
-  rootDevice   = "nvme0n1p1" # This is used by default for root on all the ec2 images
+  rootDevice   = "xvda1"     # MailRelay uses different instance family
 
   cpu_eval_periods  = local.application_data.cloudwatch_ec2.cpu.eval_periods
   cpu_datapoints    = local.application_data.cloudwatch_ec2.cpu.eval_periods

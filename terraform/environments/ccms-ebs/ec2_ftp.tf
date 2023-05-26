@@ -136,6 +136,7 @@ EOF
 module "cw-ftp-ec2" {
   source = "./modules/cw-ec2"
 
+  short_env     = local.application_data.accounts[local.environment].short_env
   name          = "ec2-ftp"
   topic         = aws_sns_topic.cw_alerts.arn
   instanceId    = aws_instance.ec2_ftp.id
