@@ -62,6 +62,8 @@
       "ebs_size_ebsdb_backup": 8000,
       "dbf_device": "nvme5n1",
       "dbf_path": "/CCMS/EBS/dbf"
+      "dbf_device": "nvme5n1",
+      "dbf_path": "/CCMS/EBS/dbf"
     },
     "test": {
       "short_env": "tst",
@@ -122,7 +124,7 @@
       "ebs_size_ebsdb_redoA": 100,
       "ebs_size_ebsdb_techst": 50,
       "ebs_size_ebsdb_backup": 8000,
-      "dbf_device": "nvme5n1",
+      "dbf_device": "nvme2n1",
       "dbf_path": "/CCMS/EBS/dbf"
     },
     "preproduction": {
@@ -184,7 +186,7 @@
       "ebs_size_ebsdb_redoA": 100,
       "ebs_size_ebsdb_techst": 50,
       "ebs_size_ebsdb_backup": 8000,
-      "dbf_device": "nvme7n1",
+      "dbf_device": "nvme3n1",
       "dbf_path": "/CCMS/EBS/dbf"
     },
     "production": {
@@ -249,7 +251,7 @@
       "ebs_size_ebsdb_techst": 50,
       "ebs_size_ebsdb_backup": 8000,
       "ebs_size_ebsdb_diag": 50,
-      "dbf_device": "nvme7n1",
+      "dbf_device": "nvme8n1",
       "dbf_path": "/CCMS/EBSPROD/dbf"
     }
   },
@@ -627,3 +629,4 @@
     }
   }
 }
+

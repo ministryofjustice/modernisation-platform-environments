@@ -147,21 +147,6 @@ resource "aws_instance" "s609693lo6vw108" {
   }
 }
 
-/*
-resource "aws_instance" "PPUD-DEV-AWS-AD" {
-  count                  = local.is-development == true ? 1 : 0
-  ami                    = "ami-04a9f465215b89a4b"
-  instance_type          = "t2.micro"
-  source_dest_check      = false
-  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.PPUD-DEV-AD.id]
-  subnet_id              = data.aws_subnet.private_subnets_a.id
-  tags = {
-    Name   = "PPUD-DEV-AWS-AD"
-    backup = true
-  }
-}
-*/
 
 #################################
 # Pre-Production (UAT Instances) #
