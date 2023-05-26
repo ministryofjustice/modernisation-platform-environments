@@ -176,20 +176,22 @@ locals {
       service_name          = "oam_1"
       mserver_alarm_threshold = 80
       dimensions = {
-        MountPath = "/IDAM/product/runtime/Domain/mserver"
+        path = "/IDAM/product/runtime/Domain/mserver"
         # Filesystem = "/dev/nvme4n1"
         InstanceId = aws_instance.oam_instance_1.id
-      }
-    },
-    ohs_instance_1 = {
-      service_name          = "ohs_1"
-      mserver_alarm_threshold = 80
-      dimensions = {
-        MountPath = "/IDAM/product/runtime/Domain/mserver"
-        # Filesystem = "/dev/nvme4n1"
-        InstanceId = aws_instance.ohs1.id
+        ImageId = aws_instance.oam_instance_1.ami
+        InstanceType = aws_instance.oam_instance_1.instance_type
       }
     }
+    # ohs_instance_1 = {
+    #   service_name          = "ohs_1"
+    #   mserver_alarm_threshold = 80
+    #   dimensions = {
+    #     MountPath = "/IDAM/product/runtime/Domain/mserver"
+    #     # Filesystem = "/dev/nvme4n1"
+    #     InstanceId = aws_instance.ohs1.id
+    #   }
+    # }
   }
   mserver_alarms_2 = {
     oam_instance_2 = {
@@ -374,8 +376,8 @@ resource "aws_cloudwatch_metric_alarm" "mserver_alarm" {
   comparison_operator = "GreaterThanThreshold"
   dimensions          = each.value.dimensions
   evaluation_periods  = "5"
-  metric_name         = "DiskSpaceUtilization"
-  namespace           = "System/Linux"
+  metric_name         = "disk_used_percent"
+  namespace           = "CWAgent"
   period              = "60"
   statistic           = "Average"
   threshold           = each.value.mserver_alarm_threshold
