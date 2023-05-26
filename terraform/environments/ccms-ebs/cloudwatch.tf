@@ -122,3 +122,30 @@ resource "aws_iam_role_policy_attachment" "cloudwatch_datasource_policy_attach" 
   role = aws_iam_role.role_stsassume_oracle_base.name
 
 }
+
+/*
+# Disk Free Alarm
+resource "aws_cloudwatch_metric_alarm" "disk_free" {
+  alarm_name                = "${var.short_env}-${local.name}-disk_free_root"
+  alarm_description         = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space on root falls below 15% for 2 minutes, the alarm will trigger"
+  comparison_operator       = "LessThanOrEqualToThreshold"
+  metric_name               = "disk_free"
+  namespace                 = "CWAgent"
+  statistic                 = "Average"
+  insufficient_data_actions = []
+
+  evaluation_periods  = var.disk_eval_periods
+  datapoints_to_alarm = var.disk_datapoints
+  period              = var.disk_period
+  threshold           = var.disk_threshold
+  alarm_actions       = [var.topic]
+  dimensions = {
+    InstanceId   = var.instanceId
+    ImageId      = var.imageId
+    InstanceType = var.instanceType
+    path         = "/"
+    device       = var.rootDevice
+    fstype       = var.fileSystem
+  }
+}
+*/
