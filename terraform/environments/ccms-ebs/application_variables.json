@@ -250,7 +250,9 @@
       "ebs_size_ebsdb_backup": 8000,
       "ebs_size_ebsdb_diag": 50,
       "dbf_device": "nvme8n1",
-      "dbf_path": "/CCMS/EBSPROD/dbf"
+      "dbf_path": "/CCMS/EBSPROD/dbf",
+      "ebs_size_ebsdb_dbf2": 9000,
+      "ebs_default_dbf2_iops": 10000
     }
   },
   "ec2_sg_base_ingress_rules": {
