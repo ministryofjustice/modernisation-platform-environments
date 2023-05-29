@@ -36,5 +36,5 @@ data "aws_secretsmanager_secret" "get_tactical_products_db_secrets" {
 }
 
 data "aws_secretsmanager_secret_version" "get_tactical_products_rds_credentials" {
-  secret_id  = data.aws_secretsmanager_secret.get_tactical_products_db_secrets.id
+  secret_id = data.aws_secretsmanager_secret.get_tactical_products_db_secrets.id
 }

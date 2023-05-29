@@ -104,7 +104,7 @@ data "aws_iam_policy_document" "extra-policy-document" {
     resources = [
       "arn:aws:logs:*:*:/aws-glue/*"
     ]
-  }   
+  }
   statement {
     actions = [
       "glue:*",
@@ -112,7 +112,7 @@ data "aws_iam_policy_document" "extra-policy-document" {
       "iam:GetRole",
       "iam:GetRolePolicy",
       "cloudwatch:PutMetricData",
-      "sqs:*"  # Needs Fixing
+      "sqs:*" # Needs Fixing
     ]
     resources = [
       "*"
@@ -130,16 +130,16 @@ data "aws_iam_policy_document" "extra-policy-document" {
     resources = [
       "arn:aws:kinesis:${var.region}:${var.account}:stream/${var.project_id}-*"
     ]
-  } 
+  }
   statement {
     actions = [
-    "kms:Encrypt*",
-    "kms:Decrypt*",
-    "kms:ReEncrypt*",
-    "kms:GenerateDataKey*",
-    "kms:DescribeKey"  
+      "kms:Encrypt*",
+      "kms:Decrypt*",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*",
+      "kms:DescribeKey"
     ]
-  resources = [
+    resources = [
       "arn:aws:kms:*:${var.account}:key/*"
     ]
   }
@@ -155,12 +155,12 @@ data "aws_iam_policy_document" "extra-policy-document" {
       "dynamodb:CreateTable",
       "dynamodb:Delete*",
       "dynamodb:Update*",
-      "dynamodb:PutItem"       
+      "dynamodb:PutItem"
     ]
     resources = [
       "arn:aws:dynamodb:${var.region}:${var.account}:table/dpr-*"
     ]
-  }  
+  }
 }
 
 resource "aws_iam_policy" "additional-policy" {
@@ -175,7 +175,7 @@ resource "aws_iam_role_policy_attachment" "glue_policies" {
     "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"
   ])
 
-  role = var.create_role ? join("", aws_iam_role.glue-service-role.*.name) : var.role_name
+  role       = var.create_role ? join("", aws_iam_role.glue-service-role.*.name) : var.role_name
   policy_arn = each.value
 }
 

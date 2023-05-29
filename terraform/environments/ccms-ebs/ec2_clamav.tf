@@ -86,36 +86,36 @@ EOF
 module "cw-clamav-ec2" {
   source = "./modules/cw-ec2"
 
-  short_env     = local.application_data.accounts[local.environment].short_env
-  name          = "ec2-clamav"
-  topic         = aws_sns_topic.cw_alerts.arn
-  instanceId    = aws_instance.ec2_clamav.id
-  imageId       = local.application_data.accounts[local.environment].clamav_ami_id
-  instanceType  = local.application_data.accounts[local.environment].ec2_instance_type_clamav
-  fileSystem    = "xfs"       # Linux root filesystem
-  rootDevice    = "xvda1"     # ClamAV uses different instance family
+  short_env    = local.application_data.accounts[local.environment].short_env
+  name         = "ec2-clamav"
+  topic        = aws_sns_topic.cw_alerts.arn
+  instanceId   = aws_instance.ec2_clamav.id
+  imageId      = local.application_data.accounts[local.environment].clamav_ami_id
+  instanceType = local.application_data.accounts[local.environment].ec2_instance_type_clamav
+  fileSystem   = "xfs"   # Linux root filesystem
+  rootDevice   = "xvda1" # ClamAV uses different instance family
 
-  cpu_eval_periods  = local.application_data.cloudwatch_ec2.cpu.eval_periods
-  cpu_datapoints    = local.application_data.cloudwatch_ec2.cpu.eval_periods
-  cpu_period        = local.application_data.cloudwatch_ec2.cpu.period
-  cpu_threshold     = local.application_data.cloudwatch_ec2.cpu.threshold
+  cpu_eval_periods = local.application_data.cloudwatch_ec2.cpu.eval_periods
+  cpu_datapoints   = local.application_data.cloudwatch_ec2.cpu.eval_periods
+  cpu_period       = local.application_data.cloudwatch_ec2.cpu.period
+  cpu_threshold    = local.application_data.cloudwatch_ec2.cpu.threshold
 
-  mem_eval_periods  = local.application_data.cloudwatch_ec2.mem.eval_periods
-  mem_datapoints    = local.application_data.cloudwatch_ec2.mem.eval_periods
-  mem_period        = local.application_data.cloudwatch_ec2.mem.period
-  mem_threshold     = local.application_data.cloudwatch_ec2.mem.threshold
+  mem_eval_periods = local.application_data.cloudwatch_ec2.mem.eval_periods
+  mem_datapoints   = local.application_data.cloudwatch_ec2.mem.eval_periods
+  mem_period       = local.application_data.cloudwatch_ec2.mem.period
+  mem_threshold    = local.application_data.cloudwatch_ec2.mem.threshold
 
-  disk_eval_periods  = local.application_data.cloudwatch_ec2.disk.eval_periods
-  disk_datapoints    = local.application_data.cloudwatch_ec2.disk.eval_periods
-  disk_period        = local.application_data.cloudwatch_ec2.disk.period
-  disk_threshold     = local.application_data.cloudwatch_ec2.disk.threshold
+  disk_eval_periods = local.application_data.cloudwatch_ec2.disk.eval_periods
+  disk_datapoints   = local.application_data.cloudwatch_ec2.disk.eval_periods
+  disk_period       = local.application_data.cloudwatch_ec2.disk.period
+  disk_threshold    = local.application_data.cloudwatch_ec2.disk.threshold
 
-  insthc_eval_periods  = local.application_data.cloudwatch_ec2.insthc.eval_periods
-  insthc_period        = local.application_data.cloudwatch_ec2.insthc.period
-  insthc_threshold     = local.application_data.cloudwatch_ec2.insthc.threshold
+  insthc_eval_periods = local.application_data.cloudwatch_ec2.insthc.eval_periods
+  insthc_period       = local.application_data.cloudwatch_ec2.insthc.period
+  insthc_threshold    = local.application_data.cloudwatch_ec2.insthc.threshold
 
-  syshc_eval_periods  = local.application_data.cloudwatch_ec2.syshc.eval_periods
-  syshc_period        = local.application_data.cloudwatch_ec2.syshc.period
-  syshc_threshold     = local.application_data.cloudwatch_ec2.syshc.threshold
+  syshc_eval_periods = local.application_data.cloudwatch_ec2.syshc.eval_periods
+  syshc_period       = local.application_data.cloudwatch_ec2.syshc.period
+  syshc_threshold    = local.application_data.cloudwatch_ec2.syshc.threshold
 
 }

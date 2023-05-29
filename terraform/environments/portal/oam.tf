@@ -1,9 +1,9 @@
 locals {
-  nonprod_workspaces_cidr         = "10.200.0.0/20"
-  prod_workspaces_cidr            = "10.200.16.0/20"
-  redc_cidr                       = "172.16.0.0/20"
-  atos_cidr                       = "10.0.0.0/8"
-  portal_hosted_zone              = data.aws_route53_zone.external.name # TODO This needs a logic for a TBC Hosted Zone for production
+  nonprod_workspaces_cidr = "10.200.0.0/20"
+  prod_workspaces_cidr    = "10.200.16.0/20"
+  redc_cidr               = "172.16.0.0/20"
+  atos_cidr               = "10.0.0.0/8"
+  portal_hosted_zone      = data.aws_route53_zone.external.name # TODO This needs a logic for a TBC Hosted Zone for production
 
 
   # EC2 User data
@@ -43,8 +43,8 @@ resource "aws_security_group" "oam_instance" {
 
 resource "aws_vpc_security_group_egress_rule" "outbound" {
   security_group_id = aws_security_group.oam_instance.id
-  cidr_ipv4   = "0.0.0.0/0"
-  ip_protocol = "-1"
+  cidr_ipv4         = "0.0.0.0/0"
+  ip_protocol       = "-1"
 }
 
 # TODO some rules will need adding referencing Landing Zone environments (e.g. VPC) for other dependent applications not migrated to MP yet but needs talking to Portal.
@@ -53,92 +53,92 @@ resource "aws_vpc_security_group_egress_rule" "outbound" {
 
 resource "aws_vpc_security_group_ingress_rule" "oam_inbound" {
   security_group_id = aws_security_group.oam_instance.id
-  description = "OAM Inbound"
-  cidr_ipv4   = data.aws_vpc.shared.cidr_block #!ImportValue env-VpcCidr
-  from_port   = 14100
-  ip_protocol = "tcp"
-  to_port     = 14100
+  description       = "OAM Inbound"
+  cidr_ipv4         = data.aws_vpc.shared.cidr_block #!ImportValue env-VpcCidr
+  from_port         = 14100
+  ip_protocol       = "tcp"
+  to_port           = 14100
 }
 
 resource "aws_vpc_security_group_ingress_rule" "oam_proxy" {
   security_group_id = aws_security_group.oam_instance.id
-  description = "OAM Proxy Inbound"
-  cidr_ipv4   = data.aws_vpc.shared.cidr_block #!ImportValue env-VpcCidr
-  from_port   = 5575
-  ip_protocol = "tcp"
-  to_port     = 5575
+  description       = "OAM Proxy Inbound"
+  cidr_ipv4         = data.aws_vpc.shared.cidr_block #!ImportValue env-VpcCidr
+  from_port         = 5575
+  ip_protocol       = "tcp"
+  to_port           = 5575
 }
 
 resource "aws_vpc_security_group_ingress_rule" "oam_nodemanager" {
   security_group_id = aws_security_group.oam_instance.id
-  description = "OAM NodeManager Port"
-  cidr_ipv4   = data.aws_vpc.shared.cidr_block #!ImportValue env-VpcCidr
-  from_port   = 5556
-  ip_protocol = "tcp"
-  to_port     = 5556
+  description       = "OAM NodeManager Port"
+  cidr_ipv4         = data.aws_vpc.shared.cidr_block #!ImportValue env-VpcCidr
+  from_port         = 5556
+  ip_protocol       = "tcp"
+  to_port           = 5556
 }
 
 resource "aws_vpc_security_group_ingress_rule" "oracle_access_gate" {
   security_group_id = aws_security_group.oam_instance.id
-  description = "Oracle Access Gate"
-  cidr_ipv4   = data.aws_vpc.shared.cidr_block #!ImportValue env-VpcCidr
-  from_port   = 9002
-  ip_protocol = "tcp"
-  to_port     = 9002
+  description       = "Oracle Access Gate"
+  cidr_ipv4         = data.aws_vpc.shared.cidr_block #!ImportValue env-VpcCidr
+  from_port         = 9002
+  ip_protocol       = "tcp"
+  to_port           = 9002
 }
 
 resource "aws_vpc_security_group_ingress_rule" "oracle_admin" {
   security_group_id = aws_security_group.oam_instance.id
-  description = "OAM Admin Server"
-  cidr_ipv4   = data.aws_vpc.shared.cidr_block #!ImportValue env-VpcCidr
-  from_port   = 7001
-  ip_protocol = "tcp"
-  to_port     = 7001
+  description       = "OAM Admin Server"
+  cidr_ipv4         = data.aws_vpc.shared.cidr_block #!ImportValue env-VpcCidr
+  from_port         = 7001
+  ip_protocol       = "tcp"
+  to_port           = 7001
 }
 
 resource "aws_vpc_security_group_ingress_rule" "oracle_admin_prod" {
   security_group_id = aws_security_group.oam_instance.id
-  description = "OAM Admin Server from Prod Shared Svs"
-  cidr_ipv4   = local.prod_workspaces_cidr
-  from_port   = 7001
-  ip_protocol = "tcp"
-  to_port     = 7001
+  description       = "OAM Admin Server from Prod Shared Svs"
+  cidr_ipv4         = local.prod_workspaces_cidr
+  from_port         = 7001
+  ip_protocol       = "tcp"
+  to_port           = 7001
 }
 
 resource "aws_vpc_security_group_ingress_rule" "ping" {
   security_group_id = aws_security_group.oam_instance.id
-  description = "Allow ping response"
-  cidr_ipv4   = data.aws_vpc.shared.cidr_block #!ImportValue env-VpcCidr
-  from_port   = 8
-  ip_protocol = "icmp"
-  to_port     = -1
+  description       = "Allow ping response"
+  cidr_ipv4         = data.aws_vpc.shared.cidr_block #!ImportValue env-VpcCidr
+  from_port         = 8
+  ip_protocol       = "icmp"
+  to_port           = -1
 }
 
 resource "aws_vpc_security_group_ingress_rule" "oam_coherence_tcp" {
   security_group_id = aws_security_group.oam_instance.id
-  description = "OAM coherence communication"
-  cidr_ipv4   = data.aws_vpc.shared.cidr_block #!ImportValue env-VpcCidr
-  from_port   = 0
-  ip_protocol = "tcp"
-  to_port     = 65535
+  description       = "OAM coherence communication"
+  cidr_ipv4         = data.aws_vpc.shared.cidr_block #!ImportValue env-VpcCidr
+  from_port         = 0
+  ip_protocol       = "tcp"
+  to_port           = 65535
 }
 
 resource "aws_vpc_security_group_ingress_rule" "oam_coherence_icmp" {
   security_group_id = aws_security_group.oam_instance.id
-  description = "OAM coherence communication"
-  cidr_ipv4   = data.aws_vpc.shared.cidr_block #!ImportValue env-VpcCidr
-  from_port   = -1
-  ip_protocol = "icmp"
-  to_port     = -1
+  description       = "OAM coherence communication"
+  cidr_ipv4         = data.aws_vpc.shared.cidr_block #!ImportValue env-VpcCidr
+  from_port         = -1
+  ip_protocol       = "icmp"
+  to_port           = -1
 }
 
 resource "aws_vpc_security_group_ingress_rule" "nfs_oam_to_oam" {
-  security_group_id = aws_security_group.oam_instance.id
-  description = "Inbound NFS from other OAM instances"
+  security_group_id            = aws_security_group.oam_instance.id
+  description                  = "Inbound NFS from other OAM instances"
   referenced_security_group_id = aws_security_group.oam_instance.id
-  from_port   = 2049
-  ip_protocol = "tcp"
-  to_port     = 2049
+  from_port                    = 2049
+  ip_protocol                  = "tcp"
+  to_port                      = 2049
 }
 
 # TODO enable when IDM resources are created
@@ -155,12 +155,12 @@ resource "aws_vpc_security_group_ingress_rule" "nfs_oam_to_oam" {
 # TODO enable when OHS resources are created
 
 resource "aws_vpc_security_group_ingress_rule" "nfs_ohs_to_oam" {
-  security_group_id = aws_security_group.oam_instance.id
-  description = "Inbound NFS from OHS Instances"
+  security_group_id            = aws_security_group.oam_instance.id
+  description                  = "Inbound NFS from OHS Instances"
   referenced_security_group_id = aws_security_group.ohs_instance.id
-  from_port   = 2049
-  ip_protocol = "tcp"
-  to_port     = 2049
+  from_port                    = 2049
+  ip_protocol                  = "tcp"
+  to_port                      = 2049
 }
 
 # TODO enable when OIM resources are created
@@ -175,31 +175,31 @@ resource "aws_vpc_security_group_ingress_rule" "nfs_ohs_to_oam" {
 # }
 
 resource "aws_vpc_security_group_ingress_rule" "nonprod_workspaces" {
-  count = contains(["development", "testing"], local.environment) ? 1 : 0
+  count             = contains(["development", "testing"], local.environment) ? 1 : 0
   security_group_id = aws_security_group.oam_instance.id
-  description = "OAM Admin Server from Shared Svs"
-  cidr_ipv4   = local.nonprod_workspaces_cidr # env-BastionSSHCIDR
-  from_port   = 7001
-  ip_protocol = "tcp"
-  to_port     = 7001
+  description       = "OAM Admin Server from Shared Svs"
+  cidr_ipv4         = local.nonprod_workspaces_cidr # env-BastionSSHCIDR
+  from_port         = 7001
+  ip_protocol       = "tcp"
+  to_port           = 7001
 }
 
 resource "aws_vpc_security_group_ingress_rule" "redc" {
-  count = contains(["development", "testing"], local.environment) ? 1 : 0
+  count             = contains(["development", "testing"], local.environment) ? 1 : 0
   security_group_id = aws_security_group.oam_instance.id
-  cidr_ipv4   = local.redc_cidr
-  from_port   = 5575
-  ip_protocol = "tcp"
-  to_port     = 5575
+  cidr_ipv4         = local.redc_cidr
+  from_port         = 5575
+  ip_protocol       = "tcp"
+  to_port           = 5575
 }
 
 resource "aws_vpc_security_group_ingress_rule" "atos" {
-  count = contains(["preproduction", "production"], local.environment) ? 1 : 0
+  count             = contains(["preproduction", "production"], local.environment) ? 1 : 0
   security_group_id = aws_security_group.oam_instance.id
-  cidr_ipv4   = local.atos_cidr
-  from_port   = 5575
-  ip_protocol = "tcp"
-  to_port     = 5575
+  cidr_ipv4         = local.atos_cidr
+  from_port         = 5575
+  ip_protocol       = "tcp"
+  to_port           = 5575
 }
 
 ######################################
@@ -207,37 +207,37 @@ resource "aws_vpc_security_group_ingress_rule" "atos" {
 ######################################
 
 resource "aws_instance" "oam_instance_1" {
-  ami                         = local.application_data.accounts[local.environment].oam_ami_id
-  availability_zone           = "eu-west-2a"
-  instance_type               = local.application_data.accounts[local.environment].oam_instance_type
-  vpc_security_group_ids      = [aws_security_group.oam_instance.id]
-  monitoring                  = true
-  subnet_id                   = data.aws_subnet.private_subnets_a.id
-  iam_instance_profile        = aws_iam_instance_profile.portal.id
-  user_data_base64            = base64encode(local.oam_1_userdata)
+  ami                    = local.application_data.accounts[local.environment].oam_ami_id
+  availability_zone      = "eu-west-2a"
+  instance_type          = local.application_data.accounts[local.environment].oam_instance_type
+  vpc_security_group_ids = [aws_security_group.oam_instance.id]
+  monitoring             = true
+  subnet_id              = data.aws_subnet.private_subnets_a.id
+  iam_instance_profile   = aws_iam_instance_profile.portal.id
+  user_data_base64       = base64encode(local.oam_1_userdata)
 
   tags = merge(
     local.tags,
     { "Name" = "${local.application_name} OAM Instance 1" },
-    { "snapshot-with-daily-35-day-retention" = "yes" }    # TODO the Backup rule needs setting up first
+    { "snapshot-with-daily-35-day-retention" = "yes" } # TODO the Backup rule needs setting up first
   )
 }
 
 resource "aws_instance" "oam_instance_2" {
-  count = local.environment == "production" ? 1 : 0
-  ami                         = local.application_data.accounts[local.environment].oam_ami_id
-  availability_zone           = "eu-west-2b"
-  instance_type               = local.application_data.accounts[local.environment].oam_instance_type
-  vpc_security_group_ids      = [aws_security_group.oam_instance.id]
-  monitoring                  = true
-  subnet_id                   = data.aws_subnet.private_subnets_b.id
+  count                  = local.environment == "production" ? 1 : 0
+  ami                    = local.application_data.accounts[local.environment].oam_ami_id
+  availability_zone      = "eu-west-2b"
+  instance_type          = local.application_data.accounts[local.environment].oam_instance_type
+  vpc_security_group_ids = [aws_security_group.oam_instance.id]
+  monitoring             = true
+  subnet_id              = data.aws_subnet.private_subnets_b.id
   # iam_instance_profile        = aws_iam_instance_profile.portal_instance_profile.id # TODO to be updated once merging with OHS work
-  user_data_base64            = base64encode(local.oam_2_userdata)
+  user_data_base64 = base64encode(local.oam_2_userdata)
 
   tags = merge(
     local.tags,
     { "Name" = "${local.application_name} OAM Instance 2" },
-    { "snapshot-with-daily-35-day-retention" = "yes" }    # TODO the Backup rule needs setting up first
+    { "snapshot-with-daily-35-day-retention" = "yes" } # TODO the Backup rule needs setting up first
   )
 }
 
@@ -274,7 +274,7 @@ resource "aws_ebs_volume" "oam_config" {
   size              = 15
   type              = "gp2"
   encrypted         = true
-  kms_key_id        = data.aws_kms_key.ebs_shared.key_id  # TODO This key is not being used by Terraform and is pointing to the AWS default one in the local account
+  kms_key_id        = data.aws_kms_key.ebs_shared.key_id # TODO This key is not being used by Terraform and is pointing to the AWS default one in the local account
   snapshot_id       = local.application_data.accounts[local.environment].oam_config_snapshot
 
   lifecycle {

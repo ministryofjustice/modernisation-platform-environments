@@ -64,19 +64,19 @@ resource "aws_security_group" "WAM-Portal" {
 }
 
 resource "aws_security_group_rule" "WAM-Portal-ingress" {
-  type      = "ingress"
-  from_port = 80
-  to_port   = 80
-  protocol  = "tcp"
+  type              = "ingress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
   security_group_id = aws_security_group.WAM-Portal.id
 }
 
 resource "aws_security_group_rule" "WAM-Portal-ingress-1" {
-  type      = "ingress"
-  from_port = 3389
-  to_port   = 3389
-  protocol  = "tcp"
+  type              = "ingress"
+  from_port         = 3389
+  to_port           = 3389
+  protocol          = "tcp"
   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
   security_group_id = aws_security_group.WAM-Portal.id
 }
@@ -158,33 +158,33 @@ resource "aws_security_group" "SCR-Team-Foundation-Server" {
 }
 
 resource "aws_security_group_rule" "SCR-Team-Foundation-Server-Ingress" {
-  count                    = local.is-development == true ? 1 : 0
-  type                     = "ingress"
-  from_port                = 8080
-  to_port                  = 8080
-  protocol                 = "tcp"
-  cidr_blocks              = [data.aws_vpc.shared.cidr_block]
-  security_group_id        = aws_security_group.SCR-Team-Foundation-Server[0].id
+  count             = local.is-development == true ? 1 : 0
+  type              = "ingress"
+  from_port         = 8080
+  to_port           = 8080
+  protocol          = "tcp"
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+  security_group_id = aws_security_group.SCR-Team-Foundation-Server[0].id
 }
 
 resource "aws_security_group_rule" "SCR-Team-Foundation-Server-Ingress-1" {
-  count                    = local.is-development == true ? 1 : 0
-  type                     = "ingress"
-  from_port                = 80
-  to_port                  = 80
-  protocol                 = "tcp"
-  cidr_blocks              = [data.aws_vpc.shared.cidr_block]
-  security_group_id        = aws_security_group.SCR-Team-Foundation-Server[0].id
+  count             = local.is-development == true ? 1 : 0
+  type              = "ingress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+  security_group_id = aws_security_group.SCR-Team-Foundation-Server[0].id
 }
 
 resource "aws_security_group_rule" "SCR-Team-Foundation-Server-Ingress-2" {
-  count                    = local.is-development == true ? 1 : 0
-  type                     = "ingress"
-  from_port                = 3389
-  to_port                  = 3389
-  protocol                 = "tcp"
-  cidr_blocks              = [data.aws_vpc.shared.cidr_block]
-  security_group_id        = aws_security_group.SCR-Team-Foundation-Server[0].id
+  count             = local.is-development == true ? 1 : 0
+  type              = "ingress"
+  from_port         = 3389
+  to_port           = 3389
+  protocol          = "tcp"
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+  security_group_id = aws_security_group.SCR-Team-Foundation-Server[0].id
 }
 
 resource "aws_security_group_rule" "SCR-Team-Foundation-Server-Egress" {
