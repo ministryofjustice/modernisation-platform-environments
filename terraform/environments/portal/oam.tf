@@ -41,7 +41,7 @@ resource "aws_security_group" "oam_instance" {
   vpc_id      = data.aws_vpc.shared.id
 }
 
-resource "aws_vpc_security_group_egress_rule" "oam_outbound" {
+resource "aws_vpc_security_group_egress_rule" "outbound" {
   security_group_id = aws_security_group.oam_instance.id
   cidr_ipv4   = "0.0.0.0/0"
   ip_protocol = "-1"
@@ -537,6 +537,7 @@ resource "aws_security_group" "efs" {
   name        = "${local.application_name}-${local.environment}-efs-security-group"
   description = "Portal EFS Security Group"
   vpc_id      = data.aws_vpc.shared.id
+  encrypted   = true
 }
 
 resource "aws_vpc_security_group_egress_rule" "efs_outbound" {
