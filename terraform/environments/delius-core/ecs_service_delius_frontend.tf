@@ -244,33 +244,33 @@ resource "aws_ecs_task_definition" "delius_core_frontend_task_definition" {
             name      = "JDBC_PASSWORD"
             valueFrom = aws_ssm_parameter.delius_core_frontend_env_var_jdbc_password.arn
           },
-          {
-            name      = "DEV_USERNAME"
-            valueFrom = aws_ssm_parameter.delius_core_frontend_env_var_dev_username.arn
-          },
-          {
-            name      = "DEV_PASSWORD"
-            valueFrom = aws_ssm_parameter.delius_core_frontend_env_var_dev_password.arn
-          },
+          # {
+          #   name      = "DEV_USERNAME"
+          #   valueFrom = aws_ssm_parameter.delius_core_frontend_env_var_dev_username.arn
+          # },
+          # {
+          #   name      = "DEV_PASSWORD"
+          #   valueFrom = aws_ssm_parameter.delius_core_frontend_env_var_dev_password.arn
+          # },
           {
             name      = "TEST_MODE"
             valueFrom = aws_ssm_parameter.delius_core_frontend_env_var_test_mode.arn
+          },
+          {
+            name      = "LDAP_PORT"
+            valueFrom = data.aws_ssm_parameter.delius_core_frontend_env_var_ldap_port.arn
+          },
+          {
+            name      = "LDAP_HOST"
+            valueFrom = data.aws_ssm_parameter.delius_core_frontend_env_var_ldap_host.arn
+          },
+          {
+            name      = "LDAP_PRINCIPAL"
+            valueFrom = data.aws_ssm_parameter.delius_core_frontend_env_var_ldap_principal.arn
+          },
+          { name      = "LDAP_CREDENTIAL"
+            valueFrom = data.aws_secretsmanager_secret.ldap_credential.arn
           }
-          # {
-          #   name      = "LDAP_PORT"
-          #   valueFrom = data.aws_ssm_parameter.delius_core_frontend_env_var_ldap_port.arn
-          # },
-          # {
-          #   name      = "LDAP_HOST"
-          #   valueFrom = data.aws_ssm_parameter.delius_core_frontend_env_var_ldap_host.arn
-          # },
-          # {
-          #   name      = "LDAP_PRINCIPAL"
-          #   valueFrom = data.aws_ssm_parameter.delius_core_frontend_env_var_ldap_principal.arn
-          # },
-          # { name      = "LDAP_CREDENTIAL"
-          #   valueFrom = data.aws_secretsmanager_secret.ldap_credential.arn
-          # }
         ]
       }
   ])
@@ -399,37 +399,4 @@ resource "aws_ecs_service" "delius-frontend-service" {
   tags                               = local.tags
   triggers                           = {} # Change this for force redeployment
 
-}
-
-
-resource "aws_instance" "docker" {
-  #checkov:skip=CKV2_AWS_41:"IAM role is not implemented for this example EC2. SSH/AWS keys are not used either."
-  # Specify the instance type and ami to be used (this is the Amazon free tier option)
-  instance_type = "t2.xlarge"
-  ami           = "ami-0e1c5be2aa956338b"
-  # ami = "ami-0e3dd4f4b84ef84f5" # AL2 amzn2-ami-hvm-2.0.20230418.0-x86_64-gp2
-  vpc_security_group_ids      = [aws_security_group.base_ami_test_instance_sg.id]
-  subnet_id                   = data.aws_subnet.private_subnets_a.id
-  iam_instance_profile        = aws_iam_instance_profile.base_ami_test_instance_profile.name
-  associate_public_ip_address = false
-  monitoring                  = false
-  ebs_optimized               = false
-  root_block_device {
-    volume_size = 64
-    volume_type = "gp3"
-  }
-
-  metadata_options {
-    http_endpoint = "enabled"
-    http_tokens   = "required"
-  }
-  # Increase the volume size of the root volume
-  # root_block_device {
-  #   volume_type = "gp3"
-  #   volume_size = 30
-  #   encrypted   = true
-  # }
-  tags = merge(local.tags,
-    { Name = lower(format("ec2-%s-%s-docker", local.application_name, local.environment)) }
-  )
 }
