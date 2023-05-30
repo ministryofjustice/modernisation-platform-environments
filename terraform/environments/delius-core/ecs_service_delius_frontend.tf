@@ -74,6 +74,10 @@ data "aws_ssm_parameter" "delius_core_frontend_env_var_ldap_principal" {
   name = format("/%s/LDAP_PRINCIPAL", local.application_name)
 }
 
+data "aws_ssm_parameter" "delius_core_frontend_env_var_user_context" {
+  name = format("/%s/USER_CONTEXT", local.application_name)
+}
+
 data "aws_secretsmanager_secret" "ldap_credential" {
   name = "${local.application_name}-openldap-bind-password"
 }
@@ -270,6 +274,10 @@ resource "aws_ecs_task_definition" "delius_core_frontend_task_definition" {
           },
           { name      = "LDAP_CREDENTIAL"
             valueFrom = data.aws_secretsmanager_secret.ldap_credential.arn
+          },
+          {
+            name      = "USER_CONTEXT"
+            valueFrom = data.aws_ssm_parameter.delius_core_frontend_env_var_user_context.arn
           }
         ]
       }
