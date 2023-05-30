@@ -22,11 +22,11 @@ locals {
     }
   }
 
-  domain_name_main_prod   = [for k, v in local.domain_types_prod : v.name if k == "tipstaff.service.justice.gov.uk"]
-  domain_name_sub_prod    = [for k, v in local.domain_types_prod : v.name if k != "tipstaff.service.justice.gov.uk"]
-  domain_record_main_prod = [for k, v in local.domain_types_prod : v.record if k == "tipstaff.service.justice.gov.uk"]
-  domain_record_sub_prod  = [for k, v in local.domain_types_prod : v.record if k != "tipstaff.service.justice.gov.uk"]
-  domain_type_main_prod   = [for k, v in local.domain_types_prod : v.type if k == "tipstaff.service.justice.gov.uk"]
-  domain_type_sub_prod    = [for k, v in local.domain_types_prod : v.type if k != "tipstaff.service.justice.gov.uk"]
+  domain_name_main_prod   = [for k, v in local.domain_types_prod : v.name if k == "service.justice.gov.uk"]
+  domain_name_sub_prod    = [for k, v in local.domain_types_prod : v.name if k != "service.justice.gov.uk"]
+  domain_record_main_prod = [for k, v in local.domain_types_prod : v.record if k == "service.justice.gov.uk"]
+  domain_record_sub_prod  = [for k, v in local.domain_types_prod : v.record if k != "service.justice.gov.uk"]
+  domain_type_main_prod   = [for k, v in local.domain_types_prod : v.type if k == "service.justice.gov.uk"]
+  domain_type_sub_prod    = [for k, v in local.domain_types_prod : v.type if k != "service.justice.gov.uk"]
 
 }
