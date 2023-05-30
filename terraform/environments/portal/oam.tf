@@ -516,6 +516,10 @@ resource "aws_route53_record" "oam1_nonprod" {
 # ###############
 
 
+#########################
+# EFS POC
+#########################
+
 resource "aws_efs_file_system" "portal" {
 
   tags = {
@@ -526,4 +530,26 @@ resource "aws_efs_file_system" "portal" {
 resource "aws_efs_mount_target" "portal" {
   file_system_id = aws_efs_file_system.portal.id
   subnet_id      = data.aws_subnet.private_subnets_a.id
+  security_groups = [aws_security_group.oam_instance.id]
+}
+
+resource "aws_security_group" "efs" {
+  name        = "${local.application_name}-${local.environment}-efs-security-group"
+  description = "Portal EFS Security Group"
+  vpc_id      = data.aws_vpc.shared.id
+}
+
+resource "aws_vpc_security_group_egress_rule" "outbound" {
+  security_group_id = aws_security_group.efs.id
+  cidr_ipv4   = "0.0.0.0/0"
+  ip_protocol = "-1"
+}
+
+resource "aws_vpc_security_group_ingress_rule" "efs" {
+  security_group_id = aws_security_group.efs.id
+  description = "EFS POC Rule"
+  referenced_security_group_id = aws_security_group.oam_instance.id
+  from_port   = 2049
+  ip_protocol = "tcp"
+  to_port     = 2049
 }
