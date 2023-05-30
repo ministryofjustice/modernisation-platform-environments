@@ -521,7 +521,8 @@ resource "aws_route53_record" "oam1_nonprod" {
 #########################
 
 resource "aws_efs_file_system" "portal" {
-
+  encrypted   = true
+  
   tags = {
     Name = "portal-efs-poc"
   }
@@ -537,7 +538,6 @@ resource "aws_security_group" "efs" {
   name        = "${local.application_name}-${local.environment}-efs-security-group"
   description = "Portal EFS Security Group"
   vpc_id      = data.aws_vpc.shared.id
-  encrypted   = true
 }
 
 resource "aws_vpc_security_group_egress_rule" "efs_outbound" {
