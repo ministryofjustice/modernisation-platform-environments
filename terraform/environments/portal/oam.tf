@@ -514,3 +514,16 @@ resource "aws_route53_record" "oam1_nonprod" {
 # }
 #
 # ###############
+
+
+resource "aws_efs_file_system" "portal" {
+
+  tags = {
+    Name = "portal-efs-poc"
+  }
+}
+
+resource "aws_efs_mount_target" "portal" {
+  file_system_id = aws_efs_file_system.portal.id
+  subnet_id      = data.aws_subnet.private_subnets_a.id
+}
