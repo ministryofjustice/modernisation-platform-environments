@@ -13,13 +13,13 @@ locals {
     }
 
     baseline_ec2_autoscaling_groups = {
-      "prod-${local.application_name}-web-trn" = merge(local.webserver, {
+      "prod-${local.application_name}-web-trn-a" = merge(local.webserver_a, {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name                  = "${local.application_name}_webserver_release_*"
           ssm_parameters_prefix     = "ec2-web-trn/"
           iam_resource_names_prefix = "ec2-web-trn"
         })
-        tags = merge(local.webserver.tags, {
+        tags = merge(local.webserver_a.tags, {
           description                             = "${local.environment} training ${local.application_name} web"
           "${local.application_name}-environment" = "trn"
           oracle-db-sid                           = "OASTRN"
@@ -78,7 +78,7 @@ locals {
               #   priority = 100
               #   actions = [{
               #     type              = "forward"
-              #     target_group_name = "prod-${local.application_name}-web-http-8080"
+              #     target_group_name = "prod-${local.application_name}-web-a-http-8080"
               #   }]
               #   conditions = [
               #     {
@@ -97,7 +97,7 @@ locals {
                 priority = 100
                 actions = [{
                   type              = "forward"
-                  target_group_name = "prod-${local.application_name}-web-trn-http-8080"
+                  target_group_name = "prod-${local.application_name}-web-trn-a-http-8080"
                 }]
                 conditions = [
                   {
@@ -112,25 +112,6 @@ locals {
                   }
                 ]
               }
-              # ptc-web-http-8080 = {
-              #   priority = 100
-              #   actions = [{
-              #     type              = "forward"
-              #     target_group_name = "prod-${local.application_name}-web-ptc-http-8080"
-              #   }]
-              #   conditions = [
-              #     {
-              #       host_header = {
-              #         values = ["ptc.${module.environment.domains.public.short_name}"]
-              #       }
-              #     },
-              #     {
-              #       path_pattern = {
-              #         values = ["/"]
-              #       }
-              #     }
-              #   ]
-              # }
             }
           }
         }
