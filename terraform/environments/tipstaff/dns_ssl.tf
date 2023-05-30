@@ -115,16 +115,16 @@ resource "aws_route53_record" "external_validation_prod" {
   zone_id         = data.aws_route53_zone.prod_network_services.zone_id
 }
 
-resource "aws_route53_record" "external_validation_subdomain_prod" {
-  provider = aws.core-network-services
+# resource "aws_route53_record" "external_validation_subdomain_prod" {
+#   provider = aws.core-network-services
 
-  allow_overwrite = true
-  name            = local.domain_name_sub_prod[0]
-  records         = local.domain_record_sub_prod
-  ttl             = 60
-  type            = local.domain_type_sub_prod[0]
-  zone_id         = data.aws_route53_zone.external.zone_id
-}
+#   allow_overwrite = true
+#   name            = local.domain_name_sub_prod[0]
+#   records         = local.domain_record_sub_prod
+#   ttl             = 60
+#   type            = local.domain_type_sub_prod[0]
+#   zone_id         = data.aws_route53_zone.external.zone_id
+# }
 
 # resource "aws_acm_certificate_validation" "external_prod" {
 #   # count = local.is-production ? 1 : 0
@@ -140,5 +140,5 @@ resource "aws_route53_record" "external_validation_subdomain_prod" {
 
 resource "aws_acm_certificate_validation" "external_prod" {
   certificate_arn         = aws_acm_certificate.external_prod.arn
-  validation_record_fqdns = [local.domain_name_main_prod[0], local.domain_name_sub_prod[0]]
+  validation_record_fqdns = [local.domain_name_main_prod[0]]
 }
