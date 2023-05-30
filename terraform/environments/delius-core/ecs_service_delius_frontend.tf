@@ -406,7 +406,7 @@ resource "aws_instance" "docker" {
   #checkov:skip=CKV2_AWS_41:"IAM role is not implemented for this example EC2. SSH/AWS keys are not used either."
   # Specify the instance type and ami to be used (this is the Amazon free tier option)
   instance_type = "t2.xlarge"
-  ami           = ami-0e1c5be2aa956338b
+  ami           = "ami-0e1c5be2aa956338b"
   # ami = "ami-0e3dd4f4b84ef84f5" # AL2 amzn2-ami-hvm-2.0.20230418.0-x86_64-gp2
   vpc_security_group_ids      = [aws_security_group.base_ami_test_instance_sg.id]
   subnet_id                   = data.aws_subnet.private_subnets_a.id
