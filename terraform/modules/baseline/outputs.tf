@@ -38,16 +38,16 @@ output "key_pairs" {
   value       = aws_key_pair.this
 }
 
-output "lbs" {
-  description = "map of loadbalancer module and lb_listeners corresponding to var.lbs"
-  value = {
-    for lb_key, lb_value in var.lbs : lb_key => merge(module.lb[lb_key], {
-      listeners = {
-        for key, value in lb_value.listeners : key => module.lb_listener["${lb_key}-${key}"]
-      }
-    })
-  }
-}
+# output "lbs" {
+#   description = "map of loadbalancer module and lb_listeners corresponding to var.lbs"
+#   value = {
+#     for lb_key, lb_value in var.lbs : lb_key => merge(module.lb[lb_key], {
+#       listeners = {
+#         for key, value in lb_value.listeners : key => module.lb_listener["${lb_key}-${key}"]
+#       }
+#     })
+#   }
+# }
 
 output "route53_resolvers_security_group" {
   description = "security group used for route53 resolvers"
