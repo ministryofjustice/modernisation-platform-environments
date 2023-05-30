@@ -41,7 +41,7 @@ resource "aws_security_group" "oam_instance" {
   vpc_id      = data.aws_vpc.shared.id
 }
 
-resource "aws_vpc_security_group_egress_rule" "outbound" {
+resource "aws_vpc_security_group_egress_rule" "oam_outbound" {
   security_group_id = aws_security_group.oam_instance.id
   cidr_ipv4   = "0.0.0.0/0"
   ip_protocol = "-1"
@@ -539,7 +539,7 @@ resource "aws_security_group" "efs" {
   vpc_id      = data.aws_vpc.shared.id
 }
 
-resource "aws_vpc_security_group_egress_rule" "outbound" {
+resource "aws_vpc_security_group_egress_rule" "efs_outbound" {
   security_group_id = aws_security_group.efs.id
   cidr_ipv4   = "0.0.0.0/0"
   ip_protocol = "-1"
