@@ -20,6 +20,8 @@
       "ami_owner": "self",
       "ec2_instance_type_ftp": "c5d.large",
       "ftp_ami_id": "ami-08cd358d745620807",
+      "ec2_instance_type_clamav": "c5d.large",
+      "clamav_ami_id": "ami-03e88be9ecff64781",
       "restored_db_image": "ami-0df5f31cae1c86635",
       "orace_base_prereqs_ami_name": "Oracle79-prereqs-v1_5",
       "orace_db_ami_name": "Oracle79-prereqs-v1_8",
@@ -57,7 +59,9 @@
       "ebs_size_ebsdb_dbf": 8000,
       "ebs_size_ebsdb_redoA": 100,
       "ebs_size_ebsdb_techst": 50,
-      "ebs_size_ebsdb_backup": 8000
+      "ebs_size_ebsdb_backup": 8000,
+      "dbf_device": "nvme5n1",
+      "dbf_path": "/CCMS/EBS/dbf"
     },
     "test": {
       "short_env": "tst",
@@ -79,6 +83,8 @@
       "ami_owner": "767123802783",
       "ec2_instance_type_ftp": "c5d.large",
       "ftp_ami_id": "ami-08cd358d745620807",
+      "ec2_instance_type_clamav": "c5d.large",
+      "clamav_ami_id": "ami-03e88be9ecff64781",
       "orace_base_prereqs_ami_name": "Oracle79-prereqs-v1_7",
       "orace_db_ami_name": "Oracle79-prereqs-v1_7",
       "orace_db_dr_ami_name": "EBSDB-DR-test",
@@ -115,7 +121,9 @@
       "ebs_size_ebsdb_dbf": 8000,
       "ebs_size_ebsdb_redoA": 100,
       "ebs_size_ebsdb_techst": 50,
-      "ebs_size_ebsdb_backup": 8000
+      "ebs_size_ebsdb_backup": 8000,
+      "dbf_device": "nvme2n1",
+      "dbf_path": "/CCMS/EBS/dbf"
     },
     "preproduction": {
       "short_env": "prep",
@@ -137,6 +145,8 @@
       "ami_owner": "767123802783",
       "ec2_instance_type_ftp": "c5d.large",
       "ftp_ami_id": "ami-08cd358d745620807",
+      "ec2_instance_type_clamav": "c5d.large",
+      "clamav_ami_id": "ami-03e88be9ecff64781",
       "orace_base_prereqs_ami_name": "Oracle79-prereqs-v1_8",
       "orace_db_ami_name": "Oracle79-prereqs-v1_8",
       "orace_db_dr_ami_name": "EBSDB-DR-test",
@@ -173,7 +183,9 @@
       "ebs_size_ebsdb_dbf": 8000,
       "ebs_size_ebsdb_redoA": 100,
       "ebs_size_ebsdb_techst": 50,
-      "ebs_size_ebsdb_backup": 8000
+      "ebs_size_ebsdb_backup": 8000,
+      "dbf_device": "nvme3n1",
+      "dbf_path": "/CCMS/EBS/dbf"
     },
     "production": {
       "short_env": "prod",
@@ -195,6 +207,8 @@
       "ami_owner": "767123802783",
       "ec2_instance_type_ftp": "c5d.large",
       "ftp_ami_id": "ami-08cd358d745620807",
+      "ec2_instance_type_clamav": "c5d.large",
+      "clamav_ami_id": "ami-03e88be9ecff64781",
       "orace_base_prereqs_ami_name": "Oracle79-prereqs-v1_8",
       "orace_db_ami_name": "Oracle79-prereqs-v1_8",
       "orace_db_dr_ami_name": "EBSDB-DR-test",
@@ -234,7 +248,11 @@
       "ebs_size_ebsdb_redoB": 50,
       "ebs_size_ebsdb_techst": 50,
       "ebs_size_ebsdb_backup": 8000,
-      "ebs_size_ebsdb_diag": 50
+      "ebs_size_ebsdb_diag": 50,
+      "dbf_device": "nvme8n1",
+      "dbf_path": "/CCMS/EBSPROD/dbf",
+      "ebs_size_ebsdb_dbf2": 9000,
+      "ebs_default_dbf2_iops": 10000
     }
   },
   "ec2_sg_base_ingress_rules": {
@@ -352,7 +370,7 @@
       "destination_cidr": "0.0.0.0/0"
     },
     "SSH_22": {
-      "from_port": 22,
+      "from_port": 21,
       "to_port": 22,
       "protocol": "TCP",
       "destination_cidr": "0.0.0.0/0"
@@ -540,7 +558,8 @@
     "disk": {
       "eval_periods": 2,
       "period": 60,
-      "threshold": 15
+      "threshold": 80,
+      "threshold_dbf": 90
     },
     "iowait": {
       "eval_periods": 6,
@@ -587,7 +606,7 @@
       "destination_cidr": "0.0.0.0/0"
     },
     "SSH_22": {
-      "from_port": 22,
+      "from_port": 21,
       "to_port": 22,
       "protocol": "TCP",
       "destination_cidr": "0.0.0.0/0"
@@ -610,3 +629,4 @@
     }
   }
 }
+
