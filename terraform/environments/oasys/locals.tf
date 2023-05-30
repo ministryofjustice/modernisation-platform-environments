@@ -247,7 +247,6 @@ locals {
   }
   
 
-
   # lb_listener_defaults = {
 
   #   oasys_public = {
