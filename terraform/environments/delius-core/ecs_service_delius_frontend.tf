@@ -414,6 +414,10 @@ resource "aws_instance" "docker" {
   associate_public_ip_address = false
   monitoring                  = false
   ebs_optimized               = false
+  root_block_device {
+    volume_size = 64
+    volume_type = "gp3"
+  }
 
   metadata_options {
     http_endpoint = "enabled"
