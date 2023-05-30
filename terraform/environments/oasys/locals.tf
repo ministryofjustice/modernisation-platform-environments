@@ -78,7 +78,7 @@ locals {
     user_data_cloud_init     = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags
     autoscaling_schedules    = module.baseline_presets.ec2_autoscaling_schedules.working_hours
     autoscaling_group        = module.baseline_presets.ec2_autoscaling_group.default
-    lb_target_groups = {}
+    # lb_target_groups = {}
       # http-8080 = {
       #   port                 = 8080
       #   protocol             = "HTTP"
@@ -217,7 +217,7 @@ locals {
       }
     }
     # Example target group setup below
-    lb_target_groups = [] #local.lb_target_groups # This won't be correct for db, will correct later
+    # lb_target_groups = [] #local.lb_target_groups # This won't be correct for db, will correct later
   }
   database_tags = {
     component                               = "data"
