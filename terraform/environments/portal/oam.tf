@@ -522,7 +522,7 @@ resource "aws_route53_record" "oam1_nonprod" {
 
 resource "aws_efs_file_system" "portal" {
   encrypted   = true
-  
+
   tags = {
     Name = "portal-efs-poc"
   }
@@ -531,7 +531,7 @@ resource "aws_efs_file_system" "portal" {
 resource "aws_efs_mount_target" "portal" {
   file_system_id = aws_efs_file_system.portal.id
   subnet_id      = data.aws_subnet.private_subnets_a.id
-  security_groups = [aws_security_group.oam_instance.id]
+  security_groups = [aws_security_group.efs.id]
 }
 
 resource "aws_security_group" "efs" {
