@@ -65,11 +65,12 @@ locals {
   ###
   ### env independent webserver vars
   ###
-  webserver = {
+  webserver_a = {
     config = merge(module.baseline_presets.ec2_instance.config.default, {
       ami_name                  = "oasys_webserver_release_*"
       ssm_parameters_prefix     = "ec2-web/"
       iam_resource_names_prefix = "ec2-web"
+      availability_zone         = "${local.region}a"
     })
     instance = merge(module.baseline_presets.ec2_instance.instance.default, {
       monitoring = true
@@ -116,10 +117,16 @@ locals {
       oracle-db-sid = "OASPROD"
     }
   }
+  webserver_b = merge(local.webserver_a, {
+    config = merge(local.webserver_a.config, {
+      availability_zone = "${local.region}b"
+    })
+  })
 
-  database = {
+  database_a = {
     config = merge(module.baseline_presets.ec2_instance.config.db, {
       ami_name = "oasys_oracle_db_*"
+      availability_zone = "${local.region}a"
     })
     instance              = module.baseline_presets.ec2_instance.instance.default_db
     autoscaling_schedules = {}
@@ -219,6 +226,11 @@ locals {
     # Example target group setup below
     lb_target_groups = local.lb_target_groups # This won't be correct for db, will correct later
   }
+  database_b = merge(local.database_a, {
+    config = merge(local.database_a.config, {
+      availability_zone = "${local.region}b"
+    })
+  })
   database_tags = {
     component                               = "data"
     oracle-sids                             = "OASPROD BIPINFRA"
@@ -233,6 +245,7 @@ locals {
     "${local.application_name}-environment" = local.environment
     environment-name                        = terraform.workspace # used in provisioning script to select group vars
   }
+  
 
 
   # lb_listener_defaults = {
