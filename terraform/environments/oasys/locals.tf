@@ -78,28 +78,28 @@ locals {
     user_data_cloud_init     = module.baseline_presets.ec2_instance.user_data_cloud_init.ssm_agent_ansible_no_tags
     autoscaling_schedules    = module.baseline_presets.ec2_autoscaling_schedules.working_hours
     autoscaling_group        = module.baseline_presets.ec2_autoscaling_group.default
-    lb_target_groups = {
-      http-8080 = {
-        port                 = 8080
-        protocol             = "HTTP"
-        target_type          = "instance"
-        deregistration_delay = 30
-        health_check = {
-          enabled             = true
-          interval            = 30
-          healthy_threshold   = 3
-          matcher             = "200-399"
-          path                = "/"
-          port                = 8080
-          timeout             = 5
-          unhealthy_threshold = 5
-        }
-        stickiness = {
-          enabled = true
-          type    = "lb_cookie"
-        }
-      }
-    }
+    # lb_target_groups = {
+    #   http-8080 = {
+    #     port                 = 8080
+    #     protocol             = "HTTP"
+    #     target_type          = "instance"
+    #     deregistration_delay = 30
+    #     health_check = {
+    #       enabled             = true
+    #       interval            = 30
+    #       healthy_threshold   = 3
+    #       matcher             = "200-399"
+    #       path                = "/"
+    #       port                = 8080
+    #       timeout             = 5
+    #       unhealthy_threshold = 5
+    #     }
+    #     stickiness = {
+    #       enabled = true
+    #       type    = "lb_cookie"
+    #     }
+    #   }
+    # }
     tags = {
       component         = "web"
       description       = "${local.environment} ${local.application_name} web"
@@ -217,7 +217,7 @@ locals {
       }
     }
     # Example target group setup below
-    lb_target_groups = local.lb_target_groups # This won't be correct for db, will correct later
+    #lb_target_groups = local.lb_target_groups # This won't be correct for db, will correct later
   }
   database_tags = {
     component                               = "data"
