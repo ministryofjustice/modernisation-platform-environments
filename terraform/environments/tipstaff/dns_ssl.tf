@@ -60,7 +60,6 @@ resource "aws_route53_record" "external" {
 
 // ACM Public Certificate
 resource "aws_acm_certificate" "external_prod" {
-  count                     = local.is-production ? 1 : 0
   domain_name               = "tipstaff.service.justice.gov.uk"
   validation_method         = "DNS"
   subject_alternative_names = ["tipstaff.service.justice.gov.uk"]
@@ -73,12 +72,11 @@ resource "aws_acm_certificate" "external_prod" {
 }
 
 resource "aws_acm_certificate_validation" "external_prod" {
-  count = local.is-production ? 1 : 0
   depends_on = [
     aws_route53_record.external_validation_prod[0]
   ]
-  certificate_arn         = aws_acm_certificate.external_prod[0].arn
-  validation_record_fqdns = [for record in aws_route53_record.external_validation_prod[0] : record.fqdn]
+  certificate_arn         = aws_acm_certificate.external_prod.arn
+  validation_record_fqdns = [for record in aws_route53_record.external_validation_prod : record.fqdn]
   timeouts {
     create = "10m"
   }
@@ -86,11 +84,10 @@ resource "aws_acm_certificate_validation" "external_prod" {
 
 // Route53 DNS record for certificate validation
 resource "aws_route53_record" "external_validation_prod" {
-  count    = local.is-production ? 1 : 0
   provider = aws.core-network-services
 
   for_each = {
-    for dvo in aws_acm_certificate.external_prod[0].domain_validation_options : dvo.domain_name => {
+    for dvo in aws_acm_certificate.external_prod.domain_validation_options : dvo.domain_name => {
       name   = dvo.resource_record_name
       record = dvo.resource_record_value
       type   = dvo.resource_record_type
@@ -107,7 +104,6 @@ resource "aws_route53_record" "external_validation_prod" {
 
 // Route53 DNS record for directing traffic to the service
 resource "aws_route53_record" "external_prod" {
-  count    = local.is-production ? 1 : 0
   provider = aws.core-network-services
 
   zone_id = data.aws_route53_zone.application_zone.zone_id
