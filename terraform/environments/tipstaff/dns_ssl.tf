@@ -60,9 +60,11 @@ resource "aws_route53_record" "external" {
 
 // ACM Public Certificate
 resource "aws_acm_certificate" "external_prod" {
-  domain_name               = "tipstaff.service.justice.gov.uk"
-  validation_method         = "DNS"
-  subject_alternative_names = ["tipstaff.service.justice.gov.uk"]
+  domain_name       = "tipstaff.service.justice.gov.uk"
+  validation_method = "DNS"
+  subject_alternative_names = [
+    "*.tipstaff.service.justice.gov.uk"
+  ]
   tags = {
     Environment = local.environment
   }
