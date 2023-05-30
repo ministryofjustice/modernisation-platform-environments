@@ -72,9 +72,6 @@ resource "aws_acm_certificate" "external_prod" {
 }
 
 resource "aws_acm_certificate_validation" "external_prod" {
-  depends_on = [
-    aws_route53_record.external_validation_prod[0]
-  ]
   certificate_arn         = aws_acm_certificate.external_prod.arn
   validation_record_fqdns = [for record in aws_route53_record.external_validation_prod : record.fqdn]
   timeouts {
