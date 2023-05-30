@@ -44,37 +44,37 @@ module "lb" {
   ]
 }
 
-module "lb_listener" {
-  for_each = local.lb_listeners
+# module "lb_listener" {
+#   for_each = local.lb_listeners
 
-  source = "../../modules/lb_listener"
+#   source = "../../modules/lb_listener"
 
-  name                      = each.key
-  business_unit             = var.environment.business_unit
-  environment               = var.environment.environment
-  load_balancer             = module.lb[each.value.lb_application_name].load_balancer
-  existing_target_groups    = merge(local.asg_target_groups, var.lbs[each.value.lb_application_name].existing_target_groups)
-  port                      = each.value.port
-  protocol                  = each.value.protocol
-  ssl_policy                = each.value.ssl_policy
-  certificate_arn_lookup    = { for key, value in module.acm_certificate : key => value.arn }
-  certificate_names_or_arns = each.value.certificate_names_or_arns
-  default_action            = each.value.default_action
-  rules                     = each.value.rules
+#   name                      = each.key
+#   business_unit             = var.environment.business_unit
+#   environment               = var.environment.environment
+#   load_balancer             = module.lb[each.value.lb_application_name].load_balancer
+#   existing_target_groups    = merge(local.asg_target_groups, var.lbs[each.value.lb_application_name].existing_target_groups)
+#   port                      = each.value.port
+#   protocol                  = each.value.protocol
+#   ssl_policy                = each.value.ssl_policy
+#   certificate_arn_lookup    = { for key, value in module.acm_certificate : key => value.arn }
+#   certificate_names_or_arns = each.value.certificate_names_or_arns
+#   default_action            = each.value.default_action
+#   rules                     = each.value.rules
 
-  cloudwatch_metric_alarms = {
-    for key, value in each.value.cloudwatch_metric_alarms : key => merge(value, {
-      alarm_actions = [
-        for item in value.alarm_actions : try(aws_sns_topic.this[item].arn, item)
-      ]
-    })
-  }
+#   cloudwatch_metric_alarms = {
+#     for key, value in each.value.cloudwatch_metric_alarms : key => merge(value, {
+#       alarm_actions = [
+#         for item in value.alarm_actions : try(aws_sns_topic.this[item].arn, item)
+#       ]
+#     })
+#   }
 
-  tags = merge(local.tags, each.value.tags)
+#   tags = merge(local.tags, each.value.tags)
 
-  depends_on = [
-    module.acm_certificate, # ensure certs are created first
-  ]
+#   depends_on = [
+#     module.acm_certificate, # ensure certs are created first
+#   ]
 
-  alarm_target_group_names = each.value.alarm_target_group_names
-}
+#   alarm_target_group_names = each.value.alarm_target_group_names
+# }
