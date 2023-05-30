@@ -63,9 +63,9 @@ resource "aws_acm_certificate" "external_prod" {
   # count             = local.is-production ? 1 : 0
   domain_name       = "tipstaff.service.justice.gov.uk"
   validation_method = "DNS"
-  subject_alternative_names = [
-    "*.tipstaff.service.justice.gov.uk"
-  ]
+  # subject_alternative_names = [
+  #   "*.tipstaff.service.justice.gov.uk"
+  # ]
 
   lifecycle {
     create_before_destroy = true
@@ -116,7 +116,7 @@ resource "aws_route53_record" "external_validation_prod" {
 }
 
 resource "aws_route53_record" "external_validation_subdomain_prod" {
-  provider = aws.core-vpc
+  provider = aws.core-network-services
 
   allow_overwrite = true
   name            = local.domain_name_sub_prod[0]
