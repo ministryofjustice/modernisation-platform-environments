@@ -52,7 +52,7 @@ make
 make install
 cd /
 mkdir /rman
-s3fs -o iam_role="role_stsassume_oracle_base" -o url="https://s3.eu-west-2.amazonaws.com" -o endpoint=eu-west-2 -o dbglevel=info -o curldbg -o allow_other -o use_cache=/tmp ccms-ebs-${local.environment}-dbbackup /rman
+s3fs -o iam_role="role_stsassume_oracle_base" -o url="https://s3.eu-west-2.amazonaws.com" -o endpoint=eu-west-2 -o dbglevel=info -o curldbg -o allow_other ccms-ebs-${local.environment}-dbbackup /rman
 echo "ccms-ebs-${local.environment}-dbbackup /rman fuse.s3fs _netdev,allow_other,url=https://s3.eu-west-2.amazonaws.com,iam_role=role_stsassume_oracle_base 0 0" >> /etc/fstab
 
 EOF
@@ -271,7 +271,32 @@ resource "aws_volume_attachment" "diag_att" {
   volume_id   = aws_ebs_volume.diag[0].id
   instance_id = aws_instance.ec2_oracle_ebs.id
 }
+/*
+####  This mount was required for golive incident
+####  Just commenting out, rather than remove - just in case
 
+resource "aws_ebs_volume" "dbf2" {
+  count = local.is-production ? 1 : 0
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
+  availability_zone = "eu-west-2a"
+  size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_dbf2
+  type              = "io2"
+  iops              = local.application_data.accounts[local.environment].ebs_default_dbf2_iops
+  encrypted         = true
+  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  tags = merge(local.tags,
+    { Name = "dbf2" }
+  )
+}
+resource "aws_volume_attachment" "dbf2_att" {
+  count = local.is-production ? 1 : 0
+  device_name = "/dev/sdo"
+  volume_id   = aws_ebs_volume.dbf2[0].id
+  instance_id = aws_instance.ec2_oracle_ebs.id
+}
+*/
 
 module "cw-ebs-ec2" {
   source = "./modules/cw-ec2"
@@ -328,11 +353,12 @@ resource "aws_cloudwatch_metric_alarm" "disk_free_dbf" {
   alarm_actions       = [aws_sns_topic.cw_alerts.arn]
 
   dimensions = {
-    InstanceId   = aws_instance.ec2_oracle_ebs.id
-    imageId      = aws_instance.ec2_oracle_ebs.ami
+    ImageId      = aws_instance.ec2_oracle_ebs.ami
+    path         = local.application_data.accounts[local.environment].dbf_path
     InstanceType = aws_instance.ec2_oracle_ebs.instance_type
-    path         = "/CCMS/EBS/dbf"
-    device       = local.application_data.accounts[local.environment].dbf_device
+    InstanceId   = aws_instance.ec2_oracle_ebs.id
     fstype       = "ext4"
+    device       = local.application_data.accounts[local.environment].dbf_device
   }
 }
+

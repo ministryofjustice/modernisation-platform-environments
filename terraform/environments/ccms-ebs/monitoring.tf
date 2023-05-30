@@ -1,7 +1,7 @@
 # DDoS Alarm
 
 resource "aws_cloudwatch_metric_alarm" "ddos_attack_external_ebsapps_alb" {
-  alarm_name          = "DDoSDetected"
+  alarm_name          = "DDoSDetectedEBSALB"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = "3"
   metric_name         = "DDoSDetected"
@@ -17,7 +17,7 @@ resource "aws_cloudwatch_metric_alarm" "ddos_attack_external_ebsapps_alb" {
   }
 }
 resource "aws_cloudwatch_metric_alarm" "ddos_attack_external_ebsapps_nlb" {
-  alarm_name          = "DDoSDetected"
+  alarm_name          = "DDoSDetectedEBSNLB"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = "3"
   metric_name         = "DDoSDetected"
@@ -34,7 +34,7 @@ resource "aws_cloudwatch_metric_alarm" "ddos_attack_external_ebsapps_nlb" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "ddos_attack_external_webgate_alb" {
-  alarm_name          = "DDoSDetected"
+  alarm_name          = "DDoSDetectedWebGateALB"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = "3"
   metric_name         = "DDoSDetected"
@@ -46,11 +46,11 @@ resource "aws_cloudwatch_metric_alarm" "ddos_attack_external_webgate_alb" {
   treat_missing_data  = "notBreaching"
   alarm_actions       = [aws_sns_topic.ddos_alarm.arn]
   dimensions = {
-    ResourceArn = aws_lb.webgate_lb[0].arn
+    ResourceArn = aws_lb.webgate_public_lb.arn
   }
 }
 resource "aws_cloudwatch_metric_alarm" "ddos_attack_external_webgate_nlb" {
-  alarm_name          = "DDoSDetected"
+  alarm_name          = "DDoSDetectedWebGateNLB"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = "3"
   metric_name         = "DDoSDetected"
