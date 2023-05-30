@@ -4,7 +4,7 @@ data "aws_db_instance" "database" {
 }
 
 data "aws_secretsmanager_secret" "rds-secrets" {
-  arn = "arn:aws:secretsmanager:eu-west-2:207640118376:secret:tf-tribunals-dev-credentials-3Qvv1c"
+  arn = var.rds_secret_arn
 }
 
 data "aws_secretsmanager_secret_version" "rds" {

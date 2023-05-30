@@ -17,3 +17,6 @@ variable app_db_login_name {
 
 variable "db_instance_identifier" {  
 }
+
+variable "rds_secret_arn" {  
+}
