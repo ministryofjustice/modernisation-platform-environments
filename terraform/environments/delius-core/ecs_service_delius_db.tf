@@ -109,10 +109,6 @@ data "aws_iam_policy_document" "delius_db_ecs_exec" {
 
     actions = [
       "ssm:GetParameters",
-      "ssmmessages:CreateControlChannel",
-      "ssmmessages:CreateDataChannel",
-      "ssmmessages:OpenControlChannel",
-      "ssmmessages:OpenDataChannel",
       "ecr:GetAuthorizationToken",
       "ecr:BatchCheckLayerAvailability",
       "ecr:GetDownloadUrlForLayer",
