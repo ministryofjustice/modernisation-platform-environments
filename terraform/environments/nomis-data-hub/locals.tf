@@ -21,7 +21,7 @@ locals {
     "ndh_ems_port_1",
     "ndh_ems_port_2",
     "ndh_host_os",
-    "ndh_host_os_version"
-    "ndh_harkemsadmin_ssl_pass"
+    "ndh_host_os_version",
+    "ndh_harkemsadmin_ssl_pass",
   ]
 }
