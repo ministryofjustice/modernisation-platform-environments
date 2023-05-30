@@ -99,7 +99,7 @@ locals {
       #     type    = "lb_cookie"
       #   }
       # }
-    }
+    # }
     tags = {
       component         = "web"
       description       = "${local.environment} ${local.application_name} web"
