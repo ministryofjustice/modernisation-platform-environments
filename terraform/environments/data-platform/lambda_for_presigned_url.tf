@@ -7,7 +7,7 @@ data "archive_file" "presigned_url_zip" {
 resource "aws_iam_role" "presigned_url_lambda_role" {
   name               = "presigned_url_role_${local.environment}"
   assume_role_policy = data.aws_iam_policy_document.lambda_trust_policy_doc.json
-  tags = local.tags
+  tags               = local.tags
 }
 
 data "aws_iam_policy_document" "iam_policy_document_for_presigned_url_lambda" {
@@ -24,7 +24,7 @@ resource "aws_iam_policy" "presigned_url_lambda_policy" {
   path        = "/"
   description = "AWS IAM Policy for managing presigned_url lambda role"
   policy      = data.aws_iam_policy_document.iam_policy_document_for_presigned_url_lambda.json
-  tags = local.tags
+  tags        = local.tags
 }
 
 resource "aws_iam_role_policy_attachment" "attach_presigned_url_lambda_policy_to_iam_role" {
@@ -47,4 +47,13 @@ resource "aws_lambda_function" "presigned_url" {
     }
   }
   tags = local.tags
+}
+
+resource "aws_lambda_permission" "api_gw" {
+  statement_id  = "AllowExecutionFromAPIGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.presigned_url.function_name
+  principal     = "apigateway.amazonaws.com"
+
+  source_arn = "arn:aws:execute-api:${local.region}:${local.account_id}:${aws_api_gateway_rest_api.data_platform.id}/*/${aws_api_gateway_method.upload_data_get.http_method}${aws_api_gateway_resource.upload_data.path}"
 }

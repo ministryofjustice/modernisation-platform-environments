@@ -50,25 +50,7 @@ locals {
               }
             }
             rules = {
-              # pp-web-http-8080 = {
-              #   priority = 100
-              #   actions = [{
-              #     type              = "forward"
-              #     target_group_name = "pp-${local.application_name}-web-http-8080"
-              #   }]
-              #   conditions = [
-              #     {
-              #       host_header = {
-              #         values = ["pp.${module.environment.domains.public.short_name}"]
-              #       }
-              #     },
-              #     {
-              #       path_pattern = {
-              #         values = ["/"]
-              #       }
-              #     }
-              #   ]
-              # }
+
             }
           }
         }

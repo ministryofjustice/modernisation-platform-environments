@@ -22,16 +22,20 @@ locals {
 
     baseline_ec2_autoscaling_groups = {
 
-      "dev-${local.application_name}-db" = merge(local.database, {
+      "dev-${local.application_name}-db-a" = merge(local.database_a, {
         autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
         tags                  = local.database_tags
       })
+      # "dev-${local.application_name}-db-b" = merge(local.database_b, {
+      #   autoscaling_schedules = module.baseline_presets.ec2_autoscaling_schedules.working_hours
+      #   tags                  = local.database_tags
+      # })
 
-      "${local.application_name}-web" = merge(local.webserver, {
+      "${local.application_name}-web-a" = merge(local.webserver_a, {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name = "oasys_webserver_release_*"
         })
-        tags = merge(local.webserver.tags, {
+        tags = merge(local.webserver_a.tags, {
           description = "${local.application_name} web"
         })
       })
@@ -88,7 +92,7 @@ locals {
                 priority = 100
                 actions = [{
                   type              = "forward"
-                  target_group_name = "${local.application_name}-web-http-8080"
+                  target_group_name = "${local.application_name}-web-a-http-8080"
                 }]
                 conditions = [
                   {
