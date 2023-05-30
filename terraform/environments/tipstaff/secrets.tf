@@ -10,7 +10,7 @@ resource "random_password" "password" {
 
 // Secrets for the tipstaff database on the modernisation platform
 resource "aws_secretsmanager_secret" "rds_db_credentials" {
-  name                    = "rds-db-credentials"
+  name                    = "db-password"
   recovery_window_in_days = 0
 }
 
