@@ -97,7 +97,7 @@ resource "aws_route53_record" "external_validation_prod" {
 }
 
 resource "aws_route53_record" "external_validation_subdomain_prod" {
-  provider = aws.core-vpc
+  provider = aws.core-network-services
 
   allow_overwrite = true
   name            = local.domain_name_sub_prod[0]
@@ -109,7 +109,7 @@ resource "aws_route53_record" "external_validation_subdomain_prod" {
 
 // Route53 DNS record for directing traffic to the service
 resource "aws_route53_record" "external_prod" {
-  provider = aws.core-vpc
+  provider = aws.core-network-services
 
   zone_id = data.aws_route53_zone.application_zone.zone_id
   name    = "tipstaff.service.justice.gov.uk"
