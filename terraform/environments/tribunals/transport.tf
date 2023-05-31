@@ -1,3 +1,12 @@
+data "aws_secretsmanager_secret" "rds-secrets" {
+  arn = "arn:aws:secretsmanager:eu-west-2:263310006819:secret:tribunals-db-dev-credentials-WIKA7c"
+}
+
+data "aws_secretsmanager_secret_version" "rds" {
+  secret_id = data.aws_secretsmanager_secret.rds-secrets.id
+}
+
+
 resource "random_password" "new_password" {
   length  = 16
   special = false //Only printable ASCII characters besides '/', '@', '"', ' ' may be used.
