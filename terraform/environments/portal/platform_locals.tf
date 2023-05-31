@@ -1,6 +1,6 @@
 locals {
 
-  application_name = "portal"
+  # application_name = "portal"
 
   environment_management = jsondecode(data.aws_secretsmanager_secret_version.environment_management.secret_string)
 

@@ -1,3 +1,29 @@
+locals {
+  # General
+  region = "eu-west-2"
+
+  # RDS
+  application_name           = "igdb"
+  appstream_cidr             = "10.200.32.0/19"
+  cidr_ire_workspace         = "10.200.96.0/19"
+  workspaces_cidr            = "10.200.16.0/20"
+  cp_vpc_cidr                = "172.20.0.0/20"
+  storage_size               = "200"
+  auto_minor_version_upgrade = false
+  backup_retention_period    = "35"
+  character_set_name         = "AL32UTF8"
+  instance_class             = "db.t3.large"
+  engine                     = "oracle-ee"
+  engine_version             = "19.0.0.0.ru-2021-10.rur-2021-10.r1"
+  username                   = "sysdba"
+  max_allocated_storage      = "3500"
+  backup_window              = "22:00-01:00"
+  maintenance_window         = "Mon:01:15-Mon:06:00"
+  storage_type               = "gp2"
+  rds_snapshot_name          = "laws3169-mojfin-migration-v1"
+  lzprd-vpc                  = "10.205.0.0/20"
+}
+
 resource "aws_db_subnet_group" "igdb" {
   name       = "${local.application_name}-${local.environment}-subnetgrp"
   subnet_ids = [data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id]
@@ -122,40 +148,40 @@ resource "aws_security_group" "igdb" {
   }
 
 
-  ingress {
-    description = "Connectivity from Portal IDM VPC"
-    from_port   = 1521
-    to_port     = 1521
-    protocol    = "tcp"
-    cidr_blocks = [data.aws_vpc.shared.cidr_block_IDM]
-  }
+  # ingress {
+  #   description = "Connectivity from Portal IDM VPC"
+  #   from_port   = 1521
+  #   to_port     = 1521
+  #   protocol    = "tcp"
+  #   cidr_blocks = [data.aws_vpc.shared.cidr_block_IDM]
+  # }
 
 
-  ingress {
-    description = "Connectivity from Portal OAM VPC"
-    from_port   = 1521
-    to_port     = 1521
-    protocol    = "tcp"
-    cidr_blocks = [data.aws_vpc.shared.cidr_block_OAM]
-  }
+  # ingress {
+  #   description = "Connectivity from Portal OAM VPC"
+  #   from_port   = 1521
+  #   to_port     = 1521
+  #   protocol    = "tcp"
+  #   cidr_blocks = [data.aws_vpc.shared.cidr_block_OAM]
+  # }
 
 
-  ingress {
-    description = "Connectivity from Portal OIM VPC"
-    from_port   = 1521
-    to_port     = 1521
-    protocol    = "tcp"
-    cidr_blocks = [data.aws_vpc.shared.cidr_block_OIM]
-  }
+  # ingress {
+  #   description = "Connectivity from Portal OIM VPC"
+  #   from_port   = 1521
+  #   to_port     = 1521
+  #   protocol    = "tcp"
+  #   cidr_blocks = [data.aws_vpc.shared.cidr_block_OIM]
+  # }
 
 
-  ingress {
-    description = "Connectivity from Portal OIM VPC"
-    from_port   = 1521
-    to_port     = 1521
-    protocol    = "tcp"
-    cidr_blocks = [data.aws_vpc.shared.cidr_block_OHS]
-  }
+  # ingress {
+  #   description = "Connectivity from Portal OHS VPC"
+  #   from_port   = 1521
+  #   to_port     = 1521
+  #   protocol    = "tcp"
+  #   cidr_blocks = [data.aws_vpc.shared.cidr_block_OHS]
+  # }
 
 
   egress {
@@ -217,25 +243,25 @@ resource "aws_db_instance" "appdb1" {
   backup_window                   = local.backup_window
   character_set_name              = local.character_set_name
   #?max_allocated_storage           = local.max_allocated_storage
-  username                        = local.username
-  password                        = random_password.rds_password.result
-  vpc_security_group_ids          = [aws_security_group.igdb.id]
+  username               = local.username
+  password               = random_password.rds_password.result
+  vpc_security_group_ids = [aws_security_group.igdb.id]
   #?skip_final_snapshot             = false
   #?final_snapshot_identifier       = "${local.application_name}-${formatdate("DDMMMYYYYhhmm", timestamp())}-finalsnapshot"
-  parameter_group_name            = aws_db_parameter_group.igdb-parametergroup-19c.name
-  db_subnet_group_name            = aws_db_subnet_group.igdb.name
-  maintenance_window              = local.maintenance_window
-  license_model                   = "bring-your-own-license"
-  deletion_protection             = true
-  copy_tags_to_snapshot           = true
-  storage_encrypted               = true
+  parameter_group_name  = aws_db_parameter_group.igdb-parametergroup-19c.name
+  db_subnet_group_name  = aws_db_subnet_group.igdb.name
+  maintenance_window    = local.maintenance_window
+  license_model         = "bring-your-own-license"
+  deletion_protection   = true
+  copy_tags_to_snapshot = true
+  storage_encrypted     = true
   #?apply_immediately               = true
-  snapshot_identifier             = format("arn:aws:rds:eu-west-2:%s:snapshot:%s", data.aws_caller_identity.current.account_id,local.rds_snapshot_name)
-  kms_key_id                      = data.aws_kms_key.rds_shared.arn
-  publicly_accessible             = false
-  allow_major_version_upgrade     = true
-  multi_az                        = false
-  option_group_name               = aws_db_option_group.PortalIGDB19OptionGroup.name
+  snapshot_identifier         = format("arn:aws:rds:eu-west-2:%s:snapshot:%s", data.aws_caller_identity.current.account_id, local.rds_snapshot_name)
+  kms_key_id                  = data.aws_kms_key.rds_shared.arn
+  publicly_accessible         = false
+  allow_major_version_upgrade = true
+  multi_az                    = false
+  option_group_name           = aws_db_option_group.PortalIGDB19OptionGroup.name
 
 
 
