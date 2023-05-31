@@ -271,6 +271,9 @@ resource "aws_volume_attachment" "diag_att" {
   volume_id   = aws_ebs_volume.diag[0].id
   instance_id = aws_instance.ec2_oracle_ebs.id
 }
+/*
+####  This mount was required for golive incident
+####  Just commenting out, rather than remove - just in case
 
 resource "aws_ebs_volume" "dbf2" {
   count = local.is-production ? 1 : 0
@@ -278,9 +281,9 @@ resource "aws_ebs_volume" "dbf2" {
     ignore_changes = [kms_key_id]
   }
   availability_zone = "eu-west-2a"
-  size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_dbf
+  size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_dbf2
   type              = "io2"
-  iops              = local.application_data.accounts[local.environment].ebs_default_iops
+  iops              = local.application_data.accounts[local.environment].ebs_default_dbf2_iops
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,
@@ -293,6 +296,7 @@ resource "aws_volume_attachment" "dbf2_att" {
   volume_id   = aws_ebs_volume.dbf2[0].id
   instance_id = aws_instance.ec2_oracle_ebs.id
 }
+*/
 
 module "cw-ebs-ec2" {
   source = "./modules/cw-ec2"

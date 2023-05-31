@@ -16,9 +16,9 @@ if [[ -z $profile || -z $db_name || -z $expiry ]]; then
 fi
 
 if [[ $profile == "nomis-development" || $profile == "nomis-test" ]]; then
-  az_sas_token=$(az storage account generate-sas --subscription "NOMS Dev & Test Environments" --account-name strtcmonsazcopyorabkup --permissions rl --resource-types o --services b --https-only --expiry "$expiry" | sed 's/"//g')
+  az_sas_token=$(az storage account generate-sas --subscription "NOMS Dev & Test Environments" --account-name strtcmonsazcopyorabkup --permissions rl --resource-types oc --services b --https-only --expiry "$expiry" | sed 's/"//g')
 elif [[ $profile == "nomis-preproduction" || $profile == "nomis-production" ]]; then
-  az_sas_token=$(az storage account generate-sas --subscription "NOMS Production 1" --account-name strpdnomsazcopyorabkup --permissions rl --resource-types o --services b --https-only --expiry "$expiry" | sed 's/"//g')
+  az_sas_token=$(az storage account generate-sas --subscription "NOMS Production 1" --account-name strpdnomsazcopyorabkup --permissions rl --resource-types oc --services b --https-only --expiry "$expiry" | sed 's/"//g')
 else
   echo "Unexpected profile $profile"
   exit 1
