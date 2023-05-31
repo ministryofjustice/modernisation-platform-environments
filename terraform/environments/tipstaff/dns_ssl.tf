@@ -65,12 +65,6 @@ resource "aws_route53_record" "external" {
 resource "aws_acm_certificate" "external_prod" {
   domain_name       = "tipstaff.service.justice.gov.uk"
   validation_method = "DNS"
-  subject_alternative_names = [
-    "*.tipstaff.service.justice.gov.uk"
-  ]
-  tags = {
-    Environment = local.environment
-  }
   lifecycle {
     create_before_destroy = true
   }
