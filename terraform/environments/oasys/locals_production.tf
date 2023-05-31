@@ -28,25 +28,6 @@ locals {
     }
 
     baseline_acm_certificates = {
-      "${local.application_name}_wildcard_cert" = {
-        # domain_name limited to 64 chars so use modernisation platform domain for this
-        # and put the wildcard in the san
-        domain_name = module.environment.domains.public.modernisation_platform
-        subject_alternate_names = [
-          "*.${module.environment.domains.public.application_environment}",
-          "*.${module.environment.domains.public.short_name}",     #     "oasys.service.justice.gov.uk"
-          "*.trn.${module.environment.domains.public.short_name}", # "trn.oasys.service.justice.gov.uk"
-          "*.ptc.${module.environment.domains.public.short_name}", # "ptc.oasys.service.justice.gov.uk"
-          "*.${local.application_name}.az.justice.gov.uk",
-          "*.trn.${local.application_name}.az.justice.gov.uk",
-          "*.ptc.${local.application_name}.az.justice.gov.uk",
-        ]
-        external_validation_records_created = true
-        cloudwatch_metric_alarms            = {} #module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso"].acm_default
-        tags = {
-          description = "wildcard cert for ${local.application_name} ${local.environment} domains"
-        }
-      }
     }
 
     baseline_lbs = {
