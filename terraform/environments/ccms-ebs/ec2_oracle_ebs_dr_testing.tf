@@ -200,7 +200,7 @@ resource "aws_volume_attachment" "techst_att_dr" {
   volume_id   = aws_ebs_volume.techst_dr[0].id
   instance_id = aws_instance.ec2_oracle_ebs_dr[0].id
 }
-
+/*
 resource "aws_ebs_volume" "backup_dr" {
   count = local.environment == "development" ? 1 : 0
   lifecycle {
@@ -222,3 +222,4 @@ resource "aws_volume_attachment" "backup_att_dr" {
   volume_id   = aws_ebs_volume.backup_dr[0].id
   instance_id = aws_instance.ec2_oracle_ebs_dr[0].id
 }
+*/
