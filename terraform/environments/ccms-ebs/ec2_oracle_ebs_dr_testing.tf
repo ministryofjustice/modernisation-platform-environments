@@ -144,7 +144,7 @@ resource "aws_ebs_volume" "dbf_dr" {
   availability_zone = "eu-west-2a"
   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_dbf
   type              = "io2"
-  iops              = local.application_data.accounts[local.environment].ebs_default_iops
+  iops              = local.application_data.accounts[local.environment].ebs_default_iops_test
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,

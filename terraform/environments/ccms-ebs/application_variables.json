@@ -61,6 +61,7 @@
       "ebs_size_ebsdb_redoA": 100,
       "ebs_size_ebsdb_techst": 50,
       "ebs_size_ebsdb_backup": 8000,
+      "ebs_default_iops_test": 9000,
       "dbf_device": "nvme5n1",
       "dbf_path": "/CCMS/EBS/dbf"
     },
