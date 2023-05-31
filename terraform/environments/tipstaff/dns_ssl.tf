@@ -77,10 +77,6 @@ resource "aws_acm_certificate" "external_prod" {
 }
 
 resource "aws_acm_certificate_validation" "external_prod" {
-  depends_on = [
-    aws_route53_record.external_validation_prod
-  ]
-
   certificate_arn         = aws_acm_certificate.external_prod.arn
   validation_record_fqdns = [local.domain_name_main_prod[0]]
   timeouts {
@@ -100,9 +96,20 @@ resource "aws_route53_record" "external_validation_prod" {
   zone_id         = data.aws_route53_zone.application_zone.zone_id
 }
 
+resource "aws_route53_record" "external_validation_subdomain_prod" {
+  provider = aws.core-vpc
+
+  allow_overwrite = true
+  name            = local.domain_name_sub_prod[0]
+  records         = local.domain_record_sub_prod
+  ttl             = 60
+  type            = local.domain_type_sub_prod[0]
+  zone_id         = data.aws_route53_zone.application_zone.zone_id
+}
+
 // Route53 DNS record for directing traffic to the service
 resource "aws_route53_record" "external_prod" {
-  provider = aws.core-network-services
+  provider = aws.core-vpc
 
   zone_id = data.aws_route53_zone.application_zone.zone_id
   name    = "tipstaff.service.justice.gov.uk"
