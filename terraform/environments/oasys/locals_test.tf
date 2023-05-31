@@ -11,13 +11,13 @@ locals {
     }
 
     baseline_ec2_autoscaling_groups = {
-      "t2-${local.application_name}-web" = merge(local.webserver, {
+      "t2-${local.application_name}-web-a" = merge(local.webserver_a, {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name                  = "oasys_webserver_release_*"
           ssm_parameters_prefix     = "ec2-web-t2/"
           iam_resource_names_prefix = "ec2-web-t2"
         })
-        tags = merge(local.webserver.tags, {
+        tags = merge(local.webserver_a.tags, {
           description                             = "t2 ${local.application_name} web"
           "${local.application_name}-environment" = "t2"
           oracle-db-hostname                      = "db.t2.oasys.hmpps-test.modernisation-platform.internal" # "T2ODL0009.azure.noms.root"
@@ -71,7 +71,7 @@ locals {
                 priority = 100
                 actions = [{
                   type              = "forward"
-                  target_group_name = "t2-${local.application_name}-web-http-8080"
+                  target_group_name = "t2-${local.application_name}-web-a-http-8080"
                 }]
                 conditions = [
                   {

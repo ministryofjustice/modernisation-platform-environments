@@ -39,7 +39,7 @@ data "aws_iam_policy_document" "lambda_trust_policy_doc" {
 resource "aws_iam_role" "data_extractor_lambda_role" {
   name               = "data_extractor_${local.environment}_role_${local.environment}"
   assume_role_policy = data.aws_iam_policy_document.lambda_trust_policy_doc.json
-  tags = local.tags
+  tags               = local.tags
 }
 
 data "aws_iam_policy_document" "iam_policy_document_for_data_lambda" {
@@ -63,7 +63,7 @@ resource "aws_iam_policy" "data_extractor_lambda_policy" {
   path        = "/"
   description = "AWS IAM Policy for managing data_extractor lambda role"
   policy      = data.aws_iam_policy_document.iam_policy_document_for_data_lambda.json
-  tags = local.tags
+  tags        = local.tags
 }
 
 resource "aws_iam_role_policy_attachment" "attach_data_lambda_policy_to_iam_role" {
