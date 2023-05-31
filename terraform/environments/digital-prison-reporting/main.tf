@@ -52,7 +52,7 @@ module "glue_reporting_hub_job" {
     "--enable-spark-ui"                         = false
     "--enable-job-insights"                     = true
     "--dpr.aws.kinesis.endpointUrl"             = "https://kinesis.${local.account_region}.amazonaws.com"
-    "--dpr.contract.registryName"               = module.glue_registry_avro.registry_name
+    "--dpr.contract.registryName"               = split("/", module.glue_registry_avro.registry_name)
   }
 }
 
