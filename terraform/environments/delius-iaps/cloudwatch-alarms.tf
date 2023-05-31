@@ -64,6 +64,33 @@ resource "aws_cloudwatch_metric_alarm" "in_service_instances_below_threshold" {
   }
 }
 
+// Nginx Alarms
+resource "aws_cloudwatch_log_metric_filter" "nginx_connect_error" {
+  name           = "NginxConnectError"
+  pattern        = "\"[error]\" \"connect() failed\""
+  log_group_name = aws_cloudwatch_log_group.cloudwatch_agent_log_groups["error.log"].name
+
+  metric_transformation {
+    name      = "NginxConnectError"
+    namespace = "IAPS"
+    value     = 1
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "nginx_connect_error" {
+  alarm_name          = "${local.application_name}-high-nginx-connect-error-count"
+  alarm_description   = "Triggers alarm if there are consistent upstream connection errors"
+  namespace           = "IAPS"
+  metric_name         = "NginxConnectError"
+  statistic           = "Sum"
+  period              = "300"
+  evaluation_periods  = "1"
+  alarm_actions       = [aws_sns_topic.iaps_alerting.arn]
+  ok_actions          = [aws_sns_topic.iaps_alerting.arn]
+  threshold           = "3"
+  treat_missing_data  = "missing"
+  comparison_operator = "GreaterThanThreshold"
+}
 
 // RDS Alarms
 resource "aws_cloudwatch_metric_alarm" "rds_cpu_utilization_over_threshold" {
