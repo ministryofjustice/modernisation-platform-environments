@@ -1,6 +1,6 @@
 # Pre-req - security group
-resource "aws_security_group" "onprem_gateway_sg" {
-  name        = "onprem-gateway-sg"
+resource "aws_security_group" "onprem_gateway" {
+  name        = "onprem-gateway"
   description = "Controls access onprem gateway instance"
   vpc_id      = data.aws_vpc.shared.id
   tags = merge(local.tags,
@@ -9,7 +9,7 @@ resource "aws_security_group" "onprem_gateway_sg" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "onprem_gateway_https_out" {
-  security_group_id = aws_security_group.onprem_gateway_sg.id
+  security_group_id = aws_security_group.onprem_gateway.id
   cidr_ipv4         = "0.0.0.0/0"
   from_port         = 443
   to_port           = 443
@@ -21,7 +21,7 @@ resource "aws_vpc_security_group_egress_rule" "onprem_gateway_https_out" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "onprem_gateway_http_out" {
-  security_group_id = aws_security_group.onprem_gateway_sg.id
+  security_group_id = aws_security_group.onprem_gateway.id
   cidr_ipv4         = "0.0.0.0/0"
   from_port         = 80
   to_port           = 80
@@ -33,7 +33,7 @@ resource "aws_vpc_security_group_egress_rule" "onprem_gateway_http_out" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "onprem_gateway_rds_out" {
-  security_group_id = aws_security_group.onprem_gateway_sg.id
+  security_group_id = aws_security_group.onprem_gateway.id
   cidr_ipv4         = "0.0.0.0/0"
   from_port         = 1433
   to_port           = 1433
@@ -91,7 +91,7 @@ resource "aws_instance" "onprem_gateway" {
   # Specify the instance type and ami to be used (this is the Amazon free tier option)
   instance_type               = "t3.small"
   ami                         = data.aws_ami.onprem_gateway_windows.id
-  vpc_security_group_ids      = [aws_security_group.onprem_gateway_sg.id]
+  vpc_security_group_ids      = [aws_security_group.onprem_gateway.id]
   subnet_id                   = data.aws_subnet.private_subnets_a.id
   iam_instance_profile        = aws_iam_instance_profile.onprem_gateway_profile.name
   associate_public_ip_address = false
