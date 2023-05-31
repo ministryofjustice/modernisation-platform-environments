@@ -45,7 +45,7 @@ resource "aws_vpc_security_group_egress_rule" "onprem_gateway_rds_out" {
 }
 
 # Pre-req - IAM role, attachment for SSM usage and instance profile
-data "aws_iam_policy_document" "onprem_gateway_iam_assume_policy" {
+data "aws_iam_policy_document" "onprem_gateway" {
   statement {
     effect = "Allow"
     actions = [
@@ -58,22 +58,22 @@ data "aws_iam_policy_document" "onprem_gateway_iam_assume_policy" {
   }
 }
 
-resource "aws_iam_role" "onprem_gateway_iam_role" {
-  name               = "onprem_gateway_iam_role"
-  assume_role_policy = data.aws_iam_policy_document.onprem_gateway_iam_assume_policy.json
+resource "aws_iam_role" "onprem_gateway" {
+  name               = "onprem_gateway"
+  assume_role_policy = data.aws_iam_policy_document.onprem_gateway.json
   tags = merge(local.tags,
     { Name = lower(format("sg-%s-%s-onprem-gateway", local.application_name, local.environment)) }
   )
 }
 
 resource "aws_iam_role_policy_attachment" "onprem_gateway_amazonssmmanagedinstancecore" {
-  role       = aws_iam_role.onprem_gateway_iam_role.name
+  role       = aws_iam_role.onprem_gateway.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
 resource "aws_iam_instance_profile" "onprem_gateway_profile" {
-  name = "onprem_gateway_iam_role"
-  role = aws_iam_role.onprem_gateway_iam_role.name
+  name = "onprem_gateway"
+  role = aws_iam_role.onprem_gateway.name
 }
 
 # Get latest Windows Server 2019 AMI
