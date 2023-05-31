@@ -82,7 +82,7 @@ resource "aws_acm_certificate_validation" "external_prod" {
   ]
 
   certificate_arn         = aws_acm_certificate.external_prod.arn
-  validation_record_fqdns = [local.domain_name_main[0]]
+  validation_record_fqdns = [local.domain_name_main_prod[0]]
   timeouts {
     create = "10m"
   }
