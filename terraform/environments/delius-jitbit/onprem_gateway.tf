@@ -71,7 +71,7 @@ resource "aws_iam_role_policy_attachment" "onprem_gateway_amazonssmmanagedinstan
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
-resource "aws_iam_instance_profile" "onprem_gateway_profile" {
+resource "aws_iam_instance_profile" "onprem_gateway" {
   name = "onprem_gateway"
   role = aws_iam_role.onprem_gateway.name
 }
@@ -93,7 +93,7 @@ resource "aws_instance" "onprem_gateway" {
   ami                         = data.aws_ami.onprem_gateway_windows.id
   vpc_security_group_ids      = [aws_security_group.onprem_gateway.id]
   subnet_id                   = data.aws_subnet.private_subnets_a.id
-  iam_instance_profile        = aws_iam_instance_profile.onprem_gateway_profile.name
+  iam_instance_profile        = aws_iam_instance_profile.onprem_gateway.name
   associate_public_ip_address = false
   monitoring                  = false
   ebs_optimized               = false
