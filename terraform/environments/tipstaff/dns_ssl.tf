@@ -89,26 +89,6 @@ resource "aws_acm_certificate_validation" "external_prod" {
 }
 
 // Route53 DNS record for certificate validation
-
-# resource "aws_route53_record" "external_validation_prod" {
-#   provider = aws.core-network-services
-
-#   for_each = {
-#     for dvo in aws_acm_certificate.external_prod.domain_validation_options : dvo.domain_name => {
-#       name   = dvo.resource_record_name
-#       record = dvo.resource_record_value
-#       type   = dvo.resource_record_type
-#     }
-#   }
-
-#   allow_overwrite = true
-#   name            = each.value.name
-#   records         = [each.value.record]
-#   ttl             = 60
-#   type            = each.value.type
-#   zone_id         = data.aws_route53_zone.application_zone.zone_id
-# }
-
 resource "aws_route53_record" "external_validation_prod" {
   provider = aws.core-network-services
 
@@ -121,16 +101,16 @@ resource "aws_route53_record" "external_validation_prod" {
 }
 
 // Route53 DNS record for directing traffic to the service
-resource "aws_route53_record" "external_prod" {
-  provider = aws.core-network-services
+# resource "aws_route53_record" "external_prod" {
+#   provider = aws.core-network-services
 
-  zone_id = data.aws_route53_zone.application_zone.zone_id
-  name    = "tipstaff.service.justice.gov.uk"
-  type    = "A"
+#   zone_id = data.aws_route53_zone.application_zone.zone_id
+#   name    = "tipstaff.service.justice.gov.uk"
+#   type    = "A"
 
-  alias {
-    name                   = aws_lb.tipstaff_lb.dns_name
-    zone_id                = aws_lb.tipstaff_lb.zone_id
-    evaluate_target_health = true
-  }
-}
+#   alias {
+#     name                   = aws_lb.tipstaff_lb.dns_name
+#     zone_id                = aws_lb.tipstaff_lb.zone_id
+#     evaluate_target_health = true
+#   }
+# }
