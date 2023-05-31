@@ -4,7 +4,7 @@ resource "aws_security_group" "onprem_gateway" {
   description = "Controls access onprem gateway instance"
   vpc_id      = data.aws_vpc.shared.id
   tags = merge(local.tags,
-    { Name = lower(format("OnPremiseDataGateway-%s-%s", local.application_name, local.environment)) }
+    { Name = lower(local.on_prem_dgw_name) }
   )
 }
 
@@ -16,7 +16,7 @@ resource "aws_vpc_security_group_egress_rule" "onprem_gateway_https_out" {
   ip_protocol       = "tcp"
   description       = "Allow communication out on port 443, e.g. for SSM"
   tags = merge(local.tags,
-    { Name = lower(format("OnPremiseDataGateway-%s-%s", local.application_name, local.environment)) }
+    { Name = lower(local.on_prem_dgw_name) }
   )
 }
 
@@ -28,7 +28,7 @@ resource "aws_vpc_security_group_egress_rule" "onprem_gateway_http_out" {
   ip_protocol       = "tcp"
   description       = "Allow communication out on port 80"
   tags = merge(local.tags,
-    { Name = lower(format("OnPremiseDataGateway-%s-%s", local.application_name, local.environment)) }
+    { Name = lower(local.on_prem_dgw_name) }
   )
 }
 
@@ -40,7 +40,7 @@ resource "aws_vpc_security_group_egress_rule" "onprem_gateway_rds_out" {
   ip_protocol       = "tcp"
   description       = "Allow communication out to RDS"
   tags = merge(local.tags,
-    { Name = lower(format("OnPremiseDataGateway-%s-%s", local.application_name, local.environment)) }
+    { Name = lower(local.on_prem_dgw_name) }
   )
 }
 
@@ -62,7 +62,7 @@ resource "aws_iam_role" "onprem_gateway" {
   name               = "onprem_gateway"
   assume_role_policy = data.aws_iam_policy_document.onprem_gateway.json
   tags = merge(local.tags,
-    { Name = lower(format("OnPremiseDataGateway-%s-%s", local.application_name, local.environment)) }
+    { Name = lower(local.on_prem_dgw_name) }
   )
 }
 
@@ -104,7 +104,6 @@ resource "aws_instance" "onprem_gateway" {
   }
 
   tags = merge(local.tags,
-    { Name = lower(format("OnPremiseDataGateway-%s-%s", local.application_name, local.environment)) }
+    { Name = lower(local.on_prem_dgw_name) }
   )
-
 }
