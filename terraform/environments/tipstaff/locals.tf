@@ -15,7 +15,7 @@ locals {
   domain_type_main   = [for k, v in local.domain_types : v.type if k == "modernisation-platform.service.justice.gov.uk"]
   domain_type_sub    = [for k, v in local.domain_types : v.type if k != "modernisation-platform.service.justice.gov.uk"]
 
-  domain_types_prod = { for dvo in aws_acm_certificate.external_prod.domain_validation_options : dvo.domain_name => {
+  domain_types_prod = { for dvo in aws_acm_certificate.external_prod[0].domain_validation_options : dvo.domain_name => {
     name   = dvo.resource_record_name
     record = dvo.resource_record_value
     type   = dvo.resource_record_type
