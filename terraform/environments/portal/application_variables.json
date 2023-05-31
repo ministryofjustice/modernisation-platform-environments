@@ -2,7 +2,8 @@
   "accounts": {
     "development": {
       "example_var": "dev-data",
-      "existing_archive_bucket_name": ""
+      "existing_archive_bucket_name": "",
+      "igdb_snapshot_name": "portal-igdb-spike-manual-mp-31052023"
     },
     "test": {
       "example_var": "test-data"

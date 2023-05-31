@@ -20,9 +20,11 @@ locals {
   backup_window              = "22:00-01:00"
   maintenance_window         = "Mon:01:15-Mon:06:00"
   storage_type               = "gp2"
-  rds_snapshot_name          = "laws3169-mojfin-migration-v1"
+  rds_snapshot_name          = "portal-igdb-spike-manual-mp-31052023"
   lzprd-vpc                  = "10.205.0.0/20"
-}
+  mp_account_id              = data.aws_caller_identity.current.account_id
+  igdb_snapshot_arn          = "arn:aws:rds:eu-west-2:${data.aws_caller_identity.current.account_id}:snapshot:${local.application_data.accounts[local.environment].igdb_snapshot_name}"
+ }
 
 resource "aws_db_subnet_group" "igdb" {
   name       = "${local.application_name}-${local.environment}-subnetgrp"
