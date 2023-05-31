@@ -102,7 +102,7 @@ resource "aws_lb_target_group" "delius_core_frontend_target_group" {
     interval            = "300"
     protocol            = "HTTP"
     unhealthy_threshold = "2"
-    matcher             = "200-499"
+    matcher             = "0-999"
     timeout             = "5"
   }
 }
