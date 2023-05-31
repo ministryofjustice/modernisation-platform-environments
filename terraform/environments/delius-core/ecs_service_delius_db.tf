@@ -280,7 +280,7 @@ resource "aws_route53_record" "delius-core-db" {
   name     = "${local.db_service_name}-${local.application_name}.${data.aws_route53_zone.inner.name}"
   type     = "A"
   ttl      = 300
-  records  = ["10.26.24.174"]
+  records  = ["10.26.25.119"]
 }
 
 ##
