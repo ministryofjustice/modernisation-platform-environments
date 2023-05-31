@@ -557,6 +557,7 @@ module "dms_nomis_ingestor" {
   short_name            = "nomis"
   migration_type        = "full-load-and-cdc"
   replication_instance_version  = "3.4.6"
+  replication_instance_class = "dms.t3.medium"
   subnet_ids            = [data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id]
 
   vpc_role_dependency        = [aws_iam_role.dmsvpcrole]
@@ -682,6 +683,34 @@ module "s3_application_tf_state" {
     {
       Name          = "${local.project}-terraform-state-${local.environment}"
       Resource_Type = "S3 Bucket"
+    }
+  )
+}
+
+# Dynamo Tab for Application TF State 
+module "dynamo_tab_application_tf_state" {
+  source              = "./modules/dynamo_tables"
+  create_table        = true
+  autoscaling_enabled = false
+  name                = "${local.project}-terraform-state-${local.environment}"
+
+  hash_key    = "LockID"   # Hash
+  range_key   = ""         # Sort
+  table_class = "STANDARD"
+  ttl_enabled = false
+
+  attributes = [
+    {
+      name = "LockID"
+      type = "S"
+    }
+  ]
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-terraform-state-${local.environment}"
+      Resource_Type = "Dynamo Table"
     }
   )
 }
