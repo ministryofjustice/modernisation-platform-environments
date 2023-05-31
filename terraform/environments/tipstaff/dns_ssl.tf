@@ -63,7 +63,9 @@ resource "aws_route53_record" "external" {
 
 // ACM Public Certificate
 resource "aws_acm_certificate" "external_prod" {
-  domain_name       = "prod.tipstaff.service.justice.gov.uk"
+  count = local.is-production ? 1 : 0
+
+  domain_name       = "tipstaff.service.justice.gov.uk"
   validation_method = "DNS"
   lifecycle {
     create_before_destroy = true
@@ -71,8 +73,9 @@ resource "aws_acm_certificate" "external_prod" {
 }
 
 resource "aws_acm_certificate_validation" "external_prod" {
-  certificate_arn = aws_acm_certificate.external_prod.arn
-  # validation_record_fqdns = [local.domain_name_main_prod[0]]
+  count = local.is-production ? 1 : 0
+
+  certificate_arn         = aws_acm_certificate.external_prod[0].arn
   validation_record_fqdns = [aws_route53_record.external_validation_prod.fqdn]
   timeouts {
     create = "10m"
@@ -81,40 +84,24 @@ resource "aws_acm_certificate_validation" "external_prod" {
 
 // Route53 DNS record for certificate validation
 resource "aws_route53_record" "external_validation_prod" {
+  count    = local.is-production ? 1 : 0
   provider = aws.core-network-services
 
-  # allow_overwrite = true
-  # name            = local.domain_name_main_prod[0]
-  # records         = local.domain_record_main_prod
-  # ttl             = 60
-  # type            = local.domain_type_main_prod[0]
-  # zone_id         = data.aws_route53_zone.application_zone.zone_id
-
   allow_overwrite = true
-  name            = tolist(aws_acm_certificate.external_prod.domain_validation_options)[0].resource_record_name
-  records         = [tolist(aws_acm_certificate.external_prod.domain_validation_options)[0].resource_record_value]
-  type            = tolist(aws_acm_certificate.external_prod.domain_validation_options)[0].resource_record_type
+  name            = tolist(aws_acm_certificate.external_prod[0].domain_validation_options)[0].resource_record_name
+  records         = [tolist(aws_acm_certificate.external_prod[0].domain_validation_options)[0].resource_record_value]
+  type            = tolist(aws_acm_certificate.external_prod[0].domain_validation_options)[0].resource_record_type
   zone_id         = data.aws_route53_zone.application_zone.zone_id
   ttl             = 60
 }
 
-# resource "aws_route53_record" "external_validation_subdomain_prod" {
-#   provider = aws.core-network-services
-
-#   allow_overwrite = true
-#   name            = local.domain_name_sub_prod[0]
-#   records         = local.domain_record_sub_prod
-#   ttl             = 60
-#   type            = local.domain_type_sub_prod[0]
-#   zone_id         = data.aws_route53_zone.application_zone.zone_id
-# }
-
 // Route53 DNS record for directing traffic to the service
 resource "aws_route53_record" "external_prod" {
+  count    = local.is-production ? 1 : 0
   provider = aws.core-network-services
 
   zone_id = data.aws_route53_zone.application_zone.zone_id
-  name    = "prod.tipstaff.service.justice.gov.uk"
+  name    = "tipstaff.service.justice.gov.uk"
   type    = "A"
 
   alias {
