@@ -248,37 +248,37 @@ resource "aws_ecs_task_definition" "delius_core_frontend_task_definition" {
             name      = "JDBC_PASSWORD"
             valueFrom = aws_ssm_parameter.delius_core_frontend_env_var_jdbc_password.arn
           },
-          {
-            name      = "DEV_USERNAME"
-            valueFrom = aws_ssm_parameter.delius_core_frontend_env_var_dev_username.arn
-          },
-          {
-            name      = "DEV_PASSWORD"
-            valueFrom = aws_ssm_parameter.delius_core_frontend_env_var_dev_password.arn
-          },
+          # {
+          #   name      = "DEV_USERNAME"
+          #   valueFrom = aws_ssm_parameter.delius_core_frontend_env_var_dev_username.arn
+          # },
+          # {
+          #   name      = "DEV_PASSWORD"
+          #   valueFrom = aws_ssm_parameter.delius_core_frontend_env_var_dev_password.arn
+          # },
           {
             name      = "TEST_MODE"
             valueFrom = aws_ssm_parameter.delius_core_frontend_env_var_test_mode.arn
+          },
+          {
+            name      = "LDAP_PORT"
+            valueFrom = data.aws_ssm_parameter.delius_core_frontend_env_var_ldap_port.arn
+          },
+          {
+            name      = "LDAP_HOST"
+            valueFrom = data.aws_ssm_parameter.delius_core_frontend_env_var_ldap_host.arn
+          },
+          {
+            name      = "LDAP_PRINCIPAL"
+            valueFrom = data.aws_ssm_parameter.delius_core_frontend_env_var_ldap_principal.arn
+          },
+          { name      = "LDAP_CREDENTIAL"
+            valueFrom = data.aws_secretsmanager_secret.ldap_credential.arn
+          },
+          {
+            name      = "USER_CONTEXT"
+            valueFrom = data.aws_ssm_parameter.delius_core_frontend_env_var_user_context.arn
           }
-          # {
-          #   name      = "LDAP_PORT"
-          #   valueFrom = data.aws_ssm_parameter.delius_core_frontend_env_var_ldap_port.arn
-          # },
-          # {
-          #   name      = "LDAP_HOST"
-          #   valueFrom = data.aws_ssm_parameter.delius_core_frontend_env_var_ldap_host.arn
-          # },
-          # {
-          #   name      = "LDAP_PRINCIPAL"
-          #   valueFrom = data.aws_ssm_parameter.delius_core_frontend_env_var_ldap_principal.arn
-          # },
-          # { name      = "LDAP_CREDENTIAL"
-          #   valueFrom = data.aws_secretsmanager_secret.ldap_credential.arn
-          # },
-          # {
-          #   name      = "USER_CONTEXT"
-          #   valueFrom = data.aws_ssm_parameter.delius_core_frontend_env_var_user_context.arn
-          # }
         ]
       }
   ])
