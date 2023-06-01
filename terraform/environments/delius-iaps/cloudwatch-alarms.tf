@@ -111,7 +111,7 @@ resource "aws_cloudwatch_metric_alarm" "interface_low_level_error" {
   namespace           = "IAPS"
   metric_name         = "NDeliusInterfaceLowLevelError"
   statistic           = "Sum"
-  period              = "120"
+  period              = "180"
   evaluation_periods  = "1"
   alarm_actions       = [aws_sns_topic.iaps_alerting.arn]
   ok_actions          = [aws_sns_topic.iaps_alerting.arn]
