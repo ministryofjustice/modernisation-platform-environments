@@ -23,6 +23,7 @@ locals {
   storage_type               = "gp2"
   rds_snapshot_name          = "laws3169-mojfin-migration-v1"
   lzprd-vpc                  = "10.205.0.0/20"
+  appstreamldnprd            = "10.200.33.0/24"
 
   # CloudWatch Alarms
   cpu_threshold                     = "90"

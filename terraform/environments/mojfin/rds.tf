@@ -94,6 +94,14 @@ resource "aws_security_group" "mojfin" {
     protocol    = "tcp"
     cidr_blocks = [local.lzprd-vpc]
   }
+
+   ingress {
+    description = "AppStream London Prod"
+    from_port   = 1521
+    to_port     = 1521
+    protocol    = "tcp"
+    cidr_blocks = [local.appstreamldnprd]
+  }
   egress {
     from_port   = 0
     to_port     = 0
