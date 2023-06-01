@@ -3,7 +3,7 @@ locals {
   region = "eu-west-2"
 
   # RDS
-  application_name           = "igdb"
+  igdb_dbname                = "IGDB"
   appstream_cidr             = "10.200.32.0/19"
   cidr_ire_workspace         = "10.200.96.0/19"
   workspaces_cidr            = "10.200.16.0/20"
@@ -232,7 +232,7 @@ resource "aws_secretsmanager_secret_version" "rds_password_secret_version" {
 
 resource "aws_db_instance" "appdb1" {
   allocated_storage               = local.storage_size
-  db_name                         = upper(local.application_name)
+  db_name                         = local.igdb_dbname
   identifier                      = local.application_name
   engine                          = local.engine
   engine_version                  = local.engine_version
