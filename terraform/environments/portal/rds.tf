@@ -53,6 +53,7 @@ resource "aws_db_parameter_group" "igdb-parametergroup-19c" {
   parameter {
     name  = "processes"
     value = "1000"
+    apply_method = "pending-reboot"
   }
 
   parameter {
