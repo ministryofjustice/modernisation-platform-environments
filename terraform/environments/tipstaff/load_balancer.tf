@@ -40,8 +40,8 @@ resource "aws_lb" "tipstaff_lb" {
 
 resource "aws_lb_target_group" "tipstaff_target_group" {
   name                 = "tipstaff-target-group"
-  port                 = 80
-  protocol             = "HTTP"
+  port                 = 443
+  protocol             = "HTTPS"
   vpc_id               = data.aws_vpc.shared.id
   target_type          = "ip"
   deregistration_delay = 30
@@ -53,8 +53,8 @@ resource "aws_lb_target_group" "tipstaff_target_group" {
   health_check {
     healthy_threshold   = "3"
     interval            = "15"
-    protocol            = "HTTP"
-    port                = "80"
+    protocol            = "HTTPS"
+    port                = "443"
     unhealthy_threshold = "3"
     matcher             = "200-302"
     timeout             = "5"
