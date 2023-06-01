@@ -55,27 +55,3 @@ resource "aws_security_group" "sqlserver_db_sc" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
-
-resource "random_password" "password" {
-  length  = 16
-  special = false
-}
-
-resource "aws_secretsmanager_secret" "rds_credentials" {
-  name = "${local.application_data.accounts[local.environment].identifier}-credentials"
-}
-
-resource "aws_secretsmanager_secret_version" "rds_credentials_current" {
-  secret_id     = aws_secretsmanager_secret.rds_credentials.id
-  secret_string = <<EOF
-{
-  "username": "${aws_db_instance.rdsdb.username}",
-  "password": "${aws_db_instance.rdsdb.password}",
-  "engine": "${aws_db_instance.rdsdb.engine}",
-  "host": "${aws_db_instance.rdsdb.address}",
-  "port": ${aws_db_instance.rdsdb.port},
-  "dbClusterIdentifier": "${aws_db_instance.rdsdb.ca_cert_identifier}",
-  "database_name": "master"
-}
-EOF
-}
