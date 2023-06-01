@@ -92,6 +92,34 @@ resource "aws_cloudwatch_metric_alarm" "nginx_connect_error" {
   comparison_operator = "GreaterThanThreshold"
 }
 
+// Interface Alarms
+resource "aws_cloudwatch_log_metric_filter" "interface_low_level_error" {
+  name           = "IapsNDeliusInterfaceLowLevelError"
+  pattern        = "\"LOW LEVEL ERROR - WAIT for 50 seconds\""
+  log_group_name = aws_cloudwatch_log_group.cloudwatch_agent_log_groups["ndinterface/xmltransfer.log"].name
+
+  metric_transformation {
+    name      = "NDeliusInterfaceLowLevelError"
+    namespace = "IAPS"
+    value     = 1
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "interface_low_level_error" {
+  alarm_name          = "${local.application_name}-high-ndelius-interface-low-level-errors"
+  alarm_description   = "Triggers alarm if there are consistent NDelius Interface low level errors"
+  namespace           = "IAPS"
+  metric_name         = "NDeliusInterfaceLowLevelError"
+  statistic           = "Sum"
+  period              = "120"
+  evaluation_periods  = "1"
+  alarm_actions       = [aws_sns_topic.iaps_alerting.arn]
+  ok_actions          = [aws_sns_topic.iaps_alerting.arn]
+  threshold           = "3"
+  treat_missing_data  = "missing"
+  comparison_operator = "GreaterThanThreshold"
+}
+
 // RDS Alarms
 resource "aws_cloudwatch_metric_alarm" "rds_cpu_utilization_over_threshold" {
   alarm_name          = "${local.application_name}-rds-cpu-utilization-over-threshold"
