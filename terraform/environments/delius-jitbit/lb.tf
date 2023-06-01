@@ -63,7 +63,7 @@ resource "aws_lb_listener" "listener" {
   load_balancer_arn = aws_lb.external.id
   port              = 443
   protocol          = "HTTPS"
-  certificate_arn   = aws_acm_certificate.external_test.arn
+  certificate_arn   = aws_acm_certificate.external.arn
   ssl_policy        = "ELBSecurityPolicy-TLS-1-2-2017-01"
 
   default_action {
@@ -129,7 +129,10 @@ resource "aws_acm_certificate" "external" {
   domain_name       = "modernisation-platform.service.justice.gov.uk"
   validation_method = "DNS"
 
-  subject_alternative_names = ["${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
+  subject_alternative_names = [
+    "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk",
+    "helpdesk.jitbit.dev.cr.probation.service.justice.gov.uk"
+  ]
   tags = {
     Environment = local.environment
   }
