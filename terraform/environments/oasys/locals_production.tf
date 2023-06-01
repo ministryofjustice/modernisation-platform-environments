@@ -13,13 +13,13 @@ locals {
     }
 
     baseline_ec2_autoscaling_groups = {
-      "prod-${local.application_name}-web-trn" = merge(local.webserver, {
+      "prod-${local.application_name}-web-trn-a" = merge(local.webserver_a, {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name                  = "${local.application_name}_webserver_release_*"
           ssm_parameters_prefix     = "ec2-web-trn/"
           iam_resource_names_prefix = "ec2-web-trn"
         })
-        tags = merge(local.webserver.tags, {
+        tags = merge(local.webserver_a.tags, {
           description                             = "${local.environment} training ${local.application_name} web"
           "${local.application_name}-environment" = "trn"
           oracle-db-sid                           = "OASTRN"
@@ -28,25 +28,6 @@ locals {
     }
 
     baseline_acm_certificates = {
-      "${local.application_name}_wildcard_cert" = {
-        # domain_name limited to 64 chars so use modernisation platform domain for this
-        # and put the wildcard in the san
-        domain_name = module.environment.domains.public.modernisation_platform
-        subject_alternate_names = [
-          "*.${module.environment.domains.public.application_environment}",
-          "*.${module.environment.domains.public.short_name}",     #     "oasys.service.justice.gov.uk"
-          "*.trn.${module.environment.domains.public.short_name}", # "trn.oasys.service.justice.gov.uk"
-          "*.ptc.${module.environment.domains.public.short_name}", # "ptc.oasys.service.justice.gov.uk"
-          "*.${local.application_name}.az.justice.gov.uk",
-          "*.trn.${local.application_name}.az.justice.gov.uk",
-          "*.ptc.${local.application_name}.az.justice.gov.uk",
-        ]
-        external_validation_records_created = true
-        cloudwatch_metric_alarms            = {} #module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso"].acm_default
-        tags = {
-          description = "wildcard cert for ${local.application_name} ${local.environment} domains"
-        }
-      }
     }
 
     baseline_lbs = {
@@ -78,7 +59,7 @@ locals {
               #   priority = 100
               #   actions = [{
               #     type              = "forward"
-              #     target_group_name = "prod-${local.application_name}-web-http-8080"
+              #     target_group_name = "prod-${local.application_name}-web-a-http-8080"
               #   }]
               #   conditions = [
               #     {
@@ -97,7 +78,7 @@ locals {
                 priority = 100
                 actions = [{
                   type              = "forward"
-                  target_group_name = "prod-${local.application_name}-web-trn-http-8080"
+                  target_group_name = "prod-${local.application_name}-web-trn-a-http-8080"
                 }]
                 conditions = [
                   {
@@ -112,25 +93,6 @@ locals {
                   }
                 ]
               }
-              # ptc-web-http-8080 = {
-              #   priority = 100
-              #   actions = [{
-              #     type              = "forward"
-              #     target_group_name = "prod-${local.application_name}-web-ptc-http-8080"
-              #   }]
-              #   conditions = [
-              #     {
-              #       host_header = {
-              #         values = ["ptc.${module.environment.domains.public.short_name}"]
-              #       }
-              #     },
-              #     {
-              #       path_pattern = {
-              #         values = ["/"]
-              #       }
-              #     }
-              #   ]
-              # }
             }
           }
         }
