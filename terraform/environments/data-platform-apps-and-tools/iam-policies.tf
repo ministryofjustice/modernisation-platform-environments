@@ -6,19 +6,19 @@
 # TODO: Update placeholders
 data "aws_iam_policy_document" "airflow_execution_policy" {
   statement {
-    sid = "AllowAirflowPublishMetrics"
-    effect = "Allow"
-    actions = ["airflow:PublishMetrics"]
+    sid       = "AllowAirflowPublishMetrics"
+    effect    = "Allow"
+    actions   = ["airflow:PublishMetrics"]
     resources = ["arn:aws:airflow:{your-region}:{your-account-id}:environment/{your-environment-name}"]
   }
   statement {
-    sid = "DenyS3ListAllMyBuckets"
-    effect = "Deny"
-    actions = ["s3:ListAllMyBuckets"]
+    sid       = "DenyS3ListAllMyBuckets"
+    effect    = "Deny"
+    actions   = ["s3:ListAllMyBuckets"]
     resources = ["*"]
   }
   statement {
-    sid = "AllowS3GetListBucketObjects"
+    sid    = "AllowS3GetListBucketObjects"
     effect = "Allow"
     actions = [
       "s3:GetBucket*",
@@ -31,7 +31,7 @@ data "aws_iam_policy_document" "airflow_execution_policy" {
     ]
   }
   statement {
-    sid = "AllowCloudWatchLogsCreatePutGet"
+    sid    = "AllowCloudWatchLogsCreatePutGet"
     effect = "Allow"
     actions = [
       "logs:CreateLogStream",
@@ -45,27 +45,27 @@ data "aws_iam_policy_document" "airflow_execution_policy" {
     resources = ["arn:aws:logs:{your-region}:{your-account-id}:log-group:airflow-{your-environment-name}-*"]
   }
   statement {
-    sid = "AllowCloudWatchLogGroupsDescribe"
-    effect = "Allow"
-    actions = ["logs:DescribeLogGroups"]
+    sid       = "AllowCloudWatchLogGroupsDescribe"
+    effect    = "Allow"
+    actions   = ["logs:DescribeLogGroups"]
     resources = ["*"]
   }
   statement {
-    sid = "AllowS3GetAccountPublicAccessBlock"
-    effect = "Allow"
-    actions = ["s3:GetAccountPublicAccessBlock"]
+    sid       = "AllowS3GetAccountPublicAccessBlock"
+    effect    = "Allow"
+    actions   = ["s3:GetAccountPublicAccessBlock"]
     resources = ["*"]
   }
   statement {
-    sid = "AllowCloudWatchPutMetricData"
-    effect = "Allow"
-    actions = ["cloudwatch:PutMetricData"]
+    sid       = "AllowCloudWatchPutMetricData"
+    effect    = "Allow"
+    actions   = ["cloudwatch:PutMetricData"]
     resources = ["*"]
   }
   statement {
-    sid = "AllowSQSChangeDeleteGetReceiveSend"
+    sid    = "AllowSQSChangeDeleteGetReceiveSend"
     effect = "Allow"
-    actions = [ 
+    actions = [
       "sqs:ChangeMessageVisibility",
       "sqs:DeleteMessage",
       "sqs:GetQueueAttributes",
@@ -81,6 +81,6 @@ module "airflow_execution_policy" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
   version = "5.20.0"
 
-  name = "data-platform-airflow-execution-policy"
+  name   = "data-platform-airflow-execution-policy"
   policy = data.aws_iam_policy_document.airflow_execution_policy.json
 }
