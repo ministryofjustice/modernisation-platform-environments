@@ -9,7 +9,7 @@ resource "random_password" "password" {
 }
 
 resource "aws_secretsmanager_secret" "resource_rds_secret" {
-  name = "${local.application_data.accounts[local.environment].identifier}-credentials"
+  name = "${local.application_data.accounts[local.environment].db_identifier}-credentials"
 }
 
 resource "aws_secretsmanager_secret_version" "resource_rds_secret_current" {

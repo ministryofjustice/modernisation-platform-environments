@@ -5,7 +5,7 @@
 //Shared resources:
 resource "aws_dms_endpoint" "target" {
   depends_on    = [aws_db_instance.rdsdb]
-  database_name = local.application_data.accounts[local.environment].db_name
+  database_name = local.application_data.accounts[local.environment].db_identifier
   endpoint_id   = "tribunals-target"
   endpoint_type = "target"
   engine_name   = "sqlserver"

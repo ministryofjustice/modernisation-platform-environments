@@ -2,7 +2,7 @@ resource "aws_db_instance" "rdsdb" {
   allocated_storage = local.application_data.accounts[local.environment].allocated_storage
   //db_name                 = DBName must be null for engine: sqlserver-se
   storage_type   = local.application_data.accounts[local.environment].storage_type
-  identifier     = local.application_data.accounts[local.environment].identifier
+  identifier     = local.application_data.accounts[local.environment].db_identifier
   engine         = local.application_data.accounts[local.environment].engine
   engine_version = local.application_data.accounts[local.environment].engine_version
   instance_class = local.application_data.accounts[local.environment].instance_class
