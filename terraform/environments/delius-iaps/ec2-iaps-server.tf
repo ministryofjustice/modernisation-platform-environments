@@ -62,6 +62,7 @@ locals {
           delius_iaps_rds_db_address          = aws_db_instance.iaps.address
           ndelius_interface_url               = local.application_data.accounts[local.environment].iaps_ndelius_interface_url
           im_interface_url                    = local.application_data.accounts[local.environment].iaps_im_interface_url
+          vpc_dns_ip                          = cidrhost(data.aws_vpc.shared.cidr_block, 2) # Derive IP of Amazon DNS endpoint in VPC
         }
       )
     )
