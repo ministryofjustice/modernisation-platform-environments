@@ -2,14 +2,12 @@
 # Airflow
 ##################################################
 
-# Based on https://docs.aws.amazon.com/mwaa/latest/userguide/mwaa-create-role.html#mwaa-create-role-json but without CMK permissions
-# TODO: Update placeholders
 data "aws_iam_policy_document" "airflow_execution_policy" {
   statement {
     sid       = "AllowAirflowPublishMetrics"
     effect    = "Allow"
     actions   = ["airflow:PublishMetrics"]
-    resources = ["arn:aws:airflow:{your-region}:{your-account-id}:environment/{your-environment-name}"]
+    resources = ["arn:aws:airflow:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:environment/${local.airflow_environment_name}"]
   }
   statement {
     sid       = "DenyS3ListAllMyBuckets"
@@ -26,8 +24,8 @@ data "aws_iam_policy_document" "airflow_execution_policy" {
       "s3:List*"
     ]
     resources = [
-      "arn:aws:s3:::{your-bucket-name}",
-      "arn:aws:s3:::{your-bucket-name}/*"
+      "arn:aws:s3:::${module.airflow_s3_bucket.bucket.id}",
+      "arn:aws:s3:::${module.airflow_s3_bucket.bucket.id}/*"
     ]
   }
   statement {
@@ -42,7 +40,7 @@ data "aws_iam_policy_document" "airflow_execution_policy" {
       "logs:GetLogGroupFields",
       "logs:GetQueryResults"
     ]
-    resources = ["arn:aws:logs:{your-region}:{your-account-id}:log-group:airflow-{your-environment-name}-*"]
+    resources = ["arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:airflow-${local.airflow_environment_name}-*"]
   }
   statement {
     sid       = "AllowCloudWatchLogGroupsDescribe"
@@ -73,7 +71,24 @@ data "aws_iam_policy_document" "airflow_execution_policy" {
       "sqs:ReceiveMessage",
       "sqs:SendMessage"
     ]
-    resources = ["arn:aws:sqs:{your-region}:*:airflow-celery-*"]
+    resources = ["arn:aws:sqs:${data.aws_region.current.name}:*:airflow-celery-*"]
+  }
+  statement {
+    /* TODO: Check this statement is required, it isn't on AWS' example, but is on DE's current policy */
+    sid    = "AllowSQSKMS"
+    effect = "Allow"
+    actions = [
+      "kms:GenerateDataKey*",
+      "kms:Encrypt",
+      "kms:DescribeKey",
+      "kms:Decrypt"
+    ]
+    not_resources = ["arn:aws:kms:*:${data.aws_caller_identity.current.account_id}:key/*"]
+    condition {
+      test     = "StringLike"
+      variable = "kms:ViaService"
+      values   = ["sqs.${data.aws_region.current.name}.amazonaws.com"]
+    }
   }
 }
 
