@@ -9,12 +9,12 @@ module "airflow_execution_role" {
   create_role = true
   role_name   = "data-platform-airflow-execution-role"
 
-  trusted_role_service = [
+  trusted_role_services = [
     "airflow.amazonaws.com",
     "airflow-env.amazonaws.com"
   ]
 
-  policy_arns = [
+  custom_role_policy_arns = [
     module.airflow_execution_policy.arn
   ]
 }
