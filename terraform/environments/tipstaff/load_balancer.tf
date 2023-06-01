@@ -57,7 +57,7 @@ resource "aws_lb_target_group" "tipstaff_target_group" {
     port                = "443"
     unhealthy_threshold = "3"
     matcher             = "200-302"
-    timeout             = "5"
+    timeout             = "45"
   }
 
 }
