@@ -48,7 +48,7 @@ resource "aws_lb" "tipstaff_lb" {
 
 resource "aws_lb_target_group" "tipstaff_target_group" {
   name                 = "tipstaff-target-group"
-  port                 = 443
+  port                 = 80
   protocol             = "HTTPS"
   vpc_id               = data.aws_vpc.shared.id
   target_type          = "ip"
