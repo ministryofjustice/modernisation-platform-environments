@@ -65,7 +65,7 @@ resource "aws_secretsmanager_secret" "rds_credentials" {
   name = "${local.application_data.accounts[local.environment].identifier}-credentials"
 }
 
-resource "aws_secretsmanager_secret_version" "rds_credentials" {
+resource "aws_secretsmanager_secret_version" "rds_credentials_current" {
   secret_id     = aws_secretsmanager_secret.rds_credentials.id
   secret_string = <<EOF
 {
