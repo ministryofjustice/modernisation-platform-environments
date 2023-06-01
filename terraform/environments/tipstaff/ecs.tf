@@ -27,9 +27,9 @@ resource "aws_ecs_task_definition" "tipstaff_task_definition" {
       essential = true
       portMappings = [
         {
-          containerPort = 443
+          containerPort = 80
           protocol      = "tcp"
-          hostPort      = 443
+          hostPort      = 80
         }
       ]
       logConfiguration = {
@@ -109,7 +109,7 @@ resource "aws_ecs_service" "tipstaff_ecs_service" {
   load_balancer {
     target_group_arn = aws_lb_target_group.tipstaff_target_group.arn
     container_name   = "tipstaff-container"
-    container_port   = 443
+    container_port   = 80
   }
 
   deployment_controller {
@@ -239,6 +239,6 @@ resource "aws_security_group" "ecs_service" {
 }
 
 resource "aws_ecr_repository" "tipstaff-ecr-repo" {
-  name          = "tipstaff-ecr-repo"
-  force_delete  = true
+  name         = "tipstaff-ecr-repo"
+  force_delete = true
 }

@@ -4,6 +4,14 @@ resource "aws_security_group" "tipstaff_lb_sc" {
   vpc_id      = data.aws_vpc.shared.id
 
   ingress {
+    description = "allow access on HTTP for the MOJ VPN"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = [local.application_data.accounts[local.environment].moj_ip]
+  }
+
+  ingress {
     description = "allow access on HTTPS for the MOJ VPN"
     from_port   = 443
     to_port     = 443
@@ -54,7 +62,7 @@ resource "aws_lb_target_group" "tipstaff_target_group" {
     healthy_threshold   = "3"
     interval            = "40"
     protocol            = "HTTPS"
-    port                = "443"
+    port                = "80"
     unhealthy_threshold = "3"
     matcher             = "200-302"
     timeout             = "30"
