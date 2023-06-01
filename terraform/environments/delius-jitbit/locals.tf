@@ -17,11 +17,14 @@ locals {
   }
 
   domain_name_main   = [for k, v in local.domain_types : v.name if k == "modernisation-platform.service.justice.gov.uk"]
-  domain_name_sub    = [for k, v in local.domain_types : v.name if k != "modernisation-platform.service.justice.gov.uk"]
+  domain_name_sub    = [for k, v in local.domain_types : v.name if k == local.app_url]
   domain_record_main = [for k, v in local.domain_types : v.record if k == "modernisation-platform.service.justice.gov.uk"]
-  domain_record_sub  = [for k, v in local.domain_types : v.record if k != "modernisation-platform.service.justice.gov.uk"]
+  domain_record_sub  = [for k, v in local.domain_types : v.record if k == local.app_url]
   domain_type_main   = [for k, v in local.domain_types : v.type if k == "modernisation-platform.service.justice.gov.uk"]
-  domain_type_sub    = [for k, v in local.domain_types : v.type if k != "modernisation-platform.service.justice.gov.uk"]
+  domain_type_sub    = [for k, v in local.domain_types : v.type if k == local.app_url]
 
-  on_prem_dgw_name = "OnPremiseDataGateway-${local.application_name}-${local.environment}"
+  domain_name_prod   = [for k, v in local.domain_types : v.name if k == "helpdesk.jitbit.dev.cr.probation.service.justice.gov.uk"]
+  domain_record_prod = [for k, v in local.domain_types : v.record if k == "helpdesk.jitbit.dev.cr.probation.service.justice.gov.uk"]
+  domain_type_prod   = [for k, v in local.domain_types : v.type if k == "helpdesk.jitbit.dev.cr.probation.service.justice.gov.uk"]
+  on_prem_dgw_name   = "OnPremiseDataGateway-${local.application_name}-${local.environment}"
 }
