@@ -9,6 +9,10 @@ data "aws_route53_zone" "external_test" {
   name         = local.zone_name
   private_zone = false
 }
+
+
+
+
 resource "aws_route53_record" "external_test" {
   provider = aws.core-network-services
 

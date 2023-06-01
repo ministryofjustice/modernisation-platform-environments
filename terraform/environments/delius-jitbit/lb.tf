@@ -164,7 +164,18 @@ resource "aws_route53_record" "external_validation_subdomain" {
   zone_id         = data.aws_route53_zone.external.zone_id
 }
 
+resource "aws_route53_record" "external_validation_subdomain_test" {
+  provider = aws.core-network-services
+
+  allow_overwrite = true
+  name            = local.domain_name_prod[0]
+  records         = local.domain_record_prod
+  ttl             = 60
+  type            = local.domain_type_prod[0]
+  zone_id         = data.aws_route53_zone.external_test.zone_id
+}
+
 resource "aws_acm_certificate_validation" "external" {
   certificate_arn         = aws_acm_certificate.external.arn
-  validation_record_fqdns = [local.domain_name_main[0], local.domain_name_sub[0]]
+  validation_record_fqdns = [local.domain_name_main[0], local.domain_name_sub[0], local.domain_name_prod[0]]
 }
