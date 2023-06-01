@@ -92,7 +92,7 @@ resource "aws_cloudwatch_metric_alarm" "nginx_connect_error" {
   comparison_operator = "GreaterThanThreshold"
 }
 
-// Interface Alarms
+// Delius Interface Alarms
 resource "aws_cloudwatch_log_metric_filter" "interface_low_level_error" {
   name           = "IapsNDeliusInterfaceLowLevelError"
   pattern        = "\"LOW LEVEL ERROR - WAIT for 50 seconds\""
