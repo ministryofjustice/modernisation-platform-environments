@@ -94,7 +94,7 @@ resource "aws_lb_listener" "tipstaff_lb_2" {
 resource "aws_lb_listener" "tipstaff_lb_3" {
   count = local.is-production ? 1 : 0
   depends_on = [
-    aws_acm_certificate.external_prod[0].arn
+    aws_acm_certificate.external_prod[0]
   ]
   certificate_arn   = aws_acm_certificate.external_prod[0].arn
   load_balancer_arn = aws_lb.tipstaff_lb.arn
