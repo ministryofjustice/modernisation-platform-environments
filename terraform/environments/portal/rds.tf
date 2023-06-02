@@ -102,7 +102,7 @@ resource "aws_db_option_group" "PortalIGDB19OptionGroup" {
 
 resource "aws_security_group" "igdb" {
   # name        = "${local.application_name}-${local.environment}-secgroup"
-  name        = "${local.application_name}-${local.environment}-secgroup-${local.igdb_dbname}"
+  name        = "${local.application_name}-${local.environment}-secgroup-DB"
   description = "RDS access with the LAA Landing Zone"
   vpc_id      = data.aws_vpc.shared.id
 
