@@ -44,18 +44,18 @@ tasks:
           allow 127.0.0.1;
           deny  all;
 
-          set $ndelius_interface_url "${ndelius_interface_url}";
-          set $im_interface_url "${im_interface_url}";
+          set `$ndelius_interface_url "${ndelius_interface_url}";
+          set `$im_interface_url "${im_interface_url}";
 
           # Proxy requests to the NDelius Interface
           location ^~ /NDeliusIAPS {
-            proxy_pass        https://$ndelius_interface_url;
+            proxy_pass        https://`$ndelius_interface_url;
             proxy_ssl_ciphers ALL:!aNULL:!EXPORT56:RC4+RSA:+HIGH:+MEDIUM:+LOW:+SSLv2:+EXP;
           }
 
           # Proxy all other requests IM servers
           location / {
-            proxy_pass                    https://$im_interface_url;
+            proxy_pass                    https://`$im_interface_url;
             proxy_ssl_protocols           TLSv1.3;
             proxy_ssl_ciphers             EECDH+CHACHA20:EECDH+AESGCM:EECDH+AES;
             proxy_http_version            1.1;
