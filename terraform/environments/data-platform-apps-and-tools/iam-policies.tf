@@ -7,7 +7,7 @@ data "aws_iam_policy_document" "airflow_execution_policy" {
     sid       = "AllowAirflowPublishMetrics"
     effect    = "Allow"
     actions   = ["airflow:PublishMetrics"]
-    resources = ["arn:aws:airflow:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:environment/${local.airflow_environment_name}"]
+    resources = ["arn:aws:airflow:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:environment/${local.airflow_name}"]
   }
   statement {
     sid       = "DenyS3ListAllMyBuckets"
@@ -40,7 +40,7 @@ data "aws_iam_policy_document" "airflow_execution_policy" {
       "logs:GetLogGroupFields",
       "logs:GetQueryResults"
     ]
-    resources = ["arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:airflow-${local.airflow_environment_name}-*"]
+    resources = ["arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:airflow-${local.airflow_name}-*"]
   }
   statement {
     sid       = "AllowCloudWatchLogGroupsDescribe"
@@ -96,6 +96,8 @@ module "airflow_execution_policy" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
   version = "5.20.0"
 
-  name   = "data-platform-airflow-execution-policy"
+  name   = "data-platform-airflow-${local.environment}-execution-policy"
   policy = data.aws_iam_policy_document.airflow_execution_policy.json
+
+  tags = local.tags
 }
