@@ -504,7 +504,7 @@ module "datamart" {
   enhanced_vpc_routing    = false
   subnet_ids              = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id, data.aws_subnet.private_subnets_c.id]
   vpc                     = data.aws_vpc.shared.id
-  cidr                    = [data.aws_vpc.shared.cidr_block]
+  cidr                    = [data.aws_vpc.shared.cidr_block, local.cloud_platform_cidr]
   iam_role_arns           = [aws_iam_role.redshift-role.arn, aws_iam_role.redshift-spectrum-role.arn]
 
   # Endpoint access - only available when using the ra3.x type, for S3 Simple Service
