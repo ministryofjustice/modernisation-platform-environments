@@ -16,11 +16,16 @@
       "oam_repo_home_snapshot": "snap-04ed65da750df338c",
       "ohs_instance_type": "t3a.medium",
 <<<<<<< HEAD
+<<<<<<< HEAD
       "oim_instance_type": "t3a.xlarge",
       "pagerduty_integration_key_name": "laa_portal_nonprod_alarms"
 =======
       "igdb_snapshot_name": "portal-igdb-spike-manual-mp-31052023"
 >>>>>>> ecfede727 (LAWS-3241: igdb rds instance with snapshot)
+=======
+      "igdb_snapshot_name": "portal-igdb-spike-manual-mp-31052023",
+      "oim_instance_type": "t3a.xlarge"
+>>>>>>> 239f4a5ff (LAWS-3241: added comma to entry in application_variables file)
 
     },
     "test": {
