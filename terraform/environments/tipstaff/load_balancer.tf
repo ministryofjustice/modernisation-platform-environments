@@ -4,14 +4,6 @@ resource "aws_security_group" "tipstaff_lb_sc" {
   vpc_id      = data.aws_vpc.shared.id
 
   ingress {
-    description = "allow access on HTTP for the MOJ VPN"
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = [local.application_data.accounts[local.environment].moj_ip]
-  }
-
-  ingress {
     description = "allow access on HTTPS for the MOJ VPN"
     from_port   = 443
     to_port     = 443
@@ -49,7 +41,7 @@ resource "aws_lb" "tipstaff_lb" {
 resource "aws_lb_target_group" "tipstaff_target_group" {
   name                 = "tipstaff-target-group"
   port                 = 80
-  protocol             = "HTTPS"
+  protocol             = "HTTP"
   vpc_id               = data.aws_vpc.shared.id
   target_type          = "ip"
   deregistration_delay = 30
@@ -60,12 +52,12 @@ resource "aws_lb_target_group" "tipstaff_target_group" {
 
   health_check {
     healthy_threshold   = "3"
-    interval            = "40"
-    protocol            = "HTTPS"
+    interval            = "15"
+    protocol            = "HTTP"
     port                = "80"
     unhealthy_threshold = "3"
     matcher             = "200-302"
-    timeout             = "30"
+    timeout             = "5"
   }
 
 }
@@ -83,7 +75,28 @@ resource "aws_lb_listener" "tipstaff_lb_1" {
 }
 
 resource "aws_lb_listener" "tipstaff_lb_2" {
-  certificate_arn   = local.is-production ? aws_acm_certificate.external_prod[0].arn : aws_acm_certificate.external.arn
+  count = local.is-production ? 0 : 1
+  depends_on = [
+    aws_acm_certificate.external
+  ]
+  certificate_arn   = aws_acm_certificate.external.arn
+  load_balancer_arn = aws_lb.tipstaff_lb.arn
+  port              = local.application_data.accounts[local.environment].server_port_2
+  protocol          = local.application_data.accounts[local.environment].lb_listener_protocol_2
+  ssl_policy        = local.application_data.accounts[local.environment].lb_listener_protocol_2 == "HTTP" ? "" : "ELBSecurityPolicy-2016-08"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.tipstaff_target_group.arn
+  }
+}
+
+resource "aws_lb_listener" "tipstaff_lb_2" {
+  count = local.is-production ? 1 : 0
+  depends_on = [
+    aws_acm_certificate.external_prod[0].arn
+  ]
+  certificate_arn   = aws_acm_certificate.external_prod[0].arn
   load_balancer_arn = aws_lb.tipstaff_lb.arn
   port              = local.application_data.accounts[local.environment].server_port_2
   protocol          = local.application_data.accounts[local.environment].lb_listener_protocol_2
