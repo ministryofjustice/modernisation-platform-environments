@@ -115,7 +115,7 @@ resource "aws_dms_endpoint" "source" {
 
 resource "aws_dms_replication_task" "migration-task" {
   #depends_on = [null_resource.setup_target_rds_security_group, var.db_instance, aws_dms_endpoint.target, aws_dms_endpoint.source, aws_dms_replication_instance.replication-instance]
-  depends_on = [var.db_instance, aws_dms_endpoint.target, aws_dms_endpoint.source, aws_dms_replication_instance.replication-instance]
+  depends_on = [aws_db_instance.rdsdb, aws_dms_endpoint.target, aws_dms_endpoint.source, aws_dms_replication_instance.tribunals_replication_instance]
 
   migration_type            = "full-load-and-cdc"
   replication_instance_arn  = aws_dms_replication_instance.tribunals_replication_instance.replication_instance_arn
