@@ -19,6 +19,7 @@ locals {
       airflow_configuration_options = {
         "webserver.warn_deployment_exposure" = 0
       }
+      eks_cluster_arn = "arn:aws:eks:eu-west-1:525294151996:cluster/development-aWrhyc0m"
     }
   }
 }
