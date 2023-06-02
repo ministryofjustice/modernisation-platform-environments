@@ -240,7 +240,8 @@ resource "aws_secretsmanager_secret_version" "rds_password_secret_version" {
 resource "aws_db_instance" "appdb1" {
   allocated_storage               = local.storage_size
   db_name                         = local.igdb_dbname
-  identifier                      = local.application_name
+  # identifier                      = local.application_name
+  identifier                      = local.igdb_dbname
   engine                          = local.engine
   engine_version                  = local.engine_version
   enabled_cloudwatch_logs_exports = ["alert", "audit", "listener", "trace"]
@@ -283,8 +284,10 @@ resource "aws_db_instance" "appdb1" {
 
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_name}" },
-    { "Keep" = "true" }
+    # { "Name" = "${local.application_name}" },
+    { "Name" = "${local.igdb_dbname}" },
+    { "Keep" = "true" },
+    { "scheduler:ebs-snapshot" = "True" }
   )
 
 }
