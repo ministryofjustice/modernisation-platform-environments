@@ -96,26 +96,26 @@ module "airflow_execution_policy" {
 # Airflow SES
 ##################################################
 
-data "aws_iam_policy_document" "airflow_ses_policy" {
-  statement {
-    sid       = "AllowSESSendRawEmail"
-    effect    = "Allow"
-    actions   = ["ses:SendRawEmail"]
-    resources = ["arn:aws:ses:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:identity/${local.ses_domain_identity}"]
-    condition {
-      test     = "StringEquals"
-      variable = "ses:FromAddress"
-      values   = [local.airflow_mail_from_address]
-    }
-  }
-}
+# data "aws_iam_policy_document" "airflow_ses_policy" {
+#   statement {
+#     sid       = "AllowSESSendRawEmail"
+#     effect    = "Allow"
+#     actions   = ["ses:SendRawEmail"]
+#     resources = ["arn:aws:ses:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:identity/${local.ses_domain_identity}"]
+#     condition {
+#       test     = "StringEquals"
+#       variable = "ses:FromAddress"
+#       values   = [local.airflow_mail_from_address]
+#     }
+#   }
+# }
 
-module "airflow_ses_policy" {
-  source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.20.0"
+# module "airflow_ses_policy" {
+#   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
+#   version = "5.20.0"
 
-  name   = "data-platform-airflow-${local.environment}-ses-policy"
-  policy = data.aws_iam_policy_document.airflow_ses_policy.json
+#   name   = "data-platform-airflow-${local.environment}-ses-policy"
+#   policy = data.aws_iam_policy_document.airflow_ses_policy.json
 
-  tags = local.tags
-}
+#   tags = local.tags
+# }
