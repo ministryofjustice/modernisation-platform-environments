@@ -1,0 +1,4 @@
+--constraint "https://raw.githubusercontent.com/apache/airflow/constraints-2.4.3/constraints-3.10.txt"
+apache-airflow[cncf.kubernetes]
+kubernetes
+mojap-airflow-tools==2.4.3

@@ -77,7 +77,7 @@ data "aws_iam_policy_document" "airflow_execution_policy" {
     sid       = "AllowEKSDescribeCluster"
     effect    = "Allow"
     actions   = ["eks:DescribeCluster"]
-    resources = [local.eks_cluster_arn]
+    resources = [local.environment_configuration.eks_cluster_arn]
   }
 }
 
