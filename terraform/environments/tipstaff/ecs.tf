@@ -6,12 +6,17 @@ resource "aws_ecs_cluster" "tipstaff_cluster" {
   }
 }
 
-resource "aws_cloudwatch_log_group" "tipstaffFamily_logs" {
-  name = "/ecs/tipstaffFamily"
+resource "aws_cloudwatch_log_group" "ecs_logs" {
+  name = "/ecs/container-logs"
+}
+
+resource "aws_cloudwatch_log_stream" "ecs_log_stream" {
+  name           = "my-ecs-log-stream"
+  log_group_name = aws_cloudwatch_log_group.ecs_logs.name
 }
 
 resource "aws_ecs_task_definition" "tipstaff_task_definition" {
-  family                   = "tipstaffFamily"
+  family                   = "tipstaff-ecs-task"
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
   execution_role_arn       = aws_iam_role.app_execution.arn
@@ -35,9 +40,9 @@ resource "aws_ecs_task_definition" "tipstaff_task_definition" {
       logConfiguration = {
         logDriver = "awslogs"
         options = {
-          awslogs-group         = "${aws_cloudwatch_log_group.tipstaffFamily_logs.name}"
+          awslogs-group         = "${aws_cloudwatch_log_group.ecs_logs.name}"
           awslogs-region        = "eu-west-2"
-          awslogs-stream-prefix = "ecs"
+          awslogs-stream-prefix = "${aws_cloudwatch_log_stream.ecs_log_stream.name}"
         }
       }
       environment = [
