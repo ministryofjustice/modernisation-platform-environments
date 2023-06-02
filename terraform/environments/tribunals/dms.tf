@@ -3,19 +3,6 @@
 // DMS is not used in the Dev environment.
 
 //Shared resources:
-resource "aws_dms_endpoint" "target" {
-  depends_on    = [aws_db_instance.rdsdb]
-  database_name = local.application_data.accounts[local.environment].db_identifier
-  endpoint_id   = "tribunals-target"
-  endpoint_type = "target"
-  engine_name   = "sqlserver"
-  username      = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["username"]
-  password      = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["password"]
-  port          = 1433
-  server_name   = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["host"]
-  ssl_mode      = "none"
-}
-
 resource "aws_dms_replication_instance" "tribunals_replication_instance" {
   allocated_storage           = 300
   apply_immediately           = true
@@ -99,3 +86,29 @@ resource "aws_iam_role_policy" "dms_vpc_management_policy" {
   })
 }
 
+//transport
+resource "aws_dms_endpoint" "target" {
+  depends_on    = [aws_db_instance.rdsdb]
+  database_name = local.application_data.accounts[local.environment].db_identifier
+  endpoint_id   = "tribunals-target"
+  endpoint_type = "target"
+  engine_name   = "sqlserver"
+  username      = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["username"]
+  password      = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["password"]
+  port          = 1433
+  server_name   = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["host"]
+  ssl_mode      = "none"
+}
+
+resource "aws_dms_endpoint" "source" {
+  database_name               = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["dbname"]
+  endpoint_id                 = "tribunals-source"
+  endpoint_type               = "source"
+  engine_name                 = "sqlserver"
+  password                    = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["password"]
+  port                        = 1433
+  server_name                 = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["host"]
+  ssl_mode                    = "none"
+
+  username = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["username"]
+}

@@ -36,3 +36,12 @@ data "aws_secretsmanager_secret_version" "data_rds_secret_current" {
   depends_on = [aws_secretsmanager_secret_version.resource_rds_secret_current]
   secret_id  = data.aws_secretsmanager_secret.data_rds_secret.id
 }
+
+// retrieve secrets for the tactical products database
+data "aws_secretsmanager_secret" "source_db_secret" {
+  arn = local.application_data.accounts[local.environment].tactical_products_db_secrets_arn
+}
+
+data "aws_secretsmanager_secret_version" "source_db_secret_current" {
+  secret_id = data.aws_secretsmanager_secret.source_db_secret.id
+}

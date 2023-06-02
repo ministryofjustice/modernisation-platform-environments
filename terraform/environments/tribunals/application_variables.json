@@ -9,7 +9,7 @@
       "engine_version": "15.00.4198.2.v1",
       "instance_class": "db.m5.large",
       "username": "admin",
-      "tactical_products_db_secrets_arn": "arn:aws:secretsmanager:eu-west-2:913862848426:secret:tactical-products-db-secrets-ox3sNi"
+      "tactical_products_db_secrets_arn": "arn:aws:secretsmanager:eu-west-2:263310006819:secret:tribunals-source-db-credentials-dev-BHvvLl"
     },
     "test": {
       "example_var": "test-data"
