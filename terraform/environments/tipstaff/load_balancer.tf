@@ -52,12 +52,12 @@ resource "aws_lb_target_group" "tipstaff_target_group" {
 
   health_check {
     healthy_threshold   = "3"
-    interval            = "30"
+    interval            = "15"
     protocol            = "HTTP"
     port                = "80"
     unhealthy_threshold = "3"
     matcher             = "200-302"
-    timeout             = "25"
+    timeout             = "5"
   }
 
 }
@@ -75,28 +75,10 @@ resource "aws_lb_listener" "tipstaff_lb_1" {
 }
 
 resource "aws_lb_listener" "tipstaff_lb_2" {
-  count = local.is-production ? 0 : 1
   depends_on = [
     aws_acm_certificate.external
   ]
   certificate_arn   = aws_acm_certificate.external.arn
-  load_balancer_arn = aws_lb.tipstaff_lb.arn
-  port              = local.application_data.accounts[local.environment].server_port_2
-  protocol          = local.application_data.accounts[local.environment].lb_listener_protocol_2
-  ssl_policy        = local.application_data.accounts[local.environment].lb_listener_protocol_2 == "HTTP" ? "" : "ELBSecurityPolicy-2016-08"
-
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.tipstaff_target_group.arn
-  }
-}
-
-resource "aws_lb_listener" "tipstaff_lb_3" {
-  count = local.is-production ? 1 : 0
-  depends_on = [
-    aws_acm_certificate.external_prod[0]
-  ]
-  certificate_arn   = aws_acm_certificate.external_prod[0].arn
   load_balancer_arn = aws_lb.tipstaff_lb.arn
   port              = local.application_data.accounts[local.environment].server_port_2
   protocol          = local.application_data.accounts[local.environment].lb_listener_protocol_2
