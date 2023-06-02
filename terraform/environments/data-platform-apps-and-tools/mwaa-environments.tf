@@ -23,12 +23,12 @@ resource "aws_mwaa_environment" "main" {
   airflow_configuration_options = merge(
     local.environment_configuration.airflow_configuration_options,
     {
-      "smtp.smtp_host"      = "email-smtp.${data.aws_region.current.name}.amazonaws.com"
-      "smtp.smtp_port"      = 587
-      "smtp.smtp_starttls"  = 1
-      "smtp.smtp_user"      = module.airflow_iam_user.iam_access_key_id
-      "smtp.smtp_password"  = module.airflow_iam_user.iam_access_key_ses_smtp_password_v4
-      "smtp.smtp_mail_from" = local.airflow_mail_from_address
+      # "smtp.smtp_host"      = "email-smtp.${data.aws_region.current.name}.amazonaws.com"
+      # "smtp.smtp_port"      = 587
+      # "smtp.smtp_starttls"  = 1
+      # "smtp.smtp_user"      = module.airflow_iam_user.iam_access_key_id
+      # "smtp.smtp_password"  = module.airflow_iam_user.iam_access_key_ses_smtp_password_v4
+      # "smtp.smtp_mail_from" = local.airflow_mail_from_address
     }
   )
 
