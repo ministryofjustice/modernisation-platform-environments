@@ -71,71 +71,6 @@ EOF
   depends_on = [aws_security_group.ec2_sg_ebsdb]
 }
 
-
-resource "aws_ebs_volume" "export_home_dr" {
-  count = local.environment == "development" ? 1 : 0
-  lifecycle {
-    ignore_changes = [kms_key_id]
-  }
-  availability_zone = "eu-west-2a"
-  size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_exhome
-  type              = "io2"
-  iops              = 3000
-  encrypted         = true
-  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  tags = merge(local.tags,
-    { Name = "export/home_dr" }
-  )
-}
-resource "aws_volume_attachment" "export_home_att_dr" {
-  count       = local.environment == "development" ? 1 : 0
-  device_name = "/dev/sdh"
-  volume_id   = aws_ebs_volume.export_home_dr[0].id
-  instance_id = aws_instance.ec2_oracle_ebs_dr[0].id
-}
-resource "aws_ebs_volume" "u01_dr" {
-  count = local.environment == "development" ? 1 : 0
-  lifecycle {
-    ignore_changes = [kms_key_id]
-  }
-  availability_zone = "eu-west-2a"
-  size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_u01
-  type              = "io2"
-  iops              = 3000
-  encrypted         = true
-  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  tags = merge(local.tags,
-    { Name = "u01_dr" }
-  )
-}
-resource "aws_volume_attachment" "u01_att_dr" {
-  count       = local.environment == "development" ? 1 : 0
-  device_name = "/dev/sdi"
-  volume_id   = aws_ebs_volume.u01_dr[0].id
-  instance_id = aws_instance.ec2_oracle_ebs_dr[0].id
-}
-resource "aws_ebs_volume" "arch_dr" {
-  count = local.environment == "development" ? 1 : 0
-  lifecycle {
-    ignore_changes = [kms_key_id]
-  }
-  availability_zone = "eu-west-2a"
-  size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_arch
-  type              = "io2"
-  iops              = 3000
-  encrypted         = true
-  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  tags = merge(local.tags,
-    { Name = "arch_dr" }
-  )
-}
-resource "aws_volume_attachment" "arch_att_dr" {
-  count       = local.environment == "development" ? 1 : 0
-  device_name = "/dev/sdj"
-  volume_id   = aws_ebs_volume.arch_dr[0].id
-  instance_id = aws_instance.ec2_oracle_ebs_dr[0].id
-}
-
 resource "aws_ebs_volume" "dbf_dr" {
   count = local.environment == "development" ? 1 : 0
   lifecycle {
@@ -158,48 +93,113 @@ resource "aws_volume_attachment" "dbf_att_dr" {
   instance_id = aws_instance.ec2_oracle_ebs_dr[0].id
 }
 
-resource "aws_ebs_volume" "redoA_dr" {
-  count = local.environment == "development" ? 1 : 0
-  lifecycle {
-    ignore_changes = [kms_key_id]
-  }
-  availability_zone = "eu-west-2a"
-  size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_redoA
-  type              = "io2"
-  iops              = 3000
-  encrypted         = true
-  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  tags = merge(local.tags,
-    { Name = "redoA_dr" }
-  )
-}
-resource "aws_volume_attachment" "redoA_att_dr" {
-  count       = local.environment == "development" ? 1 : 0
-  device_name = "/dev/sdl"
-  volume_id   = aws_ebs_volume.redoA_dr[0].id
-  instance_id = aws_instance.ec2_oracle_ebs_dr[0].id
-}
-resource "aws_ebs_volume" "techst_dr" {
-  count = local.environment == "development" ? 1 : 0
-  lifecycle {
-    ignore_changes = [kms_key_id]
-  }
-  availability_zone = "eu-west-2a"
-  size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_techst
-  type              = "io2"
-  iops              = 3000
-  encrypted         = true
-  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  tags = merge(local.tags,
-    { Name = "techst_dr" }
-  )
-}
-resource "aws_volume_attachment" "techst_att_dr" {
-  count       = local.environment == "development" ? 1 : 0
-  device_name = "/dev/sdm"
-  volume_id   = aws_ebs_volume.techst_dr[0].id
-  instance_id = aws_instance.ec2_oracle_ebs_dr[0].id
-}
+####below this line commented out as different snaps were used for manual building to test
+#resource "aws_ebs_volume" "export_home_dr" {
+#  count = local.environment == "development" ? 1 : 0
+#  lifecycle {
+#    ignore_changes = [kms_key_id]
+#  }
+#  availability_zone = "eu-west-2a"
+#  size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_exhome
+#  type              = "io2"
+#  iops              = 3000
+#  encrypted         = true
+#  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+#  tags = merge(local.tags,
+#    { Name = "export/home_dr" }
+#  )
+#}
+#resource "aws_volume_attachment" "export_home_att_dr" {
+#  count       = local.environment == "development" ? 1 : 0
+#  device_name = "/dev/sdh"
+#  volume_id   = aws_ebs_volume.export_home_dr[0].id
+#  instance_id = aws_instance.ec2_oracle_ebs_dr[0].id
+#}
+#resource "aws_ebs_volume" "u01_dr" {
+#  count = local.environment == "development" ? 1 : 0
+#  lifecycle {
+#    ignore_changes = [kms_key_id]
+#  }
+#  availability_zone = "eu-west-2a"
+#  size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_u01
+#  type              = "io2"
+#  iops              = 3000
+#  encrypted         = true
+#  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+#  tags = merge(local.tags,
+#    { Name = "u01_dr" }
+#  )
+#}
+#resource "aws_volume_attachment" "u01_att_dr" {
+#  count       = local.environment == "development" ? 1 : 0
+#  device_name = "/dev/sdi"
+#  volume_id   = aws_ebs_volume.u01_dr[0].id
+#  instance_id = aws_instance.ec2_oracle_ebs_dr[0].id
+#}
+#resource "aws_ebs_volume" "arch_dr" {
+#  count = local.environment == "development" ? 1 : 0
+#  lifecycle {
+#    ignore_changes = [kms_key_id]
+#  }
+#  availability_zone = "eu-west-2a"
+#  size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_arch
+#  type              = "io2"
+#  iops              = 3000
+#  encrypted         = true
+#  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+#  tags = merge(local.tags,
+#    { Name = "arch_dr" }
+#  )
+#}
+#resource "aws_volume_attachment" "arch_att_dr" {
+#  count       = local.environment == "development" ? 1 : 0
+#  device_name = "/dev/sdj"
+#  volume_id   = aws_ebs_volume.arch_dr[0].id
+#  instance_id = aws_instance.ec2_oracle_ebs_dr[0].id
+#}
+#
+#resource "aws_ebs_volume" "redoA_dr" {
+#  count = local.environment == "development" ? 1 : 0
+#  lifecycle {
+#    ignore_changes = [kms_key_id]
+#  }
+#  availability_zone = "eu-west-2a"
+#  size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_redoA
+#  type              = "io2"
+#  iops              = 3000
+#  encrypted         = true
+#  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+#  tags = merge(local.tags,
+#    { Name = "redoA_dr" }
+#  )
+#}
+#resource "aws_volume_attachment" "redoA_att_dr" {
+#  count       = local.environment == "development" ? 1 : 0
+#  device_name = "/dev/sdl"
+#  volume_id   = aws_ebs_volume.redoA_dr[0].id
+#  instance_id = aws_instance.ec2_oracle_ebs_dr[0].id
+#}
+#resource "aws_ebs_volume" "techst_dr" {
+#  count = local.environment == "development" ? 1 : 0
+#  lifecycle {
+#    ignore_changes = [kms_key_id]
+#  }
+#  availability_zone = "eu-west-2a"
+#  size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_techst
+#  type              = "io2"
+#  iops              = 3000
+#  encrypted         = true
+#  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+#  tags = merge(local.tags,
+#    { Name = "techst_dr" }
+#  )
+#}
+#resource "aws_volume_attachment" "techst_att_dr" {
+#  count       = local.environment == "development" ? 1 : 0
+#  device_name = "/dev/sdm"
+#  volume_id   = aws_ebs_volume.techst_dr[0].id
+#  instance_id = aws_instance.ec2_oracle_ebs_dr[0].id
+#}
 /*
 resource "aws_ebs_volume" "backup_dr" {
   count = local.environment == "development" ? 1 : 0
