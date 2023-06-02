@@ -3,7 +3,7 @@
 resource "aws_db_snapshot_copy" "local" {
   for_each                      = var.rds_refresh_snapshot_id != "" ? toset([var.rds_refresh_snapshot_id]) : []
   source_db_snapshot_identifier = each.value
-  kms_key_id                    = data.aws_kms_key.rds_shared.id
+  kms_key_id                    = data.aws_kms_key.rds_shared.arn
   target_db_snapshot_identifier = "data-refresh-snapshot"
 }
 
@@ -13,9 +13,11 @@ resource "aws_db_instance" "iaps" {
   license_model  = "bring-your-own-license"
   instance_class = local.application_data.accounts[local.environment].db_instance_class
   db_name        = "IAPS"
-  identifier     = "${local.application_name}-${local.environment}-database"
-  username       = local.application_data.accounts[local.environment].db_user
-  password       = aws_secretsmanager_secret_version.db_password.secret_string
+  identifier     = "iaps"
+
+  username                      = local.application_data.accounts[local.environment].db_user
+  manage_master_user_password   = true
+  master_user_secret_kms_key_id = data.aws_kms_key.rds_shared.arn
 
   # temporary 2-layer try function, to conditionally allow a build from a snapshot originating in an external account
   snapshot_identifier    = try(local.application_data.accounts[local.environment].db_snapshot_identifier, try(aws_db_snapshot_copy.local[0].id, null))
@@ -41,6 +43,7 @@ resource "aws_db_instance" "iaps" {
   monitoring_interval = local.application_data.accounts[local.environment].db_monitoring_interval
   monitoring_role_arn = local.application_data.accounts[local.environment].db_monitoring_interval == 0 ? "" : aws_iam_role.rds_enhanced_monitoring[0].arn
   #checkov:skip=CKV_AWS_118: "enhanced monitoring is enabled, but optional"
+  kms_key_id                      = data.aws_kms_key.rds_shared.arn
   storage_encrypted               = true
   performance_insights_enabled    = local.application_data.accounts[local.environment].db_performance_insights_enabled
   performance_insights_kms_key_id = "" #tfsec:ignore:aws-rds-enable-performance-insights-encryption Left empty so that it will run, however should be populated with real key in scenario.
