@@ -43,7 +43,7 @@ resource "aws_secretsmanager_secret" "resource_source_db_secret" {
 }
 
 resource "aws_secretsmanager_secret_version" "resource_source_db_secret_current" {
-  secret_id = data.aws_secretsmanager_secret.resource_source_db_secret.id
+  secret_id = aws_secretsmanager_secret.resource_source_db_secret.id
    secret_string = <<EOF
   {
     "username": "",
