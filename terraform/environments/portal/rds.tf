@@ -48,6 +48,7 @@ resource "aws_db_parameter_group" "igdb-parametergroup-19c" {
   parameter {
     name  = "open_cursors"
     value = "1000"
+    apply_method = "pending-reboot"
   }
 
   parameter {
@@ -59,21 +60,25 @@ resource "aws_db_parameter_group" "igdb-parametergroup-19c" {
   parameter {
     name  = "query_rewrite_enabled"
     value = "TRUE"
+    apply_method = "pending-reboot"
   }
 
   parameter {
     name  = "query_rewrite_integrity"
     value = "TRUSTED"
+    apply_method = "pending-reboot"
   }
 
   parameter {
     name  = "sessions"
     value = "1000"
+    apply_method = "pending-reboot"
   }
 
   parameter {
     name  = "sqlnetora.sqlnet.allowed_logon_version_server"
     value = "11"
+    apply_method = "pending-reboot"
   }
 
   tags = merge(
