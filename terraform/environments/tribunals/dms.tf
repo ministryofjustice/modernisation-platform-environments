@@ -112,3 +112,17 @@ resource "aws_dms_endpoint" "source" {
 
   username = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["username"]
 }
+
+resource "aws_dms_replication_task" "migration-task" {
+  #depends_on = [null_resource.setup_target_rds_security_group, var.db_instance, aws_dms_endpoint.target, aws_dms_endpoint.source, aws_dms_replication_instance.replication-instance]
+  depends_on = [var.db_instance, aws_dms_endpoint.target, aws_dms_endpoint.source, aws_dms_replication_instance.replication-instance]
+
+  migration_type            = "full-load-and-cdc"
+  replication_instance_arn  = aws_dms_replication_instance.tribunals_replication_instance.replication_instance_arn
+  replication_task_id       = "tf-tribunals-migration-task"
+  replication_task_settings = "{\"FullLoadSettings\": {\"TargetTablePrepMode\": \"TRUNCATE_BEFORE_LOAD\"}}"
+  source_endpoint_arn       = aws_dms_endpoint.source.endpoint_arn
+  table_mappings            = "{\"rules\":[{\"rule-type\":\"selection\",\"rule-id\":\"1\",\"rule-name\":\"1\",\"object-locator\":{\"schema-name\":\"dbo\",\"table-name\":\"%\"},\"rule-action\":\"include\"}]}"
+  target_endpoint_arn = aws_dms_endpoint.target.endpoint_arn
+  start_replication_task = true
+}
