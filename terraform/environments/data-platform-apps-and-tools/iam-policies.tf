@@ -73,6 +73,12 @@ data "aws_iam_policy_document" "airflow_execution_policy" {
     ]
     resources = ["arn:aws:sqs:${data.aws_region.current.name}:*:airflow-celery-*"]
   }
+  statement {
+    sid       = "AllowEKSDescribeCluster"
+    effect    = "Allow"
+    actions   = ["eks:DescribeCluster"]
+    resources = [local.eks_cluster_arn]
+  }
 }
 
 module "airflow_execution_policy" {
