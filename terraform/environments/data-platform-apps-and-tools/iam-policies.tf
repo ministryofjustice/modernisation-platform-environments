@@ -73,23 +73,6 @@ data "aws_iam_policy_document" "airflow_execution_policy" {
     ]
     resources = ["arn:aws:sqs:${data.aws_region.current.name}:*:airflow-celery-*"]
   }
-  statement {
-    /* TODO: Check this statement is required, it isn't on AWS' example, but is on DE's current policy */
-    sid    = "AllowSQSKMS"
-    effect = "Allow"
-    actions = [
-      "kms:GenerateDataKey*",
-      "kms:Encrypt",
-      "kms:DescribeKey",
-      "kms:Decrypt"
-    ]
-    not_resources = ["arn:aws:kms:*:${data.aws_caller_identity.current.account_id}:key/*"]
-    condition {
-      test     = "StringLike"
-      variable = "kms:ViaService"
-      values   = ["sqs.${data.aws_region.current.name}.amazonaws.com"]
-    }
-  }
 }
 
 module "airflow_execution_policy" {
