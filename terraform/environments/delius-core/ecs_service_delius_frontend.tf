@@ -78,6 +78,10 @@ data "aws_ssm_parameter" "delius_core_frontend_env_var_user_context" {
   name = format("/%s/USER_CONTEXT", local.application_name)
 }
 
+data "aws_ssm_parameter" "delius_core_frontend_env_var_eis_user_context" {
+  name = format("/%s/EIS_USER_CONTEXT", local.application_name)
+}
+
 data "aws_secretsmanager_secret" "ldap_credential" {
   name = "${local.application_name}-openldap-bind-password"
 }
@@ -278,6 +282,10 @@ resource "aws_ecs_task_definition" "delius_core_frontend_task_definition" {
           {
             name      = "USER_CONTEXT"
             valueFrom = data.aws_ssm_parameter.delius_core_frontend_env_var_user_context.arn
+          },
+          {
+            name      = "EIS_USER_CONTEXT"
+            valueFrom = data.aws_ssm_parameter.delius_core_frontend_env_var_eis_user_context.arn
           }
         ]
       }
