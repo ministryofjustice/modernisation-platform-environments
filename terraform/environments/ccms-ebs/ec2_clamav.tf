@@ -93,7 +93,7 @@ module "cw-clamav-ec2" {
   imageId       = local.application_data.accounts[local.environment].clamav_ami_id
   instanceType  = local.application_data.accounts[local.environment].ec2_instance_type_clamav
   fileSystem    = "xfs"       # Linux root filesystem
-  rootDevice    = "xvda1"     # ClamAV uses different instance family
+  rootDevice    = "nvme0n1p1"     # ClamAV uses different instance family
 
   cpu_eval_periods  = local.application_data.cloudwatch_ec2.cpu.eval_periods
   cpu_datapoints    = local.application_data.cloudwatch_ec2.cpu.eval_periods
