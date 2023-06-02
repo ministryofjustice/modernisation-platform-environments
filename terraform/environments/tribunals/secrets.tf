@@ -37,11 +37,34 @@ data "aws_secretsmanager_secret_version" "data_rds_secret_current" {
   secret_id  = data.aws_secretsmanager_secret.data_rds_secret.id
 }
 
-// retrieve secrets for the tactical products database
+//source db secret definition, will be filled manually
+resource "aws_secretsmanager_secret" "resource_source_db_secret" {
+  name = "tribunals-source-db-credentials"
+}
+
+resource "aws_secretsmanager_secret_version" "resource_source_db_secret_current" {
+  secret_id = data.aws_secretsmanager_secret.resource_source_db_secret.id
+   secret_string = <<EOF
+  {
+    "username": "",
+    "password": "",
+    "engine": "sqlserver",
+    "host": "${aws_db_instance.rdsdb.address}",
+    "port": 1433,
+    "dbname": "master",
+    "dms_source_account_access_key": "",
+    "dms_source_account_secret_key": "",
+    "ec2-instance-id": ""
+  }
+  EOF
+}
+// retrieve secrets for the source database on tactical products account
 data "aws_secretsmanager_secret" "source_db_secret" {
-  arn = local.application_data.accounts[local.environment].tactical_products_db_secrets_arn
+  depends_on = [aws_secretsmanager_secret_version.resource_source_db_secret_current]
+  arn = aws_secretsmanager_secret_version.resource_source_db_secret_current.arn
 }
 
 data "aws_secretsmanager_secret_version" "source_db_secret_current" {
+  depends_on = [aws_secretsmanager_secret_version.resource_source_db_secret_current]
   secret_id = data.aws_secretsmanager_secret.source_db_secret.id
 }
