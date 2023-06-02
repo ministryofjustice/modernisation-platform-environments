@@ -12,7 +12,7 @@ resource "aws_security_group" "ohs_instance" {
     from_port   = 8
     to_port     = 1
     protocol    = "ICMP"
-    cidr_blocks = [local.firstohs-cidr]
+    cidr_blocks = [local.first-cidr]
 
   }
   ingress {
@@ -20,7 +20,7 @@ resource "aws_security_group" "ohs_instance" {
     from_port   = 7777
     to_port     = 7777
     protocol    = "TCP"
-    cidr_blocks = [local.firstohs-cidr]
+    cidr_blocks = [local.first-cidr]
 
   }
   ingress {
@@ -28,7 +28,7 @@ resource "aws_security_group" "ohs_instance" {
     from_port   = 6200
     to_port     = 6200
     protocol    = "TCP"
-    cidr_blocks = [local.firstohs-cidr]
+    cidr_blocks = [local.first-cidr]
 
   }
 
@@ -37,7 +37,7 @@ resource "aws_security_group" "ohs_instance" {
   #   from_port   = 22
   #   to_port     = 22
   #   protocol    = "TCP"
-  #   cidr_blocks = [local.secondohs-cidr]
+  #   cidr_blocks = [local.second-cidr]
 
   # }
   # ingress {
@@ -45,7 +45,7 @@ resource "aws_security_group" "ohs_instance" {
   #   from_port   = 22
   #   to_port     = 22
   #   protocol    = "TCP"
-  #   cidr_blocks = [local.firstohs-cidr]
+  #   cidr_blocks = [local.first-cidr]
 
   # }
    ingress {
@@ -53,7 +53,7 @@ resource "aws_security_group" "ohs_instance" {
     from_port   = 7777
     to_port     = 7777
     protocol    = "TCP"
-    cidr_blocks = [local.secondohs-cidr]
+    cidr_blocks = [local.second-cidr]
 
   }
   #   ingress {
