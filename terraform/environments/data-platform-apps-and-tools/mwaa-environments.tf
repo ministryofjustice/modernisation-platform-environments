@@ -14,7 +14,7 @@ resource "aws_mwaa_environment" "main" {
 
   network_configuration {
     security_group_ids = [module.airflow_security_group.security_group_id]
-    subnet_ids         = slice(data.aws_subnets.shared-private.ids, 0, 1)
+    subnet_ids         = slice(data.aws_subnets.shared-private.ids, 0, 2)
   }
 
   tags = local.tags
