@@ -98,7 +98,7 @@ resource "aws_ecs_service" "tipstaff_ecs_service" {
   launch_type                       = "FARGATE"
   enable_execute_command            = true
   desired_count                     = 1
-  health_check_grace_period_seconds = 90
+  health_check_grace_period_seconds = 160
 
   network_configuration {
     subnets          = data.aws_subnets.shared-public.ids
@@ -239,6 +239,6 @@ resource "aws_security_group" "ecs_service" {
 }
 
 resource "aws_ecr_repository" "tipstaff-ecr-repo" {
-  name          = "tipstaff-ecr-repo"
-  force_delete  = true
+  name         = "tipstaff-ecr-repo"
+  force_delete = true
 }
