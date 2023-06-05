@@ -256,8 +256,8 @@ resource "aws_db_instance" "appdb1" {
   username               = local.username
   password               = random_password.rds_password.result
   vpc_security_group_ids = [aws_security_group.igdb.id]
-  skip_final_snapshot             = true
-  # final_snapshot_identifier       = "${local.application_name}-${formatdate("DDMMMYYYYhhmm", timestamp())}-finalsnapshot"
+  # skip_final_snapshot             = false
+  final_snapshot_identifier       = "${local.application_name}-${formatdate("DDMMMYYYYhhmm", timestamp())}-finalsnapshot"
   parameter_group_name  = aws_db_parameter_group.igdb-parametergroup-19c.name
   db_subnet_group_name  = aws_db_subnet_group.igdb.name
   maintenance_window    = local.maintenance_window
@@ -265,7 +265,7 @@ resource "aws_db_instance" "appdb1" {
   deletion_protection   = true
   copy_tags_to_snapshot = true
   storage_encrypted     = true
-  apply_immediately           = true
+  # apply_immediately           = true
   snapshot_identifier         = format("arn:aws:rds:eu-west-2:%s:snapshot:%s", data.aws_caller_identity.current.account_id, local.rds_snapshot_name)
   kms_key_id                  = data.aws_kms_key.rds_shared.arn
   publicly_accessible         = false
