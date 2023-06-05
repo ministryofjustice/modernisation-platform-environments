@@ -37,10 +37,11 @@ resource "aws_security_group" "tipstaff_lb_sc" {
 }
 
 resource "aws_lb" "tipstaff_lb" {
-  name                       = "tipstaff-load-balancer"
-  load_balancer_type         = "application"
-  security_groups            = [aws_security_group.tipstaff_lb_sc.id]
-  subnets                    = data.aws_subnets.shared-public.ids
+  name               = "tipstaff-load-balancer"
+  load_balancer_type = "application"
+  security_groups    = [aws_security_group.tipstaff_lb_sc.id]
+  # subnets                    = data.aws_subnets.shared-public.ids
+  subnets                    = ["subnet-0692a182aeb853315", "subnet-035241413be986222", "subnet-0444725373ce40ec7"]
   enable_deletion_protection = false
   internal                   = false
   depends_on                 = [aws_security_group.tipstaff_lb_sc]
