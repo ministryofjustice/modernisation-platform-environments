@@ -6,7 +6,7 @@
 locals {
   glue_avro_registry = split("/", module.glue_registry_avro.registry_name)
 }
-    
+
 module "glue_reporting_hub_job" {
   source                        = "./modules/glue_job"
   create_job                    = local.create_job
@@ -19,17 +19,17 @@ module "glue_reporting_hub_job" {
   checkpoint_dir                = "s3://${module.s3_glue_job_bucket.bucket_id}/checkpoint/${local.project}-reporting-hub-${local.env}/"
   spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-reporting-hub-${local.env}/"
   # Placeholder Script Location
-  script_location               = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/scripts/digital-prison-reporting-jobs-vLatest.scala"
-  enable_continuous_log_filter  = false
-  project_id                    = local.project
-  aws_kms_key                   = local.s3_kms_arn
-  additional_policies           = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_admin_arn
-  execution_class               = "STANDARD"
-  worker_type                   = "G.1X"
-  number_of_workers             = 2
-  max_concurrent                = 1
-  region                        = local.account_region
-  account                       = local.account_id
+  script_location              = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/scripts/digital-prison-reporting-jobs-vLatest.scala"
+  enable_continuous_log_filter = false
+  project_id                   = local.project
+  aws_kms_key                  = local.s3_kms_arn
+  additional_policies          = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_admin_arn
+  execution_class              = "STANDARD"
+  worker_type                  = "G.1X"
+  number_of_workers            = 2
+  max_concurrent               = 1
+  region                       = local.account_region
+  account                      = local.account_id
 
   tags = merge(
     local.all_tags,
@@ -73,18 +73,18 @@ module "glue_domain_refresh_job" {
   checkpoint_dir                = "s3://${module.s3_glue_job_bucket.bucket_id}/checkpoint/${local.project}-domain-refresh-${local.env}/"
   spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-domain-refresh-${local.env}/"
   # Placeholder Script Location
-  script_location               = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/scripts/digital-prison-reporting-jobs-vLatest.scala"
-  enable_continuous_log_filter  = false
-  project_id                    = local.project
-  aws_kms_key                   = local.s3_kms_arn
-  additional_policies           = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_admin_arn
+  script_location              = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/scripts/digital-prison-reporting-jobs-vLatest.scala"
+  enable_continuous_log_filter = false
+  project_id                   = local.project
+  aws_kms_key                  = local.s3_kms_arn
+  additional_policies          = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_admin_arn
   # timeout                       = 1440
-  execution_class               = "FLEX"
-  worker_type                   = "G.1X"
-  number_of_workers             = 2
-  max_concurrent                = 1
-  region                        = local.account_region
-  account                       = local.account_id  
+  execution_class   = "FLEX"
+  worker_type       = "G.1X"
+  number_of_workers = 2
+  max_concurrent    = 1
+  region            = local.account_region
+  account           = local.account_id
 
   tags = merge(
     local.all_tags,
@@ -96,16 +96,16 @@ module "glue_domain_refresh_job" {
   )
 
   arguments = {
-    "--extra-jars"                    = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/jars/digital-prison-reporting-jobs-vLatest-all.jar"
-    "--class"                         = "uk.gov.justice.digital.job.DomainRefreshJob"
-    "--datalake-formats"              = "delta"
-    "--dpr.aws.dynamodb.endpointUrl"  = "https://dynamodb.${local.account_region}.amazonaws.com"
-    "--dpr.aws.kinesis.endpointUrl"   = "https://kinesis.${local.account_region}.amazonaws.com"
-    "--dpr.aws.region"                = local.account_region
-    "--dpr.curated.s3.path"           = "s3://${module.s3_curated_bucket.bucket_id}"
-    "--dpr.domain.registry"           = "${local.project}-domain-registry-${local.environment}"
-    "--dpr.domain.target.path"        =  "s3://${module.s3_domain_bucket.bucket_id}"
-    "--dpr.domain.catalog.db"         = module.glue_data_domain_database.db_name
+    "--extra-jars"                   = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/jars/digital-prison-reporting-jobs-vLatest-all.jar"
+    "--class"                        = "uk.gov.justice.digital.job.DomainRefreshJob"
+    "--datalake-formats"             = "delta"
+    "--dpr.aws.dynamodb.endpointUrl" = "https://dynamodb.${local.account_region}.amazonaws.com"
+    "--dpr.aws.kinesis.endpointUrl"  = "https://kinesis.${local.account_region}.amazonaws.com"
+    "--dpr.aws.region"               = local.account_region
+    "--dpr.curated.s3.path"          = "s3://${module.s3_curated_bucket.bucket_id}"
+    "--dpr.domain.registry"          = "${local.project}-domain-registry-${local.environment}"
+    "--dpr.domain.target.path"       = "s3://${module.s3_domain_bucket.bucket_id}"
+    "--dpr.domain.catalog.db"        = module.glue_data_domain_database.db_name
   }
 }
 
@@ -151,9 +151,9 @@ module "glue_registry_avro" {
 
 ## Glue Table, RAW
 module "glue_raw_table" {
-  source = "./modules/glue_table"
-  enable_glue_catalog_table       = true
-  name   = "raw"
+  source                    = "./modules/glue_table"
+  enable_glue_catalog_table = true
+  name                      = "raw"
 
   # AWS Glue catalog DB
   glue_catalog_database_name       = module.glue_raw_zone_database.db_name
@@ -192,7 +192,7 @@ module "glue_raw_table" {
         columns_name    = "data"
         columns_type    = "string"
         columns_comment = "Data Column"
-      },      
+      },
     ]
 
     ser_de_info = [
@@ -449,7 +449,7 @@ module "glue_connection_redshift" {
   security_groups   = []
   availability_zone = ""
   subnet            = ""
-  password          = ""   ## Needs to pull from Secrets Manager, #TD
+  password          = "" ## Needs to pull from Secrets Manager, #TD
   username          = ""
 }
 
@@ -472,8 +472,8 @@ module "ec2_kinesis_agent" {
   ebs_encrypted               = true
   ebs_delete_on_termination   = false
   # s3_policy_arn               = aws_iam_policy.read_s3_read_access_policy.arn # TBC
-  region                      = local.account_region
-  account                     = local.account_id  
+  region  = local.account_region
+  account = local.account_id
 
   tags = merge(
     local.all_tags,
@@ -488,7 +488,7 @@ module "ec2_kinesis_agent" {
 module "datamart" {
   source                  = "./modules/redshift"
   project_id              = local.project
-  env                     = local.environment  
+  env                     = local.environment
   create_redshift_cluster = local.create_datamart
   name                    = local.redshift_cluster_name
   node_type               = "ra3.xlplus"
@@ -528,10 +528,10 @@ module "datamart" {
   }
 
   logging = {
-    enable = true
+    enable               = true
     log_destination_type = "cloudwatch"
-    log_exports = ["useractivitylog", "userlog", "connectionlog"]
-  }  
+    log_exports          = ["useractivitylog", "userlog", "connectionlog"]
+  }
 
   tags = merge(
     local.all_tags,
@@ -544,35 +544,35 @@ module "datamart" {
 
 # DMS Nomis Data Collector
 module "dms_nomis_ingestor" {
-  source                = "./modules/dms"
-  name                  = "${local.project}-dms-nomis-ingestor-${local.env}"
-  vpc_cidr              = [data.aws_vpc.shared.cidr_block]
-  source_engine_name    = "oracle"
-  source_db_name        = "CNOMT3"
-  source_app_username   = "digital_prison_reporting"
-  source_app_password   = "DSkpo4n7GhnmIV" ## Needs to pull from Secrets Manager, #TD
-  source_address        = "10.101.63.135"
-  source_db_port        = 1521
-  vpc                   = data.aws_vpc.shared.id
-  kinesis_stream_policy = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_admin_arn
-  project_id            = local.project
-  env                   = local.environment
-  dms_source_name       = "oracle"
-  dms_target_name       = "kinesis"
-  short_name            = "nomis"
-  migration_type        = "full-load-and-cdc"
-  replication_instance_version  = "3.4.6"
-  replication_instance_class = "dms.t3.medium"
-  subnet_ids            = [data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id]
+  source                       = "./modules/dms"
+  name                         = "${local.project}-dms-nomis-ingestor-${local.env}"
+  vpc_cidr                     = [data.aws_vpc.shared.cidr_block]
+  source_engine_name           = "oracle"
+  source_db_name               = "CNOMT3"
+  source_app_username          = "digital_prison_reporting"
+  source_app_password          = "DSkpo4n7GhnmIV" ## Needs to pull from Secrets Manager, #TD
+  source_address               = "10.101.63.135"
+  source_db_port               = 1521
+  vpc                          = data.aws_vpc.shared.id
+  kinesis_stream_policy        = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_admin_arn
+  project_id                   = local.project
+  env                          = local.environment
+  dms_source_name              = "oracle"
+  dms_target_name              = "kinesis"
+  short_name                   = "nomis"
+  migration_type               = "full-load-and-cdc"
+  replication_instance_version = "3.4.6"
+  replication_instance_class   = "dms.t3.medium"
+  subnet_ids                   = [data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id]
 
   vpc_role_dependency        = [aws_iam_role.dmsvpcrole]
   cloudwatch_role_dependency = [aws_iam_role.dms_cloudwatch_logs_role]
 
   kinesis_settings = {
-    "include_null_and_empty"          = "true"
-    "partition_include_schema_table"  = "true"
-    "include_partition_value"         = "true"
-    "kinesis_target_stream"           = "arn:aws:kinesis:eu-west-2:${data.aws_caller_identity.current.account_id}:stream/${local.kinesis_stream_ingestor}"
+    "include_null_and_empty"         = "true"
+    "partition_include_schema_table" = "true"
+    "include_partition_value"        = "true"
+    "kinesis_target_stream"          = "arn:aws:kinesis:eu-west-2:${data.aws_caller_identity.current.account_id}:stream/${local.kinesis_stream_ingestor}"
   }
 
   availability_zones = {
@@ -699,8 +699,8 @@ module "dynamo_tab_application_tf_state" {
   autoscaling_enabled = false
   name                = "${local.project}-terraform-state-${local.environment}"
 
-  hash_key    = "LockID"   # Hash
-  range_key   = ""         # Sort
+  hash_key    = "LockID" # Hash
+  range_key   = ""       # Sort
   table_class = "STANDARD"
   ttl_enabled = false
 

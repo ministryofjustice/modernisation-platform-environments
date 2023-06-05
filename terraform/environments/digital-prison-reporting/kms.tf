@@ -77,7 +77,7 @@ resource "aws_kms_key" "redshift-kms-key" {
   description         = "Encryption key for Redshift Cluster"
   enable_key_rotation = true
   policy              = data.aws_iam_policy_document.redhsift-kms.json
-  is_enabled          = true  
+  is_enabled          = true
 
   tags = merge(
     local.tags,

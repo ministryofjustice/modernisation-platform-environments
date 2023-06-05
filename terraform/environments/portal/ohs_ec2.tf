@@ -48,7 +48,7 @@ resource "aws_security_group" "ohs_instance" {
   #   cidr_blocks = [local.first-cidr]
 
   # }
-   ingress {
+  ingress {
     description = "OHS Inbound from Shared Svs VPC"
     from_port   = 7777
     to_port     = 7777
@@ -92,12 +92,12 @@ resource "aws_security_group" "ohs_instance" {
 # TODO Depending on outcome of how EBS/EFS is used, this resource may depend on aws_instance.oam_instance_1
 
 resource "aws_instance" "ohs1" {
-  ami                         = local.ami-id
-  instance_type               = local.application_data.accounts[local.environment].ohs_instance_type
-  monitoring                  = true
-  vpc_security_group_ids      = [aws_security_group.ohs_instance.id]
-  subnet_id                   = data.aws_subnet.data_subnets_a.id
-  iam_instance_profile        = aws_iam_instance_profile.portal.id
+  ami                    = local.ami-id
+  instance_type          = local.application_data.accounts[local.environment].ohs_instance_type
+  monitoring             = true
+  vpc_security_group_ids = [aws_security_group.ohs_instance.id]
+  subnet_id              = data.aws_subnet.data_subnets_a.id
+  iam_instance_profile   = aws_iam_instance_profile.portal.id
 
   # root_block_device {
   #   delete_on_termination      = false
@@ -113,18 +113,18 @@ resource "aws_instance" "ohs1" {
   tags = merge(
     local.tags,
     { "Name" = "${local.application_name} OHS Instance 1" },
-    { "snapshot-with-daily-35-day-retention" = "yes" }    # TODO the Backup rule needs setting up first
+    { "snapshot-with-daily-35-day-retention" = "yes" } # TODO the Backup rule needs setting up first
   )
 }
 
 
 resource "aws_instance" "ohs2" {
-  count = local.environment == "production" ? 1 : 0
-  ami                            = local.ami-id
-  instance_type                  = local.application_data.accounts[local.environment].ohs_instance_type
-  vpc_security_group_ids         = [aws_security_group.ohs_instance.id]
-  subnet_id                      = data.aws_subnet.data_subnets_b.id
-  iam_instance_profile           = aws_iam_instance_profile.portal.id
+  count                  = local.environment == "production" ? 1 : 0
+  ami                    = local.ami-id
+  instance_type          = local.application_data.accounts[local.environment].ohs_instance_type
+  vpc_security_group_ids = [aws_security_group.ohs_instance.id]
+  subnet_id              = data.aws_subnet.data_subnets_b.id
+  iam_instance_profile   = aws_iam_instance_profile.portal.id
 
   #   # root_block_device {
   #   # delete_on_termination     = false
@@ -141,7 +141,7 @@ resource "aws_instance" "ohs2" {
   tags = merge(
     local.tags,
     { "Name" = "${local.application_name} OHS Instance 2" },
-    { "snapshot-with-daily-35-day-retention" = "yes" }    # TODO the Backup rule needs setting up first
+    { "snapshot-with-daily-35-day-retention" = "yes" } # TODO the Backup rule needs setting up first
   )
 }
 
