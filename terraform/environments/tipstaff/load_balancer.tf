@@ -59,13 +59,13 @@ resource "aws_lb_target_group" "tipstaff_target_group" {
   }
 
   health_check {
-    healthy_threshold   = "3"
-    interval            = "15"
+    healthy_threshold   = "2"
+    interval            = "120"
     protocol            = "HTTP"
     port                = "80"
     unhealthy_threshold = "3"
     matcher             = "200-302"
-    timeout             = "5"
+    timeout             = "60"
   }
 
 }
