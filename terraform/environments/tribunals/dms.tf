@@ -143,7 +143,7 @@ resource "null_resource" "setup_target_rds_security_group" {
     command = "ifconfig -a; chmod +x ./setup-security-group.sh; ./setup-security-group.sh"   
 
     environment = {
-      DMS_SECURITY_GROUP            = aws_security_group.modernisation_dms_access_prod[0].id
+      DMS_SECURITY_GROUP            = aws_security_group.modernisation_dms_access[0].id
       EC2_INSTANCE_ID               = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["ec2-instance-id"]
       DMS_SOURCE_ACCOUNT_ACCESS_KEY = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["dms_source_account_access_key"]
       DMS_SOURCE_ACCOUNT_SECRET_KEY = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["dms_source_account_secret_key"]
