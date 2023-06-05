@@ -123,7 +123,7 @@ resource "aws_security_group" "modernisation_dms_access" {
     to_port     = 1433
     protocol    = "tcp"
     description = "Allow DMS to connect to source database"
-    cidr_blocks = ["${aws_dms_replication_instance.tribunals_replication_instance.replication_instance_public_ips}/32"]
+    cidr_blocks = ["${aws_dms_replication_instance.tribunals_replication_instance.replication_instance_public_ips[0]}/32"]
   }
 
   egress {
