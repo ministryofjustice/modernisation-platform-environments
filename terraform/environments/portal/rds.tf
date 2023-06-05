@@ -256,7 +256,7 @@ resource "aws_db_instance" "appdb1" {
   username               = local.username
   password               = random_password.rds_password.result
   vpc_security_group_ids = [aws_security_group.igdb.id]
-  #?skip_final_snapshot             = false
+  skip_final_snapshot             = false
   final_snapshot_identifier       = "${local.application_name}-${formatdate("DDMMMYYYYhhmm", timestamp())}-finalsnapshot"
   parameter_group_name  = aws_db_parameter_group.igdb-parametergroup-19c.name
   db_subnet_group_name  = aws_db_subnet_group.igdb.name
