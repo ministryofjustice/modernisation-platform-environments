@@ -240,8 +240,8 @@ resource "aws_secretsmanager_secret_version" "rds_password_secret_version" {
 resource "aws_db_instance" "appdb1" {
   allocated_storage               = local.storage_size
   db_name                         = local.igdb_dbname
-  # identifier                      = local.application_name
-  identifier                      = lower(local.igdb_dbname)
+  identifier                      = local.application_name
+  # identifier                      = lower(local.igdb_dbname)
   engine                          = local.engine
   engine_version                  = local.engine_version
   enabled_cloudwatch_logs_exports = ["alert", "audit", "listener", "trace"]
@@ -262,7 +262,7 @@ resource "aws_db_instance" "appdb1" {
   db_subnet_group_name  = aws_db_subnet_group.igdb.name
   maintenance_window    = local.maintenance_window
   license_model         = "bring-your-own-license"
-  deletion_protection   = true
+  #TODO deletion_protection   = true
   copy_tags_to_snapshot = true
   storage_encrypted     = true
   # apply_immediately           = true
