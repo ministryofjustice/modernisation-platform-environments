@@ -419,6 +419,12 @@
       "protocol": "TCP",
       "destination_cidr": "0.0.0.0/0"
     },
+    "TCP_50000": {
+      "from_port": 50000,
+      "to_port": 51000,
+      "protocol": "TCP",
+      "destination_cidr": "0.0.0.0/0"
+    },
     "TCP_800x": {
       "from_port": 8000,
       "to_port": 8005,
