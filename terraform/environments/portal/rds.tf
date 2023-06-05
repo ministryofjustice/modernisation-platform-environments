@@ -15,7 +15,7 @@ locals {
   instance_class             = "db.t3.large"
   engine                     = "oracle-ee"
   engine_version             = "19.0.0.0.ru-2021-10.rur-2021-10.r1"
-  username                   = "sysdba"
+  username                   = "admin"
   max_allocated_storage      = "3500"
   backup_window              = "22:00-01:00"
   maintenance_window         = "Mon:01:15-Mon:06:00"
