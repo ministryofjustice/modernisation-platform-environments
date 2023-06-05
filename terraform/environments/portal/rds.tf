@@ -3,7 +3,7 @@ locals {
   region = "eu-west-2"
 
   # RDS
-  igdb_dbname                = "IGDB"
+  igdb_dbname                = "igdb"
   appstream_cidr             = "10.200.32.0/19"
   cidr_ire_workspace         = "10.200.96.0/19"
   workspaces_cidr            = "10.200.16.0/20"
