@@ -265,7 +265,7 @@ resource "aws_db_instance" "appdb1" {
   deletion_protection   = true
   copy_tags_to_snapshot = true
   storage_encrypted     = true
-  #?apply_immediately               = true
+  apply_immediately           = true
   snapshot_identifier         = format("arn:aws:rds:eu-west-2:%s:snapshot:%s", data.aws_caller_identity.current.account_id, local.rds_snapshot_name)
   kms_key_id                  = data.aws_kms_key.rds_shared.arn
   publicly_accessible         = false
