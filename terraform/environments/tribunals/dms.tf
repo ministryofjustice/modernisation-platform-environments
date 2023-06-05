@@ -1,4 +1,4 @@
-// These resources setup and configure AWS DMS (Database Migration Service) to migrate data from the existing RDS instance in the Tactical Products AWS account to the new RDS instance in the Modernisation Platform.
+// These resources setup and configure AWS DMS (Database Migration Service) to migrate data from the existing RDS instance in the mojdsd AWS account to the new RDS instance in the Modernisation Platform.
 // Split into 3 sections: Shared resources (resources that are the same in both Pre-Prod and Prod environments), and then Pre-Prod and Prod specific resources, as each will have different target endpoints.
 // DMS is not used in the Dev environment.
 
@@ -89,7 +89,7 @@ resource "aws_iam_role_policy" "dms_vpc_management_policy" {
 //transport
 resource "aws_dms_endpoint" "target" {
   depends_on    = [aws_db_instance.rdsdb]
-  database_name = local.application_data.accounts[local.environment].db_identifier
+  database_name = ""
   endpoint_id   = "tribunals-target"
   endpoint_type = "target"
   engine_name   = "sqlserver"
@@ -114,7 +114,7 @@ resource "aws_dms_endpoint" "source" {
 }
 
 resource "aws_security_group" "modernisation_dms_access" {
-  provider    = aws.tacticalproducts
+  provider    = aws.mojdsd
   name        = "modernisation_dms_access"
   description = "allow dms access to the database for the modernisation platform"
 

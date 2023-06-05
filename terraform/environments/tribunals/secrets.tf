@@ -49,7 +49,7 @@ resource "aws_secretsmanager_secret_version" "resource_source_db_secret_current"
     "username": "",
     "password": "",
     "engine": "sqlserver",
-    "host": "${aws_db_instance.rdsdb.address}",
+    "host": "${local.application_data.accounts[local.environment].dms_source_db}",
     "port": 1433,
     "dbname": "master",
     "dms_source_account_access_key": "",
@@ -58,7 +58,7 @@ resource "aws_secretsmanager_secret_version" "resource_source_db_secret_current"
   }
   EOF
 }
-// retrieve secrets for the source database on tactical products account
+// retrieve secrets for the source database on mojdsd account
 data "aws_secretsmanager_secret" "source_db_secret" {
   depends_on = [aws_secretsmanager_secret_version.resource_source_db_secret_current]
   arn = aws_secretsmanager_secret_version.resource_source_db_secret_current.arn
