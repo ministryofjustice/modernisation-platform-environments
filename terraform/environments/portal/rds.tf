@@ -241,7 +241,7 @@ resource "aws_db_instance" "appdb1" {
   allocated_storage               = local.storage_size
   db_name                         = local.igdb_dbname
   # identifier                      = local.application_name
-  identifier                      = local.application_name
+  identifier                      = lower(local.igdb_dbname)
   engine                          = local.engine
   engine_version                  = local.engine_version
   enabled_cloudwatch_logs_exports = ["alert", "audit", "listener", "trace"]
