@@ -223,6 +223,22 @@ resource "aws_security_group" "ecs_service" {
   vpc_id      = data.aws_vpc.shared.id
 
   ingress {
+    from_port       = 80
+    to_port         = 80
+    protocol        = "-1"
+    description     = "Allow all traffic from load balancer"
+    security_groups = [aws_security_group.tipstaff_lb_sc.id]
+  }
+
+  ingress {
+    description = "allow all IPs access on HTTP"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
     from_port       = 0
     to_port         = 0
     protocol        = "-1"
@@ -239,6 +255,6 @@ resource "aws_security_group" "ecs_service" {
 }
 
 resource "aws_ecr_repository" "tipstaff-ecr-repo" {
-  name          = "tipstaff-ecr-repo"
-  force_delete  = true
+  name         = "tipstaff-ecr-repo"
+  force_delete = true
 }
