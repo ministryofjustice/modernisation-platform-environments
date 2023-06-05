@@ -101,7 +101,8 @@ resource "aws_ecs_service" "tipstaff_ecs_service" {
   health_check_grace_period_seconds = 90
 
   network_configuration {
-    subnets          = data.aws_subnets.shared-public.ids
+    # subnets          = data.aws_subnets.shared-public.ids
+    subnets          = ["subnet-0692a182aeb853315", "subnet-035241413be986222", "subnet-0444725373ce40ec7"]
     security_groups  = [aws_security_group.ecs_service.id]
     assign_public_ip = true
   }
