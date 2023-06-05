@@ -123,7 +123,7 @@ resource "aws_security_group" "modernisation_dms_access" {
     to_port     = 1433
     protocol    = "tcp"
     description = "Allow DMS to connect to source database"
-    cidr_blocks = ["${aws_dms_replication_instance.tribunals_replication_instance.replication_instance_public_ips[0]}/32"]
+    cidr_blocks = ["${aws_dms_replication_instance.tribunals_replication_instance.replication_instance_public_ips}/32"]
   }
 
   egress {
@@ -143,7 +143,7 @@ resource "null_resource" "setup_target_rds_security_group" {
     command = "ifconfig -a; chmod +x ./setup-security-group.sh; ./setup-security-group.sh"   
 
     environment = {
-      DMS_SECURITY_GROUP            = aws_security_group.modernisation_dms_access[0].id
+      DMS_SECURITY_GROUP            = aws_security_group.modernisation_dms_access.id
       EC2_INSTANCE_ID               = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["ec2-instance-id"]
       DMS_SOURCE_ACCOUNT_ACCESS_KEY = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["dms_source_account_access_key"]
       DMS_SOURCE_ACCOUNT_SECRET_KEY = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["dms_source_account_secret_key"]
@@ -158,7 +158,7 @@ resource "null_resource" "setup_target_rds_security_group" {
 
 resource "aws_dms_replication_task" "migration-task" {
   #depends_on = [null_resource.setup_target_rds_security_group, var.db_instance, aws_dms_endpoint.target, aws_dms_endpoint.source, aws_dms_replication_instance.replication-instance]
-  depends_on = [null_resource.setup_target_rds_security_group[0], aws_db_instance.rdsdb, aws_dms_endpoint.target, aws_dms_endpoint.source, aws_dms_replication_instance.tribunals_replication_instance]
+  depends_on = [null_resource.setup_target_rds_security_group, aws_db_instance.rdsdb, aws_dms_endpoint.target, aws_dms_endpoint.source, aws_dms_replication_instance.tribunals_replication_instance]
 
   migration_type            = "full-load"
   replication_instance_arn  = aws_dms_replication_instance.tribunals_replication_instance.replication_instance_arn
