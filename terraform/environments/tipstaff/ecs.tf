@@ -238,7 +238,7 @@
 #   }
 # }
 
-# resource "aws_ecr_repository" "tipstaff-ecr-repo" {
-#   name         = "tipstaff-ecr-repo"
-#   force_delete = true
-# }
+resource "aws_ecr_repository" "tipstaff-ecr-repo" {
+  name         = "tipstaff-ecr-repo"
+  force_delete = true
+}
