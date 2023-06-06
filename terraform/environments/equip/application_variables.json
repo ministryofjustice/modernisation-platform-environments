@@ -677,6 +677,16 @@
       "from_port": 4119,
       "to_port": 4119,
       "protocol": "TCP"
+    },
+    "TCP_5721": {
+      "from_port": 5721,
+      "to_port": 5721,
+      "protocol": "TCP"
+    },
+    "TCP_8530-8531": {
+      "from_port": 8530,
+      "to_port": 8531,
+      "protocol": "TCP"
     }
   },
   "equip_internal_rules": {
