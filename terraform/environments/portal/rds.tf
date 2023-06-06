@@ -23,7 +23,6 @@ locals {
   workspaces_cidr            = "10.200.16.0/20"
   cp_vpc_cidr                = "172.20.0.0/20"
   lzprd-vpc                  = "10.205.0.0/20"
-  mp_account_id              = data.aws_caller_identity.current.account_id
  }
 
 resource "aws_db_subnet_group" "igdb" {
@@ -290,7 +289,7 @@ resource "aws_db_instance" "appdb1" {
 }
 
 
-resource "aws_route53_record" "IGDBDbDNSRecord" {
+resource "aws_route53_record" "development_igdb_rds" {
   provider = aws.core-vpc
   zone_id  = data.aws_route53_zone.external.zone_id
   name     = "rds.${local.application_name}.${data.aws_route53_zone.external.name}"
