@@ -15,9 +15,8 @@ resource "aws_db_instance" "iaps" {
   db_name        = "IAPS"
   identifier     = "iaps"
 
-  username                      = local.application_data.accounts[local.environment].db_user
-  manage_master_user_password   = true
-  master_user_secret_kms_key_id = data.aws_kms_key.rds_shared.arn
+  username = local.application_data.accounts[local.environment].db_user
+  password = aws_secretsmanager_secret_version.db_password.secret_string
 
   # temporary 2-layer try function, to conditionally allow a build from a snapshot originating in an external account
   snapshot_identifier    = try(local.application_data.accounts[local.environment].db_snapshot_identifier, try(aws_db_snapshot_copy.local[0].id, null))
