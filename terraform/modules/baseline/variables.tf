@@ -720,6 +720,26 @@ variable "sns_topics" {
   default = {}
 }
 
+variable "ssm_parameters" {
+  description = "map of ssm parameters to create.  Designed to be used in conjunction with ec2 modules.  SSM parameter is {prefix}{mapkey}{postfix}{name} where mapkey is name of EC2/ASG and names is a list of parameters.  By default creates a placeholder value but you can set a specific value, read a value from a file, or assign a random value"
+  type = map(object({
+    prefix  = optional(string, "")
+    postfix = optional(string, "/")
+    names = map(object({
+      description = optional(string)
+      type        = optional(string, "SecureString")
+      key_id      = optional(string, null)
+      file        = optional(string)
+      random = optional(object({
+        length  = number
+        special = optional(bool)
+      }))
+      value = optional(string, "placeholder, overwrite me outside of terraform")
+    }))
+  }))
+  default = {}
+}
+
 variable "tags" {
   description = "Any additional tags to apply to all resources, in addition to those provided by environment module"
   type        = map(string)
