@@ -13,7 +13,7 @@ resource "aws_route53_record" "external" {
 }
 
 resource "aws_acm_certificate" "external" {
-  domain_name       = "modernisation-platform.service.justice.gov.uk"
+  domain_name       = local.application_data.accounts[local.environment].domain_name
   validation_method = "DNS"
 
   subject_alternative_names = ["${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
@@ -59,7 +59,7 @@ resource "aws_acm_certificate_validation" "external" {
 resource "aws_acm_certificate" "external_prod" {
   count = local.is-production ? 1 : 0
 
-  domain_name       = "tipstaff.service.justice.gov.uk"
+  domain_name       = local.application_data.accounts[local.environment].domain_name
   validation_method = "DNS"
   lifecycle {
     create_before_destroy = true
@@ -95,7 +95,7 @@ resource "aws_route53_record" "external_prod" {
   provider = aws.core-network-services
 
   zone_id = data.aws_route53_zone.application_zone.zone_id
-  name    = "tipstaff.service.justice.gov.uk"
+  name    = local.application_data.accounts[local.environment].domain_name
   type    = "A"
 
   alias {
