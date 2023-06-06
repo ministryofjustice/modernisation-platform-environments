@@ -355,7 +355,6 @@ resource "aws_instance" "s266316rgsl200" {
   }
 }
 
-
 resource "aws_instance" "s265903rgsl400" {
   count                  = local.is-production == true ? 1 : 0
   ami                    = "ami-0f43890c2b4907c29"
@@ -476,6 +475,7 @@ resource "aws_eip_association" "s265903rgsl400-eip-association-non-cjsm" {
   instance_id   = aws_instance.s265903rgsl400-non-cjsm[0].id
   allocation_id = aws_eip.s265903rgsl400-non-cjsm[0].id
 }
+
 
 resource "aws_eip_association" "s265903rgsl401-eip-association-cjsm" {
   count         = local.is-production == true ? 1 : 0
