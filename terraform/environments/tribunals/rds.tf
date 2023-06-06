@@ -80,7 +80,7 @@ resource "null_resource" "setup_db" {
     command     = "ifconfig -a; chmod +x ./setup-mssql.sh; ./setup-mssql.sh"
 
     environment = {
-      DB_URL = data.aws_db_instance.database.address      
+      DB_URL = aws_db_instance.rdsdb.address      
       USER_NAME = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["username"]
       PASSWORD = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["password"]
       NEW_DB_NAME = "transport"
