@@ -175,6 +175,8 @@ locals {
 }
 
 # link the sns topic to the service
+# Non-Prod alerts channel: #hmpps-iaps-alerts-non-prod
+# Prod alerts channel:     #hmpps-iaps-alerts-prod
 module "pagerduty_core_alerts" {
   depends_on = [
     aws_sns_topic.iaps_alerting
