@@ -1,8 +1,3 @@
-// These resources setup and configure AWS DMS (Database Migration Service) to migrate data from the existing RDS instance in the mojdsd AWS account to the new RDS instance in the Modernisation Platform.
-// Split into 3 sections: Shared resources (resources that are the same in both Pre-Prod and Prod environments), and then Pre-Prod and Prod specific resources, as each will have different target endpoints.
-// DMS is not used in the Dev environment.
-
-//Shared resources:
 resource "aws_dms_replication_instance" "tribunals_replication_instance" {
   allocated_storage           = 300
   apply_immediately           = true
