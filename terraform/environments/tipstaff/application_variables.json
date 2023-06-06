@@ -4,6 +4,7 @@
       "moj_ip": "81.134.202.29/32",
       "db_name": "tipstaff_db_dev",
       "identifier": "tipstaff-db-dev",
+      "db_username": "dbadmin",
       "allocated_storage": "20",
       "storage_type": "gp2",
       "engine": "postgres",
@@ -17,7 +18,9 @@
       "curserver": "DEVELOPMENT",
       "support_team": "DTS Legacy Apps Support Team",
       "support_email": "dts-legacy-apps-support-team@hmcts.net",
-      "rds_port": "5432"
+      "rds_port": "5432",
+      "domain_name": "modernisation-platform.service.justice.gov.uk",
+      "tactical_products_db_secrets_arn": "arn:aws:secretsmanager:eu-west-2:913862848426:secret:tactical-products-db-secrets-ox3sNi"
     },
     "test": {
       "example_var": "test-data"
@@ -26,6 +29,7 @@
       "moj_ip": "81.134.202.29/32",
       "db_name": "tipstaff_db_pre_prod",
       "identifier": "tipstaff-db-pre-prod",
+      "db_username": "dbadmin",
       "allocated_storage": "20",
       "storage_type": "gp2",
       "engine": "postgres",
@@ -39,12 +43,15 @@
       "curserver": "PREPRODUCTION",
       "support_team": "DTS Legacy Apps Support Team",
       "support_email": "dts-legacy-apps-support-team@hmcts.net",
-      "rds_port": "5432"
+      "rds_port": "5432",
+      "domain_name": "modernisation-platform.service.justice.gov.uk",
+      "tactical_products_db_secrets_arn": "arn:aws:secretsmanager:eu-west-2:842764906196:secret:tactical-products-db-secrets-vhUrZe"
     },
     "production": {
       "moj_ip": "81.134.202.29/32",
       "db_name": "tipstaff_db_prod",
       "identifier": "tipstaff-db-prod",
+      "db_username": "dbadmin",
       "allocated_storage": "20",
       "storage_type": "gp2",
       "engine": "postgres",
@@ -58,7 +65,9 @@
       "curserver": "PRODUCTION",
       "support_team": "DTS Legacy Apps Support Team",
       "support_email": "dts-legacy-apps-support-team@hmcts.net",
-      "rds_port": "5432"
+      "rds_port": "5432",
+      "domain_name": "tipstaff.service.justice.gov.uk",
+      "tactical_products_db_secrets_arn": "arn:aws:secretsmanager:eu-west-2:017977998587:secret:tactical-products-db-secrets-EDIqYI"
     }
   }
 }
