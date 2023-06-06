@@ -262,7 +262,7 @@ resource "aws_ecs_task_definition" "delius_core_frontend_task_definition" {
           },
           {
             name  = "LDAP_HOST"
-            value = aws_lb.delius_core_ldap_lb.dns_name
+            value = aws_lb.ldap.dns_name
           },
           {
             name      = "LDAP_PRINCIPAL"
