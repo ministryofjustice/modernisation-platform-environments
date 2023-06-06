@@ -9,27 +9,31 @@ _If you have any questions surrounding this page please post in the `#team-name`
 
 ### **Last review date:**
 
-<!-- Adding the last date this page was reviewed, with any accompanying information -->
+06/06/23
 
 ### **Description:**
 
-<!-- A short (less than 50 word) description of what your service does, and who it’s for.-->
+Terraform Infrastructure as code that creates 3 AWS environments for the Tipstaff application: Development, PreProduction, and Production, including a RDS Postgresql database, and a DMS Database Migration Service.
 
 ### **Service URLs:**
 
-<!--  The URL(s) of the service’s production environment, and test environments if possible-->
+Dev: https://tipstaff.hmcts-development.modernisation-platform.service.justice.gov.uk/
+
+Staging: https://tipstaff.hmcts-preproduction.modernisation-platform.service.justice.gov.uk/
+
+Prod: https://tipstaff.service.justice.gov.uk/
 
 ### **Incident response hours:**
 
-<!-- When your service receives support for urgent issues. This should be written in a clear, unambiguous way. For example: 24/7/365, Office hours, usually 9am-6pm on working days, or 7am-10pm, 365 days a year. -->
+9am-5:30pm Mon-Fri
 
 ### **Incident contact details:**
 
-<!-- How people can raise an urgent issue with your service. This must not be the email address or phone number of an individual on your team, it should be a shared email address, phone number, or website that allows someone with an urgent issue to raise it quickly. -->
+dts-legacy-apps-support-team@hmcts.net
 
 ### **Service team contact:**
 
-<!-- How people with non-urgent issues or questions can get in touch with your team. As with incident contact details, this must not be the email address or phone number of an individual on the team, it should be a shared email address or a ticket tracking system.-->
+dts-legacy-apps-support-team@hmcts.net
 
 ### **Hosting environment:**
 
