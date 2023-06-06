@@ -48,11 +48,18 @@ resource "aws_security_group" "sqlserver_db_sc" {
     cidr_blocks = ["0.0.0.0/0"]
   }
   ingress {
-    from_port   = 5432
-    to_port     = 5432
+    from_port   = 1433
+    to_port     = 1433
     protocol    = "tcp"
     description = "Allows Github Actions to access RDS"
     cidr_blocks = ["${jsondecode(data.http.myip.response_body)["ip"]}/32"]
+  }
+  ingress {
+    from_port       = 1433
+    to_port         = 1433
+    protocol        = "tcp"
+    description     = "Allows DMS to access RDS"
+    security_groups = [aws_security_group.vpc_dms_replication_instance_group.id]
   }
   egress {
     description = "allow all outbound traffic"
