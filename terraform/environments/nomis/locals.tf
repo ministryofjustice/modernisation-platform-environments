@@ -129,8 +129,17 @@ locals {
             special = false
           }
         }
+        test-random2 = {
+          random = {
+            length  = 30
+            special = false
+          }
+        }
         test-value = {
           value = "test"
+        }
+        test-value2 = {
+          value = "test2"
         }
       }
     }
