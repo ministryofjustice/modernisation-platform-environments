@@ -4,7 +4,15 @@ resource "aws_security_group" "tipstaff_lb_sc" {
   vpc_id      = data.aws_vpc.shared.id
 
   ingress {
-    description = "allow access on HTTPS for the MOJ VPN"
+    description = "allow access for http"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = [local.application_data.accounts[local.environment].moj_ip]
+  }
+
+  ingress {
+    description = "allow access for https"
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
