@@ -386,6 +386,36 @@ resource "aws_instance" "s265903rgsl401" {
   }
 }
 
+resource "aws_instance" "s265903rgsl400-non-cjsm" {
+  count                  = local.is-production == true ? 1 : 0
+  ami                    = "ami-0f43890c2b4907c29"
+  instance_type          = "m5.large"
+  source_dest_check      = false
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.PPUD-Mail-Server-2[0].id]
+  subnet_id              = data.aws_subnet.public_subnets_b.id
+  key_name               = aws_key_pair.cjms_instance[0].key_name
+  tags = {
+    Name          = "s265903rgsl400-non-cjsm"
+    is-production = true
+  }
+}
+
+resource "aws_instance" "s265903rgsl401-cjsm" {
+  count                  = local.is-production == true ? 1 : 0
+  ami                    = "ami-0f43890c2b4907c29"
+  instance_type          = "m5.large"
+  source_dest_check      = false
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.PPUD-Mail-Server-2[0].id]
+  subnet_id              = data.aws_subnet.public_subnets_c.id
+  key_name               = aws_key_pair.cjms_instance[0].key_name
+  tags = {
+    Name          = "s265903rgsl401-cjsm"
+    is-production = true
+  }
+}
+
 resource "aws_key_pair" "cjms_instance" {
   count      = local.is-production == true ? 1 : 0
   key_name   = "linuxcjms"
@@ -409,6 +439,24 @@ resource "aws_eip" "s265903rgsl401-eip" {
   }
 }
 
+# resource block for eip
+resource "aws_eip" "s265903rgsl400-non-cjsm" {
+  count = local.is-production == true ? 1 : 0
+  vpc   = true
+  tags = {
+    Name = "s265903rgsl400-non-cjsm"
+  }
+}
+
+resource "aws_eip" "s265903rgsl401-cjsm" {
+  count = local.is-production == true ? 1 : 0
+  vpc   = true
+  tags = {
+    Name = "s265903rgsl401-cjsm"
+  }
+}
+
+
 #Associate EIP with EC2 Instance
 resource "aws_eip_association" "s265903rgsl400-eip-association" {
   count         = local.is-production == true ? 1 : 0
@@ -420,4 +468,17 @@ resource "aws_eip_association" "s265903rgsl401-eip-association" {
   count         = local.is-production == true ? 1 : 0
   instance_id   = aws_instance.s265903rgsl401[0].id
   allocation_id = aws_eip.s265903rgsl401-eip[0].id
+}
+
+#Associate EIP for SMTP Relay EC2 Instance
+resource "aws_eip_association" "s265903rgsl400-eip-association-non-cjsm" {
+  count         = local.is-production == true ? 1 : 0
+  instance_id   = aws_instance.s265903rgsl400-non-cjsm[0].id
+  allocation_id = aws_eip.s265903rgsl400-non-cjsm[0].id
+}
+
+resource "aws_eip_association" "s265903rgsl401-eip-association-cjsm" {
+  count         = local.is-production == true ? 1 : 0
+  instance_id   = aws_instance.s265903rgsl401-cjsm[0].id
+  allocation_id = aws_eip.s265903rgsl401-cjsm[0].id
 }
