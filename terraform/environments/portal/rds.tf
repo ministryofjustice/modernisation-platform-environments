@@ -289,7 +289,7 @@ resource "aws_db_instance" "appdb1" {
 }
 
 
-resource "aws_route53_record" "development_igdb_rds" {
+resource "aws_route53_record" "igdb_rds" {
   provider = aws.core-vpc
   zone_id  = data.aws_route53_zone.external.zone_id
   name     = "rds.${local.application_name}.${data.aws_route53_zone.external.name}"
