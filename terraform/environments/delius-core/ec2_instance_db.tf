@@ -79,18 +79,6 @@ data "aws_iam_policy_document" "core_shared_services_bucket_access" {
   }
 }
 
-data "aws_iam_policy_document" "ec2_access_for_ansible" {
-  statement {
-    effect = "Allow"
-    actions = [
-      "ec2:DescribeTags",
-      "ec2:DescribeInstances",
-      "ec2:DescribeVolumes"
-    ]
-    resources = ["*"]
-  }
-}
-
 resource "aws_iam_role_policy" "business_unit_kms_key_access" {
   name   = "business_unit_kms_key_access"
   role   = aws_iam_role.base_ami_test_instance_iam_role.name
@@ -101,12 +89,6 @@ resource "aws_iam_role_policy" "core_shared_services_bucket_access" {
   name   = "core_shared_services_bucket_access"
   role   = aws_iam_role.base_ami_test_instance_iam_role.name
   policy = data.aws_iam_policy_document.core_shared_services_bucket_access.json
-}
-
-resource "aws_iam_role_policy" "ec2_access" {
-  name   = "ec2_access"
-  role   = aws_iam_role.base_ami_test_instance_iam_role.name
-  policy = data.aws_iam_policy_document.ec2_access_for_ansible.json
 }
 
 resource "aws_iam_role_policy_attachment" "base_ami_test_instance_amazonssmmanagedinstancecore" {
