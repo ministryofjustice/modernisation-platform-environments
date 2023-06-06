@@ -30,7 +30,7 @@ locals {
 
   ssm_parameters_value = {
     for item in local.ssm_parameters_list :
-    item.key => item.value if item.value.file != null && item.value.random != null
+    item.key => item.value if item.value.file == null && item.value.random == null
   }
 
   ssm_parameters = merge(
