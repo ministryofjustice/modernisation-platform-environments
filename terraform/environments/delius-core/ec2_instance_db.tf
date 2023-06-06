@@ -123,7 +123,7 @@ resource "aws_iam_instance_profile" "base_ami_test_instance_profile" {
 data "aws_ami" "aws_ami_base_ol" {
   most_recent = true
   owners      = [local.environment_management.account_ids["core-shared-services-production"]]
-  name_regex  = "^delius_oracle_db_"
+  name_regex  = "^delius_core_ol_8_5_oracle_db_19c_"
 }
 
 resource "aws_instance" "base_ami_test_instance" {
