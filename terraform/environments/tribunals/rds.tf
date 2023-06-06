@@ -47,11 +47,48 @@ resource "aws_security_group" "sqlserver_db_sc" {
     description = "Allows codebuild access to RDS"
     cidr_blocks = ["0.0.0.0/0"]
   }
+  ingress {
+    from_port   = 5432
+    to_port     = 5432
+    protocol    = "tcp"
+    description = "Allows Github Actions to access RDS"
+    cidr_blocks = ["${jsondecode(data.http.myip.response_body)["ip"]}/32"]
+  }
   egress {
     description = "allow all outbound traffic"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+data "http" "myip" {
+  url = "http://ipinfo.io/json"
+}
+
+resource "random_password" "new_password" {
+  length  = 16
+  special = false 
+}
+
+resource "null_resource" "setup_db" {
+  depends_on = [aws_db_instance.rdsdb] #wait for the db to be ready
+
+  provisioner "local-exec" {
+    interpreter = ["bash", "-c"]
+    command     = "ifconfig -a; chmod +x ./setup-mssql.sh; ./setup-mssql.sh"
+
+    environment = {
+      DB_URL = data.aws_db_instance.database.address      
+      USER_NAME = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["username"]
+      PASSWORD = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["password"]
+      NEW_DB_NAME = "transport"
+      NEW_USER_NAME = "transport_admin"
+      NEW_PASSWORD = random_password.new_password.result
+    }
+  }
+  triggers = {
+    always_run = "${timestamp()}"
   }
 }
