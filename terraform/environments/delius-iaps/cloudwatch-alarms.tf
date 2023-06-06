@@ -124,12 +124,12 @@ resource "aws_cloudwatch_metric_alarm" "interface_low_level_error" {
 resource "aws_cloudwatch_metric_alarm" "rds_cpu_utilization_over_threshold" {
   alarm_name          = "${local.application_name}-rds-cpu-utilization-over-threshold"
   comparison_operator = "GreaterThanOrEqualToThreshold"
-  evaluation_periods  = "2"
+  evaluation_periods  = "3"
   metric_name         = "CPUUtilization"
   namespace           = "AWS/RDS"
-  period              = "300"
+  period              = "180"
   statistic           = "Average"
-  threshold           = "80"
+  threshold           = "90"
   alarm_description   = "This metric monitors CPU utilization for the RDS instance"
   alarm_actions       = [aws_sns_topic.iaps_alerting.arn]
   ok_actions          = [aws_sns_topic.iaps_alerting.arn]
