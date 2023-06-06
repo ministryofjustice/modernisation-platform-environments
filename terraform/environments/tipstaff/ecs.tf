@@ -231,10 +231,10 @@ resource "aws_security_group" "ecs_service" {
   }
 
   ingress {
-    from_port       = 0
-    to_port         = 0
-    protocol        = "-1"
-    description     = "Allow all traffic from load balancer"
+    description     = "allow traffic from the load balancer on port 80"
+    from_port       = 80
+    to_port         = 80
+    protocol        = "tcp"
     security_groups = [aws_security_group.tipstaff_lb_sc.id]
   }
 
