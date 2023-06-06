@@ -261,8 +261,8 @@ resource "aws_ecs_task_definition" "delius_core_frontend_task_definition" {
             valueFrom = data.aws_ssm_parameter.delius_core_frontend_env_var_ldap_port.arn
           },
           {
-            name      = "LDAP_HOST"
-            valueFrom = data.aws_ssm_parameter.delius_core_frontend_env_var_ldap_host.arn
+            name  = "LDAP_HOST"
+            value = aws_lb.delius_core_ldap_lb.dns_name
           },
           {
             name      = "LDAP_PRINCIPAL"
