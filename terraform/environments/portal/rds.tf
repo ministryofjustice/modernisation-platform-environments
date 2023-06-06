@@ -3,27 +3,27 @@ locals {
   region = "eu-west-2"
 
   # RDS
-  igdb_dbname                = "IGDB"
+  igdb_dbname                     = "IGDB"
+  igdb_storage_size               = "200"
+  igdb_auto_minor_version_upgrade = false
+  igdb_backup_retention_period    = "35"
+  igdb_character_set_name         = "AL32UTF8"
+  igdb_instance_class             = "db.t3.large"
+  igdb_engine                     = "oracle-ee"
+  igdb_engine_version             = "19.0.0.0.ru-2021-10.rur-2021-10.r1"
+  igdb_username                   = "admin"
+  igdb_max_allocated_storage      = "3500"
+  igdb_backup_window              = "22:00-01:00"
+  igdb_maintenance_window         = "Mon:01:15-Mon:06:00"
+  igdb_storage_type               = "gp2"
+  igdb_rds_snapshot_name          = "portal-igdb-spike-manual-mp-31052023"
+  igdb_snapshot_arn          = "arn:aws:rds:eu-west-2:${data.aws_caller_identity.current.account_id}:snapshot:${local.application_data.accounts[local.environment].igdb_snapshot_name}"
   appstream_cidr             = "10.200.32.0/19"
   cidr_ire_workspace         = "10.200.96.0/19"
   workspaces_cidr            = "10.200.16.0/20"
   cp_vpc_cidr                = "172.20.0.0/20"
-  storage_size               = "200"
-  auto_minor_version_upgrade = false
-  backup_retention_period    = "35"
-  character_set_name         = "AL32UTF8"
-  instance_class             = "db.t3.large"
-  engine                     = "oracle-ee"
-  engine_version             = "19.0.0.0.ru-2021-10.rur-2021-10.r1"
-  username                   = "admin"
-  max_allocated_storage      = "3500"
-  backup_window              = "22:00-01:00"
-  maintenance_window         = "Mon:01:15-Mon:06:00"
-  storage_type               = "gp2"
-  rds_snapshot_name          = "portal-igdb-spike-manual-mp-31052023"
   lzprd-vpc                  = "10.205.0.0/20"
   mp_account_id              = data.aws_caller_identity.current.account_id
-  igdb_snapshot_arn          = "arn:aws:rds:eu-west-2:${data.aws_caller_identity.current.account_id}:snapshot:${local.application_data.accounts[local.environment].igdb_snapshot_name}"
  }
 
 resource "aws_db_subnet_group" "igdb" {
