@@ -171,6 +171,7 @@ data "aws_secretsmanager_secret_version" "pagerduty_integration_keys" {
 # Add a local to get the keys
 locals {
   pagerduty_integration_keys = jsondecode(data.aws_secretsmanager_secret_version.pagerduty_integration_keys.secret_string)
+  integration_key_lookup     = local.is-production ? "iaps_prod_alarms" : "iaps_nonprod_alarms"
 }
 
 # link the sns topic to the service
@@ -180,5 +181,5 @@ module "pagerduty_core_alerts" {
   ]
   source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v1.0.0"
   sns_topics                = [aws_sns_topic.iaps_alerting.name]
-  pagerduty_integration_key = local.pagerduty_integration_keys["iaps_nonprod_alarms"]
+  pagerduty_integration_key = local.pagerduty_integration_keys[local.integration_key_lookup]
 }
