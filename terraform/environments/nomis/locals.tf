@@ -111,18 +111,27 @@ locals {
       prefix  = ""
       postfix = ""
       names = {
-        cloud-watch-config-linux = {
+        test-cloud-watch-config-linux = {
           description = "cloud watch agent config for linux"
           file        = "./templates/cloud_watch_linux.json"
           type        = "String"
         }
-        cloud-watch-config-windows = {
+        test-cloud-watch-config-windows = {
           description = "cloud watch agent config for windows"
           file        = "./templates/cloud_watch_windows.json"
           type        = "String"
         }
-        ec2-user_pem       = {}
-        github-ci-user-pat = {}
+        test-ec2-user_pem       = {}
+        test-github-ci-user-pat = {}
+        test-random = {
+          random = {
+            length  = 30
+            special = false
+          }
+        }
+        test-value = {
+          value = "test"
+        }
       }
     }
   }
