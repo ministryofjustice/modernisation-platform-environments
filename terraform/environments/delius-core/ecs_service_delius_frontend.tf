@@ -318,22 +318,21 @@ resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_security_gr
 }
 
 resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_ldap_tcp" {
-  security_group_id            = aws_security_group.delius_core_frontend_security_group.id
-  description                  = "ingress from ldap server tcp"
-  from_port                    = 389
-  to_port                      = 389
-  ip_protocol                  = "tcp"
-  referenced_security_group_id = aws_security_group.ldap.id
-
+  security_group_id = aws_security_group.delius_core_frontend_security_group.id
+  description       = "ingress from ldap server tcp"
+  from_port         = 389
+  to_port           = 389
+  ip_protocol       = "tcp"
+  cidr_ipv4         = data.aws_vpc.shared.cidr_block
 }
 
 resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_ldap_udp" {
-  security_group_id            = aws_security_group.delius_core_frontend_security_group.id
-  description                  = "ingress from ldap server"
-  from_port                    = 389
-  to_port                      = 389
-  ip_protocol                  = "udp"
-  referenced_security_group_id = aws_security_group.ldap.id
+  security_group_id = aws_security_group.delius_core_frontend_security_group.id
+  description       = "ingress from ldap server"
+  from_port         = 389
+  to_port           = 389
+  ip_protocol       = "udp"
+  cidr_ipv4         = data.aws_vpc.shared.cidr_block
 }
 
 resource "aws_vpc_security_group_egress_rule" "delius_core_frontend_security_group_egress_internet" {
@@ -346,21 +345,21 @@ resource "aws_vpc_security_group_egress_rule" "delius_core_frontend_security_gro
 }
 
 resource "aws_vpc_security_group_egress_rule" "delius_core_frontend_security_group_ldap_tcp" {
-  security_group_id            = aws_security_group.delius_core_frontend_security_group.id
-  description                  = "outbound from weblogic to any secure endpoint"
-  ip_protocol                  = "tcp"
-  to_port                      = 389
-  from_port                    = 389
-  referenced_security_group_id = aws_security_group.ldap.id
+  security_group_id = aws_security_group.delius_core_frontend_security_group.id
+  description       = "outbound from weblogic to any secure endpoint"
+  ip_protocol       = "tcp"
+  to_port           = 389
+  from_port         = 389
+  cidr_ipv4         = data.aws_vpc.shared.cidr_block
 }
 
 resource "aws_vpc_security_group_egress_rule" "delius_core_frontend_security_group_ldap_udp" {
-  security_group_id            = aws_security_group.delius_core_frontend_security_group.id
-  description                  = "outbound from weblogic to any secure endpoint"
-  ip_protocol                  = "udp"
-  to_port                      = 389
-  from_port                    = 389
-  referenced_security_group_id = aws_security_group.ldap.id
+  security_group_id = aws_security_group.delius_core_frontend_security_group.id
+  description       = "outbound from weblogic to any secure endpoint"
+  ip_protocol       = "udp"
+  to_port           = 389
+  from_port         = 389
+  cidr_ipv4         = data.aws_vpc.shared.cidr_block
 }
 
 resource "aws_vpc_security_group_egress_rule" "delius_core_frontend_security_group_egress_db" {
