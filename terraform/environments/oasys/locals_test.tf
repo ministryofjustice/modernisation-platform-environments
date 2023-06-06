@@ -11,13 +11,13 @@ locals {
     }
 
     baseline_ec2_autoscaling_groups = {
-      "t2-${local.application_name}-web" = merge(local.webserver, {
+      "t2-${local.application_name}-web-a" = merge(local.webserver_a, {
         config = merge(module.baseline_presets.ec2_instance.config.default, {
           ami_name                  = "oasys_webserver_release_*"
           ssm_parameters_prefix     = "ec2-web-t2/"
           iam_resource_names_prefix = "ec2-web-t2"
         })
-        tags = merge(local.webserver.tags, {
+        tags = merge(local.webserver_a.tags, {
           description                             = "t2 ${local.application_name} web"
           "${local.application_name}-environment" = "t2"
           oracle-db-hostname                      = "db.t2.oasys.hmpps-test.modernisation-platform.internal" # "T2ODL0009.azure.noms.root"
@@ -26,29 +26,54 @@ locals {
     }
 
     baseline_acm_certificates = {
-      "${local.application_name}_wildcard_cert" = {
+      "t2_${local.application_name}_cert" = {
         # domain_name limited to 64 chars so use modernisation platform domain for this
         # and put the wildcard in the san
-        domain_name = module.environment.domains.public.modernisation_platform
+        domain_name = "t2.oasys.service.justice.gov.uk"
         subject_alternate_names = [
-          "*.${module.environment.domains.public.application_environment}",    #    *.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk
-          "*.t2.${module.environment.domains.public.application_environment}", # *.t2.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk
-          "*.${local.environment}.${module.environment.domains.public.short_name}", # *.test.oasys.service.justice.gov.uk"
-          "*.t1.${module.environment.domains.public.short_name}",                   #   *.t1.oasys.service.justice.gov.uk"
-          "*.t2.${module.environment.domains.public.short_name}",                   #   *.t2.oasys.service.justice.gov.uk"
-          "*.${local.environment}.${local.application_name}.az.justice.gov.uk", # *.test.oasys.az.justice.gov.uk
-          "*.t1.${local.application_name}.az.justice.gov.uk",                   #   *.t1.oasys.az.justice.gov.uk
-          "*.t2.${local.application_name}.az.justice.gov.uk",                   #   *.t2.oasys.az.justice.gov.uk
+          "*.t2.oasys.service.justice.gov.uk",
+          "t2-oasys.hmpp-azdt.justice.gov.uk",
         ]
         external_validation_records_created = true
-        cloudwatch_metric_alarms            = {} # module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso"].acm_default
+        cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms_lists_with_actions["dso_pagerduty"].acm_default
         tags = {
-          description = "wildcard cert for ${local.application_name} ${local.environment} domains"
+          description = "cert for t2 ${local.application_name} ${local.environment} domains"
         }
       }
     }
 
     baseline_lbs = {
+      public = {
+        load_balancer_type       = "network"
+        internal_lb              = false
+        enable_delete_protection = false
+        existing_target_groups   = {}
+        idle_timeout             = 60 # 60 is default
+        security_groups          = ["public"]
+        public_subnets           = module.environment.subnets["public"].ids
+        tags                     = local.tags
+        listeners = {
+          https = {
+            port                      = 443
+            protocol                  = "HTTPS"
+            ssl_policy                = "ELBSecurityPolicy-2016-08"
+            certificate_names_or_arns = ["application_environment_wildcard_cert"]
+            default_action = {
+              type = "forward"
+              target_group_name = "private-lb-web-https-443"
+            }
+            rules = {
+              t2-web-http-8080 = {
+                priority = 100
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "private-lb-web-https-443"
+                }]
+              }
+            }
+          }
+        }
+      }
       private = {
         internal_lb              = true
         enable_delete_protection = false
@@ -63,7 +88,7 @@ locals {
             port                      = 443
             protocol                  = "HTTPS"
             ssl_policy                = "ELBSecurityPolicy-2016-08"
-            certificate_names_or_arns = ["application_environment_wildcard_cert"]
+            certificate_names_or_arns = ["t2_${local.application_name}_cert"]
             default_action = {
               type = "forward"
               target_group_name = "t2-${local.application_name}-web-http-8080"
@@ -91,75 +116,31 @@ locals {
             }
           }
         }
-        # lb_target_groups = {
-        #   https-443 = {
-        #     port                 = 443
-        #     protocol             = "HTTPS"
-        #     target_type          = "alb"
-        #     deregistration_delay = 30
-        #     health_check = {
-        #       enabled             = true
-        #       interval            = 30
-        #       healthy_threshold   = 3
-        #       matcher             = "200-399"
-        #       path                = "/"
-        #       port                = 443
-        #       timeout             = 5
-        #       unhealthy_threshold = 5
-        #     }
-        #     stickiness = {
-        #       enabled = true
-        #       type    = "lb_cookie"
-        #     }
-        #   }
-        # }
-      }
-      public = {
-        load_balancer_type       = "network"
-        internal_lb              = false
-        enable_delete_protection = false
-        existing_target_groups   = {}
-        idle_timeout             = 60 # 60 is default
-        security_groups          = [] #["public"] Security groups are not supported for load balancers with type 'network'
-        public_subnets           = module.environment.subnets["public"].ids
-        tags                     = local.tags
-
-        listeners = {
-          https = {
-            port                      = 443
-            protocol                  = "HTTPS"
-            ssl_policy                = "ELBSecurityPolicy-2016-08"
-            certificate_names_or_arns = ["application_environment_wildcard_cert"]
-            default_action = {
-              type = "forward"
-              #target_group_name = "private-lb-web-https-443" change to this one when it exists
-              target_group_name = "t2-${local.application_name}-web-http-8080"
+        lb_target_groups = {
+          https-443 = {
+            port                 = 443
+            protocol             = "HTTPS"
+            target_type          = "alb"
+            deregistration_delay = 30
+            health_check = {
+              enabled             = true
+              interval            = 30
+              healthy_threshold   = 3
+              matcher             = "200-399"
+              path                = "/"
+              port                = 443
+              timeout             = 5
+              unhealthy_threshold = 5
             }
-            rules = {
-              t2-web-http-8080 = {
-                priority = 100
-                actions = [{
-                  type              = "forward"
-                  #target_group_name = "private-lb-web-https-443" change to this one when it exists
-                  target_group_name = "t2-${local.application_name}-web-http-8080"
-                }]
-                conditions = [
-                  {
-                    host_header = {
-                      values = [
-                        "web.t2.${module.environment.domains.public.application_environment}", # web.t2.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk
-                        "t2.${module.environment.domains.public.application_environment}",     #    web.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk
-                      ]
-                    }
-                  }
-                ]
-              }
+            stickiness = {
+              enabled = true
+              type    = "lb_cookie"
             }
           }
         }
       }
-
     }
+
     # The following zones can be found on azure:
     # az.justice.gov.uk
     # oasys.service.justice.gov.uk
@@ -167,31 +148,31 @@ locals {
       #
       # public
       #
-      "t2.${local.application_name}.service.justice.gov.uk" = {
-        lb_alias_records = [
-          { name = "web", type = "A", lbs_map_key = "public" }, # web.t2.oasys.service.justice.gov.uk # need to add an ns record to oasys.service.justice.gov.uk -> t2, 
-          { name = "db", type = "A", lbs_map_key = "public" }, # db.t2.oasys.service.justice.gov.uk currently pointing to azure db T2ODL0009
-        ]
-      }
-      "t1.${local.application_name}.service.justice.gov.uk" = {
-        lb_alias_records = [
-          { name = "web", type = "A", lbs_map_key = "public" }, # web.t1.oasys.service.justice.gov.uk # need to add an ns record to oasys.service.justice.gov.uk -> t1, 
-          { name = "db", type = "A", lbs_map_key = "public" },
-        ]
-      }
+      # "t2.${local.application_name}.service.justice.gov.uk" = {
+      #   lb_alias_records = [
+      #     { name = "web", type = "A", lbs_map_key = "public" }, # web.t2.oasys.service.justice.gov.uk # need to add an ns record to oasys.service.justice.gov.uk -> t2, 
+      #     { name = "db", type = "A", lbs_map_key = "public" },  # db.t2.oasys.service.justice.gov.uk currently pointing to azure db T2ODL0009
+      #   ]
+      # }
+      # "t1.${local.application_name}.service.justice.gov.uk" = {
+      #   lb_alias_records = [
+      #     { name = "web", type = "A", lbs_map_key = "public" }, # web.t1.oasys.service.justice.gov.uk # need to add an ns record to oasys.service.justice.gov.uk -> t1, 
+      #     { name = "db", type = "A", lbs_map_key = "public" },
+      #   ]
+      # }
       (module.environment.domains.public.business_unit_environment) = { # hmpps-test.modernisation-platform.service.justice.gov.uk
-        lb_alias_records = [
-          { name = "t2.${local.application_name}", type = "A", lbs_map_key = "public" },     # t2.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk
-          { name = "web.t2.${local.application_name}", type = "A", lbs_map_key = "public" }, # web.t2.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk
-          { name = "db.t2.${local.application_name}", type = "A", lbs_map_key = "public" },
-          { name = "db.t1.${local.application_name}", type = "A", lbs_map_key = "public" },
-        ]
+        # lb_alias_records = [
+        #   { name = "t2.${local.application_name}", type = "A", lbs_map_key = "public" },     # t2.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk
+        #   { name = "web.t2.${local.application_name}", type = "A", lbs_map_key = "public" }, # web.t2.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk
+        #   { name = "db.t2.${local.application_name}", type = "A", lbs_map_key = "public" },
+        #   { name = "db.t1.${local.application_name}", type = "A", lbs_map_key = "public" },
+        # ]
       }
       #
       # internal/private
       #
       (module.environment.domains.internal.business_unit_environment) = { # hmpps-test.modernisation-platform.internal
-        vpc = {                                                              # this makes it a private hosted zone
+        vpc = {                                                           # this makes it a private hosted zone
           id = module.environment.vpc.id
         }
         records = [
@@ -199,10 +180,10 @@ locals {
           { name = "db.t1.${local.application_name}", type = "A", ttl = "300", records = ["10.101.6.132"] },  # db.t1.oasys.hmpps-test.modernisation-platform.internal currently pointing to azure db T1ODL0007
         ]
         lb_alias_records = [
-          { name = "t2.${local.application_name}", type = "A", lbs_map_key = "public" },
-          { name = "web.t2.${local.application_name}", type = "A", lbs_map_key = "public" },
-          { name = "t1.${local.application_name}", type = "A", lbs_map_key = "public" },
-          { name = "web.t1.${local.application_name}", type = "A", lbs_map_key = "public" },
+          # { name = "t2.${local.application_name}", type = "A", lbs_map_key = "public" },
+          # { name = "web.t2.${local.application_name}", type = "A", lbs_map_key = "public" },
+          # { name = "t1.${local.application_name}", type = "A", lbs_map_key = "public" },
+          # { name = "web.t1.${local.application_name}", type = "A", lbs_map_key = "public" },
         ]
       }
     }
