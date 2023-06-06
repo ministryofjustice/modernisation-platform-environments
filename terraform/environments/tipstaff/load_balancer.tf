@@ -4,7 +4,15 @@ resource "aws_security_group" "tipstaff_lb_sc" {
   vpc_id      = data.aws_vpc.shared.id
 
   ingress {
-    description = "allow access on HTTPS for the MOJ VPN"
+    description = "allow access for http"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = [local.application_data.accounts[local.environment].moj_ip]
+  }
+
+  ingress {
+    description = "allow access for https"
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
@@ -75,6 +83,10 @@ resource "aws_lb_listener" "tipstaff_lb_1" {
 }
 
 resource "aws_lb_listener" "tipstaff_lb_2" {
+  depends_on = [
+    aws_acm_certificate.external
+  ]
+  # certificate_arn   = aws_acm_certificate.external.arn
   certificate_arn   = local.is-production ? aws_acm_certificate.external_prod[0].arn : aws_acm_certificate.external.arn
   load_balancer_arn = aws_lb.tipstaff_lb.arn
   port              = local.application_data.accounts[local.environment].server_port_2

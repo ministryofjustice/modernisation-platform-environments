@@ -239,6 +239,5 @@ resource "aws_security_group" "ecs_service" {
 }
 
 resource "aws_ecr_repository" "tipstaff-ecr-repo" {
-  name          = "tipstaff-ecr-repo"
-  force_delete  = true
+  name = "tipstaff-ecr-repo"
 }
