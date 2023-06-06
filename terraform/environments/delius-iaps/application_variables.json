@@ -26,6 +26,7 @@
     },
     "preproduction": {
       "short_environment_name": "preprod",
+      "db_snapshot_identifier": "kms-key-correction",
       "db_auto_minor_version_upgrade": "false",
       "db_allow_major_version_upgrade": "false",
       "db_apply_immediately": "false",

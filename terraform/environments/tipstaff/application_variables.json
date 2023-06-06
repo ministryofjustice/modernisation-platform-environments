@@ -8,7 +8,7 @@
       "allocated_storage": "20",
       "storage_type": "gp2",
       "engine": "postgres",
-      "engine_version": "14.4",
+      "engine_version": "10.21",
       "instance_class": "db.t3.micro",
       "server_port_1": "80",
       "lb_listener_protocol_1": "HTTP",
@@ -33,7 +33,7 @@
       "allocated_storage": "20",
       "storage_type": "gp2",
       "engine": "postgres",
-      "engine_version": "14.4",
+      "engine_version": "10.21",
       "instance_class": "db.t3.micro",
       "server_port_1": "80",
       "lb_listener_protocol_1": "HTTP",
@@ -55,7 +55,7 @@
       "allocated_storage": "20",
       "storage_type": "gp2",
       "engine": "postgres",
-      "engine_version": "14.4",
+      "engine_version": "10.21",
       "instance_class": "db.t3.micro",
       "server_port_1": "80",
       "lb_listener_protocol_1": "HTTP",
@@ -66,7 +66,7 @@
       "support_team": "DTS Legacy Apps Support Team",
       "support_email": "dts-legacy-apps-support-team@hmcts.net",
       "rds_port": "5432",
-      "domain_name": "service.justice.gov.uk",
+      "domain_name": "tipstaff.service.justice.gov.uk",
       "tactical_products_db_secrets_arn": "arn:aws:secretsmanager:eu-west-2:017977998587:secret:tactical-products-db-secrets-EDIqYI"
     }
   }

@@ -64,17 +64,72 @@ resource "aws_cloudwatch_metric_alarm" "in_service_instances_below_threshold" {
   }
 }
 
+// Nginx Alarms
+resource "aws_cloudwatch_log_metric_filter" "nginx_connect_error" {
+  name           = "NginxConnectError"
+  pattern        = "\"[error]\" \"connect() failed\""
+  log_group_name = aws_cloudwatch_log_group.cloudwatch_agent_log_groups["error.log"].name
+
+  metric_transformation {
+    name      = "NginxConnectError"
+    namespace = "IAPS"
+    value     = 1
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "nginx_connect_error" {
+  alarm_name          = "${local.application_name}-high-nginx-connect-error-count"
+  alarm_description   = "Triggers alarm if there are consistent upstream connection errors"
+  namespace           = "IAPS"
+  metric_name         = "NginxConnectError"
+  statistic           = "Sum"
+  period              = "300"
+  evaluation_periods  = "1"
+  alarm_actions       = [aws_sns_topic.iaps_alerting.arn]
+  ok_actions          = [aws_sns_topic.iaps_alerting.arn]
+  threshold           = "3"
+  treat_missing_data  = "missing"
+  comparison_operator = "GreaterThanThreshold"
+}
+
+// Delius Interface Alarms
+resource "aws_cloudwatch_log_metric_filter" "interface_low_level_error" {
+  name           = "IapsNDeliusInterfaceLowLevelError"
+  pattern        = "\"LOW LEVEL ERROR - WAIT for 50 seconds\""
+  log_group_name = aws_cloudwatch_log_group.cloudwatch_agent_log_groups["ndinterface/xmltransfer.log"].name
+
+  metric_transformation {
+    name      = "NDeliusInterfaceLowLevelError"
+    namespace = "IAPS"
+    value     = 1
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "interface_low_level_error" {
+  alarm_name          = "${local.application_name}-high-ndelius-interface-low-level-errors"
+  alarm_description   = "Triggers alarm if there are consistent NDelius Interface low level errors"
+  namespace           = "IAPS"
+  metric_name         = "NDeliusInterfaceLowLevelError"
+  statistic           = "Sum"
+  period              = "180"
+  evaluation_periods  = "1"
+  alarm_actions       = [aws_sns_topic.iaps_alerting.arn]
+  ok_actions          = [aws_sns_topic.iaps_alerting.arn]
+  threshold           = "3"
+  treat_missing_data  = "missing"
+  comparison_operator = "GreaterThanThreshold"
+}
 
 // RDS Alarms
 resource "aws_cloudwatch_metric_alarm" "rds_cpu_utilization_over_threshold" {
   alarm_name          = "${local.application_name}-rds-cpu-utilization-over-threshold"
   comparison_operator = "GreaterThanOrEqualToThreshold"
-  evaluation_periods  = "2"
+  evaluation_periods  = "3"
   metric_name         = "CPUUtilization"
   namespace           = "AWS/RDS"
-  period              = "300"
+  period              = "180"
   statistic           = "Average"
-  threshold           = "80"
+  threshold           = "90"
   alarm_description   = "This metric monitors CPU utilization for the RDS instance"
   alarm_actions       = [aws_sns_topic.iaps_alerting.arn]
   ok_actions          = [aws_sns_topic.iaps_alerting.arn]
@@ -116,14 +171,17 @@ data "aws_secretsmanager_secret_version" "pagerduty_integration_keys" {
 # Add a local to get the keys
 locals {
   pagerduty_integration_keys = jsondecode(data.aws_secretsmanager_secret_version.pagerduty_integration_keys.secret_string)
+  integration_key_lookup     = local.is-production ? "iaps_prod_alarms" : "iaps_nonprod_alarms"
 }
 
 # link the sns topic to the service
+# Non-Prod alerts channel: #hmpps-iaps-alerts-non-prod
+# Prod alerts channel:     #hmpps-iaps-alerts-prod
 module "pagerduty_core_alerts" {
   depends_on = [
     aws_sns_topic.iaps_alerting
   ]
   source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v1.0.0"
   sns_topics                = [aws_sns_topic.iaps_alerting.name]
-  pagerduty_integration_key = local.pagerduty_integration_keys["iaps_nonprod_alarms"]
+  pagerduty_integration_key = local.pagerduty_integration_keys[local.integration_key_lookup]
 }

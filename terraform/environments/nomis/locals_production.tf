@@ -93,10 +93,10 @@ locals {
 
       prod-nomis-db-2 = merge(local.database_ec2_a, {
         tags = merge(local.database_ec2_a.tags, {
-          nomis-environment        = "prod"
-          description              = "Production NOMIS MIS and Audit database to replace Azure PDPDL00036 and PDPDL00038"
-          oracle-sids              = "CNMAUD"
-          fixngo-connection-target = "10.40.0.136"
+          nomis-environment         = "prod"
+          description               = "Production NOMIS MIS and Audit database to replace Azure PDPDL00036 and PDPDL00038"
+          oracle-sids               = "CNMAUD"
+          fixngo-connection-targets = "10.40.0.136 4903 10.40.129.79 22" # fixngo connection alarm
         })
         instance = merge(local.database_ec2_a.instance, {
           instance_type = "r6i.2xlarge"
