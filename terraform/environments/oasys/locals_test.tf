@@ -91,23 +91,22 @@ locals {
             certificate_names_or_arns = ["t2_${local.application_name}_cert"]
             default_action = {
               type = "forward"
-              target_group_name = "t2-${local.application_name}-web-http-8080"
+              target_group_name = "t2-${local.application_name}-web-a-http-8080"
             }
             rules = {
               t2-web-http-8080 = {
                 priority = 100
                 actions = [{
                   type              = "forward"
-                  target_group_name = "t2-${local.application_name}-web-http-8080"
+                  target_group_name = "t2-${local.application_name}-web-a-http-8080"
                 }]
                 conditions = [
                   {
                     host_header = {
                       values = [
-                        "web.t2.${module.environment.domains.public.application_environment}", # web.t2.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk
-                        "t2.${module.environment.domains.public.application_environment}",     #    web.oasys.hmpps-test.modernisation-platform.service.justice.gov.uk
-                        "web.t2.${local.application_name}.${module.environment.domains.internal.business_unit_environment}", # web.t2.oasys.hmpps-test.modernisation-platform.internal
-                        "t2.${local.application_name}.${module.environment.domains.internal.business_unit_environment}",     #    web.oasys.hmpps-test.modernisation-platform.internal
+                        "t2.oasys.service.justice.gov.uk",
+                        "*.t2.oasys.service.justice.gov.uk",
+                        "t2-oasys.hmpp-azdt.justice.gov.uk",
                       ]
                     }
                   }
